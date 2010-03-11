@@ -28,9 +28,6 @@
 #include "font.h"
 #include "sprintf.h"
 #include "storage.h"
-#ifndef BOOTLOADER
-#include "action.h"
-#endif
 #ifdef IPOD_NANO2G
 #include "power.h"
 #include "pmu-target.h"
@@ -40,23 +37,18 @@
 /*  Skeleton for adding target specific debug info to the debug menu
  */
 
-#define _DEBUG_PRINTF(a,varargs...) do { \
-        snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf); \
-        } while(0)
+#define _DEBUG_PRINTF(a, varargs...) lcd_putsf(0, line++, (a), ##varargs);
 
 extern int lcd_type;
 extern uint32_t nand_type[4];
 
 bool __dbg_hw_info(void)
 {
-    char buf[50];
     int line;
     int i;
 #ifdef IPOD_NANO2G
-#ifndef BOOTLOADER
     unsigned int state = 0;
     const unsigned int max_states=2;
-#endif
     int nand_bank_count;
     struct storage_info info;
     const struct nand_device_info_type *nand_devicetype[4];
@@ -72,9 +64,7 @@ bool __dbg_hw_info(void)
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
-#ifndef BOOTLOADER
     state=0;
-#endif
     while(1)
     {
         lcd_clear_display();
@@ -83,10 +73,8 @@ bool __dbg_hw_info(void)
         /* _DEBUG_PRINTF statements can be added here to show debug info */
 #ifdef IPOD_NANO2G
 
-#ifndef BOOTLOADER
         if(state == 0)
         {
-#endif
             _DEBUG_PRINTF("CPU:");
             _DEBUG_PRINTF("current_tick: %d", (unsigned int)current_tick);
             line++;
@@ -109,7 +97,6 @@ bool __dbg_hw_info(void)
             _DEBUG_PRINTF("sectors: %d", info.num_sectors);
             _DEBUG_PRINTF("sector size: %d", info.sector_size);
             _DEBUG_PRINTF("last disk activity: %d", (unsigned int)nand_last_disk_activity());
-#ifndef BOOTLOADER
         }
         else if(state==1)
         {
@@ -144,32 +131,30 @@ bool __dbg_hw_info(void)
         {
             state=0;
         }
-#endif
 
 #else
         _DEBUG_PRINTF("__dbg_hw_info");
 #endif
 
         lcd_update(); 
-#ifndef BOOTLOADER
-        switch(get_action(CONTEXT_STD,HZ/20))
+        switch(button_get_w_tmo(HZ/20))
         {
-            case ACTION_STD_PREV:
+            case BUTTON_SCROLL_FWD:
                 if(state!=0) state--;
                 break;
 
-            case ACTION_STD_NEXT:
+            case BUTTON_SCROLL_BACK:
                 if(state!=max_states-1)
                 {
                     state++;
                 }
                 break;
 
-            case ACTION_STD_CANCEL:
+            case DEBUG_CANCEL:
+            case BUTTON_REL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-#endif
     }
 
     lcd_setfont(FONT_UI);
@@ -178,7 +163,6 @@ bool __dbg_hw_info(void)
 
 bool __dbg_ports(void)
 {
-    char buf[32];
     int line;
 
     lcd_setfont(FONT_SYSFIXED);

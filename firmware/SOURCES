@@ -1422,24 +1422,25 @@ target/arm/s5l8700/udacodec-meizu.c
 
 #ifdef IPOD_NANO2G
 #ifndef SIMULATOR
-drivers/audio/wm8975.c
-target/arm/usb-s3c6400x.c
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/kernel-s5l8700.c
-target/arm/s5l8700/wmcodec-s5l8700.c
-target/arm/s5l8700/pcm-s5l8700.c
-target/arm/s5l8700/adc-s5l8700.c
-target/arm/s5l8700/debug-s5l8700.c
 target/arm/s5l8700/dma-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
 target/arm/s5l8700/ipodnano2g/powermgmt-nano2g.c
 target/arm/s5l8700/ipodnano2g/power-nano2g.c
-target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
 target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
+#ifndef BOOTLOADER
+drivers/audio/wm8975.c
+target/arm/usb-s3c6400x.c
+target/arm/s5l8700/wmcodec-s5l8700.c
+target/arm/s5l8700/pcm-s5l8700.c
+target/arm/s5l8700/ipodnano2g/audio-nano2g.c
+target/arm/s5l8700/debug-s5l8700.c
+#endif
 #endif
 #endif
 
