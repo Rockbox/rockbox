@@ -4596,6 +4596,7 @@
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4607,6 +4608,7 @@
     gigabeatfx: "POWER = 返回"
     mrobe100: "DISPLAY = 返回"
     gigabeats: "BACK = 返回"
+    vibe500: "CANCEL = 返回"
   </dest>
   <voice>
     *: none
@@ -4697,14 +4699,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "硬碟已滿, 按下 OFF 繼續."
     iriverh100,iriverh120,iriverh300: "硬碟已滿, 按下 STOP 繼續."
     iaudiom5,iaudiox5: "硬碟已滿, 按下 POWER 繼續."
-    sansae200*,sansac200*: "硬碟已滿, 按下 PREV 繼續."
+    sansae200*,sansac200*,vibe500: "硬碟已滿, 按下 PREV 繼續."
   </dest>
   <voice>
     *: none
@@ -4877,6 +4879,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4884,6 +4887,7 @@
     ipod*: "SELECT=設定 MENU=取消"
     iriverh10,iriverh10_5gb: "SELECT=設定 PREV=取消"
     gigabeats: "SELECT=設定 POWER=取消"
+    vibe500: "OK=設定 C=取消"
   </dest>
   <voice>
     *: none
@@ -7411,7 +7415,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -7420,7 +7424,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP: 離開"
     ipod*: "PLAY/PAUSE: 離開"
     iaudiox5,iaudiom5: "長按PLAY: 離開"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV: 離開"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: 離開"
     gigabeats: "BACK: 離開"
     gigabeatfx: "POWER: 離開"
   </dest>
@@ -8759,14 +8763,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "建立資料庫... 找到 %d 項 (OFF: 回上一畫面)"
     iriverh100,iriverh120,iriverh300: "建立資料庫... 找到 %d 項 (STOP: 回上一畫面)"
     ipod*: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -9335,12 +9339,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = 是"
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = 是"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = 是"
   </dest>
   <voice>
     *: ""
@@ -9358,12 +9364,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = 設定"
+    vibe500: "OK = 設定"
   </dest>
   <voice>
     *: none

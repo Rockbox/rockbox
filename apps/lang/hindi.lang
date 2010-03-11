@@ -235,12 +235,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "बजाना = हां"
     iriverh100,iriverh120,iriverh300: "NAVI = हां"
     ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "चुन = हां"
     archosplayer: "(बजाना/रोक)"
+    vibe500: "OK = हां"
   </dest>
   <voice>
     *: ""
@@ -1270,14 +1272,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
     iriverh100,iriverh120,iriverh300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
     ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
     iaudiox5,iaudiom5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2133,12 +2135,14 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=लगा OFF=बंद"
     ipod*: "SELECT=लगा MENU=बंद"
     iriverh10,iriverh10_5gb: "SELECT=लगा PREV=बंद"
+    vibe500: "OK=लगा C=बंद"
   </dest>
   <voice>
     *: none
@@ -4046,14 +4050,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "दिसक भरी ह. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
     iaudiom5,iaudiox5: "दिसक भरी ह. Press POWER to continue."
-    sansae200*,sansac200*: "दिसक भरी ह. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "दिसक भरी ह. Press PREV to continue."
   </dest>
   <voice>
     *: none

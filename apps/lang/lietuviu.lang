@@ -336,12 +336,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Taip"
     iriverh100,iriverh120,iriverh300: "NAVI = Taip"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Taip"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Taip"
   </dest>
   <voice>
     *: ""
@@ -2457,14 +2459,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Kuriama duomenų bazė... %d rasta (OFF grįžimui)"
     iriverh100,iriverh120,iriverh300: "Kuriama duomenų bazė... %d rasta (STOP grįžimui)"
     ipod*: "Kuriama duomenų bazė... %d rasta (PREV grįžimui)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Kuriama duomenų bazė... %d rasta (LEFT grįžimui)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Kuriama duomenų bazė... %d rasta (PREV to grįžimui)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Kuriama duomenų bazė... %d rasta (PREV to grįžimui)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -4217,12 +4219,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Nustatyti"
     iriverh100,iriverh120,iriverh300: "NAVI = Nustatyti"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Nustatyti"
+    vibe500: "OK = Nustatyti"
   </dest>
   <voice>
     *: none
@@ -4243,6 +4247,7 @@
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4254,6 +4259,7 @@
     gigabeatfx: "POWER = Atstatyti"
     mrobe100: "DISPLAY = Atstatyti"
     gigabeats: "BACK = Atstatyti"
+    vibe500: "CANCEL = Atstatyti"
   </dest>
   <voice>
     *: none
@@ -4781,6 +4787,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4788,6 +4795,7 @@
     ipod*: "SELECT=Nustatyti MENU=Atšaukti"
     iriverh10,iriverh10_5gb: "SELECT=Nustatyti PREV=Atšaukti"
     gigabeats: "SELECT=Nustatyti POWER=Atšaukti"
+    vibe500: "OK=Nustatyti C=Atšaukti"
   </dest>
   <voice>
     *: none
@@ -8388,14 +8396,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Diskas pilnas. Spauskite OFF."
     iriverh100,iriverh120,iriverh300: "Diskas pilnas. Spauskite STOP."
     iaudiom5,iaudiox5: "Diskas pilnas. Spauskite POWER."
-    sansae200*,sansac200*: "Diskas pilnas. Spauskite PREV."
+    sansae200*,sansac200*,vibe500: "Diskas pilnas. Spauskite PREV."
   </dest>
   <voice>
     *: none
@@ -8490,7 +8498,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8499,7 +8507,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP atšaukimui"
     ipod*: "PLAY/PAUSE atšaukimui"
     iaudiox5,iaudiom5: "Ilgas PLAY atšaukimui"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV atšaukimui"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV atšaukimui"
     gigabeats: "BACK atšaukimui"
     gigabeatfx: "POWER atšaukimui"
   </dest>

@@ -4874,6 +4874,7 @@
     iriverh10,iriverh10_5gb: "SELECT = Set"
     gigabeatfx: "SELECT = Set"
     sansae200*,sansac200*: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: "ON muutmiseks"
@@ -4883,6 +4884,7 @@
     iriverh10,iriverh10_5gb: "SELECT muutmiseks"
     gigabeatfx: "SELECT muutmiseks"
     sansae200*,sansac200*: "SELECT muutmiseks"
+    vibe500: "OK muutmiseks"
   </dest>
   <voice>
     *: ""
@@ -4899,6 +4901,7 @@
     iaudiox5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: "OFF tagasi pöördumiseks"
@@ -4907,6 +4910,7 @@
     iaudiox5: "RECORD tagasi pöördumiseks"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV tagasi pöördumiseks"
     gigabeatfx: "POWER tagasi pöördumiseks"
+    vibe500: "C tagasi pöördumiseks"
   </dest>
   <voice>
     *: ""
@@ -5101,10 +5105,12 @@
   <source>
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </dest>
   <voice>
     *: ""
@@ -5327,10 +5333,12 @@
   <source>
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </dest>
   <voice>
     *: ""
@@ -7880,7 +7888,7 @@
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb: "PREV to abort"
-    sansae200*,sansac200*: "PREV to abort"
+    sansae200*,sansac200*,vibe500: "PREV to abort"
   </source>
   <dest>
     *: "OFF katkestamiseks"
@@ -7888,7 +7896,7 @@
     ipod*: "PLAY/PAUSE katkestamiseks"
     iaudiox5: "Long PLAY katkestamiseks"
     iriverh10,iriverh10_5gb: "PREV katkestamiseks"
-    sansae200*,sansac200*: "PREV katkestamiseks"
+    sansae200*,sansac200*,vibe500: "PREV katkestamiseks"
   </dest>
   <voice>
     *: ""

@@ -272,6 +272,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Tak"
@@ -280,6 +281,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Tak"
     mrobe500: "PLAY lub POWER = Tak"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Tak"
   </dest>
   <voice>
     *: ""
@@ -2395,7 +2397,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -2403,7 +2405,7 @@
     iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP żeby wrócić)"
     ipod*: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Budowanie biblioteki... %d znalezionych (LEFT żeby wrócić)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
     gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW żeby wrócić)"
   </dest>
   <voice>
@@ -4159,6 +4161,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -4167,6 +4170,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Ustaw"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Ustaw"
     gogearsa9200:"PLAY = Ustaw"
+    vibe500: "OK = Ustaw"
   </dest>
   <voice>
     *: none
@@ -4189,6 +4193,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4202,6 +4207,7 @@
     mrobe100: "DISPLAY = Przywróć"
     gigabeats: "BACK = Przywróć"
     gogearsa9200: "LEFT = Przywróć"
+    vibe500: "C = Przywróć"
   </dest>
   <voice>
     *: none
@@ -4730,6 +4736,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4737,6 +4744,7 @@
     ipod*: "WYBIERZ=Ustaw MENU=Anuluj"
     iriverh10,iriverh10_5gb: "WYBIERZ=Ustaw COFNIJ=Anuluj"
     gigabeats: "WYBIERZ=Ustaw POWER=Anuluj"
+    vibe500: "OK=Ustaw C=Anuluj"
   </dest>
   <voice>
     *: none
@@ -8341,14 +8349,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Pamięć jest pełna. Wciśnij OFF żeby kontynuować."
     iriverh100,iriverh120,iriverh300: "Pamięć jest pełna. Wciśnij STOP żeby kontynuować."
     iaudiom5,iaudiox5: "Pamięć jest pełna. Wciśnij POWER żeby kontynuować."
-    sansae200*,sansac200*: "Pamięć jest pełna. Wciśnij PREV żeby kontynuować."
+    sansae200*,sansac200*,vibe500: "Pamięć jest pełna. Wciśnij PREV żeby kontynuować."
   </dest>
   <voice>
     *: none
@@ -8442,7 +8450,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8451,7 +8459,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP = Anuluj"
     ipod*: "PLAY/PAUSE = Anuluj"
     iaudiox5,iaudiom5: "Przytrzymaj PLAY = Anuluj"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV = Anuluj"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV = Anuluj"
     gigabeats: "BACK = Anuluj"
     gigabeatfx: "POWER = Anuluj"
   </dest>

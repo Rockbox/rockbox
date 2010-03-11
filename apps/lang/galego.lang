@@ -3582,9 +3582,11 @@
   user: core
   <source>
     *: "ON To Set"
+    vibe500: "OK To Set"
   </source>
   <dest>
     *: "ON para cambiar"
+    vibe500: "OK para cambiar"
   </dest>
   <voice>
     *: ""
@@ -3596,9 +3598,11 @@
   user: core
   <source>
     *: "OFF To Revert"
+    vibe500: "CANCEL To Revert"
   </source>
   <dest>
     *: "OFf para anular"
+    vibe500: "CANCEL para anular"
   </dest>
   <voice>
     *: ""
@@ -3988,9 +3992,11 @@
   user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=Acepta OFF=Anula"
+    vibe500: "OK=Acepta C=Anula"
   </dest>
   <voice>
     *: ""
@@ -6256,9 +6262,11 @@
   user: core
   <source>
     *: "OFF to abort"
+    vibe500: "PREV to abort"
   </source>
   <dest>
     *: "OFF para abortar"
+    vibe500: "PREV para abortar"
   </dest>
   <voice>
     *: ""
@@ -7226,9 +7234,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "O disco esta cheo. Presionar OFF para continuar."
+    vibe500: "O disco esta cheo. Presionar PREV para continuar."
   </dest>
   <voice>
     *: ""

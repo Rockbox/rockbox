@@ -4456,9 +4456,11 @@
   user: core
   <source>
     *: "OFF To Revert"
+    vibe500: "CANCEL To Revert"
   </source>
   <dest>
     *: "OFF Por Malvalidigi"
+    vibe500: "C Por Malvalidigi"
   </dest>
   <voice>
     *: ""
@@ -4876,9 +4878,11 @@
   user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "LEGI=Validigi OFF=Malvalidigi"
+    vibe500: "OK=Validigi C=Malvalidigi"
   </dest>
   <voice>
     *: ""
@@ -7424,9 +7428,11 @@
   user: core
   <source>
     *: "OFF to abort"
+    vibe500: "PREV to abort"
   </source>
   <dest>
     *: "OFF por malfari"
+    vibe500: "PREV por malfari"
   </dest>
   <voice>
     *: ""
@@ -8726,9 +8732,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "Durdisko plena. Pesu OFF por kontinui."
+    vibe500: "Durdisko plena. Pesu PREV por kontinui."
   </dest>
   <voice>
     *: ""

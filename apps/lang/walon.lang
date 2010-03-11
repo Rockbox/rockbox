@@ -269,6 +269,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Oyi"
@@ -277,6 +278,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Oyi"
     mrobe500: "PLAY or POWER = Oyi"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Oyi"
   </dest>
   <voice>
     *: ""
@@ -2392,7 +2394,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -2400,7 +2402,7 @@
     iriverh100,iriverh120,iriverh300: "Bastixhaedje del båze di dnêyes... %d di trovés (STOP po-z eraler en erî)"
     ipod*: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Bastixhaedje del båze di dnêyes... %d di trovés (LEFT po-z eraler en erî)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
     gogearsa9200: "Bastixhaedje del båze di dnêyes... %d di trovés (REW po-z eraler en erî)"
   </dest>
   <voice>
@@ -4156,6 +4158,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -4164,6 +4167,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Eployî"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Eployî"
     gogearsa9200: "PLAY = Eployî"
+    vibe500: "OK = Eployî"
   </dest>
   <voice>
     *: none
@@ -4186,6 +4190,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4199,6 +4204,7 @@
     mrobe100: "DISPLAY = Rinoncî"
     gigabeats: "BACK = Rinoncî"
     gogearsa9200: "LEFT = Rinoncî"
+    vibe500: "C = Rinoncî"
   </dest>
   <voice>
     *: none
@@ -4727,6 +4733,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4734,6 +4741,7 @@
     ipod*: "SELECT=Set MENU=Rinoncî"
     iriverh10,iriverh10_5gb: "SELECT=Defini PREV=Rinoncî"
     gigabeats: "SELECT=Defini POWER=Rinoncî"
+    vibe500: "OK=Set C=Rinoncî"
   </dest>
   <voice>
     *: none
@@ -8334,14 +8342,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Li plake est plinne. Tchôkîz OFF et tcheryî pus lon."
     iriverh100,iriverh120,iriverh300: "Li plake est plinne. Tchôkîz STOP et tcheryî pus lon."
     iaudiom5,iaudiox5: "Li plake est plinne. Tchôkîz POWER et tcheryî pus lon."
-    sansae200*,sansac200*: "Li plake est plinne. Tchôkîz PREV et tcheryî pus lon."
+    sansae200*,sansac200*,vibe500: "Li plake est plinne. Tchôkîz PREV et tcheryî pus lon."
   </dest>
   <voice>
     *: none
@@ -8436,7 +8444,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8445,7 +8453,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP po-z abandner"
     ipod*: "PLAY/PAUSE po-z abandner"
     iaudiox5,iaudiom5: "Long PLAY po-z abandner"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV po-z abandner"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV po-z abandner"
     gigabeats: "BACK po-z abandner"
     gigabeatfx:"POWER po-z abandner"
   </dest>

@@ -1356,6 +1356,7 @@
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -1367,6 +1368,7 @@
     gigabeatfx: "POWER за отказ"
     mrobe100: "DISPLAY за отказ"
     gigabeats: "BACK за отказ"
+    vibe500: "CANCEL за отказ"
   </dest>
   <voice>
     *: none
@@ -2917,14 +2919,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Изграждане на базата данни...  намерени %d (OFF за връщане)"
     iriverh100,iriverh120,iriverh300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
     ipod*: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -4651,14 +4653,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Дискът е пълен. Натиснете OFF за да продължите."
     iriverh100,iriverh120,iriverh300: "Дискът е пълен. Натиснете STOP за да продължите."
     iaudiom5,iaudiox5: "Дискът е пълен. Натиснете POWER за да продължите."
-    sansae200*,sansac200*: "Дискът е пълен. Натиснете PREV за да продължите."
+    sansae200*,sansac200*,vibe500: "Дискът е пълен. Натиснете PREV за да продължите."
   </dest>
   <voice>
     *: ""
@@ -4990,12 +4992,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Да"
     iriverh100,iriverh120,iriverh300: "NAVI = Да"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Да"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Да"
   </dest>
   <voice>
     *: ""
@@ -5024,12 +5028,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Запази"
     iriverh100,iriverh120,iriverh300: "NAVI = Запази"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Запази"
+    vibe500: "OK = Запази"
   </dest>
   <voice>
     *: none
@@ -5447,14 +5453,14 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
   </source>
   <dest>
     *: "OFF за отказ"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP за отказ"
     ipod*: "PLAY/PAUSE за отказ"
     iaudiox5,iaudiom5: "Продължително PLAY за отказ"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV за отказ"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за отказ"
   </dest>
   <voice>
     *: ""
@@ -11360,6 +11366,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -11367,6 +11374,7 @@
     ipod*: "SELECT=Установяване MENU=Отказ"
     iriverh10,iriverh10_5gb: "SELECT=Установяване PREV=Отказ"
     gigabeats: "SELECT=Установяване POWER=Отказ"
+    vibe500: "OK=Установяване C=Отказ"
   </dest>
   <voice>
     *: none

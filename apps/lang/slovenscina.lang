@@ -2137,9 +2137,11 @@
   user: core
   <source>
     *: "ON To Set"
+    vibe500: "OK To Set"
   </source>
   <dest>
     *: "ON Nastavi"
+    vibe500: "OK Nastavi"
   </dest>
   <voice>
     *: ""
@@ -2151,9 +2153,11 @@
   user: core
   <source>
     *: "OFF To Revert"
+    vibe500: "CANCEL To Revert"
   </source>
   <dest>
     *: "OFF Preklici"
+    vibe500: "C Preklici"
   </dest>
   <voice>
     *: ""
@@ -2305,9 +2309,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "Disk je poln. Pritisni OFF"
+    vibe500: "Disk je poln. Pritisni PREV"
   </dest>
   <voice>
     *: ""
@@ -2375,9 +2381,11 @@
   user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=nastavi OFF=Odpovej"
+    vibe500: "OK=nastavi C=Odpovej"
   </dest>
   <voice>
     *: ""
@@ -3103,9 +3111,11 @@
   user: core
   <source>
     *: "OFF to abort"
+    vibe500: "PREV to abort"
   </source>
   <dest>
     *: "OFF za odpoved"
+    vibe500: "PREV za odpoved"
   </dest>
   <voice>
     *: ""

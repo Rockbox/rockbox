@@ -266,6 +266,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = ใช่"
@@ -274,6 +275,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = ใช่"
     mrobe500: "PLAY, POWER, หรือ มุมบนขวา = ใช่"
     archosplayer: "(เล่น/หยุด)"
+    vibe500: "OK = ใช่"
   </dest>
   <voice>
     *: ""
@@ -2372,7 +2374,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -2380,7 +2382,7 @@
     iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
     ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
     gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (REW เพื่อย้อนกลับ)"
   </dest>
   <voice>
@@ -4119,6 +4121,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -4127,6 +4130,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = ตั้งค่า"
     gogearsa9200: "PLAY = ตั้งค่า"
+    vibe500: "OK = ตั้งค่า"
   </dest>
   <voice>
     *: none
@@ -4148,6 +4152,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4161,6 +4166,7 @@
     mrobe100: "DISPLAY = ยกเลิก"
     gigabeats: "BACK = ยกเลิก"
     gogearsa9200: "LEFT = ยกเลิก"
+    vibe500: "C = ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -4688,6 +4694,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4695,6 +4702,7 @@
     ipod*: "SELECT=ตั้งเวลา MENU=ยกเลิก"
     iriverh10,iriverh10_5gb: "SELECT=ตั้งเวลา PREV=ยกเลิก"
     gigabeats: "SELECT=ตั้งเวลา POWER=ยกเลิก"
+    vibe500: "OK=ตั้งเวลา C=ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -8295,14 +8303,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "ดีสก์เต็ม กดปุ่ม OFF เพื่อทำงานต่อ"
     iriverh100,iriverh120,iriverh300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
     iaudiom5,iaudiox5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
-    sansae200*,sansac200*: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
+    sansae200*,sansac200*,vibe500: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
   </dest>
   <voice>
     *: none
@@ -8397,7 +8405,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8406,7 +8414,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP เพื่อยกเลิก"
     ipod*: "PLAY/PAUSE เพื่อยกเลิก"
     iaudiox5,iaudiom5: "Long PLAY เพื่อยกเลิก"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV เพื่อยกเลิก"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV เพื่อยกเลิก"
     gigabeats: "BACK เพื่อยกเลิก"
     gigabeatfx: "POWER เพื่อยกเลิก"
   </dest>

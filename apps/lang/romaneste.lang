@@ -1523,6 +1523,7 @@
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -1534,6 +1535,7 @@
     gigabeatfx: "POWER pentru anulare"
     mrobe100: "DISPLAY pentru anulare"
     gigabeats: "BACK  pentru anulare"
+    vibe500: "C pentru anulare"
   </dest>
   <voice>
     *: none
@@ -1668,6 +1670,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -1675,6 +1678,7 @@
     ipod*: "SELECT=Setat MENU=Anulare"
     iriverh10,iriverh10_5gb: "SELECT=Setat PREV=Anulare"
     gigabeats: "SELECT=Setat POWER=Anulare"
+    vibe500: "OK=Setat C=Anulare"
   </dest>
   <voice>
     *: none
@@ -3229,14 +3233,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Creare bază de date... %d găsite (OFF pentru revenire)"
     iriverh100,iriverh120,iriverh300: "Creare bază de date... %d găsite (STOP pentru revenire)"
     ipod*: "Creare bază de date... %d găsite (PREV pentru revenire)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Creare bază de date... %d găsite (LEFT pentru revenire)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Creare bază de date... %d găsite (PREV pentru revenire)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Creare bază de date... %d găsite (PREV pentru revenire)"
   </dest>
   <voice>
     *: "intrări găsite pentru baza de date"
@@ -4907,14 +4911,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Discul este plin. Apasati OFF pentru a continua."
     iriverh100,iriverh120,iriverh300: "Discul este plin. Apasati STOP pentru a continua."
     iaudiom5,iaudiox5: "Discul este plin. Apasati POWER pentru a continua."
-    sansae200*,sansac200*: "Discul este plin. Apasati PREV pentru a continua."
+    sansae200*,sansac200*,vibe500: "Discul este plin. Apasati PREV pentru a continua."
   </dest>
   <voice>
     *: none
@@ -5246,12 +5250,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Da"
     iriverh100,iriverh120,iriverh300: "NAVI = Da"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Da"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Da"
   </dest>
   <voice>
     *: ""
@@ -5280,12 +5286,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Setat"
     iriverh100,iriverh120,iriverh300: "NAVI = Setat"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Setat"
+    vibe500: "OK = Setat"
   </dest>
   <voice>
     *: none
@@ -5675,7 +5683,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -5684,7 +5692,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP pentru anulare"
     ipod*: "PLAY/PAUSE pentru anulare"
     iaudiox5,iaudiom5: "PLAY (apasare lunga) pentru anulare"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV pentru anulare"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV pentru anulare"
     gigabeats: "BACK pentru anulare"
     gigabeatfx: "POWER pentru anulare"
   </dest>

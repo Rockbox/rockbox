@@ -264,6 +264,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Igen"
@@ -271,6 +272,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Igen"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Igen"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Igen"
   </dest>
   <voice>
     *: ""
@@ -2368,7 +2370,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -2376,7 +2378,7 @@
     iriverh100,iriverh120,iriverh300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
     ipod*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
     gogearsa9200: "Készítem az adatbázist... %d-t találtam (REW - vissza)"
   </dest>
   <voice>
@@ -4131,6 +4133,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -4139,6 +4142,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Beállít"
     gogearsa9200: "PLAY = Beállít"
+    vibe500: "OK = Beállít"
   </dest>
   <voice>
     *: none
@@ -4160,6 +4164,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4173,6 +4178,7 @@
     mrobe100: "DISPLAY = mégsem"
     gigabeats: "VISSZA = mégsem"
     gogearsa9200: "BAL = mégsem"
+    vibe500: "C = mégsem"
   </dest>
   <voice>
     *: none
@@ -4700,6 +4706,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4707,6 +4714,7 @@
     ipod*: "SELECT=OK MENU=Mégsem"
     iriverh10,iriverh10_5gb: "SELECT=OK PREV=Mégsem"
     gigabeats: "SELECT=OK POWER=Mégsem"
+    vibe500: "OK=OK C=Mégsem"
   </dest>
   <voice>
     *: none
@@ -8306,14 +8314,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "A merevlemez tele van. Folytatáshoz nyomj OFF-ot."
     iriverh100,iriverh120,iriverh300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
     iaudiom5,iaudiox5: "A merevlemez tele van. Folytatáshoz nyomd meg a POWER gombot."
-    sansae200*,sansac200*: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
+    sansae200*,sansac200*,vibe500: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
   </dest>
   <voice>
     *: none
@@ -8408,7 +8416,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8417,7 +8425,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP - megszakít"
     ipod*: "PLAY/PAUSE - megszakít"
     iaudiox5,iaudiom5: "PLAY hosszan - megszakít"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV - megszakít"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV - megszakít"
     gigabeats: "VISSZA - megszakít"
     gigabeatfx: "POWER - megszakít"
   </dest>

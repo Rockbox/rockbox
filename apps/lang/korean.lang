@@ -4605,6 +4605,7 @@
     gigabeatfx: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4616,6 +4617,7 @@
     gigabeatfx: "[전원]: 원상태 복구"
     mrobe100: "[화면]: 원상태 복구"
     gigabeats: "[뒤]: 원상태 복구"
+    vibe500: "C: 원상태 복구"
   </dest>
   <voice>
     *: none
@@ -4715,14 +4717,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press UP to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "디스크 공간이 부족합니다. [끔] 버튼을 누르세요."
     iriverh100,iriverh120,iriverh300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
     iaudiom5,iaudiox5: "디스크 공간이 부족합니다. [전원] 버튼을 누르세요."
-    sansae200*,sansac200*: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
+    sansae200*,sansac200*,vibe500: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
   </dest>
   <voice>
     *: none
@@ -4891,6 +4893,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4898,6 +4901,7 @@
     ipod*: "[선택]: 설정   [메뉴]: 취소"
     iriverh10,iriverh10_5gb: "[선택]: 설정   [이전]: 취소"
     gigabeats: "[선택]: 설정   [꺼짐]: 취소"
+    vibe500: "OK: 설정   C: 취소"
   </dest>
   <voice>
     *: none
@@ -7407,7 +7411,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -7416,7 +7420,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "[정지]: 중지"
     ipod*: "[재생/일시정지]: 중지"
     iaudiox5,iaudiom5: "[재생 길게누름]: 중지"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "[이전]: 중지"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "[이전]: 중지"
     gigabeats: "[뒤]: 중지"
     gigabeatfx: "[전원]: 중지"
   </dest>
@@ -9988,14 +9992,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 돌아가기)"
     iriverh100,iriverh120,iriverh300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
     ipod*: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
   </dest>
   <voice>
     *: "음악 DB의 요소를 찾음"
@@ -10730,12 +10734,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "[재생] = 예"
     iriverh100,iriverh120,iriverh300: "[네비] = 예"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "[선택] = 예"
     archosplayer: "(재생/정지)"
+    vibe500: "OK = 예"
   </dest>
   <voice>
     *: ""
@@ -10750,12 +10756,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "[켬] = 설정"
     iriverh100,iriverh120,iriverh300: "[네비] = 설정"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "[선택] = 설정"
+    vibe500: "OK = 설정"
   </dest>
   <voice>
     *: none

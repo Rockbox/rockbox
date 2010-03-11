@@ -3897,6 +3897,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -3910,6 +3911,7 @@
     mrobe100: "VIS = Fortryd"
     gigabeats: "TILBAGE = Fortryd"
     gogearsa9200: "VENSTRE = Fortryd"
+    vibe500: "C = Fortryd"
   </dest>
   <voice>
     *: none
@@ -3992,14 +3994,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
     iriverh100,iriverh120,iriverh300: "Disken er fuld. Tryk STOP for at fortsætte."
     iaudiom5,iaudiox5: "Disken er fuld. Tryk TÆND/SLUK for at fortsætte."
-    sansae200*,sansac200*: "Disken er fuld. Tryk FORRIGE for at fortsætte."
+    sansae200*,sansac200*,vibe500: "Disken er fuld. Tryk FORRIGE for at fortsætte."
   </dest>
   <voice>
     *: none
@@ -4172,6 +4174,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4179,6 +4182,7 @@
     ipod*: "VÆLG=Sæt MENU=Annuller"
     iriverh10,iriverh10_5gb: "VÆLG=Sæt FORRIGE=Annuller"
     gigabeats: "VÆLG=Sæt TÆND/SLUK=Annuller"
+    vibe500: "OK=Sæt C=Annuller"
   </dest>
   <voice>
     *: none
@@ -6613,7 +6617,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -6622,7 +6626,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP for at afbryde"
     ipod*: "SPIL/PAUSE for at afbryde"
     iaudiox5,iaudiom5: "Lang SPIL for at afbryde"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "FORRIGE for at afbryde"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "FORRIGE for at afbryde"
     gigabeats: "TILBAGE for at afbryde"
     gigabeatfx: "TÆND/SLUK for at afbryde"
   </dest>
@@ -9319,7 +9323,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -9327,7 +9331,7 @@
     iriverh100,iriverh120,iriverh300: "Bygger database... %d fundet (STOP for at stoppe)"
     ipod*: "Bygger database... %d fundet (FORRIGE for at stoppe)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Bygger database... %d fundet (FORRIGE for at stoppe)"
     gogearsa9200: "Bygger database... %d fundet (SPOL TILBAGE for at stoppe)"
   </dest>
   <voice>
@@ -10559,6 +10563,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "SPIL = Ja"
@@ -10567,6 +10572,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "VÆLG = Ja"
     mrobe500: "SPIL, TÆND/SLUK eller top-højre = Ja"
     archosplayer: "(SPIL/STOP)"
+    vibe500: "OK = Ja"
   </dest>
   <voice>
     *: ""
@@ -10583,6 +10589,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -10591,6 +10598,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Indstil"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "VÆLG = Indstil"
     gogearsa9200: "SPIL = Indstil"
+    vibe500: "OK = Indstil"
   </dest>
   <voice>
     *: none

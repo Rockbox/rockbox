@@ -3777,9 +3777,11 @@
   user: core
   <source>
     *: "ON To Set"
+    vibe500: "OK To Set"
   </source>
   <dest>
     *: "À til að stilla"
+    vibe500: "OK til að stilla"
   </dest>
   <voice>
     *: ""
@@ -3791,9 +3793,11 @@
   user: core
   <source>
     *: "OFF To Revert"
+    vibe500: "CANCEL To Revert"
   </source>
   <dest>
     *: "AF till að hætta við"
+    vibe500: "C till að hætta við"
   </dest>
   <voice>
     *: ""
@@ -3959,9 +3963,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "Harðidiskurin er fullur. Ýtið á AF til að halda áfram"
+    vibe500: "Harðidiskurin er fullur. Ýtið á PREV til að halda áfram"
   </dest>
   <voice>
     *: ""
@@ -4183,9 +4189,11 @@
   user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=Vista OFF=Hætta við"
+    vibe500: "OK=Vista C=Hætta við"
   </dest>
   <voice>
     *: ""
@@ -6507,9 +6515,11 @@
   user: core
   <source>
     *: "OFF to abort"
+    vibe500: "PREV to abort"
   </source>
   <dest>
     *: "AF til að slíta vinnslu"
+    vibe500: "PREV til að slíta vinnslu"
   </dest>
   <voice>
     *: ""

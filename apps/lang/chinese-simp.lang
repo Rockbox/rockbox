@@ -4596,6 +4596,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4609,6 +4610,7 @@
     mrobe100: "DISPLAY:取消"
     gigabeats: "BACK:取消"
     gogearsa9200: "LEFT:取消"
+    vibe500: "CANCEL:取消"
   </dest>
   <voice>
     *: none
@@ -4691,14 +4693,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "磁盘已满，按下OFF继续."
     iriverh100,iriverh120,iriverh300: "磁盘已满，按下STOP继续."
     iaudiom5,iaudiox5: "磁盘已满，按下POWER继续."
-    sansae200*,sansac200*: "磁盘，按下PREV继续."
+    sansae200*,sansac200*,vibe500: "磁盘，按下PREV继续."
   </dest>
   <voice>
     *: none
@@ -4867,6 +4869,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4874,6 +4877,7 @@
     ipod*: "SELECT=设置 MENU=取消"
     iriverh10,iriverh10_5gb: "SELECT=设置 PREV=取消"
     gigabeats: "SELECT=设置 POWER=取消"
+    vibe500: "OK=设置 C=取消"
   </dest>
   <voice>
    *: none
@@ -7401,7 +7405,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -7410,7 +7414,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "按STOP键取消"
     ipod*: "按PLAY/PAUSE键取消"
     iaudiox5,iaudiom5: "长按PLAY键取消"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "按PREV键取消"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "按PREV键取消"
     gigabeats: "按BACK键取消"
     gigabeatfx: "按POWER键取消"
   </dest>
@@ -8783,7 +8787,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -8791,7 +8795,7 @@
     iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP键返回)"
     ipod*: "数据库更新中...已找到%d个(按PREV键返回)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT键返回)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "数据库更新中...已找到%d个(按PREV键返回)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "数据库更新中...已找到%d个(按PREV键返回)"
     gogearsa9200: "数据库更新中...已找到%d个(按REW键返回)"
   </dest>
   <voice>
@@ -9358,6 +9362,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY:是"
@@ -9366,6 +9371,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT:是"
     mrobe500: "PLAY,POWER或TOP-RIGHT:是"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK:是"
   </dest>
   <voice>
     *: ""
@@ -9382,6 +9388,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -9390,6 +9397,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT:设置"
     gogearsa9200: "PLAY:设置"
+    vibe500: "OK:设置"
   </dest>
   <voice>
     *: none

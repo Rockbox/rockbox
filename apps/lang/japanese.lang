@@ -271,6 +271,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = はい"
@@ -279,6 +280,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = はい"
     mrobe500: "PLAY または POWER, top-right = はい"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = はい"
   </dest>
   <voice>
     *: ""
@@ -2394,7 +2396,7 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
@@ -2402,7 +2404,7 @@
     iriverh100,iriverh120,iriverh300: "データベース構築中... %d 件 (STOPで戻る)"
     ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "データベース構築中... %d 件 (左で戻る)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*: "データベース構築中... %d 件 (PREVで戻る)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "データベース構築中... %d 件 (PREVで戻る)"
     gogearsa9200: "データベース構築中... %d 件 (REWで戻る)"
   </dest>
   <voice>
@@ -4158,6 +4160,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
@@ -4166,6 +4169,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = 設定"
     gogearsa9200: "PLAY = 設定"
+    vibe500: "OK = 設定"
   </dest>
   <voice>
     *: none
@@ -4188,6 +4192,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4201,6 +4206,7 @@
     mrobe100: "DISPLAY = 元に戻す"
     gigabeats: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
+    vibe500: "CANCEL = 元に戻す"
   </dest>
   <voice>
     *: none
@@ -4729,6 +4735,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4736,6 +4743,7 @@
     ipod*: "SELECT=設定 MENU=キャンセル"
     iriverh10,iriverh10_5gb: "SELECT=設定 PREV=キャンセル"
     gigabeats: "SELECT=設定 POWER=キャンセル"
+    vibe500: "OK=設定 C=キャンセル"
   </dest>
   <voice>
     *: none
@@ -8336,14 +8344,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press PREV to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "ディスクが一杯です. OFFボタンを押してください"
     iriverh100,iriverh120,iriverh300: "ディスクが一杯です. STOPボタンを押してください"
     iaudiom5,iaudiox5: "ディスクが一杯です. POWERボタンを押してください"
-    sansae200*,sansac200*: "ディスクが一杯です. PREVボタンを押してください"
+    sansae200*,sansac200*,vibe500: "ディスクが一杯です. PREVボタンを押してください"
   </dest>
   <voice>
     *: none
@@ -8438,7 +8446,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
   </source>
@@ -8447,7 +8455,7 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP: キャンセル"
     ipod*: "PLAY/PAUSE: キャンセル"
     iaudiox5,iaudiom5: "Long PLAY: キャンセル"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV: キャンセル"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: キャンセル"
     gigabeats: "BACK: キャンセル"
     gigabeatfx: "POWER: キャンセル"
   </dest>

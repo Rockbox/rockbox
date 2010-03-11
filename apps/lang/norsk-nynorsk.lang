@@ -4525,6 +4525,7 @@
     gigabeatfx: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
@@ -4536,6 +4537,7 @@
     gigabeatfx: "A = tilbakestill"
     mrobe100: "VIS = tilbakestill"
     gigabeats: "TILBAKE = tilbakestill"
+    vibe500: "C = tilbakestill"
   </dest>
   <voice>
     *: none
@@ -4616,7 +4618,7 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*: "The disk is full. Press UP to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
@@ -4786,6 +4788,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4793,6 +4796,7 @@
     ipod*: "VEL = vel  – MENY = avbryt"
     iriverh10,iriverh10_5gb: "VEL = vel – TILBAKE = avbryt"
     gigabeats: "VEL = vel – PÅ/AV = avbryt"
+    vibe500: "OK = vel – C = avbryt"
   </dest>
   <voice>
     *: none
@@ -7284,14 +7288,14 @@
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryta"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOPP for å avbryta"
     ipod*: "SPEL/PAUSE for å avbryta"
     iaudiox5,iaudiom5: "SPEL (lenge) for å avbryta"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: "TILBAKE for å avbryta"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "TILBAKE for å avbryta"
   </dest>
   <voice>
     *: ""
@@ -9691,14 +9695,14 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Byggjer database … Fann %d. (AV for å gå tilbake.)"
     iriverh100,iriverh120,iriverh300: "Byggjer database … Fann %d. (STOPP for å gå tilbake.)"
     ipod*: "Byggjer database … Fann %d. (SPEL/PAUSE for å gå tilbake.)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Byggjer database … Fann %d. (VENSTRE for å gå tilbake.)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: "Byggjer database … Fann %d. (TILBAKE for å gå tilbake.)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Byggjer database … Fann %d. (TILBAKE for å gå tilbake.)"
   </dest>
   <voice>
     *: "oppføringar funne til databasen"
@@ -10230,12 +10234,14 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "SPEL = ja"
     iriverh100,iriverh120,iriverh300: "NAVI = ja"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "VEL = ja"
     archosplayer: "(SPEL/STOPP)"
+    vibe500: "OK = ja"
   </dest>
   <voice>
     *: ""
@@ -10250,12 +10256,14 @@
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "PÅ = vel"
     iriverh100,iriverh120,iriverh300: "NAVI = vel"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "VEL = ja"
+    vibe500: "OK = vel"
   </dest>
   <voice>
     *: none
