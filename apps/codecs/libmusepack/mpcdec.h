@@ -47,34 +47,23 @@
 extern "C" {
 #endif
 
-#ifndef IBSS_ATTR_MPC_LARGE_IRAM
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
-/* PP5022/24 and MCF5250 have 128KB of IRAM */
-#define IBSS_ATTR_MPC_LARGE_IRAM IBSS_ATTR
-#else
-/* other PP's and MCF5249 have 96KB of IRAM */
-#define IBSS_ATTR_MPC_LARGE_IRAM
-#endif
-#endif
-
-#ifndef ICODE_ATTR_MPC_LARGE_IRAM
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
-/* PP5022/24 have 128KB of IRAM and have better performance with ICODE_ATTR */
-#define ICODE_ATTR_MPC_LARGE_IRAM ICODE_ATTR
-#else
-/* all other targets either haven't enough IRAM or performance suffers */
+#if   (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
+/* Enough IRAM but performance suffers with ICODE_ATTR. */
+#define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_MPC_LARGE_IRAM
-#endif
-#endif
-
-#ifndef ICONST_ATTR_MPC_LARGE_IRAM
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
-/* PP5022/24 and MCF5250 have 128KB of IRAM */
 #define ICONST_ATTR_MPC_LARGE_IRAM ICONST_ATTR
+
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+/* Enough IRAM to move additional data and code to it. */
+#define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
+#define ICODE_ATTR_MPC_LARGE_IRAM  ICODE_ATTR
+#define ICONST_ATTR_MPC_LARGE_IRAM ICONST_ATTR
+
 #else
-/* other PP's and MCF5249 have 96KB of IRAM */
+/* Not enough IRAM available. */
+#define IBSS_ATTR_MPC_LARGE_IRAM
+#define ICODE_ATTR_MPC_LARGE_IRAM
 #define ICONST_ATTR_MPC_LARGE_IRAM
-#endif
 #endif
 
 enum {
