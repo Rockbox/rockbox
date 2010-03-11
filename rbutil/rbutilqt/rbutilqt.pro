@@ -29,14 +29,6 @@ RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
 
 message("Rockbox Base dir: "$$RBBASE_DIR)
 
-# check for system speex. Add a custom rule for pre-building librbspeex if not
-# found. Newer versions of speex are split up into libspeex and libspeexdsp,
-# and some distributions package them separately. Check for both and fall back
-# to librbspeex if not found.
-LIBSPEEX = $$system(pkg-config --silence-errors --libs speex speexdsp)
-!static:!isEmpty(LIBSPEEX) {
-    LIBS += $$LIBSPEEX
-}
 # custom rules for rockbox-specific libs
 !mac {
     RBLIBPOSTFIX = .a
@@ -186,6 +178,17 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 DEPENDPATH = $$INCLUDEPATH
 
 LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lucl
+
+# check for system speex. Add a custom rule for pre-building librbspeex if not
+# found. Newer versions of speex are split up into libspeex and libspeexdsp,
+# and some distributions package them separately. Check for both and fall back
+# to librbspeex if not found.
+# NOTE: keep this after -lrbspeex, otherwise linker errors occur if the linker
+# defaults to --as-needed (see http://www.gentoo.org/proj/en/qa/asneeded.xml)
+LIBSPEEX = $$system(pkg-config --silence-errors --libs speex speexdsp)
+!static:!isEmpty(LIBSPEEX) {
+    LIBS += $$LIBSPEEX
+}
 
 TEMPLATE = app
 dbg {
