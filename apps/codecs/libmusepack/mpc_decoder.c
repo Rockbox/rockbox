@@ -115,10 +115,12 @@ enum
 //------------------------------------------------------------------------------
 // forward declarations
 //------------------------------------------------------------------------------
-void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r);
+void mpc_decoder_requantisierung   (mpc_decoder *d) 
+                                    ICODE_ATTR_MPC_LARGE_IRAM;
+void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r) 
+                                    ICODE_ATTR_MPC_LARGE_IRAM;
 void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
                                     mpc_bool_t is_key_frame);
-static void mpc_decoder_requantisierung(mpc_decoder *d);
 
 /**
  * set the scf indexes for seeking use
