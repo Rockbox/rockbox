@@ -1436,10 +1436,11 @@ target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
 #ifndef BOOTLOADER
 drivers/audio/wm8975.c
 target/arm/usb-s3c6400x.c
-target/arm/s5l8700/wmcodec-s5l8700.c
-target/arm/s5l8700/pcm-s5l8700.c
-target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/debug-s5l8700.c
+target/arm/s5l8700/pcm-s5l8700.c
+target/arm/s5l8700/wmcodec-s5l8700.c
+target/arm/s5l8700/ipodnano2g/audio-nano2g.c
+target/arm/s5l8700/ipodnano2g/adc-nano2g.c
 #endif
 #endif
 #endif
