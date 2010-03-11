@@ -57,12 +57,20 @@
  * optimal, except for sd devices that apparently don't gain anything from
  * double-buffering
  */
+#ifdef USB_READ_BUFFER_SIZE
+#define READ_BUFFER_SIZE USB_READ_BUFFER_SIZE
+#else
 #define READ_BUFFER_SIZE (1024*64)
+#endif
 
+#ifdef USB_WRITE_BUFFER_SIZE
+#define WRITE_BUFFER_SIZE USB_WRITE_BUFFER_SIZE
+#else
 #if (CONFIG_STORAGE & STORAGE_SD)
 #define WRITE_BUFFER_SIZE (1024*64)
 #else
 #define WRITE_BUFFER_SIZE (1024*24)
+#endif
 #endif
 
 #define ALLOCATE_BUFFER_SIZE (2*MAX(READ_BUFFER_SIZE,WRITE_BUFFER_SIZE))
