@@ -60,7 +60,7 @@
 
 /** globals **/
 
-static int lcd_type;
+int lcd_type; /* also needed in debug-s5l8700.c */
 static int xoffset; /* needed for flip */
 
 /** hardware access functions */
