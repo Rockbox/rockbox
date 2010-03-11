@@ -139,11 +139,11 @@ bool __dbg_hw_info(void)
         lcd_update(); 
         switch(button_get_w_tmo(HZ/20))
         {
-            case BUTTON_SCROLL_FWD:
+            case BUTTON_SCROLL_BACK:
                 if(state!=0) state--;
                 break;
 
-            case BUTTON_SCROLL_BACK:
+            case BUTTON_SCROLL_FWD:
                 if(state!=max_states-1)
                 {
                     state++;
