@@ -43,7 +43,7 @@
 
 #define CLK_PLLA             0
 #define CLK_PLLB             1
-#define CLK_922T             2
+#define CLK_PROC             2
 #define CLK_FCLK             3
 #define CLK_EXTMEM           4
 #define CLK_PCLK             5
@@ -81,9 +81,10 @@ static inline unsigned read_cp15 (void)
 
 static int calc_freq(int clk)
 {
-    int out_div;
     unsigned int prediv = ((unsigned int)CGU_PROC>>2) & 0x3;
     unsigned int postdiv = ((unsigned int)CGU_PROC>>4) & 0xf;
+#if CONFIG_CPU == AS3525
+    int out_div;
 
     switch(clk) {
         /* clk_main = clk_int = 24MHz oscillator */
@@ -111,7 +112,17 @@ static int calc_freq(int clk)
                 return ((2 * (CGU_PLLB & 0xff))*CLK_MAIN)/
                                                (((CGU_PLLB>>8) & 0x1f)*out_div);
             return 0;
-        case CLK_922T:
+#else
+    /* AS3525v2  */
+    switch(clk) {
+        /*  we're using a known setting for PLLA = 240 MHz and PLLB inop  */
+        case CLK_PLLA:
+            return 240000000;
+
+        case CLK_PLLB:
+            return 0;
+#endif
+        case CLK_PROC:
             if (!(read_cp15()>>30))                 /* fastbus */
                 return calc_freq(CLK_PCLK);
             else                                    /* Synch or Asynch bus*/
@@ -181,6 +192,7 @@ static int calc_freq(int clk)
             }
         case CLK_DBOP:
             return calc_freq(CLK_PCLK)/((CGU_DBOP & 7)+1);
+#if CONFIG_CPU == AS3525
         case CLK_SD_MCLK_NAND:
             if(!(MCI_NAND & (1<<8)))
                 return 0;
@@ -195,6 +207,7 @@ static int calc_freq(int clk)
                 return calc_freq(CLK_PCLK);
             else
             return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)+1)*2);
+#endif
         case CLK_USB:
             switch(CGU_USB & 3) {     /* 0-> div=1  other->div=1/(2*n)  */
                 case 0:
@@ -223,10 +236,12 @@ static int calc_freq(int clk)
 bool __dbg_hw_info(void)
 {
     int line;
+#if CONFIG_CPU == AS3525
     int last_nand = 0;
 #ifdef HAVE_MULTIDRIVE
     int last_sd = 0;
 #endif
+#endif /* CONFIG_CPU == AS3525 */
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
@@ -238,15 +253,23 @@ bool __dbg_hw_info(void)
         lcd_clear_display();
         line = 0;
         lcd_puts(0, line++, "[Clock Frequencies:]");
-        lcd_puts(0, line++, "      SET       ACTUAL");
+        lcd_puts(0, line++, "     SET       ACTUAL");
+#if CONFIG_CPU == AS3525
         lcd_putsf(0, line++, "922T:%s     %3dMHz",
+#else
+        lcd_putsf(0, line++, "926ejs:%s   %3dMHz",
+#endif
                                         (!(read_cp15()>>30)) ? "FAST " :
                                         (read_cp15()>>31) ? "ASYNC" : "SYNC ",
-                                         calc_freq(CLK_922T)/1000000);
+                                         calc_freq(CLK_PROC)/1000000);
         lcd_putsf(0, line++, "PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
                                                    calc_freq(CLK_PLLA)/1000000);
         lcd_putsf(0, line++, "PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
         lcd_putsf(0, line++, "FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
+        lcd_putsf(0, line++, "DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+                                                 calc_freq(CLK_EXTMEM)/1000000);
+        lcd_putsf(0, line++, "PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
+                                                   calc_freq(CLK_PCLK)/1000000);
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -262,10 +285,6 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        lcd_putsf(0, line++, "DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                 calc_freq(CLK_EXTMEM)/1000000);
-        lcd_putsf(0, line++, "PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                   calc_freq(CLK_PCLK)/1000000);
         lcd_putsf(0, line++, "IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
                                                     calc_freq(CLK_IDE)/1000000);
         lcd_putsf(0, line++, "DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
@@ -274,24 +293,9 @@ bool __dbg_hw_info(void)
                                                        calc_freq(CLK_I2C)/1000);
         lcd_putsf(0, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
                                    "on " : "off" , calc_freq(CLK_I2SI)/1000000);
-
-#if LCD_HEIGHT < 176  /* clip  */
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
-        }
-        while(1)
-        {
-        lcd_clear_display();
-        line = 0;
-#endif  /*  LCD_HEIGHT < 176 */
-
         lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
                                     "on " : "off", calc_freq(CLK_I2SO)/1000000);
-
+#if CONFIG_CPU == AS3525
         /* If disabled, enable SD cards so we can read the registers */
         if(sd_enabled == false)
         {
@@ -313,7 +317,23 @@ bool __dbg_hw_info(void)
             ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
+#endif  /* CONFIG_CPU == AS3525 */
         lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
+
+#if LCD_HEIGHT < 176  /* clip  */
+        lcd_update();
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
+        while(1)
+        {
+        lcd_clear_display();
+        line = 0;
+#endif  /*  LCD_HEIGHT < 176 */
+
         lcd_putsf(0, line++, "MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
                                         " on" : "off", adc_read(ADC_CVDD) * 25);
         lcd_putsf(0, line++, "Icache:%s Dcache:%s",
@@ -338,6 +358,8 @@ bool __dbg_hw_info(void)
         lcd_putsf(0, line++, "CGU_PERI  :%8x", (unsigned int)(CGU_PERI));
         lcd_putsf(0, line++, "CGU_IDE   :%8x", (unsigned int)(CGU_IDE));
         lcd_putsf(0, line++, "CGU_DBOP  :%8x", (unsigned int)(CGU_DBOP));
+        lcd_putsf(0, line++, "CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
+        lcd_putsf(0, line++, "CGU_USB   :%8x", (unsigned int)(CGU_USB));
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -353,12 +375,12 @@ bool __dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        lcd_putsf(0, line++, "CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
-        lcd_putsf(0, line++, "CGU_USB   :%8x", (unsigned int)(CGU_USB));
         lcd_putsf(0, line++, "I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 |
                                                        I2C2_CPSR0));
+#if CONFIG_CPU == AS3525
         lcd_putsf(0, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
         lcd_putsf(0, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));
+#endif
 
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);
