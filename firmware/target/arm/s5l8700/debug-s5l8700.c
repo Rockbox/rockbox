@@ -28,7 +28,9 @@
 #include "font.h"
 #include "sprintf.h"
 #include "storage.h"
+#ifndef BOOTLOADER
 #include "action.h"
+#endif
 #ifdef IPOD_NANO2G
 #include "power.h"
 #include "pmu-target.h"
@@ -51,8 +53,10 @@ bool __dbg_hw_info(void)
     int line;
     int i;
 #ifdef IPOD_NANO2G
-    unsigned int state;
+#ifndef BOOTLOADER
+    unsigned int state = 0;
     const unsigned int max_states=2;
+#endif
     int nand_bank_count;
     struct storage_info info;
     const struct nand_device_info_type *nand_devicetype[4];
@@ -63,14 +67,14 @@ bool __dbg_hw_info(void)
         nand_devicetype[i] = nand_get_device_type(i);
 	if(nand_devicetype[i] != NULL) nand_bank_count++;
     }
-    state=0;
 #endif
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
+#ifndef BOOTLOADER
     state=0;
-
+#endif
     while(1)
     {
         lcd_clear_display();
@@ -79,8 +83,10 @@ bool __dbg_hw_info(void)
         /* _DEBUG_PRINTF statements can be added here to show debug info */
 #ifdef IPOD_NANO2G
 
+#ifndef BOOTLOADER
         if(state == 0)
         {
+#endif
             _DEBUG_PRINTF("CPU:");
             _DEBUG_PRINTF("current_tick: %d", (unsigned int)current_tick);
             line++;
@@ -103,6 +109,7 @@ bool __dbg_hw_info(void)
             _DEBUG_PRINTF("sectors: %d", info.num_sectors);
             _DEBUG_PRINTF("sector size: %d", info.sector_size);
             _DEBUG_PRINTF("last disk activity: %d", (unsigned int)nand_last_disk_activity());
+#ifndef BOOTLOADER
         }
         else if(state==1)
         {
@@ -137,12 +144,14 @@ bool __dbg_hw_info(void)
         {
             state=0;
         }
+#endif
 
 #else
         _DEBUG_PRINTF("__dbg_hw_info");
 #endif
 
         lcd_update(); 
+#ifndef BOOTLOADER
         switch(get_action(CONTEXT_STD,HZ/20))
         {
             case ACTION_STD_PREV:
@@ -160,6 +169,7 @@ bool __dbg_hw_info(void)
                 lcd_setfont(FONT_UI);
                 return false;
         }
+#endif
     }
 
     lcd_setfont(FONT_UI);
