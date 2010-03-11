@@ -32,7 +32,8 @@ class TTSCarbon : public TTSBase
     //! Enum to identify the settings
     enum ConfigValuesCarbon
     {
-        ConfigVoice
+        ConfigVoice,
+        ConfigSpeed
     };
     public:
         TTSCarbon(QObject *parent = NULL);

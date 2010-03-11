@@ -24,6 +24,7 @@
 #include "rbsettings.h"
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <ApplicationServices/ApplicationServices.h>
 #include <Carbon/Carbon.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -81,6 +82,10 @@ bool TTSCarbon::start(QString *errStr)
 
     error = NewSpeechChannel(vspecref, &m_channel);
     //SetSpeechInfo(channel, soSpeechDoneCallBack, speechDone);
+    Fixed rate = (Fixed)(0x10000 * RbSettings::subValue("carbon",
+                                    RbSettings::TtsSpeed).toInt());
+    if(rate != 0)
+        SetSpeechRate(m_channel, rate);
     return (error == 0) ? true : false;
 }
 
@@ -125,6 +130,12 @@ void TTSCarbon::generateSettings(void)
         tr("Voice:"), voice, voiceNames, EncTtsSetting::eNOBTN);
     insertSetting(ConfigVoice, setting);
 
+    // speed
+    int speed = RbSettings::subValue("carbon", RbSettings::TtsSpeed).toInt();
+    setting = new EncTtsSetting(this, EncTtsSetting::eINT,
+                                tr("Speed (words/min):"), speed, 80, 500,
+                                EncTtsSetting::eNOBTN);
+    insertSetting(ConfigSpeed, setting);
 }
 
 
@@ -133,6 +144,8 @@ void TTSCarbon::saveSettings(void)
     // save settings in user config
     RbSettings::setSubValue("carbon", RbSettings::TtsVoice,
                             getSetting(ConfigVoice)->current().toString());
+    RbSettings::setSubValue("carbon", RbSettings::TtsSpeed,
+                            getSetting(ConfigSpeed)->current().toInt());
     RbSettings::sync();
 }
 
