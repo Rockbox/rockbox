@@ -12688,15 +12688,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -12705,15 +12705,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </voice>
 </phrase>
 <phrase>
@@ -12722,15 +12722,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </dest>
   <voice>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </voice>
 </phrase>
 <phrase>
@@ -12739,15 +12739,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </voice>
 </phrase>
 <phrase>

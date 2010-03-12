@@ -30,6 +30,7 @@
 #include "usb_core.h"
 #ifdef USB_ENABLE_HID
 #include "usb_keymaps.h"
+#include "sprintf.h"
 #endif
 #endif
 #include "settings.h"
@@ -211,9 +212,13 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 #ifdef USB_ENABLE_HID
             if (usb_hid)
             {
+                char modestring[100];
                 screen->set_viewport(&usb_screen_vps->title);
                 usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
-                screen->puts_scroll(0, 0, str(keypad_mode_name_get()));
+                snprintf(modestring, sizeof(modestring), "%s: %s",
+                        str(LANG_USB_KEYPAD_MODE),
+                        str(keypad_mode_name_get()));
+                screen->puts_scroll(0, 0, modestring);
             }
 #endif /* USB_ENABLE_HID */
         }
