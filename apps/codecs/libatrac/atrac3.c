@@ -797,11 +797,11 @@ static int addTonalComponents (int32_t *pSpectrum, int numComponents, tonal_comp
  * @param y     second input point
  * @param s     index of interpolation point (0..7)
  */
- 
-/*
-#define INTERPOLATE(x, y, s)    ((x*ONE_16) + fixmul16(((s*ONE_16)>>3), (((x) - (y))*ONE_16)))
+
+/* rockbox: Not used anymore. Faster version defined below.
+#define INTERPOLATE_FP16(x, y, s)    ((x) + fixmul16(((s*ONE_16)>>3), (((y) - (x)))))
 */
-#define INTERPOLATE(x, y, s)    ((((x)<<3) + s*((y)-(x)))<<13)
+#define INTERPOLATE_FP16(x, y, s)    ((x) + ((s*((y)-(x)))>>3))
 
 static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pCurrCode)
 {
@@ -825,7 +825,7 @@ static void reverseMatrixing(int32_t *su1, int32_t *su2, int *pPrevCode, int *pC
             for(; nsample < 8; nsample++) {
                 c1 = su1[band+nsample];
                 c2 = su2[band+nsample];
-                c2 = fixmul16(c1, INTERPOLATE(mc1_l, mc2_l, nsample)) + fixmul16(c2, INTERPOLATE(mc1_r, mc2_r, nsample));
+                c2 = fixmul16(c1, INTERPOLATE_FP16(mc1_l, mc2_l, nsample)) + fixmul16(c2, INTERPOLATE_FP16(mc1_r, mc2_r, nsample));
                 su1[band+nsample] = c2;
                 su2[band+nsample] = (c1 << 1) - c2;
             }
@@ -891,8 +891,8 @@ static void channelWeighting (int32_t *su1, int32_t *su2, int *p3)
         for(band = 1; band < 4; band++) {
             /* scale the channels by the weights */
             for(nsample = 0; nsample < 8; nsample++) {
-                su1[band*256+nsample] = fixmul16(su1[band*256+nsample], INTERPOLATE(w[0][0], w[0][1], nsample));
-                su2[band*256+nsample] = fixmul16(su2[band*256+nsample], INTERPOLATE(w[1][0], w[1][1], nsample));
+                su1[band*256+nsample] = fixmul16(su1[band*256+nsample], INTERPOLATE_FP16(w[0][0], w[0][1], nsample));
+                su2[band*256+nsample] = fixmul16(su2[band*256+nsample], INTERPOLATE_FP16(w[1][0], w[1][1], nsample));
             }
 
             for(; nsample < 256; nsample++) {
