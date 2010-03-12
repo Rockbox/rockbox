@@ -1266,8 +1266,6 @@ uint32_t ftl_erase_block_internal(uint32_t block)
     block = block + (*ftl_nand_type).blocks
           - (*ftl_nand_type).userblocks - 0x17;
     if (block == 0 || block >= (*ftl_nand_type).blocks) return 1;
-    uint32_t pblock[4];
-    uint32_t differs = 0;
     for (i = 0; i < ftl_banks; i++)
     {
         if (ftl_vfl_check_remap_scheduled(i, block) == 1)
@@ -1276,38 +1274,29 @@ uint32_t ftl_erase_block_internal(uint32_t block)
             ftl_vfl_mark_remap_done(i, block);
         }
         ftl_vfl_log_success(i, block);
-        pblock[i] = ftl_vfl_get_physical_block(i, block);
-        if (pblock[i] != pblock[0]) differs = 1;
-    }
-    uint32_t res = 0xf;
-    if (!differs)
-        res = nand_block_erase_fast(pblock[0] * (*ftl_nand_type).pagesperblock);
-    if (!res) return 0;
-    for (i = 0; i < ftl_banks; i++)
-        if (res & (1 << i))
+        uint32_t pblock = ftl_vfl_get_physical_block(i, block);
+        uint32_t rc;
+        for (j = 0; j < 3; j++)
         {
-            uint32_t rc;
-            for (j = 0; j < 3; j++)
-            {
-                rc = nand_block_erase(i, pblock[i] * (*ftl_nand_type).pagesperblock);
-                if (rc == 0) break;
-            }
-            if (rc != 0)
-            {
-                panicf("FTL: Block erase failed on bank %u block %u",
-                       (unsigned)i, (unsigned)block);
-                if (pblock[i] != block)
-                {
-                    uint32_t spareindex = pblock[i] - ftl_vfl_cxt[i].firstspare;
-                    ftl_vfl_cxt[i].remaptable[spareindex] = 0xFFFF;
-                }
-                ftl_vfl_cxt[i].field_18++;
-                if (ftl_vfl_remap_block(i, block) == 0) return 1;
-                if (ftl_vfl_commit_cxt(i) != 0) return 1;
-                memset(&ftl_sparebuffer[0], 0, 0x40);
-                nand_write_page(i, pblock[i], &ftl_vfl_cxt[0], &ftl_sparebuffer[0], 1);
-            }
+            rc = nand_block_erase(i, pblock * (*ftl_nand_type).pagesperblock);
+            if (rc == 0) break;
         }
+        if (rc != 0)
+        {
+            panicf("FTL: Block erase failed on bank %u block %u",
+                   (unsigned)i, (unsigned)block);
+            if (pblock != block)
+            {
+                uint32_t spareindex = pblock - ftl_vfl_cxt[i].firstspare;
+                ftl_vfl_cxt[i].remaptable[spareindex] = 0xFFFF;
+            }
+            ftl_vfl_cxt[i].field_18++;
+            if (ftl_vfl_remap_block(i, block) == 0) return 1;
+            if (ftl_vfl_commit_cxt(i) != 0) return 1;
+            memset(&ftl_sparebuffer, 0, 0x40);
+            nand_write_page(i, pblock, &ftl_vfl_cxt[0], &ftl_sparebuffer, 1);
+        }
+    }
     return 0;
 }
 #endif

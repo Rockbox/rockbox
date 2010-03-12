@@ -52,7 +52,6 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
 uint32_t nand_write_page_start(uint32_t bank, uint32_t page, void* databuffer,
                                void* sparebuffer, uint32_t doecc);
 uint32_t nand_write_page_collect(uint32_t bank);
-uint32_t nand_block_erase_fast(uint32_t page);
 
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank);
 uint32_t nand_reset(uint32_t bank);
