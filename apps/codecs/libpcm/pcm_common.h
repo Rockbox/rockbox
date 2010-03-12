@@ -25,8 +25,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-/* decoded pcm sample depth */
-#define PCM_OUTPUT_DEPTH 28
+/* decoded pcm sample depth (sample 28bit + sign 1bit) */
+#define PCM_OUTPUT_DEPTH 29
 
 /* Macro that sign extends an unsigned byte */
 #define SE(x) ((int32_t)((int8_t)(x)))

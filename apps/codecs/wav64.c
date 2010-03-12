@@ -173,7 +173,7 @@ enum codec_status codec_main(void)
     uint64_t size;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
   
 next_track:
     if (codec_init()) {
