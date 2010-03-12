@@ -882,6 +882,10 @@ Lyre prototype 1 */
 //#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */
 
+#if CONFIG_USBOTG == USBOTG_ARC
+#define USB_HAS_ISOCHRONOUS
+#endif
+
 /* define the class drivers to enable */
 #ifdef BOOTLOADER
 
