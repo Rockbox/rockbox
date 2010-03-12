@@ -52,18 +52,24 @@ extern "C" {
 #define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_MPC_LARGE_IRAM
 #define ICONST_ATTR_MPC_LARGE_IRAM ICONST_ATTR
+/* Keep the data arrays of bitsreadr.c in IRAM. */
+#define ICONST_ATTR_MPC_BITSREADER ICONST_ATTR
 
 #elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
 /* Enough IRAM to move additional data and code to it. */
 #define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_MPC_LARGE_IRAM  ICODE_ATTR
 #define ICONST_ATTR_MPC_LARGE_IRAM ICONST_ATTR
+/* Not putting the data arrays of bitsreader.c to IRAM allows to move the
+ * sv7/sv8 bitstream demuxing into IRAM. This config is faster. */
+#define ICONST_ATTR_MPC_BITSREADER
 
 #else
 /* Not enough IRAM available. */
 #define IBSS_ATTR_MPC_LARGE_IRAM
 #define ICODE_ATTR_MPC_LARGE_IRAM
 #define ICONST_ATTR_MPC_LARGE_IRAM
+#define ICONST_ATTR_MPC_BITSREADER
 #endif
 
 enum {

@@ -37,7 +37,7 @@
 #include "huffman.h"
 #include "mpc_bits_reader.h"
 
-const mpc_uint32_t Cnk[MAX_ENUM / 2][MAX_ENUM] =
+const mpc_uint32_t Cnk[MAX_ENUM / 2][MAX_ENUM] ICONST_ATTR_MPC_BITSREADER =
 {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
     {0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, 91, 105, 120, 136, 153, 171, 190, 210, 231, 253, 276, 300, 325, 351, 378, 406, 435, 465},
@@ -57,7 +57,7 @@ const mpc_uint32_t Cnk[MAX_ENUM / 2][MAX_ENUM] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17, 153, 969, 4845, 20349, 74613, 245157, 735471, 2042975, 5311735, 13037895, 30421755, 67863915, 145422675, 300540195}
 };
 
-const mpc_uint8_t Cnk_len[MAX_ENUM / 2][MAX_ENUM] =
+const mpc_uint8_t Cnk_len[MAX_ENUM / 2][MAX_ENUM] ICONST_ATTR_MPC_BITSREADER =
 {
     {0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
     {0, 0, 2, 3, 4, 4, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9},
@@ -78,7 +78,7 @@ const mpc_uint8_t Cnk_len[MAX_ENUM / 2][MAX_ENUM] =
 
 };
 
-const mpc_uint32_t Cnk_lost[MAX_ENUM / 2][MAX_ENUM] =
+const mpc_uint32_t Cnk_lost[MAX_ENUM / 2][MAX_ENUM] ICONST_ATTR_MPC_BITSREADER =
 {
     {0, 0, 1, 0, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
     {0, 0, 1, 2, 6, 1, 11, 4, 28, 19, 9, 62, 50, 37, 23, 8, 120, 103, 85, 66, 46, 25, 3, 236, 212, 187, 161, 134, 106, 77, 47, 16},
@@ -98,10 +98,10 @@ const mpc_uint32_t Cnk_lost[MAX_ENUM / 2][MAX_ENUM] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 103, 55, 3347, 12419, 56459, 16987, 313105, 54177, 3076873, 3739321, 3132677, 66353813, 123012781, 236330717}
 };
 
-static const mpc_uint8_t log2[32] =
+static const mpc_uint8_t log2[32] ICONST_ATTR_MPC_BITSREADER =
 { 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6};
 
-static const mpc_uint8_t log2_lost[32] =
+static const mpc_uint8_t log2_lost[32] ICONST_ATTR_MPC_BITSREADER =
 { 0, 1, 0, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 31};
 
 mpc_int32_t mpc_bits_golomb_dec(mpc_bits_reader * r, const mpc_uint_t k)
