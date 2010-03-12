@@ -83,7 +83,7 @@ next_track:
     
     res =atrac3_decode_init(&q, ci->id3);
     if(res < 0) {
-        DEBUGF("failed to initialize atrac decoder\n");
+        DEBUGF("failed to initialize RM atrac decoder\n");
         return CODEC_ERROR;
     }
 

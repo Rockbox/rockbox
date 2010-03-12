@@ -196,6 +196,8 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
         id3->extradata_size = 14;
         id3->channels = 2;
         id3->codectype = AFMT_OMA_ATRAC3;
+        id3->bytesperframe = fmt->blockalign;
+        
         /* Store the extradata for the codec */
         AV_WL16(&id3->id3v2buf[0],  1);             // always 1
         AV_WL32(&id3->id3v2buf[2],  id3->frequency);// samples rate
@@ -303,7 +305,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
     id3->filesize = filesize(fd);
 
     /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-    if(fmt.formattag != AFMT_OMA_ATRAC3)
+    if(fmt.formattag != WAVE_FORMAT_ATRAC3)
     {
         if (id3->frequency != 0)
             id3->length = ((int64_t) fmt.totalsamples * 1000) / id3->frequency;
