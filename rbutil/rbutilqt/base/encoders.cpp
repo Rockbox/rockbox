@@ -132,8 +132,8 @@ bool EncExes::encode(QString input,QString output)
     execstring.replace("%input",input);
     execstring.replace("%output",output);
     qDebug() << execstring;
-    QProcess::execute(execstring);
-    return true;
+    int result = QProcess::execute(execstring);
+    return (result == 0) ? true : false;
 }
 
 
