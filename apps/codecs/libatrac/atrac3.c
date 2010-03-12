@@ -789,9 +789,9 @@ static int addTonalComponents (int32_t *pSpectrum, int numComponents, tonal_comp
 
 /**
  * Linear equidistant interpolation between two points x and y. 7 interpolation
- * points can be calculated. Result is scaled by <<16.
- * Result for s=0 is x*ONE_16
- * Result for s=8 is y*ONE_16
+ * points can be calculated.
+ * Result for s=0 is x
+ * Result for s=8 is y
  *
  * @param x     first input point
  * @param y     second input point
