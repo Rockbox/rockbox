@@ -32,8 +32,8 @@ CODEC_HEADER
  */
 
 enum {
-    SMAF_TRACK_CHUNK_SCORE = 0, /* Score Track */
-    SMAF_TRACK_CHUNK_AUDIO,     /* PCM Audio Track */
+    SMAF_AUDIO_TRACK_CHUNK = 0, /* PCM Audio Track */
+    SMAF_SCORE_TRACK_CHUNK,     /* Score Track */
 };
 
 /* SMAF supported codec formats */
@@ -44,9 +44,9 @@ enum {
     SMAF_FORMAT_ADPCM,          /* YAMAHA ADPCM */
 };
 
-static int support_formats[2][3] = {
-    {SMAF_FORMAT_SIGNED_PCM, SMAF_FORMAT_UNSIGNED_PCM, SMAF_FORMAT_ADPCM     },
+static const int support_formats[2][3] = {
     {SMAF_FORMAT_SIGNED_PCM, SMAF_FORMAT_ADPCM,        SMAF_FORMAT_UNSUPPORT },
+    {SMAF_FORMAT_SIGNED_PCM, SMAF_FORMAT_UNSIGNED_PCM, SMAF_FORMAT_ADPCM     },
 };
 
 static const struct pcm_entry pcm_codecs[] = {
@@ -57,7 +57,7 @@ static const struct pcm_entry pcm_codecs[] = {
 
 #define NUM_FORMATS 3
 
-static int basebits[4] = { 4, 8, 12, 16 };
+static const int basebits[4] = { 4, 8, 12, 16 };
 
 #define PCM_SAMPLE_SIZE (2048*2)
 
@@ -79,182 +79,242 @@ static const struct pcm_codec *get_codec(uint32_t formattag)
     return 0;
 }
 
-static unsigned int get_be32(uint8_t *buf)
+static unsigned int get_be32(const uint8_t *buf)
 {
     return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 }
 
-static int convert_smaf_audio_format(int track_chunk, unsigned int audio_format)
+static int convert_smaf_channels(unsigned int ch)
 {
-    if (audio_format > 3)
-        return SMAF_FORMAT_UNSUPPORT;
+    return (ch >> 7) + 1;
+}
 
-    return support_formats[track_chunk][audio_format];
+static int convert_smaf_audio_format(unsigned int chunk, unsigned int audio_format)
+{
+    int idx = (audio_format & 0x70) >> 4;
+
+    if (idx < 3)
+        return support_formats[chunk][idx];
+
+    DEBUGF("CODEC_ERROR: unsupport audio format: %d\n", audio_format);
+    return SMAF_FORMAT_UNSUPPORT;
 }
 
 static int convert_smaf_audio_basebit(unsigned int basebit)
 {
-    if (basebit > 4)
-        return 0;
-    return basebits[basebit];
+    if (basebit < 4)
+        return basebits[basebit];
+
+    DEBUGF("CODEC_ERROR: illegal basebit: %d\n", basebit);
+    return 0;
 }
 
-static bool parse_audio_track(struct pcm_format *fmt,
-                              unsigned char **stbuf, unsigned char *endbuf)
+static unsigned int search_chunk(const unsigned char *name, int nlen, off_t *pos)
 {
-    unsigned char *buf = *stbuf;
-    int chunksize;
+    const unsigned char *buf;
+    unsigned int chunksize;
+    size_t size;
 
-    buf += 8;
-    fmt->channels = ((buf[2] & 0x80) >> 7) + 1;
-    fmt->formattag = convert_smaf_audio_format(SMAF_TRACK_CHUNK_AUDIO,
-                                               (buf[2] >> 4) & 0x07);
-    if (fmt->formattag == SMAF_FORMAT_UNSUPPORT)
+    while (true)
     {
-        DEBUGF("CODEC_ERROR: unsupport pcm data format : %d\n", (buf[2] >> 4) & 0x07);
-        return false;
+        buf = ci->request_buffer(&size, 8);
+        if (size < 8)
+            break;
+
+        chunksize = get_be32(buf + 4);
+        ci->advance_buffer(8);
+        *pos += 8;
+        if (memcmp(buf, name, nlen) == 0)
+            return chunksize;
+
+        ci->advance_buffer(chunksize);
+        *pos += chunksize;
     }
-    fmt->bitspersample = convert_smaf_audio_basebit(buf[3] >> 4);
-    if (fmt->bitspersample == 0)
-    {
-        DEBUGF("CODEC_ERROR: unsupport pcm data basebit : %d\n", buf[3] >> 4);
-        return false;
-    }
-    buf += 6;
-    while (buf < endbuf)
-    {
-        chunksize = get_be32(buf + 4) + 8;
-        if (memcmp(buf, "Awa", 3) == 0)
-        {
-            fmt->numbytes = get_be32(buf + 4);
-            buf += 8;
-            return true;
-        }
-        buf += chunksize;
-    }
-    DEBUGF("CODEC_ERROR: smaf does not include stream pcm data\n");
-    return false;
+    DEBUGF("CODEC_ERROR: missing '%s' chunk\n", name);
+    return 0;
 }
 
-static bool parse_score_track(struct pcm_format *fmt,
-                              unsigned char **stbuf, unsigned char *endbuf)
+static bool parse_audio_track(struct pcm_format *fmt, unsigned int chunksize, off_t *pos)
 {
-    unsigned char *buf = *stbuf;
-    int chunksize;
+    const unsigned char *buf;
+    size_t size;
 
-    if (buf[9] != 0x00)
+    /* search PCM Audio Track Chunk */
+    ci->advance_buffer(chunksize);
+    *pos += chunksize;
+    if (search_chunk("ATR", 3, pos) == 0)
     {
-        DEBUGF("CODEC_ERROR: score track chunk unsupport sequence type %d\n", buf[9]);
+        DEBUGF("CODEC_ERROR: missing PCM Audio Track Chunk\n");
         return false;
     }
 
     /*
-     * skip to the next chunk.
-     *    MA-2/MA-3/MA-5: padding 16 bytes
-     *    MA-7:           padding 32 bytes
+     * get format
+     *  buf
+     *    +0: Format Type
+     *    +1: Sequence Type
+     *    +2: bit 7 0:mono/1:stereo, bit 4-6 format, bit 0-3: frequency
+     *    +3: bit 4-7: base bit
+     *    +4: TimeBase_D
+     *    +5: TimeBase_G
+     *
+     * Note: If PCM Audio Track does not include Sequence Data Chunk,
+     *       tmp+6 is the start position of Wave Data Chunk.
      */
-    if (buf[3] < 7)
-        buf += 28;
-    else
-        buf += 44;
-
-    while (buf < endbuf)
+    buf = ci->request_buffer(&size, 6);
+    if (size < 6)
     {
-        chunksize = get_be32(buf + 4) + 8;
-        if (memcmp(buf, "Mtsp", 4) == 0)
-        {
-            buf += 8;
-            if (memcmp(buf, "Mwa", 3) != 0)
-            {
-                DEBUGF("CODEC_ERROR: smaf does not include stream pcm data\n");
-                return false;
-            }
-            fmt->numbytes = get_be32(buf + 4) - 3;
-            fmt->channels = ((buf[8] & 0x80) >> 7) + 1;
-            fmt->formattag = convert_smaf_audio_format(SMAF_TRACK_CHUNK_SCORE,
-                                                       (buf[8] >> 4) & 0x07);
-            if (fmt->formattag == SMAF_FORMAT_UNSUPPORT)
-            {
-                DEBUGF("CODEC_ERROR: unsupport pcm data format : %d\n",
-                                                       (buf[8] >> 4) & 0x07);
-                return false;
-            }
-            fmt->bitspersample = convert_smaf_audio_basebit(buf[8] & 0x0f);
-            if (fmt->bitspersample == 0)
-            {
-                DEBUGF("CODEC_ERROR: unsupport pcm data basebit : %d\n",
-                                                           buf[8] & 0x0f);
-                return false;
-            }
-            buf += 11;
-            return true;
-        }
-        buf += chunksize;
+        DEBUGF("CODEC_ERROR: smaf is too small\n");
+        return false;
     }
 
-    DEBUGF("CODEC_ERROR: smaf does not include stream pcm data\n");
-    return false;
+    fmt->formattag     = convert_smaf_audio_format(SMAF_AUDIO_TRACK_CHUNK, buf[2]);
+    fmt->channels      = convert_smaf_channels(buf[2]);
+    fmt->bitspersample = convert_smaf_audio_basebit(buf[3] >> 4);
+
+    /* search Wave Data Chunk */
+    ci->advance_buffer(6);
+    *pos += 6;
+    fmt->numbytes = search_chunk("Awa", 3, pos);
+    if (fmt->numbytes == 0)
+    {
+        DEBUGF("CODEC_ERROR: missing Wave Data Chunk\n");
+        return false;
+    }
+
+    return true;
 }
 
-static bool parse_header(struct pcm_format *fmt, size_t *pos)
+static bool parse_score_track(struct pcm_format *fmt, off_t *pos)
 {
-    unsigned char *buf, *stbuf, *endbuf;
-    size_t chunksize;
+    const unsigned char *buf;
+    unsigned int chunksize;
+    size_t size;
+
+    /* parse Optional Data Chunk */
+    buf = ci->request_buffer(&size, 13);
+    if (size < 13)
+    {
+        DEBUGF("CODEC_ERROR: smaf is too small\n");
+        return false;
+    }
+
+    if (memcmp(buf + 5, "OPDA", 4) != 0)
+    {
+        DEBUGF("CODEC_ERROR: missing Optional Data Chunk\n");
+        return false;
+    }
+
+    /* Optional Data Chunk size */
+    chunksize = get_be32(buf + 9);
+
+    /* search Score Track Chunk */
+    ci->advance_buffer(13 + chunksize);
+    *pos += (13 + chunksize);
+    if (search_chunk("MTR", 3, pos) == 0)
+    {
+        DEBUGF("CODEC_ERROR: missing Score Track Chunk\n");
+        return false;
+    }
+
+    /*
+     * search next chunk
+     * usually, next chunk ('M***') found within 40 bytes.
+     */
+    buf = ci->request_buffer(&size, 40);
+    if (size < 40)
+    {
+        DEBUGF("CODEC_ERROR: smaf is too small\n");
+        return false;
+    }
+
+    size = 0;
+    while (size < 40 && buf[size] != 'M')
+        size++;
+
+    if (size >= 40)
+    {
+        DEBUGF("CODEC_ERROR: missing Score Track Stream PCM Data Chunk");
+        return false;
+    }
+
+    /* search Score Track Stream PCM Data Chunk */
+    ci->advance_buffer(size);
+    *pos += size;
+    if (search_chunk("Mtsp", 4, pos) == 0)
+    {
+        DEBUGF("CODEC_ERROR: missing Score Track Stream PCM Data Chunk\n");
+        return false;
+    }
+
+    /*
+     * parse Score Track Stream Wave Data Chunk
+     *  buf
+     *    +4-7: chunk size (WaveType(3bytes) + wave data count)
+     *    +8:   bit 7 0:mono/1:stereo, bit 4-6 format, bit 0-3: base bit
+     *    +9:   frequency (MSB)
+     *    +10:  frequency (LSB)
+     */
+    buf = ci->request_buffer(&size, 9);
+    if (size < 9)
+    {
+        DEBUGF("CODEC_ERROR: smaf is too small\n");
+        return false;
+    }
+
+    if (memcmp(buf, "Mwa", 3) != 0)
+    {
+        DEBUGF("CODEC_ERROR: missing Score Track Stream Wave Data Chunk\n");
+        return false;
+    }
+
+    fmt->formattag     = convert_smaf_audio_format(SMAF_SCORE_TRACK_CHUNK, buf[8]);
+    fmt->channels      = convert_smaf_channels(buf[8]);
+    fmt->bitspersample = convert_smaf_audio_basebit(buf[8] & 0xf);
+    fmt->numbytes      = get_be32(buf + 4) - 3;
+
+    *pos += 11;
+    return true;
+}
+
+static bool parse_header(struct pcm_format *fmt, off_t *pos)
+{
+    const unsigned char *buf;
+    unsigned int chunksize;
+    size_t size;
 
     ci->memset(fmt, 0, sizeof(struct pcm_format));
 
-    /* assume the SMAF pcm data position is less than 1024 bytes */
-    stbuf = ci->request_buffer(&chunksize, 1024);
-    if (chunksize < 1024)
-        return false;
-
-    buf = stbuf;
-    endbuf = stbuf + chunksize;
- 
-    if (memcmp(buf, "MMMD", 4) != 0)
+    /* check File Chunk and Contents Info Chunk */
+    buf = ci->request_buffer(&size, 16);
+    if (size < 16)
     {
-        DEBUGF("CODEC_ERROR: does not smaf format %c%c%c%c\n",
-                                  buf[0], buf[1], buf[2], buf[3]);
-        return false;
-    }
-    buf += 8;
-
-    while (buf < endbuf)
-    {
-        chunksize = get_be32(buf + 4) + 8;
-        if (memcmp(buf, "ATR", 3) == 0)
-        {
-            if (!parse_audio_track(fmt, &buf, endbuf))
-                return false;
-            break;
-        }
-        if (memcmp(buf, "MTR", 3) == 0)
-        {
-            if (!parse_score_track(fmt, &buf, endbuf))
-                return false;
-            break;
-        }
-        buf += chunksize;
-    }
-
-    if (buf >= endbuf)
-    {
-        DEBUGF("CODEC_ERROR: unsupported smaf format\n");
+        DEBUGF("CODEC_ERROR: smaf is too small\n");
         return false;
     }
 
-    /* blockalign */
-    if (fmt->formattag == SMAF_FORMAT_SIGNED_PCM ||
-        fmt->formattag == SMAF_FORMAT_UNSIGNED_PCM)
-        fmt->blockalign = fmt->channels * fmt->bitspersample >> 3;
+    if ((memcmp(buf, "MMMD", 4) != 0) || (memcmp(buf + 8, "CNTI", 4) != 0))
+    {
+        DEBUGF("CODEC_ERROR: does not smaf format\n");
+        return false;
+    }
+
+    chunksize = get_be32(buf + 12);
+    ci->advance_buffer(16);
+    *pos = 16;
+    if (chunksize > 5)
+    {
+        if (!parse_audio_track(fmt, chunksize, pos))
+            return false;
+    }
+    else if (!parse_score_track(fmt, pos))
+        return false;
 
     /* data signess (default signed) */
     fmt->is_signed = (fmt->formattag != SMAF_FORMAT_UNSIGNED_PCM);
 
+    /* data is always big endian */
     fmt->is_little_endian = false;
-
-    /* sets pcm data position */
-    *pos = buf - stbuf;
 
     return true;
 }
@@ -297,14 +357,13 @@ next_track:
 
     codec_set_replaygain(ci->id3);
 
-    ci->memset(&format, 0, sizeof(struct pcm_format));
-    format.is_signed = true;
-    format.is_little_endian = false;
+    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    bytesdone = ci->id3->offset;
 
     decodedsamples = 0;
     codec = 0;
 
-    if (!parse_header(&format, &n))
+    if (!parse_header(&format, &firstblockposn))
     {
         status = CODEC_ERROR;
         goto done;
@@ -320,29 +379,6 @@ next_track:
 
     if (!codec->set_format(&format))
     {
-        status = CODEC_ERROR;
-        goto done;
-    }
-
-    /* common format check */
-    if (format.channels == 0) {
-        DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
-        status = CODEC_ERROR;
-        goto done;
-    }
-    if (format.samplesperblock == 0) {
-        DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-wSamplesPerBlock file\n");
-        status = CODEC_ERROR;
-        goto done;
-    }
-    if (format.blockalign == 0)
-    {
-        DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-blockalign file\n");
-        status = CODEC_ERROR;
-        goto done;
-    }
-    if (format.numbytes == 0) {
-        DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
         status = CODEC_ERROR;
         goto done;
     }
@@ -370,12 +406,10 @@ next_track:
         goto done;
     }
 
-    firstblockposn = 1024 - n;
-    ci->advance_buffer(firstblockposn);
+    ci->seek_buffer(firstblockposn);
+    ci->seek_complete();
 
     /* The main decoder loop */
-    bytesdone = 0;
-    ci->set_elapsed(0);
     endofstream = 0;
 
     while (!endofstream) {

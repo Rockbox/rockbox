@@ -82,6 +82,12 @@ static bool set_format(struct pcm_format *format)
 {
     fmt = format;
 
+    if (fmt->channels == 0)
+    {
+        DEBUGF("CODEC_ERROR: channels is 0\n");
+        return false;
+    }
+
     if (fmt->bitspersample != 4)
     {
         DEBUGF("CODEC_ERROR: yamaha adpcm must be 4 bitspersample: %d\n",
