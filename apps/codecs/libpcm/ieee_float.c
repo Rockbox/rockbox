@@ -32,6 +32,12 @@ static bool set_format(struct pcm_format *format)
 {
     fmt = format;
 
+    if (fmt->channels == 0)
+    {
+        DEBUGF("CODEC_ERROR: channels is 0\n");
+        return false;
+    }
+
     if (fmt->bitspersample != 32 && fmt->bitspersample != 64)
     {
         DEBUGF("CODEC_ERROR: ieee float must be 32 or 64 bitspersample: %d\n",
@@ -40,6 +46,10 @@ static bool set_format(struct pcm_format *format)
     }
 
     fmt->bytespersample = fmt->bitspersample >> 3;
+
+    if (fmt->blockalign == 0)
+        fmt->blockalign = fmt->bytespersample * fmt->channels;
+
     fmt->samplesperblock = fmt->blockalign / (fmt->bytespersample * fmt->channels);
 
     /* chunksize = about 1/50[sec] data */

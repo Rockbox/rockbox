@@ -38,6 +38,18 @@ static bool set_format(struct pcm_format *format)
 {
     fmt = format;
 
+    if (fmt->channels == 0)
+    {
+        DEBUGF("CODEC_ERROR: channels is 0\n");
+        return false;
+    }
+
+    if (fmt->bitspersample == 0)
+    {
+        DEBUGF("CODEC_ERROR: bitspersample is 0\n");
+        return false;
+    }
+
     if (fmt->bitspersample > 32)
     {
         DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
@@ -47,8 +59,8 @@ static bool set_format(struct pcm_format *format)
 
     fmt->bytespersample = fmt->bitspersample >> 3;
 
-    if (fmt->totalsamples == 0)
-        fmt->totalsamples = fmt->numbytes/fmt->bytespersample;
+    if (fmt->blockalign == 0)
+        fmt->blockalign = fmt->bytespersample * fmt->channels;
 
     fmt->samplesperblock = fmt->blockalign / (fmt->bytespersample * fmt->channels);
 

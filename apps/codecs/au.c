@@ -45,35 +45,17 @@ enum
     AU_FORMAT_ALAW,          /* G.711 ALAW */
 };
 
-static int support_formats[28][2] = {
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_MULAW,      8  }, /* G.711 MULAW */
-  { AU_FORMAT_PCM,        8  }, /* Linear PCM 8bit (signed) */
-  { AU_FORMAT_PCM,        16 }, /* Linear PCM 16bit (signed, big endian) */
-  { AU_FORMAT_PCM,        24 }, /* Linear PCM 24bit (signed, big endian) */
-  { AU_FORMAT_PCM,        32 }, /* Linear PCM 32bit (signed, big endian) */
-  { AU_FORMAT_IEEE_FLOAT, 32 }, /* Linear PCM float 32bit (signed, big endian) */
-  { AU_FORMAT_IEEE_FLOAT, 64 }, /* Linear PCM float 64bit (signed, big endian) */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* Fragmented sample data */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* DSP program */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 8bit fixed point */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 16bit fixed point */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 24bit fixed point */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 32bit fixed point */
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 16bit linear with emphasis */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 16bit linear compressed */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* 16bit linear with emphasis and compression */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* Music kit DSP commands */
-  { AU_FORMAT_UNSUPPORT,  0  },
-  { AU_FORMAT_UNSUPPORT,  0  }, /* G.721 MULAW */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* G.722 */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* G.723 3bit */
-  { AU_FORMAT_UNSUPPORT,  0  }, /* G.723 5bit */
-  { AU_FORMAT_ALAW,       8  }, /* G.711 ALAW */
+static const char support_formats[9][2] = {
+  { AU_FORMAT_UNSUPPORT,  0  }, /* encoding */
+  { AU_FORMAT_MULAW,      8  }, /* 1:  G.711 MULAW */
+  { AU_FORMAT_PCM,        8  }, /* 2:  Linear PCM 8bit (signed) */
+  { AU_FORMAT_PCM,        16 }, /* 3:  Linear PCM 16bit (signed, big endian) */
+  { AU_FORMAT_PCM,        24 }, /* 4:  Linear PCM 24bit (signed, big endian) */
+  { AU_FORMAT_PCM,        32 }, /* 5:  Linear PCM 32bit (signed, big endian) */
+  { AU_FORMAT_IEEE_FLOAT, 32 }, /* 6:  Linear PCM float 32bit (signed, big endian) */
+  { AU_FORMAT_IEEE_FLOAT, 64 }, /* 7:  Linear PCM float 64bit (signed, big endian) */
+                                /* encoding 8 - 26 unsupported. */
+  { AU_FORMAT_ALAW,       8  }, /* 27: G.711 ALAW */
 };
 
 const struct pcm_entry au_codecs[] = {
@@ -108,15 +90,16 @@ static unsigned int get_be32(uint8_t *buf)
 
 static int convert_au_format(unsigned int encoding, struct pcm_format *fmt)
 {
-    if (encoding > 27)
-    {
-        fmt->formattag = AU_FORMAT_UNSUPPORT;
-        fmt->bitspersample = 0;
-    }
-    else
+    fmt->formattag = AU_FORMAT_UNSUPPORT;
+    if (encoding < 8)
     {
         fmt->formattag = support_formats[encoding][0];
         fmt->bitspersample = support_formats[encoding][1];
+    }
+    else if (encoding == 27)
+    {
+        fmt->formattag = support_formats[8][0];
+        fmt->bitspersample = support_formats[8][1];
     }
 
     return fmt->formattag;
@@ -138,7 +121,7 @@ enum codec_status codec_main(void)
     int offset = 0;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
   
 next_track:
     if (codec_init()) {
@@ -199,11 +182,6 @@ next_track:
         }
         /* skip sample rate */
         format.channels = get_be32(buf + 20);
-        if (format.channels == 0) {
-            DEBUGF("CODEC_ERROR: sun audio 0-channels file\n");
-            status = CODEC_ERROR;
-            goto done;
-        }
     }
 
     /* advance to first WAVE chunk */
@@ -214,9 +192,6 @@ next_track:
     decodedsamples = 0;
     codec = 0;
     bytesdone = 0;
-
-    /* blockalign = 1 sample */
-    format.blockalign = format.bitspersample * format.channels >> 3;
 
     /* get codec */
     codec = get_au_codec(format.formattag);
