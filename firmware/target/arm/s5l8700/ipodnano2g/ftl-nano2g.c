@@ -1614,7 +1614,7 @@ uint32_t ftl_commit_cxt(void)
     uint32_t mappages = ((*ftl_nand_type).userblocks + 0x3ff) >> 10;
     uint32_t ctrpages = ((*ftl_nand_type).userblocks + 23 + 0x3ff) >> 10;
     uint32_t endpage = ftl_cxt.ftlctrlpage + mappages + ctrpages + 1;
-    if (endpage % ppb > ppb - 1)
+    if (endpage >= (ftl_cxt.ftlctrlpage / ppb + 1) * ppb)
         ftl_cxt.ftlctrlpage |= ppb - 1;
     for (i = 0; i < ctrpages; i++)
     {
