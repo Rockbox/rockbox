@@ -215,10 +215,9 @@ uint32_t nand_wait_status_ready(uint32_t bank)
     return nand_send_cmd(NAND_CMD_READ);
 }
 
-uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
-                            void* buffer, uint32_t size)
+void nand_transfer_data_start(uint32_t bank, uint32_t direction,
+                              void* buffer, uint32_t size)
 {
-    long timeout = current_tick + HZ / 50;
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
     FMDNUM = size - 1;
     FMCTRL1 = FMCTRL1_DOREADDATA << direction;
@@ -232,6 +231,11 @@ uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
     DMATCNT3 = (size >> 4) - 1;
     clean_dcache();
     DMACOM3 = 4;
+}
+
+uint32_t nand_transfer_data_collect(uint32_t direction)
+{
+    long timeout = current_tick + HZ / 50;
     while ((DMAALLST & DMAALLST_DMABUSY3))
         if (nand_timeout(timeout)) return 1;
     if (!direction) invalidate_dcache();
@@ -241,17 +245,29 @@ uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
     return 0;
 }
 
-uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
+uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
+                            void* buffer, uint32_t size)
+{
+    nand_transfer_data_start(bank, direction, buffer, size);
+    uint32_t rc = nand_transfer_data_collect(direction);
+    return rc;
+}
+
+void ecc_start(uint32_t size, void* databuffer, void* sparebuffer, uint32_t type)
 {
     mutex_lock(&ecc_mtx);
-    long timeout = current_tick + HZ / 50;
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     ECC_UNK1 = size;
     ECC_DATA_PTR = (uint32_t)databuffer;
     ECC_SPARE_PTR = (uint32_t)sparebuffer;
     clean_dcache();
-    ECC_CTRL = ECCCTRL_STARTDECODING;
+    ECC_CTRL = type;
+}
+
+uint32_t ecc_collect(void)
+{
+    long timeout = current_tick + HZ / 50;
     while (!(SRCPND & INTMSK_ECC))
         if (nand_timeout(timeout)) return ecc_unlock(1);
     invalidate_dcache();
@@ -260,23 +276,18 @@ uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
     return ecc_unlock(ECC_RESULT);
 }
 
+uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
+{
+    ecc_start(size, databuffer, sparebuffer, ECCCTRL_STARTDECODING);
+    uint32_t rc = ecc_collect();
+    return rc;
+}
+
 uint32_t ecc_encode(uint32_t size, void* databuffer, void* sparebuffer)
 {
-    mutex_lock(&ecc_mtx);
-    long timeout = current_tick + HZ / 50;
-    ECC_INT_CLR = 1;
-    SRCPND = INTMSK_ECC;
-    ECC_UNK1 = size;
-    ECC_DATA_PTR = (uint32_t)databuffer;
-    ECC_SPARE_PTR = (uint32_t)sparebuffer;
-    clean_dcache();
-    ECC_CTRL = ECCCTRL_STARTENCODING;
-    while (!(SRCPND & INTMSK_ECC))
-        if (nand_timeout(timeout)) return ecc_unlock(1);
-    invalidate_dcache();
-    ECC_INT_CLR = 1;
-    SRCPND = INTMSK_ECC;
-    return ecc_unlock(0);
+    ecc_start(size, databuffer, sparebuffer, ECCCTRL_STARTENCODING);
+    ecc_collect();
+    return 0;
 }
 
 uint32_t nand_check_empty(uint8_t* buffer)
