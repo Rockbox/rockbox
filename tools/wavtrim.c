@@ -167,7 +167,9 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
         /* clip the start */
         for (i=0; i<datalen; i+=2)
         {
-            sample16 = *(short *)(databuf + i);
+            /* samples are little endian */
+            sample16 = (*(databuf + i + 1) << 8) | *(databuf + i);
+
             if (abs(sample16) > max_silence)
                 break;
         }
@@ -178,7 +180,8 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
         /* clip the end */
         for (i=datalen-2; i>skip_head; i-=2)
         {
-            sample16 = *(short *)(databuf + i);
+            /* samples are little endian */
+            sample16 = (*(databuf + i + 1) << 8) | *(databuf + i);
             if (abs(sample16) > max_silence)
                 break;
         }
@@ -231,7 +234,7 @@ int main (int argc, char** argv)
     ret = wavtrim(argv[1],max_silence,errbuffer,255 ); 
     if( ret< 0)
     {
-        printf(errbuffer);
+        printf("%s", errbuffer);
     }
     return ret;
 }
