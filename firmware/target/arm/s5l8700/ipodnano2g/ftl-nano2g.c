@@ -852,7 +852,7 @@ uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
 
 #ifndef FTL_READONLY
 /* Writes the specified vPage, dealing with all kinds of trouble */
-uint32_t ftl_vfl_write(uint32_t vpage, void* buffer, void* sparebuffer)
+uint32_t ftl_vfl_write_single(uint32_t vpage, void* buffer, void* sparebuffer)
 {
     uint32_t ppb = (*ftl_nand_type).pagesperblock * ftl_banks;
     uint32_t syshyperblocks = (*ftl_nand_type).blocks
@@ -880,6 +880,20 @@ uint32_t ftl_vfl_write(uint32_t vpage, void* buffer, void* sparebuffer)
            (unsigned)vpage, (unsigned)bank, (unsigned)physpage);
     ftl_vfl_log_trouble(bank, block);
     return 1;
+}
+#endif
+
+
+#ifndef FTL_READONLY
+/* Writes the specified vPage, dealing with all kinds of trouble */
+uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count, void* buffer, void* sparebuffer)
+{
+    uint32_t i;
+    for (i = 0; i < count; i++)
+    {
+        uint32_t rc = ftl_vfl_write_single(vpage + i, buffer, sparebuffer);
+        if (rc) return rc;
+    }
 }
 #endif
 
@@ -1258,7 +1272,7 @@ uint32_t ftl_save_erasectr_page(uint32_t index)
     ftl_sparebuffer[0].meta.usn = ftl_cxt.usn;
     ftl_sparebuffer[0].meta.idx = index;
     ftl_sparebuffer[0].meta.type = 0x46;
-    if (ftl_vfl_write(ftl_cxt.ftlctrlpage, &ftl_erasectr[index << 10],
+    if (ftl_vfl_write(ftl_cxt.ftlctrlpage, 1, &ftl_erasectr[index << 10],
                       &ftl_sparebuffer[0]) != 0)
         return 1;
     if ((ftl_vfl_read(ftl_cxt.ftlctrlpage, ftl_buffer,
@@ -1330,7 +1344,7 @@ uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
     else if (rc != 0) ftl_copyspare[0].user.eccmark = 0x55;
     if (type == 1 && destination % ppb == ppb - 1)
         ftl_copyspare[0].user.type = 0x41;
-    return ftl_vfl_write(destination, ftl_copybuffer[0], &ftl_copyspare[0]);
+    return ftl_vfl_write(destination, 1, ftl_copybuffer[0], &ftl_copyspare[0]);
 }
 #endif
 
@@ -1352,7 +1366,7 @@ uint32_t ftl_copy_block(uint32_t source, uint32_t destination)
         ftl_sparebuffer[0].user.type = 0x40;
         if (rc != 0) ftl_sparebuffer[0].user.eccmark = 0x55;
         if (i == ppb - 1) ftl_sparebuffer[0].user.type = 0x41;
-        if (ftl_vfl_write(destination * ppb + i,
+        if (ftl_vfl_write(destination * ppb + i, 1,
                           ftl_copybuffer[0], &ftl_sparebuffer[0]) != 0)
         {
             error = 1;
@@ -1614,7 +1628,7 @@ uint32_t ftl_commit_cxt(void)
         ftl_sparebuffer[0].meta.usn = ftl_cxt.usn;
         ftl_sparebuffer[0].meta.idx = i;
         ftl_sparebuffer[0].meta.type = 0x44;
-        if (ftl_vfl_write(ftl_cxt.ftlctrlpage, &ftl_map[i << 10],
+        if (ftl_vfl_write(ftl_cxt.ftlctrlpage, 1, &ftl_map[i << 10],
                           &ftl_sparebuffer[0]) != 0)
             return 1;
         ftl_cxt.ftl_map_pages[i] = ftl_cxt.ftlctrlpage;
@@ -1624,7 +1638,7 @@ uint32_t ftl_commit_cxt(void)
     memset(&ftl_sparebuffer[0], 0xFF, 0x40);
     ftl_sparebuffer[0].meta.usn = ftl_cxt.usn;
     ftl_sparebuffer[0].meta.type = 0x43;
-    if (ftl_vfl_write(ftl_cxt.ftlctrlpage, &ftl_cxt, &ftl_sparebuffer[0]) != 0)
+    if (ftl_vfl_write(ftl_cxt.ftlctrlpage, 1, &ftl_cxt, &ftl_sparebuffer[0]) != 0)
         return 1;
     return 0;
 }
@@ -1701,7 +1715,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             memset(&ftl_sparebuffer[0], 0xFF, 0x40);
             ftl_sparebuffer[0].meta.usn = ftl_cxt.usn;
             ftl_sparebuffer[0].meta.type = 0x47;
-            if (ftl_vfl_write(ftl_cxt.ftlctrlpage, ftl_buffer,
+            if (ftl_vfl_write(ftl_cxt.ftlctrlpage, 1, ftl_buffer,
                               &ftl_sparebuffer[0]) == 0)
                 break;
         }
@@ -1746,7 +1760,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                 ftl_sparebuffer[0].user.usn = ftl_cxt.nextblockusn;
                 ftl_sparebuffer[0].user.type = 0x40;
                 if (j == ppb - 1) ftl_sparebuffer[0].user.type = 0x41;
-                while (ftl_vfl_write(vblock * ppb + j,
+                while (ftl_vfl_write(vblock * ppb + j, 1,
                                      &((uint8_t*)buffer)[(i + j) << 11],
                                      &ftl_sparebuffer[0]) != 0);
             }
@@ -1772,7 +1786,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             ftl_sparebuffer[0].user.type = 0x40;
             uint32_t abspage = (*logentry).scatteredvblock * ppb
                              + (*logentry).pagesused++;
-            if (ftl_vfl_write(abspage, &((uint8_t*)buffer)[i << 11],
+            if (ftl_vfl_write(abspage, 1, &((uint8_t*)buffer)[i << 11],
                               &ftl_sparebuffer[0]) == 0)
             {
                 if ((*logentry).pageoffsets[page] == 0xFFFF)
