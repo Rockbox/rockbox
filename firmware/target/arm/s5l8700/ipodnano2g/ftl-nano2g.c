@@ -920,9 +920,14 @@ uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count, void* buffer, void* spare
     uint32_t i;
     for (i = 0; i < count; i++)
     {
-        uint32_t rc = ftl_vfl_write_single(vpage + i, buffer, sparebuffer);
+        void* databuf = (void*)0;
+        void* sparebuf = (void*)0;
+        if (buffer) databuf = (void*)((uint32_t)buffer + 0x800 * i);
+        if (sparebuffer) sparebuf = (void*)((uint32_t)sparebuffer + 0x40 * i);
+        uint32_t rc = ftl_vfl_write_single(vpage + i, databuf, sparebuf);
         if (rc) return rc;
     }
+    return 0;
 }
 #endif
 
