@@ -32,7 +32,7 @@
 
 
 #define FTL_COPYBUF_SIZE 1
-#define FTL_WRITESPARE_SIZE 1
+#define FTL_WRITESPARE_SIZE 4
 //#define FTL_FORCEMOUNT
 
 
