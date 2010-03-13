@@ -440,8 +440,8 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
     return nand_unlock(rc);
 }
 
-uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
-                         void* sparebuffer, uint32_t doecc)
+uint32_t nand_write_page_int(uint32_t bank, uint32_t page, void* databuffer,
+                             void* sparebuffer, uint32_t doecc, uint32_t wait)
 {
     uint8_t* data = nand_data;
     uint8_t* spare = nand_spare;
@@ -458,9 +458,14 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
         if (spare != sparebuffer) memcpy(spare, sparebuffer, 0x40);
     }
     else memset(spare, 0xFF, 0x40);
+    nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
+    if (nand_send_cmd(NAND_CMD_PROGRAM)) return nand_unlock(1);
+    if (nand_send_address(page, databuffer ? 0 : 0x800))
+        return nand_unlock(1);
+    if (databuffer && data != databuffer) memcpy(data, databuffer, 0x800);
+    if (databuffer) nand_transfer_data_start(bank, 1, data, 0x800);
     if (doecc)
     {
-        if (databuffer && data != databuffer) memcpy(data, databuffer, 0x800);
         if (ecc_encode(3, data, nand_ecc)) return nand_unlock(1);
         memcpy(&spare[0xC], nand_ecc, 0x28);
         memset(nand_ctrl, 0xFF, 0x200);
@@ -468,18 +473,15 @@ uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
         if (ecc_encode(0, nand_ctrl, nand_ecc)) return nand_unlock(1);
         memcpy(&spare[0x34], nand_ecc, 0xC);
     }
-    nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
-    if (nand_send_cmd(NAND_CMD_PROGRAM)) return nand_unlock(1);
-    if (nand_send_address(page, databuffer ? 0 : 0x800))
-        return nand_unlock(1);
     if (databuffer)
-        if (nand_transfer_data(bank, 1, data, 0x800))
+        if (nand_transfer_data_collect(1))
             return nand_unlock(1);
     if (sparebuffer || doecc)
         if (nand_transfer_data(bank, 1, spare, 0x40))
             return nand_unlock(1);
     if (nand_send_cmd(NAND_CMD_PROGCNFRM)) return nand_unlock(1);
-    return nand_unlock(nand_wait_status_ready(bank));
+    if (wait) if (nand_wait_status_ready(bank)) return nand_unlock(1);
+    return nand_unlock(0);
 }
 
 uint32_t nand_block_erase(uint32_t bank, uint32_t page)
@@ -629,6 +631,49 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
         if (nand_type[i] != 0xFFFFFFFF)
             rc |= status[i] << (i << 2);
     return nand_unlock(rc);
+}
+
+uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
+                         void* sparebuffer, uint32_t doecc)
+{
+    return nand_write_page_int(bank, page, databuffer, sparebuffer, doecc, 1);
+}
+
+uint32_t nand_write_page_start(uint32_t bank, uint32_t page, void* databuffer,
+                               void* sparebuffer, uint32_t doecc)
+{
+    if (((uint32_t)databuffer & 0xf) || ((uint32_t)sparebuffer & 0xf)
+     || !databuffer || !sparebuffer || !doecc)
+        return nand_write_page_int(bank, page, databuffer, sparebuffer, doecc, 0);
+
+    mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
+    led(true);
+    if (!nand_powered) nand_power_up();
+    nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
+    if (nand_send_cmd(NAND_CMD_PROGRAM))
+        return nand_unlock(1);
+    if (nand_send_address(page, 0))
+        return nand_unlock(1);
+    nand_transfer_data_start(bank, 1, databuffer, 0x800);
+    if (ecc_encode(3, databuffer, nand_ecc))
+        return nand_unlock(1);
+    memcpy((void*)((uint32_t)sparebuffer + 0xC), nand_ecc, 0x28);
+    memset(nand_ctrl, 0xFF, 0x200);
+    memcpy(nand_ctrl, sparebuffer, 0xC);
+    if (ecc_encode(0, nand_ctrl, nand_ecc))
+        return nand_unlock(1);
+    memcpy((void*)((uint32_t)sparebuffer + 0x34), nand_ecc, 0xC);
+    if (nand_transfer_data_collect(0))
+        return nand_unlock(1);
+    if (nand_transfer_data(bank, 1, sparebuffer, 0x40))
+        return nand_unlock(1);
+    return nand_unlock(nand_send_cmd(NAND_CMD_PROGCNFRM));
+}
+
+uint32_t nand_write_page_collect(uint32_t bank)
+{
+    return nand_wait_status_ready(bank);
 }
 
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
