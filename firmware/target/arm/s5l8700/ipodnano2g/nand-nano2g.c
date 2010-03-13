@@ -676,6 +676,41 @@ uint32_t nand_write_page_collect(uint32_t bank)
     return nand_wait_status_ready(bank);
 }
 
+uint32_t nand_block_erase_fast(uint32_t page)
+{
+    uint32_t i, rc = 0;
+    mutex_lock(&nand_mtx);
+    nand_last_activity_value = current_tick;
+    led(true);
+    if (!nand_powered) nand_power_up();
+    for (i = 0; i < 4; i++)
+    {
+        if (nand_type[i] == 0xFFFFFFFF) continue;
+        nand_set_fmctrl0(i, 0);
+        if (nand_send_cmd(NAND_CMD_BLOCKERASE))
+        {
+            rc |= 1 << i;
+            continue;
+        }
+        FMANUM = 2;
+        FMADDR0 = page;
+        FMCTRL1 = FMCTRL1_DOTRANSADDR;
+        if (nand_wait_cmddone())
+        {
+            rc |= 1 << i;
+            continue;
+        }
+        if (nand_send_cmd(NAND_CMD_ERASECNFRM)) rc |= 1 << i;
+    }
+    for (i = 0; i < 4; i++)
+    {
+        if (nand_type[i] == 0xFFFFFFFF) continue;
+        if (rc & (1 << i)) continue;
+        if (nand_wait_status_ready(i)) rc |= 1 << i;
+    }
+    return nand_unlock(rc);
+}
+
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
 {
     if (nand_type[bank] == 0xFFFFFFFF)
