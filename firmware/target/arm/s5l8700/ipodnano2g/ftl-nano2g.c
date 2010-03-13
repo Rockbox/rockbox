@@ -850,6 +850,35 @@ uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
 }
 
 
+/* Multi-bank version of ftl_vfl_read, will read ftl_banks pages in parallel */
+uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
+                           uint32_t checkempty, uint32_t remaponfail)
+{
+    uint32_t i, rc = 0;
+    uint32_t ppb = (*ftl_nand_type).pagesperblock * ftl_banks;
+    uint32_t syshyperblocks = (*ftl_nand_type).blocks
+                            - (*ftl_nand_type).userblocks - 0x17;
+    uint32_t abspage = vpage + ppb * syshyperblocks;
+    if (abspage + ftl_banks - 1 >= (*ftl_nand_type).blocks * ppb || abspage < ppb)
+        panicf("FTL: Trying to read out-of-bounds vPage %u", (unsigned)vpage);
+        //return 4;
+
+    for (i = 0; i < ftl_banks; i++)
+    {
+        void* databuf = (void*)0;
+        void* sparebuf = (void*)0;
+        if (buffer) databuf = (void*)((uint32_t)buffer + 0x800 * i);
+        if (sparebuffer) sparebuf = (void*)((uint32_t)sparebuffer + 0x40 * i);
+        uint32_t ret = ftl_vfl_read(vpage + i, databuf, sparebuf, checkempty, remaponfail);
+        if (ret & 1) rc |= 1 << (i << 2);
+        if (ret & 2) rc |= 2 << (i << 2);
+        if (ret & 0x10) rc |= 4 << (i << 2);
+        if (ret & 0x100) rc |= 8 << (i << 2);
+    }
+    return rc;
+}
+
+
 #ifndef FTL_READONLY
 /* Writes the specified vPage, dealing with all kinds of trouble */
 uint32_t ftl_vfl_write_single(uint32_t vpage, void* buffer, void* sparebuffer)
