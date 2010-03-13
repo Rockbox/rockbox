@@ -547,7 +547,7 @@ uint32_t ftl_vfl_store_cxt(uint32_t bank)
         nand_write_page(bank, page, &ftl_vfl_cxt[bank], &ftl_sparebuffer, 1);
     }
     uint32_t good = 0;
-    for (i = 0; i < 8; i++)
+    for (i = 1; i <= 8; i++)
     {
         uint32_t index = ftl_vfl_cxt[bank].activecxtblock;
         uint32_t block = ftl_vfl_cxt[bank].vflcxtblocks[index];
@@ -1553,6 +1553,7 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 {
     uint32_t i;
     struct ftl_log_type* entry = ftl_get_log_entry(block);
+    (*entry).usn = ftl_cxt.nextblockusn - 1;
     if (entry != (struct ftl_log_type*)0) return entry;
 
     for (i = 0; i < 0x11; i++)
@@ -1778,6 +1779,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                 i++;
             }
         }
+        if ((*logentry).pagesused == ppb) ftl_remove_scattered_block(logentry);
     }
     if (ftl_cxt.swapcounter >= 300)
     {
