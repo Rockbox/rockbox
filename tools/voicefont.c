@@ -32,12 +32,16 @@
 #define HEADER_SIZE 20
 
 /* endian conversion macros */
+#if defined(__BIG_ENDIAN__)
+#define SWAP2(x) (x)
+#define SWAP4(x) (x)
+#else
 #define SWAP2(x) ((((unsigned)(x)>>8) & 0x00ff) | (((unsigned)(x)<<8) & 0xff00))
 #define SWAP4(x) ((((unsigned)(x)>>24) & 0x000000ff) |\
                   (((unsigned)(x)>>8)  & 0x0000ff00) |\
                   (((unsigned)(x)<<8)  & 0x00ff0000) |\
                   (((unsigned)(x)<<24) & 0xff000000))
-
+#endif
 
 /* bitswap audio bytes, LSB becomes MSB and vice versa */
 int BitswapAudio (unsigned char* pDest, unsigned char* pSrc, size_t len)
@@ -247,3 +251,4 @@ int main (int argc, char** argv)
     return 0;
 }
 #endif
+
