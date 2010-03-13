@@ -106,6 +106,7 @@ static uint8_t nand_ecc[0x30] __attribute__((aligned(16)));
 uint32_t nand_unlock(uint32_t rc)
 {
     led(false);
+    nand_last_activity_value = current_tick;
     mutex_unlock(&nand_mtx);
     return rc;
 }
