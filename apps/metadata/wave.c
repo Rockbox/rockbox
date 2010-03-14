@@ -21,8 +21,6 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <inttypes.h>
 
 #include "system.h"
@@ -51,28 +49,29 @@ enum {
    FMT_CHUNK,
    FACT_CHUNK,
    DATA_CHUNK,
-   NUM_CHUNKS,
 };
 
 /* Wave chunk names */
-static const unsigned char *wave_chunknames[NUM_CHUNKS] =
-{
-    [RIFF_CHUNK] = "RIFF",
-    [WAVE_CHUNK] = "WAVE",
-    [FMT_CHUNK]  = "fmt ",
-    [FACT_CHUNK] = "fact",
-    [DATA_CHUNK] = "data",
-};
+#define WAVE_CHUNKNAME_LENGTH 4
+#define WAVE_CHUNKSIZE_LENGTH 4
+
+static const unsigned char *wave_chunklist = "RIFF"
+                                             "WAVE"
+                                             "fmt "
+                                             "fact"
+                                             "data";
 
 /* Wave64 GUIDs */
-static const unsigned char *wave64_chunknames[NUM_CHUNKS] =
-{
-    [RIFF_CHUNK] = "riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00",
-    [WAVE_CHUNK] = "wave\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a",
-    [FMT_CHUNK]  = "fmt \xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a",
-    [FACT_CHUNK] = "fact\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a",
-    [DATA_CHUNK] = "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a",
-};
+#define WAVE64_CHUNKNAME_LENGTH 16
+#define WAVE64_CHUNKSIZE_LENGTH 8
+
+static const unsigned char *wave64_chunklist
+                 = "riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00"
+                   "wave\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
+                   "fmt \xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
+                   "fact\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
+                   "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a";
+
 
 /* support formats */
 enum
@@ -113,45 +112,35 @@ static void set_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3)
         case WAVE_FORMAT_MULAW:
         case IBM_FORMAT_ALAW:
         case IBM_FORMAT_MULAW:
-            if (fmt->bitspersample != 0 && fmt->channels != 0)
-                fmt->totalsamples = fmt->numbytes / ((fmt->bitspersample >> 3) * fmt->channels);
-            break;
-        case WAVE_FORMAT_ADPCM:
-        case WAVE_FORMAT_DVI_ADPCM:
-        case WAVE_FORMAT_XBOX_ADPCM:
-            if (fmt->blockalign != 0)
-                fmt->totalsamples = (fmt->numbytes / fmt->blockalign) * fmt->samplesperblock;
+            fmt->blockalign      = fmt->bitspersample * fmt->channels >> 3;
+            fmt->samplesperblock = 1;
             break;
         case WAVE_FORMAT_YAMAHA_ADPCM:
-            if (fmt->blockalign != 0 && fmt->channels != 0)
+            if (id3->channels != 0)
             {
-                if (fmt->samplesperblock == 0)
-                {
-                    if (fmt->blockalign == ((id3->frequency / 60) + 4) * fmt->channels)
-                        fmt->samplesperblock = id3->frequency / 30;
-                    else
-                        fmt->samplesperblock = (fmt->blockalign << 1) / fmt->channels;
-                }
-                fmt->totalsamples = (fmt->numbytes / fmt->blockalign) * fmt->samplesperblock;
+                fmt->samplesperblock =
+                    (fmt->blockalign == ((id3->frequency / 60) + 4) * fmt->channels)?
+                        id3->frequency / 30 : (fmt->blockalign << 1) / fmt->channels;
             }
             break;
         case WAVE_FORMAT_DIALOGIC_OKI_ADPCM:
-            fmt->totalsamples = fmt->numbytes << 1;
+            fmt->blockalign      = 1;
+            fmt->samplesperblock = 2;
             break;
         case WAVE_FORMAT_SWF_ADPCM:
-            if (fmt->blockalign != 0 && fmt->bitspersample != 0 && fmt->channels != 0)
+            if (fmt->bitspersample != 0 && id3->channels != 0)
             {
-                if (fmt->samplesperblock == 0)
-                    fmt->samplesperblock = (((fmt->blockalign << 3) - 2) / fmt->channels - 22)
-                                                                         / fmt->bitspersample;
-
-                fmt->totalsamples = (fmt->numbytes / fmt->blockalign) * fmt->samplesperblock;
+                fmt->samplesperblock
+                     = (((fmt->blockalign << 3) - 2) / fmt->channels - 22)
+                                                     / fmt->bitspersample + 1;
             }
             break;
         default:
-            fmt->totalsamples = 0;
             break;
     }
+
+    if (fmt->blockalign != 0)
+        fmt->totalsamples = (fmt->numbytes / fmt->blockalign) * fmt->samplesperblock;
 }
 
 static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *fmt,
@@ -208,15 +197,16 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
     }
 }
 
-static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chunknames, bool is_64)
+static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunknames,
+                        bool is_64)
 {
     /* Use the temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
 
     struct wave_fmt fmt;
 
-    unsigned int namelen = (is_64)? 16 : 4;
-    unsigned int sizelen = (is_64)? 8 : 4;
+    unsigned int namelen = (is_64)? WAVE64_CHUNKNAME_LENGTH : WAVE_CHUNKNAME_LENGTH;
+    unsigned int sizelen = (is_64)? WAVE64_CHUNKSIZE_LENGTH : WAVE_CHUNKSIZE_LENGTH;
     unsigned int len = namelen + sizelen;
     uint64_t chunksize;
     uint64_t offset = len + namelen;
@@ -228,8 +218,8 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
     lseek(fd, 0, SEEK_SET);
     read(fd, buf, offset);
 
-    if ((memcmp(buf,       chunknames[RIFF_CHUNK], namelen) != 0) ||
-        (memcmp(buf + len, chunknames[WAVE_CHUNK], namelen) != 0))
+    if ((memcmp(buf,       chunknames + RIFF_CHUNK * namelen, namelen) != 0) ||
+        (memcmp(buf + len, chunknames + WAVE_CHUNK * namelen, namelen) != 0))
     {
         DEBUGF("metadata error: missing riff header.\n");
         return false;
@@ -251,7 +241,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
         chunksize = (is_64) ? get_uint64_le(buf + namelen) - len :
                               get_long_le(buf + namelen);
 
-        if (memcmp(buf, chunknames[DATA_CHUNK], namelen) == 0)
+        if (memcmp(buf, chunknames + DATA_CHUNK * namelen, namelen) == 0)
         {
             DEBUGF("find 'data' chunk\n");
             fmt.numbytes = chunksize;
@@ -265,7 +255,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
         offset += chunksize;
 
         read_data = 0;
-        if (memcmp(buf, chunknames[FMT_CHUNK], namelen) == 0)
+        if (memcmp(buf, chunknames + FMT_CHUNK * namelen, namelen) == 0)
         {
             DEBUGF("find 'fmt ' chunk\n");
 
@@ -281,7 +271,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
             read(fd, buf, read_data);
             parse_riff_format(buf, read_data, &fmt, id3);
         }
-        else if (memcmp(buf, chunknames[FACT_CHUNK], namelen) == 0)
+        else if (memcmp(buf, chunknames + FACT_CHUNK * namelen, namelen) == 0)
         {
             DEBUGF("find 'fact' chunk\n");
 
@@ -301,20 +291,19 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
     if (fmt.totalsamples == 0)
         set_totalsamples(&fmt, id3);
 
+    if (id3->frequency == 0 || id3->bitrate == 0)
+    {
+        DEBUGF("metadata error: frequency or bitrate is 0\n");
+        return false;
+    }
+
     id3->vbr = false;   /* All Wave/Wave64 files are CBR */
     id3->filesize = filesize(fd);
 
     /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-    if(fmt.formattag != WAVE_FORMAT_ATRAC3)
-    {
-        if (id3->frequency != 0)
-            id3->length = ((int64_t) fmt.totalsamples * 1000) / id3->frequency;
-    }
-    else
-    {
-        if (id3->bitrate != 0)
-            id3->length = ((id3->filesize - id3->first_frame_offset) * 8) / id3->bitrate;
-    }
+    id3->length = (fmt.formattag != WAVE_FORMAT_ATRAC3)?
+                      (uint64_t)fmt.totalsamples * 1000 / id3->frequency :
+                      ((id3->filesize - id3->first_frame_offset) * 8) / id3->bitrate;
 
     /* output header/id3 info (for debug) */
     DEBUGF("%s header info ----\n", (is_64)? "wave64" : "wave");
@@ -335,10 +324,10 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char **chun
 
 bool get_wave_metadata(int fd, struct mp3entry* id3)
 {
-    return read_header(fd, id3, (const unsigned char **)&wave_chunknames, false);
+    return read_header(fd, id3, wave_chunklist, false);
 }
 
 bool get_wave64_metadata(int fd, struct mp3entry* id3)
 {
-    return read_header(fd, id3, (const unsigned char **)&wave64_chunknames, true);
+    return read_header(fd, id3, wave64_chunklist, true);
 }
