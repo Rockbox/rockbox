@@ -900,6 +900,7 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
                                           1, checkempty);
             if ((ret & 0x11D) != 0 && (ret & 2) == 0)
             {
+                nand_reset(i);
                 ret = nand_read_page(i, physpage,
                                      (void*)((uint32_t)buffer + 0x800 * i),
                                      (void*)((uint32_t)sparebuffer + 0x40 * i),
