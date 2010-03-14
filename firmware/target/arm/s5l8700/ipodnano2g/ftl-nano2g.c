@@ -864,9 +864,7 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
         //return 4;
 
     uint32_t bank = abspage % ftl_banks;
-    uint32_t block = abspage / ((*ftl_nand_type).pagesperblock * ftl_banks);
-    uint32_t page = (abspage / ftl_banks) % (*ftl_nand_type).pagesperblock;
-    if (bank)
+//    if (bank)
     {
         for (i = 0; i < ftl_banks; i++)
         {
@@ -882,6 +880,8 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
         }
         return rc;
     }
+    uint32_t block = abspage / ((*ftl_nand_type).pagesperblock * ftl_banks);
+    uint32_t page = (abspage / ftl_banks) % (*ftl_nand_type).pagesperblock;
     uint32_t physblock = ftl_vfl_get_physical_block(bank, block);
     uint32_t physpage = physblock * (*ftl_nand_type).pagesperblock + page;
 
@@ -891,7 +891,7 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
     for (i = 0; i < ftl_banks; i++)
     {
         if ((rc >> (i << 2)) & 0x2) continue;
-        if ((rc >> (i << 2)) & 0xf)
+        if ((rc >> (i << 2)) & 0xd)
         {
             rc &= ~(0xf << (i << 2));
             nand_reset(i);
