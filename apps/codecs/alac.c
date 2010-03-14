@@ -63,6 +63,10 @@ enum codec_status codec_main(void)
 
   stream_create(&input_stream,ci);
 
+  /* Read from ci->id3->offset before calling qtmovie_read. */
+  samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
+                (ci->id3->bitrate*128));
+  
   /* if qtmovie_read returns successfully, the stream is up to
    * the movie data, which can be used directly by the decoder */
   if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -74,9 +78,19 @@ enum codec_status codec_main(void)
   /* initialise the sound converter */
   create_alac(demux_res.sound_sample_size, demux_res.num_channels,&alac);
   alac_set_info(&alac, demux_res.codecdata);
-
+  
+  /* Set i for first frame, seek to desired sample position for resuming. */
   i=0;
-  samplesdone=0;
+  if (samplesdone > 0) {
+    if (alac_seek(&demux_res, &input_stream, samplesdone,
+                  &samplesdone, (int*) &i)) {
+        elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
+        ci->set_elapsed(elapsedtime);
+    } else {
+        samplesdone = 0;
+    }
+  }
+
   /* The main decoding loop */
   while (i < demux_res.num_sample_byte_sizes) {
     ci->yield();
@@ -126,9 +140,6 @@ enum codec_status codec_main(void)
     samplesdone+=sample_duration;
     elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
     ci->set_elapsed(elapsedtime);
-
-    /* Keep track of current position - for resuming */
-    ci->set_offset(elapsedtime);
 
     i++;
   }
