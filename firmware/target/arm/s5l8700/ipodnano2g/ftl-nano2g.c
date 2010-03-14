@@ -893,20 +893,27 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
         if ((rc >> (i << 2)) & 0x2) continue;
         if ((rc >> (i << 2)) & 0xf)
         {
-            rc &= ~(0xf << (i << 2));
             nand_reset(i);
             uint32_t ret = nand_read_page(i, physpage,
                                           (void*)((uint32_t)buffer + 0x800 * i),
                                           (void*)((uint32_t)sparebuffer + 0x40 * i),
                                           1, checkempty);
+            if ((ret & 0x11D) != 0 && (ret & 2) == 0)
+            {
+                ret = nand_read_page(i, physpage,
+                                     (void*)((uint32_t)buffer + 0x800 * i),
+                                     (void*)((uint32_t)sparebuffer + 0x40 * i),
+                                     1, checkempty);
 #ifdef FTL_READONLY
-            (void)remaponfail;
+                (void)remaponfail;
 #else
-            if (remaponfail == 1 && (ret & 0x11D) != 0 && (ret & 2) == 0)
-                panicf("FTL: VFL fast read failed, RC %04X, bank %d, RET %03X, base %d",
-                       rc, i, ret, vpage);
-//                ftl_vfl_schedule_block_for_remap(i, block);
+                if (remaponfail == 1 && (ret & 0x11D) != 0 && (ret & 2) == 0)
+                    panicf("FTL: VFL fast read failed, RC %04X, bank %d, RET %03X, base %d",
+                           rc, i, ret, vpage);
+//                    ftl_vfl_schedule_block_for_remap(i, block);
 #endif
+            }
+            rc &= ~(0xf << (i << 2));
             if (ret & 1) rc |= 1 << (i << 2);
             if (ret & 2) rc |= 2 << (i << 2);
             if (ret & 0x10) rc |= 4 << (i << 2);
