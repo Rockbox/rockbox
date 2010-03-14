@@ -89,6 +89,8 @@ uint8_t nand_tunk2[4];
 uint8_t nand_tunk3[4];
 uint32_t nand_type[4];
 int nand_powered = 0;
+int nand_interleaved = 0;
+int nand_cached = 0;
 long nand_last_activity_value = -1;
 static long nand_stack[32];
 
@@ -643,8 +645,8 @@ uint32_t nand_write_page_start(uint32_t bank, uint32_t page, void* databuffer,
                                void* sparebuffer, uint32_t doecc)
 {
     if (((uint32_t)databuffer & 0xf) || ((uint32_t)sparebuffer & 0xf)
-     || !databuffer || !sparebuffer || !doecc)
-        return nand_write_page_int(bank, page, databuffer, sparebuffer, doecc, 0);
+     || !databuffer || !sparebuffer || !doecc || !nand_interleaved)
+        return nand_write_page_int(bank, page, databuffer, sparebuffer, doecc, !nand_interleaved);
 
     mutex_lock(&nand_mtx);
     nand_last_activity_value = current_tick;
@@ -769,6 +771,8 @@ uint32_t nand_device_init(void)
         nand_tunk3[i] = nand_deviceinfotable[nand_type[i]].tunk3;
     }
     if (nand_type[0] == 0xFFFFFFFF) return 1;
+    nand_interleaved = ((nand_type[0] >> 22) & 1);
+    nand_cached = ((nand_type[0] >> 23) & 1);
 
     nand_last_activity_value = current_tick;
     create_thread(nand_thread, nand_stack,
