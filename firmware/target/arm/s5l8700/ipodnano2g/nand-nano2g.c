@@ -508,131 +508,20 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
                              uint32_t checkempty)
 {
     uint32_t i, rc = 0;
-    if (((uint32_t)databuffer & 0xf) || ((uint32_t)sparebuffer & 0xf)
-     || !databuffer || !sparebuffer || !doecc)
-    {
-        for (i = 0; i < 4; i++)
-        {
-            if (nand_type[i] == 0xFFFFFFFF) continue;
-            void* databuf = (void*)0;
-            void* sparebuf = (void*)0;
-            if (databuffer) databuf = (void*)((uint32_t)databuffer + 0x800 * i);
-            if (sparebuffer) sparebuf = (void*)((uint32_t)sparebuffer + 0x40 * i);
-            uint32_t ret = nand_read_page(i, page, databuf, sparebuf, doecc, checkempty);
-            if (ret & 1) rc |= 1 << (i << 2);
-            if (ret & 2) rc |= 2 << (i << 2);
-            if (ret & 0x10) rc |= 4 << (i << 2);
-            if (ret & 0x100) rc |= 8 << (i << 2);
-        }
-        return rc;
-    }
-    mutex_lock(&nand_mtx);
-    nand_last_activity_value = current_tick;
-    led(true);
-    if (!nand_powered) nand_power_up();
     for (i = 0; i < 4; i++)
     {
         if (nand_type[i] == 0xFFFFFFFF) continue;
-        nand_set_fmctrl0(i, FMCTRL0_ENABLEDMA);
-        if (nand_send_cmd(NAND_CMD_READ))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
-        if (nand_send_address(page, databuffer ? 0 : 0x800))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
-        if (nand_send_cmd(NAND_CMD_READ2))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
+        void* databuf = (void*)0;
+        void* sparebuf = (void*)0;
+        if (databuffer) databuf = (void*)((uint32_t)databuffer + 0x800 * i);
+        if (sparebuffer) sparebuf = (void*)((uint32_t)sparebuffer + 0x40 * i);
+        uint32_t ret = nand_read_page(i, page, databuf, sparebuf, doecc, checkempty);
+        if (ret & 1) rc |= 1 << (i << 2);
+        if (ret & 2) rc |= 2 << (i << 2);
+        if (ret & 0x10) rc |= 4 << (i << 2);
+        if (ret & 0x100) rc |= 8 << (i << 2);
     }
-    uint8_t status[4];
-    for (i = 0; i < 4; i++) status[i] = (nand_type[i] == 0xFFFFFFFF);
-    if (!status[0])
-        if (nand_wait_status_ready(0))
-            status[0] = 1;
-    if (!status[0])
-        if (nand_transfer_data(0, 0, databuffer, 0x800))
-            status[0] = 1;
-    if (!status[0])
-        if (nand_transfer_data(0, 0, sparebuffer, 0x40))
-            status[0] = 1;
-    for (i = 1; i < 4; i++)
-    {
-        if (!status[i])
-            if (nand_wait_status_ready(i))
-                status[i] = 1;
-        if (!status[i])
-            nand_transfer_data_start(i, 0, (void*)((uint32_t)databuffer
-                                                 + 0x800 * i), 0x800);
-        if (!status[i - 1])
-        {
-            memcpy(nand_ecc, (void*)((uint32_t)sparebuffer + 0x40 * (i - 1) + 0xC), 0x28);
-            ecc_start(3, (void*)((uint32_t)databuffer
-                               + 0x800 * (i - 1)), nand_ecc, ECCCTRL_STARTDECODING);
-        }
-        if (!status[i])
-            if (nand_transfer_data_collect(0))
-                status[i] = 1;
-        if (!status[i])
-            nand_transfer_data_start(i, 0, (void*)((uint32_t)sparebuffer
-                                                 + 0x40 * i), 0x40);
-        if (!status[i - 1])
-            if (ecc_collect() & 1)
-                status[i - 1] = 4;
-        if (!status[i - 1])
-        {
-            memset(nand_ctrl, 0xFF, 0x200);
-            memcpy(nand_ctrl, (void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), 0xC);
-            memcpy(nand_ecc, (void*)((uint32_t)sparebuffer + 0x40 * (i - 1) + 0x34), 0xC);
-            ecc_start(0, nand_ctrl, nand_ecc, ECCCTRL_STARTDECODING);
-        }
-        if (!status[i])
-            if (nand_transfer_data_collect(0))
-                status[i] = 1;
-        if (!status[i - 1])
-        {
-            if (ecc_collect() & 1)
-            {
-                status[i - 1] |= 8;
-                memset((void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), 0xFF, 0xC);
-            }
-            else memcpy((void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), nand_ctrl, 0xC);
-            if (checkempty)
-                status[i - 1] |= nand_check_empty((void*)((uint32_t)sparebuffer
-                                                        + 0x40 * (i - 1))) << 1;
-        }
-    }
-    if (!status[i - 1])
-    {
-        memcpy(nand_ecc,(void*)((uint32_t)sparebuffer + 0x40 * (i - 1) + 0xC), 0x28);
-        if (ecc_decode(3, (void*)((uint32_t)databuffer
-                                + 0x800 * (i - 1)), nand_ecc) & 1)
-            status[i - 1] = 4;
-    }
-    if (!status[i - 1])
-    {
-        memset(nand_ctrl, 0xFF, 0x200);
-        memcpy(nand_ctrl, (void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), 0xC);
-        memcpy(nand_ecc, (void*)((uint32_t)sparebuffer + 0x40 * (i - 1) + 0x34), 0xC);
-        if (ecc_decode(0, nand_ctrl, nand_ecc) & 1)
-        {
-            status[i - 1] |= 8;
-            memset((void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), 0xFF, 0xC);
-        }
-        else memcpy((void*)((uint32_t)sparebuffer + 0x40 * (i - 1)), nand_ctrl, 0xC);
-        if (checkempty)
-            status[i - 1] |= nand_check_empty((void*)((uint32_t)sparebuffer
-                                                    + 0x40 * (i - 1))) << 1;
-    }
-    for (i = 0; i < 4; i++)
-        if (nand_type[i] != 0xFFFFFFFF)
-            rc |= status[i] << (i << 2);
-    return nand_unlock(rc);
+    return rc;
 }
 
 uint32_t nand_write_page(uint32_t bank, uint32_t page, void* databuffer,
