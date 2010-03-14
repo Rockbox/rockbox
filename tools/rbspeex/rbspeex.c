@@ -136,6 +136,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
     int i, tmp, target_sr, numchan, bps, sr, numsamples, frame_size, lookahead;
     int nbytes;
     bool ret = true;
+    int a;
 
     if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
         snprintf(errstr, errlen, "invalid WAV file");
@@ -179,7 +180,15 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
         snprintf(errstr, errlen, "could not read input file data");
         ret = false;
         goto finish;
-   }
+    }
+#if defined(__BIG_ENDIAN__)
+    /* byteswap read bytes to host endianess. */
+    a = numsamples;
+    while(a--) {
+        *(in + a) = ((unsigned short)(*(in + a)) >> 8) & 0x00ff
+                  | ((unsigned short)(*(in + a)) << 8) & 0xff00;
+    }
+#endif
 
     if (volume != 1.0f) {
         for (i = 0; i < numsamples; ++i)

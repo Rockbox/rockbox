@@ -89,6 +89,15 @@ int main(int argc, char **argv)
     speex_bits_set_bit_buffer(&bits, indata, insize);
     while (speex_decode_int(st, &bits, out) == 0) {
         /* if no error, write decoded audio */
+#if defined(__BIG_ENDIAN__)
+        /* byteswap samples from host (big) endianess to file (little) before
+         * writing. */
+        unsigned int a = frame_size - lookahead;
+        while(a--) {
+            out[lookahead + a] = ((unsigned short)out[lookahead+a]<<8)&0xff00
+                               | ((unsigned short)out[lookahead+a]>>8)&0x00ff;
+        }
+#endif
         fwrite(out + lookahead, sizeof(short), frame_size - lookahead, fout);
         samples += frame_size - lookahead;
         lookahead = 0; /* only skip samples at the start */
