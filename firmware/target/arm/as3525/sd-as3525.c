@@ -241,15 +241,13 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         if(status & MCI_RESPONSE_ERROR)    /* timeout or crc failure */
             return false;
 
-        if(status &  MCI_CMD_RESP_END)            /*Response passed CRC check */
+        if(status & MCI_CMD_RESP_END)      /* Response passed CRC check */
         {
             if(flags & MCI_LONG_RESP)
-            {   /* replace short response with long response */
-                /* store the response in reverse words order */
-                response[0] = MCI_RESP3(drive);
-                response[1] = MCI_RESP2(drive);
-                response[2] = MCI_RESP1(drive);
-                response[3] = MCI_RESP0(drive);
+            {   /* response[0] has already been read */
+                response[1] = MCI_RESP1(drive);
+                response[2] = MCI_RESP2(drive);
+                response[3] = MCI_RESP3(drive);
             }
             return true;
         }
@@ -270,9 +268,6 @@ static int sd_init_card(const int drive)
     unsigned long response;
     long init_timeout;
     bool sd_v2 = false;
-    unsigned long temp_reg[4];
-    int i;
-
 
     /* MCLCK on and set to 400kHz ident frequency  */
     MCI_CLOCK(drive) = MCI_IDENTSPEED;
@@ -310,11 +305,8 @@ static int sd_init_card(const int drive)
 
     /* CMD2 send CID */
     if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
-                            temp_reg))
+                            card_info[drive].cid))
         return -3;
-
-    for(i=0; i<4; i++)
-        card_info[drive].cid[3-i] = temp_reg[i];
 
     /* CMD3 send RCA */
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
@@ -350,11 +342,8 @@ static int sd_init_card(const int drive)
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
-                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, temp_reg))
+                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
         return -9;
-
-    for(i=0; i<4; i++)
-        card_info[drive].csd[3-i] = temp_reg[i];
 
     sd_parse_csd(&card_info[drive]);
 
