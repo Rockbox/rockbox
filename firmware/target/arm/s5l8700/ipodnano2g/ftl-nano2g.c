@@ -903,7 +903,9 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
             (void)remaponfail;
 #else
             if (remaponfail == 1 && (ret & 0x11D) != 0 && (ret & 2) == 0)
-                ftl_vfl_schedule_block_for_remap(i, block);
+                panicf("FTL: VFL fast read failed, RC %04X, bank %d, RET %03X, base %d",
+                       rc, i, ret, vpage);
+//                ftl_vfl_schedule_block_for_remap(i, block);
 #endif
             if (ret & 1) rc |= 1 << (i << 2);
             if (ret & 2) rc |= 2 << (i << 2);
