@@ -38,7 +38,6 @@
 #endif
 
 #if defined(SIMULATOR) || defined(__PCTOOL__)
-extern bool debug_wps;
 extern int wps_verbose_level;
 #endif
 

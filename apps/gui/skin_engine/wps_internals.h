@@ -370,4 +370,10 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 struct gui_img* find_image(char label, struct wps_data *data);
 struct skin_viewport* find_viewport(char label, struct wps_data *data);
 
+
+#if defined(DEBUG) || defined(SIMULATOR)
+#define DEBUG_SKIN_ENGINE
+extern bool debug_wps;
+#endif
+
 #endif

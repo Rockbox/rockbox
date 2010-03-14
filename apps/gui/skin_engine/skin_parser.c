@@ -2178,8 +2178,8 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         skinfonts[i].name = NULL;
     }
 #endif
-#if defined(DEBUG) || defined(SIMULATOR)
-    if (isfile)
+#ifdef DEBUG_SKIN_ENGINE
+    if (isfile && debug_wps)
     {
         DEBUGF("\n=====================\nLoading '%s'\n=====================\n", buf);
     }
