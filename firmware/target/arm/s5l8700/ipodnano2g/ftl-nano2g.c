@@ -881,52 +881,71 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
 
 #ifndef FTL_READONLY
 /* Writes the specified vPage, dealing with all kinds of trouble */
-uint32_t ftl_vfl_write_single(uint32_t vpage, void* buffer, void* sparebuffer)
+uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
+                       void* buffer, void* sparebuffer)
 {
+    uint32_t i, j;
     uint32_t ppb = (*ftl_nand_type).pagesperblock * ftl_banks;
     uint32_t syshyperblocks = (*ftl_nand_type).blocks
                             - (*ftl_nand_type).userblocks - 0x17;
     uint32_t abspage = vpage + ppb * syshyperblocks;
-    if (abspage >= (*ftl_nand_type).blocks * ppb || abspage < ppb)
+    if (abspage + count > (*ftl_nand_type).blocks * ppb || abspage < ppb)
         panicf("FTL: Trying to write out-of-bounds vPage %u",
                (unsigned)vpage);
         //return 4;
 
-    uint32_t bank = abspage % ftl_banks;
-    uint32_t block = abspage / ((*ftl_nand_type).pagesperblock * ftl_banks);
-    uint32_t page = (abspage / ftl_banks) % (*ftl_nand_type).pagesperblock;
-    uint32_t physblock = ftl_vfl_get_physical_block(bank, block);
-    uint32_t physpage = physblock * (*ftl_nand_type).pagesperblock + page;
+    uint32_t bank[5];
+    uint32_t block[5];
+    uint32_t physpage[5];
 
-    if (nand_write_page(bank, physpage, buffer, sparebuffer, 1) == 0)
-        return 0;
-
-    if ((nand_read_page(bank, physpage, ftl_buffer,
-                        &ftl_sparebuffer[0], 1, 1) & 0x11F) == 0)
-        return 0;
-
-    panicf("FTL: write error on vPage %u, bank %u, pPage %u",
-           (unsigned)vpage, (unsigned)bank, (unsigned)physpage);
-    ftl_vfl_log_trouble(bank, block);
-    return 1;
-}
-#endif
-
-
-#ifndef FTL_READONLY
-/* Writes the specified vPage, dealing with all kinds of trouble */
-uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count, void* buffer, void* sparebuffer)
-{
-    uint32_t i;
-    for (i = 0; i < count; i++)
+    for (i = 0; i < count; i++, abspage++)
     {
-        void* databuf = (void*)0;
-        void* sparebuf = (void*)0;
-        if (buffer) databuf = (void*)((uint32_t)buffer + 0x800 * i);
-        if (sparebuffer) sparebuf = (void*)((uint32_t)sparebuffer + 0x40 * i);
-        uint32_t rc = ftl_vfl_write_single(vpage + i, databuf, sparebuf);
-        if (rc) return rc;
+        for (j = ftl_banks; j > 0; j--)
+        {
+            bank[j] = bank[j - 1];
+            block[j] = block[j - 1];
+            physpage[j] = physpage[j - 1];
+        }
+        bank[0] = abspage % ftl_banks;
+        block[0] = abspage / ((*ftl_nand_type).pagesperblock * ftl_banks);
+        uint32_t page = (abspage / ftl_banks) % (*ftl_nand_type).pagesperblock;
+        uint32_t physblock = ftl_vfl_get_physical_block(bank[0], block[0]);
+        physpage[0] = physblock * (*ftl_nand_type).pagesperblock + page;
+
+        if (i >= ftl_banks)
+            if (nand_write_page_collect(bank[ftl_banks]))
+                if (nand_read_page(bank[ftl_banks], physpage[ftl_banks],
+                                   ftl_buffer, &ftl_sparebuffer[0], 1, 1) & 0x11F)
+                {
+                    panicf("FTL: write error (2) on vPage %u, bank %u, pPage %u",
+                           (unsigned)(vpage + i - ftl_banks),
+                           (unsigned)bank[ftl_banks],
+                           (unsigned)physpage[ftl_banks]);
+                    ftl_vfl_log_trouble(bank[ftl_banks], block[ftl_banks]);
+                }
+        if (nand_write_page_start(bank[0], physpage[0],
+                                  (void*)((uint32_t)buffer + 0x800 * i),
+                                  (void*)((uint32_t)sparebuffer + 0x40 * i), 1))
+            if (nand_read_page(bank[0], physpage[0], ftl_buffer,
+                               &ftl_sparebuffer[0], 1, 1) & 0x11F)
+            {
+                panicf("FTL: write error (1) on vPage %u, bank %u, pPage %u",
+                       (unsigned)(vpage + i), (unsigned)bank[0], (unsigned)physpage[0]);
+                ftl_vfl_log_trouble(bank[0], block[0]);
+            }
     }
+
+    for (i = count < ftl_banks ? count : ftl_banks; i > 0; i--)
+        if (nand_write_page_collect(bank[i - 1]))
+            if (nand_read_page(bank[i - 1], physpage[i - 1],
+                               ftl_buffer, &ftl_sparebuffer[0], 1, 1) & 0x11F)
+            {
+                panicf("FTL: write error (2) on vPage %u, bank %u, pPage %u",
+                       (unsigned)(vpage + count - i),
+                       (unsigned)bank[i - 1], (unsigned)physpage[i - 1]);
+                ftl_vfl_log_trouble(bank[i - 1], block[i - 1]);
+            }
+
     return 0;
 }
 #endif
