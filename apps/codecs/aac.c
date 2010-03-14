@@ -71,7 +71,7 @@ next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
   
-    sound_samples_done = ci->id3->offset;
+    file_offset = ci->id3->offset;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
@@ -110,8 +110,8 @@ next_track:
 
     i = 0;
     
-    if (sound_samples_done > 0) {
-        if (alac_seek_raw(&demux_res, &input_stream, sound_samples_done,
+    if (file_offset > 0) {
+        if (alac_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
             elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
             ci->set_elapsed(elapsed_time);
@@ -189,7 +189,7 @@ next_track:
             goto done;
         }
 
-        /* Advance codec buffer */
+        /* Advance codec buffer (no need to call set_offset because of this) */
         ci->advance_buffer(n);
 
         /* Output the audio */
@@ -239,10 +239,6 @@ next_track:
         sound_samples_done += sample_duration;
         elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
         ci->set_elapsed(elapsed_time);
-
-        /* Keep track of current position - for resuming */
-        ci->set_offset(elapsed_time);
-
         i++;
     }
 
