@@ -44,24 +44,6 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 #	define color(a)
 #endif
 
-#define LIB_OFFSET 160 /* FIXME (see below) */
-/* The alignement of library blocks (in number of 0x200 bytes blocks)
- * alignement	-	md5sum		-			filename		-	model
- * 120 : fc9dd6116001b3e6a150b898f1b091f0  m200p-4.1.08A.bin	M200
- * 128 : 82e3194310d1514e3bbcd06e84c4add3  m200p.bin			Fuze
- * 160 : c12711342169c66e209540cd1f27cd26  m300f.bin			CLIP
- *
- * Note : the size of library blocks is variable:
- *
- * For m200p-4.1.08A.bin it's always 0x1e000 blocks = 240 * 0x200
- *
- * For m200p.bin it can be 0x20000 (256*0x200) or 0x40000 (512*0x200)
- * 		(for "acp_decoder" and "sd_reload__" blocks)
- *
- * For m300f.bin it can be 0x28000 (320*0x200) or 0x14000 (160 * 0x200)
- *
- */
-
 #define bug(...) do { fprintf(stderr,"ERROR: "__VA_ARGS__); exit(1); } while(0)
 #define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
 
@@ -331,9 +313,7 @@ static void print_block(size_t off, type t)
 			break;
 #endif
 		case LIB:
-			s = LIB_OFFSET * 0x200;
-			while(s < get32le(off+12))
-				s <<= 1;
+			s = get32le(off+12);
 			color(RED);
 			printf("library block	0x%.6x\t->\t0x%.6x\t\"%s\"\n",
 					(unsigned int)s, (unsigned int)(off+s),
@@ -430,10 +410,7 @@ static size_t verify_block(size_t off)
 		if(ok) /* library block */
 		{
 			t = LIB;
-			s = LIB_OFFSET * 0x200;
-			while(s < get32le(off+12)) 	/* of course the minimum is the size
-												* specified in the block header */
-				s <<= 1;
+			s = get32le(off+12);
 		}
 		else
 			t = UNKNOWN;
