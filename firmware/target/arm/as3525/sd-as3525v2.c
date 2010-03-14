@@ -382,14 +382,11 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
 
         if(flags & MCI_LONG_RESP)
         {
-            /* store the response in little endian order for the words */
-            response[0] = MCI_RESP3;
-            response[1] = MCI_RESP2;
-            response[2] = MCI_RESP1;
-            response[3] = MCI_RESP0;
+            response[3] = MCI_RESP3;
+            response[2] = MCI_RESP2;
+            response[1] = MCI_RESP1;
         }
-        else
-            response[0] = MCI_RESP0;
+        response[0] = MCI_RESP0;
     }
     return true;
 }
@@ -397,10 +394,8 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
 static int sd_init_card(void)
 {
     unsigned long response;
-    unsigned long temp_reg[4];
     long init_timeout;
     bool sd_v2 = false;
-    int i;
 
     /*  assume 24 MHz clock / 60 = 400 kHz  */
     MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x3C;    /* CLK_DIV_0 : bits 7:0  */
@@ -437,11 +432,8 @@ static int sd_init_card(void)
     } while(!(card_info.ocr & (1<<31)) );
 
     /* CMD2 send CID */
-    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, temp_reg))
+    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, card_info.cid))
         return -5;
-
-    for(i=0; i<4; i++)
-        card_info.cid[3-i] = temp_reg[i];
 
     /* CMD3 send RCA */
     if(!send_cmd(SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &card_info.rca))
@@ -451,11 +443,8 @@ static int sd_init_card(void)
 
     /* CMD9 send CSD */
     if(!send_cmd(SD_SEND_CSD, card_info.rca,
-                 MCI_RESP|MCI_LONG_RESP, temp_reg))
+                 MCI_RESP|MCI_LONG_RESP, card_info.csd))
         return -5;
-
-    for(i=0; i<4; i++)
-        card_info.csd[3-i] = temp_reg[i];
 
     sd_parse_csd(&card_info);
 
