@@ -69,8 +69,9 @@ static mpc_bool_t canseek_impl(mpc_reader *reader)
 enum codec_status codec_main(void)
 {
     mpc_int64_t samplesdone;
-    uint32_t frequency; /* 0.1 kHz accuracy */
-    uint32_t elapsed_time; /* milliseconds */
+    uint32_t frequency;     /* 0.1 kHz accuracy */
+    uint32_t elapsed_time;  /* milliseconds */
+    uint32_t byterate;      /* bytes per second */
     mpc_status status;
     mpc_reader reader;
     mpc_streaminfo info;
@@ -102,8 +103,6 @@ next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
-    samplesdone = ci->id3->offset;
-
     /* initialize demux/decoder */
     demux = mpc_demux_init(&reader);
     if (NULL == demux)
@@ -114,9 +113,15 @@ next_track:
     /* read file's streaminfo data */
     mpc_demux_get_info(demux, &info);
     
-
+    byterate  = (mpc_uint32_t)(info.average_bitrate) / 8;
     frequency = info.sample_freq / 100; /* 0.1 kHz accuracy */
     ci->configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
+
+    /* Remark: rockbox offset is the file offset in bytes. So, estimate the 
+     * sample seek position from the file offset, the sampling frequency and
+     * the bitrate. As the saved position is exactly calculated the reverse way 
+     * there is no loss of information except rounding. */
+    samplesdone = 100 * ((mpc_uint64_t)(ci->id3->offset * frequency) / byterate);
         
     /* set playback engine up for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files
@@ -181,7 +186,9 @@ next_track:
             samplesdone += frame.samples;
             elapsed_time = (samplesdone*10)/frequency;
             ci->set_elapsed(elapsed_time);
-            ci->set_offset(samplesdone);
+            /* Remark: rockbox offset is the file offset in bytes. So estimate 
+             * this offset from the samples, sampling frequency and bitrate */
+            ci->set_offset( (samplesdone * byterate)/(frequency*100) );
         }
     } while (true);
 
