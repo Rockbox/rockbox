@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2005 Thom Johansen 
+ * Copyright (C) 2010 Andree Buschmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,9 +28,11 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 #include "replaygain.h"
+#include "fixedpoint.h"
 
-/* Needed for replay gain in sv8, please search MPC_OLD_GAIN_REF in libmusepack */
-#define SV8_TO_SV7_CONVERT_GAIN (6482) /* 64.82 * 100 */
+/* Needed for replay gain and clipping prevention of SV8 files. */
+#define SV8_TO_SV7_CONVERT_GAIN (6482)  /* 64.82 * 100, MPC_OLD_GAIN_REF */
+#define SV8_TO_SV7_CONVERT_PEAK (23119) /* 256 * 20 * log10(32768) */
 
 static int set_replaygain_sv7(struct mp3entry* id3, 
                               bool album, 
@@ -39,15 +42,9 @@ static int set_replaygain_sv7(struct mp3entry* id3,
     long gain = (int16_t) ((value >> 16) & 0xffff);
     long peak = (uint16_t) (value & 0xffff);
     
-    /* Remark: mpc sv7 outputs peak as amplitude, not as dB. The following 
-     * useage of peak is not correct and needs to be fixed. */
-    
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
-        /* Use the Xing TOC field to store ReplayGain strings for use in the
-         * ID3 screen, since Musepack files shouldn't need to use it in any
-         * other way.
-         */
+        /* Save the ReplayGain data to id3-structure for further processing. */
         used += parse_replaygain_int(album, gain * 512 / 100, peak << 9,
             id3, id3->toc + used, sizeof(id3->toc) - used);
     }
@@ -63,13 +60,19 @@ static int set_replaygain_sv8(struct mp3entry* id3,
 {
     gain = (long)(SV8_TO_SV7_CONVERT_GAIN - ((gain*100)/256));
 
+    /* Transform SV8's logarithmic peak representation to the desired linear
+     * representation: linear = pow(10, peak/256/20).
+     *
+     * FP_BITS   = 24 bits = desired fp representation for dsp routines
+     * FRAC_BITS = 12 bits = resolution used for fp_bits
+     * fp_factor(peak*(1<<FRAC_BITS)/256, FRAC_BITS) << (FP_BITS-FRAC_BITS)
+     **/
+    peak = (fp_factor((peak-SV8_TO_SV7_CONVERT_PEAK)*16, 12) << 12);
+
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
-        /* Use the Xing TOC field to store ReplayGain strings for use in the
-         * ID3 screen, since Musepack files shouldn't need to use it in any
-         * other way.
-         */
-        used += parse_replaygain_int(album, gain * 512 / 100, peak << 9,
+        /* Save the ReplayGain data to id3-structure for further processing. */
+        used += parse_replaygain_int(album, gain * 512 / 100, peak,
             id3, id3->toc + used, sizeof(id3->toc) - used);
     }
     
