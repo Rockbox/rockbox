@@ -528,28 +528,20 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
     nand_last_activity_value = current_tick;
     led(true);
     if (!nand_powered) nand_power_up();
-    for (i = 0; i < 4; i++)
-    {
-        if (nand_type[i] == 0xFFFFFFFF) continue;
-        nand_set_fmctrl0(i, FMCTRL0_ENABLEDMA);
-        if (nand_send_cmd(NAND_CMD_READ))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
-        if (nand_send_address(page, databuffer ? 0 : 0x800))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
-        if (nand_send_cmd(NAND_CMD_READ2))
-        {
-            rc |= 1 << (i << 2);
-            continue;
-        }
-    }
     uint8_t status[4];
     for (i = 0; i < 4; i++) status[i] = (nand_type[i] == 0xFFFFFFFF);
+    if (!status[0])
+    {
+        nand_set_fmctrl0(0, FMCTRL0_ENABLEDMA);
+        if (nand_send_cmd(NAND_CMD_READ))
+            status[0] = 1;
+    }
+    if (!status[0])
+        if (nand_send_address(page, 0))
+            status[0] = 1;
+    if (!status[0])
+        if (nand_send_cmd(NAND_CMD_READ2))
+            status[0] = 1;
     if (!status[0])
         if (nand_wait_status_ready(0))
             status[0] = 1;
@@ -561,6 +553,18 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
             status[0] = 1;
     for (i = 1; i < 4; i++)
     {
+        if (!status[i])
+        {
+            nand_set_fmctrl0(i, FMCTRL0_ENABLEDMA);
+            if (nand_send_cmd(NAND_CMD_READ))
+                status[i] = 1;
+        }
+        if (!status[i])
+            if (nand_send_address(page, 0))
+                status[i] = 1;
+        if (!status[i])
+            if (nand_send_cmd(NAND_CMD_READ2))
+                status[i] = 1;
         if (!status[i])
             if (nand_wait_status_ready(i))
                 status[i] = 1;
