@@ -9,6 +9,14 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
+#if 0   /* TODO */
+#ifndef BOOTLOADER
+#define HAVE_MULTIDRIVE
+#define NUM_DRIVES 2
+#define HAVE_HOTSWAP
+#endif
+#endif
+
 #if 0 /* disabled since there is no driver (yet) */
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
