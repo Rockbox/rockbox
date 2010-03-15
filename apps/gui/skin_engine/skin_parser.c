@@ -2223,6 +2223,11 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                 skin_data_reset(wps_data);
                 return false;
             }
+            if (!skin_load_fonts(wps_data))
+            {
+                skin_data_reset(wps_data);
+                return false;
+            }
 #endif
             return true;
         }
