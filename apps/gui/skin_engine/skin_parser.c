@@ -2155,7 +2155,7 @@ static bool skin_load_fonts(struct wps_data *data)
 bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                     const char *buf, bool isfile)
 {
-
+    char *wps_buffer = NULL;
     if (!wps_data || !buf)
         return false;
 #ifdef HAVE_ALBUMART
@@ -2186,6 +2186,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 #endif
 
     skin_data_reset(wps_data);
+    wps_data->wps_loaded = false;
     curr_screen = screen;
     
     /* alloc default viewport, will be fixed up later */
@@ -2213,27 +2214,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     if (!skin_start_new_line(curr_vp, 0))
         return false;
 
-    if (!isfile)
-    {
-        if (wps_parse(wps_data, buf, false))
-        {
-#ifdef HAVE_LCD_BITMAP
-            /* load the backdrop */
-            if (!load_skin_bitmaps(wps_data, BACKDROP_DIR)) {
-                skin_data_reset(wps_data);
-                return false;
-            }
-            if (!skin_load_fonts(wps_data))
-            {
-                skin_data_reset(wps_data);
-                return false;
-            }
-#endif
-            return true;
-        }
-        return false;
-    }
-    else
+    if (isfile)
     {
         int fd = open_utf8(buf, O_RDONLY);
 
@@ -2242,7 +2223,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 
         /* get buffer space from the plugin buffer */
         size_t buffersize = 0;
-        char *wps_buffer = (char *)plugin_get_buffer(&buffersize);
+        wps_buffer = (char *)plugin_get_buffer(&buffersize);
 
         if (!wps_buffer)
             return false;
@@ -2259,60 +2240,62 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                 wps_buffer[start] = 0;
             }
         }
-
         close(fd);
-
         if (start <= 0)
             return false;
-
-        /* parse the WPS source */
-        if (!wps_parse(wps_data, wps_buffer, true)) {
-            skin_data_reset(wps_data);
-            return false;
-        }
-
-        wps_data->wps_loaded = true;
+    }
+    else
+    {
+        wps_buffer = (char*)buf;
+    }
+    /* parse the WPS source */
+    if (!wps_parse(wps_data, wps_buffer, isfile)) {
+        skin_data_reset(wps_data);
+        return false;
+    }
 
 #ifdef HAVE_LCD_BITMAP
+    char bmpdir[MAX_PATH];
+    if (isfile)
+    {
         /* get the bitmap dir */
-        char bmpdir[MAX_PATH];
         char *dot = strrchr(buf, '.');
-
         strlcpy(bmpdir, buf, dot - buf + 1);
-        /* load the bitmaps that were found by the parsing */
-        if (!load_skin_bitmaps(wps_data, bmpdir)) {
-            skin_data_reset(wps_data);
-            wps_data->wps_loaded = false;
-            return false;
-        }
-        if (!skin_load_fonts(wps_data))
-        {
-            skin_data_reset(wps_data);
-            wps_data->wps_loaded = false;
-            return false;
-        }
+    }
+    else
+    {
+        snprintf(bmpdir, MAX_PATH, "%s", BACKDROP_DIR);
+    }
+    /* load the bitmaps that were found by the parsing */
+    if (!load_skin_bitmaps(wps_data, bmpdir) ||
+        !skin_load_fonts(wps_data)) 
+    {
+        skin_data_reset(wps_data);
+        return false;
+    }
 #endif
 #if defined(HAVE_ALBUMART) && !defined(__PCTOOL__)
-        status = audio_status();
-        if (status & AUDIO_STATUS_PLAY)
+    status = audio_status();
+    if (status & AUDIO_STATUS_PLAY)
+    {
+        struct skin_albumart *aa = wps_data->albumart;
+        if (aa && ((aa->state && !old_aa.state) ||
+            (aa->state &&
+            (((old_aa.height != aa->height) ||
+            (old_aa.width != aa->width))))))
         {
-            struct skin_albumart *aa = wps_data->albumart;
-            if (aa && ((aa->state && !old_aa.state) ||
-                (aa->state &&
-                (((old_aa.height != aa->height) ||
-                (old_aa.width != aa->width))))))
-            {
-                curtrack = audio_current_track();
-                offset = curtrack->offset;
-                audio_stop();
-                if (!(status & AUDIO_STATUS_PAUSE))
-                    audio_play(offset);
-            }
+            curtrack = audio_current_track();
+            offset = curtrack->offset;
+            audio_stop();
+            if (!(status & AUDIO_STATUS_PAUSE))
+                audio_play(offset);
         }
+    }
 #endif
-#if defined(DEBUG) || defined(SIMULATOR)
+    wps_data->wps_loaded = true;
+#ifdef DEBUG_SKIN_ENGINE
+    if (isfile && debug_wps)
         debug_skin_usage();
 #endif
-        return true;
-    }
+    return true;
 }
