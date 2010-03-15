@@ -59,6 +59,7 @@ newstart:
 
 #if (CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2) && !defined(BOOTLOADER)
     /* Setup MMU : has to be done before accessing IRAM ! */
+    ldr     sp, =stackend
     bl      memory_init
 
     /* Zero out IBSS */
@@ -109,7 +110,6 @@ newstart:
     bhi     1b
 
     /* Set up some stack and munge it with 0xdeadbeef */
-    ldr     sp, =stackend
     ldr     r2, =stackbegin
     ldr     r3, =0xdeadbeef
 1:
