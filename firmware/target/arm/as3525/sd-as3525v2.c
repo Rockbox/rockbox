@@ -43,6 +43,9 @@
 #include <stdarg.h>
 #include "sysfont.h"
 
+#define     INTERNAL_AS3525  0   /* embedded SD card */
+#define     SD_SLOT_AS3525   1   /* SD slot if present */
+
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
@@ -297,10 +300,9 @@
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
 static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
-static int sd_init_card(void);
 static void init_controller(void);
 
-static tCardInfo card_info;
+static tCardInfo card_info[NUM_DRIVES];
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -319,6 +321,15 @@ bool sd_enabled = false;
 static struct wakeup transfer_completion_signal;
 static volatile bool retry;
 static volatile bool data_transfer = false;
+
+static inline bool card_detect_target(void)
+{
+#if defined(HAVE_MULTIDRIVE)
+    return !(GPIOA_PIN(2));
+#else
+    return false;
+#endif
+}
 
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
@@ -392,7 +403,7 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
     return true;
 }
 
-static int sd_init_card(void)
+static int sd_init_card(const int drive)
 {
     unsigned long response;
     long init_timeout;
@@ -428,35 +439,35 @@ static int sd_init_card(void)
 
          /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         if(!send_cmd(SD_APP_OP_COND, (sd_v2 ? 0x40FF8000 : (1<<23)),
-                        MCI_RESP, &card_info.ocr))
+                        MCI_RESP, &card_info[drive].ocr))
             return -3;
-    } while(!(card_info.ocr & (1<<31)) );
+    } while(!(card_info[drive].ocr & (1<<31)) );
 
     /* CMD2 send CID */
-    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, card_info.cid))
+    if(!send_cmd(SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, card_info[drive].cid))
         return -5;
 
     /* CMD3 send RCA */
-    if(!send_cmd(SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &card_info.rca))
+    if(!send_cmd(SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &card_info[drive].rca))
         return -4;
 
     /*  End of Card Identification Mode   ************************************/
 
     /* CMD9 send CSD */
-    if(!send_cmd(SD_SEND_CSD, card_info.rca,
-                 MCI_RESP|MCI_LONG_RESP, card_info.csd))
+    if(!send_cmd(SD_SEND_CSD, card_info[drive].rca,
+                 MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
         return -5;
 
-    sd_parse_csd(&card_info);
+    sd_parse_csd(&card_info[drive]);
 
     /*  Card back to full speed  */
     MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
+    if(!send_cmd(SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
         return -6;
 
-    card_info.initialized = 1;
+    card_info[drive].initialized = 1;
 
     return 0;
 }
@@ -565,7 +576,7 @@ int sd_init(void)
     VIC_INT_ENABLE |= INTERRUPT_NAND;
 
     init_controller();
-    ret = sd_init_card();
+    ret = sd_init_card(INTERNAL_AS3525);
     if(ret < 0)
         return ret;
 
@@ -586,15 +597,15 @@ int sd_init(void)
 #ifdef STORAGE_GET_INFO
 void sd_get_info(struct storage_info *info)
 {
-    info->sector_size=card_info.blocksize;
-    info->num_sectors=card_info.numblocks;
+    info->sector_size=card_info[drive].blocksize;
+    info->num_sectors=card_info[drive].numblocks;
     info->vendor="Rockbox";
     info->product = "Internal Storage";
     info->revision="0.00";
 }
 #endif
 
-static int sd_wait_for_state(unsigned int state)
+static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned long response;
     unsigned int timeout = 100; /* ticks */
@@ -604,7 +615,7 @@ static int sd_wait_for_state(unsigned int state)
     {
         long tick;
 
-        if(!send_cmd(SD_SEND_STATUS, card_info.rca,
+        if(!send_cmd(SD_SEND_STATUS, card_info[drive].rca,
                     MCI_RESP, &response))
             return -1;
 
@@ -623,22 +634,27 @@ static int sd_wait_for_state(unsigned int state)
     }
 }
 
-static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool write)
+static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
+                                int count, void* buf, bool write)
 {
     int ret = 0;
+#ifndef HAVE_MULTIDRIVE
+    const int drive = 0;
+#endif
 
     /* skip SanDisk OF */
-    start += 0xf000;
+    if (drive == INTERNAL_AS3525)
+        start += 0xf000;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
 #endif
 
-    if (card_info.initialized <= 0)
+    if (card_info[drive].initialized <= 0)
     {
-        ret = sd_init_card();
-        if (!(card_info.initialized))
+        ret = sd_init_card(drive);
+        if (!(card_info[drive].initialized))
         {
             panicf("card not initialised (%d)", ret);
             goto sd_transfer_error;
@@ -646,7 +662,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
     }
 
     last_disk_activity = current_tick;
-    ret = sd_wait_for_state(SD_TRAN);
+    ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
     {
         static const char *st[9] = {
@@ -691,7 +707,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
         MCI_FIFOTH |= 0x503f0080;
 
 
-        if(card_info.ocr & (1<<30) ) /* SDHC */
+        if(card_info[drive].ocr & (1<<30) ) /* SDHC */
             ret = send_cmd(cmd, start, MCI_NO_RESP, NULL);
         else
             ret = send_cmd(cmd, start * SD_BLOCK_SIZE,
@@ -720,7 +736,7 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
             goto sd_transfer_error;
         }
 
-        ret = sd_wait_for_state(SD_TRAN);
+        ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
         {
             panicf(" wait for state TRAN failed (%d)", ret);
@@ -747,25 +763,30 @@ static int sd_transfer_sectors(unsigned long start, int count, void* buf, bool w
 
 sd_transfer_error:
     panicf("transfer error : %d",ret);
-    card_info.initialized = 0;
+    card_info[drive].initialized = 0;
     return ret;
 }
 
-int sd_read_sectors(unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+                    void* buf)
 {
-    return sd_transfer_sectors(start, count, buf, false);
+    return sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
 }
 
-int sd_write_sectors(unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+                     const void* buf)
 {
 #if 1 /* disabled until stable*/ \
     || defined(BOOTLOADER) /* we don't need write support in bootloader */
+#ifdef HAVE_MULTIDRIVE
+    (void) drive;
+#endif
     (void) start;
     (void) count;
     (void) buf;
     return -1;
 #else
-    return sd_transfer_sectors(start, count, (void*)buf, true);
+    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 #endif
 }
 
@@ -784,8 +805,50 @@ void sd_enable(bool on)
 
 tCardInfo *card_get_info_target(int card_no)
 {
-    (void)card_no;
-    return &card_info;
+    return &card_info[card_no];
+}
+#endif /* BOOTLOADER */
+
+#ifdef HAVE_HOTSWAP
+bool sd_removable(IF_MD_NONVOID(int drive))
+{
+    return (drive==1);
 }
 
-#endif /* BOOTLOADER */
+bool sd_present(IF_MD_NONVOID(int drive))
+{
+    return (drive == 0) ? true : card_detect_target();
+}
+
+static int sd1_oneshot_callback(struct timeout *tmo)
+{
+    (void)tmo;
+
+    /* This is called only if the state was stable for 300ms - check state
+ *      * and post appropriate event. */
+    if (card_detect_target())
+    {
+        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+    }
+    else
+        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+
+    return 0;
+}
+
+void INT_GPIOA(void)
+{
+    static struct timeout sd1_oneshot;
+    /* acknowledge interrupt */
+    GPIOA_IC = (1<<2);
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
+}
+
+void card_enable_monitoring_target(bool on)
+{
+    if (on) /* enable interrupt */
+        GPIOA_IE |= (1<<2);
+    else    /* disable interrupt */
+        GPIOA_IE &= ~(1<<2);
+}
+#endif /* HAVE_HOTSWAP */
