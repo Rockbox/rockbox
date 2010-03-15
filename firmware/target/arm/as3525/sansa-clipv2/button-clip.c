@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2009 Bertrik Sikken
  * Copyright (C) 2008 François Dinel
  * Copyright ©   2008-2009 Rafaël Carré
  *
@@ -19,11 +20,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "system.h"
 #include "button-target.h"
 #include "as3525v2.h"
-#include "kernel.h"
-
-/* FIXME : use Clipv1 like driver (FS#10285) */
+#ifndef BOOTLOADER
+#include "backlight.h"
+#endif
 
 void button_init_device(void)
 {
@@ -33,11 +35,17 @@ void button_init_device(void)
     GPIOD_PIN(4) = 1<<4;
     GPIOD_PIN(5) = 1<<5;
     GPIOD_DIR |= ((1<<5) | (1<<4) | (1<<3));
+
+    /* get initial readings */
+    button_read_device();
+    button_read_device();
+    button_read_device();
 }
 
 int button_read_device(void)
 {
-    int result = 0;
+    static int row = 0;
+    static int buttons = 0;
     static unsigned power_counter = 0;
 
     if(button_hold())
@@ -54,55 +62,84 @@ int button_read_device(void)
         power_counter--;
 
     if (GPIOA_PIN(7) && !power_counter)
-        result |= BUTTON_POWER;
+        buttons |= BUTTON_POWER;
+    else
+        buttons &= ~BUTTON_POWER;
 
     /* This is a keypad using D3-D5 as columns and D0-D2 as rows */
+    switch (row) {
 
-    GPIOD_PIN(3) = 0x00; /* activate D3 */
-    asm volatile ("nop\nnop\nnop\nnop\nnop\n"); /* wait a bit for reliable results */
+    case 0:
+        buttons &= ~(BUTTON_VOL_UP | BUTTON_UP);
 
-    /* D3D0 is unused */
+        (void)GPIOD_PIN(0); /* D3D0 is unused */
 
-    if (!GPIOD_PIN(1))
-        result |= BUTTON_VOL_UP;
+        if (!GPIOD_PIN(1))
+            buttons |= BUTTON_VOL_UP;
 
-    if (!GPIOD_PIN(2))
-        result |= BUTTON_UP;
+        if (!GPIOD_PIN(2))
+            buttons |= BUTTON_UP;
 
-    GPIOD_PIN(3) = 1<<3;
+        GPIOD_PIN(3) = 1<<3;
+        GPIOD_PIN(4) = 0x00;
+        row++;
+        break;
 
-    GPIOD_PIN(4) = 0x00; /* activate D4 */
-    asm volatile ("nop\nnop\nnop\nnop\nnop\n");
+    case 1:
+        buttons &= ~(BUTTON_LEFT | BUTTON_SELECT | BUTTON_RIGHT);
 
-    if (!GPIOD_PIN(0))
-        result |= BUTTON_LEFT;
+        if (!GPIOD_PIN(0))
+            buttons |= BUTTON_LEFT;
 
-    if (!GPIOD_PIN(1))
-        result |= BUTTON_SELECT;
+        if (!GPIOD_PIN(1))
+            buttons |= BUTTON_SELECT;
 
-    if (!GPIOD_PIN(2))
-        result |= BUTTON_RIGHT;
+        if (!GPIOD_PIN(2))
+            buttons |= BUTTON_RIGHT;
 
-    GPIOD_PIN(4) = 1<<4;
+        GPIOD_PIN(4) = 1<<4;
+        GPIOD_PIN(5) = 0x00;
+        row++;
+        break;
 
-    GPIOD_PIN(5) = 0x00; /* activate D5 */
-    asm volatile ("nop\nnop\nnop\nnop\nnop\n");
+    case 2:
+        buttons &= ~(BUTTON_DOWN | BUTTON_VOL_DOWN | BUTTON_HOME);
 
-    if (!GPIOD_PIN(0))
-        result |= BUTTON_DOWN;
+        if (!GPIOD_PIN(0))
+            buttons |= BUTTON_DOWN;
 
-    if (!GPIOD_PIN(1))
-        result |= BUTTON_VOL_DOWN;
+        if (!GPIOD_PIN(1))
+            buttons |= BUTTON_VOL_DOWN;
 
-    if (!GPIOD_PIN(2))
-        result |= BUTTON_HOME;
+        if (!GPIOD_PIN(2))
+            buttons |= BUTTON_HOME;
 
-    GPIOD_PIN(5) = 1<<5;
+        GPIOD_PIN(5) = 1<<5;
+        GPIOD_PIN(3) = 0x00;
 
-    return result;
+    default:
+        row = 0;
+        break;
+    }
+
+    return buttons;
 }
 
 bool button_hold(void)
 {
-    return (GPIOA_PIN(3) != 0);
+#ifndef BOOTLOADER
+    static bool hold_button_old = false;
+#endif
+    bool hold_button = (GPIOA_PIN(3) != 0);
+
+#ifndef BOOTLOADER
+    /* light handling */
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
+    }
+#endif /* BOOTLOADER */
+
+    return hold_button;
 }
