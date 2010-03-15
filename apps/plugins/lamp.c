@@ -160,14 +160,11 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_LCD_INVERT
-#if defined(MROBE_100) || defined(SANSA_CLIP) || defined(SANSA_CLIPV2) \
-    || defined(SANSA_CLIPPLUS)
-    /* mrobe-100 has inverted display so invert it for max brightness */
-    /* sansa clip has no real backlight so we need to enable all pixels */
+#ifdef HAVE_NEGATIVE_LCD
     rb->lcd_set_invert_display(true);
 #else
     rb->lcd_set_invert_display(false);
-#endif /* MROBE_100 */
+#endif /* HAVE_NEGATIVE_LCD */
 #endif /* HAVE_LCD_INVERT */
 
     backlight_force_on();
