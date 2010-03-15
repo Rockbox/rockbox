@@ -56,7 +56,7 @@ void audio_input_mux(int source, unsigned flags)
             }
             break;
 
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) && (INPUT_SRC_CAPS & SRC_CAP_MIC)
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
