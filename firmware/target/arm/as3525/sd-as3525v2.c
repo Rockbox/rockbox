@@ -377,8 +377,9 @@ static bool send_cmd(const int cmd, const int arg, const int flags,
 
     if(flags & MCI_RESP)
     {
-        mci_delay(); /* if we read the response too fast we might read the
-                      * response of the previous command instead */
+        int i = 0xff; while(i--) ;
+        /* if we read the response too fast we might read the response
+         * of the previous command instead */
 
         if(flags & MCI_LONG_RESP)
         {
