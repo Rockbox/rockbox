@@ -110,6 +110,7 @@ newstart:
     bhi     1b
 
     /* Set up some stack and munge it with 0xdeadbeef */
+    ldr     sp, =stackend
     ldr     r2, =stackbegin
     ldr     r3, =0xdeadbeef
 1:
