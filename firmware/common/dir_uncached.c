@@ -114,16 +114,20 @@ DIR_UNCACHED* opendir_uncached(const char* name)
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
-                /* in reality, the parent_dir parameter of fat_opendir is
+                /* In reality, the parent_dir parameter of fat_opendir seems
                  * useless because it's sole purpose it to have a way to
                  * update the file metadata, but here we are only reading
                  * a directory so there's no need for that kind of stuff.
-                 * Consequently, we can safely pass NULL of it because
-                 * fat_opendir and fat_open are NULL-protected. */
+                 * However, the rmdir_uncached function uses a ugly hack to
+                 * avoid opening a directory twice when deleting it and thus
+                 * needs those information. That's why we pass pdir->fatdir both
+                 * as the parent directory and the resulting one (this is safe,
+                 * in doubt, check fat_open(dir) code) which will allow this kind of
+                 * (ugly) things */
                 if ( fat_opendir(IF_MV2(volume,)
                                  &pdir->fatdir,
                                  entry.firstcluster,
-                                 NULL) < 0 ) {
+                                 &pdir->fatdir) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%ld)\n",
                            part, entry.firstcluster);
                     pdir->busy = false;
