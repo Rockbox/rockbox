@@ -1632,6 +1632,15 @@ int fat_open(IF_MV2(int volume,)
              struct fat_file *file,
              const struct fat_dir* dir)
 {
+    /* Remember where the file's dir entry is located
+     * Do it befoe assigning other fields so that fat_open
+     * can be called with file == &dir->file (see fat_opendir) */
+    if ( dir ) {
+        file->direntry = dir->entry - 1;
+        file->direntries = dir->entrycount;
+        file->dircluster = dir->file.firstcluster;
+    }
+    
     file->firstcluster = startcluster;
     file->lastcluster = startcluster;
     file->lastsector = 0;
@@ -1648,12 +1657,6 @@ int fat_open(IF_MV2(int volume,)
     }
 #endif
 
-    /* remember where the file's dir entry is located */
-    if ( dir ) {
-        file->direntry = dir->entry - 1;
-        file->direntries = dir->entrycount;
-        file->dircluster = dir->file.firstcluster;
-    }
     LDEBUGF("fat_open(%lx), entry %d\n",startcluster,file->direntry);
     return 0;
 }
@@ -2301,9 +2304,6 @@ int fat_opendir(IF_MV2(int volume,)
 #endif
     int rc;
 
-    dir->entry = 0;
-    dir->sector = 0;
-
     if (startcluster == 0)
         startcluster = fat_bpb->bpb_rootclus;
 
@@ -2314,6 +2314,11 @@ int fat_opendir(IF_MV2(int volume,)
                 " (error code %d)\n", rc);
         return rc * 10 - 1;
     }
+    
+    /* assign them after fat_open call so that fat_opendir can be called with the same
+     * fat_dir as parent and result */
+    dir->entry = 0;
+    dir->sector = 0;
 
     return 0;
 }
