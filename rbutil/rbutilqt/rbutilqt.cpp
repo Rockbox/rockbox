@@ -393,7 +393,8 @@ void RbUtilQt::updateManual()
         QString manual= SystemInfo::value(SystemInfo::CurManual).toString();
 
         if(manual == "")
-            manual = "rockbox-" + RbSettings::value(RbSettings::Platform).toString();
+            manual = "rockbox-"
+                + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
         QString pdfmanual;
         pdfmanual = SystemInfo::value(SystemInfo::ManualUrl).toString()
                             + "/" + manual + ".pdf";
@@ -1052,7 +1053,8 @@ void RbUtilQt::downloadManual(void)
 
     QString manual = SystemInfo::value(SystemInfo::CurManual).toString();
     if(manual.isEmpty())
-        manual = "rockbox-" + RbSettings::value(RbSettings::Platform).toString();
+        manual = "rockbox-"
+            + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
 
     QString date = ServerInfo::value(ServerInfo::DailyDate).toString();
 
