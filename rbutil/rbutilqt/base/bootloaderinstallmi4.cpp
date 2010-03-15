@@ -61,7 +61,7 @@ void BootloaderInstallMi4::installStage2(void)
     m_tempfile.open();
     qDebug() << "[BootloaderInstallMi4] renaming" << m_tempfile.fileName() << "to" << fwfile;
     m_tempfile.close();
-    m_tempfile.rename(fwfile);
+    m_tempfile.copy(fwfile);
 
     emit logItem(tr("Bootloader successful installed"), LOGOK);
     logInstall(LogAdd);
@@ -96,8 +96,7 @@ bool BootloaderInstallMi4::uninstall(void)
     QFile blfile(resolved);
     blfile.remove();
 
-    QFile oldbl(resolvePathCase(original));
-    oldbl.rename(m_blfile);
+    QFile::rename(resolvePathCase(original), m_blfile);
     emit logItem(tr("Rockbox bootloader successful removed"), LOGINFO);
     logInstall(LogRemove);
     emit done(false);

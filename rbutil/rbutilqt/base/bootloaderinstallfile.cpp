@@ -84,7 +84,7 @@ void BootloaderInstallFile::installStage2(void)
     m_tempfile.open();
     qDebug() << "[BootloaderInstallFile] renaming" << m_tempfile.fileName() << "to" << fwfile;
     m_tempfile.close();
-    m_tempfile.rename(fwfile);
+    m_tempfile.copy(fwfile);
 
     emit logItem(tr("Bootloader successful installed"), LOGOK);
     logInstall(LogAdd);
