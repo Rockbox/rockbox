@@ -77,12 +77,8 @@ extern unsigned int power_thread_inputs;
 #ifndef SIMULATOR
 
 /* Generic current values that are intentionally meaningless - config header
- * should define proper numbers.  Use insane values here to remind people 
- * to define the correct values in the proper header*/
+ * should define proper numbers.*/
  
-#ifndef CURRENT_NORMAL
-#define CURRENT_NORMAL    5  /* usual current in mA */
-#endif
 
 #ifndef CURRENT_BACKLIGHT
 #define CURRENT_BACKLIGHT  5  /* additional current when backlight always on */

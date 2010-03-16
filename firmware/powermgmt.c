@@ -113,7 +113,10 @@ static long last_event_tick;
 
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
+
+#ifdef CURRENT_NORMAL   /*only used if we have run current*/
 static int runcurrent(void);
+#endif
 
 void battery_read_info(int *voltage, int *level)
 {
@@ -272,6 +275,8 @@ static void battery_status_update(void)
 {
     int level = voltage_to_battery_level(battery_millivolts);
 
+#ifdef CURRENT_NORMAL  /*don't try to estimate run or charge
+                        time without normal current defined*/
     /* calculate estimated remaining running time */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charging_state()) {
@@ -281,6 +286,7 @@ static void battery_status_update(void)
     }
     else
 #endif
+
     /* discharging: remaining running time */
     if (battery_millivolts > percent_to_volt_discharge[0][0]) {
         /* linear extrapolation */
@@ -290,6 +296,9 @@ static void battery_status_update(void)
     if (0 > powermgmt_est_runningtime_min) {
         powermgmt_est_runningtime_min = 0;
     }
+#else
+    powermgmt_est_runningtime_min=-1;
+#endif
 
     battery_percent = level;
     send_battery_level_event();
@@ -364,14 +373,14 @@ static void handle_auto_poweroff(void)
     }
 }
 
+#ifdef CURRENT_NORMAL /*check that we have a current defined in a config file*/
+
 /*
  * Estimate how much current we are drawing just to run.
  */
 static int runcurrent(void)
 {
-    int current;
-
-    current = CURRENT_NORMAL;
+    int current = CURRENT_NORMAL;
 
 #ifndef BOOTLOADER
     if (usb_inserted()
@@ -406,10 +415,11 @@ static int runcurrent(void)
         current += CURRENT_REMOTE;
 #endif
 #endif /* BOOTLOADER */
-
+    
     return current;
 }
 
+#endif  /* CURRENT_NORMAL */
 
 /* Check to see whether or not we've received an alarm in the last second */
 #ifdef HAVE_RTC_ALARM
