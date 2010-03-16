@@ -37,9 +37,6 @@
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
 
-/* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
-
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
@@ -123,17 +120,20 @@
 #define MAX_BRIGHTNESS_SETTING     12
 #define DEFAULT_BRIGHTNESS_SETTING  6
 
+/* define this if you have a light associated with the buttons */
+#define HAVE_BUTTON_LIGHT
+
 /* Which backlight fading type? */
-#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+//#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 
 /* define this if the unit uses a scrollwheel for navigation */
-#define HAVE_SCROLLWHEEL
+//#define HAVE_SCROLLWHEEL
 /* define to activate advanced wheel acceleration code */
-#define HAVE_WHEEL_ACCELERATION
+//#define HAVE_WHEEL_ACCELERATION
 /* define from which rotation speed [degree/sec] on the acceleration starts */
-#define WHEEL_ACCEL_START 540
+//#define WHEEL_ACCEL_START 540
 /* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
-#define WHEEL_ACCELERATION 1
+//#define WHEEL_ACCELERATION 1
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

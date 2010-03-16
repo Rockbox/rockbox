@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Barry Wardell
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,19 +18,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#include <stdbool.h>
 #include "config.h"
-#include "ascodec.h"
+#include "system.h"
+#include "button.h"
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
-#ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void);
-void _buttonlight_off(void);
-#endif
-#endif
+void button_init_device(void)
+{
+}
+
+/*
+ * Get button pressed from hardware
+ */
+int button_read_device(void)
+{
+    return 0;
+}
+
