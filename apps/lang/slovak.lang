@@ -5004,7 +5004,7 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: ".talk mp3 Klip"
@@ -12612,15 +12612,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim Multimédií"
+    usb_hid: "Multimédiá"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim multimédií"
+    usb_hid: "Multimédiá"
   </voice>
 </phrase>
 <phrase>
@@ -12629,15 +12629,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim Prezentácie"
+    usb_hid: "Prezentácia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim prezentácie"
+    usb_hid: "Prezentácia"
   </voice>
 </phrase>
 <phrase>
@@ -12646,15 +12646,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim Prezerania"
+    usb_hid: "Prezeranie"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim prezerania"
+    usb_hid: "Prezeranie"
   </voice>
 </phrase>
 <phrase>
@@ -12663,15 +12663,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim Myši"
+    usb_hid: "Myš"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim Myši"
+    usb_hid: "Myš"
   </voice>
 </phrase>
 <phrase>
@@ -13217,20 +13217,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_TO_TIME
-  desc: Shown in WPS jump to a specified time in a playing track
-  user: core
-  <source>
-    *: "Jump to time"
-  </source>
-  <dest>
-    *: "Skoč Na Čas"
-  </dest>
-  <voice>
-    *: "Skoč na čas"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BASE_SKIN
   desc: browse for the base skin in theme settings
   user: core
@@ -13262,5 +13248,56 @@
   <voice>
     *:none
     lcd_bitmap: "Vzdialený základný vzhľad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Vzdialená Obrazovka"
+  </dest>
+  <voice>
+    *:none
+    remote: "Vzdialená obrazovka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Hlavná Obrazovka"
+  </dest>
+  <voice>
+    *:none
+    remote: "Hlavná obrazovka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Interval Histogramu"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Interval histogramu"
   </voice>
 </phrase>
