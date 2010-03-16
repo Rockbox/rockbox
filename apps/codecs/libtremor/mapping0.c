@@ -178,7 +178,7 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
   return(NULL);
 }
 
-#ifdef CPU_ARM
+#ifdef _ARM_ASSEM_
 #define MAGANG( _mag, _ang )\
 {\
       register int temp;\

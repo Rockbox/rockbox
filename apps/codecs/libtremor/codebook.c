@@ -143,7 +143,7 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
 static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
 {
   unsigned tmp, ret;
-#ifdef CPU_ARM
+#ifdef _ARM_ASSEM_
 #if ARM_ARCH >= 6
   unsigned mask = 0x0f0f0f0f;
 #else
@@ -191,7 +191,7 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
     : /* inputs */
     [x]"r"(x)
   );
-#else /* !CPU_ARM */
+#else /* !_ARM_ASSEM_ */
 
 #ifdef CPU_COLDFIRE
   ret = x;
@@ -211,7 +211,7 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
   tmp = ret & 0x55555555;
   ret ^= tmp;
   ret = (ret >> 1) | (tmp << 1);         /* done */
-#endif /* !CPU_ARM */
+#endif /* !_ARM_ASSEM_ */
   return ret;
 }
 
