@@ -150,6 +150,10 @@
 /* Sansa can't be powered off while charging */
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
 
+#define CURRENT_NORMAL     50
+#define CURRENT_BACKLIGHT  25
+#define CURRENT_RECORD     CURRENT_NORMAL
+
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
 
