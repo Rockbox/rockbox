@@ -371,12 +371,7 @@ static int runcurrent(void)
 {
     int current;
 
-#if MEM == 8 && !(defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
-    /* assuming 192 kbps, the running time is 22% longer with 8MB */
-    current = CURRENT_NORMAL*100 / 122;
-#else
     current = CURRENT_NORMAL;
-#endif /* MEM == 8 */
 
 #ifndef BOOTLOADER
     if (usb_inserted()

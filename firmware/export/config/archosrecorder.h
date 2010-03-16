@@ -80,7 +80,11 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
-#define CURRENT_NORMAL    145  /* usual current in mA */
+if MEM < 8
+ #define CURRENT_NORMAL    145  /* usual current in mA */
+#else
+ #define CURRENT_NORMAL    145 *100 / 122 /* assuming 192 kbps, the running time is 22% longer with 8MB */
+#endif
 #define CURRENT_RECORD     35  /* additional recording current */
 #define CURRENT_USB       500 /* usual current in mA in USB mode */
 
