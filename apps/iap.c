@@ -766,10 +766,13 @@ void iap_handlepkt(void)
                 iap_send_pkt(data, sizeof(data));
                 break;
             }        
-            /* Get Max Screen Size for Picture Upload??? */
+            /* Get Screen Size */
             case 0x0033:
             {
-                unsigned char data[] = {0x04, 0x00, 0x34, 0x01, 0x36, 0x00, 0xA8, 0x01};
+                unsigned char data[] = {0x04, 0x00, 0x34,
+                                        LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
+                                        LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
+                                        0x01};
                 iap_send_pkt(data, sizeof(data));
                 break;
             }
