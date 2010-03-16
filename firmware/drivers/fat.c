@@ -1633,7 +1633,7 @@ int fat_open(IF_MV2(int volume,)
              const struct fat_dir* dir)
 {
     /* Remember where the file's dir entry is located
-     * Do it befoe assigning other fields so that fat_open
+     * Do it before assigning other fields so that fat_open
      * can be called with file == &dir->file (see fat_opendir) */
     if ( dir ) {
         file->direntry = dir->entry - 1;
