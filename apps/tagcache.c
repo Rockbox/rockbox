@@ -1441,7 +1441,7 @@ static bool get_next(struct tagcache_search *tcs)
     {
         tcs->valid = false;
         logf("too long tag #2");
-        logf("P:%X/%X", tcs->position, entry.tag_length);
+        logf("P:%lX/%lX", tcs->position, entry.tag_length);
         return false;
     }
     
@@ -2667,7 +2667,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
-                    logf("update error: %d/%d/%d", 
+                    logf("update error: %ld/%d/%ld", 
                          idxbuf[j].flag, i+j, tcmh.tch.entry_count);
                     error = true;
                     goto error_exit;
@@ -4028,7 +4028,7 @@ static bool load_tagcache(void)
             if (bytesleft < 0)
             {
                 logf("too big tagcache #2");
-                logf("tl: %d", fe->tag_length);
+                logf("tl: %ld", fe->tag_length);
                 logf("bl: %ld", bytesleft);
                 close(fd);
                 return false;
@@ -4042,7 +4042,7 @@ static bool load_tagcache(void)
             {
                 logf("read error #13");
                 logf("rc=0x%04x", rc); // 0x431
-                logf("len=0x%04x", fe->tag_length); // 0x4000
+                logf("len=0x%04lx", fe->tag_length); // 0x4000
                 logf("pos=0x%04lx", lseek(fd, 0, SEEK_CUR)); // 0x433
                 logf("tag=0x%02x", tag); // 0x00
                 close(fd);
@@ -4105,7 +4105,7 @@ static bool check_deleted_files(void)
         if (!file_exists(buf))
         {
             logf("Entry no longer valid.");
-            logf("-> %s / %d", buf, tfe.tag_length);
+            logf("-> %s / %ld", buf, tfe.tag_length);
             delete_entry(tfe.idx_id);
         }
     }
