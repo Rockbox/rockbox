@@ -12623,15 +12623,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "USB Keypad"
   </source>
   <dest>
     *: none
-    usb_hid: "Mode clavier USB"
+    usb_hid: "Clavier USB"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mode clavier USB"
+    usb_hid: "Clavier USB"
   </voice>
 </phrase>
 <phrase>
@@ -12640,15 +12640,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Mode Multimédia"
+    usb_hid: "Multimédia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mode Multimédia"
+    usb_hid: "Multimédia"
   </voice>
 </phrase>
 <phrase>
@@ -12657,15 +12657,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Mode Présentation"
+    usb_hid: "Présentation"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mode Présentation"
+    usb_hid: "Présentation"
   </voice>
 </phrase>
 <phrase>
@@ -12674,15 +12674,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Mode Navigateur"
+    usb_hid: "Navigateur"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mode Navigateur"
+    usb_hid: "Navigateur"
   </voice>
 </phrase>
 <phrase>
@@ -12691,15 +12691,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Mode Souris"
+    usb_hid: "Souris"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse Souris"
+    usb_hid: "Souris"
   </voice>
 </phrase>
 <phrase>
@@ -13310,5 +13310,22 @@
   <voice>
     *:none
     remote: "écran télécommande"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Intervalle de l'histogramme"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Intervalle de l'histogramme"
   </voice>
 </phrase>
