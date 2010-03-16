@@ -26,6 +26,7 @@ Sansa Clip  :   firmware version starting with "01."
 Sansa Clip+ :   firmware version starting with "01."
 Sansa Clipv2:   firmware version starting with "02."
 Sansa Fuze  :   firmware version starting with "01."
+Sansa Fuzev2:   firmware version starting with "02."
 Sansa E200v2:   firmware version starting with "03."
 Sansa C200v2:   firmware version starting with "03."
 Sansa M200v4:   firmware version starting with "4."
@@ -40,6 +41,7 @@ clip v2 :   m30pa.bin
 clip    :   m300a.bin
 clip+   :   clppa.bin
 fuze    :   fuzea.bin
+fuzev2  :   fuzpa.bin
 e200v2  :   e200pa.bin
 c200v2  :   c200pa.bin
 m200v4  :   m200a.bin
@@ -55,11 +57,12 @@ firmware and the new (rockbox) firmware.
 
   To boot into the Original Firmware, you need to press the Left key.
   ***Note : on the c200v2 you need to press the Right key.
+  ***Note : on the Clip+ you can alternatively press the Home key.
 
   The player will boot into the Original Firmware as well if it is powered up by
 inserting an usb cable.
-  ***Note : on the m200v4 powering up by usb will cause booting into the new
-firmware
+  ***Note : on the m200v4 and Clip+, powering up by usb will cause booting into
+the new firmware.
 
 Hacking
 -------
