@@ -2085,7 +2085,7 @@ read_end:
     start_position = file_pos + screen_top_ptr - buffer;
 
 #ifdef HAVE_LCD_BITMAP
-    if (strcmp(prefs.font, rb->global_settings->font_file))
+    if (rb->strcmp(prefs.font, rb->global_settings->font_file))
         change_font(prefs.font);
 
     init_need_scrollbar();
@@ -2260,7 +2260,7 @@ static void viewer_exit(void *parameter)
 
     rb->close(fd);
 #ifdef HAVE_LCD_BITMAP
-    if (strcmp(prefs.font, rb->global_settings->font_file))
+    if (rb->strcmp(prefs.font, rb->global_settings->font_file))
         change_font(rb->global_settings->font_file);
 #endif
 }
