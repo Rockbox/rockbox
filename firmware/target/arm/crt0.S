@@ -74,7 +74,7 @@ newstart:
     bl      map_section
 
     mov     r0, #0                          @ physical address
-    mov     r1, #IRAM_ORIG                  @ virtual address
+    ldr     r1, =IRAM_ORIG                  @ virtual address
     mov     r2, #1                          @ size : 1MB
     mov     r3, #CACHE_ALL
     bl      map_section
