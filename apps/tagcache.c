@@ -265,17 +265,17 @@ const char* tagcache_tag_to_str(int tag)
 }
 
 /* Helper functions for the two most read/write data structure: tagfile_entry and index_entry */
-ssize_t ecread_tagfile_entry(int fd, struct tagfile_entry *buf)
+static ssize_t ecread_tagfile_entry(int fd, struct tagfile_entry *buf)
 {
     return ecread(fd, buf, 1, tagfile_entry_ec, tc_stat.econ);
 }
 
-ssize_t ecread_index_entry(int fd, struct index_entry *buf)
+static ssize_t ecread_index_entry(int fd, struct index_entry *buf)
 {
     return ecread(fd, buf, 1, index_entry_ec, tc_stat.econ);
 }
 
-ssize_t ecwrite_index_entry(int fd, struct index_entry *buf)
+static ssize_t ecwrite_index_entry(int fd, struct index_entry *buf)
 {
     return ecwrite(fd, buf, 1, index_entry_ec, tc_stat.econ);
 }
