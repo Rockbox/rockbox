@@ -233,26 +233,6 @@ static void sdram_init(void)
 
     MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
 }
-#else   /* !BOOTLOADER */
-void memory_init(void)
-{
-    ttb_init();
-    /* map every region to itself, uncached */
-    map_section(0, 0, 4096, CACHE_NONE);
-
-    /* IRAM */
-    map_section(0, IRAM_ORIG, 1, CACHE_ALL);
-    map_section(0, UNCACHED_ADDR(IRAM_ORIG), 1, CACHE_NONE);
-
-    /* DRAM */
-    map_section(0x30000000, DRAM_ORIG, MEMORYSIZE, CACHE_ALL);
-    map_section(0x30000000, UNCACHED_ADDR(DRAM_ORIG), MEMORYSIZE, CACHE_NONE);
-
-    /* map 1st mbyte of DRAM at 0x0 to have exception vectors available */
-    map_section(0x30000000, 0, 1, CACHE_ALL);
-
-    enable_mmu();
-}
 #endif /* BOOTLOADER */
 
 void system_init(void)

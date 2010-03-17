@@ -58,9 +58,54 @@ newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
 #if (CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2) && !defined(BOOTLOADER)
+
+#define CACHE_NONE  0
+#define CACHE_ALL   0x0C
+#define UNCACHED_ADDR(a) (a + 0x10000000)
+
     /* Setup MMU : has to be done before accessing IRAM ! */
-    ldr     sp, =stackend
-    bl      memory_init
+
+    bl      ttb_init
+
+    mov     r0, #0                          @ physical address
+    mov     r1, #0                          @ virtual address
+    mov     r2, #0x1000                     @ size (all memory)
+    mov     r3, #CACHE_NONE
+    bl      map_section
+
+    mov     r0, #0                          @ physical address
+    mov     r1, #IRAM_ORIG                  @ virtual address
+    mov     r2, #1                          @ size : 1MB
+    mov     r3, #CACHE_ALL
+    bl      map_section
+
+    mov     r0, #0                          @ physical address
+    ldr     r1, =UNCACHED_ADDR(IRAM_ORIG)   @ virtual address
+    mov     r2, #1                          @ size : 1MB
+    mov     r3, #CACHE_NONE
+    bl      map_section
+
+    mov     r0, #0x30000000                 @ physical address
+    mov     r1, #DRAM_ORIG                  @ virtual address
+    mov     r2, #MEMORYSIZE                 @ size
+    mov     r3, #CACHE_ALL
+    bl      map_section
+
+    mov     r0, #0x30000000                 @ physical address
+    mov     r1, #UNCACHED_ADDR(DRAM_ORIG)   @ virtual address
+    mov     r2, #MEMORYSIZE                 @ size
+    mov     r3, #CACHE_NONE
+    bl      map_section
+
+    /* map 1st mbyte of DRAM at 0x0 to have exception vectors available */
+
+    mov     r0, #0x30000000                 @ physical address
+    mov     r1, #0                          @ virtual address
+    mov     r2, #1                          @ size
+    mov     r3, #CACHE_ALL
+    bl      map_section
+
+    bl      enable_mmu
 
     /* Zero out IBSS */
     ldr     r2, =_iedata
