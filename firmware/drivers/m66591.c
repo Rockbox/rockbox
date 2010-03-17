@@ -42,7 +42,7 @@
  ******************************************************************************/
 
 /* This define is primarily intended for testing, using HISPEED all the time
- *  should be acceptable since the defice should down-train if the host does not
+ *  should be acceptable since the device should down-train if the host does not
  *  support HISPEED.
  */
 #define HISPEED
@@ -639,7 +639,7 @@ void usb_drv_set_test_mode(int mode) {
     M66591_TESTMODE |= mode;
 }
 
-/* Request an unused endpoint, support for interrupt endpoints needs addition */
+/* Request an unused endpoint */
 int usb_drv_request_endpoint(int type, int dir) {
     int ep;
     int pipecfg = 0;
