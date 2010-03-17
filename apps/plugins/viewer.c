@@ -24,22 +24,108 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE   VIEWERS_DIR "/viewer.dat" /* binary file, so dont use .cfg */
-#define BOOKMARKS_FILE  VIEWERS_DIR "/viewer_bookmarks.dat"
+/* global settings file
+ * binary file, so dont use .cfg
+ *
+ * setting file format
+ *
+ * part                byte count
+ * --------------------------------
+ * 'TVGS'               4
+ * version              1
+ * word_mode            1
+ * line_mode            1
+ * view_mode            1
+ * encoding             1
+ * scrollbar_mode       1
+ * need_scrollbar       1
+ * page_mode            1
+ * page_number_mode     1
+ * title_mode           1
+ * scroll_mode          1
+ * autoscroll_speed     1
+ * font name            MAX_PATH
+ */
+#define GLOBAL_SETTINGS_FILE     VIEWERS_DIR "/viewer.dat"
+
+/* temporary file */
+#define GLOBAL_SETTINGS_TMP_FILE VIEWERS_DIR "/viewer_file.tmp"
+
+#define GLOBAL_SETTINGS_HEADER   "\x54\x56\x47\x53\x31" /* header="TVGS" version=1 */
+#define GLOBAL_SETTINGS_H_SIZE   5
+
+/* preferences and bookmarks at each file
+ * binary file, so dont use .cfg
+ *
+ * setting file format
+ *
+ * part                byte count
+ * --------------------------------
+ * 'TVS'                3
+ * version              1
+ * file count           2
+ * [1st file]
+ *   file path          MAX_PATH
+ *   next file pos      2
+ *   [preferences]
+ *     word_mode        1
+ *     line_mode        1
+ *     view_mode        1
+ *     encoding         1
+ *     scrollbar_mode   1
+ *     need_scrollbar   1
+ *     page_mode        1
+ *     header_mode      1
+ *     footer_mode      1
+ *     scroll_mode      1
+ *     autoscroll_speed 1
+ *     font name        MAX_PATH
+ *   bookmark count     1
+ *   [1st bookmark]
+ *     file_position    4
+ *     page             2
+ *     line             1
+ *     flag             1
+ *   [2nd bookmark]
+ *   ...
+ *   [last bookmark]
+ * [2nd file]
+ * ...
+ * [last file]
+ */
+#define SETTINGS_FILE        VIEWERS_DIR "/viewer_file.dat"
+
+/* temporary file */
+#define SETTINGS_TMP_FILE    VIEWERS_DIR "/viewer_file.tmp"
+
+#define SETTINGS_HEADER      "\x54\x56\x53\x32" /* header="TVS" version=2 */
+#define SETTINGS_H_SIZE      4
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
-#define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
+#define NARROW_MAX_COLUMNS 64  /* Max displayable string len [narrow] (over-estimate) */
+#define WIDE_MAX_COLUMNS  128  /* Max displayable string len [wide] (over-estimate) */
 #define MAX_WIDTH         910  /* Max line length in WIDE mode */
-#define READ_PREV_ZONE    910  /* Arbitrary number less than SMALL_BLOCK_SIZE */
-#define SMALL_BLOCK_SIZE  0x1000 /* 4k: Smallest file chunk we will read */
-#define LARGE_BLOCK_SIZE  0x2000 /* 8k: Preferable size of file chunk to read */
+#define READ_PREV_ZONE    (block_size*9/10)  /* Arbitrary number less than SMALL_BLOCK_SIZE */
+#define SMALL_BLOCK_SIZE  block_size /* Smallest file chunk we will read */
+#define LARGE_BLOCK_SIZE  (block_size << 1) /* Preferable size of file chunk to read */
 #define TOP_SECTOR     buffer
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
-#define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
+#define BOTTOM_SECTOR  (buffer + (SMALL_BLOCK_SIZE << 1))
 #undef SCROLLBAR_WIDTH
 #define SCROLLBAR_WIDTH rb->global_settings->scrollbar_width
+#define MAX_PAGE         9999
 
-#define MAX_BOOKMARKED_FILES ((buffer_size/(signed)sizeof(struct bookmarked_file_info))-1)
+#define BOOKMARK_SIZE       8
+#define MAX_BOOKMARKS      10 /* user setting bookmarks + last read page */
+
+#define BOOKMARK_LAST       1
+#define BOOKMARK_USER       2
+
+#ifndef HAVE_LCD_BITMAP
+#define BOOKMARK_ICON       "\xee\x84\x81\x00"
+#endif
+
+#define PREFERENCES_SIZE    (11 + MAX_PATH)
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
@@ -77,6 +163,7 @@ PLUGIN_HEADER
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+#define VIEWER_BOOKMARK BUTTON_F2
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define VIEWER_QUIT BUTTON_OFF
@@ -90,6 +177,7 @@ PLUGIN_HEADER
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+#define VIEWER_BOOKMARK BUTTON_F2
 
 /* Ondio keys */
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -101,6 +189,7 @@ PLUGIN_HEADER
 #define VIEWER_MENU (BUTTON_MENU|BUTTON_REPEAT)
 #define VIEWER_AUTOSCROLL_PRE BUTTON_MENU
 #define VIEWER_AUTOSCROLL (BUTTON_MENU|BUTTON_REL)
+#define VIEWER_BOOKMARK (BUTTON_MENU|BUTTON_OFF)
 
 /* Player keys */
 #elif CONFIG_KEYPAD == PLAYER_PAD
@@ -111,6 +200,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT (BUTTON_ON|BUTTON_RIGHT)
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
+#define VIEWER_BOOKMARK BUTTON_ON
 
 /* iRiver H1x0 && H3x0 keys */
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -126,6 +216,7 @@ PLUGIN_HEADER
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+#define VIEWER_BOOKMARK (BUTTON_ON | BUTTON_SELECT)
 
 #define VIEWER_RC_QUIT BUTTON_RC_STOP
 
@@ -141,6 +232,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
+#define VIEWER_BOOKMARK BUTTON_SELECT
 
 /* iFP7xx keys */
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
@@ -151,6 +243,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MODE
 #define VIEWER_AUTOSCROLL BUTTON_SELECT
+#define VIEWER_BOOKMARK (BUTTON_LEFT|BUTTON_SELECT)
 
 /* iAudio X5 keys */
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
@@ -161,6 +254,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_SELECT
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
+#define VIEWER_BOOKMARK BUTTON_REC
 
 /* GIGABEAT keys */
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
@@ -171,6 +265,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_A
+#define VIEWER_BOOKMARK BUTTON_SELECT
 
 /* Sansa E200 keys */
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
@@ -183,6 +278,7 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL BUTTON_REC
 #define VIEWER_LINE_UP BUTTON_SCROLL_BACK
 #define VIEWER_LINE_DOWN BUTTON_SCROLL_FWD
+#define VIEWER_BOOKMARK (BUTTON_DOWN|BUTTON_SELECT)
 
 /* Sansa Fuze keys */
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
@@ -195,6 +291,7 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL   BUTTON_SELECT|BUTTON_DOWN
 #define VIEWER_LINE_UP      BUTTON_SCROLL_BACK
 #define VIEWER_LINE_DOWN    BUTTON_SCROLL_FWD
+#define VIEWER_BOOKMARK     BUTTON_SELECT
 
 /* Sansa C200 keys */
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
@@ -207,6 +304,7 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL BUTTON_REC
 #define VIEWER_LINE_UP BUTTON_UP
 #define VIEWER_LINE_DOWN BUTTON_DOWN
+#define VIEWER_BOOKMARK (BUTTON_DOWN | BUTTON_SELECT)
 
 /* Sansa Clip keys */
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD
@@ -219,6 +317,7 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL BUTTON_HOME
 #define VIEWER_LINE_UP BUTTON_UP
 #define VIEWER_LINE_DOWN BUTTON_DOWN
+#define VIEWER_BOOKMARK (BUTTON_DOWN|BUTTON_SELECT)
 
 /* Sansa M200 keys */
 #elif CONFIG_KEYPAD == SANSA_M200_PAD
@@ -231,6 +330,7 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL (BUTTON_SELECT | BUTTON_REL)
 #define VIEWER_LINE_UP BUTTON_UP
 #define VIEWER_LINE_DOWN BUTTON_DOWN
+#define VIEWER_BOOKMARK (BUTTON_DOWN|BUTTON_SELECT)
 
 /* iriver H10 keys */
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -241,6 +341,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_REW
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
+#define VIEWER_BOOKMARK BUTTON_FF
 
 /*M-Robe 500 keys */
 #elif CONFIG_KEYPAD == MROBE500_PAD
@@ -251,6 +352,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_RC_HEART
 #define VIEWER_AUTOSCROLL BUTTON_RC_MODE
+#define VIEWER_BOOKMARK BUTTON_CENTER
 
 /*Gigabeat S keys */
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
@@ -266,6 +368,7 @@ PLUGIN_HEADER
 #define VIEWER_LINE_DOWN BUTTON_DOWN
 #define VIEWER_COLUMN_LEFT BUTTON_LEFT
 #define VIEWER_COLUMN_RIGHT BUTTON_RIGHT
+#define VIEWER_BOOKMARK BUTTON_SELECT
 
 /*M-Robe 100 keys */
 #elif CONFIG_KEYPAD == MROBE100_PAD
@@ -276,17 +379,19 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_DISPLAY
+#define VIEWER_BOOKMARK BUTTON_SELECT
 
 /* iAUdio M3 keys */
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define VIEWER_QUIT BUTTON_RC_REC
+#define VIEWER_QUIT BUTTON_REC
 #define VIEWER_PAGE_UP BUTTON_RC_VOL_UP
 #define VIEWER_PAGE_DOWN BUTTON_RC_VOL_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_RC_REW
 #define VIEWER_SCREEN_RIGHT BUTTON_RC_FF
 #define VIEWER_MENU BUTTON_RC_MENU
 #define VIEWER_AUTOSCROLL BUTTON_RC_MODE
-#define VIEWER_RC_QUIT BUTTON_REC
+#define VIEWER_RC_QUIT BUTTON_RC_REC
+#define VIEWER_BOOKMARK BUTTON_RC_PLAY
 
 /* Cowon D2 keys */
 #elif CONFIG_KEYPAD == COWON_D2_PAD
@@ -294,6 +399,7 @@ PLUGIN_HEADER
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_PAGE_UP BUTTON_MINUS
 #define VIEWER_PAGE_DOWN BUTTON_PLUS
+#define VIEWER_BOOKMARK (BUTTON_MENU|BUTTON_PLUS)
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 #define VIEWER_QUIT BUTTON_POWER
@@ -304,6 +410,7 @@ PLUGIN_HEADER
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
 #define VIEWER_RC_QUIT BUTTON_STOP
+#define VIEWER_BOOKMARK (BUTTON_LEFT|BUTTON_PLAY)
 
 /* Creative Zen Vision:M keys */
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
@@ -314,6 +421,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_SELECT
+#define VIEWER_BOOKMARK BUTTON_PLAY
 
 /* Philips HDD1630 keys */
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
@@ -324,6 +432,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_VIEW
+#define VIEWER_BOOKMARK BUTTON_SELECT
 
 /* Philips SA9200 keys */
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
@@ -334,15 +443,18 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_NEXT
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_PLAY
+#define VIEWER_BOOKMARK BUTTON_RIGHT
 
 /* Onda VX747 keys */
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #define VIEWER_QUIT BUTTON_POWER
 #define VIEWER_MENU BUTTON_MENU
+#define VIEWER_BOOKMARK BUTTON_RIGHT
 
 /* Onda VX777 keys */
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
 #define VIEWER_QUIT BUTTON_POWER
+#define VIEWER_BOOKMARK BUTTON_RIGHT
 
 /* SAMSUNG YH-820 / YH-920 / YH-925 keys */
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
@@ -353,6 +465,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU         BUTTON_PLAY
 #define VIEWER_AUTOSCROLL   BUTTON_REW
+#define VIEWER_BOOKMARK     BUTTON_FFWD
 
 /* Packard Bell Vibe 500 keys */
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
@@ -365,6 +478,7 @@ PLUGIN_HEADER
 #define VIEWER_SCREEN_RIGHT BUTTON_NEXT
 #define VIEWER_MENU         BUTTON_MENU
 #define VIEWER_AUTOSCROLL   BUTTON_PLAY
+#define VIEWER_BOOKMARK     BUTTON_POWER
 
 #else
 #error No keymap defined!
@@ -403,15 +517,11 @@ PLUGIN_HEADER
 #endif
 
 /* stuff for the bookmarking */
-struct bookmarked_file_info {
+struct bookmark_info {
     long file_position;
-    int  top_ptr_pos;
-    char filename[MAX_PATH];
-};
-
-struct bookmark_file_data {
-    signed int bookmarked_files_count;
-    struct bookmarked_file_info bookmarks[];
+    int  page;
+    int  line;
+    unsigned char flag;
 };
 
 struct preferences {
@@ -434,7 +544,6 @@ struct preferences {
 
     enum codepages encoding;
 
-#ifdef HAVE_LCD_BITMAP
     enum {
         SB_OFF=0,
         SB_ON,
@@ -445,7 +554,20 @@ struct preferences {
         NO_OVERLAP=0,
         OVERLAP,
     } page_mode;
-#endif /* HAVE_LCD_BITMAP */
+
+    enum {
+        HD_NONE = 0,
+        HD_PATH,
+        HD_SBAR,
+        HD_BOTH,
+    } header_mode;
+
+    enum {
+        FT_NONE = 0,
+        FT_PAGE,
+        FT_SBAR,
+        FT_BOTH,
+    } footer_mode;
 
     enum {
         PAGE=0,
@@ -453,6 +575,13 @@ struct preferences {
     } scroll_mode;
 
     int autoscroll_speed;
+
+    unsigned char font[MAX_PATH];
+};
+
+enum {
+    VIEWER_FONT_MENU = 0,
+    VIEWER_FONT_TEXT,
 };
 
 struct preferences prefs;
@@ -460,6 +589,7 @@ struct preferences old_prefs;
 
 static unsigned char *buffer;
 static long buffer_size;
+static long block_size = 0x1000;
 static unsigned char line_break[] = {0,0x20,9,0xB,0xC,'-'};
 static int display_columns; /* number of (pixel) columns on the display */
 static int display_lines; /* number of lines on the display */
@@ -471,18 +601,34 @@ static long file_size;
 static long start_position; /* position in the file after the viewer is started */
 static bool mac_text;
 static long file_pos; /* Position of the top of the buffer in the file */
+static long last_file_pos;
 static unsigned char *buffer_end; /*Set to BUFFER_END() when file_pos changes*/
 static int max_line_len;
+static int max_width;
+static int max_columns;
+static int cline = 1;
+static int cpage = 1;
+static int lpage = 0;
 static unsigned char *screen_top_ptr;
 static unsigned char *next_screen_ptr;
 static unsigned char *next_screen_to_draw_ptr;
 static unsigned char *next_line_ptr;
+static unsigned char *last_screen_top_ptr = NULL;
 #ifdef HAVE_LCD_BITMAP
 static struct font *pf;
+static int header_height = 0;
+static int footer_height = 0;
 #endif
+struct bookmark_info bookmarks[MAX_BOOKMARKS];
+static int bookmark_count;
 
+/* UTF-8 BOM */
+#define BOM "\xef\xbb\xbf"
+#define BOM_SIZE 3
 
-int glyph_width(int ch)
+static bool is_bom = false;
+
+static int glyph_width(int ch)
 {
     if (ch == 0)
         ch = ' ';
@@ -494,7 +640,7 @@ int glyph_width(int ch)
 #endif
 }
 
-unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
+static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
 {
     unsigned char utf8_tmp[6];
     int count;
@@ -515,12 +661,60 @@ unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
         return (unsigned char*)str+1;
 }
 
+static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
+                                  int skip_width, int disp_width)
+{
+    unsigned short ch;
+    const unsigned char *oldstr;
+    const unsigned char *str = src;
+    unsigned char *utf8 = dst;
+    int width = 0;
+
+    while (*str != '\0')
+    {
+        oldstr = str;
+        str = get_ucs(oldstr, &ch);
+        width += glyph_width(ch);
+        if (width > skip_width)
+        {
+            str = oldstr;
+            break;
+        }
+    }
+    width = 0;
+    while(*str != '\0')
+    {
+        str = get_ucs(str, &ch);
+        width += glyph_width(ch);
+        if (width > disp_width)
+            break;
+
+        utf8 = rb->utf8encode(ch, utf8);
+    }
+
+    return utf8;
+}
+
+static void calc_max_width(void)
+{
+    if (prefs.view_mode == NARROW)
+    {
+        max_columns = NARROW_MAX_COLUMNS;
+        max_width   = draw_columns;
+    }
+    else
+    {
+        max_columns = WIDE_MAX_COLUMNS;
+        max_width   = 2 * draw_columns;
+    }
+}
+
 bool done = false;
 int col = 0;
 
 #define ADVANCE_COUNTERS(c) { width += glyph_width(c); k++; }
-#define LINE_IS_FULL ((k>=MAX_COLUMNS-1) ||( width >= draw_columns))
-#define LINE_IS_NOT_FULL ((k<MAX_COLUMNS-1) &&( width < draw_columns))
+#define LINE_IS_FULL ((k>=max_columns-1) ||( width >= max_width))
+#define LINE_IS_NOT_FULL ((k<max_columns-1) &&( width < max_width))
 static unsigned char* crop_at_width(const unsigned char* p)
 {
     int k,width;
@@ -531,6 +725,8 @@ static unsigned char* crop_at_width(const unsigned char* p)
 
     while (LINE_IS_NOT_FULL) {
         oldp = p;
+        if (BUFFER_OOB(p))
+           break;
         p = get_ucs(p, &ch);
         ADVANCE_COUNTERS(ch);
     }
@@ -716,7 +912,11 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
             next_line++;
 
     if (BUFFER_OOB(next_line))
+    {
+        if (BUFFER_EOF() && next_line != cur_line)
+            return (unsigned char*) next_line;
         return NULL;
+    }
 
     if (is_short)
         *is_short = false;
@@ -758,7 +958,7 @@ static unsigned char* find_prev_line(const unsigned char* cur_line)
         /* (else return NULL and read previous block) */
 
     /* Wrap downwards until too far, then use the one before. */
-    while (p < cur_line && p != NULL) {
+    while (p != NULL && p < cur_line) {
         prev_line = p;
         p = find_next_line(prev_line, NULL);
     }
@@ -769,15 +969,34 @@ static unsigned char* find_prev_line(const unsigned char* cur_line)
     return (unsigned char*) prev_line;
 }
 
+static void check_bom(void)
+{
+    unsigned char bom[BOM_SIZE];
+    off_t orig = rb->lseek(fd, 0, SEEK_CUR);
+
+    is_bom = false;
+
+    rb->lseek(fd, 0, SEEK_SET);
+
+    if (rb->read(fd, bom, BOM_SIZE) == BOM_SIZE)
+        is_bom = !memcmp(bom, BOM, BOM_SIZE);
+
+    rb->lseek(fd, orig, SEEK_SET);
+}
+
 static void fill_buffer(long pos, unsigned char* buf, unsigned size)
 {
     /* Read from file and preprocess the data */
     /* To minimize disk access, always read on sector boundaries */
     unsigned numread, i;
     bool found_CR = false;
+    off_t offset = rb->lseek(fd, pos, SEEK_SET);
 
-    rb->lseek(fd, pos, SEEK_SET);
+    if (offset == 0 && prefs.encoding == UTF_8 && is_bom)
+        rb->lseek(fd, BOM_SIZE, SEEK_SET);
+
     numread = rb->read(fd, buf, size);
+    buf[numread] = 0;
     rb->button_clear_queue(); /* clear button queue */
 
     for(i = 0; i < numread; i++) {
@@ -808,6 +1027,18 @@ static void fill_buffer(long pos, unsigned char* buf, unsigned size)
                 break;
         }
     }
+}
+
+static int viewer_find_bookmark(int page, int line)
+{
+    int i;
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        if (bookmarks[i].page == page && bookmarks[i].line == line)
+            return i;
+    }
+    return -1;
 }
 
 static int read_and_synch(int direction)
@@ -848,6 +1079,48 @@ static int read_and_synch(int direction)
     return move_vector;
 }
 
+static void get_next_line_position(unsigned char **line_begin,
+                                   unsigned char **line_end,
+                                   bool *is_short)
+{
+    int resynch_move;
+
+    *line_begin = *line_end;
+    *line_end = find_next_line(*line_begin, is_short);
+
+    if (*line_end == NULL && !BUFFER_EOF())
+    {
+        resynch_move = read_and_synch(1); /* Read block & move ptrs */
+        *line_begin -= resynch_move;
+        if (next_line_ptr > buffer)
+            next_line_ptr -= resynch_move;
+
+        *line_end = find_next_line(*line_begin, is_short);
+    }
+}
+
+static void increment_current_line(void)
+{
+    if (cline < display_lines)
+        cline++;
+    else if (cpage < MAX_PAGE)
+    {
+        cpage++;
+        cline = 1;
+    }
+}
+
+static void decrement_current_line(void)
+{
+    if (cline > 1)
+        cline--;
+    else if (cpage > 1)
+    {
+        cpage--;
+        cline = display_lines;
+    }
+}
+
 static void viewer_scroll_up(void)
 {
     unsigned char *p;
@@ -859,17 +1132,33 @@ static void viewer_scroll_up(void)
     }
     if (p != NULL)
         screen_top_ptr = p;
+
+    decrement_current_line();
 }
 
-static void viewer_scroll_down(void)
+static void viewer_scroll_down(bool autoscroll)
 {
-    if (next_screen_ptr != NULL)
+    if (cpage == lpage)
+        return;
+
+    if (next_line_ptr != NULL)
         screen_top_ptr = next_line_ptr;
+
+    if (prefs.scroll_mode == LINE || autoscroll)
+        increment_current_line();
+}
+
+static void viewer_scroll_to_top_line(void)
+{
+    int line;
+
+    for (line = cline; line > 1; line--)
+        viewer_scroll_up();
 }
 
 #ifdef HAVE_LCD_BITMAP
 static void viewer_scrollbar(void) {
-    int items, min_shown, max_shown;
+    int items, min_shown, max_shown, sb_begin_y, sb_height;
 
     items = (int) file_size;  /* (SH1 int is same as long) */
     min_shown = (int) file_pos + (screen_top_ptr - buffer);
@@ -879,14 +1168,47 @@ static void viewer_scrollbar(void) {
     else
         max_shown = min_shown + (next_screen_ptr - screen_top_ptr);
 
-    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, 0, SCROLLBAR_WIDTH-1,
-                         LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
+    sb_begin_y = header_height;
+    sb_height  = LCD_HEIGHT - header_height - footer_height;
+
+    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, sb_begin_y,
+                           SCROLLBAR_WIDTH-1, sb_height,
+                           items, min_shown, max_shown, VERTICAL);
+}
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+static void viewer_show_header(void)
+{
+    if (prefs.header_mode == HD_SBAR || prefs.header_mode == HD_BOTH)
+        rb->gui_syncstatusbar_draw(rb->statusbars, true);
+
+    if (prefs.header_mode == HD_PATH || prefs.header_mode == HD_BOTH)
+        rb->lcd_putsxy(0, header_height - pf->height, file_name);
+}
+
+static void viewer_show_footer(void)
+{
+    if (prefs.footer_mode == FT_SBAR || prefs.footer_mode == FT_BOTH)
+        rb->gui_syncstatusbar_draw(rb->statusbars, true);
+
+    if (prefs.footer_mode == FT_PAGE || prefs.footer_mode == FT_BOTH)
+    {
+        unsigned char buf[12];
+
+        if (cline == 1)
+            rb->snprintf(buf, sizeof(buf), "%d", cpage);
+        else
+            rb->snprintf(buf, sizeof(buf), "%d - %d", cpage, cpage+1);
+
+        rb->lcd_putsxy(0, LCD_HEIGHT - footer_height, buf);
+    }
 }
 #endif
 
 static void viewer_draw(int col)
 {
-    int i, j, k, line_len, line_width, resynch_move, spaces, left_col=0;
+    int i, j, k, line_len, line_width, spaces, left_col=0;
     int width, extra_spaces, indent_spaces, spaces_per_word;
     bool multiple_spacing, line_is_short;
     unsigned short ch;
@@ -894,8 +1216,8 @@ static void viewer_draw(int col)
     unsigned char *line_begin;
     unsigned char *line_end;
     unsigned char c;
-    unsigned char scratch_buffer[MAX_COLUMNS + 1];
-    unsigned char utf8_buffer[MAX_COLUMNS*4 + 1];
+    unsigned char scratch_buffer[max_columns + 1];
+    unsigned char utf8_buffer[max_columns*4 + 1];
     unsigned char *endptr;
 
     /* If col==-1 do all calculations but don't display */
@@ -912,39 +1234,26 @@ static void viewer_draw(int col)
 
     for (i = 0; i < display_lines; i++) {
         if (BUFFER_OOB(line_end))
-            break;  /* Happens after display last line at BUFFER_EOF() */
+        {
+            if (lpage == cpage)
+                break;  /* Happens after display last line at BUFFER_EOF() */
 
-        line_begin = line_end;
-        line_end = find_next_line(line_begin, &line_is_short);
-
-        if (line_end == NULL) {
-            if (BUFFER_EOF()) {
-                if (i < display_lines - 1 && !BUFFER_BOF()) {
-                    if (col != -1)
-                        rb->lcd_clear_display();
-
-                    for (; i < display_lines - 1; i++)
-                        viewer_scroll_up();
-
-                    line_begin = line_end = screen_top_ptr;
-                    i = -1;
-                    continue;
-                }
-                else {
-                    line_end = buffer_end;
-                }
-            }
-            else {
-                resynch_move = read_and_synch(1); /* Read block & move ptrs */
-                line_begin -= resynch_move;
-                if (i > 0)
-                    next_line_ptr -= resynch_move;
-
-                line_end = find_next_line(line_begin, NULL);
-                if (line_end == NULL)  /* Should not really happen */
-                    break;
+            if (lpage == 0 && cline == 1)
+            {
+                lpage = cpage;
+                last_screen_top_ptr = screen_top_ptr;
+                last_file_pos = file_pos;
             }
         }
+
+        get_next_line_position(&line_begin, &line_end, &line_is_short);
+        if (line_end == NULL)
+        {
+           if (BUFFER_OOB(line_begin))
+                break;
+           line_end = buffer_end + 1;
+        }
+
         line_len = line_end - line_begin;
 
         /* calculate line_len */
@@ -970,7 +1279,7 @@ static void viewer_draw(int col)
                     line_len--;
             }
             for (j=k=spaces=0; j < line_len; j++) {
-                if (k == MAX_COLUMNS)
+                if (k == max_columns)
                     break;
 
                 c = line_begin[j];
@@ -986,7 +1295,7 @@ static void viewer_draw(int col)
                         while (spaces) {
                             spaces--;
                             scratch_buffer[k++] = ' ';
-                            if (k == MAX_COLUMNS - 1)
+                            if (k == max_columns - 1)
                                 break;
                         }
                         scratch_buffer[k++] = c;
@@ -995,8 +1304,7 @@ static void viewer_draw(int col)
             }
             if (col != -1) {
                 scratch_buffer[k] = 0;
-                endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                        prefs.encoding, draw_columns/glyph_width('i'));
+                endptr = decode2utf8(scratch_buffer, utf8_buffer, col, draw_columns);
                 *endptr = 0;
             }
         }
@@ -1036,7 +1344,7 @@ static void viewer_draw(int col)
 
                 if (spaces) {
                     /* total number of spaces to insert between words */
-                    extra_spaces = (draw_columns-width)/glyph_width(' ')
+                    extra_spaces = (max_width-width)/glyph_width(' ')
                             - indent_spaces;
                     /* number of spaces between each word*/
                     spaces_per_word = extra_spaces / spaces;
@@ -1056,7 +1364,7 @@ static void viewer_draw(int col)
 
             multiple_spacing = false;
             for (j=k=spaces=0; j < line_len; j++) {
-                if (k == MAX_COLUMNS)
+                if (k == max_columns)
                     break;
 
                 c = line_begin[j];
@@ -1081,11 +1389,9 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-
             if (col != -1) {
                 scratch_buffer[k] = 0;
-                endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                        prefs.encoding, k-col);
+                endptr = decode2utf8(scratch_buffer, utf8_buffer, col, draw_columns);
                 *endptr = 0;
             }
         }
@@ -1116,11 +1422,29 @@ static void viewer_draw(int col)
                 }
         }
         if (col != -1 && line_width > col)
+        {
+            int dpage = (cline+i <= display_lines)?cpage:cpage+1;
+            int dline = cline+i - ((cline+i <= display_lines)?0:display_lines);
+            bool bflag = (viewer_find_bookmark(dpage, dline) >= 0);
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_putsxy(left_col, i*pf->height, utf8_buffer);
-#else
-            rb->lcd_puts(left_col, i, utf8_buffer);
+            int dy = i * pf->height + header_height;
 #endif
+            if (bflag)
+#ifdef HAVE_LCD_BITMAP
+            {
+                rb->lcd_set_drawmode(DRMODE_BG|DRMODE_FG);
+                rb->lcd_fillrect(left_col, dy, LCD_WIDTH, pf->height);
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            }
+            rb->lcd_putsxy(left_col, dy, utf8_buffer);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+#else
+            {
+                rb->lcd_puts(left_col, i, BOOKMARK_ICON);
+            }
+            rb->lcd_puts(left_col+1, i, utf8_buffer);
+#endif
+        }
         if (line_width > max_line_len)
             max_line_len = line_width;
 
@@ -1140,6 +1464,14 @@ static void viewer_draw(int col)
     next_screen_to_draw_ptr = next_screen_ptr;
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+    /* show header */
+    viewer_show_header();
+    
+    /* show footer */
+    viewer_show_footer();
+#endif
+
     if (col != -1)
         rb->lcd_update();
 }
@@ -1150,38 +1482,53 @@ static void viewer_top(void)
       and point screen pointer to top */
     if (file_pos != 0)
     {
+        rb->splash(0, "Loading...");
+
         file_pos = 0;
         buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
         fill_buffer(0, buffer, buffer_size);
     }
 
     screen_top_ptr = buffer;
+    cpage = 1;
+    cline = 1;
 }
 
 static void viewer_bottom(void)
 {
-    /* Read bottom of file into buffer
-      and point screen pointer to bottom */
-    long last_sectors;
+    unsigned char *line_begin;
+    unsigned char *line_end;
 
-    if (file_size > buffer_size) {
-        /* Find last buffer in file, round up to next sector boundary */
-        last_sectors = file_size - buffer_size + SMALL_BLOCK_SIZE;
-        last_sectors /= SMALL_BLOCK_SIZE;
-        last_sectors *= SMALL_BLOCK_SIZE;
-    }
-    else {
-        last_sectors = 0;
-    }
+    rb->splash(0, "Loading...");
 
-    if (file_pos != last_sectors)
+    if (last_screen_top_ptr)
     {
-        file_pos = last_sectors;
-        buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
-        fill_buffer(last_sectors, buffer, buffer_size);
+        cpage = lpage;
+        cline = 1;
+        screen_top_ptr = last_screen_top_ptr;
+        file_pos = last_file_pos;
+        fill_buffer(file_pos, buffer, buffer_size);
+        buffer_end = BUFFER_END();
+        return;
     }
 
-    screen_top_ptr = buffer_end-1;
+    line_end = screen_top_ptr;
+
+    while (!BUFFER_EOF() || !BUFFER_OOB(line_end))
+    {
+        get_next_line_position(&line_begin, &line_end, NULL);
+        if (line_end == NULL)
+            break;
+
+        increment_current_line();
+        if (cline == 1)
+            screen_top_ptr = line_end;
+    }
+    lpage = cpage;
+    cline = 1;
+    last_screen_top_ptr = screen_top_ptr;
+    last_file_pos = file_pos;
+    buffer_end = BUFFER_END();
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -1192,18 +1539,80 @@ static void init_need_scrollbar(void) {
     prefs.need_scrollbar = NEED_SCROLLBAR();
     draw_columns = prefs.need_scrollbar? display_columns-SCROLLBAR_WIDTH : display_columns;
     par_indent_spaces = draw_columns/(5*glyph_width(' '));
+    calc_max_width();
 }
-#else
-#define init_need_scrollbar()
+
+static void init_header_and_footer(void)
+{
+    header_height = 0;
+    footer_height = 0;
+    if (rb->global_settings->statusbar == STATUSBAR_TOP)
+    {
+        if (prefs.header_mode == HD_SBAR || prefs.header_mode == HD_BOTH)
+            header_height = STATUSBAR_HEIGHT;
+
+        if (prefs.footer_mode == FT_SBAR)
+            prefs.footer_mode = FT_NONE;
+        else if (prefs.footer_mode == FT_BOTH)
+            prefs.footer_mode = FT_PAGE;
+    }
+    else if (rb->global_settings->statusbar == STATUSBAR_BOTTOM)
+    {
+        if (prefs.footer_mode == FT_SBAR || prefs.footer_mode == FT_BOTH)
+            footer_height = STATUSBAR_HEIGHT;
+
+        if (prefs.header_mode == HD_SBAR)
+            prefs.header_mode = HD_NONE;
+        else if (prefs.header_mode == HD_BOTH)
+            prefs.header_mode = HD_PATH;
+    }
+    else /* STATUSBAR_OFF || STATUSBAR_CUSTOM */
+    {
+        if (prefs.header_mode == HD_SBAR)
+            prefs.header_mode = HD_NONE;
+        else if (prefs.header_mode == HD_BOTH)
+            prefs.header_mode = HD_PATH;
+
+        if (prefs.footer_mode == FT_SBAR)
+            prefs.footer_mode = FT_NONE;
+        else if (prefs.footer_mode == FT_BOTH)
+            prefs.footer_mode = FT_PAGE;
+    }
+
+    if (prefs.header_mode == HD_NONE || prefs.header_mode == HD_PATH ||
+        prefs.footer_mode == FT_NONE || prefs.footer_mode == FT_PAGE)
+        rb->gui_syncstatusbar_draw(rb->statusbars, false);
+
+    if (prefs.header_mode == HD_PATH || prefs.header_mode == HD_BOTH)
+        header_height += pf->height;
+    if (prefs.footer_mode == FT_PAGE || prefs.footer_mode == FT_BOTH)
+        footer_height += pf->height;
+
+    display_lines = (LCD_HEIGHT - header_height - footer_height) / pf->height;
+
+    lpage = 0;
+    last_file_pos = 0;
+    last_screen_top_ptr = NULL;
+}
+
+static void change_font(unsigned char *font)
+{
+    unsigned char buf[MAX_PATH];
+
+    if (font == NULL || *font == '\0')
+        return;
+
+    rb->snprintf(buf, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
+    if (rb->font_load(NULL, buf) < 0)
+        rb->splash(HZ/2, "font load failed.");
+}
 #endif
 
 static bool viewer_init(void)
 {
 #ifdef HAVE_LCD_BITMAP
-
+    /* initialize fonts */
     pf = rb->font_get(FONT_UI);
-
-    display_lines = LCD_HEIGHT / pf->height;
     draw_columns = display_columns = LCD_WIDTH;
 #else
     /* REAL fixed pitch :) all chars use up 1 cell */
@@ -1216,172 +1625,727 @@ static bool viewer_init(void)
     if (fd < 0)
         return false;
 
-    file_size = rb->filesize(fd);
-    if (file_size==-1)
-        return false;
-
     /* Init mac_text value used in processing buffer */
     mac_text = false;
 
     return true;
 }
 
-static void viewer_default_settings(void)
+/* When a file is UTF-8 file with BOM, if prefs.encoding is UTF-8,
+ * then file size decreases only BOM_SIZE.
+ */
+static void get_filesize(void)
+{
+    file_size = rb->filesize(fd);
+    if (file_size == -1)
+        return;
+
+    if (prefs.encoding == UTF_8 && is_bom)
+        file_size -= BOM_SIZE;
+}
+
+static int bm_comp(const void *a, const void *b)
+{
+    struct bookmark_info *pa;
+    struct bookmark_info *pb;
+
+    pa = (struct bookmark_info*)a;
+    pb = (struct bookmark_info*)b;
+
+    if (pa->page != pb->page)
+        return pa->page - pb->page;
+
+    return pa->line - pb->line;
+}
+
+static void viewer_add_bookmark(void)
+{
+    if (bookmark_count >= MAX_BOOKMARKS-1)
+        return;
+
+    bookmarks[bookmark_count].file_position
+        = file_pos + screen_top_ptr - buffer;
+    bookmarks[bookmark_count].page = cpage;
+    bookmarks[bookmark_count].line = cline;
+    bookmarks[bookmark_count].flag = BOOKMARK_USER;
+    bookmark_count++;
+}
+
+static int viewer_add_last_read_bookmark(void)
+{
+    int i;
+
+    i = viewer_find_bookmark(cpage, cline);
+    if (i >= 0)
+        bookmarks[i].flag |= BOOKMARK_LAST;
+    else
+    {
+        viewer_add_bookmark();
+        i = bookmark_count-1;
+        bookmarks[i].flag = BOOKMARK_LAST;
+    }
+    return i;
+}
+
+static void viewer_remove_bookmark(int i)
+{
+    int j;
+
+    if (i < 0 || i >= bookmark_count)
+        return;
+
+    for (j = i+1; j < bookmark_count; j++)
+        rb->memcpy(&bookmarks[j-1], &bookmarks[j],
+                   sizeof(struct bookmark_info));
+
+    bookmark_count--;
+}
+
+static void viewer_remove_last_read_bookmark(void)
+{
+    int i, j;
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        if (bookmarks[i].flag & BOOKMARK_LAST)
+        {
+            if (bookmarks[i].flag == BOOKMARK_LAST)
+            {
+                for (j = i+1; j < bookmark_count; j++)
+                    rb->memcpy(&bookmarks[j-1], &bookmarks[j],
+                               sizeof(struct bookmark_info));
+
+                bookmark_count--;
+            }
+            else
+                bookmarks[i].flag = BOOKMARK_USER;
+            break;
+        }
+    }
+}
+
+static int viewer_get_last_read_bookmark(void)
+{
+    int i;
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        if (bookmarks[i].flag & BOOKMARK_LAST)
+            return i;
+    }
+    return -1;
+}
+
+static void viewer_select_bookmark(int initval)
+{
+    int i;
+    int ipage = 0;
+    int iline = 0;
+    int screen_pos;
+    int screen_top;
+    int selected = -1;
+
+    struct opt_items items[bookmark_count];
+    unsigned char names[bookmark_count][38];
+
+    if (initval >= 0 && initval < bookmark_count)
+    {
+        ipage = bookmarks[initval].page;
+        iline = bookmarks[initval].line;
+    }
+
+    rb->qsort(bookmarks, bookmark_count, sizeof(struct bookmark_info),
+              bm_comp);
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        rb->snprintf(names[i], sizeof(names[0]),
+#if CONFIG_KEYPAD != PLAYER_PAD
+                     "%sPage: %d  Line: %d",
+#else
+                     "%sP:%d  L:%d",
+#endif
+                     (bookmarks[i].flag&BOOKMARK_LAST)? "*":" ",
+                     bookmarks[i].page,
+                     bookmarks[i].line);
+        items[i].string = names[i];
+        items[i].voice_id = -1;
+        if (selected < 0 && bookmarks[i].page == ipage && bookmarks[i].line == iline)
+            selected = i;
+    }
+
+    rb->set_option("Select bookmark", &selected, INT, items,
+                          sizeof(items) / sizeof(items[0]), NULL);
+
+    if (selected < 0 || selected >= bookmark_count)
+    {
+        if (initval < 0 || (selected = viewer_get_last_read_bookmark()) < 0)
+        {
+            if (initval < 0)
+                rb->splash(HZ, "Start the first page.");
+            file_pos = 0;
+            screen_top_ptr = buffer;
+            cpage = 1;
+            cline = 1;
+            buffer_end = BUFFER_END();
+            return;
+        }
+    }
+
+    screen_pos = bookmarks[selected].file_position;
+    screen_top = screen_pos % buffer_size;
+    file_pos = screen_pos - screen_top;
+    screen_top_ptr = buffer + screen_top;
+    cpage = bookmarks[selected].page;
+    cline = bookmarks[selected].line;
+    buffer_end = BUFFER_END();
+}
+
+static void viewer_default_preferences(void)
 {
     prefs.word_mode = WRAP;
     prefs.line_mode = NORMAL;
     prefs.view_mode = NARROW;
     prefs.scroll_mode = PAGE;
-#ifdef HAVE_LCD_BITMAP
     prefs.page_mode = NO_OVERLAP;
     prefs.scrollbar_mode = SB_OFF;
+    rb->memset(prefs.font, 0, MAX_PATH);
+#ifdef HAVE_LCD_BITMAP
+    prefs.header_mode = HD_BOTH;
+    prefs.footer_mode = FT_BOTH;
+    rb->snprintf(prefs.font, MAX_PATH, "%s", rb->global_settings->font_file);
+#else
+    prefs.header_mode = HD_NONE;
+    prefs.footer_mode = FT_NONE;
 #endif
     prefs.autoscroll_speed = 1;
     /* Set codepage to system default */
     prefs.encoding = rb->global_settings->default_codepage;
 }
 
-static void viewer_load_settings(void) /* same name as global, but not the same file.. */
+static bool viewer_read_preferences(int pfd)
 {
-    int settings_fd, i;
-    struct bookmark_file_data *data;
-    struct bookmarked_file_info this_bookmark;
+    unsigned char buf[PREFERENCES_SIZE];
+    unsigned char *p = buf;
 
-    /* read settings file */
-    settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
-    if ((settings_fd >= 0) && (rb->filesize(settings_fd) == sizeof(struct preferences)))
+    if (rb->read(pfd, buf, sizeof(buf)) != sizeof(buf))
+        return false;
+
+    prefs.word_mode        = *p++;
+    prefs.line_mode        = *p++;
+    prefs.view_mode        = *p++;
+    prefs.encoding         = *p++;
+    prefs.scrollbar_mode   = *p++;
+    prefs.need_scrollbar   = *p++;
+    prefs.page_mode        = *p++;
+    prefs.header_mode      = *p++;
+    prefs.footer_mode      = *p++;
+    prefs.scroll_mode      = *p++;
+    prefs.autoscroll_speed = *p++;
+    rb->memcpy(prefs.font, p, MAX_PATH);
+
+    return true;
+}
+
+static bool viewer_write_preferences(int pfd)
+{
+    unsigned char buf[PREFERENCES_SIZE];
+    unsigned char *p = buf;
+
+    *p++ = prefs.word_mode;
+    *p++ = prefs.line_mode;
+    *p++ = prefs.view_mode;
+    *p++ = prefs.encoding;
+    *p++ = prefs.scrollbar_mode;
+    *p++ = prefs.need_scrollbar;
+    *p++ = prefs.page_mode;
+    *p++ = prefs.header_mode;
+    *p++ = prefs.footer_mode;
+    *p++ = prefs.scroll_mode;
+    *p++ = prefs.autoscroll_speed;
+    rb->memcpy(p, prefs.font, MAX_PATH);
+
+    return (rb->write(pfd, buf, sizeof(buf)) == sizeof(buf));
+}
+
+static bool viewer_read_bookmark_info(int bfd, struct bookmark_info *b)
+{
+    unsigned char buf[BOOKMARK_SIZE];
+
+    if (rb->read(bfd, buf, sizeof(buf)) != sizeof(buf))
+        return false;
+
+    b->file_position = (buf[0] << 24)|(buf[1] << 16)|(buf[2] << 8)|buf[3];
+    b->page = (buf[4] << 8)|buf[5];
+    b->line = buf[6];
+    b->flag = buf[7];
+
+    return true;
+}
+
+static bool viewer_read_bookmark_infos(int bfd)
+{
+    unsigned char c;
+    int i;
+
+    if (rb->read(bfd, &c, 1) != 1)
     {
-        rb->read(settings_fd, &prefs, sizeof(struct preferences));
-        rb->close(settings_fd);
+        bookmark_count = 0;
+        return false;
     }
-    else
+
+    bookmark_count = c;
+    if (bookmark_count > MAX_BOOKMARKS)
+        bookmark_count = MAX_BOOKMARKS;
+
+    for (i = 0; i < bookmark_count; i++)
     {
-        /* load default settings if there is no settings file */
-        viewer_default_settings();
+        if (!viewer_read_bookmark_info(bfd, &bookmarks[i]))
+        {
+            bookmark_count = i;
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool viewer_write_bookmark_info(int bfd, struct bookmark_info *b)
+{
+    unsigned char buf[BOOKMARK_SIZE];
+    unsigned char *p = buf;
+    unsigned long ul;
+
+    ul = b->file_position;
+    *p++ = ul >> 24;
+    *p++ = ul >> 16;
+    *p++ = ul >> 8;
+    *p++ = ul;
+
+    ul = b->page;
+    *p++ = ul >> 8;
+    *p++ = ul;
+
+    *p++ = b->line;
+    *p = b->flag;
+
+    return (rb->write(bfd, buf, sizeof(buf)) == sizeof(buf));
+}
+
+static bool viewer_write_bookmark_infos(int bfd)
+{
+    unsigned char c = bookmark_count;
+    int i;
+
+    if (rb->write(bfd, &c, 1) != 1)
+        return false;
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        if (!viewer_write_bookmark_info(bfd, &bookmarks[i]))
+            return false;
+    }
+
+    return true;
+}
+
+static bool viewer_load_global_settings(void)
+{
+    unsigned buf[GLOBAL_SETTINGS_H_SIZE];
+    int sfd = rb->open(GLOBAL_SETTINGS_FILE, O_RDONLY);
+
+    if (sfd < 0)
+        return false;
+
+    if ((rb->read(sfd, buf, GLOBAL_SETTINGS_H_SIZE) != GLOBAL_SETTINGS_H_SIZE) ||
+        rb->memcmp(buf, GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE) ||
+        !viewer_read_preferences(sfd))
+     {
+        rb->close(sfd);
+        return false;
+    }
+    rb->close(sfd);
+    return true;
+}
+
+static bool viewer_save_global_settings(void)
+{
+    int sfd = rb->open(GLOBAL_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+
+    if (sfd < 0)
+         return false;
+
+    if (rb->write(sfd, &GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE)
+        != GLOBAL_SETTINGS_H_SIZE ||
+        !viewer_write_preferences(sfd))
+    {
+        rb->close(sfd);
+        rb->remove(GLOBAL_SETTINGS_TMP_FILE);
+        return false;
+    }
+    rb->close(sfd);
+    rb->remove(GLOBAL_SETTINGS_FILE);
+    rb->rename(GLOBAL_SETTINGS_TMP_FILE, GLOBAL_SETTINGS_FILE);
+    return true;
+}
+
+static void viewer_load_settings(void)
+{
+    unsigned char buf[MAX_PATH+2];
+    unsigned int fcount;
+    unsigned int i;
+    bool res = false;
+    int sfd;
+    unsigned int size;
+
+    sfd = rb->open(SETTINGS_FILE, O_RDONLY);
+    if (sfd < 0)
+        goto read_end;
+
+    if ((rb->read(sfd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2) ||
+        rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE))
+    {
+        /* illegal setting file */
+        rb->close(sfd);
+
+        if (rb->file_exists(SETTINGS_FILE))
+            rb->remove(SETTINGS_FILE);
+
+        goto read_end;
+    }
+
+    fcount = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE+1];
+    for (i = 0; i < fcount; i++)
+    {
+        if (rb->read(sfd, buf, MAX_PATH+2) != MAX_PATH+2)
+            break;
+
+        size = (buf[MAX_PATH] << 8) | buf[MAX_PATH+1];
+        if (rb->strcmp(buf, file_name))
+        {
+            if (rb->lseek(sfd, size, SEEK_CUR) < 0)
+                break;
+            continue;
+        }
+        if (!viewer_read_preferences(sfd))
+            break;
+
+        res = viewer_read_bookmark_infos(sfd);
+        break;
+    }
+
+    rb->close(sfd);
+
+read_end:
+    if (!res)
+    {
+        /* load global settings */
+        if (!viewer_load_global_settings())
+            viewer_default_preferences();
+
+        file_pos = 0;
+        screen_top_ptr = buffer;
+        cpage = 1;
+        cline = 1;
+        bookmark_count = 0;
     }
 
     rb->memcpy(&old_prefs, &prefs, sizeof(struct preferences));
+    calc_max_width();
 
-    data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
-    data->bookmarked_files_count = 0;
-
-    /* read bookmarks if file exists */
-    settings_fd = rb->open(BOOKMARKS_FILE, O_RDONLY);
-    if (settings_fd >= 0)
+    if (bookmark_count > 1)
+        viewer_select_bookmark(-1);
+    else if (bookmark_count == 1)
     {
-        /* figure out how many items to read */
-        rb->read(settings_fd, &data->bookmarked_files_count, sizeof(signed int)); 
-        if (data->bookmarked_files_count > MAX_BOOKMARKED_FILES)
-            data->bookmarked_files_count = MAX_BOOKMARKED_FILES;
-        rb->read(settings_fd, data->bookmarks, 
-                 sizeof(struct bookmarked_file_info) * data->bookmarked_files_count);
-        rb->close(settings_fd);
+        int screen_pos;
+        int screen_top;
+
+        screen_pos = bookmarks[0].file_position;
+        screen_top = screen_pos % buffer_size;
+        file_pos = screen_pos - screen_top;
+        screen_top_ptr = buffer + screen_top;
+        cpage = bookmarks[0].page;
+        cline = bookmarks[0].line;
     }
 
-    file_pos = 0;
-    screen_top_ptr = buffer;
+    viewer_remove_last_read_bookmark();
 
-    /* check if current file is in list */
-    for (i=0; i < data->bookmarked_files_count; i++)
-    {
-        if (!rb->strcmp(file_name, data->bookmarks[i].filename)) 
-        {
-            int screen_pos = data->bookmarks[i].file_position + data->bookmarks[i].top_ptr_pos;
-            int screen_top = screen_pos % buffer_size;
-            file_pos = screen_pos - screen_top;
-            screen_top_ptr = buffer + screen_top;
-            break;
-        }
-    }
-
-    this_bookmark.file_position = file_pos;
-    this_bookmark.top_ptr_pos = screen_top_ptr - buffer;
-
-    rb->memset(&this_bookmark.filename[0],0,MAX_PATH);
-    rb->strcpy(this_bookmark.filename,file_name);
-
-    /* prevent potential slot overflow */
-    if (i >= data->bookmarked_files_count) 
-    {
-        if (i < MAX_BOOKMARKED_FILES) 
-            data->bookmarked_files_count++;
-        else
-            i = MAX_BOOKMARKED_FILES-1;
-    }
-
-    /* write bookmark file with spare slot in first position 
-       to be filled in by viewer_save_settings */
-    settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
-    if (settings_fd >=0 )
-    {
-        /* write count */
-        rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
-
-        /* write the current bookmark */
-        rb->write (settings_fd, &this_bookmark, sizeof(struct bookmarked_file_info));
-
-        /* write everything that was before this bookmark */
-        rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*i);
-
-        rb->close(settings_fd);
-    }
+    check_bom();
+    get_filesize();
 
     buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
 
-    if (BUFFER_OOB(screen_top_ptr)) 
-    {
+    if (BUFFER_OOB(screen_top_ptr))
         screen_top_ptr = buffer;
-    }
 
     fill_buffer(file_pos, buffer, buffer_size);
+    if (prefs.scroll_mode == PAGE && cline > 1)
+        viewer_scroll_to_top_line();
 
     /* remember the current position */
     start_position = file_pos + screen_top_ptr - buffer;
 
+#ifdef HAVE_LCD_BITMAP
+    if (strcmp(prefs.font, rb->global_settings->font_file))
+        change_font(prefs.font);
+
     init_need_scrollbar();
+    init_header_and_footer();
+#endif
 }
 
-static void viewer_save_settings(void)/* same name as global, but not the same file.. */
+static bool copy_bookmark_file(int sfd, int dfd, off_t start, off_t size)
 {
-    int settings_fd;
+    off_t rsize;
 
-    /* save the viewer settings if they have been changed */
-    if (rb->memcmp(&prefs, &old_prefs, sizeof(struct preferences)))
+    if (rb->lseek(sfd, start, SEEK_SET) < 0)
+        return false;
+
+    while (size > 0)
     {
-        settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
+        if (size > buffer_size)
+            rsize = buffer_size;
+        else
+            rsize = size;
+        size -= rsize;
 
-        if (settings_fd >= 0 )
+        if (rb->read(sfd, buffer, rsize) != rsize ||
+            rb->write(dfd, buffer, rsize) != rsize)
+            return false;
+    }
+    return true;
+}
+
+static bool viewer_save_settings(void)
+{
+    unsigned char buf[MAX_PATH+2];
+    unsigned int fcount = 0;
+    unsigned int i;
+    int idx;
+    int ofd;
+    int tfd;
+    off_t first_copy_size = 0;
+    off_t second_copy_start_pos = 0;
+    off_t size;
+
+    /* add reading page to bookmarks */
+    idx = viewer_find_bookmark(cpage, cline);
+    if (idx >= 0)
+        bookmarks[idx].flag |= BOOKMARK_LAST;
+    else
+    {
+        viewer_add_bookmark();
+        bookmarks[bookmark_count-1].flag = BOOKMARK_LAST;
+    }
+  
+    tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+    if (tfd < 0)
+        return false;
+
+    ofd = rb->open(SETTINGS_FILE, O_RDWR);
+    if (ofd >= 0)
+    {
+        if ((rb->read(ofd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2) ||
+            rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE))
         {
-            rb->write (settings_fd, &prefs, sizeof(struct preferences));
-            rb->close(settings_fd);
+            rb->close(ofd);
+            goto save_err;
         }
+        fcount = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE+1];
+
+        for (i = 0; i < fcount; i++)
+        {
+            if (rb->read(ofd, buf, MAX_PATH+2) != MAX_PATH+2)
+            {
+                rb->close(ofd);
+                goto save_err;
+            }
+            size = (buf[MAX_PATH] << 8) | buf[MAX_PATH+1];
+            if (rb->strcmp(buf, file_name))
+            {
+                if (rb->lseek(ofd, size, SEEK_CUR) < 0)
+                {
+                    rb->close(ofd);
+                    goto save_err;
+                }
+            }
+            else
+            {
+                first_copy_size = rb->lseek(ofd, 0, SEEK_CUR);
+                if (first_copy_size < 0)
+                {
+                    rb->close(ofd);
+                    goto save_err;
+                }
+                second_copy_start_pos = first_copy_size + size;
+                first_copy_size -= MAX_PATH+2;
+                fcount--;
+                break;
+            }
+        }
+        if (first_copy_size == 0)
+            first_copy_size = rb->filesize(ofd);
+
+        if (!copy_bookmark_file(ofd, tfd, 0, first_copy_size))
+        {
+            rb->close(ofd);
+            goto save_err;
+        }
+        if (second_copy_start_pos > 0)
+        {
+            if (!copy_bookmark_file(ofd, tfd, second_copy_start_pos,
+                                    rb->filesize(ofd) - second_copy_start_pos))
+            {
+                rb->close(ofd);
+                goto save_err;
+            }
+        }
+        rb->close(ofd);
+    }
+    else
+    {
+        rb->memcpy(buf, SETTINGS_HEADER, SETTINGS_H_SIZE);
+        buf[SETTINGS_H_SIZE] = 0;
+        buf[SETTINGS_H_SIZE+1] = 0;
+        if (rb->write(tfd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2)
+            goto save_err;
     }
 
-    /* save the bookmark if the position has changed */
-    if (file_pos + screen_top_ptr - buffer != start_position)
-    {
-        settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
+    /* copy to current read file's bookmarks */
+    rb->memset(buf, 0, MAX_PATH);
+    rb->snprintf(buf, MAX_PATH, "%s", file_name);
 
-        if (settings_fd >= 0 )
-        {
-            struct bookmarked_file_info b;
-            b.file_position = file_pos + screen_top_ptr - buffer;
-            b.top_ptr_pos = 0; /* this is only kept for legassy reasons */
-            rb->memset(&b.filename[0],0,MAX_PATH);
-            rb->strcpy(b.filename,file_name);
-            rb->lseek(settings_fd,sizeof(signed int),SEEK_SET);
-            rb->write (settings_fd, &b, sizeof(struct bookmarked_file_info));
-            rb->close(settings_fd);
-        }
-    }
+    size = PREFERENCES_SIZE + bookmark_count * BOOKMARK_SIZE + 1;
+    buf[MAX_PATH] = size >> 8;
+    buf[MAX_PATH+1] = size;
+
+    if (rb->write(tfd, buf, MAX_PATH+2) != MAX_PATH+2)
+        goto save_err;
+
+    if (!viewer_write_preferences(tfd))
+        goto save_err;
+
+    if (!viewer_write_bookmark_infos(tfd))
+        goto save_err;
+
+    if (rb->lseek(tfd, SETTINGS_H_SIZE, SEEK_SET) < 0)
+        goto save_err;
+
+    fcount++;
+    buf[0] = fcount >> 8;
+    buf[1] = fcount;
+
+    if (rb->write(tfd, buf, 2) != 2)
+        goto save_err;
+
+    rb->close(tfd);
+
+    rb->remove(SETTINGS_FILE);
+    rb->rename(SETTINGS_TMP_FILE, SETTINGS_FILE);
+
+    return true;
+
+save_err:
+    rb->close(tfd);
+    rb->remove(SETTINGS_TMP_FILE);
+    return false;
 }
 
 static void viewer_exit(void *parameter)
 {
     (void)parameter;
 
-    viewer_save_settings();
+    /* save preference and bookmarks */
+    if (!viewer_save_settings())
+        rb->splash(HZ, "Can't save preference and bookmarks.");
+
     rb->close(fd);
+#ifdef HAVE_LCD_BITMAP
+    if (strcmp(prefs.font, rb->global_settings->font_file))
+        change_font(rb->global_settings->font_file);
+#endif
+}
+
+static void calc_page(void)
+{
+    int i;
+    unsigned char *line_begin;
+    unsigned char *line_end;
+    off_t sfp;
+    unsigned char *sstp;
+
+    rb->splash(0, "Calculating page/line number...");
+
+    /* add reading page to bookmarks */
+    viewer_add_last_read_bookmark();
+
+    rb->qsort(bookmarks, bookmark_count, sizeof(struct bookmark_info),
+              bm_comp);
+
+    cpage = 1;
+    cline = 1;
+    file_pos = 0;
+    screen_top_ptr = buffer;
+    buffer_end = BUFFER_END();
+
+    fill_buffer(file_pos, buffer, buffer_size);
+    line_end = line_begin = buffer;
+
+    for (i = 0; i < bookmark_count; i++)
+    {
+        sfp = bookmarks[i].file_position;
+        sstp = buffer;
+
+        while ((line_begin > sstp || sstp >= line_end) ||
+               (file_pos > sfp || sfp >= file_pos + BUFFER_END() - buffer))
+        {
+            get_next_line_position(&line_begin, &line_end, NULL);
+            if (line_end == NULL)
+                break;
+
+            next_line_ptr = line_end;
+
+            if (sstp == buffer &&
+                file_pos <= sfp && sfp < file_pos + BUFFER_END() - buffer)
+                sstp = sfp - file_pos + buffer;
+
+            increment_current_line();
+        }
+
+        decrement_current_line();
+        bookmarks[i].page = cpage;
+        bookmarks[i].line = cline;
+        bookmarks[i].file_position = file_pos + (line_begin - buffer);
+        increment_current_line();
+    }
+
+    /* remove reading page's bookmark */
+    for (i = 0; i < bookmark_count; i++)
+    {
+        if (bookmarks[i].flag & BOOKMARK_LAST)
+        {
+            int screen_pos;
+            int screen_top;
+
+            screen_pos = bookmarks[i].file_position;
+            screen_top = screen_pos % buffer_size;
+            file_pos = screen_pos - screen_top;
+            screen_top_ptr = buffer + screen_top;
+
+            cpage = bookmarks[i].page;
+            cline = bookmarks[i].line;
+            bookmarks[i].flag ^= BOOKMARK_LAST;
+            buffer_end = BUFFER_END();
+
+            fill_buffer(file_pos, buffer, buffer_size);
+
+            if (bookmarks[i].flag == 0)
+                viewer_remove_bookmark(i);
+
+            if (prefs.scroll_mode == PAGE && cline > 1)
+                viewer_scroll_to_top_line();
+            break;
+        }
+    }
 }
 
 static int col_limit(int col)
@@ -1389,8 +2353,8 @@ static int col_limit(int col)
     if (col < 0)
         col = 0;
     else
-        if (col > max_line_len - 2*glyph_width('o'))
-            col = max_line_len - 2*glyph_width('o');
+        if (col >= max_width)
+            col = max_width - draw_columns;
 
     return col;
 }
@@ -1401,6 +2365,8 @@ static bool encoding_setting(void)
 {
     static struct opt_items names[NUM_CODEPAGES];
     int idx;
+    bool res;
+    enum codepages oldenc = prefs.encoding;
 
     for (idx = 0; idx < NUM_CODEPAGES; idx++)
     {
@@ -1408,8 +2374,21 @@ static bool encoding_setting(void)
         names[idx].voice_id = -1;
     }
 
-    return rb->set_option("Encoding", &prefs.encoding, INT, names,
+    res = rb->set_option("Encoding", &prefs.encoding, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
+
+    /* When prefs.encoding changes into UTF-8 or changes from UTF-8,
+     * filesize (file_size) might change.
+     * In addition, if prefs.encoding is UTF-8, then BOM does not read.
+     */
+    if (oldenc != prefs.encoding && (oldenc == UTF_8 || prefs.encoding == UTF_8))
+    {
+        check_bom();
+        get_filesize();
+        fill_buffer(file_pos, buffer, buffer_size);
+    }
+
+    return res;
 }
 
 static bool word_wrap_setting(void)
@@ -1449,6 +2428,7 @@ static bool view_mode_setting(void)
                            names , 2, NULL);
     if (prefs.view_mode == NARROW)
         col = 0;
+    calc_max_width();
     return ret;
 }
 
@@ -1485,6 +2465,152 @@ static bool scrollbar_setting(void)
     return rb->set_option("Show Scrollbar", &prefs.scrollbar_mode, INT,
                            names, 2, NULL);
 }
+
+static bool header_setting(void)
+{
+    int len = (rb->global_settings->statusbar == STATUSBAR_TOP)? 4 : 2;
+    struct opt_items names[len];
+
+    names[0].string   = "None";
+    names[0].voice_id = -1;
+    names[1].string   = "File path";
+    names[1].voice_id = -1;
+
+    if (rb->global_settings->statusbar == STATUSBAR_TOP)
+    {
+        names[2].string   = "Status bar";
+        names[2].voice_id = -1;
+        names[3].string   = "Both";
+        names[3].voice_id = -1;
+    }
+
+    return rb->set_option("Show Header", &prefs.header_mode, INT,
+                         names, len, NULL);
+}
+
+static bool footer_setting(void)
+{
+    int len = (rb->global_settings->statusbar == STATUSBAR_BOTTOM)? 4 : 2;
+    struct opt_items names[len];
+
+    names[0].string   = "None";
+    names[0].voice_id = -1;
+    names[1].string   = "Page Num";
+    names[1].voice_id = -1;
+
+    if (rb->global_settings->statusbar == STATUSBAR_BOTTOM)
+    {
+        names[2].string   = "Status bar";
+        names[2].voice_id = -1;
+        names[3].string   = "Both";
+        names[3].voice_id = -1;
+    }
+
+    return rb->set_option("Show Footer", &prefs.footer_mode, INT,
+                           names, len, NULL);
+}
+
+static int font_comp(const void *a, const void *b)
+{
+    struct opt_items *pa;
+    struct opt_items *pb;
+
+    pa = (struct opt_items *)a;
+    pb = (struct opt_items *)b;
+
+    return rb->strcmp(pa->string, pb->string);
+}
+
+static bool font_setting(void)
+{
+    int count = 0;
+    DIR *dir;
+    struct dirent *entry;
+    int i = 0;
+    int len;
+    int new_font = 0;
+    int old_font;
+    bool res;
+    int size = 0;
+
+    dir = rb->opendir(FONT_DIR);
+    if (!dir)
+    {
+        rb->splash(HZ/2, "font dir does not access.");
+        return false;
+    }
+
+    while (1)
+    {
+        entry = rb->readdir(dir);
+
+        if (entry == NULL)
+            break;
+
+        len = rb->strlen(entry->d_name);
+        if (len < 4 || rb->strcmp(entry->d_name + len-4, ".fnt"))
+            continue;
+        size += len-3;
+        count++;
+    }
+    rb->closedir(dir);
+
+    struct opt_items names[count];
+    unsigned char font_names[size];
+    unsigned char *p = font_names;
+
+    dir = rb->opendir(FONT_DIR);
+    if (!dir)
+    {
+        rb->splash(HZ/2, "font dir does not access.");
+        return false;
+    }
+
+    while (1)
+    {
+        entry = rb->readdir(dir);
+
+        if (entry == NULL)
+            break;
+
+        len = rb->strlen(entry->d_name);
+        if (len < 4 || rb->strcmp(entry->d_name + len-4, ".fnt"))
+            continue;
+
+        rb->snprintf(p, len-3, "%s", entry->d_name);
+        names[i].string = p;
+        names[i].voice_id = -1;
+        p += len-3;
+        i++;
+        if (i >= count)
+            break;
+    }
+    rb->closedir(dir);
+
+    rb->qsort(names, count, sizeof(struct opt_items), font_comp);
+
+    for (i = 0; i < count; i++)
+    {
+        if (!rb->strcmp(names[i].string, prefs.font))
+        {
+            new_font = i;
+            break;
+        }
+    }
+    old_font = new_font;
+
+    res = rb->set_option("Select Font", &new_font, INT,
+                         names, count, NULL);
+
+    if (new_font != old_font)
+    {
+        rb->memset(prefs.font, 0, MAX_PATH);
+        rb->snprintf(prefs.font, MAX_PATH, "%s", names[new_font].string);
+        change_font(prefs.font);
+    }
+
+    return res;
+}
 #endif
 
 static bool autoscroll_speed_setting(void)
@@ -1506,6 +2632,12 @@ MENUITEM_FUNCTION(scrollbar_item, 0, "Show Scrollbar", scrollbar_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", page_mode_setting,
                   NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(header_item, 0, "Show Header", header_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(footer_item, 0, "Show Footer", footer_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(font_item, 0, "Font", font_setting,
+                  NULL, NULL, Icon_NOICON);
 #endif
 MENUITEM_FUNCTION(scroll_mode_item, 0, "Scroll Mode", scroll_mode_setting,
                   NULL, NULL, Icon_NOICON);
@@ -1514,28 +2646,39 @@ MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &view_mode_item,
 #ifdef HAVE_LCD_BITMAP
-            &scrollbar_item, &page_mode_item,
+            &scrollbar_item, &page_mode_item, &header_item, &footer_item, &font_item,
 #endif
             &scroll_mode_item, &autoscroll_speed_item);
 
-static bool viewer_options_menu(void)
+static bool viewer_options_menu(bool is_global)
 {
     bool result;
+    struct preferences tmp_prefs;
+
+    rb->memcpy(&tmp_prefs, &prefs, sizeof(struct preferences));
+
     result = (rb->do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB);
 
+    if (!is_global && rb->memcmp(&tmp_prefs, &prefs, sizeof(struct preferences)))
+    {
+        /* Show-scrollbar mode for current view-width mode */
 #ifdef HAVE_LCD_BITMAP
-    /* Show-scrollbar mode for current view-width mode */
-    init_need_scrollbar();
+        init_need_scrollbar();
+        init_header_and_footer();
 #endif
+        calc_page();
+    }
     return result;
 }
 
 static void viewer_menu(void)
 {
     int result;
+
     MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
                         "Return", "Viewer Options",
-                        "Show Playback Menu", "Quit");
+                        "Show Playback Menu", "Select Bookmark",
+                        "Global Settings", "Quit");
 
     result = rb->do_menu(&menu, NULL, NULL, false);
     switch (result)
@@ -1543,12 +2686,31 @@ static void viewer_menu(void)
         case 0: /* return */
             break;
         case 1: /* change settings */
-            done = viewer_options_menu();
+            done = viewer_options_menu(false);
             break;
         case 2: /* playback control */
             playback_control(NULL);
             break;
-        case 3: /* quit */
+        case 3: /* select bookmark */
+            viewer_select_bookmark(viewer_add_last_read_bookmark());
+            viewer_remove_last_read_bookmark();
+            fill_buffer(file_pos, buffer, buffer_size);
+            if (prefs.scroll_mode == PAGE && cline > 1)
+                viewer_scroll_to_top_line();
+            break;
+        case 4: /* change global settings */
+            {
+                struct preferences orig_prefs;
+
+                rb->memcpy(&orig_prefs, &prefs, sizeof(struct preferences));
+                if (!viewer_load_global_settings())
+                    viewer_default_preferences();
+                done = viewer_options_menu(true);
+                viewer_save_global_settings();
+                rb->memcpy(&prefs, &orig_prefs, sizeof(struct preferences));
+            }
+            break;
+        case 5: /* quit */
             viewer_exit(NULL);
             done = true;
             break;
@@ -1567,6 +2729,13 @@ enum plugin_status plugin_start(const void* file)
 
     /* get the plugin buffer */
     buffer = rb->plugin_get_buffer((size_t *)&buffer_size);
+    if (buffer_size == 0)
+    {
+        rb->splash(HZ, "buffer does not allocate !!");
+        return PLUGIN_ERROR;
+    }
+    block_size = buffer_size / 3;
+    buffer_size = 3 * block_size;
 
     if (!file)
         return PLUGIN_ERROR;
@@ -1592,13 +2761,14 @@ enum plugin_status plugin_start(const void* file)
         {
             if(old_tick <= *rb->current_tick - (110-prefs.autoscroll_speed*10))
             {
-                viewer_scroll_down();
+                viewer_scroll_down(true);
                 viewer_draw(col);
                 old_tick = *rb->current_tick;
             }
         }
 
         button = rb->button_get_w_tmo(HZ/10);
+
         switch (button) {
             case VIEWER_MENU:
 #ifdef VIEWER_MENU2
@@ -1647,10 +2817,14 @@ enum plugin_status plugin_start(const void* file)
                 {
                     /* Page down */
                     if (next_screen_ptr != NULL)
+                    {
                         screen_top_ptr = next_screen_to_draw_ptr;
+                        if (cpage < MAX_PAGE)
+                            cpage++;
+                    }
                 }
                 else
-                    viewer_scroll_down();
+                    viewer_scroll_down(autoscroll);
                 old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
@@ -1697,8 +2871,8 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_LINE_DOWN:
             case VIEWER_LINE_DOWN | BUTTON_REPEAT:
                 /* Scroll down one line */
-                if (next_screen_ptr != NULL)
-                    screen_top_ptr = next_line_ptr;
+                viewer_scroll_down(autoscroll);
+                increment_current_line();
                 old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
@@ -1736,6 +2910,29 @@ enum plugin_status plugin_start(const void* file)
                 done = true;
                 break;
 
+            case VIEWER_BOOKMARK:
+                {
+                    int idx = viewer_find_bookmark(cpage, cline);
+
+                    if (idx < 0)
+                    {
+                        if (bookmark_count >= MAX_BOOKMARKS-1)
+                            rb->splash(HZ/2, "No more add bookmark.");
+                        else
+                        {
+                            viewer_add_bookmark();
+                            rb->splash(HZ/2, "Bookmark add.");
+                        }
+                    }
+                    else
+                    {
+                        viewer_remove_bookmark(idx);
+                        rb->splash(HZ/2, "Bookmark remove.");
+                    }
+                    viewer_draw(col);
+                }
+                break;
+
             default:
                 if (rb->default_event_handler_ex(button, viewer_exit, NULL)
                     == SYS_USB_CONNECTED)
@@ -1750,5 +2947,3 @@ enum plugin_status plugin_start(const void* file)
     }
     return PLUGIN_OK;
 }
-
-
