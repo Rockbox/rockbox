@@ -175,6 +175,8 @@ void lcd_init_device(void)
     /*  38: output, non-inverted, no-irq, falling edge, no-chat, B2 */
     dm320_set_io(38, false, false, false, false, false, 0x02);
 
+    /* Enable clocks for display */
+    IO_CLK_MOD1 |= (CLK_MOD1_VENC | CLK_MOD1_OSD);
 
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
@@ -649,11 +651,6 @@ void lcd_pal256_update_pal(fb_data *palette)
     }
 }
 #endif
-    
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, 
-                  int height) __attribute__ ((section(".icode")));
                                            
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* Show it rotated so the LCD_WIDTH is now the height */
@@ -661,7 +658,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    register unsigned char const * yuv_src[3];
+    unsigned char const * yuv_src[3];
 
     if (!lcd_on)
         return;
@@ -699,31 +696,26 @@ void lcd_blit_yuv(unsigned char * const src[3],
         yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
     }
 
-    register int cbcr_remain=(stride>>1)-(width>>1);
-    register int y_remain=(stride<<1)-width;
+    int cbcr_remain=(stride>>1)-(width>>1);
+    int y_remain=(stride<<1)-width;
     do
     {
-        register fb_data *c_dst=dst;
         register int c_width=width;
-
+        register unsigned int *c_dst=(unsigned int*)dst;
         do
         {
-            /* This needs to be done in a block of 4 pixels */
+            register unsigned short Y=*((unsigned short*)yuv_src[0]);
+            register unsigned short Yst=*((unsigned short*)(yuv_src[0]+stride));
+            yuv_src[0]+=2;
             
-            *c_dst=*yuv_src[0]<<8 | *yuv_src[1];
-            *(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
-            c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
+            register unsigned char Cb=*yuv_src[1]++;
+            register unsigned char Cr=*yuv_src[2]++;
             
-            yuv_src[0]++;
-            
-            *c_dst=*yuv_src[0]<<8 | *yuv_src[1];
-            *(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
-            c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
-            
-            yuv_src[0]++;
-            
-            yuv_src[1]++;
-            yuv_src[2]++;
+            *c_dst = (Yst<<24) | (Cr << 16) | ((Y&0xFF)<<8) | Cb;
+            *(c_dst - (LCD_NATIVE_WIDTH+LCD_FUDGE)/2) = 
+                    ( (Yst&0xFF00)<<16) | (Cr << 16) | (Y&0xFF00) | Cb;
+                    
+            c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
             
             c_width -= 2;
         }
@@ -732,6 +724,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
         yuv_src[0] += y_remain; /* Skip down two luma lines-width */
         yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
         yuv_src[2] += cbcr_remain;
+
         dst+=2;
     }
     while (--height > 0);
