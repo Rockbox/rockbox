@@ -194,7 +194,7 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7423
+#define USB_PRODUCT_ID 0x74c1
 
 #endif /* !BOOTLOADER */
 
