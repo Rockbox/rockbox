@@ -328,6 +328,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_TRACK_TIME_ELAPSED,       "pc",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_TRACK_TIME_REMAINING,     "pr",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_TRACK_LENGTH,             "pt",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_TRACK_STARTING,           "pS",  WPS_REFRESH_DYNAMIC, parse_timeout },
+    { WPS_TOKEN_TRACK_ENDING,             "pE",  WPS_REFRESH_DYNAMIC, parse_timeout },
 
     { WPS_TOKEN_PLAYLIST_POSITION,        "pp",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_PLAYLIST_ENTRIES,         "pe",  WPS_REFRESH_STATIC,  NULL },
@@ -1106,6 +1108,8 @@ static int parse_timeout(const char *wps_bufptr,
             case WPS_TOKEN_SUBLINE_TIMEOUT:
                 return -1;
             case WPS_TOKEN_BUTTON_VOLUME:
+            case WPS_TOKEN_TRACK_STARTING:
+            case WPS_TOKEN_TRACK_ENDING:
                 val = 10;
                 break;
         }
