@@ -140,6 +140,8 @@
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define current usage levels */
+#define CURRENT_NORMAL     65  /*2250mah/35h = 65 ma*/  
+#define CURRENT_BACKLIGHT  25  
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
 
 /* Define this if your LCD can set contrast */
