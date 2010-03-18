@@ -908,8 +908,9 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_TRACK_ENDING:
             if (id3)
             {
-                int elapsed = id3->elapsed +  + state->ff_rewind_count;
-                if (id3->length - elapsed < token->value.i * HZ)
+                unsigned long elapsed = id3->elapsed +  + state->ff_rewind_count;
+                unsigned time = token->value.i * HZ;
+                if (id3->length - elapsed < time)
                     return "ending";
             }
             return NULL;

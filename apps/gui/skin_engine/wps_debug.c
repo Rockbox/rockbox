@@ -504,6 +504,13 @@ static char *get_token_desc(struct wps_token *token, char *buf,
         case WPS_TOKEN_LANG_IS_RTL:
             snprintf(buf, bufsize, "lang: is_rtl?");
             break;
+            
+        case WPS_TOKEN_TRACK_STARTING:
+            snprintf(buf, bufsize, "first %d seconds of track", token->value.i);
+            break;
+        case WPS_TOKEN_TRACK_ENDING:
+            snprintf(buf, bufsize, "last %d seconds of track", token->value.i);
+            break;
         default:
             for(i=1; i<sizeof(tokens)/sizeof(*token); i++)
             {
