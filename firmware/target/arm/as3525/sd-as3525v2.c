@@ -642,17 +642,6 @@ int sd_init(void)
     return 0;
 }
 
-#ifdef STORAGE_GET_INFO
-void sd_get_info(struct storage_info *info)
-{
-    info->sector_size=card_info[drive].blocksize;
-    info->num_sectors=card_info[drive].numblocks;
-    info->vendor="Rockbox";
-    info->product = "Internal Storage";
-    info->revision="0.00";
-}
-#endif
-
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned long response;
