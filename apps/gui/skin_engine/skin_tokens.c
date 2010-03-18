@@ -900,16 +900,16 @@ const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_TRACK_STARTING:
             if (id3)
             {
-                int elapsed = id3->elapsed +  + state->ff_rewind_count;
-                if (elapsed < token->value.i * HZ)
+                int elapsed = id3->elapsed + state->ff_rewind_count;
+                if (elapsed < token->value.i * 1000)
                     return "starting";
             }
             return NULL;
         case WPS_TOKEN_TRACK_ENDING:
             if (id3)
             {
-                unsigned long elapsed = id3->elapsed +  + state->ff_rewind_count;
-                unsigned time = token->value.i * HZ;
+                unsigned long elapsed = id3->elapsed + state->ff_rewind_count;
+                unsigned time = token->value.i * 1000;
                 if (id3->length - elapsed < time)
                     return "ending";
             }
