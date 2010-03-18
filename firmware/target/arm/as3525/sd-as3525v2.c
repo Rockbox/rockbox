@@ -790,14 +790,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         MCI_FIFOTH |= 0x503f0080;
 
 
-        if(card_info[drive].ocr & (1<<30) ) /* SDHC */
-            ret = send_cmd(drive, cmd, start, MCI_NO_RESP, NULL);
-        else
-            ret = send_cmd(drive, cmd, start * SD_BLOCK_SIZE,
-                    MCI_NO_RESP, NULL);
+        int arg = start;
+        if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
+            arg *= SD_BLOCK_SIZE;
 
-        if (ret < 0)
-            panicf("transfer multiple blocks failed (%d)", ret);
+        if(!send_cmd(drive, cmd, arg, MCI_NO_RESP, NULL))
+            panicf("%s multiple blocks failed", write ? "write" : "read");
 
         if(write)
             dma_enable_channel(0, dma_buf, MCI_FIFO, DMA_PERI_SD,
