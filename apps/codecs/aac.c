@@ -118,6 +118,8 @@ next_track:
         } else {
             sound_samples_done = 0;
         }
+    } else {
+        sound_samples_done = 0;
     }
     
     if (i == 0) 
