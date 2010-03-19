@@ -176,7 +176,7 @@ static bool pacbox_menu(void)
     MENUITEM_STRINGLIST(menu, "Pacbox Menu", NULL,
                         "Difficulty", "Pacmen Per Game", "Bonus Life",
                         "Ghost Names", "Display FPS",
-                        "Playback Control", "Restart", "Quit");
+                        "Restart", "Quit");
 
     rb->button_clear_queue();
     
@@ -229,10 +229,7 @@ static bool pacbox_menu(void)
                 rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
-            case 5: /* playback control */
-                playback_control(NULL);
-                break;
-            case 6: /* Restart */
+            case 5: /* Restart */
                 need_restart=true;
                 menu_quit=1;
                 break;
@@ -255,7 +252,7 @@ static bool pacbox_menu(void)
          restart game
          usb connected
     */
-    return (result==7);
+    return (result==6);
 }
 
 
