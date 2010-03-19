@@ -26,9 +26,12 @@
 
 void usb_init_device(void)
 {
-    or_l(0x00800010, &GPIO_OUT);   /* RESET deasserted, VBUS powered */
+    and_l(~0x00800000, &GPIO_OUT); /* RESET asserted */
+    or_l(0x00000010, &GPIO_OUT);   /* bus powered */
     or_l(0x00800010, &GPIO_ENABLE);
     or_l(0x00800010, &GPIO_FUNCTION);
+    sleep(1);
+    or_l(0x00800000, &GPIO_OUT);   /* RESET deasserted */
     
     or_l(0x00800000, &GPIO1_FUNCTION);  /* USB detect */
 }
