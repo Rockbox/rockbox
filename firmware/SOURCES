@@ -1208,7 +1208,8 @@ target/arm/tcc77x/c100/audio-c100.c
 
 #ifdef SANSA_CLIPPLUS
 #ifndef SIMULATOR
-target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/lcd-ssd1303.c
+target/arm/as3525/sansa-clipplus/lcd-clip-plus.c
 target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
 target/arm/as3525/sansa-clipplus/button-clip.c
 target/arm/as3525/sansa-clipplus/backlight-clip.c
@@ -1221,8 +1222,9 @@ target/arm/as3525/sansa-clip/powermgmt-clip.c
 
 #ifdef SANSA_CLIPV2
 #ifndef SIMULATOR
-target/arm/as3525/sansa-clip/lcd-ssd1303.c
-target/arm/as3525/sansa-clip/lcd-as-clip.S
+target/arm/as3525/lcd-ssd1303.c
+target/arm/as3525/sansa-clipv2/lcd-clipv2.c
+target/arm/as3525/sansa-clip/lcd-as-clip.S  /* TODO for clipv2 */
 target/arm/as3525/sansa-clipv2/button-clip.c
 target/arm/as3525/sansa-clipv2/backlight-clip.c
 #ifndef BOOTLOADER
@@ -1234,7 +1236,8 @@ target/arm/as3525/sansa-clip/powermgmt-clip.c
 
 #ifdef SANSA_CLIP
 #ifndef SIMULATOR
-target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/lcd-ssd1303.c
+target/arm/as3525/sansa-clip/lcd-clip.c
 target/arm/as3525/sansa-clip/lcd-as-clip.S
 target/arm/as3525/sansa-clip/button-clip.c
 target/arm/as3525/sansa-clip/backlight-clip.c
