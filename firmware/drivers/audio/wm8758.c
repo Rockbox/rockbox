@@ -181,6 +181,23 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
     wmcodec_write(ROUT2VOL, amp_r | ROUT2VOL_ROUT2ZC | ROUT2VOL_OUT2VU);
 }
 
+void audiohw_enable_lineout(bool enable)
+{
+    if (enable)
+    {
+        /* include enabling of OUT2 */
+        wmcodec_write(PWRMGMT3, PWRMGMT3_LOUT2EN | PWRMGMT3_ROUT2EN
+                              | PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
+                              | PWRMGMT3_DACENR | PWRMGMT3_DACENL);
+    }
+    else
+    {
+        /* exclude enabling of OUT2 */
+        wmcodec_write(PWRMGMT3, PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
+                              | PWRMGMT3_DACENR | PWRMGMT3_DACENL);
+    }
+}
+
 void audiohw_set_bass(int value)
 {
     eq1_reg = (eq1_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);

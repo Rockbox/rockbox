@@ -767,6 +767,9 @@ struct user_settings
 #ifdef HAVE_ACCESSORY_SUPPLY
     bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
 #endif
+#ifdef HAVE_LINEOUT_POWEROFF
+    bool lineout_active;
+#endif
 
 #ifdef HAVE_SPEAKER
     bool speaker_enabled;

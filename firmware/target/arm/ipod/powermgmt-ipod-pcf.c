@@ -25,6 +25,7 @@
 #include "powermgmt.h"
 #include "pcf5060x.h"
 #include "pcf50605.h"
+#include "audiohw.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -127,5 +128,13 @@ void accessory_supply_set(bool enable)
         pcf50605_write(PCF5060X_D2REGC1, 0x18); /* OFF */
     }
 
+}
+#endif
+
+#ifdef HAVE_LINEOUT_POWEROFF
+void lineout_set(bool enable)
+{
+    /* Call audio hardware driver implementation */
+    audiohw_enable_lineout(enable);
 }
 #endif

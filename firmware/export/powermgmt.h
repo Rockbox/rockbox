@@ -174,5 +174,8 @@ bool query_force_shutdown(void);
 #ifdef HAVE_ACCESSORY_SUPPLY
 void accessory_supply_set(bool);
 #endif
+#ifdef HAVE_LINEOUT_POWEROFF
+void lineout_set(bool);
+#endif
 
 #endif /* _POWERMGMT_H_ */

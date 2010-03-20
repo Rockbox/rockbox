@@ -77,6 +77,9 @@
 /* Define this if you can switch on/off the accessory power supply */
 #define HAVE_ACCESSORY_SUPPLY
 
+/* Define this, if you can switch on/off the lineout */
+#define HAVE_LINEOUT_POWEROFF
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

@@ -251,6 +251,9 @@ MENUITEM_SETTING(serial_bitrate, &global_settings.serial_bitrate, NULL);
 #ifdef HAVE_ACCESSORY_SUPPLY
 MENUITEM_SETTING(accessory_supply, &global_settings.accessory_supply, NULL);
 #endif
+#ifdef HAVE_LINEOUT_POWEROFF
+MENUITEM_SETTING(lineout_onoff, &global_settings.lineout_active, NULL);
+#endif
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 #ifdef USB_ENABLE_HID
 MENUITEM_SETTING(usb_hid, &global_settings.usb_hid, NULL);
@@ -298,6 +301,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
             &accessory_supply,
+#endif
+#ifdef HAVE_LINEOUT_POWEROFF
+            &lineout_onoff,
 #endif
 #ifdef HAVE_BUTTON_LIGHT
             &buttonlight_timeout,

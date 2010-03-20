@@ -225,6 +225,10 @@ usb_hid_mouse
 wheel_acceleration
 #endif
 
+#if defined(HAVE_LINEOUT_POWEROFF)
+lineout_poweroff
+#endif
+
 #if defined(HAVE_TOUCHSCREEN)
 touchscreen
 #endif

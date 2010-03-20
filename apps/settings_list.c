@@ -700,6 +700,10 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, accessory_supply, LANG_ACCESSORY_SUPPLY,
                   true, "accessory power supply", accessory_supply_set),
 #endif
+#ifdef HAVE_LINEOUT_POWEROFF
+    OFFON_SETTING(0, lineout_active, LANG_LINEOUT_ONOFF,
+                  true, "lineout", lineout_set),
+#endif
     /* tuner */
 #if CONFIG_TUNER
     OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,

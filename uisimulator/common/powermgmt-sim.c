@@ -142,6 +142,13 @@ void accessory_supply_set(bool enable)
 }
 #endif
 
+#ifdef HAVE_LINEOUT_POWEROFF
+void lineout_set(bool enable)
+{
+    (void)enable;
+}
+#endif
+
 void reset_poweroff_timer(void)
 {
 }
