@@ -2769,6 +2769,17 @@ enum plugin_status plugin_start(const void* file)
 
         button = rb->button_get_w_tmo(HZ/10);
 
+        if (prefs.view_mode != WIDE) {
+            /* when not in wide view mode, the SCREEN_LEFT and SCREEN_RIGHT
+               buttons jump to the beginning and end of the file. To stop
+               users doing this by accident, replace non-held occurrences
+               with page up/down instead. */
+            if (button == VIEWER_SCREEN_LEFT)
+                button = VIEWER_PAGE_UP;
+            else if (button == VIEWER_SCREEN_RIGHT)
+                button = VIEWER_PAGE_DOWN;
+        }
+
         switch (button) {
             case VIEWER_MENU:
 #ifdef VIEWER_MENU2
