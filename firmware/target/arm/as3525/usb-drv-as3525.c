@@ -122,7 +122,7 @@ void usb_drv_init(void)
         endpoints[i].busy = false;
 
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) | 1<<2);
-    ascodec_write(AS3514_USB_UTIL, ascodec_read(AS3514_USB_UTIL) & ~(1<<4));
+    ascodec_write(AS3517_USB_UTIL, ascodec_read(AS3517_USB_UTIL) & ~(1<<4));
 
     /* PHY part */
     CGU_USB = 1<<5 /* enable */
@@ -137,7 +137,7 @@ void usb_drv_init(void)
     USB_DEV_CTRL |= 0x400; /* soft disconnect */
 
     /* UVDD */
-    ascodec_write(AS3514_USB_UTIL, ascodec_read(AS3514_USB_UTIL) | (1<<4));
+    ascodec_write(AS3517_USB_UTIL, ascodec_read(AS3517_USB_UTIL) | (1<<4));
     sleep(10); //msleep(100)
 
     USB_GPIO_CSR = 0x6180000;
@@ -199,7 +199,7 @@ void usb_drv_exit(void)
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
     CGU_USB &= ~(1<<5);
     CGU_PERI &= ~CGU_USB_CLOCK_ENABLE;
-    ascodec_write(AS3514_USB_UTIL, ascodec_read(AS3514_USB_UTIL) & ~(1<<4));
+    ascodec_write(AS3517_USB_UTIL, ascodec_read(AS3517_USB_UTIL) & ~(1<<4));
 }
 
 int usb_drv_port_speed(void)

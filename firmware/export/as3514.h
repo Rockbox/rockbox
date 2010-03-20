@@ -46,10 +46,11 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define AS3514_DAC_L      0x0f
 #define AS3514_ADC_R      0x10
 #define AS3514_ADC_L      0x11
+#define AS3543_DAC_IF     0x12  /* only in as3543 */
 #define AS3514_AUDIOSET1  0x14
 #define AS3514_AUDIOSET2  0x15
 #define AS3514_AUDIOSET3  0x16
-#define AS3514_USB_UTIL   0x17  /* Only in AS3525 ? */
+#define AS3517_USB_UTIL   0x17  /* only in as3517+ */
 #define AS3514_PLLMODE    0x1d
 
 #define AS3514_SYSTEM     0x20

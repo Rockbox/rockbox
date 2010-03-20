@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Driver for AS3514 audio codec
+ * Driver for AS3514 and compatible audio codec
  *
  * Copyright (c) 2007 Daniel Ankers
  * Copyright (c) 2007 Christian Gmeiner
@@ -30,6 +30,13 @@
 #include "audiohw.h"
 #include "i2s.h"
 #include "ascodec.h"
+
+/*
+ * This drivers supports:
+ * as3514 , as used in the PP targets
+ * as3517 , as used in the as3525 targets
+ * as3543 , as used in the as3525v2 targets
+ */
 
 /* AMS Sansas based on the AS3525 use the LINE2 input for the analog radio
    signal instead of LINE1 */
@@ -170,9 +177,13 @@ void audiohw_preinit(void)
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
 #endif
 
+#if CONFIG_CPU != AS3525v2
     /* Mute and disable speaker */
     as3514_write(AS3514_LSP_OUT_R, LSP_OUT_R_SP_OVC_TO_256MS | 0x00);
     as3514_write(AS3514_LSP_OUT_L, LSP_OUT_L_SP_MUTE | 0x00);
+#else
+    as3514_clear(AS3543_DAC_IF, 0x80);
+#endif
 
     /* Set headphone over-current to 0, Min volume */
     as3514_write(AS3514_HPH_OUT_R,
@@ -262,8 +273,15 @@ void audiohw_mute(bool mute)
 {
     if (mute) {
         as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+#if CONFIG_CPU == AS3525v2
+        as3514_set(AS3543_DAC_IF, 0x80);
+#endif
+
     } else {
         as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+#if CONFIG_CPU == AS3525v2
+        as3514_clear(AS3543_DAC_IF, 0x80);
+#endif
     }
 }
 
@@ -283,6 +301,10 @@ void audiohw_close(void)
     /* turn off everything */
     as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_ON);
     as3514_write(AS3514_AUDIOSET1, 0x0);
+
+#if CONFIG_CPU == AS3525v2
+    as3514_set(AS3543_DAC_IF, 0x80);
+#endif
 
     /* Allow caps to discharge */
     sleep(HZ/4);
