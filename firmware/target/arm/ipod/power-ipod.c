@@ -117,11 +117,22 @@ void ide_power_enable(bool on)
     if (on)
     {
         GPO32_VAL &= ~0x40000000;
+        sleep(1);  /* only need 4 ms */
         DEV_EN |= DEV_IDE0;
+        GPIOG_ENABLE = 0;
+        GPIOH_ENABLE = 0;
+        GPIOI_ENABLE &= 0x40;
+        GPIOK_ENABLE &= 0XE0;
+        udelay(10);
     }
     else
     {
         DEV_EN &= ~DEV_IDE0;
+        udelay(10);
+        GPIOG_ENABLE = 0xFF;
+        GPIOH_ENABLE = 0xFF;
+        GPIOI_ENABLE |= 0xBF;
+        GPIOK_ENABLE |= 0x1F;
         GPO32_VAL |= 0x40000000;
     }
 #else /* Nano */
