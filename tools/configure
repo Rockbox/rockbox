@@ -162,6 +162,12 @@ simcc () {
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    ;;
 
+   SunOS)
+   echo "*Solaris host detected"
+   GCCOPTS="$GCCOPTS $sdl_cflags"
+   LDOPTS="$sdl_libs"
+   ;;
+
    *)
    echo "[ERROR] Unsupported system: $uname, fix configure and retry"
    exit 2
