@@ -25,14 +25,8 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <time.h>
-#ifdef __FreeBSD__
-#include <sys/param.h>
-#include <sys/mount.h>
-#elif defined(__APPLE__)
-#include <sys/param.h>
-#include <sys/mount.h>
-#elif !defined(WIN32)
-#include <sys/vfs.h>
+#ifndef WIN32
+#include <sys/statvfs.h>
 #endif
 
 #ifdef WIN32
@@ -472,15 +466,15 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
             *free = free_clusters * secperclus / 2 * (bytespersec / 512);
     }
 #else
-    struct statfs fs;
+    struct statvfs vfs;
 
-    if (!statfs(".", &fs)) {
-        DEBUGF("statfs: bsize=%d blocks=%ld free=%ld\n",
-               (int)fs.f_bsize, fs.f_blocks, fs.f_bfree);
+    if (!statvfs(".", &vfs)) {
+        DEBUGF("statvfs: frsize=%d blocks=%ld free=%ld\n",
+               (int)vfs.f_frsize, (long)vfs.f_blocks, (long)vfs.f_bfree);
         if (size)
-            *size = fs.f_blocks * (fs.f_bsize / 1024);
+            *size = vfs.f_blocks / 2 * (vfs.f_frsize / 512);
         if (free)
-            *free = fs.f_bfree * (fs.f_bsize / 1024);
+            *free = vfs.f_bfree / 2 * (vfs.f_frsize / 512);
     }
 #endif
     else {
