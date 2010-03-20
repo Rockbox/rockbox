@@ -13383,14 +13383,14 @@
   user: core
   <source>
     *: none
-    lineout_poweroff: "Line-out"
+    lineout_poweroff: "Line Out"
   </source>
   <dest>
     *: none
-    lineout_poweroff: "Line-out"
+    lineout_poweroff: "Line Out"
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Line-out"
+    lineout_poweroff: "Line Out"
   </voice>
 </phrase>
