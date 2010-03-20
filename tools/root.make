@@ -16,7 +16,7 @@ DEFINES = -DROCKBOX -DMEMORYSIZE=$(MEMORYSIZE) -DMEM=$(MEMORYSIZE) $(TARGET) \
 INCLUDES = -I$(BUILDDIR) -I$(BUILDDIR)/lang $(TARGET_INC)
 
 CFLAGS = $(INCLUDES) $(DEFINES) $(GCCOPTS) 
-PPCFLAGS = $(filter-out -Dmain=SDL_main,$(CFLAGS)) # cygwin sdl-config fix
+PPCFLAGS = $(filter-out -g -Dmain=SDL_main,$(CFLAGS)) # cygwin sdl-config fix
 
 TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
