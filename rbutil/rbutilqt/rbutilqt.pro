@@ -32,7 +32,7 @@ RCC_DIR = $$MYBUILDDIR/rcc
 
 
 # check version of Qt installation
-VER = $$find(QT_VERSION, ^4\.[3-9]+.*)
+VER = $$find(QT_VERSION, ^4\.[5-9]+.*)
 isEmpty(VER) {
     !isEmpty(QT_VERSION) error("Qt found:" $$[QT_VERSION])
     error("Qt >= 4.3 required!")
