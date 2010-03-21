@@ -1101,7 +1101,25 @@ bool dbg_ports(void)
     while(1)
     {
         line = 0;
-        lcd_puts(0, line++, "GPIO STATES:");
+        lcd_puts(0, line++, "GPIO ENABLE:");
+        lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
+                               (unsigned int)GPIOA_ENABLE,
+                               (unsigned int)GPIOE_ENABLE,
+                               (unsigned int)GPIOI_ENABLE);
+        lcd_putsf(0, line++, "B: %02x  F: %02x  J: %02x",
+                               (unsigned int)GPIOB_ENABLE,
+                               (unsigned int)GPIOF_ENABLE,
+                               (unsigned int)GPIOJ_ENABLE);
+        lcd_putsf(0, line++, "C: %02x  G: %02x  K: %02x",
+                               (unsigned int)GPIOC_ENABLE,
+                               (unsigned int)GPIOG_ENABLE,
+                               (unsigned int)GPIOK_ENABLE);
+        lcd_putsf(0, line++, "D: %02x  H: %02x  L: %02x",
+                               (unsigned int)GPIOD_ENABLE,
+                               (unsigned int)GPIOH_ENABLE,
+                               (unsigned int)GPIOL_ENABLE);
+        line++;
+        lcd_puts(0, line++, "GPIO INPUT VAL:");
         lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
                                (unsigned int)GPIOA_INPUT_VAL,
                                (unsigned int)GPIOE_INPUT_VAL,
