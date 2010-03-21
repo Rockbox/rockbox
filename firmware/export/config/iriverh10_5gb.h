@@ -113,6 +113,11 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define current usage levels */
+#define CURRENT_NORMAL     98  /* ~8.4h (820mAh) from bench with r25244 */
+#define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
+#define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */

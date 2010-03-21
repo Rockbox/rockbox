@@ -26,40 +26,40 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-#ifdef IRIVER_H10
+#if   defined(IRIVER_H10)
     3733
-#elif defined IRIVER_H10_5GB
-    3695
+#elif defined(IRIVER_H10_5GB)
+    3700
 #endif
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-#ifdef IRIVER_H10
+#if   defined(IRIVER_H10)
     3627
-#elif defined IRIVER_H10_5GB
-    3627
+#elif defined(IRIVER_H10_5GB)
+    3600
 #endif
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-#ifdef IRIVER_H10
+#if   defined(IRIVER_H10)
     { 3733, 3772, 3821, 3840, 3869, 3917, 3985, 4034, 4072, 4140, 4198 }
-#elif defined IRIVER_H10_5GB
-    { 3695, 3714, 3772, 3791, 3811, 3850, 3908, 3985, 4024, 4111, 4198 }
+#elif defined(IRIVER_H10_5GB)
+    { 3700, 3800, 3850, 3880, 3910, 3960, 4000, 4070, 4120, 4210, 4280 }
 #endif
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-#ifdef IRIVER_H10
+#if   defined(IRIVER_H10)
     3956, 3995, 4024, 4043, 4063, 4082, 4111, 4140, 4179, 4218, 4266
-#elif defined IRIVER_H10_5GB
+#elif defined(IRIVER_H10_5GB)
     /* TODO: Not yet calibrated */
-    3850, 3888, 3927, 3966, 4024, 4063, 4111, 4150, 4198, 4237, 4286
+    3700, 3800, 3850, 3880, 3910, 3960, 4000, 4070, 4120, 4210, 4280
 #endif
 };
 
