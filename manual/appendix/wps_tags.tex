@@ -222,6 +222,21 @@ some capabilities (e.g. having no FM radio) some values will be never yielded.
 Example: \config{You are in the \%?cs{\textless}Main menu{\textbar}WPS{\textbar}%
 Recording screen{\textbar}FM Radio screen{\textgreater}}
 
+\section{List Title (\fname{.sbs} only)}
+  \begin{tagmap}{}{}
+    \config{\%Lt} & Title text. Should be used in a conditional so that non-list
+      screens don't show a title when they shouldn't\\
+    \config{\%Li} & Title icon. This uses the same order as custom icons (see
+      \wikilink{CustomIcons} in the wiki) except that here \config{0} is ``no
+      icon''\\
+  \end{tagmap}
+
+  This tag can be used to give custom formatting to list titles.
+  Define a viewport with the font and formatting desired, and then use
+  \config{\%?Lt{\textless}\%Lt{\textgreater}} to display the title within the
+  viewport.  If \config{\%Lt} is present anywhere in the \fname{.sbs}, then the
+  \config{\%Vi} viewport will not show the title.
+
 \section{Changing Volume}
   \begin{tagmap}{}{}
     \config{\%mv[t]} & ``v'' if the volume is being changed\\
