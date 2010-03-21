@@ -459,7 +459,7 @@ static int sd_init_card(const int drive)
         send_cmd(drive, SD_APP_CMD, 0, MCI_RESP, &response);
 
          /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
-        if(!send_cmd(drive, SD_APP_OP_COND, (sd_v2 ? 0x40FF8000 : (1<<23)),
+        if(!send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
                         MCI_RESP, &card_info[drive].ocr))
             return -3;
     } while(!(card_info[drive].ocr & (1<<31)) );
