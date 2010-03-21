@@ -420,6 +420,21 @@ or alternate information on those that do not
 Example:
 \config{\%?cc{\textless}\%cH:\%cM{\textbar}No clock detected{\textgreater}}
 
+\section{Text Translation}
+  \begin{tagmap}{}{}
+    \config{\%Sx{\textbar}{\textless}English{\textgreater}{\textbar}}
+    & Display the translation of ``English'' in the current language\\
+  \end{tagmap}
+  
+  \begin{itemize}
+    \item ``English'' must be a phrase used in the language file.
+    \item It should match the \config{Source:} line in the language file.
+  \end{itemize}
+
+  \note{checkwps cannot verify that the string is correct, so please check on
+    either the simulator or on target.}
+
+
 \opt{touchscreen}{
   \section{Touchscreen Areas (WPS only)}
     \begin{tagmap}{}{}
