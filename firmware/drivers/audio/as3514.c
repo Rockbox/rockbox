@@ -186,9 +186,13 @@ void audiohw_preinit(void)
 #endif
 
     /* Set headphone over-current to 0, Min volume */
+#if CONFIG_CPU != AS3525v2
     as3514_write(AS3514_HPH_OUT_R,
                  HPH_OUT_R_HP_OVC_TO_0MS | 0x00);
-
+#else
+    as3514_write(AS3514_HPH_OUT_R, (0<<7) /* out */ | (1<<5) /* dac */
+        | 0x1f /* vol */);
+#endif
     /* Headphone ON, MUTE, Min volume */
     as3514_write(AS3514_HPH_OUT_L,
                  HPH_OUT_L_HP_ON | HPH_OUT_L_HP_MUTE | 0x00);
