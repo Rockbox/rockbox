@@ -1101,6 +1101,7 @@ bool dbg_ports(void)
     while(1)
     {
         line = 0;
+#if (LCD_HEIGHT / SYSFONT_HEIGHT >= 22) /* Only for displays >= 22 lines */
         lcd_puts(0, line++, "GPIO ENABLE:");
         lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
                                (unsigned int)GPIOA_ENABLE,
@@ -1119,6 +1120,7 @@ bool dbg_ports(void)
                                (unsigned int)GPIOH_ENABLE,
                                (unsigned int)GPIOL_ENABLE);
         line++;
+#endif
         lcd_puts(0, line++, "GPIO INPUT VAL:");
         lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
                                (unsigned int)GPIOA_INPUT_VAL,
