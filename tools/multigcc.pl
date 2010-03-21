@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use Switch;
 use List::Util 'shuffle'; # standard from Perl 5.8 and later
 
 my $tempfile = "multigcc.out";
@@ -24,10 +25,25 @@ my $command = join " ", @params;
 @files = shuffle(@files);  
 
 # count number of cores
-my $cores = 1;
-if (open CPUINFO, "</proc/cpuinfo") {
-    $cores = scalar grep /^processor/i, <CPUINFO>;
-    close CPUINFO;
+my $cores;
+switch($^O) {
+    case "darwin" {
+        chomp($cores = `sysctl -n hw.ncpu`);
+        $cores = 1 if ($?);
+    }
+    case "solaris" {
+        $cores = scalar grep /on-line/i, `psrinfo`;
+        $cores = 1 if ($?);
+    }
+    else {
+        if (open CPUINFO, "</proc/cpuinfo") {
+            $cores = scalar grep /^processor/i, <CPUINFO>;
+            close CPUINFO;
+        }
+        else {
+            $cores = 1;
+        }
+    }
 }
 
 # don't run empty children
