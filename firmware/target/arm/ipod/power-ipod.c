@@ -121,8 +121,8 @@ void ide_power_enable(bool on)
         DEV_EN |= DEV_IDE0;
         GPIOG_ENABLE = 0;
         GPIOH_ENABLE = 0;
-        GPIOI_ENABLE &= 0x40;
-        GPIOK_ENABLE &= 0XE0;
+        GPIO_CLEAR_BITWISE(GPIOI_ENABLE, 0xBF);
+        GPIO_CLEAR_BITWISE(GPIOK_ENABLE, 0x1F);
         udelay(10);
     }
     else
@@ -131,8 +131,8 @@ void ide_power_enable(bool on)
         udelay(10);
         GPIOG_ENABLE = 0xFF;
         GPIOH_ENABLE = 0xFF;
-        GPIOI_ENABLE |= 0xBF;
-        GPIOK_ENABLE |= 0x1F;
+        GPIO_SET_BITWISE(GPIOI_ENABLE, 0xBF);
+        GPIO_SET_BITWISE(GPIOK_ENABLE, 0x1F);
         GPO32_VAL |= 0x40000000;
     }
 #else /* Nano */
