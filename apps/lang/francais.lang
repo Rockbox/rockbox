@@ -13329,3 +13329,20 @@
     recording_histogram: "Intervalle de l'histogramme"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Sortie audio"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Sortie audio"
+  </voice>
+</phrase>
