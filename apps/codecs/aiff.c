@@ -100,6 +100,9 @@ next_track:
 
     codec_set_replaygain(ci->id3);
     
+    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    bytesdone = ci->id3->offset;
+
     /* assume the AIFF header is less than 1024 bytes */
     buf = ci->request_buffer(&n, 1024);
     if (n < 54) {
@@ -279,9 +282,26 @@ next_track:
     firstblockposn = 1024 - n;
     ci->advance_buffer(firstblockposn);
 
+    /* make sure we're at the correct offset */
+    if (bytesdone > (uint32_t) firstblockposn) {
+        /* Round down to previous block */
+        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
+                                                     PCM_SEEK_POS, NULL);
+
+        if (newpos->pos > format.numbytes)
+            goto done;
+        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        {
+            bytesdone      = newpos->pos;
+            decodedsamples = newpos->samples;
+        }
+        ci->seek_complete();
+    } else {
+        /* already where we need to be */
+        bytesdone = 0;
+    }
+
     /* The main decoder loop */
-    bytesdone = 0;
-    ci->set_elapsed(0);
     endofstream = 0;
 
     while (!endofstream) {
@@ -290,8 +310,8 @@ next_track:
             break;
 
         if (ci->seek_time) {
-            /* 2nd args(read_buffer) is unnecessary in the format which AIFF supports. */
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, NULL);
+            /* 3rd args(read_buffer) is unnecessary in the format which AIFF supports. */
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME, NULL);
 
             if (newpos->pos > format.numbytes)
                 break;

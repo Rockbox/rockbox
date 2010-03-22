@@ -44,6 +44,7 @@ static const int index_table[] ICONST_ATTR = {
 };
 
 static struct adpcm_data cur_data;
+static int blocksperchunk;
 
 static struct pcm_format *fmt;
 
@@ -71,7 +72,8 @@ static bool set_format(struct pcm_format *format)
     fmt->samplesperblock = 2;
 
     /* chunksize = about 1/32[sec] data */
-    fmt->chunksize = ci->id3->frequency >> 6;
+    blocksperchunk = ci->id3->frequency >> 6;
+    fmt->chunksize = blocksperchunk * fmt->blockalign;
 
     max_chunk_count = (uint64_t)ci->id3->length * ci->id3->frequency
                                          / (2000LL * fmt->chunksize);
@@ -146,20 +148,18 @@ static int decode_for_seek(const uint8_t *inbuf, size_t inbufsize)
     return CODEC_OK;
 }
 
-static struct pcm_pos *get_seek_pos(long seek_time,
+static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
                                     uint8_t *(*read_buffer)(size_t *realsize))
 {
     static struct pcm_pos newpos;
-    uint32_t seek_count = 0;
-    uint32_t new_count;
+    uint32_t seek_count = (seek_mode == PCM_SEEK_TIME)?
+                          ((uint64_t)seek_val * ci->id3->frequency / 1000LL)
+                                              / (blocksperchunk * fmt->samplesperblock) :
+                          seek_val / fmt->chunksize;
+    uint32_t new_count  = seek(seek_count, &cur_data, read_buffer, &decode_for_seek);
 
-    if (seek_time > 0)
-        seek_count = (uint64_t)seek_time * ci->id3->frequency
-                                         / (2000LL * fmt->chunksize);
-
-    new_count = seek(seek_count, &cur_data, read_buffer, &decode_for_seek);
     newpos.pos     = new_count * fmt->chunksize;
-    newpos.samples = (newpos.pos / fmt->blockalign) * fmt->samplesperblock;
+    newpos.samples = new_count * blocksperchunk * fmt->samplesperblock;
     return &newpos;
 }
 

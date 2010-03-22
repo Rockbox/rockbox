@@ -52,9 +52,8 @@ enum codec_status codec_main(void)
     int bufcount;
     int endofstream;
     uint8_t *voxbuf;
-    off_t firstblockposn;     /* position of the first block in file */
+    off_t firstblockposn = 0;     /* position of the first block in file */
     const struct pcm_codec *codec;
-    int offset = 0;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
@@ -70,7 +69,10 @@ next_track:
         ci->sleep(1);
 
     codec_set_replaygain(ci->id3);
-    
+
+    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    bytesdone = ci->id3->offset;
+
     ci->memset(&format, 0, sizeof(struct pcm_format));
 
     /* set format */
@@ -80,12 +82,9 @@ next_track:
     format.blockalign    = 1;
 
     /* advance to first WAVE chunk */
-    ci->advance_buffer(offset);
-
-    firstblockposn = offset;
-
+    firstblockposn = 0;
     decodedsamples = 0;
-    bytesdone = 0;
+    ci->advance_buffer(firstblockposn);
 
     /*
      * get codec
@@ -124,6 +123,25 @@ next_track:
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
 
+    /* make sure we're at the correct offset */
+    if (bytesdone > (uint32_t) firstblockposn) {
+        /* Round down to previous block */
+        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
+                                                     PCM_SEEK_POS, &read_buffer);
+
+        if (newpos->pos > format.numbytes)
+            goto done;
+        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        {
+            bytesdone      = newpos->pos;
+            decodedsamples = newpos->samples;
+        }
+        ci->seek_complete();
+    } else {
+        /* already where we need to be */
+        bytesdone = 0;
+    }
+
     /* The main decoder loop */
     endofstream = 0;
 
@@ -134,7 +152,8 @@ next_track:
         }
 
         if (ci->seek_time) {
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, &read_buffer);
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME,
+                                                         &read_buffer);
 
             if (newpos->pos > format.numbytes)
                 break;

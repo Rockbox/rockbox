@@ -40,6 +40,7 @@ bool get_vox_metadata(int fd, struct mp3entry* id3)
      * bitspersample: 4
      */
     id3->frequency = 8000;
+    id3->bitrate   = 8000 * 4 / 1000;
     id3->vbr       = false;   /* All VOX files are CBR */
     id3->filesize  = filesize(fd);
     id3->length    = id3->filesize >> 2;

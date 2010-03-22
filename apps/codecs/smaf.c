@@ -409,6 +409,28 @@ next_track:
     ci->seek_buffer(firstblockposn);
     ci->seek_complete();
 
+    /* make sure we're at the correct offset */
+    if (bytesdone > (uint32_t) firstblockposn)
+    {
+        /* Round down to previous block */
+        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
+                                                     PCM_SEEK_POS, &read_buffer);
+
+        if (newpos->pos > format.numbytes)
+            goto done;
+        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        {
+            bytesdone      = newpos->pos;
+            decodedsamples = newpos->samples;
+        }
+        ci->seek_complete();
+    }
+    else
+    {
+        /* already where we need to be */
+        bytesdone = 0;
+    }
+
     /* The main decoder loop */
     endofstream = 0;
 
@@ -418,7 +440,8 @@ next_track:
             break;
 
         if (ci->seek_time) {
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, &read_buffer);
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME,
+                                                         &read_buffer);
 
             if (newpos->pos > format.numbytes)
                 break;

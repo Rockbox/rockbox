@@ -135,6 +135,9 @@ next_track:
 
     codec_set_replaygain(ci->id3);
     
+    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    bytesdone = ci->id3->offset;
+
     ci->memset(&format, 0, sizeof(struct pcm_format));
     format.is_signed = true;
     format.is_little_endian = false;
@@ -191,7 +194,6 @@ next_track:
 
     decodedsamples = 0;
     codec = 0;
-    bytesdone = 0;
 
     /* get codec */
     codec = get_au_codec(format.formattag);
@@ -236,6 +238,25 @@ next_track:
         goto done;
     }
 
+    /* make sure we're at the correct offset */
+    if (bytesdone > (uint32_t) firstblockposn) {
+        /* Round down to previous block */
+        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
+                                                     PCM_SEEK_POS, NULL);
+
+        if (newpos->pos > format.numbytes)
+            goto done;
+        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        {
+            bytesdone      = newpos->pos;
+            decodedsamples = newpos->samples;
+        }
+        ci->seek_complete();
+    } else {
+        /* already where we need to be */
+        bytesdone = 0;
+    }
+
     /* The main decoder loop */
     endofstream = 0;
 
@@ -246,8 +267,8 @@ next_track:
         }
 
         if (ci->seek_time) {
-            /* 2nd args(read_buffer) is unnecessary in the format which Sun Audio supports.  */
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, NULL);
+            /* 3rd args(read_buffer) is unnecessary in the format which Sun Audio supports.  */
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME, NULL);
 
             if (newpos->pos > format.numbytes)
                 break;

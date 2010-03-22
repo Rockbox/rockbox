@@ -124,6 +124,9 @@ struct pcm_pos {
     uint32_t samples;
 };
 
+#define PCM_SEEK_TIME 0
+#define PCM_SEEK_POS  1
+
 struct pcm_codec {
     /*
      * sets the format speciffic RIFF/AIFF header information and checks the pcm_format.
@@ -140,8 +143,12 @@ struct pcm_codec {
     /*
      * get seek position
      *
-     * [In] seek_time
-     *         seek time [ms]
+     * [In] seek_val
+     *         seek time [ms] or seek position
+     *
+     * [In] seek_mode
+     *         if seek_mode sets PCM_SEEK_TIME, then seek_val means the seek time.
+     *         if seek_mode sets PCM_SEEK_POS, then seek_val means the seek position.
      *
      * [In] read_buffer
      *         the function which reads the data from the file (chunksize bytes read).
@@ -149,7 +156,7 @@ struct pcm_codec {
      * return
      *     position after the seeking.
      */
-    struct pcm_pos *(*get_seek_pos)(long seek_time,
+    struct pcm_pos *(*get_seek_pos)(uint32_t seek_val, int seek_mode,
                                     uint8_t *(*read_buffer)(size_t *realsize));
 
     /*

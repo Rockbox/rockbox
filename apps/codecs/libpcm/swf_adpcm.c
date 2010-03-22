@@ -81,20 +81,21 @@ static bool set_format(struct pcm_format *format)
    return true;
 }
 
-static struct pcm_pos *get_seek_pos(long seek_time,
+static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
                                     uint8_t *(*read_buffer)(size_t *realsize))
 {
     static struct pcm_pos newpos;
-    uint32_t chunkbits = blockbits;
-    uint32_t seekbits = (((uint64_t)seek_time * ci->id3->frequency)
-                                       / (1000LL * fmt->samplesperblock)) * blockbits + 2;
+    uint32_t chunkbits  = blockbits;
+    uint32_t seekblocks = (seek_mode == PCM_SEEK_TIME)?
+                          ((uint64_t)seek_val * ci->id3->frequency)
+                                              / (1000LL * fmt->samplesperblock) :
+                          ((seek_val << 3) - 2) / blockbits;
+    uint32_t seekbits   = seekblocks * blockbits + 2;
 
     (void)read_buffer;
 
     newpos.pos     = seekbits >> 3;
-    newpos.samples = (((uint64_t)seek_time * ci->id3->frequency)
-                                           / (1000LL * fmt->samplesperblock))
-                                           * fmt->samplesperblock;
+    newpos.samples = seekblocks * fmt->samplesperblock;
 
     if (newpos.pos == 0)
     {

@@ -380,10 +380,17 @@ next_track:
     /* make sure we're at the correct offset */
     if (bytesdone > (uint32_t) firstblockposn) {
         /* Round down to previous block */
-        uint32_t offset = bytesdone - bytesdone % format.blockalign;
+        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
+                                                     PCM_SEEK_POS, &read_buffer);
 
-        ci->advance_buffer(offset-firstblockposn);
-        bytesdone = offset - firstblockposn;
+        if (newpos->pos > format.numbytes)
+            goto done;
+        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        {
+            bytesdone      = newpos->pos;
+            decodedsamples = newpos->samples;
+        }
+        ci->seek_complete();
     } else {
         /* already where we need to be */
         bytesdone = 0;
@@ -399,7 +406,8 @@ next_track:
         }
 
         if (ci->seek_time) {
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, &read_buffer);
+            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME,
+                                                         &read_buffer);
 
             if (newpos->pos > format.numbytes)
                 break;
