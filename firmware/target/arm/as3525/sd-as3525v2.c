@@ -401,8 +401,6 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
             MCI_COMMAND |= CMD_RW_BIT | CMD_CHECK_CRC_BIT;
     }
 
-    MCI_CLKENA &= (1 << drive);
-
     MCI_ARGUMENT = arg;
     MCI_COMMAND |= CMD_DONE_BIT;
 
@@ -410,13 +408,9 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
     while(MCI_COMMAND & CMD_DONE_BIT)
     {
         if(--max == 0)  /* timeout */
-        {
-            MCI_CLKENA |= (1 << drive);
             return false;
-        }
     }
 
-    MCI_CLKENA |= (1 << drive);
 
     if(flags & MCI_RESP)
     {
