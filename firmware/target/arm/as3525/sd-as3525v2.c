@@ -184,9 +184,20 @@
  *  & 0x418     = MCI_INT_DTO | MCI_INT_TXDR | MCI_INT_HTO
  */
 
-#define MCI_ERROR   (MCI_INT_RE | MCI_INT_RCRC | MCI_INT_DCRC /*| MCI_INT_RTO*/ \
-                   | MCI_INT_DRTO | MCI_INT_HTO | MCI_INT_FRUN | MCI_INT_HLE \
-                   | MCI_INT_SBE | MCI_INT_EBE)
+#define MCI_CMD_ERROR    \
+         (MCI_INT_RE   | \
+          MCI_INT_RCRC | \
+          MCI_INT_RTO  | \
+          MCI_INT_HLE)
+
+#define MCI_DATA_ERROR    \
+        ( MCI_INT_DCRC  | \
+          MCI_INT_DRTO  | \
+          MCI_INT_HTO   | \
+          MCI_INT_FRUN  | \
+          MCI_INT_HLE   | \
+          MCI_INT_SBE   | \
+          MCI_INT_EBE)
 
 #define MCI_STATUS      SD_REG(0x48)
 
@@ -340,10 +351,10 @@ void INT_NAND(void)
 
     MCI_RAW_STATUS = status;    /* clear status */
 
-    if(status & MCI_ERROR)
+    if(status & MCI_DATA_ERROR)
         retry = true;
 
-    if(data_transfer && status & (MCI_INT_DTO|MCI_ERROR))
+    if(data_transfer && status & (MCI_INT_DTO|MCI_DATA_ERROR))
         wakeup_signal(&transfer_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
@@ -782,9 +793,9 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
         }
 
+
+        MCI_MASK = MCI_DATA_ERROR | MCI_INT_DTO;
         MCI_CTRL |= DMA_ENABLE;
-        MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
-            MCI_INT_HTO|MCI_INT_FRUN|MCI_INT_HLE|MCI_INT_SBE|MCI_INT_EBE;
 
         MCI_FIFOTH &= MCI_FIFOTH_MASK;
         MCI_FIFOTH |= 0x503f0080;
