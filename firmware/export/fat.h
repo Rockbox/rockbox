@@ -85,7 +85,12 @@ struct fat_dir
     unsigned int entrycount;
     long sector;
     struct fat_file file;
-    unsigned char sectorcache[3][SECTOR_SIZE];
+    unsigned char sectorcache[SECTOR_SIZE];
+    /* There are 2-bytes per characters. We don't want to bother too much, as LFN entries are
+     * at much 255 characters longs, that's at most 20 LFN entries. Each entry hold at most
+     * 13 characters, that a total of 260 characters. So we keep a buffer of that size.
+     * Keep coherent with fat.c code. */
+    unsigned char longname[260 * 2];
 };
 
 #ifdef HAVE_HOTSWAP

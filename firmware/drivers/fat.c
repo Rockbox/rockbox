@@ -31,6 +31,7 @@
 #include "timefuncs.h"
 #include "kernel.h"
 #include "rbunicode.h"
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define BYTES2INT16(array,pos) \
@@ -110,6 +111,14 @@
 #define FATLONG_ORDER        0
 #define FATLONG_TYPE         12
 #define FATLONG_CHKSUM       13
+#define FATLONG_LAST_LONG_ENTRY 0x40
+#define FATLONG_NAME_BYTES_PER_ENTRY 26
+/* at most 20 LFN entries, keep coherent with fat_dir->longname size ! */
+#define FATLONG_MAX_ORDER    20
+
+#define FATLONG_NAME_CHUNKS 3
+static unsigned char FATLONG_NAME_POS[FATLONG_NAME_CHUNKS] = {1, 14, 28};
+static unsigned char FATLONG_NAME_SIZE[FATLONG_NAME_CHUNKS] = {10, 12, 4};
 
 #define CLUSTERS_PER_FAT_SECTOR (SECTOR_SIZE / 4)
 #define CLUSTERS_PER_FAT16_SECTOR (SECTOR_SIZE / 2)
@@ -1173,7 +1182,7 @@ static int write_long_name(struct fat_file* file,
             entry[FATLONG_ORDER] = numentries-i-1;
             if (i==0) {
                 /* mark this as last long entry */
-                entry[FATLONG_ORDER] |= 0x40;
+                entry[FATLONG_ORDER] |= FATLONG_LAST_LONG_ENTRY;
 
                 /* pad name with 0xffff  */
                 for (k=1; k<11; k++) entry[k] = FAT_LONGNAME_PAD_BYTE;
@@ -2323,47 +2332,20 @@ int fat_opendir(IF_MV2(int volume,)
     return 0;
 }
 
-/* Copies a segment of long file name (UTF-16 LE encoded) to the
- * destination buffer (UTF-8 encoded). Copying is stopped when
- * either 0x0000 or 0xffff (FAT pad char) is encountered.
- * Trailing \0 is also appended at the end of the UTF8-encoded
- * string.
- *
- * utf16src   utf16 (little endian) segment to copy
- * utf16count max number of the utf16-characters to copy
- * utf8dst    where to write UTF8-encoded string to
- *
- * returns the number of UTF-16 characters actually copied
- */
-static int fat_copy_long_name_segment(unsigned char *utf16src,
-                int utf16count, unsigned char *utf8dst) {
-    int cnt = 0;
-    while ((utf16count--) > 0) {
-        unsigned short ucs = utf16src[0] | (utf16src[1] << 8);
-        if ((ucs == 0) || (ucs == FAT_LONGNAME_PAD_UCS)) {
-            break;
-        }
-        utf8dst = utf8encode(ucs, utf8dst);
-        utf16src += 2;
-        cnt++;
-    }
-    *utf8dst = 0;
-    return cnt;
-}
-
 int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 {
     bool done = false;
-    int i;
+    int i, j;
     int rc;
+    int order;
     unsigned char firstbyte;
     /* Long file names are stored in special entries. Each entry holds
-       up to 13 characters. Names can be max 255 chars (not bytes!) long
-       hence max 20 entries are required. */
-    int longarray[20];
-    int longs=0;
-    int sectoridx=0;
-    unsigned char* cached_buf = dir->sectorcache[0];
+       up to 13 characters. Names can be max 255 chars (not bytes!) long */
+    /* The number of long entries in the long name can be retrieve from the first
+     * long entry because there are stored in reverse order and have an ordinal */
+    int nb_longs = 0;
+    /* The long entries are expected to be in order, so remember the last ordinal */
+    int last_long_ord = 0;
 
     dir->entrycount = 0;
 
@@ -2371,7 +2353,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     {
         if ( !(dir->entry % DIR_ENTRIES_PER_SECTOR) || !dir->sector )
         {
-            rc = fat_readwrite(&dir->file, 1, cached_buf, false);
+            rc = fat_readwrite(&dir->file, 1, dir->sectorcache, false);
             if (rc == 0) {
                 /* eof */
                 entry->name[0] = 0;
@@ -2386,16 +2368,14 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
         }
 
         for (i = dir->entry % DIR_ENTRIES_PER_SECTOR;
-             i < DIR_ENTRIES_PER_SECTOR; i++)
-        {
+             i < DIR_ENTRIES_PER_SECTOR; i++) {
             unsigned int entrypos = i * DIR_ENTRY_SIZE;
 
-            firstbyte = cached_buf[entrypos];
+            firstbyte = dir->sectorcache[entrypos];
             dir->entry++;
 
             if (firstbyte == 0xe5) {
                 /* free entry */
-                sectoridx = 0;
                 dir->entrycount = 0;
                 continue;
             }
@@ -2409,14 +2389,48 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
             dir->entrycount++;
 
-            /* longname entry? */
-            if ( ( cached_buf[entrypos + FATDIR_ATTR] &
+            /* LFN entry? */
+            if ( ( dir->sectorcache[entrypos + FATDIR_ATTR] &
                    FAT_ATTR_LONG_NAME_MASK ) == FAT_ATTR_LONG_NAME ) {
-                longarray[longs++] = entrypos + sectoridx;
+                /* extract ordinal */
+                order = dir->sectorcache[entrypos + FATLONG_ORDER] & ~FATLONG_LAST_LONG_ENTRY;
+                /* is this entry the first long entry ? (first in order but containing last part) */
+                if (dir->sectorcache[entrypos + FATLONG_ORDER] & FATLONG_LAST_LONG_ENTRY) {
+                    /* check that order is not too big ! (and non-zero) */
+                    if(order <= 0 || order > FATLONG_MAX_ORDER)
+                        continue; /* ignore the whole LFN, will trigger lots of warnings */
+                    nb_longs = order;
+                    last_long_ord = order;
+                }
+                else {
+                    /* check orphan entry */
+                    if (nb_longs == 0) {
+                        logf("fat warning: orphan LFN entry");
+                        /* ignore */
+                        continue;
+                    }
+                    
+                    /* check order */
+                    if (order != (last_long_ord - 1)) {
+                        logf("fat warning: wrong LFN ordinal");
+                        /* ignore the whole LFN, will trigger lots of warnings */
+                        nb_longs = 0;
+                    }
+
+                    last_long_ord = order;
+                }
+
+                /* copy part, reuse [order] for another purpose :) */
+                order = (order - 1) * FATLONG_NAME_BYTES_PER_ENTRY;
+                for(j = 0; j < FATLONG_NAME_CHUNKS; j++) {
+                    memcpy(dir->longname + order,
+                            dir->sectorcache + entrypos + FATLONG_NAME_POS[j],
+                            FATLONG_NAME_SIZE[j]);
+                    order += FATLONG_NAME_SIZE[j];
+                }
             }
             else {
-                if ( parse_direntry(entry,
-                                    &cached_buf[entrypos]) ) {
+                if ( parse_direntry(entry, dir->sectorcache + entrypos) ) {
 
                     /* don't return volume id entry */
                     if ( (entry->attr &
@@ -2425,74 +2439,45 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                         continue;
 
                     /* replace shortname with longname? */
-                    if ( longs ) {
-                        int j;
-                        /* This should be enough to hold any name segment
-                           utf8-encoded */
+                    /* check that the long name is complete */
+                    if (nb_longs != 0 && last_long_ord == 1) {
+                        /* hold a copy of the shortname in case the long one is too long */
                         unsigned char shortname[13]; /* 8+3+dot+\0 */
-                        /* Add 1 for trailing \0 */
-                        unsigned char longname_utf8segm[6*4 + 1];
                         int longname_utf8len = 0;
-                        /* Temporarily store it */
+                        /* One character at a time, add 1 for trailing \0, 4 is the maximum size
+                         * of a UTF8 encoded character in rockbox */
+                        unsigned char longname_utf8segm[4 + 1];
+                        unsigned short ucs;
+                        int segm_utf8len;
+                        /* Temporarily store short name */
                         strcpy(shortname, entry->name);
                         entry->name[0] = 0;
 
-                        /* iterate backwards through the dir entries */
-                        for (j=longs-1; j>=0; j--) {
-                            unsigned char* ptr = cached_buf;
-                            int index = longarray[j];
-                            /* current or cached sector? */
-                            if ( sectoridx >= SECTOR_SIZE ) {
-                                if ( sectoridx >= SECTOR_SIZE*2 ) {
-                                    if ( ( index >= SECTOR_SIZE ) &&
-                                         ( index < SECTOR_SIZE*2 ))
-                                        ptr = dir->sectorcache[1];
-                                    else
-                                        ptr = dir->sectorcache[2];
-                                }
-                                else {
-                                    if ( index < SECTOR_SIZE )
-                                        ptr = dir->sectorcache[1];
-                                }
+                        /* Convert the FAT name to a utf8-encoded one.
+                         * The name is not necessary NUL-terminated ! */
+                        for (j = 0; j < nb_longs * FATLONG_NAME_BYTES_PER_ENTRY; j += 2) {
+                            ucs = dir->longname[j] | (dir->longname[j + 1] << 8);
+                            if(ucs == 0 || ucs == FAT_LONGNAME_PAD_UCS)
+                                break;
+                            /* utf8encode will return a pointer after the converted
+                             * string, subtract the pointer to the start to get the length of it */
+                            segm_utf8len = utf8encode(ucs, longname_utf8segm) - longname_utf8segm;
 
-                                index &= SECTOR_SIZE-1;
+                            /* warn the trailing zero ! (FAT_FILENAME_BYTES includes it) */
+                            if (longname_utf8len + segm_utf8len >= FAT_FILENAME_BYTES) {
+                                /* force use of short name */
+                                longname_utf8len = FAT_FILENAME_BYTES + 1;
+                                break; /* fallback later */
                             }
-
-                            /* Try to append each segment of the long name.
-                               Check if we'd exceed the buffer.
-                               Also check for FAT padding characters 0xFFFF. */
-                            if (fat_copy_long_name_segment(ptr + index + 1, 5,
-                                    longname_utf8segm) == 0) break;
-                            /* logf("SG: %s, EN: %s", longname_utf8segm,
-                                    entry->name); */
-                            longname_utf8len += strlen(longname_utf8segm);
-                            if (longname_utf8len < FAT_FILENAME_BYTES)
-                                strcat(entry->name, longname_utf8segm);
-                            else
-                                break;
-
-                            if (fat_copy_long_name_segment(ptr + index + 14, 6,
-                                    longname_utf8segm) == 0) break;
-                            /* logf("SG: %s, EN: %s", longname_utf8segm,
-                                    entry->name); */
-                            longname_utf8len += strlen(longname_utf8segm);
-                            if (longname_utf8len < FAT_FILENAME_BYTES)
-                                strcat(entry->name, longname_utf8segm);
-                            else
-                                break;
-
-                            if (fat_copy_long_name_segment(ptr + index + 28, 2,
-                                    longname_utf8segm) == 0) break;
-                            /* logf("SG: %s, EN: %s", longname_utf8segm,
-                                    entry->name); */
-                            longname_utf8len += strlen(longname_utf8segm);
-                            if (longname_utf8len < FAT_FILENAME_BYTES)
-                                strcat(entry->name, longname_utf8segm);
-                            else
-                                break;
+                            else {
+                                longname_utf8segm[segm_utf8len] = 0;
+                                strcat(entry->name + longname_utf8len, longname_utf8segm);
+                                longname_utf8len += segm_utf8len;
+                            }
                         }
 
                         /* Does the utf8-encoded name fit into the entry? */
+                        /* warn the trailing zero ! (FAT_FILENAME_BYTES includes it) */
                         if (longname_utf8len >= FAT_FILENAME_BYTES) {
                             /* Take the short DOS name. Need to utf8-encode it
                                since it may contain chars from the upper half of
@@ -2504,29 +2489,19 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                             unsigned char *utf8;
                             utf8 = iso_decode(shortname, entry->name, -1,
                                               strlen(shortname));
-                        *utf8 = 0;
+                            *utf8 = 0;
                             logf("SN: %s", entry->name);
                         } else {
-                            /* logf("LN: %s", entry->name);
-                               logf("LNLen: %d (%c)", longname_utf8len,
-                                    entry->name[0]); */
+                            logf("LN: %s", entry->name);
+                            logf("LNLen: %d", longname_utf8len);
                         }
                     }
                     done = true;
-                    sectoridx = 0;
                     i++;
                     break;
                 }
             }
         }
-
-        /* save this sector, for longname use */
-        if ( sectoridx )
-            memcpy( dir->sectorcache[2], dir->sectorcache[0], SECTOR_SIZE );
-        else
-            memcpy( dir->sectorcache[1], dir->sectorcache[0], SECTOR_SIZE );
-        sectoridx += SECTOR_SIZE;
-
     }
     return 0;
 }
