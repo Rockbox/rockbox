@@ -229,6 +229,7 @@ static struct md5sums sansasums[] = {
 
     { MODEL_CLIPV2, "2.01.16", "c57fb3fcbe07c2c9b360f060938f80cb" },
     { MODEL_CLIPV2, "2.01.32", "0ad3723e52022509089d938d0fbbf8c5" },
+    { MODEL_CLIPV2, "2.01.35", "a3cbbd22b9508d7f8a9a1a39acc342c2" },
 
     { MODEL_CLIPPLUS, "01.02.09", "656d38114774c2001dc18e6726df3c5d" },
 
