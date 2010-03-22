@@ -336,7 +336,6 @@ bool sd_enabled = false;
 
 static struct wakeup transfer_completion_signal;
 static volatile bool retry;
-static volatile bool data_transfer = false;
 
 #if defined(HAVE_MULTIDRIVE)
 int active_card = 0;
@@ -354,7 +353,7 @@ void INT_NAND(void)
     if(status & MCI_DATA_ERROR)
         retry = true;
 
-    if(data_transfer && status & (MCI_INT_DTO|MCI_DATA_ERROR))
+    if( status & (MCI_INT_DTO|MCI_DATA_ERROR))
         wakeup_signal(&transfer_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
@@ -793,13 +792,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
         }
 
-
-        MCI_MASK = MCI_DATA_ERROR | MCI_INT_DTO;
+        MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
         MCI_CTRL |= DMA_ENABLE;
 
         MCI_FIFOTH &= MCI_FIFOTH_MASK;
         MCI_FIFOTH |= 0x503f0080;
-
 
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
@@ -815,9 +812,9 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        data_transfer = true;
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-        data_transfer = false;
+
+        MCI_MASK &= ~(MCI_DATA_ERROR | MCI_INT_DTO);
 
         last_disk_activity = current_tick;
 
