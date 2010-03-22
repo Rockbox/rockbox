@@ -744,19 +744,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 #endif
 
     last_disk_activity = current_tick;
-    ret = sd_wait_for_state(drive, SD_TRAN);
-    if (ret < 0)
-    {
-        static const char *st[9] = {
-            "IDLE", "RDY", "IDENT", "STBY", "TRAN", "DATA", "RCV", "PRG", "DIS"
-        };
-        if(ret <= -10)
-            panicf("wait for state failed (%s) %d", st[(-ret / 10) % 9], drive);
-        else
-            panicf("wait for state failed");
-        goto sd_transfer_error;
-    }
-
     dma_retain();
 
     const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
@@ -780,6 +767,20 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         MCI_CTRL |= (FIFO_RESET|DMA_RESET);
         while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
             ;
+
+        ret = sd_wait_for_state(drive, SD_TRAN);
+        if (ret < 0)
+        {
+            static const char *st[9] = {
+                "IDLE", "RDY", "IDENT", "STBY", "TRAN", "DATA", "RCV",
+                                                                "PRG", "DIS"};
+            if(ret <= -10)
+                panicf("wait for TRAN state failed (%s) %d",
+                                                    st[(-ret / 10) % 9], drive);
+            else
+                panicf("wait for state failed");
+            goto sd_transfer_error;
+        }
 
         MCI_CTRL |= DMA_ENABLE;
         MCI_MASK = MCI_INT_CD|MCI_INT_DTO|MCI_INT_DCRC|MCI_INT_DRTO| \
@@ -813,13 +814,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         {
             ret = -666;
             panicf("STOP TRANSMISSION failed");
-            goto sd_transfer_error;
-        }
-
-        ret = sd_wait_for_state(drive, SD_TRAN);
-        if (ret < 0)
-        {
-            panicf(" wait for state TRAN failed (%d)", ret);
             goto sd_transfer_error;
         }
 
