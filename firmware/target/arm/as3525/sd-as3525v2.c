@@ -420,11 +420,13 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
 
         if(flags & MCI_LONG_RESP)
         {
-            response[3] = MCI_RESP3;
-            response[2] = MCI_RESP2;
-            response[1] = MCI_RESP1;
+            response[0] = MCI_RESP3;
+            response[1] = MCI_RESP2;
+            response[2] = MCI_RESP1;
+            response[3] = MCI_RESP0;
         }
-        response[0] = MCI_RESP0;
+        else
+            response[0] = MCI_RESP0;
     }
     return true;
 }
