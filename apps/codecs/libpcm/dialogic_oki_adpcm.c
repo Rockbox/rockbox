@@ -155,7 +155,7 @@ static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
     uint32_t seek_count = (seek_mode == PCM_SEEK_TIME)?
                           ((uint64_t)seek_val * ci->id3->frequency / 1000LL)
                                               / (blocksperchunk * fmt->samplesperblock) :
-                          seek_val / fmt->chunksize;
+                          seek_val / (unsigned long)fmt->chunksize;
     uint32_t new_count  = seek(seek_count, &cur_data, read_buffer, &decode_for_seek);
 
     newpos.pos     = new_count * fmt->chunksize;

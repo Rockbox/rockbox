@@ -221,7 +221,7 @@ static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
     uint32_t new_count = (seek_mode == PCM_SEEK_TIME)?
                          ((uint64_t)seek_val * ci->id3->frequency / 1000LL)
                                              / (blocksperchunk * fmt->samplesperblock) :
-                         seek_val / fmt->chunksize;
+                         seek_val / (unsigned long)fmt->chunksize;
 
     if (!has_block_header)
     {
