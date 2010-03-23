@@ -1,7 +1,7 @@
 % $Id$ %
 \chapter{\label{ref:wps_tags}WPS Tags}
 \section{Status Bar}
-\begin{tagmap}{}{}
+\begin{tagmap}
   \config{\%we} & Display Status Bar\\
   \config{\%wd} & Hide Status Bar\\
   \config{\%wi} & Display the inbuilt Status Bar in the current viewport\\
@@ -10,7 +10,7 @@ These tags override the player setting for the display of the status bar.
 They must be noted on their own line (which will not be shown in the WPS).
 
 \section{Information from the track tags}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%ia} & Artist\\
     \config{\%ic} & Composer\\
     \config{\%iA} & Album Artist\\
@@ -32,8 +32,8 @@ show the information for the next song to be played.
 
 \nopt{lcd_charcell}{
   \section{Viewports}
-    \begin{tagmap}{}{}
-      \nopt{lcd_non-mono}{~%
+    \begin{tagmap}
+      \nopt{lcd_non-mono}{%
         \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
         [height]{\textbar}[font]{\textbar}}
         & (see section \ref{ref:Viewports})\\}
@@ -55,7 +55,7 @@ show the information for the next song to be played.
 }
 
 \section{Power Related Information}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%bl} & Numeric battery level in percents\\
                   & Can also be used in a conditional: 
                     \config{\%?bl{\textless}-1{\textbar}0{\textbar}1{\textbar}%
@@ -72,7 +72,7 @@ show the information for the next song to be played.
   \end{tagmap}
 
 \section{Information about the file}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%fb} & File Bitrate (in kbps)\\
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
            This tag can also be used in a conditional tag, %
@@ -105,7 +105,7 @@ These tags, when written with the first letter capitalized (e.g. \config{\%Fn} o
 produce the information for the next file to be played.
 
 \section{Playlist/Song Info}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%pb} & Progress Bar\\
     \opt{player}{
           & This will display a one character ``cup''
@@ -148,7 +148,7 @@ produce the information for the next file to be played.
   \end{tagmap}
 
 \section{Runtime Database}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%rp} & Song playcount\\
     \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag: %
            \config{\%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}%
@@ -159,7 +159,7 @@ produce the information for the next file to be played.
 
 \opt{swcodec}{
 \section{Sound (DSP) settings}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%Sp} & Current playback pitch \\
   \opt{swcodec}{
     \config{\%xf} & Crossfade setting, in the order: Off, Auto Skip, Man Skip,
@@ -177,26 +177,26 @@ produce the information for the next file to be played.
 \opt{hold_button}{
   \opt{remote_button_hold}{
     \section{Hold Switches}
-      \begin{tagmap}{}{}
+      \begin{tagmap}
         \config{\%mh} & ``h'' if the main unit hold switch is on\\
         \config{\%mr} & ``r'' if the remote hold switch is on\\
       \end{tagmap}
   }
   \nopt{remote_button_hold}{
     \section{Hold Switch}
-      \begin{tagmap}{}{}
+      \begin{tagmap}
         \config{\%mh} & ``h'' if the hold switch is on\\
       \end{tagmap}
   }
 }
 
 \section{Virtual LED}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%lh} & ``h'' if the \disk\ is accessed\\
   \end{tagmap}
 
 \section{Repeat Mode}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle
            \opt{player,recorder,recorderv2fm}{, A-B}\\
   \end{tagmap}
@@ -204,7 +204,7 @@ Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 {\textbar}A-B{\textgreater}}
 
 \section{Playback Mode}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause, 
            Fast Forward, Rewind\\
   \end{tagmap}
@@ -212,7 +212,7 @@ Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
 Ffwd{\textbar}Rew{\textgreater}}
 
 \section{Current Screen}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%cs} & The current screen, 1-5, in the order:
                 Menus, WPS, Recording screen, FM Radio screen, Current Playlist screen\\
   \end{tagmap}
@@ -223,7 +223,7 @@ Example: \config{You are in the \%?cs{\textless}Main menu{\textbar}WPS{\textbar}
 Recording screen{\textbar}FM Radio screen{\textgreater}}
 
 \section{List Title (\fname{.sbs} only)}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%Lt} & Title text. Should be used in a conditional so that non-list
       screens don't show a title when they shouldn't\\
     \config{\%Li} & Title icon. This uses the same order as custom icons (see
@@ -238,7 +238,7 @@ Recording screen{\textbar}FM Radio screen{\textgreater}}
   \config{\%Vi} viewport will not show the title.
 
 \section{Changing Volume}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%mv[t]} & ``v'' if the volume is being changed\\
   \end{tagmap}
 
@@ -258,7 +258,7 @@ being changed and 2.5 secs after the volume button has been released. After
 that, it will display the volume value.
 
 \section{Settings}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%St{\textbar}<setting name>{\textbar}} & The value of the Rockbox
              setting with the specified name. See \reference{ref:config_file_options}
              for the list of the available settings.\\
@@ -273,7 +273,7 @@ Examples:
 
 \opt{lcd_bitmap}{
 \section{\label{ref:wps_images}Images}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \nopt{archos}{%
     \config{\%X{\textbar}filename.bmp{\textbar}}
         & Load and set a backdrop image for the WPS.
@@ -325,7 +325,7 @@ with image ID ``M'', and then reference the individual sub-images in a condition
 
 \opt{albumart}{
 \section{Album Art}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%Cl{\textbar}x{\textbar}y{\textbar}[[l{\textbar}c{\textbar}r]maxwidth]{\textbar}[[t{\textbar}c{\textbar}b]maxheight]{\textbar}}
         & Define the settings for albumart\\
         & \config{x}: x coordinate\\
@@ -366,7 +366,7 @@ Examples:
 }
 
 \section{Alignment}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%al} & Align the text left\\
     \config{\%aL} & Align the text left, or to the right if RTL language is in use\\
     \config{\%ac} & Centre the text\\
@@ -378,7 +378,7 @@ order left -- centre -- right. If the aligned texts overlap, they are merged.
 
 \section{Conditional Tags}
 
-\begin{tagmap}{}{}
+\begin{tagmap}
 \config{\%?xx{\textless}true{\textbar}false{\textgreater}}
     & If / Else: Evaluate for true or false case \\
 \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}\dots{\textbar}else{\textgreater}}
@@ -387,7 +387,7 @@ order left -- centre -- right. If the aligned texts overlap, they are merged.
 
 \section{Subline Tags}
 
-\begin{tagmap}{}{}
+\begin{tagmap}
 \config{\%t{\textless}time{\textgreater}}
     & Set the subline display cycle time (\%t5 or \%t3.4 formats) \\
 \config{;}
@@ -400,7 +400,7 @@ display cycling round the defined sublines. See
 
 
 \section{Time and Date}
-    \begin{tagmap}{}{}
+    \begin{tagmap}
     \opt{rtc}{
       \config{\%cd}          & Day of month from 01 to 31\\
       \config{\%ce}          & Zero padded day of month from 1 to 31\\
@@ -437,7 +437,7 @@ Example:
 \config{\%?cc{\textless}\%cH:\%cM{\textbar}No clock detected{\textgreater}}
 
 \section{Text Translation}
-  \begin{tagmap}{}{}
+  \begin{tagmap}
     \config{\%Sx{\textbar}{\textless}English{\textgreater}{\textbar}}
     & Display the translation of ``English'' in the current language\\
   \end{tagmap}
@@ -453,7 +453,7 @@ Example:
 
 \opt{touchscreen}{
   \section{Touchscreen Areas (WPS only)}
-    \begin{tagmap}{}{}
+    \begin{tagmap}
       \config{\%T{\textbar}x{\textbar}y{\textbar}width{\textbar}height%
       {\textbar}action{\textbar}}
       & Invoke the action specified when the user presses in the defined
@@ -483,7 +483,7 @@ Example:
   \end{description}
 
   \section{Last Touchscreen Press (WPS only)}
-    \begin{tagmap}{}{}
+    \begin{tagmap}
       \config{\%Tl} & Indicates that the touchscreen is pressed.\\
     \end{tagmap}
   This tag can be used to display text or images or a viewport when the
@@ -496,7 +496,7 @@ Example:
 }
 
 \section{Other Tags}
-\begin{tagmap}{}{}
+\begin{tagmap}
   \config{\%\%}          & The character `\%'\\
   \config{\%{\textless}} & The character `{\textless}'\\
   \config{\%{\textbar}}  & The character `{\textbar}'\\
