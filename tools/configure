@@ -2502,12 +2502,12 @@ fi
     tool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="jukebox.mi4"
+    output="rockbox.mi4"
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBBL"
-    bootoutput="rockbox.mi4"
+    bootoutput="jukebox.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$scramblebitmaptools

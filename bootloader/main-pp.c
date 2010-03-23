@@ -84,6 +84,9 @@ extern int show_logo(void);
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_OK
+
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */
@@ -170,6 +173,7 @@ struct tea_key tea_keytable[] = {
   { "view",              { 0x70e19bda, 0x0c69ea7d, 0x2b8b1ad1, 0xe9767ced } },
   { "sa9200",            { 0x33ea0236, 0x9247bdc5, 0xdfaedf9f, 0xd67c9d30 } },
   { "hdd1630",           { 0x04543ced, 0xcebfdbad, 0xf7477872, 0x0d12342e } },
+  { "vibe500",           { 0xe3a66156, 0x77c6b67a, 0xe821dca5, 0xca8ca37c } },
 };
 
 /*

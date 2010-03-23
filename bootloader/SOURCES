@@ -61,6 +61,6 @@ show_logo.c
 mini2440.c
 show_logo.c
 #elif defined(PBELL_VIBE500)
-pb_vibe500.c
+main-pp.c
 show_logo.c
 #endif
