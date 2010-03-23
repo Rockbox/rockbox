@@ -94,7 +94,7 @@ static void battery_voltage_sync(void)
 /* Disable charger and minimize all settings. Reset timers, etc. */
 static void disable_charger(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, 0);
+    ascodec_disable_endofch_irq();
     ascodec_write(AS3514_CHARGER,
                   TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 
@@ -111,11 +111,11 @@ static void enable_charger(void)
     ascodec_write(AS3514_CHARGER, BATT_CHG_I | BATT_CHG_V);
     /* Watch for end of charge. Temperature supervision is handled in
      * hardware. Charger status can be read and has no interrupt enable. */
-    ascodec_write(AS3514_IRQ_ENRD0, CHG_ENDOFCH);
+    ascodec_enable_endofch_irq();
 
     sleep(HZ/10); /* Allow charger turn-on time (it could be gradual). */
 
-    ascodec_read(AS3514_IRQ_ENRD0); /* Clear out interrupts (important!) */
+    ascodec_disable_endofch_irq();
 
     charge_state = CHARGING;
     charger_total_timer = CHARGER_TOTAL_TIMER;
@@ -125,7 +125,7 @@ static void enable_charger(void)
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
-    ascodec_write(AS3514_IRQ_ENRD0, 0);
+    ascodec_disable_endofch_irq();
     ascodec_write(AS3514_CHARGER,
                   TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 }

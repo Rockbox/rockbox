@@ -50,6 +50,7 @@
 #include "system.h"
 #include "as3525.h"
 #include "i2c.h"
+#include "usb-target.h"
 
 #define I2C2_DATA       *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x00))
 #define I2C2_SLAD0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x04))
@@ -81,15 +82,47 @@
 #define REQ_FINISHED   1
 #define REQ_RETRY      2
 
+#ifdef DEBUG
+#define IFDEBUG(x) x
+#else
+#define IFDEBUG(x)
+#endif
+
 static struct mutex as_mtx;
+
+static int ascodec_enrd0_shadow = 0;
 
 static unsigned char *req_data_ptr = NULL;
 static struct ascodec_request *req_head = NULL;
 static struct ascodec_request *req_tail = NULL;
 
+static struct wakeup adc_wkup;
+
+#ifdef DEBUG
+static int int_audio_ctr = 0;
+static int int_chg_finished = 0;
+static int int_chg_insert = 0;
+static int int_chg_remove = 0;
+static int int_usb_insert = 0;
+static int int_usb_remove = 0;
+static int int_rtc = 0;
+static int int_adc = 0;
+#endif
+
+static struct ascodec_request as_audio_req;
+
 static void ascodec_start_req(struct ascodec_request *req);
 static int  ascodec_continue_req(struct ascodec_request *req, int irq_status);
 static void ascodec_finish_req(struct ascodec_request *req);
+static void ascodec_read_cb(unsigned const char *data, unsigned int len);
+
+void INT_AUDIO(void)
+{
+    VIC_INT_EN_CLEAR = INTERRUPT_AUDIO;
+    IFDEBUG(int_audio_ctr++);
+
+    ascodec_async_read(AS3514_IRQ_ENRD0, 3, &as_audio_req, ascodec_read_cb);
+}
 
 void INT_I2C_AUDIO(void)
 {
@@ -129,6 +162,7 @@ void ascodec_init(void)
     int prescaler;
 
     mutex_init(&as_mtx);
+    wakeup_init(&adc_wkup);
 
     /* enable clock */
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
@@ -145,9 +179,14 @@ void ascodec_init(void)
 
     I2C2_IMR = 0x00;          /* disable interrupts */
     I2C2_INT_CLR |= I2C2_RIS; /* clear interrupt status */
-    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO;
-}
+    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO | INTERRUPT_AUDIO;
 
+    /* Generate irq for usb+charge status change */
+    ascodec_write(AS3514_IRQ_ENRD0, /*IRQ_CHGSTAT |*/ IRQ_USBSTAT);
+    /* Generate irq for push-pull, active high, irq on rtc+adc change */
+    ascodec_write(AS3514_IRQ_ENRD2, IRQ_PUSHPULL | IRQ_HIGHACTIVE |
+                                    /*IRQ_RTC |*/ IRQ_ADC);
+}
 
 /* returns != 0 when busy */
 static int i2c_busy(void)
@@ -297,9 +336,18 @@ static void ascodec_wait(struct ascodec_request *req)
 void ascodec_async_write(unsigned int index, unsigned int value,
                          struct ascodec_request *req)
 {
-    if (index == AS3514_CVDD_DCDC3) {
+    switch(index) {
+    case AS3514_CVDD_DCDC3:
         /* prevent setting of the LREG_CP_not bit */
         value &= ~(1 << 5);
+        break;
+    case AS3514_IRQ_ENRD0:
+        /* save value in register shadow
+         * for ascodec_(en|dis)able_endofch_irq() */
+        ascodec_enrd0_shadow = value;
+        break;
+    default:
+        break;
     }
 
     ascodec_req_init(req, ASCODEC_REQ_WRITE, index, 1);
@@ -373,6 +421,60 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
     }
 
     return i;
+}
+
+static void ascodec_read_cb(unsigned const char *data, unsigned int len)
+{
+    if (len != 3) /* some error happened? */
+        return;
+
+    if (data[0] & CHG_ENDOFCH) { /* chg finished */
+        IFDEBUG(int_chg_finished++);
+    }
+    if (data[0] & CHG_CHANGED) { /* chg status changed */
+        if (data[0] & CHG_STATUS) {
+            IFDEBUG(int_chg_insert++);
+        } else {
+            IFDEBUG(int_chg_remove++);
+        }
+    }
+    if (data[0] & USB_CHANGED) { /* usb status changed */
+        if (data[0] & USB_STATUS) {
+            IFDEBUG(int_usb_insert++);
+            usb_insert_int();
+        } else {
+            IFDEBUG(int_usb_remove++);
+            usb_remove_int();
+        }
+    }
+    if (data[2] & IRQ_RTC) { /* rtc irq */
+        /*
+         * Can be configured for once per second or once per minute,
+         * default is once per second
+         */
+        IFDEBUG(int_rtc++);
+    }
+    if (data[2] & IRQ_ADC) { /* adc finished */
+        IFDEBUG(int_adc++);
+        wakeup_signal(&adc_wkup);
+    }
+    VIC_INT_ENABLE = INTERRUPT_AUDIO;
+}
+
+void ascodec_wait_adc_finished(void)
+{
+    wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
+}
+
+
+void ascodec_enable_endofch_irq(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow | CHG_ENDOFCH);
+}
+
+void ascodec_disable_endofch_irq(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow & ~CHG_ENDOFCH);
 }
 
 /*

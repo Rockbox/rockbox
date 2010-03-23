@@ -59,6 +59,28 @@ static inline void ascodec_unlock(void)
     i2c_unlock();
 }
 
+static inline void ascodec_enable_endofch_irq(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, IRQ_ENDOFCH);
+}
+
+static inline void ascodec_disable_endofch_irq(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, 0);
+}
+
+static inline void ascodec_wait_adc_finished(void)
+{
+    /*
+     * FIXME: not implemented
+     *
+     * If irqs are not available on the target platform,
+     * this should be most likely implemented by polling
+     * AS3514_IRQ_ENRD2 in the same way powermgmt-ascodec.c
+     * is polling IRQ_ENDOFCH.
+     */
+}
+
 extern void ascodec_suppressor_on(bool on);
 
 #endif /* CPU_PP */

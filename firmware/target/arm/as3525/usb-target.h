@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright (C) 2006 by Barry Wardelll
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,46 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef USB_TARGET_H
+#define USB_TARGET_H
 
-#include <stdbool.h>
-#include "config.h"
-#include "usb.h"
-#ifdef HAVE_USBSTACK
-#include "usb_core.h"
+void usb_init_device(void);
+void usb_insert_int(void);
+void usb_remove_int(void);
+int usb_detect(void);
+
 #endif
-#include "usb-target.h"
-#include "power.h"
-#include "as3525.h"
-
-static int usb_status = USB_EXTRACTED;
-
-void usb_enable(bool on)
-{
-#ifdef HAVE_USBSTACK
-    if (on)
-        usb_core_init();
-    else
-        usb_core_exit();
-#else
-    (void)on;
-#endif
-}
-
-void usb_insert_int(void)
-{
-    usb_status = USB_INSERTED;
-}
-
-void usb_remove_int(void)
-{
-    usb_status = USB_EXTRACTED;
-}
-
-void usb_init_device(void)
-{
-}
-
-int usb_detect(void)
-{
-    return usb_status;
-}

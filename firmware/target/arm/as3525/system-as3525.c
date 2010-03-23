@@ -112,6 +112,7 @@ struct vec_int_src vec_int_srcs[] =
     { INT_SRC_DMAC, INT_DMAC },
     { INT_SRC_NAND, INT_NAND },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
+    { INT_SRC_AUDIO, INT_AUDIO },
 #ifdef HAVE_MULTIDRIVE
     { INT_SRC_MCI0, INT_MCI0 },
 #endif

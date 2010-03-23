@@ -283,6 +283,21 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define RVDD_WASLOW     (0x1 << 1)
 #define BVDD_ISLOW      (0x1 << 0)
 
+#define IRQ_ENDOFCH     (0x1 << 6)
+#define IRQ_CHGSTAT     (0x1 << 4)
+#define IRQ_USBSTAT     (0x1 << 2)
+
+/* AS3514_IRQ_ENRD2 */
+#define DEBOUNCE_128MS  (0x2 << 6)
+#define DEBOUNCE_256MS  (0x1 << 6)
+#define DEBOUNCE_512MS  (0x0 << 6)
+#define IRQ_HIGHACTIVE  (0x1 << 5)
+#define IRQ_PUSHPULL    (0x1 << 4)
+#define IRQ_REMDET2     (0x1 << 3)
+#define IRQ_REMDET1     (0x1 << 2)
+#define IRQ_RTC         (0x1 << 1)
+#define IRQ_ADC         (0x1 << 0)
+
 #define AS3514_I2C_ADDR 0x46
 
 #endif /* _AS3514_H */

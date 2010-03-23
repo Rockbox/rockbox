@@ -68,6 +68,8 @@ struct ascodec_request {
 
 void ascodec_init(void);
 
+void ascodec_init_late(void);
+
 int ascodec_write(unsigned int index, unsigned int value);
 
 int ascodec_read(unsigned int index);
@@ -101,5 +103,11 @@ void ascodec_submit(struct ascodec_request *req);
 void ascodec_lock(void);
 
 void ascodec_unlock(void);
+
+void ascodec_wait_adc_finished(void);
+
+void ascodec_enable_endofch_irq(void);
+
+void ascodec_disable_endofch_irq(void);
 
 #endif /* !_ASCODEC_TARGET_H */
