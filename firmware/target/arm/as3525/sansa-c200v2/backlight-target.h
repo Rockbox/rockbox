@@ -24,6 +24,7 @@
 #include <stdbool.h>
 
 bool _backlight_init(void);
+void _backlight_pwm(int on);
 void _backlight_on(void);
 void _backlight_off(void);
 void _backlight_set_brightness(int brightness);
@@ -31,4 +32,10 @@ int  __backlight_is_on(void);
 
 void _buttonlight_on(void);
 void _buttonlight_off(void);
+
+/*
+ * FIXME: This may be better off in kernel.h, but...
+ */
+void _set_timer2_pwm_ratio(int ratio);
+
 #endif

@@ -27,6 +27,32 @@
 #include "as3514.h"
 
 int buttonlight_is_on = 0;
+int backlight_is_on = 0;
+static int backlight_level = 0;
+
+/* logarithmic lookup table for brightness s*/
+static const int brightness_table[MAX_BRIGHTNESS_SETTING+1] = {
+    0, 21, 47, 78, 118, 165, 224, 296, 386, 495, 630, 796, 1000
+};
+
+static void _ll_backlight_on(void)
+{
+    GPIOA_PIN(5) = 1<<5;
+}
+
+static void _ll_backlight_off(void)
+{
+    GPIOA_PIN(5) = 0;
+}
+
+void _backlight_pwm(int on)
+{
+    if (on) {
+        _ll_backlight_on();
+    } else {
+        _ll_backlight_off();
+    }
+}
 
 bool _backlight_init(void)
 {
@@ -36,6 +62,8 @@ bool _backlight_init(void)
 
 void _backlight_set_brightness(int brightness)
 {
+    backlight_level = brightness_table[brightness];
+
     if (brightness > 0)
         _backlight_on();
     else
@@ -47,12 +75,17 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    GPIOA_PIN(5) = 1<<5;
+    if (!backlight_is_on)
+        _ll_backlight_on();
+    _set_timer2_pwm_ratio(backlight_level);
+    backlight_is_on = 1;
 }
 
 void _backlight_off(void)
 {
-    GPIOA_PIN(5) = 0;
+    backlight_is_on = 0;
+    _set_timer2_pwm_ratio(0);
+    _ll_backlight_off();
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
