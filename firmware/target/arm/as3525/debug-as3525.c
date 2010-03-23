@@ -380,6 +380,9 @@ bool __dbg_hw_info(void)
 #if CONFIG_CPU == AS3525
         lcd_putsf(0, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
         lcd_putsf(0, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));
+#else
+        lcd_putsf(0, line++, "CGU_MEMSTK:%8x", (unsigned int)(CGU_MEMSTICK));
+        lcd_putsf(0, line++, "CGU_SDSLOT:%8x", (unsigned int)(CGU_SDSLOT));
 #endif
 
         lcd_update();

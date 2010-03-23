@@ -156,7 +156,10 @@
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
 
 #if CONFIG_CPU == AS3525v2
-#define AS3525_MS_FREQ          120000000
+#define AS3525_MS_FREQ           120000000
+#define AS3525_MS_DIV            (CLK_DIV(AS3525_PLLA_FREQ, AS3525_MS_FREQ) -1)
+#define AS3525_SDSLOT_FREQ       24000000
+#define AS3525_SDSLOT_DIV        (CLK_DIV(AS3525_PLLA_FREQ, AS3525_SDSLOT_FREQ) -1)
 #define AS3525_IDE_FREQ          80000000
 #else
 #define AS3525_IDE_FREQ          50000000    /* The OF uses 66MHz maximal freq */
