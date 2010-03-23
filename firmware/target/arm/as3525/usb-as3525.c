@@ -29,10 +29,6 @@
 #include "power.h"
 #include "as3525.h"
 
-#if CONFIG_CPU != AS3525 && !defined(USB_DETECT_PIN)
-#warning USB_DETECT_PIN not defined for your target
-#endif
-
 #if CONFIG_CPU == AS3525
 static int usb_status = USB_EXTRACTED;
 #endif
