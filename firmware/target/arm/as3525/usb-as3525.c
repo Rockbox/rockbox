@@ -29,7 +29,7 @@
 #include "power.h"
 #include "as3525.h"
 
-#if defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
+#if CONFIG_CPU != AS3525 && !defined(USB_DETECT_PIN)
 #warning USB_DETECT_PIN not defined for your target
 #endif
 
