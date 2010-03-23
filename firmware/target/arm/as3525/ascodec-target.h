@@ -25,6 +25,8 @@
 #ifndef _ASCODEC_TARGET_H
 #define _ASCODEC_TARGET_H
 
+#ifndef SIMULATOR
+
 #include "as3514.h"
 #include "kernel.h" /* for struct wakeup */
 
@@ -109,5 +111,7 @@ void ascodec_wait_adc_finished(void);
 void ascodec_enable_endofch_irq(void);
 
 void ascodec_disable_endofch_irq(void);
+
+#endif /* !SIMULATOR */
 
 #endif /* !_ASCODEC_TARGET_H */
