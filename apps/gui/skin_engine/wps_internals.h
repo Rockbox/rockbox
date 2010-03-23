@@ -197,7 +197,6 @@ struct skin_line {
 #define VP_DRAW_WASHIDDEN   0x4
 /* these are never drawn, nor cleared, i.e. just ignored */
 #define VP_NEVER_VISIBLE    0x8
-#define VP_NEVER_CLEAR      0x10
 #define VP_DEFAULT_LABEL    '|'
 #define VP_NO_LABEL         '-'
 #define VP_INFO_LABEL       '_'

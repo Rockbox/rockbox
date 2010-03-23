@@ -85,7 +85,7 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
             success = false;
         }
         /* hide this viewport, forever */
-        vp->hidden_flags = VP_NEVER_CLEAR;
+        vp->hidden_flags = VP_NEVER_VISIBLE;
     }
 
     if (!success && isfile)

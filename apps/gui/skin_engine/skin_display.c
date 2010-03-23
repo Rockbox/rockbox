@@ -1123,9 +1123,10 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         struct skin_viewport *skin_viewport =
                         (struct skin_viewport *)viewport_list->token->value.data;
         unsigned vp_refresh_mode = refresh_mode;
-        unsigned hidden_flags = skin_viewport->hidden_flags;
 
         display->set_viewport(&skin_viewport->vp);
+
+        int hidden_vp = 0;
 
 #ifdef HAVE_LCD_BITMAP
         /* Set images to not to be displayed */
@@ -1137,18 +1138,19 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             imglist = imglist->next;
         }
 #endif
-        if ((hidden_flags&VP_NEVER_VISIBLE))
-        {
-            continue;
+        /* dont redraw the viewport if its disabled */
+        if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)
+        {   /* don't draw anything into this one */
+            vp_refresh_mode = 0; hidden_vp = true;
         }
-        if ((hidden_flags&VP_DRAW_HIDDEN))
+        else if ((skin_viewport->hidden_flags&VP_DRAW_HIDDEN))
         {
-            if (!(hidden_flags&VP_DRAW_WASHIDDEN))
+            if (!(skin_viewport->hidden_flags&VP_DRAW_WASHIDDEN))
                 display->scroll_stop(&skin_viewport->vp);
             skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
             continue;
         }
-        else if (((hidden_flags&
+        else if (((skin_viewport->hidden_flags&
                    (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE))
                     == (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE)))
         {
@@ -1158,8 +1160,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
         if (vp_refresh_mode == WPS_REFRESH_ALL)
         {
-            if (!(hidden_flags&VP_NEVER_CLEAR))
-                display->clear_viewport();
+            display->clear_viewport();
         }
 
         /* loop over the lines for this viewport */
@@ -1178,7 +1179,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             flags = line->curr_subline->line_type;
 
             if (vp_refresh_mode == WPS_REFRESH_ALL || (flags & vp_refresh_mode)
-                || new_subline_refresh)
+                || new_subline_refresh || hidden_vp)
             {
                 /* get_line tells us if we need to update the line */
                 update_line = get_line(gwps, subline, &align,
@@ -1224,7 +1225,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             }
 #endif
 
-            if (update_line &&
+            if (update_line && !hidden_vp &&
                 /* conditionals clear the line which means if the %Vd is put into the default
                    viewport there will be a blank line.
                    To get around this we dont allow any actual drawing to happen in the
@@ -1253,7 +1254,8 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             }
         }
         /* Now display any images in this viewport */
-        wps_display_images(gwps, &skin_viewport->vp);
+        if (!hidden_vp)
+            wps_display_images(gwps, &skin_viewport->vp);
 #endif
     }
 
