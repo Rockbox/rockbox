@@ -31,14 +31,15 @@ class SysTrace : public QDialog
     public:
         SysTrace(QWidget *parent);
         static void debug(QtMsgType type, const char* msg);
-        
         static QString getTrace() {return debugbuffer;}
+        static void save(QString filename = "");
     private:
         Ui::SysTraceFrm ui;
         static QString debugbuffer;
 
     private slots:
-        void save(void);
+        void saveCurrentTrace(void);
+        void savePreviousTrace(void);
         void refresh(void);
         
 };

@@ -21,6 +21,7 @@
 #include "systrace.h"
 #include "ui_systracefrm.h"
 
+#include "rbsettings.h"
 
 QString SysTrace::debugbuffer;
 
@@ -32,7 +33,8 @@ SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
     refresh();
 
     connect(ui.buttonClose, SIGNAL(clicked()), this, SLOT(close()));
-    connect(ui.buttonSave, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui.buttonSave, SIGNAL(clicked()), this, SLOT(saveCurrentTrace()));
+    connect(ui.buttonSavePrevious, SIGNAL(clicked()), this, SLOT(savePreviousTrace()));
     connect(ui.buttonRefresh, SIGNAL(clicked()), this, SLOT(refresh()));
 }
 
@@ -41,20 +43,49 @@ void SysTrace::refresh(void)
     int pos = ui.textTrace->verticalScrollBar()->value();
     ui.textTrace->setHtml("<pre>" + debugbuffer + "</pre>");
     ui.textTrace->verticalScrollBar()->setValue(pos);
+    QString oldlog = RbSettings::value(RbSettings::CachePath).toString()
+                     + "/rbutil-trace.log";
+    ui.buttonSavePrevious->setEnabled(QFileInfo(oldlog).isFile());
 }
 
-void SysTrace::save(void)
+
+void SysTrace::save(QString filename)
 {
-    QString fp = QFileDialog::getSaveFileName(this, tr("Save system trace log"),
-                        QDir::homePath(), "*.log");
-    if(fp == "")
-        return;
-        
-    QFile fh(fp);
+    if(filename.isEmpty())
+        filename = RbSettings::value(RbSettings::CachePath).toString()
+                    + "/rbutil-trace.log";
+    // append save date to the trace. Append it directly instead of using
+    // qDebug() as the handler might have been unregistered.
+    debugbuffer.append("[SysTrace] saving trace at ");
+    debugbuffer.append(QDateTime::currentDateTime().toString(Qt::ISODate));
+    debugbuffer.append("\n");
+    QFile fh(filename);
     if(!fh.open(QIODevice::WriteOnly))
         return;
     fh.write(debugbuffer.toUtf8(), debugbuffer.size());
     fh.close();
+}
+
+void SysTrace::saveCurrentTrace(void)
+{
+    QString fp = QFileDialog::getSaveFileName(this, tr("Save system trace log"),
+                        QDir::homePath(), "*.log");
+    if(!fp.isEmpty())
+        save(fp);
+}
+
+
+void SysTrace::savePreviousTrace(void)
+{
+    QString fp = QFileDialog::getSaveFileName(this, tr("Save system trace log"),
+                          QDir::homePath(), "*.log");
+    if(fp.isEmpty())
+        return;
+
+    QString oldlog = RbSettings::value(RbSettings::CachePath).toString()
+                     + "/rbutil-trace.log";
+    QFile::copy(oldlog, fp);
+    return;
 }
 
 void SysTrace::debug(QtMsgType type, const char* msg)

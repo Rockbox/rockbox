@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SysTraceFrm</class>
- <widget class="QDialog" name="SysTraceFrm" >
-  <property name="geometry" >
+ <widget class="QDialog" name="SysTraceFrm">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,29 +10,29 @@
     <height>550</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>System Trace</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <item row="0" column="0" colspan="5" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="6">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>System State trace</string>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="5" >
-    <widget class="QTextEdit" name="textTrace" />
+   <item row="1" column="0" colspan="6">
+    <widget class="QTextEdit" name="textTrace"/>
    </item>
-   <item row="2" column="1" colspan="2" >
-    <spacer name="horizontalSpacer" >
-     <property name="orientation" >
+   <item row="2" column="1" colspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>487</width>
        <height>26</height>
@@ -39,43 +40,54 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="4" >
-    <widget class="QPushButton" name="buttonClose" >
-     <property name="text" >
+   <item row="2" column="5">
+    <widget class="QPushButton" name="buttonClose">
+     <property name="text">
       <string>&amp;Close</string>
      </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
        <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="2" column="3" >
-    <widget class="QPushButton" name="buttonSave" >
-     <property name="text" >
+   <item row="2" column="4">
+    <widget class="QPushButton" name="buttonSave">
+     <property name="text">
       <string>&amp;Save</string>
      </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
        <normaloff>:/icons/document-save.png</normaloff>:/icons/document-save.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QPushButton" name="buttonRefresh" >
-     <property name="text" >
+   <item row="2" column="0">
+    <widget class="QPushButton" name="buttonRefresh">
+     <property name="text">
       <string>&amp;Refresh</string>
      </property>
-     <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
        <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="buttonSavePrevious">
+     <property name="text">
+      <string>Save &amp;previous</string>
+     </property>
+     <property name="icon">
+      <iconset resource="rbutilqt.qrc">
+       <normaloff>:/icons/document-save.png</normaloff>:/icons/document-save.png</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="rbutilqt.qrc" />
+  <include location="rbutilqt.qrc"/>
  </resources>
  <connections/>
 </ui>

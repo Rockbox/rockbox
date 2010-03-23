@@ -149,6 +149,7 @@ void RbUtilQt::shutdown(void)
     // object destruction -- the trace object could already be destroyed.
     // Fixes segfaults on exit.
     qInstallMsgHandler(0);
+    SysTrace::save();
     this->close();
 }
 
