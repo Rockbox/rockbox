@@ -29,7 +29,13 @@
 #include "power.h"
 #include "as3525.h"
 
+#if defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
+#warning USB_DETECT_PIN not defined for your target
+#endif
+
+#if CONFIG_CPU == AS3525
 static int usb_status = USB_EXTRACTED;
+#endif
 
 void usb_enable(bool on)
 {
@@ -43,6 +49,14 @@ void usb_enable(bool on)
 #endif
 }
 
+void usb_init_device(void)
+{
+#ifdef USB_DETECT_PIN
+    GPIOA_DIR &= ~(1 << USB_DETECT_PIN); /* set as input */
+#endif
+}
+
+#if CONFIG_CPU == AS3525
 void usb_insert_int(void)
 {
     usb_status = USB_INSERTED;
@@ -53,11 +67,18 @@ void usb_remove_int(void)
     usb_status = USB_EXTRACTED;
 }
 
-void usb_init_device(void)
-{
-}
-
 int usb_detect(void)
 {
     return usb_status;
 }
+#else
+int usb_detect(void)
+{
+#ifdef USB_DETECT_PIN
+    if (GPIOA_PIN( USB_DETECT_PIN ))
+        return USB_INSERTED;
+    else
+#endif
+        return USB_EXTRACTED;
+}
+#endif

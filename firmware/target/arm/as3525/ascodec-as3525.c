@@ -96,7 +96,9 @@ static unsigned char *req_data_ptr = NULL;
 static struct ascodec_request *req_head = NULL;
 static struct ascodec_request *req_tail = NULL;
 
+#if CONFIG_CPU == AS3525
 static struct wakeup adc_wkup;
+static struct ascodec_request as_audio_req;
 
 #ifdef DEBUG
 static int int_audio_ctr = 0;
@@ -107,15 +109,16 @@ static int int_usb_insert = 0;
 static int int_usb_remove = 0;
 static int int_rtc = 0;
 static int int_adc = 0;
-#endif
+#endif /* DEBUG */
 
-static struct ascodec_request as_audio_req;
+static void ascodec_read_cb(unsigned const char *data, unsigned int len);
+#endif /* CONFIG_CPU == AS3525 */
 
 static void ascodec_start_req(struct ascodec_request *req);
 static int  ascodec_continue_req(struct ascodec_request *req, int irq_status);
 static void ascodec_finish_req(struct ascodec_request *req);
-static void ascodec_read_cb(unsigned const char *data, unsigned int len);
 
+#if CONFIG_CPU == AS3525
 void INT_AUDIO(void)
 {
     VIC_INT_EN_CLEAR = INTERRUPT_AUDIO;
@@ -123,6 +126,7 @@ void INT_AUDIO(void)
 
     ascodec_async_read(AS3514_IRQ_ENRD0, 3, &as_audio_req, ascodec_read_cb);
 }
+#endif /* CONFIG_CPU == AS3525 */
 
 void INT_I2C_AUDIO(void)
 {
@@ -162,7 +166,9 @@ void ascodec_init(void)
     int prescaler;
 
     mutex_init(&as_mtx);
+#if CONFIG_CPU == AS3525
     wakeup_init(&adc_wkup);
+#endif
 
     /* enable clock */
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
@@ -423,6 +429,7 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
     return i;
 }
 
+#if CONFIG_CPU == AS3525
 static void ascodec_read_cb(unsigned const char *data, unsigned int len)
 {
     if (len != 3) /* some error happened? */
@@ -465,6 +472,7 @@ void ascodec_wait_adc_finished(void)
 {
     wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
 }
+#endif /* CONFIG_CPU == AS3525 */
 
 
 void ascodec_enable_endofch_irq(void)

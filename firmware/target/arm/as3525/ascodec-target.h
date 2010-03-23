@@ -28,7 +28,8 @@
 #ifndef SIMULATOR
 
 #include "as3514.h"
-#include "kernel.h" /* for struct wakeup */
+#include "kernel.h"       /* for struct wakeup */
+#include "clock-target.h" /* for AS3525_I2C_PRESCALER */
 
 /*  Charge Pump and Power management Settings  */
 #define AS314_CP_DCDC3_SETTING    \
@@ -70,8 +71,6 @@ struct ascodec_request {
 
 void ascodec_init(void);
 
-void ascodec_init_late(void);
-
 int ascodec_write(unsigned int index, unsigned int value);
 
 int ascodec_read(unsigned int index);
@@ -106,7 +105,14 @@ void ascodec_lock(void);
 
 void ascodec_unlock(void);
 
+#if CONFIG_CPU == AS3525
 void ascodec_wait_adc_finished(void);
+#else
+static inline void ascodec_wait_adc_finished(void)
+{
+    /* FIXME: Doesn't work yet on AS3525v2 */
+}
+#endif
 
 void ascodec_enable_endofch_irq(void);
 
