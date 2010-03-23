@@ -167,7 +167,7 @@ static int calc_freq(int clk)
                     return 0;
             }
         case CLK_I2C:
-            return calc_freq(CLK_PCLK)/(I2C2_CPSR1<<8 | I2C2_CPSR0);
+            return calc_freq(CLK_PCLK)/I2C_PRESCALER;
         case CLK_I2SI:
             switch((CGU_AUDIO>>12) & 3) {
                 case 0:
