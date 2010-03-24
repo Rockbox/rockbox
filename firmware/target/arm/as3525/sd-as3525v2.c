@@ -157,23 +157,23 @@
 #define MCI_RAW_STATUS  SD_REG(0x44)    /* raw interrupt status, also used as
                                          * status clear */
 
-/* interrupt bits */
-#define MCI_INT_CRDDET  (1<<0)      /* card detect */
-#define MCI_INT_RE      (1<<1)      /* response error */
-#define MCI_INT_CD      (1<<2)      /* command done */
-#define MCI_INT_DTO     (1<<3)      /* data transfer over */
-#define MCI_INT_TXDR    (1<<4)      /* tx fifo data request */
-#define MCI_INT_RXDR    (1<<5)      /* rx fifo data request */
-#define MCI_INT_RCRC    (1<<6)      /* response crc error */
-#define MCI_INT_DCRC    (1<<7)      /* data crc error */
-#define MCI_INT_RTO     (1<<8)      /* response timeout */
-#define MCI_INT_DRTO    (1<<9)      /* data read timeout */
-#define MCI_INT_HTO     (1<<10)     /* data starv timeout */
-#define MCI_INT_FRUN    (1<<11)     /* fifo over/underrun */
-#define MCI_INT_HLE     (1<<12)     /* hw locked while error */
-#define MCI_INT_SBE     (1<<13)     /* start bit error */
-#define MCI_INT_ACD     (1<<14)     /* auto command done */
-#define MCI_INT_EBE     (1<<15)     /* end bit error */
+/* interrupt bits */                /* C D E   (Cmd) (Data) (End) */
+#define MCI_INT_CRDDET  (1<<0)      /*          card detect */
+#define MCI_INT_RE      (1<<1)      /* x         response error */
+#define MCI_INT_CD      (1<<2)      /*     x     command done */
+#define MCI_INT_DTO     (1<<3)      /*     x     data transfer over */
+#define MCI_INT_TXDR    (1<<4)      /*          tx fifo data request */
+#define MCI_INT_RXDR    (1<<5)      /*          rx fifo data request */
+#define MCI_INT_RCRC    (1<<6)      /* x         response crc error */
+#define MCI_INT_DCRC    (1<<7)      /*   x       data crc error */
+#define MCI_INT_RTO     (1<<8)      /* x         response timeout */
+#define MCI_INT_DRTO    (1<<9)      /*   x       data read timeout */
+#define MCI_INT_HTO     (1<<10)     /*   x       data starv timeout */
+#define MCI_INT_FRUN    (1<<11)     /*   x       fifo over/underrun */
+#define MCI_INT_HLE     (1<<12)     /* x x        hw locked while error */
+#define MCI_INT_SBE     (1<<13)     /*   x       start bit error */
+#define MCI_INT_ACD     (1<<14)     /*          auto command done */
+#define MCI_INT_EBE     (1<<15)     /*   x       end bit error */
 #define MCI_INT_SDIO    (0xf<<16)
 
 /*
@@ -631,7 +631,7 @@ static void init_controller(void)
     MCI_FIFOTH &= MCI_FIFOTH_MASK;
     MCI_FIFOTH |= 0x503f0080;
 
-    MCI_MASK = 0xffffffff & ~(MCI_INT_ACD|MCI_INT_CRDDET);
+    MCI_MASK = 0xffff & ~(MCI_INT_ACD|MCI_INT_CRDDET|MCI_INT_RXDR|MCI_INT_TXDR);
 
     GPIOB_DIR |= (1<<5);         /* Pin B5 output  */
 
