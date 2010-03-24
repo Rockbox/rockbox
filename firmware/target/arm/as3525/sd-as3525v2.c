@@ -758,7 +758,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
-    /* Interrupt handler might set this to true during transfer */
     do
     {
         void *dma_buf = aligned_buffer;
@@ -769,14 +768,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(write)
             memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
+        /* Interrupt handler might set this to true during transfer */
         retry = false;
 
         MCI_BLKSIZ = SD_BLOCK_SIZE;
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
-
-        MCI_CTRL |= (FIFO_RESET|DMA_RESET);
-        while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
-            ;
 
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
@@ -833,6 +829,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             start += transfer;
             count -= transfer;
         }
+        else   /*  reset controller if we had an error  */
+        {
+            MCI_CTRL |= (FIFO_RESET|DMA_RESET);
+            while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
+                ;
+        }
+
     } while(retry || count);
 
     dma_release();
