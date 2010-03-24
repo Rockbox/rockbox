@@ -26,8 +26,6 @@
 #include <QtCore>
 #include <QtNetwork>
 
-class QUrl;
-
 class HttpGet : public QObject
 {
     Q_OBJECT
