@@ -318,6 +318,7 @@ static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attr
 static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
 static void init_controller(void);
+static int sd_wait_for_state(const int drive, unsigned int state);
 
 static tCardInfo card_info[NUM_DRIVES];
 
@@ -487,10 +488,28 @@ static int sd_init_card(const int drive)
 #endif
     /*  End of Card Identification Mode   ************************************/
 
+    /* Attempt to switch cards to HS timings, non HS cards just ignore this */
+    /*  CMD7 w/rca: Select card to put it in TRAN state */
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
+        return -7;
+
+    if(sd_wait_for_state(drive, SD_TRAN))
+        return -8;
+
+    /* CMD6 */
+    if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
+        return -9;
+    mci_delay();
+
+    /*  We need to go back to STBY state now so we can read csd */
+    /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_RESP, &response))
+        return -10;
+
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
-        return -7;
+        return -11;
 
     sd_parse_csd(&card_info[drive]);
 
@@ -500,7 +519,7 @@ static int sd_init_card(const int drive)
 #ifndef HAVE_MULTIDRIVE
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -8;
+        return -12;
 #endif
 
     card_info[drive].initialized = 1;
