@@ -43,7 +43,7 @@ struct vo_data
     struct vo_rect rc_clip;
 };
 
-#ifdef PROC_NEEDS_CACHEALIGN
+#if NUM_CORES > 1
 /* Cache aligned and padded to avoid clobbering other processors' cacheable
  * data */
 static uint8_t __vo_data[CACHEALIGN_UP(sizeof(struct vo_data))]
