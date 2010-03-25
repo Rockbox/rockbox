@@ -227,19 +227,17 @@ $releasenotes="/wiki/ReleaseNotes351";
         icon => 'sansac200',
     },
     'sansaclip' => {
-        name => 'SanDisk Sansa Clip',
+        name => 'SanDisk Sansa Clip v1',
         status => 2,
     },
     'sansaclipv2' => {
         name => 'SanDisk Sansa Clip v2',
         status => 2,
         icon => 'sansaclip',
-        manual => 'sansaclip',
     },
     'sansaclipplus' => {
         name => 'SanDisk Sansa Clip+',
         status => 2,
-        manual => 'sansaclip',
     },
     'sansae200' => {
         name => 'SanDisk Sansa e200',
