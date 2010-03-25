@@ -917,20 +917,33 @@ static void transfer_completed(void)
             int pipe = ep * 2 + dir;
             if (mask & pipe2mask[pipe]) {
                 struct queue_head* qh = &qh_array[pipe];
-                if(qh->wait) {
-                    qh->wait=0;
-                    wakeup_signal(&transfer_completion_signal[pipe]);
-                }
+                
                 int length=0;
                 struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
                 while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
                 {
+                    /* It seems that the controller sets the pipe bit to one even if the TD
+                     * dosn't have the IOC bit set. So we have the rely the active status bit
+                     * to check that all the TDs of the transfer are really finished and let
+                     * the transfer continue if it's no the case */
+                    if(td->size_ioc_sts & DTD_STATUS_ACTIVE)
+                    {
+                        logf("skip half finished transfer");
+                        goto Lskip;
+                    }
                     length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) -
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
                     td=(struct transfer_descriptor*) td->next_td_ptr;
                 }
+                if(qh->wait) {
+                    qh->wait=0;
+                    wakeup_signal(&transfer_completion_signal[pipe]);
+                }
+                
                 usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
                         qh->status, length);
+                Lskip:
+                continue;
             }
         }
     }
