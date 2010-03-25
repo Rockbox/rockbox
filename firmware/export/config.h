@@ -914,23 +914,6 @@ Lyre prototype 1 */
 
 #endif /* HAVE_USBSTACK */
 
-/* Storage alignment: the mask specifies a mask of bits which should be
- * clear in addresses used for storage_{read,write}_sectors(). This is
- * only relevant for buffers that will contain one or more whole sectors.
- */ 
-
-/* PP502x DMA requires an alignment of at least 16 bytes */
-#ifdef HAVE_ATA_DMA
-#ifdef  CPU_PP502x
-#define STORAGE_ALIGN_MASK 15
-#endif
-#endif /* HAVE_ATA_DMA */
-
-/* by default no alignment is required */
-#ifndef STORAGE_ALIGN_MASK
-#define STORAGE_ALIGN_MASK 0
-#endif
-
 /* This attribute can be used to enable to detection of plugin file handles leaks.
  * When enabled, the plugin core will monitor open/close/creat and when the plugin exits
  * will display an error message if the plugin leaked some file handles */

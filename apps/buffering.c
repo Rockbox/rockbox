@@ -755,8 +755,7 @@ static void reset_handle(int handle_id)
         return;
 
     /* Align to desired storage alignment */
-    alignment_pad = (h->offset - (size_t)(&buffer[h->start]))
-                    & STORAGE_ALIGN_MASK;
+    alignment_pad = STORAGE_OVERLAP(h->offset - (size_t)(&buffer[h->start]));
     h->ridx = h->widx = h->data = ringbuf_add(h->start, alignment_pad);
 
     if (h == cur_handle)
@@ -1022,8 +1021,8 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         adjusted_offset = 0;
 
     /* Reserve extra space because alignment can move data forward */
-    struct memory_handle *h = add_handle(size-adjusted_offset+STORAGE_ALIGN_MASK,
-                                         can_wrap, false);
+    size_t padded_size = STORAGE_PAD(size-adjusted_offset);
+    struct memory_handle *h = add_handle(padded_size, can_wrap, false);
     if (!h)
     {
         DEBUGF("%s(): failed to add handle\n", __func__);
@@ -1045,8 +1044,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         h->start = buf_widx;
 
         /* Align to desired storage alignment */
-        alignment_pad = (adjusted_offset - (size_t)(&buffer[buf_widx]))
-                        & STORAGE_ALIGN_MASK;
+        alignment_pad = STORAGE_OVERLAP(adjusted_offset - (size_t)(&buffer[buf_widx]));
         buf_widx = ringbuf_add(buf_widx, alignment_pad);
     }
 
@@ -1582,7 +1580,7 @@ bool buffering_reset(char *buf, size_t buflen)
 
     buffer = buf;
     /* Preserve alignment when wrapping around */
-    buffer_len = buflen & ~STORAGE_ALIGN_MASK;
+    buffer_len = STORAGE_ALIGN_DOWN(buflen);
     guard_buffer = buf + buflen;
 
     buf_widx = 0;

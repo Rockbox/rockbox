@@ -312,6 +312,16 @@ static inline void cpucache_flush(void)
 /* Aligns a buffer pointer and size to proper boundaries */
 #define CACHEALIGN_BUFFER(start, size) \
     ALIGN_BUFFER((start), (size), CACHEALIGN_SIZE)
+/* Pad a size so the buffer can be aligned later */
+#define CACHE_PAD(x) ((x) + CACHEALIGN_SIZE - 1)
+/* Number of bytes in the last cacheline assuming buffer of size x is aligned */
+#define CACHE_OVERLAP(x) (x & (CACHEALIGN_SIZE - 1))
+
+#ifdef NEEDS_STORAGE_ALIGN
+#define STORAGE_ALIGN_DOWN(x) CACHEALIGN_DOWN(x)
+#define STORAGE_PAD(x) CACHE_PAD(x)
+#define STORAGE_OVERLAP(x) CACHE_OVERLAP(x)
+#endif
 
 #else /* ndef PROC_NEEDS_CACHEALIGN */
 
@@ -323,8 +333,16 @@ static inline void cpucache_flush(void)
 #define CACHEALIGN_DOWN(x) (x)
 /* Make no adjustments */
 #define CACHEALIGN_BUFFER(start, size)
+#define CACHE_PAD(x) (x)
+#define CACHE_OVERLAP(x) 0
 
 #endif /* PROC_NEEDS_CACHEALIGN */
+
+#if !defined(PROC_NEEDS_CACHEALIGN) || !defined(NEEDS_STORAGE_ALIGN)
+#define STORAGE_ALIGN_DOWN(x) (x)
+#define STORAGE_PAD(x) (x)
+#define STORAGE_OVERLAP(x) 0
+#endif
 
 /* Double-cast to avoid 'dereferencing type-punned pointer will
  * break strict aliasing rules' B.S. */

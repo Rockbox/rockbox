@@ -22,6 +22,7 @@
 #ifndef SYSTEM_TARGET_H
 #define SYSTEM_TARGET_H
 
+#include "config.h"
 #include "system-arm.h"
 
 #ifdef CPU_PP
@@ -161,6 +162,10 @@ static inline void wake_core(int core)
  * such as data for COP use or for use with UNCACHED_ADDR */
 #define PROC_NEEDS_CACHEALIGN
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
+
+#if defined(CPU_PP502x) && defined(HAVE_ATA_DMA)
+#define NEEDS_STORAGE_ALIGN
+#endif
 
 /** cache functions **/
 #ifndef BOOTLOADER
