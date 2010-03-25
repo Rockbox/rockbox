@@ -115,7 +115,8 @@ const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg","oga",
         "shn","aif","aiff","wma","wmv","asf","spx","ape","mac",
         "sid","mod","nsf","nsfe","spc","adx","sap","rm","at3",
         "ra","rmvb","oma","aa3","dmc","dlt","mpt","mpd","rmt",
-        "tmc","tm8","tm2","cm3","cmc","cmr","cms","mmf"};
+        "tmc","tm8","tm2","cm3","cmc","cmr","cms","mmf","au",
+        "snd","vox","w64"};
 
 void prn(const char *str, int y)
 {
