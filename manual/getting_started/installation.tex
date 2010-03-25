@@ -11,7 +11,7 @@ before beginning there are a few things it is important to know.
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
-\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clip,cowond2,fuze}{
+\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clipv1,clipv2,cowond2,fuze}{
 \begin{description}  
 \item[Supported hardware versions.] 
     \opt{ipodnano,ipodnano2g}{
@@ -43,13 +43,12 @@ follow the instructions at
     v2 firmware begins with 03. Make sure that you are following the
     instructions from the correct manual.
 }
-  \opt{clip}{
-    The \playertype{} is available in multiple versions, not all of which
-    run Rockbox.  Rockbox doesn't run on the newer v2 models. They can be
-    identified by checking the Sandisk firmware version number under 
-    Settings $\rightarrow$ System Info. The v1 firmware is named 01.xx.xx,
-    while the v2 firmware begins with 02.  In addition, Rockbox does not
-    run on the Clip+.
+  \opt{clipv1,clipv2}{
+    The \playertype{} is available in multiple versions, and you need to make
+    sure which you have by checking the Sandisk firmware version number under 
+    Settings $\rightarrow$ Info. The v1 firmware is named 01.xx.xx, while the
+    v2 firmware begins with 02. Make sure that you are following the
+    instructions from the correct manual.
 }
   \opt{fuze}{
     The \playertype{} is available in multiple versions, not all of which
@@ -144,7 +143,7 @@ follow the instructions at
     is intended to be used for USB OTG connections only (digital cameras, memory
     sticks, etc.).
   }    
-  \opt{sansa,e200v2,clip}{
+  \opt{sansa,e200v2,clipv1,clipv2,clipplus}{
     \note{The following steps require you to change the setting in
     \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
     original firmware.}
@@ -287,7 +286,7 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
 Prebuilt binaries for Windows, Linux and Mac OS X are
 available at the \wikilink{RockboxUtility} wiki page.\\
 
-\opt{gigabeats,clip}{\note{Rockbox Utility does not currently support the 
+\opt{gigabeats,clipv1,clipv2,clipplus}{\note{Rockbox Utility does not currently support the 
 \playertype{} and you will therefore need to follow the manual install
 instructions below.\\}}
 
