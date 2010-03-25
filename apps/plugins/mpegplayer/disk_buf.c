@@ -859,7 +859,7 @@ bool disk_buf_init(void)
     if (disk_buf.start == NULL)
         return false;
 
-#ifdef PROC_NEEDS_CACHEALIGN
+#if NUM_CORES > 1
     CACHEALIGN_BUFFER(disk_buf.start, disk_buf.size);
     disk_buf.start = UNCACHED_ADDR(disk_buf.start);
 #endif
