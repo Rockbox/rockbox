@@ -381,29 +381,31 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
             GPIOB_PIN(5) = (1-drive) << 5;
             active_card = drive;
         }
-
-    MCI_COMMAND = cmd | CMD_CARD_NO(drive);
-#else
-    (void) drive;
-    MCI_COMMAND = cmd;
 #endif
 
-    if(flags & MCI_RESP)
-    {
-        MCI_COMMAND |= CMD_RESP_EXP_BIT;
-        if(flags & MCI_LONG_RESP)
-            MCI_COMMAND |= CMD_RESP_LENGTH_BIT;
-    }
-
-    if(cmd == SD_READ_MULTIPLE_BLOCK || cmd == SD_WRITE_MULTIPLE_BLOCK)
-    {
-        MCI_COMMAND |= CMD_WAIT_PRV_DAT_BIT | CMD_DATA_EXP_BIT;
-        if(cmd == SD_WRITE_MULTIPLE_BLOCK)
-            MCI_COMMAND |= CMD_RW_BIT | CMD_CHECK_CRC_BIT;
-    }
+#define TRANSFER_CMD  (cmd == SD_READ_MULTIPLE_BLOCK ||   \
+                       cmd == SD_WRITE_MULTIPLE_BLOCK)
 
     MCI_ARGUMENT = arg;
-    MCI_COMMAND |= CMD_DONE_BIT;
+
+    /* Construct MCI_COMMAND  */
+    MCI_COMMAND =
+      /*b5:0*/    cmd
+      /*b6  */  | ((flags & MCI_RESP)                ? CMD_RESP_EXP_BIT:      0)
+      /*b7  */  | ((flags & MCI_LONG_RESP)           ? CMD_RESP_LENGTH_BIT:   0)
+      /*b8      | CMD_CHECK_CRC_BIT       unused  */
+      /*b9  */  | (TRANSFER_CMD                      ? CMD_DATA_EXP_BIT:      0)
+      /*b10 */  | ((cmd == SD_WRITE_MULTIPLE_BLOCK)  ? CMD_RW_BIT:            0)
+      /*b11     | CMD_TRANSMODE_BIT       unused  */
+      /*b12     | CMD_SENT_AUTO_STOP_BIT  unused  */
+      /*b13 */  | (TRANSFER_CMD                      ? CMD_WAIT_PRV_DAT_BIT:  0)
+      /*b14     | CMD_ABRT_CMD_BIT        unused  */
+      /*b15     | CMD_SEND_INIT_BIT       unused  */
+   /*b20:16 */  |                                      CMD_CARD_NO(drive)
+      /*b21     | CMD_SEND_CLK_ONLY       unused  */
+      /*b22     | CMD_READ_CEATA          unused  */
+      /*b23     | CMD_CCS_EXPECTED        unused  */
+      /*b31 */  |                                      CMD_DONE_BIT;
 
     int max = 0x40000;
     while(MCI_COMMAND & CMD_DONE_BIT)
@@ -412,7 +414,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
             return false;
     }
 
-
+    /* TODO  Check crc values to determine if the response was valid  */
     if(flags & MCI_RESP)
     {
         int i = 0xff; while(i--) ;
