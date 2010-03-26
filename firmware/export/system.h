@@ -293,11 +293,13 @@ static inline void cpucache_flush(void)
 }
 #endif
 
-#ifdef PROC_NEEDS_CACHEALIGN
-/* Cache alignment attributes and sizes are enabled */
-
+#ifdef CACHEALIGN_BITS
 /* 2^CACHEALIGN_BITS = the byte size */
 #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
+#endif
+
+#ifdef PROC_NEEDS_CACHEALIGN
+/* Cache alignment attributes and sizes are enabled */
 
 #define CACHEALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))
 /* Aligns x up to a CACHEALIGN_SIZE boundary */
@@ -312,16 +314,6 @@ static inline void cpucache_flush(void)
 /* Aligns a buffer pointer and size to proper boundaries */
 #define CACHEALIGN_BUFFER(start, size) \
     ALIGN_BUFFER((start), (size), CACHEALIGN_SIZE)
-/* Pad a size so the buffer can be aligned later */
-#define CACHE_PAD(x) ((x) + CACHEALIGN_SIZE - 1)
-/* Number of bytes in the last cacheline assuming buffer of size x is aligned */
-#define CACHE_OVERLAP(x) ((x) & (CACHEALIGN_SIZE - 1))
-
-#ifdef NEEDS_STORAGE_ALIGN
-#define STORAGE_ALIGN_DOWN(x) CACHEALIGN_DOWN(x)
-#define STORAGE_PAD(x) CACHE_PAD(x)
-#define STORAGE_OVERLAP(x) CACHE_OVERLAP(x)
-#endif
 
 #else /* ndef PROC_NEEDS_CACHEALIGN */
 
@@ -333,12 +325,17 @@ static inline void cpucache_flush(void)
 #define CACHEALIGN_DOWN(x) (x)
 /* Make no adjustments */
 #define CACHEALIGN_BUFFER(start, size)
-#define CACHE_PAD(x) (x)
-#define CACHE_OVERLAP(x) 0
 
 #endif /* PROC_NEEDS_CACHEALIGN */
 
-#if !defined(PROC_NEEDS_CACHEALIGN) || !defined(NEEDS_STORAGE_ALIGN)
+#ifdef STORAGE_WANTS_ALIGN
+#define STORAGE_ALIGN_DOWN(x) \
+    ((typeof (x))ALIGN_DOWN_P2((uintptr_t)(x), CACHEALIGN_BITS))
+/* Pad a size so the buffer can be aligned later */
+#define STORAGE_PAD(x) ((x) + CACHEALIGN_SIZE - 1)
+/* Number of bytes in the last cacheline assuming buffer of size x is aligned */
+#define STORAGE_OVERLAP(x) ((x) & (CACHEALIGN_SIZE - 1))
+#else
 #define STORAGE_ALIGN_DOWN(x) (x)
 #define STORAGE_PAD(x) (x)
 #define STORAGE_OVERLAP(x) 0

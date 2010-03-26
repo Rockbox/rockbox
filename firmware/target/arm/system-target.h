@@ -164,7 +164,7 @@ static inline void wake_core(int core)
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
 #if defined(CPU_PP502x) && defined(HAVE_ATA_DMA)
-#define NEEDS_STORAGE_ALIGN
+#define STORAGE_WANTS_ALIGN
 #endif
 
 /** cache functions **/

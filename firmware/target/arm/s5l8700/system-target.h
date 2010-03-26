@@ -29,10 +29,8 @@
 #define CPUFREQ_NORMAL  47923200
 #define CPUFREQ_MAX    191692800
 
-/* DMA engine needs aligned addresses */
-#define PROC_NEEDS_CACHEALIGN
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
-#define NEEDS_STORAGE_ALIGN
+#define WANTS_STORAGE_ALIGN
 
 #define inl(a) (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
