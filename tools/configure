@@ -2091,7 +2091,7 @@ fi
     target="-DSANSA_FUZEV2"
     memory=8 # not sure
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$bmp2rb_mono"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=fuz2"
     output="rockbox.sansa"
     bootoutput="bootloader-fuzev2.sansa"

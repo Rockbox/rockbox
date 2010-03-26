@@ -35,3 +35,7 @@ int button_read_device(void)
     return 0;
 }
 
+bool button_hold(void)
+{
+    return false;
+}
