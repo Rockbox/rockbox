@@ -1907,6 +1907,7 @@ static int brickmania_game_loop(void)
                                 ball[k].tempy = pt_hit.y;
                                 ball[k].tempx = pt_hit.x;
                                 brick_hit(i, j);
+                                break;
                             }
                         } /* for k */
                     } /* if(used) */
