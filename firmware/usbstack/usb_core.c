@@ -507,14 +507,6 @@ static void allocate_interfaces_and_endpoints(void)
     usb_core_num_interfaces = interface;
 }
 
-static int usb_core_ack_control(struct usb_ctrlrequest* req)
-{
-    if (req->bRequestType & USB_DIR_IN)
-        return usb_drv_recv(EP_CONTROL,NULL,0);
-    else
-        return usb_drv_send(EP_CONTROL,NULL,0);
-}
-
 
 static void control_request_handler_drivers(struct usb_ctrlrequest* req)
 {
@@ -536,7 +528,6 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req)
         /* nope. flag error */
         logf("bad req:desc %d:%d", req->bRequest, req->wValue>>8);
         usb_drv_stall(EP_CONTROL, true, true);
-        usb_core_ack_control(req);
     }
 }
 
@@ -744,7 +735,6 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
         /* nope. flag error */
         logf("usb bad req %d",req->bRequest);
         usb_drv_stall(EP_CONTROL,true,true);
-        usb_core_ack_control(req);
     }
 }
 
