@@ -2272,7 +2272,14 @@ static int brickmania_game_loop(void)
                     for(k=0;k<used_balls;k++)
                     {
                         if (game_state==ST_READY || ball[k].glue)
+                        {
                             ball[k].pos_x+=dx;
+
+                            if (ball[k].pos_x < HALFBALL)
+                                ball[k].pos_x = HALFBALL;
+                            else if (ball[k].pos_x > GAMESCREEN_WIDTH - HALFBALL)
+                                ball[k].pos_x = GAMESCREEN_WIDTH - HALFBALL;
+                        }
                     }
                 }
             }
