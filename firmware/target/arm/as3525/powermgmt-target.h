@@ -50,7 +50,7 @@
 #define CHARGER_TOTAL_TIMER (4*3600*2)
 #define ADC_BATTERY         ADC_BVDD
 
-#elif defined(SANSA_FUZE)
+#elif defined(SANSA_FUZE) || defined(SANSA_FUZEV2) /* FIXME */
 
 /* Check if topped-off and monitor voltage while plugged. */
 #define BATT_FULL_VOLTAGE   4160

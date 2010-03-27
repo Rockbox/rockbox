@@ -108,7 +108,7 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner - suspected to be the SI4702 */
-#define CONFIG_TUNER SI4700
+//#define CONFIG_TUNER SI4700
 /* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */
@@ -148,13 +148,13 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* Charging implemented in a target-specific algorithm */
-#define CONFIG_CHARGING 0
+#define CONFIG_CHARGING CHARGING_TARGET
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-/* Define this if you have an AMS AS3525*/
-#define CONFIG_CPU AS3525
+/* Define this if you have an AMS AS3525v2 */
+#define CONFIG_CPU AS3525v2
 
 /* Define how much SD sectors are reserved for OF */
 #define AMS_OF_SIZE 0xF000
