@@ -364,7 +364,13 @@ void INT_NAND(void)
 static inline bool card_detect_target(void)
 {
 #if defined(HAVE_MULTIDRIVE)
+#if defined(SANSA_FUZEV2)
+    return GPIOA_PIN(2);
+#elif defined(SANSA_CLIPPLUS)
     return !(GPIOA_PIN(2));
+#else
+#error "microSD pin not defined for your target"
+#endif
 #else
     return false;
 #endif
