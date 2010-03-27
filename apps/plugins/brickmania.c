@@ -2238,7 +2238,7 @@ static int brickmania_game_loop(void)
             else
 #endif
             {
-                int button_right, button_left, dx;
+                int button_right, button_left;
 #ifdef ALTRIGHT
                 button_right =  move_button & (RIGHT | ALTRIGHT);
                 button_left  =  move_button & (LEFT | ALTLEFT);
@@ -2251,6 +2251,8 @@ static int brickmania_game_loop(void)
 
                 if (button_left || button_right)
                 {
+                    int dx = 0;
+
                     if ((button_right && !flip_sides) ||
                         (button_left && flip_sides))
                     {
