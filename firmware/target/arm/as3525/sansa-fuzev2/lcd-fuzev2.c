@@ -116,10 +116,12 @@ static void as3525_dbop_init(void)
 static inline void dbop_set_mode(int mode)
 {
     int delay = 10;
-    if (mode == 32 && (!(DBOP_CTRL & (1<<13|1<<14))))
-        DBOP_CTRL |= (1<<13|1<<14);
-    else if (mode == 16 && (DBOP_CTRL & (1<<13|1<<14)))
-        DBOP_CTRL &= ~(1<<14|1<<13);
+    unsigned long ctrl = DBOP_CTRL;
+    int words = (ctrl >> 13) & 3; // bits 14:13
+    if (mode == 32 && words != 2)
+        DBOP_CTRL = (ctrl & ~(1<<13)) | (1<<14); // 4 serial words
+    else if (mode == 16 && words != 1)
+        DBOP_CTRL = (ctrl & ~(1<<14)) | (1<<13); // 2 serial words
     else
         return;
     while(delay--) asm volatile("nop");
@@ -127,13 +129,12 @@ static inline void dbop_set_mode(int mode)
 
 static void dbop_write_data(const int16_t* p_bytes, int count)
 {
-    
     const int32_t *data;
     if ((intptr_t)p_bytes & 0x3 || count == 1)
     {   /* need to do a single 16bit write beforehand if the address is
          * not word aligned or count is 1, switch to 16bit mode if needed */
         dbop_set_mode(16);
-        DBOP_DOUT16 = *p_bytes++;
+        DBOP_DOUT16 = swap16(*p_bytes++);
         if (!(--count))
             return;
     }
@@ -145,7 +146,9 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
     data = (int32_t*)p_bytes;
     while (count > 1)
     {
-        DBOP_DOUT32 = *data++;
+        int pixels = *data++;
+        pixels = (swap16(pixels >> 16) << 16) | (swap16(pixels & 0xffff));
+        DBOP_DOUT32 = pixels;
         count -= 2;
 
         /* Wait if push fifo is full */
@@ -160,23 +163,19 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
         dbop_write_data((int16_t*)data, 1);
 }
 
-static void lcd_write_cmd(short cmd)
+static void lcd_write_cmd(unsigned short cmd)
 {
     volatile int i;
-    for(i=0;i<20;i++) nop;
+    for(i=0;i<0x20;i++) asm volatile ("nop\n");
 
-    int r3 = 0x2000;
-    DBOP_CTRL |= r3;
-    r3 >>= 1;
-    DBOP_CTRL &= ~r3;
-    r3 <<= 2;
-    DBOP_CTRL &= ~r3;
+    DBOP_CTRL |= 1<<13;
+    DBOP_CTRL &= ~(1<<14);  // 2 serial words
+    DBOP_CTRL &= ~(1<<12);  // 8 bit data width
     DBOP_TIMPOL_23 = 0xA12F0036;
-    cmd = swap16(cmd);
-    DBOP_DOUT16 = cmd;
+    DBOP_DOUT = swap16(cmd);
 
     while ((DBOP_STAT & (1<<10)) == 0);
-    for(i=0;i<20;i++) nop;
+    for(i=0;i<0x20;i++) asm volatile ("nop\n");
     DBOP_TIMPOL_23 = 0xA12FE037;
 }
 
@@ -277,11 +276,12 @@ void lcd_init_device(void)
     GPIOA_PIN(0) = 1;
     GPIOA_PIN(4) = 0;
 
-    GPIOB_DIR |= 0x2f;
+    GPIOB_DIR |= 0xf;
     GPIOB_PIN(0) = 1<<0;
     GPIOB_PIN(1) = 1<<1;
     GPIOB_PIN(2) = 1<<2;
     GPIOB_PIN(3) = 1<<3;
+
     GPIOA_PIN(4) = 1<<4;
     GPIOA_PIN(5) = 1<<5;
 
