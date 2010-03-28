@@ -235,7 +235,7 @@ static struct md5sums sansasums[] = {
 
     { MODEL_FUZEV2, "2.01.17", "8b85fb05bf645d08a4c8c3e344ec9ebe" },
     { MODEL_FUZEV2, "2.02.26", "d4f6f85c3e4a8ea8f2e5acc421641801" },
-    { MODEL_FUZEV2, "2.02.31", "74fb197ccd51707388f3b233402186a6" },
+    { MODEL_FUZEV2, "2.03.31", "74fb197ccd51707388f3b233402186a6" },
 };
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
