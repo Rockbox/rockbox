@@ -40,13 +40,12 @@
    on a button press - currently only the ipod, H10, Vibe 500 and Sansa versions do. */
 #if defined(IPOD_ARCH) || defined(IRIVER_H10)  || defined(IRIVER_H10_5GB) \
  || defined(SANSA_E200) || defined(SANSA_C200) || defined(GIGABEAT_F) \
- || (CONFIG_CPU == AS3525) || defined(COWON_D2) \
+ || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) || defined(COWON_D2) \
  || defined(MROBE_100) || defined(MROBE_500) \
  || defined(SAMSUNG_YH925) || defined(SAMSUNG_YH920) \
  || defined(SAMSUNG_YH820) || defined(PHILIPS_SA9200) \
  || defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) \
- || defined(ONDA_VX747) || defined(SANSA_CLIPPLUS) \
- || defined(PBELL_VIBE500)
+ || defined(ONDA_VX747) || defined(PBELL_VIBE500)
 bool verbose = false;
 #else
 bool verbose = true;
