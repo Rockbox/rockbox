@@ -1789,7 +1789,7 @@ static int brickmania_game_loop(void)
             /* draw the fires */
             for(k=0;k<used_fires;k++)
             {
-                rb->lcd_vline(INT3(fire[k].x_pos), INT3(fire[k].top), 
+                rb->lcd_vline(INT3(fire[k].x_pos), INT3(fire[k].top),
                         INT3(fire[k].top + FIRE_LENGTH));
             }
 
@@ -2002,7 +2002,7 @@ static int brickmania_game_loop(void)
                             ball[used_balls].tempy=0;
                             ball[used_balls].tempx=0;
                             ball[used_balls].pos_y=ON_PAD_POS_Y;
-                            ball[used_balls].pos_x=pad_pos_x+(pad_width/2)-2;
+                            ball[used_balls].pos_x=pad_pos_x+(pad_width/2)-HALFBALL;
 
                             k--;
                             continue;
