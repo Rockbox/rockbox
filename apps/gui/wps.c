@@ -1258,7 +1258,7 @@ long gui_wps_show(void)
                 fade(false, true);
 
             if (bookmark)
-                bookmark_autobookmark();
+                bookmark_autobookmark(true);
             audio_stop();
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();

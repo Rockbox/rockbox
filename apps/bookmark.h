@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 bool bookmark_load_menu(void);
-bool bookmark_autobookmark(void);
+bool bookmark_autobookmark(bool prompt_ok);
 bool bookmark_create_menu(void);
 bool bookmark_mrb_load(void);
 bool bookmark_autoload(const char* file);

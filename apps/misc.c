@@ -291,7 +291,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef SIMULATOR
     (void)callback;
     (void)parameter;
-    bookmark_autobookmark();
+    bookmark_autobookmark(false);
     call_storage_idle_notifys(true);
     exit(0);
 #else
@@ -356,7 +356,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                     sleep(1);
             }
 #endif
-            bookmark_autobookmark();
+            bookmark_autobookmark(false);
 
             /* audio_stop_recording == audio_stop for HWCODEC */
             audio_stop();
@@ -420,7 +420,7 @@ bool list_stop_handler(void)
         {
             if (global_settings.fade_on_stop)
                 fade(false, false);
-            bookmark_autobookmark();
+            bookmark_autobookmark(true);
             audio_stop();
             ret = true;  /* bookmarking can make a refresh necessary */
         }

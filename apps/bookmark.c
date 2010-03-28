@@ -159,7 +159,7 @@ bool bookmark_mrb_load()
 /* This function handles an autobookmark creation.  This is an interface   */
 /* function.                                                               */
 /* ----------------------------------------------------------------------- */
-bool bookmark_autobookmark(void)
+bool bookmark_autobookmark(bool prompt_ok)
 {
     char*  bookmark;
     if (!system_check())
@@ -192,7 +192,7 @@ bool bookmark_autobookmark(void)
     const struct text_message message={lines, 2};
 #endif
 
-    if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
+    if(prompt_ok && gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
         if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
             return write_bookmark(false, bookmark);
