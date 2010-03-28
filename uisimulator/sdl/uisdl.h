@@ -287,8 +287,12 @@
 #define UI_LCD_POSX                 39 /* x position of lcd */
 #define UI_LCD_POSY                 38 /* y position of lcd */
 
-#elif defined(SANSA_FUZE)
+#elif defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
+#ifdef SANSA_FUZE
 #define UI_TITLE                    "Sansa Fuze"
+#else
+#define UI_TITLE                    "Sansa Fuzev2"
+#endif
 #define UI_WIDTH                    279 /* width of GUI window */
 #define UI_HEIGHT                   449 /* height of GUI window */
 #define UI_LCD_POSX                 30 /* x position of lcd */
