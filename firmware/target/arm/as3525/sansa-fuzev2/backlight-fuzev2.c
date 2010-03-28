@@ -38,7 +38,7 @@ void _backlight_set_brightness(int brightness)
     brightness_internal += brightness + 5;
     brightness_internal <<= 25;
     brightness_internal >>= 24;
-    ascodec_write(0x1c, 2); // sub register
+    ascodec_write(0x1c, 8|2); // sub register
     ascodec_write(0x1b, brightness_internal|0xff);
 }
 
@@ -46,7 +46,7 @@ bool _backlight_init(void)
 {
     GPIOB_DIR |= 1<<5; /* for buttonlight, stuff below seems to be needed
                           for buttonlight as well*/
-    ascodec_write(0x1c, 1); // sub register
+    ascodec_write(0x1c, 8|1); // sub register
     ascodec_write(0x1b, ascodec_read(0x1b)|0x80);
     return true;
 }
@@ -60,7 +60,7 @@ void _backlight_on(void)
 #if (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_SETTING) /* in bootloader/sim */
     /* if we set the brightness to the settings value, then fading up
      * is glitchy */
-    ascodec_write(0x1c, 2); // sub register
+    ascodec_write(0x1c, 8|2); // sub register
     ascodec_write(0x1b, brightness_internal);
 #endif
 }
@@ -68,7 +68,7 @@ void _backlight_on(void)
 /* not functional */
 void _backlight_off(void)
 {
-    ascodec_write(0x1c, 1); // sub register
+    ascodec_write(0x1c, 8|1); // sub register
     ascodec_write(0x1b, ascodec_read(0x1b) & ~0x80);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
