@@ -83,7 +83,6 @@ static bool display_on = false; /* is the display turned on? */
 static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
-/* FIXME */
 #define R_ENTRY_MODE_VIDEO_NORMAL 0x7038
 #define R_ENTRY_MODE_VIDEO_FLIPPED 0x7018
 
@@ -101,34 +100,10 @@ static inline void lcd_delay(int x)
     } while (x--);
 }
 
-#define REG(x) (*(volatile unsigned long*)(x))
-typedef unsigned long reg;
-
 static void as3525_dbop_init(void)
 {
-#if 0
-    CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
-
-    DBOP_TIMPOL_01 = 0xe167e167;
-    DBOP_TIMPOL_23 = 0xe167006e;
-
-    /* short count: 16 | output data width: 16 | readstrobe line */
-    DBOP_CTRL = (1<<18|1<<12|1<<3);
-
-    GPIOB_AFSEL = 0xfc;
-    GPIOC_AFSEL = 0xff;
-
-    DBOP_TIMPOL_23 = 0x6000e;
-
-    /* short count: 16|enable write|output data width: 16|read strobe line */
-    DBOP_CTRL = (1<<18|1<<16|1<<12|1<<3);
-    DBOP_TIMPOL_01 = 0x6e167;
-    DBOP_TIMPOL_23 = 0xa167e06f;
-
-    /* TODO: The OF calls some other functions here, but maybe not important */
-#endif
-    REG(0xC810000C) |= 0x1000; /* CCU_IO |= 1<<12 */
-    CGU_DBOP |= /*(1<<3)*/ 0x18 | AS3525_DBOP_DIV;
+    CCU_IO |= 1<<12;
+    CGU_DBOP |= (1<<4) | (1<<3) | AS3525_DBOP_DIV;
     DBOP_TIMPOL_01 = 0xE12FE12F;
     DBOP_TIMPOL_23 = 0xE12F0036;
     DBOP_CTRL = 0x41004;
@@ -136,7 +111,6 @@ static void as3525_dbop_init(void)
     DBOP_CTRL = 0x51004;
     DBOP_TIMPOL_01 = 0x60036;
     DBOP_TIMPOL_23 = 0xA12FE037;
-    /* OF sets up dma and more after here */
 }
 
 static inline void dbop_set_mode(int mode)
@@ -188,15 +162,6 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
 
 static void lcd_write_cmd(short cmd)
 {
-#if 0
-    /* Write register */
-    DBOP_TIMPOL_23 = 0xa167006e;
-    dbop_write_data(&cmd, 1);
-
-    lcd_delay(4);
-
-    DBOP_TIMPOL_23 = 0xa167e06f;
-#elif 1
     volatile int i;
     for(i=0;i<20;i++) nop;
 
@@ -213,14 +178,6 @@ static void lcd_write_cmd(short cmd)
     while ((DBOP_STAT & (1<<10)) == 0);
     for(i=0;i<20;i++) nop;
     DBOP_TIMPOL_23 = 0xA12FE037;
-#else
-    int i;
-    DBOP_TIMPOL_23 = 0xA12F0036;
-    for(i=0;i<20;i++) nop;
-    dbop_write_data(&cmd, 1);
-    for(i=0;i<20;i++) nop;
-    DBOP_TIMPOL_23 = 0xA12FE037;
-#endif
 }
 
 static void lcd_write_reg(int reg, int value)
@@ -320,7 +277,6 @@ void lcd_init_device(void)
     GPIOA_PIN(0) = 1;
     GPIOA_PIN(4) = 0;
 
-    CCU_IO &= ~(0x1000);
     GPIOB_DIR |= 0x2f;
     GPIOB_PIN(0) = 1<<0;
     GPIOB_PIN(1) = 1<<1;
@@ -491,7 +447,6 @@ void lcd_update(void)
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     lcd_update_rect(0,0, LCD_WIDTH, LCD_HEIGHT);
-    //dbop_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */
