@@ -58,20 +58,20 @@ static fb_data imgbuffer[LCD_HEIGHT];
 #define MB_HEIGHT LCD_HEIGHT
 #endif
 
-#define MB_XOFS (-0x03000000L)       /* -0.75 (s5.26) */
-#if 3000*MB_HEIGHT/LCD_WIDTH >= 2400 /* width is limiting factor */
-#define MB_XFAC (0x06000000LL)       /* 1.5 (s5.26) */
-#define MB_YFAC (MB_XFAC*MB_HEIGHT/LCD_WIDTH)
-#else                                /* height is limiting factor */
-#define MB_YFAC (0x04cccccdLL)       /* 1.2 (s5.26) */
-#define MB_XFAC (MB_YFAC*LCD_WIDTH/MB_HEIGHT)
+#define MB_XOFS (-0x03000000L)             /* -0.75 (s5.26) */
+#if (3000 * MB_HEIGHT / LCD_WIDTH) >= 2400 /* width is limiting factor */
+#define MB_XFAC (0x06000000LL)             /* 1.5 (s5.26) */
+#define MB_YFAC (MB_XFAC*MB_HEIGHT / LCD_WIDTH)
+#else                                      /* height is limiting factor */
+#define MB_YFAC (0x04cccccdLL)             /* 1.2 (s5.26) */
+#define MB_XFAC (MB_YFAC*LCD_WIDTH / MB_HEIGHT)
 #endif
 
 #ifndef USEGSLIB
 #define UPDATE_FREQ (HZ/50)
 #endif
 
-/* Fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
+/* fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
 struct fractal_ops *ops;
 long x_min;
 long x_max;
@@ -127,7 +127,7 @@ static int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
     }
     else
     {
-        while (value < (1L<<26))
+        while (value < (1L << 26))
         {
             value <<= 1;
             i--;
@@ -147,7 +147,6 @@ static int recalc_parameters(void)
 
     x_delta = X_DELTA(x_step);
     y_delta = Y_DELTA(y_step);
-    y_delta = (y_step * LCD_HEIGHT) / 8;
     max_iter = MAX(15, -15 * step_log2 - 45);
 
     ops->calc = (step_log2 <= -10) ?
@@ -363,15 +362,15 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
     return 0;
 }
 
-static void mandelbrot_move(int dx, int dy)
+static void mandelbrot_move(int x_factor, int y_factor)
 {
-    long d_x = (long)dx * x_delta;
-    long d_y = (long)dy * y_delta;
+    long dx = (long)x_factor * x_delta;
+    long dy = (long)y_factor * y_delta;
 
-    x_min += d_x;
-    x_max += d_x;
-    y_min += d_y;
-    y_max += d_y;
+    x_min += dx;
+    x_max += dx;
+    y_min += dy;
+    y_max += dy;
 }
 
 static int mandelbrot_zoom(int factor)
@@ -398,14 +397,14 @@ static int mandelbrot_precision(int d)
 {
     int changed = 0;
 
-    /* Precision increase */
+    /* Increase precision */
     for (; d > 0; d--)
     {
         max_iter += max_iter / 2;
         changed = 1;
     }
 
-    /* Precision decrease */
+    /* Decrease precision */
     for (; d < 0 && max_iter >= 15; d++)
     {
         max_iter -= max_iter / 3;
