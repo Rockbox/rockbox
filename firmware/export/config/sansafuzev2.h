@@ -156,9 +156,6 @@
 /* Define this if you have an AMS AS3525v2 */
 #define CONFIG_CPU AS3525v2
 
-/* Define how much SD sectors are reserved for OF */
-#define AMS_OF_SIZE 0xF000
-
 /* Define this if you want to use the AS2525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 
@@ -194,7 +191,7 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7423
+#define USB_PRODUCT_ID 0x74c3   /* MSC = 0x74c3, MTP = 0x74c2 */
 
 #endif /* !BOOTLOADER */
 
