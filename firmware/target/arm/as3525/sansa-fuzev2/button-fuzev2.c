@@ -99,12 +99,16 @@ int button_read_device(void)
     GPIOD_DIR = 0;
     CCU_IO |= 1<<12;
 #ifdef HAS_BUTTON_HOLD
+#ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
     {
         hold_button_old = hold_button;
         backlight_hold_changed(hold_button);
     }
+#else
+    (void)hold_button_old;
+#endif
     if (hold_button)
     {
         power_counter = HZ;
