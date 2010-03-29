@@ -347,6 +347,11 @@ void audiohw_enable_recording(bool source_mic)
         as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_MIC1_on, 
                             AUDIOSET1_INPUT_MASK);
 
+#if CONFIG_CPU == AS3525v2
+        /* Enable supply */
+        as3514_clear(AS3514_MIC1_L, MIC1_L_M1_SUP_off);
+#endif
+
         /* M1_AGC_off */
         as3514_clear(AS3514_MIC1_R, MIC1_R_M1_AGC_off);
     } else {
@@ -357,6 +362,11 @@ void audiohw_enable_recording(bool source_mic)
         /* LIN1_or LIN2 on, rest off */
         as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_LIN_on,
                             AUDIOSET1_INPUT_MASK);
+
+#if CONFIG_CPU == AS3525v2
+        /* Disable supply */
+        as3514_set(AS3514_MIC1_L, MIC1_L_M1_SUP_off);
+#endif
     }
 
     /* ADC_Mute_off */
