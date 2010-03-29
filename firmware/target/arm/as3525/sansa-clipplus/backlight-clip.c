@@ -24,8 +24,6 @@
 #include "as3525v2.h"
 #include "ascodec-target.h"
 
-/* FIXME : this is clipv2 code, not sure if it works the same on clip+ */
-
 void _backlight_on(void)
 {
     ascodec_write(0x25, ascodec_read(0x25) | 2);    /* lcd power */
@@ -36,6 +34,8 @@ void _backlight_on(void)
 
 void _backlight_off(void)
 {
-    ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
     lcd_enable(false);
+    ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
+    ascodec_write(0x1c, 8|1);
+    ascodec_write(0x1b, 0x00);
 }

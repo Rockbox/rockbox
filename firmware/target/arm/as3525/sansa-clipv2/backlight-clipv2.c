@@ -34,8 +34,10 @@ void _backlight_on(void)
 
 void _backlight_off(void)
 {
-    ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
     lcd_enable(false);
+    ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
+    ascodec_write(0x1c, 8|1);
+    ascodec_write(0x1b, 0);
 }
 
 void _buttonlight_on(void)
