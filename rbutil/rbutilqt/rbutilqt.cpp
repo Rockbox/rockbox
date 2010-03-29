@@ -77,6 +77,11 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
     // init startup & autodetection
     ui.setupUi(this);
+#if defined(Q_OS_LINUX)
+    QIcon windowIcon(":/icons/rockbox-clef.svg");
+    this->setWindowIcon(windowIcon);
+#endif
+
     downloadInfo();
 
     m_gotInfo = false;
