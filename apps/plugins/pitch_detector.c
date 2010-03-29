@@ -289,7 +289,9 @@ static const struct note_entry notes[] =
 };
 
 /* GUI */
-static unsigned back_color, front_color;            
+#if LCD_DEPTH > 1
+static unsigned front_color;
+#endif
 static int font_w,font_h;
 static int bar_x_0;
 static int lbl_x_minus_50, lbl_x_minus_20, lbl_x_0, lbl_x_20, lbl_x_50;
@@ -610,8 +612,9 @@ fixed log(fixed inp)
 void print_int_xy(int x, int y, int v)
 {
     char temp[20];
-    
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(front_color);
+#endif
     rb->snprintf(temp,20,"%d",v);
     rb->lcd_putsxy(x,y,temp);
 }
@@ -619,7 +622,9 @@ void print_int_xy(int x, int y, int v)
 /* Print out the frequency etc */
 void print_str(char* s)
 {
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(front_color);
+#endif
     rb->lcd_putsxy(0, HZ_Y, s);
 }
 
@@ -630,7 +635,9 @@ void print_char_xy(int x, int y, char c)
     
     temp[0]=c;
     temp[1]=0;
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(front_color);
+#endif
     
     rb->lcd_putsxy(x, y, temp);
 }
@@ -674,8 +681,6 @@ void draw_bar(fixed wrong_by_cents)
     rb->lcd_set_foreground(LCD_RGBPACK(255,255,255)); /* Color screens */
 #elif LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
-#else
-    rb->lcd_set_foreground(LCD_BLACK);      /* Black and white screens */
 #endif
 
     rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y);
@@ -700,8 +705,6 @@ void draw_bar(fixed wrong_by_cents)
     rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));   /* Color screens */
 #elif LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_DARKGRAY);           /* Greyscale screens */
-#else
-    rb->lcd_set_foreground(LCD_BLACK);      /* Black and white screens */
 #endif
 
     if (fp_gt(wrong_by_cents, FP_ZERO))
@@ -1109,8 +1112,9 @@ void init_everything(void)
     rb->pcm_init_recording();
     
     /* GUI */
-    back_color  = rb->lcd_get_background();
+#if LCD_DEPTH > 1
     front_color = rb->lcd_get_foreground();
+#endif
     rb->lcd_getstringsize("X", &font_w, &font_h);
     
     bar_x_0  = LCD_WIDTH / 2;

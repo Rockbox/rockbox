@@ -863,6 +863,8 @@ pitch_notes.160x128x2.bmp
 pitch_notes.132x80x16.bmp
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 2)
 pitch_notes.128x96x2.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 64)
+pitch_notes.128x64x1.bmp
 #else
 #error Pitch Detector: unsupported LCD
 #endif
