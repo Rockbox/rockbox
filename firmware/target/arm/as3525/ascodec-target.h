@@ -73,6 +73,15 @@ void ascodec_init(void);
 
 int ascodec_write(unsigned int index, unsigned int value);
 
+#if CONFIG_CPU == AS3525v2
+static inline void ascodec_write_pmu(unsigned int index, unsigned int subreg,
+                                     unsigned int value)
+{
+    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
+    ascodec_write(index, value);
+}
+#endif
+
 int ascodec_read(unsigned int index);
 
 int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
