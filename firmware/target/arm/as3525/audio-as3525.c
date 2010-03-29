@@ -33,7 +33,7 @@ void audio_set_output_source(int source)
 void audio_input_mux(int source, unsigned flags)
 {
     static int last_source = AUDIO_SRC_PLAYBACK;
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) && (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
     static bool last_recording = false;
     const bool recording = flags & SRCF_RECORDING;
 #else
