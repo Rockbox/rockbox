@@ -580,3 +580,98 @@ current version.
 
 \opt{archos}{\input{advanced_topics/archos-flashing.tex}}
 
+\section{Optimising battery runtime}
+  Rockbox offers a lot of settings that have high impact on the battery runtime 
+  of your \dap{}. The largest power savings can be achieved through disabling
+  unneeded hardware components -- for some of those there are settings
+  available. 
+\opt{swcodec}{
+  Another area of savings is avoiding or reducing CPU boosting
+  through disabling computing intense features (e.g. sound processing) or 
+  using effective audio codecs. 
+} The following provides a short overview of the most relevant settings and 
+  rules of thumb.
+
+\nopt{ondio}{
+\subsection{Display backlight}
+  The active backlight consumes a lot of power. Therefore choose a setting that
+  disables the backlight after timeout (for setting \setting{Backlight} see 
+  \reference{ref:Displayoptions}). Avoid to have the backlight enabled all the 
+  time.
+}
+
+\opt{lcd_sleep}{
+\subsection{Display power-off}
+  Shutting down the display and the display controller saves a reasonable amount 
+  of power. Choose a setting that will put the display to sleep after timeout
+  (for setting \setting{Sleep} see \reference{ref:Displayoptions}). Avoid to 
+  have the display enabled all the time -- even, if the display is transflective
+  and is readable without backlight. Depending on your \dap{} it might be 
+  significantly more efficient to re-enable the display and its backlight for a 
+  glimpse a few times per hour than to keep the display enabled.
+}
+
+\opt{accessory_supply}{
+\subsection{Accessory power supply}
+  As default your \dap{}'s accessory power supply is always enabled to ensure
+  proper function of connected accessory devices. Disable this power supply, if 
+  -- or as long as -- you do not use any accessory device with your \dap{} while 
+  running Rockbox (see \reference{ref:AccessoryPowerSupply}).
+}
+
+\opt{lineout_poweroff}{
+\subsection{Line Out}
+  Rockbox allows to switch off the line-out on your \dap{}. If you do not need 
+  the line-out, switch it off (see \reference{ref:LineoutOnOff}).
+}
+
+\opt{spdif_power}{
+\subsection{Optical Output}
+  Rockbox allows to switch off the S/PDIF output on your \dap{}. If you do not 
+  need this output, switch it off (see \reference{ref:SPDIF_OnOff}).
+}
+
+\opt{disk_storage}{
+\subsection{Anti-Skip Buffer}
+  Having a large anti-skip buffer tends to use more power, and may reduce your
+  battery life. It is recommended to always use the lowest possible setting 
+  that allows correct and continuous playback (see \reference{ref:AntiSkipBuf}).
+}
+
+\opt{swcodec,disk_storage,flash_storage}{
+\subsection{Audio format and bitrate}
+\opt{swcodec}{
+  In general the fastest decoding audio format will be the best in terms of
+  battery runtime on your \dap{}. An overview of different codec's performance 
+  on different \dap{}s can be found at \wikilink{CodecPerformanceComparison}.
+}
+
+\opt{flash_storage}{
+  Your target uses flash that consumes a certain amount of power during access.
+  The less often the flash needs to be switched on for buffering and the shorter 
+  the buffering duration is, the lower is the overall power consumption. 
+  Therefore the bitrate of the audio files does have an impact on the battery 
+  runtime as well. Lower bitrate audio files will result in longer battery 
+  runtime.
+}
+\opt{disk_storage}{
+  Your target uses a hard disk which consumes a large amount of power while
+  spinning -- up to several hundred mA. The less often the hard disk needs to 
+  spin up for buffering and the shorter the buffering duration is, the lower is 
+  the power consumption. Therefore the bitrate of the audio files does have an 
+  impact on the battery runtime as well. Lower bitrate audio files will result 
+  in longer battery runtime.
+}
+
+  Please do not re-encode any existing audio files from one lossy format to 
+  another based upon the above mentioned. This will reduce the audio quality.
+  If you have the choice, select the best suiting codec when encoding the 
+  original source material.
+}
+
+\opt{swcodec}{
+\subsection{Sound settings}
+  In general all kinds of sound processing will need more CPU time and therefore
+  consume more power. The less sound processing you use, the better it is for 
+  the battery runtime (for options see \reference{ref:configure_rockbox_sound}).
+}
