@@ -132,18 +132,19 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user: core
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Startar avspeling på nytt …"
+    swcodec: ""
   </dest>
   <voice>
     *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -237,13 +238,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Vel tema"
+    *: "Bla gjennom temafiler"
   </dest>
   <voice>
-    *: "Vel tema"
+    *: "Bla gjennom temafiler"
   </voice>
 </phrase>
 <phrase>
@@ -1136,7 +1137,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1328,15 +1329,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Pipelyd"
+    swcodec: "Pipelyd ved sporhopp"
   </dest>
   <voice>
     *: none
-    swcodec: "Pipelyd"
+    swcodec: "Pipelyd ved sporhopp"
   </voice>
 </phrase>
 <phrase>
@@ -1724,15 +1725,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Skrift"
+    lcd_bitmap: "Skrifttype"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Skrift"
+    lcd_bitmap: "Skrifttype"
   </voice>
 </phrase>
 <phrase>
@@ -1740,7 +1741,7 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "Speleskjerm"
@@ -2332,13 +2333,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk-MP3-klipp"
+    *: ".talk-klipp"
   </dest>
   <voice>
-    *: ".talk-MP3-klipp"
+    *: ".talk-klipp"
   </voice>
 </phrase>
 <phrase>
@@ -4382,15 +4383,21 @@
   user: core
   <source>
     *: none
+    multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*: "mSD:"
+    archosondio*: "MMC"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
+    sansae200*,sansac200*,sansafuze*: "Micro S D"
+    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -4518,26 +4525,30 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "A = Revert"
+    gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "AV = tilbakestill"
-    iriverh100,iriverh120,iriverh300: "STOPP = tilbakestill"
-    ipod*,sansac200*,gogearsa9200: "MENY = tilbakestill"
-    iaudiox5,iaudiom5: "OPPTAK = tilbakestill"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "TILBAKE = tilbakestill"
-    gigabeatfx: "A = tilbakestill"
-    mrobe100: "VIS = tilbakestill"
-    gigabeats: "TILBAKE = tilbakestill"
-    vibe500: "C = tilbakestill"
+    rtc: "OFF = tilbakestill"
+    mrobe500: "POWER = Tilbakestill"
+    iriverh100,iriverh120,iriverh300: "STOP = Tilbakestill"
+    ipod*,sansac200*: "MENU = Tilbakestill"
+    iaudiox5,iaudiom5: "RECORD = Tilbakestill"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Tilbakestill"
+    gigabeatfx: "POWER = Tilbakestill"
+    mrobe100: "DISPLAY = Tilbakestill"
+    gigabeats: "BACK = Tilbakestill"
+    gogearsa9200: "LEFT = Tilbakestill"
+    vibe500: "CANCEL = Tilbakestill"
   </dest>
   <voice>
     *: none
@@ -4618,12 +4629,14 @@
     recording: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press UP to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "Disken er full. Trykk AV for å halda fram."
-    iriverh100,iriverh120,iriverh300: "Disken er full. Trykk STOPP for å halda fram."
+    recording: "Disken er full. Trykk OFF for å halde fram."
+    iriverh100,iriverh120,iriverh300: "Disken er full. Trykk STOP for å halde fram."
+    iaudiom5,iaudiox5: "Disken er full. Trykk POWER for å halde fram."
+    sansae200*,sansac200*,vibe500: "Disken er full. Trykk PREV for å halde fram."
   </dest>
   <voice>
     *: none
@@ -7289,13 +7302,17 @@
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
-    *: "AV for å avbryta"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOPP for å avbryta"
-    ipod*: "SPEL/PAUSE for å avbryta"
-    iaudiox5,iaudiom5: "SPEL (lenge) for å avbryta"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "TILBAKE for å avbryta"
+    *: "OFF for å avbryte"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP for å avbryte"
+    ipod*: "PLAY/PAUSE for å avbryte"
+    iaudiox5,iaudiom5: "PLAY (langt trykk) for å avbryte"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV for å avbryte"
+    gigabeats: "BACK for å avbryte"
+    gigabeatfx: "POWER for å avbryte"
   </dest>
   <voice>
     *: ""
@@ -8166,7 +8183,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
@@ -8174,6 +8191,7 @@
   </dest>
   <voice>
     *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8182,7 +8200,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
@@ -9695,14 +9713,16 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: "Byggjer database … Fann %d. (AV for å gå tilbake.)"
-    iriverh100,iriverh120,iriverh300: "Byggjer database … Fann %d. (STOPP for å gå tilbake.)"
-    ipod*: "Byggjer database … Fann %d. (SPEL/PAUSE for å gå tilbake.)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Byggjer database … Fann %d. (VENSTRE for å gå tilbake.)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Byggjer database … Fann %d. (TILBAKE for å gå tilbake.)"
+    *: "Byggjer database … Fann %d. (OFF for å gå tilbake.)"
+    iriverh100,iriverh120,iriverh300: "Byggjer database … Fann %d. (STOP for å gå tilbake.)"
+    ipod*: "Byggjer database … Fann %d. (PLAY/PAUSE for å gå tilbake.)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Byggjer database … Fann %d. (LEFT for å gå tilbake.)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Byggjer database ... fann %d. (PREV for å gå tilbake.)"
+    gogearsa9200: "Byggjer database ... Fann %d. (REW for å gå tilbake.)"
   </dest>
   <voice>
     *: "oppføringar funne til databasen"
@@ -10231,16 +10251,20 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
-    *: "SPEL = ja"
+    *: "PLAY = ja"
+    cowond2*: "MENU eller topp høgre = ja"
     iriverh100,iriverh120,iriverh300: "NAVI = ja"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "VEL = ja"
-    archosplayer: "(SPEL/STOPP)"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = ja"
+    mrobe500: "PLAY, POWER eller topp høgre = ja"
+    archosplayer: "(PLAY/STOP)"
     vibe500: "OK = ja"
   </dest>
   <voice>
@@ -10254,16 +10278,20 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "PÅ = vel"
-    iriverh100,iriverh120,iriverh300: "NAVI = vel"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "VEL = ja"
-    vibe500: "OK = vel"
+    rtc: "PÅ = velg"
+    mrobe500: "HEART = velg"
+    iriverh100,iriverh120,iriverh300: "NAVI = velg"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = velg"
+    gogearsa9200: "PLAY = velg"
+    vibe500: "OK = velg"
   </dest>
   <voice>
     *: none
@@ -11071,7 +11099,7 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
@@ -11079,7 +11107,6 @@
   </dest>
   <voice>
     *: none
-    remote: "Browse remote while-playing-screen files"
   </voice>
 </phrase>
 <phrase>
