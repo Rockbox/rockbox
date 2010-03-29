@@ -30,8 +30,8 @@ int buttonlight_is_on = 0;
 
 void _backlight_set_brightness(int brightness)
 {
-    ascodec_write(0x1c, 8|2); // sub register
-    ascodec_write(0x1b, brightness * 10);
+    ascodec_write(AS3543_PMU_ENABLE, 8|2); // sub register
+    ascodec_write(AS3543_BACKLIGHT, brightness * 10);
 }
 
 bool _backlight_init(void)
@@ -39,11 +39,11 @@ bool _backlight_init(void)
     GPIOB_DIR |= 1<<5; /* for buttonlight, stuff below seems to be needed
                           for buttonlight as well*/
 
-    ascodec_write(0x1c, 8|1); // sub register
-    ascodec_write(0x1b, 0x80);
+    ascodec_write(AS3543_PMU_ENABLE, 8|1); // sub register
+    ascodec_write(AS3543_BACKLIGHT, 0x80);
 
-    ascodec_write(0x1c, 8|2); // sub register
-    ascodec_write(0x1b, backlight_brightness * 10);
+    ascodec_write(AS3543_PMU_ENABLE, 8|2); // sub register
+    ascodec_write(AS3543_BACKLIGHT, backlight_brightness * 10);
     return true;
 }
 
@@ -52,14 +52,14 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    ascodec_write(0x1c, 8|1); // sub register
-    ascodec_write(0x1b, 0x80);
+    ascodec_write(AS3543_PMU_ENABLE, 8|1); // sub register
+    ascodec_write(AS3543_BACKLIGHT, 0x80);
 }
 
 void _backlight_off(void)
 {
-    ascodec_write(0x1c, 8|1); // sub register
-    ascodec_write(0x1b, 0);
+    ascodec_write(AS3543_PMU_ENABLE, 8|1); // sub register
+    ascodec_write(AS3543_BACKLIGHT, 0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
