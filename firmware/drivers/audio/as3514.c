@@ -183,15 +183,16 @@ void audiohw_preinit(void)
     as3514_write(AS3514_LSP_OUT_L, LSP_OUT_L_SP_MUTE | 0x00);
 #else
     as3514_clear(AS3543_DAC_IF, 0x80);
+    as3514_set(AS3514_LINE_IN1_R, 1<<6); // Select Line-in 2
 #endif
 
-    /* Set headphone over-current to 0, Min volume */
 #if CONFIG_CPU != AS3525v2
+    /* Set headphone over-current to 0, Min volume */
     as3514_write(AS3514_HPH_OUT_R,
                  HPH_OUT_R_HP_OVC_TO_0MS | 0x00);
 #else
-    as3514_write(AS3514_HPH_OUT_R, (0<<7) /* out */ | (1<<5) /* dac */
-        | 0x1f /* vol */);
+    as3514_write(AS3514_HPH_OUT_R, (0<<7) /* out */ | HPH_OUT_R_HP_OUT_DAC |
+                                  0x00);
 #endif
     /* Headphone ON, MUTE, Min volume */
     as3514_write(AS3514_HPH_OUT_L,
@@ -429,13 +430,23 @@ void audiohw_set_monitor(bool enable)
                    LINE_IN1_R_LI1R_MUTE_off);
         as3514_set((LINE_INPUT == 1) ? AS3514_LINE_IN1_L : AS3514_LINE_IN2_L,
                    LINE_IN1_L_LI1L_MUTE_off);
+
+#if CONFIG_CPU == AS3525v2
+        as3514_write_masked(AS3514_HPH_OUT_R,
+                            HPH_OUT_R_HP_OUT_LINE, HPH_OUT_R_HP_OUT_MASK);
+#endif
     }
     else {
         /* turn off both LIN1 and LIN2 */
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
+#if CONFIG_CPU != AS3525v2  /* not in as3543 */
         as3514_clear(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
         as3514_clear(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
+#else
+        as3514_write_masked(AS3514_HPH_OUT_R,
+                            HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
+#endif
         as3514_clear(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
     }
 }

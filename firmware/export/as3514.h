@@ -102,10 +102,17 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 /* HPH_OUT_R (0x02) */
 #define HPH_OUT_R_HP_OVC_TO     (0x3 << 6)
+    /* AS3514/AS3517 */
     #define HPH_OUT_R_HP_OVC_TO_0MS     (0x3 << 6)
     #define HPH_OUT_R_HP_OVC_TO_128MS   (0x1 << 6)
     #define HPH_OUT_R_HP_OVC_TO_256MS   (0x0 << 6)
     #define HPH_OUT_R_HP_OVC_TO_512MS   (0x2 << 6)
+    /* AS3543 */
+    #define HPH_OUT_R_HP_OUT_SUM        (0x0 << 5)
+    #define HPH_OUT_R_HP_OUT_DAC        (0x1 << 5)
+    #define HPH_OUT_R_HP_OUT_LINE       (0x2 << 5)
+    #define HPH_OUT_R_HP_OUT_MIC        (0x3 << 5)
+    #define HPH_OUT_R_HP_OUT_MASK       (0x3 << 5)
 /* Use AS3514_VOL_MASK */
 
 /* HPH_OUT_L (0x03) */
