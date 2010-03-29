@@ -19,6 +19,7 @@
 # - Thom Johansen
 # - Frederik Vestre
 # - Tobias Langhoff
+# - Tore Johnny Bråtveit 
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -243,13 +244,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Bla igjennom temaer"
+    *: "Bla gjennom temafiler"
   </dest>
   <voice>
-    *: "Bla igjennom temaer"
+    *: "Bla gjennom temafiler"
   </voice>
 </phrase>
 <phrase>
@@ -1065,15 +1066,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Pipelyd"
+    swcodec: "Pip for sporhopp"
   </dest>
   <voice>
     *: none
-    swcodec: "Pipelyd"
+    swcodec: "Pip for sporhopp"
   </voice>
 </phrase>
 <phrase>
@@ -1388,7 +1389,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -1404,13 +1405,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Bla igjennom .wps-filer"
+    *: "Bla gjennom .wps-filer"
   </dest>
   <voice>
-    *: "Bla igjennom WPS-filer"
+    *: "Bla gjennom WPS-filer"
   </voice>
 </phrase>
 <phrase>
@@ -1419,15 +1420,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Bla igjennom .rwps-filer"
+    remote: "Bla gjennom .rwps-filer"
   </dest>
   <voice>
     *: none
-    remote: "Bla igjennom RWPS-filer"
+    remote: "Bla gjennom RWPS-filer"
   </voice>
 </phrase>
 <phrase>
@@ -2023,13 +2024,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk-MP3-klipp"
+    *: ".talk-klipp"
   </dest>
   <voice>
-    *: "talk-MP3-klipp"
+    *: "talk-klipp"
   </voice>
 </phrase>
 <phrase>
@@ -3892,30 +3893,33 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Tilbakestill"
+    mrobe500: "POWER = Tilbakestill"
     iriverh100,iriverh120,iriverh300: "STOP = Tilbakestill"
-    ipod*,sansac200*,gogearsa9200: "MENU = Tilbakestill"
+    ipod*,sansac200*: "MENU = Tilbakestill"
     iaudiox5,iaudiom5: "RECORD = Tilbakestill"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Tilbakestill"
     gigabeatfx: "POWER = Tilbakestill"
     mrobe100: "DISPLAY = Tilbakestill"
     gigabeats: "BACK = Tilbakestill"
-    vibe500: "C = Tilbakestill"
+    gogearsa9200: "LEFT = Tilbakestill"
+    vibe500: "CANCEL = Tilbakestill"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9764,14 +9768,16 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Bygger database... %d funnet (OFF for å gå tilbake)"
     iriverh100,iriverh120,iriverh300: "Bygger database... %d funnet (STOP for å gå tilbake)"
     ipod*: "Bygger database... %d funnet (PREV for å gå tilbake)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Bygger database... %d funnet (LEFT for å gå tilbake)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Bygger database... %d funnet (PREV for å gå tilbake)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Bygger database... %d funnet (PREV for å gå tilbake)"
+    gogearsa9200: "Bygger database... %d funnet (REW for å gå tilbake)"
   </dest>
   <voice>
     *: "filer funnet for database"
@@ -10515,23 +10521,24 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Ja"
+    cowond2*: "MENU eller topp høyre = Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Ja"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Ja"
+    mrobe500: "Play, POWER eller topp høyre = Ja"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Ja"
   </dest>
   <voice>
     *: ""
-    iriverh100,iriverh120,iriverh300: ""
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: ""
-    archosplayer: ""
   </voice>
 </phrase>
 <phrase>
@@ -10541,22 +10548,23 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Sett"
+    mrobe500: "HEART = Sett"
     iriverh100,iriverh120,iriverh300: "NAVI = Sett"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Sett"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Sett"
+    gogearsa9200: "PLAY = Sett"
     vibe500: "OK = Sett"
   </dest>
   <voice>
     *: none
-    rtc: ""
-    iriverh100,iriverh120,iriverh300: ""
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -12312,5 +12320,39 @@
   <voice>
     *: none
     serial_port: "Automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    serial_port: ""
+  </source>
+  <dest>
+    *: none
+    serial_port: ""
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Skinn for statuslinje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: none
+    serial_port: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Unngå sporhopping"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Unngå sporhopping"
   </voice>
 </phrase>
