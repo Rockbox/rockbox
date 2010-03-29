@@ -39,7 +39,7 @@ crypt_firmware.c
 #endif
 
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
-    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
+    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN)) && defined(HAVE_LCD_COLOR)
 pitch_detector.c
 #endif
 
