@@ -211,20 +211,20 @@ static int calc_freq(int clk)
         case CLK_USB:
             switch(CGU_USB & 3) {     /* 0-> div=1  other->div=1/(2*n)  */
                 case 0:
-                    if (!((CGU_USB>>2) & 0xf))
+                    if (!((CGU_USB>>2) & 0x7))
                         return CLK_MAIN;
                     else
-                        return CLK_MAIN/(2*((CGU_USB>>2) & 0xf));
+                        return CLK_MAIN/(2*((CGU_USB>>2) & 0x7));
                 case 1:
-                    if (!((CGU_USB>>2) & 0xf))
+                    if (!((CGU_USB>>2) & 0x7))
                         return calc_freq(CLK_PLLA);
                     else
-                        return calc_freq(CLK_PLLA)/(2*((CGU_USB>>2) & 0xf));
+                        return calc_freq(CLK_PLLA)/(2*((CGU_USB>>2) & 0x7));
                 case 2:
-                    if (!((CGU_USB>>2) & 0xf))
+                    if (!((CGU_USB>>2) & 0x7))
                         return calc_freq(CLK_PLLB);
                     else
-                        return calc_freq(CLK_PLLB)/(2*((CGU_USB>>2) & 0xf));
+                        return calc_freq(CLK_PLLB)/(2*((CGU_USB>>2) & 0x7));
                 default:
                     return 0;
             }
