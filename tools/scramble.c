@@ -333,7 +333,8 @@ int main (int argc, char** argv)
             return 2;
         }
         /* we store a 4-letter model name too, for humans */
-        strcpy(modelname, &argv[1][5]);
+        strncpy(modelname, &argv[1][5],4);
+        modelname[4] = '\0'; /* to be sure we are null terminated */
         chksum = modelnum; /* start checksum calcs with this */
     }
 
