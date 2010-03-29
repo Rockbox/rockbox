@@ -209,22 +209,22 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
-#if 0
+#ifdef HAVE_RECORDING
 /** Recording Screen **/
 static const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_REC_PAUSE,          BUTTON_UP|BUTTON_REL,             BUTTON_UP },
-    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
-    { ACTION_REC_NEWFILE,        BUTTON_HOME|BUTTON_REL,            BUTTON_HOME },
-    { ACTION_STD_MENU,           BUTTON_SELECT|BUTTON_REPEAT,      BUTTON_SELECT},
-    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                     BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_STD_PREV,           BUTTON_LEFT,               BUTTON_NONE },
-    { ACTION_STD_PREV,           BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_STD_NEXT,           BUTTON_RIGHT,                BUTTON_NONE },
-    { ACTION_STD_NEXT,           BUTTON_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_NONE,               BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
+    { ACTION_REC_PAUSE,          BUTTON_UP|BUTTON_REL,          BUTTON_UP },
+    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,       BUTTON_POWER },
+    { ACTION_REC_NEWFILE,        BUTTON_HOME|BUTTON_REL,        BUTTON_HOME },
+    { ACTION_STD_MENU,           BUTTON_SELECT|BUTTON_REPEAT,   BUTTON_SELECT},
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                   BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_LEFT,                   BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RIGHT,                  BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_NONE,               BUTTON_DOWN|BUTTON_REL,        BUTTON_DOWN },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 #endif

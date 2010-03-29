@@ -16,19 +16,12 @@
 #define HAVE_HOTSWAP
 #endif
 
-
-#if 0 /* disabled since there is no driver (yet) */
-
-#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
-#define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
-#define REC_SAMPR_DEFAULT   SAMPR_22
-
-#endif
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
@@ -104,9 +97,9 @@
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
-/* We're working on the assumption that the AS3525 has something
-   similar to the AS3514 for audio codec etc */
+/* AS3514 or newer */
 #define HAVE_AS3514
+#define HAVE_AS3543
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER

@@ -1,5 +1,5 @@
 /*
- * This config file is for the Sandisk Sansa Fuze
+ * This config file is for the Sandisk Sansa Fuze v2
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
@@ -10,9 +10,9 @@
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
-//#define HAVE_RECORDING
+#define HAVE_RECORDING
 
-//#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23
@@ -89,9 +89,9 @@
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 
-/* We're working on the assumption that the AS3525 has something
-   similar to the AS3514 for audio codec etc */
+/* AS3514 or newer */
 #define HAVE_AS3514
+#define HAVE_AS3543
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
