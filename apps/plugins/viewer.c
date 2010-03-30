@@ -36,6 +36,7 @@ PLUGIN_HEADER
  * word_mode            1
  * line_mode            1
  * view_mode            1
+ * alignment            1
  * encoding             1
  * scrollbar_mode       1
  * need_scrollbar       1
@@ -71,6 +72,7 @@ PLUGIN_HEADER
  *     word_mode        1
  *     line_mode        1
  *     view_mode        1
+ *     alignment        1
  *     encoding         1
  *     scrollbar_mode   1
  *     need_scrollbar   1
@@ -541,6 +543,11 @@ struct preferences {
         NARROW=0,
         WIDE,
     } view_mode;
+
+    enum {
+        LEFT=0,
+        RIGHT,
+    } alignment;
 
     enum codepages encoding;
 
@@ -1428,6 +1435,7 @@ static void viewer_draw(int col)
             bool bflag = (viewer_find_bookmark(dpage, dline) >= 0);
 #ifdef HAVE_LCD_BITMAP
             int dy = i * pf->height + header_height;
+            int dx = (prefs.alignment == LEFT) ? left_col : LCD_WIDTH - line_width;
 #endif
             if (bflag)
 #ifdef HAVE_LCD_BITMAP
@@ -1436,7 +1444,7 @@ static void viewer_draw(int col)
                 rb->lcd_fillrect(left_col, dy, LCD_WIDTH, pf->height);
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             }
-            rb->lcd_putsxy(left_col, dy, utf8_buffer);
+            rb->lcd_putsxy(dx, dy, utf8_buffer);
             rb->lcd_set_drawmode(DRMODE_SOLID);
 #else
             {
@@ -1806,6 +1814,7 @@ static void viewer_default_preferences(void)
     prefs.word_mode = WRAP;
     prefs.line_mode = NORMAL;
     prefs.view_mode = NARROW;
+    prefs.alignment = LEFT;
     prefs.scroll_mode = PAGE;
     prefs.page_mode = NO_OVERLAP;
     prefs.scrollbar_mode = SB_OFF;
@@ -1834,6 +1843,7 @@ static bool viewer_read_preferences(int pfd)
     prefs.word_mode        = *p++;
     prefs.line_mode        = *p++;
     prefs.view_mode        = *p++;
+    prefs.alignment        = *p++;
     prefs.encoding         = *p++;
     prefs.scrollbar_mode   = *p++;
     prefs.need_scrollbar   = *p++;
@@ -1855,6 +1865,7 @@ static bool viewer_write_preferences(int pfd)
     *p++ = prefs.word_mode;
     *p++ = prefs.line_mode;
     *p++ = prefs.view_mode;
+    *p++ = prefs.alignment;
     *p++ = prefs.encoding;
     *p++ = prefs.scrollbar_mode;
     *p++ = prefs.need_scrollbar;
@@ -2611,6 +2622,17 @@ static bool font_setting(void)
 
     return res;
 }
+
+static bool alignment_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Left", -1},
+        {"Right", -1},
+    };
+
+    return rb->set_option("Alignment", &prefs.alignment, INT,
+                           names , 2, NULL);
+}
 #endif
 
 static bool autoscroll_speed_setting(void)
@@ -2628,6 +2650,8 @@ MENUITEM_FUNCTION(line_mode_item, 0, "Line Mode", line_mode_setting,
 MENUITEM_FUNCTION(view_mode_item, 0, "Wide View", view_mode_setting,
                   NULL, NULL, Icon_NOICON);
 #ifdef HAVE_LCD_BITMAP
+MENUITEM_FUNCTION(alignment_item, 0, "Alignment", alignment_setting,
+                  NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(scrollbar_item, 0, "Show Scrollbar", scrollbar_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", page_mode_setting,
@@ -2646,7 +2670,8 @@ MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &view_mode_item,
 #ifdef HAVE_LCD_BITMAP
-            &scrollbar_item, &page_mode_item, &header_item, &footer_item, &font_item,
+            &alignment_item, &scrollbar_item, &page_mode_item, &header_item,
+            &footer_item, &font_item,
 #endif
             &scroll_mode_item, &autoscroll_speed_item);
 
