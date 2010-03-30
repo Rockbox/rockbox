@@ -403,6 +403,9 @@ void Config::updateTtsState(int index)
         ui.configTTSstatus->setText(tr("Configuration INVALID"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
     }
+    
+    delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
+                   since that would delete the TTSBase instance on application exit*/
 }
 
 void Config::updateEncState()
@@ -699,6 +702,8 @@ void Config::configTts()
     EncTtsCfgGui gui(this,tts,TTSBase::getTTSName(ui.comboTts->itemData(index).toString()));
     gui.exec();
     updateTtsState(ui.comboTts->currentIndex());
+    delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
+                   since that would delete the TTSBase instance on application exit*/
 }
 
 void Config::testTts()
@@ -745,6 +750,9 @@ void Config::testTts()
 #else
     QSound::play(filename);
 #endif
+    
+    delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
+                   since that would delete the TTSBase instance on application exit*/
 }
 
 void Config::configEnc()
