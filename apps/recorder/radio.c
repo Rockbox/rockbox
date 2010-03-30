@@ -127,7 +127,8 @@ static int curr_freq; /* current frequency in Hz */
 static int radio_mode = RADIO_SCAN_MODE;
 static int search_dir = 0;
 
-static int radio_status = FMRADIO_OFF;
+/* make sure that radio_stop() does a full run after rockbox boots */
+static int radio_status = FMRADIO_PLAYING;
 static bool in_screen = false;
 
 #define MAX_PRESETS 64
