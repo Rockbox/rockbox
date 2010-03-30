@@ -23,6 +23,7 @@
 
 TTSFestival::~TTSFestival()
 {
+    qDebug() << "[Festival] Destroying instance";
     stop();
 }
 
@@ -48,7 +49,7 @@ void TTSFestival::generateSettings()
     EncTtsSetting* setting = new EncTtsSetting(this,
                         EncTtsSetting::eSTRINGLIST, tr("Voice:"),
                         RbSettings::subValue("festival", RbSettings::TtsVoice),
-                        getVoiceList(exepath), EncTtsSetting::eREFRESHBTN);
+                        getVoiceList(), EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     connect(setting,SIGNAL(dataChanged()),this,SLOT(clearVoiceDescription()));
     insertSetting(eVOICE,setting);
@@ -76,8 +77,10 @@ void TTSFestival::saveSettings()
 void TTSFestival::updateVoiceDescription()
 {
     // get voice Info with current voice and path
-    QString info = getVoiceInfo(getSetting(eVOICE)->current().toString(),
-            getSetting(eSERVERPATH)->current().toString());
+    currentPath = getSetting(eSERVERPATH)->current().toString();
+    QString info = getVoiceInfo(getSetting(eVOICE)->current().toString());
+    currentPath = "";
+    
     getSetting(eVOICEDESC)->setCurrent(info);
 }
 
@@ -88,47 +91,78 @@ void TTSFestival::clearVoiceDescription()
 
 void TTSFestival::updateVoiceList()
 {
-   QStringList voiceList = getVoiceList(getSetting(eSERVERPATH)->current().toString());
+   currentPath = getSetting(eSERVERPATH)->current().toString();
+   QStringList voiceList = getVoiceList();
+   currentPath = "";
+   
    getSetting(eVOICE)->setList(voiceList);
    if(voiceList.size() > 0) getSetting(eVOICE)->setCurrent(voiceList.at(0));
    else getSetting(eVOICE)->setCurrent("");
 }
 
-void TTSFestival::startServer(QString path)
+void TTSFestival::startServer()
 {
     if(!configOk())
         return;
 
-    if(path == "")
-        path = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
+    if(serverProcess.state() != QProcess::Running)
+    {
+        QString path;
+        /* currentPath is set by the GUI - if it's set, it is the currently set
+         path in the configuration GUI; if it's not set, use the saved path */
+        if (currentPath == "")
+            path = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
+        else
+            path = currentPath;
 
-    serverProcess.start(QString("%1 --server").arg(path));
-    serverProcess.waitForStarted();
+        serverProcess.start(QString("%1 --server").arg(path));
+        serverProcess.waitForStarted();
 
-    queryServer("(getpid)",300,path);
-    if(serverProcess.state() == QProcess::Running)
-        qDebug() << "Festival is up and running";
-    else
-        qDebug() << "Festival failed to start";
+        /* A friendlier version of a spinlock */
+        while (serverProcess.pid() == 0 && serverProcess.state() != QProcess::Running)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+
+        if(serverProcess.state() == QProcess::Running)
+            qDebug() << "[Festival] Server is up and running";
+        else
+            qDebug() << "[Festival] Server failed to start, state: " << serverProcess.state();
+    }
 }
 
-void TTSFestival::ensureServerRunning(QString path)
+bool TTSFestival::ensureServerRunning()
 {
     if(serverProcess.state() != QProcess::Running)
     {
-        startServer(path);
+        startServer();
     }
+    return serverProcess.state() == QProcess::Running;
 }
 
 bool TTSFestival::start(QString* errStr)
 {
-    (void) errStr;
-    ensureServerRunning();
+    qDebug() << "[Festival] Starting server with voice " << RbSettings::subValue("festival", RbSettings::TtsVoice).toString();
+    
+    bool running = ensureServerRunning();
     if (!RbSettings::subValue("festival",RbSettings::TtsVoice).toString().isEmpty())
-        queryServer(QString("(voice.select '%1)")
-        .arg(RbSettings::subValue("festival", RbSettings::TtsVoice).toString()));
-
-    return true;
+    {
+        /* There's no harm in using both methods to set the voice .. */
+        QString voiceSelect = QString("(voice.select '%1)\n")
+        .arg(RbSettings::subValue("festival", RbSettings::TtsVoice).toString());
+        queryServer(voiceSelect, 3000);
+        
+        if(prologFile.open())
+        {
+          prologFile.write(voiceSelect.toAscii());
+          prologFile.close();
+          prologPath = QFileInfo(prologFile).absoluteFilePath();
+          qDebug() << "[Festival] Prolog created at " << prologPath;
+        }
+        
+    }
+    
+    if (!running)
+      (*errStr) = "Festival could not be started";
+    return running;
 }
 
 bool TTSFestival::stop()
@@ -141,13 +175,13 @@ bool TTSFestival::stop()
 
 TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 {
-    qDebug() << text << "->" << wavfile;
+    qDebug() << "[Festival] Voicing " << text << "->" << wavfile;
 
     QString path = RbSettings::subValue("festival-client",
             RbSettings::TtsPath).toString();
     QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp"
-            " --output \"%2\" - ").arg(path).arg(wavfile);
-    qDebug() << cmd;
+            " --output \"%2\" --prolog \"%3\" - ").arg(path).arg(wavfile).arg(prologPath);
+    qDebug() << "[Festival] Client cmd: " << cmd;
 
     QProcess clientProcess;
     clientProcess.start(cmd);
@@ -159,7 +193,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
     response = response.trimmed();
     if(!response.contains("Utterance"))
     {
-        qDebug() << "Could not voice string: " << response;
+        qDebug() << "[Festival] Could not voice string: " << response;
         *errStr = tr("engine could not voice string");
         return Warning;
         /* do not stop the voicing process because of a single string
@@ -175,32 +209,40 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 
 bool TTSFestival::configOk()
 {
-    QString serverPath = RbSettings::subValue("festival-server",
-                                RbSettings::TtsPath).toString();
-    QString clientPath = RbSettings::subValue("festival-client",
-                                RbSettings::TtsPath).toString();
+    bool ret;
+    if (currentPath == "")
+    {
+        QString serverPath = RbSettings::subValue("festival-server",
+                                    RbSettings::TtsPath).toString();
+        QString clientPath = RbSettings::subValue("festival-client",
+                                    RbSettings::TtsPath).toString();
 
-    bool ret = QFileInfo(serverPath).isExecutable() &&
-        QFileInfo(clientPath).isExecutable();
-    if(RbSettings::subValue("festival",RbSettings::TtsVoice).toString().size() > 0
-            && voices.size() > 0)
-        ret = ret && (voices.indexOf(RbSettings::subValue("festival",
-                        RbSettings::TtsVoice).toString()) != -1);
+        ret = QFileInfo(serverPath).isExecutable() &&
+            QFileInfo(clientPath).isExecutable();
+        if(RbSettings::subValue("festival",RbSettings::TtsVoice).toString().size() > 0
+                && voices.size() > 0)
+            ret = ret && (voices.indexOf(RbSettings::subValue("festival",
+                            RbSettings::TtsVoice).toString()) != -1);
+    }
+    else /* If we're currently configuring the server, we need to know that 
+            the entered path is valid */
+        ret = QFileInfo(currentPath).isExecutable();
+    
     return ret;
 }
 
-QStringList TTSFestival::getVoiceList(QString path)
+QStringList TTSFestival::getVoiceList()
 {
     if(!configOk())
         return QStringList();
 
     if(voices.size() > 0)
     {
-        qDebug() << "Using voice cache";
+        qDebug() << "[Festival] Using voice cache";
         return voices;
     }
 
-    QString response = queryServer("(voice.list)",3000,path);
+    QString response = queryServer("(voice.list)", 10000);
 
     // get the 2nd line. It should be (<voice_name>, <voice_name>)
     response = response.mid(response.indexOf('\n') + 1, -1);
@@ -212,14 +254,14 @@ QStringList TTSFestival::getVoiceList(QString path)
     if (voices.size() == 1 && voices[0].size() == 0)
         voices.removeAt(0);
     if (voices.size() > 0)
-        qDebug() << "Voices: " << voices;
+        qDebug() << "[Festival] Voices: " << voices;
     else
-        qDebug() << "No voices.";
+        qDebug() << "[Festival] No voices. Response was: " << response;
 
     return voices;
 }
 
-QString TTSFestival::getVoiceInfo(QString voice,QString path)
+QString TTSFestival::getVoiceInfo(QString voice)
 {
     if(!configOk())
         return "";
@@ -231,7 +273,7 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
         return voiceDescriptions[voice];
 
     QString response = queryServer(QString("(voice.description '%1)").arg(voice),
-                            3000,path);
+                            10000);
 
     if (response == "")
     {
@@ -241,7 +283,7 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
     {
         response = response.remove(QRegExp("(description \"*\")",
                     Qt::CaseInsensitive, QRegExp::Wildcard));
-        qDebug() << "voiceInfo w/o descr: " << response;
+        qDebug() << "[Festival] voiceInfo w/o descr: " << response;
         response = response.remove(')');
         QStringList responseLines = response.split('(', QString::SkipEmptyParts);
         responseLines.removeAt(0); // the voice name itself
@@ -271,17 +313,23 @@ QString TTSFestival::getVoiceInfo(QString voice,QString path)
     return voiceDescriptions[voice];
 }
 
-QString TTSFestival::queryServer(QString query, int timeout,QString path)
+QString TTSFestival::queryServer(QString query, int timeout)
 {
     if(!configOk())
         return "";
 
     // this operation could take some time
     emit busy();
+    
+    qDebug() << "[Festival] queryServer with " << query;
 
-    ensureServerRunning(path);
+    if (!ensureServerRunning())
+    {
+      qDebug() << "[Festival] queryServer: ensureServerRunning failed";
+      emit busyEnd();
+      return "";
+    }
 
-    qDebug() << "queryServer with " << query;
     QString response;
 
     QDateTime endTime;
@@ -334,11 +382,11 @@ QString TTSFestival::queryServer(QString query, int timeout,QString path)
     QStringList lines = response.split('\n');
     if(lines.size() > 2)
     {
-        lines.removeFirst();
-        lines.removeLast();
+        lines.removeFirst(); /* should be LP */
+        lines.removeLast();  /* should be ft_StUfF_keyOK */
     }
     else
-        qDebug() << "Response too short: " << response;
+        qDebug() << "[Festival] Response too short: " << response;
 
     emit busyEnd();
     return lines.join("\n");

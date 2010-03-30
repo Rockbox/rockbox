@@ -22,6 +22,7 @@
 #ifndef TTSFESTIVAL_H
 #define TTSFESTIVAL_H
 
+#include <QTemporaryFile>
 #include "ttsbase.h"
 
 class TTSFestival : public TTSBase
@@ -52,12 +53,15 @@ class TTSFestival : public TTSBase
         void updateVoiceDescription();
         void clearVoiceDescription();
     private:
-        QStringList  getVoiceList(QString path ="");
-        QString getVoiceInfo(QString voice,QString path ="");
+        QTemporaryFile prologFile;
+        QString prologPath;
+        QString currentPath;
+        QStringList  getVoiceList();
+        QString getVoiceInfo(QString voice);
 
-        inline void startServer(QString path="");
-        inline void ensureServerRunning(QString path="");
-        QString queryServer(QString query, int timeout = -1,QString path="");
+        inline void startServer();
+        inline bool ensureServerRunning();
+        QString queryServer(QString query, int timeout = -1);
         QProcess serverProcess;
         QStringList voices;
         QMap<QString, QString> voiceDescriptions;
