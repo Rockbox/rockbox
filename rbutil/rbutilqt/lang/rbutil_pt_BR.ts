@@ -1,85 +1,8 @@
-<!DOCTYPE TS><TS>
-<context>
-    <name>@default</name>
-    <message>
-        <source>Can&apos;t open file %s!</source>
-        <translation>Não é possível abrir o arquivo %s!</translation>
-    </message>
-    <message>
-        <source>Bootloader size is %d bytes</source>
-        <translation>O tamanho do inicializador é %d bytes</translation>
-    </message>
-    <message>
-        <source>Firmware size is %d bytes</source>
-        <translation>O tamanho do firmware é %d bytes</translation>
-    </message>
-    <message>
-        <source>Can&apos;t allocate %d bytes!</source>
-        <translation>Não é possível alocar %d bytes!</translation>
-    </message>
-    <message>
-        <source>Reading %s into memory...</source>
-        <translation>Lendo %s para a memória...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t read file %s to memory!</source>
-        <translation>Não é possível ler o arquivo %s para a memória!</translation>
-    </message>
-    <message>
-        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
-        <translation>O arquivo %s não é um arquivo de firmware ChinaChip válido!</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
-        <translation>Não foi possível encontrar ccpmp.bin em %s!</translation>
-    </message>
-    <message>
-        <source>Found ccpmp.bin at %d bytes</source>
-        <translation>Encontrado ccpmp.bin a %d bytes</translation>
-    </message>
-    <message>
-        <source>Writing %d bytes to %s...</source>
-        <translation>Escrevendo %d bytes para %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t write to file %s!</source>
-        <translation>Não é possível escrever para o arquivo %s!</translation>
-    </message>
-    <message>
-        <source>Renaming it to ccpmp.old...</source>
-        <translation>Renomeando-o para ccpmp.old...</translation>
-    </message>
-    <message>
-        <source>Making place for ccpmp.bin...</source>
-        <translation>Criando espaço para ccpmp.bin...</translation>
-    </message>
-    <message>
-        <source>Adding header to %s...</source>
-        <translation>Acrescentando cabeçalho para %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t obtain current time!</source>
-        <translation>Não é possível obter a hora atual!</translation>
-    </message>
-    <message>
-        <source>Computing checksum...</source>
-        <translation>Calculando checksum...</translation>
-    </message>
-    <message>
-        <source>Updating main header...</source>
-        <translation>Atualizando cabeçalho principal...</translation>
-    </message>
-    <message>
-        <source>Writing output to %s...</source>
-        <translation>Escrevendo saída para %s...</translation>
-    </message>
-</context>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>BootloaderInstallAms</name>
-    <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
-    </message>
     <message>
         <source>Downloading bootloader file</source>
         <translation>Transferindo arquivo do inicializador</translation>
@@ -111,6 +34,10 @@
     <message>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
+    </message>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -376,22 +303,6 @@
         <translation>Erro: não é possível alocar memoria buffer!</translation>
     </message>
     <message>
-        <source>No Ipod detected
-Permission for disc access denied!</source>
-        <translation type="obsolete">Nenhum Ipod detectado
-Permissão para acesso a disco negada!</translation>
-    </message>
-    <message>
-        <source>No Ipod detected!</source>
-        <translation type="obsolete">Nenhum Ipod detectado!</translation>
-    </message>
-    <message>
-        <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
-See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation type="obsolete">Atenção: Este é um MacPod, o Rockbox funciona somente em WinPods.
-Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
-    </message>
-    <message>
         <source>Downloading bootloader file</source>
         <translation>Transferindo arquivo do inicializador</translation>
     </message>
@@ -604,10 +515,6 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
 <context>
     <name>BootloaderInstallTcc</name>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons.Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="obsolete">A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
-    </message>
-    <message>
         <source>Downloading bootloader file</source>
         <translation>Transferindo arquivo do inicializador</translation>
     </message>
@@ -622,10 +529,6 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <source>Patching Firmware...</source>
         <translation>Aplicando correção no Firmware...</translation>
-    </message>
-    <message>
-        <source>Could patch firmware</source>
-        <translation type="obsolete">Não foi possível aplicar a correção ao firmware</translation>
     </message>
     <message>
         <source>Could not open %1 for writing</source>
@@ -750,14 +653,6 @@ Você precisa modificar seu reprodutor para o modo UMS para a instalação.</tra
         <translation>Erro fatal</translation>
     </message>
     <message>
-        <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation type="obsolete">Detectado um reprodutor não suportado %1. Desculpe, o Rockbox não funciona no seu reprodutor.</translation>
-    </message>
-    <message>
-        <source>Fatal error: incompatible player found</source>
-        <translation type="obsolete">Erro fatal: encontrado reprodutor incompatível</translation>
-    </message>
-    <message>
         <source>Autodetection</source>
         <translation>Autodetecção</translation>
     </message>
@@ -839,6 +734,23 @@ Por favor, configure o motor TTS.</translation>
 </source>
         <translation>Não foi possível criar voz para a string de teste.</translation>
     </message>
+    <message>
+        <source>Showing disabled targets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Cache Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 &quot;MacPod&quot; found!
+Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfigForm</name>
@@ -865,10 +777,6 @@ Por favor, configure o motor TTS.</translation>
     <message>
         <source>&amp;Select your audio player</source>
         <translation>&amp;Selecione seu reprodutor de audio</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation>1</translation>
     </message>
     <message>
         <source>&amp;Autodetect</source>
@@ -1002,6 +910,10 @@ Por favor, configure o motor TTS.</translation>
         <source>Test TTS</source>
         <translation>Testar TTS</translation>
     </message>
+    <message>
+        <source>Show disabled targets</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Configure</name>
@@ -1127,136 +1039,6 @@ Por favor, configure o motor TTS.</translation>
     </message>
 </context>
 <context>
-    <name>Install</name>
-    <message>
-        <source>Backup to %1</source>
-        <translation type="obsolete">Cópia de segurança em %1</translation>
-    </message>
-    <message>
-        <source>Mount point is wrong!</source>
-        <translation type="obsolete">O ponto de montagem está encorreto!</translation>
-    </message>
-    <message>
-        <source>Really continue?</source>
-        <translation type="obsolete">Realmente continuar?</translation>
-    </message>
-    <message>
-        <source>Aborted!</source>
-        <translation type="obsolete">Abortado!</translation>
-    </message>
-    <message>
-        <source>Beginning Backup...</source>
-        <translation type="obsolete">Iniciando Cópia de Segurança...</translation>
-    </message>
-    <message>
-        <source>Backup successful</source>
-        <translation type="obsolete">Cópia de Segurança realizada com sucesso</translation>
-    </message>
-    <message>
-        <source>Backup failed!</source>
-        <translation type="obsolete">Cópia de Segurança falhou!</translation>
-    </message>
-    <message>
-        <source>Select Backup Filename</source>
-        <translation type="obsolete">Selecione Nome do Arquivo da Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="obsolete">Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é r%1 (%2).</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="obsolete">&lt;b&gt;Esta é a versão recomendada.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>This is the last released version of Rockbox.</source>
-        <translation type="obsolete">Está é a última versão lançada do Rockbox.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="obsolete">&lt;b&gt;Nota:&lt;/b&gt; A última versão liberada é %1. &lt;b&gt;Está é a versão recomendada.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation type="obsolete">Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="obsolete">&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
-    </message>
-</context>
-<context>
-    <name>InstallFrm</name>
-    <message>
-        <source>Install Rockbox</source>
-        <translation>Instalar Rockbox</translation>
-    </message>
-    <message>
-        <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation>Por favor, selecione a versão do Rockbox que você deseja instalar em seu reprodutor:</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Versão</translation>
-    </message>
-    <message>
-        <source>Rockbox &amp;stable</source>
-        <translation>Rockbox E&amp;stável</translation>
-    </message>
-    <message>
-        <source>&amp;Archived Build</source>
-        <translation>Compilação &amp;Arquivada</translation>
-    </message>
-    <message>
-        <source>&amp;Current Build</source>
-        <translation>&amp;Compilação Atual</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation>Detalhes</translation>
-    </message>
-    <message>
-        <source>Details about the selected version</source>
-        <translation>Detalhes sobre a versão selecionada</translation>
-    </message>
-    <message>
-        <source>Note</source>
-        <translation>Nota</translation>
-    </message>
-    <message>
-        <source>&amp;Install</source>
-        <translation>&amp;Instalar</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Cancelar</translation>
-    </message>
-    <message>
-        <source>Backup</source>
-        <translation>Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>Backup before installing</source>
-        <translation>Fazer cópia de segurança antes de instalar</translation>
-    </message>
-    <message>
-        <source>Backup location</source>
-        <translation>Localização da Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>Change</source>
-        <translation>Modificar</translation>
-    </message>
-    <message>
-        <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation>O Utilitário Rockbox armazena cópias do Rockbox já transferidas no disco local para economizar tráfego de rede. Se sua cópia local não está mais funcionando, selecione está opção para transferir uma cópia recente.</translation>
-    </message>
-    <message>
-        <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation>&amp;Não usar cópia cacheada localmente</translation>
-    </message>
-</context>
-<context>
     <name>InstallTalkFrm</name>
     <message>
         <source>Install Talk Files</source>
@@ -1303,10 +1085,6 @@ Por favor, configure o motor TTS.</translation>
         <translation>Retirar Extensões</translation>
     </message>
     <message>
-        <source>Overwrite Talkfiles</source>
-        <translation type="obsolete">Sobrescrever arquivos Talk</translation>
-    </message>
-    <message>
         <source>Generate .talk files for Folders</source>
         <translation>Gerar arquivos .talk para Pastas</translation>
     </message>
@@ -1344,6 +1122,10 @@ Por favor, configure o motor TTS.</translation>
     <message>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Selecionado codificador: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Select folder to create talk files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1403,6 +1185,77 @@ Por favor, configure o motor TTS.</translation>
     <message>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
+    </message>
+</context>
+<context>
+    <name>InstallWindowFrm</name>
+    <message>
+        <source>Install Rockbox</source>
+        <translation type="unfinished">Instalar Rockbox</translation>
+    </message>
+    <message>
+        <source>Please select the Rockbox version you want to install on your player:</source>
+        <translation type="unfinished">Por favor, selecione a versão do Rockbox que você deseja instalar em seu reprodutor:</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Versão</translation>
+    </message>
+    <message>
+        <source>Rockbox &amp;stable</source>
+        <translation type="unfinished">Rockbox E&amp;stável</translation>
+    </message>
+    <message>
+        <source>&amp;Archived Build</source>
+        <translation type="unfinished">Compilação &amp;Arquivada</translation>
+    </message>
+    <message>
+        <source>&amp;Current Build</source>
+        <translation type="unfinished">&amp;Compilação Atual</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Detalhes</translation>
+    </message>
+    <message>
+        <source>Details about the selected version</source>
+        <translation type="unfinished">Detalhes sobre a versão selecionada</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation type="unfinished">Nota</translation>
+    </message>
+    <message>
+        <source>&amp;Install</source>
+        <translation type="unfinished">&amp;Instalar</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Cancelar</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation type="unfinished">Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>Backup before installing</source>
+        <translation type="unfinished">Fazer cópia de segurança antes de instalar</translation>
+    </message>
+    <message>
+        <source>Backup location</source>
+        <translation type="unfinished">Localização da Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation type="unfinished">Modificar</translation>
+    </message>
+    <message>
+        <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
+        <translation type="unfinished">O Utilitário Rockbox armazena cópias do Rockbox já transferidas no disco local para economizar tráfego de rede. Se sua cópia local não está mais funcionando, selecione está opção para transferir uma cópia recente.</translation>
+    </message>
+    <message>
+        <source>&amp;Don&apos;t use locally cached copy</source>
+        <translation type="unfinished">&amp;Não usar cópia cacheada localmente</translation>
     </message>
 </context>
 <context>
@@ -1967,10 +1820,6 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>&amp;Arquivo</translation>
     </message>
     <message>
-        <source>Abou&amp;t</source>
-        <translation type="obsolete">So&amp;bre</translation>
-    </message>
-    <message>
         <source>Action&amp;s</source>
         <translation>Açõe&amp;s</translation>
     </message>
@@ -2139,6 +1988,10 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <source>&amp;Refresh</source>
         <translation>&amp;Atualizar</translation>
     </message>
+    <message>
+        <source>Save &amp;previous</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Sysinfo</name>
@@ -2184,6 +2037,25 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
+    </message>
+</context>
+<context>
+    <name>TTSCarbon</name>
+    <message>
+        <source>Voice:</source>
+        <translation type="unfinished">Voz:</translation>
+    </message>
+    <message>
+        <source>Speed (words/min):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not voice string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not convert intermediate file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2258,14 +2130,6 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>Iniciando geração de arquivo Talk</translation>
     </message>
     <message>
-        <source>Init of TTS engine failed</source>
-        <translation type="obsolete">Falhou ao iniciar o motor TTS</translation>
-    </message>
-    <message>
-        <source>Init of Encoder engine failed</source>
-        <translation type="obsolete">Falhou ao iniciar o motor do codificador</translation>
-    </message>
-    <message>
         <source>Reading Filelist...</source>
         <translation>Lendo Lista de Arquivos...</translation>
     </message>
@@ -2274,40 +2138,12 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>Criação de arquivo Talk abortada</translation>
     </message>
     <message>
-        <source>Voicing entries...</source>
-        <translation type="obsolete">Entradas de vocalização...</translation>
-    </message>
-    <message>
-        <source>Encoding files...</source>
-        <translation type="obsolete">Codificando arquivos...</translation>
-    </message>
-    <message>
-        <source>Copying Talkfile for Dirs...</source>
-        <translation type="obsolete">Copiando arquivo Talk para Diretórios...</translation>
-    </message>
-    <message>
-        <source>Copying Talkfile for Files...</source>
-        <translation type="obsolete">Copiando arquivo Talk para Arquivos...</translation>
-    </message>
-    <message>
         <source>Finished creating Talk files</source>
         <translation>Criação de arquivos Talk finalizada</translation>
     </message>
     <message>
-        <source>Voicing of %1 failed: %2</source>
-        <translation type="obsolete">Vocalização de %1 falhou: %2</translation>
-    </message>
-    <message>
-        <source>Encoding of %1 failed</source>
-        <translation type="obsolete">Codificação de %1 falhou</translation>
-    </message>
-    <message>
         <source>Copying of %1 to %2 failed</source>
         <translation>Cópia de %1 para %2 falhou</translation>
-    </message>
-    <message>
-        <source>Cleaning up..</source>
-        <translation type="obsolete">Limpando..</translation>
     </message>
     <message>
         <source>Copying Talkfiles...</source>
@@ -2476,6 +2312,12 @@ código de resposta HTTP: %1</translation>
         <source>Mount point is wrong!</source>
         <translation>O ponto de montagem está incorreto!</translation>
     </message>
+    <message numerus="yes">
+        <source>Download size %L1 kiB (%n item(s))</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>UnZip</name>
@@ -2598,14 +2440,6 @@ código de resposta HTTP: %1</translation>
         <translation>Desinstalação Finalizada</translation>
     </message>
     <message>
-        <source>Uninstalling </source>
-        <translation type="obsolete">Desinstalando</translation>
-    </message>
-    <message>
-        <source>Could not delete: </source>
-        <translation type="obsolete">Não foi possível apagar:</translation>
-    </message>
-    <message>
         <source>Uninstallation finished</source>
         <translation>Desinstalação finalizada</translation>
     </message>
@@ -2649,20 +2483,8 @@ código de resposta HTTP: %1</translation>
         <translation>falha ao abrir arquivo transferido</translation>
     </message>
     <message>
-        <source>Init of TTS engine failed</source>
-        <translation type="obsolete">Falhou ao iniciar o motor TTS</translation>
-    </message>
-    <message>
-        <source>Init of Encoder engine failed</source>
-        <translation type="obsolete">Falhou ao iniciar o motor do Codificador</translation>
-    </message>
-    <message>
         <source>The downloaded file was empty!</source>
         <translation>O arquivo transferido estava vazio!</translation>
-    </message>
-    <message>
-        <source>creating </source>
-        <translation type="obsolete">criando</translation>
     </message>
     <message>
         <source>Error opening downloaded file</source>
@@ -2809,20 +2631,6 @@ código de resposta HTTP: %1</translation>
         <source>The Rockbox Utility</source>
         <translation>O Utilitário Rockbox</translation>
     </message>
-    <message encoding="UTF-8">
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
-
-© 2005 - 2009 The Rockbox Team.
-Released under the GNU General Public License v2.</source>
-        <translation type="obsolete">Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.
-
-© 2005 - 2009 The Rockbox Team.
-Released under the GNU General Public License v2.</translation>
-    </message>
-    <message>
-        <source>http://www.rockbox.org</source>
-        <translation type="obsolete">http://www.rockbox.org</translation>
-    </message>
     <message>
         <source>&amp;Credits</source>
         <translation>&amp;Créditos</translation>
@@ -2835,7 +2643,7 @@ Released under the GNU General Public License v2.</translation>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
-    <message encoding="UTF-8">
+    <message utf8="true">
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.&lt;br/&gt;© 2005 - 2009 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
