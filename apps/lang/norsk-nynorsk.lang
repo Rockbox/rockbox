@@ -16,6 +16,7 @@
 #
 # Norwegian Nynorsk language file, translated by:
 # - Karl Ove Hufthammer
+# - Tore Johnny Bråtveit
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
