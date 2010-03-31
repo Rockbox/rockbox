@@ -115,6 +115,7 @@ def usage(myself):
     print "       -b, --binary-only     only create binary archive"
     if sys.platform != "darwin":
         print "       -d, --dynamic         link dynamically instead of static"
+    print "       -k, --keep-temp       keep temporary folder on build failure"
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
@@ -353,11 +354,20 @@ def filestats(filename):
     print "-" * len(filename), "\n"
 
 
+def tempclean(workfolder, nopro):
+    if nopro == True:
+        print "Cleaning up working folder %s" % workfolder
+        shutil.rmtree(workfolder)
+    else:
+        print "Project file specified or cleanup disabled!"
+        print "Temporary files kept at %s" % workfolder
+
+
 def main():
     startup = time.time()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:sbdh",
-            ["qmake=", "project=", "tag=", "add=", "source-only", "binary-only", "dynamic", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:sbdkh",
+            ["qmake=", "project=", "tag=", "add=", "source-only", "binary-only", "dynamic", "keep-temp", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -370,6 +380,7 @@ def main():
     cleanup = True
     binary = True
     source = True
+    keeptemp = False
     if sys.platform != "darwin":
         static = True
     else:
@@ -391,6 +402,8 @@ def main():
             source = False
         if o in ("-d", "--dynamic") and sys.platform != "darwin":
             static = False
+        if o in ("-k", "--keep-temp"):
+            keeptemp = True
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
@@ -434,6 +447,7 @@ def main():
         proj = sourcefolder + project
         # get sources and pack source tarball
         if not getsources(svnbase, svnpaths, sourcefolder) == 0:
+            tempclean(workfolder, cleanup and not keeptemp)
             sys.exit(1)
 
         if source == True:
@@ -463,11 +477,14 @@ def main():
 
     # build it.
     if not qmake(qm, proj, sourcefolder, static) == 0:
+        tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
     if not build(sourcefolder) == 0:
+        tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
     if sys.platform == "win32":
         if not upxfile(sourcefolder) == 0:
+            tempclean(workfolder, cleanup and not keeptemp)
             sys.exit(1)
         archive = zipball(ver, sourcefolder)
     elif sys.platform == "darwin":
@@ -476,11 +493,7 @@ def main():
         archive = tarball(ver, sourcefolder)
 
     # remove temporary files
-    print "Cleaning up working folder %s" % workfolder
-    if cleanup == True:
-        shutil.rmtree(workfolder)
-    else:
-        print "Project file specified, not cleaning up!"
+    tempclean(workfolder, cleanup)
 
     # display summary
     headline = "Build Summary for %s" % program
