@@ -127,8 +127,7 @@ static int curr_freq; /* current frequency in Hz */
 static int radio_mode = RADIO_SCAN_MODE;
 static int search_dir = 0;
 
-/* make sure that radio_stop() does a full run after rockbox boots */
-static int radio_status = FMRADIO_PLAYING;
+static int radio_status = FMRADIO_OFF;
 static bool in_screen = false;
 
 #define MAX_PRESETS 64
@@ -148,6 +147,7 @@ static int load_preset_list(void);
 static int clear_preset_list(void);
 
 static int scan_presets(void *viewports);
+static void radio_off(void);
 
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */
@@ -165,7 +165,7 @@ static bool yesno_pop(const char* text)
 void radio_init(void)
 {
     tuner_init();
-    radio_stop();
+    radio_off();
 }
 
 int get_radio_status(void)
@@ -256,15 +256,20 @@ void radio_pause(void)
     radio_status = FMRADIO_PAUSED;
 } /* radio_pause */
 
+static void radio_off(void)
+{
+    tuner_set(RADIO_MUTE, 1);
+    tuner_set(RADIO_SLEEP, 1); /* low power mode, if available */
+    radio_status = FMRADIO_OFF;
+    tuner_power(false); /* status update, power off if avail. */
+}
+
 void radio_stop(void)
 {
     if(radio_status == FMRADIO_OFF)
         return;
 
-    tuner_set(RADIO_MUTE, 1);
-    tuner_set(RADIO_SLEEP, 1); /* low power mode, if available */
-    radio_status = FMRADIO_OFF;
-    tuner_power(false); /* status update, power off if avail. */
+    radio_off();
 } /* radio_stop */
 
 bool radio_hardware_present(void)
