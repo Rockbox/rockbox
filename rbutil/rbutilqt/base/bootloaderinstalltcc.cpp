@@ -149,7 +149,7 @@ exit:
 
 bool BootloaderInstallTcc::uninstall(void)
 {
-    emit logItem("To uninstall, perform a normal upgrade with an unmodified original firmware", LOGINFO);
+    emit logItem(tr("To uninstall, perform a normal upgrade with an unmodified original firmware"), LOGINFO);
     logInstall(LogRemove);
     return false;
 }

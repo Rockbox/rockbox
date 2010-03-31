@@ -222,7 +222,7 @@ void BootloaderInstallHex::installStage2(void)
 
 bool BootloaderInstallHex::uninstall(void)
 {
-    emit logItem("Uninstallation not possible, only installation info removed", LOGINFO);
+    emit logItem(tr("Uninstallation not possible, only installation info removed"), LOGINFO);
     logInstall(LogRemove);
     return false;
 }
