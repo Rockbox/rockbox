@@ -35,9 +35,11 @@
 #if defined(SANSA_CLIP)
 #define ADC_BATTERY         ADC_BVDD
 #else
-/* ADC_RTCSUP seems to represent battery voltage better than ADC_BVDD during
- * charging (ADC_BVDD is way too high) and appears the same in normal use. */
-#define ADC_BATTERY         ADC_RTCSUP
+/* ADC_CHG_IN seems to represent battery voltage better than ADC_BVDD during
+ * charging (ADC_BVDD is way too high) and appears the same in normal use.
+ * Note that when charging some models do not give an accurate reading but jump
+ * between 2 values. */
+#define ADC_BATTERY         ADC_CHG_IN
 #endif
 
 #elif defined(SANSA_E200V2)
