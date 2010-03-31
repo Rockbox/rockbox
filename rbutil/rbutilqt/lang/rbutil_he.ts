@@ -2,16 +2,116 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="he">
 <context>
+    <name></name>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="94"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="100"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="162"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="183"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="235"/>
+        <source>Can&apos;t open file %s!</source>
+        <translation>לא מצליח לפתוח קובץ %s!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="105"/>
+        <source>Bootloader size is %d bytes</source>
+        <translation>גודלו של מנהל האיתחול הוא %d בתים</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="109"/>
+        <source>Firmware size is %d bytes</source>
+        <translation>גודלה של הקושחה הוא %d בתים</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="114"/>
+        <source>Can&apos;t allocate %d bytes!</source>
+        <translation>לא יכול להקצות %d בתים!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="119"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="194"/>
+        <source>Reading %s into memory...</source>
+        <translation>קורא את %s אל הזיכרון...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="122"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="198"/>
+        <source>Can&apos;t read file %s to memory!</source>
+        <translation>לא יכול לקרוא את %s אל הזיכרון!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="129"/>
+        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
+        <translation>הקובץ %s אינו קובץ קושחת ChinaChip תקין!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="151"/>
+        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
+        <translation>לא מוצא את ccpmp.bin בתוך %s!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="154"/>
+        <source>Found ccpmp.bin at %d bytes</source>
+        <translation>מצאתי את ccpmp.bin ב- %d בתים</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="166"/>
+        <source>Writing %d bytes to %s...</source>
+        <translation>כותב %d בתים אל %s...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="169"/>
+        <location filename="../../chinachippatcher/chinachip.c" line="242"/>
+        <source>Can&apos;t write to file %s!</source>
+        <translation>לא מצליח לכתוב לקובץ %s!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="175"/>
+        <source>Renaming it to ccpmp.old...</source>
+        <translation>משנה שם ל- ccpmp.old...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="190"/>
+        <source>Making place for ccpmp.bin...</source>
+        <translation>מכין מקום ל- ccpmp.bin...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="203"/>
+        <source>Adding header to %s...</source>
+        <translation>מוסיף כותרת ל- %s...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="213"/>
+        <source>Can&apos;t obtain current time!</source>
+        <translation>לא מצליח להשיג זמן נוכחי!</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="223"/>
+        <source>Computing checksum...</source>
+        <translation>מחשב checksum...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="227"/>
+        <source>Updating main header...</source>
+        <translation>מעדכן את הכותרת הראשית...</translation>
+    </message>
+    <message>
+        <location filename="../../chinachippatcher/chinachip.c" line="239"/>
+        <source>Writing output to %s...</source>
+        <translation>כותב פלט אל %s...</translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallAms</name>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אתה גלוש אל &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;הפורומים של Sansa&lt;/a&gt; או פנה &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="54"/>
         <source>Downloading bootloader file</source>
-        <translation>מוריד קובץ מנהל איתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="94"/>
@@ -22,7 +122,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="122"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation type="unfinished"></translation>
+        <translation>אין מספיק מקום להכנסת מנהל האיתחול, נסה גירסת קושחה אחרת</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="132"/>
@@ -47,7 +147,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="180"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>כדי להסיר את ההתקנה, בצע שדרוג רגיל עם קובץ קושחה מקורי שלא נעשה בו שינוי</translation>
     </message>
 </context>
 <context>
@@ -130,17 +230,17 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="202"/>
         <source>Waiting for system to remount player</source>
-        <translation type="unfinished"></translation>
+        <translation>ממתין למערכת שתעגון את הנגן מחדש</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
         <source>Player remounted</source>
-        <translation type="unfinished"></translation>
+        <translation>הנגן עוגן מחדש</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="237"/>
         <source>Timeout on remount</source>
-        <translation type="unfinished"></translation>
+        <translation>העגינה ארכה זמן רב מדי</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="146"/>
@@ -153,12 +253,12 @@
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="34"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation></translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ HXF). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="79"/>
         <source>Downloading bootloader file</source>
-        <translation>מוריד קובץ מנהל איתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
 </context>
 <context>
@@ -166,7 +266,7 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="35"/>
         <source>Downloading bootloader</source>
-        <translation>מוריד את מנהל האיתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="44"/>
@@ -201,7 +301,7 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="114"/>
         <source>Can&apos;t restore bootloader file.</source>
-        <translation>לא מצליח לשחזר קובץ איתחול.</translation>
+        <translation>לא מצליח לשחזר את קובץ מנהל האיתחול.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="118"/>
@@ -214,12 +314,12 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="68"/>
         <source>checking MD5 hash of input file ...</source>
-        <translation type="unfinished"></translation>
+        <translation>בודק MD5 hash של קובץ הקלט...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="79"/>
         <source>Could not verify original firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח לאמת קובץ קושחה מקורית</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="94"/>
@@ -229,7 +329,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="98"/>
         <source>MD5 hash ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="105"/>
@@ -239,22 +339,22 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="110"/>
         <source>Descrambling file</source>
-        <translation type="unfinished"></translation>
+        <translation>מפענח קובץ</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="118"/>
         <source>Error in descramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה בפיענוח: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="123"/>
         <source>Downloading bootloader file</source>
-        <translation>מוריד קובץ מנהל איתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="133"/>
         <source>Adding bootloader to firmware file</source>
-        <translation>מוסיף מנהל איתחול לקובץ הקושחה</translation>
+        <translation>מוסיף את מנהל האיתחול לקובץ הקושחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="171"/>
@@ -279,7 +379,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="175"/>
         <source>reading bootloader file failed</source>
-        <translation>קריאת קובץ מנהל איתחול נכשלה</translation>
+        <translation>קריאת קובץ מנהל האיתחול נכשלה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="176"/>
@@ -294,27 +394,32 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="179"/>
         <source>Error in patching: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה בתפירה: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="190"/>
         <source>Error in scramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה בהצפנה (ערבוב): %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="205"/>
         <source>Checking modified firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>בודק את קובץ הקושחה המוסגל</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="207"/>
         <source>Error: modified file checksum wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה: חישוב checksum של קובץ הקושחה המוסגל נכשל</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="215"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
+        <translation>הצלחה: קובץ קושחה מוסגל נוצר</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhex.cpp" line="225"/>
+        <source>Uninstallation not possible, only installation info removed</source>
+        <translation>הסרת ההתקנה אינה אפשרית, רק מידע ההתקנה הוסר</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="246"/>
@@ -329,32 +434,32 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="248"/>
         <source>invalid file: header length wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: אורך הכותרת אינו נכון</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="249"/>
         <source>invalid file: unrecognized header</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: כותרת לא מזוהה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="250"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: שדה &quot;length&quot; אינו תקין</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="251"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: שדה &quot;length2&quot; אינו תקין</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="252"/>
         <source>invalid file: internal checksum error</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: שגיאה פנימית בחישוב checksum</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="253"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>קובץ לא תקין: שדה &quot;length3&quot; אינו תקין</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="254"/>
@@ -364,7 +469,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="49"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
 </context>
 <context>
@@ -389,13 +494,14 @@
         <location filename="../base/bootloaderinstallipod.cpp" line="71"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="158"/>
         <source>Unknown version number in firmware (%1)</source>
-        <translation>מספר גרסה לא מוכר בקושחה (%1)</translation>
+        <translation>מספר גירסה לא מוכר בקושחה (%1)</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="77"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation type="unfinished"></translation>
+        <translation>אזהרה: זוהי גירסת MacPod, רוקבוקס רצה רק על נגני WinPos.
+ראה http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
@@ -416,12 +522,12 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="129"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>מנהל האיתחול הותקן בהצלחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="134"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>כתיבת היומן בוטלה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="171"/>
@@ -441,12 +547,12 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="245"/>
         <source>Error: no mountpoint specified!</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה: נקודת עגינה לא צויינה!</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="250"/>
         <source>Could not open Ipod: permission denied</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח לפתוח את האייפוד: הגישה נדחתה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="254"/>
@@ -479,7 +585,7 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="34"/>
         <source>Downloading bootloader</source>
-        <translation>מוריד מנהל איתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="43"/>
@@ -489,7 +595,7 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="66"/>
         <source>Bootloader successful installed</source>
-        <translation>המנל האיתחול הותקן בהצלחה</translation>
+        <translation>מנהל האיתחול הותקן בהצלחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="78"/>
@@ -544,7 +650,7 @@ This is required to install the bootloader</source>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="87"/>
         <source>Downloading bootloader file</source>
-        <translation>מוריד קובץ מנהל איתחול</translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="79"/>
@@ -579,12 +685,12 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="160"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>מנהל האיתחול הותקן בהצלחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="165"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>כתיבת היומן בוטלה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="259"/>
@@ -634,7 +740,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="178"/>
         <source>Uninstalling bootloader</source>
-        <translation>מסיר התקנת מנהל איתחול</translation>
+        <translation>מסיר את מנהל האיתחול</translation>
     </message>
 </context>
 <context>
@@ -642,48 +748,53 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="34"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="51"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="83"/>
         <location filename="../base/bootloaderinstalltcc.cpp" line="100"/>
         <source>Could not load %1</source>
-        <translation type="unfinished">לא מצליח לטעון את %1</translation>
+        <translation>לא מצליח לטעון את %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="91"/>
         <source>Unknown OF file used: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>משתמש בקובץ קושחה מקורית לא ידוע: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="105"/>
         <source>Patching Firmware...</source>
-        <translation type="unfinished">תופר קושחה...</translation>
+        <translation>תופר קושחה...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="112"/>
         <source>Could not patch firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח לתפור את הקושחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="118"/>
         <source>Could not open %1 for writing</source>
-        <translation type="unfinished">לא מצליח לפתוח את %1 לכתיבה</translation>
+        <translation>לא מצליח לפתוח את %1 לכתיבה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="127"/>
         <source>Could not write firmware file</source>
-        <translation type="unfinished">לא מצליח לכתוב קובץ קושחה</translation>
+        <translation>לא מצליח לכתוב קובץ קושחה</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="132"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
+        <translation>הצלחה: קובץ קושחה מוסגל נוצר</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalltcc.cpp" line="152"/>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation>כדי להסיר את ההתקנה, בצע שדרוג רגיל עם קובץ קושחה מקורי שלא נעשה בו שינוי</translation>
     </message>
 </context>
 <context>
@@ -729,12 +840,12 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../configure.cpp" line="290"/>
         <source>Showing disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>מציג נגנים שאינם מאופשרים</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="291"/>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשרת הצגת נגנים המסומנים כלא מאופשרים. נגנים אלו אינם מומלצים למשתמשי קצה. אנא השתמש באפשרות זו רק אם אתה יודע מה אתה עושה.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="398"/>
@@ -756,7 +867,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../configure.cpp" line="556"/>
         <source>Set Cache Path</source>
-        <translation type="unfinished"></translation>
+        <translation>קבע נתיב מטמון</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="617"/>
@@ -776,7 +887,8 @@ You need to change your player to UMS mode for installation. </source>
         <location filename="../configure.cpp" line="624"/>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
-        <translation type="unfinished"></translation>
+        <translation>נמצא %1 &quot;MacPod&quot;!
+רוקבוקס זקוקה לאייפוד המפורמט בשיטת FAT (נגנים אלי מכונים WinPod) על מנת לרוץ.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="628"/>
@@ -973,7 +1085,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configurefrm.ui" line="95"/>
         <source>Show disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג נגנים שאינם מאופשרים</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="105"/>
@@ -1361,12 +1473,12 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installtalkfrm.ui" line="191"/>
         <source>Generate .talk files for Folders</source>
-        <translation>עבור ספריות .talk צור קבצי</translation>
+        <translation>צור קבצי talk. עבור ספריות</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="178"/>
         <source>Generate .talk files for Files</source>
-        <translation>עבור קבצים .talk צור קבצי</translation>
+        <translation>צור קבצי talk. עבור קבצים</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="138"/>
@@ -1384,7 +1496,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installtalkwindow.cpp" line="56"/>
         <source>Select folder to create talk files</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר את הספריה בה יווצרו קבצי talk</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="91"/>
@@ -1410,72 +1522,72 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installwindow.cpp" line="107"/>
         <source>Backup to %1</source>
-        <translation type="unfinished">גיבוי ל %1</translation>
+        <translation>גיבוי ל %1</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="137"/>
         <source>Mount point is wrong!</source>
-        <translation type="unfinished"></translation>
+        <translation>נקודת העגינה הינה שגויה!</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="174"/>
         <source>Really continue?</source>
-        <translation type="unfinished">באמת להמשיך?</translation>
+        <translation>באמת להמשיך?</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="178"/>
         <source>Aborted!</source>
-        <translation type="unfinished">בוטל!</translation>
+        <translation>בוטל!</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="187"/>
         <source>Beginning Backup...</source>
-        <translation type="unfinished">מתחיל גיבוי...</translation>
+        <translation>מתחיל גיבוי...</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="203"/>
         <source>Backup successful</source>
-        <translation type="unfinished">הגיבוי הסתיים בהצלחה</translation>
+        <translation>הגיבוי הסתיים בהצלחה</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="207"/>
         <source>Backup failed!</source>
-        <translation type="unfinished">הגיבוי נכשל!</translation>
+        <translation>הגיבוי נכשל!</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="238"/>
         <source>Select Backup Filename</source>
-        <translation type="unfinished">בחר את שם קובץ הגיבוי</translation>
+        <translation>בחר את שם קובץ הגיבוי</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="271"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. גירסה נוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה הי r%1 (%2).</translation>
+        <translation>זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. גירסה נוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה הי r%1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="unfinished">&lt;b&gt;זוהי הגרסה המומלצת.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;זוהי הגירסה המומלצת.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="288"/>
         <source>This is the last released version of Rockbox.</source>
-        <translation type="unfinished">זוהי הגירסה המשוחררת האחרונה של רוקבוקס.</translation>
+        <translation>זוהי הגירסה המשוחררת האחרונה של רוקבוקס.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="291"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="unfinished">&lt;b&gt;שים לב:&lt;/b&gt; הגרסה המשוחררת האחרונה היא %1. &lt;b&gt;זוהי הגרסה המומלצת.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;שים לב:&lt;/b&gt; הגירסה המשוחררת האחרונה היא %1. &lt;b&gt;זוהי הגירסה המומלצת.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="303"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation type="unfinished">גרסאות אלו נבנות אוטומטית בכל יום מקוד המקור העדכני. לגרסאות אלו תכונות רבות יותר מהגרסה היציבה, אך מאידך הן עלולות להיות יציבות פחות. תכונות עשויות להשתנות לעיתים קרובות.</translation>
+        <translation>גירסאות אלו נבנות אוטומטית בכל יום מקוד המקור העדכני. לגירסאות אלו תכונות רבות יותר מהגירסה היציבה, אך מאידך הן עלולות להיות יציבות פחות. תכונות עשויות להשתנות לעיתים קרובות.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="307"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;שים לב:&lt;/b&gt; גרסת הארכיב היא r%1 (%2).</translation>
+        <translation>&lt;b&gt;שים לב:&lt;/b&gt; גירסת הארכיב היא r%1 (%2).</translation>
     </message>
 </context>
 <context>
@@ -1483,87 +1595,87 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installwindowfrm.ui" line="16"/>
         <source>Install Rockbox</source>
-        <translation type="unfinished">התקן את רוקבוקס</translation>
+        <translation>התקן את רוקבוקס</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="35"/>
         <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation type="unfinished">אנא בחר את גרסת הרוקבוקס שברצונך להתקין על הנגן:</translation>
+        <translation>אנא בחר את גירסת הרוקבוקס שברצונך להתקין על הנגן:</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="45"/>
         <source>Version</source>
-        <translation type="unfinished"></translation>
+        <translation>גירסה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="51"/>
         <source>Rockbox &amp;stable</source>
-        <translation type="unfinished">גרסה &amp;יציבה</translation>
+        <translation>גירסה &amp;יציבה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="58"/>
         <source>&amp;Archived Build</source>
-        <translation type="unfinished">גרסת &amp;ארכיון</translation>
+        <translation>גירסת &amp;ארכיון</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="65"/>
         <source>&amp;Current Build</source>
-        <translation type="unfinished">גרסה &amp;נוכחית</translation>
+        <translation>גירסה &amp;נוכחית</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="75"/>
         <source>Details</source>
-        <translation type="unfinished">פרטים</translation>
+        <translation>פרטים</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="81"/>
         <source>Details about the selected version</source>
-        <translation type="unfinished">פרטים אודות הגרסה שנבחרה</translation>
+        <translation>פרטים אודות הגירסה שנבחרה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="91"/>
         <source>Note</source>
-        <translation type="unfinished">הערה</translation>
+        <translation>הערה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="119"/>
         <source>&amp;Install</source>
-        <translation type="unfinished">&amp;התקנה</translation>
+        <translation>&amp;התקנה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="130"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;ביטול</translation>
+        <translation>&amp;ביטול</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="156"/>
         <source>Backup</source>
-        <translation type="unfinished">גיבוי</translation>
+        <translation>גיבוי</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="162"/>
         <source>Backup before installing</source>
-        <translation type="unfinished">גיבוי לפני התקנה</translation>
+        <translation>גיבוי לפני התקנה</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="169"/>
         <source>Backup location</source>
-        <translation type="unfinished">מיקום הגיבוי</translation>
+        <translation>מיקום הגיבוי</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="188"/>
         <source>Change</source>
-        <translation type="unfinished">שינוי</translation>
+        <translation>שינוי</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="198"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation type="unfinished">תוכנת השירות של רוקבוקס מאחסנת עותקים של רוקבוקס שהיא הורידה על הדיסק הקשיח המקומי על מנת לחסוך בתעבורת רשת. אם העותק המקומי שלך אינו עובד יותר, סמן תיבה זו על מנת להוריד עותק חדש.</translation>
+        <translation>תוכנת השירות של רוקבוקס מאחסנת עותקים של רוקבוקס שהיא הורידה על הדיסק הקשיח המקומי על מנת לחסוך בתעבורת רשת. אם העותק המקומי שלך אינו עובד יותר, סמן תיבה זו על מנת להוריד עותק חדש.</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="201"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation type="unfinished">&amp;אל תשתמש בעותק שמור מקומי</translation>
+        <translation>&amp;אל תשתמש בעותק שמור מקומי</translation>
     </message>
 </context>
 <context>
@@ -1648,13 +1760,15 @@ Select your device and Mountpoint manually.</source>
         <location filename="../base/utils.cpp" line="180"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation></translation>
+        <translation>&lt;li&gt;הרשאות אינן מספיקות להתקנת מנהל איתחול.
+הרשאות מנהל הינן הכרחיות&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="192"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation></translation>
+        <translation>&lt;li&gt;זוהה סוג נגן שגוי.
+נגן קיים: %1, הנגן שנבחר: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="199"/>
@@ -1678,12 +1792,12 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <location filename="../rbutilqt.cpp" line="197"/>
         <location filename="../rbutilqt.cpp" line="229"/>
         <source>Downloading build information, please wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>מוריד מידע גירסאות, אנא המתן...</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="208"/>
         <source>Can&apos;t get version information!</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח לקבל את מידע הגירסאות!</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="335"/>
@@ -1693,7 +1807,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="336"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
-        <translation>זוהי התקנה חדשה של תוכנת השירות של רוקבוקס, או גרסה חדשה. תיבת השיח של ההגדרות תיפתח כעת על מנת לאפשר לך להגדיר את התוכנית, או לעבור על ההגדרות הקיימות.</translation>
+        <translation>זוהי התקנה חדשה של תוכנת השירות של רוקבוקס, או גירסה חדשה. תיבת השיח של ההגדרות תיפתח כעת על מנת לאפשר לך להגדיר את התוכנית, או לעבור על ההגדרות הקיימות.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="343"/>
@@ -1709,7 +1823,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="244"/>
         <source>Download build information finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>הורדת מידע הגירסאות הסתיימה.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="257"/>
@@ -1755,7 +1869,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <location filename="../rbutilqt.cpp" line="505"/>
         <location filename="../rbutilqt.cpp" line="1116"/>
         <source>Mount point is wrong!</source>
-        <translation>נקודת העיגון הינה שגויה!</translation>
+        <translation>נקודת העגינה הינה שגויה!</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="573"/>
@@ -1805,7 +1919,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="875"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation>תוכנית השרות עדיין מורידה מידע לגבי גרסאות חדשות. אנא נסה שוב בקרוב.</translation>
+        <translation>תוכנית השרות עדיין מורידה מידע לגבי גירסאות חדשות. אנא נסה שוב בקרוב.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="881"/>
@@ -1835,7 +1949,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="999"/>
         <source>Do you really want to uninstall the Bootloader?</source>
-        <translation>האם באמת ברצונת להסיר את מנהל האיתחול?</translation>
+        <translation>האם באמת ברצונך להסיר את מנהל האיתחול?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1054"/>
@@ -1895,7 +2009,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="1317"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation></translation>
+        <translation>&lt;b&gt;קיימת גירסה חדשה של תוכנית השרות&lt;/b&gt; &lt;br&gt;&lt;br&gt;ניתן להורידה מכאן: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="209"/>
@@ -1920,12 +2034,12 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="714"/>
         <source>Bootloader detected</source>
-        <translation>מנהל איתחול זוהה</translation>
+        <translation>מנהל האיתחול זוהה</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="715"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
-        <translation>מנהל איתחול כבר מותקן. האם אתה באמת רוצה להתקין מחדש את מנהל האיתחול?</translation>
+        <translation>מנהל האיתחול כבר מותקן. האם אתה באמת רוצה להתקין מחדש את מנהל האיתחול?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="738"/>
@@ -2126,7 +2240,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="400"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
-        <translation>&lt;b&gt;התקנת קבצי משחק&lt;/b&gt;&lt;br/&gt; בסיסי על מנת לרוץ wad דום זקוקה לקובץ.</translation>
+        <translation>&lt;b&gt;התקנת קבצי משחק&lt;/b&gt;&lt;br/&gt; דום זקוקה לקובץ wad בסיסי על מנת לרוץ.</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="437"/>
@@ -2185,7 +2299,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="561"/>
         <source>Uninstall Bootloader</source>
-        <translation>הסרת התקנת מנהל האיתחול</translation>
+        <translation>הסרת מנהל האיתחול</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="578"/>
@@ -2429,22 +2543,22 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../base/serverinfo.cpp" line="72"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ידוע</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="76"/>
         <source>Unusable</source>
-        <translation type="unfinished"></translation>
+        <translation>לא שמיש</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="79"/>
         <source>Unstable</source>
-        <translation type="unfinished"></translation>
+        <translation>לא יציב</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="82"/>
         <source>Stable</source>
-        <translation type="unfinished"></translation>
+        <translation>יציב</translation>
     </message>
 </context>
 <context>
@@ -2486,7 +2600,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../systracefrm.ui" line="79"/>
         <source>Save &amp;previous</source>
-        <translation type="unfinished"></translation>
+        <translation>שמור &amp;קודם</translation>
     </message>
 </context>
 <context>
@@ -2550,22 +2664,22 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../base/ttscarbon.cpp" line="130"/>
         <source>Voice:</source>
-        <translation type="unfinished">קול:</translation>
+        <translation>קול:</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="136"/>
         <source>Speed (words/min):</source>
-        <translation type="unfinished"></translation>
+        <translation>מהירות (מילים/דקה):</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="200"/>
         <source>Could not voice string</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח להקריא את המחרוזת</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="209"/>
         <source>Could not convert intermediate file</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח להמיר קובץ ביניים</translation>
     </message>
 </context>
 <context>
@@ -2677,7 +2791,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../base/talkfile.cpp" line="267"/>
         <source>Cleaning up...</source>
-        <translation type="unfinished">מנקה...</translation>
+        <translation>מנקה...</translation>
     </message>
     <message>
         <location filename="../base/talkfile.cpp" line="278"/>
@@ -2840,13 +2954,13 @@ Please check your network and proxy settings.</source>
         <location filename="../themesinstallwindow.cpp" line="208"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translatorcomment>Keep in English</translatorcomment>
-        <translation type="unfinished">&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+        <translation>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="210"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translatorcomment>Keep in English</translatorcomment>
-        <translation type="unfinished">&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</translation>
+        <translation>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="211"/>
@@ -2866,7 +2980,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../themesinstallwindow.cpp" line="333"/>
         <source>Mount point is wrong!</source>
-        <translation>נקודת העיגון שגויה!</translation>
+        <translation>נקודת העגינה הינה שגויה!</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="38"/>
@@ -2881,7 +2995,7 @@ Please check your network and proxy settings.</source>
     <message numerus="yes">
         <location filename="../themesinstallwindow.cpp" line="177"/>
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>גודל הורדה kiB %L1 (פריט אחד)</numerusform>
             <numerusform>גודל הורדה kiB %L1 (%n פריטים)</numerusform>
         </translation>
@@ -3046,12 +3160,12 @@ HTTP response code: %1</translation>
     <message>
         <location filename="../base/uninstall.cpp" line="52"/>
         <source>Uninstalling %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>מסיר %1...</translation>
     </message>
     <message>
         <location filename="../base/uninstall.cpp" line="83"/>
         <source>Could not delete %1</source>
-        <translation type="unfinished"></translation>
+        <translation>לא הצלחתי למחוק את %1</translation>
     </message>
     <message>
         <location filename="../base/uninstall.cpp" line="113"/>
