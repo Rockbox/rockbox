@@ -422,7 +422,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
-#if 0
+#ifdef HAVE_RECORDING
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
 #endif
