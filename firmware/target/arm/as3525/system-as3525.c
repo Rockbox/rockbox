@@ -254,6 +254,7 @@ void system_init(void)
     CCU_SCON = 1; /* AHB master's priority configuration :
                      TIC (Test Interface Controller) > DMA > USB > IDE > ARM */
 
+    CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
     asm volatile(
