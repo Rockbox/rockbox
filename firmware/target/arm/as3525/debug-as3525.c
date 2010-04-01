@@ -123,9 +123,11 @@ static int calc_freq(int clk)
             return 0;
 #endif
         case CLK_PROC:
+#if CONFIG_CPU == AS3525 /* not in arm926-ejs */
             if (!(read_cp15()>>30))                 /* fastbus */
                 return calc_freq(CLK_PCLK);
             else                                    /* Synch or Asynch bus*/
+#endif /* CONFIG_CPU == AS3525 */
                 return calc_freq(CLK_FCLK);
         case CLK_FCLK:
             switch(CGU_PROC & 3) {
@@ -256,11 +258,11 @@ bool __dbg_hw_info(void)
         lcd_puts(0, line++, "     SET       ACTUAL");
 #if CONFIG_CPU == AS3525
         lcd_putsf(0, line++, "922T:%s     %3dMHz",
-#else
-        lcd_putsf(0, line++, "926ejs:%s   %3dMHz",
-#endif
                                         (!(read_cp15()>>30)) ? "FAST " :
                                         (read_cp15()>>31) ? "ASYNC" : "SYNC ",
+#else
+        lcd_putsf(0, line++, "926ejs:        %3dMHz",
+#endif
                                          calc_freq(CLK_PROC)/1000000);
         lcd_putsf(0, line++, "PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
                                                    calc_freq(CLK_PLLA)/1000000);

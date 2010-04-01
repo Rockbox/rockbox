@@ -257,6 +257,7 @@ void system_init(void)
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
+    /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
         "mrc p15, 0, r0, c1, c0   \n"      /* control register */
         "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
@@ -351,6 +352,7 @@ void set_cpu_frequency(long frequency)
         while(adc_read(ADC_CVDD) < 470); /* 470 * .0025 = 1.175V */
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
+#if CONFIG_CPU == AS3525    /* only in arm922tdmi */
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
 
@@ -363,16 +365,27 @@ void set_cpu_frequency(long frequency)
 
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
+#else
+    CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
+                (AS3525_FCLK_PREDIV  << 2) |
+                 AS3525_FCLK_SEL);
+#endif /* CONFIG_CPU == AS3525 */
 
         cpu_frequency = CPUFREQ_MAX;
     }
     else
     {
+#if CONFIG_CPU == AS3525    /* only in arm922tdmi */
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
             "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
+#else
+    CGU_PROC = ((AS3525_FCLK_POSTDIV_UNBOOSTED << 4) |
+                (AS3525_FCLK_PREDIV  << 2) |
+                 AS3525_FCLK_SEL);
+#endif /* CONFIG_CPU == AS3525 */
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Decreasing frequency so reduce voltage after change */
