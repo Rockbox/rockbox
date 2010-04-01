@@ -115,7 +115,6 @@ static void as3525_dbop_init(void)
 
 static inline void dbop_set_mode(int mode)
 {
-    int delay = 10;
     unsigned long ctrl = DBOP_CTRL;
     int words = (ctrl >> 13) & 3; // bits 14:13
     if (mode == 32 && words != 2)
@@ -124,7 +123,7 @@ static inline void dbop_set_mode(int mode)
         DBOP_CTRL = (ctrl & ~(1<<14)) | (1<<13); // 2 serial words
     else
         return;
-    while(delay--) asm volatile("nop");
+    lcd_delay(10);
 }
 
 static void dbop_write_data(const int16_t* p_bytes, int count)
@@ -166,7 +165,7 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
 static void lcd_write_cmd(unsigned short cmd)
 {
     volatile int i;
-    for(i=0;i<0x20;i++) asm volatile ("nop\n");
+    lcd_delay(0x20);
 
     DBOP_CTRL |= 1<<13;
     DBOP_CTRL &= ~(1<<14);  // 2 serial words
