@@ -99,7 +99,6 @@ class RbUtilQt : public QMainWindow
         void createTalkFiles(void);
         void createVoiceFile(void);
         void downloadDone(bool);
-        void downloadDone(int, bool);
         void downloadBleedingDone(bool);
         void downloadInfo(void);
 
