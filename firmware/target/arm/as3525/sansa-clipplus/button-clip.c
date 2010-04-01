@@ -33,21 +33,10 @@ void button_init_device(void)
     GPIOB_DIR |= (1<<0);                /* Pin B0 set output */
 }
 
-bool button_hold(void)
-{
-    /*  TODO  OF uses long home(A1) press.  Just return false for now  */
-    return false;
-}
-
 int button_read_device(void)
 {
     int buttons = 0;
 
-    /* TODO No hold button  Hold toggled by long home(A1) press in OF  */
-    if(button_hold())
-    {
-        return 0;
-    }
     /*  Buttons do not appear to need reset */
     /*  D6 needs special handling though   */
 

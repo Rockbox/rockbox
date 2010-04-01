@@ -27,7 +27,6 @@
 
 void button_init_device(void);
 int button_read_device(void);
-bool button_hold(void);
 
 /* Main unit's buttons */
 #define BUTTON_HOME         0x00000001
