@@ -31,6 +31,12 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 unsigned short button_read_dbop(void);
+#define get_scrollwheel button_read_dbop
+
+#define WHEEL_REPEAT_INTERVAL   (HZ/5)
+#define WHEEL_COUNTER_DIV       2
+#define ACCEL_INCREMENT         3
+#define ACCEL_SHIFT             1
 
 /* Sandisk Sansa E200 button codes */
 

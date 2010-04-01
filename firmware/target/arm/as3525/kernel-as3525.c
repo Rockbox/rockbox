@@ -44,7 +44,7 @@ static inline void do_scrollwheel(void)
     else
     {
         if (!button_hold())
-            button_read_dbop(); /* Read the scrollwheel */
+            get_scrollwheel(); /* Read the scrollwheel */
     }
 
     poll_scrollwheel ^= 1;

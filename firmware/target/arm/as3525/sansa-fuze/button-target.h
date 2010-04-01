@@ -31,6 +31,13 @@ void button_init_device(void);
 bool button_hold(void);
 int button_read_device(void);
 unsigned short button_read_dbop(void);
+#define get_scrollwheel button_read_dbop
+
+#define WHEEL_REPEAT_INTERVAL   (HZ/5)
+#define WHEEL_COUNTER_DIV       4
+#define ACCEL_INCREMENT         2
+#define ACCEL_SHIFT             2
+
 /* Sandisk Sansa Fuze button codes */
 
 /* Main unit's buttons */

@@ -24,20 +24,49 @@
 #include "button.h"
 #include "backlight.h"
 
-/*
- * TODO: Scrollwheel!
- */
- 
+extern void scrollwheel(unsigned wheel_value);
+
 #ifdef HAS_BUTTON_HOLD
 static bool hold_button = false;
 #endif
 void button_init_device(void)
+{   /* activate the wheel */
+    volatile int i;
+    GPIOB_DIR |= 1<<4;
+    for(i = 20; i; i--) nop;
+    GPIOB_PIN(4) = 0x10;
+}
+
+unsigned read_GPIOA_67(void)
 {
+    unsigned ret = 0;
+    volatile int i;
+    DBOP_CTRL |= 1<<19;
+    for(i = 20; i; i--) nop;
+    GPIOA_DIR &= ~0xc0;
+    for(i = 20; i; i--) nop;
+    if (GPIOA_PIN(6) != 0)
+        ret = 1<<0;
+    for(i = 20; i; i--) nop;
+    if (GPIOA_PIN(7) != 0)
+        ret |= 1<<1;
+    DBOP_CTRL &= ~(1<<19);
+    for(i = 20; i; i--) nop;
+    return ret;
+}
+
+void get_scrollwheel(void)
+{
+#if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
+    /* scroll wheel handling */
+    scrollwheel(read_GPIOA_67());
+#endif
 }
 
 /*
  * Get button pressed from hardware
  */
+
 
 int button_read_device(void)
 {
@@ -48,6 +77,7 @@ int button_read_device(void)
     unsigned gpiod = GPIOD_DATA;
     unsigned gpioa_dir = GPIOA_DIR;
     unsigned gpiod6;
+    get_scrollwheel();
     for(delay = 500; delay; delay--) nop;
     CCU_IO &= ~(1<<12);
     for(delay=8;delay;delay--) nop;
