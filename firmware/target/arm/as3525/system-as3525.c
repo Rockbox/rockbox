@@ -255,7 +255,13 @@ void system_init(void)
                      TIC (Test Interface Controller) > DMA > USB > IDE > ARM */
 
     CGU_PROC = 0;           /* fclk 24 MHz */
+#if CONFIG_CPU == AS3525v2
+    /* pclk is always based on PLLA, since we don't know the current PLLA speed,
+     * avoid having pclk too fast and hope it's not too low */
+    CGU_PERI |= 0xf << 2;   /* pclk lowest */
+#else
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
+#endif
 
     /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
