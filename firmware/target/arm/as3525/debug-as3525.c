@@ -143,7 +143,13 @@ static int calc_freq(int clk)
                     return 0;
             }
         case CLK_EXTMEM:
+        /* bits 1:0 of CGU_PERI always read as 0 and we assume source = PLLA */
+#if CONFIG_CPU == AS3525
             switch(CGU_PERI & 3) {
+#else
+        /* bits 1:0 of CGU_PERI always read as 0 and we assume source = PLLA */
+            switch(1) {
+#endif
                 case 0:
                     return CLK_MAIN/(((CGU_PERI>>2)& 0xf)+1);
                 case 1:
@@ -151,9 +157,8 @@ static int calc_freq(int clk)
                 case 2:
                     return calc_freq(CLK_PLLB)/(((CGU_PERI>>2)& 0xf)+1);
                 case 3:
-                    return calc_freq(CLK_FCLK)/(((CGU_PERI>>2)& 0xf)+1);
                 default:
-                    return 0;
+                    return calc_freq(CLK_FCLK)/(((CGU_PERI>>2)& 0xf)+1);
             }
         case CLK_PCLK:
             return calc_freq(CLK_EXTMEM)/(((CGU_PERI>>6)& 0x1)+1);

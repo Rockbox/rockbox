@@ -70,7 +70,11 @@
 #define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
 
 /* XXX: CGU_PERI might also be different (i.e. no PCLK_DIV1_SEL), but if we use
- * the same frequency for DRAM & PCLK it's not a problem as the bit is unset */
+ * the same frequency for DRAM & PCLK it's not a problem as the bit is unset
+ *
+ * Note that setting bits 1:0 have no effect and they always read back as 0
+ * Perhaps it means CGU_PERI defaults to PLLA as source ?
+ */
 #define AS3525_DRAM_FREQ        60000000    /* Initial DRAM frequency  */
 #define AS3525_PCLK_FREQ        AS3525_DRAM_FREQ/1
 
