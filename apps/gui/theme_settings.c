@@ -33,6 +33,7 @@
 #include "skin_engine/skin_engine.h"
 #include "skin_engine/skin_fonts.h"
 #include "statusbar-skinned.h"
+#include "bootchart.h"
 
 
 /* call this after loading a .wps/.rwps or other skin files, so that the
@@ -73,6 +74,7 @@ void settings_apply_skins(void)
 #ifdef HAVE_REMOTE_LCD
         screen = skins[i].suffix[0] == 'r' ? SCREEN_REMOTE : SCREEN_MAIN;
 #endif
+        CHART2(">skin load ", skins[i].suffix);
         if (skins[i].setting[0] && skins[i].setting[0] != '-')
         {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.%s",
@@ -83,6 +85,7 @@ void settings_apply_skins(void)
         {
             skins[i].loadfunc(screen, NULL, true);
         }
+        CHART2("<skin load ", skins[i].suffix);
     }
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1

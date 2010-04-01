@@ -70,6 +70,7 @@
 #include "skin_engine/skin_engine.h"
 #include "viewport.h"
 #include "statusbar-skinned.h"
+#include "bootchart.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -745,6 +746,7 @@ void settings_apply(bool read_disk)
 {
     
     char buf[64];
+    int rc;
 #if CONFIG_CODEC == SWCODEC
     int i;
 #endif
@@ -841,7 +843,10 @@ void settings_apply(bool read_disk)
             && global_settings.font_file[0] != '-') {
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
-            if (font_load(NULL, buf) < 0)
+            CHART2(">font_load ", global_settings.font_file);
+            rc = font_load(NULL, buf);
+            CHART2("<font_load ", global_settings.font_file);
+            if (rc < 0)
                 font_reset(NULL);
         }
         else
@@ -851,7 +856,10 @@ void settings_apply(bool read_disk)
             && global_settings.remote_font_file[0] != '-') {
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.remote_font_file);
-            if (font_load_remoteui(buf) < 0)
+            CHART2(">font_load_remoteui ", global_settings.remote_font_file);
+            rc = font_load_remoteui(buf);
+            CHART2("<font_load_remoteui ", global_settings.remote_font_file);
+            if (rc < 0)
                 font_load_remoteui(NULL);
         }
         else
@@ -860,7 +868,9 @@ void settings_apply(bool read_disk)
         if ( global_settings.kbd_file[0]) {
             snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
                      global_settings.kbd_file);
+            CHART(">load_kbd");
             load_kbd(buf);
+            CHART("<load_kbd");
         }
         else
             load_kbd(NULL);
@@ -869,16 +879,26 @@ void settings_apply(bool read_disk)
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
+            CHART(">lang_core_load");
             lang_core_load(buf);
+            CHART("<lang_core_load");
+            CHART(">talk_init");
             talk_init(); /* use voice of same language */
+            CHART("<talk_init");
         }
 
         /* load the icon set */
+        CHART(">icons_init");
         icons_init();
+        CHART("<icons_init");
 
 #ifdef HAVE_LCD_COLOR
         if (global_settings.colors_file[0])
+        {
+            CHART(">read_color_theme_file");
             read_color_theme_file();
+            CHART("<read_color_theme_file");
+        }
 #endif
     }
 #ifdef HAVE_LCD_COLOR
@@ -901,7 +921,9 @@ void settings_apply(bool read_disk)
     lcd_scroll_delay(global_settings.scroll_delay);
 
 
+    CHART(">set_codepage");
     set_codepage(global_settings.default_codepage);
+    CHART("<set_codepage");
 
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_CROSSFADE
@@ -966,7 +988,9 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAVE_LCD_BITMAP
     /* already called with THEME_STATUSBAR in settings_apply_skins() */
+    CHART(">viewportmanager_theme_changed");
     viewportmanager_theme_changed(THEME_UI_VIEWPORT|THEME_LANGUAGE|THEME_BUTTONBAR);
+    CHART("<viewportmanager_theme_changed");
 #endif
 }
 

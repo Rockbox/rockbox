@@ -12,6 +12,7 @@
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
+use_bootchart="#undef DO_BOOTCHART"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
@@ -366,7 +367,7 @@ whichadvanced () {
     interact=1
     echo ""
     echo "Enter your developer options (press enter when done)"
-    printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile"
+    printf "(D)EBUG, (L)ogf, (B)ootchart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile"
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
@@ -405,6 +406,11 @@ whichadvanced () {
         ;;
       [Ll])
         echo "logf() support enabled"
+        logf="yes"
+        ;;
+      [Bb])
+          echo "bootchart enabled (logf also enabled)"
+        bootchart="yes"
         logf="yes"
         ;;
       [Ss])
@@ -492,6 +498,9 @@ whichadvanced () {
   fi
   if [ "yes" = "$logf" ]; then
     use_logf="#define ROCKBOX_HAS_LOGF 1"
+  fi
+  if [ "yes" = "$bootchart" ]; then
+    use_bootchart="#define DO_BOOTCHART 1"
   fi
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
@@ -2904,6 +2913,7 @@ fi
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
+ -e "s,^#undef DO_BOOTCHART,$use_bootchart,g" \
  -e "s,@config_rtc@,$config_rtc,g" \
  -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
  -e "s,@RBDIR@,${rbdir},g" \
@@ -2920,6 +2930,9 @@ sed > autoconf.h \
 
 /* Define this if you build rockbox to support the logf logging and display */
 #undef ROCKBOX_HAS_LOGF
+
+/* Define this to record a chart with timings for the stages of boot */
+#undef DO_BOOTCHART
 
 /* optional define for a backlight modded Ondio */
 @have_backlight@

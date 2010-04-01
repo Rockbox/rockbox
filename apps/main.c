@@ -75,6 +75,7 @@
 #include "icon.h"
 #include "viewport.h"
 #include "statusbar-skinned.h"
+#include "bootchart.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -136,7 +137,9 @@ int main(void)
 #endif
 {
     int i;
+    CHART(">init");
     init();
+    CHART("<init");
     FOR_NB_SCREENS(i)
     {
         screens[i].clear_display();
@@ -167,6 +170,7 @@ int main(void)
     global_status.last_volume_change = 0;
     /* no calls INIT_ATTR functions after this point anymore!
      * see definition of INIT_ATTR in config.h */
+    CHART(">root_menu");
     root_menu();
 }
 
@@ -414,13 +418,18 @@ static void init(void)
 #ifdef CPU_ARM
     enable_fiq();
 #endif
+    /* current_tick should be ticking by now */
+    CHART("ticking");
+
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
     font_init();
 
+    CHART(">show_logo");
     show_logo();
+    CHART("<show_logo");
     lang_init(core_language_builtin, language_strings, 
               LANG_LAST_INDEX_IN_ARRAY);
 
@@ -436,7 +445,9 @@ static void init(void)
     rtc_init();
 #endif
 #ifdef HAVE_RTC_RAM
+    CHART(">settings_load(RTC)");
     settings_load(SETTINGS_RTC); /* early load parts of global_settings */
+    CHART("<settings_load(RTC)");
 #endif
 
     adc_init();
@@ -460,10 +471,18 @@ static void init(void)
 
     /* Keep the order of this 3 (viewportmanager handles statusbars)
      * Must be done before any code uses the multi-screen API */
+    CHART(">gui_syncstatusbar_init");
     gui_syncstatusbar_init(&statusbars);
+    CHART("<gui_syncstatusbar_init");
+    CHART(">sb_skin_init");
     sb_skin_init();
+    CHART("<sb_skin_init");
+    CHART(">gui_sync_wps_init");
     gui_sync_wps_init();
+    CHART("<gui_sync_wps_init");
+    CHART(">viewportmanager_init");
     viewportmanager_init();
+    CHART("<viewportmanager_init");
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
     /* charger_inserted() can't be used here because power_thread()
@@ -483,7 +502,9 @@ static void init(void)
     }
 #endif
 
+    CHART(">storage_init");
     rc = storage_init();
+    CHART("<storage_init");
     if(rc)
     {
 #ifdef HAVE_LCD_BITMAP
@@ -498,7 +519,9 @@ static void init(void)
     }
 
 #ifdef HAVE_EEPROM_SETTINGS
+    CHART(">eeprom_settings_init");
     eeprom_settings_init();
+    CHART("<eeprom_settings_init");
 #endif
 
 #ifndef HAVE_USBSTACK
@@ -527,7 +550,9 @@ static void init(void)
 
     if (!mounted)
     {
+        CHART(">disk_mount_all");
         rc = disk_mount_all();
+        CHART("<disk_mount_all");
         if (rc<=0)
         {
             lcd_clear_display();
@@ -561,19 +586,32 @@ static void init(void)
     }
     else
 #endif
+    {
+        CHART(">settings_load(ALL)");
         settings_load(SETTINGS_ALL);
+        CHART("<settings_load(ALL)");
+    }
 
-    if (init_dircache(true) < 0)
+    CHART(">init_dircache(true)");
+    rc = init_dircache(true);
+    CHART("<init_dircache(true");
+    if (rc < 0)
     {
 #ifdef HAVE_TAGCACHE
         remove(TAGCACHE_STATEFILE);
 #endif
     }
 
+    CHART(">settings_apply(true)");
     settings_apply(true);        
+    CHART("<settings_apply(true)");
+    CHART(">init_dircache(false)");
     init_dircache(false);
+    CHART("<init_dircache(false)");
 #ifdef HAVE_TAGCACHE
+    CHART(">init_tagcache");
     init_tagcache();
+    CHART("<init_tagcache");
 #endif
 
 #ifdef HAVE_EEPROM_SETTINGS
@@ -581,7 +619,9 @@ static void init(void)
     {
         /* In case we crash. */
         firmware_settings.disk_clean = false;
+        CHART(">eeprom_settings_store");
         eeprom_settings_store();
+        CHART("<eeprom_settings_store");
     }
 #endif
     playlist_init();
@@ -614,7 +654,9 @@ static void init(void)
     talk_init();
 #endif /* CONFIG_CODEC != SWCODEC */
 
+    CHART(">audio_init");
     audio_init();
+    CHART("<audio_init");
 
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
     pcm_rec_init();
@@ -636,9 +678,13 @@ static void init(void)
     lineout_set(global_settings.lineout_active);
 #endif
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+    CHART("<check_bootfile(false)");
     check_bootfile(false); /* remember write time and filesize */
+    CHART(">check_bootfile(false)");
 #endif
+    CHART("<settings_apply_skins");
     settings_apply_skins();
+    CHART(">settings_apply_skins");
 }
 
 #ifdef CPU_PP
