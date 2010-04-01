@@ -29,32 +29,46 @@ enum plugin_status plugin_start(const void* parameter)
     bool done = false;
     bool boost = false;
     int count = 0;
+    int last_count = 0;
+    int last_tick = *rb->current_tick;
+    int per_sec = 0;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
     while (!done)
     {
-        char buf[32];
         int j,x;
         for (j=1; j<100000; j++)
             x = j*11;
-        rb->lcd_clear_display();
-        rb->snprintf(buf,sizeof buf, "%s %d",boost?"boost":"normal",count);
-        rb->lcd_putsxy(0, 0, buf);
-        rb->lcd_update();
+        rb->screens[0]->clear_display();
+        rb->screens[0]->putsf(0, 0, "%s: %d",boost?"boost":"normal",count);
+        if (TIME_AFTER(*rb->current_tick, last_tick+HZ))
+        {
+            last_tick = *rb->current_tick;
+            per_sec = count-last_count;
+            last_count = count;
+        }
+        rb->screens[0]->putsf(0, 1, "loops/s: %d", per_sec);
+        rb->screens[0]->update();
         count++;
 
         int button = rb->button_get(false);
         switch (button)
         {
             case BUTTON_UP:
-                boost = true;
-                rb->cpu_boost(boost);
+                if (!boost)
+                {
+                    rb->cpu_boost(true);
+                    boost = true;
+                }
                 break;
 
             case BUTTON_DOWN:
-                boost = false;
-                rb->cpu_boost(boost);
+                if (boost)
+                {
+                    rb->cpu_boost(false);
+                    boost = false;
+                }
                 break;
 
             case BUTTON_LEFT:
