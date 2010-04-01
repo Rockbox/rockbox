@@ -214,3 +214,5 @@
 #define IRAMORIG 0x40004000
 #endif
 
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

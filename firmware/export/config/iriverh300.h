@@ -204,3 +204,6 @@
 #define MIN_REMOTE_CONTRAST_SETTING     5
 #define MAX_REMOTE_CONTRAST_SETTING     63
 #define DEFAULT_REMOTE_CONTRAST_SETTING 42 
+
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

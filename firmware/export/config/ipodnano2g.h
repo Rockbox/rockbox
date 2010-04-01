@@ -221,3 +221,5 @@
 
 #define USB_WRITE_BUFFER_SIZE (1024*64)
 
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

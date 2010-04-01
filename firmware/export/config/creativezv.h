@@ -165,3 +165,5 @@
 #define USB_PRODUCT_ID 0x4133
 #define USB_NUM_ENDPOINTS 7
 
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

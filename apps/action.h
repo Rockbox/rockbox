@@ -136,6 +136,7 @@ enum {
     ACTION_WPS_ABSETA_PREVDIR, /* these should be safe to put together seen as */
     ACTION_WPS_ABSETB_NEXTDIR, /* you shouldnt want to change dir in ab-mode */
     ACTION_WPS_ABRESET,
+    ACTION_WPS_HOTKEY,
     
     /* list and tree page up/down */    
     ACTION_LISTTREE_PGUP,/* optional */
@@ -151,6 +152,7 @@ enum {
     ACTION_TREE_PGRIGHT,/* optional */
     ACTION_TREE_STOP,
     ACTION_TREE_WPS,
+    ACTION_TREE_HOTKEY,
     
     /* radio */
     ACTION_FM_MENU,

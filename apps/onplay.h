@@ -21,7 +21,7 @@
 #ifndef _ONPLAY_H_
 #define _ONPLAY_H_
 
-int onplay(char* file, int attr, int from_screen);
+int onplay(char* file, int attr, int from_screen, bool hotkey);
 
 enum {
     ONPLAY_MAINMENU = -1,

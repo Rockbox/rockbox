@@ -174,3 +174,5 @@
 #define BUTTON_DEBUG
 */
 
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

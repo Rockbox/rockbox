@@ -200,3 +200,5 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

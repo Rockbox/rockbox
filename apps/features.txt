@@ -70,6 +70,10 @@ hold_button
 remote_button_hold
 #endif
 
+#if defined(HAVE_HOTKEY)
+hotkey
+#endif
+
 #if defined(HAVE_LCD_BITMAP)
 lcd_bitmap
 #endif

@@ -194,3 +194,5 @@
 
 #define INCLUDE_TIMEOUT_API
 
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

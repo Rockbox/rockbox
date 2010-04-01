@@ -216,3 +216,6 @@
 #define DEFAULT_REMOTE_CONTRAST_SETTING 42
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

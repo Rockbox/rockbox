@@ -178,3 +178,5 @@
 #define MAX_BRIGHTNESS_SETTING      15
 #define DEFAULT_BRIGHTNESS_SETTING  10
 
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

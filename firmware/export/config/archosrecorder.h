@@ -134,3 +134,5 @@
 #define MAX_CONTRAST_SETTING        63
 
 #define HAVE_SERIAL
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY

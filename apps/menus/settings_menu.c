@@ -47,6 +47,10 @@
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
+#ifdef HAVE_HOTKEY
+#include "list.h"
+#include "settings_list.h"
+#endif
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -400,6 +404,58 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 
 
 /***********************************/
+/*    HOTKEY MENU                  */
+#ifdef HAVE_HOTKEY
+static void view_hotkey_info(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, str(LANG_VIEW_HOTKEY), 0, NULL);
+    info.hide_selection = true;
+    simplelist_set_line_count(2);
+    simplelist_addline(0, "WPS: %s",
+        str(global_settings.hotkey_wps_desc_id));
+    simplelist_addline(1, "Tree: %s",
+        str(global_settings.hotkey_tree_desc_id));
+    simplelist_show_list(&info);
+}
+
+/* reset hotkey settings to their defaults */
+static void reset_hotkey_settings(void)
+{
+    void *vars[] = {
+        &global_settings.hotkey_tree,
+        &global_settings.hotkey_tree_desc_id,
+        &global_settings.hotkey_wps,
+        &global_settings.hotkey_wps_desc_id,
+    };
+    const int num_settings = sizeof(vars) / sizeof(vars[0]);
+    int i;
+    
+    for (i = 0; i < num_settings; i++)
+    {
+        const struct settings_list *setting = 
+            find_setting(vars[i], NULL);
+        reset_setting(setting, setting->setting);
+    }
+    
+    settings_save();
+    splash(HZ, str(LANG_RESET_DONE_CLEAR));
+}
+
+MENUITEM_FUNCTION(hotkey_view, 0, ID2P(LANG_VIEW_HOTKEY),
+            (int(*)(void))view_hotkey_info, NULL,
+            NULL, Icon_NOICON);
+MENUITEM_FUNCTION(hotkey_reset, 0, ID2P(LANG_RESET),
+            (int(*)(void))reset_hotkey_settings, NULL,
+            NULL, Icon_NOICON);
+MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
+            &hotkey_view, &hotkey_reset);
+#endif /*have_hotkey */
+/*    HOTKEY MENU                  */
+/***********************************/
+
+
+/***********************************/
 /*    SETTINGS MENU                */
 static int language_browse(void)
 {
@@ -415,7 +471,10 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &tagcache_menu,
 #endif
           &display_menu, &system_menu,
-          &bookmark_settings_menu, &browse_langs, &voice_settings_menu
+          &bookmark_settings_menu, &browse_langs, &voice_settings_menu,
+#ifdef HAVE_HOTKEY
+          &hotkey_menu,
+#endif
           );
 /*    SETTINGS MENU                */
 /***********************************/

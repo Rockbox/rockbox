@@ -13394,3 +13394,71 @@
     lineout_poweroff: "Line Out"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SET_HOTKEY
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Set Hotkey: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Set Hotkey: %s"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Set Hotkey: %s"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey Not Set"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hotkey Not Set"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hotkey Not Set"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "View Hotkey Settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "View Hotkey Settings"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "View Hotkey Settings"
+  </voice>
+</phrase>

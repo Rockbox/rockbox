@@ -888,10 +888,12 @@ long gui_wps_show(void)
         switch(button)
         {
             case ACTION_WPS_CONTEXT:
+            case ACTION_WPS_HOTKEY:
             {
+                bool hotkey = button == ACTION_WPS_HOTKEY;
                 gwps_leave_wps();
                 int retval = onplay(wps_state.id3->path, 
-                           FILE_ATTR_AUDIO, CONTEXT_WPS);
+                           FILE_ATTR_AUDIO, CONTEXT_WPS, hotkey);
                 /* if music is stopped in the context menu we want to exit the wps */
                 if (retval == ONPLAY_MAINMENU 
                     || !audio_status())

@@ -816,6 +816,13 @@ struct user_settings
     bool morse_input; /* text input method setting */
 #endif
 
+#ifdef HAVE_HOTKEY
+    int hotkey_wps;
+    int hotkey_wps_desc_id;
+    int hotkey_tree;
+    int hotkey_tree_desc_id;
+#endif
+
 };
 
 /** global variables **/

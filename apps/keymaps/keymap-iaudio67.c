@@ -71,7 +71,11 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
 
     { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
+#ifdef HAVE_HOTKEY
+    { ACTION_WPS_HOTKEY,        BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#else
     { ACTION_WPS_VIEW_PLAYLIST, BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#endif
     { ACTION_WPS_STOP,          BUTTON_STOP,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
@@ -111,6 +115,9 @@ static const struct button_mapping button_context_list[]  = {
 static const struct button_mapping button_context_tree[]  = {
   //    { ACTION_TREE_WPS,          BUTTON_REC|BUTTON_VOLUP,               BUTTON_REC },
   //    { ACTION_TREE_STOP,         BUTTON_REC|BUTTON_VOLUP|BUTTON_REPEAT, BUTTON_REC|BUTTON_VOLUP },
+#ifdef HAVE_HOTKEY
+  //    { ACTION_TREE_HOTKEY,       BUTTON_NONE,                           BUTTON_NONE },
+#endif
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */

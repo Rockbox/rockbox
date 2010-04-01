@@ -205,3 +205,5 @@ No access to the NAND yet..
 #define USB_VENDOR_ID     0x07C4
 #define USB_PRODUCT_ID    0xA4A5
 
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

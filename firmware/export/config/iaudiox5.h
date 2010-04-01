@@ -205,3 +205,6 @@
 #define MIN_REMOTE_CONTRAST_SETTING     10
 #define MAX_REMOTE_CONTRAST_SETTING     35
 #define DEFAULT_REMOTE_CONTRAST_SETTING 24 /* Match boot contrast */
+
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY

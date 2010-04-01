@@ -281,7 +281,7 @@ static int display_playlists(char* playlist, bool view)
                         sel_file);
 
                     if (onplay(playlist, FILE_ATTR_M3U,
-                            CONTEXT_TREE) != ONPLAY_OK)
+                            CONTEXT_TREE, false) != ONPLAY_OK)
                     {
                         result = 0;
                         exit = true;

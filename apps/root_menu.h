@@ -53,6 +53,7 @@ enum {
     GO_TO_BROWSEPLUGINS,
     GO_TO_TIMESCREEN,
     GO_TO_PLAYLIST_VIEWER,
+    MENU_SELECTED_HOTKEY,
 };
 
 extern const struct menu_item_ex root_menu_;

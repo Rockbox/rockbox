@@ -199,3 +199,6 @@
 #define DEFAULT_REC_MIC_GAIN    23
 #define DEFAULT_REC_LEFT_GAIN   23
 #define DEFAULT_REC_RIGHT_GAIN  23
+
+/* Define this if a programmable hotkey is mapped */
+//#define HAVE_HOTKEY
