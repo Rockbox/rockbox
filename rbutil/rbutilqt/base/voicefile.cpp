@@ -199,16 +199,19 @@ void VoiceFileCreator::downloadDone(bool error)
         return;
     }
 
-    FILE* output = fopen(QString(m_mountpoint + "/.rockbox/langs/" + m_lang + ".voice").toLocal8Bit(), "wb");
+    FILE* output = fopen(QString(m_mountpoint + "/.rockbox/langs/" + m_lang
+                + ".voice").toLocal8Bit(), "wb");
     if (output == NULL)
     {
         cleanup();
+        fclose(ids2);
         emit logItem(tr("Error opening output file"),LOGERROR);
         emit done(true);
         return;
     }
 
     voicefont(ids2,m_targetid,m_path.toLocal8Bit().data(), output);
+    // ids2 and output are closed by voicefont().
 
     //cleanup
     cleanup();
@@ -216,7 +219,8 @@ void VoiceFileCreator::downloadDone(bool error)
     // Add Voice file to the install log
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
     installlog.beginGroup("selfcreated Voice");
-    installlog.setValue("/.rockbox/langs/" + m_lang + ".voice",QDate::currentDate().toString("yyyyMMdd"));
+    installlog.setValue("/.rockbox/langs/" + m_lang + ".voice",
+            QDate::currentDate().toString("yyyyMMdd"));
     installlog.endGroup();
     installlog.sync();
 

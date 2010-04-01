@@ -207,9 +207,9 @@ bool EncRbSpeex::encode(QString input,QString output)
     }
     if ((fout = fopen(output.toLocal8Bit(), "wb")) == NULL) {
         qDebug() << "Error: could not open output file\n";
+        fclose(fin);
         return false;
     }
-
 
     int ret = encode_file(fin, fout, quality, complexity, narrowband, volume,
                       errstr, sizeof(errstr));
