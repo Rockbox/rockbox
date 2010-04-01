@@ -254,10 +254,13 @@ void system_init(void)
     CCU_SCON = 1; /* AHB master's priority configuration :
                      TIC (Test Interface Controller) > DMA > USB > IDE > ARM */
 
-#if CONFIG_CPU == AS3525
-    CGU_PROC = 0;           /* fclk 24 MHz */
-#endif
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
+
+    asm volatile(
+        "mrc p15, 0, r0, c1, c0   \n"      /* control register */
+        "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
+        "mcr p15, 0, r0, c1, c0   \n"
+        : : : "r0" );
 
     CGU_PLLASUP = 0;        /* enable PLLA */
     CGU_PLLA = AS3525_PLLA_SETTING;
@@ -269,24 +272,16 @@ void system_init(void)
     while(!(CGU_INTCTRL & (1<<1)));           /* wait until PLLB is locked */
 #endif
 
-#if CONFIG_CPU == AS3525
     /*  Set FCLK frequency */
     CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                 (AS3525_FCLK_PREDIV  << 2) |
                  AS3525_FCLK_SEL);
-#endif
 
     /*  Set PCLK frequency */
     CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider & clksel bits */
                  (AS3525_PCLK_DIV0 << 2) |
                  (AS3525_PCLK_DIV1 << 6) |
                   AS3525_PCLK_SEL);
-
-    asm volatile(
-        "mrc p15, 0, r0, c1, c0   \n"      /* control register */
-        "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
-        "mcr p15, 0, r0, c1, c0   \n"
-        : : : "r0" );
 
 #ifdef BOOTLOADER
     sdram_init();

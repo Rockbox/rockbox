@@ -66,7 +66,6 @@
 #define AS3525_PLLA_FREQ        240000000
 #define AS3525_PLLA_SETTING     0x113B
 
-/* XXX: CGU_PROC seems to be different as well */
 #define AS3525_FCLK_PREDIV      0
 #define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
 
