@@ -258,6 +258,11 @@ $releasenotes="/wiki/ReleaseNotes351";
         name => 'SanDisk Sansa Fuze',
         status => 3,
     },
+    'sansafuzev2' => {
+        name => 'SanDisk Sansa Fuze v2',
+        status => 2,
+        icon => 'sansafuze',
+    },
     'sansam200' => {
         name => 'SanDisk Sansa m200',
         status => 1,
