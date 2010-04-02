@@ -130,12 +130,20 @@ your WPS (While Playing Screen).
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
          & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
       }%
-      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
-          ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{%
+        \ActionWpsPlaylist 
+          & Show current \setting{Playlist}.\\%
+      }%
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
+          ,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsIdThreeScreen 
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsIdThreeScreen}
           & Enter \setting{ID3 Viewer}.\\%
       }%
+      \opt{hotkey}{%
+        \ActionWpsHotkey & Activate the \setting{Hotkey} function
+        (see \reference{ref:Hotkeys}).\\
+      }
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
          \ActionWpsAbSetBNextDir{} or }%
@@ -258,12 +266,13 @@ This allows you to create a bookmark in the currently-playing track.
 This screen is accessible from the WPS screen, and provides a detailed view of
 all the identity information about the current track. This info is known as
 meta data and is stored in audio file formats to keep information on artist,
-album etc. To access this screen, % 
-\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,%
-      MROBE100_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,%
-      GIGABEAT_PAD,GIGABEAT_S_PAD}{
+album etc. \opt{hotkey}{\setting{Hotkey}able from the \setting{WPS Context
+Menu}.} To access this screen, % 
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,%
+      SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{
   press \ActionWpsIdThreeScreen. }%
-\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD}{press
+\opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD,%
+      GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_CLIP_PAD}{press
   \ActionWpsContext{} to access the \setting{WPS Context Menu} and select
   \setting{Show Track Info}. }%
 \opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
@@ -271,23 +280,23 @@ album etc. To access this screen, %
 
 \subsubsection{Open With...}
 This \setting{Open With} function is the same as the \setting{Open With} 
-function in the file browser's \setting{Context Menu}.
+function in the file browser's \setting{Context Menu}. \opt{hotkey}{\setting{Hotkey}able.}
 
 \subsubsection{Delete}
 Delete the currently playing file. The file will be deleted but the playback
 of the file will not stop immediately. Instead, the part of the file that
 has already been buffered (i.e. read into the \daps\ memory) will be played.
-This may even be the whole track.
+This may even be the whole track. \opt{hotkey}{\setting{Hotkey}able.}
 
 \opt{pitchscreen}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
   The \setting{Pitch Screen} allows you to change the rate of playback
   (i.e. the playback speed and at the same time the pitch) of your
-  \dap. The rate value can be adjusted between 50\% and 200\%. 50\%
-  means half the normal playback speed and a pitch that is an octave
-  lower than the normal pitch. 200\% means double playback speed and a
-  pitch that is an octave higher than the normal pitch.
+  \dap.  \opt{hotkey}{\setting{Hotkey}able.}  The rate value can be adjusted
+  between 50\% and 200\%. 50\% means half the normal playback speed and a
+  pitch that is an octave lower than the normal pitch. 200\% means double
+  playback speed and a pitch that is an octave higher than the normal pitch.
 
   The rate can be changed in two modes: procentual and semitone.
   Initially, procentual mode is active.
