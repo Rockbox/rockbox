@@ -177,4 +177,4 @@
 #define DEFAULT_BRIGHTNESS_SETTING  8  /*  8/16 (50.00%) = x5 boot default */
 
 /* Define this if a programmable hotkey is mapped */
-//#define HAVE_HOTKEY
+#define HAVE_HOTKEY

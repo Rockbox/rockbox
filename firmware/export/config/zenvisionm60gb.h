@@ -167,4 +167,4 @@
 #define USB_NUM_ENDPOINTS 7
 
 /* Define this if a programmable hotkey is mapped */
-//#define HAVE_HOTKEY
+#define HAVE_HOTKEY

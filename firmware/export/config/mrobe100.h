@@ -207,4 +207,4 @@
 #define HAVE_ATA_DMA
 
 /* Define this if a programmable hotkey is mapped */
-//#define HAVE_HOTKEY
+#define HAVE_HOTKEY

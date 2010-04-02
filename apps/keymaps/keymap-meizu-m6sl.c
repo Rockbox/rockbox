@@ -88,17 +88,13 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,         BUTTON_UP,                      BUTTON_NONE },
 
     { ACTION_WPS_PITCHSCREEN,   BUTTON_PLAY|BUTTON_UP,          BUTTON_PLAY },
-#ifdef HAVE_HOTKEY
-    { ACTION_WPS_HOTKEY,        BUTTON_PLAY|BUTTON_DOWN,        BUTTON_PLAY },
-#else
     { ACTION_WPS_VIEW_PLAYLIST, BUTTON_PLAY|BUTTON_DOWN,        BUTTON_PLAY },
-#endif
 
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_MENU },
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
 
-    { ACTION_WPS_ID3SCREEN,     BUTTON_PLAY|BUTTON_MENU,          BUTTON_NONE },
+    { ACTION_WPS_HOTKEY,        BUTTON_PLAY|BUTTON_MENU,        BUTTON_NONE },
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
 
     LAST_ITEM_IN_LIST
@@ -118,9 +114,7 @@ static const struct button_mapping button_context_list[]  = {
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
     { ACTION_TREE_STOP,   BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_NONE },
-#ifdef HAVE_HOTKEY
-//    { ACTION_TREE_HOTKEY, BUTTON_NONE,                    BUTTON_NONE },
-#endif
+    { ACTION_TREE_HOTKEY, BUTTON_PLAY|BUTTON_MENU,        BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
