@@ -55,7 +55,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     proxyValidator->setRegExp(validate);
     ui.proxyPort->setValidator(proxyValidator);
 #if !defined(Q_OS_LINUX) && !defined(Q_OS_WIN32)
-    ui.radioSystemProxy->setEnabled(false); // not on macox for now
+    ui.radioSystemProxy->setEnabled(false); // not on OS X for now
 #endif
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
@@ -446,11 +446,10 @@ void Config::setNoProxy(bool checked)
 
 void Config::setSystemProxy(bool checked)
 {
-    bool i = !checked;
-    ui.proxyPort->setEnabled(i);
-    ui.proxyHost->setEnabled(i);
-    ui.proxyUser->setEnabled(i);
-    ui.proxyPass->setEnabled(i);
+    ui.proxyPort->setEnabled(!checked);
+    ui.proxyHost->setEnabled(!checked);
+    ui.proxyUser->setEnabled(!checked);
+    ui.proxyPass->setEnabled(!checked);
     if(checked) {
         // save values in input box
         proxy.setScheme("http");
@@ -460,12 +459,30 @@ void Config::setSystemProxy(bool checked)
         proxy.setPort(ui.proxyPort->text().toInt());
         // show system values in input box
         QUrl envproxy = System::systemProxy();
+        qDebug() << "[Config] setting system proxy" << envproxy;
 
         ui.proxyHost->setText(envproxy.host());
-
         ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
         ui.proxyUser->setText(envproxy.userName());
         ui.proxyPass->setText(envproxy.password());
+
+        if(envproxy.host().isEmpty() || envproxy.port() == -1) {
+            qDebug() << "[Config] sytem proxy is invalid.";
+            QMessageBox::warning(this, tr("Proxy Detection"),
+                    tr("The System Proxy settings are invalid!\n"
+                        "Rockbox Utility can't work with this proxy settings. "
+                        "Make sure the system proxy is set correctly. Note that "
+                        "\"proxy auto-config (PAC)\" scripts are not supported by "
+                        "Rockbox Utility. If your system uses this you need "
+                        "to use manual proxy settings."),
+                    QMessageBox::Ok ,QMessageBox::Ok);
+            // the current proxy settings are invalid. Check the saved proxy
+            // type again.
+            if(RbSettings::value(RbSettings::ProxyType).toString() == "manual")
+                ui.radioManualProxy->setChecked(true);
+            else
+                ui.radioNoProxy->setChecked(true);
+        }
 
     }
     else {
