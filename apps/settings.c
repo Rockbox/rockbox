@@ -746,7 +746,9 @@ void settings_apply(bool read_disk)
 {
     
     char buf[64];
+#ifdef HAVE_LCD_BITMAP
     int rc;
+#endif
 #if CONFIG_CODEC == SWCODEC
     int i;
 #endif

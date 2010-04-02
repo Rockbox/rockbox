@@ -119,6 +119,6 @@ void scrollwheel(unsigned int wheel_value)
 
     old_wheel_value = wheel_value;
 #else
-    (void)wheel_value
+    (void)wheel_value;
 #endif
 }
