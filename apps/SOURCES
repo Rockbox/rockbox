@@ -2,7 +2,9 @@
 logfdisp.c
 #endif
 action.c
+#ifdef HAVE_RTC_ALARM
 alarm_menu.c
+#endif
 abrepeat.c
 bookmark.c
 debug_menu.c
