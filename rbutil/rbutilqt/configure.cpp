@@ -54,9 +54,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     QRegExp validate("[0-9]*");
     proxyValidator->setRegExp(validate);
     ui.proxyPort->setValidator(proxyValidator);
-#if !defined(Q_OS_LINUX) && !defined(Q_OS_WIN32)
-    ui.radioSystemProxy->setEnabled(false); // not on OS X for now
-#endif
+
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)

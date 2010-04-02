@@ -60,6 +60,9 @@
 #include <sys/param.h>
 #include <sys/ucred.h>
 #include <sys/mount.h>
+
+#include <CoreFoundation/CoreFoundation.h>
+#include <SystemConfiguration/SystemConfiguration.h>
 #endif
 
 #include "utils.h"
@@ -390,6 +393,42 @@ QUrl System::systemProxy(void)
         return QUrl("http://" + QString::fromWCharArray(proxyval));
     else
         return QUrl("");
+#elif defined(Q_OS_MACX)
+
+    CFDictionaryRef dictref;
+    CFStringRef stringref;
+    CFNumberRef numberref;
+    int enable;
+    int port;
+    unsigned int bufsize = 0;
+    char *buf;
+    QUrl proxy;
+
+    dictref = SCDynamicStoreCopyProxies(NULL);
+    stringref = (CFStringRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPProxy);
+    numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPEnable);
+    CFNumberGetValue(numberref, kCFNumberIntType, &enable);
+    if(enable == 1) {
+        // get number of characters. CFStringGetLength uses UTF-16 code pairs
+        bufsize = CFStringGetLength(stringref) * 2 + 1;
+        buf = (char*)malloc(sizeof(char) * bufsize);
+        if(buf == NULL) {
+            qDebug() << "[System] can't allocate memory for proxy string!";
+            CFRelease(dictref);
+            return QUrl("");
+        }
+        CFStringGetCString(stringref, buf, bufsize, kCFStringEncodingUTF16);
+        numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPPort);
+        CFNumberGetValue(numberref, kCFNumberIntType, &port);
+        proxy.setScheme("http");
+        proxy.setHost(QString::fromUtf16((unsigned short*)buf));
+        proxy.setPort(port);
+
+        free(buf);
+    }
+    CFRelease(dictref);
+
+    return proxy;
 #else
     return QUrl("");
 #endif
