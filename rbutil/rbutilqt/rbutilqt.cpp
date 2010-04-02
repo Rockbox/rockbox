@@ -31,6 +31,7 @@
 #include "themesinstallwindow.h"
 #include "uninstallwindow.h"
 #include "utils.h"
+#include "rockboxinfo.h"
 #include "rbzip.h"
 #include "sysinfo.h"
 #include "system.h"
@@ -556,7 +557,7 @@ bool RbUtilQt::installAuto()
     file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
 
     // check installed Version and Target
-    QString warning = check(false);
+    QString warning = Utils::checkEnvironment(false);
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,

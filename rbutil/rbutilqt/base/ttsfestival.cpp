@@ -32,7 +32,7 @@ void TTSFestival::generateSettings()
     // server path
     QString exepath = RbSettings::subValue("festival-server",
                         RbSettings::TtsPath).toString();
-    if(exepath == "" ) exepath = findExecutable("festival");
+    if(exepath == "" ) exepath = Utils::findExecutable("festival");
     insertSetting(eSERVERPATH,new EncTtsSetting(this,
                         EncTtsSetting::eSTRING, "Path to Festival server:",
                         exepath,EncTtsSetting::eBROWSEBTN));
@@ -40,7 +40,7 @@ void TTSFestival::generateSettings()
     // client path
     QString clientpath = RbSettings::subValue("festival-client",
                         RbSettings::TtsPath).toString();
-    if(clientpath == "" ) clientpath = findExecutable("festival_client");
+    if(clientpath == "" ) clientpath = Utils::findExecutable("festival_client");
     insertSetting(eCLIENTPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
                         tr("Path to Festival client:"),
                         clientpath,EncTtsSetting::eBROWSEBTN));

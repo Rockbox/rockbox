@@ -34,7 +34,7 @@ TTSExes::TTSExes(QString name,QObject* parent) : TTSBase(parent)
 void TTSExes::generateSettings()
 {
     QString exepath =RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
-    if(exepath == "") exepath = findExecutable(m_name);
+    if(exepath == "") exepath = Utils::findExecutable(m_name);
 
     insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
         tr("Path to TTS engine:"),exepath,EncTtsSetting::eBROWSEBTN));

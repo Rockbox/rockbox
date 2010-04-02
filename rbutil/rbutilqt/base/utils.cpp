@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "utils.h"
+#include "rockboxinfo.h"
 #include "system.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
@@ -41,7 +42,7 @@
 #endif
 
 // recursive function to delete a dir with files
-bool recRmdir( const QString &dirName )
+bool Utils::recursiveRmdir( const QString &dirName )
 {
     QString dirN = dirName;
     QDir dir(dirN);
@@ -54,19 +55,21 @@ bool recRmdir( const QString &dirName )
         curItem = dirN + "/" + name;
         fileInfo.setFile(curItem);
         if(fileInfo.isDir())    // is directory
-            recRmdir(curItem);  // call recRmdir() recursively for deleting subdirectory
+            recursiveRmdir(curItem);    // call recRmdir() recursively for
+                                        // deleting subdirectory
         else                    // is file
-            QFile::remove(curItem); // ok, delete file
+            QFile::remove(curItem);     // ok, delete file
     }
     dir.cdUp();
-    return dir.rmdir(dirN); // delete empty dir and return if (now empty) dir-removing was successfull
+    return dir.rmdir(dirN); // delete empty dir and return if (now empty)
+                            // dir-removing was successfull
 }
 
 
 //! @brief resolves the given path, ignoring case.
 //! @param path absolute path to resolve.
 //! @return returns exact casing of path, empty string if path not found.
-QString resolvePathCase(QString path)
+QString Utils::resolvePathCase(QString path)
 {
     QStringList elems;
     QString realpath;
@@ -110,7 +113,7 @@ QString resolvePathCase(QString path)
 //! @brief figure the free disk space on a filesystem
 //! @param path path on the filesystem to check
 //! @return size in bytes
-qulonglong filesystemFree(QString path)
+qulonglong Utils::filesystemFree(QString path)
 {
     qlonglong size = 0;
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
@@ -135,7 +138,7 @@ qulonglong filesystemFree(QString path)
 }
 
 //! \brief searches for a Executable in the Environement Path
-QString findExecutable(QString name)
+QString Utils::findExecutable(QString name)
 {
     QString exepath;
     //try autodetect tts   
@@ -167,7 +170,7 @@ QString findExecutable(QString name)
  *  @param permission if it should check for permission
  *  @return string with error messages if problems occurred, empty strings if none.
  */
-QString check(bool permission)
+QString Utils::checkEnvironment(bool permission)
 {
     QString text = "";
 
@@ -199,49 +202,5 @@ QString check(bool permission)
         return QObject::tr("Problem detected:") + "<ul>" + text + "</ul>";
     else
         return text;
-}
-
-
-RockboxInfo::RockboxInfo(QString mountpoint)
-{
-    qDebug() << "[RockboxInfo] trying to find rockbox-info at" << mountpoint;
-    QFile file(mountpoint + "/.rockbox/rockbox-info.txt");
-    m_success = false;
-    if(!file.exists())
-        return;
-
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    // read file contents
-    while (!file.atEnd())
-    {
-        QString line = file.readLine();
-
-        if(line.contains("Version:"))
-        {
-            m_version = line.remove("Version:").trimmed();
-        }
-        else if(line.contains("Target: "))
-        {
-            m_target = line.remove("Target: ").trimmed();
-        }
-        else if(line.contains("Features:"))
-        {
-            m_features = line.remove("Features:").trimmed();
-        }
-        else if(line.contains("Target id:"))
-        {
-            m_targetid = line.remove("Target id:").trimmed();
-        }
-        else if(line.contains("Memory:"))
-        {
-            m_ram = line.remove("Memory:").trimmed().toInt();
-        }
-    }
-
-    file.close();
-    m_success = true;
-    return;
 }
 

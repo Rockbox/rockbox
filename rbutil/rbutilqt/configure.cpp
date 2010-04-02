@@ -756,8 +756,8 @@ void Config::testTts()
     }
     tts->stop();
 #if defined(Q_OS_LINUX)
-    QString exe = findExecutable("aplay");
-    if(exe == "") exe = findExecutable("play");
+    QString exe = Utils::findExecutable("aplay");
+    if(exe == "") exe = Utils::findExecutable("play");
     if(exe != "")
     {
         QProcess::execute(exe+" "+filename);

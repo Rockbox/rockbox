@@ -67,6 +67,7 @@ SOURCES += \
  base/bootloaderinstallchinachip.cpp \
  base/bootloaderinstallams.cpp \
  base/bootloaderinstalltcc.cpp \
+ base/rockboxinfo.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
 
@@ -132,6 +133,7 @@ HEADERS += \
  base/bootloaderinstallchinachip.h \
  base/bootloaderinstallams.h \
  base/bootloaderinstalltcc.h \
+ base/rockboxinfo.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \
 

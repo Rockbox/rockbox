@@ -50,7 +50,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 ThemesInstallWindow::~ThemesInstallWindow()
 {
     if(infocachedir!="")
-        recRmdir(infocachedir);
+        Utils::recursiveRmdir(infocachedir);
 }
 
 

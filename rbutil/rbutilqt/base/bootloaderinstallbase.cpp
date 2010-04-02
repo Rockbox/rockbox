@@ -114,7 +114,7 @@ bool BootloaderInstallBase::backup(QString to)
     }
     QString tofile = to + "/" + QFileInfo(m_blfile).fileName();
     qDebug() << "[BootloaderInstallBase] trying to backup" << m_blfile << "to" << tofile;
-    if(!QFile::copy(resolvePathCase(m_blfile), tofile)) {
+    if(!QFile::copy(Utils::resolvePathCase(m_blfile), tofile)) {
         emit logItem(tr("Creating backup copy failed."), LOGERROR);
         return false;
     }
@@ -247,7 +247,7 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
 {
     // figue which of the possible bootloader filenames is correct.
     for(int a = 0; a < sl.size(); a++) {
-        if(!resolvePathCase(sl.at(a)).isEmpty()) {
+        if(!Utils::resolvePathCase(sl.at(a)).isEmpty()) {
             m_blfile = sl.at(a);
         }
     }

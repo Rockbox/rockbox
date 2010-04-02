@@ -32,7 +32,7 @@ void Uninstaller::deleteAll(ProgressloggerInterface* dp)
     QString rbdir(m_mountpoint + ".rockbox/");
     m_dp->addItem(tr("Starting Uninstallation"),LOGINFO);
     m_dp->setProgressMax(0);
-    recRmdir(rbdir);
+    Utils::recursiveRmdir(rbdir);
     m_dp->setProgressMax(1);
     m_dp->setProgressValue(1);
     m_dp->addItem(tr("Finished Uninstallation"),LOGOK);

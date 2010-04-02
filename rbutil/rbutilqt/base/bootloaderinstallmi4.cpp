@@ -44,9 +44,9 @@ void BootloaderInstallMi4::installStage2(void)
     QCoreApplication::processEvents();
 
     // move old bootloader out of the way
-    QString fwfile(resolvePathCase(m_blfile));
+    QString fwfile(Utils::resolvePathCase(m_blfile));
     QFile oldbl(fwfile);
-    QString moved = QFileInfo(resolvePathCase(m_blfile)).absolutePath()
+    QString moved = QFileInfo(Utils::resolvePathCase(m_blfile)).absolutePath()
                         + "/OF.mi4";
     if(!QFileInfo(moved).exists()) {
         qDebug() << "[BootloaderInstallMi4] renaming" << fwfile << "to" << moved;
@@ -83,20 +83,20 @@ bool BootloaderInstallMi4::uninstall(void)
 
     // check if OF file present
     emit logItem(tr("Checking for original firmware file"), LOGINFO);
-    QString original = QFileInfo(resolvePathCase(m_blfile)).absolutePath()
+    QString original = QFileInfo(Utils::resolvePathCase(m_blfile)).absolutePath()
                         + "/OF.mi4";
 
-    if(resolvePathCase(original).isEmpty()) {
+    if(Utils::resolvePathCase(original).isEmpty()) {
         emit logItem(tr("Error finding original firmware file"), LOGERROR);
         return false;
     }
 
     // finally remove RB bootloader
-    QString resolved = resolvePathCase(m_blfile);
+    QString resolved = Utils::resolvePathCase(m_blfile);
     QFile blfile(resolved);
     blfile.remove();
 
-    QFile::rename(resolvePathCase(original), m_blfile);
+    QFile::rename(Utils::resolvePathCase(original), m_blfile);
     emit logItem(tr("Rockbox bootloader successful removed"), LOGINFO);
     logInstall(LogRemove);
     emit done(false);
@@ -114,7 +114,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallMi4::installed(void)
 
     // make sure to resolve case to prevent case issues
     QString resolved;
-    resolved = resolvePathCase(m_blfile);
+    resolved = Utils::resolvePathCase(m_blfile);
     if(resolved.isEmpty()) {
         qDebug() << "[BootloaderInstallMi4] installed: BootloaderNone";
         return BootloaderNone;

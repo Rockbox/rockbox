@@ -148,7 +148,7 @@ void ZipInstaller::downloadDone(bool error)
         // check for free space. Make sure after installation will still be
         // some room for operating (also includes calculation mistakes due to
         // cluster sizes on the player).
-        if(filesystemFree(m_mountpoint) < (uz.totalSize() + 1000000)) {
+        if(Utils::filesystemFree(m_mountpoint) < (uz.totalSize() + 1000000)) {
             emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
             emit logProgress(1, 1);
             emit done(true);

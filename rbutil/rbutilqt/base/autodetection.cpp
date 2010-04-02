@@ -54,6 +54,7 @@
 
 #include "system.h"
 #include "utils.h"
+#include "rockboxinfo.h"
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {

@@ -45,16 +45,16 @@ void BootloaderInstallFile::installStage2(void)
     QCoreApplication::processEvents();
 
     // if an old bootloader is present (Gigabeat) move it out of the way.
-    QString fwfile(resolvePathCase(m_blfile));
+    QString fwfile(Utils::resolvePathCase(m_blfile));
     if(!fwfile.isEmpty()) {
-        QString moved = resolvePathCase(m_blfile) + ".ORIG";
+        QString moved = Utils::resolvePathCase(m_blfile) + ".ORIG";
         qDebug() << "[BootloaderInstallFile] renaming" << fwfile << "to" << moved;
         QFile::rename(fwfile, moved);
     }
 
     // if no old file found resolve path without basename
     QFileInfo fi(m_blfile);
-    QString absPath = resolvePathCase(fi.absolutePath());
+    QString absPath = Utils::resolvePathCase(fi.absolutePath());
 
     // if it's not possible to locate the base path try to create it
     if(absPath.isEmpty()) {
@@ -67,10 +67,10 @@ void BootloaderInstallFile::installStage2(void)
         QString basePath = pathElements.join("/");
 
         // check for base and bail out if not found. Otherwise create folder.
-        absPath = resolvePathCase(basePath);
+        absPath = Utils::resolvePathCase(basePath);
         QDir d(absPath);
         d.mkpath(lastElement);
-        absPath = resolvePathCase(fi.absolutePath());
+        absPath = Utils::resolvePathCase(fi.absolutePath());
 
         if(absPath.isEmpty()) {
             emit logItem(tr("Error accessing output folder"), LOGERROR);
@@ -98,13 +98,13 @@ bool BootloaderInstallFile::uninstall(void)
     qDebug() << "[BootloaderInstallFile] Uninstalling bootloader";
     emit logItem(tr("Removing Rockbox bootloader"), LOGINFO);
     // check if a .ORIG file is present, and allow moving it back.
-    QString origbl = resolvePathCase(m_blfile + ".ORIG");
+    QString origbl = Utils::resolvePathCase(m_blfile + ".ORIG");
     if(origbl.isEmpty()) {
         emit logItem(tr("No original firmware file found."), LOGERROR);
         emit done(true);
         return false;
     }
-    QString fwfile = resolvePathCase(m_blfile);
+    QString fwfile = Utils::resolvePathCase(m_blfile);
     if(!QFile::remove(fwfile)) {
         emit logItem(tr("Can't remove Rockbox bootloader file."), LOGERROR);
         emit done(true);
@@ -128,10 +128,10 @@ bool BootloaderInstallFile::uninstall(void)
 BootloaderInstallBase::BootloaderType BootloaderInstallFile::installed(void)
 {
     qDebug() << "[BootloaderInstallFile] checking installed bootloader";
-    if(!resolvePathCase(m_blfile).isEmpty()
-        && !resolvePathCase(m_blfile + ".ORIG").isEmpty())
+    if(!Utils::resolvePathCase(m_blfile).isEmpty()
+        && !Utils::resolvePathCase(m_blfile + ".ORIG").isEmpty())
         return BootloaderRockbox;
-    else if(!resolvePathCase(m_blfile).isEmpty())
+    else if(!Utils::resolvePathCase(m_blfile).isEmpty())
         return BootloaderOther;
     else
         return BootloaderUnknown;

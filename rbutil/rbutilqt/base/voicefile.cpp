@@ -19,6 +19,7 @@
 
 #include "voicefile.h"
 #include "utils.h"
+#include "rockboxinfo.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
 

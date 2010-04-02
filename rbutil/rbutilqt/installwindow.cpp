@@ -25,6 +25,7 @@
 #include "serverinfo.h"
 #include "systeminfo.h"
 #include "utils.h"
+#include "rockboxinfo.h"
 
 InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
 {
@@ -168,7 +169,7 @@ void InstallWindow::accept()
 
     RbSettings::sync();
 
-    QString warning = check(false);
+    QString warning = Utils::checkEnvironment(false);
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,
