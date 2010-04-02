@@ -63,6 +63,7 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
+#include <CoreServices/CoreServices.h>
 #endif
 
 #include "utils.h"
@@ -180,6 +181,34 @@ QString System::osVersionString(void)
 
     result = QString("CPU: %1<br/>System: %2<br/>Release: %3<br/>Version: %4")
         .arg(u.machine).arg(u.sysname).arg(u.release).arg(u.version);
+#if defined(Q_OS_MACX)
+    SInt32 major;
+    SInt32 minor;
+    SInt32 bugfix;
+    OSErr error;
+    error = Gestalt(gestaltSystemVersionMajor, &major);
+    error = Gestalt(gestaltSystemVersionMinor, &minor);
+    error = Gestalt(gestaltSystemVersionBugFix, &bugfix);
+
+    result += QString("<br/>OS X %1.%2.%3 ").arg(major).arg(minor).arg(bugfix);
+    // 1: 86k, 2: ppc, 10: i386
+    SInt32 arch;
+    error = Gestalt(gestaltSysArchitecture, &arch);
+    switch(arch) {
+        case 1:
+        result.append("(86k)");
+        break;
+    case 2:
+        result.append("(ppc)");
+        break;
+    case 10:
+        result.append("(x86)");
+        break;
+    default:
+        result.append("(unknown)");
+        break;
+    }
+#endif
 #endif
     result += QString("<br/>Qt version %1").arg(qVersion());
     return result;

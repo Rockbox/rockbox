@@ -139,7 +139,9 @@ macx {
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
     QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
     CONFIG+=x86 ppc
-    LIBS += -L/usr/local/lib -framework IOKit -framework CoreFoundation -framework Carbon -framework SystemConfiguration -lz
+    LIBS += -L/usr/local/lib -lz \
+            -framework IOKit -framework CoreFoundation -framework Carbon \
+            -framework SystemConfiguration -framework CoreServices
     INCLUDEPATH += /usr/local/include
     
     # rule for creating a dmg file
