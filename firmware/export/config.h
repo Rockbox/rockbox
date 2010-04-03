@@ -921,7 +921,7 @@ Lyre prototype 1 */
 #define HAVE_PLUGIN_CHECK_OPEN_CLOSE
 #endif
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(SIMULATOR)
 #define HAVE_IO_PRIORITY
 #endif
 
