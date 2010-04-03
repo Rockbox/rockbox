@@ -1227,7 +1227,7 @@ target/arm/as3525/sansa-clip/powermgmt-clip.c
 #ifndef SIMULATOR
 target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clipv2/lcd-clipv2.c
-target/arm/as3525/sansa-clip/lcd-as-clip.S  /* TODO for clipv2 */
+target/arm/as3525/sansa-clipv2/lcd-as-clipv2.S
 target/arm/as3525/sansa-clipv2/button-clip.c
 target/arm/as3525/sansa-clipv2/backlight-clipv2.c
 #ifndef BOOTLOADER
