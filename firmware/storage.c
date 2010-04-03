@@ -71,7 +71,7 @@ static void storage_wait_turn(IF_MD_NONVOID(int drive))
 #ifndef HAVE_MULTIDRIVE
     int drive=0;
 #endif
-    int my_prio = thread_get_io_priority(thread_get_current());
+    int my_prio = thread_get_io_priority(THREAD_ID_CURRENT);
     int loops=my_prio;
     while(storage_should_wait(drive, my_prio) && (loops--)>=0)
     {
