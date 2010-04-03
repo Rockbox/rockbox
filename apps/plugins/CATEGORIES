@@ -100,6 +100,7 @@ stats,apps
 stopwatch,apps
 sudoku,games
 test_boost,apps
+test_mem,apps
 test_codec,viewers
 test_disk,apps
 test_fps,apps
