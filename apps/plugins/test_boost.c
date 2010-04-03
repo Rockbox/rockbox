@@ -55,7 +55,8 @@ enum plugin_status plugin_start(const void* parameter)
         int button = rb->button_get(false);
         switch (button)
         {
-            case BUTTON_UP:
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            case ACTION_STD_PREV:
                 if (!boost)
                 {
                     rb->cpu_boost(true);
@@ -63,15 +64,15 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 break;
 
-            case BUTTON_DOWN:
+            case ACTION_STD_NEXT:
                 if (boost)
                 {
                     rb->cpu_boost(false);
                     boost = false;
                 }
                 break;
-
-            case BUTTON_LEFT:
+#endif
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
         }
