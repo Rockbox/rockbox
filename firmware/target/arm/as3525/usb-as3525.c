@@ -31,6 +31,10 @@
 
 #if CONFIG_CPU == AS3525
 static int usb_status = USB_EXTRACTED;
+#else
+#ifdef SANSA_FUZEV2
+#define USB_DETECT_PIN 3
+#endif
 #endif
 
 void usb_enable(bool on)
