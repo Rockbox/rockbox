@@ -1326,9 +1326,10 @@ static void set_hotkey(bool is_wps)
     char **line2_ptr = &line2;
     const struct text_message     message={(const char **)line1_ptr, 1};
     const struct text_message yes_message={(const char **)line2_ptr, 1};
-    
-    snprintf(line1, sizeof(line1_buf), str(LANG_SET_HOTKEY_QUESTION), str(this_id));
-    snprintf(line2, sizeof(line2_buf), str(LANG_HOTKEY_ASSIGNED), str(this_id));
+    char *func_name = str(this_id);
+
+    snprintf(line1, sizeof(line1_buf), str(LANG_SET_HOTKEY_QUESTION), func_name);
+    snprintf(line2, sizeof(line2_buf), str(LANG_HOTKEY_ASSIGNED), func_name);
 
     /* confirm the hotkey setting change */
     if(gui_syncyesno_run(&message, &yes_message, NULL)==YESNO_YES)
