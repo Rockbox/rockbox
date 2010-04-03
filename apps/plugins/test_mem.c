@@ -51,11 +51,11 @@ enum plugin_status plugin_start(const void* parameter)
             for (j = 0; j < BUF_SIZE; j++)
                 buf[j] = j;
         }
+        delta = *rb->current_tick - last_tick;
         rb->screens[0]->clear_display();
         rb->screens[0]->putsf(0, line++, "%s", boost?"boosted":"unboosted");
         rb->screens[0]->putsf(0, line++, "bufsize: %u", BUF_SIZE*sizeof(buf[0]));
         rb->screens[0]->putsf(0, line++, "loop#: %d", ++count);
-        delta = *rb->current_tick - last_tick;
         rb->screens[0]->putsf(0, line++, "write ticks: %d (%d kB/s)", delta,
                               KB_PER_SEC(delta));
         last_tick = *rb->current_tick;
