@@ -1319,16 +1319,16 @@ static void set_hotkey(bool is_wps)
     if (!match_found || (this_hk == *hk_func)) return;
     
     char line1_buf[100];
-    char line2_buf[101];
+    char line2_buf[100];
     char *line1 = line1_buf;
     char *line2 = line2_buf;
     char **line1_ptr = &line1;
     char **line2_ptr = &line2;
-    const struct text_message     message={(const char **)line2_ptr, 1};
-    const struct text_message yes_message={(const char **)line1_ptr, 1};
+    const struct text_message     message={(const char **)line1_ptr, 1};
+    const struct text_message yes_message={(const char **)line2_ptr, 1};
     
-    snprintf(line1, 100, str(LANG_SET_HOTKEY), str(this_id));
-    strcat(strcpy(line2, line1), "?");
+    snprintf(line1, sizeof(line1_buf), str(LANG_SET_HOTKEY_QUESTION), str(this_id));
+    snprintf(line2, sizeof(line2_buf), str(LANG_HOTKEY_ASSIGNED), str(this_id));
 
     /* confirm the hotkey setting change */
     if(gui_syncyesno_run(&message, &yes_message, NULL)==YESNO_YES)
@@ -1338,7 +1338,6 @@ static void set_hotkey(bool is_wps)
         *hk_desc = this_id;
         
         settings_save();
-        splash(HZ*2, line1);
     }
 }
 #endif /* HOTKEY */

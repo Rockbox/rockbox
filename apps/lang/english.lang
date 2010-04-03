@@ -13395,20 +13395,37 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_HOTKEY
+  id: LANG_SET_HOTKEY_QUESTION
   desc: hotkey splash
   user: core
   <source>
     *: none
-    hotkey: "Set Hotkey: %s"
+    hotkey: "Set Hotkey: %s?"
   </source>
   <dest>
     *: none
-    hotkey: "Set Hotkey: %s"
+    hotkey: "Set Hotkey: %s?"
   </dest>
   <voice>
     *: none
-    hotkey: "Set Hotkey: %s"
+    hotkey: "Set Hotkey?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: Confirmation after the hotkey has been assigned
+  user: core
+  <source>
+    *: none
+    hotkey: "Assigned hotkey: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Assigned hotkey: %s"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Assigned hotkey"
   </voice>
 </phrase>
 <phrase>
