@@ -166,19 +166,14 @@
 
 #define USB_HANDLED_BY_OF
 
-#if 0 /* disabled since there is no USB driver */
-
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_ARC
+#define CONFIG_USBOTG USBOTG_AS3525
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7433
+#define USB_PRODUCT_ID 0x7435
 #endif /* BOOTLOADER */
-
-#endif
-
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
