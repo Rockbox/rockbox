@@ -118,8 +118,21 @@
 
 /* Tell the software what frequencies we're running */
 #define CPUFREQ_MAX              AS3525_FCLK_FREQ
+
+#if CONFIG_CPU == AS3525
 #define CPUFREQ_DEFAULT          AS3525_PCLK_FREQ
 #define CPUFREQ_NORMAL           AS3525_PCLK_FREQ
+#else
+/* On as3525v2, pclk & fclk are not bound */
+#ifdef SANSA_FUZEV2
+    /* scrollwheel is much less responsive under 60MHz */
+#define CPUFREQ_DEFAULT          60000000
+#define CPUFREQ_NORMAL           60000000
+#else
+#define CPUFREQ_DEFAULT          24000000
+#define CPUFREQ_NORMAL           24000000
+#endif /* SANSA_FUZEV2 */
+#endif /* CONFIG_CPU == AS3525 */
 
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
