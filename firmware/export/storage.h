@@ -57,6 +57,7 @@ struct storage_info
  */
     #define storage_num_drives() NUM_DRIVES
     #if (CONFIG_STORAGE & STORAGE_ATA)
+        #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
         #define storage_sleep ata_sleep
         #define storage_spin ata_spin
@@ -67,8 +68,6 @@ struct storage_info
         #define storage_soft_reset() ata_soft_reset()
         #define storage_init() ata_init()
         #define storage_close() ata_close()
-        #define storage_read_sectors(drive, start, count, buf) ata_read_sectors(IF_MD2(drive,) start, count, buf)
-        #define storage_write_sectors(drive, start, count, buf) ata_write_sectors(IF_MD2(drive,) start, count, buf)
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -84,6 +83,7 @@ struct storage_info
             #define storage_present(drive) ata_present(IF_MD(drive))
         #endif
     #elif (CONFIG_STORAGE & STORAGE_SD)
+        #define STORAGE_FUNCTION(NAME) (sd_## NAME)
         #define storage_spindown sd_spindown
         #define storage_sleep sd_sleep
         #define storage_spin sd_spin
@@ -93,8 +93,6 @@ struct storage_info
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
         #define storage_init() sd_init()
-        #define storage_read_sectors(drive, start, count, buf) sd_read_sectors(IF_MD2(drive,) start, count, buf)
-        #define storage_write_sectors(drive, start, count, buf) sd_write_sectors(IF_MD2(drive,) start, count, buf)
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -110,6 +108,7 @@ struct storage_info
             #define storage_present(drive) sd_present(IF_MD(drive))
         #endif
      #elif (CONFIG_STORAGE & STORAGE_MMC)
+        #define STORAGE_FUNCTION(NAME) (mmc_## NAME)
         #define storage_spindown mmc_spindown
         #define storage_sleep mmc_sleep
         #define storage_spin mmc_spin
@@ -119,8 +118,6 @@ struct storage_info
         #define storage_disk_is_active() mmc_disk_is_active()
         #define storage_soft_reset() (void)0
         #define storage_init() mmc_init()
-        #define storage_read_sectors(drive, start, count, buf) mmc_read_sectors(IF_MD2(drive,) start, count, buf)
-        #define storage_write_sectors(drive, start, count, buf) mmc_write_sectors(IF_MD2(drive,) start, count, buf)
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -136,6 +133,7 @@ struct storage_info
             #define storage_present(drive) mmc_present(IF_MD(drive))
         #endif
     #elif (CONFIG_STORAGE & STORAGE_NAND)
+        #define STORAGE_FUNCTION(NAME) (nand_## NAME)
         #define storage_spindown nand_spindown
         #define storage_sleep nand_sleep
         #define storage_spin nand_spin
@@ -145,8 +143,6 @@ struct storage_info
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
         #define storage_init() nand_init()
-        #define storage_read_sectors(drive, start, count, buf) nand_read_sectors(IF_MD2(drive,) start, count, buf)
-        #define storage_write_sectors(drive, start, count, buf) nand_write_sectors(IF_MD2(drive,) start, count, buf)
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() nand_flush()
         #endif
@@ -162,6 +158,7 @@ struct storage_info
             #define storage_present(drive) nand_present(IF_MD(drive))
         #endif
     #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+        #define STORAGE_FUNCTION(NAME) (ramdisk_## NAME)
         #define storage_spindown ramdisk_spindown
         #define storage_sleep ramdisk_sleep
         #define storage_spin ramdisk_spin
@@ -171,8 +168,6 @@ struct storage_info
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
         #define storage_init() ramdisk_init()
-        #define storage_read_sectors(drive, start, count, buf) ramdisk_read_sectors(IF_MD2(drive,) start, count, buf)
-        #define storage_write_sectors(drive, start, count, buf) ramdisk_write_sectors(IF_MD2(drive,) start, count, buf)
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -200,8 +195,6 @@ void storage_sleepnow(void);
 bool storage_disk_is_active(void);
 int storage_soft_reset(void);
 int storage_init(void);
-int storage_read_sectors(int drive, unsigned long start, int count, void* buf);
-int storage_write_sectors(int drive, unsigned long start, int count, const void* buf);
 int storage_flush(void);
 void storage_spin(void);
 void storage_spindown(int seconds);
@@ -217,4 +210,7 @@ bool storage_present(int drive);
 #endif
 
 #endif /* NOT CONFIG_STORAGE_MULTI and NOT SIMULATOR*/
+
+int storage_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
+int storage_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
 #endif

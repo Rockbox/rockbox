@@ -82,7 +82,7 @@ struct partinfo* disk_init(IF_MD_NONVOID(int drive))
     (void)drive;
 #endif
 
-    storage_read_sectors(drive, 0,1, &sector);
+    storage_read_sectors(IF_MD2(drive,) 0,1, &sector);
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {

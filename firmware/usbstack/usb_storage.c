@@ -353,7 +353,7 @@ static bool check_disk_present(IF_MD_NONVOID(int volume))
     return true;
 #else
     unsigned char sector[SECTOR_SIZE];
-    return storage_read_sectors(volume,0,1,sector) == 0;
+    return storage_read_sectors(IF_MD2(volume,)0,1,sector) == 0;
 #endif
 }
 
@@ -537,7 +537,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                         cur_cmd.data[cur_cmd.data_select],
                         MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                int result = storage_write_sectors(cur_cmd.lun,
+                int result = storage_write_sectors(IF_MD2(cur_cmd.lun,)
                         cur_cmd.sector,
                         MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);
@@ -726,7 +726,7 @@ static void send_and_read_next(void)
                 ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-        cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
+        cur_cmd.last_result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
                 cur_cmd.sector,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                 cur_cmd.data[cur_cmd.data_select]);
@@ -1070,7 +1070,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                         ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                         MIN(READ_BUFFER_SIZE/SECTOR_SIZE,cur_cmd.count)*SECTOR_SIZE);
 #else
-                cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
+                cur_cmd.last_result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
                         cur_cmd.sector,
                         MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);

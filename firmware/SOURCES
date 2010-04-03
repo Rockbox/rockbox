@@ -152,9 +152,7 @@ drivers/sd.c
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 drivers/ramdisk.c
 #endif
-#ifdef CONFIG_STORAGE_MULTI
 storage.c
-#endif
 drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 hotswap.c

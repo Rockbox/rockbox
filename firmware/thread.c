@@ -2413,6 +2413,11 @@ unsigned int create_thread(void (*function)(void),
     prio_add_entry(&thread->pdist, priority);
 #endif
 
+#ifdef HAVE_IO_PRIORITY
+    /* Default to high (foreground) priority */
+    thread->io_priority = IO_PRIORITY_IMMEDIATE;
+#endif
+
 #if NUM_CORES > 1
     thread->core = core;
 
@@ -2917,6 +2922,20 @@ int thread_get_priority(unsigned int thread_id)
     return base_priority;
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
+
+#ifdef HAVE_IO_PRIORITY
+int thread_get_io_priority(unsigned int thread_id)
+{
+    struct thread_entry *thread = thread_id_entry(thread_id);
+    return thread->io_priority;
+}
+
+void thread_set_io_priority(unsigned int thread_id,int io_priority)
+{
+    struct thread_entry *thread = thread_id_entry(thread_id);
+    thread->io_priority = io_priority;
+}
+#endif
 
 /*---------------------------------------------------------------------------
  * Starts a frozen thread - similar semantics to wakeup_thread except that

@@ -921,4 +921,8 @@ Lyre prototype 1 */
 #define HAVE_PLUGIN_CHECK_OPEN_CLOSE
 #endif
 
+#ifdef HAVE_DIRCACHE
+#define HAVE_IO_PRIORITY
+#endif
+
 #endif /* __CONFIG_H__ */

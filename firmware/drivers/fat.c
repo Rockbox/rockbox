@@ -311,7 +311,7 @@ int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 #endif
 
     /* Read the sector */
-    rc = storage_read_sectors(drive, startsector,1,buf);
+    rc = storage_read_sectors(IF_MD2(drive,) startsector,1,buf);
     if(rc)
     {
         DEBUGF( "fat_mount() - Couldn't read BPB (error code %d)\n", rc);
@@ -433,7 +433,7 @@ int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 #endif /* #ifdef HAVE_FAT16SUPPORT */
     {
         /* Read the fsinfo sector */
-        rc = storage_read_sectors(drive, 
+        rc = storage_read_sectors(IF_MD2(drive,)
             startsector + fat_bpb->bpb_fsinfo, 1, buf);
         if (rc < 0)
         {
@@ -618,7 +618,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
 #endif
 
     /* Write to the first FAT */
-    rc = storage_write_sectors(fce->fat_vol->drive,
+    rc = storage_write_sectors(IF_MD2(fce->fat_vol->drive,)
                            secnum, 1,
                            sectorbuf);
     if(rc < 0)
@@ -639,7 +639,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
 #else
         secnum += fat_bpbs[0].fatsize;
 #endif
-        rc = storage_write_sectors(fce->fat_vol->drive,
+        rc = storage_write_sectors(IF_MD2(fce->fat_vol->drive,)
                                secnum, 1, sectorbuf);
         if(rc < 0)
         {
@@ -685,7 +685,7 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
     /* Load the sector if it is not cached */
     if(!fce->inuse)
     {
-        rc = storage_read_sectors(fat_bpb->drive,
+        rc = storage_read_sectors(IF_MD2(fat_bpb->drive,)
                               secnum + fat_bpb->startsector,1,
                               sectorbuf);
         if(rc < 0)
@@ -944,7 +944,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
 #endif /* #ifdef HAVE_FAT16SUPPORT */
 
     /* update fsinfo */
-    rc = storage_read_sectors(fat_bpb->drive, 
+    rc = storage_read_sectors(IF_MD2(fat_bpb->drive,)
                           fat_bpb->startsector + fat_bpb->bpb_fsinfo, 1,fsinfo);
     if (rc < 0)
     {
@@ -957,7 +957,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
     intptr = (long*)&(fsinfo[FSINFO_NEXTFREE]);
     *intptr = htole32(fat_bpb->fsinfo.nextfree);
 
-    rc = storage_write_sectors(fat_bpb->drive,
+    rc = storage_write_sectors(IF_MD2(fat_bpb->drive,)
                            fat_bpb->startsector + fat_bpb->bpb_fsinfo,1,fsinfo);
     if (rc < 0)
     {
@@ -2110,11 +2110,11 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
         if (start + count > fat_bpb->totalsectors)
             panicf("Write %ld after data\n",
                 start + count - fat_bpb->totalsectors);
-        rc = storage_write_sectors(fat_bpb->drive,
+        rc = storage_write_sectors(IF_MD2(fat_bpb->drive,)
                                start + fat_bpb->startsector, count, buf);
     }
     else
-        rc = storage_read_sectors(fat_bpb->drive,
+        rc = storage_read_sectors(IF_MD2(fat_bpb->drive,)
                               start + fat_bpb->startsector, count, buf);
     if (rc < 0) {
         DEBUGF( "transfer() - Couldn't %s sector %lx"
