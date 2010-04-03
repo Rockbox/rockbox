@@ -130,7 +130,18 @@ bool button_hold(void)
 #ifndef BOOTLOADER
     static bool hold_button_old = false;
 #endif
+
+    GPIOA_DIR |= 1<<7;
+    GPIOA_PIN(7) = 1<<7;
+
+    int delay = 50;
+    while(delay--)
+        asm("nop");
+
     bool hold_button = (GPIOA_PIN(3) != 0);
+
+    GPIOA_PIN(7) = 0;
+    GPIOA_DIR &= ~(1<<7);
 
 #ifndef BOOTLOADER
     /* light handling */
