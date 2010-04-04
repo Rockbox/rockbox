@@ -130,32 +130,42 @@ Viewers are stored in the \fname{/.rockbox/rocks/viewers/} directory.
 Some viewer plugins can only be used by selecting the \setting{Open With...}
 option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \begin{table}
-\begin{rbtabular}{.92\textwidth}{Xlc}%
+  \begin{rbtabular}{.92\textwidth}{Xlc}%
       {\textbf{Viewer Plugin}& \textbf{Associated filetype(s)} & \textbf{Context Menu only}}%
       {}{}
-  BMP Viewer            & \fname{.bmp}                     & \\
-  Shortcuts             & \fname{.link}                    & \\ 
-  Chip-8 Emulator       & \fname{.ch8}                     & \\
-  Frotz                 & \fname{.z1 - .z8}                & \\
-  JPEG Viewer           & \fname{.jpg, .jpeg}              & \\
-  Lua scripting language& \fname{.lua}                     & \\
-  Midiplay              & \fname{.mid, .midi}              & \\
-  \opt{swcodec}{
-  MPEG Player           & \fname{.mpg, .mpeg, .mpv, .m2v}  & \\}
-  \opt{masf}{\opt{lcd_bitmap}{
-  Movie Player          & \fname{.rvf}                     & \\}}
-  PNG viewer            & \fname{.png}                     & \\
-  \opt{lcd_color}{
-  PPM viewer            & \fname{.ppm}                     & \\}
-  Rockboy               & \fname{.gb, .gbc}                & \\
-  Search                & \fname{.m3u, .m3u8}              & x \\
-  Sort                  & \fname{.*}                       & x \\
-  Text Viewer           & \fname{.txt, .nfo, .*}           & \\
-  VBRfix                & \fname{.mp3}                     & x \\
-  \opt{masf}{
-  Wavplay               & \fname{.wav}                     & \\}
-  ZXBox                 & \fname{.tap, .tax, .sna, .z80}   & \\
-\end{rbtabular}
+    BMP Viewer            & \fname{.bmp}                     &   \\
+    Shortcuts             & \fname{.link}                    &   \\
+    Chip-8 Emulator       & \fname{.ch8}                     &   \\
+    Frotz                 & \fname{.z1 - .z8}                &   \\
+    JPEG Viewer           & \fname{.jpg, .jpeg}              &   \\
+    Lua scripting language& \fname{.lua}                     &   \\
+    \opt{swcodec}{
+        Midiplay          & \fname{.mid, .midi}              &   \\
+        MPEG Player       & \fname{.mpg, .mpeg, .mpv, .m2v}  &   \\
+    }
+    \opt{masf}{
+        \opt{lcd_bitmap}{
+            Movie Player  & \fname{.rvf}                     &   \\
+        }
+    }
+    \opt{lcd_color}{
+        PNG viewer        & \fname{.png}                     &   \\
+        PPM viewer        & \fname{.ppm}                     &   \\
+    }
+    \opt{lcd_bitmap}{
+        \nopt{ondio}{% not enough buttons
+            Rockboy       & \fname{.gb, .gbc}                &   \\
+        }
+    }
+    Search                & \fname{.m3u, .m3u8}              & x \\
+    Sort                  & \fname{.*}                       & x \\
+    Text Viewer           & \fname{.txt,.nfo, .*}            &   \\
+    VBRfix                & \fname{.mp3}                     & x \\
+    \opt{masf}{
+        Wavplay           & \fname{.wav}                     &   \\
+    }
+    ZXBox                 & \fname{.tap, .tax, .sna, .z80}   &   \\
+  \end{rbtabular}
 \end{table}
 
 {\input{plugins/shortcuts.tex}}
