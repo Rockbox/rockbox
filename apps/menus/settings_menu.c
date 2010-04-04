@@ -411,6 +411,7 @@ static void view_hotkey_info(void)
     struct simplelist_info info;
     simplelist_info_init(&info, str(LANG_VIEW_HOTKEY), 0, NULL);
     info.hide_selection = true;
+    info.scroll_all = true;
     simplelist_set_line_count(2);
     simplelist_addline(0, "WPS: %s",
         str(global_settings.hotkey_wps_desc_id));
