@@ -83,6 +83,21 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     this->setWindowIcon(windowIcon);
 #endif
 
+#if defined(Q_OS_WIN32)
+    long ret;
+    HKEY hk;
+    ret = RegOpenKeyEx(HKEY_CURRENT_USER, _TEXT("Software\\Wine"),
+        0, KEY_QUERY_VALUE, &hk);
+    if(ret == ERROR_SUCCESS) {
+        QMessageBox::warning(this, tr("Wine detected!"),
+                tr("It seems you are trying to run this program under Wine. "
+                    "Please don't do this, running under Wine will fail. "
+                    "Use the native Linux binary instead."),
+                QMessageBox::Ok, QMessageBox::Ok);
+        qDebug() << "[RbUtil] WINE DETECTED!";
+        RegCloseKey(hk);
+    }
+#endif
     downloadInfo();
 
     m_gotInfo = false;
