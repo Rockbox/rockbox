@@ -68,24 +68,27 @@ findtool(){
   fi
 }
 
-# scan the $PATH for sdl-config - if crosscompiling, require that it is
-# a mingw32 sdl-config
+# scan the $PATH for sdl-config - check whether for a (cross-)win32
+# sdl as requested
 findsdl(){
   file="sdl-config"
+  winbuild="$1"
 
   IFS=":"
   for path in $PATH
   do
     #echo "checks for $file in $path" >&2
     if test -f "$path/$file"; then
-      if [ "yes" = "${crosscompile}" ]; then
-        if [ "0" != `$path/$file --libs |grep -c mwindows` ]; then
+      if [ "0" != `$path/$file --libs |grep -c mwindows` ]; then
+        if [ "yes" = "${winbuild}" ]; then
           echo "$path/$file"
           return
         fi
       else
-        echo "$path/$file"
-        return
+        if [ "yes" != "${winbuild}" ]; then
+          echo "$path/$file"
+          return
+        fi
       fi
     fi
   done
@@ -97,26 +100,13 @@ simcc () {
  prefixtools ""
 
  simver=sdl
+ winbuild="$crosscompile"
  GCCOPTS='-W -Wall -g -fno-builtin'
  GCCOPTIMIZE=''
+ LDOPTS=''
 
- output="rockboxui" # use this as default output binary name
- sdl=`findsdl`
- sdl_cflags=""
- sdl_libs=""
-
- if [ $1 = "sdl" ]; then
-    if [ -z "$sdl" ]; then
-        echo "configure didn't find sdl-config, which indicates that you"
-        echo "don't have SDL (properly) installed. Please correct and"
-        echo "re-run configure!"
-        exit 1
-    else 
-        # generic sdl-config checker
-        sdl_cflags=`$sdl --cflags`
-        sdl_libs=`$sdl --libs`
-    fi
- fi
+ # default output binary name
+ output="rockboxui"
 
  # default share option, override below if needed
  SHARED_FLAG="-shared"
@@ -125,55 +115,57 @@ simcc () {
    CYGWIN*)
    echo "Cygwin host detected"
 
-   # sdl version
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="-mconsole $sdl_libs"
-
-   output="rockboxui.exe" # use this as output binary name
+   LDOPTS="-mconsole"
+   output="rockboxui.exe"
+   winbuild="yes"
    ;;
 
    MINGW*)
    echo "MinGW host detected"
 
-   # sdl version
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="-mconsole $sdl_libs"
-
-   output="rockboxui.exe" # use this as output binary name
+   LDOPTS="-mconsole"
+   output="rockboxui.exe"
+   winbuild="yes"
    ;;
 
    Linux)
    echo "Linux host detected"
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="$sdl_libs"
    ;;
 
    FreeBSD)
    echo "FreeBSD host detected"
-   # sdl version
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="$sdl_libs"
    ;;
 
    Darwin)
    echo "Darwin host detected"
-   # sdl version
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="$sdl_libs"
+
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    ;;
 
    SunOS)
    echo "*Solaris host detected"
-   GCCOPTS="$GCCOPTS $sdl_cflags"
-   LDOPTS="$sdl_libs"
    ;;
 
    *)
    echo "[ERROR] Unsupported system: $uname, fix configure and retry"
-   exit 2
+   exit 1
    ;;
  esac
+
+ sdl=`findsdl $winbuild`
+
+ if [ $1 = "sdl" ]; then
+    if [ -z "$sdl" ]; then
+        echo "configure didn't find sdl-config, which indicates that you"
+        echo "don't have SDL (properly) installed. Please correct and"
+        echo "re-run configure!"
+        exit 2
+    else 
+        # generic sdl-config checker
+        GCCOPTS="$GCCOPTS `$sdl --cflags`"
+        LDOPTS="$LDOPTS `$sdl --libs`"
+    fi
+ fi
 
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
@@ -230,8 +222,8 @@ EOF
    # We are crosscompiling
    # add cross-compiler option(s)
    prefixtools i586-mingw32msvc-
-   LDOPTS="-mconsole $sdl_libs"
-   output="rockboxui.exe" # use this as output binary name
+   LDOPTS="$LDOPTS -mconsole"
+   output="rockboxui.exe"
    endian="little" # windows is little endian
    echo "Enabling MMX support"
    GCCOPTS="$GCCOPTS -mmmx"
