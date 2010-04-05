@@ -23,8 +23,10 @@ STARTUP(target/arm/crt0.o)
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
+#define CODEC_BUFFER_FILLS_IRAM defined(AMS_LOWMEM) || (CONFIG_CPU == AS3525v2)
 
-#ifdef AMS_LOWMEM
+#if CODEC_BUFFER_FILLS_IRAM
+/* Entire codec buffer in IRAM */
 #define DRAMSIZE (DRAM_SIZE - STUBOFFSET - PLUGINSIZE - TTB_SIZE)
 #define CODECORIG (IRAMORIG + (IRAM_SIZE - CODEC_SIZE))
 #define IRAMSIZE (IRAM_SIZE - CODEC_SIZE)
@@ -36,7 +38,7 @@ STARTUP(target/arm/crt0.o)
 
 
 /* Where the codec buffer ends, and the plugin buffer starts */
-#ifdef AMS_LOWMEM
+#if CODEC_BUFFER_FILLS_IRAM
 #define ENDADDR (ENDAUDIOADDR)
 #else
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
@@ -44,7 +46,7 @@ STARTUP(target/arm/crt0.o)
 
 MEMORY
 {
-#ifdef AMS_LOWMEM
+#if CODEC_BUFFER_FILLS_IRAM
     CODEC_IRAM : ORIGIN = CODECORIG, LENGTH = CODEC_SIZE
 #endif
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
@@ -110,7 +112,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .init CODECORIG : 
+    .init ENDADDR : 
     {
         . = ALIGN(4);
         _initstart = .;
@@ -154,7 +156,7 @@ SECTIONS
     {
         codecbuf = .;
         _codecbuf = .;
-#ifdef AMS_LOWMEM
+#if CODEC_BUFFER_FILLS_IRAM
     } > CODEC_IRAM
 #else
     } > DRAM
