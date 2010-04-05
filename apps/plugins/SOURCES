@@ -180,3 +180,25 @@ md5sum.c
 #ifdef USB_ENABLE_HID
 remote_control.c
 #endif
+
+#ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
+test_boost.c
+test_codec.c
+test_core_jpeg.c
+test_disk.c
+test_fps.c
+test_gfx.c
+#ifndef HAVE_LCD_COLOR
+test_grey.c
+test_greylib_bitmap_scale.c
+#endif
+test_mem.c
+test_mem_jpeg.c
+test_resize.c
+test_sampr.c
+test_scanrate.c
+#ifdef HAVE_TOUCHSCREEN
+test_touchscreen.c
+#endif
+test_viewports.c
+#endif

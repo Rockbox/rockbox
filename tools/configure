@@ -362,7 +362,7 @@ whichadvanced () {
     interact=1
     echo ""
     echo "Enter your developer options (press enter when done)"
-    printf "(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile"
+    printf "(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile, (T)est plugins"
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
@@ -402,6 +402,10 @@ whichadvanced () {
       [Ll])
         echo "logf() support enabled"
         logf="yes"
+        ;;
+      [Tt])
+        echo "Including test plugins"
+        extradefines="$extradefines -DHAVE_TEST_PLUGINS"
         ;;
       [Cc])
           echo "bootchart enabled (logf also enabled)"
