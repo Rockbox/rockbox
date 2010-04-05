@@ -69,16 +69,22 @@
 #define AS3525_FCLK_PREDIV      0
 #define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
 
-/* XXX: CGU_PERI might also be different (i.e. no PCLK_DIV1_SEL), but if we use
- * the same frequency for DRAM & PCLK it's not a problem as the bit is unset
+/* XXX: CGU_PERI might also be different (i.e. no PCLK_DIV1_SEL), so we don't
+ * set bit 6 (PCLK_DIV1_SEL) for the moment
  *
  * Note that setting bits 1:0 have no effect and they always read back as 0
- * Perhaps it means CGU_PERI defaults to PLLA as source ?
+ * Also note that CGU_PERI is based on fclk, not PLLA
  */
-#define AS3525_DRAM_FREQ        60000000    /* Initial DRAM frequency  */
-#define AS3525_PCLK_FREQ        AS3525_DRAM_FREQ/1
 
-#else /* AS3525v1 */
+#ifdef SANSA_FUZEV2
+/* XXX: display is noticeably slower at 24MHz */
+#define AS3525_DRAM_FREQ        60000000    /* Initial DRAM frequency  */
+#else
+#define AS3525_DRAM_FREQ        24000000    /* Initial DRAM frequency  */
+#endif /* SANSA_FUZEV2 */
+
+#else
+/* AS3525v1 */
 
 /* PLL  frequencies and settings*/
 #define AS3525_PLLA_FREQ        248000000   /*124,82.7,62,49.6,41.3,35.4 */
@@ -102,42 +108,31 @@
 
 #define AS3525_FCLK_FREQ      248000000            /* Boosted FCLK frequency  */
 #define AS3525_DRAM_FREQ       62000000            /* Initial DRAM frequency  */
-        /* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
-#define AS3525_PCLK_FREQ      AS3525_DRAM_FREQ/1   /* PCLK divided from DRAM freq */
+/* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
 
 #endif  /* CONFIG_CPU == AS3525v2 */
 
-#define AS3525_DBOP_FREQ      AS3525_PCLK_FREQ/1   /* DBOP divided from PCLK freq */
+#define AS3525_PCLK_FREQ      (AS3525_DRAM_FREQ/1)   /* PCLK divided from DRAM freq */
+
+#define AS3525_DBOP_FREQ      (AS3525_PCLK_FREQ/1)   /* DBOP divided from PCLK freq */
 
 /** ****************************************************************************/
 
-/* Figure out if we need to use asynchronous bus */
-#if (AS3525_FCLK_FREQ % AS3525_PCLK_FREQ)
-#define ASYNCHRONOUS_BUS                          /* Boosted mode asynchronous */
-#endif
-
 /* Tell the software what frequencies we're running */
 #define CPUFREQ_MAX              AS3525_FCLK_FREQ
-
-#if CONFIG_CPU == AS3525
 #define CPUFREQ_DEFAULT          AS3525_PCLK_FREQ
 #define CPUFREQ_NORMAL           AS3525_PCLK_FREQ
-#else
-/* On as3525v2, pclk & fclk are not bound */
-#ifdef SANSA_FUZEV2
-    /* scrollwheel is much less responsive under 60MHz */
-#define CPUFREQ_DEFAULT          60000000
-#define CPUFREQ_NORMAL           60000000
-#else
-#define CPUFREQ_DEFAULT          24000000
-#define CPUFREQ_NORMAL           24000000
-#endif /* SANSA_FUZEV2 */
-#endif /* CONFIG_CPU == AS3525 */
 
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
 #define AS3525_FCLK_POSTDIV      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), AS3525_FCLK_FREQ) - 1) /*div=1/(n+1)*/
-#define AS3525_FCLK_POSTDIV_UNBOOSTED      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), CPUFREQ_NORMAL) - 1) /*div=1/(n+1) : needed for as3525v2 */
+
+#if CONFIG_CPU == AS3525v2
+/* On as3525v2 we change fclk by writing to CGU_PROC */
+#define AS3525_FCLK_POSTDIV_UNBOOSTED      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), CPUFREQ_NORMAL) - 1) /*div=1/(n+1) */
+/* Since pclk is based on fclk, we need to change CGU_PERI as well */
+#define AS3525_PCLK_DIV0_UNBOOSTED (CLK_DIV(CPUFREQ_NORMAL, AS3525_DRAM_FREQ) - 1) /*div=1/(n+1)*/
+#endif /* CONFIG_CPU == AS3525v2 */
 
 /* MCLK */
 #define AS3525_MCLK_SEL          AS3525_CLK_PLLA
@@ -150,13 +145,20 @@
 #endif
 
 /* PCLK */
+
+/* Figure out if we need to use asynchronous bus */
+#if ((CONFIG_CPU == AS3525) && (AS3525_FCLK_FREQ % AS3525_PCLK_FREQ))
+#define ASYNCHRONOUS_BUS                          /* Boosted mode asynchronous */
+#endif
+
 #ifdef ASYNCHRONOUS_BUS
 #define AS3525_PCLK_SEL          AS3525_CLK_PLLA    /* PLLA input for asynchronous */
 #define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_DRAM_FREQ) - 1)/*div=1/(n+1)*/
-#else
+#else /* ASYNCHRONOUS_BUS */
 #define AS3525_PCLK_SEL          AS3525_CLK_FCLK    /* Fclk input for synchronous */
 #define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_FCLK_FREQ, AS3525_DRAM_FREQ) - 1) /*div=1/(n+1)*/
-#endif
+#endif /* ASYNCHRONOUS_BUS */
+
          /*unable to use AS3525_PCLK_DIV1 != 0 successfuly so far*/
 #define AS3525_PCLK_DIV1         (CLK_DIV(AS3525_DRAM_FREQ, AS3525_PCLK_FREQ) - 1)/* div = 1/(n+1)*/ 
 

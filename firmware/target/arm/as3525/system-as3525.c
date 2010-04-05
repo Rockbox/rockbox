@@ -290,7 +290,9 @@ void system_init(void)
     /*  Set PCLK frequency */
     CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider & clksel bits */
                  (AS3525_PCLK_DIV0 << 2) |
+#if CONFIG_CPU == AS3525
                  (AS3525_PCLK_DIV1 << 6) |
+#endif
                   AS3525_PCLK_SEL);
 
 #ifdef BOOTLOADER
@@ -372,9 +374,16 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 #else
+    /* AS3525v2 */
+    int oldstatus = disable_irq_save();
+
+    /* Change PCLK while FCLK is low, so it doesn't go too high */
+    CGU_PERI = (CGU_PERI & ~(0x1F << 2)) | (AS3525_PCLK_DIV0 << 2);
+
     CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                 (AS3525_FCLK_PREDIV  << 2) |
                  AS3525_FCLK_SEL);
+    restore_irq(oldstatus);
 #endif /* CONFIG_CPU == AS3525 */
 
         cpu_frequency = CPUFREQ_MAX;
@@ -388,9 +397,17 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 #else
+    /* AS3525v2 */
+    int oldstatus = disable_irq_save();
+
     CGU_PROC = ((AS3525_FCLK_POSTDIV_UNBOOSTED << 4) |
                 (AS3525_FCLK_PREDIV  << 2) |
                  AS3525_FCLK_SEL);
+
+    /* Change PCLK after FCLK is low, so it doesn't go too high */
+    CGU_PERI = (CGU_PERI & ~(0x1F << 2)) | (AS3525_PCLK_DIV0_UNBOOSTED << 2);
+
+    restore_irq(oldstatus);
 #endif /* CONFIG_CPU == AS3525 */
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
