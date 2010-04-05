@@ -366,6 +366,8 @@ static void lcd_window_blit(int xmin, int ymin, int xmax, int ymax)
     }
 }
 
+
+#ifndef BOOTLOADER
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
                                    int width,
@@ -433,6 +435,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
         while (--height > 0);
     }
 }
+
+#endif
+
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

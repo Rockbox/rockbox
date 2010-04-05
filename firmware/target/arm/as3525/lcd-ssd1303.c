@@ -216,6 +216,8 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     }
 }
 
+
+#ifndef BOOTLOADER
 /* Helper function for lcd_grey_phase_blit(). */
 void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
@@ -241,6 +243,9 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
         phases += stride;
     }
 }
+
+#endif
+
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
