@@ -30,6 +30,8 @@
 #define DBOP_PRECHARGE 0xF0FF
 #endif
 
+#if CONFIG_CPU == AS3525
+/* doesn't work with the new ams sansas so far and is not needed */
 static short int dbop_input_value = 0;
 
 /* read the DBOP data pins */
@@ -77,13 +79,24 @@ unsigned short dbop_debug(void)
     return dbop_input_value;
 }
 
+#endif
+
 static inline void dbop_set_mode(int mode)
 {
     int delay = 10;
-    if (mode == 32 && (!(DBOP_CTRL & (1<<13|1<<14))))
-        DBOP_CTRL |= (1<<13|1<<14);
-    else if (mode == 16 && (DBOP_CTRL & (1<<13|1<<14)))
-        DBOP_CTRL &= ~(1<<14|1<<13);
+    unsigned long ctrl = DBOP_CTRL;
+    int curr_mode = (DBOP_CTRL >> 13) & 0x3; // bits 14:13
+#ifdef SANSA_FUZEV2
+    if (mode == 32 && curr_mode != 1<<1)
+        DBOP_CTRL = (ctrl & ~(1<<13)) | (1<<14); // 2 serial half words
+    else if (mode == 16 && curr_mode != 1<<0)
+        DBOP_CTRL = (ctrl & ~(1<<14)) | (1<<13); // 2 serial bytes
+#else
+    if (mode == 32 && curr_mode == 0)
+        DBOP_CTRL = ctrl | (1<<13|1<<14); /* 2 serial half words */
+    else if (mode == 16 && curr_mode == (1<<1|1<<0))
+        DBOP_CTRL =  ctrl & ~(1<<14|1<<13); /* 1 serial half word */
+#endif
     else
         return;
     while(delay--) asm volatile("nop");

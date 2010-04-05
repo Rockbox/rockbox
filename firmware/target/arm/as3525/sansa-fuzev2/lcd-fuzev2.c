@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "system.h"
 #include "clock-target.h"
+#include "dbop-as3525.h"
 
 /* The controller is unknown, but some registers appear to be the same as the
    HD66789R */
@@ -113,67 +114,13 @@ static void as3525_dbop_init(void)
     DBOP_TIMPOL_23 = 0xA12FE037;
 }
 
-static inline void dbop_set_mode(int mode)
-{
-    unsigned long ctrl = DBOP_CTRL;
-    int words = (ctrl >> 13) & 3; // bits 14:13
-    if (mode == 32 && words != 2)
-        DBOP_CTRL = (ctrl & ~(1<<13)) | (1<<14); // 4 serial words
-    else if (mode == 16 && words != 1)
-        DBOP_CTRL = (ctrl & ~(1<<14)) | (1<<13); // 2 serial words
-    else
-        return;
-    lcd_delay(10);
-}
-
-static void dbop_write_data(const int16_t* p_bytes, int count)
-{
-    const int32_t *data;
-    if ((intptr_t)p_bytes & 0x3 || count == 1)
-    {   /* need to do a single 16bit write beforehand if the address is
-         * not word aligned or count is 1, switch to 16bit mode if needed */
-        dbop_set_mode(16);
-        DBOP_DOUT16 = *p_bytes++;
-        if (!(--count))
-            return;
-    }
-    /* from here, 32bit transfers are save
-     * set it to transfer 4*(outputwidth) units at a time,
-     * if bit 12 is set it only does 2 halfwords though (we never set it)
-     * switch to 32bit output if needed */
-    dbop_set_mode(32);
-    data = (int32_t*)p_bytes;
-
-    while (count > 1)
-    {
-        DBOP_DOUT32 = *data++;
-        count -= 2;
-
-        /* Wait if push fifo is full */
-        while ((DBOP_STAT & (1<<6)) != 0);
-    }
-    /* While push fifo is not empty */
-    while ((DBOP_STAT & (1<<10)) == 0);
-
-    /* due to the 32bit alignment requirement or uneven count,
-     * we possibly need to do a 16bit transfer at the end also */
-    if (count > 0)
-        dbop_write_data((int16_t*)data, 1);
-}
 
 static void lcd_write_cmd(unsigned short cmd)
 {
-    volatile int i;
-    lcd_delay(0x20);
-
-    DBOP_CTRL |= 1<<13;
-    DBOP_CTRL &= ~(1<<14);  // 2 serial words
-    DBOP_CTRL &= ~(1<<12);  // 8 bit data width
+    unsigned short data = swap16(cmd);
     DBOP_TIMPOL_23 = 0xA12F0036;
-    DBOP_DOUT = swap16(cmd);
-
-    while ((DBOP_STAT & (1<<10)) == 0);
-    for(i=0;i<0x20;i++) asm volatile ("nop\n");
+    dbop_write_data(&data, 1);
+    lcd_delay(32);
     DBOP_TIMPOL_23 = 0xA12FE037;
 }
 
@@ -403,8 +350,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_window_y(y, y + 1);
 
             lcd_write_cmd(R_WRITE_DATA_2_GRAM);
-
-            dbop_set_mode(32);
             lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
@@ -420,8 +365,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_window_y(y, y + 1);
 
             lcd_write_cmd(R_WRITE_DATA_2_GRAM);
-
-            dbop_set_mode(32);
             lcd_write_yuv420_lines(yuv_src, width, stride);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
