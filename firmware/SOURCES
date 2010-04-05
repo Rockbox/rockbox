@@ -1303,7 +1303,7 @@ target/arm/as3525/sansa-fuze/powermgmt-fuze.c
 #ifdef SANSA_FUZEV2
 #ifndef SIMULATOR
 target/arm/as3525/sansa-fuzev2/lcd-fuzev2.c
-target/arm/as3525/lcd-as-e200v2-fuze.S
+target/arm/as3525/sansa-fuzev2/lcd-as-fuzev2.S
 target/arm/as3525/sansa-fuzev2/backlight-fuzev2.c
 target/arm/as3525/sansa-fuzev2/button-fuzev2.c
 #ifndef BOOTLOADER

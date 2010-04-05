@@ -404,6 +404,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
+            dbop_set_mode(32);
             lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
@@ -420,6 +421,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
+            dbop_set_mode(32);
             lcd_write_yuv420_lines(yuv_src, width, stride);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
