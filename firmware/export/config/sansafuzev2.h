@@ -86,7 +86,7 @@
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 /* rgb565 */
+#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 swapped */
 
 
 /* AS3514 or newer */

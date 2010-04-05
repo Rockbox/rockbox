@@ -581,7 +581,7 @@ void print_usage(void)
            "\t         2  Iriver H1x0 4-grey\n"
            "\t         3  Canonical 8-bit greyscale\n"
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
-           "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
+           "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod, Fuzev2)\n"
            "\t         6  Greyscale iPod 4-grey\n"
            "\t         7  Greyscale X5 remote 4-grey\n"
            "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n");

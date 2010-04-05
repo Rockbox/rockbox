@@ -133,7 +133,7 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
     {   /* need to do a single 16bit write beforehand if the address is
          * not word aligned or count is 1, switch to 16bit mode if needed */
         dbop_set_mode(16);
-        DBOP_DOUT16 = swap16(*p_bytes++);
+        DBOP_DOUT16 = *p_bytes++;
         if (!(--count))
             return;
     }
@@ -146,7 +146,7 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
 
     while (count > 1)
     {
-        DBOP_DOUT32 = swap_odd_even32(*data++);
+        DBOP_DOUT32 = *data++;
         count -= 2;
 
         /* Wait if push fifo is full */
@@ -179,7 +179,7 @@ static void lcd_write_cmd(unsigned short cmd)
 
 static void lcd_write_reg(int reg, int value)
 {
-    int16_t data = value;
+    int16_t data = swap16(value);
     lcd_write_cmd(reg);
     dbop_write_data(&data, 1);
 }
