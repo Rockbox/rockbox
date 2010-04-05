@@ -69,8 +69,7 @@ enum plugin_status plugin_start(const void* parameter)
                               KB_PER_SEC(delta));
         rb->screens[0]->update();
 
-        int button = rb->button_get(false);
-        switch (button)
+        switch (rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK))
         {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             case ACTION_STD_PREV:
