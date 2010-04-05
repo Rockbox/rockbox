@@ -13417,15 +13417,15 @@
   user: core
   <source>
     *: none
-    hotkey: "Assigned hotkey: %s"
+    hotkey: "Assigned Hotkey: %s"
   </source>
   <dest>
     *: none
-    hotkey: "Assigned hotkey: %s"
+    hotkey: "Assigned Hotkey: %s"
   </dest>
   <voice>
     *: none
-    hotkey: "Assigned hotkey"
+    hotkey: "Assigned Hotkey"
   </voice>
 </phrase>
 <phrase>
