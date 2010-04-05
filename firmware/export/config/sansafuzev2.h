@@ -165,7 +165,7 @@
 #define CURRENT_RECORD     CURRENT_NORMAL
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      240000000
+#define CPU_FREQ      40000000
 
 /* Type of LCD */
 #define CONFIG_LCD LCD_FUZE

@@ -77,8 +77,10 @@
  */
 
 #ifdef SANSA_FUZEV2
-/* XXX: display is noticeably slower at 24MHz */
-#define AS3525_DRAM_FREQ        60000000    /* Initial DRAM frequency  */
+/* CPU_FREQ is defined in config/<target>.h
+ * display is noticeably slower at 24MHz
+ * 34285715 HZ works butter but 40MHz works even better*/
+#define AS3525_DRAM_FREQ        CPU_FREQ    /* Initial DRAM frequency  */
 #else
 #define AS3525_DRAM_FREQ        24000000    /* Initial DRAM frequency  */
 #endif /* SANSA_FUZEV2 */
