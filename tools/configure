@@ -144,6 +144,9 @@ simcc () {
 
    SunOS)
    echo "*Solaris host detected"
+
+   GCCOPTS="$GCCOPTS -fPIC"
+   LDOPTS="-lm"
    ;;
 
    *)
