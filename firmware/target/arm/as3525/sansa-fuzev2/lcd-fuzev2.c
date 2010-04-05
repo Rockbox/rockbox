@@ -144,23 +144,9 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
     dbop_set_mode(32);
     data = (int32_t*)p_bytes;
 
-    const unsigned int mask = 0xff00ff;
     while (count > 1)
     {
-        register unsigned int pixels = *data++;
-        register unsigned int tmp;
-
-        /* pixels == ABCD */
-        asm(
-            "and %[tmp], %[pixels], %[mask]           \n" /* tmp       = 0B0D */
-            "and %[pixels], %[pixels], %[mask], lsl #8\n" /* %[pixels] = A0C0 */
-            "mov %[pixels], %[pixels], lsr #8         \n" /* %[pixels] = 0A0C */
-            "orr %[pixels], %[pixels], %[tmp], lsl #8 \n" /* %[pixels] = BADC */
-            : [pixels]"+r"(pixels), [tmp]"=r"(tmp)  /* output  */
-            : [mask]"r"(mask)                       /* input */
-        );
-
-        DBOP_DOUT32 = pixels;
+        DBOP_DOUT32 = swap_odd_even32(*data++);
         count -= 2;
 
         /* Wait if push fifo is full */
