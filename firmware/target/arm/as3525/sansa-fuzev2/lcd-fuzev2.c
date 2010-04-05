@@ -143,10 +143,23 @@ static void dbop_write_data(const int16_t* p_bytes, int count)
      * switch to 32bit output if needed */
     dbop_set_mode(32);
     data = (int32_t*)p_bytes;
+
+    const unsigned int mask = 0xff00ff;
     while (count > 1)
     {
-        int pixels = *data++;
-        pixels = (swap16(pixels >> 16) << 16) | (swap16(pixels & 0xffff));
+        register unsigned int pixels = *data++;
+        register unsigned int tmp;
+
+        /* pixels == ABCD */
+        asm(
+            "and %[tmp], %[pixels], %[mask]           \n" /* tmp       = 0B0D */
+            "and %[pixels], %[pixels], %[mask], lsl #8\n" /* %[pixels] = A0C0 */
+            "mov %[pixels], %[pixels], lsr #8         \n" /* %[pixels] = 0A0C */
+            "orr %[pixels], %[pixels], %[tmp], lsl #8 \n" /* %[pixels] = BADC */
+            : [pixels]"+r"(pixels), [tmp]"=r"(tmp)  /* output  */
+            : [mask]"r"(mask)                       /* input */
+        );
+
         DBOP_DOUT32 = pixels;
         count -= 2;
 
