@@ -113,7 +113,7 @@ struct vec_int_src vec_int_srcs[] =
     { INT_SRC_NAND, INT_NAND },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
-#ifdef HAVE_MULTIDRIVE
+#if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
 #ifdef HAVE_HOTSWAP
