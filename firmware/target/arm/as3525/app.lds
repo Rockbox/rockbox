@@ -112,7 +112,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .init ENDADDR : 
+    .init CODECORIG :
     {
         . = ALIGN(4);
         _initstart = .;
