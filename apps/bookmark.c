@@ -62,7 +62,7 @@ struct bookmark_list
 };
 
 /* bookmark flags */
-#define F_BMFILES   0x001
+#define F_BMFILES   0x01
 
 /* bookmark values */
 static struct {
@@ -916,6 +916,12 @@ static const char* skip_token(const char* s)
     return s;
 }
 
+static const char* long_token(const char* s, long* dest) 	 
+{ 	 
+    *dest = atoi(s);    /* Should be atol, but we don't have it. */ 	 
+    return skip_token(s); 	 
+} 	 
+
 /* ----------------------------------------------------------------------- */
 /* This function takes a bookmark and parses it.  This function also       */
 /* validates the bookmark.  Flags are set to indicate which bookmark       */
@@ -927,7 +933,7 @@ static bool parse_bookmark(const char *bookmark, const int flags)
     const char* end;
     
 #define FLAG(a) (flags & a)
-#define GET_INT_TOKEN(var)  var =  atoi(s);     s = skip_token(s)
+#define GET_INT_TOKEN(var)  s = long_token(s, (long *)&var)
 #define GET_BOOL_TOKEN(var) var = (atoi(s)!=0); s = skip_token(s)
     
     GET_INT_TOKEN(bm.resume_index);
