@@ -843,7 +843,7 @@ struct idct_entry {
     void (*h_idct)(int16_t *ws, unsigned char *out, int16_t *end, int rowstep);
 };
 
-struct idct_entry idct_tbl[] = {
+static const struct idct_entry idct_tbl[] = {
     { PASS1_BITS, NULL, jpeg_idct1h },
     { PASS1_BITS, jpeg_idct2v, jpeg_idct2h },
     { 0, jpeg_idct4v, jpeg_idct4h },
