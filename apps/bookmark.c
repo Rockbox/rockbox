@@ -63,26 +63,17 @@ struct bookmark_list
 
 /* bookmark flags */
 #define F_BMFILES   0x001
-#define F_RES_IND   0x002
-#define F_RES_OFF   0x004
-#define F_RES_SED   0x008
-#define F_RES_1ST   0x010
-#define F_RES_TIM   0x020
-#define F_REP_MOD   0x040
-#define F_SHUFFLE   0x080
 
-static struct bookmark_values
-{
-    int resume_index;
-    int resume_offset;
-    int resume_seed;
-    int resume_first_index; /* ?? */
+/* bookmark values */
+static struct {
+    int  resume_index;
+    unsigned long resume_offset;
+    int  resume_seed;
     long resume_time;
     int  repeat_mode;
     bool shuffle;
 } bm;
 
-#define CHECK_BOOKMARK(bookmark) parse_bookmark(bookmark, 0)
 static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark, 
                           bool most_recent);
 static char* create_bookmark(void);
@@ -294,7 +285,7 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
                         
             cp  = strchr(global_read_buffer,'/');
             tmp = strrchr(global_read_buffer,';');
-            if (CHECK_BOOKMARK(global_read_buffer) &&
+            if (parse_bookmark(global_read_buffer, 0) &&
                (!unique || len != tmp -cp || strncmp(playlist,cp,len)))
             {
                 bookmark_count++;
@@ -356,7 +347,7 @@ static char* create_bookmark()
              file+1);
 
     /* checking to see if the bookmark is valid */
-    if (CHECK_BOOKMARK(global_bookmark))
+    if (parse_bookmark(global_bookmark, 0))
         return global_bookmark;
     else
         return NULL;
@@ -572,7 +563,7 @@ static const char* get_bookmark_info(int list_index,
         }
     }
     
-    const int flags = F_BMFILES | F_RES_IND | F_RES_TIM | F_SHUFFLE;
+    const int flags = F_BMFILES;
     
     if (!parse_bookmark(bookmarks->items[index - bookmarks->start], flags))
     {
@@ -841,7 +832,7 @@ static void say_bookmark(const char* bookmark,
 {
     bool is_dir;
 
-    const int flags = F_BMFILES | F_RES_IND | F_RES_TIM | F_SHUFFLE;
+    const int flags = F_BMFILES;
     
     if (!parse_bookmark(bookmark, flags))
     {
@@ -897,8 +888,7 @@ static void say_bookmark(const char* bookmark,
 /* ------------------------------------------------------------------------*/
 static bool play_bookmark(const char* bookmark)
 {
-    const int flags = F_BMFILES | F_RES_IND | F_RES_OFF | F_RES_SED | 
-                      F_REP_MOD | F_SHUFFLE;
+    const int flags = F_BMFILES;
     
     if (parse_bookmark(bookmark, flags))
     {
@@ -926,36 +916,6 @@ static const char* skip_token(const char* s)
     return s;
 }
 
-static const char* int_token(const char* s, bool parse, int* dest)
-{
-    if (parse)
-    {
-        *dest = atoi(s);
-    }
-    
-    return skip_token(s);
-}
-
-static const char* long_token(const char* s, bool parse, long* dest)
-{
-    if (parse)
-    {
-        *dest = atoi(s);    /* Should be atol, but we don't have it. */
-    }
-
-    return skip_token(s);
-}
-
-static const char* bool_token(const char* s, bool parse, bool* dest)
-{
-    if (parse)
-    {
-        *dest = atoi(s) != 0;
-    }
-
-    return skip_token(s);
-}
-
 /* ----------------------------------------------------------------------- */
 /* This function takes a bookmark and parses it.  This function also       */
 /* validates the bookmark.  Flags are set to indicate which bookmark       */
@@ -967,15 +927,18 @@ static bool parse_bookmark(const char *bookmark, const int flags)
     const char* end;
     
 #define FLAG(a) (flags & a)
+#define GET_INT_TOKEN(var)  var =  atoi(s);     s = skip_token(s)
+#define GET_BOOL_TOKEN(var) var = (atoi(s)!=0); s = skip_token(s)
     
-    s =  int_token(s, FLAG(F_RES_IND), &bm.resume_index);
-    s =  int_token(s, FLAG(F_RES_OFF), &bm.resume_offset);
-    s =  int_token(s, FLAG(F_RES_SED), &bm.resume_seed);
-    s =  int_token(s, FLAG(F_RES_1ST), &bm.resume_first_index);
-    s = long_token(s, FLAG(F_RES_TIM), &bm.resume_time);
-    s =  int_token(s, FLAG(F_REP_MOD), &bm.repeat_mode);
-    s = bool_token(s, FLAG(F_SHUFFLE), &bm.shuffle);
-
+    GET_INT_TOKEN(bm.resume_index);
+    GET_INT_TOKEN(bm.resume_offset);
+    GET_INT_TOKEN(bm.resume_seed);
+    /* skip deprecated token */
+    s = skip_token(s);
+    GET_INT_TOKEN(bm.resume_time);
+    GET_INT_TOKEN(bm.repeat_mode);
+    GET_BOOL_TOKEN(bm.shuffle);
+    
     if (*s == 0)
     {
         return false;
