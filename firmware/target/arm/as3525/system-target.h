@@ -32,4 +32,10 @@
 #define UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
 #endif
 
+
+#ifdef SANSA_C200V2
+/* 0: Backlight on A5, 1: Backlight on A7 */
+extern int c200v2_variant;
+#endif
+
 #endif /* SYSTEM_TARGET_H */

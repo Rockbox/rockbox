@@ -256,6 +256,21 @@ bool __dbg_hw_info(void)
     {
         while(1)
         {
+#ifdef SANSA_C200V2
+        lcd_clear_display();
+        line = 0;
+        lcd_puts(0, line++, "[Submodel:]");
+        lcd_putsf(0, line++, "C200v2 variant %d", c200v2_variant);
+        lcd_update();
+        int btn = button_get(1);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
+        while(1)
+        {
+#endif
         lcd_clear_display();
         line = 0;
         lcd_puts(0, line++, "[Clock Frequencies:]");

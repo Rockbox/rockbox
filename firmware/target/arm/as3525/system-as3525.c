@@ -163,6 +163,41 @@ void fiq_handler(void)
     );
 }
 
+#if defined(SANSA_C200V2)
+#include "dbop-as3525.h"
+
+int c200v2_variant = 0;
+
+static void check_model_variant(void)
+{
+    unsigned int i;
+    unsigned int saved_dir = GPIOA_DIR;
+
+    /* Make A7 input */
+    GPIOA_DIR &= ~(1<<7);
+    /* wait a little to allow the pullup/pulldown resistor
+     * to charge the input capacitance */
+    for (i=0; i<1000; i++) asm volatile ("nop\n");
+    /* read the pullup/pulldown value on A7 to determine the variant */
+    if (GPIOA_PIN(7) == 0) {
+        /*
+         * Backlight on A7.
+         */
+        c200v2_variant = 1;
+    } else {
+        /*
+         * Backlight on A5.
+         */
+        c200v2_variant = 0;
+    }
+    GPIOA_DIR = saved_dir;
+}
+#else
+static inline void check_model_variant(void)
+{
+}
+#endif /* SANSA_C200V2*/
+
 #if defined(BOOTLOADER)
 static void sdram_delay(void)
 {
@@ -319,6 +354,7 @@ void system_init(void)
     fmradio_i2c_init();
 #endif
 #endif /* !BOOTLOADER */
+    check_model_variant();
 }
 
 void system_reboot(void)

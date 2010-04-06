@@ -37,26 +37,75 @@ static const int brightness_table[MAX_BRIGHTNESS_SETTING+1] = {
 
 static void _ll_backlight_on(void)
 {
-    GPIOA_PIN(5) = 1<<5;
+    if (c200v2_variant == 0) {
+        GPIOA_PIN(5) = 1<<5;
+    } else {
+        GPIOA_PIN(7) = 1<<7;
+    }
 }
 
 static void _ll_backlight_off(void)
 {
-    GPIOA_PIN(5) = 0;
+    if (c200v2_variant == 0) {
+        GPIOA_PIN(5) = 0;
+    } else {
+        GPIOA_PIN(7) = 0;
+    }
+}
+
+static void _ll_buttonlight_on(void)
+{
+    if (c200v2_variant == 1) {
+        /* Main buttonlight is on A5 */
+        GPIOA_PIN(5) = 1<<5;
+    } else {
+        /* Needed for buttonlight and MicroSD to work at the same time */
+        /* Turn ROD control on, as the OF does */
+        GPIOD_DIR |= (1<<7);
+        SD_MCI_POWER |= (1<<7);
+        GPIOD_PIN(7) = (1<<7);
+    }
+}
+
+static void _ll_buttonlight_off(void)
+{
+    if (c200v2_variant == 1) {
+        /* Main buttonlight is on A5 */
+        GPIOA_PIN(5) = 0;
+    } else {
+        /* Needed for buttonlight and MicroSD to work at the same time */
+        /* Turn ROD control off, as the OF does */
+        SD_MCI_POWER &= ~(1<<7);
+        GPIOD_PIN(7) = 0;
+        GPIOD_DIR &= ~(1<<7);
+    }
 }
 
 void _backlight_pwm(int on)
 {
     if (on) {
-        _ll_backlight_on();
+        if (backlight_is_on)
+            _ll_backlight_on();
+
+        if (buttonlight_is_on)
+            _ll_buttonlight_on();
     } else {
-        _ll_backlight_off();
+        if (backlight_is_on)
+            _ll_backlight_off();
+
+        if (buttonlight_is_on)
+            _ll_buttonlight_off();
     }
 }
 
 bool _backlight_init(void)
 {
     GPIOA_DIR |= 1<<5;
+    if (c200v2_variant == 1) {
+        /* On this variant A7 is the backlight and
+         * A5 is the buttonlight */
+        GPIOA_DIR |= 1<<7;
+    }
     return true;
 }
 
@@ -70,21 +119,40 @@ void _backlight_set_brightness(int brightness)
         _backlight_off();
 }
 
+static void _pwm_on(void)
+{
+    _set_timer2_pwm_ratio(backlight_level);
+}
+
+static void _pwm_off(void)
+{
+    if (buttonlight_is_on == 0 && backlight_is_on == 0)
+        _set_timer2_pwm_ratio(0);
+}
+
 void _backlight_on(void)
 {
+    if (backlight_is_on == 1) {
+        /* Update pwm ratio in case user changed the brightness */
+        _pwm_on();
+        return;
+    }
+
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    if (!backlight_is_on)
-        _ll_backlight_on();
-    _set_timer2_pwm_ratio(backlight_level);
+    _ll_backlight_on();
+    _pwm_on();
     backlight_is_on = 1;
 }
 
 void _backlight_off(void)
 {
+    if (backlight_is_on == 0)
+        return;
+
     backlight_is_on = 0;
-    _set_timer2_pwm_ratio(0);
+    _pwm_off();
     _ll_backlight_off();
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
@@ -93,20 +161,22 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
-    /* Needed for buttonlight and MicroSD to work at the same time */
-    /* Turn ROD control on, as the OF does */
-    GPIOD_DIR |= (1<<7);
-    SD_MCI_POWER |= (1<<7);
-    GPIOD_PIN(7) = (1<<7);
+    if (buttonlight_is_on == 1)
+        return;
+
+    _ll_buttonlight_on();
+    _pwm_on();
     buttonlight_is_on = 1;
 }
 
 void _buttonlight_off(void)
 {
-    /* Needed for buttonlight and MicroSD to work at the same time */
-    /* Turn ROD control off, as the OF does */
-    SD_MCI_POWER &= ~(1<<7);
-    GPIOD_PIN(7) = 0;
-    GPIOD_DIR &= ~(1<<7);
+    if (buttonlight_is_on == 0)
+        return;
+
     buttonlight_is_on = 0;
+    _pwm_off();
+    _ll_buttonlight_off();
 }
+
+/* vim:set ts=4 sw=4 et: */
