@@ -694,6 +694,8 @@ int sd_init(void)
     GPIOA_IS &= ~(1<<2);
     /* detect both raising and falling edges */
     GPIOA_IBE |= (1<<2);
+    /* Configure XPD for SD-MCI interface */
+    CCU_IO |= (1<<2);
 #endif
 
     VIC_INT_ENABLE = INTERRUPT_NAND;
@@ -919,11 +921,7 @@ long sd_last_disk_activity(void)
 void sd_enable(bool on)
 {
     /* TODO */
-    if(on)
-        CCU_IO |= (1<<2);              /* XPD is SD-MCI interface (b3:2 = 01) */
-    else
-        CCU_IO &= ~(1<<2);             /* XPD is general purpose IO (b3:2 = 00) */
-    return;
+    (void) on;
 }
 
 tCardInfo *card_get_info_target(int card_no)
