@@ -725,8 +725,8 @@ static void calc_max_width(void)
     }
 }
 
-bool done = false;
-int col = 0;
+static bool done = false;
+static int col = 0;
 
 #define ADVANCE_COUNTERS(c) { width += glyph_width(c); k++; }
 #define LINE_IS_FULL ((k>=max_columns-1) ||( width >= max_width))
