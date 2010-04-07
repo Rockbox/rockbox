@@ -61,6 +61,16 @@
                                              read below 2400mV. */
 #define CHARGER_TOTAL_TIMER          300 /* minutes */
 
+/* Temperature readings - w/hysteresis */
+
+/* Temperature range before beginning charging */
+#define BATTERY_CHARGE_MIN          0
+#define BATTERY_CHARGE_MAX          50
+/* Temperature range after out-of-range detected - charging will
+ * self-resume */
+#define BATTERY_CHARGE_RESTART_MIN  5
+#define BATTERY_CHARGE_RESTART_MAX  45
+
 /* .316 ohms is closest standard value as measured in 1% tolerance - adjust
  * relative to .100 ohm which is what the PMIC is "tuned" for. */
 #define ILEVEL_ADJUST_IN(I)         (100*(I) / 316)

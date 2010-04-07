@@ -467,8 +467,13 @@ static bool charging_ok(void)
          * come back into safe range. */
         static const signed char temp_ranges[2][2] =
         {
-            { 0, 45 }, /* Temperature range before beginning charging */
-            { 5, 40 }, /* Temperature range after out-of-range detected */
+            /* Temperature range before beginning charging */
+            { BATTERY_CHARGE_MIN,
+              BATTERY_CHARGE_MAX },
+            /* Temperature range after out-of-range detected -
+               charging will self-resume */
+            { BATTERY_CHARGE_RESTART_MIN,
+              BATTERY_CHARGE_RESTART_MAX },
         };
 
         int temp = battery_adc_temp();
