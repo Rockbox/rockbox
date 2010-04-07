@@ -2373,7 +2373,7 @@ static int col_limit(int col)
     if (col < 0)
         col = 0;
     else
-        if (col >= max_width)
+        if (col >= max_width - draw_columns)
             col = max_width - draw_columns;
 
     return col;
