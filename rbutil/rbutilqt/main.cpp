@@ -65,7 +65,7 @@ int main( int argc, char ** argv ) {
     delete user;
     app.installTranslator(&translator);
     app.installTranslator(&qttrans);
-    if(applang == "he")
+    if(applang.startsWith("he"))
         app.setLayoutDirection(Qt::RightToLeft);
 
     RbUtilQt window(0);
