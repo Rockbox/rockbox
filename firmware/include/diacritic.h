@@ -22,8 +22,9 @@
 #define _DIACRITIC_H_
 #include "system.h"
 
-/* Tests whether a given charactor code is a diacritic mark
- * Sets is_rtl if the character belongs to an RTL language
+/* Tests whether a given charactor code is a diacritic mark.
+ * Sets is_rtl (if it's not NULL) to whether the character
+ * belongs to an RTL language.
  */
 int is_diacritic(const unsigned short char_code, bool *is_rtl);
 #endif
