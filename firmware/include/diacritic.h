@@ -26,5 +26,5 @@
  * Sets is_rtl (if it's not NULL) to whether the character
  * belongs to an RTL language.
  */
-int is_diacritic(const unsigned short char_code, bool *is_rtl);
+bool is_diacritic(const unsigned short char_code, bool *is_rtl);
 #endif

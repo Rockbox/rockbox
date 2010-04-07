@@ -97,7 +97,7 @@ drivers/lcd-16bit-vert.c
 drivers/lcd-16bit.c
 #endif
 #endif /* LCD_DEPTH */
-drivers/diacritic.c
+common/diacritic.c
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_REMOTE_LCD

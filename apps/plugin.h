@@ -865,7 +865,7 @@ struct plugin_api {
        the API gets incompatible */
 
 #ifdef HAVE_LCD_BITMAP
-    int (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
+    bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
 #endif
 };
 

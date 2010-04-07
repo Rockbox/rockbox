@@ -193,7 +193,7 @@ static const struct diac_range diac_ranges[] =
 static unsigned short mru_len = 0;
 static unsigned short diacritic_mru[MRU_MAX_LEN];
 
-int is_diacritic(const unsigned short char_code, bool *is_rtl)
+bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
     unsigned short mru, i;
     const struct diac_range *diac;
