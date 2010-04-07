@@ -379,42 +379,77 @@ static bool adjust_charger_current(void)
 
     if (charger_setting != 0)
     {
-        charging_set_thread_priority(true);
-
-        /* Turn regulator logically ON. Hardware may still override. */
-        i = mc13783_write_masked(MC13783_CHARGER,
-                                 charger_setting | MC13783_CHRGRAWPDEN,
-                                 MC13783_ICHRG | MC13783_VCHRG |
-                                 MC13783_CHRGRAWPDEN);
-
-        if (i != MC13783_DATA_ERROR)
+        if ((charger_setting & MC13783_VCHRG) > BATTERY_VCHARGING ||
+            (charger_setting & MC13783_ICHRG) > BATTERY_IFAST)
         {
-            int icharger;
-
-            /* Enable charge current conversion */
-            adc_enable_channel(ADC_CHARGER_CURRENT, true);
-
-            /* Charge path regulator turn on takes ~100ms max. */
-            sleep(HZ/10);
-
-            icharger = stat_battery_reading(ADC_CHARGER_CURRENT);
-
-            if (icharger != INT_MIN)
-            {
-                icharger_ave = icharger * ICHARGER_AVE_SAMPLES;
-
-                if (update_filtered_battery_voltage())
-                    return true;
-            }
+            /* Table is corrupted somehow. We shouldn't run at all.
+             *
+             * Explanation: On two occasions, even though this driver monitors
+             *              the regulator register settings on each step and
+             *              ensures that only valid table indexes are used,
+             *              the current and voltage seem to be misregulated,
+             *              resulting in excessively high battery voltage that
+             *              will trip the battery protection. After careful
+             *              review it seems that two possibilities exist:
+             *              This code or data got trashed at some point or
+             *              there really is a hardware bug of some sort. So
+             *              far the cause is unknown. Voltage is also
+             *              monitored in the CHARGING case for that reason.
+             *              The solution for data or code corruption is to
+             *              just panic and refuse to run the device. The
+             *              solution for overvoltage due to hardware bug is to
+             *              disable the charging. The action taken will reveal
+             *              the true cause, thus _who_ is responsible.
+             *              "Burning lithium is baaaad", so sayeth The Council
+             *              of Seven Ascended Masters. */
+            charge_state = CHARGE_STATE_DISABLED;
+            service_wdt = false;
         }
+        else
+        {
+            /* Turn on 5K pulldown. */
+            i = mc13783_set(MC13783_CHARGER, MC13783_CHRGRAWPDEN);
 
-        /* Force regulator OFF. */
-        charge_state = CHARGE_STATE_ERROR;
+            if (i != MC13783_DATA_ERROR)
+            {
+                charging_set_thread_priority(true);
+
+                /* Turn regulator logically ON. Hardware may still override.
+                 */
+                i = mc13783_write_masked(MC13783_CHARGER, charger_setting,
+                                         MC13783_ICHRG | MC13783_VCHRG);
+
+                if (i != MC13783_DATA_ERROR)
+                {
+                    int icharger;
+
+                    /* Enable charge current conversion */
+                    adc_enable_channel(ADC_CHARGER_CURRENT, true);
+
+                    /* Charge path regulator turn on takes ~100ms max. */
+                    sleep(HZ/10);
+
+                    icharger = stat_battery_reading(ADC_CHARGER_CURRENT);
+
+                    if (icharger != INT_MIN)
+                    {
+                        icharger_ave = icharger * ICHARGER_AVE_SAMPLES;
+
+                        if (update_filtered_battery_voltage())
+                            return true;
+                    }
+                }
+            }
+
+            /* Force regulator OFF. */
+            charge_state = CHARGE_STATE_ERROR;
+        }
     }
 
     /* Turn regulator OFF. */
     icharger_ave = 0;
-    i = mc13783_write_masked(MC13783_CHARGER, charger_bits[0][0],
+    i = mc13783_write_masked(MC13783_CHARGER,
+                             MC13783_ICHRG_0MA | MC13783_VCHRG_4_050V,
                              MC13783_ICHRG | MC13783_VCHRG |
                              MC13783_CHRGRAWPDEN);
 
@@ -533,6 +568,16 @@ static bool charging_ok(void)
 
     if (charger_setting != 0)
     {
+        if (ok)
+        {
+            /* Protect against any conceivable overcharge/voltage condition
+             * before hardware protection must intervene. Disable charger
+             * until reboot. */
+            ok = battery_voltage() < BATT_TOO_HIGH;
+            if (!ok)
+                charge_state = CHARGE_STATE_DISABLED;
+        }
+
         if (ok)
         {
             /* Watch to not overheat FET (nothing should go over about 1012.7mW).

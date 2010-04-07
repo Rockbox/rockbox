@@ -59,6 +59,10 @@
 #define BATT_USB_VSTOP              4140 /* When to "stop" when USB only */
 #define BATT_TOO_LOW                2400 /* No battery? Short? Can't
                                              read below 2400mV. */
+#define BATT_TOO_HIGH               4220 /* Extra care. Don't totally
+                                            rely upon battery protection
+                                            circutry. Stop it early if too
+                                            high. */
 #define CHARGER_TOTAL_TIMER          300 /* minutes */
 
 /* Temperature readings - w/hysteresis */
