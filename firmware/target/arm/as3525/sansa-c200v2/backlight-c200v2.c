@@ -178,5 +178,3 @@ void _buttonlight_off(void)
     _pwm_off();
     _ll_buttonlight_off();
 }
-
-/* vim:set ts=4 sw=4 et: */

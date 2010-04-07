@@ -503,5 +503,3 @@ void ascodec_unlock(void)
 {
     mutex_unlock(&as_mtx);
 }
-
-/* vim:set ts=4 sw=4 et: */
