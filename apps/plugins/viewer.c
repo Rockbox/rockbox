@@ -1688,7 +1688,7 @@ static bool change_font(unsigned char *font)
     unsigned char buf[MAX_PATH];
 
     if (font == NULL || *font == '\0')
-        return;
+        return false;
 
     rb->snprintf(buf, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
     if (rb->font_load(NULL, buf) < 0) {
@@ -1700,7 +1700,7 @@ static bool change_font(unsigned char *font)
     return true;
 }
 
-static void revert_font()
+static void revert_font(void)
 {
     if (rb->strcmp(prefs.font, rb->global_settings->font_file))
         change_font(rb->global_settings->font_file);
