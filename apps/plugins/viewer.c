@@ -1011,7 +1011,7 @@ static void fill_buffer(long pos, unsigned char* buf, unsigned size)
     if (offset == 0 && prefs.encoding == UTF_8 && is_bom)
         rb->lseek(fd, BOM_SIZE, SEEK_SET);
 
-    numread = rb->read(fd, buf, size);
+    numread = rb->read(fd, buf, size - 1);
     buf[numread] = 0;
     rb->button_clear_queue(); /* clear button queue */
 
