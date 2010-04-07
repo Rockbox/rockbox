@@ -1683,7 +1683,7 @@ static void init_header_and_footer(void)
     last_screen_top_ptr = NULL;
 }
 
-static void change_font(unsigned char *font)
+static bool change_font(unsigned char *font)
 {
     unsigned char buf[MAX_PATH];
 
@@ -1691,8 +1691,19 @@ static void change_font(unsigned char *font)
         return;
 
     rb->snprintf(buf, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
-    if (rb->font_load(NULL, buf) < 0)
-        rb->splash(HZ/2, "font load failed.");
+    if (rb->font_load(NULL, buf) < 0) {
+        rb->splash(HZ/2, "Font load failed.");
+
+        return false;
+    }
+
+    return true;
+}
+
+static void revert_font()
+{
+    if (rb->strcmp(prefs.font, rb->global_settings->font_file))
+        change_font(rb->global_settings->font_file);
 }
 #endif
 
@@ -1701,6 +1712,9 @@ static bool viewer_init(void)
 #ifdef HAVE_LCD_BITMAP
     /* initialize fonts */
     pf = rb->font_get(FONT_UI);
+    if (pf == NULL)
+        return false;
+
     draw_columns = display_columns = LCD_WIDTH;
 #else
     /* REAL fixed pitch :) all chars use up 1 cell */
@@ -2079,7 +2093,7 @@ static bool viewer_save_global_settings(void)
     return true;
 }
 
-static void viewer_load_settings(void)
+static bool viewer_load_settings(void)
 {
     unsigned char buf[MAX_PATH+2];
     unsigned int fcount;
@@ -2176,12 +2190,18 @@ read_end:
     start_position = file_pos + screen_top_ptr - buffer;
 
 #ifdef HAVE_LCD_BITMAP
-    if (rb->strcmp(prefs.font, rb->global_settings->font_file))
-        change_font(prefs.font);
+    if (rb->strcmp(prefs.font, rb->global_settings->font_file)) {
+        if (!change_font(prefs.font)) {
+            revert_font();
+            return false;
+        }
+    }
 
     init_need_scrollbar();
     init_header_and_footer();
 #endif
+
+    return true;
 }
 
 static bool copy_bookmark_file(int sfd, int dfd, off_t start, off_t size)
@@ -2627,7 +2647,7 @@ static bool font_setting(void)
     dir = rb->opendir(FONT_DIR);
     if (!dir)
     {
-        rb->splash(HZ/2, "font dir does not access.");
+        rb->splash(HZ/2, "Font dir is not accessible");
         return false;
     }
 
@@ -2653,7 +2673,7 @@ static bool font_setting(void)
     dir = rb->opendir(FONT_DIR);
     if (!dir)
     {
-        rb->splash(HZ/2, "font dir does not access.");
+        rb->splash(HZ/2, "Font dir is not accessible");
         return false;
     }
 
@@ -2695,9 +2715,13 @@ static bool font_setting(void)
 
     if (new_font != old_font)
     {
+        if (!change_font(prefs.font))
+        {
+            revert_font();
+            return false;
+        }
         rb->memset(prefs.font, 0, MAX_PATH);
         rb->snprintf(prefs.font, MAX_PATH, "%s", names[new_font].string);
-        change_font(prefs.font);
     }
 
     return res;
@@ -2852,7 +2876,8 @@ enum plugin_status plugin_start(const void* file)
         return PLUGIN_ERROR;
     }
 
-    viewer_load_settings(); /* load the preferences and bookmark */
+    if (!viewer_load_settings()) /* load the preferences and bookmark */
+        return PLUGIN_ERROR;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
