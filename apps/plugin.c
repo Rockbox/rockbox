@@ -41,6 +41,7 @@
 #include "storage.h"
 #include "pcmbuf.h"
 #include "errno.h"
+#include "diacritic.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -710,6 +711,10 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#ifdef HAVE_LCD_BITMAP
+    is_diacritic,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

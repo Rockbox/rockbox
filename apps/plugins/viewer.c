@@ -636,10 +636,13 @@ static int bookmark_count;
 static bool is_bom = false;
 
 /* calculate the width of a UCS character (zero width for diacritics) */
-static int glyph_width(int ch)
+static int glyph_width(unsigned short ch)
 {
     if (ch == 0)
         ch = ' ';
+
+    if (rb->is_diacritic(ch, NULL))
+        return 0;
 
 #ifdef HAVE_LCD_BITMAP
     return rb->font_get_width(pf, ch);
@@ -730,6 +733,10 @@ static int col = 0;
 
 static inline void advance_conters(unsigned short ch, int* k, int* width)
 {
+    /* diacritics do not count */
+    if (rb->is_diacritic(ch, NULL))
+        return;
+
     *width += glyph_width(ch);
     (*k)++;
 }
@@ -760,11 +767,18 @@ static unsigned char* crop_at_width(const unsigned char* p)
 
 static unsigned char* find_first_feed(const unsigned char* p, int size)
 {
-    int i;
+    int s = 0;
+    unsigned short ch;
+    const unsigned char *oldp = p;
 
-    for (i=0; i < size; i++)
-        if (p[i] == 0)
-            return (unsigned char*) p+i;
+    while(s <= size)
+    {
+        if (*p == 0)
+            return (unsigned char*)p;
+        oldp = p;
+        p = get_ucs(p, &ch);
+        s += (p - oldp);
+    }
 
     return NULL;
 }
@@ -786,18 +800,21 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 
     k = (prefs.line_mode==JOIN) || (prefs.line_mode==REFLOW) ? 0:1;
 
-    if (!BUFFER_OOB(&p[size]))
-        for (j=k; j < ((int) sizeof(line_break)) - 1; j++)
-            if (p[size] == line_break[j])
-                return (unsigned char*) p+size;
+    i = size;
+    if (!BUFFER_OOB(&p[i]))
+        for (j=k; j < ((int) sizeof(line_break)) - 1; j++) {
+            if (p[i] == line_break[j])
+                return (unsigned char*) p+i;
+        }
 
-    for (i=size-1; i>=0; i--)
-        for (j=k; j < (int) sizeof(line_break); j++)
-        {
-            if (!((p[i] == '-') && (prefs.word_mode == WRAP)))
+    if (prefs.word_mode == WRAP) {
+        for (i=size-1; i>=0; i--) {
+            for (j=k; j < (int) sizeof(line_break) - 1; j++) {
                 if (p[i] == line_break[j])
                     return (unsigned char*) p+i;
+            }
         }
+    }
 
     return NULL;
 }
@@ -805,9 +822,9 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_short)
 {
     const unsigned char *next_line = NULL;
-    int size, i, j, k, width, search_len, spaces, newlines;
+    int size, i, j, j_next, j_prev, k, width, search_len, spaces, newlines;
     bool first_chars;
-    unsigned char c;
+    unsigned short ch;
 
     if (is_short != NULL)
         *is_short = true;
@@ -829,16 +846,25 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
          or possibly set next_line at second hard return in a row. */
         next_line = NULL;
         first_chars=true;
-        for (j=k=width=spaces=newlines=0; ; j++) {
+        j_next=j=k=width=spaces=newlines=0;
+        while (1) {
+            const unsigned char *p, *oldp;
+
+            j_prev = j;
+            j = j_next;
+
             if (BUFFER_OOB(cur_line+j))
                 return NULL;
             if (line_is_full(k, width)) {
-                size = search_len = j;
+                size = search_len = j_prev;
                 break;
             }
 
-            c = cur_line[j];
-            switch (c) {
+            oldp = p = &cur_line[j];
+            p = get_ucs(p, &ch);
+            j_next = j + (p - oldp);
+
+            switch (ch) {
                 case ' ':
                     if (prefs.line_mode == REFLOW) {
                         if (newlines > 0) {
@@ -909,14 +935,18 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
             if (prefs.word_mode == WRAP)  /* Find last space */
                 next_line = find_last_space(cur_line, size);
 
-            if (next_line == NULL)
+            if (next_line == NULL) {
                 next_line = crop_at_width(cur_line);
-            else
-                if (prefs.word_mode == WRAP)
-                    for (i=0;
-                    i<WRAP_TRIM && isspace(next_line[0]) && !BUFFER_OOB(next_line);
-                    i++)
+            }
+            else {
+                if (prefs.word_mode == WRAP) {
+                    for (i=0;i<WRAP_TRIM;i++) {
+                        if (!(isspace(next_line[0]) && !BUFFER_OOB(next_line)))
+                            break;
                         next_line++;
+                    }
+                }
+            }
         }
 
     if (prefs.line_mode == EXPAND)
@@ -1230,18 +1260,26 @@ static void viewer_show_footer(void)
 }
 #endif
 
+/* We draw a diacritic char over a non-diacritic one. Therefore, such chars are
+ * not considered to occupy space, therefore buffers might have more than
+ * max_columns characters. The DIACRITIC_FACTOR is the max ratio between all
+ * characters and non-diacritic characters in the buffer
+ */
+#define DIACRITIC_FACTOR 2
+
 static void viewer_draw(int col)
 {
     int i, j, k, line_len, line_width, spaces, left_col=0;
-    int width, extra_spaces, indent_spaces, spaces_per_word;
+    int width, extra_spaces, indent_spaces, spaces_per_word, spaces_width;
     bool multiple_spacing, line_is_short;
     unsigned short ch;
     unsigned char *str, *oldstr;
     unsigned char *line_begin;
     unsigned char *line_end;
     unsigned char c;
-    unsigned char scratch_buffer[max_columns + 1];
-    unsigned char utf8_buffer[max_columns*4 + 1];
+    int max_chars = max_columns * DIACRITIC_FACTOR;
+    unsigned char scratch_buffer[max_chars + 1];
+    unsigned char utf8_buffer[max_chars * 4 + 1];
     unsigned char *endptr;
 
     /* If col==-1 do all calculations but don't display */
@@ -1287,11 +1325,33 @@ static void viewer_draw(int col)
             oldstr = str;
             str = crop_at_width(str);
             j++;
+            if (oldstr == str)
+            {
+                oldstr = line_end;
+                break;
+            }
         }
+        /* width of un-displayed part of the line */
         line_width = j*draw_columns;
+        spaces_width = 0;
         while (oldstr < line_end) {
             oldstr = get_ucs(oldstr, &ch);
-            line_width += glyph_width(ch);
+            /* add width of displayed part of the line */
+            if (ch)
+            {
+                int dw = glyph_width(ch);
+
+                /* avoid counting spaces at the end of the line */
+                if (ch == ' ')
+                {
+                    spaces_width += dw;
+                }
+                else
+                {
+                    line_width += dw + spaces_width;
+                    spaces_width = 0;
+                }
+            }
         }
 
         if (prefs.line_mode == JOIN) {
@@ -1303,7 +1363,7 @@ static void viewer_draw(int col)
                     line_len--;
             }
             for (j=k=spaces=0; j < line_len; j++) {
-                if (k == max_columns)
+                if (k == max_chars)
                     break;
 
                 c = line_begin[j];
@@ -1319,7 +1379,7 @@ static void viewer_draw(int col)
                         while (spaces) {
                             spaces--;
                             scratch_buffer[k++] = ' ';
-                            if (k == max_columns - 1)
+                            if (k == max_chars - 1)
                                 break;
                         }
                         scratch_buffer[k++] = c;
@@ -1388,7 +1448,7 @@ static void viewer_draw(int col)
 
             multiple_spacing = false;
             for (j=k=spaces=0; j < line_len; j++) {
-                if (k == max_columns)
+                if (k == max_chars)
                     break;
 
                 c = line_begin[j];
@@ -1420,31 +1480,32 @@ static void viewer_draw(int col)
             }
         }
         else { /* prefs.line_mode != JOIN && prefs.line_mode != REFLOW */
-            if (col != -1)
-                if (line_width > col) {
-                    str = oldstr = line_begin;
-                    k = col;
-                    width = 0;
-                    while( (width<draw_columns) && (oldstr<line_end) )
-                    {
-                        oldstr = get_ucs(oldstr, &ch);
-                        if (k > 0) {
-                            k -= glyph_width(ch);
-                            line_begin = oldstr;
-                        } else {
-                            width += glyph_width(ch);
-                        }
+            if ((col != -1) && (line_width > col)) {
+                str = oldstr = line_begin;
+                k = col;
+                width = 0;
+                while( (width<draw_columns) && (oldstr<line_end) )
+                {
+                    oldstr = get_ucs(oldstr, &ch);
+                    if (k > 0) {
+                        k -= glyph_width(ch);
+                        line_begin = oldstr;
+                    } else {
+                        width += glyph_width(ch);
                     }
-
-                    if(prefs.view_mode==WIDE)
-                        endptr = rb->iso_decode(line_begin, utf8_buffer,
-                                            prefs.encoding, oldstr-line_begin);
-                    else
-                        endptr = rb->iso_decode(line_begin, utf8_buffer,
-                                            prefs.encoding, line_end-line_begin);
-                    *endptr = 0;
                 }
+
+                if(prefs.view_mode==WIDE)
+                    endptr = rb->iso_decode(line_begin, utf8_buffer,
+                            prefs.encoding, oldstr-line_begin);
+                else
+                    endptr = rb->iso_decode(line_begin, utf8_buffer,
+                            prefs.encoding, line_end-line_begin);
+                *endptr = 0;
+            }
         }
+
+        /* display on screen the displayed part of the line */
         if (col != -1 && line_width > col)
         {
             int dpage = (cline+i <= display_lines)?cpage:cpage+1;
