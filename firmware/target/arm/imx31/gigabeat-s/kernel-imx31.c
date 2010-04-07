@@ -25,6 +25,7 @@
 #include "mc13783.h"
 #include "ccm-imx31.h"
 #include "sdma-imx31.h"
+#include "dvfs_dptc-imx31.h"
 #include "kernel.h"
 #include "thread.h"
 
@@ -69,6 +70,7 @@ void kernel_device_init(void)
     sdma_init();
     spi_init();
     mc13783_init();
+    dvfs_dptc_start();
 }
 
 #ifdef BOOTLOADER

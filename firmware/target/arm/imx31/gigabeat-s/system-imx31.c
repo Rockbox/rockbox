@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "ccm-imx31.h"
 #include "mc13783.h"
+#include "dvfs_dptc-imx31.h"
 
 static unsigned long product_rev;
 static unsigned long system_rev;
@@ -241,6 +242,7 @@ void __attribute__((naked)) imx31_regclr32(volatile uint32_t *reg_p,
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {
+    dvfs_dptc_stop();
     disable_interrupt(IRQ_FIQ_STATUS);
     avic_disable_int(INT_ALL);
     mc13783_close();

@@ -1410,6 +1410,101 @@
 #define CCM_PDR1_SSI1_PODF              (0x3f << 0)
 #define CCM_PDR1_SSI1_PODF_POS          (0)
 
+/* RCSR */
+#define CCM_RCSR_NF16B                  (1 << 31)
+
+#define CCM_RCSR_NFMS                   (1 << 30)
+
+#define CCM_RCSR_BTP4                   (1 << 27)
+#define CCM_RCSR_BTP3                   (1 << 26)
+#define CCM_RCSR_BTP2                   (1 << 25)
+#define CCM_RCSR_BTP1                   (1 << 24)
+#define CCM_RCSR_BTP0                   (1 << 23)
+
+#define CCM_RCSR_OSCNT                  (0x7f << 16)
+#define CCM_RCSR_OSCNT_POS              (16)
+
+#define CCM_RCSR_PERES                  (1 << 15)
+
+#define CCM_RCSR_SDM                    (0x3 << 12)
+#define CCM_RCSR_SDM_POS                (12)
+
+#define CCM_RCSR_GPF                    (0x7 << 5)
+#define CCM_RCSR_GPF_POS                (5)
+
+#define CCM_RCSR_WFIS                   (1 << 4)
+
+#define CCM_RCSR_REST                   (0x7 << 0)
+#define CCM_RCSR_REST_POS               (0)
+#define CCM_RCSR_REST_POR_EXT           (0x0)
+#define CCM_RCSR_REST_QUALIFIED_EXT     (0x1)
+#define CCM_RCSR_REST_WATCHDOG_TMO      (0x2)
+/* 0x3 - 0x5: reserved */
+#define CCM_RCSR_REST_JTAG              (0x6)
+#define CCM_RCSR_REST_ARM11P_GATING     (0x7)
+
+/* MPCTL */
+#define CCM_MPCTL_BRM                   (1 << 31)
+#define CCM_MPCTL_PD                    (0xf << 26)
+#define CCM_MPCTL_PD_POS                (26)
+#define CCM_MPCTL_MFD                   (0x3ff << 16)
+#define CCM_MPCTL_MFD_POS               (16)
+#define CCM_MPCTL_MFI                   (0xf << 10)
+#define CCM_MPCTL_MFI_POS               (10)
+#define CCM_MPCTL_MFN                   (0x3ff << 0)
+#define CCM_MPCTL_MFN_POS               (0)
+
+/* UPCTL */
+#define CCM_UPCTL_BRM                   (1 << 31)
+#define CCM_UPCTL_PD                    (0xf << 26)
+#define CCM_UPCTL_PD_POS                (26)
+#define CCM_UPCTL_MFD                   (0x3ff << 16)
+#define CCM_UPCTL_MFD_POS               (16)
+#define CCM_UPCTL_MFI                   (0xf << 10)
+#define CCM_UPCTL_MFI_POS               (10)
+#define CCM_UPCTL_MFN                   (0x3ff << 0)
+#define CCM_UPCTL_MFN_POS               (0)
+
+/* SPCTL */
+#define CCM_SPCTL_BRM                   (1 << 31)
+#define CCM_SPCTL_PD                    (0xf << 26)
+#define CCM_SPCTL_PD_POS                (26)
+#define CCM_SPCTL_MFD                   (0x3ff << 16)
+#define CCM_SPCTL_MFD_POS               (16)
+#define CCM_SPCTL_MFI                   (0xf << 10)
+#define CCM_SPCTL_MFI_POS               (10)
+#define CCM_SPCTL_MFN                   (0x3ff << 0)
+#define CCM_SPCTL_MFN_POS               (0)
+
+/* COSR */
+#define CCM_COSR_CLKOEN                 (1 << 9)
+#define CCM_COSR_CLKOUTDIV              (0x7 << 6)
+#define CCM_COSR_CLKOUTDIV_POS          (6)
+#define CCM_COSR_CLKOSEL                (0xf << 0)
+#define CCM_COSR_CLKOSEL_POS            (0)
+#define CCM_COSR_CLKOSEL_MPL_DPDGCK_CLK         (0x0)
+#define CCM_COSR_CLKOSEL_IPG_CLK_CCM            (0x1)
+#define CCM_COSR_CLKOSEL_UPL_DPDGCK_CLK         (0x2)
+#define CCM_COSR_CLKOSEL_PLL_REF_CLK            (0x3)
+#define CCM_COSR_CLKOSEL_FPM_CKIL512_CLK        (0x4)
+#define CCM_COSR_CLKOSEL_IPG_CLK_AHB_ARM        (0x5)
+#define CCM_COSR_CLKOSEL_IPG_CLK_ARM            (0x6)
+#define CCM_COSR_CLKOSEL_SPL_DPDGCK_CLK         (0x7)
+#define CCM_COSR_CLKOSEL_CKIH                   (0x8)
+#define CCM_COSR_CLKOSEL_IPG_CLK_AHB_EMI_CLK    (0x9)
+#define CCM_COSR_CLKOSEL_IPG_CLK_IPU_HSP        (0x9)
+#define CCM_COSR_CLKOSEL_IPG_CLK_NFC_20M        (0xa)
+#define CCM_COSR_CLKOSEL_IPG_CLK_PERCLK_UART1   (0xb)
+#define CCM_COSR_CLKOSEL_IPG_REF_CIR1           (0xc) /* ref_cir_gateload */
+#define CCM_COSR_CLKOSEL_IPG_REF_CIR2           (0xc) /* ref_cir_intrcload */
+#define CCM_COSR_CLKOSEL_IPG_REF_CIR3           (0xc) /* ref_cir_path */
+
+/* CGR0 */
+/* CGR1 */
+/* CGR2 */
+/* Handled in ccm-imx31.h and ccm-imx31.c */
+
+
 #define CCM_WIMR0_GPIO3                 (1 << 0)
 #define CCM_WIMR0_GPIO2                 (1 << 1)
 #define CCM_WIMR0_GPIO1                 (1 << 2)
@@ -1442,6 +1537,114 @@
 #define CCM_WIMR0_RESERVED29            (1 << 29)
 #define CCM_WIMR0_RESERVED30            (1 << 30)
 #define CCM_WIMR0_RESERVED31            (1 << 31)
+
+/* LDC */
+/* 32 bits specify value */
+
+/* DCVR0-DCVR3 */
+#define CCM_DCVR_ULV                    (0x3ff << 22) /* Upper limit */
+#define CCM_DCVR_ULV_POS                (22)
+#define CCM_DCVR_LLV                    (0x3ff << 12) /* Lower limit */
+#define CCM_DCVR_LLV_POS                (12)
+#define CCM_DCVR_ELV                    (0x3ff <<  2) /* Emergency limit */
+#define CCM_DCVR_ELV_POS                (2)
+
+#if 0
+enum DVFS_W_SIGS
+{
+    DVFS_W_SIGS_M3IF_M0_BUF    = 0,  /* Hready signal of M3IF's master #0
+                                        (L2 Cache) */
+    DVFS_W_SIGS_M3IF_M1        = 1,  /* Hready signal of M3IF's master #1
+                                        (L2 Cache) */
+    DVFS_W_SIGS_MBX_MBXCLKGATE = 2,  /* Hready signal of M3IF's master #2
+                                        (MBX) */
+    DVFS_W_SIGS_M3IF_M3        = 3,  /* Hready signal of M3IF's master #3
+                                        (MAX) */
+    DVFS_W_SIGS_M3IF_M4        = 4,  /* Hready signal of M3IF's master #4
+                                        (SDMA) */
+    DVFS_W_SIGS_M3IF_M5        = 5,  /* Hready signal of M3IF's master #5
+                                        (mpeg4_vga_encoder) */
+    DVFS_W_SIGS_M3IF_M6        = 6,  /* Hready signal of M3IF's master #6
+                                        (IPU) */
+    DVFS_W_SIGS_M3IF_M7        = 7,  /* Hready signal of M3IF's master #7
+                                        (IPU) */
+    DVFS_W_SIGS_ARM11_P_IRQ_B_RBT_GATE = 8, /* ARM normal interrupt */
+    DVFS_W_SIGS_ARM11_P_FIQ_B_RBT_GATE = 9, /* ARM fast interrupt */
+    DVFS_W_SIGS_IPI_GPIO1_INT0 = 10, /* Interrupt line from GPIO */
+    DVFS_W_SIGS_IPI_INT_IPU_FUNC = 11, /* Interrupt line from IPU */
+    DVFS_W_SIGS_DVGP0          = 12, /* Software-controllable general-purpose
+                                        bits from the CCM */
+    DVFS_W_SIGS_DVGP1          = 13, /* Software-controllable general-purpose
+                                        bits from the CCM */
+    DVFS_W_SIGS_DVGP2          = 14, /* Software-controllable general-purpose
+                                        bits from the CCM */
+    DVFS_W_SIGS_DVGP3          = 15, /* Software-controllable general-purpose
+                                        bits from the CCM */
+};
+#endif
+
+/* LTR0 */
+#define CCM_LTR0_UPTHR                  (0x3f << 22)
+#define CCM_LTR0_UPTHR_POS              (22)
+#define CCM_LTR0_DNTHR                  (0x3f << 16)
+#define CCM_LTR0_DNTHR_POS              (16)
+/* for div_3_clk */
+#define CCM_LTR0_DIV3CK                 (0x3 << 1)
+#define CCM_LTR0_DIV3CK_POS             (1)
+#define CCM_LTR0_DIV3CK_2048            (0x0 << 1) /* 1/2048 ARM clock */
+#define CCM_LTR0_DIV3CK_8192            (0x1 << 1) /* 1/8192 ARM clock */
+#define CCM_LTR0_DIV3CK_32768           (0x2 << 1) /* 1/32768 ARM clock */
+#define CCM_LTR0_DIV3CK_131072          (0x3 << 1) /* 1/131072 ARM clock */
+
+/* PMCR0 */
+#define CCM_PMCR0_DVSUP_MCUPLL          (1 << 31)
+#define CCM_PMCR0_DVSUP_POST_DIVIDERS   (1 << 30)
+#define CCM_PMCR0_DVSUP_DVS             (0x3 << 28)
+#define CCM_PMCR0_DVS1_0_DVS0_0         (0x0 << 28) /* Highest frequency/voltage */
+#define CCM_PMCR0_DVS1_0_DVS0_1         (0x1 << 28) /* ... */
+#define CCM_PMCR0_DVS1_1_DVS0_0         (0x2 << 28) /* ... */
+#define CCM_PMCR0_DVS1_1_DVS0_1         (0x3 << 28) /* Lowest frequency/voltage */
+#define CCM_PMCR0_DVS_POS               (28)
+#define CCM_PMCR0_UDSC                  (1 << 27)
+#define CCM_PMCR0_VSCNT                 (0x7 << 24)
+#define CCM_PMCR0_VSCNT_POS             (24)
+#define CCM_PMCR0_DVFEV                 (1 << 23)
+#define CCM_PMCR0_DVFIS                 (1 << 22)
+#define CCM_PMCR0_LBMI                  (1 << 21)
+#define CCM_PMCR0_LBFL                  (1 << 20)
+#define CCM_PMCR0_LBCF                  (0x3 << 18)
+#define CCM_PMCR0_LBCF_4                (0x0 << 18)
+#define CCM_PMCR0_LBCF_8                (0x1 << 18)
+#define CCM_PMCR0_LBCF_12               (0x2 << 18)
+#define CCM_PMCR0_LBCF_16               (0x3 << 18)
+#define CCM_PMCR0_PTVIS                 (1 << 17)
+#define CCM_PMCR0_UPDTEN                (1 << 16)
+#define CCM_PMCR0_FSVAIM                (1 << 15)
+#define CCM_PMCR0_FSVAI                 (0x3 << 13)
+#define CCM_PMCR0_FSVAI_NO_INT          (0x0 << 13)
+#define CCM_PMCR0_FSVAI_INCREASE        (0x1 << 13)
+#define CCM_PMCR0_FSVAI_DECREASE        (0x2 << 13)
+#define CCM_PMCR0_FSVAI_INCREASE_NOW    (0x3 << 13)
+#define CCM_PMCR0_FSVAI_POS             (13)
+#define CCM_PMCR0_DPVCR                 (1 << 12)
+#define CCM_PMCR0_DPVV                  (1 << 11)
+#define CCM_PMCR0_WFIM                  (1 << 10)
+#define CCM_PMCR0_DRCE3                 (1 << 9)
+#define CCM_PMCR0_DRCE2                 (1 << 8)
+#define CCM_PMCR0_DRCE1                 (1 << 7)
+#define CCM_PMCR0_DRCE0                 (1 << 6)
+#define CCM_PMCR0_DCR                   (1 << 5) /* 512 vs 256 count */
+#define CCM_PMCR0_DVFEN                 (1 << 4)
+#define CCM_PMCR0_PTVAIM                (1 << 3)
+#define CCM_PMCR0_PTVAI                 (0x3 << 1)
+#define CCM_PMCR0_PTVAI_NO_INT          (0x0 << 1)
+#define CCM_PMCR0_PTVAI_DECREASE        (0x1 << 1)
+#define CCM_PMCR0_PTVAI_INCREASE        (0x2 << 1)
+#define CCM_PMCR0_PTVAI_INCREASE_NOW    (0x3 << 1)
+#define CCM_PMCR0_DPTEN                 (1 << 0)
+
+
+
 
 /* WEIM - CS0 */
 #define CSCRU                           0x00

@@ -523,6 +523,52 @@ enum mc13783_regs_enum
 #define MC13783_SW2BSTBY                (0x3f << 12)
 #define MC13783_SW2BSTBY_POS            (12)
 
+/* Switcher Voltages (SWITCHERS0-SWITCHERS3) */
+/* Switcher 1 and 2 */
+#define MC13783_SW_0_900                0x00 /* 0.900 V */
+#define MC13783_SW_0_925                0x01 /* 0.925 V */
+#define MC13783_SW_0_950                0x02 /* 0.950 V */
+#define MC13783_SW_0_975                0x03 /* 0.975 V */
+#define MC13783_SW_1_000                0x04 /* 1.000 V */
+#define MC13783_SW_1_025                0x05 /* 1.025 V */
+#define MC13783_SW_1_050                0x06 /* 1.050 V */
+#define MC13783_SW_1_075                0x07 /* 1.075 V */
+#define MC13783_SW_1_100                0x08 /* 1.100 V */
+#define MC13783_SW_1_125                0x09 /* 1.125 V */
+#define MC13783_SW_1_150                0x0a /* 1.150 V */
+#define MC13783_SW_1_175                0x0b /* 1.175 V */
+#define MC13783_SW_1_200                0x0c /* 1.200 V */
+#define MC13783_SW_1_225                0x0d /* 1.225 V */
+#define MC13783_SW_1_250                0x0e /* 1.250 V */
+#define MC13783_SW_1_275                0x0f /* 1.275 V */
+#define MC13783_SW_1_300                0x10 /* 1.300 V */
+#define MC13783_SW_1_325                0x11 /* 1.325 V */
+#define MC13783_SW_1_350                0x12 /* 1.350 V */
+#define MC13783_SW_1_375                0x13 /* 1.375 V */
+#define MC13783_SW_1_400                0x14 /* 1.400 V */
+#define MC13783_SW_1_425                0x15 /* 1.425 V */
+#define MC13783_SW_1_450                0x16 /* 1.450 V */
+#define MC13783_SW_1_475                0x17 /* 1.475 V */
+#define MC13783_SW_1_500                0x18 /* 1.500 V */
+#define MC13783_SW_1_525                0x19 /* 1.525 V */
+#define MC13783_SW_1_550                0x1a /* 1.550 V */
+#define MC13783_SW_1_575                0x1b /* 1.575 V */
+#define MC13783_SW_1_600                0x1c /* 1.600 V */
+#define MC13783_SW_1_625                0x1d /* 1.625 V */
+#define MC13783_SW_1_650                0x1e /* 1.650 V */
+#define MC13783_SW_1_675                0x1f /* 1.675 V */
+#define MC13783_SW_1_700                0x20 /* 0x20 - 0x23 = 1.700V */
+#define MC13783_SW_1_800                0x24 /* 0x24 - 0x27 = 1.800V */
+/* Switcher 1 */
+#define MC13783_SW1_1_850               0x28 /* 0x29 - 0x2b = 1.850V */
+/* Switcher 2 */
+#define MC13783_SW2_1_900               0x28 /* 0x29 - 0x2b = 1.900V */
+/* Switcher 1 and 2 */
+#define MC13783_SW_2_000                0x2c /* 0x2c - 0x2f = 2.000V */
+#define MC13783_SW_2_100                0x30 /* 0x30 - 0x33 = 2.100V */
+#define MC13783_SW_2_200                0x34 /* 0x34 - 0x3f = 2.200V */
+
+
 /* SWITCHERS4 (28) */
 #define MC13783_SW1AMODE                (0x3 << 0)
     #define MC13783_SW1AMODE_OFF        (0x0 << 0)

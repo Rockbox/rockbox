@@ -872,6 +872,7 @@ target/arm/lcd-as-memframe.S
 target/arm/mmu-armv6.S
 target/arm/imx31/ccm-imx31.c
 target/arm/imx31/debug-imx31.c
+target/arm/imx31/dvfs_dptc-imx31.c
 target/arm/imx31/rolo_restart.S
 target/arm/imx31/sdma-imx31.c
 target/arm/imx31/gigabeat-s/adc-imx31.c
