@@ -728,9 +728,17 @@ static void calc_max_width(void)
 static bool done = false;
 static int col = 0;
 
-#define ADVANCE_COUNTERS(c) { width += glyph_width(c); k++; }
-#define LINE_IS_FULL ((k>=max_columns-1) ||( width >= max_width))
-#define LINE_IS_NOT_FULL ((k<max_columns-1) &&( width < max_width))
+static inline void advance_conters(unsigned short ch, int* k, int* width)
+{
+    *width += glyph_width(ch);
+    (*k)++;
+}
+
+static inline bool line_is_full(int k, int width)
+{
+    return ((k >= max_columns - 1) || (width >= max_width));
+}
+
 static unsigned char* crop_at_width(const unsigned char* p)
 {
     int k,width;
@@ -739,12 +747,12 @@ static unsigned char* crop_at_width(const unsigned char* p)
 
     k=width=0;
 
-    while (LINE_IS_NOT_FULL) {
+    while (!line_is_full(k, width)) {
         oldp = p;
         if (BUFFER_OOB(p))
            break;
         p = get_ucs(p, &ch);
-        ADVANCE_COUNTERS(ch);
+        advance_conters(ch, &k, &width);
     }
 
     return (unsigned char*)oldp;
@@ -824,7 +832,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
         for (j=k=width=spaces=newlines=0; ; j++) {
             if (BUFFER_OOB(cur_line+j))
                 return NULL;
-            if (LINE_IS_FULL) {
+            if (line_is_full(k, width)) {
                 size = search_len = j;
                 break;
             }
@@ -840,7 +848,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                         }
                         if (j==0) /* i=1 is intentional */
                             for (i=0; i<par_indent_spaces; i++)
-                                ADVANCE_COUNTERS(' ');
+                                advance_conters(' ', &k, &width);
                     }
                     if (!first_chars) spaces++;
                     break;
@@ -866,8 +874,8 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                     if (prefs.line_mode==JOIN || newlines>0) {
                         while (spaces) {
                             spaces--;
-                            ADVANCE_COUNTERS(' ');
-                            if (LINE_IS_FULL) {
+                            advance_conters(' ', &k, &width);
+                            if (line_is_full(k, width)) {
                                 size = search_len = j;
                                 break;
                             }
@@ -879,14 +887,14 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                          * while drawing. */
                         search_len = size;
                         spaces=0;
-                        ADVANCE_COUNTERS(' ');
-                        if (LINE_IS_FULL) {
+                        advance_conters(' ', &k, &width);
+                        if (line_is_full(k, width)) {
                             size = search_len = j;
                             break;
                         }
                     }
                     first_chars = false;
-                    ADVANCE_COUNTERS(c);
+                    advance_conters(ch, &k, &width);
                     break;
             }
         }
