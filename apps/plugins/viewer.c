@@ -641,10 +641,10 @@ static int glyph_width(unsigned short ch)
     if (ch == 0)
         ch = ' ';
 
+#ifdef HAVE_LCD_BITMAP
     if (rb->is_diacritic(ch, NULL))
         return 0;
 
-#ifdef HAVE_LCD_BITMAP
     return rb->font_get_width(pf, ch);
 #else
     return 1;
@@ -733,9 +733,11 @@ static int col = 0;
 
 static inline void advance_conters(unsigned short ch, int* k, int* width)
 {
+#ifdef HAVE_LCD_BITMAP
     /* diacritics do not count */
     if (rb->is_diacritic(ch, NULL))
         return;
+#endif
 
     *width += glyph_width(ch);
     (*k)++;
