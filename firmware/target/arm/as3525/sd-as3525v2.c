@@ -655,8 +655,8 @@ static void init_controller(void)
 
     MCI_DEBNCE = 0xfffff;   /* default value */
 
-    MCI_FIFOTH &= MCI_FIFOTH_MASK;
-    MCI_FIFOTH |= 0x503f0080;
+    /* Rx watermark = 63(sd reads)  Tx watermark = 128 (sd writes) */
+    MCI_FIFOTH = (MCI_FIFOTH & MCI_FIFOTH_MASK) | 0x503f0080;
 
     MCI_MASK = 0xffff & ~(MCI_INT_ACD|MCI_INT_CRDDET|MCI_INT_RXDR|MCI_INT_TXDR);
 
@@ -819,9 +819,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
         MCI_CTRL |= DMA_ENABLE;
-
-        MCI_FIFOTH &= MCI_FIFOTH_MASK;
-        MCI_FIFOTH |= 0x503f0080;
 
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
