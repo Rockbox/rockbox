@@ -44,6 +44,7 @@
 #define STATUS_ERR      0x0100
 
 #define ERROR_ABRT      0x0400
+#define ERROR_IDNF      0x1000
 
 #define WRITE_PATTERN1 0xa5
 #define WRITE_PATTERN2 0x5a

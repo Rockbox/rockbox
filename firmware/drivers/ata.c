@@ -478,6 +478,7 @@ static int ata_transfer_sectors(unsigned long start,
                 int sectors;
                 int wordcount;
                 int status;
+                int error;
 
                 if (!wait_for_start_of_transfer()) {
                     /* We have timed out waiting for RDY and/or DRQ, possibly
@@ -502,6 +503,7 @@ static int ata_transfer_sectors(unsigned long start,
 
                 /* read the status register exactly once per loop */
                 status = ATA_STATUS;
+                error = ATA_ERROR;
 
                 if (count >= multisectors )
                     sectors = multisectors;
@@ -526,6 +528,9 @@ static int ata_transfer_sectors(unsigned long start,
                 if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
                     perform_soft_reset();
                     ret = -6;
+                    /* no point retrying IDNF, sector no. was invalid */
+                    if (error & ERROR_IDNF)
+                        break;
                     goto retry;
                 }
 
@@ -537,8 +542,14 @@ static int ata_transfer_sectors(unsigned long start,
         }
 
         if(!ret && !wait_for_end_of_transfer()) {
+            int error;
+
+            error = ATA_ERROR;
             perform_soft_reset();
             ret = -4;
+            /* no point retrying IDNF, sector no. was invalid */
+            if (error & ERROR_IDNF)
+                break;
             goto retry;
         }
         break;

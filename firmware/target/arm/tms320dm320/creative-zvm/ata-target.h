@@ -59,6 +59,7 @@ extern int _ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 #define STATUS_DRQ      0x08
 #define STATUS_ERR      0x01
 #define ERROR_ABRT      0x04
+#define ERROR_IDNF      0x10
 
 #define WRITE_PATTERN1  0xa5
 #define WRITE_PATTERN2  0x5a
