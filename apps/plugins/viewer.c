@@ -1450,7 +1450,7 @@ static void viewer_draw(int col)
 #ifdef HAVE_LCD_BITMAP
             {
                 rb->lcd_set_drawmode(DRMODE_BG|DRMODE_FG);
-                rb->lcd_fillrect(left_col, dy, LCD_WIDTH, pf->height);
+                rb->lcd_fillrect(left_col, dy, LCD_WIDTH - left_col, pf->height);
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             }
             rb->lcd_putsxy(dx, dy, utf8_buffer);
