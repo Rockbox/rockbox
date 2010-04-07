@@ -635,6 +635,7 @@ static int bookmark_count;
 
 static bool is_bom = false;
 
+/* calculate the width of a UCS character (zero width for diacritics) */
 static int glyph_width(int ch)
 {
     if (ch == 0)
@@ -647,6 +648,7 @@ static int glyph_width(int ch)
 #endif
 }
 
+/* get UCS character from string */
 static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
 {
     unsigned char utf8_tmp[6];
@@ -659,6 +661,7 @@ static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
     rb->iso_decode(str, utf8_tmp, prefs.encoding, count);
     rb->utf8decode(utf8_tmp, ch);
 
+    /* return a pointer after the parsed section of the string */
 #ifdef HAVE_LCD_BITMAP
     if (prefs.encoding >= SJIS && *str >= 0x80
         && !(prefs.encoding == SJIS && *str > 0xA0 && *str < 0xE0))
@@ -668,6 +671,7 @@ static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
         return (unsigned char*)str+1;
 }
 
+/* decode UCS string into UTF-8 string */
 static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
                                   int skip_width, int disp_width)
 {
@@ -677,6 +681,7 @@ static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
     unsigned char *utf8 = dst;
     int width = 0;
 
+    /* skip the skip_width */
     while (*str != '\0')
     {
         oldstr = str;
@@ -688,6 +693,8 @@ static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
             break;
         }
     }
+
+    /* decode until string end or disp_width reached */
     width = 0;
     while(*str != '\0')
     {
@@ -699,9 +706,11 @@ static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
         utf8 = rb->utf8encode(ch, utf8);
     }
 
+    /* return a pointer after the dst string ends */
     return utf8;
 }
 
+/* set max_columns and max_width */
 static void calc_max_width(void)
 {
     if (prefs.view_mode == NARROW)
@@ -1475,7 +1484,7 @@ static void viewer_draw(int col)
 #ifdef HAVE_LCD_BITMAP
     /* show header */
     viewer_show_header();
-    
+
     /* show footer */
     viewer_show_footer();
 #endif
@@ -2147,7 +2156,7 @@ static bool viewer_save_settings(void)
         viewer_add_bookmark();
         bookmarks[bookmark_count-1].flag = BOOKMARK_LAST;
     }
-  
+
     tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
     if (tfd < 0)
         return false;
@@ -2637,7 +2646,7 @@ static bool alignment_setting(void)
 
 static bool autoscroll_speed_setting(void)
 {
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT,
                        &prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
@@ -2869,8 +2878,7 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Screen left */
-                    col -= draw_columns;
-                    col = col_limit(col);
+                    col = col_limit(col - draw_columns);
                 }
                 else {   /* prefs.view_mode == NARROW */
                     /* Top of file */
@@ -2884,8 +2892,7 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Screen right */
-                    col += draw_columns;
-                    col = col_limit(col);
+                    col = col_limit(col + draw_columns);
                 }
                 else {   /* prefs.view_mode == NARROW */
                     /* Bottom of file */
@@ -2918,8 +2925,7 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_COLUMN_LEFT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Scroll left one column */
-                    col -= glyph_width('o');
-                    col = col_limit(col);
+                    col = col_limit(col - glyph_width('o'));
                     viewer_draw(col);
                 }
                 break;
@@ -2928,8 +2934,7 @@ enum plugin_status plugin_start(const void* file)
             case VIEWER_COLUMN_RIGHT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Scroll right one column */
-                    col += glyph_width('o');
-                    col = col_limit(col);
+                    col = col_limit(col + glyph_width('o'));
                     viewer_draw(col);
                 }
                 break;
