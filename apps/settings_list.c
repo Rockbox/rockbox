@@ -1662,10 +1662,12 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef HAVE_HOTKEY
-    CHOICE_SETTING(0, hotkey_wps, 0, 1, "hotkey wps", 0, NULL, 0),
-    CHOICE_SETTING(0, hotkey_wps_desc_id, 0, LANG_VIEW_DYNAMIC_PLAYLIST, "hotkey wps desc id", 0, NULL, 0),
-    CHOICE_SETTING(0, hotkey_tree, 0, 0, "hotkey tree", 0, NULL, 0),
-    CHOICE_SETTING(0, hotkey_tree_desc_id, 0, LANG_OFF, "hotkey tree desc id", 0, NULL, 0),
+    CHOICE_SETTING(0, hotkey_wps, -1, 1, "hotkey wps",
+        "off,view playlist,show track info,pitchscreen,open with,delete,insert",
+        NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+    CHOICE_SETTING(0, hotkey_tree, -1, 0, "hotkey tree",
+        "off,view playlist,show track info,pitchscreen,open with,delete,insert",
+        NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 #endif
 };
 

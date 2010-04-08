@@ -1208,6 +1208,7 @@ struct hotkey_assignment {
     struct menu_func func;
     int return_code;
     const struct menu_item_ex *menu_addr;
+    int lang_id;
 };
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
@@ -1227,30 +1228,50 @@ enum hotkey_settings {
 static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_VIEW_PLAYLIST  | HOT_WPS,
             HOTKEY_FUNC(NULL, NULL),
-            ONPLAY_PLAYLIST,    &view_cur_playlist },
+            ONPLAY_PLAYLIST,    &view_cur_playlist,
+            LANG_VIEW_DYNAMIC_PLAYLIST },
     { HOTKEY_SHOW_TRACK_INFO| HOT_WPS,
             HOTKEY_FUNC(browse_id3, NULL),
-            ONPLAY_RELOAD_DIR,  &browse_id3_item },
+            ONPLAY_RELOAD_DIR,  &browse_id3_item,
+            LANG_MENU_SHOW_ID3_INFO },
 #ifdef HAVE_PITCHSCREEN
     { HOTKEY_PITCHSCREEN    | HOT_WPS,
             HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
-            ONPLAY_RELOAD_DIR,  &pitch_screen_item },
+            ONPLAY_RELOAD_DIR,  &pitch_screen_item,
+            LANG_PITCH },
 #endif
     { HOTKEY_OPEN_WITH      | HOT_WPS | HOT_TREE,
             HOTKEY_FUNC(open_with, NULL),
-            ONPLAY_RELOAD_DIR,  &list_viewers_item },
+            ONPLAY_RELOAD_DIR,  &list_viewers_item,
+            LANG_ONPLAY_OPEN_WITH },
     { HOTKEY_DELETE         | HOT_WPS | HOT_TREE,
             HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  &delete_file_item },
+            ONPLAY_RELOAD_DIR,  &delete_file_item,
+            LANG_DELETE },
     { HOTKEY_DELETE         | HOT_TREE,
             HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  &delete_dir_item },
+            ONPLAY_RELOAD_DIR,  &delete_dir_item,
+            LANG_DELETE },
     { HOTKEY_INSERT         | HOT_TREE,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
-            ONPLAY_START_PLAY,  &i_pl_item },
+            ONPLAY_START_PLAY,  &i_pl_item,
+            LANG_INSERT },
 };
 
 static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
+
+/* Return the language ID for the input function */
+int get_hotkey_desc_id(int hk_func)
+{
+    int i;
+    for (i = 0; i < num_hotkey_items; i++)
+    {
+        if ((hotkey_items[i].item & HOT_MASK) == hk_func)
+            return hotkey_items[i].lang_id;
+    }
+    
+    return LANG_HOTKEY_NOT_SET;
+}
 
 /* Execute the hotkey function, if listed for this screen */
 static int execute_hotkey(bool is_wps)
@@ -1294,9 +1315,7 @@ static void set_hotkey(bool is_wps)
     struct hotkey_assignment *this_item;
     const int context = is_wps ? HOT_WPS : HOT_TREE;
     int *hk_func = is_wps ? &global_settings.hotkey_wps :
-                            &global_settings.hotkey_tree,
-        *hk_desc = is_wps ? &global_settings.hotkey_wps_desc_id :
-                            &global_settings.hotkey_tree_desc_id;
+                            &global_settings.hotkey_tree;
     int this_hk,
         this_id;
     bool match_found = false;
@@ -1336,7 +1355,6 @@ static void set_hotkey(bool is_wps)
     {                    
         /* store the hotkey settings */
         *hk_func = this_hk;
-        *hk_desc = this_id;
         
         settings_save();
     }

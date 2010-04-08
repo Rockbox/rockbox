@@ -50,6 +50,7 @@
 #ifdef HAVE_HOTKEY
 #include "list.h"
 #include "settings_list.h"
+#include "onplay.h"
 #endif
 
 /***********************************/
@@ -413,32 +414,26 @@ static void view_hotkey_info(void)
     info.hide_selection = true;
     info.scroll_all = true;
     simplelist_set_line_count(2);
-    simplelist_addline(0, "WPS: %s",
-        str(global_settings.hotkey_wps_desc_id));
-    simplelist_addline(1, "Tree: %s",
-        str(global_settings.hotkey_tree_desc_id));
+    simplelist_addline(0, str(LANG_WPS),
+        str(get_hotkey_desc_id(global_settings.hotkey_wps)));
+    simplelist_addline(1, str(LANG_FILE_BROWSER),
+        str(get_hotkey_desc_id(global_settings.hotkey_tree)));
     simplelist_show_list(&info);
 }
 
 /* reset hotkey settings to their defaults */
 static void reset_hotkey_settings(void)
 {
-    void *vars[] = {
-        &global_settings.hotkey_tree,
-        &global_settings.hotkey_tree_desc_id,
-        &global_settings.hotkey_wps,
-        &global_settings.hotkey_wps_desc_id,
-    };
-    const int num_settings = sizeof(vars) / sizeof(vars[0]);
-    int i;
-    
-    for (i = 0; i < num_settings; i++)
     {
         const struct settings_list *setting = 
-            find_setting(vars[i], NULL);
+            find_setting(&global_settings.hotkey_wps, NULL);
         reset_setting(setting, setting->setting);
     }
-    
+    {
+        const struct settings_list *setting = 
+            find_setting(&global_settings.hotkey_tree, NULL);
+        reset_setting(setting, setting->setting);
+    }
     settings_save();
     splash(HZ, str(LANG_RESET_DONE_CLEAR));
 }

@@ -13479,3 +13479,35 @@
     hotkey: "View Hotkey Settings"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_WPS
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS: %s"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_BROWSER
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "File Browser: %s"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
