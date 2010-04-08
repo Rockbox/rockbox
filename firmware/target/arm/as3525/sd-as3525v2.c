@@ -658,7 +658,8 @@ static void init_controller(void)
     /* Rx watermark = 63(sd reads)  Tx watermark = 128 (sd writes) */
     MCI_FIFOTH = (MCI_FIFOTH & MCI_FIFOTH_MASK) | 0x503f0080;
 
-    MCI_MASK = 0xffff & ~(MCI_INT_ACD|MCI_INT_CRDDET|MCI_INT_RXDR|MCI_INT_TXDR);
+    /* Mask all MCI Interrupts initially  */
+    MCI_MASK = 0;
 
     GPIOB_DIR |= (1<<5);         /* Pin B5 output  */
 
