@@ -743,12 +743,14 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
         <source>Detected an unsupported player:
 %1
 Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le lecteur audio détecté n&apos;est pas supporté:
+%1
+Désolé, Rockbox ne fonctionne pas sur votre lecteur audio.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="640"/>
         <source>Fatal: player incompatible</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur fatale: le lecteur audio est incompatible</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="651"/>
@@ -1159,7 +1161,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../createvoicefrm.ui" line="48"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue</translation>
     </message>
     <message>
         <location filename="../createvoicefrm.ui" line="55"/>
@@ -1219,12 +1221,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../base/encoders.cpp" line="95"/>
         <source>Path to Encoder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin vers le moteur d&apos;encodage:</translation>
     </message>
     <message>
         <location filename="../base/encoders.cpp" line="97"/>
         <source>Encoder options:</source>
-        <translation type="unfinished"></translation>
+        <translation>Options du moteur d&apos;encodage</translation>
     </message>
 </context>
 <context>
@@ -1232,17 +1234,17 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../base/encoders.cpp" line="161"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume:</translation>
     </message>
     <message>
         <location filename="../base/encoders.cpp" line="163"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualité:</translation>
     </message>
     <message>
         <location filename="../base/encoders.cpp" line="165"/>
         <source>Complexity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Complexité:</translation>
     </message>
     <message>
         <location filename="../base/encoders.cpp" line="167"/>
@@ -1255,32 +1257,32 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../encttscfggui.cpp" line="32"/>
         <source>Waiting for engine...</source>
-        <translation type="unfinished"></translation>
+        <translation>En attnte du moteur d&apos;encodage...</translation>
     </message>
     <message>
         <location filename="../encttscfggui.cpp" line="82"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../encttscfggui.cpp" line="85"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../encttscfggui.cpp" line="184"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../encttscfggui.cpp" line="192"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Rafraîchir</translation>
     </message>
     <message>
         <location filename="../encttscfggui.cpp" line="364"/>
         <source>Select excutable</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner l&apos;exécutable</translation>
     </message>
 </context>
 <context>
@@ -1402,72 +1404,72 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../installwindow.cpp" line="107"/>
         <source>Backup to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde vers %1</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="137"/>
         <source>Mount point is wrong!</source>
-        <translation type="unfinished"></translation>
+        <translation>Le point de montage est incorrect !</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="174"/>
         <source>Really continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes vous sûr de vouloir poursuivre ?</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="178"/>
         <source>Aborted!</source>
-        <translation type="unfinished">Abandonné !</translation>
+        <translation>Abandon !</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="187"/>
         <source>Beginning Backup...</source>
-        <translation type="unfinished">Début de la sauvegarde...</translation>
+        <translation>Début de la sauvegarde...</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="203"/>
         <source>Backup successful</source>
-        <translation type="unfinished">Sauvegarde effectuée avec succès</translation>
+        <translation>Sauvegarde effectuée avec succès</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="207"/>
         <source>Backup failed!</source>
-        <translation type="unfinished">Sauvegarde échouée !</translation>
+        <translation>La sauvegarde a échoué !</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="238"/>
         <source>Select Backup Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez un fichier de sauvegarde</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="271"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">C&apos;est la version la plus récente possible. Elle est mise à jour à chaque fois qu&apos;un changement est fait. La version actuelle est r%1 (%2).</translation>
+        <translation>C&apos;est la version la plus récente possible. Elle est mise à jour à chaque fois qu&apos;un changement est fait. La version actuelle est r%1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;C&apos;est la version recommandée.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="288"/>
         <source>This is the last released version of Rockbox.</source>
-        <translation type="unfinished">C&apos;est la dernière version publique officielle de Rockbox.</translation>
+        <translation>C&apos;est la dernière version publique officielle de Rockbox.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="291"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Remarque:&lt;/b&gt;La dernière version publique officielle est %1. &lt;b&gt;C&apos;est la version recommandée.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="303"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation type="unfinished">Celles-ci sont compilées chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. les fonctionnalités peuvent changer.</translation>
+        <translation>Celles-ci sont compilées chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. Les fonctionnalités peuvent changer régulièrement.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="307"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Note :&lt;/b&gt; la version archivée est r%1 (%2).</translation>
+        <translation>&lt;b&gt;Remarque :&lt;/b&gt; la version archivée est r%1 (%2).</translation>
     </message>
 </context>
 <context>
@@ -1475,87 +1477,87 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../installwindowfrm.ui" line="16"/>
         <source>Install Rockbox</source>
-        <translation type="unfinished">Installer Rockbox</translation>
+        <translation>Installer Rockbox</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="35"/>
         <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation type="unfinished">Veuillez sélectionner la version de Rockbox que vous souhaitez installer sur votre lecteur audio :</translation>
+        <translation>Veuillez sélectionner la version de Rockbox que vous souhaitez installer sur votre lecteur audio :</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="45"/>
         <source>Version</source>
-        <translation type="unfinished">Version</translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="51"/>
         <source>Rockbox &amp;stable</source>
-        <translation type="unfinished">Rockbox &amp;stable</translation>
+        <translation>Rockbox &amp;stable</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="58"/>
         <source>&amp;Archived Build</source>
-        <translation type="unfinished">Version &amp;archivée</translation>
+        <translation>Version &amp;archivée</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="65"/>
         <source>&amp;Current Build</source>
-        <translation type="unfinished">Version a&amp;ctuelle</translation>
+        <translation>Version a&amp;ctuelle</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="75"/>
         <source>Details</source>
-        <translation type="unfinished">Détails</translation>
+        <translation>Détails</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="81"/>
         <source>Details about the selected version</source>
-        <translation type="unfinished">Détails à propos de la version sélectionnée</translation>
+        <translation>Détails à propos de la version sélectionnée</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="91"/>
         <source>Note</source>
-        <translation type="unfinished">Note</translation>
+        <translation>Remarques</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="119"/>
         <source>&amp;Install</source>
-        <translation type="unfinished">&amp;Installer</translation>
+        <translation>&amp;Installer</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="130"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="156"/>
         <source>Backup</source>
-        <translation type="unfinished">Sauvegarde</translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="162"/>
         <source>Backup before installing</source>
-        <translation type="unfinished">Sauvegarder avant d&apos;installer</translation>
+        <translation>Sauvegarder avant d&apos;installer</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="169"/>
         <source>Backup location</source>
-        <translation type="unfinished">Lieu de la sauvegarde</translation>
+        <translation>Lieu de la sauvegarde</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="188"/>
         <source>Change</source>
-        <translation type="unfinished">Modifier</translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="198"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation type="unfinished">L&apos;utilitaire Rockbox stocke les copies de Rockbox téléchargées sur le disque dur local pour économiser de la bande passante. Si votre copie local ne fonctionne plus, cochez cette casez pour télécharger une nouvelle copie.</translation>
+        <translation>L&apos;utilitaire Rockbox stocke les copies de Rockbox téléchargées sur le disque dur pour économiser de la bande passante. Si votre copie locale ne fonctionne plus, cochez cette casez pour télécharger une nouvelle copie.</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="201"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation type="unfinished">&amp;Ne pas utiliser la version en cache</translation>
+        <translation>&amp;Ne pas utiliser la version en cache</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1579,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../progressloggerfrm.ui" line="58"/>
         <source>Save Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder l&apos;historique</translation>
     </message>
     <message>
         <location filename="../progressloggerfrm.ui" line="82"/>
@@ -1587,7 +1589,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../progressloggerfrm.ui" line="32"/>
         <source>progresswindow</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression</translation>
     </message>
 </context>
 <context>
@@ -1670,17 +1672,17 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <location filename="../rbutilqt.cpp" line="197"/>
         <location filename="../rbutilqt.cpp" line="229"/>
         <source>Downloading build information, please wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement des informations de version, veuillez patienter...</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="208"/>
         <source>Can&apos;t get version information!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de récupérer les informations de version !</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="244"/>
         <source>Download build information finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le téléchargement des informations de version est terminé.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="257"/>
@@ -1806,12 +1808,12 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="1316"/>
         <source>RockboxUtility Update available</source>
-        <translation type="unfinished"></translation>
+        <translation>Une mise à jour de l&apos;utilitaire Rockbox est disponible</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1317"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Une nouvelle version de l&apos;utilitaire de Rockbox est disponiel.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Vous pouvez la télécharger ici: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="343"/>
@@ -1837,7 +1839,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="336"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
-        <translation type="unfinished">Votre configuration est invalide. Ceci est probablement dû à une nouvelle installation de l&apos;utilitaire Rockbox ou à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
+        <translation>Ceci est une nouvelle installation de l&apos;utilitaire Rockbox, ou l&apos;installation d&apos;une nouvelle version. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de paramétrer le programme ou de vérifier les réglages.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="573"/>
@@ -1877,58 +1879,59 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="335"/>
         <source>New installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle installation</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="344"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre configuration est invalide. Ceci est probablement dû à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="605"/>
         <source>Backup successful</source>
-        <translation type="unfinished">Sauvegarde effectuée avec succès</translation>
+        <translation>Sauvegarde effectuée avec succès</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="209"/>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de réseau</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="210"/>
         <source>Can&apos;t get version information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de récupérer les informations de version.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="569"/>
         <source>Really continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes vous sûr de vouloir poursuivre ?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="694"/>
         <source>No install method known.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune méthode d&apos;installation n&apos;est connue.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="714"/>
         <source>Bootloader detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été détecté</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="715"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader est déjà installé. Voulez-vous le réinstaller ?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="738"/>
         <source>Create Bootloader backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde du bootloader</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="739"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pouvez créer une sauvegarde du bootloader originel. Appuyez sur &quot;Oui&quot; pour sélectionner un dossier de sortie sur votre ordinateur où le fichier sera enregistré. Le fichier sera placé dans le sous-dossier &quot;%1&quot;.
+Appuyez sur &quot;Non&quot; pour ignorez cette étape.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="746"/>
@@ -1948,27 +1951,27 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="773"/>
         <source>Error opening firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le firmware</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="791"/>
         <source>Backup error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de la sauvegarde</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="792"/>
         <source>Could not create backup file. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de créer une sauvegarde. Voulez-vous poursuivre ?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="822"/>
         <source>Manual steps required</source>
-        <translation type="unfinished"></translation>
+        <translation>Des étapes manuelles sont nécessaire</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1027"/>
         <source>No uninstall method known.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune méthode de suppression n&apos;est connue.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="427"/>
