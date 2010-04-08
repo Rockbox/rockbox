@@ -25,7 +25,11 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3400
+    /*
+     * about 10%, calibrated with C240v2 battery profile at
+     * http://www.rockbox.org/wiki/bin/viewfile/Main/SansaRuntime?filename=c240v2_battery_bench_percent.png;rev=3
+     */
+    3600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
@@ -36,8 +40,12 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* TODO: calibrate, copied from powermgmt-c200.c svn r22636 */
-    { 3400, 3689, 3744, 3773, 3798, 3831, 3886, 3947, 4005, 4102, 4220 },
+    /*
+     * Below table is calibrated according to
+     * http://www.rockbox.org/wiki/bin/viewfile/Main/SansaRuntime?filename=c240v2_battery_bench_percent.png;rev=3
+     * OF seems to stop charging at 4150mV, so that's 100% here.
+     */
+    { 3300, 3597, 3674, 3719, 3745, 3776, 3825, 3890, 3954, 4035, 4150 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
