@@ -13480,7 +13480,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS
+  id: LANG_HOTKEY_VIEW_WPS
   desc: hotkey info menu
   user: core
   <source>
@@ -13496,7 +13496,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILE_BROWSER
+  id: LANG_HOTKEY_VIEW_FILE_BROWSER
   desc: hotkey info menu
   user: core
   <source>
