@@ -24,6 +24,7 @@
 #include "pl081.h"
 #include "dma-target.h"
 #include "panic.h"
+#include "config.h"
 
 static int dma_used = 0;
 static void (*dma_callback[2])(void); /* 2 channels */
@@ -48,7 +49,9 @@ void dma_release(void)
 
 void dma_init(void)
 {
+#if CONFIG_CPU == AS3525
     DMAC_SYNC = 0xffff; /* disable synchronisation logic */
+#endif
     VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
