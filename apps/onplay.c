@@ -1368,6 +1368,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
     context = from;
     selected_file = file;
     selected_file_attr = attr;
+    int menu_selection;
 #ifdef HAVE_HOTKEY
     if (hotkey)
         return execute_hotkey(context == CONTEXT_WPS);
@@ -1379,13 +1380,17 @@ int onplay(char* file, int attr, int from, bool hotkey)
         menu = &wps_onplay_menu;
     else
         menu = &tree_onplay_menu;
-    switch (do_menu(menu, NULL, NULL, false))
-    {
+    menu_selection = do_menu(menu, NULL, NULL, false);
 #ifdef HAVE_HOTKEY
-        hotkey_settable_menu = false;
+    hotkey_settable_menu = false;
+    switch (menu_selection)
+    {
         case MENU_SELECTED_HOTKEY:
             set_hotkey(context == CONTEXT_WPS);
             return ONPLAY_RELOAD_DIR;
+#else
+    switch (menu_selection)
+    {
 #endif
         case GO_TO_WPS:
             return ONPLAY_START_PLAY;
