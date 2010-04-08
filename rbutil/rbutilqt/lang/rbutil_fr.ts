@@ -6,48 +6,48 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader nécessite que vous fournissiez le firmware originel (fichier bin). Vous devez le télécharger vous même pour des raisons légales. Veuillez vous référer aux &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Forums Sansa&lt;/a&gt; ou au &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; et à la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; pour obtenir ce fichier. Appuyez sur Ok pour continuer and sélectionner le fichier du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="54"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="94"/>
         <location filename="../base/bootloaderinstallams.cpp" line="107"/>
         <source>Could not load %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de charger %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="122"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation type="unfinished"></translation>
+        <translation>Il n&apos;y a pas assez de place pour insérer le bootloader, veuillez essayer avec une autre version du firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="132"/>
         <source>Patching Firmware...</source>
-        <translation type="unfinished"></translation>
+        <translation>Modification du firmware...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="143"/>
         <source>Could not open %1 for writing</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir %1 en écriture</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="156"/>
         <source>Could not write firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;écrire le firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="172"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware a été modifié avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="180"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
     </message>
 </context>
 <context>
@@ -55,57 +55,57 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="75"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors du téléchargement: erreur HTTP %1.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="81"/>
         <source>Download error: %1</source>
-        <translation type="unfinished">Erreur de téléchargement : %1</translation>
+        <translation>Erreur lors du téléchargement : %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="87"/>
         <source>Download finished (cache used).</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement terminé (la version du cache a été utilisée).</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="89"/>
         <source>Download finished.</source>
-        <translation type="unfinished">Téléchargement terminé.</translation>
+        <translation>Téléchargement terminé.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="110"/>
         <source>Creating backup of original firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Création d&apos;un sauvegarde du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="112"/>
         <source>Creating backup folder failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La création du dossier de sauvegarde a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="118"/>
         <source>Creating backup copy failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>La création de la sauvegarde a échoué.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="121"/>
         <source>Backup created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde effectuée.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="134"/>
         <source>Creating installation log</source>
-        <translation type="unfinished">Création du journal d&apos;installation</translation>
+        <translation>Création du journal d&apos;installation</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="158"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader a presque complète. Vous &lt;b&gt;devez&lt;/b&gt; réaliser les étapes suivantes manuellement:</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="163"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;Débranchez votre lecteur audio en toute sécurité.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="167"/>
@@ -135,17 +135,17 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
         <source>Player remounted</source>
-        <translation type="unfinished"></translation>
+        <translation>Le lecteur audio a été remonté</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="237"/>
         <source>Timeout on remount</source>
-        <translation type="unfinished"></translation>
+        <translation>Le délai d&apos;attente lors du remontage a expiré</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="146"/>
         <source>Installation log created</source>
-        <translation type="unfinished"></translation>
+        <translation>Le journal d&apos;installation a été crée</translation>
     </message>
 </context>
 <context>
@@ -158,7 +158,7 @@
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="79"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
 </context>
 <context>
@@ -166,47 +166,47 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="35"/>
         <source>Downloading bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="44"/>
         <source>Installing Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="76"/>
         <source>Error accessing output folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;accès au dossier de sortie</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="89"/>
         <source>Bootloader successful installed</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été installé avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="99"/>
         <source>Removing Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Suppression du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="103"/>
         <source>No original firmware file found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun firmware originel n&apos;a pas été trouvé.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="109"/>
         <source>Can&apos;t remove Rockbox bootloader file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de supprime le bootloader de Rockbox.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="114"/>
         <source>Can&apos;t restore bootloader file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de restaurer le bootloader.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="118"/>
         <source>Original bootloader restored successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloadezr originel a été restauré avec succès.</translation>
     </message>
 </context>
 <context>
@@ -214,152 +214,152 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="68"/>
         <source>checking MD5 hash of input file ...</source>
-        <translation type="unfinished"></translation>
+        <translation>vérification de l&apos;empreinte MD5 du fichier d&apos;entrée...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="79"/>
         <source>Could not verify original firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de vérifier le firmware originel</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="94"/>
         <source>Firmware file not recognized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware n&apos;a pas été reconnu.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="98"/>
         <source>MD5 hash ok</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;empreinte MD5 est correcte</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="105"/>
         <source>Firmware file doesn&apos;t match selected player.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware ne correspond pas au lecteur audio choisi.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="110"/>
         <source>Descrambling file</source>
-        <translation type="unfinished"></translation>
+        <translation>Débrouillage du fichier</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="118"/>
         <source>Error in descramble: %1</source>
-        <translation type="unfinished">Error dans descramble : %1</translation>
+        <translation>Error lors du débrouillage : %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="123"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="133"/>
         <source>Adding bootloader to firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajout du bootloader au firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="171"/>
         <source>could not open input file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
+        <translation>impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="172"/>
         <source>reading header failed</source>
-        <translation type="unfinished">La lecture de l&apos;en-tête a échoué</translation>
+        <translation>la lecture de l&apos;en-tête a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="173"/>
         <source>reading firmware failed</source>
-        <translation type="unfinished">La lecture du firmware a échoué</translation>
+        <translation>la lecture du firmware a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="174"/>
         <source>can&apos;t open bootloader file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier de bootloader</translation>
+        <translation>impossible d&apos;ouvrir le fichier de bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="175"/>
         <source>reading bootloader file failed</source>
-        <translation type="unfinished">La lecture du fichier du bootloader a échoué</translation>
+        <translation>la lecture du fichier du bootloader a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="176"/>
         <source>can&apos;t open output file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier de sortie</translation>
+        <translation>impossible d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="177"/>
         <source>writing output file failed</source>
-        <translation type="unfinished">L&apos;écriture du fichier de sortie a échoué</translation>
+        <translation>l&apos;écriture du fichier de sortie a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="179"/>
         <source>Error in patching: %1</source>
-        <translation type="unfinished">Erreur dans la modification : %1</translation>
+        <translation>Erreur lors de la modification : %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="190"/>
         <source>Error in scramble: %1</source>
-        <translation type="unfinished">Erreur dans scramble : %1</translation>
+        <translation>Erreur lors du brouillage: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="205"/>
         <source>Checking modified firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification du firmware modifié</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="207"/>
         <source>Error: modified file checksum wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: la somme de contrôle du fichier est incorrecte</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="215"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware a été modifié avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="246"/>
         <source>Can&apos;t open input file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
+        <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="247"/>
         <source>Can&apos;t open output file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier de sortie</translation>
+        <translation>Impossible d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="248"/>
         <source>invalid file: header length wrong</source>
-        <translation type="unfinished">Fichier invalide : longueur de l&apos;en-tête incorrecte</translation>
+        <translation>fichier invalide : longueur de l&apos;en-tête incorrecte</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="249"/>
         <source>invalid file: unrecognized header</source>
-        <translation type="unfinished">Fichier invalide : en-tête non reconnu</translation>
+        <translation>fichier invalide : en-tête non reconnu</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="250"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
-        <translation type="unfinished">Fichier invalide : champ &quot;longueur&quot; erroné</translation>
+        <translation>fichier invalide : champ &quot;longueur&quot; erroné</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="251"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
-        <translation type="unfinished">Fichier invalide : champ &quot;longueur2&quot; erroné</translation>
+        <translation>fichier invalide : champ &quot;longueur2&quot; erroné</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="252"/>
         <source>invalid file: internal checksum error</source>
-        <translation type="unfinished">Fichier invalide : erreur interne de somme de contrôle</translation>
+        <translation>fichier invalide : erreur interne de somme de contrôle</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="253"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
-        <translation type="unfinished">Fichier invalide : champ &quot;longueur3&quot; erroné</translation>
+        <translation>fichier invalide : champ &quot;longueur3&quot; erroné</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="254"/>
         <source>unknown</source>
-        <translation type="unfinished">inconnu</translation>
+        <translation>inconnue</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="49"/>
@@ -372,24 +372,24 @@
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="54"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: impossible d&apos;allouer de la mémoire !</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="82"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="66"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="153"/>
         <source>Failed to read firmware directory</source>
-        <translation type="unfinished">La lecture du dossier du firmware a échoué</translation>
+        <translation>La lecture du dossier du firmware a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="71"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="158"/>
         <source>Unknown version number in firmware (%1)</source>
-        <translation type="unfinished">Numéro de version inconnu dans le firmware (%1)</translation>
+        <translation>Numéro de version inconnu dans le firmware (%1)</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="77"/>
@@ -401,77 +401,77 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="165"/>
         <source>Could not open Ipod in R/W mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;accéder à l&apos;Ipod en lecture et écriture</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="106"/>
         <source>Successfull added bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été ajouté avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="117"/>
         <source>Failed to add bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;ajout du bootloader a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="129"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader est terminée.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="134"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;écriture de l&apos;historique a été interrompue</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="171"/>
         <source>No bootloader detected.</source>
-        <translation type="unfinished">Aucun bootloader détecté.</translation>
+        <translation>Aucun bootloader détecté.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="177"/>
         <source>Successfully removed bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été supprimé avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="184"/>
         <source>Removing bootloader failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>La suppression du bootloader a échoué.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="245"/>
         <source>Error: no mountpoint specified!</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: aucun point de montage n&apos;a été spécifié !</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="250"/>
         <source>Could not open Ipod: permission denied</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;accéder à l&apos;Ipod: accès refusé</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="254"/>
         <source>Could not open Ipod</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;accéder à l&apos;Ipod</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="265"/>
         <source>No firmware partition on disk</source>
-        <translation type="unfinished"></translation>
+        <translation>La partition du firmware n&apos;est pas présente sur le disque</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="92"/>
         <source>Installing Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="144"/>
         <source>Uninstalling bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Suppression du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="259"/>
         <source>Error reading partition table - possibly not an Ipod</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de la lecteur de la table des partitions; ce lecteur audio n&apos;est peut-être pas un Ipod</translation>
     </message>
 </context>
 <context>
@@ -479,42 +479,42 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="34"/>
         <source>Downloading bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="43"/>
         <source>Installing Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="66"/>
         <source>Bootloader successful installed</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été installé avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="78"/>
         <source>Checking for Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="80"/>
         <source>No Rockbox bootloader found</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader de Rockbox n&apos;a pas été trouvé</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="85"/>
         <source>Checking for original firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification du firmware originel</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="90"/>
         <source>Error finding original firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de la rechercher du firmware originel</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="100"/>
         <source>Rockbox bootloader successful removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader de Rockbox a été supprimé avec succès</translation>
     </message>
 </context>
 <context>
@@ -522,28 +522,29 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="56"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: impossible d&apos;allouer de la mémoire !</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="61"/>
         <source>Searching for Sansa</source>
-        <translation type="unfinished"></translation>
+        <translation>Recherche de lecteurs Sansa</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="67"/>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;accès au disque a été refusé !
+Ceci est nécessaire à l&apos;installation du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="74"/>
         <source>No Sansa detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun lecteur Sansa n&apos;a été détecté !</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="87"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="79"/>
@@ -559,77 +560,77 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <location filename="../base/bootloaderinstallsansa.cpp" line="109"/>
         <location filename="../base/bootloaderinstallsansa.cpp" line="197"/>
         <source>Could not open Sansa in R/W mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;accéder au lecteur Sansa en lecture et écriture</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="136"/>
         <source>Successfully installed bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été installé avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="147"/>
         <source>Failed to install bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader a échoué</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="160"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader est terminée.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="165"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;écriture de l&apos;historique a été interrompue</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="259"/>
         <source>Can&apos;t find Sansa</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de trouver un lecteur Sansa</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="264"/>
         <source>Could not open Sansa</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;accéder au lecteur Sansa</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="269"/>
         <source>Could not read partition table</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire la table des partitions</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="276"/>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le disque n&apos;appartient pas à un lecteur Sansa (Erreur %1); abandon.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="203"/>
         <source>Successfully removed bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader a été supprimé averc succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="210"/>
         <source>Removing bootloader failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>La suppression du bootloader a échoué.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="101"/>
         <source>Installing Rockbox bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation du bootloader de Rockbox</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="118"/>
         <source>Checking downloaded bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification du bootloader téléchargé</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="126"/>
         <source>Bootloader mismatch! Aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader ne correspond pas ! Abandon.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="178"/>
         <source>Uninstalling bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Suppression du bootloader</translation>
     </message>
 </context>
 <context>
@@ -642,43 +643,43 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="51"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="83"/>
         <location filename="../base/bootloaderinstalltcc.cpp" line="100"/>
         <source>Could not load %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de charger %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="91"/>
         <source>Unknown OF file used: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier du firmware originel n&apos;est pas valide : %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="105"/>
         <source>Patching Firmware...</source>
-        <translation type="unfinished"></translation>
+        <translation>Modification du firmware...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="112"/>
         <source>Could not patch firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de modifier le firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="118"/>
         <source>Could not open %1 for writing</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir %1 en écriture</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="127"/>
         <source>Could not write firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;écriture le firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="132"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware a été modifié avec succès</translation>
     </message>
 </context>
 <context>
