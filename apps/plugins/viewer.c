@@ -1693,17 +1693,10 @@ static bool change_font(unsigned char *font)
     rb->snprintf(buf, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
     if (rb->font_load(NULL, buf) < 0) {
         rb->splash(HZ/2, "Font load failed.");
-
         return false;
     }
 
     return true;
-}
-
-static void revert_font(void)
-{
-    if (rb->strcmp(prefs.font, rb->global_settings->font_file))
-        change_font(rb->global_settings->font_file);
 }
 #endif
 
@@ -2190,10 +2183,12 @@ read_end:
     start_position = file_pos + screen_top_ptr - buffer;
 
 #ifdef HAVE_LCD_BITMAP
+    /* load prefs font if it is different than the global settings font */
     if (rb->strcmp(prefs.font, rb->global_settings->font_file)) {
         if (!change_font(prefs.font)) {
-            revert_font();
-            return false;
+            /* fallback by re-loading the global settings font */
+            if (!change_font(rb->global_settings->font_file))
+                return false;
         }
     }
 
@@ -2715,9 +2710,10 @@ static bool font_setting(void)
 
     if (new_font != old_font)
     {
-        if (!change_font(prefs.font))
-        {
-            revert_font();
+        /* load selected font */
+        if (!change_font((unsigned char *)names[new_font].string)) {
+            /* revert by re-loading the preferences font */
+            change_font(prefs.font);
             return false;
         }
         rb->memset(prefs.font, 0, MAX_PATH);
