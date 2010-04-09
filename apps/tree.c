@@ -1079,7 +1079,11 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
             peek_filename = playlist_peek(index);
             
             if (peek_filename == NULL)
-                return false;
+            {
+                peek_filename = playlist_peek(0);
+                if (peek_filename == NULL)
+                    return false;
+            }
                 
             if (strcmp(strrchr(peek_filename, '/') + 1, filename))
             {
