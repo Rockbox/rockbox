@@ -38,7 +38,7 @@ static struct spi_node mc13783_spi =
     CSPI2_NUM,                     /* CSPI module 2 */
     CSPI_CONREG_CHIP_SELECT_SS0 |  /* Chip select 0 */
     CSPI_CONREG_DRCTL_DONT_CARE |  /* Don't care about CSPI_RDY */
-    CSPI_CONREG_DATA_RATE_DIV_4 |  /* Clock = IPG_CLK/4 - 16.5MHz */
+    CSPI_CONREG_DATA_RATE_DIV_32 | /* Clock = IPG_CLK/32 = 2,062,500Hz. */
     CSPI_BITCOUNT(32-1) |          /* All 32 bits are to be transferred */
     CSPI_CONREG_SSPOL |            /* SS active high */
     CSPI_CONREG_SSCTL |            /* Negate SS between SPI bursts */
