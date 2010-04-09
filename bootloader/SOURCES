@@ -8,7 +8,7 @@ ipod.c
 gigabeat.c
 #elif defined(GIGABEAT_S)
 gigabeat-s.c
-../firmware/target/arm/imx31/gigabeat-s/mmu-imx31.c
+../firmware/target/arm/imx31/mmu-imx31.c
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
       defined(SANSA_E200) || defined(SANSA_C200) || \
       defined(MROBE_100)  || defined(PHILIPS_SA9200) || \
