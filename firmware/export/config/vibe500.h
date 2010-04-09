@@ -10,6 +10,9 @@
 
 #define CONFIG_STORAGE STORAGE_ATA
 
+/*define this if the ATA controller and method of USB access support LBA48 */
+#define HAVE_LBA48
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 

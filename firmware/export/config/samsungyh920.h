@@ -112,6 +112,9 @@
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 
+/*define this if the ATA controller and method of USB access support LBA48 */
+#define HAVE_LBA48
+
 /* We're able to shut off power to the HDD */
 /* todo #define HAVE_ATA_POWER_OFF */
 
