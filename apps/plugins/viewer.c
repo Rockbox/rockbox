@@ -2186,8 +2186,12 @@ read_end:
     /* load prefs font if it is different than the global settings font */
     if (rb->strcmp(prefs.font, rb->global_settings->font_file)) {
         if (!change_font(prefs.font)) {
-            /* fallback by re-loading the global settings font */
-            if (!change_font(rb->global_settings->font_file))
+            /* fallback by resetting prefs font to the global settings font */
+            rb->memset(prefs.font, 0, MAX_PATH);
+            rb->snprintf(prefs.font, MAX_PATH, "%s",
+                rb->global_settings->font_file);
+
+            if (!change_font(prefs.font))
                 return false;
         }
     }
