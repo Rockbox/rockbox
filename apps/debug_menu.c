@@ -1957,6 +1957,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         simplelist_addline(SIMPLELIST_ADD_LINE,
                  "No timing info");
     }
+    int sector_size = 512;
+    if((identify_info[106] & 0xe000) == 0x6000)
+        sector_size *= BIT_N(identify_info[106] & 0x000f);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+            "Physical sector size: %d", sector_size);
 #ifdef HAVE_ATA_DMA
     if (identify_info[63] & (1<<0)) {
         char mdma0[2], mdma1[2], mdma2[2];
