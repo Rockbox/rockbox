@@ -1080,7 +1080,9 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
             
             if (peek_filename == NULL)
             {
-                peek_filename = playlist_peek(0);
+                /* playlist has shrunk, search from the top */
+                index = 0;
+                peek_filename = playlist_peek(index);
                 if (peek_filename == NULL)
                     return false;
             }
