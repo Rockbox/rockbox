@@ -628,40 +628,40 @@ static void init_controller(void)
     int hcon_numcards = ((MCI_HCON>>1) & 0x1F) + 1;
     int card_mask = (1 << hcon_numcards) - 1;
 
-    MCI_PWREN &= ~card_mask;               /*  power off all cards  */
+    MCI_PWREN &= ~card_mask;            /*  power off all cards  */
 
-    MCI_CLKSRC = 0x00;                     /* All CLK_SRC_CRD set to 0*/
-    MCI_CLKDIV = 0x00;                     /* CLK_DIV_0 : bits 7:0  */
+    MCI_CLKSRC = 0x00;                  /* All CLK_SRC_CRD set to 0*/
+    MCI_CLKDIV = 0x00;                  /* CLK_DIV_0 : bits 7:0  */
 
-    MCI_PWREN |= card_mask;                /*  power up cards  */
+    MCI_PWREN |= card_mask;             /*  power up cards  */
     mci_delay();
 
     MCI_CTRL |= CTRL_RESET;
     while(MCI_CTRL & CTRL_RESET)
         ;
 
-    MCI_RAW_STATUS = 0xffffffff;
+    MCI_RAW_STATUS = 0xffffffff;        /* Clear all MCI Interrupts  */
 
     MCI_TMOUT = 0xffffffff;             /*  data b31:8, response b7:0 */
 
     MCI_CTYPE = 0x0;                    /*  all cards 1 bit bus for now */
 
-    MCI_CLKENA = card_mask;
+    MCI_CLKENA = card_mask;             /*  Enables card clocks  */
 
     MCI_ARGUMENT = 0;
     MCI_COMMAND = CMD_DONE_BIT|CMD_SEND_CLK_ONLY|CMD_WAIT_PRV_DAT_BIT;
     while(MCI_COMMAND & CMD_DONE_BIT)
         ;
 
-    MCI_DEBNCE = 0xfffff;   /* default value */
+    MCI_DEBNCE = 0xfffff;               /* default value */
 
     /* Rx watermark = 63(sd reads)  Tx watermark = 128 (sd writes) */
     MCI_FIFOTH = (MCI_FIFOTH & MCI_FIFOTH_MASK) | 0x503f0080;
 
+    GPIOB_DIR |= (1<<5);                 /* Set pin B5 to output  */
+
     /* Mask all MCI Interrupts initially  */
     MCI_MASK = 0;
-
-    GPIOB_DIR |= (1<<5);         /* Pin B5 output  */
 
     MCI_CTRL |= INT_ENABLE;
 }
