@@ -93,9 +93,6 @@ enum IMX31_PLLS
     NUM_PLLS,
 };
 
-#define CONFIG_CLK32_FREQ   32768
-#define CONFIG_HCLK_FREQ    27000000
-
 /* Get the PLL reference clock frequency in HZ */
 unsigned int ccm_get_pll_ref_clk(void);
 

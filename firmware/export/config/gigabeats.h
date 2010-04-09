@@ -8,6 +8,10 @@
 
 #define MODEL_NAME "Toshiba Gigabeat S"
 
+/* System source clock frequencies (Hz) */
+#define CONFIG_CKIL_FREQ    32768       /* RTC Crystal, Tuner */
+#define CONFIG_CKIH_FREQ    27000000    /* PLL Reference */
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 21
 

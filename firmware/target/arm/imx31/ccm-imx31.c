@@ -49,9 +49,9 @@ void ccm_module_clock_gating(enum IMX31_CG_LIST cg, enum IMX31_CG_MODES mode)
 unsigned int ccm_get_pll_ref_clk(void)
 {
     if ((CCM_CCMR & (3 << 1)) == (1 << 1))
-        return CONFIG_CLK32_FREQ * 1024;
+        return CONFIG_CKIL_FREQ * 1024;
     else
-        return CONFIG_HCLK_FREQ;
+        return CONFIG_CKIH_FREQ;
 }
 
 /* Return PLL frequency in HZ */
