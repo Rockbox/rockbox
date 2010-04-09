@@ -27,7 +27,7 @@
 #include "adc-target.h"
 #include "button-target.h"
 #include "usb-target.h"
-#include "power-imx31.h"
+#include "power-gigabeat-s.h"
 #include "powermgmt-target.h"
 
 /* Gigabeat S definitions for static MC13783 event registration */

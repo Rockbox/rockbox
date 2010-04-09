@@ -26,7 +26,7 @@
 #include "adc.h"
 #include "powermgmt.h"
 #include "power.h"
-#include "power-imx31.h"
+#include "power-gigabeat-s.h"
 
 /* TODO: Battery tests to get the right values! */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =

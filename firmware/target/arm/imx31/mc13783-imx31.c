@@ -26,11 +26,6 @@
 #include "debug.h"
 #include "kernel.h"
 
-#include "power-imx31.h"
-#include "button-target.h"
-#include "adc-target.h"
-#include "usb-target.h"
-
 #ifdef BOOTLOADER
 #define PMIC_DRIVER_CLOSE
 #endif

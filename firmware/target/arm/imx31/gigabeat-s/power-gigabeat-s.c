@@ -23,7 +23,7 @@
 #include "usb.h"
 #include "usb_core.h"
 #include "power.h"
-#include "power-imx31.h"
+#include "power-gigabeat-s.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
