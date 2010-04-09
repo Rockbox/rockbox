@@ -28,29 +28,29 @@
 #include "power.h"
 #include "power-gigabeat-s.h"
 
-/* TODO: Battery tests to get the right values! */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3450
+    3659
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3400
+    3650
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
-    { 3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990 },
+    /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */
+    { 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Toshiba Gigabeat Li Ion 830mAH */
-    3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
+    /* Toshiba Gigabeat S Li Ion 700mAH figured from charge curve */
+    /* TODO - get actual charge curve (this is copy of discharge) */
+    3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121
 };
 
 /* Returns battery voltage from ADC [millivolts] */
