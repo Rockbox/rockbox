@@ -5952,11 +5952,11 @@
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Linea in ingresso"
+    recording,archosplayer: "Ingresso Line"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Linea in ingresso"
+    recording,archosplayer: "Ingresso Line"
   </voice>
 </phrase>
 <phrase>
@@ -10639,11 +10639,11 @@
   </source>
   <dest>
     *: none
-    recording: "Linea in Ingresso"
+    recording: "Ingresso Line"
   </dest>
   <voice>
     *: none
-    recording: "Linea in Ingresso"
+    recording: "Ingresso Line"
   </voice>
 </phrase>
 <phrase>
@@ -13300,5 +13300,139 @@
   <voice>
     *: none
     recording_histogram: "Intervallo Istogramma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Uscita Line"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Uscita Line"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Set Hotkey: %s?"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Imposta Tasto Rapido: %s?"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Imposta Tasto Rapido?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: Confirmation after the hotkey has been assigned
+  user: core
+  <source>
+    *: none
+    hotkey: "Assigned Hotkey: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tasto Rapido Assegnato: %s"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tasto Rapido Assegnato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey Not Set"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tasto Rapido Non Impostato"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tasto Rapido Non Impostato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tasto Rapido"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tasto Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "View Hotkey Settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Visualizza Impostazioni Tasto Rapido"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Visualizza Impostazioni Tasto Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_VIEW_WPS
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS: %s"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_VIEW_FILE_BROWSER
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Sfoglia File: %s"
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
