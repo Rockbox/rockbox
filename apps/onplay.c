@@ -1215,11 +1215,11 @@ enum hotkey_action {
 };
 
 struct hotkey_assignment {
-    int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x  */
-    struct menu_func func;  /* Function to run if this entry is selcted */
-    int return_code;        /* What to return afer the function is run  */
+    int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x   */
+    struct menu_func func;  /* Function to run if this entry is selected */
+    int return_code;        /* What to return after the function is run  */
     const struct menu_item_ex *menu_addr;
-    int lang_id;            /* How to present the item to the user      */
+    int lang_id;            /* How to present the item to the user       */
 };
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
