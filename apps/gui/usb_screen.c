@@ -182,6 +182,13 @@ static void usb_screen_fix_viewports(struct screen *screen,
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
     int i;
+
+    /* Clear main and remote screens to remove scrolling line artifacts */
+    lcd_clear_display();
+#ifdef HAVE_LCD_REMOTE
+    lcd_remote_clear_display();
+#endif
+
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
