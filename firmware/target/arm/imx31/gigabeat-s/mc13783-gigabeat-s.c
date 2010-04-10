@@ -22,6 +22,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "spi-imx31.h"
 #include "mc13783.h"
 #include "mc13783-target.h"
 #include "adc-target.h"
@@ -29,6 +30,25 @@
 #include "usb-target.h"
 #include "power-gigabeat-s.h"
 #include "powermgmt-target.h"
+
+/* Gigabeat S mc13783 serial interface node. */
+
+/* This is all based on communicating with the MC13783 PMU which is on 
+ * CSPI2 with the chip select at 0. The LCD controller resides on
+ * CSPI3 cs1, but we have no idea how to communicate to it */
+struct spi_node mc13783_spi =
+{
+    CSPI2_NUM,                     /* CSPI module 2 */
+    CSPI_CONREG_CHIP_SELECT_SS0 |  /* Chip select 0 */
+    CSPI_CONREG_DRCTL_DONT_CARE |  /* Don't care about CSPI_RDY */
+    CSPI_CONREG_DATA_RATE_DIV_32 | /* Clock = IPG_CLK/32 = 2,062,500Hz. */
+    CSPI_BITCOUNT(32-1) |          /* All 32 bits are to be transferred */
+    CSPI_CONREG_SSPOL |            /* SS active high */
+    CSPI_CONREG_SSCTL |            /* Negate SS between SPI bursts */
+    CSPI_CONREG_MODE,              /* Master mode */
+    0,                             /* SPI clock - no wait states */
+};
+
 
 /* Gigabeat S definitions for static MC13783 event registration */
 

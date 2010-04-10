@@ -30,23 +30,8 @@
 #define PMIC_DRIVER_CLOSE
 #endif
 
-/* This is all based on communicating with the MC13783 PMU which is on 
- * CSPI2 with the chip select at 0. The LCD controller resides on
- * CSPI3 cs1, but we have no idea how to communicate to it */
-static struct spi_node mc13783_spi =
-{
-    CSPI2_NUM,                     /* CSPI module 2 */
-    CSPI_CONREG_CHIP_SELECT_SS0 |  /* Chip select 0 */
-    CSPI_CONREG_DRCTL_DONT_CARE |  /* Don't care about CSPI_RDY */
-    CSPI_CONREG_DATA_RATE_DIV_32 | /* Clock = IPG_CLK/32 = 2,062,500Hz. */
-    CSPI_BITCOUNT(32-1) |          /* All 32 bits are to be transferred */
-    CSPI_CONREG_SSPOL |            /* SS active high */
-    CSPI_CONREG_SSCTL |            /* Negate SS between SPI bursts */
-    CSPI_CONREG_MODE,              /* Master mode */
-    0,                             /* SPI clock - no wait states */
-};
-
 extern const struct mc13783_event_list mc13783_event_list;
+extern struct spi_node mc13783_spi;
 
 static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
