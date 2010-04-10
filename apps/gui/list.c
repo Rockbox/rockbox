@@ -805,7 +805,7 @@ bool simplelist_show_list(struct simplelist_info *info)
 {
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count, i;
-    const char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
+    list_get_name *getname;
     int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)
         getname = info->get_name;
