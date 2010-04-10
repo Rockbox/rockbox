@@ -1071,7 +1071,7 @@ void RbUtilQt::downloadManual(void)
         manual = "rockbox-"
             + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
 
-    QString date = ServerInfo::value(ServerInfo::DailyDate).toString();
+    QDate date = QDate::fromString(ServerInfo::value(ServerInfo::DailyDate).toString(),Qt::ISODate);
 
     QString manualurl;
     QString target;
@@ -1081,7 +1081,7 @@ void RbUtilQt::downloadManual(void)
         section = "Manual (PDF)";
     }
     else {
-        target = "/" + manual + "-" + date + "-html.zip";
+        target = "/" + manual + "-" + date.toString("yyyyMMdd") + "-html.zip";
         section = "Manual (HTML)";
     }
     manualurl = SystemInfo::value(SystemInfo::ManualUrl).toString() + "/" + target;
@@ -1094,7 +1094,7 @@ void RbUtilQt::downloadManual(void)
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     installer->setLogSection(section);
-    installer->setLogVersion(date);
+    installer->setLogVersion(ServerInfo::value(ServerInfo::DailyDate).toString());
     installer->setUrl(manualurl);
     installer->setUnzip(false);
     installer->setTarget(target);
