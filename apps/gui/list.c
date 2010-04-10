@@ -909,4 +909,5 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->get_name = NULL;
     info->get_talk = NULL;
     info->callback_data = data;
+    simplelist_line_count = 0;
 }
