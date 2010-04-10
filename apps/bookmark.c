@@ -942,9 +942,15 @@ static const char* skip_token(const char* s)
     return s;
 }
 
+static const char* int_token(const char* s, int* dest) 	 
+{ 	 
+    *dest = atoi(s);
+    return skip_token(s); 	 
+} 	 
+
 static const char* long_token(const char* s, long* dest) 	 
 { 	 
-    *dest = atoi(s);    /* Should be atol, but we don't have it. */ 	 
+    *dest = atoi(s);    /* Should be atol, but we don't have it. */
     return skip_token(s); 	 
 } 	 
 
@@ -958,7 +964,8 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames)
     const char* s = bookmark;
     const char* end;
     
-#define GET_INT_TOKEN(var)  s = long_token(s, (long *)&var)
+#define GET_INT_TOKEN(var)  s = int_token(s, &var)
+#define GET_LONG_TOKEN(var)  s = long_token(s, &var)
 #define GET_BOOL_TOKEN(var) var = (atoi(s)!=0); s = skip_token(s)
     
     /* if new format bookmark, extract the optional content flags,
@@ -973,11 +980,11 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames)
     
     /* extract all original bookmark tokens */
     GET_INT_TOKEN(bm.resume_index);
-    GET_INT_TOKEN(bm.resume_offset);
+    GET_LONG_TOKEN(bm.resume_offset);
     GET_INT_TOKEN(bm.resume_seed);
     if (!new_format)    /* skip deprecated token */
         s = skip_token(s);
-    GET_INT_TOKEN(bm.resume_time);
+    GET_LONG_TOKEN(bm.resume_time);
     GET_INT_TOKEN(bm.repeat_mode);
     GET_BOOL_TOKEN(bm.shuffle);
     
