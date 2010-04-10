@@ -52,8 +52,10 @@ PLUGIN_HEADER
 /* temporary file */
 #define GLOBAL_SETTINGS_TMP_FILE VIEWERS_DIR "/viewer_file.tmp"
 
-#define GLOBAL_SETTINGS_HEADER   "\x54\x56\x47\x53\x31" /* header="TVGS" version=1 */
+#define GLOBAL_SETTINGS_HEADER   "\x54\x56\x47\x53" /* header="TVGS" */
 #define GLOBAL_SETTINGS_H_SIZE   5
+#define GLOBAL_SETTINGS_VERSION       0x32          /* version=2 */
+#define GLOBAL_SETTINGS_FIRST_VERSION 0x31
 
 /* preferences and bookmarks at each file
  * binary file, so dont use .cfg
@@ -100,8 +102,10 @@ PLUGIN_HEADER
 /* temporary file */
 #define SETTINGS_TMP_FILE    VIEWERS_DIR "/viewer_file.tmp"
 
-#define SETTINGS_HEADER      "\x54\x56\x53\x32" /* header="TVS" version=2 */
-#define SETTINGS_H_SIZE      4
+#define SETTINGS_HEADER        "\x54\x56\x53" /* header="TVS" */
+#define SETTINGS_H_SIZE        4
+#define SETTINGS_VERSION       0x33           /* version=3 */
+#define SETTINGS_FIRST_VERSION 0x32
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define NARROW_MAX_COLUMNS 64  /* Max displayable string len [narrow] (over-estimate) */
@@ -127,7 +131,7 @@ PLUGIN_HEADER
 #define BOOKMARK_ICON       "\xee\x84\x81\x00"
 #endif
 
-#define PREFERENCES_SIZE    (11 + MAX_PATH)
+#define PREFERENCES_SIZE    (12 + MAX_PATH)
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
@@ -1919,7 +1923,7 @@ static void viewer_default_preferences(void)
     prefs.encoding = rb->global_settings->default_codepage;
 }
 
-static bool viewer_read_preferences(int pfd)
+static bool viewer_read_preferences(int pfd, int version)
 {
     unsigned char buf[PREFERENCES_SIZE];
     unsigned char *p = buf;
@@ -1930,7 +1934,10 @@ static bool viewer_read_preferences(int pfd)
     prefs.word_mode        = *p++;
     prefs.line_mode        = *p++;
     prefs.view_mode        = *p++;
-    prefs.alignment        = *p++;
+    if (version > 0)
+        prefs.alignment = *p++;
+    else
+        prefs.alignment = LEFT;
     prefs.encoding         = *p++;
     prefs.scrollbar_mode   = *p++;
     prefs.need_scrollbar   = *p++;
@@ -1940,7 +1947,6 @@ static bool viewer_read_preferences(int pfd)
     prefs.scroll_mode      = *p++;
     prefs.autoscroll_speed = *p++;
     rb->memcpy(prefs.font, p, MAX_PATH);
-
     return true;
 }
 
@@ -2050,19 +2056,20 @@ static bool viewer_load_global_settings(void)
 {
     unsigned buf[GLOBAL_SETTINGS_H_SIZE];
     int sfd = rb->open(GLOBAL_SETTINGS_FILE, O_RDONLY);
+    int version;
+    bool res = false;
 
     if (sfd < 0)
         return false;
 
-    if ((rb->read(sfd, buf, GLOBAL_SETTINGS_H_SIZE) != GLOBAL_SETTINGS_H_SIZE) ||
-        rb->memcmp(buf, GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE) ||
-        !viewer_read_preferences(sfd))
-     {
-        rb->close(sfd);
-        return false;
+    if ((rb->read(sfd, buf, GLOBAL_SETTINGS_H_SIZE) == GLOBAL_SETTINGS_H_SIZE) ||
+        (rb->memcmp(buf, GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE - 1) == 0))
+    {
+        version = buf[GLOBAL_SETTINGS_H_SIZE - 1] - GLOBAL_SETTINGS_FIRST_VERSION;
+        res = viewer_read_preferences(sfd, version);
     }
     rb->close(sfd);
-    return true;
+    return res;
 }
 
 static bool viewer_save_global_settings(void)
@@ -2094,13 +2101,14 @@ static bool viewer_load_settings(void)
     bool res = false;
     int sfd;
     unsigned int size;
+    int version;
 
     sfd = rb->open(SETTINGS_FILE, O_RDONLY);
     if (sfd < 0)
         goto read_end;
 
     if ((rb->read(sfd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2) ||
-        rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE))
+        rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE - 1))
     {
         /* illegal setting file */
         rb->close(sfd);
@@ -2111,6 +2119,7 @@ static bool viewer_load_settings(void)
         goto read_end;
     }
 
+    version = buf[SETTINGS_H_SIZE - 1] - SETTINGS_FIRST_VERSION;
     fcount = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE+1];
     for (i = 0; i < fcount; i++)
     {
@@ -2124,7 +2133,7 @@ static bool viewer_load_settings(void)
                 break;
             continue;
         }
-        if (!viewer_read_preferences(sfd))
+        if (!viewer_read_preferences(sfd, version))
             break;
 
         res = viewer_read_bookmark_infos(sfd);
