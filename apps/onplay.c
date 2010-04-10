@@ -1199,22 +1199,12 @@ static bool open_with(void)
 extern const struct menu_item_ex *selected_menu_item;
 extern bool hotkey_settable_menu;
 
-#define HOT_MASK    0x0FF
-#define HOT_WPS     0x100
-#define HOT_TREE    0x200
-
-struct hotkey_assignment {
-    int item;
-    struct menu_func func;
-    int return_code;
-    const struct menu_item_ex *menu_addr;
-    int lang_id;
-};
-
-#define HOTKEY_FUNC(func, param) {{(void *)func}, param}
+#define HOTKEY_ACTION_MASK 0x0FF /* Mask to apply to get the action (enum)           */
+#define HOTKEY_CTX_WPS     0x100 /* Mask to apply to check whether it's for WPS      */
+#define HOTKEY_CTX_TREE    0x200 /* Mask to apply to check whether it's for the tree */
 
 /* Any desired hotkey functions go here... */
-enum hotkey_settings {
+enum hotkey_action {
     HOTKEY_OFF = 0,
     HOTKEY_VIEW_PLAYLIST = 1,
     HOTKEY_SHOW_TRACK_INFO,
@@ -1224,35 +1214,45 @@ enum hotkey_settings {
     HOTKEY_INSERT,
 };
 
+struct hotkey_assignment {
+    int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x  */
+    struct menu_func func;  /* Function to run if this entry is selcted */
+    int return_code;        /* What to return afer the function is run  */
+    const struct menu_item_ex *menu_addr;
+    int lang_id;            /* How to present the item to the user      */
+};
+
+#define HOTKEY_FUNC(func, param) {{(void *)func}, param}
+
 /* ... and here.  Order is not important. */
 static struct hotkey_assignment hotkey_items[] = {
-    { HOTKEY_VIEW_PLAYLIST  | HOT_WPS,
+    { HOTKEY_VIEW_PLAYLIST  | HOTKEY_CTX_WPS,
             HOTKEY_FUNC(NULL, NULL),
             ONPLAY_PLAYLIST,    &view_cur_playlist,
             LANG_VIEW_DYNAMIC_PLAYLIST },
-    { HOTKEY_SHOW_TRACK_INFO| HOT_WPS,
+    { HOTKEY_SHOW_TRACK_INFO| HOTKEY_CTX_WPS,
             HOTKEY_FUNC(browse_id3, NULL),
             ONPLAY_RELOAD_DIR,  &browse_id3_item,
             LANG_MENU_SHOW_ID3_INFO },
 #ifdef HAVE_PITCHSCREEN
-    { HOTKEY_PITCHSCREEN    | HOT_WPS,
+    { HOTKEY_PITCHSCREEN    | HOTKEY_CTX_WPS,
             HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
             ONPLAY_RELOAD_DIR,  &pitch_screen_item,
             LANG_PITCH },
 #endif
-    { HOTKEY_OPEN_WITH      | HOT_WPS | HOT_TREE,
+    { HOTKEY_OPEN_WITH      | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(open_with, NULL),
             ONPLAY_RELOAD_DIR,  &list_viewers_item,
             LANG_ONPLAY_OPEN_WITH },
-    { HOTKEY_DELETE         | HOT_WPS | HOT_TREE,
+    { HOTKEY_DELETE         | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(delete_item, NULL),
             ONPLAY_RELOAD_DIR,  &delete_file_item,
             LANG_DELETE },
-    { HOTKEY_DELETE         | HOT_TREE,
+    { HOTKEY_DELETE         | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(delete_item, NULL),
             ONPLAY_RELOAD_DIR,  &delete_dir_item,
             LANG_DELETE },
-    { HOTKEY_INSERT         | HOT_TREE,
+    { HOTKEY_INSERT         | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
             ONPLAY_START_PLAY,  &i_pl_item,
             LANG_INSERT },
@@ -1266,7 +1266,7 @@ int get_hotkey_desc_id(int hk_func)
     int i;
     for (i = 0; i < num_hotkey_items; i++)
     {
-        if ((hotkey_items[i].item & HOT_MASK) == hk_func)
+        if ((hotkey_items[i].item & HOTKEY_ACTION_MASK) == hk_func)
             return hotkey_items[i].lang_id;
     }
     
@@ -1278,7 +1278,7 @@ static int execute_hotkey(bool is_wps)
 {
     int i;
     struct hotkey_assignment *this_item;
-    const int context = is_wps ? HOT_WPS : HOT_TREE;
+    const int context = is_wps ? HOTKEY_CTX_WPS : HOTKEY_CTX_TREE;
     const int this_hotkey = (is_wps ? global_settings.hotkey_wps :
         global_settings.hotkey_tree);
     
@@ -1286,8 +1286,8 @@ static int execute_hotkey(bool is_wps)
     for (i = 0; i < num_hotkey_items; i++)
     {
         this_item = &hotkey_items[i];
-        if ((this_item->item & context) && 
-            ((this_item->item & HOT_MASK) == this_hotkey))
+        if ((this_item->item & context) &&
+            ((this_item->item & HOTKEY_ACTION_MASK) == this_hotkey))
         {
             /* run the associated function (with optional param), if any */
             const struct menu_func func = this_item->func;
@@ -1313,7 +1313,7 @@ static void set_hotkey(bool is_wps)
 {
     int i;
     struct hotkey_assignment *this_item;
-    const int context = is_wps ? HOT_WPS : HOT_TREE;
+    const int context = is_wps ? HOTKEY_CTX_WPS : HOTKEY_CTX_TREE;
     int *hk_func = is_wps ? &global_settings.hotkey_wps :
                             &global_settings.hotkey_tree;
     int this_hk,
@@ -1324,10 +1324,10 @@ static void set_hotkey(bool is_wps)
     for (i = 0; i < num_hotkey_items; i++)
     {
         this_item = &hotkey_items[i];
-        if ((this_item->item & context) && 
+        if ((this_item->item & context) &&
             (this_item->menu_addr == selected_menu_item))
         {
-            this_hk = this_item->item & HOT_MASK;
+            this_hk = this_item->item & HOTKEY_ACTION_MASK;
             this_id = P2ID((selected_menu_item->callback_and_desc)->desc);
             match_found = true;
             break;
