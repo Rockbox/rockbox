@@ -341,9 +341,17 @@ static char* create_bookmark()
     snprintf(global_bookmark, sizeof(global_bookmark),
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
+#if CONFIG_CODEC == SWCODEC
+             ">%d;%d;%ld;%d;%ld;%d;%d;%s;%s",
+#else
              ">%d;%d;%ld;%d;%ld;%d;%d;%d;%d;%s;%s",
+#endif
              /* ... their flags should go here ... */
+#if CONFIG_CODEC == SWCODEC
              BM_PITCH | BM_SPEED,
+#else
+             0,
+#endif
              resume_index,
              id3->offset,
              playlist_get_seed(NULL),
@@ -351,8 +359,10 @@ static char* create_bookmark()
              global_settings.repeat_mode,
              global_settings.playlist_shuffle,
              /* ...and their values should go here */
+#if CONFIG_CODEC == SWCODEC
              sound_get_pitch(),
              dsp_get_timestretch(),
+#endif
              /* more mandatory tokens */
              playlist_get_name(NULL, global_temp_buffer,
                 sizeof(global_temp_buffer)),
@@ -896,16 +906,20 @@ static void say_bookmark(const char* bookmark,
 /* ------------------------------------------------------------------------*/
 static bool play_bookmark(const char* bookmark)
 {
+#if CONFIG_CODEC == SWCODEC
     /* preset pitch and speed to 100% in case bookmark doesn't have info */
     bm.pitch = sound_get_pitch();
     bm.speed = dsp_get_timestretch();
+#endif
     
     if (parse_bookmark(bookmark, true))
     {
         global_settings.repeat_mode = bm.repeat_mode;
         global_settings.playlist_shuffle = bm.shuffle;
+#if CONFIG_CODEC == SWCODEC
         sound_set_pitch(bm.pitch);
         dsp_set_timestretch(bm.speed);
+#endif
         return bookmark_play(global_temp_buffer, bm.resume_index,
             bm.resume_offset, bm.resume_seed, global_filename);
     }
