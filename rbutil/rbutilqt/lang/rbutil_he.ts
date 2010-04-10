@@ -106,7 +106,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אתה גלוש אל &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;הפורומים של Sansa&lt;/a&gt; או פנה &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אנא גלוש אל &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;הפורומים של Sansa&lt;/a&gt; או פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך למשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ OK כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="54"/>
@@ -253,7 +253,7 @@
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="34"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ HXF). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ HXF). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אנא פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך למשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ OK כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="79"/>
@@ -469,7 +469,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="49"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אנא פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך למשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ OK כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
 </context>
 <context>
@@ -748,7 +748,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="34"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך המשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ Ok כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
+        <translation>התקנת מנהל האיתחול דורשת שתספק קובץ קושחה של הקושחה המקורית (קובץ bin). עליך להוריד קובץ זה בעצמך מסיבות משפטיות. אנא פנה אל &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;המדריך למשתמש&lt;/a&gt; ולדף הויקי &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; לגבי מידע על איך להשיג קובץ זה.&lt;br/&gt;לחץ OK כדי להמשיך ולהפנות את התוכנה לקובץ הקושחה שברשותך.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="51"/>
@@ -1574,7 +1574,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installwindow.cpp" line="272"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. גירסה נוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה הי r%1 (%2).</translation>
+        <translation>זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. הגירסה הנוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה היא r%1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="278"/>
@@ -1868,7 +1868,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="425"/>
         <source>Select a device for a link to the correct manual</source>
-        <translation>בחר בנגן בשביל קישור למדריך המשתמש המתאים</translation>
+        <translation>בחר בנגן בשביל קישור למדריך המתאים</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="426"/>
@@ -1979,7 +1979,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="1064"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation>האם באמת ברצונך להוריד את מדריך המשתמש? המדריך יישמר בספרייה הראשית של הנגן שלך.</translation>
+        <translation>האם באמת ברצונך להוריד את המדריך למשתמש? המדריך יישמר בספרייה הראשית של הנגן שלך.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1111"/>
