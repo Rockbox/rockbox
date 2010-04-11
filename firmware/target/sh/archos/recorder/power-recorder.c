@@ -92,14 +92,10 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#ifdef HAVE_ATA_POWER_OFF
     if ((PACR2 & 0x0400) || !(PAIORL & 0x20)) /* not configured for output */
         return true; /* would be floating high, disk on */
     else
         return (PADRL & 0x20) != 0;
-#else /* !defined(NEEDS_ATA_POWER_ON) && !defined(HAVE_ATA_POWER_OFF) */
-    return true; /* pretend always powered if not controlable */
-#endif
 }
 
 void power_off(void)
