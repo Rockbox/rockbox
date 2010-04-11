@@ -270,7 +270,10 @@ void gui_usb_screen_run(void)
         struct screen *screen = &screens[i];
 
         screen->set_viewport(NULL);
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_CHARCELLS
+        /* Quick fix. Viewports should really be enabled proper for charcell */
+        viewport_set_defaults(&usb_screen_vps_ar[i].parent, i);
+#else
         usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
 #endif
     }
