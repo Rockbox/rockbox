@@ -1923,51 +1923,55 @@ static void viewer_default_preferences(void)
     prefs.encoding = rb->global_settings->default_codepage;
 }
 
-static bool viewer_read_preferences(int pfd, int version)
+static bool viewer_read_preferences(int pfd, int version, struct preferences *prf)
 {
     unsigned char buf[PREFERENCES_SIZE];
     unsigned char *p = buf;
+    int read_size = PREFERENCES_SIZE;
 
-    if (rb->read(pfd, buf, sizeof(buf)) != sizeof(buf))
+    if (version == 0)
+        read_size--;
+
+    if (rb->read(pfd, buf, read_size) != read_size)
         return false;
 
-    prefs.word_mode        = *p++;
-    prefs.line_mode        = *p++;
-    prefs.view_mode        = *p++;
+    prf->word_mode        = *p++;
+    prf->line_mode        = *p++;
+    prf->view_mode        = *p++;
     if (version > 0)
-        prefs.alignment = *p++;
+        prf->alignment = *p++;
     else
-        prefs.alignment = LEFT;
-    prefs.encoding         = *p++;
-    prefs.scrollbar_mode   = *p++;
-    prefs.need_scrollbar   = *p++;
-    prefs.page_mode        = *p++;
-    prefs.header_mode      = *p++;
-    prefs.footer_mode      = *p++;
-    prefs.scroll_mode      = *p++;
-    prefs.autoscroll_speed = *p++;
-    rb->memcpy(prefs.font, p, MAX_PATH);
+        prf->alignment = LEFT;
+    prf->encoding         = *p++;
+    prf->scrollbar_mode   = *p++;
+    prf->need_scrollbar   = *p++;
+    prf->page_mode        = *p++;
+    prf->header_mode      = *p++;
+    prf->footer_mode      = *p++;
+    prf->scroll_mode      = *p++;
+    prf->autoscroll_speed = *p++;
+    rb->memcpy(prf->font, p, MAX_PATH);
     return true;
 }
 
-static bool viewer_write_preferences(int pfd)
+static bool viewer_write_preferences(int pfd, const struct preferences *prf)
 {
     unsigned char buf[PREFERENCES_SIZE];
     unsigned char *p = buf;
 
-    *p++ = prefs.word_mode;
-    *p++ = prefs.line_mode;
-    *p++ = prefs.view_mode;
-    *p++ = prefs.alignment;
-    *p++ = prefs.encoding;
-    *p++ = prefs.scrollbar_mode;
-    *p++ = prefs.need_scrollbar;
-    *p++ = prefs.page_mode;
-    *p++ = prefs.header_mode;
-    *p++ = prefs.footer_mode;
-    *p++ = prefs.scroll_mode;
-    *p++ = prefs.autoscroll_speed;
-    rb->memcpy(p, prefs.font, MAX_PATH);
+    *p++ = prf->word_mode;
+    *p++ = prf->line_mode;
+    *p++ = prf->view_mode;
+    *p++ = prf->alignment;
+    *p++ = prf->encoding;
+    *p++ = prf->scrollbar_mode;
+    *p++ = prf->need_scrollbar;
+    *p++ = prf->page_mode;
+    *p++ = prf->header_mode;
+    *p++ = prf->footer_mode;
+    *p++ = prf->scroll_mode;
+    *p++ = prf->autoscroll_speed;
+    rb->memcpy(p, prf->font, MAX_PATH);
 
     return (rb->write(pfd, buf, sizeof(buf)) == sizeof(buf));
 }
@@ -2066,7 +2070,7 @@ static bool viewer_load_global_settings(void)
         (rb->memcmp(buf, GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE - 1) == 0))
     {
         version = buf[GLOBAL_SETTINGS_H_SIZE - 1] - GLOBAL_SETTINGS_FIRST_VERSION;
-        res = viewer_read_preferences(sfd, version);
+        res = viewer_read_preferences(sfd, version, &prefs);
     }
     rb->close(sfd);
     return res;
@@ -2075,13 +2079,16 @@ static bool viewer_load_global_settings(void)
 static bool viewer_save_global_settings(void)
 {
     int sfd = rb->open(GLOBAL_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+    unsigned char buf[GLOBAL_SETTINGS_H_SIZE];
 
     if (sfd < 0)
          return false;
 
-    if (rb->write(sfd, &GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE)
-        != GLOBAL_SETTINGS_H_SIZE ||
-        !viewer_write_preferences(sfd))
+    rb->memcpy(buf, GLOBAL_SETTINGS_HEADER, GLOBAL_SETTINGS_H_SIZE - 1);
+    buf[GLOBAL_SETTINGS_H_SIZE - 1] = GLOBAL_SETTINGS_VERSION;
+
+    if (rb->write(sfd, buf, GLOBAL_SETTINGS_H_SIZE) != GLOBAL_SETTINGS_H_SIZE ||
+        !viewer_write_preferences(sfd, &prefs))
     {
         rb->close(sfd);
         rb->remove(GLOBAL_SETTINGS_TMP_FILE);
@@ -2091,6 +2098,101 @@ static bool viewer_save_global_settings(void)
     rb->remove(GLOBAL_SETTINGS_FILE);
     rb->rename(GLOBAL_SETTINGS_TMP_FILE, GLOBAL_SETTINGS_FILE);
     return true;
+}
+
+static bool viewer_convert_settings(int sfd, int dfd, int old_ver)
+{
+    struct preferences new_prefs;
+    off_t old_pos;
+    off_t new_pos;
+    unsigned char buf[MAX_PATH + 2];
+    int settings_size;
+
+    rb->read(sfd, buf, MAX_PATH + 2);
+    rb->write(dfd, buf, MAX_PATH + 2);
+
+    settings_size = (buf[MAX_PATH] << 8) | buf[MAX_PATH + 1];
+
+    old_pos = rb->lseek(sfd, 0, SEEK_CUR);
+    new_pos = rb->lseek(dfd, 0, SEEK_CUR);
+
+    /*
+     * when the settings size != preferences size + bookmarks size,
+     * settings data are considered to be old version.
+     */
+    if (old_ver > 0 && ((settings_size - PREFERENCES_SIZE) % 8) == 0)
+        old_ver = 0;
+
+    if (!viewer_read_preferences(sfd, old_ver, &new_prefs))
+        return false;
+
+    if (!viewer_write_preferences(dfd, &new_prefs))
+        return false;
+
+    settings_size -= (rb->lseek(sfd, 0, SEEK_CUR) - old_pos);
+
+    if (settings_size > 0)
+    {
+        rb->read(sfd, buf, settings_size);
+        rb->write(dfd, buf, settings_size);
+    }
+
+    settings_size = rb->lseek(dfd, 0, SEEK_CUR) - new_pos;
+    buf[0] = settings_size >> 8;
+    buf[1] = settings_size;
+    rb->lseek(dfd, new_pos - 2, SEEK_SET);
+    rb->write(dfd, buf, 2);
+    rb->lseek(dfd, settings_size, SEEK_CUR);
+    return true;
+}
+
+static bool viewer_convert_settings_file(void)
+{
+    unsigned char buf[SETTINGS_H_SIZE+2];
+    int sfd;
+    int tfd;
+    int i;
+    int fcount;
+    int version;
+    bool res = true;
+
+    if ((sfd = rb->open(SETTINGS_FILE, O_RDONLY)) < 0)
+        return false;
+
+    if ((tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC)) < 0)
+    {
+        rb->close(sfd);
+        return false;
+    }
+
+    rb->read(sfd, buf, SETTINGS_H_SIZE + 2);
+
+    version = buf[SETTINGS_H_SIZE - 1] - SETTINGS_FIRST_VERSION;
+    fcount  = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE + 1];
+    buf[SETTINGS_H_SIZE - 1] = SETTINGS_VERSION;
+
+    rb->write(tfd, buf, SETTINGS_H_SIZE + 2);
+
+    for (i = 0; i < fcount; i++)
+    {
+        if (!viewer_convert_settings(sfd, tfd, version))
+        {
+            res = false;
+            break;
+        }
+    }
+
+    rb->close(sfd);
+    rb->close(tfd);
+
+    if (!res)
+        rb->remove(SETTINGS_TMP_FILE);
+    else
+    {
+        rb->remove(SETTINGS_FILE);
+        rb->rename(SETTINGS_TMP_FILE, SETTINGS_FILE);
+    }
+    return res;
 }
 
 static bool viewer_load_settings(void)
@@ -2119,6 +2221,15 @@ static bool viewer_load_settings(void)
         goto read_end;
     }
 
+    if (buf[SETTINGS_H_SIZE - 1] != SETTINGS_VERSION)
+    {
+        rb->close(sfd);
+        if (!viewer_convert_settings_file())
+            goto read_end;
+
+        return viewer_load_settings();
+    }
+
     version = buf[SETTINGS_H_SIZE - 1] - SETTINGS_FIRST_VERSION;
     fcount = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE+1];
     for (i = 0; i < fcount; i++)
@@ -2127,13 +2238,27 @@ static bool viewer_load_settings(void)
             break;
 
         size = (buf[MAX_PATH] << 8) | buf[MAX_PATH+1];
+
+        /*
+         * when the settings size != preferences size + bookmarks size,
+         * the settings file converts to the newer.
+         */
+        if (version > 0 && ((size - PREFERENCES_SIZE) % 8) == 0)
+        {
+            rb->close(sfd);
+            if (!viewer_convert_settings_file())
+                break;
+
+            return viewer_load_settings();
+        }
+
         if (rb->strcmp(buf, file_name))
         {
             if (rb->lseek(sfd, size, SEEK_CUR) < 0)
                 break;
             continue;
         }
-        if (!viewer_read_preferences(sfd, version))
+        if (!viewer_read_preferences(sfd, version, &prefs))
             break;
 
         res = viewer_read_bookmark_infos(sfd);
@@ -2264,11 +2389,21 @@ static bool viewer_save_settings(void)
     if (ofd >= 0)
     {
         if ((rb->read(ofd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2) ||
-            rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE))
+            rb->memcmp(buf, SETTINGS_HEADER, SETTINGS_H_SIZE - 1))
         {
             rb->close(ofd);
             goto save_err;
         }
+
+        if (buf[SETTINGS_H_SIZE - 1] != SETTINGS_VERSION)
+        {
+            rb->close(ofd);
+            if (!viewer_convert_settings_file())
+                goto save_err;
+
+            viewer_save_settings();
+        }
+
         fcount = (buf[SETTINGS_H_SIZE] << 8) | buf[SETTINGS_H_SIZE+1];
 
         for (i = 0; i < fcount; i++)
@@ -2322,8 +2457,9 @@ static bool viewer_save_settings(void)
     }
     else
     {
-        rb->memcpy(buf, SETTINGS_HEADER, SETTINGS_H_SIZE);
-        buf[SETTINGS_H_SIZE] = 0;
+        rb->memcpy(buf, SETTINGS_HEADER, SETTINGS_H_SIZE - 1);
+        buf[SETTINGS_H_SIZE-1] = SETTINGS_VERSION;
+        buf[SETTINGS_H_SIZE  ] = 0;
         buf[SETTINGS_H_SIZE+1] = 0;
         if (rb->write(tfd, buf, SETTINGS_H_SIZE+2) != SETTINGS_H_SIZE+2)
             goto save_err;
@@ -2340,7 +2476,7 @@ static bool viewer_save_settings(void)
     if (rb->write(tfd, buf, MAX_PATH+2) != MAX_PATH+2)
         goto save_err;
 
-    if (!viewer_write_preferences(tfd))
+    if (!viewer_write_preferences(tfd, &prefs))
         goto save_err;
 
     if (!viewer_write_bookmark_infos(tfd))
