@@ -896,8 +896,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      const void* buf)
 {
-#if 1 /* disabled until stable*/ \
-    || defined(BOOTLOADER) /* we don't need write support in bootloader */
+#if defined(BOOTLOADER) /* we don't need write support in bootloader */
 #ifdef HAVE_MULTIDRIVE
     (void) drive;
 #endif
@@ -906,7 +905,8 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     (void) buf;
     return -1;
 #else
-    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+    //return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+    return -1; /* not working, seems to cause FIFO overruns */
 #endif
 }
 
