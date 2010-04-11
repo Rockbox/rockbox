@@ -436,8 +436,8 @@ whichadvanced () {
         ;;
       [Aa])
         if [ "$modelname" = "archosplayer" ]; then
-          have_ata_poweroff="#define HAVE_ATA_POWEROFF"
-          echo "ATA poweroff enabled"
+          have_ata_poweroff="#define HAVE_ATA_POWER_OFF"
+          echo "ATA power off enabled"
         fi
         ;;
       [Bb])
