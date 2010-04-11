@@ -117,17 +117,11 @@ unsigned int battery_adc_voltage(void)
 #ifdef HAVE_ACCESSORY_SUPPLY
 void accessory_supply_set(bool enable)
 {
-    if (enable)
-    {
-        /* Accessory voltage supply on */
-        pcf50605_write(PCF5060X_D2REGC1, 0xf8); /* 3.3V ON */
-    }
-    else
-    {
-        /* Accessory voltage supply off */
-        pcf50605_write(PCF5060X_D2REGC1, 0x18); /* OFF */
-    }
-
+    /* Set accessory power supply to 3.3V, otherwise switch it off. */
+    unsigned char value = enable ? 0xf8 : 0x18;
+    
+    /* Write to register. */
+    pcf50605_write(PCF5060X_D2REGC1, value);
 }
 #endif
 

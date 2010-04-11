@@ -183,19 +183,15 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
 
 void audiohw_enable_lineout(bool enable)
 {
+    /* Initialize data without lineout enabling. */
+    int pwrmgmt3_data  = PWRMGMT3_RMIXEN  | PWRMGMT3_LMIXEN
+                       | PWRMGMT3_DACENR  | PWRMGMT3_DACENL;
+    /* Set lineout (OUT2), if enabled. */ 
     if (enable)
-    {
-        /* include enabling of OUT2 */
-        wmcodec_write(PWRMGMT3, PWRMGMT3_LOUT2EN | PWRMGMT3_ROUT2EN
-                              | PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
-                              | PWRMGMT3_DACENR | PWRMGMT3_DACENL);
-    }
-    else
-    {
-        /* exclude enabling of OUT2 */
-        wmcodec_write(PWRMGMT3, PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
-                              | PWRMGMT3_DACENR | PWRMGMT3_DACENL);
-    }
+        pwrmgmt3_data |= PWRMGMT3_LOUT2EN | PWRMGMT3_ROUT2EN;
+
+    /* Set register. */
+    wmcodec_write(PWRMGMT3, pwrmgmt3_data);
 }
 
 void audiohw_set_bass(int value)
