@@ -32,7 +32,7 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #if   defined(IPOD_NANO)
     3330
 #elif defined(IPOD_VIDEO)
-    3300
+    3500
 #elif defined(IPOD_COLOR)
     3300
 #elif defined(IPOD_3G)
@@ -66,8 +66,8 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     /* measured values */
     { 3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160 },
 #elif defined(IPOD_VIDEO)
-    /* iPod Video 30GB Li-Ion 400mAh, first approach based upon measurements */
-    { 3450, 3670, 3710, 3750, 3790, 3830, 3870, 3930, 4010, 4100, 4180 },
+    /* iPod Video 30GB Li-Ion 400mAh */
+    { 3600, 3720, 3750, 3780, 3810, 3840, 3880, 3950, 4020, 4100, 4180 },
 #elif defined(IPOD_COLOR)
     /* iPod Photo 30GB, see FS#9072 */
     { 3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170 },
@@ -89,8 +89,8 @@ const unsigned short percent_to_volt_charge[11] =
     /* measured values */
     3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160
 #elif defined(IPOD_VIDEO)
-    /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
-    3450, 3670, 3710, 3750, 3790, 3830, 3870, 3930, 4010, 4100, 4180
+    /* iPOD Video 30GB Li-Ion 400mAh */
+    3600, 3720, 3750, 3780, 3810, 3840, 3880, 3950, 4020, 4100, 4180
 #elif defined(IPOD_COLOR)
     /* iPod Photo 30GB, see FS#9072 */
     3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170
