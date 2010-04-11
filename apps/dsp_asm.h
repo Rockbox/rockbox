@@ -26,6 +26,7 @@
 
 /* Set the appropriate #defines based on CPU or whatever matters */
 #if defined(CPU_ARM)
+#define DSP_HAVE_ASM_APPLY_GAIN
 #define DSP_HAVE_ASM_RESAMPLING
 #define DSP_HAVE_ASM_CROSSFEED
 #define DSP_HAVE_ASM_SOUND_CHAN_MONO

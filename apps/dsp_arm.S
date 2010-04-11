@@ -381,3 +381,42 @@ dsp_upsample:
 .usend:
     .size       dsp_upsample,.usend-dsp_upsample
 
+/****************************************************************************
+ *  void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
+ *  NOTE: The following code processes two samples at once. When count is odd,
+ *        there is an additional obsolete sample processed, which will not be
+ *        used by the calling functions.
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global dsp_apply_gain
+    .type   dsp_apply_gain, %function
+dsp_apply_gain:
+    @ input: r0 = count, r1 = data, r2 = buf[]
+    stmfd   sp!, {r4-r8, lr}
+
+    ldr     r3, [r1,  #4]           @ r3 = data->num_channels
+    ldr     r4, [r1, #32]           @ r5 = data->gain
+
+.dag_outerloop:
+    ldr     r1, [r2], #4            @ r1 = buf[0] and increment index of buf[]
+    mov     lr, r0                  @ lr = r0 = count
+
+.dag_innerloop:
+    ldmia   r1, {r5, r6}            @ load r5, r6 from r1
+    smull   r7, r8, r5, r4          @ r5 = FRACMUL_SHL(r5, r4, 8)
+    mov     r8, r8, asl #9
+    orr     r5, r8, r7, lsr #23
+    smull   r7, r8, r6, r4          @ r6 = FRACMUL_SHL(r6, r4, 8)
+    mov     r8, r8, asl #9
+    orr     r6, r8, r7, lsr #23
+    stmia   r1!, {r5, r6}           @ save r5, r6 to r1 and increment r1
+    subs    lr, lr, #2
+    bgt     .dag_innerloop          @ end of inner loop
+
+    subs    r3, r3, #1
+    bgt     .dag_outerloop          @ end of outer loop
+
+    ldmfd   sp!, {r4-r8, pc}
+.dagend:
+    .size   dsp_apply_gain,.dagend-dsp_apply_gain
