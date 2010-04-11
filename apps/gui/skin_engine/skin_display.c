@@ -34,6 +34,7 @@
 #include "lang.h"
 #include "language.h"
 #include "statusbar.h"
+#include "settings.h"
 #include "scrollbar.h"
 #include "screen_access.h"
 #include "playlist.h"
