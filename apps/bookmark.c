@@ -342,9 +342,9 @@ static char* create_bookmark()
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
 #if CONFIG_CODEC == SWCODEC
-             ">%d;%d;%ld;%d;%ld;%d;%d;%s;%s",
-#else
              ">%d;%d;%ld;%d;%ld;%d;%d;%d;%d;%s;%s",
+#else
+             ">%d;%d;%ld;%d;%ld;%d;%d;%s;%s",
 #endif
              /* ... their flags should go here ... */
 #if CONFIG_CODEC == SWCODEC
