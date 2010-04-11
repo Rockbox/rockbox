@@ -1286,9 +1286,9 @@ static int execute_hotkey(bool is_wps)
             if (func.function != NULL)
             {
                 if (func.param != NULL)
-                    (*(func.function_w_param))(func.param);
+                    (*func.function_w_param)(func.param);
                 else
-                    (*(func.function))();
+                    (*func.function)();
             }
             /* return with the associated code */
             return this_item->return_code;
@@ -1308,8 +1308,8 @@ static void set_hotkey(bool is_wps)
     const int context = is_wps ? HOTKEY_CTX_WPS : HOTKEY_CTX_TREE;
     int *hk_func = is_wps ? &global_settings.hotkey_wps :
                             &global_settings.hotkey_tree;
-    int this_hk,
-        this_id;
+    int this_hk;
+    char *this_desc;
     bool match_found = false;
     
     /* search assignment struct for a function that matches the current menu item */
@@ -1320,7 +1320,7 @@ static void set_hotkey(bool is_wps)
             (this_item->menu_addr == selected_menu_item))
         {
             this_hk = this_item->item & HOTKEY_ACTION_MASK;
-            this_id = P2ID((selected_menu_item->callback_and_desc)->desc);
+            this_desc = P2STR((selected_menu_item->callback_and_desc)->desc);
             match_found = true;
             break;
         }
@@ -1329,25 +1329,23 @@ static void set_hotkey(bool is_wps)
     /* ignore the hotkey if no match found or no change to setting */
     if (!match_found || (this_hk == *hk_func)) return;
     
-    char line1_buf[100];
-    char line2_buf[100];
-    char *line1 = line1_buf;
-    char *line2 = line2_buf;
-    char **line1_ptr = &line1;
-    char **line2_ptr = &line2;
+    char   line1_buf[100],
+           line2_buf[100];
+    char  *line1 = line1_buf,
+          *line2 = line2_buf;
+    char **line1_ptr = &line1,
+         **line2_ptr = &line2;
     const struct text_message     message={(const char **)line1_ptr, 1};
     const struct text_message yes_message={(const char **)line2_ptr, 1};
-    char *func_name = str(this_id);
 
-    snprintf(line1, sizeof(line1_buf), str(LANG_SET_HOTKEY_QUESTION), func_name);
-    snprintf(line2, sizeof(line2_buf), str(LANG_HOTKEY_ASSIGNED), func_name);
+    snprintf(line1, sizeof(line1_buf), str(LANG_SET_HOTKEY_QUESTION), this_desc);
+    snprintf(line2, sizeof(line2_buf), str(LANG_HOTKEY_ASSIGNED), this_desc);
 
     /* confirm the hotkey setting change */
     if(gui_syncyesno_run(&message, &yes_message, NULL)==YESNO_YES)
     {                    
         /* store the hotkey settings */
         *hk_func = this_hk;
-        
         settings_save();
     }
 }
