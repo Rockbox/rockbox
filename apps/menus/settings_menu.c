@@ -414,9 +414,9 @@ static void view_hotkey_info(void)
     info.hide_selection = true;
     info.scroll_all = true;
     simplelist_addline(SIMPLELIST_ADD_LINE, str(LANG_HOTKEY_VIEW_WPS),
-        str(get_hotkey_desc_id(global_settings.hotkey_wps)));
+        get_hotkey_desc(global_settings.hotkey_wps));
     simplelist_addline(SIMPLELIST_ADD_LINE, str(LANG_HOTKEY_VIEW_FILE_BROWSER),
-        str(get_hotkey_desc_id(global_settings.hotkey_tree)));
+        get_hotkey_desc(global_settings.hotkey_tree));
     simplelist_show_list(&info);
 }
 

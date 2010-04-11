@@ -1218,8 +1218,7 @@ struct hotkey_assignment {
     int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x   */
     struct menu_func func;  /* Function to run if this entry is selected */
     int return_code;        /* What to return after the function is run  */
-    const struct menu_item_ex *menu_addr;
-    int lang_id;            /* How to present the item to the user       */
+    const struct menu_item_ex *menu_addr; /* Must be a MENUITEM_FUNCTION */
 };
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
@@ -1228,49 +1227,42 @@ struct hotkey_assignment {
 static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_VIEW_PLAYLIST  | HOTKEY_CTX_WPS,
             HOTKEY_FUNC(NULL, NULL),
-            ONPLAY_PLAYLIST,    &view_cur_playlist,
-            LANG_VIEW_DYNAMIC_PLAYLIST },
+            ONPLAY_PLAYLIST,    &view_cur_playlist },
     { HOTKEY_SHOW_TRACK_INFO| HOTKEY_CTX_WPS,
             HOTKEY_FUNC(browse_id3, NULL),
-            ONPLAY_RELOAD_DIR,  &browse_id3_item,
-            LANG_MENU_SHOW_ID3_INFO },
+            ONPLAY_RELOAD_DIR,  &browse_id3_item },
 #ifdef HAVE_PITCHSCREEN
     { HOTKEY_PITCHSCREEN    | HOTKEY_CTX_WPS,
             HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
-            ONPLAY_RELOAD_DIR,  &pitch_screen_item,
-            LANG_PITCH },
+            ONPLAY_RELOAD_DIR,  &pitch_screen_item },
 #endif
     { HOTKEY_OPEN_WITH      | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(open_with, NULL),
-            ONPLAY_RELOAD_DIR,  &list_viewers_item,
-            LANG_ONPLAY_OPEN_WITH },
+            ONPLAY_RELOAD_DIR,  &list_viewers_item },
     { HOTKEY_DELETE         | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  &delete_file_item,
-            LANG_DELETE },
+            ONPLAY_RELOAD_DIR,  &delete_file_item },
     { HOTKEY_DELETE         | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  &delete_dir_item,
-            LANG_DELETE },
+            ONPLAY_RELOAD_DIR,  &delete_dir_item },
     { HOTKEY_INSERT         | HOTKEY_CTX_TREE,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
-            ONPLAY_START_PLAY,  &i_pl_item,
-            LANG_INSERT },
+            ONPLAY_START_PLAY,  &i_pl_item },
 };
 
 static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
 
 /* Return the language ID for the input function */
-int get_hotkey_desc_id(int hk_func)
+char* get_hotkey_desc(int hk_func)
 {
     int i;
     for (i = 0; i < num_hotkey_items; i++)
     {
         if ((hotkey_items[i].item & HOTKEY_ACTION_MASK) == hk_func)
-            return hotkey_items[i].lang_id;
+            return P2STR(hotkey_items[i].menu_addr->callback_and_desc->desc);
     }
     
-    return LANG_HOTKEY_NOT_SET;
+    return str(LANG_HOTKEY_NOT_SET);
 }
 
 /* Execute the hotkey function, if listed for this screen */

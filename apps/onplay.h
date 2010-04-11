@@ -32,7 +32,7 @@ enum {
 };
 
 #ifdef HAVE_HOTKEY
-int get_hotkey_desc_id(int hk_func);
+char* get_hotkey_desc(int hk_func);
 #endif
 
 #endif
