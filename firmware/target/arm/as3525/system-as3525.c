@@ -439,7 +439,7 @@ void set_cpu_frequency(long frequency)
     if(frequency == CPUFREQ_MAX)
     {
         /* Change PCLK while FCLK is low, so it doesn't go too high */
-        CGU_PERI = (CGU_PERI & ~(0x1F << 2)) | (AS3525_PCLK_DIV0 << 2);
+        CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0 << 2);
 
         delay = 40; while(delay--) asm("nop");
 
@@ -461,7 +461,7 @@ void set_cpu_frequency(long frequency)
         delay = 40; while(delay--) asm("nop");
 
         /* Change PCLK after FCLK is low, so it doesn't go too high */
-        CGU_PERI = (CGU_PERI & ~(0x1F << 2)) | (AS3525_PCLK_DIV0_UNBOOSTED << 2);
+        CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0_UNBOOSTED << 2);
         delay = 40; while(delay--) asm("nop");
     }
 
