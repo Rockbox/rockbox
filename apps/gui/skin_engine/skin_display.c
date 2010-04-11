@@ -26,6 +26,7 @@
 #include "font.h"
 #include "system.h"
 #include "rbunicode.h"
+#include "sound.h"
 #ifdef DEBUG
 #include "debug.h"
 #endif
@@ -115,28 +116,35 @@ void skin_statusbar_changed(struct gui_wps *skin)
 }
 
 static void draw_progressbar(struct gui_wps *gwps,
-                             struct skin_viewport *wps_vp)
+                             struct progressbar *pb)
 {
     struct screen *display = gwps->display;
+    struct viewport *vp = pb->vp;
     struct wps_state *state = gwps->state;
-    struct progressbar *pb = wps_vp->pb;
     struct mp3entry *id3 = state->id3;
     int y = pb->y, height = pb->height;
     unsigned long length, elapsed;
     
     if (height < 0)
-        height = font_get(wps_vp->vp.font)->height;
+        height = font_get(vp->font)->height;
 
     if (y < 0)
     {
-        int line_height = font_get(wps_vp->vp.font)->height;
+        int line_height = font_get(vp->font)->height;
         /* center the pb in the line, but only if the line is higher than the pb */
         int center = (line_height-height)/2;
         /* if Y was not set calculate by font height,Y is -line_number-1 */
         y = (-y -1)*line_height + (0 > center ? 0 : center);
     }
 
-    if (id3 && id3->length)
+    if (pb->type == WPS_TOKEN_VOLUMEBAR)
+    {
+        int minvol = sound_min(SOUND_VOLUME);
+        int maxvol = sound_max(SOUND_VOLUME);
+        length = maxvol-minvol;
+        elapsed = global_settings.volume-minvol;
+    }
+    else if (id3 && id3->length)
     {
         length = id3->length;
         elapsed = id3->elapsed + state->ff_rewind_count;
@@ -155,7 +163,7 @@ static void draw_progressbar(struct gui_wps *gwps,
         gui_scrollbar_draw(display, pb->x, y, pb->width, height,
                            length, 0, elapsed, HORIZONTAL);
 
-    if (id3 && id3->length)
+    if (pb->type == WPS_TOKEN_PROGRESSBAR && id3 && id3->length)
     {
 #ifdef AB_REPEAT_ENABLE
         if (ab_repeat_mode_enabled())
@@ -1248,9 +1256,15 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
         /* progressbar */
         if (vp_refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
         {
-            if (skin_viewport->pb)
+            struct skin_token_list *bar = gwps->data->progressbars;
+            while (bar)
             {
-                draw_progressbar(gwps, skin_viewport);
+                struct progressbar *thisbar = (struct progressbar*)bar->token->value.data;
+                if (thisbar->vp == &skin_viewport->vp)
+                {
+                    draw_progressbar(gwps, thisbar);
+                }
+                bar = bar->next;
             }
         }
         /* Now display any images in this viewport */

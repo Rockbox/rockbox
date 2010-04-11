@@ -322,7 +322,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PROGRESSBAR,              "pb",  WPS_REFRESH_PLAYER_PROGRESS,
                                                          parse_progressbar },
 
-    { WPS_TOKEN_VOLUME,                   "pv",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_VOLUME,                   "pv",  WPS_REFRESH_DYNAMIC, 
+                                                         parse_progressbar },
 
     { WPS_TOKEN_TRACK_ELAPSED_PERCENT,    "px",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_TRACK_TIME_ELAPSED,       "pc",  WPS_REFRESH_DYNAMIC, NULL },
@@ -900,7 +901,6 @@ static int parse_viewport(const char *wps_bufptr,
     /* %Vl|<label>|<rest of tags>| */
     skin_vp->hidden_flags = 0;
     skin_vp->label = VP_NO_LABEL;
-    skin_vp->pb = NULL;
     skin_vp->lines  = NULL;
     if (curr_line)
     {
@@ -1118,7 +1118,7 @@ static int parse_timeout(const char *wps_bufptr,
 
     return skip;
 }
-
+   
 static int parse_progressbar(const char *wps_bufptr,
                              struct wps_token *token,
                              struct wps_data *wps_data)
@@ -1153,6 +1153,7 @@ static int parse_progressbar(const char *wps_bufptr,
         line_num++;
         line = line->next;
     }
+    pb->vp = vp;
     pb->have_bitmap_pb = false;
     pb->bm.data = NULL; /* no bitmap specified */
     pb->follow_lang_direction = follow_lang_direction > 0;
@@ -1163,8 +1164,8 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->width = vp->width;
         pb->height = SYSFONT_HEIGHT-2;
         pb->y = -line_num - 1; /* Will be computed during the rendering */
-
-        curr_vp->pb = pb;
+        if (token->type == WPS_TOKEN_VOLUME)
+            return 0; /* dont add it, let the regular token handling do the work */
         add_to_ll_chain(&wps_data->progressbars, item);
         return 0;
     }
@@ -1220,19 +1221,20 @@ static int parse_progressbar(const char *wps_bufptr,
     else
         pb->y = -line_num - 1; /* Will be computed during the rendering */
 
-    curr_vp->pb = pb;
     add_to_ll_chain(&wps_data->progressbars, item);
-
+    if (token->type == WPS_TOKEN_VOLUME)
+        token->type = WPS_TOKEN_VOLUMEBAR;
+    pb->type = token->type;
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr)-1;
 #else
     (void)token;
 
-    if (*(wps_bufptr-1) == 'f')
-        wps_data->full_line_progressbar = true;
-    else
-        wps_data->full_line_progressbar = false;
-
+    if (token->type != WPS_TOKEN_VOLUME)
+    {
+        wps_data->full_line_progressbar = 
+                        token->type == WPS_TOKEN_PLAYER_PROGRESSBAR;
+    }
     return 0;
 
 #endif
@@ -2205,7 +2207,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 
     /* Initialise the first (default) viewport */
     curr_vp->label         = VP_DEFAULT_LABEL;
-    curr_vp->pb            = NULL;
     curr_vp->hidden_flags  = 0;
     curr_vp->lines         = NULL;
     

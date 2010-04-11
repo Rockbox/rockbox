@@ -202,6 +202,7 @@ enum wps_token_type {
 #endif
     /* Volume level */
     WPS_TOKEN_VOLUME,
+    WPS_TOKEN_VOLUMEBAR,
     /* hold */
     WPS_TOKEN_MAIN_HOLD,
 #ifdef HAS_REMOTE_BUTTON_HOLD
