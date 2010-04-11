@@ -80,17 +80,14 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
 #endif
 
-
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
-#define ARCH_IRIVER
-#endif
-
-#if defined(ARCH_IRIVER) || defined(IAUDIO_M3)
+/* MCF5249 have 96KB of IRAM */
+#if CONFIG_CPU == MCF5249
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000
 
-#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
+/* MCF5250 have 128KB of IRAM */
+#elif CONFIG_CPU == MCF5250
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0x14000
