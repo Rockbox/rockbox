@@ -638,6 +638,15 @@ current version.
   that allows correct and continuous playback (see \reference{ref:AntiSkipBuf}).
 }
 
+\opt{swcodec}{
+\subsection{Replaygain}
+  Replaygain is a post processing that equalises the playback volume of audio 
+  files to the same perceived loudness. This post processing applies a factor 
+  to each single PCM sample and is therefore consuming additional CPU time. If 
+  you want to achieve some (minor) savings in runtime, switch this feature off 
+  (see \reference{ref:ReplayGain}).
+}
+
 \opt{swcodec,disk_storage,flash_storage}{
 \subsection{Audio format and bitrate}
 \opt{swcodec}{
