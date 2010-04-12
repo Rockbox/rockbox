@@ -614,7 +614,6 @@ static bool mac_text;
 static long file_pos; /* Position of the top of the buffer in the file */
 static long last_file_pos;
 static unsigned char *buffer_end; /*Set to BUFFER_END() when file_pos changes*/
-static int max_line_len;
 static int max_width;
 static int max_columns;
 static int cline = 1;
@@ -1352,7 +1351,6 @@ static void viewer_draw(int col)
 #endif
         rb->lcd_clear_display();
     }
-    max_line_len = 0;
     line_begin = line_end = screen_top_ptr;
 
     for (i = 0; i < display_lines; i++) {
@@ -1585,8 +1583,6 @@ static void viewer_draw(int col)
             rb->lcd_puts(left_col+1, i, utf8_buffer);
 #endif
         }
-        if (line_width > max_line_len)
-            max_line_len = line_width;
 
         if (i == 0)
             next_line_ptr = line_end;
