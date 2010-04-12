@@ -1560,8 +1560,9 @@ static void viewer_draw(int col)
         /* display on screen the displayed part of the line */
         if (col != -1)
         {
-            int dpage = (cline+i <= display_lines)?cpage:cpage+1;
-            int dline = cline+i - ((cline+i <= display_lines)?0:display_lines);
+            bool in_page = (cline+i > display_lines);
+            int dpage = cpage + (in_page ? 0 : 1);
+            int dline = cline + i - (in_page ? 0 : display_lines);
             bool bflag = (viewer_find_bookmark(dpage, dline) >= 0);
 #ifdef HAVE_LCD_BITMAP
             int dy = i * pf->height + header_height;
