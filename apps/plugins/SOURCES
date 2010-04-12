@@ -182,9 +182,13 @@ remote_control.c
 #endif
 
 #ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 test_boost.c
+#endif
 test_codec.c
+#ifdef HAVE_JPEG
 test_core_jpeg.c
+#endif
 test_disk.c
 test_fps.c
 test_gfx.c
@@ -194,7 +198,9 @@ test_greylib_bitmap_scale.c
 #endif
 test_mem.c
 test_mem_jpeg.c
+#ifdef HAVE_LCD_COLOR
 test_resize.c
+#endif
 test_sampr.c
 test_scanrate.c
 #ifdef HAVE_TOUCHSCREEN
