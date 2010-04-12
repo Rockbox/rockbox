@@ -1268,6 +1268,11 @@ static void viewer_scroll_down(bool autoscroll)
 
     if (prefs.scroll_mode == LINE || autoscroll)
         increment_current_line();
+    cline++;
+    if (cline > display_lines) {
+        cline = 1;
+        cpage++;
+    }
 }
 
 static void viewer_scroll_to_top_line(void)
