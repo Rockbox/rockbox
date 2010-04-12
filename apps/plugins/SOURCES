@@ -185,7 +185,9 @@ remote_control.c
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 test_boost.c
 #endif
+#if CONFIG_CODEC == SWCODEC
 test_codec.c
+#endif
 #ifdef HAVE_JPEG
 test_core_jpeg.c
 #endif
