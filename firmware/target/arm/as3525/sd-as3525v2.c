@@ -906,8 +906,14 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     return -1;
 #else
     //return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
-    return -1; /* not working, seems to cause FIFO overruns */
+#ifdef HAVE_MULTIDRIVE
+    (void)drive;
 #endif
+    (void)start;
+    (void)count;
+    (void)buf;
+    return -1; /* not working, seems to cause FIFO overruns */
+#endif /* defined(BOOTLOADER) */
 }
 
 #ifndef BOOTLOADER
