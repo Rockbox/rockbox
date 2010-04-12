@@ -1565,7 +1565,7 @@ static void viewer_draw(int col)
         /* display on screen the displayed part of the line */
         if (col != -1)
         {
-            bool in_page = (cline+i > display_lines);
+            bool in_page = (cline+i <= display_lines);
             int dpage = cpage + (in_page ? 0 : 1);
             int dline = cline + i - (in_page ? 0 : display_lines);
             bool bflag = (viewer_find_bookmark(dpage, dline) >= 0);
@@ -2595,6 +2595,7 @@ static void calc_page(void)
     fill_buffer(file_pos, buffer, buffer_size);
     line_end = line_begin = buffer;
 
+    /* update page and line of all bookmark */
     for (i = 0; i < bookmark_count; i++)
     {
         sfp = bookmarks[i].file_position;
@@ -3249,17 +3250,17 @@ enum plugin_status plugin_start(const void* file)
                     if (idx < 0)
                     {
                         if (bookmark_count >= MAX_BOOKMARKS-1)
-                            rb->splash(HZ/2, "No more add bookmark.");
+                            rb->splash(HZ/2, "No more bookmarks");
                         else
                         {
                             viewer_add_bookmark();
-                            rb->splash(HZ/2, "Bookmark add.");
+                            rb->splash(HZ/2, "Bookmark added");
                         }
                     }
                     else
                     {
                         viewer_remove_bookmark(idx);
-                        rb->splash(HZ/2, "Bookmark remove.");
+                        rb->splash(HZ/2, "Bookmark removed");
                     }
                     viewer_draw(col);
                 }
