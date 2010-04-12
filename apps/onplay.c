@@ -1218,7 +1218,9 @@ struct hotkey_assignment {
     int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x   */
     struct menu_func func;  /* Function to run if this entry is selected */
     int return_code;        /* What to return after the function is run  */
-    const struct menu_item_ex *menu_addr; /* Must be a MENUITEM_FUNCTION */
+    const struct menu_item_ex *menu_addr; /* Must have non-dynamic text, */
+        /* i.e. have the flag MENU_HAS_DESC. E.g. be a MENUITEM_FUNCTION */
+        /* For all possibilities see menu.h.                             */
 };
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
@@ -1253,7 +1255,7 @@ static struct hotkey_assignment hotkey_items[] = {
 static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
 
 /* Return the language ID for the input function */
-char* get_hotkey_desc(int hk_func)
+const char* get_hotkey_desc(int hk_func)
 {
     int i;
     for (i = 0; i < num_hotkey_items; i++)
