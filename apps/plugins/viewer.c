@@ -639,6 +639,13 @@ static int bookmark_count;
 
 static bool is_bom = false;
 
+/* We draw a diacritic char over a non-diacritic one. Therefore, such chars are
+ * not considered to occupy space, therefore buffers might have more than
+ * max_columns characters. The DIACRITIC_FACTOR is the max ratio between all
+ * characters and non-diacritic characters in the buffer
+ */
+#define DIACRITIC_FACTOR 2
+
 /* calculate the width of a UCS character (zero width for diacritics) */
 static int glyph_width(unsigned short ch)
 {
@@ -659,12 +666,11 @@ static int glyph_width(unsigned short ch)
 static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
 {
     unsigned char utf8_tmp[6];
-    int count;
+    int count = 2;
 
     if (prefs.encoding == UTF_8)
         return (unsigned char*)rb->utf8decode(str, ch);
 
-    count = BUFFER_OOB(str+2)? 1:2;
     rb->iso_decode(str, utf8_tmp, prefs.encoding, count);
     rb->utf8decode(utf8_tmp, ch);
 
@@ -678,40 +684,77 @@ static unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
         return (unsigned char*)str+1;
 }
 
-/* decode UCS string into UTF-8 string */
+/* decode iso string into UTF-8 string */
 static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
                                   int skip_width, int disp_width)
 {
+    unsigned short ucs[max_columns * DIACRITIC_FACTOR + 1];
     unsigned short ch;
     const unsigned char *oldstr;
     const unsigned char *str = src;
     unsigned char *utf8 = dst;
-    int width = 0;
+    int chars = 0;
+    int idx = 0;
+    int width = max_width;
 
-    /* skip the skip_width */
-    while (*str != '\0')
+    if (prefs.alignment == LEFT)
     {
-        oldstr = str;
-        str = get_ucs(oldstr, &ch);
-        width += glyph_width(ch);
-        if (width > skip_width)
+        /* skip the skip_width */
+        if (skip_width > 0)
         {
-            str = oldstr;
-            break;
+            while (skip_width > 0 && *str != '\0')
+            {
+                oldstr = str;
+                str = get_ucs(oldstr, &ch);
+                skip_width -= glyph_width(ch);
+            }
+            if (skip_width < 0)
+                str = oldstr;
+        }
+
+        /* decode until string end or disp_width reached */
+        while(*str != '\0')
+        {
+            str = get_ucs(str, &ch);
+            disp_width -= glyph_width(ch);
+            if (disp_width < 0)
+                break;
+            utf8 = rb->utf8encode(ch, utf8);
         }
     }
-
-    /* decode until string end or disp_width reached */
-    width = 0;
-    while(*str != '\0')
+    else
     {
-        str = get_ucs(str, &ch);
-        width += glyph_width(ch);
-        if (width > disp_width)
-            break;
+        while (width > 0 && *str != '\0')
+        {
+            str = get_ucs(str, &ch);
+            ucs[chars++] = ch;
+        }
+        ucs[chars] = 0;
 
-        utf8 = rb->utf8encode(ch, utf8);
+        skip_width = max_width - skip_width - disp_width;
+        if (skip_width > 0)
+        {
+            while (skip_width > 0 && chars-- > 0)
+                skip_width -= glyph_width(ucs[chars]);
+
+            if (skip_width < 0)
+                chars++;
+        }
+        else
+        {
+            idx = chars;
+            while (disp_width > 0 && idx-- > 0)
+                disp_width -= glyph_width(ucs[idx]);
+
+            if (disp_width < 0 || idx < 0)
+                idx++;
+        }
+
+        for (  ; idx < chars; idx++)
+            utf8 = rb->utf8encode(ucs[idx], utf8);
     }
+
+    *utf8 = '\0';
 
     /* return a pointer after the dst string ends */
     return utf8;
@@ -776,6 +819,9 @@ static unsigned char* find_first_feed(const unsigned char* p, int size)
     int s = 0;
     unsigned short ch;
     const unsigned char *oldp = p;
+    const unsigned char *lbrkp = NULL;
+    int j;
+    int width = 0;
 
     while(s <= size)
     {
@@ -783,6 +829,23 @@ static unsigned char* find_first_feed(const unsigned char* p, int size)
             return (unsigned char*)p;
         oldp = p;
         p = get_ucs(p, &ch);
+
+        if (prefs.word_mode == WRAP)
+        {
+            for (j = 0; j < ((int) sizeof(line_break)); j++)
+            {
+                if (ch == line_break[j])
+                {
+                    lbrkp = p;
+                    break;
+                }
+            }
+        }
+
+        width += glyph_width(ch);
+        if (width > max_width)
+            return (lbrkp == NULL)? (unsigned char*)oldp : (unsigned char*)lbrkp;
+
         s += (p - oldp);
     }
 
@@ -1266,17 +1329,10 @@ static void viewer_show_footer(void)
 }
 #endif
 
-/* We draw a diacritic char over a non-diacritic one. Therefore, such chars are
- * not considered to occupy space, therefore buffers might have more than
- * max_columns characters. The DIACRITIC_FACTOR is the max ratio between all
- * characters and non-diacritic characters in the buffer
- */
-#define DIACRITIC_FACTOR 2
-
 static void viewer_draw(int col)
 {
     int i, j, k, line_len, line_width, spaces, left_col=0;
-    int width, extra_spaces, indent_spaces, spaces_per_word, spaces_width;
+    int width, extra_spaces, indent_spaces, spaces_per_word, spaces_width, disp_width = 0;
     bool multiple_spacing, line_is_short;
     unsigned short ch;
     unsigned char *str, *oldstr;
@@ -1284,9 +1340,8 @@ static void viewer_draw(int col)
     unsigned char *line_end;
     unsigned char c;
     int max_chars = max_columns * DIACRITIC_FACTOR;
-    unsigned char scratch_buffer[max_chars + 1];
+    unsigned char scratch_buffer[max_chars * 4 + 1];
     unsigned char utf8_buffer[max_chars * 4 + 1];
-    unsigned char *endptr;
 
     /* If col==-1 do all calculations but don't display */
     if (col != -1) {
@@ -1392,11 +1447,7 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-            if (col != -1) {
-                scratch_buffer[k] = 0;
-                endptr = decode2utf8(scratch_buffer, utf8_buffer, col, draw_columns);
-                *endptr = 0;
-            }
+            scratch_buffer[k] = 0;
         }
         else if (prefs.line_mode == REFLOW) {
             if (line_begin[0] == 0) {
@@ -1414,12 +1465,17 @@ static void viewer_draw(int col)
                 for (str = line_begin; str < line_end; ) {
                     str = get_ucs(str, &ch);
                     switch (ch) {
-                        case ' ':
                         case 0:
-                            if ((str == line_begin) && (prefs.word_mode==WRAP))
-                                /* special case: indent the paragraph,
-                                 * don't count spaces */
-                                indent_spaces = par_indent_spaces;
+                        case ' ':
+                            if (str == line_begin)
+                            {
+                                if (prefs.word_mode == WRAP && prefs.alignment == LEFT)
+                                {
+                                    /* special case: indent the paragraph,
+                                     * don't count spaces */
+                                    indent_spaces = par_indent_spaces;
+                                }
+                            }
                             else if (!multiple_spacing)
                                 spaces++;
                             multiple_spacing = true;
@@ -1451,7 +1507,6 @@ static void viewer_draw(int col)
                 spaces_per_word = 1;
                 extra_spaces = 0;
             }
-
             multiple_spacing = false;
             for (j=k=spaces=0; j < line_len; j++) {
                 if (k == max_chars)
@@ -1459,12 +1514,18 @@ static void viewer_draw(int col)
 
                 c = line_begin[j];
                 switch (c) {
-                    case ' ':
                     case 0:
-                        if (j==0 && prefs.word_mode==WRAP) { /* indent paragraph */
-                            for (j=0; j<par_indent_spaces; j++)
-                                scratch_buffer[k++] = ' ';
-                            j=0;
+                        if (j == line_len - 1)
+                            break;
+                    case ' ':
+                        if (j==0) {
+                            /* indent paragraph */
+                            if (prefs.word_mode == WRAP && prefs.alignment == LEFT)
+                            {
+                                for (j=0; j<par_indent_spaces; j++)
+                                    scratch_buffer[k++] = ' ';
+                                j=0;
+                            }
                         }
                         else if (!multiple_spacing) {
                             for (width = spaces<extra_spaces ? -1:0; width < spaces_per_word; width++)
@@ -1479,47 +1540,34 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-            if (col != -1) {
-                scratch_buffer[k] = 0;
-                endptr = decode2utf8(scratch_buffer, utf8_buffer, col, draw_columns);
-                *endptr = 0;
-            }
+            while (scratch_buffer[k-1] == ' ')
+                k--;
+            scratch_buffer[k] = 0;
         }
         else { /* prefs.line_mode != JOIN && prefs.line_mode != REFLOW */
-            if ((col != -1) && (line_width > col)) {
-                str = oldstr = line_begin;
-                k = col;
-                width = 0;
-                while( (width<draw_columns) && (oldstr<line_end) )
-                {
-                    oldstr = get_ucs(oldstr, &ch);
-                    if (k > 0) {
-                        k -= glyph_width(ch);
-                        line_begin = oldstr;
-                    } else {
-                        width += glyph_width(ch);
-                    }
-                }
-
-                if(prefs.view_mode==WIDE)
-                    endptr = rb->iso_decode(line_begin, utf8_buffer,
-                            prefs.encoding, oldstr-line_begin);
-                else
-                    endptr = rb->iso_decode(line_begin, utf8_buffer,
-                            prefs.encoding, line_end-line_begin);
-                *endptr = 0;
+            if (col != -1)
+            {
+                rb->memcpy(scratch_buffer, line_begin, line_len);
+                scratch_buffer[line_len] = '\0';
             }
+        }
+
+        /* create displayed line */
+        if (col != -1)
+        {
+            decode2utf8(scratch_buffer, utf8_buffer, col, draw_columns);
+            rb->lcd_getstringsize(utf8_buffer, &disp_width, NULL);
         }
 
         /* display on screen the displayed part of the line */
-        if (col != -1 && line_width > col)
+        if (col != -1)
         {
             int dpage = (cline+i <= display_lines)?cpage:cpage+1;
             int dline = cline+i - ((cline+i <= display_lines)?0:display_lines);
             bool bflag = (viewer_find_bookmark(dpage, dline) >= 0);
 #ifdef HAVE_LCD_BITMAP
             int dy = i * pf->height + header_height;
-            int dx = (prefs.alignment == LEFT) ? left_col : LCD_WIDTH - line_width;
+            int dx = (prefs.alignment == LEFT)? left_col : LCD_WIDTH - disp_width;
 #endif
             if (bflag)
 #ifdef HAVE_LCD_BITMAP
