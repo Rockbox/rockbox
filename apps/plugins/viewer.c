@@ -690,7 +690,7 @@ static unsigned char *decode2utf8(const unsigned char *src, unsigned char *dst,
 {
     unsigned short ucs[max_columns * DIACRITIC_FACTOR + 1];
     unsigned short ch;
-    const unsigned char *oldstr;
+    const unsigned char *oldstr = src;
     const unsigned char *str = src;
     unsigned char *utf8 = dst;
     int chars = 0;
