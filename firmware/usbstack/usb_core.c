@@ -501,8 +501,8 @@ static void allocate_interfaces_and_endpoints(void)
 
 static void control_request_handler_drivers(struct usb_ctrlrequest* req)
 {
-    int i, interface = req->wIndex;
-    bool handled=false;
+    int i, interface = req->wIndex & 0xff;
+    bool handled = false;
 
     for(i = 0; i < USB_NUM_DRIVERS; i++) {
         if(drivers[i].enabled &&
