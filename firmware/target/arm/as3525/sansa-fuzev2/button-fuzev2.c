@@ -81,14 +81,15 @@ int button_read_device(void)
     get_scrollwheel();
 
     CCU_IO &= ~(1<<12);
+
     for(delay=8;delay;delay--) nop;
 
-    GPIOB_PIN(3) = 1<<3;
     GPIOB_PIN(0) = 1<<0;
-
     for(delay = 500; delay; delay--)
         nop;
+
     gpiod6 = GPIOD_PIN(6);
+
     GPIOB_PIN(0) = 0;
     for(delay = 240; delay; delay--)
         nop;
