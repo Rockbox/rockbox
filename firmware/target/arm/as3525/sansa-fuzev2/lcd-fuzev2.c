@@ -221,9 +221,8 @@ void lcd_init_device(void)
     GPIOA_PIN(0) = 1;
     GPIOA_PIN(4) = 0;
 
-    GPIOB_DIR |= 0xf;
+    GPIOB_DIR |= (1<<0)|(1<<2)|(1<<3);
     GPIOB_PIN(0) = 1<<0;
-    GPIOB_PIN(1) = 1<<1;
     GPIOB_PIN(2) = 1<<2;
     GPIOB_PIN(3) = 1<<3;
 
