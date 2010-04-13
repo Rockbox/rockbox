@@ -277,7 +277,7 @@ cpucache_flush:
     @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
     mov     r1, #0x00000000         @
 1:  @ clean_start                   @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
+    mcr     p15, 0, r1, c7, c10, 2  @ Clean entry by index
     add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
     add     r0, r0, #0x00000020     @
@@ -311,7 +311,7 @@ invalidate_dcache:
     @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
     mov     r1, #0x00000000         @
 1:  @ inv_start                     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
+    mcr     p15, 0, r1, c7, c14, 2  @ Clean and invalidate entry by index
     add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
     add     r0, r0, #0x00000020     @
