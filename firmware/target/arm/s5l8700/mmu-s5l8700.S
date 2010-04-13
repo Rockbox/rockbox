@@ -34,7 +34,7 @@
     .global     cpucache_flush      @ Alias
 clean_dcache:
 cpucache_flush:
-    @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
+    @ Index format: 31:26 = index, 5:4 = segment, remainder = SBZ
     mov     r1, #0x00000000         @
 1:  @ clean_start                   @
     mcr     p15, 0, r1, c7, c10, 2  @ Clean entry by index
@@ -60,7 +60,7 @@ cpucache_flush:
     .global     invalidate_dcache
     .type       invalidate_dcache, %function
 invalidate_dcache:
-    @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
+    @ Index format: 31:26 = index, 5:4 = segment, remainder = SBZ
     mov     r1, #0x00000000         @
 1:  @ inv_start                     @
     mcr     p15, 0, r1, c7, c14, 2  @ Clean and invalidate entry by index
