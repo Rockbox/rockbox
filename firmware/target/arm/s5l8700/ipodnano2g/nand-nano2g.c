@@ -28,7 +28,7 @@
 #include "inttypes.h"
 #include "nand-target.h"
 #include <pmu-target.h>
-#include <mmu-target.h>
+#include <mmu-arm.h>
 #include <string.h>
 #include "led.h"
 
