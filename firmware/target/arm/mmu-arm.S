@@ -22,7 +22,6 @@
 #include "cpu.h"
 
 /* Used by ARMv4 & ARMv5 CPUs with cp15 register and MMU */
-/* WARNING : assume size of a data cache line == 32 bytes */
 
 #if CONFIG_CPU == TCC7801 || CONFIG_CPU == AT91SAM9260
 /* MMU present but unused */
@@ -40,19 +39,38 @@
 #define USE_MMU
 #define CACHE_SIZE 16
 
+#elif CONFIG_CPU == S5L8701
+/* MMU not present */
+#define CACHE_SIZE 4
+
 #else
 #error Cache settings unknown for this CPU !
 
 #endif /* CPU specific configuration */
 
 @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ
-@ assume 64-way set associative separate I/D caches, 32B (2^5) cache line size
+@ assume 64-way set associative separate I/D caches
 @ CACHE_SIZE = N (kB) = N*2^10 B
-@ number of lines = N*2^(10-5) = N*2^(5)
+@ number of lines = N*2^(10-CACHEALIGN_BITS)
 @ Index bits = 6
-@ Segment loops = N*2^(5-6) = N*2^(-1) = N/2
+@ Segment loops = N*2^(10-CACHEALIGN_BITS-6) = N*2^(4-CACHEALIGN_BITS)
+@ Segment loops = N/2^(CACHEALIGN_BITS - 4)
+@ Segment loops = N/(1<<(CACHEALIGN_BITS - 4))
 
+#ifdef CACHE_SIZE
+
+#if CACHEALIGN_BITS == 4
+#define INDEX_STEPS CACHE_SIZE
+#elif CACHEALIGN_BITS == 5
 #define INDEX_STEPS (CACHE_SIZE/2)
+#endif /* CACHEALIGN_BITS */
+
+@ assume 64-way set associative separate I/D caches (log2(64) == 6)
+@ Index format: 31:26 = index, M:N = segment, remainder = SBZ
+@ Segment bits = log2(cache size in bytes / cache line size in byte) - Index bits (== 6)
+@ N = CACHEALIGN_BITS
+
+#endif /* CACHE_SIZE */
 
 
 #ifdef USE_MMU
@@ -318,15 +336,13 @@ cpucache_flush:
     bne     clean_dcache
     mov     r1, #0
 #else
-    @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ, assume 64-way set associative separate I/D caches
-    @ N = log2(cache size in bytes / cache line size in bytes == 32) - 6 /* index bits */ + 4 /* start offset */
     mov     r1, #0x00000000         @
 1:  @ clean_start                   @
     mcr     p15, 0, r1, c7, c10, 2  @ Clean entry by index
-    add     r0, r1, #0x00000020     @
+    add     r0, r1, #(1<<CACHEALIGN_BITS)
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
 .rept INDEX_STEPS - 2 /* 2 steps already executed */
-    add     r0, r0, #0x00000020     @
+    add     r0, r0, #(1<<CACHEALIGN_BITS)
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
 .endr
     adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
@@ -351,15 +367,13 @@ invalidate_dcache:
     bne     invalidate_dcache
     mov     r1, #0
 #else
-    @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ, assume 64-way set associative separate I/D caches
-    @ N = log2(cache size in bytes / cache line size in bytes == 32) - 6 /* index bits */ + 4 /* start offset */
     mov     r1, #0x00000000         @
 1:  @ inv_start                     @
     mcr     p15, 0, r1, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r1, #0x00000020     @
+    add     r0, r1, #(1<<CACHEALIGN_BITS)
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
 .rept INDEX_STEPS - 2 /* 2 steps already executed */
-    add     r0, r0, #0x00000020     @
+    add     r0, r0, #(1<<CACHEALIGN_BITS)
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
 .endr
     adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
