@@ -275,10 +275,10 @@ clean_dcache_range:
 clean_dcache:
 cpucache_flush:
     @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
-    mov     r0, #0x00000000         @
+    mov     r1, #0x00000000         @
 1:  @ clean_start                   @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
+    add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
@@ -292,10 +292,9 @@ cpucache_flush:
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    sub     r0, r0, #0x000000e0     @
-    adds    r0, r0, #0x04000000     @ will wrap to zero at loop end
+    adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
     bne     1b @ clean_start        @
-    mcr     p15, 0, r0, c7, c10, 4  @ Drain write buffer
+    mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @ 
     .size   clean_dcache, .-clean_dcache
 
@@ -310,10 +309,10 @@ cpucache_flush:
     .type       invalidate_dcache, %function
 invalidate_dcache:
     @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
-    mov     r0, #0x00000000         @
+    mov     r1, #0x00000000         @
 1:  @ inv_start                     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
+    add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
@@ -327,10 +326,9 @@ invalidate_dcache:
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    sub     r0, r0, #0x000000e0     @
-    adds    r0, r0, #0x04000000     @ will wrap to zero at loop end
+    adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
     bne     1b @ inv_start          @
-    mcr     p15, 0, r0, c7, c10, 4  @ Drain write buffer
+    mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   invalidate_dcache, .-invalidate_dcache
 
@@ -346,8 +344,8 @@ invalidate_dcache:
     .global     cpucache_invalidate @ Alias
 invalidate_idcache:
 cpucache_invalidate: 
-    mov     r1, lr                  @ save lr to r1, call uses r0 only
+    mov     r2, lr                  @ save lr to r1, call uses r0 only
     bl      invalidate_dcache       @ Clean and invalidate entire DCache
-    mcr     p15, 0, r0, c7, c5, 0   @ Invalidate ICache (r0=0 from call)
-    mov     pc, r1                  @
+    mcr     p15, 0, r1, c7, c5, 0   @ Invalidate ICache (r1=0 from call)
+    mov     pc, r2                  @
     .size   invalidate_idcache, .-invalidate_idcache
