@@ -30,13 +30,12 @@ extern void scrollwheel(unsigned wheel_value);
 static bool hold_button = false;
 #endif
 void button_init_device(void)
-{   /* activate the wheel */
-    volatile int i;
+{
     GPIOA_DIR &= ~(1<<6|1<<7);
     GPIOC_DIR = 0;
-    GPIOB_DIR |= (1<<4)|(1<<3)|(1<<0);
-    for(i = 20; i; i--) nop;
-    GPIOB_PIN(4) = 1<<4;
+    GPIOB_DIR |= (1<<4)|(1<<0);
+
+    GPIOB_PIN(4) = 1<<4; /* activate the wheel */
 }
 
 unsigned read_GPIOA_67(void)
@@ -81,8 +80,6 @@ int button_read_device(void)
     get_scrollwheel();
 
     CCU_IO &= ~(1<<12);
-
-    for(delay=8;delay;delay--) nop;
 
     GPIOB_PIN(0) = 1<<0;
     for(delay = 500; delay; delay--)
