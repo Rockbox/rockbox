@@ -1225,8 +1225,8 @@ static int parse_progressbar(const char *wps_bufptr,
     if (token->type == WPS_TOKEN_VOLUME)
         token->type = WPS_TOKEN_VOLUMEBAR;
     pb->type = token->type;
-    /* Skip the rest of the line */
-    return skip_end_of_line(wps_bufptr)-1;
+    
+    return ptr+1-wps_bufptr;
 #else
     (void)wps_bufptr;
     if (token->type != WPS_TOKEN_VOLUME)
