@@ -23,6 +23,8 @@
 
 /* All info gleaned and/or copied from the iPodLinux project. */
 
+#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
+
 /* PCM addresses for obtaining buffers will be what DMA is using (physical) */
 #define HAVE_PCM_DMA_ADDRESS
 

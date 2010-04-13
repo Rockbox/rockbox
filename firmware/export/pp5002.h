@@ -22,6 +22,9 @@
 #define __PP5002_H__
 
 /* Much info gleaned and/or copied from the iPodLinux project. */
+
+#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
+
 #define DRAM_START       0x28000000
 
 /* LCD bridge */

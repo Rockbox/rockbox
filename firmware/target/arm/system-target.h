@@ -161,7 +161,6 @@ static inline void wake_core(int core)
 /* Certain data needs to be out of the way of cache line interference
  * such as data for COP use or for use with UNCACHED_ADDR */
 #define PROC_NEEDS_CACHEALIGN
-#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
 #if defined(CPU_PP502x) && defined(HAVE_ATA_DMA)
 #define STORAGE_WANTS_ALIGN

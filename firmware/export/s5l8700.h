@@ -27,6 +27,8 @@
 
 #define TIMER_FREQ  47923200L
 
+#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
+
 /* 04. CALMADM2E */
 
 /* Following registers are mapped on IO Area in data memory area of Calm. */
