@@ -125,12 +125,13 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="188"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Remarque:&lt;/b&gt; Vous pouvez poursuivre par l&apos;installation du reste de Rockbox, mais n&apos;olubliez pas que les étapes suivantes sont &lt;b&gt;nécessaire&lt;/b&gt; pour finir l&apos;inbstallation !&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="202"/>
         <source>Waiting for system to remount player</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas super mais je ne vois pas comment traduire çà</translatorcomment>
+        <translation>En attente du système pour qu&apos;il remonte le lecteur audio</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
@@ -726,23 +727,24 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../configure.cpp" line="290"/>
         <source>Showing disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les cibles d&apos;installation désactivéess</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="291"/>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous venez d&apos;activer l&apos;affichage des cibles d&apos;installations désactivées. Celles-ci ne sont pas recommandées pour l&apos;utilisateur final. Vous êtes encouragé à utiliser cette option uniquement si vous savez ce que vous faites.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="556"/>
         <source>Set Cache Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner le chemin vers le cache</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="624"/>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 &quot;MacPod&quot; détecté !
+Rockbox ne peut fonctionner que sur un Ipod utilisant le système de fichier FAT (aussi appelé un &quot;WinPod&quot;).</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="635"/>
@@ -801,47 +803,51 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
     <message>
         <location filename="../configure.cpp" line="716"/>
         <source>TTS configuration invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>La configuration du moteur TTS est incorrecte</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="717"/>
         <source>TTS configuration invalid. 
  Please configure TTS engine.</source>
-        <translation type="unfinished"></translation>
+        <translation>La configuration du moteur TTS est incorrecte.
+Veuillez configurer le moteur TTS.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="723"/>
         <source>Could not start TTS engine.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible lancer le moteur TTS.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="724"/>
         <source>Could not start TTS engine.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible lancer le moteur TTS.
+</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="725"/>
         <location filename="../configure.cpp" line="739"/>
         <source>
 Please configure TTS engine.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Veuillez configurer le moteur TTS.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="734"/>
         <source>Rockbox Utility Voice Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test de la synthèse vocale de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="737"/>
         <source>Could not voice test string.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de synthétiser la phrase de test.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="738"/>
         <source>Could not voice test string.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de synthétiser la phrase de test.
+</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="531"/>
@@ -881,58 +887,58 @@ Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translat
         <location filename="../configure.cpp" line="398"/>
         <location filename="../configure.cpp" line="426"/>
         <source>Configuration OK</source>
-        <translation type="unfinished"></translation>
+        <translation>La configuration est correcte</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="403"/>
         <location filename="../configure.cpp" line="431"/>
         <source>Configuration INVALID</source>
-        <translation type="unfinished"></translation>
+        <translation>La configuration est incorrecte</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="111"/>
         <source>The following errors occurred:</source>
-        <translation type="unfinished"></translation>
+        <translation>Les erreurs suivantes sont survenues:</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="143"/>
         <source>No mountpoint given</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun point de montage spécifié</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="147"/>
         <source>Mountpoint does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Le point de montage n&apos;existe pas</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="151"/>
         <source>Mountpoint is not a directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le point de montage n&apos;est pas un dossier.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="155"/>
         <source>Mountpoint is not writeable</source>
-        <translation type="unfinished"></translation>
+        <translation>Le point de montage n&apos;est pas accessible en écriture</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="169"/>
         <source>No player selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun lecteur audio sélectionné</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="176"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le chemin vers le cache n&apos;est pas accessible en écriture. Vous pouvez laisser le chemin vide pour utiliser le dossier temporaire par défaut de votre système.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="195"/>
         <source>You need to fix the above errors before you can continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez corriger les erreurs suivantes avant de pouvoir continuer.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="198"/>
         <source>Configuration error</source>
-        <translation type="unfinished">Erreur de configuration</translation>
+        <translation>Erreur de configuration</translation>
     </message>
 </context>
 <context>
@@ -1119,7 +1125,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../configurefrm.ui" line="95"/>
         <source>Show disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les cibles d&apos;installation désactivées</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="411"/>
@@ -1336,7 +1342,8 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../installtalkfrm.ui" line="171"/>
         <source>Ignore files (comma seperated Wildcards):</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Je ne vois pas comment intégrer wildcard dans la traduction</translatorcomment>
+        <translation>Ignorer les fichiers (liste séparée par des virgules):</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="201"/>
@@ -1351,7 +1358,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../installtalkfrm.ui" line="221"/>
         <source>Create only new Talkfiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne créer que les nouveaux fichier de voix</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="149"/>
@@ -1384,7 +1391,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="../installtalkwindow.cpp" line="56"/>
         <source>Select folder to create talk files</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner le dossier où créer les fichiers de voix</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="91"/>
@@ -2561,7 +2568,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/ttscarbon.cpp" line="200"/>
         <source>Could not voice string</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de synthétiser la phrase</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="209"/>
@@ -2592,7 +2599,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/ttsfestival.cpp" line="197"/>
         <source>engine could not voice string</source>
-        <translation type="unfinished"></translation>
+        <translation>le moteur n&apos;a pas pu synthétiser la phrase</translation>
     </message>
     <message>
         <location filename="../base/ttsfestival.cpp" line="280"/>
@@ -2602,7 +2609,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/ttsfestival.cpp" line="45"/>
         <source>Path to Festival client:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin vers le client Festival:</translation>
     </message>
     <message>
         <location filename="../base/ttsfestival.cpp" line="50"/>
@@ -2721,7 +2728,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/talkgenerator.cpp" line="65"/>
         <source>Voicing entries...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synthèse des entrées...</translation>
     </message>
     <message>
         <location filename="../base/talkgenerator.cpp" line="80"/>
@@ -2731,13 +2738,13 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/talkgenerator.cpp" line="119"/>
         <source>Voicing aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Synthèse vocale annulée</translation>
     </message>
     <message>
         <location filename="../base/talkgenerator.cpp" line="154"/>
         <location filename="../base/talkgenerator.cpp" line="159"/>
         <source>Voicing of %1 failed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>La synthèse vocale de %1 a échoué: %2</translation>
     </message>
     <message>
         <location filename="../base/talkgenerator.cpp" line="197"/>
@@ -3066,7 +3073,7 @@ Code de réponse HHTP: %1</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="82"/>
         <source>Downloading voice info...</source>
-        <translation>Téléchargement des informations d&apos;annonces</translation>
+        <translation>Téléchargement des informations d&apos;annonces...</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="95"/>
@@ -3096,12 +3103,12 @@ Code de réponse HHTP: %1</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="125"/>
         <source>Reading strings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lecteur des phrases...</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="192"/>
         <source>Creating voicefiles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Création des fichiers de voix...</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="233"/>
