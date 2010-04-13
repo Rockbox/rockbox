@@ -24,16 +24,26 @@
 /* Used by ARMv4 & ARMv5 CPUs with cp15 register and MMU */
 /* WARNING : assume size of a data cache line == 32 bytes */
 
-#if     CONFIG_CPU == TCC7801   || CONFIG_CPU == AT91SAM9260 \
-    ||  CONFIG_CPU == DM320     || CONFIG_CPU == AS3525v2
+#if CONFIG_CPU == TCC7801 || CONFIG_CPU == AT91SAM9260
+/* MMU present but unused */
 #define HAVE_TEST_AND_CLEAN_CACHE
+
+#elif CONFIG_CPU == DM320 || CONFIG_CPU == AS3525v2
+#define USE_MMU
+#define HAVE_TEST_AND_CLEAN_CACHE
+
 #elif CONFIG_CPU == AS3525
+#define USE_MMU
 #define CACHE_SIZE 8
+
 #elif CONFIG_CPU == S3C2440
+#define USE_MMU
 #define CACHE_SIZE 16
+
 #else
 #error Cache settings unknown for this CPU !
-#endif
+
+#endif /* CPU specific configuration */
 
 @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ
 @ assume 64-way set associative separate I/D caches, 32B (2^5) cache line size
@@ -44,6 +54,8 @@
 
 #define INDEX_STEPS (CACHE_SIZE/2)
 
+
+#ifdef USE_MMU
 
 /** MMU setup **/
 
@@ -80,18 +92,18 @@ map_section:
     @  10:  superuser - r/w, user - no access
     @  4:   should be "1"
     @  3,2: Cache flags (flags (r3))
-    @  1:   Section signature 
+    @  1:   Section signature
     orr     r0, r0, r3
     orr     r0, r0, #0x410
     orr     r0, r0, #0x2
-    
+
     @ unsigned int* ttbPtr = TTB_BASE + (va >> 20);
-    @ sections are 1MB size 
+    @ sections are 1MB size
     mov     r1, r1, lsr #20
     ldr     r3, =TTB_BASE_ADDR
-    add     r1, r3, r1, lsl #0x2 
-    
-    @ Add MB to pa, flags are already present in pa, but addition 
+    add     r1, r3, r1, lsl #0x2
+
+    @ Add MB to pa, flags are already present in pa, but addition
     @ should not effect them
     @
     @ for( ; mb>0; mb--, pa += (1 << 20))
@@ -133,7 +145,11 @@ enable_mmu:
     bx      lr                      @
     .size   enable_mmu, .-enable_mmu
     .ltorg
-    
+
+#endif  /* USE_MMU */
+
+
+
 /** Cache coherency **/
 
 /*
@@ -315,7 +331,7 @@ cpucache_flush:
     bne     1b @ clean_start        @
 #endif /* HAVE_TEST_AND_CLEAN_CACHE */
     mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
-    bx      lr                      @ 
+    bx      lr                      @
     .size   clean_dcache, .-clean_dcache
 
 /*
@@ -362,7 +378,7 @@ invalidate_dcache:
     .type       invalidate_idcache, %function
     .global     cpucache_invalidate @ Alias
 invalidate_idcache:
-cpucache_invalidate: 
+cpucache_invalidate:
     mov     r2, lr                  @ save lr to r1, call uses r0 only
     bl      invalidate_dcache       @ Clean and invalidate entire DCache
     mcr     p15, 0, r1, c7, c5, 0   @ Invalidate ICache (r1=0 from call)
