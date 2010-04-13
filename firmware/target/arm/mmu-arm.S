@@ -24,6 +24,27 @@
 /* Used by ARMv4 & ARMv5 CPUs with cp15 register and MMU */
 /* WARNING : assume size of a data cache line == 32 bytes */
 
+#if     CONFIG_CPU == TCC7801   || CONFIG_CPU == AT91SAM9260 \
+    ||  CONFIG_CPU == DM320     || CONFIG_CPU == AS3525v2
+#define HAVE_TEST_AND_CLEAN_CACHE
+#elif CONFIG_CPU == AS3525
+#define CACHE_SIZE 8
+#elif CONFIG_CPU == S3C2440
+#define CACHE_SIZE 16
+#else
+#error Cache settings unknown for this CPU !
+#endif
+
+@ Index format: 31:26 = index, N:5 = segment, remainder = SBZ
+@ assume 64-way set associative separate I/D caches, 32B (2^5) cache line size
+@ CACHE_SIZE = N (kB) = N*2^10 B
+@ number of lines = N*2^(10-5) = N*2^(5)
+@ Index bits = 6
+@ Segment loops = N*2^(5-6) = N*2^(-1) = N/2
+
+#define INDEX_STEPS (CACHE_SIZE/2)
+
+
 /** MMU setup **/
 
 /*
@@ -274,26 +295,25 @@ clean_dcache_range:
     .global     cpucache_flush      @ Alias
 clean_dcache:
 cpucache_flush:
-    @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
+#ifdef HAVE_TEST_AND_CLEAN_CACHE
+    mrc     p15, 0, r15, c7, c10, 3 @ test and clean dcache
+    bne     clean_dcache
+    mov     r1, #0
+#else
+    @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ, assume 64-way set associative separate I/D caches
+    @ N = log2(cache size in bytes / cache line size in bytes == 32) - 6 /* index bits */ + 4 /* start offset */
     mov     r1, #0x00000000         @
 1:  @ clean_start                   @
     mcr     p15, 0, r1, c7, c10, 2  @ Clean entry by index
     add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
+.rept INDEX_STEPS - 2 /* 2 steps already executed */
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c10, 2  @ Clean entry by index
+.endr
     adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
     bne     1b @ clean_start        @
+#endif /* HAVE_TEST_AND_CLEAN_CACHE */
     mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @ 
     .size   clean_dcache, .-clean_dcache
@@ -308,26 +328,25 @@ cpucache_flush:
     .global     invalidate_dcache
     .type       invalidate_dcache, %function
 invalidate_dcache:
-    @ Index format: 31:26 = index, 7:5 = segment, remainder = SBZ
+#ifdef HAVE_TEST_AND_CLEAN_CACHE
+    mrc     p15, 0, r15, c7, c14, 3 @ test, clean and invalidate dcache
+    bne     invalidate_dcache
+    mov     r1, #0
+#else
+    @ Index format: 31:26 = index, N:5 = segment, remainder = SBZ, assume 64-way set associative separate I/D caches
+    @ N = log2(cache size in bytes / cache line size in bytes == 32) - 6 /* index bits */ + 4 /* start offset */
     mov     r1, #0x00000000         @
 1:  @ inv_start                     @
     mcr     p15, 0, r1, c7, c14, 2  @ Clean and invalidate entry by index
     add     r0, r1, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
+.rept INDEX_STEPS - 2 /* 2 steps already executed */
     add     r0, r0, #0x00000020     @
     mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
-    add     r0, r0, #0x00000020     @
-    mcr     p15, 0, r0, c7, c14, 2  @ Clean and invalidate entry by index
+.endr
     adds    r1, r1, #0x04000000     @ will wrap to zero at loop end
     bne     1b @ inv_start          @
+#endif /* HAVE_TEST_AND_CLEAN_CACHE */
     mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   invalidate_dcache, .-invalidate_dcache
