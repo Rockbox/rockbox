@@ -43,6 +43,7 @@
 #include "file.h"
 #include "common.h"
 #include "hwcompat.h"
+#include "usb.h"
 
 #define XSC(X) #X
 #define SC(X) XSC(X)
@@ -57,12 +58,6 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 
 /* Bootloader version */
 char version[] = APPSVERSION;
-
-#define BUTTON_LEFT  1
-#define BUTTON_MENU  2
-#define BUTTON_RIGHT 3
-#define BUTTON_PLAY  4
-#define BUTTON_HOLD  5
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD && !defined(IPOD_MINI)
 /* check if number of seconds has past */
@@ -193,19 +188,22 @@ void fatal_error(void)
 
     /* System font is 6 pixels wide */
 #if defined(IPOD_1G2G) || defined(IPOD_3G)
-    printf("Hold MENU+PLAY to");
-    printf("reboot then REW+FF");
-    printf("for disk mode");
+    printf("Insert Firewire cable, or");
+    printf("hold MENU+PLAY to reboot");
+    printf("then REW+FF for disk mode");
 #elif LCD_WIDTH >= (30*6)
-    printf("Hold MENU+SELECT to reboot");
+    printf("Insert USB cable, or");
+    printf("hold MENU+SELECT to reboot");
     printf("then SELECT+PLAY for disk mode");
 #else
-    printf("Hold MENU+SELECT to");
+    printf("Insert USB cable, or");
+    printf("hold MENU+SELECT to");
     printf("reboot then SELECT+PLAY");
     printf("for disk mode");
 #endif
     lcd_update();
 
+    usb_init();
     while (1) {
         if (button_hold() != holdstatus) {
             if (button_hold()) {
@@ -216,6 +214,18 @@ void fatal_error(void)
                 lcd_puts(0, line, "               ");
             }
             lcd_update();
+        }
+        if (usb_detect() == USB_INSERTED) {
+            ata_sleepnow(); /* Immediately spindown the disk. */
+            sleep(HZ*2);
+#if CONFIG_CPU == PP5020
+            memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
+#elif CONFIG_CPU == PP5022
+            memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
+#elif CONFIG_CPU == PP5002
+            memcpy((void *)0x40017f00, "diskmodehotstuff\1", 17);
+#endif /* CONFIG_CPU */
+            system_reboot(); /* Reboot */
         }
         udelay(100000); /* 100ms */
     }
