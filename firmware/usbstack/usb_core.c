@@ -169,7 +169,8 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, unsigned char* dest);
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req,
+    unsigned char* dest);
 
 static struct
 {
@@ -380,7 +381,8 @@ void usb_core_exit(void)
     logf("usb_core_exit() finished");
 }
 
-void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_data* event)
+void usb_core_handle_transfer_completion(
+    struct usb_transfer_completion_event_data* event)
 {
     completion_handler_t handler;
     int ep = event->endpoint;
@@ -388,7 +390,8 @@ void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_da
     switch(ep) {
         case EP_CONTROL:
             logf("ctrl handled %ld",current_tick);
-            usb_core_control_request_handler((struct usb_ctrlrequest*)event->data);
+            usb_core_control_request_handler(
+                (struct usb_ctrlrequest*)event->data);
             break;
         default:
             handler = ep_data[ep].completion_handler[EP_DIR(event->dir)];
@@ -714,7 +717,8 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
     control_handler_t control_handler = NULL;
 
     if(EP_NUM(req->wIndex) < USB_NUM_ENDPOINTS)
-        control_handler = ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
+        control_handler =
+            ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
     
     if(control_handler)
         handled = control_handler(req, response_data);
@@ -746,7 +750,8 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
             response_data[1] = 0;
             logf("usb_core: GET_STATUS");
             if(req->wIndex > 0)
-                response_data[0] = usb_drv_stalled(EP_NUM(req->wIndex), EP_DIR(req->wIndex));
+                response_data[0] = usb_drv_stalled(EP_NUM(req->wIndex),
+                                                    EP_DIR(req->wIndex));
             
             usb_drv_recv(EP_CONTROL, NULL, 0);
             usb_drv_send(EP_CONTROL, response_data, 2);
