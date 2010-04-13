@@ -303,7 +303,7 @@ cpucache_flush:
  * will do writeback
  * void invalidate_dcache(void);
  */
-    .section   .text, "ax", %progbits
+    .section   .icode, "ax", %progbits
     .align      2
     .global     invalidate_dcache
     .type       invalidate_dcache, %function
@@ -337,7 +337,7 @@ invalidate_dcache:
  * will do writeback
  * void invalidate_idcache(void);
  */
-    .section   .text, "ax", %progbits
+    .section   .icode, "ax", %progbits
     .align      2
     .global     invalidate_idcache
     .type       invalidate_idcache, %function
