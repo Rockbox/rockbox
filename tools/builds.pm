@@ -232,12 +232,12 @@ $releasenotes="/wiki/ReleaseNotes351";
     },
     'sansaclipv2' => {
         name => 'SanDisk Sansa Clip v2',
-        status => 2,
+        status => 1,
         icon => 'sansaclip',
     },
     'sansaclipplus' => {
         name => 'SanDisk Sansa Clip+',
-        status => 2,
+        status => 1,
     },
     'sansae200' => {
         name => 'SanDisk Sansa e200',
