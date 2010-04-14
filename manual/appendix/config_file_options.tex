@@ -45,7 +45,7 @@
     play selected   & on, off           & N/A\\
     party mode      & on, off           & N/A\\
     scan min step   & 1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 45, 60
-                                        & seconds\\
+                                        & s\\
     seek acceleration & very fast, fast, normal, slow, very slow & N/A\\
     antiskip        & 5s, 15s, 30s, 1min, 2min, 3min, 5min, 10min & N/A\\
     volume fade     & on, off           & N/A\\
@@ -76,15 +76,15 @@
     contrast        & 0 to 63           & N/A\\
     backlight timeout
                     & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
-                      45, 60, 90, 120        & seconds\\
+                      45, 60, 90, 120        & s\\
     backlight timeout plugged
                     & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
-                      45, 60, 90, 120        & seconds\\
+                      45, 60, 90, 120        & s\\
     backlight filters first keypress & on, off & N/A\\
     backlight on button hold & normal, off, on & N/A\\
     caption backlight & on, off & N/A\\
     brightness      & \fixme{devise a way to get ranges from config-*.h} & N/A\\
-    disk spindown   & 3 to 254          & seconds\\
+    disk spindown   & 3 to 254          & s\\
     battery capacity & \fixme{devise a way to get ranges from config-*.h} & mAh\\
     \opt{battery_types}{
       battery type  & alkaline, nimh    & N/A\\
@@ -101,7 +101,7 @@
                     & multimedia, presentation, browser\opt{usb_hid_mouse}{, mouse}& N/A\\
     }
     idle poweroff   & off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
-                                        & minutes\\
+                                        & min\\
     max files in playlist & 1000 - 32000 & N/A\\
     max files in dir & 50 - 10000       & N/A\\
     lang            & /path/filename.lng & N/A\\
@@ -113,7 +113,7 @@
     use most-recent-bookmarks
                     & off, on           & N/A\\
     pause on headphone unplug & off, pause, pause and resume & N/A\\
-    rewind duration on pause & 0 to 15  & seconds\\
+    rewind duration on pause & 0 to 15  & s\\
     disable autoresume if phones not present & off, on & N/A\\
     Last.fm Logging & off, on           & N/A\\
     talk dir        & off, number, spell& N/A\\
@@ -141,14 +141,14 @@
             90s, 2min, 3min, 5min, 10min, 15min & N/A\\
     prevent track skip
                     & on, off           & N/A\\
-    start in screen & previous, root, files, db, wps, menu,
+    start in screen & previous, root, files, dB, wps, menu,
       \opt{recording}{recording, }
       \opt{radio}{radio, }
       bookmarks                         & N/A\\
     playlist catalog directory & /path/to/dir & N/A\\
     \nopt{wheel_acceleration}{
       list\_accel\_start\_delay & 0 to 10  & ms\\
-      list\_accel\_wait        & 1 to 10  & seconds\\
+      list\_accel\_wait        & 1 to 10  & s\\
     }
 %
     \opt{swcodec}{
@@ -158,36 +158,36 @@
       replaygain noclip
                     & on, off           & N/A\\
       replaygain preamp
-                    & -120 to 120       & 0.1 dB\\
+                    & -120 to 120       & 0.1~dB\\
 %
       \opt{crossfade}{
       crossfade     & off, auto track change, man track skip, shuffle,
                     shuffle or man track skip, always
                                         & N/A\\
       crossfade fade in delay
-                    & 0 to 7            & seconds\\
+                    & 0 to 7            & s\\
       crossfade fade out delay
-                    & 0 to 7            & seconds\\
+                    & 0 to 7            & s\\
       crossfade fade in duration
-                    & 0 to 15           & seconds\\
+                    & 0 to 15           & s\\
       crossfade fade out duration
-                    & 0 to 15           & seconds\\
+                    & 0 to 15           & s\\
       crossfade fade out mode
                     & crossfade, mix    & N/A\\
       }
 %
       crossfeed     & on, off           & N/A\\
       crossfeed direct gain
-                    & 0 to 60           & 0.1 dB\\
+                    & 0 to 60           & 0.1~dB\\
       crossfeed cross gain
-                    & 30 to 120         & 0.1 dB\\
+                    & 30 to 120         & 0.1~dB\\
       crossfeed hf attenuation
-                    & 60 to 240         & 0.1 dB\\
+                    & 60 to 240         & 0.1~dB\\
       crossfeed hf cutoff
                     & 500 to 2000       & Hz\\
 %
       eq enabled    & on, off           & N/A\\
-      eq precut     & 0 to 240          & 0.1 dB\\
+      eq precut     & 0 to 240          & 0.1~dB\\
       eq band 0 cutoff & 0 to 32768     & Hz\\
       eq band 1 cutoff & 0 to 32768     & Hz\\
       eq band 2 cutoff & 0 to 32768     & Hz\\
@@ -198,23 +198,23 @@
       eq band 2 q   & 0 to 64           & N/A\\
       eq band 3 q   & 0 to 64           & N/A\\
       eq band 4 q   & 0 to 64           & N/A\\
-      eq band 0 gain & -240 to 240      & 0.1 dB\\
-      eq band 1 gain & -240 to 240      & 0.1 dB\\
-      eq band 2 gain & -240 to 240      & 0.1 dB\\
-      eq band 3 gain & -240 to 240      & 0.1 dB\\
-      eq band 4 gain & -240 to 240      & 0.1 dB\\
+      eq band 0 gain & -240 to 240      & 0.1~dB\\
+      eq band 1 gain & -240 to 240      & 0.1~dB\\
+      eq band 2 gain & -240 to 240      & 0.1~dB\\
+      eq band 3 gain & -240 to 240      & 0.1~dB\\
+      eq band 4 gain & -240 to 240      & 0.1~dB\\
 %
       dithering enabled & on, off       & N/A\\
 %
       timestretch enabled & on, off     & N/A\\
 %
-      compressor threshold      & 0 to -24      & -3dB\\
+      compressor threshold      & 0 to -24      & -3~dB\\
       compressor makeup gain    & off, auto     & N/A\\
       compressor ratio          & 2:1, 4:1, 6:1, 10:1, limit
                                                 & N/A\\
       compressor knee           & hard knee, soft knee
                                                 & N/A\\
-      compressor release time   & 100 to 1000   & 100 ms\\
+      compressor release time   & 100 to 1000   & 100~ms\\
 %
       beep          & off, weak, moderate, strong & N/A\\
       keyclick      & off, weak, moderate, strong & N/A\\
@@ -226,8 +226,8 @@
     \opt{masf}{
       loudness      & 0 to 17           & N/A\\
       superbass     & on, off           & N/A\\
-      auto volume   & off, 20 ms, 2 s, 4 s, 8 s
-                                        & seconds\\
+      auto volume   & off, 20ms, 2s, 4s, 8s
+                                        & N/A\\
       mdb enable    & on,off            & N/A\\
       mdb strength  & 0 to 127          & dB\\
       mdb harmonics & 0 to 100          & \%\\
@@ -301,10 +301,10 @@
                 & on, off               & N/A\\
       remote backlight timeout
                 & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25,
-                  30, 45, 60, 90        & seconds\\
+                  30, 45, 60, 90        & s\\
       remote backlight timeout plugged
                 & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25,
-                  30, 45, 60, 90        & seconds\\
+                  30, 45, 60, 90        & s\\
       remote caption backlight
                 & on, off               & N/A\\
       remote scroll speed
@@ -343,7 +343,7 @@
                 & off, 0:05, 0:10, 0:15, 0:30, 1:00, 2:00, 4:00, 6:00,
                   8:00, 16:00, 24:00    & h:mm\\
      pre-recording time
-                & off, 1 to 30          & seconds\\
+                & off, 1 to 30          & s\\
      rec directory & /path/to/dir       & N/A\\
     }%
     \opt{spdif_power}{
@@ -357,7 +357,7 @@
       jump scroll
                 & 0 to 5                & N/A\\
       jump scroll delay
-                & 0 to 250              & 0.01 s\\
+                & 0 to 250              & 0.01~s\\
     }%
 
     \bottomrule

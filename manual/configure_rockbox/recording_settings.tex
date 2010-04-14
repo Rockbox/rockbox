@@ -21,10 +21,10 @@
   \begin{table}[h!]
       \begin{rbtabular}{0.75\textwidth}{lX}%
         {\emph{Frequency} & \emph{Bitrate} (Kbit/s) -- quality 0$\rightarrow$7}{}{}
-        44100 Hz stereo   & 75, 80, 90, 100, 120, 140, 160, 170 \\
-        22050 Hz stereo   & 39, 41, 45, 50,  60,  80,  110, 130 \\
-        44100 Hz mono     & 65, 68, 73, 80,  90,  105, 125, 140 \\
-        22050 Hz mono     & 35, 38, 40, 45,  50,  60,  75,  90 \\
+        44100~Hz stereo   & 75, 80, 90, 100, 120, 140, 160, 170 \\
+        22050~Hz stereo   & 39, 41, 45, 50,  60,  80,  110, 130 \\
+        44100~Hz mono     & 65, 68, 73, 80,  90,  105, 125, 140 \\
+        22050~Hz mono     & 35, 38, 40, 45,  50,  60,  75,  90 \\
       \end{rbtabular}
   \end{table}
 }
@@ -44,30 +44,30 @@
   \section{Frequency}
    \nopt{sansa}{
     Choose the recording frequency (sample rate).
-    \opt{masf}{48 kHz, 44.1 kHz, 32 kHz, 24 kHz, 22.05 kHz, 16 kHz}
-    \opt{h100,h300}{44.1 kHz, 22.05 kHz and 11.025 kHz}
-    \opt{x5}{88.2 kHz, 44.1 kHz, 22.05 kHz and 11.025 kHz}
-    \opt{sansaAMS}{96 kHz, 88.2 kHz, 64 kHz, 48 kHz, 44.1 kHz, 32 kHz, 24 kHz, %
-        22.05 kHz, 16 kHz, 12 kHz, 11.025 kHz and 8 kHz}
-    \opt{gigabeats}{48 kHz, 44.1 kHz, 32 kHz, 24 kHz, 22.05 kHz, 16 kHz, 12 kHz, %
-        11.025 kHz and 8 kHz}
+    \opt{masf}{48~kHz, 44.1~kHz, 32~kHz, 24~kHz, 22.05~kHz, 16~kHz}
+    \opt{h100,h300}{44.1~kHz, 22.05~kHz and 11.025~kHz}
+    \opt{x5}{88.2~kHz, 44.1~kHz, 22.05~kHz and 11.025~kHz}
+    \opt{sansaAMS}{96~kHz, 88.2~kHz, 64~kHz, 48~kHz, 44.1~kHz, 32~kHz, 24~kHz, %
+        22.05~kHz, 16~kHz, 12~kHz, 11.025~kHz and 8~kHz}
+    \opt{gigabeats}{48~kHz, 44.1~kHz, 32~kHz, 24~kHz, 22.05~kHz, 16~kHz, 12~kHz, %
+        11.025~kHz and 8~kHz}
     are available. Higher sample rates use up more disk space, but give better
     sound quality.
-    \opt{swcodec}{\note{The 11.025 kHz setting is not available when using %
+    \opt{swcodec}{\note{The 11.025~kHz setting is not available when using %
       \setting{MPEG Layer 3} format.}
     }%
     \opt{masf}{
       The frequency setting also determines which version of the MPEG standard
       the sound is recorded using:\\
-      MPEG v1 for 48 kHz, 44.1 kHz and 32 kHz.\\
-      MPEG v2 for 24 kHz, 22.05 kHz and 16 kHz.\\
+      MPEG v1 for 48~kHz, 44.1~kHz and 32~kHz.\\
+      MPEG v2 for 24~kHz, 22.05~kHz and 16~kHz.\\
     }
     \opt{recorder,recorderv2fm,h100}
       {\note{You cannot change the sample rate for digital recordings.}
     }
    } % nopt sansa
    \opt{sansa}{
-       Recordings can only be made at a 22.05 kHz frequency (sample rate)
+       Recordings can only be made at a 22.05~kHz frequency (sample rate)
          on this \dap. 
     } % opt sansa
 
@@ -121,7 +121,7 @@
       Set the time to record between each split, if time is used as
       \setting{Split Measure}.\\
       Options (hours:minutes between splits): Off, 00:05, 00:10, 00:15, 00:30,
-      1:00, 1:14 (74 minute  CD), 1:20 (80 minute CD), 2:00, 4:00, 8:00, 10:00,
+      1:00, 1:14 (74 minute CD), 1:20 (80 minute CD), 2:00, 4:00, 8:00, 10:00,
       12:00, 18:00, 24:00.
 
     \item[Split Filesize.]
@@ -242,25 +242,25 @@ More information can be found at \wikilink{VolumeTriggeredRecording}.
     automatically controlling the gain while recording.
     \begin{description}
       \item[Safety (clip).]
-        This preset will lower the gain when the levels get too high (-1 dB)
+        This preset will lower the gain when the levels get too high (-1~dB)
         and will never increase gain.
         
       \item[Live (slow).]
         This preset is designed to be used for recording of live shows and has
         quite large headroom for loud parts. It heads for a nominal target peak
-        level of -9 dB and will slowly increase or decrease gain to reach it.
+        level of -9~dB and will slowly increase or decrease gain to reach it.
         
       \item[DJ-Set (slow).]
-        This preset heads for a nominal target peak level of -5 dB and will
+        This preset heads for a nominal target peak level of -5~dB and will
         slowly increase or decrease gain to reach it.
         
       \item[Medium.]
-        This preset heads for a nominal target peak level of -6 dB and will
+        This preset heads for a nominal target peak level of -6~dB and will
         increase or decrease gain to reach it.
 
       \item[Voice (fast).]
         This preset is designed to be used for voice recording and heads for a
-        nominal target peak level of -7 dB and will quickly increase or
+        nominal target peak level of -7~dB and will quickly increase or
         decrease gain to reach it.
     \end{description}
 
