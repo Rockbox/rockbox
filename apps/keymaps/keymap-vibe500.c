@@ -117,7 +117,7 @@ static const struct button_mapping button_context_yesno[]  = {
 }; /* button_context_yesno */
 
 static const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMS_DELETE,          BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
+    { ACTION_BMS_DELETE,          BUTTON_CANCEL|BUTTON_REPEAT,       BUTTON_CANCEL },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
