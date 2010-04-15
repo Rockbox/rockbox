@@ -1,0 +1,25 @@
+% $Id: vibe500.tex 24014 2010-03-29 21:39:44Z b0hoon $ %
+\def\UseOption{vibe500}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,PBELL_VIBE500_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_BUTTON_LIGHTS}
+\edef\UseOption{\UseOption,HAVE_DISK_STORAGE}
+\edef\UseOption{\UseOption,packardbell}
+
+\newcommand{\playerman}{Packard Bell}
+\newcommand{\playertype}{Vibe 500}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{160x128x16}
+\newcommand{\specimg}{vibe500}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.mi4}}
+\newcommand{\firmwareextension}{\fname{mi4}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{hard disk}
+
+% link external keymap file
+\input{platform/keymap-vibe500.tex}

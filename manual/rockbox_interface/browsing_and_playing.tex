@@ -215,7 +215,7 @@ example when renaming a file or creating a new directory.
   Also you can switch to Morse code input mode by changing the
   \setting{Use Morse Code Input} setting%
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
-      ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD}%
+      ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,PBELL_VIBE500_PAD}%
     { or by pressing \ActionKbdMorseInput{} in the virtual keyboard}%
   .
 }
@@ -269,7 +269,8 @@ example when renaming a file or creating a new directory.
     \end{btnmap}
   \end{table}
 }
-\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD}{
+\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD
+     ,PBELL_VIBE500_PAD}{
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
@@ -288,6 +289,11 @@ example when renaming a file or creating a new directory.
       \opt{HAVEREMOTEKEYMAP}{& }
       & Insert the selected keyboard letter at the current line cursor position. \\
       %
+      \opt{PBELL_VIBE500_PAD}{
+      \ActionKbdBackSpace
+      & Delete the character before the line cursor. \\
+      }
+      %
       \ActionKbdDone
       \opt{HAVEREMOTEKEYMAP}{& }
       & Exit the virtual keyboard and save any changes. \\
@@ -297,7 +303,7 @@ example when renaming a file or creating a new directory.
       & Exit the virtual keyboard without saving any changes. \\
       %
       \opt{morse_input}{
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{
           \ActionKbdMorseInput
           \opt{HAVEREMOTEKEYMAP}{& }
           & Toggle keyboard input mode and Morse code input mode. \\

@@ -405,6 +405,26 @@ detail in the following paragraph.
   above this button is the headphone jack.
   }
   %
+  \opt{vibe500}{
+  Hold or lay the \dap{} so that the side with the controls and
+  LCD is facing towards you. Below the LCD is the touch sensitive pad with the \ButtonMenu{}, 
+  \ButtonPlay{}, \ButtonPrev{}, \ButtonNext{} controls and the scroll pad in the centre. The 
+  scroll pad is oriented vertically and it is between the \ButtonOK{} and \ButtonCancel{} buttons.
+  Sliding the finger between these buttons down or up acts as \ButtonDown{} or \ButtonUp{}
+  action respectively. Note that the scroll pad is sensitive, so you will need to move 
+  slowly at first and get a feel for how it works. 
+
+  There are two buttons on the right hand side of the \dap{}: \ButtonPower{} on the top and 
+  \ButtonRec{} underneath. Under these buttons, from top to bottom you can find: USB connector, 
+  power connector and the reset hole to make a hardware reset. 
+
+  The \ButtonHold{} switch is located on the left hand side of the \dap{}. Note that when the 
+  \ButtonHold{} switch is moved to the top of the \dap{}, hold is on, and none of the other 
+  controls do anything. Be sure \ButtonHold{} is off before trying to use your player. 
+
+  On the top on the \dap{} is the internal microphone on the left and the line-in jack, near 
+  the headphone jack on the right.}
+  %
   \opt{player}{
   The main controls of this player are a four-way button on the right below
   the screen, and two round buttons to the left of it. Hold the \dap{} with
@@ -472,7 +492,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}%
           {Long \ButtonOn}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
-          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS}{\ButtonPower}%
+          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,PBELL_VIBE500_PAD%
+          }{\ButtonPower}%
       \opt{COWON_D2_PAD} {\ButtonPower{}, then \ButtonHold}%
     \opt{HAVEREMOTEKEYMAP}{&
       \opt{IRIVER_RC_H100_PAD}{\ButtonRCOn}%
@@ -484,8 +505,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
       \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}%
       \opt{PLAYER_PAD}{From the Main Menu, select \textbf{Shutdown}}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
-          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD}%
-          {Long \ButtonPower}%
+          ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD%
+          ,PBELL_VIBE500_PAD}{Long \ButtonPower}%
     \opt{HAVEREMOTEKEYMAP}{& 
       \opt{IRIVER_RC_H100_PAD}{Long \ButtonRCStop}%
           }
@@ -518,7 +539,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   \opt{SANSA_E200_PAD,SANSA_C200_PAD,IAUDIO_X5_PAD,IAUDIO_M5_PAD}
   {\ButtonPower} until the \dap{} shuts off or reboots.
 }%
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD,IRIVER_H10_PAD,MROBE100_PAD}{%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD,IRIVER_H10_PAD,MROBE100_PAD
+,PBELL_VIBE500_PAD}{%
   In the unlikely event of a software failure, a hardware reset can be
   performed by inserting a paperclip gently into the Reset hole.
 }%
@@ -613,6 +635,15 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   \opt{cowond2}
     {
     Use \ButtonPower{} to boot the original \playerman{} firmware.
+    }
+
+  \opt{vibe500}
+    {
+    Rockbox has a dual-boot feature. It loads the original firmware from
+    the file \fname{/System/OF.mi4}. To boot into the original firmware,
+    press the \ButtonPower{} normally, without holding it. After the backlight
+    reaction (when it turns on) immediately press and hold the \ButtonOK{}
+    button.
     }
 
   }

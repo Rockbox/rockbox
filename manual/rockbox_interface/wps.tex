@@ -130,7 +130,7 @@ your WPS (While Playing Screen).
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
          & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
       }%
-      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD}{%
+      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{%
         \ActionWpsPlaylist 
           & Show current \setting{Playlist}.\\%
       }%
@@ -274,7 +274,7 @@ Menu} (see \reference{ref:Hotkeys}).} To access this screen, %
       SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{
   press \ActionWpsIdThreeScreen. }%
 \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD,%
-      GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_CLIP_PAD}{press
+      GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_CLIP_PAD,PBELL_VIBE500_PAD}{press
   \ActionWpsContext{} to access the \setting{WPS Context Menu} and select
   \setting{Show Track Info}. }%
 \opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
@@ -362,10 +362,12 @@ This may even be the whole track. \opt{hotkey}{\setting{Hotkey}able (see \refere
         & Increase~/ Decrease pitch by 0.1\% (in procentual mode) or 0.1
           semitone (in semitone mode).\\
         %
+        \nopt{PBELL_VIBE500_PAD}{ % ther is no long scroll up or down because of slide
         \ActionPsIncBig{} / \ActionPsDecBig
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
         & Increase~/ Decrease pitch by 1\% (in procentual mode) or a semitone
           (in semitone mode).\\
+        }
         %
         \ActionPsNudgeLeft{} / \ActionPsNudgeRight
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionPsNudgeRight}

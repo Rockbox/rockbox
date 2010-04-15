@@ -171,7 +171,17 @@ follow the instructions at
       $\rightarrow$ Connections $\rightarrow$ PC Connections} is set to 
       \setting{gigabeat room}. Also, during installation, do not connect your
       \dap{} using the cradle but plug the USB cable directly to the \dap{}.
-  } 
+  }
+  \opt{vibe500}{
+    The installation requires you to use UMS mode.
+    In order to start up your \playertype{} in UMS mode you need to:
+      \begin{enumerate}
+        \item Turn off the \dap{} (Original Firmware).
+        \item Connect your \playertype{} to the computer using the data cable.
+        \item Push and hold \ButtonPower{} (for about 2 seconds) until the "USB" screen appears.
+      \end{enumerate}
+    The \dap{} will now appear as a regular disk on your computer.
+  }
 \end{description}
 }
 
@@ -407,7 +417,7 @@ data partiton.}}
 \dap{}.}}
 
 \item Connect your \dap{} to the computer via USB 
-  \opt{sansa,sansaAMS,h10,h10_5gb}{ in MSC mode }
+  \opt{sansa,sansaAMS,h10,h10_5gb,vibe500}{ in MSC mode }
   \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
@@ -453,6 +463,7 @@ structure that Rockbox needs.\\}
   \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
   \opt{cowond2}{\input{getting_started/cowond2_install.tex}}
+  \opt{vibe500}{\input{getting_started/vibe500_install.tex}}
 }}
 
 \subsection{Finishing the install}\label{ref:finish_install}
@@ -483,7 +494,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2}{
+\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2,vibe500}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -626,6 +637,15 @@ completely follow the manual uninstallation instructions below.}}
   connect the \dap{} to your computer, and delete the
   \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}} file and rename
   \fname{OF.mi4} to \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
+  in the \fname{System} directory on your \playertype{}. As in the installation,
+  it may be necessary to first put your device into UMS mode.
+}
+
+\opt{vibe500}{
+  If you would like to go back to using the original \playerman{} software,
+  connect the \dap{} to your computer, and delete the
+  \fname{jukebox.mi4} file and rename
+  \fname{OF.mi4} to \fname{JUKEBOX.mi4}
   in the \fname{System} directory on your \playertype{}. As in the installation,
   it may be necessary to first put your device into UMS mode.
 }
