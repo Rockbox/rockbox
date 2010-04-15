@@ -15,10 +15,78 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="vibe500m.svg"
-   style="display:inline;enable-background:new">
+   sodipodi:docname="vibe500-front.svg"
+   style="display:inline;enable-background:new"
+   inkscape:export-filename="/home/marko/vibe500-front.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mstart"
+       style="overflow:visible">
+      <path
+         id="path4276"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.4) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="TriangleInL"
+       style="overflow:visible">
+      <path
+         id="path4404"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(-0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lstart"
+       style="overflow:visible">
+      <path
+         id="path4288"
+         style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) translate(1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path4270"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lend"
+       style="overflow:visible;">
+      <path
+         id="path4273"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none;"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
     <linearGradient
        id="linearGradient4997">
       <stop
@@ -2924,6 +2992,46 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5295"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <marker
+       inkscape:stockid="TriangleInL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInL-1"
+       style="overflow:visible">
+      <path
+         id="path4404-0"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(-0.8,-0.8)" />
+    </marker>
+    <inkscape:perspective
+       id="perspective5905"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mstart-8"
+       style="overflow:visible">
+      <path
+         id="path4276-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -2932,11 +3040,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.45254834"
-     inkscape:cx="314.8011"
-     inkscape:cy="246.72805"
+     inkscape:zoom="0.90509668"
+     inkscape:cx="180.58372"
+     inkscape:cy="309.18494"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="svg2"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -2946,7 +3054,7 @@
      inkscape:snap-nodes="true"
      inkscape:bbox-paths="true"
      inkscape:window-width="1280"
-     inkscape:window-height="731"
+     inkscape:window-height="730"
      inkscape:window-x="0"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -2968,7 +3076,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -3420,21 +3528,21 @@
          y="236.6617"
          x="-159.07701"
          id="tspan3273"
-         sodipodi:role="line">Left</tspan></text>
+         sodipodi:role="line">Prev</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3279"
-       y="346.36658"
-       x="-165.52122"
+       y="350.5098"
+       x="-227.11685"
        style="font-size:30px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;enable-background:new;font-family:Palatino Linotype"
        xml:space="preserve"
        inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
        inkscape:export-xdpi="72"
        inkscape:export-ydpi="72"><tspan
-         y="346.36658"
-         x="-165.52122"
+         y="350.5098"
+         x="-227.11685"
          id="tspan3281"
-         sodipodi:role="line">Down</tspan></text>
+         sodipodi:role="line">Scroll Down</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:30px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;enable-background:new;font-family:Palatino Linotype"
@@ -3466,8 +3574,8 @@
     <text
        xml:space="preserve"
        style="font-size:30px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;enable-background:new;font-family:Palatino Linotype"
-       x="-129.06102"
-       y="25.686758"
+       x="-202.25761"
+       y="18.228991"
        id="text3295"
        sodipodi:linespacing="125%"
        inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
@@ -3475,8 +3583,8 @@
        inkscape:export-ydpi="72"><tspan
          sodipodi:role="line"
          id="tspan3297"
-         x="-129.06102"
-         y="25.686758">Up</tspan></text>
+         x="-202.25761"
+         y="18.228991">Scroll Up</tspan></text>
     <path
        sodipodi:nodetypes="cc"
        style="fill:#000000;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;enable-background:new"
@@ -3512,7 +3620,7 @@
          y="234.38086"
          x="444.41373"
          id="tspan3289"
-         sodipodi:role="line">Right</tspan></text>
+         sodipodi:role="line">Next</tspan></text>
     <path
        sodipodi:nodetypes="cc"
        style="fill:#000000;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;enable-background:new"
@@ -3524,7 +3632,7 @@
     <path
        sodipodi:nodetypes="cc"
        style="fill:#000000;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;enable-background:new"
-       d="M -76.943663,21.048605 162.96722,122.3897"
+       d="M -73.818663,21.829855 166.09222,123.17095"
        id="path4530-4-3"
        inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
        inkscape:export-xdpi="72"
@@ -3550,7 +3658,7 @@
          sodipodi:role="line"
          x="469.60284"
          y="329.56854"
-         id="tspan13772">C</tspan></text>
+         id="tspan3489">Cancel</tspan></text>
     <path
        sodipodi:nodetypes="cc"
        style="fill:#000000;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;enable-background:new"
@@ -3584,4 +3692,12 @@
        inkscape:export-xdpi="72"
        inkscape:export-ydpi="72" />
   </g>
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.00199997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:url(#Arrow1Mstart);display:inline;enable-background:new"
+     d="m 176.07422,359.16099 0,35.0361"
+     id="path4715-8" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.00199997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:url(#Arrow1Mstart);display:inline;enable-background:new"
+     d="m 176.07422,457.9425 0,-35.0361"
+     id="path4715-8-4" />
 </svg>
