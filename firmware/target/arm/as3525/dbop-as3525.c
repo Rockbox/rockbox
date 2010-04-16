@@ -34,8 +34,48 @@
 /* doesn't work with the new ams sansas so far and is not needed */
 static short int dbop_input_value = 0;
 
+#if defined(SANSA_C200V2)
+/*
+ * workaround DBOP noise issue cause it's really annoying if your
+ * buttons don't work in the debug menu...
+ */
+static short int input_value_tmp[2];
+int dbop_denoise_reject = 0;
+int dbop_denoise_accept = 0;
+#endif
+
 /* read the DBOP data pins */
+#if defined(SANSA_C200V2)
+unsigned short dbop_read_input_once(void);
+
 unsigned short dbop_read_input(void)
+{
+    int i;
+
+    while (1) {
+        for (i=0; i<2; i++) {
+            input_value_tmp[i] = dbop_read_input_once();
+        }
+        /* noise rejection */
+        if (input_value_tmp[0] == input_value_tmp[1]) {
+            dbop_denoise_accept++;
+            break;
+        } else {
+            dbop_denoise_reject++;
+        }
+    }
+    if (dbop_denoise_accept + dbop_denoise_reject > 1000) {
+        dbop_denoise_accept /= 2;
+        dbop_denoise_reject /= 2;
+    }
+
+    return dbop_input_value;
+}
+
+unsigned short dbop_read_input_once(void)
+#else
+unsigned short dbop_read_input(void)
+#endif
 {
     unsigned int dbop_ctrl_old = DBOP_CTRL;
     unsigned int dbop_timpol23_old = DBOP_TIMPOL_23;

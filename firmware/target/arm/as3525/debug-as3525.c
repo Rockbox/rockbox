@@ -257,12 +257,23 @@ bool __dbg_hw_info(void)
         while(1)
         {
 #ifdef SANSA_C200V2
+        extern int dbop_denoise_accept;
+        extern int dbop_denoise_reject;
+
         lcd_clear_display();
         line = 0;
         lcd_puts(0, line++, "[Submodel:]");
         lcd_putsf(0, line++, "C200v2 variant %d", c200v2_variant);
+        if (dbop_denoise_accept) {
+            lcd_putsf(0, line++, "DBOP noise: %d%%",
+                      (100*dbop_denoise_reject)/dbop_denoise_accept);
+        } else {
+            lcd_puts(0, line++, "DBOP noise: oo");
+        }
+        lcd_putsf(0, line++, "reject: %d", dbop_denoise_reject);
+        lcd_putsf(0, line++, "accept: %d", dbop_denoise_accept);
         lcd_update();
-        int btn = button_get(1);
+        int btn = button_get_w_tmo(HZ/10);
         if(btn == (DEBUG_CANCEL|BUTTON_REL))
             goto end;
         else if(btn == (BUTTON_DOWN|BUTTON_REL))
