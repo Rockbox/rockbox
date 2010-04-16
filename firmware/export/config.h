@@ -664,6 +664,7 @@ Lyre prototype 1 */
 #else /* !BOOTLOADER */
 
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
+#define HAVE_WAKEUP_EXT_CB
 
 #ifndef SIMULATOR
 #define HAVE_PRIORITY_SCHEDULING
