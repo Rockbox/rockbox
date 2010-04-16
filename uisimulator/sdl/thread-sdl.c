@@ -50,7 +50,7 @@ static char __name[32];
     ({ fprintf(stderr, str); exit(-1); })
 
 /* Thread/core entries as in rockbox core */
-struct core_entry cores[NUM_CORES];
+static struct core_entry cores[NUM_CORES];
 struct thread_entry threads[MAXTHREADS];
 /* Jump buffers for graceful exit - kernel threads don't stay neatly
  * in their start routines responding to messages so this is the only

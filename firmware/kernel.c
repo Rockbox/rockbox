@@ -57,8 +57,6 @@ volatile long current_tick SHAREDDATA_ATTR = 0;
 /* List of tick tasks - final element always NULL for termination */
 void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
 
-extern struct core_entry cores[NUM_CORES];
-
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct
 {
@@ -535,7 +533,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == cores[CURRENT_CORE].running,
+                  QUEUE_GET_THREAD(q) == thread_id_entry(THREAD_ID_CURRENT),
                   "queue_wait->wrong thread\n");
 #endif
 
@@ -547,7 +545,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     
     if (q->read == q->write)
     {
-        struct thread_entry *current = cores[CURRENT_CORE].running;
+        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
 
         do
         {
@@ -582,7 +580,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == cores[CURRENT_CORE].running,
+                  QUEUE_GET_THREAD(q) == thread_id_entry(THREAD_ID_CURRENT),
                   "queue_wait_w_tmo->wrong thread\n");
 #endif
 
@@ -594,7 +592,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     if (q->read == q->write && ticks > 0)
     {
-        struct thread_entry *current = cores[CURRENT_CORE].running;
+        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
 
         IF_COP( current->obj_cl = &q->cl; )
         current->bqp = &q->queue;
@@ -669,7 +667,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     {
         struct queue_sender_list *send = q->send;
         struct thread_entry **spp = &send->senders[wr];
-        struct thread_entry *current = cores[CURRENT_CORE].running;
+        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
 
         if(UNLIKELY(*spp))
         {
@@ -878,8 +876,7 @@ void mutex_init(struct mutex *m)
 /* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
 {
-    const unsigned int core = CURRENT_CORE;
-    struct thread_entry *current = cores[core].running;
+    struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
 
     if(current == MUTEX_GET_THREAD(m))
     {
@@ -918,10 +915,10 @@ void mutex_lock(struct mutex *m)
 void mutex_unlock(struct mutex *m)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(MUTEX_GET_THREAD(m) == cores[CURRENT_CORE].running,
+    KERNEL_ASSERT(MUTEX_GET_THREAD(m) == thread_id_entry(THREAD_ID_CURRENT),
                   "mutex_unlock->wrong thread (%s != %s)\n",
                   MUTEX_GET_THREAD(m)->name,
-                  cores[CURRENT_CORE].running->name);
+                  thread_id_entry(THREAD_ID_CURRENT)->name);
 
     if(m->count > 0)
     {
@@ -989,7 +986,7 @@ void semaphore_wait(struct semaphore *s)
     }
 
     /* too many waits - block until dequeued... */
-    current = cores[CURRENT_CORE].running;
+    current = thread_id_entry(THREAD_ID_CURRENT);
 
     IF_COP( current->obj_cl = &s->cl; )
     current->bqp = &s->queue;
@@ -1051,7 +1048,7 @@ int wakeup_wait(struct wakeup *w, int timeout)
 
     if(LIKELY(w->signalled == 0 && timeout != TIMEOUT_NOBLOCK))
     {
-        struct thread_entry * current = cores[CURRENT_CORE].running;
+        struct thread_entry * current = thread_id_entry(THREAD_ID_CURRENT);
 
         IF_COP( current->obj_cl = &w->cl; )
         current->bqp = &w->queue;

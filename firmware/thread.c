@@ -119,7 +119,7 @@
 /* Cast to the the machine pointer size, whose size could be < 4 or > 32
  * (someday :). */
 #define DEADBEEF ((uintptr_t)0xdeadbeefdeadbeefull)
-struct core_entry cores[NUM_CORES] IBSS_ATTR;
+static struct core_entry cores[NUM_CORES] IBSS_ATTR;
 struct thread_entry threads[MAXTHREADS] IBSS_ATTR;
 
 static const char main_thread_name[] = "main";
