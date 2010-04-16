@@ -1820,7 +1820,7 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
     <message>
         <location filename="../rbutilqt.cpp" line="336"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
-        <translation>Dies ist eine neue Installation oder eine neue Version von Rockbox Utility. Der Konfigurationsdialog wird nun automatisch geöffnet umd das Programm zu konfigurieren oder die Einstellungen zu prüfen.</translation>
+        <translation>Dies ist eine neue Installation oder eine neue Version von Rockbox Utility. Der Konfigurationsdialog wird nun automatisch geöffnet, um das Programm zu konfigurieren oder die Einstellungen zu prüfen.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="573"/>
