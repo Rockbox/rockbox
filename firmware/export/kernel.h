@@ -137,14 +137,6 @@ struct event_queue
     IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 
-#ifdef HAVE_PRIORITY_SCHEDULING
-#define MUTEX_SET_THREAD(m, t) ((m)->blocker.thread = (t))
-#define MUTEX_GET_THREAD(m)    ((m)->blocker.thread)
-#else
-#define MUTEX_SET_THREAD(m, t) ((m)->thread = (t))
-#define MUTEX_GET_THREAD(m)    ((m)->thread)
-#endif
-
 struct mutex
 {
     struct thread_entry *queue;         /* waiter list */
