@@ -196,10 +196,9 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct mp3entry id3;
 #endif
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
-    unsigned int buf_used = 0;
     
     gwps->display->set_viewport(viewer->vp);
-    for(i=start_item; (i-start_item)<lines && i<playlist_amount(); i++)
+    for(i=start_item; (i-start_item)<lines && i<=playlist_amount(); i++)
     {
         if (i == cur_playlist_pos)
         {
@@ -223,9 +222,9 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
         int line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;
         int j = 0, cur_string = 0;
         char *filename = playlist_peek(i-cur_playlist_pos);
+        unsigned int line_len = 0;
         buf[0] = '\0';
-        buf_used = 0;
-        while (j < viewer->lines[line].count && (buf_used<sizeof(buf)))
+        while (j < viewer->lines[line].count && line_len < sizeof(buf))
         {
             const char *out = NULL;
             token.type = viewer->lines[line].tokens[j];
@@ -234,8 +233,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             out = get_id3_token(&token, pid3, tempbuf, sizeof(tempbuf), -1, NULL);
             if (out)
             {
-                snprintf(&buf[buf_used], sizeof(buf)-buf_used, "%s", out);
-                buf_used += strlen(out);
+                line_len = strlcat(buf, out, sizeof(buf));
                 j++;
                 continue;
             }
@@ -270,8 +268,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             }
             if (tempbuf[0])
             {
-                snprintf(&buf[buf_used], sizeof(buf)-buf_used, "%s", tempbuf);
-                buf_used += strlen(tempbuf);
+                line_len = strlcat(buf, tempbuf, sizeof(buf));
             }
             j++;
         }
