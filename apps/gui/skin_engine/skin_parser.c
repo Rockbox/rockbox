@@ -801,6 +801,7 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
                     viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_CHARACTER;
                     viewer->lines[line].strings[cur_string][0] = *text;
                     viewer->lines[line].strings[cur_string++][1] = '\0';
+                    text++;
                     break;
                 default:
                 for (tag = all_tags;
