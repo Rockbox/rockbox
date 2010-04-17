@@ -259,7 +259,7 @@ struct thread_entry
 #endif
     struct thread_entry *queue; /* List of threads waiting for thread to be
                                   removed */
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+#ifdef HAVE_WAKEUP_EXT_CB
     void (*wakeup_ext_cb)(struct thread_entry *thread); /* Callback that
                                   performs special steps needed when being
                                   forced off of an object's wait queue that
