@@ -629,7 +629,8 @@ struct mp3entry* audio_next_track(void)
     return NULL;
 }
 
-bool audio_peek_track(struct mp3entry* id3, int offset)
+/* gets a pointer to the id3 data, Not thread safe!, DON'T yield()/sleep() */
+bool audio_peek_track(struct mp3entry** id3, int offset)
 {
     int next_idx;
     int new_offset = ci.new_track + wps_offset + offset;
@@ -640,7 +641,7 @@ bool audio_peek_track(struct mp3entry* id3, int offset)
 
     if (tracks[next_idx].id3_hid >= 0)
     {
-        return bufread(tracks[next_idx].id3_hid, sizeof(struct mp3entry), id3) 
+        return bufgetdata(tracks[next_idx].id3_hid, 0, (void**)id3) 
                     == sizeof(struct mp3entry);
     }
     return false;

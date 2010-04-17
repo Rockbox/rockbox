@@ -178,7 +178,7 @@ static void draw_progressbar(struct gui_wps *gwps,
     }
 }
 
-bool audio_peek_track(struct mp3entry* id3, int offset);
+bool audio_peek_track(struct mp3entry** id3, int offset);
 static void draw_playlist_viewer_list(struct gui_wps *gwps,
                                       struct playlistviewer *viewer)
 {
@@ -192,9 +192,6 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     int x, length, alignment = WPS_TOKEN_ALIGN_LEFT;
     
     struct mp3entry *pid3;
-#if CONFIG_CODEC == SWCODEC
-    struct mp3entry id3;
-#endif
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
     
     gwps->display->set_viewport(viewer->vp);
@@ -209,9 +206,10 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             pid3 = state->nid3;
         }
 #if CONFIG_CODEC == SWCODEC
-        else if ((i>cur_playlist_pos) && audio_peek_track(&id3, i-cur_playlist_pos))
+        else if (i>cur_playlist_pos)
         {
-            pid3 = &id3;
+            if (!audio_peek_track(&pid3, i-cur_playlist_pos))
+                pid3 = NULL;
         }
 #endif
         else
