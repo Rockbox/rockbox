@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include "lcd.h"
+#include "lcd-clip.h"
 #include "system.h"
 #include "cpu.h"
 
