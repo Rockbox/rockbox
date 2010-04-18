@@ -150,7 +150,7 @@ struct mutex
     struct thread_entry *thread;
 #endif
     IF_COP( struct corelock cl; )       /* multiprocessor sync */
-    unsigned char locked;               /* locked semaphore */
+    bool locked;                        /* locked semaphore */
 };
 
 #ifdef HAVE_SEMAPHORE_OBJECTS
@@ -167,7 +167,7 @@ struct semaphore
 struct wakeup
 {
     struct thread_entry *queue;         /* waiter list */
-    unsigned char signalled;            /* signalled status */
+    bool signalled;                     /* signalled status */
     IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 #endif

@@ -892,7 +892,7 @@ void mutex_init(struct mutex *m)
     corelock_init(&m->cl);
     m->queue = NULL;
     m->count = 0;
-    m->locked = 0;
+    m->locked = false;
     mutex_set_thread(m, NULL);
 #ifdef HAVE_PRIORITY_SCHEDULING
     m->blocker.priority = PRIORITY_IDLE;
@@ -916,11 +916,11 @@ void mutex_lock(struct mutex *m)
     /* lock out other cores */
     corelock_lock(&m->cl);
 
-    if(LIKELY(m->locked == 0))
+    if(LIKELY(!m->locked))
     {
         /* lock is open */
         mutex_set_thread(m, current);
-        m->locked = 1;
+        m->locked = true;
         corelock_unlock(&m->cl);
         return;
     }
@@ -963,7 +963,7 @@ void mutex_unlock(struct mutex *m)
     {
         /* no threads waiting - open the lock */
         mutex_set_thread(m, NULL);
-        m->locked = 0;
+        m->locked = false;
         corelock_unlock(&m->cl);
         return;
     }
@@ -1062,7 +1062,7 @@ void semaphore_release(struct semaphore *s)
 void wakeup_init(struct wakeup *w)
 {
     w->queue = NULL;
-    w->signalled = 0;
+    w->signalled = false;
     IF_COP( corelock_init(&w->cl); )
 }
 
@@ -1074,7 +1074,7 @@ int wakeup_wait(struct wakeup *w, int timeout)
 
     corelock_lock(&w->cl);
 
-    if(LIKELY(w->signalled == 0 && timeout != TIMEOUT_NOBLOCK))
+    if(LIKELY(!w->signalled && timeout != TIMEOUT_NOBLOCK))
     {
         struct thread_entry * current = thread_id_entry(THREAD_ID_CURRENT);
 
@@ -1093,14 +1093,14 @@ int wakeup_wait(struct wakeup *w, int timeout)
         corelock_lock(&w->cl);
     }
 
-    if(UNLIKELY(w->signalled == 0))
+    if(UNLIKELY(!w->signalled))
     {
         /* Timed-out or failed */
         ret = (timeout != TIMEOUT_BLOCK) ?
             OBJ_WAIT_TIMEDOUT : OBJ_WAIT_FAILED;
     }
 
-    w->signalled = 0;  /* Reset */
+    w->signalled = false;  /* Reset */
 
     corelock_unlock(&w->cl);
     restore_irq(oldlevel);
@@ -1120,7 +1120,7 @@ int wakeup_signal(struct wakeup *w)
 
     corelock_lock(&w->cl);
 
-    w->signalled = 1;
+    w->signalled = true;
     ret = wakeup_thread(&w->queue);
 
     corelock_unlock(&w->cl);
