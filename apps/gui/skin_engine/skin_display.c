@@ -178,7 +178,6 @@ static void draw_progressbar(struct gui_wps *gwps,
     }
 }
 
-bool audio_peek_track(struct mp3entry** id3, int offset);
 static void draw_playlist_viewer_list(struct gui_wps *gwps,
                                       struct playlistviewer *viewer)
 {

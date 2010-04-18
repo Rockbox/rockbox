@@ -65,6 +65,7 @@ void audio_ff_rewind(long newpos);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
+bool audio_peek_track(struct mp3entry** id3, int offset);
 #ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int setting);
 #endif
