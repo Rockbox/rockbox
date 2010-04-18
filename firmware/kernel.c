@@ -316,7 +316,9 @@ static void queue_release_sender(struct thread_entry **sender,
     struct thread_entry *thread = *sender;
 
     *sender = NULL;               /* Clear slot. */
+#ifdef HAVE_WAKEUP_EXT_CB
     thread->wakeup_ext_cb = NULL; /* Clear callback. */
+#endif
     thread->retval = retval;      /* Assign thread-local return value. */
     *thread->bqp = thread;        /* Move blocking queue head to thread since
                                      wakeup_thread wakes the first thread in
@@ -350,7 +352,9 @@ static void queue_release_all_senders(struct event_queue *q)
 static void queue_remove_sender_thread_cb(struct thread_entry *thread)
 {
     *((struct thread_entry **)thread->retval) = NULL;
+#ifdef HAVE_WAKEUP_EXT_CB
     thread->wakeup_ext_cb = NULL;
+#endif
     thread->retval = 0;
 }
 
@@ -682,7 +686,9 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
         *spp = current;
         IF_COP( current->obj_cl = &q->cl; )
         IF_PRIO( current->blocker = q->blocker_p; )
+#ifdef HAVE_WAKEUP_EXT_CB
         current->wakeup_ext_cb = queue_remove_sender_thread_cb;
+#endif
         current->retval = (intptr_t)spp;
         current->bqp = &send->list;
 
