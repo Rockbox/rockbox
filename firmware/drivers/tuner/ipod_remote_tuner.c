@@ -29,6 +29,7 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "adc.h"
 #include "settings.h"
+#include "power.h"
 
 static bool powered = false;
 
@@ -204,7 +205,7 @@ void rmt_tuner_set_param(unsigned char tuner_param)
     }
 }
 
-void set_deltafreq(int delta)
+static void set_deltafreq(int delta)
 {
     tuner_param &= 0xFC;
     switch (delta)
@@ -231,7 +232,7 @@ void set_deltafreq(int delta)
     }
 }
 
-void set_deemphasis(int deemphasis)
+static void set_deemphasis(int deemphasis)
 {
     tuner_param &= 0xBF;
     switch (deemphasis)
@@ -249,7 +250,7 @@ void set_deemphasis(int deemphasis)
     }
 }
 
-void set_mono(int value)
+static void set_mono(int value)
 {
     tuner_param &= 0xEF;
 
@@ -264,7 +265,7 @@ void set_mono(int value)
     }
 }
 
-bool reply_timeout(void)
+static bool reply_timeout(void)
 {
     int timeout = 0;
     

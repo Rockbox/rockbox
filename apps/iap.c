@@ -71,6 +71,13 @@ static void iap_task(void)
     queue_post(&button_queue, SYS_IAP_PERIODIC, 0);
 }
 
+/* called by playback when the next track starts */
+static void iap_track_changed(void *ignored)
+{
+    (void)ignored;
+    iap_changedctr = 1;
+}
+
 void iap_setup(int ratenum)
 {
     iap_bitrate_set(ratenum);
@@ -177,13 +184,6 @@ int iap_getc(unsigned char x)
     return newpkt;
 }
 
-/* called by playback when the next track starts */
-void iap_track_changed(void *ignored)
-{
-    (void)ignored;
-    iap_changedctr = 1;
-}
-
 void iap_periodic(void)
 {
     if(!iap_setupflag) return;
@@ -212,7 +212,7 @@ void iap_periodic(void)
     iap_send_pkt(data, sizeof(data));
 }
 
-void iap_set_remote_volume(void)
+static void iap_set_remote_volume(void)
 {
     unsigned char data[] = {0x03, 0x0D, 0x04, 0x00, 0x00};
     data[4] = (char)((global_settings.volume+58) * 4);
