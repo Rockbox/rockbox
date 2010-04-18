@@ -2234,12 +2234,12 @@ unsigned int wakeup_thread(struct thread_entry **list)
         }
 
         if (current != NULL &&
-            IF_COP( thread->core == current->core && )
-            find_first_set_bit(cores[current->core].rtr.mask) < current->priority)
+            find_first_set_bit(cores[IF_COP_CORE(current->core)].rtr.mask)
+                < current->priority)
         {
-            /* Woken thread is higher priority and exists on the same CPU core;
-             * recommend a task switch. Knowing if this is an interrupt call
-             * would be helpful here. */
+            /* There is a thread ready to run of higher or same priority on
+             * the same core as the current one; recommend a task switch.
+             * Knowing if this is an interrupt call would be helpful here. */
             result |= THREAD_SWITCH;
         }
 #endif /* HAVE_PRIORITY_SCHEDULING */
