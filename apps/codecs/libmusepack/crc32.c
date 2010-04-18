@@ -4,6 +4,7 @@
 *  code from http://www.w3.org/TR/PNG/#D-CRCAppendix
 *
 */
+#include "internal.h"
 
 /* Table of CRCs of all 8-bit messages. */
 static unsigned long crc_table[256];

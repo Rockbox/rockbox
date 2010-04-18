@@ -100,6 +100,18 @@ static mpc_inline mpc_status mpc_check_key(char * key)
 mpc_uint32_t mpc_random_int(mpc_decoder *d); // in synth_filter.c
 void mpc_decoder_init_quant(mpc_decoder *d, double scale_factor);
 void mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT* OutData, mpc_int_t channels);
+unsigned long mpc_crc32(unsigned char *buf, int len);
+
+// streaminfo.c
+mpc_status streaminfo_read_header_sv8(mpc_streaminfo* si,
+                                      const mpc_bits_reader * r_in,
+                                      mpc_size_t block_size);
+mpc_status streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r_in);
+void  streaminfo_encoder_info(mpc_streaminfo* si, const mpc_bits_reader * r_in);
+void  streaminfo_gain(mpc_streaminfo* si, const mpc_bits_reader * r_in);
+
+// mpc_decoder.c
+void mpc_decoder_reset_scf(mpc_decoder * d, int value);
 
 #ifdef __cplusplus
 }

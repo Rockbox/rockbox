@@ -42,7 +42,6 @@
 #include "huffman.h"
 #include "mpc_bits_reader.h"
 
-unsigned long mpc_crc32(unsigned char *buf, int len);
 /* rockbox: not used
 static const char na[] = "n.a.";
 static char const * const versionNames[] = {

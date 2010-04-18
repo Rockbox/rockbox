@@ -39,6 +39,7 @@
 #include "mpcdec.h"
 #include "decoder.h"
 #include "mpcdec_math.h"
+#include "internal.h"
 
 /* C O N S T A N T S */
 #undef _

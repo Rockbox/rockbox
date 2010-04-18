@@ -133,7 +133,7 @@ void mpc_decoder_reset_scf(mpc_decoder * d, int value)
     memset(d->SCF_Index_R, value, sizeof d->SCF_Index_R );
 }
 
-void mpc_decoder_setup(mpc_decoder *d)
+static void mpc_decoder_setup(mpc_decoder *d)
 {
     memset(d, 0, sizeof *d);
 
@@ -148,7 +148,7 @@ void mpc_decoder_setup(mpc_decoder *d)
     mpc_decoder_init_quant(d, 1.0f);
 }
 
-void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
+static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
 {
     d->stream_version     = si->stream_version;
     d->ms                 = si->ms;

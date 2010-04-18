@@ -52,17 +52,6 @@ static mpc_uint8_t g_buffer[DEMUX_BUFFER_SIZE + MAX_FRAME_SIZE];
 static mpc_seek_t g_seek_table[MAX_SEEK_TABLE_SIZE];
 static mpc_demux g_mpc_demux IBSS_ATTR;
 
-// streaminfo.c
-mpc_status streaminfo_read_header_sv8(mpc_streaminfo* si,
-                                      const mpc_bits_reader * r_in,
-                                      mpc_size_t block_size);
-mpc_status streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r_in);
-void  streaminfo_encoder_info(mpc_streaminfo* si, const mpc_bits_reader * r_in);
-void  streaminfo_gain(mpc_streaminfo* si, const mpc_bits_reader * r_in);
-
-// mpc_decoder.c
-void mpc_decoder_reset_scf(mpc_decoder * d, int value);
-
 enum {
     MPC_BUFFER_SWAP = 1,
     MPC_BUFFER_FULL = 2,
