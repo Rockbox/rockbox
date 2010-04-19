@@ -356,7 +356,7 @@ intptr_t get_action_data(void);
 /* return BUTTON_NONE               on error
  *        BUTTON_REPEAT             if repeated press
  *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
- *        BUTTON_REL                if its a short press = release after press
+ *        BUTTON_REL                if it's a short press = release after press
  *        BUTTON_TOUCHSCREEN        if press
  */
 int action_get_touchscreen_press(short *x, short *y);
