@@ -105,6 +105,8 @@ struct progressbar {
     /*progressbar image*/
     struct bitmap bm;
     bool have_bitmap_pb;
+    
+    bool draw;
 };
 #endif
 

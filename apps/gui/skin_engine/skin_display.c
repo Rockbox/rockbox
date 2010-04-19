@@ -608,6 +608,12 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
             clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, data));
+        else if (data->tokens[i].type == WPS_TOKEN_VOLUMEBAR ||
+                 data->tokens[i].type == WPS_TOKEN_PROGRESSBAR)
+        {
+            struct progressbar *bar = (struct progressbar*)data->tokens[i].value.data;
+            bar->draw = false;
+        }
 #endif
 #ifdef HAVE_ALBUMART
         if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
@@ -670,6 +676,13 @@ static bool get_line(struct gui_wps *gwps,
                 break;
 
 #ifdef HAVE_LCD_BITMAP
+            case WPS_TOKEN_VOLUMEBAR:
+            case WPS_TOKEN_PROGRESSBAR:
+            {
+                struct progressbar *bar = (struct progressbar*)data->tokens[i].value.data;
+                bar->draw = true;
+            }
+            break;
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
                 char n = data->tokens[i].value.i & 0xFF;
@@ -1255,7 +1268,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             while (bar)
             {
                 struct progressbar *thisbar = (struct progressbar*)bar->token->value.data;
-                if (thisbar->vp == &skin_viewport->vp)
+                if (thisbar->vp == &skin_viewport->vp && thisbar->draw)
                 {
                     draw_progressbar(gwps, thisbar);
                 }
