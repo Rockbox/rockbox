@@ -38,13 +38,14 @@ these markers:
       \emph{Next Variation} menu option of the \emph{Context Menu}%
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,%
          RECORDER_PAD,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
-         IRIVER_H300_PAD}{ or the %
+         IRIVER_H300_PAD,PBELL_VIBE500_PAD}{ or the %
          \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}%
          \opt{SANSA_FUZE_PAD,SANSA_CLIP_PAD}{\ButtonHome}%
          \opt{RECORDER_PAD}{\ButtonOn}%
          \opt{MROBE100_PAD}{\ButtonPower}%
          \opt{GIGABEAT_PAD}{\ButtonA}%
          \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
+         \opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec} button}. \\
       \emph{C } & There is a comment at the current node.  It can be viewed/edited using
                 the \emph{Add/Edit Comment} menu option of the \emph{Context Menu}. \\
@@ -54,8 +55,8 @@ these markers:
 \subsubsection{Controls}
 \begin{table}
     \begin{btnmap}{}{}
-        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}{
-            \ButtonUp}%
+        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
+             {\ButtonUp}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
         \opt{COWON_D2_PAD}{\TouchTopMiddle}
@@ -65,8 +66,8 @@ these markers:
         Move cursor up
         \\
         
-        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}{
-            \ButtonDown}%
+        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,COWON_D2_PAD}
+             {\ButtonDown}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}%
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
         \opt{COWON_D2_PAD}{\TouchBottomMiddle}
@@ -76,7 +77,8 @@ these markers:
         Move cursor down
         \\
             
-        \nopt{COWON_D2_PAD}{\ButtonLeft}
+        \nopt{COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonLeft}
+        \opt{PBELL_VIBE500_PAD}{\ButtonPrev}
         \opt{COWON_D2_PAD}{\TouchMidLeft}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -86,7 +88,8 @@ these markers:
             node in the game tree if in \emph{tree} navigation mode}
         \\
              
-        \nopt{COWON_D2_PAD}{\ButtonRight}
+        \nopt{COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
+        \opt{PBELL_VIBE500_PAD}{\ButtonNext}
         \opt{COWON_D2_PAD}{\TouchMidRight}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -103,9 +106,10 @@ these markers:
             \\
         }
         
-        \nopt{IRIVER_H10_PAD,COWON_D2_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_M3_PAD}{%
+        \nopt{IRIVER_H10_PAD,COWON_D2_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_M3_PAD
+             ,PBELL_VIBE500_PAD}{%
             \ButtonSelect}%
-        \opt{IRIVER_H10_PAD,RECORDER_PAD}{\ButtonPlay}%
+        \opt{IRIVER_H10_PAD,RECORDER_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}%
         \opt{ONDIO_PAD}{\ButtonMenu}
         \opt{COWON_D2_PAD}{\TouchCenter}
             &
@@ -125,6 +129,7 @@ these markers:
             \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
             \opt{RECORDER_PAD}{\ButtonFOne}
             \opt{COWON_D2_PAD}{\TouchBottomLeft}
+            \opt{PBELL_VIBE500_PAD}{\ButtonOK{} + \ButtonPrev}
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 &}
@@ -140,6 +145,7 @@ these markers:
             \opt{IAUDIO_X5_PAD}{\ButtonRec}%
             \opt{RECORDER_PAD}{\ButtonFThree}
             \opt{COWON_D2_PAD}{\TouchBottomRight}
+            \opt{PBELL_VIBE500_PAD}{\ButtonOK{} + \ButtonNext}
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 &}
@@ -156,6 +162,7 @@ these markers:
         \opt{RECORDER_PAD}{\ButtonFTwo}%
         \opt{ONDIO_PAD}{Long \ButtonMenu}
         \opt{COWON_D2_PAD}{\TouchTopLeft}
+        \opt{PBELL_VIBE500_PAD}{\ButtonMenu}
             &
         \opt{HAVEREMOTEKEYMAP}{
             &}
@@ -164,10 +171,12 @@ these markers:
 
 %        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,ONDIO_PAD,RECORDER_PAD}{%
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
-            ,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{% 
-            \nopt{IRIVER_H10_PAD,COWON_D2_PAD}{Long \ButtonSelect}%
+            ,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
+            ,PBELL_VIBE500_PAD}{% 
+            \nopt{IRIVER_H10_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{Long \ButtonSelect}%
             \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
             \opt{COWON_D2_PAD}{Long \TouchCenter}
+            \opt{PBELL_VIBE500_PAD}{\ButtonOK}
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 &}
@@ -176,7 +185,8 @@ these markers:
         }
         
         \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD%
-            ,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_CLIP_PAD}{%
+            ,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_CLIP_PAD%
+            ,PBELL_VIBE500_PAD}{%
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{%
                 \ButtonRec}%
             \opt{SANSA_FUZE_PAD,SANSA_CLIP_PAD}{\ButtonHome}%
@@ -185,6 +195,7 @@ these markers:
             \opt{GIGABEAT_PAD}{\ButtonA}%
             \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
             \opt{COWON_D2_PAD}{\TouchTopRight}
+            \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 &}

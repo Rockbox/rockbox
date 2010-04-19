@@ -16,7 +16,7 @@ view a bigger file you may need to stop playback.}
 \begin{btnmap}{}{}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
       ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
-      ,MROBE100_PAD}
+      ,MROBE100_PAD,PBELL_VIBE500_PAD}
       {\ButtonUp\ / \ButtonDown}%
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu\ / \ButtonPlay}%
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown} %
@@ -25,6 +25,7 @@ view a bigger file you may need to stop playback.}
       ,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}
       {/ \ButtonLeft\ / \ButtonRight}
     \opt{COWON_D2_PAD}{}
+    \opt{PBELL_VIBE500_PAD}{/ \ButtonPrev\ / \ButtonNext}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move around in zoomed in image\\
     \opt{RECORDER_PAD}{\ButtonPlay}
@@ -34,6 +35,7 @@ view a bigger file you may need to stop playback.}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolUp}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonUp}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom in\\
     \opt{RECORDER_PAD}{\ButtonOn}
@@ -44,6 +46,7 @@ view a bigger file you may need to stop playback.}
     \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
     \opt{MROBE100_PAD}{\ButtonPlay}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonDown}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom out\\
     \opt{RECORDER_PAD}{\ButtonFThree}
@@ -58,6 +61,7 @@ view a bigger file you may need to stop playback.}
     \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonRight}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonNext}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Next bmp in directory\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
@@ -71,6 +75,7 @@ view a bigger file you may need to stop playback.}
     \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonLeft}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonPrev}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Previous bmp in directory\\
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{%currently only defined for the sansa pads
@@ -82,16 +87,17 @@ view a bigger file you may need to stop playback.}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
     \opt{COWON_D2_PAD}{\ButtonPower}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
        }
     & Show menu / Abort \\
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{
         \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
         \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
+        \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
             \opt{HAVEREMOTEKEYMAP}{& }
         & Quit the viewer \\
     }
