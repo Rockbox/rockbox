@@ -314,6 +314,7 @@
 #define IMGVIEW_NEXT        (BUTTON_REC | BUTTON_NEXT)
 #define IMGVIEW_PREVIOUS    (BUTTON_REC | BUTTON_PREV)
 #define IMGVIEW_MENU        BUTTON_MENU
+#define IMGVIEW_QUIT        BUTTON_CANCEL
 
 #else
 #error No keymap defined!
