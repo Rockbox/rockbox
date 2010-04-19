@@ -212,13 +212,13 @@ therefore result in better runtime.
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,IRIVER_H10_PAD}%
             {\ButtonPower}%
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonRight}
-        \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonPrev}
+        \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonLeft}
     and
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonRec}%
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,IRIVER_H10_PAD}%
             {Long \ButtonPower}%
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonLeft}
-        \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonNext}
+        \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonRight}
     keys, respectively.%
     }%
     \opt{HAVEREMOTEKEYMAP}{
@@ -299,9 +299,8 @@ therefore result in better runtime.
                 % Scan previous track
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,%
                     IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
-                    ,MROBE100_PAD}
+                    ,MROBE100_PAD,PBELL_VIBE500_PAD}
                     {\ButtonLeft}
-                \opt{PBELL_VIBE500_PAD}{\ButtonPrev}
                 \opt{GIGABEAT_RC_PAD}{\ButtonPrev; \ButtonLeft}%
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -313,9 +312,8 @@ therefore result in better runtime.
                 % Scan next track
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
                     ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
-                    ,MROBE100_PAD}
+                    ,MROBE100_PAD,PBELL_VIBE500_PAD}
                     {\ButtonRight}
-                \opt{PBELL_VIBE500_PAD}{\ButtonNext}
                 \opt{GIGABEAT_RC_PAD}{\ButtonNext; \ButtonRight}%
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -362,10 +360,10 @@ therefore result in better runtime.
 
                 % Slide previous
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{\ButtonLeft}
+                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
+                    {\ButtonLeft}
                 \opt{GIGABEAT_S_PAD}{\ButtonPrev; \ButtonLeft}
                 \opt{IRIVER_H10_PAD}{\ButtonRew}
-                \opt{PBELL_VIBE500_PAD}{\ButtonPrev}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                   \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCRew}%
@@ -375,10 +373,10 @@ therefore result in better runtime.
 
                 % Slide next
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{\ButtonRight}
+                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
+                    {\ButtonRight}
                 \opt{GIGABEAT_S_PAD}{\ButtonNext; \ButtonRight}
                 \opt{IRIVER_H10_PAD}{\ButtonFF}
-                \opt{PBELL_VIBE500_PAD}{\ButtonNext}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCFF}%
@@ -388,10 +386,10 @@ therefore result in better runtime.
 
                 % Slide first
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{Long \ButtonLeft}
+                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
+                    {Long \ButtonLeft}
                 \opt{GIGABEAT_S_PAD}{Long \ButtonPrev; Long \ButtonLeft}
                 \opt{IRIVER_H10_PAD}{Long \ButtonRew}
-                \opt{PBELL_VIBE500_PAD}{Long \ButtonPrev}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCRew}%
@@ -401,10 +399,10 @@ therefore result in better runtime.
 
                 % Slide last
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
-                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}{Long \ButtonRight}
+                    ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
+                    {Long \ButtonRight}
                 \opt{GIGABEAT_S_PAD}{Long \ButtonNext; Long \ButtonRight}
                 \opt{IRIVER_H10_PAD}{Long \ButtonFF}
-                \opt{PBELL_VIBE500_PAD}{Long \ButtonNext}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCFF}%
@@ -565,9 +563,8 @@ therefore result in better runtime.
                 % Tab previous / next
                 \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
                     ,SANSA_CLIP_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-                    ,IPOD_1G2G_PAD,MROBE100_PAD}
+                    ,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
                     {\ButtonLeft / \ButtonRight}
-                \opt{PBELL_VIBE500_PAD}{\ButtonPrev / \ButtonNext}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
@@ -595,9 +592,8 @@ therefore result in better runtime.
                 % History back / forward
                 \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
                     ,SANSA_CLIP_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-                    ,IPOD_1G2G_PAD,MROBE100_PAD}
+                    ,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
                     {Long \ButtonLeft / Long \ButtonRight}
-                \opt{PBELL_VIBE500_PAD}{Long \ButtonPrev / Long \ButtonNext}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCRew / Long \ButtonRCFF}%
@@ -631,14 +627,12 @@ therefore result in better runtime.
             \begin{btnmap}{}{}
                 % Cursor move up / down / left / right
                 \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
-                    ,SANSA_CLIP_PAD,MROBE100_PAD}
+                    ,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
                     {\ButtonUp / \ButtonDown / \ButtonLeft / \ButtonRight}
                 \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown / 
                     \ButtonLeft / \ButtonRight}
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {\ButtonMenu / \ButtonPlay / \ButtonLeft / \ButtonRight}
-                \opt{PBELL_VIBE500_PAD}
-                    {\ButtonUp / \ButtonDown / \ButtonPrev / \ButtonNext}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay / 

@@ -3,8 +3,8 @@
 \newcommand{\ButtonPower}{\btnfnt{Power}}
 \newcommand{\ButtonMenu}{\btnfnt{Menu}}
 \newcommand{\ButtonPlay}{\btnfnt{Play}}
-\newcommand{\ButtonPrev}{\btnfnt{Prev}}
-\newcommand{\ButtonNext}{\btnfnt{Next}}
+\newcommand{\ButtonLeft}{\btnfnt{Prev}}
+\newcommand{\ButtonRight}{\btnfnt{Next}}
 \newcommand{\ButtonUp}{\btnfnt{Scroll Up}}
 \newcommand{\ButtonDown}{\btnfnt{Scroll Down}}
 \newcommand{\ButtonOK}{\btnfnt{OK}}
@@ -13,8 +13,8 @@
 \newcommand{\ButtonHold}{\btnfnt{Hold}}
 
 %temporary for the lack of plugin keymaps
-\newcommand{\ButtonLeft}{\btnfnt{WhatLeft}}
-\newcommand{\ButtonRight}{\btnfnt{WhatRight}}
+%\newcommand{\ButtonLeft}{\btnfnt{WhatLeft}}
+%\newcommand{\ButtonRight}{\btnfnt{WhatRight}}
 \newcommand{\ButtonSelect}{\btnfnt{WhatSelect}}
 
 %Button actions, standard context
@@ -22,8 +22,8 @@
 \newcommand{\ActionStdPrevRepeat}{\ButtonUp}
 \newcommand{\ActionStdNext}{\ButtonDown}
 \newcommand{\ActionStdNextRepeat}{\ButtonDown}
-\newcommand{\ActionStdCancel}{\ButtonPrev{} or \ButtonCancel}
-\newcommand{\ActionStdOk}{\ButtonNext{} or \ButtonOK}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonCancel}
+\newcommand{\ActionStdOk}{\ButtonRight{} or \ButtonOK}
 \newcommand{\ActionStdMenu}{\ButtonMenu}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonOK}
 \newcommand{\ActionStdContext}{Long \ButtonMenu}
@@ -33,10 +33,10 @@
 %Button actions, wps context
 \newcommand{\ActionWpsPlay}{\ButtonPlay}
 \newcommand{\ActionWpsStop}{Long \ButtonPlay}
-\newcommand{\ActionWpsSkipPrev}{\ButtonPrev}
-\newcommand{\ActionWpsSeekBack}{Long \ButtonPrev}
-\newcommand{\ActionWpsSkipNext}{\ButtonNext}
-\newcommand{\ActionWpsSeekFwd}{Long \ButtonNext}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
 \newcommand{\ActionWpsVolDown}{\ButtonDown}
 \newcommand{\ActionWpsVolUp}{\ButtonUp}
 \newcommand{\ActionWpsBrowse}{\ButtonOK}
@@ -49,8 +49,8 @@
 %Button actions, tree context
 \newcommand{\ActionTreeWps}{\ButtonPlay}
 \newcommand{\ActionTreeStop}{Long \ButtonPlay}
-\newcommand{\ActionTreeEnter}{\ButtonNext}
-\newcommand{\ActionTreeParentDirectory}{\ButtonPrev}
+\newcommand{\ActionTreeEnter}{\ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
 \newcommand{\ActionTreeHotkey}{\ButtonRec}
 
 %Button actions, YesNo context
@@ -63,12 +63,12 @@
 %Button actions, Alarm screen
 \newcommand{\ActionAlarmSet}{\ButtonOK}
 \newcommand{\ActionAlarmCancel}{\ButtonCancel}
-\newcommand{\ActionAlarmHoursDec}{\ButtonPrev}
-\newcommand{\ActionAlarmHoursInc}{\ButtonNext}
+\newcommand{\ActionAlarmHoursDec}{\ButtonLeft}
+\newcommand{\ActionAlarmHoursInc}{\ButtonRight}
 
 %Button actions, Virtual Keyboard Context
-\newcommand{\ActionKbdLeft}{\ButtonPrev}
-\newcommand{\ActionKbdRight}{\ButtonNext}
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
 \newcommand{\ActionKbdSelect}{\ButtonPlay}
 \newcommand{\ActionKbdDone}{\ButtonOK}
 \newcommand{\ActionKbdAbort}{\ButtonCancel}
@@ -84,8 +84,8 @@
 \newcommand{\ActionPsIncBig}{\ButtonUp}
 \newcommand{\ActionPsDecSmall}{\ButtonDown}
 \newcommand{\ActionPsDecBig}{\ButtonDown}
-\newcommand{\ActionPsNudgeLeft}{\ButtonPrev}
-\newcommand{\ActionPsNudgeRight}{\ButtonNext}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
 \newcommand{\ActionPsReset}{\ButtonMenu}
 \newcommand{\ActionPsExit}{\ButtonOK}
 
@@ -95,8 +95,8 @@
 \newcommand{\ActionRecMenu}{Long \ButtonMenu}
 \newcommand{\ActionRecPause}{\ButtonPlay}
 \newcommand{\ActionRecExit}{\ButtonCancel}
-\newcommand{\ActionRecSettingsInc}{\ButtonNext}
-\newcommand{\ActionRecSettingsDec}{\ButtonPrev}
+\newcommand{\ActionRecSettingsInc}{\ButtonRight}
+\newcommand{\ActionRecSettingsDec}{\ButtonLeft}
 \newcommand{\ActionRecPrev}{\ButtonUp}
 \newcommand{\ActionRecNext}{\ButtonDown}
 
