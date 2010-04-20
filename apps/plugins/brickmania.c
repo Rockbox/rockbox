@@ -1553,7 +1553,7 @@ static int brickmania_game_loop(void)
                 if (TIME_AFTER(*rb->current_tick, sec_count))
                 {
                     sec_count=*rb->current_tick+HZ;
-                    if (flip_sides_delay!=0)
+                    if (flip_sides_delay > 1)
                         flip_sides_delay--;
                     else
                         flip_sides=false;
