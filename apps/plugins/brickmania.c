@@ -1631,7 +1631,8 @@ static int brickmania_game_loop(void)
                         j = (fire[k].x_pos - LEFTMARGIN) / BRICK_WIDTH;
                         for (i=NUM_BRICKS_ROWS-1;i>=0;i--)
                         {
-
+                            if (TOPMARGIN + i*BRICK_HEIGHT<=fire[k].top)
+                                break;
                             if (brick[i][j].used)
                             {
                                 score += SCORE_FIRE_HIT_BRICK;
@@ -1642,8 +1643,6 @@ static int brickmania_game_loop(void)
                                 k--;
                                 break;
                             }
-                            if (TOPMARGIN + i*BRICK_HEIGHT<=fire[k].top)
-                                break;
                         }
                     }
                 }
