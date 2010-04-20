@@ -2031,7 +2031,7 @@ static int brickmania_game_loop(void)
                         if (check_lines(&misc_line, &screen_edge, &pt_hit))
                         {
                             /* Reverse direction */
-                            ball[k].speedx = -ball[k].speedx;
+                            ball[k].speedx = abs(ball[k].speedx);
 
                             /* Re-position ball in gameboard */
                             ball[k].tempy = pt_hit.y;
@@ -2047,7 +2047,7 @@ static int brickmania_game_loop(void)
                         if (check_lines(&misc_line, &screen_edge, &pt_hit))
                         {
                             /* Reverse direction */
-                            ball[k].speedx = -ball[k].speedx;
+                            ball[k].speedx = -abs(ball[k].speedx);
 
                             /* Re-position ball in gameboard */
                             ball[k].tempy = pt_hit.y;
