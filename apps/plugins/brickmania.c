@@ -284,6 +284,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 
 
+#define NUM_BRICKS_ROWS 8
+#define NUM_BRICKS_COLS 10
+
 /*
  *
  * Geometric dimensions
@@ -311,7 +314,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define LONG_PAD_WIDTH   FIXED3(BMPWIDTH_brickmania_long_pads)
 #define BRICK_HEIGHT     FIXED3(BMPHEIGHT_brickmania_bricks/7)
 #define BRICK_WIDTH      FIXED3(BMPWIDTH_brickmania_bricks)
-#define LEFTMARGIN       ((GAMESCREEN_WIDTH-10*BRICK_WIDTH)/2)
+#define LEFTMARGIN       ((GAMESCREEN_WIDTH-NUM_BRICKS_COLS*BRICK_WIDTH)/2)
 #define POWERUP_WIDTH    FIXED3(BMPWIDTH_brickmania_powerups)
 #define BALL             FIXED3(BMPHEIGHT_brickmania_ball)
 #define HALFBALL         (BALL / 2)
@@ -433,9 +436,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
  * Game levels
  *
  */
-
-#define NUM_BRICKS_ROWS 8
-#define NUM_BRICKS_COLS 10
 
 /* change to however many levels there are, i.e. how many arrays there are total */
 #define NUM_LEVELS 40
