@@ -968,16 +968,16 @@ struct rect
  *
  */
 
-static enum game_state game_state = ST_READY;
+static enum game_state game_state;
 static int pad_pos_x;
 static int life;
-static int score=0,vscore=0;
-static bool flip_sides=false;
-static int level=0;
-static int brick_on_board=0;
-static int used_balls=1;
-static int used_fires=0;
-static int used_powers=0;
+static int score,vscore;
+static bool flip_sides;
+static int level;
+static int brick_on_board;
+static int used_balls;
+static int used_fires;
+static int used_powers;
 static int difficulty = NORMAL;
 static int pad_width;
 static int flip_sides_delay;
