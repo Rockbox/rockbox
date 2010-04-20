@@ -324,7 +324,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define TOPMARGIN           MAX(BRICK_HEIGHT, FIXED3(8))
 
 #define STRINGPOS_FINISH    (GAMESCREEN_HEIGHT - (GAMESCREEN_HEIGHT / 6))
-#define STRINGPOS_CONGRATS  (STRINGPOS_FINISH - 20)
 #define STRINGPOS_NAVI      (STRINGPOS_FINISH - 10)
 #define STRINGPOS_FLIP      (STRINGPOS_FINISH - 10)
 
@@ -1516,7 +1515,7 @@ static void brick_hit(int i, int j)
 static int brickmania_game_loop(void)
 {
     int j,i,k;
-    int sw;
+    int sw, sh;
     char s[30];
     int sec_count=0;
     int end;
@@ -2180,8 +2179,8 @@ static int brickmania_game_loop(void)
                 }
                 else
                 {
-                    rb->lcd_getstringsize("Congratulations!", &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_CONGRATS),
+                    rb->lcd_getstringsize("Congratulations!", &sw, &sh);
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH) - 2 * sh,
                                    "Congratulations!");
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
                     rb->lcd_getstringsize("No more levels", &sw, NULL);
