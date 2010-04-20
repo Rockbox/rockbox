@@ -5,7 +5,7 @@ OBJS = $(patsubst %.c,%.o,$(SRCS))
 all: time-sync
 
 clean:
-	rm -f ${OBJS} ipod-time-sync
+	rm -f ${OBJS} time-sync
 
 %.o: %.c
 	gcc ${CFLAGS} -c -o $@ $^
