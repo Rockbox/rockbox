@@ -54,7 +54,7 @@
    <item row="1" column="0" colspan="3" >
     <widget class="QLabel" name="labelText" >
      <property name="text" >
-      <string>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/>© 2005 - 2009 The Rockbox Team.&lt;br/>Released under the GNU General Public License v2.&lt;br/>Uses icons by the &lt;a href="http://tango.freedesktop.org/">Tango Project&lt;/a>.&lt;br/>&lt;center>&lt;a href="http://www.rockbox.org">http://www.rockbox.org&lt;/a>&lt;/center></string>
+      <string>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/>© 2005 - 2010 The Rockbox Team.&lt;br/>Released under the GNU General Public License v2.&lt;br/>Uses icons by the &lt;a href="http://tango.freedesktop.org/">Tango Project&lt;/a>.&lt;br/>&lt;center>&lt;a href="http://www.rockbox.org">http://www.rockbox.org&lt;/a>&lt;/center></string>
      </property>
      <property name="textFormat" >
       <enum>Qt::RichText</enum>
