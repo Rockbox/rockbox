@@ -1176,9 +1176,9 @@ static int parse_progressbar(const char *wps_bufptr,
     if (!(ptr = parse_list("sdddd", &set, '|', ptr, &filename,
                                                  &x, &y, &width, &height)))
     {
-        /* if we are in a conditional then we probably don't want to fail
-         * if the above doesnt work. so ASSume the | is breaking the conditional
-         * and move on. the next token will fail if this is incorrect */
+        /* If we are in a conditional then we probably don't want to fail
+         * if the above doesnt work. So assume the | is breaking the conditional
+         * and move on. The next token will fail if this is incorrect. */
         if (level >= 0)
             return 0;
         return WPS_ERROR_INVALID_PARAM;
