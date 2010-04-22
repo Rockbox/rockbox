@@ -74,7 +74,7 @@ static unsigned int  cache_build_ticks = 0;
 static unsigned long appflags = 0;
 
 static struct event_queue dircache_queue;
-static long dircache_stack[(DEFAULT_STACK_SIZE + 0x200)/sizeof(long)];
+static long dircache_stack[(DEFAULT_STACK_SIZE + 0x400)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 
 static struct fdbind_queue fdbind_cache[MAX_PENDING_BINDINGS];
