@@ -546,11 +546,11 @@ static inline void copy_write_sectors(const unsigned char** buf)
 
 static int sd_select_bank(unsigned char bank)
 {
-    unsigned char card_data[512];
+    unsigned char card_data[FIFO_LEN*2];// FIFO_LEN words=FIFO_LEN*2 bytes
     const unsigned char* write_buf;
     int i, ret;
 
-    memset(card_data, 0, 512);
+    memset(card_data, 0, sizeof card_data);
 
     ret = sd_wait_for_state(SD_TRAN, EC_TRAN_SEL_BANK);
     if (ret < 0)
@@ -569,13 +569,15 @@ static int sd_select_bank(unsigned char bank)
     card_data[0] = bank;
 
     /* Write the card data */
-    write_buf = card_data;
     for (i = 0; i < SD_BLOCK_SIZE/2; i += FIFO_LEN)
     {
+        write_buf = card_data;
         /* Wait for the FIFO to empty */
         if (sd_poll_status(STAT_XMIT_FIFO_EMPTY, 10000))
         {
             copy_write_sectors(&write_buf); /* Copy one chunk of 16 words */
+            /* clear buffer: only the first chunk contains interesting data (bank), the remaining is zero filling */
+            memset(card_data, 0, sizeof card_data);
             continue;
         }
 
