@@ -70,10 +70,11 @@ void kernel_device_init(void)
     sdma_init();
     spi_init();
     mc13783_init();
-    dvfs_dptc_start();
+    dvfs_dptc_init();
+    dvfs_wfi_monitor(true); /* Monitor the WFI signal */
+    dvfs_dptc_start(); /* Should be ok to start even so early */
 }
 
-#ifdef BOOTLOADER
 void tick_stop(void)
 {
     avic_disable_int(INT_EPIT1);            /* Disable insterrupt */
@@ -81,4 +82,4 @@ void tick_stop(void)
     EPITSR1 = EPITSR_OCIF;                  /* Clear pending */
     ccm_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
 }
-#endif
+

@@ -533,7 +533,7 @@ void sdma_init(void)
     /* 32-word channel contexts, use default bootscript address */
     SDMA_CHN0ADDR = SDMA_CHN0ADDR_SMSZ | 0x0050;
 
-    avic_enable_int(INT_SDMA, INT_TYPE_IRQ, INT_PRIO_DEFAULT+1, SDMA_HANDLER);
+    avic_enable_int(INT_SDMA, INT_TYPE_IRQ, INT_PRIO_SDMA, SDMA_HANDLER);
 
     /* SDMA core must run at the proper frequency based upon the AHB/IPG
      * ratio */

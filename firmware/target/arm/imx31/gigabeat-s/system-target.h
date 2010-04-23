@@ -24,12 +24,12 @@
 #include "system-arm.h"
 #include "mmu-arm.h"
 
-#ifndef HAVE_ADJUSTABLE_CPU_FREQ
-/* TODO: implement CPU frequency scaling */
-#define CPUFREQ_DEFAULT CPU_FREQ
-#define CPUFREQ_NORMAL CPU_FREQ
-#define CPUFREQ_MAX CPU_FREQ
-#endif
+/* High enough for most tasks but low enough for reduced voltage */
+#define CPUFREQ_DEFAULT     264000000
+/* Still quite powerful, minimum possible frequency */
+#define CPUFREQ_NORMAL      132000000
+/* Overdrive mode */
+#define CPUFREQ_MAX         528000000
 
 static inline void udelay(unsigned int usecs)
 {
@@ -45,10 +45,11 @@ void gpt_stop(void);
 
 unsigned int iim_system_rev(void);
 
-/* Prepare for transition to firmware */
+/* Prepare for transition to (new) firmware */
 void system_prepare_fw_start(void);
 void tick_stop(void);
 void kernel_device_init(void);
+void system_halt(void);
 
 void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value,
                     uint32_t mask);

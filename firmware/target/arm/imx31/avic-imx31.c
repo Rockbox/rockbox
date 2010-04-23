@@ -128,7 +128,7 @@ void avic_init(void)
         : : : "r0");
 
     /* Enable normal interrupts at all priorities */
-    avic->nimask = 0x1f;
+    avic->nimask = AVIC_NIL_ENABLE;
 }
 
 void avic_set_int_priority(enum IMX31_INT_LIST ints,
@@ -209,4 +209,9 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
     }
 
     restore_interrupt(oldstatus);
+}
+
+void avic_set_ni_level(unsigned int level)
+{
+    AVIC_NIMASK = level > 0x1f ? 0x1f : level;
 }

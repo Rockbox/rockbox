@@ -66,15 +66,17 @@ void cpu_boost(bool on_off);
 #endif
 void cpu_idle_mode(bool on_off);
 int get_cpu_boost_counter(void);
-#else
+#else /* ndef HAVE_ADJUSTABLE_CPU_FREQ */
+#ifndef FREQ
 #define FREQ CPU_FREQ
+#endif
 #define set_cpu_frequency(frequency)
 #define cpu_boost(on_off)
 #define cpu_boost_id(on_off, id)
 #define cpu_idle_mode(on_off)
 #define get_cpu_boost_counter()
 #define get_cpu_boost_tracker()
-#endif
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
 #ifdef CPU_BOOST_LOGGING
 #define cpu_boost(on_off) cpu_boost_(on_off,__FILE__,  __LINE__)

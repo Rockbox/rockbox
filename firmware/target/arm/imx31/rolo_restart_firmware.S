@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2008 by Michael Sevakis
  *
- * RoLo restart code for IMX31
+ * RoLo firmware restart code for IMX31
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,13 +24,13 @@
 #include "cpu.h"
 
 /****************************************************************************
- * void rolo_restart(const unsigned char* source, unsigned char* dest,
- *                   int length) __attribute__((noreturn));
+ * void rolo_restart_firmware(const unsigned char* source, unsigned char* dest,
+ *                            int length) __attribute__((noreturn));
  */
     .section    .text, "ax", %progbits
     .align      2
-    .global     rolo_restart
-rolo_restart:
+    .global     rolo_restart_firmware
+rolo_restart_firmware:
     adr     r4, restart_copy_start
     adr     r5, restart_copy_end
     ldr     r6, =IRAM_BASE_ADDR

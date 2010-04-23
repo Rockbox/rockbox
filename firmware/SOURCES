@@ -880,7 +880,7 @@ target/arm/imx31/i2c-imx31.c
 target/arm/imx31/iomuxc-imx31.c
 target/arm/imx31/mc13783-imx31.c
 target/arm/imx31/mmu-imx31.c
-target/arm/imx31/rolo_restart.S
+target/arm/imx31/rolo_restart_firmware.S
 target/arm/imx31/sdma-imx31.c
 target/arm/imx31/spi-imx31.c
 target/arm/imx31/gigabeat-s/adc-gigabeat-s.c

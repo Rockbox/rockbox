@@ -26,6 +26,7 @@
 #include "gpio-imx31.h"
 #include "mmu-imx31.h"
 #include "system-target.h"
+#include "powermgmt-target.h"
 #include "lcd.h"
 #include "serial-imx31.h"
 #include "debug.h"
@@ -115,18 +116,24 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
+void system_halt(void)
+{
+    disable_interrupt(IRQ_FIQ_STATUS);
+    avic_set_ni_level(AVIC_NIL_DISABLE);
+    while (1)
+        core_idle();
+}
+
 void system_reboot(void)
 {
     /* Multi-context so no SPI available (WDT?)  */
-    while (1);
+    system_halt();
 }
 
 void system_exception_wait(void)
 {
     /* Called in many contexts so button reading may be a chore */
-    avic_disable_int(INT_ALL);
-    core_idle();
-    while (1);
+    system_halt();
 }
 
 void system_init(void)
@@ -174,6 +181,9 @@ void system_init(void)
     };
 
     unsigned int i;
+
+    /* Initialize frequency with current */
+    cpu_frequency = ccm_get_mcu_clk();
 
     /* MCR WFI enables wait mode (CCM_CCMR_LPM_WAIT_MODE = 0) */
     imx31_regclr32(&CCM_CCMR, CCM_CCMR_LPM);
@@ -239,16 +249,33 @@ void __attribute__((naked)) imx31_regclr32(volatile uint32_t *reg_p,
     (void)reg_p; (void)mask;
 }
 
-#ifdef BOOTLOADER
+
 void system_prepare_fw_start(void)
 {
     dvfs_dptc_stop();
-    disable_interrupt(IRQ_FIQ_STATUS);
-    avic_disable_int(INT_ALL);
     mc13783_close();
     tick_stop();
+    disable_interrupt(IRQ_FIQ_STATUS);
+    avic_set_ni_level(AVIC_NIL_DISABLE);
 }
-#endif
+
+
+#ifndef BOOTLOADER
+void rolo_restart_firmware(const unsigned char *source, unsigned char *dest,
+                           int length) __attribute__((noreturn));
+
+void __attribute__((noreturn))
+rolo_restart(const unsigned char *source, unsigned char *dest, int length)
+{
+    /* Some housekeeping tasks must be performed for a safe changeover */
+    charging_algorithm_close();
+    system_prepare_fw_start();
+
+    /* Copying routine where new image is run */
+    rolo_restart_firmware(source, dest, length);
+}
+#endif /* BOOTLOADER */
+
 
 inline void dumpregs(void) 
 {

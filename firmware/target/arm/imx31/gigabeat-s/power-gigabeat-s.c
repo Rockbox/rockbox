@@ -28,6 +28,7 @@
 #include "backlight-target.h"
 #include "avic-imx31.h"
 #include "mc13783.h"
+#include "dvfs_dptc-imx31.h"
 #if CONFIG_TUNER
 #include "fmradio_i2c.h"
 #endif
@@ -121,6 +122,9 @@ bool tuner_powered(void)
 
 void power_off(void)
 {
+    /* Turn off voltage and frequency scaling */
+    dvfs_dptc_stop();
+
     /* Cut backlight */
     _backlight_off();
 
@@ -131,9 +135,7 @@ void power_off(void)
     mc13783_set(MC13783_POWER_CONTROL0, MC13783_USEROFFSPI);
 
     /* Wait for power cut */
-    disable_interrupt(IRQ_FIQ_STATUS);
-
-    while (1);
+    system_halt();
 }
 
 void power_init(void)

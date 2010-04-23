@@ -93,11 +93,21 @@ enum IMX31_PLLS
     NUM_PLLS,
 };
 
+
+/* Return the current source pll for MCU */
+enum IMX31_PLLS ccm_get_src_pll(void);
+
+/* Decode PLL output frequency from register value */
+unsigned int ccm_calc_pll_rate(unsigned int infreq, unsigned long regval);
+
 /* Get the PLL reference clock frequency in HZ */
-unsigned int ccm_get_pll_ref_clk(void);
+unsigned int ccm_get_pll_ref_clk_rate(void);
 
 /* Return PLL frequency in HZ */
-unsigned int ccm_get_pll(enum IMX31_PLLS pll);
+unsigned int ccm_get_pll_rate(enum IMX31_PLLS pll);
+
+/* Return MCU frequency in HZ */
+unsigned int ccm_get_mcu_clk(void);
 
 /* Return ipg_clk in HZ */
 unsigned int ccm_get_ipg_clk(void);
@@ -107,5 +117,8 @@ unsigned int ccm_get_ahb_clk(void);
 
 /* Return the ATA frequency in HZ */
 unsigned int ccm_get_ata_clk(void);
+
+/* Write new values to the current PLL and post-dividers */
+void ccm_set_mcupll_and_pdr(unsigned long pllctl, unsigned long pdr);
 
 #endif /* _CCM_IMX31_H_ */

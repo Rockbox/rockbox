@@ -1336,39 +1336,6 @@
 #define CCM_DCVR_ELV                    (0x3ff <<  2) /* Emergency limit */
 #define CCM_DCVR_ELV_POS                (2)
 
-#if 0
-enum DVFS_W_SIGS
-{
-    DVFS_W_SIGS_M3IF_M0_BUF    = 0,  /* Hready signal of M3IF's master #0
-                                        (L2 Cache) */
-    DVFS_W_SIGS_M3IF_M1        = 1,  /* Hready signal of M3IF's master #1
-                                        (L2 Cache) */
-    DVFS_W_SIGS_MBX_MBXCLKGATE = 2,  /* Hready signal of M3IF's master #2
-                                        (MBX) */
-    DVFS_W_SIGS_M3IF_M3        = 3,  /* Hready signal of M3IF's master #3
-                                        (MAX) */
-    DVFS_W_SIGS_M3IF_M4        = 4,  /* Hready signal of M3IF's master #4
-                                        (SDMA) */
-    DVFS_W_SIGS_M3IF_M5        = 5,  /* Hready signal of M3IF's master #5
-                                        (mpeg4_vga_encoder) */
-    DVFS_W_SIGS_M3IF_M6        = 6,  /* Hready signal of M3IF's master #6
-                                        (IPU) */
-    DVFS_W_SIGS_M3IF_M7        = 7,  /* Hready signal of M3IF's master #7
-                                        (IPU) */
-    DVFS_W_SIGS_ARM11_P_IRQ_B_RBT_GATE = 8, /* ARM normal interrupt */
-    DVFS_W_SIGS_ARM11_P_FIQ_B_RBT_GATE = 9, /* ARM fast interrupt */
-    DVFS_W_SIGS_IPI_GPIO1_INT0 = 10, /* Interrupt line from GPIO */
-    DVFS_W_SIGS_IPI_INT_IPU_FUNC = 11, /* Interrupt line from IPU */
-    DVFS_W_SIGS_DVGP0          = 12, /* Software-controllable general-purpose
-                                        bits from the CCM */
-    DVFS_W_SIGS_DVGP1          = 13, /* Software-controllable general-purpose
-                                        bits from the CCM */
-    DVFS_W_SIGS_DVGP2          = 14, /* Software-controllable general-purpose
-                                        bits from the CCM */
-    DVFS_W_SIGS_DVGP3          = 15, /* Software-controllable general-purpose
-                                        bits from the CCM */
-};
-#endif
 
 /* LTR0 */
 #define CCM_LTR0_UPTHR                  (0x3f << 22)
@@ -1383,15 +1350,26 @@ enum DVFS_W_SIGS
 #define CCM_LTR0_DIV3CK_32768           (0x2 << 1) /* 1/32768 ARM clock */
 #define CCM_LTR0_DIV3CK_131072          (0x3 << 1) /* 1/131072 ARM clock */
 
+/* LTR1 */
+#define CCM_LTR1_LTBRSH                 (1 << 23)
+#define CCM_LTR1_LTBRSR                 (1 << 22)
+#define CCM_LTR1_DNCNT                  (0xff << 14)
+#define CCM_LTR1_DNCNT_POS              (14)
+#define CCM_LTR1_UPCNT                  (0xff << 6)
+#define CCM_LTR1_UPCNT_POS              (6)
+#define CCM_LTR1_PNCTHR                 (0x3f << 0)
+#define CCM_LTR1_PNCTHR_POS             (0)
+
+/* LTR2 */
+#define CCM_LTR2_EMAC                   (0x1ff)
+#define CCM_LTR2_EMAC_POS               (0)
+
 /* PMCR0 */
-#define CCM_PMCR0_DVSUP_MCUPLL          (1 << 31)
-#define CCM_PMCR0_DVSUP_POST_DIVIDERS   (1 << 30)
-#define CCM_PMCR0_DVSUP_DVS             (0x3 << 28)
-#define CCM_PMCR0_DVS1_0_DVS0_0         (0x0 << 28) /* Highest frequency/voltage */
-#define CCM_PMCR0_DVS1_0_DVS0_1         (0x1 << 28) /* ... */
-#define CCM_PMCR0_DVS1_1_DVS0_0         (0x2 << 28) /* ... */
-#define CCM_PMCR0_DVS1_1_DVS0_1         (0x3 << 28) /* Lowest frequency/voltage */
-#define CCM_PMCR0_DVS_POS               (28)
+#define CCM_PMCR0_DFSUP_MCUPLL          (1 << 31)
+#define CCM_PMCR0_DFSUP_MCUPLL_POS      (31)
+#define CCM_PMCR0_DFSUP_POST_DIVIDERS   (1 << 30)
+#define CCM_PMCR0_DVSUP                 (0x3 << 28)
+#define CCM_PMCR0_DVSUP_POS             (28)
 #define CCM_PMCR0_UDSC                  (1 << 27)
 #define CCM_PMCR0_VSCNT                 (0x7 << 24)
 #define CCM_PMCR0_VSCNT_POS             (24)
@@ -1431,6 +1409,13 @@ enum DVFS_W_SIGS
 #define CCM_PMCR0_DPTEN                 (1 << 0)
 
 
+/* PMCR1 */
+#define CCM_PMCR1_DVGP_POS              (0)
+#define CCM_PMCR1_DVGP_MASK             (0xf << 0)
+
+/* IC revision 2.0 or greater ONLY! */
+#define CCM_PMCR1_EMIRQ_EN              (1 << 8)
+#define CCM_PMCR1_PLLRDIS               (1 << 7) /* No PLL reset on switch */
 
 
 /* WEIM - CS0 */

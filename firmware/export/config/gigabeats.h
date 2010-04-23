@@ -147,7 +147,7 @@
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */
-#define TARGET_EXTRA_THREADS 2
+#define TARGET_EXTRA_THREADS 3
 
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
@@ -168,8 +168,9 @@
 #define FLASH_SIZE 0x200000
 
 /* Define this to the CPU frequency */
-/* TODO */
 #define CPU_FREQ 264000000 /* Set by retailOS loader */
+
+#define FREQ cpu_frequency
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

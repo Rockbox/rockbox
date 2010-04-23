@@ -115,7 +115,7 @@ static void rolo_error(const char *text)
 /* these are in assembler file "descramble.S" for SH7034 */
 extern unsigned short descramble(const unsigned char* source,
                                  unsigned char* dest, int length);
-/* this is in firmware/target/arm/imx31/rolo_restart.S for IMX31 */
+/* this is in firmware/target/arm/imx31/rolo_restart.c for IMX31 */
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else
@@ -300,6 +300,7 @@ int rolo_load(const char* filename)
 #endif
     adc_close();
 
+#if CONFIG_CPU != IMX31L /* We're not finished yet */
 #ifdef CPU_ARM
     /* Should do these together since some ARM version should never have
      * FIQ disabled and not IRQ (imx31 errata). */
@@ -308,6 +309,7 @@ int rolo_load(const char* filename)
     /* Some targets have a higher disable level than HIGEST_IRQ_LEVEL */
     set_irq_level(DISABLE_INTERRUPTS);
 #endif
+#endif /* CONFIG_CPU == IMX31L */
 
 #else /* CONFIG_CPU == SH7034 */
     /* Read file length from header and compare to real file length */

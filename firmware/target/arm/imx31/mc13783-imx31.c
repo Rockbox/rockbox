@@ -26,10 +26,6 @@
 #include "debug.h"
 #include "kernel.h"
 
-#ifdef BOOTLOADER
-#define PMIC_DRIVER_CLOSE
-#endif
-
 extern const struct mc13783_event_list mc13783_event_list;
 extern struct spi_node mc13783_spi;
 
@@ -47,10 +43,7 @@ static const unsigned char pmic_intm_regs[2] =
 static const unsigned char pmic_ints_regs[2] =
     { MC13783_INTERRUPT_STATUS0, MC13783_INTERRUPT_STATUS1 };
 
-#ifdef PMIC_DRIVER_CLOSE
-static bool pmic_close = false;
-static unsigned int mc13783_thread_id = 0;
-#endif
+static volatile unsigned int mc13783_thread_id = 0;
 
 static void mc13783_interrupt_thread(void)
 {
@@ -65,10 +58,8 @@ static void mc13783_interrupt_thread(void)
 
         wakeup_wait(&mc13783_wake, TIMEOUT_BLOCK);
 
-#ifdef PMIC_DRIVER_CLOSE
-        if (pmic_close)
+        if (mc13783_thread_id == 0)
             break;
-#endif
 
         mc13783_read_regset(pmic_ints_regs, pending, 2);
 
@@ -107,9 +98,7 @@ static void mc13783_interrupt_thread(void)
         while (++event < event_last);
     }
 
-#ifdef PMIC_DRIVER_CLOSE
     gpio_disable_event(MC13783_EVENT_ID);
-#endif
 }
 
 /* GPIO interrupt handler for mc13783 */
@@ -136,15 +125,12 @@ void mc13783_init(void)
 
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
 
-#ifdef PMIC_DRIVER_CLOSE
     mc13783_thread_id =
-#endif
         create_thread(mc13783_interrupt_thread,
             mc13783_thread_stack, sizeof(mc13783_thread_stack), 0,
             mc13783_thread_name IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
 
-#ifdef PMIC_DRIVER_CLOSE
 void mc13783_close(void)
 {
     unsigned int thread_id = mc13783_thread_id;
@@ -153,12 +139,9 @@ void mc13783_close(void)
         return;
 
     mc13783_thread_id = 0;
-
-    pmic_close = true;
     wakeup_signal(&mc13783_wake);
     thread_wait(thread_id);
 }
-#endif /* PMIC_DRIVER_CLOSE */
 
 bool mc13783_enable_event(enum mc13783_event_ids id)
 {
