@@ -71,8 +71,6 @@ static const struct
     (MC13783_BOOSTEN | MC13783_ABMODE_MONCH_LEDMD1234 | \
      MC13783_ABREF_400MV)
 
-static struct mutex backlight_mutex;    /* Block brightness change while
-                                         * setting up fading */
 static bool backlight_on_status = true; /* Is on or off? */
 static uint32_t backlight_pwm_bits;     /* Final PWM setting for fade-in */
 
@@ -81,8 +79,6 @@ static uint32_t led_ramp_mask = MC13783_LEDMDRAMPDOWN | MC13783_LEDMDRAMPUP;
 
 bool _backlight_init(void)
 {
-    mutex_init(&backlight_mutex);
-
     /* Set default LED register value */
     mc13783_write(MC13783_LED_CONTROL0,
                   MC13783_LED_CONTROL0_BITS | MC13783_LEDEN);
@@ -125,8 +121,6 @@ void _backlight_on(void)
 
     uint32_t data[2];
 
-    mutex_lock(&backlight_mutex);
-
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
 #endif
@@ -151,15 +145,11 @@ void _backlight_on(void)
         /* Write regs within 30us of each other (requires single xfer) */
         mc13783_write_regset(regs, data, 2);
     }
-
-    mutex_unlock(&backlight_mutex);
 }
 
 void _backlight_off(void)
 {
     uint32_t ctrl0 = MC13783_LED_CONTROL0_BITS | MC13783_LEDEN;
-
-    mutex_lock(&backlight_mutex);
 
     if (backlight_on_status)
         ctrl0 |= led_ramp_mask & MC13783_LEDMDRAMPDOWN;
@@ -176,8 +166,6 @@ void _backlight_off(void)
     mc13783_write_masked(MC13783_LED_CONTROL2,
                          0 << MC13783_LEDMDDC_POS,
                          MC13783_LEDMDDC);
-
-    mutex_unlock(&backlight_mutex);
 }
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -185,19 +173,13 @@ void _backlight_off(void)
  * already be range-checked in public interface. */
 void _backlight_set_brightness(int brightness)
 {
-    uint32_t md;
-
-    mutex_lock(&backlight_mutex);
-
-    md = led_md_pwm_table[brightness].md;
+    uint32_t md = led_md_pwm_table[brightness].md;
     backlight_pwm_bits = backlight_on_status ?
         (led_md_pwm_table[brightness].pwm << MC13783_LEDMDDC_POS) : 0;
 
     mc13783_write_masked(MC13783_LED_CONTROL2,
                          (md << MC13783_LEDMD_POS) | backlight_pwm_bits,
                          MC13783_LEDMD | MC13783_LEDMDDC);
-
-    mutex_unlock(&backlight_mutex);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
@@ -205,10 +187,6 @@ void _backlight_set_brightness(int brightness)
 /* Turn off LED supply */
 void _backlight_lcd_sleep(void)
 {
-    mutex_lock(&backlight_mutex);
-
     mc13783_clear(MC13783_LED_CONTROL0, MC13783_LEDEN);
-
-    mutex_unlock(&backlight_mutex);
 }
 #endif
