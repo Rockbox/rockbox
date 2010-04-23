@@ -106,11 +106,12 @@ if you select Exit, so any unsaved changes will be lost.}
 \begin{table}
   \begin{btnmap}{}{}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
-        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD}
+        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD}
             {\ButtonPower}
         \opt{IRIVER_H300_PAD}{\ButtonOff}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
         \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+        \opt{PBELL_VIBE500_PAD}{\ButtonRec}
           \opt{HAVEREMOTEKEYMAP}{& }
         & Quits Rockpaint immediately.\\
     }
@@ -130,7 +131,7 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonSelect+\ButtonPower}%
     \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonDown}%
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}%
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}%
     \opt{IRIVER_H10_PAD}{\ButtonPlay}%
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the Main Menu.\\
@@ -142,12 +143,14 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
+    \opt{PBELL_VIBE500_PAD}{\ButtonOK}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the toolbar.\\
 
-    \nopt{IRIVER_H10_PAD,COWON_D2_PAD}{\ButtonSelect}%
+    \nopt{IRIVER_H10_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonSelect}%
     \opt{IRIVER_H10_PAD}{\ButtonFF}%
     \opt{COWON_D2_PAD}{\TouchCenter}
+    \opt{PBELL_VIBE500_PAD}{\ButtonPlay}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Toggles the brush and selects objects.\\
 

@@ -25,7 +25,7 @@ aware:
 \subsubsection{Keys}
 \begin{table}
     \begin{btnmap}{}{}
-        \opt{scrollwheel,IRIVER_H10_PAD}{
+        \opt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{
             \ActionStdPrev{} / \ActionStdNext
                 &
             \opt{HAVEREMOTEKEYMAP}{
@@ -35,7 +35,7 @@ aware:
         }
         
         % only scroll wheel and 'strip' targets use the same action in album and track list
-        \nopt{scrollwheel,IRIVER_H10_PAD}{%
+        \nopt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{%
             % currently the M3 does not use buttons of the main unit which has no display
             \nopt{IAUDIO_M3_PAD,COWON_D2_PAD}{\ButtonLeft{} / \ButtonRight}
                 &
@@ -57,9 +57,10 @@ aware:
         }
 
         \nopt{IAUDIO_M3_PAD}{%
-            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,COWON_D2_PAD}{\ButtonSelect}
+            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}
+                 {\ButtonSelect}
             \opt{ONDIO_PAD}{\ButtonUp} 
-            \opt{IRIVER_H10_PAD}{\ButtonRight} 
+            \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonRight} 
             \opt{RECORDER_PAD}{\ButtonOn} 
             \opt{COWON_D2_PAD}{\TouchCenter}
         }
@@ -104,6 +105,7 @@ aware:
             \opt{SANSA_C200_PAD,IRIVER_H10_PAD,COWON_D2_PAD}{Long \ButtonPower}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonMenu}
             \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
+            \opt{PBELL_VIBE500_PAD}{\ButtonRec}
         }
             &
         \opt{HAVEREMOTEKEYMAP}{

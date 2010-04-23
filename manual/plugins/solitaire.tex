@@ -16,13 +16,13 @@ visit
 \begin{table}
   \begin{btnmap}{}{}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-        ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD}
+        ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD,PBELL_VIBE500_PAD}
       {\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD,IPOD_4G_PAD%
-        ,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD}
+        ,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
       {/ \ButtonLeft{} / \ButtonRight}
     \opt{COWON_D2_PAD}{\TouchTopMiddle{} / \TouchBottomMiddle{} / \TouchMidLeft{} / \TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -36,6 +36,7 @@ visit
       {\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
     \opt{COWON_D2_PAD}{\TouchCenter}
+    \opt{PBELL_VIBE500_PAD}{\ButtonOK}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Select cards, move cards, reveal hidden cards...\\
     %
@@ -50,6 +51,7 @@ visit
     \opt{SANSA_FUZE_PAD}{\ButtonHome}
     \opt{SANSA_C200_PAD}{\ButtonVolDown}
     \opt{COWON_D2_PAD}{\TouchTopLeft}
+    \opt{PBELL_VIBE500_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
       & If a card was selected -- unselect it, else\\
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -66,6 +68,7 @@ visit
     \opt{GIGABEAT_S_PAD}{\ButtonSelect{} + \ButtonLeft}
     \opt{MROBE100_PAD}{\ButtonDisplay{} + \ButtonLeft}
     \opt{COWON_D2_PAD}{\TouchTopRight}
+    \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Put the card from the top of the remains stack on top of the cursor\\
     %
@@ -79,6 +82,7 @@ visit
     \opt{SANSA_E200_PAD}{\ButtonRec{} + \ButtonRight}
     \opt{SANSA_FUZE_PAD}{\ButtonRight}
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
+    \opt{PBELL_VIBE500_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Put the card under the cursor on one of the 4 final colour stacks.\\
     %
@@ -93,6 +97,7 @@ visit
     \opt{MROBE100_PAD}{\ButtonDisplay{} + \ButtonRight}
     \opt{SANSA_C200_PAD}{\ButtonVolUp}
     \opt{COWON_D2_PAD}{\TouchBottomRight}
+    \opt{PBELL_VIBE500_PAD}{Long \ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Put the card on top of the remains stack on one of the final colour stacks.\\
     %
@@ -102,6 +107,7 @@ visit
         ,GIGABEAT_PAD,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
         }

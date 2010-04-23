@@ -12,12 +12,14 @@ A simple stopwatch program with support for saving times.
         ,MROBE100_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{PBELL_VIBE500_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
         }
     & Quit Plugin \\
     %
-    \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
+    \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD%
+        ,PBELL_VIBE500_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonRight}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD,IPOD_4G_PAD%
         ,IPOD_3G_PAD}{\ButtonSelect}
@@ -33,11 +35,12 @@ A simple stopwatch program with support for saving times.
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{GIGABEAT_S_PAD}{\ButtonMenu}
     \opt{MROBE100_PAD}{\ButtonDisplay}
+    \opt{PBELL_VIBE500_PAD}{\ButtonOK}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Reset timer (only when timer is stopped)\\
     %
     \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{ONDIO_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{ONDIO_PAD,GIGABEAT_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonRight}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
@@ -46,7 +49,8 @@ A simple stopwatch program with support for saving times.
     %
     \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft{} / \ButtonRight}
     \opt{RECORDER_PAD,ONDIO_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
-        ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp{} / \ButtonDown}
+        ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}%
+        {\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
   \opt{HAVEREMOTEKEYMAP}{& }

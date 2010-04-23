@@ -57,21 +57,23 @@ Game controls:}
     \begin{btnmap}{}{}
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
             ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}
+            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD%
+            ,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
         {\ButtonLeft}
         \opt{COWON_D2_PAD}{\TouchMidLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Turn left\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
             ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD}
+            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD%
+            ,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
         {\ButtonRight}
         \opt{COWON_D2_PAD}{\TouchMidRight}
              \opt{HAVEREMOTEKEYMAP}{& }
         & Turn right\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
             ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonUp}
+            ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
         \opt{COWON_D2_PAD}{\TouchTopMiddle}
@@ -79,7 +81,7 @@ Game controls:}
         & Turn Up\\
         \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
             ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonDown}
+            ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
         \opt{COWON_D2_PAD}{\TouchBottomMiddle}
@@ -123,7 +125,7 @@ The game is over when all worms are dead. The longest worm wins the
 game. 
 \item [Pause the game.]
 Press
-\opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}%
+\opt{RECORDER_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}%
 \opt{ONDIO_PAD}{\ButtonMenu}%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
   ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
@@ -139,6 +141,7 @@ There are two ways to stop a running game.
 \opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+\opt{PBELL_VIBE500_PAD}{\ButtonRec}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}.
 The game will stop immediately and you will return to the game menu. 
 \item If you want to stop the game and still see the screen hit 
@@ -148,6 +151,7 @@ The game will stop immediately and you will return to the game menu.
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
+\opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}.
 This freezes the game. If you hit
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
@@ -156,6 +160,7 @@ This freezes the game. If you hit
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
+\opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
 button again a new game starts with the same configuration. To return to the
 games menu you can hit
@@ -163,6 +168,7 @@ games menu you can hit
 \opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+\opt{PBELL_VIBE500_PAD}{\ButtonRec}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}. A stopped game can not be resumed. 
 \end{itemize}
 \end{description}
