@@ -22,6 +22,7 @@
 #include "config.h"
 #include "system.h"
 #include "mc13783.h"
+#include "iomuxc-imx31.h"
 #include "i2c-imx31.h"
 #include "fmradio_i2c.h"
 
@@ -48,36 +49,34 @@ void fmradio_i2c_init(void)
 
     /* open-drain pins - external pullups on PCB. Pullup default but
      * disabled */
-    imx31_regmod32(&SW_PAD_CTL_DSR_DTE1_RI_DTE1_DCD_DTE1,
-        /* RI_DTE1 (I2C2_SCLK) */
-        ((SW_PAD_CTL_PUE_PKE_DISABLE | SW_PAD_CTL_PUS_UP_100K |
-          SW_PAD_CTL_HYS | SW_PAD_CTL_ODE) << SW_PAD_CTL_IO2_POS) |
-        /* DCD_DTE1 (I2C2_SDA) */
-        ((SW_PAD_CTL_PUE_PKE_DISABLE | SW_PAD_CTL_PUS_UP_100K |
-          SW_PAD_CTL_HYS | SW_PAD_CTL_ODE) << SW_PAD_CTL_IO1_POS),
-        SW_PAD_CTL_IO2 | SW_PAD_CTL_IO1);
+    /* RI_DTE1 (I2C2_SCLK) */                          
+    iomuxc_set_pad_config(IOMUXC_RI_DTE1,
+        IOMUXC_PAD_PUE_PKE_DISABLE | IOMUXC_PAD_PUS_UP_100K |
+        IOMUXC_PAD_HYS | IOMUXC_PAD_ODE);
+    /* DCD_DTE1 (I2C2_SDA) */
+    iomuxc_set_pad_config(IOMUXC_DCD_DTE1,
+        IOMUXC_PAD_PUE_PKE_DISABLE | IOMUXC_PAD_PUS_UP_100K |
+        IOMUXC_PAD_HYS | IOMUXC_PAD_ODE);
+
     /* set outputs to I2C2 */
-    imx31_regmod32(&SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2,
-       /* RI_DTE1 => I2C2_SCLK */
-       ((SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2) << SW_MUX_CTL_SIG4_POS) |
-       /* DCD_DTE1 => I2C2_SDA */
-       ((SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2) << SW_MUX_CTL_SIG3_POS),
-       SW_MUX_CTL_SIG4 | SW_MUX_CTL_SIG3);
+    /* RI_DTE1 => I2C2_SCLK */
+    iomuxc_set_pin_mux(IOMUXC_RI_DTE1,
+                       IOMUXC_MUX_OUT_ALT2 | IOMUXC_MUX_IN_ALT2);
+    /* DCD_DTE1 => I2C2_SDA */
+    iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
+                       IOMUXC_MUX_OUT_ALT2 | IOMUXC_MUX_IN_ALT2);
 }
 
 void fmradio_i2c_enable(bool enable)
 {
     if (enable)
     {
-        uint32_t io_pin_mux = SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2;
         /* place in GPIO mode to hold SDIO low during RESET release,
          * SEN1 should be high already (pullup) and GPIO3 left alone */
         imx31_regset32(&GPIO2_GDIR, (1 << 15)); /* SDIO OUT */
         /* I2C2_SDA => MCU2_15 */ 
-        imx31_regmod32(&SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2,
-            (SW_MUX_OUT_GPIO_DR |
-             SW_MUX_IN_GPIO_PSR_ISR) << SW_MUX_CTL_SIG3_POS,
-            SW_MUX_CTL_SIG3);
+        iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
+                           IOMUXC_MUX_OUT_GPIO | IOMUXC_MUX_IN_GPIO);
         /* enable CLK32KMCU clock */
         mc13783_set(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
         /* enable the fm chip (release RESET) */
@@ -85,9 +84,9 @@ void fmradio_i2c_enable(bool enable)
         sleep(HZ/100);
         /* busmode should be selected - OK to release SDIO */
         imx31_regclr32(&GPIO2_GDIR, (1 << 15)); /* SDIO IN */
-        /* restore pin mux (DCD_DTE1 => I2C2_SDA) */
-        imx31_regmod32(&SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2,
-                       io_pin_mux, SW_MUX_CTL_SIG3);
+        /* restore pin mux (MCU2_15 => I2C2_SDA) */
+        iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
+                           IOMUXC_MUX_OUT_ALT2 | IOMUXC_MUX_IN_ALT2);
         /* the si4700 is the only thing connected to i2c2 so
            we can diable the i2c module when not in use */
         i2c_enable_node(&si4700_i2c_node, true);

@@ -877,6 +877,7 @@ target/arm/imx31/debug-imx31.c
 target/arm/imx31/dvfs_dptc-imx31.c
 target/arm/imx31/gpio-imx31.c
 target/arm/imx31/i2c-imx31.c
+target/arm/imx31/iomuxc-imx31.c
 target/arm/imx31/mc13783-imx31.c
 target/arm/imx31/mmu-imx31.c
 target/arm/imx31/rolo_restart.S
