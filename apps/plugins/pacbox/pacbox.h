@@ -288,8 +288,11 @@
 /* How many video frames (out of a possible 60) we display each second.
    NOTE: pacbox.c assumes this is an integer divisor of 60
  */
-#if defined(IPOD_NANO) || defined (TOSHIBA_GIGABEAT_F)
-/* The Nano and Gigabeat can manage full-speed at 30fps (1 in 2 frames) */
+#if defined(TOSHIBA_GIGABEAT_S)
+/* Gigabeat S can manage the full framerate (1 in 1 frames) */
+#define FPS 60
+#elif defined(IPOD_NANO) || defined (TOSHIBA_GIGABEAT_F)
+/* The Nano and Gigabeat F can manage full-speed at 30fps (1 in 2 frames) */
 #define FPS 30
 #else
 /* We aim for 20fps on the other targets (1 in 3 frames) */
