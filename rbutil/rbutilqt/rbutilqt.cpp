@@ -1160,8 +1160,8 @@ void RbUtilQt::updateInfo()
 {
     qDebug() << "[RbUtil] updating server info";
 
-    QSettings log(RbSettings::value(RbSettings::Mountpoint).toString()
-                    + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
+    QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
+    QSettings log(mp + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
     QStringList groups = log.childGroups();
     QList<QTreeWidgetItem *> items;
     QTreeWidgetItem *w, *w2;
@@ -1197,7 +1197,7 @@ void RbUtilQt::updateInfo()
 
         for(int b = 0; b < keys.size(); b++) {
             QString file;
-            file = RbSettings::value(RbSettings::Mountpoint).toString() + "/" + keys.at(b);
+            file = mp + "/" + keys.at(b);
             if(QFileInfo(file).isDir())
                 continue;
             w2 = new QTreeWidgetItem(w, QStringList() << "/"
