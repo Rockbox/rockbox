@@ -1344,6 +1344,17 @@ static void audio_finish_load_track(void)
 
     track_id3->elapsed = 0;
     offset = track_id3->offset;
+    size_t resume_rewind = (global_settings.resume_rewind *
+                            track_id3->bitrate * 1000) / 8;
+
+    if (offset < resume_rewind)
+    {
+        offset = 0;
+    }
+    else
+    {
+        offset -= resume_rewind;
+    }
 
     enum data_type type = TYPE_PACKET_AUDIO;
 
@@ -1374,6 +1385,8 @@ static void audio_finish_load_track(void)
         /* no special treatment needed */
         break;
     }
+
+    track_id3->offset = offset;
 
     logf("load track: %s", track_id3->path);
 

@@ -823,6 +823,10 @@ struct user_settings
     int hotkey_tree;
 #endif
 
+#if CONFIG_CODEC == SWCODEC
+    /* When resuming playback (after a stop), rewind this number of seconds */
+    int resume_rewind;
+#endif
 };
 
 /** global variables **/

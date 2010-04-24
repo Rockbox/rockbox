@@ -1683,6 +1683,12 @@ const struct settings_list settings[] = {
 #endif
         ID2P(LANG_ONPLAY_OPEN_WITH), ID2P(LANG_DELETE), ID2P(LANG_INSERT)),
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    INT_SETTING(0, resume_rewind, LANG_RESUME_REWIND, 0,
+                "resume rewind", UNIT_SEC, 0, 60, 5,
+                NULL, NULL, NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

@@ -13511,3 +13511,20 @@
     *: none
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rewind before resume"
+  </voice>
+</phrase>
