@@ -379,10 +379,10 @@ void audiohw_set_channel(int value)     { (void)value; }
 void audiohw_set_stereo_width(int value){ (void)value; }
 #endif
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-void audiohw_set_bass_cutoff(value)     { (void)value; }
+void audiohw_set_bass_cutoff(int value) { (void)value; }
 #endif
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-void audiohw_set_treble_cutoff(value)   { (void)value; }
+void audiohw_set_treble_cutoff(int value){ (void)value; }
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 int mas_codec_readreg(int reg)

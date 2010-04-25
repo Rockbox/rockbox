@@ -149,7 +149,7 @@ void sound_set_dsp_callback(int (*func)(int, intptr_t))
 }
 #endif
 
-#if CONFIG_CODEC == MAS3507D
+#if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
 /* convert tenth of dB volume (-780..+180) to dac3550 register value */
 static int tenthdb2reg(int db)
 {
