@@ -202,7 +202,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_ALIGN_RIGHT_RTL,          "aR",  0,                   NULL },
     { WPS_NO_TOKEN,                       "ax",  0,   parse_languagedirection },
 
-    { WPS_TOKEN_BATTERY_PERCENT,          "bl",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BATTERY_PERCENT,          "bl",  WPS_REFRESH_DYNAMIC, parse_progressbar },
     { WPS_TOKEN_BATTERY_VOLTS,            "bv",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_BATTERY_TIME,             "bt",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_BATTERY_SLEEPTIME,        "bs",  WPS_REFRESH_DYNAMIC, NULL },
@@ -1166,7 +1166,7 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->width = vp->width;
         pb->height = SYSFONT_HEIGHT-2;
         pb->y = -line_num - 1; /* Will be computed during the rendering */
-        if (token->type == WPS_TOKEN_VOLUME)
+        if (token->type == WPS_TOKEN_VOLUME || token->type == WPS_TOKEN_BATTERY_PERCENT)
             return 0; /* dont add it, let the regular token handling do the work */
         add_to_ll_chain(&wps_data->progressbars, item);
         return 0;
@@ -1233,12 +1233,15 @@ static int parse_progressbar(const char *wps_bufptr,
     add_to_ll_chain(&wps_data->progressbars, item);
     if (token->type == WPS_TOKEN_VOLUME)
         token->type = WPS_TOKEN_VOLUMEBAR;
+    else if (token->type == WPS_TOKEN_BATTERY_PERCENT)
+        token->type = WPS_TOKEN_BATTERY_PERCENTBAR;
     pb->type = token->type;
     
     return ptr+1-wps_bufptr;
 #else
     (void)wps_bufptr;
-    if (token->type != WPS_TOKEN_VOLUME)
+    if (token->type != WPS_TOKEN_VOLUME &&
+        token->type != WPS_TOKEN_BATTERY_PERCENTBAR)
     {
         wps_data->full_line_progressbar = 
                         token->type == WPS_TOKEN_PLAYER_PROGRESSBAR;

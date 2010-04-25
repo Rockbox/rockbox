@@ -27,6 +27,7 @@
 #include "system.h"
 #include "rbunicode.h"
 #include "sound.h"
+#include "powermgmt.h"
 #ifdef DEBUG
 #include "debug.h"
 #endif
@@ -144,6 +145,11 @@ static void draw_progressbar(struct gui_wps *gwps,
         int maxvol = sound_max(SOUND_VOLUME);
         length = maxvol-minvol;
         elapsed = global_settings.volume-minvol;
+    }
+    else if (pb->type == WPS_TOKEN_BATTERY_PERCENTBAR)
+    {
+        length = 100;
+        elapsed = battery_level();
     }
     else if (id3 && id3->length)
     {
@@ -608,8 +614,9 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
             clear_image_pos(gwps, find_image(data->tokens[i].value.i&0xFF, data));
-        else if (data->tokens[i].type == WPS_TOKEN_VOLUMEBAR ||
-                 data->tokens[i].type == WPS_TOKEN_PROGRESSBAR)
+        else if (data->tokens[i].type == WPS_TOKEN_VOLUMEBAR   ||
+                 data->tokens[i].type == WPS_TOKEN_PROGRESSBAR ||
+                 data->tokens[i].type == WPS_TOKEN_BATTERY_PERCENTBAR )
         {
             struct progressbar *bar = (struct progressbar*)data->tokens[i].value.data;
             bar->draw = false;
@@ -677,6 +684,7 @@ static bool get_line(struct gui_wps *gwps,
 
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_VOLUMEBAR:
+            case WPS_TOKEN_BATTERY_PERCENTBAR:
             case WPS_TOKEN_PROGRESSBAR:
             {
                 struct progressbar *bar = (struct progressbar*)data->tokens[i].value.data;
