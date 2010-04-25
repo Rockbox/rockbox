@@ -1129,7 +1129,10 @@ static void decodeGeneric(LodePNG_Decoder* decoder, unsigned char* in, size_t si
             {
                 if (chunkLength != 1) { decoder->error = 43; break; } /*error: this chunk must be 1 byte for indexed color image*/
                 decoder->infoPng.background_defined = 1;
-                decoder->infoPng.background_r = decoder->infoPng.background_g = decoder->infoPng.background_g = data[0];
+                decoder->infoPng.background_r = decoder->infoPng.color.palette[4 * data[0] + 0];
+                decoder->infoPng.background_g = decoder->infoPng.color.palette[4 * data[0] + 1];
+                decoder->infoPng.background_b = decoder->infoPng.color.palette[4 * data[0] + 2];
+
             }
             else if (decoder->infoPng.color.colorType == 0 || decoder->infoPng.color.colorType == 4)
             {
