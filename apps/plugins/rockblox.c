@@ -901,6 +901,7 @@ static void init_rockblox (bool resume)
     pgfx_display (0, 0);
     pgfx_display_block (3, 0, 3, 1);
     pgfx_display_block (4, 0, 3, 0);
+    rb->lcd_puts(4, 1, " ");
     pgfx_clear_display();
     pgfx_fillrect (3, 0, 2, 14);
     pgfx_fillrect (15, 7, 2, 7);
