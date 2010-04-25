@@ -238,6 +238,7 @@ QStringList Autodetection::mountpoints()
     for(int i=0; i<list.size();i++)
     {
         tempList << list.at(i).absolutePath();
+        qDebug() << "[Autodetection] Mounted on" << list.at(i).absolutePath();
     }
 
 #elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
@@ -247,6 +248,8 @@ QStringList Autodetection::mountpoints()
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
         tempList << QString(mntinf->f_mntonname);
+        qDebug() << "[Autodetection] Mounted on" << mntinf->f_mntonname
+                 << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
         mntinf++;
     }
 #elif defined(Q_OS_LINUX)
@@ -256,8 +259,11 @@ QStringList Autodetection::mountpoints()
         return QStringList("");
 
     struct mntent *ent;
-    while((ent = getmntent(mn)))
+    while((ent = getmntent(mn))) {
         tempList << QString(ent->mnt_dir);
+        qDebug() << "[Autodetection] Mounted on" << ent->mnt_dir
+                 << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
+    }
     endmntent(mn);
 
 #else
@@ -284,12 +290,18 @@ QString Autodetection::resolveMountPoint(QString device)
     while((ent = getmntent(mn))) {
         // Check for valid filesystem. Allow hfs too, as an Ipod might be a
         // MacPod.
-        if(QString(ent->mnt_fsname) == device
-           && (QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
-               || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive))) {
+        if(QString(ent->mnt_fsname) == device) {
+            QString result;
+            if(QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
+                    || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive)) {
+                qDebug() << "[Autodetect] resolved mountpoint is:" << ent->mnt_dir;
+                result = QString(ent->mnt_dir);
+            }
+            else {
+                qDebug() << "[Autodetect] mountpoint is wrong filesystem!";
+            }
             endmntent(mn);
-            qDebug() << "[Autodetect] resolved mountpoint is:" << ent->mnt_dir;
-            return QString(ent->mnt_dir);
+            return result;
         }
     }
     endmntent(mn);
@@ -304,11 +316,16 @@ QString Autodetection::resolveMountPoint(QString device)
     while(num--) {
         // Check for valid filesystem. Allow hfs too, as an Ipod might be a
         // MacPod.
-        if(QString(mntinf->f_mntfromname) == device
-           && (QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
-                || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive))) {
-            qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->f_mntonname;
-            return QString(mntinf->f_mntonname);
+        if(QString(mntinf->f_mntfromname) == device) {
+            if(QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
+                || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive)) {
+                qDebug() << "[Autodetect] resolved mountpoint is:" << mntinf->f_mntonname;
+                return QString(mntinf->f_mntonname);
+            }
+            else {
+                qDebug() << "[Autodetect] mountpoint is wrong filesystem!";
+                return QString();
+            }
         }
         mntinf++;
     }
