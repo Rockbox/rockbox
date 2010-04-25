@@ -25,17 +25,20 @@
 #include "tsc2100.h"
 #include "kernel.h"
 
-unsigned short current_bat2 = 4200;
-unsigned short current_aux = 4200;
-static unsigned short current_voltage = 4200;
+unsigned short current_bat2 = 4100;
+unsigned short current_aux = 4100;
+static unsigned short current_voltage = 4100;
+
+/* This specifies the battery level that writes are still safe */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3450
+    3600
 };
 
+/* Below this the player cannot be considered to operate reliably */
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3400
+    3580
 };
 
 /* Right now these are linear translations, it would be good to model them
@@ -47,7 +50,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3400, 3300, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400 },
+    { 3600, 3650, 3700, 3750, 3800, 3850, 3900, 3950, 4000, 4090, 4150 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
@@ -63,12 +66,6 @@ unsigned int battery_adc_voltage(void)
     static unsigned last_tick = 0;
     short tsadc;
     
-    if(tsc2100_read_volt(&bat1, &bat2, &aux)){
-        current_voltage=((short)((int)(bat1<<10)/4096*6*2.5));
-        current_bat2=((short)((int)(bat2<<10)/4096*6*2.5));
-        current_aux=((short)((int)(aux<<10)/4096*6*2.5));
-    }
-    
     tsadc=tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
     
     /* Set the TSC2100 to read voltages if not busy with pen */
@@ -76,6 +73,16 @@ unsigned int battery_adc_voltage(void)
     {
         tsc2100_set_mode(true, 0x0B);
         last_tick = current_tick;
+    }
+    
+    if(tsc2100_read_volt(&bat1, &bat2, &aux))
+    { 
+        /* Calculation was:
+         *  (val << 10) / 4096 * 6 * 2.5 
+         */
+        current_voltage = (short)( (int) (bat1 * 15) >> 2 );
+        current_bat2    = (short)( (bat2 * 15) >> 2 );
+        current_aux     = (short)( (aux  * 15) >> 2 );
     }
         
     return current_voltage;
