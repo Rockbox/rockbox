@@ -32,19 +32,17 @@ void usb_init_device(void) {
 
     /* The following EMIF timing values are from the OF:
      *      IO_EMIF_CS4CTRL1 = 0x66AB;
-     *      IO_EMIF_CS4CTRL2 = 0x4220; 
+     *      IO_EMIF_CS4CTRL2 = 0x4220;
      *
-     * These EMIF timing values are more agressive, but appear to work as long
-     *  as USB_TRANS_BLOCK is defined in the USB driver:
-     *      IO_EMIF_CS4CTRL1 = 0x2245;
-     *      IO_EMIF_CS4CTRL2 = 0x4110; 
+     * More agressive numbers may be possible, but it depends on the clocking
+     *  setup. 
      *
      * When USB_TRANS_BLOCK is not defined the USB driver does not work unless
      *  the values from the OF are used.
      */
     
-    IO_EMIF_CS4CTRL1 = 0x2245;
-    IO_EMIF_CS4CTRL2 = 0x4110; 
+    IO_EMIF_CS4CTRL1 = 0x66AB;
+    IO_EMIF_CS4CTRL2 = 0x4220; 
 
     /* Setup the m66591 reset signal */
     /*  2: output, non-inverted, no-irq, falling edge, no-chat, normal */
