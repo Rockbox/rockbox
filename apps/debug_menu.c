@@ -287,7 +287,7 @@ static void dbg_audio_task(void)
 static bool dbg_buffering_thread(void)
 {
     int button;
-    int line;
+    int line, i;    
     bool done = false;
     size_t bufused;
     size_t bufsize = pcmbuf_get_bufsize();
@@ -299,8 +299,10 @@ static bool dbg_buffering_thread(void)
     ticks = boost_ticks = freq_sum = 0;
 
     tick_add_task(dbg_audio_task);
-
-    lcd_setfont(FONT_SYSFIXED);
+    
+    FOR_NB_SCREENS(i)
+        screens[i].setfont(FONT_SYSFIXED);
+        
     while(!done)
     {
         button = get_action(CONTEXT_STD,HZ/5);
@@ -318,72 +320,83 @@ static bool dbg_buffering_thread(void)
         }
 
         buffering_get_debugdata(&d);
-
-        line = 0;
-        lcd_clear_display();
-
         bufused = bufsize - pcmbuf_free();
 
-        lcd_putsf(0, line++, "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
+        FOR_NB_SCREENS(i) 
+        {
+            line = 0;
+            screens[i].clear_display();
 
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
-                           bufsize, 0, bufused, HORIZONTAL);
-        line++;
 
-        lcd_putsf(0, line++, "alloc: %6ld/%ld", audio_filebufused(),
-                 (long) filebuflen);
+            screens[i].putsf(0, line++, "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
 
-#if LCD_HEIGHT > 80
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
-                           filebuflen, 0, audio_filebufused(), HORIZONTAL);
-        line++;
+            gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                               bufsize, 0, bufused, HORIZONTAL);
+            line++;
 
-        lcd_putsf(0, line++, "real:  %6ld/%ld", (long)d.buffered_data,
-                 (long)filebuflen);
+            screens[i].putsf(0, line++, "alloc: %6ld/%ld", audio_filebufused(),
+                            (long) filebuflen);
 
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
-                           filebuflen, 0, (long)d.buffered_data, HORIZONTAL);
-        line++;
+#if LCD_HEIGHT > 80|| REMOTE_LCD_HEIGHT > 80
+            if (screens[i].lcdheight > 80)
+            {
+                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                                   filebuflen, 0, audio_filebufused(), HORIZONTAL);
+                line++;
+
+                screens[i].putsf(0, line++, "real:  %6ld/%ld", (long)d.buffered_data,
+                                (long)filebuflen);
+
+                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                                   filebuflen, 0, (long)d.buffered_data, HORIZONTAL);
+                line++;
+            }
 #endif
 
-        lcd_putsf(0, line++, "usefl: %6ld/%ld", (long)(d.useful_data),
+            screens[i].putsf(0, line++, "usefl: %6ld/%ld", (long)(d.useful_data),
                                                        (long)filebuflen);
 
-#if LCD_HEIGHT > 80
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
-                           filebuflen, 0, d.useful_data, HORIZONTAL);
-        line++;
+#if LCD_HEIGHT > 80 || REMOTE_LCD_HEIGHT > 80
+            if (screens[i].lcdheight > 80)
+            {
+                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                                   filebuflen, 0, d.useful_data, HORIZONTAL);
+                line++;
+            }
 #endif
 
-        lcd_putsf(0, line++, "data_rem: %ld", (long)d.data_rem);
+            screens[i].putsf(0, line++, "data_rem: %ld", (long)d.data_rem);
 
-        lcd_putsf(0, line++, "track count: %2d", audio_track_count());
+            screens[i].putsf(0, line++, "track count: %2d", audio_track_count());
 
-        lcd_putsf(0, line++, "handle count: %d", (int)d.num_handles);
+            screens[i].putsf(0, line++, "handle count: %d", (int)d.num_handles);
 
 #ifndef SIMULATOR
-        lcd_putsf(0, line++, "cpu freq: %3dMHz",
-                 (int)((FREQ + 500000) / 1000000));
+            screens[i].putsf(0, line++, "cpu freq: %3dMHz",
+                             (int)((FREQ + 500000) / 1000000));
 #endif
 
-        if (ticks > 0)
-        {
-            int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
-            int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
-            lcd_putsf(0, line++, "boost:%3d.%d%% (%d.%dMHz)",
-                     boostquota/10, boostquota%10, avgclock/10, avgclock%10);
+            if (ticks > 0)
+            {
+                int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
+                int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
+                screens[i].putsf(0, line++, "boost:%3d.%d%% (%d.%dMHz)",
+                                 boostquota/10, boostquota%10, avgclock/10, avgclock%10);
+            }
+
+            screens[i].putsf(0, line++, "pcmbufdesc: %2d/%2d",
+                             pcmbuf_used_descs(), pcmbufdescs);
+            screens[i].putsf(0, line++, "watermark: %6d",
+                             (int)(d.watermark));
+
+            screens[i].update();
         }
-
-        lcd_putsf(0, line++, "pcmbufdesc: %2d/%2d",
-                pcmbuf_used_descs(), pcmbufdescs);
-        lcd_putsf(0, line++, "watermark: %6d",
-                (int)(d.watermark));
-
-        lcd_update();
     }
 
     tick_remove_task(dbg_audio_task);
-    lcd_setfont(FONT_UI);
+    
+    FOR_NB_SCREENS(i)
+        screens[i].setfont(FONT_UI);
 
     return false;
 }
