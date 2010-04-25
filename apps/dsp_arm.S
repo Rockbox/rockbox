@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+ #include "config.h"
 
 /****************************************************************************
  *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
@@ -83,7 +84,8 @@ channels_process_sound_chan_karaoke:
     ldmfd   sp!, {r4-r5, pc}
 .karaokeend:
     .size   channels_process_sound_chan_karaoke,.karaokeend-channels_process_sound_chan_karaoke
-    
+
+#if ARM_ARCH < 6
 /****************************************************************************
  *  void sample_output_mono(int count, struct dsp_data *data,
  *                          const int32_t *src[], int16_t *dst)
@@ -195,6 +197,7 @@ sample_output_stereo:
     ldmfd   sp!, {r4-r10, pc}
 .sosend:
     .size   sample_output_stereo,.sosend-sample_output_stereo
+#endif /* ARM_ARCH < 6 */    
 
 /****************************************************************************
  * void apply_crossfeed(int count, int32_t* src[])

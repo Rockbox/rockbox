@@ -158,6 +158,9 @@ dsp_cf.S
 eq_cf.S	 	
 #elif defined(CPU_ARM)
 dsp_arm.S
+#if ARM_ARCH >= 6
+dsp_arm_v6.S
+#endif
 eq_arm.S
 #endif
 #endif
