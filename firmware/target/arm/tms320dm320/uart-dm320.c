@@ -47,6 +47,9 @@ void uart_init(void)
     /*  28: output, non-inverted, no-irq, falling edge, no-chat, UART TX */
     dm320_set_io(28, false, false, false, false, false, 0x01);
     
+    /* Enable UART clock */
+    IO_CLK_MOD2 |= CLK_MOD2_UART1;
+    
     // 8-N-1
     IO_UART1_MSR = 0xC400;
     IO_UART1_BRSR = 0x0057;
