@@ -27,11 +27,15 @@
 #include "debug.h"
 #include "kernel.h"
 #include "sound.h"
+#include "audiohw.h"
 
 #include "pcm.h"
 #include "pcm_sampr.h"
 #include "SDL.h"
 
+static int sim_volume = 0;
+
+#if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
 
 static Uint8* pcm_data;
@@ -347,3 +351,58 @@ void pcm_play_dma_init(void)
 void pcm_postinit(void)
 {
 }
+
+#endif /* CONFIG_CODEC == SWCODEC */
+
+/**
+ * Audio Hardware api. Make them do nothing as we cannot properly simulate with
+ * SDL. if we used DSP we would run code that doesn't actually run on the target
+ **/
+void audiohw_set_volume(int volume)
+{
+    sim_volume = SDL_MIX_MAXVOLUME * ((volume - VOLUME_MIN) / 10) / (VOLUME_RANGE / 10);
+}
+#if defined(AUDIOHW_HAVE_PRESCALER)
+void audiohw_set_prescaler(int value)   { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_BALANCE)
+void audiohw_set_balance(int value)     { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_BASS)
+void audiohw_set_bass(int value)        { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE)
+void audiohw_set_treble(int value)      { (void)value; }
+#endif
+#if CONFIG_CODEC != SWCODEC
+void audiohw_set_channel(int value)     { (void)value; }
+void audiohw_set_stereo_width(int value){ (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
+void audiohw_set_bass_cutoff(value)     { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
+void audiohw_set_treble_cutoff(value)   { (void)value; }
+#endif
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+int mas_codec_readreg(int reg)
+{
+    (void)reg;
+    return 0;
+}
+
+int mas_codec_writereg(int reg, unsigned int val)
+{
+    (void)reg;
+    (void)val;
+    return 0;
+}
+int mas_writemem(int bank, int addr, const unsigned long* src, int len)
+{
+    (void)bank;
+    (void)addr;
+    (void)src;
+    (void)len;
+    return 0;
+}
+#endif

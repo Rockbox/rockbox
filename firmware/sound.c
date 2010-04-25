@@ -25,9 +25,9 @@
 #include "sound.h"
 #include "logf.h"
 #include "system.h"
-#ifndef SIMULATOR
 #include "i2c.h"
-#include "mas.h"
+#include "mas.h"  
+#ifndef SIMULATOR
 #if CONFIG_CPU == PNX0101
 #include "pnx0101.h"
 #endif
@@ -41,27 +41,10 @@
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
 */
 
-#define ONE_DB 10
-
-#if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
-#warning define for VOLUME_MIN and VOLUME_MAX is missing
-#define VOLUME_MIN -700
-#define VOLUME_MAX  0
-#endif
-
-/* volume/balance/treble/bass interdependency main part */
-#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
-
-#ifndef SIMULATOR
 extern bool audio_is_initialized;
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-extern unsigned long shadow_io_control_main;
-extern unsigned shadow_codec_reg0;
-#endif
-#endif /* SIMULATOR */
-
 #ifdef SIMULATOR
+extern void audiohw_set_volume(int value);
 /* dummy for sim */
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
@@ -90,7 +73,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90},
     [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0},
     [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0},
-#endif
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 };
 #endif
 
@@ -142,7 +125,7 @@ static sound_set_type * const sound_set_fns[] =
     [SOUND_MDB_SHAPE]     = sound_set_mdb_shape,
     [SOUND_MDB_ENABLE]    = sound_set_mdb_enable,
     [SOUND_SUPERBASS]     = sound_set_superbass,
-#endif
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
     [SOUND_BASS_CUTOFF]   = sound_set_bass_cutoff,
 #endif
@@ -166,7 +149,6 @@ void sound_set_dsp_callback(int (*func)(int, intptr_t))
 }
 #endif
 
-#ifndef SIMULATOR
 #if CONFIG_CODEC == MAS3507D
 /* convert tenth of dB volume (-780..+180) to dac3550 register value */
 static int tenthdb2reg(int db)
@@ -248,6 +230,7 @@ static void set_prescaled_volume(void)
     dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
 #endif
 
+#ifndef SIMULATOR
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
@@ -265,12 +248,12 @@ static void set_prescaled_volume(void)
 #elif defined(HAVE_JZ4740_CODEC)
     audiohw_set_volume(current_volume);
 #endif
+#else /* SIMULATOR */
+    audiohw_set_volume(current_volume);
+#endif /* !SIMULATOR */
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
-#endif /* !SIMULATOR */
 
-
-#ifndef SIMULATOR
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
@@ -398,7 +381,7 @@ void sound_set_treble_cutoff(int value)
 }
 #endif
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
 void sound_set_loudness(int value)
 {
     if(!audio_is_initialized)
@@ -485,95 +468,6 @@ void sound_set_superbass(int value)
     mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
 }
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
-
-#else /* SIMULATOR */
-int sim_volume;
-void sound_set_volume(int value)
-{
-    /* 128 is SDL_MIX_MAXVOLUME */
-    sim_volume = 128 * (value - VOLUME_MIN / 10) / (VOLUME_RANGE / 10);
-}
-
-void sound_set_balance(int value)
-{
-    (void)value;
-}
-
-void sound_set_bass(int value)
-{
-    (void)value;
-}
-
-void sound_set_treble(int value)
-{
-    (void)value;
-}
-
-void sound_set_channels(int value)
-{
-    (void)value;
-}
-
-void sound_set_stereo_width(int value)
-{
-    (void)value;
-}
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void sound_set_loudness(int value)
-{
-    (void)value;
-}
-
-void sound_set_avc(int value)
-{
-    (void)value;
-}
-
-void sound_set_mdb_strength(int value)
-{
-    (void)value;
-}
-
-void sound_set_mdb_harmonics(int value)
-{
-    (void)value;
-}
-
-void sound_set_mdb_center(int value)
-{
-    (void)value;
-}
-
-void sound_set_mdb_shape(int value)
-{
-    (void)value;
-}
-
-void sound_set_mdb_enable(int value)
-{
-    (void)value;
-}
-
-void sound_set_superbass(int value)
-{
-    (void)value;
-}
-#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
-
-#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
-void sound_set_bass_cutoff(int value)
-{
-    (void) value;
-}
-
-void sound_set_treble_cutoff(int value)
-{
-    (void) value;
-}
-#endif /* HAVE_WM8758 */
-
-#endif /* SIMULATOR */
 
 void sound_set(int setting, int value)
 {
@@ -691,13 +585,19 @@ int sound_val2phys(int setting, int value)
 #endif /* !defined(HAVE_AS3514) || defined(SIMULATOR) */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-#ifndef SIMULATOR
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.
 
    The pitch value precision is based on PITCH_SPEED_PRECISION (in dsp.h)
 */
+
+#ifdef SIMULATOR
+static
+#else
+extern
+#endif
+        unsigned long shadow_io_control_main;
 static int last_pitch = PITCH_SPEED_100;
 
 void sound_set_pitch(int32_t pitch)
@@ -723,15 +623,4 @@ int32_t sound_get_pitch(void)
 {
     return last_pitch;
 }
-#else /* SIMULATOR */
-void sound_set_pitch(int32_t pitch)
-{
-    (void)pitch;
-}
-
-int32_t sound_get_pitch(void)
-{
-    return PITCH_SPEED_100;
-}
-#endif /* SIMULATOR */
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */

@@ -24,6 +24,7 @@
 #include <inttypes.h>
 #include <audiohw.h>
 
+
 #if CONFIG_CODEC == SWCODEC
 enum {
     DSP_CALLBACK_SET_PRESCALE = 0,

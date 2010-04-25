@@ -69,9 +69,7 @@ static void (*callback_for_more)(unsigned char**, size_t*);
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
 #define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
 
-#ifndef SIMULATOR
 bool audio_is_initialized = false;
-#endif
 
 /* FIX: this code pretty much assumes a MAS */
 
@@ -353,6 +351,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     (void)mdb_shape;
     (void)mdb_enable;
     (void)superbass;
+    audio_is_initialized = true;
 #else
 #if CONFIG_CODEC == MAS3507D
     unsigned long val;

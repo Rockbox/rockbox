@@ -65,6 +65,20 @@
 #include "ak4537.h"
 #endif
 
+
+
+#define ONE_DB 10
+
+#if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
+#warning define for VOLUME_MIN and VOLUME_MAX is missing
+#define VOLUME_MIN -700
+#define VOLUME_MAX  0
+#endif
+
+/* volume/balance/treble/bass interdependency main part */
+#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
+
+
 /* convert caps into defines */
 #ifdef AUDIOHW_CAPS
 #if (AUDIOHW_CAPS & TREBLE_CAP)
