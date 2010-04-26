@@ -199,7 +199,7 @@ void audiohw_preinit(void)
 #endif
 
 #ifdef HAVE_AS3543
-    as3514_write(AS3514_HPH_OUT_R, (0<<7) /* out */ | HPH_OUT_R_HP_OUT_DAC |
+    as3514_write(AS3514_HPH_OUT_R, (0<<7) /* out */ | HPH_OUT_R_HP_OUT_SUM |
                                   0x00);
 #else
     /* Set headphone over-current to 0, Min volume */
@@ -440,7 +440,7 @@ void audiohw_set_monitor(bool enable)
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
 #ifdef HAVE_AS3543
         as3514_write_masked(AS3514_HPH_OUT_R,
-                            HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
+                            HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
 #else
         as3514_clear(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
         as3514_clear(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
