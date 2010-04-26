@@ -79,16 +79,11 @@ const struct sound_settings_info audiohw_settings[] = {
 };
 
 /* Shadow registers */
-static struct as3514_info
-{
-    int     vol_r;       /* Cached volume level (R) */
-    int     vol_l;       /* Cached volume level (L) */
-    uint8_t regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
-} as3514;
+static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 
 /*
  * little helper method to set register values.
- * With the help of as3514.regs, we minimize i2c
+ * With the help of as3514_regs, we minimize i2c
  * traffic.
  */
 static void as3514_write(unsigned int reg, unsigned int value)
@@ -98,9 +93,9 @@ static void as3514_write(unsigned int reg, unsigned int value)
         DEBUGF("as3514 error reg=0x%02x", reg);
     }
 
-    if (reg < ARRAYLEN(as3514.regs))
+    if (reg < ARRAYLEN(as3514_regs))
     {
-        as3514.regs[reg] = value;
+        as3514_regs[reg] = value;
     }
     else
     {
@@ -111,18 +106,18 @@ static void as3514_write(unsigned int reg, unsigned int value)
 /* Helpers to set/clear bits */
 static void as3514_set(unsigned int reg, unsigned int bits)
 {
-    as3514_write(reg, as3514.regs[reg] | bits);
+    as3514_write(reg, as3514_regs[reg] | bits);
 }
 
 static void as3514_clear(unsigned int reg, unsigned int bits)
 {
-    as3514_write(reg, as3514.regs[reg] & ~bits);
+    as3514_write(reg, as3514_regs[reg] & ~bits);
 }
 
 static void as3514_write_masked(unsigned int reg, unsigned int bits,
                                 unsigned int mask)
 {
-    as3514_write(reg, (as3514.regs[reg] & ~mask) | (bits & mask));
+    as3514_write(reg, (as3514_regs[reg] & ~mask) | (bits & mask));
 }
 
 /* convert tenth of dB volume to master volume register value */
@@ -168,9 +163,9 @@ void audiohw_preinit(void)
     unsigned int i;
 
     /* read all reg values */
-    for (i = 0; i < ARRAYLEN(as3514.regs); i++)
+    for (i = 0; i < ARRAYLEN(as3514_regs); i++)
     {
-        as3514.regs[i] = ascodec_read(i);
+        as3514_regs[i] = ascodec_read(i);
     }
 
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
@@ -250,10 +245,6 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
-
-    /* keep track of current setting */
-    as3514.vol_l = vol_l;
-    as3514.vol_r = vol_r;
 
     /* We combine the mixer channel volume range with the headphone volume
        range - keep first stage as loud as possible */
