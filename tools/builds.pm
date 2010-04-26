@@ -1,4 +1,6 @@
 $publicrelease="3.5.1";
+$manualrelease="3.5";
+$voicerelease="3.5";
 $releasedate="March 4, 2010";
 $releasenotes="/wiki/ReleaseNotes351";
 
