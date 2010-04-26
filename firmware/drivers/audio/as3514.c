@@ -190,7 +190,7 @@ void audiohw_preinit(void)
 #endif
 
 #ifdef HAVE_AS3543
-    as3514_clear(AS3543_DAC_IF, 0x80);
+    as3514_write(AS3543_DAC_IF, AS3543_DAC_INT_PLL);
     as3514_set(AS3514_LINE_IN1_R, LINE_IN_R_LINE_SELECT); /* Line 2 */
 #else
     /* Mute and disable speaker */
@@ -284,15 +284,9 @@ void audiohw_mute(bool mute)
 {
     if (mute) {
         as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#ifdef HAVE_AS3543
-        as3514_set(AS3543_DAC_IF, 0x80);
-#endif
 
     } else {
         as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#ifdef HAVE_AS3543
-        as3514_clear(AS3543_DAC_IF, 0x80);
-#endif
     }
 }
 
@@ -312,10 +306,6 @@ void audiohw_close(void)
     /* turn off everything */
     as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_ON);
     as3514_write(AS3514_AUDIOSET1, 0x0);
-
-#ifdef HAVE_AS3543
-    as3514_set(AS3543_DAC_IF, 0x80);
-#endif
 
     /* Allow caps to discharge */
     sleep(HZ/4);

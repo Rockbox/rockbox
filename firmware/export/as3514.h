@@ -222,6 +222,12 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #endif
 /* Use AS3514_VOL_MASK */
 
+/* DAC_IF (11h) */
+#ifdef HAVE_AS3543
+#define AS3543_DAC_INT_PLL      (0x0 << 7)
+#define AS3543_DAC_EXT_MCLK     (0x1 << 7)
+#endif
+
 /* AUDIOSET1 (14h)*/
 #define AUDIOSET1_ADC_on        (0x1 << 7)
 #define AUDIOSET1_SUM_on        (0x1 << 6)
