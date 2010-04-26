@@ -30,7 +30,6 @@
 void button_init_device(void);
 bool button_hold(void);
 int button_read_device(void);
-unsigned short button_read_dbop(void);
 void get_scrollwheel(void);
  
 #define WHEEL_REPEAT_INTERVAL   (HZ/5)
