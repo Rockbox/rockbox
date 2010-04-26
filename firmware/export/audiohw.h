@@ -38,7 +38,7 @@
 #include "uda1380.h"
 #elif defined(HAVE_UDA1341)
 #include "uda1341.h"
-#elif defined(HAVE_WM8751)
+#elif defined(HAVE_WM8750) || defined(HAVE_WM8751)
 #include "wm8751.h"
 #elif defined(HAVE_WM8978)
 #include "wm8978.h"

@@ -98,6 +98,15 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define RESET                       0x0f
 #define RESET_RESET                 0x000
 
+/* WM8750 only */
+#define ENHANCE_3D                  0x10
+#define ENHANCE_3D_3DEN             (1 << 0)
+#define ENHANCE_3D_DEPTH(x)         (((x) & 0xf) << 1)
+#define ENHANCE_3D_3DLC             (1 << 5)
+#define ENHANCE_3D_3DUC             (1 << 6)
+#define ENHANCE_3D_MODE3D_PLAYBACK  (1 << 7)
+#define ENHANCE_3D_MODE3D_RECORD    (0 << 7)
+
 #define ADDITIONAL1                 0x17
 #define ADDITIONAL1_TOEN            (1 << 0)
 #define ADDITIONAL1_DACINV          (1 << 1)

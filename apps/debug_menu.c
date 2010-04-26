@@ -1000,6 +1000,9 @@ static bool dbg_spdif(void)
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 #   define DEBUG_CANCEL  BUTTON_CANCEL
 
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
+#   define DEBUG_CANCEL  BUTTON_REC
+
 #endif /* key definitions */
 
 /* Test code!!! */

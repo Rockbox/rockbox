@@ -1305,6 +1305,30 @@ void button_event(int key, bool pressed)
     case SDLK_KP_MULTIPLY:
         new_btn = BUTTON_REC;
         break;
+
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+    case SDLK_UP:
+        new_btn = BUTTON_PREV;
+        break;
+    case SDLK_DOWN:
+        new_btn = BUTTON_NEXT;
+        break;
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_RETURN:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_LEFT:
+        new_btn = BUTTON_VOL_DOWN;
+        break;
+    case SDLK_RIGHT:
+        new_btn = BUTTON_VOL_UP;
+        break;
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_REC;
+        break;
+    
 #else
 #error No keymap defined!
 #endif /* CONFIG_KEYPAD */
@@ -1848,6 +1872,18 @@ struct button_map bm[] = {
     { SDLK_KP1,      58, 577, 49, "Back" },
     { SDLK_KP2,     186, 585, 46, "Down" },
     { SDLK_KP3,     311, 569, 47, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined (MPIO_HD200)
+struct button_map bm[] = {
+    { SDLK_ESCAPE,  369, 257, 20, "Rec" },
+    { SDLK_RETURN,  369, 305, 20, "Play/Stop" },
+    { SDLK_UP,      353, 168,  10, "Rew" },
+    { SDLK_DOWN,    353, 198,  10, "FF" },
+    { SDLK_SPACE,   353, 186,  10, "Select" },
+    { SDLK_LEFT,     123, 67, 20, "Vol Down" },
+    { SDLK_RIGHT,     206, 67, 20, "Vol Up" },
+    { SDLK_h,     369, 402, 30, "Hold" },
     { 0, 0, 0, 0, "None" }
 };
 #else

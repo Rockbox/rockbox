@@ -274,6 +274,16 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_OK
 
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+#define CUBE_QUIT          (BUTTON_REC | BUTTON_PLAY)
+#define CUBE_NEXT          BUTTON_NEXT
+#define CUBE_PREV          BUTTON_PREV
+#define CUBE_INC           BUTTON_VOL_UP
+#define CUBE_DEC           BUTTON_VOL_DOWN
+#define CUBE_MODE          BUTTON_REC
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

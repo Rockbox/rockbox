@@ -258,7 +258,8 @@ drivers/mas.c
 #if !defined(SIMULATOR) && !defined(BOOTLOADER)
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
-#elif defined(HAVE_WM8751)
+#elif defined(HAVE_WM8751) \
+   || defined(HAVE_WM8750)
 drivers/audio/wm8751.c
 #elif defined(HAVE_WM8978)
 drivers/audio/wm8978.c
@@ -1609,3 +1610,24 @@ target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
 #endif
 
+#ifdef MPIO_HD200
+#ifndef SIMULATOR
+/* TODO: currently including all files */
+target/coldfire/mpio/hd200/adc-hd200.c
+target/coldfire/mpio/hd200/button-hd200.c
+target/coldfire/mpio/hd200/lcd-hd200.c
+target/coldfire/mpio/hd200/lcd-as-hd200.S
+target/coldfire/mpio/hd200/power-hd200.c
+target/coldfire/mpio/hd200/powermgmt-hd200.c
+target/coldfire/mpio/hd200/backlight-hd200.c
+target/coldfire/mpio/hd200/system-hd200.c
+target/coldfire/mpio/hd200/usb-hd200.c
+target/coldfire/mpio/fmradio_i2c-mpio.c
+target/coldfire/mpio/ata-mpio.c
+target/coldfire/mpio/ata-as-mpio.S
+#ifndef BOOTLOADER
+target/coldfire/mpio/audio-mpio.c
+target/coldfire/wmcodec-coldfire.c
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif

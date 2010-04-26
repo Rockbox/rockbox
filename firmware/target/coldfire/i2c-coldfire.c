@@ -70,6 +70,10 @@ void i2c_init(void)
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     MBDR = 0;    /* iRiver firmware does this */
     MBCR = IEN;  /* Enable interface */
+#elif defined(MPIO_HD200)
+    /* second channel */
+    MFDR2 = 0x0d;
+    MBCR2 = IEN;
 #endif
 }
 

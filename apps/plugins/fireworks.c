@@ -114,6 +114,10 @@ PLUGIN_HEADER
 #define BTN_MENU BUTTON_MENU
 #define BTN_FIRE BUTTON_OK
 
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
+#define BTN_MENU BUTTON_REC
+#define BTN_FIRE BUTTON_SELECT
+
 #elif defined(HAVE_TOUCHSCREEN)
     /* This is a touchscreen target */
 #else

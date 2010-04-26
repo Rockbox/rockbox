@@ -930,9 +930,12 @@ cat <<EOF
                                                  ==Logik==
  ==Samsung==              ==Tatung==             80) DAX 1GB MP3/DAB
  140) YH-820              150) Elio TPJ-1022
- 141) YH-920                                     ==Lyre project==1
+ 141) YH-920                                     ==Lyre project==
  142) YH-925              ==Packard Bell==       130) Lyre proto 1
  143) YP-S3               160) Vibe 500          131) Mini2440
+
+ ==MPIO==
+ 170) HD200
 EOF
 
   buildfor=`input`;
@@ -2523,6 +2526,29 @@ fi
     t_cpu="arm"
     t_manufacturer="pbell"
     t_model="vibe500"
+    ;;
+
+   170|hd200)
+    target_id=69
+    modelname="mpiohd200"
+    target="-DMPIO_HD200"
+    memory=16 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=hd20"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
+    output="rockbox.mpio"
+    bootoutput="bootloader.mpio"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufacturer="mpio"
+    t_model="hd200"
     ;;
 
    *)

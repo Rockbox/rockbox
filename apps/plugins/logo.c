@@ -193,6 +193,13 @@ const unsigned char rockbox16x7[] = {
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
 
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+#define LP_QUIT  (BUTTON_REC|BUTTON_PLAY)
+#define LP_DEC_X BUTTON_VOL_DOWN
+#define LP_INC_X BUTTON_VOL_UP
+#define LP_DEC_Y BUTTON_PREV
+#define LP_INC_Y BUTTON_NEXT
+
 #else
 #define LP_QUIT BUTTON_OFF
 #define LP_DEC_X BUTTON_LEFT

@@ -117,6 +117,7 @@
 #define MINI2440_PAD       41
 #define PHILIPS_HDD6330_PAD 42
 #define PBELL_VIBE500_PAD 43
+#define MPIO_HD200_PAD     44
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -412,6 +413,8 @@ Lyre prototype 1 */
 #include "config/samsungyps3.h"
 #elif defined(PBELL_VIBE500)
 #include "config/vibe500.h"
+#elif defined(MPIO_HD200)
+#include "config/mpiohd200.h"
 #else
 /* no known platform */
 #endif

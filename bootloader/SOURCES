@@ -63,4 +63,6 @@ show_logo.c
 #elif defined(PBELL_VIBE500)
 main-pp.c
 show_logo.c
+#elif defined(MPIO_HD200)
+mpio_hd200.c
 #endif

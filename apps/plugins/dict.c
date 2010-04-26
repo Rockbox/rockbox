@@ -150,6 +150,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_LEFT
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
 #define LP_QUIT BUTTON_CANCEL
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+#define LP_QUIT (BUTTON_REC|BUTTON_PLAY)
 #else
 #define LP_QUIT BUTTON_OFF
 #endif

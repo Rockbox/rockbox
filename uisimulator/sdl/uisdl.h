@@ -389,6 +389,14 @@
 #define UI_HEIGHT                   488 /* height of GUI window */
 #define UI_LCD_POSX                 64 /* x position of lcd */
 #define UI_LCD_POSY                 61 /* y position of lcd */
+
+#elif defined(MPIO_HD200)
+#define UI_TITLE                    "MPIO HD200"
+#define UI_WIDTH                    430 /* width of GUI window */
+#define UI_HEIGHT                   479 /* height of GUI window */
+#define UI_LCD_POSX                 101
+#define UI_LCD_POSY                 195
+
 #else
 #error no UI defines
 #endif

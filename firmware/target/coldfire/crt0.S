@@ -63,7 +63,16 @@ start:
     move.l  #0x00000180,%d0 /* CSCR0 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x088,%a0)
         
-#ifndef IAUDIO_M3
+#ifdef MPIO_HD200
+    /* Chip select 3 - LCD controller */
+    /* values taken from original firmware except base address*/
+    move.l  #0xf0000000,%d0 /* CSAR3 - Base = 0xf0000000 */
+    move.l  %d0,(0x0a4,%a0)
+    moveq.l #0x1,%d0        /* CSMR3 - 64K */
+    move.l  %d0,(0x0a8,%a0)
+    move.l  #0x00000980,%d0 /* CSCR3 - 1 wait state, 16 bits no bursts */
+    move.l  %d0,(0x0ac,%a0)
+#elif !(defined IAUDIO_M3)
     /* Chip select 1 - LCD controller */
     move.l  #0xf0000000,%d0 /* CSAR1 - Base = 0xf0000000 */
     move.l  %d0,(0x08c,%a0)
@@ -262,6 +271,14 @@ start:
 #ifdef IRIVER_H300_SERIES
     /* Set KEEP_ACT before doing the lengthy copy and zero-fill operations */
     move.l #0x00080000,%d0
+    or.l %d0,(0xb4,%a1)
+    or.l %d0,(0xb8,%a1)
+    or.l %d0,(0xbc,%a1)
+#endif
+
+#ifdef MPIO_HD200
+    /* Set KEEP_ACT */
+    move.l #0x02200000,%d0
     or.l %d0,(0xb4,%a1)
     or.l %d0,(0xb8,%a1)
     or.l %d0,(0xbc,%a1)

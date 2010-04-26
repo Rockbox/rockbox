@@ -116,17 +116,22 @@ void audiohw_preinit(void)
      *    and Headphone outputs are all OFF (DACMU = 1 Power
      *    Management registers 1 and 2 are all zeros).
      */
+
     wmcodec_write(RESET, RESET_RESET);    /*Reset*/
 
      /* 2. Enable Vmid and VREF. */
     wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_5K);
 
+#ifdef CODEC_SLAVE
+    wmcodec_write(AINTFCE,AINTFCE_WL_16|AINTFCE_FORMAT_I2S);
+#else
     /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
     /* IWL=00(16 bit) FORMAT=10(I2S format) */
     wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_WL_16 |
                   AINTFCE_FORMAT_I2S);
-
+#endif
     /* Set default samplerate */
+
     audiohw_set_frequency(HW_FREQ_DEFAULT);
 }
 
@@ -140,7 +145,7 @@ void audiohw_postinit(void)
     wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
 
      /* 4. Enable line and / or headphone output buffers as required. */
-#ifdef MROBE_100
+#if defined(MROBE_100) || defined(MPIO_HD200)
     wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
                   PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
 #else
@@ -165,6 +170,19 @@ void audiohw_postinit(void)
     wmcodec_write(RIGHTMIX1, RIGHTMIX1_MI2RO | RIGHTMIX1_MI2ROVOL(2));
 #endif
 #endif
+
+#ifdef MPIO_HD200
+    /* Crude fix for high pitch noise at startup
+     * I should find out what realy causes this
+     */
+    wmcodec_write(LOUT1, LOUT1_BITS|0x7f);
+    wmcodec_write(ROUT1, ROUT1_BITS|0x7f);
+    wmcodec_write(LOUT1, LOUT1_BITS);
+    wmcodec_write(ROUT1, ROUT1_BITS);
+#endif
+
+    /* lower power consumption */
+    wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
 
     audiohw_mute(false);
 
@@ -234,6 +252,8 @@ void audiohw_close(void)
 
 void audiohw_set_frequency(int fsel)
 {
+    (void)fsel;
+#ifndef CODEC_SLAVE
     static const unsigned char srctrl_table[HW_NUM_FREQ] =
     {
         HW_HAVE_11_([HW_FREQ_11] = CODEC_SRCTRL_11025HZ,)
@@ -246,4 +266,5 @@ void audiohw_set_frequency(int fsel)
         fsel = HW_FREQ_DEFAULT;
 
     wmcodec_write(CLOCKING, srctrl_table[fsel]);
+#endif
 }

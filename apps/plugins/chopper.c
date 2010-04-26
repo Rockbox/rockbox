@@ -157,6 +157,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION2 BUTTON_UP
 #define ACTIONTEXT "PLAY"
 
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+#define QUIT (BUTTON_REC|BUTTON_PLAY)
+#define ACTION BUTTON_SELECT
+#define ACTIONTEXT "SELECT"
+
 #else
 #error No keymap defined!
 #endif

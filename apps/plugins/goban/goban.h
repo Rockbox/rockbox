@@ -309,6 +309,16 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_OK
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_CANCEL
 
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
+#define  GBN_BUTTON_UP                 BUTTON_PREV
+#define  GBN_BUTTON_DOWN               BUTTON_NEXT
+#define  GBN_BUTTON_LEFT               BUTTON_VOL_DOWN
+#define  GBN_BUTTON_RIGHT              BUTTON_VOL_UP
+#define  GBN_BUTTON_RETREAT            BUTTON_REC
+#define  GBN_BUTTON_ADVANCE            BUTTON_PLAY
+#define  GBN_BUTTON_PLAY               BUTTON_SELECT | BUTTON_REL
+#define  GBN_BUTTON_MENU               BUTTON_SELECT | BUTTON_REPEAT
+
 #else
 #error Unsupported keypad
 #endif
