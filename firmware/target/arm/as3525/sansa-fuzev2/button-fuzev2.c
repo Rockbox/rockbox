@@ -38,29 +38,15 @@ void button_init_device(void)
     GPIOB_PIN(4) = 1<<4; /* activate the wheel */
 }
 
-unsigned read_GPIOA_67(void)
-{
-    unsigned ret = 0;
-    volatile int i;
-    DBOP_CTRL |= 1<<19;
-    for(i = 20; i; i--) nop;
-    GPIOA_DIR &= ~0xc0;
-    for(i = 20; i; i--) nop;
-    if (GPIOA_PIN(6) != 0)
-        ret = 1<<0;
-    for(i = 20; i; i--) nop;
-    if (GPIOA_PIN(7) != 0)
-        ret |= 1<<1;
-    DBOP_CTRL &= ~(1<<19);
-    for(i = 20; i; i--) nop;
-    return ret;
-}
-
 void get_scrollwheel(void)
 {
 #if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
     /* scroll wheel handling */
-    scrollwheel(read_GPIOA_67());
+
+#define GPIOA_PIN76_offset ((1<<(6+2)) | (1<<(7+2)))
+#define GPIOA_PIN76 (*(volatile unsigned char*)(GPIOA_BASE+GPIOA_PIN76_offset))
+    scrollwheel(GPIOA_PIN76 >> 6);
+
 #endif
 }
 
@@ -76,6 +62,11 @@ int button_read_device(void)
     static bool hold_button_old = false;
     static long power_counter = 0;
     unsigned gpiod6;
+
+    /* if we remove this delay, we see screen corruption (the higher the CPU
+     * frequency the higher the corruption) */
+    for(delay = 1000; delay; delay--)
+        nop;
 
     get_scrollwheel();
 
