@@ -58,29 +58,26 @@ void get_scrollwheel(void)
 int button_read_device(void)
 {
     int btn = 0;
-    volatile int delay;
     static bool hold_button_old = false;
     static long power_counter = 0;
     unsigned gpiod6;
 
-    /* if we remove this delay, we see screen corruption (the higher the CPU
-     * frequency the higher the corruption) */
-    for(delay = 1000; delay; delay--)
-        nop;
+
+    /* if we don't wait for the fifo to empty, we'll see screen corruption
+     * (the higher the CPU frequency the higher the corruption) */
+    while ((DBOP_STAT & (1<<10)) == 0);
 
     get_scrollwheel();
 
     CCU_IO &= ~(1<<12);
 
     GPIOB_PIN(0) = 1<<0;
-    for(delay = 500; delay; delay--)
-        nop;
+    udelay(1);
 
     gpiod6 = GPIOD_PIN(6);
 
     GPIOB_PIN(0) = 0;
-    for(delay = 240; delay; delay--)
-        nop;
+    udelay(1);
 
     if (GPIOC_PIN(1) & 1<<1)
         btn |= BUTTON_DOWN;

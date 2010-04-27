@@ -25,13 +25,6 @@
 #include "timer.h"
 
 #ifdef HAVE_SCROLLWHEEL
-/* let the timer interrupt twice as often for the scrollwheel polling */
-#define KERNEL_TIMER_FREQ (TIMER_FREQ/2)
-#else
-#define KERNEL_TIMER_FREQ TIMER_FREQ
-#endif
-
-#ifdef HAVE_SCROLLWHEEL
 #include "button-target.h"
 /* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
 static int poll_scrollwheel = 0;

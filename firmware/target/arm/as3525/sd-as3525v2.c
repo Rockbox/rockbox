@@ -344,7 +344,7 @@ static volatile bool retry;
 int active_card = 0;
 #endif
 
-static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
+static inline void mci_delay(void) { udelay(1000); }
 
 void INT_NAND(void)
 {
