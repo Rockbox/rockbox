@@ -37,7 +37,7 @@
 %s%ac%iy
 
 #next and playlist
-%V|3|70|122|18|1|-|-|
-%s%ac%Sx|Next:|%?It<%It|%Fn>
-
+%V|3|70|122|12|1|-|-|
+%s%ac%Sx|Next:| %?It<%It|%Fn>
+%V|3|95|122|12|1|-|-|
 %al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
