@@ -226,17 +226,19 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
     if(!m_blfile.isEmpty()) {
+        QString devicename = Autodetection::resolveDevicename(m_blfile);
+        if(devicename.isEmpty()) {
+            emit logItem(tr("Error: could not retrieve device name"), LOGERROR);
+            return false;
+        }
 #if defined(Q_OS_WIN32)
-        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i",
-                Autodetection::resolveDevicename(m_blfile).toInt());
+        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i", diskname.toInt());
 #elif defined(Q_OS_MACX)
         sprintf(ipod->diskname, "%s",
-            qPrintable(Autodetection::resolveDevicename(m_blfile)
-            .remove(QRegExp("s[0-9]+$"))));
+            qPrintable(devicename.remove(QRegExp("s[0-9]+$"))));
 #else
         sprintf(ipod->diskname, "%s",
-            qPrintable(Autodetection::resolveDevicename(m_blfile)
-            .remove(QRegExp("[0-9]+$"))));
+            qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
 #endif
         qDebug() << "[BootloaderInstallIpod] ipodpatcher: overriding scan, using"
                  << ipod->diskname;

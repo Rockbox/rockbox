@@ -339,13 +339,14 @@ QString Autodetection::resolveMountPoint(QString device)
     for(letter = 'A'; letter <= 'Z'; letter++) {
         if(resolveDevicename(QString(letter)).toUInt() == driveno) {
             result = letter;
+            qDebug() << "[Autodetect] resolved mountpoint is:" << result;
             break;
         }
     }
-    qDebug() << "[Autodetect] resolved mountpoint is:" << result;
     if(!result.isEmpty())
         return result + ":/";
 #endif
+    qDebug() << "[Autodetect] resolving mountpoint failed!";
     return QString("");
 }
 

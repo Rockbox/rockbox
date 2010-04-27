@@ -242,15 +242,19 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 {
     if(!m_blfile.isEmpty()) {
+        QString devicename = Autodetection::resolveDevicename(m_blfile);
+        if(devicename.isEmpty()) {
+            emit logItem(tr("Error: could not retrieve device name"), LOGERROR);
+            return false;
+        }
 #if defined(Q_OS_WIN32)
-        sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i",
-                Autodetection::resolveDevicename(m_blfile).toInt());
+        sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i", devicename.toInt());
 #elif defined(Q_OS_MACX)
         sprintf(sansa->diskname,
-            qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("s[0-9]+$"))));
+            qPrintable(devicename.remove(QRegExp("s[0-9]+$"))));
 #else
         sprintf(sansa->diskname,
-            qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("[0-9]+$"))));
+            qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
 #endif
         qDebug() << "[BootloaderInstallSansa] sansapatcher: overriding scan, using"
                  << sansa->diskname;
