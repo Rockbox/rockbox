@@ -24,7 +24,7 @@
 #include "panic.h"
 #include "timer.h"
 
-#ifdef HAVE_SCROLLWHEEL
+#if INCREASED_SCROLLWHEEL_POLLING
 #include "button-target.h"
 /* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
 static int poll_scrollwheel = 0;

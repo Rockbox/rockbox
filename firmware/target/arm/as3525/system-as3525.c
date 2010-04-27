@@ -70,7 +70,8 @@ default_interrupt(RESERVED6); /* Interrupt 25 : unused */
 default_interrupt(RESERVED7); /* Interrupt 26 : unused */
 default_interrupt(RESERVED8); /* Interrupt 27 : unused */
 default_interrupt(RESERVED9); /* Interrupt 28 : unused */
-default_interrupt(INT_GPIOA);
+/* INT_GPIOA is declared in this file */
+void INT_GPIOA(void);
 default_interrupt(INT_GPIOB);
 default_interrupt(INT_GPIOC);
 
@@ -142,6 +143,18 @@ static void setup_vic(void)
         vic_vect_addrs[i] = (unsigned long)vec_int_srcs[i].isr;
         vic_vect_cntls[i] = (1<<5) | vec_int_srcs[i].source;
     }
+}
+
+void INT_GPIOA(void)
+{
+#ifdef HAVE_MULTIDRIVE
+    void sd_gpioa_isr(void);
+    sd_gpioa_isr();
+#endif
+#if (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+    void button_gpioa_isr(void);
+    button_gpioa_isr();
+#endif
 }
 
 void irq_handler(void)
@@ -348,6 +361,12 @@ void system_init(void)
     ascodec_init();
 
 #ifndef BOOTLOADER
+    /* setup isr for microsd monitoring and for scrollwheel irq */
+#if defined(HAVE_MULTIDRIVE) || (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+    VIC_INT_ENABLE = (INTERRUPT_GPIOA);
+    /* pin selection for irq happens in the drivers */
+#endif
+
     /*  Initialize power management settings */
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #if CONFIG_TUNER

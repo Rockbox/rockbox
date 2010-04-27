@@ -68,6 +68,15 @@
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define to activate advanced wheel acceleration code */
+#define HAVE_WHEEL_ACCELERATION
+/* define from which rotation speed [degree/sec] on the acceleration starts */
+#define WHEEL_ACCEL_START 540
+/* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
+#define WHEEL_ACCELERATION  1
+
 #endif /* !BOOTLOADER */
 
 /* put the lcd frame buffer in IRAM */
@@ -125,15 +134,6 @@
 
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
-
-/* define this if the unit uses a scrollwheel for navigation */
-#define HAVE_SCROLLWHEEL
-/* define to activate advanced wheel acceleration code */
-#define HAVE_WHEEL_ACCELERATION
-/* define from which rotation speed [degree/sec] on the acceleration starts */
-#define WHEEL_ACCEL_START 540
-/* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
-#define WHEEL_ACCELERATION 1
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

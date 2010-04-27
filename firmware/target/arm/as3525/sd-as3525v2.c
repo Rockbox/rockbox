@@ -342,6 +342,7 @@ static volatile bool retry;
 
 #if defined(HAVE_MULTIDRIVE)
 int active_card = 0;
+#define EXT_SD_BITS (1<<2)
 #endif
 
 static inline void mci_delay(void) { udelay(1000); }
@@ -687,14 +688,12 @@ int sd_init(void)
     wakeup_init(&transfer_completion_signal);
 
 #ifdef HAVE_MULTIDRIVE
-    /* setup isr for microsd monitoring */
-    VIC_INT_ENABLE = (INTERRUPT_GPIOA);
     /* clear previous irq */
-    GPIOA_IC = (1<<2);
+    GPIOA_IC = EXT_SD_BITS;
     /* enable edge detecting */
-    GPIOA_IS &= ~(1<<2);
+    GPIOA_IS &= ~EXT_SD_BITS;
     /* detect both raising and falling edges */
-    GPIOA_IBE |= (1<<2);
+    GPIOA_IBE |= EXT_SD_BITS;
     /* Configure XPD for SD-MCI interface */
     CCU_IO |= (1<<2);
 #endif
@@ -961,20 +960,21 @@ static int sd1_oneshot_callback(struct timeout *tmo)
     return 0;
 }
 
-void INT_GPIOA(void)
+void sd_gpioa_isr(void)
 {
     static struct timeout sd1_oneshot;
+    if (GPIOA_MIS & EXT_SD_BITS)
+        timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
     /* acknowledge interrupt */
-    GPIOA_IC = (1<<2);
-    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
+    GPIOA_IC = EXT_SD_BITS;
 }
 
 void card_enable_monitoring_target(bool on)
 {
     if (on) /* enable interrupt */
-        GPIOA_IE |= (1<<2);
+        GPIOA_IE |= EXT_SD_BITS;
     else    /* disable interrupt */
-        GPIOA_IE &= ~(1<<2);
+        GPIOA_IE &= ~EXT_SD_BITS;
 }
 #endif /* HAVE_HOTSWAP */
 

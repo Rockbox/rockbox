@@ -27,7 +27,11 @@
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
-#ifdef HAVE_SCROLLWHEEL
+/* We can use a interrupt-based mechanism on the fuzev2 */
+#define INCREASED_SCROLLWHEEL_POLLING \
+    (defined(HAVE_SCROLLWHEEL) && (CONFIG_CPU == AS3525))
+
+#if INCREASED_SCROLLWHEEL_POLLING
 /* let the timer interrupt twice as often for the scrollwheel polling */
 #define KERNEL_TIMER_FREQ (TIMER_FREQ/2)
 #else
