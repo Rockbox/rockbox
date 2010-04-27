@@ -266,7 +266,7 @@ static void HP_turn_off(void)
 }
 #endif
 
-void audiohw_mute(bool mute)
+static void audiohw_mute(bool mute)
 {
     if(mute)
         REG_ICDC_CDCCR1 |= ICDC_CDCCR1_HPMUTE;

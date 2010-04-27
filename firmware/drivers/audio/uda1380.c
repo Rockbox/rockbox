@@ -171,7 +171,7 @@ void audiohw_set_treble(int value)
                               | TREBLEL(value) | TREBLER(value));
 }
 
-void audiohw_mute(bool mute)
+static void audiohw_mute(bool mute)
 {
     unsigned int value = uda1380_regs[REG_MUTE];
 

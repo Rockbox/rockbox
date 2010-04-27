@@ -222,12 +222,6 @@ void audiohw_set_prescaler(int val);
 void audiohw_set_balance(int val);
 #endif
 
-/**
- * Mute or enable sound.
- * @param mute true or false.
- */
-void audiohw_mute(bool mute);
-
 #ifdef AUDIOHW_HAVE_TREBLE
 /**
  * Set new treble value.

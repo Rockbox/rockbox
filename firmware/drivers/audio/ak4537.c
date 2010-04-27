@@ -113,7 +113,7 @@ int sound_val2phys(int setting, int value)
     return result;
 }
 
-void audiohw_mute(bool mute)
+/*static void audiohw_mute(bool mute)
 {
     if (mute)
     {
@@ -125,7 +125,7 @@ void audiohw_mute(bool mute)
         udelay(200000);
         akc_clear(AK4537_DAC, SMUTE);
     }
-}
+}*/
 
 void audiohw_preinit(void)
 {

@@ -81,17 +81,7 @@ void audiohw_init(void)
     tsc2100_writereg(TSAC4_PAGE, TSAC4_ADDRESS, val);
 }
 
-void audiohw_postinit(void)
-{
-    audiohw_mute(false);
-}
-
-void audiohw_set_master_vol(int vol_l, int vol_r)
-{
-   tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, (short)((vol_l<<8) | vol_r) );
-}
-
-void audiohw_mute(bool mute)
+static void audiohw_mute(bool mute)
 {
     short vol = tsc2100_readreg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS);
     /* left  mute bit == 1<<15
@@ -106,6 +96,16 @@ void audiohw_mute(bool mute)
     }
     is_muted = mute;
     tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, vol);
+}
+
+void audiohw_postinit(void)
+{
+    audiohw_mute(false);
+}
+
+void audiohw_set_master_vol(int vol_l, int vol_r)
+{
+   tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, (short)((vol_l<<8) | vol_r) );
 }
 
 void audiohw_close(void)

@@ -346,25 +346,7 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     }
 }
 
-void audiohw_close(void)
-{
-    /* 1. Mute all analogue outputs */
-    audiohw_mute(true);
-    audiohw_enable_headphone_jack(false);
-
-    /* 2. Disable power management register 1. R1 = 00 */
-    wmc_write(WMC_POWER_MANAGEMENT1, 0x000);
-
-    /* 3. Disable power management register 2. R2 = 00 */
-    wmc_write(WMC_POWER_MANAGEMENT2, 0x000);
-
-    /* 4. Disable power management register 3. R3 = 00 */
-    wmc_write(WMC_POWER_MANAGEMENT3, 0x000);
-
-    /* 5. Remove external power supplies. */
-}
-
-void audiohw_mute(bool mute)
+static void audiohw_mute(bool mute)
 {
     wmc_vol.ahw_mute = mute;
 
@@ -383,6 +365,24 @@ void audiohw_mute(bool mute)
         if (wmc_vol.vol_r > 0)
             wmc_clear(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
+}
+
+void audiohw_close(void)
+{
+    /* 1. Mute all analogue outputs */
+    audiohw_mute(true);
+    audiohw_enable_headphone_jack(false);
+
+    /* 2. Disable power management register 1. R1 = 00 */
+    wmc_write(WMC_POWER_MANAGEMENT1, 0x000);
+
+    /* 3. Disable power management register 2. R2 = 00 */
+    wmc_write(WMC_POWER_MANAGEMENT2, 0x000);
+
+    /* 4. Disable power management register 3. R3 = 00 */
+    wmc_write(WMC_POWER_MANAGEMENT3, 0x000);
+
+    /* 5. Remove external power supplies. */
 }
 
 void audiohw_set_frequency(int fsel)

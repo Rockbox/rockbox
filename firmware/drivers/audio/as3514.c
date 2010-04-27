@@ -229,6 +229,16 @@ void audiohw_preinit(void)
 #endif
 }
 
+static void audiohw_mute(bool mute)
+{
+    if (mute) {
+        as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+
+    } else {
+        as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+    }
+}
+
 void audiohw_postinit(void)
 {
     /* wait until outputs have stabilized */
@@ -278,16 +288,6 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     as3514_write_masked(AS3514_LINE_OUT_R, vol_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_LINE_OUT_L, vol_l, AS3514_VOL_MASK);
-}
-
-void audiohw_mute(bool mute)
-{
-    if (mute) {
-        as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-
-    } else {
-        as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-    }
 }
 
 /* Nice shutdown of AS3514 audio codec */

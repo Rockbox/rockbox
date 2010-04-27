@@ -210,14 +210,14 @@ void audiohw_set_treble(int value)
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
 }
 
-void audiohw_mute(bool mute)
+/*static void audiohw_mute(bool mute)
 {
     if (mute)
         uda_regs [UDA_REG_ID_CTRL2] |= UDA_MUTE_ON;
     else    
         uda_regs [UDA_REG_ID_CTRL2] &= ~UDA_MUTE_ON;
     
-    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL2 | uda_regs [UDA_REG_ID_CTRL2] );
+    udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL2 | uda_regs [UDA_REG_ID_CTRL2] );*/
 }
 
 void audiohw_set_prescaler(int val)

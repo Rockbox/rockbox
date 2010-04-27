@@ -101,6 +101,30 @@ static void tlv320_write_reg(unsigned reg, unsigned value)
     tlv320_regs[reg] = value;
 }
 
+static void audiohw_mute(bool mute)
+{
+    unsigned value_dap = tlv320_regs[REG_DAP];
+    unsigned value_l, value_r;
+
+    if (mute)
+    {
+        value_l = LHV_LHV(HEADPHONE_MUTE);
+        value_r = RHV_RHV(HEADPHONE_MUTE);
+        value_dap |= DAP_DACM;
+    }
+    else
+    {
+        value_l = LHV_LHV(tlv320.vol_l);
+        value_r = RHV_RHV(tlv320.vol_r);
+        if (value_l > HEADPHONE_MUTE || value_r > HEADPHONE_MUTE)
+            value_dap &= ~DAP_DACM;
+    }
+
+    tlv320_write_reg(REG_LHV, LHV_LZC | value_l);
+    tlv320_write_reg(REG_RHV, RHV_RZC | value_r);
+    tlv320_write_reg(REG_DAP, value_dap);
+}
+
 /* public functions */
 
 /**
@@ -237,30 +261,6 @@ void audiohw_set_recvol(int left, int right, int type)
     }
 }
 #endif
-
-void audiohw_mute(bool mute)
-{
-    unsigned value_dap = tlv320_regs[REG_DAP];
-    unsigned value_l, value_r;
-
-    if (mute)
-    {
-        value_l = LHV_LHV(HEADPHONE_MUTE);
-        value_r = RHV_RHV(HEADPHONE_MUTE);
-        value_dap |= DAP_DACM;
-    }
-    else
-    {
-        value_l = LHV_LHV(tlv320.vol_l);
-        value_r = RHV_RHV(tlv320.vol_r);
-        if (value_l > HEADPHONE_MUTE || value_r > HEADPHONE_MUTE)
-            value_dap &= ~DAP_DACM;
-    }
-
-    tlv320_write_reg(REG_LHV, LHV_LZC | value_l);
-    tlv320_write_reg(REG_RHV, RHV_RZC | value_r);
-    tlv320_write_reg(REG_DAP, value_dap);
-}
 
 /* Nice shutdown of TLV320 codec */
 void audiohw_close(void)

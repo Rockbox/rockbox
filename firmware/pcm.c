@@ -355,16 +355,6 @@ bool pcm_is_paused(void)
     return pcm_paused;
 }
 
-void pcm_mute(bool mute)
-{
-#ifndef SIMULATOR
-    audiohw_mute(mute);
-#endif
-
-    if (mute)
-        sleep(HZ/16);
-}
-
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
 

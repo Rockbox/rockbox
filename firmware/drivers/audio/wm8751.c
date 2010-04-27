@@ -99,6 +99,13 @@ static int adaptivebass2hw(int value)
 }
 #endif
 
+static void audiohw_mute(bool mute)
+{
+    /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
+    /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
+    wmcodec_write(DACCTRL, mute ? DACCTRL_DACMU : 0);
+}
+
 /* Reset and power up the WM8751 */
 void audiohw_preinit(void)
 {
@@ -228,13 +235,6 @@ void audiohw_set_treble(int value)
 {
     wmcodec_write(TREBCTRL, TREBCTRL_BITS |
         TREBCTRL_TREB(tone_tenthdb2hw(value)));
-}
-
-void audiohw_mute(bool mute)
-{
-    /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
-    /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
-    wmcodec_write(DACCTRL, mute ? DACCTRL_DACMU : 0);
 }
 
 /* Nice shutdown of WM8751 codec */
