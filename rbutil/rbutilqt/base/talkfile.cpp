@@ -88,7 +88,8 @@ bool TalkFileCreator::createTalkFiles()
 //! \returns the modified string
 QString TalkFileCreator::stripExtension(QString filename)
 {
-    if(filename.lastIndexOf(".") != -1)
+    // only strip extension if there is a dot in the filename and there are chars before the dot
+    if(filename.lastIndexOf(".") != -1 && filename.left(filename.lastIndexOf(".")) != "")
         return filename.left(filename.lastIndexOf("."));
     else
         return filename;
