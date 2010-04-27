@@ -239,6 +239,8 @@ int button_read_device(void)
     gpiod6 = GPIOD_PIN(6);
 
     GPIOB_PIN(0) = 0;
+    for(delay = 240; delay; delay--)
+        nop;
 
     if (GPIOC_PIN(1) & 1<<1)
         btn |= BUTTON_DOWN;
