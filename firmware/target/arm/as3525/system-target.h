@@ -62,7 +62,8 @@ extern int c200v2_variant;
 static inline void udelay(unsigned usecs) __attribute__((always_inline));
 static inline void udelay(unsigned usecs)
 {
-    int now, end;
+    unsigned now;
+    int end;
     
     /**
      * we're limited to 1.5us multiplies due to the odd timer frequency (1.5MHz),
@@ -94,9 +95,24 @@ static inline void udelay(unsigned usecs)
         int delay = usecs * 2 / 3; /* us * 1.5 = us*timer_period */
         end = now - delay;
     }
+
+    unsigned old;
+
     /* underrun ? */
     if (end < 0)
+    {
+        do {
+            old = now;
+            now = TIMER2_VALUE;
+        } while(now <= old);  /* if the new value is higher then we wrapped */
+
         end += TIMER_PERIOD;
-    while(TIMER2_VALUE != (unsigned)end);
+    }
+
+    do {
+        /* if timer wraps then we missed our end value */
+        old = now;
+        now = TIMER2_VALUE;
+    } while(now > (unsigned)end && now <= old);
 }
 #endif /* SYSTEM_TARGET_H */
