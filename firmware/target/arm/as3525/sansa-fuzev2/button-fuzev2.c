@@ -31,7 +31,7 @@ static bool hold_button = false;
 #ifdef HAVE_SCROLLWHEEL
 #define SCROLLWHEEL_BITS        (1<<7|1<<6)
                                                       /* TIMER units */
-#define TIMER_TICK              (TIMER_FREQ/HZ)       /* how long a tick lasts */
+#define TIMER_TICK              (KERNEL_TIMER_FREQ/HZ)/* how long a tick lasts */
 #define TIMER_MS                (TIMER_TICK/(1000/HZ))/* how long a ms lasts */
 
 #define WHEEL_REPEAT_INTERVAL   (300*TIMER_MS)      /* 300ms */
@@ -90,7 +90,7 @@ static void scrollwheel(unsigned int wheel_value)
     }
 
     int  repeat = 1; /* assume repeat */
-    long time = TIMER1_VALUE + current_tick*TIMER_TICK; /* to timer unit */
+    long time = TIMER2_VALUE + current_tick*TIMER_TICK; /* to timer unit */
     long v = (time - last_wheel_post);
 
    /* interpolate velocity in timer_freq/timer_unit == 1/s */
