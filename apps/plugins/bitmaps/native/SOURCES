@@ -98,10 +98,7 @@ brickmania_bricks.160x128x2.bmp
 #elif LCD_WIDTH >= 138
 brickmania_ball.5x5x2.bmp
 brickmania_bricks.138x110x2.bmp
-#elif LCD_WIDTH >= 128
-brickmania_ball.4x4x2.bmp
-brickmania_bricks.128x128x2.bmp
-#else /* M3 currently */
+#else /* M3, HD200  */
 brickmania_ball.4x4x2.bmp
 brickmania_bricks.128x96x2.bmp
 #endif
