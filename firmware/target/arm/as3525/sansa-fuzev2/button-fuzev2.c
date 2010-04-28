@@ -233,14 +233,12 @@ int button_read_device(void)
     CCU_IO &= ~(1<<12);
 
     GPIOB_PIN(0) = 1<<0;
-    for(delay = 500; delay; delay--)
-        nop;
+    udelay(10);
 
     gpiod6 = GPIOD_PIN(6);
 
     GPIOB_PIN(0) = 0;
-    for(delay = 240; delay; delay--)
-        nop;
+    udelay(5);
 
     if (GPIOC_PIN(1) & 1<<1)
         btn |= BUTTON_DOWN;
