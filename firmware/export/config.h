@@ -734,7 +734,7 @@ Lyre prototype 1 */
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
-    && CONFIG_CPU != JZ4732
+    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2
 #define PLUGIN_USE_IRAM
 #endif
 #if defined(CPU_ARM)
