@@ -58,9 +58,9 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     int x = 0;
     int y, i;
     int space_w, w, h;
-    int width, height;
-#ifdef HAVE_LCD_BITMAP
     struct viewport vp;
+#ifdef HAVE_LCD_BITMAP
+    int width, height;
     int maxw = 0;
 
     viewport_set_defaults(&vp, screen->screen_type);
@@ -68,6 +68,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     
     screen->getstringsize(" ", &space_w, &h);
 #else /* HAVE_LCD_CHARCELLS */
+    vp.width = screen->lcdwidth;
+    vp.height = screen->lcdheight;
 
     space_w = h = 1;
     screen->double_height (false);
