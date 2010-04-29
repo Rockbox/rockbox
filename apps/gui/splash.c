@@ -35,6 +35,7 @@
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
 #define RECT_SPACING 2
+#define SPLASH_MEMORY_INTERVAL (HZ)
 
 #else /* HAVE_LCD_CHARCELLS */
 
@@ -57,6 +58,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     int x = 0;
     int y, i;
     int space_w, w, h;
+    int width, height;
 #ifdef HAVE_LCD_BITMAP
     struct viewport vp;
     int maxw = 0;
@@ -92,13 +94,13 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
         if (lastbreak)
         {
             if (x + (next - lastbreak) * space_w + w
-                    > screen->lcdwidth - RECT_SPACING*2)
+                    > vp.width - RECT_SPACING*2)
             {   /* too wide, wrap */
 #ifdef HAVE_LCD_BITMAP
                 if (x > maxw)
                     maxw = x;
 #endif
-                if ((y + h > screen->lcdheight) || (line >= (MAXLINES-1)))
+                if ((y + h > vp.height) || (line >= (MAXLINES-1)))
                     break;  /* screen full or out of lines */
                 x = 0;
                 y += h;
@@ -131,22 +133,23 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     screen->stop_scroll();
 
 #ifdef HAVE_LCD_BITMAP
-    /* If we center the display, then just clear the box we need and put
-       a nice little frame and put the text in there! */
-    vp.y = (screen->lcdheight - y) / 2 - RECT_SPACING;  /* height => y start position */
-    vp.x = (screen->lcdwidth - maxw) / 2 - RECT_SPACING;
-    vp.width = maxw + 2*RECT_SPACING;
-    vp.height = screen->lcdheight - (vp.y*2) + RECT_SPACING;
+
+    vp.y = (vp.height - vp.y - y) / 2 - RECT_SPACING;  /* height => y start position */
+    vp.x += (vp.width - maxw) / 2 - RECT_SPACING;
+    width = maxw + 2*RECT_SPACING;
+    height = y + 2*RECT_SPACING;
 
     if (vp.y < 0)
         vp.y = 0;
     if (vp.x < 0)
         vp.x = 0;
-    if (vp.width > screen->lcdwidth)
-        vp.width = screen->lcdwidth;
-    if (vp.height > screen->lcdheight)
-        vp.height = screen->lcdheight;
-
+    if (width > vp.width)
+        width = vp.width;
+    if (height > vp.height)
+        height = vp.height;
+    vp.width = width;
+    vp.height = height;
+    
     vp.flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
@@ -204,15 +207,12 @@ void splashf(int ticks, const char *fmt, ...)
     fmt = P2STR((unsigned char *)fmt);
     FOR_NB_SCREENS(i)
     {
-        viewportmanager_theme_enable(i, false, NULL);
         va_start(ap, fmt);
         splash_internal(&(screens[i]), fmt, ap);
         va_end(ap);
     }
     if (ticks)
         sleep(ticks);
-    FOR_NB_SCREENS(i)
-        viewportmanager_theme_undo(i, false);
 }
 
 void splash(int ticks, const char *str)
