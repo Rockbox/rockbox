@@ -149,6 +149,27 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,            BUTTON_SELECT | BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_FM_PRESET,          BUTTON_SELECT | BUTTON_REL,            BUTTON_SELECT },
+    { ACTION_FM_MODE,            BUTTON_SELECT,                         BUTTON_NONE },
+    { ACTION_FM_STOP,            BUTTON_PLAY | BUTTON_REPEAT,           BUTTON_PLAY },
+    { ACTION_FM_EXIT,            BUTTON_REC | BUTTON_REL,               BUTTON_REC },
+    { ACTION_FM_PLAY,            BUTTON_PLAY | BUTTON_REL,              BUTTON_PLAY },
+    { ACTION_FM_QUICKSCREEN,     BUTTON_REC|BUTTON_REPEAT,              BUTTON_REC },
+    { ACTION_SETTINGS_INC,       BUTTON_VOL_UP,                         BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_VOL_DOWN,                       BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_VOL_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_NEXT,                           BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_NEXT|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_PREV,                           BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_PREV|BUTTON_REPEAT,             BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+
+};
+
 const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
@@ -157,7 +178,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-
+#if CONFIG_TUNER
+         case CONTEXT_FM:
+             return button_context_radio;
+#endif
         case CONTEXT_TREE:
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:

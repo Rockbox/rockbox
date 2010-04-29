@@ -99,6 +99,18 @@ static int adaptivebass2hw(int value)
 }
 #endif
 
+#if defined(HAVE_WM8750)
+static int recvol2hw(int value)
+{
+/* convert tenth of dB of input volume (-172...300) to input register value */
+    /* +30dB to -17.25 0.75dB step 6 bits */
+    /* 111111 == +30dB  (0x3f)            */
+    /* 010111 ==   0dB  (0x17)            */
+    /* 000000 == -17.25dB                 */
+
+    return (3*(value/10 - 0x17))/4;
+}
+#endif
 static void audiohw_mute(bool mute)
 {
     /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
@@ -268,3 +280,166 @@ void audiohw_set_frequency(int fsel)
     wmcodec_write(CLOCKING, srctrl_table[fsel]);
 #endif
 }
+
+#if defined(HAVE_WM8750)
+void audiohw_set_recsrc(int source, bool recording)
+{
+    /* INPUT1 - FM radio
+     * INPUT2 - Line-in
+     * INPUT3 - MIC
+     *
+     * if recording == false we use analog bypass from input
+     * turn off ADC, PGA to save power
+     * turn on output buffer(s)
+     * 
+     * if recording == true we route input signal to PGA
+     * and monitoring picks up signal after PGA in analog domain
+     * turn on ADC, PGA, DAC, output buffer(s)
+     */
+    
+    switch(source)
+    {
+    case AUDIO_SRC_PLAYBACK:
+        /* mute PGA, disable all audio paths but DAC and output stage*/
+        wmcodec_write(LINVOL, LINVOL_LINMUTE | LINVOL_LINVOL(23)); /* 0dB */
+        wmcodec_write(RINVOL, RINVOL_RINMUTE | RINVOL_RINVOL(23)); /* 0dB */
+        wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
+        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                      PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+        /* route DAC signal to output mixer */
+        wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO);
+        wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO);
+
+        /* unmute DAC */
+        audiohw_mute(false);
+        break;
+
+    case AUDIO_SRC_FMRADIO:
+        if(recording)
+        {
+            /* Set input volume to PGA */
+            wmcodec_write(LINVOL, LINVOL_LINVOL(23));
+            wmcodec_write(RINVOL, RINVOL_RINVOL(23));
+
+            /* Turn on PGA and ADC */
+            wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K |
+                          PWRMGMT1_AINL | PWRMGMT1_AINR | 
+                          PWRMGMT1_ADCL | PWRMGMT1_ADCR);
+
+            /* Setup input source for PGA as INPUT1 
+             * MICBOOST disabled
+             */
+            wmcodec_write(ADCL, ADCL_LINSEL_LINPUT1 | ADCL_LMICBOOST_DISABLED);
+            wmcodec_write(ADCR, ADCR_RINSEL_RINPUT1 | ADCR_RMICBOOST_DISABLED);
+
+            /* setup output digital data
+             * default is LADC -> LDATA, RADC -> RDATA
+             * so we don't touch this
+             */
+
+            /* power up DAC and output stage */
+            wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                          PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+            /* analog monitor */
+            wmcodec_write(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
+                          LEFTMIX1_LD2LO);
+            wmcodec_write(RIGHTMIX2, RIGHTMIX2_RMIXSEL_ADCRIN |
+                          RIGHTMIX2_RD2RO);
+        }
+        else
+        {
+
+            /* turn off ADC, PGA */
+            wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
+
+           /* turn on DAC and output stage */
+            wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                          PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+           /* setup monitor mode by routing input signal to outmix 
+             * at 0dB volume
+             */
+            wmcodec_write(LEFTMIX1, LEFTMIX1_LI2LO | LEFTMIX1_LMIXSEL_LINPUT1 |
+                          LEFTMIX1_LI2LOVOL(0x20) | LEFTMIX1_LD2LO);
+            wmcodec_write(RIGHTMIX2, RIGHTMIX2_RI2RO | RIGHTMIX2_RMIXSEL_RINPUT1 |
+                          RIGHTMIX2_RI2ROVOL(0x20) | RIGHTMIX2_RD2RO);
+        }
+        break;
+
+    case AUDIO_SRC_LINEIN:
+        /* Set input volume to PGA */
+        wmcodec_write(LINVOL, LINVOL_LINVOL(23));
+        wmcodec_write(RINVOL, RINVOL_RINVOL(23));
+
+        /* Turn on PGA, ADC, DAC */
+        wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K |
+                      PWRMGMT1_AINL | PWRMGMT1_AINR | 
+                      PWRMGMT1_ADCL | PWRMGMT1_ADCR);
+
+        /* turn on DAC and output stage */
+        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                      PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+        /* Setup input source for PGA as INPUT2 
+         * MICBOOST disabled
+         */
+        wmcodec_write(ADCL, ADCL_LINSEL_LINPUT2 | ADCL_LMICBOOST_DISABLED);
+        wmcodec_write(ADCR, ADCR_RINSEL_RINPUT2 | ADCR_RMICBOOST_DISABLED);
+
+        /* setup output digital data
+         * default is LADC -> LDATA, RADC -> RDATA
+         * so we don't touch this
+         */
+
+        /* digital monitor */
+        wmcodec_write(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
+                      LEFTMIX1_LD2LO);
+        wmcodec_write(RIGHTMIX2, RIGHTMIX2_RMIXSEL_ADCRIN |
+                      RIGHTMIX2_RD2RO);
+        break;
+
+    case AUDIO_SRC_MIC:
+        /* Set input volume to PGA */
+        wmcodec_write(LINVOL, LINVOL_LINVOL(23));
+        wmcodec_write(RINVOL, RINVOL_RINVOL(23));
+
+        /* Turn on PGA and ADC, turn off DAC */
+        wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K |
+                      PWRMGMT1_AINL | PWRMGMT1_AINR | 
+                      PWRMGMT1_ADCL | PWRMGMT1_ADCR);
+
+        /* turn on DAC and output stage */
+        wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                      PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+        /* Setup input source for PGA as INPUT3 
+         * MICBOOST disabled
+         */
+        wmcodec_write(ADCL, ADCL_LINSEL_LINPUT3 | ADCL_LMICBOOST_DISABLED);
+        wmcodec_write(ADCR, ADCR_RINSEL_RINPUT3 | ADCR_RMICBOOST_DISABLED);
+
+        /* setup output digital data
+         * default is LADC -> LDATA, RADC -> RDATA
+         * so we don't touch this
+         */
+
+        /* analog monitor */
+        wmcodec_write(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
+                      LEFTMIX1_LD2LO);
+        wmcodec_write(RIGHTMIX2, RIGHTMIX2_RMIXSEL_ADCRIN |
+                      RIGHTMIX2_RD2RO);
+        break;
+
+    } /* switch(source) */
+}
+
+/* Setup PGA gain */
+void audiohw_set_recvol(int left, int right, int type)
+{
+    (void)type;
+    wmcodec_write(LINVOL, LINVOL_LINVOL(recvol2hw(left)));
+    wmcodec_write(RINVOL, RINVOL_RINVOL(recvol2hw(right)));
+}
+#endif
