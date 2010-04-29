@@ -291,6 +291,10 @@ $releasenotes="/wiki/ReleaseNotes351";
         name => 'Creative Zen Vision:M 60GB',
         status => 1,
     },
+    'hd200' => {
+        name => 'MPIO HD200',
+        status => 1,
+    },
 );
 
 sub manualname {
