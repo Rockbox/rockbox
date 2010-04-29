@@ -453,14 +453,14 @@ void set_cpu_frequency(long frequency)
 void set_cpu_frequency(long frequency)
 {
     int oldstatus = disable_irq_save();
-    int delay;
+
+    /* We only have 2 settings */
+    cpu_frequency = (frequency == CPUFREQ_MAX) ? frequency : CPUFREQ_NORMAL;
 
     if(frequency == CPUFREQ_MAX)
     {
         /* Change PCLK while FCLK is low, so it doesn't go too high */
         CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0 << 2);
-
-        delay = 40; while(delay--) asm("nop");
 
         CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                     (AS3525_FCLK_PREDIV  << 2) |
@@ -468,18 +468,13 @@ void set_cpu_frequency(long frequency)
     }
     else
     {
-        frequency = CPUFREQ_NORMAL; /* We only have 2 settings */
-
         CGU_PROC = ((AS3525_FCLK_POSTDIV_UNBOOSTED << 4) |
                     (AS3525_FCLK_PREDIV  << 2) |
                     AS3525_FCLK_SEL);
 
         /* Change PCLK after FCLK is low, so it doesn't go too high */
         CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0_UNBOOSTED << 2);
-        delay = 40; while(delay--) asm("nop");
     }
-
-    cpu_frequency = frequency;
 
     restore_irq(oldstatus);
 }
