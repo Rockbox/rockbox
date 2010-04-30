@@ -94,6 +94,14 @@
 #include "dsputil.h"
 #include "wma.h"
 
+/* Some defines to make it compile */
+#define AVERROR_INVALIDDATA  -1
+#define AVERROR_PATCHWELCOME -2
+#ifndef M_PI
+#define M_PI           3.14159265358979323846  /* pi */
+#endif
+#define av_log_ask_for_sample(...)
+
 /** current decoder limitations */
 #define WMAPRO_MAX_CHANNELS    8                             ///< max number of handled channels
 #define MAX_SUBFRAMES  32                                    ///< max number of subframes per channel
@@ -444,9 +452,10 @@ static av_cold int decode_init(AVCodecContext *avctx)
     /** calculate sine values for the decorrelation matrix */
     for (i = 0; i < 33; i++)
         sin64[i] = sin(i*M_PI / 64.0);
-
+#if 0
     if (avctx->debug & FF_DEBUG_BITSTREAM)
         dump_context(s);
+#endif
 
     avctx->channel_layout = channel_mask;
     return 0;
@@ -1559,7 +1568,7 @@ static void flush(AVCodecContext *avctx)
     s->packet_loss = 1;
 }
 
-
+#if 0
 /**
  *@brief wmapro decoder
  */
@@ -1576,3 +1585,10 @@ AVCodec wmapro_decoder = {
     .flush= flush,
     .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 9 Professional"),
 };
+#endif
+
+int main(void)
+{
+    /* possible test program - just here now to ensure linking is done properly */
+    return 0;
+}

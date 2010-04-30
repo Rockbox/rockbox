@@ -109,11 +109,11 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 #endif
     s->exptab1     = NULL;
     s->split_radix = 1;
-
+#if 0
     if (ARCH_ARM)     ff_fft_init_arm(s);
     if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
     if (HAVE_MMX)     ff_fft_init_mmx(s);
-
+#endif
     if (s->split_radix) {
         for(j=4; j<=nbits; j++) {
             ff_init_ff_cos_tabs(j);

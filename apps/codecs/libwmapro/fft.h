@@ -23,7 +23,7 @@
 #define AVCODEC_FFT_H
 
 #include <stdint.h>
-#include "config.h"
+//#include "config.h"
 #include "libavutil/mem.h"
 #include "avfft.h"
 

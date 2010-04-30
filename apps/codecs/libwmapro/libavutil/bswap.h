@@ -27,7 +27,7 @@
 #define AVUTIL_BSWAP_H
 
 #include <stdint.h>
-#include "config.h"
+//#include "config.h"
 #include "attributes.h"
 
 #if   ARCH_ARM

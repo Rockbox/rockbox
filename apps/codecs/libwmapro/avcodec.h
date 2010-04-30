@@ -1090,7 +1090,7 @@ typedef struct AVCodecContext {
      * - encoding: MUST be set by user.
      * - decoding: Set by libavcodec.
      */
-    AVRational time_base;
+    //AVRational time_base;
 
     /* video only */
     /**
@@ -1116,7 +1116,7 @@ typedef struct AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    enum PixelFormat pix_fmt;
+    //enum PixelFormat pix_fmt;
 
     /**
      * Frame rate emulation. If not zero, the lower layer (i.e. format handler)
@@ -1660,7 +1660,7 @@ typedef struct AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    AVRational sample_aspect_ratio;
+    //AVRational sample_aspect_ratio;
 
     /**
      * the picture in the bitstream
@@ -2677,7 +2677,7 @@ typedef struct AVCodec {
      * Will be called when seeking
      */
     void (*flush)(AVCodecContext *);
-    const AVRational *supported_framerates; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
+    //const AVRational *supported_framerates; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
     const enum PixelFormat *pix_fmts;       ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
     /**
      * Descriptive name for the codec, meant to be more human readable than name.
@@ -2719,7 +2719,7 @@ typedef struct AVHWAccel {
      *
      * Only hardware accelerated formats are supported here.
      */
-    enum PixelFormat pix_fmt;
+    //enum PixelFormat pix_fmt;
 
     /**
      * Hardware accelerated codec capabilities.
@@ -3885,7 +3885,7 @@ int av_parse_video_frame_size(int *width_ptr, int *height_ptr, const char *str);
  * @param[in,out] frame_rate pointer to the AVRational which will contain the detected
  * frame rate
  */
-int av_parse_video_frame_rate(AVRational *frame_rate, const char *str);
+//int av_parse_video_frame_rate(AVRational *frame_rate, const char *str);
 
 /**
  * Logs a generic warning message about a missing feature. This function is

@@ -21,11 +21,11 @@
 
 #include "avcodec.h"
 #include "wma.h"
-#include "wmadata.h"
+//#include "wmadata.h"
 
 #undef NDEBUG
 #include <assert.h>
-
+#if 0
 /* XXX: use same run/length optimization as mpeg decoders */
 //FIXME maybe split decode / encode or pass flag
 static void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
@@ -65,6 +65,7 @@ static void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
     *pint_table   = int_table;
     av_free(level_table);
 }
+#endif /* 0 */
 
 /**
  *@brief Get the samples per frame for this stream.
@@ -106,6 +107,7 @@ int av_cold ff_wma_get_frame_len_bits(int sample_rate, int version,
     return frame_len_bits;
 }
 
+#if 0
 int ff_wma_init(AVCodecContext *avctx, int flags2)
 {
     WMACodecContext *s = avctx->priv_data;
@@ -426,7 +428,7 @@ int ff_wma_end(AVCodecContext *avctx)
 
     return 0;
 }
-
+#endif /* 0 */
 /**
  * Decode an uncompressed coefficient.
  * @param s codec context

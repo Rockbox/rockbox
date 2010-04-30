@@ -29,17 +29,18 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
-#include "simple_idct.h"
-#include "faandct.h"
-#include "faanidct.h"
+//#include "simple_idct.h"
+//#include "faandct.h"
+//#include "faanidct.h"
 #include "mathops.h"
-#include "mpegvideo.h"
-#include "config.h"
-#include "lpc.h"
-#include "ac3dec.h"
-#include "vorbis.h"
-#include "png.h"
+//#include "mpegvideo.h"
+//#include "config.h"
+//#include "lpc.h"
+//#include "ac3dec.h"
+//#include "vorbis.h"
+//#include "png.h"
 
+#if 0
 uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 uint32_t ff_squareTbl[512] = {0, };
 
@@ -3797,6 +3798,8 @@ WRAPPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WRAPPER8_16_SQ(rd8x8_c, rd16_c)
 WRAPPER8_16_SQ(bit8x8_c, bit16_c)
 
+#endif /* 0 */
+
 static void vector_fmul_c(float *dst, const float *src, int len){
     int i;
     for(i=0; i<len; i++)
@@ -3838,7 +3841,7 @@ static void vector_fmul_scalar_c(float *dst, const float *src, float mul,
     for (i = 0; i < len; i++)
         dst[i] = src[i] * mul;
 }
-
+#if 0
 static void vector_fmul_sv_scalar_2_c(float *dst, const float *src,
                                       const float **sv, float mul, int len)
 {
@@ -3910,6 +3913,7 @@ static void int32_to_float_fmul_scalar_c(float *dst, const int *src, float mul, 
     for(i=0; i<len; i++)
         dst[i] = src[i] * mul;
 }
+
 
 static inline uint32_t clipf_c_one(uint32_t a, uint32_t mini,
                    uint32_t maxi, uint32_t maxisign)
@@ -4176,9 +4180,10 @@ int ff_check_alignment(void){
     }
     return 0;
 }
-
+#endif
 av_cold void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 {
+#if 0
     int i;
 
     ff_check_alignment();
@@ -4486,20 +4491,22 @@ av_cold void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if CONFIG_LPC
     c->lpc_compute_autocorr = ff_lpc_compute_autocorr;
 #endif
+
+#endif /* 0 */
     c->vector_fmul = vector_fmul_c;
     c->vector_fmul_reverse = vector_fmul_reverse_c;
     c->vector_fmul_add = vector_fmul_add_c;
     c->vector_fmul_window = ff_vector_fmul_window_c;
-    c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_c;
-    c->vector_clipf = vector_clipf_c;
-    c->float_to_int16 = ff_float_to_int16_c;
-    c->float_to_int16_interleave = ff_float_to_int16_interleave_c;
-    c->scalarproduct_int16 = scalarproduct_int16_c;
-    c->scalarproduct_and_madd_int16 = scalarproduct_and_madd_int16_c;
-    c->scalarproduct_float = scalarproduct_float_c;
-    c->butterflies_float = butterflies_float_c;
+    //c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_c;
+    //c->vector_clipf = vector_clipf_c;
+    //c->float_to_int16 = ff_float_to_int16_c;
+    //c->float_to_int16_interleave = ff_float_to_int16_interleave_c;
+    //c->scalarproduct_int16 = scalarproduct_int16_c;
+    //c->scalarproduct_and_madd_int16 = scalarproduct_and_madd_int16_c;
+    //c->scalarproduct_float = scalarproduct_float_c;
+    //c->butterflies_float = butterflies_float_c;
     c->vector_fmul_scalar = vector_fmul_scalar_c;
-
+#if 0
     c->vector_fmul_sv_scalar[0] = vector_fmul_sv_scalar_2_c;
     c->vector_fmul_sv_scalar[1] = vector_fmul_sv_scalar_4_c;
 
@@ -4561,5 +4568,5 @@ av_cold void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     default:
         av_log(avctx, AV_LOG_ERROR, "Internal error, IDCT permutation not set\n");
     }
+#endif /* 0 */   
 }
-

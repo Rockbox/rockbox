@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
-#include "config.h"
+//#include "config.h"
 #include "attributes.h"
-#include "timer.h"
+//#include "timer.h"
 
 #ifndef attribute_align_arg
 #if (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(4,2)
@@ -191,7 +191,7 @@
     }\
 }
 
-#include "libm.h"
+//#include "libm.h"
 
 /**
  * Returns NULL if CONFIG_SMALL is true, otherwise the argument

@@ -20,7 +20,7 @@
 #define AVUTIL_INTREADWRITE_H
 
 #include <stdint.h>
-#include "config.h"
+//#include "config.h"
 #include "bswap.h"
 #include "common.h"
 

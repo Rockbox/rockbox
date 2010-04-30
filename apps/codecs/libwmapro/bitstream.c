@@ -65,7 +65,8 @@ void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
     int i;
 
     if(length==0) return;
-
+/* The following define was just added to make the codec (wma pro) compile */
+#define CONFIG_SMALL 0
     if(CONFIG_SMALL || words < 16 || put_bits_count(pb)&7){
         for(i=0; i<words; i++) put_bits(pb, 16, AV_RB16(src + 2*i));
     }else{
