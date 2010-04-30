@@ -949,7 +949,7 @@ static int sd1_oneshot_callback(struct timeout *tmo)
     (void)tmo;
 
     /* This is called only if the state was stable for 300ms - check state
- *      * and post appropriate event. */
+     * and post appropriate event. */
     if (card_detect_target())
     {
         queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
