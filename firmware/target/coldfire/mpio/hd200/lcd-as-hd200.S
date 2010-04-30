@@ -8,6 +8,7 @@
  * $Id:$
  *
  * Copyright (C) 2010 Marcin Bukat
+ * based on lcd-as-m3.S by Jens Arnold
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -99,5 +100,80 @@ lcd_write_data:
 
 .write_end:
     rts
+.wd_end:
     .size   lcd_write_data,.wd_end-lcd_write_data
 
+    .global lcd_mono_data
+    .type   lcd_mono_data, @function
+
+lcd_mono_data:
+    move.l  (4, %sp), %a0       /* p_bytes */
+    move.l  (8, %sp), %d0       /* count */
+    lea.l   LCD_BASE_ADDRESS+2, %a1  /* LCD data port address */
+
+.md_loop:
+    move.b  (%a0)+, %d1
+    move.w  %d1, (%a1)    /* byte transfers actually */
+    move.w  %d1, (%a1)
+    subq.l  #1, %d0
+    bne.s   .md_loop
+    rts
+.md_end:
+    .size   lcd_mono_data,.md_end-lcd_mono_data
+
+    .global     lcd_grey_data
+    .type       lcd_grey_data,@function
+
+lcd_grey_data:
+    lea.l   (-2*4, %sp), %sp
+    movem.l  %a2-%a3, (%sp)
+    movem.l (2*4+4, %sp), %a0-%a2  /* values, phases, length */
+    add.l   %a2, %a2
+    lea.l   (%a1, %a2.l*4), %a2    /* end address */
+    lea.l   LCD_BASE_ADDRESS+2, %a3 /* LCD data port address */
+.ph_loop:
+    clr.l   %d1
+    move.l  (%a1), %d0          /* fetch 4 pixel phases */
+    bclr.l  #31, %d0            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = ........................00000000 */
+    lsl.l   #1, %d1             /* %d1 = .......................00000000. */
+    bclr.l  #23, %d0            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = .......................011111111 */
+    lsl.l   #1, %d1             /* %d1 = ......................011111111. */
+    bclr.l  #15, %d0            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = ......................0122222222 */
+    lsl.l   #1, %d1             /* %d1 = .....................0122222222. */
+    bclr.l  #7, %d0             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = .....................01233333333 */
+    lsl.l   #1, %d1             /* %d1 = ....................01233333333. */
+    add.l   (%a0)+, %d0         /* add 4 pixel values to the phases */
+    move.l  %d0, (%a1)+         /* store new phases, advance pointer */
+
+    clr.l   %d1
+    move.l  (%a1), %d0          /* fetch 4 pixel phases */
+    bclr.l  #31, %d0            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = ....................012344444444 */
+    lsl.l   #1, %d1             /* %d1 = ...................012344444444. */
+    bclr.l  #23, %d0            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = ...................0123455555555 */
+    lsl.l   #1, %d1             /* %d1 = ..................0123455555555. */
+    bclr.l  #15, %d0            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = ..................01234566666666 */
+    lsl.l   #1, %d1             /* %d1 = .................01234566666666. */
+    bclr.l  #7, %d0             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
+    seq.b   %d1                 /* %d1 = .................012345677777777 */
+    lsr.l   #7, %d1             /* %d1 = ........................01234567 */
+    add.l   (%a0)+, %d0         /* add 4 pixel values to the phases */
+    move.l  %d0, (%a1)+         /* store new phases, advance pointer */
+
+    move.w  %d1, (%a3)          /* transfer to lcd */
+    move.w  %d1, (%a3)          /* transfer to lcd */
+
+    cmp.l   %a2, %a1
+    bls    .ph_loop
+
+    movem.l (%sp), %a2-%a3
+    lea.l   (2*4, %sp), %sp
+    rts
+.grey_end:
+    .size    lcd_grey_data,.grey_end-lcd_grey_data

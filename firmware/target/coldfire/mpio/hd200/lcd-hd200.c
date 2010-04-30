@@ -215,27 +215,49 @@ void lcd_update_rect(int x, int y, int width, int height)
     
 }
 
-void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
-                         int x, int by, int width, int bheight, int stride)
-{
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-    /* empty stub */
-}
+/* Helper function. */
+void lcd_mono_data(const unsigned char *data, int count);
 
+/* Performance function that works with an external buffer
+   note that by and bheight are in 8-pixel units! */
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                    int bheight, int stride)
 {
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-    /* empty stub */
+    if (lcd_initialized)
+    {
+        while (bheight--)
+        {
+            lcd_write_command(LCD_SET_PAGE | (by & 0xf));
+            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+
+            lcd_mono_data(data, width);
+            data += stride;
+            by++;
+        }
+    }
 }
+
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
+
+/* Performance function that works with an external buffer
+   note that by and bheight are in 8-pixel units! */
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
+                         int x, int by, int width, int bheight, int stride)
+{
+    if (lcd_initialized)
+    {
+        stride <<= 3; /* 8 pixels per block */
+        while (bheight--)
+        {
+            lcd_write_command(LCD_SET_PAGE | (by & 0xf));
+            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+
+            lcd_grey_data(values, phases, width);
+            values += stride;
+            phases += stride;
+            by++;
+        }
+    }
+}
+

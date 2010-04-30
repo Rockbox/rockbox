@@ -89,6 +89,9 @@ PLUGIN_HEADER
 #define DEFAULT_SCAN_RATE 1500
 #define HORIZ_SCAN /* LCD controller updates the panel sideways */
 #define NEED_BOOST
+#elif defined MPIO_HD200
+#define DEFAULT_SCAN_RATE 1460
+#define NEED_BOOST
 #elif defined IAUDIO_M5
 #define DEFAULT_SCAN_RATE 730
 #elif defined IPOD_1G2G
