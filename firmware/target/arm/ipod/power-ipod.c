@@ -29,9 +29,6 @@
 #include "usb.h"
 #include "lcd.h"
 #include "string.h"
-#if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5020
-#include "rtc.h"
-#endif
 
 void power_init(void)
 {
@@ -167,26 +164,20 @@ void power_off(void)
 #endif
 
 #ifndef BOOTLOADER
-#if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5020
-    /* When shut down by OF, wakeup via alarm is enabled.  This resets the
-       alarm time so an unintended wakeup does not occur. */
-    if (!(pcf50605_wakeup_flags & 0x10))
-        rtc_enable_alarm(false);
-#endif
-#if defined(IPOD_1G2G)
+#ifdef IPOD_1G2G
     /* we cannot turn off the 1st gen/ 2nd gen yet. Need to figure out sleep mode. */
-    system_reboot();
-#elif CONFIG_CPU == PP5022
-    /* The OF in flash assumes boot failed because the battery is low.
-       If there is no charger connected, this leads to a shutdown.
-     */
-    memcpy((void *)(0x4001ff00+8), "booting!", 8);
-    system_reboot();
-#elif CONFIG_CPU == PP5020
-    memcpy((void *)(0x40017f00+8), "booting!", 8);
     system_reboot();
 #else
     /* We don't turn off the ipod, we put it in a deep sleep */
+    /* Clear latter part of iram (the part used by plugins/codecs) to ensure
+     * that the OF behaves properly on boot. There is some kind of boot
+     * failure flag there which otherwise may not be cleared.
+     */
+#if CONFIG_CPU == PP5022
+    memset((void*)0x4000c000, 0, 0x14000);
+#elif CONFIG_CPU == PP5020
+    memset((void*)0x4000c000, 0, 0xc000);
+#endif
     pcf50605_standby_mode();
 #endif
 #endif
