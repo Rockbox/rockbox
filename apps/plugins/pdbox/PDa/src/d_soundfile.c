@@ -1118,9 +1118,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     if (finalsize > bytelimit / (channels * bytespersamp))
     	finalsize = bytelimit / (channels * bytespersamp);
 #ifdef ROCKBOX
-    fp = open_soundfile(canvas_getdir(x->x_canvas)->s_name, filename,
-            headersize, &bytespersamp, &bigendian, &channels, &bytelimit,
-            skipframes);
+    fp = fd;
 #else
     fp = fdopen(fd, "rb");
 #endif
@@ -1131,7 +1129,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     	int thisread = finalsize - itemsread;
     	thisread = (thisread > bufframes ? bufframes : thisread);
 #ifdef ROCKBOX
-        nitems = read(fp, sampbuf, thisread * bytespersamp * channels);
+        nitems = read(fp, sampbuf, thisread * bytespersamp * channels) / bytespersamp;
 #else
     	nitems = fread(sampbuf, channels * bytespersamp, thisread, fp);
 #endif
@@ -1141,7 +1139,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
 	itemsread += nitems;
     }
     	/* zero out remaining elements of vectors */
-	
+
     for (i = 0; i < argc; i++)
     {
 #ifdef ROCKBOX
