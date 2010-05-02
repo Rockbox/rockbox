@@ -17,12 +17,4 @@
 #define float_q15(a) float_q(a, 15)
 #define float_q16(a) float_q(a, 16)
 
-/**
- * Fixed point square root via Newton-Raphson.
- * @param a square root argument.
- * @param fracbits specifies number of fractional bits in argument.
- * @return Square root of argument in same fixed point format as input.
- */
-int64_t fsqrt64(int64_t a, unsigned int fracbits);
-
 #endif
