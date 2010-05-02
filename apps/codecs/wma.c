@@ -9,10 +9,6 @@
  *
  * Copyright (C) 2007 Dave Chapman
  *
- * ASF parsing code based on libasf by Juho Vähä-Herttua
- * http://code.google.com/p/libasf/  libasf itself was based on the ASF
- * parser in VLC - http://www.videolan.org/
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
