@@ -57,6 +57,7 @@ static struct device_t devices[] =
     {"c100",     "Sansa C100 series",            0xb021, 0x20000000, 0x42e97010 },
     {"m200",     "Sansa M200 series",            0xb021, 0x20000000, 0x42e97010 },
     {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 },
+    {"cowons9",  "Cowon S9",                     0xb057, 0x20000000, 0xa1102800 },
     {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
     {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
     {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 },
