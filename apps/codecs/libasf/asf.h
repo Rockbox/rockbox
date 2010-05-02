@@ -35,8 +35,6 @@ struct asf_waveformatex_s {
 };
 typedef struct asf_waveformatex_s asf_waveformatex_t;
 
-/* Define the packet-specific functions only for codecs not for metadata parsers */
-
 int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
                     asf_waveformatex_t* wfx);
                     
