@@ -26,6 +26,7 @@ include $(APPSDIR)/codecs/demac/libdemac.make
 include $(APPSDIR)/codecs/liba52/liba52.make
 include $(APPSDIR)/codecs/libalac/libalac.make
 include $(APPSDIR)/codecs/libasap/libasap.make
+include $(APPSDIR)/codecs/libasf/libasf.make
 include $(APPSDIR)/codecs/libfaad/libfaad.make
 include $(APPSDIR)/codecs/libffmpegFLAC/libffmpegFLAC.make
 include $(APPSDIR)/codecs/libm4a/libm4a.make
@@ -80,7 +81,7 @@ $(CODECDIR)/aac.codec : $(CODECDIR)/libfaad.a $(CODECDIR)/libm4a.a
 $(CODECDIR)/shorten.codec : $(CODECDIR)/libffmpegFLAC.a
 $(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a
 $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
-$(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a
+$(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
 $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
