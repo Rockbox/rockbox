@@ -931,7 +931,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       if(s & 1)
       {
         ptr = *D0ptr;
-        PROD_O(hi, lo, *fo, ptr+1);
+        PROD_O(hi, lo, *fx, ptr+1);
         MLN(hi, lo);
         PROD_A(hi, lo, *fe, ptr);
         pcm[0] = SHIFT(MLZ(hi, lo));
