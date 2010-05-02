@@ -134,9 +134,9 @@ static bool test_fs(void)
     total = TEST_SIZE;
     while (total > 0)
     {
-        current = rb->rand() % (audiobuflen - 4);
+        align = rb->rand() & 0xf;
+        current = rb->rand() % (audiobuflen - align);
         current = MIN(current, total);
-        align = rb->rand() & 3;
         rb->snprintf(text_buf, sizeof text_buf, "Wrt %dKB, %dKB left",
                      current >> 10, total >> 10);
         log_text(text_buf, false);
@@ -163,9 +163,9 @@ static bool test_fs(void)
     total = TEST_SIZE;
     while (total > 0)
     {
-        current = rb->rand() % (audiobuflen - 4);
+        align = rb->rand() & 0xf;
+        current = rb->rand() % (audiobuflen - align);
         current = MIN(current, total);
-        align = rb->rand() & 3;
         rb->snprintf(text_buf, sizeof text_buf, "Cmp %dKB, %dKB left",
                      current >> 10, total >> 10);
         log_text(text_buf, false);
