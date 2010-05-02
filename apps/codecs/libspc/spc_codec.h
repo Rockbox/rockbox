@@ -37,6 +37,10 @@
 
 /** Basic configuration options **/
 
+#ifndef ARM_ARCH
+#define ARM_ARCH 0
+#endif
+
 #define SPC_DUAL_CORE 1
 
 #if !defined(SPC_DUAL_CORE) || NUM_CORES == 1
@@ -293,6 +297,15 @@ enum
     FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
 };
 #elif defined (CPU_ARM)
+#if ARM_ARCH >= 6
+enum
+{
+    FIR_BUF_CNT   = FIR_BUF_HALF * 2,
+    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
+    FIR_BUF_ALIGN = FIR_BUF_SIZE,
+    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
+};
+#else
 enum
 {
     FIR_BUF_CNT   = FIR_BUF_HALF * 2 * 2,
@@ -300,6 +313,7 @@ enum
     FIR_BUF_ALIGN = FIR_BUF_SIZE,
     FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) * 2 - 1))
 };
+#endif /* ARM_ARCH */
 #endif /* CPU_* */
 
 struct Spc_Dsp
@@ -318,7 +332,8 @@ struct Spc_Dsp
     uint16_t noise; /* also read as int16_t */
     
 #if defined(CPU_COLDFIRE)
-    /* circularly hardware masked address */
+    /* FIR history is interleaved. Hardware handles wrapping by mask.
+     * |LR|LR|LR|LR|LR|LR|LR|LR| */
     int32_t *fir_ptr;
     /* wrapped address just behind current position -
        allows mac.w to increment and mask fir_ptr */
@@ -328,9 +343,22 @@ struct Spc_Dsp
 #elif defined (CPU_ARM)
    /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
     int32_t *fir_ptr;
+#if ARM_ARCH >= 6
+    /* FIR history is interleaved with guard to eliminate wrap checking
+     * when convolving.
+     * |LR|LR|LR|LR|LR|LR|LR|LR|--|--|--|--|--|--|--|--| */
+    /* copy of echo FIR constants as int16_t, loaded as int32 for
+     * halfword, packed multiples */
+    int16_t fir_coeff [VOICE_COUNT];
+#else
+    /* FIR history is interleaved with guard to eliminate wrap checking
+     * when convolving.
+     * |LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|...
+     * |--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--| */
     /* copy of echo FIR constants as int32_t, for faster access */
     int32_t fir_coeff [VOICE_COUNT]; 
-#else
+#endif /* ARM_ARCH */
+#else /* Unoptimized CPU */
     /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
     int fir_pos; /* (0 to 7) */
     int fir_buf [FIR_BUF_HALF * 2] [2];
