@@ -1,7 +1,11 @@
 # This contains the file to upload
 ROMFILE=player.rom
 
-CFLAGS=-Wall -W -I/usr/local/include
+ifndef VERSION
+VERSION=$(shell ../../tools/version.sh)
+endif
+
+CFLAGS=-Wall -W -I/usr/local/include -DVERSION=\"$(VERSION)\"
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=tcctool.exe

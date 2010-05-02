@@ -34,8 +34,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define VERSION "0.1"
-
 #define MAX_FIRMWARESIZE   (10*1024*1024)   /* Arbitrary limit (for safety) */
 
 /* For win32 compatibility: */
@@ -265,7 +263,7 @@ int main(int argc, char* argv[])
     int fd;
     int device;
 
-    printf("tcctool v" VERSION " - (C) 2007 Dave Chapman\n");
+    printf("tcctool " VERSION " - (C) 2007-2010 Dave Chapman\n");
     printf("This is free software; see the source for copying conditions.  There is NO\n");
     printf("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
