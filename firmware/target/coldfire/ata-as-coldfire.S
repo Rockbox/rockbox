@@ -80,7 +80,7 @@ copy_read_sectors:
     and.l   #0xFFFFFFF0,%d0 /* d0 == first line bound */
     cmp.l   %a0, %d0        /* any leading longwords? */
     bls.b   .r_end_u_l1     /* no: skip loop */
-        
+
 .r_loop_u_l1:
     move.w  (%a2), %d3      /* load first word */
     swap    %d3             /* move to upper 16 bit */
@@ -150,9 +150,7 @@ copy_read_sectors:
     bhi.b   .r_loop_u_l2
         
 .r_end_u_l2:
-    addq.l  #2, %a1         /* back to final end address */
-    cmp.l   %a0, %a1        /* one word left? */
-    bls.b   .r_end_u_w2
+    blo.b   .r_end_u_w2     /* one word left? */
 
     swap    %d2             /* move old word to upper 16 bits */
     move.w  (%a2), %d2      /* load final word */
@@ -220,9 +218,7 @@ copy_read_sectors:
     bhi.b   .r_loop_a_l2
         
 .r_end_a_l2:
-    addq.l  #2, %a1         /* back to final end address */
-    cmp.l   %a0, %a1        /* one word left? */
-    bls.b   .r_end_a_w2
+    blo.b   .r_end_a_w2     /* one word left? */
 
     move.w  (%a2), (%a0)+   /* copy final word */
 
@@ -366,9 +362,7 @@ copy_write_sectors:
     bhi.b   .w_loop_u_l2
 
 .w_end_u_l2:
-    addq.l  #2, %a1         /* back to final end address */
-    cmp.l   %a0, %a1        /* one word left? */
-    bls.b   .w_end_u_w2
+    blo.b   .w_end_u_w2     /* one word left? */
 
     swap    %d2
     move.w  (%a0)+, %d2
@@ -444,9 +438,7 @@ copy_write_sectors:
     bhi.b   .w_loop_a_l2
 
 .w_end_a_l2:
-    addq.l  #2, %a1         /* back to final end address */
-    cmp.l   %a0, %a1        /* one word left? */
-    bls.b   .w_end_a_w2
+    blo.b   .w_end_a_w2     /* one word left? */
 
     move.w  (%a0)+, (%a2)   /* copy final word */
 
