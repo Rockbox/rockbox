@@ -8,8 +8,8 @@
 #define ASF_CODEC_ID_WMAV2 0x161
 
 struct asf_waveformatex_s {
-        uint32_t packet_size;
-        int audiostream;
+    uint32_t packet_size;
+    int audiostream;
     uint16_t codec_id;
     uint16_t channels;
     uint32_t rate;
