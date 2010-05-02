@@ -828,60 +828,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
 #elif defined(FPM_ARM)
 
-#define PROD_ODD_0(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3,  #4]\n\t"   \
-        "smull   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #60]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #52]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #44]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #36]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #28]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #20]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #12]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "=&r" (lo), "=&r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-#define PROD_ODD_A(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3,  #4]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #60]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #52]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #44]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #36]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #28]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #20]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #12]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "+r" (lo), "+r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-#define PROD_EVEN_0(hi, lo, f, ptr) \
-  do {                             \
+#define PROD_O(hi, lo, f, ptr) \
+  ({                             \
     mad_fixed_t *__p = (f);        \
     asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
         "ldr     r4, [%3,  #0]\n\t"   \
@@ -904,10 +852,10 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         : "=&r" (lo), "=&r" (hi), "+r" (__p) \
         : "r" (ptr)     \
         : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
+  })
 
-#define PROD_EVEN_A(hi, lo, f, ptr) \
-  do {                             \
+#define PROD_A(hi, lo, f, ptr) \
+  ({                             \
     mad_fixed_t *__p = (f);        \
     asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
         "ldr     r4, [%3,  #0]\n\t"   \
@@ -930,118 +878,18 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         : "+r" (lo), "+r" (hi), "+r" (__p) \
         : "r" (ptr)     \
         : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
+  })
 
-#define PROD_EVENBACK_0(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #60]\n\t"   \
-        "smull   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #68]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #76]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #84]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #92]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #100]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #108]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #116]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "=&r" (lo), "=&r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-#define PROD_EVENBACK_A(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #60]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #68]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #76]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #84]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #92]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #100]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #108]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #116]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "+r" (lo), "+r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-#define PROD_ODDBACK_0(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #120]\n\t"   \
-        "smull   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #64]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #72]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #80]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #88]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #96]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #104]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #112]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "=&r" (lo), "=&r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-#define PROD_ODDBACK_A(hi, lo, f, ptr) \
-  do {                             \
-    mad_fixed_t *__p = (f);        \
-    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #120]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #64]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #72]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #80]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
-        "ldr     r4, [%3, #88]\n\t"   \
-        "smlal   %0, %1, r0, r4\n\t"  \
-        "ldr     r4, [%3, #96]\n\t"   \
-        "smlal   %0, %1, r1, r4\n\t"  \
-        "ldr     r4, [%3, #104]\n\t"   \
-        "smlal   %0, %1, r2, r4\n\t"  \
-        "ldr     r4, [%3, #112]\n\t"   \
-        "smlal   %0, %1, r3, r4\n\t"  \
-        : "+r" (lo), "+r" (hi), "+r" (__p) \
-        : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4"); \
-  } while (0)
-
-void synth_full1(mad_fixed_t *pcm, mad_fixed_t (*fo)[8], mad_fixed_t (*fe)[8],
-                 mad_fixed_t const (*D0ptr)[32],
-                 mad_fixed_t const (*D1ptr)[32]);
-void synth_full2(mad_fixed_t *pcm, mad_fixed_t (*fo)[8], mad_fixed_t (*fe)[8],
-                 mad_fixed_t const (*D0ptr)[32],
-                 mad_fixed_t const (*D1ptr)[32]);
+void synth_full_odd_band (mad_fixed_t *pcm,
+                          mad_fixed_t (*fo)[8],
+                          mad_fixed_t (*fe)[8],
+                          mad_fixed_t const (*D0ptr)[32],
+                          mad_fixed_t const (*D1ptr)[32]);
+void synth_full_even_band(mad_fixed_t *pcm,
+                          mad_fixed_t (*fo)[8],
+                          mad_fixed_t (*fe)[8],
+                          mad_fixed_t const (*D0ptr)[32],
+                          mad_fixed_t const (*D1ptr)[32]);
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
@@ -1083,99 +931,39 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       if(s & 1)
       {
         ptr = *D0ptr;
-/*
-        ML0(hi, lo, (*fx)[0], ptr[ 1]);
-        MLA(hi, lo, (*fx)[1], ptr[15]);
-        MLA(hi, lo, (*fx)[2], ptr[13]);
-        MLA(hi, lo, (*fx)[3], ptr[11]);
-        MLA(hi, lo, (*fx)[4], ptr[ 9]);
-        MLA(hi, lo, (*fx)[5], ptr[ 7]);
-        MLA(hi, lo, (*fx)[6], ptr[ 5]);
-        MLA(hi, lo, (*fx)[7], ptr[ 3]);
-*/
-        PROD_ODD_0(hi, lo, *fx, ptr);
+        PROD_O(hi, lo, *fo, ptr+1);
         MLN(hi, lo);
-/*
-        MLA(hi, lo, (*fe)[0], ptr[ 0]);
-        MLA(hi, lo, (*fe)[1], ptr[14]);
-        MLA(hi, lo, (*fe)[2], ptr[12]);
-        MLA(hi, lo, (*fe)[3], ptr[10]);
-        MLA(hi, lo, (*fe)[4], ptr[ 8]);
-        MLA(hi, lo, (*fe)[5], ptr[ 6]);
-        MLA(hi, lo, (*fe)[6], ptr[ 4]);
-        MLA(hi, lo, (*fe)[7], ptr[ 2]);
-*/
-        PROD_EVEN_A(hi, lo, *fe, ptr);
+        PROD_A(hi, lo, *fe, ptr);
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
-        synth_full1(pcm, fo, fe, D0ptr, D1ptr);
+        synth_full_odd_band(pcm, fo, fe, D0ptr, D1ptr);
         D0ptr += 15;
         D1ptr += 15;
         fo += 15;
         fe += 15;
 
         ptr = *(D0ptr + 1);
-        PROD_ODD_0(hi, lo, *fo, ptr);
-/*
-        ML0(hi, lo, (*fo)[0], ptr[ 1]);
-        MLA(hi, lo, (*fo)[1], ptr[15]);
-        MLA(hi, lo, (*fo)[2], ptr[13]);
-        MLA(hi, lo, (*fo)[3], ptr[11]);
-        MLA(hi, lo, (*fo)[4], ptr[ 9]);
-        MLA(hi, lo, (*fo)[5], ptr[ 7]);
-        MLA(hi, lo, (*fo)[6], ptr[ 5]);
-        MLA(hi, lo, (*fo)[7], ptr[ 3]);
-*/
+        PROD_O(hi, lo, *fo, ptr+1);
         pcm[0] = SHIFT(-MLZ(hi, lo));
       }
       else
       {
         ptr = *D0ptr;
-/*
-        ML0(hi, lo, (*fx)[0], ptr[ 0]);
-        MLA(hi, lo, (*fx)[1], ptr[14]);
-        MLA(hi, lo, (*fx)[2], ptr[12]);
-        MLA(hi, lo, (*fx)[3], ptr[10]);
-        MLA(hi, lo, (*fx)[4], ptr[ 8]);
-        MLA(hi, lo, (*fx)[5], ptr[ 6]);
-        MLA(hi, lo, (*fx)[6], ptr[ 4]);
-        MLA(hi, lo, (*fx)[7], ptr[ 2]);
-*/
-        PROD_EVEN_0(hi, lo, *fx, ptr);
+        PROD_O(hi, lo, *fx, ptr);
         MLN(hi, lo);
-/*
-        MLA(hi, lo, (*fe)[0], ptr[ 1]);
-        MLA(hi, lo, (*fe)[1], ptr[15]);
-        MLA(hi, lo, (*fe)[2], ptr[13]);
-        MLA(hi, lo, (*fe)[3], ptr[11]);
-        MLA(hi, lo, (*fe)[4], ptr[ 9]);
-        MLA(hi, lo, (*fe)[5], ptr[ 7]);
-        MLA(hi, lo, (*fe)[6], ptr[ 5]);
-        MLA(hi, lo, (*fe)[7], ptr[ 3]);
-*/
-        PROD_ODD_A(hi, lo, *fe, ptr);
+        PROD_A(hi, lo, *fe, ptr+1);
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
-        synth_full2(pcm, fo, fe, D0ptr, D1ptr);
+        synth_full_even_band(pcm, fo, fe, D0ptr, D1ptr);
         D0ptr += 15;
         D1ptr += 15;
         fo += 15;
         fe += 15;
 
         ptr = *(D0ptr + 1);
-/*
-        ML0(hi, lo, (*fo)[0], ptr[ 0]);
-        MLA(hi, lo, (*fo)[1], ptr[14]);
-        MLA(hi, lo, (*fo)[2], ptr[12]);
-        MLA(hi, lo, (*fo)[3], ptr[10]);
-        MLA(hi, lo, (*fo)[4], ptr[ 8]);
-        MLA(hi, lo, (*fo)[5], ptr[ 6]);
-        MLA(hi, lo, (*fo)[6], ptr[ 4]);
-        MLA(hi, lo, (*fo)[7], ptr[ 2]);
-*/
-        PROD_EVEN_0(hi, lo, *fo, ptr);
+        PROD_O(hi, lo, *fo, ptr);
         pcm[0] = SHIFT(-MLZ(hi, lo));
       }
 
@@ -1185,7 +973,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   }
 }
 
-# else
+# else /* not FPM_COLDFIRE_EMAC and not FPM_ARM */
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
