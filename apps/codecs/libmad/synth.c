@@ -880,16 +880,16 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         : "r0", "r1", "r2", "r3", "r4"); \
   })
 
-void synth_full_odd_band (mad_fixed_t *pcm,
-                          mad_fixed_t (*fo)[8],
-                          mad_fixed_t (*fe)[8],
-                          mad_fixed_t const (*D0ptr)[32],
-                          mad_fixed_t const (*D1ptr)[32]);
-void synth_full_even_band(mad_fixed_t *pcm,
-                          mad_fixed_t (*fo)[8],
-                          mad_fixed_t (*fe)[8],
-                          mad_fixed_t const (*D0ptr)[32],
-                          mad_fixed_t const (*D1ptr)[32]);
+void synth_full_odd_sbsample (mad_fixed_t *pcm,
+                              mad_fixed_t (*fo)[8],
+                              mad_fixed_t (*fe)[8],
+                              mad_fixed_t const (*D0ptr)[32],
+                              mad_fixed_t const (*D1ptr)[32]);
+void synth_full_even_sbsample(mad_fixed_t *pcm,
+                              mad_fixed_t (*fo)[8],
+                              mad_fixed_t (*fe)[8],
+                              mad_fixed_t const (*D0ptr)[32],
+                              mad_fixed_t const (*D1ptr)[32]);
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
@@ -937,7 +937,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
-        synth_full_odd_band(pcm, fo, fe, D0ptr, D1ptr);
+        synth_full_odd_sbsample(pcm, fo, fe, D0ptr, D1ptr);
         D0ptr += 15;
         D1ptr += 15;
         fo += 15;
@@ -956,7 +956,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
-        synth_full_even_band(pcm, fo, fe, D0ptr, D1ptr);
+        synth_full_even_sbsample(pcm, fo, fe, D0ptr, D1ptr);
         D0ptr += 15;
         D1ptr += 15;
         fo += 15;

@@ -23,15 +23,15 @@
 
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
 
-    .global synth_full_odd_band
-    .global synth_full_even_band
+    .global synth_full_odd_sbsample
+    .global synth_full_even_sbsample
 
     ;; r0 = pcm
     ;; r1 = fo
     ;; r2 = fe
     ;; r3 = D0ptr
     ;; r4 = D1ptr
-synth_full_odd_band:
+synth_full_odd_sbsample:
     stmdb   sp!, {r4-r11, lr}
     ldr     r4, [sp, #36]
     ldr     r5, =synth_full_sp
@@ -137,7 +137,7 @@ synth_full_odd_band:
     ldr     sp, [r5]
     ldmia   sp!, {r4-r11, pc}
 
-synth_full_even_band:
+synth_full_even_sbsample:
     stmdb   sp!, {r4-r11, lr}
     ldr     r4, [sp, #36]
     ldr     r5, =synth_full_sp
