@@ -49,7 +49,7 @@ static unsigned short get_short_le(void* buf)
          0 : *(data) : get_short_le(data) : get_long_le(data))
 
 int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
-                    asf_waveformatex_t* wfx, struct codec_api* ci)
+                    asf_waveformatex_t* wfx)
 {
     uint8_t tmp8, packet_flags, packet_property;
     int stream_id;
@@ -291,7 +291,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
 }
 
 
-int asf_get_timestamp(int *duration, struct codec_api* ci)
+int asf_get_timestamp(int *duration)
 {
     uint8_t tmp8, packet_flags, packet_property;
     int ec_length, opaque_data, ec_length_type;

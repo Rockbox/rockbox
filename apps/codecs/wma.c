@@ -60,7 +60,7 @@ static int seek(int ms, asf_waveformatex_t* wfx)
         count++;
 
         /*check the time stamp of our packet*/
-        time = asf_get_timestamp(&duration, ci);
+        time = asf_get_timestamp(&duration);
         DEBUGF("seeked to %d ms with duration %d\n", time, duration);
 
         if (time < 0) {
@@ -68,7 +68,7 @@ static int seek(int ms, asf_waveformatex_t* wfx)
             DEBUGF("UKNOWN SEEK ERROR\n");
             ci->seek_buffer(ci->id3->first_frame_offset+initial_packet*wfx->packet_size);
             /*seek failed so return time stamp of the initial packet*/
-            return asf_get_timestamp(&duration, ci);
+            return asf_get_timestamp(&duration);
         }
 
         if ((time+duration>=ms && time<=ms) || count > 10) {
@@ -141,7 +141,7 @@ restart_track:
         int packet_offset = (resume_offset - ci->id3->first_frame_offset)
             % wfx.packet_size;
         ci->seek_buffer(resume_offset - packet_offset);
-        elapsedtime = asf_get_timestamp(&i, ci);
+        elapsedtime = asf_get_timestamp(&i);
         ci->set_elapsed(elapsedtime);
     }
     else
@@ -190,7 +190,7 @@ restart_track:
         }
         errcount = 0;
 new_packet:
-        res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx, ci);
+        res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
 
         if (res < 0) {
             /* We'll try to recover from a parse error a certain number of

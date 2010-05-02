@@ -36,11 +36,11 @@ struct asf_waveformatex_s {
 typedef struct asf_waveformatex_s asf_waveformatex_t;
 
 /* Define the packet-specific functions only for codecs not for metadata parsers */
-#ifdef __CODECLIB_H__
+
 int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
-                    asf_waveformatex_t* wfx, struct codec_api* ci);
+                    asf_waveformatex_t* wfx);
                     
-int asf_get_timestamp(int *duration, struct codec_api* ci);
-#endif
+int asf_get_timestamp(int *duration);
+
 
 #endif /* _ASF_H */
