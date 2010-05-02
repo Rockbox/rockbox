@@ -66,15 +66,15 @@ static inline void udelay(unsigned usecs)
     int end;
     
     /**
-     * we're limited to 1.5us multiplies due to the odd timer frequency (1.5MHz),
+     * we're limited to 0.666us multiplies due to the odd timer frequency (1.5MHz),
      * to avoid calculating which is safer (need to round up for small values)
      * and saves spending time in the divider we have a lut for
-     * small us values, it should be roughly us*2/3
+     * small us values, it should be roughly us*3/2
      **/
     static const unsigned char udelay_lut[] =
     {
-        0, 1, 2, 2,  3,  4,  4,  5,  6,  6,
-        7, 8, 8, 9, 10, 10, 11, 12, 12, 13,
+         0,  2,  3,  5,  6,  8,  9, 11, 12, 14,
+        15, 17, 18, 20, 21, 23, 24, 26, 27, 29,
     };
 
 
@@ -82,7 +82,7 @@ static inline void udelay(unsigned usecs)
     /* we don't want to handle multiple overflows, so limit the numbers
      * (if you want to wait more than a tick just poll current_tick, or
      * call sleep()) */
-    if (UNLIKELY(usecs >= TIMER_PERIOD))
+    if (UNLIKELY(usecs >= (TIMER_PERIOD*2/3)))
         panicf("%s(): %d too high!", __func__, usecs);
     if (UNLIKELY(usecs <= 0))
         return;
@@ -92,7 +92,7 @@ static inline void udelay(unsigned usecs)
     }
     else
     {   /* to usecs */
-        int delay = usecs * 2 / 3; /* us * 1.5 = us*timer_period */
+        int delay = usecs * 3 / 2; /* us * 0.666 = us*timer_period */
         end = now - delay;
     }
 
