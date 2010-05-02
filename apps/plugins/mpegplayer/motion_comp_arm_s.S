@@ -20,6 +20,8 @@
 @
 @ $Id$
 
+#include "config.h" /* Rockbox: ARM architecture version */
+
         .text
         
 @ ----------------------------------------------------------------
@@ -28,11 +30,14 @@
 MC_put_o_16:
         @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
         @@ pld [r1]
-        stmfd sp!, {r4-r11, lr} @ R14 is also called LR
+        stmfd sp!, {r4-r7, lr} @ R14 is also called LR
         and r4, r1, #3
-        adr r5, MC_put_o_16_align_jt
-        add r5, r5, r4, lsl #2
-        ldr pc, [r5]
+        ldr pc, [pc, r4, lsl #2]
+        .word 0
+        .word MC_put_o_16_align0
+        .word MC_put_o_16_align1
+        .word MC_put_o_16_align2
+        .word MC_put_o_16_align3
 
 MC_put_o_16_align0:
         ldmia r1, {r4-r7}
@@ -42,128 +47,7 @@ MC_put_o_16_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_o_16_align0
-        ldmfd sp!, {r4-r11, pc} @@ update PC with LR content.
-
-.macro  PROC shift
-        ldmia r1, {r4-r8}
-        add r1, r1, r2
-        mov r9, r4, lsr #(\shift)
-        @@ pld [r1]
-        mov r10, r5, lsr #(\shift)
-        orr r9, r9, r5, lsl #(32-\shift)
-        mov r11, r6, lsr #(\shift)
-        orr r10, r10, r6, lsl #(32-\shift)
-        mov r12, r7, lsr #(\shift)
-        orr r11, r11, r7, lsl #(32-\shift)
-        orr r12, r12, r8, lsl #(32-\shift)
-        stmia r0, {r9-r12}
-        subs r3, r3, #1
-        add r0, r0, r2
-.endm
-
-MC_put_o_16_align1:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC(8)
-        bne 1b
-        ldmfd sp!, {r4-r11, pc} @@ update PC with LR content.
-MC_put_o_16_align2:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC(16)
-        bne 1b
-        ldmfd sp!, {r4-r11, pc} @@ update PC with LR content.
-MC_put_o_16_align3:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC(24)
-        bne 1b
-        ldmfd sp!, {r4-r11, pc} @@ update PC with LR content.
-MC_put_o_16_align_jt:
-        .word MC_put_o_16_align0
-        .word MC_put_o_16_align1
-        .word MC_put_o_16_align2
-        .word MC_put_o_16_align3
-
-@ ----------------------------------------------------------------
-        .align
-        .global MC_put_o_8
-MC_put_o_8:
-        @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
-        @@ pld [r1]
-        stmfd sp!, {r4-r10, lr} @ R14 is also called LR
-        and r4, r1, #3
-        adr r5, MC_put_o_8_align_jt
-        add r5, r5, r4, lsl #2
-        ldr pc, [r5]
-MC_put_o_8_align0:
-        ldmia r1, {r4-r5}
-        add r1, r1, r2
-        @@ pld [r1]
-        stmia r0, {r4-r5}
-        add r0, r0, r2
-        subs r3, r3, #1
-        bne MC_put_o_8_align0
-        ldmfd sp!, {r4-r10, pc} @@ update PC with LR content.
-
-.macro  PROC8 shift
-        ldmia r1, {r4-r6}
-        add r1, r1, r2
-        mov r9, r4, lsr #(\shift)
-        @@ pld [r1]
-        mov r10, r5, lsr #(\shift)
-        orr r9, r9, r5, lsl #(32-\shift)
-        orr r10, r10, r6, lsl #(32-\shift)
-        stmia r0, {r9-r10}
-        subs r3, r3, #1
-        add r0, r0, r2
-.endm
-
-MC_put_o_8_align1:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC8(8)
-        bne 1b
-        ldmfd sp!, {r4-r10, pc} @@ update PC with LR content.
-
-MC_put_o_8_align2:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC8(16)
-        bne 1b
-        ldmfd sp!, {r4-r10, pc} @@ update PC with LR content.
-
-MC_put_o_8_align3:
-        and r1, r1, #0xFFFFFFFC
-1:      PROC8(24)
-        bne 1b
-        ldmfd sp!, {r4-r10, pc} @@ update PC with LR content.
-
-MC_put_o_8_align_jt:
-        .word MC_put_o_8_align0
-        .word MC_put_o_8_align1
-        .word MC_put_o_8_align2
-        .word MC_put_o_8_align3
-
-@ ----------------------------------------------------------------
-.macro  AVG_PW rW1, rW2
-        mov \rW2, \rW2, lsl #24
-        orr \rW2, \rW2, \rW1, lsr #8
-        eor r9, \rW1, \rW2
-        and \rW2, \rW1, \rW2
-        and r10, r9, r12
-        add \rW2, \rW2, r10, lsr #1
-        and r10, r9, r11
-        add \rW2, \rW2, r10
-.endm
-
-        .align
-        .global MC_put_x_16
-MC_put_x_16:
-        @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
-        @@ pld [r1]
-        stmfd sp!, {r4-r11,lr} @ R14 is also called LR
-        and r4, r1, #3
-        adr r5, MC_put_x_16_align_jt
-        ldr r11, [r5]
-        mvn r12, r11
-        add r5, r5, r4, lsl #2
-        ldr pc, [r5, #4]
+        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
 
 .macro  ADJ_ALIGN_QW shift, R0, R1, R2, R3, R4
         mov \R0, \R0, lsr #(\shift)
@@ -175,8 +59,152 @@ MC_put_x_16:
         mov \R3, \R3, lsr #(\shift)
         orr \R3, \R3, \R4, lsl #(32 - \shift)
         mov \R4, \R4, lsr #(\shift)
-@       and \R4, \R4, #0xFF
 .endm
+
+MC_put_o_16_align1:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4-r7, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_QW 8, r4, r5, r6, r7, r12
+        stmia r0, {r4-r7}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+
+MC_put_o_16_align2:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4-r7, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_QW 16, r4, r5, r6, r7, r12
+        stmia r0, {r4-r7}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+
+MC_put_o_16_align3:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4-r7, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_QW 24, r4, r5, r6, r7, r12
+        stmia r0, {r4-r7}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+
+@ ----------------------------------------------------------------
+        .align
+        .global MC_put_o_8
+MC_put_o_8:
+        @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
+        @@ pld [r1]
+        stmfd sp!, {r4, r5, lr} @ R14 is also called LR
+        and r4, r1, #3
+        ldr pc, [pc, r4, lsl #2]
+        .word 0
+        .word MC_put_o_8_align0
+        .word MC_put_o_8_align1
+        .word MC_put_o_8_align2
+        .word MC_put_o_8_align3
+
+MC_put_o_8_align0:
+        ldmia r1, {r4, r5}
+        add r1, r1, r2
+        @@ pld [r1]
+        stmia r0, {r4, r5}
+        add r0, r0, r2
+        subs r3, r3, #1
+        bne MC_put_o_8_align0
+        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+
+.macro  ADJ_ALIGN_DW shift, R0, R1, R2
+        mov \R0, \R0, lsr #(\shift)
+        orr \R0, \R0, \R1, lsl #(32 - \shift)
+        mov \R1, \R1, lsr #(\shift)
+        orr \R1, \R1, \R2, lsl #(32 - \shift)
+        mov \R2, \R2, lsr #(\shift)
+.endm
+
+MC_put_o_8_align1:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4, r5, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_DW 8, r4, r5, r12
+        stmia r0, {r4, r5}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+
+MC_put_o_8_align2:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4, r5, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_DW 16, r4, r5, r12
+        stmia r0, {r4, r5}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+
+MC_put_o_8_align3:
+        and r1, r1, #0xFFFFFFFC
+1:      ldmia r1, {r4, r5, r12}
+        add r1, r1, r2
+        @@ pld [r1]
+        ADJ_ALIGN_DW 24, r4, r5, r12
+        stmia r0, {r4, r5}
+        subs r3, r3, #1
+        add r0, r0, r2
+        bne 1b
+        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+
+@ ----------------------------------------------------------------
+.macro  AVG_PW rW1, rW2
+        mov \rW2, \rW2, lsl #24
+        orr \rW2, \rW2, \rW1, lsr #8
+        eor r9, \rW1, \rW2
+#if ARM_ARCH >= 6
+        uhadd8 \rW2, \rW1, \rW2
+#else
+        and \rW2, \rW1, \rW2
+        and r10, r9, r11
+        add \rW2, \rW2, r10, lsr #1
+#endif
+        and r9, r9, r12
+        add \rW2, \rW2, r9
+.endm
+
+#if ARM_ARCH >= 6
+#define HIGH_REGS r9
+#else
+#define HIGH_REGS r9-r11
+#endif
+
+        .align
+        .global MC_put_x_16
+MC_put_x_16:
+        @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
+        @@ pld [r1]
+        stmfd sp!, {r4-r8, HIGH_REGS, lr} @ R14 is also called LR
+        and r4, r1, #3
+        ldr r12, 2f
+#if ARM_ARCH < 6
+        mvn r11, r12
+#endif
+        ldr pc, [pc, r4, lsl #2]
+2:      .word 0x01010101
+        .word MC_put_x_16_align0
+        .word MC_put_x_16_align1
+        .word MC_put_x_16_align2
+        .word MC_put_x_16_align3
 
 MC_put_x_16_align0:
         ldmia r1, {r4-r8}
@@ -190,7 +218,8 @@ MC_put_x_16_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_x_16_align0
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_16_align1:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r8}
@@ -205,7 +234,8 @@ MC_put_x_16_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_16_align2:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r8}
@@ -220,7 +250,8 @@ MC_put_x_16_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_16_align3:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r8}
@@ -235,13 +266,7 @@ MC_put_x_16_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
-MC_put_x_16_align_jt:
-        .word 0x01010101
-        .word MC_put_x_16_align0
-        .word MC_put_x_16_align1
-        .word MC_put_x_16_align2
-        .word MC_put_x_16_align3
+        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
 
 @ ----------------------------------------------------------------
         .align
@@ -249,22 +274,18 @@ MC_put_x_16_align_jt:
 MC_put_x_8:
         @@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
         @@ pld [r1]
-        stmfd sp!, {r4-r11,lr} @ R14 is also called LR
+        stmfd sp!, {r4-r6, HIGH_REGS, lr} @ R14 is also called LR
         and r4, r1, #3
-        adr r5, MC_put_x_8_align_jt
-        ldr r11, [r5]
-        mvn r12, r11
-        add r5, r5, r4, lsl #2
-        ldr pc, [r5, #4]
-
-.macro  ADJ_ALIGN_DW shift, R0, R1, R2
-        mov \R0, \R0, lsr #(\shift)
-        orr \R0, \R0, \R1, lsl #(32 - \shift)
-        mov \R1, \R1, lsr #(\shift)
-        orr \R1, \R1, \R2, lsl #(32 - \shift)
-        mov \R2, \R2, lsr #(\shift)
-@       and \R4, \R4, #0xFF
-.endm
+        ldr r12, 2f
+#if ARM_ARCH < 6
+        mvn r11, r12
+#endif
+        ldr pc, [pc, r4, lsl #2]
+2:      .word 0x01010101
+        .word MC_put_x_8_align0
+        .word MC_put_x_8_align1
+        .word MC_put_x_8_align2
+        .word MC_put_x_8_align3
 
 MC_put_x_8_align0:
         ldmia r1, {r4-r6}
@@ -276,7 +297,8 @@ MC_put_x_8_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_x_8_align0
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_8_align1:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r6}
@@ -289,7 +311,8 @@ MC_put_x_8_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_8_align2:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r6}
@@ -302,7 +325,8 @@ MC_put_x_8_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+
 MC_put_x_8_align3:
         and r1, r1, #0xFFFFFFFC
 1:      ldmia r1, {r4-r6}
@@ -315,10 +339,4 @@ MC_put_x_8_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
-MC_put_x_8_align_jt:
-        .word 0x01010101
-        .word MC_put_x_8_align0
-        .word MC_put_x_8_align1
-        .word MC_put_x_8_align2
-        .word MC_put_x_8_align3
+        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
