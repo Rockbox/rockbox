@@ -17,7 +17,8 @@ enum asf_error_e {
     ASF_ERROR_INVALID_OBJECT = -7,  /* ASF object missing or in wrong place */
     ASF_ERROR_OBJECT_SIZE    = -8,  /* invalid ASF object size (too small) */
     ASF_ERROR_SEEKABLE       = -9,  /* file not seekable */
-    ASF_ERROR_SEEK           = -10  /* file is seekable but seeking failed */
+    ASF_ERROR_SEEK           = -10,  /* file is seekable but seeking failed */
+    ASF_ERROR_ENCRYPTED      = -11  /* file is encrypted */
 };
 
 struct asf_waveformatex_s {
@@ -34,9 +35,12 @@ struct asf_waveformatex_s {
 };
 typedef struct asf_waveformatex_s asf_waveformatex_t;
 
+/* Define the packet-specific functions only for codecs not for metadata parsers */
+#ifdef __CODECLIB_H__
 int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
                     asf_waveformatex_t* wfx, struct codec_api* ci);
                     
 int asf_get_timestamp(int *duration, struct codec_api* ci);
-
 #endif
+
+#endif /* _ASF_H */

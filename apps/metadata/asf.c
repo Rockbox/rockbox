@@ -32,7 +32,7 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "system.h"
-#include <codecs/libwma/asf.h>
+#include <codecs/libasf/asf.h>
 
 /* TODO: Just read the GUIDs into a 16-byte array, and use memcmp to compare */
 struct guid_s {
@@ -49,20 +49,6 @@ struct asf_object_s {
     uint64_t     datalen;
 };
 typedef struct asf_object_s asf_object_t;
-
-enum asf_error_e {
-    ASF_ERROR_INTERNAL       = -1,  /* incorrect input to API calls */
-    ASF_ERROR_OUTOFMEM       = -2,  /* some malloc inside program failed */
-    ASF_ERROR_EOF            = -3,  /* unexpected end of file */
-    ASF_ERROR_IO             = -4,  /* error reading or writing to file */
-    ASF_ERROR_INVALID_LENGTH = -5,  /* length value conflict in input data */
-    ASF_ERROR_INVALID_VALUE  = -6,  /* other value conflict in input data */
-    ASF_ERROR_INVALID_OBJECT = -7,  /* ASF object missing or in wrong place */
-    ASF_ERROR_OBJECT_SIZE    = -8,  /* invalid ASF object size (too small) */
-    ASF_ERROR_SEEKABLE       = -9,  /* file not seekable */
-    ASF_ERROR_SEEK           = -10, /* file is seekable but seeking failed */
-    ASF_ERROR_ENCRYPTED      = -11  /* file is encrypted */
-};
 
 static const guid_t asf_guid_null =
 {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};

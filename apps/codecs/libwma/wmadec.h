@@ -20,7 +20,7 @@
 #ifndef _WMADEC_H
 #define _WMADEC_H
 
-#include "asf.h"
+#include <codecs/libasf/asf.h>
 #include "bitstream.h" /* For GetBitContext */
 #include "types.h"
 
