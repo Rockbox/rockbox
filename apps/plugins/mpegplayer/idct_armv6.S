@@ -39,42 +39,44 @@
     ldrd    r4, L_W1357         @ load  W1, W3, W5, W7
 
     smuad   r6, r4, r10         @ b0 = W1 * f1 + W3 * f3
-    smlad   r6, r5, r11, r6     @    + W5 * f5 + W7 * f7
-
-    smultt  r7, r5, r10         @ b1 = -W7 * f3
-    smlabb  r7, r4, r11, r7     @    + -W1 * f5
-    smlabt  r7, r5, r11, r7     @    + -W5 * f7
-    rsb     r7, r7, #0
-    smlatb  r7, r4, r10, r7     @    + W3 * f1
-
-    smulbt  r8, r4, r10         @ b2 = -W1 * f3
-    rsb     r8, r8, #0
-    smlabb  r8, r5, r10, r8     @    + W5 * f1
-    smlatb  r8, r5, r11, r8     @    + W7 * f5
-    smlatt  r8, r4, r11, r8     @    + W3 * f7
+    smultt  r7, r5, r10         @ -b1 = W7 * f3
+    smulbt  r8, r4, r10         @ -b2 = W1 * f3
 
     smusdx  r9, r10, r5         @ b3 = f1 * W7 - f3 * W5
-    smlsdx  r9, r11, r4, r9     @    + f5 * W3 - f1 * W1
+    smlabb  r7, r4, r11, r7     @ -b1 += W1 * f5
+    rsb     r8, r8, #0          @ b2 = -b2
+    smlabb  r8, r5, r10, r8     @ b2 += W5 * f1
+
+    smlad   r6, r5, r11, r6     @ b0 += W5 * f5 + W7 * f7
+    smlabt  r7, r5, r11, r7     @ -b1 += W5 * f7
+    smlatb  r8, r5, r11, r8     @ b2 += W7 * f5         
+
+    smlsdx  r9, r11, r4, r9     @ b3 += f5 * W3 - f7 * W1
+    rsb     r7, r7, #0          @ b1 = -b1
+    smlatb  r7, r4, r10, r7     @ b1 += W3 * f1
+    smlatt  r8, r4, r11, r8     @ b2 += W3 * f7
 
     ldrd    r4, L_W0246         @ load  W0, W2, W4, W6
     add     r2, r2, #1          @ f0 += 1
 
-    smulbb  r10, r4, r2         @ a0' = W0 * f0
-    smlabb  r10, r5, r3, r10    @     + W4 * f4
-    smultt  r12, r4, r2         @ a3' = W2 * f2
-    smlatt  r12, r5, r3, r12    @     + W6 * f6
+    smulbb  r10, r5, r3         @ a0' = W4 * f4
+    smultt  r12, r5, r3         @ a3' = W6 * f6
+    smultt  r3, r4, r3          @ -a2' = W2 * f6
+
+    rsb     r11, r10, #0        @ a1' = -W4 * f4
+    smlabb  r10, r4, r2, r10    @ a0' += W0 * f0
+    smlabb  r11, r4, r2, r11    @ a1' += W0 * f0
+    smlatt  r12, r4, r2, r12    @ a3' += W2 * f2
+    rsb     r3, r3, #0          @ a2' = -a2'
+    smlatt  r3, r5, r2, r3      @ a2' += W6 * f2
+
     add     r10, r10, r12       @ a0  = a0' + a3'
     sub     r12, r10, r12, lsl #1  @ a3  = a0 - 2 * a3'
-
-    smulbb  r11, r5, r3         @ a1' = -W4 * f4
-    rsb     r11, r11, #0
-    smlabb  r11, r4, r2, r11    @     + W0 * f0
-    smultt  r3, r4, r3          @ a2' = -W2 * f6
-    rsb     r3, r3, #0
-    smlatt  r3, r5, r2, r3      @     + W6 * f2
     add     r11, r11, r3        @ a1  = a1' + a2'
     sub     r3, r11, r3, lsl #1 @ a2  = a1 - 2 * a2'
     
+    subs    r14, r14, #1        @ decrease loop count
+
     @ Special store order for making the column pass calculate columns in
     @ the order 0-2-1-3-4-6-5-7, allowing for uxtab16 use in later stages.
     sub     r2, r10, r6         @ block[7] = (a0 - b0)
@@ -102,7 +104,6 @@
     mov     r2, r2, asr #12     @            >> 12
     strh    r2, [r1], #2        @ advance to next temp column
     
-    subs    r14, r14, #1
     bne     .row_loop
     b       .col_start
 
@@ -129,42 +130,44 @@ L_W0246:
     ldrd    r4, L_W1357         @ load  W1, W3, W5, W7
 
     smuad   r6, r4, r10         @ b0 = W1 * f1 + W3 * f3
-    smlad   r6, r5, r11, r6     @    + W5 * f5 + W7 * f7
-
-    smultt  r7, r5, r10         @ b1 = -W7 * f3
-    smlabb  r7, r4, r11, r7     @    + -W1 * f5
-    smlabt  r7, r5, r11, r7     @    + -W5 * f7
-    rsb     r7, r7, #0
-    smlatb  r7, r4, r10, r7     @    + W3 * f1
-
-    smulbt  r8, r4, r10         @ b2 = -W1 * f3
-    rsb     r8, r8, #0
-    smlabb  r8, r5, r10, r8     @    + W5 * f1
-    smlatb  r8, r5, r11, r8     @    + W7 * f5
-    smlatt  r8, r4, r11, r8     @    + W3 * f7
+    smultt  r7, r5, r10         @ -b1 = W7 * f3
+    smulbt  r8, r4, r10         @ -b2 = W1 * f3
 
     smusdx  r9, r10, r5         @ b3 = f1 * W7 - f3 * W5
-    smlsdx  r9, r11, r4, r9     @    + f5 * W3 - f1 * W1
+    smlabb  r7, r4, r11, r7     @ -b1 += W1 * f5
+    rsb     r8, r8, #0          @ b2 = -b2
+    smlabb  r8, r5, r10, r8     @ b2 += W5 * f1
+
+    smlad   r6, r5, r11, r6     @ b0 += W5 * f5 + W7 * f7
+    smlabt  r7, r5, r11, r7     @ -b1 += W5 * f7
+    smlatb  r8, r5, r11, r8     @ b2 += W7 * f5
+
+    smlsdx  r9, r11, r4, r9     @ b3 += f5 * W3 - f7 * W1
+    rsb     r7, r7, #0          @ b1 = -b1
+    smlatb  r7, r4, r10, r7     @ b1 += W3 * f1
+    smlatt  r8, r4, r11, r8     @ b2 += W3 * f7
 
     ldrd    r4, L_W0246         @ load  W0, W2, W4, W6
     add     r2, r2, #32         @ DC offset: 0.5
 
-    smulbb  r10, r4, r2         @ a0' = W0 * f0
-    smlabb  r10, r5, r3, r10    @     + W4 * f4
-    smultt  r12, r4, r2         @ a3' = W2 * f2
-    smlatt  r12, r5, r3, r12    @     + W6 * f6
+    smulbb  r10, r5, r3         @ a0' = W4 * f4
+    smultt  r12, r5, r3         @ a3' = W6 * f6
+    smultt  r3, r4, r3          @ -a2' = W2 * f6
+
+    rsb     r11, r10, #0        @ a1' = -W4 * f4
+    smlabb  r10, r4, r2, r10    @ a0' += W0 * f0
+    smlabb  r11, r4, r2, r11    @ a1' += W0 * f0
+    smlatt  r12, r4, r2, r12    @ a3' += W2 * f2
+    rsb     r3, r3, #0          @ a2' = -a2'
+    smlatt  r3, r5, r2, r3      @ a2' += W6 * f2
+
     add     r10, r10, r12       @ a0  = a0' + a3'
     sub     r12, r10, r12, lsl #1  @ a3  = a0 - 2 * a3'
-
-    smulbb  r11, r5, r3         @ a1' = -W4 * f4
-    rsb     r11, r11, #0
-    smlabb  r11, r4, r2, r11    @     + W0 * f0
-    smultt  r3, r4, r3          @ a2' = -W2 * f6
-    rsb     r3, r3, #0
-    smlatt  r3, r5, r2, r3      @     + W6 * f2
     add     r11, r11, r3        @ a1  = a1' + a2'
     sub     r3, r11, r3, lsl #1 @ a2  = a1 - 2 * a2'
     
+    subs    r14, r14, #1        @ decrease loop count
+
     sub     r2, r10, r6         @ block[7] = (a0 - b0)
     mov     r2, r2, asr #17     @            >> 17
     strh    r2, [r1, #7*16]
@@ -190,7 +193,6 @@ L_W0246:
     mov     r2, r2, asr #17     @            >> 17
     strh    r2, [r1], #2        @ advance to next column
 
-    subs    r14, r14, #1
     bne     .col_loop
 
     sub     r0, r0, #256        @ point r0 back to the input block
