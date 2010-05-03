@@ -169,9 +169,8 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 #endif
 
     asm volatile(
-        "mov   r0, %0   \n"
-        "mov   pc, r0   \n"
-        : : "I"(DRAM_START)
+        "mov   pc, %0   \n"
+        : : "r"(DRAM_START)
     );
 
 #elif defined(CPU_ARM)
