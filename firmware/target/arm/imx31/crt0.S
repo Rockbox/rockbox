@@ -32,7 +32,7 @@ start:
     b       prefetch_abort_handler
     b       data_abort_handler
     b       reserved_handler
-    b       irq_handler
+    subs    pc, lr, #4              @ b       irq_handler
     b       fiq_handler
     .balign 0x40, 0x6B
 
@@ -322,7 +322,7 @@ remap_end:
     ldr     pc, [pc, #24]
     ldr     pc, [pc, #24]
     ldr     pc, [pc, #24]
-    ldr     pc, [pc, #24]
+    subs    pc, lr, #4          @ ldr     pc, [pc, #24]
     ldr     pc, [pc, #24]
     .word   newstart
     .word   undef_instr_handler
@@ -330,7 +330,7 @@ remap_end:
     .word   prefetch_abort_handler
     .word   data_abort_handler
     .word   reserved_handler
-    .word   irq_handler
+    .word   0                   @ irq_handler
     .word   fiq_handler
 #endif /* BOOTLOADER */
 

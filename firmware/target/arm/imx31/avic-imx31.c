@@ -66,6 +66,7 @@ void UIE_VECTOR(void)
            offset >= 0 ? avic_int_names[offset] : "<Unknown>");
 }
 
+#if 0
 /* We use the AVIC */
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
@@ -85,6 +86,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
     panicf("Unhandled IRQ %d in irq_handler: %s", offset,
            offset >= 0 ? avic_int_names[offset] : "<Unknown>");
 }
+#endif /* 0 */
 
 /* Accoring to section 9.3.5 of the UM, the AVIC doesn't accelerate
  * fast interrupts and they must be dispatched */
