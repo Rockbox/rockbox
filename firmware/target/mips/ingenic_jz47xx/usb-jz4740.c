@@ -36,13 +36,6 @@
     up to 15 endpoints (the Jz4740 only has 5).
 */
 
-enum
-{
-    USB_EP0_IDLE,
-    USB_EP0_RX,
-    USB_EP0_TX
-};
-
 #define EP_BUF_LEFT(ep)  ((ep)->length - (ep)->sent)
 #define EP_PTR(ep)       ((void*)((unsigned int)(ep)->buf + (ep)->sent))
 #define EP_NUMBER(ep)    (((int)(ep) - (int)&endpoints[0])/sizeof(struct usb_endpoint))
@@ -61,30 +54,29 @@ enum ep_type
 struct usb_endpoint
 {
     void *buf;
-    unsigned int length;
+    size_t length;
     union
     {
-        unsigned int sent;
-        unsigned int received;
+        size_t sent;
+        size_t received;
     };
     bool busy;
 
     const enum ep_type type;
     const bool use_dma;
-    bool wait;
 
-    const unsigned int fifo_addr;
+    const long fifo_addr;
     unsigned short fifo_size;
 
+    bool wait;
     struct wakeup wakeup;
 };
 
 static unsigned char ep0_rx_buf[64];
-static unsigned char ep0state = USB_EP0_IDLE;
 static struct usb_endpoint endpoints[] =
 {
     { .type = ep_control,   .fifo_addr = USB_FIFO_EP0, .fifo_size = 64 },
-    { .type = ep_control,   .fifo_addr = USB_FIFO_EP0, .fifo_size = 64, .buf = &ep0_rx_buf },
+    { .type = ep_control,   .fifo_addr = USB_FIFO_EP0, .buf = &ep0_rx_buf },
     { .type = ep_bulk,      .fifo_addr = USB_FIFO_EP1, .fifo_size = 512 },
     { .type = ep_bulk,      .fifo_addr = USB_FIFO_EP1, .fifo_size = 512 },
     { .type = ep_interrupt, .fifo_addr = USB_FIFO_EP2, .fifo_size = 64 },
@@ -172,6 +164,16 @@ static void flushFIFO(struct usb_endpoint *ep)
     }
 }
 
+static inline void ep_transfer_completed(struct usb_endpoint* ep)
+{
+    ep->sent   = 0;
+    ep->length = 0;
+    ep->buf    = NULL;
+    ep->busy   = false;
+    if(ep->wait)
+        wakeup_signal(&ep->wakeup);
+}
+
 static void EP0_send(void)
 {
     struct usb_endpoint* ep = &endpoints[0];
@@ -180,13 +182,6 @@ static void EP0_send(void)
 
     select_endpoint(0);
     csr0 = REG_USB_REG_CSR0;
-
-    if(ep->length == 0)
-    {
-        //REG_USB_REG_CSR0 = (csr0 | USB_CSR0_SVDOUTPKTRDY | USB_CSR0_DATAEND);
-        REG_USB_REG_CSR0 = (csr0 | USB_CSR0_SVDOUTPKTRDY);
-        return;
-    }
 
     if(ep->sent == 0)
         length = MIN(ep->length, ep->fifo_size);
@@ -199,9 +194,8 @@ static void EP0_send(void)
     if(ep->sent >= ep->length)
     {
         REG_USB_REG_CSR0 = (csr0 | USB_CSR0_INPKTRDY | USB_CSR0_DATAEND); /* Set data end! */
-        ep0state = USB_EP0_IDLE;
-        if(ep->wait)
-            wakeup_signal(&ep->wakeup);
+        usb_core_transfer_complete(0, USB_DIR_IN, 0, ep->sent);
+        ep_transfer_completed(ep);
     }
     else
         REG_USB_REG_CSR0 = (csr0 | USB_CSR0_INPKTRDY);
@@ -212,6 +206,8 @@ static void EP0_handler(void)
     logf("%s()", __func__);
 
     unsigned char csr0;
+    struct usb_endpoint *ep_send = &endpoints[0];
+    struct usb_endpoint *ep_recv = &endpoints[1];
 
     /* Read CSR0 */
     select_endpoint(0);
@@ -223,7 +219,6 @@ static void EP0_handler(void)
     if(csr0 & USB_CSR0_SENTSTALL)
     {
         REG_USB_REG_CSR0 = csr0 & ~USB_CSR0_SENTSTALL;
-        ep0state = USB_EP0_IDLE;
         return;
     }
 
@@ -235,24 +230,18 @@ static void EP0_handler(void)
     if(csr0 & USB_CSR0_SETUPEND)
     {
         REG_USB_REG_CSR0 = csr0 | USB_CSR0_SVDSETUPEND;
-        ep0state = USB_EP0_IDLE;
         return;
     }
 
     /* Call relevant routines for endpoint 0 state */
-    if(ep0state == USB_EP0_IDLE)
-    {
-        if(csr0 & USB_CSR0_OUTPKTRDY)   /* There is a packet in the fifo */
-        {
-            readFIFO(&endpoints[1], REG_USB_REG_COUNT0);
-            REG_USB_REG_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY; /* clear OUTPKTRDY bit */
-            usb_core_control_request((struct usb_ctrlrequest*)endpoints[1].buf);
-            if(endpoints[1].wait)
-                wakeup_signal(&endpoints[1].wakeup);
-        }
-    }
-    else if(ep0state == USB_EP0_TX)
+    if(ep_send->busy)
         EP0_send();
+    else if(csr0 & USB_CSR0_OUTPKTRDY)   /* There is a packet in the fifo */
+    {
+        readFIFO(ep_recv, REG_USB_REG_COUNT0);
+        REG_USB_REG_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY; /* clear OUTPKTRDY bit */
+        usb_core_control_request((struct usb_ctrlrequest*)ep_recv->buf);
+    }
 }
 
 static void EPIN_handler(unsigned int endpoint)
@@ -299,13 +288,8 @@ static void EPIN_handler(unsigned int endpoint)
     if(ep->sent >= ep->length)
     {
         usb_core_transfer_complete(endpoint, USB_DIR_IN, 0, ep->sent);
-        if(ep->wait)
-            wakeup_signal(&ep->wakeup);
+        ep_transfer_completed(ep);
         logf("sent complete");
-        ep->sent = 0;
-        ep->length = 0;
-        ep->buf = NULL;
-        ep->busy = false;
     }
 }
 
@@ -352,13 +336,8 @@ static void EPOUT_handler(unsigned int endpoint)
             if(size < ep->fifo_size || ep->received >= ep->length)
             {
                 usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
-                if(ep->wait)
-                    wakeup_signal(&ep->wakeup);
+                ep_transfer_completed(ep);
                 logf("receive transfer_complete");
-                ep->received = 0;
-                ep->length = 0;
-                ep->buf = NULL;
-                ep->busy = false;
             }
         }
     }
@@ -407,13 +386,7 @@ static void EPDMA_handler(int number)
 
     usb_core_transfer_complete(endpoint, EP_IS_IN(ep) ? USB_DIR_IN : USB_DIR_OUT,
                                0, ep->length);
-
-    ep->busy = false;
-    ep->sent = 0;
-    ep->length = 0;
-    ep->buf = NULL;
-    if(ep->wait)
-        wakeup_signal(&ep->wakeup);
+    ep_transfer_completed(ep);
 }
 
 static void setup_endpoint(struct usb_endpoint *ep)
@@ -485,9 +458,6 @@ static void udc_reset(void)
     logf("%s()", __func__);
 
     unsigned int i;
-
-    /* EP0 init */
-    ep0state = USB_EP0_IDLE;
 
     /* Disable interrupts */
     REG_USB_REG_INTRINE  = 0;
@@ -710,7 +680,7 @@ void usb_drv_set_address(int address)
 static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length, bool blocking)
 {
     if(ep->type == ep_control && ptr == NULL && length == 0)
-        return; /* ACK request, handled by the USB controller */
+        return; /* ACK request, handled in the ISR */
 
     int flags = disable_irq_save();
 
@@ -723,7 +693,6 @@ static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length
 
     if(ep->type == ep_control)
     {
-        ep0state = USB_EP0_TX;
         EP0_send();
     }
     else
@@ -777,8 +746,8 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 
     logf("%s(%d, 0x%x, %d)", __func__, endpoint, (int)ptr, length);
 
-    if(endpoint == EP_CONTROL && ptr == NULL && length == 0)
-        return 0; /* ACK request, handled by the USB controller */
+    if(endpoint == EP_CONTROL)
+        return 0; /* all EP0 OUT transactions are handled within the ISR */
     else
     {
         flags = disable_irq_save();
@@ -844,7 +813,7 @@ void usb_drv_cancel_all_transfers(void)
 
     for(i=0; i<TOTAL_EP(); i++)
     {
-        if(i >= 2)
+        if(i != 1) /* ep0 out needs special handling */
             endpoints[i].buf = NULL;
 
         endpoints[i].sent = 0;
@@ -854,8 +823,6 @@ void usb_drv_cancel_all_transfers(void)
         flushFIFO(&endpoints[i]);
     }
     restore_irq(flags);
-
-    ep0state = USB_EP0_IDLE;
 }
 
 void usb_drv_release_endpoint(int ep)
