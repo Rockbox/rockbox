@@ -159,7 +159,7 @@ bool warn_on_pl_erase(void)
 }
 
 
-/* Performance optimized version of the previous function. */
+/* Performance optimized version of the read_line() (see below) function. */
 int fast_readline(int fd, char *buf, int buf_size, void *parameters,
                   int (*callback)(int n, const char *buf, void *parameters))
 {
