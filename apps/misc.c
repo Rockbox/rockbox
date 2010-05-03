@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
 #include "config.h"
 #include "misc.h"
 #include "lcd.h"
@@ -33,7 +34,6 @@
 #include "lang.h"
 #include "dir.h"
 #include "lcd-remote.h"
-#include "errno.h"
 #include "system.h"
 #include "timefuncs.h"
 #include "screens.h"
@@ -158,41 +158,6 @@ bool warn_on_pl_erase(void)
         return true;
 }
 
-/* Read (up to) a line of text from fd into buffer and return number of bytes
- * read (which may be larger than the number of bytes stored in buffer). If
- * an error occurs, -1 is returned (and buffer contains whatever could be
- * read). A line is terminated by a LF char. Neither LF nor CR chars are
- * stored in buffer.
- */
-int read_line(int fd, char* buffer, int buffer_size)
-{
-    int count = 0;
-    int num_read = 0;
-
-    errno = 0;
-
-    while (count < buffer_size)
-    {
-        unsigned char c;
-
-        if (1 != read(fd, &c, 1))
-            break;
-
-        num_read++;
-
-        if ( c == '\n' )
-            break;
-
-        if ( c == '\r' )
-            continue;
-
-        buffer[count++] = c;
-    }
-
-    buffer[MIN(count, buffer_size - 1)] = 0;
-
-    return errno ? -1 : num_read;
-}
 
 /* Performance optimized version of the previous function. */
 int fast_readline(int fd, char *buf, int buf_size, void *parameters,
@@ -840,6 +805,43 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     return buffer;
 }
 #endif /* !defined(__PCTOOL__) */
+
+/* Read (up to) a line of text from fd into buffer and return number of bytes
+ * read (which may be larger than the number of bytes stored in buffer). If
+ * an error occurs, -1 is returned (and buffer contains whatever could be
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are
+ * stored in buffer.
+ */
+int read_line(int fd, char* buffer, int buffer_size)
+{
+    int count = 0;
+    int num_read = 0;
+
+    errno = 0;
+
+    while (count < buffer_size)
+    {
+        unsigned char c;
+
+        if (1 != read(fd, &c, 1))
+            break;
+
+        num_read++;
+
+        if ( c == '\n' )
+            break;
+
+        if ( c == '\r' )
+            continue;
+
+        buffer[count++] = c;
+    }
+
+    buffer[MIN(count, buffer_size - 1)] = 0;
+
+    return errno ? -1 : num_read;
+}
+
 
 char* skip_whitespace(char* const str)
 {
