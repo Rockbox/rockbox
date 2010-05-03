@@ -338,7 +338,9 @@ bool sd_enabled = false;
 #endif
 
 static struct wakeup transfer_completion_signal;
+static struct wakeup command_completion_signal;
 static volatile bool retry;
+static volatile int cmd_error;
 
 #if defined(HAVE_MULTIDRIVE)
 int active_card = 0;
@@ -350,7 +352,8 @@ static inline void mci_delay(void) { udelay(1000); }
 void INT_NAND(void)
 {
     MCI_CTRL &= ~INT_ENABLE;
-    const int status = MCI_MASK_STATUS;
+    /* use raw status here as we need to check some Ints that are masked */
+    const int status = MCI_RAW_STATUS;
 
     MCI_RAW_STATUS = status;    /* clear status */
 
@@ -359,6 +362,11 @@ void INT_NAND(void)
 
     if( status & (MCI_INT_DTO|MCI_DATA_ERROR))
         wakeup_signal(&transfer_completion_signal);
+
+    cmd_error = status & MCI_CMD_ERROR;
+
+    if(status & MCI_INT_CD)
+        wakeup_signal(&command_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
 }
@@ -394,6 +402,12 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
 #define TRANSFER_CMD  (cmd == SD_READ_MULTIPLE_BLOCK ||   \
                        cmd == SD_WRITE_MULTIPLE_BLOCK)
 
+/*  RCRC & RTO interrupts should be set together with the CD interrupt but
+ *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
+ *  them masked for now we can check them in the isr by reading raw status when
+ *  the CD int is triggered.
+ */
+    MCI_MASK |= MCI_INT_CD;
     MCI_ARGUMENT = arg;
 
     /* Construct MCI_COMMAND  */
@@ -415,19 +429,17 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
-    int max = 0x40000;
-    while(MCI_COMMAND & CMD_DONE_BIT)
-    {
-        if(--max == 0)  /* timeout */
-            return false;
-    }
+    wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
+
+    MCI_MASK &= ~MCI_INT_CD;
+
+    /*  Handle command responses */
 
     /* TODO  Check crc values to determine if the response was valid  */
     if(flags & MCI_RESP)
     {
-        int i = 0xff; while(i--) ;
-        /* if we read the response too fast we might read the response
-         * of the previous command instead */
+        if(cmd_error & MCI_INT_RCRC)  /*  skipping timeout for now  */
+            return false;
 
         if(flags & MCI_LONG_RESP)
         {
@@ -498,6 +510,9 @@ static int sd_init_card(const int drive)
 #endif
     /*  End of Card Identification Mode   ************************************/
 
+    /*  Card back to full speed  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
+
     /* Attempt to switch cards to HS timings, non HS cards just ignore this */
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
@@ -509,7 +524,6 @@ static int sd_init_card(const int drive)
     /* CMD6 */
     if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
         return -9;
-    mci_delay();
 
     /*  We need to go back to STBY state now so we can read csd */
     /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
@@ -523,8 +537,6 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
-    /*  Card back to full speed  */
-    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
 #ifndef HAVE_MULTIDRIVE
     /*  CMD7 w/rca: Select card to put it in TRAN state */
@@ -686,7 +698,7 @@ int sd_init(void)
                | 1;             /* clock source = PLLA */
 
     wakeup_init(&transfer_completion_signal);
-
+    wakeup_init(&command_completion_signal);
 #ifdef HAVE_MULTIDRIVE
     /* clear previous irq */
     GPIOA_IC = EXT_SD_BITS;
@@ -729,9 +741,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
     {
         long tick;
 
-        if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
-                    MCI_RESP, &response))
-            return -1;
+        while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
 
         if (((response >> 9) & 0xf) == state)
             return 0;
@@ -818,14 +828,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
 
         MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
-        MCI_CTRL |= DMA_ENABLE;
 
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
             arg *= SD_BLOCK_SIZE;
-
-        if(!send_cmd(drive, cmd, arg, MCI_NO_RESP, NULL))
-            panicf("%s multiple blocks failed", write ? "write" : "read");
 
         if(write)
             dma_enable_channel(0, dma_buf, MCI_FIFO, DMA_PERI_SD,
@@ -833,6 +839,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         else
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
+
+        MCI_CTRL |= DMA_ENABLE;
+
+        unsigned long dummy; /* if we don't ask for a response, writing fails */
+        if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
+            panicf("%s multiple blocks failed", write ? "write" : "read");
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
@@ -904,14 +916,7 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     (void) buf;
     return -1;
 #else
-    //return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
-#ifdef HAVE_MULTIDRIVE
-    (void)drive;
-#endif
-    (void)start;
-    (void)count;
-    (void)buf;
-    return -1; /* not working, seems to cause FIFO overruns */
+    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 #endif /* defined(BOOTLOADER) */
 }
 
