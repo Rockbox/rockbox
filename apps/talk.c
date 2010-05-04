@@ -37,6 +37,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "metadata.h"
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"
@@ -625,6 +626,7 @@ int talk_id(int32_t id, bool enqueue)
     if (clipbuf == NULL)
         return -1; /* not present */
 
+    logf("\ntalk_id: Say '%s'\n", str(id));
     queue_clip(clipbuf, clipsize, enqueue);
 
     return 0;
