@@ -405,7 +405,7 @@ static void enable_dptc(void)
 }
 
 
-/* Called after final PMIC read is completed */
+/* Called after asynchronous PMIC write is completed */
 static void dptc_transfer_done_callback(struct spi_transfer_desc *xfer)
 {
     if (xfer->count != 0)
