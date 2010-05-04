@@ -423,6 +423,7 @@ static void dptc_int(unsigned long pmcr0)
 {
     const union dvfs_dptc_voltage_table_entry *entry;
     uint32_t sw1a, sw1advs, sw1bdvs, sw1bstby;
+    uint32_t switchers0, switchers1;
 
     int wp = dptc_wp;
 
@@ -464,10 +465,12 @@ static void dptc_int(unsigned long pmcr0)
     sw1bdvs = check_regulator_setting(entry->sw1bdvs);
     sw1bstby = check_regulator_setting(entry->sw1bstby);
 
-    dptc_regs_buf[0] = dptc_reg_shadows[0] |
+    switchers0 = dptc_reg_shadows[0] & ~(MC13783_SW1A | MC13783_SW1ADVS);
+    dptc_regs_buf[0] = switchers0 |
                        sw1a << MC13783_SW1A_POS |         /* SW1A */
                        sw1advs << MC13783_SW1ADVS_POS;    /* SW1ADVS */
-    dptc_regs_buf[1] = dptc_reg_shadows[1] |
+    switchers1 = dptc_reg_shadows[1] & ~(MC13783_SW1BDVS | MC13783_SW1BSTBY);
+    dptc_regs_buf[1] = switchers1 |
                        sw1bdvs << MC13783_SW1BDVS_POS |   /* SW1BDVS */
                        sw1bstby << MC13783_SW1BSTBY_POS;  /* SW1BSTBY */
 
@@ -502,10 +505,6 @@ static void dptc_init(void)
 
      /* Shadow the regulator registers */
     mc13783_read_regs(dptc_pmic_regs, dptc_reg_shadows, 2);
-
-    /* Pre-mask the fields we change */
-    dptc_reg_shadows[0] &= ~(MC13783_SW1A | MC13783_SW1ADVS);
-    dptc_reg_shadows[1] &= ~(MC13783_SW1BDVS | MC13783_SW1BSTBY);
 
     /* Set default, safe working point. */
     dptc_new_wp(DPTC_WP_DEFAULT);
