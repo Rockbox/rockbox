@@ -419,9 +419,9 @@ int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp
 }
 #endif
 
-/* Don't let get_action*() return any ACTION_* values untill the current buttons
- * have ben release. SYS_* and BUTTON_NONE will go through.
- * Any actions relying on _RELEASE won't get seen
+/* Don't let get_action*() return any ACTION_* values until the current buttons
+ * have been released. SYS_* and BUTTON_NONE will go through.
+ * Any actions relying on _RELEASE won't get seen.
  */
 void action_wait_for_release(void)
 {
