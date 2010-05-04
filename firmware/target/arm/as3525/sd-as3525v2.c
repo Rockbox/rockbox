@@ -148,6 +148,8 @@
 #define CMD_CCS_EXPECTED        (1<<23)
 #define CMD_DONE_BIT            (1<<31)
 
+#define TRANSFER_CMD  (cmd == SD_READ_MULTIPLE_BLOCK ||   \
+                       cmd == SD_WRITE_MULTIPLE_BLOCK)
 
 #define MCI_RESP0       SD_REG(0x30)
 #define MCI_RESP1       SD_REG(0x34)
@@ -399,9 +401,6 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         }
 #endif
 
-#define TRANSFER_CMD  (cmd == SD_READ_MULTIPLE_BLOCK ||   \
-                       cmd == SD_WRITE_MULTIPLE_BLOCK)
-
 /*  RCRC & RTO interrupts should be set together with the CD interrupt but
  *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
  *  them masked for now we can check them in the isr by reading raw status when
@@ -433,12 +432,10 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
 
     MCI_MASK &= ~MCI_INT_CD;
 
-    /*  Handle command responses */
-
-    /* TODO  Check crc values to determine if the response was valid  */
+    /*  Handle command responses & errors */
     if(flags & MCI_RESP)
     {
-        if(cmd_error & MCI_INT_RCRC)  /*  skipping timeout for now  */
+        if(cmd_error & (MCI_INT_RCRC | MCI_INT_RTO))
             return false;
 
         if(flags & MCI_LONG_RESP)
@@ -515,7 +512,7 @@ static int sd_init_card(const int drive)
 
     /* Attempt to switch cards to HS timings, non HS cards just ignore this */
     /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
         return -7;
 
     if(sd_wait_for_state(drive, SD_TRAN))
@@ -527,7 +524,7 @@ static int sd_init_card(const int drive)
 
     /*  We need to go back to STBY state now so we can read csd */
     /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_RESP, &response))
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
         return -10;
 
     /* CMD9 send CSD */
@@ -789,7 +786,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 #ifdef HAVE_MULTIDRIVE
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -6;
+        return -13;
 #endif
 
     last_disk_activity = current_tick;
@@ -882,7 +879,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -6;
+        return -14;
 #endif
 
 #ifndef BOOTLOADER
