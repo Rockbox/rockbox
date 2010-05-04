@@ -1622,12 +1622,12 @@ target/coldfire/mpio/hd200/powermgmt-hd200.c
 target/coldfire/mpio/hd200/backlight-hd200.c
 target/coldfire/mpio/hd200/system-hd200.c
 target/coldfire/mpio/hd200/usb-hd200.c
-target/coldfire/mpio/fmradio_i2c-mpio.c
 target/coldfire/mpio/ata-mpio.c
 target/coldfire/mpio/ata-as-mpio.S
 #ifndef BOOTLOADER
 target/coldfire/mpio/audio-mpio.c
 target/coldfire/wmcodec-coldfire.c
+target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif
