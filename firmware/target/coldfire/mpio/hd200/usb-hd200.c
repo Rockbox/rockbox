@@ -32,7 +32,7 @@ void usb_init_device(void)
      */
     and_l(~(1<<4), &GPIO1_OUT);
     or_l((1<<4)|(1<<18), &GPIO1_ENABLE);   /* GPIO36 GPIO50 */
-    or_l((1<<4)|(1<<18), &GPIO1_FUNCTION); 
+    or_l((1<<4)|(1<<5)|(1<<18), &GPIO1_FUNCTION); /* GPIO36 GPIO37 GPIO50 */
 
      /* GPIO22 GPIO30*/
      /* GPIO31 has to be low to ATA work */
@@ -76,6 +76,7 @@ void usb_enable(bool on)
 
         and_l(~(1<<4),&GPIO1_OUT); /* GPIO36 low */
 
-       //or_l((1<<18),&GPIO1_OUT);  /* GPIO50 high */
+       while ( !(GPIO1_READ & (1<<5)) ) {}
+       sleep(HZ);
     }
 }
