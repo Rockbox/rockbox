@@ -54,6 +54,11 @@
 #define BOOTMENU_TIMEOUT (10*HZ)
 #define BOOTMENU_OPTIONS 3
 
+#define EVENT_NONE 0x00
+#define EVENT_ON   0x01
+#define EVENT_AC   0x02
+#define EVENT_USB  0x04
+
 /* From common.c */
 extern int line;
 static const char *bootmenu_options[] = {
@@ -75,24 +80,24 @@ int usb_screen(void)
 
 char version[] = APPSVERSION;
 
-bool _charger_inserted(void)
+static inline bool _charger_inserted(void)
 {
     return (GPIO1_READ & (1<<14)) ? false : true;
 }
 
-bool _battery_full(void)
+static inline bool _battery_full(void)
 {
     return (GPIO_READ & (1<<30)) ? true : false;
 }
 
 /* Reset the cookie for the crt0 crash check */
-inline void __reset_cookie(void)
+static inline void __reset_cookie(void)
 {
     asm(" move.l #0,%d0");
     asm(" move.l %d0,0x10017ffc");
 }
 
-void start_rockbox(void)
+static void start_rockbox(void)
 {
     adc_close();
     asm(" move.w #0x2700,%sr");
@@ -104,7 +109,7 @@ void start_rockbox(void)
     asm(" jmp (%a0)");
 }
 
-void start_mpio_firmware(void)
+static void start_mpio_firmware(void)
 {
     asm(" move.w #0x2700,%sr");
     __reset_cookie();
@@ -113,7 +118,7 @@ void start_mpio_firmware(void)
     asm(" jmp 8");
 }
 
-void __reset(void)
+static void __reset(void)
 {
     asm(" move.w #0x2700,%sr");
     __reset_cookie();
@@ -123,7 +128,7 @@ void __reset(void)
     asm(" jmp (%a0)");
 }
 
-void __shutdown(void)
+static void __shutdown(void)
 {
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
@@ -151,7 +156,7 @@ void __shutdown(void)
 }
 
 /* Print the battery voltage (and a warning message). */
-void check_battery(void)
+static void check_battery(void)
 {
 
     int battery_voltage, batt_int, batt_frac;
@@ -171,16 +176,54 @@ void check_battery(void)
 }
 
 
-void lcd_putstring_centered(const char *string)
+static void lcd_putstring_centered(const char *string)
 {
     int w,h;
     font_getstringsize(string, &w, &h, FONT_SYSFIXED);
     lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, string);
 }
 
-void bootmenu(void)
+static void rb_boot(void)
 {
     int rc;
+
+    rc = storage_init();
+    if(rc)
+    {
+        printf("ATA error: %d", rc);
+        sleep(HZ*5);
+        return;
+    }
+
+    disk_init();
+
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        printf("No partition found");
+        sleep(HZ*5);
+        return;
+    }
+
+    printf("Loading firmware");
+
+    rc = load_firmware((unsigned char *)DRAM_START, 
+                       BOOTFILE, MAX_LOADSIZE);
+
+    if (rc < EOK)
+    {
+        printf("Error!");
+        printf("Can't load " BOOTFILE ": ");
+        printf("Result: %s", strerror(rc));
+        sleep(HZ*5);
+        return;
+    }
+
+    start_rockbox();
+}
+
+static void bootmenu(void)
+{
     enum option_t i;
     enum option_t option = rockbox;
     int button;
@@ -250,42 +293,7 @@ void bootmenu(void)
                 switch (option)
                 {
                     case rockbox:
-                        rc = storage_init();
-                        if(rc)
-                        {
-                            printf("ATA error: %d", rc);
-                            sleep(HZ*5);
-                            __shutdown();
-                        }
-
-                        disk_init();
-
-                        rc = disk_mount_all();
-                        if (rc<=0)
-                        {
-                            printf("No partition found");
-                            sleep(HZ*5);
-                            __shutdown();
-                        }
-
-                        printf("Loading firmware");
-                        rc = load_firmware((unsigned char *)DRAM_START, 
-                                           BOOTFILE, MAX_LOADSIZE);
-                        printf("Result: %s", strerror(rc));
-
-                        if (rc < EOK)
-                        {
-                            printf("Error!");
-                            printf("Can't load " BOOTFILE ": ");
-                            printf(strerror(rc));
-                            sleep(HZ*5);
-                            __shutdown();
-                        }
-                        else
-                        {
-                            start_rockbox();
-                        }
-
+                            rb_boot();
                         break;
 
                     case mpio_firmware:
@@ -293,13 +301,12 @@ void bootmenu(void)
                         break;
 
                     default:
-                        __shutdown();
+                        return;
                         break;
                 }
         }
 }
 /* timeout */
-__shutdown();
 }
 
 void main(void)
@@ -308,24 +315,13 @@ void main(void)
     const char usb_connect_msg[] = "Bootloader USB mode";
     const char charging_msg[] = "Charging...";
     const char complete_msg[] = "Charging complete";
-    const char hold_msg[] = "Hold switch on";
-    const char shutdown_msg[] = "Shutting down...";
 
-    /* helper variables for messages */
+    /* helper variable for messages */
     bool blink_toggle = false;
-    const char *msg;
 
-    bool on_button = false;
     int button;
-
-    /* We want to read the buttons as early as possible, before the user
-       releases the ON button */
-
-    or_l( ((1<<24)|(1<<4)), &GPIO1_FUNCTION); /* main Hold & Play */
-    and_l( ~((1<<24)|(1<<4)), &GPIO1_ENABLE); /* HiZ */
-    
-    if (GPIO1_READ & (1<<24))
-        on_button = true;
+    unsigned int event = EVENT_NONE;
+    unsigned int last_event = EVENT_NONE;
 
     power_init();
 
@@ -338,118 +334,112 @@ void main(void)
     enable_irq();
     lcd_init();
 
-    backlight_init();
+    /* only lowlevel functions no queue init */
+    _backlight_init();
+    _backlight_hw_on();
+
+    /* setup font system*/
     font_init();
     lcd_setfont(FONT_SYSFIXED);
-
+    
+    /* buttons reading */
     adc_init();
     button_init();
+
     usb_init();
+    cpu_idle_mode(true);
 
-    /* handle charging */
-    if( _charger_inserted())
+    /* Handle wakeup event. Possibilities are:
+     * ON button (PLAY)
+     * USB insert
+     * AC charger plug
+     */
+
+    while(1)
     {
-        or_l((1<<15),&GPIO_OUT);
+        /* read buttons */
+        event = EVENT_NONE;
+        button = button_get_w_tmo(HZ);
 
-        cpu_idle_mode(true);
+        if ( button & BUTTON_PLAY )
+            event |= EVENT_ON;
+ 
+        if ( usb_detect() == USB_INSERTED )
+            event |= EVENT_USB;
 
-        while( _charger_inserted() && 
-               usb_detect() != USB_INSERTED &&
-               !on_button)
+        if ( _charger_inserted() )
+            event |= EVENT_AC;
+
+        reset_screen();
+        switch (event)
         {
-            button = button_get_w_tmo(HZ);
+            case EVENT_ON:
+            case (EVENT_ON | EVENT_AC):
+            /* hold is handled in button driver */
+                    cpu_idle_mode(false);
 
-            switch(button)
-            {
-            case BUTTON_ON:
-                on_button = true;
-                reset_screen();
+                    if (button == (BUTTON_PLAY|BUTTON_REC))
+                        bootmenu();
+                    else
+                        rb_boot();
+
                 break;
 
-            case BUTTON_NONE: /* Timeout */
+            case EVENT_AC:
+                /* turn on charging */
+                if (!(last_event & EVENT_AC))
+                    or_l((1<<15),&GPIO_OUT);
 
+                /* USB unplug */
+                if (last_event & EVENT_USB)
+                    usb_enable(false);
+                   
                 if(!_battery_full())
                 {
-                    /* To be replaced with a nice animation */
+                    if (blink_toggle)
+                        lcd_putstring_centered(charging_msg);
+
                     blink_toggle = !blink_toggle;
-                    msg = charging_msg;
                 }
                 else
                 {
-                    blink_toggle = true;
-                    msg = complete_msg;
+                    lcd_putstring_centered(complete_msg);
                 }
-
-                reset_screen();
-                if(blink_toggle)
-                    lcd_putstring_centered(msg);
-
                 check_battery();
                 break;
-            }
 
+            case EVENT_USB:
+            case (EVENT_USB | EVENT_AC):
+                if (!(last_event & EVENT_AC))
+                    or_l((1<<15),&GPIO_OUT);
+
+                if (!(last_event & EVENT_USB))
+                {
+                    /* init USB */
+                    ide_power_enable(true);
+                    sleep(HZ/20);
+                    usb_enable(true);
+                }
+
+                line = 0;
+
+                if (blink_toggle)
+                    lcd_putstring_centered(usb_connect_msg);
+
+                check_battery();
+                blink_toggle = !blink_toggle;
+                storage_spin();
+                break;
+
+            default:
+                /* spurious wakeup */
+                __shutdown();
+                break;
         }
-        cpu_idle_mode(false);
-    }
-
-    /* handle USB in bootloader */
-    if (usb_detect() == USB_INSERTED)
-    {
-        ide_power_enable(true);
-        sleep(HZ/20);
-        usb_enable(true);
-        cpu_idle_mode(true);
-
-        while (usb_detect() == USB_INSERTED)
-        {
-            line = 0;
-
-            reset_screen();
-
-            if(blink_toggle)
-            {
-                 lcd_putstring_centered(usb_connect_msg);
-            }
-
-            check_battery();
-            blink_toggle = !blink_toggle;
-
-            storage_spin(); /* Prevent the drive from spinning down */
-            sleep(HZ);
-        }
-
-        cpu_idle_mode(false);
-        usb_enable(false);
-
-        sleep(HZ);
-        reset_screen();
         lcd_update();
+        last_event = event;
     }
 
-    /* handle ON button press */
-    if (on_button)
-    {
-        if (button_hold() &&
-            !_charger_inserted() &&
-            usb_detect() != USB_INSERTED)
-        {
-            lcd_putstring_centered(hold_msg);
-            lcd_update();
-            sleep(HZ*3);
-            __shutdown();
-        }
-        
-    }
-    else
-    {
-        lcd_putstring_centered(shutdown_msg);
-        lcd_update();
-        sleep(HZ*3);
-        __shutdown();
-    }
-
-    
-    bootmenu();
 }
 
 /* These functions are present in the firmware library, but we reimplement
