@@ -43,9 +43,10 @@ bool _backlight_init(void)
 
 void _backlight_hw_on(void)
 {
-
+#ifndef BOOTLOADER
     if (_backlight_on)
         return;
+#endif
    
     _backlight_set_brightness(_brightness);
     _backlight_on = true;
@@ -63,8 +64,10 @@ void _backlight_set_brightness(int val)
 {
     unsigned char i;
 
+#ifndef BOOTLOADER
     if( _brightness == val && _backlight_on == true )
         return;
+#endif
 
     and_l(~(1<<28),&GPIO_OUT);
     sleep(4);
