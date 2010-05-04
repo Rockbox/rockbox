@@ -53,7 +53,7 @@ static void update_dptc_counts(unsigned int level, unsigned int wp)
 }
 
 
-static inline uint32_t check_regulator_setting(uint32_t setting)
+static uint32_t check_regulator_setting(uint32_t setting)
 {
     /* Simply a safety check *in case* table gets scrambled */
     if (setting < VOLTAGE_SETTING_MIN)
@@ -374,9 +374,17 @@ static void dvfs_stop(void)
 /** DPTC **/
 
 /* Request tracking since boot */
+static bool dptc_running = false; /* Has driver enabled DPTC? */
+
 unsigned int dptc_nr_dn = 0;
 unsigned int dptc_nr_up = 0;
 unsigned int dptc_nr_pnc = 0;
+
+static struct spi_transfer_desc dptc_pmic_xfer; /* Transfer descriptor */
+static const unsigned char dptc_pmic_regs[2] =  /* Register subaddresses */
+{ MC13783_SWITCHERS0, MC13783_SWITCHERS1 };
+static uint32_t dptc_reg_shadows[2];            /* shadow regs */
+static uint32_t dptc_regs_buf[2];               /* buffer for async write */
 
 
 /* Enable DPTC and unmask interrupt. */
@@ -397,123 +405,91 @@ static void enable_dptc(void)
 }
 
 
-static void dptc_new_wp(unsigned int wp)
+/* Called after final PMIC read is completed */
+static void dptc_transfer_done_callback(struct spi_transfer_desc *xfer)
 {
-    unsigned int level = dvfs_level;
-    const union dvfs_dptc_voltage_table_entry *entry = &dvfs_dptc_voltage_table[wp];
+    if (xfer->count != 0)
+        return;
 
-    uint32_t sw1a = check_regulator_setting(entry->sw1a);
-    uint32_t sw1advs = check_regulator_setting(entry->sw1advs);
-    uint32_t sw1bdvs = check_regulator_setting(entry->sw1bdvs);
-    uint32_t sw1bstby = check_regulator_setting(entry->sw1bstby);
+    update_dptc_counts(dvfs_level, dptc_wp);
 
-    dptc_wp = wp;
-
-    mc13783_write_masked(MC13783_SWITCHERS0,
-                         sw1a << MC13783_SW1A_POS |         /* SW1A */
-                         sw1advs << MC13783_SW1ADVS_POS,    /* SW1ADVS */
-                         MC13783_SW1A | MC13783_SW1ADVS);
-
-    mc13783_write_masked(MC13783_SWITCHERS1,
-                         sw1bdvs << MC13783_SW1BDVS_POS |   /* SW1BDVS */
-                         sw1bstby << MC13783_SW1BSTBY_POS,  /* SW1BSTBY */
-                         MC13783_SW1BDVS | MC13783_SW1BSTBY);
-
-
-    udelay(100); /* Wait to settle */
-
-    update_dptc_counts(level, wp);
+    if (dptc_running)
+        enable_dptc();
 }
 
 
-/* DPTC service thread */
-#ifdef ROCKBOX_HAS_LOGF
-#define DPTC_STACK_SIZE DEFAULT_STACK_SIZE
-#else
-#define DPTC_STACK_SIZE 160
-#endif
-static int dptc_thread_stack[DPTC_STACK_SIZE/sizeof(int)];
-static const char * const dptc_thread_name = "dptc";
-static struct wakeup dptc_wakeup;   /* Object to signal upon DPTC event */
-static struct mutex dptc_mutex;     /* Avoid mutually disrupting voltage updates */
-static unsigned long dptc_int_data; /* Data passed to thread for each event */
-static bool dptc_running = false;   /* Has driver enabled DPTC? */
-
-
-static void dptc_interrupt_thread(void)
+/* Handle the DPTC interrupt and sometimes the manual setting */
+static void dptc_int(unsigned long pmcr0)
 {
-    int wp;
+    const union dvfs_dptc_voltage_table_entry *entry;
+    uint32_t sw1a, sw1advs, sw1bdvs, sw1bstby;
 
-    mutex_lock(&dptc_mutex);
+    int wp = dptc_wp;
 
-    while (1)
+    /* Mask DPTC interrupt and disable DPTC until the change request is
+     * serviced. */
+    CCM_PMCR0 = (pmcr0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
+
+    switch (pmcr0 & CCM_PMCR0_PTVAI)
     {
-        mutex_unlock(&dptc_mutex);
+    case CCM_PMCR0_PTVAI_DECREASE:
+        wp++;
+        dptc_nr_dn++;
+        break;
 
-        wakeup_wait(&dptc_wakeup, TIMEOUT_BLOCK);
+    case CCM_PMCR0_PTVAI_INCREASE:
+        wp--;
+        dptc_nr_up++;
+        break;
 
-        mutex_lock(&dptc_mutex);
-
-        if (!dptc_running)
-            continue;
-
-        wp = dptc_wp;
-
-        switch (dptc_int_data & CCM_PMCR0_PTVAI)
-        {
-        case CCM_PMCR0_PTVAI_DECREASE:
-            wp++;
-            dptc_nr_dn++;
-            break;
-
-        case CCM_PMCR0_PTVAI_INCREASE:
-            wp--;
-            dptc_nr_up++;
-            break;
-
-        case CCM_PMCR0_PTVAI_INCREASE_NOW:
+    case CCM_PMCR0_PTVAI_INCREASE_NOW:
+        if (--wp > DPTC_WP_PANIC)
             wp = DPTC_WP_PANIC;
-            dptc_nr_pnc++;
-            break;
+        dptc_nr_pnc++;
+        break;
 
-        case CCM_PMCR0_PTVAI_NO_INT:
-            logf("DPTC: unexpected INT");
-            continue;
-        }
-
-        if (wp < 0)
-        {
-            wp = 0;
-            logf("DPTC: already @ highest (%d)", wp);
-        }
-        else if (wp >= DPTC_NUM_WP)
-        {
-            wp = DPTC_NUM_WP - 1;
-            logf("DPTC: already @ lowest (%d)", wp);
-        }
-        else
-        {
-            logf("DPTC: new wp (%d)", wp);
-        }
-
-        dptc_new_wp(wp);
-        enable_dptc();
+    case CCM_PMCR0_PTVAI_NO_INT:
+        break; /* Just maintain at global level */
     }
+
+    if (wp < 0)
+        wp = 0;
+    else if (wp >= DPTC_NUM_WP)
+        wp = DPTC_NUM_WP - 1;
+
+    entry = &dvfs_dptc_voltage_table[wp];
+
+    sw1a = check_regulator_setting(entry->sw1a);
+    sw1advs = check_regulator_setting(entry->sw1advs);
+    sw1bdvs = check_regulator_setting(entry->sw1bdvs);
+    sw1bstby = check_regulator_setting(entry->sw1bstby);
+
+    dptc_regs_buf[0] = dptc_reg_shadows[0] |
+                       sw1a << MC13783_SW1A_POS |         /* SW1A */
+                       sw1advs << MC13783_SW1ADVS_POS;    /* SW1ADVS */
+    dptc_regs_buf[1] = dptc_reg_shadows[1] |
+                       sw1bdvs << MC13783_SW1BDVS_POS |   /* SW1BDVS */
+                       sw1bstby << MC13783_SW1BSTBY_POS;  /* SW1BSTBY */
+
+    dptc_wp = wp;
+
+    mc13783_write_async(&dptc_pmic_xfer, dptc_pmic_regs,
+                        dptc_regs_buf, 2, dptc_transfer_done_callback);
+}
+
+
+static void dptc_new_wp(unsigned int wp)
+{
+    dptc_wp = wp;
+    /* "NO_INT" so the working point isn't incremented, just set. */
+    dptc_int((CCM_PMCR0 & ~CCM_PMCR0_PTVAI) | CCM_PMCR0_PTVAI_NO_INT);
 }
 
 
 /* Interrupt vector for DPTC */
 static __attribute__((interrupt("IRQ"))) void CCM_CLK_HANDLER(void)
 {
-    /* Snapshot the interrupt cause */
-    unsigned long pmcr0 = CCM_PMCR0;
-    dptc_int_data = pmcr0;
-
-    /* Mask DPTC interrupt and disable DPTC until the change request is
-     * serviced. */
-    CCM_PMCR0 = (pmcr0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
-
-    wakeup_signal(&dptc_wakeup);
+    dptc_int(CCM_PMCR0);
 }
 
 
@@ -524,22 +500,26 @@ static void dptc_init(void)
     imx31_regmod32(&CCM_PMCR0, CCM_PMCR0_PTVAIM,
                    CCM_PMCR0_PTVAIM | CCM_PMCR0_DPTEN);
 
+     /* Shadow the regulator registers */
+    mc13783_read_regs(dptc_pmic_regs, dptc_reg_shadows, 2);
+
+    /* Pre-mask the fields we change */
+    dptc_reg_shadows[0] &= ~(MC13783_SW1A | MC13783_SW1ADVS);
+    dptc_reg_shadows[1] &= ~(MC13783_SW1BDVS | MC13783_SW1BSTBY);
+
     /* Set default, safe working point. */
     dptc_new_wp(DPTC_WP_DEFAULT);
 
     /* Interrupt goes to MCU, specified reference circuits enabled when
      * DPTC is active. */
-    imx31_regset32(&CCM_PMCR0, CCM_PMCR0_PTVIS | DPTC_DRCE_MASK);
+    imx31_regset32(&CCM_PMCR0, CCM_PMCR0_PTVIS);
+
+    imx31_regmod32(&CCM_PMCR0, DPTC_DRCE_MASK,
+                   CCM_PMCR0_DRCE0 | CCM_PMCR0_DRCE1 |
+                   CCM_PMCR0_DRCE2 | CCM_PMCR0_DRCE3);
 
     /* DPTC counting range = 256 system clocks */
     imx31_regclr32(&CCM_PMCR0, CCM_PMCR0_DCR);
-
-    /* Create PMIC regulator service. */
-    wakeup_init(&dptc_wakeup);
-    mutex_init(&dptc_mutex);
-    create_thread(dptc_interrupt_thread,
-            dptc_thread_stack, sizeof(dptc_thread_stack), 0,
-            dptc_thread_name IF_PRIO(, PRIORITY_REALTIME_1) IF_COP(, CPU));
 
     logf("DPTC: Initialized");
 }
@@ -548,11 +528,7 @@ static void dptc_init(void)
 /* Start DPTC module */
 static void dptc_start(void)
 {
-    int oldstate;
-
-    mutex_lock(&dptc_mutex);
-
-    oldstate = disable_irq_save();
+    int oldlevel = disable_irq_save();
 
     if (!dptc_running)
     {
@@ -566,9 +542,7 @@ static void dptc_start(void)
         enable_dptc();
     }
 
-    restore_irq(oldstate);
-
-    mutex_unlock(&dptc_mutex);
+    restore_irq(oldlevel);
 
     logf("DPTC: started");
 }
@@ -577,28 +551,20 @@ static void dptc_start(void)
 /* Stop the DPTC hardware if running and go back to default working point */
 static void dptc_stop(void)
 {
-    int oldlevel;
-
-    mutex_lock(&dptc_mutex);
-
-    oldlevel = disable_irq_save();
+    int oldlevel = disable_irq_save();
 
     if (dptc_running)
     {
         /* Disable DPTC and mask interrupt. */
         CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
         avic_disable_int(INT_CCM_CLK);
-        dptc_int_data = 0;
-
         dptc_running = false;
     }
-
-    restore_irq(oldlevel);
 
     /* Go back to default working point. */
     dptc_new_wp(DPTC_WP_DEFAULT);
 
-    mutex_unlock(&dptc_mutex);
+    restore_irq(oldlevel);
 
     logf("DPTC: stopped");
 }
@@ -618,10 +584,7 @@ void dvfs_dptc_init(void)
 void dvfs_dptc_start(void)
 {
     dvfs_start();
-    if (0) /* Hold off for now */
-    {
-        dptc_start();
-    }
+    dptc_start();
 }
 
 
@@ -731,12 +694,10 @@ unsigned int dptc_get_wp(void)
 /* If DPTC is not running, set the working point explicitly */
 void dptc_set_wp(unsigned int wp)
 {
-    mutex_lock(&dptc_mutex);
+    int oldlevel = disable_irq_save();
 
     if (!dptc_running && wp < DPTC_NUM_WP)
-    {
         dptc_new_wp(wp);
-    }
 
-    mutex_unlock(&dptc_mutex);
+    restore_irq(oldlevel);
 }

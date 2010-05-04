@@ -71,7 +71,7 @@ unsigned short adc_read(int channel)
 
         /* Read all 8 channels that are converted - two channels in each
          * word. */
-        mc13783_read_regset(reg_array, channels[input_select], 4);
+        mc13783_read_regs(reg_array, channels[input_select], 4);
 
         last_adc_read[input_select] = current_tick;
     }

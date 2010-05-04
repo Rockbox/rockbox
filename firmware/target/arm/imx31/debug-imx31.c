@@ -213,7 +213,7 @@ bool __dbg_ports(void)
         lcd_puts(0, line++, "PMIC Registers");
         line++;
 
-        mc13783_read_regset(pmic_regset, pmic_regs, ARRAYLEN(pmic_regs));
+        mc13783_read_regs(pmic_regset, pmic_regs, ARRAYLEN(pmic_regs));
 
         for (i = 0; i < (int)ARRAYLEN(pmic_regs); i++)
         {

@@ -104,8 +104,8 @@ int rtc_read_datetime(struct tm *tm)
      * greater */
     do
     {
-        if (mc13783_read_regset(rtc_registers, regs,
-                                RTC_NUM_REGS) < RTC_NUM_REGS)
+        if (mc13783_read_regs(rtc_registers, regs,
+                              RTC_NUM_REGS) < RTC_NUM_REGS)
         {
             /* Couldn't read registers */
             return 0;
@@ -204,7 +204,7 @@ int rtc_write_datetime(const struct tm *tm)
 
     regs[RTC_REG_DAY] = day + tm->tm_mday - 1 - base_yearday;
 
-    if (mc13783_write_regset(rtc_registers, regs, 2) == 2)
+    if (mc13783_write_regs(rtc_registers, regs, 2) == 2)
     {
         return 7;
     }

@@ -21,6 +21,8 @@
 #ifndef _MC13783_H_
 #define _MC13783_H_
 
+#include "spi-imx31.h"
+
 enum mc13783_regs_enum
 {
     MC13783_INTERRUPT_STATUS0            =  0,
@@ -1261,11 +1263,21 @@ void mc13783_init(void);
 void mc13783_close(void);
 uint32_t mc13783_set(unsigned address, uint32_t bits);
 uint32_t mc13783_clear(unsigned address, uint32_t bits);
+uint32_t mc13783_read(unsigned address);
 int mc13783_write(unsigned address, uint32_t data);
 uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask);
-int mc13783_write_regset(const unsigned char *regs, const uint32_t *data, int count);
-uint32_t mc13783_read(unsigned address);
-int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer, int count);
+/* buffer must be available as packet workspace */
+int mc13783_read_regs(const unsigned char *regs, uint32_t *buffer, int count);
+/* buffer must be available as packet workspace */
+int mc13783_write_regs(const unsigned char *regs, uint32_t *buffer, int count);
+/* buffer must be available as packet workspace */
+bool mc13783_read_async(struct spi_transfer_desc *xfer,
+                        const unsigned char *regs, uint32_t *buffer,
+                        int count, spi_transfer_cb_fn_type callback);
+/* buffer must be available as packet workspace */
+bool mc13783_write_async(struct spi_transfer_desc *xfer,
+                         const unsigned char *regs, uint32_t *buffer,
+                         int count, spi_transfer_cb_fn_type callback);
 
 #define MC13783_DATA_ERROR UINT32_MAX
 

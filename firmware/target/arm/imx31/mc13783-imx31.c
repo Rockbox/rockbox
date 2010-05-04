@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "system.h"
 #include "cpu.h"
-#include "spi-imx31.h"
 #include "gpio-imx31.h"
 #include "mc13783.h"
 #include "debug.h"
@@ -29,9 +28,14 @@
 extern const struct mc13783_event_list mc13783_event_list;
 extern struct spi_node mc13783_spi;
 
+/* PMIC event service data */
 static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
-static struct wakeup mc13783_wake;
+static struct wakeup mc13783_svc_wake;
+
+/* Synchronous thread communication objects */
+static struct mutex mc13783_spi_mutex;
+static struct wakeup mc13783_spi_wake;
 
 /* Tracking for which interrupts are enabled */
 static uint32_t pmic_int_enabled[2] =
@@ -45,6 +49,34 @@ static const unsigned char pmic_ints_regs[2] =
 
 static volatile unsigned int mc13783_thread_id = 0;
 
+static void mc13783_xfer_complete_cb(struct spi_transfer_desc *trans);
+
+/* Transfer descriptor for synchronous reads and writes */
+static struct spi_transfer_desc mc13783_transfer =
+{
+    .node = &mc13783_spi,
+    .txbuf = NULL,
+    .rxbuf = NULL,
+    .count = 0,
+    .callback = mc13783_xfer_complete_cb,
+    .next = NULL,
+};
+
+/* Called when a transfer is finished and data is ready/written */
+static void mc13783_xfer_complete_cb(struct spi_transfer_desc *xfer)
+{
+    if (xfer->count != 0)
+        return;
+
+    wakeup_signal(&mc13783_spi_wake);
+}
+
+static inline bool wait_for_transfer_complete(void)
+{
+    return wakeup_wait(&mc13783_spi_wake, HZ*2) == OBJ_WAIT_SUCCEEDED &&
+           mc13783_transfer.count == 0;
+}
+
 static void mc13783_interrupt_thread(void)
 {
     uint32_t pending[2];
@@ -56,18 +88,18 @@ static void mc13783_interrupt_thread(void)
     {
         const struct mc13783_event *event, *event_last;
 
-        wakeup_wait(&mc13783_wake, TIMEOUT_BLOCK);
+        wakeup_wait(&mc13783_svc_wake, TIMEOUT_BLOCK);
 
         if (mc13783_thread_id == 0)
             break;
 
-        mc13783_read_regset(pmic_ints_regs, pending, 2);
+        mc13783_read_regs(pmic_ints_regs, pending, 2);
 
         /* Only clear interrupts being dispatched */
         pending[0] &= pmic_int_enabled[0];
         pending[1] &= pmic_int_enabled[1];
 
-        mc13783_write_regset(pmic_ints_regs, pending, 2);
+        mc13783_write_regs(pmic_ints_regs, pending, 2);
 
         /* Whatever is going to be serviced in this loop has been
          * acknowledged. Reenable interrupt and if anything was still
@@ -93,7 +125,7 @@ static void mc13783_interrupt_thread(void)
             }
 
             if ((pending[0] | pending[1]) == 0)
-                break; /* Teminate early if nothing more to service */
+                break; /* Terminate early if nothing more to service */
         }
         while (++event < event_last);
     }
@@ -107,13 +139,16 @@ void mc13783_event(void)
     /* Mask the interrupt (unmasked when PMIC thread services it). */
     imx31_regclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
-    wakeup_signal(&mc13783_wake);
+    wakeup_signal(&mc13783_svc_wake);
 }
 
 void mc13783_init(void)
 {
     /* Serial interface must have been initialized first! */
-    wakeup_init(&mc13783_wake);
+    wakeup_init(&mc13783_svc_wake);
+    mutex_init(&mc13783_spi_mutex);
+
+    wakeup_init(&mc13783_spi_wake);
 
     /* Enable the PMIC SPI module */
     spi_enable_module(&mc13783_spi);
@@ -139,8 +174,9 @@ void mc13783_close(void)
         return;
 
     mc13783_thread_id = 0;
-    wakeup_signal(&mc13783_wake);
+    wakeup_signal(&mc13783_svc_wake);
     thread_wait(thread_id);
+    spi_disable_module(&mc13783_spi);
 }
 
 bool mc13783_enable_event(enum mc13783_event_ids id)
@@ -150,12 +186,12 @@ bool mc13783_enable_event(enum mc13783_event_ids id)
     int set = event->set;
     uint32_t mask = event->mask;
 
-    spi_lock(&mc13783_spi);
+    mutex_lock(&mc13783_spi_mutex);
 
     pmic_int_enabled[set] |= mask;
     mc13783_clear(pmic_intm_regs[set], mask);
 
-    spi_unlock(&mc13783_spi);
+    mutex_unlock(&mc13783_spi_mutex);
 
     return true;
 }
@@ -167,66 +203,77 @@ void mc13783_disable_event(enum mc13783_event_ids id)
     int set = event->set;
     uint32_t mask = event->mask;
 
-    spi_lock(&mc13783_spi);
+    mutex_lock(&mc13783_spi_mutex);
 
     pmic_int_enabled[set] &= ~mask;
     mc13783_set(pmic_intm_regs[set], mask);
 
-    spi_unlock(&mc13783_spi);
+    mutex_unlock(&mc13783_spi_mutex);
 }
 
 uint32_t mc13783_set(unsigned address, uint32_t bits)
 {
-    spi_lock(&mc13783_spi);
+    uint32_t data;
 
-    uint32_t data = mc13783_read(address);
+    mutex_lock(&mc13783_spi_mutex);
+
+    data = mc13783_read(address);
 
     if (data != MC13783_DATA_ERROR)
         mc13783_write(address, data | bits);
 
-    spi_unlock(&mc13783_spi);
+    mutex_unlock(&mc13783_spi_mutex);
 
     return data;
 }
 
 uint32_t mc13783_clear(unsigned address, uint32_t bits)
 {
-    spi_lock(&mc13783_spi);
+    uint32_t data;
 
-    uint32_t data = mc13783_read(address);
+    mutex_lock(&mc13783_spi_mutex);
+
+    data = mc13783_read(address);
 
     if (data != MC13783_DATA_ERROR)
         mc13783_write(address, data & ~bits);
 
-    spi_unlock(&mc13783_spi);
+    mutex_unlock(&mc13783_spi_mutex);
 
     return data;
 }
 
 int mc13783_write(unsigned address, uint32_t data)
 {
-    struct spi_transfer xfer;
     uint32_t packet;
+    int i;
 
     if (address >= MC13783_NUM_REGS)
         return -1;
 
     packet = (1 << 31) | (address << 25) | (data & 0xffffff);
-    xfer.txbuf = &packet;
-    xfer.rxbuf = &packet;
-    xfer.count = 1;
 
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return -1;
+    mutex_lock(&mc13783_spi_mutex);
 
-    return 1 - xfer.count;
+    mc13783_transfer.txbuf = &packet;
+    mc13783_transfer.rxbuf = NULL;
+    mc13783_transfer.count = 1;
+
+    i = -1;
+
+    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
+        i = 1 - mc13783_transfer.count;
+
+    mutex_unlock(&mc13783_spi_mutex);
+
+    return i;
 }
 
 uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask)
 {
     uint32_t old;
 
-    spi_lock(&mc13783_spi);
+    mutex_lock(&mc13783_spi_mutex);
 
     old = mc13783_read(address);
 
@@ -238,69 +285,38 @@ uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask)
             old = MC13783_DATA_ERROR;
     }
 
-    spi_unlock(&mc13783_spi);
+    mutex_unlock(&mc13783_spi_mutex);
 
     return old;
-}
-
-int mc13783_write_regset(const unsigned char *regs, const uint32_t *data,
-                         int count)
-{
-    int i;
-    struct spi_transfer xfer;
-    uint32_t packets[MC13783_NUM_REGS];
-
-    if ((unsigned)count > MC13783_NUM_REGS)
-        return -1;
-
-    for (i = 0; i < count; i++)
-    {
-        uint32_t reg = regs[i];
-
-        if (reg >= MC13783_NUM_REGS)
-            return -1;
-
-        packets[i] = (1 << 31) | (reg << 25) | (data[i] & 0xffffff);
-    }
-
-    xfer.txbuf = packets;
-    xfer.rxbuf = packets;
-    xfer.count = count;
-
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return -1;
-
-    return count - xfer.count;
 }
 
 uint32_t mc13783_read(unsigned address)
 {
     uint32_t packet;
-    struct spi_transfer xfer;
 
     if (address >= MC13783_NUM_REGS)
         return MC13783_DATA_ERROR;
 
     packet = address << 25;
 
-    xfer.txbuf = &packet;
-    xfer.rxbuf = &packet;
-    xfer.count = 1;
+    mutex_lock(&mc13783_spi_mutex);
 
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return MC13783_DATA_ERROR;
+    mc13783_transfer.txbuf = &packet;
+    mc13783_transfer.rxbuf = &packet;
+    mc13783_transfer.count = 1;
+
+    if (!spi_transfer(&mc13783_transfer) || !wait_for_transfer_complete())
+        packet = MC13783_DATA_ERROR;
+
+    mutex_unlock(&mc13783_spi_mutex);
 
     return packet;
 }
 
-int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer,
-                        int count)
+int mc13783_read_regs(const unsigned char *regs, uint32_t *buffer,
+                      int count)
 {
     int i;
-    struct spi_transfer xfer;
-
-    if ((unsigned)count > MC13783_NUM_REGS)
-        return -1;
 
     for (i = 0; i < count; i++)
     {
@@ -312,12 +328,101 @@ int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer,
         buffer[i] = reg << 25;
     }
 
-    xfer.txbuf = buffer;
-    xfer.rxbuf = buffer;
-    xfer.count = count;
+    mutex_lock(&mc13783_spi_mutex);
 
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return -1;
+    mc13783_transfer.txbuf = buffer;
+    mc13783_transfer.rxbuf = buffer;
+    mc13783_transfer.count = count;
 
-    return count - xfer.count;
+    i = -1;
+
+    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
+        i = count - mc13783_transfer.count;
+
+    mutex_unlock(&mc13783_spi_mutex);
+
+    return i;
+}
+
+int mc13783_write_regs(const unsigned char *regs, uint32_t *buffer,
+                       int count)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        unsigned reg = regs[i];
+
+        if (reg >= MC13783_NUM_REGS)
+            return -1;
+
+        buffer[i] = (1 << 31) | (reg << 25) | (buffer[i] & 0xffffff);
+    }
+
+    mutex_lock(&mc13783_spi_mutex);
+
+    mc13783_transfer.txbuf = buffer;
+    mc13783_transfer.rxbuf = NULL;
+    mc13783_transfer.count = count;
+
+    i = -1;
+
+    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
+        i = count - mc13783_transfer.count;
+
+    mutex_unlock(&mc13783_spi_mutex);
+
+    return i;
+}
+
+#if 0 /* Not needed right now */
+bool mc13783_read_async(struct spi_transfer_desc *xfer,
+                        const unsigned char *regs, uint32_t *buffer,
+                        int count, spi_transfer_cb_fn_type callback)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        unsigned reg = regs[i];
+
+        if (reg >= MC13783_NUM_REGS)
+            return false;
+
+        buffer[i] = reg << 25;
+    }
+
+    xfer->node  = &mc13783_spi;
+    xfer->txbuf = buffer;
+    xfer->rxbuf = buffer;
+    xfer->count = count;
+    xfer->callback = callback;
+
+    return spi_transfer(xfer);
+}
+#endif
+
+bool mc13783_write_async(struct spi_transfer_desc *xfer,
+                         const unsigned char *regs, uint32_t *buffer,
+                         int count, spi_transfer_cb_fn_type callback)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        unsigned reg = regs[i];
+
+        if (reg >= MC13783_NUM_REGS)
+            return false;
+
+        buffer[i] = (1 << 31) | (reg << 25) | (buffer[i] & 0xffffff);
+    }
+
+    xfer->node  = &mc13783_spi;
+    xfer->txbuf = buffer;
+    xfer->rxbuf = NULL;
+    xfer->count = count;
+    xfer->callback = callback;
+
+    return spi_transfer(xfer);
 }

@@ -75,9 +75,6 @@
 /* Define mask of which reference circuits are employed for DPTC */
 #define DPTC_DRCE_MASK (CCM_PMCR0_DRCE1 | CCM_PMCR0_DRCE3)
 
-/* When panicing, this working point is used */
-#define DPTC_PANIC_WP
-
 /* Due to a hardware bug in chip revisions < 2.0, when switching between
  * Serial and MCU PLLs, DVFS forces the target PLL to go into reset and
  * relock, only post divider frequency scaling is possible.

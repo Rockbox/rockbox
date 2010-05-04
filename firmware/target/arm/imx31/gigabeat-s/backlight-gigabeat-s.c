@@ -143,7 +143,7 @@ void _backlight_on(void)
         data[1] |= backlight_pwm_bits;
 
         /* Write regs within 30us of each other (requires single xfer) */
-        mc13783_write_regset(regs, data, 2);
+        mc13783_write_regs(regs, data, 2);
     }
 }
 
