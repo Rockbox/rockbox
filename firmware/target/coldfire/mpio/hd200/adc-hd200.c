@@ -40,7 +40,7 @@ volatile unsigned short adc_data[NUM_ADC_CHANNELS] IBSS_ATTR;
 void ADC(void) __attribute__ ((interrupt_handler,section(".icode")));
 void ADC(void)
 {
-    static unsigned char channel;
+    static unsigned int channel IBSS_ATTR;
     /* read current value */
     adc_data[(channel & 0x03)] = ADVALUE;
 
