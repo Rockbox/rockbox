@@ -534,11 +534,29 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
-
-#ifndef HAVE_MULTIDRIVE
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
         return -12;
+
+#ifndef BOOTLOADER
+    /*  Switch to to 4 bit widebus mode  */
+    if(sd_wait_for_state(drive, SD_TRAN) < 0)
+        return -13;
+    /* CMD55 */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_NO_RESP, NULL))
+        return -14;
+    /* ACMD6  */
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_NO_RESP, NULL))
+        return -15;
+    mci_delay();
+    /* CMD55 */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_NO_RESP, NULL))
+        return -16;
+    /* ACMD42  */
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_NO_RESP, NULL))
+        return -17;
+    /* Now that card is widebus make controller aware */
+    MCI_CTYPE |= (1<<drive);
 #endif
 
     card_info[drive].initialized = 1;
@@ -783,11 +801,9 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
     }
 
-#ifdef HAVE_MULTIDRIVE
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -13;
-#endif
+        return -18;
 
     last_disk_activity = current_tick;
     dma_retain();
@@ -875,12 +891,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     dma_release();
 
-#ifdef HAVE_MULTIDRIVE
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -14;
-#endif
+        return -19;
 
 #ifndef BOOTLOADER
     sd_enable(false);
