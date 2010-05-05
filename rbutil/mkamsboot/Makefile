@@ -38,7 +38,7 @@ all: $(OUTPUT)
 LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
 
 $(LIBUCL):
-	make -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
+	$(MAKE) -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
 
 # inputs
 LIBSOURCES := dualboot.c md5.c mkamsboot.c
