@@ -232,6 +232,10 @@ int button_read_device(void)
 
     CCU_IO &= ~(1<<12);
 
+    /* B1 is shared with FM i2c */
+    bool gpiob_pin0_dir = GPIOB_DIR & (1<<1);
+    GPIOB_DIR &= ~(1<<1);
+
     GPIOB_PIN(0) = 1<<0;
     udelay(4);
 
@@ -265,6 +269,9 @@ int button_read_device(void)
             hold_button = true;
         }
     }
+
+    if(gpiob_pin0_dir)
+        GPIOB_DIR |= 1<<1;
 
     CCU_IO |= 1<<12;
 

@@ -30,6 +30,7 @@
 #include "as3525.h"
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
+#include "system.h"
 
 #if     defined(SANSA_CLIP) || defined(SANSA_C200V2)
 #define I2C_SCL_GPIO(x) GPIOB_PIN(x)
@@ -62,6 +63,14 @@
 #define I2C_SDA_GPIO_DIR GPIOA_DIR
 #define I2C_SCL_PIN 6
 #define I2C_SDA_PIN 7
+
+#elif   defined(SANSA_FUZEV2)
+#define I2C_SCL_GPIO(x) GPIOB_PIN(x)
+#define I2C_SDA_GPIO(x) GPIOA_PIN(x)
+#define I2C_SCL_GPIO_DIR GPIOB_DIR
+#define I2C_SDA_GPIO_DIR GPIOA_DIR
+#define I2C_SCL_PIN 1
+#define I2C_SDA_PIN 0
 
 #else
 #error no FM I2C GPIOPIN defines
@@ -158,13 +167,28 @@ void fmradio_i2c_init(void)
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
-    return i2c_write_data(fm_i2c_bus, address, -1, buf, count);
+#ifdef SANSA_FUZEV2
+    int s = disable_irq_save();
+    CCU_IO &= ~(1<<12);
+#endif
+    int ret = i2c_write_data(fm_i2c_bus, address, -1, buf, count);
+#ifdef SANSA_FUZEV2
+    CCU_IO |= 1<<12;
+    restore_irq(s);
+#endif
+    return ret;
 }
 
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
-    return i2c_read_data(fm_i2c_bus, address, -1, buf, count);
+#ifdef SANSA_FUZEV2
+    int s = disable_irq_save();
+    CCU_IO &= ~(1<<12);
+#endif
+    int ret = i2c_read_data(fm_i2c_bus, address, -1, buf, count);
+#ifdef SANSA_FUZEV2
+    CCU_IO |= 1<<12;
+    restore_irq(s);
+#endif
+    return ret;
 }
-
-
-
