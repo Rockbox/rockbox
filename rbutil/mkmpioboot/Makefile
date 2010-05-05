@@ -50,7 +50,7 @@ $(OBJDIR)%.o: %.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-libmkamsboot$(RBARCH).a: $(LIBOBJS)
+libmkmpioboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
 	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
 
