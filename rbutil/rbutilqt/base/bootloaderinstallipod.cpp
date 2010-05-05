@@ -232,7 +232,7 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
             return false;
         }
 #if defined(Q_OS_WIN32)
-        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i", diskname.toInt());
+        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i", devicename.toInt());
 #elif defined(Q_OS_MACX)
         sprintf(ipod->diskname, "%s",
             qPrintable(devicename.remove(QRegExp("s[0-9]+$"))));
