@@ -22,6 +22,8 @@
 #ifndef POWERMGMT_TARGET_H
 #define POWERMGMT_TARGET_H
 
+#include "config.h"
+
 #if defined(SANSA_CLIP) \
     || defined(SANSA_CLIPV2)    /* FIXME */ \
     || defined(SANSA_CLIPPLUS)  /* FIXME */
@@ -32,15 +34,6 @@
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_100MA
 #define CHARGER_TOTAL_TIMER (6*3600*2)  /* about 1.5 * capacity / current */
-#if defined(SANSA_CLIP)
-#define ADC_BATTERY         ADC_BVDD
-#else
-/* ADC_CHG_IN seems to represent battery voltage better than ADC_BVDD during
- * charging (ADC_BVDD is way too high) and appears the same in normal use.
- * Note that when charging some models do not give an accurate reading but jump
- * between 2 values. */
-#define ADC_BATTERY         ADC_CHG_IN
-#endif
 
 #elif defined(SANSA_E200V2)
 
@@ -50,7 +43,6 @@
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_300MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)
-#define ADC_BATTERY         ADC_BVDD
 
 #elif defined(SANSA_FUZE) || defined(SANSA_FUZEV2) /* FIXME */
 
@@ -60,7 +52,6 @@
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_200MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)
-#define ADC_BATTERY         ADC_BVDD
 
 #elif defined(SANSA_C200V2)
 
@@ -70,7 +61,6 @@
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_200MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)
-#define ADC_BATTERY         ADC_BVDD
 
 #else
 #error "Charger settings not defined!"
@@ -84,5 +74,15 @@ void charging_algorithm_close(void);
 #define HAVE_RESET_BATTERY_FILTER
 
 #define BATT_AVE_SAMPLES 32
+
+#if CONFIG_CPU == AS3525
+#define ADC_BATTERY         ADC_BVDD
+#else /* AS3525v2 */
+/* ADC_CHG_IN seems to represent battery voltage better than ADC_BVDD during
+ * charging (ADC_BVDD is way too high) and appears the same in normal use.
+ * Note that when charging some models do not give an accurate reading but jump
+ * between 2 values. */
+#define ADC_BATTERY         ADC_CHG_IN
+#endif /* CONFIG_CPU */
 
 #endif /*  POWERMGMT_TARGET_H */
