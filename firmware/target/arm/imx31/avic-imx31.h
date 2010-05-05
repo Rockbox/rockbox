@@ -218,33 +218,30 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype);
 #define AVIC_NIL_ENABLE  0x1f
 void avic_set_ni_level(unsigned int level);
 
+
 /* Call a service routine while allowing preemption by interrupts of higher
  * priority. r4-r7 must be preserved for epilogue code to restore context. */
-#define AVIC_NESTED_NI_CALL_PROLOGUE() \
+#define AVIC_NESTED_NI_CALL_PROLOGUE(prio) \
 ({ asm volatile ( \
         "sub    lr, lr, #4               \n" /* prepare return address */ \
-        "stmfd  sp!, { r0-r7, r12, lr }  \n" /* preserve return context */ \
+        "srsdb  #0x12!                   \n" /* save LR_irq and SPSR_irq */ \
+        "stmfd  sp!, { r0-r3, r12 }      \n" /* preserve context */ \
         "mov    r0, #0x68000000          \n" /* AVIC_BASE_ADDR */ \
-        "mrs    r4, spsr                 \n" /* save SPSR_irq */ \
-        "ldr    r5, [r0, #0x04]          \n" /* save NIMASK */ \
-        "ldr    r1, [r0, #0x40]          \n" /* load NIVECSR */ \
-        "mov    r2, sp                   \n" /* remember IRQ stack to use in call */ \
-        "str    r1, [r0, #0x04]          \n" /* copy NIVECSR to NIMASK */ \
-        "cps    #0x13                    \n" /* switch to SVC mode (+ unmask IRQ) */ \
-        "mov    r6, sp                   \n" /* save SP_svc */ \
-        "mov    r7, lr                   \n" /* save LR_svc */ \
-        "mov    sp, r2                   \n" /* switch to SP_irq */ \
-        ); })
+        "mov    r1, %0                   \n" /* load interrupt level */ \
+        "ldr    r2, [r0, #0x04]          \n" /* save NIMASK */ \
+        "str    r1, [r0, #0x04]          \n" /* set interrupt level */ \
+        "cpsie  i, #0x13                 \n" /* change to SVC mode, unmask IRQ */ \
+        "stmfd  sp!, { r2, lr }          \n" /* push NIMASK and LR on SVC stack */ \
+        : : "i"(prio)); })
 
 #define AVIC_NESTED_NI_CALL_EPILOGUE() \
 ({ asm volatile ( \
-        "mov    sp, r6                   \n" /* restore SP_svc */ \
-        "mov    lr, r7                   \n" /* restore LR_svc */  \
-        "cps    #0x12                    \n" /* return to IRQ mode (+ mask IRQ) */ \
+        "ldmfd  sp!, { r2, lr }          \n" /* pop original LR and NIMASK */ \
+        "cpsid  i, #0x12                 \n" /* return to IRQ mode, mask IRQ */ \
         "mov    r0, #0x68000000          \n" /* AVIC BASE ADDR */ \
-        "msr    spsr_cxsf, r4            \n" /* restore SPSR_irq */ \
-        "str    r5, [r0, #0x04]          \n" /* restore NIMASK */ \
-        "ldmfd  sp!, { r0-r7, r12, pc }^ \n" /* reload context and return */ \
+        "str    r2, [r0, #0x04]          \n" /* restore NIMASK */ \
+        "ldmfd  sp!, { r0-r3, r12 }      \n" /* reload context */ \
+        "rfefd  sp!                      \n" /* move stacked SPSR to CPSR, return */ \
         ); })
 
 #endif /* AVIC_IMX31_H */
