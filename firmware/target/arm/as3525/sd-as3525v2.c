@@ -840,8 +840,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
         }
 
-        MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
-
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
             arg *= SD_BLOCK_SIZE;
@@ -853,6 +851,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
+        MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
         MCI_CTRL |= DMA_ENABLE;
 
         unsigned long dummy; /* if we don't ask for a response, writing fails */
