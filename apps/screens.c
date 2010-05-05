@@ -49,7 +49,6 @@
 #include "splash.h"
 #include "statusbar.h"
 #include "screen_access.h"
-#include "pcmbuf.h"
 #include "list.h"
 #include "yesno.h"
 #include "backdrop.h"
