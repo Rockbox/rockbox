@@ -55,6 +55,7 @@ enum wps_token_type {
     /* Viewport display */
     WPS_VIEWPORT_ENABLE,
     WPS_VIEWPORT_CUSTOMLIST,
+    WPS_TOKEN_UIVIEWPORT_ENABLE,
     
     /* Battery */
   TOKEN_MARKER_BATTERY,

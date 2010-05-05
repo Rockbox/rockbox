@@ -775,6 +775,10 @@ static bool get_line(struct gui_wps *gwps,
                 }
             }
                 break;
+            case WPS_TOKEN_UIVIEWPORT_ENABLE:
+                    sb_set_info_vp(gwps->display->screen_type, 
+                                   data->tokens[i].value.i|VP_INFO_LABEL);
+                break;
 #ifdef HAVE_LCD_BITMAP
             case WPS_VIEWPORT_CUSTOMLIST:
                 draw_playlist_viewer_list(gwps, data->tokens[i].value.data);

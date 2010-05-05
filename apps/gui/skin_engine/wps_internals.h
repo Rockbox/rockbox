@@ -203,7 +203,7 @@ struct skin_line {
 #define VP_NEVER_VISIBLE    0x8
 #define VP_DEFAULT_LABEL    '|'
 #define VP_NO_LABEL         '-'
-#define VP_INFO_LABEL       '_'
+#define VP_INFO_LABEL       0x80
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct skin_line *lines;

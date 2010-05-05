@@ -370,6 +370,8 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC,
                                                     parse_viewport_display },
+    { WPS_TOKEN_UIVIEWPORT_ENABLE,        "VI",  WPS_REFRESH_STATIC,
+                                                    parse_viewport_display },
 #ifdef HAVE_LCD_BITMAP
     { WPS_VIEWPORT_CUSTOMLIST,            "Vp",  WPS_REFRESH_STATIC, parse_playlistview },
     { WPS_TOKEN_LIST_TITLE_TEXT,          "Lt",  WPS_REFRESH_DYNAMIC, NULL },
@@ -915,9 +917,25 @@ static int parse_viewport(const char *wps_bufptr,
 
     if (*ptr == 'i')
     {
-        skin_vp->label = VP_INFO_LABEL;
-        skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-        ++ptr;
+        if (*(ptr+1) == '|')
+        {
+            char label = *(ptr+2);
+            if (label >= 'a' && label <= 'z')
+            {
+                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
+                skin_vp->label = VP_INFO_LABEL|label;
+                ptr += 3;
+            }
+            else
+            {
+                skin_vp->label = VP_INFO_LABEL|VP_DEFAULT_LABEL;
+                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
+                ++ptr;            
+            }
+        }
+        else
+            return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+        
     }
     else if (*ptr == 'l')
     {

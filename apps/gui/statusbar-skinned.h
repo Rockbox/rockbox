@@ -36,6 +36,7 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile);
 
 void sb_create_from_settings(enum screen_type screen);
 void sb_skin_init(void) INIT_ATTR;
+void sb_set_info_vp(enum screen_type screen, char label);
 struct viewport *sb_skin_get_info_vp(enum screen_type screen);
 void sb_skin_update(enum screen_type screen, bool force);
 
