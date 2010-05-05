@@ -173,18 +173,21 @@ void audiohw_preinit(void)
     /* Turn on SUM, DAC */
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_SUM_on);
 
-    /* Set BIAS on, DITH on, AGC on, IBR_DAC max, LSP_LP on, IBR_LSP min */
-    as3514_write(AS3514_AUDIOSET2,
-                 AUDIOSET2_IBR_DAC_0 | AUDIOSET2_LSP_LP |
-                 AUDIOSET2_IBR_LSP_50);
+    /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on, 
+       IBR_LSP max reduction (50%), taken from c200v2 OF
+     */
+    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_IBR_LSP_50 | AUDIOSET2_LSP_LP |
+            AUDIOSET2_IBR_DAC_50 | AUDIOSET2_AGC_off |AUDIOSET2_DITH_off );
 
 /* AMS Sansas based on the AS3525 need HPCM enabled, otherwise they output the
    L-R signal on both L and R headphone outputs instead of normal stereo.
    Turning it off saves a little power on targets that don't need it. */
 #if (CONFIG_CPU == AS3525)
-    /* Set HPCM on, ZCU on */
-    as3514_write(AS3514_AUDIOSET3, 0);
+    /* Set HPCM on, ZCU off, reduce bias current, settings taken from c200v2 OF
+     */
+    as3514_write(AS3514_AUDIOSET3, AUDIOSET3_IBR_HPH | AUDIOSET3_ZCU_off);
 #else
+    /* TODO: check if AS3525 settings save power on e200v1 or as3525v2 */
     /* Set HPCM off, ZCU on */
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
 #endif
