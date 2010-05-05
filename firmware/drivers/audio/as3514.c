@@ -173,11 +173,13 @@ void audiohw_preinit(void)
     /* Turn on SUM, DAC */
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_SUM_on);
 
+#ifndef HAVE_AS3543
     /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on, 
        IBR_LSP max reduction (50%), taken from c200v2 OF
      */
     as3514_write(AS3514_AUDIOSET2, AUDIOSET2_IBR_LSP_50 | AUDIOSET2_LSP_LP |
-            AUDIOSET2_IBR_DAC_50 | AUDIOSET2_AGC_off |AUDIOSET2_DITH_off );
+            AUDIOSET2_IBR_DAC_50 | AUDIOSET2_AGC_off | AUDIOSET2_DITH_off );
+#endif
 
 /* AMS Sansas based on the AS3525 need HPCM enabled, otherwise they output the
    L-R signal on both L and R headphone outputs instead of normal stereo.
