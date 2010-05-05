@@ -32,26 +32,34 @@
 #include "fmradio_i2c.h"
 
 #if     defined(SANSA_CLIP) || defined(SANSA_C200V2)
-#define I2C_GPIO(x) GPIOB_PIN(x)
-#define I2C_GPIO_DIR GPIOB_DIR
+#define I2C_SCL_GPIO(x) GPIOB_PIN(x)
+#define I2C_SDA_GPIO(x) GPIOB_PIN(x)
+#define I2C_SCL_GPIO_DIR GPIOB_DIR
+#define I2C_SDA_GPIO_DIR GPIOB_DIR
 #define I2C_SCL_PIN 4
 #define I2C_SDA_PIN 5
 
 #elif     defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
-#define I2C_GPIO(x) GPIOB_PIN(x)
-#define I2C_GPIO_DIR GPIOB_DIR
+#define I2C_SCL_GPIO(x) GPIOB_PIN(x)
+#define I2C_SDA_GPIO(x) GPIOB_PIN(x)
+#define I2C_SCL_GPIO_DIR GPIOB_DIR
+#define I2C_SDA_GPIO_DIR GPIOB_DIR
 #define I2C_SCL_PIN 6
 #define I2C_SDA_PIN 7
 
 #elif   defined(SANSA_M200V4)
-#define I2C_GPIO(x) GPIOD_PIN(x)
-#define I2C_GPIO_DIR GPIOD_DIR
+#define I2C_SCL_GPIO(x) GPIOD_PIN(x)
+#define I2C_SDA_GPIO(x) GPIOD_PIN(x)
+#define I2C_SCL_GPIO_DIR GPIOD_DIR
+#define I2C_SDA_GPIO_DIR GPIOD_DIR
 #define I2C_SCL_PIN 7
 #define I2C_SDA_PIN 6
 
 #elif   defined(SANSA_FUZE) || defined(SANSA_E200V2)
-#define I2C_GPIO(x) GPIOA_PIN(x)
-#define I2C_GPIO_DIR GPIOA_DIR
+#define I2C_SCL_GPIO(x) GPIOA_PIN(x)
+#define I2C_SDA_GPIO(x) GPIOA_PIN(x)
+#define I2C_SCL_GPIO_DIR GPIOA_DIR
+#define I2C_SDA_GPIO_DIR GPIOA_DIR
 #define I2C_SCL_PIN 6
 #define I2C_SDA_PIN 7
 
@@ -63,52 +71,52 @@ static int fm_i2c_bus;
 
 static void fm_scl_hi(void)
 {
-    I2C_GPIO(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
+    I2C_SCL_GPIO(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
 }
 
 static void fm_scl_lo(void)
 {
-    I2C_GPIO(I2C_SCL_PIN) = 0;
+    I2C_SCL_GPIO(I2C_SCL_PIN) = 0;
 }
 
 static void fm_sda_hi(void)
 {
-    I2C_GPIO(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
+    I2C_SDA_GPIO(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
 }
 
 static void fm_sda_lo(void)
 {
-    I2C_GPIO(I2C_SDA_PIN) = 0;
+    I2C_SDA_GPIO(I2C_SDA_PIN) = 0;
 }
 
 static void fm_sda_input(void)
 {
-    I2C_GPIO_DIR &= ~(1 << I2C_SDA_PIN);
+    I2C_SDA_GPIO_DIR &= ~(1 << I2C_SDA_PIN);
 }
 
 static void fm_sda_output(void)
 {
-    I2C_GPIO_DIR |= 1 << I2C_SDA_PIN;
+    I2C_SDA_GPIO_DIR |= 1 << I2C_SDA_PIN;
 }
 
 static void fm_scl_input(void)
 {
-    I2C_GPIO_DIR &= ~(1 << I2C_SCL_PIN);
+    I2C_SCL_GPIO_DIR &= ~(1 << I2C_SCL_PIN);
 }
 
 static void fm_scl_output(void)
 {
-    I2C_GPIO_DIR |= 1 << I2C_SCL_PIN;
+    I2C_SCL_GPIO_DIR |= 1 << I2C_SCL_PIN;
 }
 
 static int fm_sda(void)
 {
-    return I2C_GPIO(I2C_SDA_PIN);
+    return I2C_SDA_GPIO(I2C_SDA_PIN);
 }
 
 static int fm_scl(void)
 {
-    return I2C_GPIO(I2C_SCL_PIN);
+    return I2C_SCL_GPIO(I2C_SCL_PIN);
 }
 
 /* simple and crude delay, used for all delays in the generic i2c driver */
