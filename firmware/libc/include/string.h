@@ -13,8 +13,6 @@ extern "C" {
 
 #include "_ansi.h"
 
-#include <stddef.h>
-
 #if !defined(__size_t_defined)&& !defined(_SIZE_T_) && !defined(size_t) && !defined(_SIZE_T_DECLARED)
 #define __size_t_defined
 #define _SIZE_T
