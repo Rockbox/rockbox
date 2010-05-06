@@ -21,7 +21,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include <sprintf.h>
+#include <stdio.h>
 #include "debug.h"
 #include "storage.h"
 #include "adc.h"

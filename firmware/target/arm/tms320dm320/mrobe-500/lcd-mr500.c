@@ -22,6 +22,7 @@
  *
  ****************************************************************************/
 
+#include <sys/types.h>
 #include "config.h"
 #include "cpu.h"
 #include "string.h"

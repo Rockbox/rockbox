@@ -18,12 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
 #include "config.h"
 #ifdef HAVE_LCD_CHARCELLS
 
 #include <lcd.h>
 #include <kernel.h>
-#include <sprintf.h>
 #include <string.h>
 #include <debug.h>
 

@@ -18,6 +18,7 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
+#include <sys/types.h>
 #include "config.h"
 
 #include "hwcompat.h"

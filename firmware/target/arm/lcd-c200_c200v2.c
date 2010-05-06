@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "inttypes.h"
+#include <sys/types.h>
 
 #include "config.h"
 #include "cpu.h"
