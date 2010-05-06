@@ -2835,7 +2835,7 @@ else
    GCCOPTS="$GCCOPTS -Wno-pointer-sign"
  fi
 
- if test "$gccnum" -ge "401"; then
+ if test "$gccnum" -ge "400"; then
    # this is a lame hack to avoid "warning: dereferencing type-punned pointer
    # will break strict-aliasing rules"
 
