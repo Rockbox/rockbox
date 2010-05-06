@@ -72,7 +72,9 @@ void kernel_device_init(void)
     mc13783_init();
     dvfs_dptc_init();
     dvfs_wfi_monitor(true); /* Monitor the WFI signal */
+#ifndef BOOTLOADER
     dvfs_dptc_start(); /* Should be ok to start even so early */
+#endif
 }
 
 void tick_stop(void)
