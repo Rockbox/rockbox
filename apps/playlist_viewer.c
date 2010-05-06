@@ -24,7 +24,6 @@
  * multi-screen support, rewrote a lot of code
  */
 #include <string.h>
-#include <sprintf.h>
 #include "playlist.h"
 #include "audio.h"
 #include "screens.h"

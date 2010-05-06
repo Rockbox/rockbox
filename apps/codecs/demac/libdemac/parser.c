@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #ifndef ROCKBOX
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+#include "inttypes.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>

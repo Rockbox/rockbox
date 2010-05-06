@@ -7,9 +7,12 @@ extern off_t my_ftell(int);
 extern void *my_malloc(size_t size);
 
 
+#undef getc
 #define getc my_getc
-#define malloc my_malloc
-#define ftell my_ftell
+#undef putc
 #define putc my_putc
+#undef ftell
+#define ftell my_ftell
+#define malloc my_malloc
 
 #endif /* HELPERS_H */

@@ -63,7 +63,7 @@ static const int index_tables[4][16] ICONST_ATTR = {
 };
 
 static int32_t pcmdata[2];
-static int8_t index[2];
+static int8_t indices[2];
 
 static int adpcm_data_size;
 static uint8_t step_mask;
@@ -107,7 +107,7 @@ void set_decode_parameters(int channels, int32_t *init_pcmdata, int8_t *init_ind
     for (ch = 0; ch < channels; ch++)
     {
         pcmdata[ch] = init_pcmdata[ch];
-        index[ch] = init_index[ch];
+        indices[ch] = init_index[ch];
     }
 }
 
@@ -121,7 +121,7 @@ int16_t create_pcmdata(int ch, uint8_t nibble)
 {
     int check_bit = 1 << step_shift;
     int32_t delta = 0;
-    int16_t step = step_table[index[ch]];
+    int16_t step = step_table[indices[ch]];
 
     do {
         if (nibble & check_bit)
@@ -136,8 +136,8 @@ int16_t create_pcmdata(int ch, uint8_t nibble)
     else
         pcmdata[ch] += delta;
 
-    index[ch] += use_index_table[nibble & step_mask];
-    CLIP(index[ch], 0, 88);
+    indices[ch] += use_index_table[nibble & step_mask];
+    CLIP(indices[ch], 0, 88);
 
     CLIP(pcmdata[ch], -32768, 32767);
 
@@ -150,7 +150,7 @@ int16_t create_pcmdata(int ch, uint8_t nibble)
 int16_t create_pcmdata_size4(int ch, uint8_t nibble)
 {
     int32_t delta;
-    int16_t step = step_table[index[ch]];
+    int16_t step = step_table[indices[ch]];
 
     delta = (step >> 3);
     if (nibble & 4) delta += step;
@@ -162,8 +162,8 @@ int16_t create_pcmdata_size4(int ch, uint8_t nibble)
     else
         pcmdata[ch] += delta;
 
-    index[ch] += use_index_table[nibble & 0x07];
-    CLIP(index[ch], 0, 88);
+    indices[ch] += use_index_table[nibble & 0x07];
+    CLIP(indices[ch], 0, 88);
 
     CLIP(pcmdata[ch], -32768, 32767);
 

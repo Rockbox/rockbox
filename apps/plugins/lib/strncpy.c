@@ -39,6 +39,7 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
+#include "plugin.h"
 
 /*SUPPRESS 560*/
 /*SUPPRESS 530*/

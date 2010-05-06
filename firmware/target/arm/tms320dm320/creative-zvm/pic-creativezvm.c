@@ -26,7 +26,6 @@
 #include "kernel.h"
 #include "button-target.h"
 #include "i2c-dm320.h"
-#include "sprintf.h"
 #include "logf.h"
 
 #ifdef BUTTON_DEBUG

@@ -23,9 +23,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include <stdlib.h> /* for ABS() */
+#include <stdlib.h> /* for abs() */
 #include "config.h"
-#include "sprintf.h"
 #include "action.h"
 #include "dsp.h"
 #include "sound.h"
@@ -248,10 +247,10 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             /* Pitch:XXX.X% */
             if(global_settings.pitch_mode_semitone)
             {
-                snprintf(buf, sizeof(buf), "%s: %s%ld.%02ld", str(LANG_PITCH),
+                snprintf(buf, sizeof(buf), "%s: %s%d.%02d", str(LANG_PITCH),
                          semitone >= 0 ? "+" : "-",
-                         ABS(semitone / PITCH_SPEED_PRECISION), 
-                         ABS((semitone % PITCH_SPEED_PRECISION) / 
+                         abs(semitone / PITCH_SPEED_PRECISION), 
+                         abs((semitone % PITCH_SPEED_PRECISION) / 
                                          (PITCH_SPEED_PRECISION / 100))
                         );
             }
@@ -290,10 +289,10 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         if(global_settings.pitch_mode_semitone)
         {
-            snprintf(buf, sizeof(buf), "%s%ld.%02ld",
+            snprintf(buf, sizeof(buf), "%s%d.%02d",
                      semitone >= 0 ? "+" : "-",
-                     ABS(semitone / PITCH_SPEED_PRECISION), 
-                     ABS((semitone % PITCH_SPEED_PRECISION) / 
+                     abs(semitone / PITCH_SPEED_PRECISION), 
+                     abs((semitone % PITCH_SPEED_PRECISION) / 
                                      (PITCH_SPEED_PRECISION / 100))
                     );
         }

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
-#include <string.h>
+#include "string-extra.h"
 #include "file.h"
 #include "buffer.h"
 #include "system.h"

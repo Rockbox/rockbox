@@ -34,7 +34,6 @@
 #include "settings.h"
 #include "status.h"
 #include "playlist.h"
-#include "sprintf.h"
 #include "kernel.h"
 #include "power.h"
 #include "system.h"

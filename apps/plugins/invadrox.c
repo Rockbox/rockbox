@@ -81,6 +81,10 @@ PLUGIN_HEADER
 #define DBG(format, arg...) {}
 #endif
 
+#ifndef ABS
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+#endif
+
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 
 #define QUIT BUTTON_OFF

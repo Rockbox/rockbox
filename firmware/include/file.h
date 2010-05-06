@@ -23,6 +23,7 @@
 #define _FILE_H_
 
 #include <sys/types.h>
+#include "_ansi.h"
 
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
@@ -94,5 +95,5 @@ extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
-
+int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 #endif

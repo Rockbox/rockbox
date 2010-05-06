@@ -855,7 +855,7 @@ bool disk_buf_init(void)
     disk_buf.pos_last = 0;
     disk_buf.low_wm = DISK_BUF_LOW_WATERMARK;
 
-    disk_buf.start = mpeg_malloc_all(&disk_buf.size, MPEG_ALLOC_DISKBUF);
+    disk_buf.start = mpeg_malloc_all((size_t*)&disk_buf.size, MPEG_ALLOC_DISKBUF);
     if (disk_buf.start == NULL)
         return false;
 

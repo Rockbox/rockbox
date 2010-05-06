@@ -44,7 +44,7 @@
 #include "d_think.h"
 #include "w_wad.h"
 
-#include "sscanf.h"
+#include <stdio.h> /* sscanf */
 #include "rockmacros.h"
 
 #define TRUE 1

@@ -18,8 +18,8 @@
 * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 * KIND, either express or implied.
 *
-****************************************************************************/
-#include <sys/types.h>
+****************************************************************************/ 
+#include <sys/types.h> /* off_t */
 
 #include "config.h"
 #include "system.h"

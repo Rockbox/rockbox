@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <string.h>
+#include "string-extra.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include "debug.h"

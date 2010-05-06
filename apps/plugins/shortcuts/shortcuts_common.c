@@ -35,7 +35,7 @@
 
 /* Memory (will be used for entries) */
 void *memory_buf;
-long memory_bufsize; /* Size of memory_buf in bytes */
+size_t memory_bufsize; /* Size of memory_buf in bytes */
 
 
 /* The file we're processing */

@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <sys/types.h>
 #include "system.h"
 #include "thread.h"
 #include "voice_thread.h"

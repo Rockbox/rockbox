@@ -19,9 +19,9 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "string-extra.h"
 #include "config.h"
 #include "appevents.h"
 #include "menu.h"

@@ -68,15 +68,14 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdlib.h>      
+#include <ctype.h>                      
+#include "string-extra.h"
 #include "playlist.h"
 #include "ata_idle_notify.h"
 #include "file.h"
 #include "action.h"
 #include "dir.h"
-#include "sprintf.h"
 #include "debug.h"
 #include "audio.h"
 #include "lcd.h"

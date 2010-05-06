@@ -1359,7 +1359,7 @@ int load_image(char *filename, struct image_info *info,
 
     } else {
         if (!running_slideshow) {
-            rb->snprintf(print, sizeof(print), "loading %lu bytes", image_size);
+            rb->snprintf(print, sizeof(print), "loading %zu bytes", image_size);
             rb->lcd_puts(0, 1, print);
             rb->lcd_update();
         }

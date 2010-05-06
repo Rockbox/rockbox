@@ -24,7 +24,6 @@
 #include "lcd-remote.h"
 #include "thread.h"
 #include "kernel.h"
-#include "sprintf.h"
 #include "button.h"
 #include "file.h"
 #include "audio.h"

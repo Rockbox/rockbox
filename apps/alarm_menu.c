@@ -25,7 +25,6 @@
 #include "lcd.h"
 #include "action.h"
 #include "kernel.h"
-#include "sprintf.h"
 #include <string.h>
 #include "settings.h"
 #include "power.h"

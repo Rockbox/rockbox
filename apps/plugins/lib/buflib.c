@@ -23,8 +23,8 @@
 *
 ****************************************************************************/
 
+#include <stdlib.h> /* for abs() */
 #include "buflib.h"
-
 /* The main goal of this design is fast fetching of the pointer for a handle.
  * For that reason, the handles are stored in a table at the end of the buffer
  * with a fixed address, so that returning the pointer for a handle is a simple
@@ -311,7 +311,7 @@ buflib_free(struct buflib_context *ctx, int handle_num)
     while (next_block < freed_block)
     {
         block = next_block;
-        next_block += ABS(block->val);
+        next_block += abs(block->val);
     }
     /* If next_block == block, the above loop didn't go anywhere. If it did,
      * and the block before this one is empty, we can combine them.

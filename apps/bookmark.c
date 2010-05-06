@@ -342,7 +342,7 @@ static char* create_bookmark()
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
 #if CONFIG_CODEC == SWCODEC
-             ">%d;%d;%ld;%d;%ld;%d;%d;%d;%d;%s;%s",
+             ">%d;%d;%ld;%d;%ld;%d;%d;%ld;%ld;%s;%s",
 #else
              ">%d;%d;%ld;%d;%ld;%d;%d;%s;%s",
 #endif
@@ -360,8 +360,8 @@ static char* create_bookmark()
              global_settings.playlist_shuffle,
              /* ...and their values should go here */
 #if CONFIG_CODEC == SWCODEC
-             sound_get_pitch(),
-             dsp_get_timestretch(),
+             (long)sound_get_pitch(),
+             (long)dsp_get_timestretch(),
 #endif
              /* more mandatory tokens */
              playlist_get_name(NULL, global_temp_buffer,

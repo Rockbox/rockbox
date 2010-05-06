@@ -19,17 +19,18 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
+#include "config.h"
 #include <lcd.h>
 #include <lcd-remote.h>
 #include <scroll_engine.h>
-#include "backlight.h"
 #include <font.h>
 #include <button.h>
-#include <sprintf.h>
 #include <settings.h>
 #include <kernel.h>
 #include <icons.h>
 
+#include "backlight.h"
 #include "screen_access.h"
 #include "backdrop.h"
 

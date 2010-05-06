@@ -18,9 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <string.h>
 #include <inttypes.h>
 
+#include "string-extra.h"
 #include "system.h"
 #include "metadata.h"
 #include "metadata_common.h"

@@ -13,7 +13,7 @@ DOOMBUILDDIR := $(BUILDDIR)/apps/plugins/doom
 ROCKS += $(DOOMBUILDDIR)/doom.rock
 
 DOOM_SRC := $(call preprocess, $(DOOMSRCDIR)/SOURCES)
-DOOM_SRC += $(ROOTDIR)/firmware/common/sscanf.c
+DOOM_SRC += $(ROOTDIR)/firmware/libc/sscanf.c
 DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
 
 # add source files to OTHER_SRC to get automatic dependencies

@@ -15,9 +15,10 @@ SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 # to genlang and thus (translated) phrases can be used based on those names.
 # button.h is included for the HAS_BUTTON_HOLD define.
 #
-# Kludge: depends on ctype.o only to depend on config-*.h ...
+# Kludge: depends on config.o which only depends on config-*.h to have config.h
+# changes trigger a genlang re-run
 #
-features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)/features.txt $(BUILDDIR)/firmware/common/ctype.o
+features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/config.o
 	$(SILENT)mkdir -p $(BUILDDIR)/apps
 	$(SILENT)mkdir -p $(BUILDDIR)/lang
 	$(call PRINTS,PP $(<F))

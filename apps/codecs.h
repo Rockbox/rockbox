@@ -31,8 +31,10 @@
 #define MEM 2
 #endif
 
+#include <_ansi.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "strlcpy.h"
 #include "config.h"
 #include "system.h"
 #include "metadata.h"

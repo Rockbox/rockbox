@@ -185,7 +185,7 @@ typedef float float32_t;
 
 #include <stdio.h>
 #ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
+# include "inttypes.h"
 #endif
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>

@@ -21,7 +21,7 @@
 #ifndef ZXMISC_H
 #define ZXMISC_H
 
-#include <sys/types.h>
+#include <string.h> /* size_t */
 
 extern char *get_base_name(char *fname);
 extern int   check_ext(const char *filename, const char *ext);

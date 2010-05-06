@@ -49,7 +49,6 @@
 #include "status.h"
 #include "debug_menu.h"
 #include "version.h"
-#include "sprintf.h"
 #include "font.h"
 #include "language.h"
 #include "wps.h"

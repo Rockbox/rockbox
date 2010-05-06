@@ -37,9 +37,12 @@
 /*
  * we need functions for character io
  */
-extern int ungetc(int c, int f);
-extern int fgetc(int f);
-extern int fputc(int c, int f);
+extern int frotz_ungetc(int c, int f);
+#define ungetc frotz_ungetc
+extern int frotz_fgetc(int f);
+#define fgetc frotz_fgetc
+extern int frotz_fputc(int c, int f);
+#define fputc frotz_fputc
 
 /*
  * this is used instead of os_read_key for more prompts and the like

@@ -21,7 +21,6 @@
 #ifndef CODEC_LIBPCM_IMA_ADPCM_COMMON_H
 #define CODEC_LIBPCM_IMA_ADPCM_COMMON_H
 
-#include <sys/types.h>
 #include <stdbool.h>
 #include <inttypes.h>
 

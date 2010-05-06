@@ -20,7 +20,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "ctype.h"
+#include <ctype.h>
 
 PLUGIN_HEADER
 

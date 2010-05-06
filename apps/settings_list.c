@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include <stdbool.h>
-#include <string.h>
+#include "string-extra.h"
 #include "system.h"
 #include "storage.h"
 #include "lang.h"

@@ -19,10 +19,8 @@
  *
  ****************************************************************************/
 
-#ifndef __INTTYPES_H__
-#define __INTTYPES_H__
-
-#ifndef WPSEDITOR
+#ifndef __STDINT_H__
+#define __STDINT_H__
 
 #include <limits.h>
 
@@ -105,8 +103,5 @@
 #define uint64_t    unsigned long long
 
 #endif
-#else
-#include <stdint.h>
-#endif /* !WPSEDITOR*/
 
-#endif /* __INTTYPES_H__ */
+#endif /* __STDINT_H__ */

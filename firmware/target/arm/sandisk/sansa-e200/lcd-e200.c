@@ -22,7 +22,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <sys/types.h>
+#include <sys/types.h> /* off_t */
 #include <string.h>
 #include "cpu.h"
 #include "system.h"

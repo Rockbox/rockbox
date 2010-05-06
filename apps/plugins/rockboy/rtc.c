@@ -7,7 +7,6 @@
 #include "defs.h"
 #include "mem.h"
 #include "rtc-gb.h"
-#include "sscanf.h"
 
 struct rtc rtc;
 

@@ -23,8 +23,8 @@ Audioscrobbler spec at:
 http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 */
 
+#include <stdio.h>
 #include "file.h"
-#include "sprintf.h"
 #include "logf.h"
 #include "metadata.h"
 #include "kernel.h"

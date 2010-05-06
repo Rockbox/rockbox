@@ -51,7 +51,7 @@ typedef struct sc_file_s
 
 
 extern void *memory_buf;
-extern long memory_bufsize;
+extern size_t memory_bufsize;
 
 
 extern sc_file_t sc_file;

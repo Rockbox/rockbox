@@ -1762,7 +1762,7 @@ bool recording_screen(bool no_source)
                    draw attention */
                 /* Don't use language string unless agreed upon to make this
                    method permanent - could do something in the statusbar */
-                snprintf(buf, sizeof(buf), "Warning: %08X",
+                snprintf(buf, sizeof(buf), "Warning: %08lX",
                          pcm_rec_get_warnings());
             }
             else
@@ -1771,7 +1771,7 @@ bool recording_screen(bool no_source)
                 (global_settings.rec_split_method))
             {
                 dmb = dsize/1024/1024;
-                snprintf(buf, sizeof(buf), "%s %dMB",
+                snprintf(buf, sizeof(buf), "%s %luMB",
                          str(LANG_SPLIT_SIZE), dmb);
             }
             else

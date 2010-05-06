@@ -17,6 +17,10 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
+ 
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 #include "zxmisc.h"
 #include "spconf_p.h"
 #include "interf.h"
@@ -26,11 +30,7 @@
 #include "snapshot.h"   /* for SN_Z80  and SN_SNA  */
 #include "tapefile.h"   /* for TAP_TAP and TAP_TZX */
 #include "zxconfig.h"
-#include "stdio.h"
-#include "string.h"
-#include "sys/types.h"
 #include "helpers.h"
-#include "ctype.h"
 
 
 extern const char *spcf_keynames_ascii[];

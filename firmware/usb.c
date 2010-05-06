@@ -37,7 +37,6 @@
 #include "usb-target.h"
 #include "usb.h"
 #include "button.h"
-#include "sprintf.h"
 #include "string.h"
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"

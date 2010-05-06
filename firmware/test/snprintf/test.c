@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 
-#include "sprintf.h"
 
 int main(int argc, char **argv)
 {

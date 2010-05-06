@@ -21,7 +21,6 @@
 #include "plugin.h"
 #include <ctype.h>
 #include <string.h>
-#include <sprintf.h>
 #include <stdlib.h>
 #include "debug.h"
 #include "i2c.h"

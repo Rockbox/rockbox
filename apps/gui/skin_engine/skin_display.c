@@ -21,7 +21,7 @@
  ****************************************************************************/
 #include "config.h"
 #include <stdio.h>
-#include <string.h>
+#include "string-extra.h"
 #include "misc.h"
 #include "font.h"
 #include "system.h"

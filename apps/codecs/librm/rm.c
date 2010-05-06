@@ -32,7 +32,7 @@
 #ifdef TEST
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include "inttypes.h"
 #include <sys/stat.h>
 
 int filesize(int fd)

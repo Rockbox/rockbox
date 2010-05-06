@@ -34,6 +34,7 @@ QUICKREF
 */
 
 #include <string.h>
+#include "_ansi.h"
 
 #define LBLOCKSIZE (sizeof(long))
 #define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))

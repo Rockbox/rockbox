@@ -19,10 +19,9 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <inttypes.h>
+#include "string-extra.h"
 
 #include "debug.h"
 #include "logf.h"

@@ -28,7 +28,6 @@
 #include "menu.h"
 #include "debug_menu.h"
 #include "kernel.h"
-#include "sprintf.h"
 #include "structec.h"
 #include "action.h"
 #include "debug.h"

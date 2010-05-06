@@ -21,9 +21,8 @@
 
 #include "config.h"
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-
+#include "string-extra.h"
 #include "settings.h"
 #include "skin_buffer.h"
 #include "wps_internals.h"

@@ -29,7 +29,6 @@
 #include "storage.h"
 #include "lcd.h"
 #include "scrollbar.h"
-#include "sprintf.h"
 #include "button.h"
 #include "system.h"
 #include "font.h"

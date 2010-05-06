@@ -141,7 +141,7 @@ void init_words (WavpackStream *wps)
     CLEAR (wps->w);
 }
 
-static int mylog2 (unsigned int32_t avalue);
+static int mylog2 (uint32_t avalue);
 
 // Read the median log2 values from the specifed metadata structure, convert
 // them back to 32-bit unsigned values and store them. If length is not
@@ -553,7 +553,7 @@ void send_words (int32_t *buffer, int nsamples, uint32_t flags,
         if (sign)
             value = ~value;
 
-        if ((unsigned int32_t) value < GET_MED (0)) {
+        if ((uint32_t) value < GET_MED (0)) {
             ones_count = low = 0;
             high = GET_MED (0) - 1;
             DEC_MED0 ();
@@ -709,7 +709,7 @@ void flush_word (struct words_data *w, Bitstream *bs)
 // This function returns the log2 for the specified 32-bit unsigned value.
 // The maximum value allowed is about 0xff800000 and returns 8447.
 
-static int mylog2 (unsigned int32_t avalue)
+static int mylog2 (uint32_t avalue)
 {
     int dbits;
 

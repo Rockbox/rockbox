@@ -19,11 +19,11 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include "config.h"
 #include "font.h"
 #include "kernel.h"
 #include "string.h" /* for memcmp oO*/
-#include "sprintf.h"
 #include "sound.h"
 #include "settings.h"
 #include "viewport.h"

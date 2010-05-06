@@ -24,7 +24,7 @@ PLUGIN_HEADER
 
 static int files, dirs, musicfiles, largestdir;
 static int lasttick;
-static bool abort;
+static bool cancel;
 
 #if CONFIG_KEYPAD == PLAYER_PAD 
 #define STATS_STOP BUTTON_STOP
@@ -173,7 +173,7 @@ void traversedir(char* location, char* name)
     if (dir) {
         entry = rb->readdir(dir);
         while (entry) {
-            if (abort)
+            if (cancel)
                 break;
             /* Skip .. and . */
             if (rb->strcmp(entry->d_name, ".") && rb->strcmp(entry->d_name, ".."))
@@ -206,7 +206,7 @@ void traversedir(char* location, char* name)
                     || button == STATS_STOP_REMOTE
 #endif
                     ) {
-                    abort = true;
+                    cancel = true;
                     break;
                 }
             }
@@ -229,14 +229,14 @@ enum plugin_status plugin_start(const void* parameter)
     dirs = 0;
     musicfiles = 0;
     largestdir = 0;
-    abort = false;
+    cancel = false;
 
     rb->splash(HZ, "Counting...");
     update_screen();
     lasttick = *rb->current_tick;
 
     traversedir("", "");
-    if (abort) {
+    if (cancel) {
         rb->splash(HZ, "Aborted");
         return PLUGIN_OK;
     }

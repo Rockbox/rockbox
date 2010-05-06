@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/types.h>
+#include "inttypes.h"
 #include "zxconfig.h"
 #include "helpers.h"
 #define max(x, y) ((x) > (y) ? (x) : (y))

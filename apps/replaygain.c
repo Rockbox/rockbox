@@ -20,13 +20,14 @@
  ****************************************************************************/
 
 #include <ctype.h>
-#include <inttypes.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <system.h>
+#include <inttypes.h>
+#include "strlcpy.h"
+#include "strcasecmp.h"
+#include "system.h"
 #include "metadata.h"
 #include "debug.h"
 #include "replaygain.h"
@@ -244,7 +245,7 @@ long parse_replaygain_int(bool album, long gain, long peak,
 
     if (buffer != NULL)
     {
-        len = snprintf(buffer, length, "%d.%02d dB", gain / 512,
+        len = snprintf(buffer, length, "%ld.%02d dB", gain / 512,
             ((abs(gain) & 0x01ff) * 100 + 256) / 512);
         len++;
     }

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Felix Arends
+ * Copyright (C) 2010 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,20 +19,10 @@
  *
  ****************************************************************************/
 
-#ifndef __SPRINTF_H__
-#define __SPRINTF_H__
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <stdio.h>
-
-int snprintf (char *buf, size_t size, const char *fmt, ...);
-char *strtok_r (char *, const char *, char **);
-
-int rockbox_fprintf (int fd, const char *fmt, ...);
-#define fprintf rockbox_fprintf
-
-int rockbox_vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-#define vsnprintf rockbox_vsnprintf
-
-#endif /* __SPRINTF_H__ */
+/**
+ * This file is only there to depend on config.h.
+ * Use this if non-C stuff depends on config.h (e.g. language generation)
+ * See apps/apps.make
+ **/
+#include "config.h"

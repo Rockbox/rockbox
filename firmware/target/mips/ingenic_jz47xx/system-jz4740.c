@@ -32,7 +32,6 @@
 #include "backlight-target.h"
 #include "font.h"
 #include "lcd.h"
-#include "sprintf.h"
 #endif
 
 #define NUM_DMA  6

@@ -31,7 +31,6 @@
 #include "lcd.h"
 #include "usb.h"
 #include "button.h"
-#include "sprintf.h"
 #include "string.h"
 
 void usb_init_device(void)

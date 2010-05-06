@@ -30,7 +30,6 @@
 #include "usb_core.h"
 #ifdef USB_ENABLE_HID
 #include "usb_keymaps.h"
-#include "sprintf.h"
 #endif
 #endif
 #include "settings.h"

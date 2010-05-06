@@ -18,8 +18,9 @@
  *
  */
 
+#include <stdlib.h>
+#include <string.h> /* size_t */
 #include "zxmisc.h"
-#include "helpers.h"
 #include "spperif.h"
 #include "z80.h"
 
@@ -29,9 +30,8 @@
 
 #include "spconf.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
+/* include this at last to avoid clashes with stdio functions */
+#include "helpers.h"
 
 #define COMPRESS_SAVE 1
 

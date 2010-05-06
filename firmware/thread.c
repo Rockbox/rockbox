@@ -20,9 +20,9 @@
  ****************************************************************************/
 #include "config.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include "thread.h"
 #include "panic.h"
-#include "sprintf.h"
 #include "system.h"
 #include "kernel.h"
 #include "cpu.h"

@@ -43,8 +43,8 @@ int rand(void);
 #endif /* __GNUC__ */
 #endif
 
-#define abs(x) (ABS(x))
-#define labs(x) abs(x)
+#define abs(x) ((int)ABS(x))
+#define labs(x) ((long)abs(x))
 
 #ifdef SIMULATOR
 void exit(int status);

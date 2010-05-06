@@ -285,14 +285,14 @@ void os_beep(int volume)
 static unsigned char unget_buf;
 static int unget_file;
 
-int ungetc(int c, int f)
+int frotz_ungetc(int c, int f)
 {
     unget_file = f;
     unget_buf = c;
     return c;
 }
 
-int fgetc(int f)
+int frotz_fgetc(int f)
 {
     unsigned char cb;
     if (unget_file == f)
@@ -305,7 +305,7 @@ int fgetc(int f)
     return cb;
 }
 
-int fputc(int c, int f)
+int frotz_fputc(int c, int f)
 {
     unsigned char cb = c;
     if (rb->write(f, &cb, 1) != 1)

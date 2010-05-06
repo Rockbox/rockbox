@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <limits.h>
 #include "codeclib.h"
 #include "inttypes.h"
 #include "math.h"

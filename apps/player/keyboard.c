@@ -23,7 +23,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "version.h"
-#include "sprintf.h"
 #include <string.h>
 #include "settings.h"
 #include "statusbar.h"

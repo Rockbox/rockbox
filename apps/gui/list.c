@@ -19,11 +19,11 @@
  *
  ****************************************************************************/
 
+#include <stdarg.h>
 #include "config.h"
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
-#include "sprintf.h"
 #include "string.h"
 #include "settings.h"
 #include "kernel.h"

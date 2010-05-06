@@ -165,7 +165,7 @@
 #endif
 
 #if defined(ROCKBOX) && defined(SIMULATOR) || !defined(ROCKBOX)
-int printf(char*, ...);
+int printf(const char* fmt, ...);
 #define PRINT_MSG(fmt, args...) printf(fmt, ## args)
 #define ERROR_MSG(fmt, args...) printf(fmt, ## args)
 #else

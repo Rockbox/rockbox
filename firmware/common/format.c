@@ -19,24 +19,16 @@
  *
  ****************************************************************************/
 
-/*
- * Minimal printf and snprintf formatting functions
- *
- * These support %c %s %d and %x
- * Field width and zero-padding flag only
- */
 
 #include <stdarg.h>
-#include <string.h>
 #include <stdbool.h>
 #include <limits.h>
-
-#include "file.h" /* for write(), used in fprintf() */
-#include "sprintf.h" /* to allow the simulator magic */
+#include <string.h>
+#include "file.h"
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
-static int format(
+int format(
     /* call 'push()' for each output letter */
     int (*push)(void *userp, unsigned char data),
     void *userp,
@@ -194,69 +186,6 @@ static int format(
     return ok; /* true means good */
 }
 
-#if !defined(SIMULATOR) || !defined(linux)
-/* ALSA library requires a more advanced snprintf, so let's not
-   override it in simulator for Linux.  Note that Cygwin requires
-   our snprintf or it produces garbled output after a while. */
-
-struct for_snprintf {
-    unsigned char *ptr; /* where to store it */
-    int bytes; /* amount already stored */
-    int max;   /* max amount to store */
-};
-
-static int sprfunc(void *ptr, unsigned char letter)
-{
-    struct for_snprintf *pr = (struct for_snprintf *)ptr;
-    if(pr->bytes < pr->max) {
-        *pr->ptr = letter;
-        pr->ptr++;
-        pr->bytes++;
-        return true;
-    }
-    return false; /* filled buffer */
-}
-
-
-int snprintf(char *buf, size_t size, const char *fmt, ...)
-{
-    bool ok;
-    va_list ap;
-    struct for_snprintf pr;
-
-    pr.ptr = (unsigned char *)buf;
-    pr.bytes = 0;
-    pr.max = size;
-
-    va_start(ap, fmt);
-    ok = format(sprfunc, &pr, fmt, ap);
-    va_end(ap);
-
-    /* make sure it ends with a trailing zero */
-    pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
-    
-    return pr.bytes;
-}
-
-int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
-{
-    bool ok;
-    struct for_snprintf pr;
-
-    pr.ptr = (unsigned char *)buf;
-    pr.bytes = 0;
-    pr.max = size;
-
-    ok = format(sprfunc, &pr, fmt, ap);
-
-    /* make sure it ends with a trailing zero */
-    pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
-    
-    return pr.bytes;
-}
-
-#endif /* Linux SIMULATOR */
-
 struct for_fprintf {
     int fd;    /* where to store it */
     int bytes; /* amount stored */
@@ -296,4 +225,3 @@ int vuprintf(int (*push)(void *userp, unsigned char data), void *userp, const ch
 {
     return format(push, userp, fmt, ap);
 }
-

@@ -26,7 +26,6 @@
 #include "string.h"
 #include <ctype.h>
 
-#include "sprintf.h"
 #include "settings.h"
 #include "debug.h"
 #include "lang.h"

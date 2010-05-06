@@ -158,7 +158,7 @@ static void build_slot_path(char *buf, size_t bufsiz, size_t slot_id) {
     munge_name(name_buf, strlen(name_buf));
 
     /* glom the whole mess together */
-    snprintf(buf, bufsiz, "%s/%s-%ld.rbs", STATE_DIR, name_buf, slot_id + 1);
+    snprintf(buf, bufsiz, "%s/%s-%zud.rbs", STATE_DIR, name_buf, slot_id + 1);
 }
 
 /*
@@ -253,17 +253,17 @@ static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
         if (read(fd, buf, 20) > 0)
         {
             buf[20] = '\0';
-            snprintf(info_buf, info_bufsiz, "%ld. %s", slot_id + 1, buf);
+            snprintf(info_buf, info_bufsiz, "%zud. %s", slot_id + 1, buf);
         }
         else
-            snprintf(info_buf, info_bufsiz, "%ld. ERROR", slot_id + 1);
+            snprintf(info_buf, info_bufsiz, "%zud. ERROR", slot_id + 1);
 
         close(fd);
     }
     else
     {
         /* if we couldn't open the file, then the slot is empty */
-        snprintf(info_buf, info_bufsiz, "%ld. %s", slot_id + 1, "<Empty>");
+        snprintf(info_buf, info_bufsiz, "%zu. %s", slot_id + 1, "<Empty>");
     }
 }
 

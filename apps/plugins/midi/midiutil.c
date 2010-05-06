@@ -163,8 +163,3 @@ int printf(const char *fmt, ...)
     return 1;
 }
 
-void exit(int code)
-{
-    code = code; /* Stub function, kill warning for now */
-}
-

@@ -35,7 +35,6 @@
 #include "icons.h"
 #include "font.h"
 #include "lang.h"
-#include "sprintf.h"
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"

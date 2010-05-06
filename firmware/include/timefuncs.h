@@ -30,9 +30,6 @@ struct tm *get_time(void);
 int set_time(const struct tm *tm);
 bool valid_time(const struct tm *tm);
 void set_day_of_week(struct tm *tm);
-#if CONFIG_RTC
-time_t mktime(struct tm *t);
-#endif
 
 #endif /* _TIMEFUNCS_H_ */
 

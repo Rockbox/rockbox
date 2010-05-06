@@ -35,7 +35,6 @@
 #include "usb.h"
 #include "splash.h"
 #include "talk.h"
-#include "sprintf.h"
 #include "powermgmt.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"

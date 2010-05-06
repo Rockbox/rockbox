@@ -22,7 +22,7 @@
 #ifndef _MEMORY_H_
 #define _MEMORY_H_
 
-#include <sys/types.h>
+#include "inttypes.h"
 
 void memset16(void *dst, int val, size_t len);
 

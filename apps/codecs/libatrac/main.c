@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <sys/types.h>
+#include <inttypes.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>

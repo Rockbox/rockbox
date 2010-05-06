@@ -23,7 +23,6 @@
 #include "string.h"
 #include "button.h"
 #include "lcd.h"
-#include "sprintf.h"
 #include "font.h"
 #include "debug-target.h"
 #include "mc13783.h"

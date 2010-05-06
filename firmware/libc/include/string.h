@@ -13,8 +13,16 @@ extern "C" {
 
 #include "_ansi.h"
 
-#define __need_size_t
 #include <stddef.h>
+
+#if !defined(__size_t_defined)&& !defined(_SIZE_T_) && !defined(size_t) && !defined(_SIZE_T_DECLARED)
+#define __size_t_defined
+#define _SIZE_T
+#define _SIZE_T_
+#define _SIZE_T_DECLARED
+#define size_t size_t
+typedef unsigned long size_t;
+#endif
 
 #ifndef NULL
 #define NULL ((void*)0)

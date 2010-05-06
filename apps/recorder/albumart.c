@@ -19,8 +19,7 @@
  *
  ****************************************************************************/
 
-#include <string.h>
-#include "sprintf.h"
+#include "string-extra.h"
 #include "system.h"
 #include "albumart.h"
 #include "metadata.h"

@@ -46,7 +46,6 @@ avoided by writing the decoded data one sample at a time.
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>

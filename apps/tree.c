@@ -19,9 +19,9 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "string-extra.h"
 
 #include "applimits.h"
 #include "dir.h"
@@ -32,7 +32,6 @@
 #include "kernel.h"
 #include "usb.h"
 #include "tree.h"
-#include "sprintf.h"
 #include "audio.h"
 #include "playlist.h"
 #include "menu.h"

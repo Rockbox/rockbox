@@ -35,7 +35,6 @@
 #include "usb_ch9.h"
 #include "usb_core.h"
 #include <inttypes.h>
-#include "sprintf.h"
 #include "power.h"
 
 struct ep_type

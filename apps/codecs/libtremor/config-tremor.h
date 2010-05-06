@@ -7,6 +7,7 @@
 #define _ARM_ASSEM_
 #endif
 
+#ifndef BYTE_ORDER
 #ifdef ROCKBOX_BIG_ENDIAN
 #define BIG_ENDIAN 1
 #define LITTLE_ENDIAN 0
@@ -15,6 +16,7 @@
 #define BYTE_ORDER LITTLE_ENDIAN
 #define LITTLE_ENDIAN 1
 #define BIG_ENDIAN 0
+#endif
 #endif
 
 #ifndef ICODE_ATTR_TREMOR_MDCT

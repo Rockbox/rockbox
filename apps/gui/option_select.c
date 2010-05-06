@@ -20,10 +20,9 @@
  *
  ****************************************************************************/
 #include <stdlib.h>
-#include <string.h>
+#include "string-extra.h"
 #include "config.h"
 #include "option_select.h"
-#include "sprintf.h"
 #include "kernel.h"
 #include "lang.h"
 #include "talk.h"

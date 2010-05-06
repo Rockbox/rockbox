@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "sprintf.h"
 #include "mas.h"
 #include "settings.h"
 #include "button.h"
@@ -35,7 +34,7 @@
 #include "file.h"
 #include "general.h"
 #include "errno.h"
-#include "string.h"
+#include "string-extra.h"
 #include "system.h"
 #include "radio.h"
 #include "menu.h"

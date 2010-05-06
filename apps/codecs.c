@@ -26,12 +26,13 @@
 #include <stdlib.h>
 #include <timefuncs.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include "string-extra.h"
 #include "debug.h"
 #include "button.h"
 #include "dir.h"
 #include "file.h"
 #include "kernel.h"
-#include "sprintf.h"
 #include "screens.h"
 #include "misc.h"
 #include "mas.h"

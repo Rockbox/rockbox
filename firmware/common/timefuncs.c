@@ -103,43 +103,6 @@ int set_time(const struct tm *tm)
 #endif /* RTC */
 }
 
-#if CONFIG_RTC
-/* mktime() code taken from lynx-2.8.5 source, written
- by Philippe De Muyter <phdm@macqel.be> */
-time_t mktime(struct tm *t)
-{
-    short month, year;
-    time_t result;
-    static int m_to_d[12] =
-        {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-
-    month = t->tm_mon;
-    year = t->tm_year + month / 12 + 1900;
-    month %= 12;
-    if (month < 0)
-    {
-        year -= 1;
-        month += 12;
-    }
-    result = (year - 1970) * 365 + (year - 1969) / 4 + m_to_d[month];
-    result = (year - 1970) * 365 + m_to_d[month];
-    if (month <= 1)
-        year -= 1;
-    result += (year - 1968) / 4;
-    result -= (year - 1900) / 100;
-    result += (year - 1600) / 400;
-    result += t->tm_mday;
-    result -= 1;
-    result *= 24;
-    result += t->tm_hour;
-    result *= 60;
-    result += t->tm_min;
-    result *= 60;
-    result += t->tm_sec;
-    return(result);
-}
-#endif
-
 void set_day_of_week(struct tm *tm)
 {
     int y=tm->tm_year+1900;

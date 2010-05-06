@@ -26,7 +26,6 @@
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
-#include "sprintf.h"
 #include "storage.h"
 #ifdef IPOD_NANO2G
 #include "power.h"

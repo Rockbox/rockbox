@@ -95,3 +95,5 @@
 /* default for 100% in the sim */
 #define DEFAULT_BRIGHTNESS_SETTING MAX_BRIGHTNESS_SETTING
 #endif
+
+#define _ISOC99_SOURCE 1

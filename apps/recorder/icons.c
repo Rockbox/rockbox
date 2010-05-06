@@ -22,7 +22,6 @@
 #include "lcd.h"
 #include "font.h"
 #include "kernel.h"
-#include "sprintf.h"
 #include "rtc.h"
 #include "powermgmt.h"
 

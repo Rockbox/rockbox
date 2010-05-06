@@ -24,8 +24,8 @@
 #ifndef _LIB_JHASH_H_
 #define _LIB_JHASH_H_
 #include <inttypes.h>     /* defines uint32_t etc */
-#include <sys/types.h>
-#include <plugin.h>
+#include <string.h>       /* size_t */
+#include "plugin.h"
 
 /*
 hashw() -- hash an array of uint32_t into a 32-bit value

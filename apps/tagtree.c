@@ -27,8 +27,8 @@
 /*#define LOGF_ENABLE*/
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include "string-extra.h"
 #include "config.h"
 #include "system.h"
 #include "kernel.h"

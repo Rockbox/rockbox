@@ -22,12 +22,30 @@ panic.c
 debug.c
 
 /* Common */
-common/atoi.c
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+libc/errno.c
+#endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
+libc/atoi.c
+libc/ctype.c
+libc/memcmp.c
+libc/memchr.c
+libc/qsort.c
+libc/random.c
+libc/sprintf.c
+libc/strcat.c
+libc/strchr.c
+libc/strcmp.c
+libc/strcpy.c
+libc/strncmp.c
+libc/strrchr.c
+libc/strtok.c
+libc/strstr.c
+libc/mktime.c
+common/config.c
 common/crc32.c
 #ifdef MI4_FORMAT
 common/crc32-mi4.c
 #endif
-common/ctype.c
 #ifndef SIMULATOR
 common/dir_uncached.c
 common/file.c
@@ -36,28 +54,13 @@ common/file.c
 common/dircache.c
 #endif /* HAVE_DIRCACHE */
 common/disk.c
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
-common/errno.c
-#endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
 common/filefuncs.c
-common/memcmp.c
-common/memchr.c
-common/qsort.c
-common/random.c
-common/sprintf.c
+common/format.c
 common/strcasecmp.c
 common/strcasestr.c
-common/strcat.c
-common/strchr.c
-common/strcmp.c
 common/strnatcmp.c
-common/strcpy.c
-common/strncmp.c
 common/strlcat.c
 common/strlcpy.c
-common/strrchr.c
-common/strtok.c
-common/strstr.c
 common/structec.c
 common/timefuncs.c
 common/unicode.c
@@ -377,7 +380,7 @@ target/coldfire/i2c-coldfire.c
 target/arm/support-arm.S
 target/arm/memcpy-arm.S
 target/arm/memmove-arm.S
-common/strlen.c
+libc/strlen.c
 #ifndef SIMULATOR
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
@@ -472,9 +475,9 @@ target/arm/crt0.S
 #elif defined(CPU_MIPS)
 #undef mips
 /*target/mips/strlen.S*/
-common/memmove.c
+libc/memmove.c
 common/memset16.c
-common/strlen.c
+libc/strlen.c
 target/mips/ffs-mips.S
 target/mips/memcpy-mips.S
 target/mips/memset-mips.S
@@ -488,11 +491,11 @@ target/mips/ingenic_jz47xx/crt0.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 common/ffs.c
 #endif
-common/memcpy.c
-common/memmove.c
-common/memset.c
+libc/memcpy.c
+libc/memmove.c
+libc/memset.c
 common/memset16.c
-common/strlen.c
+libc/strlen.c
 #ifndef SIMULATOR
 crt0.S
 drivers/i2c.c
@@ -752,7 +755,7 @@ target/coldfire/iaudio/audio-iaudio.c
 #ifdef IRIVER_IFP7XX_SERIES
 #ifdef STUB
 ifp_usb_serial.c
-common/sscanf.c
+libc/sscanf.c
 #endif /* STUB */
 #endif /* IRIVER_IFP7XX_SERIES */
 

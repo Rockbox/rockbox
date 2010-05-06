@@ -31,7 +31,6 @@
 #include "action.h"
 #include "kernel.h"
 #include "filetypes.h"
-#include "sprintf.h"
 #include "settings.h"
 #include "skin_engine/skin_engine.h"
 #include "mp3_playback.h"

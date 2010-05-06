@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <inttypes.h>
 #include "metadata.h"
 
 #ifdef ROCKBOX_BIG_ENDIAN

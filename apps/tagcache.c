@@ -66,7 +66,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "logf.h"
-#include "string.h"
+#include "string-extra.h"
 #include "usb.h"
 #include "metadata.h"
 #include "tagcache.h"
@@ -1392,7 +1392,7 @@ static bool get_next(struct tagcache_search *tcs)
     
     if (TAGCACHE_IS_NUMERIC(tcs->type))
     {
-        snprintf(buf, sizeof(buf), "%d", tcs->position);
+        snprintf(buf, sizeof(buf), "%ld", tcs->position);
         tcs->result = buf;
         tcs->result_len = strlen(buf) + 1;
         return true;
@@ -3490,7 +3490,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         {
             if (TAGCACHE_IS_NUMERIC(j))
             {
-                snprintf(temp, sizeof temp, "%d", idx.tag_seek[j]);
+                snprintf(temp, sizeof temp, "%d", (int)idx.tag_seek[j]);
                 write_tag(clfd, tagcache_tag_to_str(j), temp);
                 continue;
             }

@@ -22,9 +22,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
+#include <stdio.h>
 #include "config.h"
 #include "string.h"
-#include "sprintf.h"
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
@@ -201,7 +201,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
 }
 
 
-static struct viewport clock[NB_SCREENS], menu[NB_SCREENS];
+static struct viewport clock_vps[NB_SCREENS], menu[NB_SCREENS];
 static bool menu_was_pressed;
 static int time_menu_callback(int action,
                        const struct menu_item_ex *this_item)
@@ -233,7 +233,7 @@ static int time_menu_callback(int action,
     {
         last_redraw = current_tick;
         FOR_NB_SCREENS(i)
-            draw_timedate(&clock[i], &screens[i]);
+            draw_timedate(&clock_vps[i], &screens[i]);
     }
     return action;
 }
@@ -257,30 +257,30 @@ int time_screen(void* ignored)
 
     FOR_NB_SCREENS(i)
     {
-        viewport_set_defaults(&clock[i], i);
+        viewport_set_defaults(&clock_vps[i], i);
 #ifdef HAVE_BUTTONBAR
         if (global_settings.buttonbar)
         {
-            clock[i].height -= BUTTONBAR_HEIGHT;
+            clock_vps[i].height -= BUTTONBAR_HEIGHT;
         }
 #endif
-        nb_lines = viewport_get_nb_lines(&clock[i]);
+        nb_lines = viewport_get_nb_lines(&clock_vps[i]);
 
-        menu[i] = clock[i];
+        menu[i] = clock_vps[i];
         /* force time to be drawn centered */
-        clock[i].flags |= VP_FLAG_ALIGN_CENTER;
+        clock_vps[i].flags |= VP_FLAG_ALIGN_CENTER;
 
-        font_h = font_get(clock[i].font)->height;
+        font_h = font_get(clock_vps[i].font)->height;
         nb_lines -= 2; /* at least 2 lines for menu */
         if (nb_lines > 4)
             nb_lines = 4;
         if (nb_lines >= 2)
-            clock[i].height = nb_lines*font_h;
-        else /* disable the clock drawing */
-            clock[i].height = 0;
-        menu[i].y += clock[i].height;
-        menu[i].height -= clock[i].height;
-        draw_timedate(&clock[i], &screens[i]);
+            clock_vps[i].height = nb_lines*font_h;
+        else /* disable the clock_vps drawing */
+            clock_vps[i].height = 0;
+        menu[i].y += clock_vps[i].height;
+        menu[i].height -= clock_vps[i].height;
+        draw_timedate(&clock_vps[i], &screens[i]);
     }
 
     ret = do_menu(&time_menu, NULL, menu, false);

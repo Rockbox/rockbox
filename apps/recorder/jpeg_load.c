@@ -856,7 +856,7 @@ static const struct idct_entry idct_tbl[] = {
 /* JPEG decoder implementation */
 
 #ifdef JPEG_FROM_MEM
-INLINE unsigned char *getc(struct jpeg* p_jpeg)
+INLINE unsigned char *jpeg_getc(struct jpeg* p_jpeg)
 {
     if (LIKELY(p_jpeg->len))
     {
@@ -880,7 +880,7 @@ INLINE bool skip_bytes(struct jpeg* p_jpeg, int count)
     }
 }
 
-INLINE void putc(struct jpeg* p_jpeg)
+INLINE void jpeg_putc(struct jpeg* p_jpeg)
 {
     p_jpeg->len++;
     p_jpeg->data--;
@@ -892,7 +892,7 @@ INLINE void fill_buf(struct jpeg* p_jpeg)
         p_jpeg->buf_index = 0;
 }
 
-static unsigned char *getc(struct jpeg* p_jpeg)
+static unsigned char *jpeg_getc(struct jpeg* p_jpeg)
 {
     if (UNLIKELY(p_jpeg->buf_left < 1))
         fill_buf(p_jpeg);
@@ -917,7 +917,7 @@ static bool skip_bytes(struct jpeg* p_jpeg, int count)
     return p_jpeg->buf_left >= 0 || skip_bytes_seek(p_jpeg);
 }
 
-static void putc(struct jpeg* p_jpeg)
+static void jpeg_putc(struct jpeg* p_jpeg)
 {
     p_jpeg->buf_left++;
     p_jpeg->buf_index--;
@@ -933,14 +933,14 @@ do {\
 #define e_getc(jpeg, code) \
 ({ \
     unsigned char *c; \
-    if (UNLIKELY(!(c = getc(jpeg)))) \
+    if (UNLIKELY(!(c = jpeg_getc(jpeg)))) \
         return (code); \
     *c; \
 })
 
 #define d_getc(jpeg, def) \
 ({ \
-    unsigned char *cp = getc(jpeg); \
+    unsigned char *cp = jpeg_getc(jpeg); \
     unsigned char c = LIKELY(cp) ? *cp : (def); \
     c; \
 })
@@ -958,7 +958,7 @@ static int process_markers(struct jpeg* p_jpeg)
         if (c != 0xFF) /* no marker? */
         {
             JDEBUGF("Non-marker data\n");
-            putc(p_jpeg);
+            jpeg_putc(p_jpeg);
             break; /* exit marker processing */
         }
 
@@ -969,7 +969,7 @@ static int process_markers(struct jpeg* p_jpeg)
         case 0xFF: /* Fill byte */
             ret |= FILL_FF;
         case 0x00: /* Zero stuffed byte - entropy data */
-            putc(p_jpeg);
+            jpeg_putc(p_jpeg);
             continue;
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
@@ -1669,7 +1669,7 @@ static void search_restart(struct jpeg *p_jpeg)
                 return;
             }
             else
-                putc(p_jpeg);
+                jpeg_putc(p_jpeg);
         }
     }
 }

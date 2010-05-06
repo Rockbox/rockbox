@@ -20,7 +20,7 @@ const short __spm[13] =
     (31+28+31+30+31+30+31+31+30+31+30+31),
   };
 
-int __isleap(int year) {
+static inline int isleap(int year) {
   /* every fourth year is a leap year except for century years that are
    * not divisible by 400. */
 /*  return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)); */
@@ -36,7 +36,7 @@ struct tm *gmtime(const time_t *timep) {
   work=*timep/(SPD);
   r.tm_wday=(4+work)%7;
   for (i=1970; ; ++i) {
-    register time_t k=__isleap(i)?366:365;
+    register time_t k=isleap(i)?366:365;
     if (work>=k)
       work-=k;
     else
@@ -46,7 +46,7 @@ struct tm *gmtime(const time_t *timep) {
   r.tm_yday=work;
 
   r.tm_mday=1;
-  if (__isleap(i) && (work>58)) {
+  if (isleap(i) && (work>58)) {
     if (work==59) r.tm_mday=2; /* 29.2. */
     work-=1;
   }

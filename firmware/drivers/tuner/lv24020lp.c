@@ -40,7 +40,6 @@ static struct mutex tuner_mtx;
 #undef SANYO_TUNER_LOGF
 
 #ifdef SANYO_TUNER_LOG_FILE
-#include "sprintf.h"
 #include "file.h"
 
 static int fd_log = -1;

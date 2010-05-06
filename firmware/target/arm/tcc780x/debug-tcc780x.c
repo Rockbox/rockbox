@@ -26,7 +26,6 @@
 #include <stdbool.h>
 #include "button.h"
 #include "lcd.h"
-#include "sprintf.h"
 #include "font.h"
 #include "debug-target.h"
 #include "adc.h"

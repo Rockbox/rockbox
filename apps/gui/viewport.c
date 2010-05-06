@@ -41,7 +41,6 @@
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
 #ifndef __PCTOOL__
-#include "sprintf.h"
 #include "string.h"
 #include "kernel.h"
 #include "system.h"

@@ -11,7 +11,7 @@ ROCKBOY_SRCDIR = $(APPSDIR)/plugins/rockboy
 ROCKBOY_OBJDIR = $(BUILDDIR)/apps/plugins/rockboy
 
 ROCKBOY_SRC := $(call preprocess, $(ROCKBOY_SRCDIR)/SOURCES)
-ROCKBOY_SRC += $(ROOTDIR)/firmware/common/sscanf.c
+ROCKBOY_SRC += $(ROOTDIR)/firmware/libc/sscanf.c
 ROCKBOY_OBJ := $(call c2obj, $(ROCKBOY_SRC))
 
 OTHER_SRC += $(ROCKBOY_SRC)

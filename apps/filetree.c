@@ -38,7 +38,6 @@
 #include "screens.h"
 #include "plugin.h"
 #include "rolo.h"
-#include "sprintf.h"
 #include "splash.h"
 #include "cuesheet.h"
 #include "filetree.h"

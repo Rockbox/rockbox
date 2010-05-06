@@ -38,7 +38,6 @@
 #include "scrollbar.h"
 #endif
 #include "lang.h"
-#include "sprintf.h"
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"

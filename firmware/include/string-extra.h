@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Tomasz Malesinski
+ * Copyright (C) 2010 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,14 +19,9 @@
  *
  ****************************************************************************/
 
-#ifndef __SSCANF_H__
-#define __SSCANF_H__
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <_ansi.h>
-
-int sscanf(const char *s, const char *fmt, ...)
-    ATTRIBUTE_SCANF(2, 3);
-
-#endif /* __SSCANF_H__ */
+#include <string.h>
+#include "strlcpy.h"
+#include "strlcat.h"
+#include "strcasecmp.h"
+#include "strcasestr.h"

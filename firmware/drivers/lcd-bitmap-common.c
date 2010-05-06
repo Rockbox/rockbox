@@ -27,8 +27,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "stdarg.h"
-#include "sprintf.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include "string-extra.h"
 #include "diacritic.h"
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */

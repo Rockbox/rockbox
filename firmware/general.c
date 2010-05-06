@@ -20,13 +20,13 @@
  ****************************************************************************/
 
 #include "config.h"
+#include <stdio.h>
 #include "general.h"
 
 #include "dir.h"
 #include "limits.h"
-#include "sprintf.h"
 #include "stdlib.h"
-#include "string.h"
+#include "string-extra.h"
 #include "system.h"
 #include "time.h"
 #include "timefuncs.h"

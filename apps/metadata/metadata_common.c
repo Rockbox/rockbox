@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include <string.h>
+#include "string-extra.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>

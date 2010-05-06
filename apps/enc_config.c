@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include <sprintf.h>
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"

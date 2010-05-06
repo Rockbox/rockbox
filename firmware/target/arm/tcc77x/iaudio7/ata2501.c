@@ -76,7 +76,6 @@ unsigned short ata2501_read(void)
 //#define ATA2501_TEST
 #ifdef ATA2501_TEST
 #include "lcd.h"
-#include "sprintf.h"
 
 static
 void bits(char *str, unsigned short val)

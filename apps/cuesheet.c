@@ -28,7 +28,6 @@
 #include "audio.h"
 #include "kernel.h"
 #include "logf.h"
-#include "sprintf.h"
 #include "misc.h"
 #include "screens.h"
 #include "list.h"

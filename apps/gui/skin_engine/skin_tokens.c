@@ -21,7 +21,7 @@
  ****************************************************************************/
 #include "font.h"
 #include <stdio.h>
-#include <string.h>
+#include "string-extra.h"
 #include <stdlib.h>
 #include "action.h"
 #include "system.h"
@@ -247,7 +247,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 {
                     *intval = limit * elapsed / length + 1;
                 }
-                snprintf(buf, buf_size, "%d", 100 * elapsed / length);
+                snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
                 return buf;
 
 
@@ -269,7 +269,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 if ((id3->frequency % 1000) < 100)
                     snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
                 else
-                    snprintf(buf, buf_size, "%ld.%d",
+                    snprintf(buf, buf_size, "%ld.%lu",
                             id3->frequency / 1000,
                             (id3->frequency % 1000) / 100);
                 return buf;
@@ -302,12 +302,12 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
         case WPS_TOKEN_DATABASE_RATING:
             if (intval)
                 *intval = id3->rating + 1;
-            snprintf(buf, buf_size, "%ld", id3->rating);
+            snprintf(buf, buf_size, "%d", id3->rating);
             return buf;
         case WPS_TOKEN_DATABASE_AUTOSCORE:
             if (intval)
                 *intval = id3->score + 1;
-            snprintf(buf, buf_size, "%ld", id3->score);
+            snprintf(buf, buf_size, "%d", id3->score);
             return buf;
 #endif
 
@@ -1064,7 +1064,7 @@ const char *get_token_value(struct gui_wps *gwps,
                         break;)
                 }
             }
-            snprintf(buf, buf_size, "%d.%1d", samprk/1000,samprk%1000);
+            snprintf(buf, buf_size, "%lu.%1lu", samprk/1000,samprk%1000);
 #else /* HWCODEC */
             
             static const char * const freq_strings[] =
@@ -1164,7 +1164,7 @@ const char *get_token_value(struct gui_wps *gwps,
                     #endif
                     *intval = global_settings.mp3_enc_config.bitrate+1;
                 }
-                snprintf(buf, buf_size, "%d", global_settings.mp3_enc_config.bitrate+1);
+                snprintf(buf, buf_size, "%lu", global_settings.mp3_enc_config.bitrate+1);
                 return buf;
             }
             else

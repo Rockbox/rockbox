@@ -59,7 +59,7 @@
 #include <system.h>
 #include <string.h>
 #include <timer.h>
-#include <sys/types.h>
+#include "inttypes.h"
 #include "profile.h"
 
 /* PFD is Profiled Function Data */

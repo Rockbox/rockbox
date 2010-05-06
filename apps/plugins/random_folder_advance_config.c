@@ -23,7 +23,7 @@
 
 PLUGIN_HEADER
 
-static bool abort;
+static bool cancel;
 static int fd;
 static int dirs_count;
 static int lasttick;
@@ -70,7 +70,7 @@ void traversedir(char* location, char* name)
     if (dir) {
         entry = rb->readdir(dir);
         while (entry) {
-            if (abort)
+            if (cancel)
                 break;
             /* Skip .. and . */
             if (entry->d_name[0] == '.')
@@ -113,7 +113,7 @@ void traversedir(char* location, char* name)
                 lasttick = *rb->current_tick;
                 if (rb->action_userabort(TIMEOUT_NOBLOCK))
                 {
-                    abort = true;
+                    cancel = true;
                     break;
                 }
             }
@@ -213,7 +213,7 @@ bool custom_dir(void)
 void generate(void)
 {
     dirs_count = 0;
-    abort = false;
+    cancel = false;
     fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY, 0666);
     rb->write(fd,&dirs_count,sizeof(int));
     if (fd < 0)
@@ -621,7 +621,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    abort = false;
+    cancel = false;
     
     return main_menu();
 }

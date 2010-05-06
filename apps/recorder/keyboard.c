@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "kernel.h"
 #include "system.h"
-#include <string.h>
+#include "string-extra.h"
 #include "font.h"
 #include "screens.h"
 #include "talk.h"

@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "string-extra.h"
 #include "action.h"
 #include "dir.h"
 #include "file.h"
@@ -36,7 +36,6 @@
 #include "playlist.h"
 #include "settings.h"
 #include "splash.h"
-#include "sprintf.h"
 #include "tree.h"
 #include "yesno.h"
 #include "filetypes.h"

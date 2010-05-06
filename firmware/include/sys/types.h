@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Daniel Stenberg
+ * Copyright (C) 2010 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,17 @@
  *
  ****************************************************************************/
 
-#ifndef _SYS_TYPES_H_
-#define _SYS_TYPES_H_
+/**
+ * provide a sys/types.h for compatibility with imported code
+ **/
+
+#ifndef __TYPES_H__
+#define __TYPES_H__
+
+
+/*
+ * include string.h for size_t for convinence */
+#include <string.h>
 
 #if !defined(__ssize_t_defined) && !defined(_SSIZE_T_) && !defined(ssize_t) && !defined(_SSIZE_T_DECLARED)
 #define __ssize_t_defined
@@ -43,10 +52,4 @@ typedef signed long off_t;
 typedef unsigned int mode_t;
 #endif
 
-#if !defined(_SIZE_T) && !defined(_SIZE_T_DECLARED)
-#define _SIZE_T
-#define _SIZE_T_DECLARED
-typedef unsigned long size_t;
-#endif
-
-#endif /* _SYS_TYPES_H */
+#endif /* __TYPES_H__ */

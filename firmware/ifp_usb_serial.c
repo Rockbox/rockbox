@@ -37,7 +37,6 @@
 
 #ifdef LCD_DEBUG
 #include "lcd.h"
-#include "sprintf.h"
 #endif
 
 

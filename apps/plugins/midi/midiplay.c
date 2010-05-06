@@ -450,6 +450,8 @@ static int midimain(const void * filename)
 enum plugin_status plugin_start(const void* parameter)
 {
     int retval;
+    PLUGINLIB_EXIT_INIT;
+
     PLUGIN_IRAM_INIT(rb)
 
     if (parameter == NULL)

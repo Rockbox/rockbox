@@ -33,8 +33,20 @@
 #define __VALIST char*
 #endif
 
-int snprintf (char *buf, size_t size, const char *fmt, ...);
-int vsnprintf (char *buf, int size, const char *fmt, __VALIST ap);
+int vsnprintf (char *buf, size_t size, const char *fmt, __VALIST ap);
+
+int sprintf  (char *buf, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+
+int snprintf (char *buf, size_t size, const char *fmt, ...)
+              ATTRIBUTE_PRINTF(3, 4);
+
+/* callback function is called for every output character (byte) with userp and
+ * should return 0 when ch is a char other than '\0' that should stop printing */
+int vuprintf(int (*push)(void *userp, unsigned char data),
+              void *userp, const char *fmt, __VALIST ap);
+
+int sscanf(const char *s, const char *fmt, ...)
+    ATTRIBUTE_SCANF(2, 3);
 
 #ifdef SIMULATOR
 typedef void FILE;

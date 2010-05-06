@@ -22,7 +22,6 @@
 #include "config.h"
 #include "hwcompat.h"
 #include "stdarg.h"
-#include "sprintf.h"
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"

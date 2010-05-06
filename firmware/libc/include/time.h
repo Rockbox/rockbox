@@ -8,7 +8,7 @@
 #define _TIME_H_
 
 #ifdef WPSEDITOR
-#include <sys/types.h>
+#include "inttypes.h"
 #include <time.h>
 #endif
 
@@ -34,6 +34,7 @@ typedef long time_t;
 #define _TIME_T_DECLARED
 time_t time(time_t *t);
 struct tm *localtime(const time_t *timep);
+time_t mktime(struct tm *t);
 
 #endif /* SIMULATOR */
 
@@ -42,7 +43,6 @@ struct tm *localtime(const time_t *timep);
    so tell sys/stat.h not to use it */
 #undef __USE_MISC  
 #endif
-
 
 #endif /* _TIME_H_ */
 

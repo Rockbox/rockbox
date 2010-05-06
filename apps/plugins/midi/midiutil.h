@@ -21,6 +21,8 @@
 
 #define FRACTSIZE 12
 
+#include "lib/pluginlib_exit.h"
+
 #define BUF_SIZE 16384 /* 64 kB output buffers */
 #define NBUF   2
 
@@ -145,7 +147,6 @@ int readFourBytes(int file);
 int readVarData(int file);
 int eof(int fd);
 unsigned char * readData(int file, int len);
-void exit(int code);
 
 #define malloc(n) my_malloc(n)
 void * my_malloc(int size);

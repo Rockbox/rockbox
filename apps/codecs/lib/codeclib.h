@@ -22,9 +22,10 @@
 #ifndef __CODECLIB_H__
 #define __CODECLIB_H__
 
+#include <inttypes.h>
+#include <string.h>
 #include "config.h"
 #include "codecs.h"
-#include <sys/types.h>
 #include "mdct.h"
 #include "fft.h"
 
@@ -44,6 +45,7 @@ extern unsigned char* filebuf;    /* The rest of the MP3 buffer                 
 #define calloc(x,y) codec_calloc(x,y)
 #define realloc(x,y) codec_realloc(x,y)
 #define free(x) codec_free(x)
+#undef alloca
 #define alloca(x) __builtin_alloca(x)
 
 void* codec_malloc(size_t size);
@@ -59,7 +61,11 @@ void *memmove(void *s1, const void *s2, size_t n);
 size_t strlen(const char *s);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
-int strcmp(const char *, const char *);
+
+/* on some platforms strcmp() seems to be a tricky define which
+ * breaks if we write down strcmp's prototype */
+#undef strcmp
+int strcmp(const char *s1, const char *s2);
 
 void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
 

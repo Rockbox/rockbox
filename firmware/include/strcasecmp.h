@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Felix Arends
+ * Copyright (C) 2010 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,22 +19,10 @@
  *
  ****************************************************************************/
 
-#ifndef __SPRINTF_H__
-#define __SPRINTF_H__
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <_ansi.h>
-
-int snprintf (char *buf, size_t size, const char *fmt, ...)
-              ATTRIBUTE_PRINTF(3, 4);
-
-int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
-
-/* callback function is called for every output character (byte) with userp and
- * should return 0 when ch is a char other than '\0' that should stop printing */
-int vuprintf(int (*push)(void *userp, unsigned char data),
-              void *userp, const char *fmt, va_list ap);
-
-#endif /* __SPRINTF_H__ */
+#ifndef __STRCASECMP_H__
+#define __STRCASECMP_H__
+#include <string.h>
+int strcasecmp(const char *s1, const char *s2);
+int strncasecmp(const char *s1, const char *s2, size_t n);
+#endif

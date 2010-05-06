@@ -42,7 +42,6 @@ static int global_ep_irq_mask = 0x1;
 #include <inttypes.h>
 
 
-#include "sprintf.h"
 #include "power.h"
 
 #ifndef BOOTLOADER
