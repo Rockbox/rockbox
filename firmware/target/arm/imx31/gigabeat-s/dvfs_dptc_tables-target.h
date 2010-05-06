@@ -216,7 +216,7 @@ static const struct dptc_dcvr_table_entry * const
 
 /* For 27 MHz PLL reference clock */
 static const struct dvfs_clock_table_entry
-dvfs_clock_table[4] =
+dvfs_clock_table[DVFS_NUM_LEVELS] =
 {
     /*  PLL val    PDR0 val  PLL VSCNT */
     { 0x00082407, 0xff841e58, 1,   7 }, /* MCUPLL, 528 MHz, /1 = 528 MHz */
