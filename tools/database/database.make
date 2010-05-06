@@ -40,7 +40,7 @@ GCCOPTS+=`$(SDLCONFIG) --cflags`
 OLDGCCOPTS:=$(GCCOPTS)
 GCCOPTS+=-D__PCTOOL__  $(FIRMINC) $(SIMINCLUDES)
 
-LIBS=`$(SDLCONFIG) --libs`
+LIBS=`$(SDLCONFIG) --libs` -lc
 ifneq ($(findstring MINGW,$(shell uname)),MINGW)
 LIBS += -ldl
 endif

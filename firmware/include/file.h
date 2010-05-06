@@ -25,9 +25,6 @@
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 
-#ifdef __PCTOOL__
-#include <fcntl.h>
-#else
 #include <sys/types.h>
 #include "_ansi.h"
 
@@ -88,7 +85,7 @@ static inline int creat(const char *pathname, mode_t mode)
     (void)mode;
     return file_creat(pathname);
 }
-#if !defined(CODEC) && !defined(PLUGIN)
+#if !defined(CODEC) && !defined(PLUGIN) && !defined(__PCTOOL__)
 #define open(x, y, ...) file_open(x,y)
 #endif
 #endif
@@ -99,5 +96,4 @@ extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
-#endif
 #endif
