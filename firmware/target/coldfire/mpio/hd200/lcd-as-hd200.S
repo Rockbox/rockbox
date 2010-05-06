@@ -149,7 +149,6 @@ lcd_grey_data:
     add.l   (%a0)+, %d0         /* add 4 pixel values to the phases */
     move.l  %d0, (%a1)+         /* store new phases, advance pointer */
 
-    clr.l   %d1
     move.l  (%a1), %d0          /* fetch 4 pixel phases */
     bclr.l  #31, %d0            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
     seq.b   %d1                 /* %d1 = ....................012344444444 */
