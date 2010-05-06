@@ -1618,6 +1618,8 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     
     entry = &hdr->indices[idx_id];
     
+    memset(id3, 0, sizeof(struct mp3entry));
+    
     id3->title        = get_tag_string(entry, tag_title);
     id3->artist       = get_tag_string(entry, tag_artist);
     id3->album        = get_tag_string(entry, tag_album);

@@ -40,6 +40,7 @@
 #include "screen_access.h"
 #include "playlist.h"
 #include "audio.h"
+#include "tagcache.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -198,10 +199,12 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     
     struct mp3entry *pid3;
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
+    char *filename;
     
     gwps->display->set_viewport(viewer->vp);
     for(i=start_item; (i-start_item)<lines && i<=playlist_amount(); i++)
     {
+        filename = playlist_peek(i-cur_playlist_pos);
         if (i == cur_playlist_pos)
         {
             pid3 = state->id3;
@@ -213,8 +216,15 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
 #if CONFIG_CODEC == SWCODEC
         else if (i>cur_playlist_pos)
         {
-            if (!audio_peek_track(&pid3, i-cur_playlist_pos))
-                pid3 = NULL;
+#ifdef HAVE_TC_RAMCACHE
+            if (tagcache_fill_tags(&viewer->tempid3, filename))
+            {
+                pid3 = &viewer->tempid3;
+            }
+            else
+#endif 
+                if (!audio_peek_track(&pid3, i-cur_playlist_pos))
+                    pid3 = NULL;
         }
 #endif
         else
@@ -224,7 +234,6 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
 
         int line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;
         int j = 0, cur_string = 0;
-        char *filename = playlist_peek(i-cur_playlist_pos);
         unsigned int line_len = 0;
         buf[0] = '\0';
         while (j < viewer->lines[line].count && line_len < sizeof(buf))

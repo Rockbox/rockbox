@@ -241,6 +241,9 @@ struct playlistviewer {
     struct viewport *vp;
     bool show_icons;
     int start_offset;
+#ifdef HAVE_TC_RAMCACHE
+    struct mp3entry tempid3;
+#endif
     struct {
         enum wps_token_type tokens[MAX_PLAYLISTLINE_TOKENS];
         char strings[MAX_PLAYLISTLINE_STRINGS][MAX_PLAYLISTLINE_STRLEN];
