@@ -542,15 +542,15 @@ static int sd_init_card(const int drive)
     /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_state(drive, SD_TRAN) < 0)
         return -13;
-    /* CMD55 */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_NO_RESP, NULL))
+    /* CMD55 */              /*  Response is requested due to timing issue  */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
         return -14;
     /* ACMD6  */
     if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_NO_RESP, NULL))
         return -15;
     mci_delay();
-    /* CMD55 */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_NO_RESP, NULL))
+    /* CMD55 */             /*  Response is requested due to timing issue  */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
         return -16;
     /* ACMD42  */
     if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_NO_RESP, NULL))
