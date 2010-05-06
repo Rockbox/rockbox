@@ -96,7 +96,7 @@ static void * mpeg_malloc_internal (unsigned char *mallocbuf,
 {
     void *x;
 
-    DEBUGF("mpeg_alloc_internal: bs:%lu s:%u reason:%s (%d)\n",
+    DEBUGF("mpeg_alloc_internal: bs:%zu s:%u reason:%s (%d)\n",
            bufsize, size, mpeg_get_reason_str(reason), reason);
 
     if ((size_t) (*mem_ptr + size) > bufsize)

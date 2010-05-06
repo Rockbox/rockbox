@@ -710,12 +710,12 @@ ssize_t disk_buf_prepare_streaming(off_t pos, size_t len)
     else if (pos > disk_buf.filesize)
         pos = disk_buf.filesize;
 
-    DEBUGF("prepare streaming:\n  pos:%ld len:%lu\n", pos, len);
+    DEBUGF("prepare streaming:\n  pos:%ld len:%zu\n", pos, len);
 
     pos = disk_buf_lseek(pos, SEEK_SET);
     disk_buf_probe(pos, len, NULL, &len);
 
-    DEBUGF("  probe done: pos:%ld len:%lu\n", pos, len);
+    DEBUGF("  probe done: pos:%ld len:%zu\n", pos, len);
 
     len = disk_buf_send_msg(STREAM_RESET, pos);
 

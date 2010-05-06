@@ -54,7 +54,7 @@ void write_int_instruction_to_file(int fd, char *instr, int value);
 void allocate_memory(void **buf, size_t *bufsize)
 {
     *buf = rb->plugin_get_buffer(bufsize);
-    DEBUGF("Got %ld bytes of memory\n", *bufsize);
+    DEBUGF("Got %zud bytes of memory\n", *bufsize);
 }
 
 
