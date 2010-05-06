@@ -287,7 +287,7 @@ void failsafe_menu(void)
             printf("%s %s %s", arrow, options[i], def);
         }
         
-        snprintf(buf, sizeof(buf), "Time left: %ds", 
+        snprintf(buf, sizeof(buf), "Time left: %lds", 
                  (TIMEOUT - (current_tick - start_tick)) / HZ);
         lcd_puts(0, 10, buf);
         lcd_update();

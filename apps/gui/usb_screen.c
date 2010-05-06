@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
 #include "action.h"
 #include "font.h"
 #ifdef HAVE_REMOTE_LCD

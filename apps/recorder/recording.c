@@ -976,7 +976,7 @@ static const char* reclist_get_name(int selected_item, void * data,
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_SPDIF_REC
         case ITEM_SAMPLERATE_D:
-            snprintf(buffer, buffer_len, "%s: %d",
+            snprintf(buffer, buffer_len, "%s: %lu",
                      str(LANG_RECORDING_FREQUENCY),
                      pcm_rec_sample_rate());
             break;

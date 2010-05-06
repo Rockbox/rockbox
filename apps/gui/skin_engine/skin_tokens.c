@@ -1079,7 +1079,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif /* HAVE_SPDIF_IN */
             if (intval)
                 *intval = freq+1; /* so the token gets a value 1<=x<=7 */
-            snprintf(buf, buf_size, "%d\n",
+            snprintf(buf, buf_size, "%s\n",
                         freq_strings[global_settings.rec_frequency]);
 #endif
             return buf;
