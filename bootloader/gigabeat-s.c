@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include <sprintf.h>
+#include <stdio.h>
 #include "kernel.h"
 #include "string.h"
 #include "adc.h"
