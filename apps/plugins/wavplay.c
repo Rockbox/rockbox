@@ -3657,7 +3657,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-    plug_buf = rb->plugin_get_buffer(&buf_size);
+    plug_buf = rb->plugin_get_buffer((size_t *)&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
         rb->splash(HZ, "Out of memory.");
