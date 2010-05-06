@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include <stdbool.h>
 #include "action.h"
 #include "font.h"
