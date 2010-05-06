@@ -143,6 +143,9 @@ static void handle_usb(void)
     button_close();
     backlight_close();
 
+    /* Sleep a little to let the backlight ramp up */
+    sleep(HZ*5/4);
+
     reset_screen();
 }
 

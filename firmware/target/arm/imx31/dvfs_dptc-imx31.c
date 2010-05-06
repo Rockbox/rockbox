@@ -571,14 +571,15 @@ static void dptc_stop(void)
 
     if (dptc_running)
     {
+        dptc_running = false;
+
         /* Disable DPTC and mask interrupt. */
         CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
         avic_disable_int(INT_CCM_CLK);
-        dptc_running = false;
-    }
 
-    /* Go back to default working point. */
-    dptc_new_wp(DPTC_WP_DEFAULT);
+        /* Go back to default working point. */
+        dptc_new_wp(DPTC_WP_DEFAULT);
+    }
 
     restore_irq(oldlevel);
 
