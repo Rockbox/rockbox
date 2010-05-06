@@ -584,7 +584,7 @@ static int keybox(void)
 
     if (data_changed)
     {
-        fd = rb->open(KEYBOX_FILE, O_WRONLY | O_CREAT | O_TRUNC);
+        fd = rb->open(KEYBOX_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0)
             return FILE_OPEN_ERROR;
         write_output(fd);

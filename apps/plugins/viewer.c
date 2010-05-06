@@ -2138,7 +2138,7 @@ static bool viewer_load_global_settings(void)
 
 static bool viewer_save_global_settings(void)
 {
-    int sfd = rb->open(GLOBAL_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+    int sfd = rb->open(GLOBAL_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
     unsigned char buf[GLOBAL_SETTINGS_H_SIZE];
 
     if (sfd < 0)
@@ -2219,7 +2219,7 @@ static bool viewer_convert_settings_file(void)
     if ((sfd = rb->open(SETTINGS_FILE, O_RDONLY)) < 0)
         return false;
 
-    if ((tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC)) < 0)
+    if ((tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
     {
         rb->close(sfd);
         return false;
@@ -2441,7 +2441,7 @@ static bool viewer_save_settings(void)
         bookmarks[bookmark_count-1].flag = BOOKMARK_LAST;
     }
 
-    tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+    tfd = rb->open(SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if (tfd < 0)
         return false;
 

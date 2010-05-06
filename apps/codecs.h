@@ -222,7 +222,7 @@ struct codec_api {
     size_t          (*enc_unget_pcm_data)(size_t size);
 
     /* file */
-    int (*open)(const char* pathname, int flags);
+    int (*open)(const char* pathname, int flags, ...);
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*lseek)(int fd, off_t offset, int whence);

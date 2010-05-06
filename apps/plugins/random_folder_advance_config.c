@@ -214,7 +214,7 @@ void generate(void)
 {
     dirs_count = 0;
     abort = false;
-    fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY);
+    fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY, 0666);
     rb->write(fd,&dirs_count,sizeof(int));
     if (fd < 0)
     {

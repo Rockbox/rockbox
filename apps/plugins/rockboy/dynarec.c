@@ -425,7 +425,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
     newblock->block=dynapointer;
 #ifdef DYNA_DEBUG
     snprintf(meow,499,"/dyna_0x%x_asm.rb",PC);
-    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
+    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if(fd<0)
     {
         die("couldn't open dyna debug file");
@@ -1907,7 +1907,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
     newblock->length=dynapointer-newblock->block;
     IF_COP(rb->cpucache_invalidate());
     snprintf(meow,499,"/dyna_0x%x_code.rb",PC);
-    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
+    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if(fd>=0)
     {
         write(fd,newblock->block,newblock->length);

@@ -1306,7 +1306,7 @@ static void garray_write(t_garray *x, t_symbol *filename)
     	buf, MAXPDSTRING);
     sys_bashfilename(buf, buf);
 #ifdef ROCKBOX
-    if(!(fd = open(buf, O_WRONLY|O_CREAT|O_TRUNC)))
+    if(!(fd = open(buf, O_WRONLY|O_CREAT|O_TRUNC, 0666)))
 #else
     if (!(fd = fopen(buf, "w")))
 #endif
@@ -1388,7 +1388,7 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     	buf2, MAXPDSTRING);
     sys_bashfilename(buf2, buf2);
 #ifdef ROCKBOX
-    if(!(fd = open(buf2, O_WRONLY|O_CREAT|O_TRUNC)))
+    if(!(fd = open(buf2, O_WRONLY|O_CREAT|O_TRUNC, 0666)))
 #else
     if (!(fd = fopen(buf2, BINWRITEMODE)))
 #endif

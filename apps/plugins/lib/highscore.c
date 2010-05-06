@@ -33,7 +33,7 @@ int highscore_save(char *filename, struct highscore *scores, int num_scores)
     if(!highscore_updated)
         return 1;
 
-    fd = rb->open(filename, O_WRONLY|O_CREAT);
+    fd = rb->open(filename, O_WRONLY|O_CREAT, 0666);
     if(fd < 0)
         return -1;
     

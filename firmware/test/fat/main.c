@@ -356,7 +356,7 @@ int dbg_test(char* name)
     for (j=0; j<5; j++) {
         int num = 40960;
 
-        fd = open(name,O_WRONLY|O_CREAT|O_APPEND);
+        fd = open(name,O_WRONLY|O_CREAT|O_APPEND, 0666);
         if (fd<0) {
             DEBUGF("Failed opening file\n");
             return -1;

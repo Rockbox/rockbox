@@ -249,7 +249,7 @@ static int sram_save(void)
     /* If we crash before we ever loaded sram, DO NOT SAVE! */
     if (!mbc.batt || !ram.loaded || !mbc.ramsize)
         return -1;
-    fd = open(sramfile, O_WRONLY|O_CREAT|O_TRUNC);
+    fd = open(sramfile, O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if (fd<0) return -1;
     snprintf(meow,499,"Saving savedata to %s",sramfile);
     rb->splash(HZ*2, meow);
@@ -263,7 +263,7 @@ static void rtc_save(void)
 {
     int fd;
     if (!rtc.batt) return;
-    if ((fd = open(rtcfile, O_WRONLY|O_CREAT|O_TRUNC))<0) return;
+    if ((fd = open(rtcfile, O_WRONLY|O_CREAT|O_TRUNC, 0666))<0) return;
     rtc_save_internal(fd);
     close(fd);
 }

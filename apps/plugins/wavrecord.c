@@ -3492,7 +3492,7 @@ static int record_file(char *filename)
         {8, 32000}, {9, 44100}, {10, 48000}
     };
 
-    fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC);
+    fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
     if (fd < 0)
     {
         rb->splash(2*HZ, "Couldn't create WAV file");

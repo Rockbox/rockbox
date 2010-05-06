@@ -49,7 +49,7 @@
 #endif
 
 #if  defined(SIMULATOR) && !defined(PLUGIN) && !defined(CODEC)
-#define open(x,y) sim_open(x,y)
+#define open(x, ...) sim_open(x, __VA_ARGS__)
 #define creat(x,m) sim_creat(x,m)
 #define remove(x) sim_remove(x)
 #define rename(x,y) sim_rename(x,y)
@@ -61,16 +61,17 @@
 #define write(x,y,z) sim_write(x,y,z)
 #define close(x) sim_close(x)
 extern int sim_creat(const char *pathname, mode_t mode);
+extern int sim_open(const char *pathname, int flags, ...);
 #endif
 
-typedef int (*open_func)(const char* pathname, int flags);
+typedef int (*open_func)(const char* pathname, int flags, ...);
 typedef ssize_t (*read_func)(int fd, void *buf, size_t count);
 typedef int (*creat_func)(const char *pathname, mode_t mode);
 typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
 typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
                            int(*_compar)(const void *, const void *));
 
-extern int open(const char* pathname, int flags);
+extern int file_open(const char* pathname, int flags);
 extern int close(int fd);
 extern int fsync(int fd);
 extern ssize_t read(int fd, void *buf, size_t count);
@@ -83,6 +84,9 @@ static inline int creat(const char *pathname, mode_t mode)
     (void)mode;
     return file_creat(pathname);
 }
+#if !defined(CODEC) && !defined(PLUGIN)
+#define open(x, y, ...) file_open(x,y)
+#endif
 #endif
 extern ssize_t write(int fd, const void *buf, size_t count);
 extern int remove(const char* pathname);

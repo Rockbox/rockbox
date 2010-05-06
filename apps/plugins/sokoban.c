@@ -1117,7 +1117,7 @@ static bool save(char *filename, bool solution)
     }
 
     if (filename[0] == '\0' ||
-        (fd = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC)) < 0) {
+        (fd = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
         rb->splashf(HZ*2, "Unable to open %s", filename);
         return false;
     }

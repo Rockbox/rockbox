@@ -189,7 +189,7 @@ void profstop() {
     unsigned short current_index;
     timer_unregister();
     profiling = PROF_OFF;
-    fd = open("/profile.out", O_WRONLY|O_CREAT|O_TRUNC);
+    fd = open("/profile.out", O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if (profiling_exit == PROF_ERROR) {
         fdprintf(fd,"Profiling exited with an error.\n");
         fdprintf(fd,"Overflow or timer stolen most likely.\n");

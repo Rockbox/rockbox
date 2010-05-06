@@ -808,7 +808,7 @@ bool save_sudoku(struct sudoku_state_t* state)
         return false;
     }
 
-    fd=rb->open(state->filename, O_WRONLY|O_CREAT);
+    fd=rb->open(state->filename, O_WRONLY|O_CREAT, 0666);
     if (fd >= 0) {
         for (r=0;r<9;r++) {
             i=0;

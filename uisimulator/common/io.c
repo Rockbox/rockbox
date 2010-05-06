@@ -106,7 +106,9 @@ extern int _wrmdir(const wchar_t*);
 #define READDIR(a)  (_wreaddir)(a)
 #define CLOSEDIR(a) (_wclosedir)(a)
 #define STAT(a,b)   (_wstat)(UTF8_TO_OS(a),b)
-#define OPEN(a,b,c) (_wopen)(UTF8_TO_OS(a),b,c)
+/* empty variable parameter list doesn't work for variadic macros,
+ * so pretend the second parameter is variable too */
+#define OPEN(a,...) (_wopen)(UTF8_TO_OS(a), __VA_ARGS__)
 #define CLOSE(a)    (close)(a)
 #define REMOVE(a)   (_wremove)(UTF8_TO_OS(a))
 #define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,convbuf2))
@@ -124,7 +126,9 @@ extern int _wrmdir(const wchar_t*);
 #define READDIR(a)  (readdir)(a)
 #define CLOSEDIR(a) (closedir)(a)
 #define STAT(a,b)   (stat)(a,b)
-#define OPEN(a,b,c) (open)(a,b,c)
+/* empty variable parameter list doesn't work for variadic macros,
+ * so pretend the second parameter is variable too */
+#define OPEN(a, ...) (open)(a, __VA_ARGS__)
 #define CLOSE(x)    (close)(x)
 #define REMOVE(a)   (remove)(a)
 #define RENAME(a,b) (rename)(a,b)
@@ -329,15 +333,23 @@ void sim_closedir(MYDIR *dir)
     free(dir);
 }
 
-int sim_open(const char *name, int o)
+int sim_open(const char *name, int o, ...)
 {
     int opts = rockbox2sim(o);
     int ret;
-
     if (num_openfiles >= MAX_OPEN_FILES)
         return -2;
 
-    ret = OPEN(get_sim_pathname(name), opts, 0666);
+    if (o & O_CREAT)
+    {
+        va_list ap;
+        va_start(ap, o);
+        ret = OPEN(get_sim_pathname(name), opts, va_arg(ap, mode_t));
+        va_end(ap);
+    }
+    else
+        ret = OPEN(get_sim_pathname(name), opts);
+
     if (ret >= 0)
         num_openfiles++;
     return ret;

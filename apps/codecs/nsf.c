@@ -98,7 +98,7 @@ void reset_profile_timers(void) {
 int logfd=-1;
 
 void print_timers(char * path, int track) {
-    logfd = ci->open("/nsflog.txt",O_WRONLY|O_CREAT|O_APPEND);
+    logfd = ci->open("/nsflog.txt",O_WRONLY|O_CREAT|O_APPEND, 0666);
     ci->fdprintf(logfd,"%s[%d]:\t",path,track);
     ci->fdprintf(logfd,"%10ld total\t",READ_TIMER(total));
     PRINT_TIMER_PCT(cpu,total,"CPU");

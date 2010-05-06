@@ -1272,7 +1272,7 @@ int open_save_file( int flags )
 {
     char buf[MAX_PATH];
     get_save_filename( buf );
-    return rb->open( buf, flags );
+    return rb->open( buf, flags, 0666);
 }
 
 void delete_save_file( void )

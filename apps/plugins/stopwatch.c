@@ -358,7 +358,7 @@ void save_stopwatch(void)
 {
     int fd;
     
-    fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC);
+    fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
     
     if (fd < 0)
     {

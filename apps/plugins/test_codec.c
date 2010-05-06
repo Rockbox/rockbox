@@ -59,7 +59,7 @@ static bool log_init(bool use_logfile)
     if (use_logfile) {
         rb->create_numbered_filename(logfilename, "/", "test_codec_log_", ".txt",
                                      2 IF_CNFN_NUM_(, NULL));
-        log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC);
+        log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
         return log_fd >= 0;
     }
 

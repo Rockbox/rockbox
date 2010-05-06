@@ -147,7 +147,7 @@ static int write_file(void)
     if (bomsize)
         fd = rb->open_utf8(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
     else
-        fd = rb->open(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
+        fd = rb->open(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
     if(fd < 0)
         return 10 * fd - 1;

@@ -180,7 +180,7 @@ bool save_changes(int overwrite)
         }
     }
 
-    fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC);
+    fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if (fd < 0)
     {
         newfile = true;

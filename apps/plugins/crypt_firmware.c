@@ -246,7 +246,7 @@ enum plugin_status plugin_start(const void* parameter)
         memcpy(buf + 1, "nn2x", 4);
 
         /* 4 - Write to disk */
-        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC);
+        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fd < 0) {
             rb->splash(HZ*2, "Could not open output file");
@@ -307,7 +307,7 @@ enum plugin_status plugin_start(const void* parameter)
         memcpy(buf + 1, "nn2g", 4);
 
         /* 4 - Write to disk */
-        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC);
+        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fd < 0) {
             rb->splash(HZ*2, "Could not open output file");

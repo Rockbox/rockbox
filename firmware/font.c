@@ -607,7 +607,7 @@ void glyph_cache_save(struct font* pf)
     if (pf->fd >= 0 && pf == &font_ui) 
     {
 #ifdef WPSEDITOR
-        cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+        cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 #else
         cache_fd = creat(GLYPH_CACHE_FILE, 0666);
 #endif

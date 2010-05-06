@@ -63,13 +63,20 @@ int fileexists(const char * fname)
 }
 
 #ifndef SIMULATOR
-int my_open(const char *file, int flags)
+int my_open(const char *file, int flags, ...)
 {
    if(fpoint==8)
       return -1;
 #undef open
-   filearray[fpoint]=rb->open(file, flags);
-
+   if (flags & O_CREAT)
+   {
+      va_list ap;
+      va_start(ap, flags);
+      filearray[fpoint]=rb->open(file, flags, va_arg(ap, mode_t));
+      va_end(ap);
+   }
+   else
+      filearray[fpoint]=rb->open(file, flags);
    if(filearray[fpoint]<0)
       return filearray[fpoint];
 

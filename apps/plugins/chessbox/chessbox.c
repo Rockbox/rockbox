@@ -275,7 +275,7 @@ void cb_saveposition ( void ) {
     
     rb->splash ( 0 , "Saving position" );
 
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
 
     computer++; rb->write(fd, &(computer), sizeof(computer)); computer--;
     opponent++; rb->write(fd, &(opponent), sizeof(opponent)); opponent--;

@@ -2212,7 +2212,7 @@ static void bubbles_savedata(void) {
     if (last_highlevel >= highlevel) /* no need to save */
         return;
 
-    fd = rb->open(DATA_FILE, O_WRONLY|O_CREAT);
+    fd = rb->open(DATA_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0) return;
 
     rb->write(fd, &highlevel, sizeof(highlevel));
@@ -2252,7 +2252,7 @@ static void bubbles_savegame(struct game_context* bb) {
     if (!resume) /* nothing to save */
         return;
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0)
     {
         rb->splash(HZ/2, "Failed to save game");

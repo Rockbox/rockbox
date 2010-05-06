@@ -871,7 +871,7 @@ static void blackjack_savegame(struct game_context* bj) {
     if(!resume)
         return;
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT);
+    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if(fd < 0)
         return;
     rb->write(fd, bj, sizeof(struct game_context));

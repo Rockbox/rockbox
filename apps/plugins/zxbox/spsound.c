@@ -223,12 +223,12 @@ void write_buf(void){
 
 #if 0
     /* can use to save and later analyze what we produce */
-    i = rb->open ( "/sound.raw" , O_WRONLY | O_APPEND | O_CREAT );
+    i = rb->open ( "/sound.raw" , O_WRONLY | O_APPEND | O_CREAT, 0666);
     rb->write ( i  , sp_sound_buf , TMNUM );
     rb->close (i);
 
 
-    i = rb->open ( "/sound2.raw" , O_WRONLY | O_APPEND |O_CREAT);
+    i = rb->open ( "/sound2.raw" , O_WRONLY | O_APPEND |O_CREAT, 0666);
     rb->write ( i  , (unsigned char *)my_buf , TMNUM*4*3 );
     rb->close (i);
 #endif

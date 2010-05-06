@@ -2598,7 +2598,7 @@ enum plugin_status plugin_start(const void* parameter)
         {
             init_mp3_encoder_engine(true, brate[srat], cfg.samplerate);
             get_mp3_filename(wav_filename);
-            mp3file = rb->open(mp3_name , O_WRONLY|O_CREAT|O_TRUNC);
+            mp3file = rb->open(mp3_name , O_WRONLY|O_CREAT|O_TRUNC, 0666);
             frames  = 0;
 
             tim = *rb->current_tick;

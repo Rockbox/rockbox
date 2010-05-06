@@ -1923,7 +1923,7 @@ static void mpeg_thread(void)
 
                     if (mpeg_file < 0) /* delayed file open */
                     {
-                        mpeg_file = open(delayed_filename, O_WRONLY|O_CREAT);
+                        mpeg_file = open(delayed_filename, O_WRONLY|O_CREAT, 0666);
 
                         if (mpeg_file < 0)
                             panicf("recfile: %d", mpeg_file);

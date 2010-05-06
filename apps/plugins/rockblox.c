@@ -877,7 +877,7 @@ static void dump_resume(void)
 {
     int fd;
 
-    fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT);
+    fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0)
         goto fail;
 

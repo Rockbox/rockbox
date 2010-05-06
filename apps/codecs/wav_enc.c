@@ -122,7 +122,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
         return false;
 
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC);
+    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
 
     if (data->rec_file < 0)
         return false;

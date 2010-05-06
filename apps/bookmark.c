@@ -259,7 +259,7 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
     snprintf(global_temp_buffer, sizeof(global_temp_buffer),
              "%s.tmp", bookmark_file_name);
     temp_bookmark_file = open(global_temp_buffer,
-                              O_WRONLY | O_CREAT | O_TRUNC);
+                              O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */
 
@@ -814,7 +814,7 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
     snprintf(global_temp_buffer, sizeof(global_temp_buffer),
              "%s.tmp", bookmark_file_name);
     temp_bookmark_file = open(global_temp_buffer,
-                              O_WRONLY | O_CREAT | O_TRUNC);
+                              O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */

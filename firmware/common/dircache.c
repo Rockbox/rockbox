@@ -557,7 +557,7 @@ int dircache_save(void)
         return -1;
 
     logf("Saving directory cache");
-    fd = open(DIRCACHE_FILE, O_WRONLY | O_CREAT | O_TRUNC);
+    fd = open(DIRCACHE_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;

@@ -73,6 +73,26 @@ size_t codec_size;
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
+#undef open
+static int open(const char* pathname, int flags, ...)
+{
+#ifdef SIMULATOR
+    int fd;
+    if (flags & O_CREAT)
+    {
+        va_list ap;
+        va_start(ap, flags);
+        fd = sim_open(pathname, flags, va_arg(ap, mode_t));
+        va_end(ap);
+    }
+    else
+        fd = sim_open(pathname, flags);
+
+    return fd;
+#else
+    return file_open(pathname, flags);
+#endif
+}
 struct codec_api ci = {
 
     0, /* filesize */

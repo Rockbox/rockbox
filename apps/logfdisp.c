@@ -233,7 +233,7 @@ bool logfdump(void)
         /* nothing is logged just yet */
         return false;
     
-    fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC);
+    fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
     if(-1 != fd) {
         int i;
         

@@ -837,7 +837,7 @@ void z_save (void)
 
 	/* Open auxilary file */
 
-	if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC)) < 0)
+	if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
 	    goto finished;
 
 	/* Write auxilary file */
@@ -859,7 +859,7 @@ void z_save (void)
 
 	/* Open game file */
 
-	if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC)) < 0)
+	if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
 	    goto finished;
 
 	success = save_quetzal (gfp, story_fp);

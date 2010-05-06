@@ -670,7 +670,7 @@ void pgn_parse_game(const char* filename,
         rb->read_line(fhandler, line_buffer, sizeof line_buffer);
     }
 
-    loghandler = rb->open(LOG_FILE, O_WRONLY | O_CREAT);
+    loghandler = rb->open(LOG_FILE, O_WRONLY | O_CREAT, 0666);
 
     GNUChess_Initialize();
 
@@ -829,7 +829,7 @@ void pgn_store_game(struct pgn_game_node* game){
         ply_count++;
     }
 
-    fhandler = rb->open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND);
+    fhandler = rb->open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666);
 
 
     /* the first 7 tags are mandatory according to the PGN specification so we

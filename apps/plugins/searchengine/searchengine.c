@@ -78,7 +78,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->close(parsefd);
     hits=0;
     if(result!=0) {
-        int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC);
+        int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC, 0666);
         int i;
         for(i=0;i<rb->tagdbheader->filecount;i++)
             if(result[i]) {

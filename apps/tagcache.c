@@ -1705,7 +1705,7 @@ static void __attribute__ ((noinline)) add_tagcache(char *path,
 #ifdef SIMULATOR
     /* Crude logging for the sim - to aid in debugging */
     int logfd = open(ROCKBOX_DIR "/database.log",
-                     O_WRONLY | O_APPEND | O_CREAT);
+                     O_WRONLY | O_APPEND | O_CREAT, 0666);
     if (logfd >= 0) {
         write(logfd, path, strlen(path));
         write(logfd, "\n", 1);
@@ -2494,7 +2494,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * anything whether the index type is sorted or not.
          */
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
-        fd = open(buf, O_WRONLY | O_CREAT | O_TRUNC);
+        fd = open(buf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0)
         {
             logf("%s open fail", buf);
@@ -2521,7 +2521,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     if (masterfd < 0)
     {
         logf("Creating new DB");
-        masterfd = open(TAGCACHE_FILE_MASTER, O_WRONLY | O_CREAT | O_TRUNC);
+        masterfd = open(TAGCACHE_FILE_MASTER, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
         if (masterfd < 0)
         {
@@ -3447,7 +3447,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         return false;
     
     /* Initialize the changelog */
-    clfd = open(TAGCACHE_FILE_CHANGELOG, O_WRONLY | O_CREAT | O_TRUNC);
+    clfd = open(TAGCACHE_FILE_CHANGELOG, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (clfd < 0)
     {
         logf("failure to open changelog");
@@ -3820,7 +3820,7 @@ static bool tagcache_dumpsave(void)
     if (!tc_stat.ramcache)
         return false;
     
-    fd = open(TAGCACHE_STATEFILE, O_WRONLY | O_CREAT | O_TRUNC);
+    fd = open(TAGCACHE_STATEFILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd < 0)
     {
         logf("failed to create a statedump");
@@ -4252,7 +4252,7 @@ void tagcache_build(const char *path)
         return ;
     }
     
-    cachefd = open(TAGCACHE_FILE_TEMP, O_RDWR | O_CREAT | O_TRUNC);
+    cachefd = open(TAGCACHE_FILE_TEMP, O_RDWR | O_CREAT | O_TRUNC, 0666);
     if (cachefd < 0)
     {
         logf("master file open failed: %s", TAGCACHE_FILE_TEMP);

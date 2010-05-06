@@ -349,7 +349,7 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
     if (new_playlist)
         fd = open_utf8(playlist, O_CREAT|O_WRONLY|O_TRUNC);
     else
-        fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND);
+        fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND, 0666);
 
     if(fd < 0)
         return result;

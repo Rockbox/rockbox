@@ -687,7 +687,7 @@ static int save(
         /* write the file 1 */
         if (file_name1 != NULL)
         {
-            file1 = rb->open (file_name1, O_WRONLY | O_CREAT);
+            file1 = rb->open (file_name1, O_WRONLY | O_CREAT, 0666);
             if (file1 >= 0)
             {
                 int rc = copy_file(file1, src_file, end, y*2 + 1, y -1);
@@ -727,7 +727,7 @@ static int save(
         if (file_name2 != NULL)
         {
             /* write file 2 */
-            file2 = rb->open (file_name2, O_WRONLY | O_CREAT);
+            file2 = rb->open (file_name2, O_WRONLY | O_CREAT, 0666);
             if (file2 >= 0)
             {
                 end = mp3->filesize - end;

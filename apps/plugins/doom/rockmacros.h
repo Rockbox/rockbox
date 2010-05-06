@@ -39,12 +39,12 @@ char *my_strtok( char * s, const char * delim );
 #define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
 #ifdef SIMULATOR
-#define open(a,b)          rb->open((a),(b))
+#define open(a, ...)       rb->open((a), __VA_ARGS__)
 #define close(a)           rb->close((a))
 #else
-int my_open(const char *file, int flags);
+int my_open(const char *file, int flags, ...);
 int my_close(int id);
-#define open(a,b)          my_open((a),(b))
+#define open(a, ...)       my_open((a), __VA_ARGS__)
 #define close(a)           my_close((a))
 #endif
 

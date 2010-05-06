@@ -686,7 +686,7 @@ enum plugin_status plugin_start(const void* parameter)
             case 0:
                 if(create_log)
                 {
-                    log_fd = rb->open(LOG_FILENAME, O_WRONLY|O_CREAT|O_APPEND);
+                    log_fd = rb->open(LOG_FILENAME, O_WRONLY|O_CREAT|O_APPEND, 0666);
                     if(log_fd >= 0)
                         rb->fdprintf(log_fd, "---- %s ----\n", title);
                     else

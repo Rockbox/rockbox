@@ -63,20 +63,20 @@ void* main(void)
 
 #if 0
     /* Dump the flash */
-    fd=open("/flash.bin",O_CREAT|O_RDWR);
+    fd=open("/flash.bin",O_CREAT|O_RDWR, 0666);
     write(fd,(char*)0,1024*1024);
     close(fd);
 #endif
 
 #if 1
     /* Dump what may be the framebuffer */
-    fd=open("/framebuffer.bin",O_CREAT|O_RDWR|O_TRUNC);
+    fd=open("/framebuffer.bin",O_CREAT|O_RDWR|O_TRUNC, 0666);
     write(fd,framebuffer,220*176*4);
     close(fd);
 #endif
 
 
-    fd=open("/gpio.txt",O_CREAT|O_RDWR|O_TRUNC);
+    fd=open("/gpio.txt",O_CREAT|O_RDWR|O_TRUNC, 0666);
     unsigned int gpio_a = GPIOA_INPUT_VAL;
     unsigned int gpio_b = GPIOB_INPUT_VAL;
     unsigned int gpio_c = GPIOC_INPUT_VAL;

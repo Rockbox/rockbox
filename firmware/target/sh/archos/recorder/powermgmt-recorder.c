@@ -125,7 +125,7 @@ static void debug_file_log(void)
         debug_file_close();
     }
     else if (fd < 0) {
-        fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT);
+        fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT, 0666);
 
         if (fd >= 0) {
             snprintf(debug_message, DEBUG_MESSAGE_LEN,

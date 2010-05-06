@@ -626,7 +626,7 @@ int save_game(void) {
         return -1;
     }
 
-    fd = rb->open(savepath, O_WRONLY|O_CREAT);
+    fd = rb->open(savepath, O_WRONLY|O_CREAT, 0666);
     DEBUGF("savepath: %s\n", savepath);
     if(fd < 0) {
         DEBUGF("Couldn't create/open file\n");

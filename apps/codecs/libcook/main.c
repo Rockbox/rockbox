@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
             /* output raw audio frames that are sent to the decoder into separate files */
 #ifdef DUMP_RAW_FRAMES 
               snprintf(filename,sizeof(filename),"dump%d.raw",++x);
-              fd_out = open(filename,O_WRONLY|O_CREAT|O_APPEND);           
+              fd_out = open(filename,O_WRONLY|O_CREAT|O_APPEND, 0666);
               write(fd_out,pkt.frames[i],sps);  
               close(fd_out);
 #endif

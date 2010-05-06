@@ -124,7 +124,7 @@ enum plugin_status plugin_start(
     int fd;
     (void)parameter;
     
-    fd = rb->open(FILENAME, O_CREAT|O_TRUNC|O_WRONLY);
+    fd = rb->open(FILENAME, O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd < 0)
         return PLUGIN_ERROR;
     list = rb->get_settings_list(&setting_count);

@@ -325,7 +325,7 @@ static void savesettings(void)
     {
         options.dirty=0;
         snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
-        fd = open(optionsave, O_WRONLY|O_CREAT|O_TRUNC);
+        fd = open(optionsave, O_WRONLY|O_CREAT|O_TRUNC, 0666);
         write(fd,&options, sizeof(options));
         close(fd);
     }

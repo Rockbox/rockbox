@@ -62,7 +62,7 @@ static unsigned char wav_header[44]={
 int open_wav(char* filename) {
     int fd;
 
-    fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR);
+    fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
     if (fd >= 0) {
         if (write(fd,wav_header,sizeof(wav_header)) < sizeof(wav_header)) {
             fprintf(stderr,"[ERR}  Failed to write wav header\n");

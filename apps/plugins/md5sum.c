@@ -246,7 +246,7 @@ enum plugin_status plugin_start(const void* parameter)
     done = 0;
     action( out, arg );
 
-    out = rb->open( filename, O_WRONLY|O_CREAT|O_TRUNC );
+    out = rb->open( filename, O_WRONLY|O_CREAT|O_TRUNC , 0666);
     if( out < 0 ) return PLUGIN_ERROR;
     action( out, arg );
     rb->close( out );

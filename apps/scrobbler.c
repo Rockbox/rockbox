@@ -86,7 +86,7 @@ static void write_cache(void)
     Check at each write since file may be deleted at any time */
     if(!file_exists(SCROBBLER_FILE))
     {
-        fd = open(SCROBBLER_FILE, O_RDWR | O_CREAT);
+        fd = open(SCROBBLER_FILE, O_RDWR | O_CREAT, 0666);
         if(fd >= 0)
         {
             fdprintf(fd, "#AUDIOSCROBBLER/" SCROBBLER_VERSION "\n"

@@ -93,9 +93,9 @@ static char current_plugin[MAX_PATH];
 
 char *plugin_get_current_filename(void);
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 /* Some wrappers used to monitor open and close and detect leaks*/
-static int open_wrapper(const char* pathname, int flags);
+static int open_wrapper(const char* pathname, int flags, ...);
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 static int close_wrapper(int fd);
 static int creat_wrapper(const char *pathname, mode_t mode);
 #endif
@@ -299,13 +299,12 @@ static const struct plugin_api rockbox_api = {
 
     /* file */
     open_utf8,
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     (open_func)open_wrapper,
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     close_wrapper,
 #else
-    (open_func)PREFIX(open),
     PREFIX(close),
-    #endif
+#endif
     (read_func)PREFIX(read),
     PREFIX(lseek),
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
@@ -979,17 +978,34 @@ char *plugin_get_current_filename(void)
     return current_plugin;
 }
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-static int open_wrapper(const char* pathname, int flags)
+static int open_wrapper(const char* pathname, int flags, ...)
 {
-    int fd = PREFIX(open)(pathname,flags);
+/* we don't have an 'open' function. it's a define. and we need
+ * the real file_open, hence PREFIX() doesn't work here */
+    int fd;
+#ifdef SIMULATOR
+    if (flags & O_CREAT)
+    {
+        va_list ap;
+        va_start(ap, flags);
+        int fd;
+        fd = sim_open(pathname, flags, va_arg(ap, mode_t));
+        va_end(ap);
+    }
+    else
+        fd = sim_open(pathname, flags);
+#else
+    fd = file_open(pathname,flags);
+#endif
 
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     if(fd >= 0)
         open_files |= 1<<fd;
-    
+#endif
     return fd;
 }
 
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 static int close_wrapper(int fd)
 {
     if((~open_files) & (1<<fd))

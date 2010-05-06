@@ -59,7 +59,9 @@ void dynamic_recompile (struct dynarec_block *newblock);
 #define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && ((c) <= 'Z')))
 #define isalnum(c) (isdigit(c) || (isalpha(c)))
 
-#define open(a,b)       rb->open((a),(b))
+/* only 1 fixed argument for open, since variadic macros don't except empty
+ * variable parameters */
+#define open(a, ...)       rb->open((a), __VA_ARGS__)
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
 #define close(a)        rb->close((a))
 #define read(a,b,c)     rb->read((a),(b),(c))

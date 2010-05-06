@@ -45,7 +45,7 @@ void reset_profile_timers(void)
 
 void print_timers(char * path)
 {
-    int logfd = ci->open("/spclog.txt",O_WRONLY|O_CREAT|O_APPEND);
+    int logfd = ci->open("/spclog.txt",O_WRONLY|O_CREAT|O_APPEND, 0666);
     ci->fdprintf(logfd,"%s:\t",path);
     ci->fdprintf(logfd,"%10ld total\t",READ_TIMER(total));
     PRINT_TIMER_PCT(render,total,"render");

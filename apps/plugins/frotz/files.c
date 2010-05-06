@@ -74,7 +74,7 @@ void script_open (void)
 
     /* Opening in "at" mode doesn't work for script_erase_input... */
 
-    if ((sfp = rb->open (script_name, O_RDWR|O_CREAT)) != -1) {
+    if ((sfp = rb->open (script_name, O_RDWR|O_CREAT, 0666)) != -1) {
 
 	fseek (sfp, 0, SEEK_END);
 
@@ -290,7 +290,7 @@ void record_open (void)
 
 	strcpy (command_name, new_name);
 
-	if ((rfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC)) != -1)
+	if ((rfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) != -1)
 	    ostream_record = TRUE;
 	else
 	    print_string ("Cannot open file\n");

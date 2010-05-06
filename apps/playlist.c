@@ -336,7 +336,7 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
 static void create_control(struct playlist_info* playlist)
 {
     playlist->control_fd = open(playlist->control_filename,
-                                O_CREAT|O_RDWR|O_TRUNC);
+                                O_CREAT|O_RDWR|O_TRUNC, 0666);
     if (playlist->control_fd < 0)
     {
         if (check_rockboxdir())
@@ -414,7 +414,7 @@ static int recreate_control(struct playlist_info* playlist)
             return -1;
 
         playlist->control_fd = open(playlist->control_filename,
-            O_CREAT|O_RDWR|O_TRUNC);
+            O_CREAT|O_RDWR|O_TRUNC, 0666);
         if (playlist->control_fd < 0)
             return -1;
 
@@ -3375,7 +3375,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     else
     {
         /* some applications require a BOM to read the file properly */
-        fd = open(path, O_CREAT|O_WRONLY|O_TRUNC);
+        fd = open(path, O_CREAT|O_WRONLY|O_TRUNC, 0666);
     }
     if (fd < 0)
     {
