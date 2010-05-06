@@ -140,7 +140,7 @@ void screen_dump(void)
                              IF_CNFN_NUM_(, NULL));
 #endif
 
-    fd = creat(filename);
+    fd = creat(filename, 0666);
     if (fd < 0)
         return;
 
@@ -317,7 +317,7 @@ void remote_screen_dump(void)
                              IF_CNFN_NUM_(, NULL));
 #endif
 
-    fd = creat(filename);
+    fd = creat(filename, 0666);
     if (fd < 0)
         return;
 

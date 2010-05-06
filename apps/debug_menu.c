@@ -2068,7 +2068,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #if  (CONFIG_STORAGE & STORAGE_ATA) 
 static bool dbg_identify_info(void)
 {
-    int fd = creat("/identify_info.bin");
+    int fd = creat("/identify_info.bin", 0666);
     if(fd >= 0)
     {
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -2202,14 +2202,14 @@ static bool dbg_save_roms(void)
     int fd;
     int oldmode = system_memory_guard(MEMGUARD_NONE);
 
-    fd = creat("/internal_rom_0000-FFFF.bin");
+    fd = creat("/internal_rom_0000-FFFF.bin", 0666);
     if(fd >= 0)
     {
         write(fd, (void *)0, 0x10000);
         close(fd);
     }
 
-    fd = creat("/internal_rom_2000000-203FFFF.bin");
+    fd = creat("/internal_rom_2000000-203FFFF.bin", 0666);
     if(fd >= 0)
     {
         write(fd, (void *)0x2000000, 0x40000);
@@ -2226,13 +2226,13 @@ static bool dbg_save_roms(void)
     int oldmode = system_memory_guard(MEMGUARD_NONE);
 
 #if defined(IRIVER_H100_SERIES)
-    fd = creat("/internal_rom_000000-1FFFFF.bin");
+    fd = creat("/internal_rom_000000-1FFFFF.bin", 0666);
 #elif defined(IRIVER_H300_SERIES)
-    fd = creat("/internal_rom_000000-3FFFFF.bin");
+    fd = creat("/internal_rom_000000-3FFFFF.bin", 0666);
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
-    fd = creat("/internal_rom_000000-3FFFFF.bin");
+    fd = creat("/internal_rom_000000-3FFFFF.bin", 0666);
 #elif defined(MPIO_HD200)
-    fd = creat("/internal_rom_000000-1FFFFF.bin");
+    fd = creat("/internal_rom_000000-1FFFFF.bin", 0666);
 #endif
     if(fd >= 0)
     {
@@ -2242,7 +2242,7 @@ static bool dbg_save_roms(void)
     system_memory_guard(oldmode);
 
 #ifdef HAVE_EEPROM
-    fd = creat("/internal_eeprom.bin");
+    fd = creat("/internal_eeprom.bin", 0666);
     if (fd >= 0)
     {
         int old_irq_level;
@@ -2273,7 +2273,7 @@ static bool dbg_save_roms(void)
 {
     int fd;
 
-    fd = creat("/internal_rom_000000-0FFFFF.bin");
+    fd = creat("/internal_rom_000000-0FFFFF.bin", 0666);
     if(fd >= 0)
     {
         write(fd, (void *)0x20000000, FLASH_SIZE);
@@ -2287,7 +2287,7 @@ static bool dbg_save_roms(void)
 {
     int fd;
 
-    fd = creat("/flash_rom_A0000000-A01FFFFF.bin");
+    fd = creat("/flash_rom_A0000000-A01FFFFF.bin", 0666);
     if (fd >= 0)
     {
         write(fd, (void*)0xa0000000, FLASH_SIZE);
@@ -2301,7 +2301,7 @@ static bool dbg_save_roms(void)
 {
     int fd;
 
-    fd = creat("/eeprom_E0000000-E0001FFF.bin");
+    fd = creat("/eeprom_E0000000-E0001FFF.bin", 0666);
     if (fd >= 0)
     {
         write(fd, (void*)0xe0000000, 0x2000);

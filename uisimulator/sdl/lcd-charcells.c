@@ -38,7 +38,7 @@
 #endif
 
 /* extern functions, needed for screendump() */
-extern int sim_creat(const char *name);
+extern int sim_creat(const char *name, mode_t mode);
 
 SDL_Surface* lcd_surface;
 
@@ -162,7 +162,7 @@ void screen_dump(void)
         IF_CNFN_NUM_(, NULL));
     DEBUGF("screen_dump\n");
 
-    fd = sim_creat(filename);
+    fd = sim_creat(filename, 0666);
     if (fd < 0)
         return;
 

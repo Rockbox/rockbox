@@ -457,7 +457,7 @@ void load_settings(void) {
 }
 
 void save_settings(void) {
-    int fp = rb->creat(PLUGIN_DEMOS_DIR "/.vu_meter");
+    int fp = rb->creat(PLUGIN_DEMOS_DIR "/.vu_meter", 0666);
     if(fp >= 0) {
         rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
         rb->close(fp);

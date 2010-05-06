@@ -612,7 +612,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
     int fp, fq;
     /* use O_RDWR|O_CREAT so that file is created if it doesn't exist. */
     fp = rb->open(MEMO_FILE, O_RDWR|O_CREAT);
-    fq = rb->creat(TEMP_FILE);
+    fq = rb->creat(TEMP_FILE, 0666);
     if ( (fq > -1) && (fp > -1) )
     {
         int i;

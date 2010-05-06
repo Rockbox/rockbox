@@ -46,7 +46,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
     char buf[MAX_PATH];
 
     get_cfg_filename(buf, MAX_PATH, filename);
-    fd = rb->creat(buf);
+    fd = rb->creat(buf, 0666);
     if(fd < 0)
         return fd*10 - 1;
 

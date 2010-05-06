@@ -381,7 +381,7 @@ enum settings_file_status tuner_settings_load(struct tuner_settings* settings,
 enum settings_file_status tuner_settings_save(struct tuner_settings* settings,
                                               char* filename)
 {
-    int fd = rb->creat(filename);
+    int fd = rb->creat(filename, 0666);
     if(fd >= 0){ /* does file exist? */
         rb->write (fd, settings, sizeof(*settings));
         rb->close(fd);

@@ -123,7 +123,7 @@ static bool test_fs(void)
     rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
     log_text(text_buf, true);
 
-    fd = rb->creat(TEST_FILE);
+    fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
         rb->splash(HZ, "creat() failed.");
@@ -211,7 +211,7 @@ static bool file_speed(int chunksize, bool align)
     log_text("--------------------", true);
 
     /* File creation write speed */
-    fd = rb->creat(TEST_FILE);
+    fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
         rb->splash(HZ, "creat() failed.");
@@ -311,7 +311,7 @@ static bool test_speed(void)
     for (i = 0; TIME_BEFORE(*rb->current_tick, time); i++)
     {
         rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
-        fd = rb->creat(text_buf);
+        fd = rb->creat(text_buf, 0666);
         if (fd < 0)
         {
             last_file = i;

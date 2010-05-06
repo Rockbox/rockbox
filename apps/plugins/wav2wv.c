@@ -169,7 +169,7 @@ static int wav2wv(const char *infile)
     outextension = outfile + rb->strlen(outfile) - 3; 
     outextension[1] = outextension[2];
     outextension[2] = 0;
-    out_fd = rb->creat(outfile);
+    out_fd = rb->creat(outfile, 0666);
 
     if (out_fd < 0) {
         rb->splash(HZ*2, "could not create file!");

@@ -1161,7 +1161,7 @@ bool save_pfraw(char* filename, struct bitmap *bm)
     struct pfraw_header bmph;
     bmph.width = bm->width;
     bmph.height = bm->height;
-    int fh = rb->creat( filename );
+    int fh = rb->creat( filename , 0666);
     if( fh < 0 ) return false;
     rb->write( fh, &bmph, sizeof( struct pfraw_header ) );
     int y;

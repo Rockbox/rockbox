@@ -85,7 +85,7 @@ bool load_sc_file(sc_file_t *file, char *filename, bool must_exist,
         /* The file didn't exist on disk */
         if (!must_exist) {
             DEBUGF("Trying to create link file '%s'...\n", filename);
-            fd = rb->creat(filename);
+            fd = rb->creat(filename, 0666);
             if (fd < 0){
                 /* For some reason we couldn't create the file,
                  * so return an error message and exit */

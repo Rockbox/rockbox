@@ -167,7 +167,7 @@ void init_wav(char* filename)
 {
     wavinfo.totalsamples = 0;
 
-    wavinfo.fd = rb->creat(filename);
+    wavinfo.fd = rb->creat(filename, 0666);
 
     if (wavinfo.fd >= 0)
     {

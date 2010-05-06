@@ -609,7 +609,7 @@ void glyph_cache_save(struct font* pf)
 #ifdef WPSEDITOR
         cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC);
 #else
-        cache_fd = creat(GLYPH_CACHE_FILE);
+        cache_fd = creat(GLYPH_CACHE_FILE, 0666);
 #endif
         if (cache_fd < 0) return;
 

@@ -401,7 +401,7 @@ struct plugin_api {
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*lseek)(int fd, off_t offset, int whence);
-    int (*creat)(const char *pathname);
+    int (*creat)(const char *pathname, mode_t mode);
     ssize_t (*write)(int fd, const void* buf, size_t count);
     int (*remove)(const char* pathname);
     int (*rename)(const char* path, const char* newname);

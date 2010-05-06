@@ -46,7 +46,7 @@ static struct mutex tuner_mtx;
 static int fd_log = -1;
 
 #define TUNER_LOG_OPEN()    if (fd_log < 0) \
-                                fd_log = creat("/tuner_dump.txt")
+                                fd_log = creat("/tuner_dump.txt", 0666)
 /* syncing required because close() is never called */
 #define TUNER_LOG_SYNC()    fsync(fd_log)
 #define TUNER_LOG(s...)     fdprintf(fd_log, s)

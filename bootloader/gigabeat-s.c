@@ -196,7 +196,7 @@ static void untar(int tar_fd)
         {
             int wc;
 
-            fd = creat(path);
+            fd = creat(path, 0666);
             if (fd < 0)
             {
                 printf("failed to create file (%d)", fd);

@@ -60,7 +60,7 @@ int save_bmp_file( char* filename, struct bitmap *bm )
     int fh;
     int x,y;
     if( bm->format != FORMAT_NATIVE ) return -1;
-    fh = rb->creat( filename );
+    fh = rb->creat( filename , 0666);
     if( fh < 0 ) return -1;
 
     rb->write( fh, header, sizeof( header ) );

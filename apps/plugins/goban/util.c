@@ -221,7 +221,7 @@ create_or_open_file (const char *filename)
 
     if (!rb->file_exists (filename))
     {
-        fd = rb->creat (filename);
+        fd = rb->creat(filename, 0666);
     }
     else
     {

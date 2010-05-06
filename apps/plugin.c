@@ -97,7 +97,7 @@ char *plugin_get_current_filename(void);
 /* Some wrappers used to monitor open and close and detect leaks*/
 static int open_wrapper(const char* pathname, int flags);
 static int close_wrapper(int fd);
-static int creat_wrapper(const char *pathname);
+static int creat_wrapper(const char *pathname, mode_t mode);
 #endif
 
 static const struct plugin_api rockbox_api = {
@@ -1002,9 +1002,9 @@ static int close_wrapper(int fd)
     return PREFIX(close)(fd);
 }
 
-static int creat_wrapper(const char *pathname)
+static int creat_wrapper(const char *pathname, mode_t mode)
 {
-    int fd = PREFIX(creat)(pathname);
+    int fd = PREFIX(creat)(pathname, mode);
 
     if(fd >= 0)
         open_files |= (1<<fd);

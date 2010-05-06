@@ -666,7 +666,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
         src_fd = open(src, O_RDONLY);
 
         if (src_fd >= 0) {
-            target_fd = creat(target);
+            target_fd = creat(target, 0666);
 
             if (target_fd >= 0) {
                 result = true;

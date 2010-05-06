@@ -67,7 +67,7 @@ static int write_file(void)
     
     rb->snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
     
-    fd = rb->creat(tmpfilename);
+    fd = rb->creat(tmpfilename, 0666);
     if(fd < 0)
         return 10 * fd - 1;
 

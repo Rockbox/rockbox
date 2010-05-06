@@ -536,7 +536,7 @@ enum plugin_status plugin_start(const void* parameter)
     status = tidy_lcd_menu();
     if (tidy_loaded_and_changed)
     {
-        int fd = rb->creat(CUSTOM_FILES);
+        int fd = rb->creat(CUSTOM_FILES, 0666);
         int i;
         if (fd >= 0)
         {

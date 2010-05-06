@@ -352,9 +352,9 @@ int sim_close(int fd)
     return ret;
 }
 
-int sim_creat(const char *name)
+int sim_creat(const char *name, mode_t mode)
 {
-    return OPEN(get_sim_pathname(name), O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    return OPEN(get_sim_pathname(name), O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
 ssize_t sim_read(int fd, void *buf, size_t count)

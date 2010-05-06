@@ -263,7 +263,7 @@ int load_list(void)
 
 int save_list(void)
 {
-    int myfd = rb->creat(RFA_FILE);
+    int myfd = rb->creat(RFA_FILE, 0666);
     if (myfd < 0)
     {
         rb->splash(HZ, "Could Not Open " RFA_FILE);
@@ -388,7 +388,7 @@ int export_list_to_file_text(void)
     }
         
     /* create and open the file */
-    int myfd = rb->creat(RFA_FILE_TEXT);
+    int myfd = rb->creat(RFA_FILE_TEXT, 0666);
     if (myfd < 0)
     {
         rb->splashf(HZ*4, "failed to open: fd = %d, file = %s", 

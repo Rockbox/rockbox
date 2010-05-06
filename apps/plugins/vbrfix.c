@@ -49,7 +49,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
         return 10*orig_fd - 1;
     }
 
-    fd = rb->creat(tmpname);
+    fd = rb->creat(tmpname, 0666);
     if(fd < 0) {
         rb->close(orig_fd);
         return 10*fd - 2;

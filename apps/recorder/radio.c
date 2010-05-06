@@ -1135,7 +1135,7 @@ static void radio_save_presets(void)
     int fd;
     int i;
 
-    fd = creat(filepreset);
+    fd = creat(filepreset, 0666);
     if(fd >= 0)
     {
         for(i = 0;i < num_presets;i++)
