@@ -255,7 +255,6 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     (void)epc;
 
     /* Depends on crt0.S ! */
-    char buffer[LCD_WIDTH/SYSFONT_WIDTH];
     char *registers[] = { "ra", "fp", "gp", "t9", "t8", "s7", "s6", "s5", "s4",
                           "s3", "s2", "s1", "s0", "t7", "t6", "t5", "t4", "t3",
                           "t2", "t1", "t0", "a3", "a2", "a1", "a0", "v1", "v0",
@@ -275,14 +274,12 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     lcd_clear_display();
     _backlight_on();
 
-    snprintf(buffer, sizeof(buffer), "0x%08x at 0x%08x", read_c0_badvaddr(), epc);
     lcd_puts(0, 0, parse_exception(cause));
-    lcd_puts(0, 1, buffer);
+    lcd_putsf(0, 1, "0x%08x at 0x%08x", read_c0_badvaddr(), epc);
     for(i=0; i< 0x80/4; i+=2)
     {
         unsigned int* ptr = (unsigned int*)(stack_ptr + i*4);
-        snprintf(buffer, sizeof(buffer), "%s: 0x%08x %s: 0x%08x", registers[i], *ptr, registers[i+1], *(ptr+1));
-        lcd_puts(0, 3 + i/2, buffer);
+        lcd_putsf(0, 3 + i/2, "%s: 0x%08x %s: 0x%08x", registers[i], *ptr, registers[i+1], *(ptr+1));
     }
     lcd_update();
 
