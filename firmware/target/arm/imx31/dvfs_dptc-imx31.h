@@ -107,6 +107,16 @@ struct dvfs_lt_signal_descriptor
     uint8_t detect   : 1; /* 1 = edge-detected */
 };
 
+#define DVFS_NUM_LEVELS 4
+#define DPTC_NUM_WP    17
+
+/* 0 and 3 are *required*. DVFS hardware depends upon DVSUP pins showing
+ * minimum (11) and maximum (00) levels or interrupts will be continuously
+ * asserted. */
+#define DVFS_LEVEL_0   (1u << 0)
+#define DVFS_LEVEL_1   (1u << 1)
+#define DVFS_LEVEL_2   (1u << 2)
+#define DVFS_LEVEL_3   (1u << 3)
 
 extern long cpu_voltage_setting;
 

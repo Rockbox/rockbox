@@ -119,8 +119,10 @@ void avic_init(void)
     for (i = 0; i < 8; i++)
         avic->nipriority[i] = 0;
 
-    /* Set NM bit to enable VIC */
-    avic->intcntl |= AVIC_INTCNTL_NM;
+    /* Set NM bit to enable VIC. Mask fast interrupts. Core arbiter rise
+     * for normal interrupts (for lowest latency). */
+    avic->intcntl |= AVIC_INTCNTL_NM | AVIC_INTCNTL_FIDIS |
+                   AVIC_INTCNTL_NIAD;
 
     /* Enable VE bit in CP15 Control reg to enable VIC */
     asm volatile (
@@ -213,7 +215,12 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
     restore_interrupt(oldstatus);
 }
 
-void avic_set_ni_level(unsigned int level)
+void avic_set_ni_level(int level)
 {
-    AVIC_NIMASK = level > 0x1f ? 0x1f : level;
+    if (level < 0)
+        level = 0x1f; /* -1 */
+    else if (level > 15)
+        level = 15;
+
+    AVIC_NIMASK = level;
 }

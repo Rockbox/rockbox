@@ -40,8 +40,10 @@ bool __dbg_hw_info(void)
     unsigned int freq;
     uint32_t regval;
 
-    extern volatile unsigned int dvfs_nr_dn, dvfs_nr_up, dvfs_nr_pnc;
-    extern volatile unsigned int dptc_nr_dn, dptc_nr_up, dptc_nr_pnc;
+    extern volatile unsigned int dvfs_nr_dn, dvfs_nr_up,
+                                 dvfs_nr_pnc, dvfs_nr_no;
+    extern volatile unsigned int dptc_nr_dn, dptc_nr_up,
+                                 dptc_nr_pnc, dptc_nr_no;
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
@@ -119,13 +121,15 @@ bool __dbg_hw_info(void)
         lcd_putsf(0, line++, "cpu_frequency: %ld Hz", cpu_frequency);
 
         lcd_putsf(0, line++, "dvfs_level: %u", dvfs_get_level());
-        lcd_putsf(0, line++, "dvfs d|u|p: %u %u %u", dvfs_nr_dn, dvfs_nr_up, dvfs_nr_pnc);
+        lcd_putsf(0, line++, "dvfs d|u|p|n: %u %u %u %u",
+                  dvfs_nr_dn, dvfs_nr_up, dvfs_nr_pnc, dvfs_nr_no);
         regval = dvfs_dptc_get_voltage();
         lcd_putsf(0, line++, "cpu_voltage: %d.%03d V", regval / 1000,
                   regval % 1000);
 
         lcd_putsf(0, line++, "dptc_wp: %u", dptc_get_wp());
-        lcd_putsf(0, line++, "dptc d|u|p: %u %u %u", dptc_nr_dn, dptc_nr_up, dptc_nr_pnc);
+        lcd_putsf(0, line++, "dptc d|u|p|n: %u %u %u %u",
+                  dptc_nr_dn, dptc_nr_up, dptc_nr_pnc, dptc_nr_no);
         lcd_putsf(0, line++, "DVCR0,1: %08lX %08lX", CCM_DCVR0, CCM_DCVR1);
         lcd_putsf(0, line++, "DVCR2,3: %08lX %08lX", CCM_DCVR2, CCM_DCVR3);
         lcd_putsf(0, line++, "SWITCHERS0: %08lX", mc13783_read(MC13783_SWITCHERS0));

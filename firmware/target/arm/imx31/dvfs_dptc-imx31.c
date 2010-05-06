@@ -72,6 +72,7 @@ static bool dvfs_running = false; /* Has driver enabled DVFS? */
 unsigned int dvfs_nr_dn = 0;
 unsigned int dvfs_nr_up = 0;
 unsigned int dvfs_nr_pnc = 0;
+unsigned int dvfs_nr_no = 0;
 
 static void dvfs_stop(void);
 
@@ -83,7 +84,7 @@ static inline void wait_for_dvfs_update_en(void)
 }
 
 
-static void do_dvfs_update(unsigned int level)
+static void do_dvfs_update(unsigned int level, bool in_isr)
 {
     const struct dvfs_clock_table_entry *setting = &dvfs_clock_table[level];
     unsigned long pmcr0 = CCM_PMCR0;
@@ -96,7 +97,7 @@ static void do_dvfs_update(unsigned int level)
 
     pmcr0 &= ~CCM_PMCR0_VSCNT;
 
-    if (level > ((pmcr0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS))
+    if (level < ((pmcr0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS))
     { 
         pmcr0 |= CCM_PMCR0_UDSC; /* Up scaling, increase */
         pmcr0 |= setting->vscnt << CCM_PMCR0_VSCNT_POS;
@@ -126,7 +127,15 @@ static void do_dvfs_update(unsigned int level)
     }
 
     CCM_PMCR0 = pmcr0;
+    /* Note: changes to frequency with ints unmaked seem to cause spurious
+     * DVFS interrupts with value CCM_PMCR0_FSVAI_NO_INT. These aren't
+     * supposed to happen. Only do the lengthy delay with them enabled iff
+     * called from the IRQ handler. */
+    if (in_isr)
+        enable_irq();
     udelay(100); /* Software wait for voltage ramp-up */
+    if (in_isr)
+        disable_irq();
     CCM_PDR0 = setting->pdr_val;
 
     if (!(pmcr0 & CCM_PMCR0_DFSUP_POST_DIVIDERS))
@@ -160,7 +169,7 @@ static void set_current_dvfs_level(unsigned int level)
 
     wait_for_dvfs_update_en();
 
-    do_dvfs_update(level);
+    do_dvfs_update(level, false);
 
     wait_for_dvfs_update_en();
 
@@ -191,7 +200,8 @@ static void __attribute__((used)) dvfs_int(void)
 
         /* Upon the DECREASE event, the frequency will be changed to the next
          * higher state index. */
-        level++;
+        while (((1u << ++level) & DVFS_LEVEL_MASK) == 0);
+
         dvfs_nr_dn++;
         break;
 
@@ -202,7 +212,8 @@ static void __attribute__((used)) dvfs_int(void)
 
         /* Upon the INCREASE event, the frequency will be changed to the next
          * lower state index. */
-        level--;
+        while (((1u << --level) & DVFS_LEVEL_MASK) == 0);
+
         dvfs_nr_up++;
         break;
 
@@ -218,11 +229,11 @@ static void __attribute__((used)) dvfs_int(void)
         break;
 
     case CCM_PMCR0_FSVAI_NO_INT:
-    default:
+        dvfs_nr_no++;
         return;     /* Do nothing. Freq change is not required */
     } /* end switch */
 
-    do_dvfs_update(level);
+    do_dvfs_update(level, true);
 }
 
 
@@ -230,9 +241,9 @@ static void __attribute__((used)) dvfs_int(void)
 static __attribute__((naked, interrupt("IRQ"))) void CCM_DVFS_HANDLER(void)
 {
     /* Audio can glitch with the long udelay if nested IRQ isn't allowed. */
-    AVIC_NESTED_NI_CALL_PROLOGUE(INT_PRIO_DVFS);
+    AVIC_NESTED_NI_CALL_PROLOGUE(INT_PRIO_DVFS, 32*4);
     asm volatile ("bl dvfs_int");
-    AVIC_NESTED_NI_CALL_EPILOGUE();
+    AVIC_NESTED_NI_CALL_EPILOGUE(32*4);
 }
 
 
@@ -281,7 +292,7 @@ static void dvfs_init(void)
     imx31_regmod32(&CCM_LTR0,
                    DVFS_UPTHR << CCM_LTR0_UPTHR_POS |
                    DVFS_DNTHR << CCM_LTR0_DNTHR_POS |
-                   DVFS_DIV3CK,
+                   DVFS_DIV3CK << CCM_LTR0_DIV3CK_POS,
                    CCM_LTR0_UPTHR | CCM_LTR0_DNTHR | CCM_LTR0_DIV3CK);
 
     /* Set up LTR1. */
@@ -356,7 +367,7 @@ static void dvfs_stop(void)
         {
             /* Set default frequency level */
             wait_for_dvfs_update_en();
-            do_dvfs_update(DVFS_LEVEL_DEFAULT);
+            do_dvfs_update(DVFS_LEVEL_DEFAULT, false);
             wait_for_dvfs_update_en();
         }
 
@@ -379,6 +390,7 @@ static bool dptc_running = false; /* Has driver enabled DPTC? */
 unsigned int dptc_nr_dn = 0;
 unsigned int dptc_nr_up = 0;
 unsigned int dptc_nr_pnc = 0;
+unsigned int dptc_nr_no = 0;
 
 static struct spi_transfer_desc dptc_pmic_xfer; /* Transfer descriptor */
 static const unsigned char dptc_pmic_regs[2] =  /* Register subaddresses */
@@ -492,7 +504,12 @@ static void dptc_new_wp(unsigned int wp)
 /* Interrupt vector for DPTC */
 static __attribute__((interrupt("IRQ"))) void CCM_CLK_HANDLER(void)
 {
-    dptc_int(CCM_PMCR0);
+    unsigned long pmcr0 = CCM_PMCR0;
+
+    if ((pmcr0 & CCM_PMCR0_PTVAI) == CCM_PMCR0_PTVAI_NO_INT)
+        dptc_nr_no++;
+
+    dptc_int(pmcr0);
 }
 
 
