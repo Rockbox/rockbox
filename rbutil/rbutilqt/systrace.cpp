@@ -24,6 +24,8 @@
 #include "rbsettings.h"
 
 QString SysTrace::debugbuffer;
+QString SysTrace::lastmessage;
+unsigned int SysTrace::repeat = 0;
 
 SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
 {
@@ -41,6 +43,7 @@ SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
 void SysTrace::refresh(void)
 {
     int pos = ui.textTrace->verticalScrollBar()->value();
+    flush();
     ui.textTrace->setHtml("<pre>" + debugbuffer + "</pre>");
     ui.textTrace->verticalScrollBar()->setValue(pos);
     QString oldlog = RbSettings::value(RbSettings::CachePath).toString()
@@ -54,6 +57,8 @@ void SysTrace::save(QString filename)
     if(filename.isEmpty())
         filename = RbSettings::value(RbSettings::CachePath).toString()
                     + "/rbutil-trace.log";
+    // make sure any repeat detection is flushed
+    flush();
     // append save date to the trace. Append it directly instead of using
     // qDebug() as the handler might have been unregistered.
     debugbuffer.append("[SysTrace] saving trace at ");
@@ -91,11 +96,29 @@ void SysTrace::savePreviousTrace(void)
 void SysTrace::debug(QtMsgType type, const char* msg)
 {
     (void)type;
-    debugbuffer.append(msg);
-    debugbuffer.append("\n");
+    if(lastmessage != msg) {
+        lastmessage = msg;
+        flush();
+        debugbuffer.append(msg);
+        debugbuffer.append("\n");
 #if !defined(NODEBUG)
-    fprintf(stderr, "%s\n", msg);
+        fprintf(stderr, "%s\n", msg);
 #endif
+        repeat = 1;
+    }
+    else {
+        repeat++;
+    }
+}
 
+void SysTrace::flush(void)
+{
+    if(repeat > 1) {
+        debugbuffer.append(
+                QString("    (Last message repeasted %1 times.)\n").arg(repeat));
+#if !defined(NODEBUG)
+        fprintf(stderr, "    (Last message repeated %i times.)\n", repeat);
+#endif
+    }
 }
 

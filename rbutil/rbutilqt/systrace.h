@@ -34,8 +34,11 @@ class SysTrace : public QDialog
         static QString getTrace() {return debugbuffer;}
         static void save(QString filename = "");
     private:
+        static void flush(void);
         Ui::SysTraceFrm ui;
         static QString debugbuffer;
+        static QString lastmessage;
+        static unsigned int repeat;
 
     private slots:
         void saveCurrentTrace(void);
