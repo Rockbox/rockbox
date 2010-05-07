@@ -22,7 +22,6 @@
 
 #ifdef ROCKBOX_HAS_LOGF
 #include <file.h>
-#include <sprintf.h>
 #include <timefuncs.h>
 #include <string.h>
 #include <kernel.h>

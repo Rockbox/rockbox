@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <sprintf.h>
 #include "inttypes.h"
 #include "string.h"
 #include "cpu.h"

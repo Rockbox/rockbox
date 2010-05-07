@@ -55,7 +55,6 @@
  */
 
 #include <file.h>
-#include <sprintf.h>
 #include <system.h>
 #include <string.h>
 #include <timer.h>
