@@ -173,6 +173,7 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_RW2        BUTTON_PREV
 #define MPEG_FF         BUTTON_DOWN
 #define MPEG_FF2        BUTTON_NEXT
+#define MPEG_SHOW_OSD   BUTTON_BACK
 
 #define MPEG_RC_MENU    BUTTON_RC_DSP
 #define MPEG_RC_STOP    (BUTTON_RC_PLAY | BUTTON_REPEAT)
@@ -1551,7 +1552,7 @@ static void button_loop(void)
         int button;
 
         mpeg_menu_sysevent_clear();
-        button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
+        button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL/2);
 
         button = mpeg_menu_sysevent_callback(button, NULL);
 
@@ -1654,6 +1655,16 @@ static void button_loop(void)
             }
             break;
             } /* MPEG_MENU: */
+
+#ifdef MPEG_SHOW_OSD
+        case MPEG_SHOW_OSD:
+        case MPEG_SHOW_OSD | BUTTON_REPEAT:
+            /* Show if not visible */
+            wvs_show(WVS_SHOW);
+            /* Make sure it refreshes */
+            wvs_refresh(WVS_REFRESH_DEFAULT);
+            break;
+#endif
 
         case MPEG_STOP:
 #ifdef MPEG_RC_STOP
