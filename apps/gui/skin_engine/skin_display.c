@@ -199,7 +199,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     
     struct mp3entry *pid3;
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
-    char *filename;
+    const char *filename;
     
     gwps->display->set_viewport(viewer->vp);
     for(i=start_item; (i-start_item)<lines && i<=playlist_amount(); i++)

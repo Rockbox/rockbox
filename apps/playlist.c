@@ -2450,7 +2450,7 @@ bool playlist_check(int steps)
 
 /* get trackname of track that is "steps" away from current playing track.
    NULL is used to identify end of playlist */
-char* playlist_peek(int steps)
+const char* playlist_peek(int steps)
 {
     struct playlist_info* playlist = &current_playlist;
     int seek;

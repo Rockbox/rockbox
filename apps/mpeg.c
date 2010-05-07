@@ -87,7 +87,7 @@ extern enum /* from mp3_playback.c */
 } mpeg_mode;
 #endif /* CONFIG_CODEC == MAS3587F */
 
-extern char* playlist_peek(int steps);
+extern const char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
 extern int playlist_next(int steps);
 extern int playlist_amount(void);
@@ -929,7 +929,7 @@ static int new_file(int steps)
     }
     
     do {
-        char *trackname;
+        const char *trackname;
 
         trackname = playlist_peek( start + steps );
         if ( !trackname )
@@ -2741,7 +2741,7 @@ void audio_next(void)
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_NEXT, 0);
 #else /* SIMULATOR */
-    char* file;
+    const char* file;
     int steps = 1;
     int index;
 
@@ -2770,7 +2770,7 @@ void audio_prev(void)
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_PREV, 0);
 #else /* SIMULATOR */
-    char* file;
+    const char* file;
     int steps = -1;
     int index;
 
