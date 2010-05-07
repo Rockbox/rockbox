@@ -270,7 +270,8 @@ static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item);
 
 /* insert items */
-MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
+MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM | MENU_FUNC_HOTKEYABLE,
+                  ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
                   NULL, Icon_Playlist);
 MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
@@ -959,10 +960,12 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
                   view_cue, NULL, view_cue_item_callback, Icon_NOICON);
 
 /* CONTEXT_WPS items */
-MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
+MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_HOTKEYABLE,
+                  ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3, NULL, NULL, Icon_NOICON);
 #ifdef HAVE_PITCHSCREEN
-MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
+MENUITEM_FUNCTION(pitch_screen_item, MENU_FUNC_HOTKEYABLE,
+                  ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, NULL, Icon_Audio);
 #endif
 
@@ -976,9 +979,9 @@ MENUITEM_FUNCTION(clipboard_copy_item, 0, ID2P(LANG_COPY),
                   clipboard_copy, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_paste_item, 0, ID2P(LANG_PASTE),
                   clipboard_paste, NULL, clipboard_callback, Icon_NOICON);
-MENUITEM_FUNCTION(delete_file_item, 0, ID2P(LANG_DELETE),
+MENUITEM_FUNCTION(delete_file_item, MENU_FUNC_HOTKEYABLE, ID2P(LANG_DELETE),
                   delete_file_dir, NULL, clipboard_callback, Icon_NOICON);
-MENUITEM_FUNCTION(delete_dir_item, 0, ID2P(LANG_DELETE_DIR),
+MENUITEM_FUNCTION(delete_dir_item, MENU_FUNC_HOTKEYABLE, ID2P(LANG_DELETE_DIR),
                   delete_file_dir, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(create_dir_item, 0, ID2P(LANG_CREATE_DIR),
                   create_dir, NULL, clipboard_callback, Icon_NOICON);
@@ -1000,7 +1003,8 @@ static bool onplay_load_plugin(void *param)
     return false;
 }
 
-MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
+MENUITEM_FUNCTION(list_viewers_item, MENU_FUNC_HOTKEYABLE,
+                  ID2P(LANG_ONPLAY_OPEN_WITH),
                   list_viewers, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(properties_item, MENU_FUNC_USEPARAM, ID2P(LANG_PROPERTIES),
                   onplay_load_plugin, (void *)"properties",

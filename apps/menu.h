@@ -61,6 +61,7 @@ struct menu_func {
 /* Flags for MT_FUNCTION_CALL */
 #define MENU_FUNC_USEPARAM 0x80
 #define MENU_FUNC_CHECK_RETVAL 0x100
+#define MENU_FUNC_HOTKEYABLE 0x200
 
 #define MENU_COUNT_MASK 0xFFF
 #define MENU_COUNT_SHIFT 12

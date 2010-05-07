@@ -153,6 +153,11 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
     else if (menu->flags&MENU_DYNAMIC_DESC)
         menu_icon = menu->menu_get_name_and_icon->icon_id;
 
+#ifdef HAVE_HOTKEY
+    if (hotkey_settable_menu && (menu->flags&MENU_FUNC_HOTKEYABLE))
+        menu_icon = Icon_Hotkey;
+#endif
+
     if (menu_icon == Icon_NOICON)
     {
         switch (menu->flags&MENU_TYPE_MASK)

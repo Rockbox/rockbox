@@ -442,7 +442,7 @@ MENUITEM_FUNCTION(hotkey_view, 0, ID2P(LANG_VIEW_HOTKEY),
 MENUITEM_FUNCTION(hotkey_reset, 0, ID2P(LANG_RESET),
             (int(*)(void))reset_hotkey_settings, NULL,
             NULL, Icon_NOICON);
-MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
+MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_Hotkey,
             &hotkey_view, &hotkey_reset);
 #endif /*have_hotkey */
 /*    HOTKEY MENU                  */

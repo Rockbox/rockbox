@@ -68,7 +68,8 @@ static int playlist_view_(void)
 
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST), 
                   (int(*)(void))create_playlist, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(view_cur_playlist, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
+MENUITEM_FUNCTION(view_cur_playlist, MENU_FUNC_CHECK_RETVAL | MENU_FUNC_HOTKEYABLE,
+                  ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
                   (int(*)(void))playlist_view_, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
                          (int(*)(void*))save_playlist_screen, 
