@@ -43,14 +43,6 @@
 #include "progressloggerinterface.h"
 
 #include "bootloaderinstallbase.h"
-#include "bootloaderinstallmi4.h"
-#include "bootloaderinstallhex.h"
-#include "bootloaderinstallipod.h"
-#include "bootloaderinstallsansa.h"
-#include "bootloaderinstallfile.h"
-#include "bootloaderinstallchinachip.h"
-#include "bootloaderinstallams.h"
-#include "bootloaderinstalltcc.h"
 
 
 #if defined(Q_OS_LINUX)
@@ -673,38 +665,14 @@ void RbUtilQt::installBootloader()
     m_error = false;
 
     // create installer
-    BootloaderInstallBase *bl;
-    QString type = SystemInfo::value(SystemInfo::CurBootloaderMethod).toString();
-    if(type == "mi4") {
-        bl = new BootloaderInstallMi4(this);
-    }
-    else if(type == "hex") {
-        bl = new BootloaderInstallHex(this);
-    }
-    else if(type == "sansa") {
-        bl = new BootloaderInstallSansa(this);
-    }
-    else if(type == "ipod") {
-        bl = new BootloaderInstallIpod(this);
-    }
-    else if(type == "file") {
-        bl = new BootloaderInstallFile(this);
-    }
-    else if(type == "chinachip") {
-        bl = new BootloaderInstallChinaChip(this);
-    }
-    else if(type == "ams") {
-        bl = new BootloaderInstallAms(this);
-    }
-    else if(type == "tcc") {
-        bl = new BootloaderInstallTcc(this);
-    }
-    else {
+    BootloaderInstallBase *bl = BootloaderInstallBase::createBootloaderInstaller(this,
+                                    SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
+    if(bl == NULL) {
         logger->addItem(tr("No install method known."), LOGERROR);
         logger->setFinished();
         return;
     }
-
+   
     // set bootloader filename. Do this now as installed() needs it.
     QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
     QStringList blfilepath;
@@ -1015,29 +983,23 @@ void RbUtilQt::uninstallBootloader(void)
     QString platform = RbSettings::value(RbSettings::Platform).toString();
 
     // create installer
-    BootloaderInstallBase *bl;
-    QString type = SystemInfo::value(SystemInfo::CurBootloaderMethod).toString();
-    if(type == "mi4") {
-        bl = new BootloaderInstallMi4(this);
-    }
-    else if(type == "hex") {
-        bl = new BootloaderInstallHex(this);
-    }
-    else if(type == "sansa") {
-        bl = new BootloaderInstallSansa(this);
-    }
-    else if(type == "ipod") {
-        bl = new BootloaderInstallIpod(this);
-    }
-    else if(type == "file") {
-        bl = new BootloaderInstallFile(this);
-    }
-    else {
-        logger->addItem(tr("No uninstall method known."), LOGERROR);
+    BootloaderInstallBase *bl = BootloaderInstallBase::createBootloaderInstaller(this,
+                                    SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
+  
+    if(bl == NULL ) {
+        logger->addItem(tr("No uninstall method for this target known."), LOGERROR);
         logger->setFinished();
         return;
     }
-
+    if( (bl->capabilities() & BootloaderInstallBase::Uninstall) == 0)
+    {
+        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target."
+                            "Try a normal firmware update to remove the booloader."), LOGERROR);
+        logger->setFinished();
+        delete bl;
+        return;
+    }
+    
     QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
     QStringList blfilepath;
     for(int a = 0; a < blfile.size(); a++) {

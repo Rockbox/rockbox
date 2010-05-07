@@ -21,6 +21,14 @@
 #include <QtCore>
 
 #include "bootloaderinstallbase.h"
+#include "bootloaderinstallmi4.h"
+#include "bootloaderinstallhex.h"
+#include "bootloaderinstallipod.h"
+#include "bootloaderinstallsansa.h"
+#include "bootloaderinstallfile.h"
+#include "bootloaderinstallchinachip.h"
+#include "bootloaderinstallams.h"
+#include "bootloaderinstalltcc.h"
 #include "utils.h"
 
 #if defined(Q_OS_MACX)
@@ -28,6 +36,39 @@
 #include <sys/ucred.h>
 #include <sys/mount.h>
 #endif
+
+
+BootloaderInstallBase* BootloaderInstallBase::createBootloaderInstaller(QObject* parent,QString type)
+{
+    if(type == "mi4") {
+        return new BootloaderInstallMi4(parent);
+    }
+    else if(type == "hex") {
+        return new BootloaderInstallHex(parent);
+    }
+    else if(type == "sansa") {
+        return new BootloaderInstallSansa(parent);
+    }
+    else if(type == "ipod") {
+        return new BootloaderInstallIpod(parent);
+    }
+    else if(type == "file") {
+        return new BootloaderInstallFile(parent);
+    }
+    else if(type == "chinachip") {
+        return new BootloaderInstallChinaChip(parent);
+    }
+    else if(type == "ams") {
+        return new BootloaderInstallAms(parent);
+    }
+    else if(type == "tcc") {
+        return new BootloaderInstallTcc(parent);
+    }
+    else {
+        return NULL;
+    }
+
+}
 
 BootloaderInstallBase::BootloaderType BootloaderInstallBase::installed(void)
 {

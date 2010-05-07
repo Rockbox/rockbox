@@ -69,7 +69,9 @@ class BootloaderInstallBase : public QObject
         //! static and in the base class, so the installer classes dont need to
         //  be modified for new targets
         static QString postinstallHints(QString model);
-
+        
+        //! returns the correct BootloaderInstaller object for the requested type
+        static BootloaderInstallBase* createBootloaderInstaller(QObject* parent,QString type);
     protected slots:
         void downloadReqFinished(int id, bool error);
         void downloadBlFinish(bool error);
