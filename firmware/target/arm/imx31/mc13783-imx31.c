@@ -22,10 +22,11 @@
 #include "cpu.h"
 #include "gpio-imx31.h"
 #include "mc13783.h"
+#include "mc13783-target.h"
 #include "debug.h"
 #include "kernel.h"
 
-extern const struct mc13783_event_list mc13783_event_list;
+extern const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS];
 extern struct spi_node mc13783_spi;
 
 /* PMIC event service data */
@@ -107,8 +108,8 @@ static void mc13783_interrupt_thread(void)
          * generated. */
         imx31_regset32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
 
-        event = mc13783_event_list.events;
-        event_last = event + mc13783_event_list.count;
+        event = mc13783_events;
+        event_last = event + MC13783_NUM_EVENTS;
 
         /* .count is surely expected to be > 0 */
         do
@@ -181,8 +182,7 @@ void mc13783_close(void)
 
 bool mc13783_enable_event(enum mc13783_event_ids id)
 {
-    const struct mc13783_event * const event =
-        &mc13783_event_list.events[id];
+    const struct mc13783_event * const event = &mc13783_events[id];
     int set = event->set;
     uint32_t mask = event->mask;
 
@@ -198,8 +198,7 @@ bool mc13783_enable_event(enum mc13783_event_ids id)
 
 void mc13783_disable_event(enum mc13783_event_ids id)
 {
-    const struct mc13783_event * const event =
-        &mc13783_event_list.events[id];
+    const struct mc13783_event * const event = &mc13783_events[id];
     int set = event->set;
     uint32_t mask = event->mask;
 

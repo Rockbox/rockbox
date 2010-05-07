@@ -42,6 +42,28 @@ enum gpio_module_number
     GPIO_NUM_GPIO,
 };
 
+/* Possible values for gpio interrupt line config */
+enum gpio_int_sense_enum
+{
+    GPIO_SENSE_LOW_LEVEL = 0, /* High-level sensitive */
+    GPIO_SENSE_HIGH_LEVEL,    /* Low-level sensitive */
+    GPIO_SENSE_RISING,        /* Rising-edge sensitive */
+    GPIO_SENSE_FALLING,       /* Falling-edge sensitive */
+};
+
+#define GPIO_SENSE_CONFIG_MASK 0x3
+
+/* Pending events will be called in array order which allows easy
+ * pioritization */
+
+/* Describes a single event for a pin */
+struct gpio_event
+{
+    unsigned long mask;             /* mask: 1 << (0...31) */
+    enum gpio_int_sense_enum sense; /* Type of sense */
+    void (*callback)(void);         /* Callback function */
+};
+
 /* Module corresponding to the event ID is identified by range */
 enum gpio_event_bases
 {
@@ -57,55 +79,6 @@ enum gpio_event_bases
 };
 
 #include "gpio-target.h"
-
-/* Possible values for gpio interrupt line config */
-enum gpio_int_sense_enum
-{
-    GPIO_SENSE_LOW_LEVEL = 0, /* High-level sensitive */
-    GPIO_SENSE_HIGH_LEVEL,    /* Low-level sensitive */
-    GPIO_SENSE_RISING,        /* Rising-edge sensitive */
-    GPIO_SENSE_FALLING,       /* Falling-edge sensitive */
-};
-
-#define GPIO_SENSE_CONFIG_MASK 0x3
-
-/* Register map for each module */
-struct gpio_map
-{
-    volatile uint32_t dr;           /* 00h */
-    volatile uint32_t gdir;         /* 04h */
-    volatile uint32_t psr;          /* 08h */
-    union
-    {
-        struct
-        {
-            volatile uint32_t icr1; /* 0Ch */
-            volatile uint32_t icr2; /* 10h */
-        };
-        volatile uint32_t icr[2];   /* 0Ch */
-    };
-    volatile uint32_t imr;          /* 14h */
-    volatile uint32_t isr;          /* 18h */
-};
-
-/* Pending events will be called in array order which allows easy
- * pioritization */
-
-/* Describes a single event for a pin */
-struct gpio_event
-{
-    uint32_t mask;                  /* mask: 1 << (0...31) */
-    enum gpio_int_sense_enum sense; /* Type of sense */
-    void (*callback)(void);         /* Callback function */
-};
-
-/* Describes the events attached to a port */
-struct gpio_event_list
-{
-    int ints_priority;               /* Interrupt priority for this GPIO */
-    unsigned count;                  /* Count of events for the module */
-    const struct gpio_event *events; /* List of events */
-};
 
 void gpio_init(void);
 bool gpio_enable_event(enum gpio_event_ids id);

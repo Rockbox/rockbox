@@ -33,6 +33,7 @@ enum mc13783_event_ids
 #endif
     MC13783_SE1_EVENT,         /* Main charger detection */
     MC13783_USB_EVENT,         /* USB insertion */
+    MC13783_NUM_EVENTS,
 };
 
 #endif /* MC13783_TARGET_H */

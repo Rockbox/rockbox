@@ -28,7 +28,7 @@
 /* Gigabeat S definitions for static GPIO event registration */
 
 /* Describes single events for each GPIO1 pin */
-static const struct gpio_event gpio1_events[] =
+const struct gpio_event gpio1_events[] =
 {
     /* mc13783 keeps the PRIINT high (no low pulse) if other unmasked
      * interrupts become active when clearing them or if a source being
@@ -40,12 +40,4 @@ static const struct gpio_event gpio1_events[] =
         .sense    = GPIO_SENSE_HIGH_LEVEL,
         .callback = mc13783_event,
     }
-};
-
-/* Describes the events attached to GPIO1 port */
-const struct gpio_event_list gpio1_event_list =
-{
-    .ints_priority = INT_PRIO_DEFAULT,
-    .count         = ARRAYLEN(gpio1_events),
-    .events        = gpio1_events,
 };

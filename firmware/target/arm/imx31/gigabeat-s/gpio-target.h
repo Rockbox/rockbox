@@ -29,11 +29,14 @@
 #define MC13783_GPIO_ISR    GPIO1_ISR
 #define MC13783_GPIO_LINE   31
 
+#define GPIO1_INT_PRIO      INT_PRIO_DEFAULT
+
 /* Declare event indexes in priority order in a packed array */
 enum gpio_event_ids
 {
     /* GPIO1 event IDs */
     MC13783_EVENT_ID = GPIO1_EVENT_FIRST,
+    GPIO1_NUM_EVENTS = 1,
     /* GPIO2 event IDs */
     /* none defined */
     /* GPIO3 event IDs */

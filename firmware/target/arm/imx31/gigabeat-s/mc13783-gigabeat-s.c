@@ -52,7 +52,7 @@ struct spi_node mc13783_spi =
 
 /* Gigabeat S definitions for static MC13783 event registration */
 
-static const struct mc13783_event mc13783_events[] =
+const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS] =
 {
     [MC13783_ADCDONE_EVENT] = /* ADC conversion complete */
     {
@@ -86,10 +86,4 @@ static const struct mc13783_event mc13783_events[] =
         .callback = headphone_detect_event,
     },
 #endif
-};
-
-const struct mc13783_event_list mc13783_event_list =
-{
-    .count = ARRAYLEN(mc13783_events),
-    .events = mc13783_events
 };
