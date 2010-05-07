@@ -2835,13 +2835,6 @@ else
    GCCOPTS="$GCCOPTS -Wno-pointer-sign"
  fi
 
- if test "$gccnum" -ge "401"; then
-   # this is a lame hack to avoid "warning: dereferencing type-punned pointer
-   # will break strict-aliasing rules"
-
-   GCCOPTS="$GCCOPTS -fno-strict-aliasing"
- fi
-
  if test "$gccnum" -ge "402"; then
    # disable warning about "warning: initialized field overwritten" as gcc 4.2
    # and later would throw it for several valid cases
