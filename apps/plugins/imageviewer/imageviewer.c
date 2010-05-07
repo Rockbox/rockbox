@@ -128,7 +128,7 @@ static void get_pic_list(void)
     pname = rb->strrchr(np_file,'/');
     pname++;
 
-    for (i = 0; i < tree->filesindir; i++)
+    for (i = 0; i < tree->filesindir && buf_size > sizeof(char**); i++)
     {
         if (!(dircache[i].attr & ATTR_DIRECTORY)
             && img_ext(rb->strrchr(dircache[i].name,'.')))
@@ -138,11 +138,11 @@ static void get_pic_list(void)
             if (!rb->strcmp(file_pt[entries], pname))
                 curfile = entries;
             entries++;
+
+            buf += (sizeof(char**));
+            buf_size -= (sizeof(char**));
         }
     }
-
-    buf += (entries * sizeof(char**));
-    buf_size -= (entries * sizeof(char**));
 }
 
 static int change_filename(int direct)
