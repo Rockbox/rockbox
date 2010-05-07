@@ -77,7 +77,6 @@ static const unsigned short icons[Icon_Last_Themeable] = {
     [Icon_file_view_menu] = ,
     [Icon_EQ] = ,
     [Icon_Rockbox] = ,
-    [Icon_Hotkey] = ,
     */
 };
 

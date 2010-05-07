@@ -68,7 +68,6 @@ enum themable_icons {
     Icon_file_view_menu,
     Icon_EQ,
     Icon_Rockbox,
-    Icon_Hotkey,
     Icon_Last_Themeable,
 };
 
