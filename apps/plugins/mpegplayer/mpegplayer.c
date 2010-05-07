@@ -170,7 +170,9 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLDOWN2   BUTTON_VOL_DOWN
 #define MPEG_VOLUP2     BUTTON_VOL_UP
 #define MPEG_RW         BUTTON_UP
+#define MPEG_RW2        BUTTON_PREV
 #define MPEG_FF         BUTTON_DOWN
+#define MPEG_FF2        BUTTON_NEXT
 
 #define MPEG_RC_MENU    BUTTON_RC_DSP
 #define MPEG_RC_STOP    (BUTTON_RC_PLAY | BUTTON_REPEAT)
@@ -1207,22 +1209,30 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
     switch (btn)
     {
     case MPEG_FF:
+#ifdef MPEG_FF2
+    case MPEG_FF2:
+#endif
 #ifdef MPEG_RC_FF
     case MPEG_RC_FF:
 #endif
-        wvs_set_status(WVS_STATUS_FF);
+        if (!(btn & BUTTON_REPEAT))
+            wvs_set_status(WVS_STATUS_FF);
+        btn = MPEG_FF | BUTTON_REPEAT; /* simplify code below */
         break;
     case MPEG_RW:
+#ifdef MPEG_RW2
+    case MPEG_RW2:
+#endif
 #ifdef MPEG_RC_RW
     case MPEG_RC_RW:
 #endif
-        wvs_set_status(WVS_STATUS_RW);
+        if (!(btn & BUTTON_REPEAT))
+            wvs_set_status(WVS_STATUS_RW);
+        btn = MPEG_RW | BUTTON_REPEAT; /* simplify code below */
         break;
     default:
         btn = -1;
     }
-
-    btn |= BUTTON_REPEAT;
 
     while (1)
     {
@@ -1236,6 +1246,12 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 
         case MPEG_FF | BUTTON_REPEAT:
         case MPEG_RW | BUTTON_REPEAT:
+#ifdef MPEG_FF2
+        case MPEG_FF2 | BUTTON_REPEAT:
+#endif
+#ifdef MPEG_RW2
+        case MPEG_RW2 | BUTTON_REPEAT:
+#endif
 #ifdef MPEG_RC_FF
         case MPEG_RC_FF | BUTTON_REPEAT:
         case MPEG_RC_RW | BUTTON_REPEAT:
@@ -1244,6 +1260,12 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 
         case MPEG_FF | BUTTON_REL:
         case MPEG_RW | BUTTON_REL:
+#ifdef MPEG_FF2
+        case MPEG_FF2 | BUTTON_REL:
+#endif
+#ifdef MPEG_RW2
+        case MPEG_RW2 | BUTTON_REL:
+#endif
 #ifdef MPEG_RC_FF
         case MPEG_RC_FF | BUTTON_REL:
         case MPEG_RC_RW | BUTTON_REL:
@@ -1667,6 +1689,12 @@ static void button_loop(void)
 
         case MPEG_RW:
         case MPEG_FF:
+#ifdef MPEG_RW2
+        case MPEG_RW2:
+#endif
+#ifdef MPEG_FF2
+        case MPEG_FF2:
+#endif
 #ifdef MPEG_RC_RW
         case MPEG_RC_RW:
         case MPEG_RC_FF:
