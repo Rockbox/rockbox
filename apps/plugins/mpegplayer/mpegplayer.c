@@ -363,35 +363,35 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP (TS_SECOND/2)
-#define WVS_MIN_UPDATE_INTERVAL (HZ/2)
+#define OSD_MIN_UPDATE_INTERVAL (HZ/2)
 
-/* WVS status - same order as icon array */
-enum wvs_status_enum
+/* OSD status - same order as icon array */
+enum osd_status_enum
 {
-    WVS_STATUS_STOPPED = 0,
-    WVS_STATUS_PAUSED,
-    WVS_STATUS_PLAYING,
-    WVS_STATUS_FF,
-    WVS_STATUS_RW,
-    WVS_STATUS_COUNT,
-    WVS_STATUS_MASK = 0x7
+    OSD_STATUS_STOPPED = 0,
+    OSD_STATUS_PAUSED,
+    OSD_STATUS_PLAYING,
+    OSD_STATUS_FF,
+    OSD_STATUS_RW,
+    OSD_STATUS_COUNT,
+    OSD_STATUS_MASK = 0x7
 };
 
-enum wvs_bits
+enum osd_bits
 {
-    WVS_REFRESH_DEFAULT    = 0x0000, /* Only refresh elements when due */
+    OSD_REFRESH_DEFAULT    = 0x0000, /* Only refresh elements when due */
                                      /* Refresh the... */
-    WVS_REFRESH_VOLUME     = 0x0001, /* ...volume display */
-    WVS_REFRESH_TIME       = 0x0002, /* ...time display+progress */
-    WVS_REFRESH_STATUS     = 0x0004, /* ...playback status icon */
-    WVS_REFRESH_BACKGROUND = 0x0008, /* ...background (implies ALL) */
-    WVS_REFRESH_VIDEO      = 0x0010, /* ...video image upon timeout */
-    WVS_REFRESH_RESUME     = 0x0020, /* Resume playback upon timeout */
-    WVS_NODRAW             = 0x8000, /* OR bitflag - don't draw anything */
-    WVS_SHOW               = 0x4000, /* OR bitflag - show the WVS */
-    WVS_HP_PAUSE           = 0x2000,
-    WVS_HIDE               = 0x0000, /* hide the WVS (aid readability) */
-    WVS_REFRESH_ALL        = 0x000f, /* Only immediate graphical elements */
+    OSD_REFRESH_VOLUME     = 0x0001, /* ...volume display */
+    OSD_REFRESH_TIME       = 0x0002, /* ...time display+progress */
+    OSD_REFRESH_STATUS     = 0x0004, /* ...playback status icon */
+    OSD_REFRESH_BACKGROUND = 0x0008, /* ...background (implies ALL) */
+    OSD_REFRESH_VIDEO      = 0x0010, /* ...video image upon timeout */
+    OSD_REFRESH_RESUME     = 0x0020, /* Resume playback upon timeout */
+    OSD_NODRAW             = 0x8000, /* OR bitflag - don't draw anything */
+    OSD_SHOW               = 0x4000, /* OR bitflag - show the OSD */
+    OSD_HP_PAUSE           = 0x2000,
+    OSD_HIDE               = 0x0000, /* hide the OSD (aid readability) */
+    OSD_REFRESH_ALL        = 0x000f, /* Only immediate graphical elements */
 };
 
 /* Status icons selected according to font height */
@@ -399,13 +399,13 @@ extern const unsigned char mpegplayer_status_icons_8x8x1[];
 extern const unsigned char mpegplayer_status_icons_12x12x1[];
 extern const unsigned char mpegplayer_status_icons_16x16x1[];
 
-/* Main border areas that contain WVS elements */
-#define WVS_BDR_L 2
-#define WVS_BDR_T 2
-#define WVS_BDR_R 2
-#define WVS_BDR_B 2
+/* Main border areas that contain OSD elements */
+#define OSD_BDR_L 2
+#define OSD_BDR_T 2
+#define OSD_BDR_R 2
+#define OSD_BDR_B 2
 
-struct wvs
+struct osd
 {
     long hide_tick;
     long show_for;
@@ -434,18 +434,18 @@ struct wvs
     unsigned flags;
 };
 
-static struct wvs wvs;
+static struct osd osd;
 
-static void wvs_show(unsigned show);
+static void osd_show(unsigned show);
 
 #ifdef LCD_LANDSCAPE
-    #define _X (x + wvs.x)
-    #define _Y (y + wvs.y)
+    #define _X (x + osd.x)
+    #define _Y (y + osd.y)
     #define _W width
     #define _H height
 #else
-    #define _X (LCD_WIDTH - (y + wvs.y) - height)
-    #define _Y (x + wvs.x)
+    #define _X (LCD_WIDTH - (y + osd.y) - height)
+    #define _Y (x + osd.x)
     #define _W height
     #define _H width
 #endif
@@ -470,7 +470,7 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 
 /* Drawing functions that operate rotated on LCD_PORTRAIT displays -
  * most are just wrappers of lcd_* functions with transforms applied.
- * The origin is the upper-left corner of the WVS area */
+ * The origin is the upper-left corner of the OSD area */
 static void draw_update_rect(int x, int y, int width, int height)
 {
     lcd_(update_rect)(_X, _Y, _W, _H);
@@ -501,21 +501,21 @@ static void draw_fillrect(int x, int y, int width, int height)
 static void draw_hline(int x1, int x2, int y)
 {
 #ifdef LCD_LANDSCAPE
-    lcd_(hline)(x1 + wvs.x, x2 + wvs.x, y + wvs.y);
+    lcd_(hline)(x1 + osd.x, x2 + osd.x, y + osd.y);
 #else
-    y = LCD_WIDTH - (y + wvs.y) - 1;
-    lcd_(vline)(y, x1 + wvs.x, x2 + wvs.x);
+    y = LCD_WIDTH - (y + osd.y) - 1;
+    lcd_(vline)(y, x1 + osd.x, x2 + osd.x);
 #endif
 }
 
 static void draw_vline(int x, int y1, int y2)
 {
 #ifdef LCD_LANDSCAPE
-    lcd_(vline)(x + wvs.x, y1 + wvs.y, y2 + wvs.y);
+    lcd_(vline)(x + osd.x, y1 + osd.y, y2 + osd.y);
 #else
-    y1 = LCD_WIDTH - (y1 + wvs.y) - 1;
-    y2 = LCD_WIDTH - (y2 + wvs.y) - 1;
-    lcd_(hline)(y1, y2, x + wvs.x);
+    y1 = LCD_WIDTH - (y1 + osd.y) - 1;
+    y2 = LCD_WIDTH - (y2 + osd.y) - 1;
+    lcd_(hline)(y1, y2, x + osd.x);
 #endif
 }
 
@@ -534,7 +534,7 @@ static void draw_scrollbar_draw(int x, int y, int width, int height,
 
     draw_fillrect(x + 1, y + 1, val, height - 2);
 
-    lcd_(set_foreground)(wvs.prog_fillcolor);
+    lcd_(set_foreground)(osd.prog_fillcolor);
 
     draw_fillrect(x + 1 + val, y + 1, width - 2 - val, height - 2);
 
@@ -625,8 +625,8 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 
     ucs = rb->bidi_l2v(str, 1);
 
-    x += wvs.x;
-    y += wvs.y;
+    x += osd.x;
+    y += osd.y;
 
     while ((ch = *ucs++) != 0 && x < SCREEN_WIDTH)
     {
@@ -666,32 +666,32 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 {
     int mode = lcd_(get_drawmode)();
     lcd_(set_drawmode)(DRMODE_FG);
-    lcd_(putsxy)(x + wvs.x, y + wvs.y, str);
+    lcd_(putsxy)(x + osd.x, y + osd.y, str);
     lcd_(set_drawmode)(mode);
 }
 #endif /* LCD_PORTRAIT */
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /* So we can refresh the overlay */
-static void wvs_lcd_enable_hook(void* param)
+static void osd_lcd_enable_hook(void* param)
 {
     (void)param;
     rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_1, 0);
 }
 #endif
 
-static void wvs_backlight_on_video_mode(bool video_on)
+static void osd_backlight_on_video_mode(bool video_on)
 {
     if (video_on) {
         /* Turn off backlight timeout */
         /* backlight control in lib/helper.c */
         backlight_force_on();
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        rb->remove_event(LCD_EVENT_ACTIVATION, wvs_lcd_enable_hook);
+        rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
     } else {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        rb->add_event(LCD_EVENT_ACTIVATION, false, wvs_lcd_enable_hook);
+        rb->add_event(LCD_EVENT_ACTIVATION, false, osd_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
         backlight_use_settings();
@@ -699,7 +699,7 @@ static void wvs_backlight_on_video_mode(bool video_on)
 }
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-static void wvs_backlight_brightness_video_mode(bool video_on)
+static void osd_backlight_brightness_video_mode(bool video_on)
 {
     if (settings.backlight_brightness < 0)
         return;
@@ -708,10 +708,10 @@ static void wvs_backlight_brightness_video_mode(bool video_on)
         video_on ? settings.backlight_brightness : -1);
 }
 #else
-#define wvs_backlight_brightness_video_mode(video_on)
+#define osd_backlight_brightness_video_mode(video_on)
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
-static void wvs_text_init(void)
+static void osd_text_init(void)
 {
     struct hms hms;
     char buf[32];
@@ -720,118 +720,118 @@ static void wvs_text_init(void)
 
     lcd_(setfont)(FONT_UI);
 
-    wvs.x = 0;
-    wvs.width = SCREEN_WIDTH;
+    osd.x = 0;
+    osd.width = SCREEN_WIDTH;
 
-    vo_rect_clear(&wvs.time_rect);
-    vo_rect_clear(&wvs.stat_rect);
-    vo_rect_clear(&wvs.prog_rect);
-    vo_rect_clear(&wvs.vol_rect);
+    vo_rect_clear(&osd.time_rect);
+    vo_rect_clear(&osd.stat_rect);
+    vo_rect_clear(&osd.prog_rect);
+    vo_rect_clear(&osd.vol_rect);
 
     ts_to_hms(stream_get_duration(), &hms);
     hms_format(buf, sizeof (buf), &hms);
-    lcd_(getstringsize)(buf, &wvs.time_rect.r, &wvs.time_rect.b);
+    lcd_(getstringsize)(buf, &osd.time_rect.r, &osd.time_rect.b);
 
     /* Choose well-sized bitmap images relative to font height */
-    if (wvs.time_rect.b < 12) {
-        wvs.icons = mpegplayer_status_icons_8x8x1;
-        wvs.stat_rect.r = wvs.stat_rect.b = 8;
-    } else if (wvs.time_rect.b < 16) {
-        wvs.icons = mpegplayer_status_icons_12x12x1;
-        wvs.stat_rect.r = wvs.stat_rect.b = 12;
+    if (osd.time_rect.b < 12) {
+        osd.icons = mpegplayer_status_icons_8x8x1;
+        osd.stat_rect.r = osd.stat_rect.b = 8;
+    } else if (osd.time_rect.b < 16) {
+        osd.icons = mpegplayer_status_icons_12x12x1;
+        osd.stat_rect.r = osd.stat_rect.b = 12;
     } else {
-        wvs.icons = mpegplayer_status_icons_16x16x1;
-        wvs.stat_rect.r = wvs.stat_rect.b = 16;
+        osd.icons = mpegplayer_status_icons_16x16x1;
+        osd.stat_rect.r = osd.stat_rect.b = 16;
     }
 
-    if (wvs.stat_rect.b < wvs.time_rect.b) {
-        vo_rect_offset(&wvs.stat_rect, 0,
-                       (wvs.time_rect.b - wvs.stat_rect.b) / 2 + WVS_BDR_T);
-        vo_rect_offset(&wvs.time_rect, WVS_BDR_L, WVS_BDR_T);
+    if (osd.stat_rect.b < osd.time_rect.b) {
+        vo_rect_offset(&osd.stat_rect, 0,
+                       (osd.time_rect.b - osd.stat_rect.b) / 2 + OSD_BDR_T);
+        vo_rect_offset(&osd.time_rect, OSD_BDR_L, OSD_BDR_T);
     } else {
-        vo_rect_offset(&wvs.time_rect, WVS_BDR_L,
-                       wvs.stat_rect.b - wvs.time_rect.b + WVS_BDR_T);
-        vo_rect_offset(&wvs.stat_rect, 0, WVS_BDR_T);
+        vo_rect_offset(&osd.time_rect, OSD_BDR_L,
+                       osd.stat_rect.b - osd.time_rect.b + OSD_BDR_T);
+        vo_rect_offset(&osd.stat_rect, 0, OSD_BDR_T);
     }
 
-    wvs.dur_rect = wvs.time_rect;
+    osd.dur_rect = osd.time_rect;
 
     phys = rb->sound_val2phys(SOUND_VOLUME, rb->sound_min(SOUND_VOLUME));
     rb->snprintf(buf, sizeof(buf), "%d%s", phys,
                  rb->sound_unit(SOUND_VOLUME));
 
     lcd_(getstringsize)(" ", &spc_width, NULL);
-    lcd_(getstringsize)(buf, &wvs.vol_rect.r, &wvs.vol_rect.b);
+    lcd_(getstringsize)(buf, &osd.vol_rect.r, &osd.vol_rect.b);
 
-    wvs.prog_rect.r = SCREEN_WIDTH - WVS_BDR_L - spc_width -
-                           wvs.vol_rect.r - WVS_BDR_R;
-    wvs.prog_rect.b = 3*wvs.stat_rect.b / 4;
-    vo_rect_offset(&wvs.prog_rect, wvs.time_rect.l,
-                   wvs.time_rect.b);
+    osd.prog_rect.r = SCREEN_WIDTH - OSD_BDR_L - spc_width -
+                           osd.vol_rect.r - OSD_BDR_R;
+    osd.prog_rect.b = 3*osd.stat_rect.b / 4;
+    vo_rect_offset(&osd.prog_rect, osd.time_rect.l,
+                   osd.time_rect.b);
 
-    vo_rect_offset(&wvs.stat_rect,
-                   (wvs.prog_rect.r + wvs.prog_rect.l - wvs.stat_rect.r) / 2,
+    vo_rect_offset(&osd.stat_rect,
+                   (osd.prog_rect.r + osd.prog_rect.l - osd.stat_rect.r) / 2,
                    0);
 
-    vo_rect_offset(&wvs.dur_rect,
-                   wvs.prog_rect.r - wvs.dur_rect.r, 0);
+    vo_rect_offset(&osd.dur_rect,
+                   osd.prog_rect.r - osd.dur_rect.r, 0);
 
-    vo_rect_offset(&wvs.vol_rect, wvs.prog_rect.r + spc_width,
-                   (wvs.prog_rect.b + wvs.prog_rect.t - wvs.vol_rect.b) / 2);
+    vo_rect_offset(&osd.vol_rect, osd.prog_rect.r + spc_width,
+                   (osd.prog_rect.b + osd.prog_rect.t - osd.vol_rect.b) / 2);
 
-    wvs.height = WVS_BDR_T + MAX(wvs.prog_rect.b, wvs.vol_rect.b) -
-                    MIN(wvs.time_rect.t, wvs.stat_rect.t) + WVS_BDR_B;
+    osd.height = OSD_BDR_T + MAX(osd.prog_rect.b, osd.vol_rect.b) -
+                    MIN(osd.time_rect.t, osd.stat_rect.t) + OSD_BDR_B;
 
 #ifdef HAVE_LCD_COLOR
-    wvs.height = ALIGN_UP(wvs.height, 2);
+    osd.height = ALIGN_UP(osd.height, 2);
 #endif
-    wvs.y = SCREEN_HEIGHT - wvs.height;
+    osd.y = SCREEN_HEIGHT - osd.height;
 
     lcd_(setfont)(FONT_SYSFIXED);
 }
 
-static void wvs_init(void)
+static void osd_init(void)
 {
-    wvs.flags = 0;
-    wvs.show_for = HZ*4;
-    wvs.print_delay = 75*HZ/100;
-    wvs.resume_delay = HZ/2;
+    osd.flags = 0;
+    osd.show_for = HZ*4;
+    osd.print_delay = 75*HZ/100;
+    osd.resume_delay = HZ/2;
 #ifdef HAVE_LCD_COLOR
-    wvs.bgcolor = LCD_RGBPACK(0x73, 0x75, 0xbd);
-    wvs.fgcolor = LCD_WHITE;
-    wvs.prog_fillcolor = LCD_BLACK;
+    osd.bgcolor = LCD_RGBPACK(0x73, 0x75, 0xbd);
+    osd.fgcolor = LCD_WHITE;
+    osd.prog_fillcolor = LCD_BLACK;
 #else
-    wvs.bgcolor = GREY_LIGHTGRAY;
-    wvs.fgcolor = GREY_BLACK;
-    wvs.prog_fillcolor = GREY_WHITE;
+    osd.bgcolor = GREY_LIGHTGRAY;
+    osd.fgcolor = GREY_BLACK;
+    osd.prog_fillcolor = GREY_WHITE;
 #endif
-    wvs.curr_time = 0;
-    wvs.status = WVS_STATUS_STOPPED;
-    wvs.auto_refresh = WVS_REFRESH_TIME;
-    wvs.next_auto_refresh = *rb->current_tick;
-    wvs_text_init();
+    osd.curr_time = 0;
+    osd.status = OSD_STATUS_STOPPED;
+    osd.auto_refresh = OSD_REFRESH_TIME;
+    osd.next_auto_refresh = *rb->current_tick;
+    osd_text_init();
 }
 
-static void wvs_schedule_refresh(unsigned refresh)
+static void osd_schedule_refresh(unsigned refresh)
 {
     long tick = *rb->current_tick;
 
-    if (refresh & WVS_REFRESH_VIDEO)
-        wvs.print_tick = tick + wvs.print_delay;
+    if (refresh & OSD_REFRESH_VIDEO)
+        osd.print_tick = tick + osd.print_delay;
 
-    if (refresh & WVS_REFRESH_RESUME)
-        wvs.resume_tick = tick + wvs.resume_delay;
+    if (refresh & OSD_REFRESH_RESUME)
+        osd.resume_tick = tick + osd.resume_delay;
 
-    wvs.auto_refresh |= refresh;
+    osd.auto_refresh |= refresh;
 }
 
-static void wvs_cancel_refresh(unsigned refresh)
+static void osd_cancel_refresh(unsigned refresh)
 {
-    wvs.auto_refresh &= ~refresh;
+    osd.auto_refresh &= ~refresh;
 }
 
 /* Refresh the background area */
-static void wvs_refresh_background(void)
+static void osd_refresh_background(void)
 {
     char buf[32];
     struct hms hms;
@@ -842,68 +842,68 @@ static void wvs_refresh_background(void)
 #ifdef HAVE_LCD_COLOR
     /* Draw a "raised" area for our graphics */
     lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 192));
-    draw_hline(0, wvs.width, 0);
+    draw_hline(0, osd.width, 0);
 
     lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 80));
-    draw_hline(0, wvs.width, 1);
+    draw_hline(0, osd.width, 1);
 
     lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 48));
-    draw_hline(0, wvs.width, wvs.height-2);
+    draw_hline(0, osd.width, osd.height-2);
 
     lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 128));
-    draw_hline(0, wvs.width, wvs.height-1);
+    draw_hline(0, osd.width, osd.height-1);
 
     lcd_(set_background)(bg);
-    draw_clear_area(0, 2, wvs.width, wvs.height - 4);
+    draw_clear_area(0, 2, osd.width, osd.height - 4);
 #else
     /* Give contrast with the main background */
     lcd_(set_background)(GREY_WHITE);
-    draw_hline(0, wvs.width, 0);
+    draw_hline(0, osd.width, 0);
 
     lcd_(set_background)(GREY_DARKGRAY);
-    draw_hline(0, wvs.width, wvs.height-1);
+    draw_hline(0, osd.width, osd.height-1);
 
     lcd_(set_background)(bg);
-    draw_clear_area(0, 1, wvs.width, wvs.height - 2);
+    draw_clear_area(0, 1, osd.width, osd.height - 2);
 #endif
 
-    vo_rect_set_ext(&wvs.update_rect, 0, 0, wvs.width, wvs.height);
+    vo_rect_set_ext(&osd.update_rect, 0, 0, osd.width, osd.height);
     lcd_(set_drawmode)(DRMODE_SOLID);
 
     if (stream_get_duration() != INVALID_TIMESTAMP) {
         /* Draw the movie duration */
         ts_to_hms(stream_get_duration(), &hms);
         hms_format(buf, sizeof (buf), &hms);
-        draw_putsxy_oriented(wvs.dur_rect.l, wvs.dur_rect.t, buf);
+        draw_putsxy_oriented(osd.dur_rect.l, osd.dur_rect.t, buf);
     }
     /* else don't know the duration */
 }
 
 /* Refresh the current time display + the progress bar */
-static void wvs_refresh_time(void)
+static void osd_refresh_time(void)
 {
     char buf[32];
     struct hms hms;
 
     uint32_t duration = stream_get_duration();
 
-    draw_scrollbar_draw_rect(&wvs.prog_rect, 0, duration,
-                             wvs.curr_time);
+    draw_scrollbar_draw_rect(&osd.prog_rect, 0, duration,
+                             osd.curr_time);
 
-    ts_to_hms(wvs.curr_time, &hms);
+    ts_to_hms(osd.curr_time, &hms);
     hms_format(buf, sizeof (buf), &hms);
 
-    draw_clear_area_rect(&wvs.time_rect);
-    draw_putsxy_oriented(wvs.time_rect.l, wvs.time_rect.t, buf);
+    draw_clear_area_rect(&osd.time_rect);
+    draw_putsxy_oriented(osd.time_rect.l, osd.time_rect.t, buf);
 
-    vo_rect_union(&wvs.update_rect, &wvs.update_rect,
-                  &wvs.prog_rect);
-    vo_rect_union(&wvs.update_rect, &wvs.update_rect,
-                  &wvs.time_rect);
+    vo_rect_union(&osd.update_rect, &osd.update_rect,
+                  &osd.prog_rect);
+    vo_rect_union(&osd.update_rect, &osd.update_rect,
+                  &osd.time_rect);
 }
 
 /* Refresh the volume display area */
-static void wvs_refresh_volume(void)
+static void osd_refresh_volume(void)
 {
     char buf[32];
     int width;
@@ -915,18 +915,18 @@ static void wvs_refresh_volume(void)
     lcd_(getstringsize)(buf, &width, NULL);
 
     /* Right-justified */
-    draw_clear_area_rect(&wvs.vol_rect);
-    draw_putsxy_oriented(wvs.vol_rect.r - width, wvs.vol_rect.t, buf);
+    draw_clear_area_rect(&osd.vol_rect);
+    draw_putsxy_oriented(osd.vol_rect.r - width, osd.vol_rect.t, buf);
 
-    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.vol_rect);
+    vo_rect_union(&osd.update_rect, &osd.update_rect, &osd.vol_rect);
 }
 
 /* Refresh the status icon */
-static void wvs_refresh_status(void)
+static void osd_refresh_status(void)
 {
-    int icon_size = wvs.stat_rect.r - wvs.stat_rect.l;
+    int icon_size = osd.stat_rect.r - osd.stat_rect.l;
 
-    draw_clear_area_rect(&wvs.stat_rect);
+    draw_clear_area_rect(&osd.stat_rect);
 
 #ifdef HAVE_LCD_COLOR
     /* Draw status icon with a drop shadow */
@@ -938,12 +938,12 @@ static void wvs_refresh_status(void)
 
     while (1)
     {
-        draw_oriented_mono_bitmap_part(wvs.icons,
-                                       icon_size*wvs.status,
+        draw_oriented_mono_bitmap_part(osd.icons,
+                                       icon_size*osd.status,
                                        0,
-                                       icon_size*WVS_STATUS_COUNT,
-                                       wvs.stat_rect.l + wvs.x + i,
-                                       wvs.stat_rect.t + wvs.y + i,
+                                       icon_size*OSD_STATUS_COUNT,
+                                       osd.stat_rect.l + osd.x + i,
+                                       osd.stat_rect.t + osd.y + i,
                                        icon_size, icon_size);
 
         if (--i < 0)
@@ -952,42 +952,42 @@ static void wvs_refresh_status(void)
         lcd_(set_foreground)(oldfg);
     }
 
-    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.stat_rect);
+    vo_rect_union(&osd.update_rect, &osd.update_rect, &osd.stat_rect);
 #else
-    draw_oriented_mono_bitmap_part(wvs.icons,
-                                   icon_size*wvs.status,
+    draw_oriented_mono_bitmap_part(osd.icons,
+                                   icon_size*osd.status,
                                    0,
-                                   icon_size*WVS_STATUS_COUNT,
-                                   wvs.stat_rect.l + wvs.x,
-                                   wvs.stat_rect.t + wvs.y,
+                                   icon_size*OSD_STATUS_COUNT,
+                                   osd.stat_rect.l + osd.x,
+                                   osd.stat_rect.t + osd.y,
                                    icon_size, icon_size);
-    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.stat_rect);
+    vo_rect_union(&osd.update_rect, &osd.update_rect, &osd.stat_rect);
 #endif
 }
 
 /* Update the current status which determines which icon is displayed */
-static bool wvs_update_status(void)
+static bool osd_update_status(void)
 {
     int status;
 
     switch (stream_status())
     {
     default:
-        status = WVS_STATUS_STOPPED;
+        status = OSD_STATUS_STOPPED;
         break;
     case STREAM_PAUSED:
-        /* If paused with a pending resume, coerce it to WVS_STATUS_PLAYING */
-        status = (wvs.auto_refresh & WVS_REFRESH_RESUME) ?
-            WVS_STATUS_PLAYING : WVS_STATUS_PAUSED;
+        /* If paused with a pending resume, coerce it to OSD_STATUS_PLAYING */
+        status = (osd.auto_refresh & OSD_REFRESH_RESUME) ?
+            OSD_STATUS_PLAYING : OSD_STATUS_PAUSED;
         break;
     case STREAM_PLAYING:
-        status = WVS_STATUS_PLAYING;
+        status = OSD_STATUS_PLAYING;
         break;
     }
 
-    if (status != wvs.status) {
+    if (status != osd.status) {
         /* A refresh is needed */
-        wvs.status = status;
+        osd.status = status;
         return true;
     }
 
@@ -995,79 +995,79 @@ static bool wvs_update_status(void)
 }
 
 /* Update the current time that will be displayed */
-static void wvs_update_time(void)
+static void osd_update_time(void)
 {
     uint32_t start;
-    wvs.curr_time = stream_get_seek_time(&start);
-    wvs.curr_time -= start;
+    osd.curr_time = stream_get_seek_time(&start);
+    osd.curr_time -= start;
 }
 
-/* Refresh various parts of the WVS - showing it if it is hidden */
-static void wvs_refresh(int hint)
+/* Refresh various parts of the OSD - showing it if it is hidden */
+static void osd_refresh(int hint)
 {
     long tick;
     unsigned oldbg, oldfg;
 
     tick = *rb->current_tick;
 
-    if (hint == WVS_REFRESH_DEFAULT) {
+    if (hint == OSD_REFRESH_DEFAULT) {
         /* The default which forces no updates */
 
         /* Make sure Rockbox doesn't turn off the player because of
            too little activity */
-        if (wvs.status == WVS_STATUS_PLAYING)
+        if (osd.status == OSD_STATUS_PLAYING)
             rb->reset_poweroff_timer();
 
         /* Redraw the current or possibly extract a new video frame */
-        if ((wvs.auto_refresh & WVS_REFRESH_VIDEO) &&
-            TIME_AFTER(tick, wvs.print_tick)) {
-            wvs.auto_refresh &= ~WVS_REFRESH_VIDEO;
+        if ((osd.auto_refresh & OSD_REFRESH_VIDEO) &&
+            TIME_AFTER(tick, osd.print_tick)) {
+            osd.auto_refresh &= ~OSD_REFRESH_VIDEO;
             stream_draw_frame(false);
         }
 
         /* Restart playback if the timout was reached */
-        if ((wvs.auto_refresh & WVS_REFRESH_RESUME) &&
-            TIME_AFTER(tick, wvs.resume_tick)) {
-            wvs.auto_refresh &= ~(WVS_REFRESH_RESUME | WVS_REFRESH_VIDEO);
+        if ((osd.auto_refresh & OSD_REFRESH_RESUME) &&
+            TIME_AFTER(tick, osd.resume_tick)) {
+            osd.auto_refresh &= ~(OSD_REFRESH_RESUME | OSD_REFRESH_VIDEO);
             stream_resume();
         }
 
         /* If not visible, return */
-        if (!(wvs.flags & WVS_SHOW))
+        if (!(osd.flags & OSD_SHOW))
             return;
 
         /* Hide if the visibility duration was reached */
-        if (TIME_AFTER(tick, wvs.hide_tick)) {
-            wvs_show(WVS_HIDE);
+        if (TIME_AFTER(tick, osd.hide_tick)) {
+            osd_show(OSD_HIDE);
             return;
         }
     } else {
         /* A forced update of some region */
 
         /* Show if currently invisible */
-        if (!(wvs.flags & WVS_SHOW)) {
+        if (!(osd.flags & OSD_SHOW)) {
             /* Avoid call back into this function - it will be drawn */
-            wvs_show(WVS_SHOW | WVS_NODRAW);
-            hint = WVS_REFRESH_ALL;
+            osd_show(OSD_SHOW | OSD_NODRAW);
+            hint = OSD_REFRESH_ALL;
         }
 
         /* Move back timeouts for frame print and hide */
-        wvs.print_tick = tick + wvs.print_delay;
-        wvs.hide_tick = tick + wvs.show_for;
+        osd.print_tick = tick + osd.print_delay;
+        osd.hide_tick = tick + osd.show_for;
     }
 
-    if (TIME_AFTER(tick, wvs.next_auto_refresh)) {
+    if (TIME_AFTER(tick, osd.next_auto_refresh)) {
         /* Refresh whatever graphical elements are due automatically */
-        wvs.next_auto_refresh = tick + WVS_MIN_UPDATE_INTERVAL;
+        osd.next_auto_refresh = tick + OSD_MIN_UPDATE_INTERVAL;
 
-        if (wvs.auto_refresh & WVS_REFRESH_STATUS) {
-            if (wvs_update_status())
-                hint |= WVS_REFRESH_STATUS;
+        if (osd.auto_refresh & OSD_REFRESH_STATUS) {
+            if (osd_update_status())
+                hint |= OSD_REFRESH_STATUS;
         }
 
-        if (wvs.auto_refresh & WVS_REFRESH_TIME) {
-            wvs_update_time();
-            hint |= WVS_REFRESH_TIME;
+        if (osd.auto_refresh & OSD_REFRESH_TIME) {
+            osd_update_time();
+            hint |= OSD_REFRESH_TIME;
         }
     }
 
@@ -1080,26 +1080,26 @@ static void wvs_refresh(int hint)
     oldbg = lcd_(get_background)();
 
     lcd_(setfont)(FONT_UI);
-    lcd_(set_foreground)(wvs.fgcolor);
-    lcd_(set_background)(wvs.bgcolor);
+    lcd_(set_foreground)(osd.fgcolor);
+    lcd_(set_background)(osd.bgcolor);
 
-    vo_rect_clear(&wvs.update_rect);
+    vo_rect_clear(&osd.update_rect);
 
-    if (hint & WVS_REFRESH_BACKGROUND) {
-        wvs_refresh_background();
-        hint |= WVS_REFRESH_ALL; /* Requires a redraw of everything */
+    if (hint & OSD_REFRESH_BACKGROUND) {
+        osd_refresh_background();
+        hint |= OSD_REFRESH_ALL; /* Requires a redraw of everything */
     }
 
-    if (hint & WVS_REFRESH_TIME) {
-        wvs_refresh_time();
+    if (hint & OSD_REFRESH_TIME) {
+        osd_refresh_time();
     }
 
-    if (hint & WVS_REFRESH_VOLUME) {
-        wvs_refresh_volume();
+    if (hint & OSD_REFRESH_VOLUME) {
+        osd_refresh_volume();
     }
 
-    if (hint & WVS_REFRESH_STATUS) {
-        wvs_refresh_status();
+    if (hint & OSD_REFRESH_STATUS) {
+        osd_refresh_status();
     }
 
     /* Go back to defaults */
@@ -1110,49 +1110,49 @@ static void wvs_refresh(int hint)
     /* Update the dirty rectangle */
     vo_lock();
 
-    draw_update_rect(wvs.update_rect.l,
-                     wvs.update_rect.t,
-                     wvs.update_rect.r - wvs.update_rect.l,
-                     wvs.update_rect.b - wvs.update_rect.t);
+    draw_update_rect(osd.update_rect.l,
+                     osd.update_rect.t,
+                     osd.update_rect.r - osd.update_rect.l,
+                     osd.update_rect.b - osd.update_rect.t);
 
     vo_unlock();
 }
 
-/* Show/Hide the WVS */
-static void wvs_show(unsigned show)
+/* Show/Hide the OSD */
+static void osd_show(unsigned show)
 {
-    if (((show ^ wvs.flags) & WVS_SHOW) == 0)
+    if (((show ^ osd.flags) & OSD_SHOW) == 0)
     {
-        if (show & WVS_SHOW) {
-            wvs.hide_tick = *rb->current_tick + wvs.show_for;
+        if (show & OSD_SHOW) {
+            osd.hide_tick = *rb->current_tick + osd.show_for;
         }
         return;
     }
 
-    if (show & WVS_SHOW) {
+    if (show & OSD_SHOW) {
         /* Clip away the part of video that is covered */
-        struct vo_rect rc = { 0, 0, SCREEN_WIDTH, wvs.y };
+        struct vo_rect rc = { 0, 0, SCREEN_WIDTH, osd.y };
 
-        wvs.flags |= WVS_SHOW;
+        osd.flags |= OSD_SHOW;
 
-        if (wvs.status != WVS_STATUS_PLAYING) {
+        if (osd.status != OSD_STATUS_PLAYING) {
             /* Not playing - set brightness to mpegplayer setting */
-            wvs_backlight_brightness_video_mode(true);
+            osd_backlight_brightness_video_mode(true);
         }
 
         stream_vo_set_clip(&rc);
 
-        if (!(show & WVS_NODRAW))
-            wvs_refresh(WVS_REFRESH_ALL);
+        if (!(show & OSD_NODRAW))
+            osd_refresh(OSD_REFRESH_ALL);
     } else {
         /* Uncover clipped video area and redraw it */
-        wvs.flags &= ~WVS_SHOW;
+        osd.flags &= ~OSD_SHOW;
 
-        draw_clear_area(0, 0, wvs.width, wvs.height);
+        draw_clear_area(0, 0, osd.width, osd.height);
 
-        if (!(show & WVS_NODRAW)) {
+        if (!(show & OSD_NODRAW)) {
             vo_lock();
-            draw_update_rect(0, 0, wvs.width, wvs.height);
+            draw_update_rect(0, 0, osd.width, osd.height);
             vo_unlock();
 
             stream_vo_set_clip(NULL);
@@ -1161,37 +1161,37 @@ static void wvs_show(unsigned show)
             stream_vo_set_clip(NULL);
         }
 
-        if (wvs.status != WVS_STATUS_PLAYING) {
+        if (osd.status != OSD_STATUS_PLAYING) {
             /* Not playing - restore backlight brightness */
-            wvs_backlight_brightness_video_mode(false);
+            osd_backlight_brightness_video_mode(false);
         }
     }
 }
 
 /* Set the current status - update screen if specified */
-static void wvs_set_status(int status)
+static void osd_set_status(int status)
 {
-    bool draw = (status & WVS_NODRAW) == 0;
+    bool draw = (status & OSD_NODRAW) == 0;
 
-    status &= WVS_STATUS_MASK;
+    status &= OSD_STATUS_MASK;
 
-    if (wvs.status != status) {
+    if (osd.status != status) {
 
-        wvs.status = status;
+        osd.status = status;
 
         if (draw)
-            wvs_refresh(WVS_REFRESH_STATUS);
+            osd_refresh(OSD_REFRESH_STATUS);
     }
 }
 
 /* Get the current status value */
-static int wvs_get_status(void)
+static int osd_get_status(void)
 {
-    return wvs.status & WVS_STATUS_MASK;
+    return osd.status & OSD_STATUS_MASK;
 }
 
 /* Handle Fast-forward/Rewind keys using WPS settings (and some nicked code ;) */
-static uint32_t wvs_ff_rw(int btn, unsigned refresh)
+static uint32_t osd_ff_rw(int btn, unsigned refresh)
 {
     unsigned int step = TS_SECOND*rb->global_settings->ff_rewind_min_step;
     const long ff_rw_accel = (rb->global_settings->ff_rewind_accel + 3);
@@ -1200,10 +1200,10 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
     const uint32_t duration = stream_get_duration();
     unsigned int max_step = 0;
     uint32_t ff_rw_count = 0;
-    unsigned status = wvs.status;
+    unsigned status = osd.status;
 
-    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME |
-                       WVS_REFRESH_TIME);
+    osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME |
+                       OSD_REFRESH_TIME);
 
     time -= start; /* Absolute clock => stream-relative */
 
@@ -1217,7 +1217,7 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
     case MPEG_RC_FF:
 #endif
         if (!(btn & BUTTON_REPEAT))
-            wvs_set_status(WVS_STATUS_FF);
+            osd_set_status(OSD_STATUS_FF);
         btn = MPEG_FF | BUTTON_REPEAT; /* simplify code below */
         break;
     case MPEG_RW:
@@ -1228,7 +1228,7 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
     case MPEG_RC_RW:
 #endif
         if (!(btn & BUTTON_REPEAT))
-            wvs_set_status(WVS_STATUS_RW);
+            osd_set_status(OSD_STATUS_RW);
         btn = MPEG_RW | BUTTON_REPEAT; /* simplify code below */
         break;
     default:
@@ -1242,7 +1242,7 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
         switch (btn)
         {
         case BUTTON_NONE:
-            wvs_refresh(WVS_REFRESH_DEFAULT);
+            osd_refresh(OSD_REFRESH_DEFAULT);
             break;
 
         case MPEG_FF | BUTTON_REPEAT:
@@ -1271,21 +1271,21 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
         case MPEG_RC_FF | BUTTON_REL:
         case MPEG_RC_RW | BUTTON_REL:
 #endif
-            if (wvs.status == WVS_STATUS_FF)
+            if (osd.status == OSD_STATUS_FF)
                 time += ff_rw_count;
-            else if (wvs.status == WVS_STATUS_RW)
+            else if (osd.status == OSD_STATUS_RW)
                 time -= ff_rw_count;
 
             /* Fall-through */
         case -1:
         default:
-            wvs_schedule_refresh(refresh);
-            wvs_set_status(status);
-            wvs_schedule_refresh(WVS_REFRESH_TIME);
+            osd_schedule_refresh(refresh);
+            osd_set_status(status);
+            osd_schedule_refresh(OSD_REFRESH_TIME);
             return time;
         }
 
-        if (wvs.status == WVS_STATUS_FF) {
+        if (osd.status == OSD_STATUS_FF) {
             /* fast forwarding, calc max step relative to end */
             max_step = muldiv_uint32(duration - (time + ff_rw_count),
                                      FF_REWIND_MAX_PERCENT, 100);
@@ -1305,31 +1305,31 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
         /* smooth seeking by multiplying step by: 1 + (2 ^ -accel) */
         step += step >> ff_rw_accel;
 
-        if (wvs.status == WVS_STATUS_FF) {
+        if (osd.status == OSD_STATUS_FF) {
             if (duration - time <= ff_rw_count)
                 ff_rw_count = duration - time;
 
-            wvs.curr_time = time + ff_rw_count;
+            osd.curr_time = time + ff_rw_count;
         } else {
             if (time <= ff_rw_count)
                 ff_rw_count = time;
 
-            wvs.curr_time = time - ff_rw_count;
+            osd.curr_time = time - ff_rw_count;
         }
 
-        wvs_refresh(WVS_REFRESH_TIME);
+        osd_refresh(OSD_REFRESH_TIME);
 
-        btn = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
+        btn = rb->button_get_w_tmo(OSD_MIN_UPDATE_INTERVAL);
     }
 }
 
-static int wvs_status(void)
+static int osd_status(void)
 {
     int status = stream_status();
 
     /* Coerce to STREAM_PLAYING if paused with a pending resume */
     if (status == STREAM_PAUSED) {
-        if (wvs.auto_refresh & WVS_REFRESH_RESUME)
+        if (osd.auto_refresh & OSD_REFRESH_RESUME)
             status = STREAM_PLAYING;
     }
 
@@ -1337,7 +1337,7 @@ static int wvs_status(void)
 }
 
 /* Change the current audio volume by a specified amount */
-static void wvs_set_volume(int delta)
+static void osd_set_volume(int delta)
 {
     int vol = rb->global_settings->volume;
     int limit;
@@ -1363,44 +1363,44 @@ static void wvs_set_volume(int delta)
     }
 
     /* Update the volume display */
-    wvs_refresh(WVS_REFRESH_VOLUME);
+    osd_refresh(OSD_REFRESH_VOLUME);
 }
 
 /* Begin playback at the specified time */
-static int wvs_play(uint32_t time)
+static int osd_play(uint32_t time)
 {
     int retval;
 
-    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+    osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
 
     retval = stream_seek(time, SEEK_SET);
 
     if (retval >= STREAM_OK) {
-        wvs_backlight_on_video_mode(true);
-        wvs_backlight_brightness_video_mode(true);
+        osd_backlight_on_video_mode(true);
+        osd_backlight_brightness_video_mode(true);
         stream_show_vo(true);
         retval = stream_play();
 
         if (retval >= STREAM_OK)
-            wvs_set_status(WVS_STATUS_PLAYING | WVS_NODRAW);
+            osd_set_status(OSD_STATUS_PLAYING | OSD_NODRAW);
     }
 
     return retval;
 }
 
 /* Halt playback - pause engine and return logical state */
-static int wvs_halt(void)
+static int osd_halt(void)
 {
     int status = stream_pause();
 
     /* Coerce to STREAM_PLAYING if paused with a pending resume */
     if (status == STREAM_PAUSED) {
-        if (wvs_get_status() == WVS_STATUS_PLAYING)
+        if (osd_get_status() == OSD_STATUS_PLAYING)
             status = STREAM_PLAYING;
     }
 
     /* Cancel some auto refreshes - caller will restart them if desired */
-    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+    osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
 
     /* No backlight fiddling here - callers does the right thing */
 
@@ -1408,44 +1408,44 @@ static int wvs_halt(void)
 }
 
 /* Pause playback if playing */
-static int wvs_pause(void)
+static int osd_pause(void)
 {
-    unsigned refresh = wvs.auto_refresh;
-    int status = wvs_halt();
+    unsigned refresh = osd.auto_refresh;
+    int status = osd_halt();
 
-    if (status == STREAM_PLAYING && (refresh & WVS_REFRESH_RESUME)) {
+    if (status == STREAM_PLAYING && (refresh & OSD_REFRESH_RESUME)) {
         /* Resume pending - change to a still video frame update */
-        wvs_schedule_refresh(WVS_REFRESH_VIDEO);
+        osd_schedule_refresh(OSD_REFRESH_VIDEO);
     }
 
-    wvs_set_status(WVS_STATUS_PAUSED);
+    osd_set_status(OSD_STATUS_PAUSED);
 
-    wvs_backlight_on_video_mode(false);
-    /* Leave brightness alone and restore it when WVS is hidden */
+    osd_backlight_on_video_mode(false);
+    /* Leave brightness alone and restore it when OSD is hidden */
 
     return status;
 }
 
 /* Resume playback if halted or paused */
-static void wvs_resume(void)
+static void osd_resume(void)
 {
     /* Cancel video and resume auto refresh - the resyc when starting
      * playback will perform those tasks */
-    wvs_backlight_on_video_mode(true);
-    wvs_backlight_brightness_video_mode(true);
-    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
-    wvs_set_status(WVS_STATUS_PLAYING);
+    osd_backlight_on_video_mode(true);
+    osd_backlight_brightness_video_mode(true);
+    osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
+    osd_set_status(OSD_STATUS_PLAYING);
     stream_resume();
 }
 
 /* Stop playback - remember the resume point if not closed */
-static void wvs_stop(void)
+static void osd_stop(void)
 {
     uint32_t resume_time;
 
-    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
-    wvs_set_status(WVS_STATUS_STOPPED | WVS_NODRAW);
-    wvs_show(WVS_HIDE | WVS_NODRAW);
+    osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
+    osd_set_status(OSD_STATUS_STOPPED | OSD_NODRAW);
+    osd_show(OSD_HIDE | OSD_NODRAW);
 
     stream_stop();
 
@@ -1454,13 +1454,13 @@ static void wvs_stop(void)
     if (resume_time != INVALID_TIMESTAMP)
         settings.resume_time = resume_time;
 
-    wvs_backlight_on_video_mode(false);
-    wvs_backlight_brightness_video_mode(false);
+    osd_backlight_on_video_mode(false);
+    osd_backlight_brightness_video_mode(false);
 }
 
 /* Perform a seek if seeking is possible for this stream - if playing, a delay
  * will be inserted before restarting in case the user decides to seek again */
-static void wvs_seek(int btn)
+static void osd_seek(int btn)
 {
     int status;
     unsigned refresh;
@@ -1470,20 +1470,20 @@ static void wvs_seek(int btn)
         return;
 
     /* Halt playback - not strictly nescessary but nice */
-    status = wvs_halt();
+    status = osd_halt();
 
     if (status == STREAM_STOPPED)
         return;
 
-    wvs_show(WVS_SHOW);
+    osd_show(OSD_SHOW);
 
     if (status == STREAM_PLAYING)
-        refresh = WVS_REFRESH_RESUME; /* delay resume if playing */
+        refresh = OSD_REFRESH_RESUME; /* delay resume if playing */
     else
-        refresh = WVS_REFRESH_VIDEO;  /* refresh if paused */
+        refresh = OSD_REFRESH_VIDEO;  /* refresh if paused */
 
     /* Obtain a new playback point */
-    time = wvs_ff_rw(btn, refresh);
+    time = osd_ff_rw(btn, refresh);
 
     /* Tell engine to resume at that time */
     stream_seek(time, SEEK_SET);
@@ -1491,7 +1491,7 @@ static void wvs_seek(int btn)
 
 #ifdef HAVE_HEADPHONE_DETECTION
 /* Handle SYS_PHONE_PLUGGED/UNPLUGGED */
-static void wvs_handle_phone_plug(bool inserted)
+static void osd_handle_phone_plug(bool inserted)
 {
     if (rb->global_settings->unplug_mode == 0)
         return;
@@ -1499,25 +1499,25 @@ static void wvs_handle_phone_plug(bool inserted)
     /* Wait for any incomplete state transition to complete first */
     stream_wait_status();
 
-    int status = wvs_status();
+    int status = osd_status();
 
     if (inserted) {
         if (rb->global_settings->unplug_mode > 1) {
             if (status == STREAM_PAUSED) {
-                wvs_resume();
+                osd_resume();
             }
         }
     } else {
         if (status == STREAM_PLAYING) {
-            wvs_pause();
+            osd_pause();
 
             if (stream_can_seek() && rb->global_settings->unplug_rw) {
                 stream_seek(-rb->global_settings->unplug_rw*TS_SECOND,
                             SEEK_CUR);
-                wvs_schedule_refresh(WVS_REFRESH_VIDEO);
+                osd_schedule_refresh(OSD_REFRESH_VIDEO);
                 /* Update time display now */
-                wvs_update_time();
-                wvs_refresh(WVS_REFRESH_TIME);
+                osd_update_time();
+                osd_refresh(OSD_REFRESH_TIME);
             }
         }
     }
@@ -1538,10 +1538,10 @@ static void button_loop(void)
     rb->lcd_set_mode(LCD_MODE_YUV);
 #endif
 
-    wvs_init();
+    osd_init();
 
     /* Start playback at the specified starting time */
-    if (wvs_play(settings.resume_time) < STREAM_OK) {
+    if (osd_play(settings.resume_time) < STREAM_OK) {
         rb->splash(HZ*2, "Playback failed");
         return;
     }
@@ -1552,7 +1552,7 @@ static void button_loop(void)
         int button;
 
         mpeg_menu_sysevent_clear();
-        button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL/2);
+        button = rb->button_get_w_tmo(OSD_MIN_UPDATE_INTERVAL/2);
 
         button = mpeg_menu_sysevent_callback(button, NULL);
 
@@ -1560,7 +1560,7 @@ static void button_loop(void)
         {
         case BUTTON_NONE:
         {
-            wvs_refresh(WVS_REFRESH_DEFAULT);
+            osd_refresh(OSD_REFRESH_DEFAULT);
             continue;
             } /* BUTTON_NONE: */
 
@@ -1584,7 +1584,7 @@ static void button_loop(void)
         case MPEG_RC_VOLUP|BUTTON_REPEAT:
 #endif
         {
-            wvs_set_volume(+1);
+            osd_set_volume(+1);
             break;
             } /* MPEG_VOLUP*: */
 
@@ -1599,7 +1599,7 @@ static void button_loop(void)
         case MPEG_RC_VOLDOWN|BUTTON_REPEAT:
 #endif
         {
-            wvs_set_volume(-1);
+            osd_set_volume(-1);
             break;
             } /* MPEG_VOLDOWN*: */
 
@@ -1608,13 +1608,13 @@ static void button_loop(void)
         case MPEG_RC_MENU:
 #endif
         {
-            int state = wvs_halt(); /* save previous state */
+            int state = osd_halt(); /* save previous state */
             int result;
 
             /* Hide video output */
-            wvs_show(WVS_HIDE | WVS_NODRAW);
+            osd_show(OSD_HIDE | OSD_NODRAW);
             stream_show_vo(false);
-            wvs_backlight_brightness_video_mode(false);
+            osd_backlight_brightness_video_mode(false);
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
             rb->lcd_set_mode(LCD_MODE_RGB565);
@@ -1634,7 +1634,7 @@ static void button_loop(void)
             switch (result)
             {
             case MPEG_MENU_QUIT:
-                wvs_stop();
+                osd_stop();
                 break;
 
             default:
@@ -1643,13 +1643,13 @@ static void button_loop(void)
 #endif
                 /* If not stopped, show video again */
                 if (state != STREAM_STOPPED) {
-                    wvs_show(WVS_SHOW);
+                    osd_show(OSD_SHOW);
                     stream_show_vo(true);
                 }
 
                 /* If stream was playing, restart it */
                 if (state == STREAM_PLAYING) {
-                    wvs_resume();
+                    osd_resume();
                 }
                 break;
             }
@@ -1660,9 +1660,9 @@ static void button_loop(void)
         case MPEG_SHOW_OSD:
         case MPEG_SHOW_OSD | BUTTON_REPEAT:
             /* Show if not visible */
-            wvs_show(WVS_SHOW);
+            osd_show(OSD_SHOW);
             /* Make sure it refreshes */
-            wvs_refresh(WVS_REFRESH_DEFAULT);
+            osd_refresh(OSD_REFRESH_DEFAULT);
             break;
 #endif
 
@@ -1672,7 +1672,7 @@ static void button_loop(void)
 #endif
         case ACTION_STD_CANCEL:
         {
-            wvs_stop();
+            osd_stop();
             break;
             } /* MPEG_STOP: */
 
@@ -1684,15 +1684,15 @@ static void button_loop(void)
         case MPEG_RC_PAUSE:
 #endif
         {
-            int status = wvs_status();
+            int status = osd_status();
 
             if (status == STREAM_PLAYING) {
                 /* Playing => Paused */
-                wvs_pause();
+                osd_pause();
             }
             else if (status == STREAM_PAUSED) {
                 /* Paused => Playing */
-                wvs_resume();
+                osd_resume();
             }
 
             break;
@@ -1711,7 +1711,7 @@ static void button_loop(void)
         case MPEG_RC_FF:
 #endif
         {
-            wvs_seek(button);
+            osd_seek(button);
             break;
             } /* MPEG_RW: MPEG_FF: */
 
@@ -1719,7 +1719,7 @@ static void button_loop(void)
         case SYS_PHONE_PLUGGED:
         case SYS_PHONE_UNPLUGGED:
         {
-            wvs_handle_phone_plug(button == SYS_PHONE_PLUGGED);
+            osd_handle_phone_plug(button == SYS_PHONE_PLUGGED);
             break;
             } /* SYS_PHONE_*: */
 #endif
@@ -1734,12 +1734,12 @@ static void button_loop(void)
         rb->yield();
     } /* end while */
 
-    wvs_stop();
+    osd_stop();
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Be sure hook is removed before exiting since the stop will put it
      * back because of the backlight restore. */
-    rb->remove_event(LCD_EVENT_ACTIVATION, wvs_lcd_enable_hook);
+    rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
 
     rb->lcd_setfont(FONT_UI);
