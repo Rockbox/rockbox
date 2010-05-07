@@ -2654,7 +2654,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_play(long offset)
 {
 #ifdef SIMULATOR
-    char* trackname;
+    const char* trackname;
     int steps=0;
 
     is_playing = true;
