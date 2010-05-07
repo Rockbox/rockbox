@@ -26,7 +26,9 @@ PLUGIN_HEADER
 #define BUF_SIZE ((PLUGIN_BUFFER_SIZE-(10<<10)) / (sizeof(int)))
 #define LOOP_REPEAT 8
 static volatile int buf[BUF_SIZE];
-#define KB_PER_SEC(delta) ((BUF_SIZE*sizeof(buf[0])*LOOP_REPEAT/delta) >> 10)
+
+/* (Byte per loop * loops * 100 ticks per s / ticks)>>10 = KB per s */
+#define KB_PER_SEC(delta) (((BUF_SIZE*sizeof(buf[0])*LOOP_REPEAT*100)/delta) >> 10)
 
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -42,30 +44,40 @@ enum plugin_status plugin_start(const void* parameter)
     {
         unsigned i, j;
         int line = 0;
-        int x;
+        volatile int x;
         int delta;
         last_tick = *rb->current_tick;
 
         for(i = 0; i < LOOP_REPEAT; i++)
         {
-            for (j = 0; j < BUF_SIZE; j++)
-                buf[j] = j;
+            for (j = 0; j < BUF_SIZE; j+=4)
+            {
+                buf[j  ] = j;
+                buf[j+1] = j+1;
+                buf[j+2] = j+2;
+                buf[j+3] = j+3;
+            }
         }
         delta = *rb->current_tick - last_tick;
         rb->screens[0]->clear_display();
         rb->screens[0]->putsf(0, line++, "%s", boost?"boosted":"unboosted");
         rb->screens[0]->putsf(0, line++, "bufsize: %u", BUF_SIZE*sizeof(buf[0]));
         rb->screens[0]->putsf(0, line++, "loop#: %d", ++count);
-        rb->screens[0]->putsf(0, line++, "write ticks: %d (%d kB/s)", delta,
+        rb->screens[0]->putsf(0, line++, "write ticks: %2d (%5d KB/s)", delta,
                               KB_PER_SEC(delta));
         last_tick = *rb->current_tick;
         for(i = 0; i < LOOP_REPEAT; i++)
         {
-            for(j = 0; j < BUF_SIZE; j++)
-                x = buf[j];
+            for(j = 0; j < BUF_SIZE; j+=4)
+            {
+                x = buf[j  ];
+                x = buf[j+2];
+                x = buf[j+3];
+                x = buf[j+4];
+            }
         }
         delta = *rb->current_tick - last_tick;
-        rb->screens[0]->putsf(0, line++, "read ticks: %d (%d kB/s)", delta,
+        rb->screens[0]->putsf(0, line++, "read ticks : %2d (%5d KB/s)", delta,
                               KB_PER_SEC(delta));
         rb->screens[0]->update();
 
