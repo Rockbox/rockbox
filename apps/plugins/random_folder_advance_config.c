@@ -33,7 +33,7 @@ static int lasttick;
 #define MAX_REMOVED_DIRS 10
 
 char *buffer = NULL;
-ssize_t buffer_size;
+size_t buffer_size;
 int num_replaced_dirs = 0;
 char removed_dirs[MAX_REMOVED_DIRS][MAX_PATH];
 struct file_format {
@@ -248,7 +248,7 @@ int load_list(void)
     int myfd = rb->open(RFA_FILE,O_RDONLY);
     if (myfd < 0)
         return -1;
-    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
+    buffer = rb->plugin_get_audio_buffer(&buffer_size);
     if (!buffer)
     {
         return -2;
@@ -414,7 +414,7 @@ int import_list_from_file_text(void)
 {
     char line[MAX_PATH];
     
-    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
+    buffer = rb->plugin_get_audio_buffer(&buffer_size);
     if (buffer == NULL)
     {
         rb->splash(HZ*2, "failed to get audio buffer");

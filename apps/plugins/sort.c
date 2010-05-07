@@ -59,7 +59,7 @@
 
 PLUGIN_HEADER
 
-ssize_t buf_size;
+size_t buf_size;
 static char *filename;
 static int num_entries;
 static char **pointers;
@@ -104,7 +104,7 @@ int read_buffer(int offset)
         return readsize * 10 - 2;
 
     /* Temporary fix until we can do merged sorting */
-    if(readsize == buf_size)
+    if(readsize == (int)buf_size)
         return buf_size; /* File too big */
 
     buf_ptr = stringbuffer;
@@ -192,7 +192,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     filename = (char *)parameter;
 
-    buf = rb->plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */
+    buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
 
     stringbuffer = buf;
     pointers = (char **)(buf + buf_size - sizeof(int));

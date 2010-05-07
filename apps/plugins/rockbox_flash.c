@@ -568,7 +568,7 @@ static void DoUserDialog(char* filename)
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
-    ssize_t memleft;
+    size_t memleft;
     unsigned bl_version;
     bool show_greet = false;
     
@@ -587,7 +587,7 @@ static void DoUserDialog(char* filename)
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer((size_t *)&memleft);
+    sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");
@@ -772,7 +772,7 @@ static void DoUserDialog(char* filename)
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
-    ssize_t memleft;
+    size_t memleft;
     unsigned bl_version;
 
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
@@ -790,7 +790,7 @@ static void DoUserDialog(char* filename)
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer((size_t *)&memleft);
+    sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
         rb->splash(HZ*3, "Out of memory");

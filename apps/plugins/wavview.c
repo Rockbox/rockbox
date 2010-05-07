@@ -60,7 +60,7 @@ struct peakstruct
 
 /* global vars */
 static char *audiobuf;
-static ssize_t audiobuflen;
+static size_t audiobuflen;
 static uint32_t mempeakcount = 0;
 static uint32_t filepeakcount = 0;
 static uint32_t fppmp = 0; /* file peaks per mem peaks */
@@ -362,7 +362,7 @@ enum plugin_status plugin_start(const void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuflen);
+    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
 
     if (!audiobuf)
     {

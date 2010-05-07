@@ -3750,14 +3750,14 @@ static int recording_menu(void)
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    ssize_t buf_size;
+    size_t buf_size;
     int align;
     int rc;
     const char *recbasedir;
 
     (void)parameter;
     
-    plug_buf = rb->plugin_get_buffer((size_t *)&buf_size);
+    plug_buf = rb->plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
         rb->splash(HZ, "Out of memory.");
@@ -3776,7 +3776,8 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    aud_buf = rb->plugin_get_audio_buffer((size_t *)&aud_size);
+    aud_buf = rb->plugin_get_audio_buffer(&buf_size);
+    aud_size = buf_size;
     align = (-(long)aud_buf) & 3;
     aud_buf += align;
     aud_size -= align;

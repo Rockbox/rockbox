@@ -409,13 +409,13 @@ int load_all_levels(void)
 {
     int linecnt = 0;
     int fd;
-    ssize_t size;
+    size_t size;
     char buf[64]; /* Larger than WIDTH, to allow for whitespace after the
                      lines */
 
     /* Init the level_cache pointer and
        calculate how many levels that will fit */
-    level_cache = rb->plugin_get_buffer((size_t *)&size);
+    level_cache = rb->plugin_get_buffer(&size);
     max_levels = size / (HEIGHT*WIDTH);
 
     num_levels = 0;

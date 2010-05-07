@@ -32,12 +32,12 @@ short bp_offs[4][2] = {{1,1},{-1,1},{1,-1},{-1,-1}};
 
 /* global vars for pl_malloc() */
 void *bufptr = NULL;
-ssize_t bufleft;
+size_t bufleft;
 
 /* simple function to "allocate" memory in pluginbuffer.
  * (borrowed from dict.c)
  */
-void *pl_malloc(ssize_t size)
+void *pl_malloc(size_t size)
 {
     void *ptr;
     ptr = bufptr;
@@ -57,7 +57,7 @@ void *pl_malloc(ssize_t size)
 /* init function for pl_malloc() */
 void pl_malloc_init(void)
 {
-    bufptr = rb->plugin_get_buffer((size_t *)&bufleft);
+    bufptr = rb->plugin_get_buffer(&bufleft);
 }
 
 void process_tag(struct pgn_game_node* game, char* buffer){

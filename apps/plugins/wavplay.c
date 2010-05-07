@@ -3649,7 +3649,7 @@ int play_file(char* filename)
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    ssize_t buf_size;
+    size_t buf_size;
 
     if (!parameter)
     {
@@ -3657,14 +3657,15 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-    plug_buf = rb->plugin_get_buffer((size_t *)&buf_size);
+    plug_buf = rb->plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
         rb->splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
 
-    aud_buf = rb->plugin_get_audio_buffer((size_t *)&aud_size);
+    aud_buf = rb->plugin_get_audio_buffer(&buf_size);
+    aud_size = buf_size;
 
     switch (play_file((char*)parameter))
     {

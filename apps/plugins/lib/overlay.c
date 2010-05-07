@@ -49,7 +49,7 @@ enum plugin_status run_overlay(const void* parameter,
                                unsigned char *filename, unsigned char *name)
 {
     int fd, readsize;
-    ssize_t audiobuf_size;
+    size_t audiobuf_size;
     unsigned char *audiobuf;
     static struct plugin_header header;
 
@@ -80,7 +80,7 @@ enum plugin_status run_overlay(const void* parameter,
         return PLUGIN_ERROR;
     }
 
-    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuf_size);
+    audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
     if (header.load_addr < audiobuf ||
         header.end_addr > audiobuf + audiobuf_size)
     {

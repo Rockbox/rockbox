@@ -3059,11 +3059,13 @@ enum plugin_status plugin_start(const void* file)
     int lastbutton = BUTTON_NONE;
     bool autoscroll = false;
     long old_tick;
+    size_t buf_size;
 
     old_tick = *rb->current_tick;
 
     /* get the plugin buffer */
-    buffer = rb->plugin_get_buffer((size_t *)&buffer_size);
+    buffer = rb->plugin_get_buffer(&buf_size);
+    buffer_size = buf_size;
     if (buffer_size == 0)
     {
         rb->splash(HZ, "buffer does not allocate !!");
