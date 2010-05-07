@@ -27,8 +27,8 @@ PLUGIN_HEADER
 #define LOOP_REPEAT 8
 static volatile int buf[BUF_SIZE];
 
-/* (Byte per loop * loops * 100 ticks per s / ticks)>>10 = KB per s */
-#define KB_PER_SEC(delta) (((BUF_SIZE*sizeof(buf[0])*LOOP_REPEAT*100)/delta) >> 10)
+/* (Byte per loop * loops * ticks per s / ticks)>>10 = KB per s */
+#define KB_PER_SEC(delta) (((BUF_SIZE*sizeof(buf[0])*LOOP_REPEAT*HZ)/delta) >> 10)
 
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -44,7 +44,7 @@ enum plugin_status plugin_start(const void* parameter)
     {
         unsigned i, j;
         int line = 0;
-        volatile int x;
+        int x;
         int delta;
         last_tick = *rb->current_tick;
 
