@@ -30,7 +30,7 @@ else
     ROCKS += $(ZXBOX_OBJDIR)/zxbox.rock
 endif
 
-ZXBOXFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O3 -funroll-loops
+ZXBOXFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O3 -funroll-loops -fno-strict-aliasing
 
 $(ZXBOX_OBJDIR)/zxbox.rock: $(ZXBOX_OBJ)
 

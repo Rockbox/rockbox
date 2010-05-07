@@ -40,7 +40,7 @@ struct SynthObject voices[MAX_VOICES] IBSS_ATTR;
 void *alloc(int size)
 {
     static char *offset = NULL;
-    static ssize_t totalSize = 0;
+    static size_t totalSize = 0;
     char *ret;
 
     int remainder = size % 4;
@@ -49,10 +49,10 @@ void *alloc(int size)
 
     if (offset == NULL)
     {
-        offset = rb->plugin_get_audio_buffer((size_t *)&totalSize);
+        offset = rb->plugin_get_audio_buffer(&totalSize);
     }
 
-    if (size + 4 > totalSize)
+    if (size + 4 > (int)totalSize)
     {
         printf("MALLOC BARF");
         printf("MALLOC BARF");

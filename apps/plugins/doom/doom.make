@@ -19,7 +19,7 @@ DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(DOOM_SRC)
 
-DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2
+DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing
 
 ifndef SIMVER
 ifeq ($(TARGET), IRIVER_H100)
