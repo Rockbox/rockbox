@@ -437,10 +437,15 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 ((action == ACTION_WPS_HOTKEY) ||
                  (action == ACTION_TREE_HOTKEY)))
         {
-            ret = MENU_SELECTED_HOTKEY;
-            done = true;
-            selected = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
-            selected_menu_item = menu->submenus[selected];
+            int this = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
+            temp = menu->submenus[this];
+            if (temp->flags&MENU_FUNC_HOTKEYABLE)
+            {
+                selected_menu_item = temp;
+                selected = this;
+                ret = MENU_SELECTED_HOTKEY;
+                done = true;
+            }
         }
 #endif
         else if (action == ACTION_TREE_WPS)
