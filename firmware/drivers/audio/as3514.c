@@ -173,7 +173,9 @@ void audiohw_preinit(void)
     /* Turn on SUM, DAC */
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_SUM_on);
 
-#ifndef HAVE_AS3543
+#ifdef HAVE_AS3543
+    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_HPH_QUALITY_LOW_POWER);
+#else
     /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on, 
        IBR_LSP max reduction (50%), taken from c200v2 OF
      */

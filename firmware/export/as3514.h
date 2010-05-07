@@ -245,6 +245,10 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
                                 AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on
 
 /* AUDIOSET2 (15h) */
+#ifdef HAVE_AS3543
+#define AUDIOSET2_HPH_QUALITY_LOW_POWER (0x0 << 4)
+#define AUDIOSET2_HPH_QUALITY_HIGH      (0x1 << 4)
+#else
 #define AUDIOSET2_BIAS_off      (0x1 << 7)
 #define AUDIOSET2_DITH_off      (0x1 << 6)
 #define AUDIOSET2_AGC_off       (0x1 << 5)
@@ -259,6 +263,7 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
     #define AUDIOSET2_IBR_LSP_17    (0x1 << 0)
     #define AUDIOSET2_IBR_LSP_34    (0x2 << 0)
     #define AUDIOSET2_IBR_LSP_50    (0x3 << 0)
+#endif
 
 /* AUDIOSET3 (16h) */
 #define AUDIOSET3_ZCU_off       (0x1 << 2)
