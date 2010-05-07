@@ -83,7 +83,7 @@ static int open(const char* pathname, int flags, ...)
     {
         va_list ap;
         va_start(ap, flags);
-        fd = sim_open(pathname, flags, va_arg(ap, mode_t));
+        fd = sim_open(pathname, flags, va_arg(ap, unsigned int));
         va_end(ap);
     }
     else

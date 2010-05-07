@@ -340,11 +340,12 @@ int sim_open(const char *name, int o, ...)
     if (num_openfiles >= MAX_OPEN_FILES)
         return -2;
 
-    if (o & O_CREAT)
+    if (opts & O_CREAT)
     {
         va_list ap;
         va_start(ap, o);
-        ret = OPEN(get_sim_pathname(name), opts, va_arg(ap, mode_t));
+        mode_t mode = va_arg(ap, unsigned int);
+        ret = OPEN(get_sim_pathname(name), opts, mode);
         va_end(ap);
     }
     else

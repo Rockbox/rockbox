@@ -72,7 +72,7 @@ int my_open(const char *file, int flags, ...)
    {
       va_list ap;
       va_start(ap, flags);
-      filearray[fpoint]=rb->open(file, flags, va_arg(ap, mode_t));
+      filearray[fpoint]=rb->open(file, flags, va_arg(ap, unsigned int));
       va_end(ap);
    }
    else
