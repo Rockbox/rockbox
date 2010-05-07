@@ -37,25 +37,31 @@ static __attribute__((interrupt("IRQ"))) void I2C2_HANDLER(void);
 static __attribute__((interrupt("IRQ"))) void I2C3_HANDLER(void);
 #endif
 
+#define IADR (0x00 / sizeof (unsigned short)) /* 00h */
+#define IFDR (0x04 / sizeof (unsigned short)) /* 04h */
+#define I2CR (0x08 / sizeof (unsigned short)) /* 08h */
+#define I2SR (0x0c / sizeof (unsigned short)) /* 0ch */
+#define I2DR (0x10 / sizeof (unsigned short)) /* 10h */
+
 static struct i2c_module_descriptor
 {
-    struct i2c_map *base;     /* Module base address */
-    enum IMX31_CG_LIST cg;    /* Clock gating index */
-    enum IMX31_INT_LIST ints; /* Module interrupt number */
-    int enable;               /* Enable count */
-    void (*handler)(void);    /* Module interrupt handler */
-    struct mutex m;           /* Node mutual-exclusion */
-    struct wakeup w;          /* I2C done signal */
-    unsigned char *addr_data; /* Additional addressing data */
-    int addr_count;           /* Addressing byte count */
-    unsigned char *data;      /* TX/RX buffer (actual data) */
-    int data_count;           /* TX/RX byte count */
-    unsigned char addr;       /* Address + r/w bit */
+    volatile unsigned short * const base; /* Module base address */
+    void (* const handler)(void);         /* Module interrupt handler */
+    struct mutex m;                       /* Node mutual-exclusion */
+    struct wakeup w;                      /* I2C done signal */
+    unsigned char *addr_data;             /* Additional addressing data */
+    int addr_count;                       /* Addressing byte count */
+    unsigned char *data;                  /* TX/RX buffer (actual data) */
+    int data_count;                       /* TX/RX byte count */
+    unsigned char addr;                   /* Address + r/w bit */
+    uint8_t enable;                       /* Enable count */
+    const uint8_t cg;                     /* Clock gating index */
+    const uint8_t ints;                   /* Module interrupt number */
 } i2c_descs[I2C_NUM_I2C] =
 {
 #if (I2C_MODULE_MASK & USE_I2C1_MODULE)
     {
-        .base    = (struct i2c_map *)I2C1_BASE_ADDR,
+        .base    = (unsigned short *)I2C1_BASE_ADDR,
         .cg      = CG_I2C1,
         .ints    = INT_I2C1,
         .handler = I2C1_HANDLER,
@@ -63,7 +69,7 @@ static struct i2c_module_descriptor
 #endif
 #if (I2C_MODULE_MASK & USE_I2C2_MODULE)
     {
-        .base    = (struct i2c_map *)I2C2_BASE_ADDR,
+        .base    = (unsigned short *)I2C2_BASE_ADDR,
         .cg      = CG_I2C2,
         .ints    = INT_I2C2,
         .handler = I2C2_HANDLER,
@@ -71,7 +77,7 @@ static struct i2c_module_descriptor
 #endif
 #if (I2C_MODULE_MASK & USE_I2C3_MODULE)
     {
-        .base    = (struct i2c_map *)I2C3_BASE_ADDR,
+        .base    = (unsigned short *)I2C3_BASE_ADDR,
         .cg      = CG_I2C3,
         .ints    = INT_I2C3,
         .handler = I2C3_HANDLER,
@@ -81,11 +87,11 @@ static struct i2c_module_descriptor
 
 static void i2c_interrupt(enum i2c_module_number i2c)
 {
-    struct i2c_module_descriptor *const desc = &i2c_descs[i2c];
-    struct i2c_map * const base = desc->base;
-    uint16_t i2sr = base->i2sr;
+    struct i2c_module_descriptor * const desc = &i2c_descs[i2c];
+    volatile unsigned short * const base = desc->base;
+    unsigned short i2sr = base[I2SR];
 
-    base->i2sr = 0; /* Clear IIF */
+    base[I2SR] = 0; /* Clear IIF */
 
     if (desc->addr_count >= 0)
     {
@@ -100,8 +106,8 @@ static void i2c_interrupt(enum i2c_module_number i2c)
             /* Switching to data cycle */
             if (desc->addr & 0x1)
             {
-                base->i2cr &= ~I2C_I2CR_MTX; /* Switch to RX mode */
-                base->i2dr;                  /* Dummy read */
+                base[I2CR] &= ~I2C_I2CR_MTX; /* Switch to RX mode */
+                base[I2DR];                  /* Dummy read */
                 return;
             }
             /* else remaining data is TX - handle below */
@@ -109,12 +115,12 @@ static void i2c_interrupt(enum i2c_module_number i2c)
         }
         else
         {
-            base->i2dr = *desc->addr_data++; /* Send next addressing byte */
+            base[I2DR] = *desc->addr_data++; /* Send next addressing byte */
             return;
         }
     }
 
-    if (base->i2cr & I2C_I2CR_MTX)
+    if (base[I2CR] & I2C_I2CR_MTX)
     {
         /* Transmitting data */
         if ((i2sr & I2C_I2SR_RXAK) == 0)
@@ -123,7 +129,7 @@ i2c_transmit:
             if (desc->data_count > 0)
             {
                 /* More bytes to send, got ACK from previous byte */
-                base->i2dr = *desc->data++;
+                base[I2DR] = *desc->data++;
                 desc->data_count--;
                 return;
             }
@@ -138,24 +144,24 @@ i2c_transmit:
             if (desc->data_count == 1)
             {
                 /* 2nd to Last byte - NACK */
-                base->i2cr |= I2C_I2CR_TXAK;
+                base[I2CR] |= I2C_I2CR_TXAK;
             }
 
-            *desc->data++ = base->i2dr; /* Read data from I2DR and store */
+            *desc->data++ = base[I2DR]; /* Read data from I2DR and store */
             return;
         }
         else
         {
             /* Generate STOP signal before reading data */
-            base->i2cr &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
-            *desc->data++ = base->i2dr; /* Read data from I2DR and store */
+            base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+            *desc->data++ = base[I2DR]; /* Read data from I2DR and store */
             goto i2c_done;
         }
     }
 
 i2c_stop:
     /* Generate STOP signal */
-    base->i2cr &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+    base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
 i2c_done:
     /* Signal thread we're done */
     wakeup_signal(&desc->w);
@@ -183,18 +189,18 @@ static __attribute__((interrupt("IRQ"))) void I2C3_HANDLER(void)
 static int i2c_transfer(struct i2c_node * const node,
                         struct i2c_module_descriptor *const desc)
 {
-    struct i2c_map * const base = desc->base;
+    volatile unsigned short * const base = desc->base;
     int count = desc->data_count;
     uint16_t i2cr;
 
     /* Make sure bus is idle. */
-    while (base->i2sr & I2C_I2SR_IBB);
+    while (base[I2SR] & I2C_I2SR_IBB);
 
     /* Set speed */
-    base->ifdr = node->ifdr;
+    base[IFDR] = node->ifdr;
 
     /* Enable module */
-    base->i2cr = I2C_I2CR_IEN;
+    base[I2CR] = I2C_I2CR_IEN;
 
     /* Enable Interrupt, Master */
     i2cr = I2C_I2CR_IEN | I2C_I2CR_IIEN | I2C_I2CR_MTX;
@@ -206,13 +212,13 @@ static int i2c_transfer(struct i2c_node * const node,
     }
 
     /* Set config */
-    base->i2cr = i2cr;
+    base[I2CR] = i2cr;
 
     /* Generate START */
-    base->i2cr = i2cr | I2C_I2CR_MSTA;
+    base[I2CR] = i2cr | I2C_I2CR_MSTA;
 
     /* Address slave (first byte sent) and begin session. */
-    base->i2dr = desc->addr;
+    base[I2DR] = desc->addr;
 
     /* Wait for transfer to complete */
     if (wakeup_wait(&desc->w, HZ) == OBJ_WAIT_SUCCEEDED)
@@ -222,7 +228,7 @@ static int i2c_transfer(struct i2c_node * const node,
     else
     {
         /* Generate STOP if timeout */
-        base->i2cr &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+        base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
         count = -1;
     }
 
@@ -289,7 +295,7 @@ void i2c_init(void)
         ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
         mutex_init(&desc->m);
         wakeup_init(&desc->w);
-        desc->base->i2cr = 0;
+        desc->base[I2CR] = 0;
         ccm_module_clock_gating(desc->cg, CGM_OFF);
     }
 }
@@ -315,8 +321,8 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
         if (desc->enable > 0 && --desc->enable == 0)
         {
             /* Last enable */
-            while (desc->base->i2sr & I2C_I2SR_IBB); /* Wait for STOP */
-            desc->base->i2cr &= ~I2C_I2CR_IEN;
+            while (desc->base[I2SR] & I2C_I2SR_IBB); /* Wait for STOP */
+            desc->base[I2CR] &= ~I2C_I2CR_IEN;
             avic_disable_int(desc->ints);
             ccm_module_clock_gating(desc->cg, CGM_OFF);
         }

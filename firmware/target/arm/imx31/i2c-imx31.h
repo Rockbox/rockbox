@@ -43,20 +43,6 @@ enum i2c_module_number
     I2C_NUM_I2C,
 };
 
-/* Module interface map structure */
-struct i2c_map
-{
-    volatile uint16_t iadr;    /* 0x00 */
-    volatile uint16_t unused1;
-    volatile uint16_t ifdr;    /* 0x04 */
-    volatile uint16_t unused2;
-    volatile uint16_t i2cr;    /* 0x08 */
-    volatile uint16_t unused3;
-    volatile uint16_t i2sr;    /* 0x0C */
-    volatile uint16_t unused4;
-    volatile uint16_t i2dr;    /* 0x10 */
-};
-
 struct i2c_node
 {
     enum i2c_module_number num; /* Module that this node uses */

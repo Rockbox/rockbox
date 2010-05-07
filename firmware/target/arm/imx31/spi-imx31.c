@@ -37,25 +37,34 @@ static __attribute__((interrupt("IRQ"))) void CSPI2_HANDLER(void);
 static __attribute__((interrupt("IRQ"))) void CSPI3_HANDLER(void);
 #endif
 
+#define RXDATA      (0x000 / sizeof (unsigned long)) /* 000h */
+#define TXDATA      (0x004 / sizeof (unsigned long)) /* 004h */
+#define CONREG      (0x008 / sizeof (unsigned long)) /* 008h */
+#define INTREG      (0x00c / sizeof (unsigned long)) /* 00Ch */
+#define DMAREG      (0x010 / sizeof (unsigned long)) /* 010h */
+#define STATREG     (0x014 / sizeof (unsigned long)) /* 014h */
+#define PERIODREG   (0x01c / sizeof (unsigned long)) /* 018h */
+#define TESTREG     (0x1c0 / sizeof (unsigned long)) /* 1C0h */
+
 /* State data associatated with each CSPI module */
 static struct spi_module_desc
 {
-    struct cspi_map * const base;     /* CSPI module address */
-    struct spi_transfer_desc *head;   /* Running job */
-    struct spi_transfer_desc *tail;   /* Most recent job added */
-    const struct spi_node *last_node; /* Last node used for module */
-    void (*handler)(void);            /* Interrupt handler */
-    int rxcount;                      /* Independent copy of txcount */
-    int8_t enab;                      /* Enable count */
-    int8_t byte_size;                 /* Size of transfers in bytes */
-    int8_t cg;                        /* Clock-gating value */
-    int8_t ints;                      /* AVIC vector number */
+    volatile unsigned long * const base; /* CSPI module address */
+    struct spi_transfer_desc *head;      /* Running job */
+    struct spi_transfer_desc *tail;      /* Most recent job added */
+    const struct spi_node *last_node;    /* Last node used for module */
+    void (* const handler)(void);        /* Interrupt handler */
+    int rxcount;                         /* Independent copy of txcount */
+    int8_t enab;                         /* Enable count */
+    int8_t byte_size;                    /* Size of transfers in bytes */
+    const int8_t cg;                     /* Clock-gating value */
+    const int8_t ints;                   /* AVIC vector number */
 } spi_descs[SPI_NUM_CSPI] =
 /* Init non-zero members */
 {
 #if (SPI_MODULE_MASK & USE_CSPI1_MODULE)
     {
-        .base    = (struct cspi_map *)CSPI1_BASE_ADDR,
+        .base    = (unsigned long *)CSPI1_BASE_ADDR,
         .cg      = CG_CSPI1,
         .ints    = INT_CSPI1,
         .handler = CSPI1_HANDLER,
@@ -63,7 +72,7 @@ static struct spi_module_desc
 #endif
 #if (SPI_MODULE_MASK & USE_CSPI2_MODULE)
     {
-        .base    = (struct cspi_map *)CSPI2_BASE_ADDR,
+        .base    = (unsigned long *)CSPI2_BASE_ADDR,
         .cg      = CG_CSPI2,
         .ints    = INT_CSPI2,
         .handler = CSPI2_HANDLER,
@@ -71,7 +80,7 @@ static struct spi_module_desc
 #endif
 #if (SPI_MODULE_MASK & USE_CSPI3_MODULE)
     {
-        .base    = (struct cspi_map *)CSPI3_BASE_ADDR,
+        .base    = (unsigned long *)CSPI3_BASE_ADDR,
         .cg      = CG_CSPI3,
         .ints    = INT_CSPI3,
         .handler = CSPI3_HANDLER,
@@ -83,8 +92,7 @@ static struct spi_module_desc
 static void spi_reset(struct spi_module_desc * const desc)
 {
     /* Reset by leaving it disabled */
-    struct cspi_map * const base = desc->base;
-    base->conreg &= ~CSPI_CONREG_EN;
+    desc->base[CONREG] &= ~CSPI_CONREG_EN;
 }
 
 /* Write the context for the node and remember it to avoid unneeded reconfigure */
@@ -92,7 +100,7 @@ static bool spi_set_context(struct spi_module_desc *desc,
                             struct spi_transfer_desc *xfer)
 {
     const struct spi_node * const node = xfer->node; 
-    struct cspi_map * const base = desc->base;
+    volatile unsigned long * const base = desc->base;
 
     if (desc->enab == 0)
         return false;
@@ -101,17 +109,17 @@ static bool spi_set_context(struct spi_module_desc *desc,
         return true;
 
     /* Errata says CSPI should be disabled when writing PERIODREG. */
-    base->conreg &= ~CSPI_CONREG_EN;
+    base[CONREG] &= ~CSPI_CONREG_EN;
 
     /* Switch the module's node */
     desc->last_node = node;
     desc->byte_size = (((node->conreg >> 8) & 0x1f) + 1 + 7) / 8 - 1;
 
     /* Set the wait-states */
-    base->periodreg = node->periodreg & 0xffff;
+    base[PERIODREG] = node->periodreg & 0xffff;
 
     /* Keep reserved and start bits cleared. Keep enabled bit. */
-    base->conreg =
+    base[CONREG] =
         (node->conreg & ~(0xfcc8e000 | CSPI_CONREG_XCH | CSPI_CONREG_SMC));
     return true;
 }
@@ -119,13 +127,13 @@ static bool spi_set_context(struct spi_module_desc *desc,
 
 /* Fill the TX fifo. Returns the number of remaining words. */
 static int tx_fill_fifo(struct spi_module_desc * const desc,
-                        struct cspi_map * const base,
+                        volatile unsigned long * const base,
                         struct spi_transfer_desc * const xfer)
 {
     int count = xfer->count;
     int size = desc->byte_size;
 
-    while ((base->statreg & CSPI_STATREG_TF) == 0)
+    while ((base[STATREG] & CSPI_STATREG_TF) == 0)
     {
         uint32_t word = 0;
 
@@ -143,7 +151,7 @@ static int tx_fill_fifo(struct spi_module_desc * const desc,
 
         xfer->txbuf += size + 1; /* Increment buffer */
 
-        base->txdata = word;    /* Write to FIFO */
+        base[TXDATA] = word;    /* Write to FIFO */
 
         if (--count == 0)
             break;
@@ -158,13 +166,13 @@ static int tx_fill_fifo(struct spi_module_desc * const desc,
 static bool start_transfer(struct spi_module_desc * const desc,
                            struct spi_transfer_desc * const xfer)
 {
-    struct cspi_map * const base = desc->base;
+    volatile unsigned long * const base = desc->base;
     unsigned long intreg;
 
     if (!spi_set_context(desc, xfer))
         return false;
 
-    base->conreg |= CSPI_CONREG_EN; /* Enable module */
+    base[CONREG] |= CSPI_CONREG_EN; /* Enable module */
 
     desc->rxcount = xfer->count;
 
@@ -178,9 +186,9 @@ static bool start_transfer(struct spi_module_desc * const desc,
 
     tx_fill_fifo(desc, base, xfer);
 
-    base->statreg = CSPI_STATREG_TC; /* Ack 'complete' */
-    base->intreg = intreg;           /* Enable interrupts */
-    base->conreg |= CSPI_CONREG_XCH; /* Begin transfer */
+    base[STATREG] = CSPI_STATREG_TC; /* Ack 'complete' */
+    base[INTREG]  = intreg;          /* Enable interrupts */
+    base[CONREG] |= CSPI_CONREG_XCH; /* Begin transfer */
 
     return true;
 }
@@ -189,15 +197,15 @@ static bool start_transfer(struct spi_module_desc * const desc,
 static void spi_interrupt(enum spi_module_number spi)
 {
     struct spi_module_desc *desc = &spi_descs[spi];
-    struct cspi_map * const base = desc->base;
-    unsigned long intreg = base->intreg;
+    volatile unsigned long * const base = desc->base;
+    unsigned long intreg = base[INTREG];
     struct spi_transfer_desc *xfer = desc->head;
     int inc = desc->byte_size + 1;
 
     /* Data received - empty out RXFIFO */
-    while ((base->statreg & CSPI_STATREG_RR) != 0)
+    while ((base[STATREG] & CSPI_STATREG_RR) != 0)
     {
-        uint32_t word = base->rxdata;
+        uint32_t word = base[RXDATA];
 
         if (desc->rxcount <= 0)
             continue;
@@ -226,14 +234,14 @@ static void spi_interrupt(enum spi_module_number spi)
             {
                 /* No more to receive - stop RX interrupts */
                 intreg &= ~(CSPI_INTREG_RHEN | CSPI_INTREG_RREN);
-                base->intreg = intreg;
+                base[INTREG] = intreg;
             }
             else if (intreg & CSPI_INTREG_RHEN)
             {
                 /* < 4 words expected - switch to RX ready */
                 intreg &= ~CSPI_INTREG_RHEN;
                 intreg |= CSPI_INTREG_RREN;
-                base->intreg = intreg;
+                base[INTREG] = intreg;
             }
         }
     }
@@ -247,15 +255,15 @@ static void spi_interrupt(enum spi_module_number spi)
         /* Out of data - stop TX interrupts, enable TC interrupt. */
         intreg &= ~CSPI_INTREG_THEN;
         intreg |= CSPI_INTREG_TCEN;
-        base->intreg = intreg;
+        base[INTREG] = intreg;
     }
 
-    if ((intreg & CSPI_INTREG_TCEN) && (base->statreg & CSPI_STATREG_TC))
+    if ((intreg & CSPI_INTREG_TCEN) && (base[STATREG] & CSPI_STATREG_TC))
     {
         /* Outbound transfer is complete. */
         intreg &= ~CSPI_INTREG_TCEN;
-        base->intreg = intreg;
-        base->statreg = CSPI_STATREG_TC; /* Ack 'complete' */
+        base[INTREG] = intreg;
+        base[STATREG] = CSPI_STATREG_TC; /* Ack 'complete' */
     }
 
     if (intreg != 0)
@@ -268,7 +276,7 @@ static void spi_interrupt(enum spi_module_number spi)
         spi_transfer_cb_fn_type callback = xfer->callback;
         xfer->next = NULL;
 
-        base->conreg &= ~CSPI_CONREG_EN; /* Disable module */
+        base[CONREG] &= ~CSPI_CONREG_EN; /* Disable module */
 
         if (next == xfer)
         {
@@ -361,8 +369,6 @@ void spi_disable_module(const struct spi_node *node)
     if (desc->enab > 0 && --desc->enab == 0)
     {
         /* Last enable for this module */
-        struct cspi_map * const base = desc->base;
-
         /* Wait for outstanding transactions */
         while (*(void ** volatile)&desc->head != NULL);
 
@@ -370,7 +376,7 @@ void spi_disable_module(const struct spi_node *node)
         avic_disable_int(desc->ints);
 
         /* Disable interface */
-        base->conreg &= ~CSPI_CONREG_EN;
+        desc->base[CONREG] &= ~CSPI_CONREG_EN;
 
         /* Disable interface clock */
         ccm_module_clock_gating(desc->cg, CGM_OFF);
