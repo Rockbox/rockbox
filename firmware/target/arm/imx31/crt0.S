@@ -244,11 +244,6 @@ remap_end:
     ldrhi   r5, [r4], #4
     strhi   r5, [r2], #4
     bhi     1b
-
-    /* Make buffer coherent */
-    ldr     r0, =_sdmacodestart
-    sub     r1, r3, r0
-    bl      clean_dcache_range
 #endif /* BOOTLOADER */
 
     /* Initialise bss and ncbss sections to zero */
@@ -259,7 +254,7 @@ remap_end:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
-
+    
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
     ldr     r2, =stackbegin
@@ -303,7 +298,10 @@ remap_end:
     bic     r3, r3, #31<<8
     mcr     p10, 7, r3, c1, c0, 0
 #endif
-    
+
+    /* Make memory coherent for devices */
+    bl      clean_dcache
+
     bl      main
 
 #ifdef BOOTLOADER
