@@ -250,10 +250,10 @@ static bool parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
     unsigned char *endp;
     unsigned char *data_pos;
     unsigned char *curpos  = id3->id3v2buf;
-    unsigned char *nextpos;
     int datasize;
     int infosize;
     int remain = ID3V2_BUF_SIZE;
+    bool convert_string;
 
     if (is_64)
         lseek(fd, 4, SEEK_CUR);
@@ -267,7 +267,7 @@ static bool parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
     endp = bp + infosize;
     while (bp < endp)
     {
-        nextpos  = curpos;
+        convert_string = true;
         datasize = get_long_le(bp + 4);
         data_pos = bp + 8;
         remain = ID3V2_BUF_SIZE - (curpos - (unsigned char*)id3->id3v2buf);
@@ -276,57 +276,55 @@ static bool parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
 
         if (memcmp(bp, infochunk_list[INFO_TITLE], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->title = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_ARTIST], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->artist = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_ALBUM_ARTIST], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->albumartist = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_COMPOSER], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->composer = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_COMMENT], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->comment = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_GROUPING], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->grouping = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_GENRE], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->genre_string = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_DATE], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->year_string = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_TRACK], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->track_string = curpos;
         }
         else if (memcmp(bp, infochunk_list[INFO_DISC], 4) == 0)
         {
-            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
             id3->disc_string = curpos;
+        }
+        else
+        {
+            convert_string = false;
+        }
+
+        if (convert_string)
+        {
+            curpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
         }
 
         bp = data_pos + datasize + (datasize & 1);
-        curpos = nextpos;
     };
     return true;
 }
