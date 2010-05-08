@@ -35,14 +35,18 @@
 #define FRAME_SIZE    (240*320*2)
 /* Rockbox framebuffer address, not retail OS */
 #define FRAME_PHYS_ADDR (TTB_BASE_ADDR - FRAME_SIZE)
-#define FRAME         ((void *)(FRAME_PHYS_ADDR-CSD0_BASE_ADDR))
+#define FRAME         ((void *)(FRAME_PHYS_ADDR+0x100000-CSD0_BASE_ADDR))
 
-#define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
+#define CACHEALIGN_SIZE     32
+#define NOCACHE_BASE        CSD0_BASE_ADDR
+
 /* USBOTG */
 #define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
 #define USB_NUM_ENDPOINTS   8
-#define USB_DEVBSS_ATTR     DEVBSS_ATTR
+#define USB_DEVBSS_ATTR     NOCACHEBSS_ATTR
 #define USB_BASE            OTG_BASE_ADDR
+#define QHARRAY_SIZE        ((64*USB_NUM_ENDPOINTS*2 + 2047) & (0xffffffff - 2047))
+#define QHARRAY_PHYS_ADDR   ((FRAME_PHYS_ADDR - QHARRAY_SIZE) & (0xffffffff - 2047))
 
 /*
  * AIPS 1

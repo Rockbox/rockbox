@@ -30,17 +30,16 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define CACHEALIGN_SIZE 16
 #endif /* CPU_PP */
 
-#ifndef NOCACHE_BASE
-/* Default to no offset if target doesn't define this */
-#define NOCACHE_BASE 0x00000000
-#endif
+#if CONFIG_CPU==IMX31L
+/* No fudges! */
+#include "imx31l.h"
+#define DRAMSIZE ((MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE \
+                  - CODEC_SIZE - QHARRAY_SIZE - FRAME_SIZE - TTB_SIZE)
 
-#if CONFIG_CPU==DM320 || CONFIG_CPU==IMX31L
+#elif CONFIG_CPU==DM320
 /* Give this 1 meg to allow it to align to the MMU boundary */
-#if CONFIG_CPU==DM320
 #ifndef LCD_NATIVE_WIDTH
 #define LCD_NATIVE_WIDTH LCD_WIDTH
-#endif
 
 #ifndef LCD_NATIVE_HEIGHT
 #define LCD_NATIVE_HEIGHT LCD_HEIGHT
@@ -154,6 +153,11 @@ OUTPUT_FORMAT(elf32-littlemips)
 /* The bit of IRAM that is available is used in the core */
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
+#endif
+
+#ifndef NOCACHE_BASE
+/* Default to no offset if target doesn't define this */
+#define NOCACHE_BASE 0x00000000
 #endif
 
 #define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE

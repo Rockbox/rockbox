@@ -826,6 +826,11 @@ Lyre prototype 1 */
 
 #endif /* CPU_PP */
 
+#if CONFIG_CPU == IMX31L
+#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss"),nocommon))
+#define NOCACHEDATA_ATTR    __attribute__((section(".ncdata"),nocommon))
+#endif
+
 #ifndef CONFIG_CORELOCK
 #define CONFIG_CORELOCK CORELOCK_NONE
 #endif

@@ -40,9 +40,9 @@ static struct sdma_script_start_addrs script_info;
 /* Mask of channels with callback enabled */
 static unsigned long sdma_enabled_ints = 0;
 /* One channel control block per channel in physically mapped device RAM */
-static struct channel_control_block ccb_array[CH_NUM] DEVBSS_ATTR;
+static struct channel_control_block ccb_array[CH_NUM] NOCACHEBSS_ATTR;
 /* Channel 0 (command channel) data */
-static struct buffer_descriptor_extd c0_buffer_desc DEVBSS_ATTR;
+static struct buffer_descriptor_extd c0_buffer_desc NOCACHEBSS_ATTR;
 
 /* All SDMA channel interrupts are handled here.
  * Dispatches lower channel numbers first (prioritized by SDMA API callers

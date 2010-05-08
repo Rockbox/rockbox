@@ -17,7 +17,8 @@ STARTUP(target/arm/imx31/crt0.o)
 
 #include "imx31l.h"
 /* Subtract 1MB for the FRAME/TTB section */
-#define DRAMSIZE (MEMORYSIZE * 0x100000 - 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
+#define DRAMSIZE ((MEMORYSIZE * 0x100000) - STUBOFFSET - CODECSIZE - \
+                  PLUGINSIZE - QHARRAY_SIZE - FRAME_SIZE - TTB_SIZE)
 
 #define DRAMORIG (0x0 + STUBOFFSET)
 /* #define IRAMORIG 0x1FFFC000 */
@@ -34,8 +35,7 @@ STARTUP(target/arm/imx31/crt0.o)
 MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-    DEVBSS : ORIGIN = CSD0_BASE_ADDR + (MEMORYSIZE * 0x100000 - 0x100000), \
-             LENGTH = 0x100000 - FRAME_SIZE - TTB_SIZE
+    QHARRAY : ORIGIN = QHARRAY_PHYS_ADDR, LENGTH = QHARRAY_SIZE
 }
 
 SECTIONS
@@ -78,6 +78,17 @@ SECTIONS
         _dataend  = .;
     } > DRAM
 
+#if 0 /* Unneeded at the moment */
+    /* .ncdata section is placed at uncached physical alias address and is
+     * loaded at the proper cached virtual address - no copying is
+     * performed in the init code */
+    .ncdata . + NOCACHE_BASE :
+    {
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+        *(.ncdata*)
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+    } AT> DRAM
+#endif
     /DISCARD/ :
     {
         *(.eh_frame)
@@ -109,12 +120,22 @@ SECTIONS
         *(.ibss)
         *(COMMON)
         . = ALIGN(0x4);
-       _end = .;
+    } > DRAM
+    
+    .ncbss . + NOCACHE_BASE (NOLOAD) :
+    {
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+        *(.ncbss*)
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+    } AT> DRAM
+    
+    .endaddr . - NOCACHE_BASE (NOLOAD) :
+    {
+        _end = .;
     } > DRAM
 
     .audiobuf (NOLOAD) :
     {
-    	. = ALIGN(0x4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
@@ -144,12 +165,11 @@ SECTIONS
     	_sdmacodeend = .;
     }
     
-    .devbss (NOLOAD) :
+    .qharray (NOLOAD) :
     {
-    	_devbssdata = .;
-    	*(.qharray)
-    	*(.devbss*)
-    	_devbssend = .;
-    } > DEVBSS
+	_qharray = .;
+	*(.qharray)
+	_qharrayend = .;
+    } > QHARRAY
 }
 

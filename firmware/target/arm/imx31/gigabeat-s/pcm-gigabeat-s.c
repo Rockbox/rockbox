@@ -32,8 +32,8 @@
 #define DMA_PLAY_CH_PRIORITY 6
 #define DMA_REC_CH_PRIORITY 6
 
-static struct buffer_descriptor dma_play_bd DEVBSS_ATTR;
-static struct channel_descriptor dma_play_cd DEVBSS_ATTR;
+static struct buffer_descriptor dma_play_bd NOCACHEBSS_ATTR;
+static struct channel_descriptor dma_play_cd NOCACHEBSS_ATTR;
 
 struct dma_data
 {
@@ -315,7 +315,7 @@ void pcm_play_dma_pause(bool pause)
 /* Return the number of bytes waiting - full L-R sample pairs only */
 size_t pcm_get_bytes_waiting(void)
 {
-    static unsigned long dsa DEVBSS_ATTR;
+    static unsigned long dsa NOCACHEBSS_ATTR;
     long offs, size;
     int oldstatus;
 
@@ -339,7 +339,7 @@ size_t pcm_get_bytes_waiting(void)
 /* Return a pointer to the samples and the number of them in *count */
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    static unsigned long dsa DEVBSS_ATTR;
+    static unsigned long dsa NOCACHEBSS_ATTR;
     unsigned long addr;
     long offs, size;
     int oldstatus;
@@ -370,8 +370,8 @@ void * pcm_dma_addr(void *addr)
 }
 
 #ifdef HAVE_RECORDING
-static struct buffer_descriptor dma_rec_bd DEVBSS_ATTR;
-static struct channel_descriptor dma_rec_cd DEVBSS_ATTR;
+static struct buffer_descriptor dma_rec_bd NOCACHEBSS_ATTR;
+static struct channel_descriptor dma_rec_cd NOCACHEBSS_ATTR;
 
 static struct dma_data dma_rec_data =
 {
@@ -526,7 +526,7 @@ void pcm_rec_dma_init(void)
 
 const void * pcm_rec_dma_get_peak_buffer(int *count)
 {
-    static unsigned long pda DEVBSS_ATTR;
+    static unsigned long pda NOCACHEBSS_ATTR;
     unsigned long buf, addr, end, bufend;
     int oldstatus;
 

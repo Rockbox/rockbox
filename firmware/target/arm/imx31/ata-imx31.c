@@ -249,17 +249,17 @@ static struct wakeup ata_dma_wakeup;
 
 /** SDMA **/
 /* Array of buffer descriptors for large transfers and alignnment */
-static struct buffer_descriptor ata_bda[ATA_BD_COUNT] DEVBSS_ATTR;
+static struct buffer_descriptor ata_bda[ATA_BD_COUNT] NOCACHEBSS_ATTR;
 /* ATA channel descriptors */
-static struct channel_descriptor ata_cd_rd DEVBSS_ATTR; /* read channel */
-static struct channel_descriptor ata_cd_wr DEVBSS_ATTR; /* write channel */
+static struct channel_descriptor ata_cd_rd NOCACHEBSS_ATTR; /* read channel */
+static struct channel_descriptor ata_cd_wr NOCACHEBSS_ATTR; /* write channel */
 /* DMA channel to be started for transfer */
 static unsigned int current_channel = 0;
 
 /** Buffers **/
 /* Scatter buffer for first and last 32 bytes of a non cache-aligned transfer
  * to cached RAM. */
-static uint32_t scatter_buffer[32/4*2] DEVBSS_ATTR;
+static uint32_t scatter_buffer[32/4*2] NOCACHEBSS_ATTR;
 /* Address of ends in destination buffer for unaligned reads - copied after
  * DMA completes. */
 static void *sb_dst[2] = { NULL, NULL };

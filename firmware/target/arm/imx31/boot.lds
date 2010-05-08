@@ -19,8 +19,7 @@ STARTUP(target/arm/imx31/crt0.o)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-   DEVBSS : ORIGIN = CSD0_BASE_ADDR + (MEMORYSIZE*0x100000 - 0x100000), \
-            LENGTH = 0x100000 - FRAME_SIZE - TTB_SIZE
+   QHARRAY : ORIGIN = QHARRAY_PHYS_ADDR, LENGTH = QHARRAY_SIZE
 }
 
 SECTIONS
@@ -59,6 +58,18 @@ SECTIONS
         . = ALIGN(0x4);
         _dataend = . ;
     } > DRAM
+
+#if 0 /* Unneeded at the moment */
+    /* .ncdata section is placed at uncached physical alias address and is
+     * loaded at the proper cached virtual address - no copying is
+     * performed in the init code */
+    .ncdata . + NOCACHE_BASE :
+    {
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+        *(.ncdata*)
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+    } AT> DRAM
+#endif
     
     .vectors 0x0 :
     {
@@ -79,20 +90,33 @@ SECTIONS
         stackend = .;
     } > IRAM
 
+    /* .bss and .ncbss are treated as a single section to use one init loop to
+     * zero it - note "_edata" and "_end" */
     .bss (NOLOAD) :
     {
          _edata = .;
          *(.bss*);
          *(.ibss);
          *(COMMON)
-         _end = .;
+         . = ALIGN(0x4);
     } > DRAM
-   
-    .devbss (NOLOAD) :
+    
+    .ncbss . + NOCACHE_BASE (NOLOAD) :
     {
-        _devbssdata = .;
-    	*(.qharray)
-        *(.devbss*)
-        _devbssend = .;
-    } > DEVBSS
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+        *(.ncbss*)
+        . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
+    } AT> DRAM
+
+    .endaddr . - NOCACHE_BASE (NOLOAD) :
+    {
+        _end = .;
+    } > DRAM
+
+    .qharray (NOLOAD) :
+    {
+	_qharray = .;
+	*(.qharray)
+	_qharrayend = .;
+    } > QHARRAY
 }

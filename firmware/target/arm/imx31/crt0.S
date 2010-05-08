@@ -134,7 +134,8 @@ remap_start:
 
     /* Set page tables */
 
-    /* Map each memory loc to itself, no cache */
+    /* Map each memory loc to itself
+     * not cached, not buffered */
                                    /* Physical address = 0x0 */
     mov     r1,      #(1 << 10)    /* superuser - r/w, user - no access */
     orr     r1, r1, #((0 <<  5)  | /* domain 0th */ \
@@ -148,27 +149,28 @@ remap_start:
     cmp     r2, r3
     blo     1b
 
-    bic     r1, r1, #0x0ff00000 /* Back up */
+    /* Bits 31:20 of r1 will be 0 due to wraparound in previous loop */
 
-    /* Map 0x80000000 -> 0x0, cached */
-    mov     r2, r5               /* TTB pointer */
-    add     r3, r5, #64*4        /* End position */
-    orr     r1, r1, #0x80000000  /* Physical address */
-    orr     r1, r1, #((1 << 3) | /* cache flag */ \
-                      (1 << 2))  /* buffer flag */
+    /* Map PA:0x80000000-0x83ffffff to VA:0x00000000-0x03f00000
+     * cached, buffered */
+    mov     r2, r5                 /* TTB pointer */
+    add     r3, r5, #64*4          /* End position */
+    orr     r1, r1, #(0x80000000 | /* Physical address */ \
+                      (1 << 3) |   /* cache flag */ \
+                      (1 << 2))    /* buffer flag */
 1:
     str     r1, [r2], #4
     add     r1, r1, #(1 << 20)
     cmp     r2, r3
     blo     1b
 
-    /* Map device section 0x83f00000 to 0x03f00000 - buffered, not cached */
-    bic     r1, r1, #0x0ff00000
-    orr     r1, r1, #0x03f00000
-    bic     r1, r1, #(1 << 3)
-    add     r2, r5, #63*4
-    str     r1, [r2]
-    
+    /* Map TTB, FRAME and QHARRAY section PA:0x83f00000-0x83ffffff to
+     * VA:0x04000000-0x040fffff
+     * not cache, buffered */
+    sub     r1, r1, #0x00100000
+    bic     r1, r1, #(1 << 3)     /* clear cache flag */
+    str     r1, [r5, #64*4]
+
     /* Enable MMU */
     mov     r0, #0
     mcr     p15, 0, r0, c8, c7, 0 /* Invalidate TLB */
@@ -249,18 +251,9 @@ remap_end:
     bl      clean_dcache_range
 #endif /* BOOTLOADER */
 
-    /* Initialise bss section to zero */
+    /* Initialise bss and ncbss sections to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
-    mov     r4, #0
-1:
-    cmp     r3, r2
-    strhi   r4, [r2], #4
-    bhi     1b
-    
-    /* Initialise the device bss section to zero */
-    ldr     r2, =_devbssdata
-    ldr     r3, =_devbssend
     mov     r4, #0
 1:
     cmp     r3, r2
