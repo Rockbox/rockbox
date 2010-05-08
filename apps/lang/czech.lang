@@ -961,7 +961,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Grafický ekvalizér"
+    swcodec: "Grafický ekvalizér, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -1008,11 +1008,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Rozšířená nastavení ekvalizéru"
+    swcodec: "Rozšířené nastavení EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Rozšířená nastavení ekvalizéru"
+    swcodec: "Rozšířené nastavení ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -1042,11 +1042,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Procházet nastavení EQ"
+    swcodec: "Procházet konfigurační soubory EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Procházet nastavení ekvalizéru"
+    swcodec: "Procházet konfigurační soubory ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -1674,6 +1674,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_MANTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Manual Track Skip Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Pouze ruční posun po stopách"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Pouze ruční posun po stopách"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SHUFFLE_TRACKSKIP
   desc: in settings_menu
   user: core
@@ -2278,10 +2295,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Zobraz soubory"
+    *: "Typy souborů"
   </dest>
   <voice>
-    *: "Zobraz soubory"
+    *: "Typy souborů"
   </voice>
 </phrase>
 <phrase>
@@ -2501,10 +2518,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Obnovovat na pozadí"
+    *: "Obnovuji na pozadí"
   </dest>
   <voice>
-    *: "Obnovovat na pozadí"
+    *: "Obnovuji na pozadí"
   </voice>
 </phrase>
 <phrase>
@@ -2543,10 +2560,10 @@
     *: "<All tracks>"
   </source>
   <dest>
-    *: "<Všechny skladby>"
+    *: "<Vsechny skladby>"
   </dest>
   <voice>
-    *: "Vsechny skladby"
+    *: "Všechny skladby"
   </voice>
 </phrase>
 <phrase>
@@ -2604,11 +2621,11 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdálená přehrávací obrazovka"
+    remote: "Dálková přehrávací obrazovka"
   </dest>
   <voice>
     *: none
-    remote: "Vzdálená přehrávací obrazovka"
+    remote: "Dálková přehrávací obrazovka"
   </voice>
 </phrase>
 <phrase>
@@ -3481,11 +3498,11 @@
     masd: none
   </source>
   <dest>
-    *: "Udržení maxima"
+    *: "Držení maxima"
     masd: none
   </dest>
   <voice>
-    *: "Udržení maxima"
+    *: "Držení maxima"
     masd: none
   </voice>
 </phrase>
@@ -4899,7 +4916,7 @@
     *: "Ozvučit menu"
   </dest>
   <voice>
-    *: "Ozvučit menu"
+    *: "Ozvučit menu, doporučeno nevypínat"
   </voice>
 </phrase>
 <phrase>
@@ -5008,10 +5025,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Změnit nastavení"
+    *: "Správa konfigurací"
   </dest>
   <voice>
-    *: "Změnit nastavení"
+    *: "Správa konfigurací"
   </voice>
 </phrase>
 <phrase>
@@ -5036,10 +5053,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Nastavení nahráno"
+    *: "Konfigurace nahrána"
   </dest>
   <voice>
-    *: "Nastavení nahráno"
+    *: "Konfigurace nahrána"
   </voice>
 </phrase>
 <phrase>
@@ -5050,10 +5067,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Vynulovat nastavení"
+    *: "Vymazat konfigurace"
   </dest>
   <voice>
-    *: "Vynulovat nastavení"
+    *: "Vymazat konfigurace"
   </voice>
 </phrase>
 <phrase>
@@ -5078,10 +5095,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Uložit konfigurační soubor"
+    *: "Uložit konfiguraci"
   </dest>
   <voice>
-    *: "Uložit konfigurační soubor"
+    *: "Uložit konfiguraci"
   </voice>
 </phrase>
 <phrase>
@@ -5106,10 +5123,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Uložit nastavení motivu"
+    *: "Uložit konfiguraci motivu"
   </dest>
   <voice>
-    *: "Uložit nastavení motyvu"
+    *: "Uložit konfiguraci motyvu"
   </voice>
 </phrase>
 <phrase>
@@ -6908,10 +6925,10 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Dostupné:"
+    *: "Celkové:"
   </dest>
   <voice>
-    *: "Dostupné místo"
+    *: "Celkové místo"
   </voice>
 </phrase>
 <phrase>
@@ -8268,7 +8285,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Nabíjení během ú es bé připojení"
+    usb_charging_enable: "Nabíjení během ÚESBÉ připojení"
   </voice>
 </phrase>
 <phrase>
@@ -10024,7 +10041,7 @@
   </dest>
   <voice>
     *: none
-    remote: "téma na dálkovém ovládání"
+    remote: "téma dálkového ovládání"
   </voice>
 </phrase>
 <phrase>
@@ -11361,7 +11378,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Barvy"
+    lcd_color: "Barvy, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -11448,10 +11465,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Oznámit úroveň baterie"
+    *: "Oznamovat úroveň baterie"
   </dest>
   <voice>
-    *: "Oznámit úroveň baterie"
+    *: "Oznamovat úroveň baterie"
   </voice>
 </phrase>
 <phrase>
@@ -11510,10 +11527,10 @@
     *: "<Random>"
   </source>
   <dest>
-    *: "<Náhodně>"
+    *: "<Nahodne>"
   </dest>
   <voice>
-    *: "Nahodne"
+    *: "Náhodně"
   </voice>
 </phrase>
 <phrase>
@@ -11524,10 +11541,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Uložit nastavení zvuku"
+    *: "Uložit konfiguraci zvuku"
   </dest>
   <voice>
-    *: "Uložit nastavení zvuku"
+    *: "Uložit konfiguraci zvuku"
   </voice>
 </phrase>
 <phrase>
@@ -12516,11 +12533,11 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdálený stavový řádek"
+    remote: "Dalkový stavový řádek"
   </dest>
   <voice>
     *: none
-    remote: "Vzdálený stavový řádek"
+    remote: "Dalkový stavový řádek"
   </voice>
 </phrase>
 <phrase>
@@ -12588,7 +12605,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim USB klávesnice"
+    usb_hid: "Režim ÚESBÉ klávesnice"
   </voice>
 </phrase>
 <phrase>
@@ -12597,15 +12614,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimediální režim"
+    usb_hid: "Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimediální režim"
+    usb_hid: "Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -12614,15 +12631,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Prezentační režim"
+    usb_hid: "Prezentace"
   </dest>
   <voice>
     *: none
-    usb_hid: "Prezentační režim"
+    usb_hid: "Prezentace"
   </voice>
 </phrase>
 <phrase>
@@ -12631,15 +12648,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Prohlížecí režim"
+    usb_hid: "Prohlížeč"
   </dest>
   <voice>
     *: none
-    usb_hid: "Prohlížecí režim"
+    usb_hid: "Prohlížeč"
   </voice>
 </phrase>
 <phrase>
@@ -12648,15 +12665,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Režim myši"
+    usb_hid: "Myš"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim myši"
+    usb_hid: "Myš"
   </voice>
 </phrase>
 <phrase>
@@ -13049,7 +13066,7 @@
     *: ""
   </dest>
   <voice>
-    *: "vzhled vzdáleného statusbáru"
+    *: "vzhled dálkového statusbáru"
   </voice>
 </phrase>
 <phrase>
@@ -13094,7 +13111,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "USB externí zařízení"
+    usb_hid: "ÚESBÉ externí zařízení"
   </voice>
 </phrase>
 <phrase>
@@ -13228,27 +13245,212 @@
   </source>
   <dest>
     *:none
-    lcd_bitmap: "Základní vzdálený vzhled"
+    lcd_bitmap: "Základní dálkový vzhled"
   </dest>
   <voice>
     *:none
-    lcd_bitmap: "Základní vzdálený vzhled"
+    lcd_bitmap: "Základní dálkový vzhled"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MANTRACKSKIP
-  desc: in crossfade settings
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
   user: core
   <source>
     *: none
-    crossfade: "Manual Track Skip Only"
+    remote: "Main Screen"
   </source>
   <dest>
     *: none
-    crossfade: "Pouze ruční posun po stopách"
+    remote: "Hlavní displej"
   </dest>
   <voice>
     *: none
-    crossfade: "Pouze ruční posun po stopách"
+    remote: "Hlavní dysplej"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Dálkový displej"
+  </dest>
+  <voice>
+    *: none
+    remote: "Dálkový dysplej"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Rozsah histogramu"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Rozsah histogramu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Vnější výstup"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Vnější výstup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Set Hotkey: %s?"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Nastavit zkratkovou klávesu: %s?"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Nastavit zkratkovou klávesu?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: Confirmation after the hotkey has been assigned
+  user: core
+  <source>
+    *: none
+    hotkey: "Assigned Hotkey: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Přiřazená zkratková klávesa: %s"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Přiřazená zkratková klávesa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: hotkey splash
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey Not Set"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zkratková klávesa nenastavena"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zkratková klávesa nenastavena"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zkratková klávesa"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zkratková klávesa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "View Hotkey Settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zobrazit nastavení zkratkové klávesy"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zobrazit nastavení zkratkové klávesy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_VIEW_WPS
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Přehrávací obrazovka: %s"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_VIEW_FILE_BROWSER
+  desc: hotkey info menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Prohlížeč souborů: %s"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Prohlížeč souborů: %s"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Přetočit zpět před pokračováním v přehrávání"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Přetočit zpět před pokračováním v přehrávání"
   </voice>
 </phrase>
