@@ -279,7 +279,8 @@ static void sdram_init(void)
         "ldr r4, [%0]\n"
         : : "p"(0x30000000+0x2300*MEM) : "r4");
 
-    MPMC_DYNAMIC_CONTROL = 0x2; /* SDRAM NORMAL, MPMCCLKOUT runs continuously */
+    /* SDRAM NORMAL, MPMCCLKOUT stopped when SDRAM is idle */
+    MPMC_DYNAMIC_CONTROL = 0x0;
 
     MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
 }
@@ -343,8 +344,10 @@ void system_init(void)
 #endif
                   AS3525_PCLK_SEL);
 
-#ifdef BOOTLOADER
+#if defined(BOOTLOADER)
     sdram_init();
+#elif CONFIG_CPU == AS3525 /* XXX: remove me when we have a new bootloader */
+    MPMC_DYNAMIC_CONTROL = 0x0; /* MPMCCLKOUT stops when all SDRAMs are idle */
 #endif  /* BOOTLOADER */
 
 #if 0 /* the GPIO clock is already enabled by the dualboot function */
