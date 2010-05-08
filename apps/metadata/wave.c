@@ -27,6 +27,7 @@
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
+#include "rbunicode.h"
 #include "logf.h"
 
 /* Wave(RIFF)/Wave64 format */
@@ -49,6 +50,7 @@ enum {
    FMT_CHUNK,
    FACT_CHUNK,
    DATA_CHUNK,
+   LIST_CHUNK,
 };
 
 /* Wave chunk names */
@@ -59,7 +61,8 @@ static const unsigned char *wave_chunklist = "RIFF"
                                              "WAVE"
                                              "fmt "
                                              "fact"
-                                             "data";
+                                             "data"
+                                             "LIST";
 
 /* Wave64 GUIDs */
 #define WAVE64_CHUNKNAME_LENGTH 16
@@ -70,8 +73,38 @@ static const unsigned char *wave64_chunklist
                    "wave\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
                    "fmt \xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
                    "fact\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
-                   "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a";
+                   "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
+                   "\xbc\x94\x5f\x92\x5a\x52\xd2\x11\x86\xdc\x00\xc0\x4f\x8e\xdb\x8a";
 
+enum {
+   INFO_TITLE = 0,
+   INFO_ARTIST,
+   INFO_ALBUM_ARTIST,
+   INFO_ALBUM,
+   INFO_COMPOSER,
+   INFO_COMMENT,
+   INFO_GROUPING,
+   INFO_GENRE,
+   INFO_DATE,
+   INFO_TRACK,
+   INFO_DISC,
+};
+
+/* info chunk names are common wave/wave64 */
+static const unsigned char infochunk_list[][4]
+    = {
+           "INAM",  /* title */
+           "IART",  /* artist */
+           "ISBJ",  /* albumartist */
+           "IPRD",  /* album */
+           "IWRI",  /* composer */
+           "ICMT",  /* comment */
+           "ISRF",  /* grouping */
+           "IGNR",  /* genre */
+           "ICRD",  /* date */
+           "IPRT",  /* track/trackcount */
+           "IFRM",  /* disc/disccount */
+      };
 
 /* support formats */
 enum
@@ -101,6 +134,19 @@ struct wave_fmt {
     uint32_t totalsamples;
     uint64_t numbytes;
 };
+
+static unsigned char *convert_utf8(unsigned char *src, unsigned char *dst,
+                                   int datasize, int bufsize, bool is_64)
+{
+    int size = (datasize > bufsize)? bufsize : datasize;
+
+    if (is_64)
+    {
+        /* Note: wave64: metadata codepage is UTF-16 only */
+        return utf16LEdecode(src, dst, size);
+    }
+    return iso_decode(src, dst, -1, size);
+}
 
 static void set_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3)
 {
@@ -197,6 +243,94 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
     }
 }
 
+static bool parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool is_64)
+{
+    unsigned char tmpbuf[ID3V2_BUF_SIZE];
+    unsigned char *bp = tmpbuf;
+    unsigned char *endp;
+    unsigned char *data_pos;
+    unsigned char *curpos  = id3->id3v2buf;
+    unsigned char *nextpos;
+    int datasize;
+    int infosize;
+    int remain = ID3V2_BUF_SIZE;
+
+    if (is_64)
+        lseek(fd, 4, SEEK_CUR);
+    else if (read(fd, bp, 4) < 4 || memcmp(bp, "INFO", 4))
+        return false;
+
+    infosize = read(fd, bp, (ID3V2_BUF_SIZE > chunksize)? chunksize : ID3V2_BUF_SIZE);
+    if (infosize <= 8)
+        return false;
+
+    endp = bp + infosize;
+    while (bp < endp)
+    {
+        nextpos  = curpos;
+        datasize = get_long_le(bp + 4);
+        data_pos = bp + 8;
+        remain = ID3V2_BUF_SIZE - (curpos - (unsigned char*)id3->id3v2buf);
+        if (remain <= 0)
+            break;
+
+        if (memcmp(bp, infochunk_list[INFO_TITLE], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->title = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_ARTIST], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->artist = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_ALBUM_ARTIST], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->albumartist = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_COMPOSER], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->composer = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_COMMENT], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->comment = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_GROUPING], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->grouping = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_GENRE], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->genre_string = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_DATE], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->year_string = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_TRACK], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->track_string = curpos;
+        }
+        else if (memcmp(bp, infochunk_list[INFO_DISC], 4) == 0)
+        {
+            nextpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
+            id3->disc_string = curpos;
+        }
+
+        bp = data_pos + datasize + (datasize & 1);
+        curpos = nextpos;
+    };
+    return true;
+}
+
 static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunknames,
                         bool is_64)
 {
@@ -213,6 +347,9 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
     int read_data;
 
     memset(&fmt, 0, sizeof(struct wave_fmt));
+ 
+    id3->vbr = false;   /* All Wave/Wave64 files are CBR */
+    id3->filesize = filesize(fd);
 
     /* get RIFF chunk header */
     lseek(fd, 0, SEEK_SET);
@@ -226,33 +363,13 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
     }
 
     /* iterate over WAVE chunks until 'data' chunk */
-    while (true)
+    while (read(fd, buf, len) > 0)
     {
-        /* get chunk header */
-        if (read(fd, buf, len) <= 0)
-        {
-            DEBUGF("metadata error: read error or missing 'data' chunk.\n");
-            return false;
-        }
-
         offset += len;
 
         /* get chunk size (when the header is wave64, chunksize includes GUID and data length) */
         chunksize = (is_64) ? get_uint64_le(buf + namelen) - len :
                               get_long_le(buf + namelen);
-
-        if (memcmp(buf, chunknames + DATA_CHUNK * namelen, namelen) == 0)
-        {
-            DEBUGF("find 'data' chunk\n");
-            fmt.numbytes = chunksize;
-            if (fmt.formattag == WAVE_FORMAT_ATRAC3)
-                id3->first_frame_offset = offset;
-            break;
-        }
-
-        /* padded to next chunk */
-        chunksize += ((is_64)? ((1 + ~chunksize) & 0x07) : (chunksize & 1));
-        offset += chunksize;
 
         read_data = 0;
         if (memcmp(buf, chunknames + FMT_CHUNK * namelen, namelen) == 0)
@@ -284,8 +401,34 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
                 fmt.totalsamples = (is_64)? get_uint64_le(buf) : get_long_le(buf);
             }
         }
+        else if (memcmp(buf, chunknames + DATA_CHUNK * namelen, namelen) == 0)
+        {
+            DEBUGF("find 'data' chunk\n");
+            fmt.numbytes = chunksize;
+            if (fmt.formattag == WAVE_FORMAT_ATRAC3)
+                id3->first_frame_offset = offset;
+        }
+        else if (memcmp(buf, chunknames + LIST_CHUNK * namelen, namelen) == 0)
+        {
+            DEBUGF("find 'LIST' chunk\n");
+            parse_list_chunk(fd, id3, chunksize, is_64);
+            lseek(fd, offset, SEEK_SET);
+        }
+
+        /* padded to next chunk */
+        chunksize += ((is_64)? ((1 + ~chunksize) & 0x07) : (chunksize & 1));
+
+        offset += chunksize;
+        if (offset >= id3->filesize)
+            break;
 
         lseek(fd, chunksize - read_data, SEEK_CUR);
+    }
+
+    if (fmt.numbytes == 0)
+    {
+        DEBUGF("metadata error: read error or missing 'data' chunk.\n");
+        return false;
     }
 
     if (fmt.totalsamples == 0)
@@ -296,9 +439,6 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
         DEBUGF("metadata error: frequency or bitrate is 0\n");
         return false;
     }
-
-    id3->vbr = false;   /* All Wave/Wave64 files are CBR */
-    id3->filesize = filesize(fd);
 
     /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
     id3->length = (fmt.formattag != WAVE_FORMAT_ATRAC3)?
