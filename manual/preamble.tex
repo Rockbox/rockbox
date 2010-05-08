@@ -173,9 +173,9 @@
 % Note: do NOT use \textbf or similar to emphasize text, use \emph!
 \ifpdfoutput{
 \newcommand{\note}[1]{
-  \ifinner\else\par\noindent\fi
+  \ifinner\else\vspace{1ex}\par\noindent\fi
   \textbf{Note:}\ %
-  \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}#1\par\fi%
+  \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}#1\par\vspace{1ex}\fi%
 }}
 {\newcommand{\note}[1]{\ifinner\else\par\noindent\fi\textbf{Note:{} }#1\par}}
 
