@@ -165,8 +165,7 @@ simcc () {
         exit 2
     else 
         # generic sdl-config checker
-        #ignore the -D_GNU_SOURCE=1 inserted by sdl
-        GCCOPTS="$GCCOPTS `$sdl --cflags` -U_GNU_SOURCE"
+        GCCOPTS="$GCCOPTS `$sdl --cflags`"
         LDOPTS="$LDOPTS `$sdl --libs`"
     fi
  fi
