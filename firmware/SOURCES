@@ -24,6 +24,8 @@ debug.c
 /* Common */
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
+/* alsa on linux requires a more advanced sprintf, i.e. not ours */
+libc/sprintf.c
 #endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
 libc/atoi.c
 libc/ctype.c
@@ -31,7 +33,6 @@ libc/memcmp.c
 libc/memchr.c
 libc/qsort.c
 libc/random.c
-libc/sprintf.c
 libc/strcat.c
 libc/strchr.c
 libc/strcmp.c
