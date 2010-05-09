@@ -76,35 +76,29 @@ static const unsigned char *wave64_chunklist
                    "data\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
                    "\xbc\x94\x5f\x92\x5a\x52\xd2\x11\x86\xdc\x00\xc0\x4f\x8e\xdb\x8a";
 
-enum {
-   INFO_TITLE = 0,
-   INFO_ARTIST,
-   INFO_ALBUM_ARTIST,
-   INFO_ALBUM,
-   INFO_COMPOSER,
-   INFO_COMMENT,
-   INFO_GROUPING,
-   INFO_GENRE,
-   INFO_DATE,
-   INFO_TRACK,
-   INFO_DISC,
+/* list/info chunk */
+
+struct info_chunk {
+    const unsigned char* tag;
+    size_t offset;
 };
 
 /* info chunk names are common wave/wave64 */
-static const unsigned char infochunk_list[][4]
-    = {
-           "INAM",  /* title */
-           "IART",  /* artist */
-           "ISBJ",  /* albumartist */
-           "IPRD",  /* album */
-           "IWRI",  /* composer */
-           "ICMT",  /* comment */
-           "ISRF",  /* grouping */
-           "IGNR",  /* genre */
-           "ICRD",  /* date */
-           "IPRT",  /* track/trackcount */
-           "IFRM",  /* disc/disccount */
-      };
+static const struct info_chunk info_chunks[] = {
+    { "INAM", offsetof(struct mp3entry, title),        }, /* title */
+    { "IART", offsetof(struct mp3entry, artist),       }, /* artist */
+    { "ISBJ", offsetof(struct mp3entry, albumartist),  }, /* albumartist */
+    { "IPRD", offsetof(struct mp3entry, album),        }, /* album */
+    { "IWRI", offsetof(struct mp3entry, composer),     }, /* composer */
+    { "ICMT", offsetof(struct mp3entry, comment),      }, /* comment */
+    { "ISRF", offsetof(struct mp3entry, grouping),     }, /* grouping */
+    { "IGNR", offsetof(struct mp3entry, genre_string), }, /* genre */
+    { "ICRD", offsetof(struct mp3entry, year_string),  }, /* date */
+    { "IPRT", offsetof(struct mp3entry, track_string), }, /* track/trackcount */
+    { "IFRM", offsetof(struct mp3entry, disc_string),  }, /* disc/disccount */
+};
+
+#define INFO_CHUNK_COUNT ((int)ARRAYLEN(info_chunks))
 
 /* support formats */
 enum
@@ -135,11 +129,9 @@ struct wave_fmt {
     uint64_t numbytes;
 };
 
-static unsigned char *convert_utf8(unsigned char *src, unsigned char *dst,
-                                   int datasize, int bufsize, bool is_64)
+static unsigned char *convert_utf8(const unsigned char *src, unsigned char *dst,
+                                   int size, bool is_64)
 {
-    int size = (datasize > bufsize)? bufsize : datasize;
-
     if (is_64)
     {
         /* Note: wave64: metadata codepage is UTF-16 only */
@@ -243,90 +235,50 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
     }
 }
 
-static bool parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool is_64)
+static void parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool is_64)
 {
     unsigned char tmpbuf[ID3V2_BUF_SIZE];
     unsigned char *bp = tmpbuf;
     unsigned char *endp;
     unsigned char *data_pos;
-    unsigned char *curpos  = id3->id3v2buf;
+    unsigned char *tag_pos  = id3->id3v2buf;
     int datasize;
     int infosize;
-    int remain = ID3V2_BUF_SIZE;
-    bool convert_string;
+    int remain;
+    int i;
 
     if (is_64)
         lseek(fd, 4, SEEK_CUR);
     else if (read(fd, bp, 4) < 4 || memcmp(bp, "INFO", 4))
-        return false;
+        return;
 
     infosize = read(fd, bp, (ID3V2_BUF_SIZE > chunksize)? chunksize : ID3V2_BUF_SIZE);
     if (infosize <= 8)
-        return false;
+        return;
 
     endp = bp + infosize;
     while (bp < endp)
     {
-        convert_string = true;
         datasize = get_long_le(bp + 4);
         data_pos = bp + 8;
-        remain = ID3V2_BUF_SIZE - (curpos - (unsigned char*)id3->id3v2buf);
-        if (remain <= 0)
+        remain = ID3V2_BUF_SIZE - (tag_pos - (unsigned char*)id3->id3v2buf);
+        if (remain < 1)
             break;
 
-        if (memcmp(bp, infochunk_list[INFO_TITLE], 4) == 0)
+        for (i = 0; i < INFO_CHUNK_COUNT; i++)
         {
-            id3->title = curpos;
+            if (memcmp(bp, info_chunks[i].tag, 4) == 0)
+            {
+                *((char **)(((char*)id3) + info_chunks[i].offset)) = tag_pos;
+                tag_pos = convert_utf8(data_pos, tag_pos,
+                                       (datasize + 1 >= remain )? remain - 1 : datasize,
+                                       is_64);
+                *tag_pos++ = 0;
+                break;
+            }
         }
-        else if (memcmp(bp, infochunk_list[INFO_ARTIST], 4) == 0)
-        {
-            id3->artist = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_ALBUM_ARTIST], 4) == 0)
-        {
-            id3->albumartist = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_COMPOSER], 4) == 0)
-        {
-            id3->composer = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_COMMENT], 4) == 0)
-        {
-            id3->comment = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_GROUPING], 4) == 0)
-        {
-            id3->grouping = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_GENRE], 4) == 0)
-        {
-            id3->genre_string = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_DATE], 4) == 0)
-        {
-            id3->year_string = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_TRACK], 4) == 0)
-        {
-            id3->track_string = curpos;
-        }
-        else if (memcmp(bp, infochunk_list[INFO_DISC], 4) == 0)
-        {
-            id3->disc_string = curpos;
-        }
-        else
-        {
-            convert_string = false;
-        }
-
-        if (convert_string)
-        {
-            curpos = convert_utf8(data_pos, curpos, datasize, remain, is_64);
-        }
-
         bp = data_pos + datasize + (datasize & 1);
     };
-    return true;
 }
 
 static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunknames,
