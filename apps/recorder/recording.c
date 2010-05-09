@@ -698,7 +698,7 @@ void rec_set_source(int source, unsigned flags)
 
     /* Set peakmeters for recording or reset to playback */
     peak_meter_playback((flags & SRCF_RECORDING) == 0);
-    peak_meter_enabled = true;
+    peak_meter_enable(true);
 }
 #endif /* CONFIG_CODEC == SWCODEC && !defined (SIMULATOR) */
 
@@ -1099,7 +1099,7 @@ bool recording_screen(bool no_source)
        buffer */
 #else
     /* Yes, we use the D/A for monitoring */
-    peak_meter_enabled = true;
+    peak_meter_enable(true);
     peak_meter_playback(true);
 #endif
 
@@ -1549,7 +1549,7 @@ bool recording_screen(bool no_source)
                 {
 #if CONFIG_CODEC != SWCODEC
                     peak_meter_playback(true);
-                    peak_meter_enabled = false;
+                    peak_meter_enable(false);
 #endif
                     done = 1;
                 }

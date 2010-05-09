@@ -630,6 +630,10 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
             struct progressbar *bar = (struct progressbar*)data->tokens[i].value.data;
             bar->draw = false;
         }
+        else if (data->tokens[i].type == WPS_TOKEN_PEAKMETER)
+        {
+            data->peak_meter_enabled = false;
+        }
 #endif
 #ifdef HAVE_ALBUMART
         if (data->albumart && data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
@@ -692,6 +696,9 @@ static bool get_line(struct gui_wps *gwps,
                 break;
 
 #ifdef HAVE_LCD_BITMAP
+            case WPS_TOKEN_PEAKMETER:
+                data->peak_meter_enabled = true;
+                break;
             case WPS_TOKEN_VOLUMEBAR:
             case WPS_TOKEN_BATTERY_PERCENTBAR:
             case WPS_TOKEN_PROGRESSBAR:
@@ -1083,19 +1090,6 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
     bool update_line, new_subline_refresh;
 
-#ifdef HAVE_LCD_BITMAP
-
-    /* to find out wether the peak meter is enabled we
-       assume it wasn't until we find a line that contains
-       the peak meter. We can't use peak_meter_enabled itself
-       because that would mean to turn off the meter thread
-       temporarily. (That shouldn't matter unless yield
-       or sleep is called but who knows...)
-    */
-    bool enable_pm = false;
-
-#endif
-
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
@@ -1226,27 +1220,27 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             /* peakmeter */
             if (flags & vp_refresh_mode & WPS_REFRESH_PEAK_METER)
             {
-                /* the peakmeter should be alone on its line */
-                update_line = false;
-
-                int h = font_get(skin_viewport->vp.font)->height;
-                int peak_meter_y = line_count* h;
-
-                /* The user might decide to have the peak meter in the last
-                    line so that it is only displayed if no status bar is
-                    visible. If so we neither want do draw nor enable the
-                    peak meter. */
-                if (peak_meter_y + h <= skin_viewport->vp.y+skin_viewport->vp.height) {
-                    /* found a line with a peak meter -> remember that we must
-                        enable it later */
-                    enable_pm = true;
-                    peak_meter_enabled = true;
-                    peak_meter_screen(gwps->display, 0, peak_meter_y,
-                                      MIN(h, skin_viewport->vp.y+skin_viewport->vp.height - peak_meter_y));
+                if (!data->peak_meter_enabled)
+                {
+                    peak_meter_enable(false);
                 }
                 else
                 {
-                    peak_meter_enabled = false;
+                    /* the peakmeter should be alone on its line */
+                    update_line = false;
+
+                    int h = font_get(skin_viewport->vp.font)->height;
+                    int peak_meter_y = line_count* h;
+
+                    /* The user might decide to have the peak meter in the last
+                        line so that it is only displayed if no status bar is
+                        visible. If so we neither want do draw nor enable the
+                        peak meter. */
+                    if (peak_meter_y + h <= skin_viewport->vp.y+skin_viewport->vp.height) {
+                        peak_meter_enable(true);
+                        peak_meter_screen(gwps->display, 0, peak_meter_y,
+                                          MIN(h, skin_viewport->vp.y+skin_viewport->vp.height - peak_meter_y));
+                    }
                 }
             }
 
@@ -1302,9 +1296,6 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 #endif
     }
 
-#ifdef HAVE_LCD_BITMAP
-    data->peak_meter_enabled = enable_pm;
-#endif
     /* Restore the default viewport */
     display->set_viewport(NULL);
 

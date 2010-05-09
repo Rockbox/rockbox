@@ -548,7 +548,7 @@ int radio_screen(void)
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
 
-    peak_meter_enabled = true;
+    peak_meter_enable(true);
 
     rec_init_recording_options(&rec_options);
     rec_options.rec_source = AUDIO_SRC_LINEIN;

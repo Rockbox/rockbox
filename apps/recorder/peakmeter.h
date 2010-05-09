@@ -32,7 +32,7 @@ extern int pm_get_clipcount(void);
 extern void pm_reset_clipcount(void);
 extern void pm_activate_clipcount(bool active);
 
-extern bool peak_meter_enabled;
+extern void peak_meter_enable(bool enable);
 
 extern void peak_meter_playback(bool playback);
 extern int  peak_meter_draw_get_btn(int action_context, int x[], int y[],
