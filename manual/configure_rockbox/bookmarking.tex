@@ -4,71 +4,81 @@
   you can return to it at a later time. \opt{swcodec}{Bookmarks also store
   rate, pitch and speed information from the \setting{Pitch Screen} (see
   \reference{sec:pitchscreen}).} Bookmarks are saved on a per directory
-  basis or for individual (saved) playlists.
-  They are stored next to the directory/playlist they reference.
-  You can store multiple bookmarks for the same track.\\*
+  basis or for individual (saved) playlists. You can store multiple bookmarks,
+  even for the same track. When there's already a bookmark for a directory or
+  playlist, new bookmarks are added before existing ones.
+
+  Bookmarks are stored next to the directory or playlist they reference, in a
+  file with the same name as the directory or playlist and a ".bmark"
+  extension. To load a bookmark, select the bookmark file and then select
+  the bookmark to load. There are other ways to load a bookmarks mentioned
+  below.
   
   \note{Bookmarking only works when tracks are launched from the file browser,
-        and does not currently work for tracks launched via the
-        database. In addition, they do not currently work with dynamic
-        playlists.\\*}
+        and does not work for tracks launched via the
+        database. In addition, they do not work with dynamic
+        playlists.}
 
   \begin{description}
-  \item [Bookmark on Stop.] This option controls whether Rockbox writes a
-    bookmark to the disk when playback is stopped. Setting this to
-    \setting{No} turns automatic bookmarking completely off. In contrast
-    \setting{Yes} turns automatic bookmarking on while \setting{Ask} 
-    asks on stopping the track if a bookmark should be created.
-    With the above options \setting{Yes} and \setting{Ask} if there is an existing 
-    \fname{.bmark} file the current position information will be added to the
-    front of the existing list, up to the maximum number of allowed bookmarks
-    per file (currently 10). If no \fname{.bmark} file exists, one will be
-    created with the new bookmark information. Finally, if the 
-    \setting{Maintain a list of Recently Used Bookmarks}
-     option is enabled, the bookmarking
-    information will be added to recent bookmarks list.
+
+  \item [Bookmark on Stop.]
+    This option controls whether Rockbox creates a bookmark playback is
+    stopped.
     \begin{description}    
+      \item[No.]
+            Do not create bookmarks.
+      \item[Yes.]
+            Always create bookmarks.
+      \item[Ask.]
+            Ask if a bookmark should be created.
       \item[Yes -- Recent Only.]
-            Turns on automatic bookmarking -- One bookmark only
+            Always create a bookmark, but only in the recent bookmarks list.
       \item[Ask -- Recent Only.]
-            Asks if a bookmark should be created when stopping track -- 
-            One bookmark only
+            Ask if a bookmark should be created, but only add it to the recent
+            bookmarks list.
     \end{description}
-    With the two \setting{Recent Only} options, nothing is written to the 
-    \fname{.bmark} file. If the \setting{Maintain a list of Recently Used Bookmarks}
-    option is enabled, the bookmarking information will however be added to
-    recent bookmarks list. 
+    When either \setting{Yes -- Recent Only} or \setting{Ask -- Recent Only}
+    is selected, bookmarks are only created if the \setting{Maintain a List
+    of Recent Bookmarks} is enabled.
     \note{The \setting{Resume} function remembers your position in the most
       recently accessed track regardless of how the \setting{Bookmark on Stop}
       option is set.}
     
   \item [Load Last Bookmark.]
-
-  When the \setting{Load Last Bookmark} option is set to \setting{Yes}, Rockbox
-  automatically returns to the position of the last bookmark within a file
-  when that file is played. 
-
-  When the \setting{Load Last Bookmark} option is set to \setting{Ask}, Rockbox will
-  give the user the option of starting from the beginning of the track
-  of or from the bookmark. 
-
-  When the \setting{Load Last Bookmark} option is set to \setting{No}, playback always
-  starts from the beginning of the track, and the user must play the bookmark
-  or use the \setting{Load Bookmark} function in the Main Menu, while the file
-  is playing, to resume at the bookmarked location.
+    This option controls if Rockbox should automatically load a bookmark for
+    a file, when that file is played.
     
-  \item [Maintain a list of Recently Used Bookmarks.]
+    \begin{description}
+      \item[No]
+            Always start from the beginning of the track or playlist.
+      \item[Yes]
+            Automatically return to the position of the last bookmark. Start
+            from the beginning if there are no bookmarks.
+      \item[Ask]
+            Ask if playback should start from the beginning of the track or
+            from one of the bookmarks.
+    \end{description}
 
-  This list of Most Recent Bookmarks (MRB's) may be accessed through the
-  \setting{Recent Bookmarks} option of the \setting{Bookmarks} sub menu of the 
-  Main Menu. When set to \setting{Yes} each new bookmark will be added to the
-  MRB list. Setting this to \setting{No} disables the addition of bookmarks to
-  the MRB list. \setting{Unique Only} behaves like the \setting{Yes} setting 
-  but in addition all older entries for the current (dynamic) playlist will 
-  be removed from the MRB whenever a new entry is added.
-  
-  \item [Bookmark list keys.] The following keys can be used to navigate in
-  any bookmark list.\\
+  \item [Maintain a list of Recent Bookmarks.]
+    If this option is enabled, a list of the most recently created bookmarks
+    may be accessed through the \setting{Recent Bookmarks} option in the
+    \setting{Main Menu}. This list contains up to ten entries.
+    
+    \begin{description}
+      \item[No]
+            Do not keep a list of recently used bookmarks. This also removes
+            the \setting{Recent Bookmarks} from the \setting{Main Menu}.
+      \item[Yes]
+            Keep a list of recently used bookmarks. Each new bookmark is added
+            to the list of recent bookmarks.
+      \item[Unique Only]
+            Add each new bookmark to the list of recently used bookmarks, but
+            only keep one bookmark from the current directory or playlist; any
+            previous entries are removed.
+    \end{description}
+\end{description}
+
+The following keys can be used to navigate in any bookmark list.
 \begin{table}
     \begin{btnmap}{}{}
       \ActionStdNext
@@ -97,9 +107,10 @@
     \end{btnmap}
 \end{table}
 
-There are two options in the context menu:\\*
-  
-  \setting{Resume} will commence playback of the currently selected bookmark entry.
-  
-  \setting{Delete} will remove the currently selected bookmark entry from the list.
-\end{description}
+There are two options in the context menu:
+
+\begin{itemize}
+  \item \setting{Resume} will commence playback of the currently selected bookmark entry.
+  \item \setting{Delete} will remove the currently selected bookmark entry from the list.
+\end{itemize}
+
