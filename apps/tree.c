@@ -755,10 +755,12 @@ static int dirbrowse()
                 break;
 #endif
 
+#ifdef HAVE_HOTKEY
             case ACTION_TREE_HOTKEY:
                 if (!global_settings.hotkey_tree)
                     break;
                 /* fall through */
+#endif
             case ACTION_STD_CONTEXT:
             {
                 bool hotkey = button == ACTION_TREE_HOTKEY;

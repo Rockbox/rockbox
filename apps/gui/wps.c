@@ -886,10 +886,12 @@ long gui_wps_show(void)
 #endif
         switch(button)
         {
+#ifdef HAVE_HOTKEY
             case ACTION_WPS_HOTKEY:
                 if (!global_settings.hotkey_wps)
                     break;
                 /* fall through */
+#endif
             case ACTION_WPS_CONTEXT:
             {
                 bool hotkey = button == ACTION_WPS_HOTKEY;
