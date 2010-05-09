@@ -251,6 +251,8 @@ static void parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
         lseek(fd, 4, SEEK_CUR);
     else if (read(fd, bp, 4) < 4 || memcmp(bp, "INFO", 4))
         return;
+    else
+        chunksize -= 4; /* don't include "INFO" tag in chunksize */
 
     infosize = read(fd, bp, (ID3V2_BUF_SIZE > chunksize)? chunksize : ID3V2_BUF_SIZE);
     if (infosize <= 8)
@@ -289,9 +291,9 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
 
     struct wave_fmt fmt;
 
-    unsigned int namelen = (is_64)? WAVE64_CHUNKNAME_LENGTH : WAVE_CHUNKNAME_LENGTH;
-    unsigned int sizelen = (is_64)? WAVE64_CHUNKSIZE_LENGTH : WAVE_CHUNKSIZE_LENGTH;
-    unsigned int len = namelen + sizelen;
+    const unsigned int namelen = (is_64)? WAVE64_CHUNKNAME_LENGTH : WAVE_CHUNKNAME_LENGTH;
+    const unsigned int sizelen = (is_64)? WAVE64_CHUNKSIZE_LENGTH : WAVE_CHUNKSIZE_LENGTH;
+    const unsigned int len = namelen + sizelen;
     uint64_t chunksize;
     uint64_t offset = len + namelen;
     int read_data;
@@ -403,9 +405,9 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
     DEBUGF("  bitspersample:   %u\n", fmt.bitspersample);
     DEBUGF("  samplesperblock: %u\n", fmt.samplesperblock);
     DEBUGF("  totalsamples:    %u\n", (unsigned int)fmt.totalsamples);
-    DEBUGF("  numbytes;        %u\n", (unsigned int)fmt.numbytes);
+    DEBUGF("  numbytes:        %u\n", (unsigned int)fmt.numbytes);
     DEBUGF("id3 info ----\n");
-    DEBUGF("  frquency:        %u\n", (unsigned int)id3->frequency);
+    DEBUGF("  frequency:       %u\n", (unsigned int)id3->frequency);
     DEBUGF("  bitrate:         %d\n", id3->bitrate);
     DEBUGF("  length:          %u\n", (unsigned int)id3->length);
 
