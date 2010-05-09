@@ -345,8 +345,14 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             read(fd, wfx->data, 6);
                             lseek(fd,current.size - 24 - 72 - 6,SEEK_CUR);
                             wfx->audiostream = flags&0x7f;
+                        } else if (wfx->codec_id == ASF_CODEC_ID_WMAPRO) {
+                            read(fd, wfx->data, 10);
+                            lseek(fd,current.size - 24 - 72 - 10,SEEK_CUR);
+                            wfx->audiostream = flags&0x7f;
+                            /* Correct codectype to redirect playback to the proper .codec */
+                            id3->codectype = AFMT_WMAPRO;
                         } else {
-                            DEBUGF("Unsupported WMA codec (Pro, Lossless, Voice, etc)\n");
+                            DEBUGF("Unsupported WMA codec (Lossless, Voice, etc)\n");
                             lseek(fd,current.size - 24 - 72,SEEK_CUR);
                         }
 

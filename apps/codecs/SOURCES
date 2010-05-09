@@ -16,6 +16,7 @@ atrac3_rm.c
 atrac3_oma.c
 mpc.c
 wma.c
+wmapro.c
 sid.c
 ape.c
 nsf.c

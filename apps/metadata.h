@@ -59,6 +59,7 @@ enum
     AFMT_SPC,          /* SPC700 save state */
     AFMT_APE,          /* Monkey's Audio (APE) */
     AFMT_WMA,          /* WMAV1/V2 in ASF */
+    AFMT_WMAPRO,       /* WMA Professional in ASF */
     AFMT_MOD,          /* Amiga MOD File Format */
     AFMT_SAP,          /* Atari 8Bit SAP Format */
     AFMT_RM_COOK,      /* Cook in RM/RA */

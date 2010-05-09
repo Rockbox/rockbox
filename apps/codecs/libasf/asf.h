@@ -4,8 +4,9 @@
 #include <inttypes.h>
 
 /* ASF codec IDs */
-#define ASF_CODEC_ID_WMAV1 0x160
-#define ASF_CODEC_ID_WMAV2 0x161
+#define ASF_CODEC_ID_WMAV1      0x160
+#define ASF_CODEC_ID_WMAV2      0x161
+#define ASF_CODEC_ID_WMAPRO     0x162
 
 enum asf_error_e {
     ASF_ERROR_INTERNAL       = -1,  /* incorrect input to API calls */

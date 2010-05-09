@@ -82,6 +82,7 @@ $(CODECDIR)/shorten.codec : $(CODECDIR)/libffmpegFLAC.a
 $(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a
 $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
 $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
+$(CODECDIR)/wmapro.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
 $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
