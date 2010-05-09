@@ -20,11 +20,11 @@ not even load on devices with little available memory.\\
 one file.  These are rare, but if you have one don't even try it (the file will most
 likely be corrupted if you save over it). You have been warned.\\}
 
-The file \fname {"/sgf/gbn\_def.sgf"} is used by the plugin to store any unsaved
+The file \fname {/sgf/gbn\_def.sgf} is used by the plugin to store any unsaved
 changes in the most recently loaded game.  This means that if you forget to save your
-changes, you should load \fname {"/sgf/gbn\_def.sgf"} immediately to offload the changes
+changes, you should load \fname {/sgf/gbn\_def.sgf} immediately to offload the changes
 to another file.  If you load another file first then your changes will be lost
-permanently.  The \fname {"/sgf/gbn\_def.sgf"} file is also the file loaded if another
+permanently.  The \fname {/sgf/gbn\_def.sgf} file is also the file loaded if another
 is not selected.\\
 
 The information panel which displays the current move number may also contain
@@ -209,7 +209,7 @@ these markers:
     \begin{description}
         \item[New.] Create a new game with your choice of board size and handicaps.
         \item[Save.] Save the current state of the game.  It will be saved to
-            \fname {"/sgf/gbn\_def.sgf"} unless otherwise set.
+            \fname {/sgf/gbn\_def.sgf} unless otherwise set.
         \item[Save As.] Save to a specified file.
         \item[Game Info.] View and modify the metadata of the current game.
         \item[Playback Control.] Control the playback of the current playlist
@@ -220,7 +220,7 @@ these markers:
         \item[Context Menu.] Open the Context Menu which allows you to set play
             modes and other tools.
         \item[Quit.] Leave the plugin.  Any unsaved changes are saved to
-            \fname {"/sgf/gbn\_def.sgf"}.
+            \fname {/sgf/gbn\_def.sgf}.
     \end{description}
 \item [Game Info. ]
     The menu for modifying game info (metadata) of the current game.  This
@@ -270,7 +270,7 @@ these markers:
             global Rockbox settings).
         \item[Idle Autosave Time.] Set the amount of idle time to wait before
             automatically saving any unsaved changes.  These autosaves go to
-            the file \fname {"/sgf/gbn\_def.sgf"} regardless of if you have
+            the file \fname {/sgf/gbn\_def.sgf} regardless of if you have
             loaded a game or used \setting{Save As} to save the game before or
             not.  Set to \setting{Off} to disable this functionality completely.
         \item[Automatically Show Comments?] If this is enabled and you navigate
@@ -299,7 +299,7 @@ these markers:
         \item[Next Variation.] If the game is at the first move in a variation,
             this will navigate to the next variation after the current one. This
             is the only way to reach variations which start with adding or
-            removing stones, as you cannot follow them by "playing" the same move.
+            removing stones, as you cannot follow them by ``playing'' the same move.
         \item[Force Play Mode.] The same as Play Mode except that this mode will
             allow you to play illegal moves such as retaking a ko immediately
             without a ko threat, suicide on rulesets which don't allow it

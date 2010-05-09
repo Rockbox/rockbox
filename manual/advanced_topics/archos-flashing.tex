@@ -42,7 +42,7 @@ There's an ultimate safety net to bring back boxes with even completely
 garbled flash content: the \emph{UART} boot mod, which in turn requires the
 \emph{serial} mod. With that it's possible to reflash independently from the
 outside, even if the flash ROM is completely erased.
-\nopt{ondio}{This won't work if you have one of the rare "ROMless" boxes. These
+\nopt{ondio}{This won't work if you have one of the rare ``ROMless'' boxes. These
   have no boot ROM and boot directly from flash.
 }
 If the first $\approx$2KB of the flash ROM are flashed ok, \emph{Minimon} can
@@ -78,7 +78,7 @@ screen. To get out of it, perform a hardware shutdown of your \dap.
 You only need to perform this procedure the first time you flash your
 \playertype. You may also want to perform it in case the update procedure for
 the second image recommends it. In the latter case do not perform the steps
-listed under "Preparation".
+listed under ``Preparation''.
 
 \subsubsection{Preparation}
 
@@ -87,10 +87,10 @@ listed under "Preparation".
   \setting{System $\rightarrow$ Debug (Keep Out!) $\rightarrow$ View HW
   Info}. 
   \opt{lcd_charcell}{Cycle through the displayed values with \ButtonRight /
-    \ButtonLeft\ until "Flash:" is displayed. If it shows question marks,
+    \ButtonLeft\ until ``Flash:'' is displayed. If it shows question marks,
   }
-  \opt{lcd_bitmap}{Check the values in the line starting with "Flash:". If it
-    shows question marks after "M=" and "D=",
+  \opt{lcd_bitmap}{Check the values in the line starting with ``Flash:''. If it
+    shows question marks after ``M='' and ``D='',
   }
   you're out of luck, your \dap\ is not flashable without modifying the
   hardware. You can stop here. Sorry.
