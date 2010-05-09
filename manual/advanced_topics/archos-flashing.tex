@@ -45,7 +45,7 @@ outside, even if the flash ROM is completely erased.
 \nopt{ondio}{This won't work if you have one of the rare ``ROMless'' boxes. These
   have no boot ROM and boot directly from flash.
 }
-If the first $\approx$2KB of the flash ROM are flashed ok, \emph{Minimon} can
+If the first $\approx$2~KB of the flash ROM are flashed ok, \emph{Minimon} can
 be used for the same purpose.
 
 \subsection{Terminology and Basic Operation}
@@ -101,7 +101,7 @@ backup of the current flash ROM contents, in case you want to restore it later.
 Select \setting{System $\rightarrow$ Debug (Keep Out!) $\rightarrow$ Dump ROM
 contents}. You'll notice a few seconds of disk activity. When you connect your
 \dap\ to the PC afterwards, you'll find two files in the root of your \dap.
-Copy the 256KB-sized file named \fname{internal\_rom\_2000000-203FFFF.bin} to
+Copy the 256~KB-sized file named \fname{internal\_rom\_2000000-203FFFF.bin} to
 a safe place.
 
 \subsubsection{Flashing}
@@ -150,7 +150,7 @@ a safe place.
   root of your \dap.
 }
 
-\note{There are no separate flash packages for {\dap}s modified to have 8MB
+\note{There are no separate flash packages for {\dap}s modified to have 8~MB
   of RAM. You need to use the corresponding package for non-modified
   \playertype. You should then install a Rockbox image that makes use of all
   available RAM as described in the following section.
