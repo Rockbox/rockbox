@@ -154,7 +154,7 @@
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
 
 /* define current usage levels (based on battery bench) */
-#define CURRENT_NORMAL     50
+#define CURRENT_NORMAL     45
 #define CURRENT_BACKLIGHT  14
 #define CURRENT_RECORD     CURRENT_NORMAL
 
