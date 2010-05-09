@@ -46,11 +46,6 @@
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
-#ifdef HAVE_HOTKEY
-#include "list.h"
-#include "settings_list.h"
-#include "onplay.h"
-#endif
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -406,44 +401,10 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 /***********************************/
 /*    HOTKEY MENU                  */
 #ifdef HAVE_HOTKEY
-static void view_hotkey_info(void)
-{
-    struct simplelist_info info;
-    simplelist_info_init(&info, str(LANG_VIEW_HOTKEY), 0, NULL);
-    info.hide_selection = true;
-    info.scroll_all = true;
-    simplelist_addline(SIMPLELIST_ADD_LINE, str(LANG_HOTKEY_VIEW_WPS),
-        get_hotkey_desc(global_settings.hotkey_wps));
-    simplelist_addline(SIMPLELIST_ADD_LINE, str(LANG_HOTKEY_VIEW_FILE_BROWSER),
-        get_hotkey_desc(global_settings.hotkey_tree));
-    simplelist_show_list(&info);
-}
-
-/* reset hotkey settings to their defaults */
-static void reset_hotkey_settings(void)
-{
-    {
-        const struct settings_list *setting = 
-            find_setting(&global_settings.hotkey_wps, NULL);
-        reset_setting(setting, setting->setting);
-    }
-    {
-        const struct settings_list *setting = 
-            find_setting(&global_settings.hotkey_tree, NULL);
-        reset_setting(setting, setting->setting);
-    }
-    settings_save();
-    splash(HZ, str(LANG_RESET_DONE_CLEAR));
-}
-
-MENUITEM_FUNCTION(hotkey_view, 0, ID2P(LANG_VIEW_HOTKEY),
-            (int(*)(void))view_hotkey_info, NULL,
-            NULL, Icon_NOICON);
-MENUITEM_FUNCTION(hotkey_reset, 0, ID2P(LANG_RESET),
-            (int(*)(void))reset_hotkey_settings, NULL,
-            NULL, Icon_NOICON);
+MENUITEM_SETTING(hotkey_wps_item, &global_settings.hotkey_wps, NULL);
+MENUITEM_SETTING(hotkey_tree_item, &global_settings.hotkey_tree, NULL);
 MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
-            &hotkey_view, &hotkey_reset);
+            &hotkey_wps_item, &hotkey_tree_item);
 #endif /*have_hotkey */
 /*    HOTKEY MENU                  */
 /***********************************/

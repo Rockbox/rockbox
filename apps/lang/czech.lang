@@ -13321,57 +13321,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_HOTKEY_QUESTION
-  desc: hotkey splash
-  user: core
-  <source>
-    *: none
-    hotkey: "Set Hotkey: %s?"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Nastavit zkratkovou klávesu: %s?"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Nastavit zkratkovou klávesu?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_ASSIGNED
-  desc: Confirmation after the hotkey has been assigned
-  user: core
-  <source>
-    *: none
-    hotkey: "Assigned Hotkey: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Přiřazená zkratková klávesa: %s"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Přiřazená zkratková klávesa"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_NOT_SET
-  desc: hotkey splash
-  user: core
-  <source>
-    *: none
-    hotkey: "Hotkey Not Set"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Zkratková klávesa nenastavena"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Zkratková klávesa nenastavena"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
   user: core
@@ -13386,55 +13335,6 @@
   <voice>
     *: none
     hotkey: "Zkratková klávesa"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_VIEW_HOTKEY
-  desc: hotkey menu
-  user: core
-  <source>
-    *: none
-    hotkey: "View Hotkey Settings"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Zobrazit nastavení zkratkové klávesy"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Zobrazit nastavení zkratkové klávesy"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_VIEW_WPS
-  desc: hotkey info menu
-  user: core
-  <source>
-    *: none
-    hotkey: "WPS: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Přehrávací obrazovka: %s"
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_VIEW_FILE_BROWSER
-  desc: hotkey info menu
-  user: core
-  <source>
-    *: none
-    hotkey: "Prohlížeč souborů: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Prohlížeč souborů: %s"
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>

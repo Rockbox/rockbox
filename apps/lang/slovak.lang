@@ -13319,40 +13319,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_VIEW_HOTKEY
-  desc: hotkey menu
-  user: core
-  <source>
-    *: none
-    hotkey: "View Hotkey Settings"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Zobraziť Nastavenia Horúceho Klávesu"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Zobraziť nastavenia horúceho klávesu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_ASSIGNED
-  desc: Confirmation after the hotkey has been assigned
-  user: core
-  <source>
-    *: none
-    hotkey: "Assigned Hotkey: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Priradená Skratka: %s"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Priradená skratka"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
   user: core
@@ -13367,72 +13333,6 @@
   <voice>
     *: none
     hotkey: "Klávesová skratka"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_NOT_SET
-  desc: hotkey splash
-  user: core
-  <source>
-    *: none
-    hotkey: "Hotkey Not Set"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Skratka Nieje Nastavená"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Skratka nieje nastavená"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_HOTKEY_QUESTION
-  desc: hotkey splash
-  user: core
-  <source>
-    *: none
-    hotkey: "Set Hotkey: %s?"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Nastaviť skratku: %s?"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Nastaviť skratku?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_VIEW_FILE_BROWSER
-  desc: hotkey info menu
-  user: core
-  <source>
-    *: none
-    hotkey: "File Browser: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Prehliadač Súborov: %s"
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_VIEW_WPS
-  desc: hotkey info menu
-  user: core
-  <source>
-    *: none
-    hotkey: "WPS: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "WPS: %s"
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>

@@ -755,8 +755,11 @@ static int dirbrowse()
                 break;
 #endif
 
-            case ACTION_STD_CONTEXT:
             case ACTION_TREE_HOTKEY:
+                if (!global_settings.hotkey_tree)
+                    break;
+                /* fall through */
+            case ACTION_STD_CONTEXT:
             {
                 bool hotkey = button == ACTION_TREE_HOTKEY;
                 int onplay_result;

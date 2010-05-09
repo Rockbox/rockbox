@@ -818,7 +818,7 @@ struct user_settings
 
 #ifdef HAVE_HOTKEY
     /* hotkey assignments - acceptable values are in
-       hotkey_settings enum in onplay.c */
+       hotkey_action enum in onplay.h */
     int hotkey_wps;
     int hotkey_tree;
 #endif

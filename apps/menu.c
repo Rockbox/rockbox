@@ -61,12 +61,6 @@
 #include "list.h"
 #include "buttonbar.h"
 
-/* hotkey settings */
-#ifdef HAVE_HOTKEY
-const struct menu_item_ex *selected_menu_item;
-bool hotkey_settable_menu = false;
-#endif
-
 #define MAX_MENUS 8
 /* used to allow for dynamic menus */
 #define MAX_MENU_SUBITEMS 64
@@ -430,22 +424,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         {
             ret = GO_TO_RECSCREEN;
             done = true;
-        }
-#endif
-#ifdef HAVE_HOTKEY
-        else if (hotkey_settable_menu &&
-                ((action == ACTION_WPS_HOTKEY) ||
-                 (action == ACTION_TREE_HOTKEY)))
-        {
-            int this = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
-            temp = menu->submenus[this];
-            if (temp->flags&MENU_FUNC_HOTKEYABLE)
-            {
-                selected_menu_item = temp;
-                selected = this;
-                ret = MENU_SELECTED_HOTKEY;
-                done = true;
-            }
         }
 #endif
         else if (action == ACTION_TREE_WPS)

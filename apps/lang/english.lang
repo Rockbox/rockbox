@@ -13396,53 +13396,53 @@
 </phrase>
 <phrase>
   id: LANG_SET_HOTKEY_QUESTION
-  desc: hotkey splash
+  desc: deprecated
   user: core
   <source>
     *: none
-    hotkey: "Set Hotkey: %s?"
+    hotkey: ""
   </source>
   <dest>
     *: none
-    hotkey: "Set Hotkey: %s?"
+    hotkey: ""
   </dest>
   <voice>
     *: none
-    hotkey: "Set Hotkey?"
+    hotkey: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_HOTKEY_ASSIGNED
-  desc: Confirmation after the hotkey has been assigned
+  desc: deprecated
   user: core
   <source>
     *: none
-    hotkey: "Assigned Hotkey: %s"
+    hotkey: ""
   </source>
   <dest>
     *: none
-    hotkey: "Assigned Hotkey: %s"
+    hotkey: ""
   </dest>
   <voice>
     *: none
-    hotkey: "Assigned Hotkey"
+    hotkey: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_HOTKEY_NOT_SET
-  desc: hotkey splash
+  desc: deprecated
   user: core
   <source>
     *: none
-    hotkey: "Hotkey Not Set"
+    hotkey: ""
   </source>
   <dest>
     *: none
-    hotkey: "Hotkey Not Set"
+    hotkey: ""
   </dest>
   <voice>
     *: none
-    hotkey: "Hotkey Not Set"
+    hotkey: ""
   </voice>
 </phrase>
 <phrase>
@@ -13464,51 +13464,53 @@
 </phrase>
 <phrase>
   id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
   desc: hotkey menu
   user: core
   <source>
     *: none
-    hotkey: "View Hotkey Settings"
+    hotkey: "WPS Hotkey"
   </source>
   <dest>
     *: none
-    hotkey: "View Hotkey Settings"
+    hotkey: "WPS Hotkey"
   </dest>
   <voice>
     *: none
-    hotkey: "View Hotkey Settings"
+    hotkey: "WPS Hotkey"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HOTKEY_VIEW_WPS
-  desc: hotkey info menu
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
   user: core
   <source>
     *: none
-    hotkey: "WPS: %s"
+    hotkey: "File Browser Hotkey"
   </source>
   <dest>
     *: none
-    hotkey: "WPS: %s"
+    hotkey: "File Browser Hotkey"
   </dest>
   <voice>
     *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_VIEW_FILE_BROWSER
-  desc: hotkey info menu
-  user: core
-  <source>
-    *: none
-    hotkey: "File Browser: %s"
-  </source>
-  <dest>
-    *: none
-    hotkey: "File Browser: %s"
-  </dest>
-  <voice>
-    *: none
+    hotkey: "File Browser Hotkey"
   </voice>
 </phrase>
 <phrase>

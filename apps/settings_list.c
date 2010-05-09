@@ -56,6 +56,9 @@
 #include "touchscreen.h"
 #include "ctype.h" /* For isspace() */
 #endif
+#ifdef HAVE_HOTKEY
+#include "onplay.h"
+#endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -529,6 +532,21 @@ static void tsc_set_default(void* setting, void* defaultval)
     memcpy(setting, defaultval, sizeof(struct touchscreen_parameter));
 }
 #endif
+#ifdef HAVE_HOTKEY
+static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
+                              const char* unit)
+{
+    (void)buffer;
+    (void)buffer_size;
+    (void)unit;
+    return str(get_hotkey_lang_id(value));
+}
+static int32_t hotkey_getlang(int value, int unit)
+{
+    (void)unit;
+    return get_hotkey_lang_id(value);
+}
+#endif /* HAVE_HOTKEY */
 const struct settings_list settings[] = {
     /* sound settings */
     SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
@@ -1662,26 +1680,17 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef HAVE_HOTKEY
-    CHOICE_SETTING(0, hotkey_wps, -1, 1, "hotkey wps",
-        "off,view playlist,show track info,pitchscreen,open with,delete,insert",
-        NULL, 7, ID2P(LANG_OFF),
-        ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), ID2P(LANG_MENU_SHOW_ID3_INFO),
-#ifdef HAVE_PITCHSCREEN
-        ID2P(LANG_PITCH),
-#else
-        NULL,
-#endif
-        ID2P(LANG_ONPLAY_OPEN_WITH), ID2P(LANG_DELETE), ID2P(LANG_INSERT)),
-    CHOICE_SETTING(0, hotkey_tree, -1, 0, "hotkey tree",
-        "off,view playlist,show track info,pitchscreen,open with,delete,insert",
-        NULL, 7, ID2P(LANG_OFF),
-        ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), ID2P(LANG_MENU_SHOW_ID3_INFO),
-#ifdef HAVE_PITCHSCREEN
-        ID2P(LANG_PITCH),
-#else
-        NULL,
-#endif
-        ID2P(LANG_ONPLAY_OPEN_WITH), ID2P(LANG_DELETE), ID2P(LANG_INSERT)),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_wps,
+        LANG_HOTKEY_WPS, HOTKEY_VIEW_PLAYLIST, "hotkey wps",
+        "off,view playlist,show track info,pitchscreen,open with,delete",
+        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 6, HOTKEY_OFF,
+        HOTKEY_VIEW_PLAYLIST, HOTKEY_SHOW_TRACK_INFO, HOTKEY_PITCHSCREEN,
+        HOTKEY_OPEN_WITH, HOTKEY_DELETE),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_tree,
+        LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",
+        "off,open with,delete,insert",
+        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 4, HOTKEY_OFF,
+        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_INSERT),
 #endif
 
 #if CONFIG_CODEC == SWCODEC

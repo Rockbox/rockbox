@@ -32,7 +32,17 @@ enum {
 };
 
 #ifdef HAVE_HOTKEY
-const char* get_hotkey_desc(int hk_func);
+int get_hotkey_lang_id(int hk_func);
+
+enum hotkey_action {
+    HOTKEY_OFF = 0,
+    HOTKEY_VIEW_PLAYLIST,
+    HOTKEY_SHOW_TRACK_INFO,
+    HOTKEY_PITCHSCREEN,
+    HOTKEY_OPEN_WITH,
+    HOTKEY_DELETE,
+    HOTKEY_INSERT,
+};
 #endif
 
 #endif
