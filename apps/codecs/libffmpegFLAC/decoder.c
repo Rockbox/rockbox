@@ -44,8 +44,6 @@
 
 #if defined(CPU_COLDFIRE)
 #include "coldfire.h"
-#elif defined(CPU_ARM)
-#include "arm.h"
 #endif
 
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
@@ -264,10 +262,6 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
         (void)sum;
         lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order,
                         decoded + pred_order, coeffs);
-        #elif defined(CPU_ARM)
-        (void)sum;
-        lpc_decode_arm(s->blocksize - pred_order, qlevel, pred_order,
-                       decoded + pred_order, coeffs);
         #else
         for (i = pred_order; i < s->blocksize; i++)
         {
