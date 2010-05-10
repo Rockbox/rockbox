@@ -166,7 +166,7 @@
 #define ROM_START 0x00000000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      75000000
+#define CPU_FREQ      248000000
 
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_X5

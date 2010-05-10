@@ -121,7 +121,7 @@
 #define CONFIG_I2C I2C_AS3525
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      250000000
+#define CPU_FREQ      248000000
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

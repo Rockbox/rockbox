@@ -158,7 +158,7 @@
 #define ROM_START 0x00000000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      250000000
+#define CPU_FREQ      248000000
 
 /* Type of LCD : Samsung S6B33B2 */
 #define CONFIG_LCD LCD_C200
