@@ -23,6 +23,7 @@
 
     .equ    .ata_port, 0x20000020
     .equ    .swapmask, 0x00FF00FF
+#if 0
     .align  2
     .global copy_read_sectors
     .type   copy_read_sectors,@function
@@ -374,12 +375,12 @@ copy_read_sectors:
 
 .r_end:
     .size   copy_read_sectors,.r_end-copy_read_sectors
+#endif
 
     .align  2
     .global copy_write_sectors
     .type   copy_write_sectors,@function
 
-#if 0
 /* Write a number of words to the ATA data port
  *
  * Utilises line bursts, assumes there is at least one full line to copy.
@@ -754,4 +755,3 @@ copy_write_sectors:
 
 .w_end:
     .size   copy_write_sectors,.w_end-copy_write_sectors
-#endif
