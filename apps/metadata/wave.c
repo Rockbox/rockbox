@@ -251,8 +251,9 @@ static void parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
         lseek(fd, 4, SEEK_CUR);
     else if (read(fd, bp, 4) < 4 || memcmp(bp, "INFO", 4))
         return;
-    else
-        chunksize -= 4; /* don't include "INFO" tag in chunksize */
+
+    /* decrease skip bytes */
+    chunksize -= 4;
 
     infosize = read(fd, bp, (ID3V2_BUF_SIZE > chunksize)? chunksize : ID3V2_BUF_SIZE);
     if (infosize <= 8)
