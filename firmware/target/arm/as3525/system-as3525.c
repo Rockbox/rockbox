@@ -453,6 +453,8 @@ void set_cpu_frequency(long frequency)
     }
 }
 #else   /* as3525v2  */
+/* FIXME : disabled for now, seems to cause buggy memory accesses
+ * Disabling MMU or putting the function in uncached memory seems to help? */
 void set_cpu_frequency(long frequency)
 {
     int oldstatus = disable_irq_save();
