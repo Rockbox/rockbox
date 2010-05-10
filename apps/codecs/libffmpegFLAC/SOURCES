@@ -3,4 +3,6 @@ decoder.c
 shndec.c
 #if defined(CPU_COLDFIRE)
 coldfire.S
+#elif defined(CPU_ARM)
+arm.S
 #endif
