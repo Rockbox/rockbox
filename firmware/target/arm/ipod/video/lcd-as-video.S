@@ -25,7 +25,9 @@
  * void lcd_write_data(const fb_data *addr, 
  *                     int pixelcount);
  * 
- * Writes pixelcount pixels from src-pointer (lcd_framebuffer) to BCM dataport. 
+ * Writes pixelcount pixels from src-pointer (lcd_framebuffer) to BCM dataport.
+ * Use the sequence ld 2, wr 2, ld 2, wr 2 with alternating registers for best
+ * performance.
  */
     .align  2
     .global lcd_write_data
@@ -37,20 +39,24 @@ lcd_write_data:                       /* r1 = pixel count, must be even */
 
     subs    r1, r1, #16
 .loop16:
-    ldmgeia r0!, {r2-r4, r12}
-    stmgeia lr, {r2-r4, r12}
-    ldmgeia r0!, {r2-r4, r12}
-    stmgeia lr, {r2-r4, r12}
+    ldmgeia r0!, {r2-r3}
+    stmgeia lr,  {r2-r3}
+    ldmgeia r0!, {r4, r12}
+    stmgeia lr,  {r4, r12}
+    ldmgeia r0!, {r2-r3}
+    stmgeia lr,  {r2-r3}
+    ldmgeia r0!, {r4, r12}
+    stmgeia lr,  {r4, r12}
     subges  r1, r1, #16
     bge     .loop16
 
     /* no need to correct the count, we're just checking bits from now */
     tst     r1, #8
     ldmneia r0!, {r2-r4, r12}
-    stmneia lr, {r2-r4, r12}
+    stmneia lr,  {r2-r4, r12}
     tst     r1, #4
     ldmneia r0!, {r2-r3}
-    stmneia lr, {r2-r3}
+    stmneia lr,  {r2-r3}
     tst     r1, #2
     ldrne   r3, [r0], #4
     strne   r3, [lr]
