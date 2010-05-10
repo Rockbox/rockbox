@@ -26,8 +26,7 @@
  *                     int pixelcount);
  * 
  * Writes pixelcount pixels from src-pointer (lcd_framebuffer) to BCM dataport.
- * Use the sequence ld 2, wr 2, ld 2, wr 2 with alternating registers for best
- * performance.
+ * Use the sequence 2:2:2:2 (2 = read/write 2 regs) for best performance.
  */
     .align  2
     .global lcd_write_data
@@ -41,12 +40,12 @@ lcd_write_data:                       /* r1 = pixel count, must be even */
 .loop16:
     ldmgeia r0!, {r2-r3}
     stmgeia lr,  {r2-r3}
-    ldmgeia r0!, {r4, r12}
-    stmgeia lr,  {r4, r12}
     ldmgeia r0!, {r2-r3}
     stmgeia lr,  {r2-r3}
-    ldmgeia r0!, {r4, r12}
-    stmgeia lr,  {r4, r12}
+    ldmgeia r0!, {r2-r3}
+    stmgeia lr,  {r2-r3}
+    ldmgeia r0!, {r2-r3}
+    stmgeia lr,  {r2-r3}
     subges  r1, r1, #16
     bge     .loop16
 
