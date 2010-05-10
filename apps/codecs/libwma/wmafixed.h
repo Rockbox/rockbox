@@ -50,6 +50,7 @@ fixed64 Fixed32To64(fixed32 x);
 fixed32 fixdiv32(fixed32 x, fixed32 y);
 fixed64 fixdiv64(fixed64 x, fixed64 y);
 fixed32 fixsqrt32(fixed32 x);
+/* Inverse gain of circular cordic rotation in s0.31 format. */
 long fsincos(unsigned long phase, fixed32 *cos);
 
 
@@ -105,7 +106,3 @@ static inline fixed32 fixmul32(fixed32 x, fixed32 y)
 }
 
 #endif
-
-
-/* Inverse gain of circular cordic rotation in s0.31 format. */     
-long fsincos(unsigned long phase, fixed32 *cos);
