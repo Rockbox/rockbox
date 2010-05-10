@@ -189,6 +189,13 @@ void lcd_init_device(void)
     c200v1_lcd_init();
 #elif defined(SANSA_C200V2)
     as3525_dbop_init();
+
+    /* reset lcd */
+    GPIOB_DIR |= (1<<6);
+    GPIOB_PIN(6) = 0; /* pull reset low */
+    lcd_delay(20);
+    GPIOB_PIN(6) = 1<<6; /* release reset */
+    lcd_delay(20);
 #endif
 
     lcd_send_command(R_STANDBY_OFF, 0);
