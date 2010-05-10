@@ -507,9 +507,6 @@ static int sd_init_card(const int drive)
 #endif
     /*  End of Card Identification Mode   ************************************/
 
-    /*  Card back to full speed  */
-    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
-
     /* Attempt to switch cards to HS timings, non HS cards just ignore this */
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
@@ -521,6 +518,7 @@ static int sd_init_card(const int drive)
     /* CMD6 */
     if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
         return -9;
+    mci_delay();
 
     /*  We need to go back to STBY state now so we can read csd */
     /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
@@ -533,6 +531,9 @@ static int sd_init_card(const int drive)
         return -11;
 
     sd_parse_csd(&card_info[drive]);
+
+    /*  Card back to full speed  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
