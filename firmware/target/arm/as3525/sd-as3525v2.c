@@ -562,6 +562,8 @@ static int sd_init_card(const int drive)
 
     card_info[drive].initialized = 1;
 
+    MCI_CLKENA |= 1<<(drive + 16);      /*  Set low power mode  */
+
     return 0;
 }
 
