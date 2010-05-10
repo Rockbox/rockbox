@@ -54,7 +54,6 @@
 static bool cached_invert = false;
 static bool cached_flip = false;
 static int cached_contrast = DEFAULT_CONTRAST_SETTING;
-bool lcd_initialized = false;
 
 /*** hardware configuration ***/
 int lcd_default_contrast(void)
@@ -65,12 +64,10 @@ int lcd_default_contrast(void)
 void lcd_powersave(bool on)
 {
 /* What is the point of having else construct here? */
-    if(lcd_initialized) {
-        if (on)
-            lcd_write_command(LCD_SET_POWER_SAVE | 1);
-        else
-            lcd_write_command(LCD_SET_POWER_SAVE | 1);
-    }
+    if (on)
+        lcd_write_command(LCD_SET_POWER_SAVE | 1);
+    else
+        lcd_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
 void lcd_set_contrast(int val)
@@ -81,15 +78,13 @@ void lcd_set_contrast(int val)
         val = MAX_CONTRAST_SETTING;
 
     cached_contrast = val;
-    if(lcd_initialized)
-        lcd_write_command_e(LCD_SET_VOLUME, val);
+    lcd_write_command_e(LCD_SET_VOLUME, val);
 }
 
 void lcd_set_invert_display(bool yesno)
 {
     cached_invert = yesno;
-    if(lcd_initialized)
-        lcd_write_command(LCD_REVERSE | yesno);
+    lcd_write_command(LCD_REVERSE | yesno);
 
 }
 
@@ -97,29 +92,24 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
     cached_flip = yesno;
-    if(lcd_initialized)
+    if(yesno)
     {
-        if(yesno)
-        {
-            lcd_write_command(LCD_SELECT_ADC | 1);
-            lcd_write_command(LCD_SELECT_SHL | 0);
-            lcd_write_command_e(LCD_SET_COM0, 0);
-        }
-        else
-        {
-            lcd_write_command(LCD_SELECT_ADC | 0);
-            lcd_write_command(LCD_SELECT_SHL | 8);
-            lcd_write_command_e(LCD_SET_COM0, 0);
-        }
+        lcd_write_command(LCD_SELECT_ADC | 1);
+        lcd_write_command(LCD_SELECT_SHL | 0);
+        lcd_write_command_e(LCD_SET_COM0, 0);
     }
-
+    else
+    {
+        lcd_write_command(LCD_SELECT_ADC | 0);
+        lcd_write_command(LCD_SELECT_SHL | 8);
+        lcd_write_command_e(LCD_SET_COM0, 0);
+    }
 }
 
 void lcd_shutdown(void)
 {
     /* Set power save -> Power OFF (VDD - VSS) .. that's it */
-    if (lcd_initialized)
-        lcd_write_command(LCD_SET_POWER_SAVE | 1);
+    lcd_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
 void lcd_init_device(void)
@@ -155,9 +145,6 @@ void lcd_init_device(void)
     lcd_write_command(LCD_CONTROL_POWER | 7); /* All circuits ON */
     lcd_write_command(LCD_DISPLAY_ON | 1); /* display on */
 
-    /* Ok we are ready */
-    lcd_initialized = true;
-
     lcd_set_flip(cached_flip);
     lcd_set_contrast(cached_contrast);
     lcd_set_invert_display(cached_invert);
@@ -171,8 +158,6 @@ void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
    int y;
-    if(!lcd_initialized)
-	return;
     
         for(y = 0;y < LCD_FBHEIGHT;y++)
         {
@@ -190,28 +175,26 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     int ymax;
 
-    if (!lcd_initialized)
-   	return;
- 
+    /* The Y coordinates have to work on even 8 pixel rows */
+    ymax = (y + height-1) >> 3;
+    y >>= 3;
 
-        /* The Y coordinates have to work on even 8 pixel rows */
-        ymax = (y + height-1) >> 3;
-        y >>= 3;
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
 
-        if(x + width > LCD_WIDTH)
-            width = LCD_WIDTH - x;
-        if (width <= 0)
-            return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-        if(ymax >= LCD_FBHEIGHT)
-            ymax = LCD_FBHEIGHT-1;
+    if (width <= 0)
+        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
 
-        /* Copy specified rectange bitmap to hardware */
-        for (; y <= ymax; y++)
-        {
-            lcd_write_command(LCD_SET_PAGE | y ); 
-            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0x0f);
-            lcd_write_data (&lcd_framebuffer[y][x], width);
-        }
+    if (ymax >= LCD_FBHEIGHT)
+        ymax = LCD_FBHEIGHT-1;
+
+    /* Copy specified rectange bitmap to hardware */
+    for (; y <= ymax; y++)
+    {
+        lcd_write_command(LCD_SET_PAGE | y ); 
+        lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0x0f);
+        lcd_write_data (&lcd_framebuffer[y][x], width);
+    }
     
 }
 
@@ -223,17 +206,14 @@ void lcd_mono_data(const unsigned char *data, int count);
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                    int bheight, int stride)
 {
-    if (lcd_initialized)
+    while (bheight--)
     {
-        while (bheight--)
-        {
-            lcd_write_command(LCD_SET_PAGE | (by & 0xf));
-            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+        lcd_write_command(LCD_SET_PAGE | (by & 0xf));
+        lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
 
-            lcd_mono_data(data, width);
-            data += stride;
-            by++;
-        }
+        lcd_mono_data(data, width);
+        data += stride;
+        by++;
     }
 }
 
@@ -245,19 +225,17 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    if (lcd_initialized)
-    {
-        stride <<= 3; /* 8 pixels per block */
-        while (bheight--)
-        {
-            lcd_write_command(LCD_SET_PAGE | (by & 0xf));
-            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+    stride <<= 3; /* 8 pixels per block */
 
-            lcd_grey_data(values, phases, width);
-            values += stride;
-            phases += stride;
-            by++;
-        }
+    while (bheight--)
+    {
+        lcd_write_command(LCD_SET_PAGE | (by & 0xf));
+        lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+
+        lcd_grey_data(values, phases, width);
+        values += stride;
+        phases += stride;
+        by++;
     }
 }
 
