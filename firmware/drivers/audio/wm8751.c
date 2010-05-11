@@ -257,7 +257,7 @@ void audiohw_set_treble(int value)
 
 void audiohw_set_prescaler(int value)
 {
-    prescaler = 2 * value;
+    prescaler = 3 * value / 15;
     wmcodec_write(LEFTGAIN, 0xff - (prescaler & LEFTGAIN_LDACVOL));
     wmcodec_write(RIGHTGAIN, RIGHTGAIN_RDVU |
                   (0xff - (prescaler & RIGHTGAIN_RDACVOL)));

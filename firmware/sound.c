@@ -296,7 +296,7 @@ void sound_set_bass(int value)
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8750) || defined(HAVE_WM8751)
-    current_bass = value / 15;
+    current_bass = value;
 #else
     current_bass =  value * 10;
 #endif
@@ -320,7 +320,7 @@ void sound_set_treble(int value)
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8750) || defined(HAVE_WM8751)
-    current_treble = value / 15;
+    current_treble = value;
 #else
     current_treble = value * 10;
 #endif
