@@ -1075,10 +1075,12 @@ static int parse_dir_level(const char *wps_bufptr,
                            struct wps_token *token,
                            struct wps_data *wps_data)
 {
-    char val[] = { *wps_bufptr, '\0' };
+    char val[] = { wps_bufptr[1], '\0' };
+    if (wps_bufptr[0] != '(' || wps_bufptr[2] != ')')
+        return WPS_ERROR_INVALID_PARAM;
     token->value.i = atoi(val);
     (void)wps_data; /* Kill warnings */
-    return 1;
+    return 3;
 }
 
 static int parse_timeout(const char *wps_bufptr,

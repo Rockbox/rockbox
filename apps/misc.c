@@ -1031,7 +1031,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 {
                     if (!set_vals || *p != '-')
                         goto err;
-                    while (*p && *p != sep && (!is_last_var || is_last_var && *p!=')'))
+                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
                         p++;
                 }
                 else
@@ -1056,7 +1056,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                     goto err;
                 else
                 {
-                    while (*p && *p != sep && (!is_last_var || is_last_var && *p!=')'))
+                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
                         p++;
                 }
 
