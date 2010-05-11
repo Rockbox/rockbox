@@ -116,9 +116,6 @@ channels_process_sound_chan_karaoke:
 /****************************************************************************
  *  void sample_output_mono(int count, struct dsp_data *data,
  *                          const int32_t *src[], int16_t *dst)
- *  NOTE: The following code processes two samples at once. When count is odd,
- *        there is an additional obsolete sample processed, which will not be
- *        used by the calling functions.
  */
     .section .icode, "ax", %progbits
     .align  2
@@ -181,9 +178,6 @@ sample_output_mono:
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
  *                           const int32_t *src[], int16_t *dst)
- *  NOTE: The following code processes two samples at once. When count is odd,
- *        there is an additional obsolete sample processed, which will not be
- *        used by the calling functions.
  */
     .section .icode, "ax", %progbits
     .align  2
