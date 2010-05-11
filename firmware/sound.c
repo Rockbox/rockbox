@@ -189,8 +189,7 @@ static void set_prescaled_volume(void)
  */
 #if defined(HAVE_SW_TONE_CONTROLS) || !(defined(HAVE_WM8975) \
     || defined(HAVE_WM8711) || defined(HAVE_WM8721) || defined(HAVE_WM8731) \
-    || defined(HAVE_WM8751) || defined(HAVE_WM8758) || defined(HAVE_WM8985) \
-    || defined(HAVE_UDA1341))
+    || defined(HAVE_WM8758) || defined(HAVE_WM8985) || defined(HAVE_UDA1341))
 
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
@@ -297,7 +296,7 @@ void sound_set_bass(int value)
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8750) || defined(HAVE_WM8751)
-    current_bass = value;
+    current_bass = value / 15;
 #else
     current_bass =  value * 10;
 #endif
@@ -321,7 +320,7 @@ void sound_set_treble(int value)
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8750) || defined(HAVE_WM8751)
-    current_treble = value;
+    current_treble = value / 15;
 #else
     current_treble = value * 10;
 #endif

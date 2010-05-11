@@ -61,6 +61,8 @@ const struct sound_settings_info audiohw_settings[] = {
 /* We use linear treble control with 4 kHz cutoff */
 #define TREBCTRL_BITS   (TREBCTRL_TC)
 
+static int prescaler = 0;
+
 /* convert tenth of dB volume (-730..60) to master volume register value */
 int tenthdb2master(int db)
 {
@@ -173,6 +175,10 @@ void audiohw_postinit(void)
                   PWRMGMT2_ROUT2);
 #endif
 
+    /* Full -0dB on the DACS */
+    wmcodec_write(LEFTGAIN, 0xff);
+    wmcodec_write(RIGHTGAIN, RIGHTGAIN_RDVU | 0xff);
+
     wmcodec_write(ADDITIONAL1, ADDITIONAL1_TSDEN | ADDITIONAL1_TOEN |
                     ADDITIONAL1_DMONOMIX_LLRR | ADDITIONAL1_VSEL_DEFAULT);
 
@@ -247,6 +253,14 @@ void audiohw_set_treble(int value)
 {
     wmcodec_write(TREBCTRL, TREBCTRL_BITS |
         TREBCTRL_TREB(tone_tenthdb2hw(value)));
+}
+
+void audiohw_set_prescaler(int value)
+{
+    prescaler = 2 * value;
+    wmcodec_write(LEFTGAIN, 0xff - (prescaler & LEFTGAIN_LDACVOL));
+    wmcodec_write(RIGHTGAIN, RIGHTGAIN_RDVU |
+                  (0xff - (prescaler & RIGHTGAIN_RDACVOL)));
 }
 
 /* Nice shutdown of WM8751 codec */

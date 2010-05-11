@@ -25,7 +25,7 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
 
 extern int tenthdb2master(int db);
 
@@ -96,12 +96,12 @@ void audiohw_set_recsrc(int source, bool recording);
 #define CLOCKING_BCLK_DIV2          (1 << 7)
 
 #define LEFTGAIN                    0x0a
-#define LEFTGAIN_LDACVOL(x)         ((x) & 0xff)
+#define LEFTGAIN_LDACVOL            0xff
 #define LEFTGAIN_LDVU               (1 << 8)
 
 #define RIGHTGAIN                   0x0b
-#define RIGHTGAIN_LDACVOL(x)        ((x) & 0xff)
-#define RIGHTGAIN_LDVU              (1 << 8)
+#define RIGHTGAIN_RDACVOL           0xff
+#define RIGHTGAIN_RDVU              (1 << 8)
 
 #define BASSCTRL                    0x0c
 #define BASSCTRL_BASS(x)            ((x) & 0xf)
