@@ -1277,7 +1277,7 @@ static int execute_hotkey(bool is_wps)
         {
             /* run the associated function (with optional param), if any */
             const struct menu_func func = this_item->func;
-            int func_return;
+            int func_return = ONPLAY_RELOAD_DIR;
             if (func.function != NULL)
             {
                 if (func.param != NULL)
