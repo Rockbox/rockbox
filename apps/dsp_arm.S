@@ -22,10 +22,6 @@
 
 /****************************************************************************
  *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
- *
- *  NOTE: The following code processes two samples at once. When count is odd,
- *        there is an additional obsolete sample processed, which will not be
- *        used by the calling functions.
  */
     .section .icode, "ax", %progbits
     .align  2
@@ -63,13 +59,84 @@ channels_process_sound_chan_mono:
                                        @
     ldmfd   sp!, { r4, pc }            @
     .size   channels_process_sound_chan_mono, \
-                .-channels_process_sound_chan_mono 
- 
+                .-channels_process_sound_chan_mono
+
+/****************************************************************************
+ * void channels_process_sound_chan_custom(int count, int32_t *buf[])
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global channels_process_sound_chan_custom
+    .type   channels_process_sound_chan_custom, %function
+channels_process_sound_chan_custom:
+    stmfd   sp!, { r4-r10, lr }
+    
+    ldr     r3, =dsp_sw_gain
+    ldr     r4, =dsp_sw_cross
+
+    ldmia   r1, { r1, r2 }             @ r1 = buf[0], r2 = buf[1]
+    ldr     r3, [r3]                   @ r3 = dsp_sw_gain
+    ldr     r4, [r4]                   @ r4 = dsp_sw_cross
+    
+    subs    r0, r0, #1
+    beq     .custom_single_sample      @ Zero? Only one sample!
+    
+.custom_loop:
+    ldmia   r1, { r5, r6 }             @ r5 = Li0, r6 = Li1
+    ldmia   r2, { r7, r8 }             @ r7 = Ri0, r8 = Ri1
+
+    subs    r0, r0, #2
+
+    smull   r9, r10, r5, r3            @ Lc0 = Li0*gain
+    smull   r12, r14, r7, r3           @ Rc0 = Ri0*gain
+    smlal   r9, r10, r7, r4            @ Lc0 += Ri0*cross
+    smlal   r12, r14, r5, r4           @ Rc0 += Li0*cross
+    
+    mov     r9, r9, lsr #31            @ Convert to s0.31
+    mov     r12, r12, lsr #31
+    orr     r5, r9, r10, asl #1
+    orr     r7, r12, r14, asl #1
+    
+    smull   r9, r10, r6, r3            @ Lc1 = Li1*gain
+    smull   r12, r14, r8, r3           @ Rc1 = Ri1*gain
+    smlal   r9, r10, r8, r4            @ Lc1 += Ri1*cross
+    smlal   r12, r14, r6, r4           @ Rc1 += Li1*cross
+    
+    mov     r9, r9, lsr #31            @ Convert to s0.31
+    mov     r12, r12, lsr #31
+    orr     r6, r9, r10, asl #1
+    orr     r8, r12, r14, asl #1
+    
+    stmia   r1!, { r5, r6 }            @ Store Lc0, Lc1
+    stmia   r2!, { r7, r8 }            @ Store Rc0, Rc1
+
+    bgt     .custom_loop
+    
+    ldmltfd sp!, { r4-r10, pc }        @ < 0? even count
+    
+.custom_single_sample:
+    ldr     r5, [r1]                   @ handle odd sample
+    ldr     r7, [r2]
+
+    smull   r9, r10, r5, r3            @ Lc0 = Li0*gain
+    smull   r12, r14, r7, r3           @ Rc0 = Ri0*gain
+    smlal   r9, r10, r7, r4            @ Lc0 += Ri0*cross
+    smlal   r12, r14, r5, r4           @ Rc0 += Li0*cross
+
+    mov     r9, r9, lsr #31            @ Convert to s0.31
+    mov     r12, r12, lsr #31
+    orr     r5, r9, r10, asl #1
+    orr     r7, r12, r14, asl #1
+
+    str     r5, [r1]                   @ Store Lc0
+    str     r7, [r2]                   @ Store Rc0
+
+    ldmfd   sp!, { r4-r10, pc }
+    .size   channels_process_sound_chan_custom, \
+                .-channels_process_sound_chan_custom
+
 /****************************************************************************
  *  void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
- *  NOTE: The following code processes two samples at once. When count is odd,
- *        there is an additional obsolete sample processed, which will not be
- *        used by the calling functions.
  */
     .section .icode, "ax", %progbits
     .align  2
