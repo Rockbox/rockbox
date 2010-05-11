@@ -27,14 +27,16 @@
 /* NB: These values must match the register settings in s3c2440/crt0.S */
 
 #ifdef GIGABEAT_F
-    #define CPUFREQ_DEFAULT 98784000
-    #define CPUFREQ_NORMAL  98784000
-    #define CPUFREQ_MAX    296352000
+    /* MPLLCON = 0x000C9042, 16.9344 MHz refclk, therefore:
+     * MPLL = 294940800 = 2*(201 + 8)*16934400 / ((4 + 2) * 2^2) */
+    #define CPUFREQ_DEFAULT 98313600
+    #define CPUFREQ_NORMAL  98313600
+    #define CPUFREQ_MAX    294940800
 
     /* Uses 1:3:6 */
     #define FCLK    CPUFREQ_MAX
-    #define HCLK    (FCLK/3)   /* = 98,784,000 */
-    #define PCLK    (HCLK/2)   /* = 49,392,000 */
+    #define HCLK    (FCLK/3)   /* = 98,313,600 */
+    #define PCLK    (HCLK/2)   /* = 49,156,800 */
 
     #ifdef BOOTLOADER
         /* All addresses within rockbox are in IRAM in the bootloader so
