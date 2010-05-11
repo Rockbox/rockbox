@@ -368,10 +368,10 @@ dsp_downsample:
     @ keep frac in lower bits to take advantage of multiplier early termination
     and     r9, r1, r12             @ frac = phase & 0xffff
     smull   r9, r14, r11, r9
-    add     r10, r10, r14, lsl #16
-    add     r10, r10, r9, lsr #16   @ r10 = out = s[pos - 1] + frac*diff
-    str     r10, [r8], #4           @ *d++ = out
     add     r1, r1, r6              @ phase += delta
+    add     r10, r10, r9, lsr #16   @ r10 = out = s[pos - 1] + frac*diff
+    add     r10, r10, r14, lsl #16
+    str     r10, [r8], #4           @ *d++ = out
     mov     r9, r1, lsr #16         @ pos = phase >> 16
     cmp     r9, r0                  @ pos < count?
     blt     .dsloop                 @ yup, do more samples
