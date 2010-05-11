@@ -1246,12 +1246,10 @@ static struct hotkey_assignment hotkey_items[] = {
             ONPLAY_OK },
 };
 
-static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
-
 /* Return the language ID for this action */
 int get_hotkey_lang_id(int action)
 {
-    int i = num_hotkey_items;
+    int i = ARRAYLEN(hotkey_items);
     while (i--)
     {
         if (hotkey_items[i].action == action)
@@ -1264,7 +1262,7 @@ int get_hotkey_lang_id(int action)
 /* Execute the hotkey function, if listed */
 static int execute_hotkey(bool is_wps)
 {
-    int i = num_hotkey_items;
+    int i = ARRAYLEN(hotkey_items);
     struct hotkey_assignment *this_item;
     const int action = (is_wps ? global_settings.hotkey_wps :
         global_settings.hotkey_tree);
