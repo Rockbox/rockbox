@@ -1195,15 +1195,11 @@ static bool open_with(void)
     return list_viewers();
 }
 
-#define HOTKEY_ACTION_MASK 0x0FF /* Mask to apply to get the action (enum)           */
-#define HOTKEY_CTX_WPS     0x100 /* Mask to apply to check whether it's for WPS      */
-#define HOTKEY_CTX_TREE    0x200 /* Mask to apply to check whether it's for the tree */
-
 struct hotkey_assignment {
-    int item;               /* Bit or'd hotkey_action and HOTKEY_CTX_x   */
+    int action;             /* hotkey_action */
+    int lang_id;            /* Language ID */
     struct menu_func func;  /* Function to run if this entry is selected */
     int return_code;        /* What to return after the function is run  */
-    int lang_id;            /* Language ID */
 };
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
@@ -1212,61 +1208,56 @@ struct hotkey_assignment {
    and in the settings menu in settings_list.c.  The order here 
    is not important. */
 static struct hotkey_assignment hotkey_items[] = {
-    { HOTKEY_VIEW_PLAYLIST  | HOTKEY_CTX_WPS,
+    { HOTKEY_VIEW_PLAYLIST,     LANG_VIEW_DYNAMIC_PLAYLIST,
             HOTKEY_FUNC(NULL, NULL),
-            ONPLAY_PLAYLIST,    LANG_VIEW_DYNAMIC_PLAYLIST },
-    { HOTKEY_SHOW_TRACK_INFO| HOTKEY_CTX_WPS,
+            ONPLAY_PLAYLIST },
+    { HOTKEY_SHOW_TRACK_INFO,   LANG_MENU_SHOW_ID3_INFO,
             HOTKEY_FUNC(browse_id3, NULL),
-            ONPLAY_RELOAD_DIR,  LANG_MENU_SHOW_ID3_INFO },
+            ONPLAY_RELOAD_DIR },
 #ifdef HAVE_PITCHSCREEN
-    { HOTKEY_PITCHSCREEN    | HOTKEY_CTX_WPS,
+    { HOTKEY_PITCHSCREEN,       LANG_PITCH,
             HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
-            ONPLAY_RELOAD_DIR,  LANG_PITCH },
+            ONPLAY_RELOAD_DIR },
 #endif
-    { HOTKEY_OPEN_WITH      | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
+    { HOTKEY_OPEN_WITH,         LANG_ONPLAY_OPEN_WITH,
             HOTKEY_FUNC(open_with, NULL),
-            ONPLAY_RELOAD_DIR,  LANG_ONPLAY_OPEN_WITH },
-    { HOTKEY_DELETE         | HOTKEY_CTX_WPS | HOTKEY_CTX_TREE,
+            ONPLAY_RELOAD_DIR },
+    { HOTKEY_DELETE,            LANG_DELETE,
             HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  LANG_DELETE },
-    { HOTKEY_DELETE         | HOTKEY_CTX_TREE,
-            HOTKEY_FUNC(delete_item, NULL),
-            ONPLAY_RELOAD_DIR,  LANG_DELETE },
-    { HOTKEY_INSERT         | HOTKEY_CTX_TREE,
+            ONPLAY_RELOAD_DIR },
+    { HOTKEY_INSERT,            LANG_INSERT,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
-            ONPLAY_START_PLAY,  LANG_INSERT },
+            ONPLAY_START_PLAY },
 };
 
 static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
 
-/* Return the language ID for the input function */
-int get_hotkey_lang_id(int hk_func)
+/* Return the language ID for this action */
+int get_hotkey_lang_id(int action)
 {
-    int i;
-    for (i = 0; i < num_hotkey_items; i++)
+    int i = num_hotkey_items;
+    while (i--)
     {
-        if ((hotkey_items[i].item & HOTKEY_ACTION_MASK) == hk_func)
+        if (hotkey_items[i].action == action)
             return hotkey_items[i].lang_id;
     }
     
     return LANG_OFF;
 }
 
-/* Execute the hotkey function, if listed for this screen */
+/* Execute the hotkey function, if listed */
 static int execute_hotkey(bool is_wps)
 {
-    int i;
+    int i = num_hotkey_items;
     struct hotkey_assignment *this_item;
-    const int context = is_wps ? HOTKEY_CTX_WPS : HOTKEY_CTX_TREE;
-    const int this_hotkey = (is_wps ? global_settings.hotkey_wps :
+    const int action = (is_wps ? global_settings.hotkey_wps :
         global_settings.hotkey_tree);
     
     /* search assignment struct for a match for the hotkey setting */
-    for (i = 0; i < num_hotkey_items; i++)
+    while (i--)
     {
         this_item = &hotkey_items[i];
-        if ((this_item->item & context) &&
-            ((this_item->item & HOTKEY_ACTION_MASK) == this_hotkey))
+        if (this_item->action == action)
         {
             /* run the associated function (with optional param), if any */
             const struct menu_func func = this_item->func;

@@ -32,7 +32,7 @@ enum {
 };
 
 #ifdef HAVE_HOTKEY
-int get_hotkey_lang_id(int hk_func);
+int get_hotkey_lang_id(int action);
 
 enum hotkey_action {
     HOTKEY_OFF = 0,
