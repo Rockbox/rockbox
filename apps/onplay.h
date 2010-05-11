@@ -42,6 +42,7 @@ enum hotkey_action {
     HOTKEY_OPEN_WITH,
     HOTKEY_DELETE,
     HOTKEY_INSERT,
+    HOTKEY_INSERT_SHUFFLED,
 };
 #endif
 

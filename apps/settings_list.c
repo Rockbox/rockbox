@@ -1688,9 +1688,9 @@ const struct settings_list settings[] = {
         HOTKEY_OPEN_WITH, HOTKEY_DELETE),
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_tree,
         LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",
-        "off,open with,delete,insert",
-        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 4, HOTKEY_OFF,
-        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_INSERT),
+        "off,open with,delete,insert,insert shuffled",
+        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 5, HOTKEY_OFF,
+        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_INSERT, HOTKEY_INSERT_SHUFFLED),
 #endif
 
 #if CONFIG_CODEC == SWCODEC
