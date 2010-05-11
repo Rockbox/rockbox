@@ -274,8 +274,9 @@ apply_crossfeed:
     
     ldr     r1, =crossfeed_data
     ldmia   r1!, { r4-r11 }            @ load direct gain and filter data
-    add     r12, r1, #13*4*2           @ calculate end of delay
-    stmdb   sp!, { r0, r12 }           @ stack count and end of delay adr
+    mov     r12, r0                    @ better to ldm delay + count later
+    add     r0, r1, #13*4*2            @ calculate end of delay
+    stmdb   sp!, { r0, r12 }           @ stack end of delay adr and count
     ldr     r0, [r1, #13*4*2]          @ fetch current delay line address
 
     /* Register usage in loop:
@@ -304,15 +305,14 @@ apply_crossfeed:
     smlal   r14, r1, r4, r12           @ acc += gain*x_r[n]
     str     r12, [r0], #4              @ save right input to delay line
     mov     r1, r1, lsl #1             @ fix format
+    ldmia   sp, { r12, r14 }           @ fetch delay line end addr and count from stack
     str     r1, [r3], #4               @ save result
 
-    ldr     r12, [sp, #4]              @ fetch delay line end addr from stack
     cmp     r0, r12                    @ need to wrap to start of delay?
     subeq   r0, r0, #13*4*2            @ wrap back delay line ptr to start
  
-    ldr     r1, [sp]                   @ fetch count from stack
-    subs    r1, r1, #1                 @ are we finished?
-    strne   r1, [sp]                   @ nope, save count back to stack
+    subs    r14, r14, #1               @ are we finished?
+    strne   r14, [sp, #4]              @ nope, save count back to stack
     bne     .cfloop
     
     @ save data back to struct
