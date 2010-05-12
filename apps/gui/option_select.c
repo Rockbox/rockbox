@@ -192,14 +192,17 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
         int talkunit = UNIT_INT;
-        const char *unit = sound_unit(setting->sound_setting->setting);
+        int sound_setting = setting->sound_setting->setting;
+        const char *unit = sound_unit(sound_setting);
+        int decimals = sound_numdecimals(sound_setting);
+        int phys = sound_val2phys(sound_setting, value);
         if (!strcmp(unit, "dB"))
             talkunit = UNIT_DB;
         else if (!strcmp(unit, "%"))
             talkunit = UNIT_PERCENT;
         else if (!strcmp(unit, "Hz"))
             talkunit = UNIT_HERTZ;
-        talk_value(value, talkunit, false);
+        talk_value_decimal(phys, talkunit, decimals, false);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
