@@ -23,7 +23,7 @@
 
     .equ    .ata_port, 0x20000020
     .equ    .swapmask, 0x00FF00FF
-#if 0
+
     .align  2
     .global copy_read_sectors
     .type   copy_read_sectors,@function
@@ -69,23 +69,19 @@ copy_read_sectors:
     move.b  %d2, (%a0)+     /* write high byte of it, aligns dest addr */
                             /* we have byte swapped */
 
+    lsr.l   #8, %d2
     btst.l  #1, %d0         /* longword aligned? (testing old d0 value!) */
     bne.b   .r_end_u_w1     /* yes, skip leading word handling */
 
-    swap    %d2             /* move initial word up */
-    move.w  (%a2), %d2      /* combine with second word */
-
-    /* byte swap d2 */
-    move.l  %a3, %d7        /* d7 = 0x00FF00FF */
-    and.l   %d2, %d7        /* d7 = .B.D */
-    eor.l   %d7, %d2        /* d2 = A.C. */
-    lsl.l   #8, %d7         /* d7 = B.D. */
-    lsr.l   #8, %d2         /* d2 = .A.C */
-    or.l    %d7, %d2        /* d2 = BADC */
-
-    move.l  %d2, %d3
-    lsr.l   #8, %d3
-    move.w  %d3, (%a0)+     /* write bytes 2 and 3 as word */
+    move.w  (%a2), %d3
+    move.l  %d3, %d0
+    lsl.l   #8, %d2
+    and.l   #0xff, %d0
+    or.l    %d0, %d2
+ 
+    move.w  %d2, (%a0)+     /* write bytes 2 and 3 as word */
+    move.l  %d3, %d2
+    lsr.l   #8, %d2
 
 .r_end_u_w1:
     moveq.l #12, %d0
@@ -108,6 +104,7 @@ copy_read_sectors:
     or.l    %d7, %d3        /* d3 = BADC */
 
     move.l  %d3, %d4
+
     lsl.l   %d1, %d2
     lsr.l   #8, %d3
     or.l    %d3, %d2        /* combine old low byte with new top 3 bytes */
@@ -133,6 +130,7 @@ copy_read_sectors:
     or.l    %d7, %d3        /* d3 = BADC */
 
     move.l  %d3, %d0
+
     lsl.l   %d1, %d2
     lsr.l   #8, %d0
     or.l    %d0, %d2        /* combine old low byte with new top 3 bytes */
@@ -221,21 +219,16 @@ copy_read_sectors:
     cmp.l   %a0, %a1        /* one word left? */
     bls.b   .r_end_u_w2
 
-    swap    %d2             /* move old word to upper 16 bits */
-    move.w  (%a2), %d2      /* load final word */
+    move.w  (%a2), %d3
+    move.l  %d3, %d0
+    lsl.l   #8, %d2
+    and.l   #0xff, %d0
+    or.l    %d0, %d2
 
-    /* byte swap d2 */
-    move.l  %a3, %d7        /* d7 = 0x00FF00FF */
-    and.l   %d2, %d7        /* d7 = .B.D */
-    eor.l   %d7, %d2        /* d2 = A.C. */
-    lsl.l   #8, %d7         /* d7 = B.D. */
-    lsr.l   #8, %d2         /* d2 = .A.C */
-    or.l    %d7, %d2        /* d2 = BADC */
+    move.w  %d2, (%a0)+     /* write bytes 2 and 3 as word */
 
-    move.l  %d2, %d3
-    lsr.l   #8, %d3
-    move.w  %d3, (%a0)+     /* write bytes 2 and 3 as word */
-
+    move.l  %d3, %d2
+    lsr.l   #8, %d2
 .r_end_u_w2:
     move.b  %d2, (%a0)+     /* store final byte */
     bra.w   .r_exit
@@ -375,7 +368,6 @@ copy_read_sectors:
 
 .r_end:
     .size   copy_read_sectors,.r_end-copy_read_sectors
-#endif
 
     .align  2
     .global copy_write_sectors

@@ -113,11 +113,10 @@ const char *option_get_valuestring(const struct settings_list *setting,
     {
         char sign = ' ';
         const char *unit = sound_unit(setting->sound_setting->setting);
+        int val = sound_val2phys(setting->sound_setting->setting, (int)temp_var);
         if (sound_numdecimals(setting->sound_setting->setting))
         {
             int integer, dec;
-            int val = sound_val2phys(setting->sound_setting->setting,
-                                 (int)temp_var);
             if(val < 0)
             {
                 sign = '-';
@@ -128,7 +127,7 @@ const char *option_get_valuestring(const struct settings_list *setting,
             snprintf(buffer, buf_len, "%c%d.%d %s", sign, integer, dec, unit);
         }
         else
-            snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit);
+            snprintf(buffer, buf_len, "%d %s", val, unit);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
@@ -193,14 +192,17 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
         int talkunit = UNIT_INT;
-        const char *unit = sound_unit(setting->sound_setting->setting);
+        int sound_setting = setting->sound_setting->setting;
+        const char *unit = sound_unit(sound_setting);
+        int decimals = sound_numdecimals(sound_setting);
+        int phys = sound_val2phys(sound_setting, value);
         if (!strcmp(unit, "dB"))
             talkunit = UNIT_DB;
         else if (!strcmp(unit, "%"))
             talkunit = UNIT_PERCENT;
         else if (!strcmp(unit, "Hz"))
             talkunit = UNIT_HERTZ;
-        talk_value(value, talkunit, false);
+        talk_value_decimal(phys, talkunit, decimals, false);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {

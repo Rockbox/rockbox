@@ -30,6 +30,9 @@
 enum skinnable_screens {
     CUSTOM_STATUSBAR,
     WPS,
+#if CONFIG_TUNER
+    FM_SCREEN,
+#endif
     
     
     SKINNABLE_SCREENS_COUNT
@@ -53,9 +56,18 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 /* call this in statusbar toggle handlers if needed */
 void skin_statusbar_changed(struct gui_wps*);
 
+bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
+
 
 /* load a backdrop into the skin buffer.
  * reuse buffers if the file is already loaded */
 char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen);
 void skin_backdrop_init(void);
+
+
+/* do the button loop as often as required for the peak meters to update
+ * with a good refresh rate. 
+ * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()
+ */
+int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout);
 #endif

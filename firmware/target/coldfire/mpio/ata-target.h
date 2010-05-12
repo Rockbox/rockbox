@@ -21,7 +21,7 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
-/* #define ATA_OPTIMIZED_READING */
+#define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
 
 #define SWAP_WORDS
@@ -71,6 +71,6 @@ void ata_enable(bool on);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 
-/* void copy_read_sectors(unsigned char* buf, int wordcount); */
+void copy_read_sectors(unsigned char* buf, int wordcount);
 void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif

@@ -138,7 +138,7 @@ static struct mp3entry unbuffered_id3; /* the id3 for the first unbuffered track
 static struct cuesheet *curr_cue = NULL;
 
 
-#define MAX_MULTIPLE_AA 2
+#define MAX_MULTIPLE_AA SKINNABLE_SCREENS_COUNT
 
 #ifdef HAVE_ALBUMART
 static struct albumart_slot {

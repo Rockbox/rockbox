@@ -1195,6 +1195,19 @@ static bool open_with(void)
     return list_viewers();
 }
 
+static int playlist_insert_shuffled(void)
+{
+    if ((audio_status() & AUDIO_STATUS_PLAY) ||
+        (selected_file_attr & ATTR_DIRECTORY) ||
+        ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U))
+    {
+        playlist_insert_func((intptr_t*)PLAYLIST_INSERT_SHUFFLED);
+        return ONPLAY_START_PLAY;
+    }
+    
+    return ONPLAY_RELOAD_DIR;
+}
+
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
@@ -1228,14 +1241,15 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT,            LANG_INSERT,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
             ONPLAY_START_PLAY },
+    { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
+            HOTKEY_FUNC(playlist_insert_shuffled, NULL),
+            ONPLAY_OK },
 };
-
-static const int num_hotkey_items = sizeof(hotkey_items) / sizeof(hotkey_items[0]);
 
 /* Return the language ID for this action */
 int get_hotkey_lang_id(int action)
 {
-    int i = num_hotkey_items;
+    int i = ARRAYLEN(hotkey_items);
     while (i--)
     {
         if (hotkey_items[i].action == action)
@@ -1248,7 +1262,7 @@ int get_hotkey_lang_id(int action)
 /* Execute the hotkey function, if listed */
 static int execute_hotkey(bool is_wps)
 {
-    int i = num_hotkey_items;
+    int i = ARRAYLEN(hotkey_items);
     struct hotkey_assignment *this_item;
     const int action = (is_wps ? global_settings.hotkey_wps :
         global_settings.hotkey_tree);
@@ -1261,15 +1275,20 @@ static int execute_hotkey(bool is_wps)
         {
             /* run the associated function (with optional param), if any */
             const struct menu_func func = this_item->func;
+            int func_return = ONPLAY_RELOAD_DIR;
             if (func.function != NULL)
             {
                 if (func.param != NULL)
-                    (*func.function_w_param)(func.param);
+                    func_return = (*func.function_w_param)(func.param);
                 else
-                    (*func.function)();
+                    func_return = (*func.function)();
             }
             /* return with the associated code */
-            return this_item->return_code;
+            const int return_code = this_item->return_code;
+            /* ONPLAY_OK here means to use the function return code */
+            if (return_code == ONPLAY_OK)
+                return func_return;
+            return return_code;
         }
     }
     

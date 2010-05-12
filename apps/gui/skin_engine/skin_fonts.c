@@ -29,8 +29,6 @@
 #include "font.h"
 #include "skin_buffer.h"
 #include "skin_fonts.h"
-#define FONT_SIZE 10000
-
 
 static struct skin_font_info {
     struct font font;
@@ -90,7 +88,7 @@ int skin_font_load(char* font_name)
     pf = &font->font;
     if (!font->buffer)
     {
-        pf->buffer_start = skin_buffer_alloc(FONT_SIZE);
+        pf->buffer_start = skin_buffer_alloc(SKIN_FONT_SIZE);
         if (!pf->buffer_start)
             return -1;
         font->buffer = pf->buffer_start;
@@ -99,7 +97,7 @@ int skin_font_load(char* font_name)
     {
         pf->buffer_start = font->buffer;
     }
-    pf->buffer_size = FONT_SIZE;
+    pf->buffer_size = SKIN_FONT_SIZE;
     
     snprintf(filename, MAX_PATH, FONT_DIR "/%s.fnt", font_name);
     strcpy(font->name, font_name);

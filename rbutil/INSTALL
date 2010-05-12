@@ -38,7 +38,7 @@ Installation / Deployment:
 ==========================
 Rockbox Utility is build as all-in-one binary. This means for distribution
 you need:
-- rbutilqt (main binary)
+- RockboxUtility (main binary)
 - rbutil_*.qm (translation files, optional)
 You don't need any other files like configuration files, especially 
 rbutil.ini which will get included into the binary.

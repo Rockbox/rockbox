@@ -571,15 +571,7 @@ static void gwps_leave_wps(void)
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
         gui_wps[i].display->backdrop_show(sb_get_backdrop(i));
 #endif
-        
-#ifdef HAVE_LCD_BITMAP
-        bool draw = false;
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
-        else if (statusbar_position(i) != STATUSBAR_OFF)
-            draw = true;
-#endif
-        viewportmanager_theme_undo(i, draw);
+        viewportmanager_theme_undo(i, skin_has_sbs(i, gui_wps[i].data));
         
     }
 
@@ -600,15 +592,8 @@ static void gwps_enter_wps(void)
     {
         struct gui_wps *gwps = &gui_wps[i];
         struct screen *display = gwps->display;
-#ifdef HAVE_LCD_BITMAP
-        bool draw = false;
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
-        else if (statusbar_position(i) != STATUSBAR_OFF)
-            draw = true;
-#endif
         display->stop_scroll();
-        viewportmanager_theme_enable(i, draw, NULL);
+        viewportmanager_theme_enable(i, skin_has_sbs(i, gui_wps[i].data), NULL);
 
         /* Update the values in the first (default) viewport - in case the user
            has modified the statusbar or colour settings */
@@ -801,56 +786,8 @@ long gui_wps_show(void)
 #endif
             }
         }
-#ifdef HAVE_LCD_BITMAP
-        /* when the peak meter is enabled we want to have a
-            few extra updates to make it look smooth. On the
-            other hand we don't want to waste energy if it
-            isn't displayed */
-        bool pm=false;
-        FOR_NB_SCREENS(i)
-        {
-           if(gui_wps[i].data->peak_meter_enabled)
-               pm = true;
-        }
-
-        if (pm) {
-            long next_refresh = current_tick;
-            long next_big_refresh = current_tick + HZ / 5;
-            button = BUTTON_NONE;
-            while (TIME_BEFORE(current_tick, next_big_refresh)) {
-                button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_NOBLOCK);
-                /* check for restore to not let the peakmeter delay the
-                 * initial draw of the wps, don't delay handling of button
-                 * presses either */
-                if (button != ACTION_NONE || restore) {
-                    break;
-                }
-                peak_meter_peek();
-                sleep(0);   /* Sleep until end of current tick. */
-
-                if (TIME_AFTER(current_tick, next_refresh)) {
-                    FOR_NB_SCREENS(i)
-                    {
-                        if(gui_wps[i].data->peak_meter_enabled)
-                            skin_update(&gui_wps[i], WPS_REFRESH_PEAK_METER);
-                        next_refresh += HZ / PEAK_METER_FPS;
-                    }
-                }
-            }
-
-        }
-
-        /* The peak meter is disabled
-           -> no additional screen updates needed */
-        else
-#endif
-        {   /* 1 is the minimum timeout which lets other threads run.
-             * audio thread (apprently) needs to run before displaying the wps
-             * or bad things happen with regards to cuesheet
-             * (probably a race condition, on sh at least) */
-            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,
-                restore ? 1 : HZ/5);
-        }
+        button = skin_wait_for_action(gui_wps, CONTEXT_WPS|ALLOW_SOFTLOCK, 
+                                      restore ? 1 : HZ/5);
 
         /* Exit if audio has stopped playing. This happens e.g. at end of
            playlist or if using the sleep timer. */
