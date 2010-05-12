@@ -58,8 +58,10 @@
 #endif
 #include "backdrop.h"
 #include "viewport.h"
+#if CONFIG_TUNER
 #include "radio.h"
 #include "tuner.h"
+#endif
 #include "root_menu.h"
 
 
@@ -1349,6 +1351,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
 {
     (void)screen;
+    (void)data;
     bool draw = false;
 #ifdef HAVE_LCD_BITMAP
     if (data->wps_sb_tag)
@@ -1365,9 +1368,10 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
  */
 int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
 {
+    (void)gwps; /* silence charcell warning */
+    int button = ACTION_NONE;
 #ifdef HAVE_LCD_BITMAP
     int i;
-    int button = ACTION_NONE;
     /* when the peak meter is enabled we want to have a
         few extra updates to make it look smooth. On the
         other hand we don't want to waste energy if it

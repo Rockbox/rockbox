@@ -52,7 +52,10 @@
 #include "skin_engine.h"
 #include "settings.h"
 #include "settings_list.h"
+#if CONFIG_TUNER
 #include "radio.h"
+#include "tuner.h"
+#endif
 #include "skin_fonts.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -362,7 +365,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PRESET_FREQ,              "Tf",  WPS_REFRESH_STATIC, NULL },
     { WPS_TOKEN_PRESET_COUNT,             "Tc",  WPS_REFRESH_STATIC, NULL },
     { WPS_TOKEN_HAVE_RDS,                 "tx",  WPS_REFRESH_STATIC, NULL },
-#ifdef HAVE_RDS_CAPS
+#ifdef HAVE_RDS_CAP
     { WPS_TOKEN_RDS_NAME,                 "ty", WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_RDS_TEXT,                 "tz", WPS_REFRESH_DYNAMIC, NULL },
 #endif

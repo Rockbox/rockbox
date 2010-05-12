@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <stdlib.h>
 #include "config.h"
 #include "debug.h"
 #include "tuner.h"
@@ -96,4 +97,22 @@ bool tuner_power(bool status)
     return oldstatus;
 }
 
+#ifdef HAVE_RDS_CAP
+char* tuner_get_rds_info(int setting)
+{
+    char *text = NULL;
+    
+    switch(setting)
+    {
+        case RADIO_RDS_NAME:
+            text = "Rockbox Radio";
+            break;
+
+        case RADIO_RDS_TEXT:
+            text = "http://www.rockbox.org" ;
+            break;
+    }
+    return text;
+}
+#endif
 #endif

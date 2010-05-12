@@ -520,7 +520,11 @@ void fms_data_load(enum screen_type screen, const char *buf, bool isfile)
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
                                     "%?Rr<%Sx|Time:| %Rh:%Rn:%Rs|"
                                     "%?St|prerecording time|<%Sx|Prerecord Time| %Rs|%pm>>\n"
-#endif 
+#endif 	 
+#ifdef HAVE_RDS_CAP
+                                    "\n%s%ty\n"
+                                    "%s%tz\n"
+#endif
                                     ;
         skin_data_load(screen, data, default_fms, false);
     }
@@ -593,7 +597,6 @@ int radio_screen(void)
     bool have_recorded = false;
     int timeout = current_tick + HZ/10;
     unsigned int last_seconds = 0;
-    int hours, minutes;
 #ifndef SIMULATOR    
     unsigned int seconds = 0;
     struct audio_recording_options rec_options;

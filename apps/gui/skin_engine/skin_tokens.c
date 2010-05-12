@@ -61,8 +61,10 @@
 #endif
 #include "language.h"
 #include "usb.h"
+#if CONFIG_TUNER
 #include "radio.h"
 #include "tuner.h"
+#endif
 
 extern struct wps_state wps_state;
 
