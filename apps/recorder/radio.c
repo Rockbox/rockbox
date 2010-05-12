@@ -51,6 +51,7 @@
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
 #endif
+#include "appevents.h"
 #include "talk.h"
 #include "tuner.h"
 #include "power.h"
@@ -66,9 +67,8 @@
 #include "menus/exported_menus.h"
 #include "root_menu.h"
 #include "viewport.h"
-#ifdef HAVE_QUICKSCREEN
-#include "quickscreen.h"
-#endif
+#include "skin_engine/skin_engine.h"
+#include "statusbar-skinned.h"
 
 #if CONFIG_TUNER
 
@@ -100,20 +100,32 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define FM_RECORD_DBLPRE
 #define FM_RECORD
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD) \
-   || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD)
+#define FM_MENU
 #define FM_PRESET
+#define FM_STOP
 #define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define FM_PRESET
 #define FM_MODE
 
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
+#define FM_MENU
 #define FM_PRESET
+#define FM_STOP
+#define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define FM_MENU
+#define FM_STOP
+#define FM_EXIT
+#define FM_PLAY
 #define FM_MODE
 
 #endif
@@ -148,6 +160,32 @@ static int clear_preset_list(void);
 static int scan_presets(void *viewports);
 static void radio_off(void);
 
+bool radio_scan_mode(void)
+{
+    return radio_mode == RADIO_SCAN_MODE;
+}
+
+bool radio_is_stereo(void)
+{
+    return tuner_get(RADIO_STEREO) && !global_settings.fm_force_mono;
+}
+int radio_current_frequency(void)
+{
+    return curr_freq;
+}
+
+int radio_current_preset(void)
+{
+    return curr_preset;
+}
+int radio_preset_count(void)
+{
+    return num_presets;
+}
+const struct fmstation *radio_get_preset(int preset)
+{
+    return &presets[preset];
+}
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */
 static bool yesno_pop(const char* text)
@@ -460,30 +498,90 @@ static void talk_preset(int preset, bool fallback, bool enqueue)
     }
 }
 
-static void fms_restore(struct viewport vp[NB_SCREENS])
+/* Skin stuff */
+extern struct wps_state     wps_state; /* from wps.c */
+static struct gui_wps       fms_skin[NB_SCREENS]      = {{ .data = NULL }};
+static struct wps_data      fms_skin_data[NB_SCREENS] = {{ .wps_loaded = 0 }};
+static struct wps_sync_data fms_skin_sync_data        = { .do_full_update = false };
+
+
+void fms_data_load(enum screen_type screen, const char *buf, bool isfile)
 {
-    struct screen *display;
+    struct wps_data *data = fms_skin[screen].data;
+    int success;
+    success = buf && skin_data_load(screen, data, buf, isfile);
+
+    if (!success ) /* load the default */
+    {  
+        const char default_fms[] =  "%Sx|Station:| %tf\n"
+                                    "%?ts<%Sx|Stereo||%Sx|Mono|>\n"
+                                    "%?tm<%Sx|Mode:| %Sx|Scan||%Sx|Preset|: %Ti. %?Tn<%Tn|%Tf>>\n"
+                                    "%pb\n"           
+#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
+                                    "%?Rr<%Sx|Time:| %Rh:%Rn:%Rs|"
+                                    "%?St|prerecording time|<%Sx|Prerecord Time| %Rs|%pm>>\n"
+#endif 
+                                    ;
+        skin_data_load(screen, data, default_fms, false);
+    }
+}
+enum fms_exiting {
+    FMS_EXIT,
+    FMS_ENTER
+};
+void fms_fix_displays(enum fms_exiting toggle_state)
+{
     int i;
     FOR_NB_SCREENS(i)
     {
-        display = &screens[i];
-        display->set_viewport(&vp[i]);
-        display->clear_viewport();
-        display->update_viewport();
+        if (toggle_state == FMS_ENTER)
+        {
+            viewportmanager_theme_enable(i, skin_has_sbs(i, fms_skin[i].data), NULL);  
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+            screens[i].backdrop_show(fms_skin[i].data->backdrop);
+#endif
+            screens[i].clear_display();
+            /* force statusbar/skin update since we just cleared the whole screen */
+            send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        }
+        else
+        {
+            screens[i].stop_scroll();
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+            screens[i].backdrop_show(sb_get_backdrop(i));
+#endif
+            viewportmanager_theme_undo(i, skin_has_sbs(i, fms_skin[i].data));
+        }
+    }
+}
+        
+
+void fms_skin_init(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+#ifdef HAVE_ALBUMART
+        fms_skin_data[i].albumart = NULL;
+        fms_skin_data[i].playback_aa_slot = -1;
+#endif
+        fms_skin[i].data = &fms_skin_data[i];
+        fms_skin[i].display = &screens[i];
+        /* Currently no seperate wps_state needed/possible
+           so use the only available ( "global" ) one */
+        fms_skin[i].state = &wps_state;
+        fms_skin[i].sync_data = &fms_skin_sync_data;
     }
 }
 
 int radio_screen(void)
 {
-    char buf[MAX_PATH];
     bool done = false;
     int ret_val = GO_TO_ROOT;
     int button;
     int i;
     bool stereo = false, last_stereo = false;
-    int fh;
-    int top_of_screen = 0;
-    bool update_screen = true;
+    bool update_screen = true, restore = true;
     bool screen_freeze = false;
     bool keep_playing = false;
     bool talk = false;
@@ -502,32 +600,9 @@ int radio_screen(void)
 #ifndef HAVE_NOISY_IDLE_MODE
     int button_timeout = current_tick + (2*HZ);
 #endif
-    struct viewport vp[NB_SCREENS];
-#ifdef HAVE_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
-#endif
 
     /* change status to "in screen" */
     in_screen = true;
-
-    /* always display status bar in radio screen for now */
-    FOR_NB_SCREENS(i)
-    {
-        viewport_set_defaults(&vp[i], i);
-#ifdef HAVE_BUTTONBAR
-        if (global_settings.buttonbar)
-            vp[i].height -= BUTTONBAR_HEIGHT;
-#endif
-    }
-    fms_restore(vp);
-
-    fh = font_get(FONT_UI)->height;
-
-    /* Adjust for font size, trying to center the information vertically */
-    if(fh < 10)
-        top_of_screen = 1;
 
     if(num_presets <= 0)
     {
@@ -571,16 +646,11 @@ int radio_screen(void)
 #endif
 
    if(num_presets < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
-        scan_presets(vp);
+        scan_presets(NULL);
 
     curr_preset = find_preset(curr_freq);
     if(curr_preset != -1)
          radio_mode = RADIO_PRESET_MODE;
-
-#ifdef HAVE_BUTTONBAR
-    gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-        str(LANG_PRESET), str(LANG_FM_BUTTONBAR_RECORD));
-#endif
 
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(true);
@@ -608,15 +678,8 @@ int radio_screen(void)
             cancel_cpu_boost();
         }
 
-#if CONFIG_CODEC != SWCODEC
-        /* TODO: Can we timeout at HZ when recording since peaks aren't
-           displayed? This should quiet recordings too. */
-        button = get_action(CONTEXT_FM,
-            update_screen ? TIMEOUT_NOBLOCK : HZ / PEAK_METER_FPS);
-#else
-        button = get_action(CONTEXT_FM,
-            update_screen ? TIMEOUT_NOBLOCK : HZ);
-#endif
+        button = skin_wait_for_action(fms_skin, CONTEXT_FM, 
+                                      update_screen ? TIMEOUT_NOBLOCK : HZ);
 
 #ifndef HAVE_NOISY_IDLE_MODE
         if (button != ACTION_NONE)
@@ -763,19 +826,11 @@ int radio_screen(void)
                 break;
 
             case ACTION_FM_MENU:
-                FOR_NB_SCREENS(i)
-                {
-                    screens[i].scroll_stop(&vp[i]);
-                }
+                fms_fix_displays(FMS_EXIT);
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
-                fms_restore(vp);
-#ifdef HAVE_BUTTONBAR
-                gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_PRESET),
-                                  str(LANG_FM_BUTTONBAR_RECORD));
-#endif
                 update_screen = true;
+                restore = true;
                 break;
 
 #ifdef FM_PRESET
@@ -784,37 +839,15 @@ int radio_screen(void)
                 {
                     splash(HZ, ID2P(LANG_FM_NO_PRESETS));
                     update_screen = true;
-                    fms_restore(vp);
-
                     break;
                 }
-                FOR_NB_SCREENS(i)
-                    screens[i].scroll_stop(&vp[i]);
+                fms_fix_displays(FMS_EXIT);
                 handle_radio_presets();
-                fms_restore(vp);
-#ifdef HAVE_BUTTONBAR
-                gui_buttonbar_set(&buttonbar,
-                                  str(LANG_BUTTONBAR_MENU),
-                                  str(LANG_PRESET),
-                                  str(LANG_FM_BUTTONBAR_RECORD));
-#endif
                 update_screen = true;
+                restore = true;
                 break;
 #endif /* FM_PRESET */
 
-#ifdef HAVE_QUICKSCREEN
-            case ACTION_FM_QUICKSCREEN:
-            {
-                if (quick_screen_quick(button))
-                {
-                    done = true;
-                    break;
-                }
-                fms_restore(vp);
-                update_screen = true;
-            }
-            break;
-#endif
 #ifdef FM_FREEZE
             case ACTION_FM_FREEZE:
                 if(!screen_freeze)
@@ -923,17 +956,6 @@ int radio_screen(void)
         {
             /* Only display the peak meter when not recording */
 #if CONFIG_CODEC != SWCODEC
-            if(!audio_status())
-            {
-                FOR_NB_SCREENS(i)
-                {
-                    screens[i].set_viewport(&vp[i]);
-                    peak_meter_screen(&screens[i],0, fh*(top_of_screen + 4),fh);
-                    screens[i].update_rect(0, fh*(top_of_screen + 4),
-                                           screens[i].getwidth(), fh);
-                }
-            }
-
             if(TIME_AFTER(current_tick, timeout))
             {
                 timeout = current_tick + HZ;
@@ -957,85 +979,20 @@ int radio_screen(void)
 
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
             seconds = audio_recorded_time() / HZ;
-            if (update_screen || seconds > last_seconds)
+            if (update_screen || seconds > last_seconds || restore)
             {
                 last_seconds = seconds;
 #else
-            if (update_screen)
+            if (update_screen || restore)
             {
 #endif
-                int freq;
-
+                if (restore)
+                    fms_fix_displays(FMS_ENTER);
                 FOR_NB_SCREENS(i)
-                {
-                    screens[i].set_viewport(&vp[i]);
-                }
-
-                snprintf(buf, 128, curr_preset >= 0 ? "%d. %s" : " ",
-                         curr_preset + 1, presets[curr_preset].name);
-
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen, buf);
-
-                freq = curr_freq / 10000;
-                snprintf(buf, 128, str(LANG_FM_STATION),
-                         freq / 100, freq % 100);
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 1, buf);
-                                                
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 2,
-                                           stereo ? str(LANG_CHANNEL_STEREO) :
-                                                    str(LANG_CHANNEL_MONO));
-
-                snprintf(buf, 128, "%s %s", str(LANG_MODE),
-                         radio_mode ? str(LANG_PRESET) :
-                                      str(LANG_RADIO_SCAN_MODE));
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 3, buf);
-#ifndef SIMULATOR
-#ifdef HAVE_RDS_CAP
-                snprintf(buf, 128, "%s",tuner_get_rds_info(RADIO_RDS_NAME));
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 4, buf);
-
-                snprintf(buf, 128, "%s",tuner_get_rds_info(RADIO_RDS_TEXT));
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, top_of_screen + 5, buf);
-#endif
-#endif /* SIMULATOR */
-                
-#if CONFIG_CODEC != SWCODEC
-                if(audio_status() == AUDIO_STATUS_RECORD)
-                {
-                    hours = seconds / 3600;
-                    minutes = (seconds - (hours * 3600)) / 60;
-                    snprintf(buf, 32, "%s %02d:%02d:%02d",
-                             str(LANG_RECORDING_TIME),
-                             hours, minutes, seconds%60);
-                    FOR_NB_SCREENS(i)
-                        screens[i].puts_scroll(0, top_of_screen + 4, buf);
-                }
-                else
-                {
-                    if(rec_options.rec_prerecord_time)
-                    {
-                        snprintf(buf, 32, "%s %02d",
-                                 str(LANG_RECORD_PRERECORD), seconds%60);
-                        FOR_NB_SCREENS(i)
-                            screens[i].puts_scroll(0, top_of_screen + 4, buf);
-                    }
-                }
-#endif /* CONFIG_CODEC != SWCODEC */
-
-                FOR_NB_SCREENS(i)
-                    screens[i].update_viewport();
-#ifdef HAVE_BUTTONBAR
-                gui_buttonbar_draw(&buttonbar);
-#endif
+                    skin_update(&fms_skin[i], WPS_REFRESH_ALL);
+                restore = false; 
             }
         }
-
         update_screen = false;
 
         if (global_settings.talk_file && talk
@@ -1073,7 +1030,6 @@ int radio_screen(void)
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
         splash(0, str(LANG_DISK_FULL));
-        fms_restore(vp);
         audio_error_clear();
 
         while(1)
@@ -1116,11 +1072,7 @@ int radio_screen(void)
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(false);
 #endif
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].scroll_stop(&vp[i]);
-        screens[i].set_viewport(NULL);
-    }
+    fms_fix_displays(FMS_EXIT);
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
     return have_recorded;
@@ -1471,7 +1423,6 @@ static int handle_radio_presets(void)
                     result = 2;
         }
     }
-    gui_synclist_scroll_stop(&lists);
     return result - 1;
 }
 

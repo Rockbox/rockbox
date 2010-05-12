@@ -6990,16 +6990,16 @@
 </phrase>
 <phrase>
   id: LANG_FM_STATION
-  desc: in radio screen
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Station: %d.%02d MHz"
+    *: none
   </source>
   <dest>
-    *: "Stacio: %d.%02d MHz"
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>

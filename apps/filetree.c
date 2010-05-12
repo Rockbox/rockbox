@@ -331,10 +331,16 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #ifdef HAVE_LCD_BITMAP
             (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
             (*c->dirfilter == SHOW_SBS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_SBS) ||
+#if CONFIG_TUNER
+            (*c->dirfilter == SHOW_FMS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMS) ||
+#endif
 #endif
 #ifdef HAVE_REMOTE_LCD
             (*c->dirfilter == SHOW_RWPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RWPS) ||
             (*c->dirfilter == SHOW_RSBS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RSBS) ||
+#if CONFIG_TUNER
+            (*c->dirfilter == SHOW_RFMS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RFMS) ||
+#endif
 #endif
 #if CONFIG_TUNER
             (*c->dirfilter == SHOW_FMR && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMR) ||
@@ -504,6 +510,18 @@ int ft_enter(struct tree_context* c)
                 }
 
                 break;
+            case FILE_ATTR_FMS:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.fms_file, MAX_FILENAME);
+                settings_apply_skins();
+                break;
+#ifdef HAVE_REMOTE_LCD
+            case FILE_ATTR_RFMS:
+                splash(0, ID2P(LANG_WAIT));
+                set_file(buf, (char *)global_settings.rfms_file, MAX_FILENAME);
+                settings_apply_skins();
+                break;
+#endif
 #endif
 
 #ifdef HAVE_LCD_BITMAP

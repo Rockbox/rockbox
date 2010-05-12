@@ -224,11 +224,17 @@ MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
 static struct browse_folder_info fonts = {FONT_DIR, SHOW_FONT};
 static struct browse_folder_info sbs   = {SBS_DIR, SHOW_SBS};
+#if CONFIG_TUNER
+static struct browse_folder_info fms   = {WPS_DIR, SHOW_FMS};
+#endif
 #endif
 static struct browse_folder_info wps = {WPS_DIR, SHOW_WPS};
 #ifdef HAVE_REMOTE_LCD
 static struct browse_folder_info rwps = {WPS_DIR, SHOW_RWPS};
 static struct browse_folder_info rsbs = {SBS_DIR, SHOW_RSBS};
+#if CONFIG_TUNER
+static struct browse_folder_info rfms   = {WPS_DIR, SHOW_RFMS};
+#endif
 #endif
 static struct browse_folder_info themes = {THEME_DIR, SHOW_CFG};
 
@@ -247,6 +253,11 @@ MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM,
 MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM, 
         ID2P(LANG_BASE_SKIN), 
         browse_folder, (void*)&sbs, NULL, Icon_Wps);
+#if CONFIG_TUNER
+MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM, 
+        ID2P(LANG_FM_RADIO), 
+        browse_folder, (void*)&fms, NULL, Icon_Wps);
+#endif
 #endif
 MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
         ID2P(LANG_WHILE_PLAYING), 
@@ -258,6 +269,11 @@ MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM,
 MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM, 
         ID2P(LANG_REMOTE_BASE_SKIN), 
         browse_folder, (void*)&rsbs, NULL, Icon_Wps);
+#if CONFIG_TUNER
+MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM, 
+        ID2P(LANG_REMOTE_FMRADIO), 
+        browse_folder, (void*)&rfms, NULL, Icon_Wps);
+#endif
 #endif
 
 MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);
@@ -277,6 +293,12 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             &browse_wps,
 #ifdef HAVE_REMOTE_LCD
             &browse_rwps,
+#endif
+#if CONFIG_TUNER
+            &browse_fms,
+#ifdef HAVE_REMOTE_LCD
+            &browse_rfms,
+#endif
 #endif
 #ifdef HAVE_LCD_BITMAP
             &browse_sbs,

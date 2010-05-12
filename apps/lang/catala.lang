@@ -5139,15 +5139,13 @@
 </phrase>
 <phrase>
   id: LANG_FM_STATION
-  desc: in radio screen
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
     *: none
-    radio: "Emisora: %d.%dMHz"
   </dest>
   <voice>
     *: none

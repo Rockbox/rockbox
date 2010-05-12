@@ -52,6 +52,7 @@
 #include "skin_engine.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "radio.h"
 #include "skin_fonts.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -348,6 +349,25 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
+    { WPS_TOKEN_HAVE_TUNER,               "tp",  WPS_REFRESH_STATIC,  NULL },
+#if CONFIG_TUNER /* Re-uses the 't' and 'T' prefixes, be careful about doubleups */
+    { WPS_TOKEN_TUNER_TUNED,              "tt",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_TUNER_SCANMODE,           "tm",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_TUNER_STEREO,             "ts",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_TUNER_MINFREQ,            "ta",  WPS_REFRESH_STATIC,  NULL },
+    { WPS_TOKEN_TUNER_MAXFREQ,            "tb",  WPS_REFRESH_STATIC,  NULL }, 
+    { WPS_TOKEN_TUNER_CURFREQ,            "tf",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_PRESET_ID,                "Ti",  WPS_REFRESH_STATIC, NULL },
+    { WPS_TOKEN_PRESET_NAME,              "Tn",  WPS_REFRESH_STATIC, NULL },
+    { WPS_TOKEN_PRESET_FREQ,              "Tf",  WPS_REFRESH_STATIC, NULL },
+    { WPS_TOKEN_PRESET_COUNT,             "Tc",  WPS_REFRESH_STATIC, NULL },
+    { WPS_TOKEN_HAVE_RDS,                 "tx",  WPS_REFRESH_STATIC, NULL },
+#ifdef HAVE_RDS_CAPS
+    { WPS_TOKEN_RDS_NAME,                 "ty", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_RDS_TEXT,                 "tz", WPS_REFRESH_DYNAMIC, NULL },
+#endif
+#endif /* CONFIG_TUNER */
+
     { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
     { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_timeout },
 
@@ -398,10 +418,14 @@ static const struct wps_tag all_tags[] = {
     /* Recording Tokens */
     { WPS_TOKEN_HAVE_RECORDING,         "Rp", WPS_REFRESH_STATIC, NULL },
 #ifdef HAVE_RECORDING
+    { WPS_TOKEN_IS_RECORDING,           "Rr", WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_REC_FREQ,               "Rf", WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_REC_ENCODER,            "Re", WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_REC_BITRATE,            "Rb", WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_REC_MONO,               "Rm", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_SECONDS,            "Rs", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_MINUTES,            "Rn", WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_REC_HOURS,              "Rh", WPS_REFRESH_DYNAMIC, NULL },
 #endif
     { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }
     /* the array MUST end with an empty string (first char is \0) */
@@ -1723,6 +1747,13 @@ static int check_feature_tag(const char *wps_bufptr, const int type)
 #else
             return find_false_branch(wps_bufptr);
 #endif
+        case WPS_TOKEN_HAVE_TUNER:
+#if CONFIG_TUNER
+            if (radio_hardware_present())
+                return 0;
+#endif
+            return find_false_branch(wps_bufptr);
+
         default: /* not a tag we care about, just don't skip */
             return 0;
     }

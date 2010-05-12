@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
+#include "radio.h"
 #include "skin_engine/skin_engine.h"
 #include "skin_engine/skin_fonts.h"
 #include "statusbar-skinned.h"
@@ -52,9 +53,15 @@ static const struct skin_load_setting skins[] = {
     { global_settings.sbs_file, "sbs", sb_skin_data_load},
 #endif    
     { global_settings.wps_file, "wps", wps_data_load},
+#if CONFIG_TUNER
+    { global_settings.fms_file, "fms", fms_data_load},
+#endif
 #ifdef HAVE_REMOTE_LCD
     { global_settings.rsbs_file, "rsbs", sb_skin_data_load},
     { global_settings.rwps_file, "rwps", wps_data_load},
+#if CONFIG_TUNER
+    { global_settings.rfms_file, "rfms", fms_data_load},
+#endif
 #endif
 };
 
@@ -68,6 +75,9 @@ void settings_apply_skins(void)
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();
+#endif
+#if CONFIG_TUNER
+    fms_skin_init();
 #endif
     for (i=0; i<ARRAYLEN(skins); i++)
     {

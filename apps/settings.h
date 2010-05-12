@@ -146,7 +146,7 @@ enum
  *       must be added after NUM_FILTER_MODES. */
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
        NUM_FILTER_MODES,
-       SHOW_WPS, SHOW_RWPS, SHOW_SBS, SHOW_RSBS, SHOW_FMR, SHOW_CFG,
+       SHOW_WPS, SHOW_RWPS, SHOW_FMS, SHOW_RFMS, SHOW_SBS, SHOW_RSBS, SHOW_FMR, SHOW_CFG,
        SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
 /* file and dir sort options */
@@ -498,7 +498,11 @@ struct user_settings
     int fm_region;
     bool fm_force_mono;  /* Forces Mono mode if true */
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
+    unsigned char fms_file[MAX_FILENAME+1];  /* last fms */
+#ifdef HAVE_REMOTE_LCD
+    unsigned char rfms_file[MAX_FILENAME+1];  /* last remote-fms */
 #endif
+#endif /* CONFIG_TUNER */
 
     /* misc options */
 #ifndef HAVE_WHEEL_ACCELERATION

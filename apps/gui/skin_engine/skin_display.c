@@ -31,6 +31,7 @@
 #ifdef DEBUG
 #include "debug.h"
 #endif
+#include "action.h"
 #include "abrepeat.h"
 #include "lang.h"
 #include "language.h"
@@ -57,6 +58,9 @@
 #endif
 #include "backdrop.h"
 #include "viewport.h"
+#include "radio.h"
+#include "tuner.h"
+#include "root_menu.h"
 
 
 #include "wps_internals.h"
@@ -78,7 +82,7 @@ bool skin_update(struct gui_wps *gwps, unsigned int update_type)
     struct mp3entry *id3 = gwps->state->id3;
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
     gwps->sync_data->do_full_update |= cuesheet_update;
-
+ 
     retval = skin_redraw(gwps, gwps->sync_data->do_full_update ?
                                         WPS_REFRESH_ALL : update_type);
     return retval;
@@ -157,6 +161,14 @@ static void draw_progressbar(struct gui_wps *gwps,
         length = id3->length;
         elapsed = id3->elapsed + state->ff_rewind_count;
     }
+#if CONFIG_TUNER
+    else if (in_radio_screen())
+    {
+        int min = fm_region_data[global_settings.fm_region].freq_min;
+        elapsed = radio_current_frequency() - min;
+        length = fm_region_data[global_settings.fm_region].freq_max - min;
+    }
+#endif
     else
     {
         length = 1;
@@ -191,8 +203,8 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct wps_state *state = gwps->state;
     int lines = viewport_get_nb_lines(viewer->vp);
     int line_height = font_get(viewer->vp->font)->height;
-    int cur_playlist_pos = playlist_get_display_index();
-    int start_item = MAX(0, cur_playlist_pos + viewer->start_offset);
+    int cur_pos, count;
+    int start_item;
     int i;
     struct wps_token token;
     int x, length, alignment = WPS_TOKEN_ALIGN_LEFT;
@@ -200,39 +212,65 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct mp3entry *pid3;
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
     const char *filename;
+    bool ismusic = true;
+#if CONFIG_TUNER
+    if (current_screen() == GO_TO_FM)
+    {
+        cur_pos = radio_current_preset();
+        count = radio_preset_count();
+        ismusic = false;
+    }
+    else
+#endif
+    {
+        cur_pos = playlist_get_display_index();
+        count = playlist_amount()+1;
+    }
+    start_item = MAX(0, cur_pos + viewer->start_offset);    
     
     gwps->display->set_viewport(viewer->vp);
-    for(i=start_item; (i-start_item)<lines && i<=playlist_amount(); i++)
+    for(i=start_item; (i-start_item)<lines && i<count; i++)
     {
-        filename = playlist_peek(i-cur_playlist_pos);
-        if (i == cur_playlist_pos)
-        {
-            pid3 = state->id3;
-        }
-        else if (i == cur_playlist_pos+1)
-        {
-            pid3 = state->nid3;
-        }
-#if CONFIG_CODEC == SWCODEC
-        else if (i>cur_playlist_pos)
-        {
-#ifdef HAVE_TC_RAMCACHE
-            if (tagcache_fill_tags(&viewer->tempid3, filename))
-            {
-                pid3 = &viewer->tempid3;
-            }
-            else
-#endif 
-                if (!audio_peek_track(&pid3, i-cur_playlist_pos))
-                    pid3 = NULL;
-        }
-#endif
-        else
+        int line;
+#if CONFIG_TUNER
+        if (current_screen() == GO_TO_FM)
         {
             pid3 = NULL;
+            line = TRACK_HAS_INFO;
+            filename = "";
         }
-
-        int line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;
+        else
+#endif
+        {
+            filename = playlist_peek(i-cur_pos);
+            if (i == cur_pos)
+            {
+                pid3 = state->id3;
+            }
+            else if (i == cur_pos+1)
+            {
+                pid3 = state->nid3;
+            }
+#if CONFIG_CODEC == SWCODEC
+            else if (i>cur_pos)
+            {
+#ifdef HAVE_TC_RAMCACHE
+                if (tagcache_fill_tags(&viewer->tempid3, filename))
+                {
+                    pid3 = &viewer->tempid3;
+                }
+                else
+#endif 
+                    if (!audio_peek_track(&pid3, i-cur_pos))
+                        pid3 = NULL;
+            }
+#endif
+            else
+            {
+                pid3 = NULL;
+            }
+            line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;
+        }
         int j = 0, cur_string = 0;
         unsigned int line_len = 0;
         buf[0] = '\0';
@@ -243,12 +281,18 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
             token.value.i = 0;
             token.next = false;
             out = get_id3_token(&token, pid3, tempbuf, sizeof(tempbuf), -1, NULL);
+#if CONFIG_TUNER
+            if (!out)
+                out = get_radio_token(&token, i-cur_pos,
+                                      tempbuf, sizeof(tempbuf), -1, NULL);
+#endif
             if (out)
             {
                 line_len = strlcat(buf, out, sizeof(buf));
                 j++;
                 continue;
             }
+            
             switch (viewer->lines[line].tokens[j])
             {
                 case WPS_TOKEN_ALIGN_CENTER:
@@ -1302,4 +1346,71 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
     display->update();
 
     return true;
+}
+
+bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
+{
+    (void)screen;
+    bool draw = false;
+#ifdef HAVE_LCD_BITMAP
+    if (data->wps_sb_tag)
+        draw = data->show_sb_on_wps;
+    else if (statusbar_position(screen) != STATUSBAR_OFF)
+        draw = true;
+#endif
+    return draw;
+}
+
+/* do the button loop as often as required for the peak meters to update
+ * with a good refresh rate. 
+ * gwps is really gwps[NB_SCREENS]! don't wrap this if FOR_NB_SCREENS()
+ */
+int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
+{
+#ifdef HAVE_LCD_BITMAP
+    int i;
+    int button = ACTION_NONE;
+    /* when the peak meter is enabled we want to have a
+        few extra updates to make it look smooth. On the
+        other hand we don't want to waste energy if it
+        isn't displayed */
+    bool pm=false;
+    FOR_NB_SCREENS(i)
+    {
+       if(gwps[i].data->peak_meter_enabled)
+           pm = true;
+    }
+
+    if (pm) {
+        long next_refresh = current_tick;
+        long next_big_refresh = current_tick + timeout;
+        button = BUTTON_NONE;
+        while (TIME_BEFORE(current_tick, next_big_refresh)) {
+            button = get_action(context,TIMEOUT_NOBLOCK);
+            if (button != ACTION_NONE) {
+                break;
+            }
+            peak_meter_peek();
+            sleep(0);   /* Sleep until end of current tick. */
+
+            if (TIME_AFTER(current_tick, next_refresh)) {
+                FOR_NB_SCREENS(i)
+                {
+                    if(gwps[i].data->peak_meter_enabled)
+                        skin_update(&gwps[i], WPS_REFRESH_PEAK_METER);
+                    next_refresh += HZ / PEAK_METER_FPS;
+                }
+            }
+        }
+
+    }
+
+    /* The peak meter is disabled
+       -> no additional screen updates needed */
+    else
+#endif
+    {
+        button = get_action(context, timeout);
+    }
+    return button;
 }

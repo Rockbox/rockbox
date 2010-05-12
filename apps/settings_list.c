@@ -203,6 +203,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
 #define DEFAULT_SBSNAME  "-"
+#define DEFAULT_FMS_NAME DEFAULT_WPSNAME
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -1456,7 +1457,13 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
     TEXT_SETTING(0, fmr_file, "fmr", "-",
                      FMPRESET_PATH "/", ".fmr"),
+    TEXT_SETTING(F_THEMESETTING,fms_file, "fms",
+                     DEFAULT_FMS_NAME, SBS_DIR "/", ".fms"),
+#ifdef HAVE_REMOTE_LCD
+    TEXT_SETTING(F_THEMESETTING,rfms_file, "rfms",
+                     DEFAULT_FMS_NAME, SBS_DIR "/", ".rfms"),
 #endif
+#endif /* CONFIG_TUNER */
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),

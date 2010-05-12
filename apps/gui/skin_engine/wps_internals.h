@@ -371,7 +371,10 @@ const char *get_token_value(struct gui_wps *gwps,
 
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                           char *buf, int buf_size, int limit, int *intval);
-
+#if CONFIG_TUNER
+const char *get_radio_token(struct wps_token *token, int preset_offset,
+                            char *buf, int buf_size, int limit, int *intval);
+#endif
 
 struct gui_img* find_image(char label, struct wps_data *data);
 struct skin_viewport* find_viewport(char label, struct wps_data *data);

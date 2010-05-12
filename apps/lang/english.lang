@@ -5251,19 +5251,16 @@
 </phrase>
 <phrase>
   id: LANG_FM_STATION
-  desc: in radio screen
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
     *: none
-    radio: "Station: %d.%02d MHz"
   </dest>
   <voice>
     *: none
-    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -13528,5 +13525,73 @@
   <voice>
     *: none
     swcodec: "Rewind before resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "radio screen skin"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "remote radio screen skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Station:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
   </voice>
 </phrase>

@@ -219,10 +219,38 @@ enum wps_token_type {
     /* Recording Tokens */
   TOKEN_MARKER_RECORDING,
     WPS_TOKEN_HAVE_RECORDING,
+    WPS_TOKEN_IS_RECORDING,
     WPS_TOKEN_REC_FREQ,
     WPS_TOKEN_REC_ENCODER,
     WPS_TOKEN_REC_BITRATE, /* SWCODEC: MP3 bitrate, HWCODEC: MP3 "quality" */
     WPS_TOKEN_REC_MONO,
+    WPS_TOKEN_REC_SECONDS,
+    WPS_TOKEN_REC_MINUTES,
+    WPS_TOKEN_REC_HOURS,
+    
+    
+    /* Radio Tokens */
+  TOKEN_MARKER_TUNER,
+    WPS_TOKEN_HAVE_TUNER,
+#if CONFIG_TUNER
+    WPS_TOKEN_TUNER_TUNED,
+    WPS_TOKEN_TUNER_SCANMODE,
+    WPS_TOKEN_TUNER_STEREO,
+    WPS_TOKEN_TUNER_MINFREQ, /* changes based on "region" */
+    WPS_TOKEN_TUNER_MAXFREQ, /* changes based on "region" */
+    WPS_TOKEN_TUNER_CURFREQ,
+    WPS_TOKEN_PRESET_ID, /* "id" of this preset.. really the array element number */
+    WPS_TOKEN_PRESET_NAME,
+    WPS_TOKEN_PRESET_FREQ,
+    WPS_TOKEN_PRESET_COUNT,
+    /* RDS tokens */
+    WPS_TOKEN_HAVE_RDS,
+#ifdef HAVE_RDS_CAP
+    WPS_TOKEN_RDS_NAME,
+    WPS_TOKEN_RDS_TEXT,
+#endif
+#endif /* CONFIG_TUNER */
+    
     
   TOKEN_MARKER_END, /* this needs to be the last value in this enum */
 };

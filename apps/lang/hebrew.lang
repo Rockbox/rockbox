@@ -5183,19 +5183,16 @@
 </phrase>
 <phrase>
   id: LANG_FM_STATION
-  desc: in radio screen
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
     *: none
-    radio: "%d.%02d MHZ :תחנה"
   </dest>
   <voice>
     *: none
-    radio: ""
   </voice>
 </phrase>
 <phrase>

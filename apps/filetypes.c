@@ -115,6 +115,7 @@ static const struct filetype inbuilt_filetypes[] = {
 #endif
 #if CONFIG_TUNER
     { "fmr", FILE_ATTR_FMR, Icon_Preset, LANG_FMR },
+    { "fms", FILE_ATTR_FMS, Icon_Wps, VOICE_EXT_FMS },
 #endif
     { "lng", FILE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",FILE_ATTR_ROCK,Icon_Plugin,   VOICE_EXT_ROCK },
@@ -130,6 +131,9 @@ static const struct filetype inbuilt_filetypes[] = {
 #endif
 #ifdef HAVE_REMOTE_LCD
     { "rsbs", FILE_ATTR_RSBS, Icon_Wps,   VOICE_EXT_RSBS },
+#if CONFIG_TUNER
+    { "rfms", FILE_ATTR_RFMS, Icon_Wps, VOICE_EXT_RFMS },
+#endif    
 #endif
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },

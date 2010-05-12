@@ -207,6 +207,13 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 }
 #endif
 
+#if CONFIG_TUNER
+bool radio_hardware_present(void)
+{
+    return true;
+}
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 static int loaded_fonts = 0;
 int font_load(struct font* pf, const char *path)
