@@ -141,7 +141,7 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_play_data.p    = addr;
+    dma_play_data.p    = (uint16_t*)addr;
     dma_play_data.size = size;
 
 #if NUM_CORES > 1
