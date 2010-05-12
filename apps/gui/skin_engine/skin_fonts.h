@@ -32,9 +32,11 @@
 #ifndef _SKINFONTS_H_
 #define _SKINFONTS_H_
 
-
-#define SKIN_FONT_SIZE 10000
-
+#if LCD_HEIGHT > 160
+#define SKIN_FONT_SIZE (1024*10)
+#else
+#define SKIN_FONT_SIZE (1024*3)
+#endif
 
 void skin_font_init(void);
 
