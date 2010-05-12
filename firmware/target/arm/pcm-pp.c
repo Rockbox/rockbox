@@ -450,6 +450,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
     DMA0_PER_ADDR = (unsigned long)&IISFIFO_WR;
     DMA0_FLAGS = DMA_FLAGS_UNK26;
     DMA0_INCR = DMA_INCR_RANGE_FIXED | DMA_INCR_WIDTH_32BIT;
+#else
+    dma_play_data.addr = (unsigned long)addr;
+    dma_play_data.size = size;
 #endif
 
     play_start_pcm();
