@@ -33,6 +33,9 @@
 #define _SKINFONTS_H_
 
 
+#define SKIN_FONT_SIZE 10000
+
+
 void skin_font_init(void);
 
 /* load a font into the skin buffer. return the font id. */

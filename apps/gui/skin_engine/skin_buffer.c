@@ -31,6 +31,7 @@
 #include "wps_internals.h"
 #include "skin_tokens.h"
 #include "skin_buffer.h"
+#include "skin_fonts.h"
 
 /* skin buffer management.
  * This module is used to allocate space in a single global skin buffer for
@@ -66,7 +67,7 @@
 #endif
 
 
-#define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER) + \
+#define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER + SKIN_FONT_SIZE) + \
                          (WPS_MAX_TOKENS * sizeof(struct wps_token))
 #endif
 
