@@ -212,13 +212,11 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct mp3entry *pid3;
     char buf[MAX_PATH*2], tempbuf[MAX_PATH];
     const char *filename;
-    bool ismusic = true;
 #if CONFIG_TUNER
     if (current_screen() == GO_TO_FM)
     {
         cur_pos = radio_current_preset();
         count = radio_preset_count();
-        ismusic = false;
     }
     else
 #endif

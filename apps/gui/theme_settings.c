@@ -30,7 +30,9 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
+#if CONFIG_TUNER
 #include "radio.h"
+#endif
 #include "skin_engine/skin_engine.h"
 #include "skin_engine/skin_fonts.h"
 #include "statusbar-skinned.h"
