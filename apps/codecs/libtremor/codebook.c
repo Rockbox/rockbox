@@ -464,48 +464,49 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
 
 static long vorbis_book_decodevv_add_2ch_even(codebook *book,ogg_int32_t **a,
                                               long offset,oggpack_buffer *b,
-                                              int n,int point){
-  long i,k,chunk,read;
+                                              unsigned int n,int point){
+  long k,chunk,read;
   int shift=point-book->binarypoint;
   long entries[32];
   ogg_int32_t *p0 = &(a[0][offset]);
   ogg_int32_t *p1 = &(a[1][offset]);
+  const unsigned long dim = book->dim;
+  const ogg_int32_t * const vlist = book->valuelist;
 
   if(shift>=0){
-    
-    for(i=0;i<n;){
+    while(n>0){
       chunk=32;
-      if (chunk*book->dim>(n-i)*2)
-        chunk=((n-i)*2+book->dim-1)/book->dim;
+      if (16*dim>n)
+        chunk=(n*2-1)/dim + 1;
       read = decode_packed_block(book,b,entries,chunk);
       for(k=0;k<read;k++){
-        const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
-        const ogg_int32_t *u = t+book->dim;
+        const ogg_int32_t *t = vlist+entries[k]*dim;
+        const ogg_int32_t *u = t+dim;
         do{
           *p0++ += *t++>>shift;
           *p1++ += *t++>>shift;
         }while(t<u);
       }
       if (read<chunk)return-1;
-      i += read*book->dim/2;
+      n -= read*dim/2;
     }
   }else{
     shift = -shift;
-    for(i=0;i<n;){
+    while(n>0){
       chunk=32;
-      if (chunk*book->dim>(n-i)*2)
-        chunk=((n-i)*2+book->dim-1)/book->dim;
+      if (16*dim>n)
+        chunk=(n*2-1)/dim + 1;
       read = decode_packed_block(book,b,entries,chunk);
       for(k=0;k<read;k++){
-        const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
-        const ogg_int32_t *u = t+book->dim;
+        const ogg_int32_t *t = vlist+entries[k]*dim;
+        const ogg_int32_t *u = t+dim;
         do{
           *p0++ += *t++<<shift;
           *p1++ += *t++<<shift;
         }while(t<u);
       }
       if (read<chunk)return-1;
-      i += read*book->dim/2;
+      n -= read*dim/2;
     }
   }
   return(0);
