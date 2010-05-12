@@ -42,9 +42,9 @@
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 128
+#define MAX_FILETYPES 192
 #else
-#define MAX_FILETYPES 64
+#define MAX_FILETYPES 128
 #endif
 
 /* a table for the know file types */
