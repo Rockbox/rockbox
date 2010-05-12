@@ -235,12 +235,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
 
-    addr = (void *)(((long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     /* Set up DMA transfer  */
     SAR0 = (unsigned long)addr;   /* Source address      */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
@@ -382,12 +376,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
     /* stop any DMA in progress */
     pcm_rec_dma_stop();
 
-    addr = (void *)(((long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
 
     /* Start the DMA transfer.. */
@@ -396,7 +384,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
-    pcm_rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
     SAR1 = (unsigned long)&PDIR2; /* Source address      */
     DAR1 = (unsigned long)addr;   /* Destination address */
     BCR1 = (unsigned long)size;   /* Bytes to transfer   */
@@ -490,30 +477,15 @@ void DMA1(void)
 } /* DMA1 */
 
 /* Continue transferring data in - call from interrupt callback */
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
-    start = (void *)(((long)start + 3) & ~3);
-    size &= ~3;
-
-    pcm_rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
     DAR1 = (unsigned long)start;     /* Destination address */
     BCR1 = (unsigned long)size;      /* Bytes to transfer */
     or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
 } /* pcm_record_more */
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    unsigned long addr, end;
-
-    /* Make sure interrupt doesn't change the second value after we read the
-     * first value. */
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-    addr = (unsigned long)pcm_rec_peak_addr;
-    end = DAR1;
-    restore_irq(level);
-
-    addr >>= 2;
-    *count = (end >> 2) - addr;
-    return (void *)(addr << 2);
+    return (void *)(DAR1 & ~3);
 } /* pcm_rec_dma_get_peak_buffer */
 #endif

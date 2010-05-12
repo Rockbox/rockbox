@@ -220,6 +220,7 @@
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
 #define HAVE_PCM_DMA_ADDRESS
+#define HAVE_PCM_REC_DMA_ADDRESS
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

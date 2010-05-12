@@ -431,18 +431,12 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    addr = (void *)(((long)addr + 2) & ~3);
-    size &= ~3;
-
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
     dma_play_data.core = processor_id(); /* save initiating core */
 #endif
 
     pcm_play_dma_stop();
-
-    if (size == 0)
-        return;
 
 #ifdef CPU_PP502x
     if ((unsigned long)addr < UNCACHED_BASE_ADDR) {
@@ -691,9 +685,8 @@ void fiq_record(void)
 #endif /* SANSA_E200 */
 
 /* Continue transferring data in */
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
-    pcm_rec_peak_addr = start; /* Start peaking at dest */
     dma_rec_data.addr = (unsigned long)start; /* Start of RX buffer */
     dma_rec_data.size = size; /* Bytes to transfer */
 }
@@ -718,7 +711,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
 {
     pcm_rec_dma_stop();
 
-    pcm_rec_peak_addr = addr;
     dma_rec_data.addr = (unsigned long)addr;
     dma_rec_data.size = size;
 #if NUM_CORES > 1
@@ -749,17 +741,9 @@ void pcm_rec_dma_init(void)
     pcm_rec_dma_stop();
 } /* pcm_init */
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    unsigned long addr, end;
-
-    int status = disable_fiq_save();
-    addr = (unsigned long)pcm_rec_peak_addr;
-    end = dma_rec_data.addr;
-    restore_fiq(status);
-
-    *count = (end >> 2) - (addr >> 2);
-    return (void *)(addr & ~3);
+    return (void *)((unsigned long)dma_rec_data.addr & ~3);
 } /* pcm_rec_dma_get_peak_buffer */
 
 #endif /* HAVE_RECORDING */

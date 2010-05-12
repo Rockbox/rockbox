@@ -367,7 +367,7 @@ void pcm_rec_unlock(void)
 {
 }
 
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
     (void)start;
     (void)size;
@@ -393,9 +393,9 @@ void pcm_rec_dma_init(void)
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    (void)count;
+    return NULL;
 }
 
 #endif /* HAVE_RECORDING */

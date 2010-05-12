@@ -432,17 +432,13 @@ void pcm_rec_unlock(void)
     }
 }
 
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
-    start = (void *)(((unsigned long)start + 3) & ~3);
-    size &= ~3;
-
     /* Invalidate - buffer must be coherent */
     dump_dcache_range(start, size);
 
     start = (void *)addr_virt_to_phys((unsigned long)start);
 
-    pcm_rec_peak_addr = start;
     dma_rec_bd.buf_addr = start;
     dma_rec_bd.mode.count = size;
     dma_rec_bd.mode.command = TRANSFER_16BIT;
@@ -469,12 +465,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
 {
     pcm_rec_dma_stop();
 
-    addr = (void *)(((unsigned long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     if (!sdma_channel_reset(DMA_REC_CH_NUM))
         return;
     
@@ -482,7 +472,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
     dump_dcache_range(addr, size);
 
     addr = (void *)addr_virt_to_phys((unsigned long)addr);
-    pcm_rec_peak_addr = addr;
     dma_rec_bd.buf_addr = addr;
     dma_rec_bd.mode.count = size;
     dma_rec_bd.mode.command = TRANSFER_16BIT;
@@ -524,10 +513,10 @@ void pcm_rec_dma_init(void)
     sdma_channel_set_priority(DMA_REC_CH_NUM, DMA_REC_CH_PRIORITY);
 }
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
     static unsigned long pda NOCACHEBSS_ATTR;
-    unsigned long buf, addr, end, bufend;
+    unsigned long buf, end, bufend;
     int oldstatus;
 
     /* read burst dma destination address register in channel context */
@@ -536,19 +525,13 @@ const void * pcm_rec_dma_get_peak_buffer(int *count)
     oldstatus = disable_irq_save();
     end = pda;
     buf = (unsigned long)dma_rec_bd.buf_addr;
-    addr = (unsigned long)pcm_rec_peak_addr;
     bufend = buf + dma_rec_bd.mode.count;
     restore_irq(oldstatus);
 
     /* Be addresses are coherent (no buffer change during read) */
-    if (addr >= buf && addr < bufend &&
-        end >= buf && end < bufend)
-    {
-        *count = (end >> 2) - (addr >> 2);
-        return (void *)(addr & ~3);
-    }
+    if (end >= buf && end < bufend)
+        return (void *)(end & ~3);
 
-    *count = 0;
     return NULL;
 }
 

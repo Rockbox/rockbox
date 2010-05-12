@@ -202,7 +202,7 @@ void pcm_rec_unlock(void)
 }
 
 
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
     rec_start_addr = start;
     rec_size = size;
@@ -331,16 +331,9 @@ void pcm_rec_dma_init(void)
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    const void *peak_buffer;
-
-    pcm_rec_lock();
-    *count = rec_size >> 2;
-    peak_buffer = (const void*)rec_start_addr;
-    pcm_rec_unlock();
-
-    return peak_buffer;
+    return (const void*)rec_start_addr;
 }
 
 #endif /* HAVE_RECORDING */

@@ -288,13 +288,12 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    *count = 0;
     return NULL;
 }
 
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_dma_record_more(void *start, size_t size)
 {
     (void) start;
     (void) size;

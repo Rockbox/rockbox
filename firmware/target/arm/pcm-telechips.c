@@ -141,8 +141,8 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_play_data.p    = (void *)(((uintptr_t)addr + 2) & ~3);
-    dma_play_data.size = (size & ~3);
+    dma_play_data.p    = addr;
+    dma_play_data.size = size;
 
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
@@ -229,9 +229,8 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    *count = 0;
     return NULL;
 }
 
