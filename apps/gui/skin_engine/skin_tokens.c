@@ -344,6 +344,16 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 }
 
 #if CONFIG_TUNER
+
+/* Formats the frequency (specified in Hz) in MHz, */
+/* with two digits after the decimal point         */
+static void format_freq_MHz(int freq, char *buf, int buf_size)
+{
+    freq = freq / 10000;
+    snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+}
+
+
 /* Tokens which are really only used by the radio screen go in here */
 const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval)
@@ -366,20 +376,20 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             return NULL;
         case WPS_TOKEN_TUNER_MINFREQ: /* changes based on "region" */
         {
-            int freq = fm_region_data[global_settings.fm_region].freq_min / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+            format_freq_MHz(fm_region_data[global_settings.fm_region].freq_min,
+                            buf, buf_size);
             return buf;
         }
         case WPS_TOKEN_TUNER_MAXFREQ: /* changes based on "region" */
         {
-            int freq = fm_region_data[global_settings.fm_region].freq_max / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+            format_freq_MHz(fm_region_data[global_settings.fm_region].freq_max,
+                            buf, buf_size);
             return buf;
         }
         case WPS_TOKEN_TUNER_CURFREQ:
         {
-            int freq = radio_current_frequency() / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+            format_freq_MHz(radio_current_frequency(),
+                            buf, buf_size);
             return buf;
         }
         case WPS_TOKEN_PRESET_ID:
@@ -401,8 +411,8 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             }
             else
             {
-                int freq = radio_get_preset(preset)->frequency / 10000;
-                snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+                format_freq_MHz(radio_get_preset(preset)->frequency,
+                                buf, buf_size);
             }
             return buf;
         }
