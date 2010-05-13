@@ -168,41 +168,51 @@ file find the instructions on the Rockbox website:
   \opt{lcd_color}{\input{advanced_topics/viewports/colour-uivp-syntax.tex}}
 }
 
-\section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
+\section{\label{ref:ConfiguringtheWPS}Configuring the Theme}
 
-\subsection{WPS -- General Info}
+\subsection{Themeing -- General Info}
 
-\begin{description}
-\item[Description: ] The WPS or \setting{While Playing Screen} is the name used
-  to describe the information displayed on the \daps{} screen whilst an audio
-  track is being played. The default WPS is a relatively simple screen
-  displaying Track name, Artist, Album etc. in the default font as a purely
-  text based layout. There are a number of WPS files included in Rockbox, and
+  There are various different aspects of the Rockbox interface
+  that can be themed -- the WPS or \setting{While Playing Screen}, the FMS or
+  \setting{FM Screen} (if the \dap{} has a tuner), and the SBS or
+  \setting{custom status bar}. The WPS is the name used to
+  describe the information displayed on the \daps{} screen whilst an audio
+  track is being played, the FMS is the screen shown while listening to the
+  radio, and the SBS lets you specify a custom status bar that is shown in the
+  menus and browsers, as well as the WPS and FMS. The SBS also allows you to
+  control certain aspects of the appearance of the menus/browsers.
+  There are a number of themes included in Rockbox, and
   you can load one of these at any time by selecting it in
-  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ While Playing Screen}.
-  \opt{HAVE_REMOTE_LCD}{There is a related option to browse \fname{.rwps} 
-    files for \daps{} with LCD remote controls installed. This will load a 
-    similar WPS screen for the remote.}
+  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Browse Theme Files}.
+  It is also possible to set individual items of a theme from within the
+  \setting{Settings $\rightarrow$ Theme Settings} menu.
 
-\note{``Playing'' a \fname{.wps} from the \setting{File Browser} has the same effect.}
 
-\item [File Location: ]Custom WPS files may be located anywhere on the drive. 
-  The only restriction is that they must end in \fname{.wps}. When you ``play''
-  a \fname{.wps} file, it will be used for future WPS screens, and if the 
-  ``played'' \fname{.wps} file is located in the \fname{/.rockbox/wps} directory, it 
-  will be remembered and used after reboot. The name of the \fname{.wps} file must be 
-  no more than 24 characters long for it to be remembered.
-\end{description}
-
-\subsection{\label{ref:CreateYourOwnWPS}WPS -- Build Your Own}
-Quite simply, enter the WPS code in your favourite text editor, Notepad on
-Windows works fine. When you save it, instead of saving it as a \fname{.txt} 
-file, save it as a \fname{.wps} file. Example: Instead of \fname{Rockbox.txt}, 
-save the file as \fname{Rockbox.wps}. To make sure non english characters 
+\subsection{\label{ref:CreateYourOwnWPS}Themes -- Create Your Own}
+The theme files are simple text files, and can be created (or edited) in your
+favourite text editor. To make sure non-English characters 
 display correctly in your WPS you must save the .wps file with UTF-8 character 
 encoding. This can be done in most editors, for example Notepad in Windows 2000
-or XP (but not in 9x/ME) can do this. See appendix \reference{ref:wps_tags} for
-all the tags that are available.
+or XP (but not in 9x/ME) can do this.
+
+\begin{description}
+\item [Files Locations: ] Each different ``themeable'' aspect requires its own file --
+  WPS files have the extension \fname{.wps}, FM screen files have the extension
+  \fname{.fms}, and SBS files have the extension \fname{.sbs}. The main theme
+  file has the extension \fname{.cfg}. All files should have the same name.
+  
+  The theme \fname{.cfg} file should be placed in the \fname{/.rockbox/themes}
+  directory, while the \fname{.wps}, \fname{.fms} and \fname{.sbs} files should
+  be placed in the \fname{/.rockbox/wps} directory. Any images used by the
+  theme should be placed in a subdirectory of \fname{/.rockbox/wps} with the
+  same name as the theme, e.g. if the theme files are named
+  \fname{mytheme.wps, mytheme.sbs} etc., then the images should be placed in
+  \fname{/.rockbox/wps/mytheme}.
+\end{description}
+
+All full list of the available tags are given in appendix
+\reference{ref:wps_tags}; some of the more powerful concepts in theme designe
+are discussed below.
 
 \begin{itemize}
 \item All characters not preceded by \% are displayed as typed.
