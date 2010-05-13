@@ -378,6 +378,30 @@ Examples:
 \end{enumerate}
 }
 
+\section{FM Radio}
+  \begin{tagmap}
+    \config{\%tp} & Does this target have a radio? If it doesn't, the "true"
+      branch of this conditional is completly ignored so you don't need to
+      worry about tags which are not recognized on non radio targets.\\
+    \config{\%tt} & Is the tuner tuned?\\
+    \config{\%tm} & Scan or preset mode? Scan is "true", preset is "false"\\
+    \config{\%ts} & Is the station in stereo?\\
+    \config{\%ta} & Minimum frequency (region specific) in MHz, with two
+      decimal digits.\\
+    \config{\%tb} & Maximum frequency (region specific) in MHz, with two
+      decimal digits.\\
+    \config{\%tf} & Current frequency in MHz, with two decimal digits.\\
+    \config{\%Ti} & Current preset id, i.e. 1-based number of the preset
+      within the presets list (usable in playlist viewer).\\
+    \config{\%Tn} & Current preset name (usable in playlist viewer).\\
+    \config{\%Tf} & Current preset frequency (usable in playlist viewer).\\
+    \config{\%Tc} & Preset count, i.e. the number of stations in the current
+      preset list.\\
+    \config{\%tx} & Is RDS available?\\
+    \config{\%ty} & RDS name.\\
+    \config{\%tz} & RDS text.\\
+  \end{tagmap}
+
 \section{Alignment}
   \begin{tagmap}
     \config{\%al} & Align the text left\\
