@@ -48,7 +48,7 @@ static unsigned char isobuffers[ISO_BUFFERS_SIZE + 4] IBSS_ATTR;
 static unsigned char *iso_buffers_end = isobuffers + ISO_BUFFERS_SIZE;
 static unsigned int pcm_buffer_size;
 
-static decoder tta[MAX_NCH];     /* decoder state */
+static decoder tta[MAX_NCH] IBSS_ATTR;     /* decoder state */
 /* Rockbox speciffic: cache is defined in get_samples() (non static value) */
 /* static int     cache[MAX_NCH];   // decoder cache */
 
