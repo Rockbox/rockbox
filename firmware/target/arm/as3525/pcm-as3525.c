@@ -260,7 +260,6 @@ void pcm_rec_dma_stop(void)
 {
     dma_disable_channel(1);
     rec_dma_size = 0;
-    dma_release();
 
     I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
     I2SIN_CONTROL &= ~(1<<11); /* disable dma */
@@ -291,6 +290,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
 void pcm_rec_dma_close(void)
 {
+    dma_release();
 }
 
 
@@ -311,7 +311,7 @@ void pcm_rec_dma_init(void)
 
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    return rec_dma_start_addr;
+    return UNCACHED_ADDR((void*)DMAC_CH_DST_ADDR(1));
 }
 
 #endif /* HAVE_RECORDING */
