@@ -980,7 +980,6 @@ int recording_callback(int status)
 {
     (void) status;
     
-    rb->pcm_stop_recording();
     recording=0;
     return -1;  
 }
