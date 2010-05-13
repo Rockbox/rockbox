@@ -92,46 +92,46 @@ unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
 /**
- * Do peak calculation using distance squared from axis and save a lot
- * of jumps and negation. Don't bother with the calculations of left or
- * right only as it's never really used and won't save much time.
+ * Perform peak calculation on a buffer of packed 16-bit samples.
  *
  * Used for recording and playback.
  */
-static void pcm_peak_peeker(const void *addr, int count, int peaks[2])
+static void pcm_peak_peeker(const int32_t *addr, int count, int peaks[2])
 {
-    int32_t peak_l = 0, peak_r = 0;
-    int32_t peaksq_l = 0, peaksq_r = 0;
+    int peak_l = 0, peak_r = 0;
+    const int32_t * const end = addr + count;
 
     do
     {
-        int32_t value = *(int32_t *)addr;
-        int32_t ch, chsq;
+        int32_t value = *addr;
+        int ch;
+
 #ifdef ROCKBOX_BIG_ENDIAN
         ch = value >> 16;
 #else
         ch = (int16_t)value;
 #endif
-        chsq = ch*ch;
-        if (chsq > peaksq_l)
-            peak_l = ch, peaksq_l = chsq;
+        if (ch < 0)
+            ch = -ch;
+        if (ch > peak_l)
+            peak_l = ch;
 
 #ifdef ROCKBOX_BIG_ENDIAN
         ch = (int16_t)value;
 #else
         ch = value >> 16;
 #endif
-        chsq = ch*ch;
-        if (chsq > peaksq_r)
-            peak_r = ch, peaksq_r = chsq;
+        if (ch < 0)
+            ch = -ch;
+        if (ch > peak_r)
+            peak_r = ch;
 
-        addr += 16;
-        count -= 4;
+        addr += 4;
     }
-    while (count > 0);
+    while (addr < end);
 
-    peaks[0] = abs(peak_l);
-    peaks[1] = abs(peak_r);
+    peaks[0] = peak_l;
+    peaks[1] = peak_r;
 }
 
 void pcm_calculate_peaks(int *left, int *right)
@@ -167,7 +167,7 @@ void pcm_calculate_peaks(int *left, int *right)
         count = MIN(framecount, count);
 
         if (count > 0)
-            pcm_peak_peeker(addr, count, peaks);
+            pcm_peak_peeker((int32_t *)addr, count, peaks);
         /* else keep previous peak values */
     }
     else
@@ -390,7 +390,7 @@ void pcm_calculate_rec_peaks(int *left, int *right)
 
             if (count > 0)
             {
-                pcm_peak_peeker(peak_addr, count, peaks);
+                pcm_peak_peeker((int32_t *)peak_addr, count, peaks);
 
                 if (peak_addr == pcm_rec_peak_addr)
                     pcm_rec_peak_addr = addr;
