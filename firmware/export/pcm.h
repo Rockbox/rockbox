@@ -120,7 +120,7 @@ void pcm_rec_unlock(void);
 
 /* Initialize pcm recording interface */
 void pcm_init_recording(void);
-/* Uninitialze pcm recording interface */
+/* Uninitialize pcm recording interface */
 void pcm_close_recording(void);
 
 /* Start recording "raw" PCM data */
