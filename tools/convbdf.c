@@ -423,6 +423,12 @@ int main(int ac, char **av)
         usage();
         exit(1);
     }
+
+    if (gen_c && gen_fnt) {
+        print_info(".c and .fnt files can not be produced in the same run!\n");
+        exit(1);
+    }
+
     if (oflag) {
         if (ac > 1 || (gen_c && gen_fnt) || (gen_c && gen_h) || (gen_h && gen_fnt)) {
             usage();
