@@ -517,6 +517,7 @@ CE lines
 
 /* PCM addresses for obtaining buffers will be what DMA is using (physical) */
 #define HAVE_PCM_DMA_ADDRESS
+#define HAVE_PCM_REC_DMA_ADDRESS
 
 /* Timer frequency */
 #define TIMER_FREQ (24000000 / 16)

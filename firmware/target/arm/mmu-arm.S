@@ -262,7 +262,6 @@ clean_dcache_range:
     bx      lr                      @
     .size   clean_dcache_range, .-clean_dcache_range
 
-#if 0 /* unused */
 /*
  * Dump DCache for this range
  * will *NOT* do write back except for buffer edges not on a line boundary
@@ -318,7 +317,6 @@ clean_dcache_range:
     mcr     p15, 0, r0, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   dump_dcache_range, .-dump_dcache_range
-#endif /* unused function */
 
 /*
  * Cleans entire DCache
