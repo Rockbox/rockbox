@@ -134,20 +134,35 @@ void pcm_postinit(void)
     audiohw_postinit();
 }
 
-static unsigned mclk_divider(void)
+/* divider is 9 bits but the highest one (for 8kHz) fit in 8 bits */
+static const unsigned char divider[SAMPR_NUM_FREQ] = {
+    [HW_FREQ_96] = ((AS3525_MCLK_FREQ/128 + SAMPR_96/2) / SAMPR_96) - 1,
+    [HW_FREQ_88] = ((AS3525_MCLK_FREQ/128 + SAMPR_88/2) / SAMPR_88) - 1,
+    [HW_FREQ_64] = ((AS3525_MCLK_FREQ/128 + SAMPR_64/2) / SAMPR_64) - 1,
+    [HW_FREQ_48] = ((AS3525_MCLK_FREQ/128 + SAMPR_48/2) / SAMPR_48) - 1,
+    [HW_FREQ_44] = ((AS3525_MCLK_FREQ/128 + SAMPR_44/2) / SAMPR_44) - 1,
+    [HW_FREQ_32] = ((AS3525_MCLK_FREQ/128 + SAMPR_32/2) / SAMPR_32) - 1,
+    [HW_FREQ_24] = ((AS3525_MCLK_FREQ/128 + SAMPR_24/2) / SAMPR_24) - 1,
+    [HW_FREQ_22] = ((AS3525_MCLK_FREQ/128 + SAMPR_22/2) / SAMPR_22) - 1,
+    [HW_FREQ_16] = ((AS3525_MCLK_FREQ/128 + SAMPR_16/2) / SAMPR_16) - 1,
+    [HW_FREQ_12] = ((AS3525_MCLK_FREQ/128 + SAMPR_12/2) / SAMPR_12) - 1,
+    [HW_FREQ_11] = ((AS3525_MCLK_FREQ/128 + SAMPR_11/2) / SAMPR_11) - 1,
+    [HW_FREQ_8 ] = ((AS3525_MCLK_FREQ/128 + SAMPR_8 /2) / SAMPR_8 ) - 1,
+};
+
+static inline unsigned char mclk_divider(void)
 {
-    /* TODO : use a table ? */
-    return (((AS3525_MCLK_FREQ/128) + (pcm_sampr/2)) / pcm_sampr) - 1;
+    return divider[pcm_fsel];
 }
 
 void pcm_dma_apply_settings(void)
 {
-    int cgu_audio = CGU_AUDIO;  /* read register */
-    cgu_audio &= ~(3 << 0);     /* clear i2sout MCLK_SEL */
-    cgu_audio |=  (AS3525_MCLK_SEL << 0);  /* set i2sout MCLK_SEL */
-    cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
-    cgu_audio |= mclk_divider() << 2; /* set new i2sout divider */
-    CGU_AUDIO = cgu_audio;      /* write back register */
+    int cgu_audio = CGU_AUDIO;              /* read register */
+    cgu_audio &= ~(3 << 0);                 /* clear i2sout MCLK_SEL */
+    cgu_audio |=  (AS3525_MCLK_SEL << 0);   /* set i2sout MCLK_SEL */
+    cgu_audio &= ~(0x1ff << 2);             /* clear i2sout divider */
+    cgu_audio |= mclk_divider() << 2;       /* set new i2sout divider */
+    CGU_AUDIO = cgu_audio;                  /* write back register */
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -281,12 +296,12 @@ void pcm_rec_dma_close(void)
 
 void pcm_rec_dma_init(void)
 {
-    int cgu_audio = CGU_AUDIO;  /* read register */
-    cgu_audio &= ~(3 << 12);    /* clear i2sin MCLK_SEL */
+    int cgu_audio = CGU_AUDIO;              /* read register */
+    cgu_audio &= ~(3 << 12);                /* clear i2sin MCLK_SEL */
     cgu_audio |=  (AS3525_MCLK_SEL << 12);  /* set i2sin MCLK_SEL */
-    cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
-    cgu_audio |= mclk_divider() << 14; /* set new i2sin divider */
-    CGU_AUDIO = cgu_audio;      /* write back register */
+    cgu_audio &= ~(0x1ff << 14);            /* clear i2sin divider */
+    cgu_audio |= mclk_divider() << 14;      /* set new i2sin divider */
+    CGU_AUDIO = cgu_audio;                  /* write back register */
 
     /* i2c clk src = I2SOUTIF, sdata src = AFE,
      * data valid at positive edge of SCLK */
