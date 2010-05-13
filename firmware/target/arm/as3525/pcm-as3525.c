@@ -259,6 +259,7 @@ void pcm_rec_dma_record_more(void *start, size_t size)
 void pcm_rec_dma_stop(void)
 {
     dma_disable_channel(1);
+    dma_release();
     rec_dma_size = 0;
 
     I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
@@ -290,7 +291,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
 void pcm_rec_dma_close(void)
 {
-    dma_release();
 }
 
 
