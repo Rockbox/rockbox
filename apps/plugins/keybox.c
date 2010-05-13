@@ -608,6 +608,7 @@ static void reset(void)
         rb->remove(KEYBOX_FILE);
         rb->memset(&buffer, 0, sizeof(buffer));
         rb->memset(&pw_list, 0, sizeof(pw_list));
+        rb->gui_synclist_set_nb_items(&kb_list, 0);
         init_ll();
     }
 }
