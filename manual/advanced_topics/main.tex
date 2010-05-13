@@ -283,6 +283,24 @@ with one \%Vd line.
 
 \note{The tag to display conditional viewports must come before the tag to
 preload the viewport in the \fname{.wps} file.}
+
+\subsection{Info Viewport (SBS only)}
+As mentioned above, it is possible to set a UI viewport via the theme
+\fname{.cfg} file. It is also possible to set the UI viewport through the SBS
+file, and to conditionally select different UI viewports.
+
+  \begin{itemize}
+    \item {\config{\%Vi{\textbar}'label'{\textbar}\dots{\textbar}}}
+    This viewport is used as Custom UI Viewport in the case that the theme
+    doesn't have a ui viewport set in the theme \fname{.cfg} file. Having this
+    is strongly recommended since it makes you able to use the SBS
+    with other themes. If label is set this viewport can be selectivly used as the
+    Info Viewport using the \%VI tag. The '\dots' parameters use the same logic as
+    the \config{\%V} tag explained above.
+
+    \item {\config{\%VI'label'}} Set the Info Viewport to use the viewport called
+    label, as declared with the previous tag.
+  \end{itemize}
 }
 
 \subsubsection{Conditional Tags}

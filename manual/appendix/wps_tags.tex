@@ -54,6 +54,13 @@ show the information for the next song to be played.
       \config{\%Vd'identifier'} & Display the `identifier' viewport. E.g.
       \config{\%?C{\textless}\%Vda{\textbar}\%Vdb{\textgreater}}
       will show viewport `a' if album art is found, and `b' if it isn't.\\
+
+      \config{\%Vi{\textbar}'label'{\textbar}\dots{\textbar}} &
+      Declare a Custom UI Viewport. The '\dots' parameters use the same logic as
+      the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
+
+      \config{\%VI'label'} & Set the Info Viewport to use the viewport called
+      label, as declared with the previous tag.\\
     \end{tagmap}
 }
 
