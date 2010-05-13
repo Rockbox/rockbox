@@ -164,7 +164,7 @@ static void draw_progressbar(struct gui_wps *gwps,
         elapsed = id3->elapsed + state->ff_rewind_count;
     }
 #if CONFIG_TUNER
-    else if (in_radio_screen())
+    else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
     {
         int min = fm_region_data[global_settings.fm_region].freq_min;
         elapsed = radio_current_frequency() - min;

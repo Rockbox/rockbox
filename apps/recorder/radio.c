@@ -715,8 +715,6 @@ int radio_screen(void)
                                 radio_save_presets();
                         }
                     }
-                    /* Clear the preset list on exit. */
-                    clear_preset_list();
                 }
                 update_screen = true;
                 break;
@@ -770,9 +768,6 @@ int radio_screen(void)
                             radio_save_presets();
                     }
                 }
-
-                /* Clear the preset list on exit. */
-                clear_preset_list();
 
                 break;
 
@@ -1316,7 +1311,6 @@ static int clear_preset_list(void)
     /* The preset list will be cleared switch to Scan Mode. */
     radio_mode = RADIO_SCAN_MODE;
     curr_preset = -1;
-
     presets_changed = false; /* Don't ask to save when clearing the list. */
 
     return true;
