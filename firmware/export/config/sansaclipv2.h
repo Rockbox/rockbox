@@ -147,14 +147,16 @@
 #define CONFIG_CPU AS3525v2
 
 /* Define this if you want to use the AS3525 i2c interface */
-#define CONFIG_I2C I2C_AS3525   /* FIXME : looks similar to AS353x interface */
+#define CONFIG_I2C I2C_AS3525
 
 /* define this if the hardware can be powered off while charging */
 /* Sansa can't be powered off while charging */
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
 
-/* The start address index for ROM builds */
-#define ROM_START 0x00000000
+/* define current usage levels (based on battery bench) */
+#define CURRENT_NORMAL     23
+#define CURRENT_BACKLIGHT  15
+#define CURRENT_RECORD     11
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      240000000
