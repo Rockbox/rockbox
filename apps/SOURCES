@@ -197,6 +197,7 @@ metadata/oma.c
 metadata/smaf.c
 metadata/au.c
 metadata/vox.c
+metadata/tta.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

@@ -640,7 +640,7 @@ bool setid3v1title(int fd, struct mp3entry *entry)
  *
  * Returns: true if a title was found and created, else false
  */
-static void setid3v2title(int fd, struct mp3entry *entry)
+void setid3v2title(int fd, struct mp3entry *entry)
 {
     int minframesize;
     int size;
