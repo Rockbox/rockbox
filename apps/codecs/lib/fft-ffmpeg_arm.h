@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
+ * $Id$
  *
  * Copyright (C) 2010 Dave Hooper
  *
@@ -285,11 +285,10 @@ static inline void fft8( FFTComplex * z )
     {
         FFTSample temp;
         fixed32 * m4 = (fixed32 *)(&(z[4].re));
-        
+
         asm volatile(
-            "add %[z_ptr], %[z_ptr], #16\n\t"  /* point to &z[2].re */
             /* read in z[4].re thru z[7].im */
-            "ldmia %[z4_ptr]!, {r1,r2,r3,r4,r5,r6,r7,r8}\n\t"
+            "ldmia %[z4_ptr]!, {r1-r8}\n\t"
             /* (now points one word past &z[7].im) */
             "add r1,r1,r3\n\t"
             "sub r3,r1,r3,lsl #1\n\t"
@@ -299,32 +298,31 @@ static inline void fft8( FFTComplex * z )
             "sub r7,r5,r7\n\t"
             "add r5,r6,r8\n\t"
             "sub r8,r6,r8\n\t"
-            
+
             "stmdb %[z4_ptr]!, {r7,r8}\n\t" /* write z[7].re,z[7].im  straight away */
                                             /* Note, registers r7 & r8 now free */
-            
+
             "sub r6,%[temp],r1\n\t"
             "add r1,%[temp],r1\n\t"
             "add r2,r2,r5\n\t"
             "sub r5,r2,r5,lsl #1\n\t"
-            
-            "ldmia %[z_ptr],{r7,r8}\n\t"  /* load z[2].re and z[2].im */
+            "add %[temp], %[z_ptr], #16\n\t"  /* point to &z[2].re */
+            "ldmia %[temp],{r7,r8}\n\t"  /* load z[2].re and z[2].im */
             "add r7,r7,r5\n\t"
             "sub r5,r7,r5,lsl #1\n\t"
             "add r8,r8,r6\n\t"
             "sub r6,r8,r6,lsl #1\n\t"
-            
+
             /* write out z[5].re, z[5].im, z[6].re, z[6].im in one go*/
-            "stmdb %[z4_ptr]!, {r3,r4,r5,r6}\n\t"
-            "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[2].re, z[2].im */
-            "sub %[z_ptr],%[z_ptr], #16\n\t" /* point z_ptr back to &z[0].re */
+            "stmdb %[z4_ptr]!, {r3-r6}\n\t"
+            "stmia %[temp],{r7,r8}\n\t" /* write out z[2].re, z[2].im */
             "ldmia %[z_ptr],{r7,r8}\n\t" /* load r[0].re, r[0].im */
-            
+
             "add r7,r7,r1\n\t"
             "sub r1,r7,r1,lsl #1\n\t"
             "add r8,r8,r2\n\t"
             "sub r2,r8,r2,lsl #1\n\t"
-            
+
             "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[0].re, z[0].im */
             "stmdb %[z4_ptr], {r1,r2}\n\t" /* write out z[4].re, z[4].im */
             : [z4_ptr] "+r" (m4), [z_ptr] "+r" (z), [temp] "=r" (temp)
@@ -332,7 +330,7 @@ static inline void fft8( FFTComplex * z )
             : "r1","r2","r3","r4","r5","r6","r7","r8","memory"
         );
     }
-    
+
     z++;
     TRANSFORM_EQUAL(z,2);
 }

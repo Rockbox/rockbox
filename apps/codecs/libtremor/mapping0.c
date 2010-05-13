@@ -184,16 +184,17 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
       register int temp;\
       asm( "cmp %[mag], #0\n\t"\
            "cmpgt %[ang], #0\n\t"\
-           "subgt %[temp], %[mag], %[ang]\n\t"\
+           "subgt %[ang], %[mag], %[ang]\n\t"\
            "bgt 1f\n\t"\
            "cmp %[mag], #0\n\t"\
            "cmple %[ang], #0\n\t"\
            "addgt %[temp], %[mag], %[ang]\n\t"\
            "suble %[temp], %[mag], %[ang]\n\t"\
-           "1: cmp %[ang], #0\n\t"\
+           "cmp %[ang], #0\n\t"\
            "movle %[ang], %[mag]\n\t"\
            "movle %[mag], %[temp]\n\t"\
            "movgt %[ang], %[temp]\n\t"\
+           "1:\n\t"\
            : [mag] "+r" ( ( _mag ) ), [ang] "+r" ( ( _ang ) ), [temp] "=&r" (temp)\
            :\
            : "cc" );\
