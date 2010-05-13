@@ -158,11 +158,6 @@ static void draw_progressbar(struct gui_wps *gwps,
         length = 100;
         elapsed = battery_level();
     }
-    else if (id3 && id3->length)
-    {
-        length = id3->length;
-        elapsed = id3->elapsed + state->ff_rewind_count;
-    }
 #if CONFIG_TUNER
     else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
     {
@@ -171,6 +166,11 @@ static void draw_progressbar(struct gui_wps *gwps,
         length = fm_region_data[global_settings.fm_region].freq_max - min;
     }
 #endif
+    else if (id3 && id3->length)
+    {
+        length = id3->length;
+        elapsed = id3->elapsed + state->ff_rewind_count;
+    }
     else
     {
         length = 1;
