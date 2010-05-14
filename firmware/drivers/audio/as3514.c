@@ -64,7 +64,7 @@
 #endif
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB",   0,   1, -74,   6, -25},
+    [SOUND_VOLUME]        = {"dB",   0,   1, -73,   6, -25},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB",   0,   1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB",   0,   1, -24,  24,   0},
@@ -240,7 +240,6 @@ static void audiohw_mute(bool mute)
 {
     if (mute) {
         as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-
     } else {
         as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
     }
@@ -262,6 +261,12 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
+
+    if(vol_l == 0 && vol_r == 0)
+    {
+        audiohw_mute(true);
+        return;
+    }
 
     /* We combine the mixer channel volume range with the headphone volume
        range - keep first stage as loud as possible */
@@ -289,6 +294,8 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 #endif
     as3514_write_masked(AS3514_HPH_OUT_R, hph_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_HPH_OUT_L, hph_l, AS3514_VOL_MASK);
+
+    audiohw_mute(false);
 }
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
