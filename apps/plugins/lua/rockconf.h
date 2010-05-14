@@ -51,8 +51,11 @@ struct tm *gmtime(const time_t *timep);
 long strtol(const char *nptr, char **endptr, int base);
 unsigned long strtoul(const char *str, char **endptr, int base);
 size_t strftime(char* dst, size_t max, const char* format, const struct tm* tm);
-long floor(long x);
-long pow(long x, long y);
+long lfloor(long x);
+long lpow(long x, long y);
+
+#define floor   lfloor
+#define pow     lpow
 
 /* Simple substitutions */
 #define realloc  dlrealloc

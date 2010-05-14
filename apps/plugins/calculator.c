@@ -80,6 +80,9 @@ F3: equal to "="
 
 PLUGIN_HEADER
 
+
+#define M_TWOPI         (M_PI * 2.0)
+
 #define BUTTON_ROWS 5
 #define BUTTON_COLS 5
 
