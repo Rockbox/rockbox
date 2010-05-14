@@ -120,24 +120,33 @@ mpc_demux_fill(mpc_demux * d, mpc_uint32_t min_bytes, int flags)
  */
 static void
 mpc_demux_seek(mpc_demux * d, mpc_seek_t fpos, mpc_uint32_t min_bytes) {
-    mpc_seek_t next_pos;
-    mpc_int_t bit_offset;
+    // d->bits_reader.buff - d->buffer = current byte position within buffer
+    // d->bytes_total = buffer is filled with bytes_total bytes
+    // fpos = desired file position in bit (not byte)
+    // buf_fpos = desired byte position within buffer
+    mpc_seek_t next_pos = fpos>>3;
+    mpc_int_t buf_fpos = next_pos - d->r->tell(d->r) + d->bytes_total;
 
-    // FIXME : do not flush the buffer if fpos is in the current buffer
-
-    next_pos = fpos >> 3;
-    if (d->si.stream_version == 7)
-        next_pos = ((next_pos - d->si.header_position) & (-1 << 2)) + d->si.header_position;
-    bit_offset = (int) (fpos - (next_pos << 3));
-
-    d->r->seek(d->r, (mpc_int32_t) next_pos);
-    mpc_demux_clear_buff(d);
-    if (d->si.stream_version == 7)
-        mpc_demux_fill(d, (min_bytes + ((bit_offset + 7) >> 3) + 3) & (~3), MPC_BUFFER_SWAP);
-    else
-        mpc_demux_fill(d, min_bytes + ((bit_offset + 7) >> 3), 0);
-    d->bits_reader.buff += bit_offset >> 3;
-    d->bits_reader.count = 8 - (bit_offset & 7);
+    // is desired byte position within lower and upper boundaries of buffer?
+    if (buf_fpos >= 0 && buf_fpos + min_bytes <= DEMUX_BUFFER_SIZE) {
+        // desired bytes are available in current buffer
+        d->bits_reader.buff += buf_fpos - (d->bits_reader.buff - d->buffer);
+        d->bits_reader.count = 8 - (fpos & 7);
+    } else {
+        // buffer needs to be refilled
+        if (d->si.stream_version == 7)
+            next_pos = ((next_pos - d->si.header_position) & (-1 << 2)) + d->si.header_position;
+        buf_fpos = fpos - (next_pos << 3);
+    
+        d->r->seek(d->r, (mpc_int32_t) next_pos);
+        mpc_demux_clear_buff(d);
+        if (d->si.stream_version == 7)
+            mpc_demux_fill(d, DEMUX_BUFFER_SIZE, MPC_BUFFER_SWAP);
+        else
+            mpc_demux_fill(d, DEMUX_BUFFER_SIZE, 0);
+        d->bits_reader.buff += buf_fpos >> 3;
+        d->bits_reader.count = 8 - (buf_fpos & 7);
+    }
 }
 
 /**
