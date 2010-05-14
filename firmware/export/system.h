@@ -295,10 +295,14 @@ static inline void cpucache_flush(void)
 }
 #endif
 
+#ifndef CACHEALIGN_SIZE /* could be elsewhere for a particular reason */
 #ifdef CACHEALIGN_BITS
 /* 2^CACHEALIGN_BITS = the byte size */
 #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
+#else
+#define CACHEALIGN_SIZE sizeof(int)
 #endif
+#endif /* CACHEALIGN_SIZE */
 
 #ifdef PROC_NEEDS_CACHEALIGN
 /* Cache alignment attributes and sizes are enabled */

@@ -251,7 +251,7 @@ static int audio_head = 0; /* which of the two buffers to use? */
 static volatile int audio_tail = 0; /* which of the two buffers to record? */
 /* It's stereo, so make the buffer twice as big */
 #ifndef SIMULATOR
-static int16_t audio_data[2][BUFFER_SIZE];
+static int16_t audio_data[2][BUFFER_SIZE] __attribute__((aligned(CACHEALIGN_SIZE)));
 static fixed yin_buffer[YIN_BUFFER_SIZE];
 #endif
 
