@@ -52,6 +52,9 @@
 #define     INTERNAL_AS3525  0   /* embedded SD card */
 #define     SD_SLOT_AS3525   1   /* SD slot if present */
 
+/* Clipv2 Clip+ and Fuzev2 OF all occupy the same size */
+#define AMS_OF_SIZE 0xf000
+
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
@@ -532,6 +535,9 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
+    if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
+        card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
+
     /*  Card back to full speed  */
     MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
@@ -786,7 +792,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
-        start += 0xf000;
+        start += AMS_OF_SIZE;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
@@ -804,9 +810,15 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
     }
 
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -18;
+        goto sd_transfer_error;
+    }
+
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -18;
+        return -19;
 
     last_disk_activity = current_tick;
     dma_retain();
@@ -896,7 +908,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -19;
+        return -20;
 
 #ifndef BOOTLOADER
     sd_enable(false);
