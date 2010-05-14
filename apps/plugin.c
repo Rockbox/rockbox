@@ -598,7 +598,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* misc */
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if !defined(SIMULATOR)
     &errno,
 #endif
     srand,

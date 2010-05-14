@@ -20,9 +20,9 @@
  ****************************************************************************/
 
 
-#include <string.h>
-#include "strlcpy.h"
-#include "strlcat.h"
-#include "strcasecmp.h"
-#include "strcasestr.h"
-#include "strtok_r.h"
+#ifndef __STRTOK_R_H__
+#define __STRTOK_R_H__
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+char    *strtok_r(char *, const char *, char **);
+#endif
+#endif

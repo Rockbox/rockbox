@@ -27,6 +27,7 @@
  * pretend stdio.h is implemented. references to FILE * still have to be
  * changed to int, and references to NULL into -1, but there are less of those
  */
+#undef ferror
 #define fread(ptr, size, nmemb, stream) rb->read(stream, ptr, size*nmemb)
 #define fwrite(ptr, size, nmemb, stream) rb->write(stream, ptr, size*nmemb)
 #define fclose(stream) rb->close(stream)

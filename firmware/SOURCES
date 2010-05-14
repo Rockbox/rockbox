@@ -24,6 +24,7 @@ debug.c
 /* Standard library */
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
+libc/strtok.c
 /* alsa on linux requires a more advanced sprintf, i.e. not ours */
 libc/sprintf.c
 #endif /* !SIMULATOR || __MINGW32__ || __CYGWIN__ */
@@ -40,7 +41,6 @@ libc/strcmp.c
 libc/strcpy.c
 libc/strncmp.c
 libc/strrchr.c
-libc/strtok.c
 libc/strstr.c
 libc/mktime.c
 #endif /* !defined(SIMULATOR)*/

@@ -737,7 +737,7 @@ struct plugin_api {
 #endif
 
     /* misc */
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if !defined(SIMULATOR)
     int* __errno;
 #endif
     void (*srand)(unsigned int seed);
