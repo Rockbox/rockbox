@@ -121,7 +121,8 @@ struct screen
 
 #ifdef HAVE_LCD_CHARCELLS  /* no charcell remote LCDs so far */
     void (*double_height)(bool on);
-    void (*putc)(int x, int y, unsigned long ucs);
+    /* name it putchar, not putc because putc is a c library function */
+    void (*putchar)(int x, int y, unsigned long ucs);
     void (*icon)(int icon, bool enable);
     unsigned long (*get_locked_pattern)(void);
     void (*define_pattern)(unsigned long ucs, const char *pattern);

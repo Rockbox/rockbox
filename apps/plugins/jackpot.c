@@ -170,7 +170,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
     int i;
     bool changes=false;
 #ifdef HAVE_LCD_CHARCELLS
-    display->putc(0, 0, '[');
+    display->putchar(0, 0, '[');
 #else
     const struct picture* picture= &(jackpot_pictures[display->screen_type]);
     int pos_x=(display->getwidth()-NB_SLOTS*(picture->width+1))/2;
@@ -195,7 +195,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
         char* current_pattern=&(jackpot_slots_patterns[state_y]);
         display->define_pattern(char_patterns[i],
                                 current_pattern);
-        display->putc(i+1, 0, char_patterns[i]);
+        display->putchar(i+1, 0, char_patterns[i]);
 #else
         vertical_picture_draw_part(display, picture, state_y, pos_x, pos_y);
         pos_x+=(picture->width+1);
@@ -204,7 +204,7 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
     if(changes){
 #ifdef HAVE_LCD_CHARCELLS
         rb->snprintf(str,sizeof(str),"$%d", game->money);
-        display->putc(++i, 0, ']');
+        display->putchar(++i, 0, ']');
         display->puts(++i, 0, str);
 #else
         rb->snprintf(str,sizeof(str),"money : $%d", game->money);

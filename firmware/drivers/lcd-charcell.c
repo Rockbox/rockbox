@@ -27,7 +27,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include <string.h>
+#include "string-extra.h"
 #include <stdlib.h>
 #include "debug.h"
 #include "file.h"

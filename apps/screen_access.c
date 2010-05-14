@@ -174,7 +174,7 @@ struct screen screens[NB_SCREENS] =
 
 #ifdef HAVE_LCD_CHARCELLS
         .double_height=&lcd_double_height,
-        .putc=&lcd_putc,
+        .putchar=&lcd_putc,
         .get_locked_pattern=&lcd_get_locked_pattern,
         .define_pattern=&lcd_define_pattern,
         .unlock_pattern=&lcd_unlock_pattern,
