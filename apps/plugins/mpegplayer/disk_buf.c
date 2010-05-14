@@ -662,7 +662,7 @@ ssize_t disk_buf_read(void *buffer, size_t size)
     return size;
 }
 
-off_t disk_buf_lseek(off_t offset, int whence)
+ssize_t disk_buf_lseek(off_t offset, int whence)
 {
     disk_buf_lock();
 
@@ -881,7 +881,7 @@ bool disk_buf_init(void)
 
     DEBUGF("disk_buf info:\n"
            "  page count: %d\n"
-           "  size:       %ld\n",
+           "  size:       %zd\n",
            disk_buf.pgcount, disk_buf.size);
 
     rb->memset(disk_buf.cache, 0xff,

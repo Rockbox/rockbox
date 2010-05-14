@@ -366,7 +366,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     pos = pos_new;
 
     DEBUGF("Seeking stream 0x%02x\n", id);
-    DEBUGF("$$ tl:%u t:%u ct:?? tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
+    DEBUGF("$$ tl:%u t:%u ct:?? tr:%u\n   pl:%zd pn:%zd pr:%zd\n",
            (unsigned)time_left, (unsigned)time, (unsigned)time_right,
            pos_left, pos_new, pos_right);
 
@@ -425,7 +425,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                 state = STATE2; /* Last scan was early */
                 sk.dir = SSCAN_REVERSE;
    
-                DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
+                DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%zd pn:%zd pr:%zd\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, pos_left, pos_new, pos_right);
             }
@@ -453,14 +453,14 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                 state = STATE3; /* Last scan was late */
                 sk.dir = SSCAN_REVERSE;
 
-                DEBUGF("<< tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
+                DEBUGF("<< tl:%u t:%u ct:%u tr:%u\n   pl:%zd pn:%zd pr:%zd\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, pos_left, pos_new, pos_right);
             }
             else
             {
                 /* Exact match - it happens */
-                DEBUGF("|| tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
+                DEBUGF("|| tl:%u t:%u ct:%u tr:%u\n   pl:%zd pn:%zd pr:%zd\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, pos_left, pos_new, pos_right);
                 pts = currpts;
@@ -492,7 +492,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                  * will find it. */
                 pos_new = pos_left;
                 sk.dir = SSCAN_FORWARD;
-                DEBUGF("?? tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
+                DEBUGF("?? tl:%u t:%u ct:%u tr:%u\n   pl:%zd pn:%zd pr:%zd\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, pos_left, pos_new, pos_right);
                 state = STATE1;
@@ -521,7 +521,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     sk.dir = SSCAN_FORWARD;
 
     uint32_t nextpts = mpeg_parser_scan_pts(&sk, id);
-    DEBUGF("Seek pos:%ld pts:%u t:%u next pts:%u \n",
+    DEBUGF("Seek pos:%zd pts:%u t:%u next pts:%u \n",
         pos, (unsigned)pts, (unsigned)time, (unsigned)nextpts);
 
     if (pts <= time && time < nextpts)
@@ -608,7 +608,7 @@ try_again:
     str_parser.parms.sd.sk.len = 1024*1024;
     str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
 
-    DEBUGF("thumb pos:%ld len:%ld\n", str_parser.parms.sd.sk.pos,
+    DEBUGF("thumb pos:%ld len:%zd\n", str_parser.parms.sd.sk.pos,
            str_parser.parms.sd.sk.len);
 
     result = str_send_msg(&video_str, STREAM_SYNC,
