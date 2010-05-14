@@ -346,7 +346,8 @@ void system_init(void)
 
 #if defined(BOOTLOADER)
     sdram_init();
-#elif CONFIG_CPU == AS3525 /* XXX: remove me when we have a new bootloader */
+#elif defined(SANSA_FUZE) || defined(SANSA_CLIP) || defined(SANSA_E200V2)
+    /* XXX: remove me when we have a new bootloader */
     MPMC_DYNAMIC_CONTROL = 0x0; /* MPMCCLKOUT stops when all SDRAMs are idle */
 #endif  /* BOOTLOADER */
 
