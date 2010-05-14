@@ -250,8 +250,10 @@ static unsigned int sample_rate;
 static int audio_head = 0; /* which of the two buffers to use? */
 static volatile int audio_tail = 0; /* which of the two buffers to record? */
 /* It's stereo, so make the buffer twice as big */
+#ifndef SIMULATOR
 static int16_t audio_data[2][BUFFER_SIZE];
 static fixed yin_buffer[YIN_BUFFER_SIZE];
+#endif
 
 /* Description of a note of scale */
 struct note_entry
@@ -1015,6 +1017,8 @@ void record_and_get_pitch(void)
 #ifndef SIMULATOR
     fixed period;
     bool waiting = false;
+#else
+    audio_tail = 1;
 #endif
 
     backlight_force_on();
@@ -1083,14 +1087,15 @@ void record_and_get_pitch(void)
                 rb->cancel_cpu_boost();
             #endif
             }
-#else /* SIMULATOR */
-            /* Display a preselected frequency */
-            display_frequency(int2fixed(445));
-#endif
+
             /* Move to next buffer if not empty (but empty *shouldn't* happen
              * here). */
             if (audio_head != audio_tail)
                 audio_head ^= 1;
+#else /* SIMULATOR */
+            /* Display a preselected frequency */
+            display_frequency(int2fixed(445));
+#endif
         }
     }
     rb->pcm_close_recording();
