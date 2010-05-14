@@ -374,6 +374,25 @@ static int sd_init_card(const int drive)
         const int ret = sd_select_bank(-1);
         if(ret < 0)
             return ret -16;
+
+        /*  CMD7 w/rca = 0: Select card to put it in STBY state */
+        if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_ARG, NULL))
+            return -17;
+        mci_delay();
+
+        /* CMD9 send CSD again, so we got the correct number of blocks */
+        if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
+                     MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
+            return -18;
+
+        sd_parse_csd(&card_info[drive]);
+        /* The OF is stored in the first blocks */
+        card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
+
+        /*  CMD7 w/rca: Select card to put it in TRAN state */
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+            return -19;
+        mci_delay();
     }
 
     card_info[drive].initialized = 1;
@@ -665,6 +684,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
             goto sd_transfer_error;
+    }
+
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -20;
+        goto sd_transfer_error;
     }
 
     last_disk_activity = current_tick;
