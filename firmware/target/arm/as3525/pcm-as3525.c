@@ -193,8 +193,12 @@ void * pcm_dma_addr(void *addr)
 
 static int rec_locked = 0;
 static unsigned char *rec_dma_start_addr;
-static size_t rec_dma_size;
+static size_t rec_dma_size, rec_dma_transfer_size;
 static void rec_dma_callback(void);
+#if CONFIG_CPU == AS3525
+/* points to the samples which need to be duplicated into the right channel */
+static int16_t *mono_samples;
+#endif
 
 
 void pcm_rec_lock(void)
@@ -213,25 +217,58 @@ void pcm_rec_unlock(void)
 
 static void rec_dma_start(void)
 {
-    void* addr = rec_dma_start_addr;
-    size_t size = rec_dma_size;
+    rec_dma_transfer_size = rec_dma_size;
 
     /* We are limited to 8188 DMA transfers, and the recording core asks for
      * 8192 bytes. Avoid splitting 8192 bytes transfers in 8188 + 4 */
-    if(size > 4096)
-        size = 4096;
+    if(rec_dma_transfer_size > 4096)
+        rec_dma_transfer_size = 4096;
 
-    rec_dma_size -= size;
-    rec_dma_start_addr += size;
-
-    dma_enable_channel(1, (void*)I2SIN_DATA, addr, DMA_PERI_I2SIN,
-                DMAC_FLOWCTRL_DMAC_PERI_TO_MEM, false, true, size >> 2, DMA_S4,
-                rec_dma_callback);
+    dma_enable_channel(1, (void*)I2SIN_DATA, rec_dma_start_addr, DMA_PERI_I2SIN,
+                DMAC_FLOWCTRL_DMAC_PERI_TO_MEM, false, true,
+                rec_dma_transfer_size >> 2, DMA_S4, rec_dma_callback);
 }
 
 
+/* if needed, duplicate samples of the working channel until the given bound */
+static inline void mono2stereo(int16_t *end)
+{
+#if CONFIG_CPU == AS3525
+    if(audio_channels != 1) /* only for microphone */
+        return;
+#if 0
+    do {
+        int16_t left = *mono_samples++;
+        *mono_samples++ = left;
+    } while(mono_samples != end);
+#else
+    /* gcc doesn't use pre indexing and load/store mono_samples at each loop
+     * let's save some cycles with a smaller loop */
+    int16_t tmp;
+    asm (
+        "1: ldrh %0, [%1], #2   \n"
+        "   strh %0, [%1], #2   \n"
+        "   cmp %1, %2          \n"
+        "   bne  1b             \n"
+    : "=r"(tmp), "+r"(mono_samples)
+    : "r"(end)
+    : "memory"
+    );
+#endif /* C / ASM */
+#else
+    /* microphone recording is stereo on as3525v2 */
+    (void)end;
+#endif
+}
+
 static void rec_dma_callback(void)
 {
+    rec_dma_size -= rec_dma_transfer_size;
+    rec_dma_start_addr += rec_dma_transfer_size;
+
+    /* the 2nd channel is silent when recording microphone on as3525v1 */
+    mono2stereo(UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+
     if(!rec_dma_size)
     {
         register pcm_more_callback_type2 more_ready = pcm_callback_more_ready;
@@ -252,6 +289,9 @@ void pcm_rec_dma_record_more(void *start, size_t size)
 {
     dump_dcache_range(start, size);
     rec_dma_start_addr = start;
+#if CONFIG_CPU == AS3525
+    mono_samples = UNCACHED_ADDR(start);
+#endif
     rec_dma_size = size;
 }
 
@@ -274,6 +314,9 @@ void pcm_rec_dma_start(void *addr, size_t size)
 {
     dump_dcache_range(addr, size);
     rec_dma_start_addr = addr;
+#if CONFIG_CPU == AS3525
+    mono_samples = UNCACHED_ADDR(addr);
+#endif
     rec_dma_size = size;
 
     dma_retain();
@@ -311,7 +354,12 @@ void pcm_rec_dma_init(void)
 
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    return UNCACHED_ADDR((void*)DMAC_CH_DST_ADDR(1));
+    pcm_rec_lock();
+    int16_t *addr = UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
+    mono2stereo(addr);
+    pcm_rec_unlock();
+
+    return addr;
 }
 
 #endif /* HAVE_RECORDING */

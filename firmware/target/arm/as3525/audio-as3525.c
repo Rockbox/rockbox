@@ -25,6 +25,8 @@
 #include "audiohw.h"
 #include "sound.h"
 
+int audio_channels = 2;
+
 void audio_set_output_source(int source)
 {
     (void)source;
@@ -47,6 +49,7 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
+                audio_channels = 2;
 #if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
                 audiohw_set_monitor(false);
 #endif
@@ -60,6 +63,7 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
+                audio_channels = 1;
                 audiohw_set_monitor(false);
                 audiohw_enable_recording(true);  /* source mic */
             }
@@ -76,6 +80,7 @@ void audio_input_mux(int source, unsigned flags)
                 )
                 break;
 
+            audio_channels = 2;
 #ifdef HAVE_RECORDING
             last_recording = recording;
 
