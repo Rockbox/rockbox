@@ -8,13 +8,12 @@ This directory contains a decoder version of True Auido.
 
 LICENSING INFORMATION
 
-True Audio license is described in the README file or each source file (excepts filter_arm.S) 
-in this directory.
+True Audio license is described in the README file or each source file in this directory.
 
 Limitation
 
-In some players, the decoding speed is not enough ( < 110%). 
-(For example, H180: decoding speed  < 60%)
+ - Decoding is not real time on some targets.
+ - Max duration is 4095 seconds (about 1 hours 8 minutes).
 
 IMPORT DETAILS
 
