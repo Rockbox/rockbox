@@ -237,22 +237,26 @@ static inline void mono2stereo(int16_t *end)
     if(audio_channels != 1) /* only for microphone */
         return;
 #if 0
+    /* load pointer in a register and avoid updating it in each loop */
+    register int16_t *samples = mono_samples;
+
     do {
-        int16_t left = *mono_samples++;
-        *mono_samples++ = left;
-    } while(mono_samples != end);
+        int16_t left = *samples++;  // load 1 sample of the left-channel
+        *samples++ = left;          // copy it in the right-channel
+    } while(samples != end);
+
+    mono_samples = samples; /* update pointer */
 #else
-    /* gcc doesn't use pre indexing and load/store mono_samples at each loop
-     * let's save some cycles with a smaller loop */
-    int16_t tmp;
+    /* gcc doesn't use pre indexing : let's save 1 cycle */
+    int16_t left;
     asm (
-        "1: ldrh %0, [%1], #2   \n"
-        "   strh %0, [%1], #2   \n"
-        "   cmp %1, %2          \n"
+        "1: ldrh %0, [%1], #2   \n" // load 1 sample of the left-channel
+        "   strh %0, [%1], #2   \n" // copy it in the right-channel
+        "   cmp %1, %2          \n" // are we finished?
         "   bne  1b             \n"
-    : "=r"(tmp), "+r"(mono_samples)
-    : "r"(end)
-    : "memory"
+        : "=r"(left), "+r"(mono_samples)
+        : "r"(end)
+        : "memory"
     );
 #endif /* C / ASM */
 #else
