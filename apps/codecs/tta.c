@@ -38,7 +38,7 @@ enum codec_status codec_main(void)
 {
     tta_info info;
     int status = CODEC_OK;
-    unsigned int decodedsamples = 0;
+    unsigned int decodedsamples;
     int endofstream;
     int new_pos = 0;
     int sample_count;
@@ -46,6 +46,7 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, TTA_OUTPUT_DEPTH - 1);
   
+next_track:
     if (codec_init())
     {
         DEBUGF("codec_init() error\n");
@@ -53,16 +54,10 @@ enum codec_status codec_main(void)
         goto exit;
     }
 
-next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
-    if (set_tta_info(&info) < 0)
-    {
-        status = CODEC_ERROR;
-        goto exit;
-    }
-    if (player_init(&info) < 0)
+    if (set_tta_info(&info) < 0 || player_init(&info) < 0)
     {
         status = CODEC_ERROR;
         goto exit;
@@ -82,6 +77,7 @@ next_track:
     }
 
     /* The main decoder loop */
+    decodedsamples = 0;
     endofstream = 0;
 
     if (ci->id3->offset > 0)
