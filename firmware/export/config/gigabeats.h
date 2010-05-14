@@ -158,11 +158,13 @@
 
 /* TODO: have a proper status displayed in the bootloader and have it
  * work! */
-/* Charing implemented in a target-specific algorithm */
+/* Charging implemented in a target-specific algorithm */
 #define CONFIG_CHARGING CHARGING_TARGET
 
 /* define this if the hardware can be powered off while charging */
-#define HAVE_POWEROFF_WHILE_CHARGING
+/* We don't charge while powered down so maybe implement a
+   finish-charging-and-then-poweroff mode */
+//#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x200000
