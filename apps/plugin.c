@@ -713,6 +713,12 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     is_diacritic,
 #endif
+
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
+    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
+    round_value_to_list32,
+#endif
+
 };
 
 int plugin_load(const char* plugin, const void* parameter)
