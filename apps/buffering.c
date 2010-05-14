@@ -686,7 +686,7 @@ static bool buffer_handle(int handle_id)
             stop = true;
             DEBUGF( "%s(): Preventing handle corruption: h1.id:%d h2.id:%d"
                     " copy_n:%lu overlap:%ld h1.filerem:%lu\n", __func__,
-                    h->id, h->next->id, (unsigned long)copy_n, overlap,
+                    h->id, h->next->id, (unsigned long)copy_n, (long)overlap,
                     (unsigned long)h->filerem);
             copy_n -= overlap;
         }
