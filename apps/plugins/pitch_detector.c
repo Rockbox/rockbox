@@ -69,6 +69,7 @@
 #include "pluginbitmaps/pitch_notes.h"
 
 PLUGIN_HEADER
+PLUGIN_IRAM_DECLARE
 
 /* Some fixed point calculation stuff */
 typedef int32_t fixed_data;
@@ -149,7 +150,7 @@ typedef struct _fixed fixed;
 #define LCD_FACTOR (fp_div(int2fixed(LCD_WIDTH), int2fixed(100)))
 /* The threshold for the YIN algorithm */
 #define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
-const fixed yin_threshold_table[] =
+const fixed yin_threshold_table[] IDATA_ATTR =
 {
     float2fixed(0.01),
     float2fixed(0.02),
@@ -252,7 +253,12 @@ static volatile int audio_tail = 0; /* which of the two buffers to record? */
 /* It's stereo, so make the buffer twice as big */
 #ifndef SIMULATOR
 static int16_t audio_data[2][BUFFER_SIZE] __attribute__((aligned(CACHEALIGN_SIZE)));
-static fixed yin_buffer[YIN_BUFFER_SIZE];
+static fixed yin_buffer[YIN_BUFFER_SIZE] IBSS_ATTR;
+#ifdef PLUGIN_USE_IRAM
+static int16_t iram_audio_data[BUFFER_SIZE] IBSS_ATTR;
+#else
+#define iram_audio_data audio_data[audio_head]
+#endif
 #endif
 
 /* Description of a note of scale */
@@ -815,7 +821,7 @@ unsigned vec_min_elem(fixed *s, unsigned buflen)
 }
 
 
-fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf) 
+static inline fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf) 
 {
     /* Original floating point version: */
     /* tmp = s0 + (pf/2.0f) * (pf * ( s0 - 2.0f*s1 + s2 ) - 
@@ -869,7 +875,7 @@ fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf)
 
 #define QUADINT_STEP float2fixed(1.0f/200.0f)
 
-fixed vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
+fixed ICODE_ATTR vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
 {
     fixed res, frac, s0, s1, s2;
     fixed exactpos = int2fixed(pos);
@@ -916,7 +922,7 @@ fixed vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
 /* The yin pointer is just a buffer that the algorithm uses as a work
      space.  It needs to be half the length of the input buffer. */
 
-fixed pitchyin(int16_t *input, fixed *yin)
+fixed ICODE_ATTR pitchyin(int16_t *input, fixed *yin)
 {
     fixed retval;
     unsigned j,tau = 0;
@@ -956,19 +962,20 @@ fixed pitchyin(int16_t *input, fixed *yin)
 
 /*-----------------------------------------------------------------*/
 
-uint32_t buffer_magnitude(int16_t *input)
+uint32_t ICODE_ATTR buffer_magnitude(int16_t *input)
 {
     unsigned n;
     uint64_t tally = 0;
+    const unsigned size = tuner_settings.sample_size;
 
     /* Operate on only one channel of the stereo signal */
-    for(n = 0; n < tuner_settings.sample_size; n+=2)
+    for(n = 0; n < size; n+=2)
     {
         int s = input[n];
         tally += s * s;
     }
 
-    tally /= tuner_settings.sample_size / 2;
+    tally /= size / 2;
 
     /* now tally holds the average of the squares of all the samples */
     /* It must be between 0 and 0x7fff^2, so it fits in 32 bits      */
@@ -1065,9 +1072,12 @@ void record_and_get_pitch(void)
             #ifdef HAVE_SCHEDULER_BOOSTCTRL
                 rb->trigger_cpu_boost();
             #endif
-
+#ifdef PLUGIN_USE_IRAM
+                rb->memcpy(iram_audio_data, audio_data[audio_head],
+                           tuner_settings.sample_size * sizeof (int16_t));
+#endif
                 /* This returns the period of the detected pitch in samples */
-                period = pitchyin(audio_data[audio_head], yin_buffer);
+                period = pitchyin(iram_audio_data, yin_buffer);
                 /* Hz = sample rate / period */
                 if(fp_gt(period, FP_ZERO))
                 {
@@ -1099,6 +1109,7 @@ void record_and_get_pitch(void)
         }
     }
     rb->pcm_close_recording();
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     rb->cancel_cpu_boost();
 #endif
@@ -1108,10 +1119,15 @@ void record_and_get_pitch(void)
 
 /* Init recording, tuning, and GUI */
 void init_everything(void)
-{    
+{
+    /* Disable all talking before initializing IRAM */
+    rb->talk_disable(true);
+
+    PLUGIN_IRAM_INIT(rb);
+
     load_settings();
 
-    /* Stop all playback */
+    /* Stop all playback (if no IRAM, otherwise IRAM_INIT would have) */
     rb->plugin_get_audio_buffer(NULL);
 
     /* --------- Init the audio recording ----------------- */
@@ -1149,6 +1165,8 @@ void init_everything(void)
     bar_grad_y = BAR_Y - BAR_PADDING - font_h;
     /* Put the note right between the top and bottom text elements */
     note_y = ((font_h + bar_grad_y - note_bitmaps.slide_height) / 2);
+
+    rb->talk_disable(false);
 }
 
 
