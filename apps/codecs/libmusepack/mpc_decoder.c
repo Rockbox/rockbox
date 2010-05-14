@@ -35,6 +35,7 @@
 /// Core decoding routines and logic.
 
 #include <string.h>
+#include <codecs.h>
 #include "mpcdec.h"
 #include "minimax.h"
 #include "decoder.h"
@@ -227,6 +228,10 @@ void mpc_decoder_reset_scf(mpc_decoder * d, int value)
 
 static void mpc_decoder_setup(mpc_decoder *d)
 {
+#if defined(CPU_COLDFIRE)
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+#endif
+
     memset(d, 0, sizeof *d);
 
     d->__r1 = 1;
