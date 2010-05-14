@@ -45,6 +45,10 @@
 #include "disk.h"
 #endif
 
+#ifdef SANSA_FUZEV2
+#include "backlight-target.h"
+#endif
+
 #include "lcd.h"
 #include <stdarg.h>
 #include "sysfont.h"
@@ -348,7 +352,6 @@ static volatile bool retry;
 static volatile int cmd_error;
 
 #if defined(HAVE_MULTIDRIVE)
-int active_card = 0;
 #define EXT_SD_BITS (1<<2)
 #endif
 
@@ -395,13 +398,8 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         unsigned long *response)
 {
 #if defined(HAVE_MULTIDRIVE)
-    /*  Check to see if we need to switch cards  */
     if(sd_present(SD_SLOT_AS3525))
-         if(active_card != drive)
-        {
-            GPIOB_PIN(5) = (1-drive) << 5;
-            active_card = drive;
-        }
+        GPIOB_PIN(5) = (1-drive) << 5;
 #endif
 
 /*  RCRC & RTO interrupts should be set together with the CD interrupt but
@@ -431,6 +429,13 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
+#ifdef SANSA_FUZEV2
+    extern int buttonlight_is_on;
+    if(buttonlight_is_on)
+        _buttonlight_on();
+    else
+        _buttonlight_off();
+#endif
     wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
 
     MCI_MASK &= ~MCI_INT_CD;
