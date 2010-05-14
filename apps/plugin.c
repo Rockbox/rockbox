@@ -434,7 +434,9 @@ static const struct plugin_api rockbox_api = {
     memset,
     memcpy,
     memmove,
+#ifndef SIMULATOR
     _ctype_,
+#endif
     atoi,
     strchr,
     strcat,

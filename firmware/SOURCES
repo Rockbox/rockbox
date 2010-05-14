@@ -21,12 +21,13 @@ timer.c
 panic.c
 debug.c
 
-/* Common */
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+/* Standard library */
+#if !defined(SIMULATOR)
+#if defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
 /* alsa on linux requires a more advanced sprintf, i.e. not ours */
 libc/sprintf.c
-#endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
+#endif /* defined(__MINGW32__) || defined(__CYGWIN__) */
 libc/atoi.c
 libc/ctype.c
 libc/memcmp.c
@@ -42,6 +43,9 @@ libc/strrchr.c
 libc/strtok.c
 libc/strstr.c
 libc/mktime.c
+#endif /* !defined(SIMULATOR)*/
+
+/* Common */
 common/config.c
 common/crc32.c
 #ifdef MI4_FORMAT
