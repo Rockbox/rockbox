@@ -22,12 +22,12 @@ panic.c
 debug.c
 
 /* Standard library */
-#if !defined(SIMULATOR)
-#if defined(__MINGW32__) || defined(__CYGWIN__)
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
 /* alsa on linux requires a more advanced sprintf, i.e. not ours */
 libc/sprintf.c
-#endif /* defined(__MINGW32__) || defined(__CYGWIN__) */
+#endif /* !SIMULATOR || __MINGW32__ || __CYGWIN__ */
+#if !defined(SIMULATOR)
 libc/atoi.c
 libc/ctype.c
 libc/memcmp.c
