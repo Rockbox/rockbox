@@ -4764,8 +4764,8 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=Set OFF=Annuler"
-    ipod*: "SELECT=Set MENU=Annuler"
+    alarm: "PLAY=Valider OFF=Annuler"
+    ipod*: "SELECT=Valider MENU=Annuler"
     iriverh10,iriverh10_5gb: "SELECT=Valider PREV=Annuler"
     gigabeats: "SELECT=Valider POWER=Annuler"
   </dest>
