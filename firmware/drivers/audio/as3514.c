@@ -442,20 +442,12 @@ void audiohw_set_monitor(bool enable)
                             AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
         as3514_set(AS3514_LINE_IN_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_set(AS3514_LINE_IN_L, LINE_IN1_L_LI1L_MUTE_off);
-
-#ifdef HAVE_AS3543
-        as3514_write_masked(AS3514_HPH_OUT_R,
-                            HPH_OUT_R_HP_OUT_LINE, HPH_OUT_R_HP_OUT_MASK);
-#endif
     }
     else {
-        /* turn off both LIN1 and LIN2 */
+        /* turn off both LIN1 and LIN2 (if present) */
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
-#ifdef HAVE_AS3543
-        as3514_write_masked(AS3514_HPH_OUT_R,
-                            HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
-#else
+#ifndef HAVE_AS3543
         as3514_clear(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
         as3514_clear(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
 #endif
