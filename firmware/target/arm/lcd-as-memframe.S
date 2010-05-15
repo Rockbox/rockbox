@@ -393,7 +393,7 @@ lcd_write_yuv420_lines_odither:
                                         @ r6 = yuv_src[2] = Cr_p
                                         @
     sub         r3, r3, #1              @
-    add         r1, sp, #40             @ Line up pattern and kernel quadrant
+    add         r1, sp, #36             @ Line up pattern and kernel quadrant
     ldmia       r1, { r12, r14 }        @
     eor         r14, r14, r12           @
     and         r14, r14, #0x2          @
