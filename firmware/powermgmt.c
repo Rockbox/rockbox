@@ -358,7 +358,11 @@ static void handle_auto_poweroff(void)
 
             if (usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                || charging_state()
+#else
                 || charger_input_state != NO_CHARGER
+#endif
 #endif
             ) {
                 DEBUGF("Sleep timer timeout. Stopping...\n");
