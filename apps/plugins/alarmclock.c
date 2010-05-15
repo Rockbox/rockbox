@@ -28,7 +28,8 @@ const struct button_mapping *plugin_contexts[] = {generic_directions,
                                                   generic_actions};
 
 static int current = 0;
-static int alarm[2] = {0, 0}, maxval[2] = {24, 60};
+static bool tomorrow = false;
+static int alarm[2] = {0, 0}, maxval[2] = {24, 60}, prev_tick = 3600 * 24;
 static bool quit = false, usb = false, waiting = false, done = false;
 
 static inline int get_button(void) {
@@ -36,9 +37,15 @@ static inline int get_button(void) {
 }
 
 int rem_seconds(void) {
-    return (((alarm[0] - rb->get_time()->tm_hour) * 3600)
-           +((alarm[1] - rb->get_time()->tm_min)  * 60)
-           -(rb->get_time()->tm_sec));
+    int seconds = (((alarm[0] - rb->get_time()->tm_hour) * 3600)
+                  +((alarm[1] - rb->get_time()->tm_min)  * 60)
+                  -(rb->get_time()->tm_sec));
+
+    /* The tomorrow flag means that the alarm should ring on the next day */
+    if (seconds > prev_tick) tomorrow = false;
+    prev_tick = seconds;
+
+    return seconds + (tomorrow ? 24 * 3600 : 0);
 }
 
 void draw_centered_string(struct screen * display, char * string) {
@@ -87,7 +94,7 @@ bool can_play(void) {
     else if (audio_status & AUDIO_STATUS_PAUSE)
         return true;
 
-    return false;   
+    return false;
 }
 
 void play(void) {
@@ -152,7 +159,7 @@ enum plugin_status plugin_start(const void* parameter)
 
                 case PLA_FIRE: {
                     if (rem_seconds() < 0)
-                        alarm[0] += 24;
+                        tomorrow = true;
 
                     waiting = true;
                     break;
