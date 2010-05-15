@@ -35,9 +35,6 @@ void _backlight_set_brightness(int brightness)
 
 bool _backlight_init(void)
 {
-    GPIOB_DIR |= 1<<5; /* for buttonlight, stuff below seems to be needed
-                          for buttonlight as well*/
-
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x80);
     ascodec_write_pmu(AS3543_BACKLIGHT, 2, backlight_brightness * 10);
 
@@ -62,6 +59,7 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
+    GPIOB_DIR |= 1<<5;
     GPIOB_PIN(5) = (1<<5);
     buttonlight_is_on = 1;
 }
@@ -69,5 +67,6 @@ void _buttonlight_on(void)
 void _buttonlight_off(void)
 {
     GPIOB_PIN(5) = 0;
+    GPIOB_DIR &= ~(1<<5);
     buttonlight_is_on = 0;
 }
