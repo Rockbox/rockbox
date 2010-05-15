@@ -49,7 +49,7 @@ MENUITEM_SETTING(bass, &global_settings.bass,
 );
 
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
-MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
+MENUITEM_SETTING(bass_cutoff, &global_settings.bass_cutoff, NULL);
 #endif
 #endif /* AUDIOHW_HAVE_BASS */
 

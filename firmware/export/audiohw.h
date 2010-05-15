@@ -225,7 +225,12 @@ enum AUDIOHW_EQ_SETTINGS
 #if (AUDIOHW_CAPS & DEPTH_3D_CAP)
 #define AUDIOHW_HAVE_DEPTH_3D
 #endif
-
+#else
+#if defined (HAVE_SW_TONE_CONTROLS)
+/* Needed for proper sound support */
+#define AUDIOHW_HAVE_BASS
+#define AUDIOHW_HAVE_TREBLE
+#endif
 #endif /* AUDIOHW_CAPS */
 
 enum {
