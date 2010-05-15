@@ -99,7 +99,7 @@ static void get_more(unsigned char **start, size_t *size)
                 /* Just show a warning about this - will never happen
                  * without a bug in the audio thread code or a clobbered
                  * buffer */
-                DEBUGF("get_more: invalid size (%zd)\n", sz);
+                DEBUGF("get_more: invalid size (%ld)\n", (long)sz);
             }
 
             if (offset < -100*CLOCK_RATE/1000)

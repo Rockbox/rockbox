@@ -881,8 +881,8 @@ bool disk_buf_init(void)
 
     DEBUGF("disk_buf info:\n"
            "  page count: %d\n"
-           "  size:       %zd\n",
-           disk_buf.pgcount, disk_buf.size);
+           "  size:       %ld\n",
+           disk_buf.pgcount, (long)disk_buf.size);
 
     rb->memset(disk_buf.cache, 0xff,
                disk_buf.pgcount*sizeof (*disk_buf.cache));

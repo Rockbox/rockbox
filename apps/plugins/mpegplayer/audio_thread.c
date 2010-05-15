@@ -279,8 +279,8 @@ static int audio_sync(struct audio_thread_data *td,
     {
         if (audio_buffer(str, STREAM_PM_RANDOM_ACCESS) == STREAM_DATA_END)
         {
-            DEBUGF("audio_sync:STR_DATA_END\n  aqu:%zd swl:%ld swr:%ld\n",
-                    audio_queue.used, str->hdr.win_left, str->hdr.win_right);
+            DEBUGF("audio_sync:STR_DATA_END\n  aqu:%ld swl:%ld swr:%ld\n",
+                    (long)audio_queue.used, str->hdr.win_left, str->hdr.win_right);
             if (audio_queue.used <= MAD_BUFFER_GUARD)
                 goto sync_data_end;
         }
