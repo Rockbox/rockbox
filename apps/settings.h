@@ -336,8 +336,10 @@ struct user_settings
     bool superbass;     /* true/false */
 #endif
 
-#if defined(HAVE_WM8758) || defined(HAVE_WM8978)
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
     int bass_cutoff;
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
     int treble_cutoff;
 #endif
 

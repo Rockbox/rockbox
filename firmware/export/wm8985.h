@@ -26,7 +26,13 @@
 #define VOLUME_MIN -570
 #define VOLUME_MAX  60
 
+#ifdef COWON_D2
+/* FIXME: somehow something was out of sync in the .lang, settings and caps. Keep the
+ * cutoffs disabled until someone with the device works it out. */
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#else
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
+#endif
 
 extern int tenthdb2master(int db);
 

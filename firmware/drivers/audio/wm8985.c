@@ -99,8 +99,12 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
 #endif
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
     [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
     [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
+#endif
 };
 
 /* shadow registers */
