@@ -314,25 +314,9 @@ void cpu_sleep(bool enabled)
     (void)enabled;
 }
 
-void button_set_flip(bool yesno)
-{
-    (void)yesno;
-}
-
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
 void touchpad_set_sensitivity(int level)
 {
     (void)level;
 }
 #endif
-
-void system_exception_wait(void)
-{
-    thread_sdl_exception_wait();
-}
-
-void system_reboot(void)
-{
-    thread_sdl_exception_wait();
-}
-

@@ -19,7 +19,8 @@
  *
  ****************************************************************************/
 
-#include "uisdl.h"
+#include <math.h>
+#include "sim-ui-defines.h"
 #include "lcd-charcells.h"
 #include "lcd-remote.h"
 #include "config.h"
@@ -61,6 +62,8 @@ int remote_type(void)
 }
 #endif
 
+static int xy2button(int x, int y);
+
 struct event_queue button_queue;
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
@@ -78,8 +81,109 @@ bool remote_button_hold(void) {
     return remote_hold_button_state;
 }
 #endif
+static void button_event(int key, bool pressed);
+extern bool debug_wps;
+extern bool mapping;
+static void gui_message_loop(void)
+{
+    SDL_Event event;
+    static int x,y,xybutton = 0;
 
-void button_event(int key, bool pressed)
+    if (SDL_PollEvent(&event))
+    {
+        switch(event.type)
+        {
+            case SDL_KEYDOWN:
+                button_event(event.key.keysym.sym, true);
+                break;
+            case SDL_KEYUP:
+                button_event(event.key.keysym.sym, false);
+            case SDL_MOUSEBUTTONDOWN:
+                switch ( event.button.button ) {
+#ifdef HAVE_SCROLLWHEEL
+                    case SDL_BUTTON_WHEELUP:
+                        button_event( SDLK_UP, true );
+                        break;
+                    case SDL_BUTTON_WHEELDOWN:
+                        button_event( SDLK_DOWN, true );
+                        break;
+#endif
+                    case SDL_BUTTON_LEFT:
+                    case SDL_BUTTON_MIDDLE:
+                        if ( mapping && background ) {
+                            x = event.button.x;
+                            y = event.button.y;
+                        }
+                        if ( background ) {
+                            xybutton = xy2button( event.button.x, event.button.y );
+                            if( xybutton )
+                                button_event( xybutton, true );
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                if (debug_wps && event.button.button == 1)
+                {
+                    if ( background ) 
+#ifdef HAVE_REMOTE
+                        if ( event.button.y < UI_REMOTE_POSY ) /* Main Screen */
+                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
+                        else 
+                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_REMOTE_POSX -1 , event.button.y - UI_REMOTE_POSY - 1 );
+#else
+                        printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
+#endif
+                    else 
+                        if ( event.button.y/display_zoom < LCD_HEIGHT ) /* Main Screen */
+                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom );
+#ifdef HAVE_REMOTE
+                        else
+                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom - LCD_HEIGHT );
+#endif
+                }
+                break;
+            case SDL_MOUSEBUTTONUP:
+                switch ( event.button.button ) {
+                    /* The scrollwheel button up events are ignored as they are queued immediately */
+                    case SDL_BUTTON_LEFT:
+                    case SDL_BUTTON_MIDDLE:
+                        if ( mapping && background ) {
+                            printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x,
+#define SQUARE(x) ((x)*(x))
+                            y, (int)sqrt( SQUARE(x-(int)event.button.x)
+                                    + SQUARE(y-(int)event.button.y))  );
+                        }
+                        if ( background && xybutton ) {
+                                button_event( xybutton, false );
+                                xybutton = 0;
+                            }
+#ifdef HAVE_TOUCHSCREEN
+                            else {
+                                button_event(BUTTON_TOUCHSCREEN, false);
+                            }
+#endif
+                        break;
+                    default:
+                        break;
+                }
+                break;
+                
+
+            case SDL_QUIT:
+            {
+                exit(EXIT_SUCCESS);
+                break;
+            }
+            default:
+                /*printf("Unhandled event\n"); */
+                break;
+        }
+    }
+}
+
+static void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     static bool usb_connected = false;
@@ -1380,7 +1484,6 @@ int button_read_device(int* data)
 int button_read_device(void)
 {
 #endif
-
 #ifdef HAS_BUTTON_HOLD
     int hold_button = button_hold();
 
@@ -1396,7 +1499,9 @@ int button_read_device(void)
 
     if (hold_button)
         return BUTTON_NONE;
+    else
 #endif
+        gui_message_loop();
 
     return btn;
 }
@@ -1430,8 +1535,9 @@ void mouse_tick_task(void)
 }
 #endif
 
-void button_init_sdl(void)
+void button_init_device(void)
 {
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 #ifdef HAVE_TOUCHSCREEN
     tick_add_task(mouse_tick_task);
 #endif
@@ -1441,6 +1547,10 @@ void button_init_sdl(void)
 /* Run sim with --mapping to get coordinates      */
 /* or --debugbuttons to check                     */
 /* The First matching button is returned          */
+struct button_map {
+    int button, x, y, radius;
+    char *description;
+};
 
 #ifdef SANSA_FUZE
 struct button_map bm[] = {
@@ -1892,7 +2002,8 @@ struct button_map bm[] = {
 };
 #endif
 
-int xy2button( int x, int y) {
+static int xy2button( int x, int y)
+{
     int i;
     extern bool debug_buttons;
     

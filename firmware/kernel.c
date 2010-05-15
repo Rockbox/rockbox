@@ -22,14 +22,11 @@
 #include <string.h>
 #include "config.h"
 #include "kernel.h"
-#ifdef SIMULATOR
-#include "system-sdl.h"
-#include "debug.h"
-#endif
 #include "thread.h"
 #include "cpu.h"
 #include "system.h"
 #include "panic.h"
+#include "debug.h"
 
 /* Make this nonzero to enable more elaborate checks on objects */
 #if defined(DEBUG) || defined(SIMULATOR)

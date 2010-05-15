@@ -235,6 +235,7 @@ enum {
 #if !defined(SIMULATOR) && !defined(__PCTOOL__) 
 #include "system-target.h"
 #else /* SIMULATOR */
+#include "system-sdl.h"
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];

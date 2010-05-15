@@ -20,14 +20,15 @@
  ****************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <SDL.h>
 #include <SDL_thread.h>
 #include "memory.h"
 #include "system-sdl.h"
-#include "uisdl.h"
-#include "kernel.h"
 #include "thread-sdl.h"
+#include "kernel.h"
 #include "thread.h"
+#include "panic.h"
 #include "debug.h"
 
 static SDL_TimerID tick_timer_id;
@@ -90,19 +91,19 @@ void sim_exit_irq_handler(void)
     SDL_UnlockMutex(sim_irq_mtx);
 }
 
-bool sim_kernel_init(void)
+static bool sim_kernel_init(void)
 {
     sim_irq_mtx = SDL_CreateMutex();
     if (sim_irq_mtx == NULL)
     {
-        fprintf(stderr, "Cannot create sim_handler_mtx\n");
+        panicf("Cannot create sim_handler_mtx\n");
         return false;
     }
 
     sim_thread_cond = SDL_CreateCond();
     if (sim_thread_cond == NULL)
     {
-        fprintf(stderr, "Cannot create sim_thread_cond\n");
+        panicf("Cannot create sim_thread_cond\n");
         return false;
     }
 
@@ -141,6 +142,12 @@ Uint32 tick_timer(Uint32 interval, void *param)
 
 void tick_start(unsigned int interval_in_ms)
 {
+    if (!sim_kernel_init())
+    {
+        panicf("Could not initialize kernel!");
+        exit(-1);
+    }
+
     if (tick_timer_id != NULL)
     {
         SDL_RemoveTimer(tick_timer_id);

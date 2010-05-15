@@ -43,89 +43,6 @@
 
 extern bool audio_is_initialized;
 
-#ifdef SIMULATOR
-extern void audiohw_set_volume(int value);
-/* dummy for sim */
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
-/* Bass and treble tone controls */
-#ifdef AUDIOHW_HAVE_BASS
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-#endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#if defined(HAVE_RECORDING)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
-#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_DEPTH_3D)
-    [SOUND_DEPTH_3D]      = {"%",  0,   1,   0,  15,   0},
-#endif
-/* Hardware EQ tone controls */
-#if defined(AUDIOHW_HAVE_EQ_BAND1)
-    [SOUND_EQ_BAND1_GAIN] = {"dB", 0,  1, -12,  12,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND2)
-    [SOUND_EQ_BAND2_GAIN] = {"dB", 0,  1, -12,  12,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3)
-    [SOUND_EQ_BAND3_GAIN] = {"dB", 0,  1, -12,  12,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4)
-    [SOUND_EQ_BAND4_GAIN] = {"dB", 0,  1, -12,  12,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND5)
-    [SOUND_EQ_BAND5_GAIN] = {"dB", 0,  1, -12,  12,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND1_FREQUENCY)
-    [SOUND_EQ_BAND1_FREQUENCY] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND2_FREQUENCY)
-    [SOUND_EQ_BAND2_FREQUENCY] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3_FREQUENCY)
-    [SOUND_EQ_BAND3_FREQUENCY] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4_FREQUENCY)
-    [SOUND_EQ_BAND4_FREQUENCY] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
-    [SOUND_EQ_BAND5_FREQUENCY] = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND2_WIDTH)
-    [SOUND_EQ_BAND2_WIDTH]     = {"",   0,  1,   0,   1,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
-    [SOUND_EQ_BAND3_WIDTH]     = {"",   0,  1,   0,   1,   0},
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4_WIDTH)
-    [SOUND_EQ_BAND4_WIDTH]     = {"",   0,  1,   0,   1,   0},
-#endif
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0},
-    [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0},
-    [SOUND_MDB_STRENGTH]  = {"dB", 0,  1,   0, 127,  48},
-    [SOUND_MDB_HARMONICS] = {"%",  0,  1,   0, 100,  50},
-    [SOUND_MDB_CENTER]    = {"Hz", 0, 10,  20, 300,  60},
-    [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90},
-    [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0},
-    [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0},
-#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
-};
-#endif
-
 const char *sound_unit(int setting)
 {
     return audiohw_settings[setting].unit;
@@ -356,7 +273,7 @@ static void set_prescaled_volume(void)
 
 #elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
-#elif defined(HAVE_JZ4740_CODEC)
+#elif defined(HAVE_JZ4740_CODEC) || defined(HAVE_SDL_AUDIO)
     audiohw_set_volume(current_volume);
 #endif
 #else /* SIMULATOR */

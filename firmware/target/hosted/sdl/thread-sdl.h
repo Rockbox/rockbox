@@ -22,16 +22,11 @@
 #ifndef __THREADSDL_H__
 #define __THREADSDL_H__
 
-#include "SDL_thread.h"
-
-extern SDL_Thread *gui_thread;   /* The "main" thread */
-void thread_sdl_thread_lock(void *me);
-void * thread_sdl_thread_unlock(void);
-void thread_sdl_exception_wait(void);
-bool thread_sdl_init(void *param); /* Init the sim threading API - thread created calls app_main */
-void thread_sdl_shutdown(void); /* Shut down all kernel threads gracefully */
-void thread_sdl_lock(void); /* Sync with SDL threads */
-void thread_sdl_unlock(void); /* Sync with SDL threads */
+/* extra thread functions that only apply when running on hosting platforms */
+void sim_thread_lock(void *me);
+void * sim_thread_unlock(void);
+void sim_thread_exception_wait(void);
+void sim_thread_shutdown(void); /* Shut down all kernel threads gracefully */
 
 #endif /* #ifndef __THREADSDL_H__ */
 

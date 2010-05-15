@@ -429,7 +429,6 @@ void button_init(void)
     tick_add_task(button_tick);
 }
 
-#ifndef SIMULATOR
 #ifdef BUTTON_DRIVER_CLOSE
 void button_close(void)
 {
@@ -443,9 +442,10 @@ void button_close(void)
  */
 static int button_flip(int button)
 {
-    int newbutton;
+    int newbutton = button;
 
-    newbutton = button &
+#ifndef SIMULATOR
+    newbutton &=
         ~(BUTTON_LEFT | BUTTON_RIGHT
 #if defined(BUTTON_UP) && defined(BUTTON_DOWN)
         | BUTTON_UP | BUTTON_DOWN
@@ -503,7 +503,7 @@ static int button_flip(int button)
     if (button & BUTTON_PREV)
         newbutton |= BUTTON_NEXT;
 #endif
-
+#endif /* !SIMULATOR */
     return newbutton;
 }
 
@@ -523,7 +523,6 @@ void button_set_flip(bool flip)
     }
 }
 #endif /* HAVE_LCD_FLIP */
-#endif /* SIMULATOR */
 
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value)

@@ -20,7 +20,8 @@
  ****************************************************************************/
 
 #include "debug.h"
-#include "uisdl.h"
+#include "sim-ui-defines.h"
+#include "system.h"
 #include "lcd-sdl.h"
 #include "screendump.h"
 

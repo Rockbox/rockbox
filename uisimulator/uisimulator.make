@@ -8,13 +8,10 @@
 #
 
 INCLUDES += -I$(ROOTDIR)/uisimulator/sdl -I$(ROOTDIR)/uisimulator/common \
+	-I$(FIRMDIR)/include -I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR)
 
-SIMINCLUDES += -I$(ROOTDIR)/uisimulator/sdl -I$(ROOTDIR)/uisimulator/common \
-	-I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR)
+SIMFLAGS += $(INCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
 
-SIMFLAGS += $(SIMINCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
-
-SIMSRC += $(call preprocess, $(ROOTDIR)/uisimulator/sdl/SOURCES)
 SIMSRC += $(call preprocess, $(ROOTDIR)/uisimulator/common/SOURCES)
 SIMOBJ = $(call c2obj,$(SIMSRC))
 OTHER_SRC += $(SIMSRC)

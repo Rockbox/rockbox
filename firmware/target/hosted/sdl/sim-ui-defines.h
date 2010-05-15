@@ -397,12 +397,9 @@
 #define UI_LCD_POSX                 101
 #define UI_LCD_POSY                 195
 
-#else
+#elif defined(SIMULATOR)
 #error no UI defines
 #endif
-extern SDL_Surface *gui_surface;
-extern bool background;  /* True if the background image is enabled */
-extern int display_zoom; 
 
 #endif /* #ifndef __UISDL_H__ */
 

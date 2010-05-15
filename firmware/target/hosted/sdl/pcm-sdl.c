@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2005 by Nick Lanham
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,17 +24,20 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <memory.h>
-#include "kernel.h"
+#include <SDL.h>
+#include "config.h"
+#include "debug.h"
 #include "sound.h"
 #include "audiohw.h"
+#include "system.h"
 
 #include "pcm.h"
 #include "pcm_sampr.h"
-#include "SDL.h"
 
-/*#define LOGF_ENABLE*/
-#include "logf.h"
+#ifdef DEBUG
+#include <stdio.h>
+extern bool debug_audio;
+#endif
 
 static int sim_volume = 0;
 
@@ -45,22 +49,18 @@ static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
 
-static struct pcm_udata
+struct pcm_udata
 {
     Uint8 *stream;
     Uint32 num_in;
     Uint32 num_out;
+#ifdef DEBUG
     FILE  *debug;
+#endif
 } udata;
 
 static SDL_AudioSpec obtained;
 static SDL_AudioCVT cvt;
-
-extern bool debug_audio;
-
-#ifndef MIN
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#endif
 
 void pcm_play_lock(void)
 {
@@ -102,11 +102,13 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     SDL_PauseAudio(1);
+#ifdef DEBUG
     if (udata.debug != NULL) {
         fclose(udata.debug);
         udata.debug = NULL;
         DEBUGF("Audio debug file closed\n");
     }
+#endif
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -122,13 +124,14 @@ size_t pcm_get_bytes_waiting(void)
     return pcm_data_size;
 }
 
-extern int sim_volume; /* in firmware/sound.c */
-static void write_to_soundcard(struct pcm_udata *udata) {
+void write_to_soundcard(struct pcm_udata *udata)
+{
+#ifdef DEBUG
     if (debug_audio && (udata->debug == NULL)) {
         udata->debug = fopen("audiodebug.raw", "ab");
         DEBUGF("Audio debug file open\n");
     }
-
+#endif
     if (cvt.needed) {
         Uint32 rd = udata->num_in;
         Uint32 wr = (double)rd * cvt.len_ratio;
@@ -162,10 +165,11 @@ static void write_to_soundcard(struct pcm_udata *udata) {
             udata->num_in = cvt.len / pcm_sample_bytes;
             udata->num_out = cvt.len_cvt / pcm_sample_bytes;
 
+#ifdef DEBUG
             if (udata->debug != NULL) {
                fwrite(cvt.buf, sizeof(Uint8), cvt.len_cvt, udata->debug);
             }
-
+#endif
             free(cvt.buf);
         }
         else {
@@ -191,26 +195,27 @@ static void write_to_soundcard(struct pcm_udata *udata) {
                 break;
                 }
             }
-
+#ifdef DEBUG
             if (udata->debug != NULL) {
                fwrite(udata->stream, sizeof(Uint8), wr, udata->debug);
             }
+#endif
         }
     } else {
         udata->num_in = udata->num_out = MIN(udata->num_in, udata->num_out);
         SDL_MixAudio(udata->stream, pcm_data, 
                      udata->num_out * pcm_sample_bytes, sim_volume);
-        
+#ifdef DEBUG
         if (udata->debug != NULL) {
            fwrite(pcm_data, sizeof(Uint8), udata->num_out * pcm_sample_bytes,
                   udata->debug);
         }
+#endif
     }
 }
 
-static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
+void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 {
-    logf("sdl_audio_callback: len %d, pcm %d\n", len, pcm_data_size);
     udata->stream = stream;
 
     /* Write what we have in the PCM buffer */
@@ -221,6 +226,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
     while (len > 0) {
         if ((ssize_t)pcm_data_size <= 0) {
             pcm_data_size = 0;
+
             if (pcm_callback_for_more)
                 pcm_callback_for_more(&pcm_data, &pcm_data_size);
         }
@@ -302,14 +308,20 @@ const void * pcm_rec_dma_get_peak_buffer(void)
 
 void pcm_play_dma_init(void)
 {
-    SDL_AudioSpec wanted_spec;
-    udata.debug = NULL;
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO))
+    {
+        DEBUGF("Could not initialize SDL audio subsystem!\n");
+        return;
+    }
 
+    SDL_AudioSpec wanted_spec;
+#ifdef DEBUG
+    udata.debug = NULL;
     if (debug_audio) {
         udata.debug = fopen("audiodebug.raw", "wb");
         DEBUGF("Audio debug file open\n");
     }
-    
+#endif
     /* Set 16-bit stereo audio at 44Khz */
     wanted_spec.freq = 44100;
     wanted_spec.format = AUDIO_S16SYS;
@@ -322,7 +334,7 @@ void pcm_play_dma_init(void)
 
     /* Open the audio device and start playing sound! */
     if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
-        fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
+        DEBUGF("Unable to open audio: %s\n", SDL_GetError());
         return;
     }
 
@@ -339,7 +351,7 @@ void pcm_play_dma_init(void)
         pcm_channel_bytes = 2;
         break;
     default:
-        fprintf(stderr, "Unknown sample format obtained: %u\n",
+        DEBUGF("Unknown sample format obtained: %u\n",
                 (unsigned)obtained.format);
         return;
     }
@@ -353,74 +365,9 @@ void pcm_postinit(void)
 {
 }
 
+void pcm_set_mixer_volume(int volume)
+{
+    sim_volume = volume;
+}
+
 #endif /* CONFIG_CODEC == SWCODEC */
-
-/**
- * Audio Hardware api. Make them do nothing as we cannot properly simulate with
- * SDL. if we used DSP we would run code that doesn't actually run on the target
- **/
-void audiohw_set_volume(int volume)
-{
-    sim_volume = SDL_MIX_MAXVOLUME * ((volume - VOLUME_MIN) / 10) / (VOLUME_RANGE / 10);
-}
-#if defined(AUDIOHW_HAVE_PRESCALER)
-void audiohw_set_prescaler(int value)   { (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_BALANCE)
-void audiohw_set_balance(int value)     { (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_BASS)
-void audiohw_set_bass(int value)        { (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE)
-void audiohw_set_treble(int value)      { (void)value; }
-#endif
-#if CONFIG_CODEC != SWCODEC
-void audiohw_set_channel(int value)     { (void)value; }
-void audiohw_set_stereo_width(int value){ (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-void audiohw_set_bass_cutoff(int value) { (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-void audiohw_set_treble_cutoff(int value){ (void)value; }
-#endif
-/* EQ-based tone controls */
-#if defined(AUDIOHW_HAVE_EQ)
-void audiohw_set_eq_band_gain(unsigned int band, int value)
-    { (void)band; (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_EQ_FREQUENCY)
-void audiohw_set_eq_band_frequency(unsigned int band, int value)
-    { (void)band; (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_EQ_WIDTH)
-void audiohw_set_eq_band_width(unsigned int band, int value)
-    { (void)band; (void)value; }
-#endif
-#if defined(AUDIOHW_HAVE_DEPTH_3D)
-void audiohw_set_depth_3d(int value)
-    { (void)value; }
-#endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-int mas_codec_readreg(int reg)
-{
-    (void)reg;
-    return 0;
-}
-
-int mas_codec_writereg(int reg, unsigned int val)
-{
-    (void)reg;
-    (void)val;
-    return 0;
-}
-int mas_writemem(int bank, int addr, const unsigned long* src, int len)
-{
-    (void)bank;
-    (void)addr;
-    (void)src;
-    (void)len;
-    return 0;
-}
-#endif

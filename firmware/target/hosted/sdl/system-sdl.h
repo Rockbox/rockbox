@@ -41,9 +41,12 @@ int set_irq_level(int level);
 
 void sim_enter_irq_handler(void);
 void sim_exit_irq_handler(void);
-bool sim_kernel_init(void);
 void sim_kernel_shutdown(void);
+void sys_poweroff(void);
+void sys_handle_argv(int argc, char *argv[]);
 
+extern bool background;  /* True if the background image is enabled */
+extern int display_zoom;
 extern long start_tick;
 
 #endif /* _SYSTEM_SDL_H_ */

@@ -19,17 +19,18 @@
  *
  ****************************************************************************/
 
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include "system.h"
 #include "debug.h"
 #include "lcd.h"
 #include "lcd-charcell.h"
 #include "screendump.h"
 #include "general.h"
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 
 #include "lcd-playersim.h"
-#include "uisdl.h"
+#include "sim-ui-defines.h"
 #include "lcd-sdl.h"
 
 /* can't include file.h here */

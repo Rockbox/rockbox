@@ -66,6 +66,10 @@
 #elif defined(HAVE_AK4537)
 #include "ak4537.h"
 #endif
+#if defined(HAVE_SDL_AUDIO)
+/* #include <SDL_audio.h> gives errors in other code areas,
+ * we don't really need it here, so don't. but it should maybe be fixed */
+#endif
 
 
 
@@ -369,7 +373,7 @@ void audiohw_postinit(void);
  */
 void audiohw_close(void);
 
-#ifdef AUDIOHW_HAVE_CLIPPING
+#if defined(AUDIOHW_HAVE_CLIPPING) || defined(HAVE_SDL_AUDIO)
  /**
  * Set new volume value
  * @param val to set.

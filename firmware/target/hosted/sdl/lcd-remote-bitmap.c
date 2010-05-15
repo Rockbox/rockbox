@@ -19,10 +19,11 @@
  *
  ****************************************************************************/
 
-#include "uisdl.h"
+#include "sim-ui-defines.h"
 #include "lcd-sdl.h"
 #include "lcd-remote-bitmap.h"
 #include "screendump.h"
+#include "system.h" /* background */
 
 SDL_Surface *remote_surface = 0;
 

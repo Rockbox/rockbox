@@ -56,12 +56,15 @@ struct thread_entry threads[MAXTHREADS];
  * in their start routines responding to messages so this is the only
  * way to get them back in there so they may exit */
 static jmp_buf thread_jmpbufs[MAXTHREADS];
+/* this mutex locks out other Rockbox threads while one runs,
+ * that enables us to simulate a cooperative environment even if
+ * the host is preemptive */
 static SDL_mutex *m;
 static volatile bool threads_exit = false;
 
 extern long start_tick;
 
-void thread_sdl_shutdown(void)
+void sim_thread_shutdown(void)
 {
     int i;
 
@@ -79,6 +82,7 @@ void thread_sdl_shutdown(void)
     for (i = 0; i < MAXTHREADS; i++)
     {
         struct thread_entry *thread = &threads[i];
+        /* exit all current threads, except the main one */
         if (thread->context.t != NULL)
         {
             /* Signal thread on delay or block */
@@ -128,30 +132,9 @@ static struct thread_entry * find_empty_thread_slot(void)
     return thread;
 }
 
-/* Do main thread creation in this file scope to avoid the need to double-
-   return to a prior call-level which would be unaware of the fact setjmp
-   was used */
-extern void app_main(void *param);
-static int thread_sdl_app_main(void *param)
-{
-    SDL_LockMutex(m);
-    cores[CURRENT_CORE].running = &threads[0];
-
-    /* Set the jump address for return */
-    if (setjmp(thread_jmpbufs[0]) == 0)
-    {
-        app_main(param);
-        /* should not ever be reached but... */
-        THREAD_PANICF("app_main returned!\n");
-    }
-
-    /* Unlock and exit */
-    SDL_UnlockMutex(m);
-    return 0;
-}
 
 /* Initialize SDL threading */
-bool thread_sdl_init(void *param)
+void init_threads(void)
 {
     struct thread_entry *thread;
     int n;
@@ -164,7 +147,7 @@ bool thread_sdl_init(void *param)
     if (SDL_LockMutex(m) == -1)
     {
         fprintf(stderr, "Couldn't lock mutex\n");
-        return false;
+        return;
     }
 
     /* Initialize all IDs */
@@ -180,30 +163,21 @@ bool thread_sdl_init(void *param)
     thread->name = "main";
     thread->state = STATE_RUNNING;
     thread->context.s = SDL_CreateSemaphore(0);
+    thread->context.t = NULL; /* NULL for the implicit main thread */
     cores[CURRENT_CORE].running = thread;
  
     if (thread->context.s == NULL)
     {
         fprintf(stderr, "Failed to create main semaphore\n");
-        return false;
-    }
-
-    thread->context.t = SDL_CreateThread(thread_sdl_app_main, param);
-
-    if (thread->context.t == NULL)
-    {
-        SDL_DestroySemaphore(thread->context.s);
-        fprintf(stderr, "Failed to create main thread\n");
-        return false;
+        return;
     }
 
     THREAD_SDL_DEBUGF("Main thread: %p\n", thread);
 
-    SDL_UnlockMutex(m);
-    return true;
+    return;
 }
 
-void thread_sdl_exception_wait(void)
+void sim_thread_exception_wait(void)
 {
     while (1)
     {
@@ -214,7 +188,7 @@ void thread_sdl_exception_wait(void)
 }
 
 /* A way to yield and leave the threading system for extended periods */
-void thread_sdl_thread_lock(void *me)
+void sim_thread_lock(void *me)
 {
     SDL_LockMutex(m);
     cores[CURRENT_CORE].running = (struct thread_entry *)me;
@@ -223,7 +197,7 @@ void thread_sdl_thread_lock(void *me)
         thread_exit();
 }
 
-void * thread_sdl_thread_unlock(void)
+void * sim_thread_unlock(void)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
     SDL_UnlockMutex(m);
@@ -527,19 +501,6 @@ unsigned int create_thread(void (*function)(void),
                       thread - threads, THREAD_SDL_GET_NAME(thread));
 
     return thread->id;
-}
-
-void init_threads(void)
-{
-    /* Main thread is already initialized */
-    if (cores[CURRENT_CORE].running != &threads[0])
-    {
-        THREAD_PANICF("Wrong main thread in init_threads: %p\n",
-                      cores[CURRENT_CORE].running);
-    }
-
-    THREAD_SDL_DEBUGF("First Thread: %d (%s)\n",
-            0, THREAD_SDL_GET_NAME(&threads[0]));
 }
 
 #ifndef ALLOW_REMOVE_THREAD

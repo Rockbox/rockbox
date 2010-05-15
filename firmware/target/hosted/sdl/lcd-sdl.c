@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 
+#include <SDL.h>
 #include "lcd-sdl.h"
-#include "uisdl.h"
+#include "sim-ui-defines.h"
 #include "system.h" /* for MIN() and MAX() */
 
 int display_zoom = 1;

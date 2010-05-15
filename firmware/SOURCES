@@ -18,6 +18,22 @@ rolo.c
 thread.c
 timer.c
 #endif /* SIMULATOR */
+#ifdef HAVE_SDL
+target/hosted/sdl/button-sdl.c
+target/hosted/sdl/kernel-sdl.c
+#ifdef HAVE_LCD_BITMAP
+target/hosted/sdl/lcd-bitmap.c
+#elif defined(HAVE_LCD_CHARCELLS)
+target/hosted/sdl/lcd-charcells.c
+#endif
+#ifdef HAVE_REMOTE_LCD
+target/hosted/sdl/lcd-remote-bitmap.c
+#endif
+target/hosted/sdl/lcd-sdl.c
+target/hosted/sdl/system-sdl.c
+target/hosted/sdl/thread-sdl.c
+target/hosted/sdl/timer-sdl.c
+#endif
 panic.c
 debug.c
 
@@ -292,6 +308,11 @@ drivers/audio/ak4537.c
 #elif defined(HAVE_UDA1341)
 drivers/audio/uda1341.c
 #endif /* defined(HAVE_*) */
+#elif defined(HAVE_SDL_AUDIO)
+drivers/audio/sdl.c
+#if CONFIG_CODEC == SWCODEC
+target/hosted/sdl/pcm-sdl.c
+#endif
 #endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
 
 /* USB Stack */

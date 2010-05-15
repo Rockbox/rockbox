@@ -3,11 +3,11 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Thomas Martitz
+ * Copyright (C) 2006 Dan Everton
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +19,25 @@
  *
  ****************************************************************************/
 
+#ifndef __LCDSDL_H__
+#define __LCDSDL_H__
 
-#ifndef _BUTTON_SDL_H_
-#define _BUTTON_SDL_H_
+#include "lcd.h"
+#include "SDL.h"
 
-#include <stdbool.h>
-#include "config.h"
-#include "button-target.h"
+/* Default display zoom level */
+extern int display_zoom;
+extern SDL_Surface *gui_surface;
 
-#undef HAVE_LCD_FLIP
+void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
+                     int height, int max_x, int max_y,
+                     unsigned long (*getpixel)(int, int));
 
-#undef button_init_device
-#define button_init_device()
+void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
+                    int height, int max_x, int max_y, int ui_x, int ui_y);
 
-struct button_map {
-    int button, x, y, radius;
-    char *description;
-};
+void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
+                      int first, int steps);
 
-int  xy2button( int x, int y);
-bool button_hold(void);
-void button_init_sdl(void);
-#undef button_init_device
-#define button_init_device() button_init_sdl()
+#endif /* #ifndef __LCDSDL_H__ */
 
-#endif
