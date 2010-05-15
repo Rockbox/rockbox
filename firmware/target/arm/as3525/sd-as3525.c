@@ -669,10 +669,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     int ret = 0;
     unsigned loops = 0;
 
-    /* skip SanDisk OF */
-    if (drive == INTERNAL_AS3525)
-        start += AMS_OF_SIZE;
-
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
@@ -691,6 +687,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         ret = -20;
         goto sd_transfer_error;
     }
+
+    /* skip SanDisk OF */
+    if (drive == INTERNAL_AS3525)
+        start += AMS_OF_SIZE;
 
     last_disk_activity = current_tick;
 

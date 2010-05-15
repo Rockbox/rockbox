@@ -795,10 +795,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
 
-    /* skip SanDisk OF */
-    if (drive == INTERNAL_AS3525)
-        start += AMS_OF_SIZE;
-
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
@@ -820,6 +816,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         ret = -18;
         goto sd_transfer_error;
     }
+
+    /* skip SanDisk OF */
+    if (drive == INTERNAL_AS3525)
+        start += AMS_OF_SIZE;
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
