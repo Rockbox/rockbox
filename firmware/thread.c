@@ -752,7 +752,10 @@ static void core_thread_init(unsigned int core)
 static inline void core_sleep(void)
 {
     asm volatile (
-        "mcr p15, 0, %0, c7, c0, 4" /* Wait for interrupt */
+        "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
+#if CONFIG_CPU == IMX31L
+        "nop\n nop\n nop\n nop\n nop\n" /* Clean out the pipes */
+#endif
         : : "r"(0)
     );
     enable_irq();
