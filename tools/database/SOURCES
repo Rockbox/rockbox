@@ -15,6 +15,7 @@ database.c
 ../../firmware/logf.c
 ../../uisimulator/common/io.c
 #if CONFIG_CODEC != SWCODEC
+../../apps/metadata/id3tags.c
 ../../apps/metadata/mp3.c
 #endif
 /* Caution. metadata files do not add!! */

@@ -171,6 +171,7 @@ usb_keymaps.c
 gui/usb_screen.c
 #endif
 metadata.c
+metadata/id3tags.c
 metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC
 metadata/metadata_common.c
