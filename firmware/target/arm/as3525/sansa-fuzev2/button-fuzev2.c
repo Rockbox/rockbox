@@ -34,6 +34,7 @@ static bool hold_button = false;
 #define TIMER_TICK              (KERNEL_TIMER_FREQ/HZ)/* how long a tick lasts */
 #define TIMER_MS                (TIMER_TICK/(1000/HZ))/* how long a ms lasts */
 
+#define WHEEL_LOOP_INTERVAL     (  3*TIMER_MS)      /*  3 ms */
 #define WHEEL_REPEAT_INTERVAL   (300*TIMER_MS)      /* 300ms */
 #define WHEEL_FAST_ON_INTERVAL  ( 20*TIMER_MS)      /*  20ms */
 #define WHEEL_FAST_OFF_INTERVAL ( 60*TIMER_MS)      /*  60ms */
@@ -76,6 +77,18 @@ static void scrollwheel(unsigned int wheel_value)
         { 1, 3, 0, 2 }, /* Counter-clockwise  */
     };
 
+    int  repeat = 1; /* assume repeat */
+    long time = TIMER2_VALUE + current_tick*TIMER_TICK; /* to timer unit */
+    long v = (time - last_wheel_post);
+    if (v < WHEEL_LOOP_INTERVAL) /* avoid too frequent updates */
+        return ;
+
+   /* interpolate velocity in timer_freq/timer_unit == 1/s */
+    if (v) v = TIMER_FREQ / v;
+
+    /* accumulate velocities over time with each v */
+    wheel_velocity = (7*wheel_velocity + v) / 8;
+
     unsigned int btn = BUTTON_NONE;
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
@@ -88,16 +101,6 @@ static void scrollwheel(unsigned int wheel_value)
         old_wheel_value = wheel_value;
         return;
     }
-
-    int  repeat = 1; /* assume repeat */
-    long time = TIMER2_VALUE + current_tick*TIMER_TICK; /* to timer unit */
-    long v = (time - last_wheel_post);
-
-   /* interpolate velocity in timer_freq/timer_unit == 1/s */
-    if (v) v = TIMER_FREQ / v;
-
-    /* accumulate velocities over time with each v */
-    wheel_velocity = (7*wheel_velocity + v) / 8;
 
     if (btn != wheel_repeat)
     {
