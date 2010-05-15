@@ -29,6 +29,7 @@
 #include "talk.h"
 #include "splash.h"
 #include "viewport.h"
+#include "strtok_r.h"
 
 #ifdef HAVE_LCD_BITMAP
 
