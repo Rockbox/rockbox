@@ -50,10 +50,8 @@ void lcd_init_device(void)
     /* Only do this once to avoid flicker */
     memset(FRAME, 0x00, FRAME_SIZE);
 #endif
-    IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
     IPU_IMA_ADDR = ((0x1 << 16) | (MAIN_LCD_IDMAC_CHANNEL << 4)) + (1 << 3);
     IPU_IMA_DATA = FRAME_PHYS_ADDR;
-    IPU_IDMAC_CHA_EN |= (1ul << MAIN_LCD_IDMAC_CHANNEL);
 }
 
 /* Update a fraction of the display. */
