@@ -76,11 +76,11 @@ static uint16_t wmc_regs[WMC_NUM_REGISTERS] =
     [WMC_GPIO]                    = 0x000,
     [WMC_JACK_DETECT_CONTROL1]    = 0x000,
     [WMC_DAC_CONTROL]             = 0x000,
-    [WMC_LEFT_DAC_DIGITAL_VOL]    = 0x0ff | WMC_VU,
+    [WMC_LEFT_DAC_DIGITAL_VOL]    = 0x0ff, /* Latch left first */
     [WMC_RIGHT_DAC_DIGITAL_VOL]   = 0x0ff | WMC_VU,
     [WMC_JACK_DETECT_CONTROL2]    = 0x000,
     [WMC_ADC_CONTROL]             = 0x100,
-    [WMC_LEFT_ADC_DIGITAL_VOL]    = 0x0ff | WMC_VU,
+    [WMC_LEFT_ADC_DIGITAL_VOL]    = 0x0ff, /* Latch left first */
     [WMC_RIGHT_ADC_DIGITAL_VOL]   = 0x0ff | WMC_VU,
     [WMC_EQ1_LOW_SHELF]           = 0x12c,
     [WMC_EQ2_PEAK1]               = 0x02c,
@@ -104,16 +104,16 @@ static uint16_t wmc_regs[WMC_NUM_REGISTERS] =
     [WMC_3D_CONTROL]              = 0x000,
     [WMC_BEEP_CONTROL]            = 0x000,
     [WMC_INPUT_CTRL]              = 0x033,
-    [WMC_LEFT_INP_PGA_GAIN_CTRL]  = 0x010 | WMC_VU | WMC_ZC,
+    [WMC_LEFT_INP_PGA_GAIN_CTRL]  = 0x010 | WMC_ZC, /* Latch left first */
     [WMC_RIGHT_INP_PGA_GAIN_CTRL] = 0x010 | WMC_VU | WMC_ZC,
     [WMC_LEFT_ADC_BOOST_CTRL]     = 0x100,
     [WMC_RIGHT_ADC_BOOST_CTRL]    = 0x100,
     [WMC_OUTPUT_CTRL]             = 0x002,
     [WMC_LEFT_MIXER_CTRL]         = 0x001,
     [WMC_RIGHT_MIXER_CTRL]        = 0x001,
-    [WMC_LOUT1_HP_VOLUME_CTRL]    = 0x039 | WMC_VU | WMC_ZC,
+    [WMC_LOUT1_HP_VOLUME_CTRL]    = 0x039 | WMC_ZC, /* Latch left first */
     [WMC_ROUT1_HP_VOLUME_CTRL]    = 0x039 | WMC_VU | WMC_ZC,
-    [WMC_LOUT2_SPK_VOLUME_CTRL]   = 0x039 | WMC_VU | WMC_ZC,
+    [WMC_LOUT2_SPK_VOLUME_CTRL]   = 0x039 | WMC_ZC, /* Latch left first */
     [WMC_ROUT2_SPK_VOLUME_CTRL]   = 0x039 | WMC_VU | WMC_ZC,
     [WMC_OUT3_MIXER_CTRL]         = 0x001,
     [WMC_OUT4_MONO_MIXER_CTRL]    = 0x001,
@@ -305,17 +305,17 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     get_headphone_levels(vol_l, &dac_l, &hp_l, &mix_l, &boost_l);
     get_headphone_levels(vol_r, &dac_r, &hp_r, &mix_r, &boost_r);
 
-    wmc_write_masked(WMC_LEFT_MIXER_CTRL, WMC_BYPLMIXVOLw(mix_l),
+    wmc_write_masked(WMC_LEFT_MIXER_CTRL, mix_l << WMC_BYPLMIXVOL_POS,
                      WMC_BYPLMIXVOL);
     wmc_write_masked(WMC_LEFT_ADC_BOOST_CTRL,
-                     WMC_L2_2BOOSTVOLw(boost_l), WMC_L2_2BOOSTVOL);
+                     boost_l << WMC_L2_2BOOSTVOL_POS, WMC_L2_2BOOSTVOL);
     wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, dac_l, WMC_DVOL);
     wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, hp_l, WMC_AVOL);
 
-    wmc_write_masked(WMC_RIGHT_MIXER_CTRL, WMC_BYPRMIXVOLw(mix_r),
+    wmc_write_masked(WMC_RIGHT_MIXER_CTRL, mix_r << WMC_BYPRMIXVOL_POS,
                      WMC_BYPRMIXVOL);
     wmc_write_masked(WMC_RIGHT_ADC_BOOST_CTRL,
-                     WMC_R2_2BOOSTVOLw(boost_r), WMC_R2_2BOOSTVOL);
+                     boost_r << WMC_R2_2BOOSTVOL_POS, WMC_R2_2BOOSTVOL);
     wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, dac_r, WMC_DVOL);
     wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, hp_r, WMC_AVOL);
 
@@ -400,10 +400,10 @@ void audiohw_set_frequency(int fsel)
     {
         [HW_FREQ_8] = /* PLL = 65.536MHz */
         {
-            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
+            .plln    = 7 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2f,            /* 12414886 */
+            .pllk2   = 0x0b7,
+            .pllk3   = 0x1a6,
             .mclkdiv = WMC_MCLKDIV_8,   /*  2.0480 MHz */
             .filter  = WMC_SR_8KHZ,
         },
@@ -414,19 +414,19 @@ void audiohw_set_frequency(int fsel)
         },
         [HW_FREQ_12] = /* PLL = 73.728 MHz */
         {
-            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
+            .plln    = 8 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2d,            /* 11869595 */
+            .pllk2   = 0x08e,
+            .pllk3   = 0x19b,
             .mclkdiv = WMC_MCLKDIV_6,   /*  3.0720 MHz */
             .filter  = WMC_SR_12KHZ,
         },
         [HW_FREQ_16] = /* PLL = 65.536MHz */
         {
-            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
+            .plln    = 7 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2f,            /* 12414886 */
+            .pllk2   = 0x0b7,
+            .pllk3   = 0x1a6,
             .mclkdiv = WMC_MCLKDIV_4,   /*  4.0960 MHz */
             .filter  = WMC_SR_16KHZ,
         },
@@ -437,19 +437,19 @@ void audiohw_set_frequency(int fsel)
         },
         [HW_FREQ_24] = /* PLL = 73.728 MHz */
         {
-            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
+            .plln    = 8 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2d,            /* 11869595 */
+            .pllk2   = 0x08e,
+            .pllk3   = 0x19b,
             .mclkdiv = WMC_MCLKDIV_3,   /*  6.1440 MHz */
             .filter  = WMC_SR_24KHZ,
         },
         [HW_FREQ_32] = /* PLL = 65.536MHz */
         {
-            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
+            .plln    = 7 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2f,            /* 12414886 */
+            .pllk2   = 0x0b7,
+            .pllk3   = 0x1a6,
             .mclkdiv = WMC_MCLKDIV_2,   /*  8.1920 MHz */
             .filter  = WMC_SR_32KHZ,
         },
@@ -460,10 +460,10 @@ void audiohw_set_frequency(int fsel)
         },
         [HW_FREQ_48] = /* PLL = 73.728 MHz */
         {
-            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
-            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
-            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
+            .plln    = 8 | WMC_PLL_PRESCALE,
+            .pllk1   = 0x2d,            /* 11869595 */
+            .pllk2   = 0x08e,
+            .pllk3   = 0x19b,
             .mclkdiv = WMC_MCLKDIV_1_5, /* 12.2880 MHz */
             .filter  = WMC_SR_48KHZ,
         },

@@ -103,13 +103,9 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 
 /* Volume masks and macros for digital volumes */
 #define WMC_DVOL                        0xff
-#define WMC_DVOLr(x)                    ((x) & WMC_DVOL)
-#define WMC_DVOLw(x)                    ((x) & WMC_DVOL)
 
 /* Volums masks and macros for analogue volumes */
 #define WMC_AVOL                        0x3f
-#define WMC_AVOLr(x)                    ((x) & WMC_AVOL)
-#define WMC_AVOLw(x)                    ((x) & WMC_AVOL)
 
 /* WMC_SOFTWARE_RESET (0x00) */
 #define WMC_RESET
@@ -274,14 +270,18 @@ void wmc_clear(unsigned int reg, unsigned int bits);
     /* 0.5dB steps: Mute:0x00, -127dB:0x01...0dB:0xff */
     /*Use WMC_DVOL* macros */
 
-/* Macros for EQ gain and cutoff */
-#define WMC_EQGC                        0x1f
-#define WMC_EQGCr(x)                    ((x) & WMC_EQGC)
-#define WMC_EQGCw(x)                    ((x) & WMC_EQGC)
+/* Gain */
+#define WMC_EQG                         (0x1f << 0)
+
+/* Cutoff/Center */
+#define WMC_EQC                         (0x3 << 5)
+#define WMC_EQC_POS                     (5)
+
+/* Bandwidth */
+#define WMC_EQBW                        (1 << 8)
 
 /* WMC_EQ1_LOW_SHELF (0x12) */
 #define WMC_EQ3DMODE                    (1 << 8)
-#define WMC_EQ1C                        (3 << 5) /* Cutoff */
     #define WMC_EQ1C_80HZ               (0 << 5) /* 80Hz */
     #define WMC_EQ1C_105HZ              (1 << 5) /* 105Hz */
     #define WMC_EQ1C_135HZ              (2 << 5) /* 135Hz */
@@ -289,8 +289,6 @@ void wmc_clear(unsigned int reg, unsigned int bits);
     /* 00000=+12dB, 00001=+11dB...(-1dB steps)...11000=-12dB, 11001-11111=reserved */
 
 /* WMC_EQ2_PEAK1 (0x13) */
-#define WMC_EQ2BW                       (1 << 8)
-#define WMC_EQ2C                        (3 << 5) /* Center */
     #define WMC_EQ2C_230HZ              (0 << 5) /* 230Hz */
     #define WMC_EQ2C_300HZ              (1 << 5) /* 300Hz */
     #define WMC_EQ2C_385HZ              (2 << 5) /* 385Hz */
@@ -299,8 +297,6 @@ void wmc_clear(unsigned int reg, unsigned int bits);
        11001-11111=reserved */
 
 /* WMC_EQ3_PEAK2 (0x14) */
-#define WMC_EQ3BW                       (1 << 8)
-#define WMC_EQ3C                        (3 << 5) /* Center */
     #define WMC_EQ3C_650HZ              (0 << 5) /* 650Hz */
     #define WMC_EQ3C_850HZ              (1 << 5) /* 850Hz */
     #define WMC_EQ3C_1_1KHZ             (2 << 5) /* 1.1kHz */
@@ -309,8 +305,6 @@ void wmc_clear(unsigned int reg, unsigned int bits);
        11001-11111=reserved */
 
 /* WMC_EQ4_PEAK3 (0x15) */
-#define WMC_EQ4BW                       (1 << 8)
-#define WMC_EQ4C                        (3 << 5) /* Center */
     #define WMC_EQ4C_1_8KHZ             (0 << 5) /* 1.8kHz */
     #define WMC_EQ4C_2_4KHZ             (1 << 5) /* 2.4kHz */
     #define WMC_EQ4C_3_2KHZ             (2 << 5) /* 3.2kHz */
@@ -319,7 +313,6 @@ void wmc_clear(unsigned int reg, unsigned int bits);
        11001-11111=reserved */
 
 /* WMC_EQ5_HIGH_SHELF (0x16) */
-#define WMC_EQ5C                        (3 << 5) /* Cutoff */
     #define WMC_EQ5C_5_3KHZ             (0 << 5) /* 5.3kHz */
     #define WMC_EQ5C_6_9KHZ             (1 << 5) /* 6.9kHz */
     #define WMC_EQ5C_9KHZ               (2 << 5) /* 9.0kHz */
@@ -331,29 +324,20 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_LIMEN                       (1 << 8)
     /* 0000=750uS, 0001=1.5mS...(x2 each step)...1010-1111=768mS */
 #define WMC_LIMDCY                      (0xf << 4)
-    #define WMC_LIMDCYr(x)              (((x) & WMC_LIMDCY) >> 4)
-    #define WMC_LIMDCYw(x)              (((x) << 4) & WMC_LIMDCY)
+#define WMC_LIMDCY_POS                  (4)
     /* 0000=94uS, 0001=188uS...(x2 each step)...1011-1111=192mS */
 #define WMC_LIMATK                      (0xf << 0)
-    #define WMC_LIMATKr(x)              ((x) & WMC_LIMATK)
-    #define WMC_LIMATKw(x)              ((x) & WMC_LIMATK)
 
 /* WMC_DAC_LIMITER2 (0x19) */
-#define WMC_LIMLVL                      (7 << 4)
     /* 000=-1dB, 001=-2dB...(-1dB steps)...101-111:-6dB */
-    #define WMC_LIMLVLr(x)              (((x) & WMC_LIMLVL) >> 4)
-    #define WMC_LIMLVLw(x)              (((x) << 4) & WMC_LIMLVL)
-#define WMC_LIMBOOST                    (0xf << 0)
+#define WMC_LIMLVL                      (7 << 4)
+#define WMC_LIMLVL_POS                  (4)
     /* 0000=0dB, 0001=+1dB...1100=+12dB, 1101-1111=reserved */
-    #define WMC_LIMBOOSTr(x)            (((x) & WMC_LIMBOOST)    
-    #define WMC_LIMBOOSTw(x)            (((x) & WMC_LIMBOOST)    
-
+#define WMC_LIMBOOST                    (0xf << 0)
 
 /* Generic notch filter bits and macros */
 #define WMC_NFU                         (1 << 8)
 #define WMC_NFA                         (0x7f << 0)
-#define WMC_NFAr(x)                     ((x) & WMC_NFA)
-#define WMC_NFAw(x)                     ((x) & WMC_NFA)
 
 /* WMC_NOTCH_FILTER1 (0x1b) */
 #define WMC_NFEN                        (1 << 7)
@@ -369,24 +353,18 @@ void wmc_clear(unsigned int reg, unsigned int bits);
     #define WMC_ALCSEL_BOTH_ON          (3 << 7)
     /* 000=-6.75dB, 001=-0.75dB...(6dB steps)...111=+35.25dB */
 #define WMC_ALCMAXGAIN                  (7 << 3)
-    #define WMC_ALCMAXGAINr(x)          (((x) & WMC_ALCMAXGAIN) >> 3)
-    #define WMC_ALCMAXGAINw(x)          (((x) << 3) & WMC_ALCMAXGAIN)
+#define WMC_ALCMAXGAIN_POS              (3)
     /* 000:-12dB...(6dB steps)...111:+30dB */
 #define WMC_ALCMINGAIN                  (7 << 0)
-    #define WMC_ALCMINGAINr(x)          ((x) & WMC_ALCMINGAIN)
-    #define WMC_ALCMINGAINw(x)          ((x) & WMC_ALCMINGAIN)
 
 /* WMC_ALC_CONTROL2 (0x21) */
     /* 0000=0ms, 0001=2.67ms, 0010=5.33ms...
        (2x with every step)...43.691s */
 #define WMC_ALCHLD                      (0xf << 4)
-    #define WMC_ALCHLDr(x)              (((x) & WMC_ALCHLD) >> 4)
-    #define WMC_ALCHLDw(x)              (((x) << 4) & WMC_ALCHLD)
+#define WMC_ALCHLD_POS                  (4)
     /* 1111:-1.5dBFS, 1110:-1.5dBFS, 1101:-3dBFS, 1100:-4.5dBFS...
        (-1.5dB steps)...0001:-21dBFS, 0000:-22.5dBFS */
 #define WMC_ALCLVL                      (0xf << 0)
-    #define WMC_ALCLVLr(x)              ((x) & WMC_ALCLVL)
-    #define WMC_ALCLVLw(x)              ((x) & WMC_ALCLVL)
 
 /* WMC_ALC_CONTROL3 (0x22) */
 #define WMC_ALCMODE                     (1 << 8)
@@ -397,43 +375,30 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_NGEN                        (1 << 3)
     /* 000=-39dB, 001=-45dB, 010=-51dB...(6dB steps)...111=-81dB */
 #define WMC_NGTH                        (7 << 0)
-    #define WMC_NGTHr(x)                ((x) & WMC_NGTH)
-    #define WMC_NGTHw(x)                ((x) & WMC_NGTH)
 
 /* WMC_PLL_N (0x24) */
 #define WMC_PLL_PRESCALE                (1 << 4)
 #define WMC_PLLN                        (0xf << 0)
-    #define WMC_PLLNr(x)                ((x) & WMC_PLLN)
-    #define WMC_PLLNw(x)                ((x) & WMC_PLLN)
 
 /* WMC_PLL_K1 (0x25) */
 #define WMC_PLLK_23_18                  (0x3f << 0)
-    #define WMC_PLLK_23_18r(x)          ((x) & WMC_PLLK_23_18)
-    #define WMC_PLLK_23_18w(x)          ((x) & WMC_PLLK_23_18)
 
 /* WMC_PLL_K2 (0x26) */
 #define WMC_PLLK_17_9                   (0x1ff << 0)
-    #define WMC_PLLK_17_9r(x)           ((x) & WMC_PLLK_17_9)
-    #define WMC_PLLK_17_9w(x)           ((x) & WMC_PLLK_17_9)
 
 /* WMC_PLL_K3 (0x27) */
 #define WMC_PLLK_8_0                    (0x1ff << 0)
-    #define WMC_PLLK_8_0r(x)            ((x) & WMC_PLLK_8_0)
-    #define WMC_PLLK_8_0w(x)            ((x) & WMC_PLLK_8_0)
 
 /* WMC_3D_CONTROL (0x29) */
     /* 0000: 0%, 0001: 6.67%...1110: 93.3%, 1111: 100% */
 #define WMC_DEPTH3D                     (0xf << 0)
-    #define WMC_DEPTH3Dw(x)             ((x) & WMC_DEPTH3D)
-    #define WMC_DEPTH3Dr(x)             ((x) & WMC_DEPTH3D)
 
 /* WMC_BEEP_CONTROL (0x2b) */
 #define WMC_MUTERPGA2INV                (1 << 5)
 #define WMC_INVROUT2                    (1 << 4)
     /* 000=-15dB, 001=-12dB...111=+6dB */
 #define WMC_BEEPVOL                     (7 << 1)
-    #define WMC_BEEPVOLr(x)             (((x) & WMC_BEEPVOL) >> 1)
-    #define WMC_BEEPVOLw(x)             (((x) << 1) & WMC_BEEPVOL)
+#define WMC_BEEPVOL_POS                 (1)
 #define WMC_BEEPEN                      (1 << 0)
 
 /* WMC_INPUT_CTRL (0x2c) */
@@ -457,23 +422,17 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_PGABOOSTL                    (1 << 8)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_L2_2BOOSTVOL                 (7 << 4)
-    #define WMC_L2_2BOOSTVOLr(x)         (((x) & WMC_L2_2BOOSTVOL) >> 4)
-    #define WMC_L2_2BOOSTVOLw(x)         (((x) << 4) & WMC_L2_2BOOSTVOL)
+#define WMC_L2_2BOOSTVOL_POS             (4)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_AUXL2BOOSTVOL                (7 << 0)
-    #define WMC_AUXL2BOOSTVOLr(x)        ((x) & WMC_AUXL2BOOSTVOL)
-    #define WMC_AUXL2BOOSTVOLw(x)        ((x) & WMC_AUXL2BOOSTVOL)
 
 /* WMC_RIGHT_ADC_BOOST_CTRL (0x30) */
 #define WMC_PGABOOSTR                    (1 << 8)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
-#define WMC_R2_2BOOSTVOL                (7 << 4)
-    #define WMC_R2_2BOOSTVOLr(x)         (((x) & WMC_R2_2BOOSTVOL) >> 4)
-    #define WMC_R2_2BOOSTVOLw(x)         (((x) << 4) & WMC_R2_2BOOSTVOL)
+#define WMC_R2_2BOOSTVOL                 (7 << 4)
+#define WMC_R2_2BOOSTVOL_POS             (4)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_AUXR2BOOSTVOL                (7 << 0)
-    #define WMC_AUXR2BOOSTVOLr(x)        ((x) & WMC_AUXR2BOOSTVOL)
-    #define WMC_AUXR2BOOSTVOLw(x)        ((x) & WMC_AUXR2BOOSTVOL)
 
 /* WMC_OUTPUT_CTRL (0x31) */
 #define WMC_DACL2RMIX                    (1 << 6)
@@ -487,26 +446,22 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 /* WMC_LEFT_MIXER_CTRL (0x32) */
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_AUXLMIXVOL                   (7 << 6)
-    #define WMC_AUXLMIXVOLr(x)           (((x) & WMC_AUXLMIXVOL) >> 6)
-    #define WMC_AUXLMIXVOLw(x)           (((x) << 6) & WMC_AUXLMIXVOL)
+#define WMC_AUXLMIXVOL_POS               (6)
 #define WMC_AUXL2LMIX                    (1 << 5)
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_BYPLMIXVOL                   (7 << 2)
-    #define WMC_BYPLMIXVOLr(x)           (((x) & WMC_BYPLMIXVOL) >> 2)
-    #define WMC_BYPLMIXVOLw(x)           (((x) << 2) & WMC_BYPLMIXVOL)
+#define WMC_BYPLMIXVOL_POS               (2)
 #define WMC_BYPL2LMIX                    (1 << 1)
 #define WMC_DACL2LMIX                    (1 << 0)
 
 /* WMC_RIGHT_MIXER_CTRL (0x33) */
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_AUXRMIXVOL                   (7 << 6)
-    #define WMC_AUXRMIXVOLr(x)           (((x) & WMC_AUXRMIXVOL) >> 6)
-    #define WMC_AUXRMIXVOLw(x)           (((x) << 6) & WMC_AUXRMIXVOL)
+#define WMC_AUXRMIXVOL_POS               (6)
 #define WMC_AUXR2RMIX                    (1 << 5)
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_BYPRMIXVOL                   (7 << 2)
-    #define WMC_BYPRMIXVOLr(x)           (((x) & WMC_BYPRMIXVOL) >> 2)
-    #define WMC_BYPRMIXVOLw(x)           (((x) << 2) & WMC_BYPRMIXVOL)
+#define WMC_BYPRMIXVOL_POS               (2)
 #define WMC_BYPR2RMIX                    (1 << 1)
 #define WMC_DACR2RMIX                    (1 << 0)
 
