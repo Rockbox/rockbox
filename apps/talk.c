@@ -540,7 +540,9 @@ void talk_init(void)
     reset_state(); /* use this for most of our inits */
 
     filehandle = open_voicefile();
-    has_voicefile = (filehandle >= 0); /* test if we can open it */
+    size_t audiobufsz = audiobufend - audiobuf;
+    /* test if we can open and if it fits in the audiobuffer */
+    has_voicefile = filehandle >= 0 && filesize(filehandle) > (off_t)audiobufsz;
     voicefile_size = 0;
 
     if (has_voicefile)
