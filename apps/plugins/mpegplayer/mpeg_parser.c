@@ -457,7 +457,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                 DEBUGF("<< tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, (long)pos_left, (long)pos_new,
-                       pos_right);
+                       (long)pos_right);
             }
             else
             {
