@@ -277,7 +277,7 @@ $releasenotes="/wiki/ReleaseNotes351";
     },
     'vibe500' => {
         name => 'Packard Bell Vibe 500',
-        status => 2,
+        status => 3,
     },
     'zenvision' => {
         name => 'Creative Zen Vision',
