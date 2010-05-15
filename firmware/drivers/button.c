@@ -205,11 +205,7 @@ static void button_tick(void)
 #endif
                                     ) &&
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-                                !charging_state() &&
-#else
                                 !charger_inserted() &&
-#endif
 #endif
                                 repeat_count > POWEROFF_COUNT)
                         {

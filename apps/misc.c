@@ -264,11 +264,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     scrobbler_poweroff();
 
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-    if(!charging_state())
-#else
     if(!charger_inserted())
-#endif
 #endif
     {
         bool batt_safe = battery_level_safe();
@@ -410,11 +406,7 @@ bool list_stop_handler(void)
 
         if (TIME_BEFORE(current_tick, last_off + HZ/2))
         {
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-            if (charging_state())
-#else
-            if (charger_inserted())
-#endif
+            if (charger_inserted()) 
             {
                 charging_splash();
                 ret = true;  /* screen is dirty, caller needs to refresh */
