@@ -26,6 +26,19 @@
 #define VOLUME_MIN -900
 #define VOLUME_MAX 60
 
+#define AUDIOHW_CAPS (EQ_CAP | PRESCALER_CAP | DEPTH_3D_CAP)
+/* Filter bitmask */
+#define AUDIOHW_EQ_BAND_CAPS      ((EQ_CAP << 0) | (EQ_CAP << 1) | \
+                                   (EQ_CAP << 2) | (EQ_CAP << 3) | \
+                                   (EQ_CAP << 4))
+/* Filters that can adjust cutoff and center frequency */
+#define AUDIOHW_EQ_FREQUENCY_CAPS ((EQ_CAP << 0) | (EQ_CAP << 1) | \
+                                   (EQ_CAP << 2) | (EQ_CAP << 3) | \
+                                   (EQ_CAP << 4))
+/* Filters that can adjust band width */
+#define AUDIOHW_EQ_WIDTH_CAPS     ((EQ_CAP << 1) | (EQ_CAP << 2) | \
+                                   (EQ_CAP << 3))
+
 int tenthdb2master(int db);
 void audiohw_set_headphone_vol(int vol_l, int vol_r);
 void audiohw_set_recsrc(int source, bool recording);

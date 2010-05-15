@@ -90,9 +90,6 @@
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
-/* Tone controls for WM8978 have not been implemented yet */
-#define HAVE_SW_TONE_CONTROLS
-
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO

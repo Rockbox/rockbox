@@ -385,6 +385,23 @@ void audiohw_set_bass_cutoff(int value) { (void)value; }
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 void audiohw_set_treble_cutoff(int value){ (void)value; }
 #endif
+/* EQ-based tone controls */
+#if defined(AUDIOHW_HAVE_EQ)
+void audiohw_set_eq_band_gain(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_EQ_FREQUENCY)
+void audiohw_set_eq_band_frequency(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_EQ_WIDTH)
+void audiohw_set_eq_band_width(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_DEPTH_3D)
+void audiohw_set_depth_3d(int value)
+    { (void)value; }
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 int mas_codec_readreg(int reg)
 {

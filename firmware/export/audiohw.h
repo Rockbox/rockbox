@@ -26,13 +26,15 @@
 #include <stdbool.h>
 
 /* define some audiohw caps */
-#define TREBLE_CAP          (1 << 0)
-#define BASS_CAP            (1 << 1)
-#define BALANCE_CAP         (1 << 2)
-#define CLIPPING_CAP        (1 << 3)
-#define PRESCALER_CAP       (1 << 4)
-#define BASS_CUTOFF_CAP     (1 << 5)
-#define TREBLE_CUTOFF_CAP   (1 << 6)
+#define TREBLE_CAP            (1 << 0)
+#define BASS_CAP              (1 << 1)
+#define BALANCE_CAP           (1 << 2)
+#define CLIPPING_CAP          (1 << 3)
+#define PRESCALER_CAP         (1 << 4)
+#define BASS_CUTOFF_CAP       (1 << 5)
+#define TREBLE_CUTOFF_CAP     (1 << 6)
+#define EQ_CAP                (1 << 7)
+#define DEPTH_3D_CAP          (1 << 8)
 
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -75,18 +77,31 @@
 #define VOLUME_MAX  0
 #endif
 
+#ifndef AUDIOHW_NUM_TONE_CONTROLS
+#define AUDIOHW_NUM_TONE_CONTROLS 0
+#endif
+
 /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
 
 /* convert caps into defines */
 #ifdef AUDIOHW_CAPS
+/* Tone controls */
 #if (AUDIOHW_CAPS & TREBLE_CAP)
 #define AUDIOHW_HAVE_TREBLE
 #endif
 
 #if (AUDIOHW_CAPS & BASS_CAP)
 #define AUDIOHW_HAVE_BASS
+#endif
+
+#if (AUDIOHW_CAPS & BASS_CUTOFF_CAP)
+#define AUDIOHW_HAVE_BASS_CUTOFF
+#endif
+
+#if (AUDIOHW_CAPS & TREBLE_CUTOFF_CAP)
+#define AUDIOHW_HAVE_TREBLE_CUTOFF
 #endif
 
 #if (AUDIOHW_CAPS & BALANCE_CAP)
@@ -101,19 +116,127 @@
 #define AUDIOHW_HAVE_PRESCALER
 #endif
 
-#if (AUDIOHW_CAPS & BASS_CUTOFF_CAP)
-#define AUDIOHW_HAVE_BASS_CUTOFF
+/* Hardware EQ tone controls */
+#if (AUDIOHW_CAPS & EQ_CAP)
+/* A hardware equalizer is present (or perhaps some tone control variation
+ * that is not Bass and/or Treble) */
+#define AUDIOHW_HAVE_EQ
+
+/* Defined band indexes for supported bands */
+enum
+{
+    /* Band 1 is implied; bands must be contiguous, 1 to N */
+    AUDIOHW_EQ_BAND1 = 0,
+#define AUDIOHW_HAVE_EQ_BAND1
+#if (AUDIOHW_EQ_BAND_CAPS & (EQ_CAP << 1))
+    AUDIOHW_EQ_BAND2,
+#define AUDIOHW_HAVE_EQ_BAND2
+#if (AUDIOHW_EQ_BAND_CAPS & (EQ_CAP << 2))
+    AUDIOHW_EQ_BAND3,
+#define AUDIOHW_HAVE_EQ_BAND3
+#if (AUDIOHW_EQ_BAND_CAPS & (EQ_CAP << 3))
+    AUDIOHW_EQ_BAND4,
+#define AUDIOHW_HAVE_EQ_BAND4
+#if (AUDIOHW_EQ_BAND_CAPS & (EQ_CAP << 4))
+    AUDIOHW_EQ_BAND5,
+#define AUDIOHW_HAVE_EQ_BAND5
+#endif /* 5 */
+#endif /* 4 */
+#endif /* 3 */
+#endif /* 2 */
+    AUDIOHW_EQ_BAND_NUM, /* Keep last */
+};
+
+#ifdef AUDIOHW_EQ_FREQUENCY_CAPS
+/* One or more bands supports frequency cutoff or center adjustment */
+#define AUDIOHW_HAVE_EQ_FREQUENCY
+enum
+{
+    __AUDIOHW_EQ_BAND_FREQUENCY = -1,
+#if defined(AUDIOHW_HAVE_EQ_BAND1) && \
+        (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 0))
+    AUDIOHW_EQ_BAND1_FREQUENCY,
+#define AUDIOHW_HAVE_EQ_BAND1_FREQUENCY
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND2) && \
+        (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 1))
+    AUDIOHW_EQ_BAND2_FREQUENCY,
+#define AUDIOHW_HAVE_EQ_BAND2_FREQUENCY
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3) && \
+        (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 2))
+    AUDIOHW_EQ_BAND3_FREQUENCY,
+#define AUDIOHW_HAVE_EQ_BAND3_FREQUENCY
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND4) && \
+        (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 3))
+    AUDIOHW_EQ_BAND4_FREQUENCY,
+#define AUDIOHW_HAVE_EQ_BAND4_FREQUENCY
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND5) && \
+        (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 4))
+    AUDIOHW_EQ_BAND5_FREQUENCY,
+#define AUDIOHW_HAVE_EQ_BAND5_FREQUENCY
+#endif
+    AUDIOHW_EQ_FREQUENCY_NUM,
+};
+#endif /* AUDIOHW_EQ_FREQUENCY_CAPS */
+
+#ifdef AUDIOHW_EQ_WIDTH_CAPS
+/* One or more bands supports bandwidth adjustment */
+#define AUDIOHW_HAVE_EQ_WIDTH
+enum
+{
+    __AUDIOHW_EQ_BAND_WIDTH = -1,
+#if defined(AUDIOHW_HAVE_EQ_BAND1) && \
+        (AUDIOHW_EQ_WIDTH_CAPS & (EQ_CAP << 1))
+    AUDIOHW_EQ_BAND2_WIDTH,
+#define AUDIOHW_HAVE_EQ_BAND2_WIDTH
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND2) && \
+        (AUDIOHW_EQ_WIDTH_CAPS & (EQ_CAP << 2))
+    AUDIOHW_EQ_BAND3_WIDTH,
+#define AUDIOHW_HAVE_EQ_BAND3_WIDTH
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3) && \
+        (AUDIOHW_EQ_WIDTH_CAPS & (EQ_CAP << 3))
+    AUDIOHW_EQ_BAND4_WIDTH,
+#define AUDIOHW_HAVE_EQ_BAND4_WIDTH
+#endif
+    AUDIOHW_EQ_WIDTH_NUM, /* Keep last */
+};
+#endif /* AUDIOHW_EQ_WIDTH_CAPS */
+
+/* Types and number of settings types (gain, frequency, width) */
+enum AUDIOHW_EQ_SETTINGS
+{
+    AUDIOHW_EQ_GAIN = 0,
+#ifdef AUDIOHW_HAVE_EQ_FREQUENCY
+    AUDIOHW_EQ_FREQUENCY,
+#endif
+#ifdef AUDIOHW_HAVE_EQ_WIDTH
+    AUDIOHW_EQ_WIDTH,
+#endif
+    AUDIOHW_EQ_SETTING_NUM
+};
+
+#endif /* (AUDIOHW_CAPS & EQ_CAP) */
+
+#if (AUDIOHW_CAPS & DEPTH_3D_CAP)
+#define AUDIOHW_HAVE_DEPTH_3D
 #endif
 
-#if (AUDIOHW_CAPS & TREBLE_CUTOFF_CAP)
-#define AUDIOHW_HAVE_TREBLE_CUTOFF
-#endif
 #endif /* AUDIOHW_CAPS */
 
 enum {
     SOUND_VOLUME = 0,
+/* Tone control */
+#if defined(AUDIOHW_HAVE_BASS)
     SOUND_BASS,
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE)
     SOUND_TREBLE,
+#endif
     SOUND_BALANCE,
     SOUND_CHANNELS,
     SOUND_STEREO_WIDTH,
@@ -132,12 +255,61 @@ enum {
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
 #endif
+/* Bass and treble tone controls */
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
     SOUND_BASS_CUTOFF,
 #endif
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
     SOUND_TREBLE_CUTOFF,
 #endif
+/* 3D effect */
+#if defined(AUDIOHW_HAVE_DEPTH_3D)
+    SOUND_DEPTH_3D,
+#endif
+/* Hardware EQ tone controls */
+/* Band gains */
+#if defined(AUDIOHW_HAVE_EQ)
+    /* Band 1 implied */
+    SOUND_EQ_BAND1_GAIN,
+#if defined(AUDIOHW_HAVE_EQ_BAND2)
+    SOUND_EQ_BAND2_GAIN,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3)
+    SOUND_EQ_BAND3_GAIN,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND4)
+    SOUND_EQ_BAND4_GAIN,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND5)
+    SOUND_EQ_BAND5_GAIN,
+#endif
+/* Band frequencies */
+#if defined(AUDIOHW_HAVE_EQ_BAND1_FREQUENCY)
+    SOUND_EQ_BAND1_FREQUENCY,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND2_FREQUENCY)
+    SOUND_EQ_BAND2_FREQUENCY,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3_FREQUENCY)
+    SOUND_EQ_BAND3_FREQUENCY,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND4_FREQUENCY)
+    SOUND_EQ_BAND4_FREQUENCY,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
+    SOUND_EQ_BAND5_FREQUENCY,
+#endif
+/* Band widths */
+#if defined(AUDIOHW_HAVE_EQ_BAND2_WIDTH)
+    SOUND_EQ_BAND2_WIDTH,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
+    SOUND_EQ_BAND3_WIDTH,
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND4_WIDTH)
+    SOUND_EQ_BAND4_WIDTH,
+#endif
+#endif /* AUDIOHW_HAVE_EQ */
     SOUND_LAST_SETTING, /* Keep this last */
 };
 
@@ -261,6 +433,64 @@ void audiohw_set_bass_cutoff(int val);
  */
 void audiohw_set_treble_cutoff(int val);
 #endif
+
+#ifdef AUDIOHW_HAVE_EQ
+/**
+ * Set new band gain value.
+ * @param band index to which val is set
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          EQ_CAP
+ *
+ *       AUDIOHW_EQ_BAND_CAPS must be defined as a bitmask
+ *       of EQ_CAP each shifted by the zero-based band number
+ *       for each band. Bands 1 to N are indexed 0 to N-1.
+ */
+void audiohw_set_eq_band_gain(unsigned int band, int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_EQ_FREQUENCY
+/**
+ * Set new band cutoff or center frequency value.
+ * @param band index to which val is set
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          EQ_CAP
+ *
+ *       AUDIOHW_EQ_FREQUENCY_CAPS must be defined as a bitmask
+ *       of EQ_CAP each shifted by the zero-based band number
+ *       for each band that supports frequency adjustment.
+ *       Bands 1 to N are indexed 0 to N-1.
+ */
+void audiohw_set_eq_band_frequency(unsigned int band, int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_EQ_WIDTH
+/**
+ * Set new band cutoff or center frequency value.
+ * @param band index to which val is set
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          EQ_CAP
+ *
+ *       AUDIOHW_EQ_WIDTH_CAPS must be defined as a bitmask
+ *       of EQ_CAP each shifted by the zero-based band number
+ *       for each band that supports width adjustment.
+ *       Bands 1 to N are indexed 0 to N-1.
+ */
+void audiohw_set_eq_band_width(unsigned int band, int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+/**
+ * Set new 3-d enhancement (stereo expansion) effect value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          DEPTH_3D_CAP
+ */
+void audiohw_set_depth_3d(int val);
+#endif
+
 
 void audiohw_set_frequency(int fsel);
 

@@ -142,7 +142,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 184
+#define PLUGIN_API_VERSION 185
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -884,6 +884,11 @@ int (*round_value_to_list32)(unsigned long value,
                              int count,
                              bool signd);
 #endif
+
+#ifdef AUDIOHW_HAVE_EQ
+    int (*sound_enum_hw_eq_band_setting)(unsigned int band,
+                                         unsigned int band_setting);
+#endif /* AUDIOHW_HAVE_EQ */
 };
 
 /* plugin header */

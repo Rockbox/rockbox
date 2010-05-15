@@ -37,26 +37,34 @@ extern void audiohw_enable_headphone_jack(bool enable);
 
 const struct sound_settings_info audiohw_settings[] =
 {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -90,   6, -25},
-    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
+    [SOUND_VOLUME]             = {"dB", 0,   1, -90,   6, -25},
+    [SOUND_BALANCE]            = {"%",  0,   1,-100, 100,   0},
+    [SOUND_CHANNELS]           = {"",   0,   1,   0,   5,   0},
+    [SOUND_STEREO_WIDTH]       = {"%",  0,   5,   0, 250, 100},
+    [SOUND_EQ_BAND1_GAIN]      = {"dB", 0,   1, -12,  12,   0},
+    [SOUND_EQ_BAND2_GAIN]      = {"dB", 0,   1, -12,  12,   0},
+    [SOUND_EQ_BAND3_GAIN]      = {"dB", 0,   1, -12,  12,   0},
+    [SOUND_EQ_BAND4_GAIN]      = {"dB", 0,   1, -12,  12,   0},
+    [SOUND_EQ_BAND5_GAIN]      = {"dB", 0,   1, -12,  12,   0},
+    [SOUND_EQ_BAND1_FREQUENCY] = {"",   0,   1,   0,   3,   0},
+    [SOUND_EQ_BAND2_FREQUENCY] = {"",   0,   1,   0,   3,   0},
+    [SOUND_EQ_BAND3_FREQUENCY] = {"",   0,   1,   0,   3,   0},
+    [SOUND_EQ_BAND4_FREQUENCY] = {"",   0,   1,   0,   3,   0},
+    [SOUND_EQ_BAND5_FREQUENCY] = {"",   0,   1,   0,   3,   0},
+    [SOUND_EQ_BAND2_WIDTH]     = {"",   0,   1,   0,   1,   0},
+    [SOUND_EQ_BAND3_WIDTH]     = {"",   0,   1,   0,   1,   0},
+    [SOUND_EQ_BAND4_WIDTH]     = {"",   0,   1,   0,   1,   0},
+    [SOUND_DEPTH_3D]           = {"%",  0,   1,   0,  15,   0},
 #ifdef HAVE_RECORDING
     /* Digital: -119.0dB to +8.0dB in 0.5dB increments
      * Analog:  Relegated to volume control
      * Circumstances unfortunately do not allow a great deal of positive
      * gain. */
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-238,  16,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-238,  16,   0},
+    [SOUND_LEFT_GAIN]          = {"dB", 1,   1,-238,  16,   0},
+    [SOUND_RIGHT_GAIN]         = {"dB", 1,   1,-238,  16,   0},
 #if 0
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-238,  16,   0},
+    [SOUND_MIC_GAIN]           = {"dB", 1,   1,-238,  16,   0},
 #endif
-#endif
-#if 0
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
 #endif
 };
 
@@ -123,10 +131,20 @@ struct
 {
     int vol_l;
     int vol_r;
+    int dac_l;
+    int dac_r;
     bool ahw_mute;
+    int prescaler;
+    int enhance_3d_prescaler;
 } wmc_vol =
 {
-    0, 0, false
+    .vol_l = 0,
+    .vol_r = 0,
+    .dac_l = 0,
+    .dac_r = 0,
+    .ahw_mute = false,
+    .prescaler = 0,
+    .enhance_3d_prescaler = 0,
 };
 
 static void wmc_write(unsigned int reg, unsigned int val)
@@ -191,6 +209,10 @@ int sound_val2phys(int setting, int value)
         break;
 #endif
 
+    case SOUND_DEPTH_3D:
+        result = (100 * value + 8) / 15;
+        break;
+
     default:
         result = value;
     }
@@ -216,8 +238,12 @@ void audiohw_preinit(void)
     wmc_set(WMC_OUT4_MONO_MIXER_CTRL, WMC_MUTE);
 
     /* 3. Set L/RMIXEN = 1 and DACENL/R = 1 in register R3. */
-    wmc_write(WMC_POWER_MANAGEMENT3,
-              WMC_RMIXEN | WMC_LMIXEN | WMC_DACENR | WMC_DACENL);
+    wmc_write(WMC_POWER_MANAGEMENT3, WMC_RMIXEN | WMC_LMIXEN);
+
+    /* EQ and 3D applied to DAC (Set before DAC enable!) */
+    wmc_set(WMC_EQ1_LOW_SHELF, WMC_EQ3DMODE);
+
+    wmc_set(WMC_POWER_MANAGEMENT3, WMC_DACENR | WMC_DACENL);
 
     /* 4. Set BUFIOEN = 1 and VMIDSEL[1:0] to required value in register
      *    R1. Wait for VMID supply to settle */
@@ -305,6 +331,12 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     get_headphone_levels(vol_l, &dac_l, &hp_l, &mix_l, &boost_l);
     get_headphone_levels(vol_r, &dac_r, &hp_r, &mix_r, &boost_r);
 
+    wmc_vol.dac_l = dac_l;
+    wmc_vol.dac_r = dac_r;
+
+    dac_l -= wmc_vol.prescaler + wmc_vol.enhance_3d_prescaler;
+    dac_r -= wmc_vol.prescaler + wmc_vol.enhance_3d_prescaler;
+
     wmc_write_masked(WMC_LEFT_MIXER_CTRL, mix_l << WMC_BYPLMIXVOL_POS,
                      WMC_BYPLMIXVOL);
     wmc_write_masked(WMC_LEFT_ADC_BOOST_CTRL,
@@ -365,6 +397,64 @@ static void audiohw_mute(bool mute)
         if (wmc_vol.vol_r > 0)
             wmc_clear(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
+}
+
+/* Equalizer - set the eq band level -12 to +12 dB. */
+void audiohw_set_eq_band_gain(unsigned int band, int val)
+{
+    if (band > 4)
+        return;
+
+    wmc_write_masked(band + WMC_EQ1_LOW_SHELF, 12 - val, WMC_EQG);
+}
+
+/* Equalizer - set the eq band frequency index. */
+void audiohw_set_eq_band_frequency(unsigned int band, int val)
+{
+    if (band > 4)
+        return;
+
+    wmc_write_masked(band + WMC_EQ1_LOW_SHELF,
+                     val << WMC_EQC_POS, WMC_EQC);
+}
+
+/* Equalizer - set bandwidth for peaking filters to wide (!= 0) or
+ * narrow (0); only valid for peaking filter bands 1-3. */
+void audiohw_set_eq_band_width(unsigned int band, int val)
+{
+    if (band < 1 || band > 3)
+        return;
+
+    wmc_write_masked(band + WMC_EQ1_LOW_SHELF,
+                     (val == 0) ? 0 : WMC_EQBW, WMC_EQBW);
+}
+
+/* Set prescaler to prevent clipping the output amp when applying positive
+ * gain to EQ bands. */
+void audiohw_set_prescaler(int val)
+{
+    val *= 2;
+    wmc_vol.prescaler = val;
+    val += wmc_vol.enhance_3d_prescaler; /* Combine with 3D attenuation */
+
+    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, wmc_vol.dac_l - val,
+                     WMC_DVOL);
+    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, wmc_vol.dac_r - val,
+                     WMC_DVOL);
+}
+
+/* Set the depth of the 3D effect */
+void audiohw_set_depth_3d(int val)
+{
+    int att = 10*val / 15; /* -5 dB @ full setting */
+    wmc_vol.enhance_3d_prescaler = att;
+    att += wmc_vol.prescaler;  /* Combine with prescaler attenuation */
+
+    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, wmc_vol.dac_l - att,
+                     WMC_DVOL);
+    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, wmc_vol.dac_r - att,
+                     WMC_DVOL);
+    wmc_write_masked(WMC_3D_CONTROL, val, WMC_DEPTH3D);
 }
 
 void audiohw_close(void)

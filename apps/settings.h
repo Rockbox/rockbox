@@ -336,7 +336,7 @@ struct user_settings
     bool superbass;     /* true/false */
 #endif
 
-#ifdef HAVE_WM8758
+#if defined(HAVE_WM8758) || defined(HAVE_WM8978)
     int bass_cutoff;
     int treble_cutoff;
 #endif
@@ -831,6 +831,25 @@ struct user_settings
     /* When resuming playback (after a stop), rewind this number of seconds */
     int resume_rewind;
 #endif
+
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+    int depth_3d;
+#endif
+
+#ifdef AUDIOHW_HAVE_EQ
+    /** Hardware EQ tone controls **/
+    struct hw_eq_band
+    {
+        /* Maintain the order of members or sound_menu has to be changed */
+        int gain;
+#ifdef AUDIOHW_HAVE_EQ_FREQUENCY
+        int frequency;
+#endif
+#ifdef AUDIOHW_HAVE_EQ_WIDTH
+        int width;
+#endif
+    } hw_eq_bands[AUDIOHW_EQ_BAND_NUM];
+#endif /* AUDIOHW_HAVE_EQ */
 };
 
 /** global variables **/

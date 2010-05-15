@@ -403,18 +403,53 @@ static void sync_audio_setting(int setting, bool global)
     switch (setting)
     {
     case MPEG_AUDIO_TONE_CONTROLS:
+    #if defined(AUDIOHW_HAVE_BASS) || defined(AUDIOHW_HAVE_TREBLE)
         if (global || settings.tone_controls)
         {
+    #ifdef AUDIOHW_HAVE_BASS
             val0 = rb->global_settings->bass;
+    #endif
+    #ifdef AUDIOHW_HAVE_TREBLE 
             val1 = rb->global_settings->treble;
+    #endif
         }
         else
         {
+    #ifdef AUDIOHW_HAVE_BASS
             val0 = rb->sound_default(SOUND_BASS);
+    #endif
+    #ifdef AUDIOHW_HAVE_TREBLE
             val1 = rb->sound_default(SOUND_TREBLE);
+    #endif
         }
+    #ifdef AUDIOHW_HAVE_BASS
         rb->sound_set(SOUND_BASS, val0);
+    #endif
+    #ifdef AUDIOHW_HAVE_TREBLE
         rb->sound_set(SOUND_TREBLE, val1);
+    #endif
+    #endif /* AUDIOHW_HAVE_BASS || AUDIOHW_HAVE_TREBLE */
+
+    #ifdef AUDIOHW_HAVE_EQ
+        for (val1 = 0;; val1++)
+        {
+            int setting = rb->sound_enum_hw_eq_band_setting(val1, AUDIOHW_EQ_GAIN);
+
+            if (setting == -1)
+                break;
+
+            if (global || settings.tone_controls)
+            {
+                val0 = rb->global_settings->hw_eq_bands[val1].gain;
+            }
+            else
+            {
+                val0 = rb->sound_default(setting);
+            }
+
+            rb->sound_set(setting, val0);
+        }
+    #endif /* AUDIOHW_HAVE_EQ */
         break;
 
     case MPEG_AUDIO_CHANNEL_MODES:

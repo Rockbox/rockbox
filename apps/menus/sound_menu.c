@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <limits.h>
 #include "config.h"
+#include "sound.h"
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
@@ -38,6 +39,7 @@
 /***********************************/
 /*    SOUND MENU                   */
 MENUITEM_SETTING(volume, &global_settings.volume, NULL);
+#ifdef AUDIOHW_HAVE_BASS
 MENUITEM_SETTING(bass, &global_settings.bass,
 #ifdef HAVE_SW_TONE_CONTROLS
     lowlatency_callback
@@ -45,9 +47,14 @@ MENUITEM_SETTING(bass, &global_settings.bass,
     NULL
 #endif
 );
-#ifdef HAVE_WM8758
-MENUITEM_SETTING(bass_cutoff, &global_settings.bass_cutoff, NULL);
+
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
+MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
 #endif
+#endif /* AUDIOHW_HAVE_BASS */
+
+
+#ifdef AUDIOHW_HAVE_TREBLE
 MENUITEM_SETTING(treble, &global_settings.treble,
 #ifdef HAVE_SW_TONE_CONTROLS
     lowlatency_callback
@@ -55,9 +62,13 @@ MENUITEM_SETTING(treble, &global_settings.treble,
     NULL
 #endif
 );
-#ifdef HAVE_WM8758
+
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
 MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
 #endif
+#endif /* AUDIOHW_HAVE_TREBLE */
+
+
 MENUITEM_SETTING(balance, &global_settings.balance, NULL);
 MENUITEM_SETTING(channel_config, &global_settings.channel_config,
 #if CONFIG_CODEC == SWCODEC
@@ -73,6 +84,10 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
     NULL
 #endif
 );
+
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
+#endif
 
 #if CONFIG_CODEC == SWCODEC
     /* Crossfeed Submenu */
@@ -137,19 +152,30 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     MENUITEM_SETTING(speaker_enabled, &global_settings.speaker_enabled, NULL);
 #endif
 
-
+#ifdef AUDIOHW_HAVE_EQ
+#endif /* AUDIOHW_HAVE_EQ */
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
-          &volume,
-          &bass,
-#ifdef HAVE_WM8758
-          &bass_cutoff,
+          &volume
+#ifdef AUDIOHW_HAVE_BASS
+          ,&bass
 #endif
-          &treble,
-#ifdef HAVE_WM8758
-          &treble_cutoff,
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
+          ,&bass_cutoff
 #endif
-          &balance,&channel_config,&stereo_width
+#ifdef AUDIOHW_HAVE_TREBLE
+          ,&treble
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
+          ,&treble_cutoff
+#endif
+#ifdef AUDIOHW_HAVE_EQ
+          ,&audiohw_eq_tone_controls
+#endif
+          ,&balance,&channel_config,&stereo_width
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+          ,&depth_3d
+#endif
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
           ,&timestretch_enabled

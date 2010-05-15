@@ -16,6 +16,9 @@ menus/menu_common.c
 menus/display_menu.c
 menus/theme_menu.c
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_WM8978
+menus/audiohw_eq_menu.c
+#endif
 menus/eq_menu.c
 buffering.c
 voice_thread.c

@@ -721,6 +721,9 @@ static const struct plugin_api rockbox_api = {
     round_value_to_list32,
 #endif
 
+#ifdef AUDIOHW_HAVE_EQ
+    sound_enum_hw_eq_band_setting,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
