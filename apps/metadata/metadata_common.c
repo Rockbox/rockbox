@@ -28,9 +28,7 @@
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#if CONFIG_CODEC == SWCODEC
 #include "replaygain.h"
-#endif
 #include "misc.h"
 
 /* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
@@ -252,7 +250,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     char* buf, long buf_remaining, enum tagtype type)
 {
     long len = 0;
-    char** p = NULL;
+    char** p;
 
     if ((((strcasecmp(name, "track") == 0) && (type == TAGTYPE_APE)))
         || ((strcasecmp(name, "tracknumber") == 0) && (type == TAGTYPE_VORBIS)))
@@ -333,13 +331,11 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->mb_track_id);
     }
-#if CONFIG_CODEC == SWCODEC
     else
     {
         len = parse_replaygain(name, value, id3, buf, buf_remaining);
         p = NULL;
     }
-#endif
     
     if (p)
     {

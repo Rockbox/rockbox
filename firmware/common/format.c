@@ -122,6 +122,7 @@ int format(
             break;
 
         case 'l':
+        case 'z': /* assume sizeof(size_t) == sizeof(long) */
             ch = *fmt++;
             switch(ch) {
                 case 'x':

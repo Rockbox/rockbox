@@ -190,11 +190,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename)
 
     /* only seek to end of file if no id3v2 tags were found */
     if (!entry->id3v2len) {
-        if (!setid3v1title(fd, entry))
-        {
-            /* when ID3 tags are not found, search APE tags */
-            read_ape_tags(fd, entry);
-        }
+        setid3v1title(fd, entry);
     }
 
     if(!entry->length || (entry->filesize < 8 ))
