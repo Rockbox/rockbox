@@ -29,6 +29,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "thread.h"
+#include "format.h"
 
 #include "system-target.h"
 #include "uart-s3c2440.h"
