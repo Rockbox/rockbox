@@ -45,9 +45,7 @@
 
 #include "metadata.h"
 #include "mp3data.h"
-#if CONFIG_CODEC == SWCODEC
 #include "metadata_common.h"
-#endif
 #include "metadata_parsers.h"
 
 static unsigned long unsync(unsigned long b0,

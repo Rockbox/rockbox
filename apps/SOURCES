@@ -171,12 +171,12 @@ usb_keymaps.c
 gui/usb_screen.c
 #endif
 metadata.c
+metadata/ape.c
 metadata/id3tags.c
+metadata/metadata_common.c
 metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC
-metadata/metadata_common.c
 metadata/aiff.c
-metadata/ape.c
 metadata/asf.c
 metadata/adx.c
 metadata/flac.c
