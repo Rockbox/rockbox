@@ -345,12 +345,30 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 
 #if CONFIG_TUNER
 
-/* Formats the frequency (specified in Hz) in MHz, */
-/* with two digits after the decimal point         */
-static void format_freq_MHz(int freq, char *buf, int buf_size)
+/* Formats the frequency (specified in Hz) in MHz,   */
+/* with one or two digits after the decimal point -- */
+/* depending on the frequency changing step.         */
+/* Returns buf                                       */
+static char *format_freq_MHz(int freq, int freq_step, char *buf, int buf_size)
 {
-    freq = freq / 10000;
-    snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
+    int scale, div;
+    char *fmt;
+    if (freq_step < 100000)
+    {
+        /* Format with two digits after decimal point */
+        scale = 10000;
+        fmt = "%d.%02d";
+    }
+    else
+    {
+        /* Format with one digit after decimal point */
+        scale = 100000;
+        fmt = "%d.%d";
+    }
+    div = 1000000 / scale;
+    freq = freq / scale;
+    snprintf(buf, buf_size, fmt, freq/div, freq%div);
+    return buf;
 }
 
 
@@ -358,6 +376,8 @@ static void format_freq_MHz(int freq, char *buf, int buf_size)
 const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval)
 {
+    const struct fm_region_data *region_data =
+            &(fm_region_data[global_settings.fm_region]);
     (void)limit;
     switch (token->type)
     {
@@ -375,23 +395,14 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 return "s";
             return NULL;
         case WPS_TOKEN_TUNER_MINFREQ: /* changes based on "region" */
-        {
-            format_freq_MHz(fm_region_data[global_settings.fm_region].freq_min,
-                            buf, buf_size);
-            return buf;
-        }
+            return format_freq_MHz(region_data->freq_min,
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_TUNER_MAXFREQ: /* changes based on "region" */
-        {
-            format_freq_MHz(fm_region_data[global_settings.fm_region].freq_max,
-                            buf, buf_size);
-            return buf;
-        }
+            return format_freq_MHz(region_data->freq_max,
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_TUNER_CURFREQ:
-        {
-            format_freq_MHz(radio_current_frequency(),
-                            buf, buf_size);
-            return buf;
-        }
+            return format_freq_MHz(radio_current_frequency(),
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_PRESET_ID:
             snprintf(buf, buf_size, "%d", radio_current_preset() + 1 + preset_offset);
             return buf;
@@ -414,7 +425,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             else
             {
                 format_freq_MHz(radio_get_preset(preset)->frequency,
-                                buf, buf_size);
+                                region_data->freq_step, buf, buf_size);
             }
             return buf;
         }
