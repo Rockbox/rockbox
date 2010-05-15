@@ -35,6 +35,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <ctype.h>
+#include "string-extra.h"
 #include "config.h"
 #include "file.h"
 #include "logf.h"
