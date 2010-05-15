@@ -29,6 +29,10 @@
 bool button_hold(void);
 #undef button_init_device
 void button_init_device(void);
+#ifdef HAVE_BUTTON_DATA
+int button_read_device(int *data);
+#else
 int button_read_device(void);
+#endif
 
 #endif /* __BUTTON_SDL_H__ */
