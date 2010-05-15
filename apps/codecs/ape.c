@@ -281,7 +281,7 @@ frame_start:
                                     blockstodecode)) < 0)
             {
                 /* Frame decoding error, abort */
-                LOGF("APE: Frame %lu, error %d\n",currentframe,res);
+                LOGF("APE: Frame %lu, error %d\n",(unsigned long)currentframe,res);
                 retval = CODEC_ERROR;
                 goto done;
             }
@@ -322,7 +322,7 @@ frame_start:
     retval = CODEC_OK;
 
 done:
-    LOGF("APE: Decoded %ld samples\n",samplesdone);
+    LOGF("APE: Decoded %lu samples\n",(unsigned long)samplesdone);
 
     if (ci->request_next_track())
         goto next_track;

@@ -502,7 +502,7 @@ enum codec_status codec_main(void)
     retval = CODEC_OK;
 
 done:
-    LOGF("FLAC: Decoded %ld samples\n",samplesdone);
+    LOGF("FLAC: Decoded %lu samples\n",(unsigned long)samplesdone);
 
     if (ci->request_next_track())
         goto next_track;
