@@ -27,6 +27,8 @@
 #include "config.h"
 
 bool button_hold(void);
+#undef button_init_device
 void button_init_device(void);
+int button_read_device(void);
 
 #endif /* __BUTTON_SDL_H__ */

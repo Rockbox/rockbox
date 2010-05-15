@@ -40,12 +40,12 @@ void mutex_unlock(struct mutex *m)
     (void)m;
 }   
 
-void thread_sdl_thread_lock(void *me)
+void sim_thread_lock(void *me)
 {
     (void)me;
 }   
 
-void * thread_sdl_thread_unlock(void)
+void * sim_thread_unlock(void)
 {
     return (void*)1;
 }   
