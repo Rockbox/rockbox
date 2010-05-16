@@ -34,7 +34,7 @@
 /*
  * This drivers supports:
  * as3514 , as used in the PP targets
- * as3517 , as used in the as3525 targets
+ * as3515 , as used in the as3525 targets
  * as3543 , as used in the as3525v2 targets
  */
 

@@ -58,7 +58,7 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define AS3514_AUDIOSET1  0x14
 #define AS3514_AUDIOSET2  0x15
 #define AS3514_AUDIOSET3  0x16
-#define AS3517_USB_UTIL   0x17  /* only in as3517+ */
+#define AS3515_USB_UTIL   0x17  /* only in as3515 */
 
 #ifdef HAVE_AS3543
 #define AS3543_BACKLIGHT  0x1b
@@ -112,7 +112,7 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 /* HPH_OUT_R (0x02) */
 #define HPH_OUT_R_HP_OVC_TO     (0x3 << 6)
-    /* AS3514/AS3517 */
+    /* AS3514/AS3515 */
     #define HPH_OUT_R_HP_OVC_TO_0MS     (0x3 << 6)
     #define HPH_OUT_R_HP_OVC_TO_128MS   (0x1 << 6)
     #define HPH_OUT_R_HP_OVC_TO_256MS   (0x0 << 6)
