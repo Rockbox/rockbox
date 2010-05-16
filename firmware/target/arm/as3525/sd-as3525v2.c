@@ -809,9 +809,14 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
     }
 
-    if((start+count) > card_info[drive].numblocks)
+    if(count < 0) /* XXX: why is it signed ? */
     {
         ret = -18;
+        goto sd_transfer_error;
+    }
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -19;
         goto sd_transfer_error;
     }
 
@@ -821,7 +826,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -19;
+        return -20;
 
     last_disk_activity = current_tick;
     dma_retain();
@@ -911,7 +916,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -20;
+        return -21;
 
 #ifndef BOOTLOADER
     sd_enable(false);

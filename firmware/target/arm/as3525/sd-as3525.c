@@ -682,9 +682,14 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
     }
 
-    if((start+count) > card_info[drive].numblocks)
+    if(count < 0) /* XXX: why is it signed ? */
     {
         ret = -20;
+        goto sd_transfer_error;
+    }
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -21;
         goto sd_transfer_error;
     }
 
