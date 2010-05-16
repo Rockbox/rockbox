@@ -1,11 +1,27 @@
 % $Id$ %
 \section{\label{ref:SystemOptions}System}
 \subsection{Start Screen}
-    Set the screen that Rockbox will start in. Selecting
-    \setting{Resume Playback} will resume playback where it was when the \dap{}
-    was shut off if there is a playlist to resume and will then end up in the
-    WPS. Selecting \setting{Previous Screen} will make Rockbox start in the
-    screen it was when the \dap{} was shut off.
+    Set the screen that Rockbox will start in. The default is the main menu but
+    the following options are available: % almost all items in the main menu with a few exceptions
+    \begin{description}
+        \item[Previous Screen.] Start Rockbox in the same screen as when it was shut off.
+        \item[Main Menu.] Show the main menu.
+        \item[Files.] Display the file browser, starting in the root directory of your \dap.
+        \item[Database.] Show the default database view.
+        \item[Resume Playback.] Go to the WPS and and resume playback from where it was
+            before turning off (if there is a playlist to resume).
+        \item[Settings.] Display the main settings menu.
+        \opt{recording}{%
+            \item[Recording.] Start the \dap{} in the recording screen
+                (recording does not start automatically).
+        }
+        \opt{radio}{%
+            \item[FM Radio.] Go to the radio screen and start playing.
+        }
+        \item[Recent Bookmarks.] Show the list of recent bookmarks as
+            described in \reference{ref:Bookmarkconfigactual}. Bookmarking needs
+            to be enabled.
+    \end{description}
 
 \nopt{sansa}%will probably be there on Sansas one day -  exclude it the simple way without specific option
 {\nopt{sansaAMS}{
