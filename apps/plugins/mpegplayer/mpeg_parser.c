@@ -99,7 +99,7 @@ uint8_t * mpeg_parser_scan_start_code(struct stream_scan *sk, uint32_t code)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, (void **)&p);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -131,7 +131,7 @@ unsigned mpeg_parser_scan_pes(struct stream_scan *sk)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, (void **)&p);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -192,7 +192,7 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 30, (void **)&p);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 30, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -742,7 +742,7 @@ static int parse_demux(struct stream *str, enum stream_parse_mode type)
             str->hdr.pos = disk_buf_lseek(str->hdr.pos, SEEK_SET);
 
             if (str->hdr.pos < 0 || str->hdr.pos >= str->hdr.limit ||
-                disk_buf_getbuffer(MIN_BUFAHEAD, (void **)&p, NULL, NULL) <= 0)
+                disk_buf_getbuffer(MIN_BUFAHEAD, &p, NULL, NULL) <= 0)
             {
                 str_end_of_stream(str);
                 return STREAM_DATA_END;
@@ -1017,7 +1017,7 @@ static int parse_elementary(struct stream *str, enum stream_parse_mode type)
 
     case STREAM_PM_RANDOM_ACCESS:
         str->hdr.pos = disk_buf_lseek(str->hdr.pos, SEEK_SET);
-        len = disk_buf_getbuffer(DISK_BUF_PAGE_SIZE, (void **)&p, NULL, NULL);
+        len = disk_buf_getbuffer(DISK_BUF_PAGE_SIZE, &p, NULL, NULL);
 
         if (len <= 0 || str->hdr.pos < 0 || str->hdr.pos >= str->hdr.limit)
         {

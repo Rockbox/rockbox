@@ -116,10 +116,17 @@ static inline int disk_buf_status(void)
 
 int disk_buf_open(const char *filename);
 void disk_buf_close(void);
-ssize_t disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
-                           size_t *sizewrap);
-ssize_t disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
-                              size_t size, void **pp);
+ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
+                            size_t *sizewrap);
+#define disk_buf_getbuffer(size, pp, pwrap, sizewrap) \
+        _disk_buf_getbuffer((size), PUN_PTR(void **, (pp)), \
+                            PUN_PTR(void **, (pwrap)), (sizewrap))
+
+ssize_t _disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
+                               size_t size, void **pp);
+#define disk_buf_getbuffer_l2(l2, size, pp) \
+        _disk_buf_getbuffer_l2((l2), (size), PUN_PTR(void **, (pp)))
+
 ssize_t disk_buf_read(void *buffer, size_t size);
 ssize_t disk_buf_lseek(off_t offset, int whence);
 

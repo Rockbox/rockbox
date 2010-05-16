@@ -610,8 +610,8 @@ static ssize_t disk_buf_probe(off_t start, size_t length, void **p)
 
 /* Attempt to get a pointer to size bytes on the buffer. Returns real amount of
  * data available as well as the size of non-wrapped data after *p. */
-ssize_t disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
-                           size_t *sizewrap)
+ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
+                            size_t *sizewrap)
 {
     disk_buf_lock();
 
@@ -640,8 +640,8 @@ ssize_t disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
     return size;
 }
 
-ssize_t disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
-                              size_t size, void **pp)
+ssize_t _disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
+                               size_t size, void **pp)
 {
     off_t offs;
     off_t l2_addr;
