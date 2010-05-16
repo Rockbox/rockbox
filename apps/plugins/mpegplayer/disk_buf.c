@@ -714,7 +714,7 @@ ssize_t disk_buf_read(void *buffer, size_t size)
 
     disk_buf_lock();
 
-    size = disk_buf_probe(disk_buf.offset, size, (void **)&p);
+    size = disk_buf_probe(disk_buf.offset, size, PUN_PTR(void **, &p));
 
     if (size != (size_t)-1)
     {
