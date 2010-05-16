@@ -44,7 +44,7 @@ include $(APPSDIR)/codecs/libpcm/libpcm.make
 include $(APPSDIR)/codecs/libtta/libtta.make
 
 # compile flags for codecs
-CODECFLAGS = -fstrict-aliasing -I$(APPSDIR)/codecs \
+CODECFLAGS = $(CFLAGS) -fstrict-aliasing -I$(APPSDIR)/codecs \
 	-I$(APPSDIR)/codecs/lib -DCODEC
 
 ifndef SIMVER
