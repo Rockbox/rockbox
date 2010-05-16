@@ -25,6 +25,7 @@
 #include "fmradio.h"
 #endif
 #include "screen_access.h"
+#include "bmp.h"
 
 #if CONFIG_TUNER
 void radio_load_presets(char *filename);
