@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <math.h>
+#include <stdlib.h>         /* EXIT_SUCCESS */
 #include "sim-ui-defines.h"
 #include "lcd-charcells.h"
 #include "lcd-remote.h"
