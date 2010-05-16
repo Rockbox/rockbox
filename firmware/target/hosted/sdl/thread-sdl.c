@@ -24,7 +24,7 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 #include <stdlib.h>
-#include <memory.h>
+#include <string.h> /* memset() */
 #include <setjmp.h>
 #include "system-sdl.h"
 #include "thread-sdl.h"
