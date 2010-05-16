@@ -577,8 +577,18 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_FOUND:
-            if (data->albumart) {
-                if (playback_current_aa_hid(data->playback_aa_slot) >= 0)
+            if (data->albumart)
+            {
+                int handle = -1;
+                handle = playback_current_aa_hid(data->playback_aa_slot);
+#if CONFIG_TUNER
+                if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+                {
+                    struct dim dim = {data->albumart->width, data->albumart->height};
+                    handle = radio_get_art_hid(&dim);
+                }
+#endif
+                if (handle >= 0)    
                     return "C";
             }
             return NULL;

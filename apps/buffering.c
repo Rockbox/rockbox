@@ -1007,7 +1007,6 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     }
 
     /* Other cases: there is a little more work. */
-
     int fd = open(file, O_RDONLY);
     if (fd < 0)
         return ERR_FILE_ERROR;

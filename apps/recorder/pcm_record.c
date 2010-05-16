@@ -31,6 +31,7 @@
 #include "audio.h"
 #include "sound.h"
 #include "metadata.h"
+#include "appevents.h"
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
@@ -1127,6 +1128,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 static void pcmrec_init(void)
 {
     unsigned char *buffer;
+    send_event(RECORDING_EVENT_START, NULL);
 
     /* warings and errors */
     warnings          =
@@ -1183,6 +1185,7 @@ static void pcmrec_close(void)
     pcm_close_recording();
     reset_hardware();
     audio_remove_encoder();
+    send_event(RECORDING_EVENT_STOP, NULL);
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */

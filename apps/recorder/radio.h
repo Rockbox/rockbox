@@ -59,6 +59,10 @@ struct fmstation
     char name[MAX_FMPRESET_LEN+1];
 };
 
+#ifdef HAVE_ALBUMART
+int radio_get_art_hid(struct dim *requested_dim);
+#endif
+
 #endif /* CONFIG_TUNER */
 
 #endif /* RADIO_H */
