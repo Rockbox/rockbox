@@ -25,6 +25,12 @@
 
 /** Streams **/
 
+/* Initializes the cursor */
+void stream_scan_init(struct stream_scan *sk)
+{
+    dbuf_l2_init(&sk->l2);
+}
+
 /* Ensures direction is -1 or 1 and margin is properly initialized */
 void stream_scan_normalize(struct stream_scan *sk)
 {

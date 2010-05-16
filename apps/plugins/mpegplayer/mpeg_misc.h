@@ -28,6 +28,8 @@
 #define ALIGNED_ATTR(x) __attribute__((aligned(x)))
 #endif
 
+#include "disk_buf.h"
+
 /* Generic states for when things are too simple to care about naming them */
 enum state_enum
 {
@@ -158,10 +160,14 @@ struct stream_scan
     off_t   dir;    /* Direction - >= 0; forward, < 0 backward */
     ssize_t margin; /* Used by function to track margin between position and data end */
     intptr_t data;  /* */
+    struct dbuf_l2_cache l2;
 };
 
 #define SSCAN_REVERSE (-1)
 #define SSCAN_FORWARD 1
+
+/* Initializes the cursor */
+void stream_scan_init(struct stream_scan *sk);
 
 /* Ensures direction is -1 or 1 and margin is properly initialized */
 void stream_scan_normalize(struct stream_scan *sk);

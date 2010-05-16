@@ -99,7 +99,7 @@ uint8_t * mpeg_parser_scan_start_code(struct stream_scan *sk, uint32_t code)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(4, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, (void **)&p);
 
         if (pos < 0 || len < 4)
             break;
@@ -131,7 +131,7 @@ unsigned mpeg_parser_scan_pes(struct stream_scan *sk)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(4, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, (void **)&p);
 
         if (pos < 0 || len < 4)
             break;
@@ -192,7 +192,7 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(35, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 30, (void **)&p);
 
         if (pos < 0 || len < 4)
             break;
@@ -201,7 +201,7 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
         {
             uint8_t *h = p;
 
-            if (sk->margin < 6)
+            if (sk->margin < 7)
             {
                 /* Insufficient data */
             }
@@ -215,29 +215,33 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
             }
             else                            /* mpeg1 */
             {
-                ssize_t l = 7;
+                ssize_t l = 6;
                 ssize_t margin = sk->margin;
 
                 /* Skip stuffing_byte */
-                while (h[l - 1] == 0xff && ++l <= 23)
+                while (margin > 7 && h[l] == 0xff && ++l <= 22)
                     --margin;
 
-                if ((h[l - 1] & 0xc0) == 0x40)
+                if (margin >= 7)
                 {
-                    /* Skip STD_buffer_scale and STD_buffer_size */
-                    margin -= 2;
-                    l += 2;
-                }
-
-                if (margin >= 4)
-                {
-                    /* header points to the mpeg1 pes header */
-                    h += l;
-
-                    if ((h[-1] & 0xe0) == 0x20)
+                    if ((h[l] & 0xc0) == 0x40)
                     {
-                        sk->data = (h + 4) - p;
-                        return read_pts(h, -1);
+                        /* Skip STD_buffer_scale and STD_buffer_size */
+                        margin -= 2;
+                        l += 2;
+                    }
+
+                    if (margin >= 5)
+                    {
+                        /* Header points to the mpeg1 pes header */
+                        h += l;
+
+                        if ((h[0] & 0xe0) == 0x20)
+                        {
+                            /* PTS or PTS_DTS indicated */
+                            sk->data = (h + 5) - p;
+                            return read_pts(h, 0);
+                        }
                     }
                 }
             }
@@ -356,6 +360,8 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     uint32_t prevpts = 0;
     enum state_enum state = STATE0;
     struct stream_scan sk;
+
+    stream_scan_init(&sk);
 
     /* Initial estimate taken from average bitrate - later interpolations are
      * taken similarly based on the remaining file interval */
@@ -564,6 +570,8 @@ static bool prepare_image(uint32_t time)
     int tries;
     int result;
 
+    stream_scan_init(&sk);
+
     if (!str_send_msg(&video_str, STREAM_NEEDS_SYNC, time))
     {
         DEBUGF("Image was ready\n");
@@ -734,7 +742,7 @@ static int parse_demux(struct stream *str, enum stream_parse_mode type)
             str->hdr.pos = disk_buf_lseek(str->hdr.pos, SEEK_SET);
 
             if (str->hdr.pos < 0 || str->hdr.pos >= str->hdr.limit ||
-                disk_buf_getbuffer(MIN_BUFAHEAD, &p, NULL, NULL) <= 0)
+                disk_buf_getbuffer(MIN_BUFAHEAD, (void **)&p, NULL, NULL) <= 0)
             {
                 str_end_of_stream(str);
                 return STREAM_DATA_END;
@@ -1009,7 +1017,7 @@ static int parse_elementary(struct stream *str, enum stream_parse_mode type)
 
     case STREAM_PM_RANDOM_ACCESS:
         str->hdr.pos = disk_buf_lseek(str->hdr.pos, SEEK_SET);
-        len = disk_buf_getbuffer(DISK_BUF_PAGE_SIZE, &p, NULL, NULL);
+        len = disk_buf_getbuffer(DISK_BUF_PAGE_SIZE, (void **)&p, NULL, NULL);
 
         if (len <= 0 || str->hdr.pos < 0 || str->hdr.pos >= str->hdr.limit)
         {

@@ -23,6 +23,10 @@
 #ifndef DISK_BUF_H
 #define DISK_BUF_H
 
+#ifndef OFF_T_MAX
+#define OFF_T_MAX (~(off_t)1 << (sizeof (off_t)*8 - 1))
+#endif
+
 #define DISK_BUF_PAGE_SHIFT 15  /* 32KB cache lines */
 #define DISK_BUF_PAGE_SIZE (1 << DISK_BUF_PAGE_SHIFT)
 #define DISK_BUF_PAGE_MASK (DISK_BUF_PAGE_SIZE-1)
@@ -58,6 +62,19 @@ struct dbuf_range
     int pg_start;
 };
 
+#define DISK_BUF_L2_CACHE_SHIFT 6
+#define DISK_BUF_L2_CACHE_SIZE (1 << DISK_BUF_L2_CACHE_SHIFT)
+#define DISK_BUF_L2_CACHE_MASK (DISK_BUF_L2_CACHE_SIZE-1)
+
+struct dbuf_l2_cache
+{
+    off_t addr;                              /* L2 file offset */
+    size_t size;                             /* Real size */
+    uint8_t data[DISK_BUF_L2_CACHE_SIZE*2];  /* Local data and guard */
+};
+
+void dbuf_l2_init(struct dbuf_l2_cache *l2_p);
+
 /* This object is an extension of the stream manager and handles some
  * playback events as well as buffering */
 struct disk_buf
@@ -88,20 +105,8 @@ struct disk_buf
 
 extern struct disk_buf disk_buf SHAREDBSS_ATTR;
 
-static inline bool disk_buf_is_data_ready(struct stream_hdr *sh,
-                                          ssize_t margin)
-{
-    /* Data window available? */
-    off_t right = sh->win_right;
-
-    /* Margins past end-of-file can still return true */
-    if (right > disk_buf.filesize - margin)
-       right = disk_buf.filesize - margin;
-
-    return sh->win_left >= disk_buf.win_left &&
-           right + margin <= disk_buf.win_right;
-}
-
+struct stream_hdr;
+bool disk_buf_is_data_ready(struct stream_hdr *sh, ssize_t margin);
 
 bool disk_buf_init(void);
 void disk_buf_exit(void);
@@ -111,11 +116,10 @@ static inline int disk_buf_status(void)
 
 int disk_buf_open(const char *filename);
 void disk_buf_close(void);
-ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
-                            size_t *sizewrap);
-#define disk_buf_getbuffer(size, pp, pwrap, sizewrap) \
-    _disk_buf_getbuffer((size), PUN_PTR(void **, (pp)), \
-                        PUN_PTR(void **, (pwrap)), (sizewrap))
+ssize_t disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
+                           size_t *sizewrap);
+ssize_t disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
+                              size_t size, void **pp);
 ssize_t disk_buf_read(void *buffer, size_t size);
 ssize_t disk_buf_lseek(off_t offset, int whence);
 
