@@ -219,14 +219,15 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     {
         cur_pos = radio_current_preset();
         count = radio_preset_count();
+        start_item = cur_pos + viewer->start_offset;
     }
     else
 #endif
     {
         cur_pos = playlist_get_display_index();
         count = playlist_amount()+1;
-    }
-    start_item = MAX(0, cur_pos + viewer->start_offset);    
+        start_item = MAX(0, cur_pos + viewer->start_offset); 
+    }   
     
     gwps->display->set_viewport(viewer->vp);
     for(i=start_item; (i-start_item)<lines && i<count; i++)
