@@ -39,7 +39,7 @@ static int usb_status = USB_EXTRACTED;
 
 void usb_enable(bool on)
 {
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
     if (on)
         usb_core_init();
     else
