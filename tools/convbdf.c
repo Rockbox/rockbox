@@ -16,7 +16,7 @@
 #define ROTATE /* define this for the new, rotated format */
 
 /* BEGIN font.h*/
-/* loadable font magic and version #*/
+/* loadable font magic and version number */
 #ifdef ROTATE
 #define VERSION     "RB12" /* newer version */
 #else
@@ -26,7 +26,7 @@
 /*
  * bitmap_t helper macros
  */
-typedef unsigned short bitmap_t; /* bitmap image unit size*/
+typedef unsigned short bitmap_t; /* bitmap image unit size */
 
 /* Number of words to hold a pixel line of width x pixels */
 #define BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
