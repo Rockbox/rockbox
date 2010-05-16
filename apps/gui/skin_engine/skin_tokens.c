@@ -415,18 +415,14 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 return NULL;
             int preset = cur_preset + preset_offset;
             /* make sure it's in the valid range */
-            while (preset < 0)
-                preset += preset_count;
             preset %= preset_count;
+            if (preset < 0)
+                preset += preset_count;
             if (token->type == WPS_TOKEN_PRESET_NAME)
-            {
                 snprintf(buf, buf_size, "%s", radio_get_preset(preset)->name);
-            }
             else
-            {
                 format_freq_MHz(radio_get_preset(preset)->frequency,
                                 region_data->freq_step, buf, buf_size);
-            }
             return buf;
         }
         case WPS_TOKEN_PRESET_COUNT:
