@@ -150,7 +150,7 @@ static void munge_name(char *buf, const size_t bufsiz) {
  * Note: uses rom.name.  Is there a safer way of doing this?  Like a ROM
  * checksum or something like that?
  */
-static void build_slot_path(char *buf, size_t bufsiz, size_t slot_id) {
+static void build_slot_path(char *buf, size_t bufsiz, int slot_id) {
     char name_buf[17];
 
     /* munge state file name */
@@ -158,7 +158,7 @@ static void build_slot_path(char *buf, size_t bufsiz, size_t slot_id) {
     munge_name(name_buf, strlen(name_buf));
 
     /* glom the whole mess together */
-    snprintf(buf, bufsiz, "%s/%s-%zud.rbs", STATE_DIR, name_buf, slot_id + 1);
+    snprintf(buf, bufsiz, "%s/%s-%d.rbs", STATE_DIR, name_buf, slot_id + 1);
 }
 
 /*
@@ -218,7 +218,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
  *
  * Returns true on success and false on failure.
  */
-static bool do_slot(size_t slot_id, bool is_load) {
+static bool do_slot(int slot_id, bool is_load) {
     char path_buf[256], desc_buf[20];
   
     /* build slot filename, clear desc buf */
@@ -239,7 +239,7 @@ static bool do_slot(size_t slot_id, bool is_load) {
 /* 
  * get information on the given slot
  */
-static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
+static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id) {
     char buf[256];
     int fd;
 
@@ -253,17 +253,17 @@ static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
         if (read(fd, buf, 20) > 0)
         {
             buf[20] = '\0';
-            snprintf(info_buf, info_bufsiz, "%zud. %s", slot_id + 1, buf);
+            snprintf(info_buf, info_bufsiz, "%d. %s", slot_id + 1, buf);
         }
         else
-            snprintf(info_buf, info_bufsiz, "%zud. ERROR", slot_id + 1);
+            snprintf(info_buf, info_bufsiz, "%d. ERROR", slot_id + 1);
 
         close(fd);
     }
     else
     {
         /* if we couldn't open the file, then the slot is empty */
-        snprintf(info_buf, info_bufsiz, "%zu. %s", slot_id + 1, "<Empty>");
+        snprintf(info_buf, info_bufsiz, "%d. %s", slot_id + 1, "<Empty>");
     }
 }
 
