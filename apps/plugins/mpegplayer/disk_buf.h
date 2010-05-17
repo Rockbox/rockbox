@@ -24,7 +24,7 @@
 #define DISK_BUF_H
 
 #ifndef OFF_T_MAX
-#define OFF_T_MAX (~(off_t)1 << (sizeof (off_t)*8 - 1))
+#define OFF_T_MAX (~((off_t)1 << (sizeof (off_t)*8 - 1)))
 #endif
 
 #define DISK_BUF_PAGE_SHIFT 15  /* 32KB cache lines */
