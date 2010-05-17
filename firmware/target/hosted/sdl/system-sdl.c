@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <SDL.h>
+#include <SDL_thread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
