@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
+#include <inttypes.h>
 #include "system-sdl.h"
 #include "thread-sdl.h"
 #include "sim-ui-defines.h"

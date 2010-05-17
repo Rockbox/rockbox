@@ -34,6 +34,9 @@
 #include "pcm.h"
 #include "pcm_sampr.h"
 
+/*#define LOGF_ENABLE*/
+#include "logf.h"
+
 #ifdef DEBUG
 #include <stdio.h>
 extern bool debug_audio;
@@ -49,7 +52,7 @@ static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
 
-struct pcm_udata
+static struct pcm_udata
 {
     Uint8 *stream;
     Uint32 num_in;
@@ -124,7 +127,7 @@ size_t pcm_get_bytes_waiting(void)
     return pcm_data_size;
 }
 
-void write_to_soundcard(struct pcm_udata *udata)
+static void write_to_soundcard(struct pcm_udata *udata)
 {
 #ifdef DEBUG
     if (debug_audio && (udata->debug == NULL)) {
@@ -214,8 +217,9 @@ void write_to_soundcard(struct pcm_udata *udata)
     }
 }
 
-void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
+static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 {
+    logf("sdl_audio_callback: len %d, pcm %d\n", len, pcm_data_size);
     udata->stream = stream;
 
     /* Write what we have in the PCM buffer */
