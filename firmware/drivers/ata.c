@@ -280,7 +280,7 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
         do
         {
             tmp = ATA_DATA;
-#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
+#if defined(ATA_SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
 #else
@@ -295,7 +295,7 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
         unsigned short* wbufend = wbuf + wordcount;
         do
         {
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
             *wbuf = swap16(ATA_DATA);
 #else
             *wbuf = ATA_DATA;
@@ -315,7 +315,7 @@ STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
         const unsigned char* bufend = buf + wordcount*2;
         do
         {
-#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
+#if defined(ATA_SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
             tmp = (unsigned short) *buf++;
             tmp |= (unsigned short) *buf++ << 8;
             SET_16BITREG(ATA_DATA, tmp);
@@ -332,7 +332,7 @@ STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
         unsigned short* wbufend = wbuf + wordcount;
         do
         {
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
             SET_16BITREG(ATA_DATA, swap16(*wbuf));
 #else
             SET_16BITREG(ATA_DATA, *wbuf);
@@ -1127,7 +1127,7 @@ static int identify(void)
     for (i=0; i<SECTOR_SIZE/2; i++) {
         /* the IDENTIFY words are already swapped, so we need to treat
            this info differently that normal sector data */
-#if defined(ROCKBOX_BIG_ENDIAN) && !defined(SWAP_WORDS)
+#if defined(ROCKBOX_BIG_ENDIAN) && !defined(ATA_SWAP_WORDS)
         identify_info[i] = swap16(ATA_DATA);
 #else
         identify_info[i] = ATA_DATA;

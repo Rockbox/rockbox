@@ -56,14 +56,14 @@
  *   %d1 - shift count
  *   %d2-%d6 - read buffers
  *
- *   #ifdef SWAP_WORDS
+ *   #ifdef ATA_SWAP_WORDS
  *   %d7 - byte swap scrach
  *   %a3 - byte swap mask
  *   #endif
  */
 
 copy_read_sectors:
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     lea.l   (-32, %sp), %sp
     movem.l %d2-%d7/%a2-%a3, (%sp)
     movem.l (36, %sp), %a0-%a1
@@ -86,7 +86,7 @@ copy_read_sectors:
     moveq.l #24, %d1        /* preload shift count */
 
     move.w  (%a2), %d2      /* load initial word */
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.b  %d2, (%a0)+
     lsr.l   #8, %d2
 #else
@@ -96,7 +96,7 @@ copy_read_sectors:
 #endif
     btst.l  #1, %d0         /* longword aligned? (testing old d0 value!) */
     bne.b   .r_end_u_w1     /* yes, skip leading word handling */
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w  (%a2), %d3
     lsl.l   #8, %d2
     move.b  %d3, %d2
@@ -123,7 +123,7 @@ copy_read_sectors:
     swap    %d3             /* move to upper 16 bit */
     move.w  (%a2), %d3      /* load second word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d3
 #endif
 
@@ -144,7 +144,7 @@ copy_read_sectors:
     swap    %d3             /* move to upper 16 bit */
     move.w  (%a2), %d3      /* load 2nd word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d3
 #endif
 
@@ -156,7 +156,7 @@ copy_read_sectors:
     swap    %d4             /* move to upper 16 bit */
     move.w  (%a2), %d4      /* load 4th word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d4
 #endif
 
@@ -168,7 +168,7 @@ copy_read_sectors:
     swap    %d5             /* move to upper 16 bit */
     move.w  (%a2), %d5      /* load 6th word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d5
 #endif
 
@@ -180,7 +180,7 @@ copy_read_sectors:
     swap    %d6             /* move to upper 16 bit */
     move.w  (%a2), %d6      /* load 8th word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d6
 #endif
 
@@ -203,7 +203,7 @@ copy_read_sectors:
     swap    %d3             /* move to upper 16 bit */
     move.w  (%a2), %d3      /* load second word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d3
 #endif
 
@@ -219,7 +219,7 @@ copy_read_sectors:
 .r_end_u_l2:
     blo.b   .r_end_u_w2     /* one word left? */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w  (%a2), %d3
     lsl.l   #8, %d2
     move.b  %d3, %d2
@@ -245,7 +245,7 @@ copy_read_sectors:
     btst.l  #1, %d0         /* longword aligned? */
     beq.b   .r_end_a_w1     /* yes, skip leading word handling */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w  (%a2), %d7      /* copy initial word after byte swap */
     move.b  %d7, (%a0)+
     lsr.l   #8, %d7
@@ -265,7 +265,7 @@ copy_read_sectors:
     swap    %d1             /* move it to upper 16 bits */
     move.w  (%a2), %d1      /* load second word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d1
 #endif
 
@@ -290,7 +290,7 @@ copy_read_sectors:
     swap    %d3             /* move it to upper 16 bits */
     move.w  (%a2), %d3      /* load 8th word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d0
     SWAP_BYTES %d1
     SWAP_BYTES %d2
@@ -311,7 +311,7 @@ copy_read_sectors:
     swap    %d1             /* move it to upper 16 bits */
     move.w  (%a2), %d1      /* read second word */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d1
 #endif
 
@@ -322,7 +322,7 @@ copy_read_sectors:
 .r_end_a_l2:
     blo.b   .r_end_a_w2     /* one word left? */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w (%a2), %d7      /* copy final word after byte swap */
     move.b %d7, (%a0)+
     lsr.l  #8, %d7
@@ -333,7 +333,7 @@ copy_read_sectors:
 .r_end_a_w2:
 
 .r_exit:
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     movem.l (%sp), %d2-%d7/%a2-%a3
     lea.l   (32, %sp), %sp
 #else
@@ -365,14 +365,14 @@ copy_read_sectors:
  *   %d1 - shift count
  *   %d2-%d6 - read buffers
  *
- *   #ifdef SWAP_WORDS
+ *   #ifdef ATA_SWAP_WORDS
  *   %d7 - swap scrach
  *   %a3 - swap mask
  *   #endif
  */
 
 copy_write_sectors:
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     lea.l   (-32, %sp), %sp
     movem.l %d2-%d7/%a2-%a3, (%sp)
     movem.l (36, %sp), %a0-%a1
@@ -404,7 +404,7 @@ copy_write_sectors:
     move.l  %d2, %d3
     lsr.l   #8, %d3
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.l  %d3, %d7       /* byte swap low word of %d3 */
     lsr.l   #8, %d7
     lsl.l   #8, %d3
@@ -427,7 +427,7 @@ copy_write_sectors:
     lsr.l   #8, %d3
     or.l    %d3, %d2
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d2
 #endif
 
@@ -450,7 +450,7 @@ copy_write_sectors:
     lsr.l   #8, %d0
     or.l    %d0, %d2
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d2
 #endif
 
@@ -463,7 +463,7 @@ copy_write_sectors:
     lsr.l   #8, %d0
     or.l    %d0, %d3
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d3
 #endif
 
@@ -476,7 +476,7 @@ copy_write_sectors:
     lsr.l   #8, %d0
     or.l    %d0, %d4
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d4
 #endif
 
@@ -489,7 +489,7 @@ copy_write_sectors:
     lsr.l   #8, %d0
     or.l    %d0, %d5
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d5
 #endif
 
@@ -512,7 +512,7 @@ copy_write_sectors:
     lsr.l   #8, %d3
     or.l    %d3, %d2
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d2
 #endif
 
@@ -532,14 +532,14 @@ copy_write_sectors:
     move.l  %d2, %d3
     lsr.l   #8, %d3
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d3
 #endif
 
     move.w  %d3, (%a2)
 
 .w_end_u_w2:
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.l  %d2, %d7
     move.b  (%a0)+, %d2
     lsl.l   #8, %d2
@@ -558,7 +558,7 @@ copy_write_sectors:
     btst.l  #1, %d0
     beq.b   .w_end_a_w1
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w  (%a0)+, %d1    /* copy initial word bytes swaped */
     move.l  %d1, %d7
     lsl.l   #8, %d1
@@ -579,7 +579,7 @@ copy_write_sectors:
 .w_loop_a_l1:
     move.l  (%a0)+, %d1
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d1
 #endif
 
@@ -597,7 +597,7 @@ copy_write_sectors:
     movem.l (%a0), %d0-%d3
     lea.l   (16, %a0), %a0
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d0
     SWAP_BYTES %d1
     SWAP_BYTES %d2
@@ -630,7 +630,7 @@ copy_write_sectors:
 .w_loop_a_l2:
     move.l  (%a0)+, %d1
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     SWAP_BYTES %d1
 #endif
 
@@ -644,7 +644,7 @@ copy_write_sectors:
 .w_end_a_l2:
     blo.b   .w_end_a_w2     /* one word left? */
 
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     move.w  (%a0)+, %d0    /* copy final word after byte swap */
     move.l  %d0, %d7
     lsl.l   #8, %d0
@@ -658,7 +658,7 @@ copy_write_sectors:
 .w_end_a_w2:
 
 .w_exit:
-#ifdef SWAP_WORDS
+#ifdef ATA_SWAP_WORDS
     movem.l (%sp), %d2-%d7/%a2-%a3
     lea.l   (32, %sp), %sp
 #else
