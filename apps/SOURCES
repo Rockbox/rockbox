@@ -132,12 +132,19 @@ recorder/albumart.c
 gui/color_picker.c
 #endif
 #endif
-#if CONFIG_TUNER
-recorder/radio.c
-#endif
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
+
+#if CONFIG_TUNER
+radio/radio.c
+radio/presets.c
+radio/radio_skin.c
+#ifdef HAVE_ALBUMART
+radio/radioart.c
+#endif
+#endif
+
 #if CONFIG_CODEC == SWCODEC
 #if INPUT_SRC_CAPS != 0
 audio_path.c

@@ -27,6 +27,11 @@
 #include "screen_access.h"
 #include "bmp.h"
 
+enum {
+    RADIO_SCAN_MODE = 0,
+    RADIO_PRESET_MODE,
+};
+
 #if CONFIG_TUNER
 void radio_load_presets(char *filename);
 void radio_init(void) INIT_ATTR;
@@ -59,10 +64,20 @@ struct fmstation
     int frequency; /* In Hz */
     char name[MAX_FMPRESET_LEN+1];
 };
+const char* radio_get_preset_name(int preset);
 
 #ifdef HAVE_ALBUMART
+void radioart_init(bool entering_screen);
 int radio_get_art_hid(struct dim *requested_dim);
 #endif
+
+void next_station(int direction);
+
+
+enum fms_exiting {
+    FMS_EXIT,
+    FMS_ENTER
+};
 
 #endif /* CONFIG_TUNER */
 
