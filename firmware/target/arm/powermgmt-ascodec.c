@@ -94,9 +94,7 @@ static void battery_voltage_sync(void)
 /* Disable charger and minimize all settings. Reset timers, etc. */
 static void disable_charger(void)
 {
-    ascodec_disable_endofch_irq();
-    ascodec_write(AS3514_CHARGER,
-                  TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
+    ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 
     if (charge_state > DISCHARGING)
         charge_state = DISCHARGING; /* Not an error state already */
@@ -108,14 +106,13 @@ static void disable_charger(void)
 /* Enable charger with specified settings. Start timers, etc. */
 static void enable_charger(void)
 {
-    ascodec_write(AS3514_CHARGER, BATT_CHG_I | BATT_CHG_V);
-    /* Watch for end of charge. Temperature supervision is handled in
-     * hardware. Charger status can be read and has no interrupt enable. */
-    ascodec_enable_endofch_irq();
+    ascodec_write_charger(BATT_CHG_I | BATT_CHG_V);
 
     sleep(HZ/10); /* Allow charger turn-on time (it could be gradual). */
 
-    ascodec_disable_endofch_irq();
+    /* acknowledge first end of charging interrupt, it seems to happen both
+     * at charger plug and charger unplug */
+    ascodec_endofch();
 
     charge_state = CHARGING;
     charger_total_timer = CHARGER_TOTAL_TIMER;
@@ -125,9 +122,8 @@ static void enable_charger(void)
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
-    ascodec_disable_endofch_irq();
-    ascodec_write(AS3514_CHARGER,
-                  TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
+    ascodec_monitor_endofch();
+    ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 }
 
 static inline void charger_plugged(void)
@@ -148,7 +144,7 @@ static inline void charger_control(void)
         if (BATT_FULL_VOLTAGE == thresh)
         {
             /* Wait for CHG_status to be indicated. */
-            if ((ascodec_read(AS3514_IRQ_ENRD0) & CHG_STATUS) == 0)
+            if (!ascodec_chg_status())
                 break;
 
             batt_threshold = BATT_VAUTO_RECHARGE;
@@ -163,7 +159,7 @@ static inline void charger_control(void)
 
     case CHARGING:
     {
-        if ((ascodec_read(AS3514_IRQ_ENRD0) & CHG_ENDOFCH) == 0)
+        if (!ascodec_endofch())
         {
             if (--charger_total_timer > 0)
                 break;

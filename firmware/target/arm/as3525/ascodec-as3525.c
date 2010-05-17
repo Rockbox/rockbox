@@ -185,10 +185,18 @@ void ascodec_init(void)
 
     I2C2_IMR = 0x00;          /* disable interrupts */
     I2C2_INT_CLR |= I2C2_RIS; /* clear interrupt status */
-    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO | INTERRUPT_AUDIO;
+    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO;
+#if CONFIG_CPU == AS3525 /* interrupts do not work correctly on as3525v2 */
+    VIC_INT_ENABLE = INTERRUPT_AUDIO;
+#endif
 
     /* Generate irq for usb+charge status change */
-    ascodec_write(AS3514_IRQ_ENRD0, /*IRQ_CHGSTAT |*/ IRQ_USBSTAT);
+    ascodec_write(AS3514_IRQ_ENRD0,
+#ifdef CONFIG_CHARGING /* m200v4 can't charge */
+        IRQ_CHGSTAT | IRQ_ENDOFCH |
+#endif
+        IRQ_USBSTAT);
+
     /* Generate irq for push-pull, active high, irq on rtc+adc change */
     ascodec_write(AS3514_IRQ_ENRD2, IRQ_PUSHPULL | IRQ_HIGHACTIVE |
                                     /*IRQ_RTC |*/ IRQ_ADC);
@@ -342,19 +350,8 @@ static void ascodec_wait(struct ascodec_request *req)
 void ascodec_async_write(unsigned int index, unsigned int value,
                          struct ascodec_request *req)
 {
-    switch(index) {
-    case AS3514_CVDD_DCDC3:
-        /* prevent setting of the LREG_CP_not bit */
+    if (index == AS3514_CVDD_DCDC3) /* prevent setting of the LREG_CP_not bit */
         value &= ~(1 << 5);
-        break;
-    case AS3514_IRQ_ENRD0:
-        /* save value in register shadow
-         * for ascodec_(en|dis)able_endofch_irq() */
-        ascodec_enrd0_shadow = value;
-        break;
-    default:
-        break;
-    }
 
     ascodec_req_init(req, ASCODEC_REQ_WRITE, index, 1);
     req->data[0] = value;
@@ -429,24 +426,37 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
     return i;
 }
 
-#if CONFIG_CPU == AS3525
-static void ascodec_read_cb(unsigned const char *data, unsigned int len)
+/*
+ * Reading AS3514_IRQ_ENRD0 clears all interrupt bits, so we cache the results
+ * and clear individual bits when a specific interrupt is checked:
+ * - we clear the ENDOFCH (end of charge) interrupt when it's read
+ * - we set the usb and charger presence when the status change is detected
+ *
+ * on AS3525(v1) ENRD0 is only read in an interrupt handler
+ * on AS3525v2 the interrupt handler doesn't work (yet), so we read the register
+ * synchronously.
+ *  - To avoid race conditions all the reads to this register must be atomic.
+ *    We don't need to disable interrupts when reading it because all the reads
+ *    (in powermgmt-ascodec.c and power-as3525.c) are performed by the same
+ *    thread (the power thread).
+ */
+static void cache_enrd0(int enrd0)
 {
-    if (len != 3) /* some error happened? */
-        return;
-
-    if (data[0] & CHG_ENDOFCH) { /* chg finished */
+    if (enrd0 & CHG_ENDOFCH) { /* chg finished */
+        ascodec_enrd0_shadow |= CHG_ENDOFCH;
         IFDEBUG(int_chg_finished++);
     }
-    if (data[0] & CHG_CHANGED) { /* chg status changed */
-        if (data[0] & CHG_STATUS) {
+    if (enrd0 & CHG_CHANGED) { /* chg status changed */
+        if (enrd0 & CHG_STATUS) {
+            ascodec_enrd0_shadow |= CHG_STATUS;
             IFDEBUG(int_chg_insert++);
         } else {
+            ascodec_enrd0_shadow &= ~CHG_STATUS;
             IFDEBUG(int_chg_remove++);
         }
     }
-    if (data[0] & USB_CHANGED) { /* usb status changed */
-        if (data[0] & USB_STATUS) {
+    if (enrd0 & USB_CHANGED) { /* usb status changed */
+        if (enrd0 & USB_STATUS) {
             IFDEBUG(int_usb_insert++);
             usb_insert_int();
         } else {
@@ -454,6 +464,16 @@ static void ascodec_read_cb(unsigned const char *data, unsigned int len)
             usb_remove_int();
         }
     }
+}
+
+#if CONFIG_CPU == AS3525
+static void ascodec_read_cb(unsigned const char *data, unsigned int len)
+{
+    if (len != 3) /* some error happened? */
+        return;
+
+    cache_enrd0(data[0]);
+
     if (data[2] & IRQ_RTC) { /* rtc irq */
         /*
          * Can be configured for once per second or once per minute,
@@ -468,22 +488,40 @@ static void ascodec_read_cb(unsigned const char *data, unsigned int len)
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 }
 
-void ascodec_wait_adc_finished(void)
-{
-    wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
-}
 #endif /* CONFIG_CPU == AS3525 */
 
-
-void ascodec_enable_endofch_irq(void)
+void ascodec_wait_adc_finished(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow | CHG_ENDOFCH);
+#if CONFIG_CPU == AS3525
+    wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
+#else
+    /* no interrupts, busy wait
+     * XXX: make sure this is the only reader of IRQ_ENRD2
+     */
+    while(!(ascodec_read(AS3514_IRQ_ENRD2) & IRQ_ADC))
+        yield();
+#endif
 }
 
-void ascodec_disable_endofch_irq(void)
+#ifdef CONFIG_CHARGING
+bool ascodec_endofch(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow & ~CHG_ENDOFCH);
+#if CONFIG_CPU != AS3525
+    cache_enrd0(ascodec_read(AS3514_IRQ_ENRD0));
+#endif
+    bool ret = ascodec_enrd0_shadow & CHG_ENDOFCH;
+    ascodec_enrd0_shadow &= ~CHG_ENDOFCH; // clear interrupt
+    return ret;
 }
+
+bool ascodec_chg_status(void)
+{
+#if CONFIG_CPU != AS3525
+    cache_enrd0(ascodec_read(AS3514_IRQ_ENRD0));
+#endif
+    return ascodec_enrd0_shadow & CHG_STATUS;
+}
+#endif /* CONFIG_CHARGING */
 
 /*
  * NOTE:

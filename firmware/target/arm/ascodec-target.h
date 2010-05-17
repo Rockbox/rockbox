@@ -59,14 +59,19 @@ static inline void ascodec_unlock(void)
     i2c_unlock();
 }
 
-static inline void ascodec_enable_endofch_irq(void)
+static inline bool ascodec_chg_status(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, IRQ_ENDOFCH);
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_STATUS;
 }
 
-static inline void ascodec_disable_endofch_irq(void)
+static inline bool ascodec_endofch(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, 0);
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_ENDOFCH;
+}
+
+static inline void ascodec_monitor_endofch(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, IRQ_ENDOFCH);
 }
 
 static inline void ascodec_wait_adc_finished(void)
@@ -79,6 +84,16 @@ static inline void ascodec_wait_adc_finished(void)
      * AS3514_IRQ_ENRD2 in the same way powermgmt-ascodec.c
      * is polling IRQ_ENDOFCH.
      */
+}
+
+static inline void ascodec_write_charger(int value)
+{
+    ascodec_write(AS3514_CHARGER, value);
+}
+
+static inline int ascodec_read_charger(void)
+{
+    return ascodec_read(AS3514_CHARGER);
 }
 
 extern void ascodec_suppressor_on(bool on);

@@ -23,9 +23,7 @@
 
 void usb_init_device(void);
 int usb_detect(void);
-#if CONFIG_CPU == AS3525
 void usb_insert_int(void);
 void usb_remove_int(void);
-#endif /* CONFIG_CPU == AS3525 */
 
 #endif /* USB_TARGET_H */

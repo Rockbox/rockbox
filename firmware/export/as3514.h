@@ -67,6 +67,10 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 #define AS3514_PLLMODE    0x1d
 
+#ifdef HAVE_AS3543
+#define AS3543_CHARGER    0x19  /* PMU: sub register 1 (CHGVBUS1) */
+#endif
+
 #define AS3514_SYSTEM     0x20
 #define AS3514_CVDD_DCDC3 0x21
 #define AS3514_CHARGER    0x22

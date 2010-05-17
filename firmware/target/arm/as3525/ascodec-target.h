@@ -52,7 +52,7 @@
 /*
  * How many bytes we using in struct ascodec_request for the data buffer.
  * 4 fits the alignment best right now.
- * We don't actually use more than 2 at the moment (in adc_read).
+ * We don't actually use more than 3 at the moment (when reading interrupts)
  * Upper limit would be 255 since DACNT is 8 bits!
  */
 #define ASCODEC_REQ_MAXLEN 4
@@ -73,19 +73,6 @@ struct ascodec_request {
 void ascodec_init(void);
 
 int ascodec_write(unsigned int index, unsigned int value);
-
-#if CONFIG_CPU == AS3525v2
-static inline void ascodec_write_pmu(unsigned int index, unsigned int subreg,
-                                     unsigned int value)
-{
-    /* we disable interrupts to make sure no operation happen on the i2c bus
-     * between selecting the sub register and writing to it */
-    int oldstatus = disable_irq_save();
-    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
-    ascodec_write(index, value);
-    restore_irq(oldstatus);
-}
-#endif
 
 int ascodec_read(unsigned int index);
 
@@ -119,18 +106,55 @@ void ascodec_lock(void);
 
 void ascodec_unlock(void);
 
-#if CONFIG_CPU == AS3525
 void ascodec_wait_adc_finished(void);
-#else
-static inline void ascodec_wait_adc_finished(void)
+
+static inline void ascodec_monitor_endofch(void) {} /* already enabled */
+
+bool ascodec_endofch(void);
+
+bool ascodec_chg_status(void);
+
+#if CONFIG_CPU == AS3525v2
+static inline void ascodec_write_pmu(unsigned int index, unsigned int subreg,
+                                     unsigned int value)
 {
-    /* FIXME: Doesn't work yet on AS3525v2 */
+    /* we disable interrupts to make sure no operation happen on the i2c bus
+     * between selecting the sub register and writing to it */
+    int oldstatus = disable_irq_save();
+    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
+    ascodec_write(index, value);
+    restore_irq(oldstatus);
 }
+
+static inline int ascodec_read_pmu(unsigned int index, unsigned int subreg)
+{
+    /* we disable interrupts to make sure no operation happen on the i2c bus
+     * between selecting the sub register and reading it */
+    int oldstatus = disable_irq_save();
+    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
+    int ret = ascodec_read(index);
+    restore_irq(oldstatus);
+    return ret;
+}
+#endif /* CONFIG_CPU == AS3525v2 */
+
+static inline void ascodec_write_charger(int value)
+{
+#if CONFIG_CPU == AS3525
+    ascodec_write(AS3514_CHARGER, value);
+#else
+    ascodec_write_pmu(AS3543_CHARGER, 1, value);
 #endif
+}
 
-void ascodec_enable_endofch_irq(void);
-
-void ascodec_disable_endofch_irq(void);
+static inline int ascodec_read_charger(void)
+{
+#if CONFIG_CPU == AS3525
+    return ascodec_read(AS3514_CHARGER);
+#else
+    return ascodec_read_pmu(AS3543_CHARGER, 1);
+#endif
+}
 
 #endif /* !SIMULATOR */
 

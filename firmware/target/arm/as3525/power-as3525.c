@@ -41,7 +41,7 @@ void power_init(void)
 #if CONFIG_CHARGING
 unsigned int power_input_status(void)
 {
-    return (ascodec_read(AS3514_IRQ_ENRD0) & (1<<5)) ?
+    return ascodec_chg_status() ?
         POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 
     /* TODO: Handle USB and other sources properly */
