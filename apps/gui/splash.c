@@ -137,7 +137,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
 #ifdef HAVE_LCD_BITMAP
 
-    vp.y = (vp.height - vp.y - y) / 2 - RECT_SPACING;  /* height => y start position */
+    vp.y += (vp.height - y) / 2 - RECT_SPACING;  /* height => y start position */
     vp.x += (vp.width - maxw) / 2 - RECT_SPACING;
     width = maxw + 2*RECT_SPACING;
     height = y + 2*RECT_SPACING;
