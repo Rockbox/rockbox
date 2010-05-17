@@ -1,5 +1,3 @@
-#if !defined(IRIVER_IFP7XX_SERIES)
-
 /* For all targets */
 shortcuts
 
@@ -10,32 +8,38 @@ clock
 #endif
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || defined(HAVE_LCD_COLOR) \
- || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5)
+ || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5) /* FIXME */
 rockboy
 #endif
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
+
 #ifdef HAVE_TAGCACHE
 pictureflow
 #endif
+
 #if (CONFIG_CODEC == SWCODEC)
 fft
 #endif
+
 chessbox
 fractals
 imageviewer
 sudoku
 reversi
 goban
+
 /* setjmp/longjmp are not implemented on sh */
 #if (CONFIG_CPU != SH7034)
 frotz
 #endif
+
 #ifndef OLYMPUS_MROBE_500
 zxbox
 #endif
-#endif
+
+#endif /* HAVE_LCD_BITMAP */
 
 /* For all big enough colour screens, iriver H1x0 and iAudio M5 */
 #if defined(HAVE_LCD_COLOR) && LCD_HEIGHT > 96\
@@ -43,32 +47,30 @@ zxbox
 pacbox
 #endif
 
-/* For all the color targets */
 #if (defined(HAVE_LCD_COLOR) || defined(MROBE_100) || \
-    (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)) && (MEMORYSIZE > 2)
-#ifndef RB_PROFILE
+    (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)) && (MEMORYSIZE > 2) && \
+    !defined(RB_PROFILE)
 doom
-#endif
 #endif
 
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
+
 midi
+
 /* beatbox */
 #if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES)
 /* PDBox is confirmed to run on these player models. */
 pdbox
 #endif
-#ifndef RB_PROFILE
-#if MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
+
+#if !defined(RB_PROFILE) && MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
 mpegplayer
 #endif
-#endif
-#endif
+
+#endif /* CONFIG_CODEC == SWCODEC */
 
 /* Lua needs at least 160 KB to work in */
 #if (PLUGIN_BUFFER_SIZE >= 0x80000)
 lua
 #endif
-
-#endif /* IRIVER_IFP7XX_SERIES */

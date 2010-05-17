@@ -23,43 +23,118 @@ stopwatch.c
 theme_remove.c
 vbrfix.c
 viewer.c
-#ifdef HAVE_BACKLIGHT
-lamp.c
-#endif /* HAVE_BACKLIGHT */
-#ifndef SIMULATOR
-battery_bench.c
-firmware_flash.c
-#endif /* SIMULATOR */
-#if (CONFIG_CPU == SH7034)
-rockbox_flash.c
-#endif /* CONFIG_CPU */
-
-#if defined(IPOD_NANO2G) && !defined(SIMULATOR)
-crypt_firmware.c
-#endif
-
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
-    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
-pitch_detector.c
-#endif
-
-#if (CONFIG_CODEC == SWCODEC) || !defined(SIMULATOR)
-metronome.c
-#endif
-
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
-wavplay.c
-#endif
-#if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
-wavrecord.c
-#endif
-
-#ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
+md5sum.c
 dice.c
 disktidy.c
 flipit.c
 
-#ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+
+
+#ifdef USB_ENABLE_HID
+remote_control.c
+#endif
+
+
+
+#ifdef HAVE_BACKLIGHT
+lamp.c
+#endif /* HAVE_BACKLIGHT */
+
+
+
+#if CONFIG_CODEC == SWCODEC
+#if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
+pitch_detector.c
+#endif
+
+mp3_encoder.c
+wav2wv.c
+#endif /* CONFIG_CODEC */
+
+
+#if CONFIG_RTC
+alarmclock.c
+#endif /* CONFIG_RTC */
+
+
+
+/* Platform-specific */
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+iriverify.c
+#endif
+
+
+
+#ifndef SIMULATOR /* those plugins only run on hardware */
+
+/* Overlay loaders */
+
+#if (MEMORYSIZE <= 8)
+chessbox.c
+#if CONFIG_KEYPAD == RECORDER_PAD
+rockboy.c
+#endif
+zxbox.c
+#endif
+
+/* overlay loader for Goban */
+#if (PLUGIN_BUFFER_SIZE < 0x10000)
+lua.c
+goban.c
+pictureflow.c
+#endif
+
+
+#if CONFIG_CODEC != SWCODEC
+
+#if defined(HAVE_LCD_BITMAP)
+splitedit.c
+#endif
+
+#if CONFIG_LCD == LCD_SSD1815
+video.c
+#endif
+
+#endif /* HWCODEC */
+
+
+#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
+    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
+alpine_cdc.c
+#endif
+
+#if defined(IRIVER_H100_SERIES)
+iriver_flash.c
+#endif
+
+#if (CONFIG_CPU == SH7034)
+rockbox_flash.c
+#endif /* CONFIG_CPU */
+
+battery_bench.c
+firmware_flash.c
+
+#if defined(IPOD_NANO2G)
+crypt_firmware.c
+#endif
+
+#if (CONFIG_CODEC == SWCODEC)
+metronome.c
+#endif
+
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+wavplay.c
+#endif
+#if (CONFIG_CODEC == MAS3587F)
+wavrecord.c
+#endif
+
+#endif /* SIMULATOR */
+
+
+
+#ifdef HAVE_LCD_BITMAP             /* Not for the Archos Player */
+
 boomshine.lua
 rockblox1d.c
 brickmania.c
@@ -69,12 +144,8 @@ mazezam.c
 text_editor.c
 wavview.c
 robotfindskitten.c
-
-#ifdef HAVE_LCD_COLOR
-clix.c
-ppmviewer.c
-codebuster.c
-#endif
+xobox.c
+spacerocks.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
@@ -99,87 +170,46 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (CONFIG_LCD == LCD_SSD1815) && (CONFIG_CODEC != SWCODEC) && \
-    !defined(SIMULATOR)
-video.c
-#endif
 vu_meter.c
 wormlet.c
 
-#if CONFIG_RTC
-alarmclock.c
-#endif /* CONFIG_RTC */
-
-#if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* loaders, only needed for Archos */
-chessbox.c
-#if CONFIG_KEYPAD == RECORDER_PAD
-rockboy.c
-#endif
-zxbox.c
+#ifdef HAVE_LCD_COLOR
+clix.c
+ppmviewer.c
+codebuster.c
 #endif
 
-/* overlay loader for Goban */
-#if (PLUGIN_BUFFER_SIZE < 0x10000) && !defined(SIMULATOR)
-lua.c
-goban.c
-pictureflow.c
-#endif
-
-/* not support recorder models for now */
 #if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
 fireworks.c
 #endif
-xobox.c
-spacerocks.c
+
 #if LCD_DEPTH >= 16
 rockpaint.c
 #endif
 
 rocklife.c
+
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_CHARCELLS          /* Player model only */
+#ifdef HAVE_LCD_CHARCELLS          /* Archos Player model only */
 euroconverter.c
 nim.c
 #endif /* HAVE_LCD_CHARCELLS */
 
-#if CONFIG_CODEC == SWCODEC        /* software codec platforms */
-mp3_encoder.c
-wav2wv.c
-#else                              /* hardware codec platforms */
-#if !defined(ARCHOS_ONDIOSP) && !defined(ARCHOS_ONDIOFM)
-    /* not for Ondio, has no remote control pin */
-alpine_cdc.c
-#endif
-#if defined(HAVE_LCD_BITMAP) && !defined(SIMULATOR)
-splitedit.c
-#endif
-#endif /* CONFIG_CODEC */
+
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
+
 matrix.c
-#endif
 
-/* Platform-specific plugins */
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-iriverify.c
-#endif
-#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
-iriver_flash.c
-#endif
-
-#endif /* iFP7xx */
-#if (LCD_WIDTH > 138) && (LCD_DEPTH > 1)
-/* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini, mrobe100 and ifp*/
+#if (LCD_WIDTH > 138)
 invadrox.c
 superdom.c
 #endif
 
-md5sum.c
+#endif /* LCD_DEPTH > 1 */
 
-#ifdef USB_ENABLE_HID
-remote_control.c
-#endif
+
 
 #ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
