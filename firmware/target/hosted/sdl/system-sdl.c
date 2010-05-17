@@ -23,9 +23,8 @@
 #include <SDL_thread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>
 #include <inttypes.h>
-#include "system-sdl.h"
+#include "system.h"
 #include "thread-sdl.h"
 #include "sim-ui-defines.h"
 #include "lcd-sdl.h"
@@ -168,7 +167,7 @@ void system_init(void)
     SDL_mutex *m;
     if (SDL_Init(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
-    atexit(SDL_Quit);
+    atexit(sys_poweroff);
 
     c = SDL_CreateCond();
     m = SDL_CreateMutex();
