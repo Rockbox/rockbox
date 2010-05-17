@@ -424,11 +424,6 @@ int main(int ac, char **av)
         exit(1);
     }
 
-    if (gen_c && gen_fnt) {
-        print_info(".c and .fnt files can not be produced in the same run!\n");
-        exit(1);
-    }
-
     if (oflag) {
         if (ac > 1 || (gen_c && gen_fnt) || (gen_c && gen_h) || (gen_h && gen_fnt)) {
             usage();
@@ -1329,10 +1324,9 @@ int gen_c_source(struct font* pf, char *path)
             fprintf(ofp, "\n");
           }
 
-        /* update offrot since bits are now in sorted order */
-        pf->offrot[i] = ofr;
-        ofr += size;
-
+          /* update offrot since bits are now in sorted order */
+          pf->offrot[i] = ofr;
+          ofr += size;
         }
 #else
         for (x=BITMAP_WORDS(width)*pf->height; x>0; --x) {
@@ -1352,15 +1346,17 @@ int gen_c_source(struct font* pf, char *path)
                 "static const unsigned short _sysfont_offset[] = {\n");
 
         for (i=0; i<pf->size; ++i) {
-            if (pf->offset[i] == -1) {
-                pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
-                pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
+            int offset = pf->offset[i];
+            int offrot = pf->offrot[i];
+            if (offset == -1) {
+                offset = pf->offset[pf->defaultchar - pf->firstchar];
+                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
             }
             fprintf(ofp, "  %d,\t/* (0x%02x) */\n", 
 #ifdef ROTATE
-                    pf->offrot[i], i+pf->firstchar);
+                    offrot, i+pf->firstchar);
 #else
-                    pf->offset[i], i+pf->firstchar);
+                    offset, i+pf->firstchar);
 #endif
         }
         fprintf(ofp, "};\n\n");
@@ -1602,13 +1598,14 @@ int gen_fnt_file(struct font* pf, char *path)
     {
         for (i=0; i<pf->size; ++i)
         {
+            int offrot = pf->offrot[i];
             if (pf->offset[i] == -1) {
-                pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
+                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
             }
             if ( pf->bits_size < 0xFFDB )
-                writeshort(ofp, pf->offrot[i]);
+                writeshort(ofp, offrot);
             else
-                writeint(ofp, pf->offrot[i]);
+                writeint(ofp, offrot);
         }
     }
 
@@ -1623,10 +1620,11 @@ int gen_fnt_file(struct font* pf, char *path)
 
     if (pf->offset)
         for (i=0; i<pf->size; ++i) {
-            if (pf->offset[i] == -1) {
-                pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
+            int offset = pf->offset[i];
+            if (offset == -1) {
+                offset = pf->offset[pf->defaultchar - pf->firstchar];
             }
-            writeint(ofp, pf->offset[i]);
+            writeint(ofp, offset);
         }
 
     if (pf->width)
