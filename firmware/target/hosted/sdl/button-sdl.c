@@ -85,20 +85,21 @@ bool remote_button_hold(void) {
 static void button_event(int key, bool pressed);
 extern bool debug_wps;
 extern bool mapping;
-static void gui_message_loop(void)
+
+void gui_message_loop(void)
 {
     SDL_Event event;
     static int x,y,xybutton = 0;
 
-    if (SDL_PollEvent(&event))
+    while (SDL_WaitEvent(&event))
     {
+        sim_enter_irq_handler();
         switch(event.type)
         {
             case SDL_KEYDOWN:
-                button_event(event.key.keysym.sym, true);
-                break;
             case SDL_KEYUP:
-                button_event(event.key.keysym.sym, false);
+                button_event(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                break;
             case SDL_MOUSEBUTTONDOWN:
                 switch ( event.button.button ) {
 #ifdef HAVE_SCROLLWHEEL
@@ -174,6 +175,7 @@ static void gui_message_loop(void)
 
             case SDL_QUIT:
             {
+                sim_exit_irq_handler();
                 exit(EXIT_SUCCESS);
                 break;
             }
@@ -181,6 +183,7 @@ static void gui_message_loop(void)
                 /*printf("Unhandled event\n"); */
                 break;
         }
+        sim_exit_irq_handler();
     }
 }
 
@@ -1502,7 +1505,6 @@ int button_read_device(void)
         return BUTTON_NONE;
     else
 #endif
-        gui_message_loop();
 
     return btn;
 }

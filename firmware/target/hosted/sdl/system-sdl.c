@@ -70,13 +70,36 @@ void sys_poweroff(void)
     SDL_Quit();
 }
 
-void system_init(void)
+/*
+ * Button read loop */
+void gui_message_loop(void);
+
+/*
+ * This callback let's the main thread run again after SDL has been initialized
+ **/
+static uint32_t cond_signal(uint32_t interval, void *param)
 {
+    (void)interval;
+    SDL_cond *c = (SDL_cond*)param;
+    /* remove timer, CondSignal returns 0 on success */
+    return SDL_CondSignal(c);
+}
+
+/*
+ * This thread will read the buttons in an interrupt like fashion, and
+ * also initializes SDL_INIT_VIDEO and the surfaces
+ *
+ * it must be done in the same thread (at least on windows) because events only
+ * work in the thread which called SDL_Init(SubSystem) with SDL_INIT_VIDEO
+ *
+ * This is an SDL thread and relies on preemptive behavoir of the host
+ **/
+static int sdl_event_thread(void * param)
+{
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+
     SDL_Surface *picture_surface;
     int width, height;
-
-    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER))
-        panicf("%s", SDL_GetError());
 
     /* Try and load the background image. If it fails go without */
     if (background) {
@@ -122,10 +145,43 @@ void system_init(void)
         sim_lcd_remote_init();
 #endif
 
-    if (background && picture_surface != NULL) {
+    if (background && picture_surface != NULL)
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
-        SDL_UpdateRect(gui_surface, 0, 0, 0, 0);
-    }
+
+    /* calling SDL_CondSignal() right away here doesn't work reliably so
+     * post-pone it a bit */
+    SDL_AddTimer(100, cond_signal, param);
+    /*
+     * finally enter the button loop */
+    while(1)
+        gui_message_loop();
+
+    return 0;
+}
+
+
+void system_init(void)
+{
+    SDL_cond *c;
+    SDL_mutex *m;
+    if (SDL_Init(SDL_INIT_TIMER))
+        panicf("%s", SDL_GetError());
+    atexit(SDL_Quit);
+
+    c = SDL_CreateCond();
+    m = SDL_CreateMutex();
+
+    SDL_CreateThread(sdl_event_thread, c);
+
+    /* Lock mutex and wait for sdl_event_thread to run so that it can
+     * initialize the surfaces and video subsystem needed for SDL events */
+    SDL_LockMutex(m);
+    SDL_CondWait(c, m);
+    SDL_UnlockMutex(m);
+
+    /* cleanup */
+    SDL_DestroyCond(c);
+    SDL_DestroyMutex(m);
 }
 
 void system_exception_wait(void)
@@ -137,6 +193,7 @@ void system_reboot(void)
 {
     sim_thread_exception_wait();
 }
+
 
 void sys_handle_argv(int argc, char *argv[])
 {
