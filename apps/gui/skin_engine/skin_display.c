@@ -205,7 +205,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct wps_state *state = gwps->state;
     int lines = viewport_get_nb_lines(viewer->vp);
     int line_height = font_get(viewer->vp->font)->height;
-    int cur_pos, count;
+    int cur_pos, max;
     int start_item;
     int i;
     struct wps_token token;
@@ -219,18 +219,18 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     {
         cur_pos = radio_current_preset();
         start_item = cur_pos + viewer->start_offset;
-        count = start_item+radio_preset_count();
+        max = start_item+radio_preset_count();
     }
     else
 #endif
     {
         cur_pos = playlist_get_display_index();
-        count = playlist_amount()+1;
+        max = playlist_amount()+1;
         start_item = MAX(0, cur_pos + viewer->start_offset); 
     }   
     
     gwps->display->set_viewport(viewer->vp);
-    for(i=start_item; (i-start_item)<lines && i<count; i++)
+    for(i=start_item; (i-start_item)<lines && i<max; i++)
     {
         int line;
 #if CONFIG_TUNER
