@@ -11,6 +11,7 @@
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 #define HAVE_LBA48
+#define SWAP_WORDS
 
 /* define this if you have recording possibility */
 /* not implemented yet 

@@ -1652,7 +1652,7 @@ target/coldfire/mpio/hd200/backlight-hd200.c
 target/coldfire/mpio/hd200/system-hd200.c
 target/coldfire/mpio/hd200/usb-hd200.c
 target/coldfire/mpio/ata-mpio.c
-target/coldfire/mpio/ata-as-mpio.S
+target/coldfire/ata-as-coldfire.S
 #ifndef BOOTLOADER
 target/coldfire/mpio/audio-mpio.c
 target/coldfire/wmcodec-coldfire.c
