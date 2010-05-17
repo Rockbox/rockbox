@@ -29,6 +29,5 @@ disk_buf.c
 mpeg_settings.c
 stream_mgr.c
 mpegplayer.c
-mpeg_linkedlist.c
 mpeg_parser.c
 mpeg_misc.c

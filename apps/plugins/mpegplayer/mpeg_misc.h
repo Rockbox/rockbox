@@ -202,4 +202,30 @@ uint32_t muldiv_uint32(uint32_t multiplicand,
                        uint32_t multiplier,
                        uint32_t divisor);
 
+
+/** Lists **/
+
+/* Does the list have any members? */
+bool list_is_empty(void **list);
+
+/* Is the item inserted into a particular list? */
+bool list_is_member(void **list, void *item);
+
+/* Removes an item from a list - returns true if item was found
+ * and thus removed. */
+bool list_remove_item(void **list, void *item);
+
+/* Adds a list item, insert last, if not already present. */
+void list_add_item(void **list, void *item);
+
+/* Clears the entire list. */
+void list_clear_all(void **list);
+
+/* Enumerate all items in the array. */
+typedef bool (*list_enum_callback_t)(void *item, intptr_t data);
+
+void list_enum_items(void **list,
+                     list_enum_callback_t callback,
+                     intptr_t data);
+
 #endif /* MPEG_MISC_H */

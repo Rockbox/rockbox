@@ -724,6 +724,11 @@ static const struct plugin_api rockbox_api = {
 #ifdef AUDIOHW_HAVE_EQ
     sound_enum_hw_eq_band_setting,
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    find_array_ptr,
+    remove_array_ptr,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

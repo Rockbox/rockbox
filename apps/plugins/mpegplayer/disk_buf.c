@@ -30,7 +30,7 @@ static struct queue_sender_list disk_buf_queue_send SHAREDBSS_ATTR;
 static uint32_t disk_buf_stack[DEFAULT_STACK_SIZE*2/sizeof(uint32_t)];
 
 struct disk_buf disk_buf SHAREDBSS_ATTR;
-static struct list_item nf_list;
+static void *nf_list[MPEGPLAYER_MAX_STREAMS+1];
 
 static inline void disk_buf_lock(void)
 {
@@ -45,13 +45,12 @@ static inline void disk_buf_unlock(void)
 static inline void disk_buf_on_clear_data_notify(struct stream_hdr *sh)
 {
     DEBUGF("DISK_BUF_CLEAR_DATA_NOTIFY: 0x%02X (cleared)\n",
-            STR_FROM_HEADER(sh)->id);
-    list_remove_item(&sh->nf);
+           STR_FROM_HDR(sh)->id);
+    list_remove_item(nf_list, sh);
 }
 
-
 inline bool disk_buf_is_data_ready(struct stream_hdr *sh,
-                                          ssize_t margin)
+                                   ssize_t margin)
 {
     /* Data window available? */
     off_t right = sh->win_right;
@@ -71,7 +70,7 @@ void dbuf_l2_init(struct dbuf_l2_cache *l2_p)
 
 static int disk_buf_on_data_notify(struct stream_hdr *sh)
 {
-    DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X ", STR_FROM_HEADER(sh)->id);
+    DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X ", STR_FROM_HDR(sh)->id);
 
     if (sh->win_left <= sh->win_right)
     {
@@ -85,7 +84,7 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
                    sh->win_left, sh->win_right,
                    disk_buf.win_left, disk_buf.win_right);
             /* Be sure it's not listed though if multiple requests were made */
-            list_remove_item(&sh->nf);
+            list_remove_item(nf_list, sh);
             return DISK_BUF_NOTIFY_OK;
         }
 
@@ -95,7 +94,7 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
         case TSTATE_BUFFERING:
         case TSTATE_INIT:
             disk_buf.state = TSTATE_BUFFERING;
-            list_add_item(&nf_list, &sh->nf);
+            list_add_item(nf_list, sh);
             DEBUGF("(registered)\n"
                    "  swl:%lu swr:%lu\n"
                    "  dwl:%lu dwr:%lu\n",
@@ -109,20 +108,17 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
     return DISK_BUF_NOTIFY_ERROR;
 }
 
-static bool check_data_notifies_callback(struct list_item *item,
-                                         intptr_t data)
+static bool check_data_notifies_callback(struct stream_hdr *sh, intptr_t data)
 {
-    struct stream_hdr *sh = TYPE_FROM_MEMBER(struct stream_hdr, item, nf);
-
     if (disk_buf_is_data_ready(sh, 0))
     {
         /* Remove from list then post notification - post because send
          * could result in a wait for each thread to finish resulting
          * in deadlock */
-        list_remove_item(item);
-        str_post_msg(STR_FROM_HEADER(sh), DISK_BUF_DATA_NOTIFY, 0);
+        list_remove_item(nf_list, sh);
+        str_post_msg(STR_FROM_HDR(sh), DISK_BUF_DATA_NOTIFY, 0);
         DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X (notified)\n",
-               STR_FROM_HEADER(sh)->id);
+               STR_FROM_HDR(sh)->id);
     }
 
     return true;
@@ -130,15 +126,17 @@ static bool check_data_notifies_callback(struct list_item *item,
 }
 
 /* Check registered streams and notify them if their data is available */
-static void check_data_notifies(void)
+static inline void check_data_notifies(void)
 {
-    list_enum_items(&nf_list, check_data_notifies_callback, 0);
+    list_enum_items(nf_list,
+                    (list_enum_callback_t)check_data_notifies_callback,
+                    0);
 }
 
 /* Clear all registered notifications - do not post them */
 static inline void clear_data_notifies(void)
 {
-    list_clear_all(&nf_list);
+    list_clear_all(nf_list);
 }
 
 /* Background buffering when streaming */
@@ -492,7 +490,7 @@ static void disk_buf_thread(void)
             disk_buf_buffer();
 
             /* Check for any due notifications if any are pending */
-            if (nf_list.next != NULL)
+            if (*nf_list != NULL)
                 check_data_notifies();
 
             /* Still more data left? */
@@ -915,7 +913,6 @@ void disk_buf_reply_msg(intptr_t retval)
 bool disk_buf_init(void)
 {
     disk_buf.thread = 0;
-    list_initialize(&nf_list);
 
     rb->mutex_init(&disk_buf_mtx);
 

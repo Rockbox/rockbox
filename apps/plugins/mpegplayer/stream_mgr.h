@@ -35,8 +35,8 @@ struct stream_mgr
     bool seeked;                 /* A seek happened and things must be
                                     resynced */
     int    status;          /* Current playback status */
-    struct list_item strl;  /* List of available streams */
-    struct list_item actl;  /* List of active streams */
+    void   *strl[MPEGPLAYER_MAX_STREAMS+1]; /* List of available streams */
+    void   *actl[MPEGPLAYER_MAX_STREAMS+1]; /* List of active streams */
     struct mutex str_mtx;   /* Main stream manager mutex */
     struct mutex actl_mtx;  /* Lock for current-streams list */
     union /* A place for reusable non-cacheable parameters */

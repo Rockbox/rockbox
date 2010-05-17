@@ -27,6 +27,7 @@
 #include "system.h"
 #include "panic.h"
 #include "debug.h"
+#include "general.h"
 
 /* Make this nonzero to enable more elaborate checks on objects */
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -60,40 +61,6 @@ static struct
     struct event_queue *queues[MAX_NUM_QUEUES+1];
     IF_COP( struct corelock cl; )
 } all_queues SHAREDBSS_ATTR;
-
-/****************************************************************************
- * Common utilities
- ****************************************************************************/
-
-/* Find a pointer in a pointer array. Returns the addess of the element if
- * found or the address of the terminating NULL otherwise. */
-static void ** find_array_ptr(void **arr, void *ptr)
-{
-    void *curr;
-    for(curr = *arr; curr != NULL && curr != ptr; curr = *(++arr));
-    return arr;
-}
-
-/* Remove a pointer from a pointer array if it exists. Compacts it so that
- * no gaps exist. Returns 0 on success and -1 if the element wasn't found. */
-static int remove_array_ptr(void **arr, void *ptr)
-{
-    void *curr;
-    arr = find_array_ptr(arr, ptr);
-
-    if(*arr == NULL)
-        return -1;
-
-    /* Found. Slide up following items. */
-    do
-    {
-        void **arr1 = arr + 1;
-        *arr++ = curr = *arr1;
-    }
-    while(curr != NULL);
-
-    return 0;
-}
 
 /****************************************************************************
  * Standard kernel stuff

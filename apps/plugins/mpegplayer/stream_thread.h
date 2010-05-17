@@ -39,7 +39,6 @@ struct stream_hdr
         off_t pos;         /* Start/current position for random-access read */
     };
     off_t limit;           /* Limit for random-access read */
-    struct list_item nf;   /* List for data notification */
 };
 
 struct stream
@@ -48,8 +47,6 @@ struct stream
     unsigned int thread;         /* Stream's thread */
     uint8_t* curr_packet;        /* Current stream packet beginning */
     uint8_t* curr_packet_end;    /* Current stream packet end */
-    struct list_item l;          /* List of streams - either reserve pool
-                                    or active pool */
     int      state;              /* State machine parsing mode */
     uint32_t start_pts;          /* First timestamp for stream */
     uint32_t end_pts;            /* Last timestamp for stream */
@@ -57,6 +54,8 @@ struct stream
     uint32_t pkt_flags;          /* PKT_* flags */
     unsigned id;                 /* Stream identifier */
 };
+
+#define STR_FROM_HDR(sh) ((struct stream *)(sh))
 
 /* Make sure there there is always enough data buffered ahead for
  * the worst possible case - regardless of whether a valid stream
@@ -144,8 +143,6 @@ enum stream_status
                                    no better match is possible */
     STREAM_NOT_FOUND,           /* Match not found */
 };
-
-#define STR_FROM_HEADER(sh) ((struct stream *)(sh))
 
 /* Clip time to range for a particular stream */
 static inline uint32_t clip_time(struct stream *str, uint32_t time)

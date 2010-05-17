@@ -148,21 +148,21 @@ void stream_add_stream(struct stream *str)
 {
     actl_lock();
 
-    list_remove_item(&str->l);
-    list_add_item(&stream_mgr.strl, &str->l);
+    list_remove_item(stream_mgr.strl, str);
+    list_add_item(stream_mgr.strl, str);
 
     actl_unlock();
 }
 
 /* Callback for various list-moving operations */
-static bool strl_enum_callback(struct list_item *item, intptr_t data)
+static bool strl_enum_callback(struct stream *str, intptr_t data)
 {
     actl_lock();
 
-    list_remove_item(item);
+    list_remove_item(stream_mgr.strl, str);
 
     if (data == 1)
-        list_add_item(&stream_mgr.actl, item);
+        list_add_item(stream_mgr.actl, str);
 
     actl_unlock();
 
@@ -172,38 +172,38 @@ static bool strl_enum_callback(struct list_item *item, intptr_t data)
 /* Clear all streams from active and playback pools */
 void stream_remove_streams(void)
 {
-    list_enum_items(&stream_mgr.strl, strl_enum_callback, 0);
+    list_enum_items(stream_mgr.strl,
+                    (list_enum_callback_t)strl_enum_callback, 0);
 }
 
 /* Move the playback pool to the active list */
 void move_strl_to_actl(void)
 {
-    list_enum_items(&stream_mgr.strl, strl_enum_callback, 1);
+    list_enum_items(stream_mgr.strl,
+                    (list_enum_callback_t)strl_enum_callback, 1);
 }
 
 /* Remove a stream from the active list and return it to the pool */
 static bool actl_stream_remove(struct stream *str)
 {
-    if (list_is_member(&stream_mgr.actl, &str->l))
-    {
-        actl_lock();
+    bool retval;
 
-        list_remove_item(&str->l);
-        list_add_item(&stream_mgr.strl, &str->l);
+    actl_lock();
 
-        actl_unlock();
-        return true;
-    }
+    retval = list_remove_item(stream_mgr.actl, str);
 
-    return false;
+    if (retval)
+        list_add_item(stream_mgr.strl, str);
+
+    actl_unlock();
+
+    return retval;
 }
 
 /* Broadcast a message to all active streams */
-static bool actl_stream_broadcast_callback(struct list_item *item,
+static bool actl_stream_broadcast_callback(struct stream *str,
                                            struct str_broadcast_data *sbd)
 {
-    struct stream *str = TYPE_FROM_MEMBER(struct stream, item, l);
-
     switch (sbd->cmd)
     {
     case STREAM_PLAY:
@@ -215,8 +215,8 @@ static bool actl_stream_broadcast_callback(struct list_item *item,
         {
             actl_lock();
 
-            list_remove_item(item);
-            list_add_item(&stream_mgr.strl, item);
+            list_remove_item(stream_mgr.actl, str);
+            list_add_item(stream_mgr.strl, str);
 
             actl_unlock();
             sbd->data = 0;
@@ -236,7 +236,7 @@ static void actl_stream_broadcast(int cmd, intptr_t data)
     struct str_broadcast_data sbd;
     sbd.cmd = cmd;
     sbd.data = data;
-    list_enum_items(&stream_mgr.actl,
+    list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)actl_stream_broadcast_callback,
                     (intptr_t)&sbd);
 }
@@ -623,7 +623,7 @@ static void stream_on_ev_complete(struct stream *str)
     {
         /* No - remove this stream from the active list */
         DEBUGF("  finished: 0x%02x\n", str->id);
-        if (list_is_empty(&stream_mgr.actl))
+        if (list_is_empty(stream_mgr.actl))
         {
             /* All streams have acked - stop playback */
             stream_on_stop(false);
@@ -820,10 +820,9 @@ void stream_wait_status(void)
 
 /* Returns the smallest file window that includes all active streams'
  * windows */
-static bool stream_get_window_callback(struct list_item *item,
+static bool stream_get_window_callback(struct stream *str,
                                        struct stream_window *sw)
 {
-    struct stream *str = TYPE_FROM_MEMBER(struct stream, item, l);    
     off_t swl = str->hdr.win_left;
     off_t swr = str->hdr.win_right;
 
@@ -845,7 +844,7 @@ bool stream_get_window(struct stream_window *sw)
     sw->right = LONG_MIN;
 
     actl_lock();
-    list_enum_items(&stream_mgr.actl,
+    list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)stream_get_window_callback,
                     (intptr_t)sw);
     actl_unlock();
@@ -981,7 +980,6 @@ int stream_init(void)
 
     stream_mgr.status = STREAM_STOPPED;
     stream_mgr_init_state();
-    list_initialize(&stream_mgr.actl);
 
     /* Initialize our window to the outside world first */
     rb->mutex_init(&stream_mgr.str_mtx);
