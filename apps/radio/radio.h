@@ -79,6 +79,11 @@ enum fms_exiting {
     FMS_ENTER
 };
 
+/* only radio.c should be using these! */
+int fms_do_button_loop(bool update_screen);
+struct gui_wps *fms_get(enum screen_type screen);
+void fms_fix_displays(enum fms_exiting toggle_state);
+
 #endif /* CONFIG_TUNER */
 
 #endif /* RADIO_H */

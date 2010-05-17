@@ -17,6 +17,7 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/firmware/include \
            -I$(ROOTDIR)/apps \
            -I$(ROOTDIR)/apps/recorder \
+           -I$(ROOTDIR)/apps/radio \
            -I$(APPSDIR) \
            -I$(BUILDDIR)
 
@@ -26,5 +27,5 @@ GCCOPTS+=-D__PCTOOL__
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
 $(BUILDDIR)/$(BINARY): $$(OBJ)
-	@echo LD $(BINARY)
-	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -o $@ $+
+    @echo LD $(BINARY)
+    $(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -o $@ $+
