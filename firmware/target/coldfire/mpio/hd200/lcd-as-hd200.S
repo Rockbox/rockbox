@@ -72,10 +72,10 @@ lcd_write_command_e:
 lcd_write_data:
     movem.l (4, %sp), %a0	     /* Data pointer */
     move.l  (8, %sp), %d0            /* Length i in words */
-    lea     LCD_BASE_ADDRESS+2, %a1  /* LCD data port address */
+    lea.l   LCD_BASE_ADDRESS+2, %a1  /* LCD data port address */
 
     btst    #0, %d0    /* longwords multiply? */
-    beq    .l_write
+    jeq    .l_write
 
 .w_write:
     move.w  (%a0)+, %d1  /* load data         3 cycles*/
@@ -83,7 +83,7 @@ lcd_write_data:
     lsr.l   #8, %d1      /* load second byte  1 cycle*/
     move.w  %d1, (%a1)   /* transfer          1 cycle*/
     subq.l  #1, %d0      /* decrement counter 1 cycle*/
-    beq     .write_end   
+    jeq     .write_end   
     
 .l_write:
     move.l  (%a0)+, %d1  /* load data         2 cycles*/
@@ -96,7 +96,7 @@ lcd_write_data:
     lsr.l   #8, %d1      /*                   1 cycle */
     move.w  %d1, (%a1)   /* forth byte        1 cycle*/
     subq.l  #2, %d0      /* decrement counter 1 cycle*/
-    bne     .l_write
+    bne.s   .l_write
 
 .write_end:
     rts
@@ -169,7 +169,7 @@ lcd_grey_data:
     move.w  %d1, (%a3)          /* transfer to lcd */
 
     cmp.l   %a2, %a1
-    bls    .ph_loop
+    bls.s   .ph_loop
 
     movem.l (%sp), %a2-%a3
     lea.l   (2*4, %sp), %sp
