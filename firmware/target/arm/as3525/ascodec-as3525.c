@@ -190,6 +190,12 @@ void ascodec_init(void)
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 #endif
 
+    /* detect if USB was connected at startup since there is no transition */
+    if(ascodec_read(AS3514_IRQ_ENRD0) & USB_STATUS)
+        usb_insert_int();
+    else
+        usb_remove_int();
+
     /* Generate irq for usb+charge status change */
     ascodec_write(AS3514_IRQ_ENRD0,
 #ifdef CONFIG_CHARGING /* m200v4 can't charge */
