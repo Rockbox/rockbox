@@ -218,8 +218,8 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     if (current_screen() == GO_TO_FM)
     {
         cur_pos = radio_current_preset();
-        count = radio_preset_count();
         start_item = cur_pos + viewer->start_offset;
+        count = start_item+radio_preset_count();
     }
     else
 #endif
