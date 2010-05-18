@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES += -I$(ROOTDIR)/uisimulator/sdl -I$(ROOTDIR)/uisimulator/common \
+INCLUDES += -I$(ROOTDIR)/uisimulator/bitmaps -I$(ROOTDIR)/uisimulator/common \
 	-I$(FIRMDIR)/include -I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR)
 
 SIMFLAGS += $(INCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
@@ -33,5 +33,5 @@ $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SIMFLAGS) -c $< -o $@
 
-$(UIBMP): $(ROOTDIR)/uisimulator/sdl/UI-$(MODELNAME).bmp
+$(UIBMP): $(ROOTDIR)/uisimulator/bitmaps/UI-$(MODELNAME).bmp
 	$(call PRINTS,CP $(@F))cp $< $@
