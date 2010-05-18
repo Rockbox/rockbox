@@ -985,6 +985,8 @@ int usb_drv_request_endpoint(int type, int dir)
 {
     (void)type;
     (void)dir;
+
+    return -1;
 }
 
 void usb_drv_release_endpoint(int ep)
@@ -1017,6 +1019,8 @@ int usb_drv_recv(int ep, void *ptr, int len)
     (void)ep;
     (void)ptr;
     (void)len;
+
+    return -1;
 }
 
 int usb_drv_send(int ep, void *ptr, int len)
@@ -1024,6 +1028,8 @@ int usb_drv_send(int ep, void *ptr, int len)
     (void)ep;
     (void)ptr;
     (void)len;
+
+    return -1;
 }
 
 int usb_drv_send_nonblocking(int ep, void *ptr, int len)
@@ -1031,6 +1037,8 @@ int usb_drv_send_nonblocking(int ep, void *ptr, int len)
     (void)ep;
     (void)ptr;
     (void)len;
+
+    return -1;
 }
 
 void usb_drv_stall(int ep, bool stall, bool in)
