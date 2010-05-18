@@ -998,11 +998,6 @@ void usb_drv_cancel_all_transfers(void)
 {
 }
 
-static void reset_endpoints(int init)
-{
-    (void)init;
-}
-
 void usb_drv_set_test_mode(int mode)
 {
     (void)mode;
@@ -1052,6 +1047,8 @@ bool usb_drv_stalled(int ep, bool in)
 {
     (void)ep;
     (void)in;
+
+    return 0;
 }
 
 #endif
