@@ -171,8 +171,8 @@
 
 #ifndef BOOTLOADER
 
-//#define USB_HANDLED_BY_OF
-#define USE_ROCKBOX_USB
+#define USB_HANDLED_BY_OF
+//#define USE_ROCKBOX_USB
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_AS3525v2
