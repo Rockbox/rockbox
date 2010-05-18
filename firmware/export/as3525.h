@@ -242,6 +242,13 @@ CE lines
 #define CGU_TIMER2_CLOCK_ENABLE              ( 1 <<  8 ) /* timer 2 */
 #define CGU_TIMERIF_CLOCK_ENABLE             ( 1 <<  7 ) /* timer interface */
 
+/* CGU_PLL[AB]SUP bits */
+#define CGU_PLL_POWERDOWN                    ( 1 <<  3 )
+
+/* CGU_INTCTRL bits */
+#define CGU_PLLA_LOCK                        ( 1 <<  0 )
+#define CGU_PLLB_LOCK                        ( 1 <<  1 )
+
 /**  ------------------------------------------------------------------
 * Number of cycles to wait before cgu is safely locked.
 **/

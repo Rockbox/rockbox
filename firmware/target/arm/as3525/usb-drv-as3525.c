@@ -306,6 +306,29 @@ static struct usb_dev_setup_buf dummy __attribute__((unused));
 static char rx_buf[1024];
 static char tx_buf[1024];
 
+#if AS3525_MCLK_SEL != AS3525_CLK_PLLB
+static inline void usb_enable_pll(void)
+{
+    CGU_COUNTB = CGU_LOCK_CNT;
+    CGU_PLLB = AS3525_PLLB_SETTING;
+    CGU_PLLBSUP = 0;                       /* enable PLLB */
+    while(!(CGU_INTCTRL & CGU_PLLB_LOCK)); /* wait until PLLB is locked */
+}
+
+static inline void usb_disable_pll(void)
+{
+    CGU_PLLBSUP = CGU_PLL_POWERDOWN;
+}
+#else
+static inline void usb_enable_pll(void)
+{
+}
+
+static inline void usb_disable_pll(void)
+{
+}
+#endif /* AS3525_MCLK_SEL != AS3525_CLK_PLLB */
+
 void usb_attach(void)
 {
     usb_enable(true);
@@ -448,6 +471,8 @@ void usb_drv_init(void)
 {
     logf("usb_drv_init() !!!!\n");
 
+    usb_enable_pll();
+
     /* length regulator: normal operation */
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) | 1<<2);
 
@@ -524,6 +549,7 @@ void usb_drv_exit(void)
     CGU_PERI &= ~CGU_USB_CLOCK_ENABLE;
     /* Disable UVDD generating LDO */
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) & ~(1<<4));
+    usb_disable_pll();
     logf("usb_drv_exit() !!!!\n");
 }
 

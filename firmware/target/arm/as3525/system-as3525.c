@@ -320,16 +320,16 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
-    CGU_COUNTA = 0xff;
+    CGU_COUNTA = CGU_LOCK_CNT;
     CGU_PLLA = AS3525_PLLA_SETTING;
-    CGU_PLLASUP = 0;        /* enable PLLA */
-    while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
-    
-#if (defined(USE_ROCKBOX_USB) && CONFIG_CPU==AS3525) || (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
-    CGU_COUNTB = 0xff;
+    CGU_PLLASUP = 0;                          /* enable PLLA */
+    while(!(CGU_INTCTRL & CGU_PLLA_LOCK));    /* wait until PLLA is locked */
+
+#if AS3525_MCLK_SEL == AS3525_CLK_PLLB
+    CGU_COUNTB = CGU_LOCK_CNT;
     CGU_PLLB = AS3525_PLLB_SETTING;
-    CGU_PLLBSUP = 0;        /* enable PLLB */
-    while(!(CGU_INTCTRL & (1<<1)));           /* wait until PLLB is locked */
+    CGU_PLLBSUP = 0;                          /* enable PLLB */
+    while(!(CGU_INTCTRL & CGU_PLLB_LOCK));    /* wait until PLLB is locked */
 #endif
 
     /*  Set FCLK frequency */
