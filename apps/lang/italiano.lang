@@ -2602,10 +2602,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Schermata Di Riproduzione"
+    *: "Schermo Di Riproduzione"
   </dest>
   <voice>
-    *: "Schermata Di Riproduzione"
+    *: "Schermo Di Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -2618,11 +2618,11 @@
   </source>
   <dest>
     *: none
-    remote: "Schermata Di Riproduzione Per Telecomando"
+    remote: "Schermo Di Riproduzione Per Telecomando"
   </dest>
   <voice>
     *: none
-    remote: "Schermata Di Riproduzione Per Telecomando"
+    remote: "Schermo Di Riproduzione Per Telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -3898,10 +3898,10 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Schermata d'avvio"
+    *: "Schermo d'avvio"
   </dest>
   <voice>
-    *: "Schermata d'avvio"
+    *: "Schermo d'avvio"
   </voice>
 </phrase>
 <phrase>
@@ -3926,10 +3926,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Schermata Precedente"
+    *: "Schermo Precedente"
   </dest>
   <voice>
-    *: "Schermata Precedente"
+    *: "Schermo Precedente"
   </voice>
 </phrase>
 <phrase>
@@ -4645,11 +4645,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Schermata Allarme Sveglia"
+    alarm: "Schermo Allarme Sveglia"
   </dest>
   <voice>
     *: none
-    alarm: "Schermata Allarme Sveglia"
+    alarm: "Schermo Allarme Sveglia"
   </voice>
 </phrase>
 <phrase>
@@ -13258,11 +13258,11 @@
   </source>
   <dest>
     *:none
-    remote: "Schermata Principale"
+    remote: "Schermo Principale"
   </dest>
   <voice>
     *:none
-    remote: "Schermata Principale"
+    remote: "Schermo Principale"
   </voice>
 </phrase>
 <phrase>
@@ -13275,11 +13275,11 @@
   </source>
   <dest>
     *:none
-    remote: "Schermata Telecomando"
+    remote: "Schermo Telecomando"
   </dest>
   <voice>
     *:none
-    remote: "Schermata Telecomando"
+    remote: "Schermo Telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -13317,6 +13317,57 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
   user: core
@@ -13333,3 +13384,276 @@
     hotkey: "Tasto Rapido"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tasto Rapido Schermo Riproduzione"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tasto Rapido Schermo Riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tasto Rapido Sfoglia File"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tasto Rapido Sfoglia File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Riavvolgi Prima di Riprendere"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Riavvolgi Prima di Riprendere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Telecomando Radio FM"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Telecomando Radio FM"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "Skin Schermo Radio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Skin Schermo Telecomando Radio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Stazione:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Controlli Tono"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Controlli Tono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Impostazioni Avanzate Controlli Tono"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Impostazioni Avanzate Controlli Tono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Guadagno Banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Guadagno Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Frequenza Banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Frequenza Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ampiezza Banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ampiezza Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Narrow"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Wide"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Efatizzazione 3-D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Enfatizzazione 3-D"
+  </voice>
+</phrase>
+
