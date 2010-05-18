@@ -325,7 +325,7 @@ void system_init(void)
     CGU_PLLASUP = 0;        /* enable PLLA */
     while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
     
-#if defined(USE_ROCKBOX_USB) || (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
+#if (defined(USE_ROCKBOX_USB) && CONFIG_CPU==AS3525) || (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
     CGU_COUNTB = 0xff;
     CGU_PLLB = AS3525_PLLB_SETTING;
     CGU_PLLBSUP = 0;        /* enable PLLB */

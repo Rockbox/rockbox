@@ -444,6 +444,9 @@ target/arm/as3525/scrollwheel-as3525.c
 #else /* AS3535v2 */
 target/arm/as3525/sd-as3525v2.c
 #endif
+#if CONFIG_CPU == AS3525v2
+target/arm/as3525/usb-drv-as3525v2.c
+#endif
 target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c

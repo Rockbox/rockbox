@@ -276,6 +276,7 @@ Lyre prototype 1 */
 #define USBOTG_ARC      5020 /* PortalPlayer 502x */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
+#define USBOTG_AS3525v2 3535 /* AMS AS3525v2 */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701 */
 
 /* Multiple cores */
@@ -912,10 +913,11 @@ Lyre prototype 1 */
 
 #ifndef SIMULATOR
 //#define USB_ENABLE_SERIAL
-#define USB_ENABLE_STORAGE
+//#define USB_ENABLE_STORAGE
 
 #ifdef USB_HAS_INTERRUPT
-#define USB_ENABLE_HID
+//#define USB_ENABLE_HID
+#define USB_ENABLE_CHARGING_ONLY
 #else
 #define USB_ENABLE_CHARGING_ONLY
 #endif
