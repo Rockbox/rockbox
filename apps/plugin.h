@@ -126,8 +126,10 @@ void* plugin_get_buffer(size_t *buffer_size);
 #undef LDEBUGF
 #define LDEBUGF rb->debugf
 #else
-#define DEBUGF(...)
-#define LDEBUGF(...)
+#undef DEBUGF
+#define DEBUGF(...) do { } while(0)
+#undef LDEBUGF
+#define LDEBUGF(...) do { } while(0)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGF
