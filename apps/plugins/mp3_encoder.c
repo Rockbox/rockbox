@@ -29,11 +29,11 @@ enum e_byte_order { order_unknown, order_bigEndian, order_littleEndian };
 typedef struct {
     int   type; /* 0=(MPEG2 - 22.05,24,16kHz) 1=(MPEG1 - 44.1,48,32kHz) */
     int   mode; /* 0=stereo, 1=jstereo, 2=dual, 3=mono  */
-    int   bitrate;
     int   padding;
-    int   num_bands;
     long  bitr_id;
     int   smpl_id;
+    uint16_t bitrate;
+    uint8_t num_bands;
 } mpeg_t;
 
 /* Side information */
@@ -42,13 +42,13 @@ typedef struct {
     int    count1;          /* number of 0-1-quadruples  */
     uint32_t global_gain;
     uint32_t table_select[4];
-    uint32_t region_0_1;
     uint32_t address1;
     uint32_t address2;
     uint32_t address3;
     long     quantStep;
     long     additStep;
     uint32_t max_val;
+    uint8_t  region_0_1;
 } side_info_t;
 
 typedef struct {
@@ -64,7 +64,7 @@ typedef struct {
     int               channels;
     int               granules;
     int               resample;
-    long              samplerate;
+    uint16_t          samplerate;
 } config_t;
 
 typedef struct {
@@ -73,15 +73,15 @@ typedef struct {
 } BF_Data;
 
 struct huffcodetab {
-  int            len;    /* max. index                  */
-  const uint8_t  *table; /* pointer to array[len][len]  */
-  const uint8_t  *hlen;  /* pointer to array[len][len]  */
+  const uint8_t        len;   /* max. index                  */
+  const uint8_t const *table; /* pointer to array[len][len]  */
+  const uint8_t const *hlen;  /* pointer to array[len][len]  */
 };
 
 struct huffcodebig {
-  int          len;     /* max. index                   */
-  int          linbits; /* number of linbits            */
-  int          linmax;  /* max number stored in linbits */
+  const uint8_t len;     /* max. index                   */
+  const uint8_t linbits; /* number of linbits            */
+  const uint16_t linmax;  /* max number stored in linbits */
 };
 
 #define shft4(x)    ((x +     8) >>  4)
@@ -92,99 +92,102 @@ struct huffcodebig {
 #define shft_n(x,n) ((x) >> n)
 #define SQRT        724 /* sqrt(2) * 512 */
 
-static short     mfbuf       [2*(1152+512)]      IBSS_ATTR; /*  3328 Bytes */
-static int       sb_data     [2][2][18][SBLIMIT] IBSS_ATTR; /* 13824 Bytes */
+static short     mfbuf       [2*(1152+512)]      IBSS_ATTR; /*  6656 Bytes */
+static int       sb_data     [2][2][18][SBLIMIT] IBSS_ATTR; /*  9216 Bytes */
 static int       mdct_freq   [SAMPL2]            IBSS_ATTR; /*  2304 Bytes */
 static char      mdct_sign   [SAMPL2]            IBSS_ATTR; /*   576 Bytes */
 static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  1152 Bytes */
-static uint32_t  scalefac    [23]                IBSS_ATTR; /*    92 Bytes */
 static BF_Data   CodedData                       IBSS_ATTR; /*  1056 Bytes */
-static int       ca          [8]                 IBSS_ATTR; /*    32 Bytes */
-static int       cs          [8]                 IBSS_ATTR; /*    32 Bytes */
-static int       cx          [9]                 IBSS_ATTR; /*    36 Bytes */
-static int       win         [18][4]             IBSS_ATTR; /*   288 Bytes */
-static short     enwindow    [15*27+24]          IBSS_ATTR; /*   862 Bytes */
-static short     int2idx     [4096]              IBSS_ATTR; /*  8192 Bytes */
-static uint8_t   ht_count    [2][2][16]          IBSS_ATTR; /*    64 Bytes */
-static uint32_t  tab01       [ 16]               IBSS_ATTR; /*    64 Bytes */
-static uint32_t  tab23       [  9]               IBSS_ATTR; /*    36 Bytes */
-static uint32_t  tab56       [ 16]               IBSS_ATTR; /*    64 Bytes */
-static uint32_t  tab1315     [256]               IBSS_ATTR; /*  1024 Bytes */
-static uint32_t  tab1624     [256]               IBSS_ATTR; /*  1024 Bytes */
-static uint32_t  tab789      [ 36]               IBSS_ATTR; /*   144 Bytes */
-static uint32_t  tabABC      [ 64]               IBSS_ATTR; /*   256 Bytes */
-static uint8_t   t1HB        [  4]               IBSS_ATTR;
-static uint8_t   t2HB        [  9]               IBSS_ATTR;
-static uint8_t   t3HB        [  9]               IBSS_ATTR;
-static uint8_t   t5HB        [ 16]               IBSS_ATTR;
-static uint8_t   t6HB        [ 16]               IBSS_ATTR;
-static uint8_t   t7HB        [ 36]               IBSS_ATTR;
-static uint8_t   t8HB        [ 36]               IBSS_ATTR;
-static uint8_t   t9HB        [ 36]               IBSS_ATTR;
-static uint8_t   t10HB       [ 64]               IBSS_ATTR;
-static uint8_t   t11HB       [ 64]               IBSS_ATTR;
-static uint8_t   t12HB       [ 64]               IBSS_ATTR;
-static uint8_t   t13HB       [256]               IBSS_ATTR;
-static uint8_t   t15HB       [256]               IBSS_ATTR;
-static uint16_t  t16HB       [256]               IBSS_ATTR;
-static uint16_t  t24HB       [256]               IBSS_ATTR;
-static uint8_t   t1l         [  8]               IBSS_ATTR;
-static uint8_t   t2l         [  9]               IBSS_ATTR;
-static uint8_t   t3l         [  9]               IBSS_ATTR;
-static uint8_t   t5l         [ 16]               IBSS_ATTR;
-static uint8_t   t6l         [ 16]               IBSS_ATTR;
-static uint8_t   t7l         [ 36]               IBSS_ATTR;
-static uint8_t   t8l         [ 36]               IBSS_ATTR;
-static uint8_t   t9l         [ 36]               IBSS_ATTR;
-static uint8_t   t10l        [ 64]               IBSS_ATTR;
-static uint8_t   t11l        [ 64]               IBSS_ATTR;
-static uint8_t   t12l        [ 64]               IBSS_ATTR;
-static uint8_t   t13l        [256]               IBSS_ATTR;
-static uint8_t   t15l        [256]               IBSS_ATTR;
-static uint8_t   t16l        [256]               IBSS_ATTR;
-static uint8_t   t24l        [256]               IBSS_ATTR;
-static struct huffcodetab ht [HTN]               IBSS_ATTR;
 
-static const uint8_t ht_count_const[2][2][16] =
+static const uint16_t sfBand[6][23]              ICONST_ATTR;
+static const uint16_t const *scalefac            ICONST_ATTR;
+
+static const int16_t   ca    [8]                 ICONST_ATTR; /*    16 Bytes */
+static const uint16_t  cs    [8]                 ICONST_ATTR; /*    16 Bytes */
+static const int16_t   cx    [9]                 ICONST_ATTR; /*    18 Bytes */
+static const int16_t   win   [18][4]             ICONST_ATTR; /*   144 Bytes */
+static const int16_t   enwindow    [15*27+24]    ICONST_ATTR; /*   862 Bytes */
+static const uint16_t  int2idx     [4096]        ICONST_ATTR; /*  8192 Bytes */
+static const uint8_t   ht_count[2][2][16]        ICONST_ATTR; /*    64 Bytes */
+static const uint32_t  tab01 [ 16]               ICONST_ATTR; /*    64 Bytes */
+static const uint32_t  tab23       [  9]         ICONST_ATTR; /*    36 Bytes */
+static const uint32_t  tab56       [ 16]         ICONST_ATTR; /*    64 Bytes */
+static const uint32_t  tab1315     [256]         ICONST_ATTR; /*  1024 Bytes */
+static const uint32_t  tab1624     [256]         ICONST_ATTR; /*  1024 Bytes */
+static const uint32_t  tab789      [ 36]         ICONST_ATTR; /*   144 Bytes */
+static const uint32_t  tabABC      [ 64]         ICONST_ATTR; /*   256 Bytes */
+static const uint8_t   t1HB        [  4]         ICONST_ATTR;
+static const uint8_t   t2HB        [  9]         ICONST_ATTR;
+static const uint8_t   t3HB        [  9]         ICONST_ATTR;
+static const uint8_t   t5HB        [ 16]         ICONST_ATTR;
+static const uint8_t   t6HB        [ 16]         ICONST_ATTR;
+static const uint8_t   t7HB        [ 36]         ICONST_ATTR;
+static const uint8_t   t8HB        [ 36]         ICONST_ATTR;
+static const uint8_t   t9HB        [ 36]         ICONST_ATTR;
+static const uint8_t   t10HB       [ 64]         ICONST_ATTR;
+static const uint8_t   t11HB       [ 64]         ICONST_ATTR;
+static const uint8_t   t12HB       [ 64]         ICONST_ATTR;
+static const uint8_t   t13HB       [256]         ICONST_ATTR;
+static const uint8_t   t15HB       [256]         ICONST_ATTR;
+static const uint16_t  t16HB       [256]         ICONST_ATTR;
+static const uint16_t  t24HB       [256]         ICONST_ATTR;
+static const uint8_t   t1l         [  8]         ICONST_ATTR;
+static const uint8_t   t2l         [  9]         ICONST_ATTR;
+static const uint8_t   t3l         [  9]         ICONST_ATTR;
+static const uint8_t   t5l         [ 16]         ICONST_ATTR;
+static const uint8_t   t6l         [ 16]         ICONST_ATTR;
+static const uint8_t   t7l         [ 36]         ICONST_ATTR;
+static const uint8_t   t8l         [ 36]         ICONST_ATTR;
+static const uint8_t   t9l         [ 36]         ICONST_ATTR;
+static const uint8_t   t10l        [ 64]         ICONST_ATTR;
+static const uint8_t   t11l        [ 64]         ICONST_ATTR;
+static const uint8_t   t12l        [ 64]         ICONST_ATTR;
+static const uint8_t   t13l        [256]         ICONST_ATTR;
+static const uint8_t   t15l        [256]         ICONST_ATTR;
+static const uint8_t   t16l        [256]         ICONST_ATTR;
+static const uint8_t   t24l        [256]         ICONST_ATTR;
+static struct huffcodetab ht [HTN]               IDATA_ATTR;
+
+static const uint8_t ht_count[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
     { 1,  5,  5,  7,  5,  8, 7, 9, 5, 7, 7, 9, 7, 9, 9,10 } },   /* hleng0 */
   { {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },     /* table1 */
     { 4,  5,  5,  6,  5,  6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 } } }; /* hleng1 */
 
-static const uint8_t  t1HB_const[4]  = {1,1,1,0}; 
-static const uint8_t  t2HB_const[9]  = {1,2,1,3,1,1,3,2,0};
-static const uint8_t  t3HB_const[9]  = {3,2,1,1,1,1,3,2,0};
-static const uint8_t  t5HB_const[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
-static const uint8_t  t6HB_const[16] = {7,3,5,1,6,2,3,2,5,4,4,1,3,3,2,0};
+static const uint8_t  t1HB[4]  = {1,1,1,0}; 
+static const uint8_t  t2HB[9]  = {1,2,1,3,1,1,3,2,0};
+static const uint8_t  t3HB[9]  = {3,2,1,1,1,1,3,2,0};
+static const uint8_t  t5HB[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
+static const uint8_t  t6HB[16] = {7,3,5,1,6,2,3,2,5,4,4,1,3,3,2,0};
 
-static const uint8_t  t7HB_const[36] =
+static const uint8_t  t7HB[36] =
 {  1, 2,10,19,16,10, 3, 3, 7,10, 5, 3,11, 4,13,17, 8, 4,
   12,11,18,15,11, 2, 7, 6, 9,14, 3, 1, 6, 4, 5, 3, 2, 0 };
 
-static const uint8_t  t8HB_const[36] =
+static const uint8_t  t8HB[36] =
 {  3, 4, 6,18,12, 5, 5, 1, 2,16, 9, 3, 7, 3, 5,14, 7, 3,
   19,17,15,13,10, 4,13, 5, 8,11, 5, 1,12, 4, 4, 1, 1, 0 };
 
-static const uint8_t  t9HB_const[36] =
+static const uint8_t  t9HB[36] =
 {  7, 5, 9,14,15, 7, 6, 4, 5, 5, 6, 7, 7, 6, 8, 8, 8, 5,
   15, 6, 9,10, 5, 1,11, 7, 9, 6, 4, 1,14, 4, 6, 2, 6, 0 };
 
-static const uint8_t t10HB_const[64] =
+static const uint8_t t10HB[64] =
 {1,2,10,23,35,30,12,17,3,3,8,12,18,21,12,7,11,9,15,21,32,
  40,19,6,14,13,22,34,46,23,18,7,20,19,33,47,27,22,9,3,31,22,
  41,26,21,20,5,3,14,13,10,11,16,6,5,1,9,8,7,8,4,4,2,0 };
 
-static const uint8_t t11HB_const[64] =
+static const uint8_t t11HB[64] =
 {3,4,10,24,34,33,21,15,5,3,4,10,32,17,11,10,11,7,13,18,30,
  31,20,5,25,11,19,59,27,18,12,5,35,33,31,58,30,16,7,5,28,26,
  32,19,17,15,8,14,14,12,9,13,14,9,4,1,11,4,6,6,6,3,2,0 };
 
-static const uint8_t t12HB_const[64] =
+static const uint8_t t12HB[64] =
 {9,6,16,33,41,39,38,26,7,5,6,9,23,16,26,11,17,7,11,14,21,
 30,10,7,17,10,15,12,18,28,14,5,32,13,22,19,18,16,9,5,40,17,
 31,29,17,13,4,2,27,12,11,15,10,7,4,1,27,12,8,12,6,3,1,0 };
 
-static const uint8_t t13HB_const[256] =
+static const uint8_t t13HB[256] =
 {1,5,14,21,34,51,46,71,42,52,68,52,67,44,43,19,3,4,12,19,31,26,44,33,31,24,32,
  24,31,35,22,14,15,13,23,36,59,49,77,65,29,40,30,40,27,33,42,16,22,20,37,61,56,
  79,73,64,43,76,56,37,26,31,25,14,35,16,60,57,97,75,114,91,54,73,55,41,48,53,
@@ -196,7 +199,7 @@ static const uint8_t t13HB_const[256] =
  45,21,34,64,56,50,49,45,31,19,12,15,10,7,6,3,48,23,20,39,36,35,53,21,16,23,13,
  10,6,1,4,2,16,15,17,27,25,20,29,11,17,12,16,8,1,1,0,1 };
 
-static const uint8_t t15HB_const[256] =
+static const uint8_t t15HB[256] =
 {7,12,18,53,47,76,124,108,89,123,108,119,107,81,122,63,13,5,16,27,46,36,61,51,
  42,70,52,83,65,41,59,36,19,17,15,24,41,34,59,48,40,64,50,78,62,80,56,33,29,28,
  25,43,39,63,55,93,76,59,93,72,54,75,50,29,52,22,42,40,67,57,95,79,72,57,89,69,
@@ -208,7 +211,7 @@ static const uint8_t t15HB_const[256] =
  24,16,22,13,14,7,91,44,39,38,34,63,52,45,31,52,28,19,14,8,9,3,123,60,58,53,47,
  43,32,22,37,24,17,12,15,10,2,1,71,37,34,30,28,20,17,26,21,16,10,6,8,6,2,0};
 
-static const uint16_t t16HB_const[256] =
+static const uint16_t t16HB[256] =
 {1,5,14,44,74,63,110,93,172,149,138,242,225,195,376,17,3,4,12,20,35,62,53,47,
  83,75,68,119,201,107,207,9,15,13,23,38,67,58,103,90,161,72,127,117,110,209,
  206,16,45,21,39,69,64,114,99,87,158,140,252,212,199,387,365,26,75,36,68,65,
@@ -223,7 +226,7 @@ static const uint16_t t16HB_const[256] =
  358,711,709,866,1734,871,3458,870,434,0,12,10,7,11,10,17,11,9,13,12,10,7,5,3,
  1,3};
 
-static const uint16_t t24HB_const[256] =
+static const uint16_t t24HB[256] =
 {15,13,46,80,146,262,248,434,426,669,653,649,621,517,1032,88,14,12,21,38,71,
  130,122,216,209,198,327,345,319,297,279,42,47,22,41,74,68,128,120,221,207,194,
  182,340,315,295,541,18,81,39,75,70,134,125,116,220,204,190,178,325,311,293,
@@ -238,7 +241,7 @@ static const uint16_t t24HB_const[256] =
  374,369,365,361,357,2,1033,280,278,274,267,264,259,382,378,372,367,363,360,
  358,356,0,43,20,19,17,15,13,11,9,7,6,4,7,5,3,1,3};
 
-static const uint32_t tab1315_const[256] =
+static const uint32_t tab1315[256] =
 { 0x010003,0x050005,0x070006,0x080008,0x090008,0x0a0009,0x0a000a,0x0b000a,
   0x0a000a,0x0b000b,0x0c000b,0x0c000c,0x0d000c,0x0d000c,0x0e000d,0x0e000e,
   0x040005,0x060005,0x080007,0x090008,0x0a0009,0x0a0009,0x0b000a,0x0b000a,
@@ -272,18 +275,18 @@ static const uint32_t tab1315_const[256] =
   0x0d000d,0x0e000d,0x0f000d,0x10000d,0x10000d,0x10000d,0x11000d,0x10000e,
   0x11000e,0x11000e,0x12000e,0x12000e,0x15000f,0x14000f,0x15000f,0x12000f };
 
-static const uint32_t tab01_const[16] =
+static const uint32_t tab01[16] =
 { 0x10004,0x50005,0x50005,0x70006,0x50005,0x80006,0x70006,0x90007,
   0x50005,0x70006,0x70006,0x90007,0x70006,0x90007,0x90007,0xa0008 };
 
-static const uint32_t tab23_const[ 9] =
+static const uint32_t tab23[ 9] =
 { 0x10002,0x40003,0x70007,0x40004,0x50004,0x70007,0x60006,0x70007,0x80008 };
 
-static const uint32_t tab56_const[16] =
+static const uint32_t tab56[16] =
 { 0x10003,0x40004,0x70006,0x80008,0x40004,0x50004,0x80006,0x90007,
   0x70005,0x80006,0x90007,0xa0008,0x80007,0x80007,0x90008,0xa0009 };
 
-static const uint32_t tab789_const[36] =
+static const uint32_t tab789[36] =
 {0x00100803,0x00401004,0x00701c06,0x00902407,0x00902409,0x00a0280a,0x00401004,
  0x00601005,0x00801806,0x00902807,0x00902808,0x00a0280a,0x00701c05,0x00701806,
  0x00902007,0x00a02808,0x00a02809,0x00b02c0a,0x00802407,0x00902807,0x00a02808,
@@ -291,7 +294,7 @@ static const uint32_t tab789_const[36] =
  0x00b0300a,0x00c0300b,0x00902809,0x00a02809,0x00b02c0a,0x00c02c0a,0x00c0340b,
  0x00c0340b};
 
-static const uint32_t tabABC_const[64] =
+static const uint32_t tabABC[64] =
 {0x00100804,0x00401004,0x00701806,0x00902008,0x00a02409,0x00a0280a,0x00a0240a,
  0x00b0280a,0x00401004,0x00601405,0x00801806,0x00902007,0x00a02809,0x00b02809,
  0x00a0240a,0x00a0280a,0x00701806,0x00801c06,0x00902007,0x00a02408,0x00b02809,
@@ -303,7 +306,7 @@ static const uint32_t tabABC_const[64] =
  0x00a0240a,0x00a0240a,0x00b0280a,0x00c02c0b,0x00c0300b,0x00d0300b,0x00d0300b,
  0x00d0300c};
 
-static const uint32_t tab1624_const[256] =
+static const uint32_t tab1624[256] =
 {0x00010004,0x00050005,0x00070007,0x00090008,0x000a0009,0x000a000a,0x000b000a,
  0x000b000b,0x000c000b,0x000c000c,0x000c000c,0x000d000c,0x000d000c,0x000d000c,
  0x000e000d,0x000a000a,0x00040005,0x00060006,0x00080007,0x00090008,0x000a0009,
@@ -342,34 +345,34 @@ static const uint32_t tab1624_const[256] =
  0x000c0009,0x000c0009,0x000c0009,0x000d0009,0x000d0009,0x000d0009,0x000d000a,
  0x000d000a,0x000d000a,0x000d000a,0x000a0006};
 
-static const uint8_t t1l_const[8]  = {1,3,2,3,1,4,3,5};
-static const uint8_t t2l_const[9]  = {1,3,6,3,3,5,5,5,6};
-static const uint8_t t3l_const[9]  = {2,2,6,3,2,5,5,5,6};
-static const uint8_t t5l_const[16] = {1,3,6,7,3,3,6,7,6,6,7,8,7,6,7,8};
-static const uint8_t t6l_const[16] = {3,3,5,7,3,2,4,5,4,4,5,6,6,5,6,7};
+static const uint8_t t1l[8]  = {1,3,2,3,1,4,3,5};
+static const uint8_t t2l[9]  = {1,3,6,3,3,5,5,5,6};
+static const uint8_t t3l[9]  = {2,2,6,3,2,5,5,5,6};
+static const uint8_t t5l[16] = {1,3,6,7,3,3,6,7,6,6,7,8,7,6,7,8};
+static const uint8_t t6l[16] = {3,3,5,7,3,2,4,5,4,4,5,6,6,5,6,7};
 
-static const uint8_t t7l_const[36] =
+static const uint8_t t7l[36] =
 {1,3,6,8,8,9,3,4,6,7,7,8,6,5,7,8,8,9,7,7,8,9,9,9,7,7,8,9,9,10,8,8,9,10,10,10};
 
-static const uint8_t t8l_const[36] =
+static const uint8_t t8l[36] =
 {2,3,6,8,8,9,3,2,4,8,8,8,6,4,6,8,8,9,8,8,8,9,9,10,8,7,8,9,10,10,9,8,9,9,11,11};
 
-static const uint8_t t9l_const[36] =
+static const uint8_t t9l[36] =
 {3,3,5,6,8,9,3,3,4,5,6,8,4,4,5,6,7,8,6,5,6,7,7,8,7,6,7,7,8,9,8,7,8,8,9,9};
 
-static const uint8_t t10l_const[64] =
+static const uint8_t t10[64] =
 {1,3,6,8,9,9,9,10,3,4,6,7,8,9,8,8,6,6,7,8,9,10,9,9,7,7,8,9,10,10,9,10,8,8,9,10,
  10,10,10,10,9,9,10,10,11,11,10,11,8,8,9,10,10,10,11,11,9,8,9,10,10,11,11,11};
 
-static const uint8_t t11l_const[64] =
+static const uint8_t t11l[64] =
 {2,3,5,7,8,9,8,9,3,3,4,6,8,8,7,8,5,5,6,7,8,9,8,8,7,6,7,9,8,10,8,9,8,8,8,9,9,10,
  9,10,8,8,9,10,10,11,10,11,8,7,7,8,9,10,10,10,8,7,8,9,10,10,10,10};
 
-static const uint8_t t12l_const[64] =
+static const uint8_t t12l[64] =
 {4,3,5,7,8,9,9,9,3,3,4,5,7,7,8,8,5,4,5,6,7,8,7,8,6,5,6,6,7,8,8,8,7,6,7,7,8,
  8,8,9,8,7,8,8,8,9,8,9,8,7,7,8,8,9,9,10,9,8,8,9,9,9,9,10};
 
-static const uint8_t t13l_const[256] =
+static const uint8_t t13l[256] =
 {1,4,6,7,8,9,9,10,9,10,11,11,12,12,13,13,3,4,6,7,8,8,9,9,9,9,10,10,11,12,12,12,
  6,6,7,8,9,9,10,10,9,10,10,11,11,12,13,13,7,7,8,9,9,10,10,10,10,11,11,11,11,12,
  13,13,8,7,9,9,10,10,11,11,10,11,11,12,12,13,13,14,9,8,9,10,10,10,11,11,11,11,
@@ -381,7 +384,7 @@ static const uint8_t t13l_const[256] =
  16,16,13,12,12,13,13,13,15,14,14,17,15,15,15,17,16,16,12,12,13,14,14,14,15,14,
  15,15,16,16,19,18,19,16};
 
-static const uint8_t t15l_const[256] =
+static const uint8_t t15l[256] =
 {3,4,5,7,7,8,9,9,9,10,10,11,11,11,12,13,4,3,5,6,7,7,8,8,8,9,9,10,10,10,11,11,5,
  5,5,6,7,7,8,8,8,9,9,10,10,11,11,11,6,6,6,7,7,8,8,9,9,9,10,10,10,11,11,11,7,6,
  7,7,8,8,9,9,9,9,10,10,10,11,11,11,8,7,7,8,8,8,9,9,9,9,10,10,11,11,11,12,9,7,8,
@@ -392,7 +395,7 @@ static const uint8_t t15l_const[256] =
  11,11,11,11,12,12,12,12,12,13,13,12,11,11,11,11,11,11,11,12,12,12,12,13,13,12,
  13,12,11,11,11,11,11,11,12,12,12,12,12,13,13,13,13};
 
-static const uint8_t t16l_const[256] =
+static const uint8_t t16l[256] =
 {1,4,6,8,9,9,10,10,11,11,11,12,12,12,13,9,3,4,6,7,8,9,9,9,10,10,10,11,12,11,12,
  8,6,6,7,8,9,9,10,10,11,10,11,11,11,12,12,9,8,7,8,9,9,10,10,10,11,11,12,12,12,
  13,13,10,9,8,9,9,10,10,11,11,11,12,12,12,13,13,13,9,9,8,9,9,10,11,11,12,11,12,
@@ -404,7 +407,7 @@ static const uint8_t t16l_const[256] =
  17,15,11,13,13,11,12,14,14,13,14,14,15,16,15,17,15,14,11,9,8,8,9,9,10,10,10,
  11,11,11,11,11,11,11,8};
 
-static const uint8_t t24l_const[256] =
+static const uint8_t t24l[256] =
 {4,4,6,7,8,9,9,10,10,11,11,11,11,11,12,9,4,4,5,6,7,8,8,9,9,9,10,10,10,10,10,8,
  6,5,6,7,7,8,8,9,9,9,9,10,10,10,11,7,7,6,7,7,8,8,8,9,9,9,9,10,10,10,10,7,8,7,7,
  8,8,8,8,9,9,9,10,10,10,10,11,7,9,7,8,8,8,8,9,9,9,9,10,10,10,10,10,7,9,8,8,8,8,
@@ -415,7 +418,7 @@ static const uint8_t t24l_const[256] =
  11,11,11,11,11,11,8,12,10,10,10,10,10,10,11,11,11,11,11,11,11,11,8,8,7,7,7,7,
  7,7,7,7,7,7,8,8,8,8,4};
 
-static const struct huffcodetab ht_const[HTN] =
+static struct huffcodetab ht[HTN] =
 { { 0, NULL, NULL}, /* Apparently not used */
   { 2, t1HB,  t1l},
   { 3, t2HB,  t2l},
@@ -453,8 +456,8 @@ static const struct huffcodebig ht_big[HTN] =
 
 static const struct
 {
-  uint32_t region0_cnt;
-  uint32_t region1_cnt;
+  const uint8_t region0_cnt;
+  const uint8_t region1_cnt;
 } subdv_table[23] =
 { {0, 0}, /*  0 bands */
   {0, 0}, /*  1 bands */
@@ -481,7 +484,7 @@ static const struct
   {6, 7}, /* 22 bands */
 };
 
-static const uint32_t sfBand[6][23] =
+static const uint16_t sfBand[6][23] =
 {
 /* Table B.2.b: 22.05 kHz */
 {0,6,12,18,24,30,36,44,54,66,80,96,116,140,168,200,238,284,336,396,464,522,576},
@@ -497,7 +500,7 @@ static const uint32_t sfBand[6][23] =
 {0,4, 8,12,16,20,24,30,36,44,54,66, 82,102,126,156,194,240,296,364,448,550,576} };
 
 
-static const short int2idx_const[4096] = /*  int2idx[i] = sqrt(i*sqrt(i)); */
+static const uint16_t int2idx[4096] = /*  int2idx[i] = sqrt(i*sqrt(i)); */
 {
   0,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  6,  7,  7,  8,  8,  8,  9,  9,
   9, 10, 10, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15, 16,
@@ -705,33 +708,33 @@ static const short int2idx_const[4096] = /*  int2idx[i] = sqrt(i*sqrt(i)); */
 509,509,509,509,509,509,509,509,509,509,510,510,510,510,510,510,510,510,510,510,
 510,511,511,511,511,511,511,511,511,511,511,512,512,512,512,512 };
 
-static const int order[32] = 
+static const uint8_t order[32] =
 { 0, 1, 16, 17, 8, 9, 24, 25, 4, 5, 20, 21, 12, 13, 28, 29,
   2, 3, 18, 19,10,11, 26, 27, 6, 7, 22, 23, 14, 15, 30, 31 };
 
-static const long sampr_index[2][3] = 
+static const uint16_t sampr_index[2][3] =
 { { 22050, 24000, 16000 },      /* MPEG 2 */
   { 44100, 48000, 32000 } };    /* MPEG 1 */
 
-static const long bitr_index[2][15] =
+static const uint16_t bitr_index[2][15] =
 { {0, 8,16,24,32,40,48,56, 64, 80, 96,112,128,144,160},    /* MPEG 2 */
   {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320} };  /* MPEG 1 */
 
-static const int num_bands[3][15]  =
+static const uint8_t num_bands[3][15]  =
 { {0,10,10,10,10,12,14,16, 20, 22, 24, 26, 28, 30, 32},
   {0,10,10,10,10,10,12,14, 18, 24, 26, 28, 30, 32, 32},
   {0,10,12,14,18,24,26,28, 30, 32, 32, 32, 32, 32, 32} };
 
-static const int cx_const[9] =
+static const int16_t cx[9] =
 { 16135, 10531,  5604, 15396, -2845,-12551, 14189,  8192, 16384 };
 
-static const int ca_const[8] =
+static const int16_t ca[8] =
 {-16859,-15458,-10269, -5961, -3099, -1342,  -465,  -121 };
 
-static const int cs_const[8] =
+static const uint16_t cs[8] =
 { 28098, 28893, 31117, 32221, 32621, 32740, 32765, 32768 };
 
-static const short enwindow_const[15*27+24] = 
+static const int16_t enwindow[15*27+24] =
 { 0,   65,  593,  1766, 22228, 2115, 611, 62,
   8,  119, 1419, 10564,-11659,-1635,-154, -9,
  -8, -119,-1419,-10564, 11659, 1635, 154,  9, 464,  100,  91,
@@ -782,7 +785,7 @@ static const short enwindow_const[15*27+24] =
  21226,-21226,10604,-10604,1860,-1860,1458,-1458,576,-576,130,-130,60,-60,8,-8
 };
 
-static const int win_const[18][4] = {
+static const int16_t win[18][4] = {
   { -3072, -134, -146, 3352 },
   { -2747, -362, -471, 3579 },
   { -2387, -529, -831, 3747 },
@@ -805,7 +808,8 @@ static const int win_const[18][4] = {
 
 static const char* wav_filename;
 static int         mp3file, wavfile, wav_size, frames;
-static uint32_t    enc_buffer[16384]; /* storage for 65536 Bytes */
+static void        *enc_buffer;
+static size_t      enc_buffer_size;
 static int         enc_chunk = 0;     /* encode chunk counter    */
 static int         enc_size;
 static config_t    cfg;
@@ -1100,9 +1104,9 @@ int HuffmanCode(short *ix, char *xr_sign, uint32_t begin, uint32_t end, int tabl
 
   if( table > 15 )
   { /* ESC-table is used */
-    uint32_t linbits  = ht_big[table-16].linbits;
-    uint16_t *hffcode = table < 24 ? t16HB : t24HB;
-    uint8_t  *hlen    = table < 24 ? t16l  : t24l;
+    uint32_t  linbits = ht_big[table-16].linbits;
+    const uint16_t *hffcode = table < 24 ? t16HB : t24HB;
+    const uint8_t  *hlen    = table < 24 ? t16l  : t24l;
 
     for(i=begin; i<end; i+=2)
     {
@@ -1564,7 +1568,8 @@ void window_subband1(short *wk, int sb0[SBLIMIT], int sb1[SBLIMIT]) ICODE_ATTR;
 void window_subband1(short *wk, int sb0[SBLIMIT], int sb1[SBLIMIT])
 {
   int   k, i, u, v;
-  short *wp, *x1, *x2;
+  short *x1, *x2;
+  short const *wp;
 
 #ifdef CPU_COLDFIRE
   int s0, s1, t0, t1;
@@ -1824,7 +1829,7 @@ void window_subband2(short *x1, int a[SBLIMIT]) ICODE_ATTR;
 void window_subband2(short *x1, int a[SBLIMIT])
 {
   int   xr;
-  short *wp = enwindow;
+  short const *wp = enwindow;
   short *x2 = x1 - 124;
 
   wp += 27 * 15;
@@ -2011,7 +2016,7 @@ void mdct_long(int *out, int *in)
   out[16] = ct - st;
 }
 
-static int find_bitrate_index(int type, int bitrate)
+static int find_bitrate_index(int type, uint16_t bitrate)
 {
   int i;
 
@@ -2022,7 +2027,7 @@ static int find_bitrate_index(int type, int bitrate)
   return i;
 }
 
-static int find_samplerate_index(long freq, int *mp3_type)
+static int find_samplerate_index(uint16_t freq, int *mp3_type)
 {
   int    mpg, rate;
 
@@ -2037,7 +2042,7 @@ static int find_samplerate_index(long freq, int *mp3_type)
   return 0;
 }
 
-void init_mp3_encoder_engine(bool stereo, int bitrate, int sample_rate)
+void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
 {
   uint32_t  avg_byte_per_frame;
 
@@ -2067,57 +2072,7 @@ void init_mp3_encoder_engine(bool stereo, int bitrate, int sample_rate)
   cfg.mpg.bitr_id   = find_bitrate_index(cfg.mpg.type, cfg.mpg.bitrate);
   cfg.mpg.num_bands = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
 
-  memcpy(scalefac, sfBand[cfg.mpg.smpl_id + 3*cfg.mpg.type], sizeof(scalefac));
-  memset(mfbuf     , 0              , sizeof(mfbuf     ));
-  memset(mdct_freq , 0              , sizeof(mdct_freq ));
-  memset(enc_data  , 0              , sizeof(enc_data  ));
-  memset(sb_data   , 0              , sizeof(sb_data   ));
-  memset(&CodedData, 0              , sizeof(CodedData ));
-  memcpy(ca        , ca_const       , sizeof(ca        ));
-  memcpy(cs        , cs_const       , sizeof(cs        ));
-  memcpy(cx        , cx_const       , sizeof(cx        ));
-  memcpy(win       , win_const      , sizeof(win       ));
-  memcpy(enwindow  , enwindow_const , sizeof(enwindow  ));
-  memcpy(int2idx   , int2idx_const  , sizeof(int2idx   ));
-  memcpy(ht_count  , ht_count_const , sizeof(ht_count  ));
-  memcpy( tab01    , tab01_const    , sizeof(tab01     ));
-  memcpy( tab23    , tab23_const    , sizeof(tab23     ));
-  memcpy( tab56    , tab56_const    , sizeof(tab56     ));
-  memcpy( tab1315  , tab1315_const  , sizeof(tab1315   ));
-  memcpy( tab1624  , tab1624_const  , sizeof(tab1624   ));
-  memcpy( tab789   , tab789_const   , sizeof(tab789    ));
-  memcpy( tabABC   , tabABC_const   , sizeof(tabABC    ));
-  memcpy( t1HB     , t1HB_const     , sizeof(t1HB      ));
-  memcpy( t2HB     , t2HB_const     , sizeof(t2HB      ));
-  memcpy( t3HB     , t3HB_const     , sizeof(t3HB      ));
-  memcpy( t5HB     , t5HB_const     , sizeof(t5HB      ));
-  memcpy( t6HB     , t6HB_const     , sizeof(t6HB      ));
-  memcpy( t7HB     , t7HB_const     , sizeof(t7HB      ));
-  memcpy( t8HB     , t8HB_const     , sizeof(t8HB      ));
-  memcpy( t9HB     , t9HB_const     , sizeof(t9HB      ));
-  memcpy(t10HB     , t10HB_const    , sizeof(t10HB     ));
-  memcpy(t11HB     , t11HB_const    , sizeof(t11HB     ));
-  memcpy(t12HB     , t12HB_const    , sizeof(t12HB     ));
-  memcpy(t13HB     , t13HB_const    , sizeof(t13HB     ));
-  memcpy(t15HB     , t15HB_const    , sizeof(t15HB     ));
-  memcpy(t16HB     , t16HB_const    , sizeof(t16HB     ));
-  memcpy(t24HB     , t24HB_const    , sizeof(t24HB     ));
-  memcpy( t1l      , t1l_const      , sizeof(t1l       ));
-  memcpy( t2l      , t2l_const      , sizeof(t2l       ));
-  memcpy( t3l      , t3l_const      , sizeof(t3l       ));
-  memcpy( t5l      , t5l_const      , sizeof(t5l       ));
-  memcpy( t6l      , t6l_const      , sizeof(t6l       ));
-  memcpy( t7l      , t7l_const      , sizeof(t7l       ));
-  memcpy( t8l      , t8l_const      , sizeof(t8l       ));
-  memcpy( t9l      , t9l_const      , sizeof(t9l       ));
-  memcpy(t10l      , t10l_const     , sizeof(t10l      ));
-  memcpy(t11l      , t11l_const     , sizeof(t11l      ));
-  memcpy(t12l      , t12l_const     , sizeof(t12l      ));
-  memcpy(t13l      , t13l_const     , sizeof(t13l      ));
-  memcpy(t15l      , t15l_const     , sizeof(t15l      ));
-  memcpy(t16l      , t16l_const     , sizeof(t16l      ));
-  memcpy(t24l      , t24l_const     , sizeof(t24l      ));
-  memcpy(ht        , ht_const       , sizeof(ht        ));
+  scalefac = sfBand[cfg.mpg.smpl_id + 3*cfg.mpg.type];
 
   ht[ 0].table =  NULL;  ht[ 0].hlen = NULL; /* Apparently not used */
   ht[ 1].table =  t1HB;  ht[ 1].hlen =  t1l;
@@ -2377,7 +2332,7 @@ void compress(void)
       for(i=0; i<(enc_size+3)/4; i++)
         CodedData.bbuf[i] = myswap32(CodedData.bbuf[i]);
 
-    if(enc_chunk + enc_size > 65536)
+    if(enc_chunk + enc_size > (int)enc_buffer_size)
     {
       /* copy iram mp3 buffer to sdram/file */
       rb->write(mp3file, enc_buffer, enc_chunk & ~3);
@@ -2385,7 +2340,7 @@ void compress(void)
       enc_chunk &= 3;
     }
 
-    memcpy((char*)enc_buffer + enc_chunk, CodedData.bbuf, enc_size);
+    memcpy(enc_buffer + enc_chunk, CodedData.bbuf, enc_size);
     enc_chunk += enc_size;
     frames++;
   }
@@ -2553,6 +2508,8 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
 
     PLUGIN_IRAM_INIT(rb)
+
+    enc_buffer = rb->plugin_get_audio_buffer(&enc_buffer_size);
 
 #ifdef CPU_COLDFIRE
     coldfire_set_macsr(0); /* integer mode */
