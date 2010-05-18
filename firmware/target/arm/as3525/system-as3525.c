@@ -393,9 +393,6 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-    /* make sure backlight is on */
-    _backlight_on();
-    _backlight_pwm(1);
     /* wait until button release (if a button is pressed) */
     while(button_read_device());
     /* then wait until next button press */
