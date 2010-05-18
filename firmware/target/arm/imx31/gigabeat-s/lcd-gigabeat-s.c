@@ -22,7 +22,10 @@
 #include "inttypes.h"
 
 #include "config.h"
+#include "system.h"
 #include "cpu.h"
+#include "spi-imx31.h"
+#include "mc13783.h"
 #include "string.h"
 #include "lcd.h"
 #include "kernel.h"
@@ -32,15 +35,116 @@
 #define MAIN_LCD_IDMAC_CHANNEL 14
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-static bool lcd_on = true;
-static bool lcd_powered = true;
-static unsigned lcd_yuv_options = 0;
-
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
    allows a full-width rectangle to be copied more efficiently. */
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
+
+static bool lcd_on = true;
+static bool lcd_powered = true;
+static unsigned lcd_yuv_options = 0;
+
+#if 0
+/* Initialization data from OF bootloader. Identical to Gigabeat F/X. */
+static const unsigned char lcd_init_data[50] =
+{
+ /* Reg   Val */
+    0x0f, 0x01,
+    0x09, 0x06,
+    0x16, 0xa6,
+    0x1e, 0x49,
+    0x1f, 0x26,
+    0x0b, 0x2f, /* Set contrast 0-63 */
+    0x0c, 0x2b,
+    0x19, 0x5e,
+    0x1a, 0x15,
+    0x1b, 0x15,
+    0x1d, 0x01,
+    0x00, 0x03,
+    0x01, 0x10,
+    0x02, 0x0a,
+    0x06, 0x04, /* Set the orientation 2=upside down, 4=normal */
+    0x08, 0x2e,
+    0x24, 0x12,
+    0x25, 0x3f,
+    0x26, 0x0b,
+    0x27, 0x00,
+    0x28, 0x00,
+    0x29, 0xf6,
+    0x2a, 0x03,
+    0x2b, 0x0a,
+    0x04, 0x01, /* Display ON */
+};
+#endif
+
+static const struct spi_node lcd_spi_node =
+{
+    /* Original firmware settings for LCD panel commication */
+    CSPI3_NUM,                      /* CSPI module 3 */
+    CSPI_CONREG_CHIP_SELECT_SS1 |   /* Chip select 1 */
+    CSPI_CONREG_DRCTL_DONT_CARE |   /* Don't care about CSPI_RDY */
+    CSPI_CONREG_DATA_RATE_DIV_16 |  /* Clock = IPG_CLK/16 = 4,125,000Hz. */
+    CSPI_BITCOUNT(32-1) |           /* All 32 bits are to be transferred */
+    CSPI_CONREG_SSPOL |             /* SS active high */
+    CSPI_CONREG_PHA |               /* Phase 1 operation */
+    CSPI_CONREG_POL |               /* Active low polarity */
+    CSPI_CONREG_MODE,               /* Master mode */
+    0,                              /* SPI clock - no wait states */
+};
+
+static void lcd_write_reg(unsigned reg, unsigned val)
+{
+    /* packet: |00|rr|01|vv| */
+    uint32_t packet = ((reg & 0xff) << 16) | 0x0100 | (val & 0xff);
+
+    struct spi_transfer_desc xfer;
+
+    xfer.node = &lcd_spi_node;
+    xfer.txbuf = &packet;
+    xfer.rxbuf = NULL;
+    xfer.count = 1;
+    xfer.callback = NULL;
+    xfer.next = NULL;
+
+    if (spi_transfer(&xfer))
+    {
+        /* Just busy wait; the interface is not used very much */
+        while (!spi_transfer_complete(&xfer));
+    }
+}
+
+static void lcd_enable_interface(bool enable)
+{
+    if (enable)
+    {
+        spi_enable_module(&lcd_spi_node);
+    }
+    else
+    {
+        spi_disable_module(&lcd_spi_node);
+    }
+}
+
+static void lcd_set_power(bool powered)
+{
+    if (powered)
+    {
+        lcd_powered = false;
+        lcd_write_reg(0x04, 0x00);
+        lcd_enable_interface(false);
+        imx31_regclr32(&GPIO3_DR, (1 << 12));
+        mc13783_clear(MC13783_REGULATOR_MODE1, MC13783_VCAMEN);
+    }
+    else
+    {
+        mc13783_set(MC13783_REGULATOR_MODE1, MC13783_VCAMEN);
+        imx31_regset32(&GPIO3_DR, (1 << 12));
+        lcd_enable_interface(true);
+        lcd_write_reg(0x04, 0x01);
+        lcd_powered = true;
+    }
+}
 
 /* LCD init */
 void lcd_init_device(void)
@@ -50,8 +154,19 @@ void lcd_init_device(void)
     /* Only do this once to avoid flicker */
     memset(FRAME, 0x00, FRAME_SIZE);
 #endif
-    IPU_IMA_ADDR = ((0x1 << 16) | (MAIN_LCD_IDMAC_CHANNEL << 4)) + (1 << 3);
-    IPU_IMA_DATA = FRAME_PHYS_ADDR;
+    IPU_IPU_IMA_ADDR = ((0x1 << 16) | (MAIN_LCD_IDMAC_CHANNEL << 4)) + (1 << 3);
+    IPU_IPU_IMA_DATA = FRAME_PHYS_ADDR;
+
+    lcd_enable_interface(true);
+#ifdef HAVE_LCD_CONTRAST
+    lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
+#endif
+#ifdef HAVE_LCD_INVERT
+    lcd_set_invert_display(false);
+#endif
+#ifdef HAVE_LCD_FLIP
+    lcd_set_flip(false);
+#endif
 }
 
 /* Update a fraction of the display. */
@@ -96,13 +211,14 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 void lcd_sleep(void)
 {
-    if (lcd_powered)
-    {
-        lcd_enable(false);
-        lcd_powered = false;
-        IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
-        _backlight_lcd_sleep();
-    }
+    if (!lcd_powered)
+        return;
+
+    IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
+    IPU_IPU_CONF &= ~IPU_IPU_CONF_ADC_EN;
+    lcd_enable(false);
+    lcd_set_power(false);
+    _backlight_lcd_sleep();
 }
 
 void lcd_enable(bool state)
@@ -112,9 +228,11 @@ void lcd_enable(bool state)
 
     if (state)
     {
+        if (!lcd_powered)
+            lcd_set_power(true);
+        IPU_IPU_CONF |= IPU_IPU_CONF_ADC_EN;
         IPU_IDMAC_CHA_EN |= 1ul << MAIN_LCD_IDMAC_CHANNEL;
         sleep(HZ/50);
-        lcd_powered = true;
         lcd_on = true;
         lcd_update();
         send_event(LCD_EVENT_ACTIVATION, NULL);
@@ -211,18 +329,37 @@ void lcd_blit_yuv(unsigned char * const src[3],
     }
 }
 
-void lcd_set_contrast(int val) {
-  (void) val;
-  // TODO:
+#ifdef HAVE_LCD_CONTRAST
+void lcd_set_contrast(int val)
+{
+    if (!lcd_on)
+        return;
+
+    lcd_write_reg(0x0b, val);
 }
 
-void lcd_set_invert_display(bool yesno) {
-  (void) yesno;
-  // TODO:
+int lcd_default_contrast(void)
+{
+    return DEFAULT_CONTRAST_SETTING;
 }
+#endif /* HAVE_LCD_CONTRAST */
 
-void lcd_set_flip(bool yesno) {
-  (void) yesno;
-  // TODO:
+#ifdef HAVE_LCD_INVERT
+void lcd_set_invert_display(bool yesno)
+{
+    if (!lcd_on)
+        return;
+
+    lcd_write_reg(0x27, yesno ? 0x10 : 00);
 }
+#endif /* HAVE_LCD_INVERT */
 
+#ifdef HAVE_LCD_FLIP
+void lcd_set_flip(bool yesno)
+{
+    if (!lcd_on)
+        return;
+
+    lcd_write_reg(0x06, yesno ? 0x02 : 0x04);
+}
+#endif /* HAVE_LCD_FLIP */

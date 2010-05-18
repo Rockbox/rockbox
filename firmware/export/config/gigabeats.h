@@ -120,6 +120,21 @@
 
 #ifndef BOOTLOADER
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+/* Main LCD contrast range and defaults */
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    47 /* Match boot contrast */
+
+/* Define this for LCD backlight brightness available */
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
@@ -139,7 +154,7 @@
 #define CONFIG_I2C I2C_IMX31L
 
 /* Define the bitmask of modules used */
-#define SPI_MODULE_MASK (USE_CSPI2_MODULE)
+#define SPI_MODULE_MASK (USE_CSPI2_MODULE | USE_CSPI3_MODULE)
 #define I2C_MODULE_MASK (USE_I2C1_MODULE | USE_I2C2_MODULE)
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
