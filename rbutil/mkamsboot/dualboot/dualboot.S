@@ -102,7 +102,7 @@ uclcopy:
 /* TODO : M200V4 ? */
 #if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define USB_PIN 6
-#elif defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_FUZEV2)
+#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
 #define USB_PIN 3
 #endif
 
@@ -214,19 +214,23 @@ uclcopy:
 
         cmp     r1, #0
         beq     boot_of
-#elif defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
+#elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
         ldr     r0, =GPIOC
         mov     r1, #0
         str     r1, [r0, #0x400]
         ldr     r1, [r0, #0x20]    /* read pin C3 */
 
         cmp     r1, #0             /* C3 = #0 means button pressed */
-#ifdef SANSA_FUZEV2
-        /* the logic is reversed on the fuzev2 */
-        bne     boot_of
-#else
         beq     boot_of
-#endif /* SANSA_FUZEV2 */
+
+#elif defined(SANSA_FUZEV2)
+        ldr     r0, =GPIOC
+        mov     r1, #0
+        str     r1, [r0, #0x400]
+        ldr     r1, [r0, #0x20]    /* read pin C3 */
+
+        cmp     r1, #0             /* C3 != #0 means button pressed */
+        bne     boot_of
 
 #elif defined(SANSA_CLIPPLUS)
         @ read pins
@@ -242,7 +246,41 @@ uclcopy:
         bne     boot_of             @ branch directly to OF if either pin high
 
 
-        @ check USB connection
+#elif defined(SANSA_C200V2)
+        /* check for RIGHT on C6, should changed to LEFT as soon as it
+         * known in which pin that is in order for consistency  */
+        ldr     r0, =GPIOC
+        mov     r1, #0
+        str     r1, [r0, #0x400]      /* set pin to output */
+
+        ldr     r1, [r0, #256]        /* 1<<(6+2) */
+        cmp     r1, #0                /* C6 low means button pressed */
+        beq     boot_of
+#elif defined(SANSA_M200V4)
+.set row, (1<<5) /* enable output on A5 */
+.set col, (1<<0) /* read keyscan column A0 */
+
+        ldr     r0, =GPIOA
+        mov     r1, #row
+        str     r1, [r0, #0x400]
+        str     r1, [r0, #(4*row)]
+
+        ldr     r2, [r0, #(4*col)]
+
+        /* check value read (1 means button pressed) */
+        cmp     r2, #0
+        bne     boot_of
+#else
+        #error No target-specific key check defined!
+#endif
+
+#if defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
+        /* Check for USB after buttons because I trust more the GPIO code than
+         * the i2c code.
+         * Also it seems we need to wait a bit before detecting USB connection
+         * on those models, but not on c200v2
+         */
+
 
         ldr     r0, =CGU_PROC
         mov     r1, #0
@@ -302,32 +340,6 @@ uclcopy:
         bne     boot_of
 
 
-#elif defined(SANSA_C200V2)
-        /* check for RIGHT on C6, should changed to LEFT as soon as it
-         * known in which pin that is in order for consistency  */
-        ldr     r0, =GPIOC
-        mov     r1, #0
-        str     r1, [r0, #0x400]      /* set pin to output */
-
-        ldr     r1, [r0, #256]        /* 1<<(6+2) */
-        cmp     r1, #0                /* C6 low means button pressed */
-        beq     boot_of
-#elif defined(SANSA_M200V4)
-.set row, (1<<5) /* enable output on A5 */
-.set col, (1<<0) /* read keyscan column A0 */
-
-        ldr     r0, =GPIOA
-        mov     r1, #row
-        str     r1, [r0, #0x400]
-        str     r1, [r0, #(4*row)]
-
-        ldr     r2, [r0, #(4*col)]
-
-        /* check value read (1 means button pressed) */
-        cmp     r2, #0
-        bne     boot_of
-#else
-        #error No target-specific key check defined!
 #endif
 
 
