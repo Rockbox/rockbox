@@ -36,6 +36,42 @@ static volatile int buf_iram[BUF_SIZE] IBSS_ATTR;
 /* (Byte per loop * loops)>>20 * ticks per s * 10 / ticks = dMB per s */
 #define dMB_PER_SEC(cnt, delta) ((((BUF_SIZE*sizeof(int)*cnt)>>20)*HZ*10)/delta)
 
+void memset_test(volatile int *buf, int buf_size, int loop_cnt,
+                 int line, char *ramtype)
+{
+    int delta, dMB, i;
+    int last_tick = *rb->current_tick;
+
+    for(i=0; i < loop_cnt; i++)
+        memset((void *)buf, 0xff, buf_size);
+
+    delta = *rb->current_tick - last_tick;
+    delta = delta>0 ? delta : delta+1;
+    dMB   = dMB_PER_SEC(loop_cnt, delta);
+    rb->screens[0]->putsf(0, line, "%s st: %3d.%d MB/s (%2d ticks for %d MB)", 
+                          ramtype, dMB/10, dMB%10, delta,
+                          (loop_cnt*BUF_SIZE*4)>>20);
+
+}
+
+void memcpy_test(volatile int *buf, int buf_size, int loop_cnt,
+                 int line, char *ramtype)
+{
+    int delta, dMB, i;
+    int last_tick = *rb->current_tick;
+
+    for(i=0; i < loop_cnt; i++)
+        memcpy((void *)buf+(buf_size/2), (void *)buf, buf_size/2);
+
+    delta = *rb->current_tick - last_tick;
+    delta = delta>0 ? delta : delta+1;
+    dMB   = dMB_PER_SEC(loop_cnt, delta);
+    rb->screens[0]->putsf(0, line, "%s cp: %3d.%d MB/s (%2d ticks for %d MB)", 
+                          ramtype, dMB/10, dMB%10, delta,
+                          (loop_cnt*BUF_SIZE*4)>>21);
+
+}
+
 void write_test(volatile int *buf, int buf_size, int loop_cnt, 
                 int line, char *ramtype)
 {
@@ -155,9 +191,13 @@ enum plugin_status plugin_start(const void* parameter)
 
         read_test (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
         write_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        memset_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        memcpy_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
 #if defined(PLUGIN_USE_IRAM)
         read_test (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
         write_test(buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
+        memset_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
+        memcpy_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
 #endif
 
         rb->screens[0]->update();
