@@ -51,5 +51,5 @@ void _logf(const char *format, ...) ATTRIBUTE_PRINTF(1, 2);
 /* Allow fine tuning (per file) of the logf output */
 #ifndef LOGF_ENABLE
 #undef logf
-#define logf(...)
+#define logf(...) do { } while(0)
 #endif

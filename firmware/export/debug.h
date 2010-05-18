@@ -45,8 +45,8 @@ void breakpoint(void);
 #define DEBUGF  debugf
 #define LDEBUGF debugf
 #else
-#define DEBUGF(...)
-#define LDEBUGF(...)
+#define DEBUGF(...) do { } while(0)
+#define LDEBUGF(...) do { } while(0)
 #endif
 #endif
 
