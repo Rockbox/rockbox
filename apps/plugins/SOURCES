@@ -70,7 +70,8 @@ iriverify.c
 /* Overlays loaders */
 #if PLUGIN_BUFFER_SIZE <= 0x10000 && defined(HAVE_LCD_BITMAP)
 
-#if CONFIG_KEYPAD != ONDIO_PAD /* not enough buttons for rockboy */
+#if CONFIG_KEYPAD != ONDIO_PAD && CONFIG_KEYPAD != SANSA_M200_PAD
+/* not enough buttons for rockboy */
 rockboy.c
 #endif
 

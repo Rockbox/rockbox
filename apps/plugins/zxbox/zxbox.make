@@ -16,7 +16,7 @@ ZXBOX_OBJ := $(call c2obj, $(ZXBOX_SRC))
 OTHER_SRC += $(ZXBOX_SRC)
 
 ifndef SIMVER
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
+ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), YES)
     ## lowmem targets
     ROCKS += $(ZXBOX_OBJDIR)/zxbox.ovl
     ZXBOX_OUTLDS = $(ZXBOX_OBJDIR)/zxbox.link

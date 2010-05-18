@@ -16,18 +16,12 @@ ROCKBOY_OBJ := $(call c2obj, $(ROCKBOY_SRC))
 
 OTHER_SRC += $(ROCKBOY_SRC)
 
-ifndef SIMVER
-ifneq (,$(findstring RECORDER,$(TARGET)))
+ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), YES)
     ## lowmem targets
     ROCKS += $(ROCKBOY_OBJDIR)/rockboy.ovl
     ROCKBOY_OUTLDS = $(ROCKBOY_OBJDIR)/rockboy.link
     ROCKBOY_OVLFLAGS = -T$(ROCKBOY_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
-    ### all other targets
-    ROCKS += $(ROCKBOY_OBJDIR)/rockboy.rock
-endif
-else
-    ### simulator
     ROCKS += $(ROCKBOY_OBJDIR)/rockboy.rock
 endif
 

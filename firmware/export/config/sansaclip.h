@@ -111,7 +111,7 @@
 #define CODEC_SIZE 0x48000  /* in IRAM */
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x18000
+#define PLUGIN_BUFFER_SIZE 0x10000
 
 #define AB_REPEAT_ENABLE 1
 
