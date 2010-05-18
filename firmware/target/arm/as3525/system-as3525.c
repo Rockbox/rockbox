@@ -114,6 +114,7 @@ struct vec_int_src vec_int_srcs[] =
     { INT_SRC_NAND, INT_NAND },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
+    { INT_SRC_USB, INT_USB, },
 #if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
@@ -324,7 +325,7 @@ void system_init(void)
     CGU_PLLASUP = 0;        /* enable PLLA */
     while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
     
-#if (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
+#if defined(USE_ROCKBOX_USB) || (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
     CGU_COUNTB = 0xff;
     CGU_PLLB = AS3525_PLLB_SETTING;
     CGU_PLLBSUP = 0;        /* enable PLLB */
@@ -392,6 +393,9 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
+    /* make sure backlight is on */
+    _backlight_on();
+    _backlight_pwm(1);
     /* wait until button release (if a button is pressed) */
     while(button_read_device());
     /* then wait until next button press */
