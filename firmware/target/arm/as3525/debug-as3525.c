@@ -432,17 +432,18 @@ end:
 
 bool __dbg_ports(void)
 {
-    int line;
+    int line, btn, i;
 
-    lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
     {
+        lcd_clear_display();
+
         while(1)
         {
             line = 0;
-            lcd_puts(0, line++, "[GPIO Values and Directions]");
+            lcd_puts(0, line++, "[GPIO Vals and Dirs]");
             lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
             lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
             lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
@@ -459,7 +460,7 @@ bool __dbg_ports(void)
             if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
                 break;
 
-            int btn = button_get_w_tmo(HZ/10);
+            btn = button_get_w_tmo(HZ/10);
             if(btn == (DEBUG_CANCEL|BUTTON_REL))
                 goto end;
             else if(btn == (BUTTON_DOWN|BUTTON_REL))
@@ -467,6 +468,7 @@ bool __dbg_ports(void)
         }
 
 #if CONFIG_CPU == AS3525 /* as3525v2 channels are different */
+#define BATTEMP_UNIT 5/2 /* 2.5mV */
         static const char *adc_name[13] = {
             "CHG_OUT  ",
             "RTCSUP   ",
@@ -482,9 +484,29 @@ bool __dbg_ports(void)
             "I_MicSup2",
             "VBAT     ",
         };
+#elif CONFIG_CPU == AS3525v2
+#define BATTEMP_UNIT 2 /* 2mV */
+        static const char *adc_name[16] = {
+            "BVDD    ",
+            "BVDDR   ",
+            "CHGIN   ",
+            "CHGOUT  ",
+            "VBUS    ",
+            NULL,
+            "BatTemp ",
+            NULL,
+            "MicSup  ",
+            NULL,
+            "I_MiSsup",
+            NULL,
+            "VBE_1uA ",
+            "VBE_2uA ",
+            "I_CHGact",
+            "I_CHGref",
+        };
+#endif
 
         lcd_clear_display();
-        int i, btn;
 
         while(1)
         {
@@ -493,7 +515,9 @@ bool __dbg_ports(void)
             for(i=0; i<5; i++)
                 lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i) * 5);
             for(; i<8; i++)
-                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i],
+                              adc_read(i) * BATTEMP_UNIT);
 #if LCD_HEIGHT < 176  /* clip  */
             lcd_update();
 
@@ -507,12 +531,19 @@ bool __dbg_ports(void)
         while(1)
         {
             line = 0;
-#endif
+#endif /* LCD_HEIGHT < 176 */
             for(i=8; i<10; i++)
-                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
             for(; i<12; i++)
-                lcd_putsf(0, line++, "%s: %d uA", adc_name[i], adc_read(i));
-            lcd_putsf(0, line++, "%s: %d mV", adc_name[i], (adc_read(i) * 5)/2);
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d uA", adc_name[i], adc_read(i));
+#if CONFIG_CPU == AS3525 /* different units */
+            lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
+#elif CONFIG_CPU == AS3525v2
+            for(; i<16; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+#endif
             lcd_update();
 
             btn = button_get_w_tmo(HZ/10);
@@ -521,7 +552,6 @@ bool __dbg_ports(void)
             else if(btn == (BUTTON_DOWN|BUTTON_REL))
                 break;
         }
-#endif
     }
 
 end:
