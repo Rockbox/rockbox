@@ -47,6 +47,7 @@ void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
 
 extern bool background;  /* True if the background image is enabled */
+extern bool showremote;
 extern int display_zoom;
 extern long start_tick;
 

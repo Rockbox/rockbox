@@ -106,7 +106,7 @@ void sim_backlight(int value)
 #endif
 
 /* initialise simulator lcd driver */
-void sim_lcd_init(void)
+void lcd_init_device(void)
 {
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 
                                        SIM_LCD_WIDTH * display_zoom,

@@ -98,8 +98,10 @@ void sim_remote_backlight(int value)
 }
 
 /* initialise simulator lcd remote driver */
-void sim_lcd_remote_init(void)
+void lcd_remote_init_device(void)
 {
+    if (!showremote)
+        return;
     remote_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                           LCD_REMOTE_WIDTH * display_zoom,
                                           LCD_REMOTE_HEIGHT * display_zoom,

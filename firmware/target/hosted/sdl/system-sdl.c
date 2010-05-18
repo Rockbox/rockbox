@@ -140,12 +140,6 @@ static int sdl_event_thread(void * param)
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
 
-    sim_lcd_init();
-#ifdef HAVE_REMOTE_LCD
-    if (showremote)
-        sim_lcd_remote_init();
-#endif
-
     if (background && picture_surface != NULL)
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
 

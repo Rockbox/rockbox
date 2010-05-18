@@ -160,7 +160,7 @@ void sim_backlight(int value)
 #endif /* HAVE_BACKLIGHT */
 
 /* initialise simulator lcd driver */
-void sim_lcd_init(void)
+void lcd_init_device(void)
 {
 #if LCD_DEPTH == 16
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
