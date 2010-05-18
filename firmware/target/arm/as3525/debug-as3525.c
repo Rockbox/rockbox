@@ -439,24 +439,92 @@ bool __dbg_ports(void)
 
     while(1)
     {
-        line = 0;
-        lcd_puts(0, line++, "[GPIO Values and Directions]");
-        lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
-        lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
-        lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
-        lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
+        while(1)
+        {
+            line = 0;
+            lcd_puts(0, line++, "[GPIO Values and Directions]");
+            lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
+            lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
+            lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
+            lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
 #ifdef DEBUG_DBOP
-        line++;
-        lcd_puts(0, line++, "[DBOP_DIN]");
-        lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
+            line++;
+            lcd_puts(0, line++, "[DBOP_DIN]");
+            lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
 #endif
-        line++;
-        lcd_puts(0, line++, "[CP15]");
-        lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
-        lcd_update();
-        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
-            break;
+            line++;
+            lcd_puts(0, line++, "[CP15]");
+            lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
+            lcd_update();
+            if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
+                break;
+
+            int btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+
+#if CONFIG_CPU == AS3525 /* as3525v2 channels are different */
+        static const char *adc_name[13] = {
+            "CHG_OUT  ",
+            "RTCSUP   ",
+            "VBUS     ",
+            "CHG_IN   ",
+            "CVDD     ",
+            "BatTemp  ",
+            "MicSup1  ",
+            "MicSup2  ",
+            "VBE1     ",
+            "VBE2     ",
+            "I_MicSup1",
+            "I_MicSup2",
+            "VBAT     ",
+        };
+
+        lcd_clear_display();
+        int i, btn;
+
+        while(1)
+        {
+            line = 0;
+
+            for(i=0; i<5; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i) * 5);
+            for(; i<8; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
+#if LCD_HEIGHT < 176  /* clip  */
+            lcd_update();
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+        lcd_clear_display();
+        while(1)
+        {
+            line = 0;
+#endif
+            for(i=8; i<10; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+            for(; i<12; i++)
+                lcd_putsf(0, line++, "%s: %d uA", adc_name[i], adc_read(i));
+            lcd_putsf(0, line++, "%s: %d mV", adc_name[i], (adc_read(i) * 5)/2);
+            lcd_update();
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+#endif
     }
+
+end:
     lcd_setfont(FONT_UI);
     return false;
 }
