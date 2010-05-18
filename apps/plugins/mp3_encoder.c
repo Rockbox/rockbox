@@ -100,7 +100,7 @@ static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  1152 Bytes */
 static BF_Data   CodedData                       IBSS_ATTR; /*  1056 Bytes */
 
 static const uint16_t sfBand[6][23]              ICONST_ATTR;
-static const uint16_t const *scalefac            ICONST_ATTR;
+static const uint16_t const *scalefac            IBSS_ATTR;
 
 static const int16_t   ca    [8]                 ICONST_ATTR; /*    16 Bytes */
 static const uint16_t  cs    [8]                 ICONST_ATTR; /*    16 Bytes */
@@ -360,7 +360,7 @@ static const uint8_t t8l[36] =
 static const uint8_t t9l[36] =
 {3,3,5,6,8,9,3,3,4,5,6,8,4,4,5,6,7,8,6,5,6,7,7,8,7,6,7,7,8,9,8,7,8,8,9,9};
 
-static const uint8_t t10[64] =
+static const uint8_t t10l[64] =
 {1,3,6,8,9,9,9,10,3,4,6,7,8,9,8,8,6,6,7,8,9,10,9,9,7,7,8,9,10,10,9,10,8,8,9,10,
  10,10,10,10,9,9,10,10,11,11,10,11,8,8,9,10,10,10,11,11,9,8,9,10,10,11,11,11};
 
