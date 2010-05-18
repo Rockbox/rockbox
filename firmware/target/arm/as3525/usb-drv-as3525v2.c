@@ -44,7 +44,9 @@ struct usb_endpoint
     bool busy;
 };
 
+#if 0
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS*2];
+#endif
 
 void usb_attach(void)
 {
@@ -116,7 +118,9 @@ static void core_reset(void)
         i++;
 
     if(USB_GRSTCTL & USB_GRSTCTL_csftrst)
+    {
         logf("oops, usb core soft reset hang :(");
+    }
 
     /* Wait for 3 PHY Clocks */
     /*mdelay(100);*/
@@ -255,7 +259,6 @@ bool usb_drv_stalled(int ep, bool in)
 {
     (void) ep;
     (void) in;
-    return true;
     return true;
 }
 
