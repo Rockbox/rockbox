@@ -77,10 +77,6 @@ void cf_set_cpu_frequency(long frequency)
         IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(3<<10);
                     /* BUFEN2 enable on /CS2 | CS2Post 1 clock| CS2Pre 3 clocks*/
         IDECONFIG2 = (1<<18)|(1<<16)|(1<<8)|(1<<0); /* TA /CS2 enable + CS2wait */
-
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<2)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/32 */
-
         break;
 
     case CPUFREQ_NORMAL:
@@ -98,11 +94,8 @@ void cf_set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_NORMAL;
 	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
 	IDECONFIG2 = (1<<18)|(1<<16);
-
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<1)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/8 */
-
         break;
+
     default:
         DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
               /* Refresh timer for bypass frequency */
@@ -116,10 +109,6 @@ void cf_set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_DEFAULT;
 	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
 	IDECONFIG2 = (1<<18)|(1<<16);
-
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/2 */
-
         break;
     }
 }
