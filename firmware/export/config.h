@@ -913,11 +913,10 @@ Lyre prototype 1 */
 
 #ifndef SIMULATOR
 //#define USB_ENABLE_SERIAL
-//#define USB_ENABLE_STORAGE
+#define USB_ENABLE_STORAGE
 
 #ifdef USB_HAS_INTERRUPT
-//#define USB_ENABLE_HID
-#define USB_ENABLE_CHARGING_ONLY
+#define USB_ENABLE_HID
 #else
 #define USB_ENABLE_CHARGING_ONLY
 #endif
