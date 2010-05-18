@@ -67,22 +67,19 @@ iriverify.c
 
 #ifndef SIMULATOR /* those plugins only run on hardware */
 
-/* Overlay loaders */
+/* Overlays loaders */
+#if PLUGIN_BUFFER_SIZE <= 0x10000 && defined(HAVE_LCD_BITMAP)
 
-#if (MEMORYSIZE <= 8)
-chessbox.c
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if CONFIG_KEYPAD != ONDIO_PAD /* not enough buttons for rockboy */
 rockboy.c
 #endif
-zxbox.c
-#endif
 
-/* overlay loader for Goban */
-#if (PLUGIN_BUFFER_SIZE < 0x10000)
-lua.c
+zxbox.c
+chessbox.c
 goban.c
 pictureflow.c
-#endif
+
+#endif /* PLUGIN_BUFFER_SIZE <= 0x10000 && HAVE_LCD_BITMAP */
 
 
 #if CONFIG_CODEC != SWCODEC
