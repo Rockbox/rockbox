@@ -35,6 +35,8 @@
 #include "usb_core.h"
 #include "string.h"
 
+#if defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_AS3525
+
 #define USB_NUM_EPS         4
 
 typedef struct {
@@ -959,3 +961,5 @@ bool usb_drv_stalled(int ep, bool in)
 {
     return USB_EP_CTRL(ep, in) & USB_EP_CTRL_STALL ? true : false;
 }
+
+#endif
