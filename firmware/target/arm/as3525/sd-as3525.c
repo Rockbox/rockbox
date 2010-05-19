@@ -912,6 +912,10 @@ void sd_enable(bool on)
         }
 #endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
 
+        /* not sure why we have to wait, but without this, test_disk freezes
+         * when closing the 300MB file which was just written to */
+        udelay(100);
+
         sd_enabled = false;
 
 #ifdef HAVE_MULTIDRIVE
