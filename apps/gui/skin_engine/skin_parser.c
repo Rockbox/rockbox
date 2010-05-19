@@ -1067,7 +1067,7 @@ static int parse_setting_and_lang(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     ptr++;
     end = strchr(ptr,'|');
-    if (!end)
+    if (!end || (size_t)(end-ptr+1) > sizeof temp)
         return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, ptr,end-ptr+1);
     
@@ -1084,9 +1084,7 @@ static int parse_setting_and_lang(const char *wps_bufptr,
         /* Find the setting */
         for (i=0; i<nb_settings; i++)
             if (settings[i].cfg_name &&
-                !strncmp(settings[i].cfg_name,ptr,end-ptr) &&
-                /* prevent matches on cfg_name prefixes */
-                strlen(settings[i].cfg_name)==(size_t)(end-ptr))
+                !strcmp(settings[i].cfg_name, temp))
                 break;
 #ifndef __PCTOOL__
         if (i == nb_settings)
@@ -1510,10 +1508,11 @@ static int parse_touchregion(const char *wps_bufptr,
     unsigned i, imax;
     struct touchregion *region = NULL;
     const char *ptr = wps_bufptr;
-    const char *action;
+    const char *action, *end;
     const char pb_string[] = "progressbar";
     const char vol_string[] = "volume";
     int x,y,w,h;
+    char temp[20];
 
     /* format: %T|x|y|width|height|action|
      * if action starts with & the area must be held to happen
@@ -1561,11 +1560,15 @@ static int parse_touchregion(const char *wps_bufptr,
     region->wvp = curr_vp;
     region->armed = false;
 
-    if(!strncmp(pb_string, action, sizeof(pb_string)-1)
-        && *(action + sizeof(pb_string)-1) == '|')
+    end = strchr(action, '|');
+    if (!end || (size_t)(end-action+1) > sizeof temp)
+        return WPS_ERROR_INVALID_PARAM;
+    strlcpy(temp, action, end-action+1);
+    action = temp;
+
+    if(!strcmp(pb_string, action))
         region->type = WPS_TOUCHREGION_SCROLLBAR;
-    else if(!strncmp(vol_string, action, sizeof(vol_string)-1)
-        && *(action + sizeof(vol_string)-1) == '|')
+    else if(!strcmp(vol_string, action))
         region->type = WPS_TOUCHREGION_VOLUME;
     else
     {
@@ -1579,17 +1582,15 @@ static int parse_touchregion(const char *wps_bufptr,
         else
             region->repeat = false;
 
-        i = 0;
         imax = ARRAYLEN(touchactions);
-        while ((region->action == ACTION_NONE) &&
-                (i < imax))
+        for (i = 0; i < imax; i++)
         {
             /* try to match with one of our touchregion screens */
-            int len = strlen(touchactions[i].s);
-            if (!strncmp(touchactions[i].s, action, len)
-                    && *(action+len) == '|')
+            if (!strcmp(touchactions[i].s, action))
+            {
                 region->action = touchactions[i].action;
-            i++;
+                break;
+            }
         }
         if (region->action == ACTION_NONE)
             return WPS_ERROR_INVALID_PARAM;
