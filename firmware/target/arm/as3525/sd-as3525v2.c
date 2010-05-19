@@ -402,12 +402,6 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         GPIOB_PIN(5) = (1-drive) << 5;
 #endif
 
-/*  RCRC & RTO interrupts should be set together with the CD interrupt but
- *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
- *  them masked for now we can check them in the isr by reading raw status when
- *  the CD int is triggered.
- */
-    MCI_MASK |= MCI_INT_CD;
     MCI_ARGUMENT = arg;
 
     /* Construct MCI_COMMAND  */
@@ -437,8 +431,6 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         _buttonlight_off();
 #endif
     wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
-
-    MCI_MASK &= ~MCI_INT_CD;
 
     /*  Handle command responses & errors */
     if(flags & MCI_RESP)
@@ -700,10 +692,16 @@ static void init_controller(void)
     /* Rx watermark = 63(sd reads)  Tx watermark = 128 (sd writes) */
     MCI_FIFOTH = (MCI_FIFOTH & MCI_FIFOTH_MASK) | 0x503f0080;
 
-    /* Mask all MCI Interrupts initially  */
-    MCI_MASK = 0;
+/*  RCRC & RTO interrupts should be set together with the CD interrupt but
+ *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
+ *  them masked for now we can check them in the isr by reading raw status when
+ *  the CD int is triggered.
+ */
+    MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO | MCI_INT_CD);
 
-    MCI_CTRL |= INT_ENABLE;
+    MCI_CTRL |= INT_ENABLE | DMA_ENABLE;
+
+    MCI_BLKSIZ = SD_BLOCK_SIZE;
 }
 
 int sd_init(void)
@@ -846,7 +844,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         /* Interrupt handler might set this to true during transfer */
         retry = false;
 
-        MCI_BLKSIZ = SD_BLOCK_SIZE;
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
         ret = sd_wait_for_state(drive, SD_TRAN);
@@ -874,16 +871,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
-        MCI_CTRL |= DMA_ENABLE;
-
         unsigned long dummy; /* if we don't ask for a response, writing fails */
         if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
             panicf("%s multiple blocks failed", write ? "write" : "read");
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-
-        MCI_MASK &= ~(MCI_DATA_ERROR | MCI_INT_DTO);
 
         last_disk_activity = current_tick;
 
