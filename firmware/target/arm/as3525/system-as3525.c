@@ -122,7 +122,8 @@ struct vec_int_src vec_int_srcs[] =
     { INT_SRC_TIMER2, INT_TIMER2 },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) || \
+    (defined(SANSA_FUZEV2) && !defined(INCREASED_SCROLLWHEEL_POLLING)
     { INT_SRC_GPIOA, INT_GPIOA, },
 #endif
     /* Lowest priority at the end of the list */
@@ -150,11 +151,11 @@ static void setup_vic(void)
 
 void INT_GPIOA(void)
 {
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
     void sd_gpioa_isr(void);
     sd_gpioa_isr();
 #endif
-#if (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+#if defined(SANSA_FUZEV2) && !defined(INCREASED_SCROLLWHEEL_POLLING
     void button_gpioa_isr(void);
     button_gpioa_isr();
 #endif
@@ -368,8 +369,9 @@ void system_init(void)
     ascodec_init();
 
 #ifndef BOOTLOADER
-    /* setup isr for microsd monitoring and for scrollwheel irq */
-#if defined(HAVE_MULTIDRIVE) || (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+    /* setup isr for microsd monitoring and for fuzev2 scrollwheel irq */
+#if defined(HAVE_HOTSWAP) || \
+    (defined(SANSA_FUZEV2) && !defined(INCREASED_SCROLLWHEEL_POLLING)
     VIC_INT_ENABLE = (INTERRUPT_GPIOA);
     /* pin selection for irq happens in the drivers */
 #endif
