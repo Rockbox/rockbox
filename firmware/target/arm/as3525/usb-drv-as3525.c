@@ -626,6 +626,15 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
+static void *virt_to_bus(void *addr)
+{
+    unsigned int x = (long)addr;
+
+    x -= (x & 0x40000000) >> 2; /* fix uncached address */
+
+    return (void*)x;
+}
+
 int usb_drv_recv(int ep, void *ptr, int len)
 {
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
@@ -651,7 +660,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
         uc_desc->status   |= USB_DMA_DESC_ZERO_LEN;
         uc_desc->data_ptr  = 0;
     } else {
-        uc_desc->data_ptr  = ptr;
+        uc_desc->data_ptr  = virt_to_bus(ptr);
     }
     USB_OEP_DESC_PTR(ep) = (int)&dmadescs[ep][1];
     USB_OEP_STS(ep)      = USB_EP_STAT_OUT_RCVD; /* clear status */
@@ -703,7 +712,7 @@ void ep_send(int ep, void *ptr, int len)
     if (len == 0)
         uc_desc->status |= USB_DMA_DESC_ZERO_LEN;
 
-    uc_desc->data_ptr  = ptr;
+    uc_desc->data_ptr  = virt_to_bus(ptr);
 
     USB_IEP_DESC_PTR(ep) = (int)&dmadescs[ep][0];
     USB_IEP_STS(ep)      = 0xffffffff; /* clear status */
