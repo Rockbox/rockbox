@@ -22,8 +22,6 @@
 
 /* Driver for the ARM PL180 SD/MMC controller inside AS3525 SoC */
 
-/* TODO: Find the real capacity of >2GB models (will be useful for USB) */
-
 #include "config.h" /* for HAVE_MULTIDRIVE & AMS_OF_SIZE */
 #include "fat.h"
 #include "thread.h"
@@ -575,7 +573,7 @@ bool sd_present(IF_MD_NONVOID(int drive))
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned long response = 0;
-    unsigned int timeout = current_tick + 100; /* 100 ticks timeout */
+    unsigned int timeout = current_tick + HZ;
 
     while (1)
     {
