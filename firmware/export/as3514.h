@@ -30,31 +30,45 @@ extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 /* Register Descriptions */
+
+#ifndef HAVE_AS3543
 #define AS3514_LINE_OUT_R 0x00
 #define AS3514_LINE_OUT_L 0x01
+#endif
+
 #define AS3514_HPH_OUT_R  0x02
 #define AS3514_HPH_OUT_L  0x03
+
+#ifndef HAVE_AS3543
 #define AS3514_LSP_OUT_R  0x04
 #define AS3514_LSP_OUT_L  0x05
+#endif
+
 #define AS3514_MIC1_R     0x06
 #define AS3514_MIC1_L     0x07
+
 #ifndef HAVE_AS3543
 #define AS3514_MIC2_R     0x08
 #define AS3514_MIC2_L     0x09
 #endif
+
 #define AS3514_LINE_IN1_R 0x0a
 #define AS3514_LINE_IN1_L 0x0b
+
 #ifndef HAVE_AS3543
 #define AS3514_LINE_IN2_R 0x0c
 #define AS3514_LINE_IN2_L 0x0d
 #endif
+
 #define AS3514_DAC_R      0x0e
 #define AS3514_DAC_L      0x0f
 #define AS3514_ADC_R      0x10
 #define AS3514_ADC_L      0x11
+
 #ifdef HAVE_AS3543
 #define AS3543_DAC_IF     0x12
 #endif
+
 #define AS3514_AUDIOSET1  0x14
 #define AS3514_AUDIOSET2  0x15
 #define AS3514_AUDIOSET3  0x16
@@ -65,18 +79,27 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define AS3543_PMU_ENABLE 0x1c
 #endif
 
+#ifndef HAVE_AS3543
 #define AS3514_PLLMODE    0x1d
+#endif
 
 #ifdef HAVE_AS3543
-#define AS3543_CHARGER    0x19  /* PMU: sub register 1 (CHGVBUS1) */
+#define AS3543_CHARGER    0x19  /* PMU: 2 sub registers */
 #endif
 
 #define AS3514_SYSTEM     0x20
 #define AS3514_CVDD_DCDC3 0x21
+
+#ifndef HAVE_AS3543
 #define AS3514_CHARGER    0x22
 #define AS3514_DCDC15     0x23
 #define AS3514_SUPERVISOR 0x24
+#endif
 
+/* AS3543 has 2 IRQ_ENRD registers at 0x23 and 0x24, but we don't use them
+ * We call the real IRQ_ENRD2 register, IRQ_ENRD0, to stay compatible with
+ * as3514, because the bits we use are the same
+ */
 #define AS3514_IRQ_ENRD0  0x25
 #define AS3514_IRQ_ENRD1  0x26
 #define AS3514_IRQ_ENRD2  0x27
@@ -98,8 +121,8 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 /*** Audio Registers ***/
 
-/* 00h (LINE_OUT_R) to 1Dh (PLLMODE) */
-#define AS3514_NUM_AUDIO_REGS   (0x1e)
+/* 00h (LINE_OUT_R) to 16h (AUDIOSET3) */
+#define AS3514_NUM_AUDIO_REGS   (0x17)
 
 /* Common registers masks */
 #define AS3514_VOL_MASK         (0x1f << 0)
@@ -122,6 +145,8 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
     #define HPH_OUT_R_HP_OVC_TO_256MS   (0x0 << 6)
     #define HPH_OUT_R_HP_OVC_TO_512MS   (0x2 << 6)
     /* AS3543 */
+    #define HPH_OUT_R_LINEOUT           (0x1 << 7)
+    #define HPH_OUT_R_HEADPHONES        (0x0 << 7)
     #define HPH_OUT_R_HP_OUT_SUM        (0x0 << 5)
     #define HPH_OUT_R_HP_OUT_DAC        (0x1 << 5)
     #define HPH_OUT_R_HP_OUT_LINE       (0x2 << 5)
@@ -237,16 +262,24 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #endif
 
 /* AUDIOSET1 (14h)*/
-#define AUDIOSET1_ADC_on        (0x1 << 7)
+#ifdef HAVE_AS3543
+#define AUDIOSET1_DAC_on        (0x1 << 6)
+#define AUDIOSET1_DAC_GAIN_on   (0x1 << 5)
+#else
 #define AUDIOSET1_SUM_on        (0x1 << 6)
 #define AUDIOSET1_DAC_on        (0x1 << 5)
 #define AUDIOSET1_LOUT_on       (0x1 << 4)
+#endif /* HAVE_AS3543 */
+/* common bits */
+#define AUDIOSET1_ADC_on        (0x1 << 7)
 #define AUDIOSET1_LIN2_on       (0x1 << 3)
 #define AUDIOSET1_LIN1_on       (0x1 << 2)
 #define AUDIOSET1_MIC2_on       (0x1 << 1)
 #define AUDIOSET1_MIC1_on       (0x1 << 0)
+
 #define AUDIOSET1_INPUT_MASK    AUDIOSET1_MIC1_on | AUDIOSET1_MIC2_on | \
                                 AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on
+
 
 /* AUDIOSET2 (15h) */
 #ifdef HAVE_AS3543
@@ -270,9 +303,17 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #endif
 
 /* AUDIOSET3 (16h) */
+#ifdef HAVE_AS3543
+#define AUDIOSET3_HP_FASTSTART  (0x1 << 2)
+#define AUDIOSET3_HP_LONGSTART  (0x0 << 2)
+#define AUDIOSET3_HP_BIAS_150   (0x1 << 1)
+#define AUDIOSET3_HPCM_on       (0x1 << 0)
+#define AUDIOSET3_HPCM_off      (0x0 << 0)
+#else
 #define AUDIOSET3_ZCU_off       (0x1 << 2)
 #define AUDIOSET3_IBR_HPH       (0x1 << 1)
 #define AUDIOSET3_HPCM_off      (0x1 << 0)
+#endif
 
 /* PLLMODE (1Dh) */
 #define PLLMODE_LRCK             (0x3 << 1)
