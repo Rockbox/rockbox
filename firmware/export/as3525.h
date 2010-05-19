@@ -530,9 +530,9 @@ CE lines
 /* Timer frequency */
 #define TIMER_FREQ (24000000 / 16)
 
-/* USB : TODO */
+/* USB */
 #define USB_NUM_ENDPOINTS 4
-#define USB_DEVBSS_ATTR IBSS_ATTR
+#define USB_DEVBSS_ATTR
 
 /* I2SIN registers */
 
