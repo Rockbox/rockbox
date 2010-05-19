@@ -73,7 +73,7 @@
 /* define to activate advanced wheel acceleration code */
 #define HAVE_WHEEL_ACCELERATION
 /* define from which rotation speed [degree/sec] on the acceleration starts */
-#define WHEEL_ACCEL_START 540
+#define WHEEL_ACCEL_START 720
 /* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
 #define WHEEL_ACCELERATION  1
 
