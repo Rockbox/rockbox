@@ -108,22 +108,24 @@ struct vec_int_src
 /* Vectored interrupts (16 available) */
 struct vec_int_src vec_int_srcs[] =
 {
-    { INT_SRC_TIMER1, INT_TIMER1 },
-    { INT_SRC_TIMER2, INT_TIMER2 },
+    /* Highest priority at the top of the list */
     { INT_SRC_DMAC, INT_DMAC },
     { INT_SRC_NAND, INT_NAND },
-    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
-    { INT_SRC_AUDIO, INT_AUDIO },
-    { INT_SRC_USB, INT_USB, },
 #if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
-#ifdef HAVE_HOTSWAP
-    { INT_SRC_GPIOA, INT_GPIOA, },
-#endif
+    { INT_SRC_USB, INT_USB, },
 #ifdef HAVE_RECORDING
     { INT_SRC_I2SIN, INT_I2SIN, },
 #endif
+    { INT_SRC_TIMER1, INT_TIMER1 },
+    { INT_SRC_TIMER2, INT_TIMER2 },
+    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
+    { INT_SRC_AUDIO, INT_AUDIO },
+#ifdef HAVE_HOTSWAP
+    { INT_SRC_GPIOA, INT_GPIOA, },
+#endif
+    /* Lowest priority at the end of the list */
 };
 
 static void setup_vic(void)
