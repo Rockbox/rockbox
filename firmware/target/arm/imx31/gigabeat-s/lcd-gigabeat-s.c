@@ -215,7 +215,6 @@ void lcd_sleep(void)
         return;
 
     IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
-    IPU_IPU_CONF &= ~IPU_IPU_CONF_ADC_EN;
     lcd_enable(false);
     lcd_set_power(false);
     _backlight_lcd_sleep();
@@ -230,7 +229,6 @@ void lcd_enable(bool state)
     {
         if (!lcd_powered)
             lcd_set_power(true);
-        IPU_IPU_CONF |= IPU_IPU_CONF_ADC_EN;
         IPU_IDMAC_CHA_EN |= 1ul << MAIN_LCD_IDMAC_CHANNEL;
         sleep(HZ/50);
         lcd_on = true;
