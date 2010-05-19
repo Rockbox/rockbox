@@ -53,7 +53,9 @@ typedef struct {
 /* 4 input endpoints */
 #define USB_IEP_CTRL(i)         USB_REG(0x0000 + i*0x20)
 #define USB_IEP_STS(i)          USB_REG(0x0004 + i*0x20)
+/* txfsize: bits 0-15 */
 #define USB_IEP_TXFSIZE(i)      USB_REG(0x0008 + i*0x20)
+/* mps: bits 0-10 (max 2047) */
 #define USB_IEP_MPS(i)          USB_REG(0x000C + i*0x20)
 #define USB_IEP_DESC_PTR(i)     USB_REG(0x0014 + i*0x20)
 #define USB_IEP_STS_MASK(i)     USB_REG(0x0018 + i*0x20)
@@ -61,7 +63,9 @@ typedef struct {
 /* 4 output endpoints */
 #define USB_OEP_CTRL(i)         USB_REG(0x0200 + i*0x20)
 #define USB_OEP_STS(i)          USB_REG(0x0204 + i*0x20)
+/* 'rx packet frame number' */
 #define USB_OEP_RXFR(i)         USB_REG(0x0208 + i*0x20)
+/* mps: bits 0-10 (max 2047), bits 23-31 are fifo size */
 #define USB_OEP_MPS(i)          USB_REG(0x020C + i*0x20)
 #define USB_OEP_SUP_PTR(i)      USB_REG(0x0210 + i*0x20)
 #define USB_OEP_DESC_PTR(i)     USB_REG(0x0214 + i*0x20)
@@ -298,13 +302,8 @@ static struct usb_endpoint endpoints[USB_NUM_EPS][2];
  * dmadescs may share with each other, since we only access them uncached.
  */
 static struct usb_dev_dma_desc dmadescs[USB_NUM_EPS][2] __attribute__((aligned(32)));
-
-static struct usb_dev_setup_buf setup_desc;
-/* Dummy buffer, to keep rx_buf out of this cacheline */
-static struct usb_dev_setup_buf dummy __attribute__((unused));
-
-static char rx_buf[1024];
-static char tx_buf[1024];
+/* reuse unused EP2 OUT descriptor here */
+static struct usb_dev_setup_buf *setup_desc = (void*)&dmadescs[2][1];
 
 #if AS3525_MCLK_SEL != AS3525_CLK_PLLB
 static inline void usb_enable_pll(void)
@@ -402,17 +401,12 @@ static void dma_desc_init(int ep, int dir)
 
     endpoints[ep][dir].uc_desc = uc_desc;
 
-    if (dir == 0) {
-        uc_desc->status    = USB_DMA_DESC_BS_DMA_DONE | USB_DMA_DESC_LAST | 0x40;
-        uc_desc->resv      = 0xffffffff;
-        uc_desc->data_ptr  = tx_buf;
-        uc_desc->next_desc = 0;
-    } else {
-        uc_desc->status    = USB_DMA_DESC_BS_HST_RDY | /*USB_DMA_DESC_LAST |*/ 0x40;
-        uc_desc->resv      = 0xffffffff;
-        uc_desc->data_ptr  = rx_buf;
-        uc_desc->next_desc = 0;
-    }
+    uc_desc->status    = USB_DMA_DESC_BS_DMA_DONE | \
+                         USB_DMA_DESC_LAST | \
+                         USB_DMA_DESC_ZERO_LEN;
+    uc_desc->resv      = 0xffffffff;
+    uc_desc->data_ptr  = 0;
+    uc_desc->next_desc = 0;
 }
 
 static void reset_endpoints(int init)
@@ -430,7 +424,13 @@ static void reset_endpoints(int init)
     endpoints[2][1].state |= EP_STATE_ALLOCATED;
 
     for(i = 0; i < USB_NUM_EPS; i++) {
-        int mps = i == 0 ? 64 : 2048; /* For HS */
+        /*
+         * LS: 8 (control), no bulk available 
+         * FS: 64 (control), 64 (bulk)
+         * HS: 64 (control), 512 (bulk)
+         * TODO: switch depending on speed.
+         */
+        int mps = i == 0 ? 64 : 512;
 
         if (init) {
             endpoints[i][0].state = 0;
@@ -448,23 +448,23 @@ static void reset_endpoints(int init)
         USB_IEP_MPS     (i) = mps;
         /* We don't care about the 'IN token received' event */
         USB_IEP_STS_MASK(i) = USB_EP_STAT_IN; /* OF: 0x840 */
-        USB_IEP_TXFSIZE (i) = 0x20;
+        USB_IEP_TXFSIZE (i) = mps/2;
         USB_IEP_STS     (i) = 0xffffffff; /* clear status */
         USB_IEP_DESC_PTR(i) = 0;
 
         if (i != 2) { /* Skip the OUT EP0 alias */
             dma_desc_init(i, 1);
             USB_OEP_CTRL    (i) = USB_EP_CTRL_FLUSH|USB_EP_CTRL_SNAK;
-            USB_OEP_MPS     (i) = 0x08000000|mps;
+            USB_OEP_MPS     (i) = (mps/2 << 23) | mps;
             USB_OEP_STS_MASK(i) = 0x0000; /* OF: 0x1800 */
-            USB_OEP_RXFR    (i) = 0x00;
+            USB_OEP_RXFR    (i) = 0;      /* Always 0 in OF trace? */
             USB_OEP_STS     (i) = 0xffffffff; /* clear status */
             USB_OEP_DESC_PTR(i) = 0;
         }
     }
 
-    setup_desc_init(&setup_desc);
-    USB_OEP_SUP_PTR(0)    = (int)&setup_desc;
+    setup_desc_init(setup_desc);
+    USB_OEP_SUP_PTR(0)    = (int)setup_desc;
 }
 
 void usb_drv_init(void)
@@ -582,7 +582,7 @@ int usb_drv_request_endpoint(int type, int dir)
                               (type << 4);
             USB_DEV_EP_INTR_MASK &= ~(1<<(16+i));
         }
-        logf("usb_drv_request_endpoint(%d, %d): returning %02x\n", type, dir, i | dir);
+        /* logf("usb_drv_request_endpoint(%d, %d): returning %02x\n", type, dir, i | dir); */
         return i | dir;
     }
 
@@ -610,7 +610,7 @@ void usb_drv_release_endpoint(int ep)
     if (!(endpoints[i][d].state & EP_STATE_ALLOCATED))
         return;
 
-    logf("usb_drv_release_endpoint(%d, %d)\n", i, d);
+    /* logf("usb_drv_release_endpoint(%d, %d)\n", i, d); */
     endpoints[i][d].state = 0;
     USB_DEV_EP_INTR_MASK |= (1<<(16*d+i));
     USB_EP_CTRL(i, !d) = USB_EP_CTRL_FLUSH | USB_EP_CTRL_SNAK;
@@ -705,11 +705,6 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].len = len;
     endpoints[ep][0].rc = -1;
 
-    USB_IEP_CTRL(ep)     |= USB_EP_CTRL_CNAK;
-
-    /* TEST: delay a little here */
-    for (i=0; i<1000; i++) asm volatile ("nop\n");
-
     /* Make sure data is committed to memory */
     clean_dcache();
 
@@ -723,11 +718,11 @@ void ep_send(int ep, void *ptr, int len)
 
     uc_desc->data_ptr  = virt_to_bus(ptr);
 
-    USB_IEP_CTRL(ep)     |= USB_EP_CTRL_FLUSH;
     USB_IEP_DESC_PTR(ep) = (int)&dmadescs[ep][0];
     USB_IEP_STS(ep)      = 0xffffffff; /* clear status */
     /* start transfer */
-    USB_IEP_CTRL(ep)     |= USB_EP_CTRL_PD;
+    USB_IEP_CTRL(ep)     |= USB_EP_CTRL_CNAK | USB_EP_CTRL_PD;
+    /* HW automatically sets NAK bit later */
 }
 
 int usb_drv_send(int ep, void *ptr, int len)
@@ -760,14 +755,17 @@ static void handle_in_ep(int ep)
 
     USB_IEP_STS(ep) = ep_sts; /* ack */
 
+    if (ep_sts & USB_EP_STAT_BNA) { /* Buffer was not set up */
+        logf("ep%d IN, status %x (BNA)\n", ep, ep_sts);
+        panicf("ep%d IN 0x%x (BNA)", ep, ep_sts);
+    }
+
     if (ep_sts & USB_EP_STAT_TDC) {
-        ep_sts &= ~USB_EP_STAT_TDC;
-        /* OF does SNAK and FLUSH at once here */
-        USB_IEP_CTRL(ep) |= USB_EP_CTRL_SNAK | USB_EP_CTRL_FLUSH;
+        USB_IEP_CTRL(ep) |= USB_EP_CTRL_FLUSH;
         endpoints[ep][0].state &= ~EP_STATE_BUSY;
         endpoints[ep][0].rc = 0;
-        logf("EP%d %stx done len %x stat %08x\n",
-             ep, endpoints[ep][0].state & EP_STATE_ASYNC ? "async " :"",
+        logf("EP%d %x %stx done len %x stat %08x\n",
+             ep, ep_sts, endpoints[ep][0].state & EP_STATE_ASYNC ? "async " :"",
              endpoints[ep][0].len,
              endpoints[ep][0].uc_desc->status);
         if (endpoints[ep][0].state & EP_STATE_ASYNC) {
@@ -776,6 +774,7 @@ static void handle_in_ep(int ep)
         } else {
             wakeup_signal(&endpoints[ep][0].complete);
         }
+        ep_sts &= ~USB_EP_STAT_TDC;
     }
 
     if (ep_sts) {
@@ -790,7 +789,7 @@ static void handle_in_ep(int ep)
 
 static void handle_out_ep(int ep)
 {
-    struct usb_ctrlrequest *req = (void*)UNCACHED_ADDR(&setup_desc.data1);
+    struct usb_ctrlrequest *req = (void*)UNCACHED_ADDR(&setup_desc->data1);
     int ep_sts = USB_OEP_STS(ep) & ~USB_OEP_STS_MASK(ep);
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
 
@@ -810,28 +809,23 @@ static void handle_out_ep(int ep)
         int dma_frm = (dma_sts >> 16) & 0x7ff;
         int dma_mst = dma_sts & 0xf8000000;
 
-        uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
-                             USB_DMA_DESC_LAST |
-                             0x40;
-        uc_desc->data_ptr  = rx_buf;
-        USB_OEP_DESC_PTR(ep) = (int)&dmadescs[ep][1];
-
         if (!(dma_sts & USB_DMA_DESC_ZERO_LEN)) {
-             logf("EP%d OUT token, st:%08x len:%d frm:%x data=%s\n", ep,
-                 dma_mst, dma_len, dma_frm, make_hex(uc_desc->data_ptr, dma_len));
+             logf("EP%d OUT token, st:%08x len:%d frm:%x data=%s epstate=%d\n", ep,
+                 dma_mst, dma_len, dma_frm, make_hex(uc_desc->data_ptr, dma_len),
+                 endpoints[ep][1].state);
              /*
               * If parts of the just dmaed range are in cache, dump them now.
               */
              dump_dcache_range(uc_desc->data_ptr, dma_len);
         } else{
-             logf("EP%d OUT token, st:%08x len:%d frm:%x\n", ep,
-                 dma_mst, dma_len, dma_frm);
+             logf("EP%d OUT token, st:%08x frm:%x (no data)\n", ep,
+                 dma_mst, dma_frm);
         }
 
         if (endpoints[ep][1].state & EP_STATE_BUSY) {
             endpoints[ep][1].state &= ~EP_STATE_BUSY;
             endpoints[ep][1].rc = 0;
-            usb_core_transfer_complete(ep, 0, 0, endpoints[ep][0].len);
+            usb_core_transfer_complete(ep, USB_DIR_OUT, 0, dma_len);
         } else {
             logf("EP%d OUT, but no one was listening?\n", ep);
         }
@@ -854,7 +848,7 @@ static void handle_out_ep(int ep)
              req->wLength);
 
         usb_core_control_request(&req_copy);
-        setup_desc_init(&setup_desc);
+        setup_desc_init(setup_desc);
 
         ep_sts &= ~USB_EP_STAT_SETUP_RCVD;
     }
@@ -1029,7 +1023,6 @@ void usb_drv_set_test_mode(int mode)
     (void)mode;
 }
 
-/* handled internally by controller */
 void usb_drv_set_address(int address)
 {
     (void)address;
