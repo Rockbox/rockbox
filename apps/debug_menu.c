@@ -1534,8 +1534,12 @@ static bool view_battery(void)
                 break;
 
             case 1: /* status: */
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                lcd_putsf(0, 0, "Pwr status: %s",
+                         charging_state() ? "charging" : "discharging");
+#else 
                 lcd_puts(0, 0, "Power status:");
-
+#endif
                 battery_read_info(&y, NULL);
                 lcd_putsf(0, 1, "Battery: %d.%03d V", y / 1000, y % 1000);
 #ifdef ADC_EXT_POWER
