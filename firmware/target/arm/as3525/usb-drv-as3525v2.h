@@ -50,18 +50,46 @@
 #define USB_GHWCFG3     (*(volatile unsigned long *)(USB_BASE + 0x04C)) /** User HW Config3 Register */
 #define USB_GHWCFG4     (*(volatile unsigned long *)(USB_BASE + 0x050)) /** User HW Config4 Register */
 
+/* 1<=ep<=15, don't use ep=0 !!! */
+/** Device IN Endpoint Transmit FIFO (ep) Size Register */
+#define USB_DIEPTXFSIZ(ep)  (*(volatile unsigned long *)(USB_BASE + 0x100 + 4 * (ep)))
+
+#define USB_MAKE_FIFOSIZE_DATA(startadr, depth) \
+    (((startadr) & 0xffff) | ((depth) << 16))
+
+#define USB_GET_FIFOSIZE_DEPTH(data) \
+    ((data) >> 16)
+
+#define USB_GET_FIFOSIZE_START_ADR(data) \
+    ((data) & 0xffff)
+
 #define USB_GRSTCTL_csftrst                 (1 << 0) /** Core soft reset */
 #define USB_GRSTCTL_hsftrst                 (1 << 1) /** Hclk soft reset */
+#define USB_GRSTCTL_intknqflsh              (1 << 3) /** In Token Sequence Learning Queue Flush */
+#define USB_GRSTCTL_txfnum_bit_pos          6 /** TxFIFO Number */
+#define USB_GRSTCTL_txfnum_bits             (0x1f << 6)
+#define USB_GRSTCTL_txfflsh_flush           (1 << 5) /** TxFIFO Flush */
+#define USB_GRSTCTL_rxfflsh_flush           (1 << 4) /** RxFIFO Flush */
 #define USB_GRSTCTL_ahbidle                 (1 << 31) /** AHB idle state*/
 
 #define USB_GHWCFG1_IN_EP(ep)               ((USB_GHWCFG1 >> ((ep) *2)) & 0x1) /** 1 if EP(ep) has in cap */
 #define USB_GHWCFG1_OUT_EP(ep)              ((USB_GHWCFG1 >> ((ep) *2 + 1)) & 0x1)/** 1 if EP(ep) has out cap */
 
+#define USB_GHWCFG2_ARCH                    ((USB_GHWCFG2 >> 3) & 0x3) /** Architecture */
+#define USB_GHWCFG2_HS_PHY_TYPE             ((USB_GHWCFG2 >> 6) & 0x3) /** High speed PHY type */
+#define USB_GHWCFG2_FS_PHY_TYPE             ((USB_GHWCFG2 >> 8) & 0x3) /** Full speed PHY type */
+#define USB_GHWCFG2_NUM_EP                  ((USB_GHWCFG2 >> 10) & 0xf) /** Number of endpoints */
+#define USB_GHWCFG2_DYN_FIFO                ((USB_GHWCFG2 >> 19) & 0x1) /** Dynamic FIFO */
+
+#define USB_PHY_TYPE_UNSUPPORTED            0
+#define USB_PHY_TYPE_UTMI                   1
+#define USB_INT_DMA_ARCH                    2
+
 #define USB_GHWCFG3_DFIFO_LEN               (USB_GHWCFG3 >> 16) /** Total fifo size */
 
+#define USB_GHWCFG4_UTMI_PHY_DATA_WIDTH     ((USB_GHWCFG4 >> 14) & 0x3)
+#define USB_GHWCFG4_DED_FIFO_EN             ((USB_GHWCFG4 >> 25) & 0x1)
 #define USB_GHWCFG4_NUM_IN_EP               ((USB_GHWCFG4 >> 26) & 0xf) /** Number of IN endpoints */
-
-#define USB_GHWCFG2_NUM_EP                  ((USB_GHWCFG2 >> 10) & 0xf) /** Number of endpoints */
 
 #define USB_GUSBCFG_ulpi_utmi_sel           (1 << 4) /** select ulpi:1 or utmi:0 */
 #define USB_GUSBCFG_phy_if                  (1 << 3) /** select utmi bus width ? */
@@ -71,6 +99,40 @@
 #define USB_GAHBCFG_hburstlen_bit_pos       1
 #define USB_GAHBCFG_INT_DMA_BURST_INCR      1 /** note: the linux patch has several other value, this is one picked for internal dma */
 #define USB_GAHBCFG_dma_enable              (1 << 5)
+
+#define USB_GINTMSK_usb_rst                 0x00001000   /*!< USB Reset Mask */
+#define USB_GINTMSK_EnumDone                0x00000200   /*!< Enumeration Done Mask */
+#define USB_GINTMSK_ErlySusp                0x00000400   /*!< Early Suspend Mask */
+#define USB_GINTMSK_USBSusp                 0x00000800   /*!< USB Suspend Mask */
+#define USB_GINTMSK_SOF                     0x00000008   /*!< Start of (micro)Frame Mask */
+#define USB_GINTMSK_NPTxFEmp                0x00000020   /*!< Non-periodic TxFIFO Empty Mask */
+
+#define USB_GINTMSK_wkupintr                (1 << 31)
+#define USB_GINTMSK_sessreqintr             (1 << 30)
+#define USB_GINTMSK_disconnect              (1 << 29)
+#define USB_GINTMSK_conidstschng            (1 << 28)
+#define USB_GINTMSK_ptxfempty               (1 << 26)
+#define USB_GINTMSK_hcintr                  (1 << 25)
+#define USB_GINTMSK_portintr                (1 << 24)
+#define USB_GINTMSK_incomplisoout           (1 << 21)
+#define USB_GINTMSK_incomplisoin            (1 << 20)
+#define USB_GINTMSK_outepintr               (1 << 19)
+#define USB_GINTMSK_inepintr                (1 << 18)
+#define USB_GINTMSK_epmismatch              (1 << 17)
+#define USB_GINTMSK_eopframe                (1 << 15)
+#define USB_GINTMSK_isooutdrop              (1 << 14)
+#define USB_GINTMSK_enumdone                (1 << 13)
+#define USB_GINTMSK_usbreset                (1 << 12)
+#define USB_GINTMSK_usbsuspend              (1 << 11)
+#define USB_GINTMSK_erlysuspend             (1 << 10)
+#define USB_GINTMSK_i2cintr                 (1 << 9)
+#define USB_GINTMSK_goutnakeff              (1 << 7)
+#define USB_GINTMSK_ginnakeff               (1 << 6)
+#define USB_GINTMSK_nptxfempty              (1 << 5)
+#define USB_GINTMSK_rxstsqlvl               (1 << 4)
+#define USB_GINTMSK_sofintr                 (1 << 3)
+#define USB_GINTMSK_otgintr                 (1 << 2)
+#define USB_GINTMSK_modemismatch            (1 << 1)
 
 /**
  * Device Registers Base Addresses
@@ -86,6 +148,49 @@
 #define USB_DTKNQR2     (*(volatile unsigned long *)(USB_DEVICE + 0x24)) /** Device IN Token Sequence Learning Queue Register 2 */
 #define USB_DTKNQP      (*(volatile unsigned long *)(USB_DEVICE + 0x28)) /** Device IN Token Queue Pop register */
 
+#define USB_DCFG_devspd_bits                0x3
+#define USB_DCFG_devspd_hs_phy_hs           0 /** High speed PHY running at high speed */
+#define USB_DCFG_devspd_hs_phy_fs           1 /** High speed PHY running at full speed */
+#define USB_DCFG_perfrint_bit_pos           11 /** Periodic Frame Interval */
+#define USB_DCFG_perfrint_bits              (0x3 << USB_DCFG_perfrint_bit_pos)
+#define USB_DCFG_FRAME_INTERVAL_80          0
+#define USB_DCFG_FRAME_INTERVAL_85          1
+#define USB_DCFG_FRAME_INTERVAL_90          2
+#define USB_DCFG_FRAME_INTERVAL_95          3
+
+/* 0<=ep<=15, you can use ep=0 */
+/** Device IN Endpoint (ep) Control Register */
+#define USB_DIEPCTL(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20))
+/** Device IN Endpoint (ep) Interrupt Register */
+#define USB_DIEPINT(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x8))
+/** Device IN Endpoint (ep) Transfer Size Register */
+#define USB_DIEPTSIZ(ep)    (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x10))
+/** Device IN Endpoint (ep) DMA Address Register */
+#define USB_DIEPDMA(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x14))
+/** Device IN Endpoint (ep) Transmit FIFO Status Register */
+#define USB_DTXFSTS(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x18))
+
+/** Device OUT Endpoint (ep) Control Register */
+#define USB_DOEPCTL(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20))
+/** Device OUT Endpoint (ep) Frame number Register */
+#define USB_DOEPFN(ep)      (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x4))
+/** Device Endpoint (ep) Interrupt Register */
+#define USB_DOEPINT(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x8))
+/** Device OUT Endpoint (ep) Transfer Size Register */
+#define USB_DOEPTSIZ(ep)    (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x10))
+/** Device Endpoint (ep) DMA Address Register */
+#define USB_DOEPDMA(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x14))
+
 #define USB_PCGCCTL     (*(volatile unsigned long *)(USB_BASE + 0xE00)) /** Power and Clock Gating Control Register */
+
+#define USB_DEPCTL_epena        (1 << 31) /** Endpoint enable */
+#define USB_DEPCTL_epdis        (1 << 30) /** Endpoint disable */
+#define USB_DEPCTL_snak         (1 << 27) /** Set NAK */
+#define USB_DEPCTL_cnak         (1 << 28) /** Clear NAK */
+
+/**
+ * Parameters
+ */
+
 
 #endif /* __USB_DRV_AS3525v2_H__ */
