@@ -138,7 +138,7 @@ static volatile unsigned int transfer_error[NUM_VOLUMES];
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 
 static inline void mci_delay(void) { udelay(1000) ; }

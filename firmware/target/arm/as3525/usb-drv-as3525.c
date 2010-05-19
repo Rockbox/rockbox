@@ -386,7 +386,7 @@ static void usb_phy_resume(void)
 
 static void setup_desc_init(struct usb_dev_setup_buf *desc)
 {
-    struct usb_dev_setup_buf *uc_desc = UNCACHED_ADDR(desc);
+    struct usb_dev_setup_buf *uc_desc = AS3525_UNCACHED_ADDR(desc);
 
     uc_desc->status = USB_DMA_DESC_BS_HST_RDY;
     uc_desc->resv   = 0xffffffff;
@@ -397,7 +397,7 @@ static void setup_desc_init(struct usb_dev_setup_buf *desc)
 static void dma_desc_init(int ep, int dir)
 {
     struct usb_dev_dma_desc *desc = &dmadescs[ep][dir];
-    struct usb_dev_dma_desc *uc_desc = UNCACHED_ADDR(desc);
+    struct usb_dev_dma_desc *uc_desc = AS3525_UNCACHED_ADDR(desc);
 
     endpoints[ep][dir].uc_desc = uc_desc;
 
@@ -626,15 +626,6 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
-static void *virt_to_bus(void *addr)
-{
-    unsigned int x = (long)addr;
-
-    x -= (x & 0x40000000) >> 2; /* fix uncached address */
-
-    return (void*)x;
-}
-
 int usb_drv_recv(int ep, void *ptr, int len)
 {
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
@@ -660,7 +651,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
         uc_desc->status   |= USB_DMA_DESC_ZERO_LEN;
         uc_desc->data_ptr  = 0;
     } else {
-        uc_desc->data_ptr  = virt_to_bus(ptr);
+        uc_desc->data_ptr  = ptr;
     }
     USB_OEP_DESC_PTR(ep) = (int)&dmadescs[ep][1];
     USB_OEP_STS(ep)      = USB_EP_STAT_OUT_RCVD; /* clear status */
@@ -677,7 +668,7 @@ char *make_hex(char *data, int len)
 {
     int i;
     if (!((int)data & 0x40000000))
-        data = UNCACHED_ADDR(data); /* don't pollute the cache */
+        data = AS3525_UNCACHED_ADDR(data); /* don't pollute the cache */
 
     if (len > 512)
         len = 512;
@@ -712,7 +703,7 @@ void ep_send(int ep, void *ptr, int len)
     if (len == 0)
         uc_desc->status |= USB_DMA_DESC_ZERO_LEN;
 
-    uc_desc->data_ptr  = virt_to_bus(ptr);
+    uc_desc->data_ptr  = ptr;
 
     USB_IEP_DESC_PTR(ep) = (int)&dmadescs[ep][0];
     USB_IEP_STS(ep)      = 0xffffffff; /* clear status */
@@ -785,7 +776,7 @@ static void handle_in_ep(int ep)
 
 static void handle_out_ep(int ep)
 {
-    struct usb_ctrlrequest *req = (void*)UNCACHED_ADDR(&setup_desc->data1);
+    struct usb_ctrlrequest *req = (void*)AS3525_UNCACHED_ADDR(&setup_desc->data1);
     int ep_sts = USB_OEP_STS(ep) & ~USB_OEP_STS_MASK(ep);
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
 

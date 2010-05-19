@@ -325,7 +325,7 @@
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 static void init_controller(void);
 static int sd_wait_for_state(const int drive, unsigned int state);

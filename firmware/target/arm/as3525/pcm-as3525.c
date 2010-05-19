@@ -180,7 +180,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 void * pcm_dma_addr(void *addr)
 {
     if (addr != NULL)
-        addr = UNCACHED_ADDR(addr);
+        addr = AS3525_UNCACHED_ADDR(addr);
     return addr;
 }
 #endif
@@ -271,7 +271,7 @@ static void rec_dma_callback(void)
     rec_dma_start_addr += rec_dma_transfer_size;
 
     /* the 2nd channel is silent when recording microphone on as3525v1 */
-    mono2stereo(UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+    mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
 
     if(!rec_dma_size)
     {
@@ -294,7 +294,7 @@ void pcm_rec_dma_record_more(void *start, size_t size)
     dump_dcache_range(start, size);
     rec_dma_start_addr = start;
 #if CONFIG_CPU == AS3525
-    mono_samples = UNCACHED_ADDR(start);
+    mono_samples = AS3525_UNCACHED_ADDR(start);
 #endif
     rec_dma_size = size;
 }
@@ -319,7 +319,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     dump_dcache_range(addr, size);
     rec_dma_start_addr = addr;
 #if CONFIG_CPU == AS3525
-    mono_samples = UNCACHED_ADDR(addr);
+    mono_samples = AS3525_UNCACHED_ADDR(addr);
 #endif
     rec_dma_size = size;
 
@@ -359,7 +359,7 @@ void pcm_rec_dma_init(void)
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
     pcm_rec_lock();
-    int16_t *addr = UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
+    int16_t *addr = AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
     mono2stereo(addr);
     pcm_rec_unlock();
 
