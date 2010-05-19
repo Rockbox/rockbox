@@ -110,9 +110,13 @@ static void enable_charger(void)
 
     sleep(HZ/10); /* Allow charger turn-on time (it could be gradual). */
 
+#if CONFIG_CPU != AS3525v2
     /* acknowledge first end of charging interrupt, it seems to happen both
-     * at charger plug and charger unplug */
+     * at charger plug and charger unplug
+     * It doesn't happen on newer AS3543
+     */
     ascodec_endofch();
+#endif
 
     charge_state = CHARGING;
     charger_total_timer = CHARGER_TOTAL_TIMER;
@@ -122,6 +126,9 @@ static void enable_charger(void)
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
+#if CONFIG_CPU == AS3525v2
+    ascodec_write_pmu(AS3543_CHARGER, 2, 0x01); //EOC current theshold 30%
+#endif
     ascodec_monitor_endofch();
     ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 }
