@@ -105,7 +105,7 @@ static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
 
-#define BLOCKS_PER_BANK 0x7a7800
+#define BLOCKS_PER_BANK 0x7a7800u
 
 static tCardInfo card_info[NUM_DRIVES];
 
@@ -712,7 +712,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
         {
-            unsigned int bank = start / BLOCKS_PER_BANK; /* Current bank */
+            unsigned int bank = 0;
+            while(bank_start >= BLOCKS_PER_BANK)
+            {
+                bank_start -= BLOCKS_PER_BANK;
+                bank++;
+            }
 
             /* Switch bank if needed */
             if(card_info[INTERNAL_AS3525].current_bank != bank)
@@ -724,9 +729,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                     goto sd_transfer_error;
                 }
             }
-
-            /* Adjust start block in current bank */
-            bank_start -= bank * BLOCKS_PER_BANK;
 
             /* Do not cross a bank boundary in a single transfer loop */
             if((transfer + bank_start) > BLOCKS_PER_BANK)
