@@ -41,6 +41,7 @@ const struct button_mapping pla_remote_ctx[] =
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H10_PAD) || \
       (CONFIG_KEYPAD == GIGABEAT_PAD) || \
+      (CONFIG_KEYPAD == IAUDIO_M3_PAD) || \
       (CONFIG_KEYPAD == GIGABEAT_S_PAD)
     { PLA_UP,                BUTTON_RC_FF,                     BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_REW,                    BUTTON_NONE},
@@ -128,7 +129,7 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
     || (CONFIG_KEYPAD == IPOD_4G_PAD)
     { PLA_UP,               BUTTON_MENU,                        BUTTON_NONE },
-    ( PLA_DOWN,             BUTTON_PLAY,                        BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_PLAY,                        BUTTON_NONE },
     { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
     { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
     { PLA_UP_REPEAT,        BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE },
@@ -151,6 +152,15 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
     { PLA_UP_REPEAT,        BUTTON_SCROLL_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { PLA_DOWN_REPEAT,      BUTTON_SCROLL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+    { PLA_UP,               BUTTON_VOL_UP,                      BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_VOL_DOWN,                    BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
@@ -189,11 +199,10 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN_REPEAT,       BUTTON_NEXT|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE},
-
 #else
-#ifndef HAVE_TOUCHSCREEN
-    #error pluginlib_actions: No directions defined
-#endif
+#   ifndef HAVE_TOUCHSCREEN
+#       error pluginlib_actions: No directions defined
+#   endif
 #endif
 
     /* Scrollwheels */
@@ -282,7 +291,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-    {PLA_CANCEL,            BUTTON_PREV,                        BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_REW,                         BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
@@ -354,7 +363,9 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #else
-#error pluginlib_actions: No actions defined
+#   ifndef HAVE_TOUCHSCREEN
+#       error pluginlib_actions: No actions defined
+#   endif
 #endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN),
 };
