@@ -178,7 +178,7 @@ static void draw_progressbar(struct gui_wps *gwps,
     }
 
     if (pb->have_bitmap_pb)
-        gui_bitmap_scrollbar_draw(display, pb->bm,
+        gui_bitmap_scrollbar_draw(display, &pb->bm,
                                 pb->x, y, pb->width, pb->bm.height,
                                 length, 0, elapsed, HORIZONTAL);
     else
