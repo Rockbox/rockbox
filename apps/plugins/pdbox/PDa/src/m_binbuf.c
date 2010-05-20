@@ -799,7 +799,7 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
     	if (ep - bp < length)
     	{
 #ifdef ROCKBOX
-            if(write(f, sbuf, bp-sbuf) < 1)
+            if(write(f, sbuf, bp-sbuf) < 1 * (bp-sbuf))
 #else /* ROCKBOX */
     	    if (fwrite(sbuf, bp-sbuf, 1, f) < 1)
 #endif /* ROCKBOX */
@@ -830,7 +830,7 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
 	}
     }
 #ifdef ROCKBOX
-    if(write(f, sbuf, bp-sbuf) < 1)
+    if(write(f, sbuf, bp-sbuf) < 1 * (bp-sbuf))
 #else /* ROCKBOX */
     if (fwrite(sbuf, bp-sbuf, 1, f) < 1)
 #endif /* ROCKBOX */
