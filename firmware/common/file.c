@@ -647,7 +647,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
             file->dirty = true;
         }
         else {
-            rc = fat_readwrite(&(file->fatfile), 1, &(file->cache),false);
+            rc = fat_readwrite(&(file->fatfile), 1, file->cache,false);
             if (rc < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
@@ -756,8 +756,7 @@ off_t lseek(int fd, off_t offset, int whence)
             }
         }
         if ( sectoroffset ) {
-            rc = fat_readwrite(&(file->fatfile), 1,
-                               &(file->cache),false);
+            rc = fat_readwrite(&(file->fatfile), 1, file->cache ,false);
             if ( rc < 0 ) {
                 errno = EIO;
                 return rc * 10 - 6;
