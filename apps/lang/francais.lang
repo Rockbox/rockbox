@@ -4761,6 +4761,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
@@ -4768,6 +4769,7 @@
     ipod*: "SELECT=Valider MENU=Annuler"
     iriverh10,iriverh10_5gb: "SELECT=Valider PREV=Annuler"
     gigabeats: "SELECT=Valider POWER=Annuler"
+    vibe500: "OK=Valider C=Annuler"
   </dest>
   <voice>
     *: none
@@ -12620,15 +12622,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "USB Keypad"
+    usb_hid: "USB Keypad Mode"
   </source>
   <dest>
     *: none
-    usb_hid: "Clavier USB"
+    usb_hid: "Mode clavier USB"
   </dest>
   <voice>
     *: none
-    usb_hid: "Clavier USB"
+    usb_hid: "Mode clavier USB"
   </voice>
 </phrase>
 <phrase>
