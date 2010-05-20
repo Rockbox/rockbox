@@ -247,7 +247,7 @@ static const unsigned char lcdlinear[256] = {
 187, 188, 188, 189, 190, 190, 191, 192, 192, 193, 194, 195, 196, 197, 197, 198, 
 198, 201, 205, 208, 212, 215, 219, 222, 226, 229, 233, 236, 240, 243, 247, 252
 };
-#define LCD_SCANRATE 146 /* Hz */
+#define LCD_SCANRATE 153 /* Hz */
 
 #else  /* not yet calibrated targets - generic linear mapping */
 /* TODO: calibrate iFP7xx */
