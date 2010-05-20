@@ -24,11 +24,19 @@
 
 #include "config.h"
 
-#if defined(SANSA_CLIP) \
-    || defined(SANSA_CLIPPLUS)  /* FIXME */
+#if defined(SANSA_CLIP)
 
 /* Check if topped-off and monitor voltage while plugged. */
-#define BATT_FULL_VOLTAGE   4160
+#define BATT_FULL_VOLTAGE   4190
+#define BATT_VAUTO_RECHARGE 4100
+#define BATT_CHG_V          CHG_V_4_20V
+#define BATT_CHG_I          CHG_I_100MA
+#define CHARGER_TOTAL_TIMER (6*3600*2)  /* about 1.5 * capacity / current */
+
+#elif defined(SANSA_CLIPPLUS)
+
+/* Check if topped-off and monitor voltage while plugged. */
+#define BATT_FULL_VOLTAGE   4200
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_100MA
