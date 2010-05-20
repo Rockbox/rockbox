@@ -96,6 +96,7 @@
 #define USB_GUSBCFG_SRP_cap                 0x100
 #define USB_GUSBCFG_HNP_cap                 0x200
 
+#define USB_GAHBCFG_glblintrmsk             (1 << 0)
 #define USB_GAHBCFG_hburstlen_bit_pos       1
 #define USB_GAHBCFG_INT_DMA_BURST_INCR      1 /** note: the linux patch has several other value, this is one picked for internal dma */
 #define USB_GAHBCFG_dma_enable              (1 << 5)
@@ -147,6 +148,14 @@
 #define USB_DTKNQR1     (*(volatile unsigned long *)(USB_DEVICE + 0x20)) /** Device IN Token Sequence Learning Queue Read Register 1 */
 #define USB_DTKNQR2     (*(volatile unsigned long *)(USB_DEVICE + 0x24)) /** Device IN Token Sequence Learning Queue Register 2 */
 #define USB_DTKNQP      (*(volatile unsigned long *)(USB_DEVICE + 0x28)) /** Device IN Token Queue Pop register */
+/* fixme: those registers are not present in usb_registers.h but are in dwc_otgh_regs.h.
+ *        the previous registers exists but has a different name :( */
+#define USB_DVBUSDIS    (*(volatile unsigned long *)(USB_DEVICE + 0x28)) /** Device VBUS discharge register*/
+#define USB_DVBUSPULSE  (*(volatile unsigned long *)(USB_DEVICE + 0x2C)) /** Device VBUS pulse register */
+#define USB_DTKNQR3     (*(volatile unsigned long *)(USB_DEVICE + 0x30)) /** Device IN Token Queue Read Register 3 (RO) */
+#define USB_DTHRCTL     (*(volatile unsigned long *)(USB_DEVICE + 0x30)) /** Device Thresholding control register */
+#define USB_DTKNQR4     (*(volatile unsigned long *)(USB_DEVICE + 0x34)) /** Device IN Token Queue Read Register 4 (RO) */
+#define USB_FFEMPTYMSK  (*(volatile unsigned long *)(USB_DEVICE + 0x34)) /** Device IN EPs empty Inr. Mask Register */
 
 #define USB_DCFG_devspd_bits                0x3
 #define USB_DCFG_devspd_hs_phy_hs           0 /** High speed PHY running at high speed */
@@ -157,6 +166,14 @@
 #define USB_DCFG_FRAME_INTERVAL_85          1
 #define USB_DCFG_FRAME_INTERVAL_90          2
 #define USB_DCFG_FRAME_INTERVAL_95          3
+
+#define USB_DTHRCTL_non_iso_thr_en          (1 << 0)
+#define USB_DTHRCTL_iso_thr_en              (1 << 1)
+#define USB_DTHRCTL_tx_thr_len_bit_pos      2
+#define USB_DTHRCTL_tx_thr_len_bits         (0x1FF << USB_DTHRCTL_tx_thr_len_bit_pos)
+#define USB_DTHRCTL_rx_thr_en               (1 << 16)
+#define USB_DTHRCTL_rx_thr_len_bit_pos      17
+#define USB_DTHRCTL_rx_thr_len_bits         (0x1FF << USB_DTHRCTL_rx_thr_len_bit_pos)
 
 /* 0<=ep<=15, you can use ep=0 */
 /** Device IN Endpoint (ep) Control Register */
@@ -169,6 +186,17 @@
 #define USB_DIEPDMA(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x14))
 /** Device IN Endpoint (ep) Transmit FIFO Status Register */
 #define USB_DTXFSTS(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x18))
+
+/* the following also apply to DIEPMSK */
+#define USB_DIEPINT_xfercompl       (1 << 0) /** Transfer complete */
+#define USB_DIEPINT_epdisabled      (1 << 1) /** Endpoint disabled */
+#define USB_DIEPINT_ahberr          (1 << 2) /** AHB error */
+#define USB_DIEPINT_timeout         (1 << 3) /** Tiemout handshake (non-iso TX) */
+#define USB_DIEPINT_intktxfemp      (1 << 4) /** IN token received with tx fifo empty */
+#define USB_DIEPINT_intknepmis      (1 << 5) /** IN token received with ep mismatch */
+#define USB_DIEPINT_inepnakeff      (1 << 6) /** IN endpoint NAK effective */
+#define USB_DIEPINT_emptyintr       (1 << 7) /** linux doc broken on this, empty fifo ? */
+#define USB_DIEPINT_txfifoundrn     (1 << 8) /** linux doc void on this, tx fifo underrun ? */
 
 /** Device OUT Endpoint (ep) Control Register */
 #define USB_DOEPCTL(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20))
@@ -191,6 +219,19 @@
 /**
  * Parameters
  */
-
+#ifdef USB_USE_CUSTOM_FIFO_LAYOUT
+/* Data fifo: includes RX fifo, non period TX fifo and periodic fifos
+ * NOTE: this is a hardware parameter, it cannot be changed ! */
+#define USB_DATA_FIFO_DEPTH     1333u
+/* size of the FX fifo */
+#define USB_RX_FIFO_SIZE        256u
+/* size of the non periodic TX fifo */
+#define USB_NPTX_FIFO_SIZE      256u
+/* size of each TX ep fifo size */
+#define USB_EPTX_FIFO_SIZE      256u
+#endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
+/* Number of IN/OUT endpoints */
+#define USB_NUM_IN_EP           3u
+#define USB_NUM_OUT_EP          2u
 
 #endif /* __USB_DRV_AS3525v2_H__ */

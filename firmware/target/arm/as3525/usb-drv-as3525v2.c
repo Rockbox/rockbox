@@ -48,9 +48,6 @@ struct usb_endpoint
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS*2];
 #endif
 
-static unsigned int usb_num_in_ep = 0;
-static unsigned int usb_num_out_ep = 0;
-
 void usb_attach(void)
 {
     usb_enable(true);
@@ -100,6 +97,8 @@ static void as3525v2_connect(void)
     /* 11) Do something that is probably CCU related but undocumented*/
     CCU_USB_THINGY &= ~0x1000;
     usb_delay();
+    CCU_USB_THINGY &= ~0x300000;
+    usb_delay();
     /* 12) reset usb core parameters (dev addr, speed, ...) */
     USB_DCFG = 0;
     usb_delay();
@@ -120,6 +119,31 @@ static void usb_enable_common_interrupts(void)
                     USB_GINTMSK_disconnect |
                     USB_GINTMSK_usbsuspend |
                     USB_GINTMSK_sessreqintr;
+}
+
+static void usb_enable_device_interrupts(void)
+{
+    /* Disable all interrupts */
+    USB_GINTMSK = 0;
+    /* Clear any pending interrupt */
+    USB_GINTSTS = 0xffffffff;
+    /* Enable common interrupts */
+    usb_enable_common_interrupts();
+    /* Enable interrupts */
+    USB_GINTMSK |=
+          USB_GINTMSK_usb_rst
+        | USB_GINTMSK_enumdone
+        | USB_GINTMSK_inepintr
+        | USB_GINTMSK_outepintr
+        | USB_GINTMSK_erlysuspend
+        | USB_GINTMSK_epmismatch /* only if multiple tx fifos enabled */
+#if 0 /* only if periodic fifo used */
+        | USB_GINTMSK_isooutdrop
+        | USB_GINTMSK_eopframe
+        | USB_GINTMSK_incomplisoin
+        | USB_GINTMSK_incomplisoout
+#endif
+        ;
 }
 
 static void usb_flush_tx_fifos(int nums)
@@ -171,16 +195,33 @@ static void core_reset(void)
     /* Wait for 3 PHY Clocks */
     /*mdelay(100);*/
     sleep(1);
+}
 
-    /* Check hardware capabilityies */
+static void core_dev_init(void)
+{
+    unsigned int usb_num_in_ep = 0;
+    unsigned int usb_num_out_ep = 0;
+    unsigned int i;
+    /* Restart the phy clock */
+    USB_PCGCCTL = 0;
+    /* Set phy speed : high speed */
+    USB_DCFG = (USB_DCFG & (~USB_DCFG_devspd_bits)) | USB_DCFG_devspd_hs_phy_hs;
+    /* Set periodic frame interval */
+    USB_DCFG = (USB_DCFG & (~USB_DCFG_perfrint_bits)) | (USB_DCFG_FRAME_INTERVAL_80 << USB_DCFG_perfrint_bit_pos);
+    
+    /* Check hardware capabilities */
     if(USB_GHWCFG2_ARCH != USB_INT_DMA_ARCH)
         panicf("usb: wrong architecture (%ld)", USB_GHWCFG2_ARCH);
     if(USB_GHWCFG2_HS_PHY_TYPE != USB_PHY_TYPE_UTMI)
         panicf("usb: wrong HS phy type (%ld)", USB_GHWCFG2_HS_PHY_TYPE);
     if(USB_GHWCFG2_FS_PHY_TYPE != USB_PHY_TYPE_UNSUPPORTED)
         panicf("usb: wrong FS phy type (%ld)", USB_GHWCFG2_FS_PHY_TYPE);
+    #ifdef USB_USE_CUSTOM_FIFO_LAYOUT
     if(USB_GHWCFG2_DYN_FIFO != 1)
         panicf("usb: no dynamic fifo");
+    if(USB_GRXFSIZ != USB_DATA_FIFO_DEPTH)
+        panicf("usb: wrong data fifo size");
+    #endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
     if(USB_GHWCFG4_UTMI_PHY_DATA_WIDTH != 0x2)
         panicf("usb: wrong utmi data width (%ld)", USB_GHWCFG4_UTMI_PHY_DATA_WIDTH);
     if(USB_GHWCFG4_DED_FIFO_EN != 1) /* it seems to be multiple tx fifo support */
@@ -205,19 +246,27 @@ static void core_reset(void)
 
     if(usb_num_in_ep != USB_GHWCFG4_NUM_IN_EP)
         panicf("usb: num in ep mismatch(%d,%lu)", usb_num_in_ep, USB_GHWCFG4_NUM_IN_EP);
+    if(usb_num_in_ep != USB_NUM_IN_EP)
+        panicf("usb: num in ep static mismatch(%u,%u)", usb_num_in_ep, USB_NUM_IN_EP);
+    if(usb_num_out_ep != USB_NUM_OUT_EP)
+        panicf("usb: num out ep static mismatch(%u,%u)", usb_num_out_ep, USB_NUM_OUT_EP);
 
     logf("%d in ep, %d out ep", usb_num_in_ep, usb_num_out_ep);
     logf("initial:");
-    logf("  tot fifo sz: %ld", USB_GHWCFG3_DFIFO_LEN);
-    logf("  rx fifo sz: %ld", USB_GRXFSIZ);
-    logf("  tx fifo sz: %ld", USB_GET_FIFOSIZE_DEPTH(USB_GNPTXFSIZ)); /* there is no perio ep so print only non-perio */
-    for(i = 1; i <= USB_GHWCFG4_NUM_IN_EP; i++)
+    logf("  tot fifo sz: %lx", USB_GHWCFG3_DFIFO_LEN);
+    logf("  rx fifo: [%04x,+%4lx]", 0, USB_GRXFSIZ);
+    logf("  nptx fifo: [%04lx,+%4lx]", USB_GET_FIFOSIZE_START_ADR(USB_GNPTXFSIZ),
+        USB_GET_FIFOSIZE_DEPTH(USB_GNPTXFSIZ));
+    for(i = 1; i <= USB_NUM_IN_EP; i++)
     {
-        logf("  dieptx fifo sd (%2u): %ld", i, USB_GET_FIFOSIZE_DEPTH(USB_DIEPTXFSIZ(i)));
+        logf("  dieptx fifo(%2u): [%04lx,+%4lx]", i,
+            USB_GET_FIFOSIZE_START_ADR(USB_DIEPTXFSIZ(i)),
+            USB_GET_FIFOSIZE_DEPTH(USB_DIEPTXFSIZ(i)));
     }
 
+    #ifdef USB_USE_CUSTOM_FIFO_LAYOUT
     /* Setup FIFOs */
-    /* Organize FIFO as follow (unsure):
+    /* Organize FIFO as follow:
      *             0           ->         rxfsize         : RX fifo
      *          rxfsize        ->   rxfsize + nptxfsize   : TX fifo for first IN ep
      *   rxfsize + nptxfsize   -> rxfsize + 2 * nptxfsize : TX fifo for second IN ep
@@ -225,14 +274,17 @@ static void core_reset(void)
      * ...
      */
 
-    unsigned short adr = USB_GRXFSIZ;
-    unsigned short depth = USB_GET_FIFOSIZE_DEPTH(USB_GNPTXFSIZ);
+    unsigned short adr = 0;
+    unsigned short depth = USB_RX_FIFO_SIZE;
+    USB_GRXFSIZ = depth;
+    adr += depth;
+    depth = USB_NPTX_FIFO_SIZE;
     USB_GNPTXFSIZ = USB_MAKE_FIFOSIZE_DATA(adr, depth);
     adr += depth;
 
-    for(i = 1; i <= USB_GHWCFG4_NUM_IN_EP; i++)
+    for(i = 1; i <= USB_NUM_IN_EP; i++)
     {
-        depth = USB_GET_FIFOSIZE_DEPTH(USB_DIEPTXFSIZ(i));
+        depth = USB_EPTX_FIFO_SIZE;
         USB_DIEPTXFSIZ(i) = USB_MAKE_FIFOSIZE_DATA(adr, depth);
         adr += depth;
     }
@@ -241,12 +293,16 @@ static void core_reset(void)
     logf("  rx fifo: [%04x,+%4lx]", 0, USB_GRXFSIZ);
     logf("  nptx fifo: [%04lx,+%4lx]", USB_GET_FIFOSIZE_START_ADR(USB_GNPTXFSIZ),
         USB_GET_FIFOSIZE_DEPTH(USB_GNPTXFSIZ));
-    for(i = 1; i <= USB_GHWCFG4_NUM_IN_EP; i++)
+    for(i = 1; i <= USB_NUM_IN_EP; i++)
     {
         logf("  dieptx fifo(%2u): [%04lx,+%4lx]", i,
             USB_GET_FIFOSIZE_START_ADR(USB_DIEPTXFSIZ(i)),
             USB_GET_FIFOSIZE_DEPTH(USB_DIEPTXFSIZ(i)));
     }
+
+    if(adr > USB_DATA_FIFO_DEPTH)
+        panicf("usb: total data fifo size exceeded");
+    #endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
 
     /* flush the fifos */
     usb_flush_tx_fifos(0x10); /* flush all */
@@ -261,7 +317,7 @@ static void core_reset(void)
     USB_DAINT = 0xffffffff;
     USB_DAINTMSK = 0;
 
-    for(i = 0; i <= usb_num_in_ep; i++)
+    for(i = 0; i <= USB_NUM_IN_EP; i++)
     {
         /* disable endpoint if enabled */
         if(USB_DIEPCTL(i) & USB_DEPCTL_epena)
@@ -274,7 +330,7 @@ static void core_reset(void)
         USB_DIEPINT(i) = 0xff;
     }
 
-    for(i = 0; i <= usb_num_out_ep; i++)
+    for(i = 0; i <= USB_NUM_OUT_EP; i++)
     {
         /* disable endpoint if enabled */
         if(USB_DOEPCTL(i) & USB_DEPCTL_epena)
@@ -286,17 +342,21 @@ static void core_reset(void)
         USB_DOEPDMA(i) = 0;
         USB_DOEPINT(i) = 0xff;
     }
-}
 
-static void core_dev_init(void)
-{
-    /* Restart the phy clock */
-    USB_PCGCCTL = 0;
-    /* Set phy speed : high speed */
-    USB_DCFG = (USB_DCFG & (~USB_DCFG_devspd_bits)) | USB_DCFG_devspd_hs_phy_hs;
-    /* Set periodic frame interval */
-    USB_DCFG = (USB_DCFG & (~USB_DCFG_perfrint_bits)) | (USB_DCFG_FRAME_INTERVAL_80 << USB_DCFG_perfrint_bit_pos);
-    /* Configure data fifo size */
+    /* fixme: threshold tweaking only takes place if we use multiple tx fifos it seems */
+    /* only dump them for now, leave threshold disabled */
+    logf("threshold control:");
+    logf("  non_iso_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_non_iso_thr_en) ? 1 : 0);
+    logf("  iso_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_iso_thr_en) ? 1 : 0);
+    logf("  tx_thr_len: %lu", (USB_DTHRCTL & USB_DTHRCTL_tx_thr_len_bits) >> USB_DTHRCTL_tx_thr_len_bit_pos);
+    logf("  rx_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_rx_thr_en) ? 1 : 0);
+    logf("  rx_thr_len: %lu", (USB_DTHRCTL & USB_DTHRCTL_rx_thr_len_bits) >> USB_DTHRCTL_rx_thr_len_bit_pos);
+
+    /* enable USB interrupts */
+    usb_enable_device_interrupts();
+
+    /* enable fifo underrun interrupt ? */
+    USB_DIEPMSK |= USB_DIEPINT_txfifoundrn;
 }
 
 static void core_init(void)
@@ -336,14 +396,30 @@ static void core_init(void)
     core_dev_init();
 }
 
+static void usb_enable_global_interrupts(void)
+{
+    VIC_INT_ENABLE = INTERRUPT_USB;
+    USB_GAHBCFG |= USB_GAHBCFG_glblintrmsk;
+}
+
+static void usb_disable_global_interrupts(void)
+{
+    USB_GAHBCFG &= ~USB_GAHBCFG_glblintrmsk;
+    VIC_INT_EN_CLEAR = INTERRUPT_USB;
+}
+
 void usb_drv_init(void)
 {
     logf("usb_drv_init");
+    /* Enable PHY and clocks (but leave pullups disabled) */
     as3525v2_connect();
-
+    /* Disable global interrupts */
+    usb_disable_global_interrupts();
     logf("usb: synopsis id: %lx", USB_GSNPSID);
-
+    /* Core init */
     core_init();
+    /* Enable global interrupts */
+    usb_enable_global_interrupts();
 }
 
 void usb_drv_exit(void)
