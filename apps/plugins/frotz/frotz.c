@@ -122,8 +122,8 @@ void wait_for_key()
 
     for (;;)
     {
-        action = pluginlib_getaction(TIMEOUT_BLOCK,
-                                     plugin_contexts, 1);
+        action = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                                     ARRAYLEN(plugin_contexts));
         switch (action)
         {
         case PLA_EXIT:
@@ -171,7 +171,7 @@ zchar do_input(int timeout, bool show_cursor)
         case PLA_SELECT:
             return ZC_RETURN;
 
-        case PLA_SELECT_REPEAT:
+        case PLA_DOWN:
             return ZC_BAD;
 
         default:
