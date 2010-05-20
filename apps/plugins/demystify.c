@@ -37,26 +37,33 @@ PLUGIN_HEADER
 #define MIN_POLYGONS 1
 
 /* Key assignement */
-#define DEMYSTIFY_QUIT PLA_QUIT
+#define DEMYSTIFY_QUIT                      PLA_CANCEL
 
-#define DEMYSTIFY_INCREASE_SPEED PLA_RIGHT
-#define DEMYSTIFY_DECREASE_SPEED PLA_LEFT
-#define DEMYSTIFY_INCREASE_SPEED_REPEAT PLA_RIGHT_REPEAT
-#define DEMYSTIFY_DECREASE_SPEED_REPEAT PLA_LEFT_REPEAT
+#ifdef HAVE_SCROLLWHEEL
 
-#define DEMYSTIFY_ADD_POLYGON PLA_UP
-#define DEMYSTIFY_REMOVE_POLYGON PLA_DOWN
-#define DEMYSTIFY_ADD_POLYGON_REPEAT PLA_UP_REPEAT
-#define DEMYSTIFY_REMOVE_POLYGON_REPEAT PLA_DOWN_REPEAT
+#define DEMYSTIFY_INCREASE_SPEED            PLA_SCROLL_FWD
+#define DEMYSTIFY_DECREASE_SPEED            PLA_SCROLL_BACK
+#define DEMYSTIFY_INCREASE_SPEED_REPEAT     PLA_SCROLL_FWD_REPEAT
+#define DEMYSTIFY_DECREASE_SPEED_REPEAT     PLA_SCROLL_BACK_REPEAT
+#else
+#define DEMYSTIFY_INCREASE_SPEED            PLA_RIGHT
+#define DEMYSTIFY_DECREASE_SPEED            PLA_LEFT
+#define DEMYSTIFY_INCREASE_SPEED_REPEAT     PLA_RIGHT_REPEAT
+#define DEMYSTIFY_DECREASE_SPEED_REPEAT     PLA_LEFT_REPEAT
+#endif
+
+#define DEMYSTIFY_ADD_POLYGON               PLA_UP
+#define DEMYSTIFY_REMOVE_POLYGON            PLA_DOWN
+#define DEMYSTIFY_ADD_POLYGON_REPEAT        PLA_UP_REPEAT
+#define DEMYSTIFY_REMOVE_POLYGON_REPEAT     PLA_DOWN_REPEAT
 
 const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions,
+= {pla_main_ctx,
 #if defined(HAVE_REMOTE_LCD)
-    remote_directions
+    pla_remote_ctx,
 #endif
 };
-#define NB_ACTION_CONTEXTS \
-    sizeof(plugin_contexts)/sizeof(struct button_mapping*)
+
 #ifdef HAVE_LCD_COLOR
 struct line_color
 {
@@ -383,7 +390,7 @@ int plugin_main(void)
         else
             rb->sleep(sleep_time);
         action = pluginlib_getaction(TIMEOUT_NOBLOCK,
-                                     plugin_contexts, NB_ACTION_CONTEXTS);
+                                     plugin_contexts, ARRAYLEN(plugin_contexts));
         switch(action)
         {
             case DEMYSTIFY_QUIT:

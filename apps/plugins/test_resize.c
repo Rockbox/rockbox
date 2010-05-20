@@ -33,7 +33,6 @@ PLUGIN_HEADER
 const struct button_mapping *plugin_contexts[]
 = {generic_actions, generic_directions};
 
-#define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
 /* Key assignement */
 #define SIZE_INCREASE           PLA_UP
@@ -46,8 +45,8 @@ const struct button_mapping *plugin_contexts[]
 #define WIDTH_DECREASE           PLA_LEFT
 #define WIDTH_DECREASE_REPEAT    PLA_LEFT_REPEAT
 
-#define BUTTON_QUIT             PLA_QUIT
-#define CHANGE_MODE             PLA_MENU
+#define BUTTON_QUIT             PLA_CANCEL
+#define CHANGE_MODE             PLA_SELECT
 
 #define MAX_OUTPUT_WIDTH    LCD_WIDTH
 #define MAX_OUTPUT_HEIGHT   LCD_HEIGHT
@@ -110,8 +109,8 @@ enum plugin_status plugin_start(const void* parameter)
                        output_bmp.height);
 
         rb->lcd_update();
-        button = pluginlib_getaction(HZ,
-                                     plugin_contexts, NB_ACTION_CONTEXTS);
+        button = pluginlib_getaction(HZ, plugin_contexts,
+                        ARRAYLEN(plugin_contexts));
         switch (button) {
             case BUTTON_QUIT:
                 return PLUGIN_OK;

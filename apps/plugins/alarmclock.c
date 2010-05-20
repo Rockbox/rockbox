@@ -24,8 +24,7 @@
 
 PLUGIN_HEADER
 
-const struct button_mapping *plugin_contexts[] = {generic_directions,
-                                                  generic_actions};
+const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static int current = 0;
 static bool tomorrow = false;
@@ -33,7 +32,8 @@ static int alarm[2] = {0, 0}, maxval[2] = {24, 60}, prev_tick = 3600 * 24;
 static bool quit = false, usb = false, waiting = false, done = false;
 
 static inline int get_button(void) {
-    return pluginlib_getaction(HZ/2, plugin_contexts, 2);
+    return pluginlib_getaction(HZ/2, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
 }
 
 int rem_seconds(void) {
@@ -125,7 +125,7 @@ enum plugin_status plugin_start(const void* parameter)
     while(!quit) {
         button = get_button();
 
-        if (button == PLA_QUIT)
+        if (button == PLA_EXIT || PLA_CANCEL)
             quit = true;
 
         FOR_NB_SCREENS(i) {
@@ -157,7 +157,8 @@ enum plugin_status plugin_start(const void* parameter)
                     current = (current + 1) % 2;
                     break;
 
-                case PLA_FIRE: {
+                case PLA_SELECT:
+                case PLA_SELECT_REPEAT: {
                     if (rem_seconds() < 0)
                         tomorrow = true;
 

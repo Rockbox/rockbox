@@ -28,13 +28,13 @@
 #define INITIAL_NB_DICES 1
 #define INITIAL_NB_SIDES 2 /* corresponds to 6 sides in the array */
 
-#define DICE_QUIT PLA_QUIT
-#define DICE_ROLL PLA_START
+#define DICE_QUIT PLA_CANCEL
+#define DICE_ROLL PLA_SELECT
 
 
 #define CFG_FILE "dice.cfg"
 
-const struct button_mapping* plugin_contexts[]={generic_actions};
+const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 
 struct dices
 {
@@ -94,7 +94,7 @@ enum plugin_status plugin_start(const void* parameter) {
         dice_print( &dice, rb->screens[i] );
     while(true) {
         action = pluginlib_getaction(TIMEOUT_BLOCK,
-                                     plugin_contexts, 1);
+                                     plugin_contexts, ARRAYLEN(plugin_contexts));
         switch(action) {
             case DICE_ROLL:
                 dice_roll(&dice);

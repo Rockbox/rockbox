@@ -112,7 +112,7 @@ zchar menu(void)
     }
 }
 
-const struct button_mapping* plugin_contexts[]={generic_actions};
+const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 
 void wait_for_key()
 {
@@ -126,11 +126,11 @@ void wait_for_key()
                                      plugin_contexts, 1);
         switch (action)
         {
-        case PLA_QUIT:
+        case PLA_EXIT:
             hot_key_quit();
             break;
         
-        case PLA_FIRE:
+        case PLA_SELECT:
             return;
         }
     }
@@ -154,24 +154,24 @@ zchar do_input(int timeout, bool show_cursor)
 
     for (;;)
     {
-        action = pluginlib_getaction(timeout,
-                                     plugin_contexts, 1);
+        action = pluginlib_getaction(timeout, plugin_contexts,
+                                     ARRAYLEN(plugin_contexts));
         switch (action)
         {
-        case PLA_QUIT:
+        case PLA_EXIT:
             return ZC_HKEY_QUIT;
         
-        case PLA_MENU:
+        case PLA_CANCEL:
             menu_ret = menu();
             if (menu_ret != ZC_BAD)
                 return menu_ret;
             timeout_at = *rb->current_tick + timeout;
             break;
 
-        case PLA_FIRE:
+        case PLA_SELECT:
             return ZC_RETURN;
 
-        case PLA_START:
+        case PLA_SELECT_REPEAT:
             return ZC_BAD;
 
         default:

@@ -25,7 +25,7 @@
 
 PLUGIN_HEADER
 
-const struct button_mapping* plugin_contexts[]={generic_actions};
+const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 #define NB_PICTURES 9
 #define NB_SLOTS 3
 
@@ -313,12 +313,12 @@ enum plugin_status plugin_start(const void* parameter)
     while (true)
     {
         action = pluginlib_getaction(TIMEOUT_BLOCK,
-                                     plugin_contexts, 1);
+                                plugin_contexts, ARRAYLEN(plugin_contexts));
         switch ( action )
         {
-            case PLA_QUIT:
+            case PLA_CANCEL:
                 return PLUGIN_OK;
-            case PLA_FIRE:
+            case PLA_SELECT:
                 jackpot_play_turn(&game);
                 break;
 

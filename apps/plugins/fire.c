@@ -51,20 +51,27 @@ GREY_INFO_STRUCT
 
 /* Key assignement */
 const struct button_mapping* plugin_contexts[]= {
-    generic_increase_decrease,
-    generic_directions,
+    pla_main_ctx,
 #if defined(HAVE_REMOTE_LCD)
-    remote_directions,
+    pla_remote_ctx,
 #endif
-    generic_actions
 };
-#define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-#define FIRE_QUIT PLA_QUIT
-#define FIRE_SWITCH_FLAMES_TYPE PLA_LEFT
-#define FIRE_SWITCH_FLAMES_MOVING PLA_RIGHT
-#define FIRE_INCREASE_MULT PLA_INC
-#define FIRE_DECREASE_MULT PLA_DEC
+#define FIRE_QUIT                   PLA_CANCEL
+#define FIRE_SWITCH_FLAMES_TYPE     PLA_LEFT
+#define FIRE_SWITCH_FLAMES_MOVING   PLA_RIGHT
+
+#ifdef HAVE_SCROLLWHEEL
+#define FIRE_INCREASE_MULT          PLA_SCROLL_FWD
+#define FIRE_INCREASE_MULT_REP      PLA_SCROLL_FWD_REPEAT
+#define FIRE_DECREASE_MULT          PLA_SCROLL_BACK
+#define FIRE_DECREASE_MULT_REP      PLA_SCROLL_BACK_REPEAT
+#else
+#define FIRE_INCREASE_MULT          PLA_UP
+#define FIRE_INCREASE_MULT_REP      PLA_UP_REPEAT
+#define FIRE_DECREASE_MULT          PLA_DOWN
+#define FIRE_DECREASE_MULT_REP      PLA_DOWN_REPEAT
+#endif
 
 #define MIN_FLAME_VALUE 0
 #define COOL_MAX (440/LCD_HEIGHT+2)
@@ -319,7 +326,8 @@ int main(void)
         fire_draw(&fire);
         rb->yield();
 
-        action = pluginlib_getaction(0, plugin_contexts, PLA_ARRAY_COUNT);
+        action = pluginlib_getaction(0, plugin_contexts,
+                        ARRAYLEN(plugin_contexts));
 
         switch(action){
             case FIRE_QUIT:

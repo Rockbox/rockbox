@@ -25,7 +25,8 @@
 #include "pluginlib_actions.h"
 
 #if defined(HAVE_REMOTE_LCD)
-const struct button_mapping remote_directions[] =
+/* remote directions */
+const struct button_mapping pla_remote_ctx[] =
 {
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -68,35 +69,34 @@ const struct button_mapping remote_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-    { PLA_UP,                BUTTON_UP,                        BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                      BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                      BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,                     BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REW,             BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REW,           BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,           BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,          BUTTON_NONE},
 #else
-    #error pluginlib_actions: Unsupported remote keypad
+    #error pluginlib_actions: No remote directions
 #endif
-    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN),
 };
 #endif /* HAVE_REMOTE_LCD */
 
-const struct button_mapping generic_directions[] =
+/* these were taken from the bubbles plugin, so may need tweaking */
+const struct button_mapping pla_main_ctx[] = 
 {
+    /* Touchscreens */
 #ifdef HAVE_TOUCHSCREEN
-    { PLA_UP,                BUTTON_TOPMIDDLE,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_MIDLEFT,                    BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_MIDRIGHT,                   BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_CANCEL,           BUTTON_BOTTOMRIGHT,                 BUTTON_NONE},
+    { PLA_SELECT,           BUTTON_CENTER,                      BUTTON_NONE},
+    { PLA_SELECT_REL,       BUTTON_CENTER|BUTTON_REL,           BUTTON_NONE},
+    { PLA_SELECT_REPEAT,    BUTTON_CENTER|BUTTON_REPEAT,        BUTTON_NONE},
+    { PLA_UP,               BUTTON_TOPMIDDLE,                   BUTTON_NONE},
+    { PLA_DOWN,             BUTTON_BOTTOMMIDDLE,                BUTTON_NONE},
+    { PLA_LEFT,             BUTTON_MIDLEFT,                     BUTTON_NONE},
+    { PLA_RIGHT,            BUTTON_MIDRIGHT,                    BUTTON_NONE},
+    { PLA_UP_REPEAT,        BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_DOWN_REPEAT,      BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_LEFT_REPEAT,      BUTTON_MIDLEFT|BUTTON_REPEAT,       BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,     BUTTON_MIDRIGHT|BUTTON_REPEAT,      BUTTON_NONE},
 #endif
-#if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
+
+    /* Directions */
+#if   ((CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
@@ -110,86 +110,67 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
-    || (CONFIG_KEYPAD == SANSA_M200_PAD)
-    { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    || (CONFIG_KEYPAD == SANSA_M200_PAD)\
+    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
+    || (CONFIG_KEYPAD == SANSA_FUZE_PAD) \
+    || (CONFIG_KEYPAD == SAMSUNG_YH_PAD))
+    { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_DOWN,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
+    /* now the bad ones that don't have standard names for the directional
+     * buttons */
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_4G_PAD) \
-   || (CONFIG_KEYPAD == SANSA_E200_PAD) \
-   || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-    { PLA_UP,                BUTTON_SCROLL_BACK,      BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_SCROLL_FWD,     BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,            BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,           BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_SCROLL_BACK|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE},
-#elif CONFIG_KEYPAD == PLAYER_PAD
-    {PLA_UP,                BUTTON_STOP,  BUTTON_NONE},
-    {PLA_DOWN,              BUTTON_PLAY,  BUTTON_NONE},
-    {PLA_LEFT,              BUTTON_LEFT,  BUTTON_NONE},
-    {PLA_RIGHT,             BUTTON_RIGHT, BUTTON_NONE},
-    {PLA_UP_REPEAT,         BUTTON_STOP|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_DOWN_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    { PLA_UP,               BUTTON_MENU,                        BUTTON_NONE },
+    ( PLA_DOWN,             BUTTON_PLAY,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
+#elif (CONFIG_KEYPAD == PLAYER_PAD)
+    { PLA_UP,               BUTTON_PLAY,                        BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_STOP,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_STOP|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-    { PLA_UP,                BUTTON_SCROLL_UP,           BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_SCROLL_DOWN,         BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_SCROLL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MROBE500_PAD)
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-    { PLA_UP,                BUTTON_RC_VOL_UP,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_RC_REW,                     BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RC_FF,                      BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-    { PLA_UP,                BUTTON_STOP,                       BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_PLAY,                       BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                       BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,                      BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_STOP|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE},
+    { PLA_UP,               BUTTON_SCROLL_UP,                   BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_SCROLL_DOWN,                 BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_SCROLL_UP|BUTTON_REPEAT,     BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_SCROLL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
-    { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_PREV,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_NEXT,                BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
-#elif (CONFIG_KEYPAD == ONDAVX777_PAD) /* Touchscreen target */
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-    { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                       BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,                      BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REW,              BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REW,            BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,            BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,           BUTTON_NONE},
+    { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_DOWN,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_PREV,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_NEXT,                        BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_PREV|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_NEXT|BUTTON_REPEAT,          BUTTON_NONE },
+#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
+    { PLA_UP,               BUTTON_STOP,                        BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_PLAY,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_STOP|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
     { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
     { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
@@ -210,448 +191,172 @@ const struct button_mapping generic_directions[] =
     { PLA_RIGHT_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE},
 
 #else
-    #error pluginlib_actions: Unsupported keypad
+#ifndef HAVE_TOUCHSCREEN
+    #error pluginlib_actions: No directions defined
 #endif
-    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
-};
-
-const struct button_mapping generic_left_right_fire[] =
-{
-#ifdef HAVE_TOUCHSCREEN
-    { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_CENTER,                 BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_CENTER|BUTTON_REPEAT,   BUTTON_NONE},
 #endif
-#if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
-    || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
-    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
-    || (CONFIG_KEYPAD == MROBE100_PAD)      \
-    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
-    || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
-    || (CONFIG_KEYPAD == SANSA_M200_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_4G_PAD)
-    { PLA_LEFT,              BUTTON_SCROLL_BACK,         BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_SCROLL_FWD,          BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_UP,                  BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == PLAYER_PAD
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_ON,                  BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_ON|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == RECORDER_PAD
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_PLAY,                BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD) \
-    || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) \
-   || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_REW,                 BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MROBE500_PAD)
-    { PLA_LEFT,              BUTTON_RC_REW,                     BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RC_FF,                      BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_RC_HEART,                   BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_RC_HEART|BUTTON_REPEAT,     BUTTON_NONE},
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-    { PLA_LEFT,              BUTTON_MINUS,                  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_MINUS|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_PLUS,                   BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,     BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_MENU,                   BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,     BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-    { PLA_LEFT,              BUTTON_RC_REW,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RC_FF,                 BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,   BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_RC_MODE,               BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_RC_MODE|BUTTON_REPEAT, BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_MENU,                BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,                BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
-    { PLA_LEFT,              BUTTON_PREV,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_NEXT,                BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_PLAY,                  BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD) /* Touchscreen target */
-#elif (CONFIG_KEYPAD == ONDAVX777_PAD) /* Touchscreen target */
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REW,     BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REW,    BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_UP,                  BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_UP|BUTTON_REW,       BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
-    { PLA_LEFT,              BUTTON_PREV,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_NEXT,                BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_OK,                  BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_OK|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
-    { PLA_LEFT,              BUTTON_VOL_DOWN,                   BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_VOL_UP,                     BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_SELECT,                     BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE},
 
-
-#else
-    #error pluginlib_actions: Unsupported keypad
+    /* Scrollwheels */
+#ifdef HAVE_SCROLLWHEEL
+    { PLA_SCROLL_BACK,       BUTTON_SCROLL_BACK,                BUTTON_NONE },
+    { PLA_SCROLL_FWD,        BUTTON_SCROLL_FWD,                 BUTTON_NONE },
+    { PLA_SCROLL_BACK_REPEAT,BUTTON_SCROLL_BACK|BUTTON_REPEAT,  BUTTON_NONE },
+    { PLA_SCROLL_FWD_REPEAT, BUTTON_SCROLL_FWD|BUTTON_REPEAT,   BUTTON_NONE },
 #endif
-    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
-};
 
-/* these were taken from the bubbles plugin, so may need tweaking */
-const struct button_mapping generic_actions[] = 
-{
-#ifdef HAVE_TOUCHSCREEN
-    {PLA_QUIT,          BUTTON_BOTTOMRIGHT,                 BUTTON_NONE},
-    {PLA_START,         BUTTON_CENTER,                      BUTTON_NONE},
-    {PLA_MENU,          BUTTON_TOPLEFT,                     BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE},
-#endif
+    /* Actions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    {PLA_QUIT,          BUTTON_OFF,                   BUTTON_NONE},
-    {PLA_QUIT,          BUTTON_RC_STOP,               BUTTON_NONE},
-    {PLA_START,         BUTTON_ON,                    BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_ON,                 BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MODE,                  BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_RC_MENU,               BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_RC_MENU|BUTTON_REPEAT, BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_OFF,                         BUTTON_NONE },
+    {PLA_CANCEL,            BUTTON_RC_STOP,                     BUTTON_NONE },
+    {PLA_EXIT,              BUTTON_ON,                          BUTTON_NONE },
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
+    {PLA_SELECT,            BUTTON_RC_ON,                       BUTTON_NONE },
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
+    {PLA_SELECT_REL,        BUTTON_RC_ON|BUTTON_REL,            BUTTON_RC_ON },
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+    {PLA_SELECT_REPEAT,     BUTTON_RC_ON|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
    || (CONFIG_KEYPAD == IPOD_4G_PAD)
-    {PLA_QUIT,          BUTTON_MENU|BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY},
-    {PLA_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_PLAY,                 BUTTON_NONE},
-    {PLA_MENU,          BUTTON_REC,                     BUTTON_NONE},
-    {PLA_MENU,          BUTTON_RC_MENU,                 BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_RC_MODE,                 BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_RC_MODE|BUTTON_REPEAT,   BUTTON_NONE},
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_A,           BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-    {PLA_QUIT,          BUTTON_BACK,        BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == RECORDER_PAD
-    {PLA_QUIT,          BUTTON_OFF,         BUTTON_NONE},
-    {PLA_START,         BUTTON_ON,          BUTTON_NONE},
-    {PLA_MENU,          BUTTON_F1,          BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_PLAY,        BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_PLAY|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-    {PLA_QUIT,          BUTTON_OFF,         BUTTON_NONE},
-    {PLA_START,         BUTTON_ON,          BUTTON_NONE},
-    {PLA_MENU,          BUTTON_F1,          BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    {PLA_QUIT,          BUTTON_OFF,         BUTTON_NONE},
-    {PLA_START,         BUTTON_MENU,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_UP,          BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == PLAYER_PAD
-    {PLA_QUIT,          BUTTON_STOP|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_ON,          BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_ON|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == SANSA_E200_PAD || \
-    CONFIG_KEYPAD == SANSA_C200_PAD || \
-    CONFIG_KEYPAD == SANSA_CLIP_PAD || \
-    CONFIG_KEYPAD == SANSA_M200_PAD
-    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_UP,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-    {PLA_QUIT,          (BUTTON_HOME|BUTTON_REPEAT),       BUTTON_NONE},
-    {PLA_START,         BUTTON_UP,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_FF,          BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_REW,         BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_REW|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-    {PLA_QUIT,          BUTTON_EQ,       BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,     BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MODE,     BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,   BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MROBE500_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                       BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_PLAY,                     BUTTON_NONE},
-    {PLA_MENU,          BUTTON_RC_MODE,                     BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_RC_HEART,                    BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
-#elif CONFIG_KEYPAD == MROBE100_PAD
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_MINUS,                   BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_PLUS,                    BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_PLUS|BUTTON_REPEAT,      BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-    {PLA_QUIT,          BUTTON_RC_REC,                  BUTTON_NONE},
-    {PLA_START,         BUTTON_RC_PLAY,                 BUTTON_NONE},
-    {PLA_MENU,          BUTTON_RC_MENU,                 BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_RC_MODE,                 BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_RC_MODE|BUTTON_REPEAT,   BUTTON_NONE},
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_RIGHT,                   BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_VOLUP,                   BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_VOLUP|BUTTON_REPEAT,     BUTTON_NONE},
-#elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
-    {PLA_QUIT,          BUTTON_BACK,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                   BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,     BUTTON_NONE},
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_VIEW,        BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_VOL_DOWN,                BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_VOL_UP,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ONDAVX777_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
-    {PLA_START,         BUTTON_VOL_DOWN,                BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_VOL_UP,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-    {PLA_QUIT,          BUTTON_REW,                     BUTTON_NONE},
-    {PLA_START,         BUTTON_FFWD,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_UP,                      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_UP|BUTTON_REW,           BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
-    {PLA_QUIT,          BUTTON_REC,                     BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_OK,                      BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_OK|BUTTON_REPEAT,        BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
-    {PLA_QUIT,          (BUTTON_REC|BUTTON_PLAY),       BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
-    {PLA_MENU,          BUTTON_REC,                     BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-
-#else
-    #error pluginlib_actions: Unsupported keypad
-#endif
-    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
-};
-
-const struct button_mapping generic_increase_decrease[] =
-{
-#ifdef HAVE_TOUCHSCREEN
-    {PLA_INC,             BUTTON_TOPMIDDLE,                  BUTTON_NONE},
-    {PLA_DEC,             BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
-#endif
-#if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
-    || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
-    || (CONFIG_KEYPAD == RECORDER_PAD)      \
-    || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
-    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == ONDIO_PAD)         \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
-    || (CONFIG_KEYPAD == MROBE100_PAD)      \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
-    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
-    || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
-    || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
-    || (CONFIG_KEYPAD == SANSA_M200_PAD) 
-    {PLA_INC,              BUTTON_UP,                  BUTTON_NONE},
-    {PLA_DEC,              BUTTON_DOWN,                BUTTON_NONE},
-    {PLA_INC_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-    {PLA_INC,              BUTTON_VOL_UP,                  BUTTON_NONE},
-    {PLA_DEC,              BUTTON_VOL_DOWN,                BUTTON_NONE},
-    {PLA_INC_REPEAT,       BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
-    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
-    || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-    {PLA_INC,              BUTTON_SCROLL_FWD,      BUTTON_NONE},
-    {PLA_DEC,              BUTTON_SCROLL_BACK,     BUTTON_NONE},
-    {PLA_INC_REPEAT,       BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE},
-    {PLA_DEC_REPEAT,       BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE},
-#elif CONFIG_KEYPAD == PLAYER_PAD
-    {PLA_INC,              BUTTON_STOP,  BUTTON_NONE},
-    {PLA_DEC,              BUTTON_PLAY,  BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_MENU|BUTTON_SELECT,          BUTTON_NONE },
+    {PLA_EXIT,              BUTTON_PLAY|BUTTON_SELECT,          BUTTON_NONE },
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
+    {PLA_CANCEL,            BUTTON_POWER,                       BUTTON_NONE },
+    {PLA_EXIT,              BUTTON_PLAY|BUTTON_SELECT,          BUTTON_NONE },
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
+    {PLA_SELECT,            BUTTON_RC_MODE,                     BUTTON_NONE },
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
+    {PLA_SELECT_REL,        BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE },
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+    {PLA_SELECT_REPEAT,     BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_NONE },
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD \
+    || CONFIG_KEYPAD == SANSA_E200_PAD \
+    || CONFIG_KEYPAD == SANSA_C200_PAD \
+    || CONFIG_KEYPAD == SANSA_CLIP_PAD \
+    || CONFIG_KEYPAD == SANSA_M200_PAD \
+    || CONFIG_KEYPAD == MROBE100_PAD \
+    || CONFIG_KEYPAD == PHILIPS_SA9200_PAD \
+    || CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+    {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == RECORDER_PAD)
+    {PLA_CANCEL,            BUTTON_ON,                          BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_OFF,                         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+    {PLA_CANCEL,            BUTTON_OFF|BUTTON_REL,              BUTTON_OFF},
+    {PLA_EXIT,              BUTTON_OFF|BUTTON_REPEAT,           BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == ONDIO_PAD)
+    {PLA_CANCEL,            BUTTON_OFF|BUTTON_REL,              BUTTON_OFF},
+    {PLA_EXIT,              BUTTON_OFF|BUTTON_REPEAT,           BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
+    {PLA_SELECT_REPEAT,     BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == PLAYER_PAD)
+    {PLA_CANCEL,            BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
+    {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_ON,                          BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_ON|BUTTON_REL,               BUTTON_ON},
+    {PLA_SELECT_REPEAT,     BUTTON_ON|BUTTON_REPEAT,            BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+    {PLA_CANCEL,            BUTTON_HOME|BUTTON_REL,             BUTTON_HOME},
+    {PLA_EXIT,              BUTTON_HOME|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-    {PLA_INC,              BUTTON_SCROLL_UP,           BUTTON_NONE},
-    {PLA_DEC,              BUTTON_SCROLL_DOWN,         BUTTON_NONE},
-    {PLA_INC_REPEAT,       BUTTON_SCROLL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,       BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_PREV,                        BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
+    {PLA_CANCEL,            BUTTON_EQ|BUTOTN_REL,               BUTTON_EQ},
+    {PLA_EXIT,              BUTTON_EQ|BUTTON_REPEAT,            BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
-    {PLA_INC,             BUTTON_RC_PLAY,                    BUTTON_NONE},
-    {PLA_DEC,             BUTTON_RC_DOWN,                    BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_RC_PLAY|BUTTON_REPEAT,      BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_RC_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-    {PLA_INC,             BUTTON_RC_VOL_UP,                  BUTTON_NONE},
-    {PLA_DEC,             BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-    {PLA_INC,             BUTTON_PLUS,                       BUTTON_NONE},
-    {PLA_DEC,             BUTTON_MINUS,                      BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_MINUS|BUTTON_REPEAT,        BUTTON_NONE},
-#elif CONFIG_KEYPAD == IAUDIO67_PAD
-    {PLA_INC,             BUTTON_VOLUP,                       BUTTON_NONE},
-    {PLA_DEC,             BUTTON_VOLDOWN,                     BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_VOLUP|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_VOLDOWN|BUTTON_REPEAT,       BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
-    {PLA_INC,             BUTTON_VOL_UP,                       BUTTON_NONE},
-    {PLA_DEC,             BUTTON_VOL_DOWN,                     BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,       BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDAVX777_PAD
-    {PLA_INC,             BUTTON_VOL_UP,                       BUTTON_NONE},
-    {PLA_DEC,             BUTTON_VOL_DOWN,                     BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,       BUTTON_NONE},
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-    {PLA_INC,             BUTTON_UP,                           BUTTON_NONE},
-    {PLA_DEC,             BUTTON_DOWN,                         BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_UP|BUTTON_REW,                BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_DOWN|BUTTON_REW,              BUTTON_NONE},
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-    {PLA_INC,             BUTTON_UP,                           BUTTON_NONE},
-    {PLA_DEC,             BUTTON_DOWN,                         BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_UP,                           BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_DOWN,                         BUTTON_NONE},
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-    {PLA_INC,             BUTTON_VOL_UP,                           BUTTON_NONE},
-    {PLA_DEC,             BUTTON_VOL_DOWN,                         BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,             BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,           BUTTON_NONE},
-
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_RC_HEART,                    BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_RC_HEART|BUTTON_REL,         BUTTON_RC_HEART},
+    {PLA_SELECT_REPEAT,     BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_MINUS,                       BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_MINUS|BUTTON_REL,            BUTTON_MINUS},
+    {PLA_SELECT_REPEAT,     BUTTON_MINUS|BUTTON_MINUS,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+    {PLA_CANCEL,            BUTTON_RC_REC|BUTTON_REL,           BUTTON_RC_REC},
+    {PLA_EXIT,              BUTTON_RC_REC|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_RC_MODE,                     BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE},
+    {PLA_SELECT_REPEAT,     BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_NONE},
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
+    {PLA_CANCE              BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT           BUTTON_NONE},
+#elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
+    {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
+    {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_VOL_UP|BUTTON_REL,           BUTTON_VOL_UP},
+    {PLA_SELECT_REPEAT,     BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+    {PLA_CANCEL,            BUTTON_REW,                         BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_FFWD,                        BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+    {PLA_CANCEL,            BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_REC,                         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_OK,                          BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_OK|BUTTON_REL,               BUTTON_OK  },
+    {PLA_SELECT_REPEAT,     BUTTON_OK|BUTTON_REPEAT,            BUTTON_NONE},
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)                                      
+    {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE},
+    {PLA_EXIT,              (BUTTON_REC|BUTTON_PLAY),           BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #else
-    #error pluginlib_actions: Unsupported keypad
+#error pluginlib_actions: No actions defined
 #endif
-    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN),
 };
 
 static struct button_mapping **plugin_context_order;

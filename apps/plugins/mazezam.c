@@ -27,19 +27,7 @@
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#   define MAZEZAM_MENU     (BUTTON_SELECT | BUTTON_MENU)
-#   define MAZEZAM_RIGHT    BUTTON_RIGHT
-#   define MAZEZAM_LEFT     BUTTON_LEFT
-#   define MAZEZAM_UP       BUTTON_MENU
-#   define MAZEZAM_DOWN     BUTTON_PLAY
-#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
-#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
-#   define MAZEZAM_UP_REPEAT    (BUTTON_MENU|BUTTON_REPEAT)
-#   define MAZEZAM_DOWN_REPEAT  (BUTTON_PLAY|BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD)
+#if (CONFIG_KEYPAD == IPOD_3G_PAD)
 #   define MAZEZAM_MENU    BUTTON_MENU
 #   define MAZEZAM_RIGHT   BUTTON_RIGHT
 #   define MAZEZAM_LEFT    BUTTON_LEFT
@@ -50,32 +38,9 @@ PLUGIN_HEADER
 #   define MAZEZAM_UP_REPEAT    (BUTTON_SCROLL_BACK|BUTTON_REPEAT)
 #   define MAZEZAM_DOWN_REPEAT  (BUTTON_SCROLL_FWD|BUTTON_REPEAT)
 
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   define MAZEZAM_MENU     (BUTTON_HOME | BUTTON_REPEAT)
-#   define MAZEZAM_RIGHT    BUTTON_RIGHT
-#   define MAZEZAM_LEFT     BUTTON_LEFT
-#   define MAZEZAM_UP       BUTTON_UP
-#   define MAZEZAM_DOWN     BUTTON_DOWN
-#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
-#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
-#   define MAZEZAM_UP_REPEAT    (BUTTON_UP|BUTTON_REPEAT)
-#   define MAZEZAM_DOWN_REPEAT  (BUTTON_DOWN|BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#   define MAZEZAM_MENU     BUTTON_POWER
-#   define MAZEZAM_SOLVE    BUTTON_SELECT
-#   define MAZEZAM_RIGHT    BUTTON_RIGHT
-#   define MAZEZAM_LEFT     BUTTON_LEFT
-#   define MAZEZAM_UP       BUTTON_UP
-#   define MAZEZAM_DOWN     BUTTON_DOWN
-#   define MAZEZAM_RIGHT_REPEAT (BUTTON_RIGHT|BUTTON_REPEAT)
-#   define MAZEZAM_LEFT_REPEAT  (BUTTON_LEFT|BUTTON_REPEAT)
-#   define MAZEZAM_UP_REPEAT    (BUTTON_UP|BUTTON_REPEAT)
-#   define MAZEZAM_DOWN_REPEAT  (BUTTON_DOWN|BUTTON_REPEAT)
-
 #else
 #   include "lib/pluginlib_actions.h"
-#   define MAZEZAM_MENU     PLA_QUIT
+#   define MAZEZAM_MENU     PLA_CANCEL
 #   define MAZEZAM_RIGHT    PLA_RIGHT
 #   define MAZEZAM_LEFT     PLA_LEFT
 #   define MAZEZAM_UP       PLA_UP
@@ -85,7 +50,7 @@ PLUGIN_HEADER
 #   define MAZEZAM_UP_REPEAT    PLA_UP_REPEAT
 #   define MAZEZAM_DOWN_REPEAT  PLA_DOWN_REPEAT
 const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions};
+= { pla_main_ctx };
 #endif
 
 /* All the text is here */
@@ -586,7 +551,8 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
         draw_level(li, shift, *x, *y);
         rb->lcd_update();
 #ifdef __PLUGINLIB_ACTIONS_H__
-        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                ARRAYLEN(plugin_contexts));
 #else
         button = rb->button_get(true);
 #endif

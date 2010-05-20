@@ -34,27 +34,24 @@ PLUGIN_HEADER
 
 /* Keymaps */
 const struct button_mapping* plugin_contexts[]={
-    generic_actions,
-    generic_increase_decrease,
-    generic_directions,
-#if NB_SCREENS == 2
-    remote_directions
+    pla_main_ctx,
+#ifdef HAVE_REMOTE_LCD
+    pla_remote_ctx,
 #endif
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-#define ACTION_COUNTER_TOGGLE PLA_FIRE
-#define ACTION_COUNTER_RESET PLA_FIRE_REPEAT
-#define ACTION_MENU PLA_MENU
-#define ACTION_EXIT PLA_QUIT
-#define ACTION_MODE_NEXT PLA_RIGHT
-#define ACTION_MODE_NEXT_REPEAT PLA_RIGHT_REPEAT
-#define ACTION_MODE_PREV PLA_LEFT
-#define ACTION_MODE_PREV_REPEAT PLA_LEFT_REPEAT
-#define ACTION_SKIN_NEXT PLA_INC
-#define ACTION_SKIN_NEXT_REPEAT PLA_INC_REPEAT
-#define ACTION_SKIN_PREV PLA_DEC
-#define ACTION_SKIN_PREV_REPEAT PLA_DEC_REPEAT
+#define ACTION_COUNTER_TOGGLE           PLA_SELECT
+#define ACTION_COUNTER_RESET            PLA_SELECT_REPEAT
+#define ACTION_MENU                     PLA_CANCEL
+#define ACTION_MODE_NEXT                PLA_RIGHT
+#define ACTION_MODE_NEXT_REPEAT         PLA_RIGHT_REPEAT
+#define ACTION_MODE_PREV                PLA_LEFT
+#define ACTION_MODE_PREV_REPEAT         PLA_LEFT_REPEAT
+#define ACTION_SKIN_NEXT                PLA_UP
+#define ACTION_SKIN_NEXT_REPEAT         PLA_UP_REPEAT
+#define ACTION_SKIN_PREV                PLA_DOWN
+#define ACTION_SKIN_PREV_REPEAT         PLA_DOWN_REPEAT
 
 /**************************
  * Cleanup on plugin return
@@ -176,11 +173,6 @@ enum plugin_status plugin_start(const void* parameter){
                 clock_draw_restore_colors();
                 exit_clock=main_menu();
                 break;
-
-            case ACTION_EXIT:
-                exit_clock=true;
-                break;
-
             default:
                 if(rb->default_event_handler_ex(button, cleanup, NULL)
                    == SYS_USB_CONNECTED)

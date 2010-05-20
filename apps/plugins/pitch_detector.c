@@ -413,11 +413,9 @@ void save_settings(void)
 
 /* Keymaps */
 const struct button_mapping* plugin_contexts[]={
-    generic_actions,
-    generic_increase_decrease,
-    generic_directions,
+    pla_main_ctx,
 #if NB_SCREENS == 2
-    remote_directions
+    pla_remote_ctx,
 #endif
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
@@ -1040,11 +1038,11 @@ void record_and_get_pitch(void)
 
             switch(button) 
             {
-                case PLA_QUIT:
+                case PLA_EXIT:
                     quit=true;
                     break;
                 
-                case PLA_MENU:
+                case PLA_CANCEL:
                     rb->pcm_stop_recording();
                     quit = main_menu() != 0;
                     if(!quit)

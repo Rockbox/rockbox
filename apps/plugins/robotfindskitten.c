@@ -469,47 +469,7 @@ static char* messages[] =
 
 #define RFK_VERSION "v1.4142135.406"
 
-/* Button definitions stolen from maze.c */
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#   undef __PLUGINLIB_ACTIONS_H__
-#   define RFK_QUIT     (BUTTON_SELECT | BUTTON_MENU)
-#   define RFK_RIGHT    BUTTON_RIGHT
-#   define RFK_LEFT     BUTTON_LEFT
-#   define RFK_UP       BUTTON_MENU
-#   define RFK_DOWN     BUTTON_PLAY
-#   define RFK_RRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define RFK_RLEFT    (BUTTON_LEFT | BUTTON_REPEAT)
-#   define RFK_RUP      (BUTTON_MENU | BUTTON_REPEAT)
-#   define RFK_RDOWN    (BUTTON_PLAY | BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   undef __PLUGINLIB_ACTIONS_H__
-#   define RFK_QUIT     (BUTTON_HOME|BUTTON_REPEAT)
-#   define RFK_RIGHT    BUTTON_RIGHT
-#   define RFK_LEFT     BUTTON_LEFT
-#   define RFK_UP       BUTTON_UP
-#   define RFK_DOWN     BUTTON_DOWN
-#   define RFK_RRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define RFK_RLEFT    (BUTTON_LEFT | BUTTON_REPEAT)
-#   define RFK_RUP      (BUTTON_UP | BUTTON_REPEAT)
-#   define RFK_RDOWN    (BUTTON_DOWN | BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-#   undef __PLUGINLIB_ACTIONS_H__
-#   define RFK_QUIT     (BUTTON_REC|BUTTON_REPEAT)
-#   define RFK_RIGHT    BUTTON_RIGHT
-#   define RFK_LEFT     BUTTON_LEFT
-#   define RFK_UP       BUTTON_UP
-#   define RFK_DOWN     BUTTON_DOWN
-#   define RFK_RRIGHT   (BUTTON_PLAY | BUTTON_RIGHT)
-#   define RFK_RLEFT    (BUTTON_PLAY | BUTTON_LEFT)
-#   define RFK_RUP      (BUTTON_PLAY | BUTTON_UP)
-#   define RFK_RDOWN    (BUTTON_PLAY | BUTTON_DOWN)
-
-#else
-#   define RFK_QUIT     PLA_QUIT
+#   define RFK_QUIT     PLA_CANCEL
 #   define RFK_RIGHT    PLA_RIGHT
 #   define RFK_LEFT     PLA_LEFT
 #   define RFK_UP       PLA_UP
@@ -519,7 +479,6 @@ static char* messages[] =
 #   define RFK_RUP      PLA_UP_REPEAT
 #   define RFK_RDOWN    PLA_DOWN_REPEAT
 
-#endif
 /*Constants for our internal representation of the screen.*/
 #define EMPTY -1
 #define ROBOT 0
@@ -677,9 +636,7 @@ static void play_game()
     int old_x = robot.x;
     int old_y = robot.y;
     int input = BUTTON_NONE;
-#ifdef __PLUGINLIB_ACTIONS_H__
-    const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
-#endif
+    const struct button_mapping *plugin_contexts[] = {pla_main_ctx};
 
     while (input != RFK_QUIT && exit_rfk == false)
     {
@@ -700,11 +657,8 @@ static void play_game()
             old_x = robot.x;
             old_y = robot.y;
         }
-#ifdef __PLUGINLIB_ACTIONS_H__
-        input = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
-#else
-        input = rb->button_get(true);
-#endif
+        input = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                ARRAYLEN(plugin_contexts));
     }
     message("Bye!");
     refresh();

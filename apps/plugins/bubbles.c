@@ -66,28 +66,41 @@ enum {
 
 /* keyboard layouts */
 
-#if (CONFIG_KEYPAD != SANSA_E200_PAD) && \
-      (CONFIG_KEYPAD != SANSA_FUZE_PAD)
+#ifdef HAVE_SCROLLWHEEL
 /* sansas use the wheel instead of left/right if available */
+#define BUBBLES_LEFT        PLA_SCROLL_BACK
+#define BUBBLES_LEFT_REP    PLA_SCROLL_BACK_REPEAT
+#define BUBBLES_RIGHT       PLA_SCROLL_FWD
+#define BUBBLES_RIGHT_REP   PLA_SCROLL_FWD_REPEAT
+#else
 #define BUBBLES_LEFT        PLA_LEFT
 #define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
 #define BUBBLES_RIGHT       PLA_RIGHT
 #define BUBBLES_RIGHT_REP   PLA_RIGHT_REPEAT
-#define ANGLE_STEP  4
-#define ANGLE_STEP_REP 4
-#else
-#define BUBBLES_LEFT        PLA_UP
-#define BUBBLES_LEFT_REP    PLA_UP_REPEAT
-#define BUBBLES_RIGHT       PLA_DOWN
-#define BUBBLES_RIGHT_REP   PLA_DOWN_REPEAT
-#define ANGLE_STEP  2
-#define ANGLE_STEP_REP 4
 #endif
 
-#define BUBBLES_QUIT1       PLA_QUIT
-#define BUBBLES_QUIT2       PLA_MENU
-#define BUBBLES_PAUSE       PLA_START
-#define BUBBLES_FIRE        PLA_FIRE
+#define ANGLE_STEP          2
+#define ANGLE_STEP_REP      4
+
+#define BUBBLES_QUIT1       PLA_EXIT
+#define BUBBLES_QUIT2       PLA_CANCEL
+
+/* these are better off shooting with up */
+#if (CONFIG_KEYPAD == SAMSUNG_YH_PAD) \
+ || (CONFIG_KEYPAD == ONDIO_PAD) \
+ || (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define SHOOT_WITH_UP
+#endif
+
+#ifdef SHOOT_WITH_UP
+#define BUBBLES_FIRE        PLA_UP
+#define BUBBLES_FIRE_REPEAT PLA_UP_REPEAT
+#define BUBBLES_PAUSE       PLA_SELECT
+#else
+#define BUBBLES_FIRE        PLA_SELECT
+#define BUBBLES_FIRE_REPEAT PLA_SELECT_REPEAT
+#define BUBBLES_PAUSE       PLA_UP
+#endif
 
 /* external bitmaps */
 #ifdef HAVE_LCD_COLOR
@@ -2294,16 +2307,15 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int buttonres;
     long start;
     const struct button_mapping *plugin_contexts[]
-#if (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-                     = {generic_directions,generic_actions};
-#else
-                     = {generic_left_right_fire,generic_actions};
+                     = { pla_main_ctx,
+#ifdef HAVE_REMOTE_LCD
+                         pla_remote_ctx,
 #endif
+                        };
 
     if (timeout < 0)
         timeout = 0;
-    button = pluginlib_getaction(timeout,plugin_contexts,2);
+    button = pluginlib_getaction(timeout,plugin_contexts,ARRAYLEN(plugin_contexts));
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
     /* FIXME: Should probably check remote hold here */
     if (rb->button_hold())
@@ -2324,6 +2336,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             break;
 
         case BUBBLES_FIRE: /* fire the shot */
+        case BUBBLES_FIRE_REPEAT:
             if(!animblock) {
                 bb->elapsedlvl += bb->elapsedshot;
                 bb->elapsedshot = 0;
@@ -2338,7 +2351,9 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
         case BUBBLES_PAUSE:  /* pause the game */
             start = *rb->current_tick;
             rb->splash(0, "Paused");
-            while(pluginlib_getaction(TIMEOUT_BLOCK,plugin_contexts,2)
+
+            while(pluginlib_getaction(TIMEOUT_BLOCK,plugin_contexts,
+                    ARRAYLEN(plugin_contexts))
                  != BUBBLES_PAUSE);
             bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);

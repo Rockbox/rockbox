@@ -31,8 +31,12 @@ PLUGIN_HEADER
 #define MAX_COLORS_COUNT 8
 #define MAX_GUESSES_COUNT 10
 
-const struct button_mapping *plugin_contexts[] =
-            {generic_directions, generic_actions};
+const struct button_mapping *plugin_contexts[] = {
+    pla_main_ctx,
+#ifdef HAVE_REMOTE_LCD
+    pla_remote_ctx,
+#endif
+};
 
 /*
  * Screen structure:
@@ -427,14 +431,14 @@ enum plugin_status plugin_start(const void* parameter) {
                 draw_board(guess, piece);
 
                 button = get_button();
-                if (button == PLA_FIRE || button == PLA_START)
+                if (button == PLA_SELECT)
                     break;
 
                 switch (button) {
 
                     /* Exit */
-                    case PLA_QUIT:
-                    case PLA_MENU:
+                    case PLA_EXIT:
+                    case PLA_CANCEL:
                         resume = true;
                         main_menu();
                         break;
@@ -452,6 +456,10 @@ enum plugin_status plugin_start(const void* parameter) {
                         break;
 
                     /* Next color */
+#ifdef HAVE_SCROLLWHEEL
+                    case PLA_SCROLL_FWD:
+                    case PLA_SCROLL_FWD_REPEAT:
+#endif
                     case PLA_DOWN:
                     case PLA_DOWN_REPEAT:
                          guesses[guess].pieces[piece] =
@@ -460,6 +468,10 @@ enum plugin_status plugin_start(const void* parameter) {
                         break;
 
                     /* Previous color */
+#ifdef HAVE_SCROLLWHEEL
+                    case PLA_SCROLL_BACK:
+                    case PLA_SCROLL_BACK_REPEAT:
+#endif
                     case PLA_UP:
                     case PLA_UP_REPEAT:
                         guesses[guess].pieces[piece] =
