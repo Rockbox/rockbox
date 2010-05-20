@@ -55,8 +55,7 @@ your WPS (While Playing Screen).
 
 \subsection{\label{ref:WPS_Key_Controls}WPS Key Controls}
 
-\begin{table}
-  \begin{btnmap}{}{}
+  \begin{btnmap}
       \ActionWpsVolUp{} / \ActionWpsVolDown
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsVolUp{} / \ActionRCWpsVolDown}
       & Volume up/down.\\
@@ -170,8 +169,7 @@ your WPS (While Playing Screen).
           \opt{HAVEREMOTEKEYMAP}{&} 
           & Switch to the \setting{Recording Screen}.\\
       }%
-    \end{btnmap}
-\end{table}
+  \end{btnmap}
 
 
 \opt{lcd_bitmap}{
@@ -321,8 +319,7 @@ This may even be the whole track.
   playing back those bookmarks.}
 
   \nopt{swcodec}{
-    \begin{table}
-      \begin{btnmap}{}{}
+      \begin{btnmap}
         \ActionPsToggleMode
         & Toggle pitch changing mode. \\
         %
@@ -344,14 +341,12 @@ This may even be the whole track.
         & Leave the \setting{Pitch Screen}. \\
         %
       \end{btnmap}
-    \end{table}
 
     \warn{Changing the pitch can cause audible `Artifacts' or `Dropouts'.}
   }
 
   \opt{swcodec}{
-    \begin{table}
-      \begin{btnmap}{}{}
+      \begin{btnmap}
         \ActionPsToggleMode
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
         & Toggle pitch changing mode (cycle through all available modes).\\
@@ -381,7 +376,6 @@ This may even be the whole track.
         & Leave the \setting{Pitch Screen}. \\
         %
       \end{btnmap}
-    \end{table}
   }
 
 }
@@ -412,13 +406,11 @@ This may even be the whole track.
   See \reference{ref:PlaybackOptions} for more information about these
   settings.
 
-  \begin{table}
-    \begin{btnmap}{}{}
+  \begin{btnmap}
       \ButtonLeft & Control Shuffle mode setting. \\
       \ButtonRight & Control Repeat mode setting. \\
       \ButtonDown & Control Show file setting. \\
-    \end{btnmap}
-  \end{table}
+  \end{btnmap}
   
   \ButtonFThree\ controls frequently used display options.
   
@@ -434,11 +426,9 @@ This may even be the whole track.
   See \reference{ref:Displayoptions} for more information about these
   settings.
   
-  \begin{table}
-    \begin{btnmap}{}{}
+  \begin{btnmap}
       \ButtonLeft & Control scroll bar display. \\
       \ButtonRight & Control status bar display. \\
       \ButtonDown & Control upside down screen setting. \\
-    \end{btnmap}
-  \end{table}
+  \end{btnmap}
 }
