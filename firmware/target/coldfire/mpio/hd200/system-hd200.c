@@ -70,7 +70,7 @@ void cf_set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
         PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
-        CSCR3 = 0x00000980; /* LCD: 4 wait states */
+        CSCR3 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
@@ -91,7 +91,7 @@ void cf_set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
         PLLCR = 0x0589e021 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
-        CSCR3 = 0x00000580; /* LCD: 0 wait states */
+        CSCR3 = 0x00000580; /* LCD: 1 wait state */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
