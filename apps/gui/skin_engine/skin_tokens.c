@@ -254,6 +254,20 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
                 return buf;
 
+            case WPS_TOKEN_TRACK_STARTING:
+                {
+                    unsigned long time = token->value.i * 1000;
+                    if (elapsed < time)
+                        return "starting";
+                }
+                return NULL;
+            case WPS_TOKEN_TRACK_ENDING:
+                {
+                    unsigned long time = token->value.i * 1000;
+                    if (length - elapsed < time)
+                        return "ending";
+                }
+                return NULL;
 
             case WPS_TOKEN_FILE_CODEC:
                 if (intval)
@@ -1018,23 +1032,6 @@ const char *get_token_value(struct gui_wps *gwps,
                 return "v";
             return NULL;
             
-        case WPS_TOKEN_TRACK_STARTING:
-            if (id3)
-            {
-                int elapsed = id3->elapsed + state->ff_rewind_count;
-                if (elapsed < token->value.i * 1000)
-                    return "starting";
-            }
-            return NULL;
-        case WPS_TOKEN_TRACK_ENDING:
-            if (id3)
-            {
-                unsigned long elapsed = id3->elapsed + state->ff_rewind_count;
-                unsigned time = token->value.i * 1000;
-                if (id3->length - elapsed < time)
-                    return "ending";
-            }
-            return NULL;
         case WPS_TOKEN_LASTTOUCH:
 #ifdef HAVE_TOUCHSCREEN
             if (TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +
