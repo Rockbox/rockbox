@@ -269,9 +269,9 @@ will display it permanently.
 \begin{itemize}
 \item {\config{\%Vl{\textbar}'identifier'{\textbar}\dots{\textbar}}}
 This tag preloads a viewport for later display. `identifier' is a single
-lowercase letter (a-z) and the '\dots' parameters use the same logic as
+lowercase letter (a-z) and the `\dots' parameters use the same logic as
 the \config{\%V} tag explained above.
-\item {\config{\%Vd'identifier'}} Display the 'identifier' viewport.
+\item {\config{\%Vd'identifier'}} Display the `identifier' viewport.
 \end{itemize}
 
 Viewports can share identifiers so that you can display multiple viewports
@@ -297,7 +297,7 @@ file, and to conditionally select different UI viewports.
     doesn't have a ui viewport set in the theme \fname{.cfg} file. Having this
     is strongly recommended since it makes you able to use the SBS
     with other themes. If label is set this viewport can be selectivly used as the
-    Info Viewport using the \%VI tag. The '\dots' parameters use the same logic as
+    Info Viewport using the \%VI tag. The `\dots' parameters use the same logic as
     the \config{\%V} tag explained above.
 
     \item {\config{\%VI'label'}} Set the Info Viewport to use the viewport called
@@ -356,9 +356,9 @@ It is possible to group items on each line into 2 or more groups or
 specified time, alternating continuously through each defined subline.
 
 Items on a line are broken into sublines with the semicolon
-'\config{;}' character. The display time for
+`\config{;}' character. The display time for
 each subline defaults to 2 seconds unless modified by using the
-'\config{\%t}' tag to specify an alternate
+`\config{\%t}' tag to specify an alternate
 time (in seconds and optional tenths of a second) for the subline to be
 displayed. 
 
@@ -366,7 +366,7 @@ Subline related special characters and tags:
 \begin{description}
 \item[;] Split items on a line into separate sublines
 \item[\%t] Set the subline display time. The
-'\config{\%t}' is followed by either integer
+`\config{\%t}' is followed by either integer
 seconds (\config{\%t5}), or seconds and tenths of a second (\config{\%t3.5}).
 \end{description}
 
