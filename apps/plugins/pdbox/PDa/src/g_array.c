@@ -1264,7 +1264,7 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     for (i = 0; i < nelem; i++)
     {
 #ifdef ROCKBOX
-        if(read(fd, &s, sizeof(s)) < (ssize_t) (1 * sizeof(s)))
+        if(read(fd, &s, sizeof(s)) < (ssize_t) sizeof(s))
 #else
     	if (fread(&s, sizeof(s), 1, fd) < 1)
 #endif
@@ -1413,7 +1413,7 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     }
     memcpy((void *)(waveheader + 40), (void *)(&intbuf), 4);
 #ifdef ROCKBOX
-    if(write(fd, waveheader, sizeof(waveheader)) < (ssize_t) (1 * sizeof(waveheader)))
+    if(write(fd, waveheader, sizeof(waveheader)) < (ssize_t) sizeof(waveheader))
 #else
     if (fwrite(waveheader, sizeof(waveheader), 1, fd) < 1)
 #endif
@@ -1434,7 +1434,7 @@ static void garray_write16(t_garray *x, t_symbol *filename, t_symbol *format)
     	    xxx = foo[0]; foo[0] = foo[1]; foo[1] = xxx;
     	}
 #ifdef ROCKBOX
-        if(write(fd, &sh, sizeof(sh)) < (ssize_t) (1 * sizeof(sh)))
+        if(write(fd, &sh, sizeof(sh)) < (ssize_t) sizeof(sh))
 #else
 	if (fwrite(&sh, sizeof(sh), 1, fd) < 1)
 #endif
