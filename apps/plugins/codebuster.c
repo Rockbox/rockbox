@@ -130,7 +130,8 @@ struct mm_line guesses[MAX_GUESSES_COUNT];
 
 /* Alias for pluginlib_getaction */
 static inline int get_button(void) {
-    return pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
+    return pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
 }
 
 /* Computes the margin to center an element */
