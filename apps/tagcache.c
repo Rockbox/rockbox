@@ -95,8 +95,6 @@ static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
 
-#define UNTAGGED "<Untagged>"
-
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAG_MAXLEN+32];
 

@@ -95,6 +95,9 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* Serialized DB. */
 #define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
 
+/* Tag to be used on untagged files. */
+#define UNTAGGED "<Untagged>"
+
 /* Numeric tags (we can use these tags with conditional clauses). */
 #define TAGCACHE_NUMERIC_TAGS ((1LU << tag_year) | (1LU << tag_discnumber) | \
     (1LU << tag_tracknumber) | (1LU << tag_length) | (1LU << tag_bitrate) | \

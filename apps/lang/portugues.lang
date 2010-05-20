@@ -13214,6 +13214,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Sem Etiqueta>"
+  </dest>
+  <voice>
+    *: "Sem etiqueta"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_OF
   desc: Shown in WPS: X of Y (tracks)
   user: core
