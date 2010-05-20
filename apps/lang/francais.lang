@@ -13345,3 +13345,51 @@
     lineout_poweroff: "Sortie audio"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rembobiner avant de reprendre"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rembobiner avant de reprendre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Inconnu>"
+  </source>
+  <dest>
+    *: "<Inconnu>"
+  </dest>
+  <voice>
+    *: "Inconnu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Station:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
