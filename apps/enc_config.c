@@ -400,7 +400,7 @@ bool enc_config_menu(struct encoder_config *cfg)
     }
     else
     {
-        splash(HZ, str(LANG_NO_SETTINGS));
+        splash(HZ, ID2P(LANG_NO_SETTINGS));
         return false;
     }
 } /* enc_config_menu */
@@ -458,7 +458,7 @@ bool enc_global_config_menu(void)
     }
     else
     {
-        splash(HZ, str(LANG_NO_SETTINGS));
+        splash(HZ, ID2P(LANG_NO_SETTINGS));
         return false;
     }
 } /* enc_global_config_menu */
