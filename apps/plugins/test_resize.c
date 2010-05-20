@@ -31,7 +31,7 @@
 PLUGIN_HEADER
 
 const struct button_mapping *plugin_contexts[]
-= {generic_actions, generic_directions};
+= {pla_main_ctx};
 
 
 /* Key assignement */
@@ -45,7 +45,7 @@ const struct button_mapping *plugin_contexts[]
 #define WIDTH_DECREASE           PLA_LEFT
 #define WIDTH_DECREASE_REPEAT    PLA_LEFT_REPEAT
 
-#define BUTTON_QUIT             PLA_CANCEL
+#define BUTTON_QUIT             PLA_EXIT
 #define CHANGE_MODE             PLA_SELECT
 
 #define MAX_OUTPUT_WIDTH    LCD_WIDTH
