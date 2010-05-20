@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id:$
  *
- * Copyright (C) 2010 Marcin Bukat
+ * Copyright (C) 2010 by Marcin Bukat
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +27,7 @@
 #include "timer.h"
 
 /* Settings for all possible clock frequencies (with properly working timers)
+ * NOTE: Some 5249 chips don't like having PLLDIV set to 0. We must avoid that!
  *
  *                    xxx_REFRESH_TIMER below
  * system.h, CPUFREQ_xxx_MULT    |
@@ -66,7 +68,7 @@ void cf_set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        PLLCR = 0x0102c049 | (PLLCR & 0x70C00000);
+        PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
         CSCR3 = 0x00000580; /* LCD: 4 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -87,7 +89,7 @@ void cf_set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        PLLCR = 0x05028045 | (PLLCR & 0x70C00000);
+        PLLCR = 0x0589e021 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
         CSCR3 = 0x00000180; /* LCD: 0 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -108,7 +110,7 @@ void cf_set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
         /* Power down PLL, but keep CLSEL and CRSEL */
-        PLLCR = 0x00000200 | (PLLCR & 0x70C00000);
+        PLLCR = 0x00800200 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR3 = 0x00000180; /* LCD: 0 wait states */
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
