@@ -1323,10 +1323,12 @@
     crossfade: "Crossfade"
   </source>
   <dest>
-    *: "Overvloeien"
+    *: none
+    crossfade: "Overvloeien"
   </dest>
   <voice>
-    *: "Overvloeien"
+    *: none
+    crossfade: "Overvloeien"
   </voice>
 </phrase>
 <phrase>
@@ -10544,7 +10546,8 @@
     *: "PLAY = Ja"
     cowond2*: "MENU of bovenaan rechts = Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip,sansafuze*: "SELECT = Ja"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Ja"
+    mrobe500: "PLAY, POWER, of bovenaan rechts = Ja"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Ja"
   </dest>
@@ -10571,6 +10574,7 @@
     mrobe500: "HEART = Instellen"
     iriverh100,iriverh120,iriverh300: "NAVI = Instellen"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Instellen"
+    gogearsa9200: "PLAY = Instellen"
     vibe500: "OK = Instellen"
   </dest>
   <voice>
