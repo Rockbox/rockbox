@@ -4943,10 +4943,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "MP3ファイルを使用"
+    *: "ディレクトリ名の .talk ファイルを使用"
   </dest>
   <voice>
-    *: "エムピースリーファイルを使用"
+    *: "ディレクトリ名のトーク ファイルを使用"
   </voice>
 </phrase>
 <phrase>
@@ -4971,10 +4971,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "MP3ファイルを使用"
+    *: "ファイル名の .talk ファイルを使用"
   </dest>
   <voice>
-    *: "エムピースリーファイルを使用"
+    *: "ファイル名のトーク ファイルを使用"
   </voice>
 </phrase>
 <phrase>
@@ -5010,13 +5010,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: "MP3ファイルを使用"
+    *: ".talk ファイル"
   </dest>
   <voice>
-    *: "エムピースリーファイルを使用"
+    *: "トーク ファイル"
   </voice>
 </phrase>
 <phrase>
@@ -6515,11 +6515,11 @@
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: "安全 (クリッピング)"
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "安全 (クリッピング)"
   </voice>
 </phrase>
 <phrase>
@@ -6532,11 +6532,11 @@
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: "ライブ用 (遅い)"
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "ライブ用 (遅い)"
   </voice>
 </phrase>
 <phrase>
@@ -6549,11 +6549,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: "DJ用 (遅い)"
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "D J 用 (遅い)"
   </voice>
 </phrase>
 <phrase>
@@ -6566,11 +6566,11 @@
   </source>
   <dest>
     *: none
-    agc: "Medium"
+    agc: "中音量"
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "中音量"
   </voice>
 </phrase>
 <phrase>
@@ -6583,11 +6583,11 @@
   </source>
   <dest>
     *: none
-    agc: "Voice (fast)"
+    agc: "音声用 (早い)"
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "音声用 (早い)"
   </voice>
 </phrase>
 <phrase>
@@ -8270,6 +8270,8 @@
     *: "時間"
   </voice>
 </phrase>
+/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
+ * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -8566,10 +8568,10 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "拡張子配列が一杯です"
+    *: "拡張子の個数が上限を超えています"
   </dest>
   <voice>
-    *: "拡張子配列が一杯です"
+    *: "拡張子の個数が上限を超えています"
   </voice>
 </phrase>
 <phrase>
@@ -8580,10 +8582,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "ファイル形式配列が一杯です"
+    *: "ファイル形式の個数が上限を超えています"
   </dest>
   <voice>
-    *: "ファイル形式配列が一杯です"
+    *: "ファイル形式の個数が上限を超えています"
   </voice>
 </phrase>
 <phrase>
@@ -12613,7 +12615,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
@@ -12630,7 +12632,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
@@ -12647,7 +12649,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
@@ -12664,7 +12666,7 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
@@ -12724,6 +12726,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "コンプレッサ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "コンプレッサ"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_TOP_QS_ITEM
   desc: used for the submenu name for the quickscreen items
   user: core
@@ -12772,6 +12791,227 @@
   <voice>
     *: none
     radio: "その他"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "しきい値"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "しきい値"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "圧縮率"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "圧縮率"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 対 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 対 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 対 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 対 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "リミット"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "リミット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ゲインの構成"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ゲインの構成"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "自動"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "自動"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ニー"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ニー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ハード・ニー"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ハード ニー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ソフト・ニー"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ソフト・ニー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "リリースタイム"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "リリースタイム"
   </voice>
 </phrase>
 <phrase>
@@ -13011,5 +13251,427 @@
   <voice>
     *:none
     lcd_bitmap: "リモコンの基本スキン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "メイン画面"
+  </dest>
+  <voice>
+    *:none
+    remote: "メイン画面"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "リモート画面"
+  </dest>
+  <voice>
+    *:none
+    remote: "リモート画面"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "ヒストグラムの間隔"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "ヒストグラムの間隔"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "ライン出力"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "ライン出力"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "ホットキー"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "ホットキー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS のホットキー"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "W P S のホットキー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "ファイル表示のホットキー"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "ファイル表示のホットキー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "レジューム時の巻き戻し時間"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "レジューム時の巻き戻し時間"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "リモートFMラジオ"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "リモート F M ラジオ"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "ラジオ用の画面のスキン"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "ラジオ用のリモート画面のスキン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "放送局:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "トーン・コントロール"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "トーン コントロール"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "トーン・コントロールの高度な設定"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "トーン コントロールの高度な設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "バンド %d のゲイン"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "バンドのゲイン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "バンド %d の周波数"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "バンドの周波数"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "バンド %d の幅"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "バンド幅"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ナロー"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "ナロー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ワイド"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "ワイド"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3D エンハンス"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3 D エンハンス"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<タグ無し>"
+  </dest>
+  <voice>
+    *: "タグ無し"
   </voice>
 </phrase>
