@@ -1395,7 +1395,7 @@ void sd_sleepnow(void)
 
 bool sd_disk_is_active(void)
 {
-    return sd_mtx.locked;
+    return false;
 }
 
 int sd_soft_reset(void)

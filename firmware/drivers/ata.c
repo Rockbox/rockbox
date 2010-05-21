@@ -371,6 +371,7 @@ static int ata_transfer_sectors(unsigned long start,
     ata_led(true);
 
     if ( sleeping ) {
+        sleeping = false; /* set this now since it'll be on */
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
@@ -467,7 +468,6 @@ static int ata_transfer_sectors(unsigned long start,
             if (spinup) {
                 spinup_time = current_tick - spinup_start;
                 spinup = false;
-                sleeping = false;
                 poweroff = false;
             }
         }
@@ -497,7 +497,6 @@ static int ata_transfer_sectors(unsigned long start,
                 if (spinup) {
                     spinup_time = current_tick - spinup_start;
                     spinup = false;
-                    sleeping = false;
                     poweroff = false;
                 }
 
@@ -817,13 +816,16 @@ bool ata_disk_is_active(void)
 
 static int ata_perform_sleep(void)
 {
-    mutex_lock(&ata_mtx);
+    /* guard against calls made with checks of these variables outside
+       the mutex that may not be on the ata thread; status may have changed. */
+    if (spinup || sleeping) {
+        return 0;
+    }
 
     SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
-        mutex_unlock(&ata_mtx);
         return -1;
     }
 
@@ -832,12 +834,10 @@ static int ata_perform_sleep(void)
     if (!wait_for_rdy())
     {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
-        mutex_unlock(&ata_mtx);
         return -2;
     }
 
     sleeping = true;
-    mutex_unlock(&ata_mtx);
     return 0; 
 }
 
@@ -848,10 +848,12 @@ void ata_sleep(void)
 
 void ata_sleepnow(void)
 {
-    if (!spinup && !sleeping && !ata_mtx.locked && initialized)
+    if (!spinup && !sleeping && initialized)
     {
         call_storage_idle_notifys(false);
+        mutex_lock(&ata_mtx);
         ata_perform_sleep();
+        mutex_unlock(&ata_mtx);
     }
 }
 
@@ -864,7 +866,6 @@ static void ata_thread(void)
 {
     static long last_sleep = 0;
     struct queue_event ev;
-    static long last_seen_mtx_unlock = 0;
 #ifdef ALLOW_USB_SPINDOWN
     static bool usb_mode = false;
 #endif
@@ -876,21 +877,17 @@ static void ata_thread(void)
             case SYS_TIMEOUT:
                 if (!spinup && !sleeping)
                 {
-                    if (!ata_mtx.locked)
+                    if (TIME_AFTER( current_tick, 
+                                    last_disk_activity + (HZ*2) ) )
                     {
-                        if (!last_seen_mtx_unlock)
-                            last_seen_mtx_unlock = current_tick;
-                        if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
-                        {
 #ifdef ALLOW_USB_SPINDOWN
-                            if(!usb_mode)
+                        if(!usb_mode)
 #endif
-                            {
-                                call_storage_idle_notifys(false);
-                            }
-                            last_seen_mtx_unlock = 0;
+                        {
+                            call_storage_idle_notifys(false);
                         }
                     }
+
                     if ( sleep_timeout &&
                          TIME_AFTER( current_tick, 
                                     last_user_activity + sleep_timeout ) &&
@@ -903,8 +900,10 @@ static void ata_thread(void)
                         {
                             call_storage_idle_notifys(true);
                         }
+                        mutex_lock(&ata_mtx);
                         ata_perform_sleep();
                         last_sleep = current_tick;
+                        mutex_unlock(&ata_mtx);
                     }
                 }
 
@@ -929,9 +928,11 @@ static void ata_thread(void)
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 /* There is no need to force ATA power on */
 #else
+                mutex_lock(&ata_mtx);
                 if (sleeping) {
-                    mutex_lock(&ata_mtx);
                     ata_led(true);
+                    sleeping = false; /* set this now since it'll be on */
+
                     if (poweroff) {
                         ata_power_on();
                         poweroff = false;
@@ -939,10 +940,10 @@ static void ata_thread(void)
                     else {
                         perform_soft_reset();
                     }
-                    sleeping = false;                   
+
                     ata_led(false);
-                    mutex_unlock(&ata_mtx);
                 }
+                mutex_unlock(&ata_mtx);
 
                 /* Wait until the USB cable is extracted again */
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
