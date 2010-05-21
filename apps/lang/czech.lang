@@ -413,7 +413,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Záznam"
+    recording: "Záznam, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -458,7 +458,7 @@
     *: "Pluginy"
   </dest>
   <voice>
-    *: "Plaginy"
+    *: "Plaginy, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -9321,7 +9321,7 @@
     *: ""
   </dest>
   <voice>
-    *: "sekundy"
+    *: "sekund"
   </voice>
 </phrase>
 <phrase>
@@ -9349,7 +9349,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minuty"
+    *: "minut"
   </voice>
 </phrase>
 <phrase>
@@ -9377,7 +9377,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hodiny"
+    *: "hodin"
   </voice>
 </phrase>
 <phrase>
@@ -13310,11 +13310,62 @@
   </source>
   <dest>
     *: none
-    lineout_poweroff: "Vnější výstup"
+    lineout_poweroff: "Linkový výstup"
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Vnější výstup"
+    lineout_poweroff: "Linkový výstup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
   </voice>
 </phrase>
 <phrase>
@@ -13335,6 +13386,57 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zkratková klávesa přehrávací obrazovky"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zkratková klávesa přehrávací obrazovky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zkratková klávesa prohlížeče souborů"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zkratková klávesa prohlížeče souborů"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_RESUME_REWIND
   desc: in playback settings menu
   user: core
@@ -13349,5 +13451,223 @@
   <voice>
     *: none
     swcodec: "Přetočit zpět před pokračováním v přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Dálkové FM rádio"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Dálkové EFEM rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "vzhled obrazovky rádia"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "vzhled obrazovky dálkového rádia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Stanice:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Regulace tónu"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Regulace tónu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Pokročilé nastavení regulace tónu"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Pokročilé nastavení regulace tónu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Rozsah zesílení %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Rozsah zesílení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Rozsah frekvence %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Rozsah frekvence"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Rozsah šířky %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Rozsah šířky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Zúžení"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Zúžení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Rozšíření"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Rozšíření"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3-D vylepšení"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "TŘIDÉ vylepšení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Bez popisu>"
+  </dest>
+  <voice>
+    *: "Bez popisu"
   </voice>
 </phrase>
