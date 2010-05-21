@@ -1211,6 +1211,19 @@ void dircache_add_file(const char *path, long startcluster)
     entry->startcluster = startcluster;
 }
 
+/* Check if dircache state is still valid. With hotswap, on fs changed,
+ * the dircache became invalid but functions coulld be called befire the
+ * dircache thread process the message */
+static void check_dircache_state(void)
+{
+    if(check_event_queue())
+    {
+        /* Keep this coherent with check_event_queue(). Currently, all the
+         * messages that return true will lead to disable. */
+        dircache_initialized = false;
+    }
+}
+
 DIR_CACHED* opendir_cached(const char* name)
 {
     int dd;
@@ -1235,6 +1248,8 @@ DIR_CACHED* opendir_cached(const char* name)
     }
     
     pdir->busy = true;
+    /* check real dircache state */
+    check_dircache_state();
 
     if (!dircache_initialized)
     {
