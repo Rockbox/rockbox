@@ -513,9 +513,10 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     {
         /* prepare scroll line */
         char *end;
+        int count;
 
         memset(s->line, 0, sizeof s->line);
-        strcpy(s->line, string);
+        strlcpy(s->line, string, sizeof s->line);
 
         /* get width */
         s->len = utf8length(s->line);
@@ -531,13 +532,15 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
 
         if (!s->bidir)  /* add spaces if scrolling in the round */
         {
-            strcat(s->line, "   ");
+            strlcat(s->line, "   ", sizeof s->line);
             /* get new width incl. spaces */
             s->len += SCROLL_SPACING;
         }
 
         end = strchr(s->line, '\0');
-        strlcpy(end, string, utf8seek(s->line, current_vp->width));
+        len = sizeof s->line - (end - s->line);
+        count = utf8seek(s->line, current_vp->width);
+        strlcpy(end, string, MIN(count, len));
 
         s->vp = current_vp;
         s->y = y;
