@@ -446,7 +446,7 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     {
         int handle = playback_current_aa_hid(data->playback_aa_slot);
 #if CONFIG_TUNER
-        if (in_radio_screen())
+        if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
         {
             struct dim dim = {data->albumart->width, data->albumart->height};
             handle = radio_get_art_hid(&dim);
