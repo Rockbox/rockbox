@@ -155,7 +155,9 @@ static bool check_event_queue(void)
 {
     struct queue_event ev;
     
-    queue_wait_w_tmo(&dircache_queue, &ev, 0);
+    if(!queue_peek(&dircache_queue, &ev))
+        return false;
+    
     switch (ev.id)
     {
         case DIRCACHE_STOP:
@@ -163,8 +165,6 @@ static bool check_event_queue(void)
 #ifdef HAVE_HOTSWAP
         case SYS_FS_CHANGED:
 #endif
-            /* Put the event back into the queue. */
-            queue_post(&dircache_queue, ev.id, ev.data);
             return true;
     }
     
@@ -1092,6 +1092,7 @@ void dircache_mkdir(const char *path)
     if (block_until_ready())
         return ;
         
+        
     logf("mkdir: %s", path);
     dircache_new_entry(path, ATTR_DIRECTORY);
 }
@@ -1211,17 +1212,9 @@ void dircache_add_file(const char *path, long startcluster)
     entry->startcluster = startcluster;
 }
 
-/* Check if dircache state is still valid. With hotswap, on fs changed,
- * the dircache became invalid but functions could be called before the
- * dircache thread processes the message */
-static void check_dircache_state(void)
+static bool is_disable_msg_pending(void)
 {
-    if(check_event_queue())
-    {
-        /* Keep this coherent with check_event_queue(). Currently, all the
-         * messages that return true will lead to disable. */
-        dircache_initialized = false;
-    }
+    return check_event_queue();
 }
 
 DIR_CACHED* opendir_cached(const char* name)
@@ -1248,10 +1241,8 @@ DIR_CACHED* opendir_cached(const char* name)
     }
     
     pdir->busy = true;
-    /* check real dircache state */
-    check_dircache_state();
 
-    if (!dircache_initialized)
+    if (!dircache_initialized || is_disable_msg_pending())
     {
         pdir->internal_entry = NULL;
         pdir->regulardir = opendir_uncached(name);   
