@@ -27,6 +27,10 @@
 #define OFF_T_MAX (~((off_t)1 << (sizeof (off_t)*8 - 1)))
 #endif
 
+#ifndef OFF_T_MIN
+#define OFF_T_MIN ((off_t)1 << (sizeof (off_t)*8 - 1))
+#endif
+
 #define DISK_BUF_PAGE_SHIFT 15  /* 32KB cache lines */
 #define DISK_BUF_PAGE_SIZE (1 << DISK_BUF_PAGE_SHIFT)
 #define DISK_BUF_PAGE_MASK (DISK_BUF_PAGE_SIZE-1)

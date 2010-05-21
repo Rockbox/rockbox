@@ -60,8 +60,8 @@ void str_end_of_stream(struct stream *str)
      * its behalf. Set right to the min first so a thread reading the
      * overall window gets doesn't see this as valid no matter what the
      * file length. */
-    str->hdr.win_right = LONG_MIN;
-    str->hdr.win_left = LONG_MAX;
+    str->hdr.win_right = OFF_T_MIN;
+    str->hdr.win_left = OFF_T_MAX;
     /* No packets */
     str->curr_packet = str->curr_packet_end = NULL;
     /* No flags */
