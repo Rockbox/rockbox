@@ -3714,14 +3714,14 @@ static bool check_event_queue(void)
 {
     struct queue_event ev;
     
-    queue_wait_w_tmo(&tagcache_queue, &ev, 0);
+    if(!queue_peek(&tagcache_queue, &ev))
+        return false;
+    
     switch (ev.id)
     {
         case Q_STOP_SCAN:
         case SYS_POWEROFF:
         case SYS_USB_CONNECTED:
-            /* Put the event back into the queue. */
-            queue_post(&tagcache_queue, ev.id, ev.data);
             return true;
     }
     
