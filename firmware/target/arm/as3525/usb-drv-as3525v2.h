@@ -191,7 +191,7 @@
 #define USB_DIEPINT_xfercompl       (1 << 0) /** Transfer complete */
 #define USB_DIEPINT_epdisabled      (1 << 1) /** Endpoint disabled */
 #define USB_DIEPINT_ahberr          (1 << 2) /** AHB error */
-#define USB_DIEPINT_timeout         (1 << 3) /** Tiemout handshake (non-iso TX) */
+#define USB_DIEPINT_timeout         (1 << 3) /** Timeout handshake (non-iso TX) */
 #define USB_DIEPINT_intktxfemp      (1 << 4) /** IN token received with tx fifo empty */
 #define USB_DIEPINT_intknepmis      (1 << 5) /** IN token received with ep mismatch */
 #define USB_DIEPINT_inepnakeff      (1 << 6) /** IN endpoint NAK effective */
