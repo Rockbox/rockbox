@@ -712,6 +712,7 @@ void queue_reply(struct event_queue *q, intptr_t retval)
         restore_irq(oldlevel);
     }
 }
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 bool queue_peek(struct event_queue *q, struct queue_event *ev)
 {
@@ -734,7 +735,6 @@ bool queue_peek(struct event_queue *q, struct queue_event *ev)
 
     return have_msg;
 }
-#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 /* Poll queue to see if a message exists - careful in using the result if
  * queue_remove_from_head is called when messages are posted - possibly use
