@@ -121,7 +121,7 @@ restart_track:
                 goto restart_track; /* Pretend you never saw this... */
             }
 
-            elapsedtime = seek(ci->seek_time, &wfx);
+            elapsedtime = asf_seek(ci->seek_time, &wfx);
             if (elapsedtime < 1){
                 ci->seek_complete();
                 goto next_track;

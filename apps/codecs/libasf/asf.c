@@ -378,7 +378,7 @@ int asf_get_timestamp(int *duration)
 }
 
 /*entry point for seeks*/
-int seek(int ms, asf_waveformatex_t* wfx)
+int asf_seek(int ms, asf_waveformatex_t* wfx)
 {
     int time, duration, delta, temp, count=0;
 

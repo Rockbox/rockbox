@@ -42,7 +42,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
                     
 int asf_get_timestamp(int *duration);
 
-int seek(int ms, asf_waveformatex_t* wfx);
+int asf_seek(int ms, asf_waveformatex_t* wfx);
 
 
 #endif /* _ASF_H */
