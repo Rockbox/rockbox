@@ -37,13 +37,13 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3300, 3692, 3740, 3772, 3798, 3828, 3876, 3943, 4013, 4094, 4194 }
+    { 3300, 3653, 3701, 3735, 3768, 3790, 3833, 3900, 3966, 4056, 4140 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3417, 3802, 3856, 3888, 3905, 3931, 3973, 4025, 4084, 4161, 4219
+    3333, 3757, 3815, 3845, 3867, 3900, 3950, 4008, 4078, 4166, 4167
 };
 #endif /* CONFIG_CHARGING */
