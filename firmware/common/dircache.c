@@ -1212,8 +1212,8 @@ void dircache_add_file(const char *path, long startcluster)
 }
 
 /* Check if dircache state is still valid. With hotswap, on fs changed,
- * the dircache became invalid but functions coulld be called befire the
- * dircache thread process the message */
+ * the dircache became invalid but functions could be called before the
+ * dircache thread processes the message */
 static void check_dircache_state(void)
 {
     if(check_event_queue())
