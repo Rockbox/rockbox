@@ -26,6 +26,14 @@
 
 void power_off(void)
 {
+#ifdef HAVE_RTC_ALARM
+    /* as3543 RTC wake-up needs a specific power down */
+
+    extern void rtc_alarm_poweroff(void); /* in drivers/rtc/rtc_as3514.c */
+
+    rtc_alarm_poweroff(); /* will return if wake-up isn't enabled */
+#endif /* HAVE_RTC_ALARM */
+
     /* clear bit 0 of system register */
     ascodec_write(AS3514_SYSTEM, ascodec_read(AS3514_SYSTEM) & ~1);
 

@@ -51,6 +51,112 @@ static inline bool is_leapyear(int year)
         return false;
 }
 
+#ifdef HAVE_RTC_ALARM /* as3543 */
+static int wakeup_h;
+static int wakeup_m;
+static bool alarm_enabled = false;
+
+void rtc_set_alarm(int h, int m)
+{
+    wakeup_h = h;
+    wakeup_m = m;
+}
+
+void rtc_get_alarm(int *h, int *m)
+{
+    *h = wakeup_h;
+    *m = wakeup_m;
+}
+
+void rtc_alarm_poweroff(void)
+{
+    if(!alarm_enabled)
+        return;
+
+    struct tm tm;
+    rtc_read_datetime(&tm);
+    int hours = wakeup_h - tm.tm_hour;
+    int mins  = wakeup_m - tm.tm_min;
+    if(mins < 0)
+    {
+        mins += 60;
+        hours -= 1;
+    }
+    if(hours < 0)
+        hours += 24;
+
+    uint32_t seconds = hours*3600 + mins*60;
+    if(seconds == 0)
+        seconds = 24*3600;
+
+    seconds -= tm.tm_sec;
+
+    disable_irq();
+
+    ascodec_write_pmu(0x1a, 4, 0x0); // In_Cntr : disable hearbeat source
+
+    ascodec_write(AS3543_WAKEUP, seconds);
+    seconds >>= 8;
+    ascodec_write(AS3543_WAKEUP, seconds);
+    seconds >>= 8;
+    seconds |= 1<<7; /* enable bit */
+    ascodec_write(AS3543_WAKEUP, seconds);
+
+    /* write our watermark : desired time of wake up */
+    ascodec_write(AS3543_WAKEUP, wakeup_h);
+    ascodec_write(AS3543_WAKEUP, wakeup_m);
+
+    ascodec_write(AS3514_SYSTEM, (1<<3) | (1<<0)); // enable hearbeat watchdog
+
+    while(1);
+}
+
+bool rtc_enable_alarm(bool enable)
+{
+    return alarm_enabled = enable;
+}
+
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    (void) release_alarm;
+
+    /* was it an alarm that triggered power on ? */
+    bool alarm_start = false;
+
+    /* 3 first reads give the 23 bits counter and enable bit */
+    ascodec_read(AS3543_WAKEUP); /* bits  7:0  */
+    ascodec_read(AS3543_WAKEUP); /* bits 15:8  */
+    if(ascodec_read(AS3543_WAKEUP) & (1<<7)) /* enable bit */
+    {
+        alarm_enabled = true;
+
+        /* subsequent reads give the 16 bytes static SRAM */
+        wakeup_h = ascodec_read(AS3543_WAKEUP);
+        wakeup_m = ascodec_read(AS3543_WAKEUP);
+
+        struct tm tm;
+        rtc_read_datetime(&tm);
+
+        /* do we wake up at the programmed time, or for another reason ? */
+        if(wakeup_h == tm.tm_hour && wakeup_m == tm.tm_min)
+            alarm_start = true;
+    }
+
+    /* disable alarm */
+    ascodec_write(AS3543_WAKEUP, 0); /* bits  7:0  */
+    ascodec_write(AS3543_WAKEUP, 0); /* bits 15:8  */
+    ascodec_write(AS3543_WAKEUP, 0); /* bits 22:16 + enable bit */
+
+    return alarm_start;
+}
+
+bool rtc_check_alarm_flag(void)
+{
+    /* We don't need to do anything special if it has already fired */
+    return false;
+}
+#endif /* HAVE_RTC_ALARM */
+
 void rtc_init(void)
 {
 }
@@ -168,4 +274,3 @@ int rtc_write_datetime(const struct tm *tm)
     }
     return 1;
 }
-

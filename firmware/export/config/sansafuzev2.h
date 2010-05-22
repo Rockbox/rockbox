@@ -61,9 +61,13 @@
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
-
+#ifndef BOOTLOADER
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+#endif
 
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS

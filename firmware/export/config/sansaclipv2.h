@@ -97,9 +97,12 @@
 #define HAVE_AS3514
 #define HAVE_AS3543
 
-/* define this if you have a real-time clock */
 #ifndef BOOTLOADER
+/* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */

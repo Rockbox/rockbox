@@ -96,6 +96,10 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define AS3514_SUPERVISOR 0x24
 #endif
 
+#ifdef HAVE_AS3543
+#define AS3543_WAKEUP     0x22
+#endif
+
 /* AS3543 has 2 IRQ_ENRD registers at 0x23 and 0x24, but we don't use them
  * We call the real IRQ_ENRD2 register, IRQ_ENRD0, to stay compatible with
  * as3514, because the bits we use are the same
