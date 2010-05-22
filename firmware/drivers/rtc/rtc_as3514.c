@@ -111,9 +111,9 @@ void rtc_alarm_poweroff(void)
     while(1);
 }
 
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
-    return alarm_enabled = enable;
+    alarm_enabled = enable;
 }
 
 bool rtc_check_alarm_started(bool release_alarm)

@@ -169,9 +169,9 @@ void rtc_set_alarm(int h, int m)
     (void)m;
 }
 
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
-    return enable;
+    (void)enable;
 }
 
 extern bool sim_alarm_wakeup;
