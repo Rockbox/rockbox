@@ -83,7 +83,7 @@ bool alarm_screen(void)
             {
                 screens[i].set_viewport(&vp[i]);
                 screens[i].clear_viewport();
-                screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
+                screens[i].puts(0, 4, str(LANG_ALARM_MOD_KEYS));
             }
             /* Talk when entering the wakeup screen */
             speak_time(h, m, true, true);
@@ -93,7 +93,8 @@ bool alarm_screen(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].set_viewport(&vp[i]);
-            screens[i].putsf(0, 1, str(LANG_ALARM_MOD_TIME), h, m);
+            screens[i].putsf(0, 1, str(LANG_ALARM_MOD_TIME));
+            screens[i].putsf(0, 2, "%02d:%02d", h, m);
             screens[i].update_viewport();
             screens[i].set_viewport(NULL);
         }

@@ -4663,11 +4663,11 @@
   user: core
   <source>
     *: none
-    alarm: "Alarm Time: %02d:%02d"
+    alarm: "Alarm Time:"
   </source>
   <dest>
     *: none
-    alarm: "アラーム時刻: %02d:%02d"
+    alarm: "アラーム時刻:"
   </dest>
   <voice>
     *: none

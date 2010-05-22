@@ -4665,11 +4665,11 @@
   user: core
   <source>
     *: none
-    alarm: "Alarm Time: %02d:%02d"
+    alarm: "Alarm Time:"
   </source>
   <dest>
     *: none
-    alarm: "זמן השכמה: %02d:%02d"
+    alarm: "זמן השכמה:"
   </dest>
   <voice>
     *: none

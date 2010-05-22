@@ -3935,10 +3935,10 @@
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Alarm Time: %02d:%02d"
+    *: "Alarm Time:"
   </source>
   <dest>
-    *: "Hora da Alarma: %02d:%02d"
+    *: "Hora da Alarma:"
   </dest>
   <voice>
     *: ""
