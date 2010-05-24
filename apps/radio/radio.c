@@ -279,7 +279,9 @@ void radio_pause(void)
     }
 
     tuner_set(RADIO_MUTE, 1);
-    tuner_set(RADIO_SLEEP, 1);
+    /* For si4700: 2==this is really 'pause'. other tuners treat it
+     * like 'bool'. */
+    tuner_set(RADIO_SLEEP, 2);
 
     radio_status = FMRADIO_PAUSED;
 } /* radio_pause */
