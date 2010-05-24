@@ -221,17 +221,23 @@ test_core_jpeg.c
 #endif
 test_disk.c
 test_fps.c
+#ifdef HAVE_LCD_BITMAP
 test_gfx.c
 #ifndef HAVE_LCD_COLOR
 test_grey.c
 test_greylib_bitmap_scale.c
 #endif
+#endif
 test_mem.c
+#ifdef HAVE_LCD_BITMAP
 test_mem_jpeg.c
+#endif
 #ifdef HAVE_LCD_COLOR
 test_resize.c
 #endif
+#if CONFIG_CODEC == SWCODEC
 test_sampr.c
+#endif
 test_scanrate.c
 #ifdef HAVE_TOUCHSCREEN
 test_touchscreen.c
