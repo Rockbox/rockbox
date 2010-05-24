@@ -337,6 +337,7 @@ void pcm_rec_dma_init(void)
     /* i2c clk src = I2SOUTIF, sdata src = AFE,
      * data valid at positive edge of SCLK */
     I2SIN_CONTROL = (1<<2);
+    I2SIN_MASK = 0; /* disables all interrupts */
 }
 
 
