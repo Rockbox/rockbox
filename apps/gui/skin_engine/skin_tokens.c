@@ -417,11 +417,9 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
         case WPS_TOKEN_TUNER_CURFREQ:
             return format_freq_MHz(radio_current_frequency(),
                             region_data->freq_step, buf, buf_size);
-        case WPS_TOKEN_PRESET_ID:
-            snprintf(buf, buf_size, "%d", radio_current_preset() + 1 + preset_offset);
-            return buf;
         case WPS_TOKEN_PRESET_NAME:
         case WPS_TOKEN_PRESET_FREQ:
+        case WPS_TOKEN_PRESET_ID:
         {
             int preset_count = radio_preset_count();
             int cur_preset = radio_current_preset();
@@ -434,9 +432,11 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 preset += preset_count;
             if (token->type == WPS_TOKEN_PRESET_NAME)
                 snprintf(buf, buf_size, "%s", radio_get_preset(preset)->name);
-            else
+            else if (token->type == WPS_TOKEN_PRESET_FREQ)
                 format_freq_MHz(radio_get_preset(preset)->frequency,
                                 region_data->freq_step, buf, buf_size);
+            else
+                snprintf(buf, buf_size, "%d", preset + 1);
             return buf;
         }
         case WPS_TOKEN_PRESET_COUNT:
