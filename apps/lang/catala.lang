@@ -17,6 +17,7 @@
 # Catalan language file, translated by:
 # - Victor Zabalza
 # - Vicente Ibarra
+# - Adrià Cereto Massagué
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -25,10 +26,10 @@
     *: "Yes"
   </source>
   <dest>
-    *: "Si"
+    *: "Sí"
   </dest>
   <voice>
-    *: "Si"
+    *: "Sí"
   </voice>
 </phrase>
 <phrase>
@@ -81,10 +82,10 @@
     *: "Ask"
   </source>
   <dest>
-    *: "Preguntar"
+    *: "Pregunta"
   </dest>
   <voice>
-    *: "Preguntar"
+    *: "Pregunta"
   </voice>
 </phrase>
 <phrase>
@@ -207,10 +208,10 @@
     *: "Cancelled"
   </source>
   <dest>
-    *: "Cancelat"
+    *: "Cancel·lat"
   </dest>
   <voice>
-    *: "Cancelat"
+    *: "Cancel·lat"
   </voice>
 </phrase>
 <phrase>
@@ -221,10 +222,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "ha fallat"
+    *: "Ha fallat"
   </dest>
   <voice>
-    *: "ha fallat"
+    *: "Ha fallat"
   </voice>
 </phrase>
 <phrase>
@@ -261,17 +262,21 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
-    *: "PLAY = Si"
-    iriverh100,iriverh120,iriverh300: "NAVI = Si"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Si"
+    *: "PLAY = Sí"
+    cowond2*: "MENU, o  a dalt a la dreta = Sí"
+    iriverh100,iriverh120,iriverh300: "NAVI = Sí"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Sí"
+    mrobe500: "PLAY, POWER, o a dalt a la dreta = Sí"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Si"
+    vibe500: "OK = Sí"
   </dest>
   <voice>
     *: ""
@@ -358,10 +363,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "Reproduïnt"
+    *: "Reproduint"
   </dest>
   <voice>
-    *: "Reproduïnt"
+    *: "Reproduint"
   </voice>
 </phrase>
 <phrase>
@@ -372,10 +377,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "Reprendre Reproducció"
+    *: "Reprendre reproducció"
   </dest>
   <voice>
-    *: "Reprendre Reproducció"
+    *: "Reprendre reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -419,11 +424,11 @@
   </source>
   <dest>
     *: none
-    radio: "Radio FM"
+    radio: "Ràdio FM"
   </dest>
   <voice>
     *: none
-    radio: "Radio F M"
+    radio: "Ràdio F M"
   </voice>
 </phrase>
 <phrase>
@@ -451,7 +456,7 @@
     *: "Connectors"
   </dest>
   <voice>
-    *: "Mostrar Connectors"
+    *: "Mostra Connectors"
   </voice>
 </phrase>
 <phrase>
@@ -476,7 +481,7 @@
     *: "Select Bookmark"
   </source>
   <dest>
-    *: "Escollir Punt de Pàgina"
+    *: "Escollir punt de pàgina"
   </dest>
   <voice>
     *: "Escollir Punt de Pàgina"
@@ -518,7 +523,7 @@
     *: "<Invalid Bookmark>"
   </source>
   <dest>
-    *: "<Punt de Pàgina invàlid>"
+    *: "<Punt de pàgina invàlid>"
   </dest>
   <voice>
     *: "Punt de Pàgina invàlid"
@@ -549,7 +554,7 @@
     *: "Reprendre"
   </dest>
   <voice>
-    *: "Resume"
+    *: "Reprendre"
   </voice>
 </phrase>
 <phrase>
@@ -560,10 +565,10 @@
     *: "Delete"
   </source>
   <dest>
-    *: "Esborrar"
+    *: "Esborra"
   </dest>
   <voice>
-    *: "Esborrar"
+    *: "Esborra"
   </voice>
 </phrase>
 <phrase>
@@ -574,10 +579,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Crear un Punt de pàgina?"
+    *: "Crear un punt de pàgina?"
   </dest>
   <voice>
-    *: "Crear un Punt de pàgina?"
+    *: "Crear un punt de pàgina?"
   </voice>
 </phrase>
 <phrase>
@@ -588,10 +593,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Punts de pàgina Creat"
+    *: "Punt de pàgina creat"
   </dest>
   <voice>
-    *: "Punts de pàgina Creat"
+    *: "Punt de pàgina Creat"
   </voice>
 </phrase>
 <phrase>
@@ -602,10 +607,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Errada en crear el Punt de pàgina"
+    *: "Error en crear el punt de pàgina"
   </dest>
   <voice>
-    *: "Errada en crear el Punt de pàgina"
+    *: "Error en crear el Punt de pàgina"
   </voice>
 </phrase>
 <phrase>
@@ -616,7 +621,7 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Punt de pàgina Buit"
+    *: "Punt de pàgina buit"
   </dest>
   <voice>
     *: "Punt de pàgina Buit"
@@ -630,7 +635,7 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Opcions de So"
+    *: "Opcions de so"
   </dest>
   <voice>
     *: "Opcions de so"
@@ -686,10 +691,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "Equilibri"
+    *: "Balanç"
   </dest>
   <voice>
-    *: "Equilibri"
+    *: "Balanç"
   </voice>
 </phrase>
 <phrase>
@@ -756,7 +761,7 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Mono Esquerre"
+    *: "Mono esquerre"
   </dest>
   <voice>
     *: "Mono Esquerre"
@@ -770,7 +775,7 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Mono Dret"
+    *: "Mono dret"
   </dest>
   <voice>
     *: "Mono Dret"
@@ -798,7 +803,7 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Amplada d'Estèreo"
+    *: "Amplada d'estèreo"
   </dest>
   <voice>
     *: "Amplada d'estéreo"
@@ -848,7 +853,7 @@
   </source>
   <dest>  
     *: none
-    swcodec: "Guany Creuat"
+    swcodec: "Guany creuat"
   </dest>
   <voice>  
     *: none
@@ -1001,11 +1006,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Desar EQ"
+    swcodec: "Desa EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Desar equalitzador"
+    swcodec: "Desa equalitzador"
   </voice>
 </phrase>
 <phrase>
@@ -1022,7 +1027,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Veure equalitzador desats"
+    swcodec: "Veure equalitzadors desats"
   </voice>
 </phrase>
 <phrase>
@@ -1051,11 +1056,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Guany Banda %d Hz"
+    swcodec: "Guany de banda %d Hz"
   </dest>
   <voice>
     *: none
-    swcodec: "hertz guany banda"
+    swcodec: "Guany de banda %d Hz"
   </voice>
 </phrase>
 <phrase>
@@ -1068,11 +1073,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Filtre nivell baix"
+    swcodec: "Filtre de nivell baix"
   </dest>
   <voice>
     *: none
-    swcodec: "Filtre nivell baix"
+    swcodec: "Filtre de nivell baix"
   </voice>
 </phrase>
 <phrase>
@@ -1102,11 +1107,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Filtre nivell alt"
+    swcodec: "Filtre de nivell alt"
   </dest>
   <voice>
     *: none
-    swcodec: "Filtre nivell alt"
+    swcodec: "Filtre de nivell alt"
   </voice>
 </phrase>
 <phrase>
@@ -1119,7 +1124,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Freqüència de Tall"
+    swcodec: "Freqüència de tall"
   </dest>
   <voice>
     *: none
@@ -1136,7 +1141,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Freqüència Central"
+    swcodec: "Freqüència central"
   </dest>
   <voice>
     *: none
@@ -1289,11 +1294,11 @@
   </source>
   <dest>
     *: none
-    masf: "Auto Volum"
+    masf: "Volum auto."
   </dest>
   <voice>
     *: none
-    masf: "Auto Volum"
+    masf: "Volum automàtic"
   </voice>
 </phrase>
 <phrase>
@@ -1322,11 +1327,11 @@
   </source>
   <dest>
     *: none
-    masf: "Super greus"
+    masf: "Súper greus"
   </dest>
   <voice>
     *: none
-    masf: "Super greus"
+    masf: "Súper greus"
   </voice>
 </phrase>
 <phrase>
@@ -1356,11 +1361,11 @@
   </source>
   <dest>
     *: none
-    masf: "Potencia MDB"
+    masf: "Potència MDB"
   </dest>
   <voice>
     *: none
-    masf: "Potencia MDB"
+    masf: "Potència MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1436,10 +1441,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Opcions Reproducció"
+    *: "Opcions de reproducció"
   </dest>
   <voice>
-    *: "Opcions Reproducció"
+    *: "Opcions de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -1520,10 +1525,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Reproduir primer la cançó marcada"
+    *: "Reproduir primer la cançó seleccionada"
   </dest>
   <voice>
-    *: "Reproduir primer la cançó marcada"
+    *: "Reproduir primer la cançó seleccionada"
   </voice>
 </phrase>
 <phrase>
@@ -1577,11 +1582,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Buffer Anti-salt"
+    *: "Buffer anti-salt"
     flash_storage: none
   </dest>
   <voice>
-    *: "Buffer Anti-salt"
+    *: "Bàffer anti-salt"
   </voice>
 </phrase>
 <phrase>
@@ -1606,7 +1611,7 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Mode Festa"
+    *: "Mode festa"
   </dest>
   <voice>
     *: "Mode Festa"
@@ -1639,11 +1644,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Activar Crossfade"
+    crossfade: "Activar crossfade"
   </dest>
   <voice>
     *: none
-    crossfade: "Activar Crossfade"
+    crossfade: "Activar Crosféid"
   </voice>
 </phrase>
 <phrase>
@@ -1690,7 +1695,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Retard de Fade-In"
+    crossfade: "Retard de fade-In"
   </dest>
   <voice>
     *: none
@@ -1707,7 +1712,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Durada de Fade-In"
+    crossfade: "Durada de fade-In"
   </dest>
   <voice>
     *: none
@@ -1724,7 +1729,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Retard de Fade-Out"
+    crossfade: "Retard de fade-Out"
   </dest>
   <voice>
     *: none
@@ -1741,7 +1746,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Durada de Fade-Out"
+    crossfade: "Durada de fade-Out"
   </dest>
   <voice>
     *: none
@@ -1758,11 +1763,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mode de Fade-Out"
+    crossfade: "Mode de fade-Out"
   </dest>
   <voice>
     *: none
-    crossfade: "Mode de Fade-Out"
+    crossfade: "Mode de fade-Out"
   </voice>
 </phrase>
 <phrase>
@@ -1793,7 +1798,7 @@
     *: "Replaygain"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "Ripléy guéin"
   </voice>
 </phrase>
 <phrase>
@@ -1835,10 +1840,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Tipus de Replaygain"
+    *: "Tipus de replaygain"
   </dest>
   <voice>
-    *: "Tipus de Replaygain"
+    *: "Tipus de Ripléy guéin"
   </voice>
 </phrase>
 <phrase>
@@ -1849,7 +1854,7 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Guany d'Àlbum"
+    *: "Guany d'àlbum"
   </dest>
   <voice>
     *: "Guany d'Àlbum"
@@ -1903,15 +1908,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Volum de Bip"
+    swcodec: "Volum de bip"
   </dest>
   <voice>
     *: none
-    swcodec: "Volum de Bip"
+    swcodec: "Volum de bip"
   </voice>
 </phrase>
 <phrase>
@@ -2074,10 +2079,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Suport Cuesheet"
+    *: "Suport per Cuesheet"
   </dest>
   <voice>
-    *: "Suport Cuesheet"
+    *: "Suport per Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -2156,10 +2161,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Vista d'arxius"
+    *: "Vista de fitxers"
   </dest>
   <voice>
-    *: "Vista d'arxius"
+    *: "Vista de fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -2198,10 +2203,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Ordenar arxius"
+    *: "Ordenar fitxers"
   </dest>
   <voice>
-    *: "Ordenar arxius"
+    *: "Ordenar fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -2268,10 +2273,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Mostrar arxius"
+    *: "Mostra fitxers"
   </dest>
   <voice>
-    *: "Mostrar arxius"
+    *: "Mostra fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -2324,10 +2329,10 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Mostrar Camí"
+    *: "Mostra Camí"
   </dest>
   <voice>
-    *: "Mostrar Camí"
+    *: "Mostra Camí"
   </voice>
 </phrase>
 <phrase>
@@ -2367,17 +2372,19 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
-    *: "Construint Base de dades... %d trobats (OFF per tornar)"
-    iriverh100,iriverh120,iriverh300: "Construint Base de dades... %d trobats (STOP per tornar)"
-    ipod*: "Construint Base de dades... %d trobats (PREV per tornar)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construint Base de dades... %d trobats (LEFT per tornar)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Construint Base de dades... %d trobats (PREV per tornar)"
+    *: "Construint la base de dades... %d trobats (OFF per tornar)"
+    iriverh100,iriverh120,iriverh300: "Construint la base de dades.... %d trobats (STOP per tornar)"
+    ipod*: "Construint la base de dades...Construint Base de dades... %d trobats (PREV per tornar)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construint la base de dades... %d trobats (LEFT per tornar)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construint la base de dades... %d trobats (PREV per tornar)"
+    gogearsa9200: "Construint la base de dades... %d trobats (REW per tornar)"
   </dest>
   <voice>
-    *: "entrades trobades per base de dades"
+    *: "entrades trobades per la base de dades"
   </voice>
 </phrase>
 <phrase>
@@ -2557,15 +2564,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostrar Tipus de Lletra"
+    lcd_bitmap: "Tipus de lletra"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostrar Tipus de Lletra"
+    lcd_bitmap: "Mostra tipus de lletra"
   </voice>
 </phrase>
 <phrase>
@@ -2573,13 +2580,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Mostrar arxius .wps"
+    *: "Mostra fitxers .wps"
   </dest>
   <voice>
-    *: "Mostrar arxius de pantalla de reproducció"
+    *: "Mostra fitxers de pantalla de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -2588,15 +2595,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Veure fitxers .rwps"
+    remote: "Mostra fitxers .rwps"
   </dest>
   <voice>
     *: none
-    remote: "Veure fitxers wps remot"
+    remote: "Mostra fitxers de pantalla de reproducció remota"
   </voice>
 </phrase>
 <phrase>
@@ -3051,10 +3058,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Mostrar Icones"
+    *: "Mostra Icones"
   </dest>
   <voice>
-    *: "Mostrar Icones"
+    *: "Mostra Icones"
   </voice>
 </phrase>
 <phrase>
@@ -3180,7 +3187,7 @@
     *: "Jump Scroll"
   </source>
   <dest>
-    *: "Salt de Desplaçament"
+    *: "Salt de desplaçament"
   </dest>
   <voice>
     *: "Salt de Desplaçament"
@@ -3194,7 +3201,7 @@
     *: "One time"
   </source>
   <dest>
-    *: "Un Cop"
+    *: "Un cop"
   </dest>
   <voice>
     *: "Un Cop"
@@ -3385,11 +3392,11 @@
   </source>
   <dest>
    *: none
-    lcd_bitmap: "Indicador de Batería"
+    lcd_bitmap: "Indicador de bateria"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Indicador de Batería"
+    lcd_bitmap: "Indicador de bateria"
   </voice>
 </phrase>
 <phrase>
@@ -3675,10 +3682,10 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Cirilic (CP1251)"
+    *: "Cirílic (CP1251)"
   </dest>
   <voice>
-    *: "Cirilic"
+    *: "Cirílic"
   </voice>
 </phrase>
 <phrase>
@@ -3737,10 +3744,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Llatí Extès (ISO-8859-2)"
+    *: "Llatí estès (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Llatí Extès"
+    *: "Llatí estès"
   </voice>
 </phrase>
 <phrase>
@@ -3842,7 +3849,7 @@
   <voice>
     *: none
     button_light: "Apagat de llum de botons"
-    sansafuze*,sansae200*: "Apagat de llum de roda"
+    sansafuze*,sansae200*: "Apagat de llum de la roda"
   </voice>
 </phrase>
 <phrase>
@@ -3855,11 +3862,11 @@
   </source>
   <dest>
     *: none
-    buttonlight_brightness: "Brillantor Llum Botons"
+    buttonlight_brightness: "Brillantor llum botons"
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Brillantor Llum Botons"
+    buttonlight_brightness: "Brillantor de la Llum dels Botons"
   </voice>
 </phrase>
 <phrase>
@@ -3884,10 +3891,10 @@
     *: "Main Menu"
   </source>
   <dest>
-    *: "Menu Principal"
+    *: "Menú principal"
   </dest>
   <voice>
-    *: "Menu Principal"
+    *: "Menú Principal"
   </voice>
 </phrase>
 <phrase>
@@ -3912,10 +3919,10 @@
     *: "Battery"
   </source>
   <dest>
-    *: "Batería"
+    *: "Bateria"
   </dest>
   <voice>
-    *: "Batería"
+    *: "bateria"
   </voice>
 </phrase>
 <phrase>
@@ -3926,10 +3933,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Capacitat Batería"
+    *: "Capacitat bateria"
   </dest>
   <voice>
-    *: "Capacitat Batería"
+    *: "Capacitat bateria"
   </voice>
 </phrase>
 <phrase>
@@ -3942,11 +3949,11 @@
   </source>
   <dest>
   *: none
-    battery_types: "Tipus de batería"
+    battery_types: "Tipus de bateria"
   </dest>
   <voice>
     *: none
-    battery_types: "Tipus de batería"
+    battery_types: "Tipus de bateria"
   </voice>
 </phrase>
 <phrase>
@@ -4123,20 +4130,23 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Desar"
-    iriverh100,iriverh120,iriverh300: "NAVI = Desar"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Desar"
-    vibe500: "OK = Desar"
+    rtc: "ON = Desa"
+    mrobe500: "HEART = Desa"
+    iriverh100,iriverh120,iriverh300: "NAVI = Desa"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: " SELECT = Desa"
+    gogearsa9200: "PLAY = Desa"
+    vibe500: "OK = Desa"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4146,30 +4156,33 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Cancel·lar"
-    iriverh100,iriverh120,iriverh300: "STOP = Cancel·lar"
-    ipod*,sansac200*,gogearsa9200: "MENU = Cancel·lar"
-    iaudiox5,iaudiom5: "RECORD = Cancel·lar"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Cancel·lar"
-    gigabeatfx: "POWER = Cancel·lar"
-    mrobe100: "DISPLAY = Cancel·lar"
-    gigabeats: "BACK = Cancel·lar"
-    vibe500: "CANCEL = Cancel·lar"
+    rtc: "OFF = Cancel·la"
+    mrobe500: "POWER = Cancel·la"
+    iriverh100,iriverh120,iriverh300: "STOP = Cancel·la"
+    ipod*,sansac200*: "MENU = Cancel·la"
+    iaudiox5,iaudiom5: "RECORD = Cancel·la"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Cancel·la"
+    gigabeatfx: "POWER = Cancel·la"
+    mrobe100: "DISPLAY = Cancel·la"
+    gigabeats: "BACK = Cancel·la"
+    gogearsa9200: "LEFT = Cancel·la"
+    vibe500: "CANCEL = Cancel·la"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4544,10 +4557,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Màx. Arxius per directori"
+    *: "Màx. fitxers per directori"
   </dest>
   <voice>
-    *: "Número màxim d'arxius per directori"
+    *: "Nombre màxim de fitxers per directori"
   </voice>
 </phrase>
 <phrase>
@@ -4574,7 +4587,7 @@
   </source>
   <dest>
     *: none
-    charging: "Mode d'Adaptador de Cotxe"
+    charging: "Mode d'adaptador de cotxe"
   </dest>
   <voice>
     *: none
@@ -4608,7 +4621,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Pantalla d'Alarma"
+    alarm: "Pantalla d'alarma"
   </dest>
   <voice>
     *: none
@@ -4625,7 +4638,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Hora d'Alarma:"
+    alarm: "Hora d'alarma:"
   </dest>
   <voice>
     *: none
@@ -4659,11 +4672,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarma Configurada"
+    alarm: "Alarma establida"
   </dest>
   <voice>
     *: none
-    alarm: "Alarma Configurada"
+    alarm: "Alarma establida"
   </voice>
 </phrase>
 <phrase>
@@ -4676,11 +4689,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarma massa aviat"
+    alarm: "L'alarma és massa aviat!"
   </dest>
   <voice>
     *: none
-    alarm: "Alarma massa aviat"
+    alarm: "L'alarma és massa aviat!"
   </voice>
 </phrase>
 <phrase>
@@ -4697,11 +4710,11 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=Accepta OFF=Anul·lar"
-    ipod*: "SELECT=Accepta MENU=Anul·lar"
-    iriverh10,iriverh10_5gb: "SELECT=Accepta PREV=Anul·lar"
-    gigabeats: "SELECT=Accepta POWER=Anul·lar"
-    vibe500: "OK=Accepta C=Anul·lar"
+    alarm: "PLAY=Accepta OFF=Cancel·la"
+    ipod*: "SELECT=Accepta MENU=Cancel·la"
+    iriverh10,iriverh10_5gb: "SELECT=Accepta PREV=Cancel·la"
+    gigabeats: "SELECT=Accepta POWER=Cancel·la"
+    vibe500: "OK=Accepta C=Cancel·la"
   </dest>
   <voice>
     *: none
@@ -4718,7 +4731,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarma Desactivada"
+    alarm: "Alarma desactivada"
   </dest>
   <voice>
     *: none
@@ -4747,7 +4760,7 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Punt de pàgina en Aturar"
+    *: "Punt de pàgina en aturar"
   </dest>
   <voice>
     *: "Punt de pàgina en Aturar"
@@ -4761,7 +4774,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Si - Només Recents"
+    *: "Si - Només recents"
   </dest>
   <voice>
     *: "Si - Només Recents"
@@ -4873,10 +4886,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Llegir menus"
+    *: "Llegir menús"
   </dest>
   <voice>
-    *: "Llegir menus"
+    *: "Llegir menús"
   </voice>
 </phrase>
 <phrase>
@@ -4901,10 +4914,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Usar Directori .talk"
+    *: "Usar fitxers .talk dels directoris"
   </dest>
   <voice>
-    *: "Usar Directori .talk"
+    *: "Usar fitxers .talk dels directoris"
   </voice>
 </phrase>
 <phrase>
@@ -4915,10 +4928,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Llegir arxius"
+    *: "Llegir fitxers"
   </dest>
   <voice>
-    *: "Llegir arxius"
+    *: "Llegir fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -4946,7 +4959,7 @@
     *: "Números"
   </dest>
   <voice>
-    *: "Numeros"
+    *: "Números"
   </voice>
 </phrase>
 <phrase>
@@ -4968,13 +4981,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: "fitxer mp3 .talk"
+    *: "Fitxer .talk"
   </dest>
   <voice>
-    *: "fitxer mp3 .talk"
+    *: "Fitxer talk"
   </voice>
 </phrase>
 <phrase>
@@ -4999,10 +5012,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Mostrar arxius .cfg"
+    *: "Mostra fitxers .cfg"
   </dest>
   <voice>
-    *: "Mostrar arxius de configuración"
+    *: "Mostra fitxers de configuració"
   </voice>
 </phrase>
 <phrase>
@@ -5055,10 +5068,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Escriure arxiu .cfg"
+    *: "Escriure fitxer .cfg"
   </dest>
   <voice>
-    *: "Escriure arxiu de configuració"
+    *: "Escriure fitxer de configuració"
   </voice>
 </phrase>
 <phrase>
@@ -5083,10 +5096,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Desar Configuració de Tema"
+    *: "Desa Configuració de Tema"
   </dest>
   <voice>
-    *: "Desar Configuració de Tema"
+    *: "Desa Configuració de Tema"
   </voice>
 </phrase>
 <phrase>
@@ -5094,13 +5107,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Veure Temes"
+    *: "Veure fitxers de tema"
   </dest>
   <voice>
-    *: "Veure Temes"
+    *: "Veure fitxers de tema"
   </voice>
 </phrase>
 <phrase>
@@ -5500,11 +5513,11 @@
   </source>
   <dest>
     *: none
-    radio: "Desar Llista de presintonies"
+    radio: "Desa Llista de presintonies"
     </dest>
   <voice>
     *: none
-    radio: "Desar Llista de presintonies"
+    radio: "Desa Llista de presintonies"
   </voice>
 </phrase>
 <phrase>
@@ -5568,11 +5581,11 @@
   </source>
   <dest>
     *: none
-    radio: "Desar els Canvis?"
+    radio: "Desa els Canvis?"
   </dest>
   <voice>
     *: none
-    radio: "Desar els Canvis?"
+    radio: "Desa els Canvis?"
   </voice>
 </phrase>
 <phrase>
@@ -5755,11 +5768,11 @@
   </source>
   <dest>
     *: none
-    recording: "Preferencies del codificador"
+    recording: "Preferències del codificador"
   </dest>
   <voice>
     *: none
-    recording: "Preferencies del codificador"
+    recording: "Preferències del codificador"
   </voice>
 </phrase>
 <phrase>
@@ -5979,11 +5992,11 @@
   </source>
   <dest>
     *: none
-    recording: "Que fer quan es separa"
+    recording: "Què fer quan se separa"
   </dest>
   <voice>
     *: none
-    recording: "Que fer quan es separa"
+    recording: "Què fer quan se separa"
   </voice>
 </phrase>
 <phrase>
@@ -6013,11 +6026,11 @@
   </source>
   <dest>
     *: none
-    recording: "Aturar la grabació"
+    recording: "Atura la grabació"
   </dest>
   <voice>
     *: none
-    recording: "Aturar la grabació"
+    recording: "Atura la grabació"
   </voice>
 </phrase>
 <phrase>
@@ -6047,11 +6060,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mida de Separació"
+    recording: "Mida de separació"
   </dest>
   <voice>
     *: none
-    recording: "Mida de Separació"
+    recording: "Mida de separació"
   </voice>
 </phrase>
 <phrase>
@@ -6081,7 +6094,7 @@
   </source>
   <dest>
     *: none
-    recording: "Temps de Pregrabació"
+    recording: "Temps de pregrabació"
   </dest>
   <voice>
     *: none
@@ -6132,11 +6145,11 @@
   </source>
   <dest>
     *: none
-    recording: "Establir com Directori de Gravació"
+    recording: "Establir com a directori de gravació"
   </dest>
   <voice>
     *: none
-    recording: "Establir com Directori de Gravació"
+    recording: "Establir com a directori de gravació"
   </voice>
 </phrase>
 <phrase>
@@ -6149,11 +6162,11 @@
   </source>
   <dest>
     *: none
-    recording: "Buidar Directori de gravació"
+    recording: "Buidar directori de gravació"
   </dest>
   <voice>
     *: none
-    recording: "Buidar Directori de gravació"
+    recording: "Buidar directori de gravació"
   </voice>
 </phrase>
 <phrase>
@@ -6606,7 +6619,7 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Crear Llista de Reproducció"
+    *: "Crear llista de reproducció"
   </dest>
   <voice>
     *: "Crear llista de reproducció"
@@ -6620,10 +6633,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Preferencies de visualització de llistes de repr."
+    *: "Preferències de visualització de llistes de repr."
   </dest>
   <voice>
-    *: "Preferencies de visualització de llistes de repr."
+    *: "Preferències de visualització de llistes de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -6634,7 +6647,7 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Veure la Llista de Reproducció Actual"
+    *: "Veure la llista de reproducció actual"
   </dest>
   <voice>
     *: "Veure la Llista de Reproducció Actual"
@@ -6662,10 +6675,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Mostrar Índexs"
+    *: "Mostra índexs"
   </dest>
   <voice>
-    *: "Mostrar Índexs"
+    *: "Mostra Índexs"
   </voice>
 </phrase>
 <phrase>
@@ -6676,7 +6689,7 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Pantalla de Seguiment"
+    *: "Pantalla de seguiment"
   </dest>
   <voice>
     *: "Pantalla de Seguiment"
@@ -6718,10 +6731,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Desar la Llista de Reproducció Actual"
+    *: "Desa la llista de reproducció actual"
   </dest>
   <voice>
-    *: "Desar la Llista de Reproducció Actual"
+    *: "Desa la Llista de Reproducció Actual"
   </voice>
 </phrase>
 <phrase>
@@ -6732,7 +6745,7 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "Desades %d Pistes (%s)"
+    *: "%d pistes desades (%s)"
   </dest>
   <voice>
     *: "pistes desades"
@@ -6746,7 +6759,7 @@
     *: "Playlist Catalog"
   </source>
   <dest>
-    *: "Catàleg de Llistes de reproducció"
+    *: "Catàleg de llistes de reproducció"
   </dest>
   <voice>
     *: "Catàleg de Llistes de reproducció"
@@ -6760,7 +6773,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Afegir Directoris Recursivament"
+    *: "Afegir directoris recursivament"
   </dest>
   <voice>
     *: "Afegir Directoris Recursivament"
@@ -6836,7 +6849,7 @@
     *: "Info. de rockbox"
   </dest>
   <voice>
-    *: "Info. de rockbox"
+    *: "Informació de rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -6849,10 +6862,10 @@
   </source>
   <dest>
     *: "Buffer:"
-    archosplayer: "Buf:"
+    archosplayer: "Búf:"
   </dest>
   <voice>
-    *: "Mida de Buffer"
+    *: "Mida de Báffer"
     archosplayer: ""
   </voice>
 </phrase>
@@ -6871,7 +6884,7 @@
     iriverh10,ipodmini1g,ipodmini2g: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Nivell de batería"
+    *: "Nivell de bateria"
   </voice>
 </phrase>
 <phrase>
@@ -6885,7 +6898,7 @@
     *: "Disc:"
   </dest>
   <voice>
-    *: "Mida de disc"
+    *: "Mida del disc"
   </voice>
 </phrase>
 <phrase>
@@ -6932,7 +6945,7 @@
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*: "µSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
@@ -6964,7 +6977,7 @@
     *: "Running Time"
   </source>
   <dest>
-    *: "Temps Funcionant"
+    *: "Temps funcionant"
   </dest>
   <voice>
     *: "Temps Funcionant"
@@ -7006,7 +7019,7 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "Esborrar Temps?"
+    *: "Esborrar temps?"
   </dest>
   <voice>
     *: "Esborrar Temps?"
@@ -7090,10 +7103,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Afegeix barrejades"
+    *: "Insereix barrejant"
   </dest>
   <voice>
-    *: "Afegeix barrejades"
+    *: "Insereix barrejant"
   </voice>
 </phrase>
 <phrase>
@@ -7104,10 +7117,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Posar a la cua"
+    *: "Encua"
   </dest>
   <voice>
-    *: "Posar a la cua"
+    *: "Encua"
   </voice>
 </phrase>
 <phrase>
@@ -7118,10 +7131,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "A la cua com a següent"
+    *: "Encua com a següent"
   </dest>
   <voice>
-    *: "A la cua com a següent"
+    *: "Encua com a següent"
   </voice>
 </phrase>
 <phrase>
@@ -7132,10 +7145,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "A la cua al final"
+    *: "Encua al final"
   </dest>
   <voice>
-    *: "A la cua al final"
+    *: "Encua al final"
   </voice>
 </phrase>
 <phrase>
@@ -7146,10 +7159,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Cua barrejada"
+    *: "Encua barrejant"
   </dest>
   <voice>
-    *: "Cua barrejada"
+    *: "Encua barrejant"
   </voice>
 </phrase>
 <phrase>
@@ -7160,7 +7173,7 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "Reproduir Següent"
+    *: "Reproduir següent"
   </dest>
   <voice>
     *: "Reproduir Següent"
@@ -7174,7 +7187,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Afegides %d Pistes (%s)"
+    *: "%d pistes afegides (%s)"
   </dest>
   <voice>
     *: "pistes afegides"
@@ -7188,7 +7201,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "En cua %d Pistes (%s)"
+    *: "%d pistes en cua (%s)"
   </dest>
   <voice>
     *: "pistes en cua"
@@ -7230,7 +7243,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Cercant... %d trobat (%s)"
+    *: "Cercant... %d trobades (%s)"
   </dest>
   <voice>
     *: ""
@@ -7258,7 +7271,7 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "Veure Catàleg"
+    *: "Veure catàleg"
   </dest>
   <voice>
     *: "Veure Catàleg"
@@ -7272,7 +7285,7 @@
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "Afegir a Llista de reproducció"
+    *: "Afegir a llista de reproducció"
   </dest>
   <voice>
     *: "Afegir a Llista de reproducció"
@@ -7286,7 +7299,7 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Afegir a Nova Llista de Reproducció"
+    *: "Afegir a nova llista de reproducció"
   </dest>
   <voice>
     *: "Afegir a Nova Llista de Reproducció"
@@ -7314,7 +7327,7 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "Cap Llista de Reproducció"
+    *: "Cap llista de reproducció"
   </dest>
   <voice>
     *: "Cap Llista de Reproducció"
@@ -7342,7 +7355,7 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Crear Punt de pàgina"
+    *: "Crear punt de pàgina"
   </dest>
   <voice>
     *: "Crear Punt de pàgina"
@@ -7356,7 +7369,7 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Llistar Punts de pàgina"
+    *: "Llistar punts de pàgina"
   </dest>
   <voice>
     *: "Llistar Punts de pàgina"
@@ -7370,10 +7383,10 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Menu de Context"
+    *: "Menú de Context"
   </dest>
   <voice>
-    *: "Menu de Context"
+    *: "Menú de Context"
   </voice>
 </phrase>
 <phrase>
@@ -7412,10 +7425,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Mostrar Info de Pista"
+    *: "Mostra info de pista"
   </dest>
   <voice>
-    *: "Mostrar Info de Pista"
+    *: "Mostra Informació de Pista"
   </voice>
 </phrase>
 <phrase>
@@ -7468,7 +7481,7 @@
     *: "Tracknum"
   </source>
   <dest>
-    *: "Num pista"
+    *: "Núm. pista"
   </dest>
   <voice>
     *: ""
@@ -7510,7 +7523,7 @@
     *: "Length"
   </source>
   <dest>
-    *: "Long."
+    *: "Durada"
   </dest>
   <voice>
     *: ""
@@ -7552,7 +7565,7 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Album Artista"
+    *: "Artista de l'álbum"
   </dest>
   <voice>
     *: ""
@@ -7566,7 +7579,7 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "Discnum"
+    *: "Núm.disc"
   </dest>
   <voice>
     *: ""
@@ -7583,7 +7596,7 @@
     *: "Comentari"
   </dest>
   <voice>
-    *: ""
+    *: "Comentari"
   </voice>
 </phrase>
 <phrase>
@@ -7636,7 +7649,7 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Guany d'Album"
+    *: "Guany d'àlbum"
   </dest>
   <voice>
     *: ""
@@ -7678,10 +7691,10 @@
     *: "Rename"
   </source>
   <dest>
-    *: "Canviar el nom"
+    *: "Canvia el nom"
   </dest>
   <voice>
-    *: "Canviar el nom"
+    *: "Canvia el nom"
   </voice>
 </phrase>
 <phrase>
@@ -7776,10 +7789,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "Segur que vol Esborrar?"
+    *: "Esborrar?"
   </dest>
   <voice>
-    *: "Segur que vol Esborrar?"
+    *: "Esborrar?"
   </voice>
 </phrase>
 <phrase>
@@ -7848,11 +7861,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Establir com fons"
+    lcd_non-mono: "Establir com a fons"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Establir com fons"
+    lcd_non-mono: "Establir com a fons"
   </voice>
 </phrase>
 <phrase>
@@ -7882,7 +7895,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Càrrega de Fons Fallida"
+    lcd_non-mono: "Càrrega de fons fallida"
   </dest>
   <voice>
     *: none
@@ -7897,10 +7910,10 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Obrir amb"
+    *: "Obrir amb..."
   </dest>
   <voice>
-    *: "Obrir amb"
+    *: "Obrir amb..."
   </voice>
 </phrase>
 <phrase>
@@ -7911,7 +7924,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Crear Directori"
+    *: "Crear directori"
   </dest>
   <voice>
     *: "Crear directori"
@@ -7939,10 +7952,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Afegir a enllaços directes"
+    *: "Afegir a dreceres"
   </dest>
   <voice>
-    *: "Afegir a enllaços directes"
+    *: "Afegir a dreceres"
   </voice>
 </phrase>
 <phrase>
@@ -8004,7 +8017,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitó Amunt"
+    pitchscreen: "Semi to amunt"
   </dest>
   <voice>
     *: none
@@ -8021,7 +8034,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitó Avall"
+    pitchscreen: "Semi to avall"
   </dest>
   <voice>
     *: none
@@ -8036,10 +8049,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "El búfer de la llista està ple"
+    *: "El buffer de la llista és ple"
   </dest>
   <voice>
-    *: "El búfer de la llista està ple"
+    *: "El báfer de la llista és ple"
   </voice>
 </phrase>
 <phrase>
@@ -8051,11 +8064,11 @@
     archosplayer: "End of List"
   </source>
   <dest>
-    *: "Fi de la Llista de Cançons"
+    *: "Final de la llista de cançons"
     archosplayer: "Fi Llista"
   </dest>
   <voice>
-    *: "Fi de la Llista de Cançons"
+    *: "Final de la llista de cançons"
     archosplayer: "Fi Llista"
   </voice>
 </phrase>
@@ -8095,10 +8108,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Error en Actualizar l'arxiu de control de Llistes de Reproducció"
+    *: "Error en actualizar el fitxer de control de llistes de reproducció"
   </dest>
   <voice>
-    *: "Error en Actualizar l'arxiu de control de Llistes de Reproducció"
+    *: "Error en Actualizar el fitxer de control de Llistes de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -8109,7 +8122,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Error en accedir a la Llista de Reproducció"
+    *: "Error en accedir a la llista de reproducció"
   </dest>
   <voice>
     *: "Error en accedir a la Llista de Reproducció"
@@ -8123,10 +8136,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Error en accedir a l'arxiu de control de Llistes de Reproducció"
+    *: "Error en accedir al fitxer de control de llistes de reproducció"
   </dest>
   <voice>
-    *: "Error en accedir a l'arxiu de control de Llistes de Reproducció"
+    *: "Error en accedir al fitxer de control de Llistes de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -8137,7 +8150,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Error en Accedir al Directori"
+    *: "Error en accedir al directori"
   </dest>
   <voice>
     *: "Error en Accedir al Directori"
@@ -8151,10 +8164,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Arxiu de control de Llistes de Reproducció invàlid"
+    *: "fitxer de control de Llistes de Reproducció invàlid"
   </dest>
   <voice>
-    *: "Arxiu de control de Llistes de Reproducció invàlid"
+    *: "fitxer de control de Llistes de Reproducció invàlid"
   </voice>
 </phrase>
 <phrase>
@@ -8282,7 +8295,7 @@
   </source>
   <dest>
     *: none
-    recording: "Temps"
+    recording: "Temps:"
   </dest>
   <voice>
     *: none
@@ -8356,11 +8369,11 @@
   </source>
   <dest>
     *: none
-    archosondio*: "Sisplau retiri la tarjeta MMC insertada"
+    archosondio*: "Siusplau, retireu la targeta MMC inserida"
   </dest>
   <voice>
     *: none
-    archosondio*: "Sisplau retiri la tarjeta MMC insertada"
+    archosondio*: "Siusplau, retireu la targeta MMC inserida"
   </voice>
 </phrase>
 <phrase>
@@ -8371,10 +8384,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "Arranc Modificat"
+    *: "Engegada modificada"
   </dest>
   <voice>
-    *: "Arranc Modificat"
+    *: "Engegada modificada"
   </voice>
 </phrase>
 <phrase>
@@ -8405,13 +8418,13 @@
     gigabeatfx: "POWER to abort"
   </source>
   <dest>
-    *: "OFF per a cancelar"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP per a cancelar"
-    ipod*: "PLAY/PAUSE per a cancelar"
-    iaudiox5,iaudiom5: "Long PLAY per a cancelar"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV per a cancelar"
-    gigabeats: "BACK per a cancelar"
-    gigabeatfx: "POWER per a cancelar"
+    *: "OFF per cancel·lar"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP per cancel·lar"
+    ipod*: "PLAY/PAUSE per cancel·lar"
+    iaudiox5,iaudiom5: "Long PLAY per cancel·lar"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV per cancel·lar"
+    gigabeats: "BACK per cancel·lar"
+    gigabeatfx: "POWER per cancel·lar"
   </dest>
   <voice>
     *: ""
@@ -8425,10 +8438,10 @@
     *: "No files"
   </source>
   <dest>
-    *: "No hi ha arxius"
+    *: "No hi ha fitxers"
   </dest>
   <voice>
-    *: "No hi ha arxius"
+    *: "No hi ha fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -8467,7 +8480,7 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Errada en llegir %s"
+    *: "Error en llegir %s"
   </dest>
   <voice>
     *: ""
@@ -8481,7 +8494,7 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "Model Incompatible"
+    *: "Model incompatible"
   </dest>
   <voice>
     *: ""
@@ -8495,7 +8508,7 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "Versió Incompatible"
+    *: "Versió incompatible"
   </dest>
   <voice>
     *: ""
@@ -8509,7 +8522,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "El Connector ha tornat un error"
+    *: "El Connector ha donat un error"
   </dest>
   <voice>
     *: ""
@@ -8523,10 +8536,10 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "Llista d'extensions plena"
+    *: "La llista d'extensions és plena"
   </dest>
   <voice>
-    *: "Llista d'extensions plena"
+    *: "La llista d'extensions és plena"
   </voice>
 </phrase>
 <phrase>
@@ -8537,10 +8550,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Llista de tipus d'arxiu plena"
+    *: "La llista de tipus de fitxer és plena"
   </dest>
   <voice>
-    *: "Llista de tipus d'arxiu plena"
+    *: "La llista de tipus de fitxer és plena"
   </voice>
 </phrase>
 <phrase>
@@ -8551,10 +8564,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Buffer de directori Ple!"
+    *: "Buffer de directori ple!"
   </dest>
   <voice>
-    *: "Buffer de directori Ple!"
+    *: "Báffer de directori Ple!"
   </voice>
 </phrase>
 <phrase>
@@ -8568,7 +8581,7 @@
     *: "Nom de fitxer invàlid!"
   </dest>
   <voice>
-    *: "Nom de fitxer invàlid"
+    *: "Nom de fitxer invàlid!"
   </voice>
 </phrase>
 <phrase>
@@ -8610,7 +8623,7 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Reinicia per Activar-ho"
+    *: "Reinicia per activar-ho"
   </dest>
   <voice>
     *: "Reinicia per Activar-ho"
@@ -8626,11 +8639,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batería: Carregant"
+    charging: "Bateria: Carregant"
   </dest>
   <voice>
     *: none
-    charging: "Batería: Carregant"
+    charging: "bateria: Carregant"
   </voice>
 </phrase>
 <phrase>
@@ -8643,11 +8656,11 @@
   </source>
   <dest>
     *: none
-    archosrecorder: "Batería: Top-Off Chg"
+    archosrecorder: "Bateria: Top-Off Chg"
   </dest>
   <voice>
     *: none
-    archosrecorder: "Batería: Top-Off Chg"
+    archosrecorder: "bateria: Top-Off Chg"
   </voice>
 </phrase>
 <phrase>
@@ -8660,11 +8673,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batería: Trickle Chg"
+    charging: "Bateria: Trickle Chg"
   </dest>
   <voice>
     *: none
-    charging: "Batería: Trickle Chg"
+    charging: "bateria: Trickle Chg"
   </voice>
 </phrase>
 <phrase>
@@ -8675,10 +8688,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "AVIS! Bateria Baixa!"
+    *: "AVÍS! Bateria baixa!"
   </dest>
   <voice>
-    *: "AVIS! Bateria Baixa!"
+    *: "AVÍS! Bateria baixa!"
   </voice>
 </phrase>
 <phrase>
@@ -8734,7 +8747,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "megabait"
   </voice>
 </phrase>
 <phrase>
@@ -8748,7 +8761,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "gigabait"
   </voice>
 </phrase>
 <phrase>
@@ -9392,7 +9405,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mili-amperis hora"
+    *: "mili-ampers hora"
   </voice>
 </phrase>
 <phrase>
@@ -9854,7 +9867,7 @@
     *: ""
   </dest>
   <voice>
-    *: "arxiu"
+    *: "fitxer"
   </voice>
 </phrase>
 <phrase>
@@ -9910,7 +9923,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pantalla de reproduccio"
+    *: "pantalla de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -10409,11 +10422,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Menu"
+    recorder_pad: "Menú"
   </dest>
   <voice>
     *: none
-    recorder_pad: ""
+    recorder_pad: "Menú"
   </voice>
 </phrase>
 <phrase>
@@ -10579,7 +10592,7 @@
   </source>
   <dest>
     *: none
-    recording: "Mic. Intern"
+    recording: "Mic. intern"
   </dest>
   <voice>
     *: none
@@ -10596,11 +10609,11 @@
   </source>
   <dest>
     *: none
-    recording: "Linia d'entrada"
+    recording: "Línia d'entrada"
   </dest>
   <voice>
     *: none
-    recording: "Linia d'entrada"
+    recording: "Línia d'entrada"
   </voice>
 </phrase>
 <phrase>
@@ -10732,7 +10745,7 @@
   </source>
   <dest>
     *: none
-    recording: "Guany Esquerre"
+    recording: "Guany esquerre"
   </dest>
   <voice>
     *: none
@@ -10749,7 +10762,7 @@
   </source>
   <dest>
     *: none
-    recording: "Guany Dret"
+    recording: "Guany dret"
   </dest>
   <voice>
     *: none
@@ -10987,10 +11000,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Mostrar les extensions dels fitxers"
+    *: "Mostra les extensions dels fitxers"
   </dest>
   <voice>
-    *: "Mostrar les extensions dels fitxers"
+    *: "Mostra les extensions dels fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -11113,7 +11126,7 @@
   </source>
   <dest>
     *: none
-    recording: "Comptador de Saturació"
+    recording: "Comptador de saturació"
   </dest>
   <voice>
     *: none
@@ -11217,7 +11230,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Color Primari"
+    lcd_color: "Color primari"
   </dest>
   <voice>
     *: none
@@ -11234,7 +11247,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Color Secundari"
+    lcd_color: "Color secundari"
   </dest>
   <voice>
     *: none
@@ -11251,7 +11264,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Color de Text"
+    lcd_color: "Color de text"
   </dest>
   <voice>
     *: none
@@ -11268,7 +11281,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Barra (Color Sòlid)"
+    lcd_color: "Barra (color sòlid)"
   </dest>
   <voice>
     *: none
@@ -11285,7 +11298,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Barra (Gradient de Color)"
+    lcd_color: "Barra (gradient de color)"
   </dest>
   <voice>
     *: none
@@ -11435,7 +11448,7 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Digues Tipus de Fitxer"
+    *: "Digues Tipus de fitxer"
   </dest>
   <voice>
     *: "Digues Tipus de Fitxer"
@@ -11497,10 +11510,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Desar Preferències de So"
+    *: "Desa preferències de so"
   </dest>
   <voice>
-    *: "Desar Preferències de So"
+    *: "Desa Preferències de So"
   </voice>
 </phrase>
 <phrase>
@@ -11530,7 +11543,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Repeticions de Clic de tecles"
+    swcodec: "Repeticions de clic de tecles"
   </dest>
   <voice>
     *: none
@@ -11551,7 +11564,7 @@
   </dest>
   <voice>
     *: none
-    accessory_supply: "Font d'alimentació accesoria"
+    accessory_supply: "Font d'alimentació accessòria"
   </voice>
 </phrase>
 <phrase>
@@ -11679,11 +11692,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensibilitat de Touchpad"
+    gigabeatfx: "Sensibilitat del touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensibilitat de Touchpad"
+    gigabeatfx: "Sensibilitat del Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -11711,7 +11724,7 @@
     *: "Very slow"
   </source>
   <dest>
-    *: "Molt Lent"
+    *: "Molt lent"
   </dest>
   <voice>
     *: "Molt Lent"
@@ -11739,10 +11752,10 @@
     *: "Very fast"
   </source>
   <dest>
-    *: "Molt Rapid"
+    *: "Molt ràpid"
   </dest>
   <voice>
-    *: "Molt Rapid"
+    *: "Molt Ràpid"
   </voice>
 </phrase>
 <phrase>
@@ -11753,10 +11766,10 @@
     *: "Fast"
   </source>
   <dest>
-    *: "Rapid"
+    *: "Ràpid"
   </dest>
   <voice>
-    *: "Rapid"
+    *: "Ràpid"
   </voice>
 </phrase>
 <phrase>
@@ -11781,10 +11794,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Saltar Pista"
+    *: "Salta pista"
   </dest>
   <voice>
-    *: "Saltar Pista"
+    *: "Salta Pista"
   </voice>
 </phrase>
 <phrase>
@@ -11849,7 +11862,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Control Automàtic de guany"
+    agc: "Control automàtic de guany"
   </voice>
 </phrase>
 <phrase>
@@ -11900,7 +11913,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Nom del fitxer:"
   </voice>
 </phrase>
 <phrase>
@@ -11934,7 +11947,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Temps de separació"
   </voice>
 </phrase>
 <phrase>
@@ -11951,7 +11964,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Mida:"
   </voice>
 </phrase>
 <phrase>
@@ -11978,11 +11991,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording_swcodec: "Mono esquerre + dret"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Left plus Right"
+    recording_swcodec: "Mono esquerre més dret"
   </voice>
 </phrase>
 <phrase>
@@ -11995,11 +12008,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid esquerra"
+    quickscreen: "Selecciona com a element d'accés ràpid esquerra"
   </dest>
   <voice>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid esquerra"
+    quickscreen: "Selecciona com a element d'accés ràpid esquerra"
   </voice>
 </phrase>
 <phrase>
@@ -12010,10 +12023,10 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Preferencies originals"
+    *: "Preferències originals"
   </dest>
   <voice>
-    *: "Preferencies originals"
+    *: "Preferències originals"
   </voice>
 </phrase>
 <phrase>
@@ -12043,11 +12056,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid inferior"
+    quickscreen: "Selecciona com a element d'accés ràpid inferior"
   </dest>
   <voice>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid inferior"
+    quickscreen: "Selecciona com a element d'accés ràpid inferior"
   </voice>
 </phrase>
 <phrase>
@@ -12077,11 +12090,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid dret"
+    quickscreen: "Selecciona com a element d'accés ràpid dret"
   </dest>
   <voice>
     *: none
-    quickscreen: "Selecciona com a element de accés rapid dret"
+    quickscreen: "Selecciona com a element d'accés ràpid dret"
   </voice>
 </phrase>
 <phrase>
@@ -12108,11 +12121,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Modo mono"
+    recording_swcodec: "Mode mono"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Modo mono"
+    recording_swcodec: "Mode mono"
   </voice>
 </phrase>
 <phrase>
@@ -12140,10 +12153,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Evitar Salts en Reproducció"
+    *: "Evitar salts de pista"
   </dest>
   <voice>
-    *: "Evitar Salts en Reproducció"
+    *: "Evitar salts de pista"
   </voice>
 </phrase>
 <phrase>
@@ -12156,7 +12169,7 @@
   </source>
   <dest>
     *: none
-    speaker: "Activar Altaveu"
+    speaker: "Activar altaveu"
   </dest>
   <voice>
     *: none
@@ -12191,7 +12204,7 @@
   </dest>
   <voice>
     *: none
-    serial_port: "Bitrate port sèrie"
+    serial_port: "Bit réit del port de sèrie"
   </voice>
 </phrase>
 <phrase>
@@ -12213,7 +12226,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12221,11 +12234,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Punt Absolut"
+    touchscreen: "Punt absolut"
   </dest>
   <voice>
     *: none
-    touchscreen: "Punt Absolut"
+    touchscreen: "Punt absolut"
   </voice>
 </phrase>
 <phrase>
@@ -12270,10 +12283,10 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "Com nombres sencers"
+    *: "Com a nombres enters"
   </dest>
   <voice>
-    *: "Com nombres sencers"
+    *: "Com a nombres enters"
   </voice>
 </phrase>
 <phrase>
@@ -12292,7 +12305,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12309,7 +12322,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -12317,11 +12330,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Mode Pantalla Tàctil"
+    touchscreen: "Mode de la pantalla tàctil"
   </dest>
   <voice>
     *: none
-    touchscreen: "Mode Pantalla Tàctil"
+    touchscreen: "Mode de la pantalla tàctil"
   </voice>
 </phrase>
 <phrase>
@@ -12332,10 +12345,10 @@
     *: "As digits"
   </source>
   <dest>
-    *: "Com dígits"
+    *: "Com a dígits"
   </dest>
   <voice>
-    *: "Com dígits"
+    *: "Com a dígits"
   </voice>
 </phrase>
 <phrase>
@@ -12353,5 +12366,1283 @@
   <voice>
     *: none
     serial_port: "Automàtic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Encua al final barrejada"
+  </dest>
+  <voice>
+    *: "Encua al final, barrejada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Tema de la barra d'estat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Temps d'alliberament"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Temps d'alliberament"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Drecera WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Drecera per la pantalla de reproducció"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Llindar"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Llindar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Guany de banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Guany de banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Guany de maquillatge"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Guany de maquillatge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Tema base"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Tema base"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Lain Aut"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "Tema de la pantalla de ràdio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Amplada"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Amplada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Posició de la barra de desplaçament"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Posició de la barra de desplaçament"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Barra d'estat remota"
+  </dest>
+  <voice>
+    *: none
+    remote: "Barra d'estat remota"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Tema de la barra d'estat remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Genoll"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Genoll"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auto"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Insereix al final barrejada"
+  </dest>
+  <voice>
+    *: "Insereix al final, barrejada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Genoll tou"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Genoll tou"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Següent:"
+  </dest>
+  <voice>
+    *: "Següent:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ràtio"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ràtio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Mode keypad USB"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Mode keypad USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Genoll dur"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Genoll dur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Estableix com a objecte superior a la pantalla ràpida"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Estableix com a objecte superior a la pantalla ràpida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Rate"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Reit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Browser"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Dispositiu d'interfície humana USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Dreta"
+  </dest>
+  <voice>
+    *: "Dreta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semi to"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semi to"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "remote radio screen skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Pantalla remota"
+  </dest>
+  <voice>
+    *: none
+    remote: "Pantalla remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Estret"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Estret"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Altre"
+  </dest>
+  <voice>
+    *: none
+    radio: "Altre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Drecera del navegador de fitxers"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Drecera del navegador de fitxers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Límit"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Límit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rebobina abans de continuar"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rebobina abans de continuar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Itàlia"
+  </dest>
+  <voice>
+    *: none
+    radio: "Itàlia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Calibra"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 a 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Usa entrada en codi Morse"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Usa entrada en codi Morse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Opcions avançades de control del to"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Opcions avançades de control del to"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Restableix la calibració"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Restableix la calibració"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Millora 3D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Millora 3D"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 a 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Freqüència de banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Freqüència de banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Amplada de banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Amplada de banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Ratolí"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Ratolí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Límit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Límit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimèdia"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimèdia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Personalitzada"
+  </dest>
+  <voice>
+    *: "Personalitzada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Amplada de la barra de desplaçament"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Amplada de la barra de desplaçament"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Ràdio FM remota"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Ràdio FM remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Emissora:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Ús de RAM per part del tema:"
+  </dest>
+  <voice>
+    *: "Ús de RAM per part del tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Salta fins al final (Outro)"
+  </dest>
+  <voice>
+    *: "Salta fins al final"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Només canvi de pista automàtic"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Només canvi de pista automàtic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Part inferior"
+  </dest>
+  <voice>
+    *: "Part inferior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timestretch"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 a 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Pantalla principal"
+  </dest>
+  <voice>
+    *: none
+    remote: "Pantalla principal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Compressor"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Compressor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Controls de to"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Controls de to"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Drecera"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Drecera"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Esquerra"
+  </dest>
+  <voice>
+    *: "Esquerra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Preferències de pantalla tàctil"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Preferències de pantalla tàctil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Part superior"
+  </dest>
+  <voice>
+    *: "Part superior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Velocitat"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Velocitat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Següent pista:"
+  </dest>
+  <voice>
+    *: "Següent pista:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 a 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Presentació"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Presentació"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "of"
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Intèrval d'histograma"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Intèrval d'histograma"
   </voice>
 </phrase>
