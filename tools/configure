@@ -3004,8 +3004,10 @@ if test "$apps" = "apps"; then
 fi
 
 #### Fix the cmdline ###
-if test -n "$ccache"; then
+if [ "$ARG_CCACHE" = "1" ]; then
   cmdline="--ccache "
+elif [ "$ARG_CCACHE" = "0" ]; then
+  cmdline="--no-ccache "
 fi
 if [ "$ARG_ARM_EABI" = "1" ]; then
   cmdline="$cmdline--eabi "
