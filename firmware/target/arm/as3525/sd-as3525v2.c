@@ -328,7 +328,7 @@ static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attr
 static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 static void init_controller(void);
-static int sd_wait_for_state(const int drive, unsigned int state);
+static int sd_wait_for_tran_state(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
@@ -512,7 +512,7 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
         return -7;
 
-    if(sd_wait_for_state(drive, SD_TRAN))
+    if(sd_wait_for_tran_state(drive))
         return -8;
 
     /* CMD6 */
@@ -544,7 +544,7 @@ static int sd_init_card(const int drive)
 
 #ifndef BOOTLOADER
     /*  Switch to to 4 bit widebus mode  */
-    if(sd_wait_for_state(drive, SD_TRAN) < 0)
+    if(sd_wait_for_tran_state(drive) < 0)
         return -13;
     /* CMD55 */              /*  Response is requested due to timing issue  */
     if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
@@ -756,7 +756,7 @@ int sd_init(void)
     return 0;
 }
 
-static int sd_wait_for_state(const int drive, unsigned int state)
+static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response;
     unsigned int timeout = 100; /* ticks */
@@ -768,7 +768,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 
         while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
 
-        if (((response >> 9) & 0xf) == state)
+        if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
 
         if(TIME_AFTER(current_tick, t + timeout))
@@ -846,7 +846,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
-        ret = sd_wait_for_state(drive, SD_TRAN);
+        ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
             static const char *st[9] = {

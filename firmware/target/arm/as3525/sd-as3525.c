@@ -100,7 +100,7 @@ static const int pl180_base[NUM_DRIVES] = {
 #endif
 };
 
-static int sd_wait_for_state(const int drive, unsigned int state);
+static int sd_wait_for_tran_state(const int drive);
 static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
@@ -321,7 +321,7 @@ static int sd_init_card(const int drive)
             return -5;
         mci_delay();
 
-        if(sd_wait_for_state(drive, SD_TRAN))
+        if(sd_wait_for_tran_state(drive))
             return -6;
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
@@ -570,7 +570,7 @@ bool sd_present(IF_MD_NONVOID(int drive))
 }
 #endif /* HAVE_HOTSWAP */
 
-static int sd_wait_for_state(const int drive, unsigned int state)
+static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response = 0;
     unsigned int timeout = current_tick + HZ;
@@ -581,7 +581,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
                     MCI_RESP|MCI_ARG, &response))
             return -1;
 
-        if (((response >> 9) & 0xf) == state)
+        if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
 
         if(TIME_AFTER(current_tick, timeout))
@@ -605,7 +605,7 @@ static int sd_select_bank(signed char bank)
             panicf("SD bank %d error : 0x%x", bank,
                     transfer_error[INTERNAL_AS3525]);
 
-        ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+        ret = sd_wait_for_tran_state(INTERNAL_AS3525);
         if (ret < 0)
             return ret - 2;
 
@@ -746,7 +746,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(write)
             memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
-        ret = sd_wait_for_state(drive, SD_TRAN);
+        ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
             ret -= 2*20;
