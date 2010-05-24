@@ -399,7 +399,9 @@ static
 #endif
 void sched_tick(t_time next_sys_time)
 {
+#ifndef ROCKBOX
     int countdown = 5000;
+#endif
     while (clock_setlist && clock_setlist->c_settime < next_sys_time)
     {
     	t_clock *c = clock_setlist;
@@ -407,13 +409,13 @@ void sched_tick(t_time next_sys_time)
     	clock_unset(clock_setlist);
 	outlet_setstacklim();
     	(*c->c_fn)(c->c_owner);
+#ifndef ROCKBOX
 	if (!countdown--)
 	{
 	    countdown = 5000;
-#ifndef ROCKBOX
 	    sys_pollgui();
-#endif
 	}
+#endif
 	if (sys_quit)
 	    return;
     }
