@@ -23,7 +23,11 @@
 
 PLUGIN_HEADER
 
+#if PLUGIN_BUFFER_SIZE <= 0x8000
+#define BUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */
+#else
 #define BUF_SIZE (1<<13) /* 32 KB = (1<<13)*sizeof(int) */
+#endif
 
 #define LOOP_REPEAT_DRAM 256
 static volatile int buf_dram[BUF_SIZE];
@@ -176,7 +180,9 @@ enum plugin_status plugin_start(const void* parameter)
     bool boost = false;
     int count = 0;
 
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
+#endif
     
     rb->screens[0]->clear_display();
     rb->screens[0]->putsf(0, 0, "patience, may take some seconds...");
