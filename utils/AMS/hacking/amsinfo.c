@@ -66,7 +66,7 @@ uint8_t *buf; /* file content */
 
 /* 1st block description */
 uint32_t idx,checksum,bs_multiplier,firmware_sz;
-uint32_t unknown_4_1; uint8_t unknown_1,id; uint16_t unknown_2;
+uint32_t unknown_4_1; uint16_t unknown_1, unknown_2;
 uint32_t unknown_4_2,unknown_4_3;
 
 static void *xmalloc(size_t s) /* malloc helper */
@@ -74,28 +74,6 @@ static void *xmalloc(size_t s) /* malloc helper */
 	void * r = malloc(s);
 	if(!r) bugp("malloc");
 	return r;
-}
-
-/* known models */
-static const char * model(uint8_t id)
-{
-	switch(id)
-	{
-		case 0x1E: return "FUZE"; break;
-		case 0x22: return "CLIP"; break;
-		case 0x23: return "C200"; break;
-		case 0x24: return "E200"; break;
-		case 0x25: return "M200"; break;
-		case 0x27: return "CLV2"; break;
-		case 0x28: return "CLI+"; break;
-        case 0x70:
-		case 0x6d: return "FUZ2"; break;
-		default:
-		printf("Unknown ID 0x%x\n", id);
-
-		assert(id == 0x1E || (id >= 0x22 && id <= 0x28));
-		return "UNKNOWN!";
-	}
 }
 
 /* checksums the firmware (the firmware header contains the verification) */
@@ -142,8 +120,7 @@ static void check(void)
 	assert(bs_multiplier << 9 == PAD_TO_BOUNDARY(firmware_sz)); /* 0x200 * bs_multiplier */
 
 	unknown_4_1 = get32le(0x10 + shift);
-	unknown_1 = buf[0x14 + shift];
-	id = buf[0x15 + shift];
+	unknown_1 = get16le(0x14 + shift);
 	unknown_2 = get16le(0x16 + shift);
 	unknown_4_2 = get32le(0x18 + shift);
 	unknown_4_3 = get32le(0x1c + shift);
@@ -171,9 +148,6 @@ static void check(void)
 	printf("1 Unknown                %x\n",unknown_1);
 
 	color(GREEN);
-	printf("1 Model ID               %x (%s)\n",id,model(id));
-
-	color(GREEN);
 	printf("2 Unknown (should be 0)  %x\n",unknown_2);
 	assert(unknown_2 == 0);
 
@@ -184,13 +158,6 @@ static void check(void)
 	color(GREEN);
 	printf("4 Unknown (should be 1)  %x\n",unknown_4_3);
 	assert(unknown_4_3 == 1);
-
-	/* rest of the block is padded with 0xff */
-	for(i=0x20 + shift;i<0x200 - shift;i++)
-		assert(buf[i]==0xff /* normal case */ ||
-			((id==0x1e||id==0x24) && ( /* Fuze or E200 */
-				(i>=0x3c && i<=0x3f && get32le(0x3c)==0x00005000)
-			)));
 
 	/* the 2nd block is identical, except that the 1st byte has been incremented */
 	assert(buf[0x0]==0&&buf[0x200]==1);

@@ -47,9 +47,9 @@ OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(SOURCES)))
 LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(LIBSOURCES)))
 EXTRADEPS := $(LIBUCL)
 
-# explicit dependencies on dualboot.{c,h}
-$(OBJDIR)mkamsboot.o: dualboot.h dualboot.c mkamsboot.c
-$(OBJDIR)main.o: dualboot.h dualboot.c main.c
+# explicit dependencies on dualboot.{c,h} and mkamsboot.h
+$(OBJDIR)mkamsboot.o: dualboot.h dualboot.c mkamsboot.c mkamsboot.h
+$(OBJDIR)main.o: dualboot.h dualboot.c main.c mkamsboot.h
 
 $(OBJDIR)%.o: %.c
 	@echo CC $< $

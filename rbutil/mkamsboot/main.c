@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
     int rb_packedsize;
     int patchable;
     int totalsize;
+    int model;
     char errstr[200];
     struct md5sums sum;
     char md5sum[33]; /* 32 digits + \0 */
@@ -81,11 +82,21 @@ int main(int argc, char* argv[])
     bootfile = argv[2];
     outfile = argv[3];
 
+    /* Load bootloader file */
+    rb_packed = load_rockbox_file(bootfile, &model, &bootloader_size,
+            &rb_packedsize, errstr, sizeof(errstr));
+    if (rb_packed == NULL) {
+        fprintf(stderr, "%s", errstr);
+        fprintf(stderr, "[ERR]  Could not load %s\n", bootfile);
+        return 1;
+    }
+
     /* Load original firmware file */
-    buf = load_of_file(infile, &len, &sum,
+    buf = load_of_file(infile, model, &len, &sum,
             &firmware_size, &of_packed, &of_packedsize, errstr, sizeof(errstr));
 
     if (buf == NULL) {
+        free(rb_packed);
         fprintf(stderr, "%s", errstr);
         fprintf(stderr, "[ERR]  Could not load %s\n", infile);
         return 1;
@@ -95,17 +106,6 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] Model: Sansa %s v%d - Firmware version: %s\n",
             model_names[sum.model], hw_revisions[sum.model], sum.version);
 
-
-    /* Load bootloader file */
-    rb_packed = load_rockbox_file(bootfile, sum.model, &bootloader_size,
-            &rb_packedsize, errstr, sizeof(errstr));
-    if (rb_packed == NULL) {
-        fprintf(stderr, "%s", errstr);
-        fprintf(stderr, "[ERR]  Could not load %s\n", bootfile);
-        free(buf);
-        free(of_packed);
-        return 1;
-    }
 
     printf("[INFO] Firmware patching has begun !\n\n");
 

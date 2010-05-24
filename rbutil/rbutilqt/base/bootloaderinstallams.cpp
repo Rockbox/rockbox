@@ -72,6 +72,7 @@ void BootloaderInstallAms::installStage2(void)
     struct md5sums sum;
     char md5sum[33]; /* 32 hex digits, plus terminating zero */
     int n;
+    int model;
     int firmware_size;
     int bootloader_size;
     int patchable;
@@ -84,33 +85,33 @@ void BootloaderInstallAms::installStage2(void)
     QString bootfile = m_tempfile.fileName();
     m_tempfile.close();
 
-    /* Load original firmware file */                
-    buf = load_of_file(m_offile.toLocal8Bit().data(), &len,&sum,&firmware_size,
-                        &of_packed,&of_packedsize,errstr,sizeof(errstr));
-    if (buf == NULL) 
-    {
-        qDebug() << "[BootloaderInstallAms] could not load OF: " << m_offile;
-        emit logItem(errstr, LOGERROR);
-        emit logItem(tr("Could not load %1").arg(m_offile), LOGERROR);
-        emit done(true);
-        return;
-    }
-
     /* Load bootloader file */
-    rb_packed = load_rockbox_file(bootfile.toLocal8Bit().data(), sum.model,
+    rb_packed = load_rockbox_file(bootfile.toLocal8Bit().data(), &model,
                                   &bootloader_size,&rb_packedsize,
                                     errstr,sizeof(errstr));
-    if (rb_packed == NULL) 
+    if (rb_packed == NULL)
     {   
         qDebug() << "[BootloaderInstallAms] could not load bootloader: " << bootfile;
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(bootfile), LOGERROR);
-        free(buf);
-        free(of_packed);
         emit done(true);
         return;
     }
     
+    /* Load original firmware file */
+    buf = load_of_file(m_offile.toLocal8Bit().data(), model, &len, &sum,
+                        &firmware_size, &of_packed ,&of_packedsize,
+                        errstr, sizeof(errstr));
+    if (buf == NULL)
+    {
+        qDebug() << "[BootloaderInstallAms] could not load OF: " << m_offile;
+        emit logItem(errstr, LOGERROR);
+        emit logItem(tr("Could not load %1").arg(m_offile), LOGERROR);
+        free(rb_packed);
+        emit done(true);
+        return;
+    }
+
     /* check total size */
     patchable = check_sizes(sum.model, rb_packedsize, bootloader_size,
             of_packedsize, firmware_size, &totalsize, errstr, sizeof(errstr));

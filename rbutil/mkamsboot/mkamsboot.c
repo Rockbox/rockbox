@@ -323,30 +323,6 @@ static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
     return sum;
 }
 
-static int get_model(int model_id)
-{
-    switch(model_id) {
-        case 0x1e:
-            return MODEL_FUZE;
-        case 0x22:
-            return MODEL_CLIP;
-        case 0x23:
-            return MODEL_C200V2;
-        case 0x24:
-            return MODEL_E200V2;
-        case 0x25:
-            return MODEL_M200V4;
-        case 0x27:
-            return MODEL_CLIPV2;
-        case 0x28:
-            return MODEL_CLIPPLUS;
-        case 0x70:
-            return MODEL_FUZEV2;
-    }
-
-    return MODEL_UNKNOWN;
-}
-
 /* Compress using nrv2e algorithm : Thumb decompressor fits in 168 bytes ! */
 static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
 {
@@ -388,7 +364,7 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
 
 /* Loads a Sansa AMS Original Firmware file into memory */
 unsigned char* load_of_file(
-        char* filename, off_t* bufsize, struct md5sums *sum,
+        char* filename, int model, off_t* bufsize, struct md5sums *sum,
         int* firmware_size, unsigned char** of_packed,
         int* of_packedsize, char* errstr, int errstrsize)
 {
@@ -397,7 +373,6 @@ unsigned char* load_of_file(
     off_t n;
     unsigned int i=0;
     uint32_t checksum;
-    int model_id;
     unsigned int last_word;
 
     fd = open(filename, O_RDONLY|O_BINARY);
@@ -425,21 +400,20 @@ unsigned char* load_of_file(
 
     if (i < NUM_MD5S) {
         *sum = sansasums[i];
+        if(sum->model != model) {
+            ERROR("[ERR]  OF File provided is %sv%d version %s, not for %sv%d\n",
+                model_names[sum->model], hw_revisions[sum->model],
+                sum->version, model_names[model], hw_revisions[model]
+            );
+        }
     } else {
-        int fw_version = (get_uint32le(&buf[0x204]) == 0x0000f000) ? 2 : 1;
-        model_id = buf[(fw_version == 2) ? 0x219 : 0x215];
-        sum->model = get_model(model_id);
+        /* OF unknown, give a list of tested versions for the requested model */
 
-        if (sum->model == MODEL_UNKNOWN)
-            ERROR("[ERR]  Unknown firmware model (v%d) - model id 0x%02x\n",
-                  fw_version, model_id);
-
-#if 1   /* comment to test new OFs */
         char tested_versions[100];
         tested_versions[0] = '\0';
 
         for (i = 0; i < NUM_MD5S ; i++)
-            if (sansasums[i].model == sum->model) {
+            if (sansasums[i].model == model) {
                 if (tested_versions[0] != '\0') {
                     strncat(tested_versions, ", ",
                         sizeof(tested_versions) - strlen(tested_versions) - 1);
@@ -449,9 +423,8 @@ unsigned char* load_of_file(
             }
 
         ERROR("[ERR]  Original firmware unknown, please try an other version." \
-              " Tested %s versions are : %s\n",
-              model_names[sum->model], tested_versions);
-#endif
+              " Tested %sv%d versions are : %s\n",
+              model_names[model], hw_revisions[model], tested_versions);
     }
 
     /* TODO: Do some more sanity checks on the OF image. Some images (like
@@ -484,7 +457,7 @@ error:
 
 /* Loads a rockbox bootloader file into memory */
 unsigned char* load_rockbox_file(
-            char* filename, int model, int* bufsize, int* rb_packedsize,
+            char* filename, int *model, int* bufsize, int* rb_packedsize,
             char* errstr, int errstrsize)
 {
     int fd;
@@ -504,10 +477,12 @@ unsigned char* load_rockbox_file(
     if (n != sizeof(header))
         ERROR("[ERR]  Could not read file %s\n", filename);
 
-    /* Check for correct model string */
-    if (memcmp(rb_model_names[model], header + 4, 4)!=0)
-        ERROR("[ERR]  Expected model name \"%s\" in %s, not \"%4.4s\"\n",
-                       rb_model_names[model], filename, (char*)header+4);
+    for(*model = 0; *model < NUM_MODELS; (*model)++)
+        if (memcmp(rb_model_names[*model], header + 4, 4) == 0)
+            break;
+
+    if(*model == NUM_MODELS)
+        ERROR("[ERR]  Model name \"%4.4s\" unknown. Is this really a rockbox bootloader?\n", header + 4);
 
     *bufsize = filesize(fd) - sizeof(header);
 
@@ -521,7 +496,7 @@ unsigned char* load_rockbox_file(
         ERROR("[ERR]  Could not read file %s\n", filename);
 
     /* Check checksum */
-    sum = rb_model_num[model];
+    sum = rb_model_num[*model];
     for (i = 0; i < *bufsize; i++) {
          /* add 8 unsigned bits but keep a 32 bit sum */
          sum += buf[i];
