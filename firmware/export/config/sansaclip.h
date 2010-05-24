@@ -128,9 +128,9 @@
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
 
-#define BATTERY_CAPACITY_DEFAULT 350    /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 350        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 350        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 330    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 330        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 330        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
@@ -154,8 +154,8 @@
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
 
 /* define current usage levels (based on battery bench) */
-#define CURRENT_NORMAL     45
-#define CURRENT_BACKLIGHT  14
+#define CURRENT_NORMAL     42
+#define CURRENT_BACKLIGHT  13
 #define CURRENT_RECORD     CURRENT_NORMAL
 
 /* Define this to the CPU frequency */
