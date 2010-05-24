@@ -13349,3 +13349,173 @@
     swcodec: "Vrátiť pred obnovením prehrávania"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Skratka Pre WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Skratka pre wps"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "Vzhľad obrazovky pre rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Vzhľad vzdialenej obrazovky pre rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Skratka Prezerania Súborov"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Skratka prezerania súborov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Vzdialené FM Rádio"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Vzdialené fm rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Stanica:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
