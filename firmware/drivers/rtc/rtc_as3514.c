@@ -93,8 +93,6 @@ void rtc_alarm_poweroff(void)
 
     disable_irq();
 
-    ascodec_write_pmu(0x1a, 4, 0x0); // In_Cntr : disable hearbeat source
-
     ascodec_write(AS3543_WAKEUP, seconds);
     seconds >>= 8;
     ascodec_write(AS3543_WAKEUP, seconds);
@@ -102,11 +100,15 @@ void rtc_alarm_poweroff(void)
     seconds |= 1<<7; /* enable bit */
     ascodec_write(AS3543_WAKEUP, seconds);
 
-    /* write our watermark : desired time of wake up */
+    /* write our desired time of wake up to detect power-up from RTC */
     ascodec_write(AS3543_WAKEUP, wakeup_h);
     ascodec_write(AS3543_WAKEUP, wakeup_m);
 
-    ascodec_write(AS3514_SYSTEM, (1<<3) | (1<<0)); // enable hearbeat watchdog
+    /* enable hearbeat watchdog */
+    ascodec_write(AS3514_SYSTEM, (1<<3) | (1<<0));
+
+    /* In_Cntr : disable hearbeat source */
+    ascodec_write_pmu(0x1a, 4, ascodec_read_pmu(0x1a, 4) & ~(3<<2));
 
     while(1);
 }
@@ -128,7 +130,9 @@ bool rtc_check_alarm_started(bool release_alarm)
     ascodec_read(AS3543_WAKEUP); /* bits 15:8  */
     if(ascodec_read(AS3543_WAKEUP) & (1<<7)) /* enable bit */
     {
+#if 0   /* we could have a persistent setting for wake-up time */
         alarm_enabled = true;
+#endif
 
         /* subsequent reads give the 16 bytes static SRAM */
         wakeup_h = ascodec_read(AS3543_WAKEUP);
