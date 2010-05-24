@@ -74,7 +74,7 @@ static void dma_callback(void)
 {
     if(!dma_size)
     {
-        pcm_play_get_more_callback(&dma_start_addr, &dma_size);
+        pcm_play_get_more_callback((void **)&dma_start_addr, &dma_size);
 
         if (!dma_size)
             return;
@@ -270,13 +270,14 @@ static void rec_dma_callback(void)
 
     if(!rec_dma_size)
     {
-        pcm_rec_more_ready_callback(0, &rec_dma_start_addr, &rec_dma_size);
+        pcm_rec_more_ready_callback(0, (void **)&rec_dma_start_addr,
+                                    &rec_dma_size);
 
         if(rec_dma_size != 0)
         {
             dump_dcache_range(rec_dma_start_addr, rec_dma_size);
 #if CONFIG_CPU == AS3525
-            mono_samples = AS3525_UNCACHED_ADDR(rec_dma_start_addr);
+            mono_samples = AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr);
 #endif
             rec_dma_start();
         }
