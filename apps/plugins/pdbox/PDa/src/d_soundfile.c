@@ -1129,7 +1129,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     	int thisread = finalsize - itemsread;
     	thisread = (thisread > bufframes ? bufframes : thisread);
 #ifdef ROCKBOX
-        nitems = read(fp, sampbuf, thisread * bytespersamp * channels) / bytespersamp;
+        nitems = read(fp, sampbuf, thisread * bytespersamp * channels) / (bytespersamp * channels);
 #else
     	nitems = fread(sampbuf, channels * bytespersamp, thisread, fp);
 #endif
