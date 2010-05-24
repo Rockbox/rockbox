@@ -88,7 +88,13 @@ static const char * const irqname[] =
 static void UIRQ(void)
 {
     unsigned int irq_no = 0;
+    bool masked = false;
     int status = VIC_IRQ_STATUS;
+    if(status == 0)
+    {
+        status = VIC_RAW_INTR; /* masked interrupts */
+        masked = true;
+    }
 
     if(status == 0)
         panicf("Unhandled IRQ (source unknown!)");
@@ -96,7 +102,8 @@ static void UIRQ(void)
     while((status >>= 1))
         irq_no++;
 
-    panicf("Unhandled IRQ %02X: %s", irq_no, irqname[irq_no]);
+    panicf("Unhandled %smasked IRQ %02X: %s (status 0x%8X)",
+           masked ? "" : "no", irq_no, irqname[irq_no], status);
 }
 
 struct vec_int_src
