@@ -982,7 +982,7 @@ uint32_t ICODE_ATTR buffer_magnitude(int16_t *input)
 
 /* Stop the recording when the buffer is full */
 #ifndef SIMULATOR
-int recording_callback(int status)
+void recording_callback(int status, void **start, size_t *size)
 {
     int tail = audio_tail ^ 1;
 
@@ -991,10 +991,9 @@ int recording_callback(int status)
         audio_tail = tail;
 
     /* Always record full buffer, even if not required */
-    rb->pcm_record_more(audio_data[tail],
-                        BUFFER_SIZE * sizeof (int16_t));
+    *start = audio_data[tail];
+    *size = BUFFER_SIZE * sizeof (int16_t);
 
-    return 0;
     (void)status;
 }
 #endif

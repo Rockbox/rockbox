@@ -74,18 +74,13 @@ static void dma_callback(void)
 {
     if(!dma_size)
     {
-        register pcm_more_callback_type get_more = pcm_callback_for_more;
-        if(get_more)
-            get_more(&dma_start_addr, &dma_size);
+        pcm_play_get_more_callback(&dma_start_addr, &dma_size);
+
+        if (!dma_size)
+            return;
     }
 
-    if(!dma_size)
-    {
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
-    }
-    else
-        play_start_pcm();
+    play_start_pcm();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
@@ -275,30 +270,18 @@ static void rec_dma_callback(void)
 
     if(!rec_dma_size)
     {
-        register pcm_more_callback_type2 more_ready = pcm_callback_more_ready;
-        if (!more_ready || more_ready(0) < 0)
+        pcm_rec_more_ready_callback(0, &rec_dma_start_addr, &rec_dma_size);
+
+        if(rec_dma_size != 0)
         {
-            /* Finished recording */
-            pcm_rec_dma_stop();
-            pcm_rec_dma_stopped_callback();
-            return;
+            dump_dcache_range(rec_dma_start_addr, rec_dma_size);
+#if CONFIG_CPU == AS3525
+            mono_samples = AS3525_UNCACHED_ADDR(rec_dma_start_addr);
+#endif
+            rec_dma_start();
         }
     }
-
-    rec_dma_start();
 }
-
-
-void pcm_rec_dma_record_more(void *start, size_t size)
-{
-    dump_dcache_range(start, size);
-    rec_dma_start_addr = start;
-#if CONFIG_CPU == AS3525
-    mono_samples = AS3525_UNCACHED_ADDR(start);
-#endif
-    rec_dma_size = size;
-}
-
 
 void pcm_rec_dma_stop(void)
 {

@@ -256,7 +256,7 @@ enum
 /*******************************************************************/
     
 /* Callback for when more data is ready - called in interrupt context */
-static int pcm_rec_have_more(int status)
+static void pcm_rec_have_more(int status, void **start, size_t *size)
 {
     if (status < 0)
     {
@@ -265,9 +265,9 @@ static int pcm_rec_have_more(int status)
         {
             /* Flush recorded data to disk and stop recording */
             queue_post(&pcmrec_queue, PCMREC_STOP, 0);
-            return -1;
+            return;
         }
-        /* else try again next transmission */
+        /* else try again next transmission - frame is invalid */
     }
     else if (!dma_lock)
     {
@@ -282,8 +282,8 @@ static int pcm_rec_have_more(int status)
         dma_wr_pos = next_pos;
     }
 
-    pcm_record_more(GET_PCM_CHUNK(dma_wr_pos), PCM_CHUNK_SIZE);
-    return 0;
+    *start = GET_PCM_CHUNK(dma_wr_pos);
+    *size = PCM_CHUNK_SIZE;
 } /* pcm_rec_have_more */
 
 static void reset_hardware(void)

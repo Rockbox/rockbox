@@ -52,9 +52,9 @@ static struct dma_data dma_play_data =
 
 static void play_dma_callback(void)
 {
-    unsigned char *start;
-    size_t size = 0;
-    pcm_more_callback_type get_more = pcm_callback_for_more;
+    void *start;
+    size_t size;
+    bool rror;
 
     if (dma_play_data.locked != 0)
     {
@@ -63,28 +63,20 @@ static void play_dma_callback(void)
         return;
     }
 
-    if (dma_play_bd.mode.status & BD_RROR)
-    {
-        /* Stop on error */
-    }
-    else if (get_more != NULL && (get_more(&start, &size), size != 0))
-    {
-        start = (void*)(((unsigned long)start + 3) & ~3);
-        size &= ~3;
+    rror = dma_play_bd.mode.status & BD_RROR;
 
-        /* Flush any pending cache writes */
-        clean_dcache_range(start, size);
-        dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)start);
-        dma_play_bd.mode.count = size;
-        dma_play_bd.mode.command = TRANSFER_16BIT;
-        dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
-        sdma_channel_run(DMA_PLAY_CH_NUM);
+    pcm_play_get_more_callback(rror ? NULL : &start, &size);
+
+    if (size == 0)
         return;
-    }
 
-    /* Error, callback missing or no more DMA to do */
-    pcm_play_dma_stop();
-    pcm_play_dma_stopped_callback();
+     /* Flush any pending cache writes */
+    clean_dcache_range(start, size);
+    dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)start);
+    dma_play_bd.mode.count = size;
+    dma_play_bd.mode.command = TRANSFER_16BIT;
+    dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
+    sdma_channel_run(DMA_PLAY_CH_NUM);
 }
 
 void pcm_play_lock(void)
@@ -272,12 +264,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     SSI_STCR2 &= ~SSI_STCR_TFEN0;
     SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
 
-    addr = (void *)(((unsigned long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     if (!sdma_channel_reset(DMA_PLAY_CH_NUM))
         return;
 
@@ -383,8 +369,9 @@ static struct dma_data dma_rec_data =
 
 static void rec_dma_callback(void)
 {
-    pcm_more_callback_type2 more_ready;
     int status = 0;
+    void *start;
+    size_t size;
 
     if (dma_rec_data.locked != 0)
     {
@@ -395,17 +382,22 @@ static void rec_dma_callback(void)
     if (dma_rec_bd.mode.status & BD_RROR)
         status = DMA_REC_ERROR_DMA;
 
-    more_ready = pcm_callback_more_ready;
+    pcm_rec_more_ready_callback(status, &start, &size);
 
-    if (more_ready != NULL && more_ready(status) >= 0)
-    {
-        sdma_channel_run(DMA_REC_CH_NUM);
+    if (size == 0)
         return;
-    }
 
-    /* Finished recording */
-    pcm_rec_dma_stop();
-    pcm_rec_dma_stopped_callback();
+    /* Invalidate - buffer must be coherent */
+    dump_dcache_range(start, size);
+
+    start = (void *)addr_virt_to_phys((unsigned long)start);
+
+    dma_rec_bd.buf_addr = start;
+    dma_rec_bd.mode.count = size;
+    dma_rec_bd.mode.command = TRANSFER_16BIT;
+    dma_rec_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
+
+    sdma_channel_run(DMA_REC_CH_NUM);
 }
 
 void pcm_rec_lock(void)
@@ -430,19 +422,6 @@ void pcm_rec_unlock(void)
         if (pending != 0)
             rec_dma_callback();
     }
-}
-
-void pcm_rec_dma_record_more(void *start, size_t size)
-{
-    /* Invalidate - buffer must be coherent */
-    dump_dcache_range(start, size);
-
-    start = (void *)addr_virt_to_phys((unsigned long)start);
-
-    dma_rec_bd.buf_addr = start;
-    dma_rec_bd.mode.count = size;
-    dma_rec_bd.mode.command = TRANSFER_16BIT;
-    dma_rec_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
 }
 
 void pcm_rec_dma_stop(void)

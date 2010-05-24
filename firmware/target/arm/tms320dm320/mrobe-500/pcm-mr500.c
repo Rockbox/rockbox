@@ -132,8 +132,6 @@ char buffer[80];
 void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
-    register pcm_more_callback_type get_more;   /* No stack for this */
-    
     unsigned int i;
 
     IO_INTC_FIQ0 = 1 << 11;
@@ -152,16 +150,9 @@ void DSPHINT(void)
         
     case MSG_REFILL:
         /* Buffer empty.  Try to get more. */
-        get_more = pcm_callback_for_more;
-        size = 0;
-        
-        if (get_more == NULL || (get_more(&start, &size), size == 0))
-        {
-            /* Callback missing or no more DMA to do */
-            pcm_play_dma_stop();
-            pcm_play_dma_stopped_callback();
-        }
-    
+        pcm_play_get_more_callback(&start, &size);
+
+        if (size != 0)
         {
             unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
             /* Flush any pending cache writes */

@@ -115,7 +115,6 @@ void pcm_dma_apply_settings(void)
 /* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */
 void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
 {
-    register pcm_more_callback_type get_more;
     register size_t size;
 
     DMA0_STATUS; /* Clear any pending interrupt */
@@ -141,15 +140,12 @@ void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
         }
 
         /* Buffer empty.  Try to get more. */
-        get_more = pcm_callback_for_more;
-        if (get_more) {
-            get_more((unsigned char **)&dma_play_data.addr, &dma_play_data.size);
-            dma_play_data.addr = (dma_play_data.addr + 2) & ~3;  
-            dma_play_data.size &= ~3;
-        }
+        pcm_play_get_more_callback((void **)&dma_play_data.addr,
+                                   &dma_play_data.size);
 
         if (dma_play_data.size == 0) {
-            break;
+            /* No more data */
+            return;
         }
 
         if (dma_play_data.addr < UNCACHED_BASE_ADDR) {
@@ -158,10 +154,6 @@ void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
             cpucache_flush();
         }
     }
-
-    /* Callback missing or no more DMA to do */
-    pcm_play_dma_stop();
-    pcm_play_dma_stopped_callback();
 }
 #else
 /* ASM optimised FIQ handler. Checks for the minimum allowed loop cycles by
@@ -247,28 +239,16 @@ void fiq_playback(void)
 #endif
 
     ".more_data:                     \n"
-        "ldr     r2, =pcm_callback_for_more \n"
-        "ldr     r2, [r2]            \n" /* get callback address */
-        "cmp     r2, #0              \n" /* check for null pointer */
-        "beq     .stop               \n" /* callback removed, stop */
-        "stmia   r11, { r8-r9 }      \n" /* save internal copies of variables back */
+        "ldr     r2, =pcm_play_get_more_callback \n"
         "mov     r0, r11             \n" /* r0 = &p */
         "add     r1, r11, #4         \n" /* r1 = &size */
-        "mov     lr, pc              \n" /* call pcm_callback_for_more */
+        "mov     lr, pc              \n" /* call pcm_play_get_more_callback */
         "bx      r2                  \n"
-        "ldmia   r11, { r8-r9 }      \n" /* reload p and size */
-        "cmp     r9, #0              \n" /* did we actually get more data? */
-        "bne     .check_fifo         \n"
+        "ldmia   r11, { r8-r9 }      \n" /* load new p and size */
+        "cmp     r9, #0              \n"
+        "bne     .check_fifo         \n" /* size != 0? refill */
 
-    ".stop:                          \n" /* call termination routines */
-        "ldr     r12, =pcm_play_dma_stop \n"
-        "mov     lr, pc              \n"
-        "bx      r12                 \n"
-        "ldr     r12, =pcm_play_dma_stopped_callback \n"
-        "mov     lr, pc              \n"
-        "bx      r12                 \n"
-
-    ".exit:                          \n" /* (r8=0 if stopping, look above) */
+    ".exit:                          \n" /* (r9=0 if stopping, look above) */
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
         "ldmfd   sp!, { r0-r3, lr }  \n"
         "subs    pc, lr, #4          \n" /* FIQ specific return sequence */
@@ -284,8 +264,6 @@ void fiq_playback(void) __attribute__((interrupt ("FIQ"))) ICODE_ATTR;
 /* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */
 void fiq_playback(void)
 {
-    register pcm_more_callback_type get_more;
-
 #if CONFIG_CPU == PP5002
     inl(0xcf001040);
 #endif
@@ -305,16 +283,11 @@ void fiq_playback(void)
         }
 
         /* p is empty, get some more data */
-        get_more = pcm_callback_for_more;
-        if (get_more) {
-            get_more((unsigned char**)&dma_play_data.addr,
-                     &dma_play_data.size);
-        }
+        pcm_play_get_more_callback((void **)&dma_play_data.addr,
+                                   &dma_play_data.size);
     } while (dma_play_data.size);
 
-    /* No more data, so disable the FIFO/interrupt */
-    pcm_play_dma_stop();
-    pcm_play_dma_stopped_callback();
+    /* No more data  */
 }
 #endif /* ASM / C selection */
 #endif /* CPU_PP502x */
@@ -589,7 +562,6 @@ void fiq_record(void) ICODE_ATTR __attribute__((interrupt ("FIQ")));
 #if defined(SANSA_C200) || defined(SANSA_E200)
 void fiq_record(void)
 {
-    register pcm_more_callback_type2 more_ready;
     register int32_t value;
 
     if (audio_channels == 2) {
@@ -648,20 +620,13 @@ void fiq_record(void)
         }
     }
 
-    more_ready = pcm_callback_more_ready;
-
-    if (more_ready == NULL || more_ready(0) < 0) {
-        /* Finished recording */
-        pcm_rec_dma_stop();
-        pcm_rec_dma_stopped_callback();
-    }
+    pcm_rec_more_ready_callback(0, (void *)&dma_rec_data.addr,
+                                &dma_rec_data.size);
 }
 
 #else
 void fiq_record(void)
 {
-    register pcm_more_callback_type2 more_ready;
-
     while (dma_rec_data.size > 0) {
         if (IIS_RX_FULL_COUNT < 2) {
             return;
@@ -676,23 +641,11 @@ void fiq_record(void)
         dma_rec_data.size -= 4;
     }
 
-    more_ready = pcm_callback_more_ready;
-
-    if (more_ready == NULL || more_ready(0) < 0) {
-        /* Finished recording */
-        pcm_rec_dma_stop();
-        pcm_rec_dma_stopped_callback();
-    }
+    pcm_rec_more_ready_callback(0, (void *)&dma_rec_data.addr,
+                                &dma_rec_data.size);
 }
 
 #endif /* SANSA_E200 */
-
-/* Continue transferring data in */
-void pcm_rec_dma_record_more(void *start, size_t size)
-{
-    dma_rec_data.addr = (unsigned long)start; /* Start of RX buffer */
-    dma_rec_data.size = size; /* Bytes to transfer */
-}
 
 void pcm_rec_dma_stop(void)
 {

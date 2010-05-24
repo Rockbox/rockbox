@@ -39,6 +39,7 @@
  *      pcm_play_lock
  *      pcm_play_unlock
  *   Semi-private -
+ *      pcm_play_get_more_callback
  *      pcm_play_dma_init
  *      pcm_play_dma_start
  *      pcm_play_dma_stop
@@ -48,28 +49,27 @@
  *      pcm_sampr (R)
  *      pcm_fsel (R)
  *      pcm_curr_sampr (R)
- *      pcm_callback_for_more (R)
  *      pcm_playing (R)
  *      pcm_paused (R)
  *
  * ==Playback/Recording==
+ *   Public -
+ *      pcm_dma_addr
  *   Semi-private -
  *      pcm_dma_apply_settings
- *      pcm_dma_addr
  *
  * ==Recording==
  *   Public -
  *      pcm_rec_lock
  *      pcm_rec_unlock
  *   Semi-private -
+ *      pcm_rec_more_ready_callback
  *      pcm_rec_dma_init
  *      pcm_rec_dma_close
  *      pcm_rec_dma_start
- *      pcm_rec_dma_record_more
  *      pcm_rec_dma_stop
  *      pcm_rec_dma_get_peak_buffer
  *   Data Read/Written within TSP -
- *      pcm_callback_more_ready (R)
  *      pcm_recording (R)
  *
  * States are set _after_ the target's pcm driver is called so that it may
@@ -78,7 +78,7 @@
  */
 
 /* the registered callback function to ask for more mp3 data */
-volatile pcm_more_callback_type pcm_callback_for_more
+static volatile pcm_play_callback_type pcm_callback_for_more
     SHAREDBSS_ATTR = NULL;
 /* PCM playback state */
 volatile bool pcm_playing SHAREDBSS_ATTR = false;
@@ -90,6 +90,14 @@ unsigned long pcm_curr_sampr SHAREDBSS_ATTR = 0;
 unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 /* samplerate frequency selection index */
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
+
+/* Called internally by functions to reset the state */
+static void pcm_play_stopped(void)
+{
+    pcm_callback_for_more = NULL;
+    pcm_paused = false;
+    pcm_playing = false;
+}
 
 /**
  * Perform peak calculation on a buffer of packed 16-bit samples.
@@ -187,6 +195,16 @@ const void* pcm_get_peak_buffer(int * count)
     return pcm_play_dma_get_peak_buffer(count);
 }
 
+bool pcm_is_playing(void)
+{
+    return pcm_playing;
+}
+
+bool pcm_is_paused(void)
+{
+    return pcm_paused;
+}
+
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
  * interface
@@ -198,7 +216,7 @@ void pcm_init(void)
 {
     logf("pcm_init");
 
-    pcm_play_dma_stopped_callback();
+    pcm_play_stopped();
 
     pcm_set_frequency(HW_SAMPR_DEFAULT);
 
@@ -214,7 +232,7 @@ static void pcm_play_data_start(unsigned char *start, size_t size)
 
     if (!(start && size))
     {
-        pcm_more_callback_type get_more = pcm_callback_for_more;
+        pcm_play_callback_type get_more = pcm_callback_for_more;
         size = 0;
         if (get_more)
         {
@@ -239,10 +257,10 @@ static void pcm_play_data_start(unsigned char *start, size_t size)
     /* Force a stop */
     logf(" pcm_play_dma_stop");
     pcm_play_dma_stop();
-    pcm_play_dma_stopped_callback();
+    pcm_play_stopped();
 }
 
-void pcm_play_data(pcm_more_callback_type get_more,
+void pcm_play_data(pcm_play_callback_type get_more,
                    unsigned char *start, size_t size)
 {
     logf("pcm_play_data");
@@ -255,6 +273,29 @@ void pcm_play_data(pcm_more_callback_type get_more,
     pcm_play_data_start(start, size);
 
     pcm_play_unlock();
+}
+
+void pcm_play_get_more_callback(void **start, size_t *size)
+{
+    pcm_play_callback_type get_more = pcm_callback_for_more;
+
+    *size = 0;
+
+    if (get_more && start)
+    {
+        /* Call registered callback */
+        get_more((unsigned char **)start, size);
+
+        *start = (void *)(((uintptr_t)*start + 3) & ~3);
+        *size &= ~3;
+
+        if (*start && *size)
+            return;
+    } 
+
+    /* Error, callback missing or no more DMA to do */
+    pcm_play_dma_stop();
+    pcm_play_stopped();
 }
 
 void pcm_play_pause(bool play)
@@ -302,7 +343,7 @@ void pcm_play_stop(void)
     {
         logf(" pcm_play_dma_stop");
         pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
+        pcm_play_stopped();
     }
     else
     {
@@ -310,13 +351,6 @@ void pcm_play_stop(void)
     }
 
     pcm_play_unlock();
-}
-
-void pcm_play_dma_stopped_callback(void)
-{
-    pcm_callback_for_more = NULL;
-    pcm_paused = false;
-    pcm_playing = false;
 }
 
 /**/
@@ -350,26 +384,23 @@ void pcm_apply_settings(void)
     }
 }
 
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
 
 /* Next start for recording peaks */
 static const void * volatile pcm_rec_peak_addr SHAREDBSS_ATTR = NULL;
 /* the registered callback function for when more data is available */
-volatile pcm_more_callback_type2
+static volatile pcm_rec_callback_type
     pcm_callback_more_ready SHAREDBSS_ATTR = NULL;
 /* DMA transfer in is currently active */
 volatile bool pcm_recording SHAREDBSS_ATTR = false;
+
+/* Called internally by functions to reset the state */
+static void pcm_recording_stopped(void)
+{
+    pcm_recording = false;
+    pcm_callback_more_ready = NULL;
+}
 
 /**
  * Return recording peaks - From the end of the last peak up to
@@ -410,10 +441,16 @@ void pcm_calculate_rec_peaks(int *left, int *right)
         *right = peaks[1];
 } /* pcm_calculate_rec_peaks */
 
+bool pcm_is_recording(void)
+{
+    return pcm_recording;
+}
+
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
  * interface
  */
+
 void pcm_init_recording(void)
 {
     logf("pcm_init_recording");
@@ -424,7 +461,7 @@ void pcm_init_recording(void)
     pcm_rec_lock();
 
     logf(" pcm_rec_dma_init");
-    pcm_rec_dma_stopped_callback();
+    pcm_recording_stopped();
     pcm_rec_dma_init();
 
     pcm_rec_unlock();
@@ -440,7 +477,7 @@ void pcm_close_recording(void)
     {
         logf(" pcm_rec_dma_stop");
         pcm_rec_dma_stop();
-        pcm_rec_dma_stopped_callback();
+        pcm_recording_stopped();
     }
 
     logf(" pcm_rec_dma_close");
@@ -449,7 +486,7 @@ void pcm_close_recording(void)
     pcm_rec_unlock();
 }
 
-void pcm_record_data(pcm_more_callback_type2 more_ready,
+void pcm_record_data(pcm_rec_callback_type more_ready,
                      void *start, size_t size)
 {
     logf("pcm_record_data");
@@ -493,43 +530,40 @@ void pcm_stop_recording(void)
     {
         logf(" pcm_rec_dma_stop");
         pcm_rec_dma_stop();
-        pcm_rec_dma_stopped_callback();
+        pcm_recording_stopped();
     }
 
     pcm_rec_unlock();
 } /* pcm_stop_recording */
 
-void pcm_record_more(void *start, size_t size)
+void pcm_rec_more_ready_callback(int status, void **start, size_t *size)
 {
-    start = (void *)(((uintptr_t)start + 3) & ~3);
-    size = size & ~3;
+    pcm_rec_callback_type have_more = pcm_callback_more_ready;
 
-    if (!size)
+    *size = 0;
+
+    if (have_more && start)
     {
-        pcm_rec_dma_stop();
-        pcm_rec_dma_stopped_callback();
-        return;
+        have_more(status, start, size);
+        *start = (void *)(((uintptr_t)*start + 3) & ~3);
+        *size &= ~3;
+
+        if (*start && *size)
+        {
+        #ifdef HAVE_PCM_REC_DMA_ADDRESS
+            /* Need a physical DMA address translation, if not already
+             * physical. */
+            pcm_rec_peak_addr = pcm_dma_addr(*start);
+        #else
+            pcm_rec_peak_addr = *start;
+        #endif
+            return;
+        }
     }
 
-#ifdef HAVE_PCM_REC_DMA_ADDRESS
-    /* Need a physical DMA address translation, if not already physical. */
-    pcm_rec_peak_addr = pcm_dma_addr(start);
-#else
-    pcm_rec_peak_addr = start;
-#endif
-
-    pcm_rec_dma_record_more(start, size);
-}
-
-bool pcm_is_recording(void)
-{
-    return pcm_recording;
-}
-
-void pcm_rec_dma_stopped_callback(void)
-{
-    pcm_recording = false;
-    pcm_callback_more_ready = NULL;
+    /* Error, callback missing or no more DMA to do */
+    pcm_rec_dma_stop();
+    pcm_recording_stopped();
 }
 
 #endif /* HAVE_RECORDING */

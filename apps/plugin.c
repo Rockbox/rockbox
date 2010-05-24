@@ -177,6 +177,9 @@ static const struct plugin_api rockbox_api = {
     &button_queue,
 #endif
     bidi_l2v,
+#ifdef HAVE_LCD_BITMAP
+    is_diacritic,
+#endif
     font_get_bits,
     font_load,
     font_get,
@@ -461,6 +464,9 @@ static const struct plugin_api rockbox_api = {
     sound_max,
     sound_unit,
     sound_val2phys,
+#ifdef AUDIOHW_HAVE_EQ
+    sound_enum_hw_eq_band_setting,
+#endif
 #ifndef SIMULATOR
     mp3_play_data,
     mp3_play_pause,
@@ -491,7 +497,6 @@ static const struct plugin_api rockbox_api = {
     pcm_init_recording,
     pcm_close_recording,
     pcm_record_data,
-    pcm_record_more,
     pcm_stop_recording,
     pcm_calculate_rec_peaks,
     audio_set_recording_gain,
@@ -630,7 +635,12 @@ static const struct plugin_api rockbox_api = {
     codec_thread_do_callback,
     codec_load_file,
     get_codec_filename,
+    find_array_ptr,
+    remove_array_ptr,
+#if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
+    round_value_to_list32,
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
     get_metadata,
     mp3info,
     count_mp3_frames,
@@ -711,24 +721,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#ifdef HAVE_LCD_BITMAP
-    is_diacritic,
-#endif
-
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
-    (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
-    round_value_to_list32,
-#endif
-
-#ifdef AUDIOHW_HAVE_EQ
-    sound_enum_hw_eq_band_setting,
-#endif
-
-#if CONFIG_CODEC == SWCODEC
-    find_array_ptr,
-    remove_array_ptr,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

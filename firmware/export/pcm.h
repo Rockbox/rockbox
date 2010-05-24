@@ -50,9 +50,9 @@
 /** RAW PCM routines used with playback and recording **/
 
 /* Typedef for registered callback */
-typedef void (*pcm_more_callback_type)(unsigned char **start,
+typedef void (*pcm_play_callback_type)(unsigned char **start,
                                        size_t *size);
-typedef int (*pcm_more_callback_type2)(int status);
+typedef void (*pcm_rec_callback_type)(int status, void **start, size_t *size);
 
 /* set the pcm frequency - use values in hw_sampr_list
  * use -1 for the default frequency
@@ -71,7 +71,7 @@ void pcm_init(void);
 void pcm_postinit(void);
 
 /* This is for playing "raw" PCM data */
-void pcm_play_data(pcm_more_callback_type get_more,
+void pcm_play_data(pcm_play_callback_type get_more,
                    unsigned char* start, size_t size);
 
 void pcm_calculate_peaks(int *left, int *right);
@@ -86,6 +86,11 @@ bool pcm_is_playing(void);
 /** The following are for internal use between pcm.c and target-
     specific portion **/
 
+/* Called by the bottom layer ISR when more data is needed. Returns non-
+ * zero size if more data is to be played. Setting start to NULL
+ * forces stop. */
+void pcm_play_get_more_callback(void **start, size_t *size);
+
 extern unsigned long pcm_curr_sampr;
 extern unsigned long pcm_sampr;
 extern int pcm_fsel;
@@ -94,10 +99,8 @@ extern int pcm_fsel;
 void * pcm_dma_addr(void *addr);
 #endif
 
-/* the registered callback function to ask for more mp3 data */
-extern volatile pcm_more_callback_type pcm_callback_for_more;
-extern volatile bool                   pcm_playing;
-extern volatile bool                   pcm_paused;
+extern volatile bool pcm_playing;
+extern volatile bool pcm_paused;
 
 void pcm_play_dma_lock(void);
 void pcm_play_dma_unlock(void);
@@ -105,7 +108,6 @@ void pcm_play_dma_init(void);
 void pcm_play_dma_start(const void *addr, size_t size);
 void pcm_play_dma_stop(void);
 void pcm_play_dma_pause(bool pause);
-void pcm_play_dma_stopped_callback(void);
 const void * pcm_play_dma_get_peak_buffer(int *count);
 
 void pcm_dma_apply_settings(void);
@@ -124,7 +126,7 @@ void pcm_init_recording(void);
 void pcm_close_recording(void);
 
 /* Start recording "raw" PCM data */
-void pcm_record_data(pcm_more_callback_type2 more_ready,
+void pcm_record_data(pcm_rec_callback_type more_ready,
                      void *start, size_t size);
 
 /* Stop tranferring data into supplied buffer */
@@ -133,17 +135,16 @@ void pcm_stop_recording(void);
 /* Is pcm currently recording? */
 bool pcm_is_recording(void);
 
-/* Continue transferring data in - call during interrupt handler */
-void pcm_record_more(void *start, size_t size);
+/* Called by bottom layer ISR when transfer is complete. Returns non-zero
+ * size if successful. Setting start to NULL forces stop. */
+void pcm_rec_more_ready_callback(int status, void **start, size_t *size);
 
 void pcm_calculate_rec_peaks(int *left, int *right);
 
 /** The following are for internal use between pcm.c and target-
     specific portion **/
-/* the registered callback function for when more data is available */
-extern volatile pcm_more_callback_type2 pcm_callback_more_ready;
 /* DMA transfer in is currently active */
-extern volatile bool                    pcm_recording;
+extern volatile bool pcm_recording;
 
 /* APIs implemented in the target-specific portion */
 void pcm_rec_dma_init(void);
@@ -151,7 +152,6 @@ void pcm_rec_dma_close(void);
 void pcm_rec_dma_start(void *addr, size_t size);
 void pcm_rec_dma_record_more(void *start, size_t size);
 void pcm_rec_dma_stop(void);
-void pcm_rec_dma_stopped_callback(void);
 const void * pcm_rec_dma_get_peak_buffer(void);
 
 #endif /* HAVE_RECORDING */

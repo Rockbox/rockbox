@@ -104,13 +104,10 @@ static inline void fill_dma_buf(int offset)
             p = tmp_p;
             if (l >= lend)
                 return;
-            else if (pcm_callback_for_more)
-                pcm_callback_for_more((unsigned char**)&p,
-                                  &p_size);
+
+            pcm_play_get_more_callback((void**)&p, &p_size);
         }
         while (p_size);
-
-        pcm_play_dma_stopped_callback();
     }
 
     if (l < lend)
