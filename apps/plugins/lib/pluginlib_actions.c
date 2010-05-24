@@ -186,8 +186,8 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
     { PLA_LEFT,              BUTTON_PREV,                       BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_NEXT,                       BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP,                         BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN,                       BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,         BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MPIO_HD200_PAD)

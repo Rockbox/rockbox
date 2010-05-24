@@ -29,6 +29,9 @@
 static int int_btn = BUTTON_NONE;
 static int old_pos = -1;
 
+static int scroll_repeat = BUTTON_NONE;
+static int repeat = 0;
+
 void button_init_device(void)
 {
 }
@@ -68,9 +71,23 @@ void button_int(void)
             int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
             if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
             if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
+
             old_pos = scr_pos;
+
+            /* repeat button */
+            repeat = 0;
+            if (int_btn!=BUTTON_NONE)
+            {
+                if (int_btn!=scroll_repeat)
+                scroll_repeat = int_btn;
+                else repeat = BUTTON_REPEAT;
+            }
         }
-        else old_pos=-1;
+        else
+        {
+            old_pos = -1; 
+            scroll_repeat = BUTTON_NONE; 
+        }
     }
 }
 
@@ -106,12 +123,13 @@ int button_read_device(void)
         /* Scrollstrip direct button post - much better response */
         if ((buttons==BUTTON_UP) || (buttons==BUTTON_DOWN))
         {
-            queue_post(&button_queue,buttons,0);
+            queue_post(&button_queue,buttons|repeat,0);
             backlight_on();
             buttonlight_on();
             reset_poweroff_timer();
             buttons = BUTTON_NONE;
             int_btn = BUTTON_NONE;
+            repeat = BUTTON_NONE;
         }
     }
     else return BUTTON_NONE;
