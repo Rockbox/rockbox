@@ -87,7 +87,6 @@ static const char * const irqname[] =
 
 static void UIRQ(void)
 {
-    unsigned int irq_no = 0;
     bool masked = false;
     int status = VIC_IRQ_STATUS;
     if(status == 0)
@@ -99,8 +98,7 @@ static void UIRQ(void)
     if(status == 0)
         panicf("Unhandled IRQ (source unknown!)");
 
-    while((status >>= 1))
-        irq_no++;
+    unsigned irq_no = find_first_set_bit(status);
 
     panicf("Unhandled %smasked IRQ %02X: %s (status 0x%8X)",
            masked ? "" : "no", irq_no, irqname[irq_no], status);
