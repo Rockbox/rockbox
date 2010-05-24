@@ -32,8 +32,8 @@
 /* These are global to save some latency when pcm_play_dma_get_peak_buffer is 
  *  called.
  */
-static unsigned char *start;
-static size_t         size;
+static void *start;
+static size_t size;
 
 void pcm_postinit(void)
 {

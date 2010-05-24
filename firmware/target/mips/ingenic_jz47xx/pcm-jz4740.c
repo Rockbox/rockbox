@@ -100,7 +100,7 @@ static inline void set_dma(const void *addr, size_t size)
 
 static inline void play_dma_callback(void)
 {
-    unsigned char *start;
+    void *start;
     size_t size;
 
     pcm_play_get_more_callback(&start, &size);

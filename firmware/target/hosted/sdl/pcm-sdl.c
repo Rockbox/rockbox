@@ -228,7 +228,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
-        pcm_play_get_more_callback(&pcm_data, &pcm_data_size);
+        pcm_play_get_more_callback((void **)&pcm_data, &pcm_data_size);
     start:
         if (pcm_data_size != 0) {
             udata->num_in  = pcm_data_size / pcm_sample_bytes;
