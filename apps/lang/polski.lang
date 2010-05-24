@@ -268,9 +268,10 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
@@ -825,10 +826,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Szerokość stereo"
+    *: "Szerokość bazy stereo"
   </dest>
   <voice>
-    *: "Szerokość stereofoniczna"
+    *: "Szerokość bazy stereo"
   </voice>
 </phrase>
 <phrase>
@@ -875,11 +876,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Wzm. crossfeedu"
+    swcodec: "Wzm. skrośne"
   </dest>
   <voice>
     *: none
-    swcodec: "Wzmocnienie krosfida"
+    swcodec: "wzmocnienie skrośne"
   </voice>
 </phrase>
 <phrase>
@@ -977,11 +978,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Precut"
+    swcodec: "Kompensacja poziomu"
   </dest>
   <voice>
     *: none
-    swcodec: "Pre-cut"
+    swcodec: "Kompensacja poziomu"
   </voice>
 </phrase>
 <phrase>
@@ -998,7 +999,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Podstawowe ustawnienia korektora"
+    swcodec: "Ustawnienia podstawowe korektora"
   </voice>
 </phrase>
 <phrase>
@@ -1015,7 +1016,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Zaawansowane ustawienia korektora"
+    swcodec: "Ustawienia zaawansowane korektora"
   </voice>
 </phrase>
 <phrase>
@@ -5014,7 +5015,7 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: "Plik mp3 .talk"
@@ -12675,5 +12676,1006 @@
   <voice>
     *: none
     quickscreen: "Ustaw jako górny element Szybkiego Dostępu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Losowo na koniec kolejki"
+  </dest>
+  <voice>
+    *: "Losowo na koniec kolejki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "styl paska statusu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Czas zwolnienia"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Czas zwolnienia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Szybki przycisk dla ekranu odtwarzania"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Szybki przycisk dla ekranu odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Próg wzbudzenia"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Próg wzbudzenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Wzm. pasma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Wzm. pasma %d"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Kompensacja poziomu"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Kompensacja poziomu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Styl bazowy"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Styl bazowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Wyjście liniowe"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Wyjście liniowe"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "styl ekranu radia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Szeroko"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Szeroko"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "styl paska statusu na pilocie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Krzywa kompresji"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Krzywa kompresji"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auto"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Wstaw losowo na koniec"
+  </dest>
+  <voice>
+    *: "Wstaw losowo na koniec"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Gładka"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Gładka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Następny:"
+  </dest>
+  <voice>
+    *: "Następny:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Stopień kompresji"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Stopień kompresji"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Tryb klawiatury USB"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Tryb klawiatury USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ostra"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ostra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Styl bazowy pilota"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Styl bazowy pilota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Przeglądarka"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Przeglądarka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Urządzenie USB HID"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "styl ekranu radia na pilocie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Ekran pilota"
+  </dest>
+  <voice>
+    *:none
+    remote: "Ekran pilota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Wąsko"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Wąsko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Inny"
+  </dest>
+  <voice>
+    *: none
+    radio: "Inny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Szybki przycisk dla menadżera plików"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Szybki przycisk dla menadżera plików"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cofnij przed wznowieniem"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cofnij przed wznowieniem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Bez opisu>"
+  </dest>
+  <voice>
+    *: "Bez opisu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Włochy"
+  </dest>
+  <voice>
+    *: none
+    radio: "Włochy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "dziesięć do jednego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Użyj kodów Morse'a"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Użyj kodów Morsa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Zaawansowane ustawienia dźwięku"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Zaawansowane ustawienia dźwięku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Dźwięk 3-D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Dźwięk 3-D"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "dwa do jednego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Częstotliwość pasma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Częstotliwość pasma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Szerokość pasma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Szerokość pasma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Myszka"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Myszka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimedia"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimedia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Własny"
+  </dest>
+  <voice>
+    *: "Własny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Ekran radia na pilocie"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Ekran radia na pilocie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Stacja:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skocz do zakończenia"
+  </dest>
+  <voice>
+    *: "Skocz do zakończenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Tylko przy automatycznej zmianie utworu"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Tylko przy automatycznej zmianie utworu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "sześć do jednego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Ekran główny"
+  </dest>
+  <voice>
+    *:none
+    remote: "Ekran główny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Barwa dźwięku"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Barwa dźwięku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Szybki przycisk"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Szybki przycisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Następny:"
+  </dest>
+  <voice>
+    *: "Następny:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "cztery do jednego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Prezentacja"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Prezentacja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "z"
+  </dest>
+  <voice>
+    *: "z"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Przedziały histogramu"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Przedziały histogramu"
   </voice>
 </phrase>
