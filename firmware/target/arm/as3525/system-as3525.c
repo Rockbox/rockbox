@@ -98,7 +98,7 @@ static void UIRQ(void)
     if(status == 0)
         panicf("Unhandled IRQ (source unknown!)");
 
-    unsigned irq_no = find_first_set_bit(status);
+    unsigned irq_no = 31 - __builtin_clz(status);
 
     panicf("Unhandled %smasked IRQ %02X: %s (status 0x%8X)",
            masked ? "" : "no", irq_no, irqname[irq_no], status);
