@@ -33,7 +33,7 @@
 
 #ifdef RELEASE
 #undef VERSION
-#define VERSION "4.0 with v3.0 bootloaders (v1.0 for 2nd Gen Nano)"
+#define VERSION "5.0 with v4.0 bootloaders (v1.0 for 2nd Gen Nano)"
 #endif
 
 
