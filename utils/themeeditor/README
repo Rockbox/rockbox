@@ -19,34 +19,9 @@
  *
  ****************************************************************************/
 
-namespace wps
-{
-    extern "C"
-    {
-#include "skin_parser.h"
-#include "skin_debug.h"
-    }
-}
-
-#include <cstdlib>
-#include <cstdio>
-
-#include <QtGui/QApplication>
-#include <QFileSystemModel>
-#include <QTreeView>
-
-int main(int argc, char* argv[])
-{
-
-    char* doc = "%Vd(U)\n\n%?bl(test,3,5,2,1)<param2|param3>";
-
-    struct wps::skin_element* test = wps::skin_parse(doc);
-
-    wps::skin_debug_tree(test);
-
-    wps::skin_free_tree(test);
-
-
-    return 0;
-}
-
+To build the theme editor, you will need a Qt development environment with the
+Qt core and GUI libraries and qmake, along with standard C and C++ compilers
+and libraries.  To compile, cd to the source directory and run the "qmake"
+command followed by "make".  This will produce the binary "themeeditor".  At the
+moment, this simply prints a text debug tree.  Soon, it will launch a GUI
+application.

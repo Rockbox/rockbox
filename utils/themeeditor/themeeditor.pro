@@ -1,4 +1,3 @@
-CONFIG += qt
 HEADERS += tag_table.h \
     symbols.h \
     skin_parser.h \
@@ -9,3 +8,4 @@ SOURCES += tag_table.c \
     skin_scan.c \
     skin_debug.c \
     main.cpp
+OTHER_FILES += README
