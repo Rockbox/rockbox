@@ -208,48 +208,52 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 {
     int status;
 
-    /* Clear old status flags */
-    MCI_CLEAR(drive) = 0x7ff;
-
-    /* Load command argument or clear if none */
-    MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
-
-    /* Construct MCI_COMMAND & enable CPSM */
-    MCI_COMMAND(drive) =
-       /*b0:5*/  cmd
-       /* b6 */| ((flags & (MCI_RESP|MCI_LONG_RESP)) ? MCI_COMMAND_RESPONSE : 0)
-       /* b7 */| ((flags & MCI_LONG_RESP) ? MCI_COMMAND_LONG_RESPONSE : 0)
-       /* b8   | MCI_COMMAND_INTERRUPT */
-       /* b9   | MCI_COMMAND_PENDING */  /*Only used with stream data transfer*/
-       /* b10*/| MCI_COMMAND_ENABLE;     /* Enables CPSM */
-
-    /* Wait while cmd completes then disable CPSM */
-    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
-    MCI_COMMAND(drive) = 0;
-
-    status = MCI_STATUS(drive);
-
-    /*  Handle command responses */
-    if(flags & MCI_RESP)                   /*  CMD expects response  */
+    unsigned cmd_retries = 6;
+    while(cmd_retries--)
     {
-        response[0] = MCI_RESP0(drive);    /*  Always prepare short response  */
+        /* Clear old status flags */
+        MCI_CLEAR(drive) = 0x7ff;
 
-        if(status & MCI_RESPONSE_ERROR)    /* timeout or crc failure */
-            return false;
+        /* Load command argument or clear if none */
+        MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
 
-        if(status & MCI_CMD_RESP_END)      /* Response passed CRC check */
+        /* Construct MCI_COMMAND & enable CPSM */
+        MCI_COMMAND(drive) =
+           /*b0:5*/  cmd
+           /* b6 */| ((flags & (MCI_RESP|MCI_LONG_RESP)) ? MCI_COMMAND_RESPONSE : 0)
+           /* b7 */| ((flags & MCI_LONG_RESP) ? MCI_COMMAND_LONG_RESPONSE : 0)
+           /* b8   | MCI_COMMAND_INTERRUPT */
+           /* b9   | MCI_COMMAND_PENDING */  /*Only used with stream data transfer*/
+           /* b10*/| MCI_COMMAND_ENABLE;     /* Enables CPSM */
+
+        /* Wait while cmd completes then disable CPSM */
+        while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
+        MCI_COMMAND(drive) = 0;
+
+        status = MCI_STATUS(drive);
+
+        /*  Handle command responses */
+        if(flags & MCI_RESP)                /* CMD expects response */
         {
-            if(flags & MCI_LONG_RESP)
-            {   /* response[0] has already been read */
-                response[1] = MCI_RESP1(drive);
-                response[2] = MCI_RESP2(drive);
-                response[3] = MCI_RESP3(drive);
+            response[0] = MCI_RESP0(drive); /* Always prepare short response */
+
+            if(status & MCI_RESPONSE_ERROR) /* timeout or crc failure */
+                continue;
+
+            if(status & MCI_CMD_RESP_END)   /* Response passed CRC check */
+            {
+                if(flags & MCI_LONG_RESP)
+                {   /* response[0] has already been read */
+                    response[1] = MCI_RESP1(drive);
+                    response[2] = MCI_RESP2(drive);
+                    response[3] = MCI_RESP3(drive);
+                }
+                return true;
             }
-            return true;
         }
+        else if(status & MCI_CMD_SENT)  /* CMD sent, no response required */
+            return true;
     }
-    else if(status & MCI_CMD_SENT)          /* CMD sent, no response required */
-        return true;
 
     return false;
 }
@@ -573,7 +577,7 @@ bool sd_present(IF_MD_NONVOID(int drive))
 static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response = 0;
-    unsigned int timeout = current_tick + HZ;
+    unsigned int timeout = current_tick + 5 * HZ;
 
     while (1)
     {
@@ -815,7 +819,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                                   transfer_error[drive], drive);
     }
 
-    ret = 0;    /* success */
+    /* be sure the card has finished programming */
+    ret = sd_wait_for_tran_state(drive);
+    if (ret < 0)
+        ret -= 5*20;
 
 sd_transfer_error:
 
@@ -911,10 +918,6 @@ void sd_enable(bool on)
             cpu_boosted = false;
         }
 #endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
-
-        /* not sure why we have to wait, but without this, test_disk freezes
-         * when closing the 300MB file which was just written to */
-        udelay(100);
 
         sd_enabled = false;
 
