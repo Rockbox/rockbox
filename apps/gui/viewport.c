@@ -443,7 +443,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     if (!LIST_VALUE_PARSED(set, PL_FG))
     {
-#ifdef HAVE_REMOTE_LCD
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (screen == SCREEN_REMOTE)
             vp->fg_pattern = REMOTE_FG_FALLBACK;
         else
@@ -452,7 +452,7 @@ const char* viewport_parse_viewport(struct viewport *vp,
     }
     if (!LIST_VALUE_PARSED(set, PL_BG))
     {
-#ifdef HAVE_REMOTE_LCD
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (screen == SCREEN_REMOTE)
             vp->bg_pattern = REMOTE_BG_FALLBACK;
         else
