@@ -32,6 +32,8 @@
 #define ARGLISTCLOSESYM ')'
 #define ARGLISTSEPERATESYM ','
 #define ENUMLISTSEPERATESYM '|'
+#define ENUMLISTOPENSYM '<'
+#define ENUMLISTCLOSESYM '>'
 #define DEFAULTSYM '-'
 
 #endif /* SYMBOLS_H */

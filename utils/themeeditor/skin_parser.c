@@ -153,8 +153,11 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
     struct skin_element* current = NULL;
 
     while(*cursor != '\n' && *cursor != '\0' && *cursor != MULTILINESYM
-          && !((*cursor == ARGLISTSEPERATESYM || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM) && conditional))
+          && !((*cursor == ARGLISTSEPERATESYM
+                || *cursor == ARGLISTCLOSESYM
+                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTCLOSESYM)
+               && conditional))
     {
         /* Allocating memory if necessary */
         if(root)
@@ -233,8 +236,11 @@ struct skin_element* skin_parse_sublines_optional(char** document,
 
     /* First we count the sublines */
     while(*cursor != '\0' && *cursor != '\n'
-          && !((*cursor == ARGLISTSEPERATESYM || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM) && conditional))
+          && !((*cursor == ARGLISTSEPERATESYM
+                || *cursor == ARGLISTCLOSESYM
+                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTCLOSESYM)
+               && conditional))
     {
         if(*cursor == COMMENTSYM)
             skip_comment(&cursor);
@@ -292,7 +298,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
 
     int num_args = 1;
     int i;
-    int count;
+    int star = 0; /* Flag for the all-or-none option */
+    int req_args; /* To mark when we enter optional arguments */
 
     int optional = 0;
 
@@ -327,8 +334,16 @@ int skin_parse_tag(struct skin_element* element, char** document)
     strcpy(element->name, tag_name);
     element->line = skin_line;
 
+    /* Checking for the * flag */
+    if(tag_args[0] == '*')
+    {
+        star = 1;
+        tag_args++;
+    }
+
     /* If this tag has no arguments, we can bail out now */
-    if(strlen(tag_args) == 0)
+    if(strlen(tag_args) == 0
+       || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM))
     {
         *document = cursor;
         return 1;
@@ -374,8 +389,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
     element->params = skin_alloc_params(num_args);
 
     /* Now we have to actually parse each argument */
-    i = 0;
-    while(i < num_args)
+    for(i = 0; i < num_args; i++)
     {
         /* Making sure we haven't run out of arguments */
         if(*tag_args == '\0')
@@ -388,111 +402,86 @@ int skin_parse_tag(struct skin_element* element, char** document)
         if(*tag_args == '|')
         {
             optional = 1;
+            req_args = i - 1;
             tag_args++;
         }
 
-        /* Checking for a repeated argument */
-        if(isdigit(*tag_args))
-        {
-            count = scan_int(&tag_args);
-        }
-        else
-        {
-            count = 1;
-        }
-
         /* Scanning the arguments */
-        while(count > 0)
+        skip_whitespace(&cursor);
+
+
+        /* Checking for comments */
+        if(*cursor == COMMENTSYM)
+            skip_comment(&cursor);
+
+        /* Checking a nullable argument for null */
+        if(*cursor == DEFAULTSYM)
         {
-
-            skip_whitespace(&cursor);
-
-            /* Checking for a premature end */
-            if(num_args - i < count)
+            if(islower(*tag_args))
             {
-                if(optional && (num_args - i == 0))
-                {
-                    break;
-                }
-                else
-                {
-                    /*
-                       We error out if there are too few arguments, or if there
-                       is an optional argument that was supposed to be grouped
-                       with another
-                    */
-                    skin_error(INSUFFICIENT_ARGS);
-                    return 0;
-                }
-            }
-
-            /* Checking for comments */
-            if(*cursor == COMMENTSYM)
-                skip_comment(&cursor);
-
-            /* Checking a nullable argument for null */
-            if(*cursor == DEFAULTSYM)
-            {
-                if(islower(*tag_args))
-                {
-                    element->params[i].type = DEFAULT;
-                    cursor++;
-                }
-                else
-                {
-                    skin_error(DEFAULT_NOT_ALLOWED);
-                    return 0;
-                }
-            }
-            else if(tolower(*tag_args) == 'i')
-            {
-                /* Scanning an int argument */
-                if(!isdigit(*cursor))
-                {
-                    skin_error(INT_EXPECTED);
-                    return 0;
-                }
-
-                element->params[i].type = NUMERIC;
-                element->params[i].data.numeric = scan_int(&cursor);
-            }
-            else if(tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')
-            {
-                /* Scanning a string argument */
-                element->params[i].type = STRING;
-                element->params[i].data.text = scan_string(&cursor);
-
-            }
-            else if(tolower(*tag_args) == 'c')
-            {
-                element->params[i].type = CODE;
-                element->params[i].data.code = skin_parse_code_as_arg(&cursor);
-                if(!element->params[i].data.code)
-                    return 0;
-            }
-
-            i++;
-            count--;
-            skip_whitespace(&cursor);
-
-            if(*cursor != ARGLISTSEPERATESYM && i < num_args)
-            {
-                skin_error(SEPERATOR_EXPECTED);
-                return 0;
-            }
-            else if(*cursor != ARGLISTCLOSESYM && i == num_args)
-            {
-                skin_error(CLOSE_EXPECTED);
-                return 0;
+                element->params[i].type = DEFAULT;
+                cursor++;
             }
             else
             {
-                cursor++;
+                skin_error(DEFAULT_NOT_ALLOWED);
+                return 0;
             }
+        }
+        else if(tolower(*tag_args) == 'i')
+        {
+            /* Scanning an int argument */
+            if(!isdigit(*cursor))
+            {
+                skin_error(INT_EXPECTED);
+                return 0;
+            }
+
+            element->params[i].type = NUMERIC;
+            element->params[i].data.numeric = scan_int(&cursor);
+        }
+        else if(tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')
+        {
+            /* Scanning a string argument */
+            element->params[i].type = STRING;
+            element->params[i].data.text = scan_string(&cursor);
+
+        }
+        else if(tolower(*tag_args) == 'c')
+        {
+            /* Recursively parsing a code argument */
+            element->params[i].type = CODE;
+            element->params[i].data.code = skin_parse_code_as_arg(&cursor);
+            if(!element->params[i].data.code)
+                return 0;
+        }
+
+        skip_whitespace(&cursor);
+
+        if(*cursor != ARGLISTSEPERATESYM && i < num_args - 1)
+        {
+            skin_error(SEPERATOR_EXPECTED);
+            return 0;
+        }
+        else if(*cursor != ARGLISTCLOSESYM && i == num_args - 1)
+        {
+            skin_error(CLOSE_EXPECTED);
+            return 0;
+        }
+        else
+        {
+            cursor++;
         }
 
         tag_args++;
 
+    }
+
+    /* Checking for a premature end */
+    if(*tag_args != '\0' && !(optional && (!star || num_args == req_args)))
+    {
+        skin_error(INSUFFICIENT_ARGS);
+        return 0;
     }
 
     *document = cursor;
@@ -516,8 +505,11 @@ int skin_parse_text(struct skin_element* element, char** document,
     /* First figure out how much text we're copying */
     while(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
           && *cursor != COMMENTSYM
-          && !((*cursor == ARGLISTSEPERATESYM || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM) && conditional))
+          && !((*cursor == ARGLISTSEPERATESYM
+                || *cursor == ARGLISTCLOSESYM
+                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTCLOSESYM)
+               && conditional))
     {
         /* Dealing with possibility of escaped characters */
         if(*cursor == TAGSYM)
@@ -573,13 +565,13 @@ int skin_parse_conditional(struct skin_element* element, char** document)
         return 0;
 
     /* Counting the children */
-    if(*(cursor++) != ARGLISTOPENSYM)
+    if(*(cursor++) != ENUMLISTOPENSYM)
     {
         skin_error(ARGLIST_EXPECTED);
         return 0;
     }
     bookmark = cursor;
-    while(*cursor != ARGLISTCLOSESYM && *cursor != '\n' && *cursor != '\0')
+    while(*cursor != ENUMLISTCLOSESYM && *cursor != '\n' && *cursor != '\0')
     {
         if(*cursor == COMMENTSYM)
         {
@@ -618,7 +610,7 @@ int skin_parse_conditional(struct skin_element* element, char** document)
             skin_error(SEPERATOR_EXPECTED);
             return 0;
         }
-        else if(i == children && *cursor != ARGLISTCLOSESYM)
+        else if(i == children && *cursor != ENUMLISTCLOSESYM)
         {
             skin_error(CLOSE_EXPECTED);
             return 0;

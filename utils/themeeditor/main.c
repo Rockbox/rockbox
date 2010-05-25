@@ -6,8 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    char* doc = "This is a sample %V(1, 2, 3, 4, 5, six, seven)\n"
-                "WPS document, with ; sublines and a %?T(conditional| or| two)";
+    char* doc = "%Vd(U))\n\n%?bl(test,3,5,2,1)<param2|param3>";
 
     struct skin_element* test = skin_parse(doc);
 

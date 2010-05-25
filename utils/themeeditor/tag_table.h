@@ -46,7 +46,8 @@
  *          To specify multiple instances of the same type, put a 
  *          number before the character.  For instance, the string...
  *             2s
- *          will specify two strings.
+ *          will specify two strings.  An asterisk (*) at the beginning of the
+ *          string will specify that either all or none of the optional
  *
  */
 struct tag_info

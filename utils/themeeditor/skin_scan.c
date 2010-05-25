@@ -73,6 +73,7 @@ char* scan_string(char** document)
     /* Copying the string */
     cursor = *document;
     buffer = skin_alloc_string(length);
+    buffer[length] = '\0';
     for(i = 0; i < length; i++)
     {
         if(*cursor == COMMENTSYM)

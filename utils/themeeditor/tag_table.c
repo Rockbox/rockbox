@@ -26,15 +26,33 @@
 /* The tag definition table */
 struct tag_info legal_tags[] = 
 {
-    { "V"  , "IIiii|2sc" },
-    { "Vi" , "SIIiii|2s" },
-    { "Vd" , "S" },
-    { "T"  , "" },
+    { "bl" , "*|fIIII" },
+    { "pb" , "*|fIIII" },
+    { "pv" , "*|fIIII" },
+    { "d"  , "I" },
+    { "D"  , "I" },
+    { "t"  , "I" },
+    { "mv" , "|I"},
+    { "pS" , "|I"},
+    { "pE" , "|I"},
+    { "Tl" , "|I"},
+    { "X"  , "F"},
+    { "Fl" , "IF"},
+    { "Cl" , "II|II"},
+    { "V"  , "*IIiii|ii"},
+    { "Vl" , "*SIIiii|ii"},
+    { "Vi" , "*sIIiii|ii"},
+    { "Vd" , "S"},
+    { "VI" , "S"},
+    { "Vp" , "ICC"},
+    { "St" , "S"},
+    { "Sx" , "S"},
+    { "T"  , "IIiiI"},
     { ""   , ""} /* Keep this here to mark the end of the table */
 };
 
 /* A table of legal escapable characters */
-char legal_escape_characters[] = "%(|);#,";
+char legal_escape_characters[] = "%(,);#<|>";
 
 /*
  * Just does a straight search through the tag table to find one by
