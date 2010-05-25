@@ -147,9 +147,9 @@ bool sb_set_backdrop(enum screen_type screen, char* filename)
 #endif
 void sb_skin_update(enum screen_type screen, bool force)
 {
-    static long next_update = 0;
+    static long next_update[NB_SCREENS] = {0};
     int i = screen;
-    if (TIME_AFTER(current_tick, next_update) || force)
+    if (TIME_AFTER(current_tick, next_update[i]) || force)
     {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         /* currently, all remotes are readable without backlight
@@ -158,7 +158,7 @@ void sb_skin_update(enum screen_type screen, bool force)
 #endif
             skin_update(&sb_skin[i], force?
                     WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
-        next_update = current_tick + update_delay; /* don't update too often */
+        next_update[i] = current_tick + update_delay; /* don't update too often */
         sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
     }
 }
