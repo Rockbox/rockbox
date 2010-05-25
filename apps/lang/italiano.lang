@@ -13656,4 +13656,17 @@
     gigabeats: "Enfatizzazione 3-D"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Nessun Tag>"
+  </dest>
+  <voice>
+    *: "Nessun Tag"
+  </voice>
+</phrase>
