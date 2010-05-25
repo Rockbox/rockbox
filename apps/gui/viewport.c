@@ -234,10 +234,7 @@ static void viewportmanager_redraw(void* data)
     {
 #ifdef HAVE_LCD_BITMAP
         if (is_theme_enabled(i))
-        {
-            printf("%d enabled\n", i);
             sb_skin_update(i, NULL != data);
-        }
 #else
         (void)data;
         gui_statusbar_draw(&statusbars.statusbars[i], NULL, NULL);
