@@ -28,5 +28,4 @@ void skip_whitespace(char** document);
 char* scan_string(char** document);
 int scan_int(char** document);
 
-
 #endif // SCANNING_H

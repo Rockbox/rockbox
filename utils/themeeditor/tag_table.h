@@ -22,6 +22,14 @@
 #ifndef TAG_TABLE_H
 #define TAG_TABLE_H
 
+#ifdef __cplusplus
+extern "C"
+{
+namespace wps
+{
+#endif
+
+
 /*
  * Struct for tag parsing information
  * name   - The name of the tag, i.e. V for %V

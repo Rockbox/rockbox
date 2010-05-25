@@ -33,5 +33,4 @@ void skin_debug_tree(struct skin_element* root);
 void skin_debug_params(int count, struct skin_tag_parameter params[]);
 void skin_debug_indent();
 
-
 #endif // SKIN_DEBUG_H

@@ -32,7 +32,7 @@
 
 /* Declaration of parse tree buffer */
 char skin_parse_tree[SKIN_MAX_MEMORY];
-int skin_current_block = 0; 
+int skin_current_block = 0;
 
 /* Global variables for the parser */
 int skin_line = 0;
@@ -330,7 +330,6 @@ int skin_parse_tag(struct skin_element* element, char** document)
 
     /* Copying basic tag info */
     element->type = TAG;
-    element->name = skin_alloc_string(strlen(tag_name));
     strcpy(element->name, tag_name);
     element->line = skin_line;
 
@@ -641,9 +640,6 @@ int skin_parse_newline(struct skin_element* element, char** document)
     element->type = NEWLINE;
     element->line = skin_line;
     skin_line++;
-    element->text = skin_alloc_string(1);
-    element->text[0] = '\n';
-    element->text[1] = '\0';
     element->next = NULL;
 
     *document = cursor;
@@ -800,4 +796,34 @@ char* skin_alloc_string(int length)
 struct skin_element** skin_alloc_children(int count)
 {
     return (struct skin_element**) malloc(sizeof(struct skin_element*) * count);
+}
+
+void skin_free_tree(struct skin_element* root)
+{
+    int i;
+
+    /* First make the recursive call */
+    if(!root)
+        return;
+    skin_free_tree(root->next);
+
+    /* Free any text */
+    if(root->type == TEXT)
+        free(root->text);
+
+    /* Then recursively free any children, before freeing their pointers */
+    for(i = 0; i < root->children_count; i++)
+        skin_free_tree(root->children[i]);
+    if(root->children_count > 0)
+        free(root->children);
+
+    /* Free any parameters, making sure to deallocate strings */
+    for(i = 0; i < root->params_count; i++)
+        if(root->params[i].type == STRING)
+            free(root->params[i].data.text);
+    if(root->params_count > 0)
+        free(root->params);
+
+    /* Finally, delete root's memory */
+    free(root);
 }

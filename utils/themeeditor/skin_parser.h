@@ -93,7 +93,7 @@ struct skin_element
     char* text;
 
     /* The tag or conditional name */
-    char* name;
+    char name[3];
 
     /* Pointer to and size of an array of parameters */
     int params_count;
@@ -120,5 +120,7 @@ struct skin_element* skin_alloc_element();
 struct skin_element** skin_alloc_children(int count);
 struct skin_tag_parameter* skin_alloc_params(int count);
 char* skin_alloc_string(int length);
+
+void skin_free_tree(struct skin_element* root);
 
 #endif /* GENERIC_PARSER_H */
