@@ -37,7 +37,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "metadata.h"
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"
