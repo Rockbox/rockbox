@@ -658,7 +658,7 @@ MOO
         
         $name =~ s/\"//g; # cut off the quotes
         
-        printf HFILE_CORE ("    %s,\n", $name);
+        printf HFILE_CORE ("    %s, /* 0x%x */\n", $name, $i);
     }
 
     # Output end of enum

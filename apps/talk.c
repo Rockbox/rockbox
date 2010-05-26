@@ -37,7 +37,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "metadata.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"
@@ -628,7 +628,13 @@ int talk_id(int32_t id, bool enqueue)
     if (clipbuf == NULL)
         return -1; /* not present */
 
-    logf("\ntalk_id: Say '%s'\n", str(id));
+#ifdef LOGF_ENABLE
+    if (id > VOICEONLY_DELIMITER)
+        logf("\ntalk_id: Say voice clip 0x%x\n", id - 1);
+    else
+        logf("\ntalk_id: Say '%s'\n", str(id));
+#endif
+
     queue_clip(clipbuf, clipsize, enqueue);
 
     return 0;
