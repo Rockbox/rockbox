@@ -1093,6 +1093,10 @@ bool recording_screen(bool no_source)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
+    /* This should be done before touching audio settings */
+    while (!audio_is_thread_ready())
+       sleep(0);
+
     /* recording_menu gets messed up: so prevent manus talking */
     talk_disable(true);
     /* audio_init_recording stops anything playing when it takes the audio
