@@ -39,9 +39,12 @@
 #define lang_is_rtl() (false)
 #define DEBUGF printf
 #endif /*WPSEDITOR*/
+extern FILE* updatefile;
+#define UPDATE_SKIN(...) fprintf(updatefile, __VA_ARGS__)
 #else
 #include "debug.h"
 #include "language.h"
+#define UPDATE_SKIN(...)
 #endif /*__PCTOOL__*/
 
 #include <ctype.h>
@@ -146,6 +149,22 @@ static int parse_languagedirection(const char *wps_bufptr,
                                   will be 0 again. */
     return 0;
 }
+
+static void dump_new_args(const char *start, const char *end, bool printend)
+{
+    (void)start; (void)end; (void)printend;
+#ifdef __PCTOOL__
+    UPDATE_SKIN("(");
+    while (start != end)
+    {
+        UPDATE_SKIN("%c", (*start == '|')?',':*start);
+        start++;
+    }
+    if (printend)
+        UPDATE_SKIN(")");
+#endif
+}
+
 
 #ifdef HAVE_LCD_BITMAP
 static int parse_viewport_display(const char *wps_bufptr,
@@ -507,6 +526,7 @@ static struct skin_token_list *new_skin_token_list_item(struct wps_token *token,
    immediately after the first eol, i.e. to the start of the next line */
 static int skip_end_of_line(const char *wps_bufptr)
 {
+    UPDATE_SKIN("\n");
     line_number++;
     int skip = 0;
     while(*(wps_bufptr + skip) != '\n')
@@ -655,12 +675,13 @@ static int parse_image_display(const char *wps_bufptr,
     {
         if (subimage >= img->num_subimages)
             return WPS_ERROR_INVALID_PARAM;
-
+        UPDATE_SKIN("(%c%c)", label, wps_bufptr[1]);
         /* Store sub-image number to display in high bits */
         token->value.i = label | (subimage << 8);
         return 2; /* We have consumed 2 bytes */
     } else {
         token->value.i = label;
+        UPDATE_SKIN("(%c)", label);
         return 1; /* We have consumed 1 byte */
     }
 }
@@ -689,7 +710,7 @@ static int parse_image_load(const char *wps_bufptr,
 
     if (!(ptr = parse_list("ssdd", NULL, '|', ptr, &id, &filename, &x, &y)))
         return WPS_ERROR_INVALID_PARAM;
-
+    dump_new_args(wps_bufptr+1, ptr, (token->type == WPS_TOKEN_IMAGE_DISPLAY));
     /* Check there is a terminating | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -729,6 +750,7 @@ static int parse_image_load(const char *wps_bufptr,
 
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
+        UPDATE_SKIN(",%d)", img->num_subimages);
     }
     struct skin_token_list *item = new_skin_token_list_item(NULL, img);
     if (!item)
@@ -758,7 +780,7 @@ static int parse_font_load(const char *wps_bufptr,
 
     if (!(ptr = parse_list("ds", NULL, '|', ptr, &id, &filename)))
         return WPS_ERROR_INVALID_PARAM;
-
+    dump_new_args(wps_bufptr+1, ptr, true);
     /* Check there is a terminating | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -796,6 +818,7 @@ static int parse_viewport_display(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
     token->value.i = letter;
+    UPDATE_SKIN("(%c)", letter);
     return 1;
 }
 
@@ -910,10 +933,12 @@ static int parse_playlistview(const char *wps_bufptr,
     length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
-    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);
+    ptr+=length;
+    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
-    
+    ptr+=length;
+    dump_new_args(wps_bufptr+1, ptr, true);
     return skip_end_of_line(wps_bufptr);
 }
 #endif
@@ -924,6 +949,7 @@ static int parse_viewport(const char *wps_bufptr,
 {
     (void)token; /* Kill warnings */
     const char *ptr = wps_bufptr;
+    const char* params_start;
 
     struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
 
@@ -944,6 +970,8 @@ static int parse_viewport(const char *wps_bufptr,
 
     if (*ptr == 'i')
     {
+        UPDATE_SKIN("i");
+        params_start = ptr+2;
         if (*(ptr+1) == '|')
         {
             char label = *(ptr+2);
@@ -966,8 +994,10 @@ static int parse_viewport(const char *wps_bufptr,
     }
     else if (*ptr == 'l')
     {
+        UPDATE_SKIN("l");
         if (*(ptr+1) == '|')
         {
+            params_start = ptr+2;
             char label = *(ptr+2);
             if (label >= 'a' && label <= 'z')
             {
@@ -979,6 +1009,8 @@ static int parse_viewport(const char *wps_bufptr,
             ptr += 3;
         }
     }
+    else
+        params_start = ptr+1;
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
@@ -987,7 +1019,7 @@ static int parse_viewport(const char *wps_bufptr,
     /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
     if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, '|')))
         return WPS_ERROR_INVALID_PARAM;
-
+    dump_new_args(params_start, ptr, true);
     /* Check for trailing | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -1031,11 +1063,15 @@ static int parse_image_special(const char *wps_bufptr,
         /* format: %X|filename.bmp| or %Xd */
         if (*(wps_bufptr) == 'd')
         {
+            UPDATE_SKIN("(d)");
             wps_data->backdrop = NULL;
             return skip_end_of_line(wps_bufptr);
         }
         else if (!error)
+        {
+            dump_new_args(wps_bufptr+1, strchr(wps_bufptr+1, '|'), true);
             wps_data->backdrop = (char*)wps_bufptr + 1;
+        }
     }
 #endif
     if (error)
@@ -1070,6 +1106,7 @@ static int parse_setting_and_lang(const char *wps_bufptr,
     if (!end || (size_t)(end-ptr+1) > sizeof temp)
         return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, ptr,end-ptr+1);
+    dump_new_args(wps_bufptr+1, end, true);
     
     if (token->type == WPS_TOKEN_TRANSLATEDSTRING)
     {
@@ -1105,6 +1142,7 @@ static int parse_dir_level(const char *wps_bufptr,
 {
     char val[] = { *wps_bufptr, '\0' };
     token->value.i = atoi(val);
+    UPDATE_SKIN("(%d)", token->value.i);
     (void)wps_data; /* Kill warnings */
     return 1;
 }
@@ -1157,6 +1195,9 @@ static int parse_timeout(const char *wps_bufptr,
                 val = 10;
                 break;
         }
+    }
+    else {
+        UPDATE_SKIN("(%d)", token->value.i);
     }
     token->value.i = val;
 
@@ -1226,6 +1267,7 @@ static int parse_progressbar(const char *wps_bufptr,
             return 0;
         return WPS_ERROR_INVALID_PARAM;
     }
+    dump_new_args(wps_bufptr+1, ptr, true);
 
     if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */
         pb->bm.data = (char*)filename;
@@ -1326,6 +1368,10 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* format: %Cl|x|y|[[l|c|r]mwidth]|[[t|c|b]mheight]| */
 
     newline = strchr(wps_bufptr, '\n');
+    const char* args_end = newline;
+    while (args_end > wps_bufptr+1 && *args_end!='|')
+        args_end--;
+    dump_new_args(wps_bufptr+1,args_end, true);
 
     _pos = wps_bufptr;
 
@@ -1542,7 +1588,7 @@ static int parse_touchregion(const char *wps_bufptr,
 
     if (!(ptr = parse_list("dddds", NULL, '|', ptr, &x, &y, &w, &h, &action)))
         return WPS_ERROR_INVALID_PARAM;
-
+    dump_new_args(wps_bufptr+1, ptr, true);
     /* Check there is a terminating | */
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -1621,6 +1667,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
         case ';':
         case '#':
             /* escaped characters */
+            UPDATE_SKIN("%c", *wps_bufptr);
             token->type = WPS_TOKEN_CHARACTER;
             token->value.c = *wps_bufptr;
             taglen = 1;
@@ -1629,6 +1676,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 
         case '?':
             /* conditional tag */
+            UPDATE_SKIN("?");
             token->type = WPS_TOKEN_CONDITIONAL;
             level++;
             condindex[level] = wps_data->num_tokens;
@@ -1648,6 +1696,7 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
             taglen = (tag->type != WPS_TOKEN_UNKNOWN) ? strlen(tag->name) : 2;
             token->type = tag->type;
             curr_line->curr_subline->line_type |= tag->refresh_type;
+            UPDATE_SKIN("%s", tag->name);
 
             /* if the tag has a special parsing function, we call it */
             if (tag->parse_func)
@@ -1820,6 +1869,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
 
             /* Regular tag */
             case '%':
+                UPDATE_SKIN("%%");
                 if ((ret = parse_token(wps_bufptr, data)) < 0)
                 {
                     fail = PARSE_FAIL_COND_INVALID_PARAM;
@@ -1840,7 +1890,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_UNCLOSED_COND;
                     break;
                 }
-
+                UPDATE_SKIN(";");
                 if (!skin_start_new_subline(curr_line, data->num_tokens))
                     fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
@@ -1853,6 +1903,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_COND_SYNTAX_ERROR;
                     break;
                 }
+                UPDATE_SKIN("<");
                 wps_bufptr += check_feature_tag(wps_bufptr,
                                     data->tokens[data->num_tokens-1].type);
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_START;
@@ -1866,6 +1917,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_INVALID_CHAR;
                     break;
                 }
+                UPDATE_SKIN(">");
 
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
                 if (lastcond[level])
@@ -1889,6 +1941,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_INVALID_CHAR;
                     break;
                 }
+                UPDATE_SKIN("|");
 
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_OPTION;
                 if (lastcond[level])
@@ -1911,8 +1964,17 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                     fail = PARSE_FAIL_UNCLOSED_COND;
                     break;
                 }
-
-                wps_bufptr += skip_end_of_line(wps_bufptr);
+                else
+                {
+                    UPDATE_SKIN("#");
+                    while(*wps_bufptr != '\n')
+                    {
+                        UPDATE_SKIN("%c", *wps_bufptr);
+                        wps_bufptr++;
+                    }
+                    UPDATE_SKIN("\n");
+                    wps_bufptr++;
+                }
                 break;
 
             /* End of this line */
@@ -1926,6 +1988,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CHARACTER;
                 data->tokens[data->num_tokens].value.c = '\n';
                 data->tokens[data->num_tokens].next = false;
+                UPDATE_SKIN("\n");
                 data->num_tokens++;
 
                 if (!skin_start_new_line(curr_vp, data->num_tokens))
@@ -1994,6 +2057,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
                         /* another occurrence of an existing string */
                         data->tokens[data->num_tokens].value.data = list->token->value.data;
                     }
+                    UPDATE_SKIN("%s", (char*)data->tokens[data->num_tokens].value.data);
                     data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
                     data->num_tokens++;
                 }

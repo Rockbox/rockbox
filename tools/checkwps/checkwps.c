@@ -229,6 +229,8 @@ void font_unload(int font_id)
 }
 #endif
 
+FILE* updatefile = NULL;
+
 int main(int argc, char **argv)
 {
     int res;
@@ -246,6 +248,7 @@ int main(int argc, char **argv)
     {
         printf("Usage: checkwps [OPTIONS] filename.wps [filename2.wps]...\n");
         printf("\nOPTIONS:\n");
+        printf("\t-u FILENAME\t\tUpdate skin to new format, output to FILENAME\n");
         printf("\t-v\t\tverbose\n");
         printf("\t-vv\t\tmore verbose\n");
         printf("\t-vvv\t\tvery verbose\n");
@@ -259,6 +262,16 @@ int main(int argc, char **argv)
         while (argv[1][i] && argv[1][i] == 'v') {
             i++;
             wps_verbose_level++;
+        }
+        if (argv[1][i] == 'u')
+        {
+            updatefile = fopen(argv[2], "w");
+            if (!updatefile)
+            {
+                printf("Couldnt open '%s'\n", argv[2]);
+                return 1;
+            }
+            filearg++;
         }
     }
 
