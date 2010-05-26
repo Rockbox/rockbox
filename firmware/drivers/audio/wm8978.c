@@ -129,13 +129,17 @@ static uint16_t wmc_regs[WMC_NUM_REGISTERS] =
 
 struct
 {
-    int vol_l;
-    int vol_r;
-    int dac_l;
-    int dac_r;
-    bool ahw_mute;
-    int prescaler;
-    int enhance_3d_prescaler;
+    signed   char vol_l;
+    signed   char vol_r;
+    unsigned char dac_l;
+    unsigned char dac_r;
+    unsigned char ahw_mute;
+    unsigned char prescaler;        /* Attenuation */
+    unsigned char eq_on;            /* Enabled */
+    signed   char band_gain[5];     /* Setting */
+    unsigned char enh_3d_prescaler; /* Attenuation */
+    unsigned char enh_3d_on;        /* Enabled */
+    unsigned char enh_3d;           /* Setting */
 } wmc_vol =
 {
     .vol_l = 0,
@@ -144,7 +148,11 @@ struct
     .dac_r = 0,
     .ahw_mute = false,
     .prescaler = 0,
-    .enhance_3d_prescaler = 0,
+    .eq_on = true,
+    .band_gain = { 0, 0, 0, 0, 0 },
+    .enh_3d_prescaler = 0,
+    .enh_3d_on = true,
+    .enh_3d   = 0,
 };
 
 static void wmc_write(unsigned int reg, unsigned int val)
@@ -252,14 +260,14 @@ void audiohw_preinit(void)
 
     /* 5. Set BIASEN = 1 in register R1. */
     wmc_set(WMC_POWER_MANAGEMENT1, WMC_BIASEN);
+
+    /* 6. Set L/ROUTEN = 1 in register R2. */
+    wmc_write(WMC_POWER_MANAGEMENT2, WMC_LOUT1EN | WMC_ROUT1EN);
 }
 
 void audiohw_postinit(void)
 {
-    sleep(HZ);
-
-    /* 6. Set L/ROUTEN = 1 in register R2. */
-    wmc_write(WMC_POWER_MANAGEMENT2, WMC_LOUT1EN | WMC_ROUT1EN);
+    sleep(5*HZ/4);
 
     /* 7. Enable other mixers as required */
 
@@ -316,6 +324,23 @@ static void get_headphone_levels(int val, int *dac_p, int *hp_p,
     *boost_p = boost;
 }
 
+static void sync_prescaler(void)
+{
+    int prescaler = 0;
+
+    /* Combine all prescaling into a single DAC attenuation */
+    if (wmc_vol.eq_on)
+        prescaler = wmc_vol.prescaler * 2;
+
+    if (wmc_vol.enh_3d_on)
+        prescaler += wmc_vol.enh_3d_prescaler;
+
+    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, wmc_vol.dac_l - prescaler,
+                     WMC_DVOL);
+    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, wmc_vol.dac_r - prescaler,
+                     WMC_DVOL);
+}
+
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
     int prev_l = wmc_vol.vol_l;
@@ -334,21 +359,18 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     wmc_vol.dac_l = dac_l;
     wmc_vol.dac_r = dac_r;
 
-    dac_l -= wmc_vol.prescaler + wmc_vol.enhance_3d_prescaler;
-    dac_r -= wmc_vol.prescaler + wmc_vol.enhance_3d_prescaler;
+    sync_prescaler();
 
     wmc_write_masked(WMC_LEFT_MIXER_CTRL, mix_l << WMC_BYPLMIXVOL_POS,
                      WMC_BYPLMIXVOL);
     wmc_write_masked(WMC_LEFT_ADC_BOOST_CTRL,
                      boost_l << WMC_L2_2BOOSTVOL_POS, WMC_L2_2BOOSTVOL);
-    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, dac_l, WMC_DVOL);
     wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, hp_l, WMC_AVOL);
 
     wmc_write_masked(WMC_RIGHT_MIXER_CTRL, mix_r << WMC_BYPRMIXVOL_POS,
                      WMC_BYPRMIXVOL);
     wmc_write_masked(WMC_RIGHT_ADC_BOOST_CTRL,
                      boost_r << WMC_R2_2BOOSTVOL_POS, WMC_R2_2BOOSTVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, dac_r, WMC_DVOL);
     wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, hp_r, WMC_AVOL);
 
     if (vol_l > 0)
@@ -405,6 +427,11 @@ void audiohw_set_eq_band_gain(unsigned int band, int val)
     if (band > 4)
         return;
 
+    wmc_vol.band_gain[band] = val;
+
+    if (!wmc_vol.eq_on)
+        val = 0;
+
     wmc_write_masked(band + WMC_EQ1_LOW_SHELF, 12 - val, WMC_EQG);
 }
 
@@ -433,27 +460,20 @@ void audiohw_set_eq_band_width(unsigned int band, int val)
  * gain to EQ bands. */
 void audiohw_set_prescaler(int val)
 {
-    val *= 2;
     wmc_vol.prescaler = val;
-    val += wmc_vol.enhance_3d_prescaler; /* Combine with 3D attenuation */
-
-    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, wmc_vol.dac_l - val,
-                     WMC_DVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, wmc_vol.dac_r - val,
-                     WMC_DVOL);
+    sync_prescaler();
 }
 
 /* Set the depth of the 3D effect */
 void audiohw_set_depth_3d(int val)
 {
-    int att = 10*val / 15; /* -5 dB @ full setting */
-    wmc_vol.enhance_3d_prescaler = att;
-    att += wmc_vol.prescaler;  /* Combine with prescaler attenuation */
+    wmc_vol.enh_3d_prescaler = 10*val / 15; /* -5 dB @ full setting */
+    wmc_vol.enh_3d = val;
 
-    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, wmc_vol.dac_l - att,
-                     WMC_DVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, wmc_vol.dac_r - att,
-                     WMC_DVOL);
+    if (!wmc_vol.enh_3d_on)
+        val = 0;
+
+    sync_prescaler();
     wmc_write_masked(WMC_3D_CONTROL, val, WMC_DEPTH3D);
 }
 
@@ -599,6 +619,22 @@ void audiohw_set_frequency(int fsel)
     }
 }
 
+void audiohw_enable_tone_controls(bool enable)
+{
+    int i;
+    wmc_vol.eq_on = enable;
+    audiohw_set_prescaler(wmc_vol.prescaler);
+
+    for (i = 0; i < 5; i++)
+        audiohw_set_eq_band_gain(i, wmc_vol.band_gain[i]);
+}
+
+void audiohw_enable_depth_3d(bool enable)
+{
+    wmc_vol.enh_3d_on = enable;
+    audiohw_set_depth_3d(wmc_vol.enh_3d);
+}
+
 #ifdef HAVE_RECORDING
 void audiohw_set_recsrc(int source, bool recording)
 {
@@ -615,7 +651,9 @@ void audiohw_set_recsrc(int source, bool recording)
         /* Disable IP BOOSTMIX and PGA */
         wmc_clear(WMC_POWER_MANAGEMENT2, WMC_INPPGAENL | WMC_INPPGAENR |
                   WMC_BOOSTENL | WMC_BOOSTENR);
-        wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+        wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                  WMC_LIP2INPPGA | WMC_RIP2INPPGA |
+                                  WMC_LIN2INPPGA | WMC_RIN2INPPGA);
         wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
         wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
         break;
@@ -637,7 +675,11 @@ void audiohw_set_recsrc(int source, bool recording)
             wmc_set(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
             wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
             /* Connect L/R2 inputs to PGA */
-            wmc_set(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+            wmc_write_masked(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                             WMC_LIN2INPPGA | WMC_RIN2INPPGA,
+                                             WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                             WMC_LIP2INPPGA | WMC_RIP2INPPGA |
+                                             WMC_LIN2INPPGA | WMC_RIN2INPPGA);
         }
         else
         {
@@ -647,7 +689,9 @@ void audiohw_set_recsrc(int source, bool recording)
             wmc_write_masked(WMC_POWER_MANAGEMENT2, WMC_BOOSTENL | WMC_BOOSTENR,
                 WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
                 WMC_INPPGAENR | WMC_ADCENL | WMC_ADCENR);
-            wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+            wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                      WMC_LIP2INPPGA | WMC_RIP2INPPGA |
+                                      WMC_LIN2INPPGA | WMC_RIN2INPPGA);
             wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
             wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
             /* Enable bypass to L/R mixers */

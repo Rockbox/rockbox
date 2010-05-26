@@ -23,6 +23,9 @@
 #include "audiohw.h"
 #include "audio.h"
 
+void audiohw_enable_tone_controls(bool enable);
+void audiohw_enable_depth_3d(bool enable);
+
 /* Set the audio source for IIS TX */
 void audio_set_output_source(int source)
 {
@@ -30,12 +33,19 @@ void audio_set_output_source(int source)
     {
     default:
     case AUDIO_SRC_PLAYBACK:
+        audiohw_enable_tone_controls(true);
+        audiohw_enable_depth_3d(true);
         /* Receive data from PORT2 (SSI2) */
         AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT2;
         /* wmc_clear(WMC_COMPANDING_CTRL, WMC_LOOPBACK); */
         break;
 
     case AUDIO_SRC_FMRADIO:
+        /* Analog path doesn't support these and digital radio playback
+         * cannot be done without mixing on the MCU if voice is to be
+         * heard. Any recording should match what is heard. */
+        audiohw_enable_tone_controls(false);
+        audiohw_enable_depth_3d(false);
         /* External source - receive data from self (loopback to TX) */
         AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT4;
         /* wmc_set(WMC_COMPANDING_CTRL, WMC_LOOPBACK); */
