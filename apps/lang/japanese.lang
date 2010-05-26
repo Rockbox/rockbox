@@ -13280,11 +13280,11 @@
   </source>
   <dest>
     *:none
-    remote: "リモート画面"
+    remote: "リモコン画面"
   </dest>
   <voice>
     *:none
-    remote: "リモート画面"
+    remote: "リモコン画面"
   </voice>
 </phrase>
 <phrase>
@@ -13458,20 +13458,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
     *:none
-    radio_remote: "リモートFMラジオ"
+    radio_remote: "ラジオ画面"
   </dest>
   <voice>
     *:none
-    radio_remote: "リモート F M ラジオ"
+    radio_remote: "ラジオ画面"
   </voice>
 </phrase>
 <phrase>
@@ -13673,5 +13673,22 @@
   </dest>
   <voice>
     *: "タグ無し"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "ラジオ画面"
+  </dest>
+  <voice>
+    *:none
+    radio: "ラジオ画面"
   </voice>
 </phrase>
