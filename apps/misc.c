@@ -256,7 +256,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     (void)parameter;
     bookmark_autobookmark(false);
     call_storage_idle_notifys(true);
-    exit(0);
 #else
     long msg_id = -1;
     int i;

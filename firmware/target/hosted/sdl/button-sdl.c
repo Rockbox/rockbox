@@ -176,7 +176,6 @@ void gui_message_loop(void)
             case SDL_QUIT:
             {
                 sim_exit_irq_handler();
-                SDL_Quit();
                 exit(EXIT_SUCCESS);
                 break;
             }

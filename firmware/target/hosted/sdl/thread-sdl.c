@@ -566,7 +566,12 @@ void remove_thread(unsigned int thread_id)
 
 void thread_exit(void)
 {
-    remove_thread(THREAD_ID_CURRENT);
+    struct thread_entry *t = thread_id_entry(THREAD_ID_CURRENT);
+    /* the main thread cannot be removed since it's created implicitely
+     * by starting the program;
+     * it has no valid jumpbuf to exit, do nothing for now */
+    if (t != &threads[0])
+        remove_thread(t->id);
 }
 
 void thread_wait(unsigned int thread_id)
