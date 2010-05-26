@@ -167,8 +167,11 @@ size_t pcm_get_bytes_waiting(void)
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    *count = dma_size >> 2;
-    return (const void*)dma_start_addr;
+    pcm_play_lock();
+    unsigned char *addr = (void*)DMAC_CH_SRC_ADDR(1);
+    *count = (dma_size - (addr - dma_start_addr)) >> 2;
+    pcm_play_unlock();
+    return AS3525_UNCACHED_ADDR(addr);
 }
 
 #ifdef HAVE_PCM_DMA_ADDRESS
