@@ -101,7 +101,7 @@ static void UIRQ(void)
     unsigned irq_no = 31 - __builtin_clz(status);
 
     panicf("Unhandled %smasked IRQ %02X: %s (status 0x%8X)",
-           masked ? "" : "no", irq_no, irqname[irq_no], status);
+           masked ? "" : "un", irq_no, irqname[irq_no], status);
 }
 
 struct vec_int_src
