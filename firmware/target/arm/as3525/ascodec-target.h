@@ -131,7 +131,7 @@ static inline int ascodec_read_pmu(unsigned int index, unsigned int subreg)
     /* we disable interrupts to make sure no operation happen on the i2c bus
      * between selecting the sub register and reading it */
     int oldstatus = disable_irq_save();
-    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
+    ascodec_write(AS3543_PMU_ENABLE, subreg);
     int ret = ascodec_read(index);
     restore_irq(oldstatus);
     return ret;
