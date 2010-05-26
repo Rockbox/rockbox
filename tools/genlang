@@ -390,7 +390,7 @@ my @voiceid;           # counter for voice-only ID numbers
 
 for (keys %users) {
     push @idcount, 0;
-    push @voiceid, 0x8000;
+    push @voiceid, 0x8001;
 }
 
 #
@@ -653,7 +653,7 @@ MOO
     ;
 
 # Output the ID names for the enum in the header file
-    for $i (0x8000 .. ($voiceid[$users{"core"}]-1)) {
+    for $i (0x8001 .. ($voiceid[$users{"core"}]-1)) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID name
         
         $name =~ s/\"//g; # cut off the quotes

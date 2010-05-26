@@ -630,7 +630,7 @@ int talk_id(int32_t id, bool enqueue)
 
 #ifdef LOGF_ENABLE
     if (id > VOICEONLY_DELIMITER)
-        logf("\ntalk_id: Say voice clip 0x%x\n", id - 1);
+        logf("\ntalk_id: Say voice clip 0x%x\n", id);
     else
         logf("\ntalk_id: Say '%s'\n", str(id));
 #endif
