@@ -291,7 +291,6 @@ void pcm_rec_dma_stop(void)
     dma_release();
     rec_dma_size = 0;
 
-    I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
     I2SIN_CONTROL &= ~(1<<11); /* disable dma */
 
     CGU_AUDIO &= ~((1<<23)|(1<<11));
@@ -312,8 +311,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     CGU_PERI |= CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= ((1<<23)|(1<<11));
-
-    I2SOUT_CONTROL |= 1<<5; /* source = loopback from i2sin fifo */
 
     I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */
 
