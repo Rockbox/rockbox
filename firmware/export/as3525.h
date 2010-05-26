@@ -441,9 +441,9 @@ CE lines
 #define VIC_SOFT_INT        (*(volatile unsigned long*)(VIC_BASE+0x18))
 #define VIC_SOFT_INT_CLEAR  (*(volatile unsigned long*)(VIC_BASE+0x1C))
 #define VIC_PROTECTION      (*(volatile unsigned long*)(VIC_BASE+0x20))
-#define VIC_VECT_ADDR       (*(volatile unsigned long*)(VIC_BASE+0x30))
-#define VIC_DEF_VECT_ADDR   (*(volatile unsigned long*)(VIC_BASE+0x34))
-#define VIC_VECT_ADDRS      ((volatile unsigned long*)(VIC_BASE+0x100))
+#define VIC_VECT_ADDR       ((void (* volatile *) (void)) (VIC_BASE+0x30))
+#define VIC_DEF_VECT_ADDR   ((void (* volatile *) (void)) (VIC_BASE+0x34))
+#define VIC_VECT_ADDRS      ((void (* volatile *) (void)) (VIC_BASE+0x100))
 #define VIC_VECT_CNTLS      ((volatile unsigned long*)(VIC_BASE+0x200))
 
 /* Interrupt sources (for vectors setup) */

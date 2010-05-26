@@ -38,8 +38,9 @@
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
+static void UIRQ (void) __attribute__((interrupt ("IRQ")));
+void irq_handler(void) __attribute__((interrupt ("IRQ")));
+void fiq_handler(void) __attribute__((interrupt ("FIQ")));
 
 default_interrupt(INT_WATCHDOG);
 default_interrupt(INT_TIMER1);
@@ -136,8 +137,6 @@ struct vec_int_src vec_int_srcs[] =
 
 static void setup_vic(void)
 {
-    volatile unsigned long *vic_vect_addrs = VIC_VECT_ADDRS;
-    volatile unsigned long *vic_vect_cntls = VIC_VECT_CNTLS;
     const unsigned int n = sizeof(vec_int_srcs)/sizeof(vec_int_srcs[0]);
     unsigned int i;
 
@@ -145,12 +144,12 @@ static void setup_vic(void)
     VIC_INT_EN_CLEAR = 0xffffffff; /* disable all interrupt lines */
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
 
-    VIC_DEF_VECT_ADDR = (unsigned long)UIRQ;
+    *VIC_DEF_VECT_ADDR = UIRQ;
 
     for(i = 0; i < n; i++)
     {
-        vic_vect_addrs[i] = (unsigned long)vec_int_srcs[i].isr;
-        vic_vect_cntls[i] = (1<<5) | vec_int_srcs[i].source;
+        VIC_VECT_ADDRS[i] = vec_int_srcs[i].isr;
+        VIC_VECT_CNTLS[i] = (1<<5) | vec_int_srcs[i].source;
     }
 }
 
@@ -168,21 +167,12 @@ void INT_GPIOA(void)
 
 void irq_handler(void)
 {
-    asm volatile(   "stmfd  sp!, {r0-r5,ip,lr}      \n" /* Store context */
-                    "ldr    r5, =0xC6010030         \n" /* VIC_VECT_ADDR */
-                    "mov    lr, pc                  \n" /* Return from ISR */
-                    "ldr    pc, [r5]                \n" /* execute ISR */
-                    "str    r0, [r5]                \n" /* Ack interrupt */
-                    "ldmfd  sp!, {r0-r5,ip,lr}      \n" /* Restore context */
-                    "subs   pc, lr, #4              \n" /* Return from IRQ */
-            );
+    (*VIC_VECT_ADDR)(); /* call the isr */
+    *VIC_VECT_ADDR = (void*)VIC_VECT_ADDR; /* any write will ack the irq */
 }
 
 void fiq_handler(void)
 {
-    asm volatile (
-        "subs   pc, lr, #4   \r\n"
-    );
 }
 
 #if defined(SANSA_C200V2)
