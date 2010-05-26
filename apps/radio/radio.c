@@ -70,6 +70,9 @@
 #include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "buffering.h"
+#if CONFIG_CODEC == SWCODEC
+#include "playback.h"
+#endif
 
 #if CONFIG_TUNER
 
