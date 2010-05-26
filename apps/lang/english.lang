@@ -13528,20 +13528,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </dest>
   <voice>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </voice>
 </phrase>
 <phrase>
@@ -13743,5 +13743,22 @@
   </dest>
   <voice>
     *: "Untagged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Radio Screen"
+  </dest>
+  <voice>
+    *:none
+    radio: "Radio Screen"
   </voice>
 </phrase>

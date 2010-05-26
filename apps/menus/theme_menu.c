@@ -255,7 +255,7 @@ MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM,
         browse_folder, (void*)&sbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
 MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_FM_RADIO), 
+        ID2P(LANG_RADIOSCREEN), 
         browse_folder, (void*)&fms, NULL, Icon_Wps);
 #endif
 #endif
@@ -271,7 +271,7 @@ MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM,
         browse_folder, (void*)&rsbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
 MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_FMRADIO), 
+        ID2P(LANG_REMOTE_RADIOSCREEN), 
         browse_folder, (void*)&rfms, NULL, Icon_Wps);
 #endif
 #endif
