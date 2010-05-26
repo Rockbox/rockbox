@@ -13456,12 +13456,12 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
     *:none
@@ -13671,5 +13671,22 @@
   </dest>
   <voice>
     *: "Ej taggad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Radioskal"
+  </dest>
+  <voice>
+    *:none
+    radio: "Radioskal"
   </voice>
 </phrase>
