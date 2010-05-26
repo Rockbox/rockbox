@@ -225,7 +225,7 @@ sub copywps
 
            open(WPSFILE, "$dir/$req_g_wps");
            while (<WPSFILE>) {
-              $filelist[$#filelist + 1] = $1 if (/\|([^|]*?.bmp)\|/);
+              $filelist[$#filelist + 1] = $1 if (/[\(,]([^,]*?.bmp)[\),]/);
            }
            close(WPSFILE);
 
