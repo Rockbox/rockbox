@@ -19,43 +19,41 @@
  *
  ****************************************************************************/
 
-namespace wps
+extern "C"
 {
-    extern "C"
-    {
 #include "skin_parser.h"
 #include "skin_debug.h"
-    }
 }
 
-#include <cstdlib>
-#include <cstdio>
+#ifndef PARSETREEMODEL_H
+#define PARSETREEMODEL_H
 
-#include <QtGui/QApplication>
-#include <QTreeView>
+#include <QAbstractItemModel>
+#include <QList>
 
-#include "parsetreemodel.h"
+#include "parsetreenode.h"
 
-int main(int argc, char* argv[])
+class ParseTreeModel : public QAbstractItemModel
 {
 
-    char* doc = "%Vd(U)\n\n%?bl(test,3,5,2,1)<param2|param3>";
+    Q_OBJECT
 
-    struct wps::skin_element* test = wps::skin_parse(doc);
+public:
+    /* Initializes a tree with a WPS document in a string */
+    ParseTreeModel(char* wps, QObject* parent = 0);
+    virtual ~ParseTreeModel();
 
-    wps::skin_debug_tree(test);
+    QModelIndex index(int row, int column, const QModelIndex& parent) const;
+    QModelIndex parent(const QModelIndex &child) const;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
 
-    wps::skin_free_tree(test);
+private:
+    ParseTreeNode* root;
+    struct skin_element* wps;
+};
 
-    QApplication app(argc, argv);
 
-    QTreeView tree;
-    ParseTreeModel model(doc);
-    tree.setModel(&model);
-    tree.show();
 
-    return app.exec();
-
-    return 0;
-}
-
+#endif // PARSETREEMODEL_H
