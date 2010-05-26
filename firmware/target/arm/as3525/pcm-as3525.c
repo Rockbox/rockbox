@@ -40,18 +40,20 @@ static size_t      dma_size;   /* in 4*32 bits */
 static void dma_callback(void);
 static int locked = 0;
 
+static int play_irq_state;
+
 /* Mask the DMA interrupt */
 void pcm_play_lock(void)
 {
     if(++locked == 1)
-        VIC_INT_EN_CLEAR = INTERRUPT_DMAC;
+        play_irq_state = disable_irq_save();
 }
 
 /* Unmask the DMA interrupt if enabled */
 void pcm_play_unlock(void)
 {
     if(--locked == 0)
-        VIC_INT_ENABLE = INTERRUPT_DMAC;
+        restore_irq(play_irq_state);
 }
 
 static void play_start_pcm(void)
@@ -198,18 +200,19 @@ static void rec_dma_callback(void);
 static int16_t *mono_samples;
 #endif
 
+static int rec_irq_state;
 
 void pcm_rec_lock(void)
 {
     if(++rec_locked == 1)
-        VIC_INT_EN_CLEAR = INTERRUPT_DMAC;
+        rec_irq_state = disable_irq_save();
 }
 
 
 void pcm_rec_unlock(void)
 {
     if(--rec_locked == 0)
-        VIC_INT_ENABLE = INTERRUPT_DMAC;
+        restore_irq(rec_irq_state);
 }
 
 
