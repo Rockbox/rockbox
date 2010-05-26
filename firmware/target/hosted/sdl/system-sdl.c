@@ -76,17 +76,6 @@ void sys_poweroff(void)
 void gui_message_loop(void);
 
 /*
- * This callback let's the main thread run again after SDL has been initialized
- **/
-static uint32_t cond_signal(uint32_t interval, void *param)
-{
-    (void)interval;
-    SDL_cond *c = (SDL_cond*)param;
-    /* remove timer, CondSignal returns 0 on success */
-    return SDL_CondSignal(c);
-}
-
-/*
  * This thread will read the buttons in an interrupt like fashion, and
  * also initializes SDL_INIT_VIDEO and the surfaces
  *
@@ -143,9 +132,9 @@ static int sdl_event_thread(void * param)
     if (background && picture_surface != NULL)
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
 
-    /* calling SDL_CondSignal() right away here doesn't work reliably so
-     * post-pone it a bit */
-    SDL_AddTimer(100, cond_signal, param);
+    /* let system_init proceed */
+    SDL_SemPost((SDL_sem *)param);
+
     /*
      * finally enter the button loop */
     while(1)
@@ -157,26 +146,22 @@ static int sdl_event_thread(void * param)
 
 void system_init(void)
 {
-    SDL_cond *c;
-    SDL_mutex *m;
+    SDL_sem *s;
+
     if (SDL_Init(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
     atexit(sys_poweroff);
 
-    c = SDL_CreateCond();
-    m = SDL_CreateMutex();
+    s = SDL_CreateSemaphore(0); /* 0-count so it blocks */
 
-    SDL_CreateThread(sdl_event_thread, c);
+    SDL_CreateThread(sdl_event_thread, s);
 
-    /* Lock mutex and wait for sdl_event_thread to run so that it can
-     * initialize the surfaces and video subsystem needed for SDL events */
-    SDL_LockMutex(m);
-    SDL_CondWait(c, m);
-    SDL_UnlockMutex(m);
+    /* wait for sdl_event_thread to run so that it can initialize the surfaces
+     * and video subsystem needed for SDL events */
+    SDL_SemWait(s);
 
     /* cleanup */
-    SDL_DestroyCond(c);
-    SDL_DestroyMutex(m);
+    SDL_DestroySemaphore(s);
 }
 
 void system_exception_wait(void)
