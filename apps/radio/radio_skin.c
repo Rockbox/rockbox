@@ -45,14 +45,14 @@ void fms_data_load(enum screen_type screen, const char *buf, bool isfile)
 
     if (!success ) /* load the default */
     {  
-        const char default_fms[] =  "%Sx|Station:| %tf\n"
-                                    "%?ts<%Sx|Stereo||%Sx|Mono|>\n"
-                                    "%?tm<%Sx|Mode:| %Sx|Scan||%Sx|Preset|: %Ti. %?Tn<%Tn|%Tf>>\n"
-                                    "%pb\n"           
+        const char default_fms[] =  "%s%?Ti<%Ti. |>%?Tn<%Tn|%Tf>\n"
+                                    "%Sx|Station:| %tf MHz\n"
+                                    "%?St|force fm mono|<%Sx|Force Mono||%?ts<%Sx|Stereo||%Sx|Mono|>>\n"
+                                    "%Sx|Mode:| %?tm<%Sx|Scan||%Sx|Preset|>\n"
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
-                                    "%?Rr<%Sx|Time:| %Rh:%Rn:%Rs|"
-                                    "%?St|prerecording time|<%Sx|Prerecord Time| %Rs|%pm>>\n"
-#endif 	 
+                                    "%?Rr<%Sx|Time:| %Rh:%Rn:%Rs|%?St|prerecording time|<%pm|%Sx|Prerecord Time| %Rs>>\n"
+#endif
+                                    "%pb\n"
 #ifdef HAVE_RDS_CAP
                                     "\n%s%ty\n"
                                     "%s%tz\n"
