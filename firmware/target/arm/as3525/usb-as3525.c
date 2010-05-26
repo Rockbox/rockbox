@@ -29,17 +29,11 @@
 #include "power.h"
 #include "as3525.h"
 
-#if CONFIG_CPU == AS3525
 static int usb_status = USB_EXTRACTED;
-#else
-#if defined(SANSA_CLIPV2)
-#define USB_DETECT_PIN 6
-#endif
-#endif
 
 void usb_enable(bool on)
 {
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
     if (on)
         usb_core_init();
     else
@@ -51,12 +45,8 @@ void usb_enable(bool on)
 
 void usb_init_device(void)
 {
-#ifdef USB_DETECT_PIN
-    GPIOA_DIR &= ~(1 << USB_DETECT_PIN); /* set as input */
-#endif
 }
 
-#if CONFIG_CPU == AS3525
 void usb_insert_int(void)
 {
     usb_status = USB_INSERTED;
@@ -71,14 +61,3 @@ int usb_detect(void)
 {
     return usb_status;
 }
-#else
-int usb_detect(void)
-{
-#ifdef USB_DETECT_PIN
-    if (GPIOA_PIN( USB_DETECT_PIN ))
-        return USB_INSERTED;
-    else
-#endif
-        return USB_EXTRACTED;
-}
-#endif

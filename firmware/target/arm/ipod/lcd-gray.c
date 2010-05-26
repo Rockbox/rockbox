@@ -73,7 +73,7 @@ static void invert_display(void);
 #if defined(IPOD_1G2G)
 #define DEFAULT_CONTRAST 45
 #elif defined(IPOD_3G)
-#define DEFAULT_CONTRAST 40
+#define DEFAULT_CONTRAST 50
 #elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
 #define DEFAULT_CONTRAST 42
 #elif defined(IPOD_4G)

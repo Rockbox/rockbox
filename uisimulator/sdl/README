@@ -1,6 +1,0 @@
-To build:
-
- $ ../tools/configure
- [answer questions]
- $ make
- $ ./rockboxui

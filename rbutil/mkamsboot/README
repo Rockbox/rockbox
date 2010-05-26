@@ -61,8 +61,7 @@ firmware and the new (rockbox) firmware.
 
   The player will boot into the Original Firmware as well if it is powered up by
 inserting an usb cable.
-  ***Note : on the m200v4 and Clip+, powering up by usb will cause booting into
-the new firmware.
+  ***Note : on the m200v4 powering up by usb will cause booting into the new firmware.
 
 Hacking
 -------

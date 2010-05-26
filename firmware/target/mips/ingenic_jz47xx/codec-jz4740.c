@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "audio.h"
-#include "audiohw.h"
+#include "sound.h"
 #include "jz4740.h"
 #include "system.h"
 
@@ -33,8 +33,12 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1,   0,   6,   0},
 #endif
     /* HAVE_SW_TONE_CONTROLS */
+#ifdef AUDIOHW_HAVE_BASS
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
+#endif
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},

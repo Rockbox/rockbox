@@ -234,7 +234,8 @@ enum {
 
 #if !defined(SIMULATOR) && !defined(__PCTOOL__) 
 #include "system-target.h"
-#else /* SIMULATOR */
+#elif defined(HAVE_SDL) /* SIMULATOR */
+#include "system-sdl.h"
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
@@ -295,10 +296,14 @@ static inline void cpucache_flush(void)
 }
 #endif
 
+#ifndef CACHEALIGN_SIZE /* could be elsewhere for a particular reason */
 #ifdef CACHEALIGN_BITS
 /* 2^CACHEALIGN_BITS = the byte size */
 #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
+#else
+#define CACHEALIGN_SIZE sizeof(int)
 #endif
+#endif /* CACHEALIGN_SIZE */
 
 #ifdef PROC_NEEDS_CACHEALIGN
 /* Cache alignment attributes and sizes are enabled */

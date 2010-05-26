@@ -724,9 +724,11 @@ static void dump_cook_context(COOKContext *q)
  * Cook initialization
  */
 
- int cook_decode_init(RMContext *rmctx, COOKContext *q)
- {   
-   
+int cook_decode_init(RMContext *rmctx, COOKContext *q)
+{
+#if defined(CPU_COLDFIRE)
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+#endif
     /* cook extradata */
     q->cookversion = rm_get_uint32be(rmctx->codec_extradata);
     q->samples_per_frame =  rm_get_uint16be(&rmctx->codec_extradata[4]);

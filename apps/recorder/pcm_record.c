@@ -31,6 +31,7 @@
 #include "audio.h"
 #include "sound.h"
 #include "metadata.h"
+#include "appevents.h"
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
@@ -127,7 +128,11 @@ static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
 ****************************************************************************/
 
 /** buffer parameters where incoming PCM data is placed **/
+#if MEM <= 2
+#define PCM_NUM_CHUNKS             16 /* Power of 2 */
+#else
 #define PCM_NUM_CHUNKS            256 /* Power of 2 */
+#endif
 #define PCM_CHUNK_SIZE           8192 /* Power of 2 */
 #define PCM_CHUNK_MASK          (PCM_NUM_CHUNKS*PCM_CHUNK_SIZE - 1)
 
@@ -168,15 +173,22 @@ static int            flood_watermark; /* boost thread priority when here  */
 #endif
 
 /* Constants that control watermarks */
-#define LOW_SECONDS     1       /* low watermark time till empty           */
 #define MINI_CHUNKS    10       /* chunk count for mini flush              */
 #ifdef HAVE_PRIORITY_SCHEDULING
 #define PRIO_SECONDS   10       /* max flush time before priority boost    */
 #endif
-#if MEM <= 16
+#if MEM <= 2
+/* fractions must be integer fractions of 4 because they are evaluated with
+ * X*4*XXX_SECONDS, that way we avoid float calculation */
+#define LOW_SECONDS     1/4     /* low watermark time till empty           */
+#define PANIC_SECONDS   1/2     /* flood watermark time until full         */
+#define FLUSH_SECONDS   1       /* flush watermark time until full         */
+#elif MEM <= 16
+#define LOW_SECONDS     1       /* low watermark time till empty           */
 #define PANIC_SECONDS   5       /* flood watermark time until full         */
 #define FLUSH_SECONDS   7       /* flush watermark time until full         */
 #else
+#define LOW_SECONDS     1       /* low watermark time till empty           */
 #define PANIC_SECONDS   8
 #define FLUSH_SECONDS  10
 #endif /* MEM */
@@ -244,7 +256,7 @@ enum
 /*******************************************************************/
     
 /* Callback for when more data is ready - called in interrupt context */
-static int pcm_rec_have_more(int status)
+static void pcm_rec_have_more(int status, void **start, size_t *size)
 {
     if (status < 0)
     {
@@ -253,9 +265,9 @@ static int pcm_rec_have_more(int status)
         {
             /* Flush recorded data to disk and stop recording */
             queue_post(&pcmrec_queue, PCMREC_STOP, 0);
-            return -1;
+            return;
         }
-        /* else try again next transmission */
+        /* else try again next transmission - frame is invalid */
     }
     else if (!dma_lock)
     {
@@ -270,8 +282,8 @@ static int pcm_rec_have_more(int status)
         dma_wr_pos = next_pos;
     }
 
-    pcm_record_more(GET_PCM_CHUNK(dma_wr_pos), PCM_CHUNK_SIZE);
-    return 0;
+    *start = GET_PCM_CHUNK(dma_wr_pos);
+    *size = PCM_CHUNK_SIZE;
 } /* pcm_rec_have_more */
 
 static void reset_hardware(void)
@@ -734,7 +746,9 @@ static void pcmrec_refresh_watermarks(void)
     logf("ata spinup: %d", storage_spinup_time());
 
     /* set the low mark for when flushing stops if automatic */
-    low_watermark = (LOW_SECONDS*4*sample_rate + (enc_chunk_size-1))
+    /* don't change the order in this expression, LOW_SECONDS can be an
+     * integer fraction of 4 */
+    low_watermark = (sample_rate*4*LOW_SECONDS + (enc_chunk_size-1))
                         / enc_chunk_size;
     logf("low wmk: %d", low_watermark);
 
@@ -743,8 +757,10 @@ static void pcmrec_refresh_watermarks(void)
        this allows encoder to boost with just under a second of
        pcm data (if not yet full enough to boost itself)
        and not falsely trip the alarm. */
+    /* don't change the order in this expression, PANIC_SECONDS can be an
+     * integer fraction of 4 */
     flood_watermark = enc_num_chunks -
-        (PANIC_SECONDS*4*sample_rate + (enc_chunk_size-1))
+        (sample_rate*4*PANIC_SECONDS + (enc_chunk_size-1))
              / enc_chunk_size;
 
     if (flood_watermark < low_watermark)
@@ -756,7 +772,7 @@ static void pcmrec_refresh_watermarks(void)
     logf("flood at: %d", flood_watermark);
 #endif
     spinup_time = last_storage_spinup_time = storage_spinup_time();
-
+#if (CONFIG_STORAGE & STORAGE_ATA)
     /* write at 8s + st remaining in enc_buffer - range 12s to
        20s total - default to 3.5s spinup. */
     if (spinup_time == 0)
@@ -765,6 +781,7 @@ static void pcmrec_refresh_watermarks(void)
         spinup_time = 2*HZ;      /* ludicrous - ramdisk?          */
     else if (spinup_time > 10*HZ)
         spinup_time = 10*HZ;     /* do you have a functioning HD? */
+#endif
 
     /* try to start writing with 10s remaining after disk spinup */
     high_watermark = enc_num_chunks -
@@ -773,9 +790,9 @@ static void pcmrec_refresh_watermarks(void)
 
     if (high_watermark < low_watermark)
     {
+        logf("warning: low 'write at' (%d)", high_watermark);
         high_watermark = low_watermark;
         low_watermark /= 2;
-        logf("warning: low 'write at'");
     }
 
     logf("write at: %d", high_watermark);
@@ -1111,6 +1128,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 static void pcmrec_init(void)
 {
     unsigned char *buffer;
+    send_event(RECORDING_EVENT_START, NULL);
 
     /* warings and errors */
     warnings          =
@@ -1167,6 +1185,7 @@ static void pcmrec_close(void)
     pcm_close_recording();
     reset_hardware();
     audio_remove_encoder();
+    send_event(RECORDING_EVENT_STOP, NULL);
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */

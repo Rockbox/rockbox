@@ -58,10 +58,19 @@ PLUGIN_HEADER
 #define COLS (LCD_WIDTH/SOKOBAN_TILESIZE)
 #endif
 
-/* Use either all but 16k of the plugin buffer for level data
+/* size of code+bss */
+#if CONFIG_CPU == SH7034
+#define CODE_SIZE 0x3000 /* 12k */
+#else
+#define CODE_SIZE 0x5000 /* 20k */
+#endif
+
+#define CODE_AND_UNDO_SIZE (CODE_SIZE+0x1000) /* + 4k */
+
+/* Use either all but code & undo of the plugin buffer for level data
  * or 128k, which ever is less */
-#if PLUGIN_BUFFER_SIZE - 0x4000 < 0x20000
-#define MAX_LEVEL_DATA       (PLUGIN_BUFFER_SIZE - 0x4000)
+#if PLUGIN_BUFFER_SIZE - CODE_AND_UNDO_SIZE < 0x20000
+#define MAX_LEVEL_DATA       (PLUGIN_BUFFER_SIZE - CODE_AND_UNDO_SIZE)
 #else
 #define MAX_LEVEL_DATA       0x20000
 #endif
@@ -69,11 +78,11 @@ PLUGIN_HEADER
 /* Number of levels for which to allocate buffer indexes */
 #define MAX_LEVELS           MAX_LEVEL_DATA/70
 
-/* Use 4k plus remaining plugin buffer (-12k for prog) for undo, up to 64k */
-#if PLUGIN_BUFFER_SIZE - MAX_LEVEL_DATA - 0x3000 > 0x10000
+/* Use remaining plugin buffer (- code prog) for undo, up to 64k */
+#if PLUGIN_BUFFER_SIZE - MAX_LEVEL_DATA - CODE_SIZE > 0x10000
 #define MAX_UNDOS            0x10000
 #else
-#define MAX_UNDOS            (PLUGIN_BUFFER_SIZE - MAX_LEVEL_DATA - 0x3000)
+#define MAX_UNDOS            (PLUGIN_BUFFER_SIZE - MAX_LEVEL_DATA - CODE_SIZE)
 #endif
 
 /* Move/push definitions for undo */

@@ -126,8 +126,10 @@ void* plugin_get_buffer(size_t *buffer_size);
 #undef LDEBUGF
 #define LDEBUGF rb->debugf
 #else
-#define DEBUGF(...)
-#define LDEBUGF(...)
+#undef DEBUGF
+#define DEBUGF(...) do { } while(0)
+#undef LDEBUGF
+#define LDEBUGF(...) do { } while(0)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGF
@@ -142,12 +144,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 183
+#define PLUGIN_API_VERSION 187
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 182
+#define PLUGIN_MIN_API_VERSION 187
 
 /* plugin return codes */
 enum plugin_status {
@@ -257,6 +259,9 @@ struct plugin_api {
     struct event_queue *button_queue;
 #endif
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
+#ifdef HAVE_LCD_BITMAP
+    bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
+#endif
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     int (*font_load)(struct font*, const char *path);
     struct font* (*font_get)(int font);
@@ -548,7 +553,9 @@ struct plugin_api {
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
     void* (*memmove)(void *out, const void *in, size_t n);
+#ifndef SIMULATOR
     const unsigned char *_rbctype_;
+#endif
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
@@ -573,6 +580,10 @@ struct plugin_api {
     int (*sound_max)(int setting);
     const char * (*sound_unit)(int setting);
     int (*sound_val2phys)(int setting, int value);
+#ifdef AUDIOHW_HAVE_EQ
+    int (*sound_enum_hw_eq_band_setting)(unsigned int band,
+                                         unsigned int band_setting);
+#endif /* AUDIOHW_HAVE_EQ */
 #ifndef SIMULATOR
     void (*mp3_play_data)(const unsigned char* start, int size,
                           void (*get_more)(unsigned char** start, size_t* size));
@@ -587,7 +598,7 @@ struct plugin_api {
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
-    void (*pcm_play_data)(pcm_more_callback_type get_more,
+    void (*pcm_play_data)(pcm_play_callback_type get_more,
             unsigned char* start, size_t size);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
@@ -606,9 +617,8 @@ struct plugin_api {
     const unsigned long *rec_freq_sampr;
     void (*pcm_init_recording)(void);
     void (*pcm_close_recording)(void);
-    void (*pcm_record_data)(pcm_more_callback_type2 more_ready,
+    void (*pcm_record_data)(pcm_rec_callback_type more_ready,
                             void *start, size_t size);
-    void (*pcm_record_more)(void *start, size_t size);
     void (*pcm_stop_recording)(void);
     void (*pcm_calculate_rec_peaks)(int *left, int *right);
     void (*audio_set_recording_gain)(int left, int right, int type);
@@ -735,7 +745,7 @@ struct plugin_api {
 #endif
 
     /* misc */
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if !defined(SIMULATOR)
     int* __errno;
 #endif
     void (*srand)(unsigned int seed);
@@ -770,7 +780,15 @@ struct plugin_api {
                                      unsigned int *audio_thread_id);
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
+    void ** (*find_array_ptr)(void **arr, void *ptr);
+    int (*remove_array_ptr)(void **arr, void *ptr);
+#if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
+int (*round_value_to_list32)(unsigned long value,
+                             const unsigned long list[],
+                             int count,
+                             bool signd);
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
     bool (*mp3info)(struct mp3entry *entry, const char *filename);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
@@ -870,10 +888,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#ifdef HAVE_LCD_BITMAP
-    bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
-#endif
 };
 
 /* plugin header */

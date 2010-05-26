@@ -424,11 +424,11 @@ static struct memory_handle *find_handle(int handle_id)
    delta maximum bytes available to move the handle.  If the move is performed
          it is set to the actual distance moved.
    data_size is the amount of data to move along with the struct.
-   returns a valid memory_handle if the move is successful
-           NULL if the handle is NULL, the  move would be less than the size of
-           a memory_handle after correcting for wraps or if the handle is not
-           found in the linked list for adjustment.  This function has no side
-           effects if NULL is returned. */
+   returns true if the move is successful and false if the handle is NULL,
+           the  move would be less than the size of a memory_handle after
+           correcting for wraps or if the handle is not found in the linked
+           list for adjustment.  This function has no side effects if false
+           is returned. */
 static bool move_handle(struct memory_handle **h, size_t *delta,
                         size_t data_size, bool can_wrap)
 {
@@ -552,7 +552,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     *delta = final_delta;
     mutex_unlock(&llist_mod_mutex);
     mutex_unlock(&llist_mutex);
-    return dest;
+    return true;
 }
 
 
@@ -686,7 +686,7 @@ static bool buffer_handle(int handle_id)
             stop = true;
             DEBUGF( "%s(): Preventing handle corruption: h1.id:%d h2.id:%d"
                     " copy_n:%lu overlap:%ld h1.filerem:%lu\n", __func__,
-                    h->id, h->next->id, (unsigned long)copy_n, overlap,
+                    h->id, h->next->id, (unsigned long)copy_n, (long)overlap,
                     (unsigned long)h->filerem);
             copy_n -= overlap;
         }
@@ -1007,7 +1007,6 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     }
 
     /* Other cases: there is a little more work. */
-
     int fd = open(file, O_RDONLY);
     if (fd < 0)
         return ERR_FILE_ERROR;

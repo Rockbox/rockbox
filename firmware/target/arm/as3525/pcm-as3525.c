@@ -74,18 +74,13 @@ static void dma_callback(void)
 {
     if(!dma_size)
     {
-        register pcm_more_callback_type get_more = pcm_callback_for_more;
-        if(get_more)
-            get_more(&dma_start_addr, &dma_size);
+        pcm_play_get_more_callback((void **)&dma_start_addr, &dma_size);
+
+        if (!dma_size)
+            return;
     }
 
-    if(!dma_size)
-    {
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
-    }
-    else
-        play_start_pcm();
+    play_start_pcm();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
@@ -134,19 +129,35 @@ void pcm_postinit(void)
     audiohw_postinit();
 }
 
+/* divider is 9 bits but the highest one (for 8kHz) fit in 8 bits */
+static const unsigned char divider[SAMPR_NUM_FREQ] = {
+    [HW_FREQ_96] = ((AS3525_MCLK_FREQ/128 + SAMPR_96/2) / SAMPR_96) - 1,
+    [HW_FREQ_88] = ((AS3525_MCLK_FREQ/128 + SAMPR_88/2) / SAMPR_88) - 1,
+    [HW_FREQ_64] = ((AS3525_MCLK_FREQ/128 + SAMPR_64/2) / SAMPR_64) - 1,
+    [HW_FREQ_48] = ((AS3525_MCLK_FREQ/128 + SAMPR_48/2) / SAMPR_48) - 1,
+    [HW_FREQ_44] = ((AS3525_MCLK_FREQ/128 + SAMPR_44/2) / SAMPR_44) - 1,
+    [HW_FREQ_32] = ((AS3525_MCLK_FREQ/128 + SAMPR_32/2) / SAMPR_32) - 1,
+    [HW_FREQ_24] = ((AS3525_MCLK_FREQ/128 + SAMPR_24/2) / SAMPR_24) - 1,
+    [HW_FREQ_22] = ((AS3525_MCLK_FREQ/128 + SAMPR_22/2) / SAMPR_22) - 1,
+    [HW_FREQ_16] = ((AS3525_MCLK_FREQ/128 + SAMPR_16/2) / SAMPR_16) - 1,
+    [HW_FREQ_12] = ((AS3525_MCLK_FREQ/128 + SAMPR_12/2) / SAMPR_12) - 1,
+    [HW_FREQ_11] = ((AS3525_MCLK_FREQ/128 + SAMPR_11/2) / SAMPR_11) - 1,
+    [HW_FREQ_8 ] = ((AS3525_MCLK_FREQ/128 + SAMPR_8 /2) / SAMPR_8 ) - 1,
+};
+
+static inline unsigned char mclk_divider(void)
+{
+    return divider[pcm_fsel];
+}
+
 void pcm_dma_apply_settings(void)
 {
-    unsigned long frequency = pcm_sampr;
-
-    /* TODO : use a table ? */
-    const int divider = ((AS3525_MCLK_FREQ/128) + (frequency/2)) / frequency;
-
-    int cgu_audio = CGU_AUDIO;  /* read register */
-    cgu_audio &= ~(3 << 0);     /* clear i2sout MCLK_SEL */
-    cgu_audio |=  (AS3525_MCLK_SEL << 0);  /* set i2sout MCLK_SEL */
-    cgu_audio &= ~(511 << 2);   /* clear i2sout divider */
-    cgu_audio |= (divider - 1) << 2;  /* set new i2sout divider */
-    CGU_AUDIO = cgu_audio;      /* write back register */
+    int cgu_audio = CGU_AUDIO;              /* read register */
+    cgu_audio &= ~(3 << 0);                 /* clear i2sout MCLK_SEL */
+    cgu_audio |=  (AS3525_MCLK_SEL << 0);   /* set i2sout MCLK_SEL */
+    cgu_audio &= ~(0x1ff << 2);             /* clear i2sout divider */
+    cgu_audio |= mclk_divider() << 2;       /* set new i2sout divider */
+    CGU_AUDIO = cgu_audio;                  /* write back register */
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -164,7 +175,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 void * pcm_dma_addr(void *addr)
 {
     if (addr != NULL)
-        addr = UNCACHED_ADDR(addr);
+        addr = AS3525_UNCACHED_ADDR(addr);
     return addr;
 }
 #endif
@@ -174,173 +185,171 @@ void * pcm_dma_addr(void *addr)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
-#define I2SIN_RECORDING_MASK ( I2SIN_MASK_POER | I2SIN_MASK_PUER | \
-            I2SIN_MASK_POHF | I2SIN_MASK_POAF | I2SIN_MASK_POF )
 
 static int rec_locked = 0;
-static unsigned int *rec_start_addr;
-static size_t      rec_size;
+static unsigned char *rec_dma_start_addr;
+static size_t rec_dma_size, rec_dma_transfer_size;
+static void rec_dma_callback(void);
+#if CONFIG_CPU == AS3525
+/* points to the samples which need to be duplicated into the right channel */
+static int16_t *mono_samples;
+#endif
+
 
 void pcm_rec_lock(void)
 {
-    if(++rec_locked == 1) {
-        int vic_state = disable_irq_save();
-        VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
-        I2SIN_MASK = 0;
-        restore_irq( vic_state );
-    }
+    if(++rec_locked == 1)
+        VIC_INT_EN_CLEAR = INTERRUPT_DMAC;
 }
+
 
 void pcm_rec_unlock(void)
 {
-    if(--rec_locked == 0) {
-        int vic_state = disable_irq_save();
-        VIC_INT_ENABLE = INTERRUPT_I2SIN;
-        I2SIN_MASK = I2SIN_RECORDING_MASK;
-        restore_irq( vic_state );
-    }
+    if(--rec_locked == 0)
+        VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
 
-void pcm_record_more(void *start, size_t size)
+static void rec_dma_start(void)
 {
-    rec_start_addr = start;
-    rec_size = size;
+    rec_dma_transfer_size = rec_dma_size;
+
+    /* We are limited to 8188 DMA transfers, and the recording core asks for
+     * 8192 bytes. Avoid splitting 8192 bytes transfers in 8188 + 4 */
+    if(rec_dma_transfer_size > 4096)
+        rec_dma_transfer_size = 4096;
+
+    dma_enable_channel(1, (void*)I2SIN_DATA, rec_dma_start_addr, DMA_PERI_I2SIN,
+                DMAC_FLOWCTRL_DMAC_PERI_TO_MEM, false, true,
+                rec_dma_transfer_size >> 2, DMA_S4, rec_dma_callback);
 }
 
+
+/* if needed, duplicate samples of the working channel until the given bound */
+static inline void mono2stereo(int16_t *end)
+{
+#if CONFIG_CPU == AS3525
+    if(audio_channels != 1) /* only for microphone */
+        return;
+#if 0
+    /* load pointer in a register and avoid updating it in each loop */
+    register int16_t *samples = mono_samples;
+
+    do {
+        int16_t left = *samples++;  // load 1 sample of the left-channel
+        *samples++ = left;          // copy it in the right-channel
+    } while(samples != end);
+
+    mono_samples = samples; /* update pointer */
+#else
+    /* gcc doesn't use pre indexing : let's save 1 cycle */
+    int16_t left;
+    asm (
+        "1: ldrh %0, [%1], #2   \n" // load 1 sample of the left-channel
+        "   strh %0, [%1], #2   \n" // copy it in the right-channel
+        "   cmp %1, %2          \n" // are we finished?
+        "   bne  1b             \n"
+        : "=r"(left), "+r"(mono_samples)
+        : "r"(end)
+        : "memory"
+    );
+#endif /* C / ASM */
+#else
+    /* microphone recording is stereo on as3525v2 */
+    (void)end;
+#endif
+}
+
+static void rec_dma_callback(void)
+{
+    rec_dma_size -= rec_dma_transfer_size;
+    rec_dma_start_addr += rec_dma_transfer_size;
+
+    /* the 2nd channel is silent when recording microphone on as3525v1 */
+    mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+
+    if(!rec_dma_size)
+    {
+        pcm_rec_more_ready_callback(0, (void **)&rec_dma_start_addr,
+                                    &rec_dma_size);
+
+        if(rec_dma_size == 0)
+            return;
+
+        dump_dcache_range(rec_dma_start_addr, rec_dma_size);
+#if CONFIG_CPU == AS3525
+        mono_samples = AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr);
+#endif
+    }
+
+    rec_dma_start();
+}
 
 void pcm_rec_dma_stop(void)
 {
-    int vic_state = disable_irq_save();
-    VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
-    I2SIN_MASK = 0;
-    restore_irq( vic_state );
+    dma_disable_channel(1);
+    dma_release();
+    rec_dma_size = 0;
 
     I2SOUT_CONTROL &= ~(1<<5); /* source = i2soutif fifo */
+    I2SIN_CONTROL &= ~(1<<11); /* disable dma */
+
     CGU_AUDIO &= ~((1<<23)|(1<<11));
     CGU_PERI &= ~(CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE);
 }
 
 
-void INT_I2SIN(void)
-{
-    register int status;
-    register pcm_more_callback_type2 more_ready;
-
-    status = I2SIN_STATUS;
-
-    if ( status & ((1<<6)|(1<<0)) ) /* errors */
-        panicf("i2sin error: 0x%x = %s %s", status,
-            (status & (1<<6)) ? "push" : "",
-            (status & (1<<0)) ? "pop" : ""
-        );
-
-    /* called at half full so it's safe to pull 16 FIFO reads in one chunk */
-    if( rec_size >= 16*4 )
-    {
-        /* unrolled loop */
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-        *rec_start_addr++ = *I2SIN_DATA;
-
-        rec_size -= 16*4; /* 16x4byte reads */
-    }
-
-    /* read out any odd samples left */
-    while (((I2SIN_RAW_STATUS & (1<<5)) == 0) && rec_size)
-    {
-        /* 14 bits per sample = 1 32 bits word */
-        *rec_start_addr++ = *I2SIN_DATA;
-        rec_size -= 4;
-    }
-
-    I2SIN_CLEAR = status;
-
-    if(!rec_size)
-    {
-        more_ready = pcm_callback_more_ready;
-        if(!more_ready || more_ready(0) < 0)
-        {
-            /* Finished recording */
-            pcm_rec_dma_stop();
-            pcm_rec_dma_stopped_callback();
-        }
-    }
-}
-
-
 void pcm_rec_dma_start(void *addr, size_t size)
 {
-    rec_start_addr = addr;
-    rec_size = size;
+    dump_dcache_range(addr, size);
+    rec_dma_start_addr = addr;
+#if CONFIG_CPU == AS3525
+    mono_samples = AS3525_UNCACHED_ADDR(addr);
+#endif
+    rec_dma_size = size;
+
+    dma_retain();
 
     CGU_PERI |= CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= ((1<<23)|(1<<11));
 
     I2SOUT_CONTROL |= 1<<5; /* source = loopback from i2sin fifo */
 
-    /* 14 bits samples, i2c clk src = I2SOUTIF, sdata src = AFE,
-     * data valid at positive edge of SCLK */
-    I2SIN_CONTROL = (1<<5) | (1<<2);
+    I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */
 
-    unsigned long tmp;
-    while ( ( I2SIN_RAW_STATUS & ( 1<<5 ) ) == 0 )
-        tmp = *I2SIN_DATA; /* FLUSH FIFO */
-    I2SIN_CLEAR = (1<<6)|(1<<0);    /* push error, pop error */
-    I2SIN_MASK = I2SIN_RECORDING_MASK;
-
-    VIC_INT_ENABLE = INTERRUPT_I2SIN;
+    rec_dma_start();
 }
 
 
 void pcm_rec_dma_close(void)
 {
-    pcm_rec_dma_stop();
 }
 
 
 void pcm_rec_dma_init(void)
 {
-    unsigned long frequency = pcm_sampr;
-
-    /* TODO : use a table ? */
-    const int divider = ((AS3525_MCLK_FREQ/128) + (frequency/2)) / frequency;
-
-    int cgu_audio = CGU_AUDIO;  /* read register */
-    cgu_audio &= ~(3 << 12);    /* clear i2sin MCLK_SEL */
+    int cgu_audio = CGU_AUDIO;              /* read register */
+    cgu_audio &= ~(3 << 12);                /* clear i2sin MCLK_SEL */
     cgu_audio |=  (AS3525_MCLK_SEL << 12);  /* set i2sin MCLK_SEL */
-    cgu_audio &= ~(511 << 14);  /* clear i2sin divider */
-    cgu_audio |= (divider - 1) << 14; /* set new i2sin divider */
-    CGU_AUDIO = cgu_audio;      /* write back register */
+    cgu_audio &= ~(0x1ff << 14);            /* clear i2sin divider */
+    cgu_audio |= mclk_divider() << 14;      /* set new i2sin divider */
+    CGU_AUDIO = cgu_audio;                  /* write back register */
+
+    /* i2c clk src = I2SOUTIF, sdata src = AFE,
+     * data valid at positive edge of SCLK */
+    I2SIN_CONTROL = (1<<2);
+    I2SIN_MASK = 0; /* disables all interrupts */
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    const void *peak_buffer;
-
     pcm_rec_lock();
-    *count = rec_size >> 2;
-    peak_buffer = (const void*)rec_start_addr;
+    int16_t *addr = AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
+    mono2stereo(addr);
     pcm_rec_unlock();
 
-    return peak_buffer;
+    return addr;
 }
 
 #endif /* HAVE_RECORDING */

@@ -60,8 +60,8 @@ void str_end_of_stream(struct stream *str)
      * its behalf. Set right to the min first so a thread reading the
      * overall window gets doesn't see this as valid no matter what the
      * file length. */
-    str->hdr.win_right = LONG_MIN;
-    str->hdr.win_left = LONG_MAX;
+    str->hdr.win_right = OFF_T_MIN;
+    str->hdr.win_left = OFF_T_MAX;
     /* No packets */
     str->curr_packet = str->curr_packet_end = NULL;
     /* No flags */
@@ -99,7 +99,7 @@ uint8_t * mpeg_parser_scan_start_code(struct stream_scan *sk, uint32_t code)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(4, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -131,7 +131,7 @@ unsigned mpeg_parser_scan_pes(struct stream_scan *sk)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(4, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 4, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -192,7 +192,7 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
     {
         uint8_t *p;
         off_t pos = disk_buf_lseek(sk->pos, SEEK_SET);
-        ssize_t len = disk_buf_getbuffer(35, &p, NULL, NULL);
+        ssize_t len = disk_buf_getbuffer_l2(&sk->l2, 30, &p);
 
         if (pos < 0 || len < 4)
             break;
@@ -201,7 +201,7 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
         {
             uint8_t *h = p;
 
-            if (sk->margin < 6)
+            if (sk->margin < 7)
             {
                 /* Insufficient data */
             }
@@ -215,29 +215,33 @@ uint32_t mpeg_parser_scan_pts(struct stream_scan *sk, unsigned id)
             }
             else                            /* mpeg1 */
             {
-                ssize_t l = 7;
+                ssize_t l = 6;
                 ssize_t margin = sk->margin;
 
                 /* Skip stuffing_byte */
-                while (h[l - 1] == 0xff && ++l <= 23)
+                while (margin > 7 && h[l] == 0xff && ++l <= 22)
                     --margin;
 
-                if ((h[l - 1] & 0xc0) == 0x40)
+                if (margin >= 7)
                 {
-                    /* Skip STD_buffer_scale and STD_buffer_size */
-                    margin -= 2;
-                    l += 2;
-                }
-
-                if (margin >= 4)
-                {
-                    /* header points to the mpeg1 pes header */
-                    h += l;
-
-                    if ((h[-1] & 0xe0) == 0x20)
+                    if ((h[l] & 0xc0) == 0x40)
                     {
-                        sk->data = (h + 4) - p;
-                        return read_pts(h, -1);
+                        /* Skip STD_buffer_scale and STD_buffer_size */
+                        margin -= 2;
+                        l += 2;
+                    }
+
+                    if (margin >= 5)
+                    {
+                        /* Header points to the mpeg1 pes header */
+                        h += l;
+
+                        if ((h[0] & 0xe0) == 0x20)
+                        {
+                            /* PTS or PTS_DTS indicated */
+                            sk->data = (h + 5) - p;
+                            return read_pts(h, 0);
+                        }
                     }
                 }
             }
@@ -357,6 +361,8 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     enum state_enum state = STATE0;
     struct stream_scan sk;
 
+    stream_scan_init(&sk);
+
     /* Initial estimate taken from average bitrate - later interpolations are
      * taken similarly based on the remaining file interval */
     pos_new = muldiv_uint32(time - time_left, pos_right - pos_left,
@@ -368,7 +374,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     DEBUGF("Seeking stream 0x%02x\n", id);
     DEBUGF("$$ tl:%u t:%u ct:?? tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
            (unsigned)time_left, (unsigned)time, (unsigned)time_right,
-           pos_left, pos_new, pos_right);
+           (long)pos_left, (long)pos_new, (long)pos_right);
 
     sk.dir = SSCAN_REVERSE;
 
@@ -427,7 +433,8 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
    
                 DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
-                       (unsigned)time_right, pos_left, pos_new, pos_right);
+                       (unsigned)time_right, (long)pos_left, (long)pos_new,
+                       (long)pos_right);
             }
             else if (currpts > time)
             {
@@ -455,14 +462,16 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 DEBUGF("<< tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
-                       (unsigned)time_right, pos_left, pos_new, pos_right);
+                       (unsigned)time_right, (long)pos_left, (long)pos_new,
+                       (long)pos_right);
             }
             else
             {
                 /* Exact match - it happens */
                 DEBUGF("|| tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
-                       (unsigned)time_right, pos_left, pos_new, pos_right);
+                       (unsigned)time_right, (long)pos_left, (long)pos_new,
+                       (long)pos_right);
                 pts = currpts;
                 pos = sk.pos;
                 state = STATE9;
@@ -494,7 +503,8 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
                 sk.dir = SSCAN_FORWARD;
                 DEBUGF("?? tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
-                       (unsigned)time_right, pos_left, pos_new, pos_right);
+                       (unsigned)time_right, (long)pos_left, (long)pos_new,
+                       (long)pos_right);
                 state = STATE1;
                 break;
             default:
@@ -522,7 +532,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
     uint32_t nextpts = mpeg_parser_scan_pts(&sk, id);
     DEBUGF("Seek pos:%ld pts:%u t:%u next pts:%u \n",
-        pos, (unsigned)pts, (unsigned)time, (unsigned)nextpts);
+        (long)pos, (unsigned)pts, (unsigned)time, (unsigned)nextpts);
 
     if (pts <= time && time < nextpts)
     {
@@ -559,6 +569,8 @@ static bool prepare_image(uint32_t time)
     struct stream_scan sk;
     int tries;
     int result;
+
+    stream_scan_init(&sk);
 
     if (!str_send_msg(&video_str, STREAM_NEEDS_SYNC, time))
     {
@@ -609,7 +621,7 @@ try_again:
     str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
 
     DEBUGF("thumb pos:%ld len:%ld\n", str_parser.parms.sd.sk.pos,
-           str_parser.parms.sd.sk.len);
+           (long)str_parser.parms.sd.sk.len);
 
     result = str_send_msg(&video_str, STREAM_SYNC,
                           (intptr_t)&str_parser.parms.sd);

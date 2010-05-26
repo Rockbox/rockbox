@@ -101,9 +101,12 @@
 #define HAVE_AS3514
 #define HAVE_AS3543
 
-/* define this if you have a real-time clock */
 #ifndef BOOTLOADER
+/* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */
@@ -172,19 +175,16 @@
 #ifndef BOOTLOADER
 
 #define USB_HANDLED_BY_OF
-
-#if 0 /* disabled since there is no USB driver */
+//#define USE_ROCKBOX_USB
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_ARC
+#define CONFIG_USBOTG USBOTG_AS3525v2
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x74d1
 #endif /* BOOTLOADER */
-
-#endif
 
 
 /* Virtual LED (icon) */

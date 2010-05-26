@@ -34,7 +34,7 @@
 #include "viewport.h"
 #include "lcd.h"
 #include "font.h"
-#include "string.h"
+#include "string-extra.h"
 #include "settings.h"
 
 static struct viewport bb_vp[NB_SCREENS];

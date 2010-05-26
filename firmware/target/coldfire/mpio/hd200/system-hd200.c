@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id:$
  *
- * Copyright (C) 2010 Marcin Bukat
+ * Copyright (C) 2010 by Marcin Bukat
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +27,7 @@
 #include "timer.h"
 
 /* Settings for all possible clock frequencies (with properly working timers)
+ * NOTE: Some 5249 chips don't like having PLLDIV set to 0. We must avoid that!
  *
  *                    xxx_REFRESH_TIMER below
  * system.h, CPUFREQ_xxx_MULT    |
@@ -66,9 +68,9 @@ void cf_set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        PLLCR = 0x0102c049 | (PLLCR & 0x70C00000);
+        PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
-        CSCR3 = 0x00001180; /* LCD: 4 wait states */
+        CSCR3 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
@@ -78,9 +80,8 @@ void cf_set_cpu_frequency(long frequency)
                     /* BUFEN2 enable on /CS2 | CS2Post 1 clock| CS2Pre 3 clocks*/
         IDECONFIG2 = (1<<18)|(1<<16)|(1<<8)|(1<<0); /* TA /CS2 enable + CS2wait */
 
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<2)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/32 */
-
+        and_l(~(0x07<<16), &ADCONFIG);
+        or_l((0x06)<<16, &ADCONFIG); /* adclk = busclk/64 */
         break;
 
     case CPUFREQ_NORMAL:
@@ -88,9 +89,9 @@ void cf_set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        PLLCR = 0x05028045 | (PLLCR & 0x70C00000);
+        PLLCR = 0x0589e021 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
-        CSCR3 = 0x00000180; /* LCD: 0 wait states */
+        CSCR3 = 0x00000580; /* LCD: 1 wait state */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
@@ -99,17 +100,17 @@ void cf_set_cpu_frequency(long frequency)
 	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
 	IDECONFIG2 = (1<<18)|(1<<16);
 
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<1)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/8 */
-
+        and_l(~(0x07<<16), &ADCONFIG);
+        or_l((0x03)<<16, &ADCONFIG); /* adclk = busclk/8 */
         break;
+
     default:
         DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
         /* Power down PLL, but keep CLSEL and CRSEL */
-        PLLCR = 0x00000200 | (PLLCR & 0x70C00000);
+        PLLCR = 0x00800200 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR3 = 0x00000180; /* LCD: 0 wait states */
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
@@ -117,9 +118,8 @@ void cf_set_cpu_frequency(long frequency)
 	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
 	IDECONFIG2 = (1<<18)|(1<<16);
 
-	and_l(~(0x07<<16), &ADCONFIG);
-	or_l(((1<<7)|(1<<0))<<16, &ADCONFIG); /* adclk = busclk/2 */
-
+        and_l(~(0x07<<16), &ADCONFIG);
+        or_l((0x01)<<16, &ADCONFIG); /* adclk = busclk/2 */
         break;
     }
 }

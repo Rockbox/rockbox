@@ -157,10 +157,6 @@ void shutdown_hw(void)
 {
 }
 
-void sys_poweroff(void)
-{
-}
-
 void cancel_shutdown(void)
 {
 }

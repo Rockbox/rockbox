@@ -27,6 +27,7 @@
 #include "config.h"
 #include "action.h"
 #include "crc32.h"
+#include "sound.h"
 #include "settings.h"
 #include "debug.h"
 #include "usb.h"
@@ -55,7 +56,6 @@
 #include "powermgmt.h"
 #include "keyboard.h"
 #include "version.h"
-#include "sound.h"
 #include "rbunicode.h"
 #include "dircache.h"
 #include "splash.h"
@@ -718,8 +718,12 @@ void sound_settings_apply(void)
 #if CONFIG_CODEC == SWCODEC
     sound_set_dsp_callback(dsp_callback);
 #endif
+#ifdef AUDIOHW_HAVE_BASS
     sound_set(SOUND_BASS, global_settings.bass);
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE
     sound_set(SOUND_TREBLE, global_settings.treble);
+#endif
     sound_set(SOUND_BALANCE, global_settings.balance);
     sound_set(SOUND_VOLUME, global_settings.volume);
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
@@ -734,13 +738,36 @@ void sound_settings_apply(void)
     sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
     sound_set(SOUND_SUPERBASS, global_settings.superbass);
 #endif
-
-#ifdef HAVE_WM8758
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
     sound_set(SOUND_BASS_CUTOFF, global_settings.bass_cutoff);
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
     sound_set(SOUND_TREBLE_CUTOFF, global_settings.treble_cutoff);
 #endif
-}
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+    sound_set(SOUND_DEPTH_3D, global_settings.depth_3d);
+#endif
+#ifdef AUDIOHW_HAVE_EQ
+    int b;
 
+    for (b = 0; b < AUDIOHW_EQ_BAND_NUM; b++)
+    {
+        int setting = sound_enum_hw_eq_band_setting(b, AUDIOHW_EQ_GAIN);
+        sound_set(setting, global_settings.hw_eq_bands[b].gain);
+
+#ifdef AUDIOHW_HAVE_EQ_FREQUENCY
+        setting = sound_enum_hw_eq_band_setting(b, AUDIOHW_EQ_FREQUENCY);
+        if (setting != -1)
+            sound_set(setting, global_settings.hw_eq_bands[b].frequency);
+#endif /* AUDIOHW_HAVE_EQ_FREQUENCY */
+#ifdef AUDIOHW_HAVE_EQ_WIDTH
+        setting = sound_enum_hw_eq_band_setting(b, AUDIOHW_EQ_WIDTH);
+        if (setting != -1)
+            sound_set(setting, global_settings.hw_eq_bands[b].width);
+#endif /* AUDIOHW_HAVE_EQ_WIDTH */
+    }
+#endif
+}
 
 void settings_apply(bool read_disk)
 {

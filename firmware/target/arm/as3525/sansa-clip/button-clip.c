@@ -23,7 +23,7 @@
 #include "system.h"
 #include "button-target.h"
 #include "as3525.h"
-#ifndef BOOTLOADER
+#ifndef BOOTLOADER /* backlight on hold handling */
 #include "backlight.h"
 #endif
 
@@ -138,13 +138,13 @@ int button_read_device(void)
 
 bool button_hold(void)
 {
-#ifndef BOOTLOADER
-    static bool hold_button_old = false;
-#endif
     bool hold_button = (GPIOA_PIN(3) != 0);
 
 #ifndef BOOTLOADER
-    /* light handling */
+    /* backlight handling */
+
+    static bool hold_button_old = false;
+
     if (hold_button != hold_button_old)
     {
         hold_button_old = hold_button;

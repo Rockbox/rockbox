@@ -23,7 +23,11 @@
 
 PLUGIN_HEADER
 
+#if PLUGIN_BUFFER_SIZE <= 0x8000
+#define BUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */
+#else
 #define BUF_SIZE (1<<13) /* 32 KB = (1<<13)*sizeof(int) */
+#endif
 
 #define LOOP_REPEAT_DRAM 256
 static volatile int buf_dram[BUF_SIZE];
@@ -35,6 +39,46 @@ static volatile int buf_iram[BUF_SIZE] IBSS_ATTR;
 
 /* (Byte per loop * loops)>>20 * ticks per s * 10 / ticks = dMB per s */
 #define dMB_PER_SEC(cnt, delta) ((((BUF_SIZE*sizeof(int)*cnt)>>20)*HZ*10)/delta)
+
+void memset_test(volatile int *buf, int buf_size, int loop_cnt,
+                 int line, char *ramtype)
+{
+    int delta, dMB, i;
+    int last_tick = *rb->current_tick;
+
+    for(i=0; i < loop_cnt; i++)
+    {
+        memset((void *)buf, 0xff, buf_size*sizeof(int));
+    }
+
+    delta = *rb->current_tick - last_tick;
+    delta = delta>0 ? delta : delta+1;
+    dMB   = dMB_PER_SEC(loop_cnt, delta);
+    rb->screens[0]->putsf(0, line, "%s st: %3d.%d MB/s (%3d ticks for %d MB)", 
+                          ramtype, dMB/10, dMB%10, delta,
+                          (loop_cnt*BUF_SIZE*4)>>20);
+}
+
+void memcpy_test(volatile int *buf, int buf_size, int loop_cnt,
+                 int line, char *ramtype)
+{
+    int delta, dMB, i;
+    int last_tick = *rb->current_tick;
+
+    /* double loop count to compensate for half size memcpy */
+    for(i=0; i < loop_cnt*2; i++)
+    {
+        memcpy((void *)buf+(buf_size*sizeof(int)/2), 
+               (void *)buf, buf_size*sizeof(int)/2);
+    }
+
+    delta = *rb->current_tick - last_tick;
+    delta = delta>0 ? delta : delta+1;
+    dMB   = dMB_PER_SEC(loop_cnt, delta);
+    rb->screens[0]->putsf(0, line, "%s cp: %3d.%d MB/s (%3d ticks for %d MB)", 
+                          ramtype, dMB/10, dMB%10, delta,
+                          (loop_cnt*BUF_SIZE*4)>>21);
+}
 
 void write_test(volatile int *buf, int buf_size, int loop_cnt, 
                 int line, char *ramtype)
@@ -61,7 +105,7 @@ void write_test(volatile int *buf, int buf_size, int loop_cnt,
             "bgt .outer_loop_read \n"
             :
             : [loops] "r" (loop_cnt), [size] "r" (buf_size), [buf_p] "r" (buf)
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory", "cc"
         );
 #else
     int i, j;
@@ -79,7 +123,7 @@ void write_test(volatile int *buf, int buf_size, int loop_cnt,
     delta = *rb->current_tick - last_tick;
     delta = delta>0 ? delta : delta+1;
     dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s wr: %3d.%d MB/s (%2d ticks for %d MB)", 
+    rb->screens[0]->putsf(0, line, "%s wr: %3d.%d MB/s (%3d ticks for %d MB)", 
                           ramtype, dMB/10, dMB%10, delta,
                           (loop_cnt*BUF_SIZE*4)>>20);
 }
@@ -105,7 +149,7 @@ void read_test(volatile int *buf, int buf_size, int loop_cnt,
             "bgt .outer_loop_write \n"
             :
             : [loops] "r" (loop_cnt), [size] "r" (buf_size), [buf_p] "r" (buf)
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory", "cc"
         );
 #else
     int i, j, x;
@@ -123,7 +167,7 @@ void read_test(volatile int *buf, int buf_size, int loop_cnt,
     delta = *rb->current_tick - last_tick;
     delta = delta>0 ? delta : delta+1;
     dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s rd: %3d.%d MB/s (%2d ticks for %d MB)", 
+    rb->screens[0]->putsf(0, line, "%s rd: %3d.%d MB/s (%3d ticks for %d MB)", 
                           ramtype, dMB/10, dMB%10, delta, 
                           (loop_cnt*BUF_SIZE*4)>>20);
 }
@@ -136,7 +180,9 @@ enum plugin_status plugin_start(const void* parameter)
     bool boost = false;
     int count = 0;
 
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
+#endif
     
     rb->screens[0]->clear_display();
     rb->screens[0]->putsf(0, 0, "patience, may take some seconds...");
@@ -153,11 +199,15 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
         rb->screens[0]->putsf(0, line++, "loop#: %d", ++count);
 
-        read_test (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
-        write_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        read_test  (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        write_test (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        memset_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        memcpy_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
 #if defined(PLUGIN_USE_IRAM)
-        read_test (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
-        write_test(buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
+        read_test  (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
+        write_test (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
+        memset_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
+        memcpy_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
 #endif
 
         rb->screens[0]->update();

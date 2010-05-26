@@ -48,7 +48,7 @@ bool rtc_check_alarm_flag(void)
 /**
  * Enables or disables the alarm.
  */
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
 }
 

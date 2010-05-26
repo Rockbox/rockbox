@@ -146,7 +146,7 @@ enum codec_status codec_main(void)
   retval = CODEC_OK;
 
 done:
-  LOGF("ALAC: Decoded %ld samples\n",samplesdone);
+  LOGF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);
 
   if (ci->request_next_track())
    goto next_track;

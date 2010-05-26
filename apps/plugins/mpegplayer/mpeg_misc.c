@@ -25,6 +25,12 @@
 
 /** Streams **/
 
+/* Initializes the cursor */
+void stream_scan_init(struct stream_scan *sk)
+{
+    dbuf_l2_init(&sk->l2);
+}
+
 /* Ensures direction is -1 or 1 and margin is properly initialized */
 void stream_scan_normalize(struct stream_scan *sk)
 {
@@ -95,4 +101,64 @@ uint32_t muldiv_uint32(uint32_t multiplicand,
     /* else (> 0) / 0 = UINT32_MAX */
 
     return UINT32_MAX; /* Saturate */
+}
+
+
+/** Lists **/
+
+/* Does the list have any members? */
+bool list_is_empty(void **list)
+{
+    return *list == NULL;
+}
+
+/* Is the item inserted into a particular list? */
+bool list_is_member(void **list, void *item)
+{
+    return *rb->find_array_ptr(list, item) != NULL;
+}
+
+/* Removes an item from a list - returns true if item was found
+ * and thus removed. */
+bool list_remove_item(void **list, void *item)
+{
+    return rb->remove_array_ptr(list, item) != -1;
+}
+
+/* Adds a list item, insert last, if not already present. */
+void list_add_item(void **list, void *item)
+{
+    void **item_p = rb->find_array_ptr(list, item);
+    if (*item_p == NULL)
+        *item_p = item;
+}
+
+/* Clears the entire list. */
+void list_clear_all(void **list)
+{
+    while (*list != NULL)
+        *list++ = NULL;
+}
+
+/* Enumerate all items in the array, passing each item in turn to the
+ * callback as well as the data value. The current item may be safely
+ * removed. Other changes during enumeration are undefined. The callback
+ * may return 'false' to stop the enumeration early. */
+void list_enum_items(void **list,
+                     list_enum_callback_t callback,
+                     intptr_t data)
+{
+    for (;;)
+    {
+        void *item = *list;
+
+        if (item == NULL)
+            break;
+
+        if (callback != NULL && !callback(item, data))
+            break;
+
+        if (*list == item)
+            list++; /* Item still there */
+    }
 }

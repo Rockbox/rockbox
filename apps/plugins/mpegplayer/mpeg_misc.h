@@ -28,6 +28,8 @@
 #define ALIGNED_ATTR(x) __attribute__((aligned(x)))
 #endif
 
+#include "disk_buf.h"
+
 /* Generic states for when things are too simple to care about naming them */
 enum state_enum
 {
@@ -158,10 +160,14 @@ struct stream_scan
     off_t   dir;    /* Direction - >= 0; forward, < 0 backward */
     ssize_t margin; /* Used by function to track margin between position and data end */
     intptr_t data;  /* */
+    struct dbuf_l2_cache l2;
 };
 
 #define SSCAN_REVERSE (-1)
 #define SSCAN_FORWARD 1
+
+/* Initializes the cursor */
+void stream_scan_init(struct stream_scan *sk);
 
 /* Ensures direction is -1 or 1 and margin is properly initialized */
 void stream_scan_normalize(struct stream_scan *sk);
@@ -195,5 +201,31 @@ void hms_format(char *buf, size_t bufsize, struct hms *hms);
 uint32_t muldiv_uint32(uint32_t multiplicand,
                        uint32_t multiplier,
                        uint32_t divisor);
+
+
+/** Lists **/
+
+/* Does the list have any members? */
+bool list_is_empty(void **list);
+
+/* Is the item inserted into a particular list? */
+bool list_is_member(void **list, void *item);
+
+/* Removes an item from a list - returns true if item was found
+ * and thus removed. */
+bool list_remove_item(void **list, void *item);
+
+/* Adds a list item, insert last, if not already present. */
+void list_add_item(void **list, void *item);
+
+/* Clears the entire list. */
+void list_clear_all(void **list);
+
+/* Enumerate all items in the array. */
+typedef bool (*list_enum_callback_t)(void *item, intptr_t data);
+
+void list_enum_items(void **list,
+                     list_enum_callback_t callback,
+                     intptr_t data);
 
 #endif /* MPEG_MISC_H */

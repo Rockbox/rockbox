@@ -124,7 +124,7 @@ void gui_thread(void)
 /* Core thread */
 void core_thread(void)
 {
-    /* Add the directory the called .pd resides in to lib directories. */
+    /* Add the directory the called .pd file resides in to lib directories. */
     sys_findlibdir(filename);
 
     /* Open the PD design file. */
@@ -146,7 +146,7 @@ void core_thread(void)
         while(sys_send_dacs() != SENDDACS_NO)
             sched_tick(sys_time + sys_time_per_dsp_tick);
 
-        yield();
+        rb->sleep(1);
     }
 
     rb->thread_exit();
@@ -178,12 +178,8 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(HZ, "Not enough memory!");
         return PLUGIN_ERROR;
     }
-#if 1
+
     init_memory_pool(mem_size, mem_pool);
-#endif
-#if 0
-    set_memory_pool(mem_pool, mem_size);
-#endif
 
     /* Initialize net. */
     net_init();
@@ -206,6 +202,12 @@ enum plugin_status plugin_start(const void* parameter)
                    PD_SAMPLERATE, /* Sample rate */
                    DEFAULTADVANCE, /* Scheduler advance */
                    1 /* Enable */);
+
+    /* Initialize scheduler time variables. */
+    sys_time = 0;
+    sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
+                            ((double) sys_schedblocksize) / sys_dacsr;
+
 
     /* Create stacks for threads. */
     core_stack = getbytes(CORESTACKSIZE);
@@ -242,12 +244,6 @@ enum plugin_status plugin_start(const void* parameter)
     if(core_thread_id == 0 || gui_thread_id == 0)
         return PLUGIN_ERROR;
 
-    /* Initialize scheduler time variables. */
-    sys_time = 0;
-    sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
-                            ((double) sys_schedblocksize) / sys_dacsr;
-
-
     /* Main loop. */
     while(!quit)
     {
@@ -272,12 +268,8 @@ enum plugin_status plugin_start(const void* parameter)
     net_destroy();
 
     /* Clear memory pool. */
-#if 1
     destroy_memory_pool(mem_pool);
-#endif
-#if 0
-    clear_memory_pool();
-#endif
 
     return PLUGIN_OK;
 }
+

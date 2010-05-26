@@ -321,6 +321,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     struct scrollinfo* s;
     char *end;
     int w, h;
+    int len;
 
     if ((unsigned)y >= (unsigned)current_vp->height)
         return;
@@ -358,13 +359,14 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
         s->bidir = false;
 
     if (!s->bidir) { /* add spaces if scrolling in the round */
-        strcat(s->line, "   ");
+        strlcat(s->line, "   ", sizeof s->line);
         /* get new width incl. spaces */
         s->width = LCDFN(getstringsize)(s->line, &w, &h);
     }
 
     end = strchr(s->line, '\0');
-    strlcpy(end, string, current_vp->width/2);
+    len = sizeof s->line - (end - s->line);
+    strlcpy(end, string, MIN(current_vp->width/2, len));
 
     s->vp = current_vp;
     s->y = y;

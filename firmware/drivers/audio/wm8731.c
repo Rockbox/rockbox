@@ -35,7 +35,6 @@
 #include "audio.h"
 
 #include "wmcodec.h"
-#include "audiohw.h"
 #include "sound.h"
 
 

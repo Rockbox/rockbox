@@ -107,6 +107,7 @@ float rb_atan(float);
 float rb_atan2(float, float);
 float rb_sinh(float);
 float rb_tan(float);
+#ifndef SIMULATOR
 typedef struct
 {
     int quot;
@@ -114,6 +115,7 @@ typedef struct
 }
 div_t;
 div_t div(int x, int y);
+#endif
 union f2i
 {
     float f;
@@ -180,10 +182,11 @@ void pd_init(void);
 #define write rb->write
 
 #define strncat rb_strncat
+
+#ifndef SIMULATOR
 #define floor rb_floor
 #define atof rb_atof
 #define atol rb_atol
-#define ftoan rb_ftoan
 #define sin rb_sin
 #define cos rb_cos
 #define log10 rb_log10
@@ -196,7 +199,11 @@ void pd_init(void);
 #define atan2 rb_atan2
 #define sinh rb_sinh
 #define tan rb_tan
+#else
+#include <math.h>
+#endif
 
+#define ftoan rb_ftoan
 #define strtok_r rb->strtok_r
 #define strstr rb->strcasestr
 

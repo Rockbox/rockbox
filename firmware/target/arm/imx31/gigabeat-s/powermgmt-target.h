@@ -104,7 +104,7 @@
 #define BATTERY_VMAINTAIN_USB       MC13783_VCHRG_4_150V
 
 /* Battery filter lengths in samples */
-#define BATT_AVE_SAMPLES            32
+#define BATT_AVE_SAMPLES            128
 #define ICHARGER_AVE_SAMPLES        32
 
 void powermgmt_init_target(void);

@@ -233,7 +233,7 @@ static ssize_t io_trigger_and_wait(int cmd)
     {
         /* Allow other rockbox threads to run */
         io.accum = 0;
-        mythread = thread_sdl_thread_unlock();
+        mythread = sim_thread_unlock();
     }
 
     switch (cmd)
@@ -249,7 +249,7 @@ static ssize_t io_trigger_and_wait(int cmd)
     /* Regain our status as current */
     if (mythread != NULL)
     {
-        thread_sdl_thread_lock(mythread);
+        sim_thread_lock(mythread);
     }
 
     return result;

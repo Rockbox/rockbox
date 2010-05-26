@@ -141,8 +141,8 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_play_data.p    = (void *)(((uintptr_t)addr + 2) & ~3);
-    dma_play_data.size = (size & ~3);
+    dma_play_data.p    = (uint16_t*)addr;
+    dma_play_data.size = size;
 
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
@@ -229,16 +229,9 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    *count = 0;
     return NULL;
-}
-
-void pcm_record_more(void *start, size_t size)
-{
-    (void) start;
-    (void) size;
 }
 #endif
 
@@ -290,21 +283,14 @@ void fiq_handler(void)
 
     ".more_data:                     \n"
         "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
-        "ldr     r2, =pcm_callback_for_more \n"
-        "ldr     r2, [r2]            \n" /* get callback address */
-        "cmp     r2, #0              \n" /* check for null pointer */
-        "movne   r0, r11             \n" /* r0 = &p */
-        "addne   r1, r11, #4         \n" /* r1 = &size */
-        "blxne   r2                  \n" /* call pcm_callback_for_more */
-        "ldmia   r11, { r8-r9 }      \n" /* reload p and size */
-        "cmp     r9, #0x10           \n" /* did we actually get more data? */
-        "ldmgefd sp!, { r0-r3, lr }  \n"
-        "bge     .fill_fifo          \n" /* yes: fill the fifo */
-        "ldr     r12, =pcm_play_dma_stop \n"
-        "blx     r12                 \n" /* no: stop playback */
-        "ldr     r12, =pcm_play_dma_stopped_callback \n"
-        "blx     r12                 \n"
+        "ldr     r2, =pcm_play_get_more_callback \n"
+        "mov     r0, r11             \n" /* r0 = &p */
+        "add     r1, r11, #4         \n" /* r1 = &size */
+        "blx     r2                  \n" /* call pcm_play_get_more_callback */
+        "ldmia   r11, { r8-r9 }      \n" /* load new p and size */
+        "cmp     r9, #0x10           \n" /* did we actually get enough data? */
         "ldmfd   sp!, { r0-r3, lr }  \n"
+        "bpl     .fill_fifo          \n" /* not stop and enough? refill */
         "b       .exit               \n"
         ".ltorg                      \n"
     );
@@ -316,17 +302,11 @@ void fiq_handler(void)
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
-    register pcm_more_callback_type get_more;
-
     if (dma_play_data.size < 16)
     {
         /* p is empty, get some more data */
-        get_more = pcm_callback_for_more;
-        if (get_more)
-        {
-            get_more((unsigned char**)&dma_play_data.p,
-                     &dma_play_data.size);
-        }
+        pcm_play_get_more_callback((void**)&dma_play_data.p,
+                                   &dma_play_data.size);
     }
 
     if (dma_play_data.size >= 16)
@@ -341,12 +321,6 @@ void fiq_handler(void)
         DADO_R(3) = *dma_play_data.p++;
 
         dma_play_data.size -= 16;
-    }
-    else
-    {
-        /* No more data, so disable the FIFO/interrupt */
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
     }
 
     /* Clear FIQ status */

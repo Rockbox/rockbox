@@ -45,12 +45,19 @@
 #include "disk.h"
 #endif
 
+#ifdef SANSA_FUZEV2
+#include "backlight-target.h"
+#endif
+
 #include "lcd.h"
 #include <stdarg.h>
 #include "sysfont.h"
 
 #define     INTERNAL_AS3525  0   /* embedded SD card */
 #define     SD_SLOT_AS3525   1   /* SD slot if present */
+
+/* Clipv2 Clip+ and Fuzev2 OF all occupy the same size */
+#define AMS_OF_SIZE 0xf000
 
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
@@ -318,10 +325,10 @@
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 static void init_controller(void);
-static int sd_wait_for_state(const int drive, unsigned int state);
+static int sd_wait_for_tran_state(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
@@ -345,7 +352,6 @@ static volatile bool retry;
 static volatile int cmd_error;
 
 #if defined(HAVE_MULTIDRIVE)
-int active_card = 0;
 #define EXT_SD_BITS (1<<2)
 #endif
 
@@ -392,21 +398,10 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         unsigned long *response)
 {
 #if defined(HAVE_MULTIDRIVE)
-    /*  Check to see if we need to switch cards  */
     if(sd_present(SD_SLOT_AS3525))
-         if(active_card != drive)
-        {
-            GPIOB_PIN(5) = (1-drive) << 5;
-            active_card = drive;
-        }
+        GPIOB_PIN(5) = (1-drive) << 5;
 #endif
 
-/*  RCRC & RTO interrupts should be set together with the CD interrupt but
- *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
- *  them masked for now we can check them in the isr by reading raw status when
- *  the CD int is triggered.
- */
-    MCI_MASK |= MCI_INT_CD;
     MCI_ARGUMENT = arg;
 
     /* Construct MCI_COMMAND  */
@@ -428,9 +423,14 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
+#ifdef SANSA_FUZEV2
+    extern int buttonlight_is_on;
+    if(buttonlight_is_on)
+        _buttonlight_on();
+    else
+        _buttonlight_off();
+#endif
     wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
-
-    MCI_MASK &= ~MCI_INT_CD;
 
     /*  Handle command responses & errors */
     if(flags & MCI_RESP)
@@ -512,7 +512,7 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
         return -7;
 
-    if(sd_wait_for_state(drive, SD_TRAN))
+    if(sd_wait_for_tran_state(drive))
         return -8;
 
     /* CMD6 */
@@ -532,6 +532,9 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
+    if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
+        card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
+
     /*  Card back to full speed  */
     MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
@@ -541,7 +544,7 @@ static int sd_init_card(const int drive)
 
 #ifndef BOOTLOADER
     /*  Switch to to 4 bit widebus mode  */
-    if(sd_wait_for_state(drive, SD_TRAN) < 0)
+    if(sd_wait_for_tran_state(drive) < 0)
         return -13;
     /* CMD55 */              /*  Response is requested due to timing issue  */
     if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
@@ -689,12 +692,16 @@ static void init_controller(void)
     /* Rx watermark = 63(sd reads)  Tx watermark = 128 (sd writes) */
     MCI_FIFOTH = (MCI_FIFOTH & MCI_FIFOTH_MASK) | 0x503f0080;
 
-    GPIOB_DIR |= (1<<5);                 /* Set pin B5 to output  */
+/*  RCRC & RTO interrupts should be set together with the CD interrupt but
+ *  in practice sometimes incorrectly precede the CD interrupt.  If we leave
+ *  them masked for now we can check them in the isr by reading raw status when
+ *  the CD int is triggered.
+ */
+    MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO | MCI_INT_CD);
 
-    /* Mask all MCI Interrupts initially  */
-    MCI_MASK = 0;
+    MCI_CTRL |= INT_ENABLE | DMA_ENABLE;
 
-    MCI_CTRL |= INT_ENABLE;
+    MCI_BLKSIZ = SD_BLOCK_SIZE;
 }
 
 int sd_init(void)
@@ -749,7 +756,7 @@ int sd_init(void)
     return 0;
 }
 
-static int sd_wait_for_state(const int drive, unsigned int state)
+static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response;
     unsigned int timeout = 100; /* ticks */
@@ -761,7 +768,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 
         while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
 
-        if (((response >> 9) & 0xf) == state)
+        if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
 
         if(TIME_AFTER(current_tick, t + timeout))
@@ -784,10 +791,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
 
-    /* skip SanDisk OF */
-    if (drive == INTERNAL_AS3525)
-        start += 0xf000;
-
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
@@ -804,9 +807,24 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         }
     }
 
+    if(count < 0) /* XXX: why is it signed ? */
+    {
+        ret = -18;
+        goto sd_transfer_error;
+    }
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -19;
+        goto sd_transfer_error;
+    }
+
+    /* skip SanDisk OF */
+    if (drive == INTERNAL_AS3525)
+        start += AMS_OF_SIZE;
+
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -18;
+        return -20;
 
     last_disk_activity = current_tick;
     dma_retain();
@@ -826,10 +844,9 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         /* Interrupt handler might set this to true during transfer */
         retry = false;
 
-        MCI_BLKSIZ = SD_BLOCK_SIZE;
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
-        ret = sd_wait_for_state(drive, SD_TRAN);
+        ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
             static const char *st[9] = {
@@ -854,16 +871,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        MCI_MASK |= (MCI_DATA_ERROR | MCI_INT_DTO);
-        MCI_CTRL |= DMA_ENABLE;
-
         unsigned long dummy; /* if we don't ask for a response, writing fails */
         if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
             panicf("%s multiple blocks failed", write ? "write" : "read");
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-
-        MCI_MASK &= ~(MCI_DATA_ERROR | MCI_INT_DTO);
 
         last_disk_activity = current_tick;
 
@@ -892,11 +904,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     } while(retry || count);
 
     dma_release();
-
-    /* CMD lines are separate, not common, so we need to actively deselect */
-    /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
-    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -19;
 
 #ifndef BOOTLOADER
     sd_enable(false);

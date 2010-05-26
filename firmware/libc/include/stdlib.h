@@ -29,6 +29,7 @@ void *malloc(size_t);
 void *calloc (size_t nmemb, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
+int  atexit(void (*)(void));
 
 #define RAND_MAX INT_MAX
 
@@ -51,7 +52,7 @@ void exit(int status);
 #endif
 
 int atoi (const char *str);
-    
+
 #ifdef __cplusplus
 }
 #endif

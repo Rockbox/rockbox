@@ -43,6 +43,9 @@ enum {
     MODEL_C200V2,
     MODEL_CLIPPLUS,
     MODEL_FUZEV2,
+    /* new models go here */
+
+    NUM_MODELS
 };
 
 
@@ -65,8 +68,7 @@ extern const int bootloader_sizes[];
  * ARGUMENTS
  *
  * filename         :   bootloader file to load
- * model            :   a 4 characters string representing the Sansa model
- *                      ("fuze", "clip", "e2v2", "m2v4", or "c2v2")
+ * model            :   will be set to this bootloader's model
  * bootloader_size  :   set to the uncompressed bootloader size
  * rb_packed_size   :   set to the size of compressed bootloader
  * errstr           :   provided buffer to store an eventual error
@@ -78,7 +80,7 @@ extern const int bootloader_sizes[];
  */
 
 unsigned char* load_rockbox_file(
-        char* filename, int model, int* bootloader_size, int* rb_packedsize,
+        char* filename, int *model, int* bootloader_size, int* rb_packedsize,
         char* errstr, int errstrsize);
 
 
@@ -89,10 +91,9 @@ unsigned char* load_rockbox_file(
  * ARGUMENTS
  *
  * filename         :   firmware file to load
+ * model            :   desired player's model
  * bufsize          :   set to firmware file size
  * md5sum           :   set to file md5sum, must be at least 33 bytes long
- * model            :   set to firmware model (MODEL_XXX)
- * fw_version       :   set to firmware format version (1 or 2)
  * firmware_size    :   set to firmware block's size
  * of_packed        :   pointer to allocated memory containing the compressed
  *                      original firmware block
@@ -106,7 +107,7 @@ unsigned char* load_rockbox_file(
  */
 
 unsigned char* load_of_file(
-        char* filename, off_t* bufsize, struct md5sums *sum,
+        char* filename, int model, off_t* bufsize, struct md5sums *sum,
         int* firmware_size, unsigned char** of_packed,
         int* of_packedsize, char* errstr, int errstrsize);
 

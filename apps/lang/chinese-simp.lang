@@ -4797,11 +4797,11 @@
   user: core
   <source>
     *: none
-    alarm: "Alarm Time: %02d:%02d"
+    alarm: "Alarm Time:"
   </source>
   <dest>
     *: none
-    alarm: "闹铃时间:%02d:%02d"
+    alarm: "闹铃时间:"
   </dest>
   <voice>
     *: none

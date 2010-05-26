@@ -272,11 +272,7 @@ static kiss_fft_cpx output[ARRAYSIZE_OUT];
 static int32_t plot[ARRAYSIZE_PLOT];
 static char buffer[BUFSIZE];
 
-#if LCD_DEPTH > 1 /* greyscale or color, enable spectrogram */
 #define MODES_COUNT 3
-#else
-#define MODES_COUNT 2
-#endif
 
 const unsigned char* modes_text[] = { "Lines", "Bars", "Spectrogram" };
 const unsigned char* scales_text[] = { "Linear scale", "Logarithmic scale" };

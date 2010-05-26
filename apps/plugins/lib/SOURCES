@@ -1,4 +1,8 @@
 gcc-support.c
+pluginlib_actions.c
+helper.c
+md5.c
+pluginlib_exit.c
 jhash.c
 configfile.c
 fixedpoint.c
@@ -7,37 +11,49 @@ rgb_hsv.c
 buflib.c
 display_text.c
 strncpy.c
+
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 grey_core.c
 grey_draw.c
 grey_parm.c
 grey_scroll.c
+
 #ifdef CPU_COLDFIRE
 grey_coldfire.S
 #elif CONFIG_CPU == SH7034
 grey_sh.S
 #endif
-#endif
+
+#endif /* HAVE_LCD_BITMAP && LCD_DEPTH < 4 */
+
 highscore.c
+
 #ifndef SIMULATOR
 overlay.c
 #endif
+
 #ifdef HAVE_LCD_CHARCELLS
 playergfx.c
 #endif
+
 #ifdef RB_PROFILE
 profile_plugin.c
 #endif
+
 #ifdef HAVE_LCD_BITMAP
+
 #ifdef CPU_ARM
 ../../../firmware/target/arm/support-arm.S
 pluginlib_jpeg_idct_arm.S
 #endif
+
 pluginlib_jpeg_mem.c
 pluginlib_resize.c
+
 #ifndef HAVE_JPEG
 pluginlib_jpeg_load.c
 #endif
+
 checkbox.c
 picture.c
 xlcd_core.c
@@ -45,29 +61,33 @@ xlcd_draw.c
 xlcd_scroll.c
 pluginlib_bmp.c
 read_image.c
+
 #ifdef HAVE_LCD_COLOR
 bmp_smooth_scale.c
 #endif
+
 #if !defined(HAVE_ALBUMART) || !defined(HAVE_JPEG)
 pluginlib_albumart.c
 #endif
-#endif
-pluginlib_actions.c
-helper.c
+
+#endif /* HAVE_LCD_BITMAP */
+
 #ifdef HAVE_TOUCHSCREEN
 pluginlib_touchscreen.c
 #endif
-md5.c
 
 #ifndef SIMULATOR
+
 #ifdef CPU_ARM
 ../../codecs/lib/setjmp_arm.S
 #endif
+
 #ifdef CPU_COLDFIRE
 ../../codecs/lib/setjmp_cf.S
 #endif
+
 #ifdef CPU_MIPS
 ../../codecs/lib/setjmp_mips.S
 #endif
-#endif
-pluginlib_exit.c
+
+#endif /* !SIMULATOR */

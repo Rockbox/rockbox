@@ -95,8 +95,6 @@ static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
 
-#define UNTAGGED "<Untagged>"
-
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAG_MAXLEN+32];
 
@@ -3716,14 +3714,14 @@ static bool check_event_queue(void)
 {
     struct queue_event ev;
     
-    queue_wait_w_tmo(&tagcache_queue, &ev, 0);
+    if(!queue_peek(&tagcache_queue, &ev))
+        return false;
+    
     switch (ev.id)
     {
         case Q_STOP_SCAN:
         case SYS_POWEROFF:
         case SYS_USB_CONNECTED:
-            /* Put the event back into the queue. */
-            queue_post(&tagcache_queue, ev.id, ev.data);
             return true;
     }
     

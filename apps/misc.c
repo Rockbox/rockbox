@@ -968,7 +968,6 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
     const char** s;
     int* d;
     bool set, is_negative;
-    bool is_last_var;
     int i=0;
 
     va_start(ap, str);
@@ -983,7 +982,6 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 goto err;
             p++;
         }
-        is_last_var = fmt[1] == '\0';
         set = false;
         switch (*fmt++) 
         {
@@ -991,9 +989,9 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 s = va_arg(ap, const char **);
 
                 *s = p;
-                while (*p && *p != sep && *p != ')')
+                while (*p && *p != sep)
                     p++;
-                set = (s[0][0]!='-') && (s[0][1]!=sep && s[0][1]!=')') ;
+                set = (s[0][0]!='-') && (s[0][1]!=sep) ;
                 break;
 
             case 'd': /* int */
@@ -1031,7 +1029,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 {
                     if (!set_vals || *p != '-')
                         goto err;
-                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
+                    while (*p && *p != sep)
                         p++;
                 }
                 else
@@ -1056,7 +1054,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                     goto err;
                 else
                 {
-                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
+                    while (*p && *p != sep)
                         p++;
                 }
 

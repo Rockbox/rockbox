@@ -230,7 +230,7 @@ void vid_update(int scanline)
 { 
    register int cnt=0;
     int scanline_remapped;
-#if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos */
+#if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos, Clip, m200v4 */
     int balance = 0;
     if (fb.mode==1)
         scanline-=16;
@@ -306,7 +306,7 @@ void vid_update(int scanline)
         cnt ++;
     }
     rb->lcd_update_rect(0, (scanline/2) & ~7, LCD_WIDTH, 8);
-#elif (LCD_HEIGHT == 128) && (LCD_DEPTH == 2) /* iriver H1x0 */
+#elif (LCD_HEIGHT == 128) && (LCD_DEPTH == 2) /* iriver H1x0, Samsung YH920 */
     if (fb.mode==1)
         scanline-=16;
     else if (fb.mode==2)

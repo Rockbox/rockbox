@@ -31,21 +31,14 @@ strlen:
     move.l   %a0, %a1       /* %a1 = start address */
     move.l   %a0, %d0
     andi.l   #3, %d0        /* %d0 = %a0 & 3 */
-    jmp.l    (2,%pc,%d0.l*2)
-    bra.b    .bytes0
-    bra.b    .bytes3
-    bra.b    .bytes2
-    bra.b    .bytes1
-.bytes3:
+    beq.b    1f             /* already aligned */
+    jmp.l    (-2,%pc,%d0.l*4)
     tst.b    (%a0)+
     beq.b    .done
-.bytes2:
     tst.b    (%a0)+
     beq.b    .done
-.bytes1:
     tst.b    (%a0)+
     beq.b    .done
-.bytes0:
 
     1:
     move.l   (%a0)+, %d0    /* load %d0 increment %a0 */

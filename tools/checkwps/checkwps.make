@@ -17,6 +17,7 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/firmware/include \
            -I$(ROOTDIR)/apps \
            -I$(ROOTDIR)/apps/recorder \
+           -I$(ROOTDIR)/apps/radio \
            -I$(APPSDIR) \
            -I$(BUILDDIR)
 

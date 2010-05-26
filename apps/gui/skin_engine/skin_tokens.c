@@ -254,6 +254,20 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
                 return buf;
 
+            case WPS_TOKEN_TRACK_STARTING:
+                {
+                    unsigned long time = token->value.i * 1000;
+                    if (elapsed < time)
+                        return "starting";
+                }
+                return NULL;
+            case WPS_TOKEN_TRACK_ENDING:
+                {
+                    unsigned long time = token->value.i * 1000;
+                    if (length - elapsed < time)
+                        return "ending";
+                }
+                return NULL;
 
             case WPS_TOKEN_FILE_CODEC:
                 if (intval)
@@ -344,10 +358,40 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 }
 
 #if CONFIG_TUNER
+
+/* Formats the frequency (specified in Hz) in MHz,   */
+/* with one or two digits after the decimal point -- */
+/* depending on the frequency changing step.         */
+/* Returns buf                                       */
+static char *format_freq_MHz(int freq, int freq_step, char *buf, int buf_size)
+{
+    int scale, div;
+    char *fmt;
+    if (freq_step < 100000)
+    {
+        /* Format with two digits after decimal point */
+        scale = 10000;
+        fmt = "%d.%02d";
+    }
+    else
+    {
+        /* Format with one digit after decimal point */
+        scale = 100000;
+        fmt = "%d.%d";
+    }
+    div = 1000000 / scale;
+    freq = freq / scale;
+    snprintf(buf, buf_size, fmt, freq/div, freq%div);
+    return buf;
+}
+
+
 /* Tokens which are really only used by the radio screen go in here */
 const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval)
 {
+    const struct fm_region_data *region_data =
+            &(fm_region_data[global_settings.fm_region]);
     (void)limit;
     switch (token->type)
     {
@@ -365,45 +409,34 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 return "s";
             return NULL;
         case WPS_TOKEN_TUNER_MINFREQ: /* changes based on "region" */
-        {
-            int freq = fm_region_data[global_settings.fm_region].freq_min / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
-            return buf;
-        }
+            return format_freq_MHz(region_data->freq_min,
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_TUNER_MAXFREQ: /* changes based on "region" */
-        {
-            int freq = fm_region_data[global_settings.fm_region].freq_max / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
-            return buf;
-        }
+            return format_freq_MHz(region_data->freq_max,
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_TUNER_CURFREQ:
-        {
-            int freq = radio_current_frequency() / 10000;
-            snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
-            return buf;
-        }
-        case WPS_TOKEN_PRESET_ID:
-            snprintf(buf, buf_size, "%d", radio_current_preset() + 1 + preset_offset);
-            return buf;
+            return format_freq_MHz(radio_current_frequency(),
+                            region_data->freq_step, buf, buf_size);
         case WPS_TOKEN_PRESET_NAME:
         case WPS_TOKEN_PRESET_FREQ:
+        case WPS_TOKEN_PRESET_ID:
         {
-            int preset = radio_current_preset() + preset_offset;
-            if (radio_preset_count() == 0 || preset == -1)
+            int preset_count = radio_preset_count();
+            int cur_preset = radio_current_preset();
+            if (preset_count == 0 || cur_preset < 0)
                 return NULL;
-            /* make sure its in the valid range */
-            while (preset < 0)
-                preset += radio_preset_count();
-            preset %= radio_preset_count();
+            int preset = cur_preset + preset_offset;
+            /* make sure it's in the valid range */
+            preset %= preset_count;
+            if (preset < 0)
+                preset += preset_count;
             if (token->type == WPS_TOKEN_PRESET_NAME)
-            {
                 snprintf(buf, buf_size, "%s", radio_get_preset(preset)->name);
-            }
+            else if (token->type == WPS_TOKEN_PRESET_FREQ)
+                format_freq_MHz(radio_get_preset(preset)->frequency,
+                                region_data->freq_step, buf, buf_size);
             else
-            {
-                int freq = radio_get_preset(preset)->frequency / 10000;
-                snprintf(buf, buf_size, "%d.%02d", freq/100, freq%100);
-            }
+                snprintf(buf, buf_size, "%d", preset + 1);
             return buf;
         }
         case WPS_TOKEN_PRESET_COUNT:
@@ -554,8 +587,18 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_FOUND:
-            if (data->albumart) {
-                if (playback_current_aa_hid(data->playback_aa_slot) >= 0)
+            if (data->albumart)
+            {
+                int handle = -1;
+                handle = playback_current_aa_hid(data->playback_aa_slot);
+#if CONFIG_TUNER
+                if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+                {
+                    struct dim dim = {data->albumart->width, data->albumart->height};
+                    handle = radio_get_art_hid(&dim);
+                }
+#endif
+                if (handle >= 0)    
                     return "C";
             }
             return NULL;
@@ -989,23 +1032,6 @@ const char *get_token_value(struct gui_wps *gwps,
                 return "v";
             return NULL;
             
-        case WPS_TOKEN_TRACK_STARTING:
-            if (id3)
-            {
-                int elapsed = id3->elapsed + state->ff_rewind_count;
-                if (elapsed < token->value.i * 1000)
-                    return "starting";
-            }
-            return NULL;
-        case WPS_TOKEN_TRACK_ENDING:
-            if (id3)
-            {
-                unsigned long elapsed = id3->elapsed + state->ff_rewind_count;
-                unsigned time = token->value.i * 1000;
-                if (id3->length - elapsed < time)
-                    return "ending";
-            }
-            return NULL;
         case WPS_TOKEN_LASTTOUCH:
 #ifdef HAVE_TOUCHSCREEN
             if (TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +

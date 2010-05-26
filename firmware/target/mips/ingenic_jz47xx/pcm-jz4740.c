@@ -100,22 +100,15 @@ static inline void set_dma(const void *addr, size_t size)
 
 static inline void play_dma_callback(void)
 {
-    unsigned char *start = NULL;
-    size_t size = 0;
+    void *start;
+    size_t size;
 
-    if(pcm_callback_for_more)
-        pcm_callback_for_more(&start, &size);
+    pcm_play_get_more_callback(&start, &size);
 
-    if(LIKELY(size > 0 && start))
+    if (size != 0)
     {
         set_dma(start, size);
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-    }
-    else
-    {
-        /* Error, callback missing or no more DMA to do */
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
     }
 }
 
@@ -288,15 +281,8 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(int *count)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    *count = 0;
     return NULL;
-}
-
-void pcm_record_more(void *start, size_t size)
-{
-    (void) start;
-    (void) size;
 }
 #endif

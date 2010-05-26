@@ -10,6 +10,7 @@
 #undef CONFIG_I2C
 
 #undef HAVE_PCM_DMA_ADDRESS
+#undef HAVE_PCM_REC_DMA_ADDRESS
 
 #undef FLASH_SIZE
 
@@ -79,6 +80,8 @@
 
 #undef HAVE_SPEAKER
 
+#undef BUTTON_DRIVER_CLOSE
+
 #if     CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG
 #undef  CONFIG_BACKLIGHT_FADING
         /* simulate SW_SETTING, as we handle sdl very similary */
@@ -96,4 +99,6 @@
 #define DEFAULT_BRIGHTNESS_SETTING MAX_BRIGHTNESS_SETTING
 #endif
 
+#define HAVE_SDL
+#define HAVE_SDL_AUDIO
 #define _ISOC99_SOURCE 1

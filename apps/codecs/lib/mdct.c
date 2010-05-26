@@ -293,6 +293,32 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
     in_r  = output+n2+n4-8;
     while(out_r<out_r2)
     {
+#if defined CPU_COLDFIRE
+        asm volatile( 
+            "movem.l (%[in_r]), %%d0-%%d7\n\t"
+            "movem.l %%d0-%%d7, (%[out_r2])\n\t"
+            "neg.l %%d7\n\t"
+            "move.l %%d7, (%[out_r])+\n\t"
+            "neg.l %%d6\n\t"
+            "move.l %%d6, (%[out_r])+\n\t"
+            "neg.l %%d5\n\t"
+            "move.l %%d5, (%[out_r])+\n\t"
+            "neg.l %%d4\n\t"
+            "move.l %%d4, (%[out_r])+\n\t"
+            "neg.l %%d3\n\t"
+            "move.l %%d3, (%[out_r])+\n\t"
+            "neg.l %%d2\n\t"
+            "move.l %%d2, (%[out_r])+\n\t"
+            "lea.l (-8*4, %[in_r]), %[in_r]\n\t"
+            "neg.l %%d1\n\t"
+            "move.l %%d1, (%[out_r])+\n\t"
+            "lea.l (-8*4, %[out_r2]), %[out_r2]\n\t"
+            "neg.l %%d0\n\t"
+            "move.l %%d0, (%[out_r])+\n\t"
+            : [in_r] "+a" (in_r), [out_r] "+a" (out_r), [out_r2] "+a" (out_r2)
+            :
+            : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "cc", "memory" );
+#else
         out_r[0]     = -(out_r2[7] = in_r[7]);
         out_r[1]     = -(out_r2[6] = in_r[6]);
         out_r[2]     = -(out_r2[5] = in_r[5]);
@@ -304,6 +330,7 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
         in_r -= 8;
         out_r += 8;
         out_r2 -= 8;
+#endif
     }
     in_r = output + n2+n4;
     in_r2 = output + n-4;
@@ -311,6 +338,29 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
     out_r2 = output + n2 + n4 - 4;
     while(in_r<in_r2)
     {
+#if defined CPU_COLDFIRE
+        asm volatile(
+            "movem.l (%[in_r]), %%d0-%%d3\n\t"
+            "movem.l %%d0-%%d3, (%[out_r])\n\t"
+            "movem.l (%[in_r2]), %%d4-%%d7\n\t"
+            "movem.l %%d4-%%d7, (%[out_r2])\n\t"
+            "move.l %%d0, %%a3\n\t"
+            "move.l %%d3, %%d0\n\t"
+            "move.l %%d1, %%d3\n\t"
+            "movem.l %%d0/%%d2-%%d3/%%a3, (%[in_r2])\n\t"
+            "move.l %%d7, %%d1\n\t"
+            "move.l %%d6, %%d2\n\t"
+            "move.l %%d5, %%d3\n\t"
+            "movem.l %%d1-%%d4, (%[in_r])\n\t"
+            "lea.l (4*4, %[in_r]), %[in_r]\n\t"
+            "lea.l (-4*4, %[in_r2]), %[in_r2]\n\t"
+            "lea.l (4*4, %[out_r]), %[out_r]\n\t"
+            "lea.l (-4*4, %[out_r2]), %[out_r2]\n\t"
+            : [in_r] "+a" (in_r), [in_r2] "+a" (in_r2),
+              [out_r] "+a" (out_r), [out_r2] "+a" (out_r2)
+            :
+            : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a3", "memory", "cc" );
+#else
         register fixed32 t0,t1,t2,t3;
         register fixed32 s0,s1,s2,s3;
 
@@ -344,6 +394,7 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
         in_r2 -= 4;
         out_r += 4;
         out_r2 -= 4;
+#endif
     }
 }
 #else
@@ -377,7 +428,7 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
             "stmia %[out_r]!, {r0-r3,r5-r8}\n\t"
             : [in_r] "+r" (in_r), [out_r] "+r" (out_r), [out_r2] "+r" (out_r2)
             :
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" );
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "memory" );
     }
     in_r = output + n2+n4;
     in_r2 = output + n;
@@ -401,7 +452,7 @@ void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
             :
             [in_r] "+r" (in_r), [in_r2] "+r" (in_r2), [out_r] "+r" (out_r), [out_r2] "+r" (out_r2)
             :
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" );
+            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "memory" );
     }
 }
 #endif

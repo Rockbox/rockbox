@@ -96,7 +96,6 @@ static unsigned char *req_data_ptr = NULL;
 static struct ascodec_request *req_head = NULL;
 static struct ascodec_request *req_tail = NULL;
 
-#if CONFIG_CPU == AS3525
 static struct wakeup adc_wkup;
 static struct ascodec_request as_audio_req;
 
@@ -112,13 +111,11 @@ static int int_adc = 0;
 #endif /* DEBUG */
 
 static void ascodec_read_cb(unsigned const char *data, unsigned int len);
-#endif /* CONFIG_CPU == AS3525 */
 
 static void ascodec_start_req(struct ascodec_request *req);
 static int  ascodec_continue_req(struct ascodec_request *req, int irq_status);
 static void ascodec_finish_req(struct ascodec_request *req);
 
-#if CONFIG_CPU == AS3525
 void INT_AUDIO(void)
 {
     VIC_INT_EN_CLEAR = INTERRUPT_AUDIO;
@@ -126,7 +123,6 @@ void INT_AUDIO(void)
 
     ascodec_async_read(AS3514_IRQ_ENRD0, 3, &as_audio_req, ascodec_read_cb);
 }
-#endif /* CONFIG_CPU == AS3525 */
 
 void INT_I2C_AUDIO(void)
 {
@@ -166,9 +162,7 @@ void ascodec_init(void)
     int prescaler;
 
     mutex_init(&as_mtx);
-#if CONFIG_CPU == AS3525
     wakeup_init(&adc_wkup);
-#endif
 
     /* enable clock */
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
@@ -185,13 +179,32 @@ void ascodec_init(void)
 
     I2C2_IMR = 0x00;          /* disable interrupts */
     I2C2_INT_CLR |= I2C2_RIS; /* clear interrupt status */
-    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO | INTERRUPT_AUDIO;
+    VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO;
+    VIC_INT_ENABLE = INTERRUPT_AUDIO;
+
+    /* detect if USB was connected at startup since there is no transition */
+    if(ascodec_read(AS3514_IRQ_ENRD0) & USB_STATUS)
+        usb_insert_int();
+    else
+        usb_remove_int();
 
     /* Generate irq for usb+charge status change */
-    ascodec_write(AS3514_IRQ_ENRD0, /*IRQ_CHGSTAT |*/ IRQ_USBSTAT);
+    ascodec_write(AS3514_IRQ_ENRD0,
+#ifdef CONFIG_CHARGING /* m200v4 can't charge */
+        IRQ_CHGSTAT | IRQ_ENDOFCH |
+#endif
+        IRQ_USBSTAT);
+
+#if CONFIG_CPU == AS3525v2
+    /* XIRQ = IRQ, active low reset signal, 6mA push-pull output */
+    ascodec_write_pmu(0x1a, 3, (1<<2)|3); /* 1A-3 = Out_Cntr3 register */
+    /* Generate irq on (rtc,) adc change */
+    ascodec_write(AS3514_IRQ_ENRD2, /*IRQ_RTC |*/ IRQ_ADC);
+#else
     /* Generate irq for push-pull, active high, irq on rtc+adc change */
     ascodec_write(AS3514_IRQ_ENRD2, IRQ_PUSHPULL | IRQ_HIGHACTIVE |
                                     /*IRQ_RTC |*/ IRQ_ADC);
+#endif
 }
 
 /* returns != 0 when busy */
@@ -342,19 +355,8 @@ static void ascodec_wait(struct ascodec_request *req)
 void ascodec_async_write(unsigned int index, unsigned int value,
                          struct ascodec_request *req)
 {
-    switch(index) {
-    case AS3514_CVDD_DCDC3:
-        /* prevent setting of the LREG_CP_not bit */
+    if (index == AS3514_CVDD_DCDC3) /* prevent setting of the LREG_CP_not bit */
         value &= ~(1 << 5);
-        break;
-    case AS3514_IRQ_ENRD0:
-        /* save value in register shadow
-         * for ascodec_(en|dis)able_endofch_irq() */
-        ascodec_enrd0_shadow = value;
-        break;
-    default:
-        break;
-    }
 
     ascodec_req_init(req, ASCODEC_REQ_WRITE, index, 1);
     req->data[0] = value;
@@ -429,19 +431,21 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
     return i;
 }
 
-#if CONFIG_CPU == AS3525
 static void ascodec_read_cb(unsigned const char *data, unsigned int len)
 {
     if (len != 3) /* some error happened? */
         return;
 
     if (data[0] & CHG_ENDOFCH) { /* chg finished */
+        ascodec_enrd0_shadow |= CHG_ENDOFCH;
         IFDEBUG(int_chg_finished++);
     }
     if (data[0] & CHG_CHANGED) { /* chg status changed */
         if (data[0] & CHG_STATUS) {
+            ascodec_enrd0_shadow |= CHG_STATUS;
             IFDEBUG(int_chg_insert++);
         } else {
+            ascodec_enrd0_shadow &= ~CHG_STATUS;
             IFDEBUG(int_chg_remove++);
         }
     }
@@ -472,18 +476,20 @@ void ascodec_wait_adc_finished(void)
 {
     wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
 }
-#endif /* CONFIG_CPU == AS3525 */
 
-
-void ascodec_enable_endofch_irq(void)
+#ifdef CONFIG_CHARGING
+bool ascodec_endofch(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow | CHG_ENDOFCH);
+    bool ret = ascodec_enrd0_shadow & CHG_ENDOFCH;
+    ascodec_enrd0_shadow &= ~CHG_ENDOFCH; // clear interrupt
+    return ret;
 }
 
-void ascodec_disable_endofch_irq(void)
+bool ascodec_chg_status(void)
 {
-    ascodec_write(AS3514_IRQ_ENRD0, ascodec_enrd0_shadow & ~CHG_ENDOFCH);
+    return ascodec_enrd0_shadow & CHG_STATUS;
 }
+#endif /* CONFIG_CHARGING */
 
 /*
  * NOTE:

@@ -11,7 +11,7 @@ before beginning there are a few things it is important to know.
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
-\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clipv1,clipv2,cowond2,fuze}{
+\opt{ipodnano,ipodnano2g,ipodvideo,e200,c200,e200v2,clipv1,clipv2,cowond2,fuze,fuzev2}{
 \begin{description}  
 \item[Supported hardware versions.] 
     \opt{ipodnano,ipodnano2g}{
@@ -43,19 +43,13 @@ follow the instructions at
     v2 firmware begins with 03. Make sure that you are following the
     instructions from the correct manual.
 }
-  \opt{clipv1,clipv2}{
+  \opt{clipv1,clipv2,fuze,fuzev2}{
     The \playertype{} is available in multiple versions, and you need to make
-    sure which you have by checking the Sandisk firmware version number under 
-    Settings $\rightarrow$ Info. The v1 firmware is named 01.xx.xx, while the
-    v2 firmware begins with 02. Make sure that you are following the
-    instructions from the correct manual.
-}
-  \opt{fuze}{
-    The \playertype{} is available in multiple versions, not all of which
-    run Rockbox.  Rockbox doesn't run on the newer v2 models. They can be
-    identified by checking the Sandisk firmware version number under 
-    System Settings $\rightarrow$ System Info. The v1 firmware is named
-    01.xx.xx, while the v2 firmware begins with 02.
+    sure which you have by checking the Sandisk firmware version number under
+    Settings $\rightarrow$ \opt{fuze,fuzev2}{System Settings $\rightarrow$}
+    Info. The v1 firmware is named 01.xx.xx, while the v2 firmware begins with
+    02. Make sure that you are following the instructions from the correct
+    manual.
 }
   \opt{cowond2}{
     Rockbox runs on all \playerman{} \playertype{} and \playertype{}+ variants
@@ -82,7 +76,7 @@ follow the instructions at
           cards until we are satisfied the driver is safe to use.\\}
       \item There is only basic touchscreen support. Further work is
         required to make the UI more usable with a touchscreen in general.
-        \note{The touchscreen can be used in two modes, either a 3x3 grid mode
+        \note{The touchscreen can be used in two modes, either a 3$\times$3 grid mode
           which divides the screen into areas to emulate a set of physical
           buttons (the default setting), or ``absolute point'' mode where the
           touchscreen is used to point to items on the screen.\\}
@@ -139,7 +133,7 @@ follow the instructions at
   }
   \opt{x5}{
     When instructed to connect/disconnect the USB cable, always use
-    the USB port through the subpack, not the side 'USB Host' port. The side port
+    the USB port through the subpack, not the side `USB Host' port. The side port
     is intended to be used for USB OTG connections only (digital cameras, memory
     sticks, etc.).
   }

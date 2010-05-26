@@ -158,19 +158,19 @@ static void draw_progressbar(struct gui_wps *gwps,
         length = 100;
         elapsed = battery_level();
     }
-    else if (id3 && id3->length)
-    {
-        length = id3->length;
-        elapsed = id3->elapsed + state->ff_rewind_count;
-    }
 #if CONFIG_TUNER
-    else if (in_radio_screen())
+    else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
     {
         int min = fm_region_data[global_settings.fm_region].freq_min;
         elapsed = radio_current_frequency() - min;
         length = fm_region_data[global_settings.fm_region].freq_max - min;
     }
 #endif
+    else if (id3 && id3->length)
+    {
+        length = id3->length;
+        elapsed = id3->elapsed + state->ff_rewind_count;
+    }
     else
     {
         length = 1;
@@ -178,7 +178,7 @@ static void draw_progressbar(struct gui_wps *gwps,
     }
 
     if (pb->have_bitmap_pb)
-        gui_bitmap_scrollbar_draw(display, pb->bm,
+        gui_bitmap_scrollbar_draw(display, &pb->bm,
                                 pb->x, y, pb->width, pb->bm.height,
                                 length, 0, elapsed, HORIZONTAL);
     else
@@ -205,7 +205,7 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     struct wps_state *state = gwps->state;
     int lines = viewport_get_nb_lines(viewer->vp);
     int line_height = font_get(viewer->vp->font)->height;
-    int cur_pos, count;
+    int cur_pos, max;
     int start_item;
     int i;
     struct wps_token token;
@@ -218,18 +218,19 @@ static void draw_playlist_viewer_list(struct gui_wps *gwps,
     if (current_screen() == GO_TO_FM)
     {
         cur_pos = radio_current_preset();
-        count = radio_preset_count();
+        start_item = cur_pos + viewer->start_offset;
+        max = start_item+radio_preset_count();
     }
     else
 #endif
     {
         cur_pos = playlist_get_display_index();
-        count = playlist_amount()+1;
-    }
-    start_item = MAX(0, cur_pos + viewer->start_offset);    
+        max = playlist_amount()+1;
+        start_item = MAX(0, cur_pos + viewer->start_offset); 
+    }   
     
     gwps->display->set_viewport(viewer->vp);
-    for(i=start_item; (i-start_item)<lines && i<count; i++)
+    for(i=start_item; (i-start_item)<lines && i<max; i++)
     {
         int line;
 #if CONFIG_TUNER
@@ -443,8 +444,15 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     if (data->albumart && data->albumart->vp == vp
         && data->albumart->draw)
     {
-        draw_album_art(gwps, playback_current_aa_hid(data->playback_aa_slot),
-                        false);
+        int handle = playback_current_aa_hid(data->playback_aa_slot);
+#if CONFIG_TUNER
+        if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+        {
+            struct dim dim = {data->albumart->width, data->albumart->height};
+            handle = radio_get_art_hid(&dim);
+        }
+#endif
+        draw_album_art(gwps, handle, false);
         data->albumart->draw = false;
     }
 #endif

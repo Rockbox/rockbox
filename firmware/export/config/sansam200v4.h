@@ -14,7 +14,7 @@
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
-//#define HAVE_RECORDING
+#define HAVE_RECORDING
 
 #define REC_SAMPR_CAPS      SAMPR_CAP_ALL
 
@@ -79,7 +79,7 @@
 #define CODEC_SIZE 0x48000 /* in IRAM */
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x45000
+#define PLUGIN_BUFFER_SIZE 0x10000
 
 #define AB_REPEAT_ENABLE 1
 

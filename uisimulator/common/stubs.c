@@ -169,9 +169,9 @@ void rtc_set_alarm(int h, int m)
     (void)m;
 }
 
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
-    return enable;
+    (void)enable;
 }
 
 extern bool sim_alarm_wakeup;
@@ -269,10 +269,6 @@ void lcd_set_contrast( int x )
     (void)x;
 }
 
-void lcd_init_device(void)
-{
-}
-
 void mpeg_set_pitch(int pitch)
 {
     (void)pitch;
@@ -314,25 +310,9 @@ void cpu_sleep(bool enabled)
     (void)enabled;
 }
 
-void button_set_flip(bool yesno)
-{
-    (void)yesno;
-}
-
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
 void touchpad_set_sensitivity(int level)
 {
     (void)level;
 }
 #endif
-
-void system_exception_wait(void)
-{
-    thread_sdl_exception_wait();
-}
-
-void system_reboot(void)
-{
-    thread_sdl_exception_wait();
-}
-

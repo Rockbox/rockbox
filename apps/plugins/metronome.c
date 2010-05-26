@@ -608,62 +608,56 @@ static signed short sound[] = {
 };
 #endif
 
-#define METRONOME_QUIT          PLA_QUIT
-#define METRONOME_VOL_UP        PLA_INC
-#define METRONOME_VOL_DOWN      PLA_DEC
-#define METRONOME_VOL_UP_REP    PLA_INC_REPEAT
-#define METRONOME_VOL_DOWN_REP  PLA_DEC_REPEAT
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
+ || (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#define MET_SYNC
+#endif
+
+#define METRONOME_QUIT          PLA_EXIT
+
+#ifdef HAVE_SCROLLWHEEL
+#define METRONOME_VOL_UP        PLA_SCROLL_FWD
+#define METRONOME_VOL_UP_REP    PLA_SCROLL_FWD_REPEAT
+#define METRONOME_VOL_DOWN      PLA_SCROLL_BACK
+#define METRONOME_VOL_DOWN_REP  PLA_SCROLL_BACK_REPEAT
+#else
+#define METRONOME_VOL_UP        PLA_UP
+#define METRONOME_VOL_DOWN      PLA_DOWN
+#define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
+#define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
+#endif
 #define METRONOME_LEFT          PLA_LEFT
 #define METRONOME_RIGHT         PLA_RIGHT
 #define METRONOME_LEFT_REP      PLA_LEFT_REPEAT
 #define METRONOME_RIGHT_REP     PLA_RIGHT_REPEAT
+#define METRONOME_TAP           PLA_SELECT_REL
+#define METRONOME_PAUSE         PLA_CANCEL
+#define METRONOME_PLAY          PLA_SELECT_REPEAT
+
+#if defined(MET_SYNC)
 enum {
-    METRONOME_PLAY_TAP = LAST_PLUGINLIB_ACTION+1,
-#if CONFIG_KEYPAD == ONDIO_PAD
-    METRONOME_PAUSE,
-#endif /* ONDIO_PAD  */
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    METRONOME_SYNC 
+    METRONOME_SYNC  = LAST_PLUGINLIB_ACTION+1,
+};
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
-};
 
 
-#if CONFIG_KEYPAD == ONDIO_PAD
-#define METRONOME_TAP       PLA_START
-#define METRONOME_MSG_START "start: mode"
-#define METRONOME_MSG_STOP "pause: hold mode"
-static const struct button_mapping ondio_action[] = 
-{
-    {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_MENU },
-    {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN)
-};
-#else /* !ONDIO_PAD  */
-#define METRONOME_TAP       PLA_FIRE
-#define METRONOME_PLAYPAUSE PLA_START
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
+#define METRONOME_MSG_START     "start: press select"
+#define METRONOME_MSG_STOP      "start: hold select"
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define MET_SYNC
+#ifdef MET_SYNC
 static const struct button_mapping iriver_syncaction[] =
 {
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN)
 };
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
-#endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
 
 const struct button_mapping *plugin_contexts[] =
 {
-    generic_increase_decrease,
-    generic_directions,
-#if CONFIG_KEYPAD == ONDIO_PAD
-    ondio_action,
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    pla_main_ctx,
+#if defined(MET_SYNC)
     iriver_syncaction,
 #endif
-    generic_actions
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
@@ -890,6 +884,7 @@ void tap(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     int button;
+    static int last_button = BUTTON_NONE;
     enum plugin_status status;
 
     (void)parameter;
@@ -918,7 +913,7 @@ enum plugin_status plugin_start(const void* parameter)
     while (true){
         reset_tap = true;
 #if CONFIG_CODEC == SWCODEC
-        button = pluginlib_getaction(1,plugin_contexts,PLA_ARRAY_COUNT);
+        button = pluginlib_getaction(TIMEOUT_NOBLOCK,plugin_contexts,PLA_ARRAY_COUNT);
         if (need_to_play)
         {
             need_to_play = false;
@@ -936,35 +931,25 @@ enum plugin_status plugin_start(const void* parameter)
                 status = PLUGIN_OK;
                 goto metronome_exit;
 
-#if CONFIG_KEYPAD == ONDIO_PAD
-            case METRONOME_PLAY_TAP:
-                if(sound_paused) {
+            case METRONOME_PAUSE:
+                if(!sound_paused)
+                {
+                    sound_paused = true;
+                    draw_display();
+                }
+                break;
+            case METRONOME_PLAY:
+                if(sound_paused)
+                {
                     sound_paused = false;
                     calc_period();
                     draw_display();
                 }
-                else
+                break;
+            case METRONOME_TAP:
+                if (last_button != METRONOME_PLAY)
                     tap();
                 break;
-
-            case METRONOME_PAUSE:
-                if(!sound_paused) {
-                    sound_paused = true;
-                    draw_display();
-                }
-                break;
-
-#else
-            case METRONOME_PLAYPAUSE:
-                if(sound_paused)
-                    sound_paused = false;
-                else
-                    sound_paused = true;
-                calc_period();
-                draw_display();
-                break;
-#endif /* ONDIO_PAD */
-
             case METRONOME_VOL_UP:
             case METRONOME_VOL_UP_REP:
                 change_volume(1);
@@ -989,12 +974,6 @@ enum plugin_status plugin_start(const void* parameter)
                 change_bpm(1);
                 break;
 
-#ifdef  METRONOME_TAP
-            case METRONOME_TAP:
-                tap();
-                break;
-#endif
-
 #ifdef MET_SYNC
             case METRONOME_SYNC:
                 minitick = period;
@@ -1012,6 +991,8 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
         }
+        if (button)
+            last_button = button;
         if (reset_tap) {
             tap_count = 0;
         }

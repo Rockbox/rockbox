@@ -37,6 +37,11 @@
 #define FG_FALLBACK LCD_DEFAULT_FG
 #define BG_FALLBACK LCD_DEFAULT_BG
 #endif
+#ifdef HAVE_REMOTE_LCD
+#define REMOTE_FG_FALLBACK LCD_REMOTE_DEFAULT_FG
+#define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
+#endif
+
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -437,9 +442,23 @@ const char* viewport_parse_viewport(struct viewport *vp,
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     if (!LIST_VALUE_PARSED(set, PL_FG))
-        vp->fg_pattern = FG_FALLBACK;
+    {
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        if (screen == SCREEN_REMOTE)
+            vp->fg_pattern = REMOTE_FG_FALLBACK;
+        else
+#endif
+            vp->fg_pattern = FG_FALLBACK;
+    }
     if (!LIST_VALUE_PARSED(set, PL_BG))
-        vp->bg_pattern = BG_FALLBACK;
+    {
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        if (screen == SCREEN_REMOTE)
+            vp->bg_pattern = REMOTE_BG_FALLBACK;
+        else
+#endif
+            vp->bg_pattern = BG_FALLBACK;
+    }
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 
 #ifdef HAVE_LCD_COLOR

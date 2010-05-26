@@ -22,8 +22,6 @@
 
 /* Driver for the ARM PL180 SD/MMC controller inside AS3525 SoC */
 
-/* TODO: Find the real capacity of >2GB models (will be useful for USB) */
-
 #include "config.h" /* for HAVE_MULTIDRIVE & AMS_OF_SIZE */
 #include "fat.h"
 #include "thread.h"
@@ -102,12 +100,12 @@ static const int pl180_base[NUM_DRIVES] = {
 #endif
 };
 
-static int sd_wait_for_state(const int drive, unsigned int state);
+static int sd_wait_for_tran_state(const int drive);
 static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
 
-#define BLOCKS_PER_BANK 0x7a7800
+#define BLOCKS_PER_BANK 0x7a7800u
 
 static tCardInfo card_info[NUM_DRIVES];
 
@@ -140,7 +138,7 @@ static volatile unsigned int transfer_error[NUM_VOLUMES];
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
+static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 
 static inline void mci_delay(void) { udelay(1000) ; }
@@ -210,48 +208,52 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 {
     int status;
 
-    /* Clear old status flags */
-    MCI_CLEAR(drive) = 0x7ff;
-
-    /* Load command argument or clear if none */
-    MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
-
-    /* Construct MCI_COMMAND & enable CPSM */
-    MCI_COMMAND(drive) =
-       /*b0:5*/  cmd
-       /* b6 */| ((flags & (MCI_RESP|MCI_LONG_RESP)) ? MCI_COMMAND_RESPONSE : 0)
-       /* b7 */| ((flags & MCI_LONG_RESP) ? MCI_COMMAND_LONG_RESPONSE : 0)
-       /* b8   | MCI_COMMAND_INTERRUPT */
-       /* b9   | MCI_COMMAND_PENDING */  /*Only used with stream data transfer*/
-       /* b10*/| MCI_COMMAND_ENABLE;     /* Enables CPSM */
-
-    /* Wait while cmd completes then disable CPSM */
-    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
-    MCI_COMMAND(drive) = 0;
-
-    status = MCI_STATUS(drive);
-
-    /*  Handle command responses */
-    if(flags & MCI_RESP)                   /*  CMD expects response  */
+    unsigned cmd_retries = 6;
+    while(cmd_retries--)
     {
-        response[0] = MCI_RESP0(drive);    /*  Always prepare short response  */
+        /* Clear old status flags */
+        MCI_CLEAR(drive) = 0x7ff;
 
-        if(status & MCI_RESPONSE_ERROR)    /* timeout or crc failure */
-            return false;
+        /* Load command argument or clear if none */
+        MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
 
-        if(status & MCI_CMD_RESP_END)      /* Response passed CRC check */
+        /* Construct MCI_COMMAND & enable CPSM */
+        MCI_COMMAND(drive) =
+           /*b0:5*/  cmd
+           /* b6 */| ((flags & (MCI_RESP|MCI_LONG_RESP)) ? MCI_COMMAND_RESPONSE : 0)
+           /* b7 */| ((flags & MCI_LONG_RESP) ? MCI_COMMAND_LONG_RESPONSE : 0)
+           /* b8   | MCI_COMMAND_INTERRUPT */
+           /* b9   | MCI_COMMAND_PENDING */  /*Only used with stream data transfer*/
+           /* b10*/| MCI_COMMAND_ENABLE;     /* Enables CPSM */
+
+        /* Wait while cmd completes then disable CPSM */
+        while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
+        MCI_COMMAND(drive) = 0;
+
+        status = MCI_STATUS(drive);
+
+        /*  Handle command responses */
+        if(flags & MCI_RESP)                /* CMD expects response */
         {
-            if(flags & MCI_LONG_RESP)
-            {   /* response[0] has already been read */
-                response[1] = MCI_RESP1(drive);
-                response[2] = MCI_RESP2(drive);
-                response[3] = MCI_RESP3(drive);
+            response[0] = MCI_RESP0(drive); /* Always prepare short response */
+
+            if(status & MCI_RESPONSE_ERROR) /* timeout or crc failure */
+                continue;
+
+            if(status & MCI_CMD_RESP_END)   /* Response passed CRC check */
+            {
+                if(flags & MCI_LONG_RESP)
+                {   /* response[0] has already been read */
+                    response[1] = MCI_RESP1(drive);
+                    response[2] = MCI_RESP2(drive);
+                    response[3] = MCI_RESP3(drive);
+                }
+                return true;
             }
-            return true;
         }
+        else if(status & MCI_CMD_SENT)  /* CMD sent, no response required */
+            return true;
     }
-    else if(status & MCI_CMD_SENT)          /* CMD sent, no response required */
-        return true;
 
     return false;
 }
@@ -323,7 +325,7 @@ static int sd_init_card(const int drive)
             return -5;
         mci_delay();
 
-        if(sd_wait_for_state(drive, SD_TRAN))
+        if(sd_wait_for_tran_state(drive))
             return -6;
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
@@ -374,6 +376,25 @@ static int sd_init_card(const int drive)
         const int ret = sd_select_bank(-1);
         if(ret < 0)
             return ret -16;
+
+        /*  CMD7 w/rca = 0: Select card to put it in STBY state */
+        if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_ARG, NULL))
+            return -17;
+        mci_delay();
+
+        /* CMD9 send CSD again, so we got the correct number of blocks */
+        if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
+                     MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
+            return -18;
+
+        sd_parse_csd(&card_info[drive]);
+        /* The OF is stored in the first blocks */
+        card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
+
+        /*  CMD7 w/rca: Select card to put it in TRAN state */
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+            return -19;
+        mci_delay();
     }
 
     card_info[drive].initialized = 1;
@@ -553,10 +574,10 @@ bool sd_present(IF_MD_NONVOID(int drive))
 }
 #endif /* HAVE_HOTSWAP */
 
-static int sd_wait_for_state(const int drive, unsigned int state)
+static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response = 0;
-    unsigned int timeout = current_tick + 100; /* 100 ticks timeout */
+    unsigned int timeout = current_tick + 5 * HZ;
 
     while (1)
     {
@@ -564,7 +585,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
                     MCI_RESP|MCI_ARG, &response))
             return -1;
 
-        if (((response >> 9) & 0xf) == state)
+        if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
 
         if(TIME_AFTER(current_tick, timeout))
@@ -588,7 +609,7 @@ static int sd_select_bank(signed char bank)
             panicf("SD bank %d error : 0x%x", bank,
                     transfer_error[INTERNAL_AS3525]);
 
-        ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+        ret = sd_wait_for_tran_state(INTERNAL_AS3525);
         if (ret < 0)
             return ret - 2;
 
@@ -650,10 +671,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     int ret = 0;
     unsigned loops = 0;
 
-    /* skip SanDisk OF */
-    if (drive == INTERNAL_AS3525)
-        start += AMS_OF_SIZE;
-
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
     sd_enable(true);
@@ -666,6 +683,21 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if (!(card_info[drive].initialized))
             goto sd_transfer_error;
     }
+
+    if(count < 0) /* XXX: why is it signed ? */
+    {
+        ret = -20;
+        goto sd_transfer_error;
+    }
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -21;
+        goto sd_transfer_error;
+    }
+
+    /* skip SanDisk OF */
+    if (drive == INTERNAL_AS3525)
+        start += AMS_OF_SIZE;
 
     last_disk_activity = current_tick;
 
@@ -684,7 +716,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
         {
-            unsigned int bank = start / BLOCKS_PER_BANK; /* Current bank */
+            unsigned int bank = 0;
+            while(bank_start >= BLOCKS_PER_BANK)
+            {
+                bank_start -= BLOCKS_PER_BANK;
+                bank++;
+            }
 
             /* Switch bank if needed */
             if(card_info[INTERNAL_AS3525].current_bank != bank)
@@ -696,9 +733,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                     goto sd_transfer_error;
                 }
             }
-
-            /* Adjust start block in current bank */
-            bank_start -= bank * BLOCKS_PER_BANK;
 
             /* Do not cross a bank boundary in a single transfer loop */
             if((transfer + bank_start) > BLOCKS_PER_BANK)
@@ -716,7 +750,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(write)
             memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
-        ret = sd_wait_for_state(drive, SD_TRAN);
+        ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
             ret -= 2*20;
@@ -785,7 +819,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                                   transfer_error[drive], drive);
     }
 
-    ret = 0;    /* success */
+    /* be sure the card has finished programming */
+    ret = sd_wait_for_tran_state(drive);
+    if (ret < 0)
+        ret -= 5*20;
 
 sd_transfer_error:
 

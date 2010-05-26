@@ -170,7 +170,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     screen->fillrect(inner_x, inner_y, inner_wd, inner_ht);
 }
 
-void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, int y,
+void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x, int y,
                         int width, int height, int items,
                         int min_shown, int max_shown,
                         unsigned flags)
@@ -202,15 +202,15 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
     }
 
 #if LCD_DEPTH > 1
-    if (bm.format == FORMAT_MONO)
+    if (bm->format == FORMAT_MONO)
 #endif
-        screen->mono_bitmap_part(bm.data, 0, 0,
-                                 bm.width, x, y, width, height);
+        screen->mono_bitmap_part(bm->data, 0, 0,
+                                 bm->width, x, y, width, height);
 #if LCD_DEPTH > 1
     else
-        screen->transparent_bitmap_part((fb_data *)bm.data, 0, 0,
+        screen->transparent_bitmap_part((fb_data *)bm->data, 0, 0,
                                         STRIDE(screen->screen_type, 
-                                            bm.width, bm.height), 
+                                            bm->width, bm->height), 
                                         x, y, width, height);
 #endif
 }

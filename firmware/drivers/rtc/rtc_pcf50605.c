@@ -92,9 +92,8 @@ bool rtc_check_alarm_flag(void)
  * The Ipod bootloader clears all PCF interrupt registers and always enables
  * the "wake on RTC" bit on OOCC1, so we have to rely on other means to find
  * out if we just woke from an alarm.
- * Return value is always false for us. 
  */
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
     if (enable) {
         /* Tell the PCF to ignore everything but second, minute and hour, so
@@ -114,7 +113,6 @@ bool rtc_enable_alarm(bool enable)
         /* Make sure we don't wake on RTC after shutting down */
         pcf50605_wakeup_flags &= ~0x10;
     }
-    return false;
 }
 
 /**

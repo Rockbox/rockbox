@@ -55,10 +55,70 @@ void sound_set_bass(int value);
 void sound_set_treble(int value);
 void sound_set_channels(int value);
 void sound_set_stereo_width(int value);
-#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
 void sound_set_bass_cutoff(int value);
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 void sound_set_treble_cutoff(int value);
 #endif
+
+#if defined(AUDIOHW_HAVE_DEPTH_3D)
+void sound_set_depth_3d(int value);
+#endif
+
+#ifdef AUDIOHW_HAVE_EQ
+/*
+ * band = SOUND_EQ_BANDb
+ * band_setting = AUDIOHW_EQ_s
+ *
+ * Returns SOUND_EQ_BANDb_s or -1 if it doesn't exist.
+ *
+ * b: band number
+ * s: one of GAIN, FREQUENCY, WIDTH
+ */
+int sound_enum_hw_eq_band_setting(unsigned int band,
+                                  unsigned int band_setting);
+/* Band1 implied */
+void sound_set_hw_eq_band1_gain(int value);
+#ifdef AUDIOHW_HAVE_EQ_BAND1_FREQUENCY
+void sound_set_hw_eq_band1_frequency(int value);
+#endif
+#ifdef AUDIOHW_HAVE_EQ_BAND2
+void sound_set_hw_eq_band2_gain(int value);
+#ifdef AUDIOHW_HAVE_EQ_BAND2_FREQUENCY
+void sound_set_hw_eq_band2_frequency(int value);
+#endif
+#ifdef AUDIOHW_HAVE_EQ_BAND2_WIDTH
+void sound_set_hw_eq_band2_width(int value);
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND2 */
+#ifdef AUDIOHW_HAVE_EQ_BAND3
+/* Band 3 */
+void sound_set_hw_eq_band3_gain(int value);
+#ifdef AUDIOHW_HAVE_EQ_BAND3_FREQUENCY
+void sound_set_hw_eq_band3_frequency(int value);
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
+void sound_set_hw_eq_band3_width(int value);
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND3 */
+#ifdef AUDIOHW_HAVE_EQ_BAND4
+void sound_set_hw_eq_band4_gain(int value);
+#ifdef AUDIOHW_HAVE_EQ_BAND4_FREQUENCY
+void sound_set_hw_eq_band4_frequency(int value);
+#endif
+#ifdef AUDIOHW_HAVE_EQ_BAND4_WIDTH
+void sound_set_hw_eq_band4_width(int value);
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND4 */
+#ifdef AUDIOHW_HAVE_EQ_BAND5
+void sound_set_hw_eq_band5_gain(int value);
+#ifdef AUDIOHW_HAVE_EQ_BAND5_FREQUENCY
+void sound_set_hw_eq_band5_frequency(int value);
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND5 */
+#endif /* AUDIOHW_HAVE_EQ */
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void sound_set_loudness(int value);
 void sound_set_avc(int value);

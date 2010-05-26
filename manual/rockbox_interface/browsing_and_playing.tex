@@ -43,8 +43,7 @@ the \setting{Show Files} setting to all.
 }}
 
 \subsection{\label{ref:controls}File Browser Controls}
-\begin{table}
-    \begin{btnmap}{}{}
+\begin{btnmap}
       \ActionStdPrev{}/\ActionStdNext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
          & Go to previous/next item in list. If you are on the first/last 
@@ -117,8 +116,7 @@ the \setting{Show Files} setting to all.
         (see \reference{ref:Hotkeys}).
             \\
       }
-    \end{btnmap}
-\end{table}
+\end{btnmap}
 
 \opt{RECORDER_PAD}{
   The functions of the F keys are also summarised on the button bar at the
@@ -216,8 +214,7 @@ example when renaming a file or creating a new directory.
 
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
     ,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
+    \begin{btnmap}
       \ActionKbdLeft{} / \ActionKbdRight{} / \ActionKbdUp{} / \ActionKbdDown
       \opt{HAVEREMOTEKEYMAP}{
       & \ActionRCKbdLeft{} / \ActionRCKbdRight{} / \ActionRCKbdUp{} / \ActionRCKbdDown}
@@ -261,13 +258,11 @@ example when renaming a file or creating a new directory.
         %
       }
     \end{btnmap}
-  \end{table}
 }
 \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD
      ,PBELL_VIBE500_PAD}{
   \textbf{Picker area}
-  \begin{table}
-    \begin{btnmap}{}{}
+    \begin{btnmap}
       \ActionKbdLeft{} / \ActionKbdRight
       \opt{HAVEREMOTEKEYMAP}{& }
       & Move the cursor on the virtual keyboard.
@@ -309,11 +304,9 @@ example when renaming a file or creating a new directory.
         %
       }
     \end{btnmap}
-  \end{table}
 
   \textbf{Line edit mode}
-  \begin{table}
-    \begin{btnmap}{}{}
+    \begin{btnmap}
       \ActionKbdLeft{} / \ActionKbdRight
       \opt{HAVEREMOTEKEYMAP}{& }
       & Move the line cursor within the text line. \\
@@ -327,14 +320,12 @@ example when renaming a file or creating a new directory.
       & Return to the picker area. \\
       %
     \end{btnmap}
-  \end{table}
 }
 \opt{player}{
   The current text line to be entered or edited is always listed on the first
   line of the display. The second line of the display can contain the character
   selection bar, as in the screenshot above.
-  \begin{table}
-    \begin{btnmap}{}{}
+    \begin{btnmap}
       \ButtonOn & Toggle picker- and line edit mode. \\
       \ButtonLeft{} / \ButtonRight
         & Move back and forth in the selected line (picker of input line). \\
@@ -344,7 +335,6 @@ example when renaming a file or creating a new directory.
       \ButtonStop & Cancel \\
       \ButtonMenu & Flip picker lines. \\
     \end{btnmap}
-  \end{table}
 }
 
 \input{rockbox_interface/tagcache.tex}

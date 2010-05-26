@@ -25,10 +25,6 @@
  * but also much slower.
  * 
  * TODO:
- * - Find someone who knows how recording actually works, and rewrite the 
- *   recording code to use proper, gapless recording with a callback function
- *   that provides new buffer, instead of stopping and restarting recording
- *   everytime the buffer is full
  * - Adapt the Yin FFT algorithm, which would reduce complexity from O(n^2)
  *   to O(nlogn), theoretically reducing latency by a factor of ~10. -David
  * 
@@ -54,6 +50,7 @@
  *                       calculation
  *                   Fixed a problem that caused an octave-off error
  *                   -David
+ * 05.14.2010        Multibuffer continuous recording with two buffers
  *                   
  * 
  * CURRENT LIMITATIONS:
@@ -68,18 +65,11 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/picture.h"
+#include "lib/helper.h"
 #include "pluginbitmaps/pitch_notes.h"
 
 PLUGIN_HEADER
-
-/* First figure out what sample rate we're going to use */
-#if (REC_SAMPR_CAPS & SAMPR_CAP_44)
-#define SAMPLE_RATE     SAMPR_44
-#elif (REC_SAMPR_CAPS & SAMPR_CAP_22)
-#define SAMPLE_RATE     SAMPR_22
-#elif (REC_SAMPR_CAPS & SAMPR_CAP_11)
-#define SAMPLE_RATE     SAMPR_11
-#endif
+PLUGIN_IRAM_DECLARE
 
 /* Some fixed point calculation stuff */
 typedef int32_t fixed_data;
@@ -129,10 +119,10 @@ typedef struct _fixed fixed;
 /* With an 18-bit decimal precision, the max value in the    */
 /* integer part is 8192.  Divide 44100 by 7 and it'll fit in */
 /* that variable.                                            */
-#define fp_period2freq(x) fp_div(int2fixed(SAMPLE_RATE / 7), \
+#define fp_period2freq(x) fp_div(int2fixed(sample_rate / 7), \
                                  fp_div((x),int2fixed(7)))
 #define fp_freq2period(x) fp_period2freq(x)
-#define period2freq(x)    (SAMPLE_RATE / (x))
+#define period2freq(x)    (sample_rate / (x))
 #define freq2period(x)    period2freq(x)
 
 #define sqr(x)    ((x)*(x))
@@ -146,7 +136,7 @@ typedef struct _fixed fixed;
 
 /* The recording buffer size */
 /* This is how much is sampled at a time. */
-/* It also determines latency -- if BUFFER_SIZE == SAMPLE_RATE then */
+/* It also determines latency -- if BUFFER_SIZE == sample_rate then */
 /*   there'll be one sample per second, or a latency of one second. */
 /* Furthermore, the lowest detectable frequency will be about twice */
 /*   the number of reads per second                                 */
@@ -160,7 +150,7 @@ typedef struct _fixed fixed;
 #define LCD_FACTOR (fp_div(int2fixed(LCD_WIDTH), int2fixed(100)))
 /* The threshold for the YIN algorithm */
 #define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
-const fixed yin_threshold_table[] =
+const fixed yin_threshold_table[] IDATA_ATTR =
 {
     float2fixed(0.01),
     float2fixed(0.02),
@@ -257,11 +247,19 @@ const struct picture note_bitmaps =
 };
 
 
-typedef signed short audio_sample_type;
+static unsigned int sample_rate;
+static int audio_head = 0; /* which of the two buffers to use? */
+static volatile int audio_tail = 0; /* which of the two buffers to record? */
 /* It's stereo, so make the buffer twice as big */
-audio_sample_type audio_data[BUFFER_SIZE];
-fixed yin_buffer[YIN_BUFFER_SIZE];
-static int recording=0;
+#ifndef SIMULATOR
+static int16_t audio_data[2][BUFFER_SIZE] __attribute__((aligned(CACHEALIGN_SIZE)));
+static fixed yin_buffer[YIN_BUFFER_SIZE] IBSS_ATTR;
+#ifdef PLUGIN_USE_IRAM
+static int16_t iram_audio_data[BUFFER_SIZE] IBSS_ATTR;
+#else
+#define iram_audio_data audio_data[audio_head]
+#endif
+#endif
 
 /* Description of a note of scale */
 struct note_entry
@@ -415,11 +413,9 @@ void save_settings(void)
 
 /* Keymaps */
 const struct button_mapping* plugin_contexts[]={
-    generic_actions,
-    generic_increase_decrease,
-    generic_directions,
+    pla_main_ctx,
 #if NB_SCREENS == 2
-    remote_directions
+    pla_remote_ctx,
 #endif
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
@@ -460,9 +456,9 @@ void set_min_freq(int new_freq)
         tuner_settings.sample_size = SAMPLE_SIZE_MIN;
     else if(tuner_settings.sample_size >= BUFFER_SIZE)
         tuner_settings.sample_size = BUFFER_SIZE;
-    /* sample size must be divisible by 4 */
-    else if(tuner_settings.sample_size % 4 != 0)
-        tuner_settings.sample_size += 4 - (tuner_settings.sample_size % 4);
+
+    /* sample size must be divisible by 4 - round up */
+    tuner_settings.sample_size = (tuner_settings.sample_size + 3) & ~3;
 }
 
 bool main_menu(void)
@@ -473,6 +469,11 @@ bool main_menu(void)
     int choice;
     int freq_val;
     bool reset;
+
+    backlight_use_settings();
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    rb->cancel_cpu_boost();
+#endif
 
     MENUITEM_STRINGLIST(menu,"Tuner Settings",NULL,
                         "Return to Tuner",
@@ -506,8 +507,8 @@ bool main_menu(void)
                 rb->set_int("Lowest Frequency", "Hz", UNIT_INT,
                                &tuner_settings.lowest_freq, set_min_freq, 1,
                                /* Range depends on the size of the buffer */
-                               SAMPLE_RATE / (BUFFER_SIZE / 4), 
-                               SAMPLE_RATE / (SAMPLE_SIZE_MIN / 4), NULL);
+                               sample_rate / (BUFFER_SIZE / 4), 
+                               sample_rate / (SAMPLE_SIZE_MIN / 4), NULL);
                 break;
             case 4:
                 rb->set_option(
@@ -551,6 +552,8 @@ bool main_menu(void)
                 break;
         }
     }
+
+    backlight_force_on();
     return exit_tuner;
 }
 
@@ -816,7 +819,7 @@ unsigned vec_min_elem(fixed *s, unsigned buflen)
 }
 
 
-fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf) 
+static inline fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf) 
 {
     /* Original floating point version: */
     /* tmp = s0 + (pf/2.0f) * (pf * ( s0 - 2.0f*s1 + s2 ) - 
@@ -870,7 +873,7 @@ fixed aubio_quadfrac(fixed s0, fixed s1, fixed s2, fixed pf)
 
 #define QUADINT_STEP float2fixed(1.0f/200.0f)
 
-fixed vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
+fixed ICODE_ATTR vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
 {
     fixed res, frac, s0, s1, s2;
     fixed exactpos = int2fixed(pos);
@@ -917,7 +920,7 @@ fixed vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos, unsigned span)
 /* The yin pointer is just a buffer that the algorithm uses as a work
      space.  It needs to be half the length of the input buffer. */
 
-fixed pitchyin(audio_sample_type *input, fixed *yin)
+fixed ICODE_ATTR pitchyin(int16_t *input, fixed *yin)
 {
     fixed retval;
     unsigned j,tau = 0;
@@ -957,18 +960,20 @@ fixed pitchyin(audio_sample_type *input, fixed *yin)
 
 /*-----------------------------------------------------------------*/
 
-uint32_t buffer_magnitude(audio_sample_type *input)
+uint32_t ICODE_ATTR buffer_magnitude(int16_t *input)
 {
     unsigned n;
     uint64_t tally = 0;
+    const unsigned size = tuner_settings.sample_size;
 
     /* Operate on only one channel of the stereo signal */
-    for(n = 0; n < tuner_settings.sample_size; n+=2)
+    for(n = 0; n < size; n+=2)
     {
-        tally += (uint64_t)input[n] * (uint64_t)input[n];
+        int s = input[n];
+        tally += s * s;
     }
 
-    tally /= tuner_settings.sample_size / 2;
+    tally /= size / 2;
 
     /* now tally holds the average of the squares of all the samples */
     /* It must be between 0 and 0x7fff^2, so it fits in 32 bits      */
@@ -976,13 +981,31 @@ uint32_t buffer_magnitude(audio_sample_type *input)
 }
 
 /* Stop the recording when the buffer is full */
-int recording_callback(int status)
+#ifndef SIMULATOR
+void recording_callback(int status, void **start, size_t *size)
 {
-    (void) status;
-    
-    rb->pcm_stop_recording();
-    recording=0;
-    return -1;  
+    int tail = audio_tail ^ 1;
+
+    /* Do not overrun the reader. Reuse current buffer if full. */
+    if (tail != audio_head)
+        audio_tail = tail;
+
+    /* Always record full buffer, even if not required */
+    *start = audio_data[tail];
+    *size = BUFFER_SIZE * sizeof (int16_t);
+
+    (void)status;
+}
+#endif
+
+/* Start recording */
+static void record_data(void)
+{
+#ifndef SIMULATOR
+    /* Always record full buffer, even if not required */
+    rb->pcm_record_data(recording_callback, audio_data[audio_tail], 
+                        BUFFER_SIZE * sizeof (int16_t));
+#endif
 }
 
 /* The main program loop */
@@ -998,42 +1021,35 @@ void record_and_get_pitch(void)
 #ifndef SIMULATOR
     fixed period;
     bool waiting = false;
+#else
+    audio_tail = 1;
 #endif
+
+    backlight_force_on();
+
+    record_data();
 
     while(!quit) 
     {
-#ifndef SIMULATOR
-                                        /* Start recording */
-        rb->pcm_record_data(recording_callback, (void *) audio_data, 
-                            (size_t) tuner_settings.sample_size * 
-                                     sizeof(audio_sample_type));
-#endif
-        recording=1;    
-        
-        while (recording && !quit)      /* wait for the buffer to be filled */
+        while (audio_head == audio_tail && !quit)      /* wait for the buffer to be filled */
         {        
-            rb->yield();
-#ifdef SIMULATOR
-            /* Only do this loop once if this is the simulator */
-            recording = 0;
-#endif
-            button=pluginlib_getaction(0, plugin_contexts, PLA_ARRAY_COUNT);
+            button=pluginlib_getaction(HZ/100, plugin_contexts, PLA_ARRAY_COUNT);
+
             switch(button) 
             {
-                case PLA_QUIT:
+                case PLA_EXIT:
                     quit=true;
-                    rb->yield();
                     break;
                 
-                case PLA_MENU:
-                    if(main_menu())
-                        quit=true;
-                    else redraw = true;
-                    rb->yield();
+                case PLA_CANCEL:
+                    rb->pcm_stop_recording();
+                    quit = main_menu() != 0;
+                    if(!quit)
+                    {
+                        redraw = true;
+                        record_data();
+                    }
                     break;
-                
-                default:
-                    rb->yield();
                 
                 break;
             }
@@ -1043,23 +1059,22 @@ void record_and_get_pitch(void)
         {
 #ifndef SIMULATOR
             /* Only do the heavy lifting if the volume is high enough */
-            if(buffer_magnitude(audio_data) > 
-                sqr(tuner_settings.volume_threshold * 
+            if(buffer_magnitude(audio_data[audio_head]) > 
+                sqr(tuner_settings.volume_threshold *
                     rb->sound_max(SOUND_MIC_GAIN)))
             {
-                if(waiting)
-                {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                    rb->cpu_boost(true);
-#endif
-                    waiting = false;
-                }
-                
-                rb->backlight_on();
+                waiting = false;
                 redraw = false;
 
+            #ifdef HAVE_SCHEDULER_BOOSTCTRL
+                rb->trigger_cpu_boost();
+            #endif
+#ifdef PLUGIN_USE_IRAM
+                rb->memcpy(iram_audio_data, audio_data[audio_head],
+                           tuner_settings.sample_size * sizeof (int16_t));
+#endif
                 /* This returns the period of the detected pitch in samples */
-                period = pitchyin(audio_data, yin_buffer);
+                period = pitchyin(iram_audio_data, yin_buffer);
                 /* Hz = sample rate / period */
                 if(fp_gt(period, FP_ZERO))
                 {
@@ -1074,12 +1089,16 @@ void record_and_get_pitch(void)
             {
                 waiting = true;
                 redraw = false;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(false);
-#endif
-                /*rb->backlight_off();*/
                 display_frequency(FP_ZERO);
+            #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cancel_cpu_boost();
+            #endif
             }
+
+            /* Move to next buffer if not empty (but empty *shouldn't* happen
+             * here). */
+            if (audio_head != audio_tail)
+                audio_head ^= 1;
 #else /* SIMULATOR */
             /* Display a preselected frequency */
             display_frequency(int2fixed(445));
@@ -1087,15 +1106,26 @@ void record_and_get_pitch(void)
         }
     }
     rb->pcm_close_recording();
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    rb->cancel_cpu_boost();
 #endif
+
+    backlight_use_settings();
 }
 
 /* Init recording, tuning, and GUI */
 void init_everything(void)
-{    
+{
+    /* Disable all talking before initializing IRAM */
+    rb->talk_disable(true);
+
+    PLUGIN_IRAM_INIT(rb);
+
     load_settings();
+
+    /* Stop all playback (if no IRAM, otherwise IRAM_INIT would have) */
+    rb->plugin_get_audio_buffer(NULL);
 
     /* --------- Init the audio recording ----------------- */
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);  
@@ -1106,9 +1136,12 @@ void init_everything(void)
                                  tuner_settings.record_gain, 
                                  AUDIO_GAIN_MIC);
 
-    rb->pcm_set_frequency(SAMPLE_RATE);
-    rb->pcm_apply_settings();
-    
+    /* Highest C on piano is approx 4.186 kHz, so we need just over
+     * 8.372 kHz to pass it. */
+    sample_rate = rb->round_value_to_list32(9000, rb->rec_freq_sampr,
+                                            REC_NUM_FREQ, false);
+    sample_rate = rb->rec_freq_sampr[sample_rate];
+    rb->pcm_set_frequency(sample_rate);
     rb->pcm_init_recording();
     
     /* GUI */
@@ -1129,6 +1162,8 @@ void init_everything(void)
     bar_grad_y = BAR_Y - BAR_PADDING - font_h;
     /* Put the note right between the top and bottom text elements */
     note_y = ((font_h + bar_grad_y - note_bitmaps.slide_height) / 2);
+
+    rb->talk_disable(false);
 }
 
 

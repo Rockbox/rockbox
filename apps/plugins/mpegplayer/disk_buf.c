@@ -30,7 +30,7 @@ static struct queue_sender_list disk_buf_queue_send SHAREDBSS_ATTR;
 static uint32_t disk_buf_stack[DEFAULT_STACK_SIZE*2/sizeof(uint32_t)];
 
 struct disk_buf disk_buf SHAREDBSS_ATTR;
-static struct list_item nf_list;
+static void *nf_list[MPEGPLAYER_MAX_STREAMS+1];
 
 static inline void disk_buf_lock(void)
 {
@@ -45,13 +45,32 @@ static inline void disk_buf_unlock(void)
 static inline void disk_buf_on_clear_data_notify(struct stream_hdr *sh)
 {
     DEBUGF("DISK_BUF_CLEAR_DATA_NOTIFY: 0x%02X (cleared)\n",
-            STR_FROM_HEADER(sh)->id);
-    list_remove_item(&sh->nf);
+           STR_FROM_HDR(sh)->id);
+    list_remove_item(nf_list, sh);
+}
+
+inline bool disk_buf_is_data_ready(struct stream_hdr *sh,
+                                   ssize_t margin)
+{
+    /* Data window available? */
+    off_t right = sh->win_right;
+
+    /* Margins past end-of-file can still return true */
+    if (right > disk_buf.filesize - margin)
+       right = disk_buf.filesize - margin;
+
+    return sh->win_left >= disk_buf.win_left &&
+           right + margin <= disk_buf.win_right;
+}
+
+void dbuf_l2_init(struct dbuf_l2_cache *l2_p)
+{
+    l2_p->addr = OFF_T_MAX; /* Mark as invalid */
 }
 
 static int disk_buf_on_data_notify(struct stream_hdr *sh)
 {
-    DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X ", STR_FROM_HEADER(sh)->id);
+    DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X ", STR_FROM_HDR(sh)->id);
 
     if (sh->win_left <= sh->win_right)
     {
@@ -65,7 +84,7 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
                    sh->win_left, sh->win_right,
                    disk_buf.win_left, disk_buf.win_right);
             /* Be sure it's not listed though if multiple requests were made */
-            list_remove_item(&sh->nf);
+            list_remove_item(nf_list, sh);
             return DISK_BUF_NOTIFY_OK;
         }
 
@@ -75,7 +94,7 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
         case TSTATE_BUFFERING:
         case TSTATE_INIT:
             disk_buf.state = TSTATE_BUFFERING;
-            list_add_item(&nf_list, &sh->nf);
+            list_add_item(nf_list, sh);
             DEBUGF("(registered)\n"
                    "  swl:%lu swr:%lu\n"
                    "  dwl:%lu dwr:%lu\n",
@@ -89,20 +108,17 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
     return DISK_BUF_NOTIFY_ERROR;
 }
 
-static bool check_data_notifies_callback(struct list_item *item,
-                                         intptr_t data)
+static bool check_data_notifies_callback(struct stream_hdr *sh, intptr_t data)
 {
-    struct stream_hdr *sh = TYPE_FROM_MEMBER(struct stream_hdr, item, nf);
-
     if (disk_buf_is_data_ready(sh, 0))
     {
         /* Remove from list then post notification - post because send
          * could result in a wait for each thread to finish resulting
          * in deadlock */
-        list_remove_item(item);
-        str_post_msg(STR_FROM_HEADER(sh), DISK_BUF_DATA_NOTIFY, 0);
+        list_remove_item(nf_list, sh);
+        str_post_msg(STR_FROM_HDR(sh), DISK_BUF_DATA_NOTIFY, 0);
         DEBUGF("DISK_BUF_DATA_NOTIFY: 0x%02X (notified)\n",
-               STR_FROM_HEADER(sh)->id);
+               STR_FROM_HDR(sh)->id);
     }
 
     return true;
@@ -110,15 +126,17 @@ static bool check_data_notifies_callback(struct list_item *item,
 }
 
 /* Check registered streams and notify them if their data is available */
-static void check_data_notifies(void)
+static inline void check_data_notifies(void)
 {
-    list_enum_items(&nf_list, check_data_notifies_callback, 0);
+    list_enum_items(nf_list,
+                    (list_enum_callback_t)check_data_notifies_callback,
+                    0);
 }
 
 /* Clear all registered notifications - do not post them */
 static inline void clear_data_notifies(void)
 {
-    list_clear_all(&nf_list);
+    list_clear_all(nf_list);
 }
 
 /* Background buffering when streaming */
@@ -472,7 +490,7 @@ static void disk_buf_thread(void)
             disk_buf_buffer();
 
             /* Check for any due notifications if any are pending */
-            if (nf_list.next != NULL)
+            if (*nf_list != NULL)
                 check_data_notifies();
 
             /* Still more data left? */
@@ -519,17 +537,16 @@ static void disk_buf_thread(void)
 }
 
 /* Caches some data from the current file */
-static int disk_buf_probe(off_t start, size_t length,
-                          void **p, size_t *outlen)
+static ssize_t disk_buf_probe(off_t start, size_t length, void **p)
 {
     off_t end;
     uint32_t tag, tag_end;
     int page;
 
     /* Can't read past end of file */
-    if (length > (size_t)(disk_buf.filesize - disk_buf.offset))
+    if (length > (size_t)(disk_buf.filesize - start))
     {
-        length = disk_buf.filesize - disk_buf.offset;
+        length = disk_buf.filesize - start;
     }
 
     /* Can't cache more than the whole buffer size */
@@ -559,11 +576,6 @@ static int disk_buf_probe(off_t start, size_t length,
                 + (start & DISK_BUF_PAGE_MASK);
     }
 
-    if (outlen != NULL)
-    {
-        *outlen = length;
-    }
-
     /* Obtain initial load point. If all data was cached, no message is sent
      * otherwise begin on the first page that is not cached. Since we have to
      * send the message anyway, the buffering thread will determine what else
@@ -573,12 +585,17 @@ static int disk_buf_probe(off_t start, size_t length,
         if (disk_buf.cache[page] != tag)
         {
             static struct dbuf_range rng IBSS_ATTR;
+            intptr_t result;
+
             DEBUGF("disk_buf: cache miss\n");
             rng.tag_start = tag;
             rng.tag_end = tag_end;
             rng.pg_start = page;
-            return rb->queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
-                                  (intptr_t)&rng);
+            
+            result = rb->queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
+                                    (intptr_t)&rng);
+
+            return result == DISK_BUF_NOTIFY_OK ? (ssize_t)length : -1;
         }
 
         if (++page >= disk_buf.pgcount)
@@ -586,34 +603,95 @@ static int disk_buf_probe(off_t start, size_t length,
     }
     while (++tag <= tag_end);
 
-    return DISK_BUF_NOTIFY_OK;
+    return length;
 }
 
 /* Attempt to get a pointer to size bytes on the buffer. Returns real amount of
  * data available as well as the size of non-wrapped data after *p. */
-ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap, size_t *sizewrap)
+ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap,
+                            size_t *sizewrap)
 {
     disk_buf_lock();
 
-    if (disk_buf_probe(disk_buf.offset, size, pp, &size) == DISK_BUF_NOTIFY_OK)
-    {
-        if (pwrap && sizewrap)
-        {
-            uint8_t *p = (uint8_t *)*pp;
+    size = disk_buf_probe(disk_buf.offset, size, pp);
 
-            if (p + size > disk_buf.end + DISK_GUARDBUF_SIZE)
-            {
-                /* Return pointer to wraparound and the size of same */
-                size_t nowrap = (disk_buf.end + DISK_GUARDBUF_SIZE) - p;
-                *pwrap = disk_buf.start + DISK_GUARDBUF_SIZE;
-                *sizewrap = size - nowrap;
-            }
-            else
-            {
-                *pwrap = NULL;
-                *sizewrap = 0;
-            }
+    if (size != (size_t)-1 && pwrap && sizewrap)
+    {
+        uint8_t *p = (uint8_t *)*pp;
+
+        if (p + size > disk_buf.end + DISK_GUARDBUF_SIZE)
+        {
+            /* Return pointer to wraparound and the size of same */
+            size_t nowrap = (disk_buf.end + DISK_GUARDBUF_SIZE) - p;
+            *pwrap = disk_buf.start + DISK_GUARDBUF_SIZE;
+            *sizewrap = size - nowrap;
         }
+        else
+        {
+            *pwrap = NULL;
+            *sizewrap = 0;
+        }
+    }
+
+    disk_buf_unlock();
+
+    return size;
+}
+
+ssize_t _disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
+                               size_t size, void **pp)
+{
+    off_t offs;
+    off_t l2_addr;
+    size_t l2_size;
+    void *l2_p;
+
+    if (l2 == NULL)
+    {
+        /* Shouldn't have to check this normally */
+        DEBUGF("disk_buf_getbuffer_l2: l2 = NULL!\n");
+    }
+
+    if (size > DISK_BUF_L2_CACHE_SIZE)
+    {
+        /* Asking for too much; just go through L1 */
+        return disk_buf_getbuffer(size, pp, NULL, NULL);
+    }
+
+    offs = disk_buf.offset; /* Other calls keep this within bounds */
+    l2_addr = l2->addr;
+
+    if (offs >= l2_addr && offs < l2_addr + DISK_BUF_L2_CACHE_SIZE)
+    {
+        /* Data is in the local buffer */
+        offs &= DISK_BUF_L2_CACHE_MASK;
+
+        *pp = l2->data + offs;
+        if (offs + size > l2->size)
+            size = l2->size - offs; /* Keep size within file limits */
+
+        return size;
+    }
+
+    /* Have to probe main buffer */
+    l2_addr = offs & ~DISK_BUF_L2_CACHE_MASK;
+    l2_size = DISK_BUF_L2_CACHE_SIZE*2; /* 2nd half is a guard buffer */
+
+    disk_buf_lock();
+
+    l2_size = disk_buf_probe(l2_addr, l2_size, &l2_p);
+
+    if (l2_size != (size_t)-1)
+    {
+        rb->memcpy(l2->data, l2_p, l2_size);
+
+        l2->addr = l2_addr;
+        l2->size = l2_size;
+        offs -= l2_addr;
+
+        *pp = l2->data + offs;
+        if (offs + size > l2->size)
+            size = l2->size - offs; /* Keep size within file limits */
     }
     else
     {
@@ -625,6 +703,7 @@ ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap, size_t *sizewr
     return size;
 }
 
+
 /* Read size bytes of data into a buffer - advances the buffer pointer
  * and returns the real size read. */
 ssize_t disk_buf_read(void *buffer, size_t size)
@@ -633,8 +712,9 @@ ssize_t disk_buf_read(void *buffer, size_t size)
 
     disk_buf_lock();
 
-    if (disk_buf_probe(disk_buf.offset, size, PUN_PTR(void **, &p),
-                       &size) == DISK_BUF_NOTIFY_OK)
+    size = disk_buf_probe(disk_buf.offset, size, PUN_PTR(void **, &p));
+
+    if (size != (size_t)-1)
     {
         if (p + size > disk_buf.end + DISK_GUARDBUF_SIZE)
         {
@@ -652,17 +732,13 @@ ssize_t disk_buf_read(void *buffer, size_t size)
 
         disk_buf.offset += size;
     }
-    else
-    {   
-        size = -1;
-    }
 
     disk_buf_unlock();
 
     return size;
 }
 
-off_t disk_buf_lseek(off_t offset, int whence)
+ssize_t disk_buf_lseek(off_t offset, int whence)
 {
     disk_buf_lock();
 
@@ -713,7 +789,7 @@ ssize_t disk_buf_prepare_streaming(off_t pos, size_t len)
     DEBUGF("prepare streaming:\n  pos:%ld len:%zu\n", pos, len);
 
     pos = disk_buf_lseek(pos, SEEK_SET);
-    disk_buf_probe(pos, len, NULL, &len);
+    len = disk_buf_probe(pos, len, NULL);
 
     DEBUGF("  probe done: pos:%ld len:%zu\n", pos, len);
 
@@ -837,7 +913,6 @@ void disk_buf_reply_msg(intptr_t retval)
 bool disk_buf_init(void)
 {
     disk_buf.thread = 0;
-    list_initialize(&nf_list);
 
     rb->mutex_init(&disk_buf_mtx);
 
@@ -882,7 +957,7 @@ bool disk_buf_init(void)
     DEBUGF("disk_buf info:\n"
            "  page count: %d\n"
            "  size:       %ld\n",
-           disk_buf.pgcount, disk_buf.size);
+           disk_buf.pgcount, (long)disk_buf.size);
 
     rb->memset(disk_buf.cache, 0xff,
                disk_buf.pgcount*sizeof (*disk_buf.cache));

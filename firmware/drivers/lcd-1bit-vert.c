@@ -105,9 +105,7 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 void LCDFN(init)(void)
 {
     LCDFN(clear_display)();
-#ifndef SIMULATOR
     LCDFN(init_device)();
-#endif
 #ifdef MAIN_LCD
     scroll_init();
 #endif

@@ -83,4 +83,7 @@ void spi_disable_module(const struct spi_node *node);
 /* Send and/or receive data on the specified node (asychronous) */
 bool spi_transfer(struct spi_transfer_desc *xfer);
 
+/* Returns 'true' if the descriptor is not busy */
+bool spi_transfer_complete(const struct spi_transfer_desc *xfer);
+
 #endif /* SPI_IMX31_H */

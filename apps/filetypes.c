@@ -42,9 +42,9 @@
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
-#define MAX_FILETYPES 128
+#define MAX_FILETYPES 192
 #else
-#define MAX_FILETYPES 64
+#define MAX_FILETYPES 128
 #endif
 
 /* a table for the know file types */
@@ -105,6 +105,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "snd", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "vox", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "w64", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "tta", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
 #endif
     { "m3u", FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "m3u8",FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },

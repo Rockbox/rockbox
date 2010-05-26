@@ -26,6 +26,7 @@
 .set GPIOB,     0xC80C0000
 .set GPIOC,     0xC80D0000
 .set GPIOD,     0xC80E0000
+.set CGU_PROC,  0xC80F0010
 .set CGU_PERI,  0xC80F0014
 .set I2C_BASE,  0xC8070000
 .set I2C_DATA,  0x00
@@ -101,7 +102,7 @@ uclcopy:
 /* TODO : M200V4 ? */
 #if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
 #define USB_PIN 6
-#elif defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_FUZEV2)
+#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
 #define USB_PIN 3
 #endif
 
@@ -213,19 +214,23 @@ uclcopy:
 
         cmp     r1, #0
         beq     boot_of
-#elif defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
+#elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
         ldr     r0, =GPIOC
         mov     r1, #0
         str     r1, [r0, #0x400]
         ldr     r1, [r0, #0x20]    /* read pin C3 */
 
         cmp     r1, #0             /* C3 = #0 means button pressed */
-#ifdef SANSA_FUZEV2
-        /* the logic is reversed on the fuzev2 */
-        bne     boot_of
-#else
         beq     boot_of
-#endif /* SANSA_FUZEV2 */
+
+#elif defined(SANSA_FUZEV2)
+        ldr     r0, =GPIOC
+        mov     r1, #0
+        str     r1, [r0, #0x400]
+        ldr     r1, [r0, #0x20]    /* read pin C3 */
+
+        cmp     r1, #0             /* C3 != #0 means button pressed */
+        bne     boot_of
 
 #elif defined(SANSA_CLIPPLUS)
         @ read pins
@@ -239,6 +244,8 @@ uclcopy:
 
         cmp     r2, #0              @ test input from pins
         bne     boot_of             @ branch directly to OF if either pin high
+
+
 #elif defined(SANSA_C200V2)
         /* check for RIGHT on C6, should changed to LEFT as soon as it
          * known in which pin that is in order for consistency  */
@@ -265,6 +272,74 @@ uclcopy:
         bne     boot_of
 #else
         #error No target-specific key check defined!
+#endif
+
+#if defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
+        /* Check for USB after buttons because I trust more the GPIO code than
+         * the i2c code.
+         * Also it seems we need to wait a bit before detecting USB connection
+         * on those models, but not on c200v2
+         */
+
+
+        ldr     r0, =CGU_PROC
+        mov     r1, #0
+        str     r1, [r0]    @ fclk = 24MHz
+
+        ldr     r0, =CGU_PERI
+        ldr     r1, [r0]
+        /* enable i2c audio master clock */
+        orr     r1, r1, #(1<<17)
+        /* pclk = fclk = 24MHz */
+        bic     r1, r1, #0x7f
+        str     r1, [r0]
+
+        ldr     r0, =I2C_BASE
+        /* disable i2c interrupts */
+        mov     r1, #0
+        str     r1, [r0, #I2C_IMR]
+        /* setup prescaler */
+        mov     r1, #I2C_PRESCALER_LOW
+        str     r1, [r0, #I2C_CPSR0]
+        mov     r1, #I2C_PRESCALER_HIGH
+        str     r1, [r0, #I2C_CPSR1]
+        /* setup i2c slave address */
+        mov     r1, #(AS3514_I2C_ADDR << 1)
+        str     r1, [r0, #I2C_SLAD0]
+        mov     r2, #0x51
+        str     r2, [r0, #I2C_CNTRL]
+
+        /* wait for not busy */
+1:
+        ldr     r1, [r0, #I2C_SR]
+        tst     r1, #1
+        bne 1b
+
+        /* wait a bit (~100ms) else detection fails */
+        mov     r1, #0x80000
+1:      subs    r1, r1, #1
+        bne 1b
+
+        /* start read of irq_enrd0 */
+        mov     r1, #AS3514_IRQ_ENRD0
+        str     r1, [r0, #I2C_SADDR]
+        orr     r2, r2, #(1 << 1)
+        str     r2, [r0, #I2C_CNTRL]
+        mov     r1, #1
+        str     r1, [r0, #I2C_DACNT]
+
+        /* wait for transfer to finish */
+1:
+        ldr     r1, [r0, #I2C_DACNT]
+        cmp     r1, #0
+        bne     1b
+
+        /* load result and test USB_STATUS bit */
+        ldr     r1, [r0, #I2C_DATA]
+        tst     r1, #(1 << 3)
+        bne     boot_of
+
+
 #endif
 
 

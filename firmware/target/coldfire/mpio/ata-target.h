@@ -24,8 +24,6 @@
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
 
-#define SWAP_WORDS
-
 #define ATA_IOBASE      0x20000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
 #define ATA_CONTROL     (*((volatile unsigned short*)(ATA_IOBASE + 0x1c)))

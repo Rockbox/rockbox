@@ -90,9 +90,6 @@
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
-/* Tone controls for WM8978 have not been implemented yet */
-#define HAVE_SW_TONE_CONTROLS
-
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO
@@ -123,6 +120,21 @@
 
 #ifndef BOOTLOADER
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+/* Main LCD contrast range and defaults */
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    47 /* Match boot contrast */
+
+/* Define this for LCD backlight brightness available */
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
@@ -142,7 +154,7 @@
 #define CONFIG_I2C I2C_IMX31L
 
 /* Define the bitmask of modules used */
-#define SPI_MODULE_MASK (USE_CSPI2_MODULE)
+#define SPI_MODULE_MASK (USE_CSPI2_MODULE | USE_CSPI3_MODULE)
 #define I2C_MODULE_MASK (USE_I2C1_MODULE | USE_I2C2_MODULE)
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
@@ -158,10 +170,12 @@
 
 /* TODO: have a proper status displayed in the bootloader and have it
  * work! */
-/* Charing implemented in a target-specific algorithm */
+/* Charging implemented in a target-specific algorithm */
 #define CONFIG_CHARGING CHARGING_TARGET
 
 /* define this if the hardware can be powered off while charging */
+/* We don't charge while powered down so maybe implement a
+   finish-charging-and-then-poweroff mode */
 #define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The size of the flash ROM */
@@ -220,6 +234,7 @@
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
 #define HAVE_PCM_DMA_ADDRESS
+#define HAVE_PCM_REC_DMA_ADDRESS
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

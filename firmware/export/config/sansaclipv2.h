@@ -97,9 +97,12 @@
 #define HAVE_AS3514
 #define HAVE_AS3543
 
-/* define this if you have a real-time clock */
 #ifndef BOOTLOADER
+/* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */
@@ -147,14 +150,16 @@
 #define CONFIG_CPU AS3525v2
 
 /* Define this if you want to use the AS3525 i2c interface */
-#define CONFIG_I2C I2C_AS3525   /* FIXME : looks similar to AS353x interface */
+#define CONFIG_I2C I2C_AS3525
 
 /* define this if the hardware can be powered off while charging */
 /* Sansa can't be powered off while charging */
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
 
-/* The start address index for ROM builds */
-#define ROM_START 0x00000000
+/* define current usage levels (based on battery bench) */
+#define CURRENT_NORMAL     23
+#define CURRENT_BACKLIGHT  15
+#define CURRENT_RECORD     11
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      240000000
@@ -167,7 +172,7 @@
 #define USB_HANDLED_BY_OF
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_AS3525
+#define CONFIG_USBOTG USBOTG_AS3525v2
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK

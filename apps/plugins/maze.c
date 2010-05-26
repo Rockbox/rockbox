@@ -37,56 +37,35 @@ PLUGIN_HEADER
 
 /* key assignments */
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#   define MAZE_NEW      (BUTTON_SELECT | BUTTON_REPEAT)
-#   define MAZE_NEW_PRE  BUTTON_SELECT
-#   define MAZE_QUIT     (BUTTON_SELECT | BUTTON_MENU)
-#   define MAZE_SOLVE    (BUTTON_SELECT | BUTTON_PLAY)
-#   define MAZE_RIGHT    BUTTON_RIGHT
-#   define MAZE_LEFT     BUTTON_LEFT
-#   define MAZE_UP       BUTTON_MENU
-#   define MAZE_DOWN     BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD)
-#   define MAZE_NEW      (BUTTON_SELECT | BUTTON_REPEAT)
-#   define MAZE_NEW_PRE  BUTTON_SELECT
-#   define MAZE_QUIT     BUTTON_MENU
-#   define MAZE_SOLVE    (BUTTON_SELECT | BUTTON_PLAY)
-#   define MAZE_RIGHT    BUTTON_RIGHT
-#   define MAZE_LEFT     BUTTON_LEFT
-#   define MAZE_UP       BUTTON_SCROLL_BACK
-#   define MAZE_DOWN     BUTTON_SCROLL_FWD
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   define MAZE_NEW      (BUTTON_SELECT | BUTTON_REPEAT)
-#   define MAZE_QUIT     (BUTTON_HOME | BUTTON_REPEAT)
-#   define MAZE_SOLVE    BUTTON_SELECT
-#   define MAZE_RIGHT    BUTTON_RIGHT
-#   define MAZE_LEFT     BUTTON_LEFT
-#   define MAZE_UP       BUTTON_UP
-#   define MAZE_DOWN     BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#   define MAZE_NEW      (BUTTON_SELECT | BUTTON_REPEAT)
-#   define MAZE_QUIT     BUTTON_POWER
-#   define MAZE_SOLVE    BUTTON_SELECT
-#   define MAZE_RIGHT    BUTTON_RIGHT
-#   define MAZE_LEFT     BUTTON_LEFT
-#   define MAZE_UP       BUTTON_UP
-#   define MAZE_DOWN     BUTTON_DOWN
+#if (CONFIG_KEYPAD == IPOD_3G_PAD)
+#   define MAZE_NEW             (BUTTON_SELECT | BUTTON_REPEAT)
+#   define MAZE_NEW_PRE         BUTTON_SELECT
+#   define MAZE_QUIT            BUTTON_MENU
+#   define MAZE_SOLVE           (BUTTON_SELECT | BUTTON_PLAY)
+#   define MAZE_RIGHT           BUTTON_RIGHT
+#   define MAZE_RIGHT_REPEAT    BUTTON_RIGHT|BUTTON_REPEAT
+#   define MAZE_LEFT            BUTTON_LEFT
+#   define MAZE_LEFT_REPEAT     BUTTON_LEFT|BUTTON_REPEAT
+#   define MAZE_UP              BUTTON_SCROLL_BACK
+#   define MAZE_UP_REPEAT       BUTTON_SCROLL_BACK|BUTTON_REPEAT
+#   define MAZE_DOWN            BUTTON_SCROLL_FWD
+#   define MAZE_DOWN_REPEAT     BUTTON_SCROLL_FWD|BUTTON_REPEAT
 
 #else
 #   include "lib/pluginlib_actions.h"
-#   define MAZE_NEW      PLA_START
-#   define MAZE_QUIT     PLA_QUIT
-#   define MAZE_SOLVE    PLA_FIRE
-#   define MAZE_RIGHT    PLA_RIGHT
-#   define MAZE_LEFT     PLA_LEFT
-#   define MAZE_UP       PLA_UP
-#   define MAZE_DOWN     PLA_DOWN
+#   define MAZE_NEW             PLA_SELECT_REPEAT
+#   define MAZE_QUIT            PLA_CANCEL
+#   define MAZE_SOLVE           PLA_SELECT_REL
+#   define MAZE_RIGHT           PLA_RIGHT
+#   define MAZE_RIGHT_REPEAT    PLA_RIGHT_REPEAT
+#   define MAZE_LEFT            PLA_LEFT
+#   define MAZE_LEFT_REPEAT     PLA_LEFT_REPEAT
+#   define MAZE_UP              PLA_UP
+#   define MAZE_UP_REPEAT       PLA_UP_REPEAT
+#   define MAZE_DOWN            PLA_DOWN
+#   define MAZE_DOWN_REPEAT     PLA_DOWN_REPEAT
 static const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions};
+= {pla_main_ctx};
 
 #endif
 
@@ -546,7 +525,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     while(!quit) {
 #ifdef __PLUGINLIB_ACTIONS_H__
-        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                ARRAYLEN(plugin_contexts));
 #else
         button = rb->button_get(true);
 #endif
@@ -567,25 +547,25 @@ enum plugin_status plugin_start(const void* parameter)
                 maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_UP:
-        case (MAZE_UP|BUTTON_REPEAT):
+        case MAZE_UP_REPEAT:
             maze_move_player_up(&maze);
             FOR_NB_SCREENS(i)
                 maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_RIGHT:
-        case (MAZE_RIGHT|BUTTON_REPEAT):
+        case MAZE_RIGHT_REPEAT:
             maze_move_player_right(&maze);
             FOR_NB_SCREENS(i)
                 maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_DOWN:
-        case (MAZE_DOWN|BUTTON_REPEAT):
+        case MAZE_DOWN_REPEAT:
             maze_move_player_down(&maze);
             FOR_NB_SCREENS(i)
                 maze_draw(&maze, rb->screens[i]);
             break;
         case MAZE_LEFT:
-        case (MAZE_LEFT|BUTTON_REPEAT):
+        case MAZE_LEFT_REPEAT:
             maze_move_player_left(&maze);
             FOR_NB_SCREENS(i)
                 maze_draw(&maze, rb->screens[i]);

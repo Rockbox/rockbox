@@ -435,3 +435,9 @@ bool spi_transfer(struct spi_transfer_desc *xfer)
 
     return retval;
 }
+
+/* Returns 'true' if the descriptor is not busy */
+bool spi_transfer_complete(const struct spi_transfer_desc *xfer)
+{
+    return xfer->next == NULL;
+}

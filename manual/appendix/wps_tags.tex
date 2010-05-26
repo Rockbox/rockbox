@@ -1,5 +1,8 @@
 % $Id$ %
-\chapter{\label{ref:wps_tags}WPS Tags}
+\chapter{\label{ref:wps_tags}Theme Tags}
+Themeing is discussed in detail in section \reference{ref:ConfiguringtheWPS},
+what follows is a list of the available tags.
+
 \section{Status Bar}
 \begin{tagmap}
   \config{\%we} & Display Status Bar\\
@@ -51,6 +54,13 @@ show the information for the next song to be played.
       \config{\%Vd'identifier'} & Display the `identifier' viewport. E.g.
       \config{\%?C{\textless}\%Vda{\textbar}\%Vdb{\textgreater}}
       will show viewport `a' if album art is found, and `b' if it isn't.\\
+
+      \config{\%Vi{\textbar}'label'{\textbar}\dots{\textbar}} &
+      Declare a Custom UI Viewport. The `\dots' parameters use the same logic as
+      the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
+
+      \config{\%VI'label'} & Set the Info Viewport to use the viewport called
+      label, as declared with the previous tag.\\
     \end{tagmap}
 }
 
@@ -134,6 +144,8 @@ produce the information for the next file to be played.
          & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
            {\textbar}N{\textgreater}}\\
          & 0 is used for mute, the last option is used for values greater than zero.\\
+         \opt{lcd_bitmap}{& This can also be used like \%pb to provide a continuous scale:
+         \config{\%pv{\textbar}image.bmp{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
          10 seconds if no number is specified.\\
@@ -359,12 +371,34 @@ Examples:
 \begin{enumerate}
   \item Load albumart at position 20,40 and display it without resizing:\\
   \config{\%Cl{\textbar}20{\textbar}40{\textbar}{\textbar}{\textbar}}
-  \item Load albumart at position 0,20 and resize it to be at most 100x100
+  \item Load albumart at position 0,20 and resize it to be at most 100$\times$100
         pixels. If the image isn't square, align it to the bottom-right
         corner:\\
   \config{\%CL{\textbar}0{\textbar}20{\textbar}r100{\textbar}b100{\textbar}}
 \end{enumerate}
 }
+
+\section{FM Radio}
+  \begin{tagmap}
+    \config{\%tp} & Does this target have a radio? If it doesn't, the ``true''
+      branch of this conditional is completly ignored so you don't need to
+      worry about tags which are not recognized on non radio targets.\\
+    \config{\%tt} & Is the tuner tuned?\\
+    \config{\%tm} & Scan or preset mode? Scan is ``true'', preset is ``false''.\\
+    \config{\%ts} & Is the station in stereo?\\
+    \config{\%ta} & Minimum frequency (region specific) in MHz.\\
+    \config{\%tb} & Maximum frequency (region specific) in MHz.\\
+    \config{\%tf} & Current frequency in MHz.\\
+    \config{\%Ti} & Current preset id, i.e. 1-based number of the preset
+      within the presets list (usable in playlist viewer).\\
+    \config{\%Tn} & Current preset name (usable in playlist viewer).\\
+    \config{\%Tf} & Current preset frequency (usable in playlist viewer).\\
+    \config{\%Tc} & Preset count, i.e. the number of stations in the current
+      preset list.\\
+    \config{\%tx} & Is RDS available?\\
+    \config{\%ty} & RDS name.\\
+    \config{\%tz} & RDS text.\\
+  \end{tagmap}
 
 \section{Alignment}
   \begin{tagmap}

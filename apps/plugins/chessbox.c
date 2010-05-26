@@ -22,8 +22,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if MEM <= 8 && !defined(SIMULATOR)
-
 #include "lib/overlay.h"
 
 PLUGIN_HEADER
@@ -33,4 +31,3 @@ enum plugin_status plugin_start(const void* parameter)
 {
     return run_overlay(parameter, PLUGIN_GAMES_DIR "/chessbox.ovl", "ChessBox");
 }
-#endif

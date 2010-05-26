@@ -15,18 +15,12 @@ CHESSBOX_OBJ := $(call c2obj, $(CHESSBOX_SRC))
 
 OTHER_SRC += $(CHESSBOX_SRC)
 
-ifndef SIMVER
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
+ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), YES)
     ### lowmem targets
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.ovl
     CHESSBOX_OUTLDS = $(CHESSBOX_OBJDIR)/chessbox.link
     CHESSBOX_OVLFLAGS = -T$(CHESSBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
-    ### all other targets
-    ROCKS += $(CHESSBOX_OBJDIR)/chessbox.rock
-endif
-else
-    ### simulator
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.rock
 endif
 

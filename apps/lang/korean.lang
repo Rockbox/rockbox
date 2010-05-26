@@ -4821,11 +4821,11 @@
   user: core
   <source>
     *: none
-    alarm: "Alarm Time: %02d:%02d"
+    alarm: "Alarm Time:"
   </source>
   <dest>
     *: none
-    alarm: "알람 시간: %02d:%02d"
+    alarm: "알람 시간:"
   </dest>
   <voice>
     *: none

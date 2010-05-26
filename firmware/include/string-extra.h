@@ -25,3 +25,4 @@
 #include "strlcat.h"
 #include "strcasecmp.h"
 #include "strcasestr.h"
+#include "strtok_r.h"

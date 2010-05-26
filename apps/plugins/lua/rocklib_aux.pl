@@ -52,7 +52,8 @@ my @forbidden_functions = ('^open$',
                            '^[a-z]+dir$',
                            '^__.+$',
                            '^.+_(un)?cached$',
-                           '^audio_play$');
+                           '^audio_play$',
+                           '^round_value_to_list32$');
 
 my $rocklib = sprintf("%s/rocklib.c", $ARGV[0]);
 open ROCKLIB, "<$rocklib" or die("Couldn't open $rocklib: $!");

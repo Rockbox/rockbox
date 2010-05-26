@@ -66,11 +66,11 @@
 
 PLUGIN_HEADER
 
-#define ROCKLIFE_PLAY_PAUSE PLA_FIRE
+#define ROCKLIFE_PLAY_PAUSE PLA_SELECT
 #define ROCKLIFE_INIT       PLA_DOWN
 #define ROCKLIFE_NEXT       PLA_RIGHT
 #define ROCKLIFE_NEXT_REP   PLA_RIGHT_REPEAT
-#define ROCKLIFE_QUIT       PLA_QUIT
+#define ROCKLIFE_QUIT       PLA_CANCEL
 #define ROCKLIFE_STATUS     PLA_LEFT
 
 #define PATTERN_RANDOM     0
@@ -80,7 +80,7 @@ PLUGIN_HEADER
 #define PATTERN_GLIDER_GUN 4
 
 const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions};
+= {pla_main_ctx};
 
 #define GRID_W LCD_WIDTH
 #define GRID_H LCD_HEIGHT
@@ -512,7 +512,7 @@ enum plugin_status plugin_start(const void* parameter)
     show_grid(pgrid);
 
     while(!quit) {
-        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, ARRAYLEN(plugin_contexts));
         switch(button) {
         case ROCKLIFE_NEXT:
         case ROCKLIFE_NEXT_REP:
@@ -537,7 +537,7 @@ enum plugin_status plugin_start(const void* parameter)
                 /* show new generation */
                 rb->yield();
                 show_grid(pgrid);
-                button = pluginlib_getaction(0, plugin_contexts, 2);
+                button = pluginlib_getaction(0, plugin_contexts, ARRAYLEN(plugin_contexts));
                 switch(button) {
                 case ROCKLIFE_PLAY_PAUSE:
                 case ROCKLIFE_QUIT:

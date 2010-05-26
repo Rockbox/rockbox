@@ -61,9 +61,13 @@
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
-
+#ifndef BOOTLOADER
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+#endif
 
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
@@ -73,7 +77,7 @@
 /* define to activate advanced wheel acceleration code */
 #define HAVE_WHEEL_ACCELERATION
 /* define from which rotation speed [degree/sec] on the acceleration starts */
-#define WHEEL_ACCEL_START 540
+#define WHEEL_ACCEL_START 720
 /* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
 #define WHEEL_ACCELERATION  1
 
@@ -160,7 +164,7 @@
 #define CONFIG_I2C I2C_AS3525
 
 /* define current usage levels (based on battery bench) */
-#define CURRENT_NORMAL     65
+#define CURRENT_NORMAL     30
 #define CURRENT_BACKLIGHT  30
 #define CURRENT_RECORD     CURRENT_NORMAL
 
@@ -186,7 +190,7 @@
 #define USB_HANDLED_BY_OF
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_AS3525
+#define CONFIG_USBOTG USBOTG_AS3525v2
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK

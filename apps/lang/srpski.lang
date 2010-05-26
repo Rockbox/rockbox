@@ -4640,11 +4640,11 @@
   user: core
   <source>
     *: none
-    alarm: "Alarm Time: %02d:%02d"
+    alarm: "Alarm Time:"
   </source>
   <dest>
     *: none
-    alarm: "Време аларма: %02d:%02d"
+    alarm: "Време аларма:"
   </dest>
   <voice>
     *: none

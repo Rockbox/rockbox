@@ -39,9 +39,9 @@
 #endif
 
 #ifdef BOOTLOADER
-#define UNCACHED_ADDR(a) (a)
+#define AS3525_UNCACHED_ADDR(a) (a)
 #else
-#define UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
+#define AS3525_UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
 #endif
 
 #ifdef SANSA_C200V2

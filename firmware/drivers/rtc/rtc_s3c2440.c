@@ -100,9 +100,8 @@ void rtc_get_alarm(int *h, int *m)
 }
 
 /* turn alarm on or off by setting the alarm flag enable
- * returns false if alarm was set and alarm flag (output) is off 
  */
-bool rtc_enable_alarm(bool enable)
+vodi rtc_enable_alarm(bool enable)
 {
     if (enable)
     {
@@ -112,7 +111,5 @@ bool rtc_enable_alarm(bool enable)
     {
         RTCALM=0x00;
     }
-
-    return false; /* all ok */
 }
 #endif

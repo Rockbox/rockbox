@@ -108,7 +108,8 @@
 #endif
 
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-    || defined(SANSA_CLIP) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
+      || (CONFIG_CPU == AS3525 && defined(CONFIG_CHARGING)) \
+      || CONFIG_CPU == AS3525v2
 #include "ascodec.h"
 #include "as3514.h"
 #endif
@@ -1533,8 +1534,12 @@ static bool view_battery(void)
                 break;
 
             case 1: /* status: */
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                lcd_putsf(0, 0, "Pwr status: %s",
+                         charging_state() ? "charging" : "discharging");
+#else 
                 lcd_puts(0, 0, "Power status:");
-
+#endif
                 battery_read_info(&y, NULL);
                 lcd_putsf(0, 1, "Battery: %d.%03d V", y / 1000, y % 1000);
 #ifdef ADC_EXT_POWER
@@ -1656,8 +1661,8 @@ static bool view_battery(void)
                     lcd_puts(0, line++, "T Battery: ?");
                 }
                     
-#elif defined(SANSA_E200) || defined(SANSA_C200) || defined(SANSA_CLIP) || \
-      defined(SANSA_FUZE) || defined (SANSA_C200V2)
+#elif defined(SANSA_E200) || defined(SANSA_C200) || CONFIG_CPU == AS3525 || \
+      CONFIG_CPU == AS3525v2
                 const int first = CHARGE_STATE_DISABLED;
                 static const char * const chrgstate_strings[] =
                 {
@@ -1678,8 +1683,7 @@ static bool view_battery(void)
                 lcd_putsf(0, 4, "State: %s",
                          str ? str : "<unknown>");
 
-                lcd_putsf(0, 5, "CHARGER: %02X", 
-                         ascodec_read(AS3514_CHARGER));
+                lcd_putsf(0, 5, "CHARGER: %02X", ascodec_read_charger());
 #elif defined(IPOD_NANO2G)
                 y = pmu_read_battery_voltage();
                 lcd_putsf(17, 1, "RAW: %d.%03d V", y / 1000, y % 1000);

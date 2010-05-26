@@ -110,6 +110,7 @@
 #define CCU_VERS          (*(volatile unsigned long *)(CCU_BASE + 0x14))
 #define CCU_SPARE1        (*(volatile unsigned long *)(CCU_BASE + 0x18))
 #define CCU_SPARE2        (*(volatile unsigned long *)(CCU_BASE + 0x1C))
+#define CCU_USB_THINGY    (*(volatile unsigned long *)(CCU_BASE + 0x20))
 
 /* DBOP */
 #define DBOP_TIMPOL_01    (*(volatile unsigned long *)(DBOP_BASE + 0x00))
@@ -240,6 +241,13 @@ CE lines
 #define CGU_TIMER1_CLOCK_ENABLE              ( 1 <<  9 ) /* timer 1 */
 #define CGU_TIMER2_CLOCK_ENABLE              ( 1 <<  8 ) /* timer 2 */
 #define CGU_TIMERIF_CLOCK_ENABLE             ( 1 <<  7 ) /* timer interface */
+
+/* CGU_PLL[AB]SUP bits */
+#define CGU_PLL_POWERDOWN                    ( 1 <<  3 )
+
+/* CGU_INTCTRL bits */
+#define CGU_PLLA_LOCK                        ( 1 <<  0 )
+#define CGU_PLLB_LOCK                        ( 1 <<  1 )
 
 /**  ------------------------------------------------------------------
 * Number of cycles to wait before cgu is safely locked.
@@ -517,13 +525,14 @@ CE lines
 
 /* PCM addresses for obtaining buffers will be what DMA is using (physical) */
 #define HAVE_PCM_DMA_ADDRESS
+#define HAVE_PCM_REC_DMA_ADDRESS
 
 /* Timer frequency */
 #define TIMER_FREQ (24000000 / 16)
 
-/* USB : TODO */
+/* USB */
 #define USB_NUM_ENDPOINTS 4
-#define USB_DEVBSS_ATTR IBSS_ATTR
+#define USB_DEVBSS_ATTR
 
 /* I2SIN registers */
 

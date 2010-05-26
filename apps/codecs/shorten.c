@@ -126,7 +126,8 @@ seek_start:
                                     bytesleft, ci->yield);
  
         if (res == FN_ERROR) {
-            LOGF("Shorten: shorten_decode_frames error (%ld)\n", samplesdone);
+            LOGF("Shorten: shorten_decode_frames error (%lu)\n",
+                (unsigned long)samplesdone);
             break;
         } else {
             /* Insert decoded samples in pcmbuf */

@@ -432,31 +432,129 @@ end:
 
 bool __dbg_ports(void)
 {
-    int line;
+    int line, btn, i;
 
-    lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
     {
-        line = 0;
-        lcd_puts(0, line++, "[GPIO Values and Directions]");
-        lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
-        lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
-        lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
-        lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
+        lcd_clear_display();
+
+        while(1)
+        {
+            line = 0;
+            lcd_puts(0, line++, "[GPIO Vals and Dirs]");
+            lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
+            lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
+            lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
+            lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
 #ifdef DEBUG_DBOP
-        line++;
-        lcd_puts(0, line++, "[DBOP_DIN]");
-        lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
+            line++;
+            lcd_puts(0, line++, "[DBOP_DIN]");
+            lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
 #endif
-        line++;
-        lcd_puts(0, line++, "[CP15]");
-        lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
-        lcd_update();
-        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
-            break;
+            line++;
+            lcd_puts(0, line++, "[CP15]");
+            lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
+            lcd_update();
+            if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
+                break;
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+
+#if CONFIG_CPU == AS3525 /* as3525v2 channels are different */
+#define BATTEMP_UNIT 5/2 /* 2.5mV */
+        static const char *adc_name[13] = {
+            "CHG_OUT  ",
+            "RTCSUP   ",
+            "VBUS     ",
+            "CHG_IN   ",
+            "CVDD     ",
+            "BatTemp  ",
+            "MicSup1  ",
+            "MicSup2  ",
+            "VBE1     ",
+            "VBE2     ",
+            "I_MicSup1",
+            "I_MicSup2",
+            "VBAT     ",
+        };
+#elif CONFIG_CPU == AS3525v2
+#define BATTEMP_UNIT 2 /* 2mV */
+        static const char *adc_name[16] = {
+            "BVDD    ",
+            "BVDDR   ",
+            "CHGIN   ",
+            "CHGOUT  ",
+            "VBUS    ",
+            NULL,
+            "BatTemp ",
+            NULL,
+            "MicSup  ",
+            NULL,
+            "I_MiSsup",
+            NULL,
+            "VBE_1uA ",
+            "VBE_2uA ",
+            "I_CHGact",
+            "I_CHGref",
+        };
+#endif
+
+        lcd_clear_display();
+
+        while(1)
+        {
+            line = 0;
+
+            for(i=0; i<5; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i) * 5);
+            for(; i<8; i++)
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i],
+                              adc_read(i) * BATTEMP_UNIT);
+#if LCD_HEIGHT < 176  /* clip  */
+            lcd_update();
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+        lcd_clear_display();
+        while(1)
+        {
+            line = 0;
+#endif /* LCD_HEIGHT < 176 */
+            for(i=8; i<10; i++)
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+            for(; i<12; i++)
+                if(adc_name[i])
+                    lcd_putsf(0, line++, "%s: %d uA", adc_name[i], adc_read(i));
+#if CONFIG_CPU == AS3525 /* different units */
+            lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
+#elif CONFIG_CPU == AS3525v2
+            for(; i<16; i++)
+                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+#endif
+            lcd_update();
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
     }
+
+end:
     lcd_setfont(FONT_UI);
     return false;
 }

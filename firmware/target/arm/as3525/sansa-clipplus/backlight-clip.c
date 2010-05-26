@@ -26,7 +26,6 @@
 
 void _backlight_on(void)
 {
-    ascodec_write(0x25, ascodec_read(0x25) | 2);    /* lcd power */
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x90);
     lcd_enable(true);
 }
@@ -34,6 +33,5 @@ void _backlight_on(void)
 void _backlight_off(void)
 {
     lcd_enable(false);
-    ascodec_write(0x25, ascodec_read(0x25) & ~2);    /* lcd power */
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x00);
 }

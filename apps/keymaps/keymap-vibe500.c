@@ -39,9 +39,9 @@
  */
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,          BUTTON_UP,                          BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_UP,                          BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_DOWN,                        BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN,                        BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_PREV,                        BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_CANCEL|BUTTON_REL,           BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_NEXT,                        BUTTON_NONE },
@@ -63,7 +63,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_SEEKFWD,   BUTTON_NEXT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,  BUTTON_NEXT|BUTTON_REL,         BUTTON_NEXT|BUTTON_REPEAT },
     { ACTION_WPS_VOLDOWN,   BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,   BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLUP,     BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_WPS_VOLUP,     BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_BROWSE,    BUTTON_OK|BUTTON_REL,             BUTTON_OK },
     { ACTION_WPS_CONTEXT,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
     { ACTION_WPS_HOTKEY,    BUTTON_REC|BUTTON_REL,          BUTTON_REC  },
@@ -98,9 +100,9 @@ static const struct button_mapping button_context_tree_scroll_lr[]  = {
 
 static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_UP,                     BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP,                     BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_DOWN,                   BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN,                   BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_PREV,              BUTTON_PREV,                   BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,        BUTTON_PREV|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_NEXT,                   BUTTON_NONE },
@@ -123,7 +125,9 @@ static const struct button_mapping button_context_bmark[]  = {
 
 static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_TOP,        BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_PREV,                    BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_PREV|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_NEXT,                    BUTTON_NONE },
@@ -135,9 +139,9 @@ static const struct button_mapping button_context_quickscreen[]  = {
 
 static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFT,     BUTTON_PREV,                BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_PREV|BUTTON_REL,     BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_NEXT,                BUTTON_NONE },
@@ -160,7 +164,9 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_DONE,         BUTTON_OK,                             BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_CANCEL|BUTTON_REL,            BUTTON_CANCEL },
     { ACTION_KBD_UP,           BUTTON_UP,                             BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN,                           BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,    BUTTON_MENU|BUTTON_REL,                BUTTON_MENU },
     { ACTION_KBD_MORSE_INPUT,  BUTTON_MENU|BUTTON_REPEAT,             BUTTON_MENU },
     { ACTION_KBD_MORSE_SELECT, BUTTON_PLAY|BUTTON_REL,                BUTTON_NONE },
@@ -176,7 +182,9 @@ const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,          BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
     { ACTION_STD_CANCEL,         BUTTON_CANCEL,                     BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_PREV,           BUTTON_UP,                         BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
     { ACTION_SETTINGS_INC,       BUTTON_NEXT,                       BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT, BUTTON_NEXT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_SETTINGS_DEC,       BUTTON_PREV,                       BUTTON_NONE },
@@ -198,7 +206,9 @@ static const struct button_mapping button_context_usb_hid[] = {
 
 static const struct button_mapping button_context_usb_hid_mode_multimedia[] = {
     { ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_DOWN,                 BUTTON_NONE },
+    { ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_UP,                   BUTTON_NONE },
+    { ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_USB_HID_MULTIMEDIA_VOLUME_MUTE,         BUTTON_MENU|BUTTON_REL,      BUTTON_MENU },
     { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_PLAY_PAUSE, BUTTON_PLAY|BUTTON_REL,      BUTTON_PLAY },
     { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       BUTTON_CANCEL|BUTTON_REL,  BUTTON_CANCEL },
@@ -219,7 +229,9 @@ static const struct button_mapping button_context_usb_hid_mode_presentation[] = 
     { ACTION_USB_HID_PRESENTATION_SCREEN_BLACK,      BUTTON_CANCEL|BUTTON_REL,  BUTTON_CANCEL },
     { ACTION_USB_HID_PRESENTATION_SCREEN_WHITE,      BUTTON_MENU|BUTTON_REL,      BUTTON_MENU },
     { ACTION_USB_HID_PRESENTATION_LINK_PREV,         BUTTON_UP,                   BUTTON_NONE },
+    { ACTION_USB_HID_PRESENTATION_LINK_PREV,         BUTTON_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_USB_HID_PRESENTATION_LINK_NEXT,         BUTTON_DOWN,                 BUTTON_NONE },
+    { ACTION_USB_HID_PRESENTATION_LINK_NEXT,         BUTTON_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_USB_HID_PRESENTATION_MOUSE_CLICK,       BUTTON_OK|BUTTON_REL,          BUTTON_OK },
     { ACTION_USB_HID_PRESENTATION_MOUSE_OVER,        BUTTON_OK|BUTTON_REPEAT,       BUTTON_OK },
 
@@ -228,7 +240,9 @@ static const struct button_mapping button_context_usb_hid_mode_presentation[] = 
 
 static const struct button_mapping button_context_usb_hid_mode_browser[] = {
     { ACTION_USB_HID_BROWSER_SCROLL_UP,        BUTTON_UP,                     BUTTON_NONE },
+    { ACTION_USB_HID_BROWSER_SCROLL_UP,        BUTTON_UP|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_USB_HID_BROWSER_SCROLL_DOWN,      BUTTON_DOWN,                   BUTTON_NONE },
+    { ACTION_USB_HID_BROWSER_SCROLL_DOWN,      BUTTON_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_USB_HID_BROWSER_SCROLL_PAGE_UP,   BUTTON_OK|BUTTON_REL,            BUTTON_OK },
     { ACTION_USB_HID_BROWSER_SCROLL_PAGE_DOWN, BUTTON_CANCEL|BUTTON_REL,    BUTTON_CANCEL },
     { ACTION_USB_HID_BROWSER_ZOOM_IN,          BUTTON_PLAY|BUTTON_REL,        BUTTON_PLAY },
@@ -247,9 +261,9 @@ static const struct button_mapping button_context_usb_hid_mode_browser[] = {
 #ifdef HAVE_USB_HID_MOUSE
 static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
     { ACTION_USB_HID_MOUSE_UP,                BUTTON_UP,                   BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_UP,                   BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_UP_REP,            BUTTON_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_DOWN,              BUTTON_DOWN,                 BUTTON_NONE },
-    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_DOWN,                 BUTTON_NONE },
+    { ACTION_USB_HID_MOUSE_DOWN_REP,          BUTTON_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_LEFT,              BUTTON_PREV,                 BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_LEFT_REP,          BUTTON_PREV|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_RIGHT,             BUTTON_NEXT,                 BUTTON_NONE },

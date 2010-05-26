@@ -18,10 +18,12 @@ in the font package at \url{http://www.rockbox.org/daily.shtml}.}
   \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Font}
   in the \setting{Main Menu}.\\
 
-  \note{Advanced Users Only: Any BDF font file up to 16 pixels high should
+  \note{Advanced Users Only: Any BDF font should
     be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use
     the \fname{convbdf} tool. This tool can be found in the \fname{tools}
-    directory of the Rockbox source code.}
+    directory of the Rockbox source code. See \wikilink{CreateFonts\#ConvBdf}
+    for more details. Or just run \fname{convbdf} without any parameters to
+    see the possible options.}
 }
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
@@ -123,7 +125,7 @@ file find the instructions on the Rockbox website:
   \subsection{\label{ref:LoadingBackdrops}Loading Backdrops}
   Rockbox supports showing an image as a backdrop in the \setting{File Browser}
   and the menus. The backdrop image must be a \fname{.bmp} file of the exact
-  same dimensions as the display in your \dap{} (\genericimg{} with the last
+  same dimensions as the display in your \dap{} (\dapdisplaysize{} with the last
   number giving the colour depth in bits). To use an image as a backdrop browse
   to it in the \setting{File Browser} and open the \setting{Context Menu}
   (see \reference{ref:Contextmenu}) on it and select the option
@@ -168,60 +170,70 @@ file find the instructions on the Rockbox website:
   \opt{lcd_color}{\input{advanced_topics/viewports/colour-uivp-syntax.tex}}
 }
 
-\section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
+\section{\label{ref:ConfiguringtheWPS}Configuring the Theme}
 
-\subsection{WPS -- General Info}
+\subsection{Themeing -- General Info}
 
-\begin{description}
-\item[Description: ] The WPS or \setting{While Playing Screen} is the name used
-  to describe the information displayed on the \daps{} screen whilst an audio
-  track is being played. The default WPS is a relatively simple screen
-  displaying Track name, Artist, Album etc. in the default font as a purely
-  text based layout. There are a number of WPS files included in Rockbox, and
+  There are various different aspects of the Rockbox interface
+  that can be themed -- the WPS or \setting{While Playing Screen}, the FMS or
+  \setting{FM Screen} (if the \dap{} has a tuner), and the SBS or
+  \setting{Base Skin}. The WPS is the name used to
+  describe the information displayed on the \daps{} screen whilst an audio
+  track is being played, the FMS is the screen shown while listening to the
+  radio, and the SBS lets you specify a base skin that is shown in the
+  menus and browsers, as well as the WPS and FMS. The SBS also allows you to
+  control certain aspects of the appearance of the menus/browsers.
+  There are a number of themes included in Rockbox, and
   you can load one of these at any time by selecting it in
-  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ While Playing Screen}.
-  \opt{HAVE_REMOTE_LCD}{There is a related option to browse \fname{.rwps} 
-    files for \daps{} with LCD remote controls installed. This will load a 
-    similar WPS screen for the remote.}
+  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Browse Theme Files}.
+  It is also possible to set individual items of a theme from within the
+  \setting{Settings $\rightarrow$ Theme Settings} menu.
 
-\note{``Playing'' a \fname{.wps} from the \setting{File Browser} has the same effect.}
 
-\item [File Location: ]Custom WPS files may be located anywhere on the drive. 
-  The only restriction is that they must end in \fname{.wps}. When you ``play''
-  a \fname{.wps} file, it will be used for future WPS screens, and if the 
-  ``played'' \fname{.wps} file is located in the \fname{/.rockbox/wps} directory, it 
-  will be remembered and used after reboot. The name of the \fname{.wps} file must be 
-  no more than 24 characters long for it to be remembered.
-\end{description}
-
-\subsection{\label{ref:CreateYourOwnWPS}WPS -- Build Your Own}
-Quite simply, enter the WPS code in your favourite text editor, Notepad on
-Windows works fine. When you save it, instead of saving it as a \fname{.txt} 
-file, save it as a \fname{.wps} file. Example: Instead of \fname{Rockbox.txt}, 
-save the file as \fname{Rockbox.wps}. To make sure non english characters 
+\subsection{\label{ref:CreateYourOwnWPS}Themes -- Create Your Own}
+The theme files are simple text files, and can be created (or edited) in your
+favourite text editor. To make sure non-English characters 
 display correctly in your WPS you must save the .wps file with UTF-8 character 
 encoding. This can be done in most editors, for example Notepad in Windows 2000
-or XP (but not in 9x/ME) can do this. See appendix \reference{ref:wps_tags} for
-all the tags that are available.
+or XP (but not in 9x/ME) can do this.
+
+\begin{description}
+\item [Files Locations: ] Each different ``themeable'' aspect requires its own file --
+  WPS files have the extension \fname{.wps}, FM screen files have the extension
+  \fname{.fms}, and SBS files have the extension \fname{.sbs}. The main theme
+  file has the extension \fname{.cfg}. All files should have the same name.
+  
+  The theme \fname{.cfg} file should be placed in the \fname{/.rockbox/themes}
+  directory, while the \fname{.wps}, \fname{.fms} and \fname{.sbs} files should
+  be placed in the \fname{/.rockbox/wps} directory. Any images used by the
+  theme should be placed in a subdirectory of \fname{/.rockbox/wps} with the
+  same name as the theme, e.g. if the theme files are named
+  \fname{mytheme.wps, mytheme.sbs} etc., then the images should be placed in
+  \fname{/.rockbox/wps/mytheme}.
+\end{description}
+
+All full list of the available tags are given in appendix
+\reference{ref:wps_tags}; some of the more powerful concepts in theme designe
+are discussed below.
 
 \begin{itemize}
 \item All characters not preceded by \% are displayed as typed.
 \item Lines beginning with \# are comments and will be ignored.
 \end{itemize}
 
-\note{Keep in mind that your \dap{} resolution is \genericimg{} (with
+\note{Keep in mind that your \dap{} resolution is \dapdisplaysize{} (with
   the last number giving the colour depth in bits) when
   designing your own WPS, or if you use a WPS designed for another target.
   \opt{HAVE_REMOTE_LCD}{The resolution of the remote is
-  \opt{h100,h300}{128x64x1}\opt{x5,m5}{128x96x2} pixels.}}
+  \opt{h100,h300}{128$\times$64$\times$1}\opt{x5,m5}{128$\times$96$\times$2} pixels.}}
 
 \nopt{lcd_charcell}{
 \subsubsection{\label{ref:Viewports}Viewports}
 
 By default, a viewport filling the whole screen contains all the elements
-defined in the \fname(.wps) file. The 
+defined in the \fname{.wps} file. The 
 \opt{lcd_non-mono}{elements in this viewport are displayed
-  with the same background/foreground
+  with the same background/\linebreak{}foreground
   \opt{lcd_color}{colours}\nopt{lcd_color}{shades} and the}
 text is rendered in the
 same font as in the main menu. To change this behaviour a custom viewport can
@@ -256,10 +268,10 @@ will display it permanently.
 
 \begin{itemize}
 \item {\config{\%Vl{\textbar}'identifier'{\textbar}\dots{\textbar}}}
-This tag preloads a viewport for later display. 'identifier' is a single
-lowercase letter (a-z) and the '\dots' parameters use the same logic as
+This tag preloads a viewport for later display. `identifier' is a single
+lowercase letter (a-z) and the `\dots' parameters use the same logic as
 the \config{\%V} tag explained above.
-\item {\config{\%Vd'identifier'}} Display the 'identifier' viewport.
+\item {\config{\%Vd'identifier'}} Display the `identifier' viewport.
 \end{itemize}
 
 Viewports can share identifiers so that you can display multiple viewports
@@ -273,6 +285,24 @@ with one \%Vd line.
 
 \note{The tag to display conditional viewports must come before the tag to
 preload the viewport in the \fname{.wps} file.}
+
+\subsection{Info Viewport (SBS only)}
+As mentioned above, it is possible to set a UI viewport via the theme
+\fname{.cfg} file. It is also possible to set the UI viewport through the SBS
+file, and to conditionally select different UI viewports.
+
+  \begin{itemize}
+    \item {\config{\%Vi{\textbar}'label'{\textbar}\dots{\textbar}}}
+    This viewport is used as Custom UI Viewport in the case that the theme
+    doesn't have a ui viewport set in the theme \fname{.cfg} file. Having this
+    is strongly recommended since it makes you able to use the SBS
+    with other themes. If label is set this viewport can be selectivly used as the
+    Info Viewport using the \%VI tag. The `\dots' parameters use the same logic as
+    the \config{\%V} tag explained above.
+
+    \item {\config{\%VI'label'}} Set the Info Viewport to use the viewport called
+    label, as declared with the previous tag.
+  \end{itemize}
 }
 
 \subsubsection{Conditional Tags}
@@ -326,9 +356,9 @@ It is possible to group items on each line into 2 or more groups or
 specified time, alternating continuously through each defined subline.
 
 Items on a line are broken into sublines with the semicolon
-'\config{;}' character. The display time for
+`\config{;}' character. The display time for
 each subline defaults to 2 seconds unless modified by using the
-'\config{\%t}' tag to specify an alternate
+`\config{\%t}' tag to specify an alternate
 time (in seconds and optional tenths of a second) for the subline to be
 displayed. 
 
@@ -336,7 +366,7 @@ Subline related special characters and tags:
 \begin{description}
 \item[;] Split items on a line into separate sublines
 \item[\%t] Set the subline display time. The
-'\config{\%t}' is followed by either integer
+`\config{\%t}' is followed by either integer
 seconds (\config{\%t5}), or seconds and tenths of a second (\config{\%t3.5}).
 \end{description}
 
@@ -514,7 +544,8 @@ Example of a configuration file:
 \item [Reset Settings]This wipes the saved settings
   in the \dap{} and resets all settings to their default values. 
   
-  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+      ,PBELL_VIBE500_PAD}{
       \note{You can also reset all settings to their default 
       values by turning off the \dap, turning it back on, and holding the
       \ButtonRec{} button immediately after the \dap{} turns on.}

@@ -1709,6 +1709,7 @@ static void audio_play_start(size_t offset)
 {
     int i;
 
+    send_event(PLAYBACK_EVENT_START_PLAYBACK, NULL);
 #if INPUT_SRC_CAPS != 0
     audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);

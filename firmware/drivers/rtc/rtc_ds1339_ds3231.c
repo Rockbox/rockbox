@@ -99,9 +99,7 @@ void rtc_get_alarm(int *h, int *m)
 /* turn alarm on or off by setting the alarm flag enable */
 /* the alarm is automatically disabled when the RTC gets Vcc power at startup */
 /* avoid that an alarm occurs when the device is on because this locks the ON key forever */
-/* returns false if alarm was set and alarm flag (output) is off */
-/* returns true if alarm flag went on, which would lock the device, so the alarm was disabled again */
-bool rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
     unsigned char buf[2];
     
@@ -109,8 +107,6 @@ bool rtc_enable_alarm(bool enable)
     buf[1] = 0x00; /* reset alarm flags (and OSF for good measure) */
     
     sw_i2c_write(RTC_ADDR, 0x0e, buf, 2);        
-
-    return false; /* all ok */
 }
 
 #endif /* HAVE_RTC_ALARM */ 

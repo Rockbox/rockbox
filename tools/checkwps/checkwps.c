@@ -273,7 +273,8 @@ int main(int argc, char **argv)
         printf("Checking %s...\n", argv[filearg]);
 #ifdef HAVE_REMOTE_LCD
         if((strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0) || 
-            (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rsbs") == 0))
+           (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rsbs") == 0) ||
+           (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rfms") == 0))
             screen = SCREEN_REMOTE;
         else
             screen = SCREEN_MAIN;

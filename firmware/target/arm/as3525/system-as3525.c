@@ -87,16 +87,21 @@ static const char * const irqname[] =
 
 static void UIRQ(void)
 {
-    unsigned int irq_no = 0;
+    bool masked = false;
     int status = VIC_IRQ_STATUS;
+    if(status == 0)
+    {
+        status = VIC_RAW_INTR; /* masked interrupts */
+        masked = true;
+    }
 
     if(status == 0)
         panicf("Unhandled IRQ (source unknown!)");
 
-    while((status >>= 1))
-        irq_no++;
+    unsigned irq_no = 31 - __builtin_clz(status);
 
-    panicf("Unhandled IRQ %02X: %s", irq_no, irqname[irq_no]);
+    panicf("Unhandled %smasked IRQ %02X: %s (status 0x%8X)",
+           masked ? "" : "no", irq_no, irqname[irq_no], status);
 }
 
 struct vec_int_src
@@ -108,21 +113,25 @@ struct vec_int_src
 /* Vectored interrupts (16 available) */
 struct vec_int_src vec_int_srcs[] =
 {
-    { INT_SRC_TIMER1, INT_TIMER1 },
-    { INT_SRC_TIMER2, INT_TIMER2 },
+    /* Highest priority at the top of the list */
     { INT_SRC_DMAC, INT_DMAC },
     { INT_SRC_NAND, INT_NAND },
-    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
-    { INT_SRC_AUDIO, INT_AUDIO },
 #if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
-#ifdef HAVE_HOTSWAP
-    { INT_SRC_GPIOA, INT_GPIOA, },
-#endif
+    { INT_SRC_USB, INT_USB, },
 #ifdef HAVE_RECORDING
     { INT_SRC_I2SIN, INT_I2SIN, },
 #endif
+    { INT_SRC_TIMER1, INT_TIMER1 },
+    { INT_SRC_TIMER2, INT_TIMER2 },
+    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
+    { INT_SRC_AUDIO, INT_AUDIO },
+#if defined(HAVE_HOTSWAP) || \
+    (defined(SANSA_FUZEV2) && !INCREASED_SCROLLWHEEL_POLLING)
+    { INT_SRC_GPIOA, INT_GPIOA, },
+#endif
+    /* Lowest priority at the end of the list */
 };
 
 static void setup_vic(void)
@@ -147,11 +156,11 @@ static void setup_vic(void)
 
 void INT_GPIOA(void)
 {
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
     void sd_gpioa_isr(void);
     sd_gpioa_isr();
 #endif
-#if (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+#if defined(SANSA_FUZEV2) && !INCREASED_SCROLLWHEEL_POLLING
     void button_gpioa_isr(void);
     button_gpioa_isr();
 #endif
@@ -319,16 +328,16 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
-    CGU_COUNTA = 0xff;
+    CGU_COUNTA = CGU_LOCK_CNT;
     CGU_PLLA = AS3525_PLLA_SETTING;
-    CGU_PLLASUP = 0;        /* enable PLLA */
-    while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
-    
-#if (AS3525_MCLK_SEL == AS3525_CLK_PLLB)
-    CGU_COUNTB = 0xff;
+    CGU_PLLASUP = 0;                          /* enable PLLA */
+    while(!(CGU_INTCTRL & CGU_PLLA_LOCK));    /* wait until PLLA is locked */
+
+#if AS3525_MCLK_SEL == AS3525_CLK_PLLB
+    CGU_COUNTB = CGU_LOCK_CNT;
     CGU_PLLB = AS3525_PLLB_SETTING;
-    CGU_PLLBSUP = 0;        /* enable PLLB */
-    while(!(CGU_INTCTRL & (1<<1)));           /* wait until PLLB is locked */
+    CGU_PLLBSUP = 0;                          /* enable PLLB */
+    while(!(CGU_INTCTRL & CGU_PLLB_LOCK));    /* wait until PLLB is locked */
 #endif
 
     /*  Set FCLK frequency */
@@ -346,7 +355,8 @@ void system_init(void)
 
 #if defined(BOOTLOADER)
     sdram_init();
-#elif CONFIG_CPU == AS3525 /* XXX: remove me when we have a new bootloader */
+#elif defined(SANSA_FUZE) || defined(SANSA_CLIP) || defined(SANSA_E200V2)
+    /* XXX: remove me when we have a new bootloader */
     MPMC_DYNAMIC_CONTROL = 0x0; /* MPMCCLKOUT stops when all SDRAMs are idle */
 #endif  /* BOOTLOADER */
 
@@ -364,8 +374,9 @@ void system_init(void)
     ascodec_init();
 
 #ifndef BOOTLOADER
-    /* setup isr for microsd monitoring and for scrollwheel irq */
-#if defined(HAVE_MULTIDRIVE) || (defined(HAVE_SCROLLWHEEL) && CONFIG_CPU != AS3525)
+    /* setup isr for microsd monitoring and for fuzev2 scrollwheel irq */
+#if defined(HAVE_HOTSWAP) || \
+    (defined(SANSA_FUZEV2) && !INCREASED_SCROLLWHEEL_POLLING)
     VIC_INT_ENABLE = (INTERRUPT_GPIOA);
     /* pin selection for irq happens in the drivers */
 #endif

@@ -31,6 +31,9 @@
 #endif
 /* #else function-like empty macros are defined in the headers */
 
+/* Should be enough for now */
+#define MPEGPLAYER_MAX_STREAMS 4
+
 /* Memory allotments for various subsystems */
 #define MIN_MEMMARGIN (4*1024)
 
@@ -85,7 +88,6 @@
 #include "mpeg2.h"
 #include "video_out.h"
 #include "mpeg_stream.h"
-#include "mpeg_linkedlist.h"
 #include "mpeg_misc.h"
 #include "mpeg_alloc.h"
 #include "stream_thread.h"

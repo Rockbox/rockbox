@@ -254,35 +254,27 @@ void pcm_play_dma_pause(bool pause)
 
 void fiq_handler(void)
 {
-    static unsigned char *start;
-    static size_t         size;
-    register pcm_more_callback_type get_more;   /* No stack for this */
+    static void *start;
+    static size_t size;
 
     /* clear any pending interrupt */
     SRCPND = DMA2_MASK;
 
     /* Buffer empty.  Try to get more. */
-    get_more = pcm_callback_for_more;
-    size = 0;
+    pcm_play_get_more_callback(&start, &size);
 
-    if (get_more == NULL || (get_more(&start, &size), size == 0))
-    {
-        /* Callback missing or no more DMA to do */
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
-    }
-    else
-    {
-        /* Flush any pending cache writes */
-        clean_dcache_range(start, size);
+    if (size == 0)
+        return;
 
-        /* set the new DMA values */
-        DCON2 = DMA_CONTROL_SETUP | (size >> 1);
-        DISRC2 = (unsigned int)start + 0x30000000;
+    /* Flush any pending cache writes */
+    clean_dcache_range(start, size);
 
-        /* Re-Activate the channel */
-        DMASKTRIG2 = 0x2;
-    }
+    /* set the new DMA values */
+    DCON2 = DMA_CONTROL_SETUP | (size >> 1);
+    DISRC2 = (unsigned int)start + 0x30000000;
+
+    /* Re-Activate the channel */
+    DMASKTRIG2 = 0x2;
 }
 
 size_t pcm_get_bytes_waiting(void)

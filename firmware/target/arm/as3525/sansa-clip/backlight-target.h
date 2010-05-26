@@ -25,8 +25,6 @@
 #include "lcd.h"
 #include "backlight.h"
 
-#define _backlight_init() true
-
 static inline void _backlight_on(void)
 {
     lcd_enable(true);
@@ -37,7 +35,20 @@ static inline void _backlight_off(void)
     lcd_enable(false);
 }
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+static inline bool _backlight_init(void)
+{
+    GPIOD_DIR |= (1<<7); /* for button light */
+    return true;
+}
+
+static inline void _buttonlight_on(void)
+{
+    GPIOD_PIN(7) = (1<<7);
+}
+
+static inline void _buttonlight_off(void)
+{
+    GPIOD_PIN(7) = 0;
+}
 
 #endif

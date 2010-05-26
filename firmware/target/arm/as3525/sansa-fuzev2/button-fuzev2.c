@@ -90,7 +90,7 @@ static void scrollwheel(unsigned int wheel_value)
     }
 
     int  repeat = 1; /* assume repeat */
-    long time = TIMER2_VALUE + current_tick*TIMER_TICK; /* to timer unit */
+    long time = (TIMER_TICK - TIMER2_VALUE) + current_tick*TIMER_TICK; /* to timer unit */
     long v = (time - last_wheel_post);
 
    /* interpolate velocity in timer_freq/timer_unit == 1/s */

@@ -235,12 +235,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
 
-    addr = (void *)(((long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     /* Set up DMA transfer  */
     SAR0 = (unsigned long)addr;   /* Source address      */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
@@ -294,13 +288,14 @@ void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA0(void)
 {
     unsigned long res = DSR0;
+    void *start;
+    size_t size;
 
     and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
     DSR0 = 1; /* Clear interrupt and errors */
 
     if (res & 0x70)
     {
-        /* Stop on error */
         logf("DMA0 err: %02x", res);
 #if 0
         logf("  SAR0: %08x", SAR0);
@@ -309,32 +304,17 @@ void DMA0(void)
         logf("  DCR0: %08x", DCR0);
 #endif
     }
-    else
+
+    /* Force stop on error */
+    pcm_play_get_more_callback((res & 0x70) ? NULL : &start, &size);
+
+    if (size != 0)
     {
-        pcm_more_callback_type get_more  = pcm_callback_for_more;
-        unsigned char *start;
-        size_t size = 0;
-
-        if (get_more)
-            get_more(&start, &size);
-
-        start = (unsigned char *)(((long)start + 3) & ~3);
-        size &= ~3;
-
-        if (size > 0)
-        {
-            SAR0 = (unsigned long)start;     /* Source address */
-            BCR0 = size;                     /* Bytes to transfer */
-            or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
-            return;
-        }
-        /* Finished playing */
+        SAR0 = (unsigned long)start;     /* Source address */
+        BCR0 = size;                     /* Bytes to transfer */
+        or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
     }
-
-    /* Stop interrupt and futher transfers */
-    pcm_play_dma_stop();
-    /* Inform PCM that we're done */
-    pcm_play_dma_stopped_callback();
+    /* else inished playing */
 } /* DMA0 */
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
@@ -382,12 +362,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
     /* stop any DMA in progress */
     pcm_rec_dma_stop();
 
-    addr = (void *)(((long)addr + 3) & ~3);
-    size &= ~3;
-
-    if (size <= 0)
-        return;
-
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
 
     /* Start the DMA transfer.. */
@@ -396,7 +370,6 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
-    pcm_rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
     SAR1 = (unsigned long)&PDIR2; /* Source address      */
     DAR1 = (unsigned long)addr;   /* Destination address */
     BCR1 = (unsigned long)size;   /* Bytes to transfer   */
@@ -449,7 +422,8 @@ void DMA1(void)
 {
     unsigned long res = DSR1;
     int status = 0;
-    pcm_more_callback_type2 more_ready;
+    void *start;
+    size_t size;
 
     and_l(~(DMA_EEXT | DMA_INT), &DCR1); /* per request and int OFF */
     DSR1 = 1;                            /* Clear interrupt and errors */
@@ -478,42 +452,19 @@ void DMA1(void)
     }
 #endif
 
-    more_ready = pcm_callback_more_ready;
+    /* Inform PCM we have more data (or error) */
+    pcm_rec_more_ready_callback(status, &start, &size);
 
-    if (more_ready != NULL && more_ready(status) >= 0)
-        return;
-
-    /* Finished recording */
-    pcm_rec_dma_stop();
-    /* Inform PCM that we're done */
-    pcm_rec_dma_stopped_callback();
+    if (size != 0)
+    {
+        DAR1 = (unsigned long)start;     /* Destination address */
+        BCR1 = (unsigned long)size;      /* Bytes to transfer */
+        or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
+    }
 } /* DMA1 */
 
-/* Continue transferring data in - call from interrupt callback */
-void pcm_record_more(void *start, size_t size)
+const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    start = (void *)(((long)start + 3) & ~3);
-    size &= ~3;
-
-    pcm_rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
-    DAR1 = (unsigned long)start;     /* Destination address */
-    BCR1 = (unsigned long)size;      /* Bytes to transfer */
-    or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
-} /* pcm_record_more */
-
-const void * pcm_rec_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr, end;
-
-    /* Make sure interrupt doesn't change the second value after we read the
-     * first value. */
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-    addr = (unsigned long)pcm_rec_peak_addr;
-    end = DAR1;
-    restore_irq(level);
-
-    addr >>= 2;
-    *count = (end >> 2) - addr;
-    return (void *)(addr << 2);
+    return (void *)(DAR1 & ~3);
 } /* pcm_rec_dma_get_peak_buffer */
 #endif

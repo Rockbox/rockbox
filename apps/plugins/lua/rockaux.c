@@ -24,7 +24,7 @@
 #define _ROCKCONF_H_ /* Protect against unwanted include */
 #include "lua.h"
 
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if !defined(SIMULATOR)
 int errno = 0;
 #endif
 

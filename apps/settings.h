@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include "inttypes.h"
 #include "config.h"
+#include "audiohw.h" /* for the AUDIOHW_* defines */
 #include "statusbar.h" /* for the statusbar values */
 #include "quickscreen.h"
 #include "button.h"
@@ -336,8 +337,10 @@ struct user_settings
     bool superbass;     /* true/false */
 #endif
 
-#ifdef HAVE_WM8758
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
     int bass_cutoff;
+#endif
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
     int treble_cutoff;
 #endif
 
@@ -831,6 +834,25 @@ struct user_settings
     /* When resuming playback (after a stop), rewind this number of seconds */
     int resume_rewind;
 #endif
+
+#ifdef AUDIOHW_HAVE_DEPTH_3D
+    int depth_3d;
+#endif
+
+#ifdef AUDIOHW_HAVE_EQ
+    /** Hardware EQ tone controls **/
+    struct hw_eq_band
+    {
+        /* Maintain the order of members or sound_menu has to be changed */
+        int gain;
+#ifdef AUDIOHW_HAVE_EQ_FREQUENCY
+        int frequency;
+#endif
+#ifdef AUDIOHW_HAVE_EQ_WIDTH
+        int width;
+#endif
+    } hw_eq_bands[AUDIOHW_EQ_BAND_NUM];
+#endif /* AUDIOHW_HAVE_EQ */
 };
 
 /** global variables **/

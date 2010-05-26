@@ -38,27 +38,26 @@ enum {
     PLA_LEFT_REPEAT,
     PLA_RIGHT_REPEAT,
 
-    PLA_INC,
-    PLA_DEC,
-    PLA_INC_REPEAT,
-    PLA_DEC_REPEAT,
+    PLA_CANCEL,
+    PLA_EXIT,
+    PLA_SELECT,
+    PLA_SELECT_REL,
+    PLA_SELECT_REPEAT,
 
-    PLA_QUIT,
-    PLA_START,
-    PLA_MENU,
-    PLA_FIRE,
-    PLA_FIRE_REPEAT,
+#ifdef HAVE_SCROLLWHEEL
+    PLA_SCROLL_FWD,
+    PLA_SCROLL_FWD_REPEAT,
+    PLA_SCROLL_BACK,
+    PLA_SCROLL_BACK_REPEAT,
+#endif
 
     LAST_PLUGINLIB_ACTION
 };
 
 #if defined(HAVE_REMOTE_LCD)
-extern const struct button_mapping remote_directions[];
+extern const struct button_mapping pla_remote_ctx[];
 #endif
-extern const struct button_mapping generic_directions[];
-extern const struct button_mapping generic_left_right_fire[];
-extern const struct button_mapping generic_actions[];
-extern const struct button_mapping generic_increase_decrease[];
+extern const struct button_mapping pla_main_ctx[];
 
 int pluginlib_getaction(int timeout,
                         const struct button_mapping *plugin_contexts[],

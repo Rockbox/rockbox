@@ -16,6 +16,9 @@ menus/menu_common.c
 menus/display_menu.c
 menus/theme_menu.c
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_WM8978
+menus/audiohw_eq_menu.c
+#endif
 menus/eq_menu.c
 buffering.c
 voice_thread.c
@@ -129,12 +132,19 @@ recorder/albumart.c
 gui/color_picker.c
 #endif
 #endif
-#if CONFIG_TUNER
-recorder/radio.c
-#endif
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
+
+#if CONFIG_TUNER
+radio/radio.c
+radio/presets.c
+radio/radio_skin.c
+#ifdef HAVE_ALBUMART
+radio/radioart.c
+#endif
+#endif
+
 #if CONFIG_CODEC == SWCODEC
 #if INPUT_SRC_CAPS != 0
 audio_path.c
@@ -171,6 +181,7 @@ usb_keymaps.c
 gui/usb_screen.c
 #endif
 metadata.c
+metadata/id3tags.c
 metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC
 metadata/metadata_common.c
@@ -197,6 +208,7 @@ metadata/oma.c
 metadata/smaf.c
 metadata/au.c
 metadata/vox.c
+metadata/tta.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

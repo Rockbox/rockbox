@@ -608,6 +608,8 @@ static bool charging_ok(void)
 
 void powermgmt_init_target(void)
 {
+    last_inputs = power_thread_inputs;
+
 #ifdef IMX31_ALLOW_CHARGING
     const uint32_t regval_w =
         MC13783_VCHRG_4_050V | MC13783_ICHRG_0MA |
