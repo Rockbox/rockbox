@@ -19,9 +19,10 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "ascodec.h"
 
-void lcd_hw_init(void);
+void lcd_hw_init(void) INIT_ATTR;
 static inline void lcd_enable_power(bool onoff)
 {
     ascodec_write(AS3514_DCDC15, onoff ? 1 : 0);

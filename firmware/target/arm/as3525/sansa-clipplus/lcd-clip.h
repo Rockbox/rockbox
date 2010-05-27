@@ -19,7 +19,9 @@
  *
  ****************************************************************************/
 
-void lcd_hw_init(void);
+#include "config.h"
+
+void lcd_hw_init(void) INIT_ATTR;
 static inline void lcd_enable_power(bool onoff)
 {
     (void) onoff;
