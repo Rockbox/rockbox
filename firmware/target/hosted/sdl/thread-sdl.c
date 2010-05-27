@@ -60,11 +60,12 @@ static jmp_buf thread_jmpbufs[MAXTHREADS];
  * that enables us to simulate a cooperative environment even if
  * the host is preemptive */
 static SDL_mutex *m;
-static volatile bool threads_exit = false;
+#define THREADS_RUN                 0
+#define THREADS_EXIT                1
+#define THREADS_EXIT_COMMAND_DONE   2
+static volatile int threads_status = THREADS_RUN;
 
 extern long start_tick;
-
-void sim_do_exit(SDL_mutex *m);
 
 void sim_thread_shutdown(void)
 {
@@ -79,7 +80,7 @@ void sim_thread_shutdown(void)
        on each unlock but that is safe. */
 
     /* Do this before trying to acquire lock */
-    threads_exit = true;
+    threads_status = THREADS_EXIT;
 
     /* Take control */
     SDL_LockMutex(m);
@@ -122,6 +123,9 @@ void sim_thread_shutdown(void)
     }
 
     SDL_UnlockMutex(m);
+
+    /* Signal completion of operation */
+    threads_status = THREADS_EXIT_COMMAND_DONE;
 }
 
 static void new_thread_id(unsigned int slot_num,
@@ -210,8 +214,14 @@ void init_threads(void)
 
     SDL_UnlockMutex(m);
 
-    /* doesn't return */
-    sim_do_exit(m);
+    /* Set to 'COMMAND_DONE' when other rockbox threads have exited. */
+    while (threads_status < THREADS_EXIT_COMMAND_DONE)
+        SDL_Delay(10);
+
+    SDL_DestroyMutex(m);
+
+    /* We're the main thead - perform exit - doesn't return. */
+    sim_do_exit();
 }
 
 void sim_thread_exception_wait(void)
@@ -219,7 +229,7 @@ void sim_thread_exception_wait(void)
     while (1)
     {
         SDL_Delay(HZ/10);
-        if (threads_exit)
+        if (threads_status != THREADS_RUN)
             thread_exit();
     }
 }
@@ -230,7 +240,7 @@ void sim_thread_lock(void *me)
     SDL_LockMutex(m);
     cores[CURRENT_CORE].running = (struct thread_entry *)me;
 
-    if (threads_exit)
+    if (threads_status != THREADS_RUN)
         thread_exit();
 }
 
@@ -371,7 +381,7 @@ void switch_thread(void)
 
     cores[CURRENT_CORE].running = current;
 
-    if (threads_exit)
+    if (threads_status != THREADS_RUN)
         thread_exit();
 }
 
@@ -474,7 +484,7 @@ int runthread(void *data)
             cores[CURRENT_CORE].running = current;
         }
 
-        if (!threads_exit)
+        if (threads_status == THREADS_RUN)
         {
             current->context.start();
             THREAD_SDL_DEBUGF("Thread Done: %d (%s)\n",

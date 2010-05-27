@@ -144,13 +144,10 @@ static int sdl_event_thread(void * param)
     return 0;
 }
 
-void sim_do_exit(SDL_mutex *m)
+void sim_do_exit(void)
 {
     /* wait for event thread to finish */
     SDL_WaitThread(evt_thread, NULL);
-
-    /* cleanup */
-    SDL_DestroyMutex(m);
 
     SDL_Quit();
     exit(EXIT_SUCCESS);
