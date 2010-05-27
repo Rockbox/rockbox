@@ -43,10 +43,6 @@ void usb_enable(bool on)
 #endif
 }
 
-void usb_init_device(void)
-{
-}
-
 void usb_insert_int(void)
 {
     usb_status = USB_INSERTED;
