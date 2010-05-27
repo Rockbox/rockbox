@@ -35,6 +35,23 @@
 static struct buffer_descriptor dma_play_bd NOCACHEBSS_ATTR;
 static struct channel_descriptor dma_play_cd NOCACHEBSS_ATTR;
 
+/* The pcm locking relies on the fact the interrupt handlers run to completion
+ * before lower-priority modes proceed. We don't have to touch hardware
+ * registers. Disabling SDMA interrupt would disable DMA callbacks systemwide
+ * and that is not something that is desireable.
+ *
+ * Lock explanation [++.locked]:
+ * Trivial, just increment .locked.
+ *
+ * Unlock explanation [if (--.locked == 0 && .state != 0)]:
+ * If int occurred and saw .locked as nonzero, we'll get a pending
+ * and it will have taken no action other than to set the flag to the
+ * value of .state. If it saw zero for .locked, it will have proceeded
+ * normally into the pcm callbacks. If cb set the pending flag, it has
+ * to be called to kickstart the callback mechanism and DMA. If the unlock
+ * came after a stop, we won't be in the block and DMA will be off. If
+ * we're still doing transfers, cb will see 0 for .locked and if pending,
+ * it won't be called by DMA again. */
 struct dma_data
 {
     int locked;
@@ -44,7 +61,7 @@ struct dma_data
 
 static struct dma_data dma_play_data =
 {
-    /* Initialize to a locked, stopped state */
+    /* Initialize to an unlocked, stopped state */
     .locked = 0,
     .callback_pending = 0,
     .state = 0
@@ -81,8 +98,7 @@ static void play_dma_callback(void)
 
 void pcm_play_lock(void)
 {
-    if (++dma_play_data.locked == 1)
-        imx31_regclr32(&SSI_SIER2, SSI_SIER_TDMAE);
+    ++dma_play_data.locked;
 }
 
 void pcm_play_unlock(void)
@@ -92,12 +108,8 @@ void pcm_play_unlock(void)
         int oldstatus = disable_irq_save();
         int pending = dma_play_data.callback_pending;
         dma_play_data.callback_pending = 0;
-        SSI_SIER2 |= SSI_SIER_TDMAE;
         restore_irq(oldstatus);
 
-        /* Should an interrupt be forced instead? The upper pcm layer can
-         * call producer's callback in thread context so technically this is
-         * acceptable. */
         if (pending != 0)
             play_dma_callback();
     }
@@ -238,21 +250,24 @@ static void play_start_pcm(void)
     SSI_STX0_2 = 0;
     SSI_STX0_2 = 0;
 
-    SSI_SCR2 |= SSI_SCR_TE;  /* Start transmitting */
+    SSI_SIER2 |= SSI_SIER_TDMAE; /* Enable DMA req. */
+    SSI_SCR2 |= SSI_SCR_TE;      /* Start transmitting */
 }
 
 static void play_stop_pcm(void)
 {
+    SSI_SIER2 &= ~SSI_SIER_TDMAE; /* Disable DMA req. */
+
+    /* Set state before pending to prevent race with interrupt */
+    dma_play_data.state = 0;
+
     /* Wait for FIFO to empty */
     while (SSI_SFCSR_TFCNT0 & SSI_SFCSR2);
 
-    /* Disable transmission */
-    SSI_STCR2 &= ~SSI_STCR_TFEN0;
-    SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
+    SSI_STCR2 &= ~SSI_STCR_TFEN0; /* Disable TX */
+    SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN); /* Disable transmission, SSI */
 
-    /* Set state before pending to prevent race with interrupt */
-    /* Do not enable DMA requests on unlock */
-    dma_play_data.state = 0;
+    /* Clear any pending callback */
     dma_play_data.callback_pending = 0;
 }
 
@@ -361,7 +376,7 @@ static struct channel_descriptor dma_rec_cd NOCACHEBSS_ATTR;
 
 static struct dma_data dma_rec_data =
 {
-    /* Initialize to a locked, stopped state */
+    /* Initialize to an unlocked, stopped state */
     .locked = 0,
     .callback_pending = 0,
     .state = 0
@@ -402,8 +417,7 @@ static void rec_dma_callback(void)
 
 void pcm_rec_lock(void)
 {
-    if (++dma_rec_data.locked == 1)
-        imx31_regclr32(&SSI_SIER1, SSI_SIER_RDMAE);
+    ++dma_rec_data.locked;
 }
 
 void pcm_rec_unlock(void)
@@ -413,12 +427,8 @@ void pcm_rec_unlock(void)
         int oldstatus = disable_irq_save();
         int pending = dma_rec_data.callback_pending;
         dma_rec_data.callback_pending = 0;
-        SSI_SIER1 |= SSI_SIER_RDMAE;
         restore_irq(oldstatus);
 
-        /* Should an interrupt be forced instead? The upper pcm layer can
-         * call consumer's callback in thread context so technically this is
-         * acceptable. */
         if (pending != 0)
             rec_dma_callback();
     }
@@ -426,6 +436,11 @@ void pcm_rec_unlock(void)
 
 void pcm_rec_dma_stop(void)
 {
+    SSI_SIER1 &= ~SSI_SIER_RDMAE; /* Disable DMA req. */
+
+    /* Set state before pending to prevent race with interrupt */
+    dma_rec_data.state = 0;
+
     /* Stop receiving data */
     sdma_channel_stop(DMA_REC_CH_NUM);
 
@@ -434,9 +449,7 @@ void pcm_rec_dma_stop(void)
     SSI_SCR1 &= ~SSI_SCR_RE;      /* Disable RX */
     SSI_SRCR1 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
 
-    /* Set state before pending to prevent race with interrupt */
-    /* Do not enable DMA requests on unlock */
-    dma_rec_data.state = 0;
+    /* Clear any pending callback */
     dma_rec_data.callback_pending = 0;
 }
 
@@ -466,6 +479,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     /* Enable receive */
     SSI_SCR1 |= SSI_SCR_RE;
+    SSI_SIER1 |= SSI_SIER_RDMAE; /* Enable DMA req. */
+
     sdma_channel_run(DMA_REC_CH_NUM);
 }
 
