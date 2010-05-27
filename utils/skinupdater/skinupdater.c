@@ -189,11 +189,31 @@ top:
 
 int main(int argc, char* argv[])
 {
-    parse_text("%s%?it<%?in<%in. |>%it|%fn>\n"
-            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-            "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n\n"
-            "%al%pc/%pt%ar[%pp:%pe]\n"
-            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-            "%pb\n%pm\n", stdout);
+    char buffer[10*1024], temp[512];
+    FILE *in, *out = stdout;
+    if( (argc < 2) ||
+        strcmp(argv[1],"-h") == 0 ||
+        strcmp(argv[1],"--help") == 0 )
+    {
+        printf("Usage: %s infile [outfile]\n", argv[0]);
+        return 0;
+    }
+    in = fopen(argv[1], "r");
+    if (!in)
+        return 1;
+    while (fgets(temp, 512, in))
+        strcat(buffer, temp);
+    
+    if (argc == 3)
+    {
+        out = fopen(argv[2], "w");
+        if (!out)
+            return 1;
+    }        
+    
+    parse_text(buffer, out);
+    fclose(in);
+    if (out != stdout)
+        fclose(out);
     return 0;
 }
