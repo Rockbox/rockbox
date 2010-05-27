@@ -21,12 +21,27 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define _backlight_init() true
+#include <stdbool.h>
+#include "cpu.h"
 
 void _backlight_on(void);
 void _backlight_off(void);
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+static inline bool _backlight_init(void)
+{
+    GPIOA_DIR |= 1<<5; /* for button light */
+    return true;
+}
+
+static inline void _buttonlight_on(void)
+{
+    GPIOA_PIN(5) |= 1<<5;
+}
+
+static inline void _buttonlight_off(void)
+{
+    GPIOA_PIN(5) &= ~(1<<5);
+}
+
 
 #endif

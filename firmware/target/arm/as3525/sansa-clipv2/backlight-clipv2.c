@@ -35,15 +35,3 @@ void _backlight_off(void)
     lcd_enable(false);
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x0);
 }
-
-void _buttonlight_on(void)
-{
-    GPIOA_DIR |= (1<<5);
-    GPIOA_PIN(5) = (1<<5);  /* set pin a5 high */
-}
-
-void _buttonlight_off(void)
-{
-    GPIOA_DIR |= (1<<5);
-    GPIOA_PIN(5) = 0;       /* set pin a5 low */
-}
