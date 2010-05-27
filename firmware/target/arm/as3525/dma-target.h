@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "config.h" /* for INIT_ATTR */
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -32,7 +33,7 @@
 #define DMA_PERI_SD         5   /* embedded storage */
 #define DMA_PERI_DBOP       8
 
-void dma_init(void);
+void dma_init(void) INIT_ATTR;
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
                         size_t size, int nwords, void (*callback)(void));

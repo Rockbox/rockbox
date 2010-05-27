@@ -211,7 +211,7 @@ extern void yield(void);
 extern void sleep(int ticks);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
-extern void tick_start(unsigned int interval_in_ms);
+extern void tick_start(unsigned int interval_in_ms) INIT_ATTR;
 
 #ifdef INCLUDE_TIMEOUT_API
 struct timeout;

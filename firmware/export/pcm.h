@@ -67,8 +67,8 @@ void pcm_apply_settings(void);
 void pcm_play_lock(void);
 void pcm_play_unlock(void);
 
-void pcm_init(void);
-void pcm_postinit(void);
+void pcm_init(void) INIT_ATTR;
+void pcm_postinit(void) INIT_ATTR;
 
 /* This is for playing "raw" PCM data */
 void pcm_play_data(pcm_play_callback_type get_more,
@@ -104,7 +104,7 @@ extern volatile bool pcm_paused;
 
 void pcm_play_dma_lock(void);
 void pcm_play_dma_unlock(void);
-void pcm_play_dma_init(void);
+void pcm_play_dma_init(void) INIT_ATTR;
 void pcm_play_dma_start(const void *addr, size_t size);
 void pcm_play_dma_stop(void);
 void pcm_play_dma_pause(bool pause);

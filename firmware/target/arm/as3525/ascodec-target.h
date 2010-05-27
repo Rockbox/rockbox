@@ -70,7 +70,7 @@ struct ascodec_request {
     struct ascodec_request *next;
 };
 
-void ascodec_init(void);
+void ascodec_init(void) INIT_ATTR;
 
 int ascodec_write(unsigned int index, unsigned int value);
 

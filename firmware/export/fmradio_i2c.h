@@ -22,9 +22,10 @@
 #ifndef FMRADIO_I2C_H
 #define FMRADIO_I2C_H
 
+#include "config.h" /* for INIT_ATTR */
 #include <stdbool.h>
 
-void fmradio_i2c_init(void);
+void fmradio_i2c_init(void) INIT_ATTR;
 void fmradio_i2c_enable(bool enable);
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count);
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count);
