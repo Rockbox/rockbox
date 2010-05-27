@@ -24,7 +24,7 @@ static void get_more(unsigned char** start, size_t* size)
     doneplay=1;
 }
 
-void pcm_init(void)
+void rockboy_pcm_init(void)
 {
     if(plugbuf)
         return;
@@ -61,7 +61,7 @@ void pcm_init(void)
     rb->pcm_set_frequency(pcm.hz); /* 44100 22050 11025 */
 }
 
-void pcm_close(void)
+void rockboy_pcm_close(void)
 {
     memset(&pcm, 0, sizeof pcm);    
     newly_started = true;   
@@ -69,7 +69,7 @@ void pcm_close(void)
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
-int pcm_submit(void)
+int rockboy_pcm_submit(void)
 {
     if (!pcm.buf) return 0;
     if (pcm.pos < pcm.len) return 1;
@@ -91,7 +91,7 @@ int pcm_submit(void)
 
 #else
 
-void pcm_init(void)
+void rockboy_pcm_init(void)
 {
     pcm.hz = 44100;
     pcm.stereo = 1;
@@ -100,12 +100,12 @@ void pcm_init(void)
     pcm.pos = 0;
 }
 
-void pcm_close(void)
+void rockboy_pcm_close(void)
 {
     memset(&pcm, 0, sizeof pcm);
 }
 
-int pcm_submit(void)
+int rockboy_pcm_submit(void)
 {
     pcm.pos =0;
     return 0;

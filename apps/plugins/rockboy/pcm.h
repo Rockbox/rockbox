@@ -15,9 +15,9 @@ struct pcm
 
 extern struct pcm pcm;
 
-void pcm_init(void);
-int  pcm_submit(void);
-void pcm_close(void);
+void rockboy_pcm_init(void);
+int  rockboy_pcm_submit(void);
+void rockboy_pcm_close(void);
 
 #endif
 

@@ -364,22 +364,22 @@ called before reading or writing a sound register, and at the end of
 each frame.
 
 The main sound module interfaces with the system-specific code through
-one structure, pcm, and a few functions: pcm_init, pcm_close, and
-pcm_submit. While the first two should be obvious, pcm_submit needs
+one structure, pcm, and a few functions: rockboy_pcm_init, rockboy_pcm_close, and
+rockboy_pcm_submit. While the first two should be obvious, rockboy_pcm_submit needs
 some explaining. Whenever realtime sound output is operational,
-pcm_submit is responsible for timing, and should not return until it
+rockboy_pcm_submit is responsible for timing, and should not return until it
 has successfully processed all the data in its input buffer (pcm.buf).
 On *nix sound devices, this typically means just waiting for the write
 syscall to return, but on systems such as DOS where low level IO must
-be handled in the program, pcm_submit needs to delay until the current
+be handled in the program, rockboy_pcm_submit needs to delay until the current
 position in the DMA buffer has advanced sufficiently to make space for
 the new samples, then copy them.
 
 For special sound output implementations like write-to-file or the
-dummy sound device, pcm_submit should write the data immediately and
+dummy sound device, rockboy_pcm_submit should write the data immediately and
 return 0, indicating to the caller that other methods must be used for
 timing. On real sound devices that are presently functional,
-pcm_submit should return 1, regardless of whether it buffered or
+rockboy_pcm_submit should return 1, regardless of whether it buffered or
 actually wrote the sound data.
 
 And yes, for unices without OSS, we hope to add piped audio output

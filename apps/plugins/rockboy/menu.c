@@ -85,7 +85,7 @@ int do_user_menu(void) {
                         "Load Game", "Save Game",
                         "Options", "Quit");
 
-    pcm_init();
+    rockboy_pcm_init();
 
     while(!done)
     {

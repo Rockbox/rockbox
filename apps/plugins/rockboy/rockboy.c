@@ -361,7 +361,7 @@ static int gnuboy_main(const char *rom)
     rb->lcd_puts(0,0,"Init video");
     vid_init();
     rb->lcd_puts(0,1,"Init sound");
-    pcm_init();
+    rockboy_pcm_init();
     rb->lcd_puts(0,2,"Loading rom");
     loader_init(rom);
     if(shut)
@@ -438,7 +438,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
     if(!rb->audio_status())
-        pcm_close();
+        rockboy_pcm_close();
         
     rb->splash(HZ/2, "Closing Rockboy");
 

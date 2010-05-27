@@ -422,7 +422,7 @@ void sound_mix(void)
         if (pcm.buf)
         {
             if (pcm.pos >= pcm.len)
-                pcm_submit();
+                rockboy_pcm_submit();
             if (pcm.stereo)
             {
                 pcm.buf[pcm.pos++] = l;

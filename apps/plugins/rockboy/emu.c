@@ -56,7 +56,7 @@ void emu_run(void)
         if (options.sound || !plugbuf)
 		{
             sound_mix();
-            pcm_submit();
+            rockboy_pcm_submit();
 		}
 
         doevents();
