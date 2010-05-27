@@ -86,7 +86,7 @@ static void button_event(int key, bool pressed);
 extern bool debug_wps;
 extern bool mapping;
 
-void gui_message_loop(void)
+bool gui_message_loop(void)
 {
     SDL_Event event;
     static int x,y,xybutton = 0;
@@ -176,8 +176,7 @@ void gui_message_loop(void)
             case SDL_QUIT:
             {
                 sim_exit_irq_handler();
-                exit(EXIT_SUCCESS);
-                break;
+                return false;
             }
             default:
                 /*printf("Unhandled event\n"); */
@@ -185,6 +184,8 @@ void gui_message_loop(void)
         }
         sim_exit_irq_handler();
     }
+
+    return true;
 }
 
 static void button_event(int key, bool pressed)

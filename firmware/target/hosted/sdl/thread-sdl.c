@@ -64,9 +64,14 @@ static volatile bool threads_exit = false;
 
 extern long start_tick;
 
+void sim_do_exit(SDL_mutex *m);
+
 void sim_thread_shutdown(void)
 {
     int i;
+
+    /* This *has* to be a push operation from a thread not in the pool
+       so that they may be dislodged from their blocking calls. */
 
     /* Tell all threads jump back to their start routines, unlock and exit
        gracefully - we'll check each one in turn for it's status. Threads
@@ -79,25 +84,44 @@ void sim_thread_shutdown(void)
     /* Take control */
     SDL_LockMutex(m);
 
+    /* Signal all threads on delay or block */
     for (i = 0; i < MAXTHREADS; i++)
     {
         struct thread_entry *thread = &threads[i];
-        /* exit all current threads, except the main one */
-        if (thread->context.t != NULL)
+        if (thread->context.s == NULL)
+            continue;
+        SDL_SemPost(thread->context.s);
+    }
+
+    /* Wait for all threads to finish and cleanup old ones. */
+    for (i = 0; i < MAXTHREADS; i++)
+    {
+        struct thread_entry *thread = &threads[i];
+        SDL_Thread *t = thread->context.t;
+
+        if (t != NULL)
         {
-            /* Signal thread on delay or block */
-            SDL_Thread *t = thread->context.t;
-            SDL_SemPost(thread->context.s);
             SDL_UnlockMutex(m);
             /* Wait for it to finish */
             SDL_WaitThread(t, NULL);
             /* Relock for next thread signal */
             SDL_LockMutex(m);
-        }        
+            /* Already waited and exiting thread would have waited .told,
+             * replacing it with t. */
+            thread->context.told = NULL;
+        }
+        else
+        {
+            /* Wait on any previous thread in this location-- could be one not quite
+             * finished exiting but has just unlocked the mutex. If it's NULL, the
+             * call returns immediately.
+             *
+             * See remove_thread below for more information. */
+            SDL_WaitThread(thread->context.told, NULL);
+        }
     }
 
     SDL_UnlockMutex(m);
-    SDL_DestroyMutex(m);
 }
 
 static void new_thread_id(unsigned int slot_num,
@@ -172,9 +196,22 @@ void init_threads(void)
         return;
     }
 
-    THREAD_SDL_DEBUGF("Main thread: %p\n", thread);
+    /* Tell all threads jump back to their start routines, unlock and exit
+       gracefully - we'll check each one in turn for it's status. Threads
+       _could_ terminate via remove_thread or multiple threads could exit
+       on each unlock but that is safe. */
 
-    return;
+    /* Setup jump for exit */
+    if (setjmp(thread_jmpbufs[0]) == 0)
+    {
+        THREAD_SDL_DEBUGF("Main thread: %p\n", thread);
+        return;
+    }
+
+    SDL_UnlockMutex(m);
+
+    /* doesn't return */
+    sim_do_exit(m);
 }
 
 void sim_thread_exception_wait(void)
@@ -522,7 +559,20 @@ void remove_thread(unsigned int thread_id)
 
     t = thread->context.t;
     s = thread->context.s;
+
+    /* Wait the last thread here and keep this one or SDL will leak it since
+     * it doesn't free its own library allocations unless a wait is performed.
+     * Such behavior guards against the memory being invalid by the time
+     * SDL_WaitThread is reached and also against two different threads having
+     * the same pointer. It also makes SDL_WaitThread a non-concurrent function.
+     *
+     * However, see more below about SDL_KillThread.
+     */
+    SDL_WaitThread(thread->context.told, NULL);
+
     thread->context.t = NULL;
+    thread->context.s = NULL;
+    thread->context.told = t;
 
     if (thread != current)
     {
@@ -560,18 +610,16 @@ void remove_thread(unsigned int thread_id)
         longjmp(thread_jmpbufs[current - threads], 1);
     }
 
+    /* SDL_KillThread frees the old pointer too because it uses SDL_WaitThread
+     * to wait for the host to remove it. */
+    thread->context.told = NULL;
     SDL_KillThread(t);
     restore_irq(oldlevel);
 }
 
 void thread_exit(void)
 {
-    struct thread_entry *t = thread_id_entry(THREAD_ID_CURRENT);
-    /* the main thread cannot be removed since it's created implicitely
-     * by starting the program;
-     * it has no valid jumpbuf to exit, do nothing for now */
-    if (t != &threads[0])
-        remove_thread(t->id);
+    remove_thread(THREAD_ID_CURRENT);
 }
 
 void thread_wait(unsigned int thread_id)

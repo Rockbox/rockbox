@@ -122,6 +122,7 @@ struct regs
 struct regs
 {
     void *t;             /* Simulator OS thread */
+    void *told;          /* Last thread in slot (explained in thead-sdl.c) */
     void *s;             /* Semaphore for blocking and wakeup */
     void (*start)(void); /* Start function */
 };

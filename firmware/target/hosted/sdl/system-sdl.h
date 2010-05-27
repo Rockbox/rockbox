@@ -44,7 +44,7 @@ void sim_exit_irq_handler(void);
 void sim_kernel_shutdown(void);
 void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
-void gui_message_loop(void);
+bool gui_message_loop(void);
 
 extern bool background;  /* True if the background image is enabled */
 extern bool showremote;

@@ -54,6 +54,8 @@ bool            sim_alarm_wakeup = false;
 const char     *sim_root_dir = NULL;
 extern int      display_zoom;
 
+static SDL_Thread *evt_thread = NULL;
+
 #ifdef DEBUG
 bool debug_audio = false;
 #endif
@@ -64,16 +66,11 @@ int wps_verbose_level = 3;
 
 void sys_poweroff(void)
 {
-    /* Order here is relevent to prevent deadlocks and use of destroyed
-       sync primitives by kernel threads */
-    sim_thread_shutdown();
-    sim_kernel_shutdown();
-    SDL_Quit();
 }
 
 /*
  * Button read loop */
-void gui_message_loop(void);
+bool gui_message_loop(void);
 
 /*
  * This thread will read the buttons in an interrupt like fashion, and
@@ -137,12 +134,28 @@ static int sdl_event_thread(void * param)
 
     /*
      * finally enter the button loop */
-    while(1)
-        gui_message_loop();
+    while(gui_message_loop());
+
+    /* Order here is relevent to prevent deadlocks and use of destroyed
+       sync primitives by kernel threads */
+    sim_thread_shutdown();
+    sim_kernel_shutdown();
 
     return 0;
 }
 
+void sim_do_exit(SDL_mutex *m)
+{
+    /* wait for event thread to finish */
+    SDL_WaitThread(evt_thread, NULL);
+
+    /* cleanup */
+    SDL_DestroyMutex(m);
+
+    SDL_Quit();
+    exit(EXIT_SUCCESS);
+    while(1);
+}
 
 void system_init(void)
 {
@@ -150,11 +163,10 @@ void system_init(void)
 
     if (SDL_Init(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
-    atexit(sys_poweroff);
 
     s = SDL_CreateSemaphore(0); /* 0-count so it blocks */
 
-    SDL_CreateThread(sdl_event_thread, s);
+    evt_thread = SDL_CreateThread(sdl_event_thread, s);
 
     /* wait for sdl_event_thread to run so that it can initialize the surfaces
      * and video subsystem needed for SDL events */
