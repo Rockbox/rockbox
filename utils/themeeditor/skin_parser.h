@@ -41,7 +41,8 @@ enum skin_element_type
     COMMENT,
     TAG,
     CONDITIONAL,
-    SUBLINES
+    SUBLINES,
+    LINE
 };
 
 enum skin_errorcode

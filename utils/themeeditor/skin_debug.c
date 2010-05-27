@@ -129,17 +129,10 @@ void skin_debug_tree(struct skin_element* root)
             debug_indent_level++;
             for(i = 0; i < current->children_count; i++)
             {
-                skin_debug_indent();
-                printf("[ Subline %d\n", i);
-
-                debug_indent_level++;
                 skin_debug_tree(current->children[i]);
-                debug_indent_level--;
-
-                skin_debug_indent();
-                printf("]\n");
             }
             debug_indent_level--;
+
             skin_debug_indent();
             printf("]\n");
             break;
@@ -175,6 +168,16 @@ void skin_debug_tree(struct skin_element* root)
 
             break;
 
+        case LINE:
+            printf("[ Logical line on line %d\n", current->line);
+
+            debug_indent_level++;
+            skin_debug_tree(current->children[0]);
+            debug_indent_level--;
+
+            skin_debug_indent();
+            printf("]\n");
+            break;
         }
 
         current = current->next;

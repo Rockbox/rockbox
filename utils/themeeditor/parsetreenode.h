@@ -13,7 +13,8 @@ extern "C"
 class ParseTreeNode
 {
 public:
-    ParseTreeNode(struct skin_element* data, ParseTreeNode* parent, bool stop = false);
+    ParseTreeNode(struct skin_element* data, ParseTreeNode* parent, bool tree);
+    ParseTreeNode(struct skin_tag_parameter* param, ParseTreeNode* parent);
     virtual ~ParseTreeNode();
 
     void appendChild(ParseTreeNode* child);
@@ -29,6 +30,7 @@ private:
     ParseTreeNode* parentLink;
     QList<ParseTreeNode*> children;
     struct skin_element* element;
+    struct skin_tag_parameter* param;
 
 };
 

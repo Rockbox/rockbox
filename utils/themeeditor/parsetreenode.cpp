@@ -1,15 +1,33 @@
 #include "parsetreenode.h"
 
 ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent,
-                             bool stop):
-        parentLink(parent), element(data)
+                             bool tree)
 {
 
-    if(stop)
-        return;
-    for(int i = 0; i < 5; i++)
-        appendChild(new ParseTreeNode(data, this, true));
+    if(tree)
+    {
+        while(data)
+        {
+            appendChild(new ParseTreeNode(data, this, false));
+            data = data->next;
+        }
+        parentLink = 0;
+    }
+    else
+    {
+        element = data;
+        parentLink = parent;
+    }
+
 }
+
+ParseTreeNode::ParseTreeNode(struct skin_tag_parameter* param,
+                             ParseTreeNode* parent)
+                                 :parentLink(parent), element(0), param(param)
+{
+
+}
+
 
 ParseTreeNode::~ParseTreeNode()
 {

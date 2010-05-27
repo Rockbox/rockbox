@@ -151,6 +151,14 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
 
     struct skin_element* root = NULL;
     struct skin_element* current = NULL;
+    struct skin_element* retval = NULL;
+
+    /* A wrapper for the line */
+    retval = skin_alloc_element();
+    retval->type = LINE;
+    retval->line = skin_line;
+    retval->children_count = 1;
+    retval->children = skin_alloc_children(1);
 
     while(*cursor != '\n' && *cursor != '\0' && *cursor != MULTILINESYM
           && !((*cursor == ARGLISTSEPERATESYM
@@ -214,7 +222,8 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
     /* Moving up the calling function's pointer */
     *document = cursor;
 
-    return root;
+    retval->children[0] = root;
+    return retval;
 }
 
 struct skin_element* skin_parse_sublines(char** document)
@@ -233,6 +242,7 @@ struct skin_element* skin_parse_sublines_optional(char** document,
     retval = skin_alloc_element();
     retval->type = SUBLINES;
     retval->next = NULL;
+    retval->line = skin_line;
 
     /* First we count the sublines */
     while(*cursor != '\0' && *cursor != '\n'
@@ -276,7 +286,7 @@ struct skin_element* skin_parse_sublines_optional(char** document,
             skin_error(MULTILINE_EXPECTED);
             return NULL;
         }
-        else
+        else if(i != sublines - 1)
         {
             cursor++;
         }

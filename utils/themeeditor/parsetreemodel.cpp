@@ -27,7 +27,6 @@ ParseTreeModel::ParseTreeModel(char* wps, QObject* parent):
         QAbstractItemModel(parent)
 {
     this->wps = skin_parse(wps);
-    skin_debug_tree(this->wps);
     this->root = new ParseTreeNode(this->wps, 0, true);
 }
 
