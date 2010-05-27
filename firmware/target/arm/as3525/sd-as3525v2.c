@@ -759,26 +759,22 @@ int sd_init(void)
 static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response;
-    unsigned int timeout = 100; /* ticks */
-    long t = current_tick;
+    unsigned int timeout = current_tick + 5*HZ;
 
     while (1)
     {
-        long tick;
-
         while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
 
         if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
 
-        if(TIME_AFTER(current_tick, t + timeout))
+        if(TIME_AFTER(current_tick, timeout))
             return -10 * ((response >> 9) & 0xf);
 
-        if (TIME_AFTER((tick = current_tick), next_yield))
+        if (TIME_AFTER(current_tick, next_yield))
         {
             yield();
-            timeout += current_tick - tick;
-            next_yield = tick + MIN_YIELD_PERIOD;
+            next_yield = current_tick + MIN_YIELD_PERIOD;
         }
     }
 }
