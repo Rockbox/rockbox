@@ -241,7 +241,7 @@ static void play_start_pcm(void)
     SSI_SCR2 |= SSI_SCR_SSIEN;   /* Enable SSI */
     SSI_STCR2 |= SSI_STCR_TFEN0; /* Enable TX FIFO */
 
-    dma_play_data.state = 1; /* Enable DMA requests on unlock */
+    dma_play_data.state = 1; /* Check callback on unlock */
 
     /* Do prefill to prevent swapped channels (see TLSbo61214 in MCIMX31CE).
      * No actual solution was offered but this appears to work. */
@@ -469,7 +469,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     dma_rec_bd.mode.command = TRANSFER_16BIT;
     dma_rec_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
 
-    dma_rec_data.state = 1;
+    dma_rec_data.state = 1; /* Check callback on unlock */
 
     SSI_SRCR1 |= SSI_SRCR_RFEN0; /* Enable RX FIFO */
 
