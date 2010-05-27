@@ -2175,10 +2175,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Sensible a Maj/minúscules"
+    *: "Sensible a MAJ/minúscules"
   </dest>
   <voice>
-    *: "Sensible a Maj/minúscules"
+    *: "Sensible a Majúscules i minúscules"
   </voice>
 </phrase>
 <phrase>
@@ -2245,7 +2245,7 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "més recent"
+    *: "Més recent"
   </dest>
   <voice>
     *: "més recent"
@@ -2259,7 +2259,7 @@
     *: "By Type"
   </source>
   <dest>
-    *: "per tipus"
+    *: "Per tipus"
   </dest>
   <voice>
     *: "per tipus"
@@ -12799,11 +12799,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Tema base remot"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Tema base remot"
   </voice>
 </phrase>
 <phrase>
@@ -13644,5 +13644,19 @@
   <voice>
     *: none
     recording_histogram: "Intèrval d'histograma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Sense etiquetar>"
+  </dest>
+  <voice>
+    *: "Sense etiquetar"
   </voice>
 </phrase>
