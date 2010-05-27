@@ -23,13 +23,14 @@
 #include "font.h"
 #include <stdio.h>
 #include <string.h>
+#include "version.h"
 
 #include "bitmaps/rockboxlogo.h"
 
 #if LCD_WIDTH <= 128
-#define BOOT_VERSION ("Boot " APPSVERSION)
+#define BOOT_VERSION ("Boot " RBVERSION)
 #else
-#define BOOT_VERSION ("Boot Ver. " APPSVERSION)
+#define BOOT_VERSION ("Boot Ver. " RBVERSION)
 #endif
 
 /* Ensure TEXT_XPOS is >= 0 */

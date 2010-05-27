@@ -45,10 +45,9 @@
 #include "usb.h"
 #include "mmu-arm.h"
 #include "rtc.h"
+#include "version.h"
 
 #include <stdarg.h>
-
-char version[] = APPSVERSION;
 
 void shutdown(void)
 {
@@ -174,7 +173,7 @@ void main(void)
         verbose = true;
 
     printf("Rockbox boot loader");
-    printf("Version %s", version);
+    printf("Version " RBVERSION);
 
     sleep(50); /* ATA seems to error without this pause */
 

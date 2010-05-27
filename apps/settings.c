@@ -536,7 +536,7 @@ static bool settings_write_config(const char* filename, int options)
     if (fd < 0)
         return false;
     fdprintf(fd, "# .cfg file created by rockbox %s - "
-                 "http://www.rockbox.org\r\n\r\n", appsversion);
+                 "http://www.rockbox.org\r\n\r\n", rbversion);
     for(i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name == NULL)

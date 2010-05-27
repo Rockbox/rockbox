@@ -47,6 +47,7 @@
 #include "common.h"
 #include "rbunicode.h"
 #include "isp1362.h"
+#include "version.h"
 
 #include <stdarg.h>
 
@@ -54,8 +55,6 @@
 #define MAX_LOADSIZE (10*1024*1024)
 
 #define DRAM_START 0x31000000
-
-char version[] = APPSVERSION;
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -210,7 +209,7 @@ void main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version %s", version);
+    printf("Version " RBVERSION);
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)

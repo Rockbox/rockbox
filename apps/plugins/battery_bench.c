@@ -546,7 +546,7 @@ int main(void)
                 "will continue.\n\n",BATTERY_LOG);
             rb->fdprintf(fd,
                 "Battery bench run for %s version %s\n\n"
-                ,MODEL_NAME,rb->appsversion);
+                ,MODEL_NAME,rb->rbversion);
 
             rb->fdprintf(fd,
                 "Battery type: %d mAh      Buffer Entries: %d\n"
@@ -578,7 +578,7 @@ int main(void)
         rb->fdprintf(fd, "\n--File already present. Resuming Benchmark--\n");
         rb->fdprintf(fd,
             "Battery bench run for %s version %s\n\n"
-            ,MODEL_NAME,rb->appsversion);
+            ,MODEL_NAME,rb->rbversion);
         rb->close(fd);
     }
     

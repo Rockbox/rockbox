@@ -44,6 +44,7 @@
 #include "common.h"
 #include "hwcompat.h"
 #include "usb.h"
+#include "version.h"
 
 #define XSC(X) #X
 #define SC(X) XSC(X)
@@ -55,9 +56,6 @@
 
 /* A buffer to load the Linux kernel or Rockbox into */
 unsigned char *loadbuffer = (unsigned char *)DRAM_START;
-
-/* Bootloader version */
-char version[] = APPSVERSION;
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD && !defined(IPOD_MINI)
 /* check if number of seconds has past */
@@ -335,7 +333,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version: %s", version);
+    printf("Version: " RBVERSION);
     printf("IPOD version: 0x%08x", IPOD_HW_REVISION);
 
     i=ata_init();

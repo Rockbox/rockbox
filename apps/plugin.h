@@ -885,7 +885,7 @@ int (*round_value_to_list32)(unsigned long value,
     void (*semaphore_release)(struct semaphore *s);
 #endif
 
-    const char *appsversion;
+    const char *rbversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };

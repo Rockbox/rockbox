@@ -621,7 +621,7 @@ int show_logo( void )
     char version[32];
     int font_h, font_w;
 
-    snprintf(version, sizeof(version), "Ver. %s", appsversion);
+    snprintf(version, sizeof(version), "Ver. %s", rbversion);
 
     lcd_clear_display();
 #if defined(SANSA_CLIP) || defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
@@ -646,7 +646,7 @@ int show_logo( void )
     lcd_clear_display();
     lcd_double_height(true);
     lcd_puts(0, 0, rockbox);
-    lcd_puts_scroll(0, 1, appsversion);
+    lcd_puts_scroll(0, 1, rbversion);
 #endif
     lcd_update();
 

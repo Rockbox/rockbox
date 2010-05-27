@@ -172,7 +172,7 @@ static const char* info_getname(int selected_item, void *data,
     {
         case INFO_VERSION:
             snprintf(buffer, buffer_len, "%s: %s", 
-                     str(LANG_VERSION), appsversion);
+                     str(LANG_VERSION), rbversion);
             break;
 
         case INFO_BUFFER: /* buffer */
@@ -259,7 +259,7 @@ static int info_speak_item(int selected_item, void * data)
     {
         case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
-            talk_spell(appsversion, true);
+            talk_spell(rbversion, true);
             break;
 
         case INFO_BUFFER: /* buffer */

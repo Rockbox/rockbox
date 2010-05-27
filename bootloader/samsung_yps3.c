@@ -57,7 +57,6 @@
 #include "wmcodec.h"
 #include "nand-target.h"
 
-char version[] = APPSVERSION;
 #define LONG_DELAY  200000
 #define SHORT_DELAY  50000
 #define PAUSE_DELAY  50000

@@ -43,6 +43,7 @@
 #include "file.h"
 
 #include "common.h"
+#include "version.h"
 
 #include <stdarg.h>
 
@@ -77,8 +78,6 @@ int usb_screen(void)
 {
    return 0;
 }
-
-char version[] = APPSVERSION;
 
 static inline bool _charger_inserted(void)
 {
@@ -233,7 +232,7 @@ static void bootmenu(void)
     /* backbone of menu */
     /* run the loader */
     printf("Rockbox boot loader");
-    printf("Ver: %s", version);
+    printf("Ver: " RBVERSION);
 
     check_battery();
 

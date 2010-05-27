@@ -39,7 +39,7 @@ bool action_userabort(int timeout)
     \return
     \description
 
-const char *appsversion
+const char *rbversion
     \return version of the plugin API
     \description
 

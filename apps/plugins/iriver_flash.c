@@ -411,7 +411,7 @@ int flash_rockbox(const char *filename, int section)
     rb->memset(&hdr, 0, sizeof(struct flash_header));
     hdr.magic = FLASH_MAGIC;
     hdr.length = len;
-    // rb->strncpy(hdr.version, APPSVERSION, sizeof(hdr.version)-1);
+    // rb->strncpy(hdr.version, rb->rbversion , sizeof(hdr.version)-1);
     p16 = (uint16_t *)&hdr;
     
     rb->snprintf(buf, sizeof(buf), "Programming...");

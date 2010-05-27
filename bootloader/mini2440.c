@@ -46,6 +46,7 @@
 #include "dma-target.h"
 #include "uart-s3c2440.h"
 #include "led-mini2440.h"
+#include "version.h"
 
 
 int main(void)
@@ -78,7 +79,7 @@ int main(void)
         verbose = true;
         
     printf("Rockbox boot loader");
-    printf("Version %s", APPSVERSION);
+    printf("Version " RBVERSION);
 
     rc = storage_init();
     if(rc)

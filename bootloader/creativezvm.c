@@ -29,6 +29,7 @@
 #include "button.h"
 #include "common.h"
 #include "usb.h"
+#include "version.h"
 
 
 static void load_fw(unsigned char* ptr, unsigned int len)
@@ -66,7 +67,7 @@ void main(void)
     lcd_setfont(FONT_SYSFIXED);
     reset_screen();
     printf("Rockbox boot loader");
-    printf("Version %s", APPSVERSION);
+    printf("Version " RBVERSION);
     
     ret = storage_init();
     if(ret)

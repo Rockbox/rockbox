@@ -718,7 +718,7 @@ static const struct plugin_api rockbox_api = {
     semaphore_release,
 #endif
 
-    appsversion,
+    rbversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };

@@ -46,12 +46,8 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
 endif
 
-ifndef VERSION
-VERSION=$(shell date +%y%m%d-%H%M)
-endif
-
-CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES)			\
- -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) 		\
+ -DMEM=${MEMORYSIZE}
 
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 SOURCES = $(SRC)

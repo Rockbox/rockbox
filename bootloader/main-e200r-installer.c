@@ -39,9 +39,7 @@
 #include "i2c.h"
 #include "backlight-target.h"
 #include "power.h"
-
-/* Bootloader version */
-char version[] = APPSVERSION;
+#include "version.h"
 
 #define START_SECTOR_OF_ROM 1
 #define ROMSECTOR_TO_HACK 63
@@ -116,7 +114,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox e200R installer");
-    printf("Version: %s", version);
+    printf("Version: " RBVERSION);
     printf(MODEL_NAME);
     printf("");
 

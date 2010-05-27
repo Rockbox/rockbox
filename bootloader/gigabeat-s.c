@@ -35,11 +35,11 @@
 #include "font.h"
 #include "lcd.h"
 #include "usb-target.h"
+#include "version.h"
 
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157
 
-const char version[] = APPSVERSION;
 /* Where files sent via MTP are stored */
 static const char basedir[] = "/Content/0b00/00/";
 /* Can use memory after vector table up to 0x01f00000 */
@@ -346,7 +346,7 @@ void main(void)
     lcd_clear_display();
 
     printf("Gigabeat S Rockbox Bootloader");
-    printf("Version %s", version);
+    printf("Version " RBVERSION);
 
     /* Initialize KPP so we can poll the button states */
     button_init_device();

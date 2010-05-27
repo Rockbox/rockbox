@@ -39,8 +39,6 @@
 #include "file.h"
 #include "common.h"
 
-char version[] = APPSVERSION;
-
 void* main(void)
 {
     int i;

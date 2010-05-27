@@ -42,6 +42,8 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "file.h"
+#include "version.h"
+
 
 #include "pcf50606.h"
 #include "common.h"
@@ -57,8 +59,6 @@ int usb_screen(void)
 {
    return 0;
 }
-
-char version[] = APPSVERSION;
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -188,7 +188,7 @@ void main(void)
     }
 
     printf("Rockbox boot loader");
-    printf("Version %s", version);
+    printf("Version " RBVERSION);
     
     check_battery();
     

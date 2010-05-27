@@ -129,7 +129,7 @@ enum plugin_status plugin_start(
         return PLUGIN_ERROR;
     list = rb->get_settings_list(&setting_count);
     rb->fdprintf(fd, "# .cfg file created by rockbox %s - "
-            "http://www.rockbox.org\r\n\r\n", rb->appsversion);
+            "http://www.rockbox.org\r\n\r\n", rb->rbversion);
     
     rb->fdprintf(fd, "# -- Sound settings -- #\r\n");
     for(i=0;i<setting_count;i++)

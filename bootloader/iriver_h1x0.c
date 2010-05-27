@@ -46,6 +46,7 @@
 #include "eeprom_settings.h"
 #include "rbunicode.h"
 #include "common.h"
+#include "version.h"
 
 #include <stdarg.h>
 
@@ -57,8 +58,6 @@
 #ifdef HAVE_EEPROM_SETTINGS
 static bool recovery_mode = false;
 #endif
-
-char version[] = APPSVERSION;
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -254,7 +253,7 @@ void failsafe_menu(void)
     extern int line;
     
     reset_screen();
-    printf("Bootloader %s", version);
+    printf("Bootloader " RBVERSION);
     check_battery();
     printf("=========================");
     line += FAILSAFE_OPTIONS;
@@ -502,7 +501,7 @@ void main(void)
     lcd_setfont(FONT_SYSFIXED);
     
     printf("Rockbox boot loader");
-    printf("Version %s", version);
+    printf("Version " RBVERSION);
 
     /* No need to wait here more because lcd_init and others already do that. */
     // sleep(HZ/50); /* Allow the button driver to check the buttons */

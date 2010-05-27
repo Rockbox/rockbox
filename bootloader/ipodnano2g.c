@@ -44,6 +44,7 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "version.h"
 
 /* Safety measure - maximum allowed firmware image size. 
    The largest known current (October 2009) firmware is about 6.2MB so 
@@ -53,9 +54,6 @@
 
 /* The buffer to load the firmware into - use an uncached alias of 0x08000000 */
 unsigned char *loadbuffer = (unsigned char *)0x48000000;
-
-/* Bootloader version */
-char version[] = APPSVERSION;
 
 extern int line;
 
@@ -209,7 +207,7 @@ void main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version: %s", version);
+    printf("Version: " RBVERSION);
 
     i = storage_init();
 

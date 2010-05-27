@@ -120,8 +120,6 @@
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
-const char appsversion[]=APPSVERSION;
-
 static void init(void);
 
 #ifdef HAVE_SDL

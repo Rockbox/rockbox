@@ -45,6 +45,7 @@
 #include "tsc2100.h"
 #include "time.h"
 #include "system-arm.h"
+#include "version.h"
 
 void main(void)
 {
@@ -83,7 +84,7 @@ void main(void)
         verbose = true;
 
     printf("Rockbox boot loader");
-    printf("Version %s", APPSVERSION);
+    printf("Version " RBVERSION);
 
     /* Enter USB mode without USB thread */
     if(usb_detect() == USB_INSERTED)
