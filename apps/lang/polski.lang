@@ -277,7 +277,7 @@
   </source>
   <dest>
     *: "PLAY = Tak"
-    covond2*: "MENU = Tak"
+    covond2*: "MENU lub lewo-góra = Tak"
     iriverh100,iriverh120,iriverh300: "NAVI = Tak"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Tak"
     mrobe500: "PLAY lub POWER = Tak"
@@ -11161,11 +11161,11 @@
   </source>
   <dest>
     *: none
-    recording: "Clip Counter"
+    recording: "Licznik przesterowań"
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "Licznik przesterowań"
   </voice>
 </phrase>
 <phrase>
@@ -13417,23 +13417,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *:none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *:none
-    radio_remote: "Ekran radia na pilocie"
-  </dest>
-  <voice>
-    *:none
-    radio_remote: "Ekran radia na pilocie"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -13677,5 +13660,39 @@
   <voice>
     *: none
     recording_histogram: "Przedziały histogramu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Ekran radia na pilocie"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Ekran radia na pilocie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Ekran radia"
+  </dest>
+  <voice>
+    *:none
+    radio: "Ekran radia"
   </voice>
 </phrase>
