@@ -45,7 +45,7 @@ bool TTSCarbon::start(QString *errStr)
 {
     (void)errStr;
     VoiceSpec vspec;
-    VoiceSpec* vspecref;
+    VoiceSpec* vspecref = NULL;
     VoiceDescription vdesc;
     OSErr error;
     QString selectedVoice
@@ -72,7 +72,6 @@ bool TTSCarbon::start(QString *errStr)
         // voice not found. Add user notification here and proceed with
         // system default voice.
         qDebug() << "selected voice not found, using system default!";
-        vspecref = NULL;
         GetVoiceDescription(&vspec, &vdesc, sizeof(vdesc));
         if(vdesc.script != -1)
             m_voiceScript = (CFStringBuiltInEncodings)vdesc.script;
