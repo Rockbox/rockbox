@@ -18,9 +18,9 @@ int dump_arg(FILE* out, const char* start, int count, bool close)
         {
             if (count > 1)
             {
-                printf(",");
+                PUTCH(out, ',');
             } else if (close) {
-                printf(")");
+                PUTCH(out, ')');
             }
             count--;
         } else {
@@ -179,6 +179,13 @@ top:
                     break;
             }
             in += parse_tag(out, in);
+        }
+        else if (*in == '#')
+        {
+            while (*in != '\n')
+            {
+                PUTCH(out, *in++);
+            }
         }
         else 
         {
