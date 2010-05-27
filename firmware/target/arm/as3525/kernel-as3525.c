@@ -111,8 +111,6 @@ static inline void do_sw_pwm(void)
 {
     if (!timer2_pwm_on) {
         do_scrollwheel();  /* Handle scrollwheel and tick tasks */
-        TIMER2_INTCLR = 0;  /* clear interrupt */
-        return;
     }
 
     timer2_pwm_state ^= 1;
@@ -133,8 +131,6 @@ static inline void do_sw_pwm(void)
         if (!(timer2_cycles_pwmon > timer2_cycles_pwmoff))
             do_scrollwheel();  /* Handle scrollwheel and tick tasks */
     }
-
-    TIMER2_INTCLR = 0;  /* clear interrupt */
 }
 #else
 static inline void do_sw_pwm(void)
