@@ -75,15 +75,9 @@ static bool display_on = false; /* is the display turned on? */
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
-/* Flip Flag */
 #define R_ENTRY_MODE_HORZ_NORMAL 0x7030
-#define R_ENTRY_MODE_HORZ_FLIPPED 0x7000
-static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
-#define R_ENTRY_MODE_VIDEO_NORMAL 0x7020
-#define R_ENTRY_MODE_VIDEO_FLIPPED 0x7010
-
 
 /* Reverse Flag */
 #define R_DISP_CONTROL_NORMAL 0x0004
@@ -164,34 +158,17 @@ void lcd_set_invert_display(bool yesno)
 
 }
 
-static bool display_flipped = false;
-
 /* turn the display upside down  */
 void lcd_set_flip(bool yesno)
 {
-    display_flipped = yesno;
-
-    r_entry_mode = yesno ? R_ENTRY_MODE_HORZ_FLIPPED :
-                           R_ENTRY_MODE_HORZ_NORMAL;
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x21b : 0x11b);
 }
 
 static void lcd_window(int xmin, int ymin, int xmax, int ymax)
 {
-    if (!display_flipped)
-    {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-        lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | xmin);
-    }
-    else
-    {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS,
-            ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,
-            ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_HEIGHT-1 - ymax));
-        lcd_write_reg(R_RAM_ADDR_SET,
-            ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_WIDTH-1 - xmin));
-    }
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | xmin);
 }
 
 static void _display_on(void)
@@ -211,7 +188,7 @@ static void _display_on(void)
     /* Address counter updated in horizontal direction; left to right;
      * vertical increment horizontal increment.
      * data format for 8bit transfer or spi = 65k (5,6,5) */
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ_NORMAL);
 
     /* Replace data on writing to GRAM */
     lcd_write_reg(R_COMPARE_REG1, 0);
@@ -352,20 +329,10 @@ void lcd_yuv_set_options(unsigned options)
 #ifndef BOOTLOADER
 static void lcd_window_blit(int xmin, int ymin, int xmax, int ymax)
 {
-    if (!display_flipped)
-    {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS,
-            ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-        lcd_write_reg(R_RAM_ADDR_SET,
-            (ymin << 8) | (LCD_WIDTH-1 - xmin));
-        }
-        else
-    {
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-        lcd_write_reg(R_RAM_ADDR_SET,       (ymax << 8) | xmin);
-    }
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS,
+        ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | (LCD_WIDTH-1 - xmin));
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
@@ -397,10 +364,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    lcd_write_reg(R_ENTRY_MODE,
-        display_flipped ? R_ENTRY_MODE_VIDEO_FLIPPED : R_ENTRY_MODE_VIDEO_NORMAL
-    );
 
     if (lcd_yuv_options & LCD_YUV_DITHER)
     {
@@ -446,7 +409,7 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ_NORMAL);
 
     /* Set start position and window */
     lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
@@ -484,7 +447,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y; /* clip bottom */
 
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ_NORMAL);
 
     /* we need to make x and width even to enable 32bit transfers */
     width = (width + (x & 1) + 1) & ~1;
