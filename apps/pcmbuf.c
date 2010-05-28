@@ -47,8 +47,10 @@
                                      non-fatal) */
 #define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
                                      this to the DMA */
-#define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet
-                                     for mixing (crossfade or voice) */
+#define CROSSFADE_BUFSIZE    8192 /* Size of the crossfade buffer */
+#define AUX_BUFSIZE           512 /* Size of the aux buffer; can be 512 if no
+                                     resampling or timestretching is allowed in
+                                     the aux channel, must be 2048 otherwise */
 
 /* number of bytes played per second (sample rate * 2 channels * 2 bytes/sample) */
 #define BYTERATE            (NATIVE_FREQUENCY * 4)
@@ -64,7 +66,7 @@
  * by the driver code. */
 struct chunkdesc
 {
-    void *addr;
+    unsigned char *addr;
     size_t size;
     struct chunkdesc* link;
     /* true if last chunk in the track */
@@ -376,7 +378,7 @@ void *pcmbuf_request_buffer(int *count)
     /* crossfade has begun, put the new track samples in fadebuf */
     if (crossfade_active)
     {
-        *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
+        *count = MIN(*count, CROSSFADE_BUFSIZE/4);
         return fadebuf;
     }
     else
@@ -464,9 +466,9 @@ size_t pcmbuf_init(unsigned char *bufend)
     pcmbuf_size = get_next_required_pcmbuf_size();
     write_chunk = (struct chunkdesc *)pcmbuf_bufend -
         NUM_CHUNK_DESCS(pcmbuf_size);
-    voicebuf = (char *)write_chunk - PCMBUF_MIX_CHUNK;
+    voicebuf = (char *)write_chunk - AUX_BUFSIZE;
 #ifdef HAVE_CROSSFADE
-    fadebuf = voicebuf - PCMBUF_MIX_CHUNK;
+    fadebuf = voicebuf - CROSSFADE_BUFSIZE;
     pcmbuffer = fadebuf - pcmbuf_size;
 #else
     pcmbuffer = voicebuf - pcmbuf_size;
@@ -623,14 +625,12 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
     }
 
     {
-        /* Send the new chunk to the PCM */
+        /* Send the new chunk to the DMA */
         if(read_chunk)
         {
-            size_t current_size = read_chunk->size;
-
-            pcmbuf_unplayed_bytes -= current_size;
-            last_chunksize = current_size;
-            *size = current_size;
+            last_chunksize = read_chunk->size;
+            pcmbuf_unplayed_bytes -= last_chunksize;
+            *size = last_chunksize;
             *start = read_chunk->addr;
         }
         else
@@ -654,7 +654,7 @@ void pcmbuf_play_start(void)
         last_chunksize = read_chunk->size;
         pcmbuf_unplayed_bytes -= last_chunksize;
         pcm_play_data(pcmbuf_pcm_callback,
-            (unsigned char *)read_chunk->addr, last_chunksize);
+            read_chunk->addr, last_chunksize);
     }
 }
 
@@ -715,7 +715,7 @@ static size_t find_chunk(size_t length, struct chunkdesc **chunk)
         length -= (*chunk)->size;
         *chunk = (*chunk)->link;
     }
-    return length / 2;
+    return length;
 }
 
 /* Returns the number of bytes _NOT_ mixed/faded */
@@ -808,7 +808,7 @@ static void crossfade_start(void)
          * so find the right chunk and sample to start the crossfade */
         {
             crossfade_sample = find_chunk(crossfade_rem - crossfade_need,
-                &crossfade_chunk);
+                &crossfade_chunk) / 2;
             crossfade_rem = crossfade_need;
         }
         else
@@ -842,7 +842,7 @@ static void crossfade_start(void)
 
         /* Find the right chunk and sample to start fading out */
         fade_out_delay += crossfade_sample * 2;
-        fade_out_sample = find_chunk(fade_out_delay, &fade_out_chunk);
+        fade_out_sample = find_chunk(fade_out_delay, &fade_out_chunk) / 2;
 
         while (fade_out_rem > 0)
         {
@@ -869,7 +869,7 @@ static void crossfade_start(void)
 
     /* Find the right chunk and sample to start fading in */
     fade_in_delay += crossfade_sample * 2;
-    crossfade_sample = find_chunk(fade_in_delay, &crossfade_chunk);
+    crossfade_sample = find_chunk(fade_in_delay, &crossfade_chunk) / 2;
     logf("crossfade_start done!");
 }
 
@@ -1020,7 +1020,7 @@ void *pcmbuf_request_voice_buffer(int *count)
         else if (pcmbuf_usage() >= 10 && pcmbuf_mix_free() >= 30 &&
                  (mix_chunk || read_chunk->link))
         {
-            *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
+            *count = MIN(*count, AUX_BUFSIZE/4);
             return voicebuf;
         }
         else
@@ -1072,7 +1072,7 @@ void pcmbuf_write_voice_complete(int count)
             if (!mix_chunk)
                 return;
             pcmbuf_mix_sample = 0;
-            obuf = mix_chunk->addr;
+            obuf = (int16_t *)mix_chunk->addr;
             chunk_samples = mix_chunk->size / 2;
         }
         sample += obuf[pcmbuf_mix_sample] >> 2;
@@ -1088,7 +1088,7 @@ size_t pcmbuf_free(void)
 {
     if (read_chunk != NULL)
     {
-        void *read = read_chunk->addr;
+        void *read = (void *)read_chunk->addr;
         void *write = &pcmbuffer[pcmbuffer_pos + pcmbuffer_fillpos];
         if (read < write)
             return (size_t)(read - write) + pcmbuf_size;
