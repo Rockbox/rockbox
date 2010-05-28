@@ -250,10 +250,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Estàs Segur?"
+    *: "N'estàs segur?"
   </dest>
   <voice>
-    *: "Estàs Segur?"
+    *: "n'estàs segur?"
   </voice>
 </phrase>
 <phrase>
@@ -921,11 +921,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Activar EQ"
+    swcodec: "Activa EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Activar equalitzador"
+    swcodec: "Activa equalitzador"
   </voice>
 </phrase>
 <phrase>
@@ -1344,11 +1344,11 @@
   </source>
   <dest>
     *: none
-    masf: "Activar MDB"
+    masf: "Activa MDB"
   </dest>
   <voice>
     *: none
-    masf: "Activar MDB"
+    masf: "Activa MDB"
   </voice>
 </phrase>
 <phrase>
@@ -2614,10 +2614,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "Opcions del LCD"
+    *: "Opcions de la LCD"
   </dest>
   <voice>
-    *: "Opcions del LCD"
+    *: "Opcions de la LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2740,11 +2740,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Dormir (Després d'apagar llum)"
+    lcd_sleep: "Dormir (després d'apagar il·luminació)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Dormir després d'apagar llum"
+    lcd_sleep: "Dormir (després d'apagar la il·luminació)"
   </voice>
 </phrase>
 <phrase>
@@ -2809,7 +2809,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Mode LCD"
+    lcd_invert,remote_lcd_invert: "Mode de la LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2856,11 +2856,11 @@
   </source>
   <dest>
   *: none
-    lcd_bitmap: "Tipus de Selector de línia"
+    lcd_bitmap: "Tipus de selector de línia"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Tipus de Selector de línia"
+    lcd_bitmap: "Tipus de selector de línia"
   </voice>
 </phrase>
 <phrase>
@@ -3026,11 +3026,11 @@
   </source>
   <dest>
     *: none
-    remote: "Opcions de LCD remot"
+    remote: "Opcions de LCD remota"
     </dest>
   <voice>
     *: none
-    remote: "Opcions de LCD remot"
+    remote: "Opcions de LCD remota"
   </voice>
 </phrase>
 <phrase>
@@ -4065,11 +4065,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Posar Hora/Data"
+    rtc: "Posa Hora/Data"
   </dest>
   <voice>
     *: none
-    rtc: "Posar Hora/Data"
+    rtc: "Posa Hora/Data"
   </voice>
 </phrase>
 <phrase>
@@ -4774,10 +4774,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Si - Només recents"
+    *: "Sí - Només recents"
   </dest>
   <voice>
-    *: "Si - Només Recents"
+    *: "Sí - Només Recents"
   </voice>
 </phrase>
 <phrase>
@@ -4788,10 +4788,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Preguntar - Només Recents"
+    *: "Pregunta - Només Recents"
   </dest>
   <voice>
-    *: "Preguntar - Només Recents"
+    *: "Pregunta - Només Recents"
   </voice>
 </phrase>
 <phrase>
@@ -4802,10 +4802,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Carregar darrer punt de pàgina"
+    *: "Carrega darrer punt de pàgina"
   </dest>
   <voice>
-    *: "Carregar darrer punt de pàgina"
+    *: "Carrega darrer punt de pàgina"
   </voice>
 </phrase>
 <phrase>
@@ -4914,10 +4914,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Usar fitxers .talk dels directoris"
+    *: "Usa fitxers .talk dels directoris"
   </dest>
   <voice>
-    *: "Usar fitxers .talk dels directoris"
+    *: "Usa fitxers .talk dels directoris"
   </voice>
 </phrase>
 <phrase>
@@ -4942,10 +4942,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Usar fitxers .talk"
+    *: "Usa fitxers .talk"
   </dest>
   <voice>
-    *: "Usar fitxers .talk"
+    *: "Usa fitxers .talk"
   </voice>
 </phrase>
 <phrase>
@@ -4998,10 +4998,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Gestionar Opcions"
+    *: "Gestiona Opcions"
   </dest>
   <voice>
-    *: "Gestionar opcions"
+    *: "Gestiona opcions"
   </voice>
 </phrase>
 <phrase>
@@ -5040,10 +5040,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Reiniciar opcions"
+    *: "Reinicia opcions"
   </dest>
   <voice>
-    *: "Reiniciar opcions"
+    *: "Reinicia opcions"
   </voice>
 </phrase>
 <phrase>
@@ -5208,11 +5208,11 @@
   </source>
   <dest>
     *: none
-    radio: "Editar presintonía"
+    radio: "Edita presintonía"
   </dest>
   <voice>
     *: none
-    radio: "Editar presintonía"
+    radio: "Edita presintonía"
   </voice>
 </phrase>
 <phrase>
@@ -5225,11 +5225,11 @@
   </source>
   <dest>
     *: none
-    radio: "Eliminar Sintonia"
+    radio: "Eliminar sintonia"
   </dest>
   <voice>
     *: none
-    radio: "Eliminar Sintonia"
+    radio: "Eliminar sintonia"
   </voice>
 </phrase>
 <phrase>
@@ -5259,11 +5259,11 @@
   </source>
   <dest>
     *: none
-    radio: "Llista de Sintonies plena"
+    radio: "Llista de sintonies plena"
   </dest>
   <voice>
     *: none
-    radio: "Llista de Sintonies plena"
+    radio: "Llista de sintonies plena"
   </voice>
 </phrase>
 <phrase>
@@ -6692,7 +6692,7 @@
     *: "Pantalla de seguiment"
   </dest>
   <voice>
-    *: "Pantalla de Seguiment"
+    *: "Pantalla de seguiment"
   </voice>
 </phrase>
 <phrase>
@@ -8369,11 +8369,11 @@
   </source>
   <dest>
     *: none
-    archosondio*: "Siusplau, retireu la targeta MMC inserida"
+    archosondio*: "Siusplau, retira la targeta MMC inserida"
   </dest>
   <voice>
     *: none
-    archosondio*: "Siusplau, retireu la targeta MMC inserida"
+    archosondio*: "Siusplau, retira la targeta MMC inserida"
   </voice>
 </phrase>
 <phrase>
@@ -11130,7 +11130,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Comptador de Saturació"
+    recording: "Comptador de saturació"
   </voice>
 </phrase>
 <phrase>
@@ -11513,7 +11513,7 @@
     *: "Desa preferències de so"
   </dest>
   <voice>
-    *: "Desa Preferències de So"
+    *: "Desa Preferències de so"
   </voice>
 </phrase>
 <phrase>
@@ -13260,23 +13260,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *: none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *: none
-    radio_remote: "Ràdio FM remota"
-  </dest>
-  <voice>
-    *: none
-    radio_remote: "Ràdio FM remota"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -13658,5 +13641,39 @@
   </dest>
   <voice>
     *: "Sense etiquetar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Pantalla remota de ràdio"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Pantalla remota de ràdio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Pantalla de ràdio"
+  </dest>
+  <voice>
+    *: none
+    radio: "Pantalla de ràdio"
   </voice>
 </phrase>
