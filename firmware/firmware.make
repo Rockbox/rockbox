@@ -44,5 +44,8 @@ $(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(BUILDDIR)/sysfont.c $<
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$(BUILDDIR)/sysfont.c))$(CC) $(CFLAGS) -c $(BUILDDIR)/sysfont.c -o $@
 
-$(BUILDDIR)/version.c $(BUILDDIR)/version.h:
-	$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
+$(BUILDDIR)/version.c: $(BUILDDIR)/version.h
+	$(TOOLSDIR)/genversion.sh c $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
+
+$(BUILDDIR)/version.h:
+	$(TOOLSDIR)/genversion.sh h $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
