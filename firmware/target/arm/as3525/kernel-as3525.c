@@ -111,6 +111,7 @@ static inline void do_sw_pwm(void)
 {
     if (!timer2_pwm_on) {
         do_scrollwheel();  /* Handle scrollwheel and tick tasks */
+        return;
     }
 
     timer2_pwm_state ^= 1;
