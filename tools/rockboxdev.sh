@@ -194,8 +194,8 @@ case $arch in
   [Ee])
     target="arm-elf-eabi"
     gccpatch="rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff"
-    gccver="4.4.3"
-    # needed to build a bare-metal gcc-4.4.2
+    gccver="4.4.4"
+    # needed to build a bare-metal gcc-4.4.x
     gcctarget="all-gcc all-target-libgcc"
     gccinstalltarget="install-gcc install-target-libgcc"
     binutils="2.20.1"
