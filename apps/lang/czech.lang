@@ -623,10 +623,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Prázdná záložka"
+    *: "Prázdné záložky"
   </dest>
   <voice>
-    *: "Prázdná záložka"
+    *: "Prázdné záložky"
   </voice>
 </phrase>
 <phrase>
@@ -2087,10 +2087,10 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Poslední FM záznam"
+    *: "Logovací soubor pro Last.fm"
   </dest>
   <voice>
-    *: "Poslední EFEM záznam"
+    *: "Logovací soubor pro Last tečka efem"
   </voice>
 </phrase>
 <phrase>
@@ -7032,10 +7032,10 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Nejdelší doba"
+    *: "Nejdelší doba běhu"
   </dest>
   <voice>
-    *: "Nejdelší doba"
+    *: "Nejdelší doba běhu"
   </voice>
 </phrase>
 <phrase>
@@ -7940,7 +7940,7 @@
     *: "Otevřít v..."
   </dest>
   <voice>
-    *: "Otevřít v"
+    *: "Otevřít ve"
   </voice>
 </phrase>
 <phrase>
@@ -7968,7 +7968,7 @@
     *: "Vlastnosti"
   </dest>
   <voice>
-    *: "Vlastnosti"
+    *: "Vlastnosti, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -13254,15 +13254,15 @@
   desc: in the main menu
   user: core
   <source>
-    *: none
+    *:none
     remote: "Main Screen"
   </source>
   <dest>
-    *: none
+    *:none
     remote: "Hlavní displej"
   </dest>
   <voice>
-    *: none
+    *:none
     remote: "Hlavní dysplej"
   </voice>
 </phrase>
@@ -13271,15 +13271,15 @@
   desc: in the main menu
   user: core
   <source>
-    *: none
+    *:none
     remote: "Remote Screen"
   </source>
   <dest>
-    *: none
+    *:none
     remote: "Dálkový displej"
   </dest>
   <voice>
-    *: none
+    *:none
     remote: "Dálkový dysplej"
   </voice>
 </phrase>
@@ -13454,20 +13454,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
     *:none
-    radio_remote: "Dálkové FM rádio"
+    radio_remote: "Obrazovka dálkové rádia"
   </dest>
   <voice>
     *:none
-    radio_remote: "Dálkové EFEM rádio"
+    radio_remote: "Obrazovka dálkové rádia"
   </voice>
 </phrase>
 <phrase>
@@ -13669,5 +13669,22 @@
   </dest>
   <voice>
     *: "Bez popisu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Obrazovka rádia"
+  </dest>
+  <voice>
+    *:none
+    radio: "Obrazovka rádia"
   </voice>
 </phrase>
