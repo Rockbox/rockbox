@@ -85,10 +85,10 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("xl"))
     {
-        /* THIS IS BLOODY WRONG! */
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 4, false);
-        start += len+1;
+        int read = 1+dump_arg(out, start+1, 4, false);
+        len += read;
+        start += read;
         if (*start>= '0' && *start <= '9')
         {
             PUTCH(out, ',');
