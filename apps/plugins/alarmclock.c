@@ -125,7 +125,7 @@ enum plugin_status plugin_start(const void* parameter)
     while(!quit) {
         button = get_button();
 
-        if (button == PLA_EXIT || PLA_CANCEL)
+        if (button == PLA_EXIT || button == PLA_CANCEL)
             quit = true;
 
         FOR_NB_SCREENS(i) {
@@ -141,11 +141,18 @@ enum plugin_status plugin_start(const void* parameter)
             switch (button) {
                 case PLA_UP:
                 case PLA_UP_REPEAT:
+#ifdef HAVE_SCROLLWHEEL
+                case PLA_SCROLL_FWD:
+                case PLA_SCROLL_FWD_REPEAT:
+#endif
                     alarm[current] = (alarm[current] + 1) % maxval[current];
                     break;
-
                 case PLA_DOWN:
                 case PLA_DOWN_REPEAT:
+#ifdef HAVE_SCROLLWHEEL
+                case PLA_SCROLL_BACK:
+                case PLA_SCROLL_BACK_REPEAT:
+#endif
                     alarm[current] = (alarm[current] + maxval[current] - 1)
                         % maxval[current];
                     break;
