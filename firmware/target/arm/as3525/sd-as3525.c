@@ -819,11 +819,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                                   transfer_error[drive], drive);
     }
 
-    /* be sure the card has finished programming */
-    ret = sd_wait_for_tran_state(drive);
-    if (ret < 0)
-        ret -= 5*20;
-
 sd_transfer_error:
 
     dma_release();
