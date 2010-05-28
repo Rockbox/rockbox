@@ -31,7 +31,7 @@ struct tag_info legal_tags[] =
     { "aL", "" },
     { "ar", "" },
     { "aR", "" },
-    { "aX", "" },
+    { "ax", "" },
     
     { "bl" , "*fIIII" },
     { "bv", "" },

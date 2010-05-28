@@ -6,6 +6,14 @@
 
 #define PUTCH(out, c) fprintf(out, "%c", c)
 extern struct tag_info legal_tags[];
+
+
+/** Command line setting **/
+bool is_mono_display = false;
+
+
+
+
 /* dump "count" args to output replacing '|' with ',' except after the last count.
  * return the amount of chars read. (start+return will be after the last | )
  */
@@ -30,8 +38,9 @@ int dump_arg(FILE* out, const char* start, int count, bool close)
     }
     return l;
 }
+
 #define MATCH(s) (!strcmp(tag->name, s))
-int parse_tag(FILE* out, const char* start)
+int parse_tag(FILE* out, const char* start, bool in_conditional)
 {
     struct tag_info *tag;
     int len = 0;
@@ -49,11 +58,11 @@ int parse_tag(FILE* out, const char* start)
     len += strlen(tag->name);
     start += len;
     /* handle individual tags which accept params */
-    if (MATCH("bl") || MATCH("pb") || MATCH("pv"))
+    if ((MATCH("bl") || MATCH("pb") || MATCH("pv")) && !in_conditional)
     {
-        start++; len++;
         if (*start == '|')
         {
+            len++; start++;
             PUTCH(out, '(');
             /* TODO: need to verify that we are actually using the long form... */
             len += dump_arg(out, start, 5, true);
@@ -76,8 +85,16 @@ int parse_tag(FILE* out, const char* start)
     }
     else if (MATCH("xl"))
     {
+        /* THIS IS BLOODY WRONG! */
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 5, true);
+        len += 1+dump_arg(out, start+1, 4, false);
+        start += len+1;
+        if (*start>= '0' && *start <= '9')
+        {
+            PUTCH(out, ',');
+            len += dump_arg(out, start, 1, false);
+        }
+        PUTCH(out, ')');
     }
     else if (MATCH("xd"))
     {
@@ -86,7 +103,9 @@ int parse_tag(FILE* out, const char* start)
         PUTCH(out, *start++); len++;
         if ((*start >= 'a' && *start <= 'z') ||
             (*start >= 'A' && *start <= 'Z'))
-        PUTCH(out, *start); len++;
+        {
+            PUTCH(out, *start); len++;
+        }
         PUTCH(out, ')');
     }
     else if (MATCH("x"))
@@ -119,12 +138,12 @@ int parse_tag(FILE* out, const char* start)
     else if (MATCH("Vl") || MATCH("Vi"))
     {
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 8, true);
+        len += 1+dump_arg(out, start+1, is_mono_display?6:8, true);
     }
     else if (MATCH("V"))
     {
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 7, true);
+        len += 1+dump_arg(out, start+1, is_mono_display?5:7, true);
     }
     else if (MATCH("X"))
     {
@@ -156,6 +175,8 @@ int parse_tag(FILE* out, const char* start)
 void parse_text(const char* in, FILE* out)
 {
     const char* end = in+strlen(in);
+    int level = 0;
+    int len;
 top:
     while (in < end && *in)
     {
@@ -178,7 +199,25 @@ top:
                     PUTCH(out, *in++);
                     break;
             }
-            in += parse_tag(out, in);
+            len = parse_tag(out, in, level>0);
+            if (len < 0)
+            {
+                PUTCH(out, *in++);
+            }
+            else
+            {
+                in += len;
+            }
+        }
+        else if (*in == '<')
+        {
+            level++;
+            PUTCH(out, *in++);
+        }
+        else if (*in == '>')
+        {
+            level--;
+            PUTCH(out, *in++);
         }
         else if (*in == '#')
         {
@@ -198,28 +237,57 @@ int main(int argc, char* argv[])
 {
     char buffer[10*1024], temp[512];
     FILE *in, *out = stdout;
+    int filearg = 1, i=0;
     if( (argc < 2) ||
         strcmp(argv[1],"-h") == 0 ||
         strcmp(argv[1],"--help") == 0 )
     {
-        printf("Usage: %s infile [outfile]\n", argv[0]);
+        printf("Usage: %s [OPTIONS] infile [outfile]\n", argv[0]);
+        printf("\nOPTIONS:\n");
+        printf("\t-m\tSkin is for a mono display (different viewport tags)\n");
         return 0;
     }
-    in = fopen(argv[1], "r");
+    
+    while ((argc > filearg) && argv[filearg][0] == '-')
+    {
+        i=1;
+        while (argv[filearg][i])
+        {
+            switch(argv[filearg][i])
+            {
+                case 'm': /* skin is for a mono display */
+                    is_mono_display = true;
+                    break;
+            }
+            i++;
+        }
+        filearg++;
+    }
+    if (argc == filearg)
+    {
+        printf("Missing input filename\n");
+        return 1;
+    }
+    
+    in = fopen(argv[filearg], "r");
     if (!in)
         return 1;
     while (fgets(temp, 512, in))
         strcat(buffer, temp);
+    fclose(in);
+    filearg++;
     
-    if (argc == 3)
+    if (argc > filearg)
     {
-        out = fopen(argv[2], "w");
+        out = fopen(argv[filearg], "w");
         if (!out)
+        {
+            printf("Couldn't open %s\n", argv[filearg]);
             return 1;
+        }
     }        
     
     parse_text(buffer, out);
-    fclose(in);
     if (out != stdout)
         fclose(out);
     return 0;
