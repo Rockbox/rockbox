@@ -262,8 +262,11 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    /* TODO: Implement lcd_set_invert_display() */
+#ifdef HAVE_LCD_INVERT
+    lcd_send_command(R_SPEC_DISPLAY_PATTERN, yesno ? 1 : 0);
+#else
     (void)yesno;
+#endif
 }
 
 #if defined(HAVE_LCD_ENABLE)

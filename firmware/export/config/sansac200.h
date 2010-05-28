@@ -65,7 +65,7 @@
 #define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
-/* TODO: #define HAVE_LCD_INVERT */
+#define HAVE_LCD_INVERT
 
 /* Define this if your LCD can set contrast */
 #define HAVE_LCD_CONTRAST
