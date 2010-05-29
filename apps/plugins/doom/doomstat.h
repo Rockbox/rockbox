@@ -59,7 +59,7 @@ enum {
    am_follow = 8,  // keep the player centred
    am_grid   =16,  // show grid
 };
-typedef int automapmode_e;
+typedef unsigned automapmode_e;
 extern automapmode_e automapmode; // Mode that the automap is in
 
 // -----------------------------------------------------

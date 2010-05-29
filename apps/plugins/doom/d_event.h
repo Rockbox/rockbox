@@ -49,7 +49,7 @@ enum
    ev_mouse,
    ev_joystick
 };
-typedef int evtype_t;
+typedef unsigned evtype_t;
 
 // Event structure.
 typedef struct
