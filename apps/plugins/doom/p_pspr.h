@@ -65,12 +65,13 @@
  * coordinates are given for a 320*200 view screen.
  */
 
-typedef enum
+enum
 {
    ps_weapon,
    ps_flash,
    NUMPSPRITES
-} psprnum_t;
+};
+typedef unsigned psprnum_t;
 
 typedef struct
 {

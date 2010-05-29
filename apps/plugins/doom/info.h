@@ -41,7 +41,7 @@
 /********************************************************************
  * Sprite name enumeration - must match info.c                      *
  ********************************************************************/
-typedef enum
+enum
 {
    SPR_TROO,
    SPR_SHTG,
@@ -188,13 +188,14 @@ typedef enum
 #endif
    NUMSPRITES
 
-} spritenum_t;
+};
+typedef unsigned spritenum_t;
 
 /********************************************************************
  * States (frames) enumeration -- must match info.c                 *
  ********************************************************************/
 
-typedef enum
+enum
 {
    S_NULL,
    S_LIGHTDONE,
@@ -1204,7 +1205,8 @@ typedef enum
 
    NUMSTATES  /* Counter of how many there are */
 
-} statenum_t;
+};
+typedef unsigned statenum_t;
 
 /********************************************************************
  * Definition of the state (frames) structure                       *
@@ -1230,7 +1232,7 @@ extern const char *sprnames[NUMSPRITES+1]; /* 1/17/98 killough - CPhipps - const
  * Note that many of these are generically named for the ornamentals
  */
 
-typedef enum {
+enum {
    MT_PLAYER,
    MT_POSSESSED,
    MT_SHOTGUY,
@@ -1391,7 +1393,8 @@ typedef enum {
    MT_STEALTHZOMBIE,
    NUMMOBJTYPES
 
-} mobjtype_t;
+};
+typedef unsigned mobjtype_t;
 
 /********************************************************************
  * Definition of the Thing structure

@@ -33,18 +33,9 @@
 #define __DOOMTYPE__
 #include "rockmacros.h"
 
-#ifndef __BYTEBOOL__
-#define __BYTEBOOL__
 // Fixed to use builtin bool type with C++.
-#ifdef __cplusplus
-typedef bool boolean;
-#else
-//typedef enum {false, true} boolean;
-//#define boolean bool
-typedef enum _boolean { FALSE, TRUE } boolean;
-#endif
+typedef unsigned int boolean;
 typedef unsigned char byte;
-#endif
 
 typedef signed long long int_64_t;
 typedef unsigned long long uint_64_t;
@@ -63,7 +54,7 @@ typedef unsigned long long uint_64_t;
 #define MINLONG  ((long)0x80000000)
 
 /* cph - move compatibility levels here so we can use them in d_server.c */
-typedef enum {
+enum {
    doom_12_compatibility, /* Behave like early doom versions */
    doom_demo_compatibility, /* As compatible as possible for
            * playing original Doom demos */
@@ -80,6 +71,7 @@ typedef enum {
    /* Aliases follow */
    boom_compatibility = boom_201_compatibility, /* Alias used by G_Compatibility */
    best_compatibility = prboom_3_compatibility,
-} complevel_t;
+};
+typedef unsigned complevel_t;
 
 #endif

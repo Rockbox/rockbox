@@ -194,7 +194,7 @@ int ddt_cheating = 0;         // killough 2/7/98: make global, rename to ddt_*
 
 static int leveljuststarted = 1;       // kluge until AM_LevelInit() is called
 
-enum automapmode_e automapmode; // Mode that the automap is in
+automapmode_e automapmode; // Mode that the automap is in
 
 // location of window on screen
 static int  f_x;

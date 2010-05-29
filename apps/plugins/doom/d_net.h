@@ -58,12 +58,12 @@
 // Networking and tick handling related.
 #define BACKUPTICS              12
 
-typedef enum
+enum
 {
    CMD_SEND    = 1,
    CMD_GET     = 2
-
-} command_t;
+};
+typedef unsigned command_t;
 
 
 //
@@ -125,11 +125,12 @@ typedef struct
    char filler[sizeof(ticcmd_t)*BACKUPTICS-STARTUPLEN];
 } startup_t;
 
-typedef enum {
+enum {
    // Leave space, so low values corresponding to normal netgame setup packets can be ignored
    nm_plcolour = 3,
    nm_savegamename = 4,
-} netmisctype_t;
+};
+typedef unsigned netmisctype_t;
 
 typedef struct
 {

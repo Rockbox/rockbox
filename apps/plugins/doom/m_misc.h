@@ -61,6 +61,17 @@ struct default_s *M_LookupDefault(const char *name);     /* killough 11/98 */
 
 // CPhipps - struct to hold a value in a config file
 // Cannot be a union, as it must be initialised
+enum {
+  def_none, // Dummy entry
+  def_str,  // A string
+  def_int,  // Integer
+  def_hex,  // Integer (write in hex)
+  def_bool = def_int,  // Boolean
+  def_key = def_hex,   // Key code (byte)
+  def_mouseb = def_int,// Mouse button
+  def_colour = def_hex // Colour (256 colour palette entry)
+}; /* type */
+
 typedef struct default_s
 {
    const char* name;
@@ -84,16 +95,7 @@ typedef struct default_s
    // Limits (for an int)
    int   minvalue;         // jff 3/3/98 minimum allowed value
    int   maxvalue;         // jff 3/3/98 maximum allowed value
-   enum {
-      def_none, // Dummy entry
-      def_str,  // A string
-      def_int,  // Integer
-      def_hex,  // Integer (write in hex)
-      def_bool = def_int,  // Boolean
-      def_key = def_hex,   // Key code (byte)
-      def_mouseb = def_int,// Mouse button
-      def_colour = def_hex // Colour (256 colour palette entry)
-   } type; // CPhipps - type of entry
+   unsigned type; // CPhipps - type of entry
    int   setupscreen;      // phares 4/19/98: setup screen where this appears
    int  *current;          /* cph - MBF-like pointer to current value */
    // cph - removed the help strings from the config file

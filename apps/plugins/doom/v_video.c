@@ -208,7 +208,7 @@ void V_MarkRect(int x, int y, int width, int height)
 //
 void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
                 int height, int destx, int desty, int destscrn,
-                enum patch_translation_e flags)
+                patch_translation_e flags)
 {
    byte *src;
    byte *dest;
@@ -263,7 +263,7 @@ void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
 //  implemented, to support highres in the menus
 //
 void V_DrawBlock(int x, int y, int scrn, int width, int height,
-                 const byte *src, enum patch_translation_e flags)
+                 const byte *src, patch_translation_e flags)
 {
    byte *dest;
 
@@ -406,7 +406,7 @@ void V_Init (void)
 //  means that their inner loops weren't so well optimised, so merging code may even speed them).
 //
 void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
-                    int cm, enum patch_translation_e flags)
+                    int cm, patch_translation_e flags)
 {
    const byte *trans;
 
@@ -588,7 +588,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
 inline
 #endif
 void V_DrawNumPatch(int x, int y, int scrn, int lump,
-                    int cm, enum patch_translation_e flags)
+                    int cm, patch_translation_e flags)
 {
    V_DrawMemPatch(x, y, scrn, (const patch_t*)W_CacheLumpNum(lump),
                   cm, flags);
@@ -634,7 +634,7 @@ int V_NamePatchHeight(const char* name)
 // patch will be undefined (in fact black for now)
 
 byte *V_PatchToBlock(const char* name, int cm,
-                     enum patch_translation_e flags,
+                     patch_translation_e flags,
                      unsigned short* width, unsigned short* height)
 {
    (void)cm;

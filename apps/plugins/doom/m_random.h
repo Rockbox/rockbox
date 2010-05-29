@@ -57,7 +57,7 @@
 // indicated by the #'s, because they're critical for preserving demo
 // sync. Do not remove entries simply because they become unused later.
 
-typedef enum {
+enum {
    pr_skullfly,                // #1
    pr_damage,                  // #2
    pr_crush,                   // #3
@@ -124,7 +124,8 @@ typedef enum {
 
    // End of new entries
    NUMPRCLASS               // MUST be last item in list
-} pr_class_t;
+};
+typedef unsigned pr_class_t;
 
 // The random number generator's state.
 typedef struct {

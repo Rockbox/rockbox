@@ -193,7 +193,7 @@
 
 // define names for the TriggerType field of the general linedefs
 
-typedef enum
+enum
 {
    WalkOnce,
    WalkMany,
@@ -203,21 +203,23 @@ typedef enum
    GunMany,
    PushOnce,
    PushMany,
-} triggertype_e;
+};
+typedef unsigned triggertype_e;
 
 // define names for the Speed field of the general linedefs
 
-typedef enum
+enum
 {
    SpeedSlow,
    SpeedNormal,
    SpeedFast,
    SpeedTurbo,
-} motionspeed_e;
+};
+typedef unsigned motionspeed_e;
 
 // define names for the Target field of the general floor
 
-typedef enum
+enum
 {
    FtoHnF,
    FtoLnF,
@@ -227,29 +229,32 @@ typedef enum
    FbyST,
    Fby24,
    Fby32,
-} floortarget_e;
+};
+typedef unsigned floortarget_e;
 
 // define names for the Changer Type field of the general floor
 
-typedef enum
+enum
 {
    FNoChg,
    FChgZero,
    FChgTxt,
    FChgTyp,
-} floorchange_e;
+};
+typedef unsigned floorchange_e;
 
 // define names for the Change Model field of the general floor
 
-typedef enum
+enum
 {
    FTriggerModel,
    FNumericModel,
-} floormodel_t;
+};
+typedef unsigned floormodel_t;
 
 // define names for the Target field of the general ceiling
 
-typedef enum
+enum
 {
    CtoHnC,
    CtoLnC,
@@ -259,49 +264,54 @@ typedef enum
    CbyST,
    Cby24,
    Cby32,
-} ceilingtarget_e;
+};
+typedef unsigned ceilingtarget_e;
 
 // define names for the Changer Type field of the general ceiling
 
-typedef enum
+enum
 {
    CNoChg,
    CChgZero,
    CChgTxt,
    CChgTyp,
-} ceilingchange_e;
+};
+typedef unsigned ceilingchange_e;
 
 // define names for the Change Model field of the general ceiling
 
-typedef enum
+enum
 {
    CTriggerModel,
    CNumericModel,
-} ceilingmodel_t;
+};
+typedef unsigned ceilingmodel_t;
 
 // define names for the Target field of the general lift
 
-typedef enum
+enum
 {
    F2LnF,
    F2NnF,
    F2LnC,
    LnF2HnF,
-} lifttarget_e;
+};
+typedef unsigned lifttarget_e;
 
 // define names for the door Kind field of the general ceiling
 
-typedef enum
+enum
 {
    OdCDoor,
    ODoor,
    CdODoor,
    CDoor,
-} doorkind_e;
+};
+typedef unsigned intdoorkind_e;
 
 // define names for the locked door Kind field of the general ceiling
 
-typedef enum
+enum
 {
    AnyKey,
    RCard,
@@ -311,7 +321,8 @@ typedef enum
    BSkull,
    YSkull,
    AllKeys,
-} keykind_e;
+};
+typedef unsigned keykind_e;
 
 //////////////////////////////////////////////////////////////////
 //
@@ -321,31 +332,34 @@ typedef enum
 
 //jff 2/23/98 identify the special classes that can share sectors
 
-typedef enum
+enum
 {
    floor_special,
    ceiling_special,
    lighting_special,
-} special_e;
+};
+typedef unsigned special_e;
 
 //jff 3/15/98 pure texture/type change for better generalized support
-typedef enum
+enum
 {
    trigChangeOnly,
    numChangeOnly,
-} change_e;
+};
+typedef unsigned change_e;
 
 // p_plats
 
-typedef enum
+enum
 {
    up,
    down,
    waiting,
    in_stasis
-} plat_e;
+};
+typedef unsigned plat_e;
 
-typedef enum
+enum
 {
    perpetualRaise,
    downWaitUpStay,
@@ -356,11 +370,12 @@ typedef enum
    genPerpetual,
    toggleUpDn,   //jff 3/14/98 added to support instant toggle type
 
-} plattype_e;
+};
+typedef unsigned plattype_e;
 
 // p_doors
 
-typedef enum
+enum
 {
    normal,
    close30ThenOpen,
@@ -380,11 +395,12 @@ typedef enum
    genBlazeClose,
    genCdO,
    genBlazeCdO,
-} vldoor_e;
+};
+typedef unsigned vldoor_e;
 
 // p_ceilng
 
-typedef enum
+enum
 {
    lowerToFloor,
    raiseToHighest,
@@ -405,11 +421,12 @@ typedef enum
    genCrusher,
    genSilentCrusher,
 
-} ceiling_e;
+};
+typedef unsigned ceiling_e;
 
 // p_floor
 
-typedef enum
+enum
 {
    // lower floor to highest surrounding floor
    lowerFloor,
@@ -464,21 +481,24 @@ typedef enum
    //new types for stair builders
    buildStair,
    genBuildStair,
-} floor_e;
+};
+typedef unsigned floor_e;
 
-typedef enum
+enum
 {
    build8, // slowly build by 8
    turbo16 // quickly build by 16
 
-} stair_e;
+};
+typedef unsigned stair_e;
 
-typedef enum
+enum
 {
    elevateUp,
    elevateDown,
    elevateCurrent,
-} elevator_e;
+};
+typedef unsigned elevator_e;
 
 //////////////////////////////////////////////////////////////////
 //
@@ -487,21 +507,23 @@ typedef enum
 //////////////////////////////////////////////////////////////////
 
 // texture type enum
-typedef enum
+enum
 {
    top,
    middle,
    bottom
 
-} bwhere_e;
+};
+typedef unsigned bwhere_e;
 
 // crush check returns
-typedef enum
+enum
 {
    ok,
    crushed,
    pastdest
-} result_e;
+};
+typedef unsigned result_e;
 
 //////////////////////////////////////////////////////////////////
 //
@@ -700,6 +722,14 @@ typedef struct
 // p_spec
 
 // killough 3/7/98: Add generalized scroll effects
+enum
+{
+  sc_side,
+  sc_floor,
+  sc_ceiling,
+  sc_carry,
+  sc_carry_ceiling,  // killough 4/11/98: carry objects hanging on ceilings
+}; /* type */
 
 typedef struct {
    thinker_t thinker;   // Thinker structure for scrolling
@@ -709,14 +739,7 @@ typedef struct {
    fixed_t last_height; // Last known height of control sector
    fixed_t vdx, vdy;    // Accumulated velocity if accelerative
    int accel;           // Whether it's accelerative
-   enum
-   {
-      sc_side,
-      sc_floor,
-      sc_ceiling,
-      sc_carry,
-      sc_carry_ceiling,  // killough 4/11/98: carry objects hanging on ceilings
-   } type;              // Type of scroll effect
+   unsigned type;       // Type of scroll effect
 } scroll_t;
 
 // phares 3/12/98: added new model of friction for ice/sludge effects
@@ -730,15 +753,17 @@ typedef struct {
 
 // phares 3/20/98: added new model of Pushers for push/pull effects
 
+enum
+{
+  p_push,
+  p_pull,
+  p_wind,
+  p_current,
+}; /* type */
+
 typedef struct {
    thinker_t thinker;   // Thinker structure for Pusher
-   enum
-   {
-      p_push,
-      p_pull,
-      p_wind,
-      p_current,
-   } type;
+   unsigned type;
    mobj_t* source;      // Point source if point pusher
    int x_mag;           // X Strength
    int y_mag;           // Y Strength

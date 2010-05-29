@@ -246,7 +246,8 @@ enum
    readthis,
    quitdoom,
    main_end
-} main_e;
+};
+unsigned main_e;
 
 menuitem_t MainMenu[]=
    {
@@ -280,7 +281,8 @@ enum
    ep3,
    ep4,
    ep_end
-} episodes_e;
+};
+unsigned episodes_e;
 
 menuitem_t EpisodeMenu[]=
    {
@@ -311,7 +313,8 @@ enum
    violence,
    nightmare,
    newg_end
-} newgame_e;
+};
+unsigned newgame_e;
 
 menuitem_t NewGameMenu[]=
    {
@@ -347,7 +350,8 @@ enum
    option_empty2,
    soundvol,
    opt_end
-} options_e;
+};
+unsigned options_e;
 
 menuitem_t OptionsMenu[]=
    {
@@ -377,7 +381,8 @@ enum
 {
    rdthsempty1,
    read1_end
-} read_e;
+};
+unsigned read_e;
 
 menuitem_t ReadMenu1[] =
    {
@@ -398,7 +403,8 @@ enum
 {
    rdthsempty2,
    read2_end
-} read_e2;
+};
+unsigned read_e2;
 
 menuitem_t ReadMenu2[]=
    {
@@ -427,7 +433,8 @@ enum
    system_vol,
    sfx_empty3,
    sound_end
-} sound_e;
+};
+unsigned sound_e;
 
 menuitem_t SoundMenu[]=
    {
@@ -461,7 +468,8 @@ enum
    load5,
    load6,
    load_end
-} load_e;
+};
+unsigned load_e;
 
 menuitem_t LoadMenu[]=
    {

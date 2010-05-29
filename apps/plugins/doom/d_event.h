@@ -42,13 +42,14 @@
 //
 
 // Input event types.
-typedef enum
+enum
 {
    ev_keydown,
    ev_keyup,
    ev_mouse,
    ev_joystick
-} evtype_t;
+};
+typedef int evtype_t;
 
 // Event structure.
 typedef struct
@@ -60,7 +61,7 @@ typedef struct
 } event_t;
 
 
-typedef enum
+enum
 {
    ga_nothing,
    ga_loadlevel,
@@ -71,14 +72,15 @@ typedef enum
    ga_completed,
    ga_victory,
    ga_worlddone,
-} gameaction_t;
+};
+typedef unsigned gameaction_t;
 
 
 
 //
 // Button/action code definitions.
 //
-typedef enum
+enum
 {
    // Press "Fire".
    BT_ATTACK       = 1,
@@ -111,7 +113,8 @@ typedef enum
    BTS_SAVEMASK    = (4+8+16),
    BTS_SAVESHIFT   = 2,
 
-} buttoncode_t;
+};
+typedef unsigned buttoncode_t;
 
 
 //

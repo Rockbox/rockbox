@@ -50,7 +50,7 @@
 
 static mobj_t *current_actor;
 
-typedef enum {
+enum {
    DI_EAST,
    DI_NORTHEAST,
    DI_NORTH,
@@ -61,7 +61,8 @@ typedef enum {
    DI_SOUTHEAST,
    DI_NODIR,
    NUMDIRS
-} dirtype_t;
+};
+typedef unsigned dirtype_t;
 
 void A_Fall(mobj_t *actor);
 void A_FaceTarget(mobj_t *actor);

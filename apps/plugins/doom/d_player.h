@@ -58,7 +58,7 @@
 //
 // Player states.
 //
-typedef enum
+enum
 {
    // Playing or camping.
    PST_LIVE,
@@ -67,13 +67,14 @@ typedef enum
    // Ready to restart/respawn???
    PST_REBORN
 
-} playerstate_t;
+};
+typedef unsigned playerstate_t;
 
 
 //
 // Player internal flags, for cheats and debug.
 //
-typedef enum
+enum
 {
    // No clipping, walk through barriers.
    CF_NOCLIP           = 1,
@@ -82,7 +83,8 @@ typedef enum
    // Not really a cheat, just a debug aid.
    CF_NOMOMENTUM       = 4
 
-} cheat_t;
+};
+typedef unsigned cheat_t;
 
 
 //

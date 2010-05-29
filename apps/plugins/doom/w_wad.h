@@ -73,7 +73,7 @@ typedef struct
 
 // CPhipps - defined enum in wider scope
 // Ty 08/29/98 - add source field to identify where this lump came from
-typedef enum {
+enum {
    // CPhipps - define elements in order of 'how new/unusual'
    source_iwad=0,    // iwad file load
    source_pre,       // predefined lump
@@ -81,7 +81,15 @@ typedef enum {
    source_pwad,      // pwad file load
    source_lmp,       // lmp file load
    source_net        // CPhipps
-} wad_source_t;
+};
+typedef unsigned wad_source_t;
+
+enum {
+  ns_global=0,
+  ns_sprites,
+  ns_flats,
+  ns_colormaps
+}; /* namespace */
 
 typedef struct
 {
@@ -97,12 +105,7 @@ typedef struct
    int index, next;
 
    // killough 4/17/98: namespace tags, to prevent conflicts between resources
-   enum {
-      ns_global=0,
-      ns_sprites,
-      ns_flats,
-      ns_colormaps
-   } namespace;
+   unsigned namespace;
 
    int handle;
    int position;

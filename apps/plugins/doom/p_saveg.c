@@ -248,10 +248,11 @@ void P_UnArchiveWorld (void)
 // Thinkers
 //
 
-typedef enum {
+enum {
    tc_end,
    tc_mobj
-} thinkerclass_t;
+};
+typedef unsigned thinkerclass_t;
 
 // phares 9/13/98: Moved this code outside of P_ArchiveThinkers so the
 // thinker indices could be used by the code that saves sector info.
@@ -527,7 +528,8 @@ enum {
    tc_pusher,      // phares 3/22/98:  new push/pull effect thinker
    tc_flicker,     // killough 10/4/98
    tc_endspecials
-} specials_e;
+};
+unsigned specials_e;
 
 //
 // Things to handle:

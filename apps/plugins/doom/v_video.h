@@ -53,7 +53,7 @@
 extern const byte *colrngs[];
 
 // symbolic indices into color translation table pointer array
-typedef enum
+enum
 {
    CR_BRICK,   //0
    CR_TAN,     //1
@@ -67,7 +67,8 @@ typedef enum
    CR_YELLOW,  //9
    CR_BLUE2,   //10 // proff
    CR_LIMIT    //11 //jff 2/27/98 added for range check
-} crange_idx_e;
+};
+typedef unsigned crange_idx_e;
 //jff 1/16/98 end palette color range additions
 
 #define CR_DEFAULT CR_RED   /* default value for out of range colors */
@@ -83,17 +84,18 @@ void V_InitColorTranslation(void);
 // Allocates buffer screens, call before R_Init.
 void V_Init (void);
 
-enum patch_translation_e {
+enum {
    VPT_NONE    = 0, // Normal
    VPT_FLIP    = 1, // Flip image horizontally
    VPT_TRANS   = 2, // Translate image via a translation table
    VPT_STRETCH = 4, // Stretch to compensate for high-res
 };
+typedef unsigned patch_translation_e;
 
 #ifndef GL_DOOM
 void V_CopyRect(int srcx,  int srcy,  int srcscrn, int width, int height,
                 int destx, int desty, int destscrn,
-                enum patch_translation_e flags);
+                patch_translation_e flags);
 #else
 #define V_CopyRect(sx,sy,ss,w,h,dx,dy,ds,f)
 #endif /* GL_DOOM */
@@ -111,14 +113,14 @@ void V_FillRect(int scrn, int x, int y, int width, int height, byte colour);
 #define V_DrawMemPatch(x,y,s,p,t,f) gld_DrawPatchFromMem(x,y,p,t,f)
 #else
 void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
-                    int cm, enum patch_translation_e flags);
+                    int cm, patch_translation_e flags);
 #endif
 // V_DrawNumPatch - Draws the patch from lump num
 #ifdef GL_DOOM
 #define V_DrawNumPatch(x,y,s,l,t,f) gld_DrawNumPatch(x,y,l,t,f)
 #else
 void V_DrawNumPatch(int x, int y, int scrn, int lump,
-                    int cm, enum patch_translation_e flags);
+                    int cm, patch_translation_e flags);
 #endif
 // V_DrawNamePatch - Draws the patch from lump "name"
 #ifdef GL_DOOM
@@ -140,7 +142,7 @@ int V_NamePatchHeight(const char* name);
 // CPhipps - added const's, patch translation flags for stretching
 #ifndef GL_DOOM
 void V_DrawBlock(int x, int y, int scrn, int width, int height,
-                 const byte *src, enum patch_translation_e flags);
+                 const byte *src, patch_translation_e flags);
 #endif
 
 /* cphipps 10/99: function to tile a flat over the screen */
@@ -160,7 +162,7 @@ void V_MarkRect(int x, int y, int width,int height);
 // CPhipps - function to convert a patch_t into a simple block bitmap
 // Returns pointer to the malloc()'ed bitmap, and its width and height
 byte *V_PatchToBlock(const char* name, int cm,
-                     enum patch_translation_e flags,
+                     patch_translation_e flags,
                      unsigned short* width, unsigned short* height);
 #else
 #define V_MarkRect(x,y,w,h)

@@ -177,13 +177,22 @@ side_t;
 //
 // Move clipping aid for LineDefs.
 //
-typedef enum
+enum
 {
    ST_HORIZONTAL,
    ST_VERTICAL,
    ST_POSITIVE,
    ST_NEGATIVE
-} slopetype_t;
+};
+typedef int slopetype_t;
+
+enum {                 // cph:
+  RF_TOP_TILE  = 1,     // Upper texture needs tiling
+  RF_MID_TILE = 2,     // Mid texture needs tiling
+  RF_BOT_TILE = 4,     // Lower texture needs tiling
+  RF_IGNORE   = 8,     // Renderer can skip this line
+  RF_CLOSED   =16,     // Line blocks view
+};
 
 typedef struct line_s
 {
@@ -202,13 +211,7 @@ typedef struct line_s
    int tranlump;          // killough 4/11/98: translucency filter, -1 == none
    int firsttag,nexttag;  // killough 4/17/98: improves searches for tags.
    int r_validcount;      // cph: if == gametic, r_flags already done
-   enum {                 // cph:
-      RF_TOP_TILE  = 1,     // Upper texture needs tiling
-      RF_MID_TILE = 2,     // Mid texture needs tiling
-      RF_BOT_TILE = 4,     // Lower texture needs tiling
-      RF_IGNORE   = 8,     // Renderer can skip this line
-      RF_CLOSED   =16,     // Line blocks view
-   } r_flags;
+   int r_flags;
 }
 line_t;
 

@@ -52,14 +52,15 @@ extern  boolean fastparm; // checkparm of -fast
 
 extern  boolean devparm; // DEBUG: launched with -devparm
 
-enum automapmode_e {
+enum {
    am_active = 1,  // currently shown
    am_overlay= 2,  // covers the screen, i.e. not overlay mode
    am_rotate = 4,  // rotates to the player facing direction
    am_follow = 8,  // keep the player centred
    am_grid   =16,  // show grid
 };
-extern enum automapmode_e automapmode; // Mode that the automap is in
+typedef int automapmode_e;
+extern automapmode_e automapmode; // Mode that the automap is in
 
 // -----------------------------------------------------
 // Game Mode - identify IWAD as shareware, retail etc.

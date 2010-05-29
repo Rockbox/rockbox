@@ -60,13 +60,13 @@ void M_StartControlPanel (void);
  * The setup_group enum is used to show which 'groups' keys fall into so
  * that you can bind a key differently in each 'group'.
  */
-
-typedef enum {
+enum {
    m_null,       // Has no meaning; not applicable
    m_scrn,       // A key can not be assigned to more than one action
    m_map,        // in the same group. A key can be assigned to one
    m_menu,       // action in one group, and another action in another.
-} setup_group;
+};
+typedef unsigned setup_group;
 
 /****************************
  *
