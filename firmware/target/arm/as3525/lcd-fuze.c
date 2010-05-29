@@ -7,9 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2004 by Linus Nielsen Feltzing
  * Copyright (C) 2008 by Dave Chapman
- *
- * LCD driver for the Sansa Fuze - controller unknown
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,13 +33,14 @@
    HD66789R */
 static bool display_on = false; /* is the display turned on? */
 
-/* Flip Flag */
-static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
-
 /* Reverse Flag */
-static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
+static int r_disp_control_rev = R_DISP_CONTROL_NORMAL;
 
-static const int xoffset = 20;
+/* Flip flag */
+static int r_drv_output_control = R_DRV_OUTPUT_CONTROL_NORMAL;
+static int r_gate_scan_pos = R_GATE_SCAN_POS_NORMAL;
+
+static int xoffset = 20;
 
 /*** hardware configuration ***/
 
@@ -62,15 +62,27 @@ void lcd_set_invert_display(bool yesno)
 }
 
 #ifdef HAVE_LCD_FLIP
-static bool display_flipped = false;
-
 /* turn the display upside down  */
 void lcd_set_flip(bool yesno)
 {
-    display_flipped = yesno;
+    if (yesno)
+    {
+        xoffset = 0;
+        r_drv_output_control = R_DRV_OUTPUT_CONTROL_FLIPPED;
+        r_gate_scan_pos = R_GATE_SCAN_POS_FLIPPED;
+    }
+    else
+    {
+        xoffset = 20;
+        r_drv_output_control = R_DRV_OUTPUT_CONTROL_NORMAL;
+        r_gate_scan_pos = R_GATE_SCAN_POS_NORMAL;
+    }
 
-    r_entry_mode = yesno ? R_ENTRY_MODE_HORZ_FLIPPED :
-                           R_ENTRY_MODE_HORZ_NORMAL;
+    if (display_on)
+    {
+        lcd_write_reg(R_GATE_SCAN_POS, r_gate_scan_pos);
+        lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
+    }
 }
 #endif
 
@@ -89,9 +101,9 @@ void fuze_display_on(void)
     lcd_write_reg(R_POWER_CONTROL4, 0x60);
 
     lcd_write_reg(R_POWER_CONTROL4, 0x70);
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, 277);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
     lcd_write_reg(R_DRV_WAVEFORM_CONTROL, (7<<8));
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     lcd_write_reg(R_DISP_CONTROL2, 0x01);
     lcd_write_reg(R_FRAME_CYCLE_CONTROL, (1<<10));
     lcd_write_reg(R_EXT_DISP_IF_CONTROL, 0);
@@ -140,6 +152,8 @@ void lcd_enable(bool on)
         lcd_write_reg(R_POWER_CONTROL4, 112);
         lcd_write_reg(R_DISP_CONTROL1, 0x11);
         lcd_write_reg(R_DISP_CONTROL1, 0x13 | r_disp_control_rev);
+        lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
+        lcd_write_reg(R_GATE_SCAN_POS, r_gate_scan_pos);
         display_on = true;
         lcd_update();      /* Resync display */
         send_event(LCD_EVENT_ACTIVATION, NULL);
@@ -173,15 +187,15 @@ static void lcd_window_x(int xmin, int xmax)
 {
     xmin += xoffset;
     xmax += xoffset;
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS + 2, (xmax << 8) | xmin);
-    lcd_write_reg(R_RAM_ADDR_SET - 1, xmin);
+    lcd_write_reg(0x46, (xmax << 8) | xmin);
+    lcd_write_reg(0x20, xmin);
 }
 
 /* Set vertical window addresses */
 static void lcd_window_y(int ymin, int ymax)
 {
-    lcd_write_reg(R_VERT_RAM_ADDR_POS + 2, ymax);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS + 3, ymin);
+    lcd_write_reg(0x47, ymax);
+    lcd_write_reg(0x48, ymin);
     lcd_write_reg(R_RAM_ADDR_SET, ymin);
 }
 
@@ -224,13 +238,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-#ifdef HAVE_LCD_FLIP
-    lcd_write_reg(R_ENTRY_MODE,
-        display_flipped ? R_ENTRY_MODE_VIDEO_FLIPPED : R_ENTRY_MODE_VIDEO_NORMAL
-    );
-#else
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO_NORMAL);
-#endif
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO);
 
     lcd_window_x(x, x + width - 1);
 
@@ -278,7 +286,7 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     lcd_window_x(0, LCD_WIDTH - 1);
     lcd_window_y(0, LCD_HEIGHT - 1);
@@ -316,7 +324,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y; /* clip bottom */
 
-    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     /* we need to make x and width even to enable 32bit transfers */
     width = (width + (x & 1) + 1) & ~1;

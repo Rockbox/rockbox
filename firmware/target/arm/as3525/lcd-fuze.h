@@ -41,15 +41,18 @@
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
-/* Flip Flag */
-#define R_ENTRY_MODE_HORZ_NORMAL 0x1030
-#define R_ENTRY_MODE_HORZ_FLIPPED 0x1000
-#define R_ENTRY_MODE_VIDEO_NORMAL 0x1038
-#define R_ENTRY_MODE_VIDEO_FLIPPED 0x1018
+#define R_ENTRY_MODE_HORZ   0x1030
+#define R_ENTRY_MODE_VIDEO  0x1038
 
 /* Reverse Flag */
 #define R_DISP_CONTROL_NORMAL 0x0004
 #define R_DISP_CONTROL_REV    0x0000
+
+#define R_DRV_OUTPUT_CONTROL_NORMAL     0x115
+#define R_DRV_OUTPUT_CONTROL_FLIPPED    0x215
+
+#define R_GATE_SCAN_POS_NORMAL  0
+#define R_GATE_SCAN_POS_FLIPPED 18
 
 void lcd_write_cmd(int16_t cmd);
 void lcd_write_reg(int reg, int value);
