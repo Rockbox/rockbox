@@ -242,7 +242,7 @@ top:
         }
         else if (*in == '#')
         {
-            while (*in != '\n')
+            while (*in && *in != '\n')
             {
                 PUTCH(out, *in++);
             }
