@@ -199,7 +199,7 @@ static void button_tick(void)
                            which doesn't shut down easily with the OFF
                            key */
 #ifdef HAVE_SW_POWEROFF
-                        if ((btn == POWEROFF_BUTTON
+                        if ((btn & POWEROFF_BUTTON
 #ifdef RC_POWEROFF_BUTTON
                                     || btn == RC_POWEROFF_BUTTON
 #endif
