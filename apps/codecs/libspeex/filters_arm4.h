@@ -60,7 +60,7 @@ int normalize16(const spx_sig_t *x, spx_word16_t *y, spx_sig_t max_scale, int le
    : "=r" (dead1), "=r" (max_val), "=r" (dead3), "=r" (dead4),
    "=r" (dead5), "=r" (dead6)
    : "0" (x), "2" (len)
-   : "cc");
+   : "cc", "memory");
 
    sig_shift=0;
    while (max_val>max_scale)

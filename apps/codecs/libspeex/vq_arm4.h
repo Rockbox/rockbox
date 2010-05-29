@@ -66,7 +66,7 @@ void vq_nbest(spx_word16_t *in, const spx_word16_t *codebook, int len, int entri
       "=r" (dead1), "=r" (dead2), "=r" (codebook), "=r" (dead4),
       "=r" (dead5), "=r" (dead6), "=r" (dead7)
          : "4" (len), "5" (in), "6" (codebook)
-         : "cc");
+         : "cc", "memory");
 #else
 dist1=dist2=dist3=dist4=0;
    /*   spx_word32_t dist1=0;

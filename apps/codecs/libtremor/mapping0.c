@@ -211,7 +211,8 @@ static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
                     "ldmia %[pcmA], {%[A0], %[A1], %[A2], %[A3]}\n\t"
                     : [M0] "=r" (M0), [M1] "=r" (M1), [M2] "=r" (M2), [M3] "=r" (M3),
                       [A0] "=r" (A0), [A1] "=r" (A1), [A2] "=r" (A2), [A3] "=r" (A3)
-                    : [pcmM] "r" (pcmM), [pcmA] "r" (pcmA) );
+                    : [pcmM] "r" (pcmM), [pcmA] "r" (pcmA) 
+                    : "memory" );
       MAGANG( M0, A0 );
       MAGANG( M1, A1 );
       MAGANG( M2, A2 );
@@ -220,7 +221,8 @@ static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
                     "stmia %[pcmA]!, {%[A0], %[A1], %[A2], %[A3]}\n\t"
                     : [pcmM] "+r" (pcmM), [pcmA] "+r" (pcmA)
                     : [M0] "r" (M0), [M1] "r" (M1), [M2] "r" (M2), [M3] "r" (M3),
-                      [A0] "r" (A0), [A1] "r" (A1), [A2] "r" (A2), [A3] "r" (A3) );
+                      [A0] "r" (A0), [A1] "r" (A1), [A2] "r" (A2), [A3] "r" (A3) 
+                    : "memory" );
     }
 }    
 #else

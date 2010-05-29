@@ -168,7 +168,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         [res]"=r"(res)
         : /* inputs */
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r4", "r5", "memory"
+        "r0", "r1", "r2", "r3", "r4", "r5", "cc", "memory"
     );
     return res;
 }
@@ -310,7 +310,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         [res]"=r"(res)
         : /* inputs */
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory"
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "cc", "memory"
     );
     return res;
 }
@@ -398,7 +398,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         [res]"=r"(res)
         : /* inputs */
         : /* clobbers */
-        "r0", "r1", "r2", "r3"
+        "r0", "r1", "r2", "r3", "cc", "memory"
     );
     return res;
 }

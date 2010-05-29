@@ -840,7 +840,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                   [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
                   [_2]"=&r"(_2), [_3]"=&r"(_3)
                 : [fwd]"r"(fwd), [rev]"r"(rev),
-                  [interp]"r"(interp));
+                  [interp]"r"(interp)
+                : "memory");
                 /* Apply voice envelope */
                 asm volatile (
                 "mov     %[_2], %[out], asr #(11-5)   \r\n" /* To do >> 16 later */
@@ -876,7 +877,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                   [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
                   [_2]"=&r"(_2), [_3]"=&r"(_3)
                 : [fwd]"r"(fwd), [rev]"r"(rev),
-                  [interp]"r"(interp));
+                  [interp]"r"(interp)
+                : "memory");
                 /* Apply voice envelope */
                 asm volatile (
                 "mov     %[_2], %[out], asr #11       \r\n"
@@ -932,7 +934,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                       [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
                       [_2]"=&r"(_2), [_3]"=&r"(_3)
                     : [fwd]"r"(fwd), [rev]"r"(rev),
-                      [interp]"r"(interp));
+                      [interp]"r"(interp)
+                    : "memory");
                     asm volatile (
                     "mov     %[out], %[out], asr#12        \r\n"
                     "add     %[_0], %[out], %[_0], asr #12 \r\n"
@@ -993,7 +996,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                       [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
                       [_2]"=&r"(_2), [_3]"=&r"(_3)
                     : [fwd]"r"(fwd), [rev]"r"(rev),
-                      [interp]"r"(interp));
+                      [interp]"r"(interp)
+                    : "memory");
 
                     output = CLAMP16(output);
                 }
@@ -1128,7 +1132,9 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "sub    %[y1], %[y1], %[y0]         \r\n"
                 "mul    %[f], %[y1], %[f]           \r\n"
                 "add    %[y0], %[y0], %[f], asr #12 \r\n"
-                : [f]"+r"(f), [y0]"+r"(amp_0), [y1]"=&r"(amp_1));
+                : [f]"+r"(f), [y0]"+r"(amp_0), [y1]"=&r"(amp_1)
+                :
+                : "memory");
             }
 
             voice->position += rate;
@@ -1347,7 +1353,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         /* duplicate at +8 eliminates wrap checking below */
         "str    %[fb_0], [%[fir_p], #28]      \r\n"
         : [fir_p]"=&r"(fir_ptr), [t_fir_p]"+r"(this->fir_ptr)
-        : [fb_0]"r"(fb_0), [mask]"i"(~FIR_BUF_MASK));
+        : [fb_0]"r"(fb_0), [mask]"i"(~FIR_BUF_MASK)
+        : "memory");
 
         fir_coeff = (int32_t *)this->fir_coeff;
 
@@ -1377,7 +1384,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         : [acc0]"+r"(fb_0), [acc1]"=&r"(fb_1), [_0]"=&r"(_0),
           [fir_p]"+r"(fir_ptr), [fir_c]"+r"(fir_coeff)
         :
-        : "r0", "r1", "r2", "r3", "r4", "r5");
+        : "r0", "r1", "r2", "r3", "r4", "r5", "memory");
 
         /* Generate output */
         int amp_0, amp_1;
@@ -1439,7 +1446,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         "str    %[fb_0], [%[fir_p], #56]      \r\n"
         "str    %[fb_1], [%[fir_p], #60]      \r\n"
         : [fir_p]"=&r"(fir_ptr), [t_fir_p]"+r"(this->fir_ptr)
-        : [fb_0]"r"(fb_0), [fb_1]"r"(fb_1), [mask]"i"(~FIR_BUF_MASK));
+        : [fb_0]"r"(fb_0), [fb_1]"r"(fb_1), [mask]"i"(~FIR_BUF_MASK)
+        : "memory");
 
         fir_coeff = this->fir_coeff;
 
@@ -1471,7 +1479,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         : [fb_0]"+r"(fb_0), [fb_1]"+r"(fb_1),
           [fir_p]"+r"(fir_ptr), [fir_c]"+r"(fir_coeff)
         :
-        : "r0", "r1", "r2", "r3", "r4", "r5");
+        : "r0", "r1", "r2", "r3", "r4", "r5", "memory");
 
         /* Generate output */
         int amp_0 = (chans_0 * global_vol_0 + fb_0 * this->r.g.echo_volume_0)
