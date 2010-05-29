@@ -636,19 +636,16 @@ bool storage_present(int drive)
 #if (CONFIG_STORAGE & STORAGE_SD)
     case STORAGE_SD:
         return sd_present(ldrive);
-        break;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
     case STORAGE_NAND:
         return true;
-        break;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
         return true;
-        break;
 #endif
 
     default:
