@@ -4,28 +4,11 @@ in a menu and start by choosing ``Roll Dice''. The result is shown as individual
 numbers as well as the total of the rolled dice.
 
 \begin{btnmap}
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{GIGABEAT_PAD}{\ButtonA}
-    \opt{PLAYER_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
-    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonUp}
-    \opt{COWON_D2_PAD}{\ButtonMinus{} or \TouchCenter}
-       \opt{HAVEREMOTEKEYMAP}{& 
-          \opt{IRIVER_RC_H100_PAD}{\ButtonRCOn}
-        }
+    \PluginSelect
+          \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelect}
         & Roll dice again\\
-    \opt{PLAYER_PAD}{\ButtonStop}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
-    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD%
-        ,IRIVER_H10_PAD}{\ButtonPower}
-    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-    \opt{GIGABEAT_S_PAD}{\ButtonBack}
-    \opt{COWON_D2_PAD}{\ButtonPower{} or \TouchBottomRight}
-    \opt{PBELL_VIBE500_PAD}{\ButtonRec}
-       \opt{HAVEREMOTEKEYMAP}{& 
-          \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
-        }
+
+    \PluginCancel
+       \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
         & Quit\\
 \end{btnmap}
