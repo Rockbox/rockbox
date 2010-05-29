@@ -42,10 +42,9 @@ foreach (@files)
     $file = $_;
     $out = "$tmp/" . `basename $file`; chomp($out);
     `./skinupdater $args $file $out`;
-    print "$out";
-    `diff -u $file $out >> $tmp/changes.diff`;
+    `diff -u $file $out >> $tmp/$theme_name.diff`;
     `mv $out $file`;
-    # TODO zip up the new folder..     
+    `cd $outdir && zip -r $tmp/$theme_name.zip .`;   
     
 }
 
