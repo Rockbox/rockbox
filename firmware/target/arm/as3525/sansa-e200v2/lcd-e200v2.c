@@ -79,6 +79,11 @@ static bool display_on = false; /* is the display turned on? */
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
 
+/* Reverse Flag */
+#define R_DISP_CONTROL_NORMAL 0x0004
+#define R_DISP_CONTROL_REV    0x0000
+static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
+
 static inline void lcd_delay(int x)
 {
     do {
@@ -143,9 +148,12 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
+    r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
+                                 R_DISP_CONTROL_NORMAL;
+
     if (display_on)
     {
-        lcd_write_reg(R_DISP_CONTROL1, yesno ? 0x33 : 0x37);
+        lcd_write_reg(R_DISP_CONTROL1, 0x0033 | r_disp_control_rev);
     }
 
 }
@@ -187,7 +195,7 @@ static void _display_on(void)
     lcd_write_reg(R_COMPARE_REG2, 0);
 
     /* GON = 0, DTE = 0, D1-0 = 00b */
-    lcd_write_reg(R_DISP_CONTROL1, 0x0000);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0000 | r_disp_control_rev);
 
     /* Front porch lines: 2; Back porch lines: 2; */
     lcd_write_reg(R_DISP_CONTROL2, 0x0203);
@@ -261,7 +269,7 @@ static void _display_on(void)
     lcd_write_reg(R_1ST_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
     lcd_write_reg(R_2ND_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
 
-    lcd_write_reg(R_DISP_CONTROL1, 0x0037);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0033 | r_disp_control_rev);
 
     display_on = true;  /* must be done before calling lcd_update() */
     lcd_update();
