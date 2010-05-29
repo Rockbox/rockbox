@@ -337,7 +337,51 @@ with image ID ``M'', and then reference the individual sub-images in a condition
 }
 
 \opt{albumart}{
-\section{Album Art}
+\section{\label{ref:album_art}Album Art}
+Rockbox allows you to put the album art, or another image related to the music
+on your \dap{} to display it in the PictureFlow plugin\opt{albumart}{ or in the
+theme}. For this feature to work, there are a few requirements.
+
+\subsection{Limitations}
+
+Rockbox does not support album art embedded in your files' tags, and will
+instead look for a picture located on disk. In addition to this, the
+pictures must be in either BMP or JPEG format. Rockbox does not support
+RLE-compressed BMP files, nor does it support progressive and multi-scan
+JPEG files. JPEG files must consist of a single scan with interleaved components, 
+as progessive and multi-scan images require much more memory to decode.
+
+\subsection{Where to put album art}
+
+The pictures can be named a number of different ways, and placed to a number of
+different locations. You can have pictures specific to the file or the album
+or use a generic picture. You can place the picture in the same directory
+as the file, in the parent directory or in a fixed directory named
+\fname{/.rockbox/albumart/}. The order Rockbox uses when looking for a picture
+is as follows (a list in braces means that those file extensions are tried in
+that order):
+
+\begin{enumerate}
+\item  \fname{./filename.\{jpeg,jpg,bmp\}}
+\item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{./cover.\{jpeg,jpg,bmp\}}
+\item  \fname{./folder.jpg}
+\item  \fname{/.rockbox/albumart/artist-albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../cover.\{jpeg,jpg,bmp\}}
+\end{enumerate}
+
+The following characters will be replaced with an underscore (\_) when looking
+for albumtitle.bmp or artist-albumtitle.bmp: \textbackslash{} / : \textless{}
+\textgreater{} ? * \textbar{}. Doublequotes will be replaced by single quotes.
+See \wikilink{AlbumArt} in the wiki for programs that will
+help you automate the process of putting album art on your \dap{}.
+
+\subsection{How to display the album art}
+
+Once the album art files are present on your \dap, they can be displayed as
+follows.
+
   \begin{tagmap}
     \config{\%Cl{\textbar}x{\textbar}y{\textbar}[[l{\textbar}c{\textbar}r]maxwidth]{\textbar}[[t{\textbar}c{\textbar}b]maxheight]{\textbar}}
         & Define the settings for albumart\\
