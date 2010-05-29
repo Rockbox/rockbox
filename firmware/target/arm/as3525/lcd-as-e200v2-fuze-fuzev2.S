@@ -242,7 +242,6 @@ lcd_write_yuv420_lines:
     beq         1b                      @
 
     ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
-    bx          lr                      @
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
 
