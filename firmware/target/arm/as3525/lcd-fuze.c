@@ -38,7 +38,9 @@ static int r_disp_control_rev = R_DISP_CONTROL_NORMAL;
 
 /* Flip flag */
 static int r_drv_output_control = R_DRV_OUTPUT_CONTROL_NORMAL;
+#ifdef HAVE_LCD_FLIP
 static int r_gate_scan_pos = R_GATE_SCAN_POS_NORMAL;
+#endif
 
 static int xoffset = 20;
 
