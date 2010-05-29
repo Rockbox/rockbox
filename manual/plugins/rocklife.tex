@@ -12,3 +12,25 @@ A \fname{.cells} file is a text file. A capital `O' marks a live cell, a dot
 marks a dead cell, all other characters are ignored. Everything on a line
 starting with an exclamation sign (and including it) is a comment and is
 ignored.
+
+\begin{btnmap}
+    \PluginSelect
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelect}
+    & Play/pause\\
+
+    \PluginDown
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCDown}
+    & Change growth mode\\
+
+    \PluginRight
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCRight}
+    & Next generation\\
+
+    \PluginLeft
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCLeft}
+    & Status (only when paused)\\
+
+    \PluginCancel
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
+    & Exit\\
+\end{btnmap}
