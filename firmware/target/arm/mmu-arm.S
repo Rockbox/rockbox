@@ -396,5 +396,5 @@ cpucache_invalidate:
     mov     r2, lr                  @ save lr to r1, call uses r0 only
     bl      invalidate_dcache       @ Clean and invalidate entire DCache
     mcr     p15, 0, r1, c7, c5, 0   @ Invalidate ICache (r1=0 from call)
-    mov     pc, r2                  @
+    bx      r2
     .size   invalidate_idcache, .-invalidate_idcache
