@@ -28,6 +28,8 @@
 #define PUTCH(out, c) fprintf(out, "%c", c)
 extern struct tag_info legal_tags[];
 
+char images_with_subimages[100];
+int image_count = 0;
 
 /** Command line setting **/
 bool is_mono_display = false;
@@ -106,12 +108,14 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("xl"))
     {
+        char label = start[1];
         PUTCH(out, '(');
         int read = 1+dump_arg(out, start+1, 4, false);
         len += read;
         start += read;
         if (*start>= '0' && *start <= '9')
         {
+            images_with_subimages[image_count++] = label;
             PUTCH(out, ',');
             len += dump_arg(out, start, 1, false);
         }
@@ -119,11 +123,19 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("xd"))
     {
-        /* NOTE: almost certainly needs work */
+        char label = start[0];
+        int i=0;
+        while (i<image_count)
+        {
+            if (images_with_subimages[i] == label)
+                break;
+            i++;
+        }
         PUTCH(out, '(');
         PUTCH(out, *start++); len++;
-        if ((*start >= 'a' && *start <= 'z') ||
-            (*start >= 'A' && *start <= 'Z'))
+        if (i<image_count && 
+            ((*start >= 'a' && *start <= 'z') ||
+             (*start >= 'A' && *start <= 'Z')))
         {
             PUTCH(out, *start); len++;
         }
