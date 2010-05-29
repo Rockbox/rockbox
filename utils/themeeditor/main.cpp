@@ -27,6 +27,7 @@ extern "C"
 
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 
 #include <QtGui/QApplication>
 #include <QTreeView>
@@ -36,15 +37,21 @@ extern "C"
 int main(int argc, char* argv[])
 {
 
-    char doc[] = "%Vd(U);Hey\n%?bl(test,3,5,2,1)<param2|param3>";
+    char doc[] = "#Comment\n%Vd(U);Hey\n%?bl(test,3,5,2,1)<param2|param3>";
 
     struct skin_element* test = skin_parse(doc);
 
-    skin_debug_tree(test);
+    ParseTreeNode tree(test);
+    std::cout << "----" << std::endl;
+    if(std::string(doc) == tree.genCode().toStdString())
+        std::cout << "Code in/out matches" << std::endl;
+    else
+        std::cout << "Match error" << std::endl;
+
 
     skin_free_tree(test);
 
-
+/*
     QApplication app(argc, argv);
 
     QTreeView tree;
@@ -53,7 +60,7 @@ int main(int argc, char* argv[])
     tree.show();
 
     return app.exec();
-
+*/
     return 0;
 }
 

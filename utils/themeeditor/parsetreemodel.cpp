@@ -26,8 +26,8 @@
 ParseTreeModel::ParseTreeModel(char* wps, QObject* parent):
         QAbstractItemModel(parent)
 {
-    this->wps = skin_parse(wps);
-    this->root = new ParseTreeNode(this->wps, 0, true);
+    this->tree = skin_parse(wps);
+    this->root = new ParseTreeNode(tree, 0);
 }
 
 
@@ -36,6 +36,12 @@ ParseTreeModel::~ParseTreeModel()
     delete root;
 }
 
+QString genCode()
+{
+    return QString();
+}
+
+/*
 QModelIndex ParseTreeModel::index(int row, int column,
                                   const QModelIndex& parent) const
 {
@@ -98,3 +104,4 @@ QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
     ParseTreeNode* item = static_cast<ParseTreeNode*>(index.internalPointer());
     return item->data(index.column());
 }
+*/

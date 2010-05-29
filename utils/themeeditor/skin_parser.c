@@ -103,7 +103,14 @@ struct skin_element* skin_parse(char* document)
         else
             to_write = &(last->next);
 
-        if(sublines)
+        if(*cursor == '\n')
+        {
+            *to_write = skin_alloc_element();
+            skin_parse_newline(*to_write, &cursor);
+            if(!last)
+                return NULL;
+        }
+        else if(sublines)
         {
             *to_write = skin_parse_sublines(&cursor);
             last = *to_write;
@@ -200,23 +207,6 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
             if(!skin_parse_text(current, &cursor, conditional))
                 return NULL;
         }
-    }
-
-    if(*cursor == '\n')
-    {
-        /* Allocating memory if necessary */
-        if(root)
-        {
-            current->next = skin_alloc_element();
-            current = current->next;
-        }
-        else
-        {
-            current = skin_alloc_element();
-            root = current;
-        }
-        if(!skin_parse_newline(current, &cursor))
-            return NULL;
     }
 
     /* Moving up the calling function's pointer */
