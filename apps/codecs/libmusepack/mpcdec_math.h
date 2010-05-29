@@ -115,32 +115,32 @@
           return t1;
       }
    #elif defined(CPU_ARM)
-      // borrowed and adapted from libMAD
+      /* Calculate: result = (X*Y)>>14 */
       #define MPC_MULTIPLY(X,Y) \
          ({ \
-            MPC_SAMPLE_FORMAT low; \
-            MPC_SAMPLE_FORMAT high; \
-            asm volatile (                   /* will calculate: result = (X*Y)>>14 */ \
-               "smull  %0,%1,%2,%3 \n\t"     /* multiply with result %0 [0..31], %1 [32..63] */ \
-               "mov %0, %0, lsr #14 \n\t"    /* %0 = %0 >> 14 */ \
-               "orr %0, %0, %1, lsl #18 \n\t"/* result = %0 OR (%1 << 18) */ \
-               : "=&r"(low), "=&r" (high) \
-               : "r"(X),"r"(Y)); \
-            low; \
+            MPC_SAMPLE_FORMAT lo; \
+            MPC_SAMPLE_FORMAT hi; \
+            asm volatile ( \
+               "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+               "mov   %[lo], %[lo], lsr #14    \n\t" /* lo >>= 14 */ \
+               "orr   %[lo], %[lo], %[hi], lsl #18"  /* lo |= (hi << 18) */ \
+               : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+               : [x]"r"(X), [y]"r"(Y)); \
+            lo; \
          })
       
-      // borrowed and adapted from libMAD
+      /* Calculate: result = (X*Y)>>Z */
       #define MPC_MULTIPLY_EX(X,Y,Z) \
          ({ \
-            MPC_SAMPLE_FORMAT low; \
-            MPC_SAMPLE_FORMAT high; \
-            asm volatile (                   /* will calculate: result = (X*Y)>>Z */ \
-               "smull  %0,%1,%2,%3 \n\t"     /* multiply with result %0 [0..31], %1 [32..63] */ \
-               "mov %0, %0, lsr %4 \n\t"     /* %0 = %0 >> Z */ \
-               "orr %0, %0, %1, lsl %5 \n\t" /* result = %0 OR (%1 << (32-Z)) */ \
-               : "=&r"(low), "=&r" (high) \
-               : "r"(X),"r"(Y),"r"(Z),"r"(32-Z)); \
-            low; \
+            MPC_SAMPLE_FORMAT lo; \
+            MPC_SAMPLE_FORMAT hi; \
+            asm volatile ( \
+               "smull %[lo], %[hi], %[x], %[y] \n\t"   /* multiply */ \
+               "mov   %[lo], %[lo], lsr %[shr] \n\t"   /* lo >>= Z */ \
+               "orr   %[lo], %[lo], %[hi], lsl %[shl]" /* lo |= (hi << (32-Z)) */ \
+               : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+               : [x]"r"(X), [y]"r"(Y), [shr]"r"(Z), [shl]"r"(32-Z)); \
+            lo; \
          })
    #else /* libmusepack standard */
 
@@ -188,16 +188,16 @@
                t; \
             })
       #elif defined(CPU_ARM)
-         // borrowed and adapted from libMAD
+         /* Calculate: result = (X*Y)>>32, without need for >>32 */
          #define MPC_MULTIPLY_FRACT(X,Y) \
             ({ \
-               MPC_SAMPLE_FORMAT low; \
-               MPC_SAMPLE_FORMAT high; \
-               asm volatile (                /* will calculate: result = (X*Y)>>32 */ \
-                  "smull  %0,%1,%2,%3 \n\t"  /* multiply with result %0 [0..31], %1 [32..63] */ \
-                  : "=&r"(low), "=&r" (high) /* result = %1 [32..63], saves the >>32 */ \
-                  : "r"(X),"r"(Y)); \
-               high; \
+               MPC_SAMPLE_FORMAT lo; \
+               MPC_SAMPLE_FORMAT hi; \
+               asm volatile ( \
+                  "smull %[lo], %[hi], %[x], %[y]" /* hi = result */ \
+                  : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+                  : [x]"r"(X), [y]"r"(Y)); \
+               hi; \
             })
       #else
          #define MPC_MULTIPLY_FRACT(X,Y) MPC_MULTIPLY_EX(X,Y,32)

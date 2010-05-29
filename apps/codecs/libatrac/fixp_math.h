@@ -31,30 +31,33 @@
 /* Fixed point math routines for use in atrac3.c */
 
 #if defined(CPU_ARM)
+    /* Calculates: result = (X*Y)>>16 */
     #define fixmul16(X,Y) \
      ({ \
-        int32_t low; \
-        int32_t high; \
-        asm volatile (                   /* calculates: result = (X*Y)>>16 */ \
-           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
-           "mov %0, %0, lsr #16 \n\t"    /* %0 = %0 >> 16 */ \
-           "orr %0, %0, %1, lsl #16 \n\t"/* result = %0 OR (%1 << 16) */ \
-           : "=&r"(low), "=&r" (high) \
-           : "r"(X),"r"(Y)); \
-        low; \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+           "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+           "mov   %[lo], %[lo], lsr #16    \n\t" /* lo >>= 16 */ \
+           "orr   %[lo], %[lo], %[hi], lsl #16"  /* lo |= (hi << 16) */ \
+           : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+           : [x]"r"(X), [y]"r"(Y)); \
+        lo; \
      })
      
+    /* Calculates: result = (X*Y)>>31 */
+    /* Use scratch register r12 */
     #define fixmul31(X,Y) \
      ({ \
-        int32_t low; \
-        int32_t high; \
-        asm volatile (                   /* calculates: result = (X*Y)>>31 */ \
-           "smull  %0,%1,%2,%3 \n\t"     /* 64 = 32x32 multiply */ \
-           "mov %0, %0, lsr #31 \n\t"    /* %0 = %0 >> 31 */ \
-           "orr %0, %0, %1, lsl #1 \n\t" /* result = %0 OR (%1 << 1) */ \
-           : "=&r"(low), "=&r" (high) \
-           : "r"(X),"r"(Y)); \
-        low; \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+           "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+           "mov   %[lo], %[lo], lsr #31    \n\t" /* lo >>= 31 */ \
+           "orr   %[lo], %[lo], %[hi], lsl #1"   /* lo |= (hi << 1) */ \
+           : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+           : [x]"r"(X), [y]"r"(Y)); \
+        lo; \
      })
 #elif defined(CPU_COLDFIRE)
     #define fixmul16(X,Y) \
