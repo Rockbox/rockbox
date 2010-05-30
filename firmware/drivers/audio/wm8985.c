@@ -42,6 +42,7 @@
 #define ADCCTL      0x0e
 #define LADCVOL     0x0f
 #define RADCVOL     0x10
+#define RDACVOL_DACVU      0x100
 
 #define EQ1         0x12
 #define EQ2         0x13
@@ -88,7 +89,7 @@
 #define BIASCTL     0x3d
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -90,   6, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
@@ -111,21 +112,48 @@ const struct sound_settings_info audiohw_settings[] = {
 unsigned int eq1_reg;
 unsigned int eq5_reg;
 
-/* convert tenth of dB volume (-57..6) to master volume register value */
+/* convert tenth of dB volume (-89..6) to master volume register value */
 int tenthdb2master(int db)
 {
-    /* +6 to -57dB in 1dB steps == 64 levels = 6 bits */
-    /* 0111111 == +6dB  (0x3f) = 63) */
-    /* 0111001 == 0dB   (0x39) = 57) */
-    /* 0000001 == -56dB (0x01) = */
-    /* 0000000 == -57dB (0x00) */
-
-    /* 1000000 == Mute (0x40) */
+     /* Might have no sense, taken from wm8758.c :
+         att  DAC  AMP  result
+         +6dB    0   +6     96
+          0dB    0    0     90
+        -57dB    0  -57     33
+        -58dB   -1  -57     32
+        -89dB  -32  -57      1
+        -90dB  -oo  -oo      0 */
 
     if (db < VOLUME_MIN) {
-        return 0x40;
+        return 0;
     } else {
-        return((db/10)+57);
+        return (db-VOLUME_MIN)/10 + 1;
+    }
+}
+
+ /* helper function coming from wm8758.c that calculates the register setting for amplifier and
+    DAC volume out of the input from tenthdb2master() */
+static void get_volume_params(int db, int *dac, int *amp)
+{
+    /* should never happen, set max volume for amp and dac */
+    if      (db > 96) {
+        *dac = 255;
+        *amp = 63;
+    }
+    /* set dac to max and set volume for amp (better snr) */
+    else if (db > 32) {
+        *dac = 255;
+        *amp = (db-90)+57;
+    }
+    /* set amp to min and reduce dac output */
+    else if (db >  0) {
+        *dac = (db-33)*2 + 255;
+        *amp = 0;
+    }
+    /* mute all */
+    else {
+        *dac = 0x00;
+        *amp = 0x40;
     }
 }
 
@@ -190,16 +218,29 @@ void audiohw_postinit(void)
 
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
-    /* OUT1 */
-    wmcodec_write(LOUT1VOL, 0x080 | vol_l);
-    wmcodec_write(ROUT1VOL, 0x180 | vol_r);
+    int dac_l, amp_l, dac_r, amp_r;
+    get_volume_params(vol_l, &dac_l, &amp_l);
+    get_volume_params(vol_r, &dac_r, &amp_r);
+ 
+    /* set DAC
+       Important: DAC is global and will also affect lineout */
+    wmcodec_write(LDACVOL, dac_l);
+    wmcodec_write(RDACVOL, dac_r | RDACVOL_DACVU);
+
+    /* set headphone amp OUT1 */
+    wmcodec_write(LOUT1VOL, amp_l | 0x080);
+    wmcodec_write(ROUT1VOL, amp_r | 0x180);
 }
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    /* OUT2 */
-    wmcodec_write(LOUT2VOL, vol_l);
-    wmcodec_write(ROUT2VOL, 0x100 | vol_r);
+     int dac_l, amp_l, dac_r, amp_r;
+     get_volume_params(vol_l, &dac_l, &amp_l);
+     get_volume_params(vol_r, &dac_r, &amp_r);
+ 
+     /* set lineout amp OUT2 */
+     wmcodec_write(LOUT2VOL, amp_l);
+     wmcodec_write(ROUT2VOL, amp_r | 0x100);
 }
 
 void audiohw_set_aux_vol(int vol_l, int vol_r)

@@ -23,7 +23,7 @@
 #define _WM8985_H
 
 /* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -570
+#define VOLUME_MIN -890
 #define VOLUME_MAX  60
 
 #ifdef COWON_D2
