@@ -456,7 +456,7 @@
     *: "Connectors"
   </dest>
   <voice>
-    *: "Mostra Connectors"
+    *: "Mostra connectors"
   </voice>
 </phrase>
 <phrase>
@@ -509,7 +509,7 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", Aleatori"
+    *: ", aleatori"
   </dest>
   <voice>
     *: ""
@@ -596,7 +596,7 @@
     *: "Punt de pàgina creat"
   </dest>
   <voice>
-    *: "Punt de pàgina Creat"
+    *: "Punt de pàgina creat"
   </voice>
 </phrase>
 <phrase>
@@ -624,7 +624,7 @@
     *: "Punt de pàgina buit"
   </dest>
   <voice>
-    *: "Punt de pàgina Buit"
+    *: "Punt de pàgina buit"
   </voice>
 </phrase>
 <phrase>
@@ -778,7 +778,7 @@
     *: "Mono dret"
   </dest>
   <voice>
-    *: "Mono Dret"
+    *: "Mono dret"
   </voice>
 </phrase>
 <phrase>
@@ -857,7 +857,7 @@
   </dest>
   <voice>  
     *: none
-    swcodec: "Guany Creuat"
+    swcodec: "Guany creuat"
   </voice>
 </phrase>
 <phrase>
@@ -1145,7 +1145,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Freqüència Central"
+    swcodec: "Freqüència central"
   </voice>
 </phrase>
 <phrase>
@@ -1648,7 +1648,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Activar Crosféid"
+    crossfade: "Activar crosféid"
   </voice>
 </phrase>
 <phrase>
@@ -2082,7 +2082,7 @@
     *: "Suport per Cuesheet"
   </dest>
   <voice>
-    *: "Suport per Cuesheet"
+    *: "Suport per cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -2329,10 +2329,10 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Mostra Camí"
+    *: "Mostra camí"
   </dest>
   <voice>
-    *: "Mostra Camí"
+    *: "Mostra camí"
   </voice>
 </phrase>
 <phrase>
@@ -2343,10 +2343,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Només Directori Actual"
+    *: "Només directori actual"
   </dest>
   <voice>
-    *: "Només Directori Actual"
+    *: "Només directori actual"
   </voice>
 </phrase>
 <phrase>
@@ -2357,10 +2357,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Camí Complet"
+    *: "Camí complert"
   </dest>
   <voice>
-    *: "Ruta Completa"
+    *: "Camí complert"
   </voice>
 </phrase>
 <phrase>
@@ -2378,7 +2378,7 @@
   <dest>
     *: "Construint la base de dades... %d trobats (OFF per tornar)"
     iriverh100,iriverh120,iriverh300: "Construint la base de dades.... %d trobats (STOP per tornar)"
-    ipod*: "Construint la base de dades...Construint Base de dades... %d trobats (PREV per tornar)"
+    ipod*: "Construint la base de dades...Construint base de dades... %d trobats (PREV per tornar)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construint la base de dades... %d trobats (LEFT per tornar)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construint la base de dades... %d trobats (PREV per tornar)"
     gogearsa9200: "Construint la base de dades... %d trobats (REW per tornar)"
@@ -2412,10 +2412,10 @@
     *: "Auto Update"
   </source>
   <dest>
-    *: "Actualització Automàtica"
+    *: "Actualització automàtica"
   </dest>
   <voice>
-    *: "Actualització Automàtica"
+    *: "Actualització automàtica"
   </voice>
 </phrase>
 <phrase>
@@ -2454,10 +2454,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Recollir Runtime Data"
+    *: "Recollir informació del temps d'execució"
   </dest>
   <voice>
-    *: "Recollir Runtime Data"
+    *: "Recollir informació del temps d'execució"
   </voice>
 </phrase>
 <phrase>
@@ -2468,10 +2468,10 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Exportar Modificacions"
+    *: "Exportar modificacions"
   </dest>
   <voice>
-    *: "Exportar Modificacions"
+    *: "Exportar modificacions"
   </voice>
 </phrase>
 <phrase>
@@ -2482,10 +2482,10 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Importar Modificacions"
+    *: "Importar modificacions"
   </dest>
   <voice>
-    *: "Importar Modificacions"
+    *: "Importar modificacions"
   </voice>
 </phrase>
 <phrase>
@@ -2496,10 +2496,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Actualitzant en segon plà"
+    *: "Actualitzant en segon pla"
   </dest>
   <voice>
-    *: "Actualitzant en segon plà"
+    *: "Actualitzant en segon pla"
   </voice>
 </phrase>
 <phrase>
@@ -2524,10 +2524,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Base de dades no llesta"
+    *: "La base de dades no està llesta"
   </dest>
   <voice>
-    *: "Base de dades no llesta"
+    *: "La base de dades no està llesta"
   </voice>
 </phrase>
 <phrase>
@@ -2572,7 +2572,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostra tipus de lletra"
+    lcd_bitmap: "Mostra els tipus de lletra"
   </voice>
 </phrase>
 <phrase>
@@ -2644,11 +2644,11 @@
   </source>
   <dest>
     *: none
-    charging: "Il·luminat mentre endollat"
+    charging: "Il·luminació mentres endollat"
   </dest>
   <voice>
     *: none
-    charging: "Il·luminat mentre endollat"
+    charging: "Il·luminació mentres endollat"
   </voice>
 </phrase>
 <phrase>
@@ -2661,11 +2661,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Llum quan Bloquejat"
+    hold_button: "Il·luminació mentres bloquejat"
   </dest>
   <voice>
     *: none
-    hold_button: "Llum quan Bloquejat"
+    hold_button: "Il·luminació mentres bloquejat"
   </voice>
 </phrase>
 <phrase>
@@ -3848,7 +3848,7 @@
   </dest>
   <voice>
     *: none
-    button_light: "Apagat de llum de botons"
+    button_light: "Apagat de la llum de botons"
     sansafuze*,sansae200*: "Apagat de llum de la roda"
   </voice>
 </phrase>
@@ -3866,7 +3866,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Brillantor de la Llum dels Botons"
+    buttonlight_brightness: "Brillantor de la llum dels botons"
   </voice>
 </phrase>
 <phrase>
@@ -4763,7 +4763,7 @@
     *: "Punt de pàgina en aturar"
   </dest>
   <voice>
-    *: "Punt de pàgina en Aturar"
+    *: "Punt de pàgina en aturar"
   </voice>
 </phrase>
 <phrase>
@@ -5564,11 +5564,11 @@
   </source>
   <dest>
    *: none
-    radio: "No s'han trobat presintoníes, AutoScan?"
+    radio: "No s'han trobat presintoníes, escaneig auto.?"
   </dest>
   <voice>
     *: none
-    radio: "No s'han trobat presintoníes, AutoScan?"
+    radio: "No s'han trobat presintoníes, escanejar automàticament?"
   </voice>
 </phrase>
 <phrase>
@@ -7425,7 +7425,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Mostra info de pista"
+    *: "Mostra info. de pista"
   </dest>
   <voice>
     *: "Mostra Informació de Pista"
@@ -8065,11 +8065,11 @@
   </source>
   <dest>
     *: "Final de la llista de cançons"
-    archosplayer: "Fi Llista"
+    archosplayer: "Final de llista"
   </dest>
   <voice>
     *: "Final de la llista de cançons"
-    archosplayer: "Fi Llista"
+    archosplayer: "Final de llista"
   </voice>
 </phrase>
 <phrase>
@@ -12514,7 +12514,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
+    *:none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
@@ -12794,7 +12794,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
+    *:none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
@@ -13000,11 +13000,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Rebobina abans de continuar"
+    swcodec: "Rebobina abans de reprendre"
   </dest>
   <voice>
     *: none
-    swcodec: "Rebobina abans de continuar"
+    swcodec: "Rebobina abans de reprendre"
   </voice>
 </phrase>
 <phrase>
@@ -13675,5 +13675,19 @@
   <voice>
     *: none
     radio: "Pantalla de ràdio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Compositor"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
