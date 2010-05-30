@@ -13688,3 +13688,17 @@
     radio: "Obrazovka rádia"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Skladatel"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
