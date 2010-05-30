@@ -44,9 +44,9 @@ foreach (@files)
     `./skinupdater $args $file $out`;
     `diff -u $file $out >> $tmp/$theme_name.diff`;
     `mv $out $file`;
-    `cd $outdir && zip -r $tmp/$theme_name.zip .`;   
     
 }
+`cd $outdir && zip -r $tmp/$theme_name.zip .`;   
 
 
 system("rm -Rf $outdir");
