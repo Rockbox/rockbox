@@ -725,12 +725,14 @@ static const char* id3_get_info(int selected_item, void* data,
                 snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
                 val=buffer;
                 break;
+#if CONFIG_CODEC == SWCODEC
             case LANG_ID3_TRACK_GAIN:
                 val=id3->track_gain_string;
                 break;
             case LANG_ID3_ALBUM_GAIN:
                 val=id3->album_gain_string;
                 break;
+#endif
             case LANG_ID3_PATH:
                 val=id3->path;
                 break;    
