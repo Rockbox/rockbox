@@ -14,6 +14,8 @@ INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDI
 .PHONY: all buildmanual clean
 MANFILE := rockbox-build
 
+VERSION= `$(TOOLSDIR)/version.sh $(ROOTDIR)`
+
 all: manual-pdf 
 
 features: $(OBJDIR)/features
