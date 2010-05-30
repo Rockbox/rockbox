@@ -36,12 +36,22 @@ extern "C"
 
 int main(int argc, char* argv[])
 {
+    QApplication app(argc, argv);
 
     char doc[] = "#Comment\n%Vd(U);Hey\n%?bl(test,3,5,2,1)<param2|param3>";
 
+    ParseTreeModel tree(doc);
+
+    QTreeView view;
+    view.setModel(&tree);
+    view.show();
+
+    return app.exec();
+
+    /*
     struct skin_element* test = skin_parse(doc);
 
-    ParseTreeNode tree(test);
+    ParseTreeModel tree(doc);
     std::cout << "----" << std::endl;
     if(std::string(doc) == tree.genCode().toStdString())
         std::cout << "Code in/out matches" << std::endl;
@@ -50,17 +60,7 @@ int main(int argc, char* argv[])
 
 
     skin_free_tree(test);
+    */
 
-/*
-    QApplication app(argc, argv);
-
-    QTreeView tree;
-    ParseTreeModel model(doc);
-    tree.setModel(&model);
-    tree.show();
-
-    return app.exec();
-*/
-    return 0;
 }
 

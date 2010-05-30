@@ -47,24 +47,59 @@ QString ParseTreeModel::genCode()
 QModelIndex ParseTreeModel::index(int row, int column,
                                   const QModelIndex& parent) const
 {
-    return QModelIndex();
+    if(!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    ParseTreeNode* foundParent;
+
+    if(parent.isValid())
+        foundParent = static_cast<ParseTreeNode*>(parent.internalPointer());
+    else
+        foundParent = root;
+
+    if(row < foundParent->numChildren() && row >= 0)
+        return createIndex(row, column, foundParent->child(row));
+    else
+        return QModelIndex();
 }
 
 QModelIndex ParseTreeModel::parent(const QModelIndex &child) const
 {
-    return QModelIndex();
+    if(!child.isValid())
+        return QModelIndex();
+
+    ParseTreeNode* foundParent = static_cast<ParseTreeNode*>
+                                 (child.internalPointer())->getParent();
+
+    if(foundParent == root)
+        return QModelIndex();
+
+    return createIndex(foundParent->getRow(), 0, foundParent);
 }
 
 int ParseTreeModel::rowCount(const QModelIndex &parent) const
 {
-    return 0;
+    if(!parent.isValid())
+        return root->numChildren();
+
+    if(parent.column() > 0)
+        return 0;
+
+    return static_cast<ParseTreeNode*>(parent.internalPointer())->numChildren();
 }
 
 int ParseTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return 0;
+    return 3;
 }
 QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
 {
-    return QVariant();
+    if(!index.isValid())
+        return QVariant();
+
+    if(role != Qt::DisplayRole)
+        return QVariant();
+
+    return static_cast<ParseTreeNode*>(index.internalPointer())->
+            data(index.column());
 }

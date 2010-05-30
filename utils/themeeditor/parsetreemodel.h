@@ -39,7 +39,7 @@ class ParseTreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    /* Initializes a tree with a WPS document in a string */
+    /* Initializes a tree with a skin document in a string */
     ParseTreeModel(char* document, QObject* parent = 0);
     virtual ~ParseTreeModel();
 

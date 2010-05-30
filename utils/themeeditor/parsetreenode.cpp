@@ -273,9 +273,8 @@ QVariant ParseTreeNode::data(int column) const
             switch(element->type)
             {
             case LINE:
-                return QString();
-
             case SUBLINES:
+            case CONDITIONAL:
                 return QString();
 
             case NEWLINE:
@@ -285,7 +284,6 @@ QVariant ParseTreeNode::data(int column) const
             case COMMENT:
                 return QString(element->text);
 
-            case CONDITIONAL:
             case TAG:
                 return QString(element->name);
             }
