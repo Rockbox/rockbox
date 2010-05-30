@@ -201,8 +201,8 @@ lcd_mono_data:
  *
  * Register usage:
  *   r3/r4 - current block of phases
- *   r5/r6 - current block of values
- *   r7  - lcd data accumulator
+ *   r5/r6 - lcd data accumulators
+ *   r6/r7 - current block of values
  *   r12 - phase signs mask
  *   lr  - lcd bridge address
  */
@@ -216,63 +216,52 @@ lcd_grey_data:
 
 .greyloop:
     ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
-    ldmia   r0!, {r5-r6}        /* Fetch 8 pixel values */
 
-#ifdef IPOD_MINI2G              /* Serial bridge mode */
-    mov     r7, #0x760000
-    tst     r3, #0x80
-    orreq   r7, r7, #0xc000
-    tst     r3, #0x8000
-    orreq   r7, r7, #0x3000
-    tst     r3, #0x800000
-    orreq   r7, r7, #0x0c00
-    tst     r3, #0x80000000
-    orreq   r7, r7, #0x0300
+    bic     r5, r12, r3         /* r5 = 0.......1.......2.......3....... */
+    orr     r5, r5, r5, lsr #10 /* r5 = 0.......1.0.....2.1.....3.2..... */
+    orr     r5, r5, r5, lsr #10 /* r5 = 0.......1.0.....2.1.0...3.2.1... */
+    orr     r5, r5, r5, lsr #10 /* r5 = 0.......1.0.....2.1.0...3.2.1.0. */
+    orr     r5, r5, r5, lsr #1  /* r5 = 00......1100....221100..33221100 */
     bic     r3, r3, r12
-    add     r3, r3, r5
-#else                           /* Parallel bridge mode */
-    mov     r7, #0
-    tst     r3, #0x80
-    orreq   r7, r7, #0xc0
-    tst     r3, #0x8000
-    orreq   r7, r7, #0x30
-    tst     r3, #0x800000
-    orreq   r7, r7, #0x0c
-    tst     r3, #0x80000000
-    orreq   r7, r7, #0x03
-    bic     r3, r3, r12
-    add     r3, r3, r5
 
+#ifndef IPOD_MINI2G  /* 8 bit parallel bridge mode */
 1:
-    ldr     r5, [lr]
-    tst     r5, #LCD1_BUSY_MASK
+    ldr     r6, [lr]
+    tst     r6, #LCD1_BUSY_MASK
     bne     1b
 
-    str     r7, [lr, #0x10]
-    mov     r7, #0
+    str     r5, [lr, #0x10]
 #endif
 
-    tst     r4, #0x80
-    orreq   r7, r7, #0xc0
-    tst     r4, #0x8000
-    orreq   r7, r7, #0x30
-    tst     r4, #0x800000
-    orreq   r7, r7, #0x0c
-    tst     r4, #0x80000000
-    orreq   r7, r7, #0x03
-    bic     r4, r4, r12
-    add     r4, r4, r6
+    ldmia   r0!, {r6-r7}        /* Fetch 8 pixel values */
+    add     r3, r3, r6
 
+    bic     r6, r12, r4         /* r6 = 4.......5.......6.......7....... */
+    orr     r6, r6, r6, lsr #10 /* r6 = 4.......5.4.....6.5.....7.6..... */
+    orr     r6, r6, r6, lsr #10 /* r6 = 4.......5.4.....6.5.4...7.6.5... */
+    orr     r6, r6, r6, lsr #10 /* r6 = 4.......5.4.....6.5.4...7.6.5.4. */
+    orr     r6, r6, r6, lsr #1  /* r6 = 44......5544....665544..77665544 */
+    bic     r4, r4, r12
+
+    add     r4, r4, r7
     stmia   r1!, {r3-r4}
 
+#ifdef IPOD_MINI2G   /* 16 bit serial bridge mode */
+    and     r5, r5, #0xff       /* r5 = ........................33221100 */
+    and     r6, r6, #0xff       /* r6 = ........................77665544 */
+    orr     r5, r5, r6, lsl #8  /* r5 = ................7766554433221100 */
+    orr     r5, r5, #0x760000   /* data marker */
+#endif
+
 1:
-    ldr     r5, [lr]
-    tst     r5, #LCD1_BUSY_MASK
+    ldr     r7, [lr]
+    tst     r7, #LCD1_BUSY_MASK
     bne     1b
+
 #ifdef IPOD_MINI2G
-    str     r7, [lr, #0x08]
+    str     r5, [lr, #0x08]
 #else
-    str     r7, [lr, #0x10]
+    str     r6, [lr, #0x10]
 #endif
 
     subs    r2, r2, #1
