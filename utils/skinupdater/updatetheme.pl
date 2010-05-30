@@ -35,7 +35,7 @@ system("unzip $ARGV[0] -d $outdir") and die;
 
 #for each skin in the zip run skinupdater
 @files = `find $outdir -iname "*.wps" -o -iname "*.sbs" -o -iname "*.fms" -o -iname "*.rwps" -o -iname "*.rsbs" -o -iname "*.rfms"`;
-`touch $tmp/changes.diff`;
+`touch $tmp/theme_name.diff`;
 foreach (@files)
 {
     chomp($_);
