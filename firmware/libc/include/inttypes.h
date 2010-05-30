@@ -24,6 +24,78 @@
 
 #include <stdint.h>
 
-/* could possibly have (f)printf format specifies here */
+/* could possibly have (f)scanf format specifiers here */
+
+/* 8 bit */
+#define PRId8   "d"
+#define PRIi8   "d"
+#define PRIu8   "u"
+#define PRIx8   "x"
+#define PRIX8   "X"
+
+/* 16 bit */
+#if USHRT_MAX == 0xffff
+
+#define PRId16  "d"
+#define PRIi16  "d"
+#define PRIu16  "u"
+#define PRIx16  "x"
+#define PRIX16  "X"
+
+#endif
+
+/* 32 bit */
+#if ULONG_MAX == 0xfffffffful
+
+#define PRId32  "ld"
+#define PRIi32  "ld"
+#define PRIu32  "lu"
+#define PRIx32  "lx"
+#define PRIX32  "lX"
+#define PRIdPTR "ld"
+#define PRIiPTR "ld"
+#define PRIuPTR "lu"
+#define PRIxPTR "lx"
+#define PRIXPTR "lX"
+
+#elif UINT_MAX == 0xffffffffu
+
+#define PRId32  "d"
+#define PRIi32  "d"
+#define PRIu32  "u"
+#define PRIx32  "x"
+#define PRIX32  "X"
+
+#endif
+
+/* 64 bit */
+#if ULONG_MAX == 0xffffffffffffffffull
+
+#define PRId64  "ld"
+#define PRIi64  "ld"
+#define PRIu64  "lu"
+#define PRIx64  "lx"
+#define PRIX64  "lX"
+#define PRIdPTR "ld"
+#define PRIiPTR "ld"
+#define PRIuPTR "lu"
+#define PRIxPTR "lx"
+#define PRIXPTR "lX"
+
+
+#else
+
+#define PRId64  "lld"
+#define PRIi64  "lld"
+#define PRIu64  "llu"
+#define PRIx64  "llx"
+#define PRIX64  "llX"
+#define PRIdPTR "lld"
+#define PRIiPTR "lld"
+#define PRIuPTR "llu"
+#define PRIxPTR "llx"
+#define PRIXPTR "llX"
+
+#endif
 
 #endif /* __INTTYPES_H__ */
