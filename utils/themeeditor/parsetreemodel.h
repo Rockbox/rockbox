@@ -40,18 +40,16 @@ class ParseTreeModel : public QAbstractItemModel
 
 public:
     /* Initializes a tree with a WPS document in a string */
-    ParseTreeModel(char* wps, QObject* parent = 0);
+    ParseTreeModel(char* document, QObject* parent = 0);
     virtual ~ParseTreeModel();
 
     QString genCode();
 
-    /*
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
     QModelIndex parent(const QModelIndex &child) const;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    */
 
 private:
     ParseTreeNode* root;

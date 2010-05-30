@@ -37,6 +37,7 @@ public:
     ParseTreeNode(struct skin_element* data);
     ParseTreeNode(struct skin_element* data, ParseTreeNode* parent);
     ParseTreeNode(struct skin_tag_parameter* data, ParseTreeNode* parent);
+    virtual ~ParseTreeNode();
 
     QString genCode() const;
 
@@ -44,7 +45,7 @@ public:
     int numChildren() const;
     QVariant data(int column) const;
     int getRow() const;
-    ParseTreeNode* getParent();
+    ParseTreeNode* getParent() const;
 
 private:
     ParseTreeNode* parent;

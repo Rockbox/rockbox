@@ -181,6 +181,10 @@ QString ParseTreeNode::genCode() const
             buffer.append(DEFAULTSYM);
             break;
 
+        case skin_tag_parameter::CODE:
+            buffer.append(QObject::tr("This doesn't belong here"));
+            break;
+
         }
     }
     else
@@ -191,10 +195,152 @@ QString ParseTreeNode::genCode() const
 
     return buffer;
 }
-/*
-ParseTreeNode* child(int row);
-int numChildren() const;
-QVariant data(int column) const;
-int getRow() const;
-ParseTreeNode* getParent();
-*/
+
+ParseTreeNode* ParseTreeNode::child(int row)
+{
+    if(row < 0 || row >= children.count())
+        return 0;
+
+    return children[row];
+}
+
+int ParseTreeNode::numChildren() const
+{
+    return children.count();
+}
+
+
+QVariant ParseTreeNode::data(int column) const
+{
+    switch(column)
+    {
+        /* Column 0 is the element type */
+    case 0:
+        if(element)
+        {
+            switch(element->type)
+            {
+            case LINE:
+                return QObject::tr("Logical Line");
+
+            case SUBLINES:
+                return QObject::tr("Alternator");
+
+            case COMMENT:
+                return QObject::tr("Comment");
+
+            case CONDITIONAL:
+                return QObject::tr("Conditional Tag");
+
+            case TAG:
+                return QObject::tr("Tag");
+
+            case NEWLINE:
+                return QObject::tr("Newline");
+
+            case TEXT:
+                return QObject::tr("Plaintext");
+            }
+        }
+        else if(param)
+        {
+            switch(param->type)
+            {
+            case skin_tag_parameter::STRING:
+                return QObject::tr("String");
+
+            case skin_tag_parameter::NUMERIC:
+                return QObject::tr("Number");
+
+            case skin_tag_parameter::DEFAULT:
+                return QObject::tr("Default Argument");
+
+            case skin_tag_parameter::CODE:
+                return QObject::tr("This doesn't belong here");
+            }
+        }
+        else
+        {
+            return QObject::tr("Root");
+        }
+
+        break;
+
+        /* Column 1 is the value */
+    case 1:
+        if(element)
+        {
+            switch(element->type)
+            {
+            case LINE:
+                return QString();
+
+            case SUBLINES:
+                return QString();
+
+            case NEWLINE:
+                return QObject::tr("\\n");
+
+            case TEXT:
+            case COMMENT:
+                return QString(element->text);
+
+            case CONDITIONAL:
+            case TAG:
+                return QString(element->name);
+            }
+        }
+        else if(param)
+        {
+            switch(param->type)
+            {
+            case skin_tag_parameter::DEFAULT:
+                return QObject::tr("-");
+
+            case skin_tag_parameter::STRING:
+                return QString(param->data.text);
+
+            case skin_tag_parameter::NUMERIC:
+                return QString::number(param->data.numeric, 10);
+
+            case skin_tag_parameter::CODE:
+                return QObject::tr("Seriously, something's wrong here");
+            }
+        }
+        else
+        {
+            return QString();
+        }
+        break;
+
+        /* Column 2 is the line number */
+    case 2:
+        if(element)
+            return QString::number(element->line, 10);
+        else
+            return QString();
+        break;
+    }
+
+    return QVariant();
+}
+
+
+int ParseTreeNode::getRow() const
+{
+    if(!parent)
+        return -1;
+
+    return parent->children.indexOf(const_cast<ParseTreeNode*>(this));
+}
+
+ParseTreeNode* ParseTreeNode::getParent() const
+{
+    return parent;
+}
+
+ParseTreeNode::~ParseTreeNode()
+{
+    for(int i = 0; i < children.count(); i++)
+        delete children[i];
+}

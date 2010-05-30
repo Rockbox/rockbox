@@ -23,85 +23,48 @@
 #include "parsetreemodel.h"
 #include <QObject>
 
-ParseTreeModel::ParseTreeModel(char* wps, QObject* parent):
+ParseTreeModel::ParseTreeModel(char* document, QObject* parent):
         QAbstractItemModel(parent)
 {
-    this->tree = skin_parse(wps);
-    this->root = new ParseTreeNode(tree, 0);
+    this->tree = skin_parse(document);
+    this->root = new ParseTreeNode(tree);
 }
 
 
 ParseTreeModel::~ParseTreeModel()
 {
-    delete root;
+    if(root)
+        delete root;
+    if(tree)
+        skin_free_tree(tree);
 }
 
-QString genCode()
+QString ParseTreeModel::genCode()
 {
-    return QString();
+    return root->genCode();
 }
 
-/*
 QModelIndex ParseTreeModel::index(int row, int column,
                                   const QModelIndex& parent) const
 {
-    if(!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    ParseTreeNode* parentLookup;
-
-    if(!parent.isValid())
-        parentLookup = root;
-    else
-        parentLookup = static_cast<ParseTreeNode*>(parent.internalPointer());
-
-    ParseTreeNode* childLookup = parentLookup->child(row);
-    if(childLookup)
-        return createIndex(row, column, childLookup);
-    else
-        return QModelIndex();
+    return QModelIndex();
 }
 
 QModelIndex ParseTreeModel::parent(const QModelIndex &child) const
 {
-    if(!child.isValid())
-        return QModelIndex();
-
-    ParseTreeNode* childLookup = static_cast<ParseTreeNode*>
-                                 (child.internalPointer());
-    ParseTreeNode* parentLookup = childLookup->parent();
-
-    if(parentLookup == root)
-        return QModelIndex();
-
-    return createIndex(parentLookup->row(), 0, parentLookup);
+    return QModelIndex();
 }
 
 int ParseTreeModel::rowCount(const QModelIndex &parent) const
 {
-    ParseTreeNode* parentLookup;
-    if(parent.column() > 0)
-        return 0;
-
-    if(!parent.isValid())
-        parentLookup = root;
-    else
-        parentLookup = static_cast<ParseTreeNode*>(parent.internalPointer());
-
-    return parentLookup->childCount();
+    return 0;
 }
 
 int ParseTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    return 0;
 }
-
 QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid() || role != Qt::DisplayRole)
-        return QVariant();
-
-    ParseTreeNode* item = static_cast<ParseTreeNode*>(index.internalPointer());
-    return item->data(index.column());
+    return QVariant();
 }
-*/
