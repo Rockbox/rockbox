@@ -74,10 +74,9 @@ void main(void)
 {
     char mystring[64];
     int line, col;
-    unsigned char read_data[16];
+    struct tm dt;
     int i;
     struct si4700_dbg_info si4700_info;
-//    unsigned int data;
     int brightness = DEFAULT_BRIGHTNESS_SETTING;
     unsigned int button;
     unsigned int fm_frequency = 100700000;
@@ -124,6 +123,7 @@ void main(void)
     tuner_power(true);
     si4700_set(RADIO_SLEEP, 0);
     si4700_set(RADIO_MUTE, 0);
+    si4700_set(RADIO_REGION, 0);
     si4700_set(RADIO_FREQUENCY, fm_frequency);
     
     lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
@@ -152,16 +152,16 @@ void main(void)
         line = 1;
 
 #if 1   /* enable to see GPIOs */
-        snprintf(mystring, 64, "%02X %02X %02X %02X %02X %02X %02X %02X", PDAT0, PDAT1, PDAT2, PDAT3, PDAT4, PDAT5, PDAT6, PDAT7); 
+        snprintf(mystring, 64, "%02X %02X %02X %02X %02X %02X %02X %02X",
+            PDAT0, PDAT1, PDAT2, PDAT3, PDAT4, PDAT5, PDAT6, PDAT7);
         lcd_puts(0, line++, mystring);
 #endif
 
 #if 1   /* enable this to see info about the RTC */
-        rtc_read_datetime(read_data);
-        snprintf(mystring, 64, "RTC:");
-        for (i = 0; i < 7; i++) {
-            snprintf(mystring + 2 * i + 4, 64, "%02X", read_data[i]);
-        }
+        rtc_read_datetime(&dt);
+        snprintf(mystring, 64, "RTC: %04d-%02d-%02d %02d:%02d:%02d",
+            dt.tm_year + 1900, dt.tm_mon+1, dt.tm_mday,
+            dt.tm_hour, dt.tm_min, dt.tm_sec);
         lcd_puts(0, line++, mystring);
 #endif 
 
@@ -211,7 +211,8 @@ void main(void)
 #endif
 
 #if 1   /* enable this to see ADC info */
-        snprintf(mystring, 64, "%04X %04X %04X %04X", adc_read(0), adc_read(1), adc_read(2), adc_read(3));
+        snprintf(mystring, 64, "ADC: %04X %04X %04X %04X", 
+            adc_read(0), adc_read(1), adc_read(2), adc_read(3));
         lcd_puts(0, line++, mystring);
         snprintf(mystring, 64, "ADC:USB %4d mV BAT %4d mV",
             (adc_read(0) * 6000) >> 10, (adc_read(2) * 4650) >> 10);
@@ -268,7 +269,7 @@ void main(void)
                 _backlight_set_brightness(brightness);
             }
         }
-        snprintf(mystring, 64, "bright %3d", brightness);
+        snprintf(mystring, 64, "brightness %3d", brightness);
         lcd_puts(0, line++, mystring);
 #endif
 
@@ -289,6 +290,13 @@ void main(void)
         snprintf(mystring, 64, "NAND ID: %08X %08X", nand_ids[0], nand_ids[1]);
         lcd_puts(0, line++, mystring);
         snprintf(mystring, 64, "NAND ID: %08X %08X", nand_ids[2], nand_ids[3]);
+        lcd_puts(0, line++, mystring);
+#endif
+
+#if 1
+        snprintf(mystring, 64, "TIMER A:%08X B:%08X", TACNT, TBCNT);
+        lcd_puts(0, line++, mystring);
+        snprintf(mystring, 64, "TIMER C:%08X D:%08X", TCCNT, TDCNT);
         lcd_puts(0, line++, mystring);
 #endif
 

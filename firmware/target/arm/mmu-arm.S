@@ -39,7 +39,7 @@
 #define USE_MMU
 #define CACHE_SIZE 16
 
-#elif CONFIG_CPU == S5L8701
+#elif CONFIG_CPU == S5L8700 || CONFIG_CPU == S5L8701
 /* MMU not present */
 #define CACHE_SIZE 4
 

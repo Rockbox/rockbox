@@ -154,7 +154,9 @@ void fiq_dummy(void)
 
 void system_init(void)
 {
+#ifdef IPOD_NANO2G
     pmu_init();
+#endif
 }
 
 void system_reboot(void)
