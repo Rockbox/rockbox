@@ -90,6 +90,10 @@ struct skin_element* skin_parse(char* document)
 
                 cursor++;
             }
+            else if(*cursor == COMMENTSYM)
+            {
+                skip_comment(&cursor);
+            }
             else
             {
                 /* Advancing the cursor as normal */
