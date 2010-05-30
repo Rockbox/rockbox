@@ -13762,3 +13762,17 @@
     radio: "Radio Screen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Composer"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

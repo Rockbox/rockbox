@@ -612,6 +612,7 @@ static const int id3_headers[]=
 {
     LANG_ID3_TITLE,
     LANG_ID3_ARTIST,
+    LANG_ID3_COMPOSER,    
     LANG_ID3_ALBUM,
     LANG_ID3_ALBUMARTIST,
     LANG_ID3_GROUPING,
@@ -653,24 +654,24 @@ static const char* id3_get_info(int selected_item, void* data,
     {/* data */
 
         char * val=NULL;
-        switch(info->info_id[info_no])
+        switch(id3_headers[info->info_id[info_no]])
         {
-            case 0:/*LANG_ID3_TITLE*/
+            case LANG_ID3_TITLE:
                 val=id3->title;
                 break;
-            case 1:/*LANG_ID3_ARTIST*/
+            case LANG_ID3_ARTIST:
                 val=id3->artist;
                 break;
-            case 2:/*LANG_ID3_ALBUM*/
+            case LANG_ID3_ALBUM:
                 val=id3->album;
                 break;
-            case 3:/*LANG_ID3_ALBUMARTIST*/
+            case LANG_ID3_ALBUMARTIST:
                 val=id3->albumartist;
                 break;
-            case 4:/*LANG_ID3_GROUPING*/
+            case LANG_ID3_GROUPING:
                 val=id3->grouping;
                 break;
-            case 5:/*LANG_ID3_DISCNUM*/
+            case LANG_ID3_DISCNUM:
                 if (id3->disc_string)
                     val = id3->disc_string;
                 else if (id3->discnum)
@@ -679,7 +680,7 @@ static const char* id3_get_info(int selected_item, void* data,
                     val = buffer;
                 }
                 break;
-            case 6:/*LANG_ID3_TRACKNUM*/
+            case LANG_ID3_TRACKNUM:
                 if (id3->track_string)
                     val = id3->track_string;
                 else if (id3->tracknum)
@@ -688,16 +689,16 @@ static const char* id3_get_info(int selected_item, void* data,
                     val = buffer;
                 }
                 break;
-            case 7:/*LANG_ID3_COMMENT*/
+            case LANG_ID3_COMMENT:
                 if (!id3->comment)
                     return NULL;
                 snprintf(buffer, buffer_len, "%s", id3->comment);
                 val=buffer;
                 break;
-            case 8:/*LANG_ID3_GENRE*/
+            case LANG_ID3_GENRE:
                 val = id3->genre_string;
                 break;
-            case 9:/*LANG_ID3_YEAR*/
+            case LANG_ID3_YEAR:
                 if (id3->year_string)
                     val = id3->year_string;
                 else if (id3->year)
@@ -706,36 +707,35 @@ static const char* id3_get_info(int selected_item, void* data,
                     val = buffer;
                 }
                 break;
-            case 10:/*LANG_ID3_LENGTH*/
+            case LANG_ID3_LENGTH:
                 format_time(buffer, buffer_len, id3->length);
                 val=buffer;
                 break;
-            case 11:/*LANG_ID3_PLAYLIST*/
+            case LANG_ID3_PLAYLIST:
                 snprintf(buffer, buffer_len, "%d/%d",
                          playlist_get_display_index(), playlist_amount());
                 val=buffer;
                 break;
-            case 12:/*LANG_ID3_BITRATE*/
+            case LANG_ID3_BITRATE:
                 snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 val=buffer;
                 break;
-            case 13:/*LANG_ID3_FREQUENCY*/
+            case LANG_ID3_FREQUENCY:
                 snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
                 val=buffer;
                 break;
-#if CONFIG_CODEC == SWCODEC
-            case 14:/*LANG_ID3_TRACK_GAIN*/
+            case LANG_ID3_TRACK_GAIN:
                 val=id3->track_gain_string;
                 break;
-            case 15:/*LANG_ID3_ALBUM_GAIN*/
+            case LANG_ID3_ALBUM_GAIN:
                 val=id3->album_gain_string;
                 break;
-            case 16:/*LANG_ID3_PATH*/
-#else
-            case 14:/*LANG_ID3_PATH*/
-#endif
+            case LANG_ID3_PATH:
                 val=id3->path;
+                break;    
+            case LANG_ID3_COMPOSER:
+                val=id3->composer;
                 break;
         }
         return val && *val ? val : NULL;
