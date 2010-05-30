@@ -33,6 +33,7 @@ int image_count = 0;
 
 /** Command line setting **/
 bool is_mono_display = false;
+bool use_new_vp_tags = true;
 
 
 
@@ -60,6 +61,41 @@ int dump_arg(FILE* out, const char* start, int count, bool close)
         l++;
     }
     return l;
+}
+
+int dump_viewport_tags(FILE* out, const char* start)
+{
+    int len = 0;
+    if (is_mono_display)
+    {
+        return dump_arg(out, start, 5, true);
+    }
+    else
+    {
+        int arg_count = use_new_vp_tags?5:7;
+        len += dump_arg(out, start, arg_count, true);
+        if (!use_new_vp_tags)
+            return len;
+        if (start[len] != '-')
+        {
+            fprintf(out, "%%Vf(");
+            len += dump_arg(out, start+len, 1, true);
+        }
+        else
+        {
+            while (start[len++] != '|');
+        }
+        if (start[len] != '-')
+        {
+            fprintf(out, "%%Vb(");
+            len += dump_arg(out, start+len, 1, true);
+        }
+        else
+        {
+            while (start[len++] != '|');
+        }
+    }
+    return len;
 }
 
 #define MATCH(s) (!strcmp(tag->name, s))
@@ -170,13 +206,16 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("Vl") || MATCH("Vi"))
     {
+        int read;
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, is_mono_display?6:8, true);
+        read = 1+dump_arg(out, start+1, 1, false);
+        PUTCH(out, ',');
+        len += read + dump_viewport_tags(out, start+read);
     }
     else if (MATCH("V"))
     {
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, is_mono_display?5:7, true);
+        len += 1+dump_viewport_tags(out, start+1);
     }
     else if (MATCH("X"))
     {
@@ -277,6 +316,7 @@ int main(int argc, char* argv[])
     {
         printf("Usage: %s [OPTIONS] infile [outfile]\n", argv[0]);
         printf("\nOPTIONS:\n");
+        printf("\t-c\tDon't use new viewport colour tags (non-mono displays only)\n");
         printf("\t-m\tSkin is for a mono display (different viewport tags)\n");
         return 0;
     }
@@ -288,6 +328,9 @@ int main(int argc, char* argv[])
         {
             switch(argv[filearg][i])
             {
+                case 'c': /* disable new colour tags */
+                    use_new_vp_tags = false;
+                    break;
                 case 'm': /* skin is for a mono display */
                     is_mono_display = true;
                     break;
