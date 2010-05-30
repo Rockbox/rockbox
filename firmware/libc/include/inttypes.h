@@ -90,11 +90,6 @@
 #define PRIu64  "llu"
 #define PRIx64  "llx"
 #define PRIX64  "llX"
-#define PRIdPTR "lld"
-#define PRIiPTR "lld"
-#define PRIuPTR "llu"
-#define PRIxPTR "llx"
-#define PRIXPTR "llX"
 
 #endif
 
