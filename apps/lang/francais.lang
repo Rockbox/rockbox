@@ -13367,7 +13367,7 @@
   desc: "<untagged>" entry in tag browser
   user: core
   <source>
-    *: "<Inconnu>"
+    *: "<Untagged>"
   </source>
   <dest>
     *: "<Inconnu>"
