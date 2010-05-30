@@ -8264,8 +8264,6 @@
     *: "Čas"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -13435,23 +13433,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *:none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *:none
-    radio_remote: "Vzdialené FM Rádio"
-  </dest>
-  <voice>
-    *:none
-    radio_remote: "Vzdialené fm rádio"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -13517,5 +13498,189 @@
   <voice>
     *: none
     hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Vzdialená Obrazovka Rádia"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Vzdialená obrazovka rádia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Šírka Pásma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Šírka pásma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Široké"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Široké"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Úzke"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Úzke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Netagované>"
+  </dest>
+  <voice>
+    *: "Netagované"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Pokročilé Nastavenia Tónu"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Pokročilé nastavenia tónu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3-D Vylepšenie"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3-D Vylepšenie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Frekvencia Pásma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Frekvencia pásma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Šírka Pásma %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Šírka pásma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Obrazovka Rádia"
+  </dest>
+  <voice>
+    *: none
+    radio: "Obrazovka rádia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Nastavenia Tónu"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Nastavenia tónu"
   </voice>
 </phrase>
