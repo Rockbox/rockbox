@@ -22,10 +22,20 @@
 #ifndef SCANNING_H
 #define SCANNING_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 /* Scanning functions */
 void skip_comment(char** document);
 void skip_whitespace(char** document);
 char* scan_string(char** document);
 int scan_int(char** document);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SCANNING_H

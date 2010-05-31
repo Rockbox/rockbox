@@ -25,8 +25,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-namespace wps
-{
 #endif
 
 
@@ -297,5 +295,9 @@ char* find_tag(char* name);
  * false, otherwise returns true
  */
 int find_escape_character(char lookup);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TAG_TABLE_H */

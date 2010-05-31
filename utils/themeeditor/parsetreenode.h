@@ -22,10 +22,7 @@
 #ifndef PARSETREENODE_H
 #define PARSETREENODE_H
 
-extern "C"
-{
 #include "skin_parser.h"
-}
 
 #include <QString>
 #include <QVariant>

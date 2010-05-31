@@ -23,6 +23,11 @@
 #ifndef SKIN_DEBUG_H
 #define SKIN_DEBUG_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "skin_parser.h"
 
 /* Debugging functions */
@@ -32,5 +37,9 @@ void skin_debug_tree(struct skin_element* root);
 /* Auxiliary debug functions */
 void skin_debug_params(int count, struct skin_tag_parameter params[]);
 void skin_debug_indent();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SKIN_DEBUG_H

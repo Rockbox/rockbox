@@ -19,11 +19,8 @@
  *
  ****************************************************************************/
 
-extern "C"
-{
 #include "skin_parser.h"
 #include "skin_debug.h"
-}
 
 #include <cstdlib>
 #include <cstdio>

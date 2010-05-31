@@ -22,6 +22,12 @@
 #ifndef SYMBOLS_H
 #define SYMBOLS_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 /* Symbol definitions for WPS parsing */
 
 #define TAGSYM '%'
@@ -35,5 +41,9 @@
 #define ENUMLISTOPENSYM '<'
 #define ENUMLISTCLOSESYM '>'
 #define DEFAULTSYM '-'
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SYMBOLS_H */

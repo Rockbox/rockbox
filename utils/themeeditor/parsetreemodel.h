@@ -19,11 +19,8 @@
  *
  ****************************************************************************/
 
-extern "C"
-{
 #include "skin_parser.h"
 #include "skin_debug.h"
-}
 
 #ifndef PARSETREEMODEL_H
 #define PARSETREEMODEL_H

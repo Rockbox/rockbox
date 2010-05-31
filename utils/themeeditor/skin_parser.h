@@ -22,6 +22,12 @@
 #ifndef GENERIC_PARSER_H
 #define GENERIC_PARSER_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #define SKIN_MAX_MEMORY 1048576
 
 /********************************************************************
@@ -123,5 +129,9 @@ struct skin_tag_parameter* skin_alloc_params(int count);
 char* skin_alloc_string(int length);
 
 void skin_free_tree(struct skin_element* root);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GENERIC_PARSER_H */
