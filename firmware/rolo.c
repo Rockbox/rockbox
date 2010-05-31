@@ -90,9 +90,8 @@ void rolo_restart_cop(void)
     cpu_reply = 2;
 
     asm volatile(
-        "mov   r0, %0   \n"
-        "mov   pc, r0   \n"
-        : : "I"(DRAM_START)
+        "bx    %0   \n"
+        : : "r"(DRAM_START)
     );
 }
 #endif /* NUM_CORES > 1 */
@@ -168,7 +167,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 #endif
 
     asm volatile(
-        "mov   pc, %0   \n"
+        "bx    %0   \n"
         : : "r"(DRAM_START)
     );
 
@@ -178,7 +177,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     cpucache_invalidate();
 #endif
     asm volatile(
-        "mov   pc, %0            \n"
+        "bx    %0   \n"
         : : "r"(dest)
     );
 #elif defined(CPU_MIPS)
