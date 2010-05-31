@@ -163,7 +163,7 @@ remap_start:
     str    r2, [r1]
     str    r4, [r3]
     ldr    r1, L_post_remap
-    mov    pc, r1
+    bx     r1
 L_post_remap:
     .word remap_end
 remap_end:

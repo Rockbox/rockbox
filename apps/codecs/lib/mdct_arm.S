@@ -60,7 +60,7 @@ mdct_butterfly_8:
     add     r11, r12, r7                @ y7 = (x7 + x3) + (x5 + x1)
     stmia   r0!, {r1, r2, r3, r4, r5, r6, r10, r11}
 
-    mov     pc, lr
+    bx      lr
 
 mdct_butterfly_16:
 @ inputs: r0,r1   &lr

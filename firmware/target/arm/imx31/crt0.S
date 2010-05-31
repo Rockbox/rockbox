@@ -67,7 +67,7 @@ newstart:
     strhi   r4, [r1], #4
     bhi     1b
 
-    mov     pc, r6
+    bx      r6
 
     /* Remapping stub. No absolute addresses may be used until after the
      * remapping is complete. */

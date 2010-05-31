@@ -486,7 +486,7 @@ skipreset:
     ldr     r1, =donecopy
     ldr     r2, =0x30000000
     add     r1, r1, r2
-    mov     pc, r1           /* The code is located where we want it so jump */
+    bx      r1               /* The code is located where we want it so jump */
 
 donecopy: 
 
