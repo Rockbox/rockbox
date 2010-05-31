@@ -46,6 +46,12 @@ static int max_line = 0;
 static int log_fd = -1;
 static char logfilename[MAX_PATH];
 
+static void log_close(void)
+{
+    if (log_fd >= 0)
+        rb->close(log_fd);
+}
+
 static bool log_init(bool use_logfile)
 {
     int h;
@@ -57,6 +63,7 @@ static bool log_init(bool use_logfile)
     rb->lcd_update();
 
     if (use_logfile) {
+        log_close();
         rb->create_numbered_filename(logfilename, "/", "test_codec_log_", ".txt",
                                      2 IF_CNFN_NUM_(, NULL));
         log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
@@ -77,12 +84,6 @@ static void log_text(char *text, bool advance)
         if (log_fd >= 0)
             rb->fdprintf(log_fd, "%s\n", text);
     }
-}
-
-static void log_close(void)
-{
-    if (log_fd >= 0)
-        rb->close(log_fd);
 }
 
 struct wavinfo_t
@@ -860,6 +861,7 @@ show_menu:
         }
         while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
+    rb->button_clear_queue();
     goto show_menu;
 
 exit:
