@@ -101,6 +101,12 @@ video.c
 alpine_cdc.c
 #endif
 
+#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
+    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2) || \
+    defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
+firmware_flash.c
+#endif
+
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
 #endif
@@ -110,7 +116,6 @@ rockbox_flash.c
 #endif /* CONFIG_CPU */
 
 battery_bench.c
-firmware_flash.c
 
 #if defined(IPOD_NANO2G)
 crypt_firmware.c

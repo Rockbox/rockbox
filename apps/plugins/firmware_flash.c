@@ -74,10 +74,8 @@
 #define KEEP MASK_ADR /* keep the mask value */
 #define PLATFORM_ID ID_ONDIO_SP
 #else
-#undef PLATFORM_ID /* this platform is not (yet) flashable */
+#error this platform is not (yet) flashable
 #endif
-
-#ifdef PLATFORM_ID
 
 PLUGIN_HEADER
 
@@ -1040,5 +1038,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-#endif /* ifdef PLATFORM_ID */
