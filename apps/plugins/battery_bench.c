@@ -529,28 +529,28 @@ int main(void)
         if (fd >= 0)
         {
             rb->fdprintf(fd,
-                "This plugin will log your battery performance in a\n"
-                "file (%s) every minute.\n"
-                "To properly test your battery:\n"
-                "1) Select and playback an album. "
-                "(Be sure to be more than the player's buffer)\n"
-                "2) Set to repeat.\n"
-                "3) Let the player run completely out of battery.\n"
-                "4) Recharge and copy (or whatever you want) the txt file to "
-                "your computer.\n"
-                "Now you can make graphs with the data of the battery log.\n"
-                "Do not enter another plugin during the test or else the "
-                "logging activity will end.\n\n"
-                "P.S: You can decide how you will make your tests.\n"
-                "Just don't open another plugin to be sure that your log "
+                "# This plugin will log your battery performance in a\n"
+                "# file (%s) every minute.\n"
+                "# To properly test your battery:\n"
+                "# 1) Select and playback an album. "
+                "# (Be sure to be more than the player's buffer)\n"
+                "# 2) Set to repeat.\n"
+                "# 3) Let the player run completely out of battery.\n"
+                "# 4) Recharge and copy (or whatever you want) the txt file to "
+                "# your computer.\n"
+                "# Now you can make graphs with the data of the battery log.\n"
+                "# Do not enter another plugin during the test or else the \n"
+                "# logging activity will end.\n\n"
+                "# P.S: You can decide how you will make your tests.\n"
+                "# Just don't open another plugin to be sure that your log "
                 "will continue.\n\n",BATTERY_LOG);
             rb->fdprintf(fd,
-                "Battery bench run for %s version %s\n\n"
+                "# Battery bench run for %s version %s\n\n"
                 ,MODEL_NAME,rb->rbversion);
 
             rb->fdprintf(fd,
-                "Battery type: %d mAh      Buffer Entries: %d\n"
-                "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
+                "# Battery type: %d mAh      Buffer Entries: %d\n"
+                "# Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
 #if CONFIG_CHARGING
                 ", C:"
 #endif
