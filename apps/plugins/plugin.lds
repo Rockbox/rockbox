@@ -120,10 +120,13 @@ OUTPUT_FORMAT(elf32-littlemips)
 
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define DRAMORIG 0x20000000
-/*#define IRAMORIG 0x1000c000
-#define IRAMSIZE 0xc000*/
+#if CONFIG_CPU==TCC7801
+#define IRAMORIG 0x1000c000
+#define IRAMSIZE 0xc000
+#else
 #define IRAM DRAM
 #define IRAMSIZE 0
+#endif
 
 #elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2
 #if defined(AMS_LOWMEM) || (CONFIG_CPU == AS3525v2)

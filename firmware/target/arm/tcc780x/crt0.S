@@ -155,8 +155,8 @@ copied_start:
     ldr     r0, =0x8001eec0  /* Region 6: 0x80000000-0xffffffff (2Gb) */
     str     r0, [r1,#0x18]   /* AP: 3 EN: 1 DO: 6 CACHE_NONE */
 
-    ldr     r0, =0x1001aee0  /* Region 7: 0x10000000-0x17ffffff (128Mb) */
-    str     r0, [r1,#0x1c]   /* AP: 3 EN: 1 DO: 7 CACHE_NONE */
+    ldr     r0, =0x1001aeec  /* Region 7: 0x10000000-0x17ffffff (128Mb) */
+    str     r0, [r1,#0x1c]   /* AP: 3 EN: 1 DO: 7 CACHE_ALL */
 
     add     r1, r1, #0x8000
     mcr     p15, 0, r1, c2, c0, 0  /* Set TTBR = TABBASE (Virtual TLB) */
