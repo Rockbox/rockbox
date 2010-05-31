@@ -185,17 +185,26 @@ static void draw_progressbar(struct gui_wps *gwps,
         gui_scrollbar_draw(display, pb->x, y, pb->width, height,
                            length, 0, elapsed, HORIZONTAL);
 
-    if (pb->type == WPS_TOKEN_PROGRESSBAR && id3 && id3->length)
+    if (pb->type == WPS_TOKEN_PROGRESSBAR)
     {
+        if (id3 && id3->length)
+        {
 #ifdef AB_REPEAT_ENABLE
-        if (ab_repeat_mode_enabled())
-            ab_draw_markers(display, id3->length,
-                            pb->x, y, pb->width, height);
+            if (ab_repeat_mode_enabled())
+                ab_draw_markers(display, id3->length,
+                                pb->x, y, pb->width, height);
 #endif
 
-        if (id3->cuesheet)
-            cue_draw_markers(display, id3->cuesheet, id3->length,
-                             pb->x, y+1, pb->width, height-2);
+            if (id3->cuesheet)
+                cue_draw_markers(display, id3->cuesheet, id3->length,
+                                 pb->x, y+1, pb->width, height-2);
+        }
+#if CONFIG_TUNER
+        else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+        {
+            presets_draw_markers(display, pb->x, y, pb->width, height);
+        }
+#endif
     }
 }
 

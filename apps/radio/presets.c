@@ -612,3 +612,30 @@ void presets_save(void)
     else
         radio_save_presets();
 }
+
+#ifdef HAVE_LCD_BITMAP
+static inline void draw_veritcal_line_mark(struct screen * screen,
+                                           int x, int y, int h)
+{
+    screen->set_drawmode(DRMODE_COMPLEMENT);
+    screen->vline(x, y, y+h-1);
+}
+
+/* draw the preset markers for a track of length "tracklen",
+   between (x,y) and (x+w,y) */
+void presets_draw_markers(struct screen *screen,
+                          int x, int y, int w, int h)
+{
+    int i,xi;
+    const struct fm_region_data *region_data =
+            &(fm_region_data[global_settings.fm_region]);
+    int len = region_data->freq_max - region_data->freq_min;
+    for (i=0; i < radio_preset_count(); i++)
+    {
+        int freq = radio_get_preset(i)->frequency;
+        int diff = freq - region_data->freq_min;
+        xi = x + (w * diff)/len;
+        draw_veritcal_line_mark(screen, xi, y, h);
+    }
+}
+#endif

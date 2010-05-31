@@ -65,6 +65,7 @@ struct fmstation
     char name[MAX_FMPRESET_LEN+1];
 };
 const char* radio_get_preset_name(int preset);
+void presets_draw_markers(struct screen *screen, int x, int y, int w, int h);
 
 #ifdef HAVE_ALBUMART
 void radioart_init(bool entering_screen);

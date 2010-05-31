@@ -1211,6 +1211,7 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->y = -line_num - 1; /* Will be computed during the rendering */
         if (token->type == WPS_TOKEN_VOLUME || token->type == WPS_TOKEN_BATTERY_PERCENT)
             return 0; /* dont add it, let the regular token handling do the work */
+        pb->type = token->type;
         add_to_ll_chain(&wps_data->progressbars, item);
         return 0;
     }
