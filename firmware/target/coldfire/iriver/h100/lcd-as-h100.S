@@ -106,153 +106,134 @@ lcd_write_data:
      * will occur. */
 
 lcd_grey_data:
-    lea.l   (-10*4, %sp), %sp
-    movem.l %d2-%d6/%a2-%a6, (%sp)  /* free some registers */
-    movem.l (10*4+4, %sp), %a0-%a2  /* values, phases, length */
+    lea.l   (-11*4, %sp), %sp
+    movem.l %d2-%d7/%a2-%a6, (%sp)  /* free some registers */
+    movem.l (11*4+4, %sp), %a0-%a2  /* values, phases, length */
     lea.l   (%a1, %a2.l*4), %a2     /* end address */
     moveq   #8, %d1
     or.l    %d1, (MBAR2+0xb4)   /* A0 = 1 (data) */
     lea     0xf0000000, %a3     /* LCD data port */
-    
-    moveq.l #15, %d3
-    add.l   %a1, %d3
-    and.l   #0xfffffff0, %d3    /* first line bound */
-    move.l  %a2, %d1
-    and.l   #0xfffffff0, %d1    /* last line bound */
-    cmp.l   %d3, %d1
-    bls.w   .g_tloop            /* no lines to copy - jump to tail loop */
-    cmp.l   %a1, %d0
-    bls.s   .g_lloop            /* no head blocks - jump to line loop */
+    moveq.l #24, %d6            /* shift count */
+    move.l  #0xc30c3, %d7       /* bit shuffle factor */
+
+    moveq.l #12, %d2
+    add.l   %a1, %d2
+    and.l   #0xfffffff0, %d2    /* first line bound */
+    cmp.l   %d2, %a2            /* end address lower than first line bound? */
+    bhs.s   1f
+    move.l  %a2, %d2            /* -> adjust end address of head loop */
+1:
+    cmp.l   %a1, %d2
+    bls.s   .g_hend
 
 .g_hloop:
-    move.l  (%a1), %d2          /* fetch 4 pixel phases */
+    move.l  (%a1), %d0          /* fetch 4 pixel phases */
 
-    bclr.l  #31, %d2            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
-    seq.b   %d0                 /* %d0 = ........................00000000 */
-    lsl.l   #2, %d0             /* %d0 = ......................00000000.. */
-    bclr.l  #23, %d2            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
-    seq.b   %d0                 /* %d0 = ......................0011111111 */
-    lsl.l   #2, %d0             /* %d0 = ....................0011111111.. */
-    bclr.l  #15, %d2            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
-    seq.b   %d0                 /* %d0 = ....................001122222222 */
-    lsl.l   #2, %d0             /* %d0 = ..................001122222222.. */
-    bclr.l  #7, %d2             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
-    seq.b   %d0                 /* %d0 = ..................00112233333333 */
-    lsr.l   #6, %d0             /* %d0 = ........................00112233 */
-    move.w  %d0, (%a3)          /* write pixel block */
-    
-    add.l   (%a0)+, %d2         /* add 4 pixel values to the phases */
-    move.l  %d2, (%a1)+         /* store new phases, advance pointer */
+    move.l  %d0, %d1
+    and.l   #0x80808080, %d1    /* separate MSBs of the 4 phases */
+    eor.l   %d1, %d0            /* clear them in %d0 */
+    add.l   (%a0)+, %d0         /* add 4 pixel values to the phases */
+    move.l  %d0, (%a1)+         /* store new phases, advance pointer */
 
-    cmp.l   %a1, %d3            /* go up to first line bound */
+    lsr.l   #1, %d1             /* %d1 = .0.......1.......2.......3...... */
+    mulu.l  %d7, %d1            /* %d1 = 00112233112233..2233....33...... */
+    not.l   %d1                 /*       negate bits */
+    lsr.l   %d6, %d1            /* %d1 = ........................00112233 */
+    move.w  %d1, (%a3)          /* write pixel block */
+
+    cmp.l   %a1, %d2            /* go up to first line bound */
     bhi.s   .g_hloop
+
+.g_hend:
+    cmp.l   %a1, %a2
+    bls.w   .g_tend
+    lea.l   (-12, %a2), %a2
+    cmp.l   %a1, %a2
+    bls.s   .g_lend
     
 .g_lloop:
-    movem.l (%a1), %d2-%d5      /* fetch 4 blocks of 4 pixel phases each */
-    
-    bclr.l  #31, %d2            /* calculate first pixel block */
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #23, %d2
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #15, %d2
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #7, %d2
-    seq.b   %d0
-    lsr.l   #6, %d0
+    movem.l (%a1), %d0-%d3      /* fetch 4 blocks of 4 pixel phases each */
 
-    move.w  %d0, (%a3)          /* write first block to LCD */
+    move.l  %d0, %d4            /* calculate first pixel block */
+    and.l   #0x80808080, %d4
+    eor.l   %d4, %d0            
+    lsr.l   #1, %d4             
+    mulu.l  %d7, %d4            
+    not.l   %d4
+    lsr.l   %d6, %d4
 
-    bclr.l  #31, %d3            /* calculate second pixel block */
-    seq.b   %d6
-    lsl.l   #2, %d6
-    bclr.l  #23, %d3
-    seq.b   %d6
-    lsl.l   #2, %d6
-    bclr.l  #15, %d3
-    seq.b   %d6
-    lsl.l   #2, %d6
-    bclr.l  #7, %d3
-    seq.b   %d6
-    lsr.l   #6, %d6
+    move.w  %d4, (%a3)          /* write first pixel block to LCD */
 
-    bclr.l  #31, %d4            /* calculate third pixel block */
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #23, %d4
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #15, %d4
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #7, %d4
-    seq.b   %d0
-    lsr.l   #6, %d0
+    move.l  %d1, %d5            /* calculate second pixel block */
+    and.l   #0x80808080, %d5
+    eor.l   %d5, %d1
+    lsr.l   #1, %d5
+    mulu.l  %d7, %d5
+    not.l   %d5
+    lsr.l   %d6, %d5
+                                
+    move.l  %d2, %d4            /* calculate third pixel block */
+    and.l   #0x80808080, %d4    
+    eor.l   %d4, %d2            
+    lsr.l   #1, %d4
+    mulu.l  %d7, %d4            
+    not.l   %d4
+    lsr.l   %d6, %d4
 
-    move.w  %d6, (%a3)          /* write second block to LCD */
+    move.w  %d5, (%a3)          /* write second pixel block to LCD */
 
-    movem.l (%a0), %d6/%a4-%a6  /* fetch 4 blocks of 4 pixel values each */
+    movem.l (%a0), %d5/%a4-%a6  /* fetch 4 blocks of 4 pixel values each */
     lea.l   (16, %a0), %a0
 
-    move.w  %d0, (%a3)          /* write third block to LCD */
+    move.w  %d4, (%a3)          /* write third pixel block to LCD */
+                                
+    move.l  %d3, %d4            /* calculate fourth pixel block */
+    and.l   #0x80808080, %d4
+    eor.l   %d4, %d3
+    lsr.l   #1, %d4
+    mulu.l  %d7, %d4            
+    not.l   %d4
+    lsr.l   %d6, %d4
 
-    bclr.l  #31, %d5            /* calculate fourth pixel block */
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #23, %d5
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #15, %d5
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #7, %d5
-    seq.b   %d0
-    lsr.l   #6, %d0
+    add.l   %d5, %d0            /* calculate 4*4 new pixel phases */
+    add.l   %a4, %d1            /* (packed addition) */
+    add.l   %a5, %d2
+    add.l   %a6, %d3
 
-    add.l   %d6, %d2            /* calculate 4*4 new pixel phases */
-    add.l   %a4, %d3            /* (packed addition) */
-    add.l   %a5, %d4
-    add.l   %a6, %d5
-
-    movem.l %d2-%d5, (%a1)      /* store 4*4 new pixel phases */
+    movem.l %d0-%d3, (%a1)      /* store 4*4 new pixel phases */
     lea.l   (16, %a1), %a1
 
-    move.w  %d0, (%a3)          /* write fourth block to LCD */
+    move.w  %d4, (%a3)          /* write fourth pixel block to LCD */
 
-    cmp.l   %a1, %d1            /* go up to last line bound */
-    bhi.w   .g_lloop
+    cmp.l   %a1, %a2            /* go up to last line bound */
+    bhi.s   .g_lloop
     
+.g_lend:
+    lea.l   (12, %a2), %a2
     cmp.l   %a1, %a2
-    bls.s   .g_no_tail
+    bls.s   .g_tend
 
 .g_tloop:
-    move.l  (%a1), %d2
+    move.l  (%a1), %d0          /* fetch 4 pixel phases */
 
-    bclr.l  #31, %d2
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #23, %d2
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #15, %d2
-    seq.b   %d0
-    lsl.l   #2, %d0
-    bclr.l  #7, %d2
-    seq.b   %d0
-    lsr.l   #6, %d0
-    move.w  %d0, (%a3)
+    move.l  %d0, %d1
+    and.l   #0x80808080, %d1
+    eor.l   %d1, %d0            
+    add.l   (%a0)+, %d0         /* add 4 pixel values to the phases */
+    move.l  %d0, (%a1)+         /* store new phases, advance pointer */
 
-    add.l   (%a0)+, %d2
-    move.l  %d2, (%a1)+
+    lsr.l   #1, %d1             
+    mulu.l  %d7, %d1
+    not.l   %d1
+    lsr.l   %d6, %d1
+    move.w  %d1, (%a3)          /* write pixel block */
 
     cmp.l   %a1, %a2            /* go up to end address */
     bhi.s   .g_tloop
 
-.g_no_tail:
-    movem.l (%sp), %d2-%d6/%a2-%a6  /* restore registers */
-    lea.l   (10*4, %sp), %sp
+.g_tend:
+    movem.l (%sp), %d2-%d7/%a2-%a6  /* restore registers */
+    lea.l   (11*4, %sp), %sp
     rts
 
 .gd_end:
