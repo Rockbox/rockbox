@@ -74,39 +74,27 @@ lcd_grey_data:
     ldr     lr, =LCD1_BASE
 
 .greyloop:
-    ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
-    ldmia   r0!, {r5-r6}        /* Fetch 8 pixel values */
-
-    mov     r7, #0xff
-    tst     r3, #0x80
-    biceq   r7, r7, #0x80
-    tst     r3, #0x8000
-    biceq   r7, r7, #0x40
-    tst     r3, #0x800000
-    biceq   r7, r7, #0x20
-    tst     r3, #0x80000000
-    biceq   r7, r7, #0x10
+    ldmia   r1, {r3-r4}
+    
+    and     r5, r12, r3         /* r5 = 3.......2.......1.......0....... */
+    and     r6, r12, r4         /* r6 = 7.......6.......5.......4....... */
+    orr     r5, r5, r6, lsr #4  /* r5 = 3...7...2...6...1...5...0...4... */
+    orr     r5, r5, r5, lsr #9  /* r5 = 3...7...23..67..12..56..01..45.. */
+    orr     r5, r5, r5, lsr #9  /* r5 = 3...7...23..67..123.567.012.456. */
+    orr     r5, r5, r5, lsr #9  /* r5 = 3...7...23..67..123.567.01234567 */
+    
+    ldmia   r0!, {r6-r7}
     bic     r3, r3, r12
-    add     r3, r3, r5
-
-    tst     r4, #0x80
-    biceq   r7, r7, #0x08
-    tst     r4, #0x8000
-    biceq   r7, r7, #0x04
-    tst     r4, #0x800000
-    biceq   r7, r7, #0x02
-    tst     r4, #0x80000000
-    biceq   r7, r7, #0x01
+    add     r3, r3, r6
     bic     r4, r4, r12
-    add     r4, r4, r6
-
+    add     r4, r4, r7
     stmia   r1!, {r3-r4}
 
 1:
-    ldr     r5, [lr]
-    tst     r5, #LCD1_BUSY_MASK
+    ldr     r6, [lr]
+    tst     r6, #LCD1_BUSY_MASK
     bne     1b
-    str     r7, [lr, #0x10]
+    str     r5, [lr, #0x10]
 
     subs    r2, r2, #1
     bne     .greyloop
