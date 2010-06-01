@@ -64,6 +64,7 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         }
         break;
 
+    case VIEWPORT:
     case LINE:
         for(struct skin_element* current = data->children[0]; current;
             current = current->next)
@@ -92,6 +93,10 @@ QString ParseTreeNode::genCode() const
     {
         switch(element->type)
         {
+
+        case VIEWPORT:
+            buffer.append(children[0]->genCode());
+
         case LINE:
             for(int i = 0; i < children.count(); i++)
             {
@@ -220,6 +225,9 @@ QVariant ParseTreeNode::data(int column) const
         {
             switch(element->type)
             {
+            case VIEWPORT:
+                return QObject::tr("Viewport");
+
             case LINE:
                 return QObject::tr("Logical Line");
 
@@ -272,6 +280,7 @@ QVariant ParseTreeNode::data(int column) const
         {
             switch(element->type)
             {
+            case VIEWPORT:
             case LINE:
             case SUBLINES:
             case CONDITIONAL:

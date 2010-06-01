@@ -38,6 +38,7 @@ int skin_current_block = 0;
 int skin_line = 0;
 
 /* Auxiliary parsing functions (not visible at global scope) */
+struct skin_element* skin_parse_viewport(char** document);
 struct skin_element* skin_parse_line(char** document);
 struct skin_element* skin_parse_line_optional(char** document, int conditional);
 struct skin_element* skin_parse_sublines(char** document);
@@ -54,26 +55,68 @@ struct skin_element* skin_parse_code_as_arg(char** document);
 
 struct skin_element* skin_parse(char* document)
 {
-    
+
     struct skin_element* root = NULL;
     struct skin_element* last = NULL;
 
     struct skin_element** to_write = 0;
-    
-    char* cursor = document; /* Keeps track of location in the document */
-    char* bookmark; /* Used when we need to look ahead */
 
-    int sublines = 0; /* Flag for parsing sublines */
+    char* cursor = document; /* Keeps track of location in the document */
 
     skin_line = 1;
 
     while(*cursor != '\0')
     {
 
+        if(!root)
+            to_write = &root;
+        else
+            to_write = &(last->next);
+
+
+        *to_write = skin_parse_viewport(&cursor);
+        last = *to_write;
+        if(!last)
+            return NULL;
+
+        /* Making sure last is at the end */
+        while(last->next)
+            last = last->next;
+
+    }
+
+    return root;
+
+}
+
+struct skin_element* skin_parse_viewport(char** document)
+{
+
+    struct skin_element* root = NULL;
+    struct skin_element* last = NULL;
+    struct skin_element* retval = NULL;
+
+    retval = skin_alloc_element();
+    retval->type = VIEWPORT;
+    retval->children = skin_alloc_children(1);
+    retval->children_count = 1;
+    retval->line = skin_line;
+
+    struct skin_element** to_write = 0;
+
+    char* cursor = *document; /* Keeps track of location in the document */
+    char* bookmark; /* Used when we need to look ahead */
+
+    int sublines = 0; /* Flag for parsing sublines */
+
+    while(*cursor != '\0' && !(check_viewport(cursor) && cursor != *document))
+    {
+
         /* First, we check to see if this line will contain sublines */
         bookmark = cursor;
         sublines = 0;
-        while(*cursor != '\n' && *cursor != '\0')
+        while(*cursor != '\n' && *cursor != '\0'
+              && !(check_viewport(cursor) && cursor != *document))
         {
             if(*cursor == MULTILINESYM)
             {
@@ -135,10 +178,13 @@ struct skin_element* skin_parse(char* document)
         while(last->next)
             last = last->next;
 
-    }     
+    }
 
-    return root;
-    
+    *document = cursor;
+
+    retval->children[0] = root;
+    return retval;
+
 }
 
 /* Auxiliary Parsing Functions */
@@ -176,7 +222,8 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
                 || *cursor == ARGLISTCLOSESYM
                 || *cursor == ENUMLISTSEPERATESYM
                 || *cursor == ENUMLISTCLOSESYM)
-               && conditional))
+               && conditional)
+          && !(check_viewport(cursor) && cursor != *document))
     {
         /* Allocating memory if necessary */
         if(root)
@@ -244,7 +291,8 @@ struct skin_element* skin_parse_sublines_optional(char** document,
                 || *cursor == ARGLISTCLOSESYM
                 || *cursor == ENUMLISTSEPERATESYM
                 || *cursor == ENUMLISTCLOSESYM)
-               && conditional))
+               && conditional)
+          && !(check_viewport(cursor) && cursor != *document))
     {
         if(*cursor == COMMENTSYM)
             skip_comment(&cursor);
@@ -405,7 +453,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
         if(*tag_args == '|')
         {
             optional = 1;
-            req_args = i - 1;
+            req_args = i;
             tag_args++;
         }
 
@@ -477,6 +525,14 @@ int skin_parse_tag(struct skin_element* element, char** document)
         }
 
         tag_args++;
+
+        /* Checking for the optional bar */
+        if(*tag_args == '|')
+        {
+            optional = 1;
+            req_args = i + 1;
+            tag_args++;
+        }
 
     }
 

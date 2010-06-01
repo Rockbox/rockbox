@@ -33,6 +33,7 @@ void skip_comment(char** document);
 void skip_whitespace(char** document);
 char* scan_string(char** document);
 int scan_int(char** document);
+int check_viewport(char* document); /* Checks for a viewport declaration */
 
 #ifdef __cplusplus
 }

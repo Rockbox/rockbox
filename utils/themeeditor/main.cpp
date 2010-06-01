@@ -35,7 +35,11 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    char doc[] = "#Comment\n%Vd(U);Hey\n%?bl(test,3,5,2,1)<param2|param3>";
+    char doc[] = "#Comment\n"
+                 "%Vd(U);Hey\n"
+                 "%?bl(test,3,5,2,1)<param2|param3>\n"
+                 "%V(1,2,3,4,5)%pS(5)\n"
+                 "Some more stuff here";
 
     ParseTreeModel tree(doc);
 

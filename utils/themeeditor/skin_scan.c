@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "skin_scan.h"
 #include "skin_debug.h"
@@ -135,4 +136,23 @@ int scan_int(char** document)
 
     *document = cursor;
     return retval;
+}
+
+int check_viewport(char* document)
+{
+    if(strlen(document) < 3)
+        return 0;
+
+    if(document[0] != TAGSYM)
+        return 0;
+
+    if(document[1] != 'V')
+        return 0;
+
+    if(document[2] != ARGLISTOPENSYM
+       && document[2] != 'l'
+       && document[2] != 'i')
+        return 0;
+
+    return 1;
 }

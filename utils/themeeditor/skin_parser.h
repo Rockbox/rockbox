@@ -42,6 +42,7 @@ extern char skin_parse_tree[];
 /* Possible types of element in a WPS file */
 enum skin_element_type
 {
+    VIEWPORT,
     LINE,
     SUBLINES,
     CONDITIONAL,

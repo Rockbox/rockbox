@@ -91,6 +91,16 @@ void skin_debug_tree(struct skin_element* root)
         switch(current->type)
         {
 
+        case VIEWPORT:
+            printf("[ Viewport \n");
+
+            debug_indent_level++;
+            skin_debug_tree(current->children[0]);
+            debug_indent_level--;
+
+            printf("]");
+            break;
+
         case TEXT:
             printf("[ Plain text on line %d : %s ]\n", current->line,
                    current->text);
