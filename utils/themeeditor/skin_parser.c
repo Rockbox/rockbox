@@ -53,7 +53,7 @@ int skin_parse_newline(struct skin_element* element, char** document);
 int skin_parse_comment(struct skin_element* element, char** document);
 struct skin_element* skin_parse_code_as_arg(char** document);
 
-struct skin_element* skin_parse(char* document)
+struct skin_element* skin_parse(const char* document)
 {
 
     struct skin_element* root = NULL;
@@ -61,7 +61,7 @@ struct skin_element* skin_parse(char* document)
 
     struct skin_element** to_write = 0;
 
-    char* cursor = document; /* Keeps track of location in the document */
+    char* cursor = (char*)document; /*Keeps track of location in the document*/
 
     skin_line = 1;
 
@@ -738,18 +738,20 @@ int skin_parse_comment(struct skin_element* element, char** document)
      */
     for(length = 0; cursor[length] != '\n' && cursor[length] != '\0'; length++);
 
-    length--;
     element->type = COMMENT;
     element->line = skin_line;
     element->text = skin_alloc_string(length);
     /* We copy from one char past cursor to leave out the # */
-    memcpy((void*)(element->text), (void*)(cursor + 1), sizeof(char) * length);
-    element->text[length] = '\0';
+    memcpy((void*)(element->text), (void*)(cursor + 1),
+           sizeof(char) * (length-1));
+    element->text[length - 1] = '\0';
 
-    if(cursor[length + 1] == '\n')
+    if(cursor[length] == '\n')
         skin_line++;
 
-    *document += (length + 2); /* Move cursor up past # and all text */
+    *document += (length); /* Move cursor up past # and all text */
+    if(**document == '\n')
+        (*document)++;
 
     return 1;
 }

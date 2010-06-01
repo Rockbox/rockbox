@@ -123,7 +123,7 @@ struct skin_element
 
 /* Parses a WPS document and returns a list of skin_element
    structures. */
-struct skin_element* skin_parse(char* document);
+struct skin_element* skin_parse(const char* document);
 
 /* Memory management functions */
 struct skin_element* skin_alloc_element();

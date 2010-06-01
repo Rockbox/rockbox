@@ -19,41 +19,31 @@
  *
  ****************************************************************************/
 
-#include "skin_parser.h"
-#include "skin_debug.h"
-#include "editorwindow.h"
+#ifndef EDITORWINDOW_H
+#define EDITORWINDOW_H
 
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-
-#include <QtGui/QApplication>
-#include <QTreeView>
+#include <QMainWindow>
 
 #include "parsetreemodel.h"
 
-int main(int argc, char* argv[])
-{
-    QApplication app(argc, argv);
-
-    EditorWindow mainWindow;
-    mainWindow.show();
-
-    return app.exec();
-
-    /*
-    struct skin_element* test = skin_parse(doc);
-
-    ParseTreeModel tree(doc);
-    std::cout << "----" << std::endl;
-    if(std::string(doc) == tree.genCode().toStdString())
-        std::cout << "Code in/out matches" << std::endl;
-    else
-        std::cout << "Match error" << std::endl;
-
-
-    skin_free_tree(test);
-    */
-
+namespace Ui {
+    class EditorWindow;
 }
 
+class EditorWindow : public QMainWindow {
+    Q_OBJECT
+public:
+    EditorWindow(QWidget *parent = 0);
+    ~EditorWindow();
+
+private slots:
+    void updateCode();
+    void updateTree();
+
+private:
+    Ui::EditorWindow *ui;
+    ParseTreeModel* tree;
+
+};
+
+#endif // EDITORWINDOW_H

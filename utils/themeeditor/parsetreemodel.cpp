@@ -27,7 +27,7 @@
 
 #include <QObject>
 
-ParseTreeModel::ParseTreeModel(char* document, QObject* parent):
+ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         QAbstractItemModel(parent)
 {
     this->tree = skin_parse(document);

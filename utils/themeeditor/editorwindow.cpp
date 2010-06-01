@@ -19,41 +19,45 @@
  *
  ****************************************************************************/
 
-#include "skin_parser.h"
-#include "skin_debug.h"
 #include "editorwindow.h"
+#include "ui_editorwindow.h"
 
-#include <cstdlib>
-#include <cstdio>
 #include <iostream>
 
-#include <QtGui/QApplication>
-#include <QTreeView>
-
-#include "parsetreemodel.h"
-
-int main(int argc, char* argv[])
+EditorWindow::EditorWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::EditorWindow)
 {
-    QApplication app(argc, argv);
+    ui->setupUi(this);
 
-    EditorWindow mainWindow;
-    mainWindow.show();
+    tree = 0;
 
-    return app.exec();
-
-    /*
-    struct skin_element* test = skin_parse(doc);
-
-    ParseTreeModel tree(doc);
-    std::cout << "----" << std::endl;
-    if(std::string(doc) == tree.genCode().toStdString())
-        std::cout << "Code in/out matches" << std::endl;
-    else
-        std::cout << "Match error" << std::endl;
-
-
-    skin_free_tree(test);
-    */
-
+    /* Connecting the buttons */
+    QObject::connect(ui->code, SIGNAL(cursorPositionChanged()),
+                     this, SLOT(updateTree()));
+    QObject::connect(ui->fromTree, SIGNAL(pressed()),
+                     this, SLOT(updateCode()));
 }
 
+void EditorWindow::updateTree()
+{
+    if(tree)
+        delete tree;
+
+    tree = new ParseTreeModel(ui->code->document()->toPlainText().toAscii());
+    ui->parseTree->setModel(tree);
+    ui->parseTree->expandAll();
+}
+
+void EditorWindow::updateCode()
+{
+    tree->genCode();
+    ui->code->setDocument(new QTextDocument(tree->genCode()));
+}
+
+EditorWindow::~EditorWindow()
+{
+    delete ui;
+    if(tree)
+        delete tree;
+}

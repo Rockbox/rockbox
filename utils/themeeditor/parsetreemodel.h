@@ -43,7 +43,7 @@ public:
     static const int valueColumn = 2;
 
     /* Initializes a tree with a skin document in a string */
-    ParseTreeModel(char* document, QObject* parent = 0);
+    ParseTreeModel(const char* document, QObject* parent = 0);
     virtual ~ParseTreeModel();
 
     QString genCode();

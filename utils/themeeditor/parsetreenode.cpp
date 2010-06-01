@@ -19,11 +19,8 @@
  *
  ****************************************************************************/
 
-extern "C"
-{
 #include "symbols.h"
 #include "tag_table.h"
-}
 
 #include "parsetreenode.h"
 #include "parsetreemodel.h"
@@ -100,8 +97,6 @@ QString ParseTreeNode::genCode() const
         {
 
         case VIEWPORT:
-            buffer.append(children[0]->genCode());
-
         case LINE:
             for(int i = 0; i < children.count(); i++)
             {
