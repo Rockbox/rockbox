@@ -62,7 +62,10 @@
 #define CHECK_BYTE  /*empty*/
 #endif  /*}*/
 
-/* "mov lr,pc; bxx ..." implements conditional subroutine call */
+/* "mov lr,pc; bxx ..." implements conditional subroutine call
+ *
+ * NOTE: the lsb will not be set, so you MUST NOT use 'bx lr' to return,
+ * else the T bit will be cleared and processor will go in ARM state */
 #define GETBIT  add bits,bits; mov lr,pc; beq get1_n2e
 
 #define getnextb(reg) GETBIT; adc reg,reg
@@ -123,6 +126,8 @@ get1_n2e:  @ In: Carry set [from adding 0x80000000 (1<<31) to itself]
           CHECK_SRC
           add src,#1
         lsl bits,#24  @ move to top byte, and set CarryOut from old bit 8
+        /* NOTE: the following instruction will not work on ARMv7+, because
+         * it will update the T bit and return into ARM state */
         mov pc,lr  @ return, stay in current (THUMB) mode
 
 lit_n2e:
