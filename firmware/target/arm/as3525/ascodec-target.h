@@ -46,30 +46,6 @@
 #define CVDD_1_10          2
 #define CVDD_1_05          3
 
-#define ASCODEC_REQ_READ   0
-#define ASCODEC_REQ_WRITE  1
-
-/*
- * How many bytes we using in struct ascodec_request for the data buffer.
- * 4 fits the alignment best right now.
- * We don't actually use more than 3 at the moment (when reading interrupts)
- * Upper limit would be 255 since DACNT is 8 bits!
- */
-#define ASCODEC_REQ_MAXLEN 4
-
-typedef void (ascodec_cb_fn)(unsigned const char *data, unsigned cnt);
-
-struct ascodec_request {
-    unsigned char type;
-    unsigned char index;
-    unsigned char status;
-    unsigned char cnt;
-    unsigned char data[ASCODEC_REQ_MAXLEN];
-    struct wakeup wkup;
-    ascodec_cb_fn *callback;
-    struct ascodec_request *next;
-};
-
 void ascodec_init(void) INIT_ATTR;
 
 int ascodec_write(unsigned int index, unsigned int value);
@@ -77,30 +53,6 @@ int ascodec_write(unsigned int index, unsigned int value);
 int ascodec_read(unsigned int index);
 
 int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
-
-/*
- * The request struct passed in must be allocated statically.
- * If you call ascodec_async_write from different places, each
- * call needs it's own request struct.
- * This comment is duplicated in .c and .h for your convenience.
- */
-void ascodec_async_write(unsigned index, unsigned int value, struct ascodec_request *req);
-
-/*
- * The request struct passed in must be allocated statically.
- * If you call ascodec_async_read from different places, each
- * call needs it's own request struct.
- * If len is bigger than ASCODEC_REQ_MAXLEN it will be
- * set to ASCODEC_REQ_MAXLEN.
- * This comment is duplicated in .c and .h for your convenience.
- */
-void ascodec_async_read(unsigned index, unsigned int len,
-                        struct ascodec_request *req, ascodec_cb_fn *cb);
-
-void ascodec_req_init(struct ascodec_request *req, int type,
-                      unsigned int index, unsigned int cnt);
-
-void ascodec_submit(struct ascodec_request *req);
 
 void ascodec_lock(void);
 

@@ -88,6 +88,31 @@
 #define IFDEBUG(x)
 #endif
 
+#define ASCODEC_REQ_READ   0
+#define ASCODEC_REQ_WRITE  1
+
+/*
+ * How many bytes we using in struct ascodec_request for the data buffer.
+ * 4 fits the alignment best right now.
+ * We don't actually use more than 3 at the moment (when reading interrupts)
+ * Upper limit would be 255 since DACNT is 8 bits!
+ */
+#define ASCODEC_REQ_MAXLEN 4
+
+typedef void (ascodec_cb_fn)(unsigned const char *data, unsigned cnt);
+
+struct ascodec_request {
+    unsigned char type;
+    unsigned char index;
+    unsigned char status;
+    unsigned char cnt;
+    unsigned char data[ASCODEC_REQ_MAXLEN];
+    struct wakeup wkup;
+    ascodec_cb_fn *callback;
+    struct ascodec_request *next;
+};
+
+
 static struct mutex as_mtx;
 
 static int ascodec_enrd0_shadow = 0;
@@ -110,18 +135,94 @@ static int int_rtc = 0;
 static int int_adc = 0;
 #endif /* DEBUG */
 
-static void ascodec_read_cb(unsigned const char *data, unsigned int len);
-
-static void ascodec_start_req(struct ascodec_request *req);
-static int  ascodec_continue_req(struct ascodec_request *req, int irq_status);
-static void ascodec_finish_req(struct ascodec_request *req);
-
-void INT_AUDIO(void)
+/* returns != 0 when busy */
+static inline int i2c_busy(void)
 {
-    VIC_INT_EN_CLEAR = INTERRUPT_AUDIO;
-    IFDEBUG(int_audio_ctr++);
+    return (I2C2_SR & 1);
+}
 
-    ascodec_async_read(AS3514_IRQ_ENRD0, 3, &as_audio_req, ascodec_read_cb);
+static void ascodec_finish_req(struct ascodec_request *req)
+{
+    /*
+     * Wait if still busy, unfortunately this happens since
+     * the controller is running at a low divisor, so it's
+     * still busy when we serviced the interrupt.
+     * I tried upping the i2c speed to 4MHz which
+     * made the number of busywait cycles much smaller
+     * (none for reads and only a few for writes),
+     * but who knows if it's reliable at that frequency. ;)
+     * For one thing, 8MHz doesn't work, so 4MHz is likely
+     * borderline.
+     * In general writes need much more wait cycles than reads
+     * for some reason, possibly because we read the data register
+     * for reads, which will likely block the processor while
+     * the i2c controller responds to the register read.
+     */
+    while (i2c_busy());
+
+    /* disable clock */
+    CGU_PERI &= ~CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
+
+    req->status = 1;
+
+    if (req->callback) {
+        req->callback(req->data, req_data_ptr - req->data);
+    }
+    wakeup_signal(&req->wkup);
+
+    req_head = req->next;
+    req->next = NULL;
+    if (req_head == NULL)
+        req_tail = NULL;
+
+}
+
+static int ascodec_continue_req(struct ascodec_request *req, int irq_status)
+{
+    if ((irq_status & (I2C2_IRQ_RXOVER|I2C2_IRQ_ACKTIMEO)) > 0) {
+        /* some error occured, restart the request */
+        return REQ_RETRY;
+    }
+    if (req->type == ASCODEC_REQ_READ &&
+        (irq_status & I2C2_IRQ_RXFULL) > 0) {
+        *(req_data_ptr++) = I2C2_DATA;
+    } else {
+        if (req->cnt > 1 &&
+            (irq_status & I2C2_IRQ_TXEMPTY) > 0) {
+            I2C2_DATA = *(req_data_ptr++);
+        }
+    }
+
+    req->index++;
+    if (--req->cnt > 0)
+        return REQ_UNFINISHED;
+
+    return REQ_FINISHED;
+}
+
+static void ascodec_start_req(struct ascodec_request *req)
+{
+    int unmask = 0;
+
+    /* enable clock */
+    CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
+
+    /* start transfer */
+    I2C2_SADDR = req->index;
+    if (req->type == ASCODEC_REQ_READ) {
+        req_data_ptr = req->data;
+        /* start transfer */
+        I2C2_CNTRL = I2C2_CNTRL_DEFAULT | I2C2_CNTRL_READ;
+        unmask = I2C2_IRQ_RXFULL|I2C2_IRQ_RXOVER;
+    } else {
+        req_data_ptr = &req->data[1];
+        I2C2_CNTRL = I2C2_CNTRL_DEFAULT | I2C2_CNTRL_WRITE;
+        I2C2_DATA = req->data[0];
+        unmask = I2C2_IRQ_TXEMPTY|I2C2_IRQ_ACKTIMEO;
+    }
+
+    I2C2_DACNT = req->cnt;
+    I2C2_IMR |= unmask; /* enable interrupts */
 }
 
 void INT_I2C_AUDIO(void)
@@ -207,13 +308,7 @@ void ascodec_init(void)
 #endif
 }
 
-/* returns != 0 when busy */
-static int i2c_busy(void)
-{
-    return (I2C2_SR & 1);
-}
-
-void ascodec_req_init(struct ascodec_request *req, int type,
+static void ascodec_req_init(struct ascodec_request *req, int type,
                       unsigned int index, unsigned int cnt)
 {
     wakeup_init(&req->wkup);
@@ -224,7 +319,7 @@ void ascodec_req_init(struct ascodec_request *req, int type,
     req->cnt = cnt;
 }
 
-void ascodec_submit(struct ascodec_request *req)
+static void ascodec_submit(struct ascodec_request *req)
 {
     int oldlevel = disable_irq_save();
 
@@ -239,90 +334,6 @@ void ascodec_submit(struct ascodec_request *req)
     }
 
     restore_irq(oldlevel);
-}
-
-static void ascodec_start_req(struct ascodec_request *req)
-{
-    int unmask = 0;
-
-    /* enable clock */
-    CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
-
-    /* start transfer */
-    I2C2_SADDR = req->index;
-    if (req->type == ASCODEC_REQ_READ) {
-        req_data_ptr = req->data;
-        /* start transfer */
-        I2C2_CNTRL = I2C2_CNTRL_DEFAULT | I2C2_CNTRL_READ;
-        unmask = I2C2_IRQ_RXFULL|I2C2_IRQ_RXOVER;
-    } else {
-        req_data_ptr = &req->data[1];
-        I2C2_CNTRL = I2C2_CNTRL_DEFAULT | I2C2_CNTRL_WRITE;
-        I2C2_DATA = req->data[0];
-        unmask = I2C2_IRQ_TXEMPTY|I2C2_IRQ_ACKTIMEO;
-    }
-
-    I2C2_DACNT = req->cnt;
-    I2C2_IMR |= unmask; /* enable interrupts */
-}
-
-static int ascodec_continue_req(struct ascodec_request *req, int irq_status)
-{
-    if ((irq_status & (I2C2_IRQ_RXOVER|I2C2_IRQ_ACKTIMEO)) > 0) {
-        /* some error occured, restart the request */
-        return REQ_RETRY;
-    }
-    if (req->type == ASCODEC_REQ_READ &&
-        (irq_status & I2C2_IRQ_RXFULL) > 0) {
-        *(req_data_ptr++) = I2C2_DATA;
-    } else {
-        if (req->cnt > 1 &&
-            (irq_status & I2C2_IRQ_TXEMPTY) > 0) {
-            I2C2_DATA = *(req_data_ptr++);
-        }
-    }
-
-    req->index++;
-    if (--req->cnt > 0)
-        return REQ_UNFINISHED;
-
-    return REQ_FINISHED;
-}
-
-static void ascodec_finish_req(struct ascodec_request *req)
-{
-    /*
-     * Wait if still busy, unfortunately this happens since
-     * the controller is running at a low divisor, so it's
-     * still busy when we serviced the interrupt.
-     * I tried upping the i2c speed to 4MHz which
-     * made the number of busywait cycles much smaller
-     * (none for reads and only a few for writes),
-     * but who knows if it's reliable at that frequency. ;)
-     * For one thing, 8MHz doesn't work, so 4MHz is likely
-     * borderline.
-     * In general writes need much more wait cycles than reads
-     * for some reason, possibly because we read the data register
-     * for reads, which will likely block the processor while
-     * the i2c controller responds to the register read.
-     */
-    while (i2c_busy());
-
-    /* disable clock */
-    CGU_PERI &= ~CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
-
-    req->status = 1;
-
-    if (req->callback) {
-        req->callback(req->data, req_data_ptr - req->data);
-    }
-    wakeup_signal(&req->wkup);
-
-    req_head = req->next;
-    req->next = NULL;
-    if (req_head == NULL)
-        req_tail = NULL;
-
 }
 
 static int irq_disabled(void)
@@ -350,9 +361,8 @@ static void ascodec_wait(struct ascodec_request *req)
  * The request struct passed in must be allocated statically.
  * If you call ascodec_async_write from different places, each
  * call needs it's own request struct.
- * This comment is duplicated in .c and .h for your convenience.
  */
-void ascodec_async_write(unsigned int index, unsigned int value,
+static void ascodec_async_write(unsigned int index, unsigned int value,
                          struct ascodec_request *req)
 {
     if (index == AS3514_CVDD_DCDC3) /* prevent setting of the LREG_CP_not bit */
@@ -380,9 +390,8 @@ int ascodec_write(unsigned int index, unsigned int value)
  * call needs it's own request struct.
  * If len is bigger than ASCODEC_REQ_MAXLEN it will be
  * set to ASCODEC_REQ_MAXLEN.
- * This comment is duplicated in .c and .h for your convenience.
  */
-void ascodec_async_read(unsigned int index, unsigned int len,
+static void ascodec_async_read(unsigned int index, unsigned int len,
                         struct ascodec_request *req, ascodec_cb_fn *cb)
 {
     if (len > ASCODEC_REQ_MAXLEN)
@@ -433,8 +442,8 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
 
 static void ascodec_read_cb(unsigned const char *data, unsigned int len)
 {
-    if (len != 3) /* some error happened? */
-        return;
+    if (UNLIKELY(len != 3)) /* some error happened? */
+        panicf("INT_AUDIO callback got %d regs", len);
 
     if (data[0] & CHG_ENDOFCH) { /* chg finished */
         ascodec_enrd0_shadow |= CHG_ENDOFCH;
@@ -470,6 +479,14 @@ static void ascodec_read_cb(unsigned const char *data, unsigned int len)
         wakeup_signal(&adc_wkup);
     }
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
+}
+
+void INT_AUDIO(void)
+{
+    VIC_INT_EN_CLEAR = INTERRUPT_AUDIO;
+    IFDEBUG(int_audio_ctr++);
+
+    ascodec_async_read(AS3514_IRQ_ENRD0, 3, &as_audio_req, ascodec_read_cb);
 }
 
 void ascodec_wait_adc_finished(void)
