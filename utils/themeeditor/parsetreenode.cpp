@@ -172,6 +172,7 @@ QString ParseTreeNode::genCode() const
         case COMMENT:
             buffer.append(COMMENTSYM);
             buffer.append(element->text);
+            buffer.append('\n');
             break;
         }
     }

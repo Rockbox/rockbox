@@ -142,8 +142,14 @@ Qt::ItemFlags ParseTreeModel::flags(const QModelIndex &index) const
 
     ParseTreeNode* element = static_cast<ParseTreeNode*>
                              (index.internalPointer());
-    if(element->isParam() && index.column() == valueColumn)
+
+    if((element->isParam()
+        || element->getElement()->type == TEXT
+        || element->getElement()->type == COMMENT)
+        && index.column() == valueColumn)
+    {
         retval |= Qt::ItemIsEditable;
+    }
 
     return retval;
 }
@@ -157,43 +163,54 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
     if(index.column() != valueColumn)
         return false;
 
-    ParseTreeNode* element = static_cast<ParseTreeNode*>
+    ParseTreeNode* node = static_cast<ParseTreeNode*>
                              (index.internalPointer());
 
-    if(!element->isParam())
-        return false;
-
-    struct skin_tag_parameter* param = element->getParam();
-
-    /* Now that we've established that we do, in fact, have a parameter, we'll
-     * set it to its new value if an acceptable one has been entered
-     */
-    if(value.toString().trimmed() == QString(QChar(DEFAULTSYM)))
+    if(node->isParam())
     {
-        if(islower(param->type_code))
-            param->type = skin_tag_parameter::DEFAULT;
+        struct skin_tag_parameter* param = node->getParam();
+
+        /* Now that we've established that we do, in fact, have a parameter,
+         * set it to its new value if an acceptable one has been entered
+         */
+        if(value.toString().trimmed() == QString(QChar(DEFAULTSYM)))
+        {
+            if(islower(param->type_code))
+                param->type = skin_tag_parameter::DEFAULT;
+            else
+                return false;
+        }
+        else if(tolower(param->type_code) == 's'
+                || tolower(param->type_code) == 'f')
+        {
+            if(param->type == skin_tag_parameter::STRING)
+                free(param->data.text);
+
+            param->type = skin_tag_parameter::STRING;
+            param->data.text = strdup(value.toString().trimmed().toAscii());
+        }
+        else if(tolower(param->type_code) == 'i')
+        {
+            if(!value.canConvert(QVariant::Int))
+                return false;
+
+            param->type = skin_tag_parameter::NUMERIC;
+            param->data.numeric = value.toInt();
+        }
         else
+        {
             return false;
-    }
-    else if(tolower(param->type_code) == 's' || tolower(param->type_code) == 'f')
-    {
-        if(param->type == skin_tag_parameter::STRING)
-            free(param->data.text);
-
-        param->type = skin_tag_parameter::STRING;
-        param->data.text = strdup(value.toString().trimmed().toAscii());
-    }
-    else if(tolower(param->type_code) == 'i')
-    {
-        if(!value.canConvert(QVariant::Int))
-            return false;
-
-        param->type = skin_tag_parameter::NUMERIC;
-        param->data.numeric = value.toInt();
+        }
     }
     else
     {
-        return false;
+        struct skin_element* element = node->getElement();
+
+        if(element->type != COMMENT && element->type != TEXT)
+            return false;
+
+        free(element->text);
+        element->text = strdup(value.toString().trimmed().toAscii());
     }
 
     emit dataChanged(index, index);

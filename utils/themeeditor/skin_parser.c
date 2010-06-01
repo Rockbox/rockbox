@@ -738,6 +738,7 @@ int skin_parse_comment(struct skin_element* element, char** document)
      */
     for(length = 0; cursor[length] != '\n' && cursor[length] != '\0'; length++);
 
+    length--;
     element->type = COMMENT;
     element->line = skin_line;
     element->text = skin_alloc_string(length);
@@ -745,10 +746,10 @@ int skin_parse_comment(struct skin_element* element, char** document)
     memcpy((void*)(element->text), (void*)(cursor + 1), sizeof(char) * length);
     element->text[length] = '\0';
 
-    if(cursor[length] == '\n')
+    if(cursor[length + 1] == '\n')
         skin_line++;
 
-    *document += (length + 1); /* Move cursor up past # and all text */
+    *document += (length + 2); /* Move cursor up past # and all text */
 
     return 1;
 }
