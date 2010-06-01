@@ -39,21 +39,28 @@ static unsigned char *dma_start_addr;
 static size_t      dma_size;   /* in 4*32 bits */
 static void dma_callback(void);
 static int locked = 0;
-
-static int play_irq_state;
+static bool is_playing = false;
+static bool play_callback_pending = false;
 
 /* Mask the DMA interrupt */
 void pcm_play_lock(void)
 {
-    if(++locked == 1)
-        play_irq_state = disable_irq_save();
+    ++locked;
 }
 
 /* Unmask the DMA interrupt if enabled */
 void pcm_play_unlock(void)
 {
-    if(--locked == 0)
-        restore_irq(play_irq_state);
+    if(--locked == 0 && is_playing)
+    {
+        int old = disable_irq_save();
+        if(play_callback_pending)
+        {
+            play_callback_pending = false;
+            dma_callback();
+        }
+        restore_irq(old);
+    }
 }
 
 static void play_start_pcm(void)
@@ -74,6 +81,12 @@ static void play_start_pcm(void)
 
 static void dma_callback(void)
 {
+    if(locked)
+    {
+        play_callback_pending = is_playing;
+        return;
+    }
+
     if(!dma_size)
     {
         pcm_play_get_more_callback((void **)&dma_start_addr, &dma_size);
@@ -95,11 +108,14 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     dma_retain();
 
+    is_playing = true;
+
     play_start_pcm();
 }
 
 void pcm_play_dma_stop(void)
 {
+    is_playing = false;
     dma_disable_channel(1);
     dma_size = 0;
 
@@ -111,6 +127,8 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_dma_pause(bool pause)
 {
+    is_playing = !pause;
+
     if(pause)
         dma_disable_channel(1);
     else
@@ -192,6 +210,8 @@ void * pcm_dma_addr(void *addr)
 #ifdef HAVE_RECORDING
 
 static int rec_locked = 0;
+static bool is_recording = false;
+static bool rec_callback_pending = false;
 static unsigned char *rec_dma_start_addr;
 static size_t rec_dma_size, rec_dma_transfer_size;
 static void rec_dma_callback(void);
@@ -200,19 +220,25 @@ static void rec_dma_callback(void);
 static int16_t *mono_samples;
 #endif
 
-static int rec_irq_state;
 
 void pcm_rec_lock(void)
 {
-    if(++rec_locked == 1)
-        rec_irq_state = disable_irq_save();
+    ++rec_locked;
 }
 
 
 void pcm_rec_unlock(void)
 {
-    if(--rec_locked == 0)
-        restore_irq(rec_irq_state);
+    if(--rec_locked == 0 && is_recording)
+    {
+        int old = disable_irq_save();
+        if(rec_callback_pending)
+        {
+            rec_callback_pending = false;
+            rec_dma_callback();
+        }
+        restore_irq(old);
+    }
 }
 
 
@@ -268,11 +294,24 @@ static inline void mono2stereo(int16_t *end)
 
 static void rec_dma_callback(void)
 {
-    rec_dma_size -= rec_dma_transfer_size;
-    rec_dma_start_addr += rec_dma_transfer_size;
+    if(rec_dma_transfer_size)
+    {
+        rec_dma_size -= rec_dma_transfer_size;
+        rec_dma_start_addr += rec_dma_transfer_size;
 
-    /* the 2nd channel is silent when recording microphone on as3525v1 */
-    mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+        /* don't act like we just transferred data when we are called from
+         * pcm_rec_unlock() */
+        rec_dma_transfer_size = 0;
+
+        /* the 2nd channel is silent when recording microphone on as3525v1 */
+        mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+
+        if(locked)
+        {
+            rec_callback_pending = is_recording;
+            return;
+        }
+    }
 
     if(!rec_dma_size)
     {
@@ -293,6 +332,7 @@ static void rec_dma_callback(void)
 
 void pcm_rec_dma_stop(void)
 {
+    is_recording = false;
     dma_disable_channel(1);
     dma_release();
     rec_dma_size = 0;
@@ -319,6 +359,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
     CGU_AUDIO |= ((1<<23)|(1<<11));
 
     I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */
+
+    is_recording = true;
 
     rec_dma_start();
 }
