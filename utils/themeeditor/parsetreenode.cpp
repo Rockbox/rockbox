@@ -67,10 +67,13 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
 
     case VIEWPORT:
     case LINE:
-        for(struct skin_element* current = data->children[0]; current;
-            current = current->next)
+        for(int i = 0; i < data->children_count; i++)
         {
-            children.append(new ParseTreeNode(current, this));
+            for(struct skin_element* current = data->children[i]; current;
+                current = current->next)
+            {
+                children.append(new ParseTreeNode(current, this));
+            }
         }
         break;
 

@@ -98,7 +98,6 @@ struct skin_element* skin_parse_viewport(char** document)
 
     retval = skin_alloc_element();
     retval->type = VIEWPORT;
-    retval->children = skin_alloc_children(1);
     retval->children_count = 1;
     retval->line = skin_line;
 
@@ -108,6 +107,21 @@ struct skin_element* skin_parse_viewport(char** document)
     char* bookmark; /* Used when we need to look ahead */
 
     int sublines = 0; /* Flag for parsing sublines */
+
+    /* Parsing out the viewport tag if there is one */
+    if(check_viewport(cursor))
+    {
+        retval->children_count = 2;
+        retval->children = skin_alloc_children(2);
+        retval->children[0] = skin_alloc_element();
+        skin_parse_tag(retval->children[0], &cursor);
+    }
+    else
+    {
+        retval->children_count = 1;
+        retval->children = skin_alloc_children(1);
+    }
+
 
     while(*cursor != '\0' && !(check_viewport(cursor) && cursor != *document))
     {
@@ -182,7 +196,7 @@ struct skin_element* skin_parse_viewport(char** document)
 
     *document = cursor;
 
-    retval->children[0] = root;
+    retval->children[retval->children_count - 1] = root;
     return retval;
 
 }
