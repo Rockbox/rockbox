@@ -544,6 +544,14 @@ void usb_drv_init(void)
 void usb_drv_exit(void)
 {
     USB_DEV_CTRL |= (1<<10); /* soft disconnect */
+    /*
+     * mask all interrupts _before_ writing to VIC_INT_EN_CLEAR,
+     * or else the core might latch the interrupt while
+     * the write ot VIC_INT_EN_CLEAR is in the pipeline and
+     * so cause a fake spurious interrupt.
+     */
+    USB_DEV_EP_INTR_MASK = 0xffffffff;
+    USB_DEV_INTR_MASK    = 0xffffffff;
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
     CGU_USB &= ~(1<<5);
     CGU_PERI &= ~CGU_USB_CLOCK_ENABLE;
