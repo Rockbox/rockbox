@@ -32,7 +32,7 @@
 #include "PDa/src/m_pd.h"
 
 /* Minimal memory size. */
-#define MIN_MEM_SIZE (2 * 1024 * 1024)
+#define MIN_MEM_SIZE (4 * 1024 * 1024)
 
 /* Memory prototypes. */
 
@@ -49,7 +49,11 @@
 #define PD_OUT_CHANNELS 2
 
 /* Audio buffer part. Contains data for one HZ period. */
+#ifdef SIMULATOR
+#define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS * 16)
+#else
 #define AUDIOBUFSIZE (PD_SAMPLES_PER_HZ * PD_OUT_CHANNELS)
+#endif
 struct audio_buffer
 {
     int16_t data[AUDIOBUFSIZE];

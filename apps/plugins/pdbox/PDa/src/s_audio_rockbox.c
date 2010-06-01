@@ -131,45 +131,46 @@ int rockbox_send_dacs(void)
     if(outbuf_fill >= OUTBUFSIZE-1)
         return SENDDACS_NO;
 
-    /* Write the block of sound. */
-write_block:
-    for(out = outbuf[outbuf_head].data +
-              outbuf[outbuf_head].fill * PD_OUT_CHANNELS;
-        outbuf[outbuf_head].fill < (AUDIOBUFSIZE / PD_OUT_CHANNELS) &&
-            samples_out < DEFDACBLKSIZE;
-        left++, right++, samples_out++, outbuf[outbuf_head].fill++)
+    do
     {
-        /* Copy samples from both channels. */
-        sample = SCALE16(*left);
-        if(sample > 32767)
-            sample = 32767;
-        else if(sample < -32767)
-            sample = -32767;
-        *out++ = sample;
-        sample = SCALE16(*right);
-        if(sample > 32767)
-            sample = 32767;
-        else if(sample < -32767)
-            sample = -32767;
-        *out++ = sample;
-    }
+      /* Write the block of sound. */
+      for(out = outbuf[outbuf_head].data +
+                outbuf[outbuf_head].fill * PD_OUT_CHANNELS;
+          outbuf[outbuf_head].fill < (AUDIOBUFSIZE / PD_OUT_CHANNELS) &&
+              samples_out < DEFDACBLKSIZE;
+          left++, right++, samples_out++, outbuf[outbuf_head].fill++)
+      {
+          /* Copy samples from both channels. */
+          sample = SCALE16(*left);
+          if(sample > 32767)
+              sample = 32767;
+          else if(sample < -32767)
+              sample = -32767;
+          *out++ = sample;
+          sample = SCALE16(*right);
+          if(sample > 32767)
+              sample = 32767;
+          else if(sample < -32767)
+              sample = -32767;
+          *out++ = sample;
+      }
 
-    /* If part of output buffer filled... */
-    if(outbuf[outbuf_head].fill >= (AUDIOBUFSIZE / PD_OUT_CHANNELS))
-    {
-        /* Advance one part of output buffer. */
-        if(outbuf_head == OUTBUFSIZE-1)
-            outbuf_head = 0;
-        else
-            outbuf_head++;
+      /* If part of output buffer filled... */
+      if(outbuf[outbuf_head].fill >= (AUDIOBUFSIZE / PD_OUT_CHANNELS))
+      {
+          /* Advance one part of output buffer. */
+          if(outbuf_head == OUTBUFSIZE-1)
+              outbuf_head = 0;
+          else
+              outbuf_head++;
 
-        /* Increase fill counter. */
-        outbuf_fill++;
-    }
+          /* Increase fill counter. */
+          outbuf_fill++;
+      }
 
     /* If needed, fill the next frame. */
-    if(samples_out < DEFDACBLKSIZE)
-        goto write_block;
+    }
+    while(samples_out < DEFDACBLKSIZE);
 
     /* Clear Pure Data output buffer. */
     memset(sys_soundout,
