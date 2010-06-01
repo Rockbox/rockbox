@@ -1154,7 +1154,7 @@ static void garray_read(t_garray *x, t_symbol *filename)
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
     	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 0)) < 0 
 #ifdef ROCKBOX
-                )
+                || !(fd = filedesc))
 #else
 	    	|| !(fd = fdopen(filedesc, "r")))
 #endif
@@ -1234,7 +1234,7 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
     	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0 
 #ifdef ROCKBOX
-        )
+        || !(fd = filedesc))
 #else
 	    	|| !(fd = fdopen(filedesc, BINREADMODE)))
 #endif

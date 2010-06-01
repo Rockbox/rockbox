@@ -423,7 +423,14 @@ static void soundfile_xferin(int sfchannels, int nvecs, t_sample **vecs,
 	    {
 	    	for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
 		    j < nitems; j++, sp2 += bytesperframe, fp++)
+#ifdef ROCKBOX_BIG_ENDIAN
+		    {
+		    	short xx = (sp2[1] << 8) | sp2[0];
+		    	*fp = xx << (fix1-16);
+		    }
+#else
 		    	*fp = ((short*)sp2)[0]<<(fix1-16); 
+#endif
 	    }
 	}
 	else if (bytespersamp == 3)
