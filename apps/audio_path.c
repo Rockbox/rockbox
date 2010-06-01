@@ -135,6 +135,15 @@ void audio_set_input_source(int source, unsigned flags)
 {
     (void)source;
     (void)flags;
+#if CONFIG_TUNER
+    /* Switch radio off or on per source and flags. */
+    if (source != AUDIO_SRC_FMRADIO)
+        radio_stop();
+    else if (flags & SRCF_FMRADIO_PAUSED)
+        radio_pause();
+    else
+        radio_start();
+#endif
 } /* audio_set_input_source */
 
 #ifdef HAVE_SPDIF_IN
