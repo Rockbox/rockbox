@@ -22,6 +22,7 @@
 extern "C"
 {
 #include "symbols.h"
+#include "tag_table.h"
 }
 
 #include "parsetreenode.h"
@@ -140,7 +141,7 @@ QString ParseTreeNode::genCode() const
             /* When generating code, we DO NOT insert the leading TAGSYM, leave
              * the calling functions to handle that
              */
-            buffer.append(element->name);
+            buffer.append(element->tag->name);
 
             if(element->params_count > 0)
             {
@@ -294,7 +295,7 @@ QVariant ParseTreeNode::data(int column) const
                 return QString(element->text);
 
             case TAG:
-                return QString(element->name);
+                return QString(element->tag->name);
             }
         }
         else if(param)

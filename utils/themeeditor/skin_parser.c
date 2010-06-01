@@ -347,6 +347,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
 
     char tag_name[3];
     char* tag_args;
+    struct tag_info *tag;
 
     int num_args = 1;
     int i;
@@ -361,12 +362,12 @@ int skin_parse_tag(struct skin_element* element, char** document)
     tag_name[2] = '\0';
 
     /* First we check the two characters after the '%', then a single char */
-    tag_args = find_tag(tag_name);
+    tag = find_tag(tag_name);
 
-    if(!tag_args)
+    if(!tag)
     {
         tag_name[1] = '\0';
-        tag_args = find_tag(tag_name);
+        tag = find_tag(tag_name);
         cursor++;
     }
     else
@@ -374,7 +375,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
         cursor += 2;
     }
 
-    if(!tag_args)
+    if(!tag)
     {
         skin_error(ILLEGAL_TAG);
         return 0;
@@ -382,7 +383,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
 
     /* Copying basic tag info */
     element->type = TAG;
-    strcpy(element->name, tag_name);
+    element->tag = tag;
+    tag_args = tag->params;
     element->line = skin_line;
 
     /* Checking for the * flag */

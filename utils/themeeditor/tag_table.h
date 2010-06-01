@@ -287,7 +287,7 @@ struct tag_info
  * Finds a tag by name and returns its parameter list, or an empty
  * string if the tag is not found in the table
  */
-char* find_tag(char* name);
+struct tag_info* find_tag(char* name);
 
 /*
  * Determines whether a character is legal to escape or not.  If 

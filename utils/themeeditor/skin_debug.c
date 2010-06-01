@@ -25,6 +25,7 @@
 
 #include "skin_parser.h"
 #include "skin_debug.h"
+#include "tag_table.h"
 
 /* Global variables for debug output */
 int debug_indent_level = 0;
@@ -123,7 +124,8 @@ void skin_debug_tree(struct skin_element* root)
             break;
 
         case TAG:
-            printf("[ %s tag on line %d with %d arguments\n", current->name,
+            printf("[ %s tag on line %d with %d arguments\n",
+                   current->tag->name,
                    current->line, current->params_count);
             debug_indent_level++;
             skin_debug_params(current->params_count, current->params);

@@ -206,7 +206,8 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_REC_MINUTES,           "Rn"   , ""},
     { SKIN_TOKEN_REC_HOURS,             "Rh"   , ""},
     
-    { SKIN_TOKEN_UNKNOWN,                ""   , ""} /* Keep this here to mark the end of the table */
+    { SKIN_TOKEN_UNKNOWN,                ""   , ""}
+    /* Keep this here to mark the end of the table */
 };
 
 /* A table of legal escapable characters */
@@ -216,7 +217,7 @@ char legal_escape_characters[] = "%(,);#<|>";
  * Just does a straight search through the tag table to find one by
  * the given name
  */
-char* find_tag(char* name)
+struct tag_info* find_tag(char* name)
 {
     
     struct tag_info* current = legal_tags;
@@ -233,7 +234,7 @@ char* find_tag(char* name)
     if(current->name[0] == '\0')
         return NULL;
     else
-        return current->params;
+        return current;
 
 }
 

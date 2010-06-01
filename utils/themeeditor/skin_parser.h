@@ -101,7 +101,7 @@ struct skin_element
     char* text;
 
     /* The tag or conditional name */
-    char name[3];
+    struct tag_info *tag;
 
     /* Pointer to and size of an array of parameters */
     int params_count;
