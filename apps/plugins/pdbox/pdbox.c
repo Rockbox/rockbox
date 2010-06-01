@@ -218,8 +218,10 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* Boost CPU. */
-    cpu_boost(true);
+    rb->trigger_cpu_boost();
+#endif
 
     /* Start threads. */
     core_thread_id =
@@ -258,8 +260,10 @@ enum plugin_status plugin_start(const void* parameter)
     rb->thread_wait(gui_thread_id);
     rb->thread_wait(core_thread_id);
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* Unboost CPU. */
-    cpu_boost(false);
+    rb->cancel_cpu_boost();
+#endif
 
     /* Close audio subsystem. */
     sys_close_audio();
