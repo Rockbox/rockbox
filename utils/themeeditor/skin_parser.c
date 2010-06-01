@@ -481,6 +481,9 @@ int skin_parse_tag(struct skin_element* element, char** document)
         if(*cursor == COMMENTSYM)
             skip_comment(&cursor);
 
+        /* Storing the type code */
+        element->params[i].type_code = *tag_args;
+
         /* Checking a nullable argument for null */
         if(*cursor == DEFAULTSYM)
         {

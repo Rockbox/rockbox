@@ -21,6 +21,10 @@
 
 
 #include "parsetreemodel.h"
+#include "symbols.h"
+
+#include <cstdlib>
+
 #include <QObject>
 
 ParseTreeModel::ParseTreeModel(char* document, QObject* parent):
@@ -82,7 +86,7 @@ int ParseTreeModel::rowCount(const QModelIndex &parent) const
     if(!parent.isValid())
         return root->numChildren();
 
-    if(parent.column() > 0)
+    if(parent.column() != typeColumn)
         return 0;
 
     return static_cast<ParseTreeNode*>(parent.internalPointer())->numChildren();
@@ -90,8 +94,9 @@ int ParseTreeModel::rowCount(const QModelIndex &parent) const
 
 int ParseTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return 3;
+    return numColumns;
 }
+
 QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
@@ -102,4 +107,95 @@ QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
 
     return static_cast<ParseTreeNode*>(index.internalPointer())->
             data(index.column());
+}
+
+QVariant ParseTreeModel::headerData(int col, Qt::Orientation orientation,
+                                    int role) const
+{
+    if(orientation != Qt::Horizontal)
+        return QVariant();
+
+    if(col >= numColumns)
+        return QVariant();
+
+    if(role != Qt::DisplayRole)
+        return QVariant();
+
+    switch(col)
+    {
+    case typeColumn:
+        return QObject::tr("Type");
+
+    case lineColumn:
+        return QObject::tr("Line");
+
+    case valueColumn:
+        return QObject::tr("Value");
+    }
+
+    return QVariant();
+}
+
+Qt::ItemFlags ParseTreeModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags retval = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+    ParseTreeNode* element = static_cast<ParseTreeNode*>
+                             (index.internalPointer());
+    if(element->isParam() && index.column() == valueColumn)
+        retval |= Qt::ItemIsEditable;
+
+    return retval;
+}
+
+bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
+                             int role)
+{
+    if(role != Qt::EditRole)
+        return false;
+
+    if(index.column() != valueColumn)
+        return false;
+
+    ParseTreeNode* element = static_cast<ParseTreeNode*>
+                             (index.internalPointer());
+
+    if(!element->isParam())
+        return false;
+
+    struct skin_tag_parameter* param = element->getParam();
+
+    /* Now that we've established that we do, in fact, have a parameter, we'll
+     * set it to its new value if an acceptable one has been entered
+     */
+    if(value.toString().trimmed() == QString(QChar(DEFAULTSYM)))
+    {
+        if(islower(param->type_code))
+            param->type = skin_tag_parameter::DEFAULT;
+        else
+            return false;
+    }
+    else if(tolower(param->type_code) == 's' || tolower(param->type_code) == 'f')
+    {
+        if(param->type == skin_tag_parameter::STRING)
+            free(param->data.text);
+
+        param->type = skin_tag_parameter::STRING;
+        param->data.text = strdup(value.toString().trimmed().toAscii());
+    }
+    else if(tolower(param->type_code) == 'i')
+    {
+        if(!value.canConvert(QVariant::Int))
+            return false;
+
+        param->type = skin_tag_parameter::NUMERIC;
+        param->data.numeric = value.toInt();
+    }
+    else
+    {
+        return false;
+    }
+
+    emit dataChanged(index, index);
+    return true;
 }

@@ -85,6 +85,8 @@ struct skin_tag_parameter
         char* text;
         struct skin_element* code;
     } data;
+
+    char type_code;
             
 };
 

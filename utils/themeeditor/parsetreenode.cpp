@@ -26,6 +26,7 @@ extern "C"
 }
 
 #include "parsetreenode.h"
+#include "parsetreemodel.h"
 
 /* Root element constructor */
 ParseTreeNode::ParseTreeNode(struct skin_element* data)
@@ -223,8 +224,7 @@ QVariant ParseTreeNode::data(int column) const
 {
     switch(column)
     {
-        /* Column 0 is the element type */
-    case 0:
+    case ParseTreeModel::typeColumn:
         if(element)
         {
             switch(element->type)
@@ -278,8 +278,7 @@ QVariant ParseTreeNode::data(int column) const
 
         break;
 
-        /* Column 1 is the value */
-    case 1:
+    case ParseTreeModel::valueColumn:
         if(element)
         {
             switch(element->type)
@@ -324,8 +323,7 @@ QVariant ParseTreeNode::data(int column) const
         }
         break;
 
-        /* Column 2 is the line number */
-    case 2:
+    case ParseTreeModel::lineColumn:
         if(element)
             return QString::number(element->line, 10);
         else

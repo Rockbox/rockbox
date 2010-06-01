@@ -36,6 +36,12 @@ class ParseTreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    /* Constants */
+    static const int numColumns = 3;
+    static const int typeColumn = 0;
+    static const int lineColumn = 1;
+    static const int valueColumn = 2;
+
     /* Initializes a tree with a skin document in a string */
     ParseTreeModel(char* document, QObject* parent = 0);
     virtual ~ParseTreeModel();
@@ -47,6 +53,9 @@ public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int col, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
 
 private:
     ParseTreeNode* root;
