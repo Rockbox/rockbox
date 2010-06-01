@@ -604,6 +604,16 @@ static int sd_select_bank(signed char bank)
     int ret;
     unsigned loops = 0;
 
+    memset(uncached_buffer, 0, 512);
+    if(bank == -1)
+    {   /* enable bank switching */
+        uncached_buffer[0] = 16;
+        uncached_buffer[1] = 1;
+        uncached_buffer[2] = 10;
+    }
+    else
+        uncached_buffer[0] = bank;
+
     do {
         if(loops++ > PL180_MAX_TRANSFER_ERRORS)
             panicf("SD bank %d error : 0x%x", bank,
@@ -622,16 +632,6 @@ static int sd_select_bank(signed char bank)
             return -2;
 
         mci_delay();
-
-        memset(uncached_buffer, 0, 512);
-        if(bank == -1)
-        {   /* enable bank switching */
-            uncached_buffer[0] = 16;
-            uncached_buffer[1] = 1;
-            uncached_buffer[2] = 10;
-        }
-        else
-            uncached_buffer[0] = bank;
 
         dma_retain();
         /* we don't use the uncached buffer here, because we need the
