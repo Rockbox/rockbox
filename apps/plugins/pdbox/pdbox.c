@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 Wincent Balin
+ * Copyright (C) 2009, 2010 Wincent Balin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
