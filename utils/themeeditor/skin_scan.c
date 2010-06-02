@@ -101,9 +101,9 @@ char* scan_string(char** document)
 int scan_int(char** document)
 {
 
-    char* cursor = *document;
+    char* cursor = *document, *end;
     int length = 0;
-    char* buffer = NULL;
+    char buffer[16];
     int retval;
     int i;
 
@@ -118,9 +118,9 @@ int scan_int(char** document)
         length++;
         cursor++;
     }
-
-    buffer = skin_alloc_string(length);
-
+    if (length > 15)
+        length = 15;
+    end = cursor;
     /* Copying to the buffer while avoiding comments */
     cursor = *document;
     buffer[length] = '\0';
@@ -138,9 +138,8 @@ int scan_int(char** document)
 
     }
     retval = atoi(buffer);
-    free(buffer);
 
-    *document = cursor;
+    *document = end;
     return retval;
 }
 

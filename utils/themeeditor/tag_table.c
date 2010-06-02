@@ -167,7 +167,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_DISABLE_THEME,         "wd", "" },
     { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "" },
     
-    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SFIIi" },
+    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SFII|I" },
     { SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S" },
     { SKIN_TOKEN_IMAGE_PRELOAD,         "x", "SFII" },
     
