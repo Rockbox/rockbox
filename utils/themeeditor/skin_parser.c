@@ -295,6 +295,7 @@ struct skin_element* skin_parse_sublines_optional(char** document,
     char* cursor = *document;
     int sublines = 1;
     int i;
+    int nested = 0;
 
     retval = skin_alloc_element();
     retval->type = SUBLINES;
@@ -311,8 +312,24 @@ struct skin_element* skin_parse_sublines_optional(char** document,
           && !(check_viewport(cursor) && cursor != *document))
     {
         if(*cursor == COMMENTSYM)
+        {
             skip_comment(&cursor);
+            continue;
+        }
 
+        if(*cursor == ENUMLISTOPENSYM && conditional)
+        {
+            nested++;
+            cursor++;
+            while(nested)
+            {
+                if(*cursor == ENUMLISTOPENSYM)
+                    nested++;
+                if(*cursor == ENUMLISTCLOSESYM)
+                    nested--;
+                cursor++;
+            }
+        }
         /* Accounting for escaped subline symbols */
         if(*cursor == TAGSYM)
         {
@@ -637,6 +654,7 @@ int skin_parse_conditional(struct skin_element* element, char** document)
     struct skin_element* tag = skin_alloc_element(); /* The tag to evaluate */
     int children = 1;
     int i;
+    int nested = 0;
 
     element->type = CONDITIONAL;
     element->line = skin_line;
@@ -658,6 +676,20 @@ int skin_parse_conditional(struct skin_element* element, char** document)
         {
             skip_comment(&cursor);
             continue;
+        }
+
+        if(*cursor == ENUMLISTOPENSYM)
+        {
+            nested++;
+            cursor++;
+            while(nested)
+            {
+                if(*cursor == ENUMLISTOPENSYM)
+                    nested++;
+                if(*cursor == ENUMLISTCLOSESYM)
+                    nested--;
+                cursor++;
+            }
         }
 
         if(*cursor == TAGSYM)

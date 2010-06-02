@@ -25,6 +25,8 @@
 #include "parsetreenode.h"
 #include "parsetreemodel.h"
 
+int ParseTreeNode::openConditionals = 0;
+
 /* Root element constructor */
 ParseTreeNode::ParseTreeNode(struct skin_element* data)
     : parent(0), element(0), param(0), children()
@@ -117,7 +119,8 @@ QString ParseTreeNode::genCode() const
                     buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
             }
-            buffer.append('\n');
+            if(openConditionals == 0)
+                buffer.append('\n');
             break;
 
         case SUBLINES:
@@ -131,6 +134,7 @@ QString ParseTreeNode::genCode() const
             break;
 
         case CONDITIONAL:
+            openConditionals++;
             /* Inserts a %?, the tag renderer doesn't deal with the TAGSYM */
             buffer.append(TAGSYM);
             buffer.append(CONDITIONSYM);
@@ -145,6 +149,7 @@ QString ParseTreeNode::genCode() const
                     buffer.append(ENUMLISTSEPERATESYM);
             }
             buffer.append(ENUMLISTCLOSESYM);
+            openConditionals--;
             break;
 
         case TAG:

@@ -53,6 +53,8 @@ private:
     struct skin_tag_parameter* param;
     QList<ParseTreeNode*> children;
 
+    static int openConditionals;
+
 };
 
 #endif // PARSETREENODE_H
