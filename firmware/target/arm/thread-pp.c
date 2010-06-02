@@ -253,6 +253,7 @@ static inline void core_sleep(void)
     sleep_core(CURRENT_CORE);
     enable_irq();
 }
+#else
 /* PP5002 has no mailboxes - emulate using bytes */
 static inline void core_sleep(unsigned int core)
 {
