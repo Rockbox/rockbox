@@ -272,23 +272,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: ""
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTOVOL
   desc: in sound_settings
   user: core
@@ -303,23 +286,6 @@
   <voice>
     *: none
     masf: "Avtom. glasnost"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: ""
-  </dest>
-  <voice>
-    *: none
-    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -738,23 +704,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_ALARM_MENU
-  desc: The name of the additional entry in the main menu for the RTC alarm mod.
-  user: core
-  <source>
-    *: none
-    alarm: "Wake-Up Alarm"
-  </source>
-  <dest>
-    *: none
-    alarm: ""
-  </dest>
-  <voice>
-    *: none
-    alarm: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_QUALITY
   desc: in the recording settings
   user: core
@@ -843,40 +792,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: ""
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT
-  desc: Record split menu
-  user: core
-  <source>
-    *: none
-    recording: "File Split Options"
-  </source>
-  <dest>
-    *: none
-    recording: ""
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FFRW_STEP
   desc: in settings_menu
   user: core
@@ -916,23 +831,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu, backlight timeout with charger connected
-  user: core
-  <source>
-    *: none
-    charging: "Backlight (While Plugged In)"
-  </source>
-  <dest>
-    *: none
-    charging: ""
-  </dest>
-  <voice>
-    *: none
-    charging: ""
   </voice>
 </phrase>
 <phrase>
@@ -978,74 +876,6 @@
   <voice>
     *: none
     lcd_invert,remote_lcd_invert: "LCD način"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_INVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
-  </source>
-  <dest>
-    *: none
-    lcd_invert,remote_lcd_invert: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_invert,remote_lcd_invert: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_CURSOR
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_CURSOR_POINTER
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Pointer"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_CURSOR_BAR
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
