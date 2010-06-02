@@ -481,7 +481,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
         element->params[i].type_code = *tag_args;
 
         /* Checking a nullable argument for null */
-        if(*cursor == DEFAULTSYM)
+        if(*cursor == DEFAULTSYM && !isdigit(cursor[1]))
         {
             if(islower(*tag_args))
             {
@@ -497,7 +497,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
         else if(tolower(*tag_args) == 'i')
         {
             /* Scanning an int argument */
-            if(!isdigit(*cursor))
+            if(!isdigit(*cursor) && *cursor != '-')
             {
                 skin_error(INT_EXPECTED);
                 return 0;

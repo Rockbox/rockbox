@@ -97,9 +97,10 @@ QString ParseTreeNode::genCode() const
         {
 
         case VIEWPORT:
+            if(children[0]->element->type == TAG)
+                buffer.append(TAGSYM);
             buffer.append(children[0]->genCode());
-            if(!children[0]->isParam()
-                && children[0]->getElement()->type == TAG)
+            if(children[0]->element->type == TAG)
                 buffer.append('\n');
             for(int i = 1; i < children.count(); i++)
                 buffer.append(children[i]->genCode());

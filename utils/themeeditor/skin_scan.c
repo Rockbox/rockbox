@@ -107,7 +107,7 @@ int scan_int(char** document)
     int retval;
     int i;
 
-    while(isdigit(*cursor) || *cursor == COMMENTSYM)
+    while(isdigit(*cursor) || *cursor == COMMENTSYM || *cursor == '-')
     {
         if(*cursor == COMMENTSYM)
         {
