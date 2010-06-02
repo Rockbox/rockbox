@@ -45,6 +45,7 @@ const static struct {
     { SystemInfo::ServerConfUrl,        "server_conf_url",      "" },
     { SystemInfo::GenlangUrl,           "genlang_url",          "" },
     { SystemInfo::ThemesUrl,            "themes_url",           "" },
+    { SystemInfo::ThemesInfoUrl,        "themes_info_url",      "" },
     { SystemInfo::RbutilUrl,            "rbutil_url",           "" },
     { SystemInfo::BleedingInfo,         "bleeding_info",        "" },
     { SystemInfo::CurPlatformName,      ":platform:/name",      "" },

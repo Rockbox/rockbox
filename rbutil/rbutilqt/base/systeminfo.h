@@ -49,6 +49,7 @@ class SystemInfo : public QObject
             ServerConfUrl,
             GenlangUrl,
             ThemesUrl,
+            ThemesInfoUrl,
             RbutilUrl,
             BleedingInfo,
             CurPlatformName,
