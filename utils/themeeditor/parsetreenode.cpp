@@ -116,10 +116,8 @@ QString ParseTreeNode::genCode() const
                 if(children[i]->element->type == TAG)
                     buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
-                buffer.append('\n');
             }
-            if(children.count() == 0)
-                buffer.append('\n');
+            buffer.append('\n');
             break;
 
         case SUBLINES:

@@ -114,6 +114,11 @@ struct skin_element* skin_parse_viewport(char** document)
         retval->children = skin_alloc_children(2);
         retval->children[0] = skin_alloc_element();
         skin_parse_tag(retval->children[0], &cursor);
+        if(*cursor == '\n')
+        {
+            cursor++;
+            skin_line++;
+        }
     }
     else
     {
@@ -185,8 +190,10 @@ struct skin_element* skin_parse_viewport(char** document)
             last = last->next;
 
         if(*cursor == '\n')
+        {
             cursor++;
-
+            skin_line++;
+        }
     }
 
     *document = cursor;
