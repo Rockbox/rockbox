@@ -1537,13 +1537,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: "Archivo mp3 (.talk)"
   </dest>
   <voice>
-    *: "Archivo m p 3, t a l k"
+    *: "Archivo m p 3, punto t a l k"
   </voice>
 </phrase>
 <phrase>
@@ -12493,11 +12493,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "Aspecto predeterminado"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "Aspecto predeterminado"
   </voice>
 </phrase>
 <phrase>
@@ -12722,11 +12722,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Aspecto predeterminado del mando"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Aspecto predeterminado del mando"
   </voice>
 </phrase>
 <phrase>
@@ -12735,15 +12735,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Modo de navegador"
   </dest>
   <voice>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Modo de navegador"
   </voice>
 </phrase>
 <phrase>
@@ -12936,15 +12936,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Modo del ratón"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Modo del ratón"
   </voice>
 </phrase>
 <phrase>
@@ -12970,15 +12970,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Modo multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Modo multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -13221,15 +13221,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Modo presentación"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Modo presentación"
   </voice>
 </phrase>
 <phrase>
@@ -13244,5 +13244,426 @@
   </dest>
   <voice>
     *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tecla rápida de la WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tecla rápida de la WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ganancia de la banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ganancia de la banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Salida de línea"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Salida de línea"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "aspecto de la pantalla de radio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ancha"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ancha"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "aspecto de la pantalla del mando de la radio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Pantalla del mando"
+  </dest>
+  <voice>
+    *: none
+    remote: "Pantalla del mando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Estrecha"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Estrecha"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_HOTKEY
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tecla rápida del examinador de archivos"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rebobinar antes de continuar"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rebobinar antes de continuar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Untagged>"
+  </dest>
+  <voice>
+    *: "Untagged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ajustes avanzados de control de tono"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ajustes avanzados de control de tono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Realce 3D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Realce 3 D"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Frecuencia de la banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Frecuencia de la banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ancho de la banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ancho de la banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_FMRADIO
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote FM Radio"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Radio FM remota"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Radio F M remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Emisora:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_ASSIGNED
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Pantalla principal"
+  </dest>
+  <voice>
+    *: none
+    remote: "Pantalla principal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Controles de tono"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Controles de tono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tecla rápida"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tecla rápida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_NOT_SET
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_HOTKEY_QUESTION
+  desc: deprecated
+  user: core
+  <source>
+    *: none
+    hotkey: ""
+  </source>
+  <dest>
+    *: none
+    hotkey: ""
+  </dest>
+  <voice>
+    *: none
+    hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Intervalo del histograma"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Intervalo del histograma"
   </voice>
 </phrase>
