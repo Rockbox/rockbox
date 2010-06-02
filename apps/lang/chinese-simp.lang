@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -27,10 +27,10 @@
     *: "Yes"
   </source>
   <dest>
-    *: "是"
+    *: "确定"
   </dest>
   <voice>
-    *: "是"
+    *: "确定"
   </voice>
 </phrase>
 <phrase>
@@ -41,10 +41,10 @@
     *: "No"
   </source>
   <dest>
-    *: "不"
+    *: "取消"
   </dest>
   <voice>
-    *: "不"
+    *: "取消"
   </voice>
 </phrase>
 <phrase>
@@ -176,10 +176,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "已失败"
+    *: "操作失败"
   </dest>
   <voice>
-    *: "已失败"
+    *: "操作失败"
   </voice>
 </phrase>
 <phrase>
@@ -204,10 +204,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "声音的设置"
+    *: "声音设置"
   </dest>
   <voice>
-    *: "声音的设置"
+    *: "声音设置"
   </voice>
 </phrase>
 <phrase>
@@ -246,10 +246,10 @@
     *: "Browse Theme Files"
   </source>
   <dest>
-    *: "浏览主题"
+    *: "主题"
   </dest>
   <voice>
-    *: "浏览主题"
+    *: "主题"
   </voice>
 </phrase>
 <phrase>
@@ -262,11 +262,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM广播"
+    radio: "FM广播界面"
   </dest>
   <voice>
     *: none
-    radio: "FM广播"
+    radio: "FM广播界面"
   </voice>
 </phrase>
 <phrase>
@@ -279,11 +279,11 @@
   </source>
   <dest>
     *: none
-    recording: "录音"
+    recording: "录音界面"
   </dest>
   <voice>
     *: none
-    recording: "录音"
+    recording: "录音界面"
   </voice>
 </phrase>
 <phrase>
@@ -958,7 +958,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "编辑模式:%s"
+    swcodec: "编辑:%s"
   </dest>
   <voice>
     *: none
@@ -1748,11 +1748,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "浏览字体"
+    lcd_bitmap: "字体"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "浏览字体"
+    lcd_bitmap: "字体"
   </voice>
 </phrase>
 <phrase>
@@ -1763,10 +1763,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "浏览WPS(正在播放界面)文件"
+    *: "音乐播放界面"
   </dest>
   <voice>
-    *: "浏览WPS(正在播放界面)文件"
+    *: "音乐播放界面"
   </voice>
 </phrase>
 <phrase>
@@ -1779,11 +1779,11 @@
   </source>
   <dest>
     *: none
-    remote: "浏览RWPS(线控正在播放界面)文件"
+    remote: "正在播放界面(线控器)"
   </dest>
   <voice>
     *: none
-    remote: "浏览RWPS(线控正在播放界面)文件"
+    remote: "正在线控器播放界面"
   </voice>
 </phrase>
 <phrase>
@@ -6991,16 +6991,19 @@
 </phrase>
 <phrase>
   id: LANG_FM_STATION
-  desc: deprecated
-  user:
+  desc: in radio screen
+  user: core
   <source>
     *: none
+    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
     *: none
+    radio: "频道:%d.%02dMHz"
   </dest>
   <voice>
     *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -12262,10 +12265,10 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "以整个数字排"
+    *: "以整体数字排序"
   </dest>
   <voice>
-    *: "以整个数字排"
+    *: "以整体数字排序"
   </voice>
 </phrase>
 <phrase>
@@ -12321,10 +12324,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "h"
+    *: "禁止曲目跳转"
   </dest>
   <voice>
-    *: "不要让歌化"
+    *: "禁止曲目跳转"
   </voice>
 </phrase>
 <phrase>
@@ -12371,11 +12374,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "触屏模式选择"
+    touchscreen: "触屏模式"
   </dest>
   <voice>
     *: none
-    touchscreen: "触屏模式选择"
+    touchscreen: "选择触屏模式"
   </voice>
 </phrase>
 <phrase>
@@ -12417,7 +12420,7 @@
     *: ""
   </dest>
   <voice>
-    *: "状态栏样式"
+    *: "状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -12430,11 +12433,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "编译时间"
+    swcodec: "Release Time"
   </dest>
   <voice>
     *: none
-    swcodec: "编译时间"
+    swcodec: "Release Time"
   </voice>
 </phrase>
 <phrase>
@@ -12495,11 +12498,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "浏览SBS(状态栏样式)文件"
+    lcd_bitmap: "状态栏"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "浏览SBS(状态栏样式)文件"
+    lcd_bitmap: "状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -12512,11 +12515,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll Bar Position"
+    lcd_bitmap: "滚动栏位置"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar position"
+    lcd_bitmap: "滚动栏位置"
   </voice>
 </phrase>
 <phrase>
@@ -12529,11 +12532,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Statusbar"
+    remote: "线控状态栏"
   </dest>
   <voice>
     *: none
-    remote: "Remote Statusbar"
+    remote: "线控状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -12577,11 +12580,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Auto"
+    swcodec: "自动"
   </dest>
   <voice>
     *: none
-    swcodec: "Auto"
+    swcodec: "自动"
   </voice>
 </phrase>
 <phrase>
@@ -12592,10 +12595,10 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Insert Last Shuffled"
+    *: "随机插入到播放列表最后"
   </dest>
   <voice>
-    *: "Insert Last Shuffled"
+    *: "随机插入到播放列表的最后位置"
   </voice>
 </phrase>
 <phrase>
@@ -12623,10 +12626,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Next:"
+    *: "下一曲:"
   </dest>
   <voice>
-    *: "Next:"
+    *: "下一曲:"
   </voice>
 </phrase>
 <phrase>
@@ -12656,11 +12659,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "USB键盘模式"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "USB键盘模式"
   </voice>
 </phrase>
 <phrase>
@@ -12690,7 +12693,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "设为快屏上键"
   </dest>
   <voice>
     *: none
@@ -12724,11 +12727,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "浏览RSBS(线控状态栏样式)文件"
+    lcd_bitmap: "线控状态栏"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "浏览RSBS(线控状态栏样式)文件"
+    lcd_bitmap: "线控状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -12758,7 +12761,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB HID"
+    usb_hid: "开启USB HID"
   </dest>
   <voice>
     *: none
@@ -12857,11 +12860,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "校准触摸屏"
   </dest>
   <voice>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "校准触摸屏"
   </voice>
 </phrase>
 <phrase>
@@ -12891,11 +12894,11 @@
   </source>
   <dest>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "使用莫尔斯电码输入"
   </dest>
   <voice>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "使用莫尔斯电码输入"
   </voice>
 </phrase>
 <phrase>
@@ -12908,11 +12911,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "重置校准"
   </dest>
   <voice>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "重置触摸屏校准"
   </voice>
 </phrase>
 <phrase>
@@ -12976,11 +12979,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "多媒体模式"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "多媒体模式
   </voice>
 </phrase>
 <phrase>
@@ -12991,10 +12994,10 @@
     *: "Custom"
   </source>
   <dest>
-    *: "Custom"
+    *: "自定义"
   </dest>
   <voice>
-    *: "Custom"
+    *: "自定义"
   </voice>
 </phrase>
 <phrase>
@@ -13007,11 +13010,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll Bar Width"
+    lcd_bitmap: "滚动栏宽度"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar width"
+    lcd_bitmap: "滚动栏宽度"
   </voice>
 </phrase>
 <phrase>
@@ -13052,11 +13055,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "仅在自动跳变曲目时"
   </dest>
   <voice>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "仅在曲目自动跳变时"
   </voice>
 </phrase>
 <phrase>
@@ -13067,10 +13070,10 @@
     *: "Bottom"
   </source>
   <dest>
-    *: "Bottom"
+    *: "底部"
   </dest>
   <voice>
-    *: "Bottom"
+    *: "屏幕底部"
   </voice>
 </phrase>
 <phrase>
@@ -13083,11 +13086,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Timestretch"
+    swcodec: "音调/音速"
   </dest>
   <voice>
     *: none
-    swcodec: "Timestretch"
+    swcodec: "音调/音速"
   </voice>
 </phrase>
 <phrase>
@@ -13148,11 +13151,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "触屏设置"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "触摸屏设置"
   </voice>
 </phrase>
 <phrase>
@@ -13163,10 +13166,10 @@
     *: "Top"
   </source>
   <dest>
-    *: "Top"
+    *: "顶部"
   </dest>
   <voice>
-    *: "Top"
+    *: "屏幕顶部"
   </voice>
 </phrase>
 <phrase>
@@ -13227,11 +13230,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "普通模式"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "普通模式"
   </voice>
 </phrase>
 <phrase>
