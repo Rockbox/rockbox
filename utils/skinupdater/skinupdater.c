@@ -36,8 +36,6 @@ bool is_mono_display = false;
 bool use_new_vp_tags = true;
 
 
-
-
 /* dump "count" args to output replacing '|' with ',' except after the last count.
  * return the amount of chars read. (start+return will be after the last | )
  */
@@ -56,6 +54,10 @@ int dump_arg(FILE* out, const char* start, int count, bool close)
             }
             count--;
         } else {
+            if (find_escape_character(start[l]))
+            {
+                PUTCH(out, '%');
+            }
             PUTCH(out, start[l]);
         }
         l++;
@@ -264,6 +266,9 @@ top:
                 case '>':
                 case ';':
                 case '#':
+                case ')':
+                case '(':
+                case ',':
                     PUTCH(out, *in++);
                     goto top;
                     break;
@@ -291,6 +296,14 @@ top:
             level--;
             PUTCH(out, *in++);
         }
+        else if (*in == '|')
+        {
+            if (level == 0)
+            {
+                PUTCH(out, '%');
+            }
+            PUTCH(out, *in++);
+        }
         else if (*in == '#')
         {
             while (*in && *in != '\n')
@@ -300,6 +313,10 @@ top:
         }
         else 
         {
+            if (find_escape_character(*in))
+            {
+                PUTCH(out, '%');
+            }
             PUTCH(out, *in++);
         }            
     }
