@@ -47,17 +47,17 @@ hybrid_filter:
     @ r6 fs->error
     @ lr sum := fs->round
 
-    add      r2,  r0, #148                       @ r2 = fs->dl
-    add      r3,  r0, #52                        @ r3 = fs->dx
-    add      r4,  r0, #20                        @ r4 = fs->qm
     ldmia    r0,  {r5, r6, lr}                   @ r5 = fs->index
                                                  @ r6 = fs->error
                                                  @ lr = fs->round
-    mov      r5,  r5, asl #2
-    add      r2,  r2, r5                         @ r2 = fs->dl + fs->index
-    add      r3,  r3, r5                         @ r3 = fs->dx + fs->index
+    add      r2,  r0, #148                       @ r2 = fs->dl
+    add      r3,  r0, #52                        @ r3 = fs->dx
+    add      r4,  r0, #20                        @ r4 = fs->qm
+    add      r2,  r2, r5                         @ r2 = (unsigned char*)fs->dl + fs->index
+    add      r3,  r3, r5                         @ r3 = (unsigned char*)fs->dx + fs->index
 
     cmp      r6,  #0
+    bmi      .hf_negative
     bne      .hf_positive
 
     @ case fs->error == 0
@@ -71,32 +71,6 @@ hybrid_filter:
     mla      lr,  r8, r12, lr
     ldmia    r4!, {r5, r6,  r7,  r8 }
     b        .hf2
-
-.hf_positive:
-    blt      .hf_negative
-
-    @ case fs->error > 0
-
-    ldmia    r4,  {r5, r6,  r7,  r8 }
-    ldmia    r3!, {r9, r10, r11, r12}
-    add      r5,  r5, r9
-    add      r6,  r6, r10
-    add      r7,  r7, r11
-    add      r8,  r8, r12
-    stmia    r4!, {r5, r6,  r7,  r8 }            @ update fs->qm[0], ..., fs->qm[3]
-    ldmia    r2!, {r9, r10, r11, r12}
-    mla      lr,  r5, r9,  lr
-    mla      lr,  r6, r10, lr
-    mla      lr,  r7, r11, lr
-    mla      lr,  r8, r12, lr
-    ldmia    r4,  {r5, r6,  r7,  r8 }
-    ldmia    r3!, {r9, r10, r11, r12}
-    add      r5,  r5, r9
-    add      r6,  r6, r10
-    add      r7,  r7, r11
-    add      r8,  r8, r12
-    stmia    r4!, {r5, r6,  r7,  r8 }            @ update fs->qm[4], ..., fs->qm[7]
-    b .hf2
 
 .hf_negative:
     @ case fs->error < 0
@@ -120,6 +94,30 @@ hybrid_filter:
     sub      r7,  r7, r11
     sub      r8,  r8, r12
     stmia    r4!, {r5, r6,  r7,  r8 }            @ update fs->qm[4], ..., fs->qm[7]
+    b .hf2
+
+.hf_positive:
+    @ case fs->error > 0
+
+    ldmia    r4,  {r5, r6,  r7,  r8 }
+    ldmia    r3!, {r9, r10, r11, r12}
+    add      r5,  r5, r9
+    add      r6,  r6, r10
+    add      r7,  r7, r11
+    add      r8,  r8, r12
+    stmia    r4!, {r5, r6,  r7,  r8 }            @ update fs->qm[0], ..., fs->qm[3]
+    ldmia    r2!, {r9, r10, r11, r12}
+    mla      lr,  r5, r9,  lr
+    mla      lr,  r6, r10, lr
+    mla      lr,  r7, r11, lr
+    mla      lr,  r8, r12, lr
+    ldmia    r4,  {r5, r6,  r7,  r8 }
+    ldmia    r3!, {r9, r10, r11, r12}
+    add      r5,  r5, r9
+    add      r6,  r6, r10
+    add      r7,  r7, r11
+    add      r8,  r8, r12
+    stmia    r4!, {r5, r6,  r7,  r8 }            @ update fs->qm[4], ..., fs->qm[7]
 
 .hf2:
     ldmia    r2!, {r9, r10, r11, r12}
@@ -140,9 +138,9 @@ hybrid_filter:
     @ update fs->index
 
     ldr      r1,  [r0]                           @ r1 = fs->index
-    add      r1,  r1,  #1
-    ands     r1,  r1,  #15                       @ set Z flag (after this, CPSR must keep !!)
-    stmia    r0,  {r1, r5}                       @ fs->index = (++fs->index & 15)
+    add      r1,  r1,  #4
+    ands     r1,  r1,  #63                       @ set Z flag (after this, CPSR must keep !!)
+    stmia    r0,  {r1, r5}                       @ fs->index = (fs->index + 4) & 63
                                                  @ fs->error = (original) *in
 
     @ change *pM, *(pM-1), *(pM-2), *(pM-3)
@@ -166,13 +164,10 @@ hybrid_filter:
     sub      r11, r12, r11
     sub      r10, r11, r10
 
-    @ check fs->index is zero
-    beq      .hf_memshl
-
     @ set to the memory: *pA, *(pA-1), *(pA-2), *(pA-3), *pM, *(pM-1), *(pM-2), *(pM-3)
-    stmda    r2,  {r10, r11, r12, lr}
-    stmda    r3,  {r5,  r6,  r7,  r8}
-    ldmfd    sp!, {r4-r12, pc}                   @ hybrid_filter end (when fs->index != 0)
+    stmneda  r2,  {r10, r11, r12, lr}
+    stmneda  r3,  {r5,  r6,  r7,  r8}
+    ldmnefd  sp!, {r4-r12, pc}                   @ hybrid_filter end (when fs->index != 0)
 
 .hf_memshl:
     @ memshl (fs->dl)
