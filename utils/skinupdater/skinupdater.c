@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include "tag_table.h"
 
 #define PUTCH(out, c) fprintf(out, "%c", c)
@@ -191,8 +192,78 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("Cl"))
     {
+        int read;
+        char xalign = '\0', yalign = '\0';
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 4, true);
+        read = 1+dump_arg(out, start+1, 2, false);
+        len += read;
+        start += read;
+        switch (tolower(*start))
+        {
+            case 'l':
+            case 'c':
+            case 'r':
+            case '+':
+            case '-':
+                xalign = *start;
+                len++;
+                start++;
+                break;
+            case 'd':
+            case 'D':
+            case 'i':
+            case 'I':
+            case 's':
+            case 'S':
+                len++;
+                start++;
+                break;
+        }
+        PUTCH(out,',');
+        read = dump_arg(out, start, 1, false);
+        len += read;
+        start += read;
+        switch (tolower(*start))
+        {
+            case 't':
+            case 'c':
+            case 'b':
+            case '+':
+            case '-':
+                yalign = *start;
+                len++;
+                start++;
+                break;
+            case 'd':
+            case 'D':
+            case 'i':
+            case 'I':
+            case 's':
+            case 'S':
+                len++;
+                start++;
+                break;
+        }
+        PUTCH(out,',');
+        read = dump_arg(out, start, 1, false);
+        if (xalign)
+        {
+            if (xalign == '-')
+                xalign = 'l';
+            if (xalign == '+')
+                xalign = 'r';
+            fprintf(out, ",%c", xalign); 
+        }
+        if (yalign)
+        {
+            if (yalign == '-')
+                yalign = 't';
+            if (yalign == '+')
+                yalign = 'b';
+            fprintf(out, ",%s%c", xalign?"":"-,", yalign); 
+        }
+        PUTCH(out, ')');
+        len += read;
     }
     else if (MATCH("Vd") || MATCH("VI"))
     {
