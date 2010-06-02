@@ -272,7 +272,7 @@ enum skin_token_type {
  *          number before the character.  For instance, the string...
  *             2s
  *          will specify two strings.  An asterisk (*) at the beginning of the
- *          string will specify that either all or none of the optional
+ *          string will specify that you may choose to omit all arguments
  *
  */
 struct tag_info

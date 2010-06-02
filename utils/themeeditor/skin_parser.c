@@ -410,7 +410,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
 
     /* If this tag has no arguments, we can bail out now */
     if(strlen(tag_args) == 0
-       || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM))
+       || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM)
+       || (star && *cursor != ARGLISTOPENSYM))
     {
         *document = cursor;
         return 1;
@@ -556,7 +557,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     /* Checking for a premature end */
-    if(*tag_args != '\0' && !(optional && (!star || num_args == req_args)))
+    if(*tag_args != '\0' && !(optional && !star))
     {
         skin_error(INSUFFICIENT_ARGS);
         return 0;
