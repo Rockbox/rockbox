@@ -1054,7 +1054,7 @@ void draw_spectrogram_vertical(void)
             lcd_(drawpixel)(graph_settings.spectrogram_pos,
                             scale_factor-1 - y);
 
-            if(++y >= LCD_HEIGHT)
+            if(++y >= scale_factor)
                 break;
 
             bins_acc -= ARRAYLEN_PLOT;
@@ -1107,7 +1107,7 @@ void draw_spectrogram_horizontal(void)
             lcd_(set_foreground)(SPECTROGRAPH_PALETTE(index));
             lcd_(drawpixel)(x, graph_settings.spectrogram_pos);
 
-            if(++x >= LCD_WIDTH)
+            if(++x >= scale_factor)
                 break;
 
             bins_acc -= ARRAYLEN_PLOT;
