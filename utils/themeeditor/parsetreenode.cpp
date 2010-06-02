@@ -107,6 +107,8 @@ QString ParseTreeNode::genCode() const
                 if(children[i]->element->type == TAG)
                     buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
+                if(element->type == LINE || i == 0)
+                    buffer.append('\n');
             }
             break;
 
@@ -117,6 +119,7 @@ QString ParseTreeNode::genCode() const
                 if(i != children.count() - 1)
                     buffer.append(MULTILINESYM);
             }
+            buffer.append('\n');
             break;
 
         case CONDITIONAL:
@@ -154,10 +157,6 @@ QString ParseTreeNode::genCode() const
                 }
                 buffer.append(ARGLISTCLOSESYM);
             }
-            break;
-
-        case NEWLINE:
-            buffer.append('\n');
             break;
 
         case TEXT:
@@ -253,9 +252,6 @@ QVariant ParseTreeNode::data(int column) const
             case TAG:
                 return QObject::tr("Tag");
 
-            case NEWLINE:
-                return QObject::tr("Newline");
-
             case TEXT:
                 return QObject::tr("Plaintext");
             }
@@ -294,9 +290,6 @@ QVariant ParseTreeNode::data(int column) const
             case SUBLINES:
             case CONDITIONAL:
                 return QString();
-
-            case NEWLINE:
-                return QObject::tr("\\n");
 
             case TEXT:
             case COMMENT:

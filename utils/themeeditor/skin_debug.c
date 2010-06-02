@@ -107,10 +107,6 @@ void skin_debug_tree(struct skin_element* root)
                    current->text);
             break;
 
-        case NEWLINE:
-            printf("[ Newline on line %d ]\n", current->line);
-            break;
-
         case COMMENT:
             printf("[ Comment on line %d: ", current->line);
             for(i = 0; i < (int)strlen(current->text); i++)

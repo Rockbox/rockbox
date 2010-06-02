@@ -49,7 +49,6 @@ int skin_parse_tag(struct skin_element* element, char** document);
 int skin_parse_text(struct skin_element* element, char** document,
                     int conditional);
 int skin_parse_conditional(struct skin_element* element, char** document);
-int skin_parse_newline(struct skin_element* element, char** document);
 int skin_parse_comment(struct skin_element* element, char** document);
 struct skin_element* skin_parse_code_as_arg(char** document);
 
@@ -166,10 +165,7 @@ struct skin_element* skin_parse_viewport(char** document)
 
         if(*cursor == '\n')
         {
-            *to_write = skin_alloc_element();
-            skin_parse_newline(*to_write, &cursor);
-            if(!last)
-                return NULL;
+            cursor++;
         }
         else if(sublines)
         {
@@ -699,28 +695,6 @@ int skin_parse_conditional(struct skin_element* element, char** document)
             cursor++;
         }
     }
-
-    *document = cursor;
-
-    return 1;
-}
-
-int skin_parse_newline(struct skin_element* element, char** document)
-{
-
-    char* cursor = *document;
-    if(*cursor != '\n')
-    {
-        skin_error(NEWLINE_EXPECTED);
-        return 0;
-    }
-    cursor++;
-
-    /* Assembling a skin_element struct for a newline */
-    element->type = NEWLINE;
-    element->line = skin_line;
-    skin_line++;
-    element->next = NULL;
 
     *document = cursor;
 

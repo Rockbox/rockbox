@@ -47,7 +47,6 @@ enum skin_element_type
     SUBLINES,
     CONDITIONAL,
     TAG,
-    NEWLINE,
     TEXT,
     COMMENT,
 };
