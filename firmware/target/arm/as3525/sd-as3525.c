@@ -878,12 +878,7 @@ void sd_enable(bool on)
         return; /* nothing to do */
     if(on)
     {
-        /*  Enable both NAF_CLOCK & IDE clk for internal SD */
-        CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE  |= (1<<6);     /* enable non AHB interface*/
 #ifdef HAVE_MULTIDRIVE
-        /* Enable MCI clk for uSD */
-        CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #ifdef HAVE_BUTTON_LIGHT
         /* buttonlight AMSes need a bit of special handling for the buttonlight
          * here due to the dual mapping of GPIOD and XPD */
@@ -922,13 +917,7 @@ void sd_enable(bool on)
         if (buttonlight_is_on)
             _buttonlight_on();
 #endif /* HAVE_BUTTON_LIGHT */
-        /* Disable MCI clk for uSD */
-        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
 #endif /* HAVE_MULTIDRIVE */
-
-        /*  Disable both NAF_CLOCK & IDE clk for internal SD */
-        CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE &= ~(1<<6);       /* disable non AHB interface*/
     }
 }
 
