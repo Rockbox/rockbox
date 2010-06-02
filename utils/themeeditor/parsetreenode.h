@@ -37,6 +37,8 @@ public:
     virtual ~ParseTreeNode();
 
     QString genCode() const;
+    int genHash() const;
+
     bool isParam() const{ if(param) return true; else return false; }
     struct skin_tag_parameter* getParam(){ return param;}
     struct skin_element* getElement(){return element;}
@@ -46,6 +48,13 @@ public:
     QVariant data(int column) const;
     int getRow() const;
     ParseTreeNode* getParent() const;
+    ParseTreeNode* getChild(int row) const
+    {
+        if(row < children.count())
+            return children[row];
+        else
+            return 0;
+    }
 
 private:
     ParseTreeNode* parent;

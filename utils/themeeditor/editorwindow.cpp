@@ -30,7 +30,9 @@ EditorWindow::EditorWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    tree = 0;
+    /* Establishing the parse tree */
+    tree = new ParseTreeModel(ui->code->document()->toPlainText().toAscii());
+    ui->parseTree->setModel(tree);
 
     /* Connecting the buttons */
     QObject::connect(ui->code, SIGNAL(cursorPositionChanged()),
@@ -41,11 +43,7 @@ EditorWindow::EditorWindow(QWidget *parent) :
 
 void EditorWindow::updateTree()
 {
-    if(tree)
-        delete tree;
-
-    tree = new ParseTreeModel(ui->code->document()->toPlainText().toAscii());
-    ui->parseTree->setModel(tree);
+    tree->changeTree(ui->code->document()->toPlainText().toAscii());
     ui->parseTree->expandAll();
 }
 

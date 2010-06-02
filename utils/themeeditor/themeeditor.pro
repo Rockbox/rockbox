@@ -1,3 +1,10 @@
+# build in a separate folder.
+MYBUILDDIR = $$OUT_PWD/build/
+OBJECTS_DIR = $$MYBUILDDIR/o
+UI_DIR = $$MYBUILDDIR/ui
+MOC_DIR = $$MYBUILDDIR/moc
+RCC_DIR = $$MYBUILDDIR/rcc
+
 HEADERS += tag_table.h \
     symbols.h \
     skin_parser.h \

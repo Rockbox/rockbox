@@ -224,6 +224,75 @@ QString ParseTreeNode::genCode() const
     return buffer;
 }
 
+/* A more or less random hashing algorithm */
+int ParseTreeNode::genHash() const
+{
+    int hash = 0;
+
+    if(element)
+    {
+        hash += element->type;
+        switch(element->type)
+        {
+        case VIEWPORT:
+        case LINE:
+        case SUBLINES:
+        case CONDITIONAL:
+            hash += element->children_count;
+            break;
+
+        case TAG:
+            for(unsigned int i = 0; i < strlen(element->tag->name); i++)
+                hash += element->tag->name[i];
+            break;
+
+        case COMMENT:
+        case TEXT:
+            for(unsigned int i = 0; i < strlen(element->text); i++)
+            {
+                if(i % 2)
+                    hash += element->text[i] % element->type;
+                else
+                    hash += element->text[i] % element->type * 2;
+            }
+            break;
+        }
+
+    }
+
+    if(param)
+    {
+        hash += param->type;
+        switch(param->type)
+        {
+        case skin_tag_parameter::DEFAULT:
+        case skin_tag_parameter::CODE:
+            break;
+
+        case skin_tag_parameter::NUMERIC:
+            hash += param->data.numeric * (param->data.numeric / 4);
+            break;
+
+        case skin_tag_parameter::STRING:
+            for(unsigned int i = 0; i < strlen(param->data.text); i++)
+            {
+                if(i % 2)
+                    hash += param->data.text[i] * 2;
+                else
+                    hash += param->data.text[i];
+            }
+            break;
+        }
+    }
+
+    for(int i = 0; i < children.count(); i++)
+    {
+        hash += children[i]->genHash();
+    }
+
+    return hash;
+}
+
 ParseTreeNode* ParseTreeNode::child(int row)
 {
     if(row < 0 || row >= children.count())
@@ -234,7 +303,7 @@ ParseTreeNode* ParseTreeNode::child(int row)
 
 int ParseTreeNode::numChildren() const
 {
-    return children.count();
+        return children.count();
 }
 
 

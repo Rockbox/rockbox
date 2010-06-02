@@ -31,7 +31,11 @@ ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         QAbstractItemModel(parent)
 {
     this->tree = skin_parse(document);
-    this->root = new ParseTreeNode(tree);
+
+    if(tree)
+        this->root = new ParseTreeNode(tree);
+    else
+        this->root = 0;
 }
 
 
@@ -46,6 +50,36 @@ ParseTreeModel::~ParseTreeModel()
 QString ParseTreeModel::genCode()
 {
     return root->genCode();
+}
+
+bool ParseTreeModel::changeTree(const char *document)
+{
+    struct skin_element* test = skin_parse(document);
+
+    if(!test)
+        return false;
+
+    ParseTreeNode* temp = new ParseTreeNode(test);
+    if(root && temp->genHash() == root->genHash())
+    {
+        delete temp;
+        return true;
+    }
+
+    if(root)
+    {
+        emit beginRemoveRows(QModelIndex(), 0, root->numChildren() - 1);
+        delete root;
+        emit endRemoveRows();
+    }
+
+    root = temp;
+
+    emit beginInsertRows(QModelIndex(), 0, temp->numChildren() - 1);
+    emit endInsertRows();
+
+    return true;
+
 }
 
 QModelIndex ParseTreeModel::index(int row, int column,
@@ -83,6 +117,9 @@ QModelIndex ParseTreeModel::parent(const QModelIndex &child) const
 
 int ParseTreeModel::rowCount(const QModelIndex &parent) const
 {
+    if(!root)
+        return 0;
+
     if(!parent.isValid())
         return root->numChildren();
 
