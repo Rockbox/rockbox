@@ -163,11 +163,7 @@ struct skin_element* skin_parse_viewport(char** document)
         else
             to_write = &(last->next);
 
-        if(*cursor == '\n')
-        {
-            cursor++;
-        }
-        else if(sublines)
+        if(sublines)
         {
             *to_write = skin_parse_sublines(&cursor);
             last = *to_write;
@@ -187,6 +183,9 @@ struct skin_element* skin_parse_viewport(char** document)
         /* Making sure last is at the end */
         while(last->next)
             last = last->next;
+
+        if(*cursor == '\n')
+            cursor++;
 
     }
 

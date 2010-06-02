@@ -97,6 +97,14 @@ QString ParseTreeNode::genCode() const
         {
 
         case VIEWPORT:
+            buffer.append(children[0]->genCode());
+            if(!children[0]->isParam()
+                && children[0]->getElement()->type == TAG)
+                buffer.append('\n');
+            for(int i = 1; i < children.count(); i++)
+                buffer.append(children[i]->genCode());
+            break;
+
         case LINE:
             for(int i = 0; i < children.count(); i++)
             {
@@ -107,9 +115,10 @@ QString ParseTreeNode::genCode() const
                 if(children[i]->element->type == TAG)
                     buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
-                if(element->type == LINE || i == 0)
-                    buffer.append('\n');
+                buffer.append('\n');
             }
+            if(children.count() == 0)
+                buffer.append('\n');
             break;
 
         case SUBLINES:
