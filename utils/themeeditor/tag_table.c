@@ -245,7 +245,7 @@ int find_escape_character(char lookup)
     while(*current != lookup && *current != '\0')
         current++;
 
-    if(*current == lookup)
+    if(*current == lookup && *current)
         return 1;
     else
         return 0;

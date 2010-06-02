@@ -61,6 +61,9 @@ char* scan_string(char** document)
             continue;
         }
 
+        if(*cursor == TAGSYM)
+            cursor++;
+
         if(*cursor == '\n')
         {
             skin_error(UNEXPECTED_NEWLINE);
@@ -77,6 +80,9 @@ char* scan_string(char** document)
     buffer[length] = '\0';
     for(i = 0; i < length; i++)
     {
+        if(*cursor == TAGSYM)
+            cursor++;
+
         if(*cursor == COMMENTSYM)
         {
             skip_comment(&cursor);

@@ -257,7 +257,7 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
             if(!skin_parse_conditional(current, &cursor))
                 return NULL;
         }
-        else if(*cursor == TAGSYM)
+        else if(*cursor == TAGSYM && !find_escape_character(cursor[1]))
         {
             if(!skin_parse_tag(current, &cursor))
                 return NULL;
@@ -557,7 +557,7 @@ int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     /* Checking for a premature end */
-    if(*tag_args != '\0' && !(optional && !star))
+    if(*tag_args != '\0' && !optional)
     {
         skin_error(INSUFFICIENT_ARGS);
         return 0;
