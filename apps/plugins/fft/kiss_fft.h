@@ -31,7 +31,7 @@ extern "C" {
 
 #ifdef FIXED_POINT
 #include <inttypes.h>
-# if (FIXED_POINT == 32)
+# if 1 /* 16-bit data is _slow_ on devices (FIXED_POINT == 32) */
 #  define kiss_fft_scalar int32_t
 # else
 #  define kiss_fft_scalar int16_t

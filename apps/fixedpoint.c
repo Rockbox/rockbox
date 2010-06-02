@@ -171,6 +171,35 @@ long fp_sqrt(long x, unsigned int fracbits)
 
     return b;
 }
+
+/* Accurate int sqrt with only elementary operations. (the above
+ * routine fails badly without enough iterations, more iterations
+ * than this requires -- [give that one a FIXME]).
+ * Snagged from:
+ *   http://www.devmaster.net/articles/fixed-point-optimizations/ */
+unsigned long isqrt(unsigned long x)
+{
+    /* Adding CLZ could optimize this further */
+    unsigned long g = 0;
+    int bshift = 15;
+    unsigned long b = 1ul << bshift;
+    
+    do
+    {
+        unsigned long temp = (g + g + b) << bshift;
+
+        if (x > temp)
+        {
+            g += b;
+            x -= temp;
+        }
+
+        b >>= 1;
+    }
+    while (bshift--);
+
+    return g;
+}
 #endif  /* PLUGIN or CODEC */
 
 
@@ -254,6 +283,44 @@ long fp16_log(int x) {
     t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
     x=0x80000000-x;
     y-=x>>15;
+    return y;
+}
+
+/**
+ * Fixed-point exponential
+ * taken from http://www.quinapalus.com/efunc.html
+ *  "The code assumes integers are at least 32 bits long. The (non-negative)
+ *   argument and the result of the function are both expressed as fixed-point
+ *   values with 16 fractional bits. Notice that after 11 steps of the
+ *   algorithm the constants involved become such that the code is simply
+ *   doing a multiplication: this is explained in the note below.
+ *   The extension to negative arguments is left as an exercise."
+ */
+long fp16_exp(int x)
+{
+    int t,y;
+
+    y=0x00010000;
+    t=x-0x58b91; if(t>=0) x=t,y<<=8;
+    t=x-0x2c5c8; if(t>=0) x=t,y<<=4;
+    t=x-0x162e4; if(t>=0) x=t,y<<=2;
+    t=x-0x0b172; if(t>=0) x=t,y<<=1;
+    t=x-0x067cd; if(t>=0) x=t,y+=y>>1;
+    t=x-0x03920; if(t>=0) x=t,y+=y>>2;
+    t=x-0x01e27; if(t>=0) x=t,y+=y>>3;
+    t=x-0x00f85; if(t>=0) x=t,y+=y>>4;
+    t=x-0x007e1; if(t>=0) x=t,y+=y>>5;
+    t=x-0x003f8; if(t>=0) x=t,y+=y>>6;
+    t=x-0x001fe; if(t>=0) x=t,y+=y>>7;
+    if(x&0x100)               y+=y>>8;
+    if(x&0x080)               y+=y>>9;
+    if(x&0x040)               y+=y>>10;
+    if(x&0x020)               y+=y>>11;
+    if(x&0x010)               y+=y>>12;
+    if(x&0x008)               y+=y>>13;
+    if(x&0x004)               y+=y>>14;
+    if(x&0x002)               y+=y>>15;
+    if(x&0x001)               y+=y>>16;
     return y;
 }
 #endif /* PLUGIN */

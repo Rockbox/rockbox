@@ -59,6 +59,9 @@ long fp_sqrt(long a, unsigned int fracbits);
 long fp14_cos(int val);
 long fp14_sin(int val);
 long fp16_log(int x);
+long fp16_exp(int x);
+
+unsigned long isqrt(unsigned long x);
 
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */

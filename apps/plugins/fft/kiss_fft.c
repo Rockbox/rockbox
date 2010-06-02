@@ -18,10 +18,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  fixed or floating point complex numbers.  It also delares the kf_ internal functions.
  */
 
-static kiss_fft_cpx *scratchbuf=NULL;
-static size_t nscratchbuf=0;
-static kiss_fft_cpx *tmpbuf=NULL;
-static size_t ntmpbuf=0;
+static kiss_fft_cpx *scratchbuf SHAREDBSS_ATTR = NULL;
+static size_t nscratchbuf SHAREDBSS_ATTR = 0;
+static kiss_fft_cpx *tmpbuf SHAREDBSS_ATTR = NULL;
+static size_t ntmpbuf SHAREDBSS_ATTR = 0;
 
 #define CHECKBUF(buf,nbuf,n) \
     do { \

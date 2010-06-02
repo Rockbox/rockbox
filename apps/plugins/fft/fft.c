@@ -23,7 +23,7 @@
 #include "lib/helper.h"
 #include "lib/xlcd.h"
 #include "math.h"
-#include "thread.h"
+#include "fracmul.h"
 
 #ifndef HAVE_LCD_COLOR
 #include "lib/grey.h"
@@ -36,172 +36,183 @@ GREY_INFO_STRUCT
 #endif
 
 #if CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_F3
-#   define FFT_WINDOW     BUTTON_F1
-#   define FFT_SCALE       BUTTON_UP
-#   define FFT_QUIT     BUTTON_OFF
+#   define FFT_WINDOW       BUTTON_F1
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_QUIT         BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_REC
-#   define FFT_WINDOW     BUTTON_SELECT
-#   define FFT_SCALE       BUTTON_UP
-#   define FFT_QUIT     BUTTON_OFF
+#   define FFT_WINDOW       BUTTON_SELECT
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #   define MINESWP_SCROLLWHEEL
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  (BUTTON_SELECT | BUTTON_LEFT)
-#   define FFT_WINDOW     (BUTTON_SELECT | BUTTON_RIGHT)
-#   define FFT_SCALE         BUTTON_MENU
-#   define FFT_QUIT       (BUTTON_SELECT | BUTTON_MENU)
+#   define FFT_WINDOW       (BUTTON_SELECT | BUTTON_RIGHT)
+#   define FFT_AMP_SCALE    BUTTON_MENU
+#   define FFT_FREQ_SCALE   BUTTON_PLAY
+#   define FFT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW     BUTTON_PLAY
-#   define FFT_SCALE       BUTTON_UP
-#   define FFT_QUIT     BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_PLAY
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
-#   define FFT_SCALE       BUTTON_UP
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
 #   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW        BUTTON_A
-#   define FFT_QUIT     BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_A
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW        BUTTON_REC
-#   define FFT_SCALE       BUTTON_UP
-#   define FFT_QUIT     BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_REC
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   define FFT_PREV_GRAPH     BUTTON_LEFT
-#   define FFT_NEXT_GRAPH    BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  (BUTTON_SELECT | BUTTON_LEFT)
-#   define FFT_WINDOW     (BUTTON_SELECT | BUTTON_RIGHT)
-#   define FFT_SCALE       BUTTON_UP
+#   define FFT_WINDOW       (BUTTON_SELECT | BUTTON_RIGHT)
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
 #   define FFT_QUIT     (BUTTON_HOME|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW        BUTTON_REC
-#   define FFT_SCALE         BUTTON_SELECT
-#   define FFT_QUIT       BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_REC
+#   define FFT_AMP_SCALE    BUTTON_SELECT
+#   define FFT_QUIT         BUTTON_POWER
 #elif (CONFIG_KEYPAD == SANSA_M200_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW        BUTTON_DOWN
-#   define FFT_SCALE         BUTTON_SELECT
-#   define FFT_QUIT       BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_DOWN
+#   define FFT_AMP_SCALE    BUTTON_SELECT
+#   define FFT_QUIT         BUTTON_POWER
 #elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW        BUTTON_HOME
-#   define FFT_SCALE         BUTTON_SELECT
-#   define FFT_QUIT       BUTTON_POWER
+#   define FFT_WINDOW       BUTTON_HOME
+#   define FFT_AMP_SCALE    BUTTON_SELECT
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH       BUTTON_RIGHT
-#   define FFT_ORIENTATION      BUTTON_FF
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_FF
 #   define FFT_WINDOW       BUTTON_SCROLL_UP
-#   define FFT_SCALE            BUTTON_REW
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_AMP_SCALE    BUTTON_REW
+#   define FFT_FREQ_SCALE   BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH       BUTTON_RIGHT
-#   define FFT_ORIENTATION      BUTTON_MENU
-#   define FFT_WINDOW     BUTTON_PREV
-#   define FFT_SCALE            BUTTON_UP
-#   define FFT_QUIT             BUTTON_BACK
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_MENU
+#   define FFT_WINDOW       BUTTON_PREV
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_BACK
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH       BUTTON_RIGHT
-#   define FFT_ORIENTATION      BUTTON_PLAY
-#   define FFT_WINDOW     BUTTON_SELECT
-#   define FFT_SCALE            BUTTON_UP
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_PLAY
+#   define FFT_WINDOW       BUTTON_SELECT
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#   define FFT_PREV_GRAPH       BUTTON_RC_REW
-#   define FFT_NEXT_GRAPH       BUTTON_RC_FF
-#   define FFT_ORIENTATION      BUTTON_RC_MODE
-#   define FFT_WINDOW        BUTTON_RC_PLAY
-#   define FFT_SCALE            BUTTON_RC_VOL_UP
-#   define FFT_QUIT             BUTTON_RC_REC
+#   define FFT_PREV_GRAPH   BUTTON_RC_REW
+#   define FFT_NEXT_GRAPH   BUTTON_RC_FF
+#   define FFT_ORIENTATION  BUTTON_RC_MODE
+#   define FFT_WINDOW       BUTTON_RC_PLAY
+#   define FFT_AMP_SCALE    BUTTON_RC_VOL_UP
+#   define FFT_QUIT         BUTTON_RC_REC
 
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#   define FFT_QUIT             BUTTON_POWER
-#   define FFT_PREV_GRAPH       BUTTON_PLUS
-#   define FFT_NEXT_GRAPH       BUTTON_MINUS
+#   define FFT_QUIT         BUTTON_POWER
+#   define FFT_PREV_GRAPH   BUTTON_PLUS
+#   define FFT_NEXT_GRAPH   BUTTON_MINUS
 
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH       BUTTON_RIGHT
-#   define FFT_ORIENTATION      BUTTON_MENU
-#   define FFT_WINDOW     BUTTON_SELECT
-#   define FFT_SCALE            BUTTON_UP
-#   define FFT_QUIT             BUTTON_BACK
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_MENU
+#   define FFT_WINDOW       BUTTON_SELECT
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_BACK
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH       BUTTON_RIGHT
-#   define FFT_ORIENTATION      BUTTON_SELECT
-#   define FFT_WINDOW     BUTTON_MENU
-#   define FFT_SCALE            BUTTON_UP
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_SELECT
+#   define FFT_WINDOW       BUTTON_MENU
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_LEFT
-#   define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW        BUTTON_DOWN
-#   define FFT_SCALE         BUTTON_FFWD
-#   define FFT_QUIT       BUTTON_PLAY
+#   define FFT_WINDOW       BUTTON_DOWN
+#   define FFT_AMP_SCALE    BUTTON_FFWD
+#   define FFT_QUIT         BUTTON_PLAY
 
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD)
-#   define FFT_QUIT             BUTTON_POWER
+#   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
-#   define FFT_PREV_GRAPH       BUTTON_PREV
-#   define FFT_NEXT_GRAPH       BUTTON_NEXT
-#   define FFT_ORIENTATION      BUTTON_MENU
-#   define FFT_WINDOW           BUTTON_OK
-#   define FFT_SCALE            BUTTON_PLAY
-#   define FFT_QUIT             BUTTON_REC
+#   define FFT_PREV_GRAPH   BUTTON_PREV
+#   define FFT_NEXT_GRAPH   BUTTON_NEXT
+#   define FFT_ORIENTATION  BUTTON_MENU
+#   define FFT_WINDOW       BUTTON_OK
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_REC
 
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#   define FFT_PREV_GRAPH       BUTTON_PREV
-#   define FFT_NEXT_GRAPH       BUTTON_NEXT
-#   define FFT_ORIENTATION      BUTTON_REC
-#   define FFT_WINDOW           BUTTON_SELECT
-#   define FFT_SCALE            BUTTON_PLAY
-#   define FFT_QUIT             (BUTTON_REC | BUTTON_PLAY)
+#   define FFT_PREV_GRAPH   BUTTON_PREV
+#   define FFT_NEXT_GRAPH   BUTTON_NEXT
+#   define FFT_ORIENTATION  BUTTON_REC
+#   define FFT_WINDOW       BUTTON_SELECT
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT        (BUTTON_REC | BUTTON_PLAY)
 
 #else
 #error No keymap defined!
@@ -209,24 +220,24 @@ GREY_INFO_STRUCT
 
 #ifdef HAVE_TOUCHSCREEN
 #ifndef FFT_PREV_GRAPH
-#   define FFT_PREV_GRAPH     BUTTON_MIDLEFT
+#   define FFT_PREV_GRAPH   BUTTON_MIDLEFT
 #endif
 #ifndef FFT_NEXT_GRAPH
-#   define FFT_NEXT_GRAPH    BUTTON_MIDRIGHT
+#   define FFT_NEXT_GRAPH   BUTTON_MIDRIGHT
 #endif
 #ifndef FFT_ORIENTATION
 #   define FFT_ORIENTATION  BUTTON_CENTER
 #endif
 #ifndef FFT_WINDOW
-#   define FFT_WINDOW        BUTTON_TOPLEFT
+#   define FFT_WINDOW       BUTTON_TOPLEFT
 #endif
-#ifndef FFT_SCALE
-#   define FFT_SCALE       BUTTON_TOPRIGHT
+#ifndef FFT_AMP_SCALE
+#   define FFT_AMP_SCALE    BUTTON_TOPRIGHT
 #endif
 #ifndef FFT_QUIT
-#   define FFT_QUIT     BUTTON_BOTTOMLEFT
+#   define FFT_QUIT         BUTTON_BOTTOMLEFT
 #endif
-#endif
+#endif /* HAVE_TOUCHSCREEN */
 
 #ifdef HAVE_LCD_COLOR
 #include "pluginbitmaps/fft_colors.h"
@@ -250,9 +261,19 @@ GREY_INFO_STRUCT
 #define FFT_SIZE 8192 /* 2048*4 */
 #endif
 
-#define ARRAYSIZE_IN (FFT_SIZE)
-#define ARRAYSIZE_OUT (FFT_SIZE/2)
-#define ARRAYSIZE_PLOT (FFT_SIZE/4)
+#ifdef HAVE_LCD_COLOR
+#define lcd_(fn)        rb->lcd_##fn
+#define lcd_scroll_up   xlcd_scroll_up
+#define lcd_scroll_left xlcd_scroll_left
+#else
+#define lcd_(fn)        grey_##fn
+#define lcd_scroll_up   grey_scroll_up
+#define lcd_scroll_left grey_scroll_left
+#endif
+
+#define ARRAYLEN_IN (FFT_SIZE)
+#define ARRAYLEN_OUT (FFT_SIZE/2)
+#define ARRAYLEN_PLOT ((FFT_SIZE/4)-1) /* -1 to ignore DC bin */
 #define BUFSIZE_FFT (sizeof(struct kiss_fft_state)+sizeof(kiss_fft_cpx)*(FFT_SIZE-1))
 #define BUFSIZE_FFTR (BUFSIZE_FFT+sizeof(struct kiss_fftr_state)+sizeof(kiss_fft_cpx)*(FFT_SIZE*3/2))
 #define BUFSIZE BUFSIZE_FFTR
@@ -267,117 +288,278 @@ GREY_INFO_STRUCT
 
 /****************************** Globals ****************************/
 
-static kiss_fft_scalar input[ARRAYSIZE_IN];
-static kiss_fft_cpx output[ARRAYSIZE_OUT];
-static int32_t plot[ARRAYSIZE_PLOT];
-static char buffer[BUFSIZE];
+static volatile int output_head SHAREDBSS_ATTR = 0;
+static volatile int output_tail SHAREDBSS_ATTR = 0;
+/* cacheline-aligned buffers with COP, otherwise word-aligned */
 
-#define MODES_COUNT 3
+#define CACHEALIGN_UP_SIZE(type, len) \
+    (CACHEALIGN_UP((len)*sizeof(type) + (sizeof(type)-1)) / sizeof(type))
+/* Shared */
+/* COP + CPU PCM */
+static kiss_fft_scalar input[CACHEALIGN_UP_SIZE(kiss_fft_scalar, ARRAYLEN_IN)]
+                            CACHEALIGN_AT_LEAST_ATTR(4);
+/* CPU+COP */
 
-const unsigned char* modes_text[] = { "Lines", "Bars", "Spectrogram" };
-const unsigned char* scales_text[] = { "Linear scale", "Logarithmic scale" };
-const unsigned char* window_text[] = { "Hamming window", "Hann window" };
+/* The result is nfft/2+1 complex frequency bins from DC to Nyquist. */
+static kiss_fft_cpx output[2][CACHEALIGN_UP_SIZE(kiss_fft_cpx, ARRAYLEN_OUT+1)]
+                            __attribute__((aligned(4))) SHAREDBSS_ATTR;
 
-struct mutex input_mutex;
-bool input_thread_run = true;
-bool input_thread_has_data = false;
+/* Unshared */
+/* COP */
+static char buffer[CACHEALIGN_UP_SIZE(char, BUFSIZE)]
+                CACHEALIGN_AT_LEAST_ATTR(4);
+/* CPU */
+static int32_t plot_history[ARRAYLEN_PLOT];
+static int32_t plot[ARRAYLEN_PLOT];
+static struct
+{
+    int16_t bin;   /* integer bin number */
+    uint16_t frac; /* interpolation fraction */
+} binlog[ARRAYLEN_PLOT] __attribute__((aligned(4)));
 
-struct {
-    int32_t mode;
-    bool logarithmic;
+static volatile bool fft_thread_run SHAREDDATA_ATTR = false;
+
+enum fft_window_func
+{
+    FFT_WF_FIRST = 0,
+    FFT_WF_HAMMING = 0,
+    FFT_WF_HANN,
+};
+#define FFT_WF_COUNT (FFT_WF_HANN+1)
+
+enum fft_display_mode
+{
+    FFT_DM_FIRST = 0,
+    FFT_DM_LINES = 0,
+    FFT_DM_BARS,
+    FFT_DM_SPECTROGRAPH,
+};
+#define FFT_DM_COUNT (FFT_DM_SPECTROGRAPH+1)
+
+static const unsigned char* const modes_text[FFT_DM_COUNT] =
+{ "Lines", "Bars", "Spectrogram" };
+
+static const unsigned char* const amp_scales_text[2] =
+{ "Linear amplitude", "Logarithmic amplitude" };
+
+static const unsigned char* const freq_scales_text[2] =
+{ "Linear frequency", "Logarithmic frequency" };
+
+static const unsigned char* const window_text[FFT_WF_COUNT] =
+{ "Hamming window", "Hann window" };
+
+static struct {
     bool orientation_vertical;
-    int window_func;
-    struct {
-        int column;
-        int row;
-    } spectrogram;
-    struct {
-        bool orientation;
-        bool mode;
-        bool scale;
+    enum fft_display_mode mode;
+    bool logarithmic_amp;
+    bool logarithmic_freq;
+    enum fft_window_func window_func;
+    int spectrogram_pos; /* row or column - only used by one at a time */
+    union
+    {
+        struct
+        {
+            bool orientation : 1;
+            bool mode        : 1;
+            bool amp_scale   : 1;
+            bool freq_scale  : 1;
+            bool window_func : 1;
+            bool do_clear    : 1;
+        };
+        bool clear_all; /* Write 'false' to clear all above */
     } changed;
-} graph_settings;
+} graph_settings SHAREDDATA_ATTR = 
+{
+     /* Defaults */
+    .orientation_vertical = true,
+    .mode                 = FFT_DM_LINES,
+    .logarithmic_amp      = true,
+    .logarithmic_freq     = true,
+    .window_func          = FFT_WF_HAMMING,
+    .spectrogram_pos      = 0,
+    .changed              = { .clear_all = false },
+};
 
-#define COLORS BMPWIDTH_fft_colors
+#ifdef HAVE_LCD_COLOR
+#define SHADES BMPWIDTH_fft_colors
+#define SPECTROGRAPH_PALETTE(index) (fft_colors[index])
+#else
+#define SHADES 256
+#define SPECTROGRAPH_PALETTE(index) (255 - (index))
+#endif
 
 /************************* End of globals *************************/
 
 /************************* Math functions *************************/
-#define QLOG_MAX 0x00040000 
-#define QLIN_MAX 0x5B000000
-#define QLN_10 float_q16(2.302585093)
-#define LIN_MAX (QLIN_MAX >> 16)
 
-/* Returns logarithmically scaled values in S15.16 format */
-inline int32_t get_log_value(int32_t value)
-{
-    return Q16_DIV(fp16_log(value), QLN_10);
-}
+/* Based on playing back a 0dB sweep tone */
+#define QLOG_MAX 0x000865EF
+/* fudge it a little or it's not very visbile */
+#define QLIN_MAX (0x00001157 >> 1)
 
-/* Apply window function to input
- * 0 - Hamming window
- * 1 - Hann window */
-#define WINDOW_COUNT 2
-void apply_window_func(char mode)
+/* Apply window function to input */
+void apply_window_func(enum fft_window_func mode)
 {
+    int i;
+
     switch(mode)
     {
-        case 0: /* Hamming window */
-        {
-            size_t i;
-            for (i = 0; i < ARRAYSIZE_IN; ++i)
+        case FFT_WF_HAMMING:
+            for(i = 0; i < ARRAYLEN_IN; ++i)
             {
-                input[i] = Q15_MUL(input[i] << 15, HAMMING_COEFF[i]) >> 15;
+                input[i] = (input[i] * HAMMING_COEFF[i] + 16384) >> 15;
             } 
             break;
-        }
-        case 1: /* Hann window */
-        {
-            size_t i;
-            for (i = 0; i < ARRAYSIZE_IN; ++i)
+
+        case FFT_WF_HANN:
+            for(i = 0; i < ARRAYLEN_IN; ++i)
             {
-                input[i] = Q15_MUL(input[i] << 15, HANN_COEFF[i]) >> 15;
+                input[i] = (input[i] * HANN_COEFF[i] + 16384) >> 15;
             }
             break;
-        }
     }
 }
 
 /* Calculates the magnitudes from complex numbers and returns the maximum */
-int32_t calc_magnitudes(bool logarithmic)
+int32_t calc_magnitudes(bool logarithmic_amp)
 {
     /* A major assumption made when calculating the Q*MAX constants 
      * is that the maximum magnitude is 29 bits long. */
-
-    uint32_t tmp;
-    size_t i;
-
-    int32_t max = 0;
+    uint32_t max = 0;
+    kiss_fft_cpx *this_output = output[output_head] + 1; /* skip DC */
+    int i;
 
     /* Calculate the magnitude, discarding the phase. */
-    for (i = 0; i < ARRAYSIZE_PLOT; ++i)
+    for(i = 0; i < ARRAYLEN_PLOT; ++i)
     {
-        tmp = output[i].r * output[i].r + output[i].i * output[i].i;
+        int32_t re = this_output[i].r;
+        int32_t im = this_output[i].i;
 
-        if (tmp > 0x7FFFFFFF) tmp >>= 1; /* if our assumptions are correct,
-                                            this should never happen. It's just
-                                            a safeguard. */
-        if (tmp > 0)
+        uint32_t tmp = re*re + im*im;
+
+        if(tmp > 0)
         {
-            tmp = fp_sqrt(tmp, 0); /* linear scaling, nothing
-                                      bad should happen */
-            tmp <<= 16;
-            if (logarithmic)
-                tmp = get_log_value(tmp);/* the log function
-                                            expects s15.16 values */
-        }
-        plot[i] = tmp;
+            if(tmp > 0x7FFFFFFF) /* clip */
+            {
+                tmp = 0x7FFFFFFF; /* if our assumptions are correct,
+                                     this should never happen. It's just
+                                     a safeguard. */
+            }
 
-        if (plot[i] > max)
-            max = plot[i];
+            if(logarithmic_amp)
+            {
+                if(tmp < 0x8000) /* be more precise */
+                {
+                    /* ln(x ^ .5) = .5*ln(x) */
+                    tmp = fp16_log(tmp << 16) >> 1;
+                }
+                else
+                {
+                    tmp = isqrt(tmp); /* linear scaling, nothing
+                                         bad should happen */
+                    tmp = fp16_log(tmp << 16); /* the log function
+                                                  expects s15.16 values */
+                }
+            }
+            else
+            {
+                tmp = isqrt(tmp); /* linear scaling, nothing
+                                     bad should happen */
+            }
+        }
+
+        /* Length 2 moving average - last transform and this one */
+        tmp = (plot_history[i] + tmp) >> 1;
+        plot[i] = tmp;
+        plot_history[i] = tmp;
+
+        if(tmp > max)
+            max = tmp;
     }
+
     return max;
 }
+
+/* Move plot bins into a logarithmic scale by sliding them towards the
+ * Nyquist bin according to the translation in the binlog array. */
+void logarithmic_plot_translate(void)
+{
+    int i;
+
+    for(i = ARRAYLEN_PLOT-1; i > 0; --i)
+    {
+        int bin;
+        int s = binlog[i].bin;
+        int e = binlog[i-1].bin;
+        int frac = binlog[i].frac;
+
+        bin = plot[s];
+
+        if(frac)
+        {
+            /* slope < 1, Interpolate stretched bins (linear for now) */
+            int diff = plot[s+1] - bin;
+
+            do
+            {
+                plot[i] = bin + FRACMUL(frac << 15, diff);
+                frac = binlog[--i].frac;
+            }
+            while(frac);
+        }
+        else
+        {
+            /* slope > 1, Find peak of two or more bins */
+            while(--s > e)
+            {
+                int val = plot[s];
+
+                if (val > bin)
+                    bin = val;
+            }
+        }
+
+        plot[i] = bin;
+    }
+}
+
+/* Calculates the translation for logarithmic plot bins */
+void logarithmic_plot_init(void)
+{
+    int i, j;
+    /*
+     * log: y = round(n * ln(x) / ln(n))
+     * anti: y = round(exp(x * ln(n) / n))
+     */
+    j = fp16_log((ARRAYLEN_PLOT - 1) << 16);
+    for(i = 0; i < ARRAYLEN_PLOT; ++i)
+    {
+        binlog[i].bin = (fp16_exp(i * j / (ARRAYLEN_PLOT - 1)) + 32768) >> 16;
+    }
+
+    /* setup fractions for interpolation of stretched bins */
+    for(i = 0; i < ARRAYLEN_PLOT-1; i = j)
+    {
+        j = i + 1;
+
+        /* stop when we have two different values */
+        while(binlog[j].bin == binlog[i].bin)
+            j++; /* if here, local slope of curve is < 1 */
+
+        if(j > i + 1)
+        {
+            /* distribute pieces evenly over stretched interval */
+            int diff = j - i;
+            int x = 0;
+            do
+            {
+                binlog[i].frac = (x++ << 16) / diff;
+            }
+            while(++i < j);
+        }
+    }
+}
+
 /************************ End of math functions ***********************/
 
 /********************* Plotting functions (modes) *********************/
@@ -388,53 +570,94 @@ void draw_bars_horizontal(void);
 void draw_spectrogram_vertical(void);
 void draw_spectrogram_horizontal(void);
 
+#ifdef HAVE_LCD_COLOR
+#define COLOR_DEFAULT_FG    LCD_DEFAULT_FG
+#define COLOR_DEFAULT_BG    LCD_DEFAULT_BG
+#define COLOR_MESSAGE_FRAME LCD_RGBPACK(0xc6, 0x00, 0x00)
+#define COLOR_MESSAGE_BG    LCD_BLACK
+#define COLOR_MESSAGE_FG    LCD_WHITE
+#else
+#define COLOR_DEFAULT_FG    GREY_BLACK
+#define COLOR_DEFAULT_BG    GREY_WHITE
+#define COLOR_MESSAGE_FRAME GREY_DARKGRAY
+#define COLOR_MESSAGE_BG    GREY_WHITE
+#define COLOR_MESSAGE_FG    GREY_BLACK
+#endif
+
+#define POPUP_HPADDING      3 /* 3 px of horizontal padding and */
+#define POPUP_VPADDING      2 /* 2 px of vertical padding */
+
+void draw_message_string(const unsigned char *message, bool active)
+{
+    int x, y;
+    lcd_(getstringsize)(message, &x, &y);
+
+    /* x and y give the size of the box for the popup */
+    x += POPUP_HPADDING*2;
+    y += POPUP_VPADDING*2;
+
+    /* In vertical spectrogram mode, leave space for the popup
+     * before actually drawing it (if space is needed) */
+    if(active &&
+       graph_settings.mode == FFT_DM_SPECTROGRAPH &&
+       graph_settings.orientation_vertical &&
+       graph_settings.spectrogram_pos >= LCD_WIDTH - x) 
+    {
+        lcd_scroll_left(graph_settings.spectrogram_pos -
+                        LCD_WIDTH + x);
+        graph_settings.spectrogram_pos = LCD_WIDTH - x - 1;
+    }
+
+    lcd_(set_foreground)(COLOR_MESSAGE_FRAME);
+    lcd_(fillrect)(LCD_WIDTH - x, 0, LCD_WIDTH - 1, y);
+
+    lcd_(set_foreground)(COLOR_MESSAGE_FG);
+    lcd_(set_background)(COLOR_MESSAGE_BG);
+    lcd_(putsxy)(LCD_WIDTH - x + POPUP_HPADDING,
+                 POPUP_VPADDING, message);
+    lcd_(set_foreground)(COLOR_DEFAULT_FG);
+    lcd_(set_background)(COLOR_DEFAULT_BG);
+}
+
 void draw(const unsigned char* message)
 {
-    static uint32_t show_message = 0;
-    static unsigned char* last_message = 0;
+    static long show_message_tick = 0;
+    static const unsigned char* last_message = 0;
 
-    static char last_mode = 0;
-    static bool last_orientation = true, last_scale = true;
-
-    if (message != 0)
+    if(message != NULL)
     {
-        last_message = (unsigned char*) message;
-        show_message = 5;
+        last_message = message;
+        show_message_tick = (*rb->current_tick + HZ) | 1;
     }
 
-    if(last_mode != graph_settings.mode)
+    /* maybe take additional actions depending upon the changed setting */
+    if(graph_settings.changed.orientation)
     {
-        last_mode = graph_settings.mode;
-        graph_settings.changed.mode = true;
+       graph_settings.changed.amp_scale = true;
+       graph_settings.changed.do_clear = true;
     }
-    if(last_scale != graph_settings.logarithmic)
+
+    if(graph_settings.changed.mode)
     {
-        last_scale = graph_settings.logarithmic;
-        graph_settings.changed.scale = true;
+        graph_settings.changed.amp_scale = true;
+        graph_settings.changed.do_clear = true;
     }
-    if(last_orientation != graph_settings.orientation_vertical)
-    {
-        last_orientation = graph_settings.orientation_vertical;
-        graph_settings.changed.orientation = true;
-    }
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_DEFAULT_FG);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
-#else
-    grey_set_foreground(GREY_BLACK);
-    grey_set_background(GREY_WHITE);
-#endif
+
+    if(graph_settings.changed.amp_scale)
+        memset(plot_history, 0, sizeof (plot_history));
+
+    if(graph_settings.changed.freq_scale)
+        graph_settings.changed.freq_scale = true;
+
+    lcd_(set_foreground)(COLOR_DEFAULT_FG);
+    lcd_(set_background)(COLOR_DEFAULT_BG);
 
     switch (graph_settings.mode)
     {
         default:
-        case 0: {
+        case FFT_DM_LINES: {
 
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_clear_display();
-#else
-            grey_clear_display();
-#endif
+            lcd_(clear_display)();
 
             if (graph_settings.orientation_vertical)
                 draw_lines_vertical();
@@ -442,13 +665,9 @@ void draw(const unsigned char* message)
                 draw_lines_horizontal();
             break;
         }
-        case 1: {
+        case FFT_DM_BARS: {
 
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_clear_display();
-#else
-            grey_clear_display();
-#endif
+            lcd_(clear_display());
 
             if(graph_settings.orientation_vertical)
                 draw_bars_vertical();
@@ -457,7 +676,14 @@ void draw(const unsigned char* message)
 
             break;
         }
-        case 2: {
+        case FFT_DM_SPECTROGRAPH: {
+
+            if(graph_settings.changed.do_clear)
+            {
+                graph_settings.spectrogram_pos = 0;
+                lcd_(clear_display)();
+            }
+
             if(graph_settings.orientation_vertical)
                 draw_spectrogram_vertical();
             else
@@ -466,182 +692,129 @@ void draw(const unsigned char* message)
         }
     }
 
-    if (show_message > 0)
+    if(show_message_tick != 0)
     {
-		/* We have a message to show */
-
-        int x, y;
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_getstringsize(last_message, &x, &y);
-#else
-        grey_getstringsize(last_message, &x, &y);
-#endif
-		/* x and y give the size of the box for the popup */
-        x += 6; /* 3 px of horizontal padding and */
-        y += 4; /* 2 px of vertical padding */
-
-        /* In vertical spectrogram mode, leave space for the popup
-		 * before actually drawing it (if space is needed) */
-        if(graph_settings.mode == 2 &&
-		   graph_settings.orientation_vertical &&
-           graph_settings.spectrogram.column > LCD_WIDTH-x-2) 
-		{
-#ifdef HAVE_LCD_COLOR
-			xlcd_scroll_left(graph_settings.spectrogram.column -
-							 (LCD_WIDTH - x - 1));
-#else
-			grey_scroll_left(graph_settings.spectrogram.column -
-							 (LCD_WIDTH - x - 1));
-#endif
-			graph_settings.spectrogram.column = LCD_WIDTH - x - 2;
-		}
-
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_DARKGRAY);
-        rb->lcd_fillrect(LCD_WIDTH-1-x, 0, LCD_WIDTH-1, y);
-
-        rb->lcd_set_foreground(LCD_DEFAULT_FG);
-        rb->lcd_set_background(LCD_DARKGRAY);
-        rb->lcd_putsxy(LCD_WIDTH-1-x+3, 2, last_message);
-        rb->lcd_set_background(LCD_DEFAULT_BG);
-#else
-        grey_set_foreground(GREY_LIGHTGRAY);
-        grey_fillrect(LCD_WIDTH-1-x, 0, LCD_WIDTH-1, y);
-
-        grey_set_foreground(GREY_BLACK);
-        grey_set_background(GREY_LIGHTGRAY);
-        grey_putsxy(LCD_WIDTH-1-x+3, 2, last_message);
-        grey_set_background(GREY_WHITE);
-#endif
-
-        show_message--;
+        if(TIME_BEFORE(*rb->current_tick, show_message_tick))
+        {
+    		/* We have a message to show */
+            draw_message_string(last_message, true);
+        }
+        else
+        {
+            /* Stop drawing message */
+            show_message_tick = 0;
+        }
     }
-    else if(last_message != 0)
+    else if(last_message != NULL)
     {
-		if(graph_settings.mode != 2)
-		{
-			/* These modes clear the screen themselves */
-			last_message = 0;
-		}
-		else /* Spectrogram mode - need to erase the popup */
-		{
+        if(graph_settings.mode == FFT_DM_SPECTROGRAPH)
+        {
+    		/* Spectrogram mode - need to erase the popup */
 			int x, y;
-#ifdef HAVE_LCD_COLOR
-			rb->lcd_getstringsize(last_message, &x, &y);
-#else
-			grey_getstringsize(last_message, &x, &y);
-#endif
+			lcd_(getstringsize)(last_message, &x, &y);
 			/* Recalculate the size */
-			x += 6; /* 3 px of horizontal padding and */
-			y += 4; /* 2 px of vertical padding */
+			x += POPUP_HPADDING*2;
+			y += POPUP_VPADDING*2;
 
 			if(!graph_settings.orientation_vertical)
 			{
 				/* In horizontal spectrogram mode, just scroll up by Y lines */
-#ifdef HAVE_LCD_COLOR
-				xlcd_scroll_up(y);
-#else
-				grey_scroll_up(y);
-#endif
-				graph_settings.spectrogram.row -= y;
-				if(graph_settings.spectrogram.row < 0)
-					graph_settings.spectrogram.row = 0;
+				lcd_scroll_up(y);
+				graph_settings.spectrogram_pos -= y;
+				if(graph_settings.spectrogram_pos < 0)
+					graph_settings.spectrogram_pos = 0;
 			}
 			else
 			{
 				/* In vertical spectrogram mode, erase the popup */
-#ifdef HAVE_LCD_COLOR
-				rb->lcd_set_foreground(LCD_DEFAULT_BG);
-				rb->lcd_fillrect(LCD_WIDTH-2-x, 0, LCD_WIDTH-1, y);
-				rb->lcd_set_foreground(LCD_DEFAULT_FG);
-#else
-				grey_set_foreground(GREY_WHITE);
-				grey_fillrect(LCD_WIDTH-2-x, 0, LCD_WIDTH-1, y);
-				grey_set_foreground(GREY_BLACK);
-#endif
+                lcd_(set_foreground)(COLOR_DEFAULT_BG);
+				lcd_(fillrect)(graph_settings.spectrogram_pos + 1, 0,
+                               LCD_WIDTH, y);
+                lcd_(set_foreground)(COLOR_DEFAULT_FG);
 			}
+        }
+        /* else These modes clear the screen themselves */
 			
-			last_message = 0;
-		}
+        last_message = NULL;
     }
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_update();
-#else
-    grey_update();
-#endif
 
-    graph_settings.changed.mode =  false;
-    graph_settings.changed.orientation = false;
-    graph_settings.changed.scale = false;
+    lcd_(update)();
+
+    graph_settings.changed.clear_all = false;
 }
 
 void draw_lines_vertical(void)
 {
-    static int32_t max = 0, vfactor = 0, vfactor_count = 0;
-    static const int32_t hfactor =
-            Q16_DIV(LCD_WIDTH << 16, (ARRAYSIZE_PLOT) << 16),
-            bins_per_pixel = (ARRAYSIZE_PLOT) / LCD_WIDTH;
-    static bool old_scale = true;
+    static int max = 0;
 
-    if (old_scale != graph_settings.logarithmic)
-        old_scale = graph_settings.logarithmic, max = 0; /* reset the graph on scaling mode change */
+#if LCD_WIDTH < ARRAYLEN_PLOT /* graph compression */
+    const int offset = 0;
+    const int plotwidth = LCD_WIDTH;
+#else
+    const int offset = (LCD_HEIGHT - ARRAYLEN_PLOT) / 2;
+    const int plotwidth = ARRAYLEN_PLOT;
+#endif
 
-    int32_t new_max = calc_magnitudes(graph_settings.logarithmic);
+    int this_max;
+    int i, x;
 
-    if (new_max > max)
+    if(graph_settings.changed.amp_scale)
+        max = 0; /* reset the graph on scaling mode change */
+
+    this_max = calc_magnitudes(graph_settings.logarithmic_amp);
+
+    if(this_max == 0)
     {
-        max = new_max;
-        vfactor = Q16_DIV(LCD_HEIGHT << 16, max); /* s15.16 */
-        vfactor_count = Q16_DIV(vfactor, bins_per_pixel << 16); /* s15.16 */
+        lcd_(hline)(0, LCD_WIDTH - 1, LCD_HEIGHT - 1); /* Draw all "zero" */
+        return;
     }
 
-    if (new_max == 0 || max == 0) /* nothing to draw */
-        return;
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
 
-    /* take the average of neighboring bins
-     * if we have to scale the graph horizontally */
-    int64_t bins_avg = 0;
-    bool draw = true;
-    int32_t i;
-    for (i = 0; i < ARRAYSIZE_PLOT; ++i)
+    /* take the maximum of neighboring bins if we have to scale the graph
+     * horizontally */
+    if(LCD_WIDTH < ARRAYLEN_PLOT) /* graph compression */
     {
-        int32_t x = 0, y = 0;
+        int bins_acc = LCD_WIDTH / 2;
+        int bins_max = 0;
+        
+        i = 0, x = 0;
 
-        x = Q16_MUL(hfactor, i << 16) >> 16;
-        //x = (x + (1 << 15)) >> 16;
-
-        if (hfactor < 65536) /* hfactor < 0, graph compression */
+        for(;;)
         {
-            draw = false;
-            bins_avg += plot[i];
+            int bin = plot[i++];
 
-            /* fix the division by zero warning:
-             * bins_per_pixel is zero when the graph is expanding;
-             * execution won't even reach this point - this is a dummy constant
-             */
-            const int32_t div = bins_per_pixel > 0 ? bins_per_pixel : 1;
-            if ((i + 1) % div == 0)
+            if(bin > bins_max)
+                bins_max = bin;
+
+            bins_acc += LCD_WIDTH;
+
+            if(bins_acc >= ARRAYLEN_PLOT)
             {
-                y = Q16_MUL(vfactor_count, bins_avg) >> 16;
+                plot[x] = bins_max;
+                
+                if(bins_max > max)
+                    max = bins_max;
 
-                bins_avg = 0;
-                draw = true;
+                if(++x >= LCD_WIDTH)
+                    break;
+
+                bins_acc -= ARRAYLEN_PLOT;
+                bins_max = 0;
             }
         }
-        else
-        {
-            y = Q16_MUL(vfactor, plot[i]) >> 16;
-            draw = true;
-        }
+    }
+    else
+    {
+        if(this_max > max)
+            max = this_max;
+    }
 
-        if (draw)
-        {
-#ifdef HAVE_LCD_COLOR
-			rb->lcd_vline(x, LCD_HEIGHT-1, LCD_HEIGHT-y-1);
-#else
-			grey_vline(x, LCD_HEIGHT-1, LCD_HEIGHT-y-1);
-#endif
-        }
+    for(x = 0; x < plotwidth; ++x)
+    {
+        int h = LCD_HEIGHT*plot[x] / max;
+        lcd_(vline)(x + offset, LCD_HEIGHT - h, LCD_HEIGHT-1);
     }
 }
 
@@ -649,449 +822,411 @@ void draw_lines_horizontal(void)
 {
     static int max = 0;
 
-    static const int32_t vfactor =
-            Q16_DIV(LCD_HEIGHT << 16, (ARRAYSIZE_PLOT) << 16),
-            bins_per_pixel = (ARRAYSIZE_PLOT) / LCD_HEIGHT;
+#if LCD_WIDTH < ARRAYLEN_PLOT /* graph compression */
+    const int offset = 0;
+    const int plotwidth = LCD_HEIGHT;
+#else
+    const int offset = (LCD_HEIGHT - ARRAYLEN_PLOT) / 2;
+    const int plotwidth = ARRAYLEN_PLOT;
+#endif
 
-    if (graph_settings.changed.scale)
+    int this_max;
+    int y;
+
+    if(graph_settings.changed.amp_scale)
         max = 0; /* reset the graph on scaling mode change */
 
-    int32_t new_max = calc_magnitudes(graph_settings.logarithmic);
+    this_max = calc_magnitudes(graph_settings.logarithmic_amp);
 
-    if (new_max > max)
-        max = new_max;
-
-    if (new_max == 0 || max == 0) /* nothing to draw */
-        return;
-
-    int32_t hfactor;
-
-    hfactor = Q16_DIV((LCD_WIDTH - 1) << 16, max); /* s15.16 */
-
-    /* take the average of neighboring bins
-     * if we have to scale the graph horizontally */
-    int64_t bins_avg = 0;
-    bool draw = true;
-    int32_t i;
-    for (i = 0; i < ARRAYSIZE_PLOT; ++i)
+    if(this_max == 0)
     {
-        int32_t x = 0, y = 0;
+        lcd_(vline)(0, 0, LCD_HEIGHT-1); /* Draw all "zero" */
+        return;
+    }
 
-        y = Q16_MUL(vfactor, i << 16) + (1 << 15);
-        y >>= 16;
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
 
-        if (vfactor < 65536) /* vfactor < 0, graph compression */
+    /* take the maximum of neighboring bins if we have to scale the graph
+     * horizontally */
+    if(LCD_HEIGHT < ARRAYLEN_PLOT) /* graph compression */
+    {
+        int bins_acc = LCD_HEIGHT / 2;
+        int bins_max = 0;
+        int i = 0;
+
+        y = 0;
+
+        for(;;)
         {
-            draw = false;
-            bins_avg += plot[i];
+            int bin = plot[i++];
 
-            /* fix the division by zero warning:
-             * bins_per_pixel is zero when the graph is expanding;
-             * execution won't even reach this point - this is a dummy constant
-             */
-            const int32_t div = bins_per_pixel > 0 ? bins_per_pixel : 1;
-            if ((i + 1) % div == 0)
+            if (bin > bins_max)
+                bins_max = bin;
+
+            bins_acc += LCD_HEIGHT;
+
+            if(bins_acc >= ARRAYLEN_PLOT)
             {
-                bins_avg = Q16_DIV(bins_avg, div << 16);
-                x = Q16_MUL(hfactor, bins_avg) >> 16;
+                plot[y] = bins_max;
 
-                bins_avg = 0;
-                draw = true;
+                if(bins_max > max)
+                    max = bins_max;
+
+                if(++y >= LCD_HEIGHT)
+                    break;
+
+                bins_acc -= ARRAYLEN_PLOT;
+                bins_max = 0;
             }
         }
-        else
-        {
-            y = Q16_MUL(hfactor, plot[i]) >> 16;
-            draw = true;
-        }
+    }
+    else
+    {
+        if(this_max > max)
+            max = this_max;
+    }
 
-        if (draw)
-        {
-#ifdef HAVE_LCD_COLOR
-			rb->lcd_hline(0, x, y);
-#else
-			grey_hline(0, x, y);
-#endif
-        }
+    for(y = 0; y < plotwidth; ++y)
+    {
+        int w = LCD_WIDTH*plot[y] / max;
+        lcd_(hline)(0, w - 1, y + offset);
     }
 }
 
 void draw_bars_vertical(void)
 {
-    static const unsigned int bars = 20, border = 2, items = ARRAYSIZE_PLOT
-            / bars, width = (LCD_WIDTH - ((bars - 1) * border)) / bars;
+    static int max = 0;
 
-    calc_magnitudes(graph_settings.logarithmic);
+#if LCD_WIDTH < LCD_HEIGHT
+    const int bars = 15;
+#else
+    const int bars = 20;
+#endif
+    const int border = 2;
+    const int barwidth = LCD_WIDTH / (bars + border);
+    const int width = barwidth - border;
+    const int offset = (LCD_WIDTH - bars*barwidth) / 2;
 
-    uint64_t bars_values[bars], bars_max = 0, avg = 0;
-    unsigned int i, bars_idx = 0;
-    for (i = 0; i < ARRAYSIZE_PLOT; ++i)
+    if(graph_settings.changed.amp_scale)
+        max = 0; /* reset the graph on scaling mode change */
+
+    lcd_(hline)(0, LCD_WIDTH-1, LCD_HEIGHT-1); /* Draw baseline */
+
+    if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
+        return; /* nothing more to draw */
+
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
+
+    int bins_acc = bars / 2;
+    int bins_max = 0;
+    int x = 0, i = 0;
+
+    for(;;)
     {
-        avg += plot[i];
-        if ((i + 1) % items == 0)
+        int bin = plot[i++];
+
+        if(bin > bins_max)
+            bins_max = bin;
+
+        bins_acc += bars;
+
+        if(bins_acc >= ARRAYLEN_PLOT)
         {
-            /* Calculate the average value and keep the fractional part
-             * for some added precision */
-            avg = Q16_DIV(avg, items << 16);
-            bars_values[bars_idx] = avg;
+            plot[x] = bins_max;
 
-            if (bars_values[bars_idx] > bars_max)
-                bars_max = bars_values[bars_idx];
+            if(bins_max > max)
+                max = bins_max;
 
-            bars_idx++;
-            avg = 0;
+            if(++x >= bars)
+                break;
+
+            bins_acc -= ARRAYLEN_PLOT;
+            bins_max = 0;
         }
     }
 
-    if(bars_max == 0) /* nothing to draw */
-        return;
-
-    /* Give the graph some headroom */
-    bars_max = Q16_MUL(bars_max, float_q16(1.1));
-
-    uint64_t vfactor = Q16_DIV(LCD_HEIGHT << 16, bars_max);
-
-    for (i = 0; i < bars; ++i)
+    for(i = 0, x = offset; i < bars; ++i, x += barwidth)
     {
-        int x = (i) * (border + width);
-        int y;
-        y = Q16_MUL(vfactor, bars_values[i]) + (1 << 15);
-        y >>= 16;
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_fillrect(x, LCD_HEIGHT - y - 1, width, y);
-#else
-        grey_fillrect(x, LCD_HEIGHT - y - 1, width, y);
-#endif
+        int h = LCD_HEIGHT * plot[i] / max;
+        lcd_(fillrect)(x, LCD_HEIGHT - h, width, h - 1);
     }
 }
 
 void draw_bars_horizontal(void)
 {
-    static const unsigned int bars = 14, border = 3, items = ARRAYSIZE_PLOT
-            / bars, height = (LCD_HEIGHT - ((bars - 1) * border)) / bars;
+    static int max = 0;
 
-    calc_magnitudes(graph_settings.logarithmic);
+#if LCD_WIDTH < LCD_HEIGHT
+    const int bars = 20;
+#else
+    const int bars = 15;
+#endif
+    const int border = 2;
+    const int barwidth = LCD_HEIGHT / (bars + border);
+    const int height = barwidth - border;
+    const int offset = (LCD_HEIGHT - bars*barwidth) / 2;
 
-    int64_t bars_values[bars], bars_max = 0, avg = 0;
-    unsigned int i, bars_idx = 0;
-    for (i = 0; i < ARRAYSIZE_PLOT; ++i)
+    if(graph_settings.changed.amp_scale)
+        max = 0; /* reset the graph on scaling mode change */
+
+    lcd_(vline)(0, 0, LCD_HEIGHT-1); /* Draw baseline */
+
+    if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
+        return; /* nothing more to draw */
+
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
+
+    int bins_acc = bars / 2;
+    int bins_max = 0;
+    int y = 0, i = 0;
+
+    for(;;)
     {
-        avg += plot[i];
-        if ((i + 1) % items == 0)
+        int bin = plot[i++];
+
+        if (bin > bins_max)
+            bins_max = bin;
+
+        bins_acc += bars;
+
+        if(bins_acc >= ARRAYLEN_PLOT)
         {
-            /* Calculate the average value and keep the fractional part
-             * for some added precision */
-            avg = Q16_DIV(avg, items << 16); /* s15.16 */
-            bars_values[bars_idx] = avg;
+            plot[y] = bins_max;
 
-            if (bars_values[bars_idx] > bars_max)
-                bars_max = bars_values[bars_idx];
+            if(bins_max > max)
+                max = bins_max;
 
-            bars_idx++;
-            avg = 0;
+            if(++y >= bars)
+                break;
+
+            bins_acc -= ARRAYLEN_PLOT;
+            bins_max = 0;
         }
     }
 
-    if(bars_max == 0) /* nothing to draw */
-        return;
-
-    /* Give the graph some headroom */
-    bars_max = Q16_MUL(bars_max, float_q16(1.1));
-
-    int64_t hfactor = Q16_DIV(LCD_WIDTH << 16, bars_max);
-
-    for (i = 0; i < bars; ++i)
+    for(i = 0, y = offset; i < bars; ++i, y += barwidth)
     {
-        int y = (i) * (border + height);
-        int x;
-        x = Q16_MUL(hfactor, bars_values[i]) + (1 << 15);
-        x >>= 16;
-
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_fillrect(0, y, x, height);
-#else
-        grey_fillrect(0, y, x, height);
-#endif
+        int w = LCD_WIDTH * plot[i] / max;
+        lcd_(fillrect)(1, y, w, height);
     }
 }
 
 void draw_spectrogram_vertical(void)
 {
-    const int32_t scale_factor = ARRAYSIZE_PLOT / LCD_HEIGHT
-#ifdef HAVE_LCD_COLOR
-        ,colors_per_val_log = Q16_DIV((COLORS-1) << 16, QLOG_MAX),
-        colors_per_val_lin = Q16_DIV((COLORS-1) << 16, QLIN_MAX)
-#else
-		,grey_vals_per_val_log = Q16_DIV(255 << 16, QLOG_MAX),
-		grey_vals_per_val_lin = Q16_DIV(255 << 16, QLIN_MAX)
-#endif
-		;
+    const int32_t scale_factor = MIN(LCD_HEIGHT, ARRAYLEN_PLOT);
 
-    const int32_t remaining_div =
-        (ARRAYSIZE_PLOT-scale_factor*LCD_HEIGHT) > 0 ?
-        ( Q16_DIV((scale_factor*LCD_HEIGHT) << 16,
-                  (ARRAYSIZE_PLOT-scale_factor*LCD_HEIGHT) << 16)
-         + (1<<15) ) >> 16 : 0;
+    calc_magnitudes(graph_settings.logarithmic_amp);
 
-    calc_magnitudes(graph_settings.logarithmic);
-    if(graph_settings.changed.mode || graph_settings.changed.orientation)
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
+
+    int bins_acc = scale_factor / 2;
+    int bins_max = 0;
+    int y = 0, i = 0;
+
+    for(;;)
     {
-        graph_settings.spectrogram.column = 0;
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_clear_display();
-#else
-        grey_clear_display();
-#endif
-    }
+        int bin = plot[i++];
 
-    int i, y = LCD_HEIGHT-1, count = 0, rem_count = 0;
-    uint64_t avg = 0;
-    bool added_extra_value = false;
-    for(i = 0; i < ARRAYSIZE_PLOT; ++i)
-    {
-        if(plot[i] > 0)
-            avg += plot[i];
-        ++count;
-        ++rem_count;
+        if(bin > bins_max)
+            bins_max = bin;
 
-        /* Kinda hacky - due to the rounding in scale_factor, we try to
-         * uniformly interweave the extra values in our calculations */
-        if(remaining_div > 0 && rem_count >= remaining_div &&
-                i < (ARRAYSIZE_PLOT-1))
+        bins_acc += scale_factor;
+
+        if(bins_acc >= ARRAYLEN_PLOT)
         {
-            ++i;
-            if(plot[i] > 0)
-                avg += plot[i];
-            rem_count = 0;
-            added_extra_value = true;
-        }
+            unsigned index;
 
-        if(count >= scale_factor)
-        {
-            if(added_extra_value)
-                { ++count; added_extra_value = false; }
-
-            int32_t color;
-
-            avg = Q16_DIV(avg, count << 16);
-
-#ifdef HAVE_LCD_COLOR
-            if(graph_settings.logarithmic)
-                color = Q16_MUL(avg, colors_per_val_log) >> 16;
+            if(graph_settings.logarithmic_amp)
+                index = (SHADES-1)*bins_max / QLOG_MAX;
             else
-                color = Q16_MUL(avg, colors_per_val_lin) >> 16;
-            if(color >= COLORS) /* TODO These happen because we don't normalize the values to be above 1 and log() returns negative numbers. I think. */
-                color = COLORS-1;
-            else if (color < 0)
-                color = 0;
+                index = (SHADES-1)*bins_max / QLIN_MAX;
 
-#else
-			if(graph_settings.logarithmic)
-				color = Q16_MUL(avg, grey_vals_per_val_log) >> 16;
-			else
-				color = Q16_MUL(avg, grey_vals_per_val_lin) >> 16;
-            if(color > 255) 
-                color = 255;
-            else if (color < 0)
-                color = 0;
-#endif
+            /* These happen because we exaggerate the graph a little for
+             * linear mode */
+            if(index >= SHADES)
+                index = SHADES-1;
 
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(fft_colors[color]);
-            rb->lcd_drawpixel(graph_settings.spectrogram.column, y);
-#else
-            grey_set_foreground(255 - color);
-            grey_drawpixel(graph_settings.spectrogram.column, y);
-#endif
+            lcd_(set_foreground)(SPECTROGRAPH_PALETTE(index));
+            lcd_(drawpixel)(graph_settings.spectrogram_pos,
+                            scale_factor-1 - y);
 
-            y--;
+            if(++y >= LCD_HEIGHT)
+                break;
 
-            avg = 0;
-            count = 0;
+            bins_acc -= ARRAYLEN_PLOT;
+            bins_max = 0;
         }
-        if(y < 0)
-            break;
     }
-    if(graph_settings.spectrogram.column != LCD_WIDTH-1)
-        graph_settings.spectrogram.column++;
+
+    if(graph_settings.spectrogram_pos < LCD_WIDTH-1)
+        graph_settings.spectrogram_pos++;
     else
-#ifdef HAVE_LCD_COLOR
-        xlcd_scroll_left(1);
-#else
-        grey_scroll_left(1);
-#endif
+        lcd_scroll_left(1);
 }
 
 void draw_spectrogram_horizontal(void)
 {
-    const int32_t scale_factor = ARRAYSIZE_PLOT / LCD_WIDTH
-#ifdef HAVE_LCD_COLOR
-        ,colors_per_val_log = Q16_DIV((COLORS-1) << 16, QLOG_MAX),
-        colors_per_val_lin = Q16_DIV((COLORS-1) << 16, QLIN_MAX)
-#else
-		,grey_vals_per_val_log = Q16_DIV(255 << 16, QLOG_MAX),
-		grey_vals_per_val_lin = Q16_DIV(255 << 16, QLIN_MAX)
-#endif
-		;
+    const int32_t scale_factor = MIN(LCD_WIDTH, ARRAYLEN_PLOT);
 
-    const int32_t remaining_div =
-            (ARRAYSIZE_PLOT-scale_factor*LCD_WIDTH) > 0 ?
-            ( Q16_DIV((scale_factor*LCD_WIDTH) << 16,
-                      (ARRAYSIZE_PLOT-scale_factor*LCD_WIDTH) << 16)
-             + (1<<15) ) >> 16 : 0;
+    calc_magnitudes(graph_settings.logarithmic_amp);
 
-    calc_magnitudes(graph_settings.logarithmic);
-    if(graph_settings.changed.mode || graph_settings.changed.orientation)
+    if(graph_settings.logarithmic_freq)
+        logarithmic_plot_translate();
+
+    int bins_acc = scale_factor / 2;
+    int bins_max = 0;
+    int x = 0, i = 0;
+
+    for(;;)
     {
-        graph_settings.spectrogram.row = 0;
-#ifdef HAVE_LCD_COLOR
-        rb->lcd_clear_display();
-#else
-        grey_clear_display();
-#endif
-    }
+        int bin = plot[i++];
 
-    int i, x = 0, count = 0, rem_count = 0;
-    uint64_t avg = 0;
-    bool added_extra_value = false;
-    for(i = 0; i < ARRAYSIZE_PLOT; ++i)
-    {
-        if(plot[i] > 0)
-            avg += plot[i];
-        ++count;
-        ++rem_count;
+        if(bin > bins_max)
+            bins_max = bin;
 
-        /* Kinda hacky - due to the rounding in scale_factor, we try to
-         * uniformly interweave the extra values in our calculations */
-        if(remaining_div > 0 && rem_count >= remaining_div &&
-                i < (ARRAYSIZE_PLOT-1))
+        bins_acc += scale_factor;
+
+        if(bins_acc >= ARRAYLEN_PLOT)
         {
-            ++i;
-            if(plot[i] > 0)
-                avg += plot[i];
-            rem_count = 0;
-            added_extra_value = true;
-        }
+            unsigned index;
 
-        if(count >= scale_factor)
-        {
-            if(added_extra_value)
-                { ++count; added_extra_value = false; }
-
-            int32_t color;
-
-            avg = Q16_DIV(avg, count << 16);
-
-#ifdef HAVE_LCD_COLOR
-            if(graph_settings.logarithmic)
-                color = Q16_MUL(avg, colors_per_val_log) >> 16;
+            if(graph_settings.logarithmic_amp)
+                index = (SHADES-1)*bins_max / QLOG_MAX;
             else
-                color = Q16_MUL(avg, colors_per_val_lin) >> 16;
-            if(color >= COLORS) /* TODO same as _vertical */
-                color = COLORS-1;
-            else if (color < 0)
-                color = 0;
+                index = (SHADES-1)*bins_max / QLIN_MAX;
 
-#else
-			if(graph_settings.logarithmic)
-				color = Q16_MUL(avg, grey_vals_per_val_log) >> 16;
-			else
-				color = Q16_MUL(avg, grey_vals_per_val_lin) >> 16;
-            if(color > 255) 
-				color = 255;
-            else if (color < 0)
-                color = 0;
-#endif
+            /* These happen because we exaggerate the graph a little for
+             * linear mode */
+            if(index >= SHADES)
+                index = SHADES-1;
 
-#ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(fft_colors[color]);
-            rb->lcd_drawpixel(x, graph_settings.spectrogram.row);
-#else
-            grey_set_foreground(255 - color);
-            grey_drawpixel(x, graph_settings.spectrogram.row);
-#endif
+            lcd_(set_foreground)(SPECTROGRAPH_PALETTE(index));
+            lcd_(drawpixel)(x, graph_settings.spectrogram_pos);
 
-            x++;
+            if(++x >= LCD_WIDTH)
+                break;
 
-            avg = 0;
-            count = 0;
+            bins_acc -= ARRAYLEN_PLOT;
+            bins_max = 0;
         }
-        if(x >= LCD_WIDTH)
-            break;
     }
-    if(graph_settings.spectrogram.row != LCD_HEIGHT-1)
-        graph_settings.spectrogram.row++;
+
+    if(graph_settings.spectrogram_pos < LCD_HEIGHT-1)
+        graph_settings.spectrogram_pos++;
     else
-#ifdef HAVE_LCD_COLOR
-        xlcd_scroll_up(1);
-#else
-        grey_scroll_up(1);
-#endif
+        lcd_scroll_up(1);
 }
 
 /********************* End of plotting functions (modes) *********************/
 
-static long thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-void input_thread_entry(void)
+/* TODO: Only have this thread for multicore, otherwise it serves no purpose */
+long fft_thread_stack[CACHEALIGN_UP(DEFAULT_STACK_SIZE*4/sizeof(long))]
+                    CACHEALIGN_AT_LEAST_ATTR(4);
+void fft_thread_entry(void)
 {
-	kiss_fft_scalar * value;
-	kiss_fft_scalar left;
-	int count;
-	int idx = 0; /* offset in the buffer */
-	int fft_idx = 0; /* offset in input */
-	while(true)
+    size_t size = sizeof(buffer);
+    FFT_CFG state = FFT_ALLOC(FFT_SIZE, 0, buffer, &size);
+    int count;
+
+    if(state == 0)
+    {
+        DEBUGF("needed data: %i", (int) size);
+        output_tail = -1; /* tell that we bailed */
+        fft_thread_run = true;
+        return;
+    }
+
+    fft_thread_run = true;
+
+    while(fft_thread_run)
 	{
-		rb->mutex_lock(&input_mutex);
-		if(!input_thread_run)
-			rb->thread_exit();
+        int16_t *value = (int16_t *) rb->pcm_get_peak_buffer(&count);
+        /* This block can introduce discontinuities in our data. Meaning, the
+         * FFT will not be done a continuous segment of the signal. Which can
+         * be bad. Or not.
+         * 
+         * Anyway, this is a demo, not a scientific tool. If you want accuracy,
+         * do a proper spectrum analysis.*/
 
-		value = (kiss_fft_scalar*) rb->pcm_get_peak_buffer(&count);
-		
-		if (value == 0 || count == 0)
-		{
-			rb->mutex_unlock(&input_mutex);
-			rb->yield();
-			continue;
-			/* This block can introduce discontinuities in our data. Meaning, the FFT
-			 * will not be done a continuous segment of the signal. Which can be bad. Or not.
-			 * 
-			 * Anyway, this is a demo, not a scientific tool. If you want accuracy, do a proper
-			 * spectrum analysis.*/
-		}
-		else
-		{
-			idx = fft_idx = 0;
-			do
-			{
-				left = *(value + idx);
-				idx += 2;
+        /* there are cases when we don't have enough data to fill the buffer */
+        if (!rb->pcm_is_playing())
+        {
+            rb->sleep(HZ/5);
+            output_tail = output_head; /* set empty */
+            continue;
+        }
+        else if(count != ARRAYLEN_IN/2)
+        {
+            if(count < ARRAYLEN_IN/2)
+            {
+                rb->sleep(0);       /* not enough - ease up */
+                continue;
+            }
 
-				input[fft_idx] = left;
-				fft_idx++;
-				input[fft_idx] = 0;
-				fft_idx++;
+            count = ARRAYLEN_IN/2;  /* too much - limit */
+        }
 
-				if (fft_idx == ARRAYSIZE_IN)
-					break;
-			} while (idx < count);
-		}
-		if(fft_idx == ARRAYSIZE_IN) /* there are cases when we don't have enough data to fill the buffer */
-		    input_thread_has_data = true;	
-		
-		rb->mutex_unlock(&input_mutex);
-		rb->yield();
+        int fft_idx = 0; /* offset in 'input' */
+
+        do
+        {
+            kiss_fft_scalar left = *value++;
+            kiss_fft_scalar right = *value++;
+            input[fft_idx++] = (left + right) >> 1; /* to mono */
+            input[fft_idx++] = 0;
+        } while (--count > 0);
+
+        apply_window_func(graph_settings.window_func);
+        FFT_FFT(state, input, output[output_tail]);
+        rb->yield();
+#if NUM_CORES > 1
+        /* write back output for other processor and invalidate for next frame read */
+        rb->cpucache_invalidate();
+#endif
+        int new_tail = output_tail ^ 1;
+
+        /* if full, block waiting until reader has freed a slot */
+        while(new_tail == output_head && fft_thread_run)
+            rb->sleep(0);
+
+        output_tail = new_tail;
 	}
 }
 
-
 enum plugin_status plugin_start(const void* parameter)
 {
-    (void) parameter;
-    if ((rb->audio_status() & AUDIO_STATUS_PLAY) == 0)
+    /* Defaults */
+    bool run = true;
+    bool showing_warning = false;
+    int timeout = HZ/100;
+
+    /* create worker thread - on the COP for dual-core targets */
+    unsigned int fft_thread = rb->create_thread(fft_thread_entry,
+            fft_thread_stack, sizeof(fft_thread_stack), 0, "fft output thread"
+            IF_PRIO(, PRIORITY_USER_INTERFACE+1) IF_COP(, COP));
+
+    if(fft_thread == 0)
     {
-        rb->splash(HZ * 2, "No track playing. Exiting..");
-        return PLUGIN_OK;
+        rb->splash(HZ, "FFT thread failed create");
+        return PLUGIN_ERROR;
     }
+
+    /* wait for it to indicate 'ready' */
+    while(fft_thread_run == false)
+        rb->sleep(0);
+
+    if(output_tail == -1)
+    {
+        /* FFT thread bailed-out like The Fed */
+        rb->thread_wait(fft_thread);
+        rb->splash(HZ, "FFT thread failed to init");
+        return PLUGIN_ERROR;
+    }
+
 #ifndef HAVE_LCD_COLOR
     unsigned char *gbuf;
     size_t  gbuf_size = 0;
@@ -1103,13 +1238,19 @@ enum plugin_status plugin_start(const void* parameter)
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
+        fft_thread_run = false;
+        rb->thread_wait(fft_thread);
         return PLUGIN_ERROR;
     }
     grey_show(true); 
 #endif
 
+    logarithmic_plot_init();
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+    lcd_(clear_display)();
+    lcd_(update)();
 #endif
     backlight_force_on();
 
@@ -1117,93 +1258,92 @@ enum plugin_status plugin_start(const void* parameter)
     rb->cpu_boost(true);
 #endif
 
-    rb->mutex_init(&input_mutex);
-
-    /* Defaults */
-    bool run = true;
-    graph_settings.mode = 0;
-    graph_settings.logarithmic = true;
-    graph_settings.orientation_vertical = true;
-    graph_settings.window_func = 0;
-    graph_settings.changed.mode = false;
-    graph_settings.changed.scale = false;
-    graph_settings.changed.orientation = false;
-    graph_settings.spectrogram.row = 0;
-    graph_settings.spectrogram.column = 0;
-
-    bool changed_window = false;
-
-    size_t size = sizeof(buffer);
-    FFT_CFG state = FFT_ALLOC(FFT_SIZE, 0, buffer, &size);
-
-    if (state == 0)
-    {
-        DEBUGF("needed data: %i", (int) size);
-        return PLUGIN_ERROR;
-    }
-	
-	unsigned int input_thread = rb->create_thread(&input_thread_entry, thread_stack, sizeof(thread_stack), 0, "fft input thread" IF_PRIO(, PRIORITY_BACKGROUND) IF_COP(, CPU));
-	rb->yield();
     while (run)
     {
-		rb->mutex_lock(&input_mutex);
-		if(!input_thread_has_data)
+        int button;
+
+        while(output_head == output_tail)
 		{
-			/* Make sure the input thread has started before doing anything else */
-			rb->mutex_unlock(&input_mutex);
-			rb->yield();
-			continue;
+            if(!rb->pcm_is_playing())
+            {
+                showing_warning = true;
+                lcd_(clear_display)();
+                draw_message_string("No audio playing", false);
+                lcd_(update)();
+                timeout = HZ/5;
+            }
+            else
+            {
+                if(showing_warning)
+                {
+                    showing_warning = false;
+                    lcd_(clear_display)();
+                    lcd_(update)();
+                    timeout = HZ/100;
+                }
+            }
+
+            /* Make sure the input thread has produced something before doing
+             * anything but watching for buttons. Music might not be playing
+             * or things just aren't going well for picking up buffers so keys
+             * are scanned to avoid lockup.  */
+             button = rb->button_get_w_tmo(timeout);
+             if (button != BUTTON_NONE)
+                 goto read_button;
 		}
-		apply_window_func(graph_settings.window_func);
-		FFT_FFT(state, input, output);
 
-		if(changed_window)
-		{
-			draw(window_text[graph_settings.window_func]);
-			changed_window = false;
-		}
-		else
-			draw(0);
+	    draw(NULL);
 
-		input_thread_has_data = false;
-        rb->mutex_unlock(&input_mutex);
-		rb->yield();
+        output_head ^= 1; /* done drawing, free this buffer */
+        rb->yield();
 
-		int button = rb->button_get(false);
+		button = rb->button_get(false);
+    read_button:
         switch (button)
         {
             case FFT_QUIT:
                 run = false;
                 break;
             case FFT_PREV_GRAPH: {
-                graph_settings.mode--;
-                if (graph_settings.mode < 0)
-                    graph_settings.mode = MODES_COUNT-1;
+                if (graph_settings.mode-- <= FFT_DM_FIRST)
+                    graph_settings.mode = FFT_DM_COUNT-1;
+                graph_settings.changed.mode = true;
                 draw(modes_text[graph_settings.mode]);
                 break;
             }
             case FFT_NEXT_GRAPH: {
-                graph_settings.mode++;
-                if (graph_settings.mode >= MODES_COUNT)
-                    graph_settings.mode = 0;
+                if (++graph_settings.mode >= FFT_DM_COUNT)
+                    graph_settings.mode = FFT_DM_FIRST;
+                graph_settings.changed.mode = true;
                 draw(modes_text[graph_settings.mode]);
                 break;
             }
             case FFT_WINDOW: {
-                changed_window = true;
-                graph_settings.window_func ++;
-                if(graph_settings.window_func >= WINDOW_COUNT)
-                    graph_settings.window_func = 0;
+                if(++graph_settings.window_func >= FFT_WF_COUNT)
+                    graph_settings.window_func = FFT_WF_FIRST;
+                graph_settings.changed.window_func = true;
+                draw(window_text[graph_settings.window_func]);
                 break;
             }
-            case FFT_SCALE: {
-                graph_settings.logarithmic = !graph_settings.logarithmic;
-                draw(scales_text[graph_settings.logarithmic ? 1 : 0]);
+            case FFT_AMP_SCALE: {
+                graph_settings.logarithmic_amp = !graph_settings.logarithmic_amp;
+                graph_settings.changed.amp_scale = true;
+                draw(amp_scales_text[graph_settings.logarithmic_amp ? 1 : 0]);
                 break;
             }
+#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
+            case FFT_FREQ_SCALE: {
+                graph_settings.logarithmic_freq = !graph_settings.logarithmic_freq;
+                graph_settings.changed.freq_scale = true;
+                draw(freq_scales_text[graph_settings.logarithmic_freq ? 1 : 0]);
+                break;
+            }
+#endif
             case FFT_ORIENTATION: {
-                graph_settings.orientation_vertical = !graph_settings.orientation_vertical;
-                draw(0);
+                graph_settings.orientation_vertical =
+                    !graph_settings.orientation_vertical;
+                graph_settings.changed.orientation = true;
+                draw(NULL);
                 break;
             }
             default: {
@@ -1214,11 +1354,12 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 	
-	/* Handle our input thread. We haven't yield()'d since our last mutex_unlock, so we know we have the mutex */
-	rb->mutex_lock(&input_mutex);
-	input_thread_run = false;
-	rb->mutex_unlock(&input_mutex);
-	rb->thread_wait(input_thread);
+    /* Handle our FFT thread. */
+    fft_thread_run = false;
+    rb->thread_wait(fft_thread);
+#if NUM_CORES > 1
+    rb->cpucache_flush();
+#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -1228,4 +1369,5 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     backlight_use_settings();
     return PLUGIN_OK;
+    (void)parameter;
 }
