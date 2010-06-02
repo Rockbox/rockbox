@@ -245,6 +245,15 @@ enum pd_key_id
     #define PDPOD_WHEELLEFT (BUTTON_DOWN)
     #define PDPOD_WHEELRIGHT (BUTTON_UP)
     #define PDPOD_ACTION (BUTTON_ON)
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+    #define PDPOD_QUIT (BUTTON_HOME|BUTTON_REPEAT)
+    #define PDPOD_PLAY BUTTON_UP
+    #define PDPOD_PREVIOUS BUTTON_LEFT
+    #define PDPOD_NEXT BUTTON_RIGHT
+    #define PDPOD_MENU BUTTON_SELECT
+    #define PDPOD_WHEELLEFT BUTTON_SCROLL_BACK
+    #define PDPOD_WHEELRIGHT BUTTON_SCROLL_FWD
+    #define PDPOD_ACTION BUTTON_DOWN
 #else
     #warning "No keys defined for this architecture!"
 #endif
