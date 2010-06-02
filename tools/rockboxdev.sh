@@ -26,7 +26,7 @@ builddir="${RBDEV_BUILD:-/tmp/rbdev-build}"
 if [ -f "`which gmake 2>/dev/null`" ]; then
     make="gmake"
 else
-    make="make -j4"
+    make="make"
 fi
 
 if [ -z $GNU_MIRROR ] ; then
