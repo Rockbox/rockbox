@@ -13453,20 +13453,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
     *:none
-    radio_remote: "Remote FM Radio"
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
     *:none
-    radio_remote: "Telecomando Radio FM"
+    radio_remote: "Schermo Telecomando Radio"
   </dest>
   <voice>
     *:none
-    radio_remote: "Telecomando Radio FM"
+    radio_remote: "Schermo Telecomando Radio"
   </voice>
 </phrase>
 <phrase>
@@ -13668,5 +13668,36 @@
   </dest>
   <voice>
     *: "Nessun Tag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Schermo Radio"
+  </dest>
+  <voice>
+    *:none
+    radio: "Schermo Radio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Compositore"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
