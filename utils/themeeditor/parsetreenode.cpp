@@ -101,9 +101,9 @@ QString ParseTreeNode::genCode() const
             for(int i = 0; i < children.count(); i++)
             {
                 /*
-               Adding a % in case of tag, because the tag rendering code
-               doesn't insert its own
-            */
+                  Adding a % in case of tag, because the tag rendering code
+                  doesn't insert its own
+                 */
                 if(children[i]->element->type == TAG)
                     buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
@@ -161,7 +161,12 @@ QString ParseTreeNode::genCode() const
             break;
 
         case TEXT:
-            buffer.append(element->text);
+            for(char* cursor = element->text; *cursor; cursor++)
+            {
+                if(find_escape_character(*cursor))
+                    buffer.append(TAGSYM);
+                buffer.append(*cursor);
+            }
             break;
 
         case COMMENT:
@@ -176,7 +181,12 @@ QString ParseTreeNode::genCode() const
         switch(param->type)
         {
         case skin_tag_parameter::STRING:
-            buffer.append(param->data.text);
+            for(char* cursor = param->data.text; *cursor; cursor++)
+            {
+                if(find_escape_character(*cursor))
+                    buffer.append(TAGSYM);
+                buffer.append(*cursor);
+            }
             break;
 
         case skin_tag_parameter::NUMERIC:
