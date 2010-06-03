@@ -9,10 +9,11 @@
 %pb|pb-128x64x1.bmp|2|1|124|4|
 
 # tag info viewport
-%V|0|6|128|37|1|
+%V|0|8|128|37|1|
 %ac%s%?it<%it|%fn>
 %ac%s%?ia<%ia|%?d2<%d2|(root)>>
 %ac%s%?id<%id|%?d1<%d1|(root)>>
+%ac%s%Sx|Next:| %?It<%It|%Fn>
 %x|b|bar-128x64x1.bmp|2|36|
 
 # playtime info and status bar
