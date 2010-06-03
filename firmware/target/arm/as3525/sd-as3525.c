@@ -876,15 +876,12 @@ void sd_enable(bool on)
 
     if (sd_enabled == on)
         return; /* nothing to do */
+
+    sd_enabled = on;
+
     if(on)
     {
-        /*  Enable both NAF_CLOCK & IDE clk for internal SD */
-        CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE  |= (1<<6);     /* enable non AHB interface*/
-#ifdef HAVE_MULTIDRIVE
-        /* Enable MCI clk for uSD */
-        CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
-#ifdef HAVE_BUTTON_LIGHT
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
         /* buttonlight AMSes need a bit of special handling for the buttonlight
          * here due to the dual mapping of GPIOD and XPD */
         CCU_IO |= (1<<2);              /* XPD is SD-MCI interface (b3:2 = 01) */
@@ -892,9 +889,7 @@ void sd_enable(bool on)
             GPIOD_DIR &= ~(1<<7);
         else
             _buttonlight_off();
-#endif /* HAVE_BUTTON_LIGHT */
-#endif /* HAVE_MULTIDRIVE */
-        sd_enabled = true;
+#endif
 
 #if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
         if(card_detect_target())  /* If SD card present Boost cpu for voltage */
@@ -914,21 +909,11 @@ void sd_enable(bool on)
         }
 #endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
 
-        sd_enabled = false;
-
-#ifdef HAVE_MULTIDRIVE
-#ifdef HAVE_BUTTON_LIGHT
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
         CCU_IO &= ~(1<<2);           /* XPD is general purpose IO (b3:2 = 00) */
         if (buttonlight_is_on)
             _buttonlight_on();
-#endif /* HAVE_BUTTON_LIGHT */
-        /* Disable MCI clk for uSD */
-        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
-#endif /* HAVE_MULTIDRIVE */
-
-        /*  Disable both NAF_CLOCK & IDE clk for internal SD */
-        CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
-        CGU_IDE &= ~(1<<6);       /* disable non AHB interface*/
+#endif
     }
 }
 
