@@ -223,6 +223,14 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME ""
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+#if LCD_REMOTE_HEIGHT <= 64
+  #define DEFAULT_REMOTE_FONTNAME "08-Rockfont"
+#else
+  #define DEFAULT_REMOTE_FONTNAME "-"
+#endif
+#endif /* HAVE_REMOTE_LCD */
+
 #ifdef HAVE_LCD_COLOR
   #define DEFAULT_ICONSET "tango_small"
   #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers"
@@ -1564,7 +1572,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING, remote_font_file, "remote font",
-                     "-", FONT_DIR "/", ".fnt"),
+                     DEFAULT_REMOTE_FONTNAME, FONT_DIR "/", ".fnt"),
 #endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),

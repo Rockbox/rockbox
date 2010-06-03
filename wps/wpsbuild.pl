@@ -47,6 +47,7 @@ my $rsbs_w_size;
 my $width;
 my $height;
 my $font;
+my $remotefont;
 my $fgcolor;
 my $bgcolor;
 my $statusbar;
@@ -160,11 +161,11 @@ sub copybackdrop
 sub copythemefont
 {
     #copy the font specified by the theme
+    my $o = $_[0];
 
-    my $o=$font;
     $o =~ s/\.fnt/\.bdf/;
     mkdir "$rbdir/fonts";
-    my $cmd ="$ROOT/tools/convbdf -f -o \"$rbdir/fonts/$font\" \"$ROOT/fonts/$o\" ";
+    my $cmd ="$ROOT/tools/convbdf -f -o \"$rbdir/fonts/$_[0]\" \"$ROOT/fonts/$o\" ";
     `$cmd`;
 }
 
@@ -288,6 +289,13 @@ MOO
             push @out, "font: /$rbdir/fonts/$font\n";
         }
     }
+    if(defined($remotefont) && $has_remote) {
+        if ($remotefont eq '') {
+            push @out, "remote font: -\n";
+        } else {
+            push @out, "remote font: /$rbdir/fonts/$remotefont\n";
+        }
+    }
     if($fgcolor && $main_depth > 2) {
         push @out, "foreground color: $fgcolor\n";
     }
@@ -405,6 +413,7 @@ while(<WPS>) {
         undef $width;
         undef $height;
         undef $font;
+        undef $remotefont;
         undef $fgcolor;
         undef $bgcolor;
         undef $statusbar;
@@ -492,7 +501,10 @@ while(<WPS>) {
                     copythemeviewericon();
                 }
                 if ($font) {
-                    copythemefont();
+                    copythemefont($font);
+                }
+                if ($remotefont) {
+                    copythemefont($remotefont);
                 }
                 if(!$isrwps) {
                     # We only make .cfg files for <wps> sections:
@@ -553,6 +565,12 @@ while(<WPS>) {
         }
         elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $font = $1;
+        }
+        elsif($l =~ /^Remote Font\.${remote_width}x${remote_height}x$remote_depth: *(.*)/i) {
+            $remotefont = $1;
+        }
+        elsif($l =~ /^Remote Font: *(.*)/i) {
+            $remotefont = $1;
         }
         elsif($l =~ /^Foreground Color: *(.*)/i) {
             $fgcolor = $1;

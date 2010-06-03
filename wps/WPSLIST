@@ -308,6 +308,9 @@ Font.132x80x16: 11-Sazanami-Mincho.fnt
 Font.128x64x1: 08-Rockfont.fnt
 Font.112x64x1: 08-Rockfont.fnt
 
+# Remote font for iriver
+Remote Font.128x64x1: 08-Rockfont.fnt
+
 #misc settings that should be ignored on grayscale targets
 foreground color: CCCCCC
 background color: 000000
