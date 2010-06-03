@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$version="3.6RC";
+$version="3.6";
 
 my $verbose;
 if($ARGV[0] eq "-v") {
