@@ -264,8 +264,9 @@ sub copyskin
     my @filelist;
     my $src;
     my $dest;
+    my $sizestring;
         
-    if($wpslist =~ /(.*)OUT/) {
+    if($wpslist =~ /(.*)WPSFILE/) {
         $dir = $1;
         
         # first try the actual filename given to us
@@ -274,6 +275,10 @@ sub copyskin
         $src = "${dir}$skin.$ext";
         if ( -e $src )
         {
+            if ($skin =~ /\w\.(\d*x\d*x\d*).*/)
+            {
+                $sizestring = $1;
+            }
             my $cmd = "cp $src $rbdir/wps/$themename.$ext";
             `$cmd`;
         }
@@ -287,13 +292,13 @@ sub copyskin
             foreach my $d (@depthlist)
             {
                 next if ($d > $depth);
-                $src = "${dir}$skin.${width}x${height}x${d}.$ext";
+                $sizestring = "${width}x${height}x${d}";
+                $src = "${dir}$skin.${sizestring}.$ext";
                 last if (-e $src);
             }
             if (-e $src)
             {
                 my $cmd = "cp $src $rbdir/wps/$themename.$ext";
-                print "$cmd\n";
                 `$cmd`;
             }
             elsif (-e "${dir}$skin.$ext")
@@ -304,6 +309,35 @@ sub copyskin
             else
             {
                 #print STDERR "buildtheme warning: No suitable skin file for $ext\n";
+                return;
+            }
+        }
+        
+        open(WPSFILE, "$rbdir/wps/$themename.$ext");
+        while (<WPSFILE>) {
+           $filelist[$#filelist + 1] = $1 if (/\|([^|]*?.bmp)\|/);
+        }
+        close(WPSFILE);
+        if ($#filelist >= 0)
+        {
+            my $file;
+            if ($sizestring && -e "$dir/$themename/$sizestring") 
+            {
+                foreach $file (@filelist) 
+                {
+                    system("cp $dir/$themename/$sizestring/$file $rbdir/wps/$themename/");
+                }
+            }
+            elsif (-e "$dir/$themename") 
+            {
+                foreach $file (@filelist) 
+                {
+                    system("cp $dir/$themename/$file $rbdir/wps/$themename/");
+                }
+            }
+            else
+            {
+                print STDERR "beep, no dir to copy WPS from!\n";
             }
         }
     }
