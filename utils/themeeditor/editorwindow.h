@@ -37,6 +37,9 @@ public:
     EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
 
+protected:
+    virtual void closeEvent(QCloseEvent* event);
+
 private slots:
     void updateCode();
     void codeChanged();

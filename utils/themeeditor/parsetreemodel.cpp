@@ -131,7 +131,10 @@ int ParseTreeModel::rowCount(const QModelIndex &parent) const
 
 int ParseTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return numColumns;
+    if(parent.isValid())
+        return numColumns;
+    else
+        return numColumns;
 }
 
 QVariant ParseTreeModel::data(const QModelIndex &index, int role) const
