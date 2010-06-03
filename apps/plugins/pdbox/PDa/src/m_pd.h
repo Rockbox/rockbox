@@ -121,7 +121,7 @@ typedef union word
     int w_index;
 } t_word;
 
-typedef enum
+enum
 {
     A_NULL,
     A_FLOAT,
@@ -135,7 +135,8 @@ typedef enum
     A_DOLLSYM,
     A_GIMME,
     A_CANT
-}  t_atomtype;
+};
+typedef unsigned int t_atomtype;
 
 #define A_DEFSYMBOL A_DEFSYM	/* better name for this */
 
