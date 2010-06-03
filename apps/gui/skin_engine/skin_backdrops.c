@@ -31,7 +31,7 @@
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 
 static struct skin_backdrop {
-    char name[MAX_FILENAME+1];
+    char name[MAX_PATH];
     char *buffer;
     enum screen_type screen;
 } backdrops[SKINNABLE_SCREENS_COUNT*NB_SCREENS];
@@ -88,7 +88,7 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
     
     for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
     {
-        if (!strcmp(backdrops[i].name, backdrop) && backdrops[i].screen == screen)
+        if (!strcmp(backdrops[i].name, filename) && backdrops[i].screen == screen)
         {
             return backdrops[i].buffer;
         }
@@ -105,7 +105,7 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
         return NULL;
     loaded = screens[screen].backdrop_load(filename, bdrop->buffer);
     bdrop->screen = screen;
-    strlcpy(bdrop->name, backdrop, MAX_FILENAME+1);
+    strlcpy(bdrop->name, filename, sizeof(bdrop->name));
     
     return loaded ? bdrop->buffer : NULL;
 }
