@@ -247,18 +247,14 @@ GREY_INFO_STRUCT
 #include "_kiss_fft_guts.h" /* sizeof(struct kiss_fft_state) */
 #include "const.h"
 
-#if (LCD_WIDTH < LCD_HEIGHT)
-#define LCD_SIZE LCD_HEIGHT
-#else
-#define LCD_SIZE LCD_WIDTH
-#endif
+#define LCD_SIZE MAX(LCD_WIDTH, LCD_HEIGHT)
 
-#if (LCD_SIZE < 512)
-#define FFT_SIZE 2048 /* 512*4 */
-#elif (LCD_SIZE < 1024)
-#define FFT_SIZE 4096 /* 1024*4 */
+#if (LCD_SIZE <= 511)
+#define FFT_SIZE 1024 /* 512*2 */
+#elif (LCD_SIZE <= 1023)
+#define FFT_SIZE 2048 /* 1024*2 */
 #else
-#define FFT_SIZE 8192 /* 2048*4 */
+#define FFT_SIZE 4096 /* 2048*2 */
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -272,14 +268,9 @@ GREY_INFO_STRUCT
 #endif
 
 #define ARRAYLEN_IN (FFT_SIZE)
-#define ARRAYLEN_OUT (FFT_SIZE/2)
-#define ARRAYLEN_PLOT ((FFT_SIZE/4)-1) /* -1 to ignore DC bin */
+#define ARRAYLEN_OUT (FFT_SIZE)
+#define ARRAYLEN_PLOT (FFT_SIZE/2-1) /* FFT is symmetric, ignore DC */
 #define BUFSIZE_FFT (sizeof(struct kiss_fft_state)+sizeof(kiss_fft_cpx)*(FFT_SIZE-1))
-#define BUFSIZE_FFTR (BUFSIZE_FFT+sizeof(struct kiss_fftr_state)+sizeof(kiss_fft_cpx)*(FFT_SIZE*3/2))
-#define BUFSIZE BUFSIZE_FFTR
-#define FFT_ALLOC kiss_fftr_alloc
-#define FFT_FFT   kiss_fftr
-#define FFT_CFG   kiss_fftr_cfg
 
 #define __COEFF(type,size) type##_##size
 #define _COEFF(x, y) __COEFF(x,y) /* force the preprocessor to evaluate FFT_SIZE) */
@@ -294,28 +285,28 @@ GREY_INFO_STRUCT
     (CACHEALIGN_UP((len)*sizeof(type) + (sizeof(type)-1)) / sizeof(type))
 /* Shared */
 /* COP + CPU PCM */
-static kiss_fft_scalar input[CACHEALIGN_UP_SIZE(kiss_fft_scalar, ARRAYLEN_IN)]
+static kiss_fft_cpx input[CACHEALIGN_UP_SIZE(kiss_fft_scalar, ARRAYLEN_IN)]
                             CACHEALIGN_AT_LEAST_ATTR(4);
 /* CPU+COP */
 #if NUM_CORES > 1
 /* Output queue indexes */
 static volatile int output_head SHAREDBSS_ATTR = 0;
 static volatile int output_tail SHAREDBSS_ATTR = 0;
-/* The result is nfft/2+1 complex frequency bins from DC to Nyquist. */
-static kiss_fft_cpx output[2][CACHEALIGN_UP_SIZE(kiss_fft_cpx, ARRAYLEN_OUT+1)]
+/* The result is nfft/2 complex frequency bins from DC to Nyquist. */
+static kiss_fft_cpx output[2][CACHEALIGN_UP_SIZE(kiss_fft_cpx, ARRAYLEN_OUT)]
                                 SHAREDBSS_ATTR;
 #else
 /* Only one output buffer */
 #define output_head 0
 #define output_tail 0
-/* The result is nfft/2+1 complex frequency bins from DC to Nyquist. */
-static kiss_fft_cpx output[1][ARRAYLEN_OUT+1];
+/* The result is nfft/2 complex frequency bins from DC to Nyquist. */
+static kiss_fft_cpx output[1][ARRAYLEN_OUT];
 #endif
 
 /* Unshared */
 /* COP */
-static FFT_CFG fft_state SHAREDBSS_ATTR;
-static char buffer[CACHEALIGN_UP_SIZE(char, BUFSIZE)]
+static kiss_fft_cfg fft_state SHAREDBSS_ATTR;
+static char fft_buffer[CACHEALIGN_UP_SIZE(char, BUFSIZE_FFT)]
                 CACHEALIGN_AT_LEAST_ATTR(4);
 /* CPU */
 static int32_t plot_history[ARRAYLEN_PLOT];
@@ -399,10 +390,10 @@ static struct {
 
 /************************* Math functions *************************/
 
-/* Based on playing back a 0dB sweep tone */
-#define QLOG_MAX 0x000865EF
+/* Based on feeding-in a 0db sinewave at FS/4 */
+#define QLOG_MAX 0x0009154B
 /* fudge it a little or it's not very visbile */
-#define QLIN_MAX (0x00001157 >> 1)
+#define QLIN_MAX (0x00002266 >> 1)
 
 /* Apply window function to input */
 static void apply_window_func(enum fft_window_func mode)
@@ -414,14 +405,14 @@ static void apply_window_func(enum fft_window_func mode)
         case FFT_WF_HAMMING:
             for(i = 0; i < ARRAYLEN_IN; ++i)
             {
-                input[i] = (input[i] * HAMMING_COEFF[i] + 16384) >> 15;
+                input[i].r = (input[i].r * HAMMING_COEFF[i] + 16384) >> 15;
             } 
             break;
 
         case FFT_WF_HANN:
             for(i = 0; i < ARRAYLEN_IN; ++i)
             {
-                input[i] = (input[i] * HANN_COEFF[i] + 16384) >> 15;
+                input[i].r = (input[i].r * HANN_COEFF[i] + 16384) >> 15;
             }
             break;
     }
@@ -1135,8 +1126,8 @@ static void draw_spectrogram_horizontal(void)
 /** functions use in single/multi configuration **/
 static inline bool fft_init_fft_lib(void)
 {
-    size_t size = sizeof(buffer);
-    fft_state = FFT_ALLOC(FFT_SIZE, 0, buffer, &size);
+    size_t size = sizeof(fft_buffer);
+    fft_state = kiss_fft_alloc(FFT_SIZE, 0, fft_buffer, &size);
 
     if(fft_state == NULL)
     {
@@ -1159,12 +1150,12 @@ static inline bool fft_get_fft(void)
      * do a proper spectrum analysis.*/
 
     /* there are cases when we don't have enough data to fill the buffer */
-    if(count != ARRAYLEN_IN/2)
+    if(count != ARRAYLEN_IN)
     {
-        if(count < ARRAYLEN_IN/2)
+        if(count < ARRAYLEN_IN)
             return false;
 
-        count = ARRAYLEN_IN/2;  /* too much - limit */
+        count = ARRAYLEN_IN;  /* too much - limit */
     }
 
     int fft_idx = 0; /* offset in 'input' */
@@ -1173,15 +1164,14 @@ static inline bool fft_get_fft(void)
     {
         kiss_fft_scalar left = *value++;
         kiss_fft_scalar right = *value++;
-        input[fft_idx++] = (left + right) >> 1; /* to mono */
-        input[fft_idx++] = 0;
-    } while (--count > 0);
+        input[fft_idx].r = (left + right) >> 1; /* to mono */
+    } while (fft_idx++, --count > 0);
 
     apply_window_func(graph_settings.window_func);
 
     rb->yield();
 
-    FFT_FFT(fft_state, input, output[output_tail]);
+    kiss_fft(fft_state, input, output[output_tail]);
 
     rb->yield();
 
