@@ -1294,7 +1294,7 @@ static void fft_close_fft(void)
  * target uses IRAM */
 static bool fft_have_fft(void)
 {
-    return fft_get_fft();
+    return rb->pcm_is_playing() && fft_get_fft();
 }
 
 static inline void fft_free_fft_output(void)
@@ -1355,6 +1355,9 @@ enum plugin_status plugin_start(const void* parameter)
 
     while (run)
     {
+        /* Unless otherwise specified, HZ/50 is around the window length
+         * and quite fast. We want to be done with drawing by this time. */
+        long next_frame_tick = *rb->current_tick + HZ/50;
         int button;
 
         while (!fft_have_fft())
@@ -1378,13 +1381,13 @@ enum plugin_status plugin_start(const void* parameter)
                     lcd_(update)();
                 }
 
-                timeout = HZ/100;
+                timeout = HZ/100; /* 'till end of curent tick, don't use 100% CPU */
             }
 
-            /* Make sure the input thread has produced something before doing
-             * anything but watching for buttons. Music might not be playing
-             * or things just aren't going well for picking up buffers so keys
-             * are scanned to avoid lockup.  */
+            /* Make sure the FFT has produced something before doing anything
+             * but watching for buttons. Music might not be playing or things
+             * just aren't going well for picking up buffers so keys are
+             * scanned to avoid lockup.  */
              button = rb->button_get_w_tmo(timeout);
              if (button != BUTTON_NONE)
                  goto read_button;
@@ -1394,9 +1397,18 @@ enum plugin_status plugin_start(const void* parameter)
 
         fft_free_fft_output(); /* COP only */
 
-        rb->yield();
+        long tick = *rb->current_tick;
+        if(TIME_BEFORE(tick, next_frame_tick))
+        {
+            tick = next_frame_tick - tick;
+        }
+        else
+        {
+            rb->yield(); /* tmo = 0 won't yield */
+            tick = 0;
+        }
 
-		button = rb->button_get(false);
+		button = rb->button_get_w_tmo(tick);
     read_button:
         switch (button)
         {
