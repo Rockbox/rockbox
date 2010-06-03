@@ -18,7 +18,12 @@ rbdir=$tempdir/rockbox-$version
 mkdir -p $rbdir
 
 # copy everything to the temp dir
-svn ls -R | xargs -Imoo cp --parents moo $rbdir 2>/dev/null
+
+# Only GNU cp accepts --long-options (and --parents)
+# If the system cp is POSIX cp, try gcp (works on OSX)
+CP=cp
+$CP --help >/dev/null 2>&1 || CP=gcp
+svn ls -R | xargs -Imoo $CP --parents moo $rbdir 2>/dev/null
 
 cd $tempdir
 
