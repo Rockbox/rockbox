@@ -36,10 +36,20 @@ static t_int *cos_perform(t_int *w)
 	 phase = *in++;
 	 phase &= ((1<<fix1)-1);
 	 off =  fixtoi((long long)phase<<ILOGCOSTABSIZE);
-
+#ifdef ROCKBOX
+#ifdef NO_INTERPOLATION
+        *out = *(tab+off);
+#else /* NO_INTERPOLATION */
+        frac = phase & ((1<<(fix1-ILOGCOSTABSIZE))-1);
+        frac <<= ILOGCOSTABSIZE;
+        *out = mult(*(tab + off    ), (itofix(1) - frac)) + 
+               mult(*(tab + off + 1), frac);
+#endif /* NO_INTERPOLATION */
+#else /* ROCKBOX */
 	 frac = phase&(itofix(1)-1);
 	 *out = mult(*(tab + off),itofix(1) - frac) + 
 	      mult(*(tab + off + 1),frac);
+#endif /* ROCKBOX */
 	 out++;
     }
     return (w+4);
