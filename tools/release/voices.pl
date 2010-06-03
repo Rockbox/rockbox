@@ -2,6 +2,8 @@
 
 $version="3.0";
 
+require "tools/builds.pm";
+
 my $verbose;
 if($ARGV[0] eq "-v") {
     $verbose =1;
