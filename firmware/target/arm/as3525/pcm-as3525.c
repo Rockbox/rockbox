@@ -35,7 +35,7 @@
                                       * and the number of 32bits words has to
                                       * fit in 11 bits of DMA register */
 
-static unsigned char *dma_start_addr;
+static void *dma_start_addr;
 static size_t      dma_size;   /* in 4*32 bits */
 static void dma_callback(void);
 static int locked = 0;
@@ -89,7 +89,7 @@ static void dma_callback(void)
 
     if(!dma_size)
     {
-        pcm_play_get_more_callback((void **)&dma_start_addr, &dma_size);
+        pcm_play_get_more_callback(&dma_start_addr, &dma_size);
 
         if (!dma_size)
             return;
@@ -188,7 +188,7 @@ size_t pcm_get_bytes_waiting(void)
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     pcm_play_lock();
-    unsigned char *addr = (void*)DMAC_CH_SRC_ADDR(1);
+    void *addr = (void*)DMAC_CH_SRC_ADDR(1);
     *count = (dma_size - (addr - dma_start_addr)) >> 2;
     pcm_play_unlock();
     return AS3525_UNCACHED_ADDR(addr);
@@ -212,7 +212,7 @@ void * pcm_dma_addr(void *addr)
 static int rec_locked = 0;
 static bool is_recording = false;
 static bool rec_callback_pending = false;
-static unsigned char *rec_dma_start_addr;
+static void *rec_dma_start_addr;
 static size_t rec_dma_size, rec_dma_transfer_size;
 static void rec_dma_callback(void);
 #if CONFIG_CPU == AS3525
@@ -315,7 +315,7 @@ static void rec_dma_callback(void)
 
     if(!rec_dma_size)
     {
-        pcm_rec_more_ready_callback(0, (void **)&rec_dma_start_addr,
+        pcm_rec_more_ready_callback(0, &rec_dma_start_addr,
                                     &rec_dma_size);
 
         if(rec_dma_size == 0)
