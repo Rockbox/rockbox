@@ -59,7 +59,7 @@ sub buildit {
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --target=$target --type=m";
+    my $c = "../tools/configure --target=$target --type=m --ram=0";
 
     print "C: $c\n" if($verbose);
     `$c`;

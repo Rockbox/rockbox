@@ -56,7 +56,7 @@ sub buildit {
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --type=av --target=$model --language=0 --tts=f";
+    my $c = "../tools/configure --type=av --target=$model --language=0 --tts=f --ram=0 --voice=0";
 
     print "C: $c\n" if($verbose);
     `$c`;
