@@ -76,7 +76,7 @@ my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
 $ENV{'POOL'}="$pool";
 
 for my $b (&stablebuilds) {
-    next if ($builds{$b}{configname} < 3); # no variants
+    next if (length($builds{$b}{configname}) > 0); # no variants
 
     runone($b);
 }

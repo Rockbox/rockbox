@@ -75,7 +75,7 @@ sub buildit {
 `(cd tools && make ) >/dev/null 2>&1`;
 
 for my $b (&stablebuilds) {
-    next if ($builds{$b}{configname} < 3); # no variants
+    next if (length($builds{$b}{configname}) > 0); # no variants
 
     runone($b);
 }
