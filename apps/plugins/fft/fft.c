@@ -287,10 +287,8 @@ GREY_INFO_STRUCT
 #define HAMMING_COEFF _COEFF(hamming, FFT_SIZE)
 
 /****************************** Globals ****************************/
-
-static volatile int output_head SHAREDBSS_ATTR = 0;
-static volatile int output_tail SHAREDBSS_ATTR = 0;
 /* cacheline-aligned buffers with COP, otherwise word-aligned */
+/* CPU/COP only applies when compiled for more than one core */
 
 #define CACHEALIGN_UP_SIZE(type, len) \
     (CACHEALIGN_UP((len)*sizeof(type) + (sizeof(type)-1)) / sizeof(type))
@@ -299,13 +297,24 @@ static volatile int output_tail SHAREDBSS_ATTR = 0;
 static kiss_fft_scalar input[CACHEALIGN_UP_SIZE(kiss_fft_scalar, ARRAYLEN_IN)]
                             CACHEALIGN_AT_LEAST_ATTR(4);
 /* CPU+COP */
-
+#if NUM_CORES > 1
+/* Output queue indexes */
+static volatile int output_head SHAREDBSS_ATTR = 0;
+static volatile int output_tail SHAREDBSS_ATTR = 0;
 /* The result is nfft/2+1 complex frequency bins from DC to Nyquist. */
 static kiss_fft_cpx output[2][CACHEALIGN_UP_SIZE(kiss_fft_cpx, ARRAYLEN_OUT+1)]
-                            __attribute__((aligned(4))) SHAREDBSS_ATTR;
+                                SHAREDBSS_ATTR;
+#else
+/* Only one output buffer */
+#define output_head 0
+#define output_tail 0
+/* The result is nfft/2+1 complex frequency bins from DC to Nyquist. */
+static kiss_fft_cpx output[1][ARRAYLEN_OUT+1];
+#endif
 
 /* Unshared */
 /* COP */
+static FFT_CFG fft_state SHAREDBSS_ATTR;
 static char buffer[CACHEALIGN_UP_SIZE(char, BUFSIZE)]
                 CACHEALIGN_AT_LEAST_ATTR(4);
 /* CPU */
@@ -316,8 +325,6 @@ static struct
     int16_t bin;   /* integer bin number */
     uint16_t frac; /* interpolation fraction */
 } binlog[ARRAYLEN_PLOT] __attribute__((aligned(4)));
-
-static volatile bool fft_thread_run SHAREDDATA_ATTR = false;
 
 enum fft_window_func
 {
@@ -1123,18 +1130,76 @@ void draw_spectrogram_horizontal(void)
 
 /********************* End of plotting functions (modes) *********************/
 
-/* TODO: Only have this thread for multicore, otherwise it serves no purpose */
-long fft_thread_stack[CACHEALIGN_UP(DEFAULT_STACK_SIZE*4/sizeof(long))]
-                    CACHEALIGN_AT_LEAST_ATTR(4);
-void fft_thread_entry(void)
+/****************************** FFT functions ********************************/
+
+/** functions use in single/multi configuration **/
+static inline bool fft_init_fft_lib(void)
 {
     size_t size = sizeof(buffer);
-    FFT_CFG state = FFT_ALLOC(FFT_SIZE, 0, buffer, &size);
-    int count;
+    fft_state = FFT_ALLOC(FFT_SIZE, 0, buffer, &size);
 
-    if(state == 0)
+    if(fft_state == NULL)
     {
         DEBUGF("needed data: %i", (int) size);
+        return false;
+    }
+
+    return true;
+}
+
+static inline bool fft_get_fft(void)
+{
+    int count;
+    int16_t *value = (int16_t *) rb->pcm_get_peak_buffer(&count);
+    /* This block can introduce discontinuities in our data. Meaning, the
+     * FFT will not be done a continuous segment of the signal. Which can
+     * be bad. Or not.
+     * 
+     * Anyway, this is a demo, not a scientific tool. If you want accuracy,
+     * do a proper spectrum analysis.*/
+
+    /* there are cases when we don't have enough data to fill the buffer */
+    if(count != ARRAYLEN_IN/2)
+    {
+        if(count < ARRAYLEN_IN/2)
+            return false;
+
+        count = ARRAYLEN_IN/2;  /* too much - limit */
+    }
+
+    int fft_idx = 0; /* offset in 'input' */
+
+    do
+    {
+        kiss_fft_scalar left = *value++;
+        kiss_fft_scalar right = *value++;
+        input[fft_idx++] = (left + right) >> 1; /* to mono */
+        input[fft_idx++] = 0;
+    } while (--count > 0);
+
+    apply_window_func(graph_settings.window_func);
+
+    rb->yield();
+
+    FFT_FFT(fft_state, input, output[output_tail]);
+
+    rb->yield();
+
+    return true;
+}
+
+#if NUM_CORES > 1
+/* use a worker thread if there is another processor core */
+static volatile bool fft_thread_run SHAREDDATA_ATTR = false;
+static unsigned long fft_thread;
+
+static long fft_thread_stack[CACHEALIGN_UP(DEFAULT_STACK_SIZE*4/sizeof(long))]
+                             CACHEALIGN_AT_LEAST_ATTR(4);
+
+static void fft_thread_entry(void)
+{
+    if (!fft_init_fft_lib())
+    {
         output_tail = -1; /* tell that we bailed */
         fft_thread_run = true;
         return;
@@ -1144,45 +1209,18 @@ void fft_thread_entry(void)
 
     while(fft_thread_run)
 	{
-        int16_t *value = (int16_t *) rb->pcm_get_peak_buffer(&count);
-        /* This block can introduce discontinuities in our data. Meaning, the
-         * FFT will not be done a continuous segment of the signal. Which can
-         * be bad. Or not.
-         * 
-         * Anyway, this is a demo, not a scientific tool. If you want accuracy,
-         * do a proper spectrum analysis.*/
-
-        /* there are cases when we don't have enough data to fill the buffer */
         if (!rb->pcm_is_playing())
         {
             rb->sleep(HZ/5);
-            output_tail = output_head; /* set empty */
             continue;
         }
-        else if(count != ARRAYLEN_IN/2)
-        {
-            if(count < ARRAYLEN_IN/2)
-            {
-                rb->sleep(0);       /* not enough - ease up */
-                continue;
-            }
 
-            count = ARRAYLEN_IN/2;  /* too much - limit */
+        if (!fft_get_fft())
+        {
+            rb->sleep(0);    /* not enough - ease up */
+            continue;
         }
 
-        int fft_idx = 0; /* offset in 'input' */
-
-        do
-        {
-            kiss_fft_scalar left = *value++;
-            kiss_fft_scalar right = *value++;
-            input[fft_idx++] = (left + right) >> 1; /* to mono */
-            input[fft_idx++] = 0;
-        } while (--count > 0);
-
-        apply_window_func(graph_settings.window_func);
-        FFT_FFT(state, input, output[output_tail]);
-        rb->yield();
 #if NUM_CORES > 1
         /* write back output for other processor and invalidate for next frame read */
         rb->cpucache_invalidate();
@@ -1190,29 +1228,41 @@ void fft_thread_entry(void)
         int new_tail = output_tail ^ 1;
 
         /* if full, block waiting until reader has freed a slot */
-        while(new_tail == output_head && fft_thread_run)
-            rb->sleep(0);
+        while(fft_thread_run)
+        {
+            if(new_tail != output_head)
+            {
+                output_tail = new_tail;
+                break;
+            }
 
-        output_tail = new_tail;
+            rb->sleep(0);
+        }
 	}
 }
 
-enum plugin_status plugin_start(const void* parameter)
+static bool fft_have_fft(void)
 {
-    /* Defaults */
-    bool run = true;
-    bool showing_warning = false;
-    int timeout = HZ/100;
+    return output_head != output_tail;
+}
 
+/* Call only after fft_have_fft() has returned true */
+static inline void fft_free_fft_output(void)
+{
+    output_head ^= 1; /* finished with this */
+}
+
+static bool fft_init_fft(void)
+{
     /* create worker thread - on the COP for dual-core targets */
-    unsigned int fft_thread = rb->create_thread(fft_thread_entry,
+    fft_thread = rb->create_thread(fft_thread_entry,
             fft_thread_stack, sizeof(fft_thread_stack), 0, "fft output thread"
             IF_PRIO(, PRIORITY_USER_INTERFACE+1) IF_COP(, COP));
 
     if(fft_thread == 0)
     {
         rb->splash(HZ, "FFT thread failed create");
-        return PLUGIN_ERROR;
+        return false;
     }
 
     /* wait for it to indicate 'ready' */
@@ -1224,8 +1274,54 @@ enum plugin_status plugin_start(const void* parameter)
         /* FFT thread bailed-out like The Fed */
         rb->thread_wait(fft_thread);
         rb->splash(HZ, "FFT thread failed to init");
-        return PLUGIN_ERROR;
+        return false;
     }
+
+    return true;
+}
+
+static void fft_close_fft(void)
+{
+    /* Handle our FFT thread. */
+    fft_thread_run = false;
+    rb->thread_wait(fft_thread);
+#if NUM_CORES > 1
+    rb->cpucache_invalidate();
+#endif
+}
+#else /* NUM_CORES == 1 */
+/* everything serialize on single-core and FFT gets to use IRAM main stack if
+ * target uses IRAM */
+static bool fft_have_fft(void)
+{
+    return fft_get_fft();
+}
+
+static inline void fft_free_fft_output(void)
+{
+    /* nothing to do */
+}
+
+static bool fft_init_fft(void)
+{
+    return fft_init_fft_lib();
+}
+
+static inline void fft_close_fft(void)
+{
+    /* nothing to do */
+}
+#endif /* NUM_CORES */
+/*************************** End of FFT functions ****************************/
+
+enum plugin_status plugin_start(const void* parameter)
+{
+    /* Defaults */
+    bool run = true;
+    bool showing_warning = false;
+
+    if (!fft_init_fft())
+        return PLUGIN_ERROR;
 
 #ifndef HAVE_LCD_COLOR
     unsigned char *gbuf;
@@ -1238,8 +1334,7 @@ enum plugin_status plugin_start(const void* parameter)
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
-        fft_thread_run = false;
-        rb->thread_wait(fft_thread);
+        fft_close_fft();
         return PLUGIN_ERROR;
     }
     grey_show(true); 
@@ -1262,8 +1357,10 @@ enum plugin_status plugin_start(const void* parameter)
     {
         int button;
 
-        while(output_head == output_tail)
+        while (!fft_have_fft())
 		{
+            int timeout;
+
             if(!rb->pcm_is_playing())
             {
                 showing_warning = true;
@@ -1279,8 +1376,9 @@ enum plugin_status plugin_start(const void* parameter)
                     showing_warning = false;
                     lcd_(clear_display)();
                     lcd_(update)();
-                    timeout = HZ/100;
                 }
+
+                timeout = HZ/100;
             }
 
             /* Make sure the input thread has produced something before doing
@@ -1294,7 +1392,8 @@ enum plugin_status plugin_start(const void* parameter)
 
 	    draw(NULL);
 
-        output_head ^= 1; /* done drawing, free this buffer */
+        fft_free_fft_output(); /* COP only */
+
         rb->yield();
 
 		button = rb->button_get(false);
@@ -1353,13 +1452,8 @@ enum plugin_status plugin_start(const void* parameter)
 
         }
     }
-	
-    /* Handle our FFT thread. */
-    fft_thread_run = false;
-    rb->thread_wait(fft_thread);
-#if NUM_CORES > 1
-    rb->cpucache_flush();
-#endif
+
+    fft_close_fft();	
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
