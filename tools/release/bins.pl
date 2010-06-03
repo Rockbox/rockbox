@@ -106,13 +106,13 @@ sub buildit {
     `$c`;
 
     print "Run 'make'\n" if($verbose);
-    `make -j 2>/dev/null`;
+    `make`;
 
     print "Run 'make zip'\n" if($verbose);
-    `make zip 2>/dev/null`;
+    `make zip`;
 
     print "Run 'make mapzip'\n" if($verbose);
-    `make mapzip 2>/dev/null`;
+    `make mapzip`;
 }
 
 sub buildfonts {
@@ -127,12 +127,12 @@ sub buildfonts {
     `$c`;
 
     print "Run 'make fontzip'\n" if($verbose);
-    `make fontzip 2>/dev/null`;
+    `make fontzip`;
 }
 
 # run make in tools first to make sure they're up-to-date
 print "cd tools && make\n" if($verbose);
-`(cd tools && make ) >/dev/null 2>&1`;
+`(cd tools && make ) >/dev/null`;
 
 for my $b (&stablebuilds) {
     my $configname = $builds{b}{configname} ? $builds{b}{configname} : $b;
