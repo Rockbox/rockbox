@@ -3,11 +3,20 @@ pdbox-net.c
 pdbox-func.c
 pdbox-gui.c
 
-/*
-wfirstfit.c
-*/
-
 PDa/src/s_audio_rockbox.c
+
+PDa/src/d_ugen.c
+PDa/src/d_arithmetic.c
+PDa/src/d_dac.c
+PDa/src/d_misc.c
+PDa/src/d_fft.c
+PDa/src/d_imayer_fft.c
+PDa/src/d_mayer_fft.c
+PDa/src/d_fftroutine.c
+PDa/src/d_global.c
+PDa/src/d_resample.c
+PDa/src/d_ctl.c
+PDa/src/d_soundfile.c
 
 PDa/src/g_canvas.c
 PDa/src/g_graph.c
@@ -31,57 +40,32 @@ PDa/src/g_toggle.c
 PDa/src/g_vdial.c
 PDa/src/g_vslider.c
 PDa/src/g_vumeter.c
+
 PDa/src/m_pd.c
 PDa/src/m_class.c
 PDa/src/m_obj.c
 PDa/src/m_atom.c
 PDa/src/m_memory.c
-
 PDa/src/m_binbuf.c
 PDa/src/m_conf.c
 PDa/src/m_glob.c
 PDa/src/m_sched.c
-/* PDa/src/s_main.c Does not compile, system reasons */
-/* PDa/src/s_inter.c Does not compile, BSD sockets */
+PDa/src/m_fixed.c
+
 PDa/src/s_file.c
 PDa/src/s_print.c
 PDa/src/s_loader.c
 PDa/src/s_path.c
-/*
-PDa/src/s_entry.c
-*/
 PDa/src/s_audio.c
-/*
-PDa/src/s_midi.c
-*/
-PDa/src/d_ugen.c
-PDa/src/d_arithmetic.c
-PDa/src/d_dac.c
-PDa/src/d_misc.c
-PDa/src/d_fft.c
-PDa/src/d_mayer_fft.c
-PDa/src/d_fftroutine.c
-PDa/src/d_global.c
-PDa/src/d_resample.c
-PDa/src/d_ctl.c
-PDa/src/d_soundfile.c
+
 PDa/src/x_arithmetic.c
 PDa/src/x_connective.c
 PDa/src/x_interface.c
-/*
-PDa/src/x_midi.c
-*/
 PDa/src/x_misc.c
 PDa/src/x_time.c
 PDa/src/x_acoustics.c
 PDa/src/x_net.c
 PDa/src/x_qlist.c
-/*
-PDa/src/x_gui.c
-*/
-
-PDa/src/d_imayer_fft.c
-PDa/src/m_fixed.c
 
 PDa/intern/biquad~.c
 PDa/intern/bp~.c
@@ -109,9 +93,6 @@ PDa/intern/rsqrt~.c
 PDa/intern/samphold~.c
 PDa/intern/sfread~.c
 PDa/intern/sfwrite~.c
-/*
-PDa/intern/sig~.c
-*/
 PDa/intern/snapshot~.c
 PDa/intern/sqrt~.c
 PDa/intern/tabosc4~.c
@@ -130,9 +111,7 @@ PDa/intern/vline~.c
 PDa/intern/vsnapshot~.c
 PDa/intern/wrap~.c
 
-/* PDa/extra/OSCroute.c */
 PDa/extra/bandpass.c
-/* PDa/extra/dumpOSC.c Does not compile, file handling stuff */
 PDa/extra/equalizer.c
 PDa/extra/gcanvas.c
 PDa/extra/highpass.c
@@ -143,10 +122,4 @@ PDa/extra/lowpass.c
 PDa/extra/lowshelf.c
 PDa/extra/moog~.c
 PDa/extra/notch.c
-/* PDa/extra/sendOSC.c Does not compile, file handling stuff */
-/*
-PDa/extra/shell.c
-PDa/extra/slider.c
-PDa/extra/sliderh.c
-*/
 PDa/extra/zerox~.c
