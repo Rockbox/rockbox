@@ -68,6 +68,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     absolutePath = qApp->applicationDirPath();
 
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
+    HttpGet::setGlobalProxy(proxy());
     // init startup & autodetection
     ui.setupUi(this);
 #if defined(Q_OS_LINUX)
@@ -319,15 +320,7 @@ void RbUtilQt::updateSettings()
     qDebug() << "[RbUtil] updating current settings";
     updateDevice();
     updateManual();
-    if(RbSettings::value(RbSettings::ProxyType) == "system") {
-        HttpGet::setGlobalProxy(System::systemProxy());
-    }
-    else if(RbSettings::value(RbSettings::ProxyType) == "manual") {
-        HttpGet::setGlobalProxy(RbSettings::value(RbSettings::Proxy).toString());
-    }
-    else {
-        HttpGet::setGlobalProxy(QUrl(""));
-    }
+    HttpGet::setGlobalProxy(proxy());
     HttpGet::setGlobalCache(RbSettings::value(RbSettings::CachePath).toString());
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
     
