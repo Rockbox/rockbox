@@ -22,5 +22,8 @@ SOURCES += tag_table.c \
     parsetreenode.cpp \
     editorwindow.cpp \
     skinhighlighter.cpp
-OTHER_FILES += README
+OTHER_FILES += README \
+    resources/windowicon.png \
+    resources/appicon.xcf
 FORMS += editorwindow.ui
+RESOURCES += resources.qrc

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>resources/windowicon.png</file>
+    </qresource>
+</RCC>
