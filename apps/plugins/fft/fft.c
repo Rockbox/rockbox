@@ -405,7 +405,7 @@ static struct {
 #define QLIN_MAX (0x00001157 >> 1)
 
 /* Apply window function to input */
-void apply_window_func(enum fft_window_func mode)
+static void apply_window_func(enum fft_window_func mode)
 {
     int i;
 
@@ -428,7 +428,7 @@ void apply_window_func(enum fft_window_func mode)
 }
 
 /* Calculates the magnitudes from complex numbers and returns the maximum */
-int32_t calc_magnitudes(bool logarithmic_amp)
+static int32_t calc_magnitudes(bool logarithmic_amp)
 {
     /* A major assumption made when calculating the Q*MAX constants 
      * is that the maximum magnitude is 29 bits long. */
@@ -489,7 +489,7 @@ int32_t calc_magnitudes(bool logarithmic_amp)
 
 /* Move plot bins into a logarithmic scale by sliding them towards the
  * Nyquist bin according to the translation in the binlog array. */
-void logarithmic_plot_translate(void)
+static void logarithmic_plot_translate(void)
 {
     int i;
 
@@ -531,7 +531,7 @@ void logarithmic_plot_translate(void)
 }
 
 /* Calculates the translation for logarithmic plot bins */
-void logarithmic_plot_init(void)
+static void logarithmic_plot_init(void)
 {
     int i, j;
     /*
@@ -570,12 +570,12 @@ void logarithmic_plot_init(void)
 /************************ End of math functions ***********************/
 
 /********************* Plotting functions (modes) *********************/
-void draw_lines_vertical(void);
-void draw_lines_horizontal(void);
-void draw_bars_vertical(void);
-void draw_bars_horizontal(void);
-void draw_spectrogram_vertical(void);
-void draw_spectrogram_horizontal(void);
+static void draw_lines_vertical(void);
+static void draw_lines_horizontal(void);
+static void draw_bars_vertical(void);
+static void draw_bars_horizontal(void);
+static void draw_spectrogram_vertical(void);
+static void draw_spectrogram_horizontal(void);
 
 #ifdef HAVE_LCD_COLOR
 #define COLOR_DEFAULT_FG    LCD_DEFAULT_FG
@@ -594,7 +594,7 @@ void draw_spectrogram_horizontal(void);
 #define POPUP_HPADDING      3 /* 3 px of horizontal padding and */
 #define POPUP_VPADDING      2 /* 2 px of vertical padding */
 
-void draw_message_string(const unsigned char *message, bool active)
+static void draw_message_string(const unsigned char *message, bool active)
 {
     int x, y;
     lcd_(getstringsize)(message, &x, &y);
@@ -626,7 +626,7 @@ void draw_message_string(const unsigned char *message, bool active)
     lcd_(set_background)(COLOR_DEFAULT_BG);
 }
 
-void draw(const unsigned char* message)
+static void draw(const unsigned char* message)
 {
     static long show_message_tick = 0;
     static const unsigned char* last_message = 0;
@@ -750,7 +750,7 @@ void draw(const unsigned char* message)
     graph_settings.changed.clear_all = false;
 }
 
-void draw_lines_vertical(void)
+static void draw_lines_vertical(void)
 {
     static int max = 0;
 
@@ -825,7 +825,7 @@ void draw_lines_vertical(void)
     }
 }
 
-void draw_lines_horizontal(void)
+static void draw_lines_horizontal(void)
 {
     static int max = 0;
 
@@ -901,7 +901,7 @@ void draw_lines_horizontal(void)
     }
 }
 
-void draw_bars_vertical(void)
+static void draw_bars_vertical(void)
 {
     static int max = 0;
 
@@ -961,7 +961,7 @@ void draw_bars_vertical(void)
     }
 }
 
-void draw_bars_horizontal(void)
+static void draw_bars_horizontal(void)
 {
     static int max = 0;
 
@@ -1021,7 +1021,7 @@ void draw_bars_horizontal(void)
     }
 }
 
-void draw_spectrogram_vertical(void)
+static void draw_spectrogram_vertical(void)
 {
     const int32_t scale_factor = MIN(LCD_HEIGHT, ARRAYLEN_PLOT);
 
@@ -1075,7 +1075,7 @@ void draw_spectrogram_vertical(void)
         lcd_scroll_left(1);
 }
 
-void draw_spectrogram_horizontal(void)
+static void draw_spectrogram_horizontal(void)
 {
     const int32_t scale_factor = MIN(LCD_WIDTH, ARRAYLEN_PLOT);
 
