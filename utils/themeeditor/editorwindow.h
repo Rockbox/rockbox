@@ -39,9 +39,14 @@ public:
 
 private slots:
     void updateCode();
-    void updateTree();
+    void codeChanged();
 
 private:
+    /* Setup functions */
+    void loadSettings();
+    void setupUI();
+    void setupMenus();
+
     Ui::EditorWindow *ui;
     ParseTreeModel* tree;
     SkinHighlighter* highlighter;

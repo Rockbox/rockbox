@@ -29,33 +29,51 @@ EditorWindow::EditorWindow(QWidget *parent) :
     ui(new Ui::EditorWindow)
 {
     ui->setupUi(this);
+    loadSettings();
+    setupUI();
+    setupMenus();
+}
 
+void EditorWindow::loadSettings()
+{
+    /* When there are settings to load, they'll be loaded here */
+}
+
+void EditorWindow::setupUI()
+{
     /* Establishing the parse tree */
-    tree = new ParseTreeModel(ui->code->document()->toPlainText().toAscii());
+    tree = new ParseTreeModel(ui->codeEdit->document()->toPlainText().
+                              toAscii());
     ui->parseTree->setModel(tree);
 
     /* Setting up the syntax highlighter */
     highlighter = new SkinHighlighter(QColor(0,255,0), QColor(255,0,0),
                                       QColor(0,0,255), QColor(150,150,150),
-                                      ui->code->document());
+                                      ui->codeEdit->document());
 
     /* Connecting the buttons */
-    QObject::connect(ui->code, SIGNAL(cursorPositionChanged()),
-                     this, SLOT(updateTree()));
+    QObject::connect(ui->codeEdit, SIGNAL(cursorPositionChanged()),
+                     this, SLOT(codeChanged()));
     QObject::connect(ui->fromTree, SIGNAL(pressed()),
                      this, SLOT(updateCode()));
+
 }
 
-void EditorWindow::updateTree()
+void EditorWindow::setupMenus()
 {
-    tree->changeTree(ui->code->document()->toPlainText().toAscii());
+    /* When there are menus to setup, they'll be set up here */
+}
+
+void EditorWindow::codeChanged()
+{
+    tree->changeTree(ui->codeEdit->document()->toPlainText().toAscii());
     ui->parseTree->expandAll();
 }
 
 void EditorWindow::updateCode()
 {
     tree->genCode();
-    ui->code->document()->setPlainText(tree->genCode());
+    ui->codeEdit->document()->setPlainText(tree->genCode());
 }
 
 EditorWindow::~EditorWindow()
