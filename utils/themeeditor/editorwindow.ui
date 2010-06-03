@@ -32,7 +32,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTextEdit" name="code"/>
+       <widget class="QPlainTextEdit" name="code"/>
       </item>
      </layout>
     </item>
@@ -74,8 +74,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>57</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>299</x>

@@ -25,6 +25,7 @@
 #include <QMainWindow>
 
 #include "parsetreemodel.h"
+#include "skinhighlighter.h"
 
 namespace Ui {
     class EditorWindow;
@@ -43,6 +44,7 @@ private slots:
 private:
     Ui::EditorWindow *ui;
     ParseTreeModel* tree;
+    SkinHighlighter* highlighter;
 
 };
 

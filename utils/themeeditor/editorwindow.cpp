@@ -34,6 +34,11 @@ EditorWindow::EditorWindow(QWidget *parent) :
     tree = new ParseTreeModel(ui->code->document()->toPlainText().toAscii());
     ui->parseTree->setModel(tree);
 
+    /* Setting up the syntax highlighter */
+    highlighter = new SkinHighlighter(QColor(0,255,0), QColor(255,0,0),
+                                      QColor(0,0,255), QColor(150,150,150),
+                                      ui->code->document());
+
     /* Connecting the buttons */
     QObject::connect(ui->code, SIGNAL(cursorPositionChanged()),
                      this, SLOT(updateTree()));
@@ -50,7 +55,7 @@ void EditorWindow::updateTree()
 void EditorWindow::updateCode()
 {
     tree->genCode();
-    ui->code->setDocument(new QTextDocument(tree->genCode()));
+    ui->code->document()->setPlainText(tree->genCode());
 }
 
 EditorWindow::~EditorWindow()
