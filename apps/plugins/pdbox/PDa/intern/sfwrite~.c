@@ -13,7 +13,7 @@
 #endif /* ROCKBOX */
 
 #include "../src/m_pd.h"
-#include <../src/m_fixed.h>
+#include "../src/m_fixed.h"
 #include "../src/g_canvas.h"
 
 

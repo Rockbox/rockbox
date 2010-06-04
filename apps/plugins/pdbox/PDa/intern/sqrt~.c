@@ -6,8 +6,8 @@
 #include "../../pdbox.h"
 #endif
 
-#include"../src/m_pd.h"
-#include<../src/m_fixed.h>
+#include "../src/m_pd.h"
+#include "../src/m_fixed.h"
 
 /* sigsqrt -  square root good to 8 mantissa bits  */
 
