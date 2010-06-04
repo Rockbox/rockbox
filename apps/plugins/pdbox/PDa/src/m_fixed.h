@@ -16,7 +16,7 @@ typedef int t_sample;
 
 /* fixed point multiplication and division */
 
-#ifdef ROCKBOX
+#if defined(ROCKBOX) && !defined(SIMULATOR)
 #if defined(CPU_ARM)
 #define mult(A,B) \
      ({ \
@@ -48,11 +48,14 @@ static inline t_fixed mult_cf(t_fixed x, t_fixed y)
     return t1;
 }
 #define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
-#endif /* CPU_... */
-#else /* ROCKBOX */
+#else /* CPU_... */
 #define mult(a,b) (long long)(((long long) (a) * (long long) (b))>>fix1)
 #define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
-#endif /* ROCKBOX */
+#endif /* CPU_... */
+#else /* ROCKBOX && !SIMULATOR */
+#define mult(a,b) (long long)(((long long) (a) * (long long) (b))>>fix1)
+#define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
+#endif /* ROCKBOX && !SIMULATOR */
 
 /* conversion macros */
 
