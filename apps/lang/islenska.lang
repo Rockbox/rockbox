@@ -88,7 +88,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (archosplayer) the jump scroll shall be done "always
+  desc: used in various places
   user: core
   <source>
     *: "Always"
@@ -105,13 +105,16 @@
   desc: in shutdown screen
   user: core
   <source>
-    *: "Press OFF to shut down"
+    *: none
+    soft_shutdown: "Press OFF to shut down"
   </source>
   <dest>
-    *: "Haldið af til ad keyra niður"
+    *: none
+    soft_shutdown: "Haldið af til ad keyra niður"
   </dest>
   <voice>
-    *: ""
+    *: none
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -147,13 +150,16 @@
   desc: before acknowledging usb in case an MMC is inserted (Ondio)
   user: core
   <source>
-    *: "Please remove inserted MMC"
+    *: none
+    archosondio*: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "Vinsamlegast fjarlægjið MMC-Kortið"
+    *: none
+    archosondio*: "Vinsamlegast fjarlægjið MMC-Kortið"
   </dest>
   <voice>
-    *: "Please remove multimedia card"
+    *: none
+    archosondio*: "Please remove multimedia card"
   </voice>
 </phrase>
 <phrase>
@@ -172,13 +178,13 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user: core
   <source>
     *: "Failed"
   </source>
   <dest>
-    *: "Mislukkað"
+    *: "Mistókst"
   </dest>
   <voice>
     *: ""
@@ -186,7 +192,7 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user: core
   <source>
     *: "Recent Bookmarks"
@@ -228,7 +234,7 @@
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user: core
   <source>
     *: "Manage Settings"
@@ -242,16 +248,19 @@
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: fm menu title
   user: core
   <source>
-    *: "FM Radio"
+    *: none
+    radio: "FM Radio"
   </source>
   <dest>
-    *: "FM útvarp"
+    *: none
+    radio: "FM útvarp"
   </dest>
   <voice>
-    *: "FM Radio"
+    *: none
+    radio: "FM Radio"
   </voice>
 </phrase>
 <phrase>
@@ -259,13 +268,16 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Recording"
+    *: none
+    recording: "Recording"
   </source>
   <dest>
-    *: "Hljóðritun"
+    *: none
+    recording: "Hljóðritun"
   </dest>
   <voice>
-    *: "Recording"
+    *: none
+    recording: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -284,16 +296,16 @@
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user: core
   <source>
-    *: "Browse Plugins"
+    *: "Plugins"
   </source>
   <dest>
     *: "Skoða hugbúnað"
   </dest>
   <voice>
-    *: "Browse Plugins"
+    *: "Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -315,13 +327,16 @@
   desc: in main menu
   user: core
   <source>
-    *: "Shut down"
+    *: none
+    soft_shutdown: "Shut down"
   </source>
   <dest>
-    *: "Keyra niður"
+    *: none
+    soft_shutdown: "Keyra niður"
   </dest>
   <voice>
-    *: "Shut down"
+    *: none
+    soft_shutdown: "Shut down"
   </voice>
 </phrase>
 <phrase>
@@ -497,13 +512,13 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Stereó vídd"
   </dest>
   <voice>
-    *: "Stereo width"
+    *: "Stereo Width"
   </voice>
 </phrase>
 <phrase>
@@ -511,13 +526,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Loudness"
+    *: none
+    masf: "Loudness"
   </source>
   <dest>
-    *: "Hljóðstyrkur"
+    *: none
+    masf: "Hljóðstyrkur"
   </dest>
   <voice>
-    *: "Loudness"
+    *: none
+    masf: "Loudness"
   </voice>
 </phrase>
 <phrase>
@@ -525,13 +543,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Auto Volume"
+    *: none
+    masf: "Auto Volume"
   </source>
   <dest>
-    *: "Sjálfvirk hljóðstilling"
+    *: none
+    masf: "Sjálfvirk hljóðstilling"
   </dest>
   <voice>
-    *: "Auto Volume"
+    *: none
+    masf: "Auto Volume"
   </voice>
 </phrase>
 <phrase>
@@ -539,13 +560,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "AV Decay Time"
+    *: none
+    masf: "AV Decay Time"
   </source>
   <dest>
-    *: "SH Tímafall"
+    *: none
+    masf: "SH Tímafall"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -553,13 +577,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Super bass"
+    *: none
+    masf: "Super Bass"
   </source>
   <dest>
-    *: "Súper bassi"
+    *: none
+    masf: "Ofurbassi"
   </dest>
   <voice>
-    *: "Super bass"
+    *: none
+    masf: "Super Bass"
   </voice>
 </phrase>
 <phrase>
@@ -567,13 +594,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Enable"
+    *: none
+    masf: "MDB Enable"
   </source>
   <dest>
-    *: "MDB á"
+    *: none
+    masf: "MDB á"
   </dest>
   <voice>
-    *: "MDB Enable"
+    *: none
+    masf: "MDB Enable"
   </voice>
 </phrase>
 <phrase>
@@ -581,13 +611,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Strength"
+    *: none
+    masf: "MDB Strength"
   </source>
   <dest>
-    *: "MDB Sterkleiki"
+    *: none
+    masf: "MDB Sterkleiki"
   </dest>
   <voice>
-    *: "MDB Strength"
+    *: none
+    masf: "MDB Strength"
   </voice>
 </phrase>
 <phrase>
@@ -595,13 +628,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Harmonics"
+    *: none
+    masf: "MDB Harmonics"
   </source>
   <dest>
-    *: "MDB hljómfræði"
+    *: none
+    masf: "MDB hljómfræði"
   </dest>
   <voice>
-    *: "MDB Harmonics"
+    *: none
+    masf: "MDB Harmonics"
   </voice>
 </phrase>
 <phrase>
@@ -609,13 +645,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Center frequency"
+    *: none
+    masf: "MDB Center frequency"
   </source>
   <dest>
-    *: "MDB mið tíðni"
+    *: none
+    masf: "MDB mið tíðni"
   </dest>
   <voice>
-    *: "MDB Center frequency"
+    *: none
+    masf: "MDB Center frequency"
   </voice>
 </phrase>
 <phrase>
@@ -623,13 +662,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "MDB Shape"
+    *: none
+    masf: "MDB Shape"
   </source>
   <dest>
-    *: "MDB hljóð form"
+    *: none
+    masf: "MDB hljóð form"
   </dest>
   <voice>
-    *: "MDB Shape"
+    *: none
+    masf: "MDB Shape"
   </voice>
 </phrase>
 <phrase>
@@ -637,13 +679,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
     *: "Spilastillingar"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Playback Settings"
   </voice>
 </phrase>
 <phrase>
@@ -676,7 +718,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSTEM
-  desc: in settings_menu()
+  desc: in the main menu and settings menu
   user: core
   <source>
     *: "System"
@@ -879,7 +921,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Visti mislukkað"
+    *: "Vistun mistókst"
   </dest>
   <voice>
     *: ""
@@ -907,7 +949,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Visti mislukkað"
+    *: "Vistun mistókst"
   </dest>
   <voice>
     *: ""
@@ -946,13 +988,16 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Recording Settings"
+    *: none
+    recording: "Recording Settings"
   </source>
   <dest>
-    *: "Hljóðritunarstillingar"
+    *: none
+    recording: "Hljóðritunarstillingar"
   </dest>
   <voice>
-    *: "Recording Settings"
+    *: none
+    recording: "Recording Settings"
   </voice>
 </phrase>
 <phrase>
@@ -1027,7 +1072,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1041,7 +1086,7 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user: core
   <source>
     *: "Debug (Keep Out!)"
@@ -1125,7 +1170,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: repeat one song
+  desc: repeat range from point A to B
   user: core
   <source>
     *: "A-B"
@@ -1170,7 +1215,7 @@
   desc: in the playback sub menu
   user: core
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
     *: "Spóla áfram/aftur á bak"
@@ -1185,12 +1230,15 @@
   user: core
   <source>
     *: "Anti-Skip Buffer"
+    flash_storage: none
   </source>
   <dest>
     *: "Anti-Skip minni"
+    flash_storage: none
   </dest>
   <voice>
     *: "Anti-Skip Buffer"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -1198,7 +1246,7 @@
   desc: options menu to set fade on stop or pause
   user: core
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
     *: "Dofnun við Stop/Pásu"
@@ -1212,13 +1260,16 @@
   desc: in playback settings
   user: core
   <source>
-    *: "Crossfade"
+    *: none
+    crossfade: "Crossfade"
   </source>
   <dest>
-    *: "Blanda enda lags í næsta lag"
+    *: none
+    crossfade: "Blanda enda lags í næsta lag"
   </dest>
   <voice>
-    *: "Crossfade"
+    *: none
+    crossfade: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1240,13 +1291,16 @@
   desc: in playback settings
   user: core
   <source>
-    *: "Beep volume"
+    *: none
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
-    *: "Beep hljóðstyrkni"
+    *: none
+    swcodec: "Píp við lagskipti"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Track Skip Beep"
   </voice>
 </phrase>
 <phrase>
@@ -1254,13 +1308,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Weak"
+    *: none
+    swcodec: "Weak"
   </source>
   <dest>
-    *: "Lág"
+    *: none
+    swcodec: "Lág"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Weak"
   </voice>
 </phrase>
 <phrase>
@@ -1268,13 +1325,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Moderate"
+    *: none
+    swcodec: "Moderate"
   </source>
   <dest>
-    *: "Mið"
+    *: none
+    swcodec: "Mið"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Moderate"
   </voice>
 </phrase>
 <phrase>
@@ -1296,13 +1356,16 @@
   desc: in playback settings menu. enable/disable the optical out
   user: core
   <source>
-    *: "Optical output"
+    *: none
+    spdif_power: "Optical Output"
   </source>
   <dest>
-    *: "Ljósleiðar úttak"
+    *: none
+    spdif_power: "Ljósleiðar úttak"
   </dest>
   <voice>
-    *: "Optical output"
+    *: none
+    spdif_power: "Optical Output"
   </voice>
 </phrase>
 <phrase>
@@ -1349,16 +1412,16 @@
 </phrase>
 <phrase>
   id: LANG_NEXT_FOLDER
-  desc: in settings_menu.  Should we move to next folder when current one ends
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user: core
   <source>
-    *: "Move to Next Folder"
+    *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Áfram til næstu skrár"
+    *: "Sjálfkrafa möppuskipti"
   </dest>
   <voice>
-    *: "Move to Next Folder"
+    *: "Auto-Change Directory"
   </voice>
 </phrase>
 <phrase>
@@ -1436,13 +1499,13 @@
   desc: browser sorting setting
   user: core
   <source>
-    *: "by date"
+    *: "By date"
   </source>
   <dest>
     *: "Eftir dagsetningu"
   </dest>
   <voice>
-    *: "by date"
+    *: "By date"
   </voice>
 </phrase>
 <phrase>
@@ -1450,13 +1513,13 @@
   desc: browser sorting setting
   user: core
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
-    *: "Eftir nýustu dagsetningu"
+    *: "Eftir nýjustu dagsetningu"
   </dest>
   <voice>
-    *: "by newest date"
+    *: "By Newest Date"
   </voice>
 </phrase>
 <phrase>
@@ -1590,13 +1653,16 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: "Browse Fonts"
+    *: none
+    lcd_bitmap: "Font"
   </source>
   <dest>
-    *: "Skoða Bókstafi"
+    *: none
+    lcd_bitmap: "Letur"
   </dest>
   <voice>
-    *: "Browse Fonts"
+    *: none
+    lcd_bitmap: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -1604,13 +1670,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Skoða .wps skráir"
+    *: "Spilunarskjár"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "While Playing Screen"
   </voice>
 </phrase>
 <phrase>
@@ -1632,13 +1698,16 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: "Remote-LCD Settings"
+    *: none
+    remote: "Remote-LCD Settings"
   </source>
   <dest>
-    *: "Fjarstýringaskjá stillingar"
+    *: none
+    remote: "Fjarstýringaskjá stillingar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    remote: "Remote LCD Settings"
   </voice>
 </phrase>
 <phrase>
@@ -1660,13 +1729,16 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: "Status-/Scrollbar"
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Stöðu-/flettistik"
+    *: none
+    lcd_bitmap: "Stöðu-/flettistik"
   </dest>
   <voice>
-    *: "Status- and Scrollbar"
+    *: none
+    lcd_bitmap: "Status- and Scrollbar"
   </voice>
 </phrase>
 <phrase>
@@ -1674,13 +1746,16 @@
   desc: in the display menu
   user: core
   <source>
-    *: "Peak Meter"
+    *: none
+    masd: "Peak Meter"
   </source>
   <dest>
-    *: "Hámarksmælir"
+    *: none
+    masd: "Hámarksmælir"
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: none
+    masd: "Peak Meter"
   </voice>
 </phrase>
 <phrase>
@@ -1716,13 +1791,16 @@
   desc: in the system sub menu
   user: core
   <source>
-    *: "Time & Date"
+    *: none
+    rtc: "Time & Date"
   </source>
   <dest>
-    *: "Tíminn & dagsetning"
+    *: none
+    rtc: "Tíminn & dagsetning"
   </dest>
   <voice>
-    *: "Time and Date"
+    *: none
+    rtc: "Time and Date"
   </voice>
 </phrase>
 <phrase>
@@ -1758,13 +1836,16 @@
   desc: The name of the additional entry in the main menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Wake-Up Alarm"
+    *: none
+    alarm: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "Vekjaraklukka"
+    *: none
+    alarm: "Vekjaraklukka"
   </dest>
   <voice>
-    *: "Wake-Up Alarm"
+    *: none
+    alarm: "Wake-Up Alarm"
   </voice>
 </phrase>
 <phrase>
@@ -1783,16 +1864,19 @@
 </phrase>
 <phrase>
   id: LANG_LINE_IN
-  desc: in settings_menu
+  desc: in the recording settings
   user: core
   <source>
-    *: "Line In"
+    *: none
+    recording,archosplayer: "Line In"
   </source>
   <dest>
-    *: "Lína inn"
+    *: none
+    recording,archosplayer: "Lína inn"
   </dest>
   <voice>
-    *: "Line In"
+    *: none
+    recording,archosplayer: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -1800,13 +1884,16 @@
   desc: Displayed for setting car adapter mode to on/off
   user: core
   <source>
-    *: "Car Adapter Mode"
+    *: none
+    charging: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Bíla stilling"
+    *: none
+    charging: "Bíla stilling"
   </dest>
   <voice>
-    *: "Car Adapter Mode"
+    *: none
+    charging: "Car Adapter Mode"
   </voice>
 </phrase>
 <phrase>
@@ -1909,7 +1996,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user: core
   <source>
     *: "Voice Directories"
@@ -1923,7 +2010,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user: core
   <source>
     *: "Voice Filenames"
@@ -1937,7 +2024,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user: core
   <source>
     *: "Numbers"
@@ -1951,7 +2038,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user: core
   <source>
     *: "Spell"
@@ -1965,16 +2052,16 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 skrá"
+    *: ".talk skrá"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "talk Clip"
   </voice>
 </phrase>
 <phrase>
@@ -1982,13 +2069,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Gæði"
+    *: none
+    recording_hwcodec: "Gæði"
   </dest>
   <voice>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -1996,13 +2086,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Tíðni"
+    *: none
+    recording: "Tíðni"
   </dest>
   <voice>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -2010,13 +2103,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Uppspretta"
+    *: none
+    recording: "Uppspretta"
   </dest>
   <voice>
-    *: "Source"
+    *: none
+    recording: "Source"
   </voice>
 </phrase>
 <phrase>
@@ -2024,13 +2120,19 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Mic"
+    *: none
+    recording: "Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </source>
   <dest>
-    *: "Hljóðnemi"
+    *: none
+    recording: "Hljóðnemi"
+    iriverh100,iriverh120,iriverh300: "Innbyggður hljóðnemi"
   </dest>
   <voice>
-    *: "Microphone"
+    *: none
+    recording: "Microphone"
+    iriverh100,iriverh120,iriverh300: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -2052,13 +2154,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Stafrænn"
+    *: none
+    recording: "Stafrænn"
   </dest>
   <voice>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </voice>
 </phrase>
 <phrase>
@@ -2080,27 +2185,33 @@
   desc: Editable recordings setting
   user: core
   <source>
-    *: "Independent frames"
+    *: none
+    recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-    *: "Sjálfstæðir rammar"
+    *: none
+    recording_hwcodec: "Sjálfstæðir rammar"
   </dest>
   <voice>
-    *: "Independent frames"
+    *: none
+    recording_hwcodec: "Independent Frames"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user: core
   <source>
-    *: "Time Split"
+    *: none
+    recording: "File Split Options"
   </source>
   <dest>
-    *: "Tíma aðskili"
+    *: none
+    recording: "Skráaraðskilnaður"
   </dest>
   <voice>
-    *: "Time Split"
+    *: none
+    recording: "File Split Options"
   </voice>
 </phrase>
 <phrase>
@@ -2108,13 +2219,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Prerecord time"
+    *: none
+    recording: "Prerecord Time"
   </source>
   <dest>
-    *: "Forhljóðritunar tími"
+    *: none
+    recording: "Forhljóðritunartími"
   </dest>
   <voice>
-    *: "Pre-Record time"
+    *: none
+    recording: "Pre-Record Time"
   </voice>
 </phrase>
 <phrase>
@@ -2122,13 +2236,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Directory"
+    *: none
+    recording: "Directory"
   </source>
   <dest>
-    *: "Skrá"
+    *: none
+    recording: "Skrá"
   </dest>
   <voice>
-    *: "Directory"
+    *: none
+    recording: "Directory"
   </voice>
 </phrase>
 <phrase>
@@ -2164,13 +2281,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "Gikkur"
+    *: none
+    recording: "Gikkur"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Trigger"
   </voice>
 </phrase>
 <phrase>
@@ -2206,13 +2326,16 @@
   desc: in playback settings, crossfade option
   user: core
   <source>
-    *: "Mix"
+    *: none
+    crossfade: "Mix"
   </source>
   <dest>
-    *: "Blanda"
+    *: none
+    crossfade: "Blanda"
   </dest>
   <voice>
-    *: "Mix"
+    *: none
+    crossfade: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -2234,13 +2357,16 @@
   desc: in replaygain
   user: core
   <source>
-    *: "Prevent clipping"
+    *: none
+    swcodec: "Prevent Clipping"
   </source>
   <dest>
-    *: "Hindra úrklippi"
+    *: none
+    swcodec: "Hindra úrklippi"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Prevent Clipping"
   </voice>
 </phrase>
 <phrase>
@@ -2248,13 +2374,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
-    *: "Gerð af sjálfvirku hljóðstyrkni"
+    *: "Gerð af hljóðstyrksaðlögun"
   </dest>
   <voice>
-    *: ""
+    *: "Replaygain Type"
   </voice>
 </phrase>
 <phrase>
@@ -2262,13 +2388,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "Albúm hækkun"
+    *: "Albúm aðlögun"
   </dest>
   <voice>
-    *: ""
+    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -2276,10 +2402,10 @@
   desc: in replaygain
   user: core
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "Lag hækkun"
+    *: "Lagaðlögun"
   </dest>
   <voice>
     *: ""
@@ -2287,7 +2413,7 @@
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_PREAMP
-  desc: in browse_id3
+  desc: in replaygain settings
   user: core
   <source>
     *: "Pre-amp"
@@ -2296,7 +2422,7 @@
     *: "Fyrir-mögnun"
   </dest>
   <voice>
-    *: ""
+    *: "Preamp"
   </voice>
 </phrase>
 <phrase>
@@ -2315,16 +2441,19 @@
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu
+  desc: in display_settings_menu, backlight timeout with charger connected
   user: core
   <source>
-    *: "Backlight On When Plugged"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Skjáljós á þegar í sambandi"
+    *: none
+    charging: "Skjáljós þegar í sambandi"
   </dest>
   <voice>
-    *: "Backlight On When Plugged"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </voice>
 </phrase>
 <phrase>
@@ -2332,13 +2461,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
-    *: "Upplysingar ljós"
+    *: "Upplýsingarljós"
   </dest>
   <voice>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </voice>
 </phrase>
 <phrase>
@@ -2346,13 +2475,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Backlight fade in"
+    *: none
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
-    *: "Upplita skjá"
+    *: none
+    backlight_fade*: "Upplita skjá"
   </dest>
   <voice>
-    *: "Backlight fade in"
+    *: none
+    backlight_fade*: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
@@ -2360,13 +2492,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Backlight fade out"
+    *: none
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
-    *: "Dimma skjá"
+    *: none
+    backlight_fade*: "Dimma skjá"
   </dest>
   <voice>
-    *: "Backlight fade out"
+    *: none
+    backlight_fade*: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>
@@ -2388,13 +2523,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "LCD Mode"
+    *: none
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
-    *: "Kristalskjáar stilling"
+    *: none
+    lcd_invert,remote_lcd_invert: "Kristalskjáar stilling"
   </dest>
   <voice>
-    *: "LCD Mode"
+    *: none
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </voice>
 </phrase>
 <phrase>
@@ -2416,27 +2554,33 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Inverse"
+    *: none
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
-    *: "Öfugt"
+    *: none
+    lcd_invert,remote_lcd_invert: "Öfugt"
   </dest>
   <voice>
-    *: "Inverse"
+    *: none
+    lcd_invert,remote_lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "Á hvolfi"
+    *: none
+    lcd_bitmap: "Á hvolfi"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </voice>
 </phrase>
 <phrase>
@@ -2444,13 +2588,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Line Selector"
+    *: none
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
-    *: "Val lína"
+    *: none
+    lcd_bitmap: "Vallínutegund"
   </dest>
   <voice>
-    *: "Line Selector"
+    *: none
+    lcd_bitmap: "Line Selector Type"
   </voice>
 </phrase>
 <phrase>
@@ -2458,13 +2605,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </source>
   <dest>
-    *: "vísir"
+    *: none
+    lcd_bitmap: "Vísir"
   </dest>
   <voice>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </voice>
 </phrase>
 <phrase>
@@ -2472,13 +2622,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Bar(Inverse)"
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Súla(öfug)"
+    *: none
+    lcd_bitmap: "Súla (öfug)"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: none
+    lcd_bitmap: "Inverse Bar"
   </voice>
 </phrase>
 <phrase>
@@ -2567,21 +2720,21 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu altarnative for jump scroll
+  desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
     *: "Skopp skrun"
   </dest>
   <voice>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time
+  desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
     *: "One time"
@@ -2612,13 +2765,16 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "Skruna súla"
+    *: none
+    lcd_bitmap: "Skrunsúla"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
@@ -2640,13 +2796,16 @@
   desc: in settings menu
   user: core
   <source>
-    *: "Button bar"
+    *: none
+    recorder_pad: "Button Bar"
   </source>
   <dest>
-    *: "Hnappa stik"
+    *: none
+    recorder_pad: "Hnappastika"
   </dest>
   <voice>
-    *: "Button bar"
+    *: none
+    recorder_pad: "Button Bar"
   </voice>
 </phrase>
 <phrase>
@@ -2654,13 +2813,16 @@
   desc: Volume type title
   user: core
   <source>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </source>
   <dest>
-    *: "Hljóðstyrki skjár"
+    *: none
+    lcd_bitmap: "Hljóðstyrki skjár"
   </dest>
   <voice>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </voice>
 </phrase>
 <phrase>
@@ -2668,13 +2830,16 @@
   desc: Battery type title
   user: core
   <source>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </source>
   <dest>
-    *: "Rafhlöðu skjár"
+    *: none
+    lcd_bitmap: "Rafhlöðu skjár"
   </dest>
   <voice>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </voice>
 </phrase>
 <phrase>
@@ -2682,13 +2847,16 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *: "Myndrænn"
+    *: none
+    lcd_bitmap: "Myndrænn"
   </dest>
   <voice>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </voice>
 </phrase>
 <phrase>
@@ -2696,13 +2864,16 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </source>
   <dest>
-    *: "Í tölum"
+    *: none
+    lcd_bitmap: "Í tölum"
   </dest>
   <voice>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </voice>
 </phrase>
 <phrase>
@@ -2710,13 +2881,16 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Peak Release"
+    *: none
+    masd: "Peak Release"
   </source>
   <dest>
-    *: "Hámarks losun"
+    *: none
+    masd: "Hámarkslosun"
   </dest>
   <voice>
-    *: "Peak Release"
+    *: none
+    masd: "Peak Release"
   </voice>
 </phrase>
 <phrase>
@@ -2739,12 +2913,15 @@
   user: core
   <source>
     *: "Peak Hold Time"
+    masd: none
   </source>
   <dest>
-    *: "Hámarks biðtími"
+    *: "Hámarksbiðtími"
+    masd: none
   </dest>
   <voice>
     *: "Peak Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2753,12 +2930,15 @@
   user: core
   <source>
     *: "Clip Hold Time"
+    masd: none
   </source>
   <dest>
-    *: "Bita Biðtími"
+    *: "Bitabiðtími"
+    masd: none
   </dest>
   <voice>
     *: "Clip Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2767,12 +2947,15 @@
   user: core
   <source>
     *: "Eternal"
+    masd: none
   </source>
   <dest>
     *: "Eilífur"
+    masd: none
   </dest>
   <voice>
     *: "Eternal"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2781,12 +2964,15 @@
   user: core
   <source>
     *: "Scale"
+    masd: none
   </source>
   <dest>
     *: "Mælikvarði"
+    masd: none
   </dest>
   <voice>
     *: "Scale"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2794,13 +2980,16 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
+    masd: none
   </source>
   <dest>
-    *: "Lógaritmi(dB)"
+    *: "Lógariþmi (dB)"
+    masd: none
   </dest>
   <voice>
     *: "Logarithmic decibel"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2808,13 +2997,16 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
+    masd: none
   </source>
   <dest>
-    *: "Línulegur(%)"
+    *: "Línulegur (%)"
+    masd: none
   </dest>
   <voice>
     *: "Linear percent"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2823,12 +3015,15 @@
   user: core
   <source>
     *: "Minimum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "Lágmark af sviði"
+    *: "Lágmark sviðs"
+    masd: none
   </dest>
   <voice>
     *: "Minimum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2837,12 +3032,15 @@
   user: core
   <source>
     *: "Maximum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "Hámark af sviði"
+    *: "Hámark sviðs"
+    masd: none
   </dest>
   <voice>
     *: "Maximum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2864,13 +3062,16 @@
   desc: in battery settings
   user: core
   <source>
-    *: "Battery Type"
+    *: none
+    battery_types: "Battery Type"
   </source>
   <dest>
-    *: "Batterígerð"
+    *: none
+    battery_types: "Batterígerð"
   </dest>
   <voice>
-    *: "Battery type"
+    *: none
+    battery_types: "Battery type"
   </voice>
 </phrase>
 <phrase>
@@ -2878,13 +3079,16 @@
   desc: in battery settings
   user: core
   <source>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </source>
   <dest>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </dest>
   <voice>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </voice>
 </phrase>
 <phrase>
@@ -2907,12 +3111,15 @@
   user: core
   <source>
     *: "Disk Spindown"
+    flash_storage: none
   </source>
   <dest>
     *: "Slökkva á harðadiskinum"
+    flash_storage: none
   </dest>
   <voice>
     *: "Disk Spindown"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -2931,16 +3138,19 @@
 </phrase>
 <phrase>
   id: LANG_TIME
-  desc: in settings_menu
+  desc: in the system sub menu
   user: core
   <source>
-    *: "Set Time/Date"
+    *: none
+    rtc: "Time & Date"
   </source>
   <dest>
-    *: "Stilla tíman/dagsetninguna"
+    *: none
+    rtc: "Stilla tímann/dagsetninguna"
   </dest>
   <voice>
-    *: "Set Time and Date"
+    *: none
+    rtc: "Time and Date"
   </voice>
 </phrase>
 <phrase>
@@ -2948,13 +3158,16 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </source>
   <dest>
-    *: "Tímakerfi"
+    *: none
+    rtc: "Tímakerfi"
   </dest>
   <voice>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </voice>
 </phrase>
 <phrase>
@@ -2962,13 +3175,16 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: "12 Hour Clock"
+    *: none
+    rtc: "12 Hour Clock"
   </source>
   <dest>
-    *: "12 Tímar AM/PM"
+    *: none
+    rtc: "12 tímar AM/PM"
   </dest>
   <voice>
-    *: "12 Hour Clock"
+    *: none
+    rtc: "12 Hour Clock"
   </voice>
 </phrase>
 <phrase>
@@ -2976,13 +3192,16 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: "24 Hour Clock"
+    *: none
+    rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: "24 Tímar"
+    *: none
+    rtc: "24 tímar"
   </dest>
   <voice>
-    *: "24 Hour Clock"
+    *: none
+    rtc: "24 Hour Clock"
   </voice>
 </phrase>
 <phrase>
@@ -2990,13 +3209,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Max files in dir browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Háma. skrár í Skjali"
+    *: "Hámark skráa í skráarskoðara"
   </dest>
   <voice>
-    *: "Max files in directory browser"
+    *: "Maximum Entries in File Browser"
   </voice>
 </phrase>
 <phrase>
@@ -3004,10 +3223,10 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Háma. lagalista stærð"
+    *: "Hámarksstærð lagalista"
   </dest>
   <voice>
     *: "Max playlist size"
@@ -3043,30 +3262,30 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user: core
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Sýna ID3 Uppl."
+    *: "Sýna lagsupplýsingar"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MENU_SET_RATING
-  desc: in wps context menu
+  desc: Set the rating of a file in the wps context menu
   user: core
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
-    *: "Gefa lag einkun"
+    *: "Gefa lagi einkunn"
   </dest>
   <voice>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </voice>
 </phrase>
 <phrase>
@@ -3119,7 +3338,7 @@
     *: "Delete directory"
   </source>
   <dest>
-    *: "Eyða skrjali"
+    *: "Eyða möppu"
   </dest>
   <voice>
     *: "delete directory"
@@ -3158,10 +3377,10 @@
   desc: Onplay open with
   user: core
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "Opna með"
+    *: "Opna með..."
   </dest>
   <voice>
     *: "open with"
@@ -3172,13 +3391,13 @@
   desc: in main menu
   user: core
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
-    *: "Skapa skjal"
+    *: "Búa til möppu"
   </dest>
   <voice>
-    *: "Create directory"
+    *: "Create Directory"
   </voice>
 </phrase>
 <phrase>
@@ -3337,16 +3556,16 @@
 </phrase>
 <phrase>
   id: LANG_ROCKBOX_INFO
-  desc: displayed topmost on the info screen
+  desc: displayed topmost on the info screen and in the info menu
   user: core
   <source>
-    *: "Rockbox Info:"
+    *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox Upplýsingar:"
+    *: "Rockbox upplýsingar"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox Info"
   </voice>
 </phrase>
 <phrase>
@@ -3382,27 +3601,33 @@
   desc: tells that the battery is charging, instead of battery level
   user: core
   <source>
-    *: "Battery: Charging"
+    *: none
+    charging: "Battery: Charging"
   </source>
   <dest>
-    *: "Rafhlaða: hleðsla"
+    *: none
+    charging: "Rafhlaða: í hleðslu"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: "Battery: Charging"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running
+  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
   user: core
   <source>
-    *: "Battery: Top-Off Chg"
+    *: none
+    archosrecorder: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "Rafhlaða: Að klára hlöðun"
+    *: none
+    archosrecorder: "Rafhlaða: Að klára hlöðun"
   </dest>
   <voice>
-    *: ""
+    *: none
+    archosrecorder: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -3410,13 +3635,16 @@
   desc: in info display, shows that trickle charge is running
   user: core
   <source>
-    *: "Battery: Trickle Chg"
+    *: none
+    charging: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "Rafhlaða: Stöðug hlöðun"
+    *: none
+    charging: "Rafhlaða: Stöðug hlöðun"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: "Trickle charge"
   </voice>
 </phrase>
 <phrase>
@@ -3424,10 +3652,14 @@
   desc: battery level in % and estimated time remaining
   user: core
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %ds %dmin"
+    *: "Rafhlaða: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Rafhl.: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -3466,13 +3698,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: "Int:"
+    *: none
+    multivolume: "Int:"
   </source>
   <dest>
-    *: "Innb:"
+    *: none
+    multivolume: "Innb.:"
   </dest>
   <voice>
-    *: "Internal"
+    *: none
+    multivolume: "Internal"
   </voice>
 </phrase>
 <phrase>
@@ -3480,13 +3715,22 @@
   desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
   user: core
   <source>
-    *: "MMC:"
+    *: none
+    multivolume: "HD1"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
+    archosondio*: "MMC:"
   </source>
   <dest>
-    *: "MMC:"
+    *: none
+    multivolume: "HD1"
+    sansae200*,sansac200*,sansafuze*: "mSD:"
+    archosondio*: "MMC:"
   </dest>
   <voice>
-    *: "Multimedia card"
+    *: none
+    multivolume: "H D 1"
+    sansae200*,sansac200*,sansafuze*: "micro S D"
+    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -3494,13 +3738,16 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: ""
+    *: none
+    rtc: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    rtc: ""
   </dest>
   <voice>
-    *: "Current time:"
+    *: none
+    rtc: "Current time:"
   </voice>
 </phrase>
 <phrase>
@@ -3508,13 +3755,16 @@
   desc: in wps
   user: core
   <source>
-    *: "Pitch Up"
+    *: none
+    pitchscreen: "Pitch Up"
   </source>
   <dest>
-    *: "Hækka tónhæð"
+    *: none
+    pitchscreen: "Hækka tónhæð"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -3522,18 +3772,21 @@
   desc: in wps
   user: core
   <source>
-    *: "Pitch Down"
+    *: none
+    pitchscreen: "Pitch Down"
   </source>
   <dest>
-    *: "Lækka tónhæð"
+    *: none
+    pitchscreen: "Lækka tónhæð"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PAUSE
-  desc: in wps
+  desc: in wps and recording trigger menu
   user: core
   <source>
     *: "Pause"
@@ -3542,7 +3795,7 @@
     *: "Pása"
   </dest>
   <voice>
-    *: ""
+    *: "Pause"
   </voice>
 </phrase>
 <phrase>
@@ -3751,7 +4004,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Bókamerki mislukkað"
+    *: "Bókamerking mistókst"
   </dest>
   <voice>
     *: ""
@@ -3792,15 +4045,36 @@
   desc: used in set_time()
   user: core
   <source>
-    *: "OFF To Revert"
-    vibe500: "CANCEL To Revert"
+    *: none
+    rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
-    *: "AF till að hætta við"
-    vibe500: "C till að hætta við"
+    *: none
+    rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    ipod*,sansac200*: "MENU = Revert"
+    iaudiox5,iaudiom5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    gigabeatfx: "POWER = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
+    vibe500: "CANCEL = Revert"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3864,13 +4138,16 @@
   desc: Display of recorded time
   user: core
   <source>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </source>
   <dest>
-    *: "Tími:"
+    *: none
+    recording: "Tími:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3892,13 +4169,16 @@
   desc: Display of recorded file size
   user: core
   <source>
-    *: "Size:"
+    *: none
+    recording: "Size:"
   </source>
   <dest>
-    *: "Stærð:"
+    *: none
+    recording: "Stærð:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3906,13 +4186,16 @@
   desc: in recording and radio screen
   user: core
   <source>
-    *: "Prerecording"
+    *: none
+    recording: "Pre-Recording"
   </source>
   <dest>
-    *: "Forhljóðritun"
+    *: none
+    recording: "Forhljóðritun"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3962,15 +4245,22 @@
   desc: in recording screen
   user: core
   <source>
-    *: "The disk is full. Press OFF to continue."
-    vibe500: "The disk is full. Press PREV to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
+    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
-    *: "Harðidiskurin er fullur. Ýtið á AF til að halda áfram"
-    vibe500: "Harðidiskurin er fullur. Ýtið á PREV til að halda áfram"
+    *: none
+    recording: "Harði diskurinn er fullur. Ýtið á OFF til að halda áfram."
+    iriverh100,iriverh120,iriverh300: "Harði diskurinn er fullur. Ýtið á STOP til að halda áfram."
+    iaudiom5,iaudiox5: "Harði diskurinn er fullur. Ýtið á POWER til að halda áfram."
+    sansae200*,sansac200*,vibe500: "Harði diskurinn er fullur. Ýtið á PREV til að halda áfram."
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3992,13 +4282,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Once"
+    *: none
+    recording: "Once"
   </source>
   <dest>
-    *: "Einusinni"
+    *: none
+    recording: "Einusinni"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Once"
   </voice>
 </phrase>
 <phrase>
@@ -4020,13 +4313,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Start above"
+    *: none
+    recording: "Start Above"
   </source>
   <dest>
-    *: "Byrja fyrir ofan"
+    *: none
+    recording: "Byrja fyrir ofan"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Start Above"
   </voice>
 </phrase>
 <phrase>
@@ -4048,13 +4344,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Stop below"
+    *: none
+    recording: "Stop Below"
   </source>
   <dest>
-    *: "Hætta fyrir neðan"
+    *: none
+    recording: "Hætta fyrir neðan"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Stop Below"
   </voice>
 </phrase>
 <phrase>
@@ -4076,13 +4375,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Presplit gap"
+    *: none
+    recording: "Presplit gap"
   </source>
   <dest>
-    *: "Skiptisbil"
+    *: none
+    recording: "Forskiptibil"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Presplit gap"
   </voice>
 </phrase>
 <phrase>
@@ -4090,13 +4392,16 @@
   desc: -inf db for values below measurement
   user: core
   <source>
-    *: "-inf"
+    *: none
+    recording: "-inf"
   </source>
   <dest>
-    *: "-inf"
+    *: none
+    recording: "-inf"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>
@@ -4132,13 +4437,16 @@
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Alarm Time:"
+    *: none
+    alarm: "Alarm Time:"
   </source>
   <dest>
-    *: "Viðvörunartími:"
+    *: none
+    alarm: "Viðvörunartími:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4146,13 +4454,16 @@
   desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Waking Up In %d:%02d"
+    *: none
+    alarm: "Waking Up In %d:%02d"
   </source>
   <dest>
-    *: "Vek eftir %d:%02d"
+    *: none
+    alarm: "Vakna eftir %d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Waking up in"
   </voice>
 </phrase>
 <phrase>
@@ -4160,13 +4471,16 @@
   desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
   user: core
   <source>
-    *: "Alarm Set"
+    *: none
+    alarm: "Alarm Set"
   </source>
   <dest>
-    *: "Viðvörun stillt"
+    *: none
+    alarm: "Viðvörun stillt"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Alarm Set"
   </voice>
 </phrase>
 <phrase>
@@ -4174,13 +4488,16 @@
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
   <source>
-    *: "Alarm Time Is Too Soon!"
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Viðvörunartími ekki réttur!"
+    *: none
+    alarm: "Viðvörunartími ekki réttur!"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
   </voice>
 </phrase>
 <phrase>
@@ -4188,15 +4505,24 @@
   desc: Shown key functions in alarm menu (for the RTC alarm mod).
   user: core
   <source>
-    *: "PLAY=Set OFF=Cancel"
+    *: none
+    alarm: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
+    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
-    *: "PLAY=Vista OFF=Hætta við"
+    *: none
+    alarm: "PLAY=Vista OFF=Hætta við"
+    ipod*: "SELECT=Vista MENU=Hætta við"
+    iriverh10,iriverh10_5gb: "SELECT=Vista PREV=Hætta við"
+    gigabeats: "SELECT=Vista POWER=Hætta við"
     vibe500: "OK=Vista C=Hætta við"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4204,18 +4530,21 @@
   desc: Announce that the RTC alarm has been turned off
   user: core
   <source>
-    *: "Alarm Disabled"
+    *: none
+    alarm: "Alarm Disabled"
   </source>
   <dest>
-    *: "Viðvörun óvirk"
+    *: none
+    alarm: "Viðvörun óvirk"
   </dest>
   <voice>
-    *: "Alarm Disabled"
+    *: none
+    alarm: "Alarm Disabled"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Title"
@@ -4229,7 +4558,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Artist"
@@ -4243,7 +4572,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Album"
@@ -4257,7 +4586,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Tracknum"
@@ -4271,7 +4600,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user: core
   <source>
     *: "Genre"
@@ -4285,7 +4614,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user: core
   <source>
     *: "Year"
@@ -4299,7 +4628,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Playlist"
@@ -4313,7 +4642,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Bitrate"
@@ -4355,7 +4684,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FREQUENCY
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Frequency"
@@ -4369,7 +4698,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user: core
   <source>
     *: "Track gain"
@@ -4386,10 +4715,10 @@
   desc: in browse_id3
   user: core
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "Albúm hækkun"
+    *: "Albúmaðlögun"
   </dest>
   <voice>
     *: ""
@@ -4397,7 +4726,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user: core
   <source>
     *: "Path"
@@ -4411,7 +4740,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user: core
   <source>
     *: "<No Info>"
@@ -4428,13 +4757,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Sun"
+    *: none
+    rtc: "Sun"
   </source>
   <dest>
-    *: "Sun"
+    *: none
+    rtc: "Sun"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4442,13 +4774,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Mon"
+    *: none
+    rtc: "Mon"
   </source>
   <dest>
-    *: "Mán"
+    *: none
+    rtc: "Mán"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4456,13 +4791,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Tue"
+    *: none
+    rtc: "Tue"
   </source>
   <dest>
-    *: "Þri"
+    *: none
+    rtc: "Þri"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4470,13 +4808,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Wed"
+    *: none
+    rtc: "Wed"
   </source>
   <dest>
-    *: "Mið"
+    *: none
+    rtc: "Mið"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4484,13 +4825,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Thu"
+    *: none
+    rtc: "Thu"
   </source>
   <dest>
-    *: "Fim"
+    *: none
+    rtc: "Fim"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4498,13 +4842,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Fri"
+    *: none
+    rtc: "Fri"
   </source>
   <dest>
-    *: "Fös"
+    *: none
+    rtc: "Fös"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4512,13 +4859,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: "Sat"
+    *: none
+    rtc: "Sat"
   </source>
   <dest>
-    *: "Lau"
+    *: none
+    rtc: "Lau"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4526,13 +4876,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Jan"
+    *: none
+    rtc: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: none
+    rtc: "Jan"
   </dest>
   <voice>
-    *: "January"
+    *: none
+    rtc: "January"
   </voice>
 </phrase>
 <phrase>
@@ -4540,13 +4893,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Feb"
+    *: none
+    rtc: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: none
+    rtc: "Feb"
   </dest>
   <voice>
-    *: "February"
+    *: none
+    rtc: "February"
   </voice>
 </phrase>
 <phrase>
@@ -4554,13 +4910,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Mar"
+    *: none
+    rtc: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: none
+    rtc: "Mar"
   </dest>
   <voice>
-    *: "March"
+    *: none
+    rtc: "March"
   </voice>
 </phrase>
 <phrase>
@@ -4568,13 +4927,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Apr"
+    *: none
+    rtc: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: none
+    rtc: "Apr"
   </dest>
   <voice>
-    *: "April"
+    *: none
+    rtc: "April"
   </voice>
 </phrase>
 <phrase>
@@ -4582,13 +4944,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "May"
+    *: none
+    rtc: "May"
   </source>
   <dest>
-    *: "Maí"
+    *: none
+    rtc: "Maí"
   </dest>
   <voice>
-    *: "May"
+    *: none
+    rtc: "May"
   </voice>
 </phrase>
 <phrase>
@@ -4596,13 +4961,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Jun"
+    *: none
+    rtc: "Jun"
   </source>
   <dest>
-    *: "Jún"
+    *: none
+    rtc: "Jún"
   </dest>
   <voice>
-    *: "June"
+    *: none
+    rtc: "June"
   </voice>
 </phrase>
 <phrase>
@@ -4610,13 +4978,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Jul"
+    *: none
+    rtc: "Jul"
   </source>
   <dest>
-    *: "Júl"
+    *: none
+    rtc: "Júl"
   </dest>
   <voice>
-    *: "July"
+    *: none
+    rtc: "July"
   </voice>
 </phrase>
 <phrase>
@@ -4624,13 +4995,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Aug"
+    *: none
+    rtc: "Aug"
   </source>
   <dest>
-    *: "Áug"
+    *: none
+    rtc: "Áug"
   </dest>
   <voice>
-    *: "August"
+    *: none
+    rtc: "August"
   </voice>
 </phrase>
 <phrase>
@@ -4638,13 +5012,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Sep"
+    *: none
+    rtc: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: none
+    rtc: "Sep"
   </dest>
   <voice>
-    *: "September"
+    *: none
+    rtc: "September"
   </voice>
 </phrase>
 <phrase>
@@ -4652,13 +5029,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Oct"
+    *: none
+    rtc: "Oct"
   </source>
   <dest>
-    *: "Ókt"
+    *: none
+    rtc: "Ókt"
   </dest>
   <voice>
-    *: "October"
+    *: none
+    rtc: "October"
   </voice>
 </phrase>
 <phrase>
@@ -4666,13 +5046,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Nov"
+    *: none
+    rtc: "Nov"
   </source>
   <dest>
-    *: "Nóv"
+    *: none
+    rtc: "Nóv"
   </dest>
   <voice>
-    *: "November"
+    *: none
+    rtc: "November"
   </voice>
 </phrase>
 <phrase>
@@ -4680,13 +5063,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: "Dec"
+    *: none
+    rtc: "Dec"
   </source>
   <dest>
-    *: "Des"
+    *: none
+    rtc: "Des"
   </dest>
   <voice>
-    *: "December"
+    *: none
+    rtc: "December"
   </voice>
 </phrase>
 <phrase>
@@ -6007,16 +6393,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user: core
   <source>
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Lagalisti Minni fullt"
+    *: "Lagalistaminni fullt"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist Buffer Full"
   </voice>
 </phrase>
 <phrase>
@@ -6217,16 +6603,19 @@
 </phrase>
 <phrase>
   id: LANG_FM_NO_PRESETS
-  desc: DEPRECATED
+  desc: error when preset list is empty
   user: core
   <source>
-    *: ""
+    *: none
+    radio: "No presets"
   </source>
   <dest>
-    *: ""
+    *: none
+    radio: "Engar forstillingar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "No presets"
   </voice>
 </phrase>
 <phrase>
@@ -6234,13 +6623,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Edit preset"
+    *: none
+    radio: "Edit Preset"
   </source>
   <dest>
-    *: "Breyta stillingu"
+    *: none
+    radio: "Breyta forstillingu"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Edit Preset"
   </voice>
 </phrase>
 <phrase>
@@ -6248,13 +6640,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Remove preset"
+    *: none
+    radio: "Remove preset"
   </source>
   <dest>
-    *: "Eyða forstillingu"
+    *: none
+    radio: "Eyða forstillingu"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Remove Preset"
   </voice>
 </phrase>
 <phrase>
@@ -6262,13 +6657,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Preset save failed"
+    *: none
+    radio: "Preset Save Failed"
   </source>
   <dest>
-    *: "Forstillinga vistun mislukkuð"
+    *: none
+    radio: "Forstillingavistun mistókst"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Preset Save Failed"
   </voice>
 </phrase>
 <phrase>
@@ -6276,13 +6674,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "The preset list is full"
+    *: none
+    radio: "The preset List is Full"
   </source>
   <dest>
-    *: "Forstillingarlisti er fullur"
+    *: none
+    radio: "Forstillingarlistinn er fullur"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "The Preset List is Full"
   </voice>
 </phrase>
 <phrase>
@@ -6290,13 +6691,16 @@
   desc: in button bar
   user: core
   <source>
-    *: "Menu"
+    *: none
+    radio_screen_button_bar: "Menu"
   </source>
   <dest>
-    *: "Valmynd"
+    *: none
+    radio_screen_button_bar: "Valmynd"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6304,13 +6708,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Exit"
+    *: none
+    radio_screen_button_bar: "Exit"
   </source>
   <dest>
-    *: "Út"
+    *: none
+    radio_screen_button_bar: "Út"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6318,13 +6725,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Action"
+    *: none
+    radio_screen_button_bar: "Action"
   </source>
   <dest>
-    *: "Gera"
+    *: none
+    radio_screen_button_bar: "Gera"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6346,27 +6756,33 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Add"
+    *: none
+    radio_screen_button_bar: "Add"
   </source>
   <dest>
-    *: "Bæta við"
+    *: none
+    radio_screen_button_bar: "Bæta við"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user: core
   <source>
-    *: "Record"
+    *: none
+    radio_screen_button_bar: "Record"
   </source>
   <dest>
-    *: "Hljóðrita"
+    *: none
+    radio_screen_button_bar: "Hljóðrita"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6374,13 +6790,16 @@
   desc: in radio screen
   user: core
   <source>
-    *: "Force Mono"
+    *: none
+    radio: "Force Mono"
   </source>
   <dest>
-    *: "Neyða mónó hljóð"
+    *: none
+    radio: "Neyða mónó hljóð"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6430,13 +6849,13 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user: core
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Skráakerfisminni Er fullur!"
+    *: "Skráakerfisminni er fullt!"
   </dest>
   <voice>
-    *: ""
+    *: "Direcrory Buffer is Full!"
   </voice>
 </phrase>
 <phrase>
@@ -6515,11 +6934,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    vibe500: "PREV to abort"
-  </source>
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iaudiox5,iaudiom5: "Long PLAY to abort"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatfx: "POWER to abort"
+    *: "OFF to abort"
   <dest>
-    *: "AF til að slíta vinnslu"
-    vibe500: "PREV til að slíta vinnslu"
+    *: "OFF til að slíta vinnslu"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP til að slíta vinnslu"
+    ipod*: "PLAY/PAUSE til að slíta vinnslu"
+    iaudiox5,iaudiom5: "Long PLAY til að slíta vinnslu"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV til að slíta vinnslu"
+    gigabeats: "BACK til að slíta vinnslu"
+    gigabeatfx: "POWER til að slíta vinnslu"
   </dest>
   <voice>
     *: ""
@@ -6701,7 +7130,7 @@
     *: "Move failed"
   </source>
   <dest>
-    *: "Færsla mislukkuð"
+    *: "Færsla mistókst"
   </dest>
   <voice>
     *: ""
@@ -6740,13 +7169,13 @@
   desc: track display options
   user: core
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
-    *: "Bara laga nafn"
+    *: "Bara lagaheiti"
   </dest>
   <voice>
-    *: "Track name only"
+    *: "Track Name Only"
   </voice>
 </phrase>
 <phrase>
@@ -6754,10 +7183,10 @@
   desc: track display options
   user: core
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
-    *: "fullt skrár nafn"
+    *: "Fullt slóð"
   </dest>
   <voice>
     *: "Full path"
@@ -7006,13 +7435,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </source>
   <dest>
-    *: "Stereó"
+    *: none
+    recording: "Stereó"
   </dest>
   <voice>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -7020,13 +7452,16 @@
   desc: in sound_settings
   user: core
   <source>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </source>
   <dest>
-    *: "Mónó"
+    *: none
+    recording: "Mónó"
   </dest>
   <voice>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -7194,13 +7629,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Gæði"
+    *: none
+    recording_hwcodec: "Gæði"
   </dest>
   <voice>
-    *: "Quality"
+    *: none
+    recording_hwodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -7222,13 +7660,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Uppspretta"
+    *: none
+    recording: "Uppspretta"
   </dest>
   <voice>
-    *: "Source"
+    *: none
+    recording: "Source"
   </voice>
 </phrase>
 <phrase>
@@ -7236,13 +7677,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Mic"
+    *: none
+    recording: "Int. Mic"
   </source>
   <dest>
-    *: "Hljóðnemi"
+    *: none
+    recording: "Innb. hljóðnemi"
   </dest>
   <voice>
-    *: "Microphone"
+    *: none
+    recording: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -7264,13 +7708,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Stafrænn"
+    *: none
+    recording: "Stafrænn"
   </dest>
   <voice>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </voice>
 </phrase>
 <phrase>
@@ -7292,13 +7739,16 @@
   desc: in recording settings_menu
   user: core
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "Gikkur"
+    *: none
+    recording: "Gikkur"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7466,16 +7916,16 @@
   desc: in the recording screen
   user: core
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Left"
-    *: "Gain Left"
+    *: none
+    recording: ""
   </source>
   <dest>
-    *: "Vinstri"
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7483,16 +7933,16 @@
   desc: in the recording screen
   user: core
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Right"
-    *: "Gain Right"
+    *: none
+    recording: ""
   </source>
   <dest>
-    *: "Hægri"
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7514,13 +7964,16 @@
   desc: in dir browser, F1 button bar text
   user: core
   <source>
-    *: "Menu"
+    *: none
+    recorder_pad: "Menu"
   </source>
   <dest>
-    *: "Valmynd"
+    *: none
+    recorder_pad: "Valmynd"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -7528,13 +7981,16 @@
   desc: in dir browser, F2 button bar text
   user: core
   <source>
-    *: "Option"
+    *: none
+    recorder_pad: "Option"
   </source>
   <dest>
-    *: "Stilling"
+    *: none
+    recorder_pad: "Stilling"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -7542,12 +7998,15 @@
   desc: in dir browser, F3 button bar text
   user: core
   <source>
-    *: "LCD"
+    *: none
+    recorder_pad: "LCD"
   </source>
   <dest>
-    *: "Skjár"
+    *: none
+    recorder_pad: "Skjár"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
