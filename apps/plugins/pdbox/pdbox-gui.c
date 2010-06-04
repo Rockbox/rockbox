@@ -578,8 +578,8 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
                 rb->lcd_vline(wg->x,
                               wg->y,
                               wg->y + wg->h);
-                char sbuf[12];
-                ftoan(wg->value, sbuf, 12);
+                char sbuf[8];
+                ftoan(wg->value, sbuf, 8);
                 rb->lcd_putsxy(wg->x + 2, wg->y + 2, sbuf);
                 break;
 
