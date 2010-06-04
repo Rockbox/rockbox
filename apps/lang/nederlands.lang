@@ -13556,23 +13556,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *:none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *:none
-    radio_remote: "FM Radio afstandsbediening"
-  </dest>
-  <voice>
-    *:none
-    radio_remote: "FM Radio afstandsbediening"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -13672,5 +13655,53 @@
   <voice>
     *: none
     hotkey: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Radio scherm op afstandsbediening"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Radio scherm op afstandsbediening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Componist"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Radio scherm"
+  </dest>
+  <voice>
+    *:none
+    radio: "Radio scherm"
   </voice>
 </phrase>
