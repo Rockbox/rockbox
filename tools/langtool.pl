@@ -53,6 +53,12 @@ Usage langtool [--inplace] --options langfile1 [langfile2 ...]
     Example:
       langtool --changetarget --from e200 --to e200,c200 --id LANG_ON dansk.lang
 
+  --delete --id ID_1,ID_2 --id ID_3 langfile
+
+    Delete a number of ids. THIS WILL BREAK BACKWARDS COMPATIBILITY. Use with
+    extreme caution.
+    Example: langtool --delete --id LANG_LEFT,LANG_RIGHT english.lang
+
   --inplace
 
     Perform file operations in-place, instead of outputting the result to
@@ -77,6 +83,7 @@ my $changesource = '';
 my $changeid = '';
 my $changetarget = '';
 my $changedesc = '';
+my $delete = '';
 my $inplace = '';
 my $help = '';
 # Parameters
@@ -91,6 +98,7 @@ GetOptions(
     'changeid'     => \$changeid,
     'changetarget' => \$changetarget,
     'changedesc'   => \$changedesc,
+    'delete'       => \$delete,
     'help'         => \$help,
     'inplace'      => \$inplace,
 
@@ -110,8 +118,8 @@ if ($help) {
     exit();
 }
 # More than one option set (or none)
-elsif (($deprecate + $changesource + $changeid + $changetarget + $changedesc) != 1) {
-    error("Exactly one of --deprecate, --changesource, --changeid, --changetarget,\n--changedesc must be used.");
+elsif (($deprecate + $changesource + $changeid + $changetarget + $changedesc +$delete) != 1) {
+    error("Exactly one of --deprecate, --changesource, --changeid, --changetarget,\n--changedesc, --delete must be used.");
 }
 # Do changeid, but either from or to is empty
 elsif ($changeid and ($from eq "" or $to eq "")) {
@@ -128,6 +136,10 @@ elsif ($changetarget and ($from eq "" or $to eq "")) {
 # Do deprecate, but no ids set
 elsif ($deprecate and $numids < 1) {
     error("--deprecate used, but no IDs specified");
+}
+# Do delete, but no ids set
+elsif ($delete and $numids < 1) {
+    error("--delete used, but no IDs specified");
 }
 # Do changesource, but either target or to not set
 elsif ($changesource and ($s_target eq "" or $to eq "")) {
@@ -159,7 +171,7 @@ foreach my $file (@ARGV) {
     my $target = "";
     my $string = "";
     my $open = 0;
-    my $output = "";
+    my @output;
 
     for (<LANGFILE>) {
         my $line = $_;
@@ -209,6 +221,16 @@ foreach my $file (@ARGV) {
                 }
             }
         }
+        elsif ($delete) {
+            if ($id ne "" and grep(/^$id$/, @ids)) {
+                if ($location eq "phrase" and $line =~ /id:/) {
+                    # Kluge to nuke the <phrase> line
+                    pop(@output);
+                }
+                # Set the whole phrase to empty string.
+                $line = "";
+            }
+        }
         elsif ($changetarget) {
             # Change target if set and it's the same as $from
             if ($id ne "" and grep(/^$id$/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
@@ -234,17 +256,16 @@ foreach my $file (@ARGV) {
             print("This should never happen.\n");
             exit(3);
         }
-        if ($inplace) {
-            $output .= $line;
-        }
-        else {
-            print($line);
-        }
+
+        push(@output, $line);
     }
     close(LANGFILE);
     if ($inplace) {
         open(LANGFILE, ">", $file) or die(sprintf("Couldn't open file for writing: %s\n", $file));
-        print(LANGFILE $output);
+        print(LANGFILE @output);
         close(LANGFILE);
+    }
+    else {
+        print(@output);
     }
 }
