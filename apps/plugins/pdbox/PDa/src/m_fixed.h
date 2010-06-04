@@ -1,6 +1,10 @@
 #ifndef __M_FIXED_H__
 #define __M_FIXED_H__
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#endif
+
 typedef int t_sample;
 
 #define t_fixed int
