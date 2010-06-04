@@ -56,42 +56,27 @@ lcd_grey_data:
     ldr     lr, =DBOP_BASE
 
 .greyloop:
-    ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
-    ldmia   r0!, {r5-r6}        /* Fetch 8 pixel values */
+    ldmia   r1, {r3-r4}
+    
+    and     r5, r12, r3         @ r5 = 3.......2.......1.......0.......
+    and     r6, r12, r4         @ r6 = 7.......6.......5.......4.......
+    orr     r5, r5, r6, lsr #4  @ r5 = 3...7...2...6...1...5...0...4...
+    orr     r5, r5, r5, lsr #9  @ r5 = 3...7...23..67..12..56..01..45..
+    orr     r5, r5, r5, lsr #9  @ r5 = 3...7...23..67..123.567.012.456.
+    orr     r5, r5, r5, lsr #9  @ r5 = 3...7...23..67..123.567.01234567
 
-    mov     r7, #0
-
-    /* set bits 7..3 */
-    tst     r3, #0x80
-    orrne   r7, r7, #0x80
-    tst     r3, #0x8000
-    orrne   r7, r7, #0x40
-    tst     r3, #0x800000
-    orrne   r7, r7, #0x20
-    tst     r3, #0x80000000
-    orrne   r7, r7, #0x10
+    ldmia   r0!, {r6-r7}
     bic     r3, r3, r12
-    add     r3, r3, r5
-
-    /* set bits 3..0 */
-    tst     r4, #0x80
-    orrne   r7, r7, #0x08
-    tst     r4, #0x8000
-    orrne   r7, r7, #0x04
-    tst     r4, #0x800000
-    orrne   r7, r7, #0x02
-    tst     r4, #0x80000000
-    orrne   r7, r7, #0x01
+    add     r3, r3, r6
     bic     r4, r4, r12
-    add     r4, r4, r6
-
+    add     r4, r4, r7
     stmia   r1!, {r3-r4}
 
-    strb    r7, [lr, #0x10]     @ DBOP_DOUT
+    strb    r5, [lr, #0x10]     @ DBOP_DOUT
 
 1:
-    ldr     r5, [lr, #0xC]      @ DBOP_STAT
-    ands    r5, r5, #(1<<6)    @ wait until push fifo is full
+    ldr     r6, [lr, #0xC]      @ DBOP_STAT
+    ands    r6, r6, #(1<<6)     @ wait until push fifo is full
     bne     1b
 
     subs    r2, r2, #1
