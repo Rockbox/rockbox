@@ -1,6 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0">
+<!DOCTYPE TS><TS>
+<context>
+    <name>@default</name>
+    <message>
+        <source>Can&apos;t open file %s!</source>
+        <translation>Não é possível abrir o arquivo %s!</translation>
+    </message>
+    <message>
+        <source>Bootloader size is %d bytes</source>
+        <translation>O tamanho do inicializador é %d bytes</translation>
+    </message>
+    <message>
+        <source>Firmware size is %d bytes</source>
+        <translation>O tamanho do firmware é %d bytes</translation>
+    </message>
+    <message>
+        <source>Can&apos;t allocate %d bytes!</source>
+        <translation>Não é possível alocar %d bytes!</translation>
+    </message>
+    <message>
+        <source>Reading %s into memory...</source>
+        <translation>Lendo %s na memória...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t read file %s to memory!</source>
+        <translation>Não é possível ler o arquivo %s para a memória!</translation>
+    </message>
+    <message>
+        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
+        <translation>O arquivo %s não é um firmware ChinaChip válido!</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
+        <translation>Não foi possível encontrar ccpmp.bin em %s!</translation>
+    </message>
+    <message>
+        <source>Found ccpmp.bin at %d bytes</source>
+        <translation>Encontrando ccpmp.bin no %d bytes</translation>
+    </message>
+    <message>
+        <source>Writing %d bytes to %s...</source>
+        <translation>Escrevendo %d bytes para %s...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t write to file %s!</source>
+        <translation>Não é possível escrever no arquivo %s!</translation>
+    </message>
+    <message>
+        <source>Renaming it to ccpmp.old...</source>
+        <translation>Renomeando-o para ccpmp.old...</translation>
+    </message>
+    <message>
+        <source>Making place for ccpmp.bin...</source>
+        <translation>Dando lugar a ccpmp.bin...</translation>
+    </message>
+    <message>
+        <source>Adding header to %s...</source>
+        <translation>Adicionando cabeçalho para %s...</translation>
+    </message>
+    <message>
+        <source>Can&apos;t obtain current time!</source>
+        <translation>Não foi possível obter a hora atual!</translation>
+    </message>
+    <message>
+        <source>Computing checksum...</source>
+        <translation>Calculando checksum...</translation>
+    </message>
+    <message>
+        <source>Updating main header...</source>
+        <translation>Atualizando cabeçalho principal...</translation>
+    </message>
+    <message>
+        <source>Writing output to %s...</source>
+        <translation>Escrevendo saída para %s...</translation>
+    </message>
+</context>
 <context>
     <name>BootloaderInstallAms</name>
     <message>
@@ -37,7 +110,7 @@
     </message>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
 </context>
 <context>
@@ -295,6 +368,10 @@
         <source>unknown</source>
         <translation>desconhecido</translation>
     </message>
+    <message>
+        <source>Uninstallation not possible, only installation info removed</source>
+        <translation>A desistalação não é possível, apenas a remoção de informação de instalação</translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallIpod</name>
@@ -379,6 +456,10 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <source>Could not open Ipod: permission denied</source>
         <translation>Não foi possível abrir o Ipod: permissão negada</translation>
+    </message>
+    <message>
+        <source>Error: could not retrieve device name</source>
+        <translation>Erro: não foi possível encontrar o nome do dispositivo</translation>
     </message>
 </context>
 <context>
@@ -511,6 +592,10 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
         <source>Writing log aborted</source>
         <translation>Abortada a escrita do log</translation>
     </message>
+    <message>
+        <source>Error: could not retrieve device name</source>
+        <translation>Erro: não foi possível encontrar o nome do dispositivo</translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallTcc</name>
@@ -549,6 +634,10 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <source>Could not patch firmware</source>
         <translation>Não foi possível escrever o arquivo de firmware</translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
     </message>
 </context>
 <context>
@@ -736,20 +825,31 @@ Por favor, configure o motor TTS.</translation>
     </message>
     <message>
         <source>Showing disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrando alvos desabilitados</translation>
     </message>
     <message>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Você acaba de habilitar mostrar alvos que estão marcados como desabilitado. Alvos desabilitado não são recomendados para usuários finais. Por favor, use está opção apenas se você sabe o que está fazendo.</translation>
     </message>
     <message>
         <source>Set Cache Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Definir Caminho do Cache</translation>
     </message>
     <message>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 encontrado &quot;MacPod&quot;!
+O Rockbox precisa de um Ipod formatado como FAT (chamado de &quot;WinPod&quot;) para funcionar.</translation>
+    </message>
+    <message>
+        <source>Proxy Detection</source>
+        <translation>Detecção de Proxy</translation>
+    </message>
+    <message>
+        <source>The System Proxy settings are invalid!
+Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
+        <translation>As configurações de Proxy do Sistema são inválidas!
+O Utilitário Rockbox não funciona com estas configurações de proxy. Certifique-se que o proxy do sistema esteja configurado corretamente. Note que scripts &quot;proxy auto-config (PAC)&quot; não são suportados pelo Utilitário Rockbox. Se seu sistema usa um desses scripts você precisa configurar o proxy manualmente.</translation>
     </message>
 </context>
 <context>
@@ -912,7 +1012,7 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
     </message>
     <message>
         <source>Show disabled targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar alvos desabilitados</translation>
     </message>
 </context>
 <context>
@@ -1125,7 +1225,7 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
     </message>
     <message>
         <source>Select folder to create talk files</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar pasta para criar arquivos talk</translation>
     </message>
 </context>
 <context>
@@ -1191,71 +1291,71 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
     <name>InstallWindowFrm</name>
     <message>
         <source>Install Rockbox</source>
-        <translation type="unfinished">Instalar Rockbox</translation>
+        <translation>Instalar Rockbox</translation>
     </message>
     <message>
         <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation type="unfinished">Por favor, selecione a versão do Rockbox que você deseja instalar em seu reprodutor:</translation>
+        <translation>Por favor, selecione a versão do Rockbox que você deseja instalar em seu reprodutor:</translation>
     </message>
     <message>
         <source>Version</source>
-        <translation type="unfinished">Versão</translation>
+        <translation>Versão</translation>
     </message>
     <message>
         <source>Rockbox &amp;stable</source>
-        <translation type="unfinished">Rockbox E&amp;stável</translation>
+        <translation>Rockbox E&amp;stável</translation>
     </message>
     <message>
         <source>&amp;Archived Build</source>
-        <translation type="unfinished">Compilação &amp;Arquivada</translation>
+        <translation>Compilação &amp;Arquivada</translation>
     </message>
     <message>
         <source>&amp;Current Build</source>
-        <translation type="unfinished">&amp;Compilação Atual</translation>
+        <translation>&amp;Compilação Atual</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Detalhes</translation>
+        <translation>Detalhes</translation>
     </message>
     <message>
         <source>Details about the selected version</source>
-        <translation type="unfinished">Detalhes sobre a versão selecionada</translation>
+        <translation>Detalhes sobre a versão selecionada</translation>
     </message>
     <message>
         <source>Note</source>
-        <translation type="unfinished">Nota</translation>
+        <translation>Nota</translation>
     </message>
     <message>
         <source>&amp;Install</source>
-        <translation type="unfinished">&amp;Instalar</translation>
+        <translation>&amp;Instalar</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Cancelar</translation>
+        <translation>&amp;Cancelar</translation>
     </message>
     <message>
         <source>Backup</source>
-        <translation type="unfinished">Cópia de Segurança</translation>
+        <translation>Cópia de Segurança</translation>
     </message>
     <message>
         <source>Backup before installing</source>
-        <translation type="unfinished">Fazer cópia de segurança antes de instalar</translation>
+        <translation>Fazer cópia de segurança antes de instalar</translation>
     </message>
     <message>
         <source>Backup location</source>
-        <translation type="unfinished">Localização da Cópia de Segurança</translation>
+        <translation>Localização da Cópia de Segurança</translation>
     </message>
     <message>
         <source>Change</source>
-        <translation type="unfinished">Modificar</translation>
+        <translation>Modificar</translation>
     </message>
     <message>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation type="unfinished">O Utilitário Rockbox armazena cópias do Rockbox já transferidas no disco local para economizar tráfego de rede. Se sua cópia local não está mais funcionando, selecione está opção para transferir uma cópia recente.</translation>
+        <translation>O Utilitário Rockbox armazena cópias do Rockbox já transferidas no disco local para economizar tráfego de rede. Se sua cópia local não está mais funcionando, selecione está opção para transferir uma cópia recente.</translation>
     </message>
     <message>
         <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation type="unfinished">&amp;Não usar cópia cacheada localmente</translation>
+        <translation>&amp;Não usar cópia cacheada localmente</translation>
     </message>
 </context>
 <context>
@@ -1354,7 +1454,7 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <source>Can&apos;t get version information.</source>
-        <translation>Não é possível obter informação da versão.</translation>
+        <translation type="obsolete">Não é possível obter informação da versão.</translation>
     </message>
     <message>
         <source>New installation</source>
@@ -1374,7 +1474,7 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation>Erro de rede: %1. Por favor, verifique suas configurações de rede e proxy.</translation>
+        <translation type="obsolete">Erro de rede: %1. Por favor, verifique suas configurações de rede e proxy.</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
@@ -1548,7 +1648,7 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     </message>
     <message>
         <source>No uninstall method known.</source>
-        <translation>Nenhum método de desinstalação conhecido.</translation>
+        <translation type="obsolete">Nenhum método de desinstalação conhecido.</translation>
     </message>
     <message>
         <source>Confirm download</source>
@@ -1610,6 +1710,28 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
         <translation>&lt;b&gt;Nova versão do RockboxUtility disponível.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Baixá-la daqui: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
+    <message>
+        <source>Wine detected!</source>
+        <translation>Detectado Wine!</translation>
+    </message>
+    <message>
+        <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
+        <translation>Parece que você está tentando rodar este programa sob o Wine. Por favor não faça isso, rodar sob o Wine irá falhar. Ao invés disso, use um Linux nativo.</translation>
+    </message>
+    <message>
+        <source>Can&apos;t get version information.
+Network error: %1. Please check your network and proxy settings.</source>
+        <translation>Não é possível obter informação de versão.
+Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</translation>
+    </message>
+    <message>
+        <source>No uninstall method for this target known.</source>
+        <translation>Não é conhecido método de desistalação deste alvo.</translation>
+    </message>
+    <message>
+        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <translation>O Utilitário Rockbox não pode desinstalar o inicializador neste alvo. Tente uma atualização normal de firmware para remover o inicializador.</translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1659,7 +1781,7 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     </message>
     <message>
         <source>&amp;Installation</source>
-        <translation>&amp;Instalação</translation>
+        <translation>Ins&amp;talação</translation>
     </message>
     <message>
         <source>Basic Rockbox installation</source>
@@ -1715,7 +1837,7 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     </message>
     <message>
         <source>&amp;Accessibility</source>
-        <translation>&amp;Acessibilidade</translation>
+        <translation>Acessi&amp;bilidade</translation>
     </message>
     <message>
         <source>Install accessibility add-ons</source>
@@ -1853,7 +1975,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>&amp;Ajuda</translation>
+        <translation>A&amp;juda</translation>
     </message>
     <message>
         <source>Info</source>
@@ -1990,7 +2112,7 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
     <message>
         <source>Save &amp;previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar &amp;anterior</translation>
     </message>
 </context>
 <context>
@@ -2043,19 +2165,19 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <name>TTSCarbon</name>
     <message>
         <source>Voice:</source>
-        <translation type="unfinished">Voz:</translation>
+        <translation>Voz:</translation>
     </message>
     <message>
         <source>Speed (words/min):</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidade (palavras/min):</translation>
     </message>
     <message>
         <source>Could not voice string</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível criar a string de voz</translation>
     </message>
     <message>
         <source>Could not convert intermediate file</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível converter o arquivo intermediário</translation>
     </message>
 </context>
 <context>
@@ -2312,10 +2434,9 @@ código de resposta HTTP: %1</translation>
         <source>Mount point is wrong!</source>
         <translation>O ponto de montagem está incorreto!</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation type="obsolete">
         </translation>
     </message>
 </context>
@@ -2643,7 +2764,7 @@ código de resposta HTTP: %1</translation>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
-    <message utf8="true">
+    <message encoding="UTF-8">
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
