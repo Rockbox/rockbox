@@ -63,8 +63,11 @@ libmkamsboot.commands = @$(MAKE) \
 libmktccboot.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
         libmktccboot$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
-QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot
-PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot
+libmkmpioboot.commands = @$(MAKE) \
+        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
+        libmkmpioboot$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
+PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
@@ -86,7 +89,7 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 
 DEPENDPATH = $$INCLUDEPATH
 
-LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lucl
+LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lmkmpioboot -lucl
 
 # check for system speex. Add a custom rule for pre-building librbspeex if not
 # found. Newer versions of speex are split up into libspeex and libspeexdsp,

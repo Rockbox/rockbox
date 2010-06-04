@@ -29,6 +29,7 @@
 #include "bootloaderinstallchinachip.h"
 #include "bootloaderinstallams.h"
 #include "bootloaderinstalltcc.h"
+#include "bootloaderinstallmpio.h"
 #include "utils.h"
 
 #if defined(Q_OS_MACX)
@@ -63,6 +64,9 @@ BootloaderInstallBase* BootloaderInstallBase::createBootloaderInstaller(QObject*
     }
     else if(type == "tcc") {
         return new BootloaderInstallTcc(parent);
+    }
+    else if(type == "mpio") {
+        return new BootloaderInstallMpio(parent);
     }
     else {
         return NULL;
@@ -212,7 +216,7 @@ QString BootloaderInstallBase::postinstallHints(QString model)
                 "<li>After the firmware has been updated reboot your player.</li>");
     }
     if(model == "iaudiox5" || model == "iaudiom5"
-            || model == "iaudiox5v" || model == "iaudiom3") {
+            || model == "iaudiox5v" || model == "iaudiom3" || model == "mpioh200") {
         hint = true;
         msg += tr("<li>Turn the player off</li>"
                 "<li>Insert the charger</li>");
@@ -224,7 +228,6 @@ QString BootloaderInstallBase::postinstallHints(QString model)
                 "<li>Toggle the battery switch on the player</li>"
                 "<li>Hold <i>Power</i> to boot into Rockbox</li>");
     }
-
     msg += "</ol>";
     msg += tr("<p><b>Note:</b> You can safely install other parts first, but "
             "the above steps are <b>required</b> to finish the installation!</p>");

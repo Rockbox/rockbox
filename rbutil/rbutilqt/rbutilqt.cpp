@@ -43,7 +43,7 @@
 #include "progressloggerinterface.h"
 
 #include "bootloaderinstallbase.h"
-
+#include "bootloaderinstallmpio.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
