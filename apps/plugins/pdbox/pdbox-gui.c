@@ -224,6 +224,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strtok_r(NULL, " ", &saveptr);
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
 
+            /* Reset value. */
+            wg->value = 0;
+
             /* We got one more widget. */
             wg++;
             widgets++;
@@ -245,6 +248,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strtok_r(NULL, " ", &saveptr);
             strtok_r(NULL, " ", &saveptr);
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
+
+            /* Reset value. */
+            wg->value = 0;
 
             /* We got one more widget. */
             wg++;
@@ -269,6 +275,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strtok_r(NULL, " ", &saveptr);
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
 
+            /* Reset value. */
+            wg->value = 0;
+
             /* We got one more widget. */
             wg++;
             widgets++;
@@ -291,6 +300,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strtok_r(NULL, " ", &saveptr);
             strtok_r(NULL, " ", &saveptr);
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
+
+            /* Reset value. */
+            wg->value = 0;
 
             /* We got one more widget. */
             wg++;
@@ -316,6 +328,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
             wg->max--;
 
+            /* Reset value. */
+            wg->value = 0;
+
             /* We got one more widget. */
             wg++;
             widgets++;
@@ -340,6 +355,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
             wg->max--;
 
+            /* Reset value. */
+            wg->value = 0;
+
             /* We got one more widget. */
             wg++;
             widgets++;
@@ -363,6 +381,9 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
             strncpy(wg->name, strtok_r(NULL, " ", &saveptr), sizeof(wg->name));
             wg->min = 0;
             wg->max = 1;
+
+            /* Reset value. */
+            wg->value = 0;
 
             /* Clear timeout flag. */
             wg->timeout = 0;
