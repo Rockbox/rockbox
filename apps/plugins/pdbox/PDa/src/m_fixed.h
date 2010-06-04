@@ -16,7 +16,8 @@ typedef int t_sample;
 
 /* fixed point multiplication and division */
 
-#if defined(ROCKBOX) && defined(CPU_ARM)
+#ifdef ROCKBOX
+#if defined(CPU_ARM)
 #define mult(A,B) \
      ({ \
         t_fixed lo; \
@@ -30,10 +31,28 @@ typedef int t_sample;
         lo; \
      })
 #define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
-#else /* ROCKBOX && CPU_ARM */
+#elif defined(CPU_COLDFIRE)
+#define mult(a,b) mult_cf((a),(b))
+static inline t_fixed mult_cf(t_fixed x, t_fixed y)
+{
+    t_fixed t1, t2;
+    asm volatile (
+       "mac.l   %[x],%[y],%%acc0 \n" /* multiply */
+       "mulu.l  %[y],%[x]        \n" /* get low half, avoid emac stall */
+       "movclr.l %%acc0,%[t1]    \n" /* get higher half */
+       "asl.l   %[shl],%[t1]     \n" /* hi <<= 13, plus one free */
+       "lsr.l   %[shr],%[x]      \n" /* (unsigned)lo >>= 18 */
+       "or.l    %[x],%[t1]       \n" /* combine result */
+       : [t1]"=&d"(t1), [t2]"=&d"(t2), [x]"+d"(x)
+       : [y]"d"(y), [shl]"d"(31-fix1), [shr]"d"(fix1));
+    return t1;
+}
+#define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
+#endif /* CPU_... */
+#else /* ROCKBOX */
 #define mult(a,b) (long long)(((long long) (a) * (long long) (b))>>fix1)
 #define idiv(a,b) ((((long long) (a) )<<fix1)/(long long) (b) )
-#endif /* ROCKBOX && CPU_ARM */
+#endif /* ROCKBOX */
 
 /* conversion macros */
 
