@@ -135,8 +135,8 @@ print "cd tools && make\n" if($verbose);
 `(cd tools && make ) >/dev/null`;
 
 for my $b (&stablebuilds) {
-    my $configname = $builds{b}{configname} ? $builds{b}{configname} : $b;
-    runone($b, $configname, $builds{b}{ram});
+    my $configname = $builds{$b}{configname} ? $builds{$b}{configname} : $b;
+    runone($b, $configname, $builds{$b}{ram});
 }
 
 fonts("fonts", "iaudiox5");
