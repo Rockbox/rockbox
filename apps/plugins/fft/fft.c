@@ -22,6 +22,7 @@
 
 #include "lib/helper.h"
 #include "lib/xlcd.h"
+#include "lib/mylcd.h"
 #include "math.h"
 #include "fracmul.h"
 
@@ -255,16 +256,6 @@ GREY_INFO_STRUCT
 #define FFT_SIZE 2048 /* 1024*2 */
 #else
 #define FFT_SIZE 4096 /* 2048*2 */
-#endif
-
-#ifdef HAVE_LCD_COLOR
-#define lcd_(fn)        rb->lcd_##fn
-#define lcd_scroll_up   xlcd_scroll_up
-#define lcd_scroll_left xlcd_scroll_left
-#else
-#define lcd_(fn)        grey_##fn
-#define lcd_scroll_up   grey_scroll_up
-#define lcd_scroll_left grey_scroll_left
 #endif
 
 #define ARRAYLEN_IN (FFT_SIZE)
@@ -568,15 +559,14 @@ static void draw_bars_horizontal(void);
 static void draw_spectrogram_vertical(void);
 static void draw_spectrogram_horizontal(void);
 
+#define COLOR_DEFAULT_FG    MYLCD_DEFAULT_FG
+#define COLOR_DEFAULT_BG    MYLCD_DEFAULT_BG
+
 #ifdef HAVE_LCD_COLOR
-#define COLOR_DEFAULT_FG    LCD_DEFAULT_FG
-#define COLOR_DEFAULT_BG    LCD_DEFAULT_BG
 #define COLOR_MESSAGE_FRAME LCD_RGBPACK(0xc6, 0x00, 0x00)
 #define COLOR_MESSAGE_BG    LCD_BLACK
 #define COLOR_MESSAGE_FG    LCD_WHITE
 #else
-#define COLOR_DEFAULT_FG    GREY_BLACK
-#define COLOR_DEFAULT_BG    GREY_WHITE
 #define COLOR_MESSAGE_FRAME GREY_DARKGRAY
 #define COLOR_MESSAGE_BG    GREY_WHITE
 #define COLOR_MESSAGE_FG    GREY_BLACK
@@ -588,7 +578,7 @@ static void draw_spectrogram_horizontal(void);
 static void draw_message_string(const unsigned char *message, bool active)
 {
     int x, y;
-    lcd_(getstringsize)(message, &x, &y);
+    mylcd_getstringsize(message, &x, &y);
 
     /* x and y give the size of the box for the popup */
     x += POPUP_HPADDING*2;
@@ -601,20 +591,20 @@ static void draw_message_string(const unsigned char *message, bool active)
        graph_settings.orientation_vertical &&
        graph_settings.spectrogram_pos >= LCD_WIDTH - x) 
     {
-        lcd_scroll_left(graph_settings.spectrogram_pos -
-                        LCD_WIDTH + x);
+        mylcd_scroll_left(graph_settings.spectrogram_pos -
+                          LCD_WIDTH + x);
         graph_settings.spectrogram_pos = LCD_WIDTH - x - 1;
     }
 
-    lcd_(set_foreground)(COLOR_MESSAGE_FRAME);
-    lcd_(fillrect)(LCD_WIDTH - x, 0, LCD_WIDTH - 1, y);
+    mylcd_set_foreground(COLOR_MESSAGE_FRAME);
+    mylcd_fillrect(LCD_WIDTH - x, 0, LCD_WIDTH - 1, y);
 
-    lcd_(set_foreground)(COLOR_MESSAGE_FG);
-    lcd_(set_background)(COLOR_MESSAGE_BG);
-    lcd_(putsxy)(LCD_WIDTH - x + POPUP_HPADDING,
+    mylcd_set_foreground(COLOR_MESSAGE_FG);
+    mylcd_set_background(COLOR_MESSAGE_BG);
+    mylcd_putsxy(LCD_WIDTH - x + POPUP_HPADDING,
                  POPUP_VPADDING, message);
-    lcd_(set_foreground)(COLOR_DEFAULT_FG);
-    lcd_(set_background)(COLOR_DEFAULT_BG);
+    mylcd_set_foreground(COLOR_DEFAULT_FG);
+    mylcd_set_background(COLOR_DEFAULT_BG);
 }
 
 static void draw(const unsigned char* message)
@@ -647,15 +637,15 @@ static void draw(const unsigned char* message)
     if(graph_settings.changed.freq_scale)
         graph_settings.changed.freq_scale = true;
 
-    lcd_(set_foreground)(COLOR_DEFAULT_FG);
-    lcd_(set_background)(COLOR_DEFAULT_BG);
+    mylcd_set_foreground(COLOR_DEFAULT_FG);
+    mylcd_set_background(COLOR_DEFAULT_BG);
 
     switch (graph_settings.mode)
     {
         default:
         case FFT_DM_LINES: {
 
-            lcd_(clear_display)();
+            mylcd_clear_display();
 
             if (graph_settings.orientation_vertical)
                 draw_lines_vertical();
@@ -665,7 +655,7 @@ static void draw(const unsigned char* message)
         }
         case FFT_DM_BARS: {
 
-            lcd_(clear_display());
+            mylcd_clear_display();
 
             if(graph_settings.orientation_vertical)
                 draw_bars_vertical();
@@ -679,7 +669,7 @@ static void draw(const unsigned char* message)
             if(graph_settings.changed.do_clear)
             {
                 graph_settings.spectrogram_pos = 0;
-                lcd_(clear_display)();
+                mylcd_clear_display();
             }
 
             if(graph_settings.orientation_vertical)
@@ -709,7 +699,7 @@ static void draw(const unsigned char* message)
         {
     		/* Spectrogram mode - need to erase the popup */
 			int x, y;
-			lcd_(getstringsize)(last_message, &x, &y);
+			mylcd_getstringsize(last_message, &x, &y);
 			/* Recalculate the size */
 			x += POPUP_HPADDING*2;
 			y += POPUP_VPADDING*2;
@@ -717,7 +707,7 @@ static void draw(const unsigned char* message)
 			if(!graph_settings.orientation_vertical)
 			{
 				/* In horizontal spectrogram mode, just scroll up by Y lines */
-				lcd_scroll_up(y);
+				mylcd_scroll_up(y);
 				graph_settings.spectrogram_pos -= y;
 				if(graph_settings.spectrogram_pos < 0)
 					graph_settings.spectrogram_pos = 0;
@@ -725,10 +715,10 @@ static void draw(const unsigned char* message)
 			else
 			{
 				/* In vertical spectrogram mode, erase the popup */
-                lcd_(set_foreground)(COLOR_DEFAULT_BG);
-				lcd_(fillrect)(graph_settings.spectrogram_pos + 1, 0,
+                mylcd_set_foreground(COLOR_DEFAULT_BG);
+				mylcd_fillrect(graph_settings.spectrogram_pos + 1, 0,
                                LCD_WIDTH, y);
-                lcd_(set_foreground)(COLOR_DEFAULT_FG);
+                mylcd_set_foreground(COLOR_DEFAULT_FG);
 			}
         }
         /* else These modes clear the screen themselves */
@@ -736,7 +726,7 @@ static void draw(const unsigned char* message)
         last_message = NULL;
     }
 
-    lcd_(update)();
+    mylcd_update();
 
     graph_settings.changed.clear_all = false;
 }
@@ -763,7 +753,7 @@ static void draw_lines_vertical(void)
 
     if(this_max == 0)
     {
-        lcd_(hline)(0, LCD_WIDTH - 1, LCD_HEIGHT - 1); /* Draw all "zero" */
+        mylcd_hline(0, LCD_WIDTH - 1, LCD_HEIGHT - 1); /* Draw all "zero" */
         return;
     }
 
@@ -812,7 +802,7 @@ static void draw_lines_vertical(void)
     for(x = 0; x < plotwidth; ++x)
     {
         int h = LCD_HEIGHT*plot[x] / max;
-        lcd_(vline)(x + offset, LCD_HEIGHT - h, LCD_HEIGHT-1);
+        mylcd_vline(x + offset, LCD_HEIGHT - h, LCD_HEIGHT-1);
     }
 }
 
@@ -838,7 +828,7 @@ static void draw_lines_horizontal(void)
 
     if(this_max == 0)
     {
-        lcd_(vline)(0, 0, LCD_HEIGHT-1); /* Draw all "zero" */
+        mylcd_vline(0, 0, LCD_HEIGHT-1); /* Draw all "zero" */
         return;
     }
 
@@ -888,7 +878,7 @@ static void draw_lines_horizontal(void)
     for(y = 0; y < plotwidth; ++y)
     {
         int w = LCD_WIDTH*plot[y] / max;
-        lcd_(hline)(0, w - 1, y + offset);
+        mylcd_hline(0, w - 1, y + offset);
     }
 }
 
@@ -909,7 +899,7 @@ static void draw_bars_vertical(void)
     if(graph_settings.changed.amp_scale)
         max = 0; /* reset the graph on scaling mode change */
 
-    lcd_(hline)(0, LCD_WIDTH-1, LCD_HEIGHT-1); /* Draw baseline */
+    mylcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-1); /* Draw baseline */
 
     if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
         return; /* nothing more to draw */
@@ -948,7 +938,7 @@ static void draw_bars_vertical(void)
     for(i = 0, x = offset; i < bars; ++i, x += barwidth)
     {
         int h = LCD_HEIGHT * plot[i] / max;
-        lcd_(fillrect)(x, LCD_HEIGHT - h, width, h - 1);
+        mylcd_fillrect(x, LCD_HEIGHT - h, width, h - 1);
     }
 }
 
@@ -969,7 +959,7 @@ static void draw_bars_horizontal(void)
     if(graph_settings.changed.amp_scale)
         max = 0; /* reset the graph on scaling mode change */
 
-    lcd_(vline)(0, 0, LCD_HEIGHT-1); /* Draw baseline */
+    mylcd_vline(0, 0, LCD_HEIGHT-1); /* Draw baseline */
 
     if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
         return; /* nothing more to draw */
@@ -1008,7 +998,7 @@ static void draw_bars_horizontal(void)
     for(i = 0, y = offset; i < bars; ++i, y += barwidth)
     {
         int w = LCD_WIDTH * plot[i] / max;
-        lcd_(fillrect)(1, y, w, height);
+        mylcd_fillrect(1, y, w, height);
     }
 }
 
@@ -1048,8 +1038,8 @@ static void draw_spectrogram_vertical(void)
             if(index >= SHADES)
                 index = SHADES-1;
 
-            lcd_(set_foreground)(SPECTROGRAPH_PALETTE(index));
-            lcd_(drawpixel)(graph_settings.spectrogram_pos,
+            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
+            mylcd_drawpixel(graph_settings.spectrogram_pos,
                             scale_factor-1 - y);
 
             if(++y >= scale_factor)
@@ -1063,7 +1053,7 @@ static void draw_spectrogram_vertical(void)
     if(graph_settings.spectrogram_pos < LCD_WIDTH-1)
         graph_settings.spectrogram_pos++;
     else
-        lcd_scroll_left(1);
+        mylcd_scroll_left(1);
 }
 
 static void draw_spectrogram_horizontal(void)
@@ -1102,8 +1092,8 @@ static void draw_spectrogram_horizontal(void)
             if(index >= SHADES)
                 index = SHADES-1;
 
-            lcd_(set_foreground)(SPECTROGRAPH_PALETTE(index));
-            lcd_(drawpixel)(x, graph_settings.spectrogram_pos);
+            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
+            mylcd_drawpixel(x, graph_settings.spectrogram_pos);
 
             if(++x >= scale_factor)
                 break;
@@ -1116,7 +1106,7 @@ static void draw_spectrogram_horizontal(void)
     if(graph_settings.spectrogram_pos < LCD_HEIGHT-1)
         graph_settings.spectrogram_pos++;
     else
-        lcd_scroll_up(1);
+        mylcd_scroll_up(1);
 }
 
 /********************* End of plotting functions (modes) *********************/
@@ -1334,8 +1324,8 @@ enum plugin_status plugin_start(const void* parameter)
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-    lcd_(clear_display)();
-    lcd_(update)();
+    mylcd_clear_display();
+    mylcd_update();
 #endif
     backlight_force_on();
 
@@ -1357,9 +1347,9 @@ enum plugin_status plugin_start(const void* parameter)
             if(!rb->pcm_is_playing())
             {
                 showing_warning = true;
-                lcd_(clear_display)();
+                mylcd_clear_display();
                 draw_message_string("No audio playing", false);
-                lcd_(update)();
+                mylcd_update();
                 timeout = HZ/5;
             }
             else
@@ -1367,8 +1357,8 @@ enum plugin_status plugin_start(const void* parameter)
                 if(showing_warning)
                 {
                     showing_warning = false;
-                    lcd_(clear_display)();
-                    lcd_(update)();
+                    mylcd_clear_display();
+                    mylcd_update();
                 }
 
                 timeout = HZ/100; /* 'till end of curent tick, don't use 100% CPU */

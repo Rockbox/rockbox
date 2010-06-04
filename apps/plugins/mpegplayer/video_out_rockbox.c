@@ -86,16 +86,16 @@ static void vo_draw_black(void)
 
     video_lock();
 
-    foreground = lcd_(get_foreground)();
+    foreground = mylcd_get_foreground();
 
-    lcd_(set_foreground)(DRAW_BLACK);
+    mylcd_set_foreground(MYLCD_BLACK);
 
-    lcd_(fillrect)(vo.output_x, vo.output_y, vo.output_width,
+    mylcd_fillrect(vo.output_x, vo.output_y, vo.output_width,
                    vo.output_height);
-    lcd_(update_rect)(vo.output_x, vo.output_y, vo.output_width,
+    mylcd_update_rect(vo.output_x, vo.output_y, vo.output_width,
                       vo.output_height);
 
-    lcd_(set_foreground)(foreground);
+    mylcd_set_foreground(foreground);
 
     video_unlock();
 }

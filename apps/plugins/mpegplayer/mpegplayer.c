@@ -473,7 +473,7 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
  * The origin is the upper-left corner of the OSD area */
 static void draw_update_rect(int x, int y, int width, int height)
 {
-    lcd_(update_rect)(_X, _Y, _W, _H);
+    mylcd_update_rect(_X, _Y, _W, _H);
 }
 
 static void draw_clear_area(int x, int y, int width, int height)
@@ -495,34 +495,34 @@ static void draw_clear_area_rect(const struct vo_rect *rc)
 
 static void draw_fillrect(int x, int y, int width, int height)
 {
-    lcd_(fillrect)(_X, _Y, _W, _H);
+    mylcd_fillrect(_X, _Y, _W, _H);
 }
 
 static void draw_hline(int x1, int x2, int y)
 {
 #ifdef LCD_LANDSCAPE
-    lcd_(hline)(x1 + osd.x, x2 + osd.x, y + osd.y);
+    mylcd_hline(x1 + osd.x, x2 + osd.x, y + osd.y);
 #else
     y = LCD_WIDTH - (y + osd.y) - 1;
-    lcd_(vline)(y, x1 + osd.x, x2 + osd.x);
+    mylcd_vline(y, x1 + osd.x, x2 + osd.x);
 #endif
 }
 
 static void draw_vline(int x, int y1, int y2)
 {
 #ifdef LCD_LANDSCAPE
-    lcd_(vline)(x + osd.x, y1 + osd.y, y2 + osd.y);
+    mylcd_vline(x + osd.x, y1 + osd.y, y2 + osd.y);
 #else
     y1 = LCD_WIDTH - (y1 + osd.y) - 1;
     y2 = LCD_WIDTH - (y2 + osd.y) - 1;
-    lcd_(hline)(y1, y2, x + osd.x);
+    mylcd_hline(y1, y2, x + osd.x);
 #endif
 }
 
 static void draw_scrollbar_draw(int x, int y, int width, int height,
                                 uint32_t min, uint32_t max, uint32_t val)
 {
-    unsigned oldfg = lcd_(get_foreground)();
+    unsigned oldfg = mylcd_get_foreground();
 
     draw_hline(x + 1, x + width - 2, y);
     draw_hline(x + 1, x + width - 2, y + height - 1);
@@ -534,11 +534,11 @@ static void draw_scrollbar_draw(int x, int y, int width, int height,
 
     draw_fillrect(x + 1, y + 1, val, height - 2);
 
-    lcd_(set_foreground)(osd.prog_fillcolor);
+    mylcd_set_foreground(osd.prog_fillcolor);
 
     draw_fillrect(x + 1 + val, y + 1, width - 2 - val, height - 2);
 
-    lcd_(set_foreground)(oldfg);
+    mylcd_set_foreground(oldfg);
 }
 
 static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int min,
@@ -656,18 +656,18 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
                                            int stride, int x, int y,
                                            int width, int height)
 {
-    int mode = lcd_(get_drawmode)();
-    lcd_(set_drawmode)(DRMODE_FG);
-    lcd_(mono_bitmap_part)(src, src_x, src_y, stride, x, y, width, height);
-    lcd_(set_drawmode)(mode);
+    int mode = mylcd_get_drawmode();
+    mylcd_set_drawmode(DRMODE_FG);
+    mylcd_mono_bitmap_part(src, src_x, src_y, stride, x, y, width, height);
+    mylcd_set_drawmode(mode);
 }
 
 static void draw_putsxy_oriented(int x, int y, const char *str)
 {
-    int mode = lcd_(get_drawmode)();
-    lcd_(set_drawmode)(DRMODE_FG);
-    lcd_(putsxy)(x + osd.x, y + osd.y, str);
-    lcd_(set_drawmode)(mode);
+    int mode = mylcd_get_drawmode();
+    mylcd_set_drawmode(DRMODE_FG);
+    mylcd_putsxy(x + osd.x, y + osd.y, str);
+    mylcd_set_drawmode(mode);
 }
 #endif /* LCD_PORTRAIT */
 
@@ -718,7 +718,7 @@ static void osd_text_init(void)
     int phys;
     int spc_width;
 
-    lcd_(setfont)(FONT_UI);
+    mylcd_setfont(FONT_UI);
 
     osd.x = 0;
     osd.width = SCREEN_WIDTH;
@@ -730,7 +730,7 @@ static void osd_text_init(void)
 
     ts_to_hms(stream_get_duration(), &hms);
     hms_format(buf, sizeof (buf), &hms);
-    lcd_(getstringsize)(buf, &osd.time_rect.r, &osd.time_rect.b);
+    mylcd_getstringsize(buf, &osd.time_rect.r, &osd.time_rect.b);
 
     /* Choose well-sized bitmap images relative to font height */
     if (osd.time_rect.b < 12) {
@@ -760,8 +760,8 @@ static void osd_text_init(void)
     rb->snprintf(buf, sizeof(buf), "%d%s", phys,
                  rb->sound_unit(SOUND_VOLUME));
 
-    lcd_(getstringsize)(" ", &spc_width, NULL);
-    lcd_(getstringsize)(buf, &osd.vol_rect.r, &osd.vol_rect.b);
+    mylcd_getstringsize(" ", &spc_width, NULL);
+    mylcd_getstringsize(buf, &osd.vol_rect.r, &osd.vol_rect.b);
 
     osd.prog_rect.r = SCREEN_WIDTH - OSD_BDR_L - spc_width -
                            osd.vol_rect.r - OSD_BDR_R;
@@ -787,7 +787,7 @@ static void osd_text_init(void)
 #endif
     osd.y = SCREEN_HEIGHT - osd.height;
 
-    lcd_(setfont)(FONT_SYSFIXED);
+    mylcd_setfont(FONT_SYSFIXED);
 }
 
 static void osd_init(void)
@@ -836,39 +836,39 @@ static void osd_refresh_background(void)
     char buf[32];
     struct hms hms;
 
-    unsigned bg = lcd_(get_background)();
-    lcd_(set_drawmode)(DRMODE_SOLID | DRMODE_INVERSEVID);
+    unsigned bg = mylcd_get_background();
+    mylcd_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
 
 #ifdef HAVE_LCD_COLOR
     /* Draw a "raised" area for our graphics */
-    lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 192));
+    mylcd_set_background(draw_blendcolor(bg, MYLCD_WHITE, 192));
     draw_hline(0, osd.width, 0);
 
-    lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 80));
+    mylcd_set_background(draw_blendcolor(bg, MYLCD_WHITE, 80));
     draw_hline(0, osd.width, 1);
 
-    lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 48));
+    mylcd_set_background(draw_blendcolor(bg, MYLCD_BLACK, 48));
     draw_hline(0, osd.width, osd.height-2);
 
-    lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 128));
+    mylcd_set_background(draw_blendcolor(bg, MYLCD_BLACK, 128));
     draw_hline(0, osd.width, osd.height-1);
 
-    lcd_(set_background)(bg);
+    mylcd_set_background(bg);
     draw_clear_area(0, 2, osd.width, osd.height - 4);
 #else
     /* Give contrast with the main background */
-    lcd_(set_background)(GREY_WHITE);
+    mylcd_set_background(MYLCD_WHITE);
     draw_hline(0, osd.width, 0);
 
-    lcd_(set_background)(GREY_DARKGRAY);
+    mylcd_set_background(MYLCD_DARKGRAY);
     draw_hline(0, osd.width, osd.height-1);
 
-    lcd_(set_background)(bg);
+    mylcd_set_background(bg);
     draw_clear_area(0, 1, osd.width, osd.height - 2);
 #endif
 
     vo_rect_set_ext(&osd.update_rect, 0, 0, osd.width, osd.height);
-    lcd_(set_drawmode)(DRMODE_SOLID);
+    mylcd_set_drawmode(DRMODE_SOLID);
 
     if (stream_get_duration() != INVALID_TIMESTAMP) {
         /* Draw the movie duration */
@@ -912,7 +912,7 @@ static void osd_refresh_volume(void)
     rb->snprintf(buf, sizeof (buf), "%d%s",
                  rb->sound_val2phys(SOUND_VOLUME, volume),
                  rb->sound_unit(SOUND_VOLUME));
-    lcd_(getstringsize)(buf, &width, NULL);
+    mylcd_getstringsize(buf, &width, NULL);
 
     /* Right-justified */
     draw_clear_area_rect(&osd.vol_rect);
@@ -930,11 +930,11 @@ static void osd_refresh_status(void)
 
 #ifdef HAVE_LCD_COLOR
     /* Draw status icon with a drop shadow */
-    unsigned oldfg = lcd_(get_foreground)();
+    unsigned oldfg = mylcd_get_foreground();
     int i = 1;
 
-    lcd_(set_foreground)(draw_blendcolor(lcd_(get_background)(),
-                         DRAW_BLACK, 96));
+    mylcd_set_foreground(draw_blendcolor(mylcd_get_background(),
+                        MYLCD_BLACK, 96));
 
     while (1)
     {
@@ -949,7 +949,7 @@ static void osd_refresh_status(void)
         if (--i < 0)
             break;
 
-        lcd_(set_foreground)(oldfg);
+        mylcd_set_foreground(oldfg);
     }
 
     vo_rect_union(&osd.update_rect, &osd.update_rect, &osd.stat_rect);
@@ -1076,12 +1076,12 @@ static void osd_refresh(int hint)
 
     /* Set basic drawing params that are used. Elements that perform variations
      * will restore them. */
-    oldfg = lcd_(get_foreground)();
-    oldbg = lcd_(get_background)();
+    oldfg = mylcd_get_foreground();
+    oldbg = mylcd_get_background();
 
-    lcd_(setfont)(FONT_UI);
-    lcd_(set_foreground)(osd.fgcolor);
-    lcd_(set_background)(osd.bgcolor);
+    mylcd_setfont(FONT_UI);
+    mylcd_set_foreground(osd.fgcolor);
+    mylcd_set_background(osd.bgcolor);
 
     vo_rect_clear(&osd.update_rect);
 
@@ -1103,9 +1103,9 @@ static void osd_refresh(int hint)
     }
 
     /* Go back to defaults */
-    lcd_(setfont)(FONT_SYSFIXED);
-    lcd_(set_foreground)(oldfg);
-    lcd_(set_background)(oldbg);
+    mylcd_setfont(FONT_SYSFIXED);
+    mylcd_set_foreground(oldfg);
+    mylcd_set_background(oldbg);
 
     /* Update the dirty rectangle */
     vo_lock();

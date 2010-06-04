@@ -67,23 +67,13 @@
 #define DISK_GUARDBUF_SIZE     ALIGN_UP(65535+6, 4)
 
 #ifdef HAVE_LCD_COLOR
-#define DRAW_BLACK            LCD_BLACK
-#define DRAW_DARKGRAY         LCD_DARKGRAY
-#define DRAW_LIGHTGRAY        LCD_LIGHTGRAY
-#define DRAW_WHITE            LCD_WHITE
-#define lcd_(fn)              rb->lcd_##fn
-#define lcd_splash            splash
-
+#define mylcd_splash         rb->splash
 #else
-
 #include "lib/grey.h"
-#define DRAW_BLACK            GREY_BLACK
-#define DRAW_DARKGRAY         GREY_DARKGRAY
-#define DRAW_LIGHTGRAY        GREY_LIGHTGRAY
-#define DRAW_WHITE            GREY_WHITE
-#define lcd_(fn)              grey_##fn
-
+#define mylcd_splash         grey_splash
 #endif
+
+#include "lib/mylcd.h"
 
 #include "mpeg2.h"
 #include "video_out.h"

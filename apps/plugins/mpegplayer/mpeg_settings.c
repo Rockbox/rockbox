@@ -540,11 +540,11 @@ static void grey_splash(int ticks, const unsigned char *fmt, ...)
 
 static void show_loading(struct vo_rect *rc)
 {
-    int oldmode = lcd_(get_drawmode)();
-    lcd_(set_drawmode)(DRMODE_SOLID | DRMODE_INVERSEVID);
-    lcd_(fillrect)(rc->l-1, rc->t-1, rc->r - rc->l + 2, rc->b - rc->t + 2);
-    lcd_(set_drawmode)(oldmode);
-    lcd_(splash)(0, "Loading...");
+    int oldmode = mylcd_get_drawmode();
+    mylcd_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    mylcd_fillrect(rc->l-1, rc->t-1, rc->r - rc->l + 2, rc->b - rc->t + 2);
+    mylcd_set_drawmode(oldmode);
+    mylcd_splash(0, "Loading...");
 }
 
 static void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
@@ -567,36 +567,36 @@ static void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
     /* Put positition on left */
     ts_to_hms(pos, &hms);
     hms_format(str, sizeof(str), &hms);
-    lcd_(getstringsize)(str, NULL, &text_h);
+    mylcd_getstringsize(str, NULL, &text_h);
     text_y = SLIDER_Y - SLIDER_TEXTMARGIN - text_h;
 
     if (rc == NULL)
     {
-        int oldmode = lcd_(get_drawmode)();
-        lcd_(set_drawmode)(DRMODE_BG | DRMODE_INVERSEVID);
-        lcd_(fillrect)(SLIDER_X, text_y, SLIDER_WIDTH,
+        int oldmode = mylcd_get_drawmode();
+        mylcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
+        mylcd_fillrect(SLIDER_X, text_y, SLIDER_WIDTH,
                        LCD_HEIGHT - SLIDER_BMARGIN - text_y
                        - SLIDER_TMARGIN);
-        lcd_(set_drawmode)(oldmode);
+        mylcd_set_drawmode(oldmode);
 
-        lcd_(putsxy)(SLIDER_X, text_y, str);
+        mylcd_putsxy(SLIDER_X, text_y, str);
 
         /* Put duration on right */
         ts_to_hms(range, &hms);
         hms_format(str, sizeof(str), &hms);
-        lcd_(getstringsize)(str, &text_w, NULL);
+        mylcd_getstringsize(str, &text_w, NULL);
 
-        lcd_(putsxy)(SLIDER_X + SLIDER_WIDTH - text_w, text_y, str);
+        mylcd_putsxy(SLIDER_X + SLIDER_WIDTH - text_w, text_y, str);
 
         /* Draw slider */
-        lcd_(drawrect)(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
-        lcd_(fillrect)(SLIDER_X, SLIDER_Y,
-                       muldiv_uint32(pos, SLIDER_WIDTH, range),
-                       SLIDER_HEIGHT);
+        mylcd_drawrect(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
+        mylcd_fillrect(SLIDER_X, SLIDER_Y,
+                      muldiv_uint32(pos, SLIDER_WIDTH, range),
+                      SLIDER_HEIGHT);
 
         /* Update screen */
-        lcd_(update_rect)(SLIDER_X, text_y - SLIDER_TMARGIN, SLIDER_WIDTH,
-                          LCD_HEIGHT - SLIDER_BMARGIN - text_y + SLIDER_TEXTMARGIN);
+        mylcd_update_rect(SLIDER_X, text_y - SLIDER_TMARGIN, SLIDER_WIDTH,
+                         LCD_HEIGHT - SLIDER_BMARGIN - text_y + SLIDER_TEXTMARGIN);
     }
     else
     {
@@ -612,28 +612,28 @@ static bool display_thumb_image(const struct vo_rect *rc)
 {
     if (!stream_display_thumb(rc))
     {
-        lcd_(splash)(0, "Frame not available");
+        mylcd_splash(0, "Frame not available");
         return false;
     }
 
     /* Draw a raised border around the frame */
-    int oldcolor = lcd_(get_foreground)();
-    lcd_(set_foreground)(DRAW_LIGHTGRAY);
+    int oldcolor = mylcd_get_foreground();
+    mylcd_set_foreground(MYLCD_LIGHTGRAY);
 
-    lcd_(hline)(rc->l-1, rc->r-1, rc->t-1);
-    lcd_(vline)(rc->l-1, rc->t, rc->b-1);
+    mylcd_hline(rc->l-1, rc->r-1, rc->t-1);
+    mylcd_vline(rc->l-1, rc->t, rc->b-1);
 
-    lcd_(set_foreground)(DRAW_DARKGRAY);
+    mylcd_set_foreground(MYLCD_DARKGRAY);
 
-    lcd_(hline)(rc->l-1, rc->r, rc->b);
-    lcd_(vline)(rc->r, rc->t-1, rc->b);
+    mylcd_hline(rc->l-1, rc->r, rc->b);
+    mylcd_vline(rc->r, rc->t-1, rc->b);
 
-    lcd_(set_foreground)(oldcolor);
+    mylcd_set_foreground(oldcolor);
 
-    lcd_(update_rect)(rc->l-1, rc->t-1, rc->r - rc->l + 2, 1);
-    lcd_(update_rect)(rc->l-1, rc->t, 1, rc->b - rc->t);
-    lcd_(update_rect)(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
-    lcd_(update_rect)(rc->r, rc->t, 1, rc->b - rc->t);
+    mylcd_update_rect(rc->l-1, rc->t-1, rc->r - rc->l + 2, 1);
+    mylcd_update_rect(rc->l-1, rc->t, 1, rc->b - rc->t);
+    mylcd_update_rect(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
+    mylcd_update_rect(rc->r, rc->t, 1, rc->b - rc->t);
 
     return true;
 }
@@ -679,8 +679,8 @@ static int get_start_time(uint32_t duration)
 
     enum state_enum slider_state = STATE0;
 
-    lcd_(clear_display)();
-    lcd_(update)();
+    mylcd_clear_display();
+    mylcd_update();
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     rb->add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);

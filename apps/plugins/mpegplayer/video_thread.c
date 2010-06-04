@@ -80,10 +80,10 @@ static void draw_fps(struct video_thread_data *td)
                  td->info->display_picture->temporal_reference,
                  /* Audio information */
                  buf_pct, pcm_underruns, pcm_skipped);
-    lcd_(putsxy)(0, 0, str);
+    mylcd_putsxy(0, 0, str);
 
     vo_lock();
-    lcd_(update_rect)(0, 0, LCD_WIDTH, 8);
+    mylcd_update_rect(0, 0, LCD_WIDTH, 8);
     vo_unlock();
 
     td->last_showfps = *rb->current_tick;
