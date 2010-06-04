@@ -57,33 +57,39 @@ void EditorWindow::setupUI()
     model->setRootPath(QDir::currentPath());
     ui->fileTree->setModel(model);
 
-    /* Establishing the parse tree */
-    tree = new ParseTreeModel(ui->codeEdit->document()->toPlainText().
-                              toAscii());
-    ui->parseTree->setModel(tree);
-
-    /* Setting up the syntax highlighter */
-    highlighter = new SkinHighlighter(QColor(0,255,0), QColor(255,0,0),
-                                      QColor(0,0,255), QColor(150,150,150),
-                                      ui->codeEdit->document());
-
     /* Connecting the buttons */
-    QObject::connect(ui->codeEdit, SIGNAL(cursorPositionChanged()),
-                     this, SLOT(codeChanged()));
     QObject::connect(ui->fromTree, SIGNAL(pressed()),
                      this, SLOT(updateCode()));
-
 }
 
 void EditorWindow::setupMenus()
 {
-    /* When there are menus to setup, they'll be set up here */
+    /* Connecting panel show actions */
+    QObject::connect(ui->actionFile_Panel, SIGNAL(triggered()),
+                     this, SLOT(showPanel()));
+    QObject::connect(ui->actionDisplay_Panel, SIGNAL(triggered()),
+                     this, SLOT(showPanel()));
+    QObject::connect(ui->actionPreview_Panel, SIGNAL(triggered()),
+                     this, SLOT(showPanel()));
 }
 
 void EditorWindow::codeChanged()
 {
-    tree->changeTree(ui->codeEdit->document()->toPlainText().toAscii());
     ui->parseTree->expandAll();
+}
+
+void EditorWindow::updateCode()
+{
+}
+
+void EditorWindow::showPanel()
+{
+    if(sender() == ui->actionFile_Panel)
+        ui->fileDock->setVisible(true);
+    if(sender() == ui->actionPreview_Panel)
+        ui->skinPreviewDock->setVisible(true);
+    if(sender() == ui->actionDisplay_Panel)
+        ui->parseTreeDock->setVisible(true);
 }
 
 void EditorWindow::closeEvent(QCloseEvent* event)
@@ -91,15 +97,7 @@ void EditorWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-void EditorWindow::updateCode()
-{
-    if(tree)
-        ui->codeEdit->document()->setPlainText(tree->genCode());
-}
-
 EditorWindow::~EditorWindow()
 {
     delete ui;
-    if(tree)
-        delete tree;
 }

@@ -20,9 +20,18 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="codeEdit">
-      <property name="lineWrapMode">
-       <enum>QPlainTextEdit::NoWrap</enum>
+     <widget class="QTabWidget" name="editorTabs">
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -41,6 +50,9 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionNew_Document"/>
+    <addaction name="actionOpen_Document"/>
+    <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -58,21 +70,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="skinPreviewDock">
+   <property name="windowTitle">
+    <string>Skin Preview</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Skin Preview</string>
-       </property>
-       <property name="buddy">
-        <cstring>skinPreview</cstring>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QGraphicsView" name="skinPreview"/>
      </item>
@@ -87,25 +92,18 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QDockWidget" name="fileDock">
+   <property name="windowTitle">
+    <string>Files</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Files</string>
-       </property>
-       <property name="buddy">
-        <cstring>fileTree</cstring>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QTreeView" name="fileTree"/>
      </item>
@@ -113,21 +111,14 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="parseTreeDock">
+   <property name="windowTitle">
+    <string>Parse Tree</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Parse Tree</string>
-       </property>
-       <property name="buddy">
-        <cstring>parseTree</cstring>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QTreeView" name="parseTree"/>
      </item>
@@ -151,10 +142,10 @@
   </action>
   <action name="actionDisplay_Panel">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Parse &amp;Tree Panel</string>
@@ -170,10 +161,10 @@
   </action>
   <action name="actionFile_Panel">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;File Panel</string>
@@ -181,13 +172,29 @@
   </action>
   <action name="actionPreview_Panel">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;Preview Panel</string>
+   </property>
+  </action>
+  <action name="actionNew_Document">
+   <property name="text">
+    <string>&amp;New Document</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionOpen_Document">
+   <property name="text">
+    <string>&amp;Open Document</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>
@@ -208,102 +215,6 @@
     <hint type="destinationlabel">
      <x>299</x>
      <y>199</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionDisplay_Panel</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>parseTreeDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>680</x>
-     <y>129</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>parseTreeDock</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>actionDisplay_Panel</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>680</x>
-     <y>129</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionFile_Panel</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>fileDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>79</x>
-     <y>206</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fileDock</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>actionFile_Panel</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>79</x>
-     <y>206</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionPreview_Panel</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>skinPreviewDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>680</x>
-     <y>112</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>skinPreviewDock</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>actionPreview_Panel</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>680</x>
-     <y>112</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
     </hint>
    </hints>
   </connection>

@@ -43,6 +43,7 @@ protected:
 private slots:
     void updateCode();
     void codeChanged();
+    void showPanel();
 
 private:
     /* Setup functions */
@@ -51,7 +52,6 @@ private:
     void setupMenus();
 
     Ui::EditorWindow *ui;
-    ParseTreeModel* tree;
     SkinHighlighter* highlighter;
 
 };
