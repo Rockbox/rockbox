@@ -16,12 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "plugin.h"
-#include "lib/grey.h"
-#include "lib/helper.h"
-#include "lib/mylcd.h"
 
 //#define TEST_GREYLIB  /* Uncomment for testing greylib instead of core gfx */
+
+#include "plugin.h"
+#ifdef TEST_GREYLIB /* otherwise, mylcd defaults to core gfx */
+#include "lib/grey.h"
+#endif
+#include "lib/helper.h"
+#include "lib/mylcd.h"
 
 #ifdef TEST_GREYLIB
 GREY_INFO_STRUCT
