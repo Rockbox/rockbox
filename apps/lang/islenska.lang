@@ -7916,16 +7916,13 @@
   desc: in the recording screen
   user: core
   <source>
-    *: none
-    recording: ""
+    *: "Gain Left"
   </source>
   <dest>
-    *: none
-    recording: ""
+    *: "Vinstri"
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7933,16 +7930,13 @@
   desc: in the recording screen
   user: core
   <source>
-    *: none
-    recording: ""
+    *: "Gain Right"
   </source>
   <dest>
-    *: none
-    recording: ""
+    *: "Hægri"
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
