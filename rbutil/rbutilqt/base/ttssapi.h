@@ -42,6 +42,7 @@ class TTSSapi : public TTSBase
         TTSStatus voice(QString text,QString wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop();
+        Capabilities capabilities();
 
         // for settings
         bool configOk();

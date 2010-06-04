@@ -30,6 +30,11 @@ TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
     m_sapi4 =false;
 }
 
+TTSBase::Capabilities TTSSapi::capabilities()
+{
+    return None;
+}
+
 void TTSSapi::generateSettings()
 {
     // language
@@ -195,13 +200,17 @@ TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
     *voicestream << query;
     *voicestream << "SYNC\tbla\r\n";
     voicestream->flush();
-    voicescript->waitForReadyRead();
+    char temp[20];
+    
+    //we use this, because waitForReadyRead doesnt work from a different thread
+    while( voicescript->readLine(temp,20) == 0)
+        QCoreApplication::processEvents();
+
     return NoError;
 }
 
 bool TTSSapi::stop()
 {
-
     *voicestream << "QUIT\r\n";
     voicestream->flush();
     voicescript->waitForFinished();

@@ -34,6 +34,10 @@ TTSCarbon::TTSCarbon(QObject* parent) : TTSBase(parent)
 {
 }
 
+TTSBase::Capabilities TTSCarbon::capabilities()
+{
+    return None;
+}
 
 bool TTSCarbon::configOk()
 {

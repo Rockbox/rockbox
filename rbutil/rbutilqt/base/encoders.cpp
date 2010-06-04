@@ -131,7 +131,7 @@ bool EncExes::encode(QString input,QString output)
     execstring.replace("%options",m_EncOpts);
     execstring.replace("%input",input);
     execstring.replace("%output",output);
-    qDebug() << execstring;
+    qDebug() << "[EncExes] cmd: " << execstring;
     int result = QProcess::execute(execstring);
     return (result == 0) ? true : false;
 }
@@ -197,16 +197,16 @@ bool EncRbSpeex::start()
 
 bool EncRbSpeex::encode(QString input,QString output)
 {
-    qDebug() << "encoding " << input << " to "<< output;
+    qDebug() << "[RbSpeex] Encoding " << input << " to "<< output;
     char errstr[512];
 
     FILE *fin,*fout;
     if ((fin = fopen(input.toLocal8Bit(), "rb")) == NULL) {
-        qDebug() << "Error: could not open input file\n";
+        qDebug() << "[RbSpeex] Error: could not open input file\n";
         return false;
     }
     if ((fout = fopen(output.toLocal8Bit(), "wb")) == NULL) {
-        qDebug() << "Error: could not open output file\n";
+        qDebug() << "[RbSpeex] Error: could not open output file\n";
         fclose(fin);
         return false;
     }
@@ -218,7 +218,7 @@ bool EncRbSpeex::encode(QString input,QString output)
 
     if (!ret) {
         /* Attempt to delete unfinished output */
-        qDebug() << "Error:" << errstr;
+        qDebug() << "[RbSpeex] Error:" << errstr;
         QFile(output).remove();
         return false;
     }

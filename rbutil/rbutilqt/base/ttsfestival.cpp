@@ -27,6 +27,11 @@ TTSFestival::~TTSFestival()
     stop();
 }
 
+TTSBase::Capabilities TTSFestival::capabilities()
+{
+    return RunInParallel;
+}
+
 void TTSFestival::generateSettings()
 {
     // server path

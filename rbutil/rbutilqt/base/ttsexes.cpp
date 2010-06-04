@@ -31,6 +31,11 @@ TTSExes::TTSExes(QString name,QObject* parent) : TTSBase(parent)
 
 }
 
+TTSBase::Capabilities TTSExes::capabilities()
+{
+    return RunInParallel;
+}
+
 void TTSExes::generateSettings()
 {
     QString exepath =RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
