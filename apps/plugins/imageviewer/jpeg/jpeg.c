@@ -94,7 +94,7 @@ void draw_image_rect(struct image_info *info,
         width, height,
         settings.jpeg_colour_mode, settings.jpeg_dither_mode);
 #else
-    MYXLCD(gray_bitmap_part)(
+    mylcd_ub_gray_bitmap_part(
         pdisp->bitmap[0], info->x + x, info->y + y, pdisp->stride,
         x + MAX(0, (LCD_WIDTH-info->width)/2),
         y + MAX(0, (LCD_HEIGHT-info->height)/2),

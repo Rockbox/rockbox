@@ -30,6 +30,7 @@
 #include "lib/helper.h"
 #include "lib/configfile.h"
 #include "lib/grey.h"
+#include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
 #include "lib/buflib.h"
 
@@ -176,7 +177,6 @@ const struct button_mapping *pf_contexts[] =
 #define USEGSLIB
 GREY_INFO_STRUCT
 #define LCD_BUF _grey_info.buffer
-#define MYLCD(fn) grey_ ## fn
 #define G_PIX(r,g,b) \
     (77 * (unsigned)(r) + 150 * (unsigned)(g) + 29 * (unsigned)(b)) / 256
 #define N_PIX(r,g,b) N_BRIGHT(G_PIX(r,g,b))
@@ -186,7 +186,6 @@ GREY_INFO_STRUCT
 typedef unsigned char pix_t;
 #else   /* LCD_DEPTH >= 8 */
 #define LCD_BUF rb->lcd_framebuffer
-#define MYLCD(fn) rb->lcd_ ## fn
 #define G_PIX LCD_RGBPACK
 #define N_PIX LCD_RGBPACK
 #define G_BRIGHT(y) LCD_RGBPACK(y,y,y)
@@ -1865,9 +1864,9 @@ void show_next_slide(void)
 */
 void render_all_slides(void)
 {
-    MYLCD(set_background)(G_BRIGHT(0));
+    mylcd_set_background(G_BRIGHT(0));
     /* TODO: Optimizes this by e.g. invalidating rects */
-    MYLCD(clear_display)();
+    mylcd_clear_display();
 
     int nleft = num_slides;
     int nright = num_slides;
@@ -2251,12 +2250,12 @@ static inline void draw_gradient(int y, int h)
     int c2 = selected_track_pulse - 5;
     for (r=0; r<h; r++) {
 #ifdef HAVE_LCD_COLOR
-        MYLCD(set_foreground)(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
+        mylcd_set_foreground(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
                                            c2+250-(c >> 8)));
 #else
-        MYLCD(set_foreground)(G_BRIGHT(c2+160-(c >> 8)));
+        mylcd_set_foreground(G_BRIGHT(c2+160-(c >> 8)));
 #endif
-        MYLCD(hline)(0, LCD_WIDTH, r+y);
+        mylcd_hline(0, LCD_WIDTH, r+y);
         if ( r > h/2 )
             c-=inc;
         else
@@ -2312,7 +2311,7 @@ void reset_track_list(void)
  */
 void show_track_list(void)
 {
-    MYLCD(clear_display)();
+    mylcd_clear_display();
     if ( center_slide.slide_index != track_index ) {
         create_track_index(center_slide.slide_index);
         reset_track_list();
@@ -2326,11 +2325,11 @@ void show_track_list(void)
     for (;track_i < track_list_visible_entries+start_index_track_list;
          track_i++)
     {
-        MYLCD(getstringsize)(get_track_name(track_i), &titletxt_w, NULL);
+        mylcd_getstringsize(get_track_name(track_i), &titletxt_w, NULL);
         titletxt_x = (LCD_WIDTH-titletxt_w)/2;
         if ( track_i == selected_track ) {
             draw_gradient(titletxt_y, titletxt_h);
-            MYLCD(set_foreground)(G_BRIGHT(255));
+            mylcd_set_foreground(G_BRIGHT(255));
             if (titletxt_w > LCD_WIDTH ) {
                 if ( titletxt_w + track_scroll_index <= LCD_WIDTH )
                     track_scroll_dir = 1;
@@ -2338,12 +2337,12 @@ void show_track_list(void)
                 track_scroll_index += track_scroll_dir*2;
                 titletxt_x = track_scroll_index;
             }
-            MYLCD(putsxy)(titletxt_x,titletxt_y,get_track_name(track_i));
+            mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
         }
         else {
             color = 250 - (abs(selected_track - track_i) * 200 / track_count);
-            MYLCD(set_foreground)(G_BRIGHT(color));
-            MYLCD(putsxy)(titletxt_x,titletxt_y,get_track_name(track_i));
+            mylcd_set_foreground(G_BRIGHT(color));
+            mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
         }
         titletxt_y += titletxt_h;
     }
@@ -2446,8 +2445,8 @@ void draw_album_text(void)
         albumtxt = get_album_name(center_index);
     }
 
-    MYLCD(set_foreground)(G_BRIGHT(c));
-    MYLCD(getstringsize)(albumtxt, &albumtxt_w, &albumtxt_h);
+    mylcd_set_foreground(G_BRIGHT(c));
+    mylcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
     if (center_index != prev_center_index) {
         albumtxt_x = 0;
         albumtxt_dir = -1;
@@ -2460,7 +2459,7 @@ void draw_album_text(void)
         albumtxt_y = LCD_HEIGHT - albumtxt_h - albumtxt_h/2;
 
     if (albumtxt_w > LCD_WIDTH ) {
-        MYLCD(putsxy)(albumtxt_x, albumtxt_y , albumtxt);
+        mylcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
         if ( pf_state == pf_idle || pf_state == pf_show_tracks ) {
             if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
             else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
@@ -2468,7 +2467,7 @@ void draw_album_text(void)
         }
     }
     else {
-        MYLCD(putsxy)((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
+        mylcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
     }
 
 
@@ -2641,9 +2640,9 @@ int main(void)
         if (show_fps)
         {
 #ifdef USEGSLIB
-            MYLCD(set_foreground)(G_BRIGHT(255));
+            mylcd_set_foreground(G_BRIGHT(255));
 #else
-            MYLCD(set_foreground)(G_PIX(255,0,0));
+            mylcd_set_foreground(G_PIX(255,0,0));
 #endif
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
             if (show_album_name == album_name_top)
@@ -2651,13 +2650,13 @@ int main(void)
                            rb->screens[SCREEN_MAIN]->getcharheight();
             else
                 fpstxt_y = 0;
-            MYLCD(putsxy)(0, fpstxt_y, fpstxt);
+            mylcd_putsxy(0, fpstxt_y, fpstxt);
         }
         draw_album_text();
 
 
         /* Copy offscreen buffer to LCD and give time to other threads */
-        MYLCD(update)();
+        mylcd_update();
         rb->yield();
 
         /*/ Handle buttons */
@@ -2695,7 +2694,7 @@ int main(void)
 #ifdef USEGSLIB
             grey_show(true);
 #endif
-            MYLCD(set_drawmode)(DRMODE_FG);
+            mylcd_set_drawmode(DRMODE_FG);
             break;
 
         case PF_NEXT:

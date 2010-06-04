@@ -30,6 +30,8 @@
 #include "lib/xlcd.h"
 #endif
 
+#include "lib/mylcd.h"
+
 #define DELTA 8 /* Panning moves 1/DELTA of screen */
 
 #define LCD_SHIFT_X (LCD_WIDTH / DELTA)

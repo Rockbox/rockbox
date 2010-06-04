@@ -21,20 +21,15 @@
 
 #include "plugin.h"
 #include "lib/grey.h"
+#include "lib/mylcd.h"
 PLUGIN_HEADER
 
 /* different graphics libraries */
 #if LCD_DEPTH < 8
 #define USEGSLIB
 GREY_INFO_STRUCT
-#define MYLCD(fn) grey_ub_ ## fn
-#define MYLCD_UPDATE()
-#define MYXLCD(fn) grey_ub_ ## fn
 #define CFORMAT &format_grey
 #else
-#define MYLCD(fn) rb->lcd_ ## fn
-#define MYLCD_UPDATE() rb->lcd_update();
-#define MYXLCD(fn) xlcd_ ## fn
 #define CFORMAT NULL
 #endif
 
@@ -80,7 +75,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_bitmap((fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
         (LCD_HEIGHT - bm.height) >> 1, bm.width, bm.height);
 #endif
-    MYLCD_UPDATE();
+    mylcd_ub_update();
     while (rb->get_action(CONTEXT_STD,1) != ACTION_STD_OK) rb->yield();
 #ifdef USEGSLIB
     grey_release();

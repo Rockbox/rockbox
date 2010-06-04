@@ -119,7 +119,7 @@ void draw_image_rect(struct image_info *info,
         y + MAX(0, (LCD_HEIGHT-info->height)/2),
         width, height);
 #else
-    MYXLCD(gray_bitmap_part)(
+    mylcd_ub_gray_bitmap_part(
         pdisp->bitmap, info->x + x, info->y + y, info->width,
         x + MAX(0, (LCD_WIDTH-info->width)/2),
         y + MAX(0, (LCD_HEIGHT-info->height)/2),

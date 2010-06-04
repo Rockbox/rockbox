@@ -20,11 +20,11 @@
  **************************************************************************/
 #include "plugin.h"
 #include "lib/playergfx.h"
+#include "lib/mylcd.h"
 
 PLUGIN_HEADER
 
 #ifdef HAVE_LCD_BITMAP
-#define MYLCD(fn) rb->lcd_ ## fn
 #define GFX_X (LCD_WIDTH/2-1)
 #define GFX_Y (LCD_HEIGHT/2-1)
 #if LCD_WIDTH != LCD_HEIGHT
@@ -35,7 +35,6 @@ PLUGIN_HEADER
 #define GFX_HEIGHT (4*GFX_Y/5)
 #endif
 #else
-#define MYLCD(fn) pgfx_ ## fn
 #define GFX_X 9
 #define GFX_Y 6
 #define GFX_WIDTH  9
@@ -208,8 +207,8 @@ enum plugin_status plugin_start(const void* parameter)
     }
     pgfx_display(3, 0);
 #endif
-    MYLCD(clear_display)();
-    MYLCD(set_drawmode)(DRMODE_COMPLEMENT);
+    mylcd_clear_display();
+    mylcd_set_drawmode(DRMODE_COMPLEMENT);
     while (1) {
 
         x+=sx;
@@ -238,11 +237,11 @@ enum plugin_status plugin_start(const void* parameter)
             sy = -sy;
         }
 
-        MYLCD(fillrect)(GFX_X-x, GFX_Y-y, 2*x+1, 1);
-        MYLCD(fillrect)(GFX_X-x, GFX_Y+y, 2*x+1, 1);
-        MYLCD(fillrect)(GFX_X-x, GFX_Y-y+1, 1, 2*y-1);
-        MYLCD(fillrect)(GFX_X+x, GFX_Y-y+1, 1, 2*y-1);
-        MYLCD(update)();
+        mylcd_fillrect(GFX_X-x, GFX_Y-y, 2*x+1, 1);
+        mylcd_fillrect(GFX_X-x, GFX_Y+y, 2*x+1, 1);
+        mylcd_fillrect(GFX_X-x, GFX_Y-y+1, 1, 2*y-1);
+        mylcd_fillrect(GFX_X+x, GFX_Y-y+1, 1, 2*y-1);
+        mylcd_update();
 
         rb->sleep(HZ/timer);
 
@@ -253,7 +252,7 @@ enum plugin_status plugin_start(const void* parameter)
             case MOSAIQUE_RC_QUIT:
 #endif
             case MOSAIQUE_QUIT:
-                MYLCD(set_drawmode)(DRMODE_SOLID);
+                mylcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_CHARCELLS
                 pgfx_release();
 #endif
@@ -271,14 +270,14 @@ enum plugin_status plugin_start(const void* parameter)
                 sy = rb->rand() % (GFX_HEIGHT/2) + 1;
                 x=0;
                 y=0;
-                MYLCD(clear_display)();
+                mylcd_clear_display();
                 break;
 
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-                    MYLCD(set_drawmode)(DRMODE_SOLID);
+                    mylcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_CHARCELLS
                     pgfx_release();
 #endif

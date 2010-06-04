@@ -22,13 +22,12 @@
 
 #include "lib/helper.h"
 #include "lib/xlcd.h"
-#include "lib/mylcd.h"
 #include "math.h"
 #include "fracmul.h"
-
 #ifndef HAVE_LCD_COLOR
 #include "lib/grey.h"
 #endif
+#include "lib/mylcd.h"
 
 PLUGIN_HEADER
 

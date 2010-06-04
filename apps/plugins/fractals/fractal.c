@@ -31,16 +31,6 @@
 #include "mandelbrot_set.h"
 
 #ifdef USEGSLIB
-#define MYLCD(fn) grey_ub_ ## fn
-#define MYLCD_UPDATE()
-#define MYXLCD(fn) grey_ub_ ## fn
-#else
-#define MYLCD(fn) rb->lcd_ ## fn
-#define MYLCD_UPDATE() rb->lcd_update();
-#define MYXLCD(fn) xlcd_ ## fn
-#endif
-
-#ifdef USEGSLIB
 GREY_INFO_STRUCT
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
@@ -143,8 +133,8 @@ enum plugin_status plugin_start(const void* parameter)
             switch (redraw)
             {
                 case REDRAW_FULL:
-                    MYLCD(clear_display)();
-                    MYLCD_UPDATE();
+                    mylcd_ub_clear_display();
+                    mylcd_ub_update();
                     /* fall-through */
                 case REDRAW_FULL_OVERLAY:
                     rects_queue_init();
@@ -200,32 +190,32 @@ enum plugin_status plugin_start(const void* parameter)
 
         case FRACTAL_UP:
             ops->move(0, +1);
-            MYXLCD(scroll_down)(LCD_SHIFT_Y);
-            MYLCD_UPDATE();
+            mylcd_ub_scroll_down(LCD_SHIFT_Y);
+            mylcd_ub_update();
             if (redraw != REDRAW_FULL)
                 redraw = rects_move_down() ? REDRAW_FULL : REDRAW_PARTIAL;
             break;
 
         case FRACTAL_DOWN:
             ops->move(0, -1);
-            MYXLCD(scroll_up)(LCD_SHIFT_Y);
-            MYLCD_UPDATE();
+            mylcd_ub_scroll_up(LCD_SHIFT_Y);
+            mylcd_ub_update();
             if (redraw != REDRAW_FULL)
                 redraw = rects_move_up() ? REDRAW_FULL : REDRAW_PARTIAL;
             break;
 
         case FRACTAL_LEFT:
             ops->move(-1, 0);
-            MYXLCD(scroll_right)(LCD_SHIFT_X);
-            MYLCD_UPDATE();
+            mylcd_ub_scroll_right(LCD_SHIFT_X);
+            mylcd_ub_update();
             if (redraw != REDRAW_FULL)
                 redraw = rects_move_right() ? REDRAW_FULL : REDRAW_PARTIAL;
             break;
 
         case FRACTAL_RIGHT:
             ops->move(+1, 0);
-            MYXLCD(scroll_left)(LCD_SHIFT_X);
-            MYLCD_UPDATE();
+            mylcd_ub_scroll_left(LCD_SHIFT_X);
+            mylcd_ub_update();
             if (redraw != REDRAW_FULL)
                 redraw = rects_move_left() ? REDRAW_FULL : REDRAW_PARTIAL;
             break;

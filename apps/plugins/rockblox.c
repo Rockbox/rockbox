@@ -26,6 +26,7 @@
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 #include "lib/playergfx.h"
+#include "lib/mylcd.h"
 
 PLUGIN_HEADER
 
@@ -599,8 +600,6 @@ PLUGIN_HEADER
 #define LINES_X LABEL_X
 #endif
 
-#define MYLCD(fn) rb->lcd_ ## fn
-
 extern const fb_data rockblox_background[];
 
 #else /* HAVE_LCD_CHARCELLS */
@@ -613,8 +612,6 @@ extern const fb_data rockblox_background[];
 #define BOARD_Y      0
 #define PREVIEW_X    15
 #define PREVIEW_Y    1
-
-#define MYLCD(fn) pgfx_ ## fn
 
 #endif
 
@@ -983,14 +980,14 @@ static void refresh_board (void)
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
-    MYLCD(set_drawmode) (DRMODE_SOLID | DRMODE_INVERSEVID);
+    mylcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
 
-    MYLCD(fillrect) (BOARD_X, BOARD_Y, BOARD_WIDTH * BLOCK_WIDTH,
-                     BOARD_HEIGHT * BLOCK_HEIGHT);
+    mylcd_fillrect (BOARD_X, BOARD_Y, BOARD_WIDTH * BLOCK_WIDTH,
+                    BOARD_HEIGHT * BLOCK_HEIGHT);
 
 #if LCD_DEPTH == 1
-    MYLCD(set_drawmode) (DRMODE_SOLID);
+    mylcd_set_drawmode (DRMODE_SOLID);
 #endif
 
     for (i = 0; i < BOARD_WIDTH; i++)
@@ -1067,7 +1064,7 @@ static void refresh_board (void)
         pgfx_drawpixel (BOARD_X + x, BOARD_Y + y);
 #endif
     }
-    MYLCD(update) ();
+    mylcd_update ();
 }
 
 static bool canMoveTo (int x, int y, int newOrientation)
@@ -1092,14 +1089,14 @@ static void draw_next_block (void)
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
-    MYLCD(set_drawmode) (DRMODE_SOLID | DRMODE_INVERSEVID);
+    mylcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
 
     /* 4x4 */
-    MYLCD(fillrect) (PREVIEW_X, PREVIEW_Y, BLOCK_WIDTH * 4, BLOCK_HEIGHT * 4);
+    mylcd_fillrect (PREVIEW_X, PREVIEW_Y, BLOCK_WIDTH * 4, BLOCK_HEIGHT * 4);
 
 #if LCD_DEPTH == 1
-    MYLCD(set_drawmode) (DRMODE_SOLID);
+    mylcd_set_drawmode (DRMODE_SOLID);
 #endif
 
     /* draw the lightgray rectangles */

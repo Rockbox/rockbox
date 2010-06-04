@@ -21,8 +21,14 @@
 *
 ***************************************************************************/
 #include "plugin.h"
-#include "lib/grey.h"
 #include "lib/playergfx.h"
+#if LCD_DEPTH > 1
+#include "lib/mylcd.h" /* MYLCD_CFG_RB_XLCD or MYLCD_CFG_PGFX */
+#include "lib/grey.h"
+#else
+#include "lib/grey.h"
+#include "lib/mylcd.h" /* MYLCD_CFG_GREYLIB or MYLCD_CFG_PGFX */
+#endif
 #include "lib/xlcd.h"
 #include "lib/fixedpoint.h"
 
@@ -339,15 +345,9 @@ static struct my_lcd lcdfuncs; /* initialised at runtime */
 static struct my_lcd *mylcd = &greyfuncs;
 
 #define MYLCD(fn) mylcd->fn
-#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) grey_filltriangle(x1, y1, x2, y2, x3, y3)
-#define MY_SET_FOREGROUND(fg) grey_set_foreground(fg)
-#define MY_GET_FOREGROUND() grey_get_foreground()
 
 #else
 #define MYLCD(fn) rb->lcd_ ## fn
-#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) xlcd_filltriangle(x1, y1, x2, y2, x3, y3)
-#define MY_SET_FOREGROUND(fg) rb->lcd_set_foreground(fg)
-#define MY_GET_FOREGROUND() rb->lcd_get_foreground()
 #endif
 
 #if CONFIG_LCD == LCD_SSD1815
@@ -540,7 +540,7 @@ static void cube_draw(void)
 #if LCD_DEPTH > 1 || defined(USEGSLIB)
       case SOLID:
       
-        old_foreground = MY_GET_FOREGROUND();
+        old_foreground = mylcd_get_foreground();
         for (i = 0; i < 6; i++)
         {
             /* backface culling; if the shape winds counter-clockwise, we are
@@ -552,22 +552,22 @@ static void cube_draw(void)
                    * (point2D[faces[i].corner[2]].x - point2D[faces[i].corner[1]].x))
                 continue;
 
-            MY_SET_FOREGROUND(face_colors[i]);
-            MY_FILLTRIANGLE(point2D[faces[i].corner[0]].x,
-                            point2D[faces[i].corner[0]].y,
-                            point2D[faces[i].corner[1]].x,
-                            point2D[faces[i].corner[1]].y,
-                            point2D[faces[i].corner[2]].x,
-                            point2D[faces[i].corner[2]].y);
-            MY_FILLTRIANGLE(point2D[faces[i].corner[0]].x,
-                            point2D[faces[i].corner[0]].y,
-                            point2D[faces[i].corner[2]].x,
-                            point2D[faces[i].corner[2]].y,
-                            point2D[faces[i].corner[3]].x,
-                            point2D[faces[i].corner[3]].y);
+            mylcd_set_foreground(face_colors[i]);
+            mylcd_filltriangle(point2D[faces[i].corner[0]].x,
+                               point2D[faces[i].corner[0]].y,
+                               point2D[faces[i].corner[1]].x,
+                               point2D[faces[i].corner[1]].y,
+                               point2D[faces[i].corner[2]].x,
+                               point2D[faces[i].corner[2]].y);
+            mylcd_filltriangle(point2D[faces[i].corner[0]].x,
+                               point2D[faces[i].corner[0]].y,
+                               point2D[faces[i].corner[2]].x,
+                               point2D[faces[i].corner[2]].y,
+                               point2D[faces[i].corner[3]].x,
+                               point2D[faces[i].corner[3]].y);
 
         }
-        MY_SET_FOREGROUND(old_foreground);
+        mylcd_set_foreground(old_foreground);
         break;
 #endif /* (LCD_DEPTH > 1) || GSLIB */
 
