@@ -13388,8 +13388,6 @@
     gigabeats: "Breed"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: VOICE_EXT_RFMS
   desc: spoken only, for file extension
@@ -13407,8 +13405,6 @@
     radio_remote: "remote radio screen skin"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_HW_EQ_WIDTH_NARROW
   desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
@@ -13419,15 +13415,13 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Narrow"
+    gigabeats: "Smal"
   </dest>
   <voice>
     *: none
-    gigabeats: "Narrow"
+    gigabeats: "Smal"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_VIEW_HOTKEY
   desc: deprecated
@@ -13445,8 +13439,6 @@
     hotkey: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_HOTKEY_FILE_BROWSER
   desc: hotkey menu
@@ -13457,15 +13449,13 @@
   </source>
   <dest>
     *: none
-    hotkey: "File Browser Hotkey"
+    hotkey: "Bestanden bladeren Hotkey"
   </dest>
   <voice>
     *: none
-    hotkey: "File Browser Hotkey"
+    hotkey: "Bestanden bladeren Hotkey"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_RESUME_REWIND
   desc: in playback settings menu
@@ -13476,15 +13466,13 @@
   </source>
   <dest>
     *: none
-    swcodec: "Rewind Before Resume"
+    swcodec: "Terugspoelen alvorens te hernemen"
   </dest>
   <voice>
     *: none
-    swcodec: "Rewind before resume"
+    swcodec: "Terugspoelen alvorens te hernemen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
   desc: "<untagged>" entry in tag browser
@@ -13493,14 +13481,12 @@
     *: "<Untagged>"
   </source>
   <dest>
-    *: "<Untagged>"
+    *: "<GeenTags>"
   </dest>
   <voice>
-    *: "Untagged"
+    *: "GeenTags"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
   desc: in sound_menu, advanced settings for hardware equalizer tone controls
@@ -13511,15 +13497,13 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats: "Uitgebreide klank instellingen"
   </dest>
   <voice>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats: "Uitgebreide klank instellingen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_DEPTH_3D
   desc: in sound_menu, amount of 3D enhancement effect
@@ -13530,15 +13514,13 @@
   </source>
   <dest>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats: "3-D Verbetering"
   </dest>
   <voice>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats: "3-D Verbetering"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_HW_EQ_FREQUENCY
   desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
@@ -13549,15 +13531,13 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats: "Band %d Frequentie"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Frequency"
+    gigabeats: "Band Frequentie"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_HW_EQ_WIDTH
   desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
@@ -13568,11 +13548,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats: "Band %d Breedte"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Width"
+    gigabeats: "Band Breedte"
   </voice>
 </phrase>
 <phrase>
