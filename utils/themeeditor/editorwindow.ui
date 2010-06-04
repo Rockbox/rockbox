@@ -21,9 +21,6 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="editorTabs">
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
       <property name="currentIndex">
        <number>-1</number>
       </property>

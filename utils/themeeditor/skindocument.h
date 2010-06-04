@@ -19,27 +19,41 @@
  *
  ****************************************************************************/
 
-#include "skin_parser.h"
-#include "skin_debug.h"
-#include "editorwindow.h"
+#ifndef SKINDOCUMENT_H
+#define SKINDOCUMENT_H
 
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QPlainTextEdit>
 
-#include <QtGui/QApplication>
-#include <QTreeView>
-
+#include "skinhighlighter.h"
 #include "parsetreemodel.h"
 
-int main(int argc, char* argv[])
+class SkinDocument : public QWidget
 {
-    QApplication app(argc, argv);
+Q_OBJECT
+public:
+    SkinDocument(QWidget *parent = 0);
+    virtual ~SkinDocument();
 
-    EditorWindow mainWindow;
-    mainWindow.show();
+    ParseTreeModel* getModel(){ return model; }
+    QString getTitle(){ return title; }
 
-    return app.exec();
+signals:
 
-}
+private slots:
+    void codeChanged();
 
+private:
+    void setupUI();
+
+    QString title;
+
+    QLayout* layout;
+    QPlainTextEdit* editor;
+
+    SkinHighlighter* highlighter;
+    ParseTreeModel* model;
+};
+
+#endif // SKINDOCUMENT_H

@@ -12,7 +12,8 @@ HEADERS += tag_table.h \
     parsetreemodel.h \
     parsetreenode.h \
     editorwindow.h \
-    skinhighlighter.h
+    skinhighlighter.h \
+    skindocument.h
 SOURCES += tag_table.c \
     skin_parser.c \
     skin_scan.c \
@@ -21,7 +22,8 @@ SOURCES += tag_table.c \
     parsetreemodel.cpp \
     parsetreenode.cpp \
     editorwindow.cpp \
-    skinhighlighter.cpp
+    skinhighlighter.cpp \
+    skindocument.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf

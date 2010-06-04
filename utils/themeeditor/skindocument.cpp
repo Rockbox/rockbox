@@ -19,27 +19,45 @@
  *
  ****************************************************************************/
 
-#include "skin_parser.h"
-#include "skin_debug.h"
-#include "editorwindow.h"
+#include "skindocument.h"
 
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-
-#include <QtGui/QApplication>
-#include <QTreeView>
-
-#include "parsetreemodel.h"
-
-int main(int argc, char* argv[])
+SkinDocument::SkinDocument(QWidget *parent) :
+    QWidget(parent)
 {
-    QApplication app(argc, argv);
+    setupUI();
 
-    EditorWindow mainWindow;
-    mainWindow.show();
-
-    return app.exec();
-
+    title = "Untitled";
 }
 
+SkinDocument::~SkinDocument()
+{
+    delete highlighter;
+    delete model;
+}
+
+void SkinDocument::setupUI()
+{
+    /* Setting up the text edit */
+    layout = new QHBoxLayout;
+    editor = new QPlainTextEdit(this);
+    layout->addWidget(editor);
+
+    setLayout(layout);
+
+    /* Attaching the syntax highlighter */
+    highlighter = new SkinHighlighter(QColor(0,180,0), QColor(255,0,0),
+                                      QColor(0,0,255), QColor(120,120,120),
+                                      editor->document());
+
+    /* Setting up the model */
+    model = new ParseTreeModel("");
+
+    /* Connecting the editor's signal */
+    QObject::connect(editor, SIGNAL(textChanged()),
+                     this, SLOT(codeChanged()));
+}
+
+void SkinDocument::codeChanged()
+{
+    model->changeTree(editor->document()->toPlainText().toAscii());
+}

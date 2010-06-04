@@ -60,6 +60,7 @@ void EditorWindow::setupUI()
     /* Connecting the buttons */
     QObject::connect(ui->fromTree, SIGNAL(pressed()),
                      this, SLOT(updateCode()));
+
 }
 
 void EditorWindow::setupMenus()
@@ -71,15 +72,17 @@ void EditorWindow::setupMenus()
                      this, SLOT(showPanel()));
     QObject::connect(ui->actionPreview_Panel, SIGNAL(triggered()),
                      this, SLOT(showPanel()));
+
+    /* Connecting the document opening/closing actions */
+    QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),
+                     this, SLOT(newTab()));
 }
 
-void EditorWindow::codeChanged()
-{
-    ui->parseTree->expandAll();
-}
 
-void EditorWindow::updateCode()
+void EditorWindow::newTab()
 {
+    SkinDocument* doc = new SkinDocument;
+    ui->editorTabs->addTab(doc, doc->getTitle());
 }
 
 void EditorWindow::showPanel()

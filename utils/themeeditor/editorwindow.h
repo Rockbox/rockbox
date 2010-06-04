@@ -26,6 +26,7 @@
 
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
+#include "skindocument.h"
 
 namespace Ui {
     class EditorWindow;
@@ -41,9 +42,8 @@ protected:
     virtual void closeEvent(QCloseEvent* event);
 
 private slots:
-    void updateCode();
-    void codeChanged();
     void showPanel();
+    void newTab();
 
 private:
     /* Setup functions */
@@ -52,8 +52,6 @@ private:
     void setupMenus();
 
     Ui::EditorWindow *ui;
-    SkinHighlighter* highlighter;
-
 };
 
 #endif // EDITORWINDOW_H
