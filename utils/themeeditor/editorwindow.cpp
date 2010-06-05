@@ -24,6 +24,7 @@
 
 #include <QDesktopWidget>
 #include <QFileSystemModel>
+#include <QSettings>
 
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,17 +38,37 @@ EditorWindow::EditorWindow(QWidget *parent) :
 
 void EditorWindow::loadSettings()
 {
-    /* When there are settings to load, they'll be loaded here */
-    /* For now, we'll just set the window to take up most of the screen */
-    QDesktopWidget* desktop = QApplication::desktop();
 
-    QRect availableSpace = desktop->availableGeometry(desktop->primaryScreen());
-    QRect buffer(availableSpace.left() + availableSpace.width() / 10,
-                 availableSpace.top() + availableSpace.height() / 10,
-                 availableSpace.width() * 8 / 10,
-                 availableSpace.height() * 8 / 10);
-    this->setGeometry(buffer);
+    QSettings settings;
 
+    /* Main Window location */
+    settings.beginGroup("MainWindow");
+    QSize size = settings.value("size").toSize();
+    QPoint pos = settings.value("position").toPoint();
+    QByteArray state = settings.value("state").toByteArray();
+    settings.endGroup();
+
+    if(!(size.isNull() || pos.isNull() || state.isNull()))
+    {
+        resize(size);
+        move(pos);
+        restoreState(state);
+    }
+
+
+}
+
+void EditorWindow::saveSettings()
+{
+
+    QSettings settings;
+
+    /* Saving window and panel positions */
+    settings.beginGroup("MainWindow");
+    settings.setValue("position", pos());
+    settings.setValue("size", size());
+    settings.setValue("state", saveState());
+    settings.endGroup();
 }
 
 void EditorWindow::setupUI()
@@ -56,10 +77,6 @@ void EditorWindow::setupUI()
     QFileSystemModel* model = new QFileSystemModel;
     model->setRootPath(QDir::currentPath());
     ui->fileTree->setModel(model);
-
-    /* Connecting the buttons */
-    QObject::connect(ui->fromTree, SIGNAL(pressed()),
-                     this, SLOT(updateCode()));
 
 }
 
@@ -97,6 +114,7 @@ void EditorWindow::showPanel()
 
 void EditorWindow::closeEvent(QCloseEvent* event)
 {
+    saveSettings();
     event->accept();
 }
 

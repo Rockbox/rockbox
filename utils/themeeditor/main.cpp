@@ -28,13 +28,16 @@
 #include <iostream>
 
 #include <QtGui/QApplication>
-#include <QTreeView>
 
 #include "parsetreemodel.h"
 
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
+
+    QCoreApplication::setApplicationName(QObject::tr("Rockbox Theme Editor"));
+    QCoreApplication::setApplicationVersion(QObject::tr("Pre-Alpha"));
+    QCoreApplication::setOrganizationName(QObject::tr("Rockbox"));
 
     EditorWindow mainWindow;
     mainWindow.show();

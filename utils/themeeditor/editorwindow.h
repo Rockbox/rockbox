@@ -48,6 +48,7 @@ private slots:
 private:
     /* Setup functions */
     void loadSettings();
+    void saveSettings();
     void setupUI();
     void setupMenus();
 

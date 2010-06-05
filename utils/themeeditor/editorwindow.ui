@@ -14,7 +14,7 @@
    <string>Rockbox Theme Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/resources/resources/windowicon.png</normaloff>:/resources/resources/windowicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -195,9 +195,7 @@
    </property>
   </action>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>actionQuit</sender>
