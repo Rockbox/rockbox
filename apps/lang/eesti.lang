@@ -73,20 +73,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Küsi"
-  </dest>
-  <voice>
-    *: "Küsi"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALWAYS
   desc: used in various places
   user: core
@@ -154,20 +140,6 @@
   </dest>
   <voice>
     *: "Palun eemalda multimeedia kaart"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_SETTING_CANCEL
-  desc: Visual confirmation of canceling a changed setting
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Katkestatud"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -283,20 +255,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_MENU
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Playlist Options"
-  </source>
-  <dest>
-    *: "Esitusloendi seaded"
-  </dest>
-  <voice>
-    *: "Esitusloendi seaded"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLUGINS
   desc: in the main menu
   user: core
@@ -308,20 +266,6 @@
   </dest>
   <voice>
     *: "Lisad"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Info"
-  </dest>
-  <voice>
-    *: "Info"
   </voice>
 </phrase>
 <phrase>
@@ -392,34 +336,6 @@
   </dest>
   <voice>
     *: "Tasakaal"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanalid"
-  </dest>
-  <voice>
-    *: "Kanalid"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Kanali konfiguratsioon"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -787,20 +703,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Browse Firmwares"
-  </source>
-  <dest>
-    *: "Püsivarad"
-  </dest>
-  <voice>
-    *: "Püsivarad"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user: core
@@ -812,74 +714,6 @@
   </dest>
   <voice>
     *: "Taasta seaded"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user: core
-  <source>
-    *: "Are You Sure?"
-  </source>
-  <dest>
-    *: "Oled sa kindel?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic archosrecorder string to use to confirm
-  user: core
-  <source>
-    *: "PLAY = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*: "SELECT = Yes"
-    iaudiox5: "SELECT = Yes"
-    iriverh10,iriverh10_5gb: "SELECT = Yes"
-    gigabeatfx: "SELECT = Yes"
-    sansae200*,sansac200*: "SELECT = Yes"
-  </source>
-  <dest>
-    *: "PLAY = Jah"
-    iriverh100,iriverh120,iriverh300: "NAVI = Jah"
-    ipod*: "SELECT = Jah"
-    iaudiox5: "SELECT = Jah"
-    iriverh10,iriverh10_5gb: "SELECT = Jah"
-    gigabeatfx: "SELECT = Jah"
-    sansae200*,sansac200*: "SELECT = Jah"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic archosrecorder string to use to cancel
-  user: core
-  <source>
-    *: "Any Other = No"
-  </source>
-  <dest>
-    *: "Mõni teine = Ei"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user: core
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Seaded"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -897,20 +731,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Katkestatud"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SAVE_SETTINGS
   desc: in system_settings_menu()
   user: core
@@ -922,76 +742,6 @@
   </dest>
   <voice>
     *: "Kirjuta konfiguratsiooni fail"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Salvestamine ebaõnnestus"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Partition?"
-  </source>
-  <dest>
-    *: "Partitsioon?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Salvestamine ebaõnnestus"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "No partition?"
-  </source>
-  <dest>
-    *: "Mitte mingit partitsiooni?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_MENU
-  desc: in the recording sub menu
-  user: core
-  <source>
-    *: "Recording Screen"
-  </source>
-  <dest>
-    *: "Salvestamise ekraan"
-  </dest>
-  <voice>
-    *: "Salvestamise ekraan"
   </voice>
 </phrase>
 <phrase>
@@ -1303,20 +1053,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO_MENU
-  desc: in the info menu
-  user: core
-  <source>
-    *: "Rockbox Info"
-  </source>
-  <dest>
-    *: "Rockboxi info"
-  </dest>
-  <voice>
-    *: "Rockboxi info"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VERSION
   desc: in the info menu
   user: core
@@ -1373,20 +1109,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Kõiki"
-  </dest>
-  <voice>
-    *: "Kõiki"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user: core
@@ -1426,20 +1148,6 @@
   </dest>
   <voice>
     *: "Mängi valitud fail kõigepealt"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Resume on Startup"
-  </source>
-  <dest>
-    *: "Jätka käima panemisel"
-  </dest>
-  <voice>
-    *: "Jätka käima panemisel"
   </voice>
 </phrase>
 <phrase>
@@ -1821,20 +1529,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Kõiki"
-  </dest>
-  <voice>
-    *: "Kõiki"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
   user: core
@@ -1860,34 +1554,6 @@
   </dest>
   <voice>
     *: "Muusikat"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Esitusloendeid"
-  </dest>
-  <voice>
-    *: "Esitusloendeid"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ID3DB
-  desc: show ID3 Database
-  user: core
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3 andmebaasi"
-  </dest>
-  <voice>
-    *: "ID3 andmebaasi"
   </voice>
 </phrase>
 <phrase>
@@ -2577,20 +2243,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Line In"
-  </dest>
-  <voice>
-    *: "Line In"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -2602,20 +2254,6 @@
   </dest>
   <voice>
     *: "Digitaalne"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanalid"
-  </dest>
-  <voice>
-    *: "kanalid"
   </voice>
 </phrase>
 <phrase>
@@ -3092,20 +2730,6 @@
   </dest>
   <voice>
     *: "LCD Režiim"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "Normaalne"
-  </dest>
-  <voice>
-    *: "Normaalne"
   </voice>
 </phrase>
 <phrase>
@@ -3675,20 +3299,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user: core
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "Ketta väljalülitus"
-  </dest>
-  <voice>
-    *: "Ketta väljalülitus"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DIRCACHE_ENABLE
   desc: in directory cache settings
   user: core
@@ -3854,20 +3464,6 @@
   </dest>
   <voice>
     *: "Sea laulu hinnet"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RATING
-  desc: in set_rating
-  user: core
-  <source>
-    *: "Rating:"
-  </source>
-  <dest>
-    *: "Hinne:"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4263,34 +3859,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Buf: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Puhver: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
   user: core
@@ -4463,62 +4031,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Režiim:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Seisund"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Keri"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "Riba"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -4575,34 +4087,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user: core
-  <source>
-    *: "ON = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*: "SELECT = Set"
-    iaudiox5: "SELECT = Set"
-    iriverh10,iriverh10_5gb: "SELECT = Set"
-    gigabeatfx: "SELECT = Set"
-    sansae200*,sansac200*: "SELECT = Set"
-    vibe500: "OK = Set"
-  </source>
-  <dest>
-    *: "ON muutmiseks"
-    iriverh100,iriverh120,iriverh300: "NAVI muutmiseks"
-    ipod*: "SELECT muutmiseks"
-    iaudiox5: "SELECT muutmiseks"
-    iriverh10,iriverh10_5gb: "SELECT muutmiseks"
-    gigabeatfx: "SELECT muutmiseks"
-    sansae200*,sansac200*: "SELECT muutmiseks"
-    vibe500: "OK muutmiseks"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user: core
@@ -4629,62 +4113,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "Klahvilukk SEES"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "Klahvilukk VÄLJAS"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Keylock is ON"
-  </source>
-  <dest>
-    *: "Klahvilukk on SEES"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Keylock is OFF"
-  </source>
-  <dest>
-    *: "Klahvilukk on VÄLJAS"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
   user: core
@@ -4693,20 +4121,6 @@
   </source>
   <dest>
     *: "Aeg:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user: core
-  <source>
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "Eraldatud aeg:"
   </dest>
   <voice>
     *: ""
@@ -4735,20 +4149,6 @@
   </source>
   <dest>
     *: "Eel-salvestamine"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Kasu"
   </dest>
   <voice>
     *: ""
@@ -4801,20 +4201,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_TRIGGER_MODE
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Trigger"
-  </source>
-  <dest>
-    *: "Trigger"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_TRIG_NOREARM
   desc: in recording settings_menu
   user: core
@@ -4823,20 +4209,6 @@
   </source>
   <dest>
     *: "Once"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_REARM
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Repeat"
   </dest>
   <voice>
     *: ""
@@ -4857,20 +4229,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_MIN_DURATION
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "for at least"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_STOP_THRESHOLD
   desc: in recording settings_menu
   user: core
@@ -4879,20 +4237,6 @@
   </source>
   <dest>
     *: "Stop Below"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STOP_POSTREC
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "for at least"
   </dest>
   <voice>
     *: ""
@@ -4921,34 +4265,6 @@
   </source>
   <dest>
     *: "-inf"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_IDLE
-  desc: waiting for threshold
-  user: core
-  <source>
-    *: "Trigger Idle"
-  </source>
-  <dest>
-    *: "Trigger Idle"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
-  user: core
-  <source>
-    *: "Trigger Active"
-  </source>
-  <dest>
-    *: "Trigger Active"
   </dest>
   <voice>
     *: ""
@@ -5205,20 +4521,6 @@
   </source>
   <dest>
     *: "Bitrate"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNIT_DB
-  desc: in browse_id3
-  user: core
-  <source>
-    *: "dB"
-  </source>
-  <dest>
-    *: "dB"
   </dest>
   <voice>
     *: ""
@@ -6821,20 +6123,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "flash"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
   user: core
@@ -6877,20 +6165,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user: core
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Laeb..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -6899,20 +6173,6 @@
   </source>
   <dest>
     *: "Esitusloendi buffer täis"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End of Song List"
-  </source>
-  <dest>
-    *: "Lauludenimekirja lõpp"
   </dest>
   <voice>
     *: ""
@@ -7213,20 +6473,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user: core
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "Preset"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
   user: core
@@ -7381,48 +6627,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "Menüü"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "Valik"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "LCD"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHOWDIR_BUFFER_FULL
   desc: in showdir(), displayed on screen when you reach buffer limit
   user: core
@@ -7531,20 +6735,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on archosplayer models
-  user: core
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "STOP to abort"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
   user: core
@@ -7601,48 +6791,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3DB_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Artists"
-  </source>
-  <dest>
-    *: "Artistid"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Albums"
-  </source>
-  <dest>
-    *: "Albumid"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Songs"
-  </source>
-  <dest>
-    *: "Laulud"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3DB_GENRES
   desc: in tag cache
   user: core
@@ -7651,90 +6799,6 @@
   </source>
   <dest>
     *: "Žanrd"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search"
-  </source>
-  <dest>
-    *: "Otsi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Artists"
-  </source>
-  <dest>
-    *: "Otsi artiste"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Albums"
-  </source>
-  <dest>
-    *: "Otsi albumeid"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Songs"
-  </source>
-  <dest>
-    *: "Otsi lugusid"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_MATCHES
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Found %d matches"
-  </source>
-  <dest>
-    *: "%d vastet leitud"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALL_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "<All songs>"
-  </source>
-  <dest>
-    *: "<Kõik lood>"
   </dest>
   <voice>
     *: ""
@@ -7752,20 +6816,6 @@
   </dest>
   <voice>
     *: "Liiguta"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user: core
-  <source>
-    *: "Move Failed"
-  </source>
-  <dest>
-    *: "Liigutamine ebaõnnestus"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7836,20 +6886,6 @@
   </dest>
   <voice>
     *: "Remove"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user: core
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "Faili seaded"
-  </dest>
-  <voice>
-    *: "File Options"
   </voice>
 </phrase>
 <phrase>
@@ -7931,34 +6967,6 @@
   </source>
   <dest>
     *: "Filetype array full"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user: core
-  <source>
-    *: "Filetype string buffer empty"
-  </source>
-  <dest>
-    *: "Failistringide buffer tühi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user: core
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -8286,20 +7294,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Kõik"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_SRC_MIC
   desc: in the recording settings
   user: core
@@ -8398,20 +7392,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Režiim:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_DIRBROWSE_F2
   desc: in dir browser, F2 button bar text
   user: core
@@ -8482,20 +7462,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -8510,20 +7476,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Helikõrgus üles"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
   user: core
@@ -8535,34 +7487,6 @@
   </dest>
   <voice>
     *: "Update now"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanalid"
-  </dest>
-  <voice>
-    *: "Channels"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Kõik"
-  </dest>
-  <voice>
-    *: "All"
   </voice>
 </phrase>
 <phrase>
@@ -8718,20 +7642,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-  desc: show ID3 Database
-  user: core
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3 andmebaas"
-  </dest>
-  <voice>
-    *: "ID3 Database"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CATALOG
   desc: in onplay menu
   user: core
@@ -8757,20 +7667,6 @@
   </dest>
   <voice>
     *: "Split Measure"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Helikõrgus alla"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8869,20 +7765,6 @@
   </dest>
   <voice>
     *: "What to do when Splitting"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Line In"
-  </dest>
-  <voice>
-    *: "Line In"
   </voice>
 </phrase>
 <phrase>

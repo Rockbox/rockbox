@@ -4328,62 +4328,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "Klava Bloko Ebligata"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "Klava Bloko Malebligata"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Keylock is ON"
-  </source>
-  <dest>
-    *: "Klava Bloko Ebligita"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Keylock is OFF"
-  </source>
-  <dest>
-    *: "Klava Bloko Malebligita"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
   user: core
@@ -4392,20 +4336,6 @@
   </source>
   <dest>
     *: "Tempo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user: core
-  <source>
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "Tranĉa Tempo:"
   </dest>
   <voice>
     *: ""
@@ -4434,20 +4364,6 @@
   </source>
   <dest>
     *: "Pra-Rikordo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gajno"
   </dest>
   <voice>
     *: ""
@@ -4496,20 +4412,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_TRIGGER_MODE
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Trigger"
-  </source>
-  <dest>
-    *: "Lanĉilo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_TRIG_NOREARM
   desc: in recording settings_menu
   user: core
@@ -4518,20 +4420,6 @@
   </source>
   <dest>
     *: "Unufoje"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_REARM
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Ripeti"
   </dest>
   <voice>
     *: ""
@@ -4552,20 +4440,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_MIN_DURATION
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "Por almenaŭ"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_STOP_THRESHOLD
   desc: in recording settings_menu
   user: core
@@ -4574,20 +4448,6 @@
   </source>
   <dest>
     *: "Stopi Sube"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STOP_POSTREC
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "Por almenaŭ"
   </dest>
   <voice>
     *: ""
@@ -4616,34 +4476,6 @@
   </source>
   <dest>
     *: "-inf"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_IDLE
-  desc: waiting for threshold
-  user: core
-  <source>
-    *: "Trigger Idle"
-  </source>
-  <dest>
-    *: "Malaktiva Lanĉilo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
-  user: core
-  <source>
-    *: "Trigger Active"
-  </source>
-  <dest>
-    *: "Aktiva Lanĉilo"
   </dest>
   <voice>
     *: ""
@@ -4898,20 +4730,6 @@
   </source>
   <dest>
     *: "Bitfrekvenco"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNIT_DB
-  desc: in browse_id3
-  user: core
-  <source>
-    *: "dB"
-  </source>
-  <dest>
-    *: "dB"
   </dest>
   <voice>
     *: ""
@@ -6514,20 +6332,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "ekbrilo"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
   user: core
@@ -6570,20 +6374,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user: core
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Ŝarĝanta..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -6592,34 +6382,6 @@
   </source>
   <dest>
     *: "Leglista Bufro Plena"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End of List"
-  </source>
-  <dest>
-    *: "Fino da Listo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End of Song List"
-  </source>
-  <dest>
-    *: "Fino da Kantlisto"
   </dest>
   <voice>
     *: ""
@@ -6920,20 +6682,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user: core
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "Stacioj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
   user: core
@@ -7088,48 +6836,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "Menuo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "Opcio"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "LCD"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHOWDIR_BUFFER_FULL
   desc: in showdir(), displayed on screen when you reach buffer limit
   user: core
@@ -7230,20 +6936,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on archosplayer models
-  user: core
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "STOP por malfari"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
   user: core
@@ -7300,48 +6992,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3DB_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Artists"
-  </source>
-  <dest>
-    *: "Artistoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Albums"
-  </source>
-  <dest>
-    *: "Albumoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Songs"
-  </source>
-  <dest>
-    *: "Kantoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3DB_GENRES
   desc: in tag cache
   user: core
@@ -7350,90 +7000,6 @@
   </source>
   <dest>
     *: "Ĝenroj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search"
-  </source>
-  <dest>
-    *: "Serĉi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Artists"
-  </source>
-  <dest>
-    *: "Serĉi Artistoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Albums"
-  </source>
-  <dest>
-    *: "Serĉi Albumoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Songs"
-  </source>
-  <dest>
-    *: "Serĉi Kantoj"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_MATCHES
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Found %d matches"
-  </source>
-  <dest>
-    *: "%d kongruoj trovita"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALL_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "<All songs>"
-  </source>
-  <dest>
-    *: "<Ĉiuj kantoj>"
   </dest>
   <voice>
     *: ""
@@ -7451,20 +7017,6 @@
   </dest>
   <voice>
     *: "Movi"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user: core
-  <source>
-    *: "Move Failed"
-  </source>
-  <dest>
-    *: "Movo Malsukcesis"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7535,20 +7087,6 @@
   </dest>
   <voice>
     *: "Forpreni"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user: core
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "Dosieraj Opcioj"
-  </dest>
-  <voice>
-    *: "Dosieraj Opcioj"
   </voice>
 </phrase>
 <phrase>
@@ -7630,34 +7168,6 @@
   </source>
   <dest>
     *: "Dosiertipa tabelo plena"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user: core
-  <source>
-    *: "Dosiertipo ĉena bufro malplena"
-  </source>
-  <dest>
-    *: "Dosiertipo ĉena bufro malplena"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user: core
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(LEGI/STOPI)"
   </dest>
   <voice>
     *: ""
@@ -7958,48 +7468,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Ĉiuj"
-  </dest>
-  <voice>
-    *: "Ĉiuj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Ĉiuj"
-  </dest>
-  <voice>
-    *: "Ĉiuj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-  desc: show ID3 Database
-  user: core
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3a Datumbazo"
-  </dest>
-  <voice>
-    *: "ID3a Datumbazo"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_QUALITY
   desc: in the recording settings
   user: core
@@ -8056,20 +7524,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Analoga Enigaĵo"
-  </dest>
-  <voice>
-    *: "Analoga Enigaĵo"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -8081,20 +7535,6 @@
   </dest>
   <voice>
     *: "Cifereca"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanaloj"
-  </dest>
-  <voice>
-    *: "Kanaloj"
   </voice>
 </phrase>
 <phrase>
@@ -8123,62 +7563,6 @@
   </dest>
   <voice>
     *: "Lega Rapido"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Tonalten"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Tonmalalten"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Reĝimo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gajno"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>

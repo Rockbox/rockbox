@@ -73,20 +73,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Naafrägu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALWAYS
   desc: (archosplayer) the jump scroll shall be done "always
   user: core
@@ -137,20 +123,6 @@
   </source>
   <dest>
     *: "Bitte MMC üsanäh"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_SETTING_CANCEL
-  desc: Visual confirmation of canceling a changed setting
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Abgibrochu"
   </dest>
   <voice>
     *: ""
@@ -255,20 +227,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_MENU
-  desc: in main menu.
-  user: core
-  <source>
-    *: "Playlist Options"
-  </source>
-  <dest>
-    *: "Abschpillischta Optione"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLUGINS
   desc: in main_menu()
   user: core
@@ -277,20 +235,6 @@
   </source>
   <dest>
     *: "Plugins"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Informazione"
   </dest>
   <voice>
     *: ""
@@ -361,34 +305,6 @@
   </source>
   <dest>
     *: "Balance"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanäl"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Kanalischtellig"
   </dest>
   <voice>
     *: ""
@@ -703,20 +619,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Browse Firmwares"
-  </source>
-  <dest>
-    *: "Firmwares"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user: core
@@ -725,63 +627,6 @@
   </source>
   <dest>
     *: "Ischtellige zruggsetzu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user: core
-  <source>
-    *: "Are You Sure?"
-  </source>
-  <dest>
-    *: "Bisch sicher?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic archosrecorder string to use to confirm
-  user: core
-  <source>
-    *: "PLAY = Yes"
-  </source>
-  <dest>
-    *: "PLAY = Ja"
-    iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic archosrecorder string to use to cancel
-  user: core
-  <source>
-    *: "Any Other = No"
-  </source>
-  <dest>
-    *: "Andri = Nei"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user: core
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Ischtellige"
   </dest>
   <voice>
     *: ""
@@ -802,20 +647,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Abgibrochu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SAVE_SETTINGS
   desc: in system_settings_menu()
   user: core
@@ -824,76 +655,6 @@
   </source>
   <dest>
     *: "Sichre .cfg Datii"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Spiicherfähler"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Partition?"
-  </source>
-  <dest>
-    *: "Akku läär?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Spiicherfähler"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "No partition?"
-  </source>
-  <dest>
-    *: "Akku läär?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_MENU
-  desc: in the recording sub menu
-  user: core
-  <source>
-    *: "Start Recording"
-  </source>
-  <dest>
-    *: "Üfnahm startu"
   </dest>
   <voice>
     *: ""
@@ -970,20 +731,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO_MENU
-  desc: in the info sub menu
-  user: core
-  <source>
-    *: "Rockbox Info"
-  </source>
-  <dest>
-    *: "Rockbox Info"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VERSION
   desc: in the main menu
   user: core
@@ -1040,20 +787,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alli"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user: core
@@ -1076,20 +809,6 @@
   </source>
   <dest>
     *: "Gwählts zersch abschpilu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Resume"
-  </source>
-  <dest>
-    *: "Fortsetzu"
   </dest>
   <voice>
     *: ""
@@ -1250,20 +969,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alli"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
   user: core
@@ -1286,20 +991,6 @@
   </source>
   <dest>
     *: "Müsig"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Liederlischta"
   </dest>
   <voice>
     *: ""
@@ -1768,20 +1459,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Analog"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -1790,20 +1467,6 @@
   </source>
   <dest>
     *: "Digital"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanal"
   </dest>
   <voice>
     *: ""
@@ -1958,20 +1621,6 @@
   </source>
   <dest>
     *: "LCD Modus"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "normal"
   </dest>
   <voice>
     *: ""
@@ -2384,20 +2033,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user: core
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "HDD Üsschaltbifähl brüüchu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME
   desc: in settings_menu
   user: core
@@ -2748,34 +2383,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Puf: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Puffer: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
   user: core
@@ -2888,176 +2495,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Modus:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Status-"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Scroll-"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "Azeig:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
-  user: core
-  <source>
-    *: "Down = List"
-  </source>
-  <dest>
-    *: "Embri = Lischta"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
-  user: core
-  <source>
-    *: "OFF = Exit"
-  </source>
-  <dest>
-    *: "OFF = Biendu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
-  user: core
-  <source>
-    *: "Bookmark"
-  </source>
-  <dest>
-    *: "Läsezeichu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
-  user: core
-  <source>
-    *: "Index"
-  </source>
-  <dest>
-    *: "Index"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
-  user: core
-  <source>
-    *: "Time"
-  </source>
-  <dest>
-    *: "Zit"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
-  user: core
-  <source>
-    *: "PLAY = Select"
-  </source>
-  <dest>
-    *: "PLAY = üswählu"
-    iriverh100,iriverh120,iriverh300: "NAVI = üswählu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
-  user: core
-  <source>
-    *: "ON+Play = Delete"
-  </source>
-  <dest>
-    *: "ON+PLAY = leschu"
-    iriverh100,iriverh120,iriverh300: "ON+NAVI = leschu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
-  user: core
-  <source>
-    *: "Load Last Bookmark?"
-  </source>
-  <dest>
-    *: "zletscht Läsezeichu ladu?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -3114,22 +2551,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user: core
-  <source>
-    *: "ON To Set"
-    vibe500: "OK To Set"
-  </source>
-  <dest>
-    *: "ON = spiichru"
-    vibe500: "OK = spiichru"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user: core
@@ -3146,62 +2567,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "Schperri A"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "Schperri Üs"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock Is ON"
-  </source>
-  <dest>
-    *: "Schperri isch A"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock Is OFF"
-  </source>
-  <dest>
-    *: "Schperri isch Üs"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
   user: core
@@ -3210,20 +2575,6 @@
   </source>
   <dest>
     *: "Zit:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: 
-  user: core
-  <source>
-    *: "Split time:"
-  </source>
-  <dest>
-    *: "Üfnahm teilu:"
   </dest>
   <voice>
     *: ""
@@ -3252,20 +2603,6 @@
   </source>
   <dest>
     *: "Vorüsüfnahm"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Verst"
   </dest>
   <voice>
     *: ""
@@ -4956,20 +4293,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
   user: core
@@ -4984,20 +4307,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user: core
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Ladu..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -5006,34 +4315,6 @@
   </source>
   <dest>
     *: "Liederlischta Puffer voll"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End Of List"
-  </source>
-  <dest>
-    *: "Lischtuendi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End Of Song List"
-  </source>
-  <dest>
-    *: "Lischtuendi"
   </dest>
   <voice>
     *: ""
@@ -5292,20 +4573,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user: core
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "Sender"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
   user: core
@@ -5342,48 +4609,6 @@
   </source>
   <dest>
     *: "Mono erzwingu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "Mönü"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "Option"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "LCD"
   </dest>
   <voice>
     *: ""
@@ -5490,20 +4715,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on archosplayer models
-  user: core
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "STOP fer abzbrächu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
   user: core
@@ -5526,20 +4737,6 @@
   </source>
   <dest>
     *: "verschiebu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user: core
-  <source>
-    *: "Move failed"
-  </source>
-  <dest>
-    *: "Fähler bim verschiebu"
   </dest>
   <voice>
     *: ""
@@ -5610,20 +4807,6 @@
   </source>
   <dest>
     *: "leschu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user: core
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "Datiioptione"
   </dest>
   <voice>
     *: ""
@@ -5714,34 +4897,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user: core
-  <source>
-    *: "Filetype string buffer empty"
-  </source>
-  <dest>
-    *: "Datiitypu-Zeichubuffer läär"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: posible answers to resume question
-  user: core
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(PLAY/STOP)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -5764,34 +4919,6 @@
   </source>
   <dest>
     *: "Mono"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alli"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alli"
   </dest>
   <voice>
     *: ""
@@ -5854,20 +4981,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Analog"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -5876,76 +4989,6 @@
   </source>
   <dest>
     *: "Digital"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanal"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "schnäller"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "langsamer"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Modus:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Verst"
   </dest>
   <voice>
     *: ""

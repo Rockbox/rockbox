@@ -73,20 +73,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Vra"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SOUND_SETTINGS
   desc: in the main menu
   user: core
@@ -109,20 +95,6 @@
   </source>
   <dest>
     *: "Algemene Opsies"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Inligting"
   </dest>
   <voice>
     *: ""
@@ -179,34 +151,6 @@
   </source>
   <dest>
     *: "Balans"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Kanale"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Kanaal Opsies"
   </dest>
   <voice>
     *: ""
@@ -381,34 +325,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user: core
-  <source>
-    *: "Are you sure?"
-  </source>
-  <dest>
-    *: "Seker?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user: core
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Opsies"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_DONE_CLEAR
   desc: visual confirmation after settings reset
   user: core
@@ -417,76 +333,6 @@
   </source>
   <dest>
     *: "Skoon"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Gekanselleer"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save failed"
-  </source>
-  <dest>
-    *: "Bêre gebreek"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Batt. low?"
-  </source>
-  <dest>
-    *: "Batt. leeg?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save failed"
-  </source>
-  <dest>
-    *: "Bêre gebreek"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Is battery low?"
-  </source>
-  <dest>
-    *: "Battery leeg?"
   </dest>
   <voice>
     *: ""
@@ -549,20 +395,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alles"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user: core
@@ -591,20 +423,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Resume"
-  </source>
-  <dest>
-    *: "Voort"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SORT_CASE
   desc: in settings_menu
   user: core
@@ -627,20 +445,6 @@
   </source>
   <dest>
     *: "Wys Lêers"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alle"
   </dest>
   <voice>
     *: ""
@@ -941,34 +745,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buf: %d.%02dMB"
-  </source>
-  <dest>
-    *: "Buf: %d.%02dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buffer: %d.%02dMB"
-  </source>
-  <dest>
-    *: "Buffer: %d.%02dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
   user: core
@@ -1025,76 +801,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "mode:"
-  </source>
-  <dest>
-    *: "modus:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Status"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Rol"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "bar"
-  </source>
-  <dest>
-    *: "balk"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TIME_SET
-  desc: 
-  user: core
-  <source>
-    *: "ON to set"
-  </source>
-  <dest>
-    *: "ON stel"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user: core
@@ -1103,62 +809,6 @@
   </source>
   <dest>
     *: "OFF kanselleer"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Keylock ON"
-  </source>
-  <dest>
-    *: "Toetsblok AAN"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Keylock OFF"
-  </source>
-  <dest>
-    *: "Toetsblok AF"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key lock is ON"
-  </source>
-  <dest>
-    *: "Toetsblok is AAN"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key lock is OFF"
-  </source>
-  <dest>
-    *: "Toetsblok is AF"
   </dest>
   <voice>
     *: ""
@@ -1277,20 +927,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user: core
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Laai..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -1299,34 +935,6 @@
   </source>
   <dest>
     *: "Speellys buffer vol"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End of list"
-  </source>
-  <dest>
-    *: "Einde van lys"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End of song list"
-  </source>
-  <dest>
-    *: "Einde van die titellys"
   </dest>
   <voice>
     *: ""
@@ -1361,20 +969,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user: core
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(SPEEL/STOP)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -1397,85 +991,6 @@
   </source>
   <dest>
     *: "Mono"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alles"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Alle"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Pitch up"
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Versnel"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Pitch down"
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Vertraag"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "mode:"
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "modus:"
   </dest>
   <voice>
     *: ""

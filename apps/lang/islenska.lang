@@ -73,20 +73,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Spyrja"
-  </dest>
-  <voice>
-    *: "Ask"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALWAYS
   desc: used in various places
   user: core
@@ -146,20 +132,6 @@
   <voice>
     *: none
     archosondio*: "Please remove multimedia card"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_SETTING_CANCEL
-  desc: Visual confirmation of canceling a changed setting
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Hætt við"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -234,7 +206,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: fm menu title
+  desc: in the main menu
   user: core
   <source>
     *: none
@@ -267,20 +239,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_MENU
-  desc: in main menu.
-  user: core
-  <source>
-    *: "Playlist Options"
-  </source>
-  <dest>
-    *: "Lagalista stillinga"
-  </dest>
-  <voice>
-    *: "Playlist Options"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLUGINS
   desc: in the main menu
   user: core
@@ -292,20 +250,6 @@
   </dest>
   <voice>
     *: "Plugins"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Upplýsingar"
-  </dest>
-  <voice>
-    *: "Info"
   </voice>
 </phrase>
 <phrase>
@@ -379,34 +323,6 @@
   </dest>
   <voice>
     *: "Balance"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Rásir"
-  </dest>
-  <voice>
-    *: "Channels"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Rásauppsetning"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -632,15 +548,15 @@
   user: core
   <source>
     *: none
-    masf: "MDB Center frequency"
+    masf: "MDB Centre Frequency"
   </source>
   <dest>
     *: none
-    masf: "MDB mið tíðni"
+    masf: "MDB miðtíðni"
   </dest>
   <voice>
     *: none
-    masf: "MDB Center frequency"
+    masf: "MDB Centre Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -773,20 +689,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: in the main menu
-  user: core
-  <source>
-    *: "Browse Firmwares"
-  </source>
-  <dest>
-    *: "Skoða Stýrikerfi"
-  </dest>
-  <voice>
-    *: "Browse Firmwares"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user: core
@@ -798,63 +700,6 @@
   </dest>
   <voice>
     *: "Reset Settings"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user: core
-  <source>
-    *: "Are You Sure?"
-  </source>
-  <dest>
-    *: "Ertu viss?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic archosrecorder string to use to confirm
-  user: core
-  <source>
-    *: "PLAY = Yes"
-  </source>
-  <dest>
-    *: "PLAY = Já"
-    iriverh100,iriverh120,iriverh300: "NAVI = Já"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic archosrecorder string to use to cancel
-  user: core
-  <source>
-    *: "Any Other = No"
-  </source>
-  <dest>
-    *: "Allt annað = Nei"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user: core
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Stillingar"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -872,20 +717,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user: core
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Hætti við"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SAVE_SETTINGS
   desc: in system_settings_menu()
   user: core
@@ -897,76 +728,6 @@
   </dest>
   <voice>
     *: "Write configuration file"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Vistun mistókst"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "Partition?"
-  </source>
-  <dest>
-    *: "Deila?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "Vistun mistókst"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "No partition?"
-  </source>
-  <dest>
-    *: "Eingin skipting?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_MENU
-  desc: in the recording sub menu
-  user: core
-  <source>
-    *: "Recording screen"
-  </source>
-  <dest>
-    *: "Hjlóðritunarskjár"
-  </dest>
-  <voice>
-    *: "Recording screen"
   </voice>
 </phrase>
 <phrase>
@@ -1043,20 +804,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO_MENU
-  desc: in the info sub menu
-  user: core
-  <source>
-    *: "Rockbox Info"
-  </source>
-  <dest>
-    *: "Rockbox upplýsingar"
-  </dest>
-  <voice>
-    *: "Rockbox Info"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VERSION
   desc: in the Rockbox Info screen
   user: core
@@ -1113,20 +860,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Öll"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user: core
@@ -1166,20 +899,6 @@
   </dest>
   <voice>
     *: "Play Selected File First"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Resume on startup"
-  </source>
-  <dest>
-    *: "Halda áfram"
-  </dest>
-  <voice>
-    *: "Resume on startup"
   </voice>
 </phrase>
 <phrase>
@@ -1314,13 +1033,16 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: "Strong"
+    *: none
+    swcodec: "Strong"
   </source>
   <dest>
-    *: "Há"
+    *: none
+    swcodec: "Há"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Strong"
   </voice>
 </phrase>
 <phrase>
@@ -1429,13 +1151,13 @@
   desc: browser sorting setting
   user: core
   <source>
-    *: "By date"
+    *: "By Date"
   </source>
   <dest>
     *: "Eftir dagsetningu"
   </dest>
   <voice>
-    *: "By date"
+    *: "By Date"
   </voice>
 </phrase>
 <phrase>
@@ -1457,13 +1179,13 @@
   desc: browser sorting setting
   user: core
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
-    *: "Eftir típa"
+    *: "Eftir tegund"
   </dest>
   <voice>
-    *: "by type"
+    *: "By Type"
   </voice>
 </phrase>
 <phrase>
@@ -1478,20 +1200,6 @@
   </dest>
   <voice>
     *: "Show Files"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Allt"
-  </dest>
-  <voice>
-    *: "All"
   </voice>
 </phrase>
 <phrase>
@@ -1520,34 +1228,6 @@
   </dest>
   <voice>
     *: "Music"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Lagalisti"
-  </dest>
-  <voice>
-    *: "Playlists"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ID3DB
-  desc: show ID3 database
-  user: core
-  <source>
-    *: "ID3 database"
-  </source>
-  <dest>
-    *: "ID3 gagnagrunn"
-  </dest>
-  <voice>
-    *: "ID3 database"
   </voice>
 </phrase>
 <phrase>
@@ -1676,16 +1356,16 @@
   desc: in the display menu
   user: core
   <source>
-    *: none
-    masd: "Peak Meter"
+    *: "Peak Meter"
+    masd: none
   </source>
   <dest>
-    *: none
-    masd: "Hámarksmælir"
+    *: "Hámarksmælir"
+    masd: none
   </dest>
   <voice>
-    *: none
-    masd: "Peak Meter"
+    *: "Peak Meter"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2066,20 +1746,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Lína inn"
-  </dest>
-  <voice>
-    *: "Line In"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -2094,20 +1760,6 @@
   <voice>
     *: none
     recording: "Digital"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Rásir"
-  </dest>
-  <voice>
-    *: "Channels"
   </voice>
 </phrase>
 <phrase>
@@ -2176,20 +1828,6 @@
   <voice>
     *: none
     recording: "Directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
-  user: core
-  <source>
-    *: "Show recording screen on startup"
-  </source>
-  <dest>
-    *: "Sýna Upptökusjá þegar kveikt er á"
-  </dest>
-  <voice>
-    *: "Show recording screen on startup"
   </voice>
 </phrase>
 <phrase>
@@ -2438,20 +2076,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "Eðlilegt"
-  </dest>
-  <voice>
-    *: "Normal"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_INVERT_LCD_INVERSE
   desc: in settings_menu
   user: core
@@ -2642,13 +2266,16 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "Stöðu súla"
+    *: none
+    lcd_bitmap: "Stöðu súla"
   </dest>
   <voice>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </voice>
 </phrase>
 <phrase>
@@ -2741,16 +2368,16 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: none
-    masd: "Peak Release"
+    *: "Peak Release"
+    masd: none
   </source>
   <dest>
-    *: none
-    masd: "Hámarkslosun"
+    *: "Hámarkslosun"
+    masd: none
   </dest>
   <voice>
-    *: none
-    masd: "Peak Release"
+    *: "Peak Release"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2942,13 +2569,16 @@
   desc: in battery settings
   user: core
   <source>
-    *: "NiMH"
+    *: none
+    battery_types: "NiMH"
   </source>
   <dest>
-    *: "NiMH"
+    *: none
+    battery_types: "NiMH"
   </dest>
   <voice>
-    *: "Nickel metal hydride"
+    *: none
+    battery_types: "Nickel metal hydride"
   </voice>
 </phrase>
 <phrase>
@@ -2969,34 +2599,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user: core
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "Slökkva á diski"
-  </dest>
-  <voice>
-    *: "Disk Poweroff"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME
-  desc: in the system sub menu
+  desc: Used on the bookmark select window to label elapsed time
   user: core
   <source>
-    *: none
-    rtc: "Time & Date"
+    *: "Time"
   </source>
   <dest>
-    *: none
-    rtc: "Stilla tímann/dagsetninguna"
+    *: "Tími"
   </dest>
   <voice>
-    *: none
-    rtc: "Time and Date"
+    *: "Time"
   </voice>
 </phrase>
 <phrase>
@@ -3135,20 +2748,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RATING
-  desc: in set_rating
-  user: core
-  <source>
-    *: "Rating:"
-  </source>
-  <dest>
-    *: "Einkun"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RENAME
   desc: The verb/action Rename
   user: core
@@ -3181,7 +2780,7 @@
   desc: in on+play menu
   user: core
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
     *: "Eyða möppu"
@@ -3415,34 +3014,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size archosplayer-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Min: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size archosrecorder-screen width, %d MB %d fraction of MB
-  user: core
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Minni: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
   user: core
@@ -3645,176 +3216,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Háttur:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Staða"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Skruna"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user: core
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "Súla"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: From the auto-load screen, allows user to list all bookmarks
-  user: core
-  <source>
-    *: "Down = List"
-  </source>
-  <dest>
-    *: "Niður = Listi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_EXIT
-  desc: From the bookmark list screen, allows user to exit
-  user: core
-  <source>
-    *: "OFF = Exit"
-  </source>
-  <dest>
-    *: "Af = Hætta"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: Used on the bookmark select window to label bookmark number
-  user: core
-  <source>
-    *: "Bookmark"
-  </source>
-  <dest>
-    *: "Bókamerki"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: Used on the bookmark select window to label index number
-  user: core
-  <source>
-    *: "Index"
-  </source>
-  <dest>
-    *: "Vísitala"
-  </dest>
-  <voice>
-    *: "Index"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: Used on the bookmark select window to label elapsed time
-  user: core
-  <source>
-    *: "Time"
-  </source>
-  <dest>
-    *: "Tími"
-  </dest>
-  <voice>
-    *: "Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_PLAY
-  desc: Used on the bookmark select window to indicated the play option
-  user: core
-  <source>
-    *: "PLAY = Select"
-  </source>
-  <dest>
-    *: "Spila = Velja"
-    iriverh100,iriverh120,iriverh300: "NAVI = Velja"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_DELETE
-  desc: Used on the bookmark select window to indicated the bookmark delete option
-  user: core
-  <source>
-    *: "ON+Play = Delete"
-  </source>
-  <dest>
-    *: "Á+Spila = Eyða"
-    iriverh100,iriverh120,iriverh300: "Á+NAVI = Eyða"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: prompt for user to decide to create a bookmark
-  user: core
-  <source>
-    *: "Load Last Bookmark?"
-  </source>
-  <dest>
-    *: "Hlaða síðasta bókamerki?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -3871,22 +3272,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user: core
-  <source>
-    *: "ON To Set"
-    vibe500: "OK To Set"
-  </source>
-  <dest>
-    *: "À til að stilla"
-    vibe500: "OK til að stilla"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user: core
@@ -3924,62 +3309,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "Lás á"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "Lás af"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user: core
-  <source>
-    *: "Key Lock Is ON"
-  </source>
-  <dest>
-    *: "Takkalás á"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user: core
-  <source>
-    *: "Key Lock Is OFF"
-  </source>
-  <dest>
-    *: "Takkalás af"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
   user: core
@@ -3994,20 +3323,6 @@
   <voice>
     *: none
     recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user: core
-  <source>
-    *: "Split time:"
-  </source>
-  <dest>
-    *: "Aðskilninga tími:"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4045,20 +3360,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Bæta"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_FULL
   desc: in recording screen
   user: core
@@ -4082,20 +3383,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_TRIGGER_MODE
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Trigger"
-  </source>
-  <dest>
-    *: "Gikkur"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_TRIG_NOREARM
   desc: in recording settings_menu
   user: core
@@ -4110,20 +3397,6 @@
   <voice>
     *: none
     recording: "Once"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_REARM
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Endurtaka"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4144,20 +3417,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_MIN_DURATION
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "að minnstakosti"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_STOP_THRESHOLD
   desc: in recording settings_menu
   user: core
@@ -4175,26 +3434,12 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_STOP_POSTREC
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "að minnstakosti"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_STOP_GAP
   desc: in recording settings_menu
   user: core
   <source>
     *: none
-    recording: "Presplit gap"
+    recording: "Presplit Gap"
   </source>
   <dest>
     *: none
@@ -4202,7 +3447,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Presplit gap"
+    recording: "Presplit Gap"
   </voice>
 </phrase>
 <phrase>
@@ -4220,34 +3465,6 @@
   <voice>
     *: none
     recording: "minus infinity"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_IDLE
-  desc: waiting for threshold
-  user: core
-  <source>
-    *: "Trigger idle"
-  </source>
-  <dest>
-    *: "Gikkur laus"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
-  user: core
-  <source>
-    *: "Trigger active"
-  </source>
-  <dest>
-    *: "Gikkur virkur"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4473,20 +3690,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_UNIT_DB
-  desc: in browse_id3
-  user: core
-  <source>
-    *: "dB"
-  </source>
-  <dest>
-    *: "Gagnagrunn"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_VBR
   desc: in browse_id3
   user: core
@@ -4519,7 +3722,7 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
     *: "Lag hækkun"
@@ -4530,7 +3733,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user: core
   <source>
     *: "Album Gain"
@@ -6140,20 +5343,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "flash"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
   user: core
@@ -6168,20 +5357,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user: core
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Hleðsla..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -6193,34 +5368,6 @@
   </dest>
   <voice>
     *: "Playlist Buffer Full"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End Of List"
-  </source>
-  <dest>
-    *: "Endir af lagalista"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user: core
-  <source>
-    *: "End Of Song List"
-  </source>
-  <dest>
-    *: "Listi búinn"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6417,7 +5564,7 @@
   user: core
   <source>
     *: none
-    radio: "Remove preset"
+    radio: "Remove Preset"
   </source>
   <dest>
     *: none
@@ -6451,7 +5598,7 @@
   user: core
   <source>
     *: none
-    radio: "The preset List is Full"
+    radio: "The Preset List is Full"
   </source>
   <dest>
     *: none
@@ -6514,20 +5661,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user: core
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "Forstilling"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
   user: core
@@ -6576,48 +5709,6 @@
   <voice>
     *: none
     radio: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "Valmynd"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "Stilling"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "Skjár"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6731,20 +5822,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on archosplayer models
-  user: core
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "STOPP til að hætta vinnslu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
   user: core
@@ -6753,132 +5830,6 @@
   </source>
   <dest>
     *: "Eingar Skrár"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Artists"
-  </source>
-  <dest>
-    *: "Listamenn"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Albums"
-  </source>
-  <dest>
-    *: "Albúm"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Songs"
-  </source>
-  <dest>
-    *: "Lög"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search"
-  </source>
-  <dest>
-    *: "Leita"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ARTISTS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Artists"
-  </source>
-  <dest>
-    *: "Leita að listamanni"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ALBUMS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Albums"
-  </source>
-  <dest>
-    *: "Leita að albúmi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Search Songs"
-  </source>
-  <dest>
-    *: "Leita að lagi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_MATCHES
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "Found %d matches"
-  </source>
-  <dest>
-    *: "Fann %d"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALL_SONGS
-  desc: ID3 virtual folder name
-  user: core
-  <source>
-    *: "<All songs>"
-  </source>
-  <dest>
-    *: "<Öll lög>"
   </dest>
   <voice>
     *: ""
@@ -6896,20 +5847,6 @@
   </dest>
   <voice>
     *: "Move"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user: core
-  <source>
-    *: "Move failed"
-  </source>
-  <dest>
-    *: "Færsla mistókst"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6980,20 +5917,6 @@
   </dest>
   <voice>
     *: "Remove"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user: core
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "Skráar Stillingar"
-  </dest>
-  <voice>
-    *: "File Options"
   </voice>
 </phrase>
 <phrase>
@@ -7081,34 +6004,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user: core
-  <source>
-    *: "Filetype string buffer empty"
-  </source>
-  <dest>
-    *: "Skjalatípu strengis minni tómmt"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user: core
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(Já/Nei)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -7143,54 +6038,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Öll"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user: core
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Allt"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: show ID3 database
-  desc: show ID3 Database
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "ID3 database"
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "ID3 gagnagrunn"
-  </dest>
-  <voice>
-    *: "ID3 database"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_QUALITY
   desc: in the recording settings
   user: core
@@ -7212,13 +6059,16 @@
   desc: in the recording settings
   user: core
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Tíðni"
+    *: none
+    recording: "Tíðni"
   </dest>
   <voice>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -7256,20 +6106,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Lína inn"
-  </dest>
-  <voice>
-    *: "Line In"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
   desc: in the recording settings
   user: core
@@ -7287,20 +6123,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Rásir"
-  </dest>
-  <voice>
-    *: "Channels"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
   user: core
@@ -7315,62 +6137,6 @@
   <voice>
     *: none
     recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Hækka tónhæð"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user: core
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Lækka tónhæð"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Háttur:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Bæta"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
