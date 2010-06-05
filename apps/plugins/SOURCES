@@ -6,6 +6,7 @@ dict.c
 jackpot.c
 keybox.c
 logo.c
+lrcplayer.c
 mosaique.c
 properties.c
 random_folder_advance_config.c
