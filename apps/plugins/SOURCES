@@ -23,7 +23,6 @@ stopwatch.c
 #endif
 theme_remove.c
 vbrfix.c
-viewer.c
 md5sum.c
 dice.c
 disktidy.c
