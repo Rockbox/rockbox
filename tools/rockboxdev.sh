@@ -34,7 +34,7 @@ if [ -z $GNU_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc bzip2 make patch"
+reqtools="gcc bzip2 make patch makeinfo"
 
 ##############################################################################
 # Functions:
