@@ -33,7 +33,7 @@ PLUGIN_IRAM_DECLARE
 char* filename;
 
 /* Running time. */
-uint64_t runningtime = 0;
+uint64_t runningtime IBSS_ATTR = 0;
 
 /* Variables for Pure Data. */
 int sys_verbose;
@@ -57,19 +57,19 @@ rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
 
 
 /* Quit flag. */
-bool quit = false;
+bool quit IBSS_ATTR = false;
 
 /* Stack sizes for threads. */
 #define CORESTACKSIZE (1 * 1024 * 1024)
 #define GUISTACKSIZE (512 * 1024)
 
 /* Thread stacks. */
-void* core_stack;
-void* gui_stack;
+void* core_stack IBSS_ATTR;
+void* gui_stack IBSS_ATTR;
 
 /* Thread IDs. */
-unsigned int core_thread_id;
-unsigned int gui_thread_id;
+unsigned int core_thread_id IBSS_ATTR;
+unsigned int gui_thread_id IBSS_ATTR;
 
 
 /* GUI thread */
