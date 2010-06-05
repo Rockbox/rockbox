@@ -22,7 +22,7 @@
 #include "sd.h"
 #include "system.h"
 #include <string.h>
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "storage.h"
 #include "led.h"
 #include "thread.h"

@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "logf.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "storage.h"
 
 static const unsigned char sd_mantissa[] = {  /* *10 */

@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include "mmc.h"
 #include "ata_mmc.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "ata_idle_notify.h"
 #include "kernel.h"
 #include "thread.h"

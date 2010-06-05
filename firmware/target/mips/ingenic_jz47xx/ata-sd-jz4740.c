@@ -27,7 +27,7 @@
 #include "disk.h"
 #include "fat.h"
 #include "led.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "logf.h"
 #include "sd.h"
 #include "system.h"

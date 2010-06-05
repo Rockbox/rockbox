@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "fat.h"
 #ifdef HAVE_HOTSWAP
-#include "hotswap.h"
+#include "sdmmc.h" /* for card_enable_monitoring() */
 #include "dir.h" /* for release_dirs() */
 #include "file.h" /* for release_files() */
 #endif

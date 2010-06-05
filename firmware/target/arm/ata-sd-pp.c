@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "config.h" /* for HAVE_MULTIDRIVE */
 #include "fat.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #ifdef HAVE_HOTSWAP
 #include "sd-pp-target.h"
 #endif

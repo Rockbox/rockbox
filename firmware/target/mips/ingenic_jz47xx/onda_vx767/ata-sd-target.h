@@ -23,7 +23,7 @@
 #define ATA_SD_TARGET_H
 
 #include "inttypes.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "jz4740.h"
 
 int _sd_read_sectors(unsigned long start, int count, void* buf);

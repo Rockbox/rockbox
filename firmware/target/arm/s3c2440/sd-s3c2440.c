@@ -31,7 +31,7 @@
 #include "uart-s3c2440.h"
 #endif
 #ifdef HAVE_HOTSWAP
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "disk.h"
 #include "fat.h"
 #endif

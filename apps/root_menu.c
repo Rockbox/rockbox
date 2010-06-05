@@ -40,7 +40,6 @@
 
 #ifdef HAVE_HOTSWAP
 #include "storage.h"
-#include "hotswap.h"
 #include "dir.h"
 #endif
 /* gui api */

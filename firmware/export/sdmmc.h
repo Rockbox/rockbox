@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HOTSWAP_H__
-#define __HOTSWAP_H__
+#ifndef __SDMMC_H__
+#define __SDMMC_H__
 
 #include <stdbool.h>
 

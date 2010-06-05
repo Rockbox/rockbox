@@ -26,7 +26,6 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "storage.h"
-#include "hotswap.h"
 #include "disk.h"
 /* Needed to get at the audio buffer */
 #include "audio.h"

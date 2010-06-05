@@ -23,7 +23,7 @@
 #if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #else
-#include "hotswap.h"
+#include "sdmmc.h"
 #endif
 
 /* helper function to extract n (<=32) bits from an arbitrary position.

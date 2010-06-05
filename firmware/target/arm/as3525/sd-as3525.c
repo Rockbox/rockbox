@@ -26,7 +26,7 @@
 #include "fat.h"
 #include "thread.h"
 #include "led.h"
-#include "hotswap.h"
+#include "sdmmc.h"
 #include "system.h"
 #include "cpu.h"
 #include <stdio.h>

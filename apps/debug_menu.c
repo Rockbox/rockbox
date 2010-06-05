@@ -64,7 +64,7 @@
 #include "mas.h"
 #include "eeprom_24cxx.h"
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
-#include "hotswap.h"
+#include "sdmmc.h"
 #endif
 #if (CONFIG_STORAGE & STORAGE_ATA)
 #include "ata.h"
