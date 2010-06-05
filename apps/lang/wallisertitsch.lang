@@ -1012,20 +1012,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
   user: core
@@ -1146,48 +1132,6 @@
   </source>
   <dest>
     *: "Uberblendu bi Stop/Pause"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ORDER
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "ID3 tag priority"
-  </source>
-  <dest>
-    *: "Bivorzugte ID3 tag"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "V1 then V2"
-  </source>
-  <dest>
-    *: "V1 vor V2"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "V2 then V1"
-  </source>
-  <dest>
-    *: "V2 vor V1"
   </dest>
   <voice>
     *: ""
@@ -1922,20 +1866,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
-  user: core
-  <source>
-    *: "Current dir"
-  </source>
-  <dest>
-    *: "aktuells Verzeichnis"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FFRW_STEP
   desc: in settings_menu
   user: core
@@ -2206,13 +2136,16 @@
   desc: (archosplayer) menu altarnative for jump scroll
   user: core
   <source>
-    *: "Jump scroll"
+    *: none
+    lcd_charcell: "Jump scroll"
   </source>
   <dest>
-    *: "Gump-Scroll"
+    *: none
+    lcd_charcell: "Gump-Scroll"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_charcell: ""
   </voice>
 </phrase>
 <phrase>
@@ -2220,13 +2153,16 @@
   desc: (archosplayer) the jump scroll shall be done "one time
   user: core
   <source>
-    *: "One time"
+    *: none
+    lcd_charcell: "One time"
   </source>
   <dest>
-    *: "eis Mal"
+    *: none
+    lcd_charcell: "eis Mal"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_charcell: ""
   </voice>
 </phrase>
 <phrase>
@@ -2234,13 +2170,16 @@
   desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
-    *: "Jump Scroll Delay"
+    *: none
+    lcd_charcell: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Gumpverzögrig"
+    *: none
+    lcd_charcell: "Gumpverzögrig"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_charcell: ""
   </voice>
 </phrase>
 <phrase>
@@ -2350,20 +2289,6 @@
   </source>
   <dest>
     *: "Gschw. bim Abfallu"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
-  user: core
-  <source>
-    *: "Units Per Read"
-  </source>
-  <dest>
-    *: "Einheite pro Mässig"
   </dest>
   <voice>
     *: ""
@@ -3392,34 +3317,6 @@
   </source>
   <dest>
     *: "Verst"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_LEFT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Left"
-  </source>
-  <dest>
-    *: "Lings"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Right"
-  </source>
-  <dest>
-    *: "Rächts"
   </dest>
   <voice>
     *: ""
@@ -5068,20 +4965,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_ROCK
   desc: spoken only, for file extension
   user: core
@@ -5160,20 +5043,6 @@
   </source>
   <dest>
     *: "Ladu..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
-  user: core
-  <source>
-    *: "Shuffling..."
-  </source>
-  <dest>
-    *: "Mischlu..."
   </dest>
   <voice>
     *: ""
@@ -5359,20 +5228,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_STATION
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5896,20 +5751,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_EXTENSION_FULL
-  desc: Extension array full
-  user: core
-  <source>
-    *: "Extension array full"
-  </source>
-  <dest>
-    *: "Erwitrigslischta voll"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
   user: core
@@ -5918,20 +5759,6 @@
   </source>
   <dest>
     *: "Datiitypulischta voll"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_PLUGIN_NAME_LONG
-  desc: Viewer plugin name too long
-  user: core
-  <source>
-    *: "Plugin name too long"
-  </source>
-  <dest>
-    *: "Plugin-Namu z'lenge"
   </dest>
   <voice>
     *: ""
@@ -5966,76 +5793,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
-  user: core
-  <source>
-    *: "Yes"
-  </source>
-  <dest>
-    *: "Ja"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
-  user: core
-  <source>
-    *: "No"
-  </source>
-  <dest>
-    *: "Nei"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "On"
-  </source>
-  <dest>
-    *: "A"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "Off"
-  </source>
-  <dest>
-    *: "Üs"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Volume"
-  </source>
-  <dest>
-    *: "Lütschterchi"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -6064,34 +5821,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Shuffle"
-  </source>
-  <dest>
-    *: "Züefall"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Wiederholig"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_REPEAT_ALL
   desc: repeat playlist once all songs have completed
   user: core
@@ -6106,34 +5835,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
-  user: core
-  <source>
-    *: "One"
-  </source>
-  <dest>
-    *: "Eis"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
-  user: core
-  <source>
-    *: "Show Files"
-  </source>
-  <dest>
-    *: "Datiifilter"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_FILTER_ALL
   desc: show all files
   user: core
@@ -6142,48 +5843,6 @@
   </source>
   <dest>
     *: "Alli"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
-  user: core
-  <source>
-    *: "Supported"
-  </source>
-  <dest>
-    *: "Unnerschtützti"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
-  user: core
-  <source>
-    *: "Music"
-  </source>
-  <dest>
-    *: "Müsig"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Liederlischta"
   </dest>
   <voice>
     *: ""
@@ -6288,48 +5947,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user: core
-  <source>
-    *: "Upside Down"
-  </source>
-  <dest>
-    *: "umgidräht"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Scroll Bar"
-  </source>
-  <dest>
-    *: "Scrolliischta"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Status Bar"
-  </source>
-  <dest>
-    *: "Statusliischta"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_PITCH_UP
   desc: in wps
   user: core
@@ -6372,71 +5989,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
-  user: core
-  <source>
-    *: "Time:"
-  </source>
-  <dest>
-    *: "Zit:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: 
-  desc: Display of record timer interval setting, on the record screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Split time:"
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "Üfnahm teilu:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
-  user: core
-  <source>
-    *: "Size:"
-  </source>
-  <dest>
-    *: "Greessi:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Prerecording"
-    *: "Pre-Recording"
-  </source>
-  <dest>
-    *: "Vorüsüfnahm"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_GAIN
   desc: in the recording screen
   user: core
@@ -6445,54 +5997,6 @@
   </source>
   <dest>
     *: "Verst"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_LEFT
-  desc: in the recording screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Left"
-    *: "Gain Left"
-  </source>
-  <dest>
-    *: "Lings"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_RIGHT
-  desc: in the recording screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Right"
-    *: "Gain Right"
-  </source>
-  <dest>
-    *: "Rächts"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
-  user: core
-  <source>
-    *: "The disk is full. Press OFF to continue."
-  </source>
-  <dest>
-    *: "Feschtplatta isch voll. Drick OFF."
   </dest>
   <voice>
     *: ""

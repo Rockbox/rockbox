@@ -1041,20 +1041,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
   user: core
@@ -1206,48 +1192,6 @@
   </dest>
   <voice>
     *: "Optical output"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ORDER
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "ID3 tag priority"
-  </source>
-  <dest>
-    *: "Prioridad do tag ID3"
-  </dest>
-  <voice>
-    *: "ID3 tag priority"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "V1 then V2"
-  </source>
-  <dest>
-    *: "Versión 1 entonces versión 2"
-  </dest>
-  <voice>
-    *: "Version 1 then version 2"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
-  user: core
-  <source>
-    *: "V2 then V1"
-  </source>
-  <dest>
-    *: "Versión 2 entonces version 1"
-  </dest>
-  <voice>
-    *: "Version 2 then version 1"
   </voice>
 </phrase>
 <phrase>
@@ -2035,20 +1979,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
-  user: core
-  <source>
-    *: "Current dir"
-  </source>
-  <dest>
-    *: "Directorio actual"
-  </dest>
-  <voice>
-    *: "Current directory"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_STARTUP
   desc: Start Rockbox in Recording screen
   user: core
@@ -2375,13 +2305,16 @@
   desc: (archosplayer) menu altarnative for jump scroll
   user: core
   <source>
-    *: "Jump scroll"
+    *: none
+    lcd_charcell: "Jump scroll"
   </source>
   <dest>
-    *: "salto no desprazamento"
+    *: none
+    lcd_charcell: "salto no desprazamento"
   </dest>
   <voice>
-    *: "Jump scroll"
+    *: none
+    lcd_charcell: "Jump scroll"
   </voice>
 </phrase>
 <phrase>
@@ -2389,13 +2322,16 @@
   desc: (archosplayer) the jump scroll shall be done "one time
   user: core
   <source>
-    *: "One time"
+    *: none
+    lcd_charcell: "One time"
   </source>
   <dest>
-    *: "Unha vez"
+    *: none
+    lcd_charcell: "Unha vez"
   </dest>
   <voice>
-    *: "One time"
+    *: none
+    lcd_charcell: "One time"
   </voice>
 </phrase>
 <phrase>
@@ -2403,13 +2339,16 @@
   desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
-    *: "Jump Scroll Delay"
+    *: none
+    lcd_charcell: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Retardo no salto de desprazamento"
+    *: none
+    lcd_charcell: "Retardo no salto de desprazamento"
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: none
+    lcd_charcell: "Jump Scroll Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2522,20 +2461,6 @@
   </dest>
   <voice>
     *: "Peak Release"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
-  user: core
-  <source>
-    *: "Units Per Read"
-  </source>
-  <dest>
-    *: "Unidades por Lectura"
-  </dest>
-  <voice>
-    *: "Units Per Read"
   </voice>
 </phrase>
 <phrase>
@@ -3729,34 +3654,6 @@
   </source>
   <dest>
     *: "Gañanza"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_LEFT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Left"
-  </source>
-  <dest>
-    *: "Esquerdo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: "Right"
-  </source>
-  <dest>
-    *: "Dereito"
   </dest>
   <voice>
     *: ""
@@ -5641,20 +5538,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "text"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_ROCK
   desc: spoken only, for file extension
   user: core
@@ -5733,20 +5616,6 @@
   </source>
   <dest>
     *: "Cargando..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
-  user: core
-  <source>
-    *: "Shuffling..."
-  </source>
-  <dest>
-    *: "Misturando..."
   </dest>
   <voice>
     *: ""
@@ -5943,34 +5812,6 @@
   </source>
   <dest>
     *: "Arquivo de control da lista de repr. invalido"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_STATION
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_NO_PRESETS
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
   </dest>
   <voice>
     *: ""
@@ -6609,20 +6450,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_EXTENSION_FULL
-  desc: Extension array full
-  user: core
-  <source>
-    *: "Extension array full"
-  </source>
-  <dest>
-    *: "Array de extensions cheo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
   user: core
@@ -6631,20 +6458,6 @@
   </source>
   <dest>
     *: "Array de tipos de arquivos cheo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_PLUGIN_NAME_LONG
-  desc: Viewer plugin name too long
-  user: core
-  <source>
-    *: "Plugin name too long"
-  </source>
-  <dest>
-    *: "Nome do conector demasiado longo"
   </dest>
   <voice>
     *: ""
@@ -6679,76 +6492,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
-  user: core
-  <source>
-    *: "Yes"
-  </source>
-  <dest>
-    *: "Sí"
-  </dest>
-  <voice>
-    *: "Yes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
-  user: core
-  <source>
-    *: "No"
-  </source>
-  <dest>
-    *: "Non"
-  </dest>
-  <voice>
-    *: "No"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "On"
-  </source>
-  <dest>
-    *: "Activo"
-  </dest>
-  <voice>
-    *: "On"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "Off"
-  </source>
-  <dest>
-    *: "Off"
-  </dest>
-  <voice>
-    *: "Off"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Volume"
-  </source>
-  <dest>
-    *: "Volumen"
-  </dest>
-  <voice>
-    *: "Volume"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -6777,34 +6520,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Shuffle"
-  </source>
-  <dest>
-    *: "Aleatorio"
-  </dest>
-  <voice>
-    *: "Shuffle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Repetir"
-  </dest>
-  <voice>
-    *: "Repeat"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_REPEAT_ALL
   desc: repeat playlist once all songs have completed
   user: core
@@ -6819,34 +6534,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
-  user: core
-  <source>
-    *: "One"
-  </source>
-  <dest>
-    *: "Unha"
-  </dest>
-  <voice>
-    *: "One"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
-  user: core
-  <source>
-    *: "Show Files"
-  </source>
-  <dest>
-    *: "Amosar Arquivos"
-  </dest>
-  <voice>
-    *: "Show Files"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_FILTER_ALL
   desc: show all files
   user: core
@@ -6858,48 +6545,6 @@
   </dest>
   <voice>
     *: "All"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
-  user: core
-  <source>
-    *: "Supported"
-  </source>
-  <dest>
-    *: "Soportado"
-  </dest>
-  <voice>
-    *: "Supported"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
-  user: core
-  <source>
-    *: "Music"
-  </source>
-  <dest>
-    *: "Música"
-  </dest>
-  <voice>
-    *: "Music"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Listas de Reprodución"
-  </dest>
-  <voice>
-    *: "Playlists"
   </voice>
 </phrase>
 <phrase>
@@ -7035,48 +6680,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user: core
-  <source>
-    *: "Upside Down"
-  </source>
-  <dest>
-    *: "Arriba Abaixo"
-  </dest>
-  <voice>
-    *: "Upside Down"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Scroll Bar"
-  </source>
-  <dest>
-    *: "Barra de Desprazamento"
-  </dest>
-  <voice>
-    *: "Scroll Bar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Status Bar"
-  </source>
-  <dest>
-    *: "Barra de Estado"
-  </dest>
-  <voice>
-    *: "Status Bar"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_PITCH_UP
   desc: in wps
   user: core
@@ -7119,68 +6722,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
-  user: core
-  <source>
-    *: "Time:"
-  </source>
-  <dest>
-    *: "Tempo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Split time:"
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "Tempo de División"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
-  user: core
-  <source>
-    *: "Size:"
-  </source>
-  <dest>
-    *: "Tamaño:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Prerecording"
-    *: "Pre-Recording"
-  </source>
-  <dest>
-    *: "Pregravación"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_GAIN
   desc: in the recording screen
   user: core
@@ -7189,56 +6730,6 @@
   </source>
   <dest>
     *: "Gañanza"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_LEFT
-  desc: in the recording screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Left"
-    *: "Gain Left"
-  </source>
-  <dest>
-    *: "Esquerdo"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_RIGHT
-  desc: in the recording screen
-  user: core
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Right"
-    *: "Gain Right"
-  </source>
-  <dest>
-    *: "Dereito"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
-  user: core
-  <source>
-    *: "The disk is full. Press OFF to continue."
-    vibe500: "The disk is full. Press PREV to continue."
-  </source>
-  <dest>
-    *: "O disco esta cheo. Presionar OFF para continuar."
-    vibe500: "O disco esta cheo. Presionar PREV para continuar."
   </dest>
   <voice>
     *: ""

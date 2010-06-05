@@ -171,20 +171,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_SHUFFLE
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CANCEL
   desc: Visual confirmation of canceling a changed setting
   user: core
@@ -659,91 +645,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_EQUALIZER_HARDWARE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    ipodvideo: ""
-  </source>
-  <dest>
-    *: none
-    ipodvideo: ""
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    ipodvideo: ""
-  </source>
-  <dest>
-    *: none
-    ipodvideo: ""
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BANDWIDTH
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    ipodvideo: ""
-  </source>
-  <dest>
-    *: none
-    ipodvideo: ""
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    ipodvideo: ""
-  </source>
-  <dest>
-    *: none
-    ipodvideo: ""
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    ipodvideo: ""
-  </source>
-  <dest>
-    *: none
-    ipodvideo: ""
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SUPERBASS
   desc: in sound settings
   user: core
@@ -935,20 +836,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPLAYGAIN_ENABLE
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPLAYGAIN_NOCLIP
   desc: in replaygain
   user: core
@@ -1014,48 +901,6 @@
   <voice>
     *: none
     swcodec: "जोरदार"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ORDER
-  desc: DEPRECATED 
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED 
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED 
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1513,15 +1358,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Background Colour"
+    lcd_color: "Background Colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "पीछे का रंग"
+    lcd_color: "पीछे का रंग"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "पीछे का रंग"
+    lcd_color: "पीछे का रंग"
   </voice>
 </phrase>
 <phrase>
@@ -1530,15 +1375,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Foreground Colour"
+    lcd_color: "Foreground Colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "आगे का रंग"
+    lcd_color: "आगे का रंग"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "आगे का रंग"
+    lcd_color: "आगे का रंग"
   </voice>
 </phrase>
 <phrase>
@@ -1547,15 +1392,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Reset Colours"
+    lcd_color: "Reset Colours"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "रंग मिटा"
+    lcd_color: "रंग मिटा"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "रंग मिटा"
+    lcd_color: "रंग मिटा"
   </voice>
 </phrase>
 <phrase>
@@ -1564,15 +1409,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Invalid colour"
+    lcd_color: "Invalid colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "गलत रंग"
+    lcd_color: "गलत रंग"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -1625,27 +1470,16 @@
   desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
-    *: "One time"
+    *: none
+    lcd_charcell: "One time"
   </source>
   <dest>
-    *: "एक बार"
+    *: none
+    lcd_charcell: "एक बार"
   </dest>
   <voice>
-    *: "एक बार"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PM_UNITS_PER_READ
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    lcd_charcell: "एक बार"
   </voice>
 </phrase>
 <phrase>
@@ -2807,23 +2641,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_CURRENT_DIR
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: none
-    recording: ""
-  </source>
-  <dest>
-    *: none
-    recording: deprecated
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLEAR_REC_DIR
   desc:
   user: core
@@ -3207,20 +3024,6 @@
   </dest>
   <voice>
     *: "वरशन"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CURRENT_TIME
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3967,36 +3770,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
-  user: core
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "बच नहीं सका"
-  </dest>
-  <voice>
-    *: "बच नहीं सका"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
-  user: core
-  <source>
-    *: "No partition?"
-    archosplayer: "Partition?"
-  </source>
-  <dest>
-    *: "पारटिशन नहीं है?"
-    archosplayer: "पारटिशन?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PAUSE
   desc: in wps and recording trigger menu
   user: core
@@ -4225,20 +3998,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_EXTENSION_FULL
-  desc: Extension array full
-  user: core
-  <source>
-    *: "Extension array full"
-  </source>
-  <dest>
-    *: "Extension array भरा है"
-  </dest>
-  <voice>
-    *: "Extension array भरा है"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
   user: core
@@ -4278,20 +4037,6 @@
   </dest>
   <voice>
     *: "फऍल का नाम गलत है"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_PLUGIN_NAME_LONG
-  desc: Viewer plugin name too long
-  user: core
-  <source>
-    *: "Plugin name too long"
-  </source>
-  <dest>
-    *: "फऍल का नाम लमबा है"
-  </dest>
-  <voice>
-    *: "फऍल का नाम लमबा है"
   </voice>
 </phrase>
 <phrase>
@@ -4855,20 +4600,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_TXT
-  desc: DEPRECATED
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: deprecated
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_CURRENT_TIME
   desc: spoken only, for wall clock announce
   user: core
@@ -4883,282 +4614,6 @@
   <voice>
     *: none
     rtc: "अभी का समय:"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Yes"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "हां"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "हा"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "No"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "नहीं"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "नहीं"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "On"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "चालू"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "चालू"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Off"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "बंद"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "बंद"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "All"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "सब"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "सब"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "One"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "एक"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "एक"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Show Files"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "फऍल दिखा"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "फऍल दिखा"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Music"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "गाने"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "गाने"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Playlists"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "पलेलिसट"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "पलेलिसट"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Upside Down"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "ऊलटा"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: "ऊलटा"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
-  user: core
-  <source>
-    *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
-    iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: "The disk is full. Press LEFT to continue."
-  </source>
-  <dest>
-    *: none
-    recording: "दिसक भरी ह. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
-    iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: "दिसक भरी ह. Press LEFT to continue."
-  </dest>
-  <voice>
-    *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,ipod4g,ipodcolor,ipodnano1g,ipodvideo,sansae200*,sansac200*: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
-  user: core
-  <source>
-    *: none
-    recording: "Time:"
-  </source>
-  <dest>
-    *: none
-    recording: "समय:"
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
-  user: core
-  <source>
-    *: none
-    agc: "Live (slow)"
-  </source>
-  <dest>
-    *: none
-    agc: "Live (धीमा)"
-  </dest>
-  <voice>
-    *: none
-    agc: "Live (धीमा)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
-  user: core
-  <source>
-    *: none
-    agc: "DJ-Set (slow)"
-  </source>
-  <dest>
-    *: none
-    agc: "DJ-Set (धीमा)"
-  </dest>
-  <voice>
-    *: none
-    agc: "DJ set (धीमा)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
-  user: core
-  <source>
-    *: none
-    agc: "Medium"
-  </source>
-  <dest>
-    *: none
-    agc: "माध्यम"
-  </dest>
-  <voice>
-    *: none
-    agc: "माध्यम"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
-  user: core
-  <source>
-    *: none
-    agc: "Voice (fast)"
-  </source>
-  <dest>
-    *: none
-    agc: "आवाज़ (तेज)"
-  </dest>
-  <voice>
-    *: none
-    agc: "आवाज़ (तेज)"
   </voice>
 </phrase>
 <phrase>

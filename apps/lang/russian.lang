@@ -3041,13 +3041,16 @@
   desc: (archosplayer) menu alternative for jump scroll
   user: core
   <source>
-    *: "Jump Scroll"
+    *: none
+    lcd_charcell: "Jump Scroll"
   </source>
   <dest>
-    *: "Ступень прокрутки"
+    *: none
+    lcd_charcell: "Ступень прокрутки"
   </dest>
   <voice>
-    *: "Ступень прокрутки"
+    *: none
+    lcd_charcell: "Ступень прокрутки"
   </voice>
 </phrase>
 <phrase>
@@ -3055,13 +3058,16 @@
   desc: (archosplayer) the jump scroll shall be done "one time"
   user: core
   <source>
-    *: "One time"
+    *: none
+    lcd_charcell: "One time"
   </source>
   <dest>
-    *: "Один раз"
+    *: none
+    lcd_charcell: "Один раз"
   </dest>
   <voice>
-    *: "Один раз"
+    *: none
+    lcd_charcell: "Один раз"
   </voice>
 </phrase>
 <phrase>
@@ -3069,13 +3075,16 @@
   desc: (archosplayer) Delay before making a jump scroll
   user: core
   <source>
-    *: "Jump Scroll Delay"
+    *: none
+    lcd_charcell: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Задержка ступени прокрутки"
+    *: none
+    lcd_charcell: "Задержка ступени прокрутки"
   </dest>
   <voice>
-    *: "Задержка ступени прокрутки"
+    *: none
+    lcd_charcell: "Задержка ступени прокрутки"
   </voice>
 </phrase>
 <phrase>
@@ -3083,13 +3092,16 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: "Screen Scrolls Out Of View"
+    *: none
+    lcd_bitmap: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "Прокрутка экрана"
+    *: none
+    lcd_bitmap: "Прокрутка экрана"
   </dest>
   <voice>
-    *: "Прокрутка экрана"
+    *: none
+    lcd_bitmap: "Прокрутка экрана"
   </voice>
 </phrase>
 <phrase>
@@ -3097,13 +3109,16 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: "Screen Scroll Step Size"
+    *: none
+    lcd_bitmap: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Шаг прокрутки экрана"
+    *: none
+    lcd_bitmap: "Шаг прокрутки экрана"
   </dest>
   <voice>
-    *: "Шаг прокрутки экрана"
+    *: none
+    lcd_bitmap: "Шаг прокрутки экрана"
   </voice>
 </phrase>
 <phrase>
@@ -6460,20 +6475,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_STATION
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_NO_PRESETS
   desc: error when preset list is empty
   user: core
@@ -7092,20 +7093,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_EXTENSION_FULL
-  desc: Extension array full
-  user: core
-  <source>
-    *: "Extension array full"
-  </source>
-  <dest>
-    *: "Массив расширений полон"
-  </dest>
-  <voice>
-    *: "Массив расширений полон"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
   user: core
@@ -7117,20 +7104,6 @@
   </dest>
   <voice>
     *: "Массив типов файлов полон"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILETYPES_PLUGIN_NAME_LONG
-  desc: Viewer plugin name too long
-  user: core
-  <source>
-    *: "Plugin name too long"
-  </source>
-  <dest>
-    *: "Имя плагина слишком длинное"
-  </dest>
-  <voice>
-    *: "Имя плагина слишком длинное"
   </voice>
 </phrase>
 <phrase>
@@ -7301,40 +7274,6 @@
   <voice>
     *: none
     recording: "Триггер"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_LEFT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: none
-    recording: "Gain Left"
-  </source>
-  <dest>
-    *: none
-    recording: "Левый"
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_RIGHT
-  desc: in the recording screen
-  user: core
-  <source>
-    *: none
-    recording: "Gain Right"
-  </source>
-  <dest>
-    *: none
-    recording: "Правый"
-  </dest>
-  <voice>
-    *: none
-    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7788,15 +7727,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Background Colour"
+    lcd_color: "Background Colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Цвет фона"
+    lcd_color: "Цвет фона"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Цвет фона"
+    lcd_color: "Цвет фона"
   </voice>
 </phrase>
 <phrase>
@@ -8166,15 +8105,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Foreground Colour"
+    lcd_color: "Foreground Colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Цвет переднего плана"
+    lcd_color: "Цвет переднего плана"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Цвет переднего плана"
+    lcd_color: "Цвет переднего плана"
   </voice>
 </phrase>
 <phrase>
@@ -8676,15 +8615,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Gain"
+    swcodec: "Gain"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Усиление"
+    swcodec: "Усиление"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Усиление"
+    swcodec: "Усиление"
   </voice>
 </phrase>
 <phrase>
@@ -9215,15 +9154,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Invalid colour"
+    lcd_color: "Invalid colour"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Неверный цвет"
+    lcd_color: "Неверный цвет"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -9378,15 +9317,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Reset Colours"
+    lcd_color: "Reset Colours"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Сброс цветов"
+    lcd_color: "Сброс цветов"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Сброс цветов"
+    lcd_color: "Сброс цветов"
   </voice>
 </phrase>
 <phrase>

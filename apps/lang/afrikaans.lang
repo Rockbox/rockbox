@@ -521,20 +521,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
   user: core
@@ -865,20 +851,6 @@
   </source>
   <dest>
     *: "Piek Terugloop"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
-  user: core
-  <source>
-    *: "Units Per Read"
-  </source>
-  <dest>
-    *: "Eenhede Per Keer"  "
   </dest>
   <voice>
     *: ""
@@ -1319,20 +1291,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
-  user: core
-  <source>
-    *: "Shuffling..."
-  </source>
-  <dest>
-    *: "Skommel..."
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full
   user: core
@@ -1417,76 +1375,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
-  user: core
-  <source>
-    *: "Yes"
-  </source>
-  <dest>
-    *: "Ja"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
-  user: core
-  <source>
-    *: "No"
-  </source>
-  <dest>
-    *: "Nee"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "On"
-  </source>
-  <dest>
-    *: "Aan"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
-  user: core
-  <source>
-    *: "Off"
-  </source>
-  <dest>
-    *: "Af"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Volume"
-  </source>
-  <dest>
-    *: "Volume"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -1515,34 +1403,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Shuffle"
-  </source>
-  <dest>
-    *: "Skommel"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Herhaal"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_REPEAT_ALL
   desc: repeat playlist once all songs have completed
   user: core
@@ -1557,34 +1417,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
-  user: core
-  <source>
-    *: "One"
-  </source>
-  <dest>
-    *: "Een"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
-  user: core
-  <source>
-    *: "Show Files"
-  </source>
-  <dest>
-    *: "Wys Lêers"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_FILTER_ALL
   desc: show all files
   user: core
@@ -1593,62 +1425,6 @@
   </source>
   <dest>
     *: "Alle"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
-  user: core
-  <source>
-    *: "Supported"
-  </source>
-  <dest>
-    *: "Ondersteunde"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
-  user: core
-  <source>
-    *: "Music"
-  </source>
-  <dest>
-    *: "Musiek"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Scroll Bar"
-  </source>
-  <dest>
-    *: "Rol balk"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
-  user: core
-  <source>
-    *: "Status Bar"
-  </source>
-  <dest>
-    *: "Status balk"
   </dest>
   <voice>
     *: ""
