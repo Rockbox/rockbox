@@ -1345,40 +1345,7 @@ static void button_event(int key, bool pressed)
         new_btn = BUTTON_REC;
         break;
 #elif CONFIG_KEYPAD == MINI2440_PAD
-    case SDLK_LEFT:
-        new_btn = BUTTON_LEFT;
-        break;
-    case SDLK_RIGHT:
-        new_btn = BUTTON_RIGHT;
-        break;
-    case SDLK_UP:
-        new_btn = BUTTON_UP;
-        break;
-    case SDLK_DOWN:
-        new_btn = BUTTON_DOWN;
-        break;
-    case SDLK_F8:
-    case SDLK_ESCAPE:
-        new_btn = BUTTON_POWER;
-        break;
-    case SDLK_KP_ENTER:
-    case SDLK_RETURN:
-    case SDLK_a:
-        new_btn = BUTTON_A;
-        break;
-    case SDLK_SPACE:
-        new_btn = BUTTON_SELECT;
-        break;
-    case SDLK_KP_PERIOD:
-    case SDLK_INSERT:
-        new_btn = BUTTON_MENU;
-        break;
-    case SDLK_KP_PLUS:
-        new_btn = BUTTON_VOL_UP;
-        break;
-    case SDLK_KP_MINUS:
-        new_btn = BUTTON_VOL_DOWN;
-        break;
+    /* no keymap, touchscreen */
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
     case SDLK_KP4:
     case SDLK_LEFT:
