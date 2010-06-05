@@ -169,6 +169,16 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 #ifdef HAVE_USB_CHARGING_ENABLE
 static int usb_charging_mode = USB_CHARGING_DISABLE;
 static int usb_charging_current_requested = 500;
+static struct timeout usb_no_host_timeout;
+static bool usb_no_host = false;
+
+static int usb_no_host_callback(struct timeout *tmo)
+{
+    (void)tmo;
+    usb_no_host = true;
+    usb_charger_update();
+    return 0;
+}
 #endif
 
 static int usb_core_num_interfaces;
@@ -365,6 +375,10 @@ void usb_core_init(void)
 
     initialized = true;
     usb_state = DEFAULT;
+#ifdef HAVE_USB_CHARGING_ENABLE
+    usb_no_host = false;
+    timeout_register(&usb_no_host_timeout, usb_no_host_callback, HZ*10, 0);
+#endif
     logf("usb_core_init() finished");
 }
 
@@ -384,6 +398,7 @@ void usb_core_exit(void)
     }
     usb_state = DEFAULT;
 #ifdef HAVE_USB_CHARGING_ENABLE
+    usb_no_host = false;
     usb_charging_maxcurrent_change(usb_charging_maxcurrent());
 #endif
     logf("usb_core_exit() finished");
@@ -800,6 +815,13 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
 /* Handling USB requests starts here */
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 {
+#ifdef HAVE_USB_CHARGING_ENABLE
+    timeout_cancel(&usb_no_host_timeout);
+    if(usb_no_host) {
+	usb_no_host = false;
+	usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+    }
+#endif
     if(usb_state == DEFAULT) {
         set_serial_descriptor();
         usb_core_set_serial_function_id();
@@ -882,11 +904,12 @@ void usb_charging_enable(int state)
 
 int usb_charging_maxcurrent()
 {
-    if (!initialized
-            || usb_charging_mode == USB_CHARGING_DISABLE
-            || usb_state != CONFIGURED)
+    if (!initialized || usb_charging_mode == USB_CHARGING_DISABLE)
         return 100;
-    /* usb_state == CONFIGURED, charging enabled/forced */
-    return usb_charging_current_requested;
+    if (usb_state == CONFIGURED)
+	return usb_charging_current_requested;
+    if (usb_charging_mode == USB_CHARGING_FORCE && usb_no_host)
+	return 500;
+    return 100;
 }
 #endif

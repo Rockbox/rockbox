@@ -871,6 +871,13 @@ Lyre prototype 1 */
 #endif
 #endif /* HAVE_HEADPHONE_DETECTION */
 
+#if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
+/* USB charging support in the USB stack requires timeout objects */
+#ifndef INCLUDE_TIMEOUT_API
+#define INCLUDE_TIMEOUT_API
+#endif
+#endif /* HAVE_USB_CHARGING_ENABLE && HAVE_USBSTACK */
+
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
 #define STORAGE_GET_INFO
 #endif

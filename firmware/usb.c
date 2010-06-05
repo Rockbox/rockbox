@@ -432,9 +432,22 @@ static void usb_thread(void)
                     try_reboot();
                 break;
 #endif /* USB_FIREWIRE_HANDLING */
+
+#if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
+            case USB_CHARGER_UPDATE:
+                usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+                break;
+#endif
         }
     }
 }
+
+#if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
+void usb_charger_update(void)
+{
+    queue_post(&usb_queue, USB_CHARGER_UPDATE, 0);
+}
+#endif
 
 #ifdef USB_STATUS_BY_EVENT
 void usb_status_event(int current_status)

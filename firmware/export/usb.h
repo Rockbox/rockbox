@@ -52,6 +52,9 @@ enum {
     USB_REQUEST_REBOOT,      /* Event */
 #endif
     USB_QUIT,                /* Event */
+#if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
+    USB_CHARGER_UPDATE,      /* Event */
+#endif
 };
 
 #ifdef HAVE_USB_POWER
@@ -156,8 +159,11 @@ enum {
  * or target-specific code on others
  */
 void usb_charging_enable(int state);
-#endif
-#endif
+#ifdef HAVE_USBSTACK
+void usb_charger_update(void);
+#endif /* HAVE_USBSTACK */
+#endif /* HAVE_USB_CHARGING_ENABLE */
+#endif /* HAVE_USB_POWER */
 #ifdef HAVE_USBSTACK
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data *event_data);
