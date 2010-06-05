@@ -1,0 +1,12 @@
+text_viewer.c
+tv_action.c
+tv_bookmark.c
+tv_menu.c
+tv_pager.c
+tv_preferences.c
+tv_reader.c
+tv_screen_pos.c
+tv_settings.c
+tv_text_processor.c
+tv_text_reader.c
+tv_window.c
