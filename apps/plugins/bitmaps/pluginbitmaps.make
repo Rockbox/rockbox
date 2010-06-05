@@ -32,7 +32,7 @@ PLUGINBITMAPLIB := $(BUILDDIR)/apps/plugins/bitmaps/libpluginbitmaps.a
 PLUGINBITMAPDIR := $(dir $(PLUGINBITMAPLIB))
 
 PBMPHFILES := $(subst $(ROOTDIR),$(BUILDDIR),$(PBMP))
-PBMPHFILES := $(shell echo $(PBMPHFILES) | sed  -e 's/\.[0-9x]\+\.bmp/.h/g' -e 's/\.bmp/.h/g' -e 's/apps\/plugins\/bitmaps\/\(mono\|native\|remote_mono\|remote_native\)/pluginbitmaps/g')
+PBMPHFILES := $(shell echo $(PBMPHFILES) | sed  -e 's/\.[0-9x]*\.bmp/.h/g' -e 's/\.bmp/.h/g' | awk "{ gsub(/apps\/plugins\/bitmaps\/(mono|native|remote_mono|remote_native)/, \"pluginbitmaps\"); print }" )
 
 $(PBMPHFILES): $(PLUGIN_BITMAPS)
 
