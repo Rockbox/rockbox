@@ -233,8 +233,10 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-    {PLA_CANCEL,            BUTTON_POWER,                       BUTTON_NONE },
-    {PLA_EXIT,              BUTTON_PLAY|BUTTON_SELECT,          BUTTON_NONE },
+    {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE },
+    {PLA_CANCEL,            BUTTON_RC_REC|BUTTON_REL,           BUTTON_RC_REC},
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE },
+    {PLA_EXIT,              BUTTON_RC_REC|BUTTON_REPEAT,        BUTTON_NONE },
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
     {PLA_SELECT,            BUTTON_RC_MODE,                     BUTTON_NONE },
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
