@@ -44,6 +44,8 @@ protected:
 private slots:
     void showPanel();
     void newTab();
+    void shiftTab(int index);
+    void closeTab(int index);
 
 private:
     /* Setup functions */

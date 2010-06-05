@@ -78,6 +78,12 @@ void EditorWindow::setupUI()
     model->setRootPath(QDir::currentPath());
     ui->fileTree->setModel(model);
 
+    /* Connecting the tab bar signals */
+    QObject::connect(ui->editorTabs, SIGNAL(currentChanged(int)),
+                     this, SLOT(shiftTab(int)));
+    QObject::connect(ui->editorTabs, SIGNAL(tabCloseRequested(int)),
+                     this, SLOT(closeTab(int)));
+
 }
 
 void EditorWindow::setupMenus()
@@ -100,6 +106,26 @@ void EditorWindow::newTab()
 {
     SkinDocument* doc = new SkinDocument;
     ui->editorTabs->addTab(doc, doc->getTitle());
+}
+
+void EditorWindow::shiftTab(int index)
+{
+    if(index < 0)
+        ui->parseTree->setModel(0);
+    else
+        ui->parseTree->setModel(dynamic_cast<SkinDocument*>
+                                (ui->editorTabs->currentWidget())->getModel());
+}
+
+void EditorWindow::closeTab(int index)
+{
+    SkinDocument* widget = dynamic_cast<SkinDocument*>
+                           (ui->editorTabs->widget(index));
+    if(widget->requestClose())
+    {
+        ui->editorTabs->removeTab(index);
+        widget->deleteLater();
+    }
 }
 
 void EditorWindow::showPanel()

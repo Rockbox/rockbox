@@ -39,6 +39,8 @@ public:
     ParseTreeModel* getModel(){ return model; }
     QString getTitle(){ return title; }
 
+    bool requestClose();
+
 signals:
 
 private slots:

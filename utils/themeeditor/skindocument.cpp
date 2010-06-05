@@ -35,6 +35,11 @@ SkinDocument::~SkinDocument()
     delete model;
 }
 
+bool SkinDocument::requestClose()
+{
+    return true;
+}
+
 void SkinDocument::setupUI()
 {
     /* Setting up the text edit */
