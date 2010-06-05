@@ -24,6 +24,8 @@
 #include <QFile>
 #include <QTimer>
 #include <QSettings>
+#include <QMessageBox>
+#include <QFileDialog>
 
 SkinDocument::SkinDocument(QWidget *parent) :
     QWidget(parent)
@@ -43,6 +45,7 @@ SkinDocument::~SkinDocument()
 
 bool SkinDocument::requestClose()
 {
+    saveAs();
     return true;
 }
 
@@ -99,5 +102,22 @@ void SkinDocument::save()
 void SkinDocument::saveAs()
 {
     /* Determining the directory to open */
+    QSettings settings;
 
+    settings.beginGroup("SkinDocument");
+    QString openDir = settings.value("defaultDirectory", "").toString();
+
+    fileName = QFileDialog::getSaveFileName(this, tr("Save File"), openDir,"");
+    QString directory = fileName;
+    directory.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
+    settings.setValue("defaultDirectory", directory);
+
+    settings.endGroup();
+
+    QFile fout(fileName);
+    fout.open(QFile::WriteOnly);
+    fout.write(editor->document()->toPlainText().toAscii());
+    fout.close();
+
+    saved = true;
 }
