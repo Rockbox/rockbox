@@ -198,12 +198,26 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
     if (pFile == NULL)
     {
         snprintf(errstring,errsize,"Error opening file %s for writing\n",filename);
+        free(pBuf);
         return -1;
     }
 
     /* write the new file */
-    fwrite(pBuf, 1, datapos, pFile); /* write header */
-    fwrite(pBuf + datapos + skip_head, 1, datalen - skip_head - skip_tail, pFile);
+    if ((int)fwrite(pBuf, 1, datapos, pFile) != datapos) /* write header */
+    {
+        snprintf(errstring,errsize,"Error writing file %s header\n",filename);
+        fclose(pFile);
+        free(pBuf);
+        return -1;
+    }
+    if ((int)fwrite(pBuf + datapos + skip_head, 1, datalen - skip_head - skip_tail, pFile)
+            != datalen - skip_head - skip_tail)
+    {
+        snprintf(errstring,errsize,"Error writing file %s data\n",filename);
+        fclose(pFile);
+        free(pBuf);
+        return -1;
+    }
     fclose(pFile);
 
     free(pBuf);
