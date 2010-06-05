@@ -8,23 +8,29 @@
 %x|a|pbbackground-128x64x1.bmp|1|0|
 %pb|pb-128x64x1.bmp|2|1|124|4|
 
+%V|0|8|128|8|1|
+%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pc
+
 # tag info viewport
-%V|0|8|128|37|1|
+%V|0|16|128|24|1|
 %ac%s%?it<%it|%fn>
 %ac%s%?ia<%ia|%?d2<%d2|(root)>>
 %ac%s%?id<%id|%?d1<%d1|(root)>>
+
+# next file viewport
+%V|0|42|128|8|1|
 %ac%s%Sx|Next:| %?It<%It|%Fn>
-%x|b|bar-128x64x1.bmp|2|36|
 
 # playtime info and status bar
-%V|2|43|124|21|1|
-%xl|A|lock-128x64x1.bmp|1|12|2|
-%xl|B|battery-128x64x1.bmp|23|12|9|
-%xl|C|volume-128x64x1.bmp|46|12|9|
-%xl|D|shuffle-128x64x1.bmp|67|13|
-%xl|E|repeat-128x64x1.bmp|93|12|4|
-%xl|F|playmode-128x64x1.bmp|113|12|5|
-%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pc
+
+%V|2|52|124|12|1|
+%x|b|bar-128x64x1.bmp|2|0|
+%xl|A|lock-128x64x1.bmp|1|4|2|
+%xl|B|battery-128x64x1.bmp|23|4|9|
+%xl|C|volume-128x64x1.bmp|46|4|9|
+%xl|D|shuffle-128x64x1.bmp|67|5|
+%xl|E|repeat-128x64x1.bmp|93|4|4|
+%xl|F|playmode-128x64x1.bmp|113|4|5|
 
 # status bar
 %?mh<%xdAa|%xdAb>
