@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lrcplayer.c 85 2010-06-03 10:01:19Z teru $
+ * $Id$
  *
  * Copyright (C) 2008-2009 Teruaki Kawashima
  *
