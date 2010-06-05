@@ -97,7 +97,7 @@ findsdl(){
 simcc () {
 
  # default tool setup for native building
- prefixtools ""
+ prefixtools "$CROSS_COMPILE"
 
  simver=sdl
  winbuild="$crosscompile"
@@ -204,12 +204,19 @@ EOF
 
    $CC -o $tmpdir/conftest-$id $tmpdir/conftest-$id.c 2>/dev/null
 
-   if test `$tmpdir/conftest-$id 2>/dev/null` -gt "1"; then
+   # when cross compiling, the endianess cannot be detected because the above program doesn't run
+   # on the local machine. assume little endian but print a warning
+   endian=`$tmpdir/conftest-$id 2> /dev/null`
+   if [ "$endian" != "" ] && [ $endian -gt "1" ]; then
      # big endian
      endian="big"
    else
      # little endian
      endian="little"
+   fi
+
+   if [ "$CROSS_COMPILE" != "" ]; then
+     echo "WARNING: Cross Compiling, cannot detect endianess. Assuming little endian!"
    fi
 
    if [ $1 = "sdl" ]; then
@@ -2841,7 +2848,7 @@ else
  fi
 
  case $prefix in
-   "")
+   ""|"$CROSS_COMPILE")
      # simulator
    ;;
    i586-mingw32msvc-)
