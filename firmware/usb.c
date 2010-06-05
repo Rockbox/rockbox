@@ -408,8 +408,8 @@ static void usb_thread(void)
 #else  /* !HAVE_USBSTACK */
                 if(usb_state == USB_INSERTED)
                 {
-                    usb_enable(false);
 #if (CONFIG_STORAGE & STORAGE_MMC)
+                    usb_enable(false);
                     usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
 #endif /* STORAGE_MMC */
                 }
