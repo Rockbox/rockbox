@@ -53,6 +53,7 @@ void lcd_awake(void);
 bool _backlight_init(void);
 void _backlight_on(void);
 void _backlight_off(void);
+void _backlight_set_brightness(int val);
 
 #elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
 

@@ -115,6 +115,12 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+#define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING      31
+#define DEFAULT_BRIGHTNESS_SETTING  20
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
