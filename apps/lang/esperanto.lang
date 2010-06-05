@@ -3200,57 +3200,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu altarnative for jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Saltanta Rulumo"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Saltanta Rulumo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Unu Fojo"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Unu Fojo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Saltanta Rulumo Malfruiĝo"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Saltanta Rulumo Malfruiĝo"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SCREEN_SCROLL_VIEW
   desc: should lines scroll out of the screen
   user: core

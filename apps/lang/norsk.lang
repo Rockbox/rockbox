@@ -2695,57 +2695,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu alternative for jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Hopprulling"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Hopprulling"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Én gang"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Én gang"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Hopprullingforsinkelse"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Hopprullingforsinkelse"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SCROLL_BAR
   desc: display menu, F3 substitute
   user: core

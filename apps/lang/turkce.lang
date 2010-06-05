@@ -7437,23 +7437,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPLAYGAIN_PREAMP
   desc: in replaygain settings
   user: core
@@ -7482,23 +7465,6 @@
   <voice>
     *: none
     agc: "Medium"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "One time"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "One time"
   </voice>
 </phrase>
 <phrase>
@@ -11077,23 +11043,6 @@
   </dest>
   <voice>
     *: "Track Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu alternative for jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Jump Scroll"
   </voice>
 </phrase>
 <phrase>

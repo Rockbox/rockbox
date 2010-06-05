@@ -3220,57 +3220,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu alternative for jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Spring scroll"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Spring scroll"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Een keer"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Een keer"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Spring scroll vertraging"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Spring scroll vertraging"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SCREEN_SCROLL_VIEW
   desc: should lines scroll out of the screen
   user: core

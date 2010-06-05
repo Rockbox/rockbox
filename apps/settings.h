@@ -696,12 +696,6 @@ struct user_settings
 #endif
     unsigned char kbd_file[MAX_FILENAME+1];  /* last keyboard */
 #endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_CHARCELLS
-    int jump_scroll;   /* Fast jump when scrolling */
-    int jump_scroll_delay; /* Delay between jump scroll screens */
-#endif
-
     int  backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
                                then according to timeout_values[] */

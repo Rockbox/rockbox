@@ -6157,23 +6157,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_JUMP_SCROLL_DELAY
-  desc: (archosplayer) Delay before making a jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll Delay"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Intarziere salt defilare "
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Intarziere salt defilare "
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPLAYGAIN_PREAMP
   desc: in replaygain settings
   user: core
@@ -6202,23 +6185,6 @@
   <voice>
     *: none
     agc: "Mediu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "O singura data"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "O singura data"
   </voice>
 </phrase>
 <phrase>
@@ -9592,23 +9558,6 @@
   </dest>
   <voice>
     *: "Track Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_JUMP_SCROLL
-  desc: (archosplayer) menu alternative for jump scroll
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "Jump Scroll"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "Salt defilare"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "Salt defilare"
   </voice>
 </phrase>
 <phrase>

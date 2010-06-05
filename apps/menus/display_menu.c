@@ -254,10 +254,7 @@ MAKE_MENU(remote_scroll_sets, ID2P(LANG_REMOTE_SCROLL_SETS), 0, Icon_NOICON,
           &remote_scroll_speed, &remote_scroll_delay,
           &remote_scroll_step, &remote_bidir_limit);
 #endif /* HAVE_REMOTE_LCD */
-#ifdef HAVE_LCD_CHARCELLS
-MENUITEM_SETTING(jump_scroll, &global_settings.jump_scroll, NULL);
-MENUITEM_SETTING(jump_scroll_delay, &global_settings.jump_scroll_delay, NULL);
-#endif
+
 /* list acceleration */
 #ifndef HAVE_WHEEL_ACCELERATION
 MENUITEM_SETTING(list_accel_start_delay,
@@ -290,9 +287,6 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
           &bidir_limit,
 #ifdef HAVE_REMOTE_LCD
           &remote_scroll_sets,
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-          &jump_scroll, &jump_scroll_delay,
 #endif
 #ifdef HAVE_LCD_BITMAP
           &offset_out_of_view, &screen_scroll_step,

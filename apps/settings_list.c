@@ -420,46 +420,6 @@ static void set_superbass(bool value)
 }
 #endif
 
-#ifdef HAVE_LCD_CHARCELLS
-static const char* jumpscroll_format(char* buffer, size_t buffer_size, int value,
-                              const char* unit)
-{
-    (void)unit;
-    switch (value)
-    {
-        case 0:
-            return str(LANG_OFF);
-        case 1:
-            return str(LANG_ONE_TIME);
-        case 2:
-        case 3:
-        case 4:
-            snprintf(buffer, buffer_size, "%d", value);
-            break;
-        case 5:
-            return str(LANG_ALWAYS);
-    }
-    return buffer;
-}
-static int32_t jumpscroll_getlang(int value, int unit)
-{
-    switch (value)
-    {
-        case 0:
-            return LANG_OFF;
-        case 1:
-            return LANG_ONE_TIME;
-        case 2:
-        case 3:
-        case 4:
-            return TALK_ID(value, unit);
-        case 5:
-            return LANG_ALWAYS;
-    }
-    return -1;
-}
-#endif /* HAVE_LCD_CHARCELLS */
-
 #ifdef HAVE_QUICKSCREEN
 static int find_setting_by_name(char*name)
 {
@@ -940,13 +900,6 @@ const struct settings_list settings[] = {
                 "screen scroll step", UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL,
                 gui_list_screen_scroll_step),
 #endif /* HAVE_LCD_BITMAP */
-#ifdef HAVE_LCD_CHARCELLS
-    INT_SETTING(0, jump_scroll, LANG_JUMP_SCROLL, 0, "jump scroll", UNIT_INT, 0,
-                5, 1, jumpscroll_format, jumpscroll_getlang, lcd_jump_scroll),
-    INT_SETTING(0, jump_scroll_delay, LANG_JUMP_SCROLL_DELAY, 500,
-                "jump scroll delay", UNIT_MS, 0, 2500, 100, NULL, NULL,
-                lcd_jump_scroll_delay),
-#endif
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
                   false,"scroll paginated",NULL),
 #ifdef HAVE_LCD_COLOR

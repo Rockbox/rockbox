@@ -5292,23 +5292,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ONE_TIME
-  desc: (archosplayer) the jump scroll shall be done "one time"
-  user: core
-  <source>
-    *: none
-    lcd_charcell: "One time"
-  </source>
-  <dest>
-    *: none
-    lcd_charcell: "مرة واحدة"
-  </dest>
-  <voice>
-    *: none
-    lcd_charcell: "مرة واحدة"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RENAME
   desc: The verb/action Rename
   user: core
