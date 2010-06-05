@@ -83,10 +83,11 @@ unsigned short dbop_read_input(void)
     /* make sure that the DBOP FIFO is empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
-    /* write DBOP_DOUT to pre-charge DBOP data lines with a defined level */
-    DBOP_TIMPOL_23 = 0xe007e007;    /* no strobe towards lcd */
     int delay = 10;
     while (delay--) asm volatile ("nop\n");
+
+    /* write DBOP_DOUT to pre-charge DBOP data lines with a defined level */
+    DBOP_TIMPOL_23 = 0xe007e007;    /* no strobe towards lcd */
     DBOP_CTRL = (1 << 19) |         /* tri-state output */
                 (1 << 16) |         /* enw=1 (enable write) */
                 (1 << 12);          /* ow=1 (16-bit data width) */
