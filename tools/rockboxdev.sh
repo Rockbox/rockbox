@@ -30,18 +30,14 @@ else
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=ftp://ftp.gnu.org/pub/gnu
+    GNU_MIRROR=http://mirrors.kernel.org/gnu
 fi
 
-# If detection fails, override the value of make manually:
-# make="make"
-
-##############################################################################
-
-#
 # These are the tools this script requires and depends upon.
 reqtools="gcc bzip2 make patch"
 
+##############################################################################
+# Functions:
 
 findtool(){
   file="$1"
@@ -92,306 +88,225 @@ getfile() {
   fi
 }
 
+
+build() {
+    toolname="$1"
+    target="$2"
+    version="$3"
+    patch="$4"
+    configure_params="$5"
+    needs_gmp="$6"
+
+    patch_url="http://www.rockbox.org/gcc"
+
+    case $toolname in
+        gcc)
+            file="gcc-core-$version.tar.bz2"
+            url="$GNU_MIRROR/gcc/gcc-$version"
+            ;;
+
+        binutils)
+            file="binutils-$version.tar.bz2"
+            url="$GNU_MIRROR/binutils"
+            ;;
+
+        *)
+            echo "ROCKBOXDEV: Bad toolname $toolname"
+            exit
+            ;;
+    esac
+    
+    # create build directory
+    if test -d $builddir; then
+        if test ! -w $builddir; then
+            echo "ROCKBOXDEV: No write permission for $builddir"
+            exit
+        fi
+    else
+        mkdir -p $builddir
+    fi
+
+    # download source tarball
+    if test ! -f "$dlwhere/$file"; then
+        getfile "$file" "$url"
+    fi
+
+    # download patch
+    if test -n "$patch"; then
+        if test ! -f "$dlwhere/$patch"; then
+            getfile "$patch" "$patch_url"
+        fi
+    fi
+
+    cd $builddir
+
+    echo "ROCKBOXDEV: extracting $file"
+    tar xjf $dlwhere/$file
+
+    # do we have a patch?
+    if test -n "$patch"; then
+        echo "ROCKBOXDEV: applying patch $patch"
+
+        # apply the patch
+        (cd $builddir/$toolname-$version && patch -p1 < "$dlwhere/$patch")
+
+        # check if the patch applied cleanly
+        if [ $? -gt 0 ]; then
+            echo "ROCKBOXDEV: failed to apply patch $patch"
+            exit
+        fi
+    fi
+
+    # kludge to avoid having to install GMP and MPFR for new gcc
+    if test -n "$needs_gmp"; then
+        if test ! -d gmp; then
+            echo "ROCKBOXDEV: Getting GMP"
+            getfile "gmp-5.0.1.tar.bz2" "$GNU_MIRROR/gmp"
+            tar xjf $dlwhere/gmp-5.0.1.tar.bz2
+            ln -s gmp-5.0.1.tar.bz2 gmp
+        fi
+
+        if test ! -d mpfr; then
+            echo "ROCKBOXDEV: Getting MPFR"
+            getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
+            tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
+            ln -s mpfr-2.4.2 mpfr
+        fi
+    fi
+
+    echo "ROCKBOXDEV: mkdir build-$toolname"
+    mkdir build-$toolname
+
+    echo "ROCKBOXDEV: cd build-$toolname"
+    cd build-$toolname
+
+    echo "ROCKBOXDEV: $toolname/configure"
+    ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+
+    echo "ROCKBOXDEV: $toolname/make"
+    $make -j8
+
+    echo "ROCKBOXDEV: $toolname/make install"
+    $make install
+
+    rm -rf $builddir
+}
+
+##############################################################################
+# Code:
+
+# Verify required tools
 for t in $reqtools; do
-  tool=`findtool $t`
-  if test -z "$tool"; then
-    echo "ROCKBOXDEV: \"$t\" is required for this script to work."
-    echo "ROCKBOXDEV: Please install \"$t\" and re-run the script."
-    exit
-  fi
+    tool=`findtool $t`
+    if test -z "$tool"; then
+        echo "ROCKBOXDEV: \"$t\" is required for this script to work."
+        echo "ROCKBOXDEV: Please install \"$t\" and re-run the script."
+        exit
+    fi
 done
 
-###########################################################################
-# Verify download directory or create it
+echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD to change)"
+echo "Install prefix     : $prefix  (set RBDEV_PREFIX to change)"
+echo "Build dir          : $builddir (set RBDEV_BUILD to change)"
+echo ""
+
+# Verify download directory
 if test -d "$dlwhere"; then
   if ! test -w "$dlwhere"; then
-    echo "$dlwhere exists, but doesn't seem to be writable for you"
+    echo "ROCKBOXDEV: No write permission for $dlwhere"
     exit
   fi
 else
   mkdir $dlwhere
   if test $? -ne 0; then
-    echo "$dlwhere is missing and we failed to create it!"
+    echo "ROCKBOXDEV: Failed creating directory $dlwhere"
     exit
   fi
-  echo "$dlwhere has been created to store downloads in"
 fi
 
-echo "Download directory: $dlwhere (set RBDEV_DOWNLOAD to change dir)"
-echo "Install prefix: $prefix/[target] (set RBDEV_PREFIX to change dir)"
-echo "Build dir: $builddir (set RBDEV_BUILD to change dir)"
-
-###########################################################################
-# Verify that the prefix dir exists and that we can write to it,
-#  as otherwise we will hardly be able to install there!
+# Verify the prefix dir
 if test ! -d $prefix; then
-  echo "ERROR: The installation destination does not exist."
-  echo "Please create it and re-run this script"
-  exit
+  mkdir -p $prefix
+  if test $? -ne 0; then
+      echo "ROCKBOXDEV: Failed creating directory $prefix"
+      exit
+  fi
 fi
 if test ! -w $prefix; then
-  echo "ERROR: This script is set to install in $prefix but has no write permissions for it"
-  echo "Please fix this and re-run this script"
+  echo "ROCKBOXDEV: No write permission for $prefix"
   exit
 fi
 
-
-
-cleardir () {
-  # $1 is the name of the build dir
-  # $2 is the arch
-  # delete the build dirs and the source dirs
-  echo "Cleaning up build folder"
-  rm -rf $1/build-gcc-$2 $1/build-binu-$2
-}
-
-buildone () {
-
-arch=$1
-gccpatch="" # default is no gcc patch
-gccver="4.0.3" # default gcc version
-binutils="2.16.1" # The binutils version to use
-gccconfigure="" #default is nothing added to configure
-binutilsconf="" #default is nothing added to configure
-gcctarget="" #default make target
-gccinstalltarget="install" #default install target
-
-system=`uname -s`
-gccurl="http://www.rockbox.org/gcc"
-
-case $arch in
-  [Ss])
-    target="sh-elf"
-    gccpatch="gcc-4.0.3-rockbox-1.diff"
-    ;;
-  [Mm])
-    target="m68k-elf"
-    gccver="3.4.6"
-    case $system in
-      CYGWIN* | Darwin | FreeBSD | Interix | SunOS)
-        gccpatch="gcc-3.4.6.patch"
-        ;;
-      Linux)
-        machine=`uname -m`
-        case $machine in
-          x86_64)
-            gccpatch="gcc-3.4.6-amd64.patch"
-            ;;
-        esac
-        ;;
-      *)
-        echo "Unknown host system $system detected - check necessity of" \
-             "patch for ${target}-gcc $gccver and add it."
-        echo "Press enter to continue..."
-        read ignore
-        ;;
-    esac
-    ;;
-  [Aa])
-    target="arm-elf"
-    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_3.diff"
-    ;;
-  [Ee])
-    target="arm-elf-eabi"
-    gccpatch="rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff"
-    gccver="4.4.4"
-    # needed to build a bare-metal gcc-4.4.x
-    gcctarget="all-gcc all-target-libgcc"
-    gccinstalltarget="install-gcc install-target-libgcc"
-    binutils="2.20.1"
-    ;;
-  [Ii])
-    target="mipsel-elf"
-    gccver="4.1.2"
-    binutils="2.17"
-    gccconfigure="--disable-libssp"
-    binutilsconf="--disable-werror"
-    # necessary to make binutils build on gcc 4.3+
-    case $system in
-      Interix)
-        gccpatch="gcc-4.1.2-interix.diff"
-        ;;
-      *)
-        ;;
-    esac
-    ;;
-  *)
-    echo "An unsupported architecture option: $arch"
-    exit
-    ;;
-esac
-
-bindir="$prefix/$target/bin"
-if test -n $pathadd; then
-  pathadd="$pathadd:$bindir"
-else
-  pathadd="$bindir"
-fi
-
-echo ""
-echo "In case you encounter a slow internet connection, you can use an alternative mirror."
-echo "A list of other GNU mirrors is available here: http://www.gnu.org/prep/ftp.html"
-echo ""
-echo "Usage: GNU_MIRROR=[URL] ./rockboxdev.sh"
-echo ""
-echo "Example:"
-echo "$ GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh"
-echo ""
-
-if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
-  echo "binutils $binutils already downloaded"
-else
-  getfile binutils-$binutils.tar.bz2 $GNU_MIRROR/binutils
-fi
-
-if test -f "$dlwhere/gcc-core-$gccver.tar.bz2"; then
-  echo "gcc $gccver already downloaded"
-else
-  getfile gcc-core-$gccver.tar.bz2 $GNU_MIRROR/gcc/gcc-$gccver
-fi
-
-if test -n "$gccpatch"; then
-  if test -f "$dlwhere/$gccpatch"; then
-    echo "$gccpatch already downloaded"
-  else
-    getfile "$gccpatch" "$gccurl"
-  fi
-fi
-
-###########################################################################
-# If there's already a build dir, we don't overwrite or delete it
-if test -d $builddir; then
-  if test ! -w $builddir; then
-    echo "ERROR: No write permissions for the build directory!"
-    exit
-  fi
-else
-  mkdir -p $builddir
-fi
-
-cd $builddir
-
-###########################################################################
-# Create a summary file for each toolchain, containing info about the version
-# and a remainder to append the compiler path to PATH
-
-summary="summary-$1"
-
-echo "============================ Summary ============================" > $summary
-echo "target:              $target" >> $summary
-echo "gcc version:         $gccver" >> $summary
-if test -n "$gccpatch"; then
-    echo "gcc patch:           $gccpatch" >> $summary
-fi
-echo "binutils:            $binutils" >> $summary
-echo "installation target: $prefix/$target" >> $summary
-echo "" >> $summary
-echo "When done, append $bindir to PATH" >> $summary
-echo "=================================================================" >> $summary
-
-cat $summary
-
-echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
-bunzip2 < $dlwhere/binutils-$binutils.tar.bz2 | tar xf -
-echo "ROCKBOXDEV: extracting gcc-$gccver in $builddir"
-bunzip2 < $dlwhere/gcc-core-$gccver.tar.bz2 | tar xf -
-
-if test -n "$gccpatch"; then
-  echo "ROCKBOXDEV: applying gcc patch"
-  # apply the patch and hope it runs well - don't be dependant on the
-  # exact gcc version, thus strip the gcc folder
-  (cd $builddir/gcc-$gccver && patch -p1 < "$dlwhere/$gccpatch")
-    if [ $? -gt 0 ]; then # check if the applied cleanly
-      echo "ROCKBOXDEV: failed to apply the gcc patch"
-      exit
-    fi
-fi
-
-echo "ROCKBOXDEV: mkdir build-binu-$1"
-mkdir build-binu-$1
-echo "ROCKBOXDEV: cd build-binu-$1"
-cd build-binu-$1
-echo "ROCKBOXDEV: binutils/configure"
-# we undefine _FORTIFY_SOURCE to make the binutils built run fine on recent
-# Ubuntu installations
-CFLAGS=-U_FORTIFY_SOURCE ../binutils-$binutils/configure --target=$target --prefix=$prefix/$target $binutilsconf
-echo "ROCKBOXDEV: binutils/make"
-# We add -r when building binutils to fix compilation on OSX - Apple's make has
-# extra built-ins which cause problems.
-$make -r
-echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
-$make install
-cd .. # get out of build-binu-$1
-PATH="$bindir:${PATH}"
-SHELL=/bin/sh # seems to be needed by the gcc build in some cases
-
-echo "ROCKBOXDEV: mkdir build-gcc-$1"
-mkdir build-gcc-$1
-echo "ROCKBOXDEV: cd build-gcc-$1"
-cd build-gcc-$1
-echo "ROCKBOXDEV: gcc/configure"
-# we undefine _FORTIFY_SOURCE to make the gcc build go through fine on
-# recent Ubuntu installations
-CFLAGS=-U_FORTIFY_SOURCE ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
-echo "ROCKBOXDEV: gcc/make"
-$make $gcctarget
-echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
-$make $gccinstalltarget
-cd .. # get out of build-gcc
-cd .. # get out of $builddir
-
-} # buildone()
-
-echo ""
 echo "Select target arch:"
 echo "s   - sh       (Archos models)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
-echo "e   - arm-eabi (same as above, new testing toolchain)"
+echo "e   - arm-eabi (same as above, new gcc toolchain)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m86k and arm)"
 echo ""
 
 selarch=`input`
+system=`uname -s`
+
+# add target dir to path to ensure the new binutils are used in gcc build
+PATH="$prefix/bin:${PATH}"
 
 for arch in $selarch
 do
-echo ""
-case $arch in
-  [Ss])
-    buildone $arch
-    cleardir $builddir $arch
-    ;;
-  [Ii])
-    buildone $arch
-    cleardir $builddir $arch
-    ;;
-  [Mm])
-    buildone $arch
-    cleardir $builddir $arch
-    ;;
-  [Aa])
-    buildone $arch
-    cleardir $builddir $arch
-    ;;
-  [Ee])
-    buildone $arch
-    cleardir $builddir $arch
-    ;;
-  *)
-    echo "An unsupported architecture option: $arch"
-    exit
-    ;;
-esac
+    echo ""
+    case $arch in
+        [Ss])
+            build "binutils" "sh-elf" "2.16.1"
+            build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
+            ;;
+
+        [Ii])
+            build "binutils" "mips-elf" "2.17" "" "--disable-werror"
+            patch=""
+            if [ "$system" = "Interix" ]; then
+                patch="gcc-4.1.2-interix.diff"
+            fi
+            build "gcc" "mips-elf" "4.1.2" "$patch"
+            ;;
+
+        [Mm])
+            build "binutils" "m68k-elf" "2.16.1"
+            patch=""
+            case $system in
+                CYGWIN* | Darwin | FreeBSD | Interix | SunOS)
+                    patch="gcc-3.4.6.patch"
+                    ;;
+                Linux)
+                    machine=`uname -m`
+                    if [ "$machine" = "x86_64" ]; then
+                        patch="gcc-3.4.6-amd64.patch"
+                    fi
+                    ;;
+            esac
+            build "gcc" "m68k-elf" "3.4.6" "$patch"
+            ;;
+
+        [Aa])
+            build "binutils" "arm-elf" "2.16.1"
+            build "gcc" "arm-elf" "4.0.3" "rockbox-multilibs-arm-elf-gcc-4.0.3_3.diff"
+            ;;
+
+        [Ee])
+            build "binutils" "arm-elf-eabi" "2.20.1"
+            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "" "needs_gmp"
+            ;;
+
+        *)
+            echo "ROCKBOXDEV: Unsupported architecture option: $arch"
+            exit
+            ;;
+    esac
 done
 
-# show the summaries:
-cat $builddir/summary-*
-rm $builddir/summary-*
-
 echo ""
-echo "Done!"
+echo "ROCKBOXDEV: Done!"
 echo ""
-echo "Make your PATH include $pathadd"
+echo "ROCKBOXDEV: Make sure your PATH includes $prefix/bin"
 echo ""
