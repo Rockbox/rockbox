@@ -71,16 +71,14 @@ unsigned int power_input_status(void)
 }
 
 #ifdef HAVE_USB_POWER
-bool usb_charging_enable(bool on)
+void usb_charging_enable(int state)
 {
-    bool rc = false;
+    bool on = (state != USB_CHARGING_DISABLE);
     int irqlevel;
     logf("usb_charging_enable(%s)\n", on ? "on" : "off" );
     irqlevel = disable_irq_save();
     pcf50606_set_usb_charging(on);
-    rc = on;
     restore_irq(irqlevel);
-    return rc;
 }
 #endif /* HAVE_USB_POWER */
 
@@ -90,17 +88,6 @@ bool usb_charging_enable(bool on)
 bool charging_state(void)
 {
     return (GPIO_READ & 0x00800000)?true:false;
-}
-
-bool usb_charging_enabled(void)
-{
-    bool rc = false;
-    /* TODO: read the state of the GPOOD2 register...
-     * (this also means to set the irq level here) */
-    rc = pcf50606_usb_charging_enabled();
-
-    logf("usb charging %s", rc ? "enabled" : "disabled" );
-    return rc;
 }
 
 void ide_power_enable(bool on)

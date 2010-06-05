@@ -146,9 +146,16 @@ int usb_detect(void); /* return the raw hardware value - nothing/pc/charger */
 void usb_status_event(int current_status);
 #ifdef HAVE_USB_POWER
 bool usb_powered(void);
-#ifdef CONFIG_CHARGING
-bool usb_charging_enable(bool on);
-bool usb_charging_enabled(void);
+#ifdef HAVE_USB_CHARGING_ENABLE
+enum {
+    USB_CHARGING_DISABLE,
+    USB_CHARGING_ENABLE,
+    USB_CHARGING_FORCE
+};
+/* called by app, implemented by usb_core on targets with rockbox usb
+ * or target-specific code on others
+ */
+void usb_charging_enable(int state);
 #endif
 #endif
 #ifdef HAVE_USBSTACK

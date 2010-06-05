@@ -1595,7 +1595,9 @@ const struct settings_list settings[] = {
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
-    OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
+    CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, 0, "usb charging",
+                   "off,on,force", NULL, 3, ID2P(LANG_SET_BOOL_NO),
+                   ID2P(LANG_SET_BOOL_YES), ID2P(LANG_FORCE)),
 #endif
     OFFON_SETTING(F_BANFROMQS,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),

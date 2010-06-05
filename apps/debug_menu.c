@@ -1556,9 +1556,6 @@ static bool view_battery(void)
                 lcd_puts(0, 7, power_message);
                 lcd_putsf(0, 8, "USB Inserted: %s",
                          usb_inserted() ? "yes" : "no");
-#elif defined IRIVER_H300_SERIES
-                lcd_putsf(0, 9, "USB Charging Enabled: %s",
-                         usb_charging_enabled() ? "yes" : "no");
 #elif defined IPOD_NANO || defined IPOD_VIDEO
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
                 int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
@@ -1609,8 +1606,6 @@ static bool view_battery(void)
                 lcd_putsf(0, line++, "%s%s",
                          (st & POWER_INPUT_MAIN_CHARGER) ? " Main" : "",
                          (st & POWER_INPUT_USB_CHARGER) ? " USB" : "");
-
-                lcd_putsf(0, line++, "IUSB Max: %d", usb_allowed_current());
 
                 y = ARRAYLEN(chrgstate_strings) - 1;
 

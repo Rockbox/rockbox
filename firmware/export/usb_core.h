@@ -59,8 +59,14 @@ void usb_core_release_endpoint(int dir);
 void usb_core_hotswap_event(int volume,bool inserted);
 #endif
 
-#ifdef HAVE_USB_POWER
-unsigned short usb_allowed_current(void);
+#ifdef HAVE_USB_CHARGING_ENABLE
+/* hardware which knows how to control usb current should use one
+ * of the following to find out from the usb stack how much is ok
+ */
+/* implemented by target, called by usb when value changes */
+void usb_charging_maxcurrent_change(int maxcurrent);
+/* implemented by usb, called by target to get value */
+int usb_charging_maxcurrent(void);
 #endif
 
 #endif

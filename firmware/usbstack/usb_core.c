@@ -166,6 +166,11 @@ static int usb_address = 0;
 static bool initialized = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
+#ifdef HAVE_USB_CHARGING_ENABLE
+static int usb_charging_mode = USB_CHARGING_DISABLE;
+static int usb_charging_current_requested = 500;
+#endif
+
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
@@ -378,6 +383,9 @@ void usb_core_exit(void)
         initialized = false;
     }
     usb_state = DEFAULT;
+#ifdef HAVE_USB_CHARGING_ENABLE
+    usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+#endif
     logf("usb_core_exit() finished");
 }
 
@@ -552,6 +560,16 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
                     config_descriptor.bDescriptorType =
                         USB_DT_OTHER_SPEED_CONFIG;
                 }
+#ifdef HAVE_USB_CHARGING_ENABLE
+                if (usb_charging_mode == USB_CHARGING_DISABLE) {
+                    config_descriptor.bMaxPower = (100+1)/2;
+                    usb_charging_current_requested = 100;
+                }
+                else {
+                    config_descriptor.bMaxPower = (500+1)/2;
+                    usb_charging_current_requested = 500;
+                }
+#endif
                 size = sizeof(struct usb_config_descriptor);
 
                 for(i = 0; i < USB_NUM_DRIVERS; i++)
@@ -628,8 +646,10 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 }
                 else
                     usb_state = ADDRESS;
-                
                 usb_drv_send(EP_CONTROL, NULL, 0);
+#ifdef HAVE_USB_CHARGING_ENABLE
+                usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+#endif
                 break;
             }
         case USB_REQ_SET_ADDRESS: {
@@ -809,6 +829,9 @@ void usb_core_bus_reset(void)
 {
     usb_address = 0;
     usb_state = DEFAULT;
+#ifdef HAVE_USB_CHARGING_ENABLE
+    usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+#endif
 }
 
 /* called by usb_drv_transfer_completed() */
@@ -850,9 +873,20 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     usb_signal_transfer_completion(completion_event);
 }
 
-#ifdef HAVE_USB_POWER
-unsigned short usb_allowed_current()
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_enable(int state)
 {
-    return (usb_state == CONFIGURED) ? MAX(USB_MAX_CURRENT, 100) : 100;
+    usb_charging_mode = state;
+    usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+}
+
+int usb_charging_maxcurrent()
+{
+    if (!initialized
+            || usb_charging_mode == USB_CHARGING_DISABLE
+            || usb_state != CONFIGURED)
+        return 100;
+    /* usb_state == CONFIGURED, charging enabled/forced */
+    return usb_charging_current_requested;
 }
 #endif

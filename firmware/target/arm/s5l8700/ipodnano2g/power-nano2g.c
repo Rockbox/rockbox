@@ -54,15 +54,10 @@ void power_init(void)
 #if CONFIG_CHARGING
 
 #ifdef HAVE_USB_CHARGING_ENABLE
-bool usb_charging_enable(bool on)
+void usb_charging_maxcurrent_change(int maxcurrent)
 {
+    bool on = (maxcurrent >= 500);
     PDAT11 = (PDAT11 & ~1) | (on ? 1 : 0);
-    return on;
-}
-
-bool usb_charging_enabled(void)
-{
-    return PDAT11 & 1;
 }
 #endif
 

@@ -173,6 +173,8 @@
 /* Charging implemented in a target-specific algorithm */
 #define CONFIG_CHARGING CHARGING_TARGET
 
+#define HAVE_USB_CHARGING_ENABLE
+
 /* define this if the hardware can be powered off while charging */
 /* We don't charge while powered down so maybe implement a
    finish-charging-and-then-poweroff mode */

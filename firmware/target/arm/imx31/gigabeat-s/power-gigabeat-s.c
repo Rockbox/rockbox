@@ -43,13 +43,19 @@ unsigned int power_input_status(void)
     if (GPIO3_DR & (1 << 20))
         status |= POWER_INPUT_BATTERY;
 
-    if (usb_allowed_current() < 500)
+    if (usb_charging_maxcurrent() < 500)
     {
         /* ACK that USB is connected but NOT chargeable */
         status &= ~(POWER_INPUT_USB_CHARGER & POWER_INPUT_CHARGER);
     }
 
     return status;
+}
+
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    (void)maxcurrent;
+    /* Nothing to do */
 }
 
 /* Detect changes in presence of the AC adaptor. */

@@ -669,7 +669,7 @@ struct user_settings
     bool spdif_enable; /* S/PDIF power on/off */
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
-    bool usb_charging;
+    int usb_charging;
 #endif
 
     /* device settings */
