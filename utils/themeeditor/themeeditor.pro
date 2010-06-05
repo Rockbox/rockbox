@@ -26,6 +26,10 @@ SOURCES += tag_table.c \
     skindocument.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
-    resources/appicon.xcf
+    resources/appicon.xcf \
+    resources/COPYING \
+    resources/document-save.png \
+    resources/document-open.png \
+    resources/document-new.png
 FORMS += editorwindow.ui
 RESOURCES += resources.qrc

@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/resources">
         <file>resources/windowicon.png</file>
+        <file>resources/document-new.png</file>
+        <file>resources/document-open.png</file>
+        <file>resources/document-save.png</file>
     </qresource>
 </RCC>

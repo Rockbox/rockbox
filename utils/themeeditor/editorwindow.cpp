@@ -96,9 +96,22 @@ void EditorWindow::setupMenus()
     QObject::connect(ui->actionPreview_Panel, SIGNAL(triggered()),
                      this, SLOT(showPanel()));
 
-    /* Connecting the document opening/closing actions */
+    /* Connecting the document management actions */
     QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),
                      this, SLOT(newTab()));
+    QObject::connect(ui->actionToolbarNew, SIGNAL(triggered()),
+                     this, SLOT(newTab()));
+
+    QObject::connect(ui->actionClose_Document, SIGNAL(triggered()),
+                     this, SLOT(closeCurrent()));
+
+    QObject::connect(ui->actionSave_Document, SIGNAL(triggered()),
+                     this, SLOT(saveCurrent()));
+    QObject::connect(ui->actionSave_Document_As, SIGNAL(triggered()),
+                     this, SLOT(saveCurrentAs()));
+    QObject::connect(ui->actionToolbarSave, SIGNAL(triggered()),
+                     this, SLOT(saveCurrent()));
+
 }
 
 
@@ -115,13 +128,23 @@ void EditorWindow::newTab()
 void EditorWindow::shiftTab(int index)
 {
     if(index < 0)
+    {
         ui->parseTree->setModel(0);
+        ui->actionSave_Document->setEnabled(false);
+        ui->actionSave_Document_As->setEnabled(false);
+        ui->actionClose_Document->setEnabled(false);
+    }
     else
+    {
         ui->parseTree->setModel(dynamic_cast<SkinDocument*>
                                 (ui->editorTabs->currentWidget())->getModel());
+        ui->actionSave_Document->setEnabled(true);
+        ui->actionSave_Document_As->setEnabled(true);
+        ui->actionClose_Document->setEnabled(true);
+    }
 }
 
-void EditorWindow::closeTab(int index)
+bool EditorWindow::closeTab(int index)
 {
     SkinDocument* widget = dynamic_cast<SkinDocument*>
                            (ui->editorTabs->widget(index));
@@ -129,8 +152,29 @@ void EditorWindow::closeTab(int index)
     {
         ui->editorTabs->removeTab(index);
         widget->deleteLater();
+        return true;
     }
+
+    return false;
 }
+
+void EditorWindow::closeCurrent()
+{
+    closeTab(ui->editorTabs->currentIndex());
+}
+
+void EditorWindow::saveCurrent()
+{
+    if(ui->editorTabs->currentIndex() >= 0)
+        dynamic_cast<SkinDocument*>(ui->editorTabs->currentWidget())->save();
+}
+
+void EditorWindow::saveCurrentAs()
+{
+    if(ui->editorTabs->currentIndex() >= 0)
+        dynamic_cast<SkinDocument*>(ui->editorTabs->currentWidget())->saveAs();
+}
+
 
 void EditorWindow::tabTitleChanged(QString title)
 {
@@ -150,7 +194,20 @@ void EditorWindow::showPanel()
 
 void EditorWindow::closeEvent(QCloseEvent* event)
 {
+
     saveSettings();
+
+    /* Closing all the tabs */
+    for(int i = 0; i < ui->editorTabs->count(); i++)
+    {
+        if(!dynamic_cast<SkinDocument*>
+           (ui->editorTabs->widget(i))->requestClose())
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     event->accept();
 }
 

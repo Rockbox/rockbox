@@ -45,7 +45,10 @@ private slots:
     void showPanel();
     void newTab();
     void shiftTab(int index);
-    void closeTab(int index);
+    bool closeTab(int index);
+    void closeCurrent();
+    void saveCurrent();
+    void saveCurrentAs();
     void tabTitleChanged(QString title);
 
 private:

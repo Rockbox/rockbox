@@ -28,13 +28,18 @@
 #include <QFileDialog>
 
 SkinDocument::SkinDocument(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), fileFilter(tr("WPS Files (*.wps *.rwps);;"
+                                   "SBS Files (*.sbs *.rsbs);;"
+                                   "FMS Files (*.fms *.rfms);;"
+                                   "All Skin Files (*.wps *.rwps *.sbs "
+                                   "*.rsbs *.fms *.rfms);;"
+                                   "All Files (*.*)"))
 {
     setupUI();
 
     title = "Untitled";
     fileName = "";
-    saved = true;
+    saved = "";
 }
 
 SkinDocument::~SkinDocument()
@@ -45,7 +50,35 @@ SkinDocument::~SkinDocument()
 
 bool SkinDocument::requestClose()
 {
-    saveAs();
+    if(editor->document()->toPlainText() != saved)
+    {
+        /* Spawning the "Are you sure?" dialog */
+        QMessageBox confirm(this);
+        confirm.setText(title + tr(" has been modified."));
+        confirm.setInformativeText(tr("Do you want to save your changes?"));
+        confirm.setStandardButtons(QMessageBox::Save | QMessageBox::Discard
+                                   | QMessageBox::Cancel);
+        confirm.setDefaultButton(QMessageBox::Save);
+        int confirmation = confirm.exec();
+
+        switch(confirmation)
+        {
+        case QMessageBox::Save:
+            save();
+            /* After calling save, make sure the user actually went through */
+            if(editor->document()->toPlainText() != saved)
+                return false;
+            else
+                return true;
+
+        case QMessageBox::Discard:
+            return true;
+
+        case QMessageBox::Cancel:
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -74,11 +107,22 @@ void SkinDocument::setupUI()
 void SkinDocument::codeChanged()
 {
     model->changeTree(editor->document()->toPlainText().toAscii());
-    if(saved == true)
+
+    if(editor->document()->toPlainText() != saved)
     {
-        saved = false;
-        title.append(tr("*"));
-        emit titleChanged(title);
+        if(title.length() > 0 && title[title.length() - 1] != '*')
+        {
+            title.append('*');
+            emit titleChanged(title);
+        }
+    }
+    else
+    {
+        if(title.length() > 0 && title[title.length() - 1] == '*')
+        {
+            title.chop(1);
+            emit titleChanged(title);
+        }
     }
 }
 
@@ -88,7 +132,7 @@ void SkinDocument::save()
 
     if(!fout.exists())
     {
-        QTimer::singleShot(0, this, SLOT(saveAs()));
+        saveAs();
         return;
     }
 
@@ -96,22 +140,31 @@ void SkinDocument::save()
     fout.write(editor->document()->toPlainText().toAscii());
     fout.close();
 
-    saved = true;
+    saved = editor->document()->toPlainText();
+    QStringList decompose = fileName.split('/');
+    title = decompose[decompose.count() - 1];
+    emit titleChanged(title);
+
 }
 
 void SkinDocument::saveAs()
 {
     /* Determining the directory to open */
-    QSettings settings;
-
-    settings.beginGroup("SkinDocument");
-    QString openDir = settings.value("defaultDirectory", "").toString();
-
-    fileName = QFileDialog::getSaveFileName(this, tr("Save File"), openDir,"");
     QString directory = fileName;
+
+    QSettings settings;
+    settings.beginGroup("SkinDocument");
+    if(directory == "")
+        directory = settings.value("defaultDirectory", "").toString();
+
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Document"),
+                                            directory, fileFilter);
+    directory = fileName;
+    if(fileName == "")
+        return;
+
     directory.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
     settings.setValue("defaultDirectory", directory);
-
     settings.endGroup();
 
     QFile fout(fileName);
@@ -119,5 +172,9 @@ void SkinDocument::saveAs()
     fout.write(editor->document()->toPlainText().toAscii());
     fout.close();
 
-    saved = true;
+    saved = editor->document()->toPlainText();
+    QStringList decompose = fileName.split('/');
+    title = decompose[decompose.count() - 1];
+    emit titleChanged(title);
+
 }

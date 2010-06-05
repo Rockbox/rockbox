@@ -33,20 +33,22 @@ class SkinDocument : public QWidget
 {
 Q_OBJECT
 public:
+    const QString fileFilter;
+
+
     SkinDocument(QWidget *parent = 0);
     virtual ~SkinDocument();
 
     ParseTreeModel* getModel(){ return model; }
     QString getTitle(){ return title; }
 
+    void save();
+    void saveAs();
+
     bool requestClose();
 
 signals:
     void titleChanged(QString);
-
-public slots:
-    void save();
-    void saveAs();
 
 private slots:
     void codeChanged();
@@ -56,7 +58,7 @@ private:
 
     QString title;
     QString fileName;
-    bool saved;
+    QString saved;
 
     QLayout* layout;
     QPlainTextEdit* editor;

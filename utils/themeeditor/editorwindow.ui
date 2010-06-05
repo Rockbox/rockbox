@@ -14,7 +14,7 @@
    <string>Rockbox Theme Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="resources.qrc">
     <normaloff>:/resources/resources/windowicon.png</normaloff>:/resources/resources/windowicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -49,6 +49,11 @@
     </property>
     <addaction name="actionNew_Document"/>
     <addaction name="actionOpen_Document"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose_Document"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Document"/>
+    <addaction name="actionSave_Document_As"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
@@ -91,6 +96,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionToolbarNew"/>
+   <addaction name="actionToolbarOpen"/>
+   <addaction name="actionToolbarSave"/>
   </widget>
   <widget class="QDockWidget" name="fileDock">
    <property name="windowTitle">
@@ -147,13 +155,13 @@
    <property name="text">
     <string>Parse &amp;Tree Panel</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+D</string>
-   </property>
   </action>
   <action name="actionPreferences">
    <property name="text">
     <string>&amp;Preferences</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="actionFile_Panel">
@@ -194,8 +202,79 @@
     <string>Ctrl+O</string>
    </property>
   </action>
+  <action name="actionSave_Document">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Save Document</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionClose_Document">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Close Document</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionSave_Document_As">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save Document &amp;As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionToolbarNew">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/resources/document-new.png</normaloff>:/resources/resources/document-new.png</iconset>
+   </property>
+   <property name="text">
+    <string>ToolbarNew</string>
+   </property>
+   <property name="toolTip">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionToolbarOpen">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/resources/document-open.png</normaloff>:/resources/resources/document-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>ToolbarOpen</string>
+   </property>
+   <property name="toolTip">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionToolbarSave">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/resources/document-save.png</normaloff>:/resources/resources/document-save.png</iconset>
+   </property>
+   <property name="text">
+    <string>ToolbarSave</string>
+   </property>
+   <property name="toolTip">
+    <string>Save</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionQuit</sender>
