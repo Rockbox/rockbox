@@ -21,12 +21,18 @@
 
 #include "skindocument.h"
 
+#include <QFile>
+#include <QTimer>
+#include <QSettings>
+
 SkinDocument::SkinDocument(QWidget *parent) :
     QWidget(parent)
 {
     setupUI();
 
     title = "Untitled";
+    fileName = "";
+    saved = true;
 }
 
 SkinDocument::~SkinDocument()
@@ -65,4 +71,33 @@ void SkinDocument::setupUI()
 void SkinDocument::codeChanged()
 {
     model->changeTree(editor->document()->toPlainText().toAscii());
+    if(saved == true)
+    {
+        saved = false;
+        title.append(tr("*"));
+        emit titleChanged(title);
+    }
+}
+
+void SkinDocument::save()
+{
+    QFile fout(fileName);
+
+    if(!fout.exists())
+    {
+        QTimer::singleShot(0, this, SLOT(saveAs()));
+        return;
+    }
+
+    fout.open(QFile::WriteOnly);
+    fout.write(editor->document()->toPlainText().toAscii());
+    fout.close();
+
+    saved = true;
+}
+
+void SkinDocument::saveAs()
+{
+    /* Determining the directory to open */
+
 }

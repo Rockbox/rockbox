@@ -42,6 +42,11 @@ public:
     bool requestClose();
 
 signals:
+    void titleChanged(QString);
+
+public slots:
+    void save();
+    void saveAs();
 
 private slots:
     void codeChanged();
@@ -50,6 +55,8 @@ private:
     void setupUI();
 
     QString title;
+    QString fileName;
+    bool saved;
 
     QLayout* layout;
     QPlainTextEdit* editor;

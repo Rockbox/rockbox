@@ -46,6 +46,7 @@ private slots:
     void newTab();
     void shiftTab(int index);
     void closeTab(int index);
+    void tabTitleChanged(QString title);
 
 private:
     /* Setup functions */

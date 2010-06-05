@@ -106,6 +106,10 @@ void EditorWindow::newTab()
 {
     SkinDocument* doc = new SkinDocument;
     ui->editorTabs->addTab(doc, doc->getTitle());
+
+    /* Connecting to title change events */
+    QObject::connect(doc, SIGNAL(titleChanged(QString)),
+                     this, SLOT(tabTitleChanged(QString)));
 }
 
 void EditorWindow::shiftTab(int index)
@@ -126,6 +130,12 @@ void EditorWindow::closeTab(int index)
         ui->editorTabs->removeTab(index);
         widget->deleteLater();
     }
+}
+
+void EditorWindow::tabTitleChanged(QString title)
+{
+    SkinDocument* sender = dynamic_cast<SkinDocument*>(QObject::sender());
+    ui->editorTabs->setTabText(ui->editorTabs->indexOf(sender), title);
 }
 
 void EditorWindow::showPanel()
