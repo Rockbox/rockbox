@@ -218,6 +218,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_CANCEL,            BUTTON_OFF,                         BUTTON_NONE },
     {PLA_CANCEL,            BUTTON_RC_STOP,                     BUTTON_NONE },
     {PLA_EXIT,              BUTTON_ON,                          BUTTON_NONE },
+    {PLA_EXIT,              BUTTON_RC_MENU,                     BUTTON_NONE },
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
     {PLA_SELECT,            BUTTON_RC_ON,                       BUTTON_NONE },
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
