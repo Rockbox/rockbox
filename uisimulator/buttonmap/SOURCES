@@ -8,7 +8,7 @@ gigabeat.c
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 gigabeat-s.c
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-iaudio-x5m5.c
+iaudio-x5_m5.c
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 iaudio-m3.c
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
