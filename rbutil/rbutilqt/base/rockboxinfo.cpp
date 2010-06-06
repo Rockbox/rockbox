@@ -41,6 +41,15 @@ RockboxInfo::RockboxInfo(QString mountpoint)
         if(line.contains("Version:"))
         {
             m_version = line.remove("Version:").trimmed();
+            if(m_version.startsWith("r")) {
+                m_revision = m_version;
+                m_revision.remove("r").replace(QRegExp("-.+$"), "");
+                m_release = "";
+            }
+            else {
+                m_release = m_version;
+                m_revision = "";
+            }
         }
         else if(line.contains("Target: "))
         {

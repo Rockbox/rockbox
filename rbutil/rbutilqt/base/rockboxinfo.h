@@ -36,8 +36,12 @@ public:
     QString target() {return m_target;}
     int ram() { return m_ram; }
     bool success() { return m_success; }
+    QString revision(void) { return m_revision; }
+    QString release(void) { return m_release; }
 private:
     QString m_version;
+    QString m_revision;
+    QString m_release;
     QString m_features;
     QString m_targetid;
     QString m_target;

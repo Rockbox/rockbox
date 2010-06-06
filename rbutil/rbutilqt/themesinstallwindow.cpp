@@ -62,16 +62,6 @@ void ThemesInstallWindow::downloadInfo()
     getter = new HttpGet(this);
     RockboxInfo installInfo
         = RockboxInfo(RbSettings::value(RbSettings::Mountpoint).toString());
-    QString revision;
-    QString release;
-    // installInfo.version() holds either the revision (as r<revision>-<date>)
-    // or the release version number.
-    if(installInfo.version().startsWith("r")) {
-        revision = installInfo.version().remove("r").replace(QRegExp("-.+$"), "");
-    }
-    else {
-        release = installInfo.version();
-    }
 
     themesInfo.open();
     qDebug() << "[Themes] downloading info to" << themesInfo.fileName();
@@ -80,8 +70,8 @@ void ThemesInstallWindow::downloadInfo()
     QString infoUrl = SystemInfo::value(SystemInfo::ThemesInfoUrl).toString();
     infoUrl.replace("%TARGET%",
             SystemInfo::value(SystemInfo::CurConfigureModel).toString());
-    infoUrl.replace("%REVISION%", revision);
-    infoUrl.replace("%RELEASE%", release);
+    infoUrl.replace("%REVISION%", installInfo.revision());
+    infoUrl.replace("%RELEASE%", installInfo.release());
     infoUrl.replace("%RBUTILVER%", VERSION);
     QUrl url = QUrl(infoUrl);
     qDebug() << "[Themes] Info URL:" << url << "Query:" << url.queryItems();
