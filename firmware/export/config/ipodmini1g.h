@@ -143,6 +143,11 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define this if the unit can have USB charging disabled by user -
+:Qa
+ * if USB/MAIN power is discernable and hardware doesn't compel charging */
+#define HAVE_USB_CHARGING_ENABLE
+
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020
 

@@ -146,6 +146,10 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define this if the unit can have USB charging disabled by user -
+ * if USB/MAIN power is discernable and hardware doesn't compel charging */
+#define HAVE_USB_CHARGING_ENABLE
+
 /* define current usage levels */
 #define CURRENT_NORMAL     100  /* MP3: ~10.5h out of 1100mAh battery  */
 #define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */

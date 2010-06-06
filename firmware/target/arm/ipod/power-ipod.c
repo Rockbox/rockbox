@@ -182,3 +182,65 @@ void power_off(void)
 #endif
 #endif
 }
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    bool suspend_charging = (maxcurrent < 100);
+    bool fast_charging = (maxcurrent >= 500);
+
+    /* This GPIO is connected to the LTC4066's SUSP pin */
+    /* Setting it high prevents any power being drawn over USB */
+    /* which supports USB suspend */
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
+    if (suspend_charging)
+        GPIOL_OUTPUT_VAL |= 4;
+    else
+        GPIOL_OUTPUT_VAL &= ~4;
+#elif defined(IPOD_MINI2G)
+    if (suspend_charging)
+        GPIOJ_OUTPUT_VAL |= 2;
+    else
+        GPIOJ_OUTPUT_VAL &= ~2;
+#else
+    if (suspend_charging)
+        GPO32_VAL |= 0x8000000;
+    else
+        GPO32_VAL &= ~0x8000000;
+#endif
+
+    /* This GPIO is connected to the LTC4066's HPWR pin */
+    /* Setting it low limits current to 100mA, setting it high allows 500mA */
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
+    if (fast_charging)
+        GPIOA_OUTPUT_VAL |= 4;
+    else
+        GPIOA_OUTPUT_VAL &= ~4;
+#else
+    if (fast_charging)
+        GPO32_VAL |= 0x40;
+    else 
+        GPO32_VAL &= ~0x40;
+#endif
+
+    /* This GPIO is connected to the LTC4066's CLDIS pin */
+    /* Setting it high allows up to 1.5A of current to be drawn */
+    /* This doesn't appear to actually be safe even with an AC charger */
+    /* so for now it is disabled. It's not known (or maybe doesn't exist) */
+    /* on all models. */
+#if 0
+#if defined(IPOD_VIDEO)
+    if (unlimited_charging)
+        GPO32_VAL |= 0x10000000;
+    else 
+        GPO32_VAL &= ~0x10000000;
+#elif defined(IPOD_4G) || defined(IPOD_COLOR)
+    if (unlimited_charging)
+        GPO32_VAL |= 0x200;
+    else 
+        GPO32_VAL &= ~0x200;
+#endif
+    /* This might be GPIOD & 40 on 2G */
+#endif
+}
+#endif /* HAVE_USB_CHARGING_ENABLE */
