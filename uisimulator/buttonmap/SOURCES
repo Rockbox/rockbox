@@ -59,7 +59,7 @@ onda-vx747.c
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
 onda-vx777.c
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-samsung-yh820_yh925.c
+samsung-yh820_yh92x.c
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
 pbell-vibe500.c
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD

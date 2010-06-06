@@ -29,28 +29,6 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_t:
-            if(pressed)
-                switch(_remote_type)
-                {
-                    case REMOTETYPE_UNPLUGGED: 
-                        _remote_type=REMOTETYPE_H100_LCD;
-                        DEBUGF("Changed remote type to H100\n");
-                        break;
-                    case REMOTETYPE_H100_LCD:
-                        _remote_type=REMOTETYPE_H300_LCD;
-                        DEBUGF("Changed remote type to H300\n");
-                        break;
-                    case REMOTETYPE_H300_LCD:
-                        _remote_type=REMOTETYPE_H300_NONLCD;
-                        DEBUGF("Changed remote type to H300 NON-LCD\n");
-                        break;
-                    case REMOTETYPE_H300_NONLCD:
-                        _remote_type=REMOTETYPE_UNPLUGGED;
-                        DEBUGF("Changed remote type to none\n");
-                        break;
-                }
-            break;
         case SDLK_KP4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;

@@ -20,6 +20,10 @@ n/***************************************************************************
  ****************************************************************************/
 
 
+#include <SDL.h>
+#include "button.h"
+#include "buttonmap.h"
+
 int key_to_button(int keyboard_button)
 {
     int new_btn = BUTTON_NONE;

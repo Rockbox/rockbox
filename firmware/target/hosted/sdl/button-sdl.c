@@ -228,6 +228,30 @@ static void button_event(int key, bool pressed)
         return;
 #endif
 
+#if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
+    case SDLK_t:
+        if(pressed)
+            switch(_remote_type)
+            {
+                case REMOTETYPE_UNPLUGGED: 
+                    _remote_type=REMOTETYPE_H100_LCD;
+                    DEBUGF("Changed remote type to H100\n");
+                    break;
+                case REMOTETYPE_H100_LCD:
+                    _remote_type=REMOTETYPE_H300_LCD;
+                    DEBUGF("Changed remote type to H300\n");
+                    break;
+                case REMOTETYPE_H300_LCD:
+                    _remote_type=REMOTETYPE_H300_NONLCD;
+                    DEBUGF("Changed remote type to H300 NON-LCD\n");
+                    break;
+                case REMOTETYPE_H300_NONLCD:
+                    _remote_type=REMOTETYPE_UNPLUGGED;
+                    DEBUGF("Changed remote type to none\n");
+                    break;
+            }
+        break;
+#endif
     case SDLK_KP0:
     case SDLK_F5:
         if(pressed)
@@ -236,9 +260,17 @@ static void button_event(int key, bool pressed)
             return;
         }
         break;
+#ifdef HAVE_TOUCHSCREEN
+    case SDLK_F4:
+        if(pressed)
+        {
+            touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
+            printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
+        }
+#endif
     default:
 #ifdef HAVE_TOUCHSCREEN
-        new_btn = key_to_touch(key);
+        new_btn = key_to_touch(key, mouse_coords);
         if (!new_btn)
 #endif
             new_btn = key_to_button(key);

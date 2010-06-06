@@ -36,7 +36,7 @@ int xy2button( int x, int y);
 
 int key_to_button(int keyboard_button);
 #ifdef HAVE_TOUCHSCREEN
-int key_to_touch(int keyboard_button);
+int key_to_touch(int keyboard_button, unsigned int mouse_coords);
 #endif
 
 #endif /* __BUTTONMAP_H__ */

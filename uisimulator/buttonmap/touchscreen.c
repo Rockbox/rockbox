@@ -26,7 +26,7 @@
 #include "buttonmap.h"
 #include "touchscreen.h"
 
-int key_to_touch(int keyboard_button)
+int key_to_touch(int keyboard_button, unsigned int mouse_coords)
 {
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
@@ -90,13 +90,6 @@ int key_to_touch(int keyboard_button)
         case SDLK_KP3:
         case SDLK_l:
             new_btn = BUTTON_BOTTOMRIGHT;
-            break;
-        case SDLK_F4:
-            if(pressed)
-            {
-                touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
-                printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
-            }
             break;
     }
     return new_btn;
