@@ -101,7 +101,7 @@ void rtc_get_alarm(int *h, int *m)
 
 /* turn alarm on or off by setting the alarm flag enable
  */
-vodi rtc_enable_alarm(bool enable)
+void rtc_enable_alarm(bool enable)
 {
     if (enable)
     {
