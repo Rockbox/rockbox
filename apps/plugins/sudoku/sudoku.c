@@ -302,6 +302,10 @@ static void save_state(struct sudoku_state_t *state)
 {
     rb->memcpy(state->savedboard, state->currentboard,
             sizeof(state->savedboard));
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    rb->memcpy(state->savedpossible, state->possiblevals,
+            sizeof(state->savedpossible));
+#endif
 }
 
 /* Copies the saved to the current board */
@@ -309,6 +313,10 @@ static void restore_state(struct sudoku_state_t *state)
 {
     rb->memcpy(state->currentboard, state->savedboard,
             sizeof(state->savedboard));
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    rb->memcpy(state->possiblevals, state->savedpossible,
+            sizeof(state->possiblevals));
+#endif
 }
 
 void default_state(struct sudoku_state_t* state)
@@ -420,10 +428,10 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
 {
     int fd;
     size_t n;
-    int r = 0, c = 0;
+    int r = 0, c = 0, d = 0;
     unsigned int i;
     int valid=0;
-    char buf[300]; /* A buffer to read a sudoku board from */
+    char buf[500]; /* A buffer to read a sudoku board from */
 
     fd=rb->open(filename, O_RDONLY);
     if (fd < 0) {
@@ -432,15 +440,15 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
     }
 
     rb->strlcpy(state->filename,filename,MAX_PATH);
-    n=rb->read(fd,buf,300);
+    n=rb->read(fd,buf,500);
     if (n <= 0) {
         return(false);
     }
     rb->close(fd);
-
     r=0;
     c=0;
     i=0;
+    d=0;
     while ((i < n) && (r < 9)) {
         switch (buf[i]){
             case ' ': case '\t':
@@ -458,6 +466,7 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
                     valid=0;
                 }
                 c = 0;
+                d = 0;
                 break;
             case '_': case '.':
                 valid=1;
@@ -485,6 +494,13 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
                     }
                     c++;
                 }
+                if((buf[i]>='a' && buf[i] <= 'z') && i < (n-1)
+                    && (buf[i+1] >= 'a' && buf[i+1] <= 'z')) {
+                    state->possiblevals[r][d]
+                        = (((buf[i]-'a') * 26 + buf[i+1]-'a')<<1);
+                    i++;
+                    d++;
+                }
                 /* Ignore any other characters */
                 break;
         }
@@ -511,12 +527,15 @@ bool save_sudoku(struct sudoku_state_t* state)
     int fd;
     int r,c;
     int i;
-    char line[13];
-    char sep[13];
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    int x;
+    char line[41]="...|...|... ;                          \r\n";
+#else
+    char line[13]="...|...|...\r\n";
+#endif
+    char sep[13]="-----------\r\n";
 
     rb->splash(0, "Saving...");
-    rb->memcpy(line,"...|...|...\r\n",13);
-    rb->memcpy(sep,"-----------\r\n",13);
 
     if (state->filename[0]==0) {
         return false;
@@ -539,6 +558,15 @@ bool save_sudoku(struct sudoku_state_t* state)
                     i++;
                 }
             }
+#ifdef SUDOKU_BUTTON_POSSIBLE
+            i+=2;
+            for(c=0; c<9; c++) {
+                x = ((state->possiblevals[r][c]>>1)/26);
+                line[i++] = x + 'a';
+                x = ((state->possiblevals[r][c]>>1)%26);
+                line[i++] = x + 'a';
+            }
+#endif
             rb->write(fd,line,sizeof(line));
             if ((r==2) || (r==5)) {
                 rb->write(fd,sep,sizeof(sep));
@@ -570,7 +598,7 @@ void clear_board(struct sudoku_state_t* state)
     state->y=0;
 }
 
-void update_cell(struct sudoku_state_t* state, int r, int c) 
+void update_cell(struct sudoku_state_t* state, int r, int c)
 {
     /* We have four types of cell:
        1) User-entered number

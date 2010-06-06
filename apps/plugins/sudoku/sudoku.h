@@ -330,6 +330,7 @@ struct sudoku_state_t {
   int editmode;             /* We are editing the start board */
 #ifdef SUDOKU_BUTTON_POSSIBLE 
   short possiblevals[9][9];  /* possible values a cell could be, user sets them */
+  short savedpossible[9][9]; /* cached copy of possible cell values */
 #endif
 };
 
