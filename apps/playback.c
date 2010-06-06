@@ -524,7 +524,6 @@ struct mp3entry* audio_current_track(void)
         {
             bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
             thistrack_id3->cuesheet = curr_cue;
-            cue_spoof_id3(thistrack_id3->cuesheet, thistrack_id3);
         }
         return thistrack_id3;
     }
@@ -538,7 +537,6 @@ struct mp3entry* audio_current_track(void)
         {
             bufread(tracks[cur_idx].cuesheet_hid, sizeof(struct cuesheet), curr_cue);
             othertrack_id3->cuesheet = curr_cue;
-            cue_spoof_id3(othertrack_id3->cuesheet, othertrack_id3);
         }
         return othertrack_id3;
     }

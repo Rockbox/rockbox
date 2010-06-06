@@ -34,6 +34,7 @@
 #include "powermgmt.h"
 #include "sound.h"
 #include "debug.h"
+#include "cuesheet.h"
 #ifdef HAVE_LCD_CHARCELLS
 #include "hwcompat.h"
 #endif
@@ -513,6 +514,12 @@ const char *get_token_value(struct gui_wps *gwps,
         *intval = -1;
     }
     
+    if (state->id3 && state->id3->cuesheet)
+    {
+        out_text = get_cuesheetid3_token(token, state->id3, token->next?1:0, buf, buf_size);
+        if (out_text)
+            return out_text;
+    }
     out_text = get_id3_token(token, id3, buf, buf_size, limit, intval);
     if (out_text)
         return out_text;

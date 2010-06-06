@@ -2079,7 +2079,6 @@ struct mp3entry* audio_current_track(void)
                 parse_cuesheet(cuepath, curr_cuesheet))
             {
                 id3->cuesheet = curr_cuesheet;
-                cue_spoof_id3(curr_cuesheet, id3);
             }
         }
         return id3;

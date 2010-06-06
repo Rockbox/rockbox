@@ -1230,7 +1230,6 @@ static void track_changed_callback(void *param)
     if (wps_state.id3->cuesheet)
     {
         cue_find_current_track(wps_state.id3->cuesheet, wps_state.id3->elapsed);
-        cue_spoof_id3(wps_state.id3->cuesheet, wps_state.id3);
     }
     wps_sync_data.do_full_update = true;
 }
