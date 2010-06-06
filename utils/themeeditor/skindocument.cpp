@@ -54,6 +54,7 @@ bool SkinDocument::requestClose()
     {
         /* Spawning the "Are you sure?" dialog */
         QMessageBox confirm(this);
+        confirm.setWindowTitle(tr("Confirm Close"));
         confirm.setText(title + tr(" has been modified."));
         confirm.setInformativeText(tr("Do you want to save your changes?"));
         confirm.setStandardButtons(QMessageBox::Save | QMessageBox::Discard
@@ -109,21 +110,9 @@ void SkinDocument::codeChanged()
     model->changeTree(editor->document()->toPlainText().toAscii());
 
     if(editor->document()->toPlainText() != saved)
-    {
-        if(title.length() > 0 && title[title.length() - 1] != '*')
-        {
-            title.append('*');
-            emit titleChanged(title);
-        }
-    }
+        emit titleChanged(title + QChar('*'));
     else
-    {
-        if(title.length() > 0 && title[title.length() - 1] == '*')
-        {
-            title.chop(1);
-            emit titleChanged(title);
-        }
-    }
+        emit titleChanged(title);
 }
 
 void SkinDocument::save()

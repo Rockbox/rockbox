@@ -272,6 +272,13 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>fileTree</tabstop>
+  <tabstop>skinPreview</tabstop>
+  <tabstop>parseTree</tabstop>
+  <tabstop>fromTree</tabstop>
+  <tabstop>editorTabs</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>
