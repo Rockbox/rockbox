@@ -878,6 +878,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         last_disk_activity = current_tick;
 
+        if(write)
+        {
+            /* wait for the card to exit programming state */
+            while(MCI_STATUS & DATA_BUSY) ;
+        }
+
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_RESP, NULL))
         {
             ret = -666;
