@@ -687,12 +687,12 @@ int skin_parse_conditional(struct skin_element* element, char** document)
                 if(*cursor == ENUMLISTOPENSYM)
                 {
                     nested++;
-                    break;
                 }
                 else if(*cursor == ENUMLISTCLOSESYM)
                 {
                     nested--;
-                    break;
+                    if(nested == 0)
+                        break;
                 }
                 cursor++;
             }
