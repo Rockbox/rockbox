@@ -25,6 +25,7 @@
 #include <QDesktopWidget>
 #include <QFileSystemModel>
 #include <QSettings>
+#include <QFileDialog>
 
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -181,6 +182,17 @@ void EditorWindow::saveCurrentAs()
 {
     if(ui->editorTabs->currentIndex() >= 0)
         dynamic_cast<SkinDocument*>(ui->editorTabs->currentWidget())->saveAs();
+}
+
+void EditorWindow::openFile()
+{
+    QStringList fileNames;
+    QSettings settings;
+
+    settings.beginGroup("SkinDocument");
+    QString directory = settings.value("defaultDirectory", "").toString();
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), directory,
+                                              SkinDocument::fileFilter());
 }
 
 

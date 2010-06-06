@@ -49,7 +49,10 @@ ParseTreeModel::~ParseTreeModel()
 
 QString ParseTreeModel::genCode()
 {
-    return root->genCode();
+    if(root)
+        return root->genCode();
+    else
+        return "";
 }
 
 bool ParseTreeModel::changeTree(const char *document)

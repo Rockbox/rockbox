@@ -28,12 +28,7 @@
 #include <QFileDialog>
 
 SkinDocument::SkinDocument(QWidget *parent) :
-    QWidget(parent), fileFilter(tr("WPS Files (*.wps *.rwps);;"
-                                   "SBS Files (*.sbs *.rsbs);;"
-                                   "FMS Files (*.fms *.rfms);;"
-                                   "All Skin Files (*.wps *.rwps *.sbs "
-                                   "*.rsbs *.fms *.rfms);;"
-                                   "All Files (*.*)"))
+    QWidget(parent)
 {
     setupUI();
 
@@ -147,7 +142,7 @@ void SkinDocument::saveAs()
         directory = settings.value("defaultDirectory", "").toString();
 
     fileName = QFileDialog::getSaveFileName(this, tr("Save Document"),
-                                            directory, fileFilter);
+                                            directory, fileFilter());
     directory = fileName;
     if(fileName == "")
         return;

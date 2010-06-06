@@ -49,6 +49,7 @@ private slots:
     void closeCurrent();
     void saveCurrent();
     void saveCurrentAs();
+    void openFile();
     void tabTitleChanged(QString title);
     void updateCurrent(); /* Generates code in the current tab */
 

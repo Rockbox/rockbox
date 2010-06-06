@@ -33,8 +33,15 @@ class SkinDocument : public QWidget
 {
 Q_OBJECT
 public:
-    const QString fileFilter;
-
+    static QString fileFilter()
+    {
+        return tr("WPS Files (*.wps *.rwps);;"
+                  "SBS Files (*.sbs *.rsbs);;"
+                  "FMS Files (*.fms *.rfms);;"
+                  "All Skin Files (*.wps *.rwps *.sbs "
+                  "*.rsbs *.fms *.rfms);;"
+                  "All Files (*.*)");
+    }
 
     SkinDocument(QWidget *parent = 0);
     virtual ~SkinDocument();
