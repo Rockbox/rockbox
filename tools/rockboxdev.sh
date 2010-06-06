@@ -245,7 +245,7 @@ fi
 
 echo "Select target arch:"
 echo "s   - sh       (Archos models)"
-echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
+echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
 echo "e   - arm-eabi (same as above, new gcc toolchain)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
