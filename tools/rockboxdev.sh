@@ -159,19 +159,25 @@ build() {
 
     # kludge to avoid having to install GMP and MPFR for new gcc
     if test -n "$needs_gmp"; then
+        cd "gcc-$version"
         if test ! -d gmp; then
             echo "ROCKBOXDEV: Getting GMP"
-            getfile "gmp-5.0.1.tar.bz2" "$GNU_MIRROR/gmp"
+            if test ! -f $dlwhere/gmp-5.0.1.tar.bz2; then
+                getfile "gmp-5.0.1.tar.bz2" "$GNU_MIRROR/gmp"
+            fi
             tar xjf $dlwhere/gmp-5.0.1.tar.bz2
-            ln -s gmp-5.0.1.tar.bz2 gmp
+            ln -s gmp-5.0.1 gmp
         fi
 
         if test ! -d mpfr; then
             echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
+            if test ! -f $dlwhere/mpfr-2.4.2.tar.bz2; then
+                getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
+            fi
             tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
             ln -s mpfr-2.4.2 mpfr
         fi
+        cd $builddir
     fi
 
     echo "ROCKBOXDEV: mkdir build-$toolname"
