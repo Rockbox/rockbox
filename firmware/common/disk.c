@@ -66,7 +66,7 @@ static struct mutex disk_mutex;
 int disk_sector_multiplier = 1;
 #endif
 
-static struct partinfo* disk_init(IF_MD_NONVOID(int drive))
+struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
     int i;
     unsigned char sector[SECTOR_SIZE];
