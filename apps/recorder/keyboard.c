@@ -59,20 +59,10 @@
 /* no key combos to move the cursor if not in line edit mode */
 #define KBD_MODES /* uses 2 modes, picker and line edit */
 
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
-    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
-    || (CONFIG_KEYPAD == SANSA_FUZE_PAD) \
-    || (CONFIG_KEYPAD == SANSA_C200_PAD) \
-    || (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#else
 /* certain key combos move the cursor even if not in line edit mode */
 #define KBD_CURSOR_KEYS
 #define KBD_MODES /* uses 2 modes, picker and line edit */
-
-#else
-#define KBD_CURSOR_KEYS /* certain keys move the cursor, no line edit mode */
 #endif
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
