@@ -194,15 +194,15 @@ void usb_charging_maxcurrent_change(int maxcurrent)
     /* which supports USB suspend */
 #if defined(IPOD_VIDEO) || defined(IPOD_NANO)
     if (suspend_charging)
-        GPIOL_OUTPUT_VAL |= 4;
+        GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 4);
     else
-        GPIOL_OUTPUT_VAL &= ~4;
+        GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 4);
 #elif defined(IPOD_MINI2G)
     if (suspend_charging)
-        GPIOJ_OUTPUT_VAL |= 2;
+        GPIO_SET_BITWISE(GPIOJ_OUTPUT_VAL, 2);
     else
-        GPIOJ_OUTPUT_VAL &= ~2;
-#else
+        GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 2);
+#else /* Color, 4G, Mini G1 */
     if (suspend_charging)
         GPO32_VAL |= 0x8000000;
     else
@@ -213,9 +213,9 @@ void usb_charging_maxcurrent_change(int maxcurrent)
     /* Setting it low limits current to 100mA, setting it high allows 500mA */
 #if defined(IPOD_VIDEO) || defined(IPOD_NANO)
     if (fast_charging)
-        GPIOA_OUTPUT_VAL |= 4;
+        GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 4);
     else
-        GPIOA_OUTPUT_VAL &= ~4;
+        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 4);
 #else
     if (fast_charging)
         GPO32_VAL |= 0x40;
