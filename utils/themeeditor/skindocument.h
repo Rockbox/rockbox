@@ -41,6 +41,7 @@ public:
 
     ParseTreeModel* getModel(){ return model; }
     QString getTitle(){ return title; }
+    void genCode(){ editor->document()->setPlainText(model->genCode()); }
 
     void save();
     void saveAs();

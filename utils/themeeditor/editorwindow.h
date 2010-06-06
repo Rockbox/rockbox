@@ -50,6 +50,7 @@ private slots:
     void saveCurrent();
     void saveCurrentAs();
     void tabTitleChanged(QString title);
+    void updateCurrent(); /* Generates code in the current tab */
 
 private:
     /* Setup functions */

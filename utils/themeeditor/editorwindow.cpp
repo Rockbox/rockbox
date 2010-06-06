@@ -84,6 +84,10 @@ void EditorWindow::setupUI()
     QObject::connect(ui->editorTabs, SIGNAL(tabCloseRequested(int)),
                      this, SLOT(closeTab(int)));
 
+    /* Connecting the code gen button */
+    QObject::connect(ui->fromTree, SIGNAL(pressed()),
+                     this, SLOT(updateCurrent()));
+
 }
 
 void EditorWindow::setupMenus()
@@ -133,6 +137,8 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document->setEnabled(false);
         ui->actionSave_Document_As->setEnabled(false);
         ui->actionClose_Document->setEnabled(false);
+        ui->actionToolbarSave->setEnabled(false);
+        ui->fromTree->setEnabled(false);
     }
     else
     {
@@ -141,6 +147,8 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document->setEnabled(true);
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
+        ui->actionToolbarSave->setEnabled(true);
+        ui->fromTree->setEnabled(true);
     }
 }
 
@@ -209,6 +217,15 @@ void EditorWindow::closeEvent(QCloseEvent* event)
     }
 
     event->accept();
+}
+
+void EditorWindow::updateCurrent()
+{
+    if(ui->editorTabs->currentIndex() < 0)
+        return;
+
+    dynamic_cast<SkinDocument*>
+            (ui->editorTabs->currentWidget())->genCode();
 }
 
 EditorWindow::~EditorWindow()

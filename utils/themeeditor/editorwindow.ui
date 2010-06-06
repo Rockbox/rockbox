@@ -129,6 +129,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="fromTree">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Update Code</string>
        </property>
@@ -260,6 +263,9 @@
    </property>
   </action>
   <action name="actionToolbarSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/resources/document-save.png</normaloff>:/resources/resources/document-save.png</iconset>
