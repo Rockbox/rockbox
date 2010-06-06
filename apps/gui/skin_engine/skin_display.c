@@ -199,7 +199,7 @@ static void draw_progressbar(struct gui_wps *gwps,
                 cue_draw_markers(display, id3->cuesheet, id3->length,
                                  pb->x, y+1, pb->width, height-2);
         }
-#if CONFIG_TUNER
+#if 0 /* disable for now CONFIG_TUNER */
         else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
         {
             presets_draw_markers(display, pb->x, y, pb->width, height);
