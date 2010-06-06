@@ -10833,6 +10833,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disc"
+  </dest>
+  <voice>
+    *: "Disc"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BASE_SKIN
   desc: browse for the base skin in theme settings
   user: core
