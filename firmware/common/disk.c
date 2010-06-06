@@ -19,11 +19,11 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include "kernel.h"
 #include "storage.h"
 #include "debug.h"
 #include "fat.h"
 #ifdef HAVE_HOTSWAP
-#include "sdmmc.h" /* for card_enable_monitoring() */
 #include "dir.h" /* for release_dirs() */
 #include "file.h" /* for release_files() */
 #endif
@@ -60,12 +60,13 @@ static const unsigned char fat_partition_types[] = {
 
 static struct partinfo part[NUM_DRIVES*4]; /* space for 4 partitions on 2 drives */
 static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
+static struct mutex disk_mutex;
 
 #ifdef MAX_LOG_SECTOR_SIZE
 int disk_sector_multiplier = 1;
 #endif
 
-struct partinfo* disk_init(IF_MD_NONVOID(int drive))
+static struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
     int i;
     unsigned char sector[SECTOR_SIZE];
@@ -113,13 +114,18 @@ struct partinfo* disk_partinfo(int partition)
     return &part[partition];
 }
 
+void disk_init_subsystem(void)
+{
+   mutex_init(&disk_mutex);
+}
+
 int disk_mount_all(void)
 {
     int mounted=0;
     int i;
     
 #ifdef HAVE_HOTSWAP
-    card_enable_monitoring(false);
+    mutex_lock(&disk_mutex);
 #endif
 
     fat_init(); /* reset all mounted partitions */
@@ -139,9 +145,8 @@ int disk_mount_all(void)
 #endif
 
 #ifdef HAVE_HOTSWAP
-    card_enable_monitoring(true);
+    mutex_unlock(&disk_mutex);
 #endif
-
     return mounted;
 }
 
@@ -160,11 +165,21 @@ static int get_free_volume(void)
 int disk_mount(int drive)
 {
     int mounted = 0; /* reset partition-on-drive flag */
-    int volume = get_free_volume();
-    struct partinfo* pinfo = disk_init(IF_MD(drive));
+    int volume;
+    struct partinfo* pinfo;
+
+#ifdef HAVE_HOTSWAP
+    mutex_lock(&disk_mutex);
+#endif
+
+    volume = get_free_volume();
+    pinfo = disk_init(IF_MD(drive));
 
     if (pinfo == NULL)
     {
+#ifdef HAVE_HOTSWAP
+        mutex_unlock(&disk_mutex);
+#endif
         return 0;
     }
 #if defined(TOSHIBA_GIGABEAT_S)
@@ -214,6 +229,9 @@ int disk_mount(int drive)
             vol_drive[volume] = drive; /* remember the drive for this volume */
         }
     }
+#ifdef HAVE_HOTSWAP
+    mutex_unlock(&disk_mutex);
+#endif
     return mounted;
 }
 
@@ -222,6 +240,7 @@ int disk_unmount(int drive)
 {
     int unmounted = 0;
     int i;
+    mutex_lock(&disk_mutex);
     for (i=0; i<NUM_VOLUMES; i++)
     {
         if (vol_drive[i] == drive)
@@ -233,6 +252,7 @@ int disk_unmount(int drive)
             fat_unmount(i, false);
         }
     }
+    mutex_unlock(&disk_mutex);
 
     return unmounted;
 }

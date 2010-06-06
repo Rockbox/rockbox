@@ -93,7 +93,6 @@ static long last_disk_activity = -1;
 static struct mutex mmc_mutex;
 
 #ifdef HAVE_HOTSWAP
-static bool mmc_monitor_enabled = true;
 static long mmc_stack[((DEFAULT_STACK_SIZE*2) + 0x800)/sizeof(long)];
 #else
 static long mmc_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
@@ -130,7 +129,9 @@ static tCardInfo card_info[2];
 static int current_card = 0;
 #endif
 static bool last_mmc_status = false;
-static int countdown = HZ/3; /* for mmc switch debouncing */
+static int countdown = -1; /* for mmc switch debouncing. -1 because the 
+                              countdown should not happen if the card
+                              is inserted at boot */
 static bool usb_activity;    /* monitoring the USB bridge */
 static long last_usb_activity;
 
@@ -807,13 +808,6 @@ static void mmc_thread(void)
     }
 }
 
-#ifdef HAVE_HOTSWAP
-void mmc_enable_monitoring(bool on)
-{
-    mmc_monitor_enabled = on;
-}
-#endif
-
 bool mmc_detect(void)
 {
     return (adc_read(ADC_MMC_SWITCH) < 0x200);
@@ -846,9 +840,6 @@ bool mmc_usb_active(int delayticks)
 static void mmc_tick(void)
 {
     bool current_status;
-#ifndef HAVE_HOTSWAP
-    const bool mmc_monitor_enabled = true;
-#endif
 
     if (new_mmc_circuit)
         /* USB bridge activity is 0 on idle, ~527 on active */
@@ -860,33 +851,30 @@ static void mmc_tick(void)
         last_usb_activity = current_tick;
     usb_activity = current_status;
 
-    if (mmc_monitor_enabled)
+    current_status = mmc_detect();
+    /* Only report when the status has changed */
+    if (current_status != last_mmc_status)
     {
-        current_status = mmc_detect();
-        /* Only report when the status has changed */
-        if (current_status != last_mmc_status)
-        {
-            last_mmc_status = current_status;
-            countdown = HZ/3;
-        }
-        else
-        {
-            /* Count down until it gets negative */
-            if (countdown >= 0)
-                countdown--;
+        last_mmc_status = current_status;
+        countdown = HZ/3;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
 
-            if (countdown == 0)
+        if (countdown == 0)
+        {
+            if (current_status)
             {
-                if (current_status)
-                {
-                    queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-                }
-                else
-                {
-                    queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-                    mmc_status = MMC_UNTOUCHED;
-                    card_info[1].initialized = false;
-                }
+                queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+            }
+            else
+            {
+                queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+                mmc_status = MMC_UNTOUCHED;
+                card_info[1].initialized = false;
             }
         }
     }

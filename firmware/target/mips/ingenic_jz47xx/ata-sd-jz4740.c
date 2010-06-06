@@ -1412,14 +1412,6 @@ bool sd_removable(IF_MV_NONVOID(int drive))
     return true;
 }
 
-void card_enable_monitoring_target(bool on)
-{
-    if(on)
-        sd_gpio_setup_irq(card_detect_target());
-    else
-        __gpio_mask_irq(MMC_CD_PIN);
-}
-
 static int sd_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;

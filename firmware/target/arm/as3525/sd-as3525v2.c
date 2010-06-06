@@ -731,6 +731,9 @@ int sd_init(void)
     GPIOA_IS &= ~EXT_SD_BITS;
     /* detect both raising and falling edges */
     GPIOA_IBE |= EXT_SD_BITS;
+    /* enable the card detect interrupt */
+    GPIOA_IE |= EXT_SD_BITS;
+
     /* Configure XPD for SD-MCI interface */
     CCU_IO |= (1<<2);
 #endif
@@ -988,14 +991,6 @@ void sd_gpioa_isr(void)
         timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
     /* acknowledge interrupt */
     GPIOA_IC = EXT_SD_BITS;
-}
-
-void card_enable_monitoring_target(bool on)
-{
-    if (on) /* enable interrupt */
-        GPIOA_IE |= EXT_SD_BITS;
-    else    /* disable interrupt */
-        GPIOA_IE &= ~EXT_SD_BITS;
 }
 #endif /* HAVE_HOTSWAP */
 

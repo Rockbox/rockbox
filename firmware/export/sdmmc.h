@@ -57,17 +57,12 @@ typedef struct
 tCardInfo *card_get_info_target(int card_no);
 void sd_parse_csd(tCardInfo *card);
 
-#ifdef HAVE_HOTSWAP
-#define card_enable_monitoring card_enable_monitoring_target
-#endif
-
 #else /* STORAGE_MMC */
 
 #include "ata_mmc.h"
 #define card_get_info          mmc_card_info
 tCardInfo *mmc_card_info(int card_no);
 #define card_touched           mmc_touched
-#define card_enable_monitoring mmc_enable_monitoring
 
 #endif
 

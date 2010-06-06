@@ -270,6 +270,11 @@ static void init_sdi_controller(const int card_no)
     
     /* Card Detect input */
     S3C2440_GPIO_CONFIG (GPGCON, 8, GPIO_INPUT);
+    /* enable external irq 8-23 on the internal interrupt controller */
+    INTMSK &= ~1<<5;
+    /* enable GPG8 IRQ on the external interrupt controller */
+    EINTMASK &= ~(1<<16);
+    
     
     /* Write Protect input */
     S3C2440_GPIO_CONFIG (GPHCON, 8, GPIO_INPUT);
@@ -521,22 +526,6 @@ static int sd1_oneshot_callback(struct timeout *tmo)
     else
         queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
     return 0;
-}
-
-void card_enable_monitoring_target(bool on)
-{
-    if (on)
-    {   /* enable external irq 8-23 on the internal interrupt controller */
-        INTMSK &= ~1<<5;
-        /* enable GPG8 IRQ on the external interrupt controller */
-        EINTMASK &= ~(1<<16);
-    }
-    else
-    {
-        /* mask internal and external IRQs */
-        INTMSK |=  1<<5;
-        EINTMASK |= (1<<16);
-    }
 }
 
 void EINT8_23(void)

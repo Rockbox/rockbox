@@ -508,6 +508,8 @@ static void init_pl180_controller(const int drive)
     GPIOA_IS &= ~EXT_SD_BITS;
     /* detect both raising and falling edges */
     GPIOA_IBE |= EXT_SD_BITS;
+    /* enable the card detect interrupt */
+    GPIOA_IE |= EXT_SD_BITS;
 
 #else
     VIC_INT_ENABLE = INTERRUPT_NAND;
@@ -921,16 +923,6 @@ tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
 }
-
-#ifdef HAVE_HOTSWAP
-void card_enable_monitoring_target(bool on)
-{
-    if (on) /* enable interrupt */
-        GPIOA_IE |= EXT_SD_BITS;
-    else    /* disable interrupt */
-        GPIOA_IE &= ~EXT_SD_BITS;
-}
-#endif /* HAVE_HOTSWAP */
 
 #endif /* !BOOTLOADER */
 

@@ -48,7 +48,6 @@ void sd_get_info(IF_MD2(int drive,) struct storage_info *info);
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive));
 bool sd_present(IF_MV_NONVOID(int drive));
-void card_enable_monitoring_target(bool on);
 #endif
 
 long sd_last_disk_activity(void);

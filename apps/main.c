@@ -342,6 +342,7 @@ static void init(void)
     sb_skin_init();
     viewportmanager_init();
 
+    disk_init_subsystem();
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
@@ -506,6 +507,8 @@ static void init(void)
     }
 #endif
 
+
+    disk_init_subsystem();
     CHART(">storage_init");
     rc = storage_init();
     CHART("<storage_init");

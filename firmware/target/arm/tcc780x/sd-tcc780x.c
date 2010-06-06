@@ -214,18 +214,6 @@ static inline bool card_detect_target(void)
 #endif
 }
 
-void card_enable_monitoring_target(bool on)
-{
-    if (on)
-    {
-        IEN |= EXT0_IRQ_MASK;
-    }
-    else
-    {
-        IEN &= ~EXT0_IRQ_MASK;
-    }
-}
-
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
@@ -786,6 +774,7 @@ int sd_init(void)
         /* Configure interrupts for the card slot */
         TMODE &= ~EXT0_IRQ_MASK; /* edge-triggered */
         TMODEA |= EXT0_IRQ_MASK; /* trigger on both edges */
+        IEN |= EXT0_IRQ_MASK; /* enable the interrupt */
 #endif
     }
 

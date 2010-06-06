@@ -35,8 +35,9 @@ struct partinfo {
 #define PARTITION_TYPE_OS2_HIDDEN_C_DRIVE   0x84
 
 /* returns a pointer to an array of 8 partinfo structs */
-struct partinfo* disk_init(IF_MD_NONVOID(int drive));
 struct partinfo* disk_partinfo(int partition);
+
+void disk_init_subsystem(void); /* Initialises mutexes */
 int disk_mount_all(void); /* returns the # of successful mounts */
 int disk_mount(int drive);
 int disk_unmount(int drive);
