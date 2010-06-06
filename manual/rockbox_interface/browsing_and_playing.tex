@@ -209,118 +209,88 @@ example when renaming a file or creating a new directory.
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
       ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,PBELL_VIBE500_PAD}%
     { or by pressing \ActionKbdMorseInput{} in the virtual keyboard}%
-  .
-}
+  .}
 
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
-    ,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{
-    \begin{btnmap}
-      \ActionKbdLeft{} / \ActionKbdRight{} / \ActionKbdUp{} / \ActionKbdDown
-      \opt{HAVEREMOTEKEYMAP}{
-      & \ActionRCKbdLeft{} / \ActionRCKbdRight{} / \ActionRCKbdUp{} / \ActionRCKbdDown}
-      & Move the cursor on the virtual keyboard. \\
-      %
-      \ActionKbdPageFlip
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdPageFlip}
-      & Flip to the next page of characters (if there is more than one). \\
-      %
-      \ActionKbdCursorLeft{} / \ActionKbdCursorRight
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight}
-      & Move the line cursor within the text line. \\
-      %
-      \ActionKbdSelect
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdSelect}
-      & Insert the selected keyboard letter at the current line cursor position. \\
-      %
-      \ActionKbdBackSpace
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdBackSpace}
-      & Delete the character before the line cursor. \\
-      %
-      \ActionKbdDone
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdDone}
-      & Exit the virtual keyboard and saves any changes. \\
-      %
-      \ActionKbdAbort
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdAbort}
-      & Exit the virtual keyboard without saving any changes. \\
-      %
+\note{When the cursor is on the input line, \ActionKbdSelect deletes the preceding character}
+
+\begin{btnmap}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+        ,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{
+        \ActionKbdCursorLeft{} / \ActionKbdCursorRight
+            &
+        \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdCursorLeft{} / \ActionRCKbdCursorRight
+            &}
+        Move the line cursor within the text line.
+            \\
+        %
+        \ActionKbdBackSpace
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        Delete the character before the line cursor.
+            \\
+    }%
+    \ActionKbdLeft{} / \ActionKbdRight
+        &
+    \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdLeft{} / \ActionRCKbdRight
+        &}
+    Move the cursor on the virtual keyboard.
+    If you move out of the picker area, you get the previous/next page of
+    characters (if there is more than one).
+        \\
+    %
+    \ActionKbdUp{} / \ActionKbdDown
+        &
+    \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdUp{} / \ActionRCKbdDown
+        &}
+    Move the cursor on the virtual keyboard.
+    If you move out of the picker area you get to the line edit mode.
+        \\
+    %
+    \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,ONDIO_PAD,PBELL_VIBE500_PAD}{
+        \ActionKbdPageFlip
+            &
+        \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdPageFlip
+            &}
+        Flip to the next page of characters (if there is more than one).
+            \\
+    }
+    %
+    \ActionKbdSelect
+        &
+    \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdSelect
+        &}
+    Insert the selected keyboard letter at the current line cursor position.
+        \\
+    %
+    \ActionKbdDone
+        &
+    \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdDone
+        &}
+    Exit the virtual keyboard and save any changes.
+        \\
+    %
+    \ActionKbdAbort
+        &
+    \opt{HAVEREMOTEKEYMAP}{\ActionRCKbdAbort
+        &}
+    Exit the virtual keyboard without saving any changes.
+        \\
+% to be done - create a separate section for morse imput and update the info
       \opt{morse_input}{
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
-            ,MROBE100_PAD,SANSA_E200_PAD}{
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PADD%
+            ,SANSA_E200_PA,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{
           \ActionKbdMorseInput
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseInput}
-          & Toggle keyboard input mode and Morse code input mode. \\
-        }
+          & Toggle keyboard input mode and Morse code input mode. \\}
         %
         \ActionKbdMorseSelect
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
         & Tap to select a character in Morse code input mode. \\
-        %
-      }
-    \end{btnmap}
-}
-\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD
-     ,PBELL_VIBE500_PAD}{
-  \textbf{Picker area}
-    \begin{btnmap}
-      \ActionKbdLeft{} / \ActionKbdRight
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Move the cursor on the virtual keyboard.
-        If you move out of the picker area, you get the previous/next page of
-        characters (if there is more than one). \\
-      %
-      \ActionKbdUp{} / \ActionKbdDown
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Move the cursor on the virtual keyboard.
-        If you move out of the picker area you get to the line edit mode. \\
-      %
-      \ActionKbdSelect
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Insert the selected keyboard letter at the current line cursor position. \\
-      %
-      \opt{PBELL_VIBE500_PAD}{
-      \ActionKbdBackSpace
-      & Delete the character before the line cursor. \\
-      }
-      %
-      \ActionKbdDone
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Exit the virtual keyboard and save any changes. \\
-      %
-      \ActionKbdAbort
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Exit the virtual keyboard without saving any changes. \\
-      %
-      \opt{morse_input}{
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{
-          \ActionKbdMorseInput
-          \opt{HAVEREMOTEKEYMAP}{& }
-          & Toggle keyboard input mode and Morse code input mode. \\
-        }
-        %
-        \ActionKbdMorseSelect
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
-        & Tap to select a character in Morse code input mode. \\
-        %
-      }
-    \end{btnmap}
+      } 
+\end{btnmap}
 
-  \textbf{Line edit mode}
-    \begin{btnmap}
-      \ActionKbdLeft{} / \ActionKbdRight
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Move the line cursor within the text line. \\
-      %
-      \ActionKbdSelect
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Delete the character before the line cursor. \\
-      %
-      \ActionKbdUp{} / \ActionKbdDown
-      \opt{HAVEREMOTEKEYMAP}{& }
-      & Return to the picker area. \\
-      %
-    \end{btnmap}
-}
+
 \opt{player}{
   The current text line to be entered or edited is always listed on the first
   line of the display. The second line of the display can contain the character
