@@ -33,6 +33,7 @@
 #include "misc.h"
 #include "exported_menus.h"
 #include "tree.h"
+#include "storage.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
@@ -341,24 +342,24 @@ static int info_action_callback(int action, struct gui_synclist *lists)
     if (action == ACTION_STD_CANCEL)
         return action;
     else if ((action == ACTION_STD_OK)
-#ifdef HAVE_MULTIVOLUME
-        || action == SYS_HOTSWAP_INSERTED
-        || action == SYS_HOTSWAP_EXTRACTED
+#ifdef HAVE_HOTSWAP
+        || action == SYS_FS_CHANGED
 #endif
         )
     {
 #ifndef SIMULATOR
         struct info_data *info = (struct info_data *)lists->data;
+        int i;
         info->new_data = true;
         splash(0, ID2P(LANG_SCANNING_DISK));
-        fat_recalc_free(IF_MV(0));
-#ifdef HAVE_MULTIVOLUME
-        if (fat_ismounted(1))
-            fat_recalc_free(1);
+        for (i = 0; i < NUM_VOLUMES; i++)
+        {
+#ifdef HAVE_HOTSWAP
+            if (fat_ismounted(i))
 #endif
-
+                fat_recalc_free(IF_MV(i));
+        }
 #else
-
         (void) lists;
 #endif
         gui_synclist_speak_item(lists);
