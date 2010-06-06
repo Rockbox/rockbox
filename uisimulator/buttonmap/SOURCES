@@ -1,0 +1,68 @@
+#ifdef SIMULATOR
+buttonmaps.c
+#ifdef HAVE_TOUCHSCREEN
+touchscreen.c
+#endif
+#if CONFIG_KEYPAD == GIGABEAT_PAD
+gigabeat.c
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+gigabeat-s.c
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
+iaudio-x5m5.c
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+iaudio-m3.c
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+   || (CONFIG_KEYPAD == IPOD_4G_PAD)
+ipod.c
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+iriver-h10.c
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+iriver-h100_h300.c
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+iriver-ifp7xx.c
+#elif CONFIG_KEYPAD == ONDIO_PAD
+archos-ondio.c
+#elif CONFIG_KEYPAD == PLAYER_PAD
+archos-player.c
+#elif CONFIG_KEYPAD == RECORDER_PAD
+archos-recorder.c
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+archos-av300.c           
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+sansa-c200.c
+#elif CONFIG_KEYPAD == SANSA_CLIP_PAD
+sansa-clip.c              
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+sansa-e200.c
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+sansa-fuze.c
+#elif CONFIG_KEYPAD == SANSA_M200_PAD
+sansa-m200.c
+#elif CONFIG_KEYPAD == MROBE500_PAD
+mrobe500.c
+#elif CONFIG_KEYPAD == MROBE100_PAD
+mrobe100.c
+#elif CONFIG_KEYPAD == COWON_D2_PAD
+cowon-d2.c
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+iaudio-6_7.c
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+creative-zvm.c
+#elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
+meizu-m6sl.c
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+gogear-sa9200.c
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+gogear-hdd1630.c
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+onda-vx747.c
+#elif CONFIG_KEYPAD == ONDAVX777_PAD
+onda-vx777.c
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+samsung-yh820_yh925.c
+#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
+pbell-vibe500.c
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+mpio-hd200.c
+#endif
+#endif /* SIMULATOR */

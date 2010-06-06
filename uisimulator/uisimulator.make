@@ -7,12 +7,13 @@
 # $Id$
 #
 
-INCLUDES += -I$(ROOTDIR)/uisimulator/bitmaps -I$(ROOTDIR)/uisimulator/common \
+INCLUDES += -I$(ROOTDIR)/uisimulator/bitmaps -I$(ROOTDIR)/uisimulator/common -I$(ROOTDIR)/uisimulator/buttonmap $\
 	-I$(FIRMDIR)/include -I$(FIRMDIR)/export $(TARGET_INC) -I$(BUILDDIR) -I$(APPSDIR)
 
 SIMFLAGS += $(INCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
 
 SIMSRC += $(call preprocess, $(ROOTDIR)/uisimulator/common/SOURCES)
+SIMSRC += $(call preprocess, $(ROOTDIR)/uisimulator/buttonmap/SOURCES)
 SIMOBJ = $(call c2obj,$(SIMSRC))
 OTHER_SRC += $(SIMSRC)
 
