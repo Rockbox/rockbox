@@ -45,6 +45,7 @@ class SystemInfo : public QObject
             VoiceUrl,
             DoomUrl,
             ReleaseUrl,
+            ReleaseVoiceUrl,
             DailyUrl,
             ServerConfUrl,
             GenlangUrl,

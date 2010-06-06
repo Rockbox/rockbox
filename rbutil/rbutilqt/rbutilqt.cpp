@@ -847,26 +847,53 @@ void RbUtilQt::installVoice()
         return;
     }
 
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    RockboxInfo installInfo(mountpoint);
+
+    QString voiceurl;
+    QString logversion;
+    QString relversion = installInfo.release();
+    // if no version is found abort.
+    if(installInfo.revision().isEmpty() && relversion.isEmpty()) {
+        QMessageBox::critical(this, tr("No Rockbox installation found"),
+                tr("Could not determine the installed Rockbox version. "
+                    "Please install a Rockbox build before installing "
+                    "voice files."));
+        return;
+    }
+    if(relversion.isEmpty()) {
+        // release is empty for non-release versions (i.e. daily / current)
+        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl).toString();
+        logversion = installInfo.revision();
+    }
+    else {
+        voiceurl = SystemInfo::value(SystemInfo::ReleaseVoiceUrl).toString();
+        logversion = installInfo.release();
+    }
     if(QMessageBox::question(this, tr("Confirm Installation"),
        tr("Do you really want to install the voice file?"),
-       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        return;
+
+    QDate date = QDate::fromString(ServerInfo::value(ServerInfo::DailyDate).toString(),Qt::ISODate);
+    QString model = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
+    // replace placeholder in voice url
+    voiceurl.replace("%DATE%", date.toString("yyyyMMdd"));
+    voiceurl.replace("%MODEL%", model);
+    voiceurl.replace("%RELVERSION%", relversion);
+
+    qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
+
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-
     // create zip installer
     installer = new ZipInstaller(this);
 
-    QString voiceurl = SystemInfo::value(SystemInfo::VoiceUrl).toString();
-    QDate date = QDate::fromString(ServerInfo::value(ServerInfo::DailyDate).toString(),Qt::ISODate);
-    voiceurl += SystemInfo::value(SystemInfo::CurBuildserverModel).toString() + "-" +
-        date.toString("yyyyMMdd") + "-english.zip";
-    qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
-
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
-    installer->setLogVersion(ServerInfo::value(ServerInfo::DailyDate).toString());
-    installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
+    installer->setLogVersion(logversion);
+    installer->setMountPoint(mountpoint);
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));

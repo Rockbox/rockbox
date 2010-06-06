@@ -39,6 +39,7 @@ const static struct {
     { SystemInfo::BootloaderInfoUrl,    "bootloader_info_url",  "" },
     { SystemInfo::FontUrl,              "font_url",             "" },
     { SystemInfo::VoiceUrl,             "voice_url",            "" },
+    { SystemInfo::ReleaseVoiceUrl,      "release_voice_url",    "" },
     { SystemInfo::DoomUrl,              "doom_url",             "" },
     { SystemInfo::ReleaseUrl,           "release_url",          "" },
     { SystemInfo::DailyUrl,             "daily_url",            "" },
