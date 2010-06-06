@@ -69,15 +69,10 @@ static bool tv_line_mode_setting(void)
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 
-static bool tv_view_mode_setting(void)
+static bool tv_windows_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"No (Narrow)", -1},
-        {"Yes",         -1},
-    };
-
-    return rb->set_option("Wide View", &new_prefs.view_mode, INT,
-                           names , 2, NULL);
+    return rb->set_int("Screens Per Page", "", UNIT_INT, 
+                       &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
 static bool tv_scroll_mode_setting(void)
@@ -272,7 +267,7 @@ MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", tv_word_wrap_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(line_mode_item, 0, "Line Mode", tv_line_mode_setting,
                   NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(view_mode_item, 0, "Wide View", tv_view_mode_setting,
+MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page", tv_windows_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(alignment_item, 0, "Alignment", tv_alignment_setting,
                   NULL, NULL, Icon_NOICON);
@@ -293,7 +288,7 @@ MENUITEM_FUNCTION(scroll_mode_item, 0, "Scroll Mode", tv_scroll_mode_setting,
 MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
                   tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
-            &encoding_item, &word_wrap_item, &line_mode_item, &view_mode_item,
+            &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
             &alignment_item,
 #ifdef HAVE_LCD_BITMAP
             &scrollbar_item, &page_mode_item, &header_item, &footer_item, &font_item,

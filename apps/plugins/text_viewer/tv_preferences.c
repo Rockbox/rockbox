@@ -46,7 +46,7 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
     if ((oldp == NULL)                                 ||
         (oldp->word_mode      != newp->word_mode)      ||
         (oldp->line_mode      != newp->line_mode)      ||
-        (oldp->view_mode      != newp->view_mode)      ||
+        (oldp->windows        != newp->windows)        ||
         (oldp->scrollbar_mode != newp->scrollbar_mode) ||
         (oldp->encoding       != newp->encoding)       ||
 #ifdef HAVE_LCD_BITMAP
@@ -91,7 +91,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
 {
     p->word_mode = WRAP;
     p->line_mode = NORMAL;
-    p->view_mode = NARROW;
+    p->windows = 1;
     p->alignment = LEFT;
     p->scroll_mode = PAGE;
     p->page_mode = NO_OVERLAP;

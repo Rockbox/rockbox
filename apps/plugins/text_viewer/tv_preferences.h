@@ -37,11 +37,6 @@ struct tv_preferences {
     } line_mode;
 
     enum {
-        NARROW = 0,
-        WIDE,
-    } view_mode;
-
-    enum {
         LEFT = 0,
         RIGHT,
     } alignment;
@@ -78,6 +73,8 @@ struct tv_preferences {
     } scroll_mode;
 
     int autoscroll_speed;
+
+    int windows;
 
     unsigned char font_name[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP

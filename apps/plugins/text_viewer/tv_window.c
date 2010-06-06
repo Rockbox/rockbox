@@ -27,8 +27,6 @@
 #include "tv_text_reader.h"
 #include "tv_window.h"
 
-#define TV_WINDOWS_PER_SCREEN 2
-
 #define TV_SCROLLBAR_WIDTH rb->global_settings->scrollbar_width
 
 #ifndef HAVE_LCD_BITMAP
@@ -47,8 +45,6 @@ static int display_lines;
 static int window_width;
 static int window_columns;
 static int col_width;
-
-static int max_windows;
 
 static int cur_window;
 static int cur_column;
@@ -204,7 +200,7 @@ void tv_draw_window(void)
     int offset = cur_column * col_width;
     int size = 0;
     int line_width;
-    int draw_width = (max_windows - cur_window) * LCD_WIDTH - offset;
+    int draw_width = (prefs->windows - cur_window) * LCD_WIDTH - offset;
     int dx = start_width - offset;
 
     tv_copy_screen_pos(&pos);
@@ -213,7 +209,7 @@ void tv_draw_window(void)
     if (prefs->alignment == LEFT)
         tv_read_start(cur_window, (cur_column > 0));
     else
-        tv_read_start(0, prefs->view_mode == WIDE);
+        tv_read_start(0, prefs->windows > 1);
 
     for (line = 0; line < display_lines; line++)
     {
@@ -313,8 +309,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     col_width = 1;
 #endif
 
-    max_windows = (prefs->view_mode == NARROW)? 1: TV_WINDOWS_PER_SCREEN;
-    if (cur_window >= max_windows)
+    if (cur_window >= prefs->windows)
         cur_window = 0;
 
     window_width = LCD_WIDTH;
@@ -322,7 +317,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     need_scrollbar = false;
     start_width = 0;
     tv_seek_top();
-    tv_set_read_conditions(max_windows, window_width);
+    tv_set_read_conditions(prefs->windows, window_width);
     if (tv_traverse_lines() && prefs->scrollbar_mode)
     {
         need_scrollbar = true;
@@ -337,7 +332,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 
     cur_column = 0;
 
-    tv_set_read_conditions(max_windows, window_width);
+    tv_set_read_conditions(prefs->windows, window_width);
 }
 
 bool tv_init_window(unsigned char *buf, size_t bufsize, size_t *used_size)
@@ -365,9 +360,9 @@ void tv_move_window(int window_delta, int column_delta)
         cur_window = 0;
         cur_column = 0;
     }
-    else if (cur_window >= max_windows)
+    else if (cur_window >= prefs->windows)
     {
-        cur_window = max_windows - 1;
+        cur_window = prefs->windows - 1;
         cur_column = 0;
     }
 
@@ -383,7 +378,7 @@ void tv_move_window(int window_delta, int column_delta)
     }
     else
     {
-        if (cur_window == max_windows - 1)
+        if (cur_window == prefs->windows - 1)
             cur_column = 0;
         else if (cur_column >= window_columns)
         {

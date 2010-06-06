@@ -39,7 +39,7 @@ enum tv_text_type {
 #define TV_MAX_CHARS_PER_BLOCK (LCD_WIDTH + 1)
 #endif
 
-#define TV_MAX_BLOCKS 2
+#define TV_MAX_BLOCKS 5
 
 /*
  * number of spaces to indent first paragraph

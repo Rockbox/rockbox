@@ -44,8 +44,6 @@ TODO list
 
   - add History feature.
 
-  - when the WIDE screen, allow to specify the number of screens.
-
   - when the line_mode is reflow, allow to specify indent spaces.
 
   - for the horizontal scroll, allow the select scroll by screen/scroll by column for the settings menu.

@@ -30,30 +30,31 @@
  *
  * setting file format
  *
- * part                byte count
- * --------------------------------
- * 'TVGS'               4
- * version              1
- * word_mode            1
- * line_mode            1
- * view_mode            1
- * alignment            1
- * encoding             1
- * scrollbar_mode       1
- * (unused)             1 (for compatibility)
- * page_mode            1
- * page_number_mode     1
- * title_mode           1
- * scroll_mode          1
- * autoscroll_speed     1
- * font name            MAX_PATH
+ * part               byte count
+ * -------------------------------
+ * 'TVGS'                 4
+ * version                1
+ * word_mode              1
+ * line_mode              1
+ * windows                1 (when version <= 0x32, this value is view_mode)
+ * alignment              1
+ * encoding               1
+ * scrollbar_mode         1
+ * (unused)               1 (for compatibility)
+ * page_mode              1
+ * page_number_mode       1
+ * title_mode             1
+ * scroll_mode            1
+ * autoscroll_speed       1
+ * (reserved)             16
+ * font name              MAX_PATH
  */
 
 #define VIEWER_GLOBAL_SETTINGS_FILE      VIEWERS_DIR "/viewer.dat"
 #define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DIR "/tv_global.dat"
 
 #define TV_GLOBAL_SETTINGS_HEADER        "\x54\x56\x47\x53" /* "TVGS" */
-#define TV_GLOBAL_SETTINGS_VERSION       0x32
+#define TV_GLOBAL_SETTINGS_VERSION       0x33
 #define TV_GLOBAL_SETTINGS_HEADER_SIZE   5
 #define TV_GLOBAL_SETTINGS_FIRST_VERSION 0x31
 
@@ -62,34 +63,35 @@
  *
  * setting file format
  *
- * part                byte count
- * --------------------------------
- * 'TVS'                3
- * version              1
- * file count           2
+ * part                   byte count
+ * -----------------------------------
+ * 'TVS'                      3
+ * version                    1
+ * file count                 2
  * [1st file]
- *   file path          MAX_PATH
- *   next file pos      2 (prefences size + bookmark count * bookmark size + 1)
+ *   file path                MAX_PATH
+ *   next file pos            2 (prefences size + bookmark count * bookmark size + 1)
  *   [preferences]
- *     word_mode        1
- *     line_mode        1
- *     view_mode        1
- *     alignment        1
- *     encoding         1
- *     scrollbar_mode   1
- *     (unused)         1 (for compatibility)
- *     page_mode        1
- *     header_mode      1
- *     footer_mode      1
- *     scroll_mode      1
- *     autoscroll_speed 1
- *     font name        MAX_PATH
- *   bookmark count     1
+ *     word_mode              1
+ *     line_mode              1
+ *     windows                1 (when version <= 0x33, this value is view_mode)
+ *     alignment              1
+ *     encoding               1
+ *     scrollbar_mode         1
+ *     (unused)               1 (for compatibility)
+ *     page_mode              1
+ *     header_mode            1
+ *     footer_mode            1
+ *     scroll_mode            1
+ *     autoscroll_speed       1
+ *     (reserved)             16
+ *     font name              MAX_PATH
+ *   bookmark count           1
  *   [1st bookmark]
- *     file_position    4
- *     page             2
- *     line             1
- *     flag             1
+ *     file_position          4
+ *     page                   2
+ *     line                   1
+ *     flag                   1
  *   [2nd bookmark]
  *   ...
  *   [last bookmark]
@@ -104,11 +106,11 @@
 #define TV_SETTINGS_TMP_FILE      VIEWERS_DIR "/tv_file.tmp"
 
 #define TV_SETTINGS_HEADER        "\x54\x56\x53" /* "TVS" */
-#define TV_SETTINGS_VERSION       0x33
+#define TV_SETTINGS_VERSION       0x34
 #define TV_SETTINGS_HEADER_SIZE   4
 #define TV_SETTINGS_FIRST_VERSION 0x32
 
-#define TV_PREFERENCES_SIZE    (12 + MAX_PATH)
+#define TV_PREFERENCES_SIZE       (28 + MAX_PATH)
 
 /* ----------------------------------------------------------------------------
  * read/write the preferences
@@ -122,18 +124,25 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     int read_size = TV_PREFERENCES_SIZE;
 
     if (version == 0)
-        read_size--;
+        read_size -= 17;
+    else if (version == 1)
+        read_size -= 16;
 
     if (rb->read(pfd, buf, read_size) < 0)
         return false;
 
     prefs->word_mode        = *p++;
     prefs->line_mode        = *p++;
-    prefs->view_mode        = *p++;
+
+    prefs->windows = *p++;
+    if (version <= 1)
+        prefs->windows++;
+
     if (version > 0)
         prefs->alignment = *p++;
     else
         prefs->alignment = LEFT;
+
     prefs->encoding         = *p++;
     prefs->scrollbar_mode   = *p++;
     /* skip need_scrollbar */
@@ -143,7 +152,9 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     prefs->footer_mode      = *p++;
     prefs->scroll_mode      = *p++;
     prefs->autoscroll_speed = *p++;
-    rb->memcpy(prefs->font_name, p, MAX_PATH);
+
+    rb->memcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
+
 #ifdef HAVE_LCD_BITMAP
     prefs->font = rb->font_get(FONT_UI);
 #endif
@@ -158,7 +169,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
 
     *p++ = prefs->word_mode;
     *p++ = prefs->line_mode;
-    *p++ = prefs->view_mode;
+    *p++ = prefs->windows;
     *p++ = prefs->alignment;
     *p++ = prefs->encoding;
     *p++ = prefs->scrollbar_mode;
@@ -169,7 +180,8 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->footer_mode;
     *p++ = prefs->scroll_mode;
     *p++ = prefs->autoscroll_speed;
-    rb->memcpy(p, prefs->font_name, MAX_PATH);
+
+    rb->memcpy(buf + 28, prefs->font_name, MAX_PATH);
 
     return (rb->write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
 }

@@ -108,12 +108,12 @@ enum plugin_status plugin_start(const void* file)
 
             case TV_SCREEN_LEFT:
             case TV_SCREEN_LEFT | BUTTON_REPEAT:
-                if (prefs->view_mode == WIDE)
+                if (prefs->windows > 1)
                 {
                     /* Screen left */
                     tv_scroll_left(TV_HORIZONTAL_SCROLL_WINDOW);
                 }
-                else {   /* prefs->view_mode == NARROW */
+                else {   /* prefs->windows == 1 */
                     /* scroll to previous page */
                     tv_scroll_up(TV_VERTICAL_SCROLL_PAGE);
 #if 0
@@ -125,12 +125,12 @@ enum plugin_status plugin_start(const void* file)
 
             case TV_SCREEN_RIGHT:
             case TV_SCREEN_RIGHT | BUTTON_REPEAT:
-                if (prefs->view_mode == WIDE)
+                if (prefs->windows > 1)
                 {
                     /* Screen right */
                     tv_scroll_right(TV_HORIZONTAL_SCROLL_WINDOW);
                 }
-                else {   /* prefs->view_mode == NARROW */
+                else {   /* prefs->windows == 1 */
                     /* scroll to next page */
                     tv_scroll_down(TV_VERTICAL_SCROLL_PAGE);
 #if 0
