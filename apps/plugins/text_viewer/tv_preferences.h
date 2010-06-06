@@ -23,6 +23,11 @@
 #ifndef PLUGIN_TEXT_VIEWER_PREFERENCES_H
 #define PLUGIN_TEXT_VIEWER_PREFERENCES_H
 
+enum scrollbar_mode {
+    SB_OFF = 0,
+    SB_ON,
+};
+
 struct tv_preferences {
     enum {
         WRAP = 0,
@@ -43,10 +48,8 @@ struct tv_preferences {
 
     enum codepages encoding;
 
-    enum {
-        SB_OFF = 0,
-        SB_ON,
-    } scrollbar_mode;
+    enum scrollbar_mode horizontal_scrollbar;
+    enum scrollbar_mode vertical_scrollbar;
 
     enum {
         NO_OVERLAP = 0,

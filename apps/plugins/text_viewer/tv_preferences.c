@@ -43,16 +43,17 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
      *   - font
      *   - autoscroll_speed
      */
-    if ((oldp == NULL)                                 ||
-        (oldp->word_mode      != newp->word_mode)      ||
-        (oldp->line_mode      != newp->line_mode)      ||
-        (oldp->windows        != newp->windows)        ||
-        (oldp->scrollbar_mode != newp->scrollbar_mode) ||
-        (oldp->encoding       != newp->encoding)       ||
+    if ((oldp == NULL)                                             ||
+        (oldp->word_mode            != newp->word_mode)            ||
+        (oldp->line_mode            != newp->line_mode)            ||
+        (oldp->windows              != newp->windows)              ||
+        (oldp->horizontal_scrollbar != newp->horizontal_scrollbar) ||
+        (oldp->vertical_scrollbar   != newp->vertical_scrollbar)   ||
+        (oldp->encoding             != newp->encoding)             ||
 #ifdef HAVE_LCD_BITMAP
-        (oldp->header_mode    != newp->header_mode)    ||
-        (oldp->footer_mode    != newp->footer_mode)    ||
-        (rb->strcmp(oldp->font_name, newp->font_name)) ||
+        (oldp->header_mode          != newp->header_mode)          ||
+        (oldp->footer_mode          != newp->footer_mode)          ||
+        (rb->strcmp(oldp->font_name, newp->font_name))             ||
 #endif
         (rb->strcmp(oldp->file_name, newp->file_name)))
     {
@@ -95,7 +96,8 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->alignment = LEFT;
     p->scroll_mode = PAGE;
     p->page_mode = NO_OVERLAP;
-    p->scrollbar_mode = SB_OFF;
+    p->horizontal_scrollbar = SB_OFF;
+    p->vertical_scrollbar = SB_OFF;
     rb->memset(p->font_name, 0, MAX_PATH);
 #ifdef HAVE_LCD_BITMAP
     p->header_mode = HD_BOTH;

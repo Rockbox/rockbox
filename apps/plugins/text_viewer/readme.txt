@@ -48,8 +48,6 @@ TODO list
 
   - for the horizontal scroll, allow the select scroll by screen/scroll by column for the settings menu.
 
-  - can display the horizontal scroll bar.
-
   - draw images that are linked to the text. (<img src="...">)
 
   - play audios that are linked to the text. (<audio src="...">)

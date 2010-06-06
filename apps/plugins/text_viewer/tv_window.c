@@ -27,7 +27,8 @@
 #include "tv_text_reader.h"
 #include "tv_window.h"
 
-#define TV_SCROLLBAR_WIDTH rb->global_settings->scrollbar_width
+#define TV_SCROLLBAR_WIDTH  rb->global_settings->scrollbar_width
+#define TV_SCROLLBAR_HEIGHT 4
 
 #ifndef HAVE_LCD_BITMAP
 #define TV_BOOKMARK_ICON 0xe101
@@ -36,7 +37,7 @@
 #ifdef HAVE_LCD_BITMAP
 static int header_height;
 static int footer_height;
-static bool need_scrollbar = false;
+static bool need_vertical_scrollbar = false;
 #endif
 
 static int start_width;
@@ -123,27 +124,41 @@ static void tv_show_scrollbar(off_t cur_pos, int size)
     int items;
     int min_shown;
     int max_shown;
-    int sb_begin_y;
+    int sb_width;
     int sb_height;
 
-    if (!need_scrollbar)
-        return;
+    sb_height = LCD_HEIGHT - header_height - footer_height;
+    if (prefs->horizontal_scrollbar)
+    {
+        items     = prefs->windows * window_columns;
+        min_shown = cur_window * window_columns + cur_column;
+        max_shown = min_shown + window_columns;
+        sb_width  = (need_vertical_scrollbar)? TV_SCROLLBAR_WIDTH : 0;
+        sb_height -= TV_SCROLLBAR_HEIGHT;
 
-    items = (int) tv_get_total_text_size();
-    min_shown = (int) cur_pos;
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+                               sb_width,
+                               LCD_HEIGHT - footer_height - TV_SCROLLBAR_HEIGHT,
+                               LCD_WIDTH - sb_width, TV_SCROLLBAR_HEIGHT,
+                               items, min_shown, max_shown, HORIZONTAL);
+    }
 
-    max_shown = min_shown + size;
+    if (need_vertical_scrollbar)
+    {
+        items     = (int) tv_get_total_text_size();
+        min_shown = (int) cur_pos;
+        max_shown = min_shown + size;
 
-    sb_begin_y = header_height;
-    sb_height  = LCD_HEIGHT - header_height - footer_height;
-
-    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, sb_begin_y,
-                           TV_SCROLLBAR_WIDTH-1, sb_height,
-                           items, min_shown, max_shown, VERTICAL);
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN], 0, header_height,
+                               TV_SCROLLBAR_WIDTH-1, sb_height,
+                               items, min_shown, max_shown, VERTICAL);
+    }
 }
 
 static int tv_calc_display_lines(void)
 {
+    int scrollbar_height = (prefs->horizontal_scrollbar)? TV_SCROLLBAR_HEIGHT : 0;
+
     header_height = (prefs->header_mode == HD_SBAR || prefs->header_mode == HD_BOTH)?
                     STATUSBAR_HEIGHT : 0;
 
@@ -160,7 +175,7 @@ static int tv_calc_display_lines(void)
     if (prefs->footer_mode == FT_PAGE || prefs->footer_mode == FT_BOTH)
         footer_height += prefs->font->height;
 
-    return (LCD_HEIGHT - header_height - footer_height) / prefs->font->height;
+    return (LCD_HEIGHT - header_height - footer_height - scrollbar_height) / prefs->font->height;
 }
 #endif
 
@@ -314,13 +329,13 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 
     window_width = LCD_WIDTH;
 #ifdef HAVE_LCD_BITMAP
-    need_scrollbar = false;
+    need_vertical_scrollbar = false;
     start_width = 0;
     tv_seek_top();
     tv_set_read_conditions(prefs->windows, window_width);
-    if (tv_traverse_lines() && prefs->scrollbar_mode)
+    if (tv_traverse_lines() && prefs->vertical_scrollbar)
     {
-        need_scrollbar = true;
+        need_vertical_scrollbar = true;
         start_width = TV_SCROLLBAR_WIDTH;
     }
     tv_seek_top();

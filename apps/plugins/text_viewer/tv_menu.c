@@ -30,6 +30,42 @@
 
 static struct tv_preferences new_prefs;
 
+/* scrollbar menu */
+#ifdef HAVE_LCD_BITMAP
+static bool tv_horizontal_scrollbar_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No",  -1},
+        {"Yes", -1},
+    };
+
+    return rb->set_option("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar, INT,
+                           names, 2, NULL);
+}
+
+static bool tv_vertical_scrollbar_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No",  -1},
+        {"Yes", -1},
+    };
+
+    return rb->set_option("Vertical Scrollbar", &new_prefs.vertical_scrollbar, INT,
+                           names, 2, NULL);
+}
+
+MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Horizontal",
+                  tv_horizontal_scrollbar_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Vertical",
+                  tv_vertical_scrollbar_setting,
+                  NULL, NULL, Icon_NOICON);
+MAKE_MENU(scrollbar_menu, "Scrollbar", NULL, Icon_NOICON,
+          &horizontal_scrollbar_item, &vertical_scrollbar_item);
+#endif
+
+/* main menu */
+
 static bool tv_encoding_setting(void)
 {
     static struct opt_items names[NUM_CODEPAGES];
@@ -106,17 +142,6 @@ static bool tv_page_mode_setting(void)
     };
 
     return rb->set_option("Overlap Pages", &new_prefs.page_mode, INT,
-                           names, 2, NULL);
-}
-
-static bool tv_scrollbar_setting(void)
-{
-    static const struct opt_items names[] = {
-        {"Off", -1},
-        {"On",  -1}
-    };
-
-    return rb->set_option("Show Scrollbar", &new_prefs.scrollbar_mode, INT,
                            names, 2, NULL);
 }
 
@@ -272,8 +297,6 @@ MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page", tv_windows_setting,
 MENUITEM_FUNCTION(alignment_item, 0, "Alignment", tv_alignment_setting,
                   NULL, NULL, Icon_NOICON);
 #ifdef HAVE_LCD_BITMAP
-MENUITEM_FUNCTION(scrollbar_item, 0, "Show Scrollbar", tv_scrollbar_setting,
-                  NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", tv_page_mode_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(header_item, 0, "Show Header", tv_header_setting,
@@ -291,7 +314,7 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
             &alignment_item,
 #ifdef HAVE_LCD_BITMAP
-            &scrollbar_item, &page_mode_item, &header_item, &footer_item, &font_item,
+            &scrollbar_menu, &page_mode_item, &header_item, &footer_item, &font_item,
 #endif
             &scroll_mode_item, &autoscroll_speed_item);
 
