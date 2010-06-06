@@ -342,7 +342,6 @@ static void init(void)
     sb_skin_init();
     viewportmanager_init();
 
-    disk_init_subsystem();
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);

@@ -70,11 +70,11 @@ common/crc32-mi4.c
 #ifndef SIMULATOR
 common/dir_uncached.c
 common/file.c
+common/disk.c
 #endif /* SIMULATOR */
 #ifdef HAVE_DIRCACHE
 common/dircache.c
 #endif /* HAVE_DIRCACHE */
-common/disk.c
 common/filefuncs.c
 common/format.c
 common/strcasecmp.c
