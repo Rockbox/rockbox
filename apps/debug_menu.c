@@ -1118,23 +1118,35 @@ bool dbg_ports(void)
     {
         line = 0;
 #if (LCD_HEIGHT >= 176) /* Only for displays with appropriate height. */
-        lcd_puts(0, line++, "GPIO ENABLE:");
-        lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x",
+        lcd_puts(0, line++, "GPIO ENABLE:          GPIO OUTPUT ENABLE:");
+        lcd_putsf(0, line++, "A: %02x  E: %02x  I: %02x   A: %02x  E: %02x  I: %02x",
                                (unsigned int)GPIOA_ENABLE,
                                (unsigned int)GPIOE_ENABLE,
-                               (unsigned int)GPIOI_ENABLE);
-        lcd_putsf(0, line++, "B: %02x  F: %02x  J: %02x",
+                               (unsigned int)GPIOI_ENABLE,
+                               (unsigned int)GPIOA_OUTPUT_EN,
+                               (unsigned int)GPIOE_OUTPUT_EN,
+                               (unsigned int)GPIOI_OUTPUT_EN);
+        lcd_putsf(0, line++, "B: %02x  F: %02x  J: %02x   B: %02x  F: %02x  J: %02x",
                                (unsigned int)GPIOB_ENABLE,
                                (unsigned int)GPIOF_ENABLE,
-                               (unsigned int)GPIOJ_ENABLE);
-        lcd_putsf(0, line++, "C: %02x  G: %02x  K: %02x",
+                               (unsigned int)GPIOJ_ENABLE,
+                               (unsigned int)GPIOB_OUTPUT_EN,
+                               (unsigned int)GPIOF_OUTPUT_EN,
+                               (unsigned int)GPIOJ_OUTPUT_EN);
+        lcd_putsf(0, line++, "C: %02x  G: %02x  K: %02x   C: %02x  G: %02x  K: %02x",
                                (unsigned int)GPIOC_ENABLE,
                                (unsigned int)GPIOG_ENABLE,
-                               (unsigned int)GPIOK_ENABLE);
-        lcd_putsf(0, line++, "D: %02x  H: %02x  L: %02x",
+                               (unsigned int)GPIOK_ENABLE,
+                               (unsigned int)GPIOC_OUTPUT_EN,
+                               (unsigned int)GPIOG_OUTPUT_EN,
+                               (unsigned int)GPIOK_OUTPUT_EN);
+        lcd_putsf(0, line++, "D: %02x  H: %02x  L: %02x   D: %02x  H: %02x  L: %02x",
                                (unsigned int)GPIOD_ENABLE,
                                (unsigned int)GPIOH_ENABLE,
-                               (unsigned int)GPIOL_ENABLE);
+                               (unsigned int)GPIOL_ENABLE,
+                               (unsigned int)GPIOD_OUTPUT_EN,
+                               (unsigned int)GPIOH_OUTPUT_EN,
+                               (unsigned int)GPIOL_OUTPUT_EN);
         line++;
 #endif
         lcd_puts(0, line++, "GPIO INPUT VAL:");
