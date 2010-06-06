@@ -863,7 +863,7 @@ void RbUtilQt::installVoice()
     }
     if(relversion.isEmpty()) {
         // release is empty for non-release versions (i.e. daily / current)
-        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl).toString();
+        voiceurl = SystemInfo::value(SystemInfo::DailyVoiceUrl).toString();
         logversion = installInfo.revision();
     }
     else {

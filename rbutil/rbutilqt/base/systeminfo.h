@@ -42,7 +42,7 @@ class SystemInfo : public QObject
             BootloaderUrl,
             BootloaderInfoUrl,
             FontUrl,
-            VoiceUrl,
+            DailyVoiceUrl,
             DoomUrl,
             ReleaseUrl,
             ReleaseVoiceUrl,
