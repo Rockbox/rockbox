@@ -8,8 +8,8 @@
 %ac%s%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(1)<%d(1)|Unknown Artist>>
 
-%ac%s%?id<%?in<Track %#%in From The LP|From The Album>%t(8)|%t(0)>%;%?ic<%acComposed by:%t(6)|%t(0)>%;%ac%sTrack Info:%t(6)
-%ac%s%?id<"%id"%?iy< %(%iy%)>%t(8)|%t(0)>%;%?ic<%ac%s%ic%t(6)|%t(0)>%;%s%ac%fb kbps%?fv< VBR>%, %ff Hz%t(6)
+%ac%s%?id<%?in<Track %#%in From The LP|From The Album>%t(8)|%t(0)>;%?ic<%acComposed by:%t(6)|%t(0)>;%ac%sTrack Info:%t(6)
+%ac%s%?id<"%id"%?iy< %(%iy%)>%t(8)|%t(0)>;%?ic<%ac%s%ic%t(6)|%t(0)>;%s%ac%fb kbps%?fv< VBR>%, %ff Hz%t(6)
 
 %pb
 %pc/%pt %ar%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>

@@ -18,9 +18,9 @@
 
 
 %ac%s%?it<%it|%fn>
-%ac%t(5)%s%?ia<%ia|%?d(2)<%d(2)|%(Unknown Artist%)>>%;%ac%t(5)%s%?id<%id|%?d(1)<%d(1)|%(Unknown Album%)>>
+%ac%t(5)%s%?ia<%ia|%?d(2)<%d(2)|%(Unknown Artist%)>>;%ac%t(5)%s%?id<%id|%?d(1)<%d(1)|%(Unknown Album%)>>
 
-%ac%t(5)%pc / %pt%;%ac%t(5)Track %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>
+%ac%t(5)%pc / %pt;%ac%t(5)Track %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>
 
 
 
@@ -29,7 +29,7 @@
 %pb(pb-220.bmp,0,-,208,8)
 
 
-%ac%t(5)%s%?It<%It|%Fn>%;%ac%t(5)%s%?Ia<%Ia|%D(2)>
+%ac%t(5)%s%?It<%It|%Fn>;%ac%t(5)%s%?Ia<%Ia|%D(2)>
 
 
 %pm

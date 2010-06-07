@@ -7,7 +7,7 @@
 %s%?it<%?in<%in. >%it|%fn>
 %pb
 %xl(A,codec.bmp,102,48,21)
-%pc/%pt %ar%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%t(5)%;%pc/%pt%?fc<%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Af)|%xd(Ag)|%xd(Ah)|%xd(Ai)|%xd(Aj)|%xd(Ak)|%xd(Al)|%xd(Am)|%xd(An)|%xd(Ao)|%xd(Ap)|%xd(Aq)|%xd(Ar)|%xd(As)|%xd(At)|%xd(Au)>%t(3)%;%pc/%pt %ar%?fv<[VBR]|%fbkbps>%t(3)
+%pc/%pt %ar%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%t(5);%pc/%pt%?fc<%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Af)|%xd(Ag)|%xd(Ah)|%xd(Ai)|%xd(Aj)|%xd(Ak)|%xd(Al)|%xd(Am)|%xd(An)|%xd(Ao)|%xd(Ap)|%xd(Aq)|%xd(Ar)|%xd(As)|%xd(At)|%xd(Au)>%t(3);%pc/%pt %ar%?fv<[VBR]|%fbkbps>%t(3)
 %xl(B,battery-small.bmp,0,0,6)
 %?bp<%xd(Ba)|%?bl<%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)>>
 %xl(C,volume.bmp,24,0,9)

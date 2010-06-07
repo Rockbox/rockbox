@@ -18,7 +18,7 @@
         %fbk
 %?fv<%xd(Ba)|%xd(Bb)>
 %?pv<%xd(Ha)|%xd(Hb)|%xd(Hc)|%xd(Hd)|%xd(He)|%xd(Hf)|%xd(Hg)|%xd(Hh)|%xd(Hi)|%xd(Hj)>
-%t(0.2)%?bp<%xd(Ia)|%?bl<%xd(Ib)|%xd(Ic)|%xd(Id)|%xd(Ie)|%xd(If)>>%;%t(0.2)%?bp<%xd(Ia)|%?bl<|%xd(Ic)|%xd(Id)|%xd(Ie)|%xd(If)>>%;%t(0.2)%?bp<%xd(Ia)|%?bl<%xd(Ib)||%xd(Id)|%xd(Ie)|%xd(If)>>%;%t(0.2)%?bp<%xd(Ia)|%?bl<||%xd(Id)|%xd(Ie)|%xd(If)>>
+%t(0.2)%?bp<%xd(Ia)|%?bl<%xd(Ib)|%xd(Ic)|%xd(Id)|%xd(Ie)|%xd(If)>>;%t(0.2)%?bp<%xd(Ia)|%?bl<|%xd(Ic)|%xd(Id)|%xd(Ie)|%xd(If)>>;%t(0.2)%?bp<%xd(Ia)|%?bl<%xd(Ib)||%xd(Id)|%xd(Ie)|%xd(If)>>;%t(0.2)%?bp<%xd(Ia)|%?bl<||%xd(Id)|%xd(Ie)|%xd(If)>>
 %?mm<|%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)>
 %?mp<%xd(Da)|%xd(Db)|%xd(Dc)|%xd(Dd)|%xd(De)>
 %?ps<%xd(E)|>

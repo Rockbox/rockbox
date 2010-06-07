@@ -15,16 +15,16 @@
 
 
 %ac%s%?it<%it|%fn>
-%ac%t(5)%s%?ia<%ia|%?d(2)<%d(2)|%(Unknown Artist%)>>%;%ac%t(5)%s%?id<%id|%?d(1)<%d(1)|%(Unknown Album%)>>
+%ac%t(5)%s%?ia<%ia|%?d(2)<%d(2)|%(Unknown Artist%)>>;%ac%t(5)%s%?id<%id|%?d(1)<%d(1)|%(Unknown Album%)>>
 
-%ac%t(5)%pc / %pt%;%ac%t(5)Track %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>
+%ac%t(5)%pc / %pt;%ac%t(5)Track %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>
 
  %fbk
 
 %pb
 
 
-%ac%t(5)%s%?It<%It|%Fn>%;%ac%t(5)%s%?Ia<%Ia|%D(2)>
+%ac%t(5)%s%?It<%It|%Fn>;%ac%t(5)%s%?Ia<%Ia|%D(2)>
 %?pv<%xd(Ha)|%xd(Hb)|%xd(Hc)|%xd(Hd)|%xd(He)|%xd(Hf)|%xd(Hg)|%xd(Hh)|%xd(Hi)|%xd(Hj)|%xd(Hk)>
 %?bp<%xd(Ia)|%?bl<%xd(Ib)|%xd(Ic)|%xd(Id)|%xd(Ie)|%xd(If)>>
 %?fc<%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Af)|%xd(Ag)|%xd(Ah)|%xd(Ai)|%xd(Aj)|%xd(Ak)|%xd(Al)|%xd(Am)|%xd(An)|%xd(Ao)|%xd(Ap)|%xd(Aq)|%xd(Ar)|%xd(As)|%xd(At)|%xd(Au)|%xd(Av)>
