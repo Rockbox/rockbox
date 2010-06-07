@@ -182,9 +182,12 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_LIST_TITLE_TEXT,       "Lt" , ""},
     { SKIN_TOKEN_LIST_TITLE_ICON,       "Li" , ""},
     
-    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii|ii"},
+    { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "I"},
+    { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "I"},
+    
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii|ii"},
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii|ii"},
+    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii|ii"},
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f"},
     
