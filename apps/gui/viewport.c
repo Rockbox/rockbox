@@ -379,9 +379,9 @@ void viewport_set_defaults(struct viewport *vp,
 
 int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
 {
-    (void)screen;
-    int colour;
+    (void)screen; (void)fbcolour;
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+    int colour;
     if (fgcolour)
     {
 #if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
@@ -408,8 +408,10 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
             colour = BG_FALLBACK;
 #endif
     }
-#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
     return colour;
+#else
+    return 0;
+#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 }
 
 const char* viewport_parse_viewport(struct viewport *vp,
