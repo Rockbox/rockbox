@@ -379,7 +379,7 @@ void viewport_set_defaults(struct viewport *vp,
 
 int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
 {
-    (void)screen; (void)fbcolour;
+    (void)screen; (void)fgcolour;
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
     int colour;
     if (fgcolour)
