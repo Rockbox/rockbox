@@ -81,6 +81,9 @@ void PreferencesDialog::loadColors()
     bgColor = settings.value("bgColor", Qt::white).value<QColor>();
     setButtonColor(ui->bgButton, bgColor);
 
+    errorColor = settings.value("errorColor", Qt::red).value<QColor>();
+    setButtonColor(ui->errorButton, errorColor);
+
     settings.endGroup();
 }
 
@@ -114,6 +117,7 @@ void PreferencesDialog::saveColors()
 
     settings.setValue("fgColor", fgColor);
     settings.setValue("bgColor", bgColor);
+    settings.setValue("errorColor", errorColor);
 
     settings.endGroup();
 
@@ -149,6 +153,7 @@ void PreferencesDialog::setupUI()
     buttons.append(ui->tagButton);
     buttons.append(ui->conditionalButton);
     buttons.append(ui->escapedButton);
+    buttons.append(ui->errorButton);
 
     for(int i = 0; i < buttons.count(); i++)
         QObject::connect(buttons[i], SIGNAL(pressed()),
@@ -171,6 +176,8 @@ void PreferencesDialog::colorClicked()
         toEdit = &conditionalColor;
     else if(QObject::sender() == ui->escapedButton)
         toEdit = &escapedColor;
+    else if(QObject::sender() == ui->errorButton)
+        toEdit = &errorColor;
 
     if(!toEdit)
         return;

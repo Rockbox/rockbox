@@ -26,7 +26,7 @@
       <attribute name="title">
        <string>Editor</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
@@ -113,9 +113,27 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Error Color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="errorButton">
+           <property name="text">
+            <string>Click To Change</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="prefsGroupsPage1" native="true">
+     <widget class="QWidget" name="prefsGroupsPage1">
       <attribute name="title">
        <string>Highlighting</string>
       </attribute>

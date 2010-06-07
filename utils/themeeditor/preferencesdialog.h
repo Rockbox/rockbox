@@ -62,6 +62,7 @@ private:
 
     QColor fgColor;
     QColor bgColor;
+    QColor errorColor;
     QColor commentColor;
     QColor escapedColor;
     QColor tagColor;

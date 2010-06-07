@@ -27,6 +27,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
+#include <iostream>
+
 SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
         QWidget(parent), statusLabel(statusLabel)
 {
@@ -141,8 +143,12 @@ void SkinDocument::settingsChanged()
     QPalette palette;
     palette.setColor(QPalette::All, QPalette::Base, bg);
     palette.setColor(QPalette::All, QPalette::Text, fg);
-
     editor->setPalette(palette);
+
+    errorColor = QTextCharFormat();
+    QColor highlight = settings.value("errorColor", Qt::red).value<QColor>();
+    errorColor.setBackground(highlight);
+    errorColor.setProperty(QTextFormat::FullWidthSelection, true);
 
     /* Setting the font */
     QFont family = settings.value("fontFamily", QFont()).value<QFont>();
@@ -160,6 +166,26 @@ void SkinDocument::codeChanged()
     parseStatus = model->changeTree(editor->document()->
                                     toPlainText().toAscii());
     statusLabel->setText(parseStatus);
+
+    /* Highlighting if an error was found */
+    if(skin_error_line() > 0)
+    {
+        QList<QTextEdit::ExtraSelection> highlight;
+        QTextEdit::ExtraSelection error;
+
+        /* Finding the apropriate line */
+        error.cursor = QTextCursor(editor->document()->
+                               findBlockByNumber(skin_error_line() - 1));
+        error.format = errorColor;
+        highlight.append(error);
+
+        editor->setExtraSelections(highlight);
+
+    }
+    else
+    {
+        editor->setExtraSelections(QList<QTextEdit::ExtraSelection>());
+    }
 
     if(editor->document()->toPlainText() != saved)
         emit titleChanged(title + QChar('*'));

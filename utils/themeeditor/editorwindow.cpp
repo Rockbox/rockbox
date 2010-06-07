@@ -96,7 +96,7 @@ void EditorWindow::setupUI()
 
     /* Setting up the parse status label */
     parseStatus = new QLabel(this);
-    ui->statusbar->addWidget(parseStatus);
+    ui->statusbar->addPermanentWidget(parseStatus);
 
 }
 

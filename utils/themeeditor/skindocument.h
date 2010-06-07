@@ -78,6 +78,8 @@ private:
     QString saved;
     QString parseStatus;
 
+    QTextCharFormat errorColor;
+
     QLayout* layout;
     QPlainTextEdit* editor;
 
