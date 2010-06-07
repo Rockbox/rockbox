@@ -4,39 +4,39 @@
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 # derived from "cabbie" (C) Yohann Misquitta
 %wd
-%X|wpsbackdrop-160x128x2.bmp|
-%xl|A|lock-160x128x2.bmp|48|114|2|
-%xl|B|battery-160x128x2.bmp|66|115|10|
-%xl|C|volume-160x128x2.bmp|87|114|10|
-%xl|D|shuffle-160x128x2.bmp|107|115|
-%xl|E|repeat-160x128x2.bmp|127|113|4|
-%xl|F|playmode-160x128x2.bmp|145|114|5|
-%ax%Cl|2|16|s64|s64|
-%pb|pb-160x128x2.bmp|1|86|158|8|
-%?mh<%xdAa|%xdAb>
-%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
-%?ps<%xdD>
-%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
-%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C%Vda|%Vdb>
+%X(wpsbackdrop-160x128x2.bmp)
+%xl(A,lock-160x128x2.bmp,48,114,2)
+%xl(B,battery-160x128x2.bmp,66,115,10)
+%xl(C,volume-160x128x2.bmp,87,114,10)
+%xl(D,shuffle-160x128x2.bmp,107,115)
+%xl(E,repeat-160x128x2.bmp,127,113,4)
+%xl(F,playmode-160x128x2.bmp,145,114,5)
+%ax%Cl(2,16,64,64)
+%pb(pb-160x128x2.bmp,1,86,158,8)
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+%?C<%C%Vd(a)|%Vd(b)>
 
-%ax%Vl|a|70|10|-|75|1|-|-|
+%ax%Vl(a,70,10,-,75,1)
 %s%al%?it<%it|%fn>
-%s%al%?ia<%ia|%?d2<%d2|(root)>>
-%s%al%?id<%id|%?d1<%d1|(root)>>
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
-%s%al%Sx|Next Track:|
+%s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
 
-%Vl|b|0|10|-|75|1|-|-|
+%Vl(b,0,10,-,75,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d2<%d2|(root)>>
-%s%ac%?id<%id|%?d1<%d1|(root)>>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
-%s%ac%Sx|Next Track:|
+%s%ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
 
-%V|1|96|158|10|1|-|-|
-%al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
+%V(1,96,158,10,1)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
 

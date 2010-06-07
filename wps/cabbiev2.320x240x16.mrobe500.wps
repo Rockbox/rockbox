@@ -2,75 +2,75 @@
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
-%T|286|207|24|24|play|
-%T|0|207|84|24|menu|
-%T|218|211|24|24|shuffle|
-%T|261|207|24|24|repmode|
-%T|10|162|300|15|progressbar|
-%X|wpsbackdrop-320x240x16.bmp|
-%xl|A|lock-320x240x16.bmp|91|207|2|
-%xl|B|battery-320x240x16.bmp|126|207|10|
-%xl|C|volume-320x240x16.bmp|177|207|10|
-%xl|D|shuffle-320x240x16.bmp|218|211|
-%xl|E|repeat-320x240x16.bmp|261|207|4|
-%xl|F|playmode-320x240x16.bmp|286|207|5|
+%T(286,207,24,24,play)
+%T(0,207,84,24,menu)
+%T(218,211,24,24,shuffle)
+%T(261,207,24,24,repmode)
+%T(10,162,300,15,progressbar)
+%X(wpsbackdrop-320x240x16.bmp)
+%xl(A,lock-320x240x16.bmp,91,207,2)
+%xl(B,battery-320x240x16.bmp,126,207,10)
+%xl(C,volume-320x240x16.bmp,177,207,10)
+%xl(D,shuffle-320x240x16.bmp,218,211)
+%xl(E,repeat-320x240x16.bmp,261,207,4)
+%xl(F,playmode-320x240x16.bmp,286,207,5)
 
 # toggle the touchscreen button viewport
-%?Tl2.5<%Vdt|%Vdu>
+%?Tl(2.5)<%Vd(t)|%Vd(u)>
 
-%Cl|16|32|s120|s120|
-%pb|pb-320x240x16.bmp|10|162|300|15|
-%?mh<%xdAa|%xdAb>
-%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
-%?ps<%xdD>
-%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
-%?mp<%xdFa|%xdFc|%xdFb|%xdFd|%xdFe>
-%?C<%Vda%C|%Vdb>
+%Cl(16,32,120,120)
+%pb(pb-320x240x16.bmp,10,162,300,15)
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fc)|%xd(Fb)|%xd(Fd)|%xd(Fe)>
+%?C<%Vd(a)%C|%Vd(b)>
 #NowPlaying
 
-%Vl|a|153|30|-|130|1|-|-|
+%Vl(a,153,30,-,130,1)
 %s%al%?it<%it|%fn>
-%s%al%?ia<%ia|%?d2<%d2|(root)>>
-%s%al%?id<%id|%?d1<%d1|(root)>>
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 #%s%al%iy
 
-%s%al%Sx|Next Track:|
+%s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
 %s%al%Ia
 
-%Vl|b|0|30|-|130|1|-|-|
+%Vl(b,0,30,-,130,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d2<%d2|(root)>>
-%s%ac%?id<%id|%?d1<%d1|(root)>>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%iy
 
-%ac%Sx|Next Track:|
+%ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
 %s%ac%Ia
 
-%V|0|180|-|20|1|-|-|
+%V(0,180,-,20,1)
 #touch the X of X regions to let the playlist viewer pop up
-%T|130|0|60|20|playlist|
-%al   %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr   
+%T(130,0,60,20,playlist)
+%al   %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr   
 
 #viewport for the touch icons
-%xl|G|browser-320x240x16.bmp|5|5|
-%xl|I|pitch-320x240x16.bmp|50|5|
-%xl|H|context-320x240x16.bmp|80|5|
-%xl|J|quick-320x240x16.bmp|110|5|
-%xl|K|rew-320x240x16.bmp|150|5|
-%xl|L|ff-320x240x16.bmp|175|5|
+%xl(G,browser-320x240x16.bmp,5,5)
+%xl(I,pitch-320x240x16.bmp,50,5)
+%xl(H,context-320x240x16.bmp,80,5)
+%xl(J,quick-320x240x16.bmp,110,5)
+%xl(K,rew-320x240x16.bmp,150,5)
+%xl(L,ff-320x240x16.bmp,175,5)
 
-%Vl|t|0|74|-|30|1|-|-|
-%xdG %xdH %xdI %xdJ %xdK %xdL
-%T|0|5|37|24|browse|
-%T|50|5|24|24|pitch|
-%T|80|5|24|24|contextmenu|
-%T|110|5|24|24|quickscreen|
-%T|150|5|24|24|&rwd|
-%T|175|5|24|24|&ffwd|
-%T|150|5|24|24|prev|
-%T|175|5|24|24|next|
-%Vl|u|0|74|-|30|1|-|-|
+%Vl(t,0,74,-,30,1)
+%xd(G) %xd(H) %xd(I) %xd(J) %xd(K) %xd(L)
+%T(0,5,37,24,browse)
+%T(50,5,24,24,pitch)
+%T(80,5,24,24,contextmenu)
+%T(110,5,24,24,quickscreen)
+%T(150,5,24,24,&rwd)
+%T(175,5,24,24,&ffwd)
+%T(150,5,24,24,prev)
+%T(175,5,24,24,next)
+%Vl(u,0,74,-,30,1)
 #purposly left blank

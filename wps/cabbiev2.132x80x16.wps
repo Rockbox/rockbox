@@ -1,35 +1,35 @@
 # cabbie 2.0 default for the Sansa c200 Series by Marc Guay
 # derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 %wd
-%X|wpsbackdrop-132x80x16.bmp|
-%xl|A|lock-132x80x16.bmp|36|69|2|
-%xl|B|battery-132x80x16.bmp|51|69|10|
-%xl|C|volume-132x80x16.bmp|69|69|10|
-%xl|D|shuffle-132x80x16.bmp|86|69|
-%xl|E|repeat-132x80x16.bmp|105|67|4|
-%xl|F|playmode-132x80x16.bmp|118|67|5|
-%ax%Cl|3|14|c40|c40|
-%pb|pb-132x80x16.bmp|2|58|127|6|
-%?C<%C%Vda|%Vdb>
+%X(wpsbackdrop-132x80x16.bmp)
+%xl(A,lock-132x80x16.bmp,36,69,2)
+%xl(B,battery-132x80x16.bmp,51,69,10)
+%xl(C,volume-132x80x16.bmp,69,69,10)
+%xl(D,shuffle-132x80x16.bmp,86,69)
+%xl(E,repeat-132x80x16.bmp,105,67,4)
+%xl(F,playmode-132x80x16.bmp,118,67,5)
+%ax%Cl(3,14,40,40,c,c)
+%pb(pb-132x80x16.bmp,2,58,127,6)
+%?C<%C%Vd(a)|%Vd(b)>
 
 #Images
-%?mh<%xdAa|%xdAb>
-%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
-%?ps<%xdD>
-%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
-%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
 
 #NowPlaying - aa
-%ax%Vl|a|48|10|-|48|1|-|-|
+%ax%Vl(a,48,10,-,48,1)
 %s%al%?it<%it|%fn>
-%s%al%?ia<%ia|%?d2<%d2|(root)>>
-%s%al%?id<%id|%?d1<%d1|(root)>>
-%s%al%Sx|Next:| %?It<%It|%Fn>
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%al%Sx(Next:) %?It<%It|%Fn>
 
 #NowPlaying - no aa
-%Vl|b|0|10|-|48|1|-|-|
+%Vl(b,0,10,-,48,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d2<%d2|(root)>>
-%s%ac%?id<%id|%?d1<%d1|(root)>>
-%s%ac%Sx|Next:| %?It<%It|%Fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%Sx(Next:) %?It<%It|%Fn>

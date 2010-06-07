@@ -4,38 +4,38 @@
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
 
-%X|wpsbackdrop-240x320x16.bmp|
-%xl|A|lock-240x320x16.bmp|11|292|2|
-%xl|B|battery-240x320x16.bmp|46|292|10|
-%xl|C|volume-240x320x16.bmp|98|292|10|
-%xl|D|shuffle-240x320x16.bmp|139|292|
-%xl|E|repeat-240x320x16.bmp|182|292|4|
-%xl|F|playmode-240x320x16.bmp|206|292|5|
-%Cl|55|30|c130|c130|
-%pb|pb-240x320x16.bmp|22|254|199|13|
+%X(wpsbackdrop-240x320x16.bmp)
+%xl(A,lock-240x320x16.bmp,11,292,2)
+%xl(B,battery-240x320x16.bmp,46,292,10)
+%xl(C,volume-240x320x16.bmp,98,292,10)
+%xl(D,shuffle-240x320x16.bmp,139,292)
+%xl(E,repeat-240x320x16.bmp,182,292,4)
+%xl(F,playmode-240x320x16.bmp,206,292,5)
+%Cl(55,30,130,130,c,c)
+%pb(pb-240x320x16.bmp,22,254,199,13)
 %?C<|>
 %?C<|%s%ac%?it<%it|%fn>>
-%?C<|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
-%?C<|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+%?C<|%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>>
+%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
 %?C<|%ac%?iy<%iy|>>
 %?C<|>
 %?C<|%ac%?ig<%ig|>>
-%?C<|%ac%?fv<(vbr) |>%fb kbit/s %fc>
+%?C<|%ac%?fv<%(vbr%) |>%fb kbit/s %fc>
 %?C<|>
 %?C<%s%ac%?it<%it|%fn>|>
-%?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|%ac%Sx|Next Track:|>
-%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%ac%s%?It<%It|%Fn>>
-%?C<|%s%ac%?Ia<%Ia|%?D2<%D2|(root)>>>
-%?C<%s%ac%Sx|Next:| %?Ia<%Ia|%?D2<%D2|(root)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D1<%D1|(root)>>>
+%?C<%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>|%ac%Sx(Next Track:)>
+%?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|%ac%s%?It<%It|%Fn>>
+%?C<|%s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>>>
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
 
 
-     %pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr     
+     %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr     
 
-%?mh<%xdAa|%xdAb>
-%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
-%?ps<%xdD>
-%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
-%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
 %?C<%C>
 

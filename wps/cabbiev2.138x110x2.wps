@@ -3,37 +3,37 @@
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 # derived from "cabbie" (C) Yohann Misquitta
 %wd
-%X|wpsbackdrop-138x110x2.bmp|
-%xl|A|lock-160x128x2.bmp|4|98|2|
-%xl|B|battery-160x128x2.bmp|28|99|10|
-%xl|C|volume-160x128x2.bmp|53|98|10|
-%xl|D|shuffle-160x128x2.bmp|78|97|
-%xl|E|repeat-160x128x2.bmp|102|97|4|
-%xl|F|playmode-160x128x2.bmp|123|98|5|
-%ax%Cl|5|15|s55|s55|
-%pb|pb-138x110x2.bmp|2|75|134|6|
+%X(wpsbackdrop-138x110x2.bmp)
+%xl(A,lock-160x128x2.bmp,4,98,2)
+%xl(B,battery-160x128x2.bmp,28,99,10)
+%xl(C,volume-160x128x2.bmp,53,98,10)
+%xl(D,shuffle-160x128x2.bmp,78,97)
+%xl(E,repeat-160x128x2.bmp,102,97,4)
+%xl(F,playmode-160x128x2.bmp,123,98,5)
+%ax%Cl(5,15,55,55)
+%pb(pb-138x110x2.bmp,2,75,134,6)
 #images
-%?mh<%xdAa|%xdAb>
-%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
-%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
-%?ps<%xdD>
-%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
-%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C%Vda|%Vdb>
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+%?C<%C%Vd(a)|%Vd(b)>
 
-%ax%Vl|a|65|10|-|60|1|-|-|
+%ax%Vl(a,65,10,-,60,1)
 %s%al%?it<%it|%fn>
-%s%al%?ia<%ia|%?d2<%d2|(root)>>
-%s%al%?id<%id|%?d1<%d1|(root)>>
-%s%al%Sx|Next Track:|
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
 
-%Vl|b|0|10|-|60|1|-|-|
+%Vl(b,0,10,-,60,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d2<%d2|(root)>>
-%s%ac%?id<%id|%?d1<%d1|(root)>>
-%s%ac%Sx|Next Track:|
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
 
-%V|2|82|134|13|1|-|-|
-%al%pc%ac%?Sr<%pe %Sx|of| %pp|%pp %Sx|of| %pe>%ar%pr
+%V(2,82,134,13,1)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr

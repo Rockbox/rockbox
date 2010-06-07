@@ -755,7 +755,20 @@ static bool get_line(struct gui_wps *gwps,
                     skip to the end of the conditional structure */
                 i = find_conditional_end(data, i);
                 break;
-
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+            case WPS_TOKEN_VIEWPORT_FGCOLOUR:
+            {
+                struct viewport_colour *col = data->tokens[i].value.data;
+                col->vp->fg_pattern = col->colour;
+            }
+            break;
+            case WPS_TOKEN_VIEWPORT_BGCOLOUR:
+            {
+                struct viewport_colour *col = data->tokens[i].value.data;
+                col->vp->bg_pattern = col->colour;
+            }
+            break;
+#endif
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_PEAKMETER:
                 data->peak_meter_enabled = true;
@@ -1208,14 +1221,16 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             }
         }
     }
-    int viewport_count = 0;
     for (viewport_list = data->viewports;
-         viewport_list; viewport_list = viewport_list->next, viewport_count++)
+         viewport_list; viewport_list = viewport_list->next)
     {
         struct skin_viewport *skin_viewport =
                         (struct skin_viewport *)viewport_list->token->value.data;
         unsigned vp_refresh_mode = refresh_mode;
-
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        skin_viewport->vp.fg_pattern = skin_viewport->start_fgcolour;
+        skin_viewport->vp.bg_pattern = skin_viewport->start_bgcolour;
+#endif
         display->set_viewport(&skin_viewport->vp);
 
         int hidden_vp = 0;

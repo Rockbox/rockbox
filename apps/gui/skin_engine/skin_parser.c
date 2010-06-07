@@ -168,6 +168,8 @@ static int parse_font_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+static int parse_viewportcolour(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_special(const char *wps_bufptr,
        struct wps_token *token, struct wps_data *wps_data);
 #endif
@@ -400,6 +402,10 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_LIST_TITLE_TEXT,          "Lt",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_LIST_TITLE_ICON,          "Li",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    { WPS_TOKEN_VIEWPORT_FGCOLOUR,        "Vf", WPS_REFRESH_STATIC, parse_viewportcolour },
+    { WPS_TOKEN_VIEWPORT_BGCOLOUR,        "Vb", WPS_REFRESH_STATIC, parse_viewportcolour },
+#endif
     { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -618,9 +624,11 @@ static int get_image_id(int c)
 char *get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
-    const char *end = strchr(start, '|');
+    const char *end = start;
     int bmpdirlen = strlen(bmpdir);
 
+    while (*end && *end != ',' && *end != ')')
+        end++;
     if ( !end || (end - start) >= (buf_size - bmpdirlen - 2) )
     {
         buf[0] = '\0';
@@ -639,7 +647,7 @@ static int parse_image_display(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    char label = wps_bufptr[0];
+    char label = wps_bufptr[1];
     int subimage;
     struct gui_img *img;;
 
@@ -651,17 +659,17 @@ static int parse_image_display(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
 
-    if ((subimage = get_image_id(wps_bufptr[1])) != -1)
+    if ((subimage = get_image_id(wps_bufptr[2])) != -1)
     {
         if (subimage >= img->num_subimages)
             return WPS_ERROR_INVALID_PARAM;
 
         /* Store sub-image number to display in high bits */
         token->value.i = label | (subimage << 8);
-        return 2; /* We have consumed 2 bytes */
+        return 4; /* We have consumed 2 bytes */
     } else {
         token->value.i = label;
-        return 1; /* We have consumed 1 byte */
+        return 3; /* We have consumed 1 byte */
     }
 }
 
@@ -670,10 +678,8 @@ static int parse_image_load(const char *wps_bufptr,
                             struct wps_data *wps_data)
 {
     const char *ptr = wps_bufptr;
-    const char *pos;
     const char* filename;
     const char* id;
-    const char *newline;
     int x,y;
     struct gui_img *img;
 
@@ -682,16 +688,16 @@ static int parse_image_load(const char *wps_bufptr,
        or %xl|n|filename.bmp|x|y|num_subimages|
     */
 
-    if (*ptr != '|')
+    if (*ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
 
     ptr++;
 
-    if (!(ptr = parse_list("ssdd", NULL, '|', ptr, &id, &filename, &x, &y)))
+    if (!(ptr = parse_list("ssdd", NULL, ',', ptr, &id, &filename, &x, &y)))
         return WPS_ERROR_INVALID_PARAM;
 
-    /* Check there is a terminating | */
-    if (*ptr != '|')
+    /* Check there is a terminating ) */
+    if (*ptr != ')' && *ptr != ',')
         return WPS_ERROR_INVALID_PARAM;
 
     /* check the image number and load state */
@@ -718,15 +724,11 @@ static int parse_image_load(const char *wps_bufptr,
     {
         img->always_display = true;
     }
-    else
+    else if (*ptr == ',')
     {
         /* Parse the (optional) number of sub-images */
         ptr++;
-        newline = strchr(ptr, '\n');
-        pos = strchr(ptr, '|');
-        if (pos && pos < newline)
-            img->num_subimages = atoi(ptr);
-
+        img->num_subimages = atoi(ptr);
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -751,16 +753,16 @@ static int parse_font_load(const char *wps_bufptr,
     int id;
     char *filename;
     
-    if (*ptr != '|')
+    if (*ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
 
     ptr++;
 
-    if (!(ptr = parse_list("ds", NULL, '|', ptr, &id, &filename)))
+    if (!(ptr = parse_list("ds", NULL, ',', ptr, &id, &filename)))
         return WPS_ERROR_INVALID_PARAM;
 
     /* Check there is a terminating | */
-    if (*ptr != '|')
+    if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
         
     if (id <= FONT_UI || id >= MAXFONTS-1)
@@ -774,7 +776,7 @@ static int parse_font_load(const char *wps_bufptr,
     /* make sure the filename contains .fnt, 
      * we dont actually use it, but require it anyway */
     ptr = strchr(filename, '.');
-    if (!ptr || strncmp(ptr, ".fnt|", 5))
+    if (!ptr || strncmp(ptr, ".fnt)", 5))
         return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
     skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
@@ -788,7 +790,7 @@ static int parse_viewport_display(const char *wps_bufptr,
                                   struct wps_data *wps_data)
 {
     (void)wps_data;
-    char letter = wps_bufptr[0];
+    char letter = wps_bufptr[1];
 
     if (letter < 'a' || letter > 'z')
     {
@@ -796,7 +798,7 @@ static int parse_viewport_display(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
     token->value.i = letter;
-    return 1;
+    return 3;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -807,12 +809,12 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
     const struct wps_tag *tag;
     int taglen = 0;
     const char *start = text;
-    if (*text != '|')
+    if (*text != ',')
         return -1;
     text++;
     viewer->lines[line].count = 0;
     viewer->lines[line].scroll = false;
-    while (*text != '|')
+    while (*text != ',' && *text != ')')
     {
         if (*text == '%') /* it is a token of some type */
         {
@@ -826,6 +828,9 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
                 case '>':
                 case ';':
                 case '#':
+                case '(':
+                case ')':
+                case ',':
                     /* escaped characters */
                     viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_CHARACTER;
                     viewer->lines[line].strings[cur_string][0] = *text;
@@ -850,7 +855,7 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
                     int i = 0;
                     /* just copy the string */
                     viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
-                    while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != '|' && text[i] != '%')
+                    while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != ',' && text[i] != ')' && text[i] != '%')
                     {
                         viewer->lines[line].strings[cur_string][i] = text[i];
                         i++;
@@ -878,7 +883,7 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
             int i = 0;
             /* just copy the string */
             viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
-            while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != '|' && text[i] != '%')
+            while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != ',' && text[i] != ')' && text[i] != '%')
             {
                 viewer->lines[line].strings[cur_string][i] = text[i];
                 i++;
@@ -891,14 +896,13 @@ static int parse_playlistview_text(struct playlistviewer *viewer,
     return text - start;
 }
 
-
 static int parse_playlistview(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
     (void)wps_data;
     /* %Vp|<use icons>|<start offset>|info line text|no info text| */
     struct playlistviewer *viewer = skin_buffer_alloc(sizeof(struct playlistviewer));
-    char *ptr = strchr(wps_bufptr, '|');
+    char *ptr = strchr(wps_bufptr, '(');
     int length;
     if (!viewer || !ptr)
         return WPS_ERROR_INVALID_PARAM;
@@ -906,7 +910,7 @@ static int parse_playlistview(const char *wps_bufptr,
     viewer->show_icons = true;
     viewer->start_offset = atoi(ptr+1);
     token->value.data = (void*)viewer;
-    ptr = strchr(ptr+1, '|');
+    ptr = strchr(ptr+1, ',');
     length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
@@ -944,7 +948,7 @@ static int parse_viewport(const char *wps_bufptr,
 
     if (*ptr == 'i')
     {
-        if (*(ptr+1) == '|')
+        if (*(ptr+1) == '(')
         {
             char label = *(ptr+2);
             if (label >= 'a' && label <= 'z')
@@ -955,9 +959,11 @@ static int parse_viewport(const char *wps_bufptr,
             }
             else
             {
+                if (label != '-')
+                    return WPS_ERROR_INVALID_PARAM;
                 skin_vp->label = VP_INFO_LABEL|VP_DEFAULT_LABEL;
                 skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-                ++ptr;            
+                ptr += 3;
             }
         }
         else
@@ -966,7 +972,7 @@ static int parse_viewport(const char *wps_bufptr,
     }
     else if (*ptr == 'l')
     {
-        if (*(ptr+1) == '|')
+        if (*(ptr+1) == '(')
         {
             char label = *(ptr+2);
             if (label >= 'a' && label <= 'z')
@@ -979,17 +985,17 @@ static int parse_viewport(const char *wps_bufptr,
             ptr += 3;
         }
     }
-    if (*ptr != '|')
+    if (*ptr != ',' && *ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
 
     ptr++;
     struct viewport *vp = &skin_vp->vp;
-    /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
-    if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, '|')))
+    /* format: %V|x|y|width|height|font| */
+    if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, ',')))
         return WPS_ERROR_INVALID_PARAM;
 
-    /* Check for trailing | */
-    if (*ptr != '|')
+    /* Check for trailing ) */
+    if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
 
     if (follow_lang_direction && lang_is_rtl())
@@ -999,6 +1005,11 @@ static int parse_viewport(const char *wps_bufptr,
     }
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
+        
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    skin_vp->start_fgcolour = vp->fg_pattern;
+    skin_vp->start_bgcolour = vp->bg_pattern;
+#endif
 
     struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
     if (!list)
@@ -1008,8 +1019,30 @@ static int parse_viewport(const char *wps_bufptr,
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
-
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+static int parse_viewportcolour(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)wps_data;
+    const char *ptr = wps_bufptr;
+    struct viewport_colour *colour = skin_buffer_alloc(sizeof(struct viewport_colour));
+    int set;
+    if (*ptr != '(' || !colour)
+        return -1;
+    ptr++;
+    if (!(ptr = parse_list("c", &set, ',', ptr, &colour->colour)))
+        return -1;
+    if (*ptr != ')')
+        return -1;
+    if (!set)
+        colour->colour = get_viewport_default_colour(curr_screen,
+                                        token->type == WPS_TOKEN_VIEWPORT_FGCOLOUR);
+    colour->vp = &curr_vp->vp;
+    token->value.data = colour;
+    ptr++;
+    return ptr - wps_bufptr;
+}
+
 static int parse_image_special(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
@@ -1020,7 +1053,7 @@ static int parse_image_special(const char *wps_bufptr,
     const char *newline;
     bool error = false;
 
-    pos = strchr(wps_bufptr + 1, '|');
+    pos = strchr(wps_bufptr + 1, ')');
     newline = strchr(wps_bufptr, '\n');
 
     error = (pos > newline);
@@ -1029,7 +1062,7 @@ static int parse_image_special(const char *wps_bufptr,
     if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| or %Xd */
-        if (*(wps_bufptr) == 'd')
+        if (*(wps_bufptr+1) == 'd')
         {
             wps_data->backdrop = NULL;
             return skip_end_of_line(wps_bufptr);
@@ -1063,10 +1096,10 @@ static int parse_setting_and_lang(const char *wps_bufptr,
     char temp[64];
 
     /* Find the setting's cfg_name */
-    if (*ptr != '|')
+    if (*ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
     ptr++;
-    end = strchr(ptr,'|');
+    end = strchr(ptr,')');
     if (!end || (size_t)(end-ptr+1) > sizeof temp)
         return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, ptr,end-ptr+1);
@@ -1103,10 +1136,12 @@ static int parse_dir_level(const char *wps_bufptr,
                            struct wps_token *token,
                            struct wps_data *wps_data)
 {
-    char val[] = { *wps_bufptr, '\0' };
+    char val[] = { wps_bufptr[1], '\0' };
+    if (wps_bufptr[0] != '(' || wps_bufptr[2] != ')')
+        return WPS_ERROR_INVALID_PARAM;
     token->value.i = atoi(val);
     (void)wps_data; /* Kill warnings */
-    return 1;
+    return 3;
 }
 
 static int parse_timeout(const char *wps_bufptr,
@@ -1119,28 +1154,31 @@ static int parse_timeout(const char *wps_bufptr,
     bool have_tenth = false;
 
     (void)wps_data; /* Kill the warning */
-
-    while ( isdigit(*wps_bufptr) || *wps_bufptr == '.' )
+    if (*wps_bufptr == '(')
     {
-        if (*wps_bufptr != '.')
+        while ( isdigit(*wps_bufptr) || *wps_bufptr == '.' )
         {
-            val *= 10;
-            val += *wps_bufptr - '0';
-            if (have_point)
+            if (*wps_bufptr != '.')
             {
-                have_tenth = true;
-                wps_bufptr++;
-                skip++;
-                break;
+                val *= 10;
+                val += *wps_bufptr - '0';
+                if (have_point)
+                {
+                    have_tenth = true;
+                    wps_bufptr++;
+                    skip++;
+                    break;
+                }
             }
+            else
+                have_point = true;
+
+            wps_bufptr++;
+            skip++;
         }
-        else
-            have_point = true;
-
-        wps_bufptr++;
-        skip++;
+        if (*wps_bufptr != ')')
+            return -1;
     }
-
     if (have_tenth == false)
         val *= 10;
 
@@ -1203,7 +1241,7 @@ static int parse_progressbar(const char *wps_bufptr,
     pb->follow_lang_direction = follow_lang_direction > 0;
     pb->draw = false;
 
-    if (*wps_bufptr != '|') /* regular old style */
+    if (*wps_bufptr != '(') /* regular old style */
     {
         pb->x = 0;
         pb->width = vp->width;
@@ -1217,7 +1255,7 @@ static int parse_progressbar(const char *wps_bufptr,
     }
     ptr = wps_bufptr + 1;
 
-    if (!(ptr = parse_list("sdddd", &set, '|', ptr, &filename,
+    if (!(ptr = parse_list("sdddd", &set, ',', ptr, &filename,
                                                  &x, &y, &width, &height)))
     {
         /* If we are in a conditional then we probably don't want to fail
@@ -1298,9 +1336,8 @@ static int parse_progressbar(const char *wps_bufptr,
 #ifdef HAVE_ALBUMART
 static int parse_int(const char *newline, const char **_pos, int *num)
 {
-    *_pos = parse_list("d", NULL, '|', *_pos, num);
-
-    return (!*_pos || *_pos > newline || **_pos != '|');
+    *_pos = parse_list("d", NULL, ',', *_pos, num);
+    return (!*_pos || *_pos > newline || (**_pos != ',' && **_pos != ')'));
 }
 
 static int parse_albumart_load(const char *wps_bufptr,
@@ -1330,7 +1367,7 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     _pos = wps_bufptr;
 
-    if (*_pos != '|')
+    if (*_pos != '(')
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
 
     ++_pos;
@@ -1387,7 +1424,7 @@ static int parse_albumart_load(const char *wps_bufptr,
         }
     }
     /* extract max width data */
-    if (*_pos != '|')
+    if (*_pos != ',')
     {
         if (parse_int(newline, &_pos, &aa->width))
             return WPS_ERROR_INVALID_PARAM;
@@ -1429,7 +1466,7 @@ static int parse_albumart_load(const char *wps_bufptr,
         }
     }
     /* extract max height data */
-    if (*_pos != '|')
+    if (*_pos != ',')
     {
         if (parse_int(newline, &_pos, &aa->height))
             return WPS_ERROR_INVALID_PARAM;
@@ -1537,15 +1574,15 @@ static int parse_touchregion(const char *wps_bufptr,
     */
 
 
-    if (*ptr != '|')
+    if (*ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
     ptr++;
 
-    if (!(ptr = parse_list("dddds", NULL, '|', ptr, &x, &y, &w, &h, &action)))
+    if (!(ptr = parse_list("dddds", NULL, ',', ptr, &x, &y, &w, &h, &action)))
         return WPS_ERROR_INVALID_PARAM;
 
     /* Check there is a terminating | */
-    if (*ptr != '|')
+    if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
 
     region = skin_buffer_alloc(sizeof(struct touchregion));
@@ -1561,7 +1598,7 @@ static int parse_touchregion(const char *wps_bufptr,
     region->wvp = curr_vp;
     region->armed = false;
 
-    end = strchr(action, '|');
+    end = strchr(action, ')');
     if (!end || (size_t)(end-action+1) > sizeof temp)
         return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, action, end-action+1);
@@ -1621,6 +1658,9 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
         case '>':
         case ';':
         case '#':
+        case ')':
+        case '(':
+        case ',':
             /* escaped characters */
             token->type = WPS_TOKEN_CHARACTER;
             token->value.c = *wps_bufptr;
@@ -2276,6 +2316,10 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     curr_vp->lines         = NULL;
     
     viewport_set_defaults(&curr_vp->vp, screen);
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    curr_vp->start_fgcolour = curr_vp->vp.fg_pattern;
+    curr_vp->start_bgcolour = curr_vp->vp.bg_pattern;
+#endif
 #ifdef HAVE_LCD_BITMAP
     curr_vp->vp.font = FONT_UI;
 #endif

@@ -129,26 +129,26 @@ void wps_data_load(enum screen_type screen, const char *buf, bool isfile)
         char *skin_buf[NB_SCREENS] = {
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
-            "%Xd\n"
+            "%X(d)\n"
 #endif
             "%s%?it<%?in<%in. |>%it|%fn>\n"
-            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-            "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n\n"
+            "%s%?ia<%ia|%?d(2)<%d(2)|%(root%)>>\n"
+            "%s%?id<%id|%?d(1)<%d(1)|%(root%)>> %?iy<%(%iy%)|>\n\n"
             "%al%pc/%pt%ar[%pp:%pe]\n"
-            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+            "%fbkBit %?fv<avg|> %?iv<%(id3v%iv%)|%(no id3%)>\n"
             "%pb\n%pm\n",
 #else
-            "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
+            "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d(2)> - %?id<%id|%d(1)>\n"
             "%pc%?ps<*|/>%pt\n",
 #endif
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1
-            "%Xd\n"
+            "%X(d)\n"
 #endif
-            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+            "%s%?ia<%ia|%?d(2)<%d(2)|%(root%)>>\n"
             "%s%?it<%?in<%in. |>%it|%fn>\n"
             "%al%pc/%pt%ar[%pp:%pe]\n"
-            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+            "%fbkBit %?fv<avg|> %?iv<%(id3v%iv%)|%(no id3%)>\n"
             "%pb\n",
 #endif
         };

@@ -209,8 +209,13 @@ struct skin_viewport {
     struct skin_line *lines;
     char hidden_flags;
     char label;
+    unsigned start_fgcolour;
+    unsigned start_bgcolour;
 };
-
+struct viewport_colour {
+    struct viewport *vp;
+    unsigned colour;
+};
 #ifdef HAVE_TOUCHSCREEN
 struct touchregion {
     struct skin_viewport* wvp;/* The viewport this region is in */

@@ -1,23 +1,23 @@
 %wd
 
 
-%t1 %?mp<%al Stopped%ar-:--/-:-- |%al %pp/%pe%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >;%t1 %?mp<%al Stopped-:--/-:-- |%al %pp/%pe%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
-%s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
-%s%ac%?id<%id|%?d1<%d1|Unknown Album>>
+%t(1) %?mp<%al Stopped%ar-:--/-:-- |%al %pp/%pe%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >%;%t(1) %?mp<%al Stopped-:--/-:-- |%al %pp/%pe%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
+%s%ac%?ia<%ia|%?d(2)<%d(2)|Unknown Artist>>
+%s%ac%?id<%id|%?d(1)<%d(1)|Unknown Album>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
-%pb|-|11|-|90|3|
-%t6%s%ac%?Fm<%Sx|Next:| %?It<%It|%Fn>|%fbKbps %fc>;%t6%s%ac%?Fm<%Sx|Next:| %?It<%It|%Fn>|%fbKbps %fc>
+%pb(-,11,-,90,3)
+%t(6)%s%ac%?Fm<%Sx(Next:) %?It<%It|%Fn>|%fbKbps %fc>%;%t(6)%s%ac%?Fm<%Sx(Next:) %?It<%It|%Fn>|%fbKbps %fc>
 
-%xl|A|battery-s.bmp|93|3|5|
-%t0.5 %?bp<%?bc<%xdAa|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAb|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAc|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAd|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAe|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>
-%xl|B|hold1-s.bmp|80|2|
-%xl|C|repeat-s.bmp|58|2|4|
-%xl|D|shuffle-s.bmp|38|4|2|
-%xl|E|playmode-s.bmp|3|3|4|
-%?mh<%xdB|>%?mm<|%xdCa|%xdCb|%xdCc|%xdCd>%?ps<%xdDa|%xdDb>%?mp<|%xdEa|%xdEb|%xdEc|%xdEd>
-%xl|F|volume-s.bmp|16|1|9|
-%xl|G|animation-s.bmp|16|1|8|
-%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGa|%xdGa|%xdGa>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGb|%xdGb|%xdGb>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGc|%xdGc|%xdGc>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGd|%xdGd|%xdGd>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGe|%xdGe|%xdGe>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGf|%xdGf|%xdGf>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGg|%xdGg|%xdGg>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGh|%xdGh|%xdGh>
-%x|W|line1-112.bmp|0|0|
-%x|X|line2-112.bmp|0|13|
-%x|Y|line1-112.bmp|0|54|
+%xl(A,battery-s.bmp,93,3,5)
+%t(0.5) %?bp<%?bc<%xd(Aa)|%xd(Ae)>|%?bl<%xd(Aa)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Ae)>>%;%t(0.5) %?bp<%?bc<%xd(Ab)|%xd(Ae)>|%?bl<%xd(Aa)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Ae)>>%;%t(0.5) %?bp<%?bc<%xd(Ac)|%xd(Ae)>|%?bl<%xd(Aa)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Ae)>>%;%t(0.5) %?bp<%?bc<%xd(Ad)|%xd(Ae)>|%?bl<%xd(Aa)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Ae)>>%;%t(0.5) %?bp<%?bc<%xd(Ae)|%xd(Ae)>|%?bl<%xd(Aa)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)|%xd(Ae)|%xd(Ae)>>
+%xl(B,hold1-s.bmp,80,2)
+%xl(C,repeat-s.bmp,58,2,4)
+%xl(D,shuffle-s.bmp,38,4,2)
+%xl(E,playmode-s.bmp,3,3,4)
+%?mh<%xd(B)|>%?mm<|%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)>%?ps<%xd(Da)|%xd(Db)>%?mp<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%xl(F,volume-s.bmp,16,1,9)
+%xl(G,animation-s.bmp,16,1,8)
+%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Ga)|%xd(Ga)|%xd(Ga)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gb)|%xd(Gb)|%xd(Gb)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gc)|%xd(Gc)|%xd(Gc)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gd)|%xd(Gd)|%xd(Gd)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Ge)|%xd(Ge)|%xd(Ge)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gf)|%xd(Gf)|%xd(Gf)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gg)|%xd(Gg)|%xd(Gg)>%;%t(0.1) %?mp<%xd(Fa)|%?pv<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)|%xd(Ff)|%xd(Fg)|%xd(Fh)|%xd(Fi)>|%xd(Gh)|%xd(Gh)|%xd(Gh)>
+%x(W,line1-112.bmp,0,0)
+%x(X,line2-112.bmp,0,13)
+%x(Y,line1-112.bmp,0,54)

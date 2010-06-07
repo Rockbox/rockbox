@@ -376,6 +376,34 @@ void viewport_set_defaults(struct viewport *vp,
 
 
 #ifdef HAVE_LCD_BITMAP
+
+int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
+{
+    (void)screen;
+    int colour;
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+    if (fgcolour)
+    {
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        if (screen == SCREEN_REMOTE)
+            colour = REMOTE_FG_FALLBACK;
+        else
+#endif
+            colour = global_settings.fg_color;
+    }
+    else
+    {
+#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
+        if (screen == SCREEN_REMOTE)
+            colour = REMOTE_BG_FALLBACK;
+        else
+#endif
+            colour = global_settings.bg_color;
+    }
+#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
+    return colour;
+}
+
 const char* viewport_parse_viewport(struct viewport *vp,
                                     enum screen_type screen,
                                     const char *bufptr,
@@ -383,7 +411,6 @@ const char* viewport_parse_viewport(struct viewport *vp,
 {
     /* parse the list to the viewport struct */
     const char *ptr = bufptr;
-    int depth;
     uint32_t set = 0;
 
     enum {
@@ -392,33 +419,11 @@ const char* viewport_parse_viewport(struct viewport *vp,
         PL_WIDTH,
         PL_HEIGHT,
         PL_FONT,
-        PL_FG,
-        PL_BG,
     };
     
-    /* Work out the depth of this display */
-    depth = screens[screen].depth;
-#if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
-    if (depth == 1)
-    {
-        if (!(ptr = parse_list("ddddd", &set, separator, ptr,
-                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
-            return NULL;
-    }
-    else
-#endif
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    if (depth >= 2)
-    {
-        if (!(ptr = parse_list(ARG_STRING(depth), &set, separator, ptr,
-                    &vp->x, &vp->y, &vp->width, &vp->height, &vp->font,
-                    &vp->fg_pattern,&vp->bg_pattern)))
-            return NULL;
-    }
-    else
-#endif
-    {}
-#undef ARG_STRING
+    if (!(ptr = parse_list("ddddd", &set, separator, ptr,
+                &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
+        return NULL;
 
     /* X and Y *must* be set */
     if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
@@ -441,24 +446,8 @@ const char* viewport_parse_viewport(struct viewport *vp,
         vp->height = (vp->height + screens[screen].lcdheight) - vp->y;
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    if (!LIST_VALUE_PARSED(set, PL_FG))
-    {
-#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-        if (screen == SCREEN_REMOTE)
-            vp->fg_pattern = REMOTE_FG_FALLBACK;
-        else
-#endif
-            vp->fg_pattern = FG_FALLBACK;
-    }
-    if (!LIST_VALUE_PARSED(set, PL_BG))
-    {
-#if (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-        if (screen == SCREEN_REMOTE)
-            vp->bg_pattern = REMOTE_BG_FALLBACK;
-        else
-#endif
-            vp->bg_pattern = BG_FALLBACK;
-    }
+    vp->fg_pattern = get_viewport_default_colour(screen, true);
+    vp->bg_pattern = get_viewport_default_colour(screen, false);
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 
 #ifdef HAVE_LCD_COLOR
