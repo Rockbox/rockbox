@@ -44,6 +44,7 @@ public:
     }
 
     SkinDocument(QWidget *parent = 0);
+    SkinDocument(QString file, QWidget* parent = 0);
     virtual ~SkinDocument();
 
     ParseTreeModel* getModel(){ return model; }

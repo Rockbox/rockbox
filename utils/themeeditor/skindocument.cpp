@@ -22,19 +22,37 @@
 #include "skindocument.h"
 
 #include <QFile>
-#include <QTimer>
 #include <QSettings>
 #include <QMessageBox>
 #include <QFileDialog>
 
-SkinDocument::SkinDocument(QWidget *parent) :
-    QWidget(parent)
+SkinDocument::SkinDocument(QWidget *parent) : QWidget(parent)
 {
     setupUI();
 
     title = "Untitled";
     fileName = "";
     saved = "";
+}
+
+SkinDocument::SkinDocument(QString file, QWidget *parent):
+        QWidget(parent), fileName(file)
+{
+    setupUI();
+
+    /* Loading the file */
+    if(QFile::exists(fileName))
+    {
+        QFile fin(fileName);
+        fin.open(QFile::ReadOnly);
+        editor->document()->setPlainText(QString(fin.readAll()));
+        saved = editor->document()->toPlainText();
+        fin.close();
+    }
+
+    /* Setting the title */
+    QStringList decomposed = fileName.split('/');
+    title = decomposed.last();
 }
 
 SkinDocument::~SkinDocument()
@@ -126,7 +144,7 @@ void SkinDocument::save()
 
     saved = editor->document()->toPlainText();
     QStringList decompose = fileName.split('/');
-    title = decompose[decompose.count() - 1];
+    title = decompose.last();
     emit titleChanged(title);
 
 }

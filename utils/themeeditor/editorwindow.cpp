@@ -117,6 +117,11 @@ void EditorWindow::setupMenus()
     QObject::connect(ui->actionToolbarSave, SIGNAL(triggered()),
                      this, SLOT(saveCurrent()));
 
+    QObject::connect(ui->actionOpen_Document, SIGNAL(triggered()),
+                     this, SLOT(openFile()));
+    QObject::connect(ui->actionToolbarOpen, SIGNAL(triggered()),
+                     this, SLOT(openFile()));
+
 }
 
 
@@ -193,6 +198,28 @@ void EditorWindow::openFile()
     QString directory = settings.value("defaultDirectory", "").toString();
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), directory,
                                               SkinDocument::fileFilter());
+
+    for(int i = 0; i < fileNames.count(); i++)
+    {
+        if(!QFile::exists(fileNames[i]))
+            continue;
+
+        QString current = fileNames[i];
+
+        /* Adding a new document for each file name */
+        SkinDocument* doc = new SkinDocument(current);
+        ui->editorTabs->addTab(doc, doc->getTitle());
+
+        QObject::connect(doc, SIGNAL(titleChanged(QString)),
+                         this, SLOT(tabTitleChanged(QString)));
+
+        /* And setting the new default directory */
+        current.chop(current.length() - current.lastIndexOf('/') - 1);
+        settings.setValue("defaultDirectory", current);
+
+    }
+
+    settings.endGroup();
 }
 
 
