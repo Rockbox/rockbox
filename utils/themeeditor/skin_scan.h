@@ -31,6 +31,8 @@ extern "C"
 /* Scanning functions */
 void skip_comment(char** document);
 void skip_whitespace(char** document);
+void skip_arglist(char** document);
+void skip_enumlist(char** document);
 char* scan_string(char** document);
 int scan_int(char** document);
 int check_viewport(char* document); /* Checks for a viewport declaration */

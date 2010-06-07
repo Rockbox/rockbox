@@ -34,14 +34,69 @@
 /* Simple function to advance a char* past a comment */
 void skip_comment(char** document)
 {
-    for(/*NO INIT*/;**document != '\n' && **document != '\0'; (*document)++);
+    while(**document != '\n' && **document != '\0')
+        (*document)++;
     if(**document == '\n')
         (*document)++;
 }
 
 void skip_whitespace(char** document)
 {
-    for(/*NO INIT*/; **document == ' ' || **document == '\t'; (*document)++);
+    while(**document == ' ' || **document == '\t')
+        (*document)++;
+}
+
+void skip_arglist(char** document)
+{
+    if(**document == ARGLISTOPENSYM)
+        (*document)++;
+    while(**document && **document != ARGLISTCLOSESYM)
+    {
+        if(**document == TAGSYM)
+        {
+            (*document)++;
+            if(**document == '\0')
+                break;
+            (*document)++;
+        }
+        else if(**document == ARGLISTOPENSYM)
+            skip_arglist(document);
+        else if(**document == ENUMLISTOPENSYM)
+            skip_enumlist(document);
+        else if(**document == COMMENTSYM)
+            skip_comment(document);
+        else
+            (*document)++;
+    }
+    if(**document == ARGLISTCLOSESYM)
+        (*document)++;
+}
+
+void skip_enumlist(char** document)
+{
+    if(**document == ENUMLISTOPENSYM)
+        (*document)++;
+    while(**document && **document != ENUMLISTCLOSESYM)
+    {
+        if(**document == TAGSYM)
+        {
+            (*document)++;
+            if(**document == '\0')
+                break;
+            (*document)++;
+        }
+        else if(**document == ARGLISTOPENSYM)
+            skip_arglist(document);
+        else if(**document == ENUMLISTOPENSYM)
+            skip_enumlist(document);
+        else if(**document == COMMENTSYM)
+            skip_comment(document);
+        else
+            (*document)++;
+    }
+
+    if(**document == ENUMLISTCLOSESYM)
+        (*document)++;
 }
 
 char* scan_string(char** document)

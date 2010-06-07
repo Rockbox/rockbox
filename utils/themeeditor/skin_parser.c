@@ -157,6 +157,14 @@ struct skin_element* skin_parse_viewport(char** document)
             {
                 skip_comment(&cursor);
             }
+            else if(*cursor == ARGLISTOPENSYM)
+            {
+                skip_arglist(&cursor);
+            }
+            else if(*cursor == ENUMLISTOPENSYM)
+            {
+                skip_arglist(&cursor);
+            }
             else
             {
                 /* Advancing the cursor as normal */
@@ -297,7 +305,6 @@ struct skin_element* skin_parse_sublines_optional(char** document,
     char* cursor = *document;
     int sublines = 1;
     int i;
-    int nested = 0;
 
     retval = skin_alloc_element();
     retval->type = SUBLINES;
@@ -316,36 +323,31 @@ struct skin_element* skin_parse_sublines_optional(char** document,
         if(*cursor == COMMENTSYM)
         {
             skip_comment(&cursor);
-            continue;
         }
-
-        if(*cursor == ENUMLISTOPENSYM && conditional)
+        else if(*cursor == ENUMLISTOPENSYM)
         {
-            nested++;
-            cursor++;
-            while(nested)
-            {
-                if(*cursor == ENUMLISTOPENSYM)
-                    nested++;
-                if(*cursor == ENUMLISTCLOSESYM)
-                    nested--;
-                cursor++;
-            }
+            skip_enumlist(&cursor);
         }
-        /* Accounting for escaped subline symbols */
-        if(*cursor == TAGSYM)
+        else if(*cursor == ARGLISTOPENSYM)
+        {
+            skip_arglist(&cursor);
+        }
+        else if(*cursor == TAGSYM)
         {
             cursor++;
             if(*cursor == '\0' || *cursor == '\n')
                 break;
+            cursor++;
         }
-
-        if(*cursor == MULTILINESYM)
+        else if(*cursor == MULTILINESYM)
         {
             sublines++;
+            cursor++;
         }
-
-        cursor++;
+        else
+        {
+            cursor++;
+        }
     }
 
     /* ...and then we parse them */
@@ -449,8 +451,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
         cursor++;
     }
 
-    for(bookmark = cursor; *cursor != '\n' && *cursor != '\0' &&
-        *cursor != ARGLISTCLOSESYM; cursor++)
+    bookmark = cursor;
+    while(*cursor != '\n' && *cursor != '\0' && *cursor != ARGLISTCLOSESYM)
     {
         /* Skipping over escaped characters */
         if(*cursor == TAGSYM)
@@ -458,21 +460,27 @@ int skin_parse_tag(struct skin_element* element, char** document)
             cursor++;
             if(*cursor == '\0')
                 break;
+            cursor++;
         }
-
-        /* Skipping comments */
-        if(*cursor == COMMENTSYM)
+        else if(*cursor == COMMENTSYM)
+        {
             skip_comment(&cursor);
-
-        /* Commas inside of contained lists don't count */
-        if(*cursor == ARGLISTOPENSYM)
-            while(*cursor != ARGLISTCLOSESYM && *cursor != '\0')
-                cursor++;
-
-        if(*cursor == ARGLISTSEPERATESYM)
+        }
+        else if(*cursor == ARGLISTOPENSYM)
+        {
+            skip_arglist(&cursor);
+        }
+        else if(*cursor == ARGLISTSEPERATESYM)
+        {
             num_args++;
-
+            cursor++;
+        }
+        else
+        {
+            cursor++;
+        }
     }
+
     cursor = bookmark; /* Restoring the cursor */
     element->params_count = num_args;
     element->params = skin_alloc_params(num_args);
@@ -656,7 +664,6 @@ int skin_parse_conditional(struct skin_element* element, char** document)
     struct skin_element* tag = skin_alloc_element(); /* The tag to evaluate */
     int children = 1;
     int i;
-    int nested = 0;
 
     element->type = CONDITIONAL;
     element->line = skin_line;
@@ -677,42 +684,27 @@ int skin_parse_conditional(struct skin_element* element, char** document)
         if(*cursor == COMMENTSYM)
         {
             skip_comment(&cursor);
-            continue;
         }
-
-        if(*cursor == ENUMLISTOPENSYM)
+        else if(*cursor == ENUMLISTOPENSYM)
         {
-            nested++;
-            cursor++;
-            while(nested)
-            {
-                if(*cursor == ENUMLISTOPENSYM)
-                {
-                    nested++;
-                }
-                else if(*cursor == ENUMLISTCLOSESYM)
-                {
-                    nested--;
-                    if(nested == 0)
-                        break;
-                }
-                cursor++;
-            }
+            skip_enumlist(&cursor);
         }
-
-        if(*cursor == TAGSYM)
+        else if(*cursor == TAGSYM)
         {
             cursor++;
             if(*cursor == '\0' || *cursor == '\n')
                 break;
             cursor++;
-            continue;
         }
-
-        if(*cursor == ENUMLISTSEPERATESYM)
+        else if(*cursor == ENUMLISTSEPERATESYM)
+        {
             children++;
-
-        cursor++;
+            cursor++;
+        }
+        else
+        {
+            cursor++;
+        }
     }
     cursor = bookmark;
 
