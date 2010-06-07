@@ -63,7 +63,7 @@ signals:
     void titleChanged(QString);
 
 public slots:
-    void colorsChanged();
+    void settingsChanged();
 
 private slots:
     void codeChanged();

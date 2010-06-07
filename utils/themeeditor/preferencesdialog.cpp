@@ -42,6 +42,7 @@ PreferencesDialog::~PreferencesDialog()
 void PreferencesDialog::loadSettings()
 {
     loadColors();
+    loadFont();
 }
 
 void PreferencesDialog::loadColors()
@@ -83,9 +84,25 @@ void PreferencesDialog::loadColors()
     settings.endGroup();
 }
 
+void PreferencesDialog::loadFont()
+{
+    QSettings settings;
+    settings.beginGroup("SkinDocument");
+
+    QVariant family = settings.value("fontFamily", QFont());
+    int size = settings.value("fontSize", 12).toInt();
+
+    settings.endGroup();
+
+    ui->fontSelect->setCurrentFont(family.value<QFont>());
+    ui->fontSize->setValue(size);
+
+}
+
 void PreferencesDialog::saveSettings()
 {
     saveColors();
+    saveFont();
 }
 
 void PreferencesDialog::saveColors()
@@ -107,6 +124,17 @@ void PreferencesDialog::saveColors()
     settings.setValue("commentColor", commentColor);
     settings.setValue("conditionalColor", conditionalColor);
     settings.setValue("escapedColor", escapedColor);
+
+    settings.endGroup();
+}
+
+void PreferencesDialog::saveFont()
+{
+    QSettings settings;
+    settings.beginGroup("SkinDocument");
+
+    settings.setValue("fontFamily", ui->fontSelect->currentFont());
+    settings.setValue("fontSize", ui->fontSize->value());
 
     settings.endGroup();
 }

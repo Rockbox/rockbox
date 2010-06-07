@@ -53,8 +53,10 @@ private:
 
     void loadSettings();
     void loadColors();
+    void loadFont();
     void saveSettings();
     void saveColors();
+    void saveFont();
 
     void setupUI();
 

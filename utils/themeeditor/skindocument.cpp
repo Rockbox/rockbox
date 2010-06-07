@@ -65,7 +65,7 @@ SkinDocument::~SkinDocument()
 void SkinDocument::connectPrefs(PreferencesDialog* prefs)
 {
     QObject::connect(prefs, SIGNAL(accepted()),
-                     this, SLOT(colorsChanged()));
+                     this, SLOT(settingsChanged()));
     QObject::connect(prefs, SIGNAL(accepted()),
                      highlighter, SLOT(loadSettings()));
 }
@@ -124,10 +124,10 @@ void SkinDocument::setupUI()
     QObject::connect(editor, SIGNAL(textChanged()),
                      this, SLOT(codeChanged()));
 
-    colorsChanged();
+    settingsChanged();
 }
 
-void SkinDocument::colorsChanged()
+void SkinDocument::settingsChanged()
 {
     /* Setting the editor colors */
     QSettings settings;
@@ -140,6 +140,12 @@ void SkinDocument::colorsChanged()
     palette.setColor(QPalette::All, QPalette::Text, fg);
 
     editor->setPalette(palette);
+
+    /* Setting the font */
+    QFont family = settings.value("fontFamily", QFont()).value<QFont>();
+    family.setPointSize(settings.value("fontSize", 12).toInt());
+    editor->setFont(family);
+
     editor->repaint();
 
     settings.endGroup();
