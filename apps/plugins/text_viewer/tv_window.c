@@ -279,23 +279,22 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 {
 #ifdef HAVE_LCD_BITMAP
     static bool is_executing = false;
+    const unsigned char *font_str;
 
     is_executing = true;
+    font_str = oldp? oldp->font_name: rb->global_settings->font_file;
 
     /* change font */
-    if (oldp == NULL || rb->strcmp(oldp->font_name, prefs->font_name))
+    if (rb->strcmp(font_str, prefs->font_name))
     {
         if (!tv_set_font(prefs->font_name))
         {
             struct tv_preferences new_prefs = *prefs;
-            const unsigned char *font_str;
-
-            font_str = (oldp == NULL)? rb->global_settings->font_file : oldp->font_name;
 
             if (!tv_set_font(font_str) && oldp != NULL)
             {
-                 font_str = rb->global_settings->font_file;
-                 tv_set_font(new_prefs.font_name);
+                font_str = rb->global_settings->font_file;
+                tv_set_font(font_str);
             }
 
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
@@ -363,6 +362,12 @@ bool tv_init_window(unsigned char *buf, size_t bufsize, size_t *used_size)
 void tv_finalize_window(void)
 {
     tv_finalize_text_reader();
+
+    /* restore font */
+    if (rb->strcmp(rb->global_settings->font_file, prefs->font_name))
+    {
+        tv_set_font(rb->global_settings->font_file);
+    }
 }
 
 void tv_move_window(int window_delta, int column_delta)

@@ -247,82 +247,41 @@ static bool tv_footer_setting(void)
                            names, len, NULL);
 }
 
-static int tv_font_comp(const void *a, const void *b)
-{
-    struct opt_items *pa;
-    struct opt_items *pb;
-
-    pa = (struct opt_items *)a;
-    pb = (struct opt_items *)b;
-
-    return rb->strcmp(pa->string, pb->string);
-}
-
 static bool tv_font_setting(void)
 {
     int count = 0;
-    DIR *dir;
-    struct dirent *entry;
     int i = 0;
-    int len;
     int new_font = 0;
     int old_font;
     bool res;
-    int size = 0;
 
-    dir = rb->opendir(FONT_DIR);
-    if (!dir)
-    {
-        rb->splash(HZ/2, "font dir does not access");
-        return false;
-    }
+    struct tree_context *tree;
+    struct tree_context backup;
+    struct entry *dc;
+    int dirfilter = SHOW_FONT;
 
-    while ((entry = rb->readdir(dir)) != NULL)
-    {
-        len = rb->strlen(entry->d_name);
-        if (len < 4 || rb->strcmp(entry->d_name + len - 4, ".fnt"))
-            continue;
-        size += len - 3;
-        count++;
-    }
-    rb->closedir(dir);
+    tree = rb->tree_get_context();
+    backup = *tree;
+    dc = tree->dircache;
+    rb->strlcat(backup.currdir, "/", MAX_PATH);
+    rb->strlcat(backup.currdir, dc[tree->selected_item].name, MAX_PATH);
+    tree->dirfilter = &dirfilter;
+    rb->set_current_file(FONT_DIR"/");
+    count = tree->filesindir;
 
     struct opt_items names[count];
-    unsigned char font_names[size];
-    unsigned char *p = font_names;
-
-    dir = rb->opendir(FONT_DIR);
-    if (!dir)
-    {
-        rb->splash(HZ/2, "font dir does not access");
-        return false;
-    }
-
-    while ((entry = rb->readdir(dir)) != NULL)
-    {
-        len = rb->strlen(entry->d_name);
-        if (len < 4 || rb->strcmp(entry->d_name + len - 4, ".fnt"))
-            continue;
-
-        rb->strlcpy(p, entry->d_name, len - 3);
-        names[i].string = p;
-        names[i].voice_id = -1;
-        p += len - 3;
-        if (++i >= count)
-            break;
-    }
-    rb->closedir(dir);
-
-    rb->qsort(names, count, sizeof(struct opt_items), tv_font_comp);
 
     for (i = 0; i < count; i++)
     {
-        if (!rb->strcmp(names[i].string, new_prefs.font_name))
-        {
+        char *p = rb->strrchr(dc[i].name, '.');
+        if (p) *p = 0;
+        if (!rb->strcmp(dc[i].name, new_prefs.font_name))
             new_font = i;
-            break;
-        }
+
+        names[i].string = dc[i].name;
+        names[i].voice_id = -1;
     }
+
     old_font = new_font;
 
     res = rb->set_option("Select Font", &new_font, INT,
@@ -334,6 +293,8 @@ static bool tv_font_setting(void)
         rb->strlcpy(new_prefs.font_name, names[new_font].string, MAX_PATH);
     }
 
+    *tree = backup;
+    rb->set_current_file(backup.currdir);
     return res;
 }
 #endif
