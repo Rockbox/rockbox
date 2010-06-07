@@ -257,10 +257,10 @@ static void rec_dma_start(void)
 }
 
 
+#if CONFIG_CPU == AS3525
 /* if needed, duplicate samples of the working channel until the given bound */
 static inline void mono2stereo(int16_t *end)
 {
-#if CONFIG_CPU == AS3525
     if(audio_channels != 1) /* only for microphone */
         return;
 #if 0
@@ -286,11 +286,8 @@ static inline void mono2stereo(int16_t *end)
         : "memory"
     );
 #endif /* C / ASM */
-#else
-    /* microphone recording is stereo on as3525v2 */
-    (void)end;
-#endif
 }
+#endif /* CONFIG_CPU == AS3525 */
 
 static void rec_dma_callback(void)
 {
@@ -303,8 +300,10 @@ static void rec_dma_callback(void)
          * pcm_rec_unlock() */
         rec_dma_transfer_size = 0;
 
+#if CONFIG_CPU == AS3525
         /* the 2nd channel is silent when recording microphone on as3525v1 */
         mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
+#endif
 
         if(locked)
         {
@@ -389,12 +388,23 @@ void pcm_rec_dma_init(void)
 
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    pcm_rec_lock();
+#if CONFIG_CPU == AS3525
+    /*
+     * We need to prevent the DMA callback from kicking in while we are
+     * faking the right channel with data from left channel.
+     */
+
+    int old = disable_irq_save();
     int16_t *addr = AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
     mono2stereo(addr);
-    pcm_rec_unlock();
+    restore_irq(old);
 
     return addr;
+
+#else
+    /* Microphone recording is stereo on as3525v2 */
+    return AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
+#endif
 }
 
 #endif /* HAVE_RECORDING */
