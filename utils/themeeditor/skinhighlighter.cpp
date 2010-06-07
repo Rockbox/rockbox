@@ -21,13 +21,12 @@
 
 #include "skinhighlighter.h"
 
-SkinHighlighter::SkinHighlighter(QColor comment, QColor tag, QColor conditional,
-                                 QColor escaped, QTextDocument* doc)
-                                     :QSyntaxHighlighter(doc),
-                                     escaped(escaped), tag(tag),
-                                     conditional(conditional), comment(comment)
-{
+#include <QSettings>
 
+SkinHighlighter::SkinHighlighter(QTextDocument* doc)
+    :QSyntaxHighlighter(doc)
+{
+    loadSettings();
 }
 
 SkinHighlighter::~SkinHighlighter()
@@ -150,4 +149,24 @@ void SkinHighlighter::highlightBlock(const QString& text)
             }
         }
     }
+}
+
+void SkinHighlighter::loadSettings()
+{
+    QSettings settings;
+
+    settings.beginGroup("SkinHighlighter");
+
+    /* Loading the highlighting colors */
+    tag = settings.value("tagColor", QColor(180,0,0)).value<QColor>();
+    conditional = settings.value("conditionalColor",
+                                 QColor(0, 0, 180)).value<QColor>();
+    escaped = settings.value("escapedColor",
+                             QColor(120,120,120)).value<QColor>();
+    comment = settings.value("commentColor",
+                             QColor(0, 180, 0)).value<QColor>();
+
+    settings.endGroup();
+
+    rehighlight();
 }

@@ -23,6 +23,7 @@
 
 #include <QFile>
 #include <QSettings>
+#include <QColor>
 #include <QMessageBox>
 #include <QFileDialog>
 
@@ -59,6 +60,14 @@ SkinDocument::~SkinDocument()
 {
     delete highlighter;
     delete model;
+}
+
+void SkinDocument::connectPrefs(PreferencesDialog* prefs)
+{
+    QObject::connect(prefs, SIGNAL(accepted()),
+                     this, SLOT(colorsChanged()));
+    QObject::connect(prefs, SIGNAL(accepted()),
+                     highlighter, SLOT(loadSettings()));
 }
 
 bool SkinDocument::requestClose()
@@ -106,9 +115,7 @@ void SkinDocument::setupUI()
     setLayout(layout);
 
     /* Attaching the syntax highlighter */
-    highlighter = new SkinHighlighter(QColor(0,180,0), QColor(255,0,0),
-                                      QColor(0,0,255), QColor(120,120,120),
-                                      editor->document());
+    highlighter = new SkinHighlighter(editor->document());
 
     /* Setting up the model */
     model = new ParseTreeModel("");
@@ -116,6 +123,27 @@ void SkinDocument::setupUI()
     /* Connecting the editor's signal */
     QObject::connect(editor, SIGNAL(textChanged()),
                      this, SLOT(codeChanged()));
+
+    colorsChanged();
+}
+
+void SkinDocument::colorsChanged()
+{
+    /* Setting the editor colors */
+    QSettings settings;
+    settings.beginGroup("SkinDocument");
+
+    QColor fg = settings.value("fgColor", Qt::black).value<QColor>();
+    QColor bg = settings.value("bgColor", Qt::white).value<QColor>();
+    QPalette palette;
+    palette.setColor(QPalette::All, QPalette::Base, bg);
+    palette.setColor(QPalette::All, QPalette::Text, fg);
+
+    editor->setPalette(palette);
+    editor->repaint();
+
+    settings.endGroup();
+
 }
 
 void SkinDocument::codeChanged()

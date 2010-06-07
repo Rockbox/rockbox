@@ -27,6 +27,7 @@
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
 #include "skindocument.h"
+#include "preferencesdialog.h"
 
 namespace Ui {
     class EditorWindow;
@@ -59,8 +60,10 @@ private:
     void saveSettings();
     void setupUI();
     void setupMenus();
+    void addTab(SkinDocument* doc);
 
     Ui::EditorWindow *ui;
+    PreferencesDialog* prefs;
 };
 
 #endif // EDITORWINDOW_H

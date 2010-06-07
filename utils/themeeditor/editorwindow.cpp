@@ -32,6 +32,7 @@ EditorWindow::EditorWindow(QWidget *parent) :
     ui(new Ui::EditorWindow)
 {
     ui->setupUi(this);
+    prefs = new PreferencesDialog(this);
     loadSettings();
     setupUI();
     setupMenus();
@@ -43,7 +44,7 @@ void EditorWindow::loadSettings()
     QSettings settings;
 
     /* Main Window location */
-    settings.beginGroup("MainWindow");
+    settings.beginGroup("EditorWindow");
     QSize size = settings.value("size").toSize();
     QPoint pos = settings.value("position").toPoint();
     QByteArray state = settings.value("state").toByteArray();
@@ -65,7 +66,7 @@ void EditorWindow::saveSettings()
     QSettings settings;
 
     /* Saving window and panel positions */
-    settings.beginGroup("MainWindow");
+    settings.beginGroup("EditorWindow");
     settings.setValue("position", pos());
     settings.setValue("size", size());
     settings.setValue("state", saveState());
@@ -88,6 +89,10 @@ void EditorWindow::setupUI()
     /* Connecting the code gen button */
     QObject::connect(ui->fromTree, SIGNAL(pressed()),
                      this, SLOT(updateCurrent()));
+
+    /* Connecting the preferences dialog */
+    QObject::connect(ui->actionPreferences, SIGNAL(triggered()),
+                     prefs, SLOT(exec()));
 
 }
 
@@ -124,15 +129,23 @@ void EditorWindow::setupMenus()
 
 }
 
-
-void EditorWindow::newTab()
+void EditorWindow::addTab(SkinDocument *doc)
 {
-    SkinDocument* doc = new SkinDocument;
     ui->editorTabs->addTab(doc, doc->getTitle());
 
     /* Connecting to title change events */
     QObject::connect(doc, SIGNAL(titleChanged(QString)),
                      this, SLOT(tabTitleChanged(QString)));
+
+    /* Connecting to settings change events */
+    doc->connectPrefs(prefs);
+}
+
+
+void EditorWindow::newTab()
+{
+    SkinDocument* doc = new SkinDocument;
+    addTab(doc);
 }
 
 void EditorWindow::shiftTab(int index)
@@ -208,10 +221,7 @@ void EditorWindow::openFile()
 
         /* Adding a new document for each file name */
         SkinDocument* doc = new SkinDocument(current);
-        ui->editorTabs->addTab(doc, doc->getTitle());
-
-        QObject::connect(doc, SIGNAL(titleChanged(QString)),
-                         this, SLOT(tabTitleChanged(QString)));
+        addTab(doc);
 
         /* And setting the new default directory */
         current.chop(current.length() - current.lastIndexOf('/') - 1);
@@ -270,4 +280,5 @@ void EditorWindow::updateCurrent()
 EditorWindow::~EditorWindow()
 {
     delete ui;
+    delete prefs;
 }

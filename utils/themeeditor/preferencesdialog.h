@@ -19,41 +19,51 @@
  *
  ****************************************************************************/
 
-#ifndef SKINHIGHLIGHTER_H
-#define SKINHIGHLIGHTER_H
+#ifndef PREFERENCESDIALOG_H
+#define PREFERENCESDIALOG_H
 
-#include <QSyntaxHighlighter>
-#include <QPlainTextEdit>
+#include <QDialog>
+#include <QPushButton>
 
-#include "tag_table.h"
-#include "symbols.h"
+namespace Ui {
+    class PreferencesDialog;
+}
 
-class SkinHighlighter : public QSyntaxHighlighter
-{
-Q_OBJECT
+class PreferencesDialog : public QDialog {
+    Q_OBJECT
 public:
-    /*
-     * font - The font used for all text
-     * normal - The normal text color
-     * escaped - The color for escaped characters
-     * tag - The color for tags and their delimiters
-     * conditional - The color for conditionals and their delimiters
-     *
-     */
-    SkinHighlighter(QTextDocument* doc);
-    virtual ~SkinHighlighter();
+    PreferencesDialog(QWidget *parent = 0);
+    ~PreferencesDialog();
 
-    void highlightBlock(const QString& text);
+    static void setButtonColor(QPushButton* button, QColor color)
+    {
+        QString style = "* { background:" + color.name() + "}";
+        button->setStyleSheet(style);
+    }
 
 public slots:
-    void loadSettings();
+    void accept();
+    void reject();
+
+private slots:
+    void colorClicked();
 
 private:
-    QColor escaped;
-    QColor tag;
-    QColor conditional;
-    QColor comment;
+    Ui::PreferencesDialog *ui;
 
+    void loadSettings();
+    void loadColors();
+    void saveSettings();
+    void saveColors();
+
+    void setupUI();
+
+    QColor fgColor;
+    QColor bgColor;
+    QColor commentColor;
+    QColor escapedColor;
+    QColor tagColor;
+    QColor conditionalColor;
 };
 
-#endif // SKINHIGHLIGHTER_H
+#endif // PREFERENCESDIALOG_H

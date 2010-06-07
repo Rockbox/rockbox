@@ -28,6 +28,7 @@
 
 #include "skinhighlighter.h"
 #include "parsetreemodel.h"
+#include "preferencesdialog.h"
 
 class SkinDocument : public QWidget
 {
@@ -47,6 +48,8 @@ public:
     SkinDocument(QString file, QWidget* parent = 0);
     virtual ~SkinDocument();
 
+    void connectPrefs(PreferencesDialog* prefs);
+
     ParseTreeModel* getModel(){ return model; }
     QString getTitle(){ return title; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
@@ -58,6 +61,9 @@ public:
 
 signals:
     void titleChanged(QString);
+
+public slots:
+    void colorsChanged();
 
 private slots:
     void codeChanged();

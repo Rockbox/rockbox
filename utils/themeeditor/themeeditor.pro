@@ -13,7 +13,8 @@ HEADERS += tag_table.h \
     parsetreenode.h \
     editorwindow.h \
     skinhighlighter.h \
-    skindocument.h
+    skindocument.h \
+    preferencesdialog.h
 SOURCES += tag_table.c \
     skin_parser.c \
     skin_scan.c \
@@ -23,7 +24,8 @@ SOURCES += tag_table.c \
     parsetreenode.cpp \
     editorwindow.cpp \
     skinhighlighter.cpp \
-    skindocument.cpp
+    skindocument.cpp \
+    preferencesdialog.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -31,5 +33,6 @@ OTHER_FILES += README \
     resources/document-save.png \
     resources/document-open.png \
     resources/document-new.png
-FORMS += editorwindow.ui
+FORMS += editorwindow.ui \
+    preferencesdialog.ui
 RESOURCES += resources.qrc
