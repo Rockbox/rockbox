@@ -1334,18 +1334,11 @@ static int parse_progressbar(const char *wps_bufptr,
 }
 
 #ifdef HAVE_ALBUMART
-static int parse_int(const char *newline, const char **_pos, int *num)
-{
-    *_pos = parse_list("d", NULL, ',', *_pos, num);
-    return (!*_pos || *_pos > newline || (**_pos != ',' && **_pos != ')'));
-}
-
 static int parse_albumart_load(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    const char *_pos, *newline;
-    bool parsing;
+    const char *ptr = wps_bufptr;
     struct dim dimensions;
     int albumart_slot;
     bool swap_for_rtl = lang_is_rtl() && follow_lang_direction;
@@ -1361,117 +1354,13 @@ static int parse_albumart_load(const char *wps_bufptr,
     aa->yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
     aa->vp = &curr_vp->vp;
 
+    if (*ptr != '(')
+        return WPS_ERROR_INVALID_PARAM; 
+    ptr++;
     /* format: %Cl|x|y|[[l|c|r]mwidth]|[[t|c|b]mheight]| */
-
-    newline = strchr(wps_bufptr, '\n');
-
-    _pos = wps_bufptr;
-
-    if (*_pos != '(')
+    if (!(ptr = parse_list("dddd", NULL,',',ptr, &aa->x, &aa->y, &aa->width, &aa->height)))
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-
-    ++_pos;
-
-    /* initial validation and parsing of x component */
-    if (parse_int(newline, &_pos, &aa->x))
-        return WPS_ERROR_INVALID_PARAM;
-
-    ++_pos;
-
-    /* initial validation and parsing of y component */
-    if (parse_int(newline, &_pos, &aa->y))
-        return WPS_ERROR_INVALID_PARAM;
-
-    /* parsing width field */
-    parsing = true;
-    while (parsing)
-    {
-        /* apply each modifier in turn */
-        ++_pos;
-        switch (*_pos)
-        {
-            case 'l':
-            case 'L':
-            case '+':
-                if (swap_for_rtl)
-                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
-                else
-                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
-                break;
-            case 'c':
-            case 'C':
-                aa->xalign = WPS_ALBUMART_ALIGN_CENTER;
-                break;
-            case 'r':
-            case 'R':
-            case '-':
-                if (swap_for_rtl)
-                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
-                else
-                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
-                break;
-            case 'd':
-            case 'D':
-            case 'i':
-            case 'I':
-            case 's':
-            case 'S':
-                /* simply ignored */
-                break;
-            default:
-                parsing = false;
-                break;
-        }
-    }
-    /* extract max width data */
-    if (*_pos != ',')
-    {
-        if (parse_int(newline, &_pos, &aa->width))
-            return WPS_ERROR_INVALID_PARAM;
-    }
-
-    /* parsing height field */
-    parsing = true;
-    while (parsing)
-    {
-        /* apply each modifier in turn */
-        ++_pos;
-        switch (*_pos)
-        {
-            case 't':
-            case 'T':
-            case '-':
-                aa->yalign = WPS_ALBUMART_ALIGN_TOP;
-                break;
-            case 'c':
-            case 'C':
-                aa->yalign = WPS_ALBUMART_ALIGN_CENTER;
-                break;
-            case 'b':
-            case 'B':
-            case '+':
-                aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
-                break;
-            case 'd':
-            case 'D':
-            case 'i':
-            case 'I':
-            case 's':
-            case 'S':
-                /* simply ignored */
-                break;
-            default:
-                parsing = false;
-                break;
-        }
-    }
-    /* extract max height data */
-    if (*_pos != ',')
-    {
-        if (parse_int(newline, &_pos, &aa->height))
-            return WPS_ERROR_INVALID_PARAM;
-    }
-
+        
     /* if we got here, we parsed everything ok .. ! */
     if (aa->width < 0)
         aa->width = 0;
@@ -1497,8 +1386,62 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     if (0 <= albumart_slot)
         wps_data->playback_aa_slot = albumart_slot;
-
-    /* Skip the rest of the line */
+        
+    if (*ptr == ')')
+        return skip_end_of_line(wps_bufptr);
+    else if (*ptr != ',')
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+    ptr++;
+    switch (*ptr)
+    {
+        case 'l':
+        case 'L':
+            if (swap_for_rtl)
+                aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+            else
+                aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+            break;
+        case 'c':
+        case 'C':
+            aa->xalign = WPS_ALBUMART_ALIGN_CENTER;
+            break;
+        case 'r':
+        case 'R':
+            if (swap_for_rtl)
+                aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+            else
+                aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+            break;
+    }
+    ptr++;
+    if (*ptr == ')')
+        return skip_end_of_line(wps_bufptr);
+    else if (*ptr != ',')
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+    ptr++;
+    switch (*ptr)
+    {
+        case 't':
+        case 'T':
+            aa->yalign = WPS_ALBUMART_ALIGN_TOP;
+            break;
+        case 'c':
+        case 'C':
+            aa->yalign = WPS_ALBUMART_ALIGN_CENTER;
+            break;
+        case 'b':
+        case 'B':
+            aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
+            break;
+        case 'd':
+        case 'D':
+        case 'i':
+        case 'I':
+        case 's':
+        case 'S':
+            /* simply ignored */
+            break;
+    }
     return skip_end_of_line(wps_bufptr);
 }
 
