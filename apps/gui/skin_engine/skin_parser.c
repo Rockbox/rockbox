@@ -1017,7 +1017,7 @@ static int parse_viewport(const char *wps_bufptr,
     add_to_ll_chain(&wps_data->viewports, list);
     curr_vp = skin_vp;
     /* Skip the rest of the line */
-    return skip_end_of_line(wps_bufptr);
+    return ptr-wps_bufptr;
 }
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 static int parse_viewportcolour(const char *wps_bufptr,
