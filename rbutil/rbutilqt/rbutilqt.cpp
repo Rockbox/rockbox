@@ -798,6 +798,15 @@ void RbUtilQt::installBootloaderPost(bool error)
 void RbUtilQt::installFontsBtn()
 {
     if(chkConfig(true)) return;
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    RockboxInfo installInfo(mountpoint);
+    if(installInfo.revision().isEmpty() && installInfo.release().isEmpty()) {
+        QMessageBox::critical(this, tr("No Rockbox installation found"),
+                tr("Could not determine the installed Rockbox version. "
+                    "Please install a Rockbox build before installing "
+                    "fonts."));
+        return;
+    }
     if(QMessageBox::question(this, tr("Confirm Installation"),
            tr("Do you really want to install the fonts package?"),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -816,13 +825,28 @@ bool RbUtilQt::installFontsAuto()
 
 void RbUtilQt::installFonts()
 {
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    RockboxInfo installInfo(mountpoint);
+    QString fontsurl;
+    QString logversion;
+    QString relversion = installInfo.release();
+    if(relversion.isEmpty()) {
+        // release is empty for non-release versions (i.e. daily / current)
+        fontsurl = SystemInfo::value(SystemInfo::DailyFontUrl).toString();
+        logversion = installInfo.revision();
+    }
+    else {
+        fontsurl = SystemInfo::value(SystemInfo::ReleaseFontUrl).toString();
+        logversion = installInfo.release();
+    }
+    fontsurl.replace("%RELEASEVER%", relversion);
+
     // create zip installer
     installer = new ZipInstaller(this);
-
-    installer->setUrl(SystemInfo::value(SystemInfo::FontUrl).toString());
+    installer->setUrl(fontsurl);
     installer->setLogSection("Fonts");
-    installer->setLogVersion(ServerInfo::value(ServerInfo::DailyDate).toString());
-    installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
+    installer->setLogVersion(logversion);
+    installer->setMountPoint(mountpoint);
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
