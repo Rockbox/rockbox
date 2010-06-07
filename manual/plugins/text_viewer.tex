@@ -59,34 +59,38 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollBack}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
+        \opt{GIGABEAT_PAD}{\ButtonA+\ButtonUp}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line up\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
+        \opt{GIGABEAT_PAD}{\ButtonA+\ButtonDown}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line down\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD}{
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
         \opt{GIGABEAT_S_PAD}{\ButtonLeft}
+        \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column left\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD}{
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
         \opt{GIGABEAT_S_PAD}{\ButtonRight}
+        \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column right\\
     }
