@@ -166,10 +166,10 @@ void EditorWindow::shiftTab(int index)
     else
     {
         /* Syncing the tree view and the status bar */
-        ui->parseTree->setModel(dynamic_cast<SkinDocument*>
-                                (ui->editorTabs->currentWidget())->getModel());
-        parseStatus->setText(dynamic_cast<SkinDocument*>
-                             (ui->editorTabs->currentWidget())->getStatus());
+        SkinDocument* doc = dynamic_cast<SkinDocument*>
+                            (ui->editorTabs->currentWidget());
+        ui->parseTree->setModel(doc->getModel());
+        parseStatus->setText(doc->getStatus());
 
         ui->actionSave_Document->setEnabled(true);
         ui->actionSave_Document_As->setEnabled(true);

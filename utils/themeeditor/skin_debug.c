@@ -93,6 +93,12 @@ char* skin_error_message()
     return error_message;
 }
 
+void skin_clear_errors()
+{
+    error_line = 0;
+    error_message = NULL;
+}
+
 void skin_debug_tree(struct skin_element* root)
 {
     int i;

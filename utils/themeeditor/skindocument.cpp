@@ -35,6 +35,7 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
     title = "Untitled";
     fileName = "";
     saved = "";
+    parseStatus = tr("Empty Document");
 }
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):

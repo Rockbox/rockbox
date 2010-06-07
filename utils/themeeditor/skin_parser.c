@@ -64,6 +64,8 @@ struct skin_element* skin_parse(const char* document)
 
     skin_line = 1;
 
+    skin_clear_errors();
+
     while(*cursor != '\0')
     {
 
