@@ -32,6 +32,8 @@ extern "C"
 
 /* Debugging functions */
 void skin_error(enum skin_errorcode error);
+int skin_error_line();
+char* skin_error_message();
 void skin_debug_tree(struct skin_element* root);
 
 /* Auxiliary debug functions */

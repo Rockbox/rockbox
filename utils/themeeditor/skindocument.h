@@ -23,6 +23,7 @@
 #define SKINDOCUMENT_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QHBoxLayout>
 #include <QPlainTextEdit>
 
@@ -44,14 +45,15 @@ public:
                   "All Files (*.*)");
     }
 
-    SkinDocument(QWidget *parent = 0);
-    SkinDocument(QString file, QWidget* parent = 0);
+    SkinDocument(QLabel* statusLabel, QWidget *parent = 0);
+    SkinDocument(QLabel* statusLabel, QString file, QWidget* parent = 0);
     virtual ~SkinDocument();
 
     void connectPrefs(PreferencesDialog* prefs);
 
     ParseTreeModel* getModel(){ return model; }
     QString getTitle(){ return title; }
+    QString getStatus(){ return parseStatus; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
 
     void save();
@@ -74,12 +76,15 @@ private:
     QString title;
     QString fileName;
     QString saved;
+    QString parseStatus;
 
     QLayout* layout;
     QPlainTextEdit* editor;
 
     SkinHighlighter* highlighter;
     ParseTreeModel* model;
+
+    QLabel* statusLabel;
 };
 
 #endif // SKINDOCUMENT_H

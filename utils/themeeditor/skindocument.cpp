@@ -27,7 +27,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-SkinDocument::SkinDocument(QWidget *parent) : QWidget(parent)
+SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
+        QWidget(parent), statusLabel(statusLabel)
 {
     setupUI();
 
@@ -36,8 +37,8 @@ SkinDocument::SkinDocument(QWidget *parent) : QWidget(parent)
     saved = "";
 }
 
-SkinDocument::SkinDocument(QString file, QWidget *parent):
-        QWidget(parent), fileName(file)
+SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
+        QWidget(parent), fileName(file), statusLabel(statusLabel)
 {
     setupUI();
 
@@ -155,7 +156,9 @@ void SkinDocument::settingsChanged()
 
 void SkinDocument::codeChanged()
 {
-    model->changeTree(editor->document()->toPlainText().toAscii());
+    parseStatus = model->changeTree(editor->document()->
+                                    toPlainText().toAscii());
+    statusLabel->setText(parseStatus);
 
     if(editor->document()->toPlainText() != saved)
         emit titleChanged(title + QChar('*'));

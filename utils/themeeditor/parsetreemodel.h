@@ -48,8 +48,7 @@ public:
 
     QString genCode();
     /* Changes the parse tree to a new document */
-    bool changeTree(const char* document);
-
+    QString changeTree(const char* document);
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
     QModelIndex parent(const QModelIndex &child) const;
     int rowCount(const QModelIndex &parent) const;

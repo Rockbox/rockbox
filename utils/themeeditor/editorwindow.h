@@ -23,6 +23,7 @@
 #define EDITORWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
@@ -64,6 +65,7 @@ private:
 
     Ui::EditorWindow *ui;
     PreferencesDialog* prefs;
+    QLabel* parseStatus;
 };
 
 #endif // EDITORWINDOW_H

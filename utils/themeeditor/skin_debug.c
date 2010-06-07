@@ -31,52 +31,66 @@
 int debug_indent_level = 0;
 extern int skin_line;
 
+/* Global error variables */
+int error_line;
+char* error_message;
+
 /* Debugging functions */
 void skin_error(enum skin_errorcode error)
 {
 
-    fprintf(stderr, "Error on line %d: ", skin_line);
+    error_line = skin_line;
 
     switch(error)
     {
     case MEMORY_LIMIT_EXCEEDED:
-        fprintf(stderr, "Memory limit exceeded\n");
+        error_message = "Memory limit exceeded";
         break;
     case NEWLINE_EXPECTED:
-        fprintf(stderr, "Newline expected\n");
+        error_message = "Newline expected";
         break;
     case ILLEGAL_TAG:
-        fprintf(stderr, "Illegal tag\n");
+        error_message = "Illegal tag";
         break;
     case ARGLIST_EXPECTED:
-        fprintf(stderr, "Argument list expected\n");
+        error_message = "Argument list expected";
         break;
     case TOO_MANY_ARGS:
-        fprintf(stderr, "Too many arguments given\n");
+        error_message =  "Too many arguments given";
         break;
     case DEFAULT_NOT_ALLOWED:
-        fprintf(stderr, "Argument can not be set to default\n");
+        error_message = "Argument can not be set to default";
         break;
     case UNEXPECTED_NEWLINE:
-        fprintf(stderr, "Unexpected newline\n");
+        error_message  = "Unexpected newline";
         break;
     case INSUFFICIENT_ARGS:
-        fprintf(stderr, "Not enough arguments\n");
+        error_message = "Not enough arguments";
         break;
     case INT_EXPECTED:
-        fprintf(stderr, "Expected integer\n");
+        error_message =  "Expected integer";
         break;
     case SEPERATOR_EXPECTED:
-        fprintf(stderr, "Expected argument seperator\n");
+        error_message = "Expected argument seperator";
         break;
     case CLOSE_EXPECTED:
-        fprintf(stderr, "Expected list close\n");
+        error_message = "Expected list close";
         break;
     case MULTILINE_EXPECTED:
-        fprintf(stderr, "Expected subline seperator\n");
+        error_message = "Expected subline seperator";
         break;
     };
 
+}
+
+int skin_error_line()
+{
+    return error_line;
+}
+
+char* skin_error_message()
+{
+    return error_message;
 }
 
 void skin_debug_tree(struct skin_element* root)

@@ -55,18 +55,23 @@ QString ParseTreeModel::genCode()
         return "";
 }
 
-bool ParseTreeModel::changeTree(const char *document)
+QString ParseTreeModel::changeTree(const char *document)
 {
     struct skin_element* test = skin_parse(document);
 
     if(!test)
-        return false;
+    {
+        QString error = tr("Error on line ") +
+                        QString::number(skin_error_line())
+                        + tr(": ") + QString(skin_error_message());
+        return error;
+    }
 
     ParseTreeNode* temp = new ParseTreeNode(test);
     if(root && temp->genHash() == root->genHash())
     {
         delete temp;
-        return true;
+        return tr("Document Parses Successfully");
     }
 
     if(root)
@@ -81,7 +86,7 @@ bool ParseTreeModel::changeTree(const char *document)
     emit beginInsertRows(QModelIndex(), 0, temp->numChildren() - 1);
     emit endInsertRows();
 
-    return true;
+    return tr("Document Parses Successfully");
 
 }
 

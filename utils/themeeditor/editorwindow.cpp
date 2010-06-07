@@ -94,6 +94,10 @@ void EditorWindow::setupUI()
     QObject::connect(ui->actionPreferences, SIGNAL(triggered()),
                      prefs, SLOT(exec()));
 
+    /* Setting up the parse status label */
+    parseStatus = new QLabel(this);
+    ui->statusbar->addWidget(parseStatus);
+
 }
 
 void EditorWindow::setupMenus()
@@ -144,7 +148,7 @@ void EditorWindow::addTab(SkinDocument *doc)
 
 void EditorWindow::newTab()
 {
-    SkinDocument* doc = new SkinDocument;
+    SkinDocument* doc = new SkinDocument(parseStatus);
     addTab(doc);
 }
 
@@ -161,8 +165,12 @@ void EditorWindow::shiftTab(int index)
     }
     else
     {
+        /* Syncing the tree view and the status bar */
         ui->parseTree->setModel(dynamic_cast<SkinDocument*>
                                 (ui->editorTabs->currentWidget())->getModel());
+        parseStatus->setText(dynamic_cast<SkinDocument*>
+                             (ui->editorTabs->currentWidget())->getStatus());
+
         ui->actionSave_Document->setEnabled(true);
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
@@ -220,7 +228,7 @@ void EditorWindow::openFile()
         QString current = fileNames[i];
 
         /* Adding a new document for each file name */
-        SkinDocument* doc = new SkinDocument(current);
+        SkinDocument* doc = new SkinDocument(parseStatus, current);
         addTab(doc);
 
         /* And setting the new default directory */
