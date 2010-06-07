@@ -1026,7 +1026,7 @@ static int parse_viewportcolour(const char *wps_bufptr,
     (void)wps_data;
     const char *ptr = wps_bufptr;
     struct viewport_colour *colour = skin_buffer_alloc(sizeof(struct viewport_colour));
-    int set;
+    uint32_t set;
     if (*ptr != '(' || !colour)
         return -1;
     ptr++;

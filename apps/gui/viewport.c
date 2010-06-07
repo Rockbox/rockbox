@@ -389,7 +389,11 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
             colour = REMOTE_FG_FALLBACK;
         else
 #endif
+#if defined(HAVE_LCD_COLOR)
             colour = global_settings.fg_color;
+#else
+            colour = FG_FALLBACK;
+#endif
     }
     else
     {
@@ -398,7 +402,11 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
             colour = REMOTE_BG_FALLBACK;
         else
 #endif
+#if defined(HAVE_LCD_COLOR)
             colour = global_settings.bg_color;
+#else
+            colour = BG_FALLBACK;
+#endif
     }
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
     return colour;
