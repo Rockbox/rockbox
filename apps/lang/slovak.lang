@@ -12448,3 +12448,17 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "vnútiť"
+  </dest>
+  <voice>
+    *: "vnútiť"
+  </voice>
+</phrase>
