@@ -997,6 +997,7 @@ static int parse_viewport(const char *wps_bufptr,
     /* Check for trailing ) */
     if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
+    ptr++;
 
     if (follow_lang_direction && lang_is_rtl())
     {
