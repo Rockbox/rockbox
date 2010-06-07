@@ -12255,7 +12255,7 @@
   desc: in the theme menu
   user: core
   <source>
-    *: none
+    *:none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
@@ -12405,7 +12405,7 @@
   desc: in the theme menu
   user: core
   <source>
-    *: none
+    *:none
     radio: "Radio Screen"
   </source>
   <dest>
@@ -12432,5 +12432,19 @@
   <voice>
     *: none
     gigabeats: "Nastavenia tónu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Autor"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
