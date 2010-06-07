@@ -151,7 +151,9 @@ void SkinDocument::settingsChanged()
     errorColor.setProperty(QTextFormat::FullWidthSelection, true);
 
     /* Setting the font */
-    QFont family = settings.value("fontFamily", QFont()).value<QFont>();
+    QFont def("Monospace");
+    def.setStyleHint(QFont::TypeWriter);
+    QFont family = settings.value("fontFamily", def).value<QFont>();
     family.setPointSize(settings.value("fontSize", 12).toInt());
     editor->setFont(family);
 

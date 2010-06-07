@@ -35,9 +35,9 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    QCoreApplication::setApplicationName(QObject::tr("Rockbox Theme Editor"));
-    QCoreApplication::setApplicationVersion(QObject::tr("Pre-Alpha"));
-    QCoreApplication::setOrganizationName(QObject::tr("Rockbox"));
+    QCoreApplication::setApplicationName("Rockbox Theme Editor");
+    QCoreApplication::setApplicationVersion("Pre-Alpha");
+    QCoreApplication::setOrganizationName("rockbox.org");
 
     EditorWindow mainWindow;
     mainWindow.show();

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="prefsGroups">
      <property name="tabPosition">
-      <enum>QTabWidget::West</enum>
+      <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
       <number>0</number>
@@ -119,6 +119,9 @@
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>Error Color</string>
+           </property>
+           <property name="buddy">
+            <cstring>errorButton</cstring>
            </property>
           </widget>
          </item>

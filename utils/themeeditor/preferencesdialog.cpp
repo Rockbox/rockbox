@@ -92,7 +92,10 @@ void PreferencesDialog::loadFont()
     QSettings settings;
     settings.beginGroup("SkinDocument");
 
-    QVariant family = settings.value("fontFamily", QFont());
+    QFont def("Monospace");
+    def.setStyleHint(QFont::TypeWriter);
+
+    QVariant family = settings.value("fontFamily", def);
     int size = settings.value("fontSize", 12).toInt();
 
     settings.endGroup();
