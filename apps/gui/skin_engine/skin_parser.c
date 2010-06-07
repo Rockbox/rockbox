@@ -1208,6 +1208,7 @@ static int parse_timeout(const char *wps_bufptr,
         }
         if (*wps_bufptr != ')')
             return -1;
+        skip++;
     }
     if (have_tenth == false)
         val *= 10;
