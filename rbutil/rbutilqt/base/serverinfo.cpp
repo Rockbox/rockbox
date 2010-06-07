@@ -112,7 +112,7 @@ QVariant ServerInfo::value(enum ServerInfos info)
 
     QString s = ServerInfoList[i].name;
     s.replace(":platform:", RbSettings::value(RbSettings::CurrentPlatform).toString());
-    qDebug() << "[ServerIndo] GET:" << s << serverInfos.value(s, ServerInfoList[i].def).toString();
+    qDebug() << "[ServerInfo] GET:" << s << serverInfos.value(s, ServerInfoList[i].def).toString();
     return serverInfos.value(s, ServerInfoList[i].def);
 }
 
