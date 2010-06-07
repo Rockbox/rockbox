@@ -20,12 +20,10 @@
 # All sections should list what font and status bar setting they "like".
 
 <wps>
-# Name of the theme
-Name: ipodVOL
-# Name of the WPS _excluding_ extension
-WPS: ipodVOL
+# Name of the WPS _including_ extension
+Name: ipodVOL.wps
 # default RWPS for the theme (to be loaded with the same theme file)
-RWPS: rockbox_default
+RWPS: rockbox_default.rwps
 # Name of the creator of the WPS
 Author: xameius
 # preferred font
@@ -44,9 +42,10 @@ selector type: bar (inverse)
 </wps>
 
 <wps>
-Name: rockbox_default
-WPS: rockbox_default
-RWPS: rockbox_default
+Name: rockbox_default.wps
+RWPS: rockbox_default.rwps
+SBS:
+RSBS:
 Author: Rockbox team
 Font: 08-Schumacher-Clean.fnt
 Font.11x2x1:
@@ -60,9 +59,10 @@ selector type: bar (inverse)
 </wps>
 
 <wps>
-Name: boxes
-WPS: boxes
-rwps: boxes
+Name: boxes.wps
+rwps: boxes.rwps
+SBS:
+RSBS:
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: 08-Schumacher-Clean.fnt
 Statusbar: top
@@ -78,9 +78,8 @@ remote ui viewport:
 </wps>
 
 <wps>
-Name: engineeer2
-WPS: engineeer2
-RWPS: engineeer2
+Name: engineeer2.wps
+RWPS: engineeer2.rwps
 SBS:
 RSBS:
 Author: Magnus Westerlund
@@ -95,9 +94,8 @@ remote ui viewport:
 </wps>
 
 <wps>
-Name: iAmp
-WPS: iAmp
-RWPS: iAmp
+Name: iAmp.wps
+RWPS: iAmp.rwps
 SBS:
 RSBS:
 Author: Raymond Hoh
@@ -112,9 +110,8 @@ remote ui viewport:
 </wps>
 
 <wps>
-Name: zezayer
-WPS: zezayer
-RWPS: zezayer
+Name: zezayer.wps
+RWPS: zezayer.rwps
 SBS:
 RSBS:
 Author: Jake Owen
@@ -129,44 +126,43 @@ remote ui viewport:
 </wps>
 
 <rwps>
-Name: zezayer
+Name: zezayer.rwps
 Author: Dominik Riebeling
 Font: 08-Nedore.fnt
 Statusbar: top
 </rwps>
 
 <rwps>
-Name: rockbox_default
+Name: rockbox_default.rwps
 Author: Rockbox team
 Font: 08-Schumacher-Clean.fnt
 Statusbar: top
 </rwps>
 
 <rwps>
-Name: iAmp
+Name: iAmp.rwps
 Author: Raymond Hoh
 Font: 12-Nimbus.fnt
 Statusbar: top
 </rwps>
 
 <rwps>
-Name: boxes
+Name: boxes.rwps
 Author: Christi Scarborough
 Font: 08-Schumacher-Clean.fnt
 Statusbar: top
 </rwps>
 
 <rwps>
-Name: engineeer2
+Name: engineeer2.rwps
 Author: Magnus Westerlund
 Font: 08-Nedore.fnt
 Statusbar: top
 </rwps>
 
 <wps>
-Name: DancePuffDuo
-WPS: DancePuffDuo
-RWPS: DancePuffDuo
+Name: DancePuffDuo.wps
+RWPS: DancePuffDuo.rwps
 SBS:
 RSBS:
 Author: Chris Oxtoby
@@ -183,16 +179,15 @@ remote ui viewport:
 </wps>
 
 <rwps>
-Name: DancePuffDuo
+Name: DancePuffDuo.rwps
 Author: Chris Oxtoby
 Font: 13-Nimbus.fnt
 Statusbar: top
 </rwps>
 
 <wps>
-Name: iCatcher
-WPS: iCatcher
-RWPS: iCatcher
+Name: iCatcher.wps
+RWPS: iCatcher.rwps
 SBS:
 RSBS:
 Author: Ioannis Koutoulakis
@@ -221,7 +216,7 @@ remote ui viewport:
 </wps>
 
 <rwps>
-Name: iCatcher
+Name: iCatcher.rwps
 Author: Ioannis Koutoulakis
 Font.160x128x2: 09-Nedore.fnt
 Font.220x176x16: 14-Nimbus.fnt
@@ -229,9 +224,8 @@ Statusbar: top
 </rwps>
 
 <wps>
-Name: UniCatcher
-WPS: UniCatcher
-RWPS: UniCatcher
+Name: UniCatcher.wps
+RWPS: UniCatcher.rwps
 SBS:
 RSBS:
 Author: Ioannis Koutoulakis
@@ -248,16 +242,15 @@ remote ui viewport:
 </wps>
 
 <rwps>
-Name: UniCatcher
+Name: UniCatcher.rwps
 Author: Ioannis Koutoulakis
 Font: 16-GNU-Unifont.fnt
 Statusbar: top
 </rwps>
 
 <wps>
-Name: Rockboxed
-WPS: Rockboxed
-RWPS: rockbox_default
+Name: Rockboxed.wps
+RWPS: rockbox_default.rwps
 SBS:
 RSBS:
 Author: Roan Horning
@@ -286,15 +279,13 @@ remote ui viewport:
 </wps>
 
 <wps>
-Name: progressive
-WPS: progressive
+Name: progressive.wps
 Author: Jens Arnold
 </wps>
 
 <wps>
-Name: cabbiev2
-WPS: cabbiev2
-RWPS: cabbiev2
+Name: cabbiev2.wps
+RWPS: cabbiev2.rwps
 SBS:
 RSBS:
 # Real name of the creator of the WPS
@@ -390,7 +381,7 @@ remote ui viewport:
 </wps>
 
 <rwps>
-Name: cabbiev2
+Name: cabbiev2.rwps
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 Font: 12-Adobe-Helvetica.fnt
 Statusbar: top
