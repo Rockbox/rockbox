@@ -175,21 +175,6 @@ void corelock_init(struct corelock *cl);
 void corelock_lock(struct corelock *cl);
 int corelock_try_lock(struct corelock *cl);
 void corelock_unlock(struct corelock *cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-/* Use native atomic swap/exchange instruction */
-struct corelock
-{
-    volatile unsigned char locked;
-} __attribute__((packed));
-
-#define corelock_init(cl) \
-    ({ (cl)->locked = 0; })
-#define corelock_lock(cl) \
-    ({ while (test_and_set(&(cl)->locked, 1)); })
-#define corelock_try_lock(cl) \
-    ({ test_and_set(&(cl)->locked, 1) ? 0 : 1; })
-#define corelock_unlock(cl) \
-    ({ (cl)->locked = 0; })
 #else
 /* No atomic corelock op needed or just none defined */
 #define corelock_init(cl)
@@ -383,35 +368,6 @@ struct core_entry
     o = *(a);            \
     *(a) = (v);          \
     corelock_unlock(cl); \
-    o; })
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-/* atomic */
-#define test_and_set(a, v, ...) \
-    xchg8((a), (v))
-#define xchg8(a, v, ...) \
-({  uint32_t o;                \
-    asm volatile(              \
-        "swpb %0, %1, [%2]"    \
-        : "=&r"(o)             \
-        : "r"(v),              \
-          "r"((uint8_t*)(a))); \
-    o; })
-/* atomic */
-#define xchg32(a, v, ...) \
-({  uint32_t o;                 \
-    asm volatile(               \
-        "swp %0, %1, [%2]"      \
-        : "=&r"(o)              \
-        : "r"((uint32_t)(v)),   \
-          "r"((uint32_t*)(a))); \
-    o; })
-/* atomic */
-#define xchgptr(a, v, ...) \
-({  typeof (*(a)) o;        \
-    asm volatile(           \
-        "swp %0, %1, [%2]"  \
-        : "=&r"(o)          \
-        : "r"(v), "r"(a));  \
     o; })
 #endif /* locking selection */
 #elif defined (CPU_COLDFIRE)

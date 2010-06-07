@@ -793,7 +793,6 @@ Lyre prototype 1 */
 #define CORELOCK_NONE   0
 #define SW_CORELOCK     1 /* Mutual exclusion provided by a software algorithm
                              and not a special semaphore instruction */
-#define CORELOCK_SWAP   2 /* A swap (exchange) instruction */
 
 #if defined(CPU_PP)
 #define IDLE_STACK_SIZE  0x80
@@ -818,11 +817,7 @@ Lyre prototype 1 */
 #define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   core
 
-#ifdef CPU_PP
 #define CONFIG_CORELOCK SW_CORELOCK /* SWP(B) is broken */
-#else
-#define CONFIG_CORELOCK CORELOCK_SWAP
-#endif
 
 #endif /* !defined(BOOTLOADER) && CONFIG_CPU != PP5002 */
 
