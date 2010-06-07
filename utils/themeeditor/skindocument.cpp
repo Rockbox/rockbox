@@ -110,6 +110,7 @@ void SkinDocument::setupUI()
     /* Setting up the text edit */
     layout = new QHBoxLayout;
     editor = new QPlainTextEdit(this);
+    editor->setLineWrapMode(QPlainTextEdit::NoWrap);
     layout->addWidget(editor);
 
     setLayout(layout);
