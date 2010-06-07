@@ -1156,6 +1156,8 @@ static int parse_timeout(const char *wps_bufptr,
     (void)wps_data; /* Kill the warning */
     if (*wps_bufptr == '(')
     {
+        wps_bufptr++;
+        skip++;
         while ( isdigit(*wps_bufptr) || *wps_bufptr == '.' )
         {
             if (*wps_bufptr != '.')
