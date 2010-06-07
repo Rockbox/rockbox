@@ -363,11 +363,13 @@ void tv_finalize_window(void)
 {
     tv_finalize_text_reader();
 
+#ifdef HAVE_LCD_BITMAP
     /* restore font */
     if (rb->strcmp(rb->global_settings->font_file, prefs->font_name))
     {
         tv_set_font(rb->global_settings->font_file);
     }
+#endif
 }
 
 void tv_move_window(int window_delta, int column_delta)
