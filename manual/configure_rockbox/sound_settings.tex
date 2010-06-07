@@ -325,65 +325,95 @@ change to customise your listening experience.
   of the five EQ bands.
   
     \begin{btnmap}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollFwd}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
-      \opt{SANSA_E200_PAD}{\ButtonScrollBack}
-      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonRight}
-      \opt{COWON_D2_PAD}{\TouchMidRight}
-    \opt{HAVEREMOTEKEYMAP}{& 
-      \opt{IRIVER_RC_H100_PAD,GIGABEAT_RC_PAD}{\ButtonRCFF}
-        }
-      & Raises the highlighted parameter.\\
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD%
+          ,GIGABEAT_S_PAD,SANSA_C200_PAD,IAUDIO_M3_PAD,MROBE100_PAD}{\ButtonRight}
+      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
+      \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+      \opt{PBELL_VIBE500_PAD}{\ButtonUp}
+      \opt{touchscreen}{\TouchMidRight}
+          &
+      \opt{HAVEREMOTEKEYMAP}{
+          \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCRight}
+          &}
+      Raises the highlighted parameter.
+          \\
       %
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollBack}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
-      \opt{SANSA_E200_PAD}{\ButtonScrollFwd}
-      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonLeft}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD%
+          ,GIGABEAT_S_PAD,SANSA_C200_PAD,IAUDIO_M3_PAD,MROBE100_PAD}{\ButtonLeft}
+      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
+      \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+      \opt{PBELL_VIBE500_PAD}{\ButtonDown}
       \opt{touchscreen}{\TouchMidLeft}
-    \opt{HAVEREMOTEKEYMAP}{& 
-      \opt{IRIVER_RC_H100_PAD,GIGABEAT_RC_PAD}{\ButtonRCRew}
-        }
-      & Lowers the highlighted parameter.\\
+          &
+      \opt{HAVEREMOTEKEYMAP}{
+          \opt{GIGABEAT_RC_PAD}{\ButtonRCRew}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCLeft}
+          &}
+      Lowers the highlighted parameter.
+          \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,PBELL_VIBE500_PAD}{\ButtonLeft}
-      \opt{SANSA_E200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonUp}
-      \opt{COWON_D2_PAD}{\ActionStdPrev}
-    \opt{HAVEREMOTEKEYMAP}{& }
-      \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp}
-      & Moves to the previous EQ band. \\
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD,PBELL_VIBE500_PAD}{\ButtonLeft}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+          ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD}{\ButtonUp}
+      \opt{IRIVER_H10_PAD}{\ButtonRew}
+      \opt{touchscreen}{\ActionStdPrev}
+          &
+      \opt{HAVEREMOTEKEYMAP}{
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCRew}
+          \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCUp}
+          &}
+      Moves to the previous EQ band.
+          \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRight}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
-      \opt{SANSA_E200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonDown}
-      \opt{COWON_D2_PAD}{\ActionStdNext}
-    \opt{HAVEREMOTEKEYMAP}{& }
-      \opt{GIGABEAT_RC_PAD}{\ButtonRCVolDown}
-      & Moves to the next EQ band. \\
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+          ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD}{\ButtonDown}
+      \opt{IRIVER_H10_PAD}{\ButtonFF}
+      \opt{touchscreen}{\ActionStdNext}
+          &
+      \opt{HAVEREMOTEKEYMAP}{
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCFF}
+          \opt{GIGABEAT_RC_PAD}{\ButtonRCVolDown}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCDown}
+          &}
+      Moves to the next EQ band.
+          \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
-      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD}{\ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_X5_PAD,SANSA_C200_PAD%
+          ,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,MROBE100_PAD}{\ButtonSelect}
       \opt{PBELL_VIBE500_PAD}{\ButtonOK}
-      \opt{touchscreen}{\ButtonMenu{} or \TouchCenter}
-    \opt{HAVEREMOTEKEYMAP}{&       
-      \opt{IRIVER_RC_H100_PAD}{\ButtonRCSelect}
-      \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}
-        }
-      & Toggles the cursor among the three parameters (gain, centre frequency,
-      Q) for the selected EQ band.\\
+      \opt{IRIVER_H10_PAD}{\ButtonRight}
+      \opt{IAUDIO_M3_PAD}{\ButtonPlay}
+      \opt{touchscreen}{\TouchCenter
+          \opt{COWON_D2_PAD}{/ \ButtonMenu}}
+          &
+      \opt{HAVEREMOTEKEYMAP}{     
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCSelect}
+          \opt{GIGABEAT_RC_PAD,IAUDIO_RC_PAD}{\ButtonRCPlay}
+          &}
+      Toggles the cursor among the three parameters (gain, centre frequency,
+      Q) for the selected EQ band
+          \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
       \opt{IAUDIO_X5_PAD}{\ButtonPower/\ButtonRec}
-      \opt{SANSA_E200_PAD}{\ButtonPower/\ButtonRight}
-      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonPower}
+      \opt{IAUDIO_M3_PAD}{\ButtonRec}
+      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD}{\ButtonLeft}
+      \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,MROBE100_PAD}{\ButtonPower}
       \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
-      \opt{touchscreen}{\ButtonPower{} or \TouchTopLeft}
-    \opt{HAVEREMOTEKEYMAP}{& 
-      \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
-      \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp}
-        }
-      & Exits the graphic EQ screen.\\
+      \opt{touchscreen}{\TouchTopLeft
+          \opt{COWON_D2_PAD}{/ \ButtonPower}}
+          &
+      \opt{HAVEREMOTEKEYMAP}{ 
+          \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
+          \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp}
+          \opt{IAUDIO_RC_PAD}{\ButtonRCRec}
+          &}
+      Exits the graphic EQ screen.
+          \\
     \end{btnmap}
 
   \item[Pre-cut.]
