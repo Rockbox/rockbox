@@ -111,7 +111,7 @@ enum plugin_status plugin_start(const void* file)
                 if (prefs->windows > 1)
                 {
                     /* Screen left */
-                    tv_scroll_left(TV_HORIZONTAL_SCROLL_WINDOW);
+                    tv_scroll_left(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
                     /* scroll to previous page */
@@ -128,7 +128,7 @@ enum plugin_status plugin_start(const void* file)
                 if (prefs->windows > 1)
                 {
                     /* Screen right */
-                    tv_scroll_right(TV_HORIZONTAL_SCROLL_WINDOW);
+                    tv_scroll_right(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
                     /* scroll to next page */

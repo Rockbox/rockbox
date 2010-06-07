@@ -30,7 +30,10 @@
 
 static struct tv_preferences new_prefs;
 
-/* scrollbar menu */
+/*                                 */
+/* horizontal scroll settings menu */
+/*                                 */
+
 #ifdef HAVE_LCD_BITMAP
 static bool tv_horizontal_scrollbar_setting(void)
 {
@@ -42,7 +45,38 @@ static bool tv_horizontal_scrollbar_setting(void)
     return rb->set_option("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar, INT,
                            names, 2, NULL);
 }
+#endif
 
+static bool tv_horizontal_scroll_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Scroll by Screen", -1},
+        {"Scroll by Column", -1},
+    };
+
+    return rb->set_option("Scroll Mode", &new_prefs.horizontal_scroll_mode, INT,
+                          names, 2, NULL);
+}
+
+#ifdef HAVE_LCD_BITMAP
+MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Scrollbar",
+                  tv_horizontal_scrollbar_setting,
+                  NULL, NULL, Icon_NOICON);
+#endif
+MENUITEM_FUNCTION(horizontal_scroll_mode_item, 0, "Scroll Mode",
+                  tv_horizontal_scroll_mode_setting, NULL, NULL, Icon_NOICON);
+
+MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
+#ifdef HAVE_LCD_BITMAP
+          &horizontal_scrollbar_item,
+#endif
+          &horizontal_scroll_mode_item);
+
+/*                               */
+/* vertical scroll settings menu */
+/*                               */
+
+#ifdef HAVE_LCD_BITMAP
 static bool tv_vertical_scrollbar_setting(void)
 {
     static const struct opt_items names[] = {
@@ -53,18 +87,64 @@ static bool tv_vertical_scrollbar_setting(void)
     return rb->set_option("Vertical Scrollbar", &new_prefs.vertical_scrollbar, INT,
                            names, 2, NULL);
 }
-
-MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Horizontal",
-                  tv_horizontal_scrollbar_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Vertical",
-                  tv_vertical_scrollbar_setting,
-                  NULL, NULL, Icon_NOICON);
-MAKE_MENU(scrollbar_menu, "Scrollbar", NULL, Icon_NOICON,
-          &horizontal_scrollbar_item, &vertical_scrollbar_item);
 #endif
 
+static bool tv_vertical_scroll_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Scroll by Page", -1},
+        {"Scroll by Line", -1},
+    };
+
+    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, INT,
+                          names, 2, NULL);
+}
+
+static bool tv_page_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No",  -1},
+        {"Yes", -1},
+    };
+
+    return rb->set_option("Overlap Pages", &new_prefs.page_mode, INT,
+                           names, 2, NULL);
+}
+
+static bool tv_autoscroll_speed_setting(void)
+{
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+                       &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
+}
+
+#ifdef HAVE_LCD_BITMAP
+MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
+                  tv_vertical_scrollbar_setting,
+                  NULL, NULL, Icon_NOICON);
+#endif
+MENUITEM_FUNCTION(vertical_scroll_mode_item, 0, "Scroll Mode",
+                  tv_vertical_scroll_mode_setting, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", tv_page_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
+                  tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
+
+MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
+#ifdef HAVE_LCD_BITMAP
+          &vertical_scrollbar_item,
+#endif
+          &vertical_scroll_mode_item, &page_mode_item, &autoscroll_speed_item);
+
+/*                      */
+/* scroll settings menu */
+/*                      */
+
+MAKE_MENU(scroll_menu, "Scroll Settings", NULL, Icon_NOICON,
+          &horizontal_scroll_menu, &vertical_scroll_menu);
+
+/*           */
 /* main menu */
+/*           */
 
 static bool tv_encoding_setting(void)
 {
@@ -111,17 +191,6 @@ static bool tv_windows_setting(void)
                        &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
-static bool tv_scroll_mode_setting(void)
-{
-    static const struct opt_items names[] = {
-        {"Scroll by Page", -1},
-        {"Scroll by Line", -1},
-    };
-
-    return rb->set_option("Scroll Mode", &new_prefs.scroll_mode, INT,
-                          names, 2, NULL);
-}
-
 static bool tv_alignment_setting(void)
 {
     static const struct opt_items names[] = {
@@ -134,17 +203,6 @@ static bool tv_alignment_setting(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static bool tv_page_mode_setting(void)
-{
-    static const struct opt_items names[] = {
-        {"No",  -1},
-        {"Yes", -1},
-    };
-
-    return rb->set_option("Overlap Pages", &new_prefs.page_mode, INT,
-                           names, 2, NULL);
-}
-
 static bool tv_header_setting(void)
 {
     int len = (rb->global_settings->statusbar == STATUSBAR_TOP)? 4 : 2;
@@ -280,12 +338,6 @@ static bool tv_font_setting(void)
 }
 #endif
 
-static bool tv_autoscroll_speed_setting(void)
-{
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
-                       &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
-}
-
 MENUITEM_FUNCTION(encoding_item, 0, "Encoding", tv_encoding_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", tv_word_wrap_setting,
@@ -297,8 +349,6 @@ MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page", tv_windows_setting,
 MENUITEM_FUNCTION(alignment_item, 0, "Alignment", tv_alignment_setting,
                   NULL, NULL, Icon_NOICON);
 #ifdef HAVE_LCD_BITMAP
-MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", tv_page_mode_setting,
-                  NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(header_item, 0, "Show Header", tv_header_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
@@ -306,17 +356,14 @@ MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
 MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
                   NULL, NULL, Icon_NOICON);
 #endif
-MENUITEM_FUNCTION(scroll_mode_item, 0, "Scroll Mode", tv_scroll_mode_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
-                  tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
+
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
             &alignment_item,
 #ifdef HAVE_LCD_BITMAP
-            &scrollbar_menu, &page_mode_item, &header_item, &footer_item, &font_item,
+            &header_item, &footer_item, &font_item,
 #endif
-            &scroll_mode_item, &autoscroll_speed_item);
+            &scroll_menu);
 
 static enum tv_menu_result tv_options_menu(void)
 {

@@ -46,8 +46,6 @@ TODO list
 
   - when the line_mode is reflow, allow to specify indent spaces.
 
-  - for the horizontal scroll, allow the select scroll by screen/scroll by column for the settings menu.
-
   - draw images that are linked to the text. (<img src="...">)
 
   - play audios that are linked to the text. (<audio src="...">)

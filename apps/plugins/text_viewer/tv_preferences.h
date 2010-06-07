@@ -71,9 +71,14 @@ struct tv_preferences {
     } footer_mode;
 
     enum {
-        PAGE=0,
+        SCREEN = 0,
+        COLUMN,
+    } horizontal_scroll_mode;
+
+    enum {
+        PAGE = 0,
         LINE,
-    } scroll_mode;
+    } vertical_scroll_mode;
 
     int autoscroll_speed;
 

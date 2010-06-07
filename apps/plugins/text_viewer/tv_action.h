@@ -29,7 +29,7 @@
 enum tv_horizontal_scroll_mode
 {
     TV_HORIZONTAL_SCROLL_COLUMN, /* left/right one column */
-    TV_HORIZONTAL_SCROLL_WINDOW, /* left/right one window */
+    TV_HORIZONTAL_SCROLL_SCREEN, /* left/right one screen */
     TV_HORIZONTAL_SCROLL_PREFS,  /* left/right follows the settings */
 };
 

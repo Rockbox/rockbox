@@ -89,7 +89,7 @@ void tv_scroll_up(enum tv_vertical_scroll_mode mode)
     int offset_line = -1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->vertical_scroll_mode == PAGE))
     {
         offset_page--;
 #ifdef HAVE_LCD_BITMAP
@@ -105,7 +105,7 @@ void tv_scroll_down(enum tv_vertical_scroll_mode mode)
     int offset_line = 1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->vertical_scroll_mode == PAGE))
     {
         offset_page++;
 #ifdef HAVE_LCD_BITMAP
@@ -120,7 +120,8 @@ void tv_scroll_left(enum tv_horizontal_scroll_mode mode)
     int offset_window = 0;
     int offset_column = 0;
 
-    if (mode == TV_HORIZONTAL_SCROLL_COLUMN)
+    if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && prefs->horizontal_scroll_mode == COLUMN))
     {
         /* Scroll left one column */
         offset_column--;
@@ -138,7 +139,8 @@ void tv_scroll_right(enum tv_horizontal_scroll_mode mode)
     int offset_window = 0;
     int offset_column = 0;
 
-    if (mode == TV_HORIZONTAL_SCROLL_COLUMN)
+    if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && prefs->horizontal_scroll_mode == COLUMN))
     {
         /* Scroll right one column */
         offset_column++;
@@ -159,7 +161,7 @@ void tv_top(void)
 void tv_bottom(void)
 {
     tv_move_screen(0, 0, SEEK_END);
-    if (prefs->scroll_mode == PAGE)
+    if (prefs->vertical_scroll_mode == PAGE)
         tv_move_screen(0, -tv_get_screen_pos()->line, SEEK_CUR);
 }
 
@@ -172,7 +174,7 @@ enum tv_menu_result tv_menu(void)
     res = tv_display_menu();
 
     tv_convert_fpos(cur_file_pos, &cur_pos);
-    if (prefs->scroll_mode == PAGE)
+    if (prefs->vertical_scroll_mode == PAGE)
         cur_pos.line = 0;
 
     tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);

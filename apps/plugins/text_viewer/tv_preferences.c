@@ -38,7 +38,8 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
     /*
      * the following items do not check.
      *   - alignment
-     *   - scroll_mode
+     *   - horizontal_scroll_mode
+     *   - vertical_scroll_mode
      *   - page_mode
      *   - font
      *   - autoscroll_speed
@@ -94,7 +95,8 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->line_mode = NORMAL;
     p->windows = 1;
     p->alignment = LEFT;
-    p->scroll_mode = PAGE;
+    p->horizontal_scroll_mode = SCREEN;
+    p->vertical_scroll_mode = PAGE;
     p->page_mode = NO_OVERLAP;
     p->horizontal_scrollbar = SB_OFF;
     p->vertical_scrollbar = SB_OFF;
