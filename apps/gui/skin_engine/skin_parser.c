@@ -1026,6 +1026,8 @@ static int parse_viewportcolour(const char *wps_bufptr,
 {
     (void)wps_data;
     const char *ptr = wps_bufptr;
+    int i;
+    bool found_text;
     struct viewport_colour *colour = skin_buffer_alloc(sizeof(struct viewport_colour));
     uint32_t set;
     if (*ptr != '(' || !colour)
@@ -1040,6 +1042,31 @@ static int parse_viewportcolour(const char *wps_bufptr,
                                         token->type == WPS_TOKEN_VIEWPORT_FGCOLOUR);
     colour->vp = &curr_vp->vp;
     token->value.data = colour;
+    /* If there havnt been any text tags between the %V() line and here use
+     * the colour as the viewport colour. fixes scrolling lines not
+     * having the correct colour */
+    i = curr_vp->lines->sublines.first_token_idx;
+    found_text = false;
+    while (!found_text && i< curr_vp->lines->sublines.last_token_idx)
+    {
+        if (wps_data->tokens[i++].type != WPS_TOKEN_CHARACTER &&
+            wps_data->tokens[i++].type != WPS_TOKEN_VIEWPORT_FGCOLOUR && 
+            wps_data->tokens[i++].type != WPS_TOKEN_VIEWPORT_BGCOLOUR )
+            found_text = true;
+    }
+    if (!found_text)
+    {
+        if (token->type == WPS_TOKEN_VIEWPORT_FGCOLOUR)
+        {
+            curr_vp->start_fgcolour = colour->colour;
+            curr_vp->vp.fg_pattern = colour->colour;
+        }
+        else
+        {
+            curr_vp->start_bgcolour = colour->colour;
+            curr_vp->vp.bg_pattern = colour->colour;
+        }
+    }
     ptr++;
     return ptr - wps_bufptr;
 }
