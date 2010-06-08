@@ -1090,7 +1090,7 @@ static int parse_image_special(const char *wps_bufptr,
     if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| or %Xd */
-        if (*(wps_bufptr+1) == 'd')
+        if (!strncmp(wps_bufptr, "(d)", 3))
         {
             wps_data->backdrop = NULL;
             return skip_end_of_line(wps_bufptr);
