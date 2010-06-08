@@ -173,7 +173,7 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF"},
     { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss"},
-    { SKIN_TOKEN_ALBUMART_DISPLAY,      "C" , ""},
+    { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , ""},
     
     { SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S"},
     { SKIN_TOKEN_UIVIEWPORT_ENABLE,     "VI" , "S"},

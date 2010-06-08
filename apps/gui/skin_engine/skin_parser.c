@@ -390,7 +390,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_NO_TOKEN,                       "Fl",  0,       parse_font_load },
 #ifdef HAVE_ALBUMART
     { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
-    { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_STATIC,  parse_albumart_display },
+    { WPS_TOKEN_ALBUMART_DISPLAY,         "Cd",   WPS_REFRESH_STATIC,  parse_albumart_display },
 #endif
 
     { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC,

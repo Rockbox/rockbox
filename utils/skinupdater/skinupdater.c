@@ -190,6 +190,10 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         PUTCH(out, '(');
         len += 1+dump_arg(out, start+1, 2, true);
     }
+    else if (MATCH("C"))
+    {
+        fprintf(out, "%%Cd");
+    }
     else if (MATCH("Cl"))
     {
         int read;
@@ -394,6 +398,10 @@ top:
             {
                 PUTCH(out, *in++);
             }
+        }
+        else if (*in == ';')
+        {
+            PUTCH(out, *in++);
         }
         else 
         {
