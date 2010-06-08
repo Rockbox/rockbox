@@ -1267,6 +1267,8 @@ static int parse_progressbar(const char *wps_bufptr,
         line_num++;
         line = line->next;
     }
+    if (curr_vp->label != VP_DEFAULT_LABEL)
+        line_num--;
     pb->vp = vp;
     pb->have_bitmap_pb = false;
     pb->bm.data = NULL; /* no bitmap specified */
