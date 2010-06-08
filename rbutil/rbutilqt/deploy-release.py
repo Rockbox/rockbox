@@ -434,8 +434,8 @@ def main():
             ver = "v" + re.sub('^[^\d]+', '', tag)
         else:
             trunk = gettrunkrev(svnbase)
-            sourcefolder = workfolder + "/rbutil-r" + str(trunk) + "/"
-            archivename = "rbutil-r" + str(trunk) + "-src.tar.bz2"
+            sourcefolder = workfolder + "/" + program + "-r" + str(trunk) + "/"
+            archivename = program + "-r" + str(trunk) + "-src.tar.bz2"
             ver = "r" + str(trunk)
         os.mkdir(sourcefolder)
     else:
