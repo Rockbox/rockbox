@@ -63,11 +63,17 @@ int lcd_default_contrast(void)
 
 void lcd_powersave(bool on)
 {
-/* What is the point of having else construct here? */
     if (on)
+        /* enter power saving mode
+         * this turns off lcd without controller reset
+         * probably ~1mA saving
+         */
         lcd_write_command(LCD_SET_POWER_SAVE | 1);
     else
-        lcd_write_command(LCD_SET_POWER_SAVE | 1);
+        /* leave lcd power saving mode
+         * no need to reset and initialize controller
+         */
+        lcd_write_command(LCD_SET_POWER_SAVE | 0);
 }
 
 void lcd_set_contrast(int val)
