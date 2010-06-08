@@ -197,7 +197,7 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|S"},
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "" },
-    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiI"},
+    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiS"},
     
     { SKIN_TOKEN_HAVE_RECORDING,        "Rp"   , ""},
     { SKIN_TOKEN_IS_RECORDING,          "Rr"   , ""},
