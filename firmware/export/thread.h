@@ -342,7 +342,7 @@ struct core_entry
 #endif
 
 /* Macros generate better code than an inline function is this case */
-#if (defined (CPU_PP) || defined (CPU_ARM))
+#if defined (CPU_ARM)
 /* atomic */
 #if CONFIG_CORELOCK == SW_CORELOCK
 #define test_and_set(a, v, cl) \
