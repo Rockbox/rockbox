@@ -26,20 +26,14 @@
     .global    start
 start:
     /* Exception vectors */
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-    ldr     pc, [pc, #28]
-
-#if CONFIG_CPU==S5L8700
-    .word 0x43554644 /* DFUC */
-#else
-    .word 0xdeadbeef /* to keep the same PC offsets */
-#endif
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
+    ldr     pc, [pc, #24]
 
 .word newstart
 .word undef_instr_handler
