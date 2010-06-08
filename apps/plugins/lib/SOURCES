@@ -9,6 +9,7 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 buflib.c
+simple_viewer.c
 display_text.c
 strncpy.c
 
