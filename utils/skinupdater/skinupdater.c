@@ -277,6 +277,19 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         PUTCH(out, '(');
         len += 1+dump_arg(out, start+1, 3, true);
     }
+    else if (MATCH("Vi"))
+    {
+        int read = 1;
+        
+        PUTCH(out, '(');
+        if ((start[1] >= 'a' && start[1] <= 'z') ||
+            (start[1] >= 'A' && start[1] <= 'Z'))
+        {
+            read = 1+dump_arg(out, start+1, 1, false);
+            PUTCH(out, ',');
+        }
+        len += read + dump_viewport_tags(out, start+read);
+    }
     else if (MATCH("Vl") || MATCH("Vi"))
     {
         int read;
@@ -292,7 +305,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("X"))
     {
-        if (*start+1 == 'd')
+        if (*start == 'd')
         {
             fprintf(out, "(d)");
             len ++;
