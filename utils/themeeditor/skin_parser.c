@@ -78,7 +78,10 @@ struct skin_element* skin_parse(const char* document)
         *to_write = skin_parse_viewport(&cursor);
         last = *to_write;
         if(!last)
+        {
+            skin_free_tree(root); /* Clearing any memory already used */
             return NULL;
+        }
 
         /* Making sure last is at the end */
         while(last->next)
