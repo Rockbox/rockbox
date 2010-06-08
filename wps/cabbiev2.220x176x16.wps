@@ -19,7 +19,7 @@
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
 
 #NowPlaying
-%?C<%Vd(a)%C|%Vd(b)>
+%?C<%Vd(a)%Cd|%Vd(b)>
 
 %ax%Vl(a,105,30,-,90,1)
 %s%al%?it<%it|%fn>

@@ -19,7 +19,7 @@
 %?ps<%xd(D)>
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
-%?C<%C%Vd(a)|%Vd(b)>
+%?C<%Cd%Vd(a)|%Vd(b)>
 
 %ax%Vl(a,65,10,-,60,1)
 %s%al%?it<%it|%fn>

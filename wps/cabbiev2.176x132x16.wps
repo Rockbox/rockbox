@@ -18,7 +18,7 @@
 %?ps<%xd(D)>
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
-%?C<%C%Vd(a)|%Vd(b)>
+%?C<%Cd%Vd(a)|%Vd(b)>
 
 #NowPlaying
 %ax%Vl(a,81,12,-,74,1)

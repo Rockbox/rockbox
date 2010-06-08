@@ -1482,7 +1482,7 @@ static int parse_albumart_display(const char *wps_bufptr,
                                       struct wps_data *wps_data)
 {
     (void)wps_bufptr;
-    struct wps_token *prev = token-1;
+    (void)token;
     if (wps_data->albumart)
     {
         wps_data->albumart->vp = &curr_vp->vp;
