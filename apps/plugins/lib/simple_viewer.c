@@ -92,7 +92,6 @@ static void calc_first_line(struct view_info *info, int line)
     if (line < 0)
         line = 0;
 
-    DEBUGF("%d -> %d\n", info->line, line);
     if (info->line <= line)
     {
         ptr += info->start;
@@ -105,7 +104,6 @@ static void calc_first_line(struct view_info *info, int line)
     }
     info->start = ptr - info->text;
     info->line = i;
-    DEBUGF("%d: %d\n", info->line, info->start);
 }
 
 static int init_view(struct view_info *info,
@@ -161,19 +159,15 @@ static void draw_text(struct view_info *info)
     }
 
     max_show = MIN(info->line_count - info->line, info->display_lines);
-    DEBUGF("draw_text: %d-%d/%d\n",
-           info->line, info->line + max_show, info->line_count);
     text = info->text + info->start;
 
     for (i = 0; i < max_show; i++, lines++)
     {
         ptr = get_next_line(text, info);
-        DEBUGF("%d>%d-%d, ", i, text-info->text, ptr-text);
         rb->strlcpy(output, text, ptr-text+1);
         rb->lcd_puts(0, lines, output);
         text = ptr;
     }
-    DEBUGF("\n");
 
     rb->lcd_update();
 }
