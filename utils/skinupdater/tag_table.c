@@ -173,7 +173,7 @@ struct tag_info legal_tags[] =
     
     { "Fl" , "IF"},
     { "Cl" , "IISS"},
-    { "C" , ""},
+    { "C" , "important"},
     
     { "Vd" , "S"},
     { "VI" , "S"},

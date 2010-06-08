@@ -391,6 +391,7 @@ static const struct wps_tag all_tags[] = {
 #ifdef HAVE_ALBUMART
     { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
     { WPS_TOKEN_ALBUMART_DISPLAY,         "Cd",   WPS_REFRESH_STATIC,  parse_albumart_display },
+    { WPS_TOKEN_ALBUMART_FOUND,           "C", WPS_REFRESH_STATIC, NULL },
 #endif
 
     { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC,
@@ -1482,11 +1483,7 @@ static int parse_albumart_display(const char *wps_bufptr,
 {
     (void)wps_bufptr;
     struct wps_token *prev = token-1;
-    if ((wps_data->num_tokens >= 1) && (prev->type == WPS_TOKEN_CONDITIONAL))
-    {
-        token->type = WPS_TOKEN_ALBUMART_FOUND;
-    }
-    else if (wps_data->albumart)
+    if (wps_data->albumart)
     {
         wps_data->albumart->vp = &curr_vp->vp;
     }

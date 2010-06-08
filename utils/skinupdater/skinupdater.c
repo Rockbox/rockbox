@@ -116,6 +116,12 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         fprintf(out, "%s", tag->name);
         return strlen(tag->name);
     }
+    if (!strcmp(tag->name, "C"))
+    {
+        fprintf(out, "Cd");
+        return 1;
+    }
+        
     fprintf(out, "%s", tag->name);
     len += strlen(tag->name);
     start += len;
@@ -189,10 +195,6 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     {
         PUTCH(out, '(');
         len += 1+dump_arg(out, start+1, 2, true);
-    }
-    else if (MATCH("C"))
-    {
-        fprintf(out, "%%Cd");
     }
     else if (MATCH("Cl"))
     {
@@ -365,7 +367,16 @@ top:
                     goto top;
                     break;
                 case '?':
-                    PUTCH(out, *in++);
+                    if (in[1] == 'C' && in[2] == '<')
+                    {
+                        fprintf(out, "?C");
+                        in += 2;
+                        goto top;
+                    }
+                    else
+                    {
+                        PUTCH(out, *in++);
+                    }
                     break;
             }
             len = parse_tag(out, in, level>0);
