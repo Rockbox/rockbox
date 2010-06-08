@@ -1272,7 +1272,10 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
 
         /* loop over the lines for this viewport */
         struct skin_line *line;
-        int line_count = 0;
+        /* %V() doesnt eat the \n which means the first line of text
+         * is actually going to be one line down. so set line_count to -1 
+         * unless we are using the default viewport which doesnt have this problem */
+        int line_count = skin_viewport->label==VP_DEFAULT_LABEL?0:-1;
 
         for (line = skin_viewport->lines; line; line = line->next, line_count++)
         {
@@ -1332,7 +1335,7 @@ static bool skin_redraw(struct gui_wps *gwps, unsigned refresh_mode)
             }
 #endif
 
-            if (update_line && !hidden_vp &&
+            if (line_count>= 0 && update_line && !hidden_vp &&
                 /* conditionals clear the line which means if the %Vd is put into the default
                    viewport there will be a blank line.
                    To get around this we dont allow any actual drawing to happen in the
