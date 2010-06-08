@@ -290,8 +290,12 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
             (start[1] >= 'A' && start[1] <= 'Z'))
         {
             read = 1+dump_arg(out, start+1, 1, false);
-            PUTCH(out, ',');
         }
+        else
+        {
+            PUTCH(out, '-');
+        }
+        PUTCH(out, ',');
         len += read + dump_viewport_tags(out, start+read);
     }
     else if (MATCH("Vl") || MATCH("Vi"))
