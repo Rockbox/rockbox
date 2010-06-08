@@ -43,9 +43,9 @@
 
 void usage()
 {
-  fprintf(stderr, "usage: meizu_dfu m3 <SST39VF800.dfu> <M3.EBN>\n");
-  fprintf(stderr, "       meizu_dfu m6 <SST39VF800.dfu> <M6.EBN>\n");
-  fprintf(stderr, "       meizu_dfu m6sl <updateNAND_BE_070831.dfu> <M6SL.EBN>\n");
+  fprintf(stderr, "usage: meizu_dfu m3 [SST39VF800.dfu] <M3.EBN>\n");
+  fprintf(stderr, "       meizu_dfu m6 [SST39VF800.dfu] <M6.EBN>\n");
+  fprintf(stderr, "       meizu_dfu m6sl [updateNAND_BE_070831.dfu] <M6SL.EBN>\n");
   exit(1);
 }
 
@@ -328,18 +328,21 @@ void dfu_m3_m6(char *file1, char *file2)
   memcpy(attr1.suf_sig, "RON", 3);
   attr1.suf_len = 0x10;
 
-  attr2.delay = 1000;
-  attr2.pre_off = 0x20;
-  attr2.pre_sig = 0x44465543;
-  attr2.suf_dev = 0x0100;
-  attr2.suf_prod = 0x0140;
-  attr2.suf_ven = 0x0419;
-  attr2.suf_dfu = 0x0100;
-  memcpy(attr2.suf_sig, "UFD", 3);
-  attr2.suf_len = 0x10;
-
   init_img(&img1, file1, &attr1);
-  init_img(&img2, file2, &attr2);
+
+  if (file2) {
+    attr2.delay = 1000;
+    attr2.pre_off = 0x20;
+    attr2.pre_sig = 0x44465543;
+    attr2.suf_dev = 0x0100;
+    attr2.suf_prod = 0x0140;
+    attr2.suf_ven = 0x0419;
+    attr2.suf_dfu = 0x0100;
+    memcpy(attr2.suf_sig, "UFD", 3);
+    attr2.suf_len = 0x10;
+
+    init_img(&img2, file2, &attr2);
+  }
 
   device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M3_M6);
 //  usb_mimic_windows();
@@ -347,14 +350,17 @@ void dfu_m3_m6(char *file1, char *file2)
   get_cpu(device);
   send_file(device, &img1);
 
-  printf("Wait a sec (literally)...");
-  sleep(1);
-  printf(" OK\n");
+  if (file2) {
+    printf("Wait a sec (literally)...");
+    sleep(1);
+    printf(" OK\n");
 
-  clear_status(device);
-  get_cpu(device);
-  send_file(device, &img2);
-  dfu_detach(device);
+    clear_status(device);
+    get_cpu(device);
+    send_file(device, &img2);
+    dfu_detach(device);
+  }
+
   usb_dev_close(device);
 }
 
@@ -374,51 +380,59 @@ void dfu_m6sl(char *file1, char *file2)
   memcpy(attr1.suf_sig, "UFD", 3);
   attr1.suf_len = 0x10;
 
-  attr2.delay = 1000;
-  attr2.pre_off = 0x20;
-  attr2.pre_sig = 0x44465543;
-  attr2.suf_dev = 0x0100;
-  attr2.suf_prod = 0x0140;
-  attr2.suf_ven = 0x0419;
-  attr2.suf_dfu = 0x0100;
-  memcpy(attr2.suf_sig, "UFD", 3);
-  attr2.suf_len = 0x10;
-
   init_img(&img1, file1, &attr1);
-  init_img(&img2, file2, &attr2);
+
+  if (file2) {
+    attr2.delay = 1000;
+    attr2.pre_off = 0x20;
+    attr2.pre_sig = 0x44465543;
+    attr2.suf_dev = 0x0100;
+    attr2.suf_prod = 0x0140;
+    attr2.suf_ven = 0x0419;
+    attr2.suf_dfu = 0x0100;
+    memcpy(attr2.suf_sig, "UFD", 3);
+    attr2.suf_len = 0x10;
+
+    init_img(&img2, file2, &attr2);
+  }
 
   device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6SL);
   get_cpu(device);
   get_cpu(device);
   send_file(device, &img1);
 
-  printf("Wait a sec (literally)...");
-  sleep(1);
-  printf(" OK\n");
-  usb_dev_close(device);
+  if (file2) {
+    printf("Wait a sec (literally)...");
+    sleep(1);
+    printf(" OK\n");
+    usb_dev_close(device);
 
-  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6SL);
-  get_cpu(device);
-  get_cpu(device);
-  send_file(device, &img2);
-  dfu_detach(device);
+    device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6SL);
+    get_cpu(device);
+    get_cpu(device);
+    send_file(device, &img2);
+    dfu_detach(device);
+  }
+
   usb_dev_close(device);
 }
 
 
 int main(int argc, char **argv)
 {
-  if (argc != 4)
+  if (argc < 3 || argc > 4)
     usage();
 
   setvbuf(stdout, NULL, _IONBF, 0);
 
+  char *second_file = (argc == 4) ? argv[3] : NULL;
+
   if (!strcmp(argv[1], "m3"))
-    dfu_m3_m6(argv[2], argv[3]);
+    dfu_m3_m6(argv[2], second_file);
   else if (!strcmp(argv[1], "m6"))
-    dfu_m3_m6(argv[2], argv[3]);
+    dfu_m3_m6(argv[2], second_file);
   else if (!strcmp(argv[1], "m6sl"))
-    dfu_m6sl(argv[2], argv[3]);
+    dfu_m6sl(argv[2], second_file);
   else
     usage();
 
