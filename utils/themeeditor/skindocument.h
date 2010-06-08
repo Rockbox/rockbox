@@ -25,11 +25,11 @@
 #include <QWidget>
 #include <QLabel>
 #include <QHBoxLayout>
-#include <QPlainTextEdit>
 
 #include "skinhighlighter.h"
 #include "parsetreemodel.h"
 #include "preferencesdialog.h"
+#include "codeeditor.h"
 
 class SkinDocument : public QWidget
 {
@@ -81,7 +81,7 @@ private:
     QTextCharFormat errorColor;
 
     QLayout* layout;
-    QPlainTextEdit* editor;
+    CodeEditor* editor;
 
     SkinHighlighter* highlighter;
     ParseTreeModel* model;

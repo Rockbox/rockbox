@@ -52,6 +52,7 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
         fin.open(QFile::ReadOnly);
         editor->document()->setPlainText(QString(fin.readAll()));
         saved = editor->document()->toPlainText();
+        editor->setTextCursor(QTextCursor(editor->document()->begin()));
         fin.close();
     }
 
@@ -113,7 +114,7 @@ void SkinDocument::setupUI()
 {
     /* Setting up the text edit */
     layout = new QHBoxLayout;
-    editor = new QPlainTextEdit(this);
+    editor = new CodeEditor(this);
     editor->setLineWrapMode(QPlainTextEdit::NoWrap);
     layout->addWidget(editor);
 
