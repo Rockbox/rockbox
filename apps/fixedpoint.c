@@ -152,29 +152,36 @@ long fp_sincos(unsigned long phase, long *cos)
  * @return Square root of argument in same fixed point format as input.
  *
  * This routine has been modified to run longer for greater precision,
- * but cuts calculation short if the answer is reached sooner.  In
- * general, the closer x is to 1, the quicker the calculation. 
+ * but cuts calculation short if the answer is reached sooner. 
  */
 long fp_sqrt(long x, unsigned int fracbits)
 {
-    long b = x/2 + BIT_N(fracbits); /* initial approximation */
-    long c;
-    unsigned n;
-    const unsigned iterations = 8;
-    
-    for (n = 0; n < iterations; ++n)
-    {
-        c = fp_div(x, b, fracbits);
-        if (c == b) break;
-        b = (b + c)/2;
-    }
+    unsigned long xfp, b;
+    int n = 8; /* iteration limit (should terminate earlier) */
 
-    return b;
+    if (x <= 0)
+        return 0; /* no sqrt(neg), or just sqrt(0) = 0 */
+
+    /* Increase working precision by one bit */
+    xfp = x << 1;
+    fracbits++;
+
+    /* Get the midpoint between fracbits index and the highest bit index */
+    b = ((sizeof(xfp)*8-1) - __builtin_clzl(xfp) + fracbits) >> 1;
+    b = BIT_N(b);
+
+    do
+    {
+        unsigned long c = b;
+        b = (fp_div(xfp, b, fracbits) + b) >> 1;
+        if (c == b) break;
+    }
+    while (n-- > 0);
+
+    return b >> 1;
 }
 
-/* Accurate int sqrt with only elementary operations. (the above
- * routine fails badly without enough iterations, more iterations
- * than this requires -- [give that one a FIXME]).
+/* Accurate int sqrt with only elementary operations.
  * Snagged from:
  *   http://www.devmaster.net/articles/fixed-point-optimizations/ */
 unsigned long isqrt(unsigned long x)
