@@ -33,6 +33,7 @@ EditorWindow::EditorWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     prefs = new PreferencesDialog(this);
+    project = new ProjectModel();
     loadSettings();
     setupUI();
     setupMenus();
@@ -75,11 +76,6 @@ void EditorWindow::saveSettings()
 
 void EditorWindow::setupUI()
 {
-    /* Displaying some files to test the file tree view */
-    QFileSystemModel* model = new QFileSystemModel;
-    model->setRootPath(QDir::currentPath());
-    ui->fileTree->setModel(model);
-
     /* Connecting the tab bar signals */
     QObject::connect(ui->editorTabs, SIGNAL(currentChanged(int)),
                      this, SLOT(shiftTab(int)));
@@ -97,6 +93,9 @@ void EditorWindow::setupUI()
     /* Setting up the parse status label */
     parseStatus = new QLabel(this);
     ui->statusbar->addPermanentWidget(parseStatus);
+
+    /* Setting up the project viewer */
+    ui->projectTree->setModel(project);
 
 }
 
@@ -250,7 +249,7 @@ void EditorWindow::tabTitleChanged(QString title)
 void EditorWindow::showPanel()
 {
     if(sender() == ui->actionFile_Panel)
-        ui->fileDock->setVisible(true);
+        ui->projectDock->setVisible(true);
     if(sender() == ui->actionPreview_Panel)
         ui->skinPreviewDock->setVisible(true);
     if(sender() == ui->actionDisplay_Panel)

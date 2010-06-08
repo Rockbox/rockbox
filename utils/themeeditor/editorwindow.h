@@ -29,6 +29,7 @@
 #include "skinhighlighter.h"
 #include "skindocument.h"
 #include "preferencesdialog.h"
+#include "projectmodel.h"
 
 namespace Ui {
     class EditorWindow;
@@ -66,6 +67,7 @@ private:
     Ui::EditorWindow *ui;
     PreferencesDialog* prefs;
     QLabel* parseStatus;
+    ProjectModel* project;
 };
 
 #endif // EDITORWINDOW_H

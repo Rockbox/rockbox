@@ -40,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -49,6 +49,7 @@
     </property>
     <addaction name="actionNew_Document"/>
     <addaction name="actionOpen_Document"/>
+    <addaction name="actionOpen_Project"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Document"/>
     <addaction name="separator"/>
@@ -100,9 +101,9 @@
    <addaction name="actionToolbarOpen"/>
    <addaction name="actionToolbarSave"/>
   </widget>
-  <widget class="QDockWidget" name="fileDock">
+  <widget class="QDockWidget" name="projectDock">
    <property name="windowTitle">
-    <string>Files</string>
+    <string>Project</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -110,7 +111,7 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QTreeView" name="fileTree"/>
+      <widget class="QTreeView" name="projectTree"/>
      </item>
     </layout>
    </widget>
@@ -175,7 +176,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;File Panel</string>
+    <string>P&amp;roject Panel</string>
    </property>
   </action>
   <action name="actionPreview_Panel">
@@ -277,9 +278,14 @@
     <string>Save</string>
    </property>
   </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open P&amp;roject</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
-  <tabstop>fileTree</tabstop>
+  <tabstop>projectTree</tabstop>
   <tabstop>skinPreview</tabstop>
   <tabstop>parseTree</tabstop>
   <tabstop>fromTree</tabstop>
