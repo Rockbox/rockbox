@@ -278,11 +278,11 @@ bool tv_traverse_lines(void)
 static void tv_change_preferences(const struct tv_preferences *oldp)
 {
 #ifdef HAVE_LCD_BITMAP
-    static bool is_executing = false;
+    static bool font_changing = false;
     const unsigned char *font_str;
 
-    is_executing = true;
-    font_str = oldp? oldp->font_name: rb->global_settings->font_file;
+    font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
+    font_changing = true;
 
     /* change font */
     if (rb->strcmp(font_str, prefs->font_name))
@@ -291,25 +291,22 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
         {
             struct tv_preferences new_prefs = *prefs;
 
-            if (!tv_set_font(font_str) && oldp != NULL)
-            {
-                font_str = rb->global_settings->font_file;
-                tv_set_font(font_str);
-            }
-
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
             tv_set_preferences(&new_prefs);
         }
     }
+    else if (!oldp || font_changing)
+        tv_set_font(font_str);
 
     /* calculates display lines */
     tv_check_header_and_footer();
     display_lines = tv_calc_display_lines();
 
-    if (!is_executing)
+    /* if font_changing == false, the remaining processes need not be executed. */
+    if (!font_changing)
         return;
 
-    is_executing = false;
+    font_changing = false;
 #else
     (void)oldp;
 

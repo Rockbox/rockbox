@@ -254,6 +254,7 @@ static bool tv_font_setting(void)
     int new_font = 0;
     int old_font;
     bool res;
+    unsigned char font_path[MAX_PATH];
 
     struct tree_context *tree;
     struct tree_context backup;
@@ -266,7 +267,8 @@ static bool tv_font_setting(void)
     rb->strlcat(backup.currdir, "/", MAX_PATH);
     rb->strlcat(backup.currdir, dc[tree->selected_item].name, MAX_PATH);
     tree->dirfilter = &dirfilter;
-    rb->set_current_file(FONT_DIR"/");
+    rb->snprintf(font_path, MAX_PATH, "%s/", FONT_DIR);
+    rb->set_current_file(font_path);
     count = tree->filesindir;
 
     struct opt_items names[count];
