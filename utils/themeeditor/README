@@ -22,6 +22,21 @@
 To build the theme editor, you will need a Qt development environment with the
 Qt core and GUI libraries and qmake, along with standard C and C++ compilers
 and libraries.  To compile, cd to the source directory and run the "qmake"
-command followed by "make".  This will produce the binary "themeeditor".  At the
-moment, this simply prints a text debug tree.  Soon, it will launch a GUI
-application.
+command followed by "make".  This will produce the binary "themeeditor".
+
+The binary will launch a GUI application that will allow you to create, open,
+edit and save WPS files.  Editing takes place in the central tabbed text editor.
+Docks on the edges of the main window will show you a file tree, an empty
+"Skin Preview," and a parse tree of the current document.  At present, only the
+parse tree and the editor work correctly.  You can close all the other panels
+by clicking the 'x' buttons at their corners, if you desire.  You can also
+rearrange and resize panels any way you please, including tearing them off into
+separate windows.
+
+From the preferences dialog (found in the File menu, or by pressing Ctrl+P), you
+can change the font and color scheme of the editor and syntax highlighter.
+
+If you catch a bug (other than unimplemented features, which abound at this
+stage) or think of a feature you'd like to see implemented, you can send me an
+email at robby(at)bieberphoto(dot)com, or catch me on the #rockbox IRC channel
+on Freenode.
