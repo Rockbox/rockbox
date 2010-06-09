@@ -967,7 +967,6 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
     const char** s;
     int* d;
     bool set, is_negative;
-    bool is_last_var;
     int i=0;
 
     va_start(ap, str);
@@ -982,7 +981,6 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 goto err;
             p++;
         }
-        is_last_var = fmt[1] == '\0';
         set = false;
         switch (*fmt++) 
         {
@@ -998,6 +996,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
             case 'd': /* int */
                 is_negative = false;
                 d = va_arg(ap, int*);
+
                 if (*p == '-' && isdigit(*(p+1)))
                 {
                     is_negative = true;
@@ -1007,8 +1006,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 {
                     if (!set_vals || *p != '-')
                         goto err;
-                    while (*p && (*p != sep && *p != ')'))
-                        p++;
+                    p++;
                 }
                 else
                 {
@@ -1030,8 +1028,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 {
                     if (!set_vals || *p != '-')
                         goto err;
-                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
-                        p++;
+                    p++;
                 }
                 else
                 {
@@ -1046,17 +1043,16 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
             case 'g': /* greyscale colour (0-3) */
                 d = va_arg(ap, int*);
 
-                if (is0123(*p))
+                if (!is0123(*p))
+                {
+                    if (!set_vals || *p != '-')
+                        goto err;
+                    p++;
+                }
+                else
                 {
                     *d = *p++ - '0';
                     set = true;
-                }
-                else if (!set_vals || *p != '-')
-                    goto err;
-                else
-                {
-                    while (*p && *p != sep && (!is_last_var || (is_last_var && *p!=')')))
-                        p++;
                 }
 
                 break;
