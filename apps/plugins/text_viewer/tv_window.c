@@ -282,31 +282,25 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     const unsigned char *font_str;
 
     font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
-    font_changing = true;
 
     /* change font */
-    if (rb->strcmp(font_str, prefs->font_name))
+    if (font_changing || rb->strcmp(font_str, prefs->font_name))
     {
+        font_changing = true;
         if (!tv_set_font(prefs->font_name))
         {
             struct tv_preferences new_prefs = *prefs;
 
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
             tv_set_preferences(&new_prefs);
+            return;
         }
     }
-    else if (!oldp || font_changing)
-        tv_set_font(font_str);
+    font_changing = false;
 
     /* calculates display lines */
     tv_check_header_and_footer();
     display_lines = tv_calc_display_lines();
-
-    /* if font_changing == false, the remaining processes need not be executed. */
-    if (!font_changing)
-        return;
-
-    font_changing = false;
 #else
     (void)oldp;
 
