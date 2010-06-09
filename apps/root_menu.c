@@ -545,7 +545,7 @@ static int load_context_screen(int selection)
         return GO_TO_PREVIOUS;
 }
 
-#ifdef HAVE_PICTUREFLOW
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
 static int load_plugin_screen(char *plug_path)
 {
     int ret_val;
@@ -638,7 +638,7 @@ void root_menu(void)
             case GO_TO_ROOTITEM_CONTEXT:
                 next_screen = load_context_screen(selected);
                 break;
-#ifdef HAVE_PICTUREFLOW                
+#ifdef HAVE_PICTUREFLOW_INTEGRATION                
             case GO_TO_PICTUREFLOW:
                 while ( !tagcache_is_usable() ) 
                 {

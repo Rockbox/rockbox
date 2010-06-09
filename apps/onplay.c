@@ -1250,7 +1250,7 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_OK },
-#ifdef HAVE_PICTUREFLOW
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
     { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
             HOTKEY_FUNC(NULL, NULL),
             ONPLAY_PICTUREFLOW },
@@ -1337,7 +1337,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
             return ONPLAY_MAINMENU;
         case GO_TO_PLAYLIST_VIEWER:
             return ONPLAY_PLAYLIST;
-#ifdef HAVE_PICTUREFLOW
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
         case GO_TO_PICTUREFLOW:
             return ONPLAY_PICTUREFLOW;
 #endif

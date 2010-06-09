@@ -1582,7 +1582,7 @@ const struct settings_list settings[] = {
 #define START_TUNER_COUNT 0
 #endif
                    "bookmarks"
-#ifdef HAVE_PICTUREFLOW
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
 #define START_PF_COUNT 1
                    ",pictureflow"
 #else 
@@ -1603,7 +1603,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_FM_RADIO),
 #endif
                    ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS)
-#ifdef HAVE_PICTUREFLOW
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
                    ,ID2P(LANG_ONPLAY_PICTUREFLOW)
 #endif
                   ),

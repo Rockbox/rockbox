@@ -651,7 +651,7 @@ Lyre prototype 1 */
 #endif
 
 #if defined(HAVE_TAGCACHE) && defined(HAVE_LCD_BITMAP)
-#define HAVE_PICTUREFLOW
+#define HAVE_PICTUREFLOW_INTEGRATION
 #endif
 
 /* Add one HAVE_ define for all mas35xx targets */
