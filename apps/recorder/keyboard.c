@@ -47,24 +47,6 @@
 #define DEFAULT_MARGIN 6
 #define KBD_BUF_SIZE 500
 
-#if (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
-    || (CONFIG_KEYPAD == IAUDIO_M3_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H10_PAD) \
-    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
-/* no key combos to move the cursor if not in line edit mode */
-#define KBD_MODES /* uses 2 modes, picker and line edit */
-
-#else
-/* certain key combos move the cursor even if not in line edit mode */
-#define KBD_CURSOR_KEYS
-#define KBD_MODES /* uses 2 modes, picker and line edit */
-#endif
-
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
     || (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
@@ -110,9 +92,7 @@ struct keyboard_parameters
     int page;
     int x;
     int y;
-#ifdef KBD_MODES
     bool line_edit;
-#endif
 };
 
 struct edit_state
@@ -296,6 +276,8 @@ static void kbd_insert_selected(struct keyboard_parameters *pm,
                                 struct edit_state *state);
 static void kbd_backspace(struct edit_state *state);
 static void kbd_move_cursor(struct edit_state *state, int dir);
+static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
+                                       struct edit_state *state, int dir);
 static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
                                      struct edit_state *state, int dir);
 
@@ -456,28 +438,19 @@ int kbd_input(char* text, int buflen)
         pm = &param[button_screen];
         sc = &screens[button_screen];
 
-#if defined(KBD_MODES) || defined(HAVE_MORSE_INPUT)
         /* Remap some buttons to allow to move
          * cursor in line edit mode and morse mode. */
-#if defined(KBD_MODES) && defined(HAVE_MORSE_INPUT)
-        if (pm->line_edit || state.morse_mode)
-#elif defined(KBD_MODES)
-        if (pm->line_edit)
-#else /* defined(HAVE_MORSE_INPUT) */
-        if (state.morse_mode)
-#endif
+        if (pm->line_edit
+#ifdef HAVE_MORSE_INPUT
+            || state.morse_mode
+#endif /* HAVE_MORSE_INPUT */
+            )
         {
             if (button == ACTION_KBD_LEFT)
                 button = ACTION_KBD_CURSOR_LEFT;
             if (button == ACTION_KBD_RIGHT)
                 button = ACTION_KBD_CURSOR_RIGHT;
-#ifdef KBD_MODES
-            /* select doubles as backspace in line_edit */
-            if (pm->line_edit && button == ACTION_KBD_SELECT)
-                button = ACTION_KBD_BACKSPACE;
-#endif
         }
-#endif /* defined(KBD_MODES) || defined(HAVE_MORSE_INPUT) */
 
         switch ( button )
         {
@@ -504,31 +477,11 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_RIGHT:
-                if (++pm->x >= pm->max_chars)
-                {
-#ifndef KBD_PAGE_FLIP
-                    /* no dedicated flip key - flip page on wrap */
-                    if (++pm->page >= pm->pages)
-                        pm->page = 0;
-#endif
-                    pm->x = 0;
-                }
-
-                state.changed = CHANGED_PICKER;
+                kbd_move_picker_horizontal(pm, &state, 1);
                 break;
 
             case ACTION_KBD_LEFT:
-                if (--pm->x < 0)
-                {
-#ifndef KBD_PAGE_FLIP
-                    /* no dedicated flip key - flip page on wrap */
-                    if (--pm->page < 0)
-                        pm->page = pm->pages - 1;
-#endif
-                    pm->x = pm->max_chars - 1;
-                }
-
-                state.changed = CHANGED_PICKER;
+                kbd_move_picker_horizontal(pm, &state, -1);
                 break;
 
             case ACTION_KBD_DOWN:
@@ -543,6 +496,7 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_TOGGLE_INPUT
             case ACTION_KBD_MORSE_INPUT:
                 state.morse_mode = !state.morse_mode;
+                state.changed = CHANGED_PICKER;
 
                 FOR_NB_SCREENS(l)
                 {
@@ -551,7 +505,6 @@ int kbd_input(char* text, int buflen)
                     pm->main_y = pm->old_main_y;
                     pm->old_main_y = y;
                 }
-                /* FIXME: We should talk something like Morse mode.. */
                 break;
 #endif /* KBD_TOGGLE_INPUT */
 
@@ -566,6 +519,10 @@ int kbd_input(char* text, int buflen)
 #endif /* HAVE_MORSE_INPUT */
 
             case ACTION_KBD_SELECT:
+                /* select doubles as backspace in line_edit */
+                if (pm->line_edit)
+                    kbd_backspace(&state);
+                else
 #ifdef HAVE_MORSE_INPUT
                 if (state.morse_mode)
                 {
@@ -639,14 +596,13 @@ int kbd_input(char* text, int buflen)
         {
             if (state.changed == CHANGED_PICKER)
             {
-#ifdef KBD_MODES
                 if (pm->line_edit)
                 {
                     talk_id(VOICE_EDIT, false);
                 }
                 else
-#endif
 #ifdef HAVE_MORSE_INPUT
+                /* FIXME: We should talk something like Morse mode.. */
                 if (!state.morse_mode)
 #endif
                 {
@@ -910,9 +866,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
             }
         }
 
-#ifdef KBD_MODES
         if (!pm->line_edit)
-#endif
         {
             /* highlight the key that has focus */
             sc->set_drawmode(DRMODE_COMPLEMENT);
@@ -999,14 +953,12 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     if (state->hangul) /* draw underbar */
         sc->hline(i - pm->text_w, i, pm->main_y + pm->font_h - 1);
 
-#ifdef KBD_MODES
     if (pm->line_edit)
     {
         sc->set_drawmode(DRMODE_COMPLEMENT);
         sc->fillrect(0, y + 2, sc_w, pm->font_h + 2);
         sc->set_drawmode(DRMODE_SOLID);
     }
-#endif
 }
 
 /* inserts the selected char */
@@ -1126,22 +1078,40 @@ static void kbd_move_cursor(struct edit_state *state, int dir)
     }
 }
 
+static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
+                                       struct edit_state *state, int dir)
+{
+    state->changed = CHANGED_PICKER;
+
+    pm->x += dir;
+    if (pm->x < 0)
+    {
+        if (--pm->page < 0)
+            pm->page = pm->pages - 1;
+        pm->x = pm->max_chars - 1;
+    }
+    else if (pm->x >= pm->max_chars)
+    {
+        if (++pm->page >= pm->pages)
+            pm->page = 0;
+        pm->x = 0;
+    }
+}
+
 static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
                                      struct edit_state *state, int dir)
 {
-    (void) state;
     state->changed = CHANGED_PICKER;
+
 #ifdef HAVE_MORSE_INPUT
     if (state->morse_mode)
     {
-#ifdef KBD_MODES
         pm->line_edit = !pm->line_edit;
-#endif
         return;
     }
 #endif /* HAVE_MORSE_INPUT */
+
     pm->y += dir;
-#ifdef KBD_MODES
     if (pm->line_edit)
     {
         pm->y = (dir > 0 ? 0 : pm->lines - 1);
@@ -1151,10 +1121,4 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
     {
         pm->line_edit = true;
     }
-#else
-    if (pm->y >= pm->lines)
-        pm->y = 0;
-    if (pm->y < 0)
-        pm->y = pm->lines - 1;
-#endif
 }
