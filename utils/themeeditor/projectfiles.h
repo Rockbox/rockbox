@@ -23,11 +23,12 @@
 #define PROJECTFILES_H
 
 #include "projectmodel.h"
+#include <QHash>
 
 class ProjectFiles : public ProjectNode
 {
 public:
-    ProjectFiles(ProjectNode* parent);
+    ProjectFiles(QHash<QString, QString>& settings, ProjectNode* parent);
     virtual ~ProjectFiles();
 
     virtual ProjectNode* parent() const;
@@ -41,6 +42,28 @@ public:
 private:
     ProjectNode* parentLink;
 
+};
+
+/* A class to enumerate a single file */
+class ProjectFile: public ProjectNode
+{
+public:
+    ProjectFile(QString file, ProjectNode* parent);
+    virtual ~ProjectFile();
+
+    virtual ProjectNode* parent() const{ return parentLink; }
+    virtual ProjectNode* child(int row) const{ return 0; }
+    virtual int numChildren() const{ return 0; }
+    virtual int row() const{
+        return parentLink->indexOf(const_cast<ProjectFile*>(this));
+    }
+    virtual QVariant data(int column) const;
+    virtual Qt::ItemFlags flags(int column) const;
+    virtual void activated();
+
+private:
+    ProjectNode* parentLink;
+    QString file;
 };
 
 #endif // PROJECTFILES_H

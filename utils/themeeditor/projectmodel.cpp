@@ -23,6 +23,11 @@
 #include "projectmodel.h"
 #include "projectfiles.h"
 
+#include <QFile>
+#include <QTextStream>
+#include <QHash>
+#include <QDir>
+
 ProjectModel::ProjectModel(QString config, QObject *parent) :
     QAbstractItemModel(parent)
 {
@@ -60,7 +65,7 @@ QModelIndex ProjectModel::parent(const QModelIndex &child) const
     ProjectNode* foundParent = static_cast<ProjectNode*>
                                    (child.internalPointer())->parent();
 
-    if(foundParent == 0)
+    if(foundParent == root)
         return QModelIndex();
 
     return createIndex(foundParent->row(), 0, foundParent);
@@ -118,7 +123,42 @@ bool ProjectModel::setData(const QModelIndex &index, const QVariant &value,
 /* Constructor and destructor for the root class */
 ProjectRoot::ProjectRoot(QString config)
 {
-    children.append(new ProjectFiles(this));
+    /* Reading the config file */
+    QFile cfg(config);
+    cfg.open(QFile::ReadOnly | QFile::Text);
+    if(!cfg.isReadable())
+        return;
+
+    QTextStream fin(&cfg);
+
+    /* Storing the base directory */
+    QString confDir = config;
+    confDir.chop(confDir.length() - confDir.lastIndexOf('/') - 1);
+    QDir base(confDir);
+    base.cdUp();
+    settings.insert("themebase", base.canonicalPath());
+
+    while(!fin.atEnd())
+    {
+        QString current = fin.readLine();
+        QList<QString> parts = current.split(':');
+
+        /* A valid setting has at least one : */
+        if(parts.count() < 2)
+            continue;
+
+        QString setting;
+        for(int i = 1; i < parts.count(); i++)
+            setting.append(parts[i].trimmed());
+
+        settings.insert(parts[0].trimmed(), setting);
+    }
+
+    cfg.close();
+
+    /* Showing the files */
+    children.append(new ProjectFiles(settings, this));
+
 }
 
 ProjectRoot::~ProjectRoot()

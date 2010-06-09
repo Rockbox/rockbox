@@ -21,8 +21,26 @@
 
 #include "projectfiles.h"
 
-ProjectFiles::ProjectFiles(ProjectNode* parent): parentLink(parent)
+ProjectFiles::ProjectFiles(QHash<QString, QString>& settings,
+                           ProjectNode* parent): parentLink(parent)
 {
+    QList<QString> keys;
+    keys.append("wps");
+    keys.append("rwps");
+    keys.append("sbs");
+    keys.append("rsbs");
+    keys.append("fms");
+    keys.append("rfms");
+
+    for(int i = 0; i < keys.count(); i++)
+    {
+        QString file = settings.value(keys[i], "");
+        if(file != "" && file != "-")
+        {
+            file.replace("/.rockbox/", "");
+            children.append(new ProjectFile(file, this));
+        }
+    }
 }
 
 ProjectFiles::~ProjectFiles()
@@ -73,5 +91,37 @@ Qt::ItemFlags ProjectFiles::flags(int column) const
 void ProjectFiles::activated()
 {
 
+}
+
+/* Project File functions */
+ProjectFile::ProjectFile(QString file, ProjectNode* parent) :
+        parentLink(parent), file(file)
+{
+
+}
+
+ProjectFile::~ProjectFile()
+{
+
+}
+
+QVariant ProjectFile::data(int column) const
+{
+    if(column == 0)
+        return file;
+    else
+        return QVariant();
+}
+
+Qt::ItemFlags ProjectFile::flags(int column) const
+{
+    if(column == 0)
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    else
+        return 0;
+}
+
+void ProjectFile::activated()
+{
 }
 

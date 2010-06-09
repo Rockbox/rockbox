@@ -23,6 +23,7 @@
 #define PROJECTMODEL_H
 
 #include <QAbstractItemModel>
+#include <QHash>
 
 class ProjectNode;
 
@@ -97,6 +98,9 @@ public:
     virtual QVariant data(int column) const{ return QVariant(); }
     virtual Qt::ItemFlags flags(int column) const{ return 0; }
     virtual void activated(){ }
+
+private:
+    QHash<QString, QString> settings;
 
 };
 
