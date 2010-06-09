@@ -117,6 +117,17 @@ static bool tv_autoscroll_speed_setting(void)
                        &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
+static bool tv_narrow_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Previous/Next Page", -1},
+        {"Top/Bottom Page",    -1},
+    };
+
+    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, INT,
+                          names, 2, NULL);
+}
+
 #ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
                   tv_vertical_scrollbar_setting,
@@ -128,12 +139,15 @@ MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", tv_page_mode_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
                   tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(narrow_mode_item, 0, "Left/Right Key (Narrow mode)",
+                  tv_narrow_mode_setting, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
           &vertical_scrollbar_item,
 #endif
-          &vertical_scroll_mode_item, &page_mode_item, &autoscroll_speed_item);
+          &vertical_scroll_mode_item, &page_mode_item, &autoscroll_speed_item,
+          &narrow_mode_item);
 
 /*                      */
 /* scroll settings menu */

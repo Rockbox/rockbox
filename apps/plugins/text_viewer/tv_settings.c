@@ -48,7 +48,8 @@
  * autoscroll_speed       1
  * horizontal_scrollbar   1
  * horizontal_scroll_mode 1
- * (reserved)             14
+ * narrow_mode            1
+ * (reserved)             13
  * font name              MAX_PATH
  */
 
@@ -56,7 +57,7 @@
 #define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DIR "/tv_global.dat"
 
 #define TV_GLOBAL_SETTINGS_HEADER        "\x54\x56\x47\x53" /* "TVGS" */
-#define TV_GLOBAL_SETTINGS_VERSION       0x35
+#define TV_GLOBAL_SETTINGS_VERSION       0x36
 #define TV_GLOBAL_SETTINGS_HEADER_SIZE   5
 #define TV_GLOBAL_SETTINGS_FIRST_VERSION 0x31
 
@@ -88,7 +89,8 @@
  *     autoscroll_speed       1
  *     horizontal_scrollbar   1
  *     horizontal_scroll_mode 1
- *     (reserved)             14
+ *     narrow_mode            1
+ *     (reserved)             13
  *     font name              MAX_PATH
  *   bookmark count           1
  *   [1st bookmark]
@@ -110,7 +112,7 @@
 #define TV_SETTINGS_TMP_FILE      VIEWERS_DIR "/tv_file.tmp"
 
 #define TV_SETTINGS_HEADER        "\x54\x56\x53" /* "TVS" */
-#define TV_SETTINGS_VERSION       0x36
+#define TV_SETTINGS_VERSION       0x37
 #define TV_SETTINGS_HEADER_SIZE   4
 #define TV_SETTINGS_FIRST_VERSION 0x32
 
@@ -167,6 +169,11 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     else
         prefs->horizontal_scroll_mode = SCREEN;
 
+    if (version > 4)
+        prefs->narrow_mode = *p++;
+    else
+        prefs->narrow_mode = NM_PAGE;
+
     rb->memcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
 
 #ifdef HAVE_LCD_BITMAP
@@ -196,6 +203,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->autoscroll_speed;
     *p++ = prefs->horizontal_scrollbar;
     *p++ = prefs->horizontal_scroll_mode;
+    *p++ = prefs->narrow_mode;
 
     rb->memcpy(buf + 28, prefs->font_name, MAX_PATH);
 

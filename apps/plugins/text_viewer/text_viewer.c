@@ -114,12 +114,16 @@ enum plugin_status plugin_start(const void* file)
                     tv_scroll_left(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
-                    /* scroll to previous page */
-                    tv_scroll_up(TV_VERTICAL_SCROLL_PAGE);
-#if 0
-                    /* Top of file */
-                    tv_top();
-#endif
+                    if (prefs->narrow_mode == NM_PAGE)
+                    {
+                        /* scroll to previous page */
+                        tv_scroll_up(TV_VERTICAL_SCROLL_PAGE);
+                    }
+                    else
+                    {
+                        /* Top of file */
+                        tv_top();
+                    }
                 }
                 break;
 
@@ -131,12 +135,16 @@ enum plugin_status plugin_start(const void* file)
                     tv_scroll_right(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
-                    /* scroll to next page */
-                    tv_scroll_down(TV_VERTICAL_SCROLL_PAGE);
-#if 0
-                    /* Bottom of file */
-                    tv_bottom();
-#endif
+                    if (prefs->narrow_mode == NM_PAGE)
+                    {
+                        /* scroll to next page */
+                        tv_scroll_down(TV_VERTICAL_SCROLL_PAGE);
+                    }
+                    else
+                    {
+                        /* Bottom of file */
+                        tv_bottom();
+                    }
                 }
                 break;
 

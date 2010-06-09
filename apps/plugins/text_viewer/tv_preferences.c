@@ -43,6 +43,7 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
      *   - page_mode
      *   - font
      *   - autoscroll_speed
+     *   - narrow_mode
      */
     if ((oldp == NULL)                                             ||
         (oldp->word_mode            != newp->word_mode)            ||
@@ -111,6 +112,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->footer_mode = FT_NONE;
 #endif
     p->autoscroll_speed = 1;
+    p->narrow_mode = NM_PAGE;
     /* Set codepage to system default */
     p->encoding = rb->global_settings->default_codepage;
     p->file_name[0] = '\0';

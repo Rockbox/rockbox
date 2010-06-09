@@ -52,5 +52,3 @@ TODO list
 
   - more treatments of line breaking, word wrappings.
     (for example, period does not appear the top of line.)
-
-  - whether scroll to prev/next page or scroll to top page/bottom page can be select the settings menu.

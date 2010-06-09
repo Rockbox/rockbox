@@ -84,6 +84,11 @@ struct tv_preferences {
 
     int windows;
 
+    enum {
+        NM_PAGE = 0,
+        NM_TOP_BOTTOM,
+    } narrow_mode;
+
     unsigned char font_name[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
     struct font *font;
