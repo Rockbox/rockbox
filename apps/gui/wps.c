@@ -841,8 +841,10 @@ long gui_wps_show(void)
                     return GO_TO_ROOT;
                 else if (retval == ONPLAY_PLAYLIST)
                     return GO_TO_PLAYLIST_VIEWER;
+#ifdef HAVE_PICTUREFLOW
                 else if (retval == ONPLAY_PICTUREFLOW)
                     return GO_TO_PICTUREFLOW;                 
+#endif
                 restore = true;
             }
             break;
