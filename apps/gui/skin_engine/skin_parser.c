@@ -1248,12 +1248,8 @@ static int parse_progressbar(const char *wps_bufptr,
         PB_X = 0,
         PB_Y,
         PB_WIDTH,
-<<<<<<< .mine
         PB_HEIGHT,
         PB_FILENAME,
-=======
-        PB_HEIGHT,
->>>>>>> .r26726
     };
     const char *filename;
     int x, y, height, width;
