@@ -36,7 +36,7 @@ MEMORY
     FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
 }
 
-#ifdef IPOD_NANO2G
+#if defined(IPOD_NANO2G) || defined(MEIZU_M6SL)
 #define LOAD_AREA IRAM
 #else
 #define LOAD_AREA FLASH
