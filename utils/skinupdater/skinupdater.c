@@ -279,9 +279,24 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     else if (MATCH("Vp"))
     {
+        int read;
         /* NOTE: almost certainly needs work */
         PUTCH(out, '(');
-        len += 1+dump_arg(out, start+1, 3, true);
+        read = 1+dump_arg(out, start+1, 1, false);
+        PUTCH(out, ',');
+        while (start[read] != '|')
+        {
+            PUTCH(out, start[read++]);
+        }
+        PUTCH(out, ',');
+        read++;
+        while (start[read] != '|')
+        {
+            PUTCH(out, start[read++]);
+        }
+        PUTCH(out, ')');
+        read++;
+        len += read;
     }
     else if (MATCH("Vi"))
     {
