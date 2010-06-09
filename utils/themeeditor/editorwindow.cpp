@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "editorwindow.h"
+#include "projectmodel.h"
 #include "ui_editorwindow.h"
 
 #include <QDesktopWidget>
@@ -37,6 +38,14 @@ EditorWindow::EditorWindow(QWidget *parent) :
     loadSettings();
     setupUI();
     setupMenus();
+}
+
+void EditorWindow::loadTabFromFile(QString fileName)
+{
+    /* Adding a new document for each file name */
+    SkinDocument* doc = new SkinDocument(parseStatus, fileName);
+    addTab(doc);
+
 }
 
 void EditorWindow::loadSettings()
@@ -225,9 +234,7 @@ void EditorWindow::openFile()
 
         QString current = fileNames[i];
 
-        /* Adding a new document for each file name */
-        SkinDocument* doc = new SkinDocument(parseStatus, current);
-        addTab(doc);
+        loadTabFromFile(current);
 
         /* And setting the new default directory */
         current.chop(current.length() - current.lastIndexOf('/') - 1);
@@ -254,8 +261,12 @@ void EditorWindow::openProject()
         if(project)
             delete project;
 
-        project = new ProjectModel(fileName);
+        project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);
+        ui->projectTree->expandAll();
+
+        QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
+                         project, SLOT(activated(QModelIndex)));
 
         fileName.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
         settings.setValue("defaultDirectory", fileName);

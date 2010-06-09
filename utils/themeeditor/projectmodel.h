@@ -26,6 +26,7 @@
 #include <QHash>
 
 class ProjectNode;
+class EditorWindow;
 
 class ProjectModel : public QAbstractItemModel
 {
@@ -38,7 +39,7 @@ public:
         return QObject::tr("Project Files (*.cfg);;All Files (*.*)");
     }
 
-    ProjectModel(QString config, QObject *parent = 0);
+    ProjectModel(QString config, EditorWindow* mainWindow, QObject *parent = 0);
     virtual ~ProjectModel();
 
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
@@ -50,13 +51,16 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
+    void loadFile(QString file);
 
 signals:
 
 public slots:
+    void activated(const QModelIndex& index);
 
 private:
     ProjectNode* root;
+    EditorWindow* mainWindow;
 };
 
 /* A simple abstract class required for categories */
@@ -75,6 +79,7 @@ public:
 
 protected:
     QList<ProjectNode*> children;
+    ProjectModel* model;
 
 };
 
@@ -82,7 +87,7 @@ protected:
 class ProjectRoot : public ProjectNode
 {
 public:
-    ProjectRoot(QString config);
+    ProjectRoot(QString config, ProjectModel* model);
     virtual ~ProjectRoot();
 
     virtual ProjectNode* parent() const{ return 0; }

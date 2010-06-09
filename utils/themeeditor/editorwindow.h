@@ -29,7 +29,8 @@
 #include "skinhighlighter.h"
 #include "skindocument.h"
 #include "preferencesdialog.h"
-#include "projectmodel.h"
+
+class ProjectModel;
 
 namespace Ui {
     class EditorWindow;
@@ -40,6 +41,9 @@ class EditorWindow : public QMainWindow {
 public:
     EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
+
+    /* A public function so external widgets can load files */
+    void loadTabFromFile(QString fileName);
 
 protected:
     virtual void closeEvent(QCloseEvent* event);

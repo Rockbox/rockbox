@@ -22,16 +22,19 @@
 
 #include "projectmodel.h"
 #include "projectfiles.h"
+#include "editorwindow.h"
 
 #include <QFile>
 #include <QTextStream>
 #include <QHash>
 #include <QDir>
 
-ProjectModel::ProjectModel(QString config, QObject *parent) :
-    QAbstractItemModel(parent)
+ProjectModel::ProjectModel(QString config, EditorWindow* mainWindow,
+                           QObject *parent)
+                               : QAbstractItemModel(parent),
+                               mainWindow(mainWindow)
 {
-    root = new ProjectRoot(config);
+    root = new ProjectRoot(config, this);
 }
 
 ProjectModel::~ProjectModel()
@@ -120,9 +123,21 @@ bool ProjectModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
-/* Constructor and destructor for the root class */
-ProjectRoot::ProjectRoot(QString config)
+void ProjectModel::loadFile(QString file)
 {
+    mainWindow->loadTabFromFile(file);
+}
+
+void ProjectModel::activated(const QModelIndex &index)
+{
+    static_cast<ProjectNode*>(index.internalPointer())->activated();
+}
+
+/* Constructor and destructor for the root class */
+ProjectRoot::ProjectRoot(QString config, ProjectModel* model)
+{
+    this->model = model;
+
     /* Reading the config file */
     QFile cfg(config);
     cfg.open(QFile::ReadOnly | QFile::Text);
@@ -157,7 +172,7 @@ ProjectRoot::ProjectRoot(QString config)
     cfg.close();
 
     /* Showing the files */
-    children.append(new ProjectFiles(settings, this));
+    children.append(new ProjectFiles(settings, model, this));
 
 }
 

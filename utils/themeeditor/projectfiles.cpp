@@ -22,8 +22,11 @@
 #include "projectfiles.h"
 
 ProjectFiles::ProjectFiles(QHash<QString, QString>& settings,
-                           ProjectNode* parent): parentLink(parent)
+                           ProjectModel* model, ProjectNode* parent)
+                               : parentLink(parent)
 {
+    base = settings.value("themebase");
+
     QList<QString> keys;
     keys.append("wps");
     keys.append("rwps");
@@ -38,7 +41,7 @@ ProjectFiles::ProjectFiles(QHash<QString, QString>& settings,
         if(file != "" && file != "-")
         {
             file.replace("/.rockbox/", "");
-            children.append(new ProjectFile(file, this));
+            children.append(new ProjectFile(file, model, this));
         }
     }
 }
@@ -94,10 +97,11 @@ void ProjectFiles::activated()
 }
 
 /* Project File functions */
-ProjectFile::ProjectFile(QString file, ProjectNode* parent) :
-        parentLink(parent), file(file)
+ProjectFile::ProjectFile(QString file, ProjectModel* model,
+                         ProjectNode* parent)
+                             :parentLink(parent), file(file)
 {
-
+    this->model = model;
 }
 
 ProjectFile::~ProjectFile()
@@ -123,5 +127,7 @@ Qt::ItemFlags ProjectFile::flags(int column) const
 
 void ProjectFile::activated()
 {
+    QString base = dynamic_cast<ProjectFiles*>(parentLink)->getBase();
+    model->loadFile(base + "/" + file);
 }
 

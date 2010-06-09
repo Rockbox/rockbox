@@ -28,7 +28,8 @@
 class ProjectFiles : public ProjectNode
 {
 public:
-    ProjectFiles(QHash<QString, QString>& settings, ProjectNode* parent);
+    ProjectFiles(QHash<QString, QString>& settings, ProjectModel* model,
+                 ProjectNode* parent);
     virtual ~ProjectFiles();
 
     virtual ProjectNode* parent() const;
@@ -38,9 +39,12 @@ public:
     virtual QVariant data(int column) const;
     virtual Qt::ItemFlags flags(int column) const;
     virtual void activated();
+    
+    QString getBase(){ return base; }
 
 private:
     ProjectNode* parentLink;
+    QString base;
 
 };
 
@@ -48,7 +52,7 @@ private:
 class ProjectFile: public ProjectNode
 {
 public:
-    ProjectFile(QString file, ProjectNode* parent);
+    ProjectFile(QString file, ProjectModel* model, ProjectNode* parent);
     virtual ~ProjectFile();
 
     virtual ProjectNode* parent() const{ return parentLink; }
