@@ -929,6 +929,8 @@ static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
 MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
                   set_rating_inline, NULL,
                   ratingitem_callback, Icon_Questionmark);
+MENUITEM_RETURNVALUE(pictureflow_item, ID2P(LANG_ONPLAY_PICTUREFLOW), 
+                  GO_TO_PICTUREFLOW, NULL, Icon_NOICON);                  
 #endif
 
 static bool view_cue(void)
@@ -1131,7 +1133,11 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_TAGCACHE
            &rating_item,
 #endif
-           &bookmark_menu, &browse_id3_item, &list_viewers_item,
+           &bookmark_menu, 
+#ifdef HAVE_TAGCACHE
+           &pictureflow_item,
+#endif           
+           &browse_id3_item, &list_viewers_item,
            &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
@@ -1244,6 +1250,11 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_OK },
+#ifdef HAVE_TAGCACHE
+    { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
+            HOTKEY_FUNC(NULL, NULL),
+            ONPLAY_PICTUREFLOW },
+#endif
 };
 
 /* Return the language ID for this action */
@@ -1316,6 +1327,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
     else
         menu = &tree_onplay_menu;
     menu_selection = do_menu(menu, NULL, NULL, false);
+    
     switch (menu_selection)
     {
         case GO_TO_WPS:
@@ -1325,6 +1337,10 @@ int onplay(char* file, int attr, int from, bool hotkey)
             return ONPLAY_MAINMENU;
         case GO_TO_PLAYLIST_VIEWER:
             return ONPLAY_PLAYLIST;
+#ifdef HAVE_TAGCACHE
+        case GO_TO_PICTUREFLOW:
+            return ONPLAY_PICTUREFLOW;
+#endif
         default:
             return onplay_result;
     }

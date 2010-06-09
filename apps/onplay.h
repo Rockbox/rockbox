@@ -29,6 +29,7 @@ enum {
     ONPLAY_RELOAD_DIR,
     ONPLAY_START_PLAY,
     ONPLAY_PLAYLIST,
+    ONPLAY_PICTUREFLOW,
 };
 
 #ifdef HAVE_HOTKEY
@@ -43,6 +44,7 @@ enum hotkey_action {
     HOTKEY_DELETE,
     HOTKEY_INSERT,
     HOTKEY_INSERT_SHUFFLED,
+    HOTKEY_PICTUREFLOW,
 };
 #endif
 

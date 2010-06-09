@@ -1572,22 +1572,22 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
                    "radio,"
 #endif
-                   "bookmarks" ,NULL,
+                   "bookmarks,pictureflow", NULL,
 #if defined(HAVE_TAGCACHE)
+  #if defined(HAVE_RECORDING) && CONFIG_TUNER
+                   10,
+  #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
+                   9,
+  #else
+                   8,
+  #endif
+#else
   #if defined(HAVE_RECORDING) && CONFIG_TUNER
                    9,
   #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
                    8,
   #else
                    7,
-  #endif
-#else
-  #if defined(HAVE_RECORDING) && CONFIG_TUNER
-                   8,
-  #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
-                   7,
-  #else
-                   6,
   #endif
 #endif
                    ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
@@ -1602,7 +1602,8 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
                    ID2P(LANG_FM_RADIO),
 #endif
-                   ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS)
+                   ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
+                   ID2P(LANG_ONPLAY_PICTUREFLOW)
                   ),
     SYSTEM_SETTING(NVRAM(1),last_screen,-1),
 #if defined(HAVE_RTC_ALARM) && \
@@ -1746,10 +1747,10 @@ const struct settings_list settings[] = {
 #ifdef HAVE_HOTKEY
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_wps,
         LANG_HOTKEY_WPS, HOTKEY_VIEW_PLAYLIST, "hotkey wps",
-        "off,view playlist,show track info,pitchscreen,open with,delete",
-        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 6, HOTKEY_OFF,
+        "off,view playlist,show track info,pitchscreen,open with,delete,pictureflow",
+        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 7, HOTKEY_OFF,
         HOTKEY_VIEW_PLAYLIST, HOTKEY_SHOW_TRACK_INFO, HOTKEY_PITCHSCREEN,
-        HOTKEY_OPEN_WITH, HOTKEY_DELETE),
+        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_PICTUREFLOW),
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_tree,
         LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",
         "off,open with,delete,insert,insert shuffled",

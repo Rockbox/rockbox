@@ -58,6 +58,7 @@ PLUGIN_HEADER
 #define PF_WPS ACTION_TREE_WPS
 
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
+#define PF_TRACKLIST (LAST_ACTION_PLACEHOLDER + 2)
 
 #if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
     CONFIG_KEYPAD == SAMSUNG_YH_PAD
@@ -120,6 +121,7 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_POWER,               BUTTON_NONE},
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
     {PF_QUIT,         BUTTON_HOME|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_TRACKLIST,    BUTTON_RIGHT,  BUTTON_NONE},    
 /* These all use short press of BUTTON_POWER for menu, map long POWER to quit
 */
 #elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_M200_PAD || \
@@ -311,6 +313,8 @@ static int center_margin = (LCD_WIDTH - DISPLAY_WIDTH) / 12;
 static int num_slides = 4;
 static int zoom = 100;
 static bool show_fps = false;
+static int auto_wps = 0;
+static int last_album = 0;
 static bool resize = true;
 static int cache_version = 0;
 static int show_album_name = (LCD_HEIGHT > 100)
@@ -328,8 +332,10 @@ static struct configdata config[] =
     { TYPE_BOOL, 0, 1, { .bool_p = &show_fps }, "show fps", NULL },
     { TYPE_BOOL, 0, 1, { .bool_p = &resize }, "resize", NULL },
     { TYPE_INT, 0, 100, { .int_p = &cache_version }, "cache version", NULL },
-    { TYPE_ENUM, 0, 2, { .int_p = &show_album_name }, "show album name",
-      show_album_name_conf }
+    { TYPE_ENUM, 0, 3, { .int_p = &show_album_name }, "show album name",
+      show_album_name_conf },
+    { TYPE_INT, 0, 2, { .int_p = &auto_wps }, "auto wps", NULL },
+    { TYPE_INT, 0, 999999, { .int_p = &last_album }, "last album", NULL }
 };
 
 #define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
@@ -781,6 +787,18 @@ char* get_track_filename(const int track_index)
     if ( track_index < track_count )
         return track_names + tracks[track_index].filename_idx;
     return 0;
+}
+
+int get_wps_current_index(void)
+{
+    struct mp3entry *id3 = rb->audio_current_track();
+    if(id3 && id3->album) {
+        int i;
+        for( i=0; i < album_count; i++ )
+            if(!rb->strcmp(album_names + album[i].name_idx, id3->album))
+                return i;
+        }
+    return last_album;
 }
 #endif
 /**
@@ -2071,13 +2089,19 @@ int settings_menu(void)
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
                         "Spacing", "Centre margin", "Number of slides", "Zoom",
-                        "Show album title", "Resize Covers", "Rebuild cache");
+                        "Show album title", "Resize Covers", "Rebuild cache", 
+                        "WPS Integration");
 
     static const struct opt_items album_name_options[] = {
         { "Hide album title", -1 },
         { "Show at the bottom", -1 },
         { "Show at the top", -1 }
     };
+    static const struct opt_items wps_options[] = {
+        { "Off", -1 },	
+        { "Direct", -1 },
+        { "Via Track list", -1 }
+    };    
 
     do {
         selection=rb->do_menu(&settings_menu,&selection, NULL, true);
@@ -2134,6 +2158,9 @@ int settings_menu(void)
                 rb->remove(EMPTY_SLIDE);
                 rb->splash(HZ, "Cache will be rebuilt on next restart");
                 break;
+            case 8:
+                rb->set_option("WPS Integration", &auto_wps, INT, wps_options, 3, NULL);
+                break;                
 
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
@@ -2373,7 +2400,7 @@ void select_prev_track(void)
 /*
  * Puts the current tracklist into a newly created playlist and starts playling
  */
-void start_playback(void)
+void start_playback(bool append)
 {
     static int old_playlist = -1, old_shuffle = 0;
     int count = 0;
@@ -2382,14 +2409,14 @@ void start_playback(void)
     /* reuse existing playlist if possible
      * regenerate if shuffle is on or changed, since playlist index and
      * selected track are "out of sync" */
-    if (!shuffle && center_slide.slide_index == old_playlist
+    if (!shuffle && !append && center_slide.slide_index == old_playlist
             && (old_shuffle == shuffle))
     {
         goto play;
     }
     /* First, replace the current playlist with a new one */
-    else if (rb->playlist_remove_all_tracks(NULL) == 0
-            && rb->playlist_create(NULL, NULL) == 0)
+    else if (append || (rb->playlist_remove_all_tracks(NULL) == 0
+            && rb->playlist_create(NULL, NULL) == 0))
     {
         do {
             rb->yield();
@@ -2408,7 +2435,8 @@ play:
     /* TODO: can we adjust selected_track if !play_selected ?
      * if shuffle, we can't predict the playing track easily, and for either
      * case the track list doesn't get auto scrolled*/
-    rb->playlist_start(position, 0);
+    if(!append)
+    	rb->playlist_start(position, 0);
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }
@@ -2493,7 +2521,6 @@ int main(void)
     int ret;
 
     rb->lcd_setfont(FONT_UI);
-    draw_splashscreen();
 
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
         if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
@@ -2502,7 +2529,9 @@ int main(void)
         }
     }
 
-    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION); 
+    if(auto_wps == 0)
+    	draw_splashscreen();
 
     init_reflect_table();
 
@@ -2581,6 +2610,7 @@ int main(void)
 
     recalc_offsets();
     reset_slides();
+    set_current_slide(get_wps_current_index());
 
     char fpstxt[10];
     int button;
@@ -2713,13 +2743,48 @@ int main(void)
                 show_previous_slide();
             break;
 
+        case PF_CONTEXT:
+            if ( auto_wps != 0 ) {
+                if( pf_state == pf_idle ) {  
+				    create_track_index(center_slide.slide_index);
+        		    reset_track_list();
+				    start_playback(true);
+				    rb->splash(HZ*2, "Added to playlist");
+                }
+                else if( pf_state == pf_show_tracks ) {
+                    rb->playlist_insert_track(NULL, get_track_filename(selected_track),
+                                                    PLAYLIST_INSERT_LAST, false, true);
+                    rb->playlist_sync(NULL);
+                    rb->splash(HZ*2, "Added to playlist");                    
+                }
+            }
+        	break;
+        case PF_TRACKLIST:
+            if ( auto_wps == 1 && pf_state == pf_idle ) {
+                pf_state = pf_cover_in;
+                break;				
+				} 
         case PF_SELECT:
             if ( pf_state == pf_idle ) {
-                pf_state = pf_cover_in;
+#if PF_PLAYBACK_CAPABLE
+                if(auto_wps == 1) {
+					create_track_index(center_slide.slide_index);
+        			reset_track_list();
+					start_playback(false);
+					last_album = center_index;
+                	return PLUGIN_GOTO_WPS;
+					}
+				else
+#endif              
+                pf_state = pf_cover_in;  
             }
             else if ( pf_state == pf_show_tracks ) {
 #if PF_PLAYBACK_CAPABLE
-                start_playback();
+                start_playback(false);
+                if(auto_wps != 0) {
+					last_album = center_index;
+                	return PLUGIN_GOTO_WPS;
+				}
 #endif
             }
             break;
@@ -2759,7 +2824,7 @@ enum plugin_status plugin_start(const void *parameter)
 #endif
 #endif
     ret = main();
-    if ( ret == PLUGIN_OK ) {
+    if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {

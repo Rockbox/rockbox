@@ -68,6 +68,7 @@
 #include "tagcache.h"
 #endif
 #include "language.h"
+#include "plugin.h"
 
 struct root_items {
     int (*function)(void* param);
@@ -544,6 +545,24 @@ static int load_context_screen(int selection)
         return GO_TO_PREVIOUS;
 }
 
+#ifdef HAVE_TAGCACHE
+static int load_plugin_screen(char *plug_path)
+{
+    int ret_val;
+    int old_previous = last_screen;    
+    last_screen = next_screen;
+    global_status.last_screen = (char)next_screen;
+    status_save();
+    
+    ret_val = plugin_load(plug_path, NULL);
+    if (ret_val == PLUGIN_OK) 
+        ret_val = GO_TO_PREVIOUS;
+    if (ret_val == GO_TO_PREVIOUS)
+        last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
+    return ret_val;
+}
+#endif
+
 static int previous_music = GO_TO_WPS;
 
 void previous_music_is_wps(void)
@@ -619,6 +638,18 @@ void root_menu(void)
             case GO_TO_ROOTITEM_CONTEXT:
                 next_screen = load_context_screen(selected);
                 break;
+#ifdef HAVE_TAGCACHE                
+            case GO_TO_PICTUREFLOW:
+                while ( !tagcache_is_usable() ) 
+                {
+                    splash(0, str(LANG_TAGCACHE_BUSY));
+                    if ( action_userabort(HZ/5) ) 
+                        break;
+                }
+                next_screen = load_plugin_screen(PLUGIN_DEMOS_DIR "/pictureflow.rock");
+                previous_browser = GO_TO_PICTUREFLOW;
+                break;
+#endif                
             default:
                 if (next_screen == GO_TO_FILEBROWSER 
 #ifdef HAVE_TAGCACHE
