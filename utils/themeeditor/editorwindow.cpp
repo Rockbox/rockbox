@@ -33,7 +33,7 @@ EditorWindow::EditorWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     prefs = new PreferencesDialog(this);
-    project = new ProjectModel();
+    project = 0;
     loadSettings();
     setupUI();
     setupMenus();
@@ -94,9 +94,6 @@ void EditorWindow::setupUI()
     parseStatus = new QLabel(this);
     ui->statusbar->addPermanentWidget(parseStatus);
 
-    /* Setting up the project viewer */
-    ui->projectTree->setModel(project);
-
 }
 
 void EditorWindow::setupMenus()
@@ -130,6 +127,8 @@ void EditorWindow::setupMenus()
     QObject::connect(ui->actionToolbarOpen, SIGNAL(triggered()),
                      this, SLOT(openFile()));
 
+    QObject::connect(ui->actionOpen_Project, SIGNAL(triggered()),
+                     this, SLOT(openProject()));
 }
 
 void EditorWindow::addTab(SkinDocument *doc)
@@ -239,6 +238,33 @@ void EditorWindow::openFile()
     settings.endGroup();
 }
 
+void EditorWindow::openProject()
+{
+    QString fileName;
+    QSettings settings;
+
+    settings.beginGroup("ProjectModel");
+    QString directory = settings.value("defaultDirectory", "").toString();
+    fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), directory,
+                                            ProjectModel::fileFilter());
+
+    if(QFile::exists(fileName))
+    {
+
+        if(project)
+            delete project;
+
+        project = new ProjectModel(fileName);
+        ui->projectTree->setModel(project);
+
+        fileName.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
+        settings.setValue("defaultDirectory", fileName);
+
+    }
+
+    settings.endGroup();
+
+}
 
 void EditorWindow::tabTitleChanged(QString title)
 {
@@ -288,4 +314,6 @@ EditorWindow::~EditorWindow()
 {
     delete ui;
     delete prefs;
+    if(project)
+        delete project;
 }

@@ -21,11 +21,12 @@
 
 
 #include "projectmodel.h"
+#include "projectfiles.h"
 
-ProjectModel::ProjectModel(QObject *parent) :
+ProjectModel::ProjectModel(QString config, QObject *parent) :
     QAbstractItemModel(parent)
 {
-
+    root = new ProjectRoot(config);
 }
 
 ProjectModel::~ProjectModel()
@@ -59,7 +60,7 @@ QModelIndex ProjectModel::parent(const QModelIndex &child) const
     ProjectNode* foundParent = static_cast<ProjectNode*>
                                    (child.internalPointer())->parent();
 
-    if(foundParent == root)
+    if(foundParent == 0)
         return QModelIndex();
 
     return createIndex(foundParent->row(), 0, foundParent);
@@ -104,11 +105,24 @@ QVariant ProjectModel::headerData(int col, Qt::Orientation orientation,
 
 Qt::ItemFlags ProjectModel::flags(const QModelIndex &index) const
 {
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    return static_cast<ProjectNode*>
+            (index.internalPointer())->flags(index.column());
 }
 
 bool ProjectModel::setData(const QModelIndex &index, const QVariant &value,
                            int role)
 {
     return true;
+}
+
+/* Constructor and destructor for the root class */
+ProjectRoot::ProjectRoot(QString config)
+{
+    children.append(new ProjectFiles(this));
+}
+
+ProjectRoot::~ProjectRoot()
+{
+    for(int i = 0; i < children.count(); i++)
+        delete children[i];
 }
