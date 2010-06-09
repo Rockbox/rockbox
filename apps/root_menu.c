@@ -556,7 +556,7 @@ static int load_plugin_screen(char *plug_path)
     
     ret_val = plugin_load(plug_path, NULL);
     if (ret_val == PLUGIN_OK) 
-        ret_val = GO_TO_PREVIOUS;
+        ret_val = audio_status() ? GO_TO_PREVIOUS : GO_TO_ROOT;
     if (ret_val == GO_TO_PREVIOUS)
         last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
     return ret_val;
