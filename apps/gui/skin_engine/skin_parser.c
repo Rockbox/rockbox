@@ -133,8 +133,8 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_setting_and_lang(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
-        
-        
+
+
 static int parse_languagedirection(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {
@@ -171,7 +171,7 @@ static int parse_font_load(const char *wps_bufptr,
 static int parse_viewportcolour(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_special(const char *wps_bufptr,
-       struct wps_token *token, struct wps_data *wps_data);
+        struct wps_token *token, struct wps_data *wps_data);
 #endif
 #ifdef HAVE_ALBUMART
 static int parse_albumart_load(const char *wps_bufptr,
@@ -360,7 +360,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_TUNER_SCANMODE,           "tm",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_TUNER_STEREO,             "ts",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_TUNER_MINFREQ,            "ta",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_TUNER_MAXFREQ,            "tb",  WPS_REFRESH_STATIC,  NULL }, 
+    { WPS_TOKEN_TUNER_MAXFREQ,            "tb",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_TUNER_CURFREQ,            "tf",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_PRESET_ID,                "Ti",  WPS_REFRESH_STATIC, NULL },
     { WPS_TOKEN_PRESET_NAME,              "Tn",  WPS_REFRESH_STATIC, NULL },
@@ -419,7 +419,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_TRANSLATEDSTRING,         "Sx",  WPS_REFRESH_STATIC,
                                                     parse_setting_and_lang },
     { WPS_TOKEN_LANG_IS_RTL ,             "Sr",  WPS_REFRESH_STATIC, NULL },
-                                                    
+
     { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
     { WPS_TOKEN_CURRENT_SCREEN,           "cs",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
@@ -732,6 +732,11 @@ static int parse_image_load(const char *wps_bufptr,
         img->num_subimages = atoi(ptr);
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
+        /* Check there is a terminating ) */
+        while(isdigit(*ptr))
+            ptr++;
+        if (*ptr != ')')
+            return WPS_ERROR_INVALID_PARAM;
     }
     struct skin_token_list *item = new_skin_token_list_item(NULL, img);
     if (!item)
@@ -753,7 +758,7 @@ static int parse_font_load(const char *wps_bufptr,
     const char *ptr = wps_bufptr;
     int id;
     char *filename;
-    
+
     if (*ptr != '(')
         return WPS_ERROR_INVALID_PARAM;
 
@@ -762,10 +767,10 @@ static int parse_font_load(const char *wps_bufptr,
     if (!(ptr = parse_list("ds", NULL, ',', ptr, &id, &filename)))
         return WPS_ERROR_INVALID_PARAM;
 
-    /* Check there is a terminating | */
+    /* Check there is a terminating ) */
     if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
-        
+
     if (id <= FONT_UI || id >= MAXFONTS-1)
         return WPS_ERROR_INVALID_PARAM;
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -781,11 +786,11 @@ static int parse_font_load(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
     skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
-    
+
     return skip_end_of_line(wps_bufptr);
 }
-    
-    
+
+
 static int parse_viewport_display(const char *wps_bufptr,
                                   struct wps_token *token,
                                   struct wps_data *wps_data)
@@ -918,7 +923,7 @@ static int parse_playlistview(const char *wps_bufptr,
     length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);
     if (length < 0)
         return WPS_ERROR_INVALID_PARAM;
-    
+
     return skip_end_of_line(wps_bufptr);
 }
 #endif
@@ -969,7 +974,6 @@ static int parse_viewport(const char *wps_bufptr,
         }
         else
             return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-        
     }
     else if (*ptr == 'l')
     {
@@ -1007,7 +1011,7 @@ static int parse_viewport(const char *wps_bufptr,
     }
     else
         vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
-        
+
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     skin_vp->start_fgcolour = vp->fg_pattern;
     skin_vp->start_bgcolour = vp->bg_pattern;
@@ -1232,7 +1236,7 @@ static int parse_timeout(const char *wps_bufptr,
 
     return skip;
 }
-   
+
 static int parse_progressbar(const char *wps_bufptr,
                              struct wps_token *token,
                              struct wps_data *wps_data)
@@ -1245,7 +1249,7 @@ static int parse_progressbar(const char *wps_bufptr,
         PB_X,
         PB_Y,
         PB_WIDTH,
-        PB_HEIGHT
+        PB_HEIGHT,
     };
     const char *filename;
     int x, y, height, width;
@@ -1291,14 +1295,7 @@ static int parse_progressbar(const char *wps_bufptr,
 
     if (!(ptr = parse_list("sdddd", &set, ',', ptr, &filename,
                                                  &x, &y, &width, &height)))
-    {
-        /* If we are in a conditional then we probably don't want to fail
-         * if the above doesnt work. So assume the | is breaking the conditional
-         * and move on. The next token will fail if this is incorrect. */
-        if (level >= 0)
-            return 0;
         return WPS_ERROR_INVALID_PARAM;
-    }
 
     if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */
         pb->bm.data = (char*)filename;
@@ -1346,13 +1343,16 @@ static int parse_progressbar(const char *wps_bufptr,
     else
         pb->y = -line_num - 1; /* Will be computed during the rendering */
 
+    if (*ptr != ')')
+        return WPS_ERROR_INVALID_PARAM;
+
     add_to_ll_chain(&wps_data->progressbars, item);
     if (token->type == WPS_TOKEN_VOLUME)
         token->type = WPS_TOKEN_VOLUMEBAR;
     else if (token->type == WPS_TOKEN_BATTERY_PERCENT)
         token->type = WPS_TOKEN_BATTERY_PERCENTBAR;
     pb->type = token->type;
-    
+
     return ptr+1-wps_bufptr;
 #else
     (void)wps_bufptr;
@@ -1394,7 +1394,7 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* format: %Cl|x|y|[[l|c|r]mwidth]|[[t|c|b]mheight]| */
     if (!(ptr = parse_list("dddd", NULL,',',ptr, &aa->x, &aa->y, &aa->width, &aa->height)))
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-        
+
     /* if we got here, we parsed everything ok .. ! */
     if (aa->width < 0)
         aa->width = 0;
@@ -1420,62 +1420,56 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     if (0 <= albumart_slot)
         wps_data->playback_aa_slot = albumart_slot;
-        
-    if (*ptr == ')')
-        return skip_end_of_line(wps_bufptr);
-    else if (*ptr != ',')
-        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-    ptr++;
-    switch (*ptr)
+
+    if (*ptr == ',')
     {
-        case 'l':
-        case 'L':
-            if (swap_for_rtl)
-                aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
-            else
-                aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
-            break;
-        case 'c':
-        case 'C':
-            aa->xalign = WPS_ALBUMART_ALIGN_CENTER;
-            break;
-        case 'r':
-        case 'R':
-            if (swap_for_rtl)
-                aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
-            else
-                aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
-            break;
+        ptr++;
+        switch (*ptr)
+        {
+            case 'l':
+            case 'L':
+                if (swap_for_rtl)
+                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+                else
+                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+                break;
+            case 'c':
+            case 'C':
+                aa->xalign = WPS_ALBUMART_ALIGN_CENTER;
+                break;
+            case 'r':
+            case 'R':
+                if (swap_for_rtl)
+                    aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
+                else
+                    aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
+                break;
+        }
+        ptr++;
     }
-    ptr++;
-    if (*ptr == ')')
-        return skip_end_of_line(wps_bufptr);
-    else if (*ptr != ',')
-        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-    ptr++;
-    switch (*ptr)
+    if (*ptr == ',')
     {
-        case 't':
-        case 'T':
-            aa->yalign = WPS_ALBUMART_ALIGN_TOP;
-            break;
-        case 'c':
-        case 'C':
-            aa->yalign = WPS_ALBUMART_ALIGN_CENTER;
-            break;
-        case 'b':
-        case 'B':
-            aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
-            break;
-        case 'd':
-        case 'D':
-        case 'i':
-        case 'I':
-        case 's':
-        case 'S':
-            /* simply ignored */
-            break;
+        ptr++;
+        switch (*ptr)
+        {
+            case 't':
+            case 'T':
+                aa->yalign = WPS_ALBUMART_ALIGN_TOP;
+                break;
+            case 'c':
+            case 'C':
+                aa->yalign = WPS_ALBUMART_ALIGN_CENTER;
+                break;
+            case 'b':
+            case 'B':
+                aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
+                break;
+        }
+        ptr++;
     }
+    if (*ptr != ')')
+        return WPS_ERROR_INVALID_PARAM;
+
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -1554,7 +1548,7 @@ static int parse_touchregion(const char *wps_bufptr,
     if (!(ptr = parse_list("dddds", NULL, ',', ptr, &x, &y, &w, &h, &action)))
         return WPS_ERROR_INVALID_PARAM;
 
-    /* Check there is a terminating | */
+    /* Check there is a terminating ) */
     if (*ptr != ')')
         return WPS_ERROR_INVALID_PARAM;
 
@@ -1801,7 +1795,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
         return false;
     skin_buffer_increment(max_tokens * sizeof(struct wps_token), false);
     data->num_tokens = 0;
-    
+
 #if LCD_DEPTH > 1
     /* Backdrop defaults to the setting unless %X is used, so set it now */
     if (global_settings.backdrop_file[0])
@@ -2272,7 +2266,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     skin_data_reset(wps_data);
     wps_data->wps_loaded = false;
     curr_screen = screen;
-    
+
     /* alloc default viewport, will be fixed up later */
     curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
     if (!curr_vp)
@@ -2287,7 +2281,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     curr_vp->label         = VP_DEFAULT_LABEL;
     curr_vp->hidden_flags  = 0;
     curr_vp->lines         = NULL;
-    
+
     viewport_set_defaults(&curr_vp->vp, screen);
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     curr_vp->start_fgcolour = curr_vp->vp.fg_pattern;
