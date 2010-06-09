@@ -145,6 +145,7 @@ enum skin_token_type {
     /* Albumart */
     SKIN_TOKEN_ALBUMART_LOAD,
     SKIN_TOKEN_ALBUMART_DISPLAY,
+    SKIN_TOKEN_ALBUMART_FOUND,
 
     /* Metadata */
   TOKEN_MARKER_METADATA,
@@ -261,7 +262,7 @@ enum skin_token_type {
  *             s - Nullable string
  *             F - Required file name
  *             f - Nullable file name
- *             C - Required WPS code
+ *             C - Required skin code
  *          Any nullable parameter may be replaced in the WPS file
  *          with a '-'.  To specify that parameters may be left off
  *          altogether, place a '|' in the parameter string.  For

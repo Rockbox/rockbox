@@ -174,6 +174,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF"},
     { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss"},
     { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , ""},
+    { SKIN_TOKEN_ALBUMART_FOUND,        "C" , ""},
     
     { SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S"},
     { SKIN_TOKEN_UIVIEWPORT_ENABLE,     "VI" , "S"},
@@ -182,8 +183,8 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_LIST_TITLE_TEXT,       "Lt" , ""},
     { SKIN_TOKEN_LIST_TITLE_ICON,       "Li" , ""},
     
-    { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "I"},
-    { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "I"},
+    { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "S"},
+    { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "S"},
     
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii|ii"},
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii|ii"},
