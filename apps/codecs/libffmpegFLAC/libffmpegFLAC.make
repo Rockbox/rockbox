@@ -13,6 +13,18 @@ FFMPEGFLACLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libffmpegFLAC/SOURCES)
 FFMPEGFLACLIB_OBJ := $(call c2obj, $(FFMPEGFLACLIB_SRC))
 OTHER_SRC += $(FFMPEGFLACLIB_SRC)
 
+# libffmpegFLAC is faster on ARM-targets with -O2 than -O1
+FFMPEGFLACFLAGS = -I$(APPSDIR)/codecs/libffmpegFLAC $(filter-out -O%,$(CODECFLAGS))
+ifeq ($(CPU),arm)
+   FFMPEGFLACFLAGS += -O2
+else
+   FFMPEGFLACFLAGS += -O1
+endif
+
 $(FFMPEGFLACLIB): $(FFMPEGFLACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
+
+$(CODECDIR)/libffmpegFLAC/%.o: $(ROOTDIR)/apps/codecs/libffmpegFLAC/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(FFMPEGFLACFLAGS) -c $< -o $@
