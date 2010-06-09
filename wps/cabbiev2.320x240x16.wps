@@ -10,7 +10,7 @@
 %xl(E,repeat-320x240x16.bmp,261,207,4)
 %xl(F,playmode-320x240x16.bmp,286,207,5)
 %ax%Cl(16,32,120,120)
-%pb(pb-320x240x16.bmp,10,162,300,15)
+%pb(10,162,300,15,pb-320x240x16.bmp)
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>

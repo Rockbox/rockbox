@@ -543,7 +543,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
             element->params[i].type = NUMERIC;
             element->params[i].data.numeric = scan_int(&cursor);
         }
-        else if(tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')
+        else if(tolower(*tag_args) == 'n' ||
+                tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')
         {
             /* Scanning a string argument */
             element->params[i].type = STRING;
@@ -576,7 +577,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
             cursor++;
         }
 
-        tag_args++;
+        if (*tag_args != 'N')
+            tag_args++;
 
         /* Checking for the optional bar */
         if(*tag_args == '|')

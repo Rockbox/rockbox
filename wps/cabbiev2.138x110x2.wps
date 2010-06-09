@@ -11,7 +11,7 @@
 %xl(E,repeat-160x128x2.bmp,102,97,4)
 %xl(F,playmode-160x128x2.bmp,123,98,5)
 %ax%Cl(5,15,55,55)
-%pb(pb-138x110x2.bmp,2,75,134,6)
+%pb(2,75,134,6,pb-138x110x2.bmp)
 #images
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>

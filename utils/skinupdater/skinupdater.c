@@ -130,10 +130,26 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     {
         if (*start == '|')
         {
+            int i=0;
+            char filename[128];
             len++; start++;
             PUTCH(out, '(');
+            /* |file|x|y|width|height| -> (x,y,width,height,file) */
+            while (start[i] != '|')
+            {
+                filename[i] = start[i];
+                i++;
+            }
+            filename[i] = '\0';
+            len +=i+1;
+            start += i+1;
             /* TODO: need to verify that we are actually using the long form... */
-            len += dump_arg(out, start, 5, true);
+            len += dump_arg(out, start, 4, false);
+            if (i>0)
+            {
+                fprintf(out, ",%s", filename);
+            }
+            PUTCH(out, ')');
         }
     }
     else if (MATCH("d") || MATCH("D") || MATCH("mv") || MATCH("pS") || MATCH("pE") || MATCH("t") || MATCH("Tl"))

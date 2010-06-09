@@ -5,7 +5,7 @@
 %s%ac%?ia<%ia|%?d(2)<%d(2)|Unknown Artist>>
 %s%ac%?id<%id|%?d(1)<%d(1)|Unknown Album>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
-%pb(-,11,-,90,3)
+%pb(11,-,90,3,-)
 %t(6)%s%ac%?Fm<%Sx(Next:) %?It<%It|%Fn>|%fbKbps %fc>;%t(6)%s%ac%?Fm<%Sx(Next:) %?It<%It|%Fn>|%fbKbps %fc>
 
 %xl(A,battery-s.bmp,93,3,5)

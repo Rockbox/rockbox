@@ -6,7 +6,7 @@
 %s%ac%?ia<%ia|%?d(2)<%d(2)|Unknown Artist>>
 %s%ac%?id<%id|%?d(1)<%d(1)|Unknown Album>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
-%pb(-,11,-,106,4)
+%pb(11,-,106,4,-)
 
 %s%ac%Sx(Next:) %?It<%It|%?Fn<%Fn|?>>
 

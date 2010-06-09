@@ -10,7 +10,7 @@
 %xl(E,repeat-160x128x2.bmp,93,113,4)
 %xl(F,playmode-160x128x2.bmp,112,114,5)
 %ax%Cl(4,12,60,60)
-%pb(pb-128x96x2.bmp,1,87,125,7)
+%pb(1,87,125,7,pb-128x96x2.bmp)
 # images all in the default viewport
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>

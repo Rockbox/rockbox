@@ -9,7 +9,7 @@
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 
 %al %fbKbps
-%pb(-,11,-,198,6)
+%pb(11,-,198,6,-)
 
 %s%ac%Sx(Next:) %?It<%It|%?Fn<%Fn|?>>
 

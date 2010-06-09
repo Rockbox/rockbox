@@ -6,7 +6,7 @@
 # progressbar viewport
 %V(0,0,128,6,1)
 %x(a,pbbackground-128x64x1.bmp,1,0)
-%pb(pb-128x64x1.bmp,2,1,124,4)
+%pb(2,1,124,4,pb-128x64x1.bmp)
 
 %V(0,8,128,8,1)
 %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pc

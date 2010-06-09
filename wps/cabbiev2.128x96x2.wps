@@ -8,7 +8,7 @@
 %xl(D,shuffle-160x128x2.bmp,72,2)
 %xl(E,repeat-160x128x2.bmp,93,0,4)
 %xl(F,playmode-160x128x2.bmp,112,1,5)
-%pb(pb-128x96x2.bmp,1,61,125,7)
+%pb(1,61,125,7,pb-128x96x2.bmp)
 %V(0,83,128,13,1)%Vf(0)%Vb(3)
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>

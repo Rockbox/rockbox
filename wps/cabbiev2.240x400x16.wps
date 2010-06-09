@@ -6,7 +6,7 @@
 %wd
 %X(wpsbackdrop-240x400x16.bmp)
 %Cl(55,50,130,130,c,c)
-%pb(pb-240x320x16.bmp,22,284,199,13)
+%pb(22,284,199,13,pb-240x320x16.bmp)
 %T(22,284,199,13,progressbar)
 %T(90,238,60,20,playlist)
 %?Tl(2.5)<%Vd(t)|%Vd(u)>

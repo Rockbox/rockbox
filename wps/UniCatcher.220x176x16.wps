@@ -8,7 +8,7 @@
 %s%ac%?id<%id|%?d(1)<%d(1)|Unknown Album>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 %al %fbKbps
-%pb(-,11,-,198,6)
+%pb(11,-,198,6,-)
 
 %s%ac%Sx(Next:) %?It<%It|%?Fn<%Fn|?>>
 

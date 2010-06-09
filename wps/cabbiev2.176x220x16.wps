@@ -9,7 +9,7 @@
 %xl(E,repeat-176x220x16.bmp,144,204,4)
 %xl(F,playmode-176x220x16.bmp,159,204,5)
 %Cl(29,20,120,120,c,c)
-%pb(pb-176x220x16.bmp,5,182,166,8)
+%pb(5,182,166,8,pb-176x220x16.bmp)
 #NowPlaying
 
 

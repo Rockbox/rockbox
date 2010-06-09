@@ -263,6 +263,7 @@ enum skin_token_type {
  *             F - Required file name
  *             f - Nullable file name
  *             C - Required skin code
+ *             N - any amount of strings.. must be the last param in the list
  *          Any nullable parameter may be replaced in the WPS file
  *          with a '-'.  To specify that parameters may be left off
  *          altogether, place a '|' in the parameter string.  For

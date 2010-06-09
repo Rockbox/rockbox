@@ -3,7 +3,7 @@
 %t(1) %?mp<%al%pp/%pe%ar-:--/-:--|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt>;%t(1) %?mp<%al%pp/%pe%ar-:--/-:--|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|Unknown Artist>>
 %s%ac%?id<%id|%?d(1)<%d(1)|Unknown Album>>
-%pb(-,11,-,106,4)
+%pb(11,-,106,4,-)
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 
 %xl(A,battery-s.bmp,109,3,5)

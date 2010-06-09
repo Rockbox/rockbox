@@ -1245,11 +1245,15 @@ static int parse_progressbar(const char *wps_bufptr,
     using - for any of the params uses "sane" values */
 #ifdef HAVE_LCD_BITMAP
     enum {
-        PB_FILENAME = 0,
-        PB_X,
+        PB_X = 0,
         PB_Y,
         PB_WIDTH,
+<<<<<<< .mine
         PB_HEIGHT,
+        PB_FILENAME,
+=======
+        PB_HEIGHT,
+>>>>>>> .r26726
     };
     const char *filename;
     int x, y, height, width;
@@ -1293,8 +1297,8 @@ static int parse_progressbar(const char *wps_bufptr,
     }
     ptr = wps_bufptr + 1;
 
-    if (!(ptr = parse_list("sdddd", &set, ',', ptr, &filename,
-                                                 &x, &y, &width, &height)))
+    if (!(ptr = parse_list("dddds", &set, ',', ptr,
+                           &x, &y, &width, &height, &filename)))
         return WPS_ERROR_INVALID_PARAM;
 
     if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */

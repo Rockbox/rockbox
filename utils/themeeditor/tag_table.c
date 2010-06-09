@@ -22,7 +22,7 @@
 #include "tag_table.h"
 
 #include <string.h>
-
+#define BAR_PARAMS "*|IIIIN"
 /* The tag definition table */
 struct tag_info legal_tags[] = 
 {
@@ -33,7 +33,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_ALIGN_RIGHT_RTL,       "aR", "" },
     { SKIN_TOKEN_ALIGN_LANGDIRECTION,   "ax", "" },
     
-    { SKIN_TOKEN_BATTERY_PERCENT,       "bl" , "*fIIII" },
+    { SKIN_TOKEN_BATTERY_PERCENT,       "bl" , BAR_PARAMS },
     { SKIN_TOKEN_BATTERY_VOLTS,         "bv", "" },
     { SKIN_TOKEN_BATTERY_TIME,          "bt", "" },
     { SKIN_TOKEN_BATTERY_SLEEPTIME,     "bs", "" },
@@ -124,8 +124,8 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_PEAKMETER,             "pm", "" },
     { SKIN_TOKEN_PLAYER_PROGRESSBAR,    "pf", "" },
-    { SKIN_TOKEN_PROGRESSBAR,           "pb" , "*fIIII" },
-    { SKIN_TOKEN_VOLUME,                "pv" , "*fIIII" },
+    { SKIN_TOKEN_PROGRESSBAR,           "pb" , BAR_PARAMS },
+    { SKIN_TOKEN_VOLUME,                "pv" , BAR_PARAMS },
     
     { SKIN_TOKEN_TRACK_ELAPSED_PERCENT, "px", "" },
     { SKIN_TOKEN_TRACK_TIME_ELAPSED,    "pc", "" },

@@ -16,7 +16,7 @@
 %al %s%ac%?it<%it|%fn>%ar 
 
 %ac%t(3)%ig;%ac%iy 
-%pb(pg-200.bmp,10,116,200,5)
+%pb(10,116,200,5,pg-200.bmp)
 %al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|speex|spc|ape|wma|unknown>%ar%pt  
 %?ps<%xd(B)>
 %?mp<%xd(Ab)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)>

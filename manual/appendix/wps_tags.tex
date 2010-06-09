@@ -124,7 +124,7 @@ produce the information for the next file to be played.
          & This will replace the entire line with a progress bar. \\
          & You can set the position, width and height of the progressbar %
            (in pixels) and load a custom image for it: %
-           \config{\%pb{\textbar}image.bmp{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}}} \\
+           \config{\%pb{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}image.bmp{\textbar}}} \\
     \opt{player}{%
     \config{\%pf} & Full-line progress bar \& time display\\
     }%
@@ -145,7 +145,7 @@ produce the information for the next file to be played.
            {\textbar}N{\textgreater}}\\
          & 0 is used for mute, the last option is used for values greater than zero.\\
          \opt{lcd_bitmap}{& This can also be used like \%pb to provide a continuous scale:
-         \config{\%pv{\textbar}image.bmp{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}}} \\
+         \config{\%pv{{\textbar}x{\textbar}y{\textbar}width{\textbar}height\textbar}image.bmp{\textbar}}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
          10 seconds if no number is specified.\\

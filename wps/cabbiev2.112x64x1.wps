@@ -14,7 +14,7 @@
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %t(5)%ac%s%?Fn<%Sx(Next:) %?It<%It|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>%;%t(5)%ac%s%?Fn<%Sx(Next:) %?Ia<%Ia|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>
-%pb(pb-112x64x1.bmp,1,42,110,4)
+%pb(1,42,110,4,pb-112x64x1.bmp)
 %pc%ar%pr
 #Bottom status bar
 %?mh<%xd(Aa)|%xd(Ab)>

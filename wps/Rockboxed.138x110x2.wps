@@ -13,7 +13,7 @@
 %al %s%ac%?id<%id|%d(1)>%ar 
 %al %s%ac%?it<%it|%fn>%ar 
 %ac%t(3)%ig;%ac%iy 
-%pb(pg-grey-118.bmp,10,-,118,5)
+%pb(10,-,118,5,pg-grey-118.bmp)
 %al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|speex|spc|ape|wma|unknown>%ar%pt  
 %?ps<%xd(B)>
 %?mp<%xd(Ab)|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)>
