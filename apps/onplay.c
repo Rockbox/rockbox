@@ -929,6 +929,8 @@ static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
 MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
                   set_rating_inline, NULL,
                   ratingitem_callback, Icon_Questionmark);
+#endif                  
+#ifdef HAVE_PICTUREFLOW_INTEGRATION                  
 MENUITEM_RETURNVALUE(pictureflow_item, ID2P(LANG_ONPLAY_PICTUREFLOW), 
                   GO_TO_PICTUREFLOW, NULL, Icon_NOICON);                  
 #endif
@@ -1134,7 +1136,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &rating_item,
 #endif
            &bookmark_menu, 
-#ifdef HAVE_TAGCACHE
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
            &pictureflow_item,
 #endif           
            &browse_id3_item, &list_viewers_item,
