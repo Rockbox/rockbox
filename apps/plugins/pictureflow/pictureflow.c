@@ -788,6 +788,7 @@ char* get_track_filename(const int track_index)
         return track_names + tracks[track_index].filename_idx;
     return 0;
 }
+#endif
 
 int get_wps_current_index(void)
 {
@@ -800,7 +801,7 @@ int get_wps_current_index(void)
         }
     return last_album;
 }
-#endif
+
 /**
   Compare two unsigned ints passed via pointers.
  */
@@ -2742,7 +2743,7 @@ int main(void)
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
             break;
-
+#if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
             if ( auto_wps != 0 ) {
                 if( pf_state == pf_idle ) {  
@@ -2759,6 +2760,7 @@ int main(void)
                 }
             }
         	break;
+#endif            
         case PF_TRACKLIST:
             if ( auto_wps == 1 && pf_state == pf_idle ) {
                 pf_state = pf_cover_in;
