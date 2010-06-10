@@ -1950,6 +1950,7 @@ fi
     t_manufacturer="as3525"
     t_model="sansa-clip"
     arm9tdmicc
+    GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
 
 
@@ -1992,6 +1993,7 @@ fi
     t_manufacturer="as3525"
     t_model="sansa-m200v4"
     arm9tdmicc
+    GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
 
 
@@ -2037,6 +2039,7 @@ fi
     t_manufacturer="as3525"
     t_model="sansa-c200v2"
     arm9tdmicc
+    GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
 
    60|sansaclipv2)
