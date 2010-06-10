@@ -793,11 +793,6 @@ Lyre prototype 1 */
 #define FORCE_SINGLE_CORE
 #endif
 
-/* Core locking types - specifies type of atomic operation */
-#define CORELOCK_NONE   0
-#define SW_CORELOCK     1 /* Mutual exclusion provided by a software algorithm
-                             and not a special semaphore instruction */
-
 #if defined(CPU_PP)
 #define IDLE_STACK_SIZE  0x80
 #define IDLE_STACK_WORDS 0x20
@@ -811,6 +806,7 @@ Lyre prototype 1 */
 #if !defined(FORCE_SINGLE_CORE)
 
 #define NUM_CORES 2
+#define HAVE_CORELOCK_OBJECT
 #define CURRENT_CORE current_core()
 /* Attributes for core-shared data in DRAM where IRAM is better used for other
  * purposes. */
@@ -821,9 +817,7 @@ Lyre prototype 1 */
 #define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   core
 
-#define CONFIG_CORELOCK SW_CORELOCK /* SWP(B) is broken */
-
-#endif /* !defined(BOOTLOADER) && CONFIG_CPU != PP5002 */
+#endif /* !defined(FORCE_SINGLE_CORE) */
 
 #endif /* CPU_PP */
 
@@ -831,18 +825,6 @@ Lyre prototype 1 */
 #define NOCACHEBSS_ATTR     __attribute__((section(".ncbss"),nocommon))
 #define NOCACHEDATA_ATTR    __attribute__((section(".ncdata"),nocommon))
 #endif
-
-#ifndef CONFIG_CORELOCK
-#define CONFIG_CORELOCK CORELOCK_NONE
-#endif
-
-#if CONFIG_CORELOCK == SW_CORELOCK
-#define IF_SWCL(...) __VA_ARGS__
-#define IFN_SWCL(...)
-#else
-#define IF_SWCL(...)
-#define IFN_SWCL(...) __VA_ARGS__
-#endif /* CONFIG_CORELOCK == */
 
 #ifndef NUM_CORES
 /* Default to single core */
@@ -855,7 +837,6 @@ Lyre prototype 1 */
 #define NOCACHEBSS_ATTR
 #define NOCACHEDATA_ATTR
 #endif
-#define CONFIG_CORELOCK CORELOCK_NONE
 
 #define IF_COP(...)
 #define IF_COP_VOID(...)    void

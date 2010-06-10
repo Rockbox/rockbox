@@ -109,6 +109,23 @@ struct regs
     uint32_t lr;    /*    36 - r14 (lr) */
     uint32_t start; /*    40 - Thread start address, or NULL when started */
 };
+
+#ifdef CPU_PP
+#ifdef HAVE_CORELOCK_OBJECT
+/* No reliable atomic instruction available - use Peterson's algorithm */
+struct corelock
+{
+    volatile unsigned char myl[NUM_CORES];
+    volatile unsigned char turn;
+} __attribute__((packed));
+
+/* Too big to inline everywhere */
+void corelock_init(struct corelock *cl);
+void corelock_lock(struct corelock *cl);
+int corelock_try_lock(struct corelock *cl);
+void corelock_unlock(struct corelock *cl);
+#endif /* HAVE_CORELOCK_OBJECT */
+#endif /* CPU_PP */
 #elif defined(CPU_MIPS)
 struct regs
 {
@@ -162,26 +179,13 @@ struct thread_list
     struct thread_entry *next; /* Next thread in a list */
 };
 
-/* Small objects for core-wise mutual exclusion */
-#if CONFIG_CORELOCK == SW_CORELOCK
-/* No reliable atomic instruction available - use Peterson's algorithm */
-struct corelock
-{
-    volatile unsigned char myl[NUM_CORES];
-    volatile unsigned char turn;
-} __attribute__((packed));
-
-void corelock_init(struct corelock *cl);
-void corelock_lock(struct corelock *cl);
-int corelock_try_lock(struct corelock *cl);
-void corelock_unlock(struct corelock *cl);
-#else
+#ifndef HAVE_CORELOCK_OBJECT
 /* No atomic corelock op needed or just none defined */
 #define corelock_init(cl)
 #define corelock_lock(cl)
 #define corelock_try_lock(cl)
 #define corelock_unlock(cl)
-#endif /* core locking selection */
+#endif /* HAVE_CORELOCK_OBJECT */
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 struct blocker
@@ -340,98 +344,6 @@ struct core_entry
 #define IF_PRIO(...)
 #define IFN_PRIO(...)   __VA_ARGS__
 #endif
-
-/* Macros generate better code than an inline function is this case */
-#if defined (CPU_ARM)
-/* atomic */
-#if CONFIG_CORELOCK == SW_CORELOCK
-#define test_and_set(a, v, cl) \
-    xchg8((a), (v), (cl))
-/* atomic */
-#define xchg8(a, v, cl) \
-({  uint32_t o;            \
-    corelock_lock(cl);     \
-    o = *(uint8_t *)(a);   \
-    *(uint8_t *)(a) = (v); \
-    corelock_unlock(cl);   \
-    o; })
-#define xchg32(a, v, cl) \
-({  uint32_t o;             \
-    corelock_lock(cl);      \
-    o = *(uint32_t *)(a);   \
-    *(uint32_t *)(a) = (v); \
-    corelock_unlock(cl);    \
-    o; })
-#define xchgptr(a, v, cl) \
-({  typeof (*(a)) o;     \
-    corelock_lock(cl);   \
-    o = *(a);            \
-    *(a) = (v);          \
-    corelock_unlock(cl); \
-    o; })
-#endif /* locking selection */
-#elif defined (CPU_COLDFIRE)
-/* atomic */
-/* one branch will be optimized away if v is a constant expression */
-#define test_and_set(a, v, ...) \
-({  uint32_t o = 0;                \
-    if (v) {                       \
-        asm volatile (             \
-            "bset.b #0, (%0)"      \
-            : : "a"((uint8_t*)(a)) \
-            : "cc");               \
-    } else {                       \
-        asm volatile (             \
-            "bclr.b #0, (%0)"      \
-            : : "a"((uint8_t*)(a)) \
-            : "cc");               \
-    }                              \
-    asm volatile ("sne.b %0"       \
-        : "+d"(o));                \
-    o; })
-#elif CONFIG_CPU == SH7034
-/* atomic */
-#define test_and_set(a, v, ...) \
-({  uint32_t o;                 \
-    asm volatile (              \
-        "tas.b  @%2     \n"     \
-        "mov    #-1, %0 \n"     \
-        "negc   %0, %0  \n"     \
-        : "=r"(o)               \
-        : "M"((uint32_t)(v)),   /* Value of_v must be 1 */ \
-          "r"((uint8_t *)(a))); \
-    o; })
-#endif /* CONFIG_CPU == */
-
-/* defaults for no asm version */
-#ifndef test_and_set
-/* not atomic */
-#define test_and_set(a, v, ...) \
-({  uint32_t o = *(uint8_t *)(a); \
-    *(uint8_t *)(a) = (v);        \
-    o; })
-#endif /* test_and_set */
-#ifndef xchg8
-/* not atomic */
-#define xchg8(a, v, ...) \
-({  uint32_t o = *(uint8_t *)(a); \
-    *(uint8_t *)(a) = (v);        \
-    o; })
-#endif /* xchg8 */
-#ifndef xchg32
-/* not atomic */
-#define xchg32(a, v, ...) \
-({  uint32_t o = *(uint32_t *)(a); \
-    *(uint32_t *)(a) = (v);        \
-    o; })
-#endif /* xchg32 */
-#ifndef xchgptr
-/* not atomic */
-#define xchgptr(a, v, ...) \
-({  typeof (*(a)) o = *(a); \
-    *(a) = (v);             \
-    o; })
-#endif /* xchgptr */
 
 void core_idle(void);
 void core_wake(IF_COP_VOID(unsigned int core));
