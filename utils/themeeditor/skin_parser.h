@@ -26,14 +26,7 @@
 extern "C"
 {
 #endif
-
-
-#define SKIN_MAX_MEMORY 1048576
-
-/********************************************************************
- ******  A global buffer will be used to store the parse tree *******
- *******************************************************************/
-extern char skin_parse_tree[];
+#include <stdlib.h>
 
 /********************************************************************
  ****** Data Structures *********************************************
@@ -98,8 +91,11 @@ struct skin_element
     /* The line on which it's defined in the source file */
     int line;
 
-    /* Text for comments and plaintext */
-    char* text;
+    /* Placeholder for element data
+     * TEXT and COMMENT uses it for the text string
+     * TAG, VIEWPORT, LINE, etc may use it for post parse extra storage
+     */
+    void* data;
 
     /* The tag or conditional name */
     struct tag_info *tag;
@@ -125,12 +121,14 @@ struct skin_element
 struct skin_element* skin_parse(const char* document);
 
 /* Memory management functions */
+char *skin_alloc(size_t size);
 struct skin_element* skin_alloc_element();
 struct skin_element** skin_alloc_children(int count);
 struct skin_tag_parameter* skin_alloc_params(int count);
 char* skin_alloc_string(int length);
 
 void skin_free_tree(struct skin_element* root);
+
 
 #ifdef __cplusplus
 }

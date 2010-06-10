@@ -30,27 +30,32 @@
 #include "symbols.h"
 #include "skin_scan.h"
 
+#ifdef ROCKBOX
 /* Declaration of parse tree buffer */
-char skin_parse_tree[SKIN_MAX_MEMORY];
-int skin_current_block = 0;
+#define SKIN_MAX_MEMORY (30*1024)
+static char skin_parse_tree[SKIN_MAX_MEMORY];
+static char *skin_buffer;
+#endif
 
 /* Global variables for the parser */
 int skin_line = 0;
 
 /* Auxiliary parsing functions (not visible at global scope) */
-struct skin_element* skin_parse_viewport(char** document);
-struct skin_element* skin_parse_line(char** document);
-struct skin_element* skin_parse_line_optional(char** document, int conditional);
-struct skin_element* skin_parse_sublines(char** document);
-struct skin_element* skin_parse_sublines_optional(char** document,
-                                                  int conditional);
+static struct skin_element* skin_parse_viewport(char** document);
+static struct skin_element* skin_parse_line(char** document);
+static struct skin_element* skin_parse_line_optional(char** document,
+                                                     int conditional);
+static struct skin_element* skin_parse_sublines(char** document);
+static struct skin_element* skin_parse_sublines_optional(char** document,
+                                                         int conditional);
 
-int skin_parse_tag(struct skin_element* element, char** document);
-int skin_parse_text(struct skin_element* element, char** document,
-                    int conditional);
-int skin_parse_conditional(struct skin_element* element, char** document);
-int skin_parse_comment(struct skin_element* element, char** document);
-struct skin_element* skin_parse_code_as_arg(char** document);
+static int skin_parse_tag(struct skin_element* element, char** document);
+static int skin_parse_text(struct skin_element* element, char** document,
+                           int conditional);
+static int skin_parse_conditional(struct skin_element* element,
+                                  char** document);
+static int skin_parse_comment(struct skin_element* element, char** document);
+static struct skin_element* skin_parse_code_as_arg(char** document);
 
 struct skin_element* skin_parse(const char* document)
 {
@@ -61,6 +66,10 @@ struct skin_element* skin_parse(const char* document)
     struct skin_element** to_write = 0;
 
     char* cursor = (char*)document; /*Keeps track of location in the document*/
+#ifdef ROCKBOX
+    /* FIXME */
+    skin_buffer = &skin_parse_tree[0];
+#endif
 
     skin_line = 1;
 
@@ -93,7 +102,7 @@ struct skin_element* skin_parse(const char* document)
 
 }
 
-struct skin_element* skin_parse_viewport(char** document)
+static struct skin_element* skin_parse_viewport(char** document)
 {
 
     struct skin_element* root = NULL;
@@ -218,7 +227,7 @@ struct skin_element* skin_parse_viewport(char** document)
 
 /* Auxiliary Parsing Functions */
 
-struct skin_element* skin_parse_line(char**document)
+static struct skin_element* skin_parse_line(char**document)
 {
 
     return skin_parse_line_optional(document, 0);
@@ -231,7 +240,8 @@ struct skin_element* skin_parse_line(char**document)
  * SEPERATESYM.  This should only be used when parsing a line inside a
  * conditional, otherwise just use the wrapper function skin_parse_line()
  */
-struct skin_element* skin_parse_line_optional(char** document, int conditional)
+static struct skin_element* skin_parse_line_optional(char** document,
+                                                     int conditional)
 {
     char* cursor = *document;
 
@@ -296,12 +306,12 @@ struct skin_element* skin_parse_line_optional(char** document, int conditional)
     return retval;
 }
 
-struct skin_element* skin_parse_sublines(char** document)
+static struct skin_element* skin_parse_sublines(char** document)
 {
     return skin_parse_sublines_optional(document, 0);
 }
 
-struct skin_element* skin_parse_sublines_optional(char** document,
+static struct skin_element* skin_parse_sublines_optional(char** document,
                                                   int conditional)
 {
     struct skin_element* retval;
@@ -379,7 +389,7 @@ struct skin_element* skin_parse_sublines_optional(char** document,
     return retval;
 }
 
-int skin_parse_tag(struct skin_element* element, char** document)
+static int skin_parse_tag(struct skin_element* element, char** document)
 {
 
     char* cursor = *document + 1;
@@ -422,7 +432,8 @@ int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     /* Copying basic tag info */
-    element->type = TAG;
+    if(element->type != CONDITIONAL)
+        element->type = TAG;
     element->tag = tag;
     tag_args = tag->params;
     element->line = skin_line;
@@ -606,14 +617,13 @@ int skin_parse_tag(struct skin_element* element, char** document)
  * If the conditional flag is set true, then parsing text will stop at an
  * ARGLISTSEPERATESYM.  Only set that flag when parsing within a conditional
  */
-int skin_parse_text(struct skin_element* element, char** document,
-                    int conditional)
+static int skin_parse_text(struct skin_element* element, char** document,
+                           int conditional)
 {
     char* cursor = *document;
-
     int length = 0;
-
     int dest;
+    char *text = NULL;
 
     /* First figure out how much text we're copying */
     while(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
@@ -643,7 +653,7 @@ int skin_parse_text(struct skin_element* element, char** document,
     element->type = TEXT;
     element->line = skin_line;
     element->next = NULL;
-    element->text = skin_alloc_string(length);
+    element->data = text = skin_alloc_string(length);
     
     for(dest = 0; dest < length; dest++)
     {
@@ -651,22 +661,21 @@ int skin_parse_text(struct skin_element* element, char** document,
         if(*cursor == TAGSYM)
             cursor++;
 
-        element->text[dest] = *cursor;
+        text[dest] = *cursor;
         cursor++;
     }
-    element->text[length] = '\0';
+    text[length] = '\0';
 
     *document = cursor;
 
     return 1;
 }
 
-int skin_parse_conditional(struct skin_element* element, char** document)
+static int skin_parse_conditional(struct skin_element* element, char** document)
 {
 
     char* cursor = *document + 1; /* Starting past the "%" */
     char* bookmark;
-    struct skin_element* tag = skin_alloc_element(); /* The tag to evaluate */
     int children = 1;
     int i;
 
@@ -674,7 +683,7 @@ int skin_parse_conditional(struct skin_element* element, char** document)
     element->line = skin_line;
 
     /* Parsing the tag first */
-    if(!skin_parse_tag(tag, &cursor))
+    if(!skin_parse_tag(element, &cursor))
         return 0;
 
     /* Counting the children */
@@ -714,21 +723,20 @@ int skin_parse_conditional(struct skin_element* element, char** document)
     cursor = bookmark;
 
     /* Parsing the children */
-    element->children_count = children + 1; /* Make sure to include the tag */
-    element->children = skin_alloc_children(children + 1);
-    element->children[0] = tag;
+    element->children = skin_alloc_children(children);
+    element->children_count = children;
 
-    for(i = 1; i < children + 1; i++)
+    for(i = 0; i < children; i++)
     {
         element->children[i] = skin_parse_code_as_arg(&cursor);
         skip_whitespace(&cursor);
 
-        if(i < children && *cursor != ENUMLISTSEPERATESYM)
+        if(i < children - 1 && *cursor != ENUMLISTSEPERATESYM)
         {
             skin_error(SEPERATOR_EXPECTED);
             return 0;
         }
-        else if(i == children && *cursor != ENUMLISTCLOSESYM)
+        else if(i == children - 1 && *cursor != ENUMLISTCLOSESYM)
         {
             skin_error(CLOSE_EXPECTED);
             return 0;
@@ -744,9 +752,10 @@ int skin_parse_conditional(struct skin_element* element, char** document)
     return 1;
 }
 
-int skin_parse_comment(struct skin_element* element, char** document)
+static int skin_parse_comment(struct skin_element* element, char** document)
 {
     char* cursor = *document;
+    char* text = NULL;
 
     int length;
     /*
@@ -758,12 +767,15 @@ int skin_parse_comment(struct skin_element* element, char** document)
 
     element->type = COMMENT;
     element->line = skin_line;
-    element->text = skin_alloc_string(length);
+#ifdef ROCKBOX 
+    element->data = NULL;
+#else    
+    element->data = text = skin_alloc_string(length);
     /* We copy from one char past cursor to leave out the # */
-    memcpy((void*)(element->text), (void*)(cursor + 1),
+    memcpy((void*)text, (void*)(cursor + 1),
            sizeof(char) * (length-1));
-    element->text[length - 1] = '\0';
-
+    text[length - 1] = '\0';
+#endif
     if(cursor[length] == '\n')
         skin_line++;
 
@@ -774,7 +786,7 @@ int skin_parse_comment(struct skin_element* element, char** document)
     return 1;
 }
 
-struct skin_element* skin_parse_code_as_arg(char** document)
+static struct skin_element* skin_parse_code_as_arg(char** document)
 {
 
     int sublines = 0;
@@ -813,29 +825,21 @@ struct skin_element* skin_parse_code_as_arg(char** document)
 
 
 /* Memory management */
+char* skin_alloc(size_t size)
+{
+#ifdef ROCKBOX
+    char *retval = skin_buffer;
+    skin_buffer = (void *)(((unsigned long)skin_buffer + 3) & ~3);
+    return retval;
+#else
+    return malloc(size);
+#endif
+}
+
 struct skin_element* skin_alloc_element()
 {
-
-#if 0
-
-    char* retval = &skin_parse_tree[skin_current_block * 4];
-
-    int delta = sizeof(struct skin_element) / (sizeof(char) * 4);
-
-    /* If one block is partially filled, make sure to advance to the 
-     * next one for the next allocation
-     */
-    if(sizeof(struct skin_element) % (sizeof(char) * 4) != 0)
-        delta++;
-
-    skin_current_block += delta;
-
-    return (struct skin_element*)retval;
-
-#endif
-
     struct skin_element* retval =  (struct skin_element*)
-                                   malloc(sizeof(struct skin_element));
+                                   skin_alloc(sizeof(struct skin_element));
     retval->next = NULL;
     retval->params_count = 0;
     retval->children_count = 0;
@@ -846,60 +850,25 @@ struct skin_element* skin_alloc_element()
 
 struct skin_tag_parameter* skin_alloc_params(int count)
 {
-#if 0
-
-    char* retval = &skin_parse_tree[skin_current_block * 4];
-
-    int delta = sizeof(struct skin_tag_parameter) / (sizeof(char) * 4);
-    delta *= count;
-
-    /* Correcting uneven alignment */
-    if(count * sizeof(struct skin_tag_parameter) % (sizeof(char) * 4) != 0)
-        delta++;
-
-    skin_current_block += delta;
-
-    return (struct skin_tag_parameter*) retval;
-
-#endif
-
-    return (struct skin_tag_parameter*)malloc(sizeof(struct skin_tag_parameter) 
-                                              * count);
+    size_t size = sizeof(struct skin_tag_parameter) * count;
+    return (struct skin_tag_parameter*)skin_alloc(size);
 
 }
 
 char* skin_alloc_string(int length)
 {
-
-#if 0
-    char* retval = &skin_parse_tree[skin_current_block * 4];
-    
-    /* Checking alignment */
-    length++; /* Accounting for the null terminator */
-    int delta = length / 4;
-    if(length % 4 != 0)
-        delta++;
-
-    skin_current_block += delta;
-
-    if(skin_current_block >= SKIN_MAX_MEMORY / 4)
-        skin_error(MEMORY_LIMIT_EXCEEDED);
-
-    return retval;
-
-#endif
-
-    return (char*)malloc(sizeof(char) * (length + 1));
-
+    return (char*)skin_alloc(sizeof(char) * (length + 1));
 }
 
 struct skin_element** skin_alloc_children(int count)
 {
-    return (struct skin_element**) malloc(sizeof(struct skin_element*) * count);
+    return (struct skin_element**)
+            skin_alloc(sizeof(struct skin_element*) * count);
 }
 
 void skin_free_tree(struct skin_element* root)
 {
+#ifndef ROCKBOX
     int i;
 
     /* First make the recursive call */
@@ -908,8 +877,8 @@ void skin_free_tree(struct skin_element* root)
     skin_free_tree(root->next);
 
     /* Free any text */
-    if(root->type == TEXT)
-        free(root->text);
+    if(root->type == TEXT || root->type == COMMENT)
+        free(root->data);
 
     /* Then recursively free any children, before freeing their pointers */
     for(i = 0; i < root->children_count; i++)
@@ -926,4 +895,7 @@ void skin_free_tree(struct skin_element* root)
 
     /* Finally, delete root's memory */
     free(root);
+#else
+    (void)root;
+#endif
 }

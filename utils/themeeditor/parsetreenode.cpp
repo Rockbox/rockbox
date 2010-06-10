@@ -56,8 +56,13 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         }
         break;
 
-        /* CONDITIONAL and SUBLINES fall through to the same code */
     case CONDITIONAL:
+        for(int i = 0; i < element->params_count; i++)
+            children.append(new ParseTreeNode(&data->params[i], this));
+        for(int i = 0; i < element->children_count; i++)
+            children.append(new ParseTreeNode(data->children[i], this));
+        break;
+
     case SUBLINES:
         for(int i = 0; i < element->children_count; i++)
         {
@@ -173,7 +178,7 @@ QString ParseTreeNode::genCode() const
             break;
 
         case TEXT:
-            for(char* cursor = element->text; *cursor; cursor++)
+            for(char* cursor = (char*)element->data; *cursor; cursor++)
             {
                 if(find_escape_character(*cursor))
                     buffer.append(TAGSYM);
@@ -183,7 +188,7 @@ QString ParseTreeNode::genCode() const
 
         case COMMENT:
             buffer.append(COMMENTSYM);
-            buffer.append(element->text);
+            buffer.append((char*)element->data);
             buffer.append('\n');
             break;
         }
@@ -228,6 +233,7 @@ QString ParseTreeNode::genCode() const
 int ParseTreeNode::genHash() const
 {
     int hash = 0;
+    char *text;
 
     if(element)
     {
@@ -248,12 +254,13 @@ int ParseTreeNode::genHash() const
 
         case COMMENT:
         case TEXT:
-            for(unsigned int i = 0; i < strlen(element->text); i++)
+            text = (char*)element->data;
+            for(unsigned int i = 0; i < strlen(text); i++)
             {
                 if(i % 2)
-                    hash += element->text[i] % element->type;
+                    hash += text[i] % element->type;
                 else
-                    hash += element->text[i] % element->type * 2;
+                    hash += text[i] % element->type * 2;
             }
             break;
         }
@@ -370,12 +377,14 @@ QVariant ParseTreeNode::data(int column) const
             case VIEWPORT:
             case LINE:
             case SUBLINES:
-            case CONDITIONAL:
                 return QString();
+
+            case CONDITIONAL:
+                return QString(element->tag->name);
 
             case TEXT:
             case COMMENT:
-                return QString(element->text);
+                return QString((char*)element->data);
 
             case TAG:
                 return QString(element->tag->name);

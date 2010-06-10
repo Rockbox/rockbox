@@ -102,6 +102,7 @@ void skin_clear_errors()
 void skin_debug_tree(struct skin_element* root)
 {
     int i;
+    char *text;
 
     struct skin_element* current = root;
 
@@ -123,18 +124,19 @@ void skin_debug_tree(struct skin_element* root)
             break;
 
         case TEXT:
-            printf("[ Plain text on line %d : %s ]\n", current->line,
-                   current->text);
+            text = current->data;
+            printf("[ Plain text on line %d : %s ]\n", current->line, text);
             break;
 
         case COMMENT:
+            text = current->data;
             printf("[ Comment on line %d: ", current->line);
-            for(i = 0; i < (int)strlen(current->text); i++)
+            for(i = 0; i < (int)strlen(text); i++)
             {
-                if(current->text[i] == '\n')
+                if(text[i] == '\n')
                     printf("\\n");
                 else
-                    printf("%c", current->text[i]);
+                    printf("%c", text[i]);
             }
             printf(" ]\n");
             break;

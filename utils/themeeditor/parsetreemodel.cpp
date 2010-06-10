@@ -257,8 +257,8 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
         if(element->type != COMMENT && element->type != TEXT)
             return false;
 
-        free(element->text);
-        element->text = strdup(value.toString().trimmed().toAscii());
+        free(element->data);
+        element->data = strdup(value.toString().trimmed().toAscii());
     }
 
     emit dataChanged(index, index);
