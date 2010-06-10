@@ -24,6 +24,7 @@
 #define PLUGIN_TEXT_VIEWER_MENU_H
 
 enum tv_menu_result {
+    TV_MENU_RESULT_MOVE_PAGE,
     TV_MENU_RESULT_EXIT_MENU,
     TV_MENU_RESULT_EXIT_PLUGIN,
     TV_MENU_RESULT_ATTACHED_USB,
@@ -34,6 +35,7 @@ enum tv_menu_result {
  *
  * return
  *     the following value returns
+ *         TV_MENU_RESULT_MOVE_PAGE     change reading page
  *         TV_MENU_RESULT_EXIT_MENU     menu exit and continue this plugin
  *         TV_MENU_RESULT_EXIT_PLUGIN   request to exit this plugin
  *         TV_MENU_RESULT_ATTACHED_USB  connect USB cable

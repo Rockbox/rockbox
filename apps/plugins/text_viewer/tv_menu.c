@@ -375,6 +375,7 @@ enum tv_menu_result tv_display_menu(void)
             break;
         case 3: /* select bookmark */
             tv_select_bookmark();
+            result = TV_MENU_RESULT_MOVE_PAGE;
             break;
         case 4: /* change global settings */
             if (!tv_load_global_settings(&new_prefs))

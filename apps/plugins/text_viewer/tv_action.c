@@ -173,11 +173,16 @@ enum tv_menu_result tv_menu(void)
 
     res = tv_display_menu();
 
-    tv_convert_fpos(cur_file_pos, &cur_pos);
-    if (prefs->vertical_scroll_mode == PAGE)
-        cur_pos.line = 0;
+    if (res == TV_MENU_RESULT_EXIT_MENU)
+    {
+        tv_convert_fpos(cur_file_pos, &cur_pos);
+        if (prefs->vertical_scroll_mode == PAGE)
+            cur_pos.line = 0;
 
-    tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);
+        tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);
+    }
+    else if (res == TV_MENU_RESULT_MOVE_PAGE)
+        res = TV_MENU_RESULT_EXIT_MENU;
 
     return res;
 }
