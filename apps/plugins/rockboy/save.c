@@ -16,17 +16,21 @@
 #define LIL(x) ((x<<24)|((x&0xff00)<<8)|((x>>8)&0xff00)|(x>>24))
 #endif
 
-#define I1(s, p) { 1, s, p }
-#define I2(s, p) { 2, s, p }
-#define I4(s, p) { 4, s, p }
+#define I1(s, p) { 1, { s }, p }
+#define I2(s, p) { 2, { s }, p }
+#define I4(s, p) { 4, { s }, p }
 #define R(r) I1(#r, &R_##r)
-#define NOSAVE { -1, "\0\0\0\0", 0 }
-#define END { 0, "\0\0\0\0", 0 }
+#define NOSAVE { -1, { "\0\0\0\0" }, 0 }
+#define END { 0, { "\0\0\0\0" }, 0 }
 
 struct svar
 {
     int len;
-    char key[4];
+    union
+    {
+        char key_[4];
+        un32 key;
+    } k;
     void *ptr;
 };
 
@@ -176,7 +180,7 @@ void loadstate(int fd)
     {
         for (i = 0; svars[i].ptr; i++)
         {
-            if (header[j][0] != *(un32 *)svars[i].key)
+            if (header[j][0] != svars[i].k.key)
                 continue;
             d = LIL(header[j][1]);
             switch (svars[i].len)
@@ -239,7 +243,7 @@ void savestate(int fd)
 
     for (i = 0; svars[i].len > 0; i++)
     {
-        header[i][0] = *(un32 *)svars[i].key;
+        header[i][0] = svars[i].k.key;
         switch (svars[i].len)
         {
         case 1:
