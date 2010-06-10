@@ -1505,6 +1505,7 @@ static const struct touchaction touchactions[] = {
     {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
     {"playlist", ACTION_WPS_VIEW_PLAYLIST }, {"pitch", ACTION_WPS_PITCHSCREEN},
     {"voldown", ACTION_WPS_VOLDOWN}, {"volup", ACTION_WPS_VOLUP},
+    {"hotkey", ACTION_WPS_HOTKEY}
 };
 static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
