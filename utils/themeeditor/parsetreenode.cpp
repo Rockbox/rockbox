@@ -104,8 +104,6 @@ QString ParseTreeNode::genCode() const
         {
 
         case VIEWPORT:
-            if(children[0]->element->type == TAG)
-                buffer.append(TAGSYM);
             buffer.append(children[0]->genCode());
             if(children[0]->element->type == TAG)
                 buffer.append('\n');
@@ -116,16 +114,13 @@ QString ParseTreeNode::genCode() const
         case LINE:
             for(int i = 0; i < children.count(); i++)
             {
-                /*
-                  Adding a % in case of tag, because the tag rendering code
-                  doesn't insert its own
-                 */
-                if(children[i]->element->type == TAG)
-                    buffer.append(TAGSYM);
                 buffer.append(children[i]->genCode());
             }
-            if(openConditionals == 0)
+            if(openConditionals == 0
+               && !(parent && parent->element->type == SUBLINES))
+            {
                 buffer.append('\n');
+            }
             break;
 
         case SUBLINES:
@@ -135,19 +130,32 @@ QString ParseTreeNode::genCode() const
                 if(i != children.count() - 1)
                     buffer.append(MULTILINESYM);
             }
-            buffer.append('\n');
+            if(openConditionals == 0)
+                buffer.append('\n');
             break;
 
         case CONDITIONAL:
             openConditionals++;
-            /* Inserts a %?, the tag renderer doesn't deal with the TAGSYM */
+
+            /* Inserting the tag part */
             buffer.append(TAGSYM);
             buffer.append(CONDITIONSYM);
-            buffer.append(children[0]->genCode());
+            buffer.append(element->tag->name);
+            if(element->params_count > 0)
+            {
+                buffer.append(ARGLISTOPENSYM);
+                for(int i = 0; i < element->params_count; i++)
+                {
+                    buffer.append(children[i]->genCode());
+                    if( i != element->params_count - 1)
+                        buffer.append(ARGLISTSEPERATESYM);
+                    buffer.append(ARGLISTCLOSESYM);
+                }
+            }
 
             /* Inserting the sublines */
             buffer.append(ENUMLISTOPENSYM);
-            for(int i = 1; i < children.count(); i++)
+            for(int i = element->params_count; i < children.count(); i++)
             {
                 buffer.append(children[i]->genCode());
                 if(i != children.count() - 1)
@@ -158,9 +166,7 @@ QString ParseTreeNode::genCode() const
             break;
 
         case TAG:
-            /* When generating code, we DO NOT insert the leading TAGSYM, leave
-             * the calling functions to handle that
-             */
+            buffer.append(TAGSYM);
             buffer.append(element->tag->name);
 
             if(element->params_count > 0)
