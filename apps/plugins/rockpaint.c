@@ -399,7 +399,7 @@ extern fb_data rockpaint_hsvrgb[];
 /* Maximum string size allowed for the text tool */
 #define MAX_TEXT 256
 
-static union
+typedef union
 {
     /* Used by fill and gradient algorithms */
     struct
@@ -433,7 +433,9 @@ static union
         int fw_buf[30];
         char fontname_buf[30][MAX_PATH];
     } text;
-} buffer;
+} buf;
+
+static buf *buffer;
 
 /* Current filename */
 static char filename[MAX_PATH];
@@ -655,7 +657,7 @@ static bool browse( char *dst, int dst_size, const char *start )
     struct entry *dc;
     bool reload = true;
     int dirfilter = SHOW_ALL;
-    int *indexes = (int *) buffer.clipboard;
+    int *indexes = (int *) buffer->clipboard;
 
     char *a;
 
@@ -795,12 +797,12 @@ static bool browse_fonts( char *dst, int dst_size )
     int cp = 0; /* current position */
     int fh; /* font height */
 
-    #define fh_buf buffer.text.fh_buf /* 30 might not be enough ... */
-    #define fw_buf buffer.text.fw_buf
+    #define fh_buf buffer->text.fh_buf /* 30 might not be enough ... */
+    #define fw_buf buffer->text.fw_buf
     int fw;
-    #define fontname_buf buffer.text.fontname_buf
+    #define fontname_buf buffer->text.fontname_buf
 
-    rb->snprintf( buffer.text.old_font, MAX_PATH,
+    rb->snprintf( buffer->text.old_font, MAX_PATH,
                   FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
 
@@ -892,7 +894,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     nvih = fh;
                 }
             }
-            rb->font_load(NULL, buffer.text.old_font );
+            rb->font_load(NULL, buffer->text.old_font );
             rb->closedir( d );
         }
 
@@ -1285,7 +1287,7 @@ static void draw_select_rectangle( int x1, int y1, int x2, int y2 )
 static void copy_to_clipboard( void )
 {
     /* This needs to be optimised ... but i'm lazy ATM */
-    rb->memcpy( buffer.clipboard, save_buffer, COLS*ROWS*sizeof( fb_data ) );
+    rb->memcpy( buffer->clipboard, save_buffer, COLS*ROWS*sizeof( fb_data ) );
 }
 
 /* no preview mode handling atm ... do we need it ? (one if) */
@@ -1340,7 +1342,7 @@ static void draw_hflip( int x1, int y1, int x2, int y2 )
     for( i = 0; i <= y2 - y1; i++ )
     {
         rb->memcpy( save_buffer+(y1+i)*COLS+x1,
-                    buffer.clipboard+(y2-i)*COLS+x1,
+                    buffer->clipboard+(y2-i)*COLS+x1,
                     (x2-x1+1)*sizeof( fb_data ) );
     }
     restore_screen();
@@ -1369,7 +1371,7 @@ static void draw_vflip( int x1, int y1, int x2, int y2 )
     {
         for( i = 0; i <= x2 - x1; i++ )
         {
-            save_buffer[y1*COLS+x1+i] = buffer.clipboard[y1*COLS+x2-i];
+            save_buffer[y1*COLS+x1+i] = buffer->clipboard[y1*COLS+x2-i];
         }
     }
     restore_screen();
@@ -1437,7 +1439,7 @@ static void draw_rot_90_deg( int x1, int y1, int x2, int y2, int direction )
                 x = x1+width-j;
                 y = y1+i;
             }
-            save_buffer[(y3+j)*COLS+x3+i] = buffer.clipboard[y*COLS+x];
+            save_buffer[(y3+j)*COLS+x3+i] = buffer->clipboard[y*COLS+x];
         }
     }
     restore_screen();
@@ -1475,14 +1477,14 @@ static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
     if( y1 + height > ROWS )
         height = ROWS - y1;
 
-    rb->lcd_bitmap_part( buffer.clipboard, src_x1, src_y1, COLS,
+    rb->lcd_bitmap_part( buffer->clipboard, src_x1, src_y1, COLS,
                          x1, y1, width, height );
     if( !preview )
     {
         for( i = 0; i < height; i++ )
         {
             rb->memcpy( save_buffer+(y1+i)*COLS+x1,
-                        buffer.clipboard+(src_y1+i)*COLS+src_x1,
+                        buffer->clipboard+(src_y1+i)*COLS+src_x1,
                         width*sizeof( fb_data ) );
         }
     }
@@ -1510,8 +1512,8 @@ static void show_grid( bool update )
 static void draw_text( int x, int y )
 {
     int selected = 0;
-    buffer.text.text[0] = '\0';
-    rb->snprintf( buffer.text.old_font, MAX_PATH,
+    buffer->text.text[0] = '\0';
+    rb->snprintf( buffer->text.old_font, MAX_PATH,
                   FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
     while( 1 )
@@ -1520,13 +1522,13 @@ static void draw_text( int x, int y )
         {
             case TEXT_MENU_TEXT:
                 rb->lcd_set_foreground(COLOR_BLACK);
-                rb->kbd_input( buffer.text.text, MAX_TEXT );
+                rb->kbd_input( buffer->text.text, MAX_TEXT );
                 break;
 
             case TEXT_MENU_FONT:
-                if( browse_fonts( buffer.text.font, MAX_PATH ) )
+                if( browse_fonts( buffer->text.font, MAX_PATH ) )
                 {
-                    rb->font_load(NULL, buffer.text.font );
+                    rb->font_load(NULL, buffer->text.font );
                 }
                 break;
 
@@ -1536,7 +1538,7 @@ static void draw_text( int x, int y )
                 {
                     int button;
                     restore_screen();
-                    rb->lcd_putsxy( x, y, buffer.text.text );
+                    rb->lcd_putsxy( x, y, buffer->text.text );
                     rb->lcd_update();
                     switch( button = rb->button_get( true ) )
                     {
@@ -1579,11 +1581,11 @@ static void draw_text( int x, int y )
             case TEXT_MENU_APPLY:
                 rb->lcd_set_foreground( rp_colors[ drawcolor ] );
                 buffer_putsxyofs( save_buffer, COLS, ROWS, x, y, 0,
-                                  buffer.text.text );
+                                  buffer->text.text );
             case TEXT_MENU_CANCEL:
             default:
                 restore_screen();
-                rb->font_load(NULL, buffer.text.old_font );
+                rb->font_load(NULL, buffer->text.old_font );
                 return;
         }
     }
@@ -1699,23 +1701,23 @@ static void draw_curve( int x1, int y1, int x2, int y2,
      * This will currently only be used in preview mode */
     {
 #define PUSH( a1, b1, a2, b2, a3, b3, d ) \
-        buffer.bezier[i].x1 = a1; \
-        buffer.bezier[i].y1 = b1; \
-        buffer.bezier[i].x2 = a2; \
-        buffer.bezier[i].y2 = b2; \
-        buffer.bezier[i].x3 = a3; \
-        buffer.bezier[i].y3 = b3; \
-        buffer.bezier[i].depth = d; \
+        buffer->bezier[i].x1 = a1; \
+        buffer->bezier[i].y1 = b1; \
+        buffer->bezier[i].x2 = a2; \
+        buffer->bezier[i].y2 = b2; \
+        buffer->bezier[i].x3 = a3; \
+        buffer->bezier[i].y3 = b3; \
+        buffer->bezier[i].depth = d; \
         i++;
 #define POP( a1, b1, a2, b2, a3, b3, d ) \
         i--; \
-        a1 = buffer.bezier[i].x1; \
-        b1 = buffer.bezier[i].y1; \
-        a2 = buffer.bezier[i].x2; \
-        b2 = buffer.bezier[i].y2; \
-        a3 = buffer.bezier[i].x3; \
-        b3 = buffer.bezier[i].y3; \
-        d = buffer.bezier[i].depth;
+        a1 = buffer->bezier[i].x1; \
+        b1 = buffer->bezier[i].y1; \
+        a2 = buffer->bezier[i].x2; \
+        b2 = buffer->bezier[i].y2; \
+        a3 = buffer->bezier[i].x3; \
+        b3 = buffer->bezier[i].y3; \
+        d = buffer->bezier[i].depth;
         PUSH( x1<<4, y1<<4, xb<<4, yb<<4, x2<<4, y2<<4, 0 );
         while( i )
         {
@@ -1746,27 +1748,27 @@ static void draw_curve( int x1, int y1, int x2, int y2,
     else /* We have the 4 points */
     {
 #define PUSH( a1, b1, a2, b2, a3, b3, a4, b4, d ) \
-        buffer.bezier[i].x1 = a1; \
-        buffer.bezier[i].y1 = b1; \
-        buffer.bezier[i].x2 = a2; \
-        buffer.bezier[i].y2 = b2; \
-        buffer.bezier[i].x3 = a3; \
-        buffer.bezier[i].y3 = b3; \
-        buffer.bezier[i].x4 = a4; \
-        buffer.bezier[i].y4 = b4; \
-        buffer.bezier[i].depth = d; \
+        buffer->bezier[i].x1 = a1; \
+        buffer->bezier[i].y1 = b1; \
+        buffer->bezier[i].x2 = a2; \
+        buffer->bezier[i].y2 = b2; \
+        buffer->bezier[i].x3 = a3; \
+        buffer->bezier[i].y3 = b3; \
+        buffer->bezier[i].x4 = a4; \
+        buffer->bezier[i].y4 = b4; \
+        buffer->bezier[i].depth = d; \
         i++;
 #define POP( a1, b1, a2, b2, a3, b3, a4, b4, d ) \
         i--; \
-        a1 = buffer.bezier[i].x1; \
-        b1 = buffer.bezier[i].y1; \
-        a2 = buffer.bezier[i].x2; \
-        b2 = buffer.bezier[i].y2; \
-        a3 = buffer.bezier[i].x3; \
-        b3 = buffer.bezier[i].y3; \
-        a4 = buffer.bezier[i].x4; \
-        b4 = buffer.bezier[i].y4; \
-        d = buffer.bezier[i].depth;
+        a1 = buffer->bezier[i].x1; \
+        b1 = buffer->bezier[i].y1; \
+        a2 = buffer->bezier[i].x2; \
+        b2 = buffer->bezier[i].y2; \
+        a3 = buffer->bezier[i].x3; \
+        b3 = buffer->bezier[i].y3; \
+        a4 = buffer->bezier[i].x4; \
+        b4 = buffer->bezier[i].y4; \
+        d = buffer->bezier[i].depth;
 
         PUSH( x1<<4, y1<<4, xa<<4, ya<<4, xb<<4, yb<<4, x2<<4, y2<<4, 0 );
         while( i )
@@ -1932,13 +1934,13 @@ static void draw_fill( int x0, int y0 )
 {
 #define PUSH( a, b ) \
     draw_pixel( (int)a, (int)b ); \
-    buffer.coord[i].x = a; \
-    buffer.coord[i].y = b; \
+    buffer->coord[i].x = a; \
+    buffer->coord[i].y = b; \
     i++;
 #define POP( a, b ) \
     i--; \
-    a = buffer.coord[i].x; \
-    b = buffer.coord[i].y;
+    a = buffer->coord[i].x; \
+    b = buffer->coord[i].y;
 
     unsigned int i=0;
     short x = x0;
@@ -2125,13 +2127,13 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
 #define PUSH( x0, y0 ) \
-    buffer.coord[i].x = (short)(x0); \
-    buffer.coord[i].y = (short)(y0); \
+    buffer->coord[i].x = (short)(x0); \
+    buffer->coord[i].y = (short)(y0); \
     i++;
 #define POP( a, b ) \
     i--; \
-    a = (int)buffer.coord[i].x; \
-    b = (int)buffer.coord[i].y;
+    a = (int)buffer->coord[i].x; \
+    b = (int)buffer->coord[i].y;
 
     PUSH( x, y );
 
@@ -2221,13 +2223,13 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
 #define PUSH( x0, y0 ) \
-    buffer.coord[i].x = (short)(x0); \
-    buffer.coord[i].y = (short)(y0); \
+    buffer->coord[i].x = (short)(x0); \
+    buffer->coord[i].y = (short)(y0); \
     i++;
 #define POP( a, b ) \
     i--; \
-    a = (int)buffer.coord[i].x; \
-    b = (int)buffer.coord[i].y;
+    a = (int)buffer->coord[i].x; \
+    b = (int)buffer->coord[i].y;
 
     PUSH( x, y );
 
@@ -3016,10 +3018,10 @@ static int save_bitmap( char *file )
     int i;
     for(i = 0; i < img_height; i++)
     {
-        rb->memcpy( buffer.clipboard+i*img_width, save_buffer+i*COLS,
+        rb->memcpy( buffer->clipboard+i*img_width, save_buffer+i*COLS,
                         sizeof( fb_data )*img_width );
     }
-    bm.data = (char*)buffer.clipboard;
+    bm.data = (char*)buffer->clipboard;
     bm.height = img_height;
     bm.width = img_width;
     bm.format = FORMAT_NATIVE;
@@ -3028,6 +3030,15 @@ static int save_bitmap( char *file )
 
 enum plugin_status plugin_start(const void* parameter)
 {
+    size_t buffer_size;
+    buffer = (buf*)
+             (((uintptr_t)rb->plugin_get_audio_buffer(&buffer_size) + 3) & ~3);
+    if (buffer_size < sizeof(*buffer) + 3)
+    {
+        rb->splash(HZ, "Not enough memory");
+        return PLUGIN_ERROR;
+    }
+
     rb->lcd_set_foreground(COLOR_WHITE);
     rb->lcd_set_backdrop(NULL);
     rb->lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);
