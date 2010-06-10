@@ -159,10 +159,9 @@ static void timeout_tick(void)
 void timeout_cancel(struct timeout *tmo)
 {
     int oldlevel = disable_irq_save();
-    void **arr = (void **)tmo_list;
-    int rc = remove_array_ptr(arr, tmo);
+    int rc = remove_array_ptr((void **)tmo_list, tmo);
 
-    if(rc >= 0 && *arr == NULL)
+    if(rc >= 0 && *tmo_list == NULL)
     {
         tick_remove_task(timeout_tick); /* Last one - remove task */
     }
@@ -193,7 +192,7 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
         if(*p == NULL)
         {
             /* Not present */
-            if(*arr == NULL)
+            if(*tmo_list == NULL)
             {
                 tick_add_task(timeout_tick); /* First one - add task */
             }
