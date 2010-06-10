@@ -67,7 +67,8 @@ void mad_synth_mute(struct mad_synth *synth)
   }
 }
 
-#ifdef FPM_ARM
+#if 0 /* dct32 asm implementation is slower on current arm systems */
+/* #ifdef FPM_ARM */
 
 void dct32(mad_fixed_t const in[32], unsigned int slot,
            mad_fixed_t lo[16][8], mad_fixed_t hi[16][8]);

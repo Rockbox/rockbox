@@ -202,7 +202,7 @@ static void set_elapsed(struct mp3entry* id3)
  * Run the synthesis filter on the COProcessor 
  */
 
-static int mad_synth_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)/2] IBSS_ATTR;
+static int mad_synth_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)] IBSS_ATTR;
 
 static const unsigned char * const mad_synth_thread_name = "mp3dec";
 static unsigned int mad_synth_thread_id = 0;
