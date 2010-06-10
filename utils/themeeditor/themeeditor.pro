@@ -17,7 +17,8 @@ HEADERS += tag_table.h \
     preferencesdialog.h \
     codeeditor.h \
     projectmodel.h \
-    projectfiles.h
+    projectfiles.h \
+    projectsettings.h
 SOURCES += tag_table.c \
     skin_parser.c \
     skin_scan.c \
@@ -31,7 +32,8 @@ SOURCES += tag_table.c \
     preferencesdialog.cpp \
     codeeditor.cpp \
     projectmodel.cpp \
-    projectfiles.cpp
+    projectfiles.cpp \
+    projectsettings.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

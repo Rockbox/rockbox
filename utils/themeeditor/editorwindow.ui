@@ -111,14 +111,7 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QTreeView" name="projectTree">
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-      </widget>
+      <widget class="QTreeView" name="projectTree"/>
      </item>
     </layout>
    </widget>

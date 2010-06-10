@@ -32,7 +32,7 @@ class ProjectModel : public QAbstractItemModel
 {
 Q_OBJECT
 public:
-    static const int numColumns = 1;
+    static const int numColumns = 2;
 
     static QString fileFilter()
     {

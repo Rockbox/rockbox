@@ -22,6 +22,7 @@
 
 #include "projectmodel.h"
 #include "projectfiles.h"
+#include "projectsettings.h"
 #include "editorwindow.h"
 
 #include <QFile>
@@ -173,6 +174,7 @@ ProjectRoot::ProjectRoot(QString config, ProjectModel* model)
 
     /* Showing the files */
     children.append(new ProjectFiles(settings, model, this));
+    children.append(new ProjectSettings(settings, model, this));
 
 }
 
