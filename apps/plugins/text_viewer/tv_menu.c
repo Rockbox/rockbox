@@ -344,7 +344,7 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
 
 static enum tv_menu_result tv_options_menu(void)
 {
-    bool result = TV_MENU_RESULT_EXIT_MENU;
+    enum tv_menu_result result = TV_MENU_RESULT_EXIT_MENU;
 
     if (rb->do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB)
         result = TV_MENU_RESULT_ATTACHED_USB;
@@ -354,7 +354,7 @@ static enum tv_menu_result tv_options_menu(void)
 
 enum tv_menu_result tv_display_menu(void)
 {
-    int result = TV_MENU_RESULT_EXIT_MENU;
+    enum tv_menu_result result = TV_MENU_RESULT_EXIT_MENU;
 
     MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
                         "Return", "Viewer Options",
