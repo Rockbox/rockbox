@@ -22,7 +22,7 @@
 #include "tag_table.h"
 
 #include <string.h>
-#define BAR_PARAMS "*|IIIIN"
+#define BAR_PARAMS "*|iiiiN"
 /* The tag definition table */
 struct tag_info legal_tags[] = 
 {
