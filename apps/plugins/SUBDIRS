@@ -19,7 +19,7 @@ clock
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
                                    (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)) \
     &&  (PLUGIN_BUFFER_SIZE >= 0x60000 /* it needs a lot of RAM */ || \
-         PLUGIN_BUFFER_SIZE <= 0x10000) /* but we can use overlays */
+         PLUGIN_BUFFER_SIZE <= 0x20000) /* but we can use overlays */
 rockboy
 #endif
 
@@ -31,10 +31,7 @@ pictureflow
 fft
 #endif
 
-#if PLUGIN_BUFFER_SIZE > 0x20000 || PLUGIN_BUFFER_SIZE <= 0x10000 /* overlay */
 chessbox
-#endif
-
 fractals
 imageviewer
 sudoku
@@ -47,7 +44,7 @@ frotz
 #endif
 
 #ifndef OLYMPUS_MROBE_500
-#if PLUGIN_BUFFER_SIZE > 0x40000 || PLUGIN_BUFFER_SIZE <= 0x10000 /* overlay */
+#if PLUGIN_BUFFER_SIZE > 0x40000 || PLUGIN_BUFFER_SIZE <= 0x20000 /* overlay */
 zxbox
 #endif
 #endif
