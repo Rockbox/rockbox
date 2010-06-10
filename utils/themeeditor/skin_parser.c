@@ -175,7 +175,7 @@ static struct skin_element* skin_parse_viewport(char** document)
             }
             else if(*cursor == ENUMLISTOPENSYM)
             {
-                skip_arglist(&cursor);
+                skip_enumlist(&cursor);
             }
             else
             {
@@ -793,7 +793,9 @@ static struct skin_element* skin_parse_code_as_arg(char** document)
     char* cursor = *document;
 
     /* Checking for sublines */
-    while(*cursor != '\n' && *cursor != '\0')
+    while(*cursor != '\n' && *cursor != '\0'
+          && *cursor != ENUMLISTSEPERATESYM && *cursor != ARGLISTSEPERATESYM
+          && *cursor != ENUMLISTCLOSESYM && *cursor != ARGLISTCLOSESYM)
     {
         if(*cursor == MULTILINESYM)
         {
@@ -809,6 +811,14 @@ static struct skin_element* skin_parse_code_as_arg(char** document)
                 break;
 
             cursor++;
+        }
+        else if(*cursor == ARGLISTOPENSYM)
+        {
+            skip_arglist(&cursor);
+        }
+        else if(*cursor == ENUMLISTOPENSYM)
+        {
+            skip_enumlist(&cursor);
         }
         else
         {
