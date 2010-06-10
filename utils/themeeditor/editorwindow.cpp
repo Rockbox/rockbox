@@ -42,7 +42,19 @@ EditorWindow::EditorWindow(QWidget *parent) :
 
 void EditorWindow::loadTabFromFile(QString fileName)
 {
-    /* Adding a new document for each file name */
+    /* Checking to see if the file is already open */
+    for(int i = 0; i < ui->editorTabs->count(); i++)
+    {
+        SkinDocument* current = dynamic_cast<SkinDocument*>
+                                (ui->editorTabs->widget(i));
+        if(current->getFile() == fileName)
+        {
+            ui->editorTabs->setCurrentIndex(i);
+            return;
+        }
+    }
+
+    /* Adding a new document*/
     SkinDocument* doc = new SkinDocument(parseStatus, fileName);
     addTab(doc);
 

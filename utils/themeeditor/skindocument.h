@@ -52,6 +52,7 @@ public:
     void connectPrefs(PreferencesDialog* prefs);
 
     ParseTreeModel* getModel(){ return model; }
+    QString getFile(){ return fileName; }
     QString getTitle(){ return title; }
     QString getStatus(){ return parseStatus; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
