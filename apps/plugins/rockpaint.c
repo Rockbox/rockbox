@@ -3031,12 +3031,18 @@ static int save_bitmap( char *file )
 enum plugin_status plugin_start(const void* parameter)
 {
     size_t buffer_size;
-    buffer = (buf*)
-             (((uintptr_t)rb->plugin_get_audio_buffer(&buffer_size) + 3) & ~3);
+    buffer = (buf*) (((uintptr_t)rb->plugin_get_buffer(&buffer_size) + 3) & ~3);
     if (buffer_size < sizeof(*buffer) + 3)
     {
-        rb->splash(HZ, "Not enough memory");
-        return PLUGIN_ERROR;
+        /* steal from audiobuffer if plugin buffer is too small */
+        buffer = (buf*)
+             (((uintptr_t)rb->plugin_get_audio_buffer(&buffer_size) + 3) & ~3);
+
+        if (buffer_size < sizeof(*buffer) + 3)
+        {
+            rb->splash(HZ, "Not enough memory");
+            return PLUGIN_ERROR;
+        }
     }
 
     rb->lcd_set_foreground(COLOR_WHITE);

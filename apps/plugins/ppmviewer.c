@@ -294,11 +294,17 @@ enum plugin_status plugin_start(const void* parameter)
     if(!parameter) return PLUGIN_ERROR;
 
     size_t buffer_size;
-    char *audiobuf = rb->plugin_get_audio_buffer(&buffer_size);
+    char *audiobuf = rb->plugin_get_buffer(&buffer_size);
     if (buffer_size < PPM_MAXSIZE + LCD_WIDTH * LCD_HEIGHT + 1)
     {
-        rb->splash(HZ, "Not enough memory");
-        return PLUGIN_ERROR;
+        /* steal from audiobuffer if plugin buffer is too small */
+        audiobuf = rb->plugin_get_audio_buffer(&buffer_size);
+
+        if (buffer_size < PPM_MAXSIZE + LCD_WIDTH * LCD_HEIGHT + 1)
+        {
+            rb->splash(HZ, "Not enough memory");
+            return PLUGIN_ERROR;
+        }
     }
 
     /* align on 16 bits */
