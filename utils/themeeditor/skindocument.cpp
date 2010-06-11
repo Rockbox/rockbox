@@ -37,13 +37,15 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
     title = "Untitled";
     fileName = "";
     saved = "";
-    parseStatus = tr("Empty Document");
+    parseStatus = tr("Empty document");
+    blockUpdate = false;
 }
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
         QWidget(parent), fileName(file), statusLabel(statusLabel)
 {
     setupUI();
+    blockUpdate = false;
 
     /* Loading the file */
     if(QFile::exists(fileName))
@@ -77,6 +79,8 @@ void SkinDocument::connectPrefs(PreferencesDialog* prefs)
 
 bool SkinDocument::requestClose()
 {
+    /* Storing the response in blockUpdate will also block updates to the
+       status bar if the tab is being closed */
     if(editor->document()->toPlainText() != saved)
     {
         /* Spawning the "Are you sure?" dialog */
@@ -95,19 +99,24 @@ bool SkinDocument::requestClose()
             save();
             /* After calling save, make sure the user actually went through */
             if(editor->document()->toPlainText() != saved)
-                return false;
+                blockUpdate = false;
             else
-                return true;
+                blockUpdate = true;
+            break;
 
         case QMessageBox::Discard:
-            return true;
+            blockUpdate = true;
+            break;
 
         case QMessageBox::Cancel:
-            return false;
+            blockUpdate = false;
+            break;
         }
     }
+    else
+        blockUpdate = true;
 
-    return true;
+    return blockUpdate;
 }
 
 void SkinDocument::setupUI()
@@ -164,10 +173,23 @@ void SkinDocument::settingsChanged()
 
 void SkinDocument::codeChanged()
 {
+    if(blockUpdate)
+        return;
+
+    if(editor->document()->isEmpty())
+    {
+        parseStatus = tr("Empty document");
+        statusLabel->setText(parseStatus);
+        return;
+    }
+
     editor->clearErrors();
     parseStatus = model->changeTree(editor->document()->
                                     toPlainText().toAscii());
+    if(skin_error_line() > 0)
+        parseStatus = tr("Errors in document");
     statusLabel->setText(parseStatus);
+
 
     /* Highlighting if an error was found */
     if(skin_error_line() > 0)

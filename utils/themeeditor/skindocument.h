@@ -86,6 +86,8 @@ private:
     ParseTreeModel* model;
 
     QLabel* statusLabel;
+
+    bool blockUpdate;
 };
 
 #endif // SKINDOCUMENT_H
