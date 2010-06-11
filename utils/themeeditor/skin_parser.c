@@ -124,24 +124,19 @@ static struct skin_element* skin_parse_viewport(char** document)
     /* Parsing out the viewport tag if there is one */
     if(check_viewport(cursor))
     {
-        retval->children_count = 2;
-        retval->children = skin_alloc_children(2);
-        retval->children[0] = skin_alloc_element();
-        skin_parse_tag(retval->children[0], &cursor);
+        skin_parse_tag(retval, &cursor);
         if(*cursor == '\n')
         {
             cursor++;
             skin_line++;
         }
     }
-    else
-    {
-        retval->children_count = 1;
-        retval->children = skin_alloc_children(1);
-    }
+
+    retval->children_count = 1;
+    retval->children = skin_alloc_children(1);
 
 
-    while(*cursor != '\0' && !(check_viewport(cursor) && cursor != *document))
+    do
     {
 
         /* First, we check to see if this line will contain sublines */
@@ -217,10 +212,11 @@ static struct skin_element* skin_parse_viewport(char** document)
             skin_line++;
         }
     }
+    while(*cursor != '\0' && !(check_viewport(cursor) && cursor != *document));
 
     *document = cursor;
 
-    retval->children[retval->children_count - 1] = root;
+    retval->children[0] = root;
     return retval;
 
 }
@@ -253,8 +249,11 @@ static struct skin_element* skin_parse_line_optional(char** document,
     retval = skin_alloc_element();
     retval->type = LINE;
     retval->line = skin_line;
-    retval->children_count = 1;
-    retval->children = skin_alloc_children(1);
+    if(*cursor != '\0')
+        retval->children_count = 1;
+    else retval->children_count = 0;
+    if(retval->children_count > 0)
+        retval->children = skin_alloc_children(1);
 
     while(*cursor != '\n' && *cursor != '\0' && *cursor != MULTILINESYM
           && !((*cursor == ARGLISTSEPERATESYM
@@ -302,7 +301,8 @@ static struct skin_element* skin_parse_line_optional(char** document,
     /* Moving up the calling function's pointer */
     *document = cursor;
 
-    retval->children[0] = root;
+    if(root)
+        retval->children[0] = root;
     return retval;
 }
 
@@ -432,7 +432,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     /* Copying basic tag info */
-    if(element->type != CONDITIONAL)
+    if(element->type != CONDITIONAL && element->type != VIEWPORT)
         element->type = TAG;
     element->tag = tag;
     tag_args = tag->params;
@@ -851,6 +851,7 @@ struct skin_element* skin_alloc_element()
     struct skin_element* retval =  (struct skin_element*)
                                    skin_alloc(sizeof(struct skin_element));
     retval->next = NULL;
+    retval->tag = NULL;
     retval->params_count = 0;
     retval->children_count = 0;
 

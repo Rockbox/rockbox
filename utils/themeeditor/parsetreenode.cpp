@@ -56,6 +56,7 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         }
         break;
 
+    case VIEWPORT:
     case CONDITIONAL:
         for(int i = 0; i < element->params_count; i++)
             children.append(new ParseTreeNode(&data->params[i], this));
@@ -70,7 +71,6 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         }
         break;
 
-    case VIEWPORT:
     case LINE:
         for(int i = 0; i < data->children_count; i++)
         {
@@ -104,10 +104,23 @@ QString ParseTreeNode::genCode() const
         {
 
         case VIEWPORT:
-            buffer.append(children[0]->genCode());
-            if(children[0]->element->type == TAG)
+            /* Generating the Viewport tag, if necessary */
+            if(element->tag)
+            {
+                buffer.append(TAGSYM);
+                buffer.append(element->tag->name);
+                buffer.append(ARGLISTOPENSYM);
+                for(int i = 0; i < element->params_count; i++)
+                {
+                    buffer.append(children[i]->genCode());
+                    if(i != element->params_count - 1)
+                        buffer.append(ARGLISTSEPERATESYM);
+                }
+                buffer.append(ARGLISTCLOSESYM);
                 buffer.append('\n');
-            for(int i = 1; i < children.count(); i++)
+            }
+
+            for(int i = element->params_count; i < children.count(); i++)
                 buffer.append(children[i]->genCode());
             break;
 
