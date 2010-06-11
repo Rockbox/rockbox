@@ -148,7 +148,7 @@ void fiq_handler(void)
         "mov    r10, #0x00000400                   \n"  /* INT_DMA */
         "str    r10, [r11]                         \n"  /* ACK FIQ */
         "stmfd  sp!, {r0-r3,lr}                    \n"
-        "ldrne  r0, =dma_callback                  \n"
+        "ldr    r0, =dma_callback                  \n"
         "mov    lr, pc                             \n"
         "bx     r0                                 \n"
         "mov    r10, r0                            \n"
