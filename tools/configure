@@ -40,7 +40,7 @@ prefixtools () {
 }
 
 findarmgcc() {
-  models_not_checked_with_eabi="iriverh10_5gb ipodcolor ipodnano1g ipod3g ipod4g ipodmini1g ipodmini2g ipod1g2g ipodnano2g iaudio7 cowond2 mrobe500 mrobe100 sansac200 vibe500"
+  models_not_checked_with_eabi="ipodcolor ipodnano1g ipod3g ipod4g ipodmini1g ipodmini2g ipod1g2g ipodnano2g iaudio7 cowond2 mrobe500 mrobe100 sansac200 vibe500"
   if [ "$ARG_ARM_EABI" != 1 ]; then # eabi not explicitely enabled
     for model in $models_not_checked_with_eabi; do
       if [ "$modelname" = "$model" ]; then
