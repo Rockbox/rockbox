@@ -35,6 +35,9 @@
  * 32-bit multiply-accumulate instruction and so will overflow with 24-bit
  * WavPack files.
  */
+
+#include "config.h"
+
         .text
         .align
         .global         decorr_stereo_pass_cont_arm
@@ -470,5 +473,5 @@ term_minus_3_loop:
 common_exit:
         strh    r4, [r5, #4]
         strh    r0, [r5, #6]
-        ldmfd   sp!, {r4 - r8, r10, r11, pc}
+        ldmpc   regs="r4-r8, r10-r11"
 

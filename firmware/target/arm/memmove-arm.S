@@ -112,7 +112,7 @@ memmove:
         strneb  r3, [r0, #-1]!
         strcsb  r4, [r0, #-1]!
         strcsb  ip, [r0, #-1]
-        ldmfd   sp!, {r0, r4, pc}
+        ldmpc   regs="r0, r4"
 
 9:      cmp ip, #2
         ldrgtb  r3, [r1, #-1]!

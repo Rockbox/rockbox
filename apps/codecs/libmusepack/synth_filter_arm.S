@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
     .section .text, "ax", %progbits
 
 /****************************************************************************
@@ -89,7 +91,7 @@ mpc_decoder_windowing_D:
     subs lr, lr, #1
     bgt .loop32
     
-    ldmfd   sp!, {r4-r8, pc}
+    ldmpc regs=r4-r8
 #else
 mpc_decoder_windowing_D:
     /* r0 = Data[] */
@@ -287,7 +289,7 @@ mpc_decoder_windowing_D:
     str r8, [r0], #4            /* store Data */
     add r1, r1, #4              /* V++ */
     
-    ldmfd   sp!, {r4-r11, pc}
+    ldmpc regs=r4-r11
 #endif
 .mpc_dewindowing_end:
     .size   mpc_decoder_windowing_D,.mpc_dewindowing_end-mpc_decoder_windowing_D

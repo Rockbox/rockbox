@@ -77,7 +77,15 @@ static inline void load_context(const void* addr)
     asm volatile(
         "ldr     r0, [%0, #40]          \n" /* Load start pointer */
         "cmp     r0, #0                 \n" /* Check for NULL */
-        "ldmneia %0, { r0, pc }         \n" /* If not already running, jump to start */ 
+
+        /* If not already running, jump to start */
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+        "ldmneia %0, { r0, r12 }        \n"
+        "bxne    r12                    \n"
+#else
+        "ldmneia %0, { r0, pc }         \n"
+#endif
+
         "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
         : : "r" (addr) : "r0" /* only! */
     );

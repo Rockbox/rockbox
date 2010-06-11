@@ -97,7 +97,7 @@ lcd_write_data_shifted:
     subs    r1, r1, #1
     bne     .sloop
 
-    ldmfd   sp!, {r4, pc}
+    ldmpc   regs=r4
     .size   lcd_write_data_shifted,.-lcd_write_data_shifted
     
 #elif defined IPOD_MINI
@@ -132,7 +132,7 @@ lcd_write_data_shifted:
     subs    r1, r1, #1
     bne     .sloop
 
-    ldr     pc, [sp], #4
+    ldrpc
     .size   lcd_write_data_shifted,.-lcd_write_data_shifted
 
 #endif
@@ -179,7 +179,7 @@ lcd_mono_data:
     subs    r1, r1, #1
     bne     .mloop
 
-    ldmfd   sp!, {r4, pc}
+    ldmpc   regs=r4
 
 .dibits:
     .byte   0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F
@@ -267,6 +267,6 @@ lcd_grey_data:
     subs    r2, r2, #1
     bne     .greyloop
 
-    ldmfd   sp!, {r4-r7, pc}
+    ldmpc   regs=r4-r7
     .size   lcd_grey_data,.-lcd_grey_data
 

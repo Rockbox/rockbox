@@ -505,7 +505,11 @@ loop:
 done:
     str     r14, [r12]              @ Save value of p->buf
     add     sp, sp, #12             @ Don't bother restoring r1-r3 
+#ifdef ROCKBOX
+    ldmpc   regs=r4-r11
+#else
     ldmia   sp!, {r4 - r11, pc}
+#endif
 
 move_hist:
     @ dest = r11 (p->historybuffer)
@@ -664,7 +668,11 @@ loopm:
 donem:
     str     r14, [r12]              @ Save value of p->buf
     add     sp, sp, #8              @ Don't bother restoring r1, r2
+#ifdef ROCKBOX
+    ldmpc   regs=r4-r11
+#else
     ldmia   sp!, {r4 - r11, pc}
+#endif
 
 move_histm:
     @ dest = r11 (p->historybuffer)

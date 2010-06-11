@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "as3525.h"
 
     .text
@@ -90,5 +91,5 @@ lcd_grey_data:
     ands    r5, r5, #(1<<10)    @ wait until push fifo empties
     beq     1b
 
-    ldmfd   sp!, {r4-r7, pc}
+    ldmpc   regs=r4-r7
     .size   lcd_grey_data,.-lcd_grey_data

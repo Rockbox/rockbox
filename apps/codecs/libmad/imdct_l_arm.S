@@ -45,6 +45,7 @@
 *
 ****************************************************************************/
 
+#include "config.h"
 
 /*
    On entry:
@@ -823,7 +824,7 @@ normal_block_x18_to_x35:
     @----
 
     add     sp, sp, #(21*4)             @ return stack frame
-    ldmia   sp!, { r4 - r11, pc }       @ restore callee saved regs, and return
+    ldmpc   regs=r4-r11                 @ restore callee saved regs, and return
 
     @----
 
@@ -992,7 +993,7 @@ start_block_x18_to_x35:
     @----
 
     add     sp, sp, #(21*4)             @ return stack frame
-    ldmia   sp!, { r4 - r11, pc }       @ restore callee saved regs, and return
+    ldmpc   regs=r4-r11                 @ restore callee saved regs, and return
 
     @----
     @END

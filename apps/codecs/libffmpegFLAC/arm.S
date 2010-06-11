@@ -267,5 +267,5 @@ lpc_decode_arm:
     bne .default              @ no, prepare for next sample
 
 .exit:
-    ldmia sp!, { r4-r11, pc }
+    ldmpc regs=r4-r11
 

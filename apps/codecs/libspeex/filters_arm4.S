@@ -49,7 +49,7 @@ iir_mem16:
     beq     .order_10
     cmp     r5, #8
     beq     .order_8
-    ldmia   sp!, { r4-r11, pc }     @ Non-supported order, return
+    ldmpc   regs=r4-r11             @ Non-supported order, return
 
     @ TODO: try using direct form 1 filtering
 .order_8:
@@ -94,7 +94,7 @@ iir_mem16:
     bne     0b
     ldr     r4, [sp, #40]           @ r4 = mem
     stmia   r4, { r5-r12 }          @ Save back mem[]
-    ldmia   sp!, { r4-r11, pc }     @ Exit
+    ldmpc   regs=r4-r11             @ Exit
 
 .order_10:
     ldmia   r4, { r5-r9 }           @ r5-r9 = mem[0..4]
@@ -154,7 +154,7 @@ iir_mem16:
     sub     r1, r1, #10*2
     subs    r3, r3, #1
     bne     .order_10
-    ldmia   sp!, { r4-r11, pc }     @ Exit
+    ldmpc   regs=r4-r11             @ Exit
 
 
 /* void qmf_synth(const spx_word16_t *x1, const spx_word16_t *x2, const spx_word16_t *a, spx_word16_t *y, int N, int M, spx_word32_t *mem1, spx_word32_t *mem2, char *stack) */
@@ -300,7 +300,7 @@ qmf_synth:
     strh    r8, [r6], #4
     subs    r4, r4, #4
     bne     0b
-    ldmia   sp!, { r4-r11, pc }     @ Exit
+    ldmpc   regs=r4-r11             @ Exit
 
 
 /* void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len) */
@@ -325,5 +325,5 @@ signal_mul:
     subs    r3, r3, #4                      @ Are we done?
     bne     0b
 
-    ldmia   sp!, { r4-r8, pc }              @ Exit
+    ldmpc   regs=r4-r8                      @ Exit
 

@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
     .section .icode, "ax", %progbits
 
 /****************************************************************************
@@ -60,7 +62,7 @@ lcd_write_data:                       /* r1 = pixel count, must be even */
     ldrne   r3, [r0], #4
     strne   r3, [lr]
 
-    ldmfd   sp!, {r4, pc}
+    ldmpc   regs=r4
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
@@ -294,7 +296,7 @@ lcd_write_yuv420_lines:
 
     ldr         r3, [sp, #12]
     add         sp, sp, r3            /* deallocate buffer */
-    ldmfd       sp!, { r4-r10, pc }   /* restore registers */
+    ldmpc       regs=r4-r10           /* restore registers */
 
     .ltorg
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines

@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
     .section .text, "ax", %progbits
 
 /****************************************************************************
@@ -63,7 +65,7 @@ atrac3_iqmf_matrixing:
     subs r3, r3, #4                 /* counter -= 4 */
     bgt .iqmf_matrixing_loop
     
-    ldmfd   sp!, {r4-r9, pc}       /* restore registers */
+    ldmpc   regs=r4-r9              /* restore registers */
 
 .atrac3_iqmf_matrixing_end:
     .size   atrac3_iqmf_matrixing,.atrac3_iqmf_matrixing_end-atrac3_iqmf_matrixing
@@ -218,7 +220,7 @@ atrac3_iqmf_dewindowing:
     subs r3, r3, #1                 /* outer loop -= 1 */
     bgt .iqmf_dewindow_outer_loop
     
-    ldmfd   sp!, {r4-r9, pc}        /* restore registers */
+    ldmpc   regs=r4-r9              /* restore registers */
     
 .atrac3_iqmf_dewindowing_end:
     .size   atrac3_iqmf_dewindowing,.atrac3_iqmf_dewindowing_end-atrac3_iqmf_dewindowing

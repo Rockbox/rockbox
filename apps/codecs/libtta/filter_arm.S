@@ -167,7 +167,7 @@ hybrid_filter:
     @ set to the memory: *pA, *(pA-1), *(pA-2), *(pA-3), *pM, *(pM-1), *(pM-2), *(pM-3)
     stmneda  r2,  {r10, r11, r12, lr}
     stmneda  r3,  {r5,  r6,  r7,  r8}
-    ldmnefd  sp!, {r4-r12, pc}                   @ hybrid_filter end (when fs->index != 0)
+    ldmpc    cond=ne regs=r4-r12     @ hybrid_filter end (when fs->index != 0)
 
 .hf_memshl:
     @ memshl (fs->dl)
@@ -192,7 +192,7 @@ hybrid_filter:
     ldmia    r9,  {r1, r2, r3, r4}
     sub      r9,  r9,  #64                       @ r9 = fs->dx
     stmia    r9,  {r1 - r8}
-    ldmfd    sp!, {r4 - r12, pc}                 @ hybrid_filter end (when fs->index == 0)
+    ldmpc    regs=r4-r12                         @ hybrid_filter end (when fs->index == 0)
 
 hybrid_filter_end:
     .size    hybrid_filter, hybrid_filter_end - hybrid_filter

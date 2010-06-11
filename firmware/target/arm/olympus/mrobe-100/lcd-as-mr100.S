@@ -99,6 +99,6 @@ lcd_grey_data:
     subs    r2, r2, #1
     bne     .greyloop
 
-    ldmfd   sp!, {r4-r7, pc}
+    ldmpc   regs=r4-r7
     .size   lcd_grey_data,.-lcd_grey_data
 

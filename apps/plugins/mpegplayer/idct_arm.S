@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
     .global     mpeg2_idct_copy
     .type       mpeg2_idct_copy, %function
     .global     mpeg2_idct_add
@@ -313,7 +315,7 @@ mpeg2_idct_copy:
     add    r1, r1, r2
     cmp    r0, r12
     blo    1b
-    ldmfd  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
 
 mpeg2_idct_add:
     cmp    r0, #129
@@ -385,7 +387,7 @@ mpeg2_idct_add:
     add    r1, r1, r2
     cmp    r0, r12
     blo    2b
-    ldmfd  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
 3:
     stmfd  sp!, { r4-r5, lr }
     ldrsh  r1, [r0, #0]           /* r1 = block[0] */
@@ -438,4 +440,4 @@ mpeg2_idct_add:
     add    r2, r2, r3
     cmp    r2, r0
     blo    4b
-    ldmfd  sp!, { r4-r5, pc }
+    ldmpc  regs=r4-r5

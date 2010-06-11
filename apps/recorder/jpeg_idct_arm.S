@@ -89,7 +89,7 @@ jpeg_idct2v:
     add    r0,  r0,  #4
     cmp    r0,  r1
     bcc    1b
-    ldmia  sp!, { r4, pc }
+    ldmpc  regs=r4
 #else
 /* ARMv6 offers partitioned adds and subtracts, used here to unroll the loop
    to two columns.
@@ -137,7 +137,7 @@ jpeg_idct2h:
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
-    ldmia  sp!, { r4-r5, pc }
+    ldmpc  regs=r4-r5
 #else
     stmdb  sp!, { r4, lr }
     ldrsh  r14, .Lpool4+2
@@ -190,7 +190,7 @@ jpeg_idct4v:
     add    r0,  r0,  #2
     cmp    r0,  r1
     bcc    1b
-    ldmia  sp!, { r4-r7, pc }
+    ldmpc  regs=r4-r7
 #elif ARM_ARCH < 6
     stmdb sp!, { r4-r8, lr }
     mov    r8,  #1024
@@ -221,7 +221,7 @@ jpeg_idct4v:
     cmp    r0,  r1
     bcc    1b
     ldmia sp!, { r4-r8, pc }
-#else
+#else /* ARMv6+ */
     stmdb  sp!, { r4-r10, lr }
     ldrd   r2,  .Lpool4
     mov    r12, #1024
@@ -325,8 +325,8 @@ jpeg_idct4h:
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
-    ldmia sp!, { r4-r10, pc }
-#elif ARM_ARCH < 6
+    ldmpc  regs=r4-r10
+#elif ARM_ARCH < 6 /* ARMv5 */
     stmdb  sp!, { r4-r9, lr }
     ldr    r4,  .Lpool4
     ldr    r5,  .Lpool4+4
@@ -367,7 +367,7 @@ jpeg_idct4h:
     cmp    r0,  r2
     bcc    1b
     ldmia sp!, { r4-r9, pc }
-#else
+#else /* ARMv6+ */
     stmdb sp!, { r4-r9, lr }
     ldrd   r4,  .Lpool4
     mov    r9,  r4,  lsr #16
@@ -424,7 +424,7 @@ jpeg_idct8v:
     cmp    r0,  r1
     add    r2,  r2,  #2
     bcc    1b
-    ldmia  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
 2:
     ldr    r14, =4433
     ldr    r12, =-15137
@@ -586,7 +586,7 @@ jpeg_idct8v:
     cmp    r0,  r1
     add    r2,  r2,  #2
     bcc    1b
-    ldmia  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
     .size jpeg_idct8v, .-jpeg_idct8v
 
 #if ARM_ARCH > 4
@@ -631,7 +631,7 @@ jpeg_idct8h:
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
-    ldmia  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
 2:
     ldr    r14, =4433
     ldr    r12, =-15137
@@ -826,9 +826,9 @@ jpeg_idct8h:
     add    r1,  r1,  r3
     cmp    r0,  r2
     bcc    1b
-    ldmia  sp!, { r4-r11, pc }
+    ldmpc  regs=r4-r11
     .size jpeg_idct8h, .-jpeg_idct8h
-#else
+#else /* ARMv6+ */
 jpeg_idct8v:
     stmdb  sp!, { r4-r11, lr }
     add    r2,  r0,  #128

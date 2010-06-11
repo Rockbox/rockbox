@@ -220,7 +220,7 @@ dct32:
     cmp      r0, #9
     bne      .l4
     add      sp, sp, #144
-    ldmia    sp!, {r4-r11, pc}
+    ldmpc    regs=r4-r11
 bitrev:
     .word 0x0
     .word 0x2

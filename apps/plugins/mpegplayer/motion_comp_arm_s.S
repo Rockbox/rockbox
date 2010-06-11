@@ -47,7 +47,7 @@ MC_put_o_16_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_o_16_align0
-        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r7 @@ update PC with LR content.
 
 .macro  ADJ_ALIGN_QW shift, R0, R1, R2, R3, R4
         mov \R0, \R0, lsr #(\shift)
@@ -71,7 +71,7 @@ MC_put_o_16_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r7 @@ update PC with LR content.
 
 MC_put_o_16_align2:
         and r1, r1, #0xFFFFFFFC
@@ -83,7 +83,7 @@ MC_put_o_16_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r7 @@ update PC with LR content.
 
 MC_put_o_16_align3:
         and r1, r1, #0xFFFFFFFC
@@ -95,7 +95,7 @@ MC_put_o_16_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r7, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r7 @@ update PC with LR content.
 
 @ ----------------------------------------------------------------
         .align
@@ -120,7 +120,7 @@ MC_put_o_8_align0:
         add r0, r0, r2
         subs r3, r3, #1
         bne MC_put_o_8_align0
-        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r5 @@ update PC with LR content.
 
 .macro  ADJ_ALIGN_DW shift, R0, R1, R2
         mov \R0, \R0, lsr #(\shift)
@@ -140,7 +140,7 @@ MC_put_o_8_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r5 @@ update PC with LR content.
 
 MC_put_o_8_align2:
         and r1, r1, #0xFFFFFFFC
@@ -152,7 +152,7 @@ MC_put_o_8_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r5 @@ update PC with LR content.
 
 MC_put_o_8_align3:
         and r1, r1, #0xFFFFFFFC
@@ -164,7 +164,7 @@ MC_put_o_8_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4, r5, pc} @@ update PC with LR content.
+        ldmpc regs=r4-r5 @@ update PC with LR content.
 
 @ ----------------------------------------------------------------
 .macro  AVG_PW rW1, rW2
@@ -218,7 +218,7 @@ MC_put_x_16_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_x_16_align0
-        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r8, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_16_align1:
         and r1, r1, #0xFFFFFFFC
@@ -234,7 +234,7 @@ MC_put_x_16_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r8, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_16_align2:
         and r1, r1, #0xFFFFFFFC
@@ -250,7 +250,7 @@ MC_put_x_16_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r8, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_16_align3:
         and r1, r1, #0xFFFFFFFC
@@ -266,7 +266,7 @@ MC_put_x_16_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r8, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r8, HIGH_REGS" @@ update PC with LR content.
 
 @ ----------------------------------------------------------------
         .align
@@ -297,7 +297,7 @@ MC_put_x_8_align0:
         subs r3, r3, #1
         add r0, r0, r2
         bne MC_put_x_8_align0
-        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r6, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_8_align1:
         and r1, r1, #0xFFFFFFFC
@@ -311,7 +311,7 @@ MC_put_x_8_align1:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r6, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_8_align2:
         and r1, r1, #0xFFFFFFFC
@@ -325,7 +325,7 @@ MC_put_x_8_align2:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r6, HIGH_REGS" @@ update PC with LR content.
 
 MC_put_x_8_align3:
         and r1, r1, #0xFFFFFFFC
@@ -339,4 +339,4 @@ MC_put_x_8_align3:
         subs r3, r3, #1
         add r0, r0, r2
         bne 1b
-        ldmfd sp!, {r4-r6, HIGH_REGS, pc} @@ update PC with LR content.
+        ldmpc regs="r4-r6, HIGH_REGS @@ update PC with LR content.

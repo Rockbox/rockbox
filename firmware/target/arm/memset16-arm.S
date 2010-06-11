@@ -59,7 +59,7 @@ memset16:
         stmgeia r0!, {r1, r3, ip, lr}
         stmgeia r0!, {r1, r3, ip, lr}
         bgt     2b
-        ldreq   pc, [sp], #4            @ Now <64 bytes to go.
+        ldrpc   cond=eq                 @ Now <64 bytes to go.
 /*
  * No need to correct the count; we're only testing bits from now on
  */

@@ -146,7 +146,7 @@ copy_read_sectors:
 
     strb    r3, [r0], #1        /* store final byte */
 
-    ldmfd   sp!, {r4, r5, pc}
+    ldmpc   regs=r4-r5
 
     /* 16-bit aligned */
 .r_aligned:
@@ -195,7 +195,7 @@ copy_read_sectors:
     ldrneh  r3, [r2]
     strneh  r3, [r0], #2
 
-    ldmfd   sp!, {r4, r5, pc}
+    ldmpc   regs=r4-r5
 
 .r_end:
     .size   copy_read_sectors,.r_end-copy_read_sectors
@@ -300,7 +300,7 @@ copy_write_sectors:
     orr     r3, r3, r4, lsl #8
     strh    r3, [r2]            /* write final halfword */
 
-    ldmfd   sp!, {r4, r5, pc}
+    ldmpc   regs=r4-r5
 
     /* 16-bit aligned */
 .w_aligned:
@@ -349,7 +349,7 @@ copy_write_sectors:
     ldrneh  r3, [r0], #2
     strneh  r3, [r2]
 
-    ldmfd   sp!, {r4, r5, pc}
+    ldmpc   regs=r4-r5
 
 .w_end:
     .size   copy_write_sectors,.w_end-copy_write_sectors

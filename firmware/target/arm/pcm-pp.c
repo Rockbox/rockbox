@@ -74,9 +74,14 @@ void fiq_handler(void) ICODE_ATTR __attribute__((naked));
 void fiq_handler(void)
 {
     asm volatile (
-        "ldr pc, [pc, #-4] \n"
-    "fiq_function:         \n"
-        ".word 0           \n"
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+        "ldr r12, [pc, #-4] \n"
+        "bx  r12            \n"
+#else
+        "ldr pc, [pc, #-4]  \n"
+#endif
+    "fiq_function:          \n"
+        ".word 0            \n"
     );
 }
 

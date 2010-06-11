@@ -85,5 +85,5 @@ eq_filter:
     bne .filterloop
 
     add sp, sp, #16            @ compensate for temp storage
-    ldmia sp!, { r4-r11, pc }
+    ldmpc regs=r4-r11
 

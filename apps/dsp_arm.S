@@ -23,6 +23,9 @@
 /****************************************************************************
  *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
  */
+
+#include "config.h"
+
     .section .icode, "ax", %progbits
     .align  2
     .global channels_process_sound_chan_mono
@@ -47,7 +50,7 @@ channels_process_sound_chan_mono:
     stmia   r2!, { r12, r14 }          @ store Mo0, Mo1
     bgt     .monoloop                  @
                                        @
-    ldmltfd sp!, { r4, pc }            @ if count was even, we're done
+    ldmpc   cond=lt, regs=r4           @ if count was even, we're done
                                        @
 .mono_singlesample:                    @
     ldr     r3, [r1]                   @ r3 = Ls
@@ -57,7 +60,7 @@ channels_process_sound_chan_mono:
     str     r12, [r1]                  @ store Mo
     str     r12, [r2]                  @ store Mo
                                        @
-    ldmfd   sp!, { r4, pc }            @
+    ldmpc   regs=r4                    @
     .size   channels_process_sound_chan_mono, \
                 .-channels_process_sound_chan_mono
 
@@ -112,7 +115,7 @@ channels_process_sound_chan_custom:
 
     bgt     .custom_loop
     
-    ldmltfd sp!, { r4-r10, pc }        @ < 0? even count
+    ldmpc   cond=lt, regs=r4-r10       @ < 0? even count
     
 .custom_single_sample:
     ldr     r5, [r1]                   @ handle odd sample
@@ -131,7 +134,7 @@ channels_process_sound_chan_custom:
     str     r5, [r1]                   @ Store Lc0
     str     r7, [r2]                   @ Store Rc0
 
-    ldmfd   sp!, { r4-r10, pc }
+    ldmpc   regs=r4-r10
     .size   channels_process_sound_chan_custom, \
                 .-channels_process_sound_chan_custom
 
@@ -164,7 +167,7 @@ channels_process_sound_chan_karaoke:
     stmia   r2!, { r12, r14 }          @ store Ro0, Ro1
     bgt     .karaokeloop               @
                                        @
-    ldmltfd sp!, { r4, pc }            @ if count was even, we're done
+    ldmpc   cond=lt, regs=r4           @ if count was even, we're done
                                        @
 .karaoke_singlesample:                 @
     ldr     r3, [r1]                   @ r3 = Li
@@ -175,7 +178,7 @@ channels_process_sound_chan_karaoke:
     str     r3, [r1]                   @ store Lo
     str     r12, [r2]                  @ store Ro
                                        @
-    ldmfd   sp!, { r4, pc }            @
+    ldmpc   regs=r4                    @
     .size   channels_process_sound_chan_karaoke, \
                 .-channels_process_sound_chan_karaoke
 
@@ -225,7 +228,7 @@ sample_output_mono:
     subs    r0, r0, #2
     bgt     .somloop     
        
-    ldmltfd sp!, { r4-r6, pc }         @ even 'count'? return
+    ldmpc   cond=lt, regs=r4-r6        @ even 'count'? return
 
 .som_singlesample:
     ldr     r5, [r2]                   @ do odd sample
@@ -239,7 +242,7 @@ sample_output_mono:
     orr     r5, r5, r5, lsl #16
     str     r5, [r3]
 
-    ldmfd   sp!, { r4-r6, pc }
+    ldmpc   regs=r4-r6
     .size   sample_output_mono, .-sample_output_mono
     
 /****************************************************************************
@@ -302,7 +305,7 @@ sample_output_stereo:
     subs    r0, r0, #2
     bgt     .sosloop
 
-    ldmltfd sp!, { r4-r9, pc }         @ even 'count'? return
+    ldmpc   cond=lt, regs=r4-r9        @ even 'count'? return
 
 .sos_singlesample:    
     ldr     r6, [r2]                   @ left odd sample
@@ -324,7 +327,7 @@ sample_output_stereo:
 
     str     r8, [r3]
 
-    ldmfd   sp!, { r4-r9, pc }
+    ldmpc   regs=r4-r9
     .size   sample_output_stereo, .-sample_output_stereo
 #endif /* ARM_ARCH < 6 */    
 
@@ -387,7 +390,7 @@ apply_crossfeed:
     stmia   r12, { r8-r11 }            @ save filter history
     str     r0, [r12, #30*4]           @ save delay line index
     add     sp, sp, #8                 @ remove temp variables from stack
-    ldmia   sp!, { r4-r11, pc }
+    ldmpc   regs=r4-r11
     .size   apply_crossfeed, .-apply_crossfeed
 
 /****************************************************************************
@@ -444,7 +447,7 @@ dsp_downsample:
     ldr     r1, [r3]                @ r1 = &dst[0]
     sub     r8, r8, r1              @ dst - &dst[0]
     mov     r0, r8, lsr #2          @ convert bytes->samples
-    ldmia   sp!, { r4-r11, pc }     @ ... and we're out
+    ldmpc   regs=r4-r11             @ ... and we're out
     .size   dsp_downsample, .-dsp_downsample
 
 /****************************************************************************
@@ -507,7 +510,7 @@ dsp_upsample:
     sub     r8, r8, r2              @ dst - &dst[0]
     mov     r0, r8, lsr #2          @ convert bytes->samples
     add     sp, sp, #8              @ adjust stack for temp variables
-    ldmfd   sp!, { r4-r11, pc }     @ ... and we're out
+    ldmpc   regs=r4-r11             @ ... and we're out
     .size       dsp_upsample, .-dsp_upsample
 
 /****************************************************************************
@@ -554,5 +557,5 @@ dsp_apply_gain:
     subs    r3, r3, #1
     bgt     .dag_outerloop          @ end of outer loop
                
-    ldmfd   sp!, { r4-r8, pc }
+    ldmpc   regs=r4-r8
     .size   dsp_apply_gain, .-dsp_apply_gain

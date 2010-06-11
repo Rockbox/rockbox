@@ -101,7 +101,7 @@ lcd_copy_buffer_rect:                   @
     add     r0, r0, r4, lsl #1          @
     subs    r3, r3, #1                  @ next line
     bgt     10b @ copy line             @
-    ldmfd   sp!, { r4-r11, pc }         @ restore regs and return
+    ldmpc   regs=r4-r11                 @ restore regs and return
     .ltorg                              @ dump constant pool
     .size   lcd_copy_buffer_rect, .-lcd_copy_buffer_rect
 
@@ -344,7 +344,7 @@ lcd_write_yuv420_lines:
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r10, pc }     @ restore registers and return
+    ldmpc       regs=r4-r10             @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
 
@@ -691,6 +691,6 @@ lcd_write_yuv420_lines_odither:
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @
                                         @
-    ldmfd       sp!, { r4-r11, pc }     @ restore registers and return
+    ldmpc       regs=r4-r11             @ restore registers and return
     .ltorg                              @ dump constant pool
     .size   lcd_write_yuv420_lines_odither, .-lcd_write_yuv420_lines_odither

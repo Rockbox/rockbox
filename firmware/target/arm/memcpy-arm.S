@@ -98,7 +98,7 @@ memcpy:
         strcsb  r4, [r0], #1
         strcsb  ip, [r0]
 
-        ldmfd   sp!, {r0, r4, pc}
+        ldmpc   regs="r0, r4"
 
 9:      rsb ip, ip, #4
         cmp ip, #2

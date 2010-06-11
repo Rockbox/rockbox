@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "pacbox.h"
 
     .section .icode,"ax",%progbits
@@ -120,7 +121,7 @@ loop_x:
 /* end of y loop */
          add     r1, r1, #224*3           @ vbuf += 224*3
          subs    lr, lr, #4               @ y-=4
-         ldmeqia sp!, {r4-r11, pc}
+         ldmpc   cond=eq, regs=r4-r11
          b       loop_y
 #endif
 #endif

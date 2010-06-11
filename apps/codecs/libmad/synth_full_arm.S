@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "mad_iram.h"
 
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
@@ -135,7 +136,7 @@ synth_full_odd_sbsample:
 
     ldr     r5, =synth_full_sp
     ldr     sp, [r5]
-    ldmia   sp!, {r4-r11, pc}
+    ldmpc   regs=r4-r11
 
 synth_full_even_sbsample:
     stmdb   sp!, {r4-r11, lr}
@@ -241,7 +242,7 @@ synth_full_even_sbsample:
 
     ldr     r5, =synth_full_sp
     ldr     sp, [r5]
-    ldmia   sp!, {r4-r11, pc}
+    ldmpc   regs=r4-r11
 
     .global III_aliasreduce
 
@@ -289,7 +290,7 @@ III_aliasreduce:
     add     r0, r0, #72
     cmp     r0, r1
     blo     .arl1
-    ldmia   sp!, {r4-r11, pc}
+    ldmpc   regs=r4-r11
 
 csa:
     .word +0x0db84a81
@@ -332,7 +333,7 @@ III_overlap:
     stmia r1!, {r4, r5, r6, r7, r12, lr}
     ldmia r0!, {r4, r5, r6, r7, r12, lr}
     stmia r1!, {r4, r5, r6, r7, r12, lr}
-    ldmia   sp!, {r4-r7, pc}
+    ldmpc regs=r4-r7
 
     .section    IBSS_SECTION_MPA_ARM,"aw",%nobits
 synth_full_sp:

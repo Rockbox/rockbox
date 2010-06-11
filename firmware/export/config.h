@@ -710,6 +710,26 @@ Lyre prototype 1 */
 #define ROCKBOX_STRICT_ALIGN 1
 #endif
 
+#if defined(CPU_ARM) && defined(__ASSEMBLER__)
+/* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */
+.macro ldmpc cond="", order="ia", regs:req
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+    ldm\cond\order sp!, { \regs, lr }
+    bx\cond lr
+#else
+    ldm\cond\order sp!, { \regs, pc }
+#endif
+.endm
+.macro ldrpc cond=""
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+    ldr\cond lr, [sp], #4
+    bx\cond  lr
+#else
+    ldr\cond pc, [sp], #4
+#endif
+.endm
+#endif
+
 #ifndef CODEC_SIZE
 #define CODEC_SIZE 0
 #endif
