@@ -281,7 +281,7 @@ static inline void mono2stereo(int16_t *end)
         "   strh %0, [%1], #2   \n" // copy it in the right-channel
         "   cmp %1, %2          \n" // are we finished?
         "   bne  1b             \n"
-        : "=r"(left), "+r"(mono_samples)
+        : "=&r"(left), "+r"(mono_samples)
         : "r"(end)
         : "memory"
     );
