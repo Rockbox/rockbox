@@ -388,20 +388,20 @@ int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* bu
         return _ata_read_sectors(IF_MD2(drive,) map_sector(start), count, buf);
     else
     {
-        int i, ret;
+        int i;
         unsigned char* dest = (unsigned char*)buf;
 
         /* Read sectors in parts of 0x8000 */
         for(i=0; i<count; i+=64)
         {
-            ret = _ata_read_sectors(IF_MD2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (void*)dest);
+            int ret = _ata_read_sectors(IF_MD2(drive,) map_sector(start+i), (count-i >= 64 ? 64 : count-i), (void*)dest);
             if(ret != 0)
                 return ret;
 
             dest += (count-i >= 64 ? 0x8000 : (count-i)*512);
         }
 
-        return ret;
+        return 0;
     }
 }
 
