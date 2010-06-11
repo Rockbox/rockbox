@@ -30,15 +30,10 @@
 #if CONFIG_TUNER
 bool tuner_power(bool status)
 {
-    (void)status;
     if (status)
-    {
         and_l(~(1<<17), &GPIO1_OUT);
-    }
     else
-    {
         or_l((1<<17), &GPIO1_OUT);
-    }
 
     return status;
 }
@@ -46,19 +41,38 @@ bool tuner_power(bool status)
 
 void power_init(void)
 {
-    /* GPIO53 has to be high - low resets device */
-    /* GPIO49 is FM related */
-    or_l((1<<21)|(1<<17), &GPIO1_OUT);
-    or_l((1<<21)|(1<<17), &GPIO1_ENABLE);
-    or_l((1<<21)|(1<<17)|(1<<14), &GPIO1_FUNCTION);
+    /* GPIO53 has to be high - low resets device
+     * it is setup in crt0.S
+     */
 
-    and_l(~(1<<15), &GPIO_OUT);
-    or_l((1<<15),&GPIO_ENABLE);
-    or_l((1<<15),&GPIO_FUNCTION);
+    /* GPIO50 is ATA power (default OFF) */
+    or_l((1<<18), &GPIO1_OUT);
+    or_l((1<<18), &GPIO1_ENABLE);
+    or_l((1<<18), &GPIO1_FUNCTION);
 
+    /* GPIO49 is FM power (default OFF) */
+    or_l((1<<17), &GPIO1_OUT);
+    or_l((1<<17), &GPIO1_ENABLE);
+    or_l((1<<17), &GPIO1_FUNCTION);
+
+    /* GPIO46 is wall charger detect (input) */
+    and_l(~(1<<14), &GPIO1_ENABLE);
+    or_l((1<<14), &GPIO1_FUNCTION);
+
+    /* GPIO31 needs to be low */
+    and_l(~(1<<31), &GPIO_OUT);
+    or_l((1<<31),&GPIO_ENABLE);
+    or_l((1<<31),&GPIO_FUNCTION);
+   
+    /* turn off charger by default*/
     or_l((1<<23), &GPIO_OUT);
     and_l(~(1<<23), &GPIO_ENABLE);
     or_l((1<<23), &GPIO_FUNCTION);
+
+    /* high current charge mode */
+    or_l((1<<15), &GPIO_OUT);
+    or_l((1<<15),&GPIO_ENABLE);
+    or_l((1<<15),&GPIO_FUNCTION);
 
 #ifndef BOOTLOADER
     /* The boot loader controls the power */
@@ -71,8 +85,16 @@ unsigned int power_input_status(void)
     unsigned int status = POWER_INPUT_NONE;
 /* GPIO46 is AC plug detect (low = AC plugged) */
     if (!(GPIO1_READ & (1<<14)))
-            status |= POWER_INPUT_MAIN_CHARGER;
-
+    {
+        status |= POWER_INPUT_MAIN_CHARGER;
+        /* tristate GPIO23 to start charging cycle */
+        and_l(~(1<<23), &GPIO_ENABLE);
+    }
+    else
+    {
+        /* drive GPIO23 high to enter LTC1733 shutdown mode */
+        or_l((1<<23), &GPIO_ENABLE);
+    }
     return status;
 }
 
@@ -87,20 +109,15 @@ bool charging_state(void)
 
 void ide_power_enable(bool on)
 {
-   (void)on;
-   if (on)
-        and_l(~(1<<31),&GPIO_OUT);
+    if (on)
+        and_l(~(1<<18),&GPIO1_OUT);
     else
-        or_l((1<<31),&GPIO_OUT);
-
-    or_l((1<<31),&GPIO_ENABLE);
-    or_l((1<<31),&GPIO_FUNCTION);
-
+        or_l((1<<18),&GPIO1_OUT);
 }
 
 bool ide_powered(void)
 {
-    return true;
+    return (GPIO1_OUT & (1<<18))?false:true;
 }
 
 void power_off(void)
