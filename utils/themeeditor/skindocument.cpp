@@ -175,17 +175,28 @@ void SkinDocument::codeChanged()
         editor->addError(skin_error_line());
 
         /* Now we're going to attempt parsing again at each line, until we find
-           one that won't error out
+           one that won't error out*/
         QTextDocument doc(editor->document()->toPlainText());
-        if(skin_error_line() > 0)
+        int base = 0;
+        while(skin_error_line() > 0 && !doc.isEmpty())
         {
             QTextCursor rest(&doc);
 
             for(int i = 0; i < skin_error_line(); i++)
                 rest.movePosition(QTextCursor::NextBlock,
                                   QTextCursor::KeepAnchor);
-            rest.clearSelection();
-        }*/
+            if(skin_error_line() == doc.blockCount())
+                rest.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+
+            rest.removeSelectedText();
+            base += skin_error_line();
+
+            skin_parse(doc.toPlainText().toAscii());
+
+            if(skin_error_line() > 0)
+                editor->addError(base + skin_error_line());
+
+        }
     }
 
     if(editor->document()->toPlainText() != saved)
