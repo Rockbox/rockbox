@@ -606,7 +606,7 @@ static bool charging_ok(void)
     return ok;
 }
 
-void powermgmt_init_target(void)
+void INIT_ATTR powermgmt_init_target(void)
 {
     last_inputs = power_thread_inputs;
 

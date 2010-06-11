@@ -248,7 +248,7 @@ static __attribute__((naked, interrupt("IRQ"))) void CCM_DVFS_HANDLER(void)
 
 
 /* Initialize the DVFS hardware */
-static void dvfs_init(void)
+static void INIT_ATTR dvfs_init(void)
 {
     if (CCM_PMCR0 & CCM_PMCR0_DVFEN)
     {
@@ -514,7 +514,7 @@ static __attribute__((interrupt("IRQ"))) void CCM_CLK_HANDLER(void)
 
 
 /* Initialize the DPTC hardware */
-static void dptc_init(void)
+static void INIT_ATTR dptc_init(void)
 {
     /* Force DPTC off if running for some reason. */
     imx31_regmod32(&CCM_PMCR0, CCM_PMCR0_PTVAIM,
@@ -590,7 +590,7 @@ static void dptc_stop(void)
 /** Main module interface **/
 
 /* Initialize DVFS and DPTC */
-void dvfs_dptc_init(void)
+void INIT_ATTR dvfs_dptc_init(void)
 {
     dptc_init();
     dvfs_init();

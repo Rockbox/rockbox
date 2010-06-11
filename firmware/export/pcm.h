@@ -68,7 +68,7 @@ void pcm_play_lock(void);
 void pcm_play_unlock(void);
 
 void pcm_init(void) INIT_ATTR;
-void pcm_postinit(void) INIT_ATTR;
+void pcm_postinit(void);
 
 /* This is for playing "raw" PCM data */
 void pcm_play_data(pcm_play_callback_type get_more,

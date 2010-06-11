@@ -150,7 +150,7 @@ static __attribute__((interrupt("IRQ"))) void GPIO3_HANDLER(void)
 }
 #endif
 
-void gpio_init(void)
+void INIT_ATTR gpio_init(void)
 {
     /* Mask-out GPIO interrupts - enable what's wanted later */
     int i;

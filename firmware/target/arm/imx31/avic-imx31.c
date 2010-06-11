@@ -116,7 +116,7 @@ void __attribute__((naked)) fiq_handler(void)
     );
 }
 
-void avic_init(void)
+void INIT_ATTR avic_init(void)
 {
     int i;
 

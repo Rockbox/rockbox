@@ -184,7 +184,7 @@ bool headphones_inserted(void)
     return headphones_detect;
 }
 
-void headphone_init(void)
+void INIT_ATTR headphone_init(void)
 {
     /* A thread is required to monitor the remote ADC and jack state. */
     wakeup_init(&headphone_wakeup);

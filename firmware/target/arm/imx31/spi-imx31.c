@@ -331,7 +331,7 @@ static __attribute__((interrupt("IRQ"))) void CSPI3_HANDLER(void)
 #endif
 
 /* Initialize the SPI driver */
-void spi_init(void)
+void INIT_ATTR spi_init(void)
 {
     unsigned i;
     for (i = 0; i < SPI_NUM_CSPI; i++)

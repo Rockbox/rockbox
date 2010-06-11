@@ -778,7 +778,8 @@ Lyre prototype 1 */
 #define IBSS_ATTR
 #define STATICIRAM static
 #endif
-#if (defined(CPU_PP) || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2)) \
+#if (defined(CPU_PP) || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) || \
+    (CONFIG_CPU == IMX31L)) \
     && !defined(SIMULATOR) && !defined(BOOTLOADER)
 /* Functions that have INIT_ATTR attached are NOT guaranteed to survive after
  * root_menu() has been called. Their code may be overwritten by other data or

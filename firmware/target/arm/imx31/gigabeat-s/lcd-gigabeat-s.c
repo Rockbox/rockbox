@@ -147,7 +147,7 @@ static void lcd_set_power(bool powered)
 }
 
 /* LCD init */
-void lcd_init_device(void)
+void INIT_ATTR lcd_init_device(void)
 {
     /* Move the framebuffer */
 #ifdef BOOTLOADER

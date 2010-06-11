@@ -17,7 +17,7 @@ $(SPCLIB): $(SPCLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-SPCFLAGS = $(filter-out -O%,$(CODECFLAGS))
+SPCFLAGS = $(filter-out -O%,$(CODECFLAGS)) -fno-strict-aliasing
 SPCFLAGS += -O1
 
 $(CODECDIR)/libspc/%.o: $(ROOTDIR)/apps/codecs/libspc/%.c

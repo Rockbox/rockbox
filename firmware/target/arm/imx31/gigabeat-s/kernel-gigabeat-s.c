@@ -37,7 +37,7 @@ static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
     call_tick_tasks();
 }
 
-void tick_start(unsigned int interval_in_ms)
+void INIT_ATTR tick_start(unsigned int interval_in_ms)
 {
     ccm_module_clock_gating(CG_EPIT1, CGM_ON_RUN_WAIT); /* EPIT1 module
                                                clock ON - before writing
@@ -65,7 +65,7 @@ void tick_start(unsigned int interval_in_ms)
     EPITCR1 |= EPITCR_EN;        /* Enable the counter */
 }
 
-void kernel_device_init(void)
+void INIT_ATTR kernel_device_init(void)
 {
     sdma_init();
     spi_init();

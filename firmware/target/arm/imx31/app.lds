@@ -32,9 +32,14 @@ STARTUP(target/arm/imx31/crt0.o)
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
 
+/* INIT section is the codec buffer */
+#define INITSIZE  CODECSIZE
+#define INITSTART ENDAUDIOADDR
+
 MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    INIT : ORIGIN = INITSTART, LENGTH = INITSIZE
     QHARRAY : ORIGIN = QHARRAY_PHYS_ADDR, LENGTH = QHARRAY_SIZE
 }
 
@@ -97,25 +102,35 @@ SECTIONS
     .vectors 0x0 :
     {
         _vectorsstart = .;
-        *(.vectors);
+        *(.vectors)
         _vectorsend = .;
     } AT> DRAM
 
     _vectorscopy = LOADADDR(.vectors);
     
+    .init :
+    {
+        . = ALIGN(4);
+        _initstart = .;
+        *(.init)
+        *(.sdmacode)
+        _initend = .;
+    } > INIT AT> DRAM
+
+    _initcopy = LOADADDR(.init);
+
     .stack (NOLOAD) :
     {
-       *(.stack)
-       stackbegin = .;
-       . += 0x2000;
-       stackend = .;
+        . = ALIGN(4);
+        *(.stack)
+        stackbegin = .;
+        . += 0x2000;
+        stackend = .;
     } > DRAM
     
-    _sdmacodecopy = stackbegin;
-
     .bss (NOLOAD) :
     {
-       _edata = .;
+        _edata = .;
         *(.bss*)
         *(.ibss)
         *(COMMON)
@@ -156,13 +171,6 @@ SECTIONS
     {
         _pluginbuf = .;
         pluginbuf = .;
-    }
-    
-    .sdma _pluginbuf : AT( _sdmacodecopy )
-    {
-    	_sdmacodestart = .;
-    	*(.sdmacode);
-    	_sdmacodeend = .;
     }
     
     .qharray (NOLOAD) :

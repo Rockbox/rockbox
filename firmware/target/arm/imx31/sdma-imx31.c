@@ -500,7 +500,7 @@ static bool setup_channel(struct channel_control_block *ccb_p)
 }
 
 /** Public routines **/
-void sdma_init(void)
+void INIT_ATTR sdma_init(void)
 {
     int i;
     unsigned long acr;

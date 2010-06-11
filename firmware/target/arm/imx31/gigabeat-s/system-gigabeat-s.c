@@ -48,7 +48,7 @@ unsigned int iim_prod_rev(void)
     return product_rev;
 }
 
-static void iim_init(void)
+static void INIT_ATTR iim_init(void)
 {
     /* Initialize the IC revision info (required by SDMA) */
     ccm_module_clock_gating(CG_IIM, CGM_ON_RUN_WAIT);
@@ -136,7 +136,7 @@ void system_exception_wait(void)
     system_halt();
 }
 
-void system_init(void)
+void INIT_ATTR system_init(void)
 {
     static const int disable_clocks[] =
     {

@@ -143,7 +143,7 @@ void mc13783_event(void)
     wakeup_signal(&mc13783_svc_wake);
 }
 
-void mc13783_init(void)
+void INIT_ATTR mc13783_init(void)
 {
     /* Serial interface must have been initialized first! */
     wakeup_init(&mc13783_svc_wake);
