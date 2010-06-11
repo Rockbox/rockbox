@@ -113,7 +113,6 @@ class RbUtilQt : public QMainWindow
         
         void checkUpdate(void);
         void downloadUpdateDone(bool errror);
-        bool newerVersion(QString versionOld,QString versionNew);
 };
 
 #endif

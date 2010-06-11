@@ -1269,6 +1269,7 @@ void RbUtilQt::checkUpdate(void)
     if(RbSettings::value(RbSettings::CacheOffline).toBool())
         update->setCache(true);
    
+    ui.statusbar->showMessage(tr("Checking for update ..."));
     update->getFile(QUrl(url));
 }
 
@@ -1290,7 +1291,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
         }
         qDebug() << "[Checkupdate] " << rbutilList;
         
-        QString newVersion ="";
+        QString newVersion = "";
         //check if there is a binary with higher version in this list
         for(int i=0; i < rbutilList.size(); i++)
         {
@@ -1306,9 +1307,9 @@ void RbUtilQt::downloadUpdateDone(bool error)
 #endif                
 #endif            
             //check if it is newer, and remember newest
-            if(newerVersion(VERSION,rbutilList.at(i)))
+            if(Utils::compareVersionStrings(VERSION, rbutilList.at(i)) == 1)
             {
-                if(newVersion == "" || newerVersion(newVersion,rbutilList.at(i)))
+                if(Utils::compareVersionStrings(newVersion, rbutilList.at(i)) == 1)
                 {
                     newVersion = rbutilList.at(i);
                 }
@@ -1331,58 +1332,11 @@ void RbUtilQt::downloadUpdateDone(bool error)
             QMessageBox::information(this,tr("RockboxUtility Update available"),
                         tr("<b>New RockboxUtility Version available.</b> <br><br>"
                         "Download it from here: <a href='%1'>%2</a>").arg(url).arg(newVersion) );
+            ui.statusbar->showMessage(tr("New version of Rockbox Utility available."));
+        }
+        else {
+            ui.statusbar->showMessage(tr("Rockbox Utility is up to date."), 5000);
         }
     }
 }
 
-bool RbUtilQt::newerVersion(QString versionOld,QString versionNew)
-{
-   QRegExp chars("\\d*(\\D)");
-   
-   //strip non-number from beginning
-   versionOld = versionOld.remove(0,versionOld.indexOf(QRegExp("\\d")));
-   versionNew = versionNew.remove(0,versionNew.indexOf(QRegExp("\\d")));
-
-   // split versions by "."
-   QStringList versionListOld = versionOld.split(".");
-   QStringList versionListNew = versionNew.split(".");
-   
-   QStringListIterator iteratorOld(versionListOld);
-   QStringListIterator iteratorNew(versionListNew);
-   
-   //check every section
-   while(iteratorOld.hasNext() && iteratorNew.hasNext())
-   {
-      QString newPart = iteratorNew.next();
-      QString oldPart = iteratorOld.next();
-      QString newPartChar = "", oldPartChar = "";
-      int newPartInt = 0, oldPartInt =0;
-
-      //convert to int, if it contains chars, put into seperated variable
-      if(newPart.contains(chars))
-      {
-        newPartChar = chars.cap(1);
-        newPart = newPart.remove(newPartChar);
-      }
-      newPartInt = newPart.toInt();
-      //convert to int, if it contains chars, put into seperated variable
-      if(oldPart.contains(chars))
-      {
-        oldPartChar = chars.cap(1);
-        oldPart = oldPart.remove(oldPartChar);
-      }
-      oldPartInt = oldPart.toInt();
-            
-      if(newPartInt > oldPartInt)  // this section int is higher -> true
-        return true;
-      else if(newPartInt < oldPartInt)  //this section int is lower -> false
-        return false;
-      else if(newPartChar > oldPartChar)  //ints are the same, chars is higher -> true
-        return true;
-      else if(newPartChar < oldPartChar)  //ints are the same, chars is lower -> false
-        return false;
-      //all the same, next section  
-   }
-   // all the same -> false
-   return false;
-}

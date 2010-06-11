@@ -203,4 +203,71 @@ QString Utils::checkEnvironment(bool permission)
     else
         return text;
 }
+/** @brief Compare two version strings.
+ *  @param s1 first version string
+ *  @param s2 second version string
+ *  @return 0 if strings identical, 1 if second is newer, -1 if first.
+ */
+int Utils::compareVersionStrings(QString s1, QString s2)
+{
+    QString a = s1.trimmed();
+    QString b = s2.trimmed();
+    qDebug() << "[Utils] comparing version strings" << a << "and" << b;
+    // if strings are identical return 0.
+    if(a.isEmpty())
+        return 1;
+    if(b.isEmpty())
+        return -1;
+
+    while(!a.isEmpty() || !b.isEmpty()) {
+        // trim all leading non-digits and non-dots (dots are removed afterwards)
+        a.remove(QRegExp("^[^\\d\\.]*"));
+        b.remove(QRegExp("^[^\\d\\.]*"));
+
+        // trim all trailing non-digits for conversion (QString::toInt()
+        // requires this). Copy strings first as replace() changes the string.
+        QString numa = a;
+        QString numb = b;
+        numa.remove(QRegExp("\\D+.*$"));
+        numb.remove(QRegExp("\\D+.*$"));
+
+        // convert to number
+        bool ok1, ok2;
+        int vala = numa.toUInt(&ok1);
+        int valb = numb.toUInt(&ok2);
+        // if none of the numbers converted successfully we're at trailing garbage.
+        if(!ok1 && !ok2)
+            break;
+        if(!ok1)
+            return 1;
+        if(!ok2)
+            return -1;
+
+        // if numbers mismatch we have a decision.
+        if(vala != valb)
+            return (vala > valb) ? -1 : 1;
+
+        // trim leading digits.
+        a.remove(QRegExp("^\\d*"));
+        b.remove(QRegExp("^\\d*"));
+
+        // if number is immediately followed by a character consider it as
+        // version addon (like 1.2.3b). In this case compare characters too.
+        QChar ltra;
+        QChar ltrb;
+        if(a.contains(QRegExp("^[a-zA-Z]")))
+            ltra = a.at(0);
+        if(b.contains(QRegExp("^[a-zA-Z]")))
+            ltrb = b.at(0);
+        if(ltra != ltrb)
+            return (ltra < ltrb) ? 1 : -1;
+        // both are identical or no addon characters, ignore.
+        // remove modifiers and following dot.
+        a.remove(QRegExp("^[a-zA-Z]*\\."));
+        b.remove(QRegExp("^[a-zA-Z]*\\."));
+    }
+
+    // no differences found.
+    return 0;
+}
 

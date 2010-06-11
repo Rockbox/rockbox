@@ -34,6 +34,7 @@ public:
     static qulonglong filesystemFree(QString path);
     static QString findExecutable(QString name);
     static QString checkEnvironment(bool permission);
+    static int compareVersionStrings(QString s1, QString s2);
 };
 
 #endif
