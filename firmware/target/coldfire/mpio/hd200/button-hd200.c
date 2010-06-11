@@ -28,9 +28,9 @@
 
 void button_init_device(void)
 {
-    /* Set GPIO36, GPIO56 as general purpose inputs */
-    or_l((1<<4)|(1<<24),&GPIO1_FUNCTION);
-    and_l(~((1<<4)|(1<<24)),&GPIO1_ENABLE);
+    /* Set GPIO56 (main PLAY) as general purpose inputs */
+    or_l((1<<24),&GPIO1_FUNCTION);
+    and_l(~(1<<24),&GPIO1_ENABLE);
 }
 
 bool button_hold(void)
