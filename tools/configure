@@ -107,6 +107,7 @@ simcc () {
 
  # default tool setup for native building
  prefixtools "$CROSS_COMPILE"
+ ARG_ARM_THUMB=0 # can't use thumb in native builds
 
  simver=sdl
  winbuild="$crosscompile"
