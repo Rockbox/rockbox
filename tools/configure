@@ -45,6 +45,11 @@ findarmgcc() {
     for model in $models_not_checked_with_eabi; do
       if [ "$modelname" = "$model" ]; then
         ARG_ARM_EABI="0"
+        echo "**************************************************************"
+        echo "**** Target $modelname is using non EABI compiler !"
+        echo "**** Please test a build with --eabi and enable"
+        echo "**** EABI compiler for this target"
+        echo "**************************************************************"
       fi
     done
   fi
