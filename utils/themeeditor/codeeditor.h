@@ -59,6 +59,8 @@ public:
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
+    void addError(int line){ errors.append(line); }
+    void clearErrors(){ errors.clear(); }
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -69,6 +71,7 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
+    QList<int> errors;
 };
 
 //![codeeditordefinition]

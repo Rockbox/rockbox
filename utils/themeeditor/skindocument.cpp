@@ -166,6 +166,7 @@ void SkinDocument::settingsChanged()
 
 void SkinDocument::codeChanged()
 {
+    editor->clearErrors();
     parseStatus = model->changeTree(editor->document()->
                                     toPlainText().toAscii());
     statusLabel->setText(parseStatus);
@@ -173,17 +174,7 @@ void SkinDocument::codeChanged()
     /* Highlighting if an error was found */
     if(skin_error_line() > 0)
     {
-        QList<QTextEdit::ExtraSelection> highlight;
-        QTextEdit::ExtraSelection error;
-
-        /* Finding the apropriate line */
-        error.cursor = QTextCursor(editor->document()->
-                               findBlockByNumber(skin_error_line() - 1));
-        error.format = errorColor;
-        highlight.append(error);
-
-        editor->setExtraSelections(highlight);
-
+        editor->addError(skin_error_line());
     }
     else
     {
