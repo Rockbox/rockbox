@@ -79,8 +79,6 @@ private:
     QString saved;
     QString parseStatus;
 
-    QTextCharFormat errorColor;
-
     QLayout* layout;
     CodeEditor* editor;
 

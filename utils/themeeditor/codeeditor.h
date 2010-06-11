@@ -61,6 +61,7 @@ public:
     int lineNumberAreaWidth();
     void addError(int line){ errors.append(line); }
     void clearErrors(){ errors.clear(); }
+    void setErrorColor(QColor color){ errorColor = color; }
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -72,6 +73,7 @@ private slots:
 private:
     QWidget *lineNumberArea;
     QList<int> errors;
+    QColor errorColor;
 };
 
 //![codeeditordefinition]

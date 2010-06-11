@@ -146,10 +146,8 @@ void SkinDocument::settingsChanged()
     palette.setColor(QPalette::All, QPalette::Text, fg);
     editor->setPalette(palette);
 
-    errorColor = QTextCharFormat();
     QColor highlight = settings.value("errorColor", Qt::red).value<QColor>();
-    errorColor.setBackground(highlight);
-    errorColor.setProperty(QTextFormat::FullWidthSelection, true);
+    editor->setErrorColor(highlight);
 
     /* Setting the font */
     QFont def("Monospace");
@@ -175,10 +173,19 @@ void SkinDocument::codeChanged()
     if(skin_error_line() > 0)
     {
         editor->addError(skin_error_line());
-    }
-    else
-    {
-        editor->setExtraSelections(QList<QTextEdit::ExtraSelection>());
+
+        /* Now we're going to attempt parsing again at each line, until we find
+           one that won't error out
+        QTextDocument doc(editor->document()->toPlainText());
+        if(skin_error_line() > 0)
+        {
+            QTextCursor rest(&doc);
+
+            for(int i = 0; i < skin_error_line(); i++)
+                rest.movePosition(QTextCursor::NextBlock,
+                                  QTextCursor::KeepAnchor);
+            rest.clearSelection();
+        }*/
     }
 
     if(editor->document()->toPlainText() != saved)

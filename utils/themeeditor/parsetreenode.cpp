@@ -56,7 +56,6 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         }
         break;
 
-    case VIEWPORT:
     case CONDITIONAL:
         for(int i = 0; i < element->params_count; i++)
             children.append(new ParseTreeNode(&data->params[i], this));
@@ -70,6 +69,11 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
             children.append(new ParseTreeNode(data->children[i], this));
         }
         break;
+
+case VIEWPORT:
+        for(int i = 0; i < element->params_count; i++)
+            children.append(new ParseTreeNode(&data->params[i], this));
+        /* Deliberate fall-through here */
 
     case LINE:
         for(int i = 0; i < data->children_count; i++)

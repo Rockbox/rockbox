@@ -132,7 +132,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
             if(errors.contains(blockNumber + 1))
             {
                 painter.fillRect(QRect(0, top, lineNumberArea->width(),
-                                       fontMetrics().height()), Qt::red);
+                                       fontMetrics().height()), errorColor);
             }
             painter.setPen(Qt::black);
             painter.drawText(0, top, lineNumberArea->width(),
