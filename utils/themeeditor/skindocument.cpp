@@ -138,6 +138,8 @@ void SkinDocument::setupUI()
     /* Connecting the editor's signal */
     QObject::connect(editor, SIGNAL(textChanged()),
                      this, SLOT(codeChanged()));
+    QObject::connect(editor, SIGNAL(cursorPositionChanged()),
+                     this, SLOT(cursorChanged()));
 
     settingsChanged();
 }
@@ -171,6 +173,28 @@ void SkinDocument::settingsChanged()
 
 }
 
+void SkinDocument::cursorChanged()
+{
+    if(editor->isError(editor->textCursor().blockNumber() + 1))
+    {
+        QTextCursor line = editor->textCursor();
+        line.movePosition(QTextCursor::StartOfLine);
+        line.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        skin_parse(line.selectedText().toAscii());
+        if(skin_error_line() > 0)
+            parseStatus = tr("Error on line ") +
+                          QString::number(line.blockNumber() + 1) + tr(": ") +
+                          skin_error_message();
+        statusLabel->setText(parseStatus);
+    }
+    else if(editor->hasErrors())
+    {
+        parseStatus = tr("Errors in document");
+        statusLabel->setText(parseStatus);
+    }
+
+}
+
 void SkinDocument::codeChanged()
 {
     if(blockUpdate)
@@ -189,7 +213,6 @@ void SkinDocument::codeChanged()
     if(skin_error_line() > 0)
         parseStatus = tr("Errors in document");
     statusLabel->setText(parseStatus);
-
 
     /* Highlighting if an error was found */
     if(skin_error_line() > 0)
@@ -225,6 +248,9 @@ void SkinDocument::codeChanged()
         emit titleChanged(title + QChar('*'));
     else
         emit titleChanged(title);
+
+    cursorChanged();
+
 }
 
 void SkinDocument::save()

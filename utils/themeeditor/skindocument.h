@@ -67,6 +67,7 @@ signals:
 
 public slots:
     void settingsChanged();
+    void cursorChanged();
 
 private slots:
     void codeChanged();

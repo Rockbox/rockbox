@@ -62,6 +62,8 @@ public:
     void addError(int line){ errors.append(line); }
     void clearErrors(){ errors.clear(); }
     void setErrorColor(QColor color){ errorColor = color; }
+    bool isError(int line){ return errors.contains(line); }
+    bool hasErrors(){ return !errors.isEmpty(); }
 
 protected:
     void resizeEvent(QResizeEvent *event);
