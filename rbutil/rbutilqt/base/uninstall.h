@@ -35,8 +35,8 @@ public:
     Uninstaller(QObject* parent,QString mountpoint) ;
     ~Uninstaller(){}
 
-    void deleteAll(ProgressloggerInterface* dp);
-    void uninstall(ProgressloggerInterface* dp);
+    void deleteAll(void);
+    void uninstall(void);
 
     bool uninstallPossible();
 
@@ -44,6 +44,10 @@ public:
 
     void setSections(QStringList sections) {uninstallSections = sections;}
 
+signals:
+    void logItem(QString, int); //! set logger item
+    void logProgress(int, int); //! set progress bar.
+    void logFinished(void);
 
 private slots:
 
@@ -52,8 +56,6 @@ private:
     QString m_mountpoint;
 
     QStringList uninstallSections;
-
-    ProgressloggerInterface* m_dp;
 };
 
 

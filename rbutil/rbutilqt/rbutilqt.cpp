@@ -899,7 +899,8 @@ void RbUtilQt::installVoice()
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    QDate date = QDate::fromString(ServerInfo::value(ServerInfo::DailyDate).toString(),Qt::ISODate);
+    QDate date = QDate::fromString(
+            ServerInfo::value(ServerInfo::DailyDate).toString(), Qt::ISODate);
     QString model = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
     // replace placeholder in voice url
     voiceurl.replace("%DATE%", date.toString("yyyyMMdd"));

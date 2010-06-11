@@ -31,6 +31,11 @@ UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
 
     uninstaller = new Uninstaller(this,mountpoint);
+    logger = new ProgressLoggerGui(this);
+    connect(uninstaller, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(uninstaller, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(uninstaller, SIGNAL(logFinished(void)), logger, SLOT(setFinished(void)));
+    connect(logger, SIGNAL(closed()), this, SLOT(close()));
 
     // disable smart uninstall, if not possible
     if(!uninstaller->uninstallPossible())
@@ -50,17 +55,15 @@ UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
 
 void UninstallWindow::accept()
 {
-    logger = new ProgressLoggerGui(this);
     logger->show();
     
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));
     if(ui.CompleteRadioBtn->isChecked())
     {
-        uninstaller->deleteAll(logger);
+        uninstaller->deleteAll();
     }
     else
     {
-        uninstaller->uninstall(logger);
+        uninstaller->uninstall();
     }
     
 }

@@ -26,30 +26,27 @@ Uninstaller::Uninstaller(QObject* parent,QString mountpoint): QObject(parent)
     m_mountpoint = mountpoint;
 }
 
-void Uninstaller::deleteAll(ProgressloggerInterface* dp)
+void Uninstaller::deleteAll(void)
 {
-    m_dp = dp;
     QString rbdir(m_mountpoint + ".rockbox/");
-    m_dp->addItem(tr("Starting Uninstallation"),LOGINFO);
-    m_dp->setProgressMax(0);
+    emit logItem(tr("Starting Uninstallation"), LOGINFO);
+    emit logProgress(0, 0);
     Utils::recursiveRmdir(rbdir);
-    m_dp->setProgressMax(1);
-    m_dp->setProgressValue(1);
-    m_dp->addItem(tr("Finished Uninstallation"),LOGOK);
-    m_dp->setFinished();
+    emit logProgress(1, 1);
+    emit logItem(tr("Finished Uninstallation"), LOGOK);
+    emit logFinished();
 }
 
-void Uninstaller::uninstall(ProgressloggerInterface* dp)
+void Uninstaller::uninstall(void)
 {
-    m_dp = dp;
-    m_dp->setProgressMax(0);
-    m_dp->addItem(tr("Starting Uninstallation"),LOGINFO);
+    emit logProgress(0, 0);
+    emit logItem(tr("Starting Uninstallation"), LOGINFO);
 
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
 
     for(int i=0; i< uninstallSections.size() ; i++)
     {
-        m_dp->addItem(tr("Uninstalling %1...").arg(uninstallSections.at(i)), LOGINFO);
+        emit logItem(tr("Uninstalling %1...").arg(uninstallSections.at(i)), LOGINFO);
         QCoreApplication::processEvents();
         // create list of all other install sections
         QStringList sections = installlog.childGroups();
@@ -80,8 +77,8 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
             if(toDelete.isFile())  // if it is a file remove it
             {
                 if(deleteFile && !QFile::remove(toDelete.filePath()))
-                    m_dp->addItem(tr("Could not delete %1")
-                          .arg(toDelete.filePath()),LOGWARNING);
+                    emit logItem(tr("Could not delete %1")
+                          .arg(toDelete.filePath()), LOGWARNING);
                 installlog.remove(toDeleteList.at(j));
                 qDebug() << "deleted: " << toDelete.filePath() ;
             }
@@ -108,10 +105,9 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
     }
     uninstallSections.clear();
     installlog.sync();
-    m_dp->setProgressMax(1);
-    m_dp->setProgressValue(1);
-    m_dp->addItem(tr("Uninstallation finished"),LOGOK);
-    m_dp->setFinished();
+    emit logProgress(1, 1);
+    emit logItem(tr("Uninstallation finished"), LOGOK);
+    emit logFinished();
 }
 
 QStringList Uninstaller::getAllSections()
