@@ -79,6 +79,8 @@ elif sys.platform == "darwin":
 else:
     progexe = program
 
+# all files of the program. Will get put into an archive after building
+# (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
 programfiles = [ progexe ]
 
 svnserver = "svn://svn.rockbox.org/rockbox/"
@@ -103,6 +105,9 @@ svnpaths = [ "rbutil/",
              "tools/voicefont.h",
              "tools/wavtrim.c",
              "tools/sapi_voice.vbs" ]
+# set this to true to run upx on the resulting binary, false to skip this step.
+# only used on w32.
+useupx = False
 
 # == Functions ==
 def usage(myself):
@@ -483,9 +488,10 @@ def main():
         tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
     if sys.platform == "win32":
-        if not upxfile(sourcefolder) == 0:
-            tempclean(workfolder, cleanup and not keeptemp)
-            sys.exit(1)
+        if useupx == True:
+            if not upxfile(sourcefolder) == 0:
+                tempclean(workfolder, cleanup and not keeptemp)
+                sys.exit(1)
         archive = zipball(ver, sourcefolder)
     elif sys.platform == "darwin":
         archive = macdeploy(ver, sourcefolder)
