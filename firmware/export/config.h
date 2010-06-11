@@ -763,10 +763,11 @@ Lyre prototype 1 */
     && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2
 #define PLUGIN_USE_IRAM
 #endif
-#if defined(CPU_ARM)
+#if defined(CPU_ARM) && !defined(__ARM_EABI__)
 /* GCC quirk workaround: arm-elf-gcc treats static functions as short_call
  * when not compiling with -ffunction-sections, even when the function has
- * a section attribute. */
+ * a section attribute.
+ * This is fixed with eabi since all calls are short ones by default */
 #define STATICIRAM
 #else
 #define STATICIRAM static
