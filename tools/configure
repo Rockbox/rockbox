@@ -807,6 +807,8 @@ help() {
                       for the new ARM standard abi EABI
     --no-eabi         The opposite of --eabi (prefer old non-eabi toolchains)
     --thumb           Build with -mthumb (for ARM builds)
+    --no-thumb        The opposite of --thumb (don't use thumb even for targets
+                      where this is the default
     --help            Shows this message (must not be used with other options)
 
 EOF
@@ -825,6 +827,7 @@ ARG_TTSOPTS=
 ARG_TYPE=
 ARG_VOICE=
 ARG_ARM_EABI=
+ARG_ARM_THUMB=
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -842,6 +845,7 @@ for arg in "$@"; do
 		--eabi)       ARG_ARM_EABI=1;;
 		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
+		--no-thumb)   ARG_ARM_THUMB=0;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
@@ -1960,6 +1964,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clip"
+    if [ "$ARG_ARM_THUMB" != 0 ]; then ARG_ARM_THUMB=1; fi
     arm9tdmicc
     GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
@@ -2003,6 +2008,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-m200v4"
+    if [ "$ARG_ARM_THUMB" != 0 ]; then ARG_ARM_THUMB=1; fi
     arm9tdmicc
     GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
@@ -2049,6 +2055,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-c200v2"
+    if [ "$ARG_ARM_THUMB" != 0 ]; then ARG_ARM_THUMB=1; fi
     arm9tdmicc
     GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     ;;
