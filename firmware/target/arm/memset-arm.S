@@ -69,7 +69,7 @@ memset:
         stmgedb r0!, {r1, r3, ip, lr}
         stmgedb r0!, {r1, r3, ip, lr}
         bgt     3b
-        ldmeqfd sp!, {pc}               @ Now <64 bytes to go.
+        ldreq   pc, [sp], #4            @ Now <64 bytes to go.
 /*
  * No need to correct the count; we're only testing bits from now on
  */
