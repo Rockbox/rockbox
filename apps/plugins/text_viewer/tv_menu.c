@@ -315,6 +315,12 @@ static bool tv_font_setting(void)
 }
 #endif
 
+static bool tv_indent_spaces_setting(void)
+{
+    return rb->set_int("Indent Spaces", "", UNIT_INT, 
+                       &new_prefs.indent_spaces, NULL, 1, 0, 5, NULL);
+}
+
 MENUITEM_FUNCTION(encoding_item, 0, "Encoding", tv_encoding_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", tv_word_wrap_setting,
@@ -333,6 +339,8 @@ MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
 MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
                   NULL, NULL, Icon_NOICON);
 #endif
+MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces", tv_indent_spaces_setting,
+                  NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
@@ -340,7 +348,7 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
             &header_item, &footer_item, &font_item,
 #endif
-            &scroll_menu);
+            &scroll_menu, &indent_spaces_item);
 
 static enum tv_menu_result tv_options_menu(void)
 {

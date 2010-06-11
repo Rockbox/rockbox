@@ -28,7 +28,7 @@ Difference between viewer.rock
                - If the next line is a blank line or spaces only line, this line breaks.
 
        [reflow]
-           - indent changes two spaces.
+           - indent changes is two spaces (changable in the settings).
            - supports the player which does not define HAVE_LCD_BITMAP.
 
     [alignment]
@@ -43,8 +43,6 @@ TODO list
     supports more than 999 pages of text.
 
   - add History feature.
-
-  - when the line_mode is reflow, allow to specify indent spaces.
 
   - draw images that are linked to the text. (<img src="...">)
 

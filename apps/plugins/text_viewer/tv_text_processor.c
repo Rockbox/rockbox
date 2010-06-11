@@ -41,12 +41,6 @@ enum tv_text_type {
 
 #define TV_MAX_BLOCKS 5
 
-/*
- * number of spaces to indent first paragraph
- * (this value uses the line mode is REFLOW only)
- */
-#define TV_INDENT_SPACES 2
-
 static const struct tv_preferences *prefs;
 static enum tv_text_type text_type = TV_TEXT_UNKNOWN;
 
@@ -434,7 +428,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             is_indent = false;
 
         if (prefs->line_mode == REFLOW && is_indent)
-            gw = tv_glyph_width(ch) * TV_INDENT_SPACES;
+            gw = tv_glyph_width(ch) * prefs->indent_spaces;
         else
             gw = tv_glyph_width(ch);
 
@@ -451,12 +445,13 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             break;
         }
 
-        if (prefs->line_mode == REFLOW && is_indent)
+        if (prefs->line_mode != REFLOW || !is_indent)
+            ucs[chars++] = ch;
+        else
         {
-            for (i = 1; i < TV_INDENT_SPACES; i++)
+            for (i = 0; i < prefs->indent_spaces; i++)
                 ucs[chars++] = ch;
         }
-        ucs[chars++] = ch;
 
         if (tv_is_line_break_char(ch))
         {
@@ -517,6 +512,9 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
 
     tv_get_ucs(src, &ch);
     is_indent = (tv_isspace(ch) && !is_break_line);
+
+    if (is_indent && prefs->indent_spaces == 0 && (expand_extra_line = !expand_extra_line) == true)
+        return 0;
 
     for (i = 0; i < block_count; i++)
     {

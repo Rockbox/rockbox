@@ -52,6 +52,7 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
         (oldp->horizontal_scrollbar != newp->horizontal_scrollbar) ||
         (oldp->vertical_scrollbar   != newp->vertical_scrollbar)   ||
         (oldp->encoding             != newp->encoding)             ||
+        (oldp->indent_spaces        != newp->indent_spaces)        ||
 #ifdef HAVE_LCD_BITMAP
         (oldp->header_mode          != newp->header_mode)          ||
         (oldp->footer_mode          != newp->footer_mode)          ||
@@ -113,6 +114,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
 #endif
     p->autoscroll_speed = 1;
     p->narrow_mode = NM_PAGE;
+    p->indent_spaces = 2;
     /* Set codepage to system default */
     p->encoding = rb->global_settings->default_codepage;
     p->file_name[0] = '\0';

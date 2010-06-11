@@ -89,6 +89,8 @@ struct tv_preferences {
         NM_TOP_BOTTOM,
     } narrow_mode;
 
+    int indent_spaces;
+
     unsigned char font_name[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
     struct font *font;
