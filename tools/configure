@@ -369,7 +369,7 @@ whichadvanced () {
     interact=1
     echo ""
     echo "Enter your developer options (press enter when done)"
-    printf "(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile, (T)est plugins"
+    printf "(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile, (T)est plugins, T(H)umb"
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
@@ -413,6 +413,10 @@ whichadvanced () {
       [Tt])
         echo "Including test plugins"
         extradefines="$extradefines -DHAVE_TEST_PLUGINS"
+        ;;
+      [Hh])
+        echo "Building with thumb"
+        config_thumb="#define USE_THUMB"
         ;;
       [Cc])
           echo "bootchart enabled (logf also enabled)"
@@ -2923,6 +2927,10 @@ DLLTOOL=`findtool ${DLLTOOL} --lit`
 DLLWRAP=`findtool ${DLLWRAP} --lit`
 RANLIB=`findtool ${RANLIB} --lit`
 
+if test -n "$config_thumb"; then
+  CC="$toolsdir/thumb-cc.py $CC"
+fi
+
 if test -n "$ccache"; then
   CC="$ccache $CC"
 fi
@@ -2948,6 +2956,7 @@ sed > autoconf.h \
  -e "s,@have_backlight@,$have_backlight,g" \
  -e "s,@have_fmradio_in@,$have_fmradio_in,g" \
  -e "s,@have_ata_poweroff@,$have_ata_poweroff,g" \
+ -e "s,@config_thumb@,$config_thumb,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -2970,6 +2979,9 @@ sed > autoconf.h \
 
 /* optional define for ATA poweroff on Player */
 @have_ata_poweroff@
+
+/* optional define for ARM thumb builds */
+@config_thumb@
 
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
