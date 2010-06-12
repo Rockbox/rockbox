@@ -181,7 +181,12 @@ newstart:
  * we're in. Second parameter is exception number, used for a string lookup
  * in UIE. */
 undef_instr_handler:
-    sub    r0, lr, #4
+    sub    r0, lr, #4   @ r0 points to the faulty ARM instruction
+#ifdef USE_THUMB
+    mrs    r1, spsr
+    tst    r1, #(1<<5)  @ T bit set ?
+    subne  r0, lr, #2   @ if yes, r0 points to the faulty THUMB instruction
+#endif /* USE_THUMB */
     mov    r1, #0
     b      UIE
 
