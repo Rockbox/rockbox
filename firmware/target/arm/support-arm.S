@@ -598,13 +598,11 @@
 
 __div0_wrap_s:
     sub sp, sp, #4
-    mov     r0, #0
     b       __div0
     .size __div0_wrap_s, . - __div0_wrap_s
 
 __div0_wrap:
     str     lr, [sp, #-4]!
-    mov     r0, #0
     b       __div0
     .size __div0_wrap, . - __div0_wrap
 
