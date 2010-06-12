@@ -12316,23 +12316,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *: none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *: none
-    radio_remote: "Radio FM remota"
-  </dest>
-  <voice>
-    *: none
-    radio_remote: "Radio F M remota"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -12415,5 +12398,81 @@
   <voice>
     *: none
     recording_histogram: "Intervalo del histograma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Pantalla de rádio del mando"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Pantalla de rádio del mando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Compositor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Pantalla de rádio"
+  </dest>
+  <voice>
+    *: none
+    radio: "Pantalla de rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "Pase de carátulas"
+  </dest>
+  <voice>
+    *: "Abrir pase de carátulas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Forzar"
+  </dest>
+  <voice>
+    *: "Forzar"
   </voice>
 </phrase>
