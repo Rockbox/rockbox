@@ -99,8 +99,9 @@ void __attribute__((noreturn)) UIE(unsigned int pc, unsigned int num)
 void __attribute__((naked)) __div0(void)
 {
     asm volatile (
-        "ldr    r0, [sp] \r\n"
-        "mov    r1, #3   \r\n"
-        "b      UIE      \r\n"
+        "ldr    r0, [sp]    \r\n"
+        "sub    r0, r0, #4  \r\n"
+        "mov    r1, #3      \r\n"
+        "b      UIE         \r\n"
     );
 }
