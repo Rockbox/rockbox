@@ -190,7 +190,7 @@ build() {
     CFLAGS=-U_FORTIFY_SOURCE ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
 
     echo "ROCKBOXDEV: $toolname/make"
-    $make -j8
+    $make
 
     echo "ROCKBOXDEV: $toolname/make install"
     $make install
@@ -214,6 +214,7 @@ done
 echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD to change)"
 echo "Install prefix     : $prefix  (set RBDEV_PREFIX to change)"
 echo "Build dir          : $builddir (set RBDEV_BUILD to change)"
+echo "Make options       : $MAKEFLAGS (set MAKEFLAGS to change)"
 echo ""
 
 # Verify download directory
