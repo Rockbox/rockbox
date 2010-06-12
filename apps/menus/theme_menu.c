@@ -97,6 +97,7 @@ static int set_color_func(void* color)
                          colors[c].setting, banned_color);
     settings_save();
     settings_apply(false);
+    settings_apply_skins();
     return res;
 }
 
