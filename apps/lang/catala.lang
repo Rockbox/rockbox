@@ -12455,3 +12455,17 @@
     *: "Força"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "Flux de caràtules"
+  </dest>
+  <voice>
+    *: "Obre el flux de caràtules"
+  </voice>
+</phrase>
