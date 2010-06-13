@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -78,8 +79,11 @@ struct tag_handler_table {
     int flags;
     tag_handler *func;
 };
+#define EAT_LINE_ENDING 0x01
 
 struct tag_handler_table table[] = {
+    { SKIN_TOKEN_ENABLE_THEME, EAT_LINE_ENDING, NULL },
+    { SKIN_TOKEN_DISABLE_THEME, EAT_LINE_ENDING, NULL },
     /* file tags */
     { SKIN_TOKEN_FILE_BITRATE , 0, handle_this_or_next_track },
     { SKIN_TOKEN_FILE_CODEC , 0, handle_this_or_next_track },
@@ -108,31 +112,43 @@ struct tag_handler_table table[] = {
     { SKIN_TOKEN_TRANSLATEDSTRING, 0, handle_translate_string},
 };
 
-int handle_tree(struct skin *skin, struct skin_element* tree)
+int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
 {
     /* for later.. do this in two steps
      * 1) count how much skin buffer is needed
      * 2) do the actual tree->skin conversion
      */
     struct skin_element* element = tree;
+    struct line *current_line = line;
     int counter;
     while (element)
     {
-        if (element->type == SUBLINES)
+        if (element->type == LINE)
+        {
+            struct line *line = (struct line*)malloc(sizeof(struct line));
+            line->update_mode = 0;
+            line->eat_line_ending = false;
+            element->data = line;
+            current_line = line;
+        }
+        else if (element->type == SUBLINES)
         {
             struct subline *subline = malloc(sizeof(struct subline));
             subline->current_line = -1;
             subline->last_change_tick = 0;
             element->data = subline;
         }
-        if (element->type == TAG)
+        else if (element->type == TAG)
         {
-            int i;
+            int i; 
             for(i=0;i<sizeof(table)/sizeof(*table);i++)
             {
                 if (table[i].type == element->tag->type)
                 {
-                    table[i].func(skin, element, false);
+                    if (table[i].func)
+                        table[i].func(skin, element, false);
+                    if (table[i].flags&EAT_LINE_ENDING)
+                        line->eat_line_ending = true;
                     break;
                 }
             }
@@ -145,7 +161,7 @@ int handle_tree(struct skin *skin, struct skin_element* tree)
         counter = 0;
         while (counter < element->children_count)
         {
-            int ret = handle_tree(skin, element->children[counter]);
+            int ret = handle_tree(skin, element->children[counter], current_line);
             counter++;
         }
         element = element->next;

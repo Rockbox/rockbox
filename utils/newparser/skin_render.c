@@ -94,11 +94,12 @@ void skin_render_alternator(struct skin_element* alternator,
                      buf, buf_size, line_number);
 }
 
-void skin_render_viewport(struct skin_element* line, bool draw_tags)
+void skin_render_viewport(struct skin_element* viewport, bool draw_tags)
 {
     int line_number = 0;
     char linebuf[MAX_LINE];
     skin_render_func func = skin_render_line;
+    struct skin_element* line = viewport;
     while (line)
     {
         linebuf[0] = '\0';
@@ -107,10 +108,14 @@ void skin_render_viewport(struct skin_element* line, bool draw_tags)
         else if (line->type == LINE)
             func = skin_render_line;
         
-        func (line, linebuf, sizeof(linebuf), line_number);
+        func(line, linebuf, sizeof(linebuf), line_number);
         if (draw_tags)
         {
-            printf("%s\n", linebuf);
+            printf("%s", linebuf);
+            if (!((struct line*)line->data)->eat_line_ending)
+            {
+                printf("\n");
+            }
         }
         line_number++;
         line = line->next;

@@ -51,6 +51,11 @@ struct progressbar {
     bool have_bitmap_pb;
 };
 
+struct line {
+    unsigned update_mode;
+    bool eat_line_ending;
+};
+
 struct subline {
     int timeout;
     int current_line;

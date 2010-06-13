@@ -29,7 +29,7 @@
 #include "tag_table.h"
 #include "skin_structs.h"
 
-int handle_tree(struct skin *skin, struct skin_element* tree);
+int handle_tree(struct skin *skin, struct skin_element* tree, struct line* line);
 void skin_render(struct skin_element* root);
 
 int main(int argc, char* argv[])
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     
     struct skin_element* tree = skin_parse(buffer);
     struct skin skin;
-    handle_tree(&skin, tree);
+    handle_tree(&skin, tree, NULL);
     skin_render(tree);
     
     skin_free_tree(tree);
