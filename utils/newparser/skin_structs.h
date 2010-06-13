@@ -27,26 +27,10 @@
 
 #include "skin_parser.h"
 #include "tag_table.h"
-
-struct skin_token {
-    enum skin_token_type type; /* enough to store the token type */
-
-    /* Whether the tag (e.g. track name or the album) refers the
-       current or the next song (false=current, true=next) */
-    bool next;
-
-    union {
-        char c;
-        unsigned int i;
-        void* data;
-    } value;
-};
-
-#define MAX_TOKENS 10000
+#ifndef SKIN_STRUCTS_H_
+#define SKIN_STRUCTS_H_
 struct skin 
 {
-    int token_count;
-    struct skin_token tokens[MAX_TOKENS];
 };
 
 
@@ -66,3 +50,12 @@ struct progressbar {
  //   struct bitmap bm;
     bool have_bitmap_pb;
 };
+
+struct subline {
+    int timeout;
+    int current_line;
+    unsigned long last_change_tick;
+};
+
+
+#endif

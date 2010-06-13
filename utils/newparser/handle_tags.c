@@ -25,6 +25,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "symbols.h"
 #include "skin_parser.h"
 #include "tag_table.h"
 #include "skin_structs.h"
@@ -35,32 +36,22 @@ typedef int (tag_handler)(struct skin *skin, struct skin_element* element, bool 
 
 int handle_translate_string(struct skin *skin, struct skin_element* element, bool size_only)
 {
-    struct skin_token *token = &skin->tokens[skin->token_count++];
-    token->type = element->tag->type;
-    token->next = false;
-    token->value.i = 1; /* actually need to fix this */
     return 0;
 }
 
 int handle_this_or_next_track(struct skin *skin, struct skin_element* element, bool size_only)
 {
-    struct skin_token *token = &skin->tokens[skin->token_count++];
-    token->type = element->tag->type;
-    token->next = element->tag->name[0] == 'D' 
-                  || element->tag->name[0] == 'I'
-                  || element->tag->name[0] == 'F';
     if (element->tag->type == SKIN_TOKEN_FILE_DIRECTORY)
     {
         if (element->params_count != 1 || element->params[0].type_code != NUMERIC)
             return -1;
-        token->value.i = element->params[0].data.numeric;
+        //token->value.i = element->params[0].data.numeric;
     }
     return 0;
 }
 
 int handle_bar(struct skin *skin, struct skin_element* element, bool size_only)
 {
-    struct skin_token *token = &skin->tokens[skin->token_count++];
     struct progressbar bar;
     /* %bar with no params is different for each one so handle that! */
     if (element->params_count == 0)
@@ -79,7 +70,6 @@ int handle_bar(struct skin *skin, struct skin_element* element, bool size_only)
             return sizeof(struct progressbar);
     }
     
-    token->type = element->tag->type;
     return 0;
 }
 
@@ -128,6 +118,13 @@ int handle_tree(struct skin *skin, struct skin_element* tree)
     int counter;
     while (element)
     {
+        if (element->type == SUBLINES)
+        {
+            struct subline *subline = malloc(sizeof(struct subline));
+            subline->current_line = -1;
+            subline->last_change_tick = 0;
+            element->data = subline;
+        }
         if (element->type == TAG)
         {
             int i;

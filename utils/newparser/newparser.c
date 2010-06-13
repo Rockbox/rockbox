@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
     
     struct skin_element* tree = skin_parse(buffer);
     struct skin skin;
+    handle_tree(&skin, tree);
     skin_render(tree);
-    //handle_tree(&skin, tree);
     
     skin_free_tree(tree);
     return 0;
