@@ -106,7 +106,8 @@ QString ParseTreeNode::genCode() const
     {
         switch(element->type)
         {
-
+        case UNKNOWN:
+            break;
         case VIEWPORT:
             /* Generating the Viewport tag, if necessary */
             if(element->tag)
@@ -263,6 +264,8 @@ int ParseTreeNode::genHash() const
         hash += element->type;
         switch(element->type)
         {
+        case UNKNOWN:
+            break;
         case VIEWPORT:
         case LINE:
         case SUBLINES:
@@ -346,6 +349,8 @@ QVariant ParseTreeNode::data(int column) const
         {
             switch(element->type)
             {
+            case UNKNOWN:
+                return QObject::tr("Unknown");
             case VIEWPORT:
                 return QObject::tr("Viewport");
 
@@ -397,6 +402,7 @@ QVariant ParseTreeNode::data(int column) const
         {
             switch(element->type)
             {
+            case UNKNOWN:
             case VIEWPORT:
             case LINE:
             case SUBLINES:

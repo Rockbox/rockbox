@@ -860,6 +860,7 @@ struct skin_element* skin_alloc_element()
 {
     struct skin_element* retval =  (struct skin_element*)
                                    skin_alloc(sizeof(struct skin_element));
+    retval->type = UNKNOWN;
     retval->next = NULL;
     retval->tag = NULL;
     retval->params_count = 0;

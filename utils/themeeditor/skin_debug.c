@@ -112,6 +112,9 @@ void skin_debug_tree(struct skin_element* root)
 
         switch(current->type)
         {
+        case UNKNOWN:
+            printf("[ Unknown element.. error\n]");
+            break;
 
         case VIEWPORT:
             printf("[ Viewport \n");

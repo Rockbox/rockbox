@@ -35,6 +35,7 @@ extern "C"
 /* Possible types of element in a WPS file */
 enum skin_element_type
 {
+    UNKNOWN = -1,
     VIEWPORT,
     LINE,
     SUBLINES,
