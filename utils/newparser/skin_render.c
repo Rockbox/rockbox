@@ -30,12 +30,14 @@
 #include "symbols.h"
 #include "skin_scan.h"
 
-void skin_render_alternator(struct skin_element* alternator);
+void skin_render_alternator(struct skin_element* alternator, int line_number);
 
 /* Draw a LINE element onto the display */
-void skin_render_line(struct skin_element* line)
+void skin_render_line(struct skin_element* line, int line_number)
 {
     int i=0, value;
+    if (line->children_count == 0)
+        return; /* empty line, do nothing */
     struct skin_element *child = line->children[0];
     while (child)
     {
@@ -46,9 +48,9 @@ void skin_render_line(struct skin_element* line)
                 if (value >= child->children_count)
                     value = child->children_count-1;
                 if (child->children[value]->type == SUBLINES)
-                    skin_render_alternator(child->children[value]);
+                    skin_render_alternator(child->children[value], line_number);
                 else if (child->children[value]->type == LINE)
-                    skin_render_line(child->children[value]);
+                    skin_render_line(child->children[value], line_number);
                 break;
             case TAG:
                 printf("%%%s", child->tag->name);
@@ -62,24 +64,26 @@ void skin_render_line(struct skin_element* line)
         }
         child = child->next;
     }
-    printf("\n"); /* might be incorrect */
 }
 
-void skin_render_alternator(struct skin_element* alternator)
+void skin_render_alternator(struct skin_element* alternator, int line_number)
 {
     /*TODO Choose which subline to draw */
-    skin_render_line(alternator->children[0]);
+    skin_render_line(alternator->children[0], line_number);
 }
 
 void skin_render_viewport(struct skin_element* viewport)
 {
     struct skin_element *line = viewport;
+    int line_number = 0;
     while (line)
     {
+        printf("\n[%d]", line_number); /* might be incorrect */
         if (line->type == SUBLINES)
-            skin_render_alternator(line);
+            skin_render_alternator(line, line_number);
         else if (line->type == LINE)
-            skin_render_line(line);
+            skin_render_line(line, line_number);
+        line_number++;
         line = line->next;
     }
 }
@@ -89,7 +93,7 @@ void skin_render(struct skin_element* root)
     struct skin_element* viewport = root;
     while (viewport)
     {
-        skin_render_viewport(viewport->children[viewport->children_count-1]);
+        skin_render_viewport(viewport->children[0]);
         viewport = viewport->next;
     }
 }
