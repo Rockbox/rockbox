@@ -5,7 +5,7 @@
 #
 
 # specify the UI area viewport... everything but a bar 8 pixels high at the top
-%Vi|0|8|-|-|1|-|-|
+%Vi(-,0,8,-,-,1)
 
 ##############################################################
 # Options: 
@@ -13,92 +13,92 @@
 # Just comment out the line for the one you dont want!
 
 # comment out the next line if you dont want battery icons
-%Vda%Vde
+%Vd(a)%Vd(e)
 
 # comment out the next line if you dont want battery number as text
 # %Vdb
 
 # comment out the next line if you dont want volume icons
-%Vdc
+%Vd(c)
 # comment out the next line if you dont want volume number as text
 # %Vdd
  
 ################################################################
 
 # Load some bitmaps
-%xl|B|battery.bmp|0|0|16|
-%xl|V|volume.bmp|1|0|17|
-%xl|S|status.bmp|0|0|15|
-%xl|D|access_disk.bmp|0|0|
-%xl|y|batter-y.bmp|0|0|
+%xl(B,battery.bmp,0,0,16)
+%xl(V,volume.bmp,1,0,17)
+%xl(S,status.bmp,0,0,15)
+%xl(D,access_disk.bmp,0,0)
+%xl(y,batter-y.bmp,0,0)
 
-%xl|m|rec_mpegbitrates.bmp|1|0|18|
-%xl|f|rec_frequencies.bmp|0|0|12|
-%xl|e|rec_encoders.bmp|0|0|3|
-%xl|c|rec_channels.bmp|13|0|2|
+%xl(m,rec_mpegbitrates.bmp,1,0,18)
+%xl(f,rec_frequencies.bmp,0,0,12)
+%xl(e,rec_encoders.bmp,0,0,3)
+%xl(c,rec_channels.bmp,13,0,2)
 
 # Enable the correct viewports
-%?cs<%Vdc%Vdp%Vdr%Vds|%Vdc%Vdp%Vdr%Vds|%Vdz|%Vdc%Vdp%Vdr%Vds>
+%?cs<%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(z)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)>
 
 # Charging animation viewports
-%t2%?bc<%Vdx|%Vda>;%t2%Vda
+%t(2)%?bc<%Vd(x)|%Vd(a)>;%t(2)%Vd(a)
 
 # Battery area, Icons
-%Vl|a|0|0|17|7|0|-|-|
-%?bl<%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj|%xdBk|%xdBl|%xdBm|%xdBn|%xdBo>
+%Vl(a,0,0,17,7,0)
+%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
 
 # Battery area, grey background viewport for charging animation
-%Vl|x|0|0|17|7|0|-|555555| 
-%?bl<%xdBa|%xdBb|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj|%xdBk|%xdBl|%xdBm|%xdBn|%xdBo>
+%Vl(x,0,0,17,7,0)%Vb(555555) 
+%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
 
 # end of battery symbol (to exclude it from animation)
-%Vl|e|17|0|3|7|0|-|-|
-%xdy
+%Vl(e,17,0,3,7,0)
+%xd(y)
 
 # usb power or charger icon
-%V|20|0|8|8|0|-|-| 
-%?bu<%xdSa|%?bc<%xdSa|%?bp<%xdSo>>>
+%V(20,0,8,8,0) 
+%?bu<%xd(Sa)|%?bc<%xd(Sa)|%?bp<%xd(So)>>>
 
 # battery area, no icons
-%Vl|b|0|0|18|8|0|-|-|
+%Vl(b,0,0,18,8,0)
 %ar%bl
 
 # Volume area
-%Vl|c|28|0|19|8|0|-|-|
-%?mv<%ac%?pv<%pv|%pv| %pv| %pv>|%?pv<%xdVa|%xdVb|%xdVc|%xdVd|%xdVe|%xdVf|%xdVg|%xdVh|%xdVi|%xdVj|%xdVk|%xdVl|%xdVm|%xdVn|%xdVo|%xdVp|%xdVq>>
-%Vl|d|28|0|19|8|0|-|-|
+%Vl(c,28,0,19,8,0)
+%?mv<%ac%?pv<%pv|%pv| %pv| %pv>|%?pv<%xd(Va)|%xd(Vb)|%xd(Vc)|%xd(Vd)|%xd(Ve)|%xd(Vf)|%xd(Vg)|%xd(Vh)|%xd(Vi)|%xd(Vj)|%xd(Vk)|%xd(Vl)|%xd(Vm)|%xd(Vn)|%xd(Vo)|%xd(Vp)|%xd(Vq)>>
+%Vl(d,28,0,19,8,0)
 %ac%?pv<%pv|%pv| %pv| %pv>
 
 # Icons, all in the same bmp strip, so need to use multiple viewports
 # Playback mode
-%Vl|p|47|0|9|8|0|-|-|
-%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
+%Vl(p,47,0,9,8,0)
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
 
 # Repeat mode
-%Vl|r|56|0|9|8|0|-|-|
-%?mm<|%xdSk|%xdSl|%xdSm|%xdSn>
+%Vl(r,56,0,9,8,0)
+%?mm<|%xd(Sk)|%xd(Sl)|%xd(Sm)|%xd(Sn)>
 
 # Shuffle mode
-%Vl|s|65|0|-|8|0|-|-|
-%?ps<%xdSm|>
+%Vl(s,65,0,-,8,0)
+%?ps<%xd(Sm)|>
 
 
 # Recording section
 # encoder/mpeg bitrate
-%Vl|z|28|0|19|8|0|-|-|
-%?Rp<%?Re<%xdea|%xdeb|%xdec|%?Rb<%xdma|%xdmb|%xdmc|%xdmd|%xdme|%xdmf|%xdmg|%xdmh|%xdmi|%xdmj|%xdmk|%xdml|%xdmm|%xdmn|%xdmo|%xdmp|%xdmq|%xdmr>>>
+%Vl(z,28,0,19,8,0)
+%?Rp<%?Re<%xd(ea)|%xd(eb)|%xd(ec)|%?Rb<%xd(ma)|%xd(mb)|%xd(mc)|%xd(md)|%xd(me)|%xd(mf)|%xd(mg)|%xd(mh)|%xd(mi)|%xd(mj)|%xd(mk)|%xd(ml)|%xd(mm)|%xd(mn)|%xd(mo)|%xd(mp)|%xd(mq)|%xd(mr)>>>
 # status icon
-%Vl|z|47|0|8|8|0|-|-|
-%?mp<%xdSc|%xdSb|%xdSd|%xdSe|%xdSf|%xdSg|%xdSh|%xdSi|%xdSj>
+%Vl(z,47,0,8,8,0)
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
 # frequency and channels
-%Vl|z|55|0|-|8|0|-|-|
-%?Rp<%?Rf<%xdfa|%xdfb|%xdfc|%xdfd|%xdfe|%xdff|%xdfg|%xdfh|%xdfi|%xdfj|%xdfk|%xdfl>>
-%?Rm<%xdca|%xdcb>
+%Vl(z,55,0,-,8,0)
+%?Rp<%?Rf<%xd(fa)|%xd(fb)|%xd(fc)|%xd(fd)|%xd(fe)|%xd(ff)|%xd(fg)|%xd(fh)|%xd(fi)|%xd(fj)|%xd(fk)|%xd(fl)>>
+%?Rm<%xd(ca)|%xd(cb)>
 
 # Clock on RTC able targets, and disk access
-%V|-43|0|31|8|0|-|-| # align on the right with room for 5 SYSFONT digits
-%?cc<%?ca<%?St|time format|<%cH|%cI>:%cM|--:-->|>
+%V(-43,0,31,8,0) # align on the right with room for 5 SYSFONT digits
+%?cc<%?ca<%?St(time format)<%cH|%cI>:%cM|--:-->|>
 
 # disk access icon
-%V|-12|0|-|8|0|-|-|
-%?lh<%xdD|>
+%V(-12,0,-,8,0)
+%?lh<%xd(D)|>
