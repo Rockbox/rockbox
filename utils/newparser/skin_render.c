@@ -117,7 +117,8 @@ void skin_render_viewport(struct skin_element* viewport, bool draw_tags)
                 printf("\n");
             }
         }
-        line_number++;
+        if (!((struct line*)line->data)->eat_line_ending)
+            line_number++;
         line = line->next;
     }
 }
