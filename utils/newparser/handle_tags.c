@@ -132,10 +132,10 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
             if (element->tag && next->type == LINE &&
                 element->line == next->line)
             {
-                struct line *line = (struct line*)skin_alloc(sizeof(struct line));
-                line->update_mode = 0;
-                line->eat_line_ending = true;
-                next->data = line;
+                struct line *newline = (struct line*)skin_alloc(sizeof(struct line));
+                newline->update_mode = 0;
+                newline->eat_line_ending = true;
+                next->data = newline;
             }
         }
         else if (element->type == LINE && !element->data)
