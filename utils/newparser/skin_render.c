@@ -111,7 +111,7 @@ void skin_render_viewport(struct skin_element* viewport, bool draw_tags)
         func(line, linebuf, sizeof(linebuf), line_number);
         if (draw_tags)
         {
-            printf("%s", linebuf);
+            printf("[%d]%s", line_number, linebuf);
             if (!((struct line*)line->data)->eat_line_ending)
             {
                 printf("\n");

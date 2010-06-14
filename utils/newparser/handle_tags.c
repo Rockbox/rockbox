@@ -123,7 +123,22 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
     int counter;
     while (element)
     {
-        if (element->type == LINE)
+        if (element->type == VIEWPORT)
+        {
+            struct skin_element *next;
+            /* parse the viewport */
+            /* if the next element is a LINE we need to set it to eat the line ending */
+            next = element->children[0];
+            if (element->tag && next->type == LINE &&
+                element->line == next->line)
+            {
+                struct line *line = (struct line*)malloc(sizeof(struct line));
+                line->update_mode = 0;
+                line->eat_line_ending = true;
+                next->data = line;
+            }
+        }
+        else if (element->type == LINE && !element->data)
         {
             struct line *line = (struct line*)malloc(sizeof(struct line));
             line->update_mode = 0;
@@ -164,6 +179,7 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
             int ret = handle_tree(skin, element->children[counter], current_line);
             counter++;
         }
+        /* *probably* set current_line to NULL here */
         element = element->next;
     }
     return 0;
