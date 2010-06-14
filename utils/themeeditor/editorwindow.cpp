@@ -57,6 +57,7 @@ void EditorWindow::loadTabFromFile(QString fileName)
     /* Adding a new document*/
     SkinDocument* doc = new SkinDocument(parseStatus, fileName);
     addTab(doc);
+    ui->editorTabs->setCurrentWidget(doc);
 
 }
 
@@ -169,6 +170,7 @@ void EditorWindow::newTab()
 {
     SkinDocument* doc = new SkinDocument(parseStatus);
     addTab(doc);
+    ui->editorTabs->setCurrentWidget(doc);
 }
 
 void EditorWindow::shiftTab(int index)
