@@ -62,5 +62,9 @@ struct subline {
     unsigned long last_change_tick;
 };
 
+struct conditional {
+    int last_value;
+};
+
 
 #endif

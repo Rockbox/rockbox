@@ -132,7 +132,7 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
             if (element->tag && next->type == LINE &&
                 element->line == next->line)
             {
-                struct line *line = (struct line*)malloc(sizeof(struct line));
+                struct line *line = (struct line*)skin_alloc(sizeof(struct line));
                 line->update_mode = 0;
                 line->eat_line_ending = true;
                 next->data = line;
@@ -140,7 +140,7 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
         }
         else if (element->type == LINE && !element->data)
         {
-            struct line *line = (struct line*)malloc(sizeof(struct line));
+            struct line *line = (struct line*)skin_alloc(sizeof(struct line));
             line->update_mode = 0;
             line->eat_line_ending = false;
             element->data = line;
@@ -148,10 +148,16 @@ int handle_tree(struct skin *skin, struct skin_element* tree, struct line *line)
         }
         else if (element->type == SUBLINES)
         {
-            struct subline *subline = malloc(sizeof(struct subline));
+            struct subline *subline = skin_alloc(sizeof(struct subline));
             subline->current_line = -1;
             subline->last_change_tick = 0;
             element->data = subline;
+        }
+        else if (element->type == CONDITIONAL)
+        {
+            struct conditional *cond = skin_alloc(sizeof(struct conditional));
+            cond->last_value = element->children_count;
+            element->data = cond;
         }
         else if (element->type == TAG)
         {

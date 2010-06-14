@@ -40,11 +40,55 @@ typedef void (*skin_render_func)(struct skin_element* alternator,
 void skin_render_alternator(struct skin_element* alternator, 
                             char* buf, size_t buf_size, int line_number);
 
+static void do_tags_in_hidden_conditional(struct skin_element* branch)
+{
+    /* Tags here are ones which need to be "turned off" or cleared 
+     * if they are in a conditional branch which isnt being used */
+    if (branch->type == SUBLINES)
+    {
+        int i;
+        for (i=0; i<branch->children_count; i++)
+        {
+            do_tags_in_hidden_conditional(branch->children[i]);
+        }
+    }
+    else if (branch->type == LINE)
+    {
+        struct skin_element *child = branch->children[0];
+        while (child)
+        {
+            if (child->type != TAG)
+            {
+                child = child->next;
+                continue;
+            }
+            switch (child->tag->type)
+            {
+                case SKIN_TOKEN_PEAKMETER:
+                    /* stop the peak meter */
+                    break;
+                case SKIN_TOKEN_ALBUMART_DISPLAY:
+                    /* clear the AA image */
+                    break;
+                case SKIN_TOKEN_IMAGE_DISPLAY:
+                case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
+                    printf("disable image\n");
+                    /* clear images */
+                    break;
+                default:
+                    break;
+            }
+            child = child->next;
+        }
+    }
+}
+        
+    
 /* Draw a LINE element onto the display */
 void skin_render_line(struct skin_element* line, 
                       char* buf, size_t buf_size, int line_number)
 {
-    int value;
+    int last_value, value;
     if (line->children_count == 0)
         return; /* empty line, do nothing */
     struct skin_element *child = line->children[0];
@@ -56,9 +100,16 @@ void skin_render_line(struct skin_element* line,
         switch (child->type)
         {
             case CONDITIONAL:
+                last_value = ((struct conditional*)(child->data))->last_value;
                 value = 0; /* actually get it from the token :p */
                 if (value >= child->children_count)
                     value = child->children_count-1;
+                    
+                /* some tags need handling if they are being disabled */
+                if (value != last_value && last_value < child->children_count)
+                    do_tags_in_hidden_conditional(child->children[last_value]);
+                last_value = value;
+                
                 if (child->children[value]->type == SUBLINES)
                     func = skin_render_alternator;
                 else if (child->children[value]->type == LINE)
