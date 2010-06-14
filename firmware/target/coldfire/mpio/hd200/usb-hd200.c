@@ -52,27 +52,19 @@ void usb_enable(bool on)
     if(on)
     {
         and_l(~(1<<30),&GPIO_OUT);  /* GPIO30 low */
-        /* GPIO36 low delay GPIO36 high delay */
-        and_l(~(1<<4),&GPIO1_OUT);
-        or_l((1<<4),&GPIO1_OUT);
+        and_l(~(1<<22),&GPIO_OUT);  /* GPIO22 low */
 
-        sleep(HZ/5); /* delay 200 ms */
-        and_l(~(1<<22),&GPIO_OUT); /* GPIO22 low */
+        or_l((1<<4),&GPIO1_OUT);    /* GPIO36 high */
+
     }
     else
     {
-        /* GPIO36 low delay GPIO36 high delay */
-        and_l(~(1<<4),&GPIO1_OUT);
-        sleep(HZ/100);
-        or_l((1<<4),&GPIO1_OUT);
-        sleep(HZ/100);
-
         or_l((1<<22),&GPIO_OUT);  /* GPIO22 high */
         or_l((1<<30),&GPIO_OUT);  /* GPIO30 high */
 
         and_l(~(1<<4),&GPIO1_OUT); /* GPIO36 low */
 
-       while ( !(GPIO1_READ & (1<<5)) ) {}
-       sleep(HZ);
+        while ( !(GPIO1_READ & (1<<5)) ) {}
+        sleep(HZ);
     }
 }
