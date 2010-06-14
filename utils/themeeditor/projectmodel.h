@@ -22,13 +22,12 @@
 #ifndef PROJECTMODEL_H
 #define PROJECTMODEL_H
 
-#include <QAbstractItemModel>
-#include <QHash>
+#include <QAbstractListModel>
+#include <QMap>
 
-class ProjectNode;
 class EditorWindow;
 
-class ProjectModel : public QAbstractItemModel
+class ProjectModel : public QAbstractListModel
 {
 Q_OBJECT
 public:
@@ -42,16 +41,8 @@ public:
     ProjectModel(QString config, EditorWindow* mainWindow, QObject *parent = 0);
     virtual ~ProjectModel();
 
-    QModelIndex index(int row, int column, const QModelIndex& parent) const;
-    QModelIndex parent(const QModelIndex &child) const;
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex& parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int col, Qt::Orientation orientation, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-
-    void loadFile(QString file);
 
 signals:
 
@@ -59,55 +50,9 @@ public slots:
     void activated(const QModelIndex& index);
 
 private:
-    ProjectNode* root;
     EditorWindow* mainWindow;
+    QMap<QString, QString> settings;
+    QList<QString> files;
 };
-
-/* A simple abstract class required for categories */
-class ProjectNode
-{
-public:
-    virtual ProjectNode* parent() const = 0;
-    virtual ProjectNode* child(int row) const = 0;
-    virtual int numChildren() const = 0;
-    virtual int row() const = 0;
-    virtual QVariant data(int column) const = 0;
-    virtual Qt::ItemFlags flags(int column) const = 0;
-    virtual void activated() = 0;
-
-    int indexOf(ProjectNode* child){ return children.indexOf(child); }
-
-protected:
-    QList<ProjectNode*> children;
-    ProjectModel* model;
-
-};
-
-/* A simple implementation of ProjectNode for the root */
-class ProjectRoot : public ProjectNode
-{
-public:
-    ProjectRoot(QString config, ProjectModel* model);
-    virtual ~ProjectRoot();
-
-    virtual ProjectNode* parent() const{ return 0; }
-    virtual ProjectNode* child(int row) const
-    {
-        if(row >= 0 && row < children.count())
-            return children[row];
-        else
-            return 0;
-    }
-    virtual int numChildren() const{ return children.count(); }
-    virtual int row() const{ return 0; }
-    virtual QVariant data(int column) const{ return QVariant(); }
-    virtual Qt::ItemFlags flags(int column) const{ return 0; }
-    virtual void activated(){ }
-
-private:
-    QHash<QString, QString> settings;
-
-};
-
 
 #endif // PROJECTMODEL_H

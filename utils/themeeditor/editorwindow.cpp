@@ -275,7 +275,6 @@ void EditorWindow::openProject()
 
         project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);
-        ui->projectTree->expandAll();
 
         QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
                          project, SLOT(activated(QModelIndex)));

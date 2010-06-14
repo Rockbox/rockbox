@@ -21,124 +21,18 @@
 
 
 #include "projectmodel.h"
-#include "projectfiles.h"
-#include "projectsettings.h"
 #include "editorwindow.h"
 
 #include <QFile>
 #include <QTextStream>
-#include <QHash>
+#include <QMap>
 #include <QDir>
 
 ProjectModel::ProjectModel(QString config, EditorWindow* mainWindow,
                            QObject *parent)
-                               : QAbstractItemModel(parent),
+                               : QAbstractListModel(parent),
                                mainWindow(mainWindow)
 {
-    root = new ProjectRoot(config, this);
-}
-
-ProjectModel::~ProjectModel()
-{
-    if(root)
-        delete root;
-}
-
-QModelIndex ProjectModel::index(int row, int column,
-                                const QModelIndex& parent) const
-{
-
-    if(!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    ProjectNode* foundParent = root;
-    if(parent.isValid())
-        foundParent = static_cast<ProjectNode*>(parent.internalPointer());
-
-    if(row < foundParent->numChildren() && row >= 0)
-        return createIndex(row, column, foundParent->child(row));
-    else
-        return QModelIndex();
-}
-
-QModelIndex ProjectModel::parent(const QModelIndex &child) const
-{
-    if(!child.isValid())
-        return QModelIndex();
-
-    ProjectNode* foundParent = static_cast<ProjectNode*>
-                                   (child.internalPointer())->parent();
-
-    if(foundParent == root)
-        return QModelIndex();
-
-    return createIndex(foundParent->row(), 0, foundParent);
-}
-
-int ProjectModel::rowCount(const QModelIndex &parent) const
-{
-    if(!root)
-        return 0;
-
-    if(!parent.isValid())
-        return root->numChildren();
-
-    if(parent.column() != 0)
-        return 0;
-
-    return static_cast<ProjectNode*>(parent.internalPointer())->numChildren();
-}
-
-int ProjectModel::columnCount(const QModelIndex &parent) const
-{
-    return numColumns;
-}
-
-QVariant ProjectModel::data(const QModelIndex &index, int role) const
-{
-    if(!index.isValid())
-        return QVariant();
-
-    if(role != Qt::DisplayRole)
-        return QVariant();
-
-    return static_cast<ProjectNode*>
-            (index.internalPointer())->data(index.column());
-}
-
-QVariant ProjectModel::headerData(int col, Qt::Orientation orientation,
-                                  int role) const
-{
-    return QVariant();
-}
-
-Qt::ItemFlags ProjectModel::flags(const QModelIndex &index) const
-{
-    return static_cast<ProjectNode*>
-            (index.internalPointer())->flags(index.column());
-}
-
-bool ProjectModel::setData(const QModelIndex &index, const QVariant &value,
-                           int role)
-{
-    return true;
-}
-
-void ProjectModel::loadFile(QString file)
-{
-    mainWindow->loadTabFromFile(file);
-}
-
-void ProjectModel::activated(const QModelIndex &index)
-{
-    static_cast<ProjectNode*>(index.internalPointer())->activated();
-}
-
-/* Constructor and destructor for the root class */
-ProjectRoot::ProjectRoot(QString config, ProjectModel* model)
-{
-    this->model = model;
-
     /* Reading the config file */
     QFile cfg(config);
     cfg.open(QFile::ReadOnly | QFile::Text);
@@ -172,14 +66,53 @@ ProjectRoot::ProjectRoot(QString config, ProjectModel* model)
 
     cfg.close();
 
-    /* Showing the files */
-    children.append(new ProjectFiles(settings, model, this));
-    children.append(new ProjectSettings(settings, model, this));
+    /* Adding the files, starting with the .cfg */
+    config.replace(base.canonicalPath() + "/", "");
+    files.append(config);
+
+    QList<QString> keys;
+    keys.append("wps");
+    keys.append("rwps");
+    keys.append("sbs");
+    keys.append("rsbs");
+    keys.append("fms");
+    keys.append("rfms");
+
+    for(int i = 0; i < keys.count(); i++)
+    {
+        QString file = settings.value(keys[i], "");
+        if(file != "" && file != "-")
+        {
+            file.replace("/.rockbox/", "");
+            files.append(file);
+        }
+    }
+
 
 }
 
-ProjectRoot::~ProjectRoot()
+ProjectModel::~ProjectModel()
 {
-    for(int i = 0; i < children.count(); i++)
-        delete children[i];
+}
+
+int ProjectModel::rowCount(const QModelIndex& parent) const
+{
+    return files.count();
+}
+
+QVariant ProjectModel::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid())
+        return QVariant();
+
+    if(role != Qt::DisplayRole)
+        return QVariant();
+
+    return files[index.row()];
+}
+
+void ProjectModel::activated(const QModelIndex &index)
+{
+    mainWindow->loadTabFromFile(settings.value("themebase", "")
+                                + "/" + files[index.row()]);
 }

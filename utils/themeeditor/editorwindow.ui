@@ -111,7 +111,7 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QTreeView" name="projectTree"/>
+      <widget class="QListView" name="projectTree"/>
      </item>
     </layout>
    </widget>
