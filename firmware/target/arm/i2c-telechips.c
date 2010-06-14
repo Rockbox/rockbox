@@ -28,8 +28,10 @@
 static inline void delay_loop(void)
 {
     unsigned long x;
-    for (x = (unsigned)(FREQ>>22); x; x--);
+    for (x = (unsigned)(FREQ>>22); x; x--)
+        asm volatile("nop");
 }
+
 #define DELAY delay_loop()
 
 static struct mutex i2c_mtx;
