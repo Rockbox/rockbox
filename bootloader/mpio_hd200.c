@@ -376,6 +376,7 @@ void main(void)
             case (EVENT_ON | EVENT_AC):
             /* hold is handled in button driver */
                     cpu_idle_mode(false);
+                    ide_power_enable(true);
 
                     if (button == (BUTTON_PLAY|BUTTON_REC))
                         bootmenu();
@@ -385,13 +386,19 @@ void main(void)
                 break;
 
             case EVENT_AC:
-                /* turn on charging */
                 if (!(last_event & EVENT_AC))
+                {
+                    /* high current charge */
                     or_l((1<<15),&GPIO_OUT);
+                    and_l(~(1<<23), &GPIO_ENABLE);
+                }
 
                 /* USB unplug */
                 if (last_event & EVENT_USB)
+                {
                     usb_enable(false);
+                    ide_power_enable(false);
+                }
                    
                 if(!_battery_full())
                 {
@@ -410,7 +417,11 @@ void main(void)
             case EVENT_USB:
             case (EVENT_USB | EVENT_AC):
                 if (!(last_event & EVENT_AC))
+                {
+                    /* high current charge */
                     or_l((1<<15),&GPIO_OUT);
+                    and_l(~(1<<23), &GPIO_ENABLE);
+                }
 
                 if (!(last_event & EVENT_USB))
                 {
