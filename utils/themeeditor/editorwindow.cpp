@@ -201,7 +201,7 @@ void EditorWindow::shiftTab(int index)
 {
     TabContent* widget = dynamic_cast<TabContent*>
                          (ui->editorTabs->currentWidget());
-    if(index < 0 || widget->type() != TabContent::Skin)
+    if(index < 0)
     {
         ui->parseTree->setModel(0);
         ui->actionSave_Document->setEnabled(false);
@@ -209,6 +209,13 @@ void EditorWindow::shiftTab(int index)
         ui->actionClose_Document->setEnabled(false);
         ui->actionToolbarSave->setEnabled(false);
         ui->fromTree->setEnabled(false);
+    }
+    else if(widget->type() == TabContent::Config)
+    {
+        ui->actionSave_Document->setEnabled(true);
+        ui->actionSave_Document_As->setEnabled(true);
+        ui->actionClose_Document->setEnabled(true);
+        ui->actionToolbarSave->setEnabled(true);
     }
     else
     {
@@ -318,6 +325,34 @@ void EditorWindow::openProject()
 
 }
 
+void EditorWindow::configFileChanged(QString configFile)
+{
+
+    QSettings settings;
+
+    settings.beginGroup("ProjectModel");
+
+    if(QFile::exists(configFile))
+    {
+
+        if(project)
+            delete project;
+
+        project = new ProjectModel(configFile, this);
+        ui->projectTree->setModel(project);
+
+        QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
+                         project, SLOT(activated(QModelIndex)));
+
+        configFile.chop(configFile.length() - configFile.lastIndexOf('/') - 1);
+        settings.setValue("defaultDirectory", configFile);
+
+    }
+
+    settings.endGroup();
+
+}
+
 void EditorWindow::tabTitleChanged(QString title)
 {
     TabContent* sender = dynamic_cast<TabContent*>(QObject::sender());
@@ -342,7 +377,7 @@ void EditorWindow::closeEvent(QCloseEvent* event)
     /* Closing all the tabs */
     for(int i = 0; i < ui->editorTabs->count(); i++)
     {
-        if(!dynamic_cast<SkinDocument*>
+        if(!dynamic_cast<TabContent*>
            (ui->editorTabs->widget(i))->requestClose())
         {
             event->ignore();

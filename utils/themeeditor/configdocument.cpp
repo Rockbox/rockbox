@@ -116,6 +116,7 @@ void ConfigDocument::saveAs()
 
     saved = toPlainText();
     emit titleChanged(title());
+    emit configFileChanged(file());
 
 }
 
@@ -150,7 +151,7 @@ bool ConfigDocument::requestClose()
             return false;
         }
     }
-    return false;
+    return true;
 }
 
 QString ConfigDocument::toPlainText() const
@@ -185,6 +186,11 @@ void ConfigDocument::addRow(QString key, QString value)
     QObject::connect(delButton, SIGNAL(clicked()),
                      this, SLOT(deleteClicked()));
 
+    QObject::connect(keyEdit, SIGNAL(textChanged(QString)),
+                     this, SLOT(textChanged()));
+    QObject::connect(valueEdit, SIGNAL(textChanged(QString)),
+                     this, SLOT(textChanged()));
+
     ui->configBoxes->addLayout(layout);
 
     containers.append(layout);
@@ -218,4 +224,12 @@ void ConfigDocument::deleteClicked()
 void ConfigDocument::addClicked()
 {
     addRow(tr("Key"), tr("Value"));
+}
+
+void ConfigDocument::textChanged()
+{
+    if(toPlainText() != saved)
+        emit titleChanged(title() + "*");
+    else
+        emit titleChanged(title());
 }

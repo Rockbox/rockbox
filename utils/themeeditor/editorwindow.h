@@ -53,6 +53,9 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent* event);
 
+public slots:
+    void configFileChanged(QString configFile);
+
 private slots:
     void showPanel();
     void newTab();

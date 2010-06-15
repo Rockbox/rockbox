@@ -67,9 +67,13 @@ private:
 
     void addRow(QString key, QString value);
 
+signals:
+    void configFileChanged(QString);
+
 private slots:
     void deleteClicked();
     void addClicked();
+    void textChanged();
 };
 
 #endif // CONFIGDOCUMENT_H
