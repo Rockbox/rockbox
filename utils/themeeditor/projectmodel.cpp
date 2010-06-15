@@ -113,6 +113,12 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const
 
 void ProjectModel::activated(const QModelIndex &index)
 {
-    mainWindow->loadTabFromFile(settings.value("themebase", "")
-                                + "/" + files[index.row()]);
+    if(index.row() == 0)
+        mainWindow->loadConfigTab(new ConfigDocument(settings,
+                                                     settings.value("themebase",
+                                                                    "") + "/" +
+                                                     files[index.row()]));
+    else
+        mainWindow->loadTabFromSkinFile(settings.value("themebase", "")
+                                        + "/" + files[index.row()]);
 }

@@ -16,7 +16,9 @@ HEADERS += tag_table.h \
     skindocument.h \
     preferencesdialog.h \
     codeeditor.h \
-    projectmodel.h
+    projectmodel.h \
+    tabcontent.h \
+    configdocument.h
 SOURCES += tag_table.c \
     skin_parser.c \
     skin_scan.c \
@@ -29,7 +31,8 @@ SOURCES += tag_table.c \
     skindocument.cpp \
     preferencesdialog.cpp \
     codeeditor.cpp \
-    projectmodel.cpp
+    projectmodel.cpp \
+    configdocument.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -38,5 +41,6 @@ OTHER_FILES += README \
     resources/document-open.png \
     resources/document-new.png
 FORMS += editorwindow.ui \
-    preferencesdialog.ui
+    preferencesdialog.ui \
+    configdocument.ui
 RESOURCES += resources.qrc

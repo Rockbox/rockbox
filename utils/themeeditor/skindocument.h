@@ -30,8 +30,9 @@
 #include "parsetreemodel.h"
 #include "preferencesdialog.h"
 #include "codeeditor.h"
+#include "tabcontent.h"
 
-class SkinDocument : public QWidget
+class SkinDocument : public TabContent
 {
 Q_OBJECT
 public:
@@ -52,8 +53,8 @@ public:
     void connectPrefs(PreferencesDialog* prefs);
 
     ParseTreeModel* getModel(){ return model; }
-    QString getFile(){ return fileName; }
-    QString getTitle(){ return title; }
+    QString file() const{ return fileName; }
+    QString title() const{ return titleText; }
     QString getStatus(){ return parseStatus; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
 
@@ -62,8 +63,9 @@ public:
 
     bool requestClose();
 
+    TabType type() const{ return Skin; }
+
 signals:
-    void titleChanged(QString);
 
 public slots:
     void settingsChanged();
@@ -75,7 +77,7 @@ private slots:
 private:
     void setupUI();
 
-    QString title;
+    QString titleText;
     QString fileName;
     QString saved;
     QString parseStatus;

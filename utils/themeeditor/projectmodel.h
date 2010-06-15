@@ -44,6 +44,8 @@ public:
     int rowCount(const QModelIndex& parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
+    QString getSetting(QString key){ return settings.value(key, ""); }
+
 signals:
 
 public slots:

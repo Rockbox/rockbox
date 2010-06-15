@@ -28,22 +28,27 @@
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
 #include "skindocument.h"
+#include "configdocument.h"
 #include "preferencesdialog.h"
 
 class ProjectModel;
+class TabContent;
 
-namespace Ui {
+namespace Ui
+{
     class EditorWindow;
 }
 
-class EditorWindow : public QMainWindow {
+class EditorWindow : public QMainWindow
+{
     Q_OBJECT
 public:
     EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
 
     /* A public function so external widgets can load files */
-    void loadTabFromFile(QString fileName);
+    void loadTabFromSkinFile(QString fileName);
+    void loadConfigTab(ConfigDocument* doc);
 
 protected:
     virtual void closeEvent(QCloseEvent* event);
@@ -60,6 +65,7 @@ private slots:
     void openProject();
     void tabTitleChanged(QString title);
     void updateCurrent(); /* Generates code in the current tab */
+    void lineChanged(int line); /* Used for auto-expand */
 
 private:
     /* Setup functions */
@@ -67,7 +73,9 @@ private:
     void saveSettings();
     void setupUI();
     void setupMenus();
-    void addTab(SkinDocument* doc);
+    void addTab(TabContent* doc);
+    void expandLine(ParseTreeModel* model, QModelIndex parent, int line);
+    void sizeColumns();
 
     Ui::EditorWindow *ui;
     PreferencesDialog* prefs;

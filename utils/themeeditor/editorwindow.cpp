@@ -40,14 +40,14 @@ EditorWindow::EditorWindow(QWidget *parent) :
     setupMenus();
 }
 
-void EditorWindow::loadTabFromFile(QString fileName)
+void EditorWindow::loadTabFromSkinFile(QString fileName)
 {
     /* Checking to see if the file is already open */
     for(int i = 0; i < ui->editorTabs->count(); i++)
     {
-        SkinDocument* current = dynamic_cast<SkinDocument*>
+        TabContent* current = dynamic_cast<TabContent*>
                                 (ui->editorTabs->widget(i));
-        if(current->getFile() == fileName)
+        if(current->file() == fileName)
         {
             ui->editorTabs->setCurrentIndex(i);
             return;
@@ -59,6 +59,27 @@ void EditorWindow::loadTabFromFile(QString fileName)
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
 
+}
+
+void EditorWindow::loadConfigTab(ConfigDocument* doc)
+{
+    for(int i = 0; i < ui->editorTabs->count(); i++)
+    {
+        TabContent* current = dynamic_cast<TabContent*>
+                              (ui->editorTabs->widget(i));
+        if(current->file() == doc->file())
+        {
+            ui->editorTabs->setCurrentIndex(i);
+            doc->deleteLater();
+            return;
+        }
+    }
+
+    addTab(doc);
+    ui->editorTabs->setCurrentWidget(doc);
+
+    QObject::connect(doc, SIGNAL(titleChanged(QString)),
+                     this, SLOT(tabTitleChanged(QString)));
 }
 
 void EditorWindow::loadSettings()
@@ -153,16 +174,19 @@ void EditorWindow::setupMenus()
                      this, SLOT(openProject()));
 }
 
-void EditorWindow::addTab(SkinDocument *doc)
+void EditorWindow::addTab(TabContent *doc)
 {
-    ui->editorTabs->addTab(doc, doc->getTitle());
+    ui->editorTabs->addTab(doc, doc->title());
 
     /* Connecting to title change events */
     QObject::connect(doc, SIGNAL(titleChanged(QString)),
                      this, SLOT(tabTitleChanged(QString)));
+    QObject::connect(doc, SIGNAL(lineChanged(int)),
+                     this, SLOT(lineChanged(int)));
 
     /* Connecting to settings change events */
-    doc->connectPrefs(prefs);
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->connectPrefs(prefs);
 }
 
 
@@ -175,7 +199,9 @@ void EditorWindow::newTab()
 
 void EditorWindow::shiftTab(int index)
 {
-    if(index < 0)
+    TabContent* widget = dynamic_cast<TabContent*>
+                         (ui->editorTabs->currentWidget());
+    if(index < 0 || widget->type() != TabContent::Skin)
     {
         ui->parseTree->setModel(0);
         ui->actionSave_Document->setEnabled(false);
@@ -187,8 +213,7 @@ void EditorWindow::shiftTab(int index)
     else
     {
         /* Syncing the tree view and the status bar */
-        SkinDocument* doc = dynamic_cast<SkinDocument*>
-                            (ui->editorTabs->currentWidget());
+        SkinDocument* doc = dynamic_cast<SkinDocument*>(widget);
         ui->parseTree->setModel(doc->getModel());
         parseStatus->setText(doc->getStatus());
 
@@ -197,12 +222,15 @@ void EditorWindow::shiftTab(int index)
         ui->actionClose_Document->setEnabled(true);
         ui->actionToolbarSave->setEnabled(true);
         ui->fromTree->setEnabled(true);
+
+        sizeColumns();
+
     }
 }
 
 bool EditorWindow::closeTab(int index)
 {
-    SkinDocument* widget = dynamic_cast<SkinDocument*>
+    TabContent* widget = dynamic_cast<TabContent*>
                            (ui->editorTabs->widget(index));
     if(widget->requestClose())
     {
@@ -222,13 +250,13 @@ void EditorWindow::closeCurrent()
 void EditorWindow::saveCurrent()
 {
     if(ui->editorTabs->currentIndex() >= 0)
-        dynamic_cast<SkinDocument*>(ui->editorTabs->currentWidget())->save();
+        dynamic_cast<TabContent*>(ui->editorTabs->currentWidget())->save();
 }
 
 void EditorWindow::saveCurrentAs()
 {
     if(ui->editorTabs->currentIndex() >= 0)
-        dynamic_cast<SkinDocument*>(ui->editorTabs->currentWidget())->saveAs();
+        dynamic_cast<TabContent*>(ui->editorTabs->currentWidget())->saveAs();
 }
 
 void EditorWindow::openFile()
@@ -248,7 +276,7 @@ void EditorWindow::openFile()
 
         QString current = fileNames[i];
 
-        loadTabFromFile(current);
+        loadTabFromSkinFile(current);
 
         /* And setting the new default directory */
         current.chop(current.length() - current.lastIndexOf('/') - 1);
@@ -292,7 +320,7 @@ void EditorWindow::openProject()
 
 void EditorWindow::tabTitleChanged(QString title)
 {
-    SkinDocument* sender = dynamic_cast<SkinDocument*>(QObject::sender());
+    TabContent* sender = dynamic_cast<TabContent*>(QObject::sender());
     ui->editorTabs->setTabText(ui->editorTabs->indexOf(sender), title);
 }
 
@@ -332,6 +360,44 @@ void EditorWindow::updateCurrent()
 
     dynamic_cast<SkinDocument*>
             (ui->editorTabs->currentWidget())->genCode();
+}
+
+void EditorWindow::lineChanged(int line)
+{
+    ui->parseTree->collapseAll();
+    ParseTreeModel* model = dynamic_cast<ParseTreeModel*>
+                            (ui->parseTree->model());
+    expandLine(model, QModelIndex(), line);
+    sizeColumns();
+
+}
+
+void EditorWindow::expandLine(ParseTreeModel* model, QModelIndex parent,
+                              int line)
+{
+    for(int i = 0; i < model->rowCount(parent); i++)
+    {
+        QModelIndex data = model->index(i, ParseTreeModel::lineColumn, parent);
+        QModelIndex recurse = model->index(i, 0, parent);
+
+        expandLine(model, recurse, line);
+
+        if(model->data(data, Qt::DisplayRole) == line)
+        {
+            ui->parseTree->expand(parent);
+            ui->parseTree->expand(data);
+            ui->parseTree->scrollTo(parent, QAbstractItemView::PositionAtTop);
+        }
+
+    }
+}
+
+void EditorWindow::sizeColumns()
+{
+    /* Setting the column widths */
+    ui->parseTree->resizeColumnToContents(ParseTreeModel::lineColumn);
+    ui->parseTree->resizeColumnToContents(ParseTreeModel::typeColumn);
+    ui->parseTree->resizeColumnToContents(ParseTreeModel::valueColumn);
 }
 
 EditorWindow::~EditorWindow()

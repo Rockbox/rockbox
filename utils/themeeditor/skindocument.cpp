@@ -9,10 +9,10 @@
  *
  * Copyright (C) 2010 Robert Bieber
  *
- * This program is free software; you can redistribute it and/or
+ * This program is free software;  can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * of the License, or (at your optiyouon) any later version.
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
@@ -30,11 +30,11 @@
 #include <iostream>
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
-        QWidget(parent), statusLabel(statusLabel)
+        TabContent(parent), statusLabel(statusLabel)
 {
     setupUI();
 
-    title = "Untitled";
+    titleText = "Untitled";
     fileName = "";
     saved = "";
     parseStatus = tr("Empty document");
@@ -42,7 +42,7 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
 }
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
-        QWidget(parent), fileName(file), statusLabel(statusLabel)
+        TabContent(parent), fileName(file), statusLabel(statusLabel)
 {
     setupUI();
     blockUpdate = false;
@@ -60,7 +60,7 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
 
     /* Setting the title */
     QStringList decomposed = fileName.split('/');
-    title = decomposed.last();
+    titleText = decomposed.last();
 }
 
 SkinDocument::~SkinDocument()
@@ -86,7 +86,7 @@ bool SkinDocument::requestClose()
         /* Spawning the "Are you sure?" dialog */
         QMessageBox confirm(this);
         confirm.setWindowTitle(tr("Confirm Close"));
-        confirm.setText(title + tr(" has been modified."));
+        confirm.setText(titleText + tr(" has been modified."));
         confirm.setInformativeText(tr("Do you want to save your changes?"));
         confirm.setStandardButtons(QMessageBox::Save | QMessageBox::Discard
                                    | QMessageBox::Cancel);
@@ -192,6 +192,10 @@ void SkinDocument::cursorChanged()
         parseStatus = tr("Errors in document");
         statusLabel->setText(parseStatus);
     }
+    else
+    {
+        emit lineChanged(editor->textCursor().blockNumber() + 1);
+    }
 
 }
 
@@ -245,9 +249,9 @@ void SkinDocument::codeChanged()
     }
 
     if(editor->document()->toPlainText() != saved)
-        emit titleChanged(title + QChar('*'));
+        emit titleChanged(titleText + QChar('*'));
     else
-        emit titleChanged(title);
+        emit titleChanged(titleText);
 
     cursorChanged();
 
@@ -269,8 +273,8 @@ void SkinDocument::save()
 
     saved = editor->document()->toPlainText();
     QStringList decompose = fileName.split('/');
-    title = decompose.last();
-    emit titleChanged(title);
+    titleText = decompose.last();
+    emit titleChanged(titleText);
 
 }
 
@@ -301,7 +305,7 @@ void SkinDocument::saveAs()
 
     saved = editor->document()->toPlainText();
     QStringList decompose = fileName.split('/');
-    title = decompose[decompose.count() - 1];
-    emit titleChanged(title);
+    titleText = decompose[decompose.count() - 1];
+    emit titleChanged(titleText);
 
 }

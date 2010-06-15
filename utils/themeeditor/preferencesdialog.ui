@@ -64,7 +64,7 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Foreground Color</string>
+            <string>Foreground Colour</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -91,7 +91,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Background Color</string>
+            <string>Background Colour</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -118,7 +118,7 @@
          <item>
           <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>Error Color</string>
+            <string>Error Colour</string>
            </property>
            <property name="buddy">
             <cstring>errorButton</cstring>
