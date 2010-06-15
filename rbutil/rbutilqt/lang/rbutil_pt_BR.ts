@@ -1,77 +1,79 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>@default</name>
     <message>
         <source>Can&apos;t open file %s!</source>
-        <translation>Não é possível abrir o arquivo %s!</translation>
+        <translation type="obsolete">Não é possível abrir o arquivo %s!</translation>
     </message>
     <message>
         <source>Bootloader size is %d bytes</source>
-        <translation>O tamanho do inicializador é %d bytes</translation>
+        <translation type="obsolete">O tamanho do inicializador é %d bytes</translation>
     </message>
     <message>
         <source>Firmware size is %d bytes</source>
-        <translation>O tamanho do firmware é %d bytes</translation>
+        <translation type="obsolete">O tamanho do firmware é %d bytes</translation>
     </message>
     <message>
         <source>Can&apos;t allocate %d bytes!</source>
-        <translation>Não é possível alocar %d bytes!</translation>
+        <translation type="obsolete">Não é possível alocar %d bytes!</translation>
     </message>
     <message>
         <source>Reading %s into memory...</source>
-        <translation>Lendo %s na memória...</translation>
+        <translation type="obsolete">Lendo %s na memória...</translation>
     </message>
     <message>
         <source>Can&apos;t read file %s to memory!</source>
-        <translation>Não é possível ler o arquivo %s para a memória!</translation>
+        <translation type="obsolete">Não é possível ler o arquivo %s para a memória!</translation>
     </message>
     <message>
         <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
-        <translation>O arquivo %s não é um firmware ChinaChip válido!</translation>
+        <translation type="obsolete">O arquivo %s não é um firmware ChinaChip válido!</translation>
     </message>
     <message>
         <source>Couldn&apos;t find ccpmp.bin in %s!</source>
-        <translation>Não foi possível encontrar ccpmp.bin em %s!</translation>
+        <translation type="obsolete">Não foi possível encontrar ccpmp.bin em %s!</translation>
     </message>
     <message>
         <source>Found ccpmp.bin at %d bytes</source>
-        <translation>Encontrando ccpmp.bin no %d bytes</translation>
+        <translation type="obsolete">Encontrando ccpmp.bin no %d bytes</translation>
     </message>
     <message>
         <source>Writing %d bytes to %s...</source>
-        <translation>Escrevendo %d bytes para %s...</translation>
+        <translation type="obsolete">Escrevendo %d bytes para %s...</translation>
     </message>
     <message>
         <source>Can&apos;t write to file %s!</source>
-        <translation>Não é possível escrever no arquivo %s!</translation>
+        <translation type="obsolete">Não é possível escrever no arquivo %s!</translation>
     </message>
     <message>
         <source>Renaming it to ccpmp.old...</source>
-        <translation>Renomeando-o para ccpmp.old...</translation>
+        <translation type="obsolete">Renomeando-o para ccpmp.old...</translation>
     </message>
     <message>
         <source>Making place for ccpmp.bin...</source>
-        <translation>Dando lugar a ccpmp.bin...</translation>
+        <translation type="obsolete">Dando lugar a ccpmp.bin...</translation>
     </message>
     <message>
         <source>Adding header to %s...</source>
-        <translation>Adicionando cabeçalho para %s...</translation>
+        <translation type="obsolete">Adicionando cabeçalho para %s...</translation>
     </message>
     <message>
         <source>Can&apos;t obtain current time!</source>
-        <translation>Não foi possível obter a hora atual!</translation>
+        <translation type="obsolete">Não foi possível obter a hora atual!</translation>
     </message>
     <message>
         <source>Computing checksum...</source>
-        <translation>Calculando checksum...</translation>
+        <translation type="obsolete">Calculando checksum...</translation>
     </message>
     <message>
         <source>Updating main header...</source>
-        <translation>Atualizando cabeçalho principal...</translation>
+        <translation type="obsolete">Atualizando cabeçalho principal...</translation>
     </message>
     <message>
         <source>Writing output to %s...</source>
-        <translation>Escrevendo saída para %s...</translation>
+        <translation type="obsolete">Escrevendo saída para %s...</translation>
     </message>
 </context>
 <context>
@@ -495,6 +497,69 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <source>Rockbox bootloader successful removed</source>
         <translation>Inicializador do Rockbox removido com sucesso</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallMpio</name>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished">Transferindo arquivo do inicializador</translation>
+    </message>
+    <message>
+        <source>Could not open the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loaded firmware file does not look like MPIO OF file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place for bootloader in OF file not empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader checksum error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown errornumber: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching original firmware failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success: modified firmware file created</source>
+        <translation type="unfinished">Sucesso: criado arquivo de firmware modificado</translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation type="unfinished">Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
     </message>
 </context>
 <context>
@@ -1437,6 +1502,11 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
         <source>Problem detected:</source>
         <translation>Problema detectado:</translation>
     </message>
+    <message>
+        <source>LTR</source>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQt</name>
@@ -1731,6 +1801,30 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
     <message>
         <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
         <translation>O Utilitário Rockbox não pode desinstalar o inicializador neste alvo. Tente uma atualização normal de firmware para remover o inicializador.</translation>
+    </message>
+    <message>
+        <source>No Rockbox installation found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for update ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New version of Rockbox Utility available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Utility is up to date.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2434,9 +2528,11 @@ código de resposta HTTP: %1</translation>
         <source>Mount point is wrong!</source>
         <translation>O ponto de montagem está incorreto!</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation type="obsolete">
+        <translation type="unfinished">
+            <numerusform>
+        </numerusform>
         </translation>
     </message>
 </context>
@@ -2764,7 +2860,7 @@ código de resposta HTTP: %1</translation>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
-    <message encoding="UTF-8">
+    <message utf8="true">
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>

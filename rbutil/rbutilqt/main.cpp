@@ -65,7 +65,10 @@ int main( int argc, char ** argv ) {
     delete user;
     app.installTranslator(&translator);
     app.installTranslator(&qttrans);
-    if(applang.startsWith("he"))
+    //: This string is used to indicate the writing direction. Translate it
+    //: to "RTL" (without quotes) for RTL languages. Anything else will get
+    //: treated as LTR language.
+    if(QObject::tr("LTR") == "RTL")
         app.setLayoutDirection(Qt::RightToLeft);
 
     RbUtilQt window(0);

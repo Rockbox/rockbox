@@ -4,101 +4,76 @@
 <context>
     <name></name>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="94"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="100"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="162"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="183"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="235"/>
         <source>Can&apos;t open file %s!</source>
-        <translation>לא מצליח לפתוח קובץ %s!</translation>
+        <translation type="obsolete">לא מצליח לפתוח קובץ %s!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="105"/>
         <source>Bootloader size is %d bytes</source>
-        <translation>גודלו של מנהל האיתחול הוא %d בתים</translation>
+        <translation type="obsolete">גודלו של מנהל האיתחול הוא %d בתים</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="109"/>
         <source>Firmware size is %d bytes</source>
-        <translation>גודלה של הקושחה הוא %d בתים</translation>
+        <translation type="obsolete">גודלה של הקושחה הוא %d בתים</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="114"/>
         <source>Can&apos;t allocate %d bytes!</source>
-        <translation>לא יכול להקצות %d בתים!</translation>
+        <translation type="obsolete">לא יכול להקצות %d בתים!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="119"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="194"/>
         <source>Reading %s into memory...</source>
-        <translation>קורא את %s אל הזיכרון...</translation>
+        <translation type="obsolete">קורא את %s אל הזיכרון...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="122"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="198"/>
         <source>Can&apos;t read file %s to memory!</source>
-        <translation>לא יכול לקרוא את %s אל הזיכרון!</translation>
+        <translation type="obsolete">לא יכול לקרוא את %s אל הזיכרון!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="129"/>
         <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
-        <translation>הקובץ %s אינו קובץ קושחת ChinaChip תקין!</translation>
+        <translation type="obsolete">הקובץ %s אינו קובץ קושחת ChinaChip תקין!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="151"/>
         <source>Couldn&apos;t find ccpmp.bin in %s!</source>
-        <translation>לא מוצא את ccpmp.bin בתוך %s!</translation>
+        <translation type="obsolete">לא מוצא את ccpmp.bin בתוך %s!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="154"/>
         <source>Found ccpmp.bin at %d bytes</source>
-        <translation>מצאתי את ccpmp.bin ב- %d בתים</translation>
+        <translation type="obsolete">מצאתי את ccpmp.bin ב- %d בתים</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="166"/>
         <source>Writing %d bytes to %s...</source>
-        <translation>כותב %d בתים אל %s...</translation>
+        <translation type="obsolete">כותב %d בתים אל %s...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="169"/>
-        <location filename="../../chinachippatcher/chinachip.c" line="242"/>
         <source>Can&apos;t write to file %s!</source>
-        <translation>לא מצליח לכתוב לקובץ %s!</translation>
+        <translation type="obsolete">לא מצליח לכתוב לקובץ %s!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="175"/>
         <source>Renaming it to ccpmp.old...</source>
-        <translation>משנה שם ל- ccpmp.old...</translation>
+        <translation type="obsolete">משנה שם ל- ccpmp.old...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="190"/>
         <source>Making place for ccpmp.bin...</source>
-        <translation>מכין מקום ל- ccpmp.bin...</translation>
+        <translation type="obsolete">מכין מקום ל- ccpmp.bin...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="203"/>
         <source>Adding header to %s...</source>
-        <translation>מוסיף כותרת ל- %s...</translation>
+        <translation type="obsolete">מוסיף כותרת ל- %s...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="213"/>
         <source>Can&apos;t obtain current time!</source>
-        <translation>לא מצליח להשיג זמן נוכחי!</translation>
+        <translation type="obsolete">לא מצליח להשיג זמן נוכחי!</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="223"/>
         <source>Computing checksum...</source>
-        <translation>מחשב checksum...</translation>
+        <translation type="obsolete">מחשב checksum...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="227"/>
         <source>Updating main header...</source>
-        <translation>מעדכן את הכותרת הראשית...</translation>
+        <translation type="obsolete">מעדכן את הכותרת הראשית...</translation>
     </message>
     <message>
-        <location filename="../../chinachippatcher/chinachip.c" line="239"/>
         <source>Writing output to %s...</source>
-        <translation>כותב פלט אל %s...</translation>
+        <translation type="obsolete">כותב פלט אל %s...</translation>
     </message>
 </context>
 <context>
@@ -114,38 +89,38 @@
         <translation>מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="94"/>
-        <location filename="../base/bootloaderinstallams.cpp" line="107"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="96"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="109"/>
         <source>Could not load %1</source>
         <translation>לא מצליח לטעון את %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="122"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="123"/>
         <source>No room to insert bootloader, try another firmware version</source>
         <translation>אין מספיק מקום להכנסת מנהל האיתחול, נסה גירסת קושחה אחרת</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="132"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="133"/>
         <source>Patching Firmware...</source>
         <translation>תופר קושחה...</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="143"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="144"/>
         <source>Could not open %1 for writing</source>
         <translation>לא מצליח לפתוח את %1 לכתיבה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="156"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="157"/>
         <source>Could not write firmware file</source>
         <translation>לא מצליח לכתוב קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="172"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="173"/>
         <source>Success: modified firmware file created</source>
         <translation>הצלחה: קובץ קושחה מוסגל נוצר</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallams.cpp" line="180"/>
+        <location filename="../base/bootloaderinstallams.cpp" line="181"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation>כדי להסיר את ההתקנה, בצע שדרוג רגיל עם קובץ קושחה מקורי שלא נעשה בו שינוי</translation>
     </message>
@@ -153,97 +128,97 @@
 <context>
     <name>BootloaderInstallBase</name>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="75"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="120"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>שגיאת הורדה: התקבלה שגיאת HTTP: %1.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="81"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="126"/>
         <source>Download error: %1</source>
         <translation>שגיאת הורדה: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="87"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="132"/>
         <source>Download finished (cache used).</source>
         <translation>הורדה הסתיימה (נעשה שימוש במטמון).</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="89"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="134"/>
         <source>Download finished.</source>
         <translation>הורדה הסתיימה.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="155"/>
         <source>Creating backup of original firmware file.</source>
         <translation>יוצר גיבוי של קובץ מנהל האיתחול המקורי.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="112"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="157"/>
         <source>Creating backup folder failed</source>
         <translation>יצירת ספריית גיבוי נכשלה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="118"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="163"/>
         <source>Creating backup copy failed.</source>
         <translation>יצירת עותק גיבוי נכשלה.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="121"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="166"/>
         <source>Backup created.</source>
         <translation>גיבוי נוצר.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="134"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="179"/>
         <source>Creating installation log</source>
         <translation>יוצר קובץ רישום של ההתקנה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="158"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="203"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>התקנת מנהל האיתחול כמעט הסתיימה. ההתקנה &lt;b&gt;מחייבת&lt;/b&gt; שתבצע את הצעדים הבאים באופן ידני:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="163"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="208"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;נתק את הנגן שלך בזהירות.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="167"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="212"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;il&gt;אתחל אל הקושחה המקורית של הנגן.&lt;/il&gt;&lt;li&gt;בצע את נוהל עידכון הקושחה של הקושחה המקורית. אנא עיין בהוראות ההפעלה של הנגן שלך לפרטים נוספים.&lt;/il&gt;&lt;li&gt;לאחר שהקושחה עודכנה, אתחל מחדש את הנגן&lt;/il&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="176"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="221"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;/il&gt;כבה את הנגן&lt;li&gt;&lt;/il&gt;הכנס את המטען&lt;li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="181"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="226"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;/il&gt;נתן את ה- USB ואת ספקי הכח&lt;li&gt;לחץ על &lt;i&gt;Power&lt;/i&gt; על מנת לכבות את הנגן&lt;/il&gt;&lt;li&gt;הזז את מתג הסוללה על הנגן&lt;/il&gt;&lt;li&gt;לחץ על &lt;i&gt;Power&lt;/i&gt; כדי לאתחל לתוך רוקבוקס&lt;/il&gt;&lt;li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="188"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;שים לב:&lt;/b&gt; אתה יכול להתקין חלקים אחרים קודם לכן ללא חשש, אבל הצעדים לעיל הינם &lt;b&gt;נדרשים&lt;/b&gt; על מנת לסיים את ההתקנה!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="202"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="246"/>
         <source>Waiting for system to remount player</source>
         <translation>ממתין למערכת שתעגון את הנגן מחדש</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="276"/>
         <source>Player remounted</source>
         <translation>הנגן עוגן מחדש</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="237"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="281"/>
         <source>Timeout on remount</source>
         <translation>העגינה ארכה זמן רב מדי</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="146"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="191"/>
         <source>Installation log created</source>
         <translation>קובץ רישום של ההתקנה נוצר</translation>
     </message>
@@ -545,22 +520,27 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>הסרת מנהל האיתחול נכשלה.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="245"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="231"/>
+        <source>Error: could not retrieve device name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="247"/>
         <source>Error: no mountpoint specified!</source>
         <translation>שגיאה: נקודת עגינה לא צויינה!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="250"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="252"/>
         <source>Could not open Ipod: permission denied</source>
         <translation>לא מצליח לפתוח את האייפוד: הגישה נדחתה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="254"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="256"/>
         <source>Could not open Ipod</source>
         <translation>לא מצליח לפתוח אייפוד</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="265"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="267"/>
         <source>No firmware partition on disk</source>
         <translation>אין מחיצת מנהל איתחול על הדיסק</translation>
     </message>
@@ -575,7 +555,7 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>מסיר את מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="259"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="261"/>
         <source>Error reading partition table - possibly not an Ipod</source>
         <translation>שגיאה בקריאת טבלת המחיצות - ככל הנראה נגן זה אינו אייפוד</translation>
     </message>
@@ -621,6 +601,85 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <location filename="../base/bootloaderinstallmi4.cpp" line="100"/>
         <source>Rockbox bootloader successful removed</source>
         <translation>מנהל האיתחול של רוקבוקס הוסר בהצלחה</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallMpio</name>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="33"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="52"/>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished">מוריד את קובץ מנהל האיתחול</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="78"/>
+        <source>Could not open the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="81"/>
+        <source>Could not read the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="84"/>
+        <source>Loaded firmware file does not look like MPIO OF file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="87"/>
+        <source>Could not open downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="90"/>
+        <source>Place for bootloader in OF file not empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="93"/>
+        <source>Could not read the downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="96"/>
+        <source>Bootloader checksum error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="99"/>
+        <source>Could not open outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="102"/>
+        <source>Could not write outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="105"/>
+        <source>Unknown errornumber: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="109"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="110"/>
+        <source>Patching original firmware failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="117"/>
+        <source>Success: modified firmware file created</source>
+        <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="125"/>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation type="unfinished">כדי להסיר את ההתקנה, בצע שדרוג רגיל עם קובץ קושחה מקורי שלא נעשה בו שינוי</translation>
     </message>
 </context>
 <context>
@@ -693,22 +752,27 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation>כתיבת היומן בוטלה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="259"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="247"/>
+        <source>Error: could not retrieve device name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="263"/>
         <source>Can&apos;t find Sansa</source>
         <translation>לא מצליח למצוא נגן סנסה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="264"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="268"/>
         <source>Could not open Sansa</source>
         <translation>לא מצליח לפתוח את נגן הסנסה</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="269"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="273"/>
         <source>Could not read partition table</source>
         <translation>לא מצליח לקרוא את טבלת המחיצות</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="276"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="280"/>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>הדיסק אינו נגן סנסה (שגיאה %1), מבטל.</translation>
     </message>
@@ -1769,80 +1833,86 @@ Select your device and Mountpoint manually.</source>
         <translation>(אין תיאור זמין)</translation>
     </message>
     <message>
-        <location filename="../base/utils.cpp" line="183"/>
+        <location filename="../base/utils.cpp" line="184"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&lt;li&gt;הרשאות אינן מספיקות להתקנת מנהל איתחול.
 הרשאות מנהל הינן הכרחיות&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/utils.cpp" line="195"/>
+        <location filename="../base/utils.cpp" line="196"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;li&gt;זוהה סוג נגן שגוי.
 נגן קיים: %1, הנגן שנבחר: %2.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/utils.cpp" line="202"/>
+        <location filename="../base/utils.cpp" line="203"/>
         <source>Problem detected:</source>
         <translation>זוהתה בעיה:</translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="71"/>
+        <source>LTR</source>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <translation>RTL</translation>
     </message>
 </context>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="../rbutilqt.cpp" line="111"/>
+        <location filename="../rbutilqt.cpp" line="104"/>
         <source>File</source>
         <translation>קובץ</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="111"/>
+        <location filename="../rbutilqt.cpp" line="104"/>
         <source>Version</source>
         <translation>גירסה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="212"/>
-        <location filename="../rbutilqt.cpp" line="245"/>
+        <location filename="../rbutilqt.cpp" line="205"/>
+        <location filename="../rbutilqt.cpp" line="238"/>
         <source>Downloading build information, please wait ...</source>
         <translation>מוריד מידע גירסאות, אנא המתן...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="223"/>
-        <location filename="../rbutilqt.cpp" line="254"/>
+        <location filename="../rbutilqt.cpp" line="216"/>
+        <location filename="../rbutilqt.cpp" line="247"/>
         <source>Can&apos;t get version information!</source>
         <translation>לא מצליח לקבל את מידע הגירסאות!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="225"/>
-        <location filename="../rbutilqt.cpp" line="256"/>
+        <location filename="../rbutilqt.cpp" line="218"/>
+        <location filename="../rbutilqt.cpp" line="249"/>
         <source>Can&apos;t get version information.
 Network error: %1. Please check your network and proxy settings.</source>
         <translation>לא מצליח להשיג מידע גירסה.
 שגיאת רשת: %1. אנא בדוק את הרשת והגדרות הפרוקסי.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="344"/>
+        <location filename="../rbutilqt.cpp" line="329"/>
         <source>New installation</source>
         <translation>התקנה חדשה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="345"/>
+        <location filename="../rbutilqt.cpp" line="330"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>זוהי התקנה חדשה של תוכנת השירות של רוקבוקס, או גירסה חדשה. תיבת השיח של ההגדרות תיפתח כעת על מנת לאפשר לך להגדיר את התוכנית, או לעבור על ההגדרות הקיימות.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="352"/>
-        <location filename="../rbutilqt.cpp" line="1241"/>
+        <location filename="../rbutilqt.cpp" line="337"/>
+        <location filename="../rbutilqt.cpp" line="1250"/>
         <source>Configuration error</source>
         <translation>שגיאת הגדרות</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="353"/>
+        <location filename="../rbutilqt.cpp" line="338"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>ההגדרות שלך שגויות. לרוב הדבר נובע מכך שהנתיב לנגן השתנה. תיבת השיח של ההגדרות תיפתח כעת, על מנת לאפשר לך לתקן את הבעיה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="266"/>
+        <location filename="../rbutilqt.cpp" line="259"/>
         <source>Download build information finished.</source>
         <translation>הורדת מידע הגירסאות הסתיימה.</translation>
     </message>
@@ -1851,189 +1921,230 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="obsolete">שגיאת רשת: %1. אנא בדוק את הגדרות הרשת והפרוקסי שלך.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="392"/>
+        <location filename="../rbutilqt.cpp" line="377"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; ב- &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="419"/>
+        <location filename="../rbutilqt.cpp" line="404"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;מדריך PDF&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="421"/>
+        <location filename="../rbutilqt.cpp" line="406"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;מדריך HTML (נפתח בדפדפן)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="425"/>
+        <location filename="../rbutilqt.cpp" line="410"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>בחר בנגן בשביל קישור למדריך המתאים</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="426"/>
+        <location filename="../rbutilqt.cpp" line="411"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;רשימת כל מדריכי המשתמש&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="435"/>
-        <location filename="../rbutilqt.cpp" line="491"/>
-        <location filename="../rbutilqt.cpp" line="659"/>
-        <location filename="../rbutilqt.cpp" line="840"/>
-        <location filename="../rbutilqt.cpp" line="889"/>
-        <location filename="../rbutilqt.cpp" line="928"/>
+        <location filename="../rbutilqt.cpp" line="420"/>
+        <location filename="../rbutilqt.cpp" line="476"/>
+        <location filename="../rbutilqt.cpp" line="644"/>
+        <location filename="../rbutilqt.cpp" line="811"/>
+        <location filename="../rbutilqt.cpp" line="898"/>
+        <location filename="../rbutilqt.cpp" line="942"/>
         <source>Confirm Installation</source>
         <translation>אשר התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="514"/>
-        <location filename="../rbutilqt.cpp" line="1125"/>
+        <location filename="../rbutilqt.cpp" line="499"/>
+        <location filename="../rbutilqt.cpp" line="1134"/>
         <source>Mount point is wrong!</source>
         <translation>נקודת העגינה הינה שגויה!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="582"/>
+        <location filename="../rbutilqt.cpp" line="567"/>
         <source>Aborted!</source>
         <translation>בוטל!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="592"/>
+        <location filename="../rbutilqt.cpp" line="577"/>
         <source>Installed Rockbox detected</source>
         <translation>זוהתה התקנה של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="593"/>
+        <location filename="../rbutilqt.cpp" line="578"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>זוהתה התקנה של רוקבוקס. האם ברצונך לגבות לפני כן?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="596"/>
+        <location filename="../rbutilqt.cpp" line="581"/>
         <source>Starting backup...</source>
         <translation>מתחיל גיבוי...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="614"/>
+        <location filename="../rbutilqt.cpp" line="599"/>
         <source>Backup successful</source>
         <translation>הגיבוי הסתיים בהצלחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="618"/>
+        <location filename="../rbutilqt.cpp" line="603"/>
         <source>Backup failed!</source>
         <translation>הגיבוי נכשל!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="660"/>
+        <location filename="../rbutilqt.cpp" line="645"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>האם באמת ברצונך להתקין את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="841"/>
+        <location filename="../rbutilqt.cpp" line="805"/>
+        <location filename="../rbutilqt.cpp" line="883"/>
+        <source>No Rockbox installation found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="806"/>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="812"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>האם באמת ברצונך להתקין את חבילת הגופנים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="883"/>
+        <location filename="../rbutilqt.cpp" line="869"/>
         <source>Warning</source>
         <translation>אזהרה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="884"/>
+        <location filename="../rbutilqt.cpp" line="870"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>תוכנית השרות עדיין מורידה מידע לגבי גירסאות חדשות. אנא נסה שוב בקרוב.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="890"/>
+        <location filename="../rbutilqt.cpp" line="884"/>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="899"/>
         <source>Do you really want to install the voice file?</source>
         <translation>האם באמת ברצונך להתקין את קובץ הקראת התפריטים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="923"/>
+        <location filename="../rbutilqt.cpp" line="937"/>
         <source>Error</source>
         <translation>שגיאה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="924"/>
+        <location filename="../rbutilqt.cpp" line="938"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>לנגן שברשותך אין הרחבת doom. מבטל.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="929"/>
+        <location filename="../rbutilqt.cpp" line="943"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>האם באמת ברצונך להתקין את קבצי הרחבות המשחקים?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1007"/>
+        <location filename="../rbutilqt.cpp" line="1021"/>
         <source>Confirm Uninstallation</source>
         <translation>אשר הסרת התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1008"/>
+        <location filename="../rbutilqt.cpp" line="1022"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>האם באמת ברצונך להסיר את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1063"/>
+        <location filename="../rbutilqt.cpp" line="1036"/>
+        <source>No uninstall method for this target known.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="1042"/>
+        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="1072"/>
         <source>Confirm download</source>
         <translation>אשר הורדה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1064"/>
+        <location filename="../rbutilqt.cpp" line="1073"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>האם באמת ברצונך להוריד את המדריך למשתמש? המדריך יישמר בספרייה הראשית של הנגן שלך.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1111"/>
+        <location filename="../rbutilqt.cpp" line="1120"/>
         <source>Confirm installation</source>
         <translation>אשר התקנה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1112"/>
+        <location filename="../rbutilqt.cpp" line="1121"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>האם באמת ברצונך להתקין את תוכנית השרות של רוקבוקס לנגן שלך? לאחר ההתקנה תוכל להריץ אותה מהתקן האיחסון של הנגן.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1121"/>
+        <location filename="../rbutilqt.cpp" line="1130"/>
         <source>Installing Rockbox Utility</source>
         <translation>מתקין את תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1139"/>
+        <location filename="../rbutilqt.cpp" line="1148"/>
         <source>Error installing Rockbox Utility</source>
         <translation>שגיאה בהתקנת תוכנת השרות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1143"/>
+        <location filename="../rbutilqt.cpp" line="1152"/>
         <source>Installing user configuration</source>
         <translation>מתקין הגדרות משתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1147"/>
+        <location filename="../rbutilqt.cpp" line="1156"/>
         <source>Error installing user configuration</source>
         <translation>שגיאה בהתקנת הגדרות משתמש</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1151"/>
+        <location filename="../rbutilqt.cpp" line="1160"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>התקנת תוכנית השרות של רוקבוקס הסתיימה בהצלחה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1242"/>
+        <location filename="../rbutilqt.cpp" line="1251"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>ההגדרות שלך שגויות. אנא עבור לתיבת השיח של ההגדרות וודא שהערכים הנכונים נבחרו.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1324"/>
+        <location filename="../rbutilqt.cpp" line="1274"/>
+        <source>Checking for update ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="1334"/>
         <source>RockboxUtility Update available</source>
         <translation>קיים עידכון של תוכנת השירות של רוקבוקס</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1325"/>
+        <location filename="../rbutilqt.cpp" line="1335"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
         <translation>&lt;b&gt;קיימת גירסה חדשה של תוכנית השרות&lt;/b&gt; &lt;br&gt;&lt;br&gt;ניתן להורידה מכאן: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="224"/>
-        <location filename="../rbutilqt.cpp" line="255"/>
+        <location filename="../rbutilqt.cpp" line="1337"/>
+        <source>New version of Rockbox Utility available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="1340"/>
+        <source>Rockbox Utility is up to date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="217"/>
+        <location filename="../rbutilqt.cpp" line="248"/>
         <source>Network error</source>
         <translation>שגיאת רשת</translation>
     </message>
@@ -2042,79 +2153,78 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="obsolete">לא מצליח לקבל מידע גירסה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="578"/>
+        <location filename="../rbutilqt.cpp" line="563"/>
         <source>Really continue?</source>
         <translation>באמת להמשיך?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="703"/>
+        <location filename="../rbutilqt.cpp" line="664"/>
         <source>No install method known.</source>
         <translation>אין שיטת התקנה ידועה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="723"/>
+        <location filename="../rbutilqt.cpp" line="684"/>
         <source>Bootloader detected</source>
         <translation>מנהל האיתחול זוהה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="724"/>
+        <location filename="../rbutilqt.cpp" line="685"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>מנהל האיתחול כבר מותקן. האם אתה באמת רוצה להתקין מחדש את מנהל האיתחול?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="747"/>
+        <location filename="../rbutilqt.cpp" line="708"/>
         <source>Create Bootloader backup</source>
         <translation>יוצר גיבוי מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="748"/>
+        <location filename="../rbutilqt.cpp" line="709"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>ביכולתך ליצור גיבוי של קובץ מנהל האיתחול המקורי. לחץ &quot;כן&quot; על מנת לבחור ספריית פלט על המחשב שלך אליה יישמר הקובץ, אשר יימצא תחת ספרייה חדשה בשם &quot;%1&quot; מתחת לספרייה שנבחרה.
 לחץ &quot;לא&quot; כדי לדלג על שלב זה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="755"/>
+        <location filename="../rbutilqt.cpp" line="716"/>
         <source>Browse backup folder</source>
         <translation>עיין בספריית הגיבוי</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="767"/>
+        <location filename="../rbutilqt.cpp" line="728"/>
         <source>Prerequisites</source>
         <translation>דרישות מוקדמות</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="780"/>
+        <location filename="../rbutilqt.cpp" line="741"/>
         <source>Select firmware file</source>
         <translation>בחר קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="782"/>
+        <location filename="../rbutilqt.cpp" line="743"/>
         <source>Error opening firmware file</source>
         <translation>שגיאה בפתיחת קובץ קושחה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="800"/>
+        <location filename="../rbutilqt.cpp" line="761"/>
         <source>Backup error</source>
         <translation>שגיאת גיבוי</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="801"/>
+        <location filename="../rbutilqt.cpp" line="762"/>
         <source>Could not create backup file. Continue?</source>
         <translation>לא מצליח ליצור קובץ גיבוי. להמשיך?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="831"/>
+        <location filename="../rbutilqt.cpp" line="792"/>
         <source>Manual steps required</source>
         <translation>צעדים ידניים נדרשים</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1036"/>
         <source>No uninstall method known.</source>
-        <translation>אין שיטת הסרת התקנה ידועה.</translation>
+        <translation type="obsolete">אין שיטת הסרת התקנה ידועה.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="436"/>
+        <location filename="../rbutilqt.cpp" line="421"/>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -2123,17 +2233,17 @@ This will install Rockbox %1. To install the most recent development build avail
 דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="92"/>
+        <location filename="../rbutilqt.cpp" line="85"/>
         <source>Wine detected!</source>
         <translation>Wine זוהתה!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="93"/>
+        <location filename="../rbutilqt.cpp" line="86"/>
         <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
         <translation>נראה שאתה מנסה להריץ את תוכנה זו תחת Wine. אנא הימנע מכך, כיוון שהריצה תיכשל. השתמש בקבצים הבינאריים של לינוקס במקום.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="492"/>
+        <location filename="../rbutilqt.cpp" line="477"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -2142,12 +2252,12 @@ This will install Rockbox %1. To install the most recent development build avail
 דבר זה יתקין את רוקבוקס %1. על מנת להתקין את גירסת הפיתוח המעודכנת ביותר לחץ &quot;ביטול&quot; והשתמש בלשונית ה&quot;התקנה&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="729"/>
+        <location filename="../rbutilqt.cpp" line="690"/>
         <source>Bootloader installation skipped</source>
         <translation>התקנת מנהל האיתחול לא בוצעה</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="773"/>
+        <location filename="../rbutilqt.cpp" line="734"/>
         <source>Bootloader installation aborted</source>
         <translation>התקנת מנהל האיתחול בוטלה</translation>
     </message>
@@ -2594,8 +2704,8 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>SysTrace</name>
     <message>
-        <location filename="../systrace.cpp" line="71"/>
-        <location filename="../systrace.cpp" line="80"/>
+        <location filename="../systrace.cpp" line="76"/>
+        <location filename="../systrace.cpp" line="85"/>
         <source>Save system trace log</source>
         <translation>שמור יומן ריצת מערכת</translation>
     </message>
@@ -2692,22 +2802,22 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TTSCarbon</name>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="130"/>
+        <location filename="../base/ttscarbon.cpp" line="133"/>
         <source>Voice:</source>
         <translation>קול:</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="136"/>
+        <location filename="../base/ttscarbon.cpp" line="139"/>
         <source>Speed (words/min):</source>
         <translation>מהירות (מילים/דקה):</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="200"/>
+        <location filename="../base/ttscarbon.cpp" line="203"/>
         <source>Could not voice string</source>
         <translation>לא מצליח להקריא את המחרוזת</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="209"/>
+        <location filename="../base/ttscarbon.cpp" line="212"/>
         <source>Could not convert intermediate file</source>
         <translation>לא מצליח להמיר קובץ ביניים</translation>
     </message>
@@ -2715,17 +2825,17 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TTSExes</name>
     <message>
-        <location filename="../base/ttsexes.cpp" line="68"/>
+        <location filename="../base/ttsexes.cpp" line="73"/>
         <source>TTS executable not found</source>
         <translation>קובץ הפעלה של הדיבור לא נמצא</translation>
     </message>
     <message>
-        <location filename="../base/ttsexes.cpp" line="40"/>
+        <location filename="../base/ttsexes.cpp" line="45"/>
         <source>Path to TTS engine:</source>
         <translation>נתיב למנוע הדיבור:</translation>
     </message>
     <message>
-        <location filename="../base/ttsexes.cpp" line="42"/>
+        <location filename="../base/ttsexes.cpp" line="47"/>
         <source>TTS engine options:</source>
         <translation>אפשרויות מנוע דיבור:</translation>
     </message>
@@ -2733,27 +2843,27 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TTSFestival</name>
     <message>
-        <location filename="../base/ttsfestival.cpp" line="197"/>
+        <location filename="../base/ttsfestival.cpp" line="202"/>
         <source>engine could not voice string</source>
         <translation>המנוע אינו יכול להקריא את המחרוזת</translation>
     </message>
     <message>
-        <location filename="../base/ttsfestival.cpp" line="280"/>
+        <location filename="../base/ttsfestival.cpp" line="285"/>
         <source>No description available</source>
         <translation>אין תיאור זמין</translation>
     </message>
     <message>
-        <location filename="../base/ttsfestival.cpp" line="45"/>
+        <location filename="../base/ttsfestival.cpp" line="50"/>
         <source>Path to Festival client:</source>
         <translation>נתיב ללקוח Festival:</translation>
     </message>
     <message>
-        <location filename="../base/ttsfestival.cpp" line="50"/>
+        <location filename="../base/ttsfestival.cpp" line="55"/>
         <source>Voice:</source>
         <translation>קול:</translation>
     </message>
     <message>
-        <location filename="../base/ttsfestival.cpp" line="59"/>
+        <location filename="../base/ttsfestival.cpp" line="64"/>
         <source>Voice description:</source>
         <translation>תיאור קול:</translation>
     </message>
@@ -2761,32 +2871,32 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TTSSapi</name>
     <message>
-        <location filename="../base/ttssapi.cpp" line="99"/>
+        <location filename="../base/ttssapi.cpp" line="104"/>
         <source>Could not copy the Sapi-script</source>
         <translation>לא מצליח להעתיק את Sapi-script</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="120"/>
+        <location filename="../base/ttssapi.cpp" line="125"/>
         <source>Could not start the Sapi-script</source>
         <translation>לא מצליח להפעיל את Sapi-script</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="39"/>
+        <location filename="../base/ttssapi.cpp" line="44"/>
         <source>Language:</source>
         <translation>שפה:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="45"/>
+        <location filename="../base/ttssapi.cpp" line="50"/>
         <source>Voice:</source>
         <translation>קול:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="52"/>
+        <location filename="../base/ttssapi.cpp" line="57"/>
         <source>Speed:</source>
         <translation>מהירות:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="55"/>
+        <location filename="../base/ttssapi.cpp" line="60"/>
         <source>Options:</source>
         <translation>אפשרויות:</translation>
     </message>
@@ -2814,17 +2924,17 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>מעתיק קבצי הקראת התפריטים...</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="228"/>
+        <location filename="../base/talkfile.cpp" line="229"/>
         <source>File copy aborted</source>
         <translation>העתקת קובץ בוטלה</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="267"/>
+        <location filename="../base/talkfile.cpp" line="268"/>
         <source>Cleaning up...</source>
         <translation>מנקה...</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="278"/>
+        <location filename="../base/talkfile.cpp" line="279"/>
         <source>Finished</source>
         <translation>הסתיים</translation>
     </message>
@@ -2834,7 +2944,7 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>יצירת קבצי הקראה הסתיימה</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="246"/>
+        <location filename="../base/talkfile.cpp" line="247"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>העתקת %1 ל- %2 נכשלה</translation>
     </message>
@@ -2842,53 +2952,53 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TalkGenerator</name>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="39"/>
+        <location filename="../base/talkgenerator.cpp" line="38"/>
         <source>Starting TTS Engine</source>
         <translation>מתחיל מנוע דיבור</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="44"/>
+        <location filename="../base/talkgenerator.cpp" line="43"/>
         <source>Init of TTS engine failed</source>
         <translation>איתחול מנוע הדיבור נכשל</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="51"/>
+        <location filename="../base/talkgenerator.cpp" line="50"/>
         <source>Starting Encoder Engine</source>
         <translation>מתחיל מנוע קידוד</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="55"/>
+        <location filename="../base/talkgenerator.cpp" line="54"/>
         <source>Init of Encoder engine failed</source>
         <translation>איתחול מנוע הקידוד נכשל</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="65"/>
+        <location filename="../base/talkgenerator.cpp" line="64"/>
         <source>Voicing entries...</source>
         <translation>מקריא רשומות...</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="80"/>
+        <location filename="../base/talkgenerator.cpp" line="79"/>
         <source>Encoding files...</source>
         <translation>מקודד קבצים...</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="119"/>
+        <location filename="../base/talkgenerator.cpp" line="273"/>
         <source>Voicing aborted</source>
         <translation>הקראה בוטלה</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="154"/>
-        <location filename="../base/talkgenerator.cpp" line="159"/>
+        <location filename="../base/talkgenerator.cpp" line="180"/>
+        <location filename="../base/talkgenerator.cpp" line="185"/>
         <source>Voicing of %1 failed: %2</source>
         <translation>הקראת %1 בוטלה: %2</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="197"/>
+        <location filename="../base/talkgenerator.cpp" line="278"/>
         <source>Encoding aborted</source>
         <translation>הקידוד בוטל</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="223"/>
+        <location filename="../base/talkgenerator.cpp" line="262"/>
         <source>Encoding of %1 failed</source>
         <translation>הקידוד של %1 נכשל</translation>
     </message>
@@ -2935,95 +3045,95 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>ThemesInstallWindow</name>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="37"/>
+        <location filename="../themesinstallwindow.cpp" line="39"/>
         <source>no theme selected</source>
         <translation>לא נבחרה ערכת נושא</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="104"/>
+        <location filename="../themesinstallwindow.cpp" line="111"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>תקלת רשת: %1.
 אנא בדוק את הגדרות הרשת והפרוקסי שלך.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="117"/>
+        <location filename="../themesinstallwindow.cpp" line="124"/>
         <source>the following error occured:
 %1</source>
         <translation>השגיאה הבאה התרחשה:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="123"/>
+        <location filename="../themesinstallwindow.cpp" line="130"/>
         <source>done.</source>
         <translation>הסתיים.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="190"/>
+        <location filename="../themesinstallwindow.cpp" line="197"/>
         <source>fetching details for %1</source>
         <translation>טוען פרטים עבור %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="193"/>
+        <location filename="../themesinstallwindow.cpp" line="200"/>
         <source>fetching preview ...</source>
         <translation>טוען תצוגה מקדימה...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="206"/>
+        <location filename="../themesinstallwindow.cpp" line="213"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translatorcomment>Keep in English</translatorcomment>
         <translation>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="207"/>
-        <location filename="../themesinstallwindow.cpp" line="209"/>
+        <location filename="../themesinstallwindow.cpp" line="214"/>
+        <location filename="../themesinstallwindow.cpp" line="216"/>
         <source>unknown</source>
         <translation>לא ידוע</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="208"/>
+        <location filename="../themesinstallwindow.cpp" line="215"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translatorcomment>Keep in English</translatorcomment>
         <translation>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="210"/>
+        <location filename="../themesinstallwindow.cpp" line="217"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translatorcomment>Keep in English</translatorcomment>
         <translation>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="211"/>
+        <location filename="../themesinstallwindow.cpp" line="218"/>
         <source>no description</source>
         <translation>אין תיאור</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="254"/>
+        <location filename="../themesinstallwindow.cpp" line="261"/>
         <source>no theme preview</source>
         <translation>אין תצוגה מקדימה של ערכת נושא</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="285"/>
+        <location filename="../themesinstallwindow.cpp" line="292"/>
         <source>getting themes information ...</source>
         <translation>מוריד מידע על ערכות הנושא...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="333"/>
+        <location filename="../themesinstallwindow.cpp" line="340"/>
         <source>Mount point is wrong!</source>
         <translation>נקודת העגינה הינה שגויה!</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="38"/>
+        <location filename="../themesinstallwindow.cpp" line="40"/>
         <source>no selection</source>
         <translation>אין בחירה</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="160"/>
+        <location filename="../themesinstallwindow.cpp" line="167"/>
         <source>Information</source>
         <translation>מידע</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="177"/>
+        <location filename="../themesinstallwindow.cpp" line="184"/>
         <source>Download size %L1 kiB (%n item(s))</source>
         <translation>
             <numerusform>גודל הורדה kiB %L1 (פריט אחד)</numerusform>
@@ -3031,7 +3141,7 @@ Please check your network and proxy settings.</source>
         </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="242"/>
+        <location filename="../themesinstallwindow.cpp" line="249"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
         <translation>נכשלה תצורגה מקדימה של ערכת נושא.
@@ -3177,28 +3287,28 @@ HTTP response code: %1</translation>
 <context>
     <name>Uninstaller</name>
     <message>
-        <location filename="../base/uninstall.cpp" line="33"/>
-        <location filename="../base/uninstall.cpp" line="46"/>
+        <location filename="../base/uninstall.cpp" line="32"/>
+        <location filename="../base/uninstall.cpp" line="43"/>
         <source>Starting Uninstallation</source>
         <translation>מתחיל להסיר התקנה</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="38"/>
+        <location filename="../base/uninstall.cpp" line="36"/>
         <source>Finished Uninstallation</source>
         <translation>הסרת התקנה הושלמה</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="52"/>
+        <location filename="../base/uninstall.cpp" line="49"/>
         <source>Uninstalling %1...</source>
         <translation>מסיר %1...</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="83"/>
+        <location filename="../base/uninstall.cpp" line="80"/>
         <source>Could not delete %1</source>
         <translation>לא הצלחתי למחוק את %1</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="113"/>
+        <location filename="../base/uninstall.cpp" line="109"/>
         <source>Uninstallation finished</source>
         <translation>הסרת התקנה הסתיימה</translation>
     </message>

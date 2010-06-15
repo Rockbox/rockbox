@@ -295,6 +295,10 @@
         <source>invalid file: &quot;length3&quot; field wrong</source>
         <translation>файл негоден: неверное поле &quot;длина3&quot;</translation>
     </message>
+    <message>
+        <source>Uninstallation not possible, only installation info removed</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallIpod</name>
@@ -380,6 +384,10 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <source>Could not open Ipod: permission denied</source>
         <translation>Не могу открыть iPod: доступ запрещён</translation>
     </message>
+    <message>
+        <source>Error: could not retrieve device name</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallMi4</name>
@@ -414,6 +422,69 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <source>Rockbox bootloader successful removed</source>
         <translation>Загрузчик Rockbox успешно удалён</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallMpio</name>
+    <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loaded firmware file does not look like MPIO OF file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place for bootloader in OF file not empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the downloaded bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader checksum error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write outputfile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown errornumber: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching original firmware failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success: modified firmware file created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -511,6 +582,10 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <source>Writing log aborted</source>
         <translation>Запись журнала отменена</translation>
     </message>
+    <message>
+        <source>Error: could not retrieve device name</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallTcc</name>
@@ -548,6 +623,10 @@ See http://www.rockbox.org/wiki/SansaE200Install
     </message>
     <message>
         <source>Could not patch firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -751,6 +830,15 @@ Please configure TTS engine.</source>
     <message>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The System Proxy settings are invalid!
+Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1138,7 +1226,7 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
     </message>
     <message>
         <source>Really continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Продожить?</translation>
     </message>
     <message>
         <source>Aborted!</source>
@@ -1150,11 +1238,11 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
     </message>
     <message>
         <source>Backup successful</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Резеврная копия успешно создана</translation>
     </message>
     <message>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось создать резервную копию!</translation>
     </message>
     <message>
         <source>Select Backup Filename</source>
@@ -1335,6 +1423,11 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <source>Problem detected:</source>
         <translation>Обнаружена проблема:</translation>
     </message>
+    <message>
+        <source>LTR</source>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQt</name>
@@ -1348,7 +1441,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     </message>
     <message>
         <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation>Ошибка сети: %1. Проверьте ваши настройки сети и прокси.</translation>
+        <translation type="obsolete">Ошибка сети: %1. Проверьте ваши настройки сети и прокси.</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
@@ -1500,7 +1593,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     </message>
     <message>
         <source>Can&apos;t get version information.</source>
-        <translation>Не могу получить информацию о версии.</translation>
+        <translation type="obsolete">Не могу получить информацию о версии.</translation>
     </message>
     <message>
         <source>Really continue?</source>
@@ -1558,7 +1651,7 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <source>No uninstall method known.</source>
-        <translation>Нет известного способа удаления.</translation>
+        <translation type="obsolete">Нет известного способа удаления.</translation>
     </message>
     <message>
         <source>Do you really want to perform a complete installation?
@@ -1607,6 +1700,51 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
         <translation>Доступна новая версия мастера Rockbox. Скачать можно отсюда: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Wine detected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t get version information.
+Network error: %1. Please check your network and proxy settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Rockbox installation found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No uninstall method for this target known.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for update ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New version of Rockbox Utility available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Utility is up to date.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
