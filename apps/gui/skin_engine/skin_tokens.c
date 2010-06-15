@@ -1040,11 +1040,15 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
             
         case WPS_TOKEN_LASTTOUCH:
+            {
 #ifdef HAVE_TOUCHSCREEN
-            if (TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +
-                                          touchscreen_last_touch()))
+            unsigned int last_touch = touchscreen_last_touch();
+            if (last_touch != 0xffff &&
+                TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +
+                                          last_touch))
                 return "t";
 #endif
+            }
             return NULL;
 
         case WPS_TOKEN_SETTING:
