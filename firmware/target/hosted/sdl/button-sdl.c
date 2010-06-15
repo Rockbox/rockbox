@@ -86,6 +86,23 @@ static void button_event(int key, bool pressed);
 extern bool debug_wps;
 extern bool mapping;
 
+#ifdef HAVE_TOUCHSCREEN
+static void touchscreen_event(int x, int y)
+{
+    if(background) {
+        x -= UI_LCD_POSX;
+        y -= UI_LCD_POSY;
+    }
+
+    if(x >= 0 && y >= 0 && x < SIM_LCD_WIDTH && y < SIM_LCD_HEIGHT) {
+        mouse_coords = (x << 16) | y;
+        button_event(BUTTON_TOUCHSCREEN, true);
+        if (debug_wps)
+            printf("Mouse at: (%d, %d)\n", x, y);
+    }
+}
+#endif
+
 bool gui_message_loop(void)
 {
     SDL_Event event;
@@ -100,6 +117,12 @@ bool gui_message_loop(void)
             case SDL_KEYUP:
                 button_event(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 break;
+#ifdef HAVE_TOUCHSCREEN
+            case SDL_MOUSEMOTION:
+                if (event.motion.state & SDL_BUTTON(1))
+                    touchscreen_event(event.motion.x, event.motion.y);
+                break;
+#endif
             case SDL_MOUSEBUTTONDOWN:
                 switch ( event.button.button ) {
 #ifdef HAVE_SCROLLWHEEL
@@ -118,10 +141,16 @@ bool gui_message_loop(void)
                         }
                         if ( background ) {
                             xybutton = xy2button( event.button.x, event.button.y );
-                            if( xybutton )
+                            if( xybutton ) {
                                 button_event( xybutton, true );
+                                break;
+                            }
                         }
+#ifdef HAVE_TOUCHSCREEN
+                        touchscreen_event(event.button.x, event.button.y);
+#endif
                         break;
+
                     default:
                         break;
                 }
@@ -162,9 +191,8 @@ bool gui_message_loop(void)
                                 xybutton = 0;
                             }
 #ifdef HAVE_TOUCHSCREEN
-                            else {
+                            else
                                 button_event(BUTTON_TOUCHSCREEN, false);
-                            }
 #endif
                         break;
                     default:
@@ -335,39 +363,7 @@ int button_read_device(void)
     return btn;
 }
 
-
-#ifdef HAVE_TOUCHSCREEN
-extern bool debug_wps;
-void mouse_tick_task(void)
-{
-    static int last_check = 0;
-    int x,y;
-    if (TIME_BEFORE(current_tick, last_check+(HZ/10)))
-        return;
-    last_check = current_tick;
-    if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT))
-    {
-        if(background)
-        {
-            x -= UI_LCD_POSX;
-            y -= UI_LCD_POSY;
-            
-            if(x<0 || y<0 || x>SIM_LCD_WIDTH || y>SIM_LCD_HEIGHT)
-                return;
-        }
-        
-        mouse_coords = (x<<16)|y;
-        button_event(BUTTON_TOUCHSCREEN, true);
-        if (debug_wps)
-            printf("Mouse at: (%d, %d)\n", x, y);
-    }
-}
-#endif
-
 void button_init_device(void)
 {
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-#ifdef HAVE_TOUCHSCREEN
-    tick_add_task(mouse_tick_task);
-#endif
 }
