@@ -1,5 +1,32 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2010 Robert Bieber
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include "projectmodel.h"
 #include "configdocument.h"
 #include "ui_configdocument.h"
+
+#include <QMessageBox>
+#include <QFile>
+#include <QSettings>
+#include <QFileDialog>
 
 ConfigDocument::ConfigDocument(QMap<QString, QString>& settings, QString file,
                                QWidget *parent)
@@ -44,17 +71,86 @@ QString ConfigDocument::title() const
 
 void ConfigDocument::save()
 {
+    QFile fout(filePath);
+
+    if(!fout.exists())
+    {
+        saveAs();
+        return;
+    }
+
+    fout.open(QFile::WriteOnly);
+    fout.write(toPlainText().toAscii());
+    fout.close();
+
+    saved = toPlainText();
+    emit titleChanged(title());
 
 }
 
 void ConfigDocument::saveAs()
 {
+    /* Determining the directory to open */
+    QString directory = filePath;
+
+    QSettings settings;
+    settings.beginGroup("ProjectModel");
+    if(directory == "")
+        directory = settings.value("defaultDirectory", "").toString();
+
+    filePath = QFileDialog::getSaveFileName(this, tr("Save Document"),
+                                            directory,
+                                            ProjectModel::fileFilter());
+    directory = filePath;
+    if(filePath == "")
+        return;
+
+    directory.chop(filePath.length() - filePath.lastIndexOf('/') - 1);
+    settings.setValue("defaultDirectory", directory);
+    settings.endGroup();
+
+    QFile fout(filePath);
+    fout.open(QFile::WriteOnly);
+    fout.write(toPlainText().toAscii());
+    fout.close();
+
+    saved = toPlainText();
+    emit titleChanged(title());
 
 }
 
 bool ConfigDocument::requestClose()
 {
+    if(toPlainText() != saved)
+    {
+        /* Spawning the "Are you sure?" dialog */
+        QMessageBox confirm(this);
+        confirm.setWindowTitle(tr("Confirm Close"));
+        confirm.setText(title() + tr(" has been modified."));
+        confirm.setInformativeText(tr("Do you want to save your changes?"));
+        confirm.setStandardButtons(QMessageBox::Save | QMessageBox::Discard
+                                   | QMessageBox::Cancel);
+        confirm.setDefaultButton(QMessageBox::Save);
+        int confirmation = confirm.exec();
 
+        switch(confirmation)
+        {
+        case QMessageBox::Save:
+            save();
+            /* After calling save, make sure the user actually went through */
+            if(toPlainText() != saved)
+                return false;
+            else
+                return true;
+
+        case QMessageBox::Discard:
+            return true;
+
+        case QMessageBox::Cancel:
+            return false;
+        }
+    }
+    return false;
 }
 
 QString ConfigDocument::toPlainText() const
