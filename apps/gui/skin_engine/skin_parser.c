@@ -1497,16 +1497,29 @@ static int parse_albumart_display(const char *wps_bufptr,
 
 struct touchaction {const char* s; int action;};
 static const struct touchaction touchactions[] = {
-    {"play", ACTION_WPS_PLAY }, {"stop", ACTION_WPS_STOP },
-    {"prev", ACTION_WPS_SKIPPREV }, {"next", ACTION_WPS_SKIPNEXT },
-    {"ffwd", ACTION_WPS_SEEKFWD }, {"rwd", ACTION_WPS_SEEKBACK },
-    {"menu", ACTION_WPS_MENU }, {"browse", ACTION_WPS_BROWSE },
+    /* generic actions, convert to screen actions on use */
+    {"prev", ACTION_STD_PREV },         {"next", ACTION_STD_NEXT },
+    {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_PREVREPEAT },
+    {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
+    {"menu", ACTION_STD_MENU },         {"cancel", ACTION_STD_CANCEL },
+    {"contextmenu", ACTION_STD_CONTEXT},{"quickscreen", ACTION_STD_QUICKSCREEN },
+    /* not really WPS specific, but no equivilant ACTION_STD_* */
+    {"voldown", ACTION_WPS_VOLDOWN},    {"volup", ACTION_WPS_VOLUP},
+
+    /* WPS specific actions */
+    {"browse", ACTION_WPS_BROWSE },
+    {"play", ACTION_WPS_PLAY },         {"stop", ACTION_WPS_STOP },
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
-    {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
-    {"playlist", ACTION_WPS_VIEW_PLAYLIST }, {"pitch", ACTION_WPS_PITCHSCREEN},
-    {"voldown", ACTION_WPS_VOLDOWN}, {"volup", ACTION_WPS_VOLUP},
-    {"hotkey", ACTION_WPS_HOTKEY}
+    {"pitch", ACTION_WPS_PITCHSCREEN},  {"playlist", ACTION_WPS_VIEW_PLAYLIST }, 
+
+#if CONFIG_TUNER    
+    /* FM screen actions */
+    /* Also allow browse, play, stop from WPS codes */
+    {"mode", ACTION_FM_MODE },          {"record", ACTION_FM_RECORD },
+    {"presets", ACTION_FM_PRESET}, 
+#endif
 };
+
 static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
 {

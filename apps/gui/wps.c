@@ -728,8 +728,28 @@ int wps_get_touchaction(struct wps_data *data)
     if (released)
     	wps_disarm_touchregions(data);
 
+    /* Now we need to convert buttons to the WPS context */
+    switch (returncode)
+    {
+        case ACTION_STD_PREV:
+            return ACTION_WPS_SKIPPREV;
+        case ACTION_STD_PREVREPEAT:
+            return ACTION_WPS_SEEKBACK;
+        case ACTION_STD_NEXT:
+            return ACTION_WPS_SKIPNEXT;
+        case ACTION_STD_NEXTREPEAT:
+            return ACTION_WPS_SEEKFWD;
+        case ACTION_STD_MENU:
+            return ACTION_WPS_MENU;
+        case ACTION_STD_CONTEXT:
+            return ACTION_WPS_CONTEXT;
+        case ACTION_STD_QUICKSCREEN:
+            return ACTION_WPS_QUICKSCREEN;
+    }
+    
     if (returncode != ACTION_NONE)
     	return returncode;
+        
 
     if ((last_action == ACTION_WPS_SEEKBACK || last_action == ACTION_WPS_SEEKFWD))
         return ACTION_WPS_STOPSEEK;
