@@ -110,7 +110,7 @@ static bool test_fs(void)
 {
     unsigned char text_buf[32];
     int total, current, align;
-    int fd;
+    int fd, ret;
 
     log_init();
     log_text("test_disk WRITE&VERIFY", true);
@@ -126,7 +126,7 @@ static bool test_fs(void)
     fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
-        rb->splash(HZ, "creat() failed.");
+        rb->splashf(HZ, "creat() failed: %d", fd);
         goto error;
     }
 
@@ -142,9 +142,10 @@ static bool test_fs(void)
         log_text(text_buf, false);
 
         mem_fill_frnd(audiobuf + align, current);
-        if (current != rb->write(fd, audiobuf + align, current))
+        ret = rb->write(fd, audiobuf + align, current);
+        if (current != ret)
         {
-            rb->splash(0, "write() failed.");
+            rb->splashf(0, "write() failed: %d/%d", ret, current);
             rb->close(fd);
             goto error;
         }
@@ -155,7 +156,7 @@ static bool test_fs(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, "open() failed.");
+        rb->splashf(0, "open() failed: %d", ret);
         goto error;
     }
 
@@ -170,9 +171,10 @@ static bool test_fs(void)
                      current >> 10, total >> 10);
         log_text(text_buf, false);
 
-        if (current != rb->read(fd, audiobuf + align, current))
+        ret = rb->read(fd, audiobuf + align, current);
+        if (current != ret)
         {
-            rb->splash(0, "read() failed.");
+            rb->splashf(0, "read() failed: %d/%d", ret, current);
             rb->close(fd);
             goto error;
         }
@@ -201,7 +203,7 @@ error:
 static bool file_speed(int chunksize, bool align)
 {
     unsigned char text_buf[64];
-    int fd;
+    int fd, ret;
     long filesize = 0;
     long size, time;
     
@@ -214,15 +216,16 @@ static bool file_speed(int chunksize, bool align)
     fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
-        rb->splash(HZ, "creat() failed.");
+        rb->splashf(HZ, "creat() failed: %d", fd);
         goto error;
     }
     time = *rb->current_tick;
     while (TIME_BEFORE(*rb->current_tick, time + TEST_TIME*HZ))
     {
-        if (chunksize != rb->write(fd, audiobuf + (align ? 0 : 1), chunksize))
+        ret = rb->write(fd, audiobuf + (align ? 0 : 1), chunksize);
+        if (chunksize != ret)
         {
-            rb->splash(HZ, "write() failed.");
+            rb->splashf(HZ, "write() failed: %d/%d", ret, chunksize);
             rb->close(fd);
             goto error;
         }
@@ -238,15 +241,16 @@ static bool file_speed(int chunksize, bool align)
     fd = rb->open(TEST_FILE, O_WRONLY);
     if (fd < 0)
     {
-        rb->splash(0, "open() failed.");
+        rb->splashf(0, "open() failed: %d", fd);
         goto error;
     }
     time = *rb->current_tick;
     for (size = filesize; size > 0; size -= chunksize)
     {
-        if (chunksize != rb->write(fd, audiobuf + (align ? 0 : 1), chunksize))
+        ret = rb->write(fd, audiobuf + (align ? 0 : 1), chunksize);
+        if (chunksize != ret)
         {
-            rb->splash(0, "write() failed.");
+            rb->splashf(0, "write() failed: %d/%d", ret, chunksize);
             rb->close(fd);
             goto error;
         }
@@ -261,15 +265,16 @@ static bool file_speed(int chunksize, bool align)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(0, "open() failed.");
+        rb->splashf(0, "open() failed: %d", fd);
         goto error;
     }
     time = *rb->current_tick;
     for (size = filesize; size > 0; size -= chunksize)
     {
-        if (chunksize != rb->read(fd, audiobuf + (align ? 0 : 1), chunksize))
+        ret = rb->read(fd, audiobuf + (align ? 0 : 1), chunksize);
+        if (chunksize != ret)
         {
-            rb->splash(0, "read() failed.");
+            rb->splashf(0, "read() failed: %d/%d", ret, chunksize);
             rb->close(fd);
             goto error;
         }
@@ -315,7 +320,7 @@ static bool test_speed(void)
         if (fd < 0)
         {
             last_file = i;
-            rb->splash(HZ, "creat() failed.");
+            rb->splashf(HZ, "creat() failed: %d", fd);
             goto error;
         }
         rb->close(fd);
@@ -335,7 +340,7 @@ static bool test_speed(void)
         fd = rb->open(text_buf, O_RDONLY);
         if (fd < 0)
         {
-            rb->splash(HZ, "open() failed.");
+            rb->splashf(HZ, "open() failed: %d", fd);
             goto error;
         }
         rb->close(fd);
