@@ -99,6 +99,7 @@ char* tuner_get_rds_info(int setting);
 #else
 
 #ifdef CONFIG_TUNER_MULTI
+extern int tuner_detect_type(void);
 extern int (*tuner_set)(int setting, int value);
 extern int (*tuner_get)(int setting);
 #endif /* CONFIG_TUNER_MULTI */
@@ -129,6 +130,11 @@ extern int (*tuner_get)(int setting);
 /* Silicon Labs 4700 */
 #if (CONFIG_TUNER & SI4700)
 #include "si4700.h"
+#endif
+
+/* Silicon Labs mystery radio chip in some Sansa Clip+ */
+#if (CONFIG_TUNER & FMCLIPPLUS)
+#include "fmclipplus.h"
 #endif
 
 /* Apple remote tuner */

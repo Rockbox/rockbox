@@ -316,18 +316,28 @@ static void si4700_sleep(int snooze)
     }
 }
 
+bool si4700_detect(void)
+{
+    bool detected;
+
+    tuner_power(true);
+    detected = (si4700_read_reg(DEVICEID) == 0x1242);
+    tuner_power(false);
+
+    return detected;
+}
+
 void si4700_init(void)
 {
-    tuner_power(true);
-
-    /* read all registers */
-    si4700_read(16);
-    si4700_sleep(0);
-
     /* check device id */
-    if (cache[DEVICEID] == 0x1242)
-    {
+    if (si4700_detect()) {
         tuner_present = true;
+
+        tuner_power(true);
+
+        /* read all registers */
+        si4700_read(16);
+        si4700_sleep(0);
 
 #ifdef USE_INTERNAL_OSCILLATOR
         /* Enable the internal oscillator
@@ -335,11 +345,10 @@ void si4700_init(void)
         si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
         sleep(HZ/2);
 #endif
+
+        si4700_sleep(1);
+        tuner_power(false);
     }
-
-    si4700_sleep(1);
-
-    tuner_power(false);
 }
 
 static void si4700_set_frequency(int freq)

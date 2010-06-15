@@ -5,12 +5,12 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
  * $Id$
  *
- * Tuner header for the Silicon Labs SI4700
+ * Multi-tuner detection module to select between the si4700 and a yet
+ * unidentified Silicon Labs FM tuner chip found in some Sansa Clip+ players.
  *
- * Copyright (C) 2008 Dave Chapman
+ * Copyright (C) 2010 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,35 +21,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+#include <stdint.h>
+#include "tuner.h"
 
-#ifndef _SI4700_H_
-#define _SI4700_H_
-
-#define HAVE_RADIO_REGION
-
-struct si4700_region_data
+int tuner_detect_type(void)
 {
-    unsigned char deemphasis; /* 0: 75us, 1: 50us */
-    unsigned char band; /* 0: us/europe, 1: japan */
-    unsigned char spacing; /* 0: us/australia (200kHz), 1: europe/japan (100kHz), 2: (50kHz) */
-} __attribute__((packed));
+    if (si4700_detect()) {
+        return SI4700;
+    } else if (fmclipplus_detect()) {
+        return FMCLIPPLUS;
+    } else {
+        return 0;
+    }
+}
 
-extern const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS];
-
-struct si4700_dbg_info
-{
-    uint16_t regs[16];  /* Read registers */
-};
-
-bool si4700_detect(void);
-void si4700_init(void);
-int si4700_set(int setting, int value);
-int si4700_get(int setting);
-void si4700_dbg_info(struct si4700_dbg_info *nfo);
-
-#ifndef CONFIG_TUNER_MULTI
-#define tuner_set si4700_set
-#define tuner_get si4700_get
-#endif
-
-#endif /* _SI4700_H_ */

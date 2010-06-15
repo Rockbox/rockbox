@@ -2324,6 +2324,14 @@ static bool dbg_save_roms(void)
 
 #ifndef SIMULATOR
 #if CONFIG_TUNER
+
+#ifdef CONFIG_TUNER_MULTI
+static int tuner_type = 0;
+#define IF_TUNER_TYPE(type) if(tuner_type==type)
+#else
+#define IF_TUNER_TYPE(type)
+#endif
+
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -2368,32 +2376,39 @@ static int radio_callback(int btn, struct gui_synclist *lists)
              (unsigned)nfo.write_regs[4]);
 #endif /* TEA5767 */
 #if (CONFIG_TUNER & SI4700)
-    struct si4700_dbg_info nfo;
-    si4700_dbg_info(&nfo);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
-    /* Registers */
-    simplelist_addline(SIMPLELIST_ADD_LINE,
-             "%04X %04X %04X %04X",
-             (unsigned)nfo.regs[0], (unsigned)nfo.regs[1],
-             (unsigned)nfo.regs[2], (unsigned)nfo.regs[3]);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
-             "%04X %04X %04X %04X",
-             (unsigned)nfo.regs[4], (unsigned)nfo.regs[5],
-             (unsigned)nfo.regs[6], (unsigned)nfo.regs[7]);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
-             "%04X %04X %04X %04X",
-             (unsigned)nfo.regs[8], (unsigned)nfo.regs[9],
-             (unsigned)nfo.regs[10], (unsigned)nfo.regs[11]);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
-             "%04X %04X %04X %04X",
-             (unsigned)nfo.regs[12], (unsigned)nfo.regs[13],
-             (unsigned)nfo.regs[14], (unsigned)nfo.regs[15]);
+    IF_TUNER_TYPE(SI4700)
+    {
+        struct si4700_dbg_info nfo;
+        int i;
+        si4700_dbg_info(&nfo);
+        simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
+        for (i = 0; i < 16; i += 4) {
+            simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
+                i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
+        }
+    }
 #endif /* SI4700 */
+#if (CONFIG_TUNER & FMCLIPPLUS)
+    IF_TUNER_TYPE(FMCLIPPLUS)
+    {
+        struct fmclipplus_dbg_info nfo;
+        int i;
+        fmclipplus_dbg_info(&nfo);
+        simplelist_addline(SIMPLELIST_ADD_LINE, "FM Clip+ regs:");
+        for (i = 0; i < 32; i += 4) {
+            simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
+                i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
+        }
+    }
+#endif /* FMCLIPPLUS */
     return ACTION_REDRAW;
 }
 static bool dbg_fm_radio(void)
 {
     struct simplelist_info info;
+#ifdef CONFIG_TUNER_MULTI
+    tuner_type = tuner_detect_type();
+#endif    
     info.scroll_all = true;
     simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);

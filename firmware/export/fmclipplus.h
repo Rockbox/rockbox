@@ -8,9 +8,9 @@
  *
  * $Id$
  *
- * Tuner header for the Silicon Labs SI4700
+ * Tuner header for the Silicon Labs Mystery radio chip in some Sansa Clip+
  *
- * Copyright (C) 2008 Dave Chapman
+ * Copyright (C) 2010 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,34 +22,33 @@
  *
  ****************************************************************************/
 
-#ifndef _SI4700_H_
-#define _SI4700_H_
+#ifndef _FMCLIPPLUS_H_
+#define _FMCLIPPLUS_H_
 
 #define HAVE_RADIO_REGION
 
-struct si4700_region_data
+struct fmclipplus_region_data
 {
     unsigned char deemphasis; /* 0: 75us, 1: 50us */
     unsigned char band; /* 0: us/europe, 1: japan */
-    unsigned char spacing; /* 0: us/australia (200kHz), 1: europe/japan (100kHz), 2: (50kHz) */
 } __attribute__((packed));
 
-extern const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS];
+extern const struct fmclipplus_region_data fmclipplus_region_data[TUNER_NUM_REGIONS];
 
-struct si4700_dbg_info
+struct fmclipplus_dbg_info
 {
-    uint16_t regs[16];  /* Read registers */
+    uint16_t regs[32];  /* Read registers */
 };
 
-bool si4700_detect(void);
-void si4700_init(void);
-int si4700_set(int setting, int value);
-int si4700_get(int setting);
-void si4700_dbg_info(struct si4700_dbg_info *nfo);
+bool fmclipplus_detect(void);
+void fmclipplus_init(void);
+int fmclipplus_set(int setting, int value);
+int fmclipplus_get(int setting);
+void fmclipplus_dbg_info(struct fmclipplus_dbg_info *nfo);
 
 #ifndef CONFIG_TUNER_MULTI
-#define tuner_set si4700_set
-#define tuner_get si4700_get
+#define tuner_set fmclipplus_set
+#define tuner_get fmclipplus_get
 #endif
 
-#endif /* _SI4700_H_ */
+#endif /* _FMCLIPPLUS_H_ */

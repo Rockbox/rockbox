@@ -89,6 +89,18 @@ const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS] =
 };
 #endif /* (CONFIG_TUNER & SI4700) */
 
+#if (CONFIG_TUNER & FMCLIPPLUS)
+const struct fmclipplus_region_data fmclipplus_region_data[TUNER_NUM_REGIONS] =
+{
+    [REGION_EUROPE]    = { 1, 0 }, /* 50uS, US/Europe band */
+    [REGION_US_CANADA] = { 0, 0 }, /* 75uS, US/Europe band */
+    [REGION_JAPAN]     = { 1, 1 }, /* 50uS, Japanese band  */
+    [REGION_KOREA]     = { 1, 0 }, /* 50uS, US/Europe band */
+    [REGION_ITALY]     = { 1, 0 }, /* 50uS, US/Europe band */
+    [REGION_OTHER]     = { 1, 0 }, /* 50uS, US/Europe band */
+};
+#endif /* (CONFIG_TUNER & FMCLIPPLUS) */
+
 #if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
 const struct rmt_tuner_region_data
                         rmt_tuner_region_data[TUNER_NUM_REGIONS] =
@@ -150,6 +162,12 @@ void tuner_init(void)
                         si4700_set,
                         si4700_get,
                         si4700_init())
+    #endif
+    #if (CONFIG_TUNER & FMCLIPPLUS)
+        TUNER_TYPE_CASE(FMCLIPPLUS,
+                        fmclipplus_set,
+                        fmclipplus_get,
+                        fmclipplus_init())
     #endif
     }
 }

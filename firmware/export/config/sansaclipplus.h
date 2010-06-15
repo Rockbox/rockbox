@@ -123,7 +123,7 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
-#define CONFIG_TUNER SI4700 /* in fact SI4702 */
+#define CONFIG_TUNER (SI4700|FMCLIPPLUS) /* in fact SI4702 */
 //#define HAVE_TUNER_PWR_CTRL
 
 /* Define this for LCD backlight available */

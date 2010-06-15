@@ -248,6 +248,9 @@ drivers/tuner/si4700.c
 #if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
 drivers/tuner/ipod_remote_tuner.c
 #endif /* (CONFIG_TUNER & IPOD_REMOTE_TUNER) */
+#if (CONFIG_TUNER & FMCLIPPLUS)
+drivers/tuner/fmclipplus.c
+#endif /* (CONFIG_TUNER & FMCLIPPLUS) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
 #endif /* BOOTLOADER */
@@ -1251,6 +1254,7 @@ target/arm/as3525/sansa-clipplus/backlight-clip.c
 target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipplus/powermgmt-clipplus.c
 target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
+target/arm/as3525/sansa-clipplus/tuner-clipplus.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_CLIPPLUS */
