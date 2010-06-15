@@ -165,7 +165,7 @@ void PreferencesDialog::setupUI()
 
 void PreferencesDialog::colorClicked()
 {
-    QColor* toEdit = 0;
+    QColor* toEdit = 0, newColor;
 
     if(QObject::sender() == ui->bgButton)
         toEdit = &bgColor;
@@ -185,8 +185,12 @@ void PreferencesDialog::colorClicked()
     if(!toEdit)
         return;
 
-    *toEdit = QColorDialog::getColor(*toEdit, this);
-    setButtonColor(dynamic_cast<QPushButton*>(QObject::sender()), *toEdit);
+    newColor = QColorDialog::getColor(*toEdit, this);
+    if (newColor.isValid())
+    {
+        *toEdit = newColor;
+        setButtonColor(dynamic_cast<QPushButton*>(QObject::sender()), *toEdit);
+    }
 }
 
 void PreferencesDialog::accept()
