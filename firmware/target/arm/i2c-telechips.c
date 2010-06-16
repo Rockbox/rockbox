@@ -27,9 +27,10 @@
 /* Delay loop based on CPU frequency (FREQ>>22 is 7..45 for 32MHz..192MHz) */
 static inline void delay_loop(void)
 {
-    unsigned long x;
-    for (x = (unsigned)(FREQ>>22); x; x--)
-        asm volatile("nop");
+    asm volatile ("   mov  %[freq], %[freq], asr#22 \n\t"
+                  "1: subs %[freq], %[freq], #1     \n\t"
+                  "   bne  1b"
+                  : : [freq] "r" (cpu_frequency) : "memory");
 }
 
 #define DELAY delay_loop()
