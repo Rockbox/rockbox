@@ -953,8 +953,20 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
-    /* TODO */
-    (void) on;
+    if (on)
+    {
+        CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+        CGU_IDE |= (1<<7);                  /* AHB interface enable */
+        CGU_MEMSTICK |= (1<<7);             /* interface enable */
+        CGU_SDSLOT |= (1<<7);               /* interface enable */
+    }
+    else
+    {
+        CGU_SDSLOT &= ~(1<<7);              /* interface enable */
+        CGU_MEMSTICK &= ~(1<<7);            /* interface enable */
+        CGU_IDE &= ~(1<<7);                 /* AHB interface enable */
+        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
+    }
 }
 
 tCardInfo *card_get_info_target(int card_no)
