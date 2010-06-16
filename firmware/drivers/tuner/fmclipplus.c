@@ -76,6 +76,7 @@
 #define READCHAN_READCHAN   (0x3ff << 0)
     #define READCHAN_READCHANr(x) (((x) & READCHAN_READCHAN) >> 0)
 #define READCHAN_STC        (0x1 << 14)
+#define READCHAN_ST         (0x1 << 10)
 
 /* STATUSRSSI (0xB) */
 #define STATUSRSSI_RSSI     (0x3F << 10)
@@ -251,8 +252,7 @@ static void fmclipplus_set_region(int region)
 
 static bool fmclipplus_st(void)
 {
-    /* TODO not implemented yet */
-    return false;
+    return (fmclipplus_read_reg(READCHAN) & READCHAN_ST);
 }
 
 /* tuner abstraction layer: set something to the tuner */
