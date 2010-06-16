@@ -29,8 +29,8 @@ int tuner_detect_type(void)
 {
     if (si4700_detect()) {
         return SI4700;
-    } else if (fmclipplus_detect()) {
-        return FMCLIPPLUS;
+    } else if (rda5802_detect()) {
+        return RDA5802;
     } else {
         return 0;
     }

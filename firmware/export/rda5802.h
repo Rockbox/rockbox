@@ -8,7 +8,7 @@
  *
  * $Id$
  *
- * Tuner header for the Silicon Labs Mystery radio chip in some Sansa Clip+
+ * Tuner header for the RDA Microelectronics RDA5802 FM tuner chip
  *
  * Copyright (C) 2010 Bertrik Sikken
  *
@@ -22,33 +22,33 @@
  *
  ****************************************************************************/
 
-#ifndef _FMCLIPPLUS_H_
-#define _FMCLIPPLUS_H_
+#ifndef _RDA5802_H_
+#define _RDA5802_H_
 
 #define HAVE_RADIO_REGION
 
-struct fmclipplus_region_data
+struct rda5802_region_data
 {
     unsigned char deemphasis; /* 0: 75us, 1: 50us */
     unsigned char band; /* 0: us/europe, 1: japan */
 } __attribute__((packed));
 
-extern const struct fmclipplus_region_data fmclipplus_region_data[TUNER_NUM_REGIONS];
+extern const struct rda5802_region_data rda5802_region_data[TUNER_NUM_REGIONS];
 
-struct fmclipplus_dbg_info
+struct rda5802_dbg_info
 {
-    uint16_t regs[32];  /* Read registers */
+    uint16_t regs[16];  /* Read registers */
 };
 
-bool fmclipplus_detect(void);
-void fmclipplus_init(void);
-int fmclipplus_set(int setting, int value);
-int fmclipplus_get(int setting);
-void fmclipplus_dbg_info(struct fmclipplus_dbg_info *nfo);
+bool rda5802_detect(void);
+void rda5802_init(void);
+int rda5802_set(int setting, int value);
+int rda5802_get(int setting);
+void rda5802_dbg_info(struct rda5802_dbg_info *nfo);
 
 #ifndef CONFIG_TUNER_MULTI
-#define tuner_set fmclipplus_set
-#define tuner_get fmclipplus_get
+#define tuner_set rda5802_set
+#define tuner_get rda5802_get
 #endif
 
-#endif /* _FMCLIPPLUS_H_ */
+#endif /* _RDA5802_H_ */

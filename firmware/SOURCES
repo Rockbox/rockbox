@@ -248,9 +248,9 @@ drivers/tuner/si4700.c
 #if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
 drivers/tuner/ipod_remote_tuner.c
 #endif /* (CONFIG_TUNER & IPOD_REMOTE_TUNER) */
-#if (CONFIG_TUNER & FMCLIPPLUS)
-drivers/tuner/fmclipplus.c
-#endif /* (CONFIG_TUNER & FMCLIPPLUS) */
+#if (CONFIG_TUNER & RDA5802)
+drivers/tuner/rda5802.c
+#endif /* (CONFIG_TUNER & RDA5802) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
 #endif /* BOOTLOADER */

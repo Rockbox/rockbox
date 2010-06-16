@@ -41,7 +41,7 @@
 #define TEA5760    0x10 /* Philips */
 #define LV240000   0x20 /* Sanyo */
 #define IPOD_REMOTE_TUNER   0x40 /* Apple */
-#define FMCLIPPLUS 0x80 /* Mystery SiLabs FM tuner in some clip+ */
+#define RDA5802    0x80 /* RDA Microelectronics */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587

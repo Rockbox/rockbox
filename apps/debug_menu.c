@@ -2388,19 +2388,19 @@ static int radio_callback(int btn, struct gui_synclist *lists)
         }
     }
 #endif /* SI4700 */
-#if (CONFIG_TUNER & FMCLIPPLUS)
-    IF_TUNER_TYPE(FMCLIPPLUS)
+#if (CONFIG_TUNER & RDA5802)
+    IF_TUNER_TYPE(RDA5802)
     {
-        struct fmclipplus_dbg_info nfo;
+        struct rda5802_dbg_info nfo;
         int i;
-        fmclipplus_dbg_info(&nfo);
-        simplelist_addline(SIMPLELIST_ADD_LINE, "FM Clip+ regs:");
-        for (i = 0; i < 32; i += 4) {
+        rda5802_dbg_info(&nfo);
+        simplelist_addline(SIMPLELIST_ADD_LINE, "RDA5802 regs:");
+        for (i = 0; i < 16; i += 4) {
             simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
     }
-#endif /* FMCLIPPLUS */
+#endif /* RDA55802 */
     return ACTION_REDRAW;
 }
 static bool dbg_fm_radio(void)

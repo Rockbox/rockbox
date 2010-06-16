@@ -132,9 +132,9 @@ extern int (*tuner_get)(int setting);
 #include "si4700.h"
 #endif
 
-/* Silicon Labs mystery radio chip in some Sansa Clip+ */
-#if (CONFIG_TUNER & FMCLIPPLUS)
-#include "fmclipplus.h"
+/* RDA micro RDA5802 */
+#if (CONFIG_TUNER & RDA5802)
+#include "rda5802.h"
 #endif
 
 /* Apple remote tuner */
