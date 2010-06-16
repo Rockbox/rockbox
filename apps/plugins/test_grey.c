@@ -85,7 +85,7 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
 #define GREY_QUIT (BUTTON_REC|BUTTON_PLAY)
-#define GREY_OK   BUTTON_SELECT
+#define GREY_OK   BUTTON_PLAY
 #define GREY_PREV BUTTON_PREV
 #define GREY_NEXT BUTTON_NEXT
 #define GREY_UP   BUTTON_VOL_UP
@@ -158,7 +158,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     bool done = false;
     int cur_step = 1;
-    int button, i, l, fd;
+    int button, i, j, l, fd;
     unsigned char filename[MAX_PATH];
 
     /* standard stuff */
@@ -181,6 +181,8 @@ enum plugin_status plugin_start(const void* parameter)
     grey_set_background(0); /* set background to black */
     grey_clear_display();
     grey_show(true);
+
+    rb->lcd_setfont(FONT_SYSFIXED);
 
     while (!done)
     {
@@ -235,14 +237,29 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
                 
             case GREY_OK:
+
+                /* dump result in form suitable for lcdlinear[] */
                 rb->create_numbered_filename(filename, "/", "test_grey_",
                                              ".txt", 2 IF_CNFN_NUM_(, NULL));
                 fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
                 if (fd >= 0)
                 {
+                    rb->fdprintf(fd, "Adjusted grey shades\n");
                     for (i = 0; i <= STEPS; i++)
                          rb->fdprintf(fd, "%3d: %3d\n", input_levels[i],
                                       lcd_levels[i]);
+                    rb->fdprintf(fd,"\n\nInterpolated lcdlinear matrix\n");
+
+                    for (i = 1; i <= STEPS; i++)
+                    {
+                        for (j=0; j < STEPS; j++)
+                        {
+                            rb->fdprintf(fd, "%3d, ", 
+                                lcd_levels[i-1] + 
+                                ((lcd_levels[i] - lcd_levels[i-1])*j)/STEPS);
+                        }
+                        rb->fdprintf(fd, "\n");
+                    }
                     rb->close(fd);
                 }
                 /* fall through */
