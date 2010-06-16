@@ -36,9 +36,24 @@ ConfigDocument::ConfigDocument(QMap<QString, QString>& settings, QString file,
 {
     ui->setupUi(this);
 
+    /* Populating the known keys list */
+    QFile fin(":/resources/configkeys");
+    fin.open(QFile::ReadOnly);
+
+    QStringList* container = &primaryKeys;
+    while(!fin.atEnd())
+    {
+        QString current = QString(fin.readLine());
+        if(current == "-\n")
+            container = &secondaryKeys;
+        else if(current != "\n")
+            container->append(current.trimmed());
+    }
+
     QMap<QString, QString>::iterator i;
     for(i = settings.begin(); i != settings.end(); i++)
-        addRow(i.key(), i.value());
+        if(i.key() != "themebase")
+            addRow(i.key(), i.value());
 
     saved = toPlainText();
 
@@ -160,7 +175,7 @@ QString ConfigDocument::toPlainText() const
 
     for(int i = 0; i < keys.count(); i++)
     {
-        buffer += keys[i]->text();
+        buffer += keys[i]->currentText();
         buffer += ":";
         buffer += values[i]->text();
         buffer += "\n";
@@ -172,11 +187,24 @@ QString ConfigDocument::toPlainText() const
 void ConfigDocument::addRow(QString key, QString value)
 {
     QHBoxLayout* layout = new QHBoxLayout();
-    QLineEdit* keyEdit = new QLineEdit(key, this);
+    QComboBox* keyEdit = new QComboBox(this);
     QLineEdit* valueEdit = new QLineEdit(value, this);
     QPushButton* delButton = new QPushButton(tr("-"), this);
+    QLabel* label = new QLabel(":");
+
+    /* Loading the combo box options */
+    keyEdit->setInsertPolicy(QComboBox::InsertAlphabetically);
+    keyEdit->setEditable(true);
+    keyEdit->addItems(primaryKeys);
+    keyEdit->insertSeparator(keyEdit->count());
+    keyEdit->addItems(secondaryKeys);
+    if(keyEdit->findText(key) != -1)
+        keyEdit->setCurrentIndex(keyEdit->findText(key));
+    else
+        keyEdit->setEditText(key);
 
     layout->addWidget(keyEdit);
+    layout->addWidget(label);
     layout->addWidget(valueEdit);
     layout->addWidget(delButton);
 
@@ -185,7 +213,8 @@ void ConfigDocument::addRow(QString key, QString value)
 
     QObject::connect(delButton, SIGNAL(clicked()),
                      this, SLOT(deleteClicked()));
-
+    QObject::connect(keyEdit, SIGNAL(currentIndexChanged(QString)),
+                     this, SLOT(textChanged()));
     QObject::connect(keyEdit, SIGNAL(textChanged(QString)),
                      this, SLOT(textChanged()));
     QObject::connect(valueEdit, SIGNAL(textChanged(QString)),
@@ -197,6 +226,7 @@ void ConfigDocument::addRow(QString key, QString value)
     keys.append(keyEdit);
     values.append(valueEdit);
     deleteButtons.append(delButton);
+    labels.append(label);
 
 }
 
@@ -209,11 +239,13 @@ void ConfigDocument::deleteClicked()
     keys[row]->deleteLater();
     values[row]->deleteLater();
     containers[row]->deleteLater();
+    labels[row]->deleteLater();
 
     deleteButtons.removeAt(row);
     keys.removeAt(row);
     values.removeAt(row);
     containers.removeAt(row);
+    labels.removeAt(row);
 
     if(saved != toPlainText())
         emit titleChanged(title() + "*");

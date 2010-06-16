@@ -24,8 +24,10 @@
 
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QComboBox>
 #include <QPushButton>
 #include <QWidget>
+#include <QLabel>
 #include <QMap>
 
 #include "tabcontent.h"
@@ -55,18 +57,6 @@ public:
 protected:
     void changeEvent(QEvent *e);
 
-private:
-    Ui::ConfigDocument *ui;
-    QList<QHBoxLayout*> containers;
-    QList<QLineEdit*> keys;
-    QList<QLineEdit*> values;
-    QList<QPushButton*> deleteButtons;
-
-    QString filePath;
-    QString saved;
-
-    void addRow(QString key, QString value);
-
 signals:
     void configFileChanged(QString);
 
@@ -74,6 +64,23 @@ private slots:
     void deleteClicked();
     void addClicked();
     void textChanged();
+
+
+private:
+    Ui::ConfigDocument *ui;
+    QList<QHBoxLayout*> containers;
+    QList<QComboBox*> keys;
+    QList<QLineEdit*> values;
+    QList<QPushButton*> deleteButtons;
+    QList<QLabel*> labels;
+
+    QStringList primaryKeys;
+    QStringList secondaryKeys;
+
+    QString filePath;
+    QString saved;
+
+    void addRow(QString key, QString value);
 };
 
 #endif // CONFIGDOCUMENT_H

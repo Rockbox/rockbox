@@ -1,0 +1,173 @@
+wps
+rwps
+sbs
+rsbs
+fms
+rfms
+volume
+backdrop
+foreground colour
+background colour
+foreground color
+background color
+font
+iconset
+-
+bass
+treble
+balance
+ui viewport
+channels
+stereo_width
+shuffle
+repeat
+play selected
+party mode
+scan min step
+seek acceleration
+antiskip
+volume fade
+sort case
+show files
+show filename exts
+follow playlist
+playlist viewer icons
+playlist viewer indices
+playlist viewer track display
+recursive directory insert
+scroll speed
+scroll delay
+scroll step
+screen scroll step
+Screen Scrolls Out Of View
+bidir limit
+scroll paginated
+hold_lr_for_scroll_in_list
+show path in browser
+contrast
+backlight timeout
+backlight timeout plugged
+backlight filters first keypress
+backlight on button hold
+caption backlight
+brightness
+disk spindown
+battery capacity
+usb hid
+usb keypad mode
+idle poweroff
+max files in playlist
+max files in dir
+lang
+autocreate bookmarks
+autoload bookmarks
+use most-recent-bookmarks
+pause on headphone unplug
+rewind duration on pause
+disable autoresume if phones not present
+Last.fm Logging
+talk dir
+talk dir clip
+talk file
+talk file clip
+talk filetype
+talk menu
+Announce Battery Level
+hotkey wps
+hotkey tree
+sort files
+sort dirs
+sort interpret number
+tagcache_autoupdate
+warn when erasing dynamic playlist
+cuesheet support
+folder navigation
+gather runtime data
+skip length
+prevent track skip
+start in screen
+playlist catalog directory
+list_accel_start_delay
+list_accel_wait
+replaygain type
+replaygain noclip
+replaygain preamp
+crossfade
+crossfade fade in delay
+crossfade fade out delay
+crossfade fade in duration
+crossfade fade out duration
+crossfade fade out mode
+crossfeed
+crossfeed direct gain
+crossfeed cross gain
+crossfeed hf attenuation
+crossfeed hf cutoff
+eq enabled
+eq precut
+eq band 0 cutoff
+eq band 1 cutoff
+eq band 2 cutoff
+eq band 3 cutoff
+eq band 4 cutoff
+eq band 0 q
+eq band 1 q
+eq band 2 q
+eq band 3 q
+eq band 4 q
+eq band 0 gain
+eq band 1 gain
+eq band 2 gain
+eq band 3 gain
+eq band 4 gain
+dithering enabled
+timestretch enabled
+compressor threshold
+compressor makeup gain
+compressor ratio
+compressor knee
+compressor release time
+beep
+keyclick
+keyclick repeats
+dircache
+tagcache_ram
+peak meter release
+peak meter hold
+peak meter clip hold
+peak meter busy
+peak meter dbfs
+peak meter min
+peak meter max
+statusbar
+scrollbar
+scrollbar width
+volume display
+battery display
+kbd
+invert
+flip display
+selector type
+show icons
+viewers iconset
+line selector start colour
+line selector start color
+line selector end colour
+line selector end color
+line selector text colour
+line selector text color
+filetype colours
+filetype colors
+time format
+rec quality
+rec frequency
+rec source
+rec channels
+rec mic gain
+rec left gain
+rec right gain
+editable recordings
+rec timesplit
+pre-recording time
+rec directory
+

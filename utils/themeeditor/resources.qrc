@@ -4,5 +4,6 @@
         <file>resources/document-new.png</file>
         <file>resources/document-open.png</file>
         <file>resources/document-save.png</file>
+        <file alias="configkeys">resources/configkeys</file>
     </qresource>
 </RCC>
