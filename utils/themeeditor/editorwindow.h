@@ -24,6 +24,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include <QItemSelectionModel>
 
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
@@ -84,6 +85,7 @@ private:
     PreferencesDialog* prefs;
     QLabel* parseStatus;
     ProjectModel* project;
+    QItemSelectionModel* parseTreeSelection;
 };
 
 #endif // EDITORWINDOW_H

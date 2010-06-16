@@ -101,7 +101,6 @@ void EditorWindow::loadSettings()
         restoreState(state);
     }
 
-
 }
 
 void EditorWindow::saveSettings()
@@ -137,6 +136,7 @@ void EditorWindow::setupUI()
     parseStatus = new QLabel(this);
     ui->statusbar->addPermanentWidget(parseStatus);
 
+    parseTreeSelection = 0;
 }
 
 void EditorWindow::setupMenus()
@@ -400,10 +400,14 @@ void EditorWindow::updateCurrent()
 void EditorWindow::lineChanged(int line)
 {
     ui->parseTree->collapseAll();
+    if(parseTreeSelection)
+        parseTreeSelection->deleteLater();
     ParseTreeModel* model = dynamic_cast<ParseTreeModel*>
                             (ui->parseTree->model());
+    parseTreeSelection = new QItemSelectionModel(model);
     expandLine(model, QModelIndex(), line);
     sizeColumns();
+    ui->parseTree->setSelectionModel(parseTreeSelection);
 
 }
 
@@ -412,6 +416,10 @@ void EditorWindow::expandLine(ParseTreeModel* model, QModelIndex parent,
 {
     for(int i = 0; i < model->rowCount(parent); i++)
     {
+        QModelIndex dataType = model->index(i, ParseTreeModel::typeColumn,
+                                            parent);
+        QModelIndex dataVal = model->index(i, ParseTreeModel::valueColumn,
+                                           parent);
         QModelIndex data = model->index(i, ParseTreeModel::lineColumn, parent);
         QModelIndex recurse = model->index(i, 0, parent);
 
@@ -422,6 +430,10 @@ void EditorWindow::expandLine(ParseTreeModel* model, QModelIndex parent,
             ui->parseTree->expand(parent);
             ui->parseTree->expand(data);
             ui->parseTree->scrollTo(parent, QAbstractItemView::PositionAtTop);
+
+            parseTreeSelection->select(data, QItemSelectionModel::Select);
+            parseTreeSelection->select(dataType, QItemSelectionModel::Select);
+            parseTreeSelection->select(dataVal, QItemSelectionModel::Select);
         }
 
     }
