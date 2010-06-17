@@ -32,14 +32,14 @@ extern "C"
 
 /* Debugging functions */
 void skin_error(enum skin_errorcode error);
-int skin_error_line();
-char* skin_error_message();
-void skin_clear_errors();
+int skin_error_line(void);
+char* skin_error_message(void);
+void skin_clear_errors(void);
 void skin_debug_tree(struct skin_element* root);
 
 /* Auxiliary debug functions */
 void skin_debug_params(int count, struct skin_tag_parameter params[]);
-void skin_debug_indent();
+void skin_debug_indent(void);
 
 #ifdef __cplusplus
 }

@@ -29,22 +29,11 @@
 static unsigned char buffer[SKIN_BUFFER_SIZE];
 static unsigned char *buffer_front = NULL; /* start of the free space,
                                               increases with allocation*/
-static size_t buf_size = SKIN_BUFFER_SIZE;
 #endif
 
-void skin_buffer_init(size_t size)
+void skin_buffer_init(void)
 {
-#if 0 /* this will go in again later probably */
-    if (buffer == NULL)
-    {
-        buf_size = SKIN_BUFFER_SIZE;/* global_settings.skin_buf_size */
-
-        buffer = buffer_alloc(buf_size);
-        buffer_front = buffer;
-        buffer_back = bufer + buf_size;
-    }
-    else
-#elif defined(ROCKBOX)
+#if defined(ROCKBOX)
     {
         /* reset the buffer.... */
         buffer_front = buffer;

@@ -99,6 +99,7 @@ void skin_clear_errors()
     error_message = NULL;
 }
 
+#ifndef ROCKBOX
 void skin_debug_tree(struct skin_element* root)
 {
     int i;
@@ -260,3 +261,4 @@ void skin_debug_indent()
     for(i = 0; i < debug_indent_level; i++)
         printf("    ");
 }
+#endif
