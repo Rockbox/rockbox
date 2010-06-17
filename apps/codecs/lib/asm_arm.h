@@ -19,20 +19,30 @@
 #if !defined(_V_WIDE_MATH) && !defined(_LOW_ACCURACY_)
 #define _V_WIDE_MATH
 
+#if ARM_ARCH >= 6
 static inline int32_t MULT32(int32_t x, int32_t y) {
-  int lo,hi;
-  asm volatile("smull\t%0, %1, %2, %3"
+  int32_t hi;
+  asm volatile("smmul %[hi], %[x], %[y] \n\t"
+               : [hi] "=&r" (hi)
+               : [x] "r" (x), [y] "r" (y) );
+  return(hi);
+}
+#else
+static inline int32_t MULT32(int32_t x, int32_t y) {
+  int32_t lo, hi;
+  asm volatile("smull\t%0, %1, %2, %3 \n\t"
                : "=&r"(lo),"=&r"(hi)
                : "r"(x),"r"(y) );
   return(hi);
 }
+#endif
 
 static inline int32_t MULT31(int32_t x, int32_t y) {
   return MULT32(x,y)<<1;
 }
 
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
-  int lo,hi;
+  int32_t lo,hi;
   asm volatile("smull   %0, %1, %2, %3\n\t"
                "movs    %0, %0, lsr #15\n\t"
                "adc %1, %0, %1, lsl #17\n\t"
@@ -44,75 +54,95 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
 
 #define XPROD32(a, b, t, v, x, y) \
 { \
-  long l; \
-  asm(  "smull  %0, %1, %3, %5\n\t" \
-    "rsb    %2, %6, #0\n\t" \
-    "smlal  %0, %1, %4, %6\n\t" \
-    "smull  %0, %2, %3, %2\n\t" \
-    "smlal  %0, %2, %4, %5" \
-    : "=&r" (l), "=&r" (x), "=&r" (y) \
-        : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
+  int32_t l; \
+  asm("smull  %0, %1, %3, %5\n\t" \
+      "rsb    %2, %6, #0\n\t" \
+      "smlal  %0, %1, %4, %6\n\t" \
+      "smull  %0, %2, %3, %2\n\t" \
+      "smlal  %0, %2, %4, %5" \
+      : "=&r" (l), "=&r" (x), "=&r" (y) \
+      : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
-static inline void XPROD31(int32_t  a, int32_t  b,
-               int32_t  t, int32_t  v,
-               int32_t *x, int32_t *y)
-{
-  int x1, y1, l;
-  asm(  "smull  %0, %1, %3, %5\n\t"
-    "rsb    %2, %6, #0\n\t"
-    "smlal  %0, %1, %4, %6\n\t"
-    "smull  %0, %2, %3, %2\n\t"
-    "smlal  %0, %2, %4, %5"
-    : "=&r" (l), "=&r" (x1), "=&r" (y1)
-    : "r" (a), "r" (b), "r" (t), "r" (v) );
-  *x = x1 << 1;
-  *y = y1 << 1;
-}
-
-static inline void XNPROD31(int32_t  a, int32_t  b,
-                int32_t  t, int32_t  v,
-                int32_t *x, int32_t *y)
-{
-  int x1, y1, l;
-  asm(  "smull  %0, %1, %3, %5\n\t"
-    "rsb    %2, %4, #0\n\t"
-    "smlal  %0, %1, %2, %6\n\t"
-    "smull  %0, %2, %4, %5\n\t"
-    "smlal  %0, %2, %3, %6"
-    : "=&r" (l), "=&r" (x1), "=&r" (y1)
-    : "r" (a), "r" (b), "r" (t), "r" (v) );
-  *x = x1 << 1;
-  *y = y1 << 1;
-}
-
+#if ARM_ARCH >= 6
+/* These may yield slightly different result from the macros below
+   because only the high 32 bits of the multiplications are accumulated while
+   the below macros use a 64 bit accumulator that is truncated to 32 bits.*/
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
-  int x1, y1, l;\
-  asm(  "smull  %0, %1, %5, %3\n\t"\
-    "rsb    %2, %3, #0\n\t"\
-    "smlal  %0, %1, %6, %4\n\t"\
-    "smull  %0, %2, %6, %2\n\t"\
-    "smlal  %0, %2, %5, %4"\
-    : "=&r" (l), "=&r" (x1), "=&r" (y1)\
-    : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  int32_t x1, y1;\
+  asm("smmul  %[x1], %[t], %[a] \n\t"\
+      "smmul  %[y1], %[t], %[b] \n\t"\
+      "smmla  %[x1], %[v], %[b], %[x1] \n\t"\
+      "smmls  %[y1], %[v], %[a], %[y1] \n\t"\
+      : [x1] "=&r" (x1), [y1] "=&r" (y1)\
+      : [a] "r" (_a), [b] "r" (_b), [t] "r" (_t), [v] "r" (_v) );\
   _x = x1 << 1;\
   _y = y1 << 1;\
 }
 
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
-  int x1, y1, l;\
-  asm(  "smull  %0, %1, %5, %3\n\t"\
-    "rsb    %2, %4, #0\n\t"\
-    "smlal  %0, %1, %6, %2\n\t"\
-    "smull  %0, %2, %5, %4\n\t"\
-    "smlal  %0, %2, %6, %3"\
-    : "=&r" (l), "=&r" (x1), "=&r" (y1)\
-    : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  int32_t x1, y1;\
+  asm("smmul  %[x1], %[t], %[a] \n\t"\
+      "smmul  %[y1], %[t], %[b] \n\t"\
+      "smmls  %[x1], %[v], %[b], %[x1] \n\t"\
+      "smmla  %[y1], %[v], %[a], %[y1] \n\t"\
+      : [x1] "=&r" (x1), [y1] "=&r" (y1)\
+      : [a] "r" (_a), [b] "r" (_b), [t] "r" (_t), [v] "r" (_v) );\
   _x = x1 << 1;\
   _y = y1 << 1;\
 }
+#else
+#define XPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int32_t x1, y1, l;\
+  asm("smull  %0, %1, %5, %3\n\t"\
+      "rsb    %2, %3, #0\n\t"\
+      "smlal  %0, %1, %6, %4\n\t"\
+      "smull  %0, %2, %6, %2\n\t"\
+      "smlal  %0, %2, %5, %4"\
+      : "=&r" (l), "=&r" (x1), "=&r" (y1)\
+      : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
+}
+
+#define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
+{\
+  int32_t x1, y1, l;\
+  asm("smull  %0, %1, %5, %3\n\t"\
+      "rsb    %2, %4, #0\n\t"\
+      "smlal  %0, %1, %6, %2\n\t"\
+      "smull  %0, %2, %5, %4\n\t"\
+      "smlal  %0, %2, %6, %3"\
+      : "=&r" (l), "=&r" (x1), "=&r" (y1)\
+      : "r" (_a), "r" (_b), "r" (_t), "r" (_v) );\
+  _x = x1 << 1;\
+  _y = y1 << 1;\
+}
+#endif
+
+static inline void XPROD31(int32_t  a, int32_t  b,
+                           int32_t  t, int32_t  v,
+                           int32_t *x, int32_t *y)
+{
+  int32_t _x1, _y1;
+  XPROD31_R(a, b, t, v, _x1, _y1);
+  *x = _x1;
+  *y = _y1;
+}
+
+static inline void XNPROD31(int32_t  a, int32_t  b,
+                            int32_t  t, int32_t  v,
+                            int32_t *x, int32_t *y)
+{
+  int32_t _x1, _y1;
+  XNPROD31_R(a, b, t, v, _x1, _y1);
+  *x = _x1;
+  *y = _y1;
+}
+
 
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
