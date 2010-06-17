@@ -5,17 +5,26 @@ UI_DIR = $$MYBUILDDIR/ui
 MOC_DIR = $$MYBUILDDIR/moc
 RCC_DIR = $$MYBUILDDIR/rcc
 
+RBBASE_DIR = $$_PRO_FILE_PWD_
+RBBASE_DIR = $$replace(RBBASE_DIR,/utils/themeeditor,)
+
 #Include directories
 INCLUDEPATH += gui
-INCLUDEPATH += parser
 INCLUDEPATH += models
 
-HEADERS += parser/tag_table.h \
-    parser/symbols.h \
-    parser/skin_parser.h \
-    parser/skin_scan.h \
-    parser/skin_debug.h \
-    models/parsetreemodel.h \
+
+# Stuff for the parse lib
+libskin_parser.commands = @$(MAKE) \
+        BUILDDIR=$$OBJECTS_DIR -C $$RBBASE_DIR/lib/skin_parser CC=\"$$QMAKE_CC\"
+QMAKE_EXTRA_TARGETS += libskin_parser
+PRE_TARGETDEPS += libskin_parser
+INCLUDEPATH += $$RBBASE_DIR/lib/skin_parser
+LIBS += -L$$OBJECTS_DIR -lskin_parser 
+
+
+DEPENDPATH = $$INCLUDEPATH
+
+HEADERS += models/parsetreemodel.h \
     models/parsetreenode.h \
     gui/editorwindow.h \
     gui/skinhighlighter.h \
@@ -26,11 +35,7 @@ HEADERS += parser/tag_table.h \
     gui/tabcontent.h \
     gui/configdocument.h \
     gui/skinviewer.h
-SOURCES += parser/tag_table.c \
-    parser/skin_parser.c \
-    parser/skin_scan.c \
-    parser/skin_debug.c \
-    main.cpp \
+SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
     gui/editorwindow.cpp \
