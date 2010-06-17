@@ -29,12 +29,21 @@
 #include <QWidget>
 #include <QLabel>
 #include <QMap>
+#include <QWheelEvent>
 
 #include "tabcontent.h"
 
 namespace Ui {
     class ConfigDocument;
 }
+
+class NoScrollCombo: public QComboBox
+{
+public:
+    NoScrollCombo(QWidget* parent = 0) : QComboBox(parent) {}
+
+    void wheelEvent(QWheelEvent* event) { event->ignore(); }
+};
 
 class ConfigDocument : public TabContent {
     Q_OBJECT
@@ -69,7 +78,7 @@ private slots:
 private:
     Ui::ConfigDocument *ui;
     QList<QHBoxLayout*> containers;
-    QList<QComboBox*> keys;
+    QList<NoScrollCombo*> keys;
     QList<QLineEdit*> values;
     QList<QPushButton*> deleteButtons;
     QList<QLabel*> labels;

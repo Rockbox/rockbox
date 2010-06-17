@@ -187,7 +187,7 @@ QString ConfigDocument::toPlainText() const
 void ConfigDocument::addRow(QString key, QString value)
 {
     QHBoxLayout* layout = new QHBoxLayout();
-    QComboBox* keyEdit = new QComboBox(this);
+    NoScrollCombo* keyEdit = new NoScrollCombo(this);
     QLineEdit* valueEdit = new QLineEdit(value, this);
     QPushButton* delButton = new QPushButton(tr("-"), this);
     QLabel* label = new QLabel(":");
@@ -202,6 +202,7 @@ void ConfigDocument::addRow(QString key, QString value)
         keyEdit->setCurrentIndex(keyEdit->findText(key));
     else
         keyEdit->setEditText(key);
+
 
     layout->addWidget(keyEdit);
     layout->addWidget(label);
