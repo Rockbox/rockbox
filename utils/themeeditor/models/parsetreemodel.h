@@ -21,12 +21,14 @@
 
 #include "skin_parser.h"
 #include "skin_debug.h"
+#include "projectmodel.h"
 
 #ifndef PARSETREEMODEL_H
 #define PARSETREEMODEL_H
 
 #include <QAbstractItemModel>
 #include <QList>
+#include <QGraphicsScene>
 
 #include "parsetreenode.h"
 
@@ -58,9 +60,22 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
+    QGraphicsScene* render(ProjectModel* project);
+
+    static QString safeSetting(ProjectModel* project, QString key,
+                               QString fallback)
+    {
+        if(project)
+            return project->getSetting(key, fallback);
+        else
+            return fallback;
+    }
+
+
 private:
     ParseTreeNode* root;
     struct skin_element* tree;
+    QGraphicsScene* scene;
 };
 
 

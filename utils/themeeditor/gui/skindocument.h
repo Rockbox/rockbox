@@ -25,12 +25,14 @@
 #include <QWidget>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QGraphicsScene>
 
 #include "skinhighlighter.h"
 #include "parsetreemodel.h"
 #include "preferencesdialog.h"
 #include "codeeditor.h"
 #include "tabcontent.h"
+#include "projectmodel.h"
 
 class SkinDocument : public TabContent
 {
@@ -46,8 +48,10 @@ public:
                   "All Files (*.*)");
     }
 
-    SkinDocument(QLabel* statusLabel, QWidget *parent = 0);
-    SkinDocument(QLabel* statusLabel, QString file, QWidget* parent = 0);
+    SkinDocument(QLabel* statusLabel, ProjectModel* project = 0,
+                 QWidget *parent = 0);
+    SkinDocument(QLabel* statusLabel, QString file, ProjectModel* project = 0,
+                 QWidget* parent = 0);
     virtual ~SkinDocument();
 
     void connectPrefs(PreferencesDialog* prefs);
@@ -57,6 +61,7 @@ public:
     QString title() const{ return titleText; }
     QString getStatus(){ return parseStatus; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
+    void setProject(ProjectModel* project){ this->project = project; }
 
     void save();
     void saveAs();
@@ -64,6 +69,8 @@ public:
     bool requestClose();
 
     TabType type() const{ return Skin; }
+
+    QGraphicsScene* scene(){ return model->render(project); }
 
 signals:
 
@@ -76,6 +83,7 @@ private slots:
 
 private:
     void setupUI();
+    QString findSetting(QString key, QString fallback);
 
     QString titleText;
     QString fileName;
@@ -91,6 +99,8 @@ private:
     QLabel* statusLabel;
 
     bool blockUpdate;
+
+    ProjectModel* project;
 };
 
 #endif // SKINDOCUMENT_H

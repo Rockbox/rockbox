@@ -36,6 +36,8 @@ ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         this->root = new ParseTreeNode(tree);
     else
         this->root = 0;
+
+    scene = new QGraphicsScene();
 }
 
 
@@ -263,4 +265,16 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
 
     emit dataChanged(index, index);
     return true;
+}
+
+QGraphicsScene* ParseTreeModel::render(ProjectModel* project)
+{
+    scene->clear();
+
+    /* First we set the screen size */
+    int screenWidth = safeSetting(project, "#screenwidth", "300").toInt();
+    int screenHeight = safeSetting(project, "#screenheight", "200").toInt();
+    scene->addRect(0, 0, screenWidth, screenHeight);
+
+    return scene;
 }

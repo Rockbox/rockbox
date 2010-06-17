@@ -29,8 +29,10 @@
 
 #include <iostream>
 
-SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
-        TabContent(parent), statusLabel(statusLabel)
+SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
+                           QWidget *parent)
+                               :TabContent(parent), statusLabel(statusLabel),
+                               project(project)
 {
     setupUI();
 
@@ -41,8 +43,10 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QWidget *parent) :
     blockUpdate = false;
 }
 
-SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
-        TabContent(parent), fileName(file), statusLabel(statusLabel)
+SkinDocument::SkinDocument(QLabel* statusLabel, QString file,
+                           ProjectModel* project, QWidget *parent)
+                               :TabContent(parent), fileName(file),
+                               statusLabel(statusLabel), project(project)
 {
     setupUI();
     blockUpdate = false;
@@ -65,8 +69,8 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QString file, QWidget *parent):
 
 SkinDocument::~SkinDocument()
 {
-    delete highlighter;
-    delete model;
+    highlighter->deleteLater();
+    model->deleteLater();
 }
 
 void SkinDocument::connectPrefs(PreferencesDialog* prefs)
@@ -308,4 +312,12 @@ void SkinDocument::saveAs()
     titleText = decompose[decompose.count() - 1];
     emit titleChanged(titleText);
 
+}
+
+QString SkinDocument::findSetting(QString key, QString fallback)
+{
+    if(!project)
+        return fallback;
+    else
+        return project->getSetting(key, fallback);
 }

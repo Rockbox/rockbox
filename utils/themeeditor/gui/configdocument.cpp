@@ -100,7 +100,7 @@ void ConfigDocument::save()
 
     saved = toPlainText();
     emit titleChanged(title());
-
+    emit configFileChanged(file());
 }
 
 void ConfigDocument::saveAs()

@@ -56,7 +56,7 @@ void EditorWindow::loadTabFromSkinFile(QString fileName)
     }
 
     /* Adding a new document*/
-    SkinDocument* doc = new SkinDocument(parseStatus, fileName);
+    SkinDocument* doc = new SkinDocument(parseStatus, fileName, project);
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
 
@@ -144,11 +144,6 @@ void EditorWindow::setupUI()
     viewer = new SkinViewer(this);
     ui->skinPreviewLayout->addWidget(viewer);
 
-    //TODO: Remove this test code
-    QGraphicsScene* test = new QGraphicsScene();
-    test->addRect(0,0,50,50);
-
-    viewer->setScene(test);
 }
 
 void EditorWindow::setupMenus()
@@ -204,7 +199,7 @@ void EditorWindow::addTab(TabContent *doc)
 
 void EditorWindow::newTab()
 {
-    SkinDocument* doc = new SkinDocument(parseStatus);
+    SkinDocument* doc = new SkinDocument(parseStatus, project);
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
 }
@@ -221,6 +216,7 @@ void EditorWindow::shiftTab(int index)
         ui->actionClose_Document->setEnabled(false);
         ui->actionToolbarSave->setEnabled(false);
         ui->fromTree->setEnabled(false);
+        viewer->setScene(0);
     }
     else if(widget->type() == TabContent::Config)
     {
@@ -228,8 +224,9 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
         ui->actionToolbarSave->setEnabled(true);
+        viewer->setScene(0);
     }
-    else
+    else if(widget->type() == TabContent::Skin)
     {
         /* Syncing the tree view and the status bar */
         SkinDocument* doc = dynamic_cast<SkinDocument*>(widget);
@@ -243,6 +240,9 @@ void EditorWindow::shiftTab(int index)
         ui->fromTree->setEnabled(true);
 
         sizeColumns();
+
+        /* Syncing the preview */
+        viewer->setScene(doc->scene());
 
     }
 }
@@ -331,6 +331,20 @@ void EditorWindow::openProject()
         fileName.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
         settings.setValue("defaultDirectory", fileName);
 
+        for(int i = 0; i < ui->editorTabs->count(); i++)
+        {
+            TabContent* doc = dynamic_cast<TabContent*>
+                              (ui->editorTabs->widget(i));
+            if(doc->type() == TabContent::Skin)
+            {
+                dynamic_cast<SkinDocument*>(doc)->setProject(project);
+                if(i == ui->editorTabs->currentIndex())
+                {
+                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                }
+            }
+        }
+
     }
 
     settings.endGroup();
@@ -339,10 +353,6 @@ void EditorWindow::openProject()
 
 void EditorWindow::configFileChanged(QString configFile)
 {
-
-    QSettings settings;
-
-    settings.beginGroup("ProjectModel");
 
     if(QFile::exists(configFile))
     {
@@ -356,12 +366,22 @@ void EditorWindow::configFileChanged(QString configFile)
         QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
                          project, SLOT(activated(QModelIndex)));
 
-        configFile.chop(configFile.length() - configFile.lastIndexOf('/') - 1);
-        settings.setValue("defaultDirectory", configFile);
+        for(int i = 0; i < ui->editorTabs->count(); i++)
+        {
+            TabContent* doc = dynamic_cast<TabContent*>
+                              (ui->editorTabs->widget(i));
+            if(doc->type() == TabContent::Skin)
+            {
+                dynamic_cast<SkinDocument*>(doc)->setProject(project);
+                if(i == ui->editorTabs->currentIndex())
+                {
+                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                }
+            }
+        }
 
     }
 
-    settings.endGroup();
 
 }
 

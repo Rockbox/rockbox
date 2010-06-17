@@ -44,7 +44,10 @@ public:
     int rowCount(const QModelIndex& parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
-    QString getSetting(QString key){ return settings.value(key, ""); }
+    QString getSetting(QString key, QString fallback = "")
+    {
+        return settings.value(key, fallback);
+    }
 
 signals:
 
