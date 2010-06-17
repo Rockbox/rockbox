@@ -157,11 +157,11 @@ static inline void load_context(const void* addr)
         __attribute__((always_inline));
 
 #if NUM_CORES > 1
-static void __attribute__((noinline, noreturn))
-    thread_final_exit(struct thread_entry *current);
+static void thread_final_exit(struct thread_entry *current)
+    __attribute__((noinline, noreturn));
 #else
-static void __attribute__((always_inline, noreturn))
-    thread_final_exit(struct thread_entry *current);
+static inline void thread_final_exit(struct thread_entry *current)
+    __attribute__((always_inline, noreturn));
 #endif
 
 void switch_thread(void)
