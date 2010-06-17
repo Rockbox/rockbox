@@ -22,10 +22,12 @@
 
 #include "parsetreemodel.h"
 #include "symbols.h"
+#include "rbscreen.h"
 
 #include <cstdlib>
 
 #include <QObject>
+#include <QPixmap>
 
 ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         QAbstractItemModel(parent)
@@ -271,10 +273,12 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project)
 {
     scene->clear();
 
-    /* First we set the screen size */
-    int screenWidth = safeSetting(project, "#screenwidth", "300").toInt();
-    int screenHeight = safeSetting(project, "#screenheight", "200").toInt();
-    scene->addRect(0, 0, screenWidth, screenHeight);
+    /* Setting the background */
+    scene->setBackgroundBrush(QBrush(QPixmap(":/render/scenebg.png")));
+
+    /* Adding the screen */
+    RBScreen* screen = new RBScreen(project);
+    scene->addItem(screen);
 
     return scene;
 }

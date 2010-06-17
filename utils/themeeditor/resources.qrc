@@ -6,4 +6,7 @@
         <file>resources/document-save.png</file>
         <file alias="configkeys">resources/configkeys</file>
     </qresource>
+    <qresource prefix="/render">
+        <file alias="scenebg.png">resources/render/scenebg.png</file>
+    </qresource>
 </RCC>
