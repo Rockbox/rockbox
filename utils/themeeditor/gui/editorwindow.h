@@ -46,7 +46,7 @@ class EditorWindow : public QMainWindow
     Q_OBJECT
 public:
     EditorWindow(QWidget *parent = 0);
-    ~EditorWindow();
+    virtual ~EditorWindow();
 
     /* A public function so external widgets can load files */
     void loadTabFromSkinFile(QString fileName);

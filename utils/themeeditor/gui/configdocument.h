@@ -41,6 +41,7 @@ class NoScrollCombo: public QComboBox
 {
 public:
     NoScrollCombo(QWidget* parent = 0) : QComboBox(parent) {}
+    virtual ~NoScrollCombo(){ }
 
     void wheelEvent(QWheelEvent* event) { event->ignore(); }
 };

@@ -33,7 +33,7 @@ class PreferencesDialog : public QDialog {
     Q_OBJECT
 public:
     PreferencesDialog(QWidget *parent = 0);
-    ~PreferencesDialog();
+    virtual ~PreferencesDialog();
 
     static void setButtonColor(QPushButton* button, QColor color)
     {
