@@ -683,18 +683,18 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     {
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
-            goto sd_transfer_error;
+            goto sd_transfer_error_nodma;
     }
 
     if(count < 0) /* XXX: why is it signed ? */
     {
         ret = -20;
-        goto sd_transfer_error;
+        goto sd_transfer_error_nodma;
     }
     if((start+count) > card_info[drive].numblocks)
     {
         ret = -21;
-        goto sd_transfer_error;
+        goto sd_transfer_error_nodma;
     }
 
     /* skip SanDisk OF */
@@ -824,6 +824,8 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 sd_transfer_error:
 
     dma_release();
+
+sd_transfer_error_nodma:
 
 #ifndef BOOTLOADER
     led(false);

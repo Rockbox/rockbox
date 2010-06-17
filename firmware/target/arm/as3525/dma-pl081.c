@@ -45,6 +45,8 @@ void dma_release(void)
         DMAC_CONFIGURATION &= ~(1<<0);
         CGU_PERI &= ~CGU_DMA_CLOCK_ENABLE;
     }
+    if (dma_used < 0)
+        panicf("dma_used < 0!");
 }
 
 void dma_init(void)
