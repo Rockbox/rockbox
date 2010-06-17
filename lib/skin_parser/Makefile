@@ -9,7 +9,7 @@
 
 BUILDDIR ?= .
 
-SRC = skin_parser.c skin_debug.c skin_scan.c tag_table.c
+SRC = skin_buffer.c skin_parser.c skin_debug.c skin_scan.c tag_table.c
 OBJ := $(patsubst %.c,$(BUILDDIR)/%.o,$(SRC))
 OUT = $(BUILDDIR)/libskin_parser.a
 CC = gcc

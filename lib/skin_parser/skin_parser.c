@@ -24,18 +24,12 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "skin_buffer.h"
 #include "skin_parser.h"
 #include "skin_debug.h"
 #include "tag_table.h"
 #include "symbols.h"
 #include "skin_scan.h"
-
-#ifdef ROCKBOX
-/* Declaration of parse tree buffer */
-#define SKIN_MAX_MEMORY (30*1024)
-static char skin_parse_tree[SKIN_MAX_MEMORY];
-static char *skin_buffer;
-#endif
 
 /* Global variables for the parser */
 int skin_line = 0;
@@ -66,11 +60,7 @@ struct skin_element* skin_parse(const char* document)
     struct skin_element** to_write = 0;
 
     char* cursor = (char*)document; /*Keeps track of location in the document*/
-#ifdef ROCKBOX
-    /* FIXME */
-    skin_buffer = &skin_parse_tree[0];
-#endif
-
+    
     skin_line = 1;
 
     skin_clear_errors();
@@ -765,8 +755,9 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
 static int skin_parse_comment(struct skin_element* element, char** document)
 {
     char* cursor = *document;
+#ifndef ROCKBOX
     char* text = NULL;
-
+#endif
     int length;
     /*
      * Finding the index of the ending newline or null-terminator
@@ -847,13 +838,7 @@ static struct skin_element* skin_parse_code_as_arg(char** document)
 /* Memory management */
 char* skin_alloc(size_t size)
 {
-#ifdef ROCKBOX
-    char *retval = skin_buffer;
-    skin_buffer = (void *)(((unsigned long)skin_buffer + 3) & ~3);
-    return retval;
-#else
-    return malloc(size);
-#endif
+    return skin_buffer_alloc(size);
 }
 
 struct skin_element* skin_alloc_element()
