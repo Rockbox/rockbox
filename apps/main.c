@@ -694,7 +694,7 @@ static void init(void)
 }
 
 #ifdef CPU_PP
-void cop_main(void)
+void __attribute__((noreturn)) cop_main(void)
 {
 /* This is the entry point for the coprocessor
    Anyone not running an upgraded bootloader will never reach this point,
@@ -705,7 +705,6 @@ void cop_main(void)
    destroyed for purposes of continuity. The cop sits idle until at least
    one thread exists on it. */
 
-/* 3G doesn't have Rolo or dual core support yet */
 #if NUM_CORES > 1
     system_init();
     kernel_init();
@@ -717,5 +716,4 @@ void cop_main(void)
 }
 #endif /* CPU_PP */
 
-#endif
-
+#endif /* SIMULATOR */

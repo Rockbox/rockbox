@@ -630,6 +630,11 @@ void remove_thread(unsigned int thread_id)
 void thread_exit(void)
 {
     remove_thread(THREAD_ID_CURRENT);
+    /* This should never and must never be reached - if it is, the
+     * state is corrupted */
+    THREAD_PANICF("thread_exit->K:*R",
+                  thread_id_entry(THREAD_ID_CURRENT));
+    while (1);
 }
 
 void thread_wait(unsigned int thread_id)

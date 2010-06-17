@@ -375,7 +375,7 @@ void thread_thaw(unsigned int thread_id);
 /* Wait for a thread to exit */
 void thread_wait(unsigned int thread_id);
 /* Exit the current thread */
-void thread_exit(void);
+void thread_exit(void) __attribute__((noreturn));
 #if defined(DEBUG) || defined(ROCKBOX_HAS_LOGF)
 #define ALLOW_REMOVE_THREAD
 /* Remove a thread from the scheduler */

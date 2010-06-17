@@ -156,6 +156,14 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
         __attribute__((always_inline));
 
+#if NUM_CORES > 1
+static void __attribute__((noinline, noreturn))
+    thread_final_exit(struct thread_entry *current);
+#else
+static void __attribute__((always_inline, noreturn))
+    thread_final_exit(struct thread_entry *current);
+#endif
+
 void switch_thread(void)
         __attribute__((noinline));
 
@@ -219,7 +227,7 @@ static void thread_stkov(struct thread_entry *thread)
 #define LOCK_THREAD(thread) \
     ({ corelock_lock(&(thread)->slot_cl); })
 #define TRY_LOCK_THREAD(thread) \
-    ({ corelock_try_lock(&thread->slot_cl); })
+    ({ corelock_try_lock(&(thread)->slot_cl); })
 #define UNLOCK_THREAD(thread) \
     ({ corelock_unlock(&(thread)->slot_cl); })
 #define UNLOCK_THREAD_AT_TASK_SWITCH(thread) \
@@ -854,7 +862,8 @@ struct thread_entry *
  * catch something.
  *---------------------------------------------------------------------------
  */
-static void check_for_obj_waiters(const char *function, struct thread_entry *thread)
+static void __attribute__((noinline)) check_for_obj_waiters(
+    const char *function, struct thread_entry *thread)
 {
     /* Only one bit in the mask should be set with a frequency on 1 which
      * represents the thread's own base priority */
@@ -1663,10 +1672,39 @@ void thread_wait(unsigned int thread_id)
  * Exit the current thread. The Right Way to Do Things (TM).
  *---------------------------------------------------------------------------
  */
+/* This is done to foil optimizations that may require the current stack,
+ * such as optimizing subexpressions that put variables on the stack that
+ * get used after switching stacks. */
+static void thread_final_exit(struct thread_entry *current)
+{
+#if NUM_CORES > 1
+    cpucache_flush();
+
+    /* Switch to the idle stack if not on the main core (where "main"
+     * runs) - we can hope gcc doesn't need the old stack beyond this
+     * point. */
+    if (current->core != CPU)
+    {
+        switch_to_idle_stack(current->core);
+    }
+
+    /* At this point, this thread isn't using resources allocated for
+     * execution except the slot itself. */
+#endif /* NUM_CORES */
+
+    /* Signal this thread */
+    thread_queue_wake(&current->queue);
+    corelock_unlock(&current->waiter_cl);
+    switch_thread();
+    /* This should never and must never be reached - if it is, the
+     * state is corrupted */
+    THREAD_PANICF("thread_exit->K:*R", current);
+    while (1);
+}
+
 void thread_exit(void)
 {
-    const unsigned int core = CURRENT_CORE;
-    struct thread_entry *current = cores[core].running;
+    register struct thread_entry * current = cores[CURRENT_CORE].running;
 
     /* Cancel CPU boost if any */
     cancel_cpu_boost();
@@ -1701,34 +1739,14 @@ void thread_exit(void)
     /* Switch tasks and never return */
     block_thread_on_l(current, STATE_KILLED);
 
-#if NUM_CORES > 1
-    /* Switch to the idle stack if not on the main core (where "main"
-     * runs) - we can hope gcc doesn't need the old stack beyond this
-     * point. */
-    if (core != CPU)
-    {
-        switch_to_idle_stack(core);
-    }
-
-    cpucache_flush();
-
-    /* At this point, this thread isn't using resources allocated for
-     * execution except the slot itself. */
-#endif
+    /* Slot must be unusable until thread is really gone */
+    UNLOCK_THREAD_AT_TASK_SWITCH(current);
 
     /* Update ID for this slot */
     new_thread_id(current->id, current);
     current->name = NULL;
 
-    /* Signal this thread */
-    thread_queue_wake(&current->queue);
-    corelock_unlock(&current->waiter_cl);
-    /* Slot must be unusable until thread is really gone */
-    UNLOCK_THREAD_AT_TASK_SWITCH(current);
-    switch_thread();
-    /* This should never and must never be reached - if it is, the
-     * state is corrupted */
-    THREAD_PANICF("thread_exit->K:*R", current);
+    thread_final_exit(current);
 }
 
 #ifdef ALLOW_REMOVE_THREAD
