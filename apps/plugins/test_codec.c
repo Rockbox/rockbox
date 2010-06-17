@@ -676,7 +676,7 @@ static enum plugin_status test_track(const char* filename)
     
     if (checksum)
     {
-        rb->snprintf(str, sizeof(str), "CRC32 - %x", (unsigned)crc32);
+        rb->snprintf(str, sizeof(str), "CRC32 - %08x", (unsigned)crc32);
         log_text(str,true);
     }
     else if (wavinfo.fd < 0) 
