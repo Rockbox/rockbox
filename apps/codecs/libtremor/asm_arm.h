@@ -43,50 +43,6 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   return(hi);
 }
 
-#define XPROD32(a, b, t, v, x, y) \
-{ \
-  long l; \
-  asm(  "smull  %0, %1, %4, %6\n\t" \
-        "rsb    %3, %4, #0\n\t" \
-        "smlal  %0, %1, %5, %7\n\t" \
-        "smull  %0, %2, %5, %6\n\t" \
-        "smlal  %0, %2, %3, %7" \
-        : "=&r" (l), "=&r" (x), "=&r" (y), "=r" ((a)) \
-        : "3" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
-}
-
-static inline void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
-                           ogg_int32_t  t, ogg_int32_t  v,
-                           ogg_int32_t *x, ogg_int32_t *y)
-{
-  int x1, y1, l;
-  asm(  "smull  %0, %1, %4, %6\n\t"
-        "rsb    %3, %4, #0\n\t"
-        "smlal  %0, %1, %5, %7\n\t"
-        "smull  %0, %2, %5, %6\n\t"
-        "smlal  %0, %2, %3, %7"
-        : "=&r" (l), "=&r" (x1), "=&r" (y1), "=r" (a)
-        : "3" (a), "r" (b), "r" (t), "r" (v) );
-  *x = x1 << 1;
-  *y = y1 << 1;
-}
-
-static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
-                            ogg_int32_t  t, ogg_int32_t  v,
-                            ogg_int32_t *x, ogg_int32_t *y)
-{
-  int x1, y1, l;
-  asm(  "smull  %0, %1, %3, %5\n\t"
-        "rsb    %2, %4, #0\n\t"
-        "smlal  %0, %1, %2, %6\n\t"
-        "smull  %0, %2, %4, %5\n\t"
-        "smlal  %0, %2, %3, %6"
-        : "=&r" (l), "=&r" (x1), "=&r" (y1)
-        : "r" (a), "r" (b), "r" (t), "r" (v) );
-  *x = x1 << 1;
-  *y = y1 << 1;
-}
-
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
 
