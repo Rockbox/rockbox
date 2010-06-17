@@ -58,6 +58,7 @@ include $(TOOLSDIR)/tools.make
 ifeq (,$(findstring checkwps,$(APPSDIR)))
   ifeq (,$(findstring database,$(APPSDIR)))
     include $(FIRMDIR)/firmware.make
+    include $(ROOTDIR)/lib/skin_parser/skin_parser.make
     include $(ROOTDIR)/apps/bitmaps/bitmaps.make
   endif
 endif
@@ -158,14 +159,14 @@ $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
-$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKRAM)
+$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
 		-lgcc $(BOOTBOXLDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
-$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKROM)
+$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc -L$(BUILDDIR)/firmware \
 		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
