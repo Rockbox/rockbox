@@ -27,6 +27,7 @@
 #include <QFileSystemModel>
 #include <QSettings>
 #include <QFileDialog>
+#include <QGraphicsScene>
 
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -136,7 +137,18 @@ void EditorWindow::setupUI()
     parseStatus = new QLabel(this);
     ui->statusbar->addPermanentWidget(parseStatus);
 
+    /* Setting the selection for parse tree highlighting initially NULL */
     parseTreeSelection = 0;
+
+    /* Adding the skin viewer */
+    viewer = new SkinViewer(this);
+    ui->skinPreviewLayout->addWidget(viewer);
+
+    //TODO: Remove this test code
+    QGraphicsScene* test = new QGraphicsScene();
+    test->addRect(0,0,50,50);
+
+    viewer->setScene(test);
 }
 
 void EditorWindow::setupMenus()

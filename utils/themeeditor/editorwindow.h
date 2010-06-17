@@ -31,6 +31,7 @@
 #include "skindocument.h"
 #include "configdocument.h"
 #include "preferencesdialog.h"
+#include "skinviewer.h"
 
 class ProjectModel;
 class TabContent;
@@ -86,6 +87,7 @@ private:
     QLabel* parseStatus;
     ProjectModel* project;
     QItemSelectionModel* parseTreeSelection;
+    SkinViewer* viewer;
 };
 
 #endif // EDITORWINDOW_H

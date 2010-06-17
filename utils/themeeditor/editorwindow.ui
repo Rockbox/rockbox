@@ -40,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -79,10 +79,10 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="skinPreviewContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QGraphicsView" name="skinPreview"/>
+      <layout class="QVBoxLayout" name="skinPreviewLayout"/>
      </item>
     </layout>
    </widget>
@@ -296,7 +296,6 @@
  </widget>
  <tabstops>
   <tabstop>projectTree</tabstop>
-  <tabstop>skinPreview</tabstop>
   <tabstop>parseTree</tabstop>
   <tabstop>fromTree</tabstop>
   <tabstop>editorTabs</tabstop>
