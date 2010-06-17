@@ -56,3 +56,16 @@ void* skin_buffer_alloc(size_t size)
 #endif
     return retval;
 }
+
+
+#ifdef ROCKBOX
+/* get the number of bytes currently being used */
+size_t skin_buffer_usage(void)
+{
+    return buffer_front - buffer;
+}
+size_t skin_buffer_freespace(void)
+{
+    return SKIN_BUFFER_SIZE - skin_buffer_usage();
+}
+#endif

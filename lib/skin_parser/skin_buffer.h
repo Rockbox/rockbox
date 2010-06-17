@@ -28,4 +28,8 @@
 void skin_buffer_init(size_t size);
 /* Allocate size bytes from the buffer */
 void* skin_buffer_alloc(size_t size);
+
+/* get the number of bytes currently being used */
+size_t skin_buffer_usage(void);
+size_t skin_buffer_freespace(void);
 #endif

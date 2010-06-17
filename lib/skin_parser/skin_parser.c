@@ -51,6 +51,8 @@ static int skin_parse_conditional(struct skin_element* element,
 static int skin_parse_comment(struct skin_element* element, char** document);
 static struct skin_element* skin_parse_code_as_arg(char** document);
 
+
+
 struct skin_element* skin_parse(const char* document)
 {
 
@@ -836,15 +838,10 @@ static struct skin_element* skin_parse_code_as_arg(char** document)
 
 
 /* Memory management */
-char* skin_alloc(size_t size)
-{
-    return skin_buffer_alloc(size);
-}
-
 struct skin_element* skin_alloc_element()
 {
     struct skin_element* retval =  (struct skin_element*)
-                                   skin_alloc(sizeof(struct skin_element));
+                                   skin_buffer_alloc(sizeof(struct skin_element));
     retval->type = UNKNOWN;
     retval->next = NULL;
     retval->tag = NULL;
@@ -858,19 +855,19 @@ struct skin_element* skin_alloc_element()
 struct skin_tag_parameter* skin_alloc_params(int count)
 {
     size_t size = sizeof(struct skin_tag_parameter) * count;
-    return (struct skin_tag_parameter*)skin_alloc(size);
+    return (struct skin_tag_parameter*)skin_buffer_alloc(size);
 
 }
 
 char* skin_alloc_string(int length)
 {
-    return (char*)skin_alloc(sizeof(char) * (length + 1));
+    return (char*)skin_buffer_alloc(sizeof(char) * (length + 1));
 }
 
 struct skin_element** skin_alloc_children(int count)
 {
     return (struct skin_element**)
-            skin_alloc(sizeof(struct skin_element*) * count);
+            skin_buffer_alloc(sizeof(struct skin_element*) * count);
 }
 
 void skin_free_tree(struct skin_element* root)

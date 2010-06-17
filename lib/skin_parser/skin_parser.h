@@ -122,7 +122,6 @@ struct skin_element
 struct skin_element* skin_parse(const char* document);
 
 /* Memory management functions */
-char *skin_alloc(size_t size);
 struct skin_element* skin_alloc_element(void);
 struct skin_element** skin_alloc_children(int count);
 struct skin_tag_parameter* skin_alloc_params(int count);
