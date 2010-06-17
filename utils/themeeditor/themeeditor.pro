@@ -4,37 +4,43 @@ OBJECTS_DIR = $$MYBUILDDIR/o
 UI_DIR = $$MYBUILDDIR/ui
 MOC_DIR = $$MYBUILDDIR/moc
 RCC_DIR = $$MYBUILDDIR/rcc
-HEADERS += tag_table.h \
-    symbols.h \
-    skin_parser.h \
-    skin_scan.h \
-    skin_debug.h \
-    parsetreemodel.h \
-    parsetreenode.h \
-    editorwindow.h \
-    skinhighlighter.h \
-    skindocument.h \
-    preferencesdialog.h \
-    codeeditor.h \
-    projectmodel.h \
-    tabcontent.h \
-    configdocument.h \
-    skinviewer.h
-SOURCES += tag_table.c \
-    skin_parser.c \
-    skin_scan.c \
-    skin_debug.c \
+
+#Include directories
+INCLUDEPATH += gui
+INCLUDEPATH += parser
+INCLUDEPATH += models
+
+HEADERS += parser/tag_table.h \
+    parser/symbols.h \
+    parser/skin_parser.h \
+    parser/skin_scan.h \
+    parser/skin_debug.h \
+    models/parsetreemodel.h \
+    models/parsetreenode.h \
+    gui/editorwindow.h \
+    gui/skinhighlighter.h \
+    gui/skindocument.h \
+    gui/preferencesdialog.h \
+    gui/codeeditor.h \
+    models/projectmodel.h \
+    gui/tabcontent.h \
+    gui/configdocument.h \
+    gui/skinviewer.h
+SOURCES += parser/tag_table.c \
+    parser/skin_parser.c \
+    parser/skin_scan.c \
+    parser/skin_debug.c \
     main.cpp \
-    parsetreemodel.cpp \
-    parsetreenode.cpp \
-    editorwindow.cpp \
-    skinhighlighter.cpp \
-    skindocument.cpp \
-    preferencesdialog.cpp \
-    codeeditor.cpp \
-    projectmodel.cpp \
-    configdocument.cpp \
-    skinviewer.cpp
+    models/parsetreemodel.cpp \
+    models/parsetreenode.cpp \
+    gui/editorwindow.cpp \
+    gui/skinhighlighter.cpp \
+    gui/skindocument.cpp \
+    gui/preferencesdialog.cpp \
+    gui/codeeditor.cpp \
+    models/projectmodel.cpp \
+    gui/configdocument.cpp \
+    gui/skinviewer.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -42,8 +48,8 @@ OTHER_FILES += README \
     resources/document-save.png \
     resources/document-open.png \
     resources/document-new.png
-FORMS += editorwindow.ui \
-    preferencesdialog.ui \
-    configdocument.ui \
-    skinviewer.ui
+FORMS += gui/editorwindow.ui \
+    gui/preferencesdialog.ui \
+    gui/configdocument.ui \
+    gui/skinviewer.ui
 RESOURCES += resources.qrc
