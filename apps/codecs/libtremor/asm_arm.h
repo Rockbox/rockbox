@@ -112,6 +112,32 @@ void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
   } while (n);
 }
 
+#if ARM_ARCH >= 6
+static inline 
+void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  /* Note, mult_fw uses MULT31 */
+  do{
+    asm volatile (
+                  "ldmia %[d], {r0, r1, r2, r3};"
+                  "ldmia %[w]!, {r4, r5, r6, r7};"
+                  "smmul r0, r4, r0;"
+                  "smmul r1, r5, r1;"
+                  "smmul r2, r6, r2;"
+                  "smmul r3, r7, r3;"
+                  "mov   r0, r0, lsl #1;"
+                  "mov   r1, r1, lsl #1;"
+                  "mov   r2, r2, lsl #1;"
+                  "mov   r3, r3, lsl #1;"
+                  "stmia %[d]!, {r0, r1, r2, r3};"
+                  : [d] "+r" (data), [w] "+r" (window)
+                  : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7",
+                  "memory" );
+    n -= 4;
+  } while (n);
+}
+#else
 static inline 
 void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
@@ -136,7 +162,30 @@ void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
     n -= 4;
   } while (n);
 }
+#endif
 
+#if ARM_ARCH >= 6
+static inline
+void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+{
+  /* NOTE mult_bw uses MULT_32 i.e. doesn't shift result left at end */
+  /* On ARM, we can do the shift at the same time as the overlap-add */
+  do{
+    asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
+                  "ldmda %[w]!, {r4, r5, r6, r7};"
+                  "smmul r0, r7, r0;"
+                  "smmul r1, r6, r1;"
+                  "smmul r2, r5, r2;"
+                  "smmul r3, r4, r3;"
+                  "stmia %[d]!, {r0, r1, r2, r3};"
+                  : [d] "+r" (data), [w] "+r" (window)
+                  : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7",
+                  "memory" );
+    n -= 4;
+  } while (n);
+}
+#else
 static inline
 void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
@@ -157,6 +206,7 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
     n -= 4;
   } while (n);
 }
+#endif
 
 static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
