@@ -185,19 +185,15 @@
 #define HAVE_HOTSWAP
 #endif
 
-#ifndef BOOTLOADER
-
-#define USB_HANDLED_BY_OF
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_AS3525v2
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
+#define USB_HANDLED_BY_OF
+//#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x74c3   /* MSC = 0x74c3, MTP = 0x74c2 */
-
-#endif /* !BOOTLOADER */
 
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ

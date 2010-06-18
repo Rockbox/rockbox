@@ -132,18 +132,14 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#ifndef BOOTLOADER
-
-#define USB_HANDLED_BY_OF
-
 #define CONFIG_USBOTG USBOTG_AS3525
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
+#define USB_HANDLED_BY_OF
+//#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x7431
-
-#endif /* BOOTLOADER */
 
 #define CONFIG_LCD LCD_SSD1815
 

@@ -172,19 +172,15 @@
 /* Type of LCD */
 #define CONFIG_LCD LCD_SSD1303
 
-#ifndef BOOTLOADER
-
-#define USB_HANDLED_BY_OF
-//#define USE_ROCKBOX_USB
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_AS3525v2
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
+#define USB_HANDLED_BY_OF
+//#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x74d1
-#endif /* BOOTLOADER */
 
 
 /* Virtual LED (icon) */
