@@ -38,6 +38,10 @@
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
  * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ *
+ * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
+ * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
+ * prevent namespace collisions and adding duplicate wrappers.
  */
 
 
