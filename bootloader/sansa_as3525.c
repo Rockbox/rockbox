@@ -122,11 +122,10 @@ void main(void)
     if(ret < 0)
         error(EBOOTFILE, ret);
 
-    disable_irq(); /* disable irq until we have copied the new vectors */
-
     if (ret == EOK)
     {
         kernel_entry = (void*) loadbuffer;
+        cpucache_invalidate();
         printf("Executing");
         kernel_entry();
         printf("ERR: Failed to boot");

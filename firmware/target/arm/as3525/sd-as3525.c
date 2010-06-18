@@ -672,9 +672,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
-#ifndef BOOTLOADER
     led(true);
-#endif
 
     if (card_info[drive].initialized <= 0)
     {
@@ -824,9 +822,7 @@ sd_transfer_error:
 
 sd_transfer_error_nodma:
 
-#ifndef BOOTLOADER
     led(false);
-#endif
     sd_enable(false);
 
     if (ret)    /* error */
@@ -848,12 +844,10 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 }
 
-#ifndef BOOTLOADER
 long sd_last_disk_activity(void)
 {
     return last_disk_activity;
 }
-#endif /* !BOOTLOADER */
 
 void sd_enable(bool on)
 {

@@ -30,9 +30,6 @@
 #include "clock-target.h"
 #include "fmradio_i2c.h"
 #include "button-target.h"
-#ifndef BOOTLOADER
-#include "mmu-arm.h"
-#endif
 #include "backlight-target.h"
 
 #define default_interrupt(name) \
@@ -210,81 +207,6 @@ static inline void check_model_variant(void)
 }
 #endif /* SANSA_C200V2*/
 
-#if defined(BOOTLOADER)
-static void sdram_delay(void)
-{
-    int delay = 1024; /* arbitrary */
-    while (delay--) ;
-}
-
-/* Use the same initialization than OF */
-static void sdram_init(void)
-{
-    CGU_PERI |= (CGU_EXTMEM_CLOCK_ENABLE|CGU_EXTMEMIF_CLOCK_ENABLE);
-
-    MPMC_CONTROL = 0x1; /* enable MPMC */
-
-    MPMC_DYNAMIC_CONTROL = 0x183; /* SDRAM NOP, all clocks high */
-    sdram_delay();
-
-    MPMC_DYNAMIC_CONTROL = 0x103; /* SDRAM PALL, all clocks high */
-    sdram_delay();
-
-    MPMC_DYNAMIC_REFRESH = 0x138; /* 0x138 * 16 HCLK ticks between SDRAM refresh cycles */
-
-    MPMC_CONFIG = 0; /* little endian, HCLK:MPMCCLKOUT[3:0] ratio = 1:1 */
-
-    if(MPMC_PERIPH_ID2 & 0xf0)
-        MPMC_DYNAMIC_READ_CONFIG = 0x1; /* command delayed, clock out not delayed */
-
-    /* timings */
-    MPMC_DYNAMIC_tRP    = 2;
-    MPMC_DYNAMIC_tRAS   = 4;
-    MPMC_DYNAMIC_tSREX  = 5;
-    MPMC_DYNAMIC_tAPR   = 0;
-    MPMC_DYNAMIC_tDAL   = 4;
-    MPMC_DYNAMIC_tWR    = 2;
-    MPMC_DYNAMIC_tRC    = 5;
-    MPMC_DYNAMIC_tRFC   = 5;
-    MPMC_DYNAMIC_tXSR   = 5;
-    MPMC_DYNAMIC_tRRD   = 2;
-    MPMC_DYNAMIC_tMRD   = 2;
-
-#if defined(SANSA_CLIP) || defined(SANSA_M200V4) || defined(SANSA_C200V2)
-/* 16 bits external bus, low power SDRAM, 16 Mbits = 2 Mbytes */
-#define MEMORY_MODEL 0x21
-
-#elif defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_CLIPV2) \
-    || defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
-/* 16 bits external bus, high performance SDRAM, 64 Mbits = 8 Mbytes */
-#define MEMORY_MODEL 0x5
-
-#else
-#error "The external memory in your player is unknown"
-#endif
-
-    MPMC_DYNAMIC_RASCAS_0 = (2<<8)|2; /* CAS & RAS latency = 2 clock cycles */
-    MPMC_DYNAMIC_CONFIG_0 = (MEMORY_MODEL << 7);
-
-    MPMC_DYNAMIC_RASCAS_1 = MPMC_DYNAMIC_CONFIG_1 =
-    MPMC_DYNAMIC_RASCAS_2 = MPMC_DYNAMIC_CONFIG_2 =
-    MPMC_DYNAMIC_RASCAS_3 = MPMC_DYNAMIC_CONFIG_3 = 0;
-
-    MPMC_DYNAMIC_CONTROL = 0x82; /* SDRAM MODE, MPMCCLKOUT runs continuously */
-
-    /* program the SDRAM mode register */
-    /* FIXME: details the exact settings of mode register */
-    asm volatile(
-        "ldr r4, [%0]\n"
-        : : "p"(0x30000000+0x2300*MEM) : "r4");
-
-    /* SDRAM NORMAL, MPMCCLKOUT stopped when SDRAM is idle */
-    MPMC_DYNAMIC_CONTROL = 0x0;
-
-    MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
-}
-#endif /* BOOTLOADER */
-
 void system_init(void)
 {
 #if CONFIG_CPU == AS3525v2
@@ -343,9 +265,7 @@ void system_init(void)
 #endif
                   AS3525_PCLK_SEL);
 
-#if defined(BOOTLOADER)
-    sdram_init();
-#elif defined(SANSA_FUZE) || defined(SANSA_CLIP) || defined(SANSA_E200V2)
+#if !defined(BOOTLOADER) && defined(SANSA_FUZE) || defined(SANSA_CLIP) || defined(SANSA_E200V2)
     /* XXX: remove me when we have a new bootloader */
     MPMC_DYNAMIC_CONTROL = 0x0; /* MPMCCLKOUT stops when all SDRAMs are idle */
 #endif  /* BOOTLOADER */

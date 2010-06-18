@@ -31,7 +31,6 @@
 #endif
 
 /* Virtual addresses */
-/* Do not apply to the bootloader, which uses physical addresses (no MMU) */
 #define DRAM_ORIG 0x30000000
 #define IRAM_ORIG (DRAM_ORIG + DRAM_SIZE) /* IRAM is mapped just next to DRAM */
 

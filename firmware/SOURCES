@@ -441,6 +441,7 @@ target/arm/pnx0101/timer-pnx0101.c
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
 target/arm/as3525/system-as3525.c
+target/arm/as3525/memory-init.S
 target/arm/as3525/kernel-as3525.c
 target/arm/as3525/timer-as3525.c
 #if CONFIG_CPU == AS3525
@@ -455,8 +456,8 @@ target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c
 target/arm/as3525/ascodec-as3525.c
-#ifndef BOOTLOADER
 target/arm/mmu-arm.S
+#ifndef BOOTLOADER
 drivers/generic_i2c.c
 target/arm/adc-as3514.c
 target/arm/as3525/audio-as3525.c

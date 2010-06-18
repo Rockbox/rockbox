@@ -396,8 +396,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].rc = -1;
 
     /* remove data buffer from cache */
-    if (!is_bootloader()) /* bootloader is running uncached */
-        invalidate_dcache();
+    invalidate_dcache();
 
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
@@ -448,8 +447,7 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].rc = -1;
 
     /* Make sure data is committed to memory */
-    if (!is_bootloader()) /* bootloader is running uncached */
-        clean_dcache();
+    clean_dcache();
 
     logf("xx%s\n", make_hex(ptr, len));
 
@@ -556,8 +554,7 @@ static void handle_out_ep(int ep)
              /*
               * If parts of the just dmaed range are in cache, dump them now.
               */
-             if (!is_bootloader()) /* bootloader is running uncached */
-                 dump_dcache_range(uc_desc->data_ptr, dma_len);
+             dump_dcache_range(uc_desc->data_ptr, dma_len);
         } else{
              logf("EP%d OUT token, st:%08x frm:%x (no data)\n", ep,
                  dma_mst, dma_frm);

@@ -23,12 +23,6 @@
 
 #include "as3525.h"
 
-#ifdef BOOTLOADER
-#define is_bootloader() 1
-#else
-#define is_bootloader() 0
-#endif /* BOOTLOADER */
-
 #define USB_NUM_EPS         4
 
 typedef struct {

@@ -6,39 +6,31 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
 
-#ifdef SANSA_CLIPV2
-#define RAMORIG 0x0             /* DRAM */
-#define RAMSIZE (MEM*0x100000)
-#else
-#define RAMORIG 0x81000000      /* IRAM */
-#define RAMSIZE 0x50000
-#endif
+#define LOAD_SIZE 0x100000  /* Reserve 1MB for loading the firmware */
 
 MEMORY
 {
-    RAM : ORIGIN = RAMORIG, LENGTH = RAMSIZE
+    IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
+    DRAM : ORIGIN = DRAM_ORIG + LOAD_SIZE, LENGTH = DRAM_SIZE - LOAD_SIZE - TTB_SIZE
 }
 
 SECTIONS
 {
-  . = RAMORIG;
+  . = IRAM_ORIG;
 
   .text : {
     *(.init.text)
     *(.glue_7)
     *(.glue_7t)
     *(.text*)
-  } > RAM
+    *(.icode)
+  } > IRAM
 
   .data : {
-    *(.icode)
-    *(.irodata)
-    *(.idata)
     *(.data*)
-    *(.ncdata*)
     *(.rodata*)
     _dataend = . ;
-   } > RAM
+   } > IRAM
 
   .stack  (NOLOAD) :
   {
@@ -48,14 +40,12 @@ SECTIONS
      . += 0x2000;
      _stackend = .;
      stackend = .;
-  } > RAM
+  } > IRAM
 
   .bss (NOLOAD) : {
      _edata = .;
      *(.bss*);
-     *(.ibss);
      *(COMMON)
-     *(.ncbss*);
      _end = .;
-   } > RAM
+   } > DRAM
 }

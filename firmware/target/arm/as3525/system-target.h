@@ -38,11 +38,7 @@
 #define KERNEL_TIMER_FREQ TIMER_FREQ
 #endif
 
-#ifdef BOOTLOADER
-#define AS3525_UNCACHED_ADDR(a) (a)
-#else
 #define AS3525_UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
-#endif
 
 #ifdef SANSA_C200V2
 /* 0: Backlight on A5, 1: Backlight on A7 */
