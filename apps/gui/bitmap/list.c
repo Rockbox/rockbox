@@ -351,7 +351,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     const int screen = display->screen_type;
     const int list_start_item = gui_list->start_item[screen];
     const struct viewport *list_text_vp = &list_text[screen];
-    const int list_width = list_text_vp->width;
+    int list_width = list_text_vp->width;
 
     if (global_settings.scrollbar == SCROLLBAR_RIGHT)
         list_width += SCROLLBAR_WIDTH;
