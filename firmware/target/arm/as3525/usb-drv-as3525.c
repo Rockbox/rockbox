@@ -395,10 +395,10 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].len = len;
     endpoints[ep][1].rc = -1;
 
-#ifndef BOOTLOADER
     /* remove data buffer from cache */
-    invalidate_dcache();
-#endif
+    if (!is_bootloader()) /* bootloader is running uncached */
+        invalidate_dcache();
+
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
                          USB_DMA_DESC_LAST |
@@ -447,10 +447,9 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].len = len;
     endpoints[ep][0].rc = -1;
 
-#ifndef BOOTLOADER
     /* Make sure data is committed to memory */
-    clean_dcache();
-#endif
+    if (!is_bootloader()) /* bootloader is running uncached */
+        clean_dcache();
 
     logf("xx%s\n", make_hex(ptr, len));
 
@@ -549,21 +548,16 @@ static void handle_out_ep(int ep)
     if (ep_sts & USB_EP_STAT_OUT_RCVD) {
         int dma_sts = uc_desc->status;
         int dma_len = dma_sts & 0xffff;
-#ifdef LOGF_ENABLE
-        int dma_frm = (dma_sts >> 16) & 0x7ff;
-        int dma_mst = dma_sts & 0xf8000000;
-#endif
 
         if (!(dma_sts & USB_DMA_DESC_ZERO_LEN)) {
-             logf("EP%d OUT token, st:%08x len:%d frm:%x data=%s epstate=%d\n", ep,
-                 dma_mst, dma_len, dma_frm, make_hex(uc_desc->data_ptr, dma_len),
-                 endpoints[ep][1].state);
-#ifndef BOOTLOADER
+             logf("EP%d OUT token, st:%08x len:%d frm:%x data=%s epstate=%d\n",
+                 ep, dma_sts & 0xf8000000, dma_len, (dma_sts >> 16) & 0x7ff,
+                 make_hex(uc_desc->data_ptr, dma_len), endpoints[ep][1].state);
              /*
               * If parts of the just dmaed range are in cache, dump them now.
               */
-             dump_dcache_range(uc_desc->data_ptr, dma_len);
-#endif
+             if (!is_bootloader()) /* bootloader is running uncached */
+                 dump_dcache_range(uc_desc->data_ptr, dma_len);
         } else{
              logf("EP%d OUT token, st:%08x frm:%x (no data)\n", ep,
                  dma_mst, dma_frm);
