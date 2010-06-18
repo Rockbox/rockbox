@@ -26,6 +26,7 @@
 #include "lualib.h"
 #include "rocklib.h"
 #include "rockmalloc.h"
+#include "luadir.h"
 
 PLUGIN_HEADER
 
@@ -39,6 +40,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_IOLIBNAME,   luaopen_io},
   {LUA_LOADLIBNAME, luaopen_package},
   {LUA_MATHLIBNAME, luaopen_math},
+  {LUA_DIRLIBNAME,  luaopen_luadir},
   {NULL, NULL}
 };
 

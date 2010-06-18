@@ -39,3 +39,4 @@ strtoul.c
 strtol.c
 strstr.c
 rocklua.c
+luadir.c
