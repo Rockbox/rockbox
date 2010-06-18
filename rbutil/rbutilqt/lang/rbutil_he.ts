@@ -2,81 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="he">
 <context>
-    <name></name>
-    <message>
-        <source>Can&apos;t open file %s!</source>
-        <translation type="obsolete">לא מצליח לפתוח קובץ %s!</translation>
-    </message>
-    <message>
-        <source>Bootloader size is %d bytes</source>
-        <translation type="obsolete">גודלו של מנהל האיתחול הוא %d בתים</translation>
-    </message>
-    <message>
-        <source>Firmware size is %d bytes</source>
-        <translation type="obsolete">גודלה של הקושחה הוא %d בתים</translation>
-    </message>
-    <message>
-        <source>Can&apos;t allocate %d bytes!</source>
-        <translation type="obsolete">לא יכול להקצות %d בתים!</translation>
-    </message>
-    <message>
-        <source>Reading %s into memory...</source>
-        <translation type="obsolete">קורא את %s אל הזיכרון...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t read file %s to memory!</source>
-        <translation type="obsolete">לא יכול לקרוא את %s אל הזיכרון!</translation>
-    </message>
-    <message>
-        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
-        <translation type="obsolete">הקובץ %s אינו קובץ קושחת ChinaChip תקין!</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
-        <translation type="obsolete">לא מוצא את ccpmp.bin בתוך %s!</translation>
-    </message>
-    <message>
-        <source>Found ccpmp.bin at %d bytes</source>
-        <translation type="obsolete">מצאתי את ccpmp.bin ב- %d בתים</translation>
-    </message>
-    <message>
-        <source>Writing %d bytes to %s...</source>
-        <translation type="obsolete">כותב %d בתים אל %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t write to file %s!</source>
-        <translation type="obsolete">לא מצליח לכתוב לקובץ %s!</translation>
-    </message>
-    <message>
-        <source>Renaming it to ccpmp.old...</source>
-        <translation type="obsolete">משנה שם ל- ccpmp.old...</translation>
-    </message>
-    <message>
-        <source>Making place for ccpmp.bin...</source>
-        <translation type="obsolete">מכין מקום ל- ccpmp.bin...</translation>
-    </message>
-    <message>
-        <source>Adding header to %s...</source>
-        <translation type="obsolete">מוסיף כותרת ל- %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t obtain current time!</source>
-        <translation type="obsolete">לא מצליח להשיג זמן נוכחי!</translation>
-    </message>
-    <message>
-        <source>Computing checksum...</source>
-        <translation type="obsolete">מחשב checksum...</translation>
-    </message>
-    <message>
-        <source>Updating main header...</source>
-        <translation type="obsolete">מעדכן את הכותרת הראשית...</translation>
-    </message>
-    <message>
-        <source>Writing output to %s...</source>
-        <translation type="obsolete">כותב פלט אל %s...</translation>
-    </message>
-</context>
-<context>
     <name>BootloaderInstallAms</name>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
@@ -616,68 +541,68 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished">מוריד את קובץ מנהל האיתחול</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="78"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="79"/>
         <source>Could not open the original firmware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="81"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="82"/>
         <source>Could not read the original firmware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="84"/>
-        <source>Loaded firmware file does not look like MPIO OF file.</source>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="85"/>
+        <source>Loaded firmware file does not look like MPIO original firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="87"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="100"/>
+        <source>Could not open output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="103"/>
+        <source>Could not write output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="106"/>
+        <source>Unknown error number: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="88"/>
         <source>Could not open downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="90"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
         <source>Place for bootloader in OF file not empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="93"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
         <source>Could not read the downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="96"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="97"/>
         <source>Bootloader checksum error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="99"/>
-        <source>Could not open outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="102"/>
-        <source>Could not write outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="105"/>
-        <source>Unknown errornumber: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="109"/>
         <location filename="../base/bootloaderinstallmpio.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="111"/>
         <source>Patching original firmware failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="117"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="118"/>
         <source>Success: modified firmware file created</source>
         <translation type="unfinished">הצלחה: קובץ קושחה מוסגל נוצר</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="125"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="126"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation type="unfinished">כדי להסיר את ההתקנה, בצע שדרוג רגיל עם קובץ קושחה מקורי שלא נעשה בו שינוי</translation>
     </message>
@@ -1807,51 +1732,6 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/system.cpp" line="119"/>
-        <source>Guest</source>
-        <translation>אורח</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="122"/>
-        <source>Admin</source>
-        <translation>מנהל</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="125"/>
-        <source>User</source>
-        <translation>משתמש</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="128"/>
-        <source>Error</source>
-        <translation>שגיאה</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="257"/>
-        <location filename="../base/system.cpp" line="302"/>
-        <source>(no description available)</source>
-        <translation>(אין תיאור זמין)</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="184"/>
-        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
-Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;הרשאות אינן מספיקות להתקנת מנהל איתחול.
-הרשאות מנהל הינן הכרחיות&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="196"/>
-        <source>&lt;li&gt;Target mismatch detected.
-Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;זוהה סוג נגן שגוי.
-נגן קיים: %1, הנגן שנבחר: %2.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="203"/>
-        <source>Problem detected:</source>
-        <translation>זוהתה בעיה:</translation>
-    </message>
-    <message>
         <location filename="../main.cpp" line="71"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
@@ -1915,10 +1795,6 @@ Network error: %1. Please check your network and proxy settings.</source>
         <location filename="../rbutilqt.cpp" line="259"/>
         <source>Download build information finished.</source>
         <translation>הורדת מידע הגירסאות הסתיימה.</translation>
-    </message>
-    <message>
-        <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="obsolete">שגיאת רשת: %1. אנא בדוק את הגדרות הרשת והפרוקסי שלך.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="377"/>
@@ -2149,10 +2025,6 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>שגיאת רשת</translation>
     </message>
     <message>
-        <source>Can&apos;t get version information.</source>
-        <translation type="obsolete">לא מצליח לקבל מידע גירסה.</translation>
-    </message>
-    <message>
         <location filename="../rbutilqt.cpp" line="563"/>
         <source>Really continue?</source>
         <translation>באמת להמשיך?</translation>
@@ -2218,10 +2090,6 @@ Press &quot;No&quot; to skip this step.</source>
         <location filename="../rbutilqt.cpp" line="792"/>
         <source>Manual steps required</source>
         <translation>צעדים ידניים נדרשים</translation>
-    </message>
-    <message>
-        <source>No uninstall method known.</source>
-        <translation type="obsolete">אין שיטת הסרת התקנה ידועה.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="421"/>
@@ -2800,6 +2668,35 @@ This will install Rockbox %1. To install the most recent development build avail
     </message>
 </context>
 <context>
+    <name>System</name>
+    <message>
+        <location filename="../base/system.cpp" line="119"/>
+        <source>Guest</source>
+        <translation type="unfinished">אורח</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="122"/>
+        <source>Admin</source>
+        <translation type="unfinished">מנהל</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="125"/>
+        <source>User</source>
+        <translation type="unfinished">משתמש</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="128"/>
+        <source>Error</source>
+        <translation type="unfinished">שגיאה</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="257"/>
+        <location filename="../base/system.cpp" line="302"/>
+        <source>(no description available)</source>
+        <translation type="unfinished">(אין תיאור זמין)</translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <location filename="../base/ttscarbon.cpp" line="133"/>
@@ -3311,6 +3208,28 @@ HTTP response code: %1</translation>
         <location filename="../base/uninstall.cpp" line="109"/>
         <source>Uninstallation finished</source>
         <translation>הסרת התקנה הסתיימה</translation>
+    </message>
+</context>
+<context>
+    <name>Utils</name>
+    <message>
+        <location filename="../base/utils.cpp" line="184"/>
+        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
+Administrator priviledges are necessary.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;הרשאות אינן מספיקות להתקנת מנהל איתחול.
+הרשאות מנהל הינן הכרחיות&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/utils.cpp" line="196"/>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;זוהה סוג נגן שגוי.
+נגן קיים: %1, הנגן שנבחר: %2.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/utils.cpp" line="203"/>
+        <source>Problem detected:</source>
+        <translation type="unfinished">זוהתה בעיה:</translation>
     </message>
 </context>
 <context>

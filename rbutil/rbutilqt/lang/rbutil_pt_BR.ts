@@ -2,81 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>@default</name>
-    <message>
-        <source>Can&apos;t open file %s!</source>
-        <translation type="obsolete">Não é possível abrir o arquivo %s!</translation>
-    </message>
-    <message>
-        <source>Bootloader size is %d bytes</source>
-        <translation type="obsolete">O tamanho do inicializador é %d bytes</translation>
-    </message>
-    <message>
-        <source>Firmware size is %d bytes</source>
-        <translation type="obsolete">O tamanho do firmware é %d bytes</translation>
-    </message>
-    <message>
-        <source>Can&apos;t allocate %d bytes!</source>
-        <translation type="obsolete">Não é possível alocar %d bytes!</translation>
-    </message>
-    <message>
-        <source>Reading %s into memory...</source>
-        <translation type="obsolete">Lendo %s na memória...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t read file %s to memory!</source>
-        <translation type="obsolete">Não é possível ler o arquivo %s para a memória!</translation>
-    </message>
-    <message>
-        <source>File %s isn&apos;t a valid ChinaChip firmware!</source>
-        <translation type="obsolete">O arquivo %s não é um firmware ChinaChip válido!</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t find ccpmp.bin in %s!</source>
-        <translation type="obsolete">Não foi possível encontrar ccpmp.bin em %s!</translation>
-    </message>
-    <message>
-        <source>Found ccpmp.bin at %d bytes</source>
-        <translation type="obsolete">Encontrando ccpmp.bin no %d bytes</translation>
-    </message>
-    <message>
-        <source>Writing %d bytes to %s...</source>
-        <translation type="obsolete">Escrevendo %d bytes para %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t write to file %s!</source>
-        <translation type="obsolete">Não é possível escrever no arquivo %s!</translation>
-    </message>
-    <message>
-        <source>Renaming it to ccpmp.old...</source>
-        <translation type="obsolete">Renomeando-o para ccpmp.old...</translation>
-    </message>
-    <message>
-        <source>Making place for ccpmp.bin...</source>
-        <translation type="obsolete">Dando lugar a ccpmp.bin...</translation>
-    </message>
-    <message>
-        <source>Adding header to %s...</source>
-        <translation type="obsolete">Adicionando cabeçalho para %s...</translation>
-    </message>
-    <message>
-        <source>Can&apos;t obtain current time!</source>
-        <translation type="obsolete">Não foi possível obter a hora atual!</translation>
-    </message>
-    <message>
-        <source>Computing checksum...</source>
-        <translation type="obsolete">Calculando checksum...</translation>
-    </message>
-    <message>
-        <source>Updating main header...</source>
-        <translation type="obsolete">Atualizando cabeçalho principal...</translation>
-    </message>
-    <message>
-        <source>Writing output to %s...</source>
-        <translation type="obsolete">Escrevendo saída para %s...</translation>
-    </message>
-</context>
-<context>
     <name>BootloaderInstallAms</name>
     <message>
         <source>Downloading bootloader file</source>
@@ -518,10 +443,6 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loaded firmware file does not look like MPIO OF file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not open downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -538,18 +459,6 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not open outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not write outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown errornumber: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Patching original firmware failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -560,6 +469,22 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation type="unfinished">Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
+    </message>
+    <message>
+        <source>Loaded firmware file does not look like MPIO original firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error number: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1467,42 +1392,6 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
 <context>
     <name>QObject</name>
     <message>
-        <source>Guest</source>
-        <translation>Convidado</translation>
-    </message>
-    <message>
-        <source>Admin</source>
-        <translation>Administrador</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation>Usuário</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Erro</translation>
-    </message>
-    <message>
-        <source>(no description available)</source>
-        <translation>(nenhuma descrição disponível)</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
-Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Permissões insuficientes para a instalação do carregador.
-É necessário privilégios de administrator.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Target mismatch detected.
-Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Detectada diferenças de alvos.
-Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>Problem detected:</source>
-        <translation>Problema detectado:</translation>
-    </message>
-    <message>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation type="unfinished"></translation>
@@ -1523,10 +1412,6 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
         <translation>Erro de rede</translation>
     </message>
     <message>
-        <source>Can&apos;t get version information.</source>
-        <translation type="obsolete">Não é possível obter informação da versão.</translation>
-    </message>
-    <message>
         <source>New installation</source>
         <translation>Nova instalação</translation>
     </message>
@@ -1541,10 +1426,6 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     <message>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>Sua configuração é inválida. Isto é geralmente causado por uma mudança no caminho do dispositivo. A janela de configuração abrirá agora para permitir que você corrija o problema.</translation>
-    </message>
-    <message>
-        <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="obsolete">Erro de rede: %1. Por favor, verifique suas configurações de rede e proxy.</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
@@ -1715,10 +1596,6 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     <message>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Você realmente quer desinstalar o Inicializador?</translation>
-    </message>
-    <message>
-        <source>No uninstall method known.</source>
-        <translation type="obsolete">Nenhum método de desinstalação conhecido.</translation>
     </message>
     <message>
         <source>Confirm download</source>
@@ -2256,6 +2133,29 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
 </context>
 <context>
+    <name>System</name>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished">Convidado</translation>
+    </message>
+    <message>
+        <source>Admin</source>
+        <translation type="unfinished">Administrador</translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished">Usuário</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Erro</translation>
+    </message>
+    <message>
+        <source>(no description available)</source>
+        <translation type="unfinished">(nenhuma descrição disponível)</translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <source>Voice:</source>
@@ -2667,6 +2567,25 @@ código de resposta HTTP: %1</translation>
     <message>
         <source>Could not delete %1</source>
         <translation>Não foi possível apagar %1</translation>
+    </message>
+</context>
+<context>
+    <name>Utils</name>
+    <message>
+        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
+Administrator priviledges are necessary.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Permissões insuficientes para a instalação do carregador.
+É necessário privilégios de administrator.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Detectada diferenças de alvos.
+Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>Problem detected:</source>
+        <translation type="unfinished">Problema detectado:</translation>
     </message>
 </context>
 <context>

@@ -443,10 +443,6 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loaded firmware file does not look like MPIO OF file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not open downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -463,18 +459,6 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not open outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not write outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown errornumber: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Patching original firmware failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -484,6 +468,22 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loaded firmware file does not look like MPIO original firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error number: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1388,42 +1388,6 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
 <context>
     <name>QObject</name>
     <message>
-        <source>Guest</source>
-        <translation>Гость</translation>
-    </message>
-    <message>
-        <source>Admin</source>
-        <translation>Администратор</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation>Пользователь</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
-        <source>(no description available)</source>
-        <translation>(описание недоступно)</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
-Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Недостаточные полномочия для установки загрузчика.
-Нужны полномочия администратора.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Target mismatch detected.
-Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Цели не соответствуют.
-Установленная цель: %1, Выбранная цель: %2.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>Problem detected:</source>
-        <translation>Обнаружена проблема:</translation>
-    </message>
-    <message>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation type="unfinished"></translation>
@@ -1438,10 +1402,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <source>Version</source>
         <translation>Версия</translation>
-    </message>
-    <message>
-        <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="obsolete">Ошибка сети: %1. Проверьте ваши настройки сети и прокси.</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
@@ -1592,10 +1552,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Ошибка сети</translation>
     </message>
     <message>
-        <source>Can&apos;t get version information.</source>
-        <translation type="obsolete">Не могу получить информацию о версии.</translation>
-    </message>
-    <message>
         <source>Really continue?</source>
         <translation>Продожить?</translation>
     </message>
@@ -1648,10 +1604,6 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <source>Manual steps required</source>
         <translation>Требуются действия вручную</translation>
-    </message>
-    <message>
-        <source>No uninstall method known.</source>
-        <translation type="obsolete">Нет известного способа удаления.</translation>
     </message>
     <message>
         <source>Do you really want to perform a complete installation?
@@ -2175,6 +2127,29 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
 </context>
 <context>
+    <name>System</name>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished">Гость</translation>
+    </message>
+    <message>
+        <source>Admin</source>
+        <translation type="unfinished">Администратор</translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished">Пользователь</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>(no description available)</source>
+        <translation type="unfinished">(описание недоступно)</translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <source>Voice:</source>
@@ -2587,6 +2562,25 @@ HTTP response code: %1</source>
     <message>
         <source>Could not delete %1</source>
         <translation>Не могу удалить %1</translation>
+    </message>
+</context>
+<context>
+    <name>Utils</name>
+    <message>
+        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
+Administrator priviledges are necessary.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Недостаточные полномочия для установки загрузчика.
+Нужны полномочия администратора.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Цели не соответствуют.
+Установленная цель: %1, Выбранная цель: %2.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>Problem detected:</source>
+        <translation type="unfinished">Обнаружена проблема:</translation>
     </message>
 </context>
 <context>

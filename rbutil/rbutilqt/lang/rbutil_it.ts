@@ -540,68 +540,68 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="78"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="79"/>
         <source>Could not open the original firmware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="81"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="82"/>
         <source>Could not read the original firmware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="84"/>
-        <source>Loaded firmware file does not look like MPIO OF file.</source>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="85"/>
+        <source>Loaded firmware file does not look like MPIO original firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="87"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="100"/>
+        <source>Could not open output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="103"/>
+        <source>Could not write output file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="106"/>
+        <source>Unknown error number: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="88"/>
         <source>Could not open downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="90"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
         <source>Place for bootloader in OF file not empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="93"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
         <source>Could not read the downloaded bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="96"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="97"/>
         <source>Bootloader checksum error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="99"/>
-        <source>Could not open outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="102"/>
-        <source>Could not write outputfile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="105"/>
-        <source>Unknown errornumber: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="109"/>
         <location filename="../base/bootloaderinstallmpio.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="111"/>
         <source>Patching original firmware failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="117"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="118"/>
         <source>Success: modified firmware file created</source>
         <translation type="unfinished">Firmware modificato creato con successo</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="125"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="126"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1719,50 +1719,6 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/system.cpp" line="119"/>
-        <source>Guest</source>
-        <translation>Ospite</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="122"/>
-        <source>Admin</source>
-        <translation>Amministratore</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="125"/>
-        <source>User</source>
-        <translation>Utente</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="128"/>
-        <source>Error</source>
-        <translation>Errore</translation>
-    </message>
-    <message>
-        <location filename="../base/system.cpp" line="257"/>
-        <location filename="../base/system.cpp" line="302"/>
-        <source>(no description available)</source>
-        <translation>(nessuna descrizione disponibile)</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="184"/>
-        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
-Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Permessi insufficenti per installare il bootloader.
-Sono necessari i privilegi di amministratore.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="196"/>
-        <source>&lt;li&gt;Target mismatch detected.
-Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Target non corrispondente. target installato: %1, selected target: %2.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <location filename="../base/utils.cpp" line="203"/>
-        <source>Problem detected:</source>
-        <translation>Problema individuato:</translation>
-    </message>
-    <message>
         <location filename="../main.cpp" line="71"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
@@ -1788,10 +1744,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Errore Rete</translation>
     </message>
     <message>
-        <source>Can&apos;t get version information.</source>
-        <translation type="obsolete">Impossibile ottenere informazioni riguardo la versione.</translation>
-    </message>
-    <message>
         <location filename="../rbutilqt.cpp" line="329"/>
         <source>New installation</source>
         <translation>Nuova installazione</translation>
@@ -1811,10 +1763,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <location filename="../rbutilqt.cpp" line="338"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>La tua configurazione non è valida. Questo spesso è causato da un cambiamento nel percorso del dispositivo. Si aprirà una finestra che permetterà di correggere il problema.</translation>
-    </message>
-    <message>
-        <source>Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="obsolete">Errore di rete: %1. Per favore controlla le tue impostazioni di rete e proxy.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="85"/>
@@ -2099,10 +2047,6 @@ Premi &quot;No&quot; per saltare questo passo.</translation>
         <location filename="../rbutilqt.cpp" line="1340"/>
         <source>Rockbox Utility is up to date.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No uninstall method known.</source>
-        <translation type="obsolete">Nessun metodo di disinstallazione conosciuto.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1072"/>
@@ -2708,6 +2652,35 @@ Premi &quot;No&quot; per saltare questo passo.</translation>
     </message>
 </context>
 <context>
+    <name>System</name>
+    <message>
+        <location filename="../base/system.cpp" line="119"/>
+        <source>Guest</source>
+        <translation type="unfinished">Ospite</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="122"/>
+        <source>Admin</source>
+        <translation type="unfinished">Amministratore</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="125"/>
+        <source>User</source>
+        <translation type="unfinished">Utente</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="128"/>
+        <source>Error</source>
+        <translation type="unfinished">Errore</translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="257"/>
+        <location filename="../base/system.cpp" line="302"/>
+        <source>(no description available)</source>
+        <translation type="unfinished">(nessuna descrizione disponibile)</translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <location filename="../base/ttscarbon.cpp" line="133"/>
@@ -3212,6 +3185,27 @@ HTTP response code: %1</source>
         <location filename="../base/uninstall.cpp" line="109"/>
         <source>Uninstallation finished</source>
         <translation>Disinstallazione finita</translation>
+    </message>
+</context>
+<context>
+    <name>Utils</name>
+    <message>
+        <location filename="../base/utils.cpp" line="184"/>
+        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
+Administrator priviledges are necessary.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Permessi insufficenti per installare il bootloader.
+Sono necessari i privilegi di amministratore.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/utils.cpp" line="196"/>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Target non corrispondente. target installato: %1, selected target: %2.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/utils.cpp" line="203"/>
+        <source>Problem detected:</source>
+        <translation type="unfinished">Problema individuato:</translation>
     </message>
 </context>
 <context>
