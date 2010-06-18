@@ -26,6 +26,13 @@
     .global    start
 start:
     /* Exception vectors */
+
+    /*
+     * reset vector *MUST* use relative-addressing only
+     * the MMU might not be enabled yet, and the PC might point to
+     * a memory region not present in the linked binary
+     */
+
     b   newstart
     b   undef_instr_handler
     b   software_int_handler
