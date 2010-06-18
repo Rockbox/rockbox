@@ -284,7 +284,8 @@ void ascodec_init(void)
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 
     /* detect if USB was connected at startup since there is no transition */
-    if(ascodec_read(AS3514_IRQ_ENRD0) & USB_STATUS)
+    ascodec_enrd0_shadow = ascodec_read(AS3514_IRQ_ENRD0);
+    if(ascodec_enrd0_shadow & USB_STATUS)
         usb_insert_int();
     else
         usb_remove_int();
