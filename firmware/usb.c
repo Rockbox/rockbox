@@ -51,7 +51,8 @@
      (defined(HAVE_USBSTACK) && (defined(OLYMPUS_MROBE_500))) || \
      (defined(HAVE_USBSTACK) && (defined(IPOD_NANO2G))) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
-     (CONFIG_USBOTG == USBOTG_JZ4740)
+     (CONFIG_USBOTG == USBOTG_JZ4740) || \
+     (defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_AS3525)
 #define USB_FULL_INIT
 #endif
 

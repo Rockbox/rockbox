@@ -27,6 +27,11 @@
 #include <inttypes.h>
 #include "config.h"
 #include "lcd.h"
+#ifdef USE_ROCKBOX_USB
+#include "usb.h"
+#include "usb_core.h"
+#include "sysfont.h"
+#endif /* USE_ROCKBOX_USB */
 #include "backlight.h"
 #include "button-target.h"
 #include "common.h"
@@ -81,6 +86,29 @@ void main(void)
     ret = storage_init();
     if(ret < 0)
         error(EATA,ret);
+
+#ifdef USE_ROCKBOX_USB
+    usb_init();
+    if(usb_detect() == USB_INSERTED)
+    {
+        const char msg[] = "Bootloader USB mode";
+        reset_screen();
+        lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * sizeof(msg))) / 2,
+                    (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+        lcd_update();
+
+        usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
+        usb_enable(true);
+
+        while(usb_detect() == USB_INSERTED)
+            sleep(HZ);
+
+        usb_enable(false);
+
+        reset_screen();
+        lcd_update();
+    }
+#endif /* USE_ROCKBOX_USB */
 
     if(!disk_init(IF_MV(0)))
         panicf("disk_init failed!");

@@ -916,7 +916,8 @@ Lyre prototype 1 */
 #if  (defined(TOSHIBA_GIGABEAT_S) || \
      (defined(CREATIVE_ZVx) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
-     (CONFIG_USBOTG == USBOTG_JZ4740) || defined(IPOD_NANO2G)
+     (CONFIG_USBOTG == USBOTG_JZ4740) || defined(IPOD_NANO2G) || \
+     CONFIG_USBOTG == USBOTG_AS3525
 #define USB_ENABLE_STORAGE
 #endif
 
