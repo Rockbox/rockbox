@@ -62,47 +62,57 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
-void ICODE_ATTR cpucache_flush(void)
+void ICODE_ATTR __attribute__((naked)) cpucache_flush(void)
 {
-    intptr_t b, e;
-
-    for (b = (intptr_t)&CACHE_FLUSH_BASE, e = b + CACHE_SIZE;
-         b < e; b += 16) {
-        outl(0x0, b);
-    }
+    asm volatile(
+        "mov    r0, #0xf0000000 \n"
+        "add    r0, r0, #0xc000 \n" /* r0 = CACHE_FLUSH_BASE */
+        "add    r1, r0, #0x2000 \n" /* r1 = CACHE_FLUSH_BASE + CACHE_SIZE */
+        "mov    r2, #0          \n"
+    "1:                         \n"
+        "str    r2, [r0], #16   \n" /* Flush */
+        "cmp    r0, r1          \n"
+        "blo    1b              \n"
+        "bx     lr              \n"
+    );
 }
 
-void ICODE_ATTR cpucache_invalidate(void)
+void ICODE_ATTR  __attribute__((naked)) cpucache_invalidate(void)
 {
-    intptr_t b, e;
-
-    /* Flush */
-    for (b = (intptr_t)&CACHE_FLUSH_BASE, e = b + CACHE_SIZE;
-         b < e; b += 16) {
-        outl(0x0, b);
-    }
-
-    /* Invalidate */
-    for (b = (intptr_t)&CACHE_INVALIDATE_BASE, e = b + CACHE_SIZE;
-         b < e; b += 16) {
-        outl(0x0, b);
-    }
+    asm volatile(
+        "mov    r0, #0xf0000000 \n"
+        "add    r2, r0, #0x4000 \n" /* r1 = CACHE_INVALIDATE_BASE */
+        "add    r0, r0, #0xc000 \n" /* r0 = CACHE_FLUSH_BASE */
+        "add    r1, r0, #0x2000 \n" /* r2 = CACHE_FLUSH_BASE + CACHE_SIZE */
+        "mov    r3, #0          \n"
+    "1:                         \n"
+        "str    r3, [r0], #16   \n" /* Flush */
+        "str    r3, [r2], #16   \n" /* Invalidate */
+        "cmp    r0, r1          \n"
+        "blo    1b              \n"
+        "bx     lr              \n"
+    );
 }
 
 static void ipod_init_cache(void)
 {
-    intptr_t b, e;
-
 /* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
     PROC_STAT &= ~0x700;
     outl(0x4000, 0xcf004020);
 
     CACHE_CTL = CACHE_CTL_INIT;
 
-    for (b = (intptr_t)&CACHE_INVALIDATE_BASE, e = b + CACHE_SIZE;
-         b < e; b += 16) {
-        outl(0x0, b);
-    }
+    asm volatile(
+        "mov    r0, #0xf0000000 \n"
+        "add    r0, r0, #0x4000 \n" /* r0 = CACHE_INVALIDATE_BASE */
+        "add    r1, r0, #0x2000 \n" /* r1 = CACHE_INVALIDATE_BASE + CACHE_SIZE */
+        "mov    r2, #0          \n"
+    "1:                         \n"
+        "str    r2, [r0], #16   \n" /* Invalidate */
+        "cmp    r0, r1          \n"
+        "blo    1b              \n"
+        : : : "r0", "r1", "r2"
+    );
 
     /* Cache if (addr & mask) >> 16 == (mask & match) >> 16:
      * yes: 0x00000000 - 0x03ffffff
