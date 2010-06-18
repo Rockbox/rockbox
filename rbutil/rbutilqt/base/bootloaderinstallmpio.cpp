@@ -67,7 +67,8 @@ void BootloaderInstallMpio::installStage2(void)
     QString bootfile = m_tempfile.fileName();
     m_tempfile.close();
     
-    int ret = mkmpioboot(m_offile.toLocal8Bit().data(), bootfile.toLocal8Bit().data(), m_blfile.toLocal8Bit().data(), origin);
+    int ret = mkmpioboot(m_offile.toLocal8Bit().data(),
+            bootfile.toLocal8Bit().data(), m_blfile.toLocal8Bit().data(), origin);
     
     if(ret != 0)
     {
@@ -81,7 +82,7 @@ void BootloaderInstallMpio::installStage2(void)
                 error = tr("Could not read the original firmware.");
                 break;
             case -3:
-                error = tr("Loaded firmware file does not look like MPIO OF file.");
+                error = tr("Loaded firmware file does not look like MPIO original firmware file.");
                 break;
             case -4:
                 error = tr("Could not open downloaded bootloader.");
@@ -96,13 +97,13 @@ void BootloaderInstallMpio::installStage2(void)
                 error = tr("Bootloader checksum error.");
                 break;
             case -8:
-                error = tr("Could not open outputfile.");
+                error = tr("Could not open output file.");
                 break;
             case -9:
-                error = tr("Could not write outputfile.");
+                error = tr("Could not write output file.");
                 break;
             default:
-                error = tr("Unknown errornumber: %1").arg(ret);
+                error = tr("Unknown error number: %1").arg(ret);
                 break;
         }
     
@@ -113,7 +114,7 @@ void BootloaderInstallMpio::installStage2(void)
     }
   
     //end of install
-    qDebug() << "[BootloaderInstallMpio] install successfull";
+    qDebug() << "[BootloaderInstallMpio] install successful";
     emit logItem(tr("Success: modified firmware file created"), LOGINFO);
     logInstall(LogAdd);
     emit done(false);
