@@ -199,7 +199,9 @@ static void INIT_ATTR core_thread_init(unsigned int core)
 }
 
 /*---------------------------------------------------------------------------
- * Switches to a stack that always resides in the Rockbox core.
+ * Switches to a stack that always resides in the Rockbox core then calls
+ * the final exit routine to actually finish removing the thread from the
+ * scheduler.
  *
  * Needed when a thread suicides on a core other than the main CPU since the
  * stack used when idling is the stack of the last thread to run. This stack
@@ -207,13 +209,24 @@ static void INIT_ATTR core_thread_init(unsigned int core)
  * to use a stack from an unloaded module until another thread runs on it.
  *---------------------------------------------------------------------------
  */
-static inline void switch_to_idle_stack(const unsigned int core)
+static inline void __attribute__((noreturn,always_inline))
+    thread_final_exit(struct thread_entry *current)
 {
     asm volatile (
-        "str  sp, [%0] \n" /* save original stack pointer on idle stack */
-        "mov  sp, %0   \n" /* switch stacks */
-        : : "r"(&idle_stacks[core][IDLE_STACK_WORDS-1]));
-    (void)core;
+        "cmp    %1, #0               \n" /* CPU? */
+        "ldrne  r0, =cpucache_flush  \n" /* No? write back data */
+        "movne  lr, pc               \n"
+        "bxne   r0                   \n"
+        "mov    r0, %0               \n" /* copy thread parameter */
+        "mov    sp, %2               \n" /* switch to idle stack  */
+        "bl     thread_final_exit_do \n" /* finish removal        */
+        : : "r"(current),
+            "r"(current->core),
+            "r"(&idle_stacks[current->core][IDLE_STACK_WORDS])
+        : "r0", "r1", "r2", "r3", "ip", "lr"); /* Because of flush call,
+                                                  force inputs out
+                                                  of scratch regs */
+    while (1);
 }
 
 /*---------------------------------------------------------------------------

@@ -157,8 +157,8 @@ static inline void load_context(const void* addr)
         __attribute__((always_inline));
 
 #if NUM_CORES > 1
-static void thread_final_exit(struct thread_entry *current)
-    __attribute__((noinline, noreturn));
+static void thread_final_exit_do(struct thread_entry *current)
+    __attribute__((noinline, noreturn, used));
 #else
 static inline void thread_final_exit(struct thread_entry *current)
     __attribute__((always_inline, noreturn));
@@ -1675,22 +1675,16 @@ void thread_wait(unsigned int thread_id)
 /* This is done to foil optimizations that may require the current stack,
  * such as optimizing subexpressions that put variables on the stack that
  * get used after switching stacks. */
-static void thread_final_exit(struct thread_entry *current)
-{
 #if NUM_CORES > 1
-    cpucache_flush();
-
-    /* Switch to the idle stack if not on the main core (where "main"
-     * runs) - we can hope gcc doesn't need the old stack beyond this
-     * point. */
-    if (current->core != CPU)
-    {
-        switch_to_idle_stack(current->core);
-    }
-
+/* Called by ASM stub */
+static void thread_final_exit_do(struct thread_entry *current)
+#else
+/* No special procedure is required before calling */
+static inline void thread_final_exit(struct thread_entry *current)
+#endif
+{
     /* At this point, this thread isn't using resources allocated for
      * execution except the slot itself. */
-#endif /* NUM_CORES */
 
     /* Signal this thread */
     thread_queue_wake(&current->queue);
@@ -1746,6 +1740,7 @@ void thread_exit(void)
     new_thread_id(current->id, current);
     current->name = NULL;
 
+    /* Do final cleanup and remove the thread */
     thread_final_exit(current);
 }
 
