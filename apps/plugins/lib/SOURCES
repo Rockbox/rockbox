@@ -9,6 +9,7 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 buflib.c
+highscore.c
 simple_viewer.c
 display_text.c
 strncpy.c
@@ -27,18 +28,16 @@ grey_sh.S
 
 #endif /* HAVE_LCD_BITMAP && LCD_DEPTH < 4 */
 
-highscore.c
-
 #ifndef SIMULATOR
 overlay.c
 #endif
 
-#ifdef HAVE_LCD_CHARCELLS
-playergfx.c
-#endif
-
 #ifdef RB_PROFILE
 profile_plugin.c
+#endif
+
+#ifdef HAVE_LCD_CHARCELLS
+playergfx.c
 #endif
 
 #ifdef HAVE_LCD_BITMAP
