@@ -134,6 +134,7 @@ qulonglong Utils::filesystemFree(QString path)
     if(ret)
         size = freeAvailBytes.QuadPart;
 #endif
+    qDebug() << "[Utils] Filesystem free:" << path << size;
     return size;
 }
 
