@@ -167,6 +167,7 @@
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
+#endif /* BOOTLOADER */
 
 #define CONFIG_USBOTG USBOTG_AS3525
 
