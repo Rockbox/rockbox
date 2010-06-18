@@ -29,7 +29,6 @@
 #include <stdbool.h>
 #include "panic.h"
 /*#define LOGF_ENABLE*/
-#define LOGF_ENABLE
 #include "logf.h"
 #include "usb_ch9.h"
 #include "usb_core.h"
@@ -834,8 +833,10 @@ static void handle_out_ep(int ep)
     if (ep_sts & USB_EP_STAT_OUT_RCVD) {
         int dma_sts = uc_desc->status;
         int dma_len = dma_sts & 0xffff;
+#ifdef LOGF_ENABLE
         int dma_frm = (dma_sts >> 16) & 0x7ff;
         int dma_mst = dma_sts & 0xf8000000;
+#endif
 
         if (!(dma_sts & USB_DMA_DESC_ZERO_LEN)) {
              logf("EP%d OUT token, st:%08x len:%d frm:%x data=%s epstate=%d\n", ep,
