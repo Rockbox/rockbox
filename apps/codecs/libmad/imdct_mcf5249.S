@@ -34,10 +34,10 @@ III_imdct_s:
      * get more low bits out of the accext01 register _before_ doing the
      * movclrs.
      */
-    sub.l %a0, %a0                      /* clear loop variable */
+    moveq.l #3, %d5                     /* we do three outer loop iterations */
 .imdctloop:                             /* outer loop label */
     lea.l imdct_s, %a1                  /* load pointer to imdct coefs in a1 */
-    movem.l (%a2), %d0-%d5              /* load some input data in d0-d5 */
+    movem.l (%a2), %d0-%d4/%a0          /* load some input data in d0-d4/a0 */
     lea.l (6*4, %a2), %a2
 
     clr.l %d7                           /* clear loop variable */
@@ -48,7 +48,7 @@ III_imdct_s:
     mac.l %d2, %a4, (%a1)+, %a4, %acc0
     mac.l %d3, %a4, (%a1)+, %a4, %acc0
     mac.l %d4, %a4, (%a1)+, %a4, %acc0
-    mac.l %d5, %a4, (%a1)+, %a4, %acc0
+    mac.l %a0, %a4, (%a1)+, %a4, %acc0
     movclr.l %acc0, %d6                 /* get result, left shifted once */
     asl.l #3, %d6                       /* one shift free, shift three more */
     move.l %d6, (%a3, %d7.l*4)          /* yptr[i] = result */
@@ -60,7 +60,7 @@ III_imdct_s:
     mac.l %d2, %a4, (%a1)+, %a4, %acc0
     mac.l %d3, %a4, (%a1)+, %a4, %acc0
     mac.l %d4, %a4, (%a1)+, %a4, %acc0
-    mac.l %d5, %a4, (%a1)+, %a4, %acc0
+    mac.l %a0, %a4, (%a1)+, %a4, %acc0
     movclr.l %acc0, %d6                 /* get result */
     asl.l #3, %d6
     move.l %d6, (11*4, %a3, %d7.l*4)    /* yptr[11 - i] = result */
@@ -72,9 +72,7 @@ III_imdct_s:
     jne .macloop
 
     lea.l (12*4, %a3), %a3              /* add pointer increment */
-    addq.l #1, %a0                      /* increment outer loop variable */
-    moveq.l #3, %d0
-    cmp.l %d0, %a0                      /* we do three outer loop iterations */
+    subq.l #1, %d5                      /* decrement outer loop variable */
     jne .imdctloop
 
     /* windowing, overlapping and concatenation */
