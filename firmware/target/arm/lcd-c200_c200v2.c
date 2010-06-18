@@ -182,14 +182,9 @@ static inline void as3525_dbop_init(void)
 
 #endif
 
-/* LCD init */
-void lcd_init_device(void)
+static void lcd_reset(void)
 {
-#if defined(SANSA_C200)
-    c200v1_lcd_init();
-#elif defined(SANSA_C200V2)
-    as3525_dbop_init();
-
+#if defined(SANSA_C200V2)
     /* reset lcd */
     GPIOB_DIR |= (1<<6);
     GPIOB_PIN(6) = 0; /* pull reset low */
@@ -197,7 +192,6 @@ void lcd_init_device(void)
     GPIOB_PIN(6) = 1<<6; /* release reset */
     lcd_delay(20);
 #endif
-
     lcd_send_command(R_STANDBY_OFF, 0);
     lcd_delay(20);
 
@@ -249,6 +243,17 @@ void lcd_init_device(void)
     lcd_send_command(R_DISPLAY_ON, 0);
 }
 
+/* LCD init */
+void lcd_init_device(void)
+{
+#if defined(SANSA_C200)
+    c200v1_lcd_init();
+#elif defined(SANSA_C200V2)
+    as3525_dbop_init();
+#endif
+    lcd_reset();
+}
+
 /*** hardware configuration ***/
 int lcd_default_contrast(void)
 {
@@ -277,8 +282,13 @@ void lcd_enable(bool yesno)
 
     if ((is_lcd_enabled = yesno))
     {
+#ifdef SANSA_C200V2
+        /* lcd sometimes gets stuck, do full init here */
+        lcd_reset();
+#else
         lcd_send_command(R_STANDBY_OFF, 0);
         lcd_send_command(R_DISPLAY_ON, 0);
+#endif
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
