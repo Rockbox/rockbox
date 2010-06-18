@@ -14,7 +14,9 @@ kernel.c
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */
+#if !defined(BOOTLOADER) || defined(CPU_SH)
 rolo.c
+#endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
 thread.c
 timer.c
 #endif /* SIMULATOR */
