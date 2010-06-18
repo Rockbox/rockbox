@@ -19,49 +19,36 @@
  *
  ****************************************************************************/
 
-#ifndef RBSCREEN_H
-#define RBSCREEN_H
+#ifndef RBVIEWPORT_H
+#define RBVIEWPORT_H
+
+#include "skin_parser.h"
+
+class RBScreen;
+class RBRenderInfo;
 
 #include <QGraphicsItem>
 
-#include "projectmodel.h"
-
-class RBScreen : public QGraphicsItem
+class RBViewport : public QGraphicsItem
 {
-
 public:
-    RBScreen(ProjectModel* project = 0, QGraphicsItem *parent = 0);
-    virtual ~RBScreen();
+    RBViewport(skin_element* node, const RBRenderInfo& info);
+    virtual ~RBViewport();
 
     QPainterPath shape() const;
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
-    int getWidth() const{ return width; }
-    int getHeight() const{ return height; }
-
-    static QString safeSetting(ProjectModel* project, QString key,
-                               QString fallback)
-    {
-        if(project)
-            return project->getSetting(key, fallback);
-        else
-            return fallback;
-    }
-
-    static QColor stringToColor(QString str, QColor fallback);
-
+    void show(){ displayed = true; }
 
 private:
-    int width;
-    int height;
-    QColor bgColor;
-    QColor fgColor;
-    QPixmap* backdrop;
+    QRectF size;
+    QColor background;
+    QColor foreground;
 
-    ProjectModel* project;
+    bool displayed;
 
 };
 
-#endif // RBSCREEN_H
+#endif // RBVIEWPORT_H

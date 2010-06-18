@@ -23,6 +23,7 @@
 #include "parsetreemodel.h"
 #include "symbols.h"
 #include "rbscreen.h"
+#include "rbrenderinfo.h"
 
 #include <cstdlib>
 
@@ -279,6 +280,13 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project)
     /* Adding the screen */
     RBScreen* screen = new RBScreen(project);
     scene->addItem(screen);
+
+    RBRenderInfo info(this, project, screen);
+
+    /* Rendering the tree */
+    if(root)
+        root->render(info);
+
 
     return scene;
 }

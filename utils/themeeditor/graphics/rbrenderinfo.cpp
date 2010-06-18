@@ -19,49 +19,28 @@
  *
  ****************************************************************************/
 
-#ifndef RBSCREEN_H
-#define RBSCREEN_H
+#include "rbrenderinfo.h"
 
-#include <QGraphicsItem>
-
-#include "projectmodel.h"
-
-class RBScreen : public QGraphicsItem
+RBRenderInfo::RBRenderInfo(ParseTreeModel* model,
+                           ProjectModel* project, RBScreen* screen)
+    :mProject(project), mScreen(screen), mModel(model)
 {
+}
 
-public:
-    RBScreen(ProjectModel* project = 0, QGraphicsItem *parent = 0);
-    virtual ~RBScreen();
+RBRenderInfo::RBRenderInfo(const RBRenderInfo &other)
+{
+    mProject = other.mProject;
+    mScreen = other.mScreen;
+    mModel = other.mModel;
+}
 
-    QPainterPath shape() const;
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget);
+const RBRenderInfo& RBRenderInfo::operator=(const RBRenderInfo& other)
+{
+    mProject = other.mProject;
+    mScreen = other.mScreen;
+    mModel = other.mModel;
+}
 
-    int getWidth() const{ return width; }
-    int getHeight() const{ return height; }
-
-    static QString safeSetting(ProjectModel* project, QString key,
-                               QString fallback)
-    {
-        if(project)
-            return project->getSetting(key, fallback);
-        else
-            return fallback;
-    }
-
-    static QColor stringToColor(QString str, QColor fallback);
-
-
-private:
-    int width;
-    int height;
-    QColor bgColor;
-    QColor fgColor;
-    QPixmap* backdrop;
-
-    ProjectModel* project;
-
-};
-
-#endif // RBSCREEN_H
+RBRenderInfo::~RBRenderInfo()
+{
+}

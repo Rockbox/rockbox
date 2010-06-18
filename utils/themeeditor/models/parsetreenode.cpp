@@ -98,6 +98,12 @@ ParseTreeNode::ParseTreeNode(skin_tag_parameter *data, ParseTreeNode *parent)
 
 }
 
+ParseTreeNode::~ParseTreeNode()
+{
+    for(int i = 0; i < children.count(); i++)
+        delete children[i];
+}
+
 QString ParseTreeNode::genCode() const
 {
     QString buffer = "";
@@ -467,8 +473,28 @@ ParseTreeNode* ParseTreeNode::getParent() const
     return parent;
 }
 
-ParseTreeNode::~ParseTreeNode()
+void ParseTreeNode::render(const RBRenderInfo& info)
 {
-    for(int i = 0; i < children.count(); i++)
-        delete children[i];
+    /* Parameters don't get rendered */
+    if(!element && param)
+        return;
+
+    /* If we're at the root, we need to render each viewport */
+    if(!element && !param)
+    {
+        for(int i = 0; i < children.count(); i++)
+        {
+            children[i]->render(info);
+        }
+
+        return;
+    }
+
+    switch(element->type)
+    {
+    case VIEWPORT:
+        rendered = new RBViewport(element, info);
+        break;
+    }
 }
+

@@ -23,6 +23,9 @@
 #define PARSETREENODE_H
 
 #include "skin_parser.h"
+#include "rbviewport.h"
+#include "rbscreen.h"
+#include "rbrenderinfo.h"
 
 #include <QString>
 #include <QVariant>
@@ -56,6 +59,8 @@ public:
             return 0;
     }
 
+    void render(const RBRenderInfo& info);
+
 private:
     ParseTreeNode* parent;
     struct skin_element* element;
@@ -63,6 +68,7 @@ private:
     QList<ParseTreeNode*> children;
 
     static int openConditionals;
+    QGraphicsItem* rendered;
 
 };
 
