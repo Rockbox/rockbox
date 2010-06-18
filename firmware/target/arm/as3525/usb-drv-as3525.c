@@ -366,10 +366,11 @@ void usb_attach(void)
     usb_enable(true);
 }
 
+/* delay is in milliseconds */
 static inline void usb_delay(int delay)
-{   //TUNEME : delay is in milliseconds
-    delay <<= 14;
-    while(delay--) ;
+{
+    while(delay--)
+        udelay(1000);
 }
 
 static void usb_phy_on(void)
@@ -1019,7 +1020,7 @@ void usb_drv_stall(int ep, bool stall, bool in)
 
 bool usb_drv_stalled(int ep, bool in)
 {
-    return USB_EP_CTRL(ep, in) & USB_EP_CTRL_STALL ? true : false;
+    return USB_EP_CTRL(ep, in) & USB_EP_CTRL_STALL;
 }
 
 #else
