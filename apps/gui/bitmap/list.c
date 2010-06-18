@@ -351,19 +351,17 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     const int screen = display->screen_type;
     const int list_start_item = gui_list->start_item[screen];
     const struct viewport *list_text_vp = &list_text[screen];
+    const int list_width = list_text_vp->width;
+
+    if (global_settings.scrollbar == SCROLLBAR_RIGHT)
+        list_width += SCROLLBAR_WIDTH;
 
     if (button == BUTTON_NONE)
         return ACTION_NONE;
 
-    if (x > list_text_vp->x + list_text_vp->width)
-    {
-        if (global_settings.scrollbar == SCROLLBAR_RIGHT &&
-            x > list_text_vp->x + list_text_vp->width + SCROLLBAR_WIDTH)
-	{
-            /* wider than the list's viewport, ignore it */
-            return ACTION_NONE;
-	}
-    }
+    if (x > list_text_vp->x + list_width)
+        /* wider than the list's viewport, ignore it */
+        return ACTION_NONE;
 
     if (x < list_text_vp->x)
     {
