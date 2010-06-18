@@ -238,7 +238,8 @@ struct settings {
 
 struct resources humanres;
 struct resources compres;
-enum { GS_PROD, GS_MOVE, GS_WAR } gamestate;
+enum { GS_PROD, GS_MOVE, GS_WAR };
+int gamestate;
 
 struct cursor{
     int x;
