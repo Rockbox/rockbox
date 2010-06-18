@@ -123,9 +123,7 @@ static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx;
 static struct event_queue sd_queue;
-#ifndef BOOTLOADER
 bool sd_enabled = false;
-#endif
 
 #if defined(HAVE_MULTIDRIVE)
 static bool hs_card = false;
@@ -557,10 +555,9 @@ int sd_init(void)
     create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
             sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
-#ifndef BOOTLOADER
     sd_enabled = true;
     sd_enable(false);
-#endif
+
     return 0;
 }
 
@@ -674,8 +671,8 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     unsigned loops = 0;
 
     mutex_lock(&sd_mtx);
-#ifndef BOOTLOADER
     sd_enable(true);
+#ifndef BOOTLOADER
     led(true);
 #endif
 
@@ -829,8 +826,8 @@ sd_transfer_error_nodma:
 
 #ifndef BOOTLOADER
     led(false);
-    sd_enable(false);
 #endif
+    sd_enable(false);
 
     if (ret)    /* error */
         card_info[drive].initialized = 0;
@@ -848,18 +845,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      const void* buf)
 {
-
-#ifdef BOOTLOADER /* we don't need write support in bootloader */
-#ifdef HAVE_MULTIDRIVE
-    (void) drive;
-#endif
-    (void) start;
-    (void) count;
-    (void) buf;
-    return -1;
-#else
     return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
-#endif
 }
 
 #ifndef BOOTLOADER
@@ -867,6 +853,7 @@ long sd_last_disk_activity(void)
 {
     return last_disk_activity;
 }
+#endif /* !BOOTLOADER */
 
 void sd_enable(bool on)
 {
@@ -925,8 +912,6 @@ tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
 }
-
-#endif /* !BOOTLOADER */
 
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
