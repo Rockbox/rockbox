@@ -49,5 +49,5 @@ extern int c200v2_variant;
 #define TIMER_PERIOD (KERNEL_TIMER_FREQ/HZ)
 #endif
 
-void udelay(unsigned short usecs);
+void udelay(unsigned usecs);
 #endif /* SYSTEM_TARGET_H */

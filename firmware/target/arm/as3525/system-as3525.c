@@ -326,7 +326,8 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
-void udelay(unsigned short usecs)
+/* usecs may be at most 2^32/248 (17 seconds) for 248MHz max cpu freq */
+void udelay(unsigned usecs)
 {
     unsigned cycles_per_usec;
     unsigned delay;
