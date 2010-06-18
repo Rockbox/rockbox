@@ -180,7 +180,7 @@ QString Utils::checkEnvironment(bool permission)
 #if defined(Q_OS_WIN32)
         if(System::userPermissions() != System::ADMIN)
         {
-            text += QObject::tr("<li>Permissions insufficient for bootloader "
+            text += tr("<li>Permissions insufficient for bootloader "
                     "installation.\nAdministrator priviledges are necessary.</li>");
         }
 #endif
@@ -192,14 +192,14 @@ QString Utils::checkEnvironment(bool permission)
     if(!installed.isEmpty() && installed !=
        SystemInfo::value(SystemInfo::CurConfigureModel).toString())
     {
-        text += QObject::tr("<li>Target mismatch detected.\n"
+        text += tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
             .arg(installed, SystemInfo::value(SystemInfo::CurPlatformName).toString());
             // FIXME: replace installed by human-friendly name
     }
 
     if(!text.isEmpty())
-        return QObject::tr("Problem detected:") + "<ul>" + text + "</ul>";
+        return tr("Problem detected:") + "<ul>" + text + "</ul>";
     else
         return text;
 }

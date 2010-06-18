@@ -23,10 +23,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <QtCore/QObject>
+
 #include <QString>
 #include <QUrl>
 
-class Utils
+class Utils : public QObject
 {
 public:
     static bool recursiveRmdir(const QString &dirName);

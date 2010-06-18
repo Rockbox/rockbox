@@ -116,16 +116,16 @@ QString System::userPermissionsString(void)
     int perm = userPermissions();
     switch(perm) {
         case GUEST:
-            result = QObject::tr("Guest");
+            result = tr("Guest");
             break;
         case ADMIN:
-            result = QObject::tr("Admin");
+            result = tr("Admin");
             break;
         case USER:
-            result = QObject::tr("User");
+            result = tr("User");
             break;
         default:
-            result = QObject::tr("Error");
+            result = tr("Error");
             break;
     }
     return result;
@@ -254,7 +254,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                 libusb_close(dh);
             }
             if(name.isEmpty())
-                name = QObject::tr("(no description available)");
+                name = tr("(no description available)");
             if(id) {
                 usbids.insert(id, name);
                 qDebug("[System] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
@@ -299,7 +299,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                     }
                 }
                 usb_close(dev);
-                if(name.isEmpty()) name = QObject::tr("(no description available)");
+                if(name.isEmpty()) name = tr("(no description available)");
 
                 if(id) {
                     usbids.insert(id, name);

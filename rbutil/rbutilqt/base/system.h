@@ -23,12 +23,14 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <QtCore/QObject>
+
 #include <inttypes.h>
 
 #include <QString>
 #include <QUrl>
 
-class System
+class System : public QObject
 {
 public:
     System() {}
