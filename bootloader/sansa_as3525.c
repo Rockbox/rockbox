@@ -29,7 +29,6 @@
 #include "lcd.h"
 #ifdef USE_ROCKBOX_USB
 #include "usb.h"
-#include "usb_core.h"
 #include "sysfont.h"
 #endif /* USE_ROCKBOX_USB */
 #include "backlight.h"
@@ -89,6 +88,7 @@ void main(void)
 
 #ifdef USE_ROCKBOX_USB
     usb_init();
+    usb_start_monitoring();
     if(usb_detect() == USB_INSERTED)
     {
         const char msg[] = "Bootloader USB mode";
@@ -97,13 +97,8 @@ void main(void)
                     (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
         lcd_update();
 
-        usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
-        usb_enable(true);
-
         while(usb_detect() == USB_INSERTED)
             sleep(HZ);
-
-        usb_enable(false);
 
         reset_screen();
         lcd_update();
