@@ -62,9 +62,19 @@
 #if CONFIG_CPU == AS3525v2
 
 /* PLLA & PLLB registers differ from AS3525(v1)
- * so we use a setting with a known frequency */
+ * PLL bits:
+ * - bit 0-6 = F-1 (F=multiplier)
+ * - bit 7-9 = R-1 (R=divisor)
+ * - bit 10  = OD (output divider)? Divides by 2 if set.
+ * - bit 11  = unknown (no effect)
+ * - bit 12  = unknown (always set to 1)
+ * Fpll = Fin * F / (R * OD), where Fin = 12 MHz
+ */
 #define AS3525_PLLA_FREQ        240000000
 #define AS3525_PLLA_SETTING     0x113B
+
+#define AS3525_PLLB_FREQ        192000000
+#define AS3525_PLLB_SETTING     0x155F
 
 #define AS3525_FCLK_PREDIV      0
 #define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
