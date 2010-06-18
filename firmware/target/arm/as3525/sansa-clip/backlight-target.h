@@ -35,6 +35,8 @@ static inline void _backlight_off(void)
     lcd_enable(false);
 }
 
+#define _backlight_panic_on() _backlight_on()
+
 static inline bool _backlight_init(void)
 {
     GPIOD_DIR |= (1<<7); /* for button light */

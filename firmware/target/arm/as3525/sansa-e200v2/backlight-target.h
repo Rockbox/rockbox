@@ -24,6 +24,7 @@
 #define _backlight_init() true
 void _backlight_on(void);
 void _backlight_off(void);
+#define _backlight_panic_on() _backlight_on()
 void _backlight_set_brightness(int brightness);
 int  __backlight_is_on(void);
 

@@ -26,6 +26,7 @@
 
 void _backlight_on(void);
 void _backlight_off(void);
+#define _backlight_panic_on() _backlight_on()
 
 static inline bool _backlight_init(void)
 {

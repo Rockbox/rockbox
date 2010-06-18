@@ -392,6 +392,8 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
+    /* make sure lcd+backlight are on */
+    _backlight_panic_on();
     /* wait until button release (if a button is pressed) */
     while(button_read_device());
     /* then wait until next button press */

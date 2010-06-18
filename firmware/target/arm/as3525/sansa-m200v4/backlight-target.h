@@ -37,4 +37,6 @@ static inline void _backlight_off(void)
     GPIOD_PIN(1) = 0x00;
 }
 
+#define _backlight_panic_on() _backlight_on()
+
 #endif

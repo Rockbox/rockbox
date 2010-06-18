@@ -27,6 +27,13 @@ bool _backlight_init(void);
 void _backlight_pwm(int on);
 void _backlight_on(void);
 void _backlight_off(void);
+
+static inline void _backlight_panic_on(void)
+{
+    _backlight_on();
+    _backlight_pwm(1);
+}
+
 void _backlight_set_brightness(int brightness);
 int  __backlight_is_on(void);
 
