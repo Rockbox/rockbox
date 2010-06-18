@@ -80,8 +80,7 @@ void usb_attach(void)
 /* delay is in milliseconds */
 static inline void usb_delay(int delay)
 {
-    while(delay--)
-        udelay(1000);
+    udelay(1000 * delay);
 }
 
 static void usb_phy_on(void)

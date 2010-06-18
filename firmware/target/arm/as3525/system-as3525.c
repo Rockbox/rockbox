@@ -326,6 +326,26 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
+void udelay(unsigned short usecs)
+{
+    unsigned cycles_per_usec;
+    unsigned delay;
+
+    if (cpu_frequency == CPUFREQ_MAX) {
+        cycles_per_usec = (CPUFREQ_MAX + 999999) / 1000000;
+    } else {
+        cycles_per_usec = (CPUFREQ_NORMAL + 999999) / 1000000;
+    }
+
+    delay = (usecs * cycles_per_usec + 3) / 4;
+
+    asm volatile(
+        "1: subs %0, %0, #1  \n"    /* 1 cycle  */
+        "   bne  1b          \n"    /* 3 cycles */
+        : : "r"(delay)
+    );
+}
+
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
