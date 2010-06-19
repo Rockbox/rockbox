@@ -170,11 +170,13 @@ int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
 
     if (bootfile) {
         if(readfile(bootfile, &bootloader) != 0) {
+            fprintf(stderr,"[ERR]  Reading bootloader file failed.\n");
             return 1;
         }
     }
     if (firmfile) {
         if(readfile(firmfile, &firmware) != 0) {
+            fprintf(stderr,"[ERR]  Reading firmware file failed.\n");
             return 1;
         }
     }
@@ -211,7 +213,11 @@ int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
     {
         if(firmfile) {
             /* if a firmware file is given create a dualboot image. */
-            mknkboot(&firmware, &bootloader, &fw);
+            if(mknkboot(&firmware, &bootloader, &fw))
+            {
+                fprintf(stderr,"[ERR]  Creating dualboot firmware failed.\n");
+                return 1;
+            }
         }
         else {
             /* Create a single-boot bootloader from the embedded bootloader */
@@ -219,7 +225,10 @@ int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
         }
 
         if (fw.buf == NULL)
+        {
+            fprintf(stderr,"[ERR]  Creating the bootloader failed.\n");
             return 1;
+        }
 
         if (mtp_send_firmware(&mtp_info, fw.buf, fw.len) == 0)
         {
