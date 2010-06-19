@@ -25,11 +25,11 @@
 
 #define USB_DEVICE                  (USB_BASE + 0x0800)   /** USB Device base address */
 
-#define USB_BASE_REG(offset) (*(volatile unsigned long *)(USB_BASE + offset))
-
 /**
  * Core Global Registers
  */
+#define USB_BASE_REG(offset) (*(volatile unsigned long *)(USB_BASE + offset))
+
 #define USB_GOTGCTL     USB_BASE_REG(0x000) /** OTG Control and Status Register */
 #define USB_GOTGINT     USB_BASE_REG(0x004) /** OTG Interrupt Register */
 #define USB_GAHBCFG     USB_BASE_REG(0x008) /** Core AHB Configuration Register */
