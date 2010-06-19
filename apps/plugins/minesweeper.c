@@ -365,22 +365,16 @@ tile minefield[MAX_HEIGHT][MAX_WIDTH];
 int mine_num = 0;
 
 /* percentage of mines on minefield used during generation */
-int p = 16;
+int percent = 16;
 
 /* number of tiles left on the game */
 int tiles_left;
-
-/* number of used flags on the game */
-int flags_used;
 
 /* Because mines are set after the first move... */
 bool no_mines = true;
 
 /* We need a stack (created on discover()) for the cascade algorithm. */
 int stack_pos = 0;
-
-/* a usefull string for snprintf */
-char str[30];
 
 #ifdef HAVE_TOUCHSCREEN
 
@@ -434,9 +428,10 @@ int neighbors_flagged( int y, int x )
 bool discover( int y, int x, bool explore_neighbors )
 {
     /* Selected tile. */
-    if( x < 0 || y < 0 || x > width - 1 || y > height - 1
-       || minefield[y][x].known
-       || minefield[y][x].mine || minefield[y][x].flag )
+    if( x < 0 || y < 0 || x > width - 1 || y > height - 1)
+        return false;
+
+    if( minefield[y][x].known || minefield[y][x].mine || minefield[y][x].flag )
     {
         if( !minefield[y][x].flag && minefield[y][x].mine )
             return true;
@@ -492,18 +487,7 @@ bool discover( int y, int x, bool explore_neighbors )
 /* Reset the whole board for a new game. */
 void minesweeper_init( void )
 {
-    int i,j;
-
-    for( i = 0; i < MAX_HEIGHT; i++ )
-    {
-        for( j = 0; j < MAX_WIDTH; j++ )
-        {
-            minefield[i][j].known = 0;
-            minefield[i][j].flag = 0;
-            minefield[i][j].mine = 0;
-            minefield[i][j].neighbors = 0;
-        }
-    }
+    rb->memset(minefield, 0, sizeof(minefield));
     no_mines = true;
     tiles_left = width*height;
 }
@@ -612,24 +596,24 @@ void mine_show( void )
 
 int count_tiles_left( void )
 {
-    int tiles_left = 0;
+    int tiles = 0;
     int i, j;
     for( i = 0; i < height; i++ )
         for( j = 0; j < width; j++ )
              if( minefield[i][j].known == 0 )
-                tiles_left++;
-    return tiles_left;
+                tiles++;
+    return tiles;
 }
 
 int count_flags( void )
 {
-    int flags_used = 0;
+    int flags = 0;
     int i, j;
     for( i = 0; i < height; i++ )
         for( j = 0; j < width; j++ )
              if( minefield[i][j].flag == 1 )
-                flags_used++;
-    return flags_used;
+                flags++;
+    return flags;
 }
 
 /* welcome screen where player can chose mine percentage */
@@ -657,7 +641,7 @@ enum minesweeper_status menu( void )
                 break;
 
             case 1:
-                rb->set_int( "Mine Percentage", "%", UNIT_INT, &p, NULL,
+                rb->set_int( "Mine Percentage", "%", UNIT_INT, &percent, NULL,
                              1, 2, 98, NULL );
                 break;
 
@@ -790,25 +774,29 @@ enum minesweeper_status minesweeper( void )
             /* move cursor left */
             case MINESWP_LEFT:
             case MINESWP_LEFT|BUTTON_REPEAT:
-                x = ( x + width - 1 )%width;
+                if( --x < 0)
+                    x += width;
                 break;
 
             /* move cursor right */
             case MINESWP_RIGHT:
             case MINESWP_RIGHT|BUTTON_REPEAT:
-                x = ( x + 1 )%width;
+                if( ++x >= width )
+                    x -= width;
                 break;
 
             /* move cursor down */
             case MINESWP_DOWN:
             case MINESWP_DOWN|BUTTON_REPEAT:
-                y = ( y + 1 )%height;
+                if( ++y >= height )
+                    y -= height;
                 break;
 
             /* move cursor up */
             case MINESWP_UP:
             case MINESWP_UP|BUTTON_REPEAT:
-                y = ( y + height - 1 )%height;
+                if( --y < 0 )
+                    y += height;
                 break;
 
             /*move cursor though the entire field*/
@@ -816,17 +804,21 @@ enum minesweeper_status minesweeper( void )
             case MINESWP_NEXT:
             case MINESWP_NEXT|BUTTON_REPEAT:
                 if (x == width -1 ) {
-                    y = ( y + 1 )%height;
+                    if( ++y >= height )
+                        y -= height;
                 }
-                x = ( x + 1 )%width;
+                if( ++x >= width )
+                    x -= width;
                 break;
 
             case MINESWP_PREV:
             case MINESWP_PREV|BUTTON_REPEAT:
                 if (x == 0) {
-                    y = ( y + height - 1 )%height;
+                    if( --y < 0 )
+                        y += height;
                 }
-                x = ( x + width - 1 )%width;
+                if( --x < 0 )
+                    x += width;
                 break;
 #endif
             /* discover a tile (and it's neighbors if .neighbors == 0) */
@@ -838,7 +830,7 @@ enum minesweeper_status minesweeper( void )
                 /* we put the mines on the first "click" so that you don't
                  * lose on the first "click" */
                 if( tiles_left == width*height && no_mines )
-                    minesweeper_putmines(p,x,y);
+                    minesweeper_putmines(percent,x,y);
 
                 if( discover( y, x, true ) )
                 {
@@ -862,7 +854,8 @@ enum minesweeper_status minesweeper( void )
 #ifdef MINESWP_TOGGLE2
             case MINESWP_TOGGLE2:
 #endif
-                minefield[y][x].flag = ( minefield[y][x].flag + 1 )%2;
+                if( !minefield[y][x].known )
+                    minefield[y][x].flag = !minefield[y][x].flag;
                 break;
 
             /* show how many mines you think you have found and how many
@@ -870,7 +863,7 @@ enum minesweeper_status minesweeper( void )
             case MINESWP_INFO:
                 if( no_mines )
                     break;
-                flags_used = count_flags();
+                int flags_used = count_flags();
                 if (flags_used == 1) {
                     rb->splashf( HZ*2, "You marked 1 field. There are %d mines.",
                                 mine_num );
