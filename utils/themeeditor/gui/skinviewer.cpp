@@ -55,7 +55,7 @@ void SkinViewer::changeEvent(QEvent *e)
 
 void SkinViewer::setScene(QGraphicsScene *scene)
 {
-    ui->viewer->setScene(scene);z
+    ui->viewer->setScene(scene);
 }
 
 void SkinViewer::zoomIn()
