@@ -847,7 +847,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(aligned)
         {
-            dma_buf = buf;
+            dma_buf = AS3525_PHYSICAL_ADDR(buf);
         }
         else
         {
