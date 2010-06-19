@@ -25,34 +25,36 @@
 
 #define USB_DEVICE                  (USB_BASE + 0x0800)   /** USB Device base address */
 
+#define USB_BASE_REG(offset) (*(volatile unsigned long *)(USB_BASE + offset))
+
 /**
  * Core Global Registers
  */
-#define USB_GOTGCTL     (*(volatile unsigned long *)(USB_BASE + 0x000)) /** OTG Control and Status Register */
-#define USB_GOTGINT     (*(volatile unsigned long *)(USB_BASE + 0x004)) /** OTG Interrupt Register */
-#define USB_GAHBCFG     (*(volatile unsigned long *)(USB_BASE + 0x008)) /** Core AHB Configuration Register */
-#define USB_GUSBCFG     (*(volatile unsigned long *)(USB_BASE + 0x00C)) /** Core USB Configuration Register */
-#define USB_GRSTCTL     (*(volatile unsigned long *)(USB_BASE + 0x010)) /** Core Reset Register */
-#define USB_GINTSTS     (*(volatile unsigned long *)(USB_BASE + 0x014)) /** Core Interrupt Register */
-#define USB_GINTMSK     (*(volatile unsigned long *)(USB_BASE + 0x018)) /** Core Interrupt Mask Register */
-#define USB_GRXSTSR     (*(volatile unsigned long *)(USB_BASE + 0x01C)) /** Receive Status Debug Read Register (Read Only) */
-#define USB_GRXSTSP     (*(volatile unsigned long *)(USB_BASE + 0x020)) /** Receive Status Read /Pop Register (Read Only) */
-#define USB_GRXFSIZ     (*(volatile unsigned long *)(USB_BASE + 0x024)) /** Receive FIFO Size Register */
-#define USB_GNPTXFSIZ   (*(volatile unsigned long *)(USB_BASE + 0x028)) /** Periodic Transmit FIFO Size Register */
-#define USB_GNPTXSTS    (*(volatile unsigned long *)(USB_BASE + 0x02C)) /** Non-Periodic Transmit FIFO/Queue Status Register */
-#define USB_GI2CCTL     (*(volatile unsigned long *)(USB_BASE + 0x030)) /** I2C Access Register */
-#define USB_GPVNDCTL    (*(volatile unsigned long *)(USB_BASE + 0x034)) /** PHY Vendor Control Register */
-#define USB_GGPIO       (*(volatile unsigned long *)(USB_BASE + 0x038)) /** General Purpose Input/Output Register */
-#define USB_GUID        (*(volatile unsigned long *)(USB_BASE + 0x03C)) /** User ID Register */
-#define USB_GSNPSID     (*(volatile unsigned long *)(USB_BASE + 0x040)) /** Synopsys ID Register */
-#define USB_GHWCFG1     (*(volatile unsigned long *)(USB_BASE + 0x044)) /** User HW Config1 Register */
-#define USB_GHWCFG2     (*(volatile unsigned long *)(USB_BASE + 0x048)) /** User HW Config2 Register */
-#define USB_GHWCFG3     (*(volatile unsigned long *)(USB_BASE + 0x04C)) /** User HW Config3 Register */
-#define USB_GHWCFG4     (*(volatile unsigned long *)(USB_BASE + 0x050)) /** User HW Config4 Register */
+#define USB_GOTGCTL     USB_BASE_REG(0x000) /** OTG Control and Status Register */
+#define USB_GOTGINT     USB_BASE_REG(0x004) /** OTG Interrupt Register */
+#define USB_GAHBCFG     USB_BASE_REG(0x008) /** Core AHB Configuration Register */
+#define USB_GUSBCFG     USB_BASE_REG(0x00C) /** Core USB Configuration Register */
+#define USB_GRSTCTL     USB_BASE_REG(0x010) /** Core Reset Register */
+#define USB_GINTSTS     USB_BASE_REG(0x014) /** Core Interrupt Register */
+#define USB_GINTMSK     USB_BASE_REG(0x018) /** Core Interrupt Mask Register */
+#define USB_GRXSTSR     USB_BASE_REG(0x01C) /** Receive Status Debug Read Register (Read Only) */
+#define USB_GRXSTSP     USB_BASE_REG(0x020) /** Receive Status Read /Pop Register (Read Only) */
+#define USB_GRXFSIZ     USB_BASE_REG(0x024) /** Receive FIFO Size Register */
+#define USB_GNPTXFSIZ   USB_BASE_REG(0x028) /** Periodic Transmit FIFO Size Register */
+#define USB_GNPTXSTS    USB_BASE_REG(0x02C) /** Non-Periodic Transmit FIFO/Queue Status Register */
+#define USB_GI2CCTL     USB_BASE_REG(0x030) /** I2C Access Register */
+#define USB_GPVNDCTL    USB_BASE_REG(0x034) /** PHY Vendor Control Register */
+#define USB_GGPIO       USB_BASE_REG(0x038) /** General Purpose Input/Output Register */
+#define USB_GUID        USB_BASE_REG(0x03C) /** User ID Register */
+#define USB_GSNPSID     USB_BASE_REG(0x040) /** Synopsys ID Register */
+#define USB_GHWCFG1     USB_BASE_REG(0x044) /** User HW Config1 Register */
+#define USB_GHWCFG2     USB_BASE_REG(0x048) /** User HW Config2 Register */
+#define USB_GHWCFG3     USB_BASE_REG(0x04C) /** User HW Config3 Register */
+#define USB_GHWCFG4     USB_BASE_REG(0x050) /** User HW Config4 Register */
 
 /* 1<=ep<=15, don't use ep=0 !!! */
 /** Device IN Endpoint Transmit FIFO (ep) Size Register */
-#define USB_DIEPTXFSIZ(ep)  (*(volatile unsigned long *)(USB_BASE + 0x100 + 4 * (ep)))
+#define USB_DIEPTXFSIZ(ep)  USB_BASE_REG(0x100 + 4 * (ep))
 
 /** Build the content of a FIFO size register like USB_DIEPTXFSIZ(i) and USB_GNPTXFSIZ*/
 #define USB_MAKE_FIFOSIZE_DATA(startadr, depth) \
@@ -161,24 +163,26 @@
 /**
  * Device Registers Base Addresses
  */
-#define USB_DCFG        (*(volatile unsigned long *)(USB_DEVICE + 0x00)) /** Device Configuration Register */
-#define USB_DCTL        (*(volatile unsigned long *)(USB_DEVICE + 0x04)) /** Device Control Register */
-#define USB_DSTS        (*(volatile unsigned long *)(USB_DEVICE + 0x08)) /** Device Status Register */
-#define USB_DIEPMSK     (*(volatile unsigned long *)(USB_DEVICE + 0x10)) /** Device IN Endpoint Common Interrupt Mask Register */
-#define USB_DOEPMSK     (*(volatile unsigned long *)(USB_DEVICE + 0x14)) /** Device OUT Endpoint Common Interrupt Mask Register */
-#define USB_DAINT       (*(volatile unsigned long *)(USB_DEVICE + 0x18)) /** Device All Endpoints Interrupt Register */
-#define USB_DAINTMSK    (*(volatile unsigned long *)(USB_DEVICE + 0x1C)) /** Device Endpoints Interrupt Mask Register */
-#define USB_DTKNQR1     (*(volatile unsigned long *)(USB_DEVICE + 0x20)) /** Device IN Token Sequence Learning Queue Read Register 1 */
-#define USB_DTKNQR2     (*(volatile unsigned long *)(USB_DEVICE + 0x24)) /** Device IN Token Sequence Learning Queue Register 2 */
-#define USB_DTKNQP      (*(volatile unsigned long *)(USB_DEVICE + 0x28)) /** Device IN Token Queue Pop register */
+#define USB_DEV_REG(offset) (*(volatile unsigned long *)(USB_DEVICE + offset))
+
+#define USB_DCFG        USB_DEV_REG(0x00) /** Device Configuration Register */
+#define USB_DCTL        USB_DEV_REG(0x04) /** Device Control Register */
+#define USB_DSTS        USB_DEV_REG(0x08) /** Device Status Register */
+#define USB_DIEPMSK     USB_DEV_REG(0x10) /** Device IN Endpoint Common Interrupt Mask Register */
+#define USB_DOEPMSK     USB_DEV_REG(0x14) /** Device OUT Endpoint Common Interrupt Mask Register */
+#define USB_DAINT       USB_DEV_REG(0x18) /** Device All Endpoints Interrupt Register */
+#define USB_DAINTMSK    USB_DEV_REG(0x1C) /** Device Endpoints Interrupt Mask Register */
+#define USB_DTKNQR1     USB_DEV_REG(0x20) /** Device IN Token Sequence Learning Queue Read Register 1 */
+#define USB_DTKNQR2     USB_DEV_REG(0x24) /** Device IN Token Sequence Learning Queue Register 2 */
+#define USB_DTKNQP      USB_DEV_REG(0x28) /** Device IN Token Queue Pop register */
 /* fixme: those registers are not present in usb_registers.h but are in dwc_otgh_regs.h.
  *        the previous registers exists but has a different name :( */
-#define USB_DVBUSDIS    (*(volatile unsigned long *)(USB_DEVICE + 0x28)) /** Device VBUS discharge register*/
-#define USB_DVBUSPULSE  (*(volatile unsigned long *)(USB_DEVICE + 0x2C)) /** Device VBUS pulse register */
-#define USB_DTKNQR3     (*(volatile unsigned long *)(USB_DEVICE + 0x30)) /** Device IN Token Queue Read Register 3 (RO) */
-#define USB_DTHRCTL     (*(volatile unsigned long *)(USB_DEVICE + 0x30)) /** Device Thresholding control register */
-#define USB_DTKNQR4     (*(volatile unsigned long *)(USB_DEVICE + 0x34)) /** Device IN Token Queue Read Register 4 (RO) */
-#define USB_FFEMPTYMSK  (*(volatile unsigned long *)(USB_DEVICE + 0x34)) /** Device IN EPs empty Inr. Mask Register */
+#define USB_DVBUSDIS    USB_DEV_REG(0x28) /** Device VBUS discharge register*/
+#define USB_DVBUSPULSE  USB_DEV_REG(0x2C) /** Device VBUS pulse register */
+#define USB_DTKNQR3     USB_DEV_REG(0x30) /** Device IN Token Queue Read Register 3 (RO) */
+#define USB_DTHRCTL     USB_DEV_REG(0x30) /** Device Thresholding control register */
+#define USB_DTKNQR4     USB_DEV_REG(0x34) /** Device IN Token Queue Read Register 4 (RO) */
+#define USB_FFEMPTYMSK  USB_DEV_REG(0x34) /** Device IN EPs empty Inr. Mask Register */
 
 #define USB_DCTL_rmtwkupsig                 (1 << 0) /** Remote Wakeup */
 #define USB_DCTL_sftdiscon                  (1 << 1) /** Soft Disconnect */
@@ -227,15 +231,15 @@
 
 /* 0<=ep<=15, you can use ep=0 */
 /** Device IN Endpoint (ep) Control Register */
-#define USB_DIEPCTL(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20))
+#define USB_DIEPCTL(ep)     USB_DEV_REG(0x100 + (ep) * 0x20)
 /** Device IN Endpoint (ep) Interrupt Register */
-#define USB_DIEPINT(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x8))
+#define USB_DIEPINT(ep)     USB_DEV_REG(0x100 + (ep) * 0x20 + 0x8)
 /** Device IN Endpoint (ep) Transfer Size Register */
-#define USB_DIEPTSIZ(ep)    (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x10))
+#define USB_DIEPTSIZ(ep)    USB_DEV_REG(0x100 + (ep) * 0x20 + 0x10)
 /** Device IN Endpoint (ep) DMA Address Register */
-#define USB_DIEPDMA(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x14))
+#define USB_DIEPDMA(ep)     USB_DEV_REG(0x100 + (ep) * 0x20 + 0x14)
 /** Device IN Endpoint (ep) Transmit FIFO Status Register */
-#define USB_DTXFSTS(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x100 + (ep) * 0x20 + 0x18))
+#define USB_DTXFSTS(ep)     USB_DEV_REG(0x100 + (ep) * 0x20 + 0x18)
 
 /* the following also apply to DIEPMSK */
 #define USB_DIEPINT_xfercompl       (1 << 0) /** Transfer complete */
@@ -256,17 +260,17 @@
 
 /* 0<=ep<=15, you can use ep=0 */
 /** Device OUT Endpoint (ep) Control Register */
-#define USB_DOEPCTL(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20))
+#define USB_DOEPCTL(ep)     USB_DEV_REG(0x300 + (ep) * 0x20)
 /** Device OUT Endpoint (ep) Frame number Register */
-#define USB_DOEPFN(ep)      (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x4))
+#define USB_DOEPFN(ep)      USB_DEV_REG(0x300 + (ep) * 0x20 + 0x4)
 /** Device Endpoint (ep) Interrupt Register */
-#define USB_DOEPINT(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x8))
+#define USB_DOEPINT(ep)     USB_DEV_REG(0x300 + (ep) * 0x20 + 0x8)
 /** Device OUT Endpoint (ep) Transfer Size Register */
-#define USB_DOEPTSIZ(ep)    (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x10))
+#define USB_DOEPTSIZ(ep)    USB_DEV_REG(0x300 + (ep) * 0x20 + 0x10)
 /** Device Endpoint (ep) DMA Address Register */
-#define USB_DOEPDMA(ep)     (*(volatile unsigned long *)(USB_DEVICE + 0x300 + (ep) * 0x20 + 0x14))
+#define USB_DOEPDMA(ep)     USB_DEV_REG(0x300 + (ep) * 0x20 + 0x14)
 
-#define USB_PCGCCTL         (*(volatile unsigned long *)(USB_BASE + 0xE00)) /** Power and Clock Gating Control Register */
+#define USB_PCGCCTL         USB_BASE_REG(0xE00) /** Power and Clock Gating Control Register */
 
 
 /** Maximum Packet Size
