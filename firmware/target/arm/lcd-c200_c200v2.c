@@ -124,15 +124,7 @@ static inline void c200v1_lcd_init(void)
     udelay(10000);
 }
 
-#define lcd_delay(delay) udelay((delay) * 1000)
-
 #elif defined(SANSA_C200V2)
-
-static inline void lcd_delay(int delay)
-{   //TUNEME : delay is in milliseconds
-    delay <<= 14;
-    while(delay--) ;
-}
 
 /* send LCD data */
 void lcd_write_data(const fb_data *data, int width)
@@ -177,7 +169,7 @@ static inline void as3525_dbop_init(void)
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
-    lcd_delay(20);
+    mdelay(20);
 }
 
 #endif
@@ -188,27 +180,27 @@ static void lcd_reset(void)
     /* reset lcd */
     GPIOB_DIR |= (1<<6);
     GPIOB_PIN(6) = 0; /* pull reset low */
-    lcd_delay(20);
+    mdelay(20);
     GPIOB_PIN(6) = 1<<6; /* release reset */
-    lcd_delay(20);
+    mdelay(20);
 #endif
     lcd_send_command(R_STANDBY_OFF, 0);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_OSCILLATION_MODE, 0x01);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x01);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x09);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x0b);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x0f);
-    lcd_delay(20);
+    mdelay(20);
 
     lcd_send_command(R_DRIVER_OUTPUT_MODE, 0x07);
 
@@ -238,7 +230,7 @@ static void lcd_reset(void)
     lcd_send_command(R_X_ADDR_AREA, 0); /* x1 */
     lcd_send_command(LCD_WIDTH - 1, 0); /* x2 */
 
-    lcd_delay(100);
+    mdelay(100);
 
     lcd_send_command(R_DISPLAY_ON, 0);
 }
