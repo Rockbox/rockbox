@@ -276,6 +276,10 @@ voice: voicetools features
 
 endif
 
+bininstall:
+	@echo "Installing your rockbox binary in your '$(PREFIX)' dir"
+	$(SILENT)cp $(BINARY) $(PREFIX)/.rockbox/
+
 install:
 	@echo "Installing your build in your '$(PREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
