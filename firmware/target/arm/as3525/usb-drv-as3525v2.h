@@ -42,9 +42,6 @@
 #define bitm(reg_name, field_name) \
     (reg_name##_##field_name##_bits << reg_name##_##field_name##_bitp)
 
-#define make(reg_name, field_name, value) \
-    ((value) << reg_name##_##field_name##_bitp)
-
 #define USB_DEVICE                  (USB_BASE + 0x0800)   /** USB Device base address */
 
 /**
