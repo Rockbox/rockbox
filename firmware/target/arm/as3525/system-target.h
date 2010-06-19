@@ -27,6 +27,8 @@
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
+#define STORAGE_WANTS_ALIGN
+
 /* We can use a interrupt-based mechanism on the fuzev2 */
 #define INCREASED_SCROLLWHEEL_POLLING \
     (defined(HAVE_SCROLLWHEEL) && (CONFIG_CPU == AS3525))
