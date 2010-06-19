@@ -26,6 +26,7 @@
 #include "kernel.h"
 #include "system.h"
 #ifdef SANSA_C200V2
+#include "system-target.h"
 #include "dbop-as3525.h"
 #endif
 
