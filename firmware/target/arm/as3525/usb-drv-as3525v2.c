@@ -365,51 +365,6 @@ void usb_drv_exit(void)
     logf("usb_drv_exit");
 }
 
-int usb_drv_port_speed(void)
-{
-    return 0;
-}
-
-int usb_drv_request_endpoint(int type, int dir)
-{
-    (void) type;
-    (void) dir;
-    return -1;
-}
-
-void usb_drv_release_endpoint(int ep)
-{
-    (void) ep;
-}
-
-void usb_drv_cancel_all_transfers(void)
-{
-}
-
-int usb_drv_recv(int ep, void *ptr, int len)
-{
-    (void) ep;
-    (void) ptr;
-    (void) len;
-    return -1;
-}
-
-int usb_drv_send(int ep, void *ptr, int len)
-{
-    (void) ep;
-    (void) ptr;
-    (void) len;
-    return -1;
-}
-
-int usb_drv_send_nonblocking(int ep, void *ptr, int len)
-{
-    (void) ep;
-    (void) ptr;
-    (void) len;
-    return -1;
-}
-
 static void activate_ep0(void)
 {
     /* Setup EP0 OUT to receive setup packets and
@@ -436,7 +391,7 @@ static void activate_ep0(void)
     }
 
     /* Enable OUT ep for receive */
-    USB_DOEPCTL(0) |= USB_DEPCTL_epena;
+    //USB_DOEPCTL(0) |= USB_DEPCTL_epena;
 
     /* Clear non periodic NAK for IN ep */
     USB_DCTL |= USB_DCTL_cgnpinnak;
@@ -449,7 +404,6 @@ static void ep0_out_start(void)
      * setup packet count = 1
      * transfer size = 8 (=sizeof setup packet)
      */
-    
     USB_DOEPTSIZ(0) = (1 << USB_DEPTSIZ0_supcnt_bit_pos)
                     | (1 << USB_DEPTSIZ0_pkcnt_bit_pos)
                     | 8;
@@ -519,13 +473,13 @@ static bool handle_enum_done(void)
 
 static bool handle_in_ep_int(void)
 {
-    logf("usb: in ep int");
+    panicf("usb: in ep int");
     return false;
 }
 
 static bool handle_out_ep_int(void)
 {
-    logf("usb: out ep int");
+    panicf("usb: out ep int");
     return false;
 }
 
@@ -607,12 +561,58 @@ void INT_USB(void)
 
     Lunhandled:
     dump_intsts(buffer, sizeof buffer, sts);
-        panicf("unhandled usb int: %lx (%s)", sts, buffer);
+    panicf("unhandled usb int: %lx (%s)", sts, buffer);
 
     Lerr:
     dump_intsts(buffer, sizeof buffer, sts);
     panicf("error in usb int: %lx (%s)", sts, buffer);
 }
+
+int usb_drv_port_speed(void)
+{
+    return 0;
+}
+
+int usb_drv_request_endpoint(int type, int dir)
+{
+    (void) type;
+    (void) dir;
+    return -1;
+}
+
+void usb_drv_release_endpoint(int ep)
+{
+    (void) ep;
+}
+
+void usb_drv_cancel_all_transfers(void)
+{
+}
+
+int usb_drv_recv(int ep, void *ptr, int len)
+{
+    (void) ep;
+    (void) ptr;
+    (void) len;
+    return -1;
+}
+
+int usb_drv_send(int ep, void *ptr, int len)
+{
+    (void) ep;
+    (void) ptr;
+    (void) len;
+    return -1;
+}
+
+int usb_drv_send_nonblocking(int ep, void *ptr, int len)
+{
+    (void) ep;
+    (void) ptr;
+    (void) len;
+    return -1;
+}
+
 
 void usb_drv_set_test_mode(int mode)
 {
