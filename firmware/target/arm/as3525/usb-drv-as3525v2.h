@@ -121,7 +121,11 @@
 
 #define USB_GAHBCFG_glblintrmsk             (1 << 0) /** Global interrupt mask */
 #define USB_GAHBCFG_hburstlen_bit_pos       1
+#define USB_GAHBCFG_INT_DMA_BURST_SINGLE    0
 #define USB_GAHBCFG_INT_DMA_BURST_INCR      1 /** note: the linux patch has several other value, this is one picked for internal dma */
+#define USB_GAHBCFG_INT_DMA_BURST_INCR4     3
+#define USB_GAHBCFG_INT_DMA_BURST_INCR8     5
+#define USB_GAHBCFG_INT_DMA_BURST_INCR16    7
 #define USB_GAHBCFG_dma_enable              (1 << 5) /** Enable DMA */
 
 /* NOTE: USB_GINTSTS bits are the same as in USB_GINTMSK plus the following one */
@@ -362,6 +366,20 @@
 /**
  * Parameters
  */
+#define USB_USE_CUSTOM_FIFO_LAYOUT
+
+#ifdef USB_USE_CUSTOM_FIFO_LAYOUT
+/* Data fifo: includes RX fifo, non period TX fifo and periodic fifos
+ * NOTE: this is a hardware parameter, it cannot be changed ! */
+#define USB_DATA_FIFO_DEPTH     0x535
+/* size of the FX fifo */
+#define USB_RX_FIFO_SIZE        0x100
+/* size of the non periodic TX fifo */
+#define USB_NPTX_FIFO_SIZE      0x100
+/* size of each TX ep fifo size */
+#define USB_EPTX_FIFO_SIZE      0x100
+#endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
+
 /* Number of IN/OUT endpoints */
 #define USB_NUM_IN_EP           3
 #define USB_NUM_OUT_EP          2
