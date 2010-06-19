@@ -235,24 +235,20 @@ fontzip:
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 1 -o rockbox-fonts.zip $(TARGET) $(BINARY)
 
 zip:
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
 
 mapzip:
 	$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
 
 fullzip:
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 -o rockbox-full.zip $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 -o rockbox-full.zip $(TARGET) $(BINARY)
 
 7zip:
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a -mx=9" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a -mx=9" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
 
 tar:
 	$(SILENT)rm -f rockbox.tar
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.tar" -z "tar -cf" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.tar" -z "tar -cf" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
 
 bzip2: tar
 	$(SILENT)bzip2 -f9 rockbox.tar
@@ -282,13 +278,11 @@ endif
 
 install:
 	@echo "Installing your build in your '$(PREFIX)' dir"
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
 fullinstall:
 	@echo "Installing a full setup in your '$(PREFIX)' dir"
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
+	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
 help:
 	@echo "A few helpful make targets"
