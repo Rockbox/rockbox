@@ -26,7 +26,6 @@
 #include "kernel.h"
 #include "system.h"
 #ifdef SANSA_C200V2
-#include "system-target.h"
 #include "dbop-as3525.h"
 #endif
 
@@ -170,7 +169,7 @@ static inline void as3525_dbop_init(void)
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
-    mdelay(20);
+    udelay(20000);
 }
 
 #endif
@@ -181,27 +180,27 @@ static void lcd_reset(void)
     /* reset lcd */
     GPIOB_DIR |= (1<<6);
     GPIOB_PIN(6) = 0; /* pull reset low */
-    mdelay(20);
+    udelay(20000);
     GPIOB_PIN(6) = 1<<6; /* release reset */
-    mdelay(20);
+    udelay(20000);
 #endif
     lcd_send_command(R_STANDBY_OFF, 0);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_OSCILLATION_MODE, 0x01);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x01);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x09);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x0b);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_DCDC_AMP_ONOFF, 0x0f);
-    mdelay(20);
+    udelay(20000);
 
     lcd_send_command(R_DRIVER_OUTPUT_MODE, 0x07);
 
@@ -231,7 +230,7 @@ static void lcd_reset(void)
     lcd_send_command(R_X_ADDR_AREA, 0); /* x1 */
     lcd_send_command(LCD_WIDTH - 1, 0); /* x2 */
 
-    mdelay(100);
+    udelay(100000);
 
     lcd_send_command(R_DISPLAY_ON, 0);
 }
