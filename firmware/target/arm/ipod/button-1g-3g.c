@@ -49,6 +49,138 @@ static int int_btn = BUTTON_NONE;
 #define WHEEL_TIMEOUT (HZ/4)
 #endif
 
+#ifdef IPOD_3G
+#define WHEELCLICKS_PER_ROTATION  96
+#define WHEEL_BASE_SENSITIVITY     6 /* Compute every ... clicks */
+#define WHEEL_REPEAT_VELOCITY     45 /* deg/s */
+#define WHEEL_SMOOTHING_VELOCITY 100 /* deg/s */
+
+static void handle_scroll_wheel(int new_scroll, int was_hold)
+{
+    static const signed char scroll_state[4][4] = {
+        {0, 1, -1, 0},
+        {-1, 0, 0, 1},
+        {1, 0, 0, -1},
+        {0, -1, 1, 0}
+    };
+
+    static int prev_scroll = 0;
+    static int direction = 0;
+    static int count = 0;
+    static long next_backlight_on = 0;
+
+    static unsigned long last_wheel_usec = 0;
+    static unsigned long wheel_delta = 1ul << 24;
+    static unsigned long wheel_velocity = 0;
+
+    int wheel_keycode = BUTTON_NONE;
+    int scroll = scroll_state[prev_scroll][new_scroll];
+    unsigned long usec;
+    unsigned long v;
+
+    prev_scroll = new_scroll;
+
+    if (direction != scroll) {
+        /* direction reversal - reset all */
+        direction = scroll;
+        wheel_velocity = 0;
+        wheel_delta = 1ul << 24;
+        count = 0;
+    }
+
+    if (was_hold) {
+        /* hold - reset all */
+        wheel_velocity = 0;
+        wheel_delta = 1ul << 24;
+        count = 0;
+        return;
+    }
+
+    /* poke backlight every 1/4s of activity */
+    if (TIME_AFTER(current_tick, next_backlight_on)) {
+        backlight_on();
+        reset_poweroff_timer();
+        next_backlight_on = current_tick + HZ/4;
+    }
+
+    /* has wheel travelled far enough? */
+    if (++count < WHEEL_BASE_SENSITIVITY) {
+        return;
+    }
+
+    /* reset travel count and do calculations */
+    count = 0;
+
+    /* 1st..3rd Gen wheel has inverse direction mapping
+     * compared to Mini 1st Gen wheel. */
+    switch (direction) {
+        case 1:
+            wheel_keycode = BUTTON_SCROLL_BACK;
+            break;
+        case -1:
+            wheel_keycode = BUTTON_SCROLL_FWD;
+            break;
+        default:
+            /* only happens if we get out of sync */
+            return;
+    }
+
+    /* have a keycode */
+
+    usec = USEC_TIMER;
+    v = usec - last_wheel_usec;
+
+    /* calculate deg/s based upon sensitivity-adjusted interrupt period */
+
+    if ((long)v <= 0) {
+        /* timer wrapped (no activity for awhile), skip acceleration */
+        v = 0;
+        wheel_delta = 1ul << 24;
+    }
+    else {
+        if (v > 0xfffffffful/WHEELCLICKS_PER_ROTATION) {
+            v = 0xfffffffful/WHEELCLICKS_PER_ROTATION; /* check overflow below */
+        }
+
+        v = 360000000ul*WHEEL_BASE_SENSITIVITY / (v*WHEELCLICKS_PER_ROTATION);
+
+        if (v > 0xfffffful)
+            v = 0xfffffful; /* limit to 24 bits */
+    }
+
+    if (v < WHEEL_SMOOTHING_VELOCITY) {
+        /* very slow - no smoothing */
+        wheel_velocity = v;
+    }
+    else {
+        /* some velocity filtering to smooth things out */
+        wheel_velocity = (7*wheel_velocity + v) / 8;
+    }
+
+    if (v >= WHEEL_REPEAT_VELOCITY) {
+        /* quick enough - generate repeats - use unsmoothed v to guage */
+        wheel_keycode |= BUTTON_REPEAT;
+    }
+
+    if (queue_empty(&button_queue)) {
+        /* post wheel keycode with wheel data */
+        queue_post(&button_queue, wheel_keycode,
+                   (wheel_velocity >= WHEEL_ACCEL_START ? (1ul << 31) : 0)
+                    | wheel_delta | wheel_velocity);
+        /* message posted - reset delta */
+        wheel_delta = 1ul << 24;
+    }
+    else {
+        /* skipped post - increment delta and limit to 7 bits */
+        wheel_delta += 1ul << 24;
+
+        if (wheel_delta > (0x7ful << 24))
+            wheel_delta = 0x7ful << 24;
+    }
+
+    last_wheel_usec = usec;
+}
+#else
 static void handle_scroll_wheel(int new_scroll, int was_hold)
 {
     int wheel_keycode = BUTTON_NONE;
@@ -93,6 +225,7 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
         queue_post(&button_queue, wheel_keycode, 0);
     prev_scroll = new_scroll;
 }
+#endif /* IPOD_3G */
 
 static int ipod_3g_button_read(void)
 {
@@ -100,13 +233,6 @@ static int ipod_3g_button_read(void)
     static bool was_hold = false;
     int btn = BUTTON_NONE;
     
-#ifdef IPOD_3G
-    /* The following delay was 250 in the ipodlinux source,
-     * but 50 seems to work fine. 250 causes the wheel to stop
-     * working when spinning it real fast. */
-    udelay(50);
-#endif
-
     /* get source of interupts */
     source = GPIOA_INT_STAT;
     
