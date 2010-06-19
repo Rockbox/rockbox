@@ -36,16 +36,16 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-static int __in_ep_list[USB_NUM_IN_EP] = {USB_IN_EP_LIST};
-static int __out_ep_list[USB_NUM_OUT_EP] = {USB_OUT_EP_LIST};
+static int __in_ep_list[NUM_IN_EP] = {IN_EP_LIST};
+static int __out_ep_list[NUM_OUT_EP] = {OUT_EP_LIST};
 
 /* iterate through each in/out ep except EP0
  * 'counter' is the counter, 'ep' is the actual value */
 #define FOR_EACH_IN_EP(counter, ep) \
-    for(counter = 0, ep = __in_ep_list[0]; counter < USB_NUM_IN_EP; counter++, ep = __in_ep_list[counter])
+    for(counter = 0, ep = __in_ep_list[0]; counter < NUM_IN_EP; counter++, ep = __in_ep_list[counter])
 
 #define FOR_EACH_OUT_EP(counter, ep) \
-    for(counter = 0, ep = __out_ep_list[0]; counter < USB_NUM_OUT_EP; counter++, ep = __out_ep_list[counter])
+    for(counter = 0, ep = __out_ep_list[0]; counter < NUM_OUT_EP; counter++, ep = __out_ep_list[counter])
 
 struct usb_endpoint
 {
@@ -91,29 +91,29 @@ static void as3525v2_connect(void)
     CGU_USB |= 0x20;
     usb_delay();
     /* 3) clear "stop pclk" */
-    USB_PCGCCTL &= ~0x1;
+    PCGCCTL &= ~0x1;
     usb_delay();
     /* 4) clear "power clamp" */
-    USB_PCGCCTL &= ~0x4;
+    PCGCCTL &= ~0x4;
     usb_delay();
     /* 5) clear "reset power down module" */
-    USB_PCGCCTL &= ~0x8;
+    PCGCCTL &= ~0x8;
     usb_delay();
     /* 6) set "power on program done" */
-    USB_DCTL |= USB_DCTL_pwronprgdone;
+    DCTL |= DCTL_pwronprgdone;
     usb_delay();
     /* 7) core soft reset */
-    USB_GRSTCTL |= USB_GRSTCTL_csftrst;
+    GRSTCTL |= GRSTCTL_csftrst;
     usb_delay();
     /* 8) hclk soft reset */
-    USB_GRSTCTL |= USB_GRSTCTL_hsftrst;
+    GRSTCTL |= GRSTCTL_hsftrst;
     usb_delay();
     /* 9) flush and reset everything */
-    USB_GRSTCTL |= 0x3f;
+    GRSTCTL |= 0x3f;
     usb_delay();
     /* 10) force device mode*/
-    USB_GUSBCFG &= ~USB_GUSBCFG_force_host_mode;
-    USB_GUSBCFG |= USB_GUSBCFG_force_device_mode;
+    GUSBCFG &= ~GUSBCFG_force_host_mode;
+    GUSBCFG |= GUSBCFG_force_device_mode;
     usb_delay();
     /* 11) Do something that is probably CCU related but undocumented*/
     CCU_USB_THINGY &= ~0x1000;
@@ -121,48 +121,48 @@ static void as3525v2_connect(void)
     CCU_USB_THINGY &= ~0x300000;
     usb_delay();
     /* 12) reset usb core parameters (dev addr, speed, ...) */
-    USB_DCFG = 0;
+    DCFG = 0;
     usb_delay();
 }
 
-static void usb_enable_device_interrupts(void)
+static void enable_device_interrupts(void)
 {
     /* Clear any pending interrupt */
-    USB_GINTSTS = 0xffffffff;
+    GINTSTS = 0xffffffff;
     /* Clear any pending otg interrupt */
-    USB_GOTGINT = 0xffffffff;
+    GOTGINT = 0xffffffff;
     /* Enable interrupts */
-    USB_GINTMSK = USB_GINTMSK_usbreset
-                | USB_GINTMSK_enumdone
-                | USB_GINTMSK_inepintr
-                | USB_GINTMSK_outepintr
-                | USB_GINTMSK_otgintr
-                | USB_GINTMSK_disconnect;
+    GINTMSK = GINTMSK_usbreset
+                | GINTMSK_enumdone
+                | GINTMSK_inepintr
+                | GINTMSK_outepintr
+                | GINTMSK_otgintr
+                | GINTMSK_disconnect;
 }
 
-static void usb_flush_tx_fifos(int nums)
+static void flush_tx_fifos(int nums)
 {
     unsigned int i = 0;
     
-    USB_GRSTCTL = (USB_GRSTCTL & (~USB_GRSTCTL_txfnum_bits))
-        | (nums << USB_GRSTCTL_txfnum_bit_pos)
-        | USB_GRSTCTL_txfflsh_flush;
-    while(USB_GRSTCTL & USB_GRSTCTL_txfflsh_flush && i < 0x300)
+    GRSTCTL = (GRSTCTL & (~GRSTCTL_txfnum_bits))
+        | (nums << GRSTCTL_txfnum_bit_pos)
+        | GRSTCTL_txfflsh_flush;
+    while(GRSTCTL & GRSTCTL_txfflsh_flush && i < 0x300)
         i++;
-    if(USB_GRSTCTL & USB_GRSTCTL_txfflsh_flush)
+    if(GRSTCTL & GRSTCTL_txfflsh_flush)
         panicf("usb: hang of flush tx fifos (%x)", nums);
     /* wait 3 phy clocks */
     udelay(1);
 }
 
-static void usb_flush_rx_fifo(void)
+static void flush_rx_fifo(void)
 {
     unsigned int i = 0;
     
-    USB_GRSTCTL = USB_GRSTCTL_rxfflsh_flush;
-    while(USB_GRSTCTL & USB_GRSTCTL_rxfflsh_flush && i < 0x300)
+    GRSTCTL = GRSTCTL_rxfflsh_flush;
+    while(GRSTCTL & GRSTCTL_rxfflsh_flush && i < 0x300)
         i++;
-    if(USB_GRSTCTL & USB_GRSTCTL_rxfflsh_flush)
+    if(GRSTCTL & GRSTCTL_rxfflsh_flush)
         panicf("usb: hang of flush rx fifo");
     /* wait 3 phy clocks */
     udelay(1);
@@ -172,15 +172,15 @@ static void core_reset(void)
 {
     unsigned int i = 0;
     /* Wait for AHB master IDLE state. */
-    while((USB_GRSTCTL & USB_GRSTCTL_ahbidle) == 0)
+    while((GRSTCTL & GRSTCTL_ahbidle) == 0)
         udelay(10);
     /* Core Soft Reset */
-    USB_GRSTCTL |= USB_GRSTCTL_csftrst;
+    GRSTCTL |= GRSTCTL_csftrst;
     /* Waits for the hardware to clear reset bit */
-    while(USB_GRSTCTL & USB_GRSTCTL_csftrst && i < 0x300)
+    while(GRSTCTL & GRSTCTL_csftrst && i < 0x300)
         i++;
 
-    if(USB_GRSTCTL & USB_GRSTCTL_csftrst)
+    if(GRSTCTL & GRSTCTL_csftrst)
         panicf("oops, usb core soft reset hang :(");
 
     /* Wait for 3 PHY Clocks */
@@ -192,16 +192,16 @@ static void reset_endpoints(void)
     int i, ep;
     /* disable all endpoints except EP0 */
     FOR_EACH_IN_EP(i, ep)
-        if(USB_DIEPCTL(ep) & USB_DEPCTL_epena)
-            USB_DIEPCTL(ep) =  USB_DEPCTL_epdis | USB_DEPCTL_snak;
+        if(DIEPCTL(ep) & DEPCTL_epena)
+            DIEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
         else
-            USB_DIEPCTL(ep) = 0;
+            DIEPCTL(ep) = 0;
     
     FOR_EACH_OUT_EP(i, ep)
-        if(USB_DOEPCTL(ep) & USB_DEPCTL_epena)
-            USB_DOEPCTL(ep) =  USB_DEPCTL_epdis | USB_DEPCTL_snak;
+        if(DOEPCTL(ep) & DEPCTL_epena)
+            DOEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
         else
-            USB_DOEPCTL(ep) = 0;
+            DOEPCTL(ep) = 0;
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
      * setup packet count = 1
@@ -209,88 +209,90 @@ static void reset_endpoints(void)
      * Setup EP0 IN/OUT with 64 byte maximum packet size and activate both. Enable transfer on EP0 OUT
      */
     
-    USB_DOEPTSIZ(0) = (1 << USB_DEPTSIZ0_supcnt_bit_pos)
-                    | (1 << USB_DEPTSIZ0_pkcnt_bit_pos)
+    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bit_pos)
+                    | (1 << DEPTSIZ0_pkcnt_bit_pos)
                     | 8;
 
     /* setup DMA */
     clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
-    USB_DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
+    DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
 
     /* Enable endpoint, clear nak */
-    USB_DOEPCTL(0) = USB_DEPCTL_epena | USB_DEPCTL_cnak | USB_DEPCTL_usbactep
-                    | (USB_DEPCTL_MPS_8 << USB_DEPCTL_mps_bit_pos);
+    DOEPCTL(0) = DEPCTL_epena | DEPCTL_cnak | DEPCTL_usbactep
+                    | (DEPCTL_MPS_8 << DEPCTL_mps_bit_pos);
 
     /* 64 bytes packet size, active endpoint */
-    USB_DIEPCTL(0) = (USB_DEPCTL_MPS_8 << USB_DEPCTL_mps_bit_pos)
-                    | USB_DEPCTL_usbactep;
+    DIEPCTL(0) = (DEPCTL_MPS_8 << DEPCTL_mps_bit_pos)
+                    | DEPCTL_usbactep;
 
-    USB_DCTL = USB_DCTL_cgnpinnak | USB_DCTL_cgoutnak;
+    DCTL = DCTL_cgnpinnak | DCTL_cgoutnak;
 }
 
 static void core_dev_init(void)
 {
-    unsigned int usb_num_in_ep = 0;
-    unsigned int usb_num_out_ep = 0;
+    unsigned int num_in_ep = 0;
+    unsigned int num_out_ep = 0;
     unsigned int i;
     /* Restart the phy clock */
-    USB_PCGCCTL = 0;
+    PCGCCTL = 0;
     /* Set phy speed : high speed */
-    USB_DCFG = (USB_DCFG & ~USB_DCFG_devspd_bits) | USB_DCFG_devspd_hs_phy_hs;
+    DCFG = (DCFG & ~DCFG_devspd_bits) | DCFG_devspd_hs_phy_hs;
     
     /* Check hardware capabilities */
-    if(USB_GHWCFG2_ARCH != USB_INT_DMA_ARCH)
-        panicf("usb: wrong architecture (%ld)", USB_GHWCFG2_ARCH);
-    if(USB_GHWCFG2_HS_PHY_TYPE != USB_PHY_TYPE_UTMI)
-        panicf("usb: wrong HS phy type (%ld)", USB_GHWCFG2_HS_PHY_TYPE);
-    if(USB_GHWCFG2_FS_PHY_TYPE != USB_PHY_TYPE_UNSUPPORTED)
-        panicf("usb: wrong FS phy type (%ld)", USB_GHWCFG2_FS_PHY_TYPE);
-    if(USB_GHWCFG4_UTMI_PHY_DATA_WIDTH != 0x2)
-        panicf("usb: wrong utmi data width (%ld)", USB_GHWCFG4_UTMI_PHY_DATA_WIDTH);
-    if(USB_GHWCFG4_DED_FIFO_EN != 1) /* it seems to be multiple tx fifo support */
+    if(extract(GHWCFG2, ARCH) != INT_DMA_ARCH)
+        panicf("usb: wrong architecture (%ld)", extract(GHWCFG2, ARCH));
+    if(extract(GHWCFG2, HS_PHY_TYPE) != PHY_TYPE_UTMI)
+        panicf("usb: wrong HS phy type (%ld)", extract(GHWCFG2, HS_PHY_TYPE));
+    if(extract(GHWCFG2, FS_PHY_TYPE) != PHY_TYPE_UNSUPPORTED)
+        panicf("usb: wrong FS phy type (%ld)", extract(GHWCFG2, FS_PHY_TYPE));
+    if(GHWCFG4_UTMI_PHY_DATA_WIDTH != 0x2)
+        panicf("usb: wrong utmi data width (%ld)", GHWCFG4_UTMI_PHY_DATA_WIDTH);
+    if(GHWCFG4_DED_FIFO_EN != 1) /* it seems to be multiple tx fifo support */
         panicf("usb: no multiple tx fifo");
 
-    #ifdef USB_USE_CUSTOM_FIFO_LAYOUT
-    if(USB_GHWCFG2_DYN_FIFO != 1)
+    #ifdef USE_CUSTOM_FIFO_LAYOUT
+    if(!(GHWCFG2 & GHWCFG2_DYN_FIFO))
         panicf("usb: no dynamic fifo");
-    if(USB_GRXFSIZ != USB_DATA_FIFO_DEPTH)
+    if(GRXFSIZ != DATA_FIFO_DEPTH)
         panicf("usb: wrong data fifo size");
-    #endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
+    #endif /* USE_CUSTOM_FIFO_LAYOUT */
 
     /* do some logging */
-    logf("hwcfg1: %08lx", USB_GHWCFG1);
-    logf("hwcfg2: %08lx", USB_GHWCFG2);
-    logf("hwcfg3: %08lx", USB_GHWCFG3);
-    logf("hwcfg4: %08lx", USB_GHWCFG4);
+    logf("hwcfg1: %08lx", GHWCFG1);
+    logf("hwcfg2: %08lx", GHWCFG2);
+    logf("hwcfg3: %08lx", GHWCFG3);
+    logf("hwcfg4: %08lx", GHWCFG4);
 
-    logf("%ld endpoints", USB_GHWCFG2_NUM_EP);
-    usb_num_in_ep = 0;
-    usb_num_out_ep = 0;
-    for(i = 0; i < USB_GHWCFG2_NUM_EP; i++)
+    logf("%ld endpoints", extract(GHWCFG2, NUM_EP));
+    num_in_ep = 0;
+    num_out_ep = 0;
+    for(i = 0; i < extract(GHWCFG2, NUM_EP); i++)
     {
-        if(USB_GHWCFG1_IN_EP(i))
-            usb_num_in_ep++;
-        if(USB_GHWCFG1_OUT_EP(i))
-            usb_num_out_ep++;
-        logf("  EP%d: IN=%ld OUT=%ld", i, USB_GHWCFG1_IN_EP(i), USB_GHWCFG1_OUT_EP(i));
+        if(GHWCFG1 & GHWCFG1_IN_EP(i))
+            num_in_ep++;
+        if(GHWCFG1 & GHWCFG1_OUT_EP(i))
+            num_out_ep++;
+        logf("  EP%d: IN=%s OUT=%s", i,
+            GHWCFG1 & GHWCFG1_IN_EP(i) ? "yes" : "no",
+            GHWCFG1 & GHWCFG1_OUT_EP(i) ? "yes" : "no");
     }
 
-    if(usb_num_in_ep != USB_GHWCFG4_NUM_IN_EP)
-        panicf("usb: num in ep mismatch(%d,%lu)", usb_num_in_ep, USB_GHWCFG4_NUM_IN_EP);
-    if(usb_num_in_ep != USB_NUM_IN_EP)
-        panicf("usb: num in ep static mismatch(%u,%u)", usb_num_in_ep, USB_NUM_IN_EP);
-    if(usb_num_out_ep != USB_NUM_OUT_EP)
-        panicf("usb: num out ep static mismatch(%u,%u)", usb_num_out_ep, USB_NUM_OUT_EP);
+    if(num_in_ep != GHWCFG4_NUM_IN_EP)
+        panicf("usb: num in ep mismatch(%d,%lu)", num_in_ep, GHWCFG4_NUM_IN_EP);
+    if(num_in_ep != NUM_IN_EP)
+        panicf("usb: num in ep static mismatch(%u,%u)", num_in_ep, NUM_IN_EP);
+    if(num_out_ep != NUM_OUT_EP)
+        panicf("usb: num out ep static mismatch(%u,%u)", num_out_ep, NUM_OUT_EP);
 
-    logf("%d in ep, %d out ep", usb_num_in_ep, usb_num_out_ep);
+    logf("%d in ep, %d out ep", num_in_ep, num_out_ep);
     
     logf("initial:");
-    logf("  tot fifo sz: %lx", USB_GHWCFG3_DFIFO_LEN);
-    logf("  rx fifo: [%04x,+%4lx]", 0, USB_GRXFSIZ);
-    logf("  nptx fifo: [%04lx,+%4lx]", USB_GET_FIFOSIZE_START_ADR(USB_GNPTXFSIZ),
-        USB_GET_FIFOSIZE_DEPTH(USB_GNPTXFSIZ));
+    logf("  tot fifo sz: %lx", GHWCFG3_DFIFO_LEN);
+    logf("  rx fifo: [%04x,+%4lx]", 0, GRXFSIZ);
+    logf("  nptx fifo: [%04lx,+%4lx]", GET_FIFOSIZE_START_ADR(GNPTXFSIZ),
+        GET_FIFOSIZE_DEPTH(GNPTXFSIZ));
 
-    #ifdef USB_USE_CUSTOM_FIFO_LAYOUT
+    #ifdef USE_CUSTOM_FIFO_LAYOUT
     /* Setup FIFOs */
     /* Organize FIFO as follow:
      *             0           ->         rxfsize         : RX fifo
@@ -301,38 +303,38 @@ static void core_dev_init(void)
      */
 
     unsigned short adr = 0;
-    unsigned short depth = USB_RX_FIFO_SIZE;
-    USB_GRXFSIZ = depth;
+    unsigned short depth = RX_FIFO_SIZE;
+    GRXFSIZ = depth;
     adr += depth;
-    depth = USB_NPTX_FIFO_SIZE;
-    USB_GNPTXFSIZ = USB_MAKE_FIFOSIZE_DATA(adr, depth);
+    depth = NPTX_FIFO_SIZE;
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(adr, depth);
     adr += depth;
 
-    for(i = 1; i <= USB_NUM_IN_EP; i++)
+    for(i = 1; i <= NUM_IN_EP; i++)
     {
-        depth = USB_EPTX_FIFO_SIZE;
-        USB_DIEPTXFSIZ(i) = USB_MAKE_FIFOSIZE_DATA(adr, depth);
+        depth = EPTX_FIFO_SIZE;
+        DIEPTXFSIZ(i) = MAKE_FIFOSIZE_DATA(adr, depth);
         adr += depth;
     }
 
-    if(adr > USB_DATA_FIFO_DEPTH)
+    if(adr > DATA_FIFO_DEPTH)
         panicf("usb: total data fifo size exceeded");
-    #endif /* USB_USE_CUSTOM_FIFO_LAYOUT */
+    #endif /* USE_CUSTOM_FIFO_LAYOUT */
     
-    for(i = 1; i <= USB_NUM_IN_EP; i++)
+    for(i = 1; i <= NUM_IN_EP; i++)
     {
         logf("  dieptx fifo(%2u): [%04lx,+%4lx]", i,
-            USB_GET_FIFOSIZE_START_ADR(USB_DIEPTXFSIZ(i)),
-            USB_GET_FIFOSIZE_DEPTH(USB_DIEPTXFSIZ(i)));
+            GET_FIFOSIZE_START_ADR(DIEPTXFSIZ(i)),
+            GET_FIFOSIZE_DEPTH(DIEPTXFSIZ(i)));
     }
 
     /* Setup interrupt masks for endpoints */
     /* Setup interrupt masks */
-    USB_DOEPMSK = USB_DOEPINT_setup | USB_DOEPINT_xfercompl | USB_DOEPINT_ahberr
-                | USB_DOEPINT_epdisabled;
-    USB_DIEPMSK = USB_DIEPINT_xfercompl | USB_DIEPINT_timeout
-                | USB_DIEPINT_epdisabled | USB_DIEPINT_ahberr;
-    USB_DAINTMSK = 0xffffffff;
+    DOEPMSK = DOEPINT_setup | DOEPINT_xfercompl | DOEPINT_ahberr
+                | DOEPINT_epdisabled;
+    DIEPMSK = DIEPINT_xfercompl | DIEPINT_timeout
+                | DIEPINT_epdisabled | DIEPINT_ahberr;
+    DAINTMSK = 0xffffffff;
 
     reset_endpoints();
 
@@ -340,50 +342,50 @@ static void core_dev_init(void)
     /* only dump them for now, leave threshold disabled */
     /*
     logf("threshold control:");
-    logf("  non_iso_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_non_iso_thr_en) ? 1 : 0);
-    logf("  iso_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_iso_thr_en) ? 1 : 0);
-    logf("  tx_thr_len: %lu", (USB_DTHRCTL & USB_DTHRCTL_tx_thr_len_bits) >> USB_DTHRCTL_tx_thr_len_bit_pos);
-    logf("  rx_thr_en: %d", (USB_DTHRCTL & USB_DTHRCTL_rx_thr_en) ? 1 : 0);
-    logf("  rx_thr_len: %lu", (USB_DTHRCTL & USB_DTHRCTL_rx_thr_len_bits) >> USB_DTHRCTL_rx_thr_len_bit_pos);
+    logf("  non_iso_thr_en: %d", (DTHRCTL & DTHRCTL_non_iso_thr_en) ? 1 : 0);
+    logf("  iso_thr_en: %d", (DTHRCTL & DTHRCTL_iso_thr_en) ? 1 : 0);
+    logf("  tx_thr_len: %lu", (DTHRCTL & DTHRCTL_tx_thr_len_bits) >> DTHRCTL_tx_thr_len_bit_pos);
+    logf("  rx_thr_en: %d", (DTHRCTL & DTHRCTL_rx_thr_en) ? 1 : 0);
+    logf("  rx_thr_len: %lu", (DTHRCTL & DTHRCTL_rx_thr_len_bits) >> DTHRCTL_rx_thr_len_bit_pos);
     */
 
-    USB_DTHRCTL = 0;
+    DTHRCTL = 0;
 
     /* enable USB interrupts */
-    usb_enable_device_interrupts();
+    enable_device_interrupts();
 }
 
 static void core_init(void)
 {
     /* Disconnect */
-    USB_DCTL |= USB_DCTL_sftdiscon;
+    DCTL |= DCTL_sftdiscon;
     /* Select UTMI+ 16 */
-    USB_GUSBCFG |= USB_GUSBCFG_phy_if;
+    GUSBCFG |= GUSBCFG_phy_if;
     
     /* fixme: the current code is for internal DMA only, the clip+ architecture
      *        define the internal DMA model */
     /* Set burstlen and enable DMA*/
-    USB_GAHBCFG = (USB_GAHBCFG_INT_DMA_BURST_INCR4 << USB_GAHBCFG_hburstlen_bit_pos)
-                | USB_GAHBCFG_dma_enable;
+    GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR4 << GAHBCFG_hburstlen_bit_pos)
+                | GAHBCFG_dma_enable;
     /* Disable HNP and SRP, not sure it's useful because we already forced dev mode */
-    USB_GUSBCFG &= ~(USB_GUSBCFG_srpcap | USB_GUSBCFG_hnpcapp);
+    GUSBCFG &= ~(GUSBCFG_srpcap | GUSBCFG_hnpcapp);
 
     /* perform device model specific init */
     core_dev_init();
     
     /* Reconnect */
-    USB_DCTL &= ~USB_DCTL_sftdiscon;
+    DCTL &= ~DCTL_sftdiscon;
 }
 
-static void usb_enable_global_interrupts(void)
+static void enable_global_interrupts(void)
 {
     VIC_INT_ENABLE = INTERRUPT_USB;
-    USB_GAHBCFG |= USB_GAHBCFG_glblintrmsk;
+    GAHBCFG |= GAHBCFG_glblintrmsk;
 }
 
-static void usb_disable_global_interrupts(void)
+static void disable_global_interrupts(void)
 {
-    USB_GAHBCFG &= ~USB_GAHBCFG_glblintrmsk;
+    GAHBCFG &= ~GAHBCFG_glblintrmsk;
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
 }
 
@@ -392,11 +394,11 @@ void usb_drv_init(void)
     logf("usb_drv_init");
     /* Enable PHY and clocks (but leave pullups disabled) */
     as3525v2_connect();
-    logf("usb: synopsis id: %lx", USB_GSNPSID);
+    logf("usb: synopsis id: %lx", GSNPSID);
     /* Core init */
     core_init();
     /* Enable global interrupts */
-    usb_enable_global_interrupts();
+    enable_global_interrupts();
 }
 
 void usb_drv_exit(void)
@@ -404,23 +406,23 @@ void usb_drv_exit(void)
     logf("usb_drv_exit");
 }
 
-static bool handle_usb_reset(void)
+static bool handle_reset(void)
 {
     logf("usb: bus reset");
 
     /* Clear the Remote Wakeup Signalling */
-    USB_DCTL &= ~USB_DCTL_rmtwkupsig;
+    DCTL &= ~DCTL_rmtwkupsig;
 
     /* Flush FIFOs */
-    usb_flush_tx_fifos(0x10);
+    flush_tx_fifos(0x10);
 
     /* Flush the Learning Queue */
-    USB_GRSTCTL = USB_GRSTCTL_intknqflsh;
+    GRSTCTL = GRSTCTL_intknqflsh;
 
     reset_endpoints();
 
     /* Reset Device Address */
-    USB_DCFG &= ~USB_DCFG_devadr_bits;
+    DCFG &= ~DCFG_devadr_bits;
 
     usb_core_bus_reset();
 
@@ -432,51 +434,51 @@ static bool handle_enum_done(void)
     logf("usb: enum done");
 
     /* read speed */
-    logf("DSTS: %lx", USB_DSTS);
-    logf("DOEPCTL0=%lx", USB_DOEPCTL(0));
-    logf("DOEPTSIZ=%lx", USB_DOEPTSIZ(0));
-    logf("DIEPCTL0=%lx", USB_DIEPCTL(0));
-    logf("DOEPMSK=%lx", USB_DOEPMSK);
-    logf("DIEPMSK=%lx", USB_DIEPMSK);
-    logf("DAINTMSK=%lx", USB_DAINTMSK);
-    logf("DAINT=%lx", USB_DAINT);
-    logf("GINTSTS=%lx", USB_GINTSTS);
-    logf("GINTMSK=%lx", USB_GINTMSK);
-    logf("DCTL=%lx", USB_DCTL);
-    logf("GAHBCFG=%lx", USB_GAHBCFG);
-    logf("GUSBCFG=%lx", USB_GUSBCFG);
-    logf("DCFG=%lx", USB_DCFG);
-    logf("DTHRCTL=%lx", USB_DTHRCTL);
+    logf("DSTS: %lx", DSTS);
+    logf("DOEPCTL0=%lx", DOEPCTL(0));
+    logf("DOEPTSIZ=%lx", DOEPTSIZ(0));
+    logf("DIEPCTL0=%lx", DIEPCTL(0));
+    logf("DOEPMSK=%lx", DOEPMSK);
+    logf("DIEPMSK=%lx", DIEPMSK);
+    logf("DAINTMSK=%lx", DAINTMSK);
+    logf("DAINT=%lx", DAINT);
+    logf("GINTSTS=%lx", GINTSTS);
+    logf("GINTMSK=%lx", GINTMSK);
+    logf("DCTL=%lx", DCTL);
+    logf("GAHBCFG=%lx", GAHBCFG);
+    logf("GUSBCFG=%lx", GUSBCFG);
+    logf("DCFG=%lx", DCFG);
+    logf("DTHRCTL=%lx", DTHRCTL);
 
-    switch((USB_DSTS & USB_DSTS_enumspd_bits) >> USB_DSTS_enumspd_bit_pos)
+    switch((DSTS & DSTS_enumspd_bits) >> DSTS_enumspd_bit_pos)
     {
-        case USB_DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
+        case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
             logf("usb: HS");
             break;
-        case USB_DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
-        case USB_DSTS_ENUMSPD_FS_PHY_48MHZ:
+        case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
+        case DSTS_ENUMSPD_FS_PHY_48MHZ:
             logf("usb: FS");
             break;
-        case USB_DSTS_ENUMSPD_LS_PHY_6MHZ:
+        case DSTS_ENUMSPD_LS_PHY_6MHZ:
             panicf("usb: LS is not supported");
     }
 
-    USB_DOEPCTL(0) = (USB_DOEPCTL(0) & ~USB_DEPCTL_mps_bits)
-                | (USB_DEPCTL_MPS_64 << USB_DEPCTL_mps_bit_pos);
-    USB_DIEPCTL(0) = (USB_DIEPCTL(0) & ~USB_DEPCTL_mps_bits)
-                | (USB_DEPCTL_MPS_64 << USB_DEPCTL_mps_bit_pos);
+    DOEPCTL(0) = (DOEPCTL(0) & ~DEPCTL_mps_bits)
+                | (DEPCTL_MPS_64 << DEPCTL_mps_bit_pos);
+    DIEPCTL(0) = (DIEPCTL(0) & ~DEPCTL_mps_bits)
+                | (DEPCTL_MPS_64 << DEPCTL_mps_bit_pos);
 
     unsigned i, ep;
     FOR_EACH_IN_EP(i, ep)
-        USB_DIEPCTL(ep) = (USB_DIEPCTL(ep) & ~USB_DEPCTL_mps_bits)
-                | (512 << USB_DEPCTL_mps_bit_pos);
+        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_mps_bits)
+                | (512 << DEPCTL_mps_bit_pos);
 
     FOR_EACH_OUT_EP(i, ep)
-        USB_DOEPCTL(ep) = (USB_DOEPCTL(ep) & ~USB_DEPCTL_mps_bits)
-                | (512 << USB_DEPCTL_mps_bit_pos);
+        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_mps_bits)
+                | (512 << DEPCTL_mps_bit_pos);
 
-    USB_DOEPTSIZ(0) = (1 << USB_DEPTSIZ0_supcnt_bit_pos)
-                    | (1 << USB_DEPTSIZ0_pkcnt_bit_pos)
+    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bit_pos)
+                    | (1 << DEPTSIZ0_pkcnt_bit_pos)
                     | 64;
     
     return true;
@@ -499,7 +501,7 @@ static void dump_intsts(char *buffer, size_t size, unsigned long sts)
     (void) size;
     buffer[0] = 0;
     #define DUMP_CASE(name) \
-        if(sts & USB_GINTMSK_##name) strcat(buffer, #name " ");
+        if(sts & GINTMSK_##name) strcat(buffer, #name " ");
 
     DUMP_CASE(modemismatch)
     DUMP_CASE(otgintr)
@@ -536,7 +538,7 @@ void INT_USB(void)
 {
     /* some bits in GINTSTS can be set even though we didn't enable the interrupt source
      * so AND it with the actual mask */
-    unsigned long sts = USB_GINTSTS & USB_GINTMSK;
+    unsigned long sts = GINTSTS & GINTMSK;
     unsigned long handled_one = 0; /* mask of all listed one (either handled or not) */
     
     #define HANDLED_CASE(bitmask, callfn) \
@@ -553,25 +555,25 @@ void INT_USB(void)
             goto Lunhandled;
 
     /* device part */
-    HANDLED_CASE(USB_GINTMSK_usbreset, handle_usb_reset)
-    HANDLED_CASE(USB_GINTMSK_enumdone, handle_enum_done)
+    HANDLED_CASE(GINTMSK_usbreset, handle_reset)
+    HANDLED_CASE(GINTMSK_enumdone, handle_enum_done)
     /*
-    HANDLED_CASE(USB_GINTMSK_inepintr, handle_in_ep_int)
-    HANDLED_CASE(USB_GINTMSK_outepintr, handle_out_ep_int)
+    HANDLED_CASE(GINTMSK_inepintr, handle_in_ep_int)
+    HANDLED_CASE(GINTMSK_outepintr, handle_out_ep_int)
     */
-    UNHANDLED_CASE(USB_GINTMSK_outepintr)
-    UNHANDLED_CASE(USB_GINTMSK_inepintr)
+    UNHANDLED_CASE(GINTMSK_outepintr)
+    UNHANDLED_CASE(GINTMSK_inepintr)
 
     /* common part */
-    UNHANDLED_CASE(USB_GINTMSK_otgintr)
-    UNHANDLED_CASE(USB_GINTMSK_conidstschng)
-    UNHANDLED_CASE(USB_GINTMSK_disconnect)
+    UNHANDLED_CASE(GINTMSK_otgintr)
+    UNHANDLED_CASE(GINTMSK_conidstschng)
+    UNHANDLED_CASE(GINTMSK_disconnect)
 
     /* unlisted ones */
     if(sts & ~handled_one)
         goto Lunhandled;
 
-    USB_GINTSTS = USB_GINTSTS;
+    GINTSTS = GINTSTS;
 
     return;
 
