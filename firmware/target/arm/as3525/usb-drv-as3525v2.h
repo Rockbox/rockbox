@@ -363,7 +363,11 @@
  * Parameters
  */
 /* Number of IN/OUT endpoints */
-#define USB_NUM_IN_EP           3u
-#define USB_NUM_OUT_EP          2u
+#define USB_NUM_IN_EP           3
+#define USB_NUM_OUT_EP          2
+
+/* List of IN enpoints */
+#define USB_IN_EP_LIST          1, 3, 5
+#define USB_OUT_EP_LIST         2, 4
 
 #endif /* __USB_DRV_AS3525v2_H__ */
