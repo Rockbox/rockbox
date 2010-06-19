@@ -278,7 +278,7 @@ endif
 
 bininstall: $(BUILDDIR)/$(BINARY)
 	@echo "Installing your rockbox binary in your '$(PREFIX)' dir"
-	$(SILENT)cp $(BINARY) $(PREFIX)/.rockbox/
+	$(SILENT)cp $(BINARY) "$(PREFIX)/.rockbox/"
 
 install:
 	@echo "Installing your build in your '$(PREFIX)' dir"
