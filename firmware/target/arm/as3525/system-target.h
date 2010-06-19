@@ -50,4 +50,8 @@ extern int c200v2_variant;
 #endif
 
 void udelay(unsigned usecs);
+static inline void mdelay(unsigned msecs)
+{
+    udelay(1000 * msecs);
+}
 #endif /* SYSTEM_TARGET_H */

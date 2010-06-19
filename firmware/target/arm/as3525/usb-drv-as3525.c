@@ -77,12 +77,6 @@ void usb_attach(void)
     usb_enable(true);
 }
 
-/* delay is in milliseconds */
-static inline void usb_delay(int delay)
-{
-    udelay(1000 * delay);
-}
-
 static void usb_phy_on(void)
 {
     /* PHY clock */
@@ -92,14 +86,14 @@ static void usb_phy_on(void)
 
     /* UVDD on */
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) | (1<<4));
-    usb_delay(100);
+    mdelay(100);
 
     /* reset */
     CCU_SRC = CCU_SRC_USB_AHB_EN|CCU_SRC_USB_PHY_EN;
     CCU_SRL = CCU_SRL_MAGIC_NUMBER;
-    usb_delay(1);
+    mdelay(1);
     CCU_SRC = CCU_SRC_USB_AHB_EN;
-    usb_delay(1);
+    mdelay(1);
     CCU_SRC = CCU_SRL = 0;
 
     USB_GPIO_CSR = USB_GPIO_TX_ENABLE_N
@@ -113,9 +107,9 @@ static void usb_phy_suspend(void)
     USB_GPIO_CSR |= USB_GPIO_ASESSVLD_EXT |
                     USB_GPIO_BSESSVLD_EXT |
                     USB_GPIO_VBUS_VLD_EXT;
-    usb_delay(3);
+    mdelay(3);
     USB_GPIO_CSR |= USB_GPIO_VBUS_VLD_EXT_SEL;
-    usb_delay(10);
+    mdelay(10);
 }
 
 static void usb_phy_resume(void)
@@ -123,9 +117,9 @@ static void usb_phy_resume(void)
     USB_GPIO_CSR &= ~(USB_GPIO_ASESSVLD_EXT |
                       USB_GPIO_BSESSVLD_EXT |
                       USB_GPIO_VBUS_VLD_EXT);
-    usb_delay(3);
+    mdelay(3);
     USB_GPIO_CSR &= ~USB_GPIO_VBUS_VLD_EXT_SEL;
-    usb_delay(10);
+    mdelay(10);
 }
 
 static void setup_desc_init(struct usb_dev_setup_buf *desc)
@@ -227,7 +221,7 @@ void usb_drv_init(void)
     /* reset AHB */
     CCU_SRC = CCU_SRC_USB_AHB_EN;
     CCU_SRL = CCU_SRL_MAGIC_NUMBER;
-    usb_delay(1);
+    mdelay(1);
     CCU_SRC = CCU_SRL = 0;
 
     USB_GPIO_CSR = USB_GPIO_TX_ENABLE_N
