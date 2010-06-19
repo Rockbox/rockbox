@@ -144,8 +144,8 @@ static void flush_tx_fifos(int nums)
 {
     unsigned int i = 0;
     
-    GRSTCTL = (GRSTCTL & (~GRSTCTL_txfnum_bits))
-        | (nums << GRSTCTL_txfnum_bit_pos)
+    GRSTCTL = (GRSTCTL & ~bitm(GRSTCTL, txfnum))
+        | (nums << GRSTCTL_txfnum_bitp)
         | GRSTCTL_txfflsh_flush;
     while(GRSTCTL & GRSTCTL_txfflsh_flush && i < 0x300)
         i++;
@@ -209,8 +209,8 @@ static void reset_endpoints(void)
      * Setup EP0 IN/OUT with 64 byte maximum packet size and activate both. Enable transfer on EP0 OUT
      */
     
-    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bit_pos)
-                    | (1 << DEPTSIZ0_pkcnt_bit_pos)
+    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp)
+                    | (1 << DEPTSIZ0_pkcnt_bitp)
                     | 8;
 
     /* setup DMA */
@@ -219,10 +219,10 @@ static void reset_endpoints(void)
 
     /* Enable endpoint, clear nak */
     DOEPCTL(0) = DEPCTL_epena | DEPCTL_cnak | DEPCTL_usbactep
-                    | (DEPCTL_MPS_8 << DEPCTL_mps_bit_pos);
+                    | (DEPCTL_MPS_8 << DEPCTL_mps_bitp);
 
     /* 64 bytes packet size, active endpoint */
-    DIEPCTL(0) = (DEPCTL_MPS_8 << DEPCTL_mps_bit_pos)
+    DIEPCTL(0) = (DEPCTL_MPS_8 << DEPCTL_mps_bitp)
                     | DEPCTL_usbactep;
 
     DCTL = DCTL_cgnpinnak | DCTL_cgoutnak;
@@ -236,22 +236,22 @@ static void core_dev_init(void)
     /* Restart the phy clock */
     PCGCCTL = 0;
     /* Set phy speed : high speed */
-    DCFG = (DCFG & ~DCFG_devspd_bits) | DCFG_devspd_hs_phy_hs;
+    DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_hs;
     
     /* Check hardware capabilities */
-    if(extract(GHWCFG2, ARCH) != INT_DMA_ARCH)
-        panicf("usb: wrong architecture (%ld)", extract(GHWCFG2, ARCH));
-    if(extract(GHWCFG2, HS_PHY_TYPE) != PHY_TYPE_UTMI)
-        panicf("usb: wrong HS phy type (%ld)", extract(GHWCFG2, HS_PHY_TYPE));
-    if(extract(GHWCFG2, FS_PHY_TYPE) != PHY_TYPE_UNSUPPORTED)
-        panicf("usb: wrong FS phy type (%ld)", extract(GHWCFG2, FS_PHY_TYPE));
-    if(GHWCFG4_UTMI_PHY_DATA_WIDTH != 0x2)
-        panicf("usb: wrong utmi data width (%ld)", GHWCFG4_UTMI_PHY_DATA_WIDTH);
-    if(GHWCFG4_DED_FIFO_EN != 1) /* it seems to be multiple tx fifo support */
+    if(extract(GHWCFG2, arch) != GHWCFG2_ARCH_INTERNAL_DMA)
+        panicf("usb: wrong architecture (%ld)", extract(GHWCFG2, arch));
+    if(extract(GHWCFG2, hs_phy_type) != GHWCFG2_PHY_TYPE_UTMI)
+        panicf("usb: wrong HS phy type (%ld)", extract(GHWCFG2, hs_phy_type));
+    if(extract(GHWCFG2, fs_phy_type) != GHWCFG2_PHY_TYPE_UNSUPPORTED)
+        panicf("usb: wrong FS phy type (%ld)", extract(GHWCFG2, fs_phy_type));
+    if(extract(GHWCFG4, utmi_phy_data_width) != 0x2)
+        panicf("usb: wrong utmi data width (%ld)", extract(GHWCFG4, utmi_phy_data_width));
+    if(!(GHWCFG4 & GHWCFG4_ded_fifo_en)) /* it seems to be multiple tx fifo support */
         panicf("usb: no multiple tx fifo");
 
     #ifdef USE_CUSTOM_FIFO_LAYOUT
-    if(!(GHWCFG2 & GHWCFG2_DYN_FIFO))
+    if(!(GHWCFG2 & GHWCFG2_dyn_fifo))
         panicf("usb: no dynamic fifo");
     if(GRXFSIZ != DATA_FIFO_DEPTH)
         panicf("usb: wrong data fifo size");
@@ -263,10 +263,10 @@ static void core_dev_init(void)
     logf("hwcfg3: %08lx", GHWCFG3);
     logf("hwcfg4: %08lx", GHWCFG4);
 
-    logf("%ld endpoints", extract(GHWCFG2, NUM_EP));
+    logf("%ld endpoints", extract(GHWCFG2, num_ep));
     num_in_ep = 0;
     num_out_ep = 0;
-    for(i = 0; i < extract(GHWCFG2, NUM_EP); i++)
+    for(i = 0; i < extract(GHWCFG2, num_ep); i++)
     {
         if(GHWCFG1 & GHWCFG1_IN_EP(i))
             num_in_ep++;
@@ -277,8 +277,8 @@ static void core_dev_init(void)
             GHWCFG1 & GHWCFG1_OUT_EP(i) ? "yes" : "no");
     }
 
-    if(num_in_ep != GHWCFG4_NUM_IN_EP)
-        panicf("usb: num in ep mismatch(%d,%lu)", num_in_ep, GHWCFG4_NUM_IN_EP);
+    if(num_in_ep != extract(GHWCFG4, num_in_ep))
+        panicf("usb: num in ep mismatch(%d,%lu)", num_in_ep, extract(GHWCFG4, num_in_ep));
     if(num_in_ep != NUM_IN_EP)
         panicf("usb: num in ep static mismatch(%u,%u)", num_in_ep, NUM_IN_EP);
     if(num_out_ep != NUM_OUT_EP)
@@ -287,7 +287,7 @@ static void core_dev_init(void)
     logf("%d in ep, %d out ep", num_in_ep, num_out_ep);
     
     logf("initial:");
-    logf("  tot fifo sz: %lx", GHWCFG3_DFIFO_LEN);
+    logf("  tot fifo sz: %lx", extract(GHWCFG3, dfifo_len));
     logf("  rx fifo: [%04x,+%4lx]", 0, GRXFSIZ);
     logf("  nptx fifo: [%04lx,+%4lx]", GET_FIFOSIZE_START_ADR(GNPTXFSIZ),
         GET_FIFOSIZE_DEPTH(GNPTXFSIZ));
@@ -344,9 +344,9 @@ static void core_dev_init(void)
     logf("threshold control:");
     logf("  non_iso_thr_en: %d", (DTHRCTL & DTHRCTL_non_iso_thr_en) ? 1 : 0);
     logf("  iso_thr_en: %d", (DTHRCTL & DTHRCTL_iso_thr_en) ? 1 : 0);
-    logf("  tx_thr_len: %lu", (DTHRCTL & DTHRCTL_tx_thr_len_bits) >> DTHRCTL_tx_thr_len_bit_pos);
+    logf("  tx_thr_len: %lu", extract(DTHRCTL, tx_thr_len));
     logf("  rx_thr_en: %d", (DTHRCTL & DTHRCTL_rx_thr_en) ? 1 : 0);
-    logf("  rx_thr_len: %lu", (DTHRCTL & DTHRCTL_rx_thr_len_bits) >> DTHRCTL_rx_thr_len_bit_pos);
+    logf("  rx_thr_len: %lu", extract(DTHRCTL, rx_thr_len));
     */
 
     DTHRCTL = 0;
@@ -365,7 +365,7 @@ static void core_init(void)
     /* fixme: the current code is for internal DMA only, the clip+ architecture
      *        define the internal DMA model */
     /* Set burstlen and enable DMA*/
-    GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR4 << GAHBCFG_hburstlen_bit_pos)
+    GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR4 << GAHBCFG_hburstlen_bitp)
                 | GAHBCFG_dma_enable;
     /* Disable HNP and SRP, not sure it's useful because we already forced dev mode */
     GUSBCFG &= ~(GUSBCFG_srpcap | GUSBCFG_hnpcapp);
@@ -422,7 +422,7 @@ static bool handle_reset(void)
     reset_endpoints();
 
     /* Reset Device Address */
-    DCFG &= ~DCFG_devadr_bits;
+    DCFG &= bitm(DCFG, devadr);
 
     usb_core_bus_reset();
 
@@ -450,7 +450,7 @@ static bool handle_enum_done(void)
     logf("DCFG=%lx", DCFG);
     logf("DTHRCTL=%lx", DTHRCTL);
 
-    switch((DSTS & DSTS_enumspd_bits) >> DSTS_enumspd_bit_pos)
+    switch(extract(DSTS, enumspd))
     {
         case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
             logf("usb: HS");
@@ -463,23 +463,7 @@ static bool handle_enum_done(void)
             panicf("usb: LS is not supported");
     }
 
-    DOEPCTL(0) = (DOEPCTL(0) & ~DEPCTL_mps_bits)
-                | (DEPCTL_MPS_64 << DEPCTL_mps_bit_pos);
-    DIEPCTL(0) = (DIEPCTL(0) & ~DEPCTL_mps_bits)
-                | (DEPCTL_MPS_64 << DEPCTL_mps_bit_pos);
-
-    unsigned i, ep;
-    FOR_EACH_IN_EP(i, ep)
-        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_mps_bits)
-                | (512 << DEPCTL_mps_bit_pos);
-
-    FOR_EACH_OUT_EP(i, ep)
-        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_mps_bits)
-                | (512 << DEPCTL_mps_bit_pos);
-
-    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bit_pos)
-                    | (1 << DEPTSIZ0_pkcnt_bit_pos)
-                    | 64;
+    /* fixme: change EP0 mps here */
     
     return true;
 }
