@@ -155,38 +155,6 @@ static void flush_tx_fifos(int nums)
     udelay(1);
 }
 
-static void flush_rx_fifo(void)
-{
-    unsigned int i = 0;
-    
-    GRSTCTL = GRSTCTL_rxfflsh_flush;
-    while(GRSTCTL & GRSTCTL_rxfflsh_flush && i < 0x300)
-        i++;
-    if(GRSTCTL & GRSTCTL_rxfflsh_flush)
-        panicf("usb: hang of flush rx fifo");
-    /* wait 3 phy clocks */
-    udelay(1);
-}
-
-static void core_reset(void)
-{
-    unsigned int i = 0;
-    /* Wait for AHB master IDLE state. */
-    while((GRSTCTL & GRSTCTL_ahbidle) == 0)
-        udelay(10);
-    /* Core Soft Reset */
-    GRSTCTL |= GRSTCTL_csftrst;
-    /* Waits for the hardware to clear reset bit */
-    while(GRSTCTL & GRSTCTL_csftrst && i < 0x300)
-        i++;
-
-    if(GRSTCTL & GRSTCTL_csftrst)
-        panicf("oops, usb core soft reset hang :(");
-
-    /* Wait for 3 PHY Clocks */
-    udelay(1);
-}
-
 static void reset_endpoints(void)
 {
     int i, ep;
@@ -404,6 +372,8 @@ void usb_drv_init(void)
 void usb_drv_exit(void)
 {
     logf("usb_drv_exit");
+
+    disable_global_interrupts();
 }
 
 static bool handle_reset(void)
@@ -480,43 +450,6 @@ static bool handle_out_ep_int(void)
     return false;
 }
 
-static void dump_intsts(char *buffer, size_t size, unsigned long sts)
-{
-    (void) size;
-    buffer[0] = 0;
-    #define DUMP_CASE(name) \
-        if(sts & GINTMSK_##name) strcat(buffer, #name " ");
-
-    DUMP_CASE(modemismatch)
-    DUMP_CASE(otgintr)
-    DUMP_CASE(sofintr)
-    DUMP_CASE(rxstsqlvl)
-    DUMP_CASE(nptxfempty)
-    DUMP_CASE(ginnakeff)
-    DUMP_CASE(goutnakeff)
-    DUMP_CASE(i2cintr)
-    DUMP_CASE(erlysuspend)
-    DUMP_CASE(usbsuspend)
-    DUMP_CASE(usbreset)
-    DUMP_CASE(enumdone)
-    DUMP_CASE(isooutdrop)
-    DUMP_CASE(eopframe)
-    DUMP_CASE(epmismatch)
-    DUMP_CASE(inepintr)
-    DUMP_CASE(outepintr)
-    DUMP_CASE(incomplisoin)
-    DUMP_CASE(incomplisoout)
-    DUMP_CASE(portintr)
-    DUMP_CASE(hcintr)
-    DUMP_CASE(ptxfempty)
-    DUMP_CASE(conidstschng)
-    DUMP_CASE(disconnect)
-    DUMP_CASE(sessreqintr)
-    DUMP_CASE(wkupintr)
-    
-    buffer[strlen(buffer) - 1] = 0;
-}
-
 /* interrupt service routine */
 void INT_USB(void)
 {
@@ -541,12 +474,8 @@ void INT_USB(void)
     /* device part */
     HANDLED_CASE(GINTMSK_usbreset, handle_reset)
     HANDLED_CASE(GINTMSK_enumdone, handle_enum_done)
-    /*
     HANDLED_CASE(GINTMSK_inepintr, handle_in_ep_int)
     HANDLED_CASE(GINTMSK_outepintr, handle_out_ep_int)
-    */
-    UNHANDLED_CASE(GINTMSK_outepintr)
-    UNHANDLED_CASE(GINTMSK_inepintr)
 
     /* common part */
     UNHANDLED_CASE(GINTMSK_otgintr)
