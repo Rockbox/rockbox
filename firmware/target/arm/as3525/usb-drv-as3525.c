@@ -156,6 +156,7 @@ static void dma_desc_init(int ep, int dir)
 static void reset_endpoints(int init)
 {
     int i;
+    int mps = i == 0 ? 64 : (usb_drv_port_speed() ? 512 : 64);
 
     /*
      * OUT EP 2 is an alias for OUT EP 0 on this HW!
@@ -168,14 +169,6 @@ static void reset_endpoints(int init)
     endpoints[2][1].state |= EP_STATE_ALLOCATED;
 
     for(i = 0; i < USB_NUM_EPS; i++) {
-        /*
-         * LS: 8 (control), no bulk available 
-         * FS: 64 (control), 64 (bulk)
-         * HS: 64 (control), 512 (bulk)
-         * TODO: switch depending on speed.
-         */
-        int mps = i == 0 ? 64 : 512;
-
         if (init) {
             endpoints[i][0].state = 0;
             wakeup_init(&endpoints[i][0].complete);
@@ -395,7 +388,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].rc = -1;
 
     /* remove data buffer from cache */
-    invalidate_dcache();
+    dump_dcache_range(ptr, len);
 
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
@@ -446,7 +439,7 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].rc = -1;
 
     /* Make sure data is committed to memory */
-    clean_dcache();
+    clean_dcache_range(ptr, len);
 
     logf("xx%s\n", make_hex(ptr, len));
 
