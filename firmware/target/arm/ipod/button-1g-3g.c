@@ -151,6 +151,9 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
     if (v < WHEEL_SMOOTHING_VELOCITY) {
         /* very slow - no smoothing */
         wheel_velocity = v;
+        /* ensure backlight never gets stuck for an extended period if tick
+         * wrapped such that next poke is very far ahead */
+        next_backlight_on = current_tick - 1;
     }
     else {
         /* some velocity filtering to smooth things out */
