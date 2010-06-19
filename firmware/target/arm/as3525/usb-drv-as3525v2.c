@@ -496,8 +496,6 @@ static bool handle_usb_reset(void)
     /* Clear interrupt */
     USB_GINTSTS = USB_GINTMSK_usbreset;
 
-    usb_disable_global_interrupts();
-
     return true;
 }
 
