@@ -360,6 +360,9 @@ bool ffwd_rew(int button)
 #ifdef HAVE_TOUCHSCREEN
             if (button == ACTION_TOUCHSCREEN)
                 button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+            if (button != ACTION_WPS_SEEKFWD &&
+                button != ACTION_WPS_SEEKBACK)
+                button = ACTION_WPS_STOPSEEK;
 #endif
         }
     }
