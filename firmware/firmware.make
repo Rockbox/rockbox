@@ -44,6 +44,13 @@ $(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(BUILDDIR)/sysfont.c $<
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$(BUILDDIR)/sysfont.c))$(CC) $(CFLAGS) -c $(BUILDDIR)/sysfont.c -o $@
 
+SVNVERSION:=$(shell $(TOOLSDIR)/version.sh)
+OLDSVNVERSION:=$(shell grep 'RBVERSION' $(BUILDDIR)/version.h 2>/dev/null|cut -d '"' -f 2 || echo "NOREVISION")
+
+ifneq ($(SVNVERSION),$(OLDSVNVERSION))
+.PHONY: $(BUILDDIR)/version.h
+endif
+
 $(BUILDDIR)/version.c: $(BUILDDIR)/version.h
 	$(TOOLSDIR)/genversion.sh c $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
 
