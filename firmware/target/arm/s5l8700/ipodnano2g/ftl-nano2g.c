@@ -26,6 +26,7 @@
 #include <nand-target.h>
 #include <ftl-target.h>
 #include <string.h>
+#include "system.h"
 #include "kernel.h"
 #include "panic.h"
 
@@ -371,10 +372,10 @@ struct ftl_vfl_cxt_type ftl_vfl_cxt[4];
 struct ftl_cxt_type ftl_cxt;
 
 /* Temporary data buffers for internal use by the FTL */
-uint8_t ftl_buffer[0x800] __attribute__((aligned(16)));
+uint8_t ftl_buffer[0x800] STORAGE_ALIGN_ATTR;
 
 /* Temporary spare byte buffer for internal use by the FTL */
-union ftl_spare_data_type ftl_sparebuffer[FTL_WRITESPARE_SIZE] __attribute__((aligned(16)));
+union ftl_spare_data_type ftl_sparebuffer[FTL_WRITESPARE_SIZE] STORAGE_ALIGN_ATTR;
 
 
 #ifndef FTL_READONLY
@@ -404,12 +405,12 @@ uint8_t ftl_erasectr_dirt[8];
 /* Buffer needed for copying pages around while moving or committing blocks.
    This can't be shared with ftl_buffer, because this one could be overwritten
    during the copying operation in order to e.g. commit a CXT. */
-uint8_t ftl_copybuffer[FTL_COPYBUF_SIZE][0x800] __attribute__((aligned(16)));
-union ftl_spare_data_type ftl_copyspare[FTL_COPYBUF_SIZE] __attribute__((aligned(16)));
+uint8_t ftl_copybuffer[FTL_COPYBUF_SIZE][0x800] STORAGE_ALIGN_ATTR;
+union ftl_spare_data_type ftl_copyspare[FTL_COPYBUF_SIZE] STORAGE_ALIGN_ATTR;
 
 /* Needed to store the old scattered page offsets in order to be able to roll
    back if something fails while compacting a scattered page block. */
-uint16_t ftl_offsets_backup[0x200] __attribute__((aligned(16)));
+uint16_t ftl_offsets_backup[0x200] STORAGE_ALIGN_ATTR;
 
 #endif
 

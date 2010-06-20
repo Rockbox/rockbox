@@ -99,10 +99,10 @@ static struct wakeup nand_wakeup;
 static struct mutex ecc_mtx;
 static struct wakeup ecc_wakeup;
 
-static uint8_t nand_data[0x800] __attribute__((aligned(16)));
-static uint8_t nand_ctrl[0x200] __attribute__((aligned(16)));
-static uint8_t nand_spare[0x40] __attribute__((aligned(16)));
-static uint8_t nand_ecc[0x30] __attribute__((aligned(16)));
+static uint8_t nand_data[0x800] STORAGE_ALIGN_ATTR;
+static uint8_t nand_ctrl[0x200] STORAGE_ALIGN_ATTR;
+static uint8_t nand_spare[0x40] STORAGE_ALIGN_ATTR;
+static uint8_t nand_ecc[0x30] STORAGE_ALIGN_ATTR;
 
 
 uint32_t nand_unlock(uint32_t rc)
