@@ -2317,7 +2317,7 @@ void update_cover_out_animation(void)
  */
 static inline void draw_gradient(int y, int h)
 {
-    static int r, inc, c;
+    int r, inc, c;
     inc = (100 << 8) / h;
     c = 0;
     selected_track_pulse = (selected_track_pulse+1) % 10;
@@ -2390,7 +2390,7 @@ void show_track_list(void)
         create_track_index(center_slide.slide_index);
         reset_track_list();
     }
-    static int titletxt_w, titletxt_x, color, titletxt_h;
+    int titletxt_w, titletxt_x, color, titletxt_h;
     titletxt_h = rb->screens[SCREEN_MAIN]->getcharheight();
 
     int titletxt_y = track_list_y;
