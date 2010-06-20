@@ -50,8 +50,6 @@ static int col_width;
 static int cur_window;
 static int cur_column;
 
-static const struct tv_preferences *prefs = NULL;
-
 #ifdef HAVE_LCD_BITMAP
 static bool tv_set_font(const unsigned char *font)
 {
@@ -69,46 +67,25 @@ static bool tv_set_font(const unsigned char *font)
     return true;
 }
 
-static void tv_check_header_and_footer(void)
-{
-    struct tv_preferences new_prefs;
-
-    tv_copy_preferences(&new_prefs);
-
-    if (rb->global_settings->statusbar != STATUSBAR_TOP)
-    {
-        if (new_prefs.header_mode == HD_SBAR)
-            new_prefs.header_mode = HD_NONE;
-        else if (new_prefs.header_mode == HD_BOTH)
-            new_prefs.header_mode = HD_PATH;
-    }
-    if (rb->global_settings->statusbar != STATUSBAR_BOTTOM)
-    {
-        if (new_prefs.footer_mode == FT_SBAR)
-            new_prefs.footer_mode = FT_NONE;
-        else if (new_prefs.footer_mode == FT_BOTH)
-            new_prefs.footer_mode = FT_PAGE;
-    }
-    tv_set_preferences(&new_prefs);
-}
-
 static void tv_show_header(void)
 {
-    if (prefs->header_mode == HD_SBAR || prefs->header_mode == HD_BOTH)
+    unsigned header_mode = header_mode;
+    if (header_mode == HD_SBAR || header_mode == HD_BOTH)
         rb->gui_syncstatusbar_draw(rb->statusbars, true);
 
-    if (prefs->header_mode == HD_PATH || prefs->header_mode == HD_BOTH)
-        rb->lcd_putsxy(0, header_height - prefs->font->height, prefs->file_name);
+    if (header_mode == HD_PATH || header_mode == HD_BOTH)
+        rb->lcd_putsxy(0, header_height - preferences->font->height, preferences->file_name);
 }
 
 static void tv_show_footer(const struct tv_screen_pos *pos)
 {
     unsigned char buf[12];
+    unsigned footer_mode = preferences->footer_mode;
 
-    if (prefs->footer_mode == FT_SBAR || prefs->footer_mode == FT_BOTH)
+    if (footer_mode == FT_SBAR || footer_mode == FT_BOTH)
         rb->gui_syncstatusbar_draw(rb->statusbars, true);
 
-    if (prefs->footer_mode == FT_PAGE || prefs->footer_mode == FT_BOTH)
+    if (footer_mode == FT_PAGE || footer_mode == FT_BOTH)
     {
         if (pos->line == 0)
             rb->snprintf(buf, sizeof(buf), "%d", pos->page + 1);
@@ -128,9 +105,9 @@ static void tv_show_scrollbar(off_t cur_pos, int size)
     int sb_height;
 
     sb_height = LCD_HEIGHT - header_height - footer_height;
-    if (prefs->horizontal_scrollbar)
+    if (preferences->horizontal_scrollbar)
     {
-        items     = prefs->windows * window_columns;
+        items     = preferences->windows * window_columns;
         min_shown = cur_window * window_columns + cur_column;
         max_shown = min_shown + window_columns;
         sb_width  = (need_vertical_scrollbar)? TV_SCROLLBAR_WIDTH : 0;
@@ -157,25 +134,27 @@ static void tv_show_scrollbar(off_t cur_pos, int size)
 
 static int tv_calc_display_lines(void)
 {
-    int scrollbar_height = (prefs->horizontal_scrollbar)? TV_SCROLLBAR_HEIGHT : 0;
+    int scrollbar_height = preferences->horizontal_scrollbar ? TV_SCROLLBAR_HEIGHT : 0;
+    unsigned header_mode = preferences->header_mode;
+    unsigned footer_mode = preferences->footer_mode;
 
-    header_height = (prefs->header_mode == HD_SBAR || prefs->header_mode == HD_BOTH)?
+    header_height = (header_mode == HD_SBAR || header_mode == HD_BOTH)?
                     STATUSBAR_HEIGHT : 0;
 
-    footer_height = (prefs->footer_mode == FT_SBAR || prefs->footer_mode == FT_BOTH)?
+    footer_height = (footer_mode == FT_SBAR || footer_mode == FT_BOTH)?
                     STATUSBAR_HEIGHT : 0;
 
-    if (prefs->header_mode == HD_NONE || prefs->header_mode == HD_PATH ||
-        prefs->footer_mode == FT_NONE || prefs->footer_mode == FT_PAGE)
+    if (header_mode == HD_NONE || header_mode == HD_PATH ||
+        footer_mode == FT_NONE || footer_mode == FT_PAGE)
         rb->gui_syncstatusbar_draw(rb->statusbars, false);
 
-    if (prefs->header_mode == HD_PATH || prefs->header_mode == HD_BOTH)
-        header_height += prefs->font->height;
+    if (header_mode == HD_PATH || header_mode == HD_BOTH)
+        header_height += preferences->font->height;
 
-    if (prefs->footer_mode == FT_PAGE || prefs->footer_mode == FT_BOTH)
-        footer_height += prefs->font->height;
+    if (footer_mode == FT_PAGE || footer_mode == FT_BOTH)
+        footer_height += preferences->font->height;
 
-    return (LCD_HEIGHT - header_height - footer_height - scrollbar_height) / prefs->font->height;
+    return (LCD_HEIGHT - header_height - footer_height - scrollbar_height) / preferences->font->height;
 }
 #endif
 
@@ -195,8 +174,8 @@ static void tv_show_bookmarks(const struct tv_screen_pos *top_pos)
         if (line >= 0 && line < display_lines)
         {
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_fillrect(start_width, header_height + line * prefs->font->height,
-                             window_width, prefs->font->height);
+            rb->lcd_fillrect(start_width, header_height + line * preferences->font->height,
+                             window_width, preferences->font->height);
 #else
             rb->lcd_putc(start_width - 1, line, TV_BOOKMARK_ICON);
 #endif
@@ -215,30 +194,30 @@ void tv_draw_window(void)
     int offset = cur_column * col_width;
     int size = 0;
     int line_width;
-    int draw_width = (prefs->windows - cur_window) * LCD_WIDTH - offset;
+    int draw_width = (preferences->windows - cur_window) * LCD_WIDTH - offset;
     int dx = start_width - offset;
 
     tv_copy_screen_pos(&pos);
     rb->lcd_clear_display();
 
-    if (prefs->alignment == LEFT)
+    if (preferences->alignment == LEFT)
         tv_read_start(cur_window, (cur_column > 0));
     else
-        tv_read_start(0, prefs->windows > 1);
+        tv_read_start(0, preferences->windows > 1);
 
     for (line = 0; line < display_lines; line++)
     {
         if (!tv_get_next_line(&line_buf))
             break;
 
-        if (prefs->alignment == RIGHT)
+        if (preferences->alignment == RIGHT)
         {
             rb->lcd_getstringsize(line_buf, &line_width, NULL);
             dx = draw_width - line_width;
         }
 
 #ifdef HAVE_LCD_BITMAP
-        rb->lcd_putsxy(dx, header_height + line * prefs->font->height, line_buf);
+        rb->lcd_putsxy(dx, header_height + line * preferences->font->height, line_buf);
 #else
         rb->lcd_puts(dx, line, line_buf);
 #endif
@@ -284,12 +263,13 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
 
     /* change font */
-    if (font_changing || rb->strcmp(font_str, prefs->font_name))
+    if (font_changing || rb->strcmp(font_str, preferences->font_name))
     {
         font_changing = true;
-        if (!tv_set_font(prefs->font_name))
+        if (!tv_set_font(preferences->font_name))
         {
-            struct tv_preferences new_prefs = *prefs;
+            struct tv_preferences new_prefs;
+            tv_copy_preferences(&new_prefs);
 
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
             tv_set_preferences(&new_prefs);
@@ -299,7 +279,6 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     font_changing = false;
 
     /* calculates display lines */
-    tv_check_header_and_footer();
     display_lines = tv_calc_display_lines();
 #else
     (void)oldp;
@@ -309,12 +288,12 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    col_width = 2 * rb->font_get_width(prefs->font, ' ');
+    col_width = 2 * rb->font_get_width(preferences->font, ' ');
 #else
     col_width = 1;
 #endif
 
-    if (cur_window >= prefs->windows)
+    if (cur_window >= preferences->windows)
         cur_window = 0;
 
     window_width = LCD_WIDTH;
@@ -322,8 +301,8 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     need_vertical_scrollbar = false;
     start_width = 0;
     tv_seek_top();
-    tv_set_read_conditions(prefs->windows, window_width);
-    if (tv_traverse_lines() && prefs->vertical_scrollbar)
+    tv_set_read_conditions(preferences->windows, window_width);
+    if (tv_traverse_lines() && preferences->vertical_scrollbar)
     {
         need_vertical_scrollbar = true;
         start_width = TV_SCROLLBAR_WIDTH;
@@ -337,17 +316,13 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 
     cur_column = 0;
 
-    tv_set_read_conditions(prefs->windows, window_width);
+    tv_set_read_conditions(preferences->windows, window_width);
 }
 
-bool tv_init_window(unsigned char *buf, size_t bufsize, size_t *used_size)
+bool tv_init_window(void)
 {
     tv_add_preferences_change_listner(tv_change_preferences);
-    if (!tv_init_text_reader(buf, bufsize, used_size))
-        return false;
-
-    prefs = tv_get_preferences();
-    return true;
+    return tv_init_text_reader();
 }
 
 void tv_finalize_window(void)
@@ -356,7 +331,7 @@ void tv_finalize_window(void)
 
 #ifdef HAVE_LCD_BITMAP
     /* restore font */
-    if (rb->strcmp(rb->global_settings->font_file, prefs->font_name))
+    if (rb->strcmp(rb->global_settings->font_file, preferences->font_name))
     {
         tv_set_font(rb->global_settings->font_file);
     }
@@ -373,9 +348,9 @@ void tv_move_window(int window_delta, int column_delta)
         cur_window = 0;
         cur_column = 0;
     }
-    else if (cur_window >= prefs->windows)
+    else if (cur_window >= preferences->windows)
     {
-        cur_window = prefs->windows - 1;
+        cur_window = preferences->windows - 1;
         cur_column = 0;
     }
 
@@ -391,7 +366,7 @@ void tv_move_window(int window_delta, int column_delta)
     }
     else
     {
-        if (cur_window == prefs->windows - 1)
+        if (cur_window == preferences->windows - 1)
             cur_column = 0;
         else if (cur_column >= window_columns)
         {

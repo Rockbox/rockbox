@@ -35,7 +35,6 @@ enum plugin_status plugin_start(const void* file)
     long old_tick;
     bool done = false;
     bool display_update = true;
-    const struct tv_preferences *prefs = tv_get_preferences();
 
     old_tick = *rb->current_tick;
 
@@ -66,7 +65,7 @@ enum plugin_status plugin_start(const void* file)
             case TV_MENU2:
 #endif
                 {
-                    enum tv_menu_result res = tv_menu();
+                    unsigned res = tv_menu();
 
                     if (res != TV_MENU_RESULT_EXIT_MENU)
                     {
@@ -108,13 +107,13 @@ enum plugin_status plugin_start(const void* file)
 
             case TV_SCREEN_LEFT:
             case TV_SCREEN_LEFT | BUTTON_REPEAT:
-                if (prefs->windows > 1)
+                if (preferences->windows > 1)
                 {
                     /* Screen left */
                     tv_scroll_left(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
-                    if (prefs->narrow_mode == NM_PAGE)
+                    if (preferences->narrow_mode == NM_PAGE)
                     {
                         /* scroll to previous page */
                         tv_scroll_up(TV_VERTICAL_SCROLL_PAGE);
@@ -129,13 +128,13 @@ enum plugin_status plugin_start(const void* file)
 
             case TV_SCREEN_RIGHT:
             case TV_SCREEN_RIGHT | BUTTON_REPEAT:
-                if (prefs->windows > 1)
+                if (preferences->windows > 1)
                 {
                     /* Screen right */
                     tv_scroll_right(TV_HORIZONTAL_SCROLL_PREFS);
                 }
                 else {   /* prefs->windows == 1 */
-                    if (prefs->narrow_mode == NM_PAGE)
+                    if (preferences->narrow_mode == NM_PAGE)
                     {
                         /* scroll to next page */
                         tv_scroll_down(TV_VERTICAL_SCROLL_PAGE);
@@ -206,7 +205,7 @@ enum plugin_status plugin_start(const void* file)
         }
         if (autoscroll)
         {
-            if(old_tick <= *rb->current_tick - (110 - prefs->autoscroll_speed * 10))
+            if(old_tick <= *rb->current_tick - (110 - preferences->autoscroll_speed * 10))
             {
                 tv_scroll_down(TV_VERTICAL_SCROLL_PREFS);
                 old_tick = *rb->current_tick;

@@ -28,20 +28,11 @@
 /*
  * initialize the reader module
  *
- * [In] buf
- *          the start pointer of the buffer
- *
- * [In] size
- *          enabled buffer size
- *
- * [Out] used_size
- *          the size of the buffer which the pager uses
- *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init_reader(unsigned char *buf, size_t bufsize, size_t *used_size);
+bool tv_init_reader(void);
 
 /* finalize the reader module */
 void tv_finalize_reader(void);

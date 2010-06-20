@@ -181,9 +181,9 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     else
         prefs->indent_spaces = 2;
 
+#ifdef HAVE_LCD_BITMAP
     rb->memcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
 
-#ifdef HAVE_LCD_BITMAP
     prefs->font = rb->font_get(FONT_UI);
 #endif
 
@@ -213,7 +213,9 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->narrow_mode;
     *p++ = prefs->indent_spaces;
 
+#ifdef HAVE_LCD_BITMAP
     rb->memcpy(buf + 28, prefs->font_name, MAX_PATH);
+#endif
 
     return (rb->write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
 }
@@ -457,7 +459,6 @@ static bool tv_copy_settings(int sfd, int dfd, int size)
 
 bool tv_save_settings(void)
 {
-    const struct tv_preferences *prefs = tv_get_preferences();
     unsigned char buf[MAX_PATH+2];
     unsigned int fcount = 0;
     unsigned int i;
@@ -502,7 +503,7 @@ bool tv_save_settings(void)
                 }
 
                 size = (buf[MAX_PATH] << 8) | buf[MAX_PATH + 1];
-                if (rb->strcmp(buf, prefs->file_name) == 0)
+                if (rb->strcmp(buf, preferences->file_name) == 0)
                     rb->lseek(ofd, size, SEEK_CUR);
                 else
                 {
@@ -522,12 +523,11 @@ bool tv_save_settings(void)
     {
         /* save to current read file's preferences and bookmarks */
         res = false;
-        rb->memset(buf, 0, MAX_PATH);
-        rb->strlcpy(buf, prefs->file_name, MAX_PATH);
+        rb->strlcpy(buf, preferences->file_name, MAX_PATH);
 
         if (rb->write(tfd, buf, MAX_PATH + 2) >= 0)
         {
-            if (tv_write_preferences(tfd, prefs))
+            if (tv_write_preferences(tfd, preferences))
             {
                 size = tv_serialize_bookmarks(tfd);
                 if (size > 0)

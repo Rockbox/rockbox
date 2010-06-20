@@ -23,88 +23,108 @@
 #ifndef PLUGIN_TEXT_VIEWER_PREFERENCES_H
 #define PLUGIN_TEXT_VIEWER_PREFERENCES_H
 
-enum scrollbar_mode {
+/* scrollbar_mode */
+enum {
     SB_OFF = 0,
     SB_ON,
 };
 
+/* word_mode */
+enum {
+    WRAP = 0,
+    CHOP,
+};
+
+/* line_mode */
+enum {
+    NORMAL = 0,
+    JOIN,
+    EXPAND,
+    REFLOW,
+};
+
+/* alignment */
+enum {
+    LEFT = 0,
+    RIGHT,
+};
+
+/* page_mode */
+enum {
+    NO_OVERLAP = 0,
+    OVERLAP,
+};
+
+/* header_mode */
+enum {
+    HD_NONE = 0,
+    HD_PATH,
+    HD_SBAR,
+    HD_BOTH,
+};
+
+/* footer_mode */
+enum {
+
+    FT_NONE = 0,
+    FT_PAGE,
+    FT_SBAR,
+    FT_BOTH,
+};
+
+/* horizontal_scroll_mode */
+enum {
+    SCREEN = 0,
+    COLUMN,
+};
+
+/* vertical_scroll_mode */
+enum {
+    PAGE = 0,
+    LINE,
+};
+
+/* narrow_mode */
+enum {
+    NM_PAGE = 0,
+    NM_TOP_BOTTOM,
+};
+
 struct tv_preferences {
-    enum {
-        WRAP = 0,
-        CHOP,
-    } word_mode;
+    unsigned word_mode;
+    unsigned line_mode;
+    unsigned alignment;
 
-    enum {
-        NORMAL = 0,
-        JOIN,
-        EXPAND,
-        REFLOW,
-    } line_mode;
+    unsigned encoding;
 
-    enum {
-        LEFT = 0,
-        RIGHT,
-    } alignment;
+    unsigned horizontal_scrollbar;
+    unsigned vertical_scrollbar;
 
-    enum codepages encoding;
-
-    enum scrollbar_mode horizontal_scrollbar;
-    enum scrollbar_mode vertical_scrollbar;
-
-    enum {
-        NO_OVERLAP = 0,
-        OVERLAP,
-    } page_mode;
-
-    enum {
-        HD_NONE = 0,
-        HD_PATH,
-        HD_SBAR,
-        HD_BOTH,
-    } header_mode;
-
-    enum {
-        FT_NONE = 0,
-        FT_PAGE,
-        FT_SBAR,
-        FT_BOTH,
-    } footer_mode;
-
-    enum {
-        SCREEN = 0,
-        COLUMN,
-    } horizontal_scroll_mode;
-
-    enum {
-        PAGE = 0,
-        LINE,
-    } vertical_scroll_mode;
+    unsigned page_mode;
+    unsigned header_mode;
+    unsigned footer_mode;
+    unsigned horizontal_scroll_mode;
+    unsigned vertical_scroll_mode;
 
     int autoscroll_speed;
 
     int windows;
 
-    enum {
-        NM_PAGE = 0,
-        NM_TOP_BOTTOM,
-    } narrow_mode;
+    unsigned narrow_mode;
 
-    int indent_spaces;
+    unsigned indent_spaces;
 
-    unsigned char font_name[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
+    unsigned char font_name[MAX_PATH];
     struct font *font;
 #endif
     unsigned char file_name[MAX_PATH];
 };
 
 /*
- * return the preferences
- *
- * return
- *     the pointer the preferences
+ *     global pointer to the preferences
  */
-const struct tv_preferences *tv_get_preferences(void);
+extern struct tv_preferences *preferences;
 
 /*
  * change the preferences

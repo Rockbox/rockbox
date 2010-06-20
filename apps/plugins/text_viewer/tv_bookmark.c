@@ -224,7 +224,7 @@ void tv_select_bookmark(void)
     }
 
     /* move to the select position */
-    if (tv_get_preferences()->vertical_scroll_mode == PAGE)
+    if (preferences->vertical_scroll_mode == PAGE)
         select_pos.line = 0;
 
     tv_move_screen(select_pos.page, select_pos.line, SEEK_SET);

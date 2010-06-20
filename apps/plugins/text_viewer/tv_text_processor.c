@@ -25,7 +25,7 @@
 #include "tv_preferences.h"
 #include "tv_text_processor.h"
 
-enum tv_text_type {
+enum{
     TV_TEXT_UNKNOWN,
     TV_TEXT_MAC,
     TV_TEXT_UNIX,
@@ -41,13 +41,12 @@ enum tv_text_type {
 
 #define TV_MAX_BLOCKS 5
 
-static const struct tv_preferences *prefs;
-static enum tv_text_type text_type = TV_TEXT_UNKNOWN;
+static unsigned text_type = TV_TEXT_UNKNOWN;
 
 static const unsigned char *end_ptr;
 
-static unsigned short *ucsbuf[TV_MAX_BLOCKS];
-static unsigned char  *utf8buf;
+static unsigned short ucsbuf[TV_MAX_BLOCKS][TV_MAX_CHARS_PER_BLOCK];
+static unsigned char  utf8buf[TV_MAX_CHARS_PER_BLOCK * (2 * 3)];
 static unsigned char  *outbuf;
 
 static int block_count;
@@ -96,7 +95,7 @@ static int tv_glyph_width(int ch)
     if (rb->is_diacritic(ch, NULL))
         return 0;
 
-    return rb->font_get_width(prefs->font, ch);
+    return rb->font_get_width(preferences->font, ch);
 #else
     return 1;
 #endif
@@ -136,13 +135,13 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
         return (unsigned char *)str + 1;
     }
 
-    if (prefs->encoding == UTF_8)
+    if (preferences->encoding == UTF_8)
         return (unsigned char*)rb->utf8decode(str, ch);
 
 #ifdef HAVE_LCD_BITMAP
     if ((*str >= 0x80) &&
-        ((prefs->encoding > SJIS) ||
-         (prefs->encoding == SJIS && (*str <= 0xa0 || *str >= 0xe0))))
+        ((preferences->encoding > SJIS) ||
+         (preferences->encoding == SJIS && (*str <= 0xa0 || *str >= 0xe0))))
     {
         if (str + 1 >= end_ptr)
         {
@@ -153,7 +152,7 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
         count = 2;
     }
 #endif
-    rb->iso_decode(str, utf8_tmp, prefs->encoding, count);
+    rb->iso_decode(str, utf8_tmp, preferences->encoding, count);
     rb->utf8decode(utf8_tmp, ch);
     return (unsigned char *)str + count;
 }
@@ -173,7 +172,7 @@ static bool tv_is_line_break_char(unsigned short ch)
     size_t i;
 
     /* when the word mode is CHOP, all characters does not break line. */
-    if (prefs->word_mode == CHOP)
+    if (preferences->word_mode == CHOP)
         return false;
 
     for (i = 0; i < sizeof(break_chars); i++)
@@ -222,7 +221,7 @@ static int tv_form_reflow_line(unsigned short *ucs, int chars)
     int spaces = 0;
     int words_spaces;
 
-    if (prefs->alignment == LEFT)
+    if (preferences->alignment == LEFT)
     {
         while (chars > 0 && ucs[chars-1] == ' ')
             chars--;
@@ -368,7 +367,6 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
     unsigned short prev_ch;
     int chars = 0;
     int gw;
-    int i;
     int line_break_width = 0;
     int line_end_chars   = 0;
     int width = 0;
@@ -388,7 +386,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
         next = tv_get_ucs(cur, &ch);
         if (ch == '\n')
         {
-            if (prefs->line_mode != JOIN || tv_is_break_line_join_mode(next))
+            if (preferences->line_mode != JOIN || tv_is_break_line_join_mode(next))
             {
                 line_end_ptr   = next;
                 line_end_chars = chars;
@@ -396,7 +394,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
                 break;
             }
 
-            if (prefs->word_mode == CHOP || tv_isspace(prev_ch))
+            if (preferences->word_mode == CHOP || tv_isspace(prev_ch))
                 continue;
 
             /*
@@ -413,7 +411,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
              *     (1) spacelike character convert to ' '
              *     (2) plural spaces are collected to one
              */
-            if (prefs->line_mode == REFLOW)
+            if (preferences->line_mode == REFLOW)
             {
                 ch = ' ';
                 if (prev_ch == ch)
@@ -421,14 +419,14 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             }
 
             /* when the alignment is RIGHT, ignores indent spaces. */
-            if (prefs->alignment == RIGHT && is_indent)
+            if (preferences->alignment == RIGHT && is_indent)
                 continue;
         }
         else
             is_indent = false;
 
-        if (prefs->line_mode == REFLOW && is_indent)
-            gw = tv_glyph_width(ch) * prefs->indent_spaces;
+        if (preferences->line_mode == REFLOW && is_indent)
+            gw = tv_glyph_width(ch) * preferences->indent_spaces;
         else
             gw = tv_glyph_width(ch);
 
@@ -445,11 +443,12 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             break;
         }
 
-        if (prefs->line_mode != REFLOW || !is_indent)
+        if (preferences->line_mode != REFLOW || !is_indent)
             ucs[chars++] = ch;
         else
         {
-            for (i = 0; i < prefs->indent_spaces; i++)
+            unsigned char i;
+            for (i = 0; i < preferences->indent_spaces; i++)
                 ucs[chars++] = ch;
         }
 
@@ -473,7 +472,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
          * when the last line break position is too short (line length < 0.75 * block width),
          * the line is cut off at the position where it is closest to the displayed width.
          */
-        if ((prefs->line_mode == REFLOW && line_break_ptr == NULL) ||
+        if ((preferences->line_mode == REFLOW && line_break_ptr == NULL) ||
             (4 * line_break_width < 3 * block_width))
         {
             line_end_ptr   = cur;
@@ -505,7 +504,7 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     if (dst != NULL)
         *dst = utf8buf;
 
-    if (prefs->line_mode == EXPAND && (expand_extra_line = !expand_extra_line) == true)
+    if (preferences->line_mode == EXPAND && (expand_extra_line = !expand_extra_line) == true)
         return 0;
 
     end_ptr = src + bufsize;
@@ -513,7 +512,7 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     tv_get_ucs(src, &ch);
     is_indent = (tv_isspace(ch) && !is_break_line);
 
-    if (is_indent && prefs->indent_spaces == 0 && (expand_extra_line = !expand_extra_line) == true)
+    if (is_indent && preferences->indent_spaces == 0 && (expand_extra_line = !expand_extra_line) == true)
         return 0;
 
     for (i = 0; i < block_count; i++)
@@ -527,14 +526,14 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
 
     if (dst != NULL)
     {
-        if (prefs->alignment == RIGHT)
+        if (preferences->alignment == RIGHT)
             tv_align_right(chars);
 
         for (i = 0; i < block_count; i++)
         {
             if (i == block || (is_multi && i == block + 1))
             {
-                if (is_break_line && prefs->line_mode == REFLOW)
+                if (is_break_line && preferences->line_mode == REFLOW)
                     chars[i] = tv_form_reflow_line(ucsbuf[i], chars[i]);
 
                 tv_decode2utf8(ucsbuf[i], chars[i]);
@@ -545,26 +544,11 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     return size;
 }
 
-bool tv_init_text_processor(unsigned char *buf, size_t bufsize, size_t *used_size)
+void tv_init_text_processor(void)
 {
-    int i;
-
-    *used_size = TV_MAX_CHARS_PER_BLOCK * (2 * 3 + TV_MAX_BLOCKS * sizeof(unsigned short));
-    if (bufsize < *used_size)
-        return false;
-
-    prefs = tv_get_preferences();
     text_type = TV_TEXT_UNKNOWN;
     expand_extra_line = false;
     is_break_line = false;
-
-    ucsbuf[0]  = (unsigned short*)buf;
-    for (i = 1; i < TV_MAX_BLOCKS; i++)
-        ucsbuf[i] = ucsbuf[i - 1] + TV_MAX_CHARS_PER_BLOCK;
-
-    utf8buf = buf + TV_MAX_CHARS_PER_BLOCK * TV_MAX_BLOCKS * sizeof(unsigned short);
-
-    return true;
 }
 
 void tv_set_creation_conditions(int blocks, int width)

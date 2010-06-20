@@ -28,27 +28,12 @@
 #include "tv_settings.h"
 #include "tv_window.h"
 
-static const struct tv_preferences *prefs;
-
 bool tv_init(const unsigned char *file)
 {
-    size_t req_size = 0;
-    size_t size;
-    size_t used_size;
-    unsigned char *buffer;
-
-    /* get the plugin buffer */
-    buffer = rb->plugin_get_buffer(&req_size);
-    size = req_size;
-    if (buffer == NULL || size == 0)
-        return false;
-
-    prefs = tv_get_preferences();
-
     tv_init_bookmark();
 
     /* initialize modules */
-    if (!tv_init_window(buffer, size, &used_size))
+    if (!tv_init_window())
         return false;
 
     /* load the preferences and bookmark */
@@ -83,45 +68,45 @@ void tv_draw(void)
     tv_move_screen(pos.page, pos.line, SEEK_SET);
 }
 
-void tv_scroll_up(enum tv_vertical_scroll_mode mode)
+void tv_scroll_up(unsigned mode)
 {
     int offset_page = 0;
     int offset_line = -1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->vertical_scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == PAGE))
     {
         offset_page--;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (prefs->page_mode == OVERLAP)? 1:0;
+        offset_line = (preferences->page_mode == OVERLAP)? 1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
 }
 
-void tv_scroll_down(enum tv_vertical_scroll_mode mode)
+void tv_scroll_down(unsigned mode)
 {
     int offset_page = 0;
     int offset_line = 1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && prefs->vertical_scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == PAGE))
     {
         offset_page++;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (prefs->page_mode == OVERLAP)? -1:0;
+        offset_line = (preferences->page_mode == OVERLAP)? -1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
 }
 
-void tv_scroll_left(enum tv_horizontal_scroll_mode mode)
+void tv_scroll_left(unsigned mode)
 {
     int offset_window = 0;
     int offset_column = 0;
 
     if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
-        (mode == TV_HORIZONTAL_SCROLL_PREFS && prefs->horizontal_scroll_mode == COLUMN))
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == COLUMN))
     {
         /* Scroll left one column */
         offset_column--;
@@ -134,13 +119,13 @@ void tv_scroll_left(enum tv_horizontal_scroll_mode mode)
     tv_move_window(offset_window, offset_column);
 }
 
-void tv_scroll_right(enum tv_horizontal_scroll_mode mode)
+void tv_scroll_right(unsigned mode)
 {
     int offset_window = 0;
     int offset_column = 0;
 
     if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
-        (mode == TV_HORIZONTAL_SCROLL_PREFS && prefs->horizontal_scroll_mode == COLUMN))
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == COLUMN))
     {
         /* Scroll right one column */
         offset_column++;
@@ -161,13 +146,13 @@ void tv_top(void)
 void tv_bottom(void)
 {
     tv_move_screen(0, 0, SEEK_END);
-    if (prefs->vertical_scroll_mode == PAGE)
+    if (preferences->vertical_scroll_mode == PAGE)
         tv_move_screen(0, -tv_get_screen_pos()->line, SEEK_CUR);
 }
 
-enum tv_menu_result tv_menu(void)
+unsigned tv_menu(void)
 {
-    enum tv_menu_result res;
+    unsigned res;
     struct tv_screen_pos cur_pos;
     off_t cur_file_pos = tv_get_screen_pos()->file_pos;
 
@@ -176,7 +161,7 @@ enum tv_menu_result tv_menu(void)
     if (res == TV_MENU_RESULT_EXIT_MENU)
     {
         tv_convert_fpos(cur_file_pos, &cur_pos);
-        if (prefs->vertical_scroll_mode == PAGE)
+        if (preferences->vertical_scroll_mode == PAGE)
             cur_pos.line = 0;
 
         tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);

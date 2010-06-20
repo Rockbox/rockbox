@@ -26,20 +26,8 @@
 /*
  * initialize the text processor module
  *
- * [In] buf
- *          the start pointer of the buffer
- *
- * [In] size
- *          enabled buffer size
- *
- * [Out] used_size
- *          the size of the buffer which the pager uses
- *
- * return
- *     true  initialize success
- *     false initialize failure
  */
-bool tv_init_text_processor(unsigned char *buf, size_t bufsize, size_t *used_size);
+void tv_init_text_processor(void);
 
 /*
  * set the processing conditions

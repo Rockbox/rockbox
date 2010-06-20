@@ -23,8 +23,8 @@
 #ifndef PLUGIN_TEXT_VIEWER_MENU_H
 #define PLUGIN_TEXT_VIEWER_MENU_H
 
-enum tv_menu_result {
-    TV_MENU_RESULT_MOVE_PAGE,
+enum {
+    TV_MENU_RESULT_MOVE_PAGE = 0,
     TV_MENU_RESULT_EXIT_MENU,
     TV_MENU_RESULT_EXIT_PLUGIN,
     TV_MENU_RESULT_ATTACHED_USB,
@@ -40,6 +40,6 @@ enum tv_menu_result {
  *         TV_MENU_RESULT_EXIT_PLUGIN   request to exit this plugin
  *         TV_MENU_RESULT_ATTACHED_USB  connect USB cable
  */
-enum tv_menu_result tv_display_menu(void);
+unsigned tv_display_menu(void);
 
 #endif

@@ -23,15 +23,16 @@
 #include "plugin.h"
 #include "tv_preferences.h"
 
+/* global preferences */
 static struct tv_preferences prefs;
-static bool is_initialized = false;
+struct tv_preferences *preferences = &prefs;
+
 static int listner_count = 0;
 
 #define TV_MAX_LISTNERS 4
 static void (*listners[TV_MAX_LISTNERS])(const struct tv_preferences *oldp);
 
-static void tv_notify_change_preferences(const struct tv_preferences *oldp,
-                                         const struct tv_preferences *newp)
+static void tv_notify_change_preferences(const struct tv_preferences *oldp)
 {
     int i;
 
@@ -45,50 +46,62 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp,
      *   - autoscroll_speed
      *   - narrow_mode
      */
-    if ((oldp == NULL)                                             ||
-        (oldp->word_mode            != newp->word_mode)            ||
-        (oldp->line_mode            != newp->line_mode)            ||
-        (oldp->windows              != newp->windows)              ||
-        (oldp->horizontal_scrollbar != newp->horizontal_scrollbar) ||
-        (oldp->vertical_scrollbar   != newp->vertical_scrollbar)   ||
-        (oldp->encoding             != newp->encoding)             ||
-        (oldp->indent_spaces        != newp->indent_spaces)        ||
+    if ((oldp == NULL)                                                    ||
+        (oldp->word_mode            != preferences->word_mode)            ||
+        (oldp->line_mode            != preferences->line_mode)            ||
+        (oldp->windows              != preferences->windows)              ||
+        (oldp->horizontal_scrollbar != preferences->horizontal_scrollbar) ||
+        (oldp->vertical_scrollbar   != preferences->vertical_scrollbar)   ||
+        (oldp->encoding             != preferences->encoding)             ||
+        (oldp->indent_spaces        != preferences->indent_spaces)        ||
 #ifdef HAVE_LCD_BITMAP
-        (oldp->header_mode          != newp->header_mode)          ||
-        (oldp->footer_mode          != newp->footer_mode)          ||
-        (rb->strcmp(oldp->font_name, newp->font_name))             ||
+        (oldp->header_mode          != preferences->header_mode)          ||
+        (oldp->footer_mode          != preferences->footer_mode)          ||
+        (rb->strcmp(oldp->font_name, preferences->font_name))             ||
 #endif
-        (rb->strcmp(oldp->file_name, newp->file_name)))
+        (rb->strcmp(oldp->file_name, preferences->file_name)))
     {
-        for (i = listner_count - 1; i >= 0; i--)
+        for (i = 0; i < listner_count; i++)
             listners[i](oldp);
     }
 }
 
-const struct tv_preferences *tv_get_preferences(void)
+static void tv_check_header_and_footer(void)
 {
-    return &prefs;
+    if (rb->global_settings->statusbar != STATUSBAR_TOP)
+    {
+        if (preferences->header_mode == HD_SBAR)
+            preferences->header_mode = HD_NONE;
+        else if (preferences->header_mode == HD_BOTH)
+            preferences->header_mode = HD_PATH;
+    }
+    if (rb->global_settings->statusbar != STATUSBAR_BOTTOM)
+    {
+        if (preferences->footer_mode == FT_SBAR)
+            preferences->footer_mode = FT_NONE;
+        else if (preferences->footer_mode == FT_BOTH)
+            preferences->footer_mode = FT_PAGE;
+    }
 }
 
 void tv_set_preferences(const struct tv_preferences *new_prefs)
 {
+    static struct tv_preferences old_prefs;
     struct tv_preferences *oldp = NULL;
-    struct tv_preferences old_prefs;
+    static bool is_initialized = false;
 
-    if (!is_initialized)
-        is_initialized = true;
-    else
-    {
-        old_prefs = prefs;
-        oldp      = &old_prefs;
-    }
-    rb->memcpy(&prefs, new_prefs, sizeof(struct tv_preferences));
-    tv_notify_change_preferences(oldp, &prefs);
+    if (is_initialized)
+        tv_copy_preferences((oldp = &old_prefs));
+    is_initialized = true;
+
+    rb->memcpy(preferences, new_prefs, sizeof(struct tv_preferences));
+    tv_check_header_and_footer();
+    tv_notify_change_preferences(oldp);
 }
 
 void tv_copy_preferences(struct tv_preferences *copy_prefs)
 {
-    rb->memcpy(copy_prefs, &prefs, sizeof(struct tv_preferences));
+    rb->memcpy(copy_prefs, preferences, sizeof(struct tv_preferences));
 }
 
 void tv_set_default_preferences(struct tv_preferences *p)
@@ -102,7 +115,6 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->page_mode = NO_OVERLAP;
     p->horizontal_scrollbar = SB_OFF;
     p->vertical_scrollbar = SB_OFF;
-    rb->memset(p->font_name, 0, MAX_PATH);
 #ifdef HAVE_LCD_BITMAP
     p->header_mode = HD_BOTH;
     p->footer_mode = FT_BOTH;

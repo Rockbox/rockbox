@@ -135,7 +135,6 @@ void tv_seek(off_t offset, int whence)
 static void tv_change_preferences(const struct tv_preferences *oldp)
 {
     unsigned char bom[BOM_SIZE];
-    const struct tv_preferences *prefs = tv_get_preferences();
     int cur_start_file_pos = start_file_pos;
     off_t cur_file_pos     = file_pos + buf_pos;
 
@@ -145,21 +144,21 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     start_file_pos = 0;
 
     /* open the new file */
-    if (oldp == NULL || rb->strcmp(oldp->file_name, prefs->file_name))
+    if (oldp == NULL || rb->strcmp(oldp->file_name, preferences->file_name))
     {
         if (fd >= 0)
             rb->close(fd);
 
-        fd = rb->open(prefs->file_name, O_RDONLY);
+        fd = rb->open(preferences->file_name, O_RDONLY);
         if (fd < 0)
             return;
     }
 
     /*
-     * When a file is UTF-8 file with BOM, if prefs.encoding is UTF-8,
+     * When a file is UTF-8 file with BOM, if encoding is UTF-8,
      * then file size decreases only BOM_SIZE.
      */
-    if (prefs->encoding == UTF_8)
+    if (preferences->encoding == UTF_8)
     {
         rb->lseek(fd, 0, SEEK_SET);
         rb->read(fd, bom, BOM_SIZE);
@@ -171,16 +170,20 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     tv_seek(cur_file_pos + cur_start_file_pos - start_file_pos, SEEK_SET);
 }
 
-bool tv_init_reader(unsigned char *buf, size_t bufsize, size_t *used_size)
+bool tv_init_reader(void)
 {
-    if (bufsize < 2 * TV_MIN_BLOCK_SIZE)
+    size_t size;
+
+    /* get the plugin buffer */
+    reader_buffer = rb->plugin_get_buffer(&size);
+
+    if (size < 2 * TV_MIN_BLOCK_SIZE)
         return false;
 
-    reader_buffer = buf;
-    block_size    = bufsize / 2;
+    block_size    = size / 2;
     buffer_size   = 2 * block_size;
-    *used_size    = buffer_size;
     tv_add_preferences_change_listner(tv_change_preferences);
+
     return true;
 }
 

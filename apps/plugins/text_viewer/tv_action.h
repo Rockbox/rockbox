@@ -26,17 +26,17 @@
 #include "tv_menu.h"
 
 /* horizontal scroll mode */
-enum tv_horizontal_scroll_mode
+enum
 {
-    TV_HORIZONTAL_SCROLL_COLUMN, /* left/right one column */
+    TV_HORIZONTAL_SCROLL_COLUMN = 0, /* left/right one column */
     TV_HORIZONTAL_SCROLL_SCREEN, /* left/right one screen */
     TV_HORIZONTAL_SCROLL_PREFS,  /* left/right follows the settings */
 };
 
 /*vertical scroll mode */
-enum tv_vertical_scroll_mode
+enum
 {
-    TV_VERTICAL_SCROLL_LINE,   /* up/down one line */
+    TV_VERTICAL_SCROLL_LINE = 0,   /* up/down one line */
     TV_VERTICAL_SCROLL_PAGE,   /* up/down one page */
     TV_VERTICAL_SCROLL_PREFS,  /* up/down follows the settings */
 };
@@ -70,7 +70,7 @@ void tv_draw(void);
  * [In] mode
  *          scroll mode
  */
-void tv_scroll_up(enum tv_vertical_scroll_mode mode);
+void tv_scroll_up(unsigned mode);
 
 /*
  * scroll down
@@ -78,7 +78,7 @@ void tv_scroll_up(enum tv_vertical_scroll_mode mode);
  * [In] mode
  *          scroll mode
  */
-void tv_scroll_down(enum tv_vertical_scroll_mode mode);
+void tv_scroll_down(unsigned mode);
 
 /*
  * scroll left
@@ -86,7 +86,7 @@ void tv_scroll_down(enum tv_vertical_scroll_mode mode);
  * [In] mode
  *          scroll mode
  */
-void tv_scroll_left(enum tv_horizontal_scroll_mode mode);
+void tv_scroll_left(unsigned mode);
 
 /*
  * scroll right
@@ -94,7 +94,7 @@ void tv_scroll_left(enum tv_horizontal_scroll_mode mode);
  * [In] mode
  *          scroll mode
  */
-void tv_scroll_right(enum tv_horizontal_scroll_mode mode);
+void tv_scroll_right(unsigned mode);
 
 /* jump to the top */
 void tv_top(void);
@@ -111,7 +111,7 @@ void tv_bottom(void);
  *         TV_MENU_RESULT_EXIT_PLUGIN   request to exit this plugin
  *         TV_MENU_RESULT_ATTACHED_USB  connect USB cable
  */
-enum tv_menu_result tv_menu(void);
+unsigned tv_menu(void);
 
 /* add or remove the bookmark to the current position */
 void tv_add_or_remove_bookmark(void);

@@ -219,44 +219,30 @@ static bool tv_alignment_setting(void)
 #ifdef HAVE_LCD_BITMAP
 static bool tv_header_setting(void)
 {
-    int len = (rb->global_settings->statusbar == STATUSBAR_TOP)? 4 : 2;
-    struct opt_items names[len];
-
-    names[0].string   = "None";
-    names[0].voice_id = -1;
-    names[1].string   = "File path";
-    names[1].voice_id = -1;
-
-    if (rb->global_settings->statusbar == STATUSBAR_TOP)
+    static const struct opt_items names[4] =
     {
-        names[2].string   = "Status bar";
-        names[2].voice_id = -1;
-        names[3].string   = "Both";
-        names[3].voice_id = -1;
-    }
+        {"None",       -1},
+        {"File path",  -1},
+        {"Status bar", -1},
+        {"Both",       -1},
+    };
 
+    int len = (rb->global_settings->statusbar == STATUSBAR_TOP)? 4 : 2;
     return rb->set_option("Show Header", &new_prefs.header_mode, INT,
                          names, len, NULL);
 }
 
 static bool tv_footer_setting(void)
 {
-    int len = (rb->global_settings->statusbar == STATUSBAR_BOTTOM)? 4 : 2;
-    struct opt_items names[len];
-
-    names[0].string   = "None";
-    names[0].voice_id = -1;
-    names[1].string   = "Page Num";
-    names[1].voice_id = -1;
-
-    if (rb->global_settings->statusbar == STATUSBAR_BOTTOM)
+    static const struct opt_items names[4] =
     {
-        names[2].string   = "Status bar";
-        names[2].voice_id = -1;
-        names[3].string   = "Both";
-        names[3].voice_id = -1;
-    }
+        {"None",       -1},
+        {"Page Num",   -1},
+        {"Status bar", -1},
+        {"Both",       -1},
+    };
 
+    int len = (rb->global_settings->statusbar == STATUSBAR_BOTTOM)? 4 : 2;
     return rb->set_option("Show Footer", &new_prefs.footer_mode, INT,
                            names, len, NULL);
 }
@@ -304,10 +290,7 @@ static bool tv_font_setting(void)
                          names, count, NULL);
 
     if (new_font != old_font)
-    {
-        rb->memset(new_prefs.font_name, 0, MAX_PATH);
         rb->strlcpy(new_prefs.font_name, names[new_font].string, MAX_PATH);
-    }
 
     *tree = backup;
     rb->set_current_file(backup.currdir);
@@ -350,9 +333,9 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
 #endif
             &scroll_menu, &indent_spaces_item);
 
-static enum tv_menu_result tv_options_menu(void)
+static unsigned tv_options_menu(void)
 {
-    enum tv_menu_result result = TV_MENU_RESULT_EXIT_MENU;
+    unsigned result = TV_MENU_RESULT_EXIT_MENU;
 
     if (rb->do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB)
         result = TV_MENU_RESULT_ATTACHED_USB;
@@ -360,9 +343,9 @@ static enum tv_menu_result tv_options_menu(void)
     return result;
 }
 
-enum tv_menu_result tv_display_menu(void)
+unsigned tv_display_menu(void)
 {
-    enum tv_menu_result result = TV_MENU_RESULT_EXIT_MENU;
+    unsigned result = TV_MENU_RESULT_EXIT_MENU;
 
     MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
                         "Return", "Viewer Options",
