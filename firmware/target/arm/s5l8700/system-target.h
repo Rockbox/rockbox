@@ -29,7 +29,8 @@
 #define CPUFREQ_NORMAL  47923200
 #define CPUFREQ_MAX    191692800
 
-#define WANTS_STORAGE_ALIGN
+#define PROC_NEEDS_CACHEALIGN
+#define STORAGE_WANTS_ALIGN
 
 #define inl(a) (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
