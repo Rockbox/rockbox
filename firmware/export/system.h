@@ -336,6 +336,7 @@ static inline void cpucache_flush(void)
 #endif /* PROC_NEEDS_CACHEALIGN */
 
 #ifdef STORAGE_WANTS_ALIGN
+#define STORAGE_ALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))
 #define STORAGE_ALIGN_DOWN(x) \
     ((typeof (x))ALIGN_DOWN_P2((uintptr_t)(x), CACHEALIGN_BITS))
 /* Pad a size so the buffer can be aligned later */
