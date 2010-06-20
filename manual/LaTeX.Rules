@@ -267,7 +267,7 @@ $(PDF_FILE) : %.pdf : $(TEX_FILES) $(MONITOR_FILES) $(GRAPHIC_FILES) $(XFIG_TEX)
 #
 
 %.aux %.idx : $(XFIG_TEX)
-	$(LATEX) $*
+	$(LATEX) $(LATEXOPTS) $*
 
 #
 # Distill xfig .fig files into .fig.tex and either .fig.pdf or .fig.ps
