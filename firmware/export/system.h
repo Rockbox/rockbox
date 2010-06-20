@@ -344,6 +344,7 @@ static inline void cpucache_flush(void)
 /* Number of bytes in the last cacheline assuming buffer of size x is aligned */
 #define STORAGE_OVERLAP(x) ((x) & (CACHEALIGN_SIZE - 1))
 #else
+#define STORAGE_ALIGN_ATTR
 #define STORAGE_ALIGN_DOWN(x) (x)
 #define STORAGE_PAD(x) (x)
 #define STORAGE_OVERLAP(x) 0
