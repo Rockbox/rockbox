@@ -1499,7 +1499,7 @@ struct touchaction {const char* s; int action;};
 static const struct touchaction touchactions[] = {
     /* generic actions, convert to screen actions on use */
     {"prev", ACTION_STD_PREV },         {"next", ACTION_STD_NEXT },
-    {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_PREVREPEAT },
+    {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_NEXTREPEAT },
     {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
     {"menu", ACTION_STD_MENU },         {"cancel", ACTION_STD_CANCEL },
     {"contextmenu", ACTION_STD_CONTEXT},{"quickscreen", ACTION_STD_QUICKSCREEN },
