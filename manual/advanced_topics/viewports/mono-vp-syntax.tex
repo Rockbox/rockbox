@@ -1,6 +1,6 @@
 \subsubsection{Viewport Declaration Syntax}
 
-\config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}[height]{\textbar}[font]{\textbar}}%
+\config{\%V(x,y,[width],[height],[font]}%
 
     \begin{itemize}
       \item `font' is a number: 0 is the built-in system font, 1 is the
@@ -10,11 +10,11 @@
       definitions blank will set them to their default values.
     \end{itemize}
 
-\note{The correct number of `{\textbar}'s (vertical bars) with hyphens in
+\note{The correct number of commas with hyphens in
       blank fields are still needed in any case.}
   
 \begin{example}
-    %V|12|20|-|-|1|
+    %V(12,20,-,-,1)
     %sThis viewport is displayed permanently. It starts 12px from the left and
     %s20px from the top of the screen, and fills the rest of the screen from
     %sthat point. The lines will scroll if this text does not fit in the viewport.

@@ -37,36 +37,33 @@ show the information for the next song to be played.
   \section{Viewports}
     \begin{tagmap}
       \nopt{lcd_non-mono}{%
-        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
-        [height]{\textbar}[font]{\textbar}}
+        \config{\%V(x,y,[width],[height],[font])}
         & See section \ref{ref:Viewports}\\}
 
       \nopt{lcd_color}{\opt{lcd_non-mono}{%
-        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
-        [height]{\textbar}[font]{\textbar}[fgshade]{\textbar}[bgshade]{\textbar}}
+        \config{\%V(x,y,[width],[height],[font]) \%Vf([fgshade]) \%Vb([bgshade])}
         & See section \ref{ref:Viewports}\\}}
 
       \opt{lcd_color}{%
-        \config{\%V{\textbar}x{\textbar}y{\textbar}[width]{\textbar}%
-        [height]{\textbar}[font]{\textbar}[fgcolour]{\textbar}[bgcolour]{\textbar}}
+        \config{\%V(x,y,[width],[height],[font])}
+        \config{\%Vf([fgcolour]) \%Vb([bgcolour])}
         & See section \ref{ref:Viewports}\\}
 
-      \config{\%Vd'identifier'} & Display the `identifier' viewport. E.g.
-      \config{\%?C{\textless}\%Vda{\textbar}\%Vdb{\textgreater}}
+      \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
+      \config{\%?C{\textless}\%Vd(a){\textbar}\%Vd(b){\textgreater}}
       will show viewport `a' if album art is found, and `b' if it isn't.\\
 
-      \config{\%Vi{\textbar}'label'{\textbar}\dots{\textbar}} &
+      \config{\%Vi(`label',\dots)} &
       Declare a Custom UI Viewport. The `\dots' parameters use the same logic as
       the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
 
-      \config{\%VI'label'} & Set the Info Viewport to use the viewport called
+      \config{\%VI(`label')} & Set the Info Viewport to use the viewport called
       label, as declared with the previous tag.\\
     \end{tagmap}
 
   \section{Additional Fonts}
     \begin{tagmap}
-      \config{\%F{\textbar}id{\textbar}filename{\textbar}} &
-      See section \ref{ref:multifont}.\\
+      \config{\%Fl(`id',filename)} & See section \ref{ref:multifont}.\\
     \end{tagmap}
 
 }
@@ -79,6 +76,9 @@ show the information for the next song to be played.
                     2{\textbar}\ldots{\textbar}N{\textgreater}},
                     where the value $-1$ is used when the battery level isn't
                     known (it usually is)\\
+                    & An image can also be used, the proportion of the image
+                    shown correspinds to the battery level:
+                    \config{\%bl(x,y,[width],[height],image.bmp)}\\
     \config{\%bv} & The battery level in volts\\
     \config{\%bt} & Estimated battery time left\\
     \config{\%bp} & ``p'' if the charger is connected (only on targets
@@ -110,16 +110,16 @@ show the information for the next song to be played.
     \config{\%fp} & File Path\\
     \config{\%fs} & File Size (in Kilobytes)\\
     \config{\%fv} & ``(avg)'' if variable bit rate or empty string if constant bit rate\\
-    \config{\%d1} & First directory from the end of the file path\\
-    \config{\%d2} & Second directory from the end of the file path\\
-    \config{\%d3} & Third directory from the end of the file path\\
+    \config{\%d(1)} & First directory from the end of the file path\\
+    \config{\%d(2)} & Second directory from the end of the file path\\
+    \config{\%d(3)} & Third directory from the end of the file path\\
   \end{tagmap}
-Example for the \config{\%dN} commands: If the path is 
-``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d1} is ``Isola'', 
-\config{\%d2} is ``Kent'' and \config{\%d3} is ``Rock''.
+Example for the \config{\%d(N)} commands: If the path is 
+``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d(1)} is ``Isola'', 
+\config{\%d(2)} is ``Kent'' and \config{\%d(3)} is ``Rock''.
 
-These tags, when written with the first letter capitalized (e.g. \config{\%Fn} or \config{\%D2}),
-produce the information for the next file to be played.
+These tags, when written with the first letter capitalized (e.g. \config{\%Fn}
+or \config{\%D(2)}), produce the information for the next file to be played.
 
 \section{Playlist/Song Info}
   \begin{tagmap}
@@ -131,7 +131,7 @@ produce the information for the next file to be played.
          & This will replace the entire line with a progress bar. \\
          & You can set the position, width and height of the progressbar %
            (in pixels) and load a custom image for it: %
-           \config{\%pb{\textbar}x{\textbar}y{\textbar}width{\textbar}height{\textbar}image.bmp{\textbar}}} \\
+           \config{\%pb(x,y,[width],[height],image.bmp)}} \\
     \opt{player}{%
     \config{\%pf} & Full-line progress bar \& time display\\
     }%
@@ -152,16 +152,16 @@ produce the information for the next file to be played.
            {\textbar}N{\textgreater}}\\
          & 0 is used for mute, the last option is used for values greater than zero.\\
          \opt{lcd_bitmap}{& This can also be used like \%pb to provide a continuous scale:
-         \config{\%pv{{\textbar}x{\textbar}y{\textbar}width{\textbar}height\textbar}image.bmp{\textbar}}} \\
+         \config{\%pv(x,y,[width],[height],image.bmp)}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
          10 seconds if no number is specified.\\
-         & \config{\%pS7{\textless}in the first 7 seconds of track{\textbar}in
+         & \config{\%pS(7){\textless}in the first 7 seconds of track{\textbar}in
            the rest of the track{\textgreater}}\\
     \config{\%pE} & Track is ending. An optional number gives how many seconds
          before the end of the track the tag becomes true. The default is
          10 seconds if no number is specified.\\
-         & \config{\%pE7{\textless}in the last 7 seconds of track{\textbar}in
+         & \config{\%pE(7){\textless}in the last 7 seconds of track{\textbar}in
            the rest of the track{\textgreater}}\\
     \config{\%Sp} & Current Playback Pitch\\
   \end{tagmap}
@@ -259,7 +259,7 @@ Recording screen{\textbar}FM Radio screen{\textgreater}}
 
 \section{Changing Volume}
   \begin{tagmap}
-    \config{\%mv[t]} & ``v'' if the volume is being changed\\
+    \config{\%mv(t)} & ``v'' if the volume is being changed\\
   \end{tagmap}
 
 The tag produces the letter ``v'' while the volume is being changed and some
@@ -271,7 +271,7 @@ The tag can be used as the switch in a conditional tag to display different thin
 depending on whether the volume is being changed. It can produce neat effects
 when used with conditional viewports.
 
-Example: \config{\%?mv2.5{\textless}Volume changing{\textbar}\%pv{\textgreater}}
+Example: \config{\%?mv(2.5){\textless}Volume changing{\textbar}\%pv{\textgreater}}
 
 The example above will display the text ``Volume changing'' if the volume is
 being changed and 2.5 seconds after the volume button has been released. After
@@ -279,15 +279,15 @@ that, it will display the volume value.
 
 \section{Settings}
   \begin{tagmap}
-    \config{\%St{\textbar}<setting name>{\textbar}} & The value of the Rockbox
+    \config{\%St(<setting name>)} & The value of the Rockbox
              setting with the specified name. See \reference{ref:config_file_options}
              for the list of the available settings.\\
   \end{tagmap}
 
 Examples:
 \begin{enumerate}
-\item As a simple tag: \config{\%St{\textbar}skip length{\textbar}}
-\item As a conditional: \config{\%?St{\textbar}eq enabled{\textbar}{\textless}Eq is enabled{\textbar}Eq is disabled{\textgreater}}
+\item As a simple tag: \config{\%St(skip length)}
+\item As a conditional: \config{\%?St(eq enabled){\textless}Eq is enabled{\textbar}Eq is disabled{\textgreater}}
 \end{enumerate}
 
 
@@ -295,17 +295,17 @@ Examples:
 \section{\label{ref:wps_images}Images}
   \begin{tagmap}
     \nopt{archos}{%
-    \config{\%X{\textbar}filename.bmp{\textbar}}
+    \config{\%X(filename.bmp)}
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
     }%
-    \config{\%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}}
+    \config{\%x(n,filename,x,y)}
         & Load and display an image\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
         & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate.\\
-    \config{\%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}[nimages{\textbar}]}
+    \config{\%xl(n,filename,x,y,[nimages])}
         & Preload an image for later display (useful for when your images are displayed conditionally)\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
         & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
@@ -313,7 +313,7 @@ Examples:
         & \config{y}: y coordinate\\
         & \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
-    \config{\%xdn[i]} & Display a preloaded image\\
+    \config{\%xd(n[i])} & Display a preloaded image\\
         & \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\\
         & \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
           By default the first (i.e. top most) sub-image will be used.\\
@@ -322,12 +322,12 @@ Examples:
 Examples:
 \begin{enumerate}
 \item Load and display the image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109:\\
-\config{\%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}}
+\config{\%x(a,bg.bmp,37,109)}
 \item Load a bitmap strip containing 5 volume icon images (all the same size)
 with image ID ``M'', and then reference the individual sub-images in a conditional:\\
-\config{\%xl{\textbar}M{\textbar}volume.bmp{\textbar}134{\textbar}153{\textbar}5{\textbar}}\\
-\config{\%?pv<\%xdMa{\textbar}\%xdMb{\textbar}\%xdMc{\textbar}\%xdMd{\textbar}%
-\%xdMe>}
+\config{\%xl(M,volume.bmp,134,153,5)}\\
+\config{\%?pv<\%xd(Ma){\textbar}\%xd(Mb){\textbar}\%xd(Mc){\textbar}%
+\%xd(Md){\textbar}\%xd(Me)>}
 \end{enumerate}
 
 
@@ -390,43 +390,32 @@ Once the album art files are present on your \dap, they can be displayed as
 follows.
 
   \begin{tagmap}
-    \config{\%Cl{\textbar}x{\textbar}y{\textbar}[[l{\textbar}c{\textbar}r]maxwidth]{\textbar}[[t{\textbar}c{\textbar}b]maxheight]{\textbar}}
+    \config{\%Cl(x,y,[maxwidth],[maxheight],hor\_align,vert\_align)}
         & Define the settings for albumart\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate\\
         & \config{maxwidth}: Maximum height\\
         & \config{maxheight}: Maximum width\\
+        & \config{hor\_align}: Horizontal alignment, enter as `l', `c' or `r' for
+          left, centre or right. Centre is default\\
+        & \config{vert\_align}: Vertical alignment, enter as `t', `c' or `b' for
+          top, centre or bottom. Centre is default\\
     \config{\%Cd}  & Display the album art as configured. \\
-    \config{\%C}  & USe in a conditional to determine if an image is available. \\
+    \config{\%C}  & Use in a conditional to determine if an image is available. \\
   \end{tagmap}
 
 The picture will be rescaled, preserving aspect ratio to fit the given
 \config{maxwidth} and \config{maxheight}. If the aspect ratio doesn't match the
-configured values, the picture will be placed according to the flags to the
-\config{maxwidth} and \config{maxheight} parameters:
-\begin{itemize}
-  \item \config{maxwidth}:
-    \begin{description}
-      \item[\config{l}.] Align left
-      \item[\config{c}.] Align centre (default)
-      \item[\config{r}.] Align right
-    \end{description}
-  \item \config{maxheight}:
-    \begin{description}
-      \item[\config{t}.] Align top
-      \item[\config{c}.] Align centre (default)
-      \item[\config{b}.] Align bottom
-    \end{description}
-\end{itemize}
+configured values, the picture will be placed according to the alignment flags.
 
 Examples:
 \begin{enumerate}
   \item Load albumart at position 20,40 and display it without resizing:\\
-  \config{\%Cl{\textbar}20{\textbar}40{\textbar}{\textbar}{\textbar}}
+  \config{\%Cl(20,40,,)}
   \item Load albumart at position 0,20 and resize it to be at most 100$\times$100
         pixels. If the image isn't square, align it to the bottom-right
         corner:\\
-  \config{\%CL{\textbar}0{\textbar}20{\textbar}r100{\textbar}b100{\textbar}}
+  \config{\%Cl(0,20,100,100,r,b)}
 \end{enumerate}
 }
 
@@ -484,8 +473,8 @@ order left -- centre -- right. If the aligned texts overlap, they are merged.
 \section{Subline Tags}
 
 \begin{tagmap}
-\config{\%t{\textless}time{\textgreater}}
-    & Set the subline display cycle time (\%t5 or \%t3.4 formats) \\
+\config{\%t{\textless}(time){\textgreater}}
+    & Set the subline display cycle time (\%t(5) or \%t(3.4) formats) \\
 \config{;}
     & Split items on a line into separate sublines \\
 \end{tagmap}
@@ -534,7 +523,7 @@ Example:
 
 \section{Text Translation}
   \begin{tagmap}
-    \config{\%Sx{\textbar}{\textless}English{\textgreater}{\textbar}}
+    \config{\%Sx(English)}
     & Display the translation of ``English'' in the current language\\
   \end{tagmap}
   
@@ -550,8 +539,7 @@ Example:
 \opt{touchscreen}{
   \section{Touchscreen Areas (WPS only)}
     \begin{tagmap}
-      \config{\%T{\textbar}x{\textbar}y{\textbar}width{\textbar}height%
-      {\textbar}action{\textbar}}
+      \config{\%T(x,y,[width],[height],action)}
       & Invoke the action specified when the user presses in the defined
       touchscreen area.\\
     \end{tagmap}
@@ -585,7 +573,7 @@ Example:
   This tag can be used to display text or images or a viewport when the
   touchscreen is pressed (like an On Screen Display). If you put a number
   straight after \%Tl it will be used as a timeout in seconds
-  (e.g \%Tl2.5 will give a 2.5 second timeout) between the touchscreen press
+  (e.g \%Tl(2.5) will give a 2.5 second timeout) between the touchscreen press
   being released and the tag going false. If no number is specified it will
   use a 1 second timeout.  It can also be used as a conditional, and can be
   used with conditional viewports.
@@ -593,11 +581,15 @@ Example:
 
 \section{Other Tags}
 \begin{tagmap}
+  \config{\%(}           & The character `('\\
+  \config{\%)}           & The character `)'\\
+  \config{\%,}           & The character `,'\\
   \config{\%\%}          & The character `\%'\\
   \config{\%{\textless}} & The character `{\textless}'\\
   \config{\%{\textbar}}  & The character `{\textbar}'\\
   \config{\%{\textgreater}} & The character `{\textgreater}'\\
   \config{\%;}           & The character `;'\\
+  \config{\#}             & The character `\#'\\
   \config{\%s}           & Indicate that the line should scroll. Can occur 
                            anywhere in a line (given that the text is 
                            displayed; see conditionals above). You can specify 
