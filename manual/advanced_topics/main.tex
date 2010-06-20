@@ -193,9 +193,9 @@ file find the instructions on the Rockbox website:
 \subsection{\label{ref:CreateYourOwnWPS}Themes -- Create Your Own}
 The theme files are simple text files, and can be created (or edited) in your
 favourite text editor. To make sure non-English characters 
-display correctly in your WPS you must save the .wps file with UTF-8 character 
-encoding. This can be done in most editors, for example Notepad in Windows 2000
-or XP (but not in 9x/ME) can do this.
+display correctly in your theme you must save the theme files with UTF-8
+character encoding. This can be done in most editors, for example Notepad in
+Windows 2000 or XP (but not in 9x/ME) can do this.
 
 \begin{description}
 \item [Files Locations: ] Each different ``themeable'' aspect requires its own file --
@@ -303,6 +303,23 @@ file, and to conditionally select different UI viewports.
     \item {\config{\%VI'label'}} Set the Info Viewport to use the viewport called
     label, as declared with the previous tag.
   \end{itemize}
+
+\subsection{\label{ref:multifont}Additional Fonts}
+Additional fonts can be loaded within each screen file to be used in that
+screen. In this way not only can you have different fonts between e.g. the menu
+and the WPS, but you can use multiple fonts in each of the individual screens.\\
+
+\config{\%F{\textbar}id{\textbar}filename{\textbar}}
+
+  \begin{itemize}
+    \item `id' is the number you want to use in viewport declerations, 0 and 1
+       are reserved and so can't be used.
+    \item `filename' is the font filename to load. Fonts should be stored in
+       \fname{/.rockbox/fonts/}
+  \end{itemize}
+
+  An example would be: \config{\%F{\textbar}2{\textbar}12-Nimbus.fnt{\textbar}}
+
 }
 
 \subsubsection{Conditional Tags}
