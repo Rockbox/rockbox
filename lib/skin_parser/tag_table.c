@@ -186,9 +186,9 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "S"},
     { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "S"},
     
-    { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii|ii"},
-    { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii|ii"},
-    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii|ii"},
+    { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii"},
+    { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii"},
+    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii"},
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f"},
     
