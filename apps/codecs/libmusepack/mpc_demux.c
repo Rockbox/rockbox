@@ -128,7 +128,7 @@ mpc_demux_seek(mpc_demux * d, mpc_seek_t fpos, mpc_uint32_t min_bytes) {
     mpc_int_t buf_fpos = next_pos - d->r->tell(d->r) + d->bytes_total;
 
     // is desired byte position within lower and upper boundaries of buffer?
-    if (buf_fpos >= 0 && buf_fpos + min_bytes <= DEMUX_BUFFER_SIZE) {
+    if (buf_fpos >= 0 && buf_fpos + min_bytes <= d->bytes_total) {
         // desired bytes are available in current buffer
         d->bits_reader.buff += buf_fpos - (d->bits_reader.buff - d->buffer);
         d->bits_reader.count = 8 - (fpos & 7);
