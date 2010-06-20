@@ -23,8 +23,8 @@ EOF
 
     if [ -f "$2/version.h" ]
         then if diff "$2/_version.h" "$2/version.h" > /dev/null
-            then mv "$2/_version.h" "$2/version.h"
-            else rm -f "$2/_version.h"
+            then rm -f "$2/_version.h"
+            else mv "$2/_version.h" "$2/version.h"
         fi
         else mv "$2/_version.h" "$2/version.h"
     fi
@@ -37,8 +37,8 @@ EOF
 
     if [ -f "$2/version.c" ]
         then if diff "$2/_version.c" "$2/version.c" > /dev/null
-            then mv "$2/_version.c" "$2/version.c"
-            else rm -f "$2/_version.c"
+            then rm -f "$2/_version.c"
+            else mv "$2/_version.c" "$2/version.c"
         fi
         else mv "$2/_version.c" "$2/version.c"
     fi
