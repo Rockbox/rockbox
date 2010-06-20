@@ -70,8 +70,8 @@
  * - bit 12  = unknown (always set to 1)
  * Fpll = Fin * F / (R * OD), where Fin = 12 MHz
  */
-#define AS3525_PLLA_FREQ        248000000
-#define AS3525_PLLA_SETTING     0x113D
+#define AS3525_PLLA_FREQ        240000000
+#define AS3525_PLLA_SETTING     0x113B
 
 #define AS3525_PLLB_FREQ        192000000
 #define AS3525_PLLB_SETTING     0x155F
@@ -87,10 +87,11 @@
  */
 
 #ifdef SANSA_FUZEV2
-/* display is unbearably slow at ~24MHz */
-#define AS3525_DRAM_FREQ        41333334    /* Initial DRAM frequency  */
+/* display is unbearably slow at 24MHz
+ * 34285715 HZ works ok but 40MHz works even better*/
+#define AS3525_DRAM_FREQ        40000000    /* Initial DRAM frequency  */
 #else
-#define AS3525_DRAM_FREQ        24800000    /* Initial DRAM frequency  */
+#define AS3525_DRAM_FREQ        24000000    /* Initial DRAM frequency  */
 #endif /* SANSA_FUZEV2 */
 
 #else
