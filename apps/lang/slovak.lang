@@ -12462,3 +12462,17 @@
     *: "vnútiť"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "Otvoriť picture flow"
+  </voice>
+</phrase>
