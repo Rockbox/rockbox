@@ -95,6 +95,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset)
                                 *edge_offset = vx*100/r->width;
                             else
                                 *edge_offset = vy*100/r->height;
+                            if (r->reverse_bar)
+                                *edge_offset = 100 - *edge_offset;
                         }
                         returncode = r->type;
                         break;

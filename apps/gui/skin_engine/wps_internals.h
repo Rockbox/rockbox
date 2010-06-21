@@ -228,6 +228,7 @@ struct touchregion {
         WPS_TOUCHREGION_SCROLLBAR,
         WPS_TOUCHREGION_VOLUME
     } type;                  /* type of touch region */
+    bool reverse_bar;        /* if true 0% is the left or top */
     bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
     bool armed;              /* A region is armed on press. Only armed regions are triggered

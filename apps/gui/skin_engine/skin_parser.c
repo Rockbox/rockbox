@@ -1578,12 +1578,19 @@ static int parse_touchregion(const char *wps_bufptr,
     region->height = h;
     region->wvp = curr_vp;
     region->armed = false;
+    region->reverse_bar = false;
 
     end = strchr(action, ')');
     if (!end || (size_t)(end-action+1) > sizeof temp)
         return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, action, end-action+1);
     action = temp;
+    
+    if (*action == '!')
+    {
+        region->reverse_bar = true;
+        action++;
+    }
 
     if(!strcmp(pb_string, action))
         region->type = WPS_TOUCHREGION_SCROLLBAR;
