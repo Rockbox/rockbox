@@ -21,27 +21,26 @@
 #ifndef _GEN_I2C_
 #define _GEN_I2C_
 
+#include <stdbool.h>
+
 struct i2c_interface
 {
-    void (*scl_hi)(void);  /* Drive SCL high, might sleep on clk stretch */
-    void (*scl_lo)(void);  /* Drive SCL low */
-    void (*sda_hi)(void);  /* Drive SDA high */
-    void (*sda_lo)(void);  /* Drive SDA low */
-    void (*sda_input)(void);  /* Set SDA as input */
-    void (*sda_output)(void); /* Set SDA as output */
-    void (*scl_input)(void);  /* Set SCL as input */
-    void (*scl_output)(void); /* Set SCL as output */
-    int (*scl)(void);      /* Read SCL, returns 0 or non-zero */
-    int (*sda)(void);      /* Read SDA, returns 0 or non-zero */
-
+    void (*scl_dir)(bool out);  /* Set SCL as input or output */
+    void (*sda_dir)(bool out);  /* Set SDA as input or output */
+    void (*scl_out)(bool high); /* Drive SCL, might sleep on clk stretch */
+    void (*sda_out)(bool high); /* Drive SDA */
+    bool (*scl_in)(void);       /* Read SCL, returns true if high */
+    bool (*sda_in)(void);       /* Read SDA, returns true if high */
+    void (*delay)(int delay);   /* Delay for the specified amount */
+    
     /* These are the delays specified in the I2C specification, the
        time pairs to the right are the minimum 100kHz and 400kHz specs */
-    void (*delay_hd_sta)(void); /* START SDA hold (tHD:SDA)    4.0us/0.6us */
-    void (*delay_hd_dat)(void); /* SDA hold (tHD:DAT)          5.0us/0us   */
-    void (*delay_su_dat)(void); /* SDA setup (tSU:DAT)         250ns/100ns */
-    void (*delay_su_sto)(void); /* STOP setup (tSU:STO)        4.0us/0.6us */
-    void (*delay_su_sta)(void); /* Rep. START setup (tSU:STA)  4.7us/0.6us */
-    void (*delay_thigh)(void);  /* SCL high period (tHIGH)     4.0us/0.6us */
+    int delay_hd_sta;           /* START SDA hold (tHD:SDA)    4.0us/0.6us */
+    int delay_hd_dat;           /* SDA hold (tHD:DAT)          5.0us/0us   */
+    int delay_su_dat;           /* SDA setup (tSU:DAT)         250ns/100ns */
+    int delay_su_sto;           /* STOP setup (tSU:STO)        4.0us/0.6us */
+    int delay_su_sta;           /* Rep. START setup (tSU:STA)  4.7us/0.6us */
+    int delay_thigh;            /* SCL high period (tHIGH)     4.0us/0.6us */
 };
 
 int i2c_add_node(const struct i2c_interface *iface);

@@ -28,6 +28,7 @@
  */
 
 #include "as3525.h"
+#include "system.h"
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
 
@@ -77,85 +78,75 @@
 
 static int fm_i2c_bus;
 
-static void fm_scl_hi(void)
+static void fm_scl_dir(bool out)
 {
-    I2C_SCL_GPIO(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
+    if (out) {
+        I2C_SCL_GPIO_DIR |= 1 << I2C_SCL_PIN;
+    } else {
+        I2C_SCL_GPIO_DIR &= ~(1 << I2C_SCL_PIN);
+    }
 }
 
-static void fm_scl_lo(void)
+static void fm_sda_dir(bool out)
 {
-    I2C_SCL_GPIO(I2C_SCL_PIN) = 0;
+    if (out) {
+        I2C_SDA_GPIO_DIR |= 1 << I2C_SDA_PIN;
+    } else {
+        I2C_SDA_GPIO_DIR &= ~(1 << I2C_SDA_PIN);
+    }
 }
 
-static void fm_sda_hi(void)
+static void fm_scl_out(bool level)
 {
-    I2C_SDA_GPIO(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
+    if (level) {
+        I2C_SCL_GPIO(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
+    } else {
+        I2C_SCL_GPIO(I2C_SCL_PIN) = 0;
+    }
 }
 
-static void fm_sda_lo(void)
+static void fm_sda_out(bool level)
 {
-    I2C_SDA_GPIO(I2C_SDA_PIN) = 0;
+    if (level) {
+        I2C_SDA_GPIO(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
+    } else {
+        I2C_SDA_GPIO(I2C_SDA_PIN) = 0;
+    }
 }
 
-static void fm_sda_input(void)
-{
-    I2C_SDA_GPIO_DIR &= ~(1 << I2C_SDA_PIN);
-}
-
-static void fm_sda_output(void)
-{
-    I2C_SDA_GPIO_DIR |= 1 << I2C_SDA_PIN;
-}
-
-static void fm_scl_input(void)
-{
-    I2C_SCL_GPIO_DIR &= ~(1 << I2C_SCL_PIN);
-}
-
-static void fm_scl_output(void)
-{
-    I2C_SCL_GPIO_DIR |= 1 << I2C_SCL_PIN;
-}
-
-static int fm_sda(void)
-{
-    return I2C_SDA_GPIO(I2C_SDA_PIN);
-}
-
-static int fm_scl(void)
+static bool fm_scl_in(void)
 {
     return I2C_SCL_GPIO(I2C_SCL_PIN);
 }
 
-/* simple and crude delay, used for all delays in the generic i2c driver */
-static void fm_delay(void)
+static bool fm_sda_in(void)
 {
-    volatile int i;
+    return I2C_SDA_GPIO(I2C_SDA_PIN);
+}
 
-    /* this loop is uncalibrated and could use more sophistication */
-    for (i = 0; i < 20; i++) {
+static void fm_delay(int delay)
+{
+    if (delay != 0) {
+        udelay(delay);
     }
 }
 
 /* interface towards the generic i2c driver */
 static const struct i2c_interface fm_i2c_interface = {
-    .scl_hi = fm_scl_hi,
-    .scl_lo = fm_scl_lo,
-    .sda_hi = fm_sda_hi,
-    .sda_lo = fm_sda_lo,
-    .sda_input = fm_sda_input,
-    .sda_output = fm_sda_output,
-    .scl_input = fm_scl_input,
-    .scl_output = fm_scl_output,
-    .scl = fm_scl,
-    .sda = fm_sda,
+    .scl_out = fm_scl_out,
+    .scl_dir = fm_scl_dir,
+    .sda_out = fm_sda_out,
+    .sda_dir = fm_sda_dir,
+    .sda_in = fm_sda_in,
+    .scl_in = fm_scl_in,
+    .delay = fm_delay,
 
-    .delay_hd_sta = fm_delay,
-    .delay_hd_dat = fm_delay,
-    .delay_su_dat = fm_delay,
-    .delay_su_sto = fm_delay,
-    .delay_su_sta = fm_delay,
-    .delay_thigh = fm_delay
+    .delay_hd_sta = 1,
+    .delay_hd_dat = 0,
+    .delay_su_dat = 1,
+    .delay_su_sto = 1,
+    .delay_su_sta = 1,
+    .delay_thigh = 2
 };
 
 /* initialise i2c for fmradio */
