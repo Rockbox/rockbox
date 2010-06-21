@@ -1,0 +1,41 @@
+Index: ../codecs.make
+===================================================================
+--- ../codecs.make	(revision 27008)
++++ ../codecs.make	(working copy)
+@@ -37,6 +37,7 @@
+ include $(APPSDIR)/codecs/libtremor/libtremor.make
+ include $(APPSDIR)/codecs/libwavpack/libwavpack.make
+ include $(APPSDIR)/codecs/libwma/libwma.make
++include $(APPSDIR)/codecs/libwmapro/libwmapro.make
+ include $(APPSDIR)/codecs/libcook/libcook.make
+ include $(APPSDIR)/codecs/librm/librm.make
+ include $(APPSDIR)/codecs/libatrac/libatrac.make
+@@ -58,7 +59,7 @@
+ CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \
+ 	$(FAADLIB) $(FFMPEGFLACLIB) $(M4ALIB) $(MADLIB) $(MUSEPACKLIB) \
+ 	$(SPCLIB) $(SPEEXLIB) $(TREMORLIB) $(WAVPACKLIB) $(WMALIB) $(COOKLIB) \
+-	$(ATRACLIB) \
++	$(ATRACLIB) $(WMAPROLIB) \
+ 	$(CODECLIB)
+ 
+ $(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS)
+@@ -83,6 +84,7 @@
+ $(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a
+ $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
+ $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
++$(CODECDIR)/wmapro.codec : $(CODECDIR)/libwmapro.a $(CODECDIR)/libasf.a
+ $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
+ $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
+ $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
+Index: ../SOURCES
+===================================================================
+--- ../SOURCES	(revision 27008)
++++ ../SOURCES	(working copy)
+@@ -16,6 +16,7 @@
+ atrac3_oma.c
+ mpc.c
+ wma.c
++wmapro.c
+ sid.c
+ ape.c
+ nsf.c

@@ -17,17 +17,14 @@ Based on ffmpeg svn r22886 dated 15 April 2010.
 Currently, the files contain minimal changes from their original state in order
 to be able to compile cleanly. 
 
-The file wmaprodec.c contains a main function that is just a stub to make sure 
-linking is done properly and without errors.
-
 COMPILING
 
-A make file is included that would compile and link the files when the "make"
-command is executed without arguments in any Unix-like environment.
+At the time of this writing (21 June 2010) the decoder isn't still included in
+the main build since it still only works in the simulator.
 
-The file porduces an output binary called "test" that, as of now (30 April 2010)
-, is still useless. 
+A patch is included that would enable building the library and the codec for
+testing and development purposes.
 
-To clean the compiler output and retain just the source code, the following 
-command should be executed:
-make clean
+To apply the patch, you should cd to libwmapro directory and then execute the 
+following command :
+patch -p 0 < wmapro_mainbuild.patch
