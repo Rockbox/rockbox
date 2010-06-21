@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include "action.h"
 #include "system.h"
 #include "settings.h"
 #include "appevents.h"
@@ -253,3 +254,36 @@ void sb_skin_init(void)
         sb_skin[i].sync_data = &sb_skin_sync_data;
     }
 }
+
+#ifdef HAVE_TOUCHSCREEN
+static bool bypass_sb_touchregions = true;
+void sb_bypass_touchregions(bool enable)
+{
+    bypass_sb_touchregions = enable;
+}
+
+int sb_touch_to_button(int context)
+{
+    static int last_context = -1;
+    int button, offset;
+    if (bypass_sb_touchregions)
+        return ACTION_TOUCHSCREEN;
+    
+    if (last_context != context)
+        skin_disarm_touchregions(&sb_skin_data[SCREEN_MAIN]);
+    last_context = context;
+    button = skin_get_touchaction(&sb_skin_data[SCREEN_MAIN], &offset);
+    
+    switch (button)
+    {
+#ifdef HAVE_VOLUME_IN_LIST
+        case ACTION_WPS_VOLUP:
+            return ACTION_LIST_VOLUP;
+        case ACTION_WPS_VOLDOWN:
+            return ACTION_LIST_VOLDOWN;
+#endif
+        /* TODO */
+    }
+    return button;
+}
+#endif

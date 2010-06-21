@@ -40,7 +40,8 @@ enum skinnable_screens {
 
 
 #ifdef HAVE_TOUCHSCREEN
-int wps_get_touchaction(struct wps_data *data);
+int skin_get_touchaction(struct wps_data *data, int* edge_offset);
+void skin_disarm_touchregions(struct wps_data *data);
 #endif
 
 /* Do a update_type update of the skinned screen */

@@ -85,10 +85,6 @@ static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
 
-#ifdef HAVE_TOUCHSCREEN
-static void wps_disarm_touchregions(struct wps_data *data);
-#endif
-
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #ifdef HAVE_REMOTE_LCD
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
@@ -227,6 +223,55 @@ static bool update_onvol_change(struct gui_wps * gwps)
 }
 
 
+#ifdef HAVE_TOUCHSCREEN
+int skintouch_to_wps(struct wps_data *data)
+{
+    int offset = 0;
+    int button = skin_get_touchaction(data, &offset);
+    switch (button)
+    {
+        case ACTION_STD_PREV:
+            return ACTION_WPS_SKIPPREV;
+        case ACTION_STD_PREVREPEAT:
+            return ACTION_WPS_SEEKBACK;
+        case ACTION_STD_NEXT:
+            return ACTION_WPS_SKIPNEXT;
+        case ACTION_STD_NEXTREPEAT:
+            return ACTION_WPS_SEEKFWD;
+        case ACTION_STD_MENU:
+            return ACTION_WPS_MENU;
+        case ACTION_STD_CONTEXT:
+            return ACTION_WPS_CONTEXT;
+        case ACTION_STD_QUICKSCREEN:
+            return ACTION_WPS_QUICKSCREEN;
+        case WPS_TOUCHREGION_SCROLLBAR:
+            wps_state.id3->elapsed = wps_state.id3->length*offset/100;
+            if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                audio_pre_ff_rewind();
+#else
+                audio_pause();
+#endif
+            audio_ff_rewind(wps_state.id3->elapsed);
+#if (CONFIG_CODEC != SWCODEC)
+            if (!wps_state.paused)
+                audio_resume();
+#endif
+            return ACTION_TOUCHSCREEN;
+        case WPS_TOUCHREGION_VOLUME:
+        {
+            const int min_vol = sound_min(SOUND_VOLUME);
+            const int max_vol = sound_max(SOUND_VOLUME);
+            global_settings.volume = (offset * (max_vol - min_vol)) / 100;
+            global_settings.volume += min_vol;
+            setvol();
+        }
+        return ACTION_TOUCHSCREEN;
+    }
+    return button;
+}
+#endif
+
 bool ffwd_rew(int button)
 {
     unsigned int step = 0;     /* current ff/rewind step */ 
@@ -359,7 +404,7 @@ bool ffwd_rew(int button)
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
 #ifdef HAVE_TOUCHSCREEN
             if (button == ACTION_TOUCHSCREEN)
-                button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+                button = skintouch_to_wps(gui_wps[SCREEN_MAIN].data);
             if (button != ACTION_WPS_SEEKFWD &&
                 button != ACTION_WPS_SEEKBACK)
                 button = ACTION_WPS_STOPSEEK;
@@ -616,150 +661,13 @@ static void gwps_enter_wps(void)
         skin_update(gwps, WPS_REFRESH_ALL);
 
 #ifdef HAVE_TOUCHSCREEN
-        wps_disarm_touchregions(gui_wps[i].data);
+        skin_disarm_touchregions(gui_wps[i].data);
 #endif
     }
     /* force statusbar/skin update since we just cleared the whole screen */
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
-#ifdef HAVE_TOUCHSCREEN
-/** Disarms all touchregions. */
-static void wps_disarm_touchregions(struct wps_data *data)
-{
-    struct skin_token_list *regions = data->touchregions;
-    while (regions)
-    {
-        ((struct touchregion *)regions->token->value.data)->armed = false;
-        regions = regions->next;
-    }
-}
-
-int wps_get_touchaction(struct wps_data *data)
-{
-    int returncode = ACTION_NONE;
-    short x,y;
-    short vx, vy;
-    int type = action_get_touchscreen_press(&x, &y);
-    static int last_action = ACTION_NONE;
-    struct touchregion *r;
-    bool repeated = (type == BUTTON_REPEAT);
-    bool released = (type == BUTTON_REL);
-    bool pressed = (type == BUTTON_TOUCHSCREEN);
-    struct skin_token_list *regions = data->touchregions;
-
-    while (regions)
-    {
-        r = (struct touchregion *)regions->token->value.data;
-        /* make sure this region's viewport is visible */
-        if (r->wvp->hidden_flags&VP_DRAW_HIDDEN)
-        {
-            regions = regions->next;
-            continue;
-        }
-        /* check if it's inside this viewport */
-        if (viewport_point_within_vp(&(r->wvp->vp), x, y))
-        {   /* reposition the touch inside the viewport since touchregions
-             * are relative to a preceding viewport */
-            vx = x - r->wvp->vp.x;
-            vy = y - r->wvp->vp.y;
-            /* now see if the point is inside this region */
-            if (vx >= r->x && vx < r->x+r->width &&
-                vy >= r->y && vy < r->y+r->height)
-            {
-                /* reposition the touch within the area */
-                vx -= r->x;
-                vy -= r->y;
-
-                switch(r->type)
-                {
-                    case WPS_TOUCHREGION_ACTION:
-                        if (r->armed && ((repeated && r->repeat) || (released && !r->repeat)))
-                        {
-                            last_action = r->action;
-                            returncode = r->action;
-                        }
-                        if (pressed)
-                            r->armed = true;
-                        break;
-                    case WPS_TOUCHREGION_SCROLLBAR:
-                        if(r->width > r->height)
-                            /* landscape */
-                            wps_state.id3->elapsed = (vx *
-                                    wps_state.id3->length) / r->width;
-                        else
-                            /* portrait */
-                            wps_state.id3->elapsed = (vy *
-                                    wps_state.id3->length) / r->height;
-
-                        if (!wps_state.paused)
-#if (CONFIG_CODEC == SWCODEC)
-                            audio_pre_ff_rewind();
-#else
-                            audio_pause();
-#endif
-                        audio_ff_rewind(wps_state.id3->elapsed);
-#if (CONFIG_CODEC != SWCODEC)
-                        if (!wps_state.paused)
-                            audio_resume();
-#endif
-                        break;
-                    case WPS_TOUCHREGION_VOLUME:
-                    {
-                        const int min_vol = sound_min(SOUND_VOLUME);
-                        const int max_vol = sound_max(SOUND_VOLUME);
-                        if(r->width > r->height)
-                            /* landscape */
-                            global_settings.volume = (vx *
-                                            (max_vol - min_vol)) / r->width;
-                        else
-                            /* portrait */
-                            global_settings.volume = ((r->height - vy) *
-                                                (max_vol-min_vol)) / r->height;
-
-                        global_settings.volume += min_vol;
-                        setvol();
-                        returncode = ACTION_REDRAW;
-                    }
-                }
-            }
-        }
-        regions = regions->next;
-    }
-
-    /* On release, all regions are disarmed. */
-    if (released)
-    	wps_disarm_touchregions(data);
-
-    /* Now we need to convert buttons to the WPS context */
-    switch (returncode)
-    {
-        case ACTION_STD_PREV:
-            return ACTION_WPS_SKIPPREV;
-        case ACTION_STD_PREVREPEAT:
-            return ACTION_WPS_SEEKBACK;
-        case ACTION_STD_NEXT:
-            return ACTION_WPS_SKIPNEXT;
-        case ACTION_STD_NEXTREPEAT:
-            return ACTION_WPS_SEEKFWD;
-        case ACTION_STD_MENU:
-            return ACTION_WPS_MENU;
-        case ACTION_STD_CONTEXT:
-            return ACTION_WPS_CONTEXT;
-        case ACTION_STD_QUICKSCREEN:
-            return ACTION_WPS_QUICKSCREEN;
-    }
-    
-    if (returncode != ACTION_NONE)
-    	return returncode;
-        
-
-    if ((last_action == ACTION_WPS_SEEKBACK || last_action == ACTION_WPS_SEEKFWD))
-        return ACTION_WPS_STOPSEEK;
-    last_action = ACTION_TOUCHSCREEN;
-    return ACTION_TOUCHSCREEN;
-}
-#endif
 /* The WPS can be left in two ways:
  *      a)  call a function, which draws over the wps. In this case, the wps
  *          will be still active (i.e. the below function didn't return)
@@ -818,7 +726,7 @@ long gui_wps_show(void)
             exit = true;
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
-            button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+            button = skintouch_to_wps(gui_wps[SCREEN_MAIN].data);
 #endif
 /* The iPods/X5/M5 use a single button for the A-B mode markers,
    defined as ACTION_WPSAB_SINGLE in their config files. */

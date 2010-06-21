@@ -38,6 +38,9 @@
 #include "language.h"
 #endif
 #include "viewport.h"
+#ifdef HAVE_TOUCHSCREEN
+#include "statusbar-skinned.h"
+#endif
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -320,7 +323,12 @@ static int get_action_worker(int context, int timeout,
 
 int get_action(int context, int timeout)
 {
-    return get_action_worker(context,timeout,NULL);
+    int button = get_action_worker(context,timeout,NULL);
+#ifdef HAVE_TOUCHSCREEN
+    if (button == ACTION_TOUCHSCREEN)
+        button = sb_touch_to_button(context);
+#endif
+    return button;
 }
 
 int get_custom_action(int context,int timeout,

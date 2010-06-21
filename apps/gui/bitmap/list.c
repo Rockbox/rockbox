@@ -359,7 +359,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     if (button == BUTTON_NONE)
         return ACTION_NONE;
 
-    if (x > list_text_vp->x + list_width)
+    /* make sure it is inside the UI viewport */
+    if (!viewport_point_within_vp(list_text_vp, x, y))
         /* wider than the list's viewport, ignore it */
         return ACTION_NONE;
 

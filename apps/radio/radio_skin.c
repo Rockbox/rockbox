@@ -108,8 +108,32 @@ void fms_skin_init(void)
 
 int fms_do_button_loop(bool update_screen)
 {
-    return skin_wait_for_action(fms_skin, CONTEXT_FM, 
+    int button = skin_wait_for_action(fms_skin, CONTEXT_FM, 
                                       update_screen ? TIMEOUT_NOBLOCK : HZ);
+#ifdef HAVE_TOUCHSCREEN
+    int offset;
+    if (button == ACTION_TOUCHSCREEN)
+        button = skin_get_touchaction(&fms_skin_data[SCREEN_MAIN], &offset);
+    switch (button)
+    {
+        case ACTION_WPS_STOP:
+            return ACTION_FM_STOP;
+        case ACTION_STD_CANCEL:
+            return ACTION_FM_EXIT;
+        case ACTION_WPS_VOLUP:
+            return ACTION_SETTINGS_INC;
+        case ACTION_WPS_VOLDOWN:
+            return ACTION_SETTINGS_DEC;
+        case ACTION_WPS_PLAY:
+            return ACTION_FM_PLAY;
+        case ACTION_STD_MENU:
+            return ACTION_FM_MENU;
+        case WPS_TOUCHREGION_SCROLLBAR:
+            /* TODO */
+            break;
+    }   
+#endif
+    return button;
 }
 
 struct gui_wps *fms_get(enum screen_type screen)

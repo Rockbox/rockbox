@@ -43,6 +43,11 @@ void sb_skin_update(enum screen_type screen, bool force);
 void sb_skin_set_update_delay(int delay);
 bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen);
 
+#ifdef HAVE_TOUCHSCREEN
+void sb_bypass_touchregions(bool enable);
+int sb_touch_to_button(int context);
+#endif
+
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
 char* sb_get_backdrop(enum screen_type screen);
 bool sb_set_backdrop(enum screen_type screen, char* filename);
