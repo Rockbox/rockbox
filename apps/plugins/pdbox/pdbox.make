@@ -20,8 +20,7 @@ OTHER_SRC += $(PDBOX_SRC)
 
 $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ) $(CODECDIR)/libtlsf.a
 
-PDBOXFLAGS = $(PLUGINFLAGS) \
-             -DFIXEDPOINT -DSTATIC -DPD -DUSEAPI_ROCKBOX 
+PDBOXFLAGS = $(PLUGINFLAGS)
 
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make

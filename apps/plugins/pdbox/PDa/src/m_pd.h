@@ -12,6 +12,13 @@ extern "C" {
 #define PD_MAJOR_VERSION 0  /* ... use these two instead. */
 #define PD_MINOR_VERSION 37   
 
+#ifdef ROCKBOX
+#define FIXEDPOINT 
+#define STATIC 
+#define PD 
+#define USEAPI_ROCKBOX
+#endif
+
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
 #if defined(NT) && !defined(MSW)

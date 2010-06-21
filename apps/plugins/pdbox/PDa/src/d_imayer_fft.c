@@ -9,6 +9,7 @@
 ** Computation: 2 *, 1 + per value.
 */
 
+#include "m_pd.h"
 
 #include "m_fixed.h"
 

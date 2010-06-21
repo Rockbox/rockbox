@@ -1,3 +1,5 @@
+#include "m_pd.h"
+
 #ifndef ROCKBOX
 #include <stdio.h>
 #endif
