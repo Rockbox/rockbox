@@ -452,7 +452,7 @@
 /**
  * Parameters
  */
-//#define USE_CUSTOM_FIFO_LAYOUT
+#define USE_CUSTOM_FIFO_LAYOUT
 
 #ifdef USE_CUSTOM_FIFO_LAYOUT
 /* Data fifo: includes RX fifo, non period TX fifo and periodic fifos

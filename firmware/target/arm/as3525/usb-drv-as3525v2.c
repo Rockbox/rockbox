@@ -63,7 +63,7 @@ struct usb_endpoint
 #if 0
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS*2];
 #endif
-static struct usb_ctrlrequest ep0_setup_pkt;
+static struct usb_ctrlrequest ep0_setup_pkt __attribute__((aligned(16)));
 
 void usb_attach(void)
 {
@@ -81,29 +81,6 @@ static void usb_delay(void)
     }
 }
 
-#if AS3525_MCLK_SEL != AS3525_CLK_PLLB
-static inline void usb_enable_pll(void)
-{
-    CGU_COUNTB = CGU_LOCK_CNT;
-    CGU_PLLB = AS3525_PLLB_SETTING;
-    CGU_PLLBSUP = 0;                       /* enable PLLB */
-    while(!(CGU_INTCTRL & CGU_PLLB_LOCK)); /* wait until PLLB is locked */
-}
-
-static inline void usb_disable_pll(void)
-{
-    CGU_PLLBSUP = CGU_PLL_POWERDOWN;
-}
-#else
-static inline void usb_enable_pll(void)
-{
-}
-
-static inline void usb_disable_pll(void)
-{
-}
-#endif /* AS3525_MCLK_SEL != AS3525_CLK_PLLB */
-
 static void as3525v2_connect(void)
 {
     logf("usb: init as3525v2");
@@ -112,11 +89,10 @@ static void as3525v2_connect(void)
     usb_delay();
     /* 2) enable usb phy clock */
     /* PHY clock */
-    #if 0
-    usb_enable_pll();
+    #if 1
     CGU_USB = 1<<5 /* enable */
-        | (CLK_DIV(AS3525_PLLB_FREQ, 48000000) / 2) << 2
-        | 2; /* source = PLLB */
+        | (CLK_DIV(AS3525_PLLA_FREQ, 60000000)) << 2
+        | 1; /* source = PLLA */
     #else
     CGU_USB = 0x20;
     #endif
@@ -222,8 +198,6 @@ static void reset_endpoints(void)
     /* 64 bytes packet size, active endpoint */
     DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp)
                 | DEPCTL_usbactep;
-
-    DCTL = DCTL_cgnpinnak | DCTL_cgoutnak;
 }
 
 static void core_dev_init(void)
@@ -411,10 +385,30 @@ void usb_drv_exit(void)
     disable_global_interrupts();
 }
 
+static void dump_regs(void)
+{
+    logf("DSTS: %lx", DSTS);
+    logf("DOEPCTL0=%lx", DOEPCTL(0));
+    logf("DOEPTSIZ=%lx", DOEPTSIZ(0));
+    logf("DIEPCTL0=%lx", DIEPCTL(0));
+    logf("DOEPMSK=%lx", DOEPMSK);
+    logf("DIEPMSK=%lx", DIEPMSK);
+    logf("DAINTMSK=%lx", DAINTMSK);
+    logf("DAINT=%lx", DAINT);
+    logf("GINTSTS=%lx", GINTSTS);
+    logf("GINTMSK=%lx", GINTMSK);
+    logf("DCTL=%lx", DCTL);
+    logf("GAHBCFG=%lx", GAHBCFG);
+    logf("GUSBCFG=%lx", GUSBCFG);
+    logf("DCFG=%lx", DCFG);
+    logf("DTHRCTL=%lx", DTHRCTL);
+}
+
 static bool handle_reset(void)
 {
     logf("usb: bus reset");
 
+    dump_regs();
     /* Clear the Remote Wakeup Signalling */
     DCTL &= ~DCTL_rmtwkupsig;
 
@@ -436,22 +430,6 @@ static bool handle_enum_done(void)
     logf("usb: enum done");
 
     /* read speed */
-    logf("DSTS: %lx", DSTS);
-    logf("DOEPCTL0=%lx", DOEPCTL(0));
-    logf("DOEPTSIZ=%lx", DOEPTSIZ(0));
-    logf("DIEPCTL0=%lx", DIEPCTL(0));
-    logf("DOEPMSK=%lx", DOEPMSK);
-    logf("DIEPMSK=%lx", DIEPMSK);
-    logf("DAINTMSK=%lx", DAINTMSK);
-    logf("DAINT=%lx", DAINT);
-    logf("GINTSTS=%lx", GINTSTS);
-    logf("GINTMSK=%lx", GINTMSK);
-    logf("DCTL=%lx", DCTL);
-    logf("GAHBCFG=%lx", GAHBCFG);
-    logf("GUSBCFG=%lx", GUSBCFG);
-    logf("DCFG=%lx", DCFG);
-    logf("DTHRCTL=%lx", DTHRCTL);
-
     switch(extract(DSTS, enumspd))
     {
         case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
@@ -466,6 +444,7 @@ static bool handle_enum_done(void)
     }
 
     /* fixme: change EP0 mps here */
+    dump_regs();
     
     return true;
 }
