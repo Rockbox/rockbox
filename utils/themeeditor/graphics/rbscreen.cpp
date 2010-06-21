@@ -25,7 +25,7 @@
 #include <QFile>
 
 RBScreen::RBScreen(ProjectModel* project, QGraphicsItem *parent) :
-    QGraphicsItem(parent), project(project), backdrop(0)
+    QGraphicsItem(parent), backdrop(0), project(project)
 {
 
     width = safeSetting(project, "#screenwidth", "300").toInt();

@@ -39,6 +39,8 @@ const RBRenderInfo& RBRenderInfo::operator=(const RBRenderInfo& other)
     mProject = other.mProject;
     mScreen = other.mScreen;
     mModel = other.mModel;
+
+    return *this;
 }
 
 RBRenderInfo::~RBRenderInfo()
