@@ -1266,7 +1266,7 @@ static void chip8_update_display(void)
                 *row++ = w;
         }
     }
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || (LCD_DEPTH > 1)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) || (LCD_DEPTH >= 4)
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_mono_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH,
                         CHIP8_HEIGHT);
