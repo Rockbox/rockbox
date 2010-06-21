@@ -74,14 +74,18 @@ start_loc:
     ldr    r0, =0xf005a000
     ldr    r0, [r0, #0x20] /* Read GPIO A */
     tst    r0, #0x8
-    ldrne  pc, [pc, #-28]  /* Jump to original firmware if HOLD not pressed */
+    ldreq  pc, [pc, #-28]  /* Jump to original firmware if HOLD pressed */
+    ldr    r0, =0xf005a000
+    ldr    r0, [r0, #0x60] /* Read GPIO C */
+    tst    r0, #0x4000000
+    ldreq  pc, [pc, #-44]  /* Jump to original firmware if usb connected */
 #else
     #error No bootup key detection implemented for this target
 #endif
 
     /* Copy bootloader to safe area - 0x21F00000 (end of DRAM) */
     /* TODO: Adjust this for other targets - DRAM + DRAMSIZE - 0x100000 */
-    ldr    r0, [pc, #-28]
+    ldr    r0, [pc, #-44]
     mov    r1, #0x22000000
     sub    r1, r1, #0x100000
     ldr    r2, =_dataend
