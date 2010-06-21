@@ -70,7 +70,7 @@ public:
 
     TabType type() const{ return Skin; }
 
-    QGraphicsScene* scene(){ return model->render(project); }
+    QGraphicsScene* scene(){ return model->render(project, &fileName); }
 
 signals:
 

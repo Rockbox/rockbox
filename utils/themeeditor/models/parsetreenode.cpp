@@ -25,6 +25,8 @@
 #include "parsetreenode.h"
 #include "parsetreemodel.h"
 
+#include <iostream>
+
 int ParseTreeNode::openConditionals = 0;
 
 /* Root element constructor */
@@ -490,11 +492,13 @@ void ParseTreeNode::render(const RBRenderInfo& info)
         return;
     }
 
-    switch(element->type)
+    if(element->type != VIEWPORT)
     {
-    case VIEWPORT:
-        rendered = new RBViewport(element, info);
-        break;
+        std::cerr << QObject::tr("Error in parse tree").toStdString()
+                << std::endl;
+        return;
     }
+
+    rendered = new RBViewport(element, info);
 }
 

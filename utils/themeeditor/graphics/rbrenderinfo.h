@@ -22,6 +22,8 @@
 #ifndef RBRENDERINFO_H
 #define RBRENDERINFO_H
 
+#include <QMap>
+
 class RBScreen;
 class ProjectModel;
 class ParseTreeModel;
@@ -29,19 +31,21 @@ class ParseTreeModel;
 class RBRenderInfo
 {
 public:
-    RBRenderInfo(ParseTreeModel* model,
-                 ProjectModel* project, RBScreen* screen);
+    RBRenderInfo(ParseTreeModel* model,  ProjectModel* project,
+                 QMap<QString, QString>* settings, RBScreen* screen);
     RBRenderInfo(const RBRenderInfo& other);
     virtual ~RBRenderInfo();
 
     const RBRenderInfo& operator=(const RBRenderInfo& other);
 
     ProjectModel* project() const{ return mProject; }
+    QMap<QString, QString>* settings() const{ return mSettings; }
     RBScreen* screen() const{ return mScreen; }
     ParseTreeModel* model() const{ return mModel; }
 
 private:
     ProjectModel* mProject;
+    QMap<QString, QString>* mSettings;
     RBScreen* mScreen;
     ParseTreeModel* mModel;
 };

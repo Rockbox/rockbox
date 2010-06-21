@@ -29,6 +29,8 @@
 
 #include <QObject>
 #include <QPixmap>
+#include <QMap>
+#include <QDir>
 
 ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         QAbstractItemModel(parent)
@@ -270,23 +272,40 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
-QGraphicsScene* ParseTreeModel::render(ProjectModel* project)
+QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
+                                       const QString* file)
 {
     scene->clear();
 
     /* Setting the background */
     scene->setBackgroundBrush(QBrush(QPixmap(":/render/scenebg.png")));
 
+    /* Preparing settings */
+    QMap<QString, QString> settings;
+    if(project)
+        settings = project->getSettings();
+
+    /* Setting themebase if it can't be derived from the project */
+    if(settings.value("themebase", "") == "" && file && QFile::exists(*file))
+    {
+        QDir base(*file);
+        base.cdUp();
+        settings.insert("themebase", base.canonicalPath());
+    }
+
+    RBScreen* screen = 0;
+    RBRenderInfo info(this, project, &settings, screen);
+
     /* Adding the screen */
-    RBScreen* screen = new RBScreen(project);
+    screen = new RBScreen(info);
     scene->addItem(screen);
 
-    RBRenderInfo info(this, project, screen);
+    info = RBRenderInfo(this, project, &settings, screen);
+
 
     /* Rendering the tree */
     if(root)
         root->render(info);
-
 
     return scene;
 }

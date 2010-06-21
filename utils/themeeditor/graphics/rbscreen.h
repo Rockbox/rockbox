@@ -25,12 +25,15 @@
 #include <QGraphicsItem>
 
 #include "projectmodel.h"
+#include "rbrenderinfo.h"
+
+class RBViewport;
 
 class RBScreen : public QGraphicsItem
 {
 
 public:
-    RBScreen(ProjectModel* project = 0, QGraphicsItem *parent = 0);
+    RBScreen(const RBRenderInfo& info, QGraphicsItem *parent = 0);
     virtual ~RBScreen();
 
     QPainterPath shape() const;
@@ -41,14 +44,11 @@ public:
     int getWidth() const{ return width; }
     int getHeight() const{ return height; }
 
-    static QString safeSetting(ProjectModel* project, QString key,
-                               QString fallback)
+    void loadViewport(QString name, RBViewport* view)
     {
-        if(project)
-            return project->getSetting(key, fallback);
-        else
-            return fallback;
+        namedViewports.insert(name, view);
     }
+    void showViewport(QString name);
 
     static QColor stringToColor(QString str, QColor fallback);
 
@@ -61,6 +61,8 @@ private:
     QPixmap* backdrop;
 
     ProjectModel* project;
+
+    QMap<QString, RBViewport*> namedViewports;
 
 };
 

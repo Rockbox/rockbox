@@ -49,6 +49,8 @@ public:
         return settings.value(key, fallback);
     }
 
+    const QMap<QString, QString>& getSettings() const{ return settings; }
+
 signals:
 
 public slots:

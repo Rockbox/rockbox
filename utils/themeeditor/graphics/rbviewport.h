@@ -48,6 +48,7 @@ private:
     QColor foreground;
 
     bool displayed;
+    bool customUI;
 
 };
 

@@ -50,38 +50,57 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     }
     else
     {
-        int x, y, w, h;
-        /* Parsing one of the other types of viewport */
+        int param;
+        QString ident;
+        int x,y,w,h;
+        /* Rendering one of the other types of viewport */
         switch(node->tag->name[1])
         {
         case '\0':
-            /* A normal viewport definition */
-            x = node->params[0].data.numeric;
-            y = node->params[1].data.numeric;
-
-            if(node->params[2].type == skin_tag_parameter::DEFAULT)
-                w = info.screen()->getWidth() - x;
-            else
-                w = node->params[2].data.numeric;
-
-            if(node->params[3].type == skin_tag_parameter::DEFAULT)
-                h = info.screen()->getHeight() - y;
-            else
-                h = node->params[3].data.numeric;
-
-            size = QRectF(x, y, w, h);
+            customUI = false;
             displayed = true;
+            param = 0;
             break;
 
         case 'l':
-            /* Preloaded viewport */
+            /* A preloaded viewport definition */
+            ident = node->params[0].data.text;
+            customUI = false;
+            displayed = false;
+            info.screen()->loadViewport(ident, this);
+            param = 1;
             break;
 
         case 'i':
             /* Custom UI Viewport */
+            customUI = true;
+            param = 1;
+            if(node->params[0].type == skin_tag_parameter::DEFAULT)
+            {
+                displayed = true;
+            }
+            else
+            {
+                displayed = false;
+                info.screen()->loadViewport(ident, this);
+            }
             break;
-
         }
+        /* Now we grab the info common to all viewports */
+        x = node->params[param++].data.numeric;
+        y = node->params[param++].data.numeric;
+
+        if(node->params[param].type == skin_tag_parameter::DEFAULT)
+            w = info.screen()->getWidth() - x;
+        else
+            w = node->params[param].data.numeric;
+
+        if(node->params[++param].type == skin_tag_parameter::DEFAULT)
+            h = info.screen()->getHeight() - y;
+        else
+            h = node->params[param].data.numeric;
+
+        size = QRectF(x, y, w, h);
     }
 }
 
@@ -104,7 +123,8 @@ QRectF RBViewport::boundingRect() const
 void RBViewport::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    QColor color = customUI ? Qt::blue : Qt::red;
     if(displayed)
-        painter->fillRect(size, Qt::red);
+        painter->fillRect(size, color);
 }
 

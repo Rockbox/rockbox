@@ -20,44 +20,42 @@
  ****************************************************************************/
 
 #include "rbscreen.h"
+#include "rbviewport.h"
 
 #include <QPainter>
 #include <QFile>
 
-RBScreen::RBScreen(ProjectModel* project, QGraphicsItem *parent) :
+RBScreen::RBScreen(const RBRenderInfo& info, QGraphicsItem *parent) :
     QGraphicsItem(parent), backdrop(0), project(project)
 {
 
-    width = safeSetting(project, "#screenwidth", "300").toInt();
-    height = safeSetting(project, "#screenheight", "200").toInt();
+    width = info.settings()->value("#screenwidth", "300").toInt();
+    height = info.settings()->value("#screenheight", "200").toInt();
 
-    QString bg = safeSetting(project, "background color", "FFFFFF");
+    QString bg = info.settings()->value("background color", "000000");
     bgColor = stringToColor(bg, Qt::white);
 
-    QString fg = safeSetting(project, "foreground color", "FFFFFF");
+    QString fg = info.settings()->value("foreground color", "FFFFFF");
     fgColor = stringToColor(fg, Qt::black);
 
     /* Loading backdrop if available */
-    if(project)
+    QString base = info.settings()->value("themebase", "");
+    QString backdropFile = info.settings()->value("backdrop", "");
+
+    if(QFile::exists(base + "/backdrops/" + backdropFile))
     {
-        QString base = project->getSetting("themebase", "");
-        QString backdropFile = project->getSetting("backdrop", "");
+        backdrop = new QPixmap(base + "/backdrops/" + backdropFile);
 
-        if(QFile::exists(base + "/backdrops/" + backdropFile))
+        /* If a backdrop has been found, use its width and height */
+        if(!backdrop->isNull())
         {
-            backdrop = new QPixmap(base + "/backdrops/" + backdropFile);
-
-            /* If a backdrop has been found, use its width and height */
-            if(!backdrop->isNull())
-            {
-                width = backdrop->width();
-                height = backdrop->height();
-            }
-            else
-            {
-                delete backdrop;
-                backdrop = 0;
-            }
+            width = backdrop->width();
+            height = backdrop->height();
+        }
+        else
+        {
+            delete backdrop;
+            backdrop = 0;
         }
     }
 }
@@ -92,6 +90,16 @@ void RBScreen::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         painter->fillRect(0, 0, width, height, bgColor);
     }
 }
+
+void RBScreen::showViewport(QString name)
+{
+    if(namedViewports.value(name, 0) == 0)
+        return;
+
+    namedViewports.value(name)->show();
+    update();
+}
+
 
 QColor RBScreen::stringToColor(QString str, QColor fallback)
 {

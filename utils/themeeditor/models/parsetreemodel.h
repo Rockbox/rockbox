@@ -60,7 +60,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
-    QGraphicsScene* render(ProjectModel* project);
+    QGraphicsScene* render(ProjectModel* project, const QString* file = 0);
 
     static QString safeSetting(ProjectModel* project, QString key,
                                QString fallback)
