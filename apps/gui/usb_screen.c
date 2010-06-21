@@ -274,7 +274,9 @@ void gui_usb_screen_run(void)
 #endif
     }
 
+#ifdef HAVE_LCD_BITMAP
     for (i = FONT_UI; i < MAXFONTS; i++) font_unload(i);
+#endif
 
     while (1)
     {
@@ -315,9 +317,9 @@ void gui_usb_screen_run(void)
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);
-#endif /* HAVE_LCD_CHARCELLS */
-
+#else
     settings_apply(true);
+#endif /* HAVE_LCD_CHARCELLS */
 
     FOR_NB_SCREENS(i)
     {
