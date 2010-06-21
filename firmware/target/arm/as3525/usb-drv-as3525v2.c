@@ -81,6 +81,29 @@ static void usb_delay(void)
     }
 }
 
+#if AS3525_MCLK_SEL != AS3525_CLK_PLLB
+static inline void usb_enable_pll(void)
+{
+    CGU_COUNTB = CGU_LOCK_CNT;
+    CGU_PLLB = AS3525_PLLB_SETTING;
+    CGU_PLLBSUP = 0;                       /* enable PLLB */
+    while(!(CGU_INTCTRL & CGU_PLLB_LOCK)); /* wait until PLLB is locked */
+}
+
+static inline void usb_disable_pll(void)
+{
+    CGU_PLLBSUP = CGU_PLL_POWERDOWN;
+}
+#else
+static inline void usb_enable_pll(void)
+{
+}
+
+static inline void usb_disable_pll(void)
+{
+}
+#endif /* AS3525_MCLK_SEL != AS3525_CLK_PLLB */
+
 static void as3525v2_connect(void)
 {
     logf("usb: init as3525v2");
@@ -88,7 +111,15 @@ static void as3525v2_connect(void)
     CGU_PERI |= CGU_USB_CLOCK_ENABLE;
     usb_delay();
     /* 2) enable usb phy clock */
-    CGU_USB |= 0x20;
+    /* PHY clock */
+    #if 0
+    usb_enable_pll();
+    CGU_USB = 1<<5 /* enable */
+        | (CLK_DIV(AS3525_PLLB_FREQ, 48000000) / 2) << 2
+        | 2; /* source = PLLB */
+    #else
+    CGU_USB = 0x20;
+    #endif
     usb_delay();
     /* 3) clear "stop pclk" */
     PCGCCTL &= ~0x1;
@@ -144,9 +175,8 @@ static void flush_tx_fifos(int nums)
 {
     unsigned int i = 0;
     
-    GRSTCTL = (GRSTCTL & ~bitm(GRSTCTL, txfnum))
-        | (nums << GRSTCTL_txfnum_bitp)
-        | GRSTCTL_txfflsh_flush;
+    GRSTCTL = (nums << GRSTCTL_txfnum_bitp)
+            | GRSTCTL_txfflsh_flush;
     while(GRSTCTL & GRSTCTL_txfflsh_flush && i < 0x300)
         i++;
     if(GRSTCTL & GRSTCTL_txfflsh_flush)
@@ -178,8 +208,8 @@ static void reset_endpoints(void)
      */
     
     DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp)
-                    | (1 << DEPTSIZ0_pkcnt_bitp)
-                    | 8;
+                | (1 << DEPTSIZ0_pkcnt_bitp)
+                | 8;
 
     /* setup DMA */
     clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
@@ -187,11 +217,11 @@ static void reset_endpoints(void)
 
     /* Enable endpoint, clear nak */
     DOEPCTL(0) = DEPCTL_epena | DEPCTL_cnak | DEPCTL_usbactep
-                    | (DEPCTL_MPS_8 << DEPCTL_mps_bitp);
+                | (DEPCTL_MPS_64 << DEPCTL_mps_bitp);
 
     /* 64 bytes packet size, active endpoint */
-    DIEPCTL(0) = (DEPCTL_MPS_8 << DEPCTL_mps_bitp)
-                    | DEPCTL_usbactep;
+    DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp)
+                | DEPCTL_usbactep;
 
     DCTL = DCTL_cgnpinnak | DCTL_cgoutnak;
 }
@@ -236,13 +266,20 @@ static void core_dev_init(void)
     num_out_ep = 0;
     for(i = 0; i < extract(GHWCFG2, num_ep); i++)
     {
-        if(GHWCFG1 & GHWCFG1_IN_EP(i))
+        bool in = false, out = false;
+        switch((GHWCFG1 >> GHWCFG1_epdir_bitp(i)) & GHWCFG1_epdir_bits)
+        {
+            case GHWCFG1_EPDIR_BIDIR: in = out = true; break;
+            case GHWCFG1_EPDIR_IN: in = true; break;
+            case GHWCFG1_EPDIR_OUT: out = true; break;
+            default: panicf("usb: invalid epdir");
+        }
+        /* don't count EP0 which is special and always bidirectional */
+        if(in && i != 0)
             num_in_ep++;
-        if(GHWCFG1 & GHWCFG1_OUT_EP(i))
+        if(out && i != 0)
             num_out_ep++;
-        logf("  EP%d: IN=%s OUT=%s", i,
-            GHWCFG1 & GHWCFG1_IN_EP(i) ? "yes" : "no",
-            GHWCFG1 & GHWCFG1_OUT_EP(i) ? "yes" : "no");
+        logf("  EP%d: IN=%s OUT=%s", i, in ? "yes" : "no", out ? "yes" : "no");
     }
 
     if(num_in_ep != extract(GHWCFG4, num_in_ep))
@@ -317,8 +354,6 @@ static void core_dev_init(void)
     logf("  rx_thr_len: %lu", extract(DTHRCTL, rx_thr_len));
     */
 
-    DTHRCTL = 0;
-
     /* enable USB interrupts */
     enable_device_interrupts();
 }
@@ -385,9 +420,6 @@ static bool handle_reset(void)
 
     /* Flush FIFOs */
     flush_tx_fifos(0x10);
-
-    /* Flush the Learning Queue */
-    GRSTCTL = GRSTCTL_intknqflsh;
 
     reset_endpoints();
 

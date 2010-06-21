@@ -169,9 +169,12 @@
 #define GSNPSID     BASE_REG(0x040)
 
 /** User HW Config1 Register */
-#define GHWCFG1             BASE_REG(0x044)
-#define GHWCFG1_IN_EP(ep)   (1 << (2 * (ep))) /** 1 if EP(ep) has in cap */
-#define GHWCFG1_OUT_EP(ep)  (1 << (1 + 2 * (ep))) /** same for out */
+#define GHWCFG1                 BASE_REG(0x044)
+#define GHWCFG1_epdir_bitp(ep)  (2 * (ep))
+#define GHWCFG1_epdir_bits      0x3
+#define GHWCFG1_EPDIR_BIDIR     0
+#define GHWCFG1_EPDIR_IN        1
+#define GHWCFG1_EPDIR_OUT       2
 
 /** User HW Config2 Register */
 #define GHWCFG2                     BASE_REG(0x048)
@@ -449,7 +452,7 @@
 /**
  * Parameters
  */
-#define USE_CUSTOM_FIFO_LAYOUT
+//#define USE_CUSTOM_FIFO_LAYOUT
 
 #ifdef USE_CUSTOM_FIFO_LAYOUT
 /* Data fifo: includes RX fifo, non period TX fifo and periodic fifos
