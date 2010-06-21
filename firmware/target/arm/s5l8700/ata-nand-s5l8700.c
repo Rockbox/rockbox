@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
 #include "thread.h"

@@ -31,6 +31,7 @@
 #include <mmu-arm.h>
 #include <string.h>
 #include "led.h"
+#include "ata_idle_notify.h"
 
 
 #define NAND_CMD_READ       0x00
@@ -92,7 +93,7 @@ int nand_powered = 0;
 int nand_interleaved = 0;
 int nand_cached = 0;
 long nand_last_activity_value = -1;
-static long nand_stack[32];
+static long nand_stack[DEFAULT_STACK_SIZE];
 
 static struct mutex nand_mtx;
 static struct wakeup nand_wakeup;
@@ -721,7 +722,10 @@ static void nand_thread(void)
     {
         if (TIME_AFTER(current_tick, nand_last_activity_value + HZ / 5)
          && nand_powered)
+        {
+            call_storage_idle_notifys(false);
             nand_power_down();
+        }
         sleep(HZ / 10);
     }
 }
