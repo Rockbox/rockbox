@@ -244,6 +244,10 @@ int skintouch_to_wps(struct wps_data *data)
             return ACTION_WPS_CONTEXT;
         case ACTION_STD_QUICKSCREEN:
             return ACTION_WPS_QUICKSCREEN;
+#ifdef HAVE_HOTKEY
+        case ACTION_STD_HOTKEY:
+            return ACTION_WPS_HOTKEY;
+#endif
         case WPS_TOUCHREGION_SCROLLBAR:
             wps_state.id3->elapsed = wps_state.id3->length*offset/100;
             if (!wps_state.paused)
