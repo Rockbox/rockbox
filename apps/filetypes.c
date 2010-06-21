@@ -370,6 +370,7 @@ static void read_config(char* config_file)
             filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
         filetype_count++;
     }
+    close(fd);
 }
 
 int filetype_get_attr(const char* file)
