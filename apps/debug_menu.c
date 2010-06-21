@@ -1670,20 +1670,19 @@ static bool view_battery(void)
                     
 #elif defined(SANSA_E200) || defined(SANSA_C200) || CONFIG_CPU == AS3525 || \
       CONFIG_CPU == AS3525v2
-                const int first = CHARGE_STATE_DISABLED;
                 static const char * const chrgstate_strings[] =
                 {
-                    [CHARGE_STATE_DISABLED-first] = "Disabled",
-                    [CHARGE_STATE_ERROR-first]    = "Error",
-                    [DISCHARGING-first]           = "Discharging",
-                    [CHARGING-first]              = "Charging",
+                    [CHARGE_STATE_DISABLED - CHARGE_STATE_DISABLED]= "Disabled",
+                    [CHARGE_STATE_ERROR - CHARGE_STATE_DISABLED] = "Error",
+                    [DISCHARGING - CHARGE_STATE_DISABLED]       = "Discharging",
+                    [CHARGING - CHARGE_STATE_DISABLED]          = "Charging",
                 };
                 const char *str = NULL;
 
                 lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
 
-                y = charge_state - first;
+                y = charge_state - CHARGE_STATE_DISABLED;
                 if ((unsigned)y < ARRAYLEN(chrgstate_strings))
                     str = chrgstate_strings[y];
 
