@@ -18,10 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
 #include <stdlib.h> /* sim uses rand for peakmeter simulation */
 #endif
-#include "config.h"
 #include "mas.h"
 #include "thread.h"
 #include "kernel.h"
