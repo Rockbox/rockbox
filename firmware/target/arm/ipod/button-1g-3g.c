@@ -55,7 +55,7 @@ static int int_btn = BUTTON_NONE;
 #define WHEEL_REPEAT_VELOCITY     45 /* deg/s */
 #define WHEEL_SMOOTHING_VELOCITY 100 /* deg/s */
 
-static void handle_scroll_wheel(int new_scroll, int was_hold)
+static void handle_scroll_wheel(int new_scroll)
 {
     static const signed char scroll_state[4][4] = {
         {0, 1, -1, 0},
@@ -64,7 +64,7 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
         {0, -1, 1, 0}
     };
 
-    static int prev_scroll = 0;
+    static int prev_scroll = -1;
     static int direction = 0;
     static int count = 0;
     static long next_backlight_on = 0;
@@ -72,28 +72,28 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
     static unsigned long last_wheel_usec = 0;
     static unsigned long wheel_delta = 1ul << 24;
     static unsigned long wheel_velocity = 0;
+    static int prev_keypost = BUTTON_NONE;
 
     int wheel_keycode = BUTTON_NONE;
-    int scroll = scroll_state[prev_scroll][new_scroll];
+    int scroll;
     unsigned long usec;
     unsigned long v;
 
+    if (prev_scroll == -1) {
+        prev_scroll = new_scroll;
+        return;
+    }
+
+    scroll = scroll_state[prev_scroll][new_scroll];
     prev_scroll = new_scroll;
 
     if (direction != scroll) {
-        /* direction reversal - reset all */
+        /* direction reversal or was hold - reset all */
         direction = scroll;
+        prev_keypost = BUTTON_NONE;
         wheel_velocity = 0;
         wheel_delta = 1ul << 24;
         count = 0;
-    }
-
-    if (was_hold) {
-        /* hold - reset all */
-        wheel_velocity = 0;
-        wheel_delta = 1ul << 24;
-        count = 0;
-        return;
     }
 
     /* poke backlight every 1/4s of activity */
@@ -160,14 +160,19 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
         wheel_velocity = (7*wheel_velocity + v) / 8;
     }
 
-    if (v >= WHEEL_REPEAT_VELOCITY) {
-        /* quick enough - generate repeats - use unsmoothed v to guage */
-        wheel_keycode |= BUTTON_REPEAT;
-    }
-
     if (queue_empty(&button_queue)) {
+        int key = wheel_keycode;
+
+        if (v >= WHEEL_REPEAT_VELOCITY && prev_keypost == key) {
+            /* quick enough and same key is being posted more than once in a
+             * row - generate repeats - use unsmoothed v to guage */
+            key |= BUTTON_REPEAT;
+        }
+
+        prev_keypost = wheel_keycode;
+
         /* post wheel keycode with wheel data */
-        queue_post(&button_queue, wheel_keycode,
+        queue_post(&button_queue, key,
                    (wheel_velocity >= WHEEL_ACCEL_START ? (1ul << 31) : 0)
                     | wheel_delta | wheel_velocity);
         /* message posted - reset delta */
@@ -184,7 +189,7 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
     last_wheel_usec = usec;
 }
 #else
-static void handle_scroll_wheel(int new_scroll, int was_hold)
+static void handle_scroll_wheel(int new_scroll)
 {
     int wheel_keycode = BUTTON_NONE;
     static int prev_scroll = -1;
@@ -204,7 +209,7 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
         direction = scroll_state[prev_scroll][new_scroll];
         count = 0;
     }
-    else if (!was_hold) {
+    else {
         backlight_on();
         reset_poweroff_timer();
         if (++count == 6) { /* reduce sensitivity */
@@ -233,22 +238,24 @@ static void handle_scroll_wheel(int new_scroll, int was_hold)
 static int ipod_3g_button_read(void)
 {
     unsigned char source, state;
-    static bool was_hold = false;
     int btn = BUTTON_NONE;
     
     /* get source of interupts */
     source = GPIOA_INT_STAT;
-    
+
     /* get current keypad status */
     state = GPIOA_INPUT_VAL;
     
     /* toggle interrupt level */
     GPIOA_INT_LEV = ~state;
 
+    /* ack any active interrupts */
+    GPIOA_INT_CLR = source;
+
 #ifdef IPOD_3G
+    static bool was_hold = false;
+
     if (was_hold && source == 0x40 && state == 0xbf) {
-        /* ack any active interrupts */
-        GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
     was_hold = false;
@@ -258,13 +265,11 @@ static int ipod_3g_button_read(void)
         was_hold = true;
         /* hold switch on 3g causes all outputs to go low */
         /* we shouldn't interpret these as key presses */
-        GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
 #elif defined IPOD_1G2G
     if (state & 0x20) {
         /* 1g/2g hold switch is active high */
-        GPIOA_INT_CLR = source;
         return BUTTON_NONE;
     }
 #endif
@@ -285,11 +290,8 @@ static int ipod_3g_button_read(void)
     }
 
     if (source & 0xc0) {
-        handle_scroll_wheel((state & 0xc0) >> 6, was_hold);
+        handle_scroll_wheel((state & 0xc0) >> 6);
     }
-
-    /* ack any active interrupts */
-    GPIOA_INT_CLR = source;
 
     return btn;
 }
