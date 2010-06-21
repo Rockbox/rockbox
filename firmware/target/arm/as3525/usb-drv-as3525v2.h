@@ -59,6 +59,7 @@
 #define GAHBCFG                         BASE_REG(0x008)
 #define GAHBCFG_glblintrmsk             (1 << 0) /** Global interrupt mask */
 #define GAHBCFG_hburstlen_bitp          1
+#define GAHBCFG_hburstlen_bits          0xf
 #define GAHBCFG_INT_DMA_BURST_SINGLE    0
 #define GAHBCFG_INT_DMA_BURST_INCR      1 /** note: the linux patch has several other value, this is one picked for internal dma */
 #define GAHBCFG_INT_DMA_BURST_INCR4     3
@@ -248,7 +249,6 @@
 #define DCTL_cgnpinnak      (1 << 8) /** Clear Global Non-Periodic IN NAK */
 #define DCTL_sgoutnak       (1 << 9) /** Set Global OUT NAK */
 #define DCTL_cgoutnak       (1 << 10) /** Clear Global OUT NAK */
-/* "documented" in constants.h only */
 #define DCTL_pwronprgdone   (1 << 11) /** Power on Program Done ? */
 
 /** Device Status Register */
@@ -261,7 +261,7 @@
 #define DSTS_ENUMSPD_LS_PHY_6MHZ           2
 #define DSTS_ENUMSPD_FS_PHY_48MHZ          3
 #define DSTS_errticerr      (1 << 3) /** Erratic errors ? */
-#define DSTS_soffn_bitp     7 /** Frame or Microframe Number of the received SOF */
+#define DSTS_soffn_bitp     8 /** Frame or Microframe Number of the received SOF */
 #define DSTS_soffn_bits     0x3fff
 
 /** Device IN Endpoint Common Interrupt Mask Register */
@@ -330,33 +330,12 @@
 /** Device IN EPs empty Inr. Mask Register */
 #define FFEMPTYMSK  DEV_REG(0x34) 
 
-
-/* 0<=ep<=15, you can use ep=0 */
-/** Device IN Endpoint (ep) Control Register */
-#define DIEPCTL(ep)     DEV_REG(0x100 + (ep) * 0x20)
-/** Device IN Endpoint (ep) Interrupt Register */
-#define DIEPINT(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x8)
-/** Device IN Endpoint (ep) Transfer Size Register */
-#define DIEPTSIZ(ep)    DEV_REG(0x100 + (ep) * 0x20 + 0x10)
-/** Device IN Endpoint (ep) DMA Address Register */
-#define DIEPDMA(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x14)
-/** Device IN Endpoint (ep) Transmit FIFO Status Register */
-#define DTXFSTS(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x18)
-
-/* 0<=ep<=15, you can use ep=0 */
-/** Device OUT Endpoint (ep) Control Register */
-#define DOEPCTL(ep)     DEV_REG(0x300 + (ep) * 0x20)
-/** Device OUT Endpoint (ep) Frame number Register */
-#define DOEPFN(ep)      DEV_REG(0x300 + (ep) * 0x20 + 0x4)
-/** Device Endpoint (ep) Interrupt Register */
-#define DOEPINT(ep)     DEV_REG(0x300 + (ep) * 0x20 + 0x8)
-/** Device OUT Endpoint (ep) Transfer Size Register */
-#define DOEPTSIZ(ep)    DEV_REG(0x300 + (ep) * 0x20 + 0x10)
-/** Device Endpoint (ep) DMA Address Register */
-#define DOEPDMA(ep)     DEV_REG(0x300 + (ep) * 0x20 + 0x14)
-
 #define PCGCCTL         BASE_REG(0xE00) /** Power and Clock Gating Control Register */
 
+/** Device IN Endpoint (ep) Control Register */
+#define DIEPCTL(ep)     DEV_REG(0x100 + (ep) * 0x20)
+/** Device OUT Endpoint (ep) Control Register */
+#define DOEPCTL(ep)     DEV_REG(0x300 + (ep) * 0x20)
 
 /** Maximum Packet Size
  * IN/OUT EPn
@@ -433,6 +412,10 @@
 #define DEPCTL_epdis            (1 << 30) /** Endpoint disable */
 #define DEPCTL_epena            (1 << 31) /** Endpoint enable */
 
+/** Device IN Endpoint (ep) Transfer Size Register */
+#define DIEPTSIZ(ep)    DEV_REG(0x100 + (ep) * 0x20 + 0x10)
+/** Device OUT Endpoint (ep) Transfer Size Register */
+#define DOEPTSIZ(ep)    DEV_REG(0x300 + (ep) * 0x20 + 0x10)
 
 /* valid for any D{I,O}EPTSIZi with 1<=i<=15, NOT for i=0 ! */
 #define DEPTSIZ_xfersize_bits   0x7ffff /** Transfer Size */
@@ -442,11 +425,26 @@
 #define DEPTSIZ_mc_bits         0x3
 
 /* idem but for i=0 */
-#define DEPTSIZ0_xfersize_bits  0x7f /** Transfer Size */
+#define DEPTSIZ0_xfersize_bitp  0 /** Transfer Size */
+#define DEPTSIZ0_xfersize_bits  0x7f
 #define DEPTSIZ0_pkcnt_bitp     19 /** Packet Count */
-#define DEPTSIZ0_pkcnt_bits     0x1
+#define DEPTSIZ0_pkcnt_bits     0x3
 #define DEPTSIZ0_supcnt_bitp    29 /** Setup Packet Count (DOEPTSIZ0 Only) */
 #define DEPTSIZ0_supcnt_bits    0x3
+
+/** Device IN Endpoint (ep) Interrupt Register */
+#define DIEPINT(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x8)
+/** Device IN Endpoint (ep) DMA Address Register */
+#define DIEPDMA(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x14)
+/** Device IN Endpoint (ep) Transmit FIFO Status Register */
+#define DTXFSTS(ep)     DEV_REG(0x100 + (ep) * 0x20 + 0x18)
+
+/** Device OUT Endpoint (ep) Frame number Register */
+#define DOEPFN(ep)      DEV_REG(0x300 + (ep) * 0x20 + 0x4)
+/** Device Endpoint (ep) Interrupt Register */
+#define DOEPINT(ep)     DEV_REG(0x300 + (ep) * 0x20 + 0x8)
+/** Device Endpoint (ep) DMA Address Register */
+#define DOEPDMA(ep)     DEV_REG(0x300 + (ep) * 0x20 + 0x14)
 
 /**
  * Parameters
