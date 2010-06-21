@@ -150,15 +150,6 @@ static void dma_desc_init(int ep, int dir)
 static void reset_endpoints(int init)
 {
     int i;
-    /*
-     * MPS sizes depending on speed:
-     * LS: 8 (control), no bulk available
-     * FS: 64 (control), 64 (bulk)
-     * HS: 64 (control), 512 (bulk)
-     *
-     * We don't need to handle LS since there is no low-speed only host AFAIK.
-     */
-    int mps = i == 0 ? 64 : (usb_drv_port_speed() ? 512 : 64);
 
     /*
      * OUT EP 2 is an alias for OUT EP 0 on this HW!
@@ -171,6 +162,17 @@ static void reset_endpoints(int init)
     endpoints[2][1].state |= EP_STATE_ALLOCATED;
 
     for(i = 0; i < USB_NUM_EPS; i++) {
+        /*
+         * MPS sizes depending on speed:
+         * LS: 8 (control), no bulk available
+         * FS: 64 (control), 64 (bulk)
+         * HS: 64 (control), 512 (bulk)
+         *
+         * We don't need to handle LS since there is no low-speed only
+         * host AFAIK.
+         */
+        int mps = i == 0 ? 64 : (usb_drv_port_speed() ? 512 : 64);
+
         if (init) {
             endpoints[i][0].state = 0;
             wakeup_init(&endpoints[i][0].complete);
