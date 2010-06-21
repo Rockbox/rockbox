@@ -296,7 +296,7 @@ int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
     av_log(NULL,AV_LOG_DEBUG,"build table nb_codes=%d\n", nb_codes);
 #endif
 
-    assert(symbols_size <= 2 || !symbols);
+    //assert(symbols_size <= 2 || !symbols);
     j = 0;
 #define COPY(condition)\
     for (i = 0; i < nb_codes; i++) {\

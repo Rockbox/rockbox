@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <assert.h>
+//#include <assert.h>
 #include "libavutil/bswap.h"
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"

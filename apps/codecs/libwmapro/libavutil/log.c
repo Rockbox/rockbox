@@ -54,10 +54,10 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
         return;
     }
     if(count>0){
-        fprintf(stderr, "    Last message repeated %d times\n", count);
+        //fprintf(stderr, "    Last message repeated %d times\n", count);
         count=0;
     }
-    fputs(line, stderr);
+    //fputs(line, stderr);
     strcpy(prev, line);
 }
 

@@ -93,13 +93,11 @@
 #include "wmaprodata.h"
 #include "dsputil.h"
 #include "wma.h"
+#include "wmaprodec.h"
 
 /* Some defines to make it compile */
 #define AVERROR_INVALIDDATA  -1
 #define AVERROR_PATCHWELCOME -2
-#ifndef M_PI
-#define M_PI           3.14159265358979323846  /* pi */
-#endif
 #define av_log_ask_for_sample(...)
 
 /** current decoder limitations */
@@ -238,8 +236,8 @@ typedef struct WMAProDecodeCtx {
  */
 static void av_cold dump_context(WMAProDecodeCtx *s)
 {
-#define PRINT(a, b)     av_log(s->avctx, AV_LOG_DEBUG, " %s = %d\n", a, b);
-#define PRINT_HEX(a, b) av_log(s->avctx, AV_LOG_DEBUG, " %s = %x\n", a, b);
+#define PRINT(a, b)     printf(" %s = %d\n", a, b);
+#define PRINT_HEX(a, b) printf(" %s = %x\n", a, b);
 
     PRINT("ed sample bit depth", s->bits_per_sample);
     PRINT_HEX("ed decode flags", s->decode_flags);
@@ -255,7 +253,7 @@ static void av_cold dump_context(WMAProDecodeCtx *s)
  *@param avctx codec context
  *@return 0 on success, < 0 otherwise
  */
-static av_cold int decode_end(AVCodecContext *avctx)
+av_cold int decode_end(AVCodecContext *avctx)
 {
     WMAProDecodeCtx *s = avctx->priv_data;
     int i;
@@ -271,8 +269,10 @@ static av_cold int decode_end(AVCodecContext *avctx)
  *@param avctx codec context
  *@return 0 on success, -1 otherwise
  */
-static av_cold int decode_init(AVCodecContext *avctx)
+av_cold int decode_init(AVCodecContext *avctx)
 {
+    avctx->priv_data = malloc(sizeof(WMAProDecodeCtx));
+    memset(avctx->priv_data, 0, sizeof(WMAProDecodeCtx));
     WMAProDecodeCtx *s = avctx->priv_data;
     uint8_t *edata_ptr = avctx->extradata;
     unsigned int channel_mask;
@@ -454,7 +454,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
         sin64[i] = sin(i*M_PI / 64.0);
 #if 0
     if (avctx->debug & FF_DEBUG_BITSTREAM)
-        dump_context(s);
 #endif
 
     avctx->channel_layout = channel_mask;
@@ -1379,7 +1378,7 @@ static int decode_frame(WMAProDecodeCtx *s)
     if (len != (get_bits_count(gb) - s->frame_offset) + 2) {
         /** FIXME: not sure if this is always an error */
         av_log(s->avctx, AV_LOG_ERROR, "frame[%i] would have to skip %i bits\n",
-               s->frame_num, len - (get_bits_count(gb) - s->frame_offset) - 1);
+               (int)s->frame_num, len - (get_bits_count(gb) - s->frame_offset) - 1);
         s->packet_loss = 1;
         return 0;
     }
@@ -1465,7 +1464,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
  *@param avpkt input packet
  *@return number of bytes that were read from the input buffer
  */
-static int decode_packet(AVCodecContext *avctx,
+int decode_packet(AVCodecContext *avctx,
                          void *data, int *data_size, AVPacket* avpkt)
 {
     WMAProDecodeCtx *s = avctx->priv_data;
@@ -1548,6 +1547,20 @@ static int decode_packet(AVCodecContext *avctx,
 
     *data_size = (int8_t *)s->samples - (int8_t *)data;
     s->packet_offset = get_bits_count(gb) & 7;
+
+/* Convert the pcm samples to signed 16-bit integers. This is the format that 
+ * the rockbox simulator works with. */
+#ifdef ROCKBOX    
+    float* fptr = data;
+    int32_t* ptr = data;
+    int x;
+    for(x = 0; x < *data_size; x++)
+    {
+        fptr[x] *= ((float)(INT32_MAX));
+        ptr[x] = (int32_t)fptr[x];
+        
+    }
+#endif
 
     return (s->packet_loss) ? AVERROR_INVALIDDATA : get_bits_count(gb) >> 3;
 }

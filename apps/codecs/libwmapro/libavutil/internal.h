@@ -33,7 +33,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <assert.h>
+//#include <assert.h>
 //#include "config.h"
 #include "attributes.h"
 //#include "timer.h"
@@ -142,8 +142,8 @@
 #endif
 
 /* avoid usage of dangerous/inappropriate system functions */
-#undef  malloc
-#define malloc please_use_av_malloc
+//#undef  malloc
+//#define malloc please_use_av_malloc
 #undef  free
 #define free please_use_av_free
 #undef  realloc
@@ -163,8 +163,8 @@
 #undef  exit
 #define exit exit_is_forbidden
 #ifndef LIBAVFORMAT_BUILD
-#undef  printf
-#define printf please_use_av_log_instead_of_printf
+//#undef  printf
+//#define printf please_use_av_log_instead_of_printf
 #undef  fprintf
 #define fprintf please_use_av_log_instead_of_fprintf
 #undef  puts

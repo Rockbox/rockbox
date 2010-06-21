@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <assert.h>
+//#include <assert.h>
 #include "libavutil/bswap.h"
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
@@ -153,7 +153,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     int bit_left;
 
     //    printf("put_bits=%d %x\n", n, value);
-    assert(n <= 31 && value < (1U << n));
+    //assert(n <= 31 && value < (1U << n));
 
     bit_buf = s->bit_buf;
     bit_left = s->bit_left;
@@ -264,7 +264,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 
 static inline void put_sbits(PutBitContext *pb, int n, int32_t value)
 {
-    assert(n >= 0 && n <= 31);
+    //assert(n >= 0 && n <= 31);
 
     put_bits(pb, n, value & ((1<<n)-1));
 }
@@ -304,12 +304,12 @@ static inline uint8_t* put_bits_ptr(PutBitContext *s)
  */
 static inline void skip_put_bytes(PutBitContext *s, int n)
 {
-        assert((put_bits_count(s)&7)==0);
+        //assert((put_bits_count(s)&7)==0);
 #ifdef ALT_BITSTREAM_WRITER
         FIXME may need some cleaning of the buffer
         s->index += n<<3;
 #else
-        assert(s->bit_left==32);
+        //assert(s->bit_left==32);
         s->buf_ptr += n;
 #endif
 }

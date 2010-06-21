@@ -23,8 +23,8 @@
 #include "wma.h"
 //#include "wmadata.h"
 
-#undef NDEBUG
-#include <assert.h>
+//#undef NDEBUG
+//#include <assert.h>
 #if 0
 /* XXX: use same run/length optimization as mpeg decoders */
 //FIXME maybe split decode / encode or pass flag

@@ -274,9 +274,14 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     }
 
                     fileprop = 1;
-                    /* All we want is the play duration - uint64_t at offset 40 */
-                    lseek(fd, 40, SEEK_CUR);
-
+                    
+                    /* Get the number of logical packets - uint16_t at offset 31 
+                     * (Big endian byte order) */
+                    lseek(fd, 31, SEEK_CUR);
+                    read_uint16be(fd, &wfx->numpackets);
+                    
+                    /* Now get the play duration - uint64_t at offset 40 */
+                    lseek(fd, 7, SEEK_CUR);
                     read_uint64le(fd, &play_duration);
                     id3->length = play_duration / 10000;
 
@@ -346,8 +351,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             lseek(fd,current.size - 24 - 72 - 6,SEEK_CUR);
                             wfx->audiostream = flags&0x7f;
                         } else if (wfx->codec_id == ASF_CODEC_ID_WMAPRO) {
-                            read(fd, wfx->data, 10);
-                            lseek(fd,current.size - 24 - 72 - 10,SEEK_CUR);
+                            /* wma pro decoder needs the extra-data */
+                            read(fd, wfx->data, wfx->datalen);
+                            lseek(fd,current.size - 24 - 72 - wfx->datalen,SEEK_CUR);
                             wfx->audiostream = flags&0x7f;
                             /* Correct codectype to redirect playback to the proper .codec */
                             id3->codectype = AFMT_WMAPRO;

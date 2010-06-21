@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <assert.h>
+//#include <assert.h>
 // do not use libavutil/mathematics.h since this is compiled both
 // for the host and the target and config.h is only valid for the target
 #include <math.h>
@@ -53,7 +53,7 @@ av_cold void ff_sine_window_init(float *window, int n) {
 }
 
 av_cold void ff_init_ff_sine_windows(int index) {
-    assert(index >= 0 && index < FF_ARRAY_ELEMS(ff_sine_windows));
+    //assert(index >= 0 && index < FF_ARRAY_ELEMS(ff_sine_windows));
 #if !CONFIG_HARDCODED_TABLES
     ff_sine_window_init(ff_sine_windows[index], 1 << index);
 #endif
