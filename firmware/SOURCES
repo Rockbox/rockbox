@@ -64,6 +64,7 @@ libc/mktime.c
 #endif /* !defined(SIMULATOR)*/
 
 /* Common */
+common/version.c
 common/config.c
 common/crc32.c
 #ifdef MI4_FORMAT

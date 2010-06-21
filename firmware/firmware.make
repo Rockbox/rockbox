@@ -17,7 +17,6 @@ FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
 ifeq (,$(findstring -DARCHOS_PLAYER,$(TARGET)))
     FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
 endif
-FIRMLIB_OBJ += $(BUILDDIR)/version.o
 OTHER_SRC += $(FIRMLIB_SRC)
 
 FIRMLIB = $(BUILDDIR)/firmware/libfirmware.a
@@ -51,8 +50,5 @@ ifneq ($(SVNVERSION),$(OLDSVNVERSION))
 .PHONY: $(BUILDDIR)/version.h
 endif
 
-$(BUILDDIR)/version.c: $(BUILDDIR)/version.h
-	$(TOOLSDIR)/genversion.sh c $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
-
 $(BUILDDIR)/version.h:
-	$(TOOLSDIR)/genversion.sh h $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
+	$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
