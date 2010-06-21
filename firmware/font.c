@@ -449,7 +449,7 @@ int font_load(struct font* pf, const char *path)
 void font_unload(int font_id)
 {
     struct font* pf = sysfonts[font_id];
-    if (font_id >= SYSTEMFONTCOUNT && pf)
+    if (font_id && pf)
     {
         if (pf->fd >= 0)
             close(pf->fd);
