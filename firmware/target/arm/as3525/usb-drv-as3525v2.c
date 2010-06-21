@@ -89,13 +89,9 @@ static void as3525v2_connect(void)
     usb_delay();
     /* 2) enable usb phy clock */
     /* PHY clock */
-    #if 1
     CGU_USB = 1<<5 /* enable */
         | (CLK_DIV(AS3525_PLLA_FREQ, 60000000)) << 2
         | 1; /* source = PLLA */
-    #else
-    CGU_USB = 0x20;
-    #endif
     usb_delay();
     /* 3) clear "stop pclk" */
     PCGCCTL &= ~0x1;
