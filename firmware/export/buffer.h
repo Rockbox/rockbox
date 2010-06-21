@@ -23,10 +23,10 @@
 
 #include "config.h"
 /* defined in linker script */
-#ifdef SIMULATOR
-extern unsigned char *audiobufend;
-#else
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 extern unsigned char audiobufend[];
+#else
+extern unsigned char *audiobufend;
 #endif
 
 extern unsigned char *audiobuf;

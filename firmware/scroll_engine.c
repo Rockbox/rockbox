@@ -242,7 +242,7 @@ static bool scroll_process_message(int delay)
             usb_wait_for_disconnect(&scroll_queue);
             sync_display_ticks();
             return true;
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         case SYS_REMOTE_PLUGGED:
             if (!remote_initialized)
                 sync_display_ticks();
@@ -280,7 +280,7 @@ static void scroll_thread(void)
         delay = current_tick;
 
         if (
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             !remote_initialized ||
 #endif
             (tick_remote = lcd_remote_scroll_info.last_scroll +

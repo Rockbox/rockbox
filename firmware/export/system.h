@@ -125,7 +125,7 @@ int get_cpu_boost_counter(void);
 
 
 /* newer? SDL includes endian.h, So we ignore it */
-#if defined(SIMULATOR) || defined(__PCTOOL__)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) || defined(__PCTOOL__)
 #undef letoh16
 #undef letoh32
 #undef htole16
@@ -234,8 +234,11 @@ enum {
 
 #if !defined(SIMULATOR) && !defined(__PCTOOL__) 
 #include "system-target.h"
-#elif defined(HAVE_SDL) /* SIMULATOR */
+#elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"
+#endif
+
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
@@ -268,7 +271,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return (t >> 8) | ((t ^ value) << 8);
 }
 
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_HOSTED */
 
 #ifndef BIT_N
 #define BIT_N(n) (1U << (n))

@@ -597,7 +597,7 @@ int ft_enter(struct tree_context* c)
                 break;
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
                 /* firmware file */
             case FILE_ATTR_MOD:
                 splash(0, ID2P(LANG_WAIT));

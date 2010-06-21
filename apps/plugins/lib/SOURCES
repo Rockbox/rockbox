@@ -28,7 +28,7 @@ grey_sh.S
 
 #endif /* HAVE_LCD_BITMAP && LCD_DEPTH < 4 */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 overlay.c
 #endif
 
@@ -76,7 +76,7 @@ pluginlib_albumart.c
 pluginlib_touchscreen.c
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 #ifdef CPU_ARM
 ../../codecs/lib/setjmp_arm.S
@@ -90,4 +90,4 @@ pluginlib_touchscreen.c
 ../../codecs/lib/setjmp_mips.S
 #endif
 
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */

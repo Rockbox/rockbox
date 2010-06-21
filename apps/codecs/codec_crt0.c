@@ -36,7 +36,7 @@ extern enum codec_status codec_main(void);
 
 enum codec_status codec_start(void)
 {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
     ci->memset(iedata, 0, iend - iedata);

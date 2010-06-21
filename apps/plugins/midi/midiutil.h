@@ -39,6 +39,8 @@
    improved to increase MAX_VOICES for targets that can do 22kHz */
 #ifdef CPU_PP
 #define MAX_VOICES 16
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#define MAX_VOICES 48
 #else
 #define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi spec implementation */
 #endif /* CPU_PP */

@@ -420,10 +420,10 @@ int radio_screen(void)
     bool have_recorded = false;
     int timeout = current_tick + HZ/10;
     unsigned int last_seconds = 0;
-#ifndef SIMULATOR    
+#if !defined(SIMULATOR)
     unsigned int seconds = 0;
     struct audio_recording_options rec_options;
-#endif
+#endif /* SIMULATOR */
 #endif /* CONFIG_CODEC != SWCODEC */
 #ifndef HAVE_NOISY_IDLE_MODE
     int button_timeout = current_tick + (2*HZ);

@@ -115,6 +115,8 @@
 
 #ifdef SIMULATOR
 #include "sim_tasks.h"
+#endif
+#ifdef HAVE_SDL
 #include "system-sdl.h"
 #endif
 
@@ -313,7 +315,7 @@ static void init_tagcache(void)
 }
 #endif
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
 static void init(void)
 {

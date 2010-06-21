@@ -42,7 +42,7 @@
 #endif
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 #ifdef AUDIO_CPU_BOOST
 static void audio_cpu_boost(bool state)
@@ -115,7 +115,7 @@ int audio_get_spdif_sample_rate(void)
 } /* audio_get_spdif_sample_rate */
 #endif /* HAVE_SPDIF_IN */
 
-#else /* SIMULATOR */
+#else /* PLATFORM_HOSTED */
 
 /** Sim stubs **/
 
@@ -153,4 +153,4 @@ int audio_get_spdif_sample_rate(void)
 } /* audio_get_spdif_sample_rate */
 #endif /* HAVE_SPDIF_IN */
 
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */

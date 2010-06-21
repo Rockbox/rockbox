@@ -1488,7 +1488,7 @@ void buffering_thread(void)
                 base_handle_id = (int)ev.data;
                 break;
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 LOGFQUEUE("buffering < SYS_USB_CONNECTED");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);

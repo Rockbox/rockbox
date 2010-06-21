@@ -1318,7 +1318,7 @@ static void playlist_thread(void)
                 dirty_pointers = false;
                 break ;
             
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&playlist_queue);

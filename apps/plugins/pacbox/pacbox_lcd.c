@@ -28,7 +28,7 @@
 #include "arcade.h"
 #include "hardware.h"
 
-#if defined(SIMULATOR) || !defined(IRIVER_H300_SERIES)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) || !defined(IRIVER_H300_SERIES)
 
 void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
 {

@@ -24,7 +24,7 @@
 #define _ROCKCONF_H_ /* Protect against unwanted include */
 #include "lua.h"
 
-#if !defined(SIMULATOR)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 int errno = 0;
 #endif
 

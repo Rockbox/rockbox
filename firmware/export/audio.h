@@ -36,7 +36,7 @@
 #endif /* CONFIG_CODEC == SWCODEC */
 
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define audio_play(x) sim_audio_play(x)
 #endif
 

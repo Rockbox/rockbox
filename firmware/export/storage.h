@@ -51,7 +51,7 @@ struct storage_info
     char *revision;
 };
 
-#if !defined(SIMULATOR) && !defined(CONFIG_STORAGE_MULTI)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(CONFIG_STORAGE_MULTI)
 /* storage_spindown, storage_sleep and storage_spin are passed as
  * pointers, which doesn't work with argument-macros.
  */
@@ -185,7 +185,7 @@ struct storage_info
     #else
         //#error No storage driver!
     #endif
-#else /* NOT CONFIG_STORAGE_MULTI and NOT SIMULATOR*/
+#else /* NOT CONFIG_STORAGE_MULTI and PLATFORM_NATIVE*/
 
 /* Simulator and multi-driver use normal functions */
 

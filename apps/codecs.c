@@ -54,20 +54,20 @@
 #define LOGF_ENABLE
 #include "logf.h"
 
-#ifdef SIMULATOR
-#define PREFIX(_x_) sim_ ## _x_
-#else
-#define PREFIX
-#endif
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
-#ifdef SIMULATOR
+#define PREFIX(_x_) sim_ ## _x_
 #if CONFIG_CODEC == SWCODEC
 unsigned char codecbuf[CODEC_SIZE];
 #endif
 void *sim_codec_load_ram(char* codecptr, int size, void **pd);
 void sim_codec_close(void *pd);
-#else
+
+#else /* !PLATFORM_HOSTED */
+
+#define PREFIX
 #define sim_codec_close(x)
+
 #endif
 
 size_t codec_size;
@@ -77,7 +77,7 @@ extern void* plugin_get_audio_buffer(size_t *buffer_size);
 #undef open
 static int open(const char* pathname, int flags, ...)
 {
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     int fd;
     if (flags & O_CREAT)
     {
@@ -201,7 +201,7 @@ static int codec_load_ram(int size, struct codec_api *api)
 {
     struct codec_header *hdr;
     int status;
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     hdr = (struct codec_header *)codecbuf;
         
     if (size <= (signed)sizeof(struct codec_header)
@@ -220,7 +220,7 @@ static int codec_load_ram(int size, struct codec_api *api)
 
     codec_size = hdr->end_addr - codecbuf;
 
-#else /* SIMULATOR */
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
     void *pd;
     
     hdr = sim_codec_load_ram(codecbuf, size, &pd);
@@ -241,7 +241,7 @@ static int codec_load_ram(int size, struct codec_api *api)
 
     codec_size = codecbuf - codecbuf;
 
-#endif /* SIMULATOR */
+#endif /* CONFIG_PLATFORM */
     if (hdr->api_version > CODEC_API_VERSION
         || hdr->api_version < CODEC_MIN_API_VERSION) {
         sim_codec_close(pd);

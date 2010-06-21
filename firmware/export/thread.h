@@ -81,7 +81,7 @@
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
 #ifdef CPU_COLDFIRE
@@ -135,15 +135,15 @@ struct regs
     uint32_t start; /*   44 - Thread start address, or NULL when started */
 };
 #endif /* CONFIG_CPU */
-#else
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
 struct regs
 {
-    void *t;             /* Simulator OS thread */
+    void *t;             /* OS thread */
     void *told;          /* Last thread in slot (explained in thead-sdl.c) */
     void *s;             /* Semaphore for blocking and wakeup */
     void (*start)(void); /* Start function */
 };
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of
    threads being maintained that are normally dealt with in FIFO order

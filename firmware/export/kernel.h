@@ -201,7 +201,7 @@ static inline void call_tick_tasks(void)
 }
 #endif
 
-#if defined(SIMULATOR) && !defined(PLUGIN) && !defined(CODEC)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && !defined(PLUGIN) && !defined(CODEC)
 #define sleep(x) sim_sleep(x)
 #endif
 

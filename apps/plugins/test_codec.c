@@ -697,7 +697,7 @@ static enum plugin_status test_track(const char* filename)
         rb->snprintf(str,sizeof(str),"%d.%02d%% realtime",(int)speed/100,(int)speed%100);
         log_text(str,true);
         
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         /* show effective clockrate in MHz needed for realtime decoding */
         if (speed > 0)
         {

@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if PLUGIN_BUFFER_SIZE < 0x10000 && !defined(SIMULATOR)
+#if PLUGIN_BUFFER_SIZE < 0x10000 && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 #include "lib/overlay.h"
 

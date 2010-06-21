@@ -347,7 +347,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #endif
         )
     {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         struct info_data *info = (struct info_data *)lists->data;
         int i;
         info->new_data = true;

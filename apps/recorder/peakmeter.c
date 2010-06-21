@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
 #include <stdlib.h> /* sim uses rand for peakmeter simulation */
 #endif
 #include "config.h"
@@ -538,7 +538,7 @@ void pm_reset_clipcount(void)
 void peak_meter_playback(bool playback)
 {
     int i;
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     (void)playback;
 #elif CONFIG_CODEC == SWCODEC
     pm_playback = playback;
@@ -595,7 +595,7 @@ void peak_meter_peek(void)
     left  = pm_cur_left;
     right = pm_cur_right;
 #else
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     pm_cur_left  = left  = mas_codec_readreg(pm_src_left);
     pm_cur_right = right = mas_codec_readreg(pm_src_right);
 #else

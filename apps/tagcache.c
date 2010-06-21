@@ -4442,7 +4442,7 @@ static void tagcache_thread(void)
             case SYS_POWEROFF:
                 break ;
                 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 logf("USB: TagCache");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);

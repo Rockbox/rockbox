@@ -32,7 +32,7 @@
 #define ATTR_ARCHIVE     0x20
 #define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define dirent_uncached sim_dirent
 #define DIR_UNCACHED SIM_DIR
 #define opendir_uncached sim_opendir
@@ -57,7 +57,7 @@ struct dirent_uncached {
 #include "fat.h"
 
 typedef struct {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     bool busy;
     long startcluster;
     struct fat_dir fatdir;
@@ -66,7 +66,7 @@ typedef struct {
     int volumecounter; /* running counter for faked volume entries */
 #endif
 #else
-    /* simulator: */
+    /* simulator/application: */
     void *dir; /* actually a DIR* dir */
     char *name;
 #endif

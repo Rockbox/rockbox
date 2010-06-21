@@ -23,7 +23,7 @@
 #define __PLUGINLIB_EXIT_H__
 
 #include "config.h"
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "../../codecs/lib/setjmp.h"
 #else
 #include <setjmp.h>

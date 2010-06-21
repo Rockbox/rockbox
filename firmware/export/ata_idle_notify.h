@@ -43,7 +43,7 @@ enum {
     DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
 };
 
-#define USING_STORAGE_CALLBACK  !defined(SIMULATOR)             \
+#define USING_STORAGE_CALLBACK  (CONFIG_PLATFORM & PLATFORM_NATIVE) \
                             && ! ((CONFIG_STORAGE & STORAGE_NAND) \
                                && (CONFIG_NAND == NAND_IFP7XX)) \
                             && !defined(BOOTLOADER)

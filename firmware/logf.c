@@ -208,7 +208,7 @@ void _logf(const char *fmt, ...)
 
     va_start(ap, fmt);
     
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     char buf[1024];
     vsnprintf(buf, sizeof buf, fmt, ap);
     DEBUGF("%s\n", buf);

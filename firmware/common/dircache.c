@@ -171,7 +171,7 @@ static bool check_event_queue(void)
     return false;
 }
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* scan and build static data (avoid redundancy on stack) */
 static struct
 {
@@ -301,7 +301,7 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
     
     return sab_process_dir(0, ce);
 }
-#else /* !SIMULATOR */
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) /* PLATFORM_HOSTED */
 static char sab_path[MAX_PATH];
 
 static int sab_process_dir(struct dircache_entry *ce)
@@ -400,7 +400,7 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
     strlcpy(sab_path, "/", sizeof sab_path);
     return sab_process_dir(ce);
 }
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 /**
  * Internal function to get a pointer to dircache_entry for a given filename.
@@ -689,7 +689,7 @@ static void dircache_thread(void)
                 dircache_initialized = false;
                 break ;
             
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&dircache_queue);

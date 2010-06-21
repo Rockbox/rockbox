@@ -24,6 +24,6 @@ setjmp_cf.S
 setjmp_mips.S
 #endif
 
-#elif defined(SIMULATOR) && defined(__APPLE__)
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 osx.dummy.c
 #endif

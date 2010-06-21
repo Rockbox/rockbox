@@ -114,7 +114,7 @@ static bool test_fs(void)
 
     log_init();
     log_text("test_disk WRITE&VERIFY", true);
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
@@ -304,7 +304,7 @@ static bool test_speed(void)
     rb->memset(audiobuf, 'T', audiobuflen);
     log_init();
     log_text("test_disk SPEED TEST", true);
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);

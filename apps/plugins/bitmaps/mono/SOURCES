@@ -61,6 +61,6 @@ superdom_boarditems.160x128x1.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */
-#if defined(SIMULATOR) && defined(__APPLE__)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 osx.dummy.bmp
 #endif

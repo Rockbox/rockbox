@@ -26,6 +26,7 @@
 #define MAX_PATH 260
 
 #include <sys/types.h>
+#include "config.h"
 #include "_ansi.h"
 
 #define MAX_OPEN_FILES 11
@@ -49,7 +50,7 @@
 #define O_TRUNC  0x10
 #endif
 
-#if  defined(SIMULATOR) && !defined(PLUGIN) && !defined(CODEC)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && !defined(PLUGIN) && !defined(CODEC)
 #define open(x, ...) sim_open(x, __VA_ARGS__)
 #define creat(x,m) sim_creat(x,m)
 #define remove(x) sim_remove(x)
@@ -78,7 +79,7 @@ extern int fsync(int fd);
 extern ssize_t read(int fd, void *buf, size_t count);
 extern off_t lseek(int fildes, off_t offset, int whence);
 extern int file_creat(const char *pathname);
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* posix compatibility function */
 static inline int creat(const char *pathname, mode_t mode)
 {

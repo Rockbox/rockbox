@@ -403,7 +403,7 @@ enum plugin_status plugin_start(const void* parameter)
             = rb->plugin_get_audio_buffer(&audio_buffer_free);
         plugbuf=false;
     }
-#if MEM <= 8 && !defined(SIMULATOR)
+#if MEM <= 8 && (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* loaded as an overlay plugin, protect from overwriting ourselves */
     if ((unsigned)(plugin_start_addr - (unsigned char *)audio_bufferbase)
         < audio_buffer_free)

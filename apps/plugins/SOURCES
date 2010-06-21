@@ -65,7 +65,7 @@ iriverify.c
 
 
 
-#ifndef SIMULATOR /* those plugins only run on hardware */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* those plugins only run on hardware */
 
 /* Overlays loaders */
 #if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
@@ -132,7 +132,7 @@ wavplay.c
 wavrecord.c
 #endif
 
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 
 

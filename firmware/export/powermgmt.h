@@ -74,7 +74,7 @@ extern unsigned int power_thread_inputs;
 #include "powermgmt-target.h"
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 /* Generic current values that are intentionally meaningless - config header
  * should define proper numbers.*/
@@ -129,7 +129,7 @@ extern const unsigned short percent_to_volt_charge[11];
 /* Start up power management thread */
 void powermgmt_init(void) INIT_ATTR;
 
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 /* Returns battery statust */
 int battery_level(void); /* percent */

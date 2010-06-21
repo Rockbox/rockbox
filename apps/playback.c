@@ -468,7 +468,7 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
 
 bool audio_load_encoder(int afmt)
 {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     const char *enc_fn = get_codec_filename(afmt | CODEC_TYPE_ENCODER);
     if (!enc_fn)
         return false;
@@ -493,7 +493,7 @@ bool audio_load_encoder(int afmt)
 
 void audio_remove_encoder(void)
 {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* force encoder codec unload (if currently loaded) */
     if (ci.enc_codec_loaded <= 0)
         return;
@@ -2008,7 +2008,7 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
                 audio_finalise_track_change();
                 break;
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 LOGFQUEUE("audio < SYS_USB_CONNECTED");
                 if (playing)

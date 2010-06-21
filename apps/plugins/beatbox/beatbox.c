@@ -125,7 +125,7 @@ PLUGIN_IRAM_DECLARE
 
 #undef SYNC
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     #define SYNC
 #endif
 

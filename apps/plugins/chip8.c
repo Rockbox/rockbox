@@ -1185,7 +1185,7 @@ static byte chip8_keymap[16];
 static unsigned long starttimer; /* Timer value at the beginning */
 static unsigned long cycles; /* Number of update cycles (50Hz) */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static bool is_playing;
 
 /* one frame of bitswapped mp3 data */
@@ -1208,14 +1208,14 @@ static void callback(unsigned char** start, size_t* size)
     *start = beep; /* give it the same frame again */
     *size = sizeof(beep);
 }
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 /****************************************************************************/
 /* Turn sound on                                                            */
 /****************************************************************************/
 static void chip8_sound_on (void) 
 {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
         rb->mp3_play_pause(true); /* kickoff audio */
 #endif
@@ -1226,7 +1226,7 @@ static void chip8_sound_on (void)
 /****************************************************************************/
 static void chip8_sound_off (void) 
 { 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
         rb->mp3_play_pause(false); /* pause audio */
 #endif
@@ -1266,7 +1266,7 @@ static void chip8_update_display(void)
                 *row++ = w;
         }
     }
-#if defined(SIMULATOR) || (LCD_DEPTH > 1)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || (LCD_DEPTH > 1)
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_mono_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH,
                         CHIP8_HEIGHT);
@@ -1428,7 +1428,7 @@ static bool chip8_run(const char* file)
 #endif
     rb->lcd_update();
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* init sound */
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
@@ -1442,7 +1442,7 @@ static bool chip8_run(const char* file)
     cycles = 0;
     chip8();
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
     {   /* stop it if we used audio */
         rb->mp3_play_stop(); /* Stop audio playback */

@@ -40,6 +40,9 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+
+#if defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT)
+
 #ifndef SIMULATOR
 #include "backlight-target.h"
 #else
@@ -50,8 +53,6 @@
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 #include "backlight-sw-fading.h"
 #endif
-
-#if defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT)
 
 #define BACKLIGHT_FADE_IN_THREAD \
     (CONFIG_BACKLIGHT_FADING &  (BACKLIGHT_FADING_SW_SETTING \

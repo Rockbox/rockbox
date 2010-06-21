@@ -26,7 +26,7 @@
 #include <ctype.h>
 #include "plugin.h"
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <errno.h>
 #define PREFIX(_x_) sim_ ## _x_
 #else

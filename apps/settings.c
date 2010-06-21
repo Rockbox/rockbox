@@ -837,7 +837,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_DISK_STORAGE
     storage_spindown(global_settings.disk_spindown);
 #endif
-#if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
+#if (CONFIG_CODEC == MAS3507D) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
     dac_line_in(global_settings.line_in);
 #endif
     set_poweroff_timeout(global_settings.poweroff);

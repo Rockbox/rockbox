@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #ifdef DEBUG
- #ifndef SIMULATOR
+ #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
   /* check whether a function is inside the valid memory location */
   #define IS_FUNCPTR(fp) ({/
      extern char _text[];/

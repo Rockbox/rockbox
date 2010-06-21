@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include "config.h"
 
-#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
+#if (CONFIG_CPU == SH7034) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 #define ROM_VERSION (*(short *)0x020000fe)
 
@@ -49,7 +49,7 @@ static inline int tuner_detect_type(void)
 }
 #endif
 
-#endif /* (CONFIG_CPU == SH7034) && !SIMULATOR */
+#endif /* (CONFIG_CPU == SH7034) && (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 
 #ifdef ARCHOS_PLAYER
 bool is_new_player(void);

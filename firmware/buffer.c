@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "buffer.h"
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 unsigned char audiobuffer[(MEM*1024-256)*1024];
 unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 #else

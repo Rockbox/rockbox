@@ -53,7 +53,7 @@
 #include "lcd-remote.h"
 #include "crc32.h"
 #include "logf.h"
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "disk.h"
 #include "adc.h"
 #include "power.h"
@@ -276,7 +276,7 @@ static unsigned int ticks, boost_ticks, freq_sum;
 
 static void dbg_audio_task(void)
 {
-#ifndef SIMULATOR
+#ifdef CPUFREQ_NORMAL
     if(FREQ > CPUFREQ_NORMAL)
         boost_ticks++;
     freq_sum += FREQ/1000000; /* in MHz */
@@ -371,7 +371,7 @@ static bool dbg_buffering_thread(void)
 
             screens[i].putsf(0, line++, "handle count: %d", (int)d.num_handles);
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             screens[i].putsf(0, line++, "cpu freq: %3dMHz",
                              (int)((FREQ + 500000) / 1000000));
 #endif
@@ -758,7 +758,7 @@ static bool dbg_hw_info(void)
 #endif /* !HAVE_LCD_BITMAP */
 #endif /* !SIMULATOR */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static const char* dbg_partitions_getname(int selected_item, void *data,
                                           char *buffer, size_t buffer_len)
 {
@@ -786,7 +786,7 @@ bool dbg_partitions(void)
     info.get_name = dbg_partitions_getname;
     return simplelist_show_list(&info);
 }
-#endif
+#endif /* PLATFORM_NATIVE */
 
 #if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF_OUT)
 static bool dbg_spdif(void)
@@ -928,7 +928,7 @@ static bool dbg_spdif(void)
         lcd_putsf(0, line++, "Clock accuracy: %d", x);
         line++;
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         lcd_putsf(0, line++, "Measured freq: %ldHz",
                  spdif_measure_frequency());
 #endif
@@ -950,7 +950,7 @@ static bool dbg_spdif(void)
 }
 #endif /* CPU_COLDFIRE */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_LCD_BITMAP
  /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -1334,9 +1334,9 @@ bool dbg_ports(void)
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
-#if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)
+#if (CONFIG_RTC == RTC_PCF50605) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static bool dbg_pcf(void)
 {
     int line;
@@ -1423,7 +1423,7 @@ static bool dbg_cpufreq(void)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
-#if defined(HAVE_TSC2100) && !defined(SIMULATOR)
+#if defined(HAVE_TSC2100) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "tsc2100.h"
 static char *itob(int n, int len)
 {
@@ -1493,7 +1493,7 @@ static bool tsc2100_debug(void)
     return simplelist_show_list(&info);
 }
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_LCD_BITMAP
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
@@ -1785,7 +1785,7 @@ static bool view_battery(void)
 #endif /* HAVE_LCD_BITMAP */
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
@@ -2106,7 +2106,7 @@ static bool dbg_disk_info(void)
     info.scroll_all = true;
     return simplelist_show_list(&info);
 }
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int btn, struct gui_synclist *lists)
@@ -2672,10 +2672,10 @@ static const struct the_menu_item menuitems[] = {
     || CONFIG_CPU == DM320 || defined(CPU_S5L870X) || CONFIG_CPU == AS3525v2
         { "View I/O ports", dbg_ports },
 #endif
-#if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)
+#if (CONFIG_RTC == RTC_PCF50605) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View PCF registers", dbg_pcf },
 #endif
-#if defined(HAVE_TSC2100) && !defined(SIMULATOR)
+#if defined(HAVE_TSC2100) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "TSC2100 debug", tsc2100_debug },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -2689,18 +2689,18 @@ static const struct the_menu_item menuitems[] = {
 #endif
         { "View OS stacks", dbg_os },
 #ifdef HAVE_LCD_BITMAP
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View battery", view_battery },
 #endif
         { "Screendump", dbg_screendump },
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View HW info", dbg_hw_info },
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View partitions", dbg_partitions },
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View disk info", dbg_disk_info },
 #if (CONFIG_STORAGE & STORAGE_ATA)
         { "Dump ATA identify info", dbg_identify_info},

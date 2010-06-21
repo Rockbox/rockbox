@@ -194,7 +194,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         rb->screens[0]->clear_display();
         rb->screens[0]->putsf(0, line++, "%s", boost?"boosted":"unboosted");
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         rb->screens[0]->putsf(0, line++, "clock: %d Hz", *rb->cpu_frequency);
 #endif
         rb->screens[0]->putsf(0, line++, "loop#: %d", ++count);

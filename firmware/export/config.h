@@ -74,6 +74,13 @@
 #define AT91SAM9260  9260
 #define AS3525v2    35252
 
+/* platforms
+ * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
+ * possible future PLATFORM_ANDROID (some OSes might need totally different
+ * handling to run on them than a stand-alone application) */
+#define PLATFORM_NATIVE (1<<0)
+#define PLATFORM_HOSTED (1<<1)
+
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
 #define RECORDER_PAD        2
@@ -497,6 +504,10 @@ Lyre prototype 1 */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
 #endif
 
+#ifndef CONFIG_PLATFORM
+#define CONFIG_PLATFORM PLATFORM_NATIVE
+#endif
+
 #ifndef CONFIG_TUNER
 #define CONFIG_TUNER 0
 #endif
@@ -675,10 +686,10 @@ Lyre prototype 1 */
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 #define HAVE_WAKEUP_EXT_CB
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define HAVE_PRIORITY_SCHEDULING
 #define HAVE_SCHEDULER_BOOSTCTRL
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 #define HAVE_SEMAPHORE_OBJECTS
 
@@ -744,7 +755,7 @@ Lyre prototype 1 */
 #endif
 
 /* IRAM usage */
-#if !defined(SIMULATOR) &&   /* Not for simulators */ \
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) &&   /* Not for hosted environments */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
@@ -780,9 +791,10 @@ Lyre prototype 1 */
 #define IBSS_ATTR
 #define STATICIRAM static
 #endif
+
 #if (defined(CPU_PP) || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) || \
     (CONFIG_CPU == IMX31L)) \
-    && !defined(SIMULATOR) && !defined(BOOTLOADER)
+    && (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER)
 /* Functions that have INIT_ATTR attached are NOT guaranteed to survive after
  * root_menu() has been called. Their code may be overwritten by other data or
  * code in order to save RAM, and references to them might point into
@@ -799,7 +811,7 @@ Lyre prototype 1 */
 #define INIT_ATTR
 #endif
 
-#if defined(SIMULATOR) && defined(__APPLE__)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 #define DATA_ATTR       __attribute__ ((section("__DATA, .data")))
 #else
 #define DATA_ATTR       __attribute__ ((section(".data")))
@@ -923,7 +935,7 @@ Lyre prototype 1 */
 
 #else /* BOOTLOADER */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 //#define USB_ENABLE_SERIAL
 #define USB_ENABLE_STORAGE
 
@@ -941,11 +953,11 @@ Lyre prototype 1 */
 /* This attribute can be used to enable to detection of plugin file handles leaks.
  * When enabled, the plugin core will monitor open/close/creat and when the plugin exits
  * will display an error message if the plugin leaked some file handles */
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define HAVE_PLUGIN_CHECK_OPEN_CLOSE
 #endif
 
-#if defined(HAVE_DIRCACHE) && !defined(SIMULATOR)
+#if defined(HAVE_DIRCACHE) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define HAVE_IO_PRIORITY
 #endif
 

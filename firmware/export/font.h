@@ -28,7 +28,7 @@
  */
 #include "config.h"
 
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+#if defined(HAVE_LCD_BITMAP) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #ifndef __PCTOOL__
 #include "font_cache.h"
 #include "sysfont.h"

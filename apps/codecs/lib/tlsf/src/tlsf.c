@@ -104,6 +104,7 @@
 #include <sys/mman.h>
 #endif
 
+#include "config.h"
 #include "tlsf.h"
 
 #if !defined(__GNUC__)
@@ -164,7 +165,8 @@
 #define PAGE_SIZE (getpagesize())
 #endif
 
-#if defined(ROCKBOX) && defined(SIMULATOR) || !defined(ROCKBOX)
+#if defined(ROCKBOX) && (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(DEBUG) \
+    || !defined(ROCKBOX)
 int printf(const char* fmt, ...);
 #define PRINT_MSG(fmt, args...) printf(fmt, ## args)
 #define ERROR_MSG(fmt, args...) printf(fmt, ## args)

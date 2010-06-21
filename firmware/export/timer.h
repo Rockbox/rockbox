@@ -26,7 +26,7 @@
 #include "config.h"
 #include "cpu.h"
 
-#if defined(SIMULATOR)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define TIMER_FREQ 1000000
 #endif
 

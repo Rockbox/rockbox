@@ -37,10 +37,8 @@
 
 #include "m4a.h"
 
-#if defined(DEBUG) || defined(SIMULATOR)
-#ifdef DEBUGF
 #undef DEBUGF
-#endif
+#if defined(DEBUG)
 #define DEBUGF qtmovie->stream->ci->debugf
 #else
 #define DEBUGF(...)

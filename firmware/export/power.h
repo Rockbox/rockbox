@@ -81,7 +81,7 @@ void ide_power_enable(bool on);
 bool charging_state(void);
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 void power_init(void) INIT_ATTR;
 

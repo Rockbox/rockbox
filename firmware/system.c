@@ -26,7 +26,7 @@
 #include "string.h"
 #include "file.h"
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
 #endif
 

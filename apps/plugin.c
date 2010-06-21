@@ -57,7 +57,7 @@
 #include "usbstack/usb_hid.h"
 #endif
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define PREFIX(_x_) sim_ ## _x_
 #else
 #define PREFIX
@@ -72,7 +72,7 @@
 static unsigned int open_files;
 #endif
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void *sim_plugin_load(char *plugin, void **pd);
 void sim_plugin_close(void *pd);
@@ -157,7 +157,7 @@ static const struct plugin_api rockbox_api = {
     lcd_yuv_set_options,
 #endif
 #endif /* MEMORYSIZE > 2 */
-#elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
+#elif (LCD_DEPTH < 4) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
     lcd_blit_mono,
     lcd_blit_grey_phase,
 #endif /* LCD_DEPTH */
@@ -366,7 +366,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     reset_poweroff_timer,
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     system_memory_guard,
     &cpu_frequency,
 
@@ -377,7 +377,7 @@ static const struct plugin_api rockbox_api = {
     cpu_boost,
 #endif
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     trigger_cpu_boost,
     cancel_cpu_boost,
@@ -415,7 +415,7 @@ static const struct plugin_api rockbox_api = {
     remove_event,
     send_event,
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     /* special simulator hooks */
 #if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
     sim_lcd_ex_init,
@@ -437,7 +437,7 @@ static const struct plugin_api rockbox_api = {
     memset,
     memcpy,
     memmove,
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     _ctype_,
 #endif
     atoi,
@@ -467,7 +467,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef AUDIOHW_HAVE_EQ
     sound_enum_hw_eq_band_setting,
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     mp3_play_data,
     mp3_play_pause,
     mp3_play_stop,
@@ -589,7 +589,7 @@ static const struct plugin_api rockbox_api = {
     battery_level,
     battery_level_safe,
     battery_time,
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     battery_voltage,
 #endif
 #if CONFIG_CHARGING
@@ -603,7 +603,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* misc */
-#if !defined(SIMULATOR)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     &errno,
 #endif
     srand,
@@ -727,15 +727,15 @@ int plugin_load(const char* plugin, const void* parameter)
 {
     int rc, i;
     struct plugin_header *hdr;
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     void *pd;
-#else /* !SIMULATOR */
+#else /* PLATFOR_NATIVE */
     int fd;
     ssize_t readsize;
 #if NUM_CORES > 1
     unsigned my_core;
 #endif
-#endif /* !SIMULATOR */
+#endif /* CONFIG_PLATFORM */
 
 #if LCD_DEPTH > 1
     fb_data* old_backdrop;
@@ -755,7 +755,7 @@ int plugin_load(const char* plugin, const void* parameter)
     splash(0, ID2P(LANG_WAIT));
     strcpy(current_plugin, plugin);
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     hdr = sim_plugin_load((char *)plugin, &pd);
     if (pd == NULL) {
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
@@ -990,7 +990,7 @@ static int open_wrapper(const char* pathname, int flags, ...)
 /* we don't have an 'open' function. it's a define. and we need
  * the real file_open, hence PREFIX() doesn't work here */
     int fd;
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     if (flags & O_CREAT)
     {
         va_list ap;

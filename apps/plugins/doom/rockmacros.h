@@ -42,7 +42,7 @@ char *my_strtok( char * s, const char * delim );
 #undef  read_line
 #define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define open(a, ...)       rb->open((a), __VA_ARGS__)
 #define close(a)           rb->close((a))
 #else

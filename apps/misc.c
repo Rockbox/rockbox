@@ -251,7 +251,7 @@ static void system_restore(void)
 
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     (void)callback;
     (void)parameter;
     bookmark_autobookmark(false);

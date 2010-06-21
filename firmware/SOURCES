@@ -10,7 +10,7 @@ usb.c
 logf.c
 #endif /* ROCKBOX_HAS_LOGF */
 kernel.c
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */
@@ -19,7 +19,7 @@ rolo.c
 #endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
 thread.c
 timer.c
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c
@@ -40,13 +40,13 @@ panic.c
 debug.c
 
 /* Standard library */
-#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
 libc/strtok.c
 /* alsa on linux requires a more advanced sprintf, i.e. not ours */
 libc/sprintf.c
-#endif /* !SIMULATOR || __MINGW32__ || __CYGWIN__ */
-#if !defined(SIMULATOR)
+#endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 libc/atoi.c
 libc/ctype.c
 libc/memcmp.c
@@ -70,11 +70,11 @@ common/crc32.c
 #ifdef MI4_FORMAT
 common/crc32-mi4.c
 #endif
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 common/dir_uncached.c
 common/file.c
 common/disk.c
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 #ifdef HAVE_DIRCACHE
 common/dircache.c
 #endif /* HAVE_DIRCACHE */
@@ -143,21 +143,21 @@ backlight-sw-fading.c
 /* Misc. */
 drivers/led.c
 drivers/button.c
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_DAC3550A
 drivers/dac.c
 #endif
 #ifdef HAVE_SERIAL
 drivers/serial.c
 #endif
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 #ifdef HAVE_TOUCHSCREEN
 drivers/touchscreen.c
 #endif
 
 
 /* Storage */
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_STORAGE & STORAGE_MMC)
 drivers/ata_mmc.c
 #endif
@@ -184,7 +184,7 @@ drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 sdmmc.c
 #endif
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 /* EEPROM */
 #ifdef HAVE_EEPROM
@@ -195,7 +195,7 @@ eeprom_settings.c
 #endif /* HAVE_EEPROM */
 
 /* RTC */
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_RTC == RTC_M41ST84W)
 drivers/rtc/rtc_m41st84w.c
 #elif (CONFIG_RTC == RTC_PCF50606)
@@ -225,13 +225,13 @@ drivers/rtc/rtc_s35390a.c
 #elif (CONFIG_RTC == RTC_D2)
 drivers/rtc/rtc_d2.c
 #endif /* (CONFIG_RTC == RTC_) */
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 #ifndef BOOTLOADER
 /* Tuner */
 #if CONFIG_TUNER
 tuner.c
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */
@@ -254,7 +254,7 @@ drivers/tuner/ipod_remote_tuner.c
 #if (CONFIG_TUNER & RDA5802)
 drivers/tuner/rda5802.c
 #endif /* (CONFIG_TUNER & RDA5802) */
-#endif /*SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 #endif /* CONFIG_TUNER */
 #endif /* BOOTLOADER */
 
@@ -285,7 +285,7 @@ drivers/mas.c
 #endif /* SWCODEC */
 
 /* Audio codec */
-#if !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER)
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8751) \
@@ -319,7 +319,7 @@ drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
 target/hosted/sdl/pcm-sdl.c
 #endif
-#endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
+#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
 /* USB Stack */
 #if !defined(SIMULATOR)
@@ -531,10 +531,10 @@ libc/memmove.c
 libc/memset.c
 common/memset16.c
 libc/strlen.c
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 crt0.S
 drivers/i2c.c
-#endif /* SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 #endif /* defined(CPU_*) */
 

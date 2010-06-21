@@ -340,7 +340,7 @@ static void time_greyscale(void)
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     char str[32];
     int cpu_freq;
 #endif
@@ -350,7 +350,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     
     log_init();
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
     backlight_force_on(); /* backlight control in lib/helper.c */
@@ -370,7 +370,7 @@ enum plugin_status plugin_start(const void* parameter)
     time_remote_update();
 #endif
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (*rb->cpu_frequency != cpu_freq)
         rb->snprintf(str, sizeof(str), "CPU clock changed!");
     else

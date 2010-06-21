@@ -36,7 +36,7 @@ struct travel_data {
     struct dircache_entry *first;
     struct dircache_entry *ce;
     struct dircache_entry *down_entry;
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     DIR_UNCACHED *dir, *newdir;
     struct dirent_uncached *entry;
 #else

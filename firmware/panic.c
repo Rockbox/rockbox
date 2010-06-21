@@ -41,7 +41,7 @@ void panicf( const char *fmt, ...)
 {
     va_list ap;
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* Disable interrupts */
 #ifdef CPU_ARM
     disable_interrupt(IRQ_FIQ_STATUS);

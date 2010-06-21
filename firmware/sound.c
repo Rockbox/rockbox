@@ -27,7 +27,7 @@
 #include "system.h"
 #include "i2c.h"
 #include "mas.h"  
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if CONFIG_CPU == PNX0101
 #include "pnx0101.h"
 #endif
@@ -257,7 +257,7 @@ static void set_prescaled_volume(void)
     dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
 #endif
 
-#ifndef SIMULATOR
+#ifndef HAVE_SDL_AUDIO
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
@@ -276,9 +276,9 @@ static void set_prescaled_volume(void)
 #elif defined(HAVE_JZ4740_CODEC) || defined(HAVE_SDL_AUDIO)
     audiohw_set_volume(current_volume);
 #endif
-#else /* SIMULATOR */
+#else /* HAVE_SDL_AUDIO */
     audiohw_set_volume(current_volume);
-#endif /* !SIMULATOR */
+#endif /* !HAVE_SDL_AUDIO */
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
 
@@ -714,7 +714,7 @@ void sound_set(int setting, int value)
   && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100) \
   && !defined (HAVE_WM8711) && !defined (HAVE_WM8721) \
   && !defined (HAVE_WM8731) && !defined (HAVE_WM8978) \
-  && !defined(HAVE_AK4537)) || defined(SIMULATOR)
+  && !defined(HAVE_AK4537)) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
@@ -820,7 +820,7 @@ int sound_val2phys(int setting, int value)
     return value;
 #endif
 }
-#endif /* !defined(HAVE_AS3514) || defined(SIMULATOR) */
+#endif /* CONFIG_CODECs || PLATFORM_HOSTED */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 /* This function works by telling the decoder that we have another
