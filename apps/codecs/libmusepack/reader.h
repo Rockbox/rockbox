@@ -65,12 +65,14 @@ struct mpc_reader_t {
     /// Returns the total length of the source stream, in bytes.
     mpc_int32_t (*get_size)(mpc_reader *p_reader);
 
+    /* rockbox: not used
     /// True if the stream is a seekable stream.
     mpc_bool_t (*canseek)(mpc_reader *p_reader);
 
     /// Field that can be used to identify a particular instance of
     /// reader or carry along data associated with that reader.
     void *data;
+    */
 };
 /* rockbox: not used
 /// Initializes reader with default stdio file reader implementation.  Use

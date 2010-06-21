@@ -30,39 +30,28 @@ MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
 /* Our implementations of the mpc_reader callback functions. */
 static mpc_int32_t read_impl(mpc_reader *reader, void *ptr, mpc_int32_t size)
 {
-    struct codec_api *ci = (struct codec_api *)(reader->data);
+    (void)reader;
     return ((mpc_int32_t)(ci->read_filebuf(ptr, size)));
 }
 
 static mpc_bool_t seek_impl(mpc_reader *reader, mpc_int32_t offset)
 {  
-    struct codec_api *ci = (struct codec_api *)(reader->data);
-
     /* WARNING: assumes we don't need to skip too far into the past,
        this might not be supported by the buffering layer yet */
+    (void)reader;
     return ci->seek_buffer(offset);
 }
 
 static mpc_int32_t tell_impl(mpc_reader *reader)
 {
-    struct codec_api *ci = (struct codec_api *)(reader->data);
-
+    (void)reader;
     return ci->curpos;
 }
 
 static mpc_int32_t get_size_impl(mpc_reader *reader)
 {
-    struct codec_api *ci = (struct codec_api *)(reader->data);
-    
-    return ci->filesize;
-}
-
-static mpc_bool_t canseek_impl(mpc_reader *reader)
-{
     (void)reader;
-    
-    /* doesn't much matter, libmusepack ignores this anyway */
-    return true;
+    return ci->filesize;
 }
 
 /* this is the codec entry point */
@@ -90,8 +79,6 @@ enum codec_status codec_main(void)
     reader.seek     = seek_impl;
     reader.tell     = tell_impl;
     reader.get_size = get_size_impl;
-    reader.canseek  = canseek_impl;
-    reader.data     = ci;
 
 next_track:    
     if (codec_init()) 
