@@ -1599,9 +1599,3 @@ AVCodec wmapro_decoder = {
     .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 9 Professional"),
 };
 #endif
-
-int main(void)
-{
-    /* possible test program - just here now to ensure linking is done properly */
-    return 0;
-}
