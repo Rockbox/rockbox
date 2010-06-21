@@ -370,19 +370,21 @@ static void si4700_set_frequency(int freq)
     int space = SYSCONFIG2_SPACEr(cache[SYSCONFIG2]);
     int band = SYSCONFIG2_BANDr(cache[SYSCONFIG2]);
     int chan = (freq - bands[band]) / spacings[space];
+    int readchan;
 
     curr_frequency = freq;
-
-    si4700_write_reg(CHANNEL, CHANNEL_CHANw(chan) | CHANNEL_TUNE);
 
     do
     {
         /* tuning should be done within 60 ms according to the datasheet */
+        si4700_write_reg(CHANNEL, CHANNEL_CHANw(chan) | CHANNEL_TUNE);
         sleep(HZ * 60 / 1000);
-    }
-    while ((si4700_read_reg(STATUSRSSI) & STATUSRSSI_STC) == 0); /* STC high? */
 
-    si4700_write_clear(CHANNEL, CHANNEL_TUNE); /* Set TUNE low */
+        /* get tune result */
+        readchan = si4700_read_reg(READCHAN) & READCHAN_READCHAN;
+
+        si4700_write_clear(CHANNEL, CHANNEL_TUNE);
+    } while (!((cache[STATUSRSSI] & STATUSRSSI_STC) && (readchan == chan)));
 }
 
 static int si4700_tuned(void)
