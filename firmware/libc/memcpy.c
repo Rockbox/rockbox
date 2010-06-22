@@ -33,7 +33,7 @@ QUICKREF
         */
 
 #include "config.h"
-#include <_ansi.h>
+#include "_ansi.h" /* for _DEFUN */
 #include <string.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */

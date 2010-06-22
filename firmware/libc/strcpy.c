@@ -34,6 +34,7 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
+#include "_ansi.h" /* for _DEFUN */
 
 /*SUPPRESS 560*/
 /*SUPPRESS 530*/

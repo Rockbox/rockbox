@@ -35,6 +35,7 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
+#include "_ansi.h" /* for _DEFUN */
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
 #define UNALIGNED(X) ((long)X & (sizeof (long) - 1))

@@ -46,22 +46,41 @@ libc/strtok.c
 /* alsa on linux requires a more advanced sprintf, i.e. not ours */
 libc/sprintf.c
 #endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
 libc/atoi.c
+
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+/* our ctype.[ch] comes from newlib and is incompitble with most desktop's ctype */
 libc/ctype.c
-libc/memcmp.c
+#endif
+
 libc/memchr.c
+libc/memcmp.c
+
+#if !defined(CPU_SH) && !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
+#if !defined(CPU_MIPS)
+libc/memcpy.c
+libc/memset.c
+#endif /* CPU_MIPS */
+libc/memmove.c
+#endif /* CPU_* */
+
 libc/qsort.c
 libc/random.c
 libc/strcat.c
 libc/strchr.c
 libc/strcmp.c
 libc/strcpy.c
+
+#if !defined(CPU_SH) && !defined(CPU_COLDFIRE)
+libc/strlen.c
+#endif
+
 libc/strncmp.c
 libc/strrchr.c
 libc/strstr.c
 libc/mktime.c
-#endif /* !defined(SIMULATOR)*/
+#endif /* CONFIG_PLATFORM || HAVE_ROCKBOX_C_LIBRARY */
 
 /* Common */
 common/version.c
@@ -414,7 +433,6 @@ target/coldfire/i2c-coldfire.c
 target/arm/support-arm.S
 target/arm/memcpy-arm.S
 target/arm/memmove-arm.S
-libc/strlen.c
 #ifndef SIMULATOR
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
@@ -509,10 +527,7 @@ target/arm/crt0.S
 
 #elif defined(CPU_MIPS)
 #undef mips
-/*target/mips/strlen.S*/
-libc/memmove.c
 common/memset16.c
-libc/strlen.c
 target/mips/ffs-mips.S
 target/mips/memcpy-mips.S
 target/mips/memset-mips.S
@@ -526,11 +541,7 @@ target/mips/ingenic_jz47xx/crt0.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 common/ffs.c
 #endif
-libc/memcpy.c
-libc/memmove.c
-libc/memset.c
 common/memset16.c
-libc/strlen.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 crt0.S
 drivers/i2c.c

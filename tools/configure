@@ -383,8 +383,9 @@ whichadvanced () {
   else
     interact=1
     echo ""
-    echo "Enter your developer options (press enter when done)"
-    printf "(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile, (T)est plugins"
+    printf "Enter your developer options (press only enter when done)\n\
+(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile,\n\
+(T)est plugins, S(m)all C lib:"
     if [ "$memory" = "2" ]; then
       printf ", (8)MB MOD"
     fi
@@ -424,6 +425,10 @@ whichadvanced () {
       [Ll])
         echo "logf() support enabled"
         logf="yes"
+        ;;
+      [Mm])
+        echo "Using Rockbox' small C library"
+        extradefines="$extradefines -DHAVE_ROCKBOX_C_LIBRARY"
         ;;
       [Tt])
         echo "Including test plugins"

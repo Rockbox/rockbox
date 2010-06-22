@@ -34,6 +34,7 @@ QUICKREF
 */
 
 #include <string.h>
+#include "_ansi.h" /* for _DEFUN */
 
 char *
 _DEFUN (strrchr, (s, i),
