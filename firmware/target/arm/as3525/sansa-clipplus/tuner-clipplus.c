@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Multi-tuner detection module to select between the si4700 and a yet
- * unidentified Silicon Labs FM tuner chip found in some Sansa Clip+ players.
+ * Multi-tuner detection module to select between the Si4700 and the RDA5802
  *
  * Copyright (C) 2010 Bertrik Sikken
  *
@@ -25,14 +24,15 @@
 #include <stdint.h>
 #include "tuner.h"
 
+/* return the detected tuner type */
 int tuner_detect_type(void)
 {
     if (si4700_detect()) {
         return SI4700;
-    } else if (rda5802_detect()) {
-        return RDA5802;
-    } else {
-        return 0;
     }
+    if (rda5802_detect()) {
+        return RDA5802;
+    }
+    return 0;
 }
 
