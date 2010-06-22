@@ -12466,3 +12466,17 @@
     *: "Vynutit"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "Plugin PictureFlow"
+  </dest>
+  <voice>
+    *: "Plagin pikčrflou, neozvučeno"
+  </voice>
+</phrase>
