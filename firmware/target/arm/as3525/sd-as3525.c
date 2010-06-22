@@ -363,6 +363,26 @@ static int sd_init_card(const int drive)
         return -10;
     mci_delay();
 
+#ifndef BOOTLOADER
+    /*  Switch to to 4 bit widebus mode  */
+    if(sd_wait_for_tran_state(drive) < 0)
+        return -11;
+    /* CMD55 */             /*  Response is requested due to timing issue  */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG|MCI_RESP, &response))
+        return -14;
+    /* ACMD42  */
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ARG|MCI_RESP, &response))
+        return -15;
+    /* CMD55 */              /*  Response is requested due to timing issue  */
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG|MCI_RESP, &response))
+        return -12;
+    /* ACMD6  */
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ARG|MCI_RESP, &response))
+        return -13;
+    /* Now that card is widebus make controller aware */
+    MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
+#endif
+
     /*
      * enable bank switching
      * without issuing this command, we only have access to 1/4 of the blocks
