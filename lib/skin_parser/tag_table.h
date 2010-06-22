@@ -30,7 +30,6 @@ extern "C"
 
 enum skin_token_type {
     
-  TOKEN_MARKER_CONTROL_TOKENS = -1,
     SKIN_TOKEN_UNKNOWN,
 
     /* Markers */
@@ -68,7 +67,6 @@ enum skin_token_type {
     SKIN_TOKEN_VIEWPORT_BGCOLOUR,
     
     /* Battery */
-  TOKEN_MARKER_BATTERY,
     SKIN_TOKEN_BATTERY_PERCENT,
     SKIN_TOKEN_BATTERY_PERCENTBAR,
     SKIN_TOKEN_BATTERY_VOLTS,
@@ -79,14 +77,12 @@ enum skin_token_type {
     SKIN_TOKEN_USB_POWERED,
 
     /* Sound */
-  TOKEN_MARKER_SOUND,
     SKIN_TOKEN_SOUND_PITCH,
     SKIN_TOKEN_SOUND_SPEED,
     SKIN_TOKEN_REPLAYGAIN,
     SKIN_TOKEN_CROSSFADE,
 
     /* Time */
-  TOKEN_MARKER_RTC,
     SKIN_TOKEN_RTC_PRESENT,
 
     /* The begin/end values allow us to know if a token is an RTC one.
@@ -116,13 +112,11 @@ enum skin_token_type {
     SKIN_TOKENS_RTC_END,     /* just the end marker, not an actual token */
 
     /* Database */
-  TOKEN_MARKER_DATABASE,
     SKIN_TOKEN_DATABASE_PLAYCOUNT,
     SKIN_TOKEN_DATABASE_RATING,
     SKIN_TOKEN_DATABASE_AUTOSCORE,
 
     /* File */
-  TOKEN_MARKER_FILE,
     SKIN_TOKEN_FILE_BITRATE,
     SKIN_TOKEN_FILE_CODEC,
     SKIN_TOKEN_FILE_FREQUENCY,
@@ -135,7 +129,6 @@ enum skin_token_type {
     SKIN_TOKEN_FILE_DIRECTORY,
 
     /* Image */
-  TOKEN_MARKER_IMAGES,
     SKIN_TOKEN_IMAGE_BACKDROP,
     SKIN_TOKEN_IMAGE_PROGRESS_BAR,
     SKIN_TOKEN_IMAGE_PRELOAD,
@@ -148,7 +141,6 @@ enum skin_token_type {
     SKIN_TOKEN_ALBUMART_FOUND,
 
     /* Metadata */
-  TOKEN_MARKER_METADATA,
     SKIN_TOKEN_METADATA_ARTIST,
     SKIN_TOKEN_METADATA_COMPOSER,
     SKIN_TOKEN_METADATA_ALBUM_ARTIST,
@@ -162,7 +154,6 @@ enum skin_token_type {
     SKIN_TOKEN_METADATA_YEAR,
     SKIN_TOKEN_METADATA_COMMENT,
 
-  TOKEN_MARKER_PLAYBACK_INFO,
     /* Mode */
     SKIN_TOKEN_REPEAT_MODE,
     SKIN_TOKEN_PLAYBACK_STATUS,
@@ -181,14 +172,12 @@ enum skin_token_type {
     SKIN_TOKEN_TRACK_ENDING,
 
     /* Playlist */
-  TOKEN_MARKER_PLAYLIST,
     SKIN_TOKEN_PLAYLIST_ENTRIES,
     SKIN_TOKEN_PLAYLIST_NAME,
     SKIN_TOKEN_PLAYLIST_POSITION,
     SKIN_TOKEN_PLAYLIST_SHUFFLE,
 
 
-  TOKEN_MARKER_MISC,
     SKIN_TOKEN_ENABLE_THEME,
     SKIN_TOKEN_DISABLE_THEME,
     SKIN_TOKEN_DRAW_INBUILTBAR,
@@ -216,7 +205,6 @@ enum skin_token_type {
     SKIN_TOKEN_LANG_IS_RTL,
     
     /* Recording Tokens */
-  TOKEN_MARKER_RECORDING,
     SKIN_TOKEN_HAVE_RECORDING,
     SKIN_TOKEN_IS_RECORDING,
     SKIN_TOKEN_REC_FREQ,
@@ -229,7 +217,6 @@ enum skin_token_type {
     
     
     /* Radio Tokens */
-  TOKEN_MARKER_TUNER,
     SKIN_TOKEN_HAVE_TUNER,
     SKIN_TOKEN_TUNER_TUNED,
     SKIN_TOKEN_TUNER_SCANMODE,
@@ -246,8 +233,6 @@ enum skin_token_type {
     SKIN_TOKEN_RDS_NAME,
     SKIN_TOKEN_RDS_TEXT,
     
-    
-  TOKEN_MARKER_END, /* this needs to be the last value in this enum */
 };
 
 /*
