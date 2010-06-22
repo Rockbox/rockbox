@@ -44,7 +44,6 @@ PLUGIN_HEADER
 static int line = 0;
 static int max_line = 0;
 static int log_fd = -1;
-static char logfilename[MAX_PATH];
 
 static void log_close(void)
 {
@@ -55,6 +54,7 @@ static void log_close(void)
 static bool log_init(bool use_logfile)
 {
     int h;
+    char logfilename[MAX_PATH];
 
     rb->lcd_getstringsize("A", NULL, &h);
     max_line = LCD_HEIGHT / h;
@@ -99,7 +99,6 @@ struct wavinfo_t
 static void* audiobuf;
 static void* codec_mallocbuf;
 static size_t audiosize;
-static char str[MAX_PATH];
 
 /* Our local implementation of the codec API */
 static struct codec_api ci;
@@ -591,6 +590,7 @@ static enum plugin_status test_track(const char* filename)
     unsigned long speed;
     unsigned long duration;
     const char* ch;
+    char str[MAX_PATH];
 
     /* Display filename (excluding any path)*/
     ch = rb->strrchr(filename, '/');
