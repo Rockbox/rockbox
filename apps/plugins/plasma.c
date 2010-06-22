@@ -26,6 +26,7 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
+#include "lib/pluginlib_actions.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -57,143 +58,12 @@ static int plasma_frequency;
 static bool boosted = false;
 #endif
 
-/* Key assignement, all bitmapped models */
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
-#define PLASMA_QUIT               BUTTON_OFF
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define PLASMA_QUIT               BUTTON_OFF
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-#define PLASMA_RC_QUIT            BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define PLASMA_QUIT               BUTTON_MENU
-#define PLASMA_INCREASE_FREQUENCY BUTTON_SCROLL_FWD
-#define PLASMA_DECREASE_FREQUENCY BUTTON_SCROLL_BACK
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-      (CONFIG_KEYPAD == SANSA_M200_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define PLASMA_QUIT               (BUTTON_HOME|BUTTON_REPEAT)
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_SCROLL_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_SCROLL_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#define PLASMA_QUIT               BUTTON_BACK
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == MROBE100_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
-#define PLASMA_QUIT               BUTTON_RC_REC
-#define PLASMA_INCREASE_FREQUENCY BUTTON_RC_VOL_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_RC_VOL_DOWN
-#define PLASMA_RC_QUIT            BUTTON_REC
-
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_RIGHT
-#define PLASMA_DECREASE_FREQUENCY BUTTON_LEFT
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-#define PLASMA_RC_QUIT            BUTTON_STOP
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define PLASMA_QUIT               BUTTON_BACK
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_SELECT
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define PLASMA_QUIT               BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD) || (CONFIG_KEYPAD == ONDAVX777_PAD)
-#define PLASMA_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define PLASMA_QUIT               BUTTON_PLAY
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define PLASMA_QUIT               BUTTON_REC
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define PLASMA_QUIT               (BUTTON_REC|BUTTON_PLAY)
-#define PLASMA_INCREASE_FREQUENCY BUTTON_VOL_DOWN
-#define PLASMA_DECREASE_FREQUENCY BUTTON_VOL_UP
-#define PLASMA_REGEN_COLORS       BUTTON_PLAY
-
+static const struct button_mapping* plugin_contexts[]= {
+    pla_main_ctx,
+#if defined(HAVE_REMOTE_LCD)
+    pla_remote_ctx,
 #endif
-
-#ifdef HAVE_TOUCHSCREEN
-#ifndef PLASMA_QUIT
-#define PLASMA_QUIT               BUTTON_TOPLEFT
-#endif
-#ifndef PLASMA_INCREASE_FREQUENCY
-#define PLASMA_INCREASE_FREQUENCY BUTTON_MIDRIGHT
-#endif
-#ifndef PLASMA_DECREASE_FREQUENCY
-#define PLASMA_DECREASE_FREQUENCY BUTTON_MIDLEFT
-#endif
-#ifdef HAVE_LCD_COLOR
-#ifndef PLASMA_REGEN_COLORS
-#define PLASMA_REGEN_COLORS       BUTTON_CENTER
-#endif
-#endif /* HAVE_LCD_COLOR */
-#endif /* HAVE_TOUCHSCREEN */
+};
 
 #define WAV_AMP 90
 
@@ -284,7 +154,7 @@ void cleanup(void *parameter)
 int main(void)
 {
     plasma_frequency = 1;
-    int button, delay, x, y;
+    int action, delay, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z,z0;
     long last_tick = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -383,25 +253,34 @@ int main(void)
                 rb->cpu_boost(boosted = false);
         }
 #endif
-        button = rb->button_get_w_tmo(MAX(0, delay));
+        action = pluginlib_getaction(0, plugin_contexts,
+                        ARRAYLEN(plugin_contexts));
         last_tick = *rb->current_tick;
 
-        switch(button)
+        switch(action)
         {
-#ifdef PLASMA_RC_QUIT
-            case PLASMA_RC_QUIT:
-#endif
-            case(PLASMA_QUIT):
+            case PLA_EXIT:
+            case PLA_CANCEL:
                 cleanup(NULL);
                 return PLUGIN_OK;
                 break;
 
-            case (PLASMA_INCREASE_FREQUENCY):
+#ifdef HAVE_SCROLLWHEEL
+            case PLA_SCROLL_FWD:
+            case PLA_SCROLL_FWD_REPEAT:
+#endif
+            case PLA_UP:
+            case PLA_UP_REPEAT:
                 ++plasma_frequency;
                 wave_table_generate();
                 break;
 
-            case (PLASMA_DECREASE_FREQUENCY):
+#ifdef HAVE_SCROLLWHEEL
+            case PLA_SCROLL_BACK:
+            case PLA_SCROLL_BACK_REPEAT:
+#endif
+            case PLA_DOWN:
+            case PLA_DOWN_REPEAT:
                 if(plasma_frequency>1)
                 {
                     --plasma_frequency;
@@ -409,7 +288,7 @@ int main(void)
                 }
                 break;
 #ifdef HAVE_LCD_COLOR
-            case (PLASMA_REGEN_COLORS):
+            case PLA_SELECT:
                 redfactor=rb->rand()%4;
                 greenfactor=rb->rand()%4;
                 bluefactor=rb->rand()%4;
@@ -420,7 +299,7 @@ int main(void)
 #endif
 
             default:
-                if (rb->default_event_handler_ex(button, cleanup, NULL)
+                if (rb->default_event_handler_ex(action, cleanup, NULL)
                     == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
