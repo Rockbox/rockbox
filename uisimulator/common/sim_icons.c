@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include <stdio.h>
 #include "config.h"
-#ifdef HAVE_LCD_CHARCELLS
 
 #include <lcd.h>
 #include <kernel.h>
@@ -310,7 +309,4 @@ lcd_icon(int icon, bool enable)
   lcd_print_icon(icons[icon].xpos, icons[icon].row, enable,
          icons[icon].bitmap);
 }
-
-#endif /* HAVE_LCD_CHARCELLS */
-
 
