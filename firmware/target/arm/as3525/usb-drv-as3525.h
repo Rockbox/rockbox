@@ -237,6 +237,7 @@ typedef struct {
 #define USB_DEV_INTR_SOF                0x00000020  /* SOF seen on bus */
 #define USB_DEV_INTR_ENUM_DONE          0x00000040  /* usb speed enum done */
 #define USB_DEV_INTR_SVC                0x00000080  /* USB_DEV_STS changed */
+#define USB_DEV_INTR_MYSTERY            0x00000200  /* Unknown, maybe Host Error */
 
 /* EP Control Register Fields */
 #define USB_EP_CTRL_STALL               0x00000001

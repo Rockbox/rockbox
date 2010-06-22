@@ -77,6 +77,8 @@ void usb_attach(void)
     usb_enable(true);
 }
 
+static void usb_tick(void);
+
 static void usb_phy_on(void)
 {
     /* PHY clock */
@@ -174,10 +176,20 @@ static void reset_endpoints(int init)
         int mps = i == 0 ? 64 : (usb_drv_port_speed() ? 512 : 64);
 
         if (init) {
+            if (endpoints[i][0].state & EP_STATE_BUSY) {
+                if (endpoints[i][0].state & EP_STATE_ASYNC) {
+                    endpoints[i][0].rc = -1;
+                    wakeup_signal(&endpoints[i][0].complete);
+                } else {
+                    usb_core_transfer_complete(i, USB_DIR_IN, -1, 0);
+                }
+            }
             endpoints[i][0].state = 0;
             wakeup_init(&endpoints[i][0].complete);
 
             if (i != 2) { /* Skip the OUT EP0 alias */
+                if (endpoints[i][1].state & EP_STATE_BUSY)
+                    usb_core_transfer_complete(i, USB_DIR_OUT, -1, 0);
                 endpoints[i][1].state = 0;
                 wakeup_init(&endpoints[i][1].complete);
                 USB_OEP_SUP_PTR(i)    = 0;
@@ -189,15 +201,15 @@ static void reset_endpoints(int init)
         USB_IEP_MPS     (i) = mps; /* in bytes */
         /* We don't care about the 'IN token received' event */
         USB_IEP_STS_MASK(i) = USB_EP_STAT_IN; /* OF: 0x840 */
-        USB_IEP_TXFSIZE (i) = mps/2; /* in dwords => mps*2 bytes */
+        USB_IEP_TXFSIZE (i) = mps/4; /* in dwords => mps*2 bytes */
         USB_IEP_STS     (i) = 0xffffffff; /* clear status */
         USB_IEP_DESC_PTR(i) = 0;
 
         if (i != 2) { /* Skip the OUT EP0 alias */
             dma_desc_init(i, 1);
             USB_OEP_CTRL    (i) = USB_EP_CTRL_FLUSH|USB_EP_CTRL_SNAK;
-            USB_OEP_MPS     (i) = (mps/2 << 23) | mps;
-            USB_OEP_STS_MASK(i) = 0x0000; /* OF: 0x1800 */
+            USB_OEP_MPS     (i) = (mps/4 << 16) | mps;
+            USB_OEP_STS_MASK(i) = USB_EP_STAT_BNA; /* OF: 0x1800 */
             USB_OEP_RXFR    (i) = 0;      /* Always 0 in OF trace? */
             USB_OEP_STS     (i) = 0xffffffff; /* clear status */
             USB_OEP_DESC_PTR(i) = 0;
@@ -281,10 +293,12 @@ void usb_drv_init(void)
                  | USB_GPIO_HS_INTR
                  | USB_GPIO_CLK_SEL10; /* 0x06180000; */
 
+    tick_add_task(usb_tick);
 }
 
 void usb_drv_exit(void)
 {
+    tick_remove_task(usb_tick);
     USB_DEV_CTRL |= (1<<10); /* soft disconnect */
     /*
      * mask all interrupts _before_ writing to VIC_INT_EN_CLEAR,
@@ -383,16 +397,20 @@ int usb_drv_recv(int ep, void *ptr, int len)
     ep &= 0x7f;
     logf("usb_drv_recv(%d,%x,%d)\n", ep, (int)ptr, len);
 
+    if (len > USB_DMA_DESC_RXTX_BYTES)
+        panicf("usb_recv: len=%d > %d", len, USB_DMA_DESC_RXTX_BYTES);
+
     if ((int)ptr & 31) {
         logf("addr %08x not aligned!\n", (int)ptr);
     }
 
     endpoints[ep][1].state |= EP_STATE_BUSY;
     endpoints[ep][1].len = len;
-    endpoints[ep][1].rc = -1;
+    endpoints[ep][1].rc  = -1;
+    endpoints[ep][1].buf = ptr;
 
     /* remove data buffer from cache */
-    dump_dcache_range(ptr, len);
+    invalidate_dcache();
 
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
@@ -406,7 +424,27 @@ int usb_drv_recv(int ep, void *ptr, int len)
     }
     USB_OEP_DESC_PTR(ep) = (int)&dmadescs[ep][1];
     USB_OEP_STS(ep)      = USB_EP_STAT_OUT_RCVD; /* clear status */
-    USB_OEP_CTRL(ep)    |= USB_EP_CTRL_CNAK;
+
+    /* Make sure receive DMA is on */
+    if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE)){
+        logf("enabling receive DMA\n");
+        USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
+        if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE))
+            logf("failed to enable!\n");
+    }
+
+    USB_OEP_CTRL(ep)    |= USB_EP_CTRL_CNAK; /* Go! */
+
+    if (USB_OEP_CTRL(ep) & USB_EP_CTRL_NAK) {
+        int i = 0;
+        logf("CNAK fail? CTRL=%x\n", (int)USB_OEP_CTRL(ep));
+        while (USB_OEP_CTRL(ep) & USB_EP_CTRL_NAK) {
+            USB_OEP_CTRL(ep)    |= USB_EP_CTRL_CNAK; /* Go! */
+            i++;
+        }
+        if (i>2)
+            panicf("CNAK needed %d retries\n", i);
+    }
 
     return 0;
 }
@@ -443,7 +481,7 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].rc = -1;
 
     /* Make sure data is committed to memory */
-    clean_dcache_range(ptr, len);
+    clean_dcache();
 
     logf("xx%s\n", make_hex(ptr, len));
 
@@ -493,8 +531,9 @@ static void handle_in_ep(int ep)
     USB_IEP_STS(ep) = ep_sts; /* ack */
 
     if (ep_sts & USB_EP_STAT_BNA) { /* Buffer was not set up */
-        logf("ep%d IN, status %x (BNA)\n", ep, ep_sts);
-        panicf("ep%d IN 0x%x (BNA)", ep, ep_sts);
+        int ctrl = USB_IEP_CTRL(ep);
+        logf("ep%d IN, status %x ctrl %x (BNA)\n", ep, ep_sts, ctrl);
+        panicf("ep%d IN 0x%x 0x%x (BNA)", ep, ep_sts, ctrl);
     }
 
     if (ep_sts & USB_EP_STAT_TDC) {
@@ -517,17 +556,12 @@ static void handle_in_ep(int ep)
         logf("ep%d IN, hwstat %lx, epstat %x\n", ep, USB_IEP_STS(ep), endpoints[ep][0].state);
         panicf("ep%d IN 0x%x", ep, ep_sts);
     }
-
-    /* HW automatically disables RDE, re-enable it */
-    /* But this an IN ep, I wonder... */
-    USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
 }
 
 static void handle_out_ep(int ep)
 {
     struct usb_ctrlrequest *req = (void*)AS3525_UNCACHED_ADDR(&setup_desc->data1);
     int ep_sts = USB_OEP_STS(ep) & ~USB_OEP_STS_MASK(ep);
-    struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
 
     if (ep > 3)
         panicf("out_ep > 3!?");
@@ -535,11 +569,14 @@ static void handle_out_ep(int ep)
     USB_OEP_STS(ep) = ep_sts; /* ACK */
 
     if (ep_sts & USB_EP_STAT_BNA) { /* Buffer was not set up */
-        logf("ep%d OUT, status %x (BNA)\n", ep, ep_sts);
-        panicf("ep%d OUT 0x%x (BNA)", ep, ep_sts);
+        int ctrl = USB_OEP_CTRL(ep);
+        logf("ep%d OUT, status %x ctrl %x (BNA)\n", ep, ep_sts, ctrl);
+        panicf("ep%d OUT 0x%x 0x%x (BNA)", ep, ep_sts, ctrl);
+        ep_sts &= ~USB_EP_STAT_BNA;
     }
 
     if (ep_sts & USB_EP_STAT_OUT_RCVD) {
+        struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
         int dma_sts = uc_desc->status;
         int dma_len = dma_sts & 0xffff;
 
@@ -553,7 +590,7 @@ static void handle_out_ep(int ep)
              dump_dcache_range(uc_desc->data_ptr, dma_len);
         } else{
              logf("EP%d OUT token, st:%08x frm:%x (no data)\n", ep,
-                 dma_mst, dma_frm);
+                 dma_sts & 0xf8000000, (dma_sts >> 16) & 0x7ff);
         }
 
         if (endpoints[ep][1].state & EP_STATE_BUSY) {
@@ -565,7 +602,6 @@ static void handle_out_ep(int ep)
         }
 
         USB_OEP_CTRL(ep) |= USB_EP_CTRL_SNAK; /* make sure NAK is set */
-
         ep_sts &= ~USB_EP_STAT_OUT_RCVD;
     }
 
@@ -592,9 +628,58 @@ static void handle_out_ep(int ep)
         panicf("ep%d OUT 0x%x", ep, ep_sts);
     }
 
+#if 0
     /* HW automatically disables RDE, re-enable it */
     /* THEORY: Because we only set up one DMA buffer... */
     USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
+#endif
+
+    if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE)){
+        logf("receive DMA is disabled!\n");
+        //USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
+    }
+}
+
+/*
+ * This is a simplified version of the timer based RDE enable from
+ * the Linux amd5536udc.c driver.
+ * We need this because of the following hw issue:
+ * The usb_storage buffer is 63KB, but Linux sends 120KB.
+ * We get the first part, but upon re-enabling receive dma we
+ * get a 'buffer not available' error from the hardware, since
+ * we haven't gotten the next usb_drv_recv() from the stack yet.
+ * It seems the NAK bit is ignored here and the HW tries to dma
+ * the incoming data anyway.
+ * In theory I think the BNA error should be recoverable, but
+ * I haven't figured out how to do that yet and this approach seems
+ * to work for now.
+ */
+static void usb_tick(void)
+{
+    static int rde_timer = 0;
+    static int rde_fails = 0;
+
+    if (USB_DEV_CTRL & USB_DEV_CTRL_RDE)
+        return;
+
+    if (!(USB_DEV_STS & USB_DEV_STS_RXF_EMPTY)) {
+        if (rde_timer == 0)
+            logf("usb_tick: fifo got filled\n");
+        rde_timer++;
+    }
+
+    if (rde_timer > 2) {
+        logf("usb_tick: re-enabling RDE\n");
+        USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
+        rde_timer = 0;
+        if (USB_DEV_CTRL & USB_DEV_CTRL_RDE) {
+            rde_fails = 0;
+        } else {
+            rde_fails++;
+            if (rde_fails > 3)
+                panicf("usb_tick: failed to set RDE");
+        }
+    }
 }
 
 /* interrupt service routine */
@@ -696,12 +781,6 @@ void INT_USB(void)
         if (intr)
             panicf("usb devirq 0x%x", intr);
     }
-
-    if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE)){
-        logf("re-enabling receive DMA\n");
-        USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
-    }
-
 }
 
 /* (not essential? , not implemented in usb-tcc.c) */
