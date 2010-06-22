@@ -208,7 +208,7 @@ void close_wav(void)
 /* Returns buffer to malloc array. Only codeclib should need this. */
 static void* codec_get_buffer(size_t *size)
 {
-   DEBUGF("codec_get_buffer(%d)\n",(int)size);
+   DEBUGF("codec_get_buffer(%"PRIuPTR")\n",(uintptr_t)size);
    *size = CODEC_SIZE;
    return codec_mallocbuf;
 }
