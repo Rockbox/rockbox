@@ -818,13 +818,15 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
 #ifdef HAVE_LCD_BITMAP
     if(!global_settings.statusbar)
        return;
-#endif /* HAVE_LCD_BITMAP */
     int i;
     struct viewport viewport;
     FOR_NB_SCREENS(i) {
         GET_RECT(viewport,statusbar_position(i),&screens[i]);
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, &viewport );
     }
+#else
+    gui_statusbar_draw( &(bars->statusbars[0]), force_redraw, NULL );
+#endif /* HAVE_LCD_BITMAP */
 }
 
 
