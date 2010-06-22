@@ -319,9 +319,8 @@ static int sd_init_card(const int drive)
     if(sd_v2)
     {
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
             return -5;
-        mci_delay();
 
         if(sd_wait_for_tran_state(drive))
             return -6;
@@ -359,9 +358,8 @@ static int sd_init_card(const int drive)
 #endif
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
         return -10;
-    mci_delay();
 
 #ifndef BOOTLOADER
     /*  Switch to to 4 bit widebus mode  */
@@ -395,7 +393,7 @@ static int sd_init_card(const int drive)
         if(ret < 0)
             return ret -16;
 
-        /*  CMD7 w/rca = 0: Select card to put it in STBY state */
+        /*  CMD7 w/rca = 0: Unselect card to put it in STBY state */
         if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_ARG, NULL))
             return -17;
         mci_delay();
@@ -410,9 +408,8 @@ static int sd_init_card(const int drive)
         card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
 
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
             return -19;
-        mci_delay();
     }
 
     card_info[drive].initialized = 1;
@@ -729,6 +726,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         unsigned long bank_start = start;
+        unsigned long status;
 
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
@@ -816,7 +814,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         last_disk_activity = current_tick;
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &status))
         {
             ret = -4*20;
             goto sd_transfer_error;
