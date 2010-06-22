@@ -107,18 +107,18 @@ bool tuner_power(bool status)
                in host read mode: */
 
             /* 1. Set direction of the DATA-line to input-mode. */
-            GPIOH_OUTPUT_EN &= ~(1 << 5); 
-            GPIOH_ENABLE |= (1 << 5); 
+            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, 1 << 5); 
+            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 5); 
 
             /* 2. Drive NR_W low */
-            GPIOH_OUTPUT_VAL &= ~(1 << 3); 
-            GPIOH_OUTPUT_EN |= (1 << 3); 
-            GPIOH_ENABLE |= (1 << 3); 
+            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_VAL, 1 << 3); 
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 3); 
+            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 3); 
 
             /* 3. Drive CLOCK high */
-            GPIOH_OUTPUT_VAL |= (1 << 4); 
-            GPIOH_OUTPUT_EN |= (1 << 4); 
-            GPIOH_ENABLE |= (1 << 4);
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_VAL, 1 << 4); 
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 4); 
+            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 4);
 
             lv24020lp_power(true);
         }
@@ -127,8 +127,8 @@ bool tuner_power(bool status)
             lv24020lp_power(false);
 
             /* set all as inputs */
-            GPIOH_OUTPUT_EN &= ~((1 << 5) | (1 << 3) | (1 << 4));
-            GPIOH_ENABLE &= ~((1 << 3) | (1 << 4)); 
+            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, (1 << 5) | (1 << 3) | (1 << 4));
+            GPIO_CLEAR_BITWISE(GPIOH_ENABLE, (1 << 3) | (1 << 4)); 
 
             /* turn off mystery amplification device */
 #if defined (SANSA_E200)
