@@ -159,9 +159,8 @@ static inline void int2le16(unsigned char* buf, int16_t x)
   buf[1] = (x & 0xff00) >> 8;
 }
 
-/* 32KB should be enough */
-static unsigned char wavbuffer[32*1024];
-static unsigned char dspbuffer[32*1024];
+static unsigned char *wavbuffer;
+static unsigned char *dspbuffer;
 
 void init_wav(char* filename)
 {
@@ -733,12 +732,16 @@ enum plugin_status plugin_start(const void* parameter)
     char* ch;
     char dirpath[MAX_PATH];
     char filename[MAX_PATH];
+    size_t buffer_size;
 
     if (parameter == NULL)
     {
         rb->splash(HZ*2, "No File");
         return PLUGIN_ERROR;
     }
+
+    wavbuffer = rb->plugin_get_buffer(&buffer_size);
+    dspbuffer = wavbuffer + buffer_size / 2;
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
     audiobuf = SKIPBYTES(codec_mallocbuf, CODEC_SIZE);
