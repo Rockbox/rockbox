@@ -201,14 +201,14 @@ static void reset_endpoints(int init)
         USB_IEP_MPS     (i) = mps; /* in bytes */
         /* We don't care about the 'IN token received' event */
         USB_IEP_STS_MASK(i) = USB_EP_STAT_IN; /* OF: 0x840 */
-        USB_IEP_TXFSIZE (i) = mps/4; /* in dwords => mps*2 bytes */
+        USB_IEP_TXFSIZE (i) = mps/2; /* in dwords => mps*2 bytes */
         USB_IEP_STS     (i) = 0xffffffff; /* clear status */
         USB_IEP_DESC_PTR(i) = 0;
 
         if (i != 2) { /* Skip the OUT EP0 alias */
             dma_desc_init(i, 1);
             USB_OEP_CTRL    (i) = USB_EP_CTRL_FLUSH|USB_EP_CTRL_SNAK;
-            USB_OEP_MPS     (i) = (mps/4 << 16) | mps;
+            USB_OEP_MPS     (i) = (mps/2 << 16) | mps;
             USB_OEP_STS_MASK(i) = USB_EP_STAT_BNA; /* OF: 0x1800 */
             USB_OEP_RXFR    (i) = 0;      /* Always 0 in OF trace? */
             USB_OEP_STS     (i) = 0xffffffff; /* clear status */
@@ -300,6 +300,7 @@ void usb_drv_exit(void)
 {
     tick_remove_task(usb_tick);
     USB_DEV_CTRL |= (1<<10); /* soft disconnect */
+    usb_phy_suspend();
     /*
      * mask all interrupts _before_ writing to VIC_INT_EN_CLEAR,
      * or else the core might latch the interrupt while
@@ -410,7 +411,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].buf = ptr;
 
     /* remove data buffer from cache */
-    invalidate_dcache();
+    invalidate_dcache_range(ptr, len);
 
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
@@ -481,7 +482,7 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].rc = -1;
 
     /* Make sure data is committed to memory */
-    clean_dcache();
+    clean_dcache_range(ptr, len);
 
     logf("xx%s\n", make_hex(ptr, len));
 
@@ -609,8 +610,9 @@ static void handle_out_ep(int ep)
         static struct usb_ctrlrequest req_copy;
 
         req_copy = *req;
-        logf("t%ld:got SETUP packet: type=%d req=%d val=%d ind=%d len=%d\n",
+        logf("t%ld:got SETUP packet: %s type=%d req=%d val=%d ind=%d len=%d\n",
              current_tick,
+             make_hex((void*)req, 8),
              req->bRequestType,
              req->bRequest,
              req->wValue,
@@ -669,6 +671,9 @@ static void usb_tick(void)
     }
 
     if (rde_timer > 2) {
+        logf("usb_tick: flushing EP0 IN\n");
+        /* FIXME: flushing EP0 here papers over a bug somewhere */
+        USB_IEP_CTRL(0) |= USB_EP_CTRL_FLUSH;
         logf("usb_tick: re-enabling RDE\n");
         USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
         rde_timer = 0;
@@ -778,8 +783,15 @@ void INT_USB(void)
             USB_OEP_CTRL(0) |= USB_EP_CTRL_ACT;
             intr &= ~USB_DEV_INTR_ENUM_DONE;
         }
-        if (intr)
+        if (intr & USB_DEV_INTR_MYSTERY) {
+            logf("got mystery dev intr\n");
+            USB_DEV_INTR_MASK |= USB_DEV_INTR_MYSTERY;
+            intr &= ~USB_DEV_INTR_MYSTERY;
+        }
+        if (intr) {
+            logf("usb devirq 0x%x", intr);
             panicf("usb devirq 0x%x", intr);
+        }
     }
 }
 
