@@ -41,11 +41,11 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         if(info.model()->rowCount(QModelIndex()) > 1)
         {
             /* If there is more than one viewport in the document */
-            displayed = false;
+            setVisible(false);
         }
         else
         {
-            displayed = true;
+            setVisible(true);
         }
     }
     else
@@ -58,7 +58,6 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         {
         case '\0':
             customUI = false;
-            displayed = true;
             param = 0;
             break;
 
@@ -66,7 +65,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             /* A preloaded viewport definition */
             ident = node->params[0].data.text;
             customUI = false;
-            displayed = false;
+            hide();
             info.screen()->loadViewport(ident, this);
             param = 1;
             break;
@@ -77,11 +76,11 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             param = 1;
             if(node->params[0].type == skin_tag_parameter::DEFAULT)
             {
-                displayed = true;
+                setVisible(true);
             }
             else
             {
-                displayed = false;
+                hide();
                 info.screen()->loadViewport(ident, this);
             }
             break;
@@ -124,7 +123,11 @@ void RBViewport::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QColor color = customUI ? Qt::blue : Qt::red;
-    if(displayed)
-        painter->fillRect(size, color);
+    painter->fillRect(size, color);
 }
 
+/* Called at the end of a logical line */
+void RBViewport::newline()
+{
+
+}

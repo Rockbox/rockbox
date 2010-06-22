@@ -475,6 +475,7 @@ ParseTreeNode* ParseTreeNode::getParent() const
     return parent;
 }
 
+/* This version is called for the root node and for viewports */
 void ParseTreeNode::render(const RBRenderInfo& info)
 {
     /* Parameters don't get rendered */
@@ -500,5 +501,41 @@ void ParseTreeNode::render(const RBRenderInfo& info)
     }
 
     rendered = new RBViewport(element, info);
+
+    for(int i = element->params_count; i < children.count(); i++)
+        children[i]->render(info, dynamic_cast<RBViewport*>(rendered));
 }
 
+/* This version is called for logical lines and such */
+void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
+{
+    if(element->type == LINE)
+    {
+        for(int i = 0; i < children.count(); i++)
+            children[i]->render(info, viewport);
+        viewport->newline();
+    }
+    else if(element->type == TAG)
+    {
+        QString filename;
+
+        /* Two switch statements to narrow down the tag name */
+        switch(element->tag->name[0])
+        {
+
+        case 'X':
+
+            switch(element->tag->name[1])
+            {
+            case '\0':
+                /* %X tag */
+                filename = QString(element->params[0].data.text);
+                info.screen()->setBackdrop(filename);
+                break;
+            }
+
+            break;
+
+        }
+    }
+}

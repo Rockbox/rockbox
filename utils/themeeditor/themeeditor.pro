@@ -37,7 +37,8 @@ HEADERS += models/parsetreemodel.h \
     gui/skinviewer.h \
     graphics/rbscreen.h \
     graphics/rbviewport.h \
-    graphics/rbrenderinfo.h
+    graphics/rbrenderinfo.h \
+    graphics/rbimage.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -51,7 +52,8 @@ SOURCES += main.cpp \
     gui/skinviewer.cpp \
     graphics/rbscreen.cpp \
     graphics/rbviewport.cpp \
-    graphics/rbrenderinfo.cpp
+    graphics/rbrenderinfo.cpp \
+    graphics/rbimage.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

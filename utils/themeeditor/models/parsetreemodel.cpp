@@ -32,6 +32,8 @@
 #include <QMap>
 #include <QDir>
 
+#include <iostream>
+
 ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
         QAbstractItemModel(parent)
 {
@@ -291,6 +293,16 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         QDir base(*file);
         base.cdUp();
         settings.insert("themebase", base.canonicalPath());
+    }
+
+    if(file)
+    {
+        QString skinFile = *file;
+        QStringList decomp = skinFile.split("/");
+        skinFile = decomp[decomp.count() - 1];
+        skinFile.chop(skinFile.length() - skinFile.lastIndexOf("."));
+        settings.insert("imagepath", settings.value("themebase","") + "/wps/" +
+                        skinFile);
     }
 
     RBScreen* screen = 0;

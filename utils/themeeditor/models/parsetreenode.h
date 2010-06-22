@@ -60,6 +60,7 @@ public:
     }
 
     void render(const RBRenderInfo& info);
+    void render(const RBRenderInfo &info, RBViewport* viewport);
 
 private:
     ParseTreeNode* parent;

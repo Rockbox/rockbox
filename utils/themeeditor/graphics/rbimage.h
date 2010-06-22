@@ -19,36 +19,21 @@
  *
  ****************************************************************************/
 
-#ifndef RBVIEWPORT_H
-#define RBVIEWPORT_H
+#ifndef RBIMAGE_H
+#define RBIMAGE_H
 
-#include "skin_parser.h"
+#include <QPixmap>
 
-class RBScreen;
-class RBRenderInfo;
-
-#include <QGraphicsItem>
-
-class RBViewport : public QGraphicsItem
+class RBImage
 {
 public:
-    RBViewport(skin_element* node, const RBRenderInfo& info);
-    virtual ~RBViewport();
-
-    QPainterPath shape() const;
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget);
-
-    void newline();
+    RBImage(QString file, int tiles = 0);
+    void draw(QPainter* painter, int x, int y, int tile = 0);
 
 private:
-    QRectF size;
-    QColor background;
-    QColor foreground;
-
-    bool customUI;
+    QPixmap image;
+    int tiles;
 
 };
 
-#endif // RBVIEWPORT_H
+#endif // RBIMAGE_H

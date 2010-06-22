@@ -38,13 +38,16 @@ RBScreen::RBScreen(const RBRenderInfo& info, QGraphicsItem *parent) :
     QString fg = info.settings()->value("foreground color", "FFFFFF");
     fgColor = stringToColor(fg, Qt::black);
 
-    /* Loading backdrop if available */
-    QString base = info.settings()->value("themebase", "");
-    QString backdropFile = info.settings()->value("backdrop", "");
+    settings = info.settings();
 
-    if(QFile::exists(base + "/backdrops/" + backdropFile))
+    /* Loading backdrop if available */
+    themeBase = info.settings()->value("themebase", "");
+    QString backdropFile = info.settings()->value("backdrop", "");
+    backdropFile.replace("/.rockbox/backdrops/", "");
+
+    if(QFile::exists(themeBase + "/backdrops/" + backdropFile))
     {
-        backdrop = new QPixmap(base + "/backdrops/" + backdropFile);
+        backdrop = new QPixmap(themeBase + "/backdrops/" + backdropFile);
 
         /* If a backdrop has been found, use its width and height */
         if(!backdrop->isNull())
@@ -100,6 +103,19 @@ void RBScreen::showViewport(QString name)
     update();
 }
 
+void RBScreen::setBackdrop(QString filename)
+{
+
+    if(backdrop)
+        delete backdrop;
+
+    filename = settings->value("imagepath", "") + "/" + filename;
+
+    if(QFile::exists(filename))
+        backdrop = new QPixmap(filename);
+    else
+        backdrop = 0;
+}
 
 QColor RBScreen::stringToColor(QString str, QColor fallback)
 {

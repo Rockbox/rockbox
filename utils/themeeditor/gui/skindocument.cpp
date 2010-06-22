@@ -257,7 +257,7 @@ void SkinDocument::codeChanged()
     else
         emit titleChanged(titleText);
 
-    model->render(project);
+    model->render(project, &fileName);
 
     cursorChanged();
 

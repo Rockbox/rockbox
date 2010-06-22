@@ -26,6 +26,7 @@
 
 #include "projectmodel.h"
 #include "rbrenderinfo.h"
+#include "rbimage.h"
 
 class RBViewport;
 
@@ -50,6 +51,14 @@ public:
     }
     void showViewport(QString name);
 
+    void loadImage(QString name, RBImage* image)
+    {
+        images.insert(name, image);
+    }
+    RBImage* getImage(QString name){ return images.value(name, 0); }
+
+    void setBackdrop(QString filename);
+
     static QColor stringToColor(QString str, QColor fallback);
 
 
@@ -59,10 +68,13 @@ private:
     QColor bgColor;
     QColor fgColor;
     QPixmap* backdrop;
+    QString themeBase;
 
     ProjectModel* project;
 
     QMap<QString, RBViewport*> namedViewports;
+    QMap<QString, RBImage*> images;
+    QMap<QString, QString>* settings;
 
 };
 
