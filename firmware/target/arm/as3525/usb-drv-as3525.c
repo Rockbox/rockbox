@@ -39,6 +39,7 @@
 #include "usb-drv-as3525.h"
 
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
+static int got_set_configuration = 0;
 
 /*
  * dma/setup descriptors and buffers should avoid sharing
@@ -268,11 +269,9 @@ void usb_drv_init(void)
                   USB_DEV_CFG_CSR_PRG       |
                   USB_DEV_CFG_PHY_ERR_DETECT;
 
-    USB_DEV_CTRL = USB_DEV_CTRL_BLEN_1DWORD  |
-                   USB_DEV_CTRL_DESC_UPDATE  |
+    USB_DEV_CTRL = USB_DEV_CTRL_DESC_UPDATE  |
                    USB_DEV_CTRL_THRES_ENABLE |
-                   USB_DEV_CTRL_RDE          |
-                   0x04000000;
+                   USB_DEV_CTRL_BURST_ENABLE;
 
     USB_DEV_EP_INTR_MASK &= ~((1<<0) | (1<<16));    /* ep 0 */
 
@@ -444,7 +443,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
             i++;
         }
         if (i>2)
-            panicf("CNAK needed %d retries\n", i);
+            panicf("ep%d CNAK needed %d retries CTRL=%x\n", ep, i, (int)USB_OEP_CTRL(ep));
     }
 
     return 0;
@@ -506,6 +505,16 @@ int usb_drv_send(int ep, void *ptr, int len)
     logf("usb_drv_send(%d,%x,%d): ", ep, (int)ptr, len);
 
     ep &= 0x7f;
+
+    if (ep == 0 && got_set_configuration) {
+        got_set_configuration = 0;
+        if (len != 0)
+            panicf("usb_drv_send: GSC, but len!=0");
+        /* Tell the HW we handled the request */
+        USB_DEV_CTRL |= USB_DEV_CTRL_APCSR_DONE;
+        return 0;
+    }
+
     ep_send(ep, ptr, len);
     while (endpoints[ep][0].state & EP_STATE_BUSY)
         wakeup_wait(&endpoints[ep][0].complete, TIMEOUT_BLOCK);
@@ -671,9 +680,6 @@ static void usb_tick(void)
     }
 
     if (rde_timer > 2) {
-        logf("usb_tick: flushing EP0 IN\n");
-        /* FIXME: flushing EP0 here papers over a bug somewhere */
-        USB_IEP_CTRL(0) |= USB_EP_CTRL_FLUSH;
         logf("usb_tick: re-enabling RDE\n");
         USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
         rde_timer = 0;
@@ -728,12 +734,10 @@ void INT_USB(void)
             };
 
             logf("set config\n");
+            got_set_configuration = 1;
 
             set_config.wValue = USB_DEV_STS & USB_DEV_STS_MASK_CFG;
             usb_core_control_request(&set_config);
-
-            /* Tell the HW we handled the request */
-            USB_DEV_CTRL |= USB_DEV_CTRL_APCSR_DONE;
             intr &= ~USB_DEV_INTR_SET_CONFIG;
         }
         if (intr & USB_DEV_INTR_EARLY_SUSPEND) {/* idle >3ms detected */
