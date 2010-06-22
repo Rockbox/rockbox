@@ -669,7 +669,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 #endif
     int ret = 0;
     unsigned loops = 0;
-    bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
@@ -700,14 +699,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     last_disk_activity = current_tick;
 
     dma_retain();
-
-    if(aligned)
-    {
-        if(write)
-            clean_dcache_range(buf, count * SECTOR_SIZE);
-        else
-            dump_dcache_range(buf, count * SECTOR_SIZE);
-    }
 
     while(count)
     {
@@ -749,19 +740,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
             bank_start *= SD_BLOCK_SIZE;
 
-        if(aligned)
-        {
-            dma_buf = AS3525_PHYSICAL_ADDR(buf);
-        }
-        else
-        {
-            dma_buf = aligned_buffer;
-            if(transfer > UNALIGNED_NUM_SECTORS)
-                transfer = UNALIGNED_NUM_SECTORS;
+        dma_buf = aligned_buffer;
+        if(transfer > UNALIGNED_NUM_SECTORS)
+            transfer = UNALIGNED_NUM_SECTORS;
 
-            if(write)
-                memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
-        }
+        if(write)
+            memcpy(uncached_buffer, buf, transfer * SD_BLOCK_SIZE);
 
         ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
@@ -820,7 +804,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(!transfer_error[drive])
         {
-            if(!write && !aligned)
+            if(!write)
                 memcpy(buf, uncached_buffer, transfer * SD_BLOCK_SIZE);
             buf += transfer * SD_BLOCK_SIZE;
             start += transfer;
