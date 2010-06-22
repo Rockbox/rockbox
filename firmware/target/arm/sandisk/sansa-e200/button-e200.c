@@ -26,22 +26,16 @@
 #include "backlight.h"
 #include "powermgmt.h"
 
-#define WHEEL_REPEAT_INTERVAL   300000
-#define WHEEL_FAST_ON_INTERVAL   20000
-#define WHEEL_FAST_OFF_INTERVAL  60000
+#define WHEEL_REPEAT_VELOCITY       35 /* deg/s */
+#define WHEEL_SMOOTHING_VELOCITY    50 /* deg/s */
+#define WHEEL_FAST_ON_VELOCITY     350 /* deg/s */
+#define WHEEL_FAST_OFF_VELOCITY    150 /* deg/s */
+#define WHEEL_BASE_SENSITIVITY       2
 #define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
 
-/* Clickwheel */
 #ifndef BOOTLOADER
-static unsigned int  old_wheel_value   = 0;
-static unsigned int  wheel_repeat      = BUTTON_NONE;
-static unsigned int  wheel_click_count = 0;
-static unsigned int  wheel_delta       = 0;
-static          int  wheel_fast_mode   = 0;
-static unsigned long last_wheel_usec   = 0;
-static unsigned long wheel_velocity    = 0;
-static          long last_wheel_post   = 0;
-static          long next_backlight_on = 0;
+/* Wheel */
+static int read_wheel_keycode(void);
 /* Buttons */
 static bool hold_button     = false;
 static bool hold_button_old = false;
@@ -54,38 +48,31 @@ static int  int_btn         = BUTTON_NONE;
 void button_init_device(void)
 {
     /* Enable all buttons */
-    GPIOF_OUTPUT_EN &= ~0xff;
-    GPIOF_ENABLE |= 0xff;
+    GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_EN, 0xff);
+    GPIO_SET_BITWISE(GPIOF_ENABLE, 0xff);
 
     /* Scrollwheel light - enable control through GPIOG pin 7 and set timeout */
-    GPIOG_OUTPUT_EN |= 0x80;
-    GPIOG_ENABLE = 0x80;
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_EN, 0x80);
+    GPIO_SET_BITWISE(GPIOG_ENABLE, 0x80);
 
 #ifndef BOOTLOADER
     /* Mask these before performing init ... because init has possibly
        occurred before */
-    GPIOF_INT_EN &= ~0xff;
-    GPIOH_INT_EN &= ~0xc0;
+    GPIO_CLEAR_BITWISE(GPIOF_INT_EN, 0xff);
+    GPIO_CLEAR_BITWISE(GPIOH_INT_EN, 0xc0);
 
-    /* Get current tick before enabling button interrupts */
-    last_wheel_usec = USEC_TIMER;
-    last_wheel_post = last_wheel_usec;
-
-    GPIOH_ENABLE |= 0xc0;
-    GPIOH_OUTPUT_EN &= ~0xc0;
+    GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, 0xc0);
+    GPIO_SET_BITWISE(GPIOH_ENABLE, 0xc0);
 
     /* Read initial buttons */
     button_int();
-    GPIOF_INT_CLR = 0xff;
 
     /* Read initial wheel value (bit 6-7 of GPIOH) */
-    old_wheel_value = GPIOH_INPUT_VAL & 0xc0;
-    GPIOH_INT_LEV = (GPIOH_INT_LEV & ~0xc0) | (old_wheel_value ^ 0xc0);
-    GPIOH_INT_CLR = 0xc0;
+    read_wheel_keycode();
 
     /* Enable button interrupts */
-    GPIOF_INT_EN |= 0xff;
-    GPIOH_INT_EN |= 0xc0;
+    GPIO_SET_BITWISE(GPIOF_INT_EN, 0xff);
+    GPIO_SET_BITWISE(GPIOH_INT_EN, 0xc0);
 
     CPU_INT_EN = HI_MASK;
     CPU_HI_INT_EN = GPIO1_MASK;
@@ -99,7 +86,7 @@ bool button_hold(void)
 
 /* clickwheel */
 #ifndef BOOTLOADER
-void clickwheel_int(void)
+static int read_wheel_keycode(void)
 {
     /* Read wheel 
      * Bits 6 and 7 of GPIOH change as follows:
@@ -117,137 +104,189 @@ void clickwheel_int(void)
         { 0x80, 0x00, 0xc0, 0x40 }, /* Counter-clockwise  */ 
     };
 
-    unsigned int wheel_value;
+    static unsigned long prev_value;
 
-    wheel_value = GPIOH_INPUT_VAL & 0xc0;
-    GPIOH_INT_LEV = (GPIOH_INT_LEV & ~0xc0) | (wheel_value ^ 0xc0);
+    int keycode = BUTTON_NONE;
+
+    unsigned long value = GPIOH_INPUT_VAL & 0xc0;
+    GPIO_WRITE_BITWISE(GPIOH_INT_LEV, value ^ 0xc0, 0xc0);
     GPIOH_INT_CLR = GPIOH_INT_STAT & 0xc0;
 
     if (!hold_button)
     {
-        unsigned int btn = BUTTON_NONE;
+        unsigned long prev = prev_value;
+        int scroll = value >> 6;
 
-        if (old_wheel_value == wheel_tbl[0][wheel_value >> 6])
-            btn = BUTTON_SCROLL_FWD;
-        else if (old_wheel_value == wheel_tbl[1][wheel_value >> 6])
-            btn = BUTTON_SCROLL_BACK;
-
-        if (btn != BUTTON_NONE)
-        {
-            int repeat = 1; /* assume repeat */
-            unsigned long usec = USEC_TIMER;
-            unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
-
-            v = (v>0) ? 1000000 / v : 0;     /* clicks/sec = 1000000 * clicks/usec */
-            v = (v>0xffffff) ? 0xffffff : v; /* limit to 24 bit */
-
-            /* some velocity filtering to smooth things out */
-            wheel_velocity = (7*wheel_velocity + v) / 8;
-
-            if (btn != wheel_repeat)
-            {
-                /* direction reversals nullify all fast mode states */
-                wheel_repeat      = btn;
-                repeat            =
-                wheel_fast_mode   =
-                wheel_velocity    =
-                wheel_click_count = 0;
-            }
-
-            if (wheel_fast_mode != 0)
-            {
-                /* fast OFF happens immediately when velocity drops below
-                   threshold */
-                if (TIME_AFTER(usec,
-                        last_wheel_usec + WHEEL_FAST_OFF_INTERVAL))
-                {
-                    /* moving out of fast mode */
-                    wheel_fast_mode = 0;
-                    /* reset velocity */
-                    wheel_velocity = 0;
-                    /* wheel_delta is always 1 in slow mode */
-                    wheel_delta = 1;
-                }
-            }
-            else
-            {
-                /* fast ON gets filtered to avoid inadvertent jumps to fast mode */
-                if (repeat && wheel_velocity > 1000000/WHEEL_FAST_ON_INTERVAL)
-                {
-                    /* moving into fast mode */
-                    wheel_fast_mode = 1 << 31;
-                    wheel_click_count = 0;
-                    wheel_velocity = 1000000/WHEEL_FAST_OFF_INTERVAL;
-                }
-                else if (++wheel_click_count < 2)
-                {
-                    btn = BUTTON_NONE;
-                }
-
-                /* wheel_delta is always 1 in slow mode */
-                wheel_delta = 1;
-            }
-
-            if (TIME_AFTER(current_tick, next_backlight_on) ||
-                v <= 4)
-            {
-                /* poke backlight to turn it on or maintain it no more often
-                   than every 1/4 second*/
-                next_backlight_on = current_tick + HZ/4;
-                backlight_on();
-                buttonlight_on();
-                reset_poweroff_timer();
-            }
-
-            if (btn != BUTTON_NONE)
-            {
-                wheel_click_count = 0;
-
-                /* generate repeats if quick enough */
-                if (repeat && TIME_BEFORE(usec,
-                        last_wheel_post + WHEEL_REPEAT_INTERVAL))
-                    btn |= BUTTON_REPEAT;
-
-                last_wheel_post = usec;
-
-                if (queue_empty(&button_queue))
-                {
-                    queue_post(&button_queue, btn, wheel_fast_mode |
-                               (wheel_delta << 24) | wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
-                    /* message posted - reset delta */
-                    wheel_delta = 1;
-                }
-                else
-                {
-                    /* skipped post - increment delta */
-                    if (++wheel_delta > 0x7f)
-                        wheel_delta = 0x7f;
-                }
-            }
-
-            last_wheel_usec = usec;
-        }
+        if (prev == wheel_tbl[0][scroll])
+            keycode = BUTTON_SCROLL_FWD;
+        else if (prev == wheel_tbl[1][scroll])
+            keycode = BUTTON_SCROLL_BACK;
     }
 
-    old_wheel_value = wheel_value;
+    prev_value = value;
+
+    return keycode;
+}
+
+void clickwheel_int(void)
+{
+    static int prev_keycode = BUTTON_NONE;
+    static int prev_keypost = BUTTON_NONE;
+    static int count = 0;
+    static int fast_mode = 0;
+    static long next_backlight_on = 0;
+
+    static unsigned long prev_usec[WHEEL_BASE_SENSITIVITY] = { 0 };
+    static unsigned long delta = 1ul << 24;
+    static unsigned long velocity = 0; /* Velocity smoothed or unsmoothed */
+
+    unsigned long usec = USEC_TIMER;
+    unsigned long v; /* Raw velocity */
+
+    int keycode = read_wheel_keycode();
+
+    if (keycode == BUTTON_NONE)
+        return;
+
+    /* Spurious wheel "reversals" are not uncommon. Resetting also helps
+     * cover them up. As such, prev_keypost is also not reset or else false
+     * non-repeats are generated when it happens. */
+    if (keycode != prev_keycode)
+    {
+        /* Direction reversals reset state */
+        unsigned long usec_back = 360000000ul /
+                        (WHEEL_REPEAT_VELOCITY*WHEELCLICKS_PER_ROTATION);
+        prev_keycode = keycode;
+        count = 0;
+        fast_mode = 0;
+        prev_usec[0] = usec - usec_back;
+        prev_usec[1] = prev_usec[0] - usec_back;
+        delta = 1ul << 24;
+        velocity = 0;
+    }
+
+    if (TIME_AFTER(current_tick, next_backlight_on))
+    {
+        /* Poke backlight to turn it on or maintain it no more often
+         * than every 1/4 second */
+        next_backlight_on = current_tick + HZ/4;
+        backlight_on();
+        buttonlight_on();
+        reset_poweroff_timer();
+    }
+
+    /* Calculate deg/s based upon interval and number of clicks in that
+     * interval - FIR moving average */
+    v = usec - prev_usec[1];
+
+    if ((long)v <= 0)
+    {
+        /* timer wrapped (no activity for awhile), skip acceleration */
+        v = 0;
+        delta = 1ul << 24;
+    }
+    else
+    {
+        /* Check overflow below */
+        if (v > 0xfffffffful / WHEELCLICKS_PER_ROTATION)
+            v = 0xfffffffful / WHEELCLICKS_PER_ROTATION;
+
+        v = 360000000ul*WHEEL_BASE_SENSITIVITY / (v*WHEELCLICKS_PER_ROTATION);
+
+        if (v > 0xfffffful)
+            v = 0xfffffful; /* limit to 24 bits */
+    }
+
+    prev_usec[1] = prev_usec[0];
+    prev_usec[0] = usec;
+
+    if (v < WHEEL_SMOOTHING_VELOCITY)
+    {
+        /* Very slow - no smoothing */
+        velocity = v;
+        /* Ensure backlight never gets stuck for an extended period if tick
+         * wrapped such that next poke is very far ahead */
+        next_backlight_on = current_tick - 1;
+    }
+    else
+    {
+        /* Some velocity filtering to smooth things out */
+        velocity = (7*velocity + v) / 8;
+    }
+
+    if (fast_mode != 0)
+    {
+        /* Fast OFF happens immediately when velocity drops below
+           threshold */
+        if (v < WHEEL_FAST_OFF_VELOCITY)
+        {
+            fast_mode = 0; /* moving out of fast mode */
+            velocity = v;
+
+            /* delta is always 1 in slow mode */
+            delta = 1ul << 24;
+        }
+    }
+    else
+    {
+        /* Fast ON gets filtered to avoid inadvertent jumps to fast mode */
+        if (velocity >= WHEEL_FAST_ON_VELOCITY)
+            fast_mode = 1; /* moving into fast mode */
+
+        /* delta is always 1 in slow mode */
+        delta = 1ul << 24;
+    }
+
+    count += fast_mode + 1;
+    if (count < WHEEL_BASE_SENSITIVITY)
+        return;
+
+    count = 0;
+
+    if (queue_empty(&button_queue))
+    {
+        /* Post wheel keycode with wheel data */
+        int key = keycode;
+
+        if (v >= WHEEL_REPEAT_VELOCITY && prev_keypost == key)
+        {
+            /* Quick enough and same key is being posted more than once in a
+             * row - generate repeats - use unsmoothed v */
+            key |= BUTTON_REPEAT;
+        }
+
+        prev_keypost = keycode;
+
+        queue_post(&button_queue, key, (fast_mode << 31) | delta | velocity);
+        /* Message posted - reset delta */
+        delta = 1ul << 24;
+    }
+    else
+    {
+        /* Skipped post - increment delta and limit to 7 bits */
+        delta += 1ul << 24;
+
+        if (delta > (0x7ful << 24))
+            delta = 0x7ful << 24;
+    }
 }
 #endif /* BOOTLOADER */
 
 /* device buttons */
 void button_int(void)
 {
-    unsigned char state;
-
-    int_btn = BUTTON_NONE;
-
-    state = GPIOF_INPUT_VAL & 0xff;
+    unsigned long state = GPIOF_INPUT_VAL & 0xff;
 
 #ifndef BOOTLOADER
-    GPIOF_INT_LEV = (GPIOF_INT_LEV & ~0xff) | (state ^ 0xff);
-    GPIOF_INT_CLR = GPIOF_INT_STAT;
+    unsigned long status = GPIOF_INT_STAT;
+
+    GPIO_WRITE_BITWISE(GPIOF_INT_LEV, state ^ 0xff, 0xff);
+    GPIOF_INT_CLR = status;
 
     hold_button = (state & 0x80) != 0;
 #endif
+
+    int_btn = BUTTON_NONE;
 
     if (!_button_hold())
     {
