@@ -241,7 +241,7 @@ static struct skin_element* skin_parse_line_optional(char** document,
     retval = skin_alloc_element();
     retval->type = LINE;
     retval->line = skin_line;
-    if(*cursor != '\0' && *cursor != '\n'
+    if(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
        && !(conditional && (*cursor == ARGLISTSEPERATESYM
                             || *cursor == ARGLISTCLOSESYM
                             || *cursor == ENUMLISTSEPERATESYM
