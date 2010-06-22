@@ -278,16 +278,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
 #endif
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
-        if (vp == NULL)
-        {
-            struct viewport viewport;
-            GET_RECT(viewport,statusbar_position(display->screen_type),display);
-            display->set_viewport(&viewport);
-        }
-        else
-        {
-            display->set_viewport(vp);
-        }
+        display->set_viewport(vp);
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
@@ -829,8 +820,10 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
        return;
 #endif /* HAVE_LCD_BITMAP */
     int i;
+    struct viewport viewport;
     FOR_NB_SCREENS(i) {
-        gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, NULL );
+        GET_RECT(viewport,statusbar_position(i),&screens[i]);
+        gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, &viewport );
     }
 }
 
