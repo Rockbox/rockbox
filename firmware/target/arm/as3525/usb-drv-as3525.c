@@ -445,7 +445,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
             i++;
         }
         if (i>2)
-            panicf("ep%d CNAK needed %d retries CTRL=%x\n", ep, i, (int)USB_OEP_CTRL(ep));
+            panicf("ep%d CNAK needed %d retries CTRL=%x", ep, i, (int)USB_OEP_CTRL(ep));
     }
 
     return 0;
