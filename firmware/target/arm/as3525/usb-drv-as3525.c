@@ -271,7 +271,9 @@ void usb_drv_init(void)
 
     USB_DEV_CTRL = USB_DEV_CTRL_DESC_UPDATE  |
                    USB_DEV_CTRL_THRES_ENABLE |
-                   USB_DEV_CTRL_BURST_ENABLE;
+                   USB_DEV_CTRL_BURST_ENABLE |
+                   USB_DEV_CTRL_BLEN_8DWORDS |
+                   USB_DEV_CTRL_TLEN_8THMAXSIZE;
 
     USB_DEV_EP_INTR_MASK &= ~((1<<0) | (1<<16));    /* ep 0 */
 
