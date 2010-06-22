@@ -496,8 +496,24 @@ static int tuner_measure(unsigned char type, int scale, int duration)
 
     /* start counter, delay for specified time and stop it */
     lv24020lp_write_set(CNT_CTRL, CNT_EN);
-    udelay(duration*1000 - 16);
+
+#ifdef CPU_PP
+    /* obtain actual duration, including interrupts that occurred and
+     * the time to write the counter stop */
+    long usec = USEC_TIMER;
+#endif
+
+    udelay(duration*1000);
+
     lv24020lp_write_clear(CNT_CTRL, CNT_EN);
+
+#ifdef CPU_PP
+    duration = (USEC_TIMER - usec) / 1000;
+#endif
+
+    /* This function takes a loooong time and other stuff needs
+       running by now */
+    yield();
 
     /* read tick count */
     finval = (lv24020lp_read(CNT_H) << 8) | lv24020lp_read(CNT_L);
@@ -511,10 +527,6 @@ static int tuner_measure(unsigned char type, int scale, int duration)
         finval = scale*finval*256 / duration;
     else
         finval = scale*finval / duration;
-
-    /* This function takes a loooong time and other stuff needs
-       running by now */
-    yield();
 
     return (int)finval;
 }
@@ -531,6 +543,16 @@ static void set_frequency(int freq)
     TUNER_LOG("set_frequency(%d)\n", freq);
 
     enable_afc(false);
+
+    /* For the LV2400x, the tuned frequency is the sum of the displayed
+     * frequency and the preset IF frequency, in formula:
+     *      Tuned FM frequency = displayed frequency + preset IF frequency
+     *
+     * For example: when the IF frequency of LV2400x is preset at 110 kHz,
+     * it must be tuned at 88.51 MHz to receive the radio station at 88.4 MHz.
+     * -- AN2400S04@ – V0.4
+     */
+    freq += if_set;
 
     /* MHz -> kHz */
     freq /= 1000;
