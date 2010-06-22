@@ -8,6 +8,9 @@
 #
 
 BUILDDIR ?= .
+ifndef V
+SILENT = @
+endif
 
 SRC = skin_buffer.c skin_parser.c skin_debug.c skin_scan.c tag_table.c
 OBJ := $(patsubst %.c,$(BUILDDIR)/%.o,$(SRC))
@@ -19,10 +22,12 @@ INCLUDES = -I.
 default: $(OUT)
 
 $(BUILDDIR)/%.o: %.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
+	@echo CC $<
+	$(SILENT)$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
 
 $(OUT): $(OBJ)
-	$(AR) rcs $(OUT) $(OBJ)
+	@echo AR $(notdir $(OUT))
+	$(SILENT)$(AR) rcs $(OUT) $(OBJ)
 
 clean:
 	rm -f $(OBJ) $(OUT)
