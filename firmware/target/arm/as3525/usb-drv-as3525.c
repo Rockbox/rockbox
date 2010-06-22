@@ -227,6 +227,9 @@ void usb_drv_init(void)
 
     usb_enable_pll();
 
+    /* we have external power, so boost cpu */
+    cpu_boost(1);
+
     /* length regulator: normal operation */
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) | 1<<2);
 
@@ -316,6 +319,7 @@ void usb_drv_exit(void)
     /* Disable UVDD generating LDO */
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) & ~(1<<4));
     usb_disable_pll();
+    cpu_boost(0);
     logf("usb_drv_exit() !!!!\n");
 }
 
@@ -439,13 +443,11 @@ int usb_drv_recv(int ep, void *ptr, int len)
 
     if (USB_OEP_CTRL(ep) & USB_EP_CTRL_NAK) {
         int i = 0;
-        logf("CNAK fail? CTRL=%x\n", (int)USB_OEP_CTRL(ep));
         while (USB_OEP_CTRL(ep) & USB_EP_CTRL_NAK) {
             USB_OEP_CTRL(ep)    |= USB_EP_CTRL_CNAK; /* Go! */
             i++;
         }
-        if (i>2)
-            panicf("ep%d CNAK needed %d retries CTRL=%x", ep, i, (int)USB_OEP_CTRL(ep));
+        logf("ep%d CNAK needed %d retries CTRL=%x\n", ep, i, (int)USB_OEP_CTRL(ep));
     }
 
     return 0;
