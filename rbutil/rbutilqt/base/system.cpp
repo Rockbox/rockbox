@@ -297,8 +297,8 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                         if(res > 0)
                             name += QString::fromAscii(string);
                     }
+                    usb_close(dev);
                 }
-                usb_close(dev);
                 if(name.isEmpty()) name = tr("(no description available)");
 
                 if(id) {
