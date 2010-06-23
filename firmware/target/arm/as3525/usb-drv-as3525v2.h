@@ -421,7 +421,8 @@
 #define DOEPTSIZ(ep)    DEV_REG(0x300 + (ep) * 0x20 + 0x10)
 
 /* valid for any D{I,O}EPTSIZi with 1<=i<=15, NOT for i=0 ! */
-#define DEPTSIZ_xfersize_bits   0x7ffff /** Transfer Size */
+#define DEPTSIZ_xfersize_bitp   0 /** Transfer Size */
+#define DEPTSIZ_xfersize_bits   0x7ffff
 #define DEPTSIZ_pkcnt_bitp      19 /** Packet Count */
 #define DEPTSIZ_pkcnt_bits      0x3ff
 #define DEPTSIZ_mc_bitp         29 /** Multi Count - Periodic IN endpoints */
@@ -452,7 +453,7 @@
 /**
  * Parameters
  */
-#define USE_CUSTOM_FIFO_LAYOUT
+/*#define USE_CUSTOM_FIFO_LAYOUT*/
 
 #ifdef USE_CUSTOM_FIFO_LAYOUT
 /* Data fifo: includes RX fifo, non period TX fifo and periodic fifos

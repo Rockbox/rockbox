@@ -38,32 +38,38 @@
 
 static int __in_ep_list[NUM_IN_EP] = {IN_EP_LIST};
 static int __out_ep_list[NUM_OUT_EP] = {OUT_EP_LIST};
+static int __in_ep_list_ep0[NUM_IN_EP + 1] = {0, IN_EP_LIST};
+static int __out_ep_list_ep0[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 
 /* iterate through each in/out ep except EP0
  * 'counter' is the counter, 'ep' is the actual value */
 #define FOR_EACH_IN_EP(counter, ep) \
     for(counter = 0, ep = __in_ep_list[0]; counter < NUM_IN_EP; counter++, ep = __in_ep_list[counter])
 
+#define FOR_EACH_IN_EP_AND_EP0(counter, ep) \
+    for(counter = 0, ep = __in_ep_list_ep0[0]; counter <= NUM_IN_EP; counter++, ep = __in_ep_list_ep0[counter])
+
 #define FOR_EACH_OUT_EP(counter, ep) \
     for(counter = 0, ep = __out_ep_list[0]; counter < NUM_OUT_EP; counter++, ep = __out_ep_list[counter])
 
+#define FOR_EACH_OUT_EP_AND_EP0(counter, ep) \
+    for(counter = 0, ep = __out_ep_list_ep0[0]; counter <= NUM_OUT_EP; counter++, ep = __out_ep_list_ep0[counter])
+
 struct usb_endpoint
 {
-    void *buf;
     unsigned int len;
-    union
-    {
-        unsigned int sent;
-        unsigned int received;
-    };
     bool wait;
     bool busy;
+    bool done;
+    int status;
+    struct wakeup complete;
 };
 
-#if 0
-static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS*2];
-#endif
-static struct usb_ctrlrequest ep0_setup_pkt __attribute__((aligned(16)));
+/* NOTE: the following structure is not used to EP0
+ *       and make the assumption that each endpoint is
+ *       either IN or OUT but not bidirectional */
+static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS];
+static struct usb_ctrlrequest ep0_setup_pkt USB_DEVBSS_ATTR;
 
 void usb_attach(void)
 {
@@ -175,10 +181,9 @@ static void reset_endpoints(void)
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
      * setup packet count = 1
-     * transfer size = 64
+     * transfer size = 8 (setup packet)
      * Setup EP0 IN/OUT with 64 byte maximum packet size and activate both. Enable transfer on EP0 OUT
      */
-    
     DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp)
                 | (1 << DEPTSIZ0_pkcnt_bitp)
                 | 8;
@@ -305,10 +310,8 @@ static void core_dev_init(void)
 
     /* Setup interrupt masks for endpoints */
     /* Setup interrupt masks */
-    DOEPMSK = DOEPINT_setup | DOEPINT_xfercompl | DOEPINT_ahberr
-                | DOEPINT_epdisabled;
-    DIEPMSK = DIEPINT_xfercompl | DIEPINT_timeout
-                | DIEPINT_epdisabled | DIEPINT_ahberr;
+    DOEPMSK = DOEPINT_setup | DOEPINT_xfercompl | DOEPINT_ahberr;
+    DIEPMSK = DIEPINT_xfercompl | DIEPINT_timeout | DIEPINT_ahberr;
     DAINTMSK = 0xffffffff;
 
     reset_endpoints();
@@ -381,80 +384,95 @@ void usb_drv_exit(void)
     disable_global_interrupts();
 }
 
-static void dump_regs(void)
+static void handle_ep_int(int ep, bool dir_in)
 {
-    logf("DSTS: %lx", DSTS);
-    logf("DOEPCTL0=%lx", DOEPCTL(0));
-    logf("DOEPTSIZ=%lx", DOEPTSIZ(0));
-    logf("DIEPCTL0=%lx", DIEPCTL(0));
-    logf("DOEPMSK=%lx", DOEPMSK);
-    logf("DIEPMSK=%lx", DIEPMSK);
-    logf("DAINTMSK=%lx", DAINTMSK);
-    logf("DAINT=%lx", DAINT);
-    logf("GINTSTS=%lx", GINTSTS);
-    logf("GINTMSK=%lx", GINTMSK);
-    logf("DCTL=%lx", DCTL);
-    logf("GAHBCFG=%lx", GAHBCFG);
-    logf("GUSBCFG=%lx", GUSBCFG);
-    logf("DCFG=%lx", DCFG);
-    logf("DTHRCTL=%lx", DTHRCTL);
-}
-
-static bool handle_reset(void)
-{
-    logf("usb: bus reset");
-
-    dump_regs();
-    /* Clear the Remote Wakeup Signalling */
-    DCTL &= ~DCTL_rmtwkupsig;
-
-    /* Flush FIFOs */
-    flush_tx_fifos(0x10);
-
-    reset_endpoints();
-
-    /* Reset Device Address */
-    DCFG &= bitm(DCFG, devadr);
-
-    usb_core_bus_reset();
-
-    return true;
-}
-
-static bool handle_enum_done(void)
-{
-    logf("usb: enum done");
-
-    /* read speed */
-    switch(extract(DSTS, enumspd))
+    if(dir_in)
     {
-        case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
-            logf("usb: HS");
-            break;
-        case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
-        case DSTS_ENUMSPD_FS_PHY_48MHZ:
-            logf("usb: FS");
-            break;
-        case DSTS_ENUMSPD_LS_PHY_6MHZ:
-            panicf("usb: LS is not supported");
+        if(DIEPINT(ep) & DIEPINT_ahberr)
+            panicf("usb: ahb error on EP%d IN", ep);
+        if(DIEPINT(ep) & DIEPINT_xfercompl)
+        {
+            logf("usb: xfer complete on EP%d IN", ep);
+            if(endpoints[ep].busy)
+            {
+                endpoints[ep].busy = false;
+                endpoints[ep].status = 0;
+                endpoints[ep].done = true;
+                /* works even for PE0 */
+                int transfered = endpoints[ep].len - (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+                clean_dcache_range((void *)DIEPDMA(ep), transfered);
+                usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
+            }
+        }
+        if(DIEPINT(ep) & DIEPINT_timeout)
+        {
+            logf("usb: timeout on EP%d IN", ep);
+            if(endpoints[ep].busy)
+            {
+                endpoints[ep].busy = false;
+                endpoints[ep].status = 1;
+                endpoints[ep].done = true;
+                /* for safety, act as if no bytes as been transfered */
+                endpoints[ep].len = 0;
+                usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
+                wakeup_signal(&endpoints[ep].complete);
+            }
+        }
+        /* clear interrupts */
+        DIEPINT(ep) = DIEPINT(ep);
     }
-
-    /* fixme: change EP0 mps here */
-    dump_regs();
-    
-    return true;
+    else
+    {
+        if(DOEPINT(ep) & DOEPINT_ahberr)
+            panicf("usb: ahb error on EP%d OUT", ep);
+        if(DOEPINT(ep) & DOEPINT_xfercompl)
+        {
+            logf("usb: xfer complete on EP%d OUT", ep);
+            if(endpoints[ep].busy)
+            {
+                endpoints[ep].busy = false;
+                endpoints[ep].status = 0;
+                endpoints[ep].done = true;
+                /* works even for PE0 */
+                int transfered = endpoints[ep].len - (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+                clean_dcache_range((void *)DOEPDMA(ep), transfered);
+                usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
+            }
+        }
+        if(DOEPINT(ep) & DOEPINT_setup)
+        {
+            logf("usb: setup on EP%d OUT", ep);
+            if(ep != 0)
+                panicf("usb: setup not on EP0, this is impossible");
+            clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
+            usb_core_control_request(&ep0_setup_pkt);
+        }
+        /* setup EP0 for the next transfer */
+        DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 8;
+        DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
+        DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
+        
+        /* clear interrupts */
+        DOEPINT(ep) = DOEPINT(ep);
+    }
 }
 
-static bool handle_in_ep_int(void)
+static void handle_ep_ints(void)
 {
-    panicf("usb: in ep int");
-    return false;
-}
+    logf("usb: ep int");
+    /* we must read it */
+    unsigned long daint = DAINT;
+    unsigned i, ep;
 
-static bool handle_out_ep_int(void)
-{
-    panicf("usb: out ep int");
-    return false;
+    FOR_EACH_IN_EP_AND_EP0(i, ep)
+        if(daint & DAINT_IN_EP(ep))
+            handle_ep_int(ep, true);
+    FOR_EACH_OUT_EP_AND_EP0(i, ep)
+        if(daint & DAINT_OUT_EP(ep))
+            handle_ep_int(ep, false);
+
+    /* write back to clear status */
+    DAINT = daint;
 }
 
 /* interrupt service routine */
@@ -463,45 +481,59 @@ void INT_USB(void)
     /* some bits in GINTSTS can be set even though we didn't enable the interrupt source
      * so AND it with the actual mask */
     unsigned long sts = GINTSTS & GINTMSK;
-    unsigned long handled_one = 0; /* mask of all listed one (either handled or not) */
-    
-    #define HANDLED_CASE(bitmask, callfn) \
-        handled_one |= bitmask; \
-        if(sts & bitmask) \
-        { \
-            if(!callfn()) \
-                goto Lerr; \
-        }
-
-    #define UNHANDLED_CASE(bitmask) \
-        handled_one |= bitmask; \
-        if(sts & bitmask) \
-            goto Lunhandled;
 
     /* device part */
-    HANDLED_CASE(GINTMSK_usbreset, handle_reset)
-    HANDLED_CASE(GINTMSK_enumdone, handle_enum_done)
-    HANDLED_CASE(GINTMSK_inepintr, handle_in_ep_int)
-    HANDLED_CASE(GINTMSK_outepintr, handle_out_ep_int)
+    if(sts & GINTMSK_usbreset)
+    {
+        logf("usb: bus reset");
+
+        /* Clear the Remote Wakeup Signalling */
+        DCTL &= ~DCTL_rmtwkupsig;
+
+        /* Flush FIFOs */
+        flush_tx_fifos(0x10);
+
+        reset_endpoints();
+
+        /* Reset Device Address */
+        DCFG &= bitm(DCFG, devadr);
+
+        usb_core_bus_reset();
+    }
+
+    if(sts & GINTMSK_enumdone)
+    {
+        logf("usb: enum done");
+
+        /* read speed */
+        switch(extract(DSTS, enumspd))
+        {
+            case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
+                logf("usb: HS");
+                break;
+            case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
+            case DSTS_ENUMSPD_FS_PHY_48MHZ:
+                logf("usb: FS");
+                break;
+            case DSTS_ENUMSPD_LS_PHY_6MHZ:
+                panicf("usb: LS is not supported");
+        }
+
+        /* fixme: change EP0 mps here */
+    }
+
+    if(sts & (GINTMSK_outepintr | GINTMSK_inepintr))
+    {
+        handle_ep_ints();
+    }
 
     /* common part */
-    UNHANDLED_CASE(GINTMSK_otgintr)
-    UNHANDLED_CASE(GINTMSK_conidstschng)
-    UNHANDLED_CASE(GINTMSK_disconnect)
-
-    /* unlisted ones */
-    if(sts & ~handled_one)
-        goto Lunhandled;
+    if(sts & GINTMSK_otgintr)
+    {
+        panicf("usb: otg int");
+    }
 
     GINTSTS = GINTSTS;
-
-    return;
-
-    Lunhandled:
-    panicf("unhandled usb int: %lx", sts);
-
-    Lerr:
-    panicf("error in usb int: %lx", sts);
 }
 
 int usb_drv_port_speed(void)

@@ -34,4 +34,10 @@
 
 #define CGU_SDSLOT         (*(volatile unsigned long *)(CGU_BASE + 0x3C))
 
+#ifdef USB_NUM_ENDPOINTS
+#undef USB_NUM_ENDPOINTS
+#endif
+
+#define USB_NUM_ENDPOINTS   6
+
 #endif /* __AS3525V2_H__ */
