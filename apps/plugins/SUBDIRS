@@ -57,9 +57,9 @@ zxbox
 pacbox
 #endif
 
-#if (defined(HAVE_LCD_COLOR) || defined(MROBE_100) || \
-    (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)) && (MEMORYSIZE > 2) && \
-    !defined(RB_PROFILE)
+#if (defined(HAVE_LCD_COLOR) || defined(MROBE_100) || defined(SANSA_CLIPPLUS) \
+    || defined(SANSA_CLIPV2) || (LCD_DEPTH == 2)) \
+    && (MEMORYSIZE > 2 && !defined(RB_PROFILE))
 doom
 #endif
 
