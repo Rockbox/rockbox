@@ -267,11 +267,11 @@ Defining a viewport as \config{{\%V(\dots}}
 will display it permanently.
 
 \begin{itemize}
-\item {\config{\%Vl(`identifier',\dots)}}
+\item {\config{\%Vl('identifier',\dots)}}
 This tag preloads a viewport for later display. `identifier' is a single
 lowercase letter (a-z) and the `\dots' parameters use the same logic as
 the \config{\%V} tag explained above.
-\item {\config{\%Vd(`identifier')}} Display the `identifier' viewport.
+\item {\config{\%Vd('identifier')}} Display the `identifier' viewport.
 \end{itemize}
 
 Viewports can share identifiers so that you can display multiple viewports
@@ -292,7 +292,7 @@ As mentioned above, it is possible to set a UI viewport via the theme
 file, and to conditionally select different UI viewports.
 
   \begin{itemize}
-    \item {\config{\%Vi(`label',\dots)}}
+    \item {\config{\%Vi('label',\dots)}}
     This viewport is used as Custom UI Viewport in the case that the theme
     doesn't have a ui viewport set in the theme \fname{.cfg} file. Having this
     is strongly recommended since it makes you able to use the SBS
@@ -300,7 +300,7 @@ file, and to conditionally select different UI viewports.
     Info Viewport using the \%VI tag. The `\dots' parameters use the same logic as
     the \config{\%V} tag explained above.
 
-    \item {\config{\%VI(`label')}} Set the Info Viewport to use the viewport called
+    \item {\config{\%VI('label')}} Set the Info Viewport to use the viewport called
     label, as declared with the previous tag.
   \end{itemize}
 
@@ -309,7 +309,7 @@ Additional fonts can be loaded within each screen file to be used in that
 screen. In this way not only can you have different fonts between e.g. the menu
 and the WPS, but you can use multiple fonts in each of the individual screens.\\
 
-\config{\%Fl(`id',filename)}
+\config{\%Fl('id',filename)}
 
   \begin{itemize}
     \item `id' is the number you want to use in viewport declarations, 0 and 1
