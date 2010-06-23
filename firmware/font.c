@@ -453,7 +453,10 @@ void font_unload(int font_id)
     {
         if (pf->fd >= 0)
             close(pf->fd);
-        sysfonts[font_id] = NULL;
+        if (font_id == FONT_UI)
+            font_reset(pf);
+        else if (font_id >= SYSTEMFONTCOUNT)
+            sysfonts[font_id] = NULL;
     }
 }
 
