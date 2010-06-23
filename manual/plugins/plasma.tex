@@ -3,17 +3,30 @@
 \screenshot{plugins/images/ss-plasma}{Plasma}{img:plasma}
 Plasma is a demo displaying a 80's style retro plasma effect.
 
-\begin{btnmap}
-    \PluginUp{} / \PluginDown
-    \opt{scrollwheel}{/ \PluginScrollFwd{} / \PluginScrollBack}
-       \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp{} / \PluginRCDown}
-    & Increase / decrease Frequency\\
+      \begin{btnmap}
+          \PluginUp{} / \PluginDown
+          \opt{scrollwheel}{/ \PluginScrollFwd{} / \PluginScrollBack}
+              &
+          \opt{HAVEREMOTEKEYMAP}{\PluginRCUp{} / \PluginRCDown
+              &}
+          Increase / decrease Frequency
+              \\
+       
+          \opt{lcd_color}{%
+              \PluginSelect
+                  &
+              \opt{HAVEREMOTEKEYMAP}{\PluginRCSelect
+                  &}
+              Change Color
+                  \\
+          }%
+       
+          \PluginCancel{} / \PluginExit
+              &
+          \opt{HAVEREMOTEKEYMAP}{\PluginRCCancel
+              \opt{IAUDIO_RC_PAD}{ / \PluginRCExit}
+              &}
+          Exit
+              \\
 
-    \opt{lcd_color}{%
-        \PluginSelect
-    & Change Color\\
-    }%
-
-    \PluginCancel{} / \PluginExit
-    & Exit\\
 \end{btnmap}
