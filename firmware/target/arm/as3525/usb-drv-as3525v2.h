@@ -453,19 +453,6 @@
 /**
  * Parameters
  */
-/*#define USE_CUSTOM_FIFO_LAYOUT*/
-
-#ifdef USE_CUSTOM_FIFO_LAYOUT
-/* Data fifo: includes RX fifo, non period TX fifo and periodic fifos
- * NOTE: this is a hardware parameter, it cannot be changed ! */
-#define DATA_FIFO_DEPTH     0x535
-/* size of the FX fifo */
-#define RX_FIFO_SIZE        0x100
-/* size of the non periodic TX fifo */
-#define NPTX_FIFO_SIZE      0x100
-/* size of each TX ep fifo size */
-#define EPTX_FIFO_SIZE      0x100
-#endif /* USE_CUSTOM_FIFO_LAYOUT */
 
 /* Number of IN/OUT endpoints */
 #define NUM_IN_EP           3
