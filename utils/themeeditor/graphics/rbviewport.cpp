@@ -100,7 +100,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         else
             h = node->params[param].data.numeric;
 
-        size = QRectF(x, y, w, h);
+        setPos(x, y);
+        size = QRectF(0, 0, w, h);
     }
 }
 

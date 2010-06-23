@@ -44,7 +44,8 @@ RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
 
         }
 
-        size = QRectF(x, y, image->width(), image->height() / tiles);
+        size = QRectF(0, 0, image->width(), image->height() / tiles);
+        setPos(x, y);
 
     }
     else
