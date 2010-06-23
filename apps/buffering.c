@@ -1577,8 +1577,7 @@ bool buffering_reset(char *buf, size_t buflen)
         return false;
 
     buffer = buf;
-    /* Preserve alignment when wrapping around */
-    buffer_len = STORAGE_ALIGN_DOWN(buflen);
+    buffer_len = buflen;
     guard_buffer = buf + buflen;
 
     buf_widx = 0;

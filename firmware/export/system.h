@@ -304,7 +304,7 @@ static inline void cpucache_flush(void)
 /* 2^CACHEALIGN_BITS = the byte size */
 #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
 #else
-#define CACHEALIGN_SIZE sizeof(int)
+#define CACHEALIGN_SIZE 16  /* FIXME */
 #endif
 #endif /* CACHEALIGN_SIZE */
 

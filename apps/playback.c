@@ -1850,13 +1850,13 @@ static void audio_reset_buffer(void)
 
     /* Initially set up file buffer as all space available */
     malloc_buf = audiobuf + talk_get_bufsize();
-    /* Align the malloc buf to line size. Especially important to cf
-       targets that do line reads/writes. */
-    malloc_buf = (unsigned char *)(((uintptr_t)malloc_buf + 15) & ~15);
-    filebuf    = malloc_buf; /* filebuf line align implied */
-    filebuflen = audiobufend - filebuf;
 
-    filebuflen &= ~15;
+    /* Align the malloc buf to line size.
+     * Especially important to cf targets that do line reads/writes.
+     * Also for targets which need aligned DMA storage buffers */
+    malloc_buf = (unsigned char *)(((uintptr_t)malloc_buf + (CACHEALIGN_SIZE - 1)) & ~(CACHEALIGN_SIZE - 1));
+    filebuf    = malloc_buf; /* filebuf line align implied */
+    filebuflen = (audiobufend - filebuf) & ~(CACHEALIGN_SIZE - 1);
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
