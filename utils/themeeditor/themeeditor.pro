@@ -39,7 +39,8 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbviewport.h \
     graphics/rbrenderinfo.h \
     graphics/rbimage.h \
-    graphics/rbfont.h
+    graphics/rbfont.h \
+    gui/devicestate.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -55,7 +56,8 @@ SOURCES += main.cpp \
     graphics/rbviewport.cpp \
     graphics/rbrenderinfo.cpp \
     graphics/rbimage.cpp \
-    graphics/rbfont.cpp
+    graphics/rbfont.cpp \
+    gui/devicestate.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -66,5 +68,6 @@ OTHER_FILES += README \
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \
-    gui/skinviewer.ui
+    gui/skinviewer.ui \
+    gui/devicestate.ui
 RESOURCES += resources.qrc

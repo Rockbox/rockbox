@@ -32,6 +32,7 @@
 #include "configdocument.h"
 #include "preferencesdialog.h"
 #include "skinviewer.h"
+#include "devicestate.h"
 
 class ProjectModel;
 class TabContent;
@@ -88,6 +89,7 @@ private:
     ProjectModel* project;
     QItemSelectionModel* parseTreeSelection;
     SkinViewer* viewer;
+    DeviceState deviceConfig;
 };
 
 #endif // EDITORWINDOW_H

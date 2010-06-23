@@ -14,7 +14,7 @@
    <string>Rockbox Theme Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resources.qrc">
     <normaloff>:/resources/resources/windowicon.png</normaloff>:/resources/resources/windowicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -40,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -67,6 +67,8 @@
     <addaction name="actionPreview_Panel"/>
     <addaction name="actionDisplay_Panel"/>
     <addaction name="actionFile_Panel"/>
+    <addaction name="separator"/>
+    <addaction name="actionDevice_Configuration"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -248,7 +250,7 @@
   </action>
   <action name="actionToolbarNew">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/resources/resources/document-new.png</normaloff>:/resources/resources/document-new.png</iconset>
    </property>
    <property name="text">
@@ -260,7 +262,7 @@
   </action>
   <action name="actionToolbarOpen">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/resources/resources/document-open.png</normaloff>:/resources/resources/document-open.png</iconset>
    </property>
    <property name="text">
@@ -275,7 +277,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/resources/resources/document-save.png</normaloff>:/resources/resources/document-save.png</iconset>
    </property>
    <property name="text">
@@ -293,6 +295,11 @@
     <string>Ctrl+Shift+O</string>
    </property>
   </action>
+  <action name="actionDevice_Configuration">
+   <property name="text">
+    <string>&amp;Device Configuration</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>projectTree</tabstop>
@@ -301,7 +308,7 @@
   <tabstop>editorTabs</tabstop>
  </tabstops>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -155,6 +155,8 @@ void EditorWindow::setupMenus()
                      this, SLOT(showPanel()));
     QObject::connect(ui->actionPreview_Panel, SIGNAL(triggered()),
                      this, SLOT(showPanel()));
+    QObject::connect(ui->actionDevice_Configuration, SIGNAL(triggered()),
+                     &deviceConfig, SLOT(show()));
 
     /* Connecting the document management actions */
     QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),
