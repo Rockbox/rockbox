@@ -592,6 +592,23 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
 
             break;
 
+        case 'F':
+
+            switch(element->tag->name[1])
+            {
+
+            case 'l':
+                /* %Fl */
+                x = element->params[0].data.numeric;
+                filename = info.settings()->value("themebase", "") + "/fonts/" +
+                           element->params[1].data.text;
+                info.screen()->loadFont(x, new RBFont(filename));
+                break;
+
+            }
+
+            break;
+
         case 'V':
 
             switch(element->tag->name[1])

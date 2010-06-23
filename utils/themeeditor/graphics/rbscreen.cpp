@@ -67,6 +67,11 @@ RBScreen::~RBScreen()
 {
     if(backdrop)
         delete backdrop;
+
+    QMap<int, RBFont*>::iterator i;
+    for(i = fonts.begin(); i != fonts.end(); i++)
+        if(*i)
+            delete (*i);
 }
 
 QPainterPath RBScreen::shape() const
@@ -102,6 +107,23 @@ void RBScreen::showViewport(QString name)
     namedViewports.value(name)->show();
     update();
 }
+
+void RBScreen::loadFont(int id, RBFont* font)
+{
+    if(id < 2 || id > 9)
+        return;
+
+    fonts.insert(id, font);
+}
+
+RBFont* RBScreen::getFont(int id)
+{
+    if(fonts.value(id, 0) != 0)
+        return fonts.value(id);
+    else
+        return fonts.value(0, 0);
+}
+
 
 void RBScreen::setBackdrop(QString filename)
 {

@@ -27,6 +27,7 @@
 #include "projectmodel.h"
 #include "rbrenderinfo.h"
 #include "rbimage.h"
+#include "rbfont.h"
 
 class RBViewport;
 
@@ -58,6 +59,9 @@ public:
     }
     RBImage* getImage(QString name){ return images.value(name, 0); }
 
+    void loadFont(int id, RBFont* font);
+    RBFont* getFont(int id);
+
     void setBackdrop(QString filename);
     void makeCustomUI(QString id);
 
@@ -77,6 +81,7 @@ private:
     QMap<QString, RBViewport*> namedViewports;
     QMap<QString, RBImage*> images;
     QMap<QString, QString>* settings;
+    QMap<int, RBFont*> fonts;
 
 };
 
