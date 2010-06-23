@@ -51,10 +51,9 @@
 #endif
 
 /* command flags */
-#define MCI_NO_FLAGS    (0<<0)
+#define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
 #define MCI_LONG_RESP   (1<<1)
-#define MCI_ARG         (1<<2)
 
 /* ARM PL180 registers */
 #define MCI_POWER(i)       (*(volatile unsigned char *) (pl180_base[i]+0x00))
@@ -213,7 +212,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         MCI_CLEAR(drive) = 0x7ff;
 
         /* Load command argument or clear if none */
-        MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
+        MCI_ARGUMENT(drive) = arg;
 
         /* Construct MCI_COMMAND & enable CPSM */
         MCI_COMMAND(drive) =
@@ -274,13 +273,13 @@ static int sd_init_card(const int drive)
     /*  Start of Card Identification Mode ************************************/
 
     /* CMD0 Go Idle  */
-    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
+    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
     mci_delay();
 
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
       Non v2 cards will not respond to this command*/
-    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP|MCI_ARG, &response))
+    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP, &response))
         if((response & 0xFFF) == 0x1AA)
             sd_v2 = true;
 
@@ -293,21 +292,21 @@ static int sd_init_card(const int drive)
             return -2;
 
         /* app_cmd */
-        send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response);
+        send_cmd(drive, SD_APP_CMD, 0, MCI_RESP, &response);
 
         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
-                        MCI_RESP|MCI_ARG, &card_info[drive].ocr);
+                        MCI_RESP, &card_info[drive].ocr);
 
     } while(!(card_info[drive].ocr & (1<<31)));
 
     /* CMD2 send CID */
-    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
+    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP,
                             card_info[drive].cid))
         return -3;
 
     /* CMD3 send RCA */
-    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
+    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP,
                 &card_info[drive].rca))
         return -4;
 
@@ -319,19 +318,19 @@ static int sd_init_card(const int drive)
     if(sd_v2)
     {
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
             return -5;
 
         if(sd_wait_for_tran_state(drive))
             return -6;
         /* CMD6 */
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_ARG, NULL))
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
             return -7;
         mci_delay();
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_ARG, NULL))
+        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
             return -8;
         mci_delay();
     }
@@ -339,7 +338,7 @@ static int sd_init_card(const int drive)
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
-                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
+                 MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
         return -9;
 
     sd_parse_csd(&card_info[drive]);
@@ -358,7 +357,7 @@ static int sd_init_card(const int drive)
 #endif
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
         return -10;
 
 #if 0 /* FIXME : it seems that write corrupts the filesystem */
@@ -366,16 +365,16 @@ static int sd_init_card(const int drive)
     if(sd_wait_for_tran_state(drive) < 0)
         return -11;
     /* CMD55 */             /*  Response is requested due to timing issue  */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG|MCI_RESP, &response))
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
         return -14;
     /* ACMD42  */
-    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ARG|MCI_RESP, &response))
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_RESP, &response))
         return -15;
     /* CMD55 */              /*  Response is requested due to timing issue  */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG|MCI_RESP, &response))
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
         return -12;
     /* ACMD6  */
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ARG|MCI_RESP, &response))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_RESP, &response))
         return -13;
     /* Now that card is widebus make controller aware */
     MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
@@ -394,13 +393,13 @@ static int sd_init_card(const int drive)
             return ret -16;
 
         /*  CMD7 w/rca = 0: Unselect card to put it in STBY state */
-        if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_ARG, NULL))
+        if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_NO_RESP, NULL))
             return -17;
         mci_delay();
 
         /* CMD9 send CSD again, so we got the correct number of blocks */
         if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
-                     MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
+                     MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
             return -18;
 
         sd_parse_csd(&card_info[drive]);
@@ -408,7 +407,7 @@ static int sd_init_card(const int drive)
         card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
 
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
             return -19;
     }
 
@@ -597,8 +596,8 @@ static int sd_wait_for_tran_state(const int drive)
 
     while (1)
     {
-        if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
-                    MCI_RESP|MCI_ARG, &response))
+        if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP,
+                    &response))
             return -1;
 
         if (((response >> 9) & 0xf) == SD_TRAN)
@@ -639,12 +638,13 @@ static int sd_select_bank(signed char bank)
         if (ret < 0)
             return ret - 2;
 
-        if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_ARG, NULL))
+        if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_NO_RESP,
+                     NULL))
             return -1;
 
         mci_delay();
 
-        if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_FLAGS, NULL))
+        if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_RESP, NULL))
             return -2;
 
         mci_delay();
@@ -788,7 +788,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
         }
 
-        if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
+        if(!send_cmd(drive, cmd, bank_start, MCI_NO_RESP, NULL))
         {
             ret -= 3*20;
             goto sd_transfer_error;
