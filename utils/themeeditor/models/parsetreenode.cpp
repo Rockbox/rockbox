@@ -523,7 +523,8 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     {
         QString filename;
         QString id;
-        int x, y, tiles;
+        int x, y, tiles, tile;
+        char c;
         RBImage* image;
 
         /* Two switch statements to narrow down the tag name */
@@ -533,6 +534,32 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
         case 'x':
             switch(element->tag->name[1])
             {
+            case 'd':
+                /* %xd */
+                id = "";
+                id.append(element->params[0].data.text[0]);
+                c = element->params[0].data.text[1];
+
+                if(c == '\0')
+                {
+                    tile = 1;
+                }
+                else
+                {
+                    if(isupper(c))
+                        tile = c - 'A' + 25;
+                    else
+                        tile = c - 'a';
+                }
+
+                image = info.screen()->getImage(id);
+                if(image)
+                {
+                    image->setTile(tile);
+                    image->show();
+                }
+                break;
+
             case 'l':
                 /* %xl */
                 id = element->params[0].data.text;
