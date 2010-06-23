@@ -28,6 +28,8 @@
 .set GPIOD,     0xC80E0000
 .set CGU_PROC,  0xC80F0010
 .set CGU_PERI,  0xC80F0014
+.set CGU_DBOP,  0xC80F0038
+.set DBOP,      0xC8120000
 .set I2C_BASE,  0xC8070000
 .set I2C_DATA,  0x00
 .set I2C_SLAD0, 0x04
@@ -247,14 +249,57 @@ uclcopy:
 
 
 #elif defined(SANSA_C200V2)
-        /* check for RIGHT on C6, should changed to LEFT as soon as it
-         * known in which pin that is in order for consistency  */
-        ldr     r0, =GPIOC
-        mov     r1, #0
-        str     r1, [r0, #0x400]      /* set pin to output */
+.set BUTTON_LEFT,      (1<< 2)
+.set BUTTON_DOWN,      (1<< 3)
+.set BUTTON_SELECT,    (1<< 4)
+.set BUTTON_UP,        (1<< 5)
+.set BUTTON_RIGHT,     (1<< 6)
+.set BUTTON_HOLD,      (1<<12)
+.set ENRD0_USB_STATUS, (1<< 3)
 
-        ldr     r1, [r0, #256]        /* 1<<(6+2) */
-        cmp     r1, #0                /* C6 low means button pressed */
+        ldr     r0, =CGU_DBOP
+        mov     r1, #(1<<3)         @ DBOP freq = PCLK, clock enabled
+        str     r1, [r0]
+
+        @ AFSEL needs to be set for this to work
+        ldr     r2, =GPIOB
+        mov     r1, #0xc
+        str     r1, [r2, #0x420]    @ GPIOB_AFSEL
+        ldr     r2, =GPIOC
+        mov     r1, #0xff
+        str     r1, [r2, #0x420]    @ GPIOC_AFSEL
+
+        ldr     r0, =DBOP
+        @ TIMPOL doesn't matter here since we don't need
+        @ the control signals.
+
+        @ 16 bit data width
+        @ enable write
+        @ tri-state output
+        ldr     r1, =0x00091000
+        str     r1, [r0, #8]        @ DBOP_CTRL
+
+        ldr     r1, =0xf0ff         @ precharge
+        str     r1, [r0, #0x10]     @ DBOP_DOUT
+
+2:      ldr     r1, [r0, #0xc]      @ DOBP_STAT
+        ands    r1, r1, #(1<<10)
+        beq     2b                  @ make sure fifo is empty
+
+        @ 16 bit data width
+        @ start read
+        @ tri-state output
+        @ strobe time 31
+        ldr     r1, =0x0008901f
+        str     r1, [r0, #8]        @ DBOP_CTRL
+
+3:      ldr     r1, [r0, #0xc]      @ DOBP_STAT
+        ands    r1, r1, #(1<<16)
+        beq     3b                  @ wait for valid data
+
+        ldrh    r1, [r0, #0x14]     @ DBOP_DIN
+
+        tst     r1, #BUTTON_LEFT    @ boot of?
         beq     boot_of
 #elif defined(SANSA_M200V4)
 .set row, (1<<5) /* enable output on A5 */
