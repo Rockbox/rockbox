@@ -181,7 +181,7 @@ void main(void)
     if(rc)
     {
         reset_screen();
-        error(EATA, rc);
+        error(EATA, rc, true);
     }
 
     disk_init();
@@ -189,7 +189,7 @@ void main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
-        error(EDISK,rc);
+        error(EDISK, rc, true);
     }
 
     printf("Loading firmware");
@@ -202,7 +202,7 @@ void main(void)
 
     rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
     if(rc < 0)
-        error(EBOOTFILE, rc);
+        error(EBOOTFILE, rc, true);
 
     storage_close();
     system_prepare_fw_start();

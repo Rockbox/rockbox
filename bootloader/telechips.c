@@ -158,21 +158,21 @@ void* main(void)
     if(rc)
     {
         reset_screen();
-        error(EATA, rc);
+        error(EATA, rc, true);
     }
 
     printf("mount");
     rc = disk_mount_all();
     if (rc<=0)
     {
-        error(EDISK,rc);
+        error(EDISK,rc, true);
     }
 
     rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
 
     if (rc < 0)
     {
-        error(EBOOTFILE,rc);
+        error(EBOOTFILE,rc, true);
     }
     else if (rc == EOK)
     {

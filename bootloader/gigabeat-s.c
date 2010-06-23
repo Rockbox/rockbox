@@ -302,7 +302,7 @@ static void __attribute__((noreturn)) handle_firmware_load(void)
                            load_buf_size);
 
     if(rc < 0)
-        error(EBOOTFILE, rc);
+        error(EBOOTFILE, rc, true);
 
     /* Pause to look at messages */
     pause_if_button_pressed(false);
@@ -359,7 +359,7 @@ void main(void)
     if(rc)
     {
         reset_screen();
-        error(EATA, rc);
+        error(EATA, rc, true);
     }
 
     disk_init();
@@ -367,7 +367,7 @@ void main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
-        error(EDISK,rc);
+        error(EDISK, rc, true);
     }
 
     printf("Init complete");

@@ -96,7 +96,7 @@ void main(void)
 
         ret = disk_mount_all();
         if (ret <= 0)
-            error(EDISK, ret);
+            error(EDISK, ret, true);
         
         printf("Loading Rockbox firmware...");
 
@@ -105,7 +105,7 @@ void main(void)
 
         ret = load_firmware(loadbuffer, BOOTFILE, buffer_size);
         if(ret < 0)
-            error(EBOOTFILE, ret);
+            error(EBOOTFILE, ret, true);
         
         else if(ret == EOK)
         {

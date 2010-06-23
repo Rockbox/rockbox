@@ -124,7 +124,7 @@ void* main(void)
 
     if (num_partitions<=0)
     {
-        error(EDISK,num_partitions);
+        error(EDISK, num_partitions, true);
     }
 
     pinfo = disk_partinfo(1);

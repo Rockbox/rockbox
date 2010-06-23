@@ -540,7 +540,7 @@ void* main(void)
         }
         printf(buf);
     } else {
-        error(EATA, i);
+        error(EATA, i, true);
     }
 #endif
 
@@ -548,7 +548,7 @@ void* main(void)
     num_partitions = disk_mount_all();
     if (num_partitions<=0)
     {
-        error(EDISK,num_partitions);
+        error(EDISK,num_partitions, true);
     }
 
     /* Just list the first 2 partitions since we don't have any devices yet 
@@ -643,7 +643,7 @@ void* main(void)
             return (void*)loadbuffer;
         }
         
-        error(0, 0);
+        error(0, 0, true);
     }
     return (void*)loadbuffer;
 }

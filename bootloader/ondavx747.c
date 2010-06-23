@@ -94,7 +94,7 @@ static int boot_of(void)
     printf("Mounting disk...");
     rc = disk_mount_all();
     if (rc <= 0)
-        error(EDISK,rc);
+        error(EDISK, rc, true);
 
     /* TODO: get this from the NAND flash instead of SD */
     fd = open("/ccpmp.bin", O_RDONLY);
@@ -147,7 +147,7 @@ static int boot_rockbox(void)
     printf("Mounting disk...");
     rc = disk_mount_all();
     if (rc <= 0)
-        error(EDISK,rc);
+        error(EDISK,rc, true);
 
     printf("Loading firmware...");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
@@ -172,7 +172,7 @@ static void reset_configuration(void)
 
     rc = disk_mount_all();
     if (rc <= 0)
-        error(EDISK,rc);
+        error(EDISK,rc, true);
 
     if(rename(ROCKBOX_DIR "/config.cfg", ROCKBOX_DIR "/config.old") == 0)
         show_splash(HZ/2, "Configuration reset successfully!");
@@ -271,7 +271,7 @@ int main(void)
 
     rc = storage_init();
     if(rc)
-        error(EATA, rc);
+        error(EATA, rc, true);
 
     /* Don't mount the disks yet, there could be file system/partition errors
        which are fixable in USB mode */

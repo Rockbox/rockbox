@@ -118,7 +118,7 @@ char *strerror(int error)
     }
 }
 
-void error(int errortype, int error)
+void error(int errortype, int error, bool shutdown)
 {
     switch(errortype)
     {
@@ -137,7 +137,8 @@ void error(int errortype, int error)
 
     lcd_update();
     sleep(5*HZ);
-    power_off();
+    if(shutdown)
+        power_off();
 }
 
 /* Load firmware image in a format created by tools/scramble */
