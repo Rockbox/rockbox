@@ -28,11 +28,17 @@
 /*
  * initialize the reader module
  *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          enabled buffer size
+ *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init_reader(void);
+bool tv_init_reader(unsigned char **buf, size_t *bufsize);
 
 /* finalize the reader module */
 void tv_finalize_reader(void);

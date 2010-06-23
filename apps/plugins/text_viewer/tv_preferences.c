@@ -23,9 +23,10 @@
 #include "plugin.h"
 #include "tv_preferences.h"
 
-/* global preferences */
+
 static struct tv_preferences prefs;
-struct tv_preferences *preferences = &prefs;
+/* read-only preferences pointer, for access by other files */
+const struct tv_preferences * const preferences = &prefs;
 
 static int listner_count = 0;
 
@@ -66,24 +67,6 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp)
     }
 }
 
-static void tv_check_header_and_footer(void)
-{
-    if (rb->global_settings->statusbar != STATUSBAR_TOP)
-    {
-        if (preferences->header_mode == HD_SBAR)
-            preferences->header_mode = HD_NONE;
-        else if (preferences->header_mode == HD_BOTH)
-            preferences->header_mode = HD_PATH;
-    }
-    if (rb->global_settings->statusbar != STATUSBAR_BOTTOM)
-    {
-        if (preferences->footer_mode == FT_SBAR)
-            preferences->footer_mode = FT_NONE;
-        else if (preferences->footer_mode == FT_BOTH)
-            preferences->footer_mode = FT_PAGE;
-    }
-}
-
 void tv_set_preferences(const struct tv_preferences *new_prefs)
 {
     static struct tv_preferences old_prefs;
@@ -94,8 +77,7 @@ void tv_set_preferences(const struct tv_preferences *new_prefs)
         tv_copy_preferences((oldp = &old_prefs));
     is_initialized = true;
 
-    rb->memcpy(preferences, new_prefs, sizeof(struct tv_preferences));
-    tv_check_header_and_footer();
+    rb->memcpy(&prefs, new_prefs, sizeof(struct tv_preferences));
     tv_notify_change_preferences(oldp);
 }
 

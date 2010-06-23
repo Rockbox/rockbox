@@ -67,6 +67,40 @@ static bool tv_set_font(const unsigned char *font)
     return true;
 }
 
+static bool tv_check_header_and_footer(struct tv_preferences *new_prefs)
+{
+    bool change_prefs = false;
+
+    if (rb->global_settings->statusbar != STATUSBAR_TOP)
+    {
+        if (new_prefs->header_mode == HD_SBAR)
+        {
+            new_prefs->header_mode = HD_NONE;
+            change_prefs = true;
+        }
+        else if (new_prefs->header_mode == HD_BOTH)
+        {
+            new_prefs->header_mode = HD_PATH;
+            change_prefs = true;
+        }
+    }
+    if (rb->global_settings->statusbar != STATUSBAR_BOTTOM)
+    {
+        if (new_prefs->footer_mode == FT_SBAR)
+        {
+            new_prefs->footer_mode = FT_NONE;
+            change_prefs = true;
+        }
+        else if (new_prefs->footer_mode == FT_BOTH)
+        {
+            new_prefs->footer_mode = FT_PAGE;
+            change_prefs = true;
+        }
+    }
+
+    return change_prefs;
+}
+
 static void tv_show_header(void)
 {
     unsigned header_mode = header_mode;
@@ -259,6 +293,9 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 #ifdef HAVE_LCD_BITMAP
     static bool font_changing = false;
     const unsigned char *font_str;
+    bool change_prefs = false;
+    struct tv_preferences new_prefs;
+    tv_copy_preferences(&new_prefs);
 
     font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
 
@@ -268,14 +305,17 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
         font_changing = true;
         if (!tv_set_font(preferences->font_name))
         {
-            struct tv_preferences new_prefs;
-            tv_copy_preferences(&new_prefs);
-
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
-            tv_set_preferences(&new_prefs);
-            return;
+            change_prefs = true;
         }
     }
+
+    if (tv_check_header_and_footer(&new_prefs) || change_prefs)
+    {
+        tv_set_preferences(&new_prefs);
+        return;
+    }
+
     font_changing = false;
 
     /* calculates display lines */
@@ -319,10 +359,10 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     tv_set_read_conditions(preferences->windows, window_width);
 }
 
-bool tv_init_window(void)
+bool tv_init_window(unsigned char **buf, size_t *size)
 {
     tv_add_preferences_change_listner(tv_change_preferences);
-    return tv_init_text_reader();
+    return tv_init_text_reader(buf, size);
 }
 
 void tv_finalize_window(void)

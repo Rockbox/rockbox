@@ -26,8 +26,17 @@
 /*
  * initialize the text processor module
  *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          enabled buffer size
+ *
+ * return
+ *     true  initialize success
+ *     false initialize failure
  */
-void tv_init_text_processor(void);
+bool tv_init_text_processor(unsigned char **buf, size_t *bufsize);
 
 /*
  * set the processing conditions

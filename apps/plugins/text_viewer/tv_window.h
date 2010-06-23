@@ -26,11 +26,17 @@
 /*
  * initialize the window module
  *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          enabled buffer size
+ *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init_window(void);
+bool tv_init_window(unsigned char **buf, size_t *bufsize);
 
 /* finalize the window module */
 void tv_finalize_window(void);

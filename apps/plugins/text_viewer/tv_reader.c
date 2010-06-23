@@ -170,18 +170,18 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     tv_seek(cur_file_pos + cur_start_file_pos - start_file_pos, SEEK_SET);
 }
 
-bool tv_init_reader(void)
+bool tv_init_reader(unsigned char **buf, size_t *size)
 {
-    size_t size;
-
-    /* get the plugin buffer */
-    reader_buffer = rb->plugin_get_buffer(&size);
-
-    if (size < 2 * TV_MIN_BLOCK_SIZE)
+    if (*size < 2 * TV_MIN_BLOCK_SIZE)
         return false;
 
-    block_size    = size / 2;
+    block_size    = *size / 2;
     buffer_size   = 2 * block_size;
+    reader_buffer = *buf;
+
+    *buf += buffer_size;
+    *size -= buffer_size;
+
     tv_add_preferences_change_listner(tv_change_preferences);
 
     return true;

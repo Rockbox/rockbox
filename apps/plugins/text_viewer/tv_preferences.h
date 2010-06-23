@@ -122,9 +122,9 @@ struct tv_preferences {
 };
 
 /*
- *     global pointer to the preferences
+ *     global pointer to the preferences (read-only)
  */
-extern struct tv_preferences *preferences;
+extern const struct tv_preferences * const preferences;
 
 /*
  * change the preferences

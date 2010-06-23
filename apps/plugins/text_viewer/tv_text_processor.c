@@ -544,11 +544,16 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     return size;
 }
 
-void tv_init_text_processor(void)
+bool tv_init_text_processor(unsigned char **buf, size_t *size)
 {
+    /* unused : no need for dynamic buffer yet */
+    (void)buf;
+    (void)size;
+
     text_type = TV_TEXT_UNKNOWN;
     expand_extra_line = false;
     is_break_line = false;
+    return true;
 }
 
 void tv_set_creation_conditions(int blocks, int width)

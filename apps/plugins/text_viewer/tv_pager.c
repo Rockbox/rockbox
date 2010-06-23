@@ -85,7 +85,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     tv_seek(0, SEEK_SET);
 }
 
-bool tv_init_pager(void)
+bool tv_init_pager(unsigned char **buf, size_t *size)
 {
     tv_set_screen_pos(&cur_pos);
     tv_add_preferences_change_listner(tv_change_preferences);
@@ -95,7 +95,7 @@ bool tv_init_pager(void)
 
     line_pos[0] = 0;
 
-    return tv_init_reader();
+    return tv_init_reader(buf, size);
 }
 
 void tv_finalize_pager(void)

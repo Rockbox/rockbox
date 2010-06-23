@@ -30,10 +30,15 @@
 
 bool tv_init(const unsigned char *file)
 {
+    size_t size;
+
+    /* get the plugin buffer */
+    unsigned char *buf = rb->plugin_get_buffer(&size);
+
     tv_init_bookmark();
 
     /* initialize modules */
-    if (!tv_init_window())
+    if (!tv_init_window(&buf, &size))
         return false;
 
     /* load the preferences and bookmark */

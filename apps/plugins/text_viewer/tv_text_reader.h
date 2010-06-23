@@ -26,11 +26,17 @@
 /*
  * initialize the text reader module
  *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          enabled buffer size
+ *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init_text_reader(void);
+bool tv_init_text_reader(unsigned char **buf, size_t *bufsize);
 
 /* finalize the text reader module */
 void tv_finalize_text_reader(void);

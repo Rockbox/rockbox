@@ -30,11 +30,17 @@
 /*
  * initialize the pager module
  *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          buffer size
+ *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init_pager(void);
+bool tv_init_pager(unsigned char **buf, size_t *bufsize);
 
 /* finalize the pager module */
 void tv_finalize_pager(void);
