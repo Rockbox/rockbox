@@ -51,4 +51,4 @@ ifneq ($(SVNVERSION),$(OLDSVNVERSION))
 endif
 
 $(BUILDDIR)/version.h:
-	$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
+	$(call PRINTS,GEN $(@F))$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
