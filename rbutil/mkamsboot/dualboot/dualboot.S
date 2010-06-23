@@ -255,7 +255,6 @@ uclcopy:
 .set BUTTON_UP,        (1<< 5)
 .set BUTTON_RIGHT,     (1<< 6)
 .set BUTTON_HOLD,      (1<<12)
-.set ENRD0_USB_STATUS, (1<< 3)
 
         ldr     r0, =CGU_DBOP
         mov     r1, #(1<<3)         @ DBOP freq = PCLK, clock enabled
