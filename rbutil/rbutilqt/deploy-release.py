@@ -496,6 +496,8 @@ def main():
     elif sys.platform == "darwin":
         archive = macdeploy(ver, sourcefolder)
     else:
+        if os.uname()[4].endswith("64"):
+            ver += "-64bit"
         archive = tarball(ver, sourcefolder)
 
     # remove temporary files
