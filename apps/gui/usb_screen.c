@@ -41,6 +41,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
+#include "skin_engine/skin_fonts.h"
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -261,6 +262,14 @@ void gui_usb_screen_run(void)
     usb_keypad_mode = global_settings.usb_keypad_mode;
 #endif
 
+    /* The font system leaves the .fnt fd's open, so we need for force close them all */
+#ifdef HAVE_LCD_BITMAP
+    font_reset(NULL);
+#ifdef HAVE_REMOTE_LCD
+    font_load_remoteui(NULL);
+#endif
+    skin_font_init(); /* unload all the skin fonts */
+#endif
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
@@ -314,6 +323,11 @@ void gui_usb_screen_run(void)
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);
 #endif /* HAVE_LCD_CHARCELLS */
+#ifdef HAVE_LCD_BITMAP
+    /* Not pretty, reload all settings so fonts are loaded again correctly */
+    settings_apply(true);
+    settings_apply_skins();
+#endif
 
     FOR_NB_SCREENS(i)
     {
