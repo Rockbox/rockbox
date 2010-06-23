@@ -23,16 +23,32 @@
 #define RBIMAGE_H
 
 #include <QPixmap>
+#include <QGraphicsItem>
 
-class RBImage
+class RBImage: public QGraphicsItem
 {
 public:
-    RBImage(QString file, int tiles = 0);
-    void draw(QPainter* painter, int x, int y, int tile = 0);
+    RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent = 0);
+    virtual ~RBImage();
+
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
+
+    void setTile(int tile)
+    {
+        currentTile = tile;
+        if(currentTile > tiles - 1)
+            currentTile = tiles -1;
+    }
+
 
 private:
-    QPixmap image;
+    QPixmap* image;
     int tiles;
+    int currentTile;
+
+    QRectF size;
 
 };
 

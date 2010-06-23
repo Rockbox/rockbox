@@ -20,19 +20,55 @@
  ****************************************************************************/
 
 #include <QPainter>
+#include <QFile>
+#include <QBitmap>
 
 #include "rbimage.h"
 
-RBImage::RBImage(QString file, int tiles)
-    :image(file), tiles(tiles)
+RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
+                     : QGraphicsItem(parent), tiles(tiles), currentTile(0)
 {
+    if(QFile::exists(file))
+    {
+        image = new QPixmap(file);
+
+        if(image->isNull())
+        {
+            delete image;
+            image = 0;
+            return;
+        }
+        else
+        {
+            image->setMask(image->createMaskFromColor(QColor(255,0,255)));
+
+        }
+
+        size = QRectF(x, y, image->width(), image->height() / tiles);
+
+    }
+    else
+        image = 0;
 }
 
-void RBImage::draw(QPainter *painter, int x, int y, int tile)
+RBImage::~RBImage()
 {
-    if(tiles == 0)
-        painter->drawPixmap(x, y, image.width(), image.height(), image);
-    else
-        painter->drawPixmap(x, y, image, 0, tile * (image.height() / tiles),
-                            image.width(), image.height() / tiles);
+    if(image)
+        delete image;
+}
+
+QRectF RBImage::boundingRect() const
+{
+    return size;
+}
+
+void RBImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                    QWidget *widget)
+{
+    if(!image)
+        return;
+
+    painter->drawPixmap(size, *image, QRect(0, currentTile * image->height()
+                                            / tiles, image->width(),
+                                            image->height() / tiles));
 }

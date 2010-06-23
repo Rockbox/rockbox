@@ -37,6 +37,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         /* Default viewport takes up the entire screen */
         size = QRectF(0, 0, info.screen()->getWidth(),
                       info.screen()->getHeight());
+        customUI = false;
 
         if(info.model()->rowCount(QModelIndex()) > 1)
         {
@@ -122,8 +123,9 @@ QRectF RBViewport::boundingRect() const
 void RBViewport::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QColor color = customUI ? Qt::blue : Qt::red;
-    painter->fillRect(size, color);
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(customUI ? Qt::blue : Qt::red);
+    painter->drawRect(size);
 }
 
 /* Called at the end of a logical line */

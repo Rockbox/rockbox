@@ -54,6 +54,7 @@ public:
     void loadImage(QString name, RBImage* image)
     {
         images.insert(name, image);
+        image->hide();
     }
     RBImage* getImage(QString name){ return images.value(name, 0); }
 

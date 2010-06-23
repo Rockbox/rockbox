@@ -25,6 +25,8 @@
 #include "parsetreenode.h"
 #include "parsetreemodel.h"
 
+#include "rbimage.h"
+
 #include <iostream>
 
 int ParseTreeNode::openConditionals = 0;
@@ -504,6 +506,8 @@ void ParseTreeNode::render(const RBRenderInfo& info)
 
     for(int i = element->params_count; i < children.count(); i++)
         children[i]->render(info, dynamic_cast<RBViewport*>(rendered));
+
+    std::cout << rendered->children().count() << std::endl;
 }
 
 /* This version is called for logical lines and such */
@@ -518,17 +522,56 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     else if(element->type == TAG)
     {
         QString filename;
+        QString id;
+        int x, y, tiles;
+        RBImage* image;
 
         /* Two switch statements to narrow down the tag name */
         switch(element->tag->name[0])
         {
+
+        case 'x':
+            switch(element->tag->name[1])
+            {
+            case 'l':
+                /* %xl */
+                id = element->params[0].data.text;
+                filename = info.settings()->value("imagepath", "") + "/" +
+                           element->params[1].data.text;
+                x = element->params[2].data.numeric;
+                y = element->params[3].data.numeric;
+                if(element->params_count > 4)
+                    tiles = element->params[4].data.numeric;
+                else
+                    tiles = 1;
+
+                info.screen()->loadImage(id, new RBImage(filename, tiles, x, y,
+                                                         viewport));
+                break;
+
+            case '\0':
+                /* %x */
+                id = element->params[0].data.text;
+                filename = info.settings()->value("imagepath", "") + "/" +
+                           element->params[1].data.text;
+                x = element->params[2].data.numeric;
+                y = element->params[3].data.numeric;
+                image = new RBImage(filename, 1, x, y, viewport);
+                info.screen()->loadImage(id, new RBImage(filename, 1, x, y,
+                                                         viewport));
+                info.screen()->getImage(id)->show();
+                break;
+
+            }
+
+            break;
 
         case 'X':
 
             switch(element->tag->name[1])
             {
             case '\0':
-                /* %X tag */
+                /* %X */
                 filename = QString(element->params[0].data.text);
                 info.screen()->setBackdrop(filename);
                 break;
