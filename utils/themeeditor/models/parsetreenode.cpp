@@ -507,7 +507,6 @@ void ParseTreeNode::render(const RBRenderInfo& info)
     for(int i = element->params_count; i < children.count(); i++)
         children[i]->render(info, dynamic_cast<RBViewport*>(rendered));
 
-    std::cout << rendered->children().count() << std::endl;
 }
 
 /* This version is called for logical lines and such */
