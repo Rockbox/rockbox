@@ -361,7 +361,7 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP|MCI_ARG, &response))
         return -10;
 
-#ifndef BOOTLOADER
+#if 0 /* FIXME : it seems that write corrupts the filesystem */
     /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_tran_state(drive) < 0)
         return -11;
