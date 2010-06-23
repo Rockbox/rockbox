@@ -27,8 +27,10 @@
 #include <inttypes.h>
 #include "config.h"
 #include "lcd.h"
+#ifdef USE_ROCKBOX_USB
 #include "usb.h"
 #include "sysfont.h"
+#endif /* USE_ROCKBOX_USB */
 #include "backlight.h"
 #include "button-target.h"
 #include "common.h"
@@ -39,6 +41,7 @@
 
 int show_logo(void);
 
+#ifdef USE_ROCKBOX_USB
 static void usb_mode(void)
 {
     if(usb_detect() != USB_INSERTED)
@@ -65,6 +68,7 @@ static void usb_mode(void)
     reset_screen();
     lcd_update();
 }
+#endif /* USE_ROCKBOX_USB */
 
 void main(void) __attribute__((noreturn));
 void main(void)
@@ -111,20 +115,30 @@ void main(void)
     if(ret < 0)
         error(EATA, ret, true);
 
+#ifdef USE_ROCKBOX_USB
     usb_init();
     usb_start_monitoring();
 
     /* Enter USB mode if USB is plugged and SELECT button is pressed */
     if(btn & BUTTON_SELECT && usb_detect() == USB_INSERTED)
         usb_mode();
+#endif /* USE_ROCKBOX_USB */
 
     while(!disk_init(IF_MV(0)))
+#ifdef USE_ROCKBOX_USB
         usb_mode();
+#else
+        panicf("disk_init failed!");
+#endif
 
     while((ret = disk_mount_all()) <= 0)
     {
+#ifdef USE_ROCKBOX_USB
         error(EDISK, ret, false);
         usb_mode();
+#else
+        error(EDISK, ret, true);
+#endif
     }
 
     printf("Loading firmware");
@@ -134,8 +148,12 @@ void main(void)
 
     while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) < 0)
     {
+#ifdef USE_ROCKBOX_USB
         error(EBOOTFILE, ret, false);
         usb_mode();
+#else
+        error(EBOOTFILE, ret, true);
+#endif
     }
 
     kernel_entry = (void*) loadbuffer;
