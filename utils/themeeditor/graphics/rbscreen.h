@@ -59,6 +59,7 @@ public:
     RBImage* getImage(QString name){ return images.value(name, 0); }
 
     void setBackdrop(QString filename);
+    void makeCustomUI(QString id);
 
     static QColor stringToColor(QString str, QColor fallback);
 

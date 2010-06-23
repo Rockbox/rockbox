@@ -40,6 +40,12 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
+    void setBGColor(QColor color){ background = color; }
+    void setFGColor(QColor color){ foreground = color; }
+    void makeCustomUI(){ customUI = true; }
+    void clearCustomUI(){ customUI = false; }
+
+
     void newline();
 
 private:

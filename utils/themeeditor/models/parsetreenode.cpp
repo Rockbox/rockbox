@@ -592,6 +592,42 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
 
             break;
 
+        case 'V':
+
+            switch(element->tag->name[1])
+            {
+
+            case 'b':
+                /* %Vb */
+                viewport->setBGColor(RBScreen::
+                                     stringToColor(QString(element->params[0].
+                                                           data.text),
+                                                   Qt::white));
+                break;
+
+            case 'd':
+                /* %Vd */
+                id = element->params[0].data.text;
+                info.screen()->showViewport(id);
+                break;
+
+            case 'f':
+                /* %Vf */
+                viewport->setFGColor(RBScreen::
+                                     stringToColor(QString(element->params[0].
+                                                           data.text),
+                                                   Qt::black));
+                break;
+
+            case 'I':
+                /* %VI */
+                info.screen()->makeCustomUI(element->params[0].data.text);
+                break;
+
+            }
+
+            break;
+
         case 'X':
 
             switch(element->tag->name[1])

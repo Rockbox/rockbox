@@ -117,6 +117,18 @@ void RBScreen::setBackdrop(QString filename)
         backdrop = 0;
 }
 
+void RBScreen::makeCustomUI(QString id)
+{
+    if(namedViewports.value(id, 0) != 0)
+    {
+        QMap<QString, RBViewport*>::iterator i;
+        for(i = namedViewports.begin(); i != namedViewports.end(); i++)
+            (*i)->clearCustomUI();
+        namedViewports.value(id)->makeCustomUI();
+        namedViewports.value(id)->show();
+    }
+}
+
 QColor RBScreen::stringToColor(QString str, QColor fallback)
 {
 
