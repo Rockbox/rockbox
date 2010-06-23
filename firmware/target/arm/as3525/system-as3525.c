@@ -265,6 +265,12 @@ void system_init(void)
 #endif
                   AS3525_PCLK_SEL);
 
+#if CONFIG_CPU == AS3525
+    cpu_frequency = CPUFREQ_DEFAULT;    /* fastbus */
+#else
+    cpu_frequency = CPUFREQ_MAX;
+#endif
+
 #if !defined(BOOTLOADER) && defined(SANSA_FUZE) || defined(SANSA_CLIP) || defined(SANSA_E200V2)
     /* XXX: remove me when we have a new bootloader */
     MPMC_DYNAMIC_CONTROL = 0x0; /* MPMCCLKOUT stops when all SDRAMs are idle */
