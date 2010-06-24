@@ -29,7 +29,7 @@ extern "C"
 #endif
 
 #include "skin_parser.h"
-
+#ifndef ROCKBOX
 /* Debugging functions */
 void skin_error(enum skin_errorcode error);
 int skin_error_line(void);
@@ -40,6 +40,13 @@ void skin_debug_tree(struct skin_element* root);
 /* Auxiliary debug functions */
 void skin_debug_params(int count, struct skin_tag_parameter params[]);
 void skin_debug_indent(void);
+#else
+
+#define skin_error(...)
+#define skin_clear_errors()
+
+#endif /* !ROCKBOX */
+
 
 #ifdef __cplusplus
 }

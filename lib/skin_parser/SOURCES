@@ -1,5 +1,7 @@
 skin_buffer.c
 skin_parser.c
+#ifndef ROCKBOX
 skin_debug.c
+#endif
 skin_scan.c
 tag_table.c
