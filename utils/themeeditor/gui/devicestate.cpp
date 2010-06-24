@@ -44,7 +44,6 @@ DeviceState::DeviceState(QWidget *parent) :
     QScrollArea* currentArea;
     QHBoxLayout* subLayout;
     QWidget* panel;
-    QWidget* temp;
 
     QFile fin(":/resources/deviceoptions");
     fin.open(QFile::Text | QFile::ReadOnly);
@@ -91,19 +90,25 @@ DeviceState::DeviceState(QWidget *parent) :
         elements = type.split("(");
         if(elements[0].trimmed() == "text")
         {
-            temp = new QLineEdit(defVal, currentArea);
+            QLineEdit* temp = new QLineEdit(defVal, currentArea);
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Text, temp));
+
+            QObject::connect(temp, SIGNAL(textChanged(QString)),
+                             this, SLOT(input()));
         }
         else if(elements[0].trimmed() == "check")
         {
-            temp = new QCheckBox(title, currentArea);
+            QCheckBox* temp = new QCheckBox(title, currentArea);
             subLayout->addWidget(temp);
             if(defVal.toLower() == "true")
-                dynamic_cast<QCheckBox*>(temp)->setChecked(true);
+                temp->setChecked(true);
             else
-                dynamic_cast<QCheckBox*>(temp)->setChecked(false);
+                temp->setChecked(false);
             inputs.insert(tag, QPair<InputType, QWidget*>(Check, temp));
+
+            QObject::connect(temp, SIGNAL(toggled(bool)),
+                             this, SLOT(input()));
         }
         else if(elements[0].trimmed() == "slider")
         {
@@ -113,12 +118,15 @@ DeviceState::DeviceState(QWidget *parent) :
             maxS.chop(1);
             int max = maxS.toInt();
 
-            temp = new QSlider(Qt::Horizontal, currentArea);
-            dynamic_cast<QSlider*>(temp)->setMinimum(min);
-            dynamic_cast<QSlider*>(temp)->setMaximum(max);
-            dynamic_cast<QSlider*>(temp)->setValue(defVal.toInt());
+            QSlider* temp = new QSlider(Qt::Horizontal, currentArea);
+            temp->setMinimum(min);
+            temp->setMaximum(max);
+            temp->setValue(defVal.toInt());
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Slide, temp));
+
+            QObject::connect(temp, SIGNAL(valueChanged(int)),
+                             this, SLOT(input()));
         }
         else if(elements[0].trimmed() == "spin")
         {
@@ -128,12 +136,15 @@ DeviceState::DeviceState(QWidget *parent) :
             maxS.chop(1);
             int max = maxS.toInt();
 
-            temp = new QSpinBox(currentArea);
-            dynamic_cast<QSpinBox*>(temp)->setMinimum(min);
-            dynamic_cast<QSpinBox*>(temp)->setMaximum(max);
-            dynamic_cast<QSpinBox*>(temp)->setValue(defVal.toInt());
+            QSpinBox* temp = new QSpinBox(currentArea);
+            temp->setMinimum(min);
+            temp->setMaximum(max);
+            temp->setValue(defVal.toInt());
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Spin, temp));
+
+            QObject::connect(temp, SIGNAL(valueChanged(int)),
+                             this, SLOT(input()));
         }
         else if(elements[0].trimmed() == "fspin")
         {
@@ -143,32 +154,38 @@ DeviceState::DeviceState(QWidget *parent) :
             maxS.chop(1);
             int max = maxS.toDouble();
 
-            temp = new QDoubleSpinBox(currentArea);
-            dynamic_cast<QDoubleSpinBox*>(temp)->setMinimum(min);
-            dynamic_cast<QDoubleSpinBox*>(temp)->setMaximum(max);
-            dynamic_cast<QDoubleSpinBox*>(temp)->setValue(defVal.toDouble());
-            dynamic_cast<QDoubleSpinBox*>(temp)->setSingleStep(0.1);
+            QDoubleSpinBox* temp = new QDoubleSpinBox(currentArea);
+            temp->setMinimum(min);
+            temp->setMaximum(max);
+            temp->setValue(defVal.toDouble());
+            temp->setSingleStep(0.1);
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(DSpin, temp));
+
+            QObject::connect(temp, SIGNAL(valueChanged(double)),
+                             this, SLOT(input()));
         }
         else if(elements[0].trimmed() == "combo")
         {
             elements = elements[1].trimmed().split(",");
 
             int defIndex;
-            temp = new QComboBox(currentArea);
+            QComboBox* temp = new QComboBox(currentArea);
             for(int i = 0; i < elements.count(); i++)
             {
                 QString current = elements[i].trimmed();
                 if(i == elements.count() - 1)
                     current.chop(1);
-                dynamic_cast<QComboBox*>(temp)->addItem(current, i);
+                temp->addItem(current, i);
                 if(current == defVal)
                     defIndex = i;
             }
-            dynamic_cast<QComboBox*>(temp)->setCurrentIndex(defIndex);
+            temp->setCurrentIndex(defIndex);
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Combo, temp));
+
+            QObject::connect(temp, SIGNAL(currentIndexChanged(int)),
+                             this, SLOT(input()));
         }
 
     }
@@ -206,4 +223,11 @@ QVariant DeviceState::data(QString tag)
     case Check:
         return dynamic_cast<QCheckBox*>(found.second)->isChecked();
     }
+
+    return QVariant();
+}
+
+void DeviceState::input()
+{
+    emit settingsChanged();
 }

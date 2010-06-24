@@ -48,6 +48,12 @@ public:
 
     QVariant data(QString tag);
 
+signals:
+    void settingsChanged();
+
+private slots:
+    void input();
+
 private:
     QMap<QString, QPair<InputType, QWidget*> > inputs;
     QTabWidget tabs;
