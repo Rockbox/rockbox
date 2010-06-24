@@ -272,10 +272,12 @@ mpc_decoder * mpc_decoder_init(mpc_streaminfo *si)
     return p_tmp;
 }
 
+/* rockbox: not used
 void mpc_decoder_exit(mpc_decoder *d)
 {
     (void)d;
 }
+*/
 
 void mpc_decoder_decode_frame(mpc_decoder * d,
                               mpc_bits_reader * r,

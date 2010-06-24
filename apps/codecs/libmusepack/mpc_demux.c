@@ -155,7 +155,7 @@ mpc_demux_seek(mpc_demux * d, mpc_seek_t fpos, mpc_uint32_t min_bytes) {
  * @param d demuxer context
  * @return current stream position in bits
  */
-mpc_seek_t mpc_demux_pos(mpc_demux * d)
+static mpc_seek_t mpc_demux_pos(mpc_demux * d)
 {
     return (((mpc_seek_t)(d->r->tell(d->r)) - d->bytes_total +
              d->bits_reader.buff - d->buffer) << 3) + 8 - d->bits_reader.count;
@@ -300,8 +300,10 @@ static void mpc_demux_SP(mpc_demux * d, int size, int block_size)
     mpc_demux_seek(d, (ptr - size) * 8 + cur, 11);
     st_head_size = mpc_bits_get_block(&d->bits_reader, &b);
     if (memcmp(b.key, "ST", 2) == 0) {
+/* rockbox: not used
         d->chap_pos = (ptr - size + b.size + st_head_size) * 8 + cur;
         d->chap_nb = -1;
+*/
         mpc_demux_fill(d, (mpc_uint32_t) b.size, 0);
         mpc_demux_ST(d);
     }
@@ -480,7 +482,9 @@ mpc_demux * mpc_demux_init(mpc_reader * p_reader)
         memset(p_tmp, 0, sizeof(mpc_demux));
         p_tmp->buffer  = g_buffer;
         p_tmp->r       = p_reader;
+/* rockbox: not used
         p_tmp->chap_nb = -1;
+*/
         mpc_demux_clear_buff(p_tmp);
         if (mpc_demux_header(p_tmp) == MPC_STATUS_OK &&
                   mpc_demux_seek_init(p_tmp) == MPC_STATUS_OK) {
@@ -495,11 +499,13 @@ mpc_demux * mpc_demux_init(mpc_reader * p_reader)
     return p_tmp;
 }
 
+/* rockbox: not used
 void mpc_demux_exit(mpc_demux * d)
 {
     mpc_decoder_exit(d->d);
     memset(d->seek_table, 0, sizeof(g_seek_table));
 }
+*/
 
 void mpc_demux_get_info(mpc_demux * d, mpc_streaminfo * i)
 {
@@ -567,10 +573,12 @@ error:
         return MPC_STATUS_INVALIDSV;
 }
 
+/* rockbox: not used
 mpc_status mpc_demux_seek_second(mpc_demux * d, double seconds)
 {
     return mpc_demux_seek_sample(d, (mpc_int64_t)(seconds * (double)d->si.sample_freq + 0.5));
 }
+*/
 
 mpc_status mpc_demux_seek_sample(mpc_demux * d, mpc_uint64_t destsample)
 {

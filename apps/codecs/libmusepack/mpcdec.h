@@ -95,6 +95,7 @@ typedef struct mpc_frame_info_t {
     mpc_bool_t is_key_frame;    /// 1 if this frame is a key frame (first in block) 0 else. Set by the demuxer.
 } mpc_frame_info;
 
+/* rockbox: not used
 typedef struct mpc_chap_info_t {
     mpc_uint64_t sample;    /// sample where the chapter starts
     mpc_uint16_t gain;      /// replaygain chapter value
@@ -102,14 +103,17 @@ typedef struct mpc_chap_info_t {
     mpc_uint_t tag_size;    /// size of the tag element (0 if no tag is present for this chapter)
     char * tag;             /// pointer to an APEv2 tag without the preamble
 } mpc_chap_info;
+*/
 
 /// Initializes mpc decoder with the supplied stream info parameters.
 /// \param si streaminfo structure indicating format of source stream
 /// \return pointer on the initialized decoder structure if successful, 0 if not
 MPC_API mpc_decoder * mpc_decoder_init(mpc_streaminfo *si);
 
+/* rockbox: not used
 /// Releases input mpc decoder
 MPC_API void mpc_decoder_exit(mpc_decoder *p_dec);
+*/
 
 /**
  * Sets decoder sample scaling factor.  All decoded samples will be multiplied
@@ -129,8 +133,10 @@ MPC_API void mpc_decoder_decode_frame(mpc_decoder * d, mpc_bits_reader * r, mpc_
  * @return an initialized mpc_demux pointer
  */
 MPC_API mpc_demux * mpc_demux_init(mpc_reader * p_reader);
+/* rockbox: not used
 /// free demuxer
 MPC_API void mpc_demux_exit(mpc_demux * d);
+*/
 /**
  * Calls mpc_decoder_scale_output to set the scaling factor according to the
  * replay gain stream information and the supplied ouput level
@@ -150,11 +156,15 @@ MPC_API mpc_status mpc_demux_decode(mpc_demux * d, mpc_frame_info * i);
 MPC_API void mpc_demux_get_info(mpc_demux * d, mpc_streaminfo * i);
 /// seeks to a given sample
 MPC_API mpc_status mpc_demux_seek_sample(mpc_demux * d, mpc_uint64_t destsample);
+/* rockbox: not used
 /// seeks to a given second
 MPC_API mpc_status mpc_demux_seek_second(mpc_demux * d, double seconds);
+*/
 
+/* rockbox: keep static
 /// \return the current position in the stream (in bits) from the beginning of the file
 MPC_API mpc_seek_t mpc_demux_pos(mpc_demux * d);
+*/
 
 /// chapters : only for sv8 streams
 /**

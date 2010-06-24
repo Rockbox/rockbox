@@ -78,10 +78,11 @@ struct mpc_demux_t {
     mpc_uint32_t seek_table_size; /// used size in seek_table
 
     // chapters
+/* rockbox: not used
     mpc_seek_t chap_pos; /// supposed position of the first chapter block
     mpc_int_t chap_nb; /// number of chapters (-1 if unknown, 0 if no chapter)
     mpc_chap_info * chap; /// chapters position and tag
-
+*/
 };
 
 /**
