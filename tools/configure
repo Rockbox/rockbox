@@ -118,7 +118,7 @@ simcc () {
  winbuild="$crosscompile"
  GCCOPTS='-W -Wall -g -fno-builtin'
  GCCOPTIMIZE=''
- LDOPTS=''
+ LDOPTS='-lm' # button-sdl.c uses sqrt()
 
  # default output binary name
  output="rockboxui"
@@ -130,7 +130,7 @@ simcc () {
    CYGWIN*)
    echo "Cygwin host detected"
 
-   LDOPTS="-mconsole"
+   LDOPTS="$LDOPTS -mconsole"
    output="rockboxui.exe"
    winbuild="yes"
    ;;
@@ -138,21 +138,24 @@ simcc () {
    MINGW*)
    echo "MinGW host detected"
 
-   LDOPTS="-mconsole"
+   LDOPTS="$LDOPTS -mconsole"
    output="rockboxui.exe"
    winbuild="yes"
    ;;
 
    Linux)
    echo "Linux host detected"
+   LDOPTS="$LDOPTS -ldl"
    ;;
 
    FreeBSD)
    echo "FreeBSD host detected"
+   LDOPTS="$LDOPTS -ldl"
    ;;
 
    Darwin)
    echo "Darwin host detected"
+   LDOPTS="$LDOPTS -ldl"
 
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    ;;
@@ -161,7 +164,7 @@ simcc () {
    echo "*Solaris host detected"
 
    GCCOPTS="$GCCOPTS -fPIC"
-   LDOPTS="-lm"
+   LDOPTS="$LDOPTS -ldl"
    ;;
 
    *)
