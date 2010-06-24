@@ -46,3 +46,135 @@ iC ; Comment ; text ; Current Comment
 iv ; ID3 Version ; fspin(1,2.4); 2.0
 iy ; Year ; spin(1000,2020) ; 2008
 ik ; Disk Number ; spin(1,100) ; 1
+
+[Next Track ID3 Info]
+Ia ; Next Track Artist ; text ; Next Artist
+Ic ; Next Track Composer ; text ; Next Composer
+IA ; Next Track Album Artist ; text ; Next Album Artist
+Id ; Next Track Album Name ; text ; Next Album Name
+IG ; Next Track Grouping ; text ; Next Grouping
+Ig ; Next Track Genre Name ; text ; Next Genre
+In ; Next Track Track number ; spin(1,100) ; 3
+It ; Next Track Track Title ; text ; Next Title
+IC ; Next Track Comment ; text ; Next Comment
+Iv ; Next Track ID3 Version ; fspin(1,2.4); 2.0
+Iy ; Next Track Year ; spin(1000,2020) ; 2008
+Ik ; Next Track Disk Number ; spin(1,100) ; 1
+
+[File Info]
+fb ; Bitrate (kbps) ; spin(1,2048) ; 256
+fc ; Codec ; combo(MP1, MP2, MP3, AIFF, WAV, OGG, FLAC, MPC, AC3, WV, ALAC, AAC, SHN, SID, ADX, NSF, Speex, SPC, APE, WMA) ; OGG
+ff ; Frequency (Hz) ; spin(1,100000) ; 42000
+fk ; Frequency (KHz) ; fspin(1, 100) ; 42
+fm ; Name ; text ; Current File Name.a
+fn ; Name (w/o extension) ; text ; Current File Name
+fp ; Path ; text ; /current/file/path/
+fs ; Size (KB) ; spin(1,100000) ; 3000
+fv ; Variable Bit Rate ; check ; true
+d1 ; cd up ; text ; /current/file/
+d2 ; cd up x2 ; text ; /current/
+d3 ; cd up x3 ; text ; /
+
+[Next File Info]
+Fb ; Next File Bitrate (kbps) ; spin(1,2048) ; 256
+Fc ; Next File Codec ; combo(MP1, MP2, MP3, AIFF, WAV, OGG, FLAC, MPC, AC3, WV, ALAC, AAC, SHN, SID, ADX, NSF, Speex, SPC, APE, WMA) ; OGG
+Ff ; Next File Frequency (Hz) ; spin(1,100000) ; 42000
+Fk ; Next File Frequency (KHz) ; fspin(1, 100) ; 42
+Fm ; Next File Name ; text ; Next File Name.a
+Fn ; Next File Name (w/o extension) ; text ; Next File Name
+Fp ; Next File Path ; text ; /next/file/path/
+Fs ; Next File Size (KB) ; spin(1,100000) ; 3000
+Fv ; Next File Variable Bit Rate ; check ; true
+D1 ; Next File cd up ; text ; /next/file/
+D2 ; Next File cd up x2 ; text ; /next/
+D3 ; Next File cd up x3 ; text ; /
+
+[Playlist/Song Info]
+px ; Percent Played ; spin(0,100) ; 50
+pc ; Current Time In Song ; text ; 1:00
+pe ; Playlist Entries ; spin(0,1000) ; 20
+pn ; Playlist Name ; text ; Current Playlist
+pp ; Playlist Position ; spin(0,1000) ; 10
+pr ; Time Remaining ; text ; 2:00
+ps ; Shuffle ; check ; true
+pt ; Total Track Time ; text ; 3:00
+pv ; Current Volume (dB) ; spin(-100,100) ; 0
+$pv ; Current Volume (Conditional) ; combo(Mute, Below 0 dB, 0 dB, Above 0 dB) ; 0 dB
+pS ; Track Starting ; check ; true
+pE ; Track Ending ; check ; false
+Sp ; Playback Pitch ; fspin(50,200) ; 100
+rp ; Song Playcount ; spin(0,10000) ; 20
+rr ; Song Rating ; spin(0,10) ; 5
+ra ; Autoscore ; spin(0,10) ; 7
+$C ; Album Art Available ; check ; true
+
+[Hardware Status]
+bl ; Battery Level (-1 for unknown) ; spin(-1,100) ; 50
+bv ; Battery Volts ; spin(0,20) ; 5
+bt ; Time Left (-1 for unknown) ; spin(-1,500); 100
+bp ; Charger Connected ; check ; true
+bc ; Charging ; check ; false
+bs ; Sleep Time Left ; spin(0,500) ; 100
+mh ; Hold Switch ; check ; true
+mr ; Remote Hold Switch ; check ; false
+lh ; Hard Disk Activity ; check ; true
+
+[Playback Status]
+rg ; Replaygain Value (dB) ; fspin(-100,20) ; 0
+$rg ; Replaygain Status (Conditional) ; combo(Off, Track, Album, TrackShuffle, AlbumShuffle, No Tag) ; Off
+mm ; Repeat Mode ; combo(Off, All, One, Shuffle, A-B) ; All
+mp ; Playback Mode ; combo(Stop, Play, Pause, Fast Forward, Rewind, Recording, Recording Paused, FM Radio Playing, FM Radio Muted) ; Play
+xf ; Crossfade Type ; combo(Off, Automatic Track Skip Only, Shuffle, Shuffle or Manual Track Skip, Always) ; Always
+
+[Clock]
+cc ; Has Realtime Clock ; check ; true
+cd ; Day of Month ; text ; 05
+ce ; Day of Month (No Padding) ; text ; 5
+cf ; 24 Hour Format ; check ; true
+cH ; 24h Hour ; text ; 09
+ck ; 24h Hour (No Padding) ; text ; 9
+cI ; 12h Hour ; text ; 09
+cl ; 12h Hour (No Padding) ; text ; 9
+cm ; Month (Padded) ; text ; 03
+$cm ; Month (Conditional) ; combo(January, February, March, April, May, Jun, July, August, September, October, November, December) ; January
+cM ; Minute (Padded) ; text ; 29
+cS ; Second (Padded) ; text ; 50
+cy ; Last Two Digits of Year (Padded) ; text ; 09
+cY ; Year ; text ; 2009
+cP ; Uppercase AM or PM ; combo(AM,PM) ; AM
+cp ; Lowercase AM or PM ; combo(am,pm) ; am
+ca ; Abbreviated Weekday Name ; combo(Sun, Mon, Tue, Thu, Fri, Sat); Tue
+cb ; Abbreviated Month Name ; combo(Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) ; Jan
+cu ; Day of Week (1..7, 1 is Monday) ; spin(1,7) ; 2
+$cu ; Day of Week (Monday First, Conditional) ; combo(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
+cw ; Day of Week (0..6, 0 is Sunday) ; spin(0,6) ; 2
+$cw ; Day of Week (Sunday First, Conditional) ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
+
+[Recording Status]
+Rp ; Target Has Recorder ; check ; false
+Rm ; Recording in Mono ; check ; true
+Rf ; Recording frequency ; combo(8,11,12,16,22,24,32,44,48,85,88,96) ; 44
+Re ; Encoder Being Used ; combo(WAV, AIFF, WV, MP3) ; WAV
+Rb ; Bitrate ; combo(8,16,24,32,40,48,56,64,80,96,112,128,144,160,192) ; 160
+
+[FM Radio]
+tp ; Target Has Radio ; check ; false
+tt ; Tuner Tuned ; check ; true
+tm ; Scan Mode ; check ; true
+ts ; Stereo ; check ; true
+ta ; Minimum Frequency (Two Decimal Digits) ; text ; 9.3
+tb ; Maximum Frequency (Two Decimal Digits) ; text ; 9.4
+tf ; Current Frequency (Two Decimal Digits) ; text ; 9.3
+Ti ; Current Preset ; spin(1,100) ; 4
+Tn ; Current Preset Name ; text ; Current Preset
+Tf ; Current Preset Frequency ; text ; 9.3
+Tc ; Preset Count ; spin(0,100) ; 10
+tx ; Has RDS ; check ; true
+ty ; RDS Name ; text ; Current RDS Name
+tz ; RDS Text ; text ; Current RDS Text
+
+[Misc.]
+mv ; Volume Changing ; check ; false
+cs ; Current Screen ; combo(Menus, WPS, Recording Screen, FM Radio Screen, Current Playlist Screen) ; WPS
+Lt ; List Title ; text ; Current List Title
+Li ; Title Icon ; spin(0,200) ; 2
