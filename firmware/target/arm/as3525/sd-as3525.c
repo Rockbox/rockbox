@@ -904,10 +904,10 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
         if(transfer > UNALIGNED_NUM_SECTORS)
             transfer = UNALIGNED_NUM_SECTORS;
 
-        sd_transfer_sectors(drive, start, transfer, aligned_buffer, false);
+        sd_transfer_sectors(IF_MD2(drive,) start, transfer, aligned_buffer, false);
         if (memcmp(buf, aligned_buffer, transfer * 512) != 0) {
             /* try the write again in the hope to repair the damage */
-            sd_transfer_sectors(drive, saved_start, saved_count, saved_buf, true);
+            sd_transfer_sectors(IF_MD2(drive,) saved_start, saved_count, saved_buf, true);
             panicf("sd: verify failed: sec=%ld n=%d!", start, transfer);
         }
 
