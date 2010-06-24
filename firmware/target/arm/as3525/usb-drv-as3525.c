@@ -413,7 +413,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].state |= EP_STATE_BUSY;
     endpoints[ep][1].len = len;
     endpoints[ep][1].rc  = -1;
-    endpoints[ep][1].buf = ptr;
+    endpoints[ep][1].timeout = current_tick + HZ;
 
     /* remove data buffer from cache */
     invalidate_dcache_range(ptr, len);
@@ -483,6 +483,7 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].state |= EP_STATE_BUSY;
     endpoints[ep][0].len = len;
     endpoints[ep][0].rc = -1;
+    endpoints[ep][0].timeout = current_tick + HZ;
 
     /* Make sure data is committed to memory */
     clean_dcache_range(ptr, len);
@@ -673,6 +674,24 @@ static void usb_tick(void)
 {
     static int rde_timer = 0;
     static int rde_fails = 0;
+    struct usb_endpoint *eps = &endpoints[0][0];
+    int i;
+
+    for (i=0; i<2*USB_NUM_EPS; i++) {
+        if (!(eps[i].state & EP_STATE_BUSY) ||
+            !TIME_AFTER(current_tick, endpoints[i]))
+            continue;
+
+        /* recv or send timed out */
+        if (eps[i].state & EP_STATE_ASYNC) {
+            eps[i].rc = -1;
+            wakeup_signal(&eps[i].complete);
+        } else {
+            usb_core_transfer_complete(i/2, i&1 ? USB_DIR_OUT : USB_DIR_IN,
+                                       -1, 0);
+        }
+        eps[i].state &= ~(EP_STATE_BUSY|EP_STATE_ASYNC);
+    }
 
     if (USB_DEV_CTRL & USB_DEV_CTRL_RDE)
         return;

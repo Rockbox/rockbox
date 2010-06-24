@@ -307,8 +307,8 @@ struct usb_dev_setup_buf {
 
 struct usb_endpoint
 {
-    void *buf;
     unsigned int len;
+    unsigned int timeout;
     volatile unsigned int state;
     int rc;
     struct wakeup complete;
