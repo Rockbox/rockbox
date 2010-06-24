@@ -2229,7 +2229,7 @@ fi
     target_id=65
     modelname="gogearhdd6330"
     target="-DPHILIPS_HDD6330"
-    memory=32 # supposedly
+    memory=64 # allways
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=6330 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
