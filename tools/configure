@@ -40,19 +40,8 @@ prefixtools () {
 }
 
 findarmgcc() {
-  models_not_checked_with_eabi="ipod4g cowond2"
-  if [ "$ARG_ARM_EABI" != 1 ]; then # eabi not explicitely enabled
-    for model in $models_not_checked_with_eabi; do
-      if [ "$modelname" = "$model" ]; then
-        ARG_ARM_EABI="0"
-        echo "**************************************************************"
-        echo "**** Target $modelname is using non EABI compiler !"
-        echo "**** Please test a build with --eabi and enable"
-        echo "**** EABI compiler for this target"
-        echo "**************************************************************"
-      fi
-    done
-  fi
+  # FIXME: ipod4g buttons do not work
+  [ "$ARG_ARM_EABI" != 1 -a "$modelname" = "ipod4g" ] && ARG_ARM_EABI="0"
 
   if [ "$ARG_ARM_EABI" != "0" ]; then
     prefixtools arm-elf-eabi-
