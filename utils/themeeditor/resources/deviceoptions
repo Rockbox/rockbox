@@ -8,7 +8,7 @@
 # Tag Label is a human-readable label to attach to the input
 #
 # [input] is the type of widget that should be used for the tag, and its range
-# if applicable.  The valid forms are
+# if applicable.  The valid forms are:
 # check - Inserts a true/false checkbox
 # text - Inserts a line edit box
 # slider(min, max) - Inserts a horizontal slider with range specified
@@ -27,13 +27,22 @@
 # performing much of any error checking on it: screwing up the syntax may very
 # well segfault the application on startup
 
-[Test Section 1]
-a ; Text Input ; text ; Some text
-b ; Checkbox ; check ; false
-c ; Slider 1 - 5 ; slider(1, 5) ; 4
+[Screen Sizes]
+screenwidth ; Screen Width ; spin(0,800) ; 300
+screenheight ; Screen Height ; spin(0,800) ; 200
+remotewidth ; Remote Width ; spin(0,800) ; 100
+remoteheight ; Remote Height ; spin(0,800); 50
 
-[Test Section 2]
-d ; Spinbox 6 - 10 ; spin(6, 10) ; 8
-e ; Float Spinbox 2.5 - 6.3; fspin(2.5, 6.3) ; 3.9
-# A combo box ends up returning an integer from 0 to n - 1, with n choices
-f ; Combo Box; combo(An option, Another Option, A Third option) ; Another Option
+[ID3 Info]
+ia ; Artist ; text ; Current Artist
+ic ; Composer ; text ; Current Composer
+iA ; Album Artist ; text ; Current Album Artist
+id ; Album Name ; text ; Current Album Name
+iG ; Grouping ; text ; Current Grouping
+ig ; Genre Name ; text ; Current Genre
+in ; Track number ; spin(1,100) ; 3
+it ; Track Title ; text ; Current Title
+iC ; Comment ; text ; Current Comment
+iv ; ID3 Version ; fspin(1,2.4); 2.0
+iy ; Year ; spin(1000,2020) ; 2008
+ik ; Disk Number ; spin(1,100) ; 1

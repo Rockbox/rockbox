@@ -20,13 +20,16 @@
  ****************************************************************************/
 
 #include "devicestate.h"
-#include "ui_devicestate.h"
 
 #include <QScrollArea>
 #include <QFile>
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+
 
 DeviceState::DeviceState(QWidget *parent) :
     QWidget(parent), tabs(this)
@@ -83,7 +86,8 @@ DeviceState::DeviceState(QWidget *parent) :
 
         subLayout = new QHBoxLayout();
         if(type != "check")
-            subLayout->addWidget(new QLabel(elements[1].trimmed(), currentArea));
+            subLayout->addWidget(new QLabel(elements[1].trimmed(),
+                                            currentArea));
         layout->addLayout(subLayout);
 
 
@@ -93,6 +97,9 @@ DeviceState::DeviceState(QWidget *parent) :
             QLineEdit* temp = new QLineEdit(defVal, currentArea);
             subLayout->addWidget(temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Text, temp));
+
+            temp->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
+                                            QSizePolicy::Fixed));
 
             QObject::connect(temp, SIGNAL(textChanged(QString)),
                              this, SLOT(input()));
