@@ -234,7 +234,7 @@ void tv_draw_window(void)
     tv_copy_screen_pos(&pos);
     rb->lcd_clear_display();
 
-    if (preferences->alignment == LEFT)
+    if (preferences->alignment == AL_LEFT)
         tv_read_start(cur_window, (cur_column > 0));
     else
         tv_read_start(0, preferences->windows > 1);
@@ -244,7 +244,7 @@ void tv_draw_window(void)
         if (!tv_get_next_line(&line_buf))
             break;
 
-        if (preferences->alignment == RIGHT)
+        if (preferences->alignment == AL_RIGHT)
         {
             rb->lcd_getstringsize(line_buf, &line_width, NULL);
             dx = draw_width - line_width;

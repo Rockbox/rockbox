@@ -172,7 +172,7 @@ static bool tv_is_line_break_char(unsigned short ch)
     size_t i;
 
     /* when the word mode is CHOP, all characters does not break line. */
-    if (preferences->word_mode == CHOP)
+    if (preferences->word_mode == WM_CHOP)
         return false;
 
     for (i = 0; i < sizeof(break_chars); i++)
@@ -221,7 +221,7 @@ static int tv_form_reflow_line(unsigned short *ucs, int chars)
     int spaces = 0;
     int words_spaces;
 
-    if (preferences->alignment == LEFT)
+    if (preferences->alignment == AL_LEFT)
     {
         while (chars > 0 && ucs[chars-1] == ' ')
             chars--;
@@ -386,7 +386,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
         next = tv_get_ucs(cur, &ch);
         if (ch == '\n')
         {
-            if (preferences->line_mode != JOIN || tv_is_break_line_join_mode(next))
+            if (preferences->line_mode != LM_JOIN || tv_is_break_line_join_mode(next))
             {
                 line_end_ptr   = next;
                 line_end_chars = chars;
@@ -394,7 +394,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
                 break;
             }
 
-            if (preferences->word_mode == CHOP || tv_isspace(prev_ch))
+            if (preferences->word_mode == WM_CHOP || tv_isspace(prev_ch))
                 continue;
 
             /*
@@ -411,7 +411,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
              *     (1) spacelike character convert to ' '
              *     (2) plural spaces are collected to one
              */
-            if (preferences->line_mode == REFLOW)
+            if (preferences->line_mode == LM_REFLOW)
             {
                 ch = ' ';
                 if (prev_ch == ch)
@@ -419,13 +419,13 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             }
 
             /* when the alignment is RIGHT, ignores indent spaces. */
-            if (preferences->alignment == RIGHT && is_indent)
+            if (preferences->alignment == AL_RIGHT && is_indent)
                 continue;
         }
         else
             is_indent = false;
 
-        if (preferences->line_mode == REFLOW && is_indent)
+        if (preferences->line_mode == LM_REFLOW && is_indent)
             gw = tv_glyph_width(ch) * preferences->indent_spaces;
         else
             gw = tv_glyph_width(ch);
@@ -443,7 +443,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
             break;
         }
 
-        if (preferences->line_mode != REFLOW || !is_indent)
+        if (preferences->line_mode != LM_REFLOW || !is_indent)
             ucs[chars++] = ch;
         else
         {
@@ -472,7 +472,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
          * when the last line break position is too short (line length < 0.75 * block width),
          * the line is cut off at the position where it is closest to the displayed width.
          */
-        if ((preferences->line_mode == REFLOW && line_break_ptr == NULL) ||
+        if ((preferences->line_mode == LM_REFLOW && line_break_ptr == NULL) ||
             (4 * line_break_width < 3 * block_width))
         {
             line_end_ptr   = cur;
@@ -504,7 +504,7 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     if (dst != NULL)
         *dst = utf8buf;
 
-    if (preferences->line_mode == EXPAND && (expand_extra_line = !expand_extra_line) == true)
+    if (preferences->line_mode == LM_EXPAND && (expand_extra_line = !expand_extra_line) == true)
         return 0;
 
     end_ptr = src + bufsize;
@@ -526,14 +526,14 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
 
     if (dst != NULL)
     {
-        if (preferences->alignment == RIGHT)
+        if (preferences->alignment == AL_RIGHT)
             tv_align_right(chars);
 
         for (i = 0; i < block_count; i++)
         {
             if (i == block || (is_multi && i == block + 1))
             {
-                if (is_break_line && preferences->line_mode == REFLOW)
+                if (is_break_line && preferences->line_mode == LM_REFLOW)
                     chars[i] = tv_form_reflow_line(ucsbuf[i], chars[i]);
 
                 tv_decode2utf8(ucsbuf[i], chars[i]);

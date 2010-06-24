@@ -149,7 +149,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     if (version > 0)
         prefs->alignment = *p++;
     else
-        prefs->alignment = LEFT;
+        prefs->alignment = AL_LEFT;
 
     prefs->encoding           = *p++;
     prefs->vertical_scrollbar = *p++;
@@ -169,7 +169,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     if (version > 3)
         prefs->horizontal_scroll_mode = *p++;
     else
-        prefs->horizontal_scroll_mode = SCREEN;
+        prefs->horizontal_scroll_mode = HS_SCREEN;
 
     if (version > 4)
         prefs->narrow_mode = *p++;

@@ -31,28 +31,28 @@ enum {
 
 /* word_mode */
 enum {
-    WRAP = 0,
-    CHOP,
+    WM_WRAP = 0,
+    WM_CHOP,
 };
 
 /* line_mode */
 enum {
-    NORMAL = 0,
-    JOIN,
-    EXPAND,
-    REFLOW,
+    LM_NORMAL = 0,
+    LM_JOIN,
+    LM_EXPAND,
+    LM_REFLOW,
 };
 
 /* alignment */
 enum {
-    LEFT = 0,
-    RIGHT,
+    AL_LEFT = 0,
+    AL_RIGHT,
 };
 
 /* page_mode */
 enum {
-    NO_OVERLAP = 0,
-    OVERLAP,
+    PM_NO_OVERLAP = 0,
+    PM_OVERLAP,
 };
 
 /* header_mode */
@@ -74,14 +74,14 @@ enum {
 
 /* horizontal_scroll_mode */
 enum {
-    SCREEN = 0,
-    COLUMN,
+    HS_SCREEN = 0,
+    HS_COLUMN,
 };
 
 /* vertical_scroll_mode */
 enum {
-    PAGE = 0,
-    LINE,
+    VS_PAGE = 0,
+    VS_LINE,
 };
 
 /* narrow_mode */

@@ -88,13 +88,13 @@ void tv_copy_preferences(struct tv_preferences *copy_prefs)
 
 void tv_set_default_preferences(struct tv_preferences *p)
 {
-    p->word_mode = WRAP;
-    p->line_mode = NORMAL;
+    p->word_mode = WM_WRAP;
+    p->line_mode = LM_NORMAL;
     p->windows = 1;
-    p->alignment = LEFT;
-    p->horizontal_scroll_mode = SCREEN;
-    p->vertical_scroll_mode = PAGE;
-    p->page_mode = NO_OVERLAP;
+    p->alignment = AL_LEFT;
+    p->horizontal_scroll_mode = HS_SCREEN;
+    p->vertical_scroll_mode = VS_PAGE;
+    p->page_mode = PM_NO_OVERLAP;
     p->horizontal_scrollbar = SB_OFF;
     p->vertical_scrollbar = SB_OFF;
 #ifdef HAVE_LCD_BITMAP

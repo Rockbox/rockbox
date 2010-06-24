@@ -79,11 +79,11 @@ void tv_scroll_up(unsigned mode)
     int offset_line = -1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == VS_PAGE))
     {
         offset_page--;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (preferences->page_mode == OVERLAP)? 1:0;
+        offset_line = (preferences->page_mode == PM_OVERLAP)? 1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
@@ -95,11 +95,11 @@ void tv_scroll_down(unsigned mode)
     int offset_line = 1;
 
     if ((mode == TV_VERTICAL_SCROLL_PAGE) ||
-        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == PAGE))
+        (mode == TV_VERTICAL_SCROLL_PREFS && preferences->vertical_scroll_mode == VS_PAGE))
     {
         offset_page++;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (preferences->page_mode == OVERLAP)? -1:0;
+        offset_line = (preferences->page_mode == PM_OVERLAP)? -1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
@@ -111,7 +111,7 @@ void tv_scroll_left(unsigned mode)
     int offset_column = 0;
 
     if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
-        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == COLUMN))
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == HS_COLUMN))
     {
         /* Scroll left one column */
         offset_column--;
@@ -130,7 +130,7 @@ void tv_scroll_right(unsigned mode)
     int offset_column = 0;
 
     if ((mode == TV_HORIZONTAL_SCROLL_COLUMN) ||
-        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == COLUMN))
+        (mode == TV_HORIZONTAL_SCROLL_PREFS && preferences->horizontal_scroll_mode == HS_COLUMN))
     {
         /* Scroll right one column */
         offset_column++;
@@ -151,7 +151,7 @@ void tv_top(void)
 void tv_bottom(void)
 {
     tv_move_screen(0, 0, SEEK_END);
-    if (preferences->vertical_scroll_mode == PAGE)
+    if (preferences->vertical_scroll_mode == VS_PAGE)
         tv_move_screen(0, -tv_get_screen_pos()->line, SEEK_CUR);
 }
 
@@ -166,7 +166,7 @@ unsigned tv_menu(void)
     if (res == TV_MENU_RESULT_EXIT_MENU)
     {
         tv_convert_fpos(cur_file_pos, &cur_pos);
-        if (preferences->vertical_scroll_mode == PAGE)
+        if (preferences->vertical_scroll_mode == VS_PAGE)
             cur_pos.line = 0;
 
         tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);
