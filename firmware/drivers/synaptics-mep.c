@@ -163,6 +163,9 @@ static void syn_set_data(int val)
 static inline int syn_get_data(void)
 {
     DATA_CL;
+#if defined(PBELL_VIBE500) /* for EABI (touchpad doesn't work without it) */
+    udelay(0);
+#endif
     return DATA;
 }
 
