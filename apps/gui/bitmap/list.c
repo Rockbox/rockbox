@@ -347,18 +347,25 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     short x, y;
     const int button = action_get_touchscreen_press(&x, &y);
     int line;
-    const struct screen *display = &screens[SCREEN_MAIN];
-    const int screen = display->screen_type;
+    const int screen = SCREEN_MAIN;
     const int list_start_item = gui_list->start_item[screen];
     const struct viewport *list_text_vp = &list_text[screen];
+    int list_width = list_text_vp->width;
+
+    if (global_settings.scrollbar == SCROLLBAR_RIGHT)
+        list_width += SCROLLBAR_WIDTH;
 
     if (button == BUTTON_NONE)
         return ACTION_NONE;
 
-    if (global_settings.scrollbar == SCROLLBAR_RIGHT &&
-        x > list_text_vp->x + list_text_vp->width + SCROLLBAR_WIDTH)
-        /* wider than the list's viewport, ignore it */
+    if (x > list_text_vp->x + list_width)
         return ACTION_NONE;
+
+    /* make sure it is inside the UI viewport */
+    if (list_display_title(gui_list, screen) &&
+        viewport_point_within_vp(&title_text[screen], x, y) && 
+        button == BUTTON_REL)
+        return ACTION_STD_CANCEL;
 
     if (x < list_text_vp->x)
     {
@@ -463,9 +470,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
             else
                 return ACTION_NONE;
         }
-        /* Everything above the items is cancel */
-        else if (y < list_text_vp->y && button == BUTTON_REL)
-            return ACTION_STD_CANCEL;
     }
     return ACTION_NONE;
 }
