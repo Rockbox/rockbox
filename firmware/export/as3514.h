@@ -119,8 +119,14 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 
 #define AS3514_UID_0      0x30
 
+/*different volume ranges for different AMS chips*/
+#if CONFIG_CPU == AS3525v2 
+/* Headphone volume goes from -81.0 ... +6dB */
+#define VOLUME_MIN -810
+#else
 /* Headphone volume goes from -73.5 ... +6dB */
 #define VOLUME_MIN -735
+#endif
 #define VOLUME_MAX   60
 
 /*** Audio Registers ***/

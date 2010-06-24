@@ -64,7 +64,7 @@
 #endif
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB",   0,   1, -73,   6, -25},
+    [SOUND_VOLUME]        = {"dB",   0,   1, VOLUME_MIN/10,   6, -25},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB",   0,   1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB",   0,   1, -24,  24,   0},
@@ -114,11 +114,11 @@ static void as3514_write_masked(unsigned int reg, unsigned int bits,
 /* convert tenth of dB volume to master volume register value */
 int tenthdb2master(int db)
 {
-    /* +6 to -73.5dB in 1.5dB steps == 53 levels */
+    /* +6 to -73.5dB (or -81.0 dB) in 1.5dB steps == 53 (or 58) levels */
     if (db < VOLUME_MIN) {
         return 0x0;
-    } else if (db >= VOLUME_MAX) {
-        return 0x35;
+    } else if (db > VOLUME_MAX) {
+        return (VOLUME_MAX-VOLUME_MIN)/15;
     } else {
         return((db-VOLUME_MIN)/15); /* VOLUME_MIN is negative */
     }
@@ -250,23 +250,34 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
         return;
     }
 
-    /* We combine the mixer channel volume range with the headphone volume
+    /* We combine the mixer/DAC channel volume range with the headphone volume
        range - keep first stage as loud as possible */
-    if (vol_r <= 0x16) {
+
+/*AS3543 mixer can go a little louder then the as3514, although 
+ * it might be possible to go louder on the as3514 as well */
+ 
+#if CONFIG_CPU == AS3525v2 
+#define MIXER_MAX_VOLUME 0x1b
+#else /* lets leave the AS3514 alone until its better tested*/
+#define MIXER_MAX_VOLUME 0x16
+#endif
+
+    if (vol_r <= MIXER_MAX_VOLUME) {
         mix_r = vol_r;
         hph_r = 0;
     } else {
-        mix_r = 0x16;
-        hph_r = vol_r - 0x16;
+        mix_r = MIXER_MAX_VOLUME;
+        hph_r = vol_r - MIXER_MAX_VOLUME;
     }
 
-    if (vol_l <= 0x16) {
+    if (vol_l <= MIXER_MAX_VOLUME) {
         mix_l = vol_l;
         hph_l = 0;
     } else {
-        mix_l = 0x16;
-        hph_l = vol_l - 0x16;
-    }
+        mix_l = MIXER_MAX_VOLUME;
+        hph_l = vol_l - MIXER_MAX_VOLUME;
+    }    
+
 
     as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);
