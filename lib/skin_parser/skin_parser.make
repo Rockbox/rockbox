@@ -11,7 +11,7 @@ SKINP_OBJ := $(call c2obj, $(SKINP_SRC))
 
 OTHER_SRC += $(SKINP_SRC)
 
-SKINLIB = $(BUILDDIR)/libskin_parser.a
+SKINLIB = $(BUILDDIR)/lib/libskin_parser.a
 
 INCLUDES += -I$(SKINP_DIR)
 
