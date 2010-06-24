@@ -70,8 +70,11 @@ RBScreen::~RBScreen()
 
     QMap<int, RBFont*>::iterator i;
     for(i = fonts.begin(); i != fonts.end(); i++)
-        if(*i)
-            delete (*i);
+        delete (*i);
+
+    QMap<QString, QList<RBViewport*>*>::iterator it;
+    for(it = namedViewports.begin(); it != namedViewports.end(); it++)
+        delete (*it);
 }
 
 QPainterPath RBScreen::shape() const
@@ -99,13 +102,30 @@ void RBScreen::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
 }
 
+void RBScreen::loadViewport(QString name, RBViewport *view)
+{
+    QList<RBViewport*>* list;
+    if(namedViewports.value(name, 0) == 0)
+    {
+        list = new QList<RBViewport*>;
+        list->append(view);
+        namedViewports.insert(name, list);
+    }
+    else
+    {
+        list = namedViewports.value(name, 0);
+        list->append(view);
+    }
+}
+
 void RBScreen::showViewport(QString name)
 {
     if(namedViewports.value(name, 0) == 0)
         return;
 
-    namedViewports.value(name)->show();
-    update();
+    QList<RBViewport*>* list = namedViewports.value(name, 0);
+    for(int i = 0; i < list->count(); i++)
+        list->at(i)->show();
 }
 
 void RBScreen::loadFont(int id, RBFont* font)
@@ -143,11 +163,14 @@ void RBScreen::makeCustomUI(QString id)
 {
     if(namedViewports.value(id, 0) != 0)
     {
-        QMap<QString, RBViewport*>::iterator i;
+        QMap<QString, QList<RBViewport*>*>::iterator i;
         for(i = namedViewports.begin(); i != namedViewports.end(); i++)
-            (*i)->clearCustomUI();
-        namedViewports.value(id)->makeCustomUI();
-        namedViewports.value(id)->show();
+            for(int j = 0; j < (*i)->count(); j++)
+                (*i)->at(j)->clearCustomUI();
+        for(int i = 0; i < namedViewports.value(id)->count(); i++)
+            namedViewports.value(id)->at(i)->makeCustomUI();
+        for(int i = 0; i < namedViewports.value(id)->count(); i++)
+            namedViewports.value(id)->at(i)->show();
     }
 }
 

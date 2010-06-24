@@ -46,10 +46,7 @@ public:
     int getWidth() const{ return width; }
     int getHeight() const{ return height; }
 
-    void loadViewport(QString name, RBViewport* view)
-    {
-        namedViewports.insert(name, view);
-    }
+    void loadViewport(QString name, RBViewport* view);
     void showViewport(QString name);
 
     void loadImage(QString name, RBImage* image)
@@ -78,7 +75,7 @@ private:
 
     ProjectModel* project;
 
-    QMap<QString, RBViewport*> namedViewports;
+    QMap<QString, QList<RBViewport*>*> namedViewports;
     QMap<QString, RBImage*> images;
     QMap<QString, QString>* settings;
     QMap<int, RBFont*> fonts;
