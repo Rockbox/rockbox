@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources.qrc">
-    <normaloff>:/resources/resources/windowicon.png</normaloff>:/resources/resources/windowicon.png</iconset>
+    <normaloff>:/resources/windowicon.png</normaloff>:/resources/windowicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -298,6 +298,9 @@
   <action name="actionDevice_Configuration">
    <property name="text">
     <string>&amp;Device Configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

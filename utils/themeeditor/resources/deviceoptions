@@ -1,0 +1,39 @@
+# This file defines the options for the device configuration panel
+# Declare a section with a line containing a string inside brackets, i.e.
+# [Some Section]
+# Declare options within the section in the following format, one per line
+# tag;Tag Label;[input];default
+# tag is the skin tag represented by that option
+#
+# Tag Label is a human-readable label to attach to the input
+#
+# [input] is the type of widget that should be used for the tag, and its range
+# if applicable.  The valid forms are
+# check - Inserts a true/false checkbox
+# text - Inserts a line edit box
+# slider(min, max) - Inserts a horizontal slider with range specified
+# spin(min, max) - Inserts a spin box with range specified
+# fspin(min, max) - Inserts a floating point spin box with range specified
+# combo(option1, option2...) - Inserts a combo box with the options specified
+#
+# default is the default value for the input
+#
+# Note that there aren't any provisions for escaping characters at the moment,
+# so don't include [, ], or ; in your text, or (, ) in combo box choices
+#
+# Blank lines are ignored
+#
+# Be warned: because this file is compiled into the application, I'm not
+# performing much of any error checking on it: screwing up the syntax may very
+# well segfault the application on startup
+
+[Test Section 1]
+a ; Text Input ; text ; Some text
+b ; Checkbox ; check ; false
+c ; Slider 1 - 5 ; slider(1, 5) ; 4
+
+[Test Section 2]
+d ; Spinbox 6 - 10 ; spin(6, 10) ; 8
+e ; Float Spinbox 2.5 - 6.3; fspin(2.5, 6.3) ; 3.9
+# A combo box ends up returning an integer from 0 to n - 1, with n choices
+f ; Combo Box; combo(An option, Another Option, A Third option) ; Another Option

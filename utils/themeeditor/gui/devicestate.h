@@ -23,19 +23,34 @@
 #define DEVICESTATE_H
 
 #include <QWidget>
-
-namespace Ui {
-    class DeviceState;
-}
+#include <QMap>
+#include <QPair>
+#include <QVariant>
+#include <QTabWidget>
 
 class DeviceState : public QWidget {
+
     Q_OBJECT
+
 public:
+    enum InputType
+    {
+        Text,
+        Slide,
+        Spin,
+        DSpin,
+        Combo,
+        Check
+    };
+
     DeviceState(QWidget *parent = 0);
     virtual ~DeviceState();
 
+    QVariant data(QString tag);
+
 private:
-    Ui::DeviceState *ui;
+    QMap<QString, QPair<InputType, QWidget*> > inputs;
+    QTabWidget tabs;
 };
 
 #endif // DEVICESTATE_H

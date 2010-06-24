@@ -144,6 +144,10 @@ void EditorWindow::setupUI()
     viewer = new SkinViewer(this);
     ui->skinPreviewLayout->addWidget(viewer);
 
+    /* Positioning the device settings dialog */
+    QPoint thisPos = pos();
+    deviceConfig.move(thisPos.x() + width() / 4, thisPos.y() + height() / 4);
+
 }
 
 void EditorWindow::setupMenus()

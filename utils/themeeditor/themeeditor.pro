@@ -64,10 +64,10 @@ OTHER_FILES += README \
     resources/COPYING \
     resources/document-save.png \
     resources/document-open.png \
-    resources/document-new.png
+    resources/document-new.png \
+    resources/deviceoptions
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \
-    gui/skinviewer.ui \
-    gui/devicestate.ui
+    gui/skinviewer.ui
 RESOURCES += resources.qrc

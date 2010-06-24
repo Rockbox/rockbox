@@ -1,10 +1,11 @@
 <RCC>
     <qresource prefix="/resources">
-        <file>resources/windowicon.png</file>
+        <file alias="windowicon.png">resources/windowicon.png</file>
         <file>resources/document-new.png</file>
         <file>resources/document-open.png</file>
         <file>resources/document-save.png</file>
         <file alias="configkeys">resources/configkeys</file>
+        <file alias="deviceoptions">resources/deviceoptions</file>
     </qresource>
     <qresource prefix="/render">
         <file alias="scenebg.png">resources/render/scenebg.png</file>
