@@ -50,6 +50,8 @@
 #include "disk.h"
 #endif
 
+#define VERIFY_WRITE 1
+
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
@@ -360,7 +362,6 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
         return -10;
 
-#if 0 /* FIXME : it seems that write corrupts the filesystem */
     /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_tran_state(drive) < 0)
         return -11;
@@ -378,7 +379,6 @@ static int sd_init_card(const int drive)
         return -13;
     /* Now that card is widebus make controller aware */
     MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
-#endif
 
     /*
      * enable bank switching
@@ -686,6 +686,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 #endif
     int ret = 0;
     unsigned loops = 0;
+    unsigned long response;
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
 
     mutex_lock(&sd_mtx);
@@ -788,7 +789,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error;
         }
 
-        if(!send_cmd(drive, cmd, bank_start, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, cmd, bank_start, MCI_RESP, &response))
         {
             ret -= 3*20;
             goto sd_transfer_error;
@@ -827,6 +828,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         /*  Wait for FIFO to empty, card may still be in PRG state for writes */
         while(MCI_STATUS(drive) & MCI_TX_ACTIVE);
+
+        /*
+         * If the write aborted early due to a tx underrun, disable the
+         * dma channel here, otherwise there are still 4 words in the fifo
+         * and the retried write will get corrupted.
+         */
+        dma_disable_channel(0);
 
         last_disk_activity = current_tick;
 
@@ -875,7 +883,40 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      const void* buf)
 {
-    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+#ifdef VERIFY_WRITE
+    unsigned long saved_start = start;
+    int saved_count = count;
+    void *saved_buf = (void*)buf;
+#endif
+    int ret;
+
+    ret = sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+
+#ifdef VERIFY_WRITE
+    if (ret) /* write failed, no point in verifying */
+        return ret;
+
+    count = saved_count;
+    buf = saved_buf;
+    start = saved_start;
+    while (count) {
+        int transfer = count;
+        if(transfer > UNALIGNED_NUM_SECTORS)
+            transfer = UNALIGNED_NUM_SECTORS;
+
+        sd_transfer_sectors(drive, start, transfer, aligned_buffer, false);
+        if (memcmp(buf, aligned_buffer, transfer * 512) != 0) {
+            /* try the write again in the hope to repair the damage */
+            sd_transfer_sectors(drive, saved_start, saved_count, saved_buf, true);
+            panicf("sd: verify failed: sec=%ld n=%d!", start, transfer);
+        }
+
+        buf   += transfer * 512;
+        count -= transfer;
+        start += transfer;
+    }
+#endif
+    return ret;
 }
 
 long sd_last_disk_activity(void)
