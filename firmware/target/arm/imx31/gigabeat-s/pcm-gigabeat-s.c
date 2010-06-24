@@ -33,7 +33,18 @@
 #define DMA_REC_CH_PRIORITY 6
 
 static struct buffer_descriptor dma_play_bd NOCACHEBSS_ATTR;
-static struct channel_descriptor dma_play_cd NOCACHEBSS_ATTR;
+
+static void play_dma_callback(void);
+static struct channel_descriptor dma_play_cd =
+{
+    .bd_count = 1,
+    .callback = play_dma_callback,
+    .shp_addr = SDMA_PER_ADDR_SSI2_TX1,
+    .wml      = SDMA_SSI_TXFIFO_WML*2,
+    .per_type = SDMA_PER_SSI_SHP, /* SSI2 shared with SDMA core */
+    .tran_type = SDMA_TRAN_EMI_2_PER,
+    .event_id1 = SDMA_REQ_SSI2_TX1,
+};
 
 /* The pcm locking relies on the fact the interrupt handlers run to completion
  * before lower-priority modes proceed. We don't have to touch hardware
@@ -123,14 +134,6 @@ void pcm_dma_apply_settings(void)
 void pcm_play_dma_init(void)
 {
     /* Init channel information */
-    dma_play_cd.bd_count = 1;
-    dma_play_cd.callback = play_dma_callback;
-    dma_play_cd.shp_addr = SDMA_PER_ADDR_SSI2_TX1;
-    dma_play_cd.wml      = SDMA_SSI_TXFIFO_WML*2;
-    dma_play_cd.per_type = SDMA_PER_SSI_SHP; /* SSI2 shared with SDMA core */
-    dma_play_cd.tran_type = SDMA_TRAN_EMI_2_PER;
-    dma_play_cd.event_id1 = SDMA_REQ_SSI2_TX1;
-
     sdma_channel_init(DMA_PLAY_CH_NUM, &dma_play_cd, &dma_play_bd);
     sdma_channel_set_priority(DMA_PLAY_CH_NUM, DMA_PLAY_CH_PRIORITY);
 
@@ -372,7 +375,18 @@ void * pcm_dma_addr(void *addr)
 
 #ifdef HAVE_RECORDING
 static struct buffer_descriptor dma_rec_bd NOCACHEBSS_ATTR;
-static struct channel_descriptor dma_rec_cd NOCACHEBSS_ATTR;
+
+static void rec_dma_callback(void);
+static struct channel_descriptor dma_rec_cd =
+{
+    .bd_count = 1,
+    .callback = rec_dma_callback,
+    .shp_addr = SDMA_PER_ADDR_SSI1_RX1,
+    .wml      = SDMA_SSI_RXFIFO_WML*2,
+    .per_type = SDMA_PER_SSI,
+    .tran_type = SDMA_TRAN_PER_2_EMI,
+    .event_id1 = SDMA_REQ_SSI1_RX1,
+};
 
 static struct dma_data dma_rec_data =
 {
@@ -495,14 +509,6 @@ void pcm_rec_dma_init(void)
     pcm_rec_dma_stop();
 
     /* Init channel information */
-    dma_rec_cd.bd_count = 1;
-    dma_rec_cd.callback = rec_dma_callback;
-    dma_rec_cd.shp_addr = SDMA_PER_ADDR_SSI1_RX1;
-    dma_rec_cd.wml      = SDMA_SSI_RXFIFO_WML*2;
-    dma_rec_cd.per_type = SDMA_PER_SSI;
-    dma_rec_cd.tran_type = SDMA_TRAN_PER_2_EMI;
-    dma_rec_cd.event_id1 = SDMA_REQ_SSI1_RX1;
-
     sdma_channel_init(DMA_REC_CH_NUM, &dma_rec_cd, &dma_rec_bd);
     sdma_channel_set_priority(DMA_REC_CH_NUM, DMA_REC_CH_PRIORITY);
 }

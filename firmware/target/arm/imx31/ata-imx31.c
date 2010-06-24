@@ -251,8 +251,33 @@ static struct wakeup ata_dma_wakeup;
 /* Array of buffer descriptors for large transfers and alignnment */
 static struct buffer_descriptor ata_bda[ATA_BD_COUNT] NOCACHEBSS_ATTR;
 /* ATA channel descriptors */
-static struct channel_descriptor ata_cd_rd NOCACHEBSS_ATTR; /* read channel */
-static struct channel_descriptor ata_cd_wr NOCACHEBSS_ATTR; /* write channel */
+/* Read/write channels share buffer descriptors and callbacks */
+static void ata_dma_callback(void);
+
+static struct channel_descriptor ata_cd_rd = /* read channel */
+{
+    .bd_count = ATA_BD_COUNT,
+    .callback = ata_dma_callback,
+    .shp_addr = SDMA_PER_ADDR_ATA_RX,
+    .wml      = SDMA_ATA_WML,
+    .per_type = SDMA_PER_ATA,
+    .tran_type = SDMA_TRAN_PER_2_EMI,
+    .event_id1 = SDMA_REQ_ATA_TXFER_END,
+    .event_id2 = SDMA_REQ_ATA_RX,
+};
+
+static struct channel_descriptor ata_cd_wr = /* write channel */
+{
+    .bd_count = ATA_BD_COUNT,
+    .callback = ata_dma_callback,
+    .shp_addr = SDMA_PER_ADDR_ATA_TX,
+    .wml      = SDMA_ATA_WML,
+    .per_type = SDMA_PER_ATA,
+    .tran_type = SDMA_TRAN_EMI_2_PER,
+    .event_id1 = SDMA_REQ_ATA_TXFER_END,
+    .event_id2 = SDMA_REQ_ATA_TX,
+};
+
 /* DMA channel to be started for transfer */
 static unsigned int current_channel = 0;
 
@@ -653,25 +678,6 @@ void ata_device_init(void)
 
     /* Called for first time at startup */
     wakeup_init(&ata_dma_wakeup);
-
-    /* Read/write channels share buffer descriptors */
-    ata_cd_rd.bd_count = ATA_BD_COUNT;
-    ata_cd_rd.callback = ata_dma_callback;
-    ata_cd_rd.shp_addr = SDMA_PER_ADDR_ATA_RX;
-    ata_cd_rd.wml      = SDMA_ATA_WML;
-    ata_cd_rd.per_type = SDMA_PER_ATA;
-    ata_cd_rd.tran_type = SDMA_TRAN_PER_2_EMI;
-    ata_cd_rd.event_id1 = SDMA_REQ_ATA_TXFER_END;
-    ata_cd_rd.event_id2 = SDMA_REQ_ATA_RX;
-
-    ata_cd_wr.bd_count = ATA_BD_COUNT;
-    ata_cd_wr.callback = ata_dma_callback;
-    ata_cd_wr.shp_addr = SDMA_PER_ADDR_ATA_TX;
-    ata_cd_wr.wml      = SDMA_ATA_WML;
-    ata_cd_wr.per_type = SDMA_PER_ATA;
-    ata_cd_wr.tran_type = SDMA_TRAN_EMI_2_PER;
-    ata_cd_wr.event_id1 = SDMA_REQ_ATA_TXFER_END;
-    ata_cd_wr.event_id2 = SDMA_REQ_ATA_TX;
 
     if (!sdma_channel_init(ATA_DMA_CH_NUM_RD, &ata_cd_rd, ata_bda) ||
         !sdma_channel_init(ATA_DMA_CH_NUM_WR, &ata_cd_wr, ata_bda))
