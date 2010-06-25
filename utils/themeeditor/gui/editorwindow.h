@@ -25,6 +25,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QItemSelectionModel>
+#include <QDockWidget>
 
 #include "parsetreemodel.h"
 #include "skinhighlighter.h"
@@ -89,7 +90,8 @@ private:
     ProjectModel* project;
     QItemSelectionModel* parseTreeSelection;
     SkinViewer* viewer;
-    DeviceState deviceConfig;
+    DeviceState* deviceConfig;
+    QDockWidget* deviceDock;
 };
 
 #endif // EDITORWINDOW_H

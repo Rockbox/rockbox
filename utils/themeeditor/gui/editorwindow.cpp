@@ -30,16 +30,25 @@
 #include <QGraphicsScene>
 
 EditorWindow::EditorWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::EditorWindow),
-    parseTreeSelection(0)
+    QMainWindow(parent), ui(new Ui::EditorWindow), parseTreeSelection(0)
 {
     ui->setupUi(this);
     prefs = new PreferencesDialog(this);
     project = 0;
-    loadSettings();
     setupUI();
+    loadSettings();
     setupMenus();
+}
+
+
+EditorWindow::~EditorWindow()
+{
+    delete ui;
+    delete prefs;
+    if(project)
+        delete project;
+    delete deviceConfig;
+    delete deviceDock;
 }
 
 void EditorWindow::loadTabFromSkinFile(QString fileName)
@@ -146,9 +155,13 @@ void EditorWindow::setupUI()
     ui->skinPreviewLayout->addWidget(viewer);
 
     /* Positioning the device settings dialog */
-    QPoint thisPos = pos();
-    deviceConfig.move(thisPos.x() + width() / 4, thisPos.y() + height() / 4);
+    deviceDock = new QDockWidget(tr("Device Configuration"), this);
+    deviceConfig = new DeviceState(deviceDock);
 
+    deviceDock->setObjectName("deviceDock");
+    deviceDock->setWidget(deviceConfig);
+    deviceDock->setFloating(true);
+    deviceDock->hide();
 }
 
 void EditorWindow::setupMenus()
@@ -161,7 +174,7 @@ void EditorWindow::setupMenus()
     QObject::connect(ui->actionPreview_Panel, SIGNAL(triggered()),
                      this, SLOT(showPanel()));
     QObject::connect(ui->actionDevice_Configuration, SIGNAL(triggered()),
-                     &deviceConfig, SLOT(show()));
+                     deviceDock, SLOT(show()));
 
     /* Connecting the document management actions */
     QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),
@@ -482,12 +495,4 @@ void EditorWindow::sizeColumns()
     ui->parseTree->resizeColumnToContents(ParseTreeModel::lineColumn);
     ui->parseTree->resizeColumnToContents(ParseTreeModel::typeColumn);
     ui->parseTree->resizeColumnToContents(ParseTreeModel::valueColumn);
-}
-
-EditorWindow::~EditorWindow()
-{
-    delete ui;
-    delete prefs;
-    if(project)
-        delete project;
 }
