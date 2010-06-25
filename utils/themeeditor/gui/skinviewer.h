@@ -40,6 +40,7 @@ public:
 public slots:
     void zoomIn();
     void zoomOut();
+    void zoomEven();
 
 protected:
     void changeEvent(QEvent *e);

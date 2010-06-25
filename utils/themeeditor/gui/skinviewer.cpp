@@ -32,6 +32,8 @@ SkinViewer::SkinViewer(QWidget *parent) :
                      this, SLOT(zoomOut()));
     QObject::connect(ui->zoomInButton, SIGNAL(pressed()),
                      this, SLOT(zoomIn()));
+    QObject::connect(ui->zoomEvenButton, SIGNAL(pressed()),
+                     this, SLOT(zoomEven()));
 
     ui->viewer->setDragMode(QGraphicsView::ScrollHandDrag);
 }
@@ -66,4 +68,9 @@ void SkinViewer::zoomIn()
 void SkinViewer::zoomOut()
 {
     ui->viewer->scale(1/1.2, 1/1.2);
+}
+
+void SkinViewer::zoomEven()
+{
+    ui->viewer->resetTransform();
 }

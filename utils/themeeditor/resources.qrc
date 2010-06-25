@@ -6,6 +6,9 @@
         <file>resources/document-save.png</file>
         <file alias="configkeys">resources/configkeys</file>
         <file alias="deviceoptions">resources/deviceoptions</file>
+        <file>resources/zoomeven.png</file>
+        <file>resources/zoomin.png</file>
+        <file>resources/zoomout.png</file>
     </qresource>
     <qresource prefix="/render">
         <file alias="scenebg.png">resources/render/scenebg.png</file>
