@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -17,14 +18,14 @@
    xml:space="preserve"
    style="fill-rule:evenodd;display:inline"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="fuze-front.svg"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="sansafuze-front.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"><metadata
    id="metadata321"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
-   inkscape:window-height="729"
-   inkscape:window-width="1280"
+   inkscape:window-height="689"
+   inkscape:window-width="1014"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
    guidetolerance="10.0"
@@ -41,8 +42,9 @@
    inkscape:cx="57.310911"
    inkscape:cy="252.81611"
    inkscape:window-x="0"
-   inkscape:window-y="58"
-   inkscape:current-layer="layer1" /><defs
+   inkscape:window-y="26"
+   inkscape:current-layer="svg2"
+   inkscape:window-maximized="0" /><defs
    id="defs307"><inkscape:perspective
    sodipodi:type="inkscape:persp3d"
    inkscape:vp_x="0 : 287.00787 : 1"
@@ -1318,7 +1320,13 @@
    cy="11264.977"
    fx="16591.633"
    fy="11264.977"
-   r="1526.7545" /></defs>
+   r="1526.7545" /><inkscape:perspective
+   id="perspective2910"
+   inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+   inkscape:vp_z="1 : 0.5 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_x="0 : 0.5 : 1"
+   sodipodi:type="inkscape:persp3d" /></defs>
  
 <path
    d="M 5217.1621,7864.8361 L 4814.6697,7864.8361 L 4814.0701,7922.5679 L 5217.1621,7924.8103 L 5217.1621,7864.8361 L 5217.1621,7864.8361 z M 5217.1621,7969.6762 L 4920.3832,7969.6762 L 4920.3832,8029.575 L 5217.1621,8029.575 L 5217.1621,7969.6762 z M 5217.1621,8074.4882 L 4920.3832,8074.4882 L 4920.3832,8134.415 L 5217.1621,8134.415 L 5217.1621,8074.4882 z M 5217.1621,8179.3561 L 4920.3832,8179.3561 L 4920.3832,8239.227 L 5217.1621,8239.227 L 5217.1621,8179.3561 z"
@@ -1405,7 +1413,7 @@
    inkscape:export-ydpi="90" /><path
    d="M 9061.3038,1142.2137 C 9061.3038,1034.3623 8926.3545,946.08126 8761.348,946.08126 L 1192.9986,946.08126 C 1028.1147,946.08126 893.16527,1034.3623 893.16527,1142.2137 L 893.16527,7373.8666 C 893.16527,7481.7578 1028.1147,7569.919 1192.9986,7569.919 L 8761.348,7569.919 C 8926.3545,7569.919 9061.3038,7481.7578 9061.3038,7373.8666 L 9061.3038,1142.2137 L 9061.3038,1142.2137 L 9061.3038,1142.2137 z"
    id="path2944"
-   style="opacity:1;fill:#d6dee8;fill-rule:evenodd;stroke:#575757;stroke-width:50;stroke-linejoin:bevel;display:inline"
+   style="opacity:1;fill:#11161c;fill-rule:nonzero;stroke:#000000;stroke-width:49.99989557;stroke-linejoin:bevel;display:inline;color:#000000;fill-opacity:1;stroke-linecap:butt;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;overflow:visible;enable-background:accumulate"
    inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansdisk\fuze - Marko Pahlke\fuze-front.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90" /><g
@@ -1659,6 +1667,7 @@
      id="tspan2851"
      y="12852.811"
      x="10450.156" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1677,6 +1686,7 @@
      id="tspan2861"
      y="11284.661"
      x="10452.534" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1695,6 +1705,7 @@
      id="tspan2867"
      y="10121.868"
      x="13080.611" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1713,6 +1724,7 @@
      id="tspan2885"
      y="15918.087"
      x="-4089.0598" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1731,6 +1743,7 @@
      id="tspan2903"
      y="10121.868"
      x="-4075.9426" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1749,6 +1762,7 @@
      id="tspan2909"
      y="13995.146"
      x="-4078.6418" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1767,6 +1781,7 @@
      id="tspan2915"
      y="15892.62"
      x="13088.714" /></text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1785,6 +1800,7 @@
      id="tspan2921"
      y="13994.762"
      x="13084.084" /></text>
+
 <g
    id="g3002"
    transform="matrix(-1.8550826,-7.3239456e-2,0.2667387,1.5820901,20340.11,-16730.364)"
@@ -1818,6 +1834,7 @@
    inkscape:export-filename="C:\Dokumente und Einstellungen\Marianne\Eigene Dateien\Rockbox\Graphics\Vektor\Sansdisk\fuze - Marko Pahlke\fuze-front.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">Scroll Back</text>
+
 <text
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
    xml:space="preserve"
@@ -1832,6 +1849,7 @@
      id="tspan2978"
      y="11281.596"
      x="13075.596">Scroll Fwd</tspan></text>
+
 <path
    style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:37.38484573;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
    id="path2941"

@@ -623,7 +623,19 @@
    y1="4650.3999"
    x2="1145.34"
    y2="4650.3999"
-   gradientTransform="translate(-5500.014,-6750.005)" /></defs><sodipodi:namedview
+   gradientTransform="translate(-5500.014,-6750.005)" /><inkscape:perspective
+   id="perspective2910"
+   inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+   inkscape:vp_z="1 : 0.5 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_x="0 : 0.5 : 1"
+   sodipodi:type="inkscape:persp3d" /><inkscape:perspective
+   id="perspective2910-5"
+   inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+   inkscape:vp_z="1 : 0.5 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_x="0 : 0.5 : 1"
+   sodipodi:type="inkscape:persp3d" /></defs><sodipodi:namedview
    inkscape:window-height="689"
    inkscape:window-width="1014"
    inkscape:pageshadow="2"
@@ -728,7 +740,7 @@
    style="fill:url(#id13);stroke:#666666;stroke-width:7.61999989"
    id="path225"
    d="m 4999.99,14870.3 c -592,0 -1139.85,-189 -1586.82,-509.78 -27.33,-28.71 -51.33,-81.11 -15,-131.22 l 420.67,-439.78 c 9.41,-10 16.19,-14.34 30.19,-4.41 325.74,229 722.62,363.59 1150.96,363.59 428.37,0 825.26,-134.59 1150.96,-363.59 14,-9.93 20.82,-5.59 30.22,4.41 l 420.67,439.78 c 36.37,50.11 12.33,102.51 -15,131.22 -446.93,320.78 -994.81,509.78 -1586.85,509.78 z m 0,-5450.15 c 592.04,0 1139.92,188.96 1586.85,509.74 27.33,28.7 51.37,81.07 15,131.22 l -420.67,439.78 c -9.4,10.03 -16.22,14.29 -30.22,4.41 -325.7,-229 -722.59,-363.52 -1150.96,-363.52 -428.34,0 -825.22,134.52 -1150.96,363.52 -14,9.88 -20.78,5.62 -30.19,-4.41 l -420.67,-439.78 c -36.33,-50.15 -12.33,-102.52 15,-131.22 446.97,-320.78 994.82,-509.74 1586.82,-509.74 z m 2725.04,2725.03 c 0,592 -188.89,1139.93 -509.67,1586.86 -28.71,27.29 -81.11,51.33 -131.33,15 l -439.67,-420.71 c -10.11,-9.37 -14.37,-16.15 -4.52,-30.22 229.11,-325.7 363.59,-722.56 363.59,-1150.93 0,-428.29 -134.48,-825.22 -363.59,-1150.88 -9.85,-14.08 -5.59,-20.93 4.52,-30.19 l 439.67,-420.74 c 50.22,-36.41 102.62,-12.26 131.33,15 320.78,446.93 509.67,994.81 509.67,1586.81 l 0,0 0,0 z m -5450.08,0 c 0,-592 188.96,-1139.88 509.78,-1586.81 28.63,-27.26 81.04,-51.41 131.22,-15 l 439.7,420.74 c 10.12,9.26 14.34,16.11 4.52,30.19 -229.14,325.66 -363.63,722.59 -363.63,1150.88 0,428.37 134.49,825.23 363.63,1150.93 9.82,14.07 5.6,20.85 -4.52,30.22 l -439.7,420.71 c -50.18,36.33 -102.59,12.29 -131.22,-15 -320.82,-446.93 -509.78,-994.86 -509.78,-1586.86 l 0,0 0,0 z m 2725.04,1487.34 c 821.26,0 1487.26,-666 1487.26,-1487.34 0,-821.22 -666,-1487.22 -1487.26,-1487.22 -821.22,0 -1487.22,666 -1487.22,1487.22 0,821.34 666,1487.34 1487.22,1487.34 z" /><path
-   style="fill:#d6dee8;stroke:#575757;stroke-width:50;stroke-linejoin:bevel"
+   style="color:#000000;fill:#11161c;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:49.999897;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
    id="path227"
    d="m 7663.25,1551.91 c 0,-107.74 -88,-195.93 -195.6,-195.93 l -4935.29,0 c -107.52,0 -195.52,88.19 -195.52,195.93 l 0,6225.22 c 0,107.78 88,195.85 195.52,195.85 l 4935.29,0 c 107.6,0 195.6,-88.07 195.6,-195.85 l 0,-6225.22 0,0 0,0 z" /><path
    style="fill:url(#id14);stroke:#5fb2bf;stroke-width:7.61999989"
@@ -901,6 +913,8 @@
      x="9375.9043"
      y="6813.2549">Play</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -912,6 +926,8 @@
      id="tspan2033"
      x="-2318.782"
      y="12239.819">Left</tspan></text>
+
+
 
 <text
    xml:space="preserve"
@@ -925,6 +941,8 @@
      x="9398.7744"
      y="12325.533">Right</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -936,6 +954,8 @@
      id="tspan2041"
      x="9199.9971"
      y="15389.438">Submenu</tspan></text>
+
+
 
 <text
    xml:space="preserve"
@@ -949,6 +969,8 @@
      x="-2347.9624"
      y="15403.114">Power</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -961,6 +983,8 @@
      x="-2358.897"
      y="4449.6602">Rec</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -972,6 +996,8 @@
      id="tspan2053"
      x="4502.0088"
      y="-265.66003">Hold</tspan></text>
+
+
 
 <path
    style="fill:none;stroke:#000000;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
@@ -1006,6 +1032,8 @@
      x="9361.5664"
      y="8407.417">Scroll Down</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -1018,6 +1046,8 @@
      x="-2423.9062"
      y="7464.5786">Scroll Up</tspan></text>
 
+
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:URW Palladio L"
@@ -1029,6 +1059,8 @@
      id="tspan3373"
      x="9275.8535"
      y="14021.587">Select</tspan></text>
+
+
 
 <path
    style="fill:none;stroke:#000000;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
@@ -1049,7 +1081,7 @@
    transform="translate(-5500.014,-6750.0051)"
    style="fill:#000000;fill-rule:evenodd;display:inline"
    id="path3004"
-   d="m 12206.9,18467.7 -176.76,-205.18 0,0 7.33,1.07 7.27,0.87 7.21,0.67 7.14,0.48 7.08,0.27 7.01,0.08 6.96,-0.13 6.89,-0.32 6.83,-0.52 6.76,-0.72 6.71,-0.91 6.64,-1.12 6.57,-1.31 6.52,-1.52 6.45,-1.71 6.39,-1.91 6.32,-2.11 6.27,-2.31 6.2,-2.5 6.13,-2.71 6.08,-2.9 6.01,-3.11 5.95,-3.3 5.89,-3.5 5.82,-3.7 5.76,-3.89 5.7,-4.1 5.63,-4.29 5.58,-4.5 5.5,-4.69 5.45,-4.89 5.38,-5.09 -26.67,269.5 0,0 0,0 z" /></g><path
+   d="m 12206.9,18467.7 -176.76,-205.18 0,0 7.33,1.07 7.27,0.87 7.21,0.67 7.14,0.48 7.08,0.27 7.01,0.08 6.96,-0.13 6.89,-0.32 6.83,-0.52 6.76,-0.72 6.71,-0.91 6.64,-1.12 6.57,-1.31 6.52,-1.52 6.45,-1.71 6.39,-1.91 6.32,-2.11 6.27,-2.31 6.2,-2.5 6.13,-2.71 6.08,-2.9 6.01,-3.11 5.95,-3.3 5.89,-3.5 5.82,-3.7 5.76,-3.89 5.7,-4.1 5.63,-4.29 5.58,-4.5 5.5,-4.69 5.45,-4.89 5.38,-5.09 -26.67,269.5 0,0 0,0 z" /><path
    style="fill:none;stroke:#000000;stroke-width:35.27777863;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
    d="M 9129.3915,13802.706 5120.3168,12147.427"
-   id="path3360" /></svg>
+   id="path3360" /></g></svg>
