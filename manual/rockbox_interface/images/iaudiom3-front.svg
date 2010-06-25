@@ -1,16 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="90mm"
    height="152mm"
    viewBox="0 0 9000 15200"
    id="svg2454"
-   xml:space="preserve"><defs
-   id="defs2693"><marker
+   xml:space="preserve"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="iaudiom3-front.svg"><metadata
+   id="metadata365"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="640"
+   inkscape:window-height="481"
+   id="namedview363"
+   showgrid="false"
+   inkscape:zoom="0.43818711"
+   inkscape:cx="159.44882"
+   inkscape:cy="269.29135"
+   inkscape:window-x="0"
+   inkscape:window-y="26"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="layer2" /><defs
+   id="defs2693"><inkscape:perspective
+   sodipodi:type="inkscape:persp3d"
+   inkscape:vp_x="0 : 269.29135 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_z="318.89764 : 269.29135 : 1"
+   inkscape:persp3d-origin="159.44882 : 179.52757 : 1"
+   id="perspective367" /><marker
    refX="0"
    refY="0"
    orient="auto"
@@ -1622,100 +1658,6 @@
    style="fill-rule:evenodd"
    id="g5630">
  </g><g
-   style="display:inline"
-   id="layer1"><text
-   x="9346.1738"
-   y="6336.3794"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;opacity:1;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1593"
-   xml:space="preserve"><tspan
-     x="9346.1738"
-     y="6336.3794"
-     id="tspan1595">Hold</tspan></text>
-
-<text
-   x="9349.8945"
-   y="4584.3213"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;opacity:1;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1597"
-   xml:space="preserve"><tspan
-     x="9349.8945"
-     y="4584.3213"
-     id="tspan1599">Rec</tspan></text>
-
-<text
-   x="9351.5479"
-   y="2268.3762"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1585"
-   xml:space="preserve"><tspan
-     x="9351.5479"
-     y="2268.3762"
-     id="tspan1587">Mode</tspan></text>
-
-<text
-   x="9358.5762"
-   y="1147.8312"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text22388"
-   xml:space="preserve"><tspan
-     x="9358.5762"
-     y="1147.8312"
-     id="tspan22390">Volume Up</tspan></text>
-
-<text
-   x="9358.5762"
-   y="3388.9207"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text22392"
-   xml:space="preserve"><tspan
-     x="9358.5762"
-     y="3388.9207"
-     id="tspan22394">Volume Down</tspan></text>
-
-<text
-   x="-3649.5076"
-   y="6535.6953"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1577"
-   xml:space="preserve"><tspan
-     x="-3649.5076"
-     y="6535.6953"
-     id="tspan1579">Rewind</tspan></text>
-
-<text
-   x="-3651.5747"
-   y="4421.3501"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1573"
-   xml:space="preserve"><tspan
-     x="-3651.5747"
-     y="4421.3501"
-     id="tspan1575">Forward</tspan></text>
-
-<text
-   x="-3655.2954"
-   y="2307.4187"
-   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
-   id="text1601"
-   xml:space="preserve"><tspan
-     x="-3655.2954"
-     y="2307.4187"
-     id="tspan1603">Play</tspan></text>
-
-<path
-   d="M -120.79708,4198.0189 L 7147.543,4190.3923"
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   id="path22396" /><path
-   d="M -376.42062,6255.3836 L 7147.543,5959.5272"
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   id="path22398" /><path
-   d="M -1697.1422,2120.7762 L 7147.543,2441.1353"
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   id="path30772" /><path
-   d="M 11950.027,2627.6845 C 12075.508,2240.9466 12069.742,1826.7907 11950.027,1453.7723"
-   style="color:#000000;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#737373;stroke-width:28.84311295;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:url(#Arrow1Mstart);marker-mid:none;marker-end:url(#Arrow1Mend);stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-   id="path22421" /></g><g
    transform="translate(9569.3385,0)"
    id="g21888"><path
      d="M -7224.3183,12530.187 L -7269.1083,12744.507 L -7297.7683,12744.507 L -7276.6783,12643.537 L -7387.5783,12643.537 L -7408.8283,12744.507 L -7437.4883,12744.507 L -7392.4683,12530.187 L -7364.0383,12530.187 L -7382.6083,12619.307 L -7271.5483,12619.307 L -7252.9783,12530.187 L -7224.3183,12530.187 z "
@@ -1804,4 +1746,126 @@
      id="path21234" /><path
      d="M -2881.2283,12591.587 L -2892.2383,12615.977 C -2896.7483,12612.687 -2901.7183,12611.077 -2907.2183,12611.077 C -2931.7483,12611.077 -2948.8783,12634.777 -2958.7383,12682.317 L -2971.7283,12744.537 L -2997.0283,12744.537 L -2964.5483,12589.377 L -2941.0783,12589.377 L -2947.8083,12620.937 C -2932.0583,12597.477 -2916.3883,12585.777 -2900.7183,12585.777 C -2895.5183,12585.777 -2889.0283,12587.697 -2881.2283,12591.587 L -2881.2283,12591.587 z "
      style="fill:#7a7a7a;fill-rule:evenodd"
-     id="path21236" /></g></svg>
+     id="path21236" /></g><g
+   inkscape:groupmode="layer"
+   id="layer2"
+   inkscape:label="Text"
+   style="display:inline"><g
+     style="display:inline"
+     id="layer1"><text
+   x="9346.1738"
+   y="6336.3794"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1593"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="9346.1738"
+     y="6336.3794"
+     id="tspan1595">Hold</tspan></text>
+
+
+
+<text
+   x="9349.8945"
+   y="4584.3213"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1597"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="9349.8945"
+     y="4584.3213"
+     id="tspan1599">Rec</tspan></text>
+
+
+
+<text
+   x="9351.5479"
+   y="2268.3762"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1585"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="9351.5479"
+     y="2268.3762"
+     id="tspan1587">Mode</tspan></text>
+
+
+
+<text
+   x="9358.5762"
+   y="1147.8312"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text22388"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="9358.5762"
+     y="1147.8312"
+     id="tspan22390">Volume Up</tspan></text>
+
+
+
+<text
+   x="9358.5762"
+   y="3388.9207"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text22392"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="9358.5762"
+     y="3388.9207"
+     id="tspan22394">Volume Down</tspan></text>
+
+
+
+<text
+   x="-3649.5076"
+   y="6535.6953"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1577"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="-3649.5076"
+     y="6535.6953"
+     id="tspan1579">Rewind</tspan></text>
+
+
+
+<text
+   x="-3651.5747"
+   y="4421.3501"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1573"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="-3651.5747"
+     y="4421.3501"
+     id="tspan1575">Forward</tspan></text>
+
+
+
+<text
+   x="-3655.2954"
+   y="2307.4187"
+   style="font-size:846.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99999994px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype"
+   id="text1601"
+   xml:space="preserve"
+   sodipodi:linespacing="100%"><tspan
+     x="-3655.2954"
+     y="2307.4187"
+     id="tspan1603">Play</tspan></text>
+
+
+
+<path
+   d="M -120.79708,4198.0189 7147.543,4190.3923"
+   style="fill:none;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   id="path22396" /><path
+   d="M -376.42062,6255.3836 7147.543,5959.5272"
+   style="fill:none;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   id="path22398" /><path
+   d="M -1697.1422,2120.7762 7147.543,2441.1353"
+   style="fill:none;stroke:#737373;stroke-width:28.85394287;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   id="path30772" /><path
+   d="m 11950.027,2627.6845 c 125.481,-386.7379 119.715,-800.8938 0,-1173.9122"
+   style="color:#000000;fill:none;stroke:#737373;stroke-width:28.84311295;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;marker-start:url(#Arrow1Mstart);marker-end:url(#Arrow1Mend);visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   id="path22421" /></g></g></svg>

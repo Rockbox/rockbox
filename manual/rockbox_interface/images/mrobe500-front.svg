@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,9 +13,10 @@
    height="210mm"
    id="svg3184"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="mrobe500-front.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
   <defs
      id="defs3186">
     <inkscape:perspective
@@ -24,6 +26,13 @@
        inkscape:vp_z="1052.3622 : 372.04724 : 1"
        inkscape:persp3d-origin="526.18109 : 248.03149 : 1"
        id="perspective3193" />
+    <inkscape:perspective
+       id="perspective2828"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      inkscape:document-units="mm"
@@ -32,16 +41,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.69"
-     inkscape:cx="490"
-     inkscape:cy="343.53542"
+     inkscape:zoom="0.48790368"
+     inkscape:cx="533.74251"
+     inkscape:cy="287.19285"
      inkscape:current-layer="layer1"
      id="namedview3188"
      showgrid="false"
      inkscape:window-width="925"
      inkscape:window-height="661"
-     inkscape:window-x="1440"
-     inkscape:window-y="367" />
+     inkscape:window-x="89"
+     inkscape:window-y="54"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata3190">
     <rdf:RDF>
@@ -53,68 +63,68 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <rect
-       style="fill:#333333;fill-opacity:1;stroke:#c0c0c0;stroke-width:11.53767204000000035;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect2383"
-       width="888.44324"
-       height="588.48138"
-       x="5.768836"
-       y="149.84427"
-       ry="24.285715"
-       rx="24.285715"
-       inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
-       inkscape:export-xdpi="89.462585"
-       inkscape:export-ydpi="89.462585" />
-    <text
-       xml:space="preserve"
-       style="font-size:41.76608657999999963px;font-style:normal;font-weight:normal;fill:#c6c6c6;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+  <rect
+     style="fill:#333333;fill-opacity:1;stroke:#c0c0c0;stroke-width:11.53767204;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="rect2383"
+     width="888.44324"
+     height="588.48138"
+     x="5.768836"
+     y="149.84427"
+     ry="24.285715"
+     rx="24.285715"
+     inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
+     inkscape:export-xdpi="89.462585"
+     inkscape:export-ydpi="89.462585" />
+  <text
+     xml:space="preserve"
+     style="font-size:41.76608658px;font-style:normal;font-weight:normal;fill:#c6c6c6;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+     x="449.45041"
+     y="718.68054"
+     id="text2385"
+     inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
+     inkscape:export-xdpi="89.462585"
+     inkscape:export-ydpi="89.462585"><tspan
+       sodipodi:role="line"
+       id="tspan2387"
        x="449.45041"
        y="718.68054"
-       id="text2385"
-       inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
-       inkscape:export-xdpi="89.462585"
-       inkscape:export-ydpi="89.462585"><tspan
-         sodipodi:role="line"
-         id="tspan2387"
-         x="449.45041"
-         y="718.68054"
-         style="font-size:29.23626137000000114px;text-align:center;text-anchor:middle;fill:#c6c6c6;fill-opacity:1">m:robe</tspan></text>
-    <rect
-       style="fill:#6b6b6b;fill-opacity:1;stroke:none;stroke-width:0.69999999;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3191"
-       width="640"
-       height="480"
-       x="130"
-       y="204.09448"
-       inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
-       inkscape:export-xdpi="89.462585"
-       inkscape:export-ydpi="89.462585" />
+       style="font-size:29.23626137px;text-align:center;text-anchor:middle;fill:#c6c6c6;fill-opacity:1">m:robe</tspan></text>
+  <rect
+     style="fill:#6b6b6b;fill-opacity:1;stroke:none"
+     id="rect3191"
+     width="640"
+     height="480"
+     x="130"
+     y="204.0945"
+     inkscape:export-filename="/home/kkurbjun/Projects/rockbox/uisimulator/sdl/UI-mrobe500.png"
+     inkscape:export-xdpi="89.462585"
+     inkscape:export-ydpi="89.462585" />
+  <rect
+     style="fill:#999999;fill-opacity:1;stroke:none"
+     id="rect2395"
+     width="91.304344"
+     height="14.492754"
+     x="75.36232"
+     y="129.60173" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Text">
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
        x="182.6087"
-       y="103.51478"
+       y="103.51479"
        id="text2391"
        sodipodi:linespacing="100%"><tspan
          sodipodi:role="line"
          id="tspan2393"
          x="182.6087"
-         y="103.51478"
+         y="103.51479"
          style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium">Power</tspan></text>
-    <rect
-       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:3.74399996000000002;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect2395"
-       width="91.304344"
-       height="14.492754"
-       x="75.36232"
-       y="129.60173" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
-       d="M 117.3913,122.35535 L 178.26087,94.81912"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="M 117.3913,122.35535 178.26087,94.819124"
        id="path3167"
        inkscape:connector-type="polyline" />
   </g>
