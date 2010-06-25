@@ -449,7 +449,8 @@ void lcd_init_device(void)
 
     LCDB1SADDR2 = fb_end;
     LCDB2SADDR2 = fb_end;
-    LCDF1SADDR2 = fb_end;    LCDF2SADDR2 = fb_end;
+    LCDF1SADDR2 = fb_end;
+    LCDF2SADDR2 = fb_end;
 
     LCDB1SADDR3 = window;
     LCDB2SADDR3 = window;
