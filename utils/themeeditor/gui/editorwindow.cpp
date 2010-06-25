@@ -31,7 +31,8 @@
 
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::EditorWindow)
+    ui(new Ui::EditorWindow),
+    parseTreeSelection(0)
 {
     ui->setupUi(this);
     prefs = new PreferencesDialog(this);
@@ -438,8 +439,6 @@ void EditorWindow::updateCurrent()
 void EditorWindow::lineChanged(int line)
 {
     ui->parseTree->collapseAll();
-    if(parseTreeSelection)
-        parseTreeSelection->deleteLater();
     ParseTreeModel* model = dynamic_cast<ParseTreeModel*>
                             (ui->parseTree->model());
     parseTreeSelection = new QItemSelectionModel(model);

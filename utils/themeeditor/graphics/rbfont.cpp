@@ -21,10 +21,25 @@
 
 #include "rbfont.h"
 
+#include <QFont>
+#include <QBrush>
+
 RBFont::RBFont(QString file): filename(file)
 {
 }
 
 RBFont::~RBFont()
 {
+}
+
+QGraphicsSimpleTextItem* RBFont::renderText(QString text, QColor color,
+                                            QGraphicsItem *parent)
+{
+    QGraphicsSimpleTextItem* retval = new QGraphicsSimpleTextItem(text, parent);
+    QFont font;
+    font.setFixedPitch(true);
+    font.setPixelSize(8);
+    retval->setFont(font);
+    retval->setBrush(QBrush(color));
+    return retval;
 }

@@ -44,7 +44,7 @@ DeviceState::DeviceState(QWidget *parent) :
     this->setLayout(layout);
 
     /* Loading the tabs */
-    QScrollArea* currentArea;
+    QScrollArea* currentArea = 0;
     QHBoxLayout* subLayout;
     QWidget* panel;
 
@@ -176,7 +176,7 @@ DeviceState::DeviceState(QWidget *parent) :
         {
             elements = elements[1].trimmed().split(",");
 
-            int defIndex;
+            int defIndex = 0;
             QComboBox* temp = new QComboBox(currentArea);
             for(int i = 0; i < elements.count(); i++)
             {

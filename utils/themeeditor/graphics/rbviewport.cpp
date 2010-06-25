@@ -30,7 +30,10 @@
 #include "skin_parser.h"
 
 RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
-    : QGraphicsItem(info.screen())
+    : QGraphicsItem(info.screen()), font(info.screen()->getFont(0)),
+    foreground(info.screen()->foreground()),
+    background(info.screen()->background()), textOffset(0,0),
+    screen(info.screen())
 {
     if(!node->tag)
     {
@@ -51,7 +54,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     }
     else
     {
-        int param;
+        int param = 0;
         QString ident;
         int x,y,w,h;
         /* Rendering one of the other types of viewport */
@@ -102,6 +105,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
 
         setPos(x, y);
         size = QRectF(0, 0, w, h);
+
     }
 }
 
@@ -124,13 +128,29 @@ QRectF RBViewport::boundingRect() const
 void RBViewport::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if(!screen->hasBackdrop() && background != screen->background())
+    {
+        painter->fillRect(size, QBrush(background));
+    }
+
     painter->setBrush(Qt::NoBrush);
     painter->setPen(customUI ? Qt::blue : Qt::red);
     painter->drawRect(size);
 }
 
-/* Called at the end of a logical line */
-void RBViewport::newline()
+void RBViewport::newLine()
 {
+    if(textOffset.x() > 0)
+    {
+        textOffset.setY(textOffset.y() + lineHeight);
+        textOffset.setX(0);
+    }
+}
 
+void RBViewport::write(QString text)
+{
+    QGraphicsItem* graphic = font->renderText(text, foreground, this);
+    graphic->setPos(textOffset.x(), textOffset.y());
+    textOffset.setX(textOffset.x() + graphic->boundingRect().width());
+    lineHeight = font->lineHeight();
 }

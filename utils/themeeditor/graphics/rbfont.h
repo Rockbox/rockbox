@@ -24,12 +24,17 @@
 
 #include <QString>
 #include <QFile>
+#include <QGraphicsSimpleTextItem>
 
 class RBFont
 {
 public:
     RBFont(QString file);
     virtual ~RBFont();
+
+    QGraphicsSimpleTextItem* renderText(QString text, QColor color,
+                                        QGraphicsItem* parent = 0);
+    int lineHeight(){ return 8; }
 
 private:
     QString filename;

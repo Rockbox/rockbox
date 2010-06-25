@@ -516,7 +516,11 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     {
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
-        viewport->newline();
+        viewport->newLine();
+    }
+    else if(element->type == TEXT)
+    {
+        viewport->write(QString(static_cast<char*>(element->data)));
     }
     else if(element->type == TAG)
     {

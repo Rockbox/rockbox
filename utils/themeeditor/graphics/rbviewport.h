@@ -23,6 +23,7 @@
 #define RBVIEWPORT_H
 
 #include "skin_parser.h"
+#include "rbfont.h"
 
 class RBScreen;
 class RBRenderInfo;
@@ -45,16 +46,21 @@ public:
     void makeCustomUI(){ customUI = true; }
     void clearCustomUI(){ customUI = false; }
 
-
-    void newline();
+    void newLine();
+    void write(QString text);
 
 private:
+
     QRectF size;
     QColor background;
     QColor foreground;
+    RBFont* font;
 
     bool customUI;
+    QPoint textOffset;
+    int lineHeight;
 
+    RBScreen* screen;
 };
 
 #endif // RBVIEWPORT_H

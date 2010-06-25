@@ -32,10 +32,10 @@ RBScreen::RBScreen(const RBRenderInfo& info, QGraphicsItem *parent) :
     width = info.settings()->value("#screenwidth", "300").toInt();
     height = info.settings()->value("#screenheight", "200").toInt();
 
-    QString bg = info.settings()->value("background color", "000000");
+    QString bg = info.settings()->value("background color", "FFFFFF");
     bgColor = stringToColor(bg, Qt::white);
 
-    QString fg = info.settings()->value("foreground color", "FFFFFF");
+    QString fg = info.settings()->value("foreground color", "000000");
     fgColor = stringToColor(fg, Qt::black);
 
     settings = info.settings();
@@ -61,6 +61,8 @@ RBScreen::RBScreen(const RBRenderInfo& info, QGraphicsItem *parent) :
             backdrop = 0;
         }
     }
+
+    fonts.insert(0, new RBFont("Nothin'"));
 }
 
 RBScreen::~RBScreen()

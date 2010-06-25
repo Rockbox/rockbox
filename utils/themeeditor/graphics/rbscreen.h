@@ -60,9 +60,13 @@ public:
     RBFont* getFont(int id);
 
     void setBackdrop(QString filename);
+    bool hasBackdrop(){ return backdrop != 0; }
     void makeCustomUI(QString id);
 
     static QColor stringToColor(QString str, QColor fallback);
+
+    QColor foreground(){ return fgColor; }
+    QColor background(){ return bgColor; }
 
 
 private:
