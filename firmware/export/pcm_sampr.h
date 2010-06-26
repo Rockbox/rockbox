@@ -312,4 +312,24 @@ enum rec_freq_indexes
 extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 #endif /* HAVE_RECORDING */
 
+#ifdef CONFIG_SAMPR_TYPES
+
+#define SAMPR_TYPE_MASK (0xff << 24)
+#define SAMPR_TYPE_PLAY (0x00 << 24)
+#ifdef HAVE_RECORDING
+#define SAMPR_TYPE_REC  (0x01 << 24)
+#endif
+
+unsigned int sampr_type_rec_to_play(unsigned int samplerate);
+
+#else /* ndef CONFIG_SAMPR_TYPES */
+
+/* Types are ignored and == 0 */
+#define SAMPR_TYPE_PLAY 0
+#ifdef HAVE_RECORDING
+#define SAMPR_TYPE_REC  0
+#endif
+
+#endif /* CONFIG_SAMPR_TYPES */
+
 #endif /* PCM_SAMPR_H */

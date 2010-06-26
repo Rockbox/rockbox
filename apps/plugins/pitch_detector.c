@@ -1106,7 +1106,7 @@ void record_and_get_pitch(void)
         }
     }
     rb->pcm_close_recording();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(REC_SAMPR_DEFAULT | SAMPR_TYPE_REC);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     rb->cancel_cpu_boost();
 #endif
@@ -1141,7 +1141,7 @@ void init_everything(void)
     sample_rate = rb->round_value_to_list32(9000, rb->rec_freq_sampr,
                                             REC_NUM_FREQ, false);
     sample_rate = rb->rec_freq_sampr[sample_rate];
-    rb->pcm_set_frequency(sample_rate);
+    rb->pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
     rb->pcm_init_recording();
     
     /* GUI */

@@ -288,8 +288,8 @@ static void pcm_rec_have_more(int status, void **start, size_t *size)
 
 static void reset_hardware(void)
 {
-    /* reset pcm to defaults (playback only) */
-    pcm_set_frequency(HW_SAMPR_DEFAULT);
+    /* reset pcm to defaults */
+    pcm_set_frequency(REC_SAMPR_DEFAULT | SAMPR_TYPE_REC);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings();
 }
@@ -1216,7 +1216,7 @@ static void pcmrec_set_recording_options(
         /* round to HW playback rates for monitoring */
         index = round_value_to_list32(sr, hw_freq_sampr,
                                       HW_NUM_FREQ, false);
-        pcm_set_frequency(hw_freq_sampr[index]);
+        pcm_set_frequency(hw_freq_sampr[index] | SAMPR_TYPE_REC);
         /* encoders with a limited number of rates do their own rounding */
     }
     else
@@ -1224,7 +1224,7 @@ static void pcmrec_set_recording_options(
     {
         /* set sample rate from frequency selection */
         sample_rate = rec_freq_sampr[rec_frequency];
-        pcm_set_frequency(sample_rate);
+        pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
     }
 
     /* set monitoring */

@@ -28,6 +28,10 @@
 #include "system.h"
 #include "cpu.h"
 #include "i2s.h"
+#if defined (SANSA_E200) || defined (SANSA_C200)
+#include "audiohw.h"
+#include "pcm_sampr.h"
+#endif
 
 #if CONFIG_CPU == PP5002
 void i2s_reset(void)
@@ -70,6 +74,8 @@ void i2s_reset(void)
     IISCLK = (IISCLK & ~0x1ff) | 31;
     IISDIV = (IISDIV & ~0xc0000000) | (2 << 30);
     IISDIV = (IISDIV & ~0x3f) | 16;
+#elif defined (SANSA_E200) || defined (SANSA_C200)
+    audiohw_set_sampr_dividers(HW_FREQ_DEFAULT);
 #else
     IISCLK = (IISCLK & ~0x1ff) | 33;
     IISDIV = 7;

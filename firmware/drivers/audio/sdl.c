@@ -162,6 +162,10 @@ void audiohw_set_eq_band_width(unsigned int band, int value)
 void audiohw_set_depth_3d(int value)
     { (void)value; }
 #endif
+#if defined(HAVE_SAMPR_TYPE_REC)
+unsigned int pcm_sampr_type_rec_to_play(int samplerate)
+    { return samplerate; }
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 int mas_codec_readreg(int reg)
 {

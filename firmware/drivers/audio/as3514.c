@@ -327,6 +327,15 @@ void audiohw_close(void)
 
 void audiohw_set_frequency(int fsel)
 {
+#if defined(SANSA_E200) || defined(SANSA_C200)
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
+
+    as3514_write(AS3514_PLLMODE, hw_freq_sampr[fsel] < 24000 ?
+                 PLLMODE_LRCK_8_23 : PLLMODE_LRCK_24_48);
+
+    audiohw_set_sampr_dividers(fsel);
+#endif
     (void)fsel;
 }
 

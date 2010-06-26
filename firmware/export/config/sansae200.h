@@ -7,14 +7,19 @@
 #define MODEL_NUMBER 16
 #define MODEL_NAME   "Sandisk Sansa e200 series"
 
-#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+#define HW_SAMPR_CAPS       (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32)
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
+#define REC_SAMPR_CAPS      (SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16)
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
 #define REC_SAMPR_DEFAULT   SAMPR_22
+
+/* because the samplerates don't match at each point, we must be able to
+ * tell PCM which set of rates to use. not needed if recording rates are
+ * a simple subset of playback rates and are equal values. */
+#define CONFIG_SAMPR_TYPES
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
