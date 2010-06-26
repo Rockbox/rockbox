@@ -301,6 +301,10 @@ enum rec_freq_indexes
 #define REC_FREQ_DEFAULT REC_FREQ_44
 #endif
 
+#ifndef REC_SAMPR_DEFAULT
+#define REC_SAMPR_DEFAULT SAMPR_44
+#endif
+
 #define REC_FREQ_CFG_VAL_LIST  &REC_HAVE_96_(",96") REC_HAVE_88_(",88") \
                                 REC_HAVE_64_(",64") REC_HAVE_48_(",48") \
                                 REC_HAVE_44_(",44") REC_HAVE_32_(",32") \
