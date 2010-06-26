@@ -561,8 +561,8 @@
    inkscape:vp_y="0 : 1000 : 0"
    inkscape:vp_x="0 : 0.5 : 1"
    sodipodi:type="inkscape:persp3d" /></defs><sodipodi:namedview
-   inkscape:window-height="572"
-   inkscape:window-width="746"
+   inkscape:window-height="1029"
+   inkscape:window-width="1676"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
    borderopacity="1.0"
@@ -572,11 +572,11 @@
    showguides="true"
    inkscape:guide-bbox="true"
    inkscape:zoom="0.70710678"
-   inkscape:cx="207.05818"
+   inkscape:cx="43.009406"
    inkscape:cy="307.11348"
-   inkscape:window-x="268"
-   inkscape:window-y="91"
-   inkscape:current-layer="svg2"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:current-layer="layer1"
    showgrid="false"
    inkscape:window-maximized="0" />
  <path
@@ -770,9 +770,10 @@
 <g
    inkscape:groupmode="layer"
    id="layer1"
-   inkscape:label="Text"><text
+   inkscape:label="Text"
+   style="display:inline"><text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9476.6211"
    y="8343.1211"
    id="text1573"
@@ -782,9 +783,10 @@
      x="9476.6211"
      y="8343.1211">Right</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="-2340.8987"
    y="8427.5869"
    id="text1577"
@@ -794,9 +796,10 @@
      x="-2340.8987"
      y="8427.5869">Left</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9436.3379"
    y="12829.944"
    id="text1581"
@@ -806,9 +809,10 @@
      x="9436.3379"
      y="12829.944">Down</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="-2368.3333"
    y="5739.6509"
    id="text1585"
@@ -818,9 +822,10 @@
      x="-2368.3333"
      y="5739.6509">Up</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9539.9951"
    y="10906.634"
    id="text1589"
@@ -830,9 +835,10 @@
      x="9539.9951"
      y="10906.634">Select</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9435.876"
    y="2302.2393"
    id="text1593"
@@ -842,9 +848,10 @@
      x="9435.876"
      y="2302.2393">Power/Hold</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9398.1582"
    y="4376.6807"
    id="text1597"
@@ -854,9 +861,10 @@
      x="9398.1582"
      y="4376.6807">Rec</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Palladio L"
    x="9473.5928"
    y="6187.1025"
    id="text1601"
@@ -866,19 +874,20 @@
      x="9473.5928"
      y="6187.1025">Play</tspan></text>
 
+
 <path
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.22222167;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-   d="M 7882.8786,8090.3226 L 9259.5536,8090.3226"
+   style="fill:none;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   d="m 7882.8786,8090.3226 1376.675,0"
    id="path1622" /><path
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.22222167;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-   d="M 6826.7992,8109.1812 L 9334.9879,10598.511"
+   style="fill:none;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   d="M 6826.7992,8109.1812 9334.9879,10598.511"
    id="path2497" /><path
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   d="M 6816.833,9134.2393 L 9213.3889,12488.651"
-   id="path2499" /></g><path
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   d="M -382.2766,5765.0203 L 6816.9433,7052.5357"
+   style="fill:none;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   d="M 6816.833,9134.2393 9213.3889,12488.651"
+   id="path2499" /><path
+   style="fill:none;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   d="M -382.2766,5765.0203 6816.9433,7052.5357"
    id="path2501" /><path
-   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#737373;stroke-width:28.22222167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   d="M -863.6984,8078.0184 L 5689.6983,8069.76"
-   id="path2503" /></svg>
+   style="fill:none;stroke:#737373;stroke-width:28.22222137;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+   d="M -863.6984,8078.0184 5689.6983,8069.76"
+   id="path2503" /></g></svg>
