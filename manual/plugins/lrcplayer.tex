@@ -1,73 +1,66 @@
 % $Id$ %
 \subsection{Lrcplayer}
 % \screenshot{plugins/images/ss-lrcplayer}{Lrcplayer}{}
-This plugin displays lyrics in .lrc file (and some other formats) synchronized
-with the song being played.
+This plugin displays lyrics in \fname{.lrc} files (and some other formats)
+synchronized with the song being played.
 
-\subsubsection{Supproted file types}
+\subsubsection{Supported file types}
 \begin{enumerate}
-\item .lrc
-\item .lrc8
-\item .snc
-\item .txt
-\item id3v2 SYLT or USLT tag in mp3 file
+\item \fname{.lrc}
+\item \fname{.lrc8}
+\item \fname{.snc}
+\item \fname{.txt}
+\item id3v2 SYLT or USLT tags in mp3 files
 \end{enumerate}
 
-.lrc8 file is equivalent to .lrc files except it is read that
-encoded by UTF-8 nevertheless the encoding setting.
+\fname{.lrc8} files are the same as \fname{.lrc} files except that they are UTF8
+encoded. The Lyrics3 tag is not supported.
 
-Lyrics3 tag is not supported.
-
-\subsubsection{Supported tags and formats for .lrc files}
-following tags are supported:
+\subsubsection{Supported tags and formats for \fname{.lrc} files}
+The following tags are supported:
 \begin{verbatim}
 [ti:title]
 [ar:artist]
 [offset:offset (msec)]
 \end{verbatim}
 
-each line should look like one of these:
+Each line should resemble one of the following:
 \begin{verbatim}
 [time tag]line
 [time tag]...[time tag]line
 [time tag]<word time tag>word<word time tag>...<word time tag>
 \end{verbatim}
 
-time tag must be in one of the formats: [mm:ss], [mm:ss.xx], or [mm:ss.xxx]
+The time tag must be in the form [mm:ss], [mm:ss.xx], or [mm:ss.xxx] where mm is
+minutes, ss is seconds, xx is tenth of milliseconds, and xxx is milliseconds.
+Any other tags and lines without time tags are ignored.
 
-where mm is minuts, ss is seconds, xx is tenth of millisecounds, xxx is millisecounds.
-
-e.g. [01:23], [01:23.45].
-
-any other tags and lines without time tags are ignored.
-
-\subsubsection{Searching lyrics file}
-the plugin checks following directories for lyrics file.
-\opt{swcodec}{if no lyrics file is found and the audio file is a mp3,
-  it also checks SYLT or USLT tag in id3v2.}
+\subsubsection{Location of lyrics files}
+The plugin checks the following directories for lyrics files.
+\opt{swcodec}{If no lyrics file is found and the audio file is a \fname{.mp3},
+  it also checks for SYLT and USLT tags in the id3v2 tags.}
 
 \begin{enumerate}
-\item the directory of the audio file and it's parent directories.
-\item subdirecory named ``Lylics'' of each directory in 1.
-\item almost same as 1, but ``/Lylics'' is prepended to the path.
+\item The directory containing the audio file and its parent directories.
+\item For each of the above directories, the plugin searches for a subdirectory
+      named ``Lyrics''.
+\item Finally, the plugin will search as above, but within a directory called
+      ``/Lyrics''. The name of this directory can be customized, see below.
 \end{enumerate}
-``Lylics'' can be customized.
 
-e.g.
-
-if the audio file currently playing is /Musics/Artist/Album/Title.mp3,
-then following files will be tried in this order.
-
-ext is one in supproted file types list, tried in same order of the list.
+If the audio file currently playing is \fname{/Music/Artist/Album/Title.mp3},
+then the following files will be searched for, in this order. \fname{.ext} is one
+of the supported extensions from the list above, and will be searched for in the
+same order as in that list.
 
 \begin{verbatim}
-/Musics/Artist/Album/Title.ext
-/Musics/Artist/Title.ext
-/Musics/Title.ext
+/Music/Artist/Album/Title.ext
+/Music/Artist/Title.ext
+/Music/Title.ext
 /Title.ext
-/Musics/Artist/Album/Lyrics/Title.ext
-/Musics/Artist/Lyrics/Title.ext
-/Musics/Lyrics/Title.ext
+/Music/Artist/Album/Lyrics/Title.ext
+/Music/Artist/Lyrics/Title.ext
+/Music/Lyrics/Title.ext
 /Lyrics/Title.ext
 /Lyrics/Musics/Artist/Album/Title.ext
 /Lyrics/Musics/Artist/Title.ext
@@ -122,51 +115,49 @@ ext is one in supproted file types list, tried in same order of the list.
 \subsubsection{Lrcplayer Menu}
 
 \begin{description}
-  \item[Theme settings.] change theme related settings.
+  \item[Theme settings.] Change theme related settings.
   \begin{description}
     \opt{lcd_bitmap}{%
-      \item[Show Statusbar.] show / hide statusbar.
-      \item[Display Title.] show / hide title of track.
+      \item[Show Statusbar.] Show / hide the statusbar.
+      \item[Display Title.] Show / hide the track title.
     }%
-    \item[Display Time.] show / hide current time.
+    \item[Display Time.] Show / hide the current time.
     \opt{lcd_color}{%
-      \item[Inactive Color.] set color of inactive part of lyrics.
+      \item[Inactive Colour.] Set the colour of the inactive part of the lyrics.
     }%
-    \item[Backlight Force On.] don't turn off backlight while in displaying
-        lyrics screen.
+    \item[Backlight Force On.] Do not turn off the backlight while displaying
+         the lyrics.
   \end{description}
   \opt{lcd_bitmap}{%
-    \item[Display Settings.] change displaying of lyrics.
+    \item[Display Settings.] Change how the lyrics are displayed.
     \begin{description}
-      \item[Wrap.] breaks lines at white space.
-      \item[Wipe.] wipe text.
-      \item[Align.] align text to left, center, or right.
+      \item[Wrap.] Breaks lines at white space.
+      \item[Wipe.] Wipes the text.
+      \item[Alignment.] Align text to the left, centre, or right.
       \item[Activate Only Current Line.]
-          activate only current line or current line and previous lines.
+          Activate only the current line, or the current and previous lines.
     \end{description}
   }%
-  \item[Lyrics Settings.] change loading of lyrics.
+  \item[Lyrics Settings.] Change how the lyrics files are loaded.
   \begin{description}
-    \item[Encoding.] sets the codepage in the plugin.
+    \item[Encoding.] Sets the codepage used in the plugin.
     \opt{swcodec}{%
-      \item[Read ID3 tag.] read lyrics from id3 tag in mp3 file.
+      \item[Read ID3 tag.] Read lyrics from id3 tags in mp3 files.
     }%
-    \item[Lrc Directry.] set name of a directory where lyrics files are sotred,
-      63 bytes at maximum.
+    \item[Lrc Directory.] Set the directory where lyrics files are stored,
+      must be a maximum of 63 bytes.
   \end{description}
-  \item[Playback Control.] Show playback control menu.
-  \item[Time Offset.] set offset for time tags of the lyrics currently loaded.
-  \item[Timetag Editor.] Enter timetag editor.
+  \item[Playback Control.] Show the playback control menu.
+  \item[Time Offset.] Set an offset for the time tags for the lyrics currently in use.
+  \item[Timetag Editor.] Enter the timetag editor.
   \item[Quit.] Exit the plugin.
 \end{description}
 
-\subsubsection{Editing time tag}
+\subsubsection{Editing the time tags}
 
-The time when to dispaly the line can be edited with timetag editor.
-Selecting line changes its time to current position of the song.
-To set a specific time or to adjust the time, press \ActionStdContext to
- bring up a screen for adjusting the time.
+The display time for each line can be changed with the timetag editor.
+Selecting a line changes its time to the current position of the track.
+To set a specific time or to adjust the time, press \ActionStdContext{} to
+bring up a screen to adjust the time.
 Changes will be saved automatically when the song is changed.
-
 Edting words in lyrics is not supported.
-
