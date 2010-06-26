@@ -295,6 +295,7 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         settings.insert("themebase", base.canonicalPath());
     }
 
+    bool remote = false;
     if(file)
     {
         QString skinFile = *file;
@@ -303,13 +304,18 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         skinFile.chop(skinFile.length() - skinFile.lastIndexOf("."));
         settings.insert("imagepath", settings.value("themebase","") + "/wps/" +
                         skinFile);
+
+        decomp = file->split(".");
+        QString extension = decomp.last();
+        if(extension[0] == 'r')
+            remote = true;
     }
 
     RBScreen* screen = 0;
     RBRenderInfo info(this, project, &settings, device, screen);
 
     /* Adding the screen */
-    screen = new RBScreen(info);
+    screen = new RBScreen(info, remote);
     scene->addItem(screen);
 
     info = RBRenderInfo(this, project, &settings, device, screen);

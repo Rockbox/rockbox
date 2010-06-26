@@ -35,7 +35,8 @@ class RBScreen : public QGraphicsItem
 {
 
 public:
-    RBScreen(const RBRenderInfo& info, QGraphicsItem *parent = 0);
+    RBScreen(const RBRenderInfo& info, bool remote = false,
+             QGraphicsItem *parent = 0);
     virtual ~RBScreen();
 
     QPainterPath shape() const;

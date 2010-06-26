@@ -27,11 +27,12 @@
 # performing much of any error checking on it: screwing up the syntax may very
 # well segfault the application on startup
 
-[Screen Sizes]
+[Rendering Info]
 screenwidth ; Screen Width ; spin(0,800) ; 300
 screenheight ; Screen Height ; spin(0,800) ; 200
 remotewidth ; Remote Width ; spin(0,800) ; 100
 remoteheight ; Remote Height ; spin(0,800); 50
+showviewports ; Show Viewports ; check ; true
 
 [ID3 Info]
 ia ; Artist ; text ; Current Artist

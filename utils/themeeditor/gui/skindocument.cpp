@@ -288,6 +288,8 @@ void SkinDocument::save()
     titleText = decompose.last();
     emit titleChanged(titleText);
 
+    scene();
+
 }
 
 void SkinDocument::saveAs()
@@ -319,6 +321,8 @@ void SkinDocument::saveAs()
     QStringList decompose = fileName.split('/');
     titleText = decompose[decompose.count() - 1];
     emit titleChanged(titleText);
+
+    scene();
 
 }
 

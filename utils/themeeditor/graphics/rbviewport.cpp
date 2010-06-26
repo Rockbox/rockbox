@@ -105,7 +105,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
 
         setPos(x, y);
         size = QRectF(0, 0, w, h);
-
+        debug = info.device()->data("showviewports").toBool();
     }
 }
 
@@ -135,7 +135,8 @@ void RBViewport::paint(QPainter *painter,
 
     painter->setBrush(Qt::NoBrush);
     painter->setPen(customUI ? Qt::blue : Qt::red);
-    painter->drawRect(size);
+    if(debug)
+        painter->drawRect(size);
 }
 
 void RBViewport::newLine()

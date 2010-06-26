@@ -56,6 +56,7 @@ private:
     QColor foreground;
     QColor background;
 
+    bool debug;
     bool customUI;
     QPoint textOffset;
     int lineHeight;

@@ -524,6 +524,13 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     }
     else if(element->type == TAG)
     {
+
+        if(info.device()->data(QString(element->tag->name)).isValid())
+            viewport->write(info.device()->
+                            data(QString(element->tag->name)).toString());
+
+        /* These are for special cases */
+
         QString filename;
         QString id;
         int x, y, tiles, tile;
