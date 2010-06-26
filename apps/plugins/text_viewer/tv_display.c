@@ -234,7 +234,9 @@ void tv_end_display(void)
 
 void tv_clear_display(void)
 {
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
     display->clear_viewport();
 }
 
