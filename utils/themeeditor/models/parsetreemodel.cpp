@@ -275,7 +275,7 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
 }
 
 QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
-                                       const QString* file)
+                                       DeviceState* device, const QString* file)
 {
     scene->clear();
 
@@ -306,13 +306,13 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     }
 
     RBScreen* screen = 0;
-    RBRenderInfo info(this, project, &settings, screen);
+    RBRenderInfo info(this, project, &settings, device, screen);
 
     /* Adding the screen */
     screen = new RBScreen(info);
     scene->addItem(screen);
 
-    info = RBRenderInfo(this, project, &settings, screen);
+    info = RBRenderInfo(this, project, &settings, device, screen);
 
 
     /* Rendering the tree */

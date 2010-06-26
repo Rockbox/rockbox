@@ -21,6 +21,7 @@
 
 #include "rbscreen.h"
 #include "rbviewport.h"
+#include "devicestate.h"
 
 #include <QPainter>
 #include <QFile>
@@ -29,8 +30,13 @@ RBScreen::RBScreen(const RBRenderInfo& info, QGraphicsItem *parent) :
     QGraphicsItem(parent), backdrop(0), project(project)
 {
 
+    /*
     width = info.settings()->value("#screenwidth", "300").toInt();
     height = info.settings()->value("#screenheight", "200").toInt();
+*/
+
+    width = info.device()->data("screenwidth").toInt();
+    height = info.device()->data("screenheight").toInt();
 
     QString bg = info.settings()->value("background color", "FFFFFF");
     bgColor = stringToColor(bg, Qt::white);

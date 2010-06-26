@@ -52,9 +52,9 @@ public:
 private:
 
     QRectF size;
-    QColor background;
-    QColor foreground;
     RBFont* font;
+    QColor foreground;
+    QColor background;
 
     bool customUI;
     QPoint textOffset;

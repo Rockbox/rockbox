@@ -33,6 +33,7 @@
 #include "codeeditor.h"
 #include "tabcontent.h"
 #include "projectmodel.h"
+#include "devicestate.h"
 
 class SkinDocument : public TabContent
 {
@@ -49,9 +50,9 @@ public:
     }
 
     SkinDocument(QLabel* statusLabel, ProjectModel* project = 0,
-                 QWidget *parent = 0);
+                 DeviceState* device = 0, QWidget *parent = 0);
     SkinDocument(QLabel* statusLabel, QString file, ProjectModel* project = 0,
-                 QWidget* parent = 0);
+                 DeviceState* device = 0, QWidget* parent = 0);
     virtual ~SkinDocument();
 
     void connectPrefs(PreferencesDialog* prefs);
@@ -70,7 +71,7 @@ public:
 
     TabType type() const{ return Skin; }
 
-    QGraphicsScene* scene(){ return model->render(project, &fileName); }
+    QGraphicsScene* scene(){ return model->render(project, device, &fileName); }
 
 signals:
 
@@ -80,6 +81,7 @@ public slots:
 
 private slots:
     void codeChanged();
+    void deviceChanged(){ scene(); }
 
 private:
     void setupUI();
@@ -101,6 +103,7 @@ private:
     bool blockUpdate;
 
     ProjectModel* project;
+    DeviceState* device;
 };
 
 #endif // SKINDOCUMENT_H

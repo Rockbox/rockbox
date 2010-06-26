@@ -66,7 +66,8 @@ void EditorWindow::loadTabFromSkinFile(QString fileName)
     }
 
     /* Adding a new document*/
-    SkinDocument* doc = new SkinDocument(parseStatus, fileName, project);
+    SkinDocument* doc = new SkinDocument(parseStatus, fileName, project,
+                                         deviceConfig);
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
 
@@ -219,7 +220,7 @@ void EditorWindow::addTab(TabContent *doc)
 
 void EditorWindow::newTab()
 {
-    SkinDocument* doc = new SkinDocument(parseStatus, project);
+    SkinDocument* doc = new SkinDocument(parseStatus, project, deviceConfig);
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
 }
@@ -344,6 +345,13 @@ void EditorWindow::openProject()
 
         project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);
+
+        if(project->getSetting("#screenwidth") != "")
+            deviceConfig->setData("screenwidth",
+                                  project->getSetting("#screenwidth"));
+        if(project->getSetting("#screenheight") != "")
+            deviceConfig->setData("screenheight",
+                                  project->getSetting("#screenheight"));
 
         QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
                          project, SLOT(activated(QModelIndex)));

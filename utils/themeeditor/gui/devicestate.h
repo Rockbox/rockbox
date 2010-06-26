@@ -47,6 +47,7 @@ public:
     virtual ~DeviceState();
 
     QVariant data(QString tag);
+    void setData(QString tag, QVariant data);
 
 signals:
     void settingsChanged();

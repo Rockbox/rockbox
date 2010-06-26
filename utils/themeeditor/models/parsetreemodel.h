@@ -22,6 +22,7 @@
 #include "skin_parser.h"
 #include "skin_debug.h"
 #include "projectmodel.h"
+#include "devicestate.h"
 
 #ifndef PARSETREEMODEL_H
 #define PARSETREEMODEL_H
@@ -31,6 +32,7 @@
 #include <QGraphicsScene>
 
 #include "parsetreenode.h"
+#include "devicestate.h"
 
 class ParseTreeModel : public QAbstractItemModel
 {
@@ -60,7 +62,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
-    QGraphicsScene* render(ProjectModel* project, const QString* file = 0);
+    QGraphicsScene* render(ProjectModel* project, DeviceState* device,
+                           const QString* file = 0);
 
     static QString safeSetting(ProjectModel* project, QString key,
                                QString fallback)

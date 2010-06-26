@@ -30,9 +30,9 @@
 #include <iostream>
 
 SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
-                           QWidget *parent)
+                           DeviceState* device, QWidget *parent)
                                :TabContent(parent), statusLabel(statusLabel),
-                               project(project)
+                               project(project), device(device)
 {
     setupUI();
 
@@ -44,9 +44,11 @@ SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
 }
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QString file,
-                           ProjectModel* project, QWidget *parent)
+                           ProjectModel* project, DeviceState* device,
+                           QWidget *parent)
                                :TabContent(parent), fileName(file),
-                               statusLabel(statusLabel), project(project)
+                               statusLabel(statusLabel), project(project),
+                               device(device)
 {
     setupUI();
     blockUpdate = false;
@@ -144,6 +146,10 @@ void SkinDocument::setupUI()
                      this, SLOT(codeChanged()));
     QObject::connect(editor, SIGNAL(cursorPositionChanged()),
                      this, SLOT(cursorChanged()));
+
+    /* Connecting to device setting changes */
+    QObject::connect(device, SIGNAL(settingsChanged()),
+                     this, SLOT(deviceChanged()));
 
     settingsChanged();
 }
@@ -257,7 +263,7 @@ void SkinDocument::codeChanged()
     else
         emit titleChanged(titleText);
 
-    model->render(project, &fileName);
+    model->render(project, device, &fileName);
 
     cursorChanged();
 

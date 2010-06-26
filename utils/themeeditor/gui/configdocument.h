@@ -75,7 +75,6 @@ private slots:
     void addClicked();
     void textChanged();
 
-
 private:
     Ui::ConfigDocument *ui;
     QList<QHBoxLayout*> containers;

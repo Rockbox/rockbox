@@ -234,6 +234,47 @@ QVariant DeviceState::data(QString tag)
     return QVariant();
 }
 
+void DeviceState::setData(QString tag, QVariant data)
+{
+    QPair<InputType, QWidget*> found =
+            inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));
+
+    if(found.second == 0)
+        return;
+
+    switch(found.first)
+    {
+    case Text:
+        dynamic_cast<QLineEdit*>(found.second)->setText(data.toString());
+        break;
+
+    case Slide:
+        dynamic_cast<QSlider*>(found.second)->setValue(data.toInt());
+        break;
+
+    case Spin:
+        dynamic_cast<QSpinBox*>(found.second)->setValue(data.toInt());
+        break;
+
+    case DSpin:
+        dynamic_cast<QDoubleSpinBox*>(found.second)->setValue(data.toDouble());
+        break;
+
+    case Combo:
+        dynamic_cast<QComboBox*>
+                (found.second)->
+                setCurrentIndex(dynamic_cast<QComboBox*>
+                                (found.second)->findText(data.toString()));
+        break;
+
+    case Check:
+        dynamic_cast<QCheckBox*>(found.second)->setChecked(data.toBool());
+        break;
+    }
+
+    emit settingsChanged();
+}
+
 void DeviceState::input()
 {
     emit settingsChanged();
