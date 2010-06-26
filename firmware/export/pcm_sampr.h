@@ -324,7 +324,7 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 #define SAMPR_TYPE_REC  (0x01 << 24)
 #endif
 
-unsigned int sampr_type_rec_to_play(unsigned int samplerate);
+unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate);
 
 #else /* ndef CONFIG_SAMPR_TYPES */
 
