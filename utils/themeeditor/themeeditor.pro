@@ -11,6 +11,7 @@ RBBASE_DIR = $$replace(RBBASE_DIR,/utils/themeeditor,)
 INCLUDEPATH += gui
 INCLUDEPATH += models
 INCLUDEPATH += graphics
+INCLUDEPATH += findreplace
 
 # Stuff for the parse lib
 libskin_parser.commands = @$(MAKE) \
@@ -40,7 +41,9 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbrenderinfo.h \
     graphics/rbimage.h \
     graphics/rbfont.h \
-    gui/devicestate.h
+    gui/devicestate.h \
+    findreplace/findreplaceform.h \
+    findreplace/findreplacedialog.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -57,7 +60,9 @@ SOURCES += main.cpp \
     graphics/rbrenderinfo.cpp \
     graphics/rbimage.cpp \
     graphics/rbfont.cpp \
-    gui/devicestate.cpp
+    gui/devicestate.cpp \
+    findreplace/findreplaceform.cpp \
+    findreplace/findreplacedialog.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -69,5 +74,7 @@ OTHER_FILES += README \
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \
-    gui/skinviewer.ui
+    gui/skinviewer.ui \
+    findreplace/findreplaceform.ui \
+    findreplace/findreplacedialog.ui
 RESOURCES += resources.qrc

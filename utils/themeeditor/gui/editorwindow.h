@@ -73,6 +73,12 @@ private slots:
     void tabTitleChanged(QString title);
     void updateCurrent(); /* Generates code in the current tab */
     void lineChanged(int line); /* Used for auto-expand */
+    void undo();
+    void redo();
+    void cut();
+    void copy();
+    void paste();
+    void findReplace();
 
 private:
     /* Setup functions */

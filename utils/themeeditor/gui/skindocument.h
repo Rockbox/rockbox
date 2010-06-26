@@ -27,6 +27,8 @@
 #include <QHBoxLayout>
 #include <QGraphicsScene>
 
+#include "findreplacedialog.h"
+
 #include "skinhighlighter.h"
 #include "parsetreemodel.h"
 #include "preferencesdialog.h"
@@ -61,6 +63,7 @@ public:
     QString file() const{ return fileName; }
     QString title() const{ return titleText; }
     QString getStatus(){ return parseStatus; }
+    CodeEditor* getEditor(){ return editor; }
     void genCode(){ editor->document()->setPlainText(model->genCode()); }
     void setProject(ProjectModel* project){ this->project = project; }
 
@@ -72,6 +75,9 @@ public:
     TabType type() const{ return Skin; }
 
     QGraphicsScene* scene(){ return model->render(project, device, &fileName); }
+
+    void showFind(){ findReplace->show(); }
+    void hideFind(){ findReplace->hide(); }
 
 signals:
 
@@ -104,6 +110,8 @@ private:
 
     ProjectModel* project;
     DeviceState* device;
+
+    FindReplaceDialog* findReplace;
 };
 
 #endif // SKINDOCUMENT_H

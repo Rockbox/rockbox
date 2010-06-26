@@ -151,6 +151,12 @@ void SkinDocument::setupUI()
     QObject::connect(device, SIGNAL(settingsChanged()),
                      this, SLOT(deviceChanged()));
 
+    /* Attaching the find/replace dialog */
+    findReplace = new FindReplaceDialog(this);
+    findReplace->setModal(false);
+    findReplace->setTextEdit(editor);
+    findReplace->hide();
+
     settingsChanged();
 }
 

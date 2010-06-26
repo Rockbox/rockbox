@@ -200,6 +200,20 @@ void EditorWindow::setupMenus()
 
     QObject::connect(ui->actionOpen_Project, SIGNAL(triggered()),
                      this, SLOT(openProject()));
+
+    /* Connecting the edit menu */
+    QObject::connect(ui->actionUndo, SIGNAL(triggered()),
+                     this, SLOT(undo()));
+    QObject::connect(ui->actionRedo, SIGNAL(triggered()),
+                     this, SLOT(redo()));
+    QObject::connect(ui->actionCut, SIGNAL(triggered()),
+                     this, SLOT(cut()));
+    QObject::connect(ui->actionCopy, SIGNAL(triggered()),
+                     this, SLOT(copy()));
+    QObject::connect(ui->actionPaste, SIGNAL(triggered()),
+                     this, SLOT(paste()));
+    QObject::connect(ui->actionFind_Replace, SIGNAL(triggered()),
+                     this, SLOT(findReplace()));
 }
 
 void EditorWindow::addTab(TabContent *doc)
@@ -237,6 +251,12 @@ void EditorWindow::shiftTab(int index)
         ui->actionClose_Document->setEnabled(false);
         ui->actionToolbarSave->setEnabled(false);
         ui->fromTree->setEnabled(false);
+        ui->actionUndo->setEnabled(false);
+        ui->actionRedo->setEnabled(false);
+        ui->actionCut->setEnabled(false);
+        ui->actionCopy->setEnabled(false);
+        ui->actionPaste->setEnabled(false);
+        ui->actionFind_Replace->setEnabled(false);
         viewer->setScene(0);
     }
     else if(widget->type() == TabContent::Config)
@@ -245,6 +265,12 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
         ui->actionToolbarSave->setEnabled(true);
+        ui->actionUndo->setEnabled(false);
+        ui->actionRedo->setEnabled(false);
+        ui->actionCut->setEnabled(false);
+        ui->actionCopy->setEnabled(false);
+        ui->actionPaste->setEnabled(false);
+        ui->actionFind_Replace->setEnabled(false);
         viewer->setScene(0);
     }
     else if(widget->type() == TabContent::Skin)
@@ -260,12 +286,26 @@ void EditorWindow::shiftTab(int index)
         ui->actionToolbarSave->setEnabled(true);
         ui->fromTree->setEnabled(true);
 
+        ui->actionUndo->setEnabled(true);
+        ui->actionRedo->setEnabled(true);
+        ui->actionCut->setEnabled(true);
+        ui->actionCopy->setEnabled(true);
+        ui->actionPaste->setEnabled(true);
+        ui->actionFind_Replace->setEnabled(true);
+
         sizeColumns();
 
         /* Syncing the preview */
         viewer->setScene(doc->scene());
 
     }
+
+    /* Hiding all the find/replace dialogs */
+    for(int i = 0; i < ui->editorTabs->count(); i++)
+        if(dynamic_cast<TabContent*>(ui->editorTabs->widget(i))->type() ==
+           TabContent::Skin)
+            dynamic_cast<SkinDocument*>(ui->editorTabs->widget(i))->hideFind();
+
 }
 
 bool EditorWindow::closeTab(int index)
@@ -468,6 +508,56 @@ void EditorWindow::lineChanged(int line)
     ui->parseTree->setSelectionModel(parseTreeSelection);
 
 }
+
+void EditorWindow::undo()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->getEditor()->undo();
+}
+
+void EditorWindow::redo()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->getEditor()->redo();
+
+}
+
+void EditorWindow::cut()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->getEditor()->cut();
+}
+
+void EditorWindow::copy()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->getEditor()->copy();
+}
+
+void EditorWindow::paste()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->getEditor()->paste();
+}
+
+void EditorWindow::findReplace()
+{
+    TabContent* doc = dynamic_cast<TabContent*>
+                      (ui->editorTabs->currentWidget());
+    if(doc->type() == TabContent::Skin)
+        dynamic_cast<SkinDocument*>(doc)->showFind();
+}
+
 
 void EditorWindow::expandLine(ParseTreeModel* model, QModelIndex parent,
                               int line)
