@@ -2950,13 +2950,13 @@ DLLTOOL=`findtool ${DLLTOOL} --lit`
 DLLWRAP=`findtool ${DLLWRAP} --lit`
 RANLIB=`findtool ${RANLIB} --lit`
 
+if test -n "$ccache"; then
+  CC="$ccache $CC"
+fi
+
 if test "$ARG_ARM_THUMB" = "1"; then
   extradefines="$extradefines -DUSE_THUMB"
   CC="$toolsdir/thumb-cc.py $CC"
-fi
-
-if test -n "$ccache"; then
-  CC="$ccache $CC"
 fi
 
 if test "X$endian" = "Xbig"; then
