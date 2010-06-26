@@ -62,7 +62,8 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp)
 #endif
         (rb->strcmp(oldp->file_name, preferences->file_name)))
     {
-        for (i = 0; i < listner_count; i++)
+        /* callback functions are called as FILO */
+        for (i = listner_count - 1; i >= 0; i--)
             listners[i](oldp);
     }
 }

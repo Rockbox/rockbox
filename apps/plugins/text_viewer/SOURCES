@@ -1,6 +1,7 @@
 text_viewer.c
 tv_action.c
 tv_bookmark.c
+tv_display.c
 tv_menu.c
 tv_pager.c
 tv_preferences.c

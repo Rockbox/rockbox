@@ -512,7 +512,8 @@ int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
     tv_get_ucs(src, &ch);
     is_indent = (tv_isspace(ch) && !is_break_line);
 
-    if (is_indent && preferences->indent_spaces == 0 && (expand_extra_line = !expand_extra_line) == true)
+    if (is_indent && preferences->line_mode == LM_REFLOW && preferences->indent_spaces == 0
+                  && (expand_extra_line = !expand_extra_line) == true)
         return 0;
 
     for (i = 0; i < block_count; i++)
