@@ -58,6 +58,7 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp)
 #ifdef HAVE_LCD_BITMAP
         (oldp->header_mode          != preferences->header_mode)          ||
         (oldp->footer_mode          != preferences->footer_mode)          ||
+        (oldp->statusbar            != preferences->statusbar)            ||
         (rb->strcmp(oldp->font_name, preferences->font_name))             ||
 #endif
         (rb->strcmp(oldp->file_name, preferences->file_name)))
@@ -99,13 +100,15 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->horizontal_scrollbar = SB_OFF;
     p->vertical_scrollbar = SB_OFF;
 #ifdef HAVE_LCD_BITMAP
-    p->header_mode = HD_BOTH;
-    p->footer_mode = FT_BOTH;
+    p->header_mode = HD_PATH;
+    p->footer_mode = FT_PAGE;
+    p->statusbar   = true;
     rb->strlcpy(p->font_name, rb->global_settings->font_file, MAX_PATH);
     p->font = rb->font_get(FONT_UI);
 #else
     p->header_mode = HD_NONE;
     p->footer_mode = FT_NONE;
+    p->statusbar   = false;
 #endif
     p->autoscroll_speed = 1;
     p->narrow_mode = NM_PAGE;

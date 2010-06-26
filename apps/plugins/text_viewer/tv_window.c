@@ -52,40 +52,6 @@ static bool tv_set_font(const unsigned char *font)
     }
     return true;
 }
-
-static bool tv_check_header_and_footer(struct tv_preferences *new_prefs)
-{
-    bool change_prefs = false;
-
-    if (rb->global_settings->statusbar != STATUSBAR_TOP)
-    {
-        if (new_prefs->header_mode == HD_SBAR)
-        {
-            new_prefs->header_mode = HD_NONE;
-            change_prefs = true;
-        }
-        else if (new_prefs->header_mode == HD_BOTH)
-        {
-            new_prefs->header_mode = HD_PATH;
-            change_prefs = true;
-        }
-    }
-    if (rb->global_settings->statusbar != STATUSBAR_BOTTOM)
-    {
-        if (new_prefs->footer_mode == FT_SBAR)
-        {
-            new_prefs->footer_mode = FT_NONE;
-            change_prefs = true;
-        }
-        else if (new_prefs->footer_mode == FT_BOTH)
-        {
-            new_prefs->footer_mode = FT_PAGE;
-            change_prefs = true;
-        }
-    }
-
-    return change_prefs;
-}
 #endif
 
 static void tv_show_bookmarks(const struct tv_screen_pos *top_pos)
@@ -177,7 +143,6 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 #else
     static bool font_changing = false;
     const unsigned char *font_str;
-    bool change_prefs = false;
     bool need_vertical_scrollbar;
     struct tv_preferences new_prefs;
     tv_copy_preferences(&new_prefs);
@@ -191,14 +156,9 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
         if (!tv_set_font(preferences->font_name))
         {
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
-            change_prefs = true;
+            tv_set_preferences(&new_prefs);
+            return;
         }
-    }
-
-    if (tv_check_header_and_footer(&new_prefs) || change_prefs)
-    {
-        tv_set_preferences(&new_prefs);
-        return;
     }
 
     font_changing = false;

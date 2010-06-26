@@ -223,13 +223,10 @@ static bool tv_header_setting(void)
     {
         {"None",       -1},
         {"File path",  -1},
-        {"Status bar", -1},
-        {"Both",       -1},
     };
 
-    int len = (rb->global_settings->statusbar == STATUSBAR_TOP)? 4 : 2;
     return rb->set_option("Show Header", &new_prefs.header_mode, INT,
-                         names, len, NULL);
+                         names, 2, NULL);
 }
 
 static bool tv_footer_setting(void)
@@ -238,13 +235,21 @@ static bool tv_footer_setting(void)
     {
         {"None",       -1},
         {"Page Num",   -1},
-        {"Status bar", -1},
-        {"Both",       -1},
     };
 
-    int len = (rb->global_settings->statusbar == STATUSBAR_BOTTOM)? 4 : 2;
     return rb->set_option("Show Footer", &new_prefs.footer_mode, INT,
-                           names, len, NULL);
+                           names, 2, NULL);
+}
+
+static bool tv_statusbar_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No",  -1},
+        {"Yes", -1},
+    };
+
+    return rb->set_option("Show Statusbar", &new_prefs.statusbar, BOOL,
+                           names, 2, NULL);
 }
 
 static bool tv_font_setting(void)
@@ -319,6 +324,8 @@ MENUITEM_FUNCTION(header_item, 0, "Show Header", tv_header_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
                   NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(statusbar_item, 0, "Show Statusbar", tv_statusbar_setting,
+                  NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
                   NULL, NULL, Icon_NOICON);
 #endif
@@ -329,7 +336,7 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
             &alignment_item,
 #ifdef HAVE_LCD_BITMAP
-            &header_item, &footer_item, &font_item,
+            &header_item, &footer_item, &font_item, &statusbar_item,
 #endif
             &scroll_menu, &indent_spaces_item);
 

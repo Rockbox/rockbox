@@ -42,15 +42,16 @@
  * vertical_scrollbar     1
  * (unused)               1 (for compatibility)
  * page_mode              1
- * page_number_mode       1
- * title_mode             1
+ * header_mode            1
+ * footer_mode            1
  * scroll_mode            1
  * autoscroll_speed       1
  * horizontal_scrollbar   1
  * horizontal_scroll_mode 1
  * narrow_mode            1
  * indent_spaces          1
- * (reserved)             12
+ * statusbar              1
+ * (reserved)             11
  * font name              MAX_PATH
  */
 
@@ -58,7 +59,7 @@
 #define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DIR "/tv_global.dat"
 
 #define TV_GLOBAL_SETTINGS_HEADER        "\x54\x56\x47\x53" /* "TVGS" */
-#define TV_GLOBAL_SETTINGS_VERSION       0x37
+#define TV_GLOBAL_SETTINGS_VERSION       0x38
 #define TV_GLOBAL_SETTINGS_HEADER_SIZE   5
 #define TV_GLOBAL_SETTINGS_FIRST_VERSION 0x31
 
@@ -92,7 +93,8 @@
  *     horizontal_scroll_mode 1
  *     narrow_mode            1
  *     indent_spaces          1
- *     (reserved)             12
+ *     statusbar              1
+ *     (reserved)             11
  *     font name              MAX_PATH
  *   bookmark count           1
  *   [1st bookmark]
@@ -114,7 +116,7 @@
 #define TV_SETTINGS_TMP_FILE      VIEWERS_DIR "/tv_file.tmp"
 
 #define TV_SETTINGS_HEADER        "\x54\x56\x53" /* "TVS" */
-#define TV_SETTINGS_VERSION       0x38
+#define TV_SETTINGS_VERSION       0x39
 #define TV_SETTINGS_HEADER_SIZE   4
 #define TV_SETTINGS_FIRST_VERSION 0x32
 
@@ -156,8 +158,34 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     /* skip need_scrollbar */
     p++;
     prefs->page_mode            = *p++;
-    prefs->header_mode          = *p++;
-    prefs->footer_mode          = *p++;
+
+    if (version < 7)
+    {
+        prefs->statusbar   = false;
+        if (*p > 1)
+        {
+            prefs->header_mode = (*p & 1);
+            prefs->statusbar   = true;
+        }
+        else
+            prefs->header_mode = *p;
+
+        if (*(++p) > 1)
+        {
+            prefs->footer_mode = (*p & 1);
+            prefs->statusbar   = true;
+        }
+        else
+            prefs->footer_mode = *p;
+
+        p++;
+    }
+    else
+    {
+        prefs->header_mode = *p++;
+        prefs->footer_mode = *p++;
+    }
+
     prefs->vertical_scroll_mode = *p++;
     prefs->autoscroll_speed     = *p++;
 
@@ -180,6 +208,9 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
         prefs->indent_spaces = *p++;
     else
         prefs->indent_spaces = 2;
+
+    if (version > 6)
+        prefs->statusbar = (*p++ != 0);
 
 #ifdef HAVE_LCD_BITMAP
     rb->memcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
@@ -212,6 +243,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->horizontal_scroll_mode;
     *p++ = prefs->narrow_mode;
     *p++ = prefs->indent_spaces;
+    *p++ = prefs->statusbar;
 
 #ifdef HAVE_LCD_BITMAP
     rb->memcpy(buf + 28, prefs->font_name, MAX_PATH);

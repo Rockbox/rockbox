@@ -59,8 +59,6 @@ enum {
 enum {
     HD_NONE = 0,
     HD_PATH,
-    HD_SBAR,
-    HD_BOTH,
 };
 
 /* footer_mode */
@@ -68,8 +66,6 @@ enum {
 
     FT_NONE = 0,
     FT_PAGE,
-    FT_SBAR,
-    FT_BOTH,
 };
 
 /* horizontal_scroll_mode */
@@ -113,6 +109,8 @@ struct tv_preferences {
     unsigned narrow_mode;
 
     unsigned indent_spaces;
+
+    bool statusbar;
 
 #ifdef HAVE_LCD_BITMAP
     unsigned char font_name[MAX_PATH];

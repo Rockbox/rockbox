@@ -48,14 +48,12 @@
  * |statusbar (6)            |
  * +-------------------------+
  *
- * (1) displays when rb->global_settings->statusbar == STATUSBAR_TOP
- *              and  preferences->header_mode is HD_SBAR or HD_BOTH.
- * (2) displays when preferences->header_mode is HD_PATH or HD_BOTH.
+ * (1) displays when rb->global_settings->statusbar == STATUSBAR_TOP.
+ * (2) displays when preferences->header_mode is HD_PATH.
  * (3) displays when preferences->vertical_scrollbar is SB_ON.
  * (4) displays when preferences->horizontal_scrollbar is SB_ON.
- * (5) displays when preferences->footer_mode is FT_PAGE or FT_BOTH.
- * (6) displays when rb->global_settings->statusbar == STATUSBAR_BOTTOM
- *              and  preferences->footer_mode is FT_SBAR or FT_BOTH.
+ * (5) displays when preferences->footer_mode is FT_PAGE.
+ * (6) displays when rb->global_settings->statusbar == STATUSBAR_BOTTOM.
  *
  *
  * when isn't defined HAVE_LCD_BITMAP
@@ -115,7 +113,7 @@ void tv_show_header(void)
 {
     unsigned header_mode = header_mode;
 
-    if (preferences->header_mode == HD_PATH || preferences->header_mode == HD_BOTH)
+    if (preferences->header_mode == HD_PATH)
         display->putsxy(header.x, header.y, preferences->file_name);
 }
 
@@ -124,13 +122,13 @@ void tv_show_footer(const struct tv_screen_pos *pos)
     unsigned char buf[12];
     unsigned footer_mode = preferences->footer_mode;
 
-    if (footer_mode == FT_PAGE || footer_mode == FT_BOTH)
+    if (footer_mode == FT_PAGE)
     {
         if (pos->line == 0)
             rb->snprintf(buf, sizeof(buf), "%d", pos->page + 1);
         else
             rb->snprintf(buf, sizeof(buf), "%d - %d", pos->page + 1, pos->page + 2);
-        display->putsxy(footer.x, footer.y, buf);
+        display->putsxy(footer.x, footer.y + 1, buf);
     }
 }
 
@@ -153,7 +151,7 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
         max_shown = min_shown + display_columns;
 
         rb->gui_scrollbar_draw(display,
-                               horizontal_scrollbar.x, horizontal_scrollbar.y,
+                               horizontal_scrollbar.x, horizontal_scrollbar.y + 1,
                                horizontal_scrollbar.w, TV_SCROLLBAR_HEIGHT,
                                items, min_shown, max_shown, HORIZONTAL);
     }
@@ -166,7 +164,7 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
 
         rb->gui_scrollbar_draw(display,
                                vertical_scrollbar.x, vertical_scrollbar.y,
-                               TV_SCROLLBAR_WIDTH-1, vertical_scrollbar.h,
+                               TV_SCROLLBAR_WIDTH, vertical_scrollbar.h,
                                items, min_shown, max_shown, VERTICAL);
     }
 }
@@ -236,6 +234,7 @@ void tv_end_display(void)
 
 void tv_clear_display(void)
 {
+    rb->lcd_set_backdrop(NULL);
     display->clear_viewport();
 }
 
@@ -251,22 +250,20 @@ void tv_set_layout(int col_w)
 #endif
 {
 #ifdef HAVE_LCD_BITMAP
-    int scrollbar_width  = (show_scrollbar)?                    TV_SCROLLBAR_WIDTH  : 0;
-    int scrollbar_height = (preferences->horizontal_scrollbar)? TV_SCROLLBAR_HEIGHT : 0;
-    unsigned header_mode = preferences->header_mode;
-    unsigned footer_mode = preferences->footer_mode;
+    int scrollbar_width  = (show_scrollbar)?                    TV_SCROLLBAR_WIDTH  + 1 : 0;
+    int scrollbar_height = (preferences->horizontal_scrollbar)? TV_SCROLLBAR_HEIGHT + 1 : 0;
 
     row_height = preferences->font->height;
 
     header.x = 0;
-    header.y = 0;
+    header.y = 1;
     header.w = vp_info.width;
-    header.h = (header_mode == HD_PATH || header_mode == HD_BOTH)? row_height : 0;
+    header.h = (preferences->header_mode == HD_PATH)? row_height + 1 : 0;
 
     footer.x = 0;
     footer.w = vp_info.width;
-    footer.h = (footer_mode == FT_PAGE || footer_mode == FT_BOTH)? row_height : 0;
-    footer.y = vp_info.height - footer.h;
+    footer.h = (preferences->footer_mode == FT_PAGE)? row_height + 1 : 0;
+    footer.y = vp_info.height - 1 - footer.h;
 
     drawarea.x = scrollbar_width;
     drawarea.y = header.y + header.h;
@@ -312,17 +309,13 @@ void tv_change_viewport(void)
 {
 #ifdef HAVE_LCD_BITMAP
     struct viewport vp;
-    bool show_statusbar = (preferences->header_mode == HD_SBAR ||
-                           preferences->header_mode == HD_BOTH ||
-                           preferences->footer_mode == FT_SBAR ||
-                           preferences->footer_mode == FT_BOTH);
 
     if (is_initialized_vp)
         tv_undo_viewport();
     else
         is_initialized_vp = true;
 
-    rb->viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp);
+    rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp);
     vp_info = vp;
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
 
