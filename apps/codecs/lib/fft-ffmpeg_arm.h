@@ -325,8 +325,8 @@ static inline void fft8( FFTComplex * z )
 
             "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[0].re, z[0].im */
             "stmdb %[z4_ptr], {r1,r2}\n\t" /* write out z[4].re, z[4].im */
-            : [z4_ptr] "+r" (m4), [z_ptr] "+r" (z), [temp] "=r" (temp)
-            : 
+            : [z4_ptr] "+r" (m4), [temp] "=r" (temp)
+            : [z_ptr] "r" (z)
             : "r1","r2","r3","r4","r5","r6","r7","r8","memory"
         );
     }
