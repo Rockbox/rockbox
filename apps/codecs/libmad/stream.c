@@ -48,7 +48,10 @@ void mad_stream_init(struct mad_stream *stream)
   mad_bit_init(&stream->anc_ptr, 0);
   stream->anc_bitlen = 0;
 
+/* rockbox: comment this to avoid allocation in following code. main_data is
+ * linked to an array in rockbox' apps/codecs/mpa.c before calling this.
   stream->main_data  = 0;
+*/
   stream->md_len     = 0;
 
   stream->options    = 0;

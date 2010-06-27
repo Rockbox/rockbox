@@ -56,7 +56,7 @@ struct mad_decoder {
   } *sync;
 
   void *cb_data;
-
+/* rockbox: unused
   enum mad_flow (*input_func)(void *, struct mad_stream *);
   enum mad_flow (*header_func)(void *, struct mad_header const *);
   enum mad_flow (*filter_func)(void *,
@@ -65,8 +65,9 @@ struct mad_decoder {
                                struct mad_header const *, struct mad_pcm *);
   enum mad_flow (*error_func)(void *, struct mad_stream *, struct mad_frame *);
   enum mad_flow (*message_func)(void *, void *, unsigned int *);
+*/
 };
-
+/* rockbox: unused
 void mad_decoder_init(struct mad_decoder *, void *,
                       enum mad_flow (*)(void *, struct mad_stream *),
                       enum mad_flow (*)(void *, struct mad_header const *),
@@ -87,5 +88,6 @@ int mad_decoder_finish(struct mad_decoder *);
 
 int mad_decoder_run(struct mad_decoder *, enum mad_decoder_mode);
 int mad_decoder_message(struct mad_decoder *, void *, unsigned int *);
+*/
 
 # endif

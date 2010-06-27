@@ -50,6 +50,7 @@
 # include "synth.h"
 # include "decoder.h"
 
+#if 0 /* rockbox: not used */
 /*
  * NAME:        decoder->init()
  * DESCRIPTION: initialize a decoder object with callback routines
@@ -585,3 +586,4 @@ int mad_decoder_message(struct mad_decoder *decoder,
   return -1;
 # endif
 }
+#endif

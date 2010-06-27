@@ -3230,8 +3230,10 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
   enum mad_error error;
   int result = 0;
 
+#if 0 /* rockbox: do not allocate */
   /* allocate Layer III dynamic structures */
-
+  /* rockbox: not used. Both pointers are linked to an array in rockbox' 
+   * apps/codecs/mpa.c before calling this. */
   if (stream->main_data == 0) {
     stream->main_data = malloc(MAD_BUFFER_MDLEN);
     if (stream->main_data == 0) {
@@ -3247,6 +3249,13 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
       return -1;
     }
   }
+#else
+  /* rockbox: This should not happen. Return with error. */
+  if ((stream->main_data == 0) || (frame->overlap == 0)) {
+      stream->error = MAD_ERROR_NOMEM;
+      return -1;
+  }
+#endif /* rockbox */
 
   nch = MAD_NCHANNELS(header);
   si_len = (header->flags & MAD_FLAG_LSF_EXT) ?

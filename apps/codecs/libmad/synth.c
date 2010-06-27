@@ -55,18 +55,6 @@ void mad_synth_init(struct mad_synth *synth)
  */
 void mad_synth_mute(struct mad_synth *synth)
 {
-  /*
-  unsigned int ch, s, v;
-
-  for (ch = 0; ch < 2; ++ch) {
-    for (s = 0; s < 16; ++s) {
-      for (v = 0; v < 8; ++v) {
-        synth->filter[ch][0][0][s][v] = synth->filter[ch][0][1][s][v] =
-        synth->filter[ch][1][0][s][v] = synth->filter[ch][1][1][s][v] = 0;
-      }
-    }
-  }
-  */
   memset(synth->filter, 0, sizeof(synth->filter));
 }
 
@@ -1272,8 +1260,10 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
 void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 {
   unsigned int nch, ns;
+#if 0 /* rockbox: unused */
   void (*synth_frame)(struct mad_synth *, struct mad_frame const *,
                       unsigned int, unsigned int);
+#endif
 
   nch = MAD_NCHANNELS(&frame->header);
   ns  = MAD_NSBSAMPLES(&frame->header);
@@ -1282,18 +1272,20 @@ void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
   synth->pcm.channels   = nch;
   synth->pcm.length     = 32 * ns;
 
+#if 0 /* rockbox: unused */
   synth_frame = synth_full;
 
-#if 0 /* rockbox: unused */
   if (frame->options & MAD_OPTION_HALFSAMPLERATE) {
     synth->pcm.samplerate /= 2;
     synth->pcm.length     /= 2;
 
     synth_frame = synth_half;
   }
-#endif
-
+  
   synth_frame(synth, frame, nch, ns);
+#else
+  synth_full(synth, frame, nch, ns);
+#endif
 
   synth->phase = (synth->phase + ns) % 16;
 }

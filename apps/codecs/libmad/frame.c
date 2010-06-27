@@ -92,8 +92,10 @@ void mad_frame_init(struct mad_frame *frame)
   mad_header_init(&frame->header);
 
   frame->options = 0;
-
+/* rockbox: comment this to proper zero this array in mad_frame_mute(). overlap
+ * is linked to an array in rockbox' apps/codecs/mpa.c before calling this.
   frame->overlap = 0;
+*/
   mad_frame_mute(frame);
 }
 
@@ -101,6 +103,7 @@ void mad_frame_init(struct mad_frame *frame)
  * NAME:        frame->finish()
  * DESCRIPTION: deallocate any dynamic memory associated with frame
  */
+/* rockbox: unused
 void mad_frame_finish(struct mad_frame *frame)
 {
   mad_header_finish(&frame->header);
@@ -110,6 +113,7 @@ void mad_frame_finish(struct mad_frame *frame)
     frame->overlap = 0;
   }
 }
+*/
 
 /*
  * NAME:        decode_header()
@@ -484,21 +488,7 @@ int mad_frame_decode(struct mad_frame *frame, struct mad_stream *stream)
  */
 void mad_frame_mute(struct mad_frame *frame)
 {
-  unsigned int s, sb;
-
-  for (s = 0; s < 36; ++s) {
-    for (sb = 0; sb < 32; ++sb) {
-      (*frame->sbsample)[0][s][sb] =
-      (*frame->sbsample)[1][s][sb] = 0;
-    }
-  }
-
-  if (frame->overlap) {
-    for (s = 0; s < 18; ++s) {
-      for (sb = 0; sb < 32; ++sb) {
-        (*frame->overlap)[0][sb][s] =
-        (*frame->overlap)[1][sb][s] = 0;
-      }
-    }
-  }
+  memset((*frame->sbsample_prev), 0, sizeof(*frame->sbsample_prev));
+  memset((*frame->sbsample)     , 0, sizeof(*frame->sbsample));
+  memset((*frame->overlap)      , 0, sizeof(*frame->overlap));
 }

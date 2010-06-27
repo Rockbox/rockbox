@@ -59,30 +59,29 @@ int mpeg_framesize[3] = {384, 1152, 1152};
 static void init_mad(void)
 {
     ci->memset(&stream, 0, sizeof(struct mad_stream));
-    ci->memset(&frame, 0, sizeof(struct mad_frame));
-    ci->memset(&synth, 0, sizeof(struct mad_synth));
-
-    ci->memset(&sbsample, 0, sizeof(sbsample));
+    ci->memset(&frame , 0, sizeof(struct mad_frame));
+    ci->memset(&synth , 0, sizeof(struct mad_synth));
 
 #ifdef MPA_SYNTH_ON_COP
     frame.sbsample_prev = &sbsample_prev;
-    ci->memset(&sbsample_prev, 0, sizeof(sbsample_prev));
+    frame.sbsample      = &sbsample;
 #else
     frame.sbsample_prev = &sbsample;
+    frame.sbsample      = &sbsample;
 #endif
 
-    frame.sbsample=&sbsample;
-
+    /* We do this so libmad doesn't try to call codec_calloc(). This needs to
+     * be called before mad_stream_init(), mad_frame_inti() and 
+     * mad_synth_init(). */
+    frame.overlap    = &mad_frame_overlap;
+    stream.main_data = &mad_main_data;
+    
+    /* Call mad initialization. Those will zero the arrays frame.overlap,
+     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to 
+     * zero them here. */
     mad_stream_init(&stream);
     mad_frame_init(&frame);
     mad_synth_init(&synth);
-
-    /* We do this so libmad doesn't try to call codec_calloc() */
-    ci->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
-    frame.overlap = &mad_frame_overlap;
-    stream.main_data = &mad_main_data;
-    
-    
 }
 
 static int get_file_pos(int newtime)
