@@ -40,6 +40,7 @@
 
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
 static int got_set_configuration = 0;
+static int usb_enum_timeout = -1;
 
 /*
  * dma/setup descriptors and buffers should avoid sharing
@@ -298,6 +299,8 @@ void usb_drv_init(void)
                  | USB_GPIO_CLK_SEL10; /* 0x06180000; */
 
     tick_add_task(usb_tick);
+
+    usb_enum_timeout = HZ; /* one second timeout for enumeration */
 }
 
 void usb_drv_exit(void)
@@ -677,6 +680,14 @@ static void usb_tick(void)
     struct usb_endpoint *eps = &endpoints[0][0];
     int i;
 
+    if (usb_enum_timeout != -1) {
+        /*
+         * If the enum times out it's a charger, drop out of usb mode.
+         */
+        if (usb_enum_timeout-- <= 0)
+            usb_remove_int();
+    }
+
     for (i=0; i<2*USB_NUM_EPS; i++) {
         if (!(eps[i].state & EP_STATE_BUSY) ||
             !TIME_AFTER(current_tick, endpoints[i]))
@@ -787,6 +798,7 @@ void INT_USB(void)
         }
         if (intr & USB_DEV_INTR_ENUM_DONE) {/* speed enumeration complete */
             int spd = USB_DEV_STS & USB_DEV_STS_MASK_SPD;  /* Enumerated Speed */
+            usb_enum_timeout = -1;
 
             logf("speed enum complete: ");
             if (spd == USB_DEV_STS_SPD_HS) logf("hs\n");
