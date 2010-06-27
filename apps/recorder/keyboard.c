@@ -47,6 +47,12 @@
 #define DEFAULT_MARGIN 6
 #define KBD_BUF_SIZE 500
 
+#ifdef HAVE_TOUCHSCREEN
+#define MIN_GRID_SIZE   16
+#define GRID_SIZE(s, x)   \
+        ((s) == SCREEN_MAIN && MIN_GRID_SIZE > (x) ? MIN_GRID_SIZE: (x))
+#endif
+
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
     || (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
@@ -93,6 +99,9 @@ struct keyboard_parameters
     int x;
     int y;
     bool line_edit;
+#ifdef HAVE_TOUCHSCREEN
+    bool show_buttons;
+#endif
 };
 
 struct edit_state
@@ -272,6 +281,11 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state);
 static void kbd_draw_edit_line(struct keyboard_parameters *pm,
                                struct screen *sc, struct edit_state *state);
+#ifdef HAVE_TOUCHSCREEN
+static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc);
+static int keyboard_touchscreen(struct keyboard_parameters *pm,
+                                struct screen *sc, struct edit_state *state);
+#endif
 static void kbd_insert_selected(struct keyboard_parameters *pm,
                                 struct edit_state *state);
 static void kbd_backspace(struct edit_state *state);
@@ -414,6 +428,10 @@ int kbd_input(char* text, int buflen)
             sc->clear_display();
             kbd_draw_picker(pm, sc, &state);
             kbd_draw_edit_line(pm, sc, &state);
+#ifdef HAVE_TOUCHSCREEN
+            if (pm->show_buttons)
+                kbd_draw_buttons(pm, sc);
+#endif
         }
 
 #ifdef HAVE_BUTTONBAR
@@ -437,6 +455,10 @@ int kbd_input(char* text, int buflen)
 #endif
         pm = &param[button_screen];
         sc = &screens[button_screen];
+#ifdef HAVE_TOUCHSCREEN
+        if (button == ACTION_TOUCHSCREEN)
+            button = keyboard_touchscreen(pm, sc, &state);
+#endif
 
         /* Remap some buttons to allow to move
          * cursor in line edit mode and morse mode. */
@@ -652,6 +674,12 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     unsigned short ch;
     int icon_w, sc_w, sc_h, w;
     int i, total_lines;
+#ifdef HAVE_TOUCHSCREEN
+    int button_h = 0;
+    bool flippage_button = false;
+    pm->show_buttons = (sc->screen_type == SCREEN_MAIN &&
+                                (touchscreen_get_mode() == TOUCHSCREEN_POINT));
+#endif
 
     pm->curfont = pm->default_lines ? FONT_SYSFIXED : FONT_UI;
     font = font_get(pm->curfont);
@@ -664,6 +692,9 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
         font = font_get(FONT_SYSFIXED);
         pm->font_h = font->height;
     }
+#ifdef HAVE_TOUCHSCREEN
+    pm->font_h = GRID_SIZE(sc->screen_type, pm->font_h);
+#endif
 
     /* find max width of keyboard glyphs.
      * since we're going to be adding spaces,
@@ -690,6 +721,9 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
             pm->text_w = w;
     }
 
+#ifdef HAVE_TOUCHSCREEN
+    pm->font_w = GRID_SIZE(sc->screen_type, pm->font_w);
+#endif
     /* calculate how many characters to put in a row. */
     icon_w = get_icon_width(sc->screen_type);
     sc_w = sc->getwidth();
@@ -750,6 +784,16 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
 
     /* calculate pm->pages and pm->lines */
     sc_h = sc->getheight();
+#ifdef HAVE_TOUCHSCREEN
+    /* add space for buttons */
+    if (pm->show_buttons)
+    {
+        /* reserve place for OK/Del/Cancel buttons, use ui font for them */
+        button_h = GRID_SIZE(sc->screen_type, sc->getcharheight());
+        sc_h -= MAX(MIN_GRID_SIZE*2, button_h);
+    }
+recalc_param:
+#endif
     pm->lines = (sc_h - BUTTONBAR_HEIGHT) / pm->font_h - 1;
 
     if (pm->default_lines && pm->lines > pm->default_lines)
@@ -770,9 +814,23 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     total_lines = (pm->nchars + pm->max_chars - 1) / pm->max_chars;
     pm->pages = (total_lines + pm->lines - 1) / pm->lines;
     pm->lines = (total_lines + pm->pages - 1) / pm->pages;
+#ifdef HAVE_TOUCHSCREEN
+    if (pm->pages > 1 && pm->show_buttons && !flippage_button)
+    {
+        /* add space for flip page button */
+        sc_h -= button_h;
+        flippage_button = true;
+        goto recalc_param;
+    }
+#endif
 
     pm->main_y = pm->font_h*pm->lines + pm->keyboard_margin;
     pm->keyboard_margin -= pm->keyboard_margin/2;
+#ifdef HAVE_TOUCHSCREEN
+    /* flip page button is put between piker and edit line */
+    if (flippage_button)
+        pm->main_y += button_h;
+#endif
 
 #ifdef HAVE_MORSE_INPUT
     pm->old_main_y = sc_h - pm->font_h - BUTTONBAR_HEIGHT;
@@ -849,14 +907,14 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
 
         for (i = j = 0; k < pm->nchars; k++)
         {
-            int w;
+            int w, h;
             unsigned char *utf8;
             utf8 = utf8encode(pm->kbd_buf[k], outline);
             *utf8 = 0;
 
-            sc->getstringsize(outline, &w, NULL);
+            sc->getstringsize(outline, &w, &h);
             sc->putsxy(i*pm->font_w + (pm->font_w-w) / 2,
-                       j*pm->font_h, outline);
+                       j*pm->font_h + (pm->font_h-h) / 2, outline);
 
             if (++i >= pm->max_chars)
             {
@@ -960,6 +1018,113 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         sc->set_drawmode(DRMODE_SOLID);
     }
 }
+
+#ifdef HAVE_TOUCHSCREEN
+static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
+{
+    struct viewport vp;
+    int button_h, text_h, text_y;
+    int sc_w = sc->getwidth(), sc_h = sc->getheight();
+    viewport_set_defaults(&vp, sc->screen_type);
+    vp.flags |= VP_FLAG_ALIGN_CENTER;
+    sc->set_viewport(&vp);
+    text_h = sc->getcharheight();
+    button_h = GRID_SIZE(sc->screen_type, text_h);
+    text_y = (button_h - text_h) / 2 + 1;
+    vp.x = 0;
+    vp.y = 0;
+    vp.width = sc_w;
+    vp.height = button_h;
+    /* draw buttons */
+    if (pm->pages > 1)
+    {
+        /* button to flip page. */
+        vp.y = pm->lines*pm->font_h;
+        sc->hline(0, sc_w - 1, 0);
+        sc->putsxy(0, text_y, ">");
+    }
+    /* OK/Del/Cancel buttons */
+    button_h = MAX(MIN_GRID_SIZE*2, button_h);
+    text_y = (button_h - text_h) / 2 + 1;
+    vp.y = sc_h - button_h - 1;
+    vp.height = button_h;
+    sc->hline(0, sc_w - 1, 0);
+    vp.width = sc_w/3;
+    sc->putsxy(0, text_y, str(LANG_KBD_OK));
+    vp.x += vp.width;
+    sc->vline(0, 0, button_h);
+    sc->putsxy(0, text_y, str(LANG_KBD_DELETE));
+    vp.x += vp.width;
+    sc->vline(0, 0, button_h);
+    sc->putsxy(0, text_y, str(LANG_KBD_CANCEL));
+    sc->set_viewport(NULL);
+}
+
+static int keyboard_touchscreen(struct keyboard_parameters *pm,
+                                struct screen *sc, struct edit_state *state)
+{
+    short x, y;
+    const int button = action_get_touchscreen_press(&x, &y);
+    const int sc_w = sc->getwidth(), sc_h = sc->getheight();
+    int button_h = MAX(MIN_GRID_SIZE*2, sc->getcharheight());
+#ifdef HAVE_MORSE_INPUT
+    if (state->morse_mode && y < pm->main_y - pm->keyboard_margin)
+    {
+        /* don't return ACTION_NONE since it has effect in morse mode. */
+        return button == BUTTON_TOUCHSCREEN? ACTION_KBD_SELECT:
+               button & BUTTON_REL? ACTION_KBD_MORSE_SELECT: ACTION_STD_OK;
+    }
+#else
+    (void) state;
+#endif
+    if (x < 0 || y < 0)
+        return ACTION_NONE;
+    if (y < pm->lines*pm->font_h)
+    {
+        if (x/pm->font_w < pm->max_chars)
+        {
+            /* picker area */
+            state->changed = CHANGED_PICKER;
+            pm->x = x/pm->font_w;
+            pm->y = y/pm->font_h;
+            pm->line_edit = false;
+            if (button == BUTTON_REL)
+                return ACTION_KBD_SELECT;
+        }
+    }
+    else if (y < pm->main_y - pm->keyboard_margin)
+    {
+        /* button to flip page */
+        if (button == BUTTON_REL)
+            return ACTION_KBD_PAGE_FLIP;
+    }
+    else if (y < sc_h - button_h)
+    {
+        /* edit line */
+        if (button & (BUTTON_REPEAT|BUTTON_REL))
+        {
+            if (x < sc_w/2)
+                return ACTION_KBD_CURSOR_LEFT;
+            else
+                return ACTION_KBD_CURSOR_RIGHT;
+        }
+    }
+    else
+    {
+        /* OK/Del/Cancel button */
+        if (button == BUTTON_REL)
+        {
+            if (x < sc_w/3)
+                return ACTION_KBD_DONE;
+            else if (x < (sc_w/3) * 2)
+                return ACTION_KBD_BACKSPACE;
+            else
+                return ACTION_KBD_ABORT;
+        }
+    }
+    return ACTION_NONE;
+}
+#endif
 
 /* inserts the selected char */
 static void kbd_insert_selected(struct keyboard_parameters *pm,
