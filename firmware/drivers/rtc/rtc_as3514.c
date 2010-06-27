@@ -99,6 +99,9 @@ void rtc_alarm_poweroff(void)
     seconds >>= 8;
     seconds |= 1<<7; /* enable bit */
     ascodec_write(AS3543_WAKEUP, seconds);
+    
+    /* write 0x80 to prevent the OF refreshing its database from the microSD */
+    ascodec_write(AS3543_WAKEUP, 0x80);
 
     /* write our desired time of wake up to detect power-up from RTC */
     ascodec_write(AS3543_WAKEUP, wakeup_h);
@@ -127,6 +130,9 @@ bool rtc_check_alarm_started(bool release_alarm)
     ascodec_read(AS3543_WAKEUP); /* bits 15:8  */
     if(!(ascodec_read(AS3543_WAKEUP) & (1<<7))) /* enable bit */
         return false;
+        
+    /* skip WAKEUP[3] which the OF uses for other purposes */
+    ascodec_read(AS3543_WAKEUP);
 
     /* subsequent reads give the 16 bytes static SRAM */
     wakeup_h = ascodec_read(AS3543_WAKEUP);
