@@ -66,18 +66,18 @@ void tv_init_scrollbar(off_t total, bool show_scrollbar);
  *          the size of text in displayed.
  */
 void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
-
-#else
+#endif
 
 /*
- * put the bookmark icon
+ * show bookmark
  *
- * [In] row
- *          the row where the bookmark icon is put
+ * [In] rows
+ *          the array of row where the bookmark
+ *
+ * [In] count
+ *          want to show bookmark count
  */
-void tv_put_bookmark_icon(int row);
-
-#endif
+void tv_show_bookmarks(const int *rows, int count);
 
 /* common display functons */
 
@@ -90,37 +90,8 @@ void tv_start_display(void);
 /* end the display processing */
 void tv_end_display(void);
 
-/* clear the display */
-void tv_clear_display(void);
-
 /*update the display  */
 void tv_update_display(void);
-
-#ifdef HAVE_LCD_BITMAP
-
-/*
- * set the drawmode
- *
- * [In] mode
- *          new drawmode
- */
-void tv_set_drawmode(int mode);
-
-/*
- * draw the rectangle that paints out inside
- *
- * [In] col
- *          the column of the upper left
- *
- * [In] row
- *          the row of the upper left
- *
- * [In] row
- *          draw rows
- */
-void tv_fillrect(int col, int row, int rows);
-
-#endif
 
 /*
  * draw the text
@@ -162,6 +133,19 @@ void tv_set_layout(int col_w, bool show_scrollbar);
 void tv_set_layout(int col_w);
 
 #endif
+
+/*
+ * get the draw area info
+ *
+ * [Out] width
+ *          width of the draw area
+ *
+ * [Out] cols
+ *          column count of the draw area
+ *
+ * [Out] width
+ *          row count of the draw area
+ */
 void tv_get_drawarea_info(int *width, int *cols, int *rows);
 
 /* viewport functions */

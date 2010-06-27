@@ -54,29 +54,23 @@ static bool tv_set_font(const unsigned char *font)
 }
 #endif
 
-static void tv_show_bookmarks(const struct tv_screen_pos *top_pos)
+static void tv_draw_bookmarks(const struct tv_screen_pos *top_pos)
 {
     struct tv_screen_pos bookmarks[TV_MAX_BOOKMARKS];
+    int disp_bookmarks[TV_MAX_BOOKMARKS];
     int count = tv_get_bookmark_positions(bookmarks);
+    int disp_count = 0;
     int line;
-
-#ifdef HAVE_LCD_BITMAP
-    tv_set_drawmode(DRMODE_COMPLEMENT);
-#endif
 
     while (count--)
     {
         line = (bookmarks[count].page - top_pos->page) * display_lines
                                       + (bookmarks[count].line - top_pos->line);
         if (line >= 0 && line < display_lines)
-        {
-#ifdef HAVE_LCD_BITMAP
-            tv_fillrect(0, line, 1);
-#else
-            tv_put_bookmark_icon(line);
-#endif
-        }
+            disp_bookmarks[disp_count++] = line;
     }
+
+    tv_show_bookmarks(disp_bookmarks, disp_count);
 }
 
 void tv_draw_window(void)
@@ -89,11 +83,6 @@ void tv_draw_window(void)
     tv_copy_screen_pos(&pos);
 
     tv_start_display();
-
-#ifdef HAVE_LCD_BITMAP
-    tv_set_drawmode(DRMODE_SOLID);
-#endif
-    tv_clear_display();
 
     tv_read_start(cur_window, (cur_column > 0));
 
@@ -112,7 +101,7 @@ void tv_draw_window(void)
     tv_show_header();
     tv_show_footer(&pos);
 #endif
-    tv_show_bookmarks(&pos);
+    tv_draw_bookmarks(&pos);
 
     tv_update_display();
     tv_end_display();

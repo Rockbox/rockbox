@@ -169,18 +169,24 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
     }
 }
 
-void tv_fillrect(int col, int row, int rows)
-{
-    display->fillrect(drawarea.x + col * col_width, drawarea.y + row * row_height,
-                      drawarea.w - col * col_width, rows * row_height);
-}
-
-void tv_set_drawmode(int mode)
-{
-    rb->lcd_set_drawmode(mode);
-}
-
 #endif
+
+void tv_show_bookmarks(const int *rows, int count)
+{
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+#endif
+
+    while (count--)
+    {
+#ifdef HAVE_LCD_BITMAP
+        display->fillrect(drawarea.x, drawarea.y + rows[count] * row_height,
+                          drawarea.w, row_height);
+#else
+        display->putchar(bookmark.x, drawarea.y + rows[count], TV_BOOKMARK_ICON);
+#endif
+    }
+}
 
 void tv_draw_text(int row, const unsigned char *text, int offset)
 {
@@ -203,13 +209,6 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
 #endif
 }
 
-#ifndef HAVE_LCD_BITMAP
-void tv_put_bookmark_icon(int row)
-{
-    display->putchar(bookmark.x, drawarea.y + row, TV_BOOKMARK_ICON);
-}
-#endif
-
 void tv_init_display(void)
 {
     display = rb->screens[SCREEN_MAIN];
@@ -221,7 +220,13 @@ void tv_start_display(void)
     display->set_viewport(&vp_info);
 #ifdef HAVE_LCD_BITMAP
     drawmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 #endif
+
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
+    display->clear_viewport();
 }
 
 void tv_end_display(void)
@@ -230,14 +235,6 @@ void tv_end_display(void)
     rb->lcd_set_drawmode(drawmode);
 #endif
     display->set_viewport(NULL);
-}
-
-void tv_clear_display(void)
-{
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
-    display->clear_viewport();
 }
 
 void tv_update_display(void)
