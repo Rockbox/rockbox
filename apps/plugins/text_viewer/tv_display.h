@@ -24,7 +24,29 @@
 #include "plugin.h"
 #include "tv_screen_pos.h"
 
-/* text viewer layout parts functions */
+/* stuff for the screen access */
+
+/*
+ * initialize the display module
+ *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          buffer size
+ *
+ * return
+ *     true  initialize success
+ *     false initialize failure
+ */
+bool tv_init_display(unsigned char **buf, size_t *size);
+
+/* finalize the display module */
+void tv_finalize_display(void);
+
+
+/* layout parts accessing functions */
+
 #ifdef HAVE_LCD_BITMAP
 
 /* show headaer */
@@ -66,7 +88,6 @@ void tv_init_scrollbar(off_t total, bool show_scrollbar);
  *          the size of text in displayed.
  */
 void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
-#endif
 
 /*
  * show bookmark
@@ -79,10 +100,9 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
  */
 void tv_show_bookmarks(const int *rows, int count);
 
-/* common display functons */
+#endif
 
-/* initialized display functions */
-void tv_init_display(void);
+/* common display functons */
 
 /* start the display processing  */
 void tv_start_display(void);
@@ -107,32 +127,17 @@ void tv_update_display(void);
  */
 void tv_draw_text(int row, const unsigned char *text, int offset);
 
+
 /* layout functions */
-#ifdef HAVE_LCD_BITMAP
 
 /*
  * set the layout
- *
- * [In] col_w
- *          width per column
  *
  * [In] show_scrollbar
  *          true:  show the vertical scrollbar
  *          false: does not show the vertical scrollbar
  */
-void tv_set_layout(int col_w, bool show_scrollbar);
-
-#else
-
-/*
- * set the layout
- *
- * [In] col_w
- *          width per column
- */
-void tv_set_layout(int col_w);
-
-#endif
+void tv_set_layout(bool show_scrollbar);
 
 /*
  * get the draw area info
@@ -147,13 +152,5 @@ void tv_set_layout(int col_w);
  *          row count of the draw area
  */
 void tv_get_drawarea_info(int *width, int *cols, int *rows);
-
-/* viewport functions */
-
-/* change the viewport */
-void tv_change_viewport(void);
-
-/* undo the viewport */
-void tv_undo_viewport(void);
 
 #endif

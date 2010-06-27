@@ -31,28 +31,9 @@
 static int window_width;
 static int window_columns;
 static int display_lines;
-static int col_width;
 
 static int cur_window;
 static int cur_column;
-
-#ifdef HAVE_LCD_BITMAP
-static bool tv_set_font(const unsigned char *font)
-{
-    unsigned char path[MAX_PATH];
-
-    if (font != NULL && *font != '\0')
-    {
-        rb->snprintf(path, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
-        if (rb->font_load(NULL, path) < 0)
-        {
-            rb->splash(HZ/2, "font load failed");
-            return false;
-        }
-    }
-    return true;
-}
-#endif
 
 static void tv_draw_bookmarks(const struct tv_screen_pos *top_pos)
 {
@@ -127,68 +108,31 @@ bool tv_traverse_lines(void)
 
 static void tv_change_preferences(const struct tv_preferences *oldp)
 {
-#ifndef HAVE_LCD_BITMAP
+    bool need_vertical_scrollbar = false;
+
     (void)oldp;
-#else
-    static bool font_changing = false;
-    const unsigned char *font_str;
-    bool need_vertical_scrollbar;
-    struct tv_preferences new_prefs;
-    tv_copy_preferences(&new_prefs);
 
-    font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
-
-    /* change font */
-    if (font_changing || rb->strcmp(font_str, preferences->font_name))
-    {
-        font_changing = true;
-        if (!tv_set_font(preferences->font_name))
-        {
-            rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
-            tv_set_preferences(&new_prefs);
-            return;
-        }
-    }
-
-    font_changing = false;
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    col_width = 2 * rb->font_get_width(preferences->font, ' ');
-#else
-    col_width = 1;
-#endif
-
-    if (cur_window >= preferences->windows)
-        cur_window = 0;
-
-    /* change viewport */
-    tv_change_viewport();
-
-#ifdef HAVE_LCD_BITMAP
-    need_vertical_scrollbar = false;
-    tv_set_layout(col_width, need_vertical_scrollbar);
+    tv_set_layout(need_vertical_scrollbar);
     tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
+
+#ifdef HAVE_LCD_BITMAP
     tv_seek_top();
     tv_set_read_conditions(preferences->windows, window_width);
     if (tv_traverse_lines() && preferences->vertical_scrollbar)
     {
         need_vertical_scrollbar = true;
-        tv_set_layout(col_width, need_vertical_scrollbar);
+        tv_set_layout(need_vertical_scrollbar);
         tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
     }
     tv_seek_top();
-#else
-    tv_set_layout(col_width);
-    tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
 #endif
 
-    window_columns = window_width / col_width;
     cur_column = 0;
 
-    tv_set_read_conditions(preferences->windows, window_width);
+    if (cur_window >= preferences->windows)
+        cur_window = 0;
 
-    tv_init_display();
+    tv_set_read_conditions(preferences->windows, window_width);
 #ifdef HAVE_LCD_BITMAP
     tv_init_scrollbar(tv_get_total_text_size(), need_vertical_scrollbar);
 #endif
@@ -197,23 +141,13 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 bool tv_init_window(unsigned char **buf, size_t *size)
 {
     tv_add_preferences_change_listner(tv_change_preferences);
-    return tv_init_text_reader(buf, size);
+    return tv_init_display(buf, size) && tv_init_text_reader(buf, size);
 }
 
 void tv_finalize_window(void)
 {
     tv_finalize_text_reader();
-
-#ifdef HAVE_LCD_BITMAP
-    /* restore font */
-    if (rb->strcmp(rb->global_settings->font_file, preferences->font_name))
-    {
-        tv_set_font(rb->global_settings->font_file);
-    }
-
-    /* undo viewport */
-    tv_undo_viewport();
-#endif
+    tv_finalize_display();
 }
 
 void tv_move_window(int window_delta, int column_delta)

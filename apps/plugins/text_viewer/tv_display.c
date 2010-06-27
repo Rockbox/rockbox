@@ -104,8 +104,8 @@ static struct tv_rect drawarea;
 static int display_columns;
 static int display_rows;
 
-static int col_width;
-static int row_height;
+static int col_width  = 1;
+static int row_height = 1;
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -209,12 +209,6 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
 #endif
 }
 
-void tv_init_display(void)
-{
-    display = rb->screens[SCREEN_MAIN];
-    display->clear_viewport();
-}
-
 void tv_start_display(void)
 {
     display->set_viewport(&vp_info);
@@ -242,11 +236,7 @@ void tv_update_display(void)
     display->update_viewport();
 }
 
-#ifdef HAVE_LCD_BITMAP
-void tv_set_layout(int col_w, bool show_scrollbar)
-#else
-void tv_set_layout(int col_w)
-#endif
+void tv_set_layout(bool show_scrollbar)
 {
 #ifdef HAVE_LCD_BITMAP
     int scrollbar_width  = (show_scrollbar)?                    TV_SCROLLBAR_WIDTH  + 1 : 0;
@@ -279,6 +269,8 @@ void tv_set_layout(int col_w)
     vertical_scrollbar.w = scrollbar_width;
     vertical_scrollbar.h = drawarea.h;
 #else
+    (void) show_scrollbar;
+
     row_height = 1;
 
     bookmark.x = 0;
@@ -291,7 +283,6 @@ void tv_set_layout(int col_w)
     drawarea.w = vp_info.width - 1;
     drawarea.h = vp_info.height;
 #endif
-    col_width = col_w;
 
     display_columns = drawarea.w / col_width;
     display_rows    = drawarea.h / row_height;
@@ -304,9 +295,15 @@ void tv_get_drawarea_info(int *width, int *cols, int *rows)
     *rows  = display_rows;
 }
 
-void tv_change_viewport(void)
-{
 #ifdef HAVE_LCD_BITMAP
+static void tv_undo_viewport(void)
+{
+    if (is_initialized_vp)
+        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+}
+
+static void tv_change_viewport(void)
+{
     struct viewport vp;
 
     if (is_initialized_vp)
@@ -317,8 +314,52 @@ void tv_change_viewport(void)
     rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp);
     vp_info = vp;
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
+}
 
+static bool tv_set_font(const unsigned char *font)
+{
+    unsigned char path[MAX_PATH];
+
+    if (font != NULL && *font != '\0')
+    {
+        rb->snprintf(path, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
+        if (rb->font_load(NULL, path) < 0)
+        {
+            rb->splash(HZ/2, "font load failed");
+            return false;
+        }
+    }
+    return true;
+}
+#endif
+
+static void tv_change_preferences(const struct tv_preferences *oldp)
+{
+#ifdef HAVE_LCD_BITMAP
+    static bool font_changing = false;
+    const unsigned char *font_str;
+    struct tv_preferences new_prefs;
+
+    font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
+
+    /* change font */
+    if (font_changing || rb->strcmp(font_str, preferences->font_name))
+    {
+        if (!tv_set_font(preferences->font_name))
+        {
+            font_changing = true;
+            tv_copy_preferences(&new_prefs);
+            rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
+            tv_set_preferences(&new_prefs);
+            font_changing = false;
+        }
+        col_width = 2 * rb->font_get_width(preferences->font, ' ');
+    }
+
+    tv_change_viewport();
 #else
+    (void)oldp;
+
     if (!is_initialized_vp)
     {
         rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
@@ -327,10 +368,29 @@ void tv_change_viewport(void)
 #endif
 }
 
-void tv_undo_viewport(void)
+bool tv_init_display(unsigned char **buf, size_t *size)
+{
+    (void)buf;
+    (void)size;
+
+    display = rb->screens[SCREEN_MAIN];
+    display->clear_viewport();
+
+    tv_add_preferences_change_listner(tv_change_preferences);
+
+    return true;
+}
+
+void tv_finalize_display(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    if (is_initialized_vp)
-        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+    /* restore font */
+    if (rb->strcmp(rb->global_settings->font_file, preferences->font_name))
+    {
+        tv_set_font(rb->global_settings->font_file);
+    }
+
+    /* undo viewport */
+    tv_undo_viewport();
 #endif
 }

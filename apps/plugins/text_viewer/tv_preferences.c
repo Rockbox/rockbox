@@ -30,7 +30,7 @@ const struct tv_preferences * const preferences = &prefs;
 
 static int listner_count = 0;
 
-#define TV_MAX_LISTNERS 4
+#define TV_MAX_LISTNERS 5
 static void (*listners[TV_MAX_LISTNERS])(const struct tv_preferences *oldp);
 
 static void tv_notify_change_preferences(const struct tv_preferences *oldp)
