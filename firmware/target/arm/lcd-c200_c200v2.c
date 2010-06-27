@@ -274,13 +274,8 @@ void lcd_enable(bool yesno)
 
     if ((is_lcd_enabled = yesno))
     {
-#ifdef SANSA_C200V2
-        /* lcd sometimes gets stuck, do full init here */
-        lcd_reset();
-#else
         lcd_send_command(R_STANDBY_OFF, 0);
         lcd_send_command(R_DISPLAY_ON, 0);
-#endif
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
@@ -417,6 +412,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_send_command(R_Y_ADDR_AREA, y + 0x1a);
     lcd_send_command(y + height - 1 + 0x1a, 0);
+
+#ifdef SANSA_C200V2
+    /* somehow there are glitches without this delay */
+    udelay(1);
+#endif
 
     do {
         lcd_write_data(addr, width);
