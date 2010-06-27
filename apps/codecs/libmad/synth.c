@@ -55,6 +55,7 @@ void mad_synth_init(struct mad_synth *synth)
  */
 void mad_synth_mute(struct mad_synth *synth)
 {
+  /*
   unsigned int ch, s, v;
 
   for (ch = 0; ch < 2; ++ch) {
@@ -65,6 +66,8 @@ void mad_synth_mute(struct mad_synth *synth)
       }
     }
   }
+  */
+  memset(synth->filter, 0, sizeof(synth->filter));
 }
 
 #if 0 /* dct32 asm implementation is slower on current arm systems */
@@ -978,6 +981,44 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
 # else /* not FPM_COLDFIRE_EMAC and not FPM_ARM */
 
+#define PROD_O(hi, lo, f, ptr, offset) \
+        ML0(hi, lo, (*f)[0], ptr[ 0+offset]); \
+        MLA(hi, lo, (*f)[1], ptr[14+offset]); \
+        MLA(hi, lo, (*f)[2], ptr[12+offset]); \
+        MLA(hi, lo, (*f)[3], ptr[10+offset]); \
+        MLA(hi, lo, (*f)[4], ptr[ 8+offset]); \
+        MLA(hi, lo, (*f)[5], ptr[ 6+offset]); \
+        MLA(hi, lo, (*f)[6], ptr[ 4+offset]); \
+        MLA(hi, lo, (*f)[7], ptr[ 2+offset]);
+        
+#define PROD_A(hi, lo, f, ptr, offset) \
+        MLA(hi, lo, (*f)[0], ptr[ 0+offset]); \
+        MLA(hi, lo, (*f)[1], ptr[14+offset]); \
+        MLA(hi, lo, (*f)[2], ptr[12+offset]); \
+        MLA(hi, lo, (*f)[3], ptr[10+offset]); \
+        MLA(hi, lo, (*f)[4], ptr[ 8+offset]); \
+        MLA(hi, lo, (*f)[5], ptr[ 6+offset]); \
+        MLA(hi, lo, (*f)[6], ptr[ 4+offset]); \
+        MLA(hi, lo, (*f)[7], ptr[ 2+offset]);
+        
+#define PROD_SB(hi, lo, ptr, offset, first_idx, last_idx) \
+        ML0(hi, lo, (*fe)[0], ptr[first_idx]); \
+        MLA(hi, lo, (*fe)[1], ptr[16+offset]); \
+        MLA(hi, lo, (*fe)[2], ptr[18+offset]); \
+        MLA(hi, lo, (*fe)[3], ptr[20+offset]); \
+        MLA(hi, lo, (*fe)[4], ptr[22+offset]); \
+        MLA(hi, lo, (*fe)[5], ptr[24+offset]); \
+        MLA(hi, lo, (*fe)[6], ptr[26+offset]); \
+        MLA(hi, lo, (*fe)[7], ptr[28+offset]); \
+        MLA(hi, lo, (*fo)[7], ptr[29-offset]); \
+        MLA(hi, lo, (*fo)[6], ptr[27-offset]); \
+        MLA(hi, lo, (*fo)[5], ptr[25-offset]); \
+        MLA(hi, lo, (*fo)[4], ptr[23-offset]); \
+        MLA(hi, lo, (*fo)[3], ptr[21-offset]); \
+        MLA(hi, lo, (*fo)[2], ptr[19-offset]); \
+        MLA(hi, lo, (*fo)[1], ptr[17-offset]); \
+        MLA(hi, lo, (*fo)[0], ptr[last_idx ]);
+
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
                 unsigned int nch, unsigned int ns)
@@ -1015,23 +1056,9 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       if(s & 1)
       {
         ptr = *D0ptr;
-        ML0(hi, lo, (*fx)[0], ptr[ 1]);
-        MLA(hi, lo, (*fx)[1], ptr[15]);
-        MLA(hi, lo, (*fx)[2], ptr[13]);
-        MLA(hi, lo, (*fx)[3], ptr[11]);
-        MLA(hi, lo, (*fx)[4], ptr[ 9]);
-        MLA(hi, lo, (*fx)[5], ptr[ 7]);
-        MLA(hi, lo, (*fx)[6], ptr[ 5]);
-        MLA(hi, lo, (*fx)[7], ptr[ 3]);
+        PROD_O(hi, lo, fx, ptr, 1)
         MLN(hi, lo);
-        MLA(hi, lo, (*fe)[0], ptr[ 0]);
-        MLA(hi, lo, (*fe)[1], ptr[14]);
-        MLA(hi, lo, (*fe)[2], ptr[12]);
-        MLA(hi, lo, (*fe)[3], ptr[10]);
-        MLA(hi, lo, (*fe)[4], ptr[ 8]);
-        MLA(hi, lo, (*fe)[5], ptr[ 6]);
-        MLA(hi, lo, (*fe)[6], ptr[ 4]);
-        MLA(hi, lo, (*fe)[7], ptr[ 2]);
+        PROD_A(hi, lo, fe, ptr, 0)
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
@@ -1043,76 +1070,26 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
           /* D[32 - sb][i] == -D[sb][31 - i] */
           ptr = *D0ptr;
-          ML0(hi, lo, (*fo)[0], ptr[ 1]);
-          MLA(hi, lo, (*fo)[1], ptr[15]);
-          MLA(hi, lo, (*fo)[2], ptr[13]);
-          MLA(hi, lo, (*fo)[3], ptr[11]);
-          MLA(hi, lo, (*fo)[4], ptr[ 9]);
-          MLA(hi, lo, (*fo)[5], ptr[ 7]);
-          MLA(hi, lo, (*fo)[6], ptr[ 5]);
-          MLA(hi, lo, (*fo)[7], ptr[ 3]);
+          PROD_O(hi, lo, fo, ptr, 1)
           MLN(hi, lo);
-          MLA(hi, lo, (*fe)[7], ptr[ 2]);
-          MLA(hi, lo, (*fe)[6], ptr[ 4]);
-          MLA(hi, lo, (*fe)[5], ptr[ 6]);
-          MLA(hi, lo, (*fe)[4], ptr[ 8]);
-          MLA(hi, lo, (*fe)[3], ptr[10]);
-          MLA(hi, lo, (*fe)[2], ptr[12]);
-          MLA(hi, lo, (*fe)[1], ptr[14]);
-          MLA(hi, lo, (*fe)[0], ptr[ 0]);
+          PROD_A(hi, lo, fe, ptr, 0)
           pcm[-sb] = SHIFT(MLZ(hi, lo));
 
           ptr = *D1ptr;
-          ML0(hi, lo, (*fe)[0], ptr[31 - 16]);
-          MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
-          MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
-          MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
-          MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
-          MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
-          MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
-          MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
-          MLA(hi, lo, (*fo)[7], ptr[31 -  3]);
-          MLA(hi, lo, (*fo)[6], ptr[31 -  5]);
-          MLA(hi, lo, (*fo)[5], ptr[31 -  7]);
-          MLA(hi, lo, (*fo)[4], ptr[31 -  9]);
-          MLA(hi, lo, (*fo)[3], ptr[31 - 11]);
-          MLA(hi, lo, (*fo)[2], ptr[31 - 13]);
-          MLA(hi, lo, (*fo)[1], ptr[31 - 15]);
-          MLA(hi, lo, (*fo)[0], ptr[31 -  1]);
+          PROD_SB(hi, lo, ptr, 1, 15, 30)
           pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
         ptr = *(D0ptr + 1);
-        ML0(hi, lo, (*fo)[0], ptr[ 1]);
-        MLA(hi, lo, (*fo)[1], ptr[15]);
-        MLA(hi, lo, (*fo)[2], ptr[13]);
-        MLA(hi, lo, (*fo)[3], ptr[11]);
-        MLA(hi, lo, (*fo)[4], ptr[ 9]);
-        MLA(hi, lo, (*fo)[5], ptr[ 7]);
-        MLA(hi, lo, (*fo)[6], ptr[ 5]);
-        MLA(hi, lo, (*fo)[7], ptr[ 3]);
+        PROD_O(hi, lo, fo, ptr, 1)
         pcm[0] = SHIFT(-MLZ(hi, lo));
       }
       else
       {
         ptr = *D0ptr;
-        ML0(hi, lo, (*fx)[0], ptr[ 0]);
-        MLA(hi, lo, (*fx)[1], ptr[14]);
-        MLA(hi, lo, (*fx)[2], ptr[12]);
-        MLA(hi, lo, (*fx)[3], ptr[10]);
-        MLA(hi, lo, (*fx)[4], ptr[ 8]);
-        MLA(hi, lo, (*fx)[5], ptr[ 6]);
-        MLA(hi, lo, (*fx)[6], ptr[ 4]);
-        MLA(hi, lo, (*fx)[7], ptr[ 2]);
+        PROD_O(hi, lo, fx, ptr, 0)
         MLN(hi, lo);
-        MLA(hi, lo, (*fe)[0], ptr[ 1]);
-        MLA(hi, lo, (*fe)[1], ptr[15]);
-        MLA(hi, lo, (*fe)[2], ptr[13]);
-        MLA(hi, lo, (*fe)[3], ptr[11]);
-        MLA(hi, lo, (*fe)[4], ptr[ 9]);
-        MLA(hi, lo, (*fe)[5], ptr[ 7]);
-        MLA(hi, lo, (*fe)[6], ptr[ 5]);
-        MLA(hi, lo, (*fe)[7], ptr[ 3]);
+        PROD_A(hi, lo, fe, ptr, 1)
         pcm[0] = SHIFT(MLZ(hi, lo));
         pcm   += 16;
 
@@ -1124,54 +1101,18 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
           /* D[32 - sb][i] == -D[sb][31 - i] */
           ptr = *D0ptr;
-          ML0(hi, lo, (*fo)[0], ptr[ 0]);
-          MLA(hi, lo, (*fo)[1], ptr[14]);
-          MLA(hi, lo, (*fo)[2], ptr[12]);
-          MLA(hi, lo, (*fo)[3], ptr[10]);
-          MLA(hi, lo, (*fo)[4], ptr[ 8]);
-          MLA(hi, lo, (*fo)[5], ptr[ 6]);
-          MLA(hi, lo, (*fo)[6], ptr[ 4]);
-          MLA(hi, lo, (*fo)[7], ptr[ 2]);
+          PROD_O(hi, lo, fo, ptr, 0)
           MLN(hi, lo);
-          MLA(hi, lo, (*fe)[7], ptr[ 3]);
-          MLA(hi, lo, (*fe)[6], ptr[ 5]);
-          MLA(hi, lo, (*fe)[5], ptr[ 7]);
-          MLA(hi, lo, (*fe)[4], ptr[ 9]);
-          MLA(hi, lo, (*fe)[3], ptr[11]);
-          MLA(hi, lo, (*fe)[2], ptr[13]);
-          MLA(hi, lo, (*fe)[1], ptr[15]);
-          MLA(hi, lo, (*fe)[0], ptr[ 1]);
+          PROD_A(hi, lo, fe, ptr, 1)
           pcm[-sb] = SHIFT(MLZ(hi, lo));
 
           ptr = *D1ptr;
-          ML0(hi, lo, (*fe)[0], ptr[31 -  1]);
-          MLA(hi, lo, (*fe)[1], ptr[31 - 15]);
-          MLA(hi, lo, (*fe)[2], ptr[31 - 13]);
-          MLA(hi, lo, (*fe)[3], ptr[31 - 11]);
-          MLA(hi, lo, (*fe)[4], ptr[31 -  9]);
-          MLA(hi, lo, (*fe)[5], ptr[31 -  7]);
-          MLA(hi, lo, (*fe)[6], ptr[31 -  5]);
-          MLA(hi, lo, (*fe)[7], ptr[31 -  3]);
-          MLA(hi, lo, (*fo)[7], ptr[31 -  2]);
-          MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
-          MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
-          MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
-          MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
-          MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
-          MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
-          MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
+          PROD_SB(hi, lo, ptr, 0, 30, 15)
           pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
         ptr = *(D0ptr + 1);
-        ML0(hi, lo, (*fo)[0], ptr[ 0]);
-        MLA(hi, lo, (*fo)[1], ptr[14]);
-        MLA(hi, lo, (*fo)[2], ptr[12]);
-        MLA(hi, lo, (*fo)[3], ptr[10]);
-        MLA(hi, lo, (*fo)[4], ptr[ 8]);
-        MLA(hi, lo, (*fo)[5], ptr[ 6]);
-        MLA(hi, lo, (*fo)[6], ptr[ 4]);
-        MLA(hi, lo, (*fo)[7], ptr[ 2]);
+        PROD_O(hi, lo, fo, ptr, 0)
         pcm[0] = SHIFT(-MLZ(hi, lo));
       }
 
@@ -1184,6 +1125,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 # endif
 # endif
 
+#if 0 /* rockbox: unused */
 /*
  * NAME:        synth->half()
  * DESCRIPTION: perform half frequency PCM synthesis
@@ -1321,6 +1263,7 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
     }
   }
 }
+#endif /* unused */
 
 /*
  * NAME:        synth->frame()
@@ -1341,12 +1284,14 @@ void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 
   synth_frame = synth_full;
 
+#if 0 /* rockbox: unused */
   if (frame->options & MAD_OPTION_HALFSAMPLERATE) {
     synth->pcm.samplerate /= 2;
     synth->pcm.length     /= 2;
 
     synth_frame = synth_half;
   }
+#endif
 
   synth_frame(synth, frame, nch, ns);
 
