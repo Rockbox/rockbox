@@ -61,7 +61,9 @@ struct mad_header {
   int flags;                            /* flags (see below) */
   int private_bits;                     /* private bits (see below) */
 
+#if 0 /* rockbox: not used */
   mad_timer_t duration;                 /* audio playing time of frame */
+#endif
 };
 
 struct mad_frame {

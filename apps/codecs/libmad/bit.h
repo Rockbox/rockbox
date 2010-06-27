@@ -34,12 +34,16 @@ void mad_bit_init(struct mad_bitptr *, unsigned char const *);
 unsigned int mad_bit_length(struct mad_bitptr const *,
                             struct mad_bitptr const *);
 
+/* rockbox: not used
 unsigned char mad_bit_bitsleft(struct mad_bitptr const *bitptr);
+*/
 unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *);
 
 void mad_bit_skip(struct mad_bitptr *, unsigned int);
 uint32_t mad_bit_read(struct mad_bitptr *, unsigned int);
+/* rockbox: not used
 void mad_bit_write(struct mad_bitptr *, unsigned int, uint32_t);
+*/
 
 unsigned short mad_bit_crc(struct mad_bitptr, unsigned int, unsigned short);
 

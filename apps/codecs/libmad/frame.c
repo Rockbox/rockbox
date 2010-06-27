@@ -79,8 +79,9 @@ void mad_header_init(struct mad_header *header)
 
   header->flags          = 0;
   header->private_bits   = 0;
-
+/* rockbox: not used
   header->duration       = mad_timer_zero;
+*/
 }
 
 /*
@@ -374,9 +375,11 @@ int mad_header_decode(struct mad_header *header, struct mad_stream *stream)
     goto fail;
 
   /* calculate frame duration */
+  /* rockbox: not used
   mad_timer_set(&header->duration, 0,
                 32 * MAD_NSBSAMPLES(header), header->samplerate);
-
+  */
+    
   /* calculate free bit rate */
   if (header->bitrate == 0) {
     if ((stream->freerate == 0 || !stream->sync ||
