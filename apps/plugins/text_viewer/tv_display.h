@@ -89,6 +89,8 @@ void tv_init_scrollbar(off_t total, bool show_scrollbar);
  */
 void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
 
+#endif
+
 /*
  * show bookmark
  *
@@ -99,8 +101,6 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
  *          want to show bookmark count
  */
 void tv_show_bookmarks(const int *rows, int count);
-
-#endif
 
 /* common display functons */
 
