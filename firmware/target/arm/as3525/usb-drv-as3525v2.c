@@ -43,17 +43,30 @@ static int __out_ep_list_ep0[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 
 /* iterate through each in/out ep except EP0
  * 'counter' is the counter, 'ep' is the actual value */
+#define FOR_EACH_EP(list, size, counter, ep) \
+    for(counter = 0, ep = (list)[0]; \
+        counter < (size); \
+        counter++, ep = (list)[counter])
+ 
+#define FOR_EACH_IN_EP_EX(include_ep0, counter, ep) \
+    FOR_EACH_EP(include_ep0 ? __in_ep_list_ep0 : __in_ep_list, \
+        include_ep0 ? NUM_IN_EP : NUM_IN_EP + 1, counter, ep)
+
+#define FOR_EACH_OUT_EP_EX(include_ep0, counter, ep) \
+    FOR_EACH_EP(include_ep0 ? __out_ep_list_ep0 : __out_ep_list, \
+        include_ep0 ? NUM_OUT_EP : NUM_OUT_EP + 1, counter, ep)
+ 
 #define FOR_EACH_IN_EP(counter, ep) \
-    for(counter = 0, ep = __in_ep_list[0]; counter < NUM_IN_EP; counter++, ep = __in_ep_list[counter])
+    FOR_EACH_IN_EP_EX(false, counter, ep)
 
 #define FOR_EACH_IN_EP_AND_EP0(counter, ep) \
-    for(counter = 0, ep = __in_ep_list_ep0[0]; counter <= NUM_IN_EP; counter++, ep = __in_ep_list_ep0[counter])
+    FOR_EACH_IN_EP_EX(true, counter, ep)
 
 #define FOR_EACH_OUT_EP(counter, ep) \
-    for(counter = 0, ep = __out_ep_list[0]; counter < NUM_OUT_EP; counter++, ep = __out_ep_list[counter])
+    FOR_EACH_OUT_EP_EX(false, counter, ep)
 
 #define FOR_EACH_OUT_EP_AND_EP0(counter, ep) \
-    for(counter = 0, ep = __out_ep_list_ep0[0]; counter <= NUM_OUT_EP; counter++, ep = __out_ep_list_ep0[counter])
+    FOR_EACH_OUT_EP_EX(true, counter, ep)
 
 struct usb_endpoint
 {
@@ -222,6 +235,31 @@ static void reset_endpoints(void)
     prepare_setup_ep0();
 }
 
+static void cancel_all_transfers(bool cancel_ep0)
+{
+    logf("usb-drv: cancel all transfers");
+    int flags = disable_irq_save();
+    unsigned i, ep;
+    FOR_EACH_IN_EP_EX(cancel_ep0, i, ep)
+    {
+        endpoints[ep][DIR_IN].status = 1;
+        endpoints[ep][DIR_IN].wait = false;
+        endpoints[ep][DIR_IN].busy = false;
+        wakeup_signal(&endpoints[ep][DIR_IN].complete);
+        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
+    }
+    FOR_EACH_OUT_EP_EX(cancel_ep0, i, ep)
+    {
+        endpoints[ep][DIR_OUT].status = 1;
+        endpoints[ep][DIR_OUT].wait = false;
+        endpoints[ep][DIR_OUT].busy = false;
+        wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
+    }
+    
+    restore_irq(flags);
+}
+
 static void core_dev_init(void)
 {
     unsigned int i, ep;
@@ -383,7 +421,6 @@ static void handle_ep_int(int ep, bool dir_in)
                  * so we setup EP0 to receive next setup */
                 if(ep == 0 && endpoint->len == 0)
                     prepare_setup_ep0();
-                DIEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
                 wakeup_signal(&endpoint->complete);
             }
@@ -435,12 +472,12 @@ static void handle_ep_int(int ep, bool dir_in)
         if(DOEPINT(ep) & DOEPINT_setup)
         {
             logf("usb-drv: setup on EP%d OUT", ep);
-            logf("rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
             if(ep != 0)
                 panicf("usb-drv: setup not on EP0, this is impossible");
             DOEPCTL(ep) |= DEPCTL_snak;
             /* handle the set address here because of a bug in the usb core */
             invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
+            logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
             if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
                     ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
                 usb_drv_set_address(ep0_setup_pkt.wValue);
@@ -484,6 +521,7 @@ void INT_USB(void)
         /* Clear the Remote Wakeup Signalling */
         //DCTL &= ~DCTL_rmtwkupsig;
 
+        cancel_all_transfers(true);
         /* Flush FIFOs */
         flush_tx_fifos(0x10);
         flush_rx_fifos();
@@ -501,18 +539,10 @@ void INT_USB(void)
         logf("usb-drv: enum done");
 
         /* read speed */
-        switch(extract(DSTS, enumspd))
-        {
-            case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
-                logf("usb-drv: HS");
-                break;
-            case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
-            case DSTS_ENUMSPD_FS_PHY_48MHZ:
-                logf("usb-drv: FS");
-                break;
-            case DSTS_ENUMSPD_LS_PHY_6MHZ:
-                panicf("usb-drv: LS is not supported");
-        }
+        if(usb_drv_port_speed())
+            logf("usb-drv: HS");
+        else
+            logf("usb-drv: FS");
 
         /* fixme: change EP0 mps here */
     }
@@ -523,14 +553,32 @@ void INT_USB(void)
     }
 
     if(sts & GINTMSK_disconnect)
+    {
         panicf("usb-drv: disconnect");
+        cancel_all_transfers(true);
+        usb_enable(false);        
+    }
 
     GINTSTS = GINTSTS;
 }
 
 int usb_drv_port_speed(void)
 {
-    return 0;
+    switch(extract(DSTS, enumspd))
+    {
+        case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
+            return 1;
+        case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
+        case DSTS_ENUMSPD_FS_PHY_48MHZ:
+            return 0;
+            break;
+        case DSTS_ENUMSPD_LS_PHY_6MHZ:
+            panicf("usb-drv: LS is not supported");
+            return 0;
+        default:
+            panicf("usb-drv: wtf is this speed ?");
+            return 0;
+    }
 }
 
 int usb_drv_request_endpoint(int type, int dir)
@@ -547,29 +595,9 @@ void usb_drv_release_endpoint(int ep)
     endpoints[EP_NUM(ep)][EP_DIR(ep)].active = false;
 }
 
-void usb_drv_cancel_all_transfers(void)
+void usb_drv_cancel_all_transfers()
 {
-    logf("usb-drv: cancel all transfers");
-    int flags = disable_irq_save();
-    unsigned i, ep;
-    FOR_EACH_IN_EP(i, ep)
-    {
-        endpoints[ep][DIR_IN].status = 1;
-        endpoints[ep][DIR_IN].wait = false;
-        endpoints[ep][DIR_IN].busy = false;
-        wakeup_signal(&endpoints[ep][DIR_IN].complete);
-        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
-    }
-    FOR_EACH_OUT_EP(i, ep)
-    {
-        endpoints[ep][DIR_OUT].status = 1;
-        endpoints[ep][DIR_OUT].wait = false;
-        endpoints[ep][DIR_OUT].busy = false;
-        wakeup_signal(&endpoints[ep][DIR_OUT].complete);
-        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
-    }
-    
-    restore_irq(flags);
+    cancel_all_transfers(false);
 }
 
 static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocking)
@@ -586,14 +614,15 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     #define DEPTSIZ *eptsiz
     #define DEPDMA  *epdma
 
-    if(endpoint->busy)
-        panicf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
-    
     if(DEPCTL & DEPCTL_stall)
     {
-        logf("usb-drv: cannot receive on a stalled endpoint");
+        logf("usb-drv: cannot receive/send on a stalled endpoint");
         return -1;
     }
+
+    if(endpoint->busy)
+        logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
+    
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
