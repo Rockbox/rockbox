@@ -417,7 +417,6 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].state |= EP_STATE_BUSY;
     endpoints[ep][1].len = len;
     endpoints[ep][1].rc  = -1;
-    endpoints[ep][1].timeout = current_tick + HZ;
 
     /* remove data buffer from cache */
     invalidate_dcache_range(ptr, len);
@@ -437,10 +436,9 @@ int usb_drv_recv(int ep, void *ptr, int len)
 
     /* Make sure receive DMA is on */
     if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE)){
-        logf("enabling receive DMA\n");
         USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
         if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE))
-            logf("failed to enable!\n");
+            logf("failed to enable RDE!\n");
     }
 
     USB_OEP_CTRL(ep)    |= USB_EP_CTRL_CNAK; /* Go! */
@@ -487,7 +485,15 @@ void ep_send(int ep, void *ptr, int len)
     endpoints[ep][0].state |= EP_STATE_BUSY;
     endpoints[ep][0].len = len;
     endpoints[ep][0].rc = -1;
-    endpoints[ep][0].timeout = current_tick + HZ;
+
+    /*
+     * I'm seeing a problem where Linux sends two SETUP requests,
+     * but fails to read the response from the first one.
+     * We then have the response we wanted to send still in our fifo,
+     * so flush the fifo before sending on the control endpoint.
+     */
+    if (ep == 0)
+        USB_IEP_CTRL(ep) |= USB_EP_CTRL_FLUSH;
 
     /* Make sure data is committed to memory */
     clean_dcache_range(ptr, len);
@@ -525,8 +531,8 @@ int usb_drv_send(int ep, void *ptr, int len)
     }
 
     ep_send(ep, ptr, len);
-    while (endpoints[ep][0].state & EP_STATE_BUSY)
-        wakeup_wait(&endpoints[ep][0].complete, TIMEOUT_BLOCK);
+    if (wakeup_wait(&endpoints[ep][0].complete, HZ) == OBJ_WAIT_TIMEDOUT)
+        logf("send timed out!\n");
 
     return endpoints[ep][0].rc;
 }
@@ -647,17 +653,6 @@ static void handle_out_ep(int ep)
         logf("ep%d OUT, status %x\n", ep, ep_sts);
         panicf("ep%d OUT 0x%x", ep, ep_sts);
     }
-
-#if 0
-    /* HW automatically disables RDE, re-enable it */
-    /* THEORY: Because we only set up one DMA buffer... */
-    USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
-#endif
-
-    if (!(USB_DEV_CTRL & USB_DEV_CTRL_RDE)){
-        logf("receive DMA is disabled!\n");
-        //USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
-    }
 }
 
 /*
@@ -678,8 +673,6 @@ static void usb_tick(void)
 {
     static int rde_timer = 0;
     static int rde_fails = 0;
-    struct usb_endpoint *eps = &endpoints[0][0];
-    int i;
 
     if (usb_enum_timeout != -1) {
         /*
@@ -689,42 +682,24 @@ static void usb_tick(void)
             usb_remove_int();
     }
 
-    for (i=0; i<2*USB_NUM_EPS; i++) {
-        if (!(eps[i].state & EP_STATE_BUSY) ||
-            !TIME_AFTER(current_tick, endpoints[i]))
-            continue;
-
-        /* recv or send timed out */
-        if (eps[i].state & EP_STATE_ASYNC) {
-            eps[i].rc = -1;
-            wakeup_signal(&eps[i].complete);
-        } else {
-            usb_core_transfer_complete(i/2, i&1 ? USB_DIR_OUT : USB_DIR_IN,
-                                       -1, 0);
-        }
-        eps[i].state &= ~(EP_STATE_BUSY|EP_STATE_ASYNC);
-    }
-
     if (USB_DEV_CTRL & USB_DEV_CTRL_RDE)
         return;
 
-    if (!(USB_DEV_STS & USB_DEV_STS_RXF_EMPTY)) {
-        if (rde_timer == 0)
-            logf("usb_tick: fifo got filled\n");
+    if (!(USB_DEV_STS & USB_DEV_STS_RXF_EMPTY))
         rde_timer++;
-    }
 
-    if (rde_timer > 2) {
-        logf("usb_tick: re-enabling RDE\n");
-        USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
-        rde_timer = 0;
-        if (USB_DEV_CTRL & USB_DEV_CTRL_RDE) {
-            rde_fails = 0;
-        } else {
-            rde_fails++;
-            if (rde_fails > 3)
-                panicf("usb_tick: failed to set RDE");
-        }
+    if (rde_timer < 2)
+        return;
+
+    logf("usb_tick: re-enabling RDE\n");
+    USB_DEV_CTRL |= USB_DEV_CTRL_RDE;
+    rde_timer = 0;
+    if (USB_DEV_CTRL & USB_DEV_CTRL_RDE) {
+        rde_fails = 0;
+    } else {
+        rde_fails++;
+        if (rde_fails > 3)
+            panicf("usb_tick: failed to set RDE");
     }
 }
 
@@ -806,18 +781,6 @@ void INT_USB(void)
             if (spd == USB_DEV_STS_SPD_FS) logf("fs\n");
             if (spd == USB_DEV_STS_SPD_LS) logf("ls\n");
 
-            USB_PHY_EP0_INFO = 0x00200000       |
-                               USB_CSR_DIR_OUT  |
-                               USB_CSR_TYPE_CTL;
-            USB_PHY_EP1_INFO = 0x00200000       |
-                               USB_CSR_DIR_IN   |
-                               USB_CSR_TYPE_CTL;
-            USB_PHY_EP2_INFO = 0x00200001       |
-                               USB_CSR_DIR_IN   |
-                               USB_CSR_TYPE_BULK;
-            USB_PHY_EP3_INFO = 0x00200001       |
-                               USB_CSR_DIR_IN   |
-                               USB_CSR_TYPE_BULK;
             USB_DEV_CTRL |= USB_DEV_CTRL_APCSR_DONE;
             USB_IEP_CTRL(0) |= USB_EP_CTRL_ACT;
             USB_OEP_CTRL(0) |= USB_EP_CTRL_ACT;

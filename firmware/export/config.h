@@ -907,7 +907,8 @@ Lyre prototype 1 */
 #define USB_HAS_BULK
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
-    (CONFIG_USBOTG == USBOTG_M66591)
+    (CONFIG_USBOTG == USBOTG_M66591) || \
+    (CONFIG_USBOTG == USBOTG_AS3525)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
@@ -917,7 +918,8 @@ Lyre prototype 1 */
 //#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */
 
-#if CONFIG_USBOTG == USBOTG_ARC
+#if (CONFIG_USBOTG == USBOTG_ARC) || \
+    (CONFIG_USBOTG == USBOTG_AS3525)
 #define USB_HAS_ISOCHRONOUS
 #endif
 
