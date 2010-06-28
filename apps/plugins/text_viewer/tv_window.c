@@ -77,14 +77,10 @@ void tv_draw_window(void)
 
     size = tv_read_end();
 
-#ifdef HAVE_LCD_BITMAP
-    tv_show_scrollbar(cur_window, cur_column, pos.file_pos, size);
-    tv_show_header();
-    tv_show_footer(&pos);
-#endif
     tv_draw_bookmarks(&pos);
 
-    tv_update_display();
+    tv_update_extra(cur_window, cur_column, &pos, size);
+
     tv_end_display();
 }
 
@@ -115,27 +111,26 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     tv_set_layout(need_vertical_scrollbar);
     tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
 
-#ifdef HAVE_LCD_BITMAP
-    tv_seek_top();
-    tv_set_read_conditions(preferences->windows, window_width);
-    if (tv_traverse_lines() && preferences->vertical_scrollbar)
+    if (tv_exist_scrollbar())
     {
-        need_vertical_scrollbar = true;
-        tv_set_layout(need_vertical_scrollbar);
-        tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
+        tv_seek_top();
+        tv_set_read_conditions(preferences->windows, window_width);
+        if (tv_traverse_lines() && preferences->vertical_scrollbar)
+        {
+            need_vertical_scrollbar = true;
+            tv_set_layout(need_vertical_scrollbar);
+            tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
+        }
+        tv_seek_top();
+        tv_init_scrollbar(tv_get_total_text_size(), need_vertical_scrollbar);
     }
-    tv_seek_top();
-#endif
-
-    cur_column = 0;
 
     if (cur_window >= preferences->windows)
         cur_window = 0;
 
+    cur_column = 0;
+
     tv_set_read_conditions(preferences->windows, window_width);
-#ifdef HAVE_LCD_BITMAP
-    tv_init_scrollbar(tv_get_total_text_size(), need_vertical_scrollbar);
-#endif
 }
 
 bool tv_init_window(unsigned char **buf, size_t *size)

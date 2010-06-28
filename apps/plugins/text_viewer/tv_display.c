@@ -82,13 +82,11 @@ struct tv_rect {
 static struct viewport vp_info;
 static bool is_initialized_vp = false;
 
+static struct screen* display;
+
 #ifdef HAVE_LCD_BITMAP
 static int drawmode = DRMODE_SOLID;
-static int totalsize;
-static bool show_vertical_scrollbar;
 #endif
-
-static struct screen* display;
 
 /* layout */
 #ifdef HAVE_LCD_BITMAP
@@ -101,15 +99,19 @@ static struct tv_rect bookmark;
 #endif
 static struct tv_rect drawarea;
 
+static bool show_vertical_scrollbar;
+
 static int display_columns;
 static int display_rows;
 
 static int col_width  = 1;
 static int row_height = 1;
 
+static int totalsize;
+
 #ifdef HAVE_LCD_BITMAP
 
-void tv_show_header(void)
+static void tv_show_header(void)
 {
     unsigned header_mode = header_mode;
 
@@ -117,7 +119,7 @@ void tv_show_header(void)
         display->putsxy(header.x, header.y, preferences->file_name);
 }
 
-void tv_show_footer(const struct tv_screen_pos *pos)
+static void tv_show_footer(const struct tv_screen_pos *pos)
 {
     unsigned char buf[12];
     unsigned footer_mode = preferences->footer_mode;
@@ -132,13 +134,7 @@ void tv_show_footer(const struct tv_screen_pos *pos)
     }
 }
 
-void tv_init_scrollbar(off_t total, bool show_scrollbar)
-{
-    totalsize = total;
-    show_vertical_scrollbar = show_scrollbar;
-}
-
-void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
+static void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
 {
     int items;
     int min_shown;
@@ -171,6 +167,12 @@ void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
 
 #endif
 
+void tv_init_scrollbar(off_t total, bool show_scrollbar)
+{
+    totalsize = total;
+    show_vertical_scrollbar = show_scrollbar;
+}
+
 void tv_show_bookmarks(const int *rows, int count)
 {
 #ifdef HAVE_LCD_BITMAP
@@ -186,6 +188,20 @@ void tv_show_bookmarks(const int *rows, int count)
         display->putchar(bookmark.x, drawarea.y + rows[count], TV_BOOKMARK_ICON);
 #endif
     }
+}
+
+void tv_update_extra(int window, int col, const struct tv_screen_pos *pos, int size)
+{
+#ifdef HAVE_LCD_BITMAP
+    tv_show_scrollbar(window, col, pos->file_pos, size);
+    tv_show_header();
+    tv_show_footer(pos);
+#else
+    (void)window;
+    (void)col;
+    (void)pos;
+    (void)size;
+#endif
 }
 
 void tv_draw_text(int row, const unsigned char *text, int offset)
@@ -225,15 +241,13 @@ void tv_start_display(void)
 
 void tv_end_display(void)
 {
+    display->update_viewport();
+
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_set_drawmode(drawmode);
 #endif
-    display->set_viewport(NULL);
-}
 
-void tv_update_display(void)
-{
-    display->update_viewport();
+    display->set_viewport(NULL);
 }
 
 void tv_set_layout(bool show_scrollbar)
@@ -295,27 +309,29 @@ void tv_get_drawarea_info(int *width, int *cols, int *rows)
     *rows  = display_rows;
 }
 
-#ifdef HAVE_LCD_BITMAP
-static void tv_undo_viewport(void)
-{
-    if (is_initialized_vp)
-        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
-}
-
 static void tv_change_viewport(void)
 {
+#ifdef HAVE_LCD_BITMAP
     struct viewport vp;
 
     if (is_initialized_vp)
-        tv_undo_viewport();
+        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
     else
         is_initialized_vp = true;
 
     rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp);
     vp_info = vp;
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
+#else
+    if (!is_initialized_vp)
+    {
+        rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
+        is_initialized_vp = true;
+    }
+#endif
 }
 
+#ifdef HAVE_LCD_BITMAP
 static bool tv_set_font(const unsigned char *font)
 {
     unsigned char path[MAX_PATH];
@@ -351,21 +367,14 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
             tv_copy_preferences(&new_prefs);
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
             tv_set_preferences(&new_prefs);
-            font_changing = false;
         }
         col_width = 2 * rb->font_get_width(preferences->font, ' ');
+        font_changing = false;
     }
-
-    tv_change_viewport();
 #else
     (void)oldp;
-
-    if (!is_initialized_vp)
-    {
-        rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
-        is_initialized_vp = true;
-    }
 #endif
+    tv_change_viewport();
 }
 
 bool tv_init_display(unsigned char **buf, size_t *size)
@@ -391,6 +400,15 @@ void tv_finalize_display(void)
     }
 
     /* undo viewport */
-    tv_undo_viewport();
+    rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+#endif
+}
+
+bool tv_exist_scrollbar(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return true;
+#else
+    return false;
 #endif
 }

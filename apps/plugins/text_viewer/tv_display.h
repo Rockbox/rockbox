@@ -44,75 +44,6 @@ bool tv_init_display(unsigned char **buf, size_t *size);
 /* finalize the display module */
 void tv_finalize_display(void);
 
-
-/* layout parts accessing functions */
-
-#ifdef HAVE_LCD_BITMAP
-
-/* show headaer */
-void tv_show_header(void);
-
-/*
- * show footer
- *
- * [In] pos
- *       the current position
- */
-void tv_show_footer(const struct tv_screen_pos *pos);
-
-/*
- * initialize the scrollbar
- *
- * [In] total
- *          total text size
- *
- * [In] show_scrollbar
- *          true:  show the vertical scrollbar
- *          false: does not show the vertical scrollbar
- */
-void tv_init_scrollbar(off_t total, bool show_scrollbar);
-
-/*
- * show horizontal/vertical scrollbar
- *
- * [In] window
- *          the current window
- *
- * [In] col
- *          the current column
- *
- * [In] cur_pos
- *          the current text position
- *
- * [In] size
- *          the size of text in displayed.
- */
-void tv_show_scrollbar(int window, int col, off_t cur_pos, int size);
-
-#endif
-
-/*
- * show bookmark
- *
- * [In] rows
- *          the array of row where the bookmark
- *
- * [In] count
- *          want to show bookmark count
- */
-void tv_show_bookmarks(const int *rows, int count);
-
-/* common display functons */
-
-/* start the display processing  */
-void tv_start_display(void);
-
-/* end the display processing */
-void tv_end_display(void);
-
-/*update the display  */
-void tv_update_display(void);
-
 /*
  * draw the text
  *
@@ -126,6 +57,52 @@ void tv_update_display(void);
  *          display the text that is since offset columns
  */
 void tv_draw_text(int row, const unsigned char *text, int offset);
+
+/*
+ * show bookmark
+ *
+ * [In] rows
+ *          the array of row where the bookmark
+ *
+ * [In] count
+ *          want to show bookmark count
+ */
+void tv_show_bookmarks(const int *rows, int count);
+
+/*
+ * update extra parts (header, footer, scrollbar, etc.)
+ *
+ * [In] window
+ *          current window
+ *
+ * [In] col
+ *          current column
+ *
+ * [In] pos
+ *          current screen position (file position, page, line)
+ *
+ * [In] size
+ *          the size of text which is displayed.
+ */
+void tv_update_extra(int window, int col, const struct tv_screen_pos *pos, int size);
+
+/*
+ * initialize the scrollbar
+ *
+ * [In] total
+ *          total text size
+ *
+ * [In] show_scrollbar
+ *          true:  show the vertical scrollbar
+ *          false: does not show the vertical scrollbar
+ */
+void tv_init_scrollbar(off_t total, bool show_scrollbar);
+
+/* start the display processing  */
+void tv_start_display(void);
+
+/* end the display processing */
+void tv_end_display(void);
 
 
 /* layout functions */
@@ -152,5 +129,14 @@ void tv_set_layout(bool show_scrollbar);
  *          row count of the draw area
  */
 void tv_get_drawarea_info(int *width, int *cols, int *rows);
+
+/*
+ * whether exist scrollbar
+ *
+ * return
+ *     true  exist scrollbar
+ *     false does not exist scrollbar
+ */
+bool tv_exist_scrollbar(void);
 
 #endif
