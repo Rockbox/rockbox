@@ -63,6 +63,11 @@ public:
     void render(const RBRenderInfo &info, RBViewport* viewport);
 
 private:
+
+    bool execTag(const RBRenderInfo& info, RBViewport* viewport);
+    QVariant evalTag(const RBRenderInfo& info, bool conditional = false,
+                     int branches = 0);
+
     ParseTreeNode* parent;
     struct skin_element* element;
     struct skin_tag_parameter* param;

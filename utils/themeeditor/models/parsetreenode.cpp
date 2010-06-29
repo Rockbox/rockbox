@@ -525,150 +525,161 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     else if(element->type == TAG)
     {
 
-        if(info.device()->data(QString(element->tag->name)).isValid())
-            viewport->write(info.device()->
-                            data(QString(element->tag->name)).toString());
+        if(!execTag(info, viewport))
+            viewport->write(evalTag(info).toString());
 
-        /* These are for special cases */
+    }
+}
 
-        QString filename;
-        QString id;
-        int x, y, tiles, tile;
-        char c;
-        RBImage* image;
+bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
+{
 
-        /* Two switch statements to narrow down the tag name */
-        switch(element->tag->name[0])
+    QString filename;
+    QString id;
+    int x, y, tiles, tile;
+    char c;
+    RBImage* image;
+
+    /* Two switch statements to narrow down the tag name */
+    switch(element->tag->name[0])
+    {
+
+    case 'x':
+        switch(element->tag->name[1])
         {
+        case 'd':
+            /* %xd */
+            id = "";
+            id.append(element->params[0].data.text[0]);
+            c = element->params[0].data.text[1];
 
-        case 'x':
-            switch(element->tag->name[1])
+            if(c == '\0')
             {
-            case 'd':
-                /* %xd */
-                id = "";
-                id.append(element->params[0].data.text[0]);
-                c = element->params[0].data.text[1];
-
-                if(c == '\0')
-                {
-                    tile = 1;
-                }
+                tile = 1;
+            }
+            else
+            {
+                if(isupper(c))
+                    tile = c - 'A' + 25;
                 else
-                {
-                    if(isupper(c))
-                        tile = c - 'A' + 25;
-                    else
-                        tile = c - 'a';
-                }
-
-                image = info.screen()->getImage(id);
-                if(image)
-                {
-                    image->setTile(tile);
-                    image->show();
-                }
-                break;
-
-            case 'l':
-                /* %xl */
-                id = element->params[0].data.text;
-                filename = info.settings()->value("imagepath", "") + "/" +
-                           element->params[1].data.text;
-                x = element->params[2].data.numeric;
-                y = element->params[3].data.numeric;
-                if(element->params_count > 4)
-                    tiles = element->params[4].data.numeric;
-                else
-                    tiles = 1;
-
-                info.screen()->loadImage(id, new RBImage(filename, tiles, x, y,
-                                                         viewport));
-                break;
-
-            case '\0':
-                /* %x */
-                id = element->params[0].data.text;
-                filename = info.settings()->value("imagepath", "") + "/" +
-                           element->params[1].data.text;
-                x = element->params[2].data.numeric;
-                y = element->params[3].data.numeric;
-                image = new RBImage(filename, 1, x, y, viewport);
-                info.screen()->loadImage(id, new RBImage(filename, 1, x, y,
-                                                         viewport));
-                info.screen()->getImage(id)->show();
-                break;
-
+                    tile = c - 'a';
             }
 
-            break;
-
-        case 'F':
-
-            switch(element->tag->name[1])
+            image = info.screen()->getImage(id);
+            if(image)
             {
-
-            case 'l':
-                /* %Fl */
-                x = element->params[0].data.numeric;
-                filename = info.settings()->value("themebase", "") + "/fonts/" +
-                           element->params[1].data.text;
-                info.screen()->loadFont(x, new RBFont(filename));
-                break;
-
+                image->setTile(tile);
+                image->show();
             }
+            return true;
 
-            break;
+        case 'l':
+            /* %xl */
+            id = element->params[0].data.text;
+            filename = info.settings()->value("imagepath", "") + "/" +
+                       element->params[1].data.text;
+            x = element->params[2].data.numeric;
+            y = element->params[3].data.numeric;
+            if(element->params_count > 4)
+                tiles = element->params[4].data.numeric;
+            else
+                tiles = 1;
 
-        case 'V':
+            info.screen()->loadImage(id, new RBImage(filename, tiles, x, y,
+                                                     viewport));
+            return true;
 
-            switch(element->tag->name[1])
-            {
-
-            case 'b':
-                /* %Vb */
-                viewport->setBGColor(RBScreen::
-                                     stringToColor(QString(element->params[0].
-                                                           data.text),
-                                                   Qt::white));
-                break;
-
-            case 'd':
-                /* %Vd */
-                id = element->params[0].data.text;
-                info.screen()->showViewport(id);
-                break;
-
-            case 'f':
-                /* %Vf */
-                viewport->setFGColor(RBScreen::
-                                     stringToColor(QString(element->params[0].
-                                                           data.text),
-                                                   Qt::black));
-                break;
-
-            case 'I':
-                /* %VI */
-                info.screen()->makeCustomUI(element->params[0].data.text);
-                break;
-
-            }
-
-            break;
-
-        case 'X':
-
-            switch(element->tag->name[1])
-            {
-            case '\0':
-                /* %X */
-                filename = QString(element->params[0].data.text);
-                info.screen()->setBackdrop(filename);
-                break;
-            }
-
-            break;
+        case '\0':
+            /* %x */
+            id = element->params[0].data.text;
+            filename = info.settings()->value("imagepath", "") + "/" +
+                       element->params[1].data.text;
+            x = element->params[2].data.numeric;
+            y = element->params[3].data.numeric;
+            image = new RBImage(filename, 1, x, y, viewport);
+            info.screen()->loadImage(id, new RBImage(filename, 1, x, y,
+                                                     viewport));
+            info.screen()->getImage(id)->show();
+            return true;
 
         }
+
+        return true;
+
+    case 'F':
+
+        switch(element->tag->name[1])
+        {
+
+        case 'l':
+            /* %Fl */
+            x = element->params[0].data.numeric;
+            filename = info.settings()->value("themebase", "") + "/fonts/" +
+                       element->params[1].data.text;
+            info.screen()->loadFont(x, new RBFont(filename));
+            return true;
+
+        }
+
+        return true;
+
+    case 'V':
+
+        switch(element->tag->name[1])
+        {
+
+        case 'b':
+            /* %Vb */
+            viewport->setBGColor(RBScreen::
+                                 stringToColor(QString(element->params[0].
+                                                       data.text),
+                                               Qt::white));
+            return true;
+
+        case 'd':
+            /* %Vd */
+            id = element->params[0].data.text;
+            info.screen()->showViewport(id);
+            return true;
+
+        case 'f':
+            /* %Vf */
+            viewport->setFGColor(RBScreen::
+                                 stringToColor(QString(element->params[0].
+                                                       data.text),
+                                               Qt::black));
+            return true;
+
+        case 'I':
+            /* %VI */
+            info.screen()->makeCustomUI(element->params[0].data.text);
+            return true;
+
+        }
+
+        return true;
+
+    case 'X':
+
+        switch(element->tag->name[1])
+        {
+        case '\0':
+            /* %X */
+            filename = QString(element->params[0].data.text);
+            info.screen()->setBackdrop(filename);
+            return true;
+        }
+
+        return true;
+
     }
+
+    return false;
+
+}
+
+QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
+                                int branches)
+{
+    return info.device()->data(QString(element->tag->name));
 }
