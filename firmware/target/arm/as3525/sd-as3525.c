@@ -689,7 +689,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     unsigned long response;
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
 
-    mutex_lock(&sd_mtx);
     sd_enable(true);
     led(true);
 
@@ -870,14 +869,19 @@ sd_transfer_error_nodma:
     if (ret)    /* error */
         card_info[drive].initialized = 0;
 
-    mutex_unlock(&sd_mtx);
     return ret;
 }
 
 int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      void* buf)
 {
-    return sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
+    int ret;
+
+    mutex_lock(&sd_mtx);
+    ret = sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
+    mutex_unlock(&sd_mtx);
+
+    return ret;
 }
 
 int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
@@ -890,11 +894,13 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 #endif
     int ret;
 
+    mutex_lock(&sd_mtx);
+
     ret = sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 
 #ifdef VERIFY_WRITE
     if (ret) /* write failed, no point in verifying */
-        return ret;
+        goto write_error;
 
     count = saved_count;
     buf = saved_buf;
@@ -916,6 +922,10 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
         start += transfer;
     }
 #endif
+
+write_error:
+    mutex_unlock(&sd_mtx);
+
     return ret;
 }
 
