@@ -22,7 +22,6 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "tv_bookmark.h"
-#include "tv_reader.h"
 #include "tv_settings.h"
 
 /* global settings file

@@ -21,7 +21,6 @@
 #ifndef PLUGIN_TEXT_VIEWER_DISPLAY_H
 #define PLUGIN_TEXT_VIEWER_DISPLAY_H
 
-#include "plugin.h"
 #include "tv_screen_pos.h"
 
 /* stuff for the screen access */

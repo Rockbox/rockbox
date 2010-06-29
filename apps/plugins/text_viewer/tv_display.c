@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "plugin.h"
 #include "tv_display.h"
 #include "tv_preferences.h"
 
