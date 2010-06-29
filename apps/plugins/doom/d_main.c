@@ -63,7 +63,6 @@
 #include "r_main.h"
 #include "d_main.h"
 #include "d_deh.h"  // Ty 04/08/98 - Externalizations
-#include "am_map.h"
 #include "m_swap.h"
 
 // DEHacked support - Ty 03/09/97 // CPhipps - const char*'s

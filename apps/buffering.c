@@ -46,7 +46,6 @@
 #include "screens.h"
 #include "playlist.h"
 #include "pcmbuf.h"
-#include "bmp.h"
 #include "appevents.h"
 #include "metadata.h"
 #ifdef HAVE_ALBUMART

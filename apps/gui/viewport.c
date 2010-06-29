@@ -57,7 +57,6 @@
 #endif
 #include "statusbar-skinned.h"
 #include "debug.h"
-#include "viewport.h"
 
 #define VPSTACK_DEPTH 16
 struct viewport_stack_item

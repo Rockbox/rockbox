@@ -34,7 +34,6 @@
 #include "exported_menus.h"
 #include "keyboard.h"
 #include "talk.h"
-#include "version.h"
 #include "time.h"
 #include "viewport.h"
 #include "list.h"

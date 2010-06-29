@@ -40,9 +40,6 @@
 
 /* based on implementation by Finn Yannick Jacobs */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 /* crc_tab[] -- this crcTable is being build by chksum_crc32GenTab().
  *		so make sure, you call it before using the other
  *		functions!
