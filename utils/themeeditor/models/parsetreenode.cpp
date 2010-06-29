@@ -510,13 +510,15 @@ void ParseTreeNode::render(const RBRenderInfo& info)
 }
 
 /* This version is called for logical lines, tags, conditionals and such */
-void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
+void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
+                           bool noBreak)
 {
     if(element->type == LINE)
     {
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
-        viewport->newLine();
+        if(!noBreak)
+            viewport->newLine();
     }
     else if(element->type == TEXT)
     {
@@ -530,7 +532,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     else if(element->type == CONDITIONAL)
     {
         int child = evalTag(info, true, element->children_count).toInt();
-        children[child]->render(info, viewport);
+        children[child]->render(info, viewport, true);
     }
     else if(element->type == SUBLINES)
     {
@@ -571,7 +573,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
 
         /* ...and finally render the selected branch */
         if(branch >= 0)
-            children[branch]->render(info, viewport);
+            children[branch]->render(info, viewport, true);
     }
 }
 

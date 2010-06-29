@@ -60,7 +60,8 @@ public:
     }
 
     void render(const RBRenderInfo& info);
-    void render(const RBRenderInfo &info, RBViewport* viewport);
+    void render(const RBRenderInfo &info, RBViewport* viewport,
+                bool noBreak = false);
 
     double findBranchTime(ParseTreeNode* branch, const RBRenderInfo& info);
     double findConditionalTime(ParseTreeNode* conditional,

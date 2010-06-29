@@ -208,6 +208,9 @@ QVariant DeviceState::data(QString tag, int paramCount,
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));
 
+    if(found.second == 0 && tag[0] == '?')
+        found = inputs.value(tag.right(2), QPair<InputType, QWidget*>(Slide,0));
+
     if(found.second == 0)
         return QVariant();
 
@@ -226,7 +229,10 @@ QVariant DeviceState::data(QString tag, int paramCount,
         return dynamic_cast<QDoubleSpinBox*>(found.second)->value();
 
     case Combo:
-        return dynamic_cast<QComboBox*>(found.second)->currentIndex();
+        if(tag[0] == '?')
+            return dynamic_cast<QComboBox*>(found.second)->currentIndex();
+        else
+            return dynamic_cast<QComboBox*>(found.second)->currentText();
 
     case Check:
         return dynamic_cast<QCheckBox*>(found.second)->isChecked();
