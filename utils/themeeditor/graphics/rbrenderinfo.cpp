@@ -29,6 +29,11 @@ RBRenderInfo::RBRenderInfo(ParseTreeModel* model, ProjectModel* project,
 {
 }
 
+RBRenderInfo::RBRenderInfo()
+    : mProject(0), mSettings(0), mDevice(0), mScreen(0), mModel(0)
+{
+}
+
 RBRenderInfo::RBRenderInfo(const RBRenderInfo &other)
 {
     mProject = other.mProject;

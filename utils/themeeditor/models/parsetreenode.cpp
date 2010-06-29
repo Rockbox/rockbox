@@ -532,6 +532,47 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
         int child = evalTag(info, true, element->children_count).toInt();
         children[child]->render(info, viewport);
     }
+    else if(element->type == SUBLINES)
+    {
+        /* First we build a list of the times for each branch */
+        QList<double> times;
+        for(int i = 0; i < children.count() ; i++)
+            times.append(findBranchTime(children[i], info));
+
+        /* Now we figure out which branch to select */
+        double timeLeft = info.device()->data(QString("?pc")).toDouble();
+        int branch = 0;
+        while(timeLeft > 0)
+        {
+            timeLeft -= times[branch];
+            if(timeLeft >= 0)
+                branch++;
+            else
+                break;
+            if(branch >= times.count())
+                branch = 0;
+        }
+
+        /* In case we end up on a disabled branch, skip ahead.  If we find that
+         * all the branches are disabled, don't render anything
+         */
+        int originalBranch = branch;
+        while(times[branch] == 0)
+        {
+            branch++;
+            if(branch == originalBranch)
+            {
+                branch = -1;
+                break;
+            }
+            if(branch >= times.count())
+                branch = 0;
+        }
+
+        /* ...and finally render the selected branch */
+        if(branch >= 0)
+            children[branch]->render(info, viewport);
+    }
 }
 
 bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
@@ -755,4 +796,35 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
         else
             return branches - 1;
     }
+}
+
+double ParseTreeNode::findBranchTime(ParseTreeNode *branch,
+                                     const RBRenderInfo& info)
+{
+    double retval = 2;
+    for(int i = 0; i < branch->children.count(); i++)
+    {
+        ParseTreeNode* current = branch->children[i];
+        if(current->element->type == TAG)
+        {
+            if(current->element->tag->name[0] == 't'
+               && current->element->tag->name[1] == '\0')
+            {
+                retval = atof(current->element->params[0].data.text);
+            }
+        }
+        else if(current->element->type == CONDITIONAL)
+        {
+            retval = findConditionalTime(current, info);
+        }
+    }
+    return retval;
+}
+
+double ParseTreeNode::findConditionalTime(ParseTreeNode *conditional,
+                                          const RBRenderInfo& info)
+{
+    int child = conditional->evalTag(info, true,
+                                     conditional->children.count()).toInt();
+    return findBranchTime(conditional->children[child], info);
 }

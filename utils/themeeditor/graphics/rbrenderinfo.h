@@ -35,6 +35,7 @@ public:
     RBRenderInfo(ParseTreeModel* model,  ProjectModel* project,
                  QMap<QString, QString>* settings, DeviceState* device,
                  RBScreen* screen);
+    RBRenderInfo();
     RBRenderInfo(const RBRenderInfo& other);
     virtual ~RBRenderInfo();
 

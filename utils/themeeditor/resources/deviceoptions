@@ -96,6 +96,7 @@ D3 ; Next File cd up x3 ; text ; /
 [Playlist/Song Info]
 px ; Percent Played ; spin(0,100) ; 50
 pc ; Current Time In Song ; text ; 1:00
+?pc ; Time In Song (Conditional) ; fspin(0,5000) ; 60
 pe ; Playlist Entries ; spin(0,1000) ; 20
 pn ; Playlist Name ; text ; Current Playlist
 pp ; Playlist Position ; spin(0,1000) ; 10

@@ -62,6 +62,10 @@ public:
     void render(const RBRenderInfo& info);
     void render(const RBRenderInfo &info, RBViewport* viewport);
 
+    double findBranchTime(ParseTreeNode* branch, const RBRenderInfo& info);
+    double findConditionalTime(ParseTreeNode* conditional,
+                               const RBRenderInfo& info);
+
 private:
 
     bool execTag(const RBRenderInfo& info, RBViewport* viewport);
