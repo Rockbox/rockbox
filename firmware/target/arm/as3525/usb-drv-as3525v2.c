@@ -197,19 +197,6 @@ static void flush_tx_fifos(int nums)
     udelay(1);
 }
 
-static void flush_rx_fifos(void)
-{
-    unsigned int i = 0;
-    
-    GRSTCTL = GRSTCTL_rxfflsh_flush;
-    while(GRSTCTL & GRSTCTL_rxfflsh_flush && i < 0x300)
-        i++;
-    if(GRSTCTL & GRSTCTL_rxfflsh_flush)
-        panicf("usb-drv: hang of flush rx fifos");
-    /* wait 3 phy clocks */
-    udelay(1);
-}
-
 static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
@@ -548,7 +535,7 @@ static void handle_ep_int(int ep, bool dir_in)
                 panicf("usb-drv: setup not on EP0, this is impossible");
             if((DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits) != 0)
             {
-                logf("usb-drv: ignore spurious setup (xfersize=%d)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+                logf("usb-drv: ignore spurious setup (xfersize=%ld)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
             }
             else
             {
