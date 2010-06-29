@@ -202,7 +202,8 @@ DeviceState::~DeviceState()
 {
 }
 
-QVariant DeviceState::data(QString tag)
+QVariant DeviceState::data(QString tag, int paramCount,
+                           skin_tag_parameter *params)
 {
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));

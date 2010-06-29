@@ -509,7 +509,7 @@ void ParseTreeNode::render(const RBRenderInfo& info)
 
 }
 
-/* This version is called for logical lines and such */
+/* This version is called for logical lines, tags, conditionals and such */
 void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
 {
     if(element->type == LINE)
@@ -524,10 +524,13 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     }
     else if(element->type == TAG)
     {
-
         if(!execTag(info, viewport))
             viewport->write(evalTag(info).toString());
-
+    }
+    else if(element->type == CONDITIONAL)
+    {
+        int child = evalTag(info, true, element->children_count).toInt();
+        //children[0]->render(info, viewport);
     }
 }
 

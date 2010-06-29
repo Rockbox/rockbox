@@ -23,6 +23,9 @@
 #
 # Blank lines are ignored
 #
+# A ? at the beginning of a field indicates that it's a special value for
+# conditionals
+#
 # Be warned: because this file is compiled into the application, I'm not
 # performing much of any error checking on it: screwing up the syntax may very
 # well segfault the application on startup
@@ -100,14 +103,14 @@ pr ; Time Remaining ; text ; 2:00
 ps ; Shuffle ; check ; true
 pt ; Total Track Time ; text ; 3:00
 pv ; Current Volume (dB) ; spin(-100,100) ; 0
-$pv ; Current Volume (Conditional) ; combo(Mute, Below 0 dB, 0 dB, Above 0 dB) ; 0 dB
+?pv ; Current Volume (Conditional) ; combo(Mute, Below 0 dB, 0 dB, Above 0 dB) ; 0 dB
 pS ; Track Starting ; check ; true
 pE ; Track Ending ; check ; false
 Sp ; Playback Pitch ; fspin(50,200) ; 100
 rp ; Song Playcount ; spin(0,10000) ; 20
 rr ; Song Rating ; spin(0,10) ; 5
 ra ; Autoscore ; spin(0,10) ; 7
-$C ; Album Art Available ; check ; true
+?C ; Album Art Available ; check ; true
 
 [Hardware Status]
 bl ; Battery Level (-1 for unknown) ; spin(-1,100) ; 50
@@ -122,7 +125,7 @@ lh ; Hard Disk Activity ; check ; true
 
 [Playback Status]
 rg ; Replaygain Value (dB) ; fspin(-100,20) ; 0
-$rg ; Replaygain Status (Conditional) ; combo(Off, Track, Album, TrackShuffle, AlbumShuffle, No Tag) ; Off
+?rg ; Replaygain Status (Conditional) ; combo(Off, Track, Album, TrackShuffle, AlbumShuffle, No Tag) ; Off
 mm ; Repeat Mode ; combo(Off, All, One, Shuffle, A-B) ; All
 mp ; Playback Mode ; combo(Stop, Play, Pause, Fast Forward, Rewind, Recording, Recording Paused, FM Radio Playing, FM Radio Muted) ; Play
 xf ; Crossfade Type ; combo(Off, Automatic Track Skip Only, Shuffle, Shuffle or Manual Track Skip, Always) ; Always
@@ -137,7 +140,7 @@ ck ; 24h Hour (No Padding) ; text ; 9
 cI ; 12h Hour ; text ; 09
 cl ; 12h Hour (No Padding) ; text ; 9
 cm ; Month (Padded) ; text ; 03
-$cm ; Month (Conditional) ; combo(January, February, March, April, May, Jun, July, August, September, October, November, December) ; January
+?cm ; Month (Conditional) ; combo(January, February, March, April, May, Jun, July, August, September, October, November, December) ; January
 cM ; Minute (Padded) ; text ; 29
 cS ; Second (Padded) ; text ; 50
 cy ; Last Two Digits of Year (Padded) ; text ; 09
@@ -147,9 +150,9 @@ cp ; Lowercase AM or PM ; combo(am,pm) ; am
 ca ; Abbreviated Weekday Name ; combo(Sun, Mon, Tue, Thu, Fri, Sat); Tue
 cb ; Abbreviated Month Name ; combo(Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) ; Jan
 cu ; Day of Week (1..7, 1 is Monday) ; spin(1,7) ; 2
-$cu ; Day of Week (Monday First, Conditional) ; combo(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
+?cu ; Day of Week (Monday First, Conditional) ; combo(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
 cw ; Day of Week (0..6, 0 is Sunday) ; spin(0,6) ; 2
-$cw ; Day of Week (Sunday First, Conditional) ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
+?cw ; Day of Week (Sunday First, Conditional) ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
 
 [Recording Status]
 Rp ; Target Has Recorder ; check ; false

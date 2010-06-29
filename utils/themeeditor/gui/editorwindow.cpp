@@ -499,14 +499,13 @@ void EditorWindow::updateCurrent()
 
 void EditorWindow::lineChanged(int line)
 {
-    ui->parseTree->collapseAll();
-    ParseTreeModel* model = dynamic_cast<ParseTreeModel*>
-                            (ui->parseTree->model());
-    parseTreeSelection = new QItemSelectionModel(model);
-    expandLine(model, QModelIndex(), line);
-    sizeColumns();
-    ui->parseTree->setSelectionModel(parseTreeSelection);
-
+        ui->parseTree->collapseAll();
+        ParseTreeModel* model = dynamic_cast<ParseTreeModel*>
+                                (ui->parseTree->model());
+        parseTreeSelection = new QItemSelectionModel(model);
+        expandLine(model, QModelIndex(), line);
+        sizeColumns();
+        ui->parseTree->setSelectionModel(parseTreeSelection);
 }
 
 void EditorWindow::undo()

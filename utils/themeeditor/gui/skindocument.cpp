@@ -41,6 +41,7 @@ SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
     saved = "";
     parseStatus = tr("Empty document");
     blockUpdate = false;
+    currentLine = -1;
 }
 
 SkinDocument::SkinDocument(QLabel* statusLabel, QString file,
@@ -208,8 +209,9 @@ void SkinDocument::cursorChanged()
         parseStatus = tr("Errors in document");
         statusLabel->setText(parseStatus);
     }
-    else
+    else if(editor->textCursor().blockNumber() != currentLine)
     {
+        currentLine = editor->textCursor().blockNumber();
         emit lineChanged(editor->textCursor().blockNumber() + 1);
     }
 

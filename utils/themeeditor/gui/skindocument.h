@@ -97,6 +97,7 @@ private:
     QString fileName;
     QString saved;
     QString parseStatus;
+    int currentLine;
 
     QLayout* layout;
     CodeEditor* editor;

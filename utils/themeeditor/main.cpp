@@ -19,17 +19,9 @@
  *
  ****************************************************************************/
 
-#include "skin_parser.h"
-#include "skin_debug.h"
 #include "editorwindow.h"
 
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-
 #include <QtGui/QApplication>
-
-#include "parsetreemodel.h"
 
 int main(int argc, char* argv[])
 {
