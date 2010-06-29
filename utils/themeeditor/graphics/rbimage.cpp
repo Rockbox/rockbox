@@ -49,7 +49,21 @@ RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
 
     }
     else
+    {
+        size = QRectF(0, 0, 0, 0);
         image = 0;
+    }
+}
+
+RBImage::RBImage(const RBImage &other, QGraphicsItem* parent)
+    : QGraphicsItem(parent), tiles(other.tiles), currentTile(other.currentTile)
+{
+    if(other.image)
+        image = new QPixmap(*(other.image));
+    else
+        image = 0;
+    size = other.size;
+    setPos(other.x(), other.y());
 }
 
 RBImage::~RBImage()

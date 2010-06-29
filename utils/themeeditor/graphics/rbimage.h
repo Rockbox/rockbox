@@ -29,6 +29,7 @@ class RBImage: public QGraphicsItem
 {
 public:
     RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent = 0);
+    RBImage(const RBImage& other, QGraphicsItem* parent);
     virtual ~RBImage();
 
     QRectF boundingRect() const;

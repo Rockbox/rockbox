@@ -530,7 +530,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport)
     else if(element->type == CONDITIONAL)
     {
         int child = evalTag(info, true, element->children_count).toInt();
-        //children[0]->render(info, viewport);
+        children[child]->render(info, viewport);
     }
 }
 
@@ -568,12 +568,13 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
                     tile = c - 'a';
             }
 
-            image = info.screen()->getImage(id);
-            if(image)
+            if(info.screen()->getImage(id))
             {
+                image = new RBImage(*(info.screen()->getImage(id)), viewport);
                 image->setTile(tile);
                 image->show();
             }
+
             return true;
 
         case 'l':
@@ -684,5 +685,74 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
                                 int branches)
 {
-    return info.device()->data(QString(element->tag->name));
+    if(!conditional)
+    {
+        return info.device()->data(QString(element->tag->name));
+    }
+    else
+    {
+        /* If we're evaluating for a conditional, we return the child branch
+         * index that should be selected.  For true/false values, this is
+         * 0 for true, 1 for false, and we also have to make sure not to
+         * ever exceed the number of available children
+         */
+
+        int child;
+        QVariant val = info.device()->data("?" + QString(element->tag->name));
+        if(val.isNull())
+            val = info.device()->data(QString(element->tag->name));
+
+        if(val.isNull())
+        {
+            child = 1;
+        }
+        else if(QString(element->tag->name) == "bl")
+        {
+            /* bl has to be scaled to the number of available children, but it
+             * also has an initial -1 value for an unknown state */
+            child = val.toInt();
+            if(child == -1)
+            {
+                child = 0;
+            }
+            else
+            {
+                child = ((branches - 1) * child / 100) + 1;
+            }
+        }
+        else if(QString(element->tag->name) == "px")
+        {
+            child = val.toInt();
+            child = branches * child / 100;
+        }
+        else if(val.type() == QVariant::Bool)
+        {
+            /* Boolean values have to be reversed, because conditionals are
+             * always of the form %?tag<true|false>
+             */
+            if(val.toBool())
+                child = 0;
+            else
+                child = 1;
+        }
+        else if(val.type() == QVariant::String)
+        {
+            if(val.toString().length() > 0)
+                child = 0;
+            else
+                child = 1;
+        }
+        else
+        {
+            child = val.toInt();
+        }
+
+        if(child < 0)
+            child = 0;
+
+        if(child < branches)
+            return child;
+        else
+            return branches - 1;
+    }
 }
