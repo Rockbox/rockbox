@@ -50,11 +50,11 @@ static int __out_ep_list_ep0[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
  
 #define FOR_EACH_IN_EP_EX(include_ep0, counter, ep) \
     FOR_EACH_EP(include_ep0 ? __in_ep_list_ep0 : __in_ep_list, \
-        include_ep0 ? NUM_IN_EP : NUM_IN_EP + 1, counter, ep)
+        include_ep0 ? NUM_IN_EP + 1: NUM_IN_EP, counter, ep)
 
 #define FOR_EACH_OUT_EP_EX(include_ep0, counter, ep) \
     FOR_EACH_EP(include_ep0 ? __out_ep_list_ep0 : __out_ep_list, \
-        include_ep0 ? NUM_OUT_EP : NUM_OUT_EP + 1, counter, ep)
+        include_ep0 ? NUM_OUT_EP + 1: NUM_OUT_EP, counter, ep)
  
 #define FOR_EACH_IN_EP(counter, ep) \
     FOR_EACH_IN_EP_EX(false, counter, ep)
@@ -68,19 +68,39 @@ static int __out_ep_list_ep0[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 #define FOR_EACH_OUT_EP_AND_EP0(counter, ep) \
     FOR_EACH_OUT_EP_EX(true, counter, ep)
 
+/* store per endpoint, per direction, information */
 struct usb_endpoint
 {
-    bool active;
-    unsigned int len;
-    bool wait;
-    bool busy;
-    int status;
-    struct wakeup complete;
+    bool active; /* true is endpoint has been requested (true for EP0) */
+    unsigned int len; /* length of the data buffer */
+    bool wait; /* true if usb thread is blocked on completion */
+    bool busy; /* true is a transfer is pending */
+    int status; /* completion status (0 for success) */
+    struct wakeup complete; /* wait object */
 };
 
-// 0:out, 1:in
+/* state of EP0 (to correctly schedule setup packet enqueing) */
+enum ep0state
+{
+    /* Setup packet is enqueud, waiting for actual data */
+    EP0_WAIT_SETUP = 0,
+    /* Waiting for ack (either IN or OUT) */
+    EP0_WAIT_ACK = 1,
+    /* Ack complete, waiting for data (either IN or OUT)
+     * This state is necessary because if both ack and data complete in the
+     * same interrupt, we might process data completion before ack completion
+     * so we need this bizarre state */
+    EP0_WAIT_DATA = 2,
+    /* Setup packet complete, waiting for ack and data */
+    EP0_WAIT_DATA_ACK = 3,
+};
+
+/* endpoints[ep_num][DIR_IN/DIR_OUT] */
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
+/* setup packet for EP0 */
 static struct usb_ctrlrequest ep0_setup_pkt USB_DEVBSS_ATTR;
+/* state of EP0 */
+enum ep0state ep0_state;
 
 void usb_attach(void)
 {
@@ -192,6 +212,7 @@ static void flush_rx_fifos(void)
 
 static void prepare_setup_ep0(void)
 {
+    logf("usb-drv: prepare EP0"),
     /* setup DMA */
     clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
     DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
@@ -210,6 +231,57 @@ static void prepare_setup_ep0(void)
 
     if(!(DOEPCTL(0) & DEPCTL_epena))
         panicf("usb-drv: failed to enable EP0 !");
+    ep0_state = EP0_WAIT_SETUP;
+}
+
+static void handle_ep0_complete(bool is_ack)
+{
+    switch(ep0_state)
+    {
+        case EP0_WAIT_SETUP:
+            panicf("usb-drv: EP0 completion while waiting for SETUP");
+        case EP0_WAIT_ACK:
+            if(is_ack)
+                /* everything is done, prepare next setup */
+                prepare_setup_ep0();
+            else
+                panicf("usb-drv: EP0 data completion while waiting for ACK");
+            break;
+        case EP0_WAIT_DATA:
+            if(is_ack)
+                panicf("usb-drv: EP0 ACK while waiting for data completion");
+            else
+                /* everything is done, prepare next setup */
+                prepare_setup_ep0();
+            break;
+        case EP0_WAIT_DATA_ACK:
+            /* update state */
+            if(is_ack)
+                ep0_state = EP0_WAIT_DATA;
+            else
+                ep0_state = EP0_WAIT_ACK;
+            break;
+        default:
+            panicf("usb-drv: invalid EP0 state");
+    }
+    logf("usb-drv: EP0 state updated to %d", ep0_state);
+}
+
+static void handle_ep0_setup(void)
+{
+    if(ep0_state != EP0_WAIT_SETUP)
+    {
+        logf("usb-drv: EP0 SETUP while in state %d", ep0_state);
+        DCTL |= DCTL_sftdiscon;
+        return;
+    }
+    /* determine is there is a data phase */
+    if(ep0_setup_pkt.wLength == 0)
+        /* no: wait for ack */
+        ep0_state = EP0_WAIT_ACK;
+    else
+        /* yes: wait ack and data */
+        ep0_state = EP0_WAIT_DATA_ACK;
 }
 
 static void reset_endpoints(void)
@@ -229,8 +301,8 @@ static void reset_endpoints(void)
             DOEPCTL(ep) = 0;
 
     /* 64 bytes packet size, active endpoint */
-    DOEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep;
-    DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep;
+    DOEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
+    DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
     
     prepare_setup_ep0();
 }
@@ -246,7 +318,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         endpoints[ep][DIR_IN].wait = false;
         endpoints[ep][DIR_IN].busy = false;
         wakeup_signal(&endpoints[ep][DIR_IN].complete);
-        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
+        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis | DEPCTL_snak;
     }
     FOR_EACH_OUT_EP_EX(cancel_ep0, i, ep)
     {
@@ -254,7 +326,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         endpoints[ep][DIR_OUT].wait = false;
         endpoints[ep][DIR_OUT].busy = false;
         wakeup_signal(&endpoints[ep][DIR_OUT].complete);
-        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis;
+        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis | DEPCTL_snak;
     }
     
     restore_irq(flags);
@@ -417,17 +489,17 @@ static void handle_ep_int(int ep, bool dir_in)
                     transfered);
                 invalidate_dcache_range((void *)DIEPDMA(ep), transfered);
                 DIEPCTL(ep) |= DEPCTL_snak;
-                /* if the transfer length is 0 on EP0, this is a ack
-                 * so we setup EP0 to receive next setup */
-                if(ep == 0 && endpoint->len == 0)
-                    prepare_setup_ep0();
+                /* handle EP0 state if necessary,
+                 * this is a ack if length is 0 */
+                if(ep == 0)
+                    handle_ep0_complete(endpoint->len == 0);
                 usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
                 wakeup_signal(&endpoint->complete);
             }
         }
         if(DIEPINT(ep) & DIEPINT_timeout)
         {
-            logf("usb-drv: timeout on EP%d IN", ep);
+            panicf("usb-drv: timeout on EP%d IN", ep);
             if(endpoint->busy)
             {
                 endpoint->busy = false;
@@ -459,10 +531,10 @@ static void handle_ep_int(int ep, bool dir_in)
                     (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
                 invalidate_dcache_range((void *)DOEPDMA(ep), transfered);
-                /* if the transfer length is 0 on EP0, this is a ack
-                 * so we setup EP0 to receive next setup */
-                if(ep == 0 && endpoint->len == 0)
-                    prepare_setup_ep0();
+                /* handle EP0 state if necessary,
+                 * this is a ack if length is 0 */
+                if(ep == 0)
+                    handle_ep0_complete(endpoint->len == 0);
                 else
                     DOEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
@@ -474,14 +546,27 @@ static void handle_ep_int(int ep, bool dir_in)
             logf("usb-drv: setup on EP%d OUT", ep);
             if(ep != 0)
                 panicf("usb-drv: setup not on EP0, this is impossible");
-            DOEPCTL(ep) |= DEPCTL_snak;
-            /* handle the set address here because of a bug in the usb core */
-            invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
-            logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
-            if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
-                    ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
-                usb_drv_set_address(ep0_setup_pkt.wValue);
-            usb_core_control_request(&ep0_setup_pkt);
+            if((DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits) != 0)
+            {
+                logf("usb-drv: ignore spurious setup (xfersize=%d)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+            }
+            else
+            {
+                DOEPCTL(ep) |= DEPCTL_snak;
+                logf("DOEPCTL0=%lx", DOEPCTL(ep));
+                logf("DOEPTSIZE0=%lx", DOEPTSIZ(ep));
+                if(DOEPDMA(ep) != 8 + (unsigned long)&ep0_setup_pkt)
+                    panicf("usb-drv: EP0 wrong DMA adr (%lx vs %lx)", (unsigned long)&ep0_setup_pkt, DOEPDMA(ep));
+                /* handle the set address here because of a bug in the usb core */
+                invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);
+                /* handle EP0 state */
+                handle_ep0_setup();
+                logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
+                if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
+                        ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
+                    usb_drv_set_address(ep0_setup_pkt.wValue);
+                usb_core_control_request(&ep0_setup_pkt);
+            }
         }
         /* clear interrupts */
         DOEPINT(ep) = DOEPINT(ep);
@@ -513,7 +598,6 @@ void INT_USB(void)
      * so AND it with the actual mask */
     unsigned long sts = GINTSTS & GINTMSK;
 
-    /* device part */
     if(sts & GINTMSK_usbreset)
     {
         logf("usb-drv: bus reset");
@@ -521,10 +605,8 @@ void INT_USB(void)
         /* Clear the Remote Wakeup Signalling */
         //DCTL &= ~DCTL_rmtwkupsig;
 
-        cancel_all_transfers(true);
         /* Flush FIFOs */
         flush_tx_fifos(0x10);
-        flush_rx_fifos();
 
         reset_endpoints();
 
@@ -545,6 +627,7 @@ void INT_USB(void)
             logf("usb-drv: FS");
 
         /* fixme: change EP0 mps here */
+        prepare_setup_ep0();
     }
 
     if(sts & (GINTMSK_outepintr | GINTMSK_inepintr))
@@ -640,6 +723,8 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
 
     /* fixme: check if endpoint was really enabled ? */
+    if((DEPCTL & DEPCTL_epena) == 0)
+        panicf("usb-drv: couldn't start xfer on EP%d %s", ep, dir_in ? "IN" : "OUT");
     
     if(blocking)
         wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
