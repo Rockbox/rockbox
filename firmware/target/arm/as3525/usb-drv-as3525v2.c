@@ -212,7 +212,7 @@ static void flush_rx_fifos(void)
 
 static void prepare_setup_ep0(void)
 {
-    logf("usb-drv: prepare EP0"),
+    logf("usb-drv: prepare EP0");
     /* setup DMA */
     clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
     DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
