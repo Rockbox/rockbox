@@ -43,7 +43,7 @@ static bool tv_notify_change_preferences(const struct tv_preferences *oldp)
      *   - alignment
      *   - horizontal_scroll_mode
      *   - vertical_scroll_mode
-     *   - page_mode
+     *   - overlap_page_mode
      *   - font
      *   - autoscroll_speed
      *   - narrow_mode
@@ -99,18 +99,18 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->alignment = AL_LEFT;
     p->horizontal_scroll_mode = HS_SCREEN;
     p->vertical_scroll_mode = VS_PAGE;
-    p->page_mode = PM_NO_OVERLAP;
-    p->horizontal_scrollbar = SB_OFF;
-    p->vertical_scrollbar = SB_OFF;
+    p->overlap_page_mode = false;
+    p->horizontal_scrollbar = false;
+    p->vertical_scrollbar = false;
 #ifdef HAVE_LCD_BITMAP
-    p->header_mode = HD_PATH;
-    p->footer_mode = FT_PAGE;
+    p->header_mode = true;
+    p->footer_mode = true;
     p->statusbar   = true;
     rb->strlcpy(p->font_name, rb->global_settings->font_file, MAX_PATH);
     p->font = rb->font_get(FONT_UI);
 #else
-    p->header_mode = HD_NONE;
-    p->footer_mode = FT_NONE;
+    p->header_mode = false;
+    p->footer_mode = false;
     p->statusbar   = false;
 #endif
     p->autoscroll_speed = 1;

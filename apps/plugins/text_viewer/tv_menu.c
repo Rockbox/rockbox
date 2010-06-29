@@ -37,13 +37,7 @@ static struct tv_preferences new_prefs;
 #ifdef HAVE_LCD_BITMAP
 static bool tv_horizontal_scrollbar_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"No",  -1},
-        {"Yes", -1},
-    };
-
-    return rb->set_option("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar, INT,
-                           names, 2, NULL);
+   return rb->set_bool("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar);
 }
 #endif
 
@@ -79,13 +73,7 @@ MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
 static bool tv_vertical_scrollbar_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"No",  -1},
-        {"Yes", -1},
-    };
-
-    return rb->set_option("Vertical Scrollbar", &new_prefs.vertical_scrollbar, INT,
-                           names, 2, NULL);
+    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
 }
 #endif
 
@@ -100,15 +88,9 @@ static bool tv_vertical_scroll_mode_setting(void)
                           names, 2, NULL);
 }
 
-static bool tv_page_mode_setting(void)
+static bool tv_overlap_page_mode_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"No",  -1},
-        {"Yes", -1},
-    };
-
-    return rb->set_option("Overlap Pages", &new_prefs.page_mode, INT,
-                           names, 2, NULL);
+    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode);
 }
 
 static bool tv_autoscroll_speed_setting(void)
@@ -135,7 +117,7 @@ MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
 #endif
 MENUITEM_FUNCTION(vertical_scroll_mode_item, 0, "Scroll Mode",
                   tv_vertical_scroll_mode_setting, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(page_mode_item, 0, "Overlap Pages", tv_page_mode_setting,
+MENUITEM_FUNCTION(overlap_page_mode_item, 0, "Overlap Pages", tv_overlap_page_mode_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
                   tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
@@ -146,7 +128,7 @@ MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
           &vertical_scrollbar_item,
 #endif
-          &vertical_scroll_mode_item, &page_mode_item, &autoscroll_speed_item,
+          &vertical_scroll_mode_item, &overlap_page_mode_item, &autoscroll_speed_item,
           &narrow_mode_item);
 
 /*                      */
@@ -219,37 +201,17 @@ static bool tv_alignment_setting(void)
 #ifdef HAVE_LCD_BITMAP
 static bool tv_header_setting(void)
 {
-    static const struct opt_items names[4] =
-    {
-        {"None",       -1},
-        {"File path",  -1},
-    };
-
-    return rb->set_option("Show Header", &new_prefs.header_mode, INT,
-                         names, 2, NULL);
+    return rb->set_bool("Show Header", &new_prefs.header_mode);
 }
 
 static bool tv_footer_setting(void)
 {
-    static const struct opt_items names[4] =
-    {
-        {"None",       -1},
-        {"Page Num",   -1},
-    };
-
-    return rb->set_option("Show Footer", &new_prefs.footer_mode, INT,
-                           names, 2, NULL);
+    return rb->set_bool("Show Footer", &new_prefs.footer_mode);
 }
 
 static bool tv_statusbar_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"No",  -1},
-        {"Yes", -1},
-    };
-
-    return rb->set_option("Show Statusbar", &new_prefs.statusbar, BOOL,
-                           names, 2, NULL);
+    return rb->set_bool("Show Statusbar", &new_prefs.statusbar);
 }
 
 static bool tv_font_setting(void)

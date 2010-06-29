@@ -84,7 +84,7 @@ void tv_scroll_up(unsigned mode)
     {
         offset_page--;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (preferences->page_mode == PM_OVERLAP)? 1:0;
+        offset_line = (preferences->overlap_page_mode)? 1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
@@ -100,7 +100,7 @@ void tv_scroll_down(unsigned mode)
     {
         offset_page++;
 #ifdef HAVE_LCD_BITMAP
-        offset_line = (preferences->page_mode == PM_OVERLAP)? -1:0;
+        offset_line = (preferences->overlap_page_mode)? -1:0;
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);

@@ -40,7 +40,7 @@
  * encoding               1
  * vertical_scrollbar     1
  * (unused)               1 (for compatibility)
- * page_mode              1
+ * overlap_page_mode      1
  * header_mode            1
  * footer_mode            1
  * scroll_mode            1
@@ -83,7 +83,7 @@
  *     encoding               1
  *     vertical_scrollbar     1
  *     (unused)               1 (for compatibility)
- *     page_mode              1
+ *     overlap_page_mode      1
  *     header_mode            1
  *     footer_mode            1
  *     scroll_mode            1
@@ -153,45 +153,45 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
         prefs->alignment = AL_LEFT;
 
     prefs->encoding           = *p++;
-    prefs->vertical_scrollbar = *p++;
+    prefs->vertical_scrollbar = (*p++ != 0);
     /* skip need_scrollbar */
     p++;
-    prefs->page_mode            = *p++;
+    prefs->overlap_page_mode  = (*p++ != 0);
 
     if (version < 7)
     {
         prefs->statusbar   = false;
         if (*p > 1)
         {
-            prefs->header_mode = (*p & 1);
+            prefs->header_mode = ((*p & 1) != 0);
             prefs->statusbar   = true;
         }
         else
-            prefs->header_mode = *p;
+            prefs->header_mode = (*p != 0);
 
         if (*(++p) > 1)
         {
-            prefs->footer_mode = (*p & 1);
+            prefs->footer_mode = ((*p & 1) != 0);
             prefs->statusbar   = true;
         }
         else
-            prefs->footer_mode = *p;
+            prefs->footer_mode = (*p != 0);
 
         p++;
     }
     else
     {
-        prefs->header_mode = *p++;
-        prefs->footer_mode = *p++;
+        prefs->header_mode = (*p++ != 0);
+        prefs->footer_mode = (*p++ != 0);
     }
 
     prefs->vertical_scroll_mode = *p++;
     prefs->autoscroll_speed     = *p++;
 
     if (version > 2)
-        prefs->horizontal_scrollbar = *p;
+        prefs->horizontal_scrollbar = (*p != 0);
     else
-        prefs->horizontal_scrollbar = SB_OFF;
+        prefs->horizontal_scrollbar = false;
 
     if (version > 3)
         prefs->horizontal_scroll_mode = *p++;
@@ -233,7 +233,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->vertical_scrollbar;
     /* skip need_scrollbar */
     p++;
-    *p++ = prefs->page_mode;
+    *p++ = prefs->overlap_page_mode;
     *p++ = prefs->header_mode;
     *p++ = prefs->footer_mode;
     *p++ = prefs->vertical_scroll_mode;

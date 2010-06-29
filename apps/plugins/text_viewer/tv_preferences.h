@@ -29,12 +29,6 @@ enum {
     TV_CALLBACK_ERROR,
 };
 
-/* scrollbar_mode */
-enum {
-    SB_OFF = 0,
-    SB_ON,
-};
-
 /* word_mode */
 enum {
     WM_WRAP = 0,
@@ -53,25 +47,6 @@ enum {
 enum {
     AL_LEFT = 0,
     AL_RIGHT,
-};
-
-/* page_mode */
-enum {
-    PM_NO_OVERLAP = 0,
-    PM_OVERLAP,
-};
-
-/* header_mode */
-enum {
-    HD_NONE = 0,
-    HD_PATH,
-};
-
-/* footer_mode */
-enum {
-
-    FT_NONE = 0,
-    FT_PAGE,
 };
 
 /* horizontal_scroll_mode */
@@ -99,12 +74,12 @@ struct tv_preferences {
 
     unsigned encoding;
 
-    unsigned horizontal_scrollbar;
-    unsigned vertical_scrollbar;
+    bool horizontal_scrollbar;
+    bool vertical_scrollbar;
 
-    unsigned page_mode;
-    unsigned header_mode;
-    unsigned footer_mode;
+    bool overlap_page_mode;
+    bool header_mode;
+    bool footer_mode;
     unsigned horizontal_scroll_mode;
     unsigned vertical_scroll_mode;
 

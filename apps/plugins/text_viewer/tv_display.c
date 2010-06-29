@@ -114,18 +114,15 @@ static int totalsize;
 
 static void tv_show_header(void)
 {
-    unsigned header_mode = header_mode;
-
-    if (preferences->header_mode == HD_PATH)
+    if (preferences->header_mode)
         display->putsxy(header.x, header.y, preferences->file_name);
 }
 
 static void tv_show_footer(const struct tv_screen_pos *pos)
 {
     unsigned char buf[12];
-    unsigned footer_mode = preferences->footer_mode;
 
-    if (footer_mode == FT_PAGE)
+    if (preferences->footer_mode)
     {
         if (pos->line == 0)
             rb->snprintf(buf, sizeof(buf), "%d", pos->page + 1);
@@ -262,11 +259,11 @@ void tv_set_layout(bool show_scrollbar)
     header.x = 0;
     header.y = 1;
     header.w = vp_info.width;
-    header.h = (preferences->header_mode == HD_PATH)? row_height + 1 : 0;
+    header.h = (preferences->header_mode)? row_height + 1 : 0;
 
     footer.x = 0;
     footer.w = vp_info.width;
-    footer.h = (preferences->footer_mode == FT_PAGE)? row_height + 1 : 0;
+    footer.h = (preferences->footer_mode)? row_height + 1 : 0;
     footer.y = vp_info.height - 1 - footer.h;
 
     drawarea.x = scrollbar_width;
