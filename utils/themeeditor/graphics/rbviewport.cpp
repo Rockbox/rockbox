@@ -69,7 +69,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             /* A preloaded viewport definition */
             ident = node->params[0].data.text;
             customUI = false;
-            hide();
+            if(!screen->viewPortDisplayed(ident))
+                hide();
             info.screen()->loadViewport(ident, this);
             param = 1;
             break;

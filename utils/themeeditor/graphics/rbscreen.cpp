@@ -133,7 +133,10 @@ void RBScreen::loadViewport(QString name, RBViewport *view)
 void RBScreen::showViewport(QString name)
 {
     if(namedViewports.value(name, 0) == 0)
+    {
+        displayedViewports.append(name);
         return;
+    }
 
     QList<RBViewport*>* list = namedViewports.value(name, 0);
     for(int i = 0; i < list->count(); i++)

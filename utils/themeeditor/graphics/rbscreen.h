@@ -49,6 +49,10 @@ public:
 
     void loadViewport(QString name, RBViewport* view);
     void showViewport(QString name);
+    bool viewPortDisplayed(QString name)
+    {
+        return displayedViewports.contains(name);
+    }
 
     void loadImage(QString name, RBImage* image)
     {
@@ -84,6 +88,7 @@ private:
     QMap<QString, RBImage*> images;
     QMap<QString, QString>* settings;
     QMap<int, RBFont*> fonts;
+    QList<QString> displayedViewports;
 
 };
 
