@@ -59,7 +59,7 @@ bool tv_save_global_settings(const struct tv_preferences *prefs);
  *     true  success
  *     false failure
  */
-void tv_load_settings(const unsigned char *file_name);
+bool tv_load_settings(const unsigned char *file_name);
 
 /*
  * save the settings at each file

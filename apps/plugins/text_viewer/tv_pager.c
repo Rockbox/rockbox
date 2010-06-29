@@ -73,7 +73,7 @@ static off_t tv_get_fpos(int page)
     return 0;
 }
 
-static void tv_change_preferences(const struct tv_preferences *oldp)
+static int tv_change_preferences(const struct tv_preferences *oldp)
 {
     (void)oldp;
 
@@ -83,6 +83,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     max_page  = TV_MAX_PAGE - 1;
     tv_set_fpos(cur_pos.page, 0);
     tv_seek(0, SEEK_SET);
+    return TV_CALLBACK_OK;
 }
 
 bool tv_init_pager(unsigned char **buf, size_t *size)

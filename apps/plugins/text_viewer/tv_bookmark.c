@@ -98,15 +98,16 @@ static int tv_find_bookmark(const struct tv_screen_pos *pos)
     return -1;
 }
 
-static void tv_change_preferences(const struct tv_preferences *oldp)
+static int tv_change_preferences(const struct tv_preferences *oldp)
 {
     int i;
 
-    if (oldp == NULL)
-        return;
-
-    for (i = 0; i < bookmark_count; i++)
-        tv_convert_fpos(bookmarks[i].pos.file_pos, &bookmarks[i].pos);
+    if (oldp)
+    {
+        for (i = 0; i < bookmark_count; i++)
+            tv_convert_fpos(bookmarks[i].pos.file_pos, &bookmarks[i].pos);
+    }
+    return TV_CALLBACK_OK;
 }
 
 void tv_init_bookmark(void)

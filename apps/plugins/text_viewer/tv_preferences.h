@@ -23,6 +23,12 @@
 #ifndef PLUGIN_TEXT_VIEWER_PREFERENCES_H
 #define PLUGIN_TEXT_VIEWER_PREFERENCES_H
 
+enum {
+    TV_CALLBACK_OK,
+    TV_CALLBACK_STOP,
+    TV_CALLBACK_ERROR,
+};
+
 /* scrollbar_mode */
 enum {
     SB_OFF = 0,
@@ -129,8 +135,12 @@ extern const struct tv_preferences * const preferences;
  *
  * [In] new_prefs
  *          new preferences
+ *
+ * return
+ *     true  success
+ *     false error
  */
-void tv_set_preferences(const struct tv_preferences *new_prefs);
+bool tv_set_preferences(const struct tv_preferences *new_prefs);
 
 /*
  * copy the preferences
@@ -154,6 +164,6 @@ void tv_set_default_preferences(struct tv_preferences *p);
  * [In] listner
  *          the function to be executed when the current preferences is changed
  */
-void tv_add_preferences_change_listner(void (*listner)(const struct tv_preferences *oldp));
+void tv_add_preferences_change_listner(int (*listner)(const struct tv_preferences *oldp));
 
 #endif

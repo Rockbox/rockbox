@@ -132,7 +132,7 @@ void tv_seek(off_t offset, int whence)
     }
 }
 
-static void tv_change_preferences(const struct tv_preferences *oldp)
+static int tv_change_preferences(const struct tv_preferences *oldp)
 {
     unsigned char bom[BOM_SIZE];
     int cur_start_file_pos = start_file_pos;
@@ -151,7 +151,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 
         fd = rb->open(preferences->file_name, O_RDONLY);
         if (fd < 0)
-            return;
+            return TV_CALLBACK_ERROR;
     }
 
     /*
@@ -168,6 +168,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
 
     file_size = rb->filesize(fd) - start_file_pos;
     tv_seek(cur_file_pos + cur_start_file_pos - start_file_pos, SEEK_SET);
+    return TV_CALLBACK_OK;
 }
 
 bool tv_init_reader(unsigned char **buf, size_t *size)

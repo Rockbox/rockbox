@@ -42,7 +42,8 @@ bool tv_init(const unsigned char *file)
         return false;
 
     /* load the preferences and bookmark */
-    tv_load_settings(file);
+    if (!tv_load_settings(file))
+        return false;
 
     /* select to read the page */
     tv_select_bookmark();

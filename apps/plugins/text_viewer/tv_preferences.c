@@ -31,11 +31,12 @@ const struct tv_preferences * const preferences = &prefs;
 static int listner_count = 0;
 
 #define TV_MAX_LISTNERS 5
-static void (*listners[TV_MAX_LISTNERS])(const struct tv_preferences *oldp);
+static int (*listners[TV_MAX_LISTNERS])(const struct tv_preferences *oldp);
 
-static void tv_notify_change_preferences(const struct tv_preferences *oldp)
+static bool tv_notify_change_preferences(const struct tv_preferences *oldp)
 {
     int i;
+    int res = TV_CALLBACK_OK;
 
     /*
      * the following items do not check.
@@ -65,11 +66,13 @@ static void tv_notify_change_preferences(const struct tv_preferences *oldp)
     {
         /* callback functions are called as FILO */
         for (i = listner_count - 1; i >= 0; i--)
-            listners[i](oldp);
+            if ((res = listners[i](oldp)) != TV_CALLBACK_OK)
+                break;
     }
+    return (res != TV_CALLBACK_ERROR);
 }
 
-void tv_set_preferences(const struct tv_preferences *new_prefs)
+bool tv_set_preferences(const struct tv_preferences *new_prefs)
 {
     static struct tv_preferences old_prefs;
     struct tv_preferences *oldp = NULL;
@@ -80,7 +83,7 @@ void tv_set_preferences(const struct tv_preferences *new_prefs)
     is_initialized = true;
 
     rb->memcpy(&prefs, new_prefs, sizeof(struct tv_preferences));
-    tv_notify_change_preferences(oldp);
+    return tv_notify_change_preferences(oldp);
 }
 
 void tv_copy_preferences(struct tv_preferences *copy_prefs)
@@ -118,7 +121,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->file_name[0] = '\0';
 }
 
-void tv_add_preferences_change_listner(void (*listner)(const struct tv_preferences *oldp))
+void tv_add_preferences_change_listner(int (*listner)(const struct tv_preferences *oldp))
 {
     if (listner_count < TV_MAX_LISTNERS)
         listners[listner_count++] = listner;

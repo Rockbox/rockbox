@@ -349,7 +349,7 @@ static bool tv_set_font(const unsigned char *font)
 }
 #endif
 
-static void tv_change_preferences(const struct tv_preferences *oldp)
+static int tv_change_preferences(const struct tv_preferences *oldp)
 {
 #ifdef HAVE_LCD_BITMAP
     static bool font_changing = false;
@@ -363,10 +363,18 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     {
         if (!tv_set_font(preferences->font_name))
         {
+            /*
+             * tv_set_font(rb->global_settings->font_file) doesn't fail usually.
+             * if it fails, a fatal problem occurs in Rockbox. 
+             */
+            if (!rb->strcmp(preferences->font_name, rb->global_settings->font_file))
+                return TV_CALLBACK_ERROR;
+
             font_changing = true;
             tv_copy_preferences(&new_prefs);
             rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
-            tv_set_preferences(&new_prefs);
+
+            return (tv_set_preferences(&new_prefs))? TV_CALLBACK_STOP : TV_CALLBACK_ERROR;
         }
         col_width = 2 * rb->font_get_width(preferences->font, ' ');
         font_changing = false;
@@ -375,6 +383,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     (void)oldp;
 #endif
     tv_change_viewport();
+    return TV_CALLBACK_OK;
 }
 
 bool tv_init_display(unsigned char **buf, size_t *size)

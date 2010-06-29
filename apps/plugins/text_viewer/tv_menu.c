@@ -366,7 +366,8 @@ unsigned tv_display_menu(void)
         case 1: /* change settings */
             tv_copy_preferences(&new_prefs);
             result = tv_options_menu();
-            tv_set_preferences(&new_prefs);
+            if (!tv_set_preferences(&new_prefs))
+                result = TV_MENU_RESULT_ERROR;
             break;
         case 2: /* playback control */
             playback_control(NULL);

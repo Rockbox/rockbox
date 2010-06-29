@@ -417,7 +417,7 @@ bool tv_save_global_settings(const struct tv_preferences *prefs)
  * ----------------------------------------------------------------------------
  */
 
-void tv_load_settings(const unsigned char *file_name)
+bool tv_load_settings(const unsigned char *file_name)
 {
     unsigned char buf[MAX_PATH+2];
     unsigned int fcount;
@@ -470,7 +470,7 @@ void tv_load_settings(const unsigned char *file_name)
             tv_set_default_preferences(&prefs);
     }
     rb->strlcpy(prefs.file_name, file_name, MAX_PATH);
-    tv_set_preferences(&prefs);
+    return tv_set_preferences(&prefs);
 }
 
 static bool tv_copy_settings(int sfd, int dfd, int size)

@@ -102,7 +102,7 @@ bool tv_traverse_lines(void)
     return res;
 }
 
-static void tv_change_preferences(const struct tv_preferences *oldp)
+static int tv_change_preferences(const struct tv_preferences *oldp)
 {
     bool need_vertical_scrollbar = false;
 
@@ -131,6 +131,7 @@ static void tv_change_preferences(const struct tv_preferences *oldp)
     cur_column = 0;
 
     tv_set_read_conditions(preferences->windows, window_width);
+    return TV_CALLBACK_OK;
 }
 
 bool tv_init_window(unsigned char **buf, size_t *size)

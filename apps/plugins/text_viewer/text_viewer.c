@@ -73,6 +73,8 @@ enum plugin_status plugin_start(const void* file)
                         done = true;
                         if (res == TV_MENU_RESULT_ATTACHED_USB)
                             return PLUGIN_USB_CONNECTED;
+                        else if (res == TV_MENU_RESULT_ERROR)
+                            return PLUGIN_ERROR;
                     }
                 }
                 break;
