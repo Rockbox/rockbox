@@ -45,6 +45,8 @@
 #include "ata_idle_notify.h"
 #include "sd.h"
 #include "usb.h"
+/*#define LOGF_ENABLE*/
+#include "logf.h"
 
 #ifdef HAVE_HOTSWAP
 #include "disk.h"
@@ -56,6 +58,8 @@
 #define MCI_NO_RESP     (0<<0)
 #define MCI_RESP        (1<<0)
 #define MCI_LONG_RESP   (1<<1)
+#define MCI_ACMD        (1<<2)
+#define MCI_NOCRC       (1<<3)
 
 /* ARM PL180 registers */
 #define MCI_POWER(i)       (*(volatile unsigned char *) (pl180_base[i]+0x00))
@@ -210,6 +214,10 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
     unsigned cmd_retries = 6;
     while(cmd_retries--)
     {
+        if ((flags & MCI_ACMD) && /* send SD_APP_CMD before each try */
+            !send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, response))
+            return false;
+
         /* Clear old status flags */
         MCI_CLEAR(drive) = 0x7ff;
 
@@ -236,8 +244,21 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         {
             response[0] = MCI_RESP0(drive); /* Always prepare short response */
 
-            if(status & MCI_RESPONSE_ERROR) /* timeout or crc failure */
+            if(status & MCI_RESPONSE_ERROR) {/* timeout or crc failure */
+                if ((status & MCI_CMD_CRC_FAIL) &&
+                    (flags & MCI_NOCRC))
+                    break;
+                logf("sd cmd error: drive %d cmd %d arg %08x sd_status %08x resp0 %08lx",
+                     drive, cmd, arg, status, response[0]);
                 continue;
+            }
+
+            if((flags & MCI_RESP) &&
+               !(flags & MCI_LONG_RESP) &&
+               (response[0] & SD_R1_CARD_ERROR)) {
+                logf("sd card error: drive %d cmd %d arg %08x r1 %08lx",
+                     drive, cmd, arg, response[0]);
+            }
 
             if(status & MCI_CMD_RESP_END)   /* Response passed CRC check */
             {
@@ -268,6 +289,8 @@ static int sd_init_card(const int drive)
     long init_timeout;
     bool sd_v2 = false;
 
+    card_info[drive].rca = 0;
+
     /* MCLCK on and set to 400kHz ident frequency  */
     MCI_CLOCK(drive) = MCI_IDENTSPEED;
 
@@ -293,12 +316,9 @@ static int sd_init_card(const int drive)
         if(TIME_AFTER(current_tick, init_timeout))
             return -2;
 
-        /* app_cmd */
-        send_cmd(drive, SD_APP_CMD, 0, MCI_RESP, &response);
-
         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
-                        MCI_RESP, &card_info[drive].ocr);
+                        MCI_ACMD|MCI_NOCRC|MCI_RESP, &card_info[drive].ocr);
 
     } while(!(card_info[drive].ocr & (1<<31)));
 
@@ -365,17 +385,11 @@ static int sd_init_card(const int drive)
     /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_tran_state(drive) < 0)
         return -11;
-    /* CMD55 */             /*  Response is requested due to timing issue  */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
-        return -14;
     /* ACMD42  */
-    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_RESP, &response))
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_RESP, &response))
         return -15;
-    /* CMD55 */              /*  Response is requested due to timing issue  */
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, &response))
-        return -12;
     /* ACMD6  */
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_RESP, &response))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_RESP, &response))
         return -13;
     /* Now that card is widebus make controller aware */
     MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
