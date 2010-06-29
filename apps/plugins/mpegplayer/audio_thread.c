@@ -225,20 +225,22 @@ static int audio_buffer(struct stream *str, enum stream_parse_mode type)
 /* Initialise libmad */
 static void init_mad(void)
 {
-    /*init the sbsample buffer*/
-    frame.sbsample = &sbsample;
+    /* init the sbsample buffer */
     frame.sbsample_prev = &sbsample;
-    
+    frame.sbsample = &sbsample;
+
+    /* We do this so libmad doesn't try to call codec_calloc(). This needs to
+     * be called before mad_stream_init(), mad_frame_inti() and 
+     * mad_synth_init(). */
+    frame.overlap = &mad_frame_overlap;
+    stream.main_data = &mad_main_data;
+
+    /* Call mad initialization. Those will zero the arrays frame.overlap,
+     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to 
+     * zero them here. */
     mad_stream_init(&stream);
     mad_frame_init(&frame);
     mad_synth_init(&synth);
-
-    /* We do this so libmad doesn't try to call codec_calloc() */
-    rb->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
-    frame.overlap = (void *)mad_frame_overlap;
-
-    rb->memset(mad_main_data, 0, sizeof(mad_main_data));
-    stream.main_data = &mad_main_data;
 }
 
 /* Sync audio stream to a particular frame - see main decoder loop for
