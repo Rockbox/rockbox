@@ -53,19 +53,13 @@ static void __attribute__((interrupt("IRQ"))) SDMA_HANDLER(void)
     SDMA_INTR = pending;          /* Ack all ints */
     pending &= sdma_enabled_ints; /* Only dispatch ints with callback */
 
-    while (1)
+    while (pending)
     {
-        unsigned int channel;
+        unsigned int bit = pending & -pending; /* Isolate bottom bit */
+        pending &= ~bit;          /* Clear it */
 
-        if (pending == 0)
-            break; /* No bits set */
-
-        channel = find_first_set_bit(pending);
-
-        pending &= ~(1ul << channel);
-
-        /* Call callback (required if using an interrupt) */
-        ccb_array[channel].channel_desc->callback();
+        /* Call callback (required if using an interrupt). bit number = channel */
+        ccb_array[31 - __builtin_clz(bit)].channel_desc->callback();
     }
 }
 
