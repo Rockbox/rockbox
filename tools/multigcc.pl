@@ -46,27 +46,25 @@ switch($^O) {
     }
 }
 
-# don't run empty children
-if (scalar @files <= $cores)
-{
-    $cores = 1;
-}
-
 # fork children
 my @pids;
 my $slice = int((scalar @files + $cores) / $cores);
-for my $i (0 .. $cores-1)
+
+# reset $cores to 0 so we can count the number of actually used cores
+$cores=0;
+
+for (my $i=0;$i<scalar @files;$i += $slice)
 {
     my $pid = fork;
     if ($pid)
     {
         # mother
-        $pids[$i] = $pid;
+        $pids[$cores++] = $pid;
     }
     else
     {
         # get my slice of the files
-        my @list = @files[$i * $slice .. $i * $slice + $slice - 1];
+        my @list = @files[$i .. $i + $slice - 1];
 
         # run command
         system("$command @list > $tempfile.$$");
