@@ -46,11 +46,9 @@ enum plugin_status plugin_start(const void* file)
         return PLUGIN_ERROR;
     }
 
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
-
     while (!done) {
+
+        rb->gui_syncstatusbar_draw(rb->statusbars, preferences->statusbar);
 
         if (display_update)
             tv_draw();
