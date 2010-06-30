@@ -893,6 +893,7 @@ target/arm/usb-fw-pp502x.c
 
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
+target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/adc-s3c2440.c
@@ -918,6 +919,7 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 
 #ifdef GIGABEAT_S
 #ifndef SIMULATOR
+target/arm/bits-armv6.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-armv6.S
 target/arm/imx31/ata-imx31.c
@@ -1553,6 +1555,7 @@ target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 
 #if defined(MINI2440)
 #ifndef SIMULATOR
+target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/debug-s3c2440.c

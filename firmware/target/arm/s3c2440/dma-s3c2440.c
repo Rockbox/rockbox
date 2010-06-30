@@ -76,8 +76,8 @@ void dma_init(void)
     INTPND = DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK;
     
     /* Enable interrupt in controller */
-    s3c_regclr32(&INTMOD, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
-    s3c_regclr32(&INTMSK, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
+    bitclr32(&INTMOD, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
+    bitclr32(&INTMSK, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
 }
 
 void dma_retain(void)

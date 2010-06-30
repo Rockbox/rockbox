@@ -43,7 +43,7 @@ void ccm_module_clock_gating(enum IMX31_CG_LIST cg, enum IMX31_CG_MODES mode)
     shift = 2*(cg % 16);        /* Get field shift */
     mask = CG_MASK << shift;    /* Select field */
 
-    imx31_regmod32(reg, mode << shift, mask);
+    bitmod32(reg, mode << shift, mask);
 }
 
 /* Decode PLL output frequency from register value */

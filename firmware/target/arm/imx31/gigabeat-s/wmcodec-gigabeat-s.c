@@ -48,13 +48,13 @@ void audiohw_init(void)
 
     audiohw_preinit();
 
-    imx31_regset32(&GPIO3_DR, (1 << 21)); /* Turn on analogue LDO */
+    bitset32(&GPIO3_DR, (1 << 21)); /* Turn on analogue LDO */
 }
 
 void audiohw_enable_headphone_jack(bool enable)
 {
     /* Turn headphone jack output on or off. */
-    imx31_regmod32(&GPIO3_DR, enable ? (1 << 22) : 0, (1 << 22));
+    bitmod32(&GPIO3_DR, enable ? (1 << 22) : 0, (1 << 22));
 }
 
 void wmcodec_write(int reg, int data)

@@ -133,13 +133,13 @@ static void lcd_set_power(bool powered)
         lcd_powered = false;
         lcd_write_reg(0x04, 0x00);
         lcd_enable_interface(false);
-        imx31_regclr32(&GPIO3_DR, (1 << 12));
+        bitclr32(&GPIO3_DR, (1 << 12));
         mc13783_clear(MC13783_REGULATOR_MODE1, MC13783_VCAMEN);
     }
     else
     {
         mc13783_set(MC13783_REGULATOR_MODE1, MC13783_VCAMEN);
-        imx31_regset32(&GPIO3_DR, (1 << 12));
+        bitset32(&GPIO3_DR, (1 << 12));
         lcd_enable_interface(true);
         lcd_write_reg(0x04, 0x01);
         lcd_powered = true;

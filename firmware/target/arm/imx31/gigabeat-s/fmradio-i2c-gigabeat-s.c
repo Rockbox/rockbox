@@ -38,14 +38,14 @@ static struct i2c_node si4700_i2c_node =
 void fmradio_i2c_init(void)
 {
     /* RST: LOW */
-    imx31_regclr32(&GPIO1_DR, (1 << 26));
+    bitclr32(&GPIO1_DR, (1 << 26));
     /* RST: OUT */
-    imx31_regset32(&GPIO1_GDIR, (1 << 26));
+    bitset32(&GPIO1_GDIR, (1 << 26));
 
     /* I2C2 SCL: IN, I2C2: SDA IN */
-    imx31_regclr32(&GPIO2_GDIR, (3 << 14));
+    bitclr32(&GPIO2_GDIR, (3 << 14));
     /* I2C2 SCL LO, I2C2 SDA LO */
-    imx31_regclr32(&GPIO2_DR, (3 << 14));
+    bitclr32(&GPIO2_DR, (3 << 14));
 
     /* open-drain pins - external pullups on PCB. Pullup default but
      * disabled */
@@ -73,17 +73,17 @@ void fmradio_i2c_enable(bool enable)
     {
         /* place in GPIO mode to hold SDIO low during RESET release,
          * SEN1 should be high already (pullup) and GPIO3 left alone */
-        imx31_regset32(&GPIO2_GDIR, (1 << 15)); /* SDIO OUT */
+        bitset32(&GPIO2_GDIR, (1 << 15)); /* SDIO OUT */
         /* I2C2_SDA => MCU2_15 */ 
         iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
                            IOMUXC_MUX_OUT_GPIO | IOMUXC_MUX_IN_GPIO);
         /* enable CLK32KMCU clock */
         mc13783_set(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
         /* enable the fm chip (release RESET) */
-        imx31_regset32(&GPIO1_DR, (1 << 26));
+        bitset32(&GPIO1_DR, (1 << 26));
         sleep(HZ/100);
         /* busmode should be selected - OK to release SDIO */
-        imx31_regclr32(&GPIO2_GDIR, (1 << 15)); /* SDIO IN */
+        bitclr32(&GPIO2_GDIR, (1 << 15)); /* SDIO IN */
         /* restore pin mux (MCU2_15 => I2C2_SDA) */
         iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
                            IOMUXC_MUX_OUT_ALT2 | IOMUXC_MUX_IN_ALT2);
@@ -97,7 +97,7 @@ void fmradio_i2c_enable(bool enable)
            we can diable the i2c module when not in use */
         i2c_enable_node(&si4700_i2c_node, false);
         /* disable the fm chip */
-        imx31_regclr32(&GPIO1_DR, (1 << 26));
+        bitclr32(&GPIO1_DR, (1 << 26));
         /* disable CLK32KMCU clock */
         mc13783_clear(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
     }

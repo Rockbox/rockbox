@@ -51,11 +51,6 @@ void tick_stop(void);
 void kernel_device_init(void);
 void system_halt(void);
 
-void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value,
-                    uint32_t mask);
-void imx31_regset32(volatile uint32_t *reg_p, uint32_t mask);
-void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask);
-
 #define KDEV_INIT
 
 struct ARM_REGS {

@@ -214,6 +214,11 @@ static inline __attribute__((always_inline))
 uint32_t isolate_first_bit(uint32_t val)
     { return val & -val; }
 
+/* Functions to set and clear register or variable bits atomically */
+void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask);
+void bitset32(volatile uint32_t *addr, uint32_t mask);
+void bitclr32(volatile uint32_t *addr, uint32_t mask);
+
 /* gcc 3.4 changed the format of the constraints */
 #if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3) || (__GNUC__ >= 4)
 #define I_CONSTRAINT "I08"

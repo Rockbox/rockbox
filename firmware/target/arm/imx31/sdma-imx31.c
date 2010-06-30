@@ -414,12 +414,12 @@ static void set_channel_ownership(unsigned int channel, unsigned int config)
 
     /* DSP side */
 #if 0 /* Not using this */
-    imx31_regmod32(&SDMA_DSPOVR, (config & CH_OWNSHP_DSP) ? 0 : bit, bit);
+    bitmod32(&SDMA_DSPOVR, (config & CH_OWNSHP_DSP) ? 0 : bit, bit);
 #endif
     /* Event */
-    imx31_regmod32(&SDMA_EVTOVR, (config & CH_OWNSHP_EVT) ? 0 : bit, bit);
+    bitmod32(&SDMA_EVTOVR, (config & CH_OWNSHP_EVT) ? 0 : bit, bit);
     /* MCU side */
-    imx31_regmod32(&SDMA_HOSTOVR, (config & CH_OWNSHP_MCU) ? 0 : bit, bit);
+    bitmod32(&SDMA_HOSTOVR, (config & CH_OWNSHP_MCU) ? 0 : bit, bit);
 }
 
 static bool setup_channel(struct channel_control_block *ccb_p)
@@ -485,12 +485,12 @@ static bool setup_channel(struct channel_control_block *ccb_p)
     if (channel_cfg & CH_OWNSHP_EVT)
     {
         /* Set event ID to channel activation bitmapping */
-        imx31_regset32(&SDMA_CHNENBL(cd_p->event_id1), 1ul << channel);
+        bitset32(&SDMA_CHNENBL(cd_p->event_id1), 1ul << channel);
 
         if (cd_p->per_type == SDMA_PER_ATA)
         {
             /* ATA has two */
-            imx31_regset32(&SDMA_CHNENBL(cd_p->event_id2), 1ul << channel);
+            bitset32(&SDMA_CHNENBL(cd_p->event_id2), 1ul << channel);
         }
     }
 
@@ -676,7 +676,7 @@ void sdma_channel_stop(unsigned int channel)
 
     /* Unlock callback if it was set */
     if (intmsk & chmsk)
-        imx31_regset32(&sdma_enabled_ints, chmsk);
+        bitset32(&sdma_enabled_ints, chmsk);
 
     logf("SDMA ch closed: %d", channel);
 }
@@ -721,7 +721,7 @@ bool sdma_channel_init(unsigned int channel,
 
     /* Enable interrupt if a callback is specified. */
     if (cd_p->callback != NULL)
-        imx31_regset32(&sdma_enabled_ints, 1ul << channel);
+        bitset32(&sdma_enabled_ints, 1ul << channel);
 
     /* Minimum schedulable = 1 */
     sdma_channel_set_priority(channel, 1);
@@ -741,7 +741,7 @@ void sdma_channel_close(unsigned int channel)
     ccb_p = &ccb_array[channel];
 
     /* Block callbacks (if not initialized, it won't be set). */
-    imx31_regclr32(&sdma_enabled_ints, 1ul << channel);
+    bitclr32(&sdma_enabled_ints, 1ul << channel);
 
     if (ccb_p->status.opened_init == 0)
         return;

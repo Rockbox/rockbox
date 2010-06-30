@@ -40,16 +40,16 @@ static void enable_transceiver(bool enable)
     {
         if (GPIO1_DR & (1 << 30))
         {
-            imx31_regclr32(&GPIO3_DR, (1 << 16)); /* Reset ISP1504 */
+            bitclr32(&GPIO3_DR, (1 << 16)); /* Reset ISP1504 */
             sleep(HZ/100);
-            imx31_regset32(&GPIO3_DR, (1 << 16));
+            bitset32(&GPIO3_DR, (1 << 16));
             sleep(HZ/10);
-            imx31_regclr32(&GPIO1_DR, (1 << 30)); /* Select ISP1504 */
+            bitclr32(&GPIO1_DR, (1 << 30)); /* Select ISP1504 */
         }
     }
     else
     {
-        imx31_regset32(&GPIO1_DR, (1 << 30)); /* Deselect ISP1504 */
+        bitset32(&GPIO1_DR, (1 << 30)); /* Deselect ISP1504 */
     }
 }
 

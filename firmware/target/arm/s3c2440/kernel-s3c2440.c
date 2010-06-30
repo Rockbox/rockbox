@@ -62,7 +62,7 @@ void tick_start(unsigned int interval_in_ms)
 #ifdef BOOTLOADER
 void tick_stop(void)
 {
-    s3c_regset32(&INTMSK, TIMER4_MASK);
+    bitset32(&INTMSK, TIMER4_MASK);
     TCON &= ~(1 << 20);
     SRCPND = TIMER4_MASK;
     INTPND = TIMER4_MASK;

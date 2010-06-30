@@ -69,14 +69,4 @@
 void system_prepare_fw_start(void);
 void tick_stop(void);
 
-/* Functions to set and clear register bits atomically */
-
-/* Set and clear register bits */
-void s3c_regmod32(volatile unsigned long *reg, unsigned long bits,
-                  unsigned long mask);
-/* Set register bits */
-void s3c_regset32(volatile unsigned long *reg, unsigned long bits);
-/* Clear register bits */
-void s3c_regclr32(volatile unsigned long *reg, unsigned long bits);
-
 #endif /* SYSTEM_TARGET_H */

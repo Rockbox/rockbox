@@ -275,7 +275,7 @@ static void INIT_ATTR dvfs_init(void)
 
 #ifndef DVFS_NO_PWRRDY
     /* Configure PWRRDY signal pin. */
-    imx31_regclr32(&GPIO1_GDIR, (1 << 5));
+    bitclr32(&GPIO1_GDIR, (1 << 5));
     iomuxc_set_pin_mux(IOMUXC_GPIO1_5,
                        IOMUXC_MUX_OUT_FUNCTIONAL | IOMUXC_MUX_IN_FUNCTIONAL);
 #endif
@@ -289,27 +289,26 @@ static void INIT_ATTR dvfs_init(void)
     }
 
     /* Set up LTR0. */
-    imx31_regmod32(&CCM_LTR0,
-                   DVFS_UPTHR << CCM_LTR0_UPTHR_POS |
-                   DVFS_DNTHR << CCM_LTR0_DNTHR_POS |
-                   DVFS_DIV3CK << CCM_LTR0_DIV3CK_POS,
-                   CCM_LTR0_UPTHR | CCM_LTR0_DNTHR | CCM_LTR0_DIV3CK);
+    bitmod32(&CCM_LTR0,
+             DVFS_UPTHR << CCM_LTR0_UPTHR_POS |
+             DVFS_DNTHR << CCM_LTR0_DNTHR_POS |
+             DVFS_DIV3CK << CCM_LTR0_DIV3CK_POS,
+             CCM_LTR0_UPTHR | CCM_LTR0_DNTHR | CCM_LTR0_DIV3CK);
 
     /* Set up LTR1. */
-    imx31_regmod32(&CCM_LTR1,
-                   DVFS_DNCNT << CCM_LTR1_DNCNT_POS |
-                   DVFS_UPCNT << CCM_LTR1_UPCNT_POS |
-                   DVFS_PNCTHR << CCM_LTR1_PNCTHR_POS |
-                   CCM_LTR1_LTBRSR,
-                   CCM_LTR1_DNCNT | CCM_LTR1_UPCNT |
-                   CCM_LTR1_PNCTHR | CCM_LTR1_LTBRSR);
+    bitmod32(&CCM_LTR1,
+             DVFS_DNCNT << CCM_LTR1_DNCNT_POS |
+             DVFS_UPCNT << CCM_LTR1_UPCNT_POS |
+             DVFS_PNCTHR << CCM_LTR1_PNCTHR_POS |
+             CCM_LTR1_LTBRSR,
+             CCM_LTR1_DNCNT | CCM_LTR1_UPCNT |
+             CCM_LTR1_PNCTHR | CCM_LTR1_LTBRSR);
 
     /* Set up LTR2-- EMA configuration. */
-    imx31_regmod32(&CCM_LTR2, DVFS_EMAC << CCM_LTR2_EMAC_POS,
-                   CCM_LTR2_EMAC);
+    bitmod32(&CCM_LTR2, DVFS_EMAC << CCM_LTR2_EMAC_POS, CCM_LTR2_EMAC);
 
     /* DVFS interrupt goes to MCU. Mask load buffer full interrupt. */
-    imx31_regset32(&CCM_PMCR0, CCM_PMCR0_DVFIS | CCM_PMCR0_LBMI);
+    bitset32(&CCM_PMCR0, CCM_PMCR0_DVFIS | CCM_PMCR0_LBMI);
 
     /* Initialize current core PLL and dividers for default level. Assumes
      * clocking scheme has been set up appropriately in other init code. */
@@ -517,8 +516,8 @@ static __attribute__((interrupt("IRQ"))) void CCM_CLK_HANDLER(void)
 static void INIT_ATTR dptc_init(void)
 {
     /* Force DPTC off if running for some reason. */
-    imx31_regmod32(&CCM_PMCR0, CCM_PMCR0_PTVAIM,
-                   CCM_PMCR0_PTVAIM | CCM_PMCR0_DPTEN);
+    bitmod32(&CCM_PMCR0, CCM_PMCR0_PTVAIM,
+             CCM_PMCR0_PTVAIM | CCM_PMCR0_DPTEN);
 
      /* Shadow the regulator registers */
     mc13783_read_regs(dptc_pmic_regs, dptc_reg_shadows, 2);
@@ -528,14 +527,14 @@ static void INIT_ATTR dptc_init(void)
 
     /* Interrupt goes to MCU, specified reference circuits enabled when
      * DPTC is active. */
-    imx31_regset32(&CCM_PMCR0, CCM_PMCR0_PTVIS);
+    bitset32(&CCM_PMCR0, CCM_PMCR0_PTVIS);
 
-    imx31_regmod32(&CCM_PMCR0, DPTC_DRCE_MASK,
-                   CCM_PMCR0_DRCE0 | CCM_PMCR0_DRCE1 |
-                   CCM_PMCR0_DRCE2 | CCM_PMCR0_DRCE3);
+    bitmod32(&CCM_PMCR0, DPTC_DRCE_MASK,
+             CCM_PMCR0_DRCE0 | CCM_PMCR0_DRCE1 |
+             CCM_PMCR0_DRCE2 | CCM_PMCR0_DRCE3);
 
     /* DPTC counting range = 256 system clocks */
-    imx31_regclr32(&CCM_PMCR0, CCM_PMCR0_DCR);
+    bitclr32(&CCM_PMCR0, CCM_PMCR0_DCR);
 
     logf("DPTC: Initialized");
 }
@@ -629,7 +628,7 @@ void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value)
         shift -= 16; /* Bits 13:11, 16:14 ... 31:29 */
     }
 
-    imx31_regmod32(reg_p, value << shift, 0x7 << shift);
+    bitmod32(reg_p, value << shift, 0x7 << shift);
 }
 
 
@@ -643,7 +642,7 @@ void dvfs_set_lt_detect(enum DVFS_LT_SIGS index, bool edge)
     else if ((unsigned)index < 16)
         bit = 1ul << (index + 29);
 
-    imx31_regmod32(&CCM_LTR0, edge ? bit : 0, bit);
+    bitmod32(&CCM_LTR0, edge ? bit : 0, bit);
 }
 
 
@@ -652,7 +651,7 @@ void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert)
     if ((unsigned)dvgp <= 3)
     {
         unsigned long bit = 1ul << dvgp;
-        imx31_regmod32(&CCM_PMCR1, assert ? bit : 0, bit);
+        bitmod32(&CCM_PMCR1, assert ? bit : 0, bit);
     }
 }
 
@@ -660,8 +659,7 @@ void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert)
 /* Turn the wait-for-interrupt monitoring on or off */
 void dvfs_wfi_monitor(bool on)
 {
-    imx31_regmod32(&CCM_PMCR0, on ? 0 : CCM_PMCR0_WFIM,
-                   CCM_PMCR0_WFIM);
+    bitmod32(&CCM_PMCR0, on ? 0 : CCM_PMCR0_WFIM, CCM_PMCR0_WFIM);
 }
 
 

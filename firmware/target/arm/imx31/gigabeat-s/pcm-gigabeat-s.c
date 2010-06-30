@@ -458,7 +458,7 @@ void pcm_rec_dma_stop(void)
     /* Stop receiving data */
     sdma_channel_stop(DMA_REC_CH_NUM);
 
-    imx31_regclr32(&SSI_SIER1, SSI_SIER_RDMAE);
+    bitclr32(&SSI_SIER1, SSI_SIER_RDMAE);
 
     SSI_SCR1 &= ~SSI_SCR_RE;      /* Disable RX */
     SSI_SRCR1 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */

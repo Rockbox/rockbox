@@ -136,24 +136,6 @@ void memory_init(void)
     enable_mmu();
 }
 
-void s3c_regmod32(volatile unsigned long *reg, unsigned long bits,
-                  unsigned long mask)
-{
-    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
-    *reg = (*reg & ~mask) | (bits & mask);
-    restore_interrupt(oldstatus);
-}
-
-void s3c_regset32(volatile unsigned long *reg, unsigned long bits)
-{
-    s3c_regmod32(reg, bits, bits);
-}
-
-void s3c_regclr32(volatile unsigned long *reg, unsigned long bits)
-{
-    s3c_regmod32(reg, 0, bits);
-}
-
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {

@@ -299,8 +299,8 @@ static void init_sdi_controller(const int card_no)
 
 #if 1
     /* Enable interrupt in controller */
-    s3c_regclr32(&INTMOD, SDI_MASK);
-    s3c_regclr32(&INTMSK, SDI_MASK);
+    bitclr32(&INTMOD, SDI_MASK);
+    bitclr32(&INTMSK, SDI_MASK);
     
     SDIIMSK |= S3C2410_SDIIMSK_DATAFINISH 
                | S3C2410_SDIIMSK_DATATIMEOUT

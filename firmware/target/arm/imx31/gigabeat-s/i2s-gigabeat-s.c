@@ -35,11 +35,11 @@ void i2s_reset(void)
      * WM Codec post divider (MCLKDIV=1.5):
      * INT_BIT_CLK (MCLK) / 1.5 = 11289600Hz = 256*fs = SYSCLK
      */
-    imx31_regmod32(&CCM_PDR1,
-                   ((1-1) << CCM_PDR1_SSI1_PRE_PODF_POS) |
-                   ((5-1) << CCM_PDR1_SSI1_PODF_POS) |
-                   ((8-1) << CCM_PDR1_SSI2_PRE_PODF_POS) |
-                   ((64-1) << CCM_PDR1_SSI2_PODF_POS),
-                   CCM_PDR1_SSI1_PODF | CCM_PDR1_SSI2_PODF |
-                   CCM_PDR1_SSI1_PRE_PODF | CCM_PDR1_SSI2_PRE_PODF);
+    bitmod32(&CCM_PDR1,
+             ((1-1) << CCM_PDR1_SSI1_PRE_PODF_POS) |
+             ((5-1) << CCM_PDR1_SSI1_PODF_POS) |
+             ((8-1) << CCM_PDR1_SSI2_PRE_PODF_POS) |
+             ((64-1) << CCM_PDR1_SSI2_PODF_POS),
+             CCM_PDR1_SSI1_PODF | CCM_PDR1_SSI2_PODF |
+             CCM_PDR1_SSI1_PRE_PODF | CCM_PDR1_SSI2_PRE_PODF);
 }

@@ -85,17 +85,17 @@ void ide_power_enable(bool on)
     if (!on)
     {
         /* Bus must be isolated before power off */
-        imx31_regset32(&GPIO2_DR, (1 << 16));
+        bitset32(&GPIO2_DR, (1 << 16));
     }
 
     /* HD power switch */
-    imx31_regmod32(&GPIO3_DR, on ? (1 << 5) : 0, (1 << 5));
+    bitmod32(&GPIO3_DR, on ? (1 << 5) : 0, (1 << 5));
 
     if (on)
     {
         /* Bus switch may be turned on after powerup */
         sleep(HZ/10);
-        imx31_regclr32(&GPIO2_DR, (1 << 16));
+        bitclr32(&GPIO2_DR, (1 << 16));
     }
 }
 

@@ -101,7 +101,7 @@ static void LCD_CTRL_clock(bool onoff)
         GPDCON  |= 0xAAA0AAA0;
         GPDUP   |= 0xFCFC;
 
-        s3c_regset32(&CLKCON, 0x20);  /* enable LCD clock */
+        bitset32(&CLKCON, 0x20);  /* enable LCD clock */
         LCDCON1 |= LCD_ENVID;
     }
     else
@@ -113,7 +113,7 @@ static void LCD_CTRL_clock(bool onoff)
         GPDUP   &= ~0xFCFC;
 
         LCDCON1 &= ~LCD_ENVID;        /* Must disable first or bus may freeze */
-        s3c_regclr32(&CLKCON, 0x20);  /* disable LCD clock */
+        bitclr32(&CLKCON, 0x20);  /* disable LCD clock */
     }
 }
 
@@ -165,7 +165,7 @@ static void LCD_SPI_SS(bool select)
 
 static void LCD_SPI_start(void)
 {
-    s3c_regset32(&CLKCON, 0x40000);   /* enable SPI clock */
+    bitset32(&CLKCON, 0x40000);   /* enable SPI clock */
     LCD_SPI_SS(false);
     SPCON0=0x3E;
     SPPRE0=24;
@@ -179,7 +179,7 @@ static void LCD_SPI_stop(void)
     LCD_SPI_SS(false);
 
     SPCON0 &= ~0x10;
-    s3c_regclr32(&CLKCON, 0x40000);    /* disable SPI clock */
+    bitclr32(&CLKCON, 0x40000);    /* disable SPI clock */
 }
 
 static void LCD_SPI_init(void)
@@ -253,7 +253,7 @@ void lcd_init_device(void)
     GPBUP   |= 0x181;
 #endif
 
-    s3c_regset32(&CLKCON, 0x20);  /* enable LCD clock */
+    bitset32(&CLKCON, 0x20);  /* enable LCD clock */
 
     LCD_CTRL_setup();
 #ifdef GIGABEAT_F
