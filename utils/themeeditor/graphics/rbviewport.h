@@ -33,6 +33,13 @@ class RBRenderInfo;
 class RBViewport : public QGraphicsItem
 {
 public:
+    enum Alignment
+    {
+        Left,
+        Center,
+        Right
+    };
+
     RBViewport(skin_element* node, const RBRenderInfo& info);
     virtual ~RBViewport();
 
@@ -48,8 +55,13 @@ public:
 
     void newLine();
     void write(QString text);
+    void alignText(Alignment align){ textAlign = align; }
 
 private:
+
+    void alignLeft();
+    void alignCenter();
+    void alignRight();
 
     QRectF size;
     RBFont* font;
@@ -62,6 +74,11 @@ private:
     int lineHeight;
 
     RBScreen* screen;
+
+    QList<QGraphicsItem*> leftText;
+    QList<QGraphicsItem*> centerText;
+    QList<QGraphicsItem*> rightText;
+    Alignment textAlign;
 };
 
 #endif // RBVIEWPORT_H

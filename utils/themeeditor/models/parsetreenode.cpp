@@ -590,6 +590,27 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
     switch(element->tag->name[0])
     {
 
+    case 'a':
+        switch(element->tag->name[1])
+        {
+        case 'c':
+            /* %ac */
+            viewport->alignText(RBViewport::Center);
+            return true;
+
+        case 'l':
+            /* %al */
+            viewport->alignText(RBViewport::Left);
+            return true;
+
+        case 'r':
+            /* %ar */
+            viewport->alignText(RBViewport::Right);
+            return true;
+        }
+
+        break;
+
     case 'x':
         switch(element->tag->name[1])
         {

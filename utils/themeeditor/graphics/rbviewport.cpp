@@ -33,7 +33,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     : QGraphicsItem(info.screen()), font(info.screen()->getFont(0)),
     foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
-    screen(info.screen())
+    screen(info.screen()), textAlign(Left)
 {
     if(!node->tag)
     {
@@ -108,6 +108,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         size = QRectF(0, 0, w, h);
         debug = info.device()->data("showviewports").toBool();
     }
+
+    lineHeight = font->lineHeight();
 }
 
 RBViewport::~RBViewport()
@@ -142,17 +144,85 @@ void RBViewport::paint(QPainter *painter,
 
 void RBViewport::newLine()
 {
-    if(textOffset.x() > 0)
+    if(leftText.count() != 0
+       || centerText.count() != 0
+       || rightText.count() != 0)
     {
         textOffset.setY(textOffset.y() + lineHeight);
         textOffset.setX(0);
+        textAlign = Left;
+        leftText.clear();
+        rightText.clear();
+        centerText.clear();
     }
 }
 
 void RBViewport::write(QString text)
 {
-    QGraphicsItem* graphic = font->renderText(text, foreground, this);
-    graphic->setPos(textOffset.x(), textOffset.y());
-    textOffset.setX(textOffset.x() + graphic->boundingRect().width());
-    lineHeight = font->lineHeight();
+    if(textAlign == Left)
+    {
+        leftText.append(font->renderText(text, foreground, this));
+        alignLeft();
+    }
+    else if(textAlign == Center)
+    {
+        centerText.append(font->renderText(text, foreground, this));
+        alignCenter();
+    }
+    else if(textAlign == Right)
+    {
+        rightText.append(font->renderText(text, foreground, this));
+        alignRight();
+    }
 }
+
+void RBViewport::alignLeft()
+{
+    int y = textOffset.y();
+    int x = 0;
+
+    for(int i = 0; i < leftText.count(); i++)
+    {
+        leftText[i]->setPos(x, y);
+        x += leftText[i]->boundingRect().width();
+    }
+}
+
+void RBViewport::alignCenter()
+{
+    int y = textOffset.y();
+    int x = 0;
+    int width = 0;
+
+    for(int i = 0; i < centerText.count(); i++)
+        width += centerText[i]->boundingRect().width();
+
+    x = (size.width() - width) / 2;
+
+    for(int i = 0; i < centerText.count(); i++)
+    {
+        centerText[i]->setPos(x, y);
+        x += centerText[i]->boundingRect().width();
+    }
+}
+
+void RBViewport::alignRight()
+{
+
+    int y = textOffset.y();
+    int x = 0;
+    int width = 0;
+
+    for(int i = 0; i < rightText.count(); i++)
+        width += rightText[i]->boundingRect().width();
+
+    x = size.width() - width;
+
+    for(int i = 0; i < rightText.count(); i++)
+    {
+        rightText[i]->setPos(x, y);
+        x += rightText[i]->boundingRect().width();
+    }
+
+}
+
