@@ -12,5 +12,6 @@
     </qresource>
     <qresource prefix="/render">
         <file alias="scenebg.png">resources/render/scenebg.png</file>
+        <file alias="albumart.png">resources/render/albumart.png</file>
     </qresource>
 </RCC>

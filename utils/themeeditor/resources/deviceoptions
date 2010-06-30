@@ -35,7 +35,7 @@ screenwidth ; Screen Width ; spin(0,800) ; 300
 screenheight ; Screen Height ; spin(0,800) ; 200
 remotewidth ; Remote Width ; spin(0,800) ; 100
 remoteheight ; Remote Height ; spin(0,800); 50
-showviewports ; Show Viewports ; check ; true
+showviewports ; Show Viewports ; check ; false
 
 [ID3 Info]
 ia ; Artist ; text ; Current Artist
@@ -112,6 +112,8 @@ rp ; Song Playcount ; spin(0,10000) ; 20
 rr ; Song Rating ; spin(0,10) ; 5
 ra ; Autoscore ; spin(0,10) ; 7
 ?C ; Album Art Available ; check ; true
+artwidth ; Album Art Width ; spin(0,500) ; 100
+artheight; Album Art Height ; spin(0,500) ; 100
 
 [Hardware Status]
 bl ; Battery Level (-1 for unknown) ; spin(-1,100) ; 50

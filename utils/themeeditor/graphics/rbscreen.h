@@ -28,8 +28,8 @@
 #include "rbrenderinfo.h"
 #include "rbimage.h"
 #include "rbfont.h"
-
-class RBViewport;
+#include "rbalbumart.h"
+#include "rbviewport.h"
 
 class RBScreen : public QGraphicsItem
 {
@@ -73,6 +73,16 @@ public:
     QColor foreground(){ return fgColor; }
     QColor background(){ return bgColor; }
 
+    void setAlbumArt(RBAlbumArt* art){ albumArt = art; }
+    void showAlbumArt(RBViewport* view)
+    {
+        if(albumArt)
+        {
+            albumArt->setParentItem(view);
+            albumArt->show();
+        }
+    }
+
 
 private:
     int width;
@@ -89,6 +99,8 @@ private:
     QMap<QString, QString>* settings;
     QMap<int, RBFont*> fonts;
     QList<QString> displayedViewports;
+
+    RBAlbumArt* albumArt;
 
 };
 

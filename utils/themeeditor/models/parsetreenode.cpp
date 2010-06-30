@@ -582,8 +582,8 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
     QString filename;
     QString id;
-    int x, y, tiles, tile;
-    char c;
+    int x, y, tiles, tile, maxWidth, maxHeight, width, height;
+    char c, hAlign, vAlign;
     RBImage* image;
 
     /* Two switch statements to narrow down the tag name */
@@ -609,7 +609,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             return true;
         }
 
-        break;
+        return false;
 
     case 'x':
         switch(element->tag->name[1])
@@ -672,7 +672,35 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         }
 
-        return true;
+        return false;
+
+    case 'C':
+        switch(element->tag->name[1])
+        {
+        case 'd':
+            /* %Cd */
+            info.screen()->showAlbumArt(viewport);
+            return true;
+
+        case 'l':
+            /* %Cl */
+            x = element->params[0].data.numeric;
+            y = element->params[1].data.numeric;
+            maxWidth = element->params[2].data.numeric;
+            maxHeight = element->params[3].data.numeric;
+            hAlign = element->params_count > 4
+                     ? element->params[4].data.text[0] : 'c';
+            vAlign = element->params_count > 5
+                     ? element->params[5].data.text[0] : 'c';
+            width = info.device()->data("artwidth").toInt();
+            height = info.device()->data("artheight").toInt();
+            info.screen()->setAlbumArt(new RBAlbumArt(viewport, x, y, maxWidth,
+                                                      maxHeight, width, height,
+                                                      hAlign, vAlign));
+            return true;
+        }
+
+        return false;
 
     case 'F':
 
@@ -689,7 +717,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         }
 
-        return true;
+        return false;
 
     case 'V':
 
@@ -725,7 +753,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         }
 
-        return true;
+        return false;
 
     case 'X':
 
@@ -738,7 +766,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             return true;
         }
 
-        return true;
+        return false;
 
     }
 

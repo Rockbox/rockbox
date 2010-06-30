@@ -28,7 +28,8 @@
 
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
-                       :QGraphicsItem(parent), backdrop(0), project(project)
+                       :QGraphicsItem(parent), backdrop(0), project(project),
+                       albumArt(0)
 {
 
     if(remote)
@@ -79,6 +80,9 @@ RBScreen::~RBScreen()
 {
     if(backdrop)
         delete backdrop;
+
+    if(albumArt)
+        delete albumArt;
 
     QMap<int, RBFont*>::iterator i;
     for(i = fonts.begin(); i != fonts.end(); i++)
