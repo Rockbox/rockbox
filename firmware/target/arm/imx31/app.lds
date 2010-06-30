@@ -99,6 +99,10 @@ SECTIONS
         *(.eh_frame)
     }
 
+    /* NOLOAD sections at end start here. Any part of the binary image past
+     * this point is discarded or copied elsewhere. */
+    _noloaddram = .;
+
     .vectors 0x0 :
     {
         _vectorsstart = .;
@@ -119,7 +123,7 @@ SECTIONS
 
     _initcopy = LOADADDR(.init);
 
-    .stack (NOLOAD) :
+    .stack _noloaddram (NOLOAD) :
     {
         . = ALIGN(4);
         *(.stack)
