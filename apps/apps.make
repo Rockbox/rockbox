@@ -18,14 +18,16 @@ SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 # Kludge: depends on config.o which only depends on config-*.h to have config.h
 # changes trigger a genlang re-run
 #
-features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/config.o
+$(BUILDDIR)/apps/features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/config.o
 	$(SILENT)mkdir -p $(BUILDDIR)/apps
 	$(SILENT)mkdir -p $(BUILDDIR)/lang
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
                  -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
 		grep -v "^\#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
-		for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
-		echo "$$feat" >$(BUILDDIR)/apps/genlang-features
+
+$(BUILDDIR)/apps/genlang-features:  $(BUILDDIR)/apps/features
+	for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
+	echo "$$feat" >$(BUILDDIR)/apps/genlang-features
 
 ASMDEFS_SRC += $(APPSDIR)/core_asmdefs.c
