@@ -62,6 +62,12 @@ const struct testvector testdata[] =
     { "test-1.2.3.tar.gz",      "program-1.2.3.1.tar.bz2",      1 },
     { "program-1.2.3.zip",      "program-1.2.3a.zip",           1 },
     { "program-1.2.3.tar.bz2",  "2.0.0",                        1 },
+    { "prog-1.2-64bit.tar.bz2", "prog-1.2.3.tar.bz2",           1 },
+    { "prog-1.2-64bit.tar.bz2", "prog-1.2-64bit.tar.bz2",       0 },
+    { "prog-1.2-64bit.tar.bz2", "prog-1.2.3-64bit.tar.bz2",     1 },
+    { "prog-1.2a-64bit.tar.bz2","prog-1.2b-64bit.tar.bz2",      1 },
+    { "prog-1.2-64bit.tar.bz2", "prog-1.2.3a-64bit.tar.bz2",    1 },
+    { "prog-1.2a-64bit.tar.bz2","prog-1.2.3-64bit.tar.bz2",     1 },
 };
 
 
@@ -72,8 +78,9 @@ void TestVersionCompare::testMain()
         QCOMPARE(Utils::compareVersionStrings(testdata[i].first,
                 testdata[i].second), testdata[i].expected);
         // inverse test possible because function return values are symmetrical.
-        QCOMPARE(Utils::compareVersionStrings(testdata[i].second,
-                testdata[i].first), -testdata[i].expected);
+        if(testdata[i].expected != 0)
+            QCOMPARE(Utils::compareVersionStrings(testdata[i].second,
+                    testdata[i].first), -testdata[i].expected);
     }
 }
 
