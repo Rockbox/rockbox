@@ -29,7 +29,8 @@
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
                        :QGraphicsItem(parent), backdrop(0), project(project),
-                       albumArt(0)
+                       albumArt(0), defaultStatusBar(true),
+                       statusBarTexture(":/render/statusbar.png")
 {
 
     if(remote)
@@ -116,6 +117,9 @@ void RBScreen::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     {
         painter->fillRect(0, 0, width, height, bgColor);
     }
+
+    if(defaultStatusBar)
+        painter->fillRect(QRectF(0, 0, width, 8), statusBarTexture);
 }
 
 void RBScreen::loadViewport(QString name, RBViewport *view)

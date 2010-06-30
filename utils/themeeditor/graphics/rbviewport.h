@@ -57,6 +57,8 @@ public:
     void write(QString text);
     void alignText(Alignment align){ textAlign = align; }
 
+    void enableStatusBar(){ showStatusBar = true; }
+
 private:
 
     void alignLeft();
@@ -79,6 +81,9 @@ private:
     QList<QGraphicsItem*> centerText;
     QList<QGraphicsItem*> rightText;
     Alignment textAlign;
+
+    bool showStatusBar;
+    QPixmap statusBarTexture;
 };
 
 #endif // RBVIEWPORT_H

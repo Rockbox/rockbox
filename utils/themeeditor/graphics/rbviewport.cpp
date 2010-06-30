@@ -33,7 +33,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     : QGraphicsItem(info.screen()), font(info.screen()->getFont(0)),
     foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
-    screen(info.screen()), textAlign(Left)
+    screen(info.screen()), textAlign(Left), showStatusBar(false),
+    statusBarTexture(":/render/statusbar.png")
 {
     if(!node->tag)
     {
@@ -140,6 +141,9 @@ void RBViewport::paint(QPainter *painter,
     painter->setPen(customUI ? Qt::blue : Qt::red);
     if(debug)
         painter->drawRect(size);
+
+    if(showStatusBar)
+        painter->fillRect(QRectF(0, 0, size.width(), 8), statusBarTexture);
 }
 
 void RBViewport::newLine()

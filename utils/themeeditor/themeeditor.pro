@@ -72,7 +72,9 @@ OTHER_FILES += README \
     resources/document-save.png \
     resources/document-open.png \
     resources/document-new.png \
-    resources/deviceoptions
+    resources/deviceoptions \
+    resources/render/statusbar.png \
+    resources/render/scenebg.png
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \

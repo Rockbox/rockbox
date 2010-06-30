@@ -83,6 +83,8 @@ public:
         }
     }
 
+    void disableStatusBar(){ defaultStatusBar = false; }
+    void enableStatusBar(){ defaultStatusBar = true; }
 
 private:
     int width;
@@ -101,6 +103,9 @@ private:
     QList<QString> displayedViewports;
 
     RBAlbumArt* albumArt;
+
+    bool defaultStatusBar;
+    QPixmap statusBarTexture;
 
 };
 
