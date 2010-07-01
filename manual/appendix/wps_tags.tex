@@ -373,16 +373,17 @@ that order):
 \item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{./cover.\{jpeg,jpg,bmp\}}
 \item  \fname{./folder.jpg}
-\item  \fname{/.rockbox/albumart/artist-albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{/.rockbox/albumart/albumartist-albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{../albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{../cover.\{jpeg,jpg,bmp\}}
 \end{enumerate}
 
 The following characters will be replaced with an underscore (\_) when looking
-for albumtitle.bmp or artist-albumtitle.bmp: \textbackslash{} / : \textless{}
+for albumtitle.bmp or albumartist-albumtitle.bmp: \textbackslash{} / : \textless{}
 \textgreater{} ? * \textbar{}. Doublequotes will be replaced by single quotes.
-See \wikilink{AlbumArt} in the wiki for programs that will
-help you automate the process of putting album art on your \dap{}.
+If no album artist is set, artist will be used instead. See \wikilink{AlbumArt}
+in the wiki for programs that will help you automate the process of putting
+album art on your \dap{}.
 
 \subsection{How to display the album art}
 
