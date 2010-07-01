@@ -518,7 +518,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
         if(!noBreak)
-            viewport->newLine();
+            viewport->newLine(children.count() > 0 ? false : true);
     }
     else if(element->type == TEXT)
     {

@@ -53,7 +53,7 @@ public:
     void makeCustomUI(){ customUI = true; }
     void clearCustomUI(){ customUI = false; }
 
-    void newLine();
+    void newLine(bool force = false);
     void write(QString text);
     void alignText(Alignment align){ textAlign = align; }
 
