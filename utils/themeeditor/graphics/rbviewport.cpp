@@ -154,20 +154,14 @@ void RBViewport::paint(QPainter *painter,
         painter->fillRect(QRectF(0, 0, size.width(), 8), statusBarTexture);
 }
 
-void RBViewport::newLine(bool force)
+void RBViewport::newLine()
 {
-    if(leftText.count() != 0
-       || centerText.count() != 0
-       || rightText.count() != 0
-       || force)
-    {
-        textOffset.setY(textOffset.y() + lineHeight);
-        textOffset.setX(0);
-        textAlign = Left;
-        leftText.clear();
-        rightText.clear();
-        centerText.clear();
-    }
+    textOffset.setY(textOffset.y() + lineHeight);
+    textOffset.setX(0);
+    textAlign = Left;
+    leftText.clear();
+    rightText.clear();
+    centerText.clear();
 }
 
 void RBViewport::write(QString text)
