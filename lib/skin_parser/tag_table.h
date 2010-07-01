@@ -249,6 +249,8 @@ enum skin_token_type {
  *             f - Nullable file name
  *             C - Required skin code
  *             N - any amount of strings.. must be the last param in the list
+ *             \n - causes the parser to eat everything up to and including the \n
+ *                  MUST be the last character of the prams string
  *          Any nullable parameter may be replaced in the WPS file
  *          with a '-'.  To specify that parameters may be left off
  *          altogether, place a '|' in the parameter string.  For

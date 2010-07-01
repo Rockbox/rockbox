@@ -456,8 +456,18 @@ static int skin_parse_tag(struct skin_element* element, char** document)
         return 1;
     }
 
+    /* Eating a newline if necessary */
+    if(tag_args[0] == '\n')
+    {
+        if(*cursor == '\n')
+            cursor++;
+        *document = cursor;
+        return 1;
+    }
+
     /* Checking the number of arguments and allocating args */
-    if(*cursor != ARGLISTOPENSYM && tag_args[0] != '|')
+    if(*cursor != ARGLISTOPENSYM && tag_args[0] != '|'
+       && tag_args[0] != '\n')
     {
         skin_error(ARGLIST_EXPECTED);
         return 0;
@@ -505,7 +515,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     for(i = 0; i < num_args; i++)
     {
         /* Making sure we haven't run out of arguments */
-        if(*tag_args == '\0')
+        if(*tag_args == '\0' || *tag_args == '\n')
         {
             skin_error(TOO_MANY_ARGS);
             return 0;
@@ -604,11 +614,15 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     /* Checking for a premature end */
-    if(*tag_args != '\0' && !optional)
+    if(*tag_args != '\0' && *tag_args != '\n' && !optional)
     {
         skin_error(INSUFFICIENT_ARGS);
         return 0;
     }
+
+    if(*tag_args == '\n')
+        if(*cursor == '\n')
+            cursor++;
 
     *document = cursor;
 

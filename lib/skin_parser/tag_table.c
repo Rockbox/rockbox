@@ -163,23 +163,23 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_SUBLINE_SCROLL,        "s", "" },
     { SKIN_TOKEN_SUBLINE_TIMEOUT,       "t"  , "S" },
     
-    { SKIN_TOKEN_ENABLE_THEME,          "we", "" },
-    { SKIN_TOKEN_DISABLE_THEME,         "wd", "" },
-    { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "" },
+    { SKIN_TOKEN_ENABLE_THEME,          "we", "\n" },
+    { SKIN_TOKEN_DISABLE_THEME,         "wd", "\n" },
+    { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "\n" },
     
-    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SFII|I" },
+    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SFII|I\n" },
     { SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S" },
-    { SKIN_TOKEN_IMAGE_PRELOAD,         "x", "SFII" },
+    { SKIN_TOKEN_IMAGE_PRELOAD,         "x", "SFII\n" },
     
-    { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF"},
-    { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss"},
+    { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF\n"},
+    { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss\n"},
     { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , ""},
     { SKIN_TOKEN_ALBUMART_FOUND,        "C" , ""},
     
     { SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S"},
     { SKIN_TOKEN_UIVIEWPORT_ENABLE,     "VI" , "S"},
     
-    { SKIN_TOKEN_VIEWPORT_CUSTOMLIST,   "Vp" , "ICC"},
+    { SKIN_TOKEN_VIEWPORT_CUSTOMLIST,   "Vp" , "ICC\n"},
     { SKIN_TOKEN_LIST_TITLE_TEXT,       "Lt" , ""},
     { SKIN_TOKEN_LIST_TITLE_ICON,       "Li" , ""},
     
@@ -190,7 +190,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii"},
     { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii"},
     
-    { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f"},
+    { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f\n"},
     
     { SKIN_TOKEN_SETTING,               "St" , "S"},
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S"},
@@ -198,7 +198,7 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|S"},
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "" },
-    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiS"},
+    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiS\n"},
     
     { SKIN_TOKEN_HAVE_RECORDING,        "Rp"   , ""},
     { SKIN_TOKEN_IS_RECORDING,          "Rr"   , ""},
