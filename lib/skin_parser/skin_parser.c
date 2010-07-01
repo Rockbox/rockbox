@@ -459,7 +459,9 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     /* Eating a newline if necessary */
     if(tag_args[0] == '\n')
     {
-        if(*cursor == '\n')
+        while (*cursor && *cursor != '\n')
+            cursor++;
+        if (*cursor)
             cursor++;
         *document = cursor;
         return 1;
@@ -621,9 +623,13 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     }
 
     if(*tag_args == '\n')
-        if(*cursor == '\n')
+    {
+        while (*cursor && *cursor != '\n')
             cursor++;
-
+        if (*cursor)
+            cursor++;
+    }
+    
     *document = cursor;
 
     return 1;
