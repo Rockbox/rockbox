@@ -86,7 +86,6 @@ void *faad_origbitbuffer(bitfile *ld);
 uint32_t faad_origbitbuffer_size(bitfile *ld);
 #endif
 
-/* circumvent memory alignment errors on ARM */
 static INLINE uint32_t getdword(void *mem)
 {
 #ifndef ARCH_IS_BIG_ENDIAN
