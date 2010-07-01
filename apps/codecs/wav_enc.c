@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 
-#ifndef SIMULATOR
-
 #include <inttypes.h>
 #include "codeclib.h"
 
@@ -393,5 +391,3 @@ enum codec_status codec_main(void)
 
     return CODEC_OK;
 } /* codec_start */
-
-#endif /* ndef SIMULATOR */

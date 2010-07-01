@@ -32,8 +32,6 @@
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Library General Public License for more details.
 
-#ifndef SIMULATOR
-
 #include <inttypes.h>
 #include "codeclib.h"
 
@@ -2637,5 +2635,3 @@ enum codec_status codec_main(void)
 
     return CODEC_OK;
 } /* codec_start */
-
-#endif /* ndef SIMULATOR */

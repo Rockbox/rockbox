@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 
-#ifndef SIMULATOR
-
 #include "codeclib.h"
 #include "libwavpack/wavpack.h"
 
@@ -474,5 +472,3 @@ enum codec_status codec_main(void)
 
     return CODEC_OK;
 } /* codec_start */
-
-#endif /* ndef SIMULATOR */
