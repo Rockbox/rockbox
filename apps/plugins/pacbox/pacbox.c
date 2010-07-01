@@ -281,9 +281,9 @@ static bool pacbox_menu(void)
 static uint32_t sound_buf[NBSAMPLES];
 #if CONFIG_CPU == MCF5249
 /* Not enough to put this in IRAM */
-static int raw_buf[NBSAMPLES];
+static int16_t raw_buf[NBSAMPLES];
 #else
-static int raw_buf[NBSAMPLES] IBSS_ATTR;
+static int16_t raw_buf[NBSAMPLES] IBSS_ATTR;
 #endif
 
 /*
@@ -291,22 +291,23 @@ static int raw_buf[NBSAMPLES] IBSS_ATTR;
  */
 static void get_more(unsigned char **start, size_t *size)
 {
-    int i;
-    int32_t *out;
-    int *raw;
+    int32_t *out, *outend;
+    int16_t *raw;
 
     /* Emulate the audio for the current register settings */
     playSound(raw_buf, NBSAMPLES);
 
     out = sound_buf;
+    outend = out + NBSAMPLES;
     raw = raw_buf;
 
-    /* Normalize the audio and convert to stereo */
-    for (i = 0; i < NBSAMPLES; i++)
+    /* Convert to stereo */
+    do
     {
-        uint32_t sample = (uint16_t)*raw++ << 6;
+        uint32_t sample = (uint16_t)*raw++;
         *out++ = sample | (sample << 16);
     }
+    while (out < outend);
 
     *start = (unsigned char *)sound_buf;
     *size = NBSAMPLES*sizeof(sound_buf[0]); 

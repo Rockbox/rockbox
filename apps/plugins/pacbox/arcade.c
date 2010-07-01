@@ -640,10 +640,10 @@ void renderSprites( unsigned char * buffer )
     }
 }
 
-void playSound( int * buf, int len )
+void playSound( int16_t * buf, int len )
 {
     /* Clear the buffer */
-    memset( buf, 0, sizeof (int)*len);
+    memset( buf, 0, sizeof (int16_t)*len);
 
     /* Exit now if sound is disabled */
     if( (output_devices_ & SoundEnabled) == 0 )

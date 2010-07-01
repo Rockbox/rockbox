@@ -65,7 +65,7 @@ static bool wsg3_get_voice(struct wsg3_voice *voice, int index)
     return true;
 }
 
-void wsg3_play_sound(int * buf, int len)
+void wsg3_play_sound(int16_t * buf, int len)
 {
     struct wsg3_voice voice;
 
@@ -73,7 +73,7 @@ void wsg3_play_sound(int * buf, int len)
     {
         unsigned offset = wsg3.wave_offset[0];
         unsigned step = voice.frequency * wsg3.resample_step;
-        int * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
+        int16_t * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
         int volume = voice.volume;
         int i;
 
@@ -81,7 +81,7 @@ void wsg3_play_sound(int * buf, int len)
         {
             /* Should be shifted right by 15, but we must also get rid
              * of the 10 bits used for decimals */
-            buf[i] += wave_data[(offset >> 25) & 0x1F] * volume;
+            buf[i] = (int)wave_data[(offset >> 25) & 0x1F] * volume;
             offset += step;
         }
 
@@ -92,7 +92,7 @@ void wsg3_play_sound(int * buf, int len)
     {
         unsigned offset = wsg3.wave_offset[1];
         unsigned step = voice.frequency * wsg3.resample_step;
-        int * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
+        int16_t * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
         int volume = voice.volume;
         int i;
 
@@ -100,7 +100,7 @@ void wsg3_play_sound(int * buf, int len)
         {
             /* Should be shifted right by 15, but we must also get rid
              * of the 10 bits used for decimals */
-            buf[i] += wave_data[(offset >> 25) & 0x1F] * volume;
+            buf[i] += (int)wave_data[(offset >> 25) & 0x1F] * volume;
             offset += step;
         }
 
@@ -111,7 +111,7 @@ void wsg3_play_sound(int * buf, int len)
     {
         unsigned offset = wsg3.wave_offset[2];
         unsigned step = voice.frequency * wsg3.resample_step;
-        int * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
+        int16_t * wave_data = wsg3.sound_wave_data + 32 * voice.waveform;
         int volume = voice.volume;
         int i;
 
@@ -119,7 +119,7 @@ void wsg3_play_sound(int * buf, int len)
         {
             /* Should be shifted right by 15, but we must also get rid
              * of the 10 bits used for decimals */
-            buf[i] += wave_data[(offset >> 25) & 0x1F] * volume;
+            buf[i] += (int)wave_data[(offset >> 25) & 0x1F] * volume;
             offset += step;
         }
 
@@ -137,8 +137,12 @@ void wsg3_set_sound_prom( const unsigned char * prom )
 {
     int i;
 
+    memcpy(wsg3.sound_prom, prom, 32*8);
+
+    /* Copy wave data and convert 4-bit unsigned -> 16-bit signed,
+     * prenormalized */
     for (i = 0; i < 32*8; i++)
-        wsg3.sound_wave_data[i] = (int)*prom++ - 8;
+        wsg3.sound_wave_data[i] = ((int16_t)wsg3.sound_prom[i] - 8) * 85;
 }
 
 void wsg3_init(unsigned master_clock)

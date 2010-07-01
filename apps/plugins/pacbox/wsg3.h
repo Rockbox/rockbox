@@ -56,7 +56,7 @@ struct wsg3
     unsigned char sound_prom[32*8];
     unsigned resample_step;
     unsigned wave_offset[3];
-    int sound_wave_data[32*8];
+    int16_t sound_wave_data[32*8]; /* sign-extended 4-bit, prenormalized */
 };
 
 extern struct wsg3 wsg3;
@@ -106,7 +106,7 @@ static inline unsigned char wsg3_get_register(unsigned reg)
     @param buf pointer to sound buffer that receives the audio samples
     @param len length of the sound buffer
 */
-void wsg3_play_sound(int * buf, int len);
+void wsg3_play_sound(int16_t * buf, int len);
 
 /**
     Returns the sampling rate currently in use for rendering sound.

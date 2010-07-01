@@ -123,7 +123,7 @@ void init_PacmanMachine(int dip);
 int run(void);
 void reset_PacmanMachine(void);
 void decodeROMs(void);
-void playSound( int * buf, int len );
+void playSound( int16_t * buf, int len );
 
 
 /**
