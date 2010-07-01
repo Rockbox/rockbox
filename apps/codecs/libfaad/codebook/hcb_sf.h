@@ -28,7 +28,7 @@
 /* Binary search huffman table HCB_SF */
 
 
-static uint8_t hcb_sf[][2] = {
+static uint8_t hcb_sf[][2] ICONST_ATTR_FAAD_LARGE_IRAM = {
     { /*  0 */  1, 2 },
     { /*  1 */  60, 0 },
     { /*  2 */  1, 2 },

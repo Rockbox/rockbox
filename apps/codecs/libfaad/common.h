@@ -51,6 +51,25 @@ extern struct codec_api* ci;
 #define LOGF(...)
 #endif
 
+#if   (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
+/* Enough IRAM but performance suffers with ICODE_ATTR. */
+#define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
+#define ICODE_ATTR_FAAD_LARGE_IRAM
+#define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
+
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+/* Enough IRAM to move additional data and code to it. */
+#define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
+#define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
+#define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
+
+#else
+/* Not enough IRAM available. */
+#define IBSS_ATTR_FAAD_LARGE_IRAM
+#define ICODE_ATTR_FAAD_LARGE_IRAM
+#define ICONST_ATTR_FAAD_LARGE_IRAM
+#endif
+
 #define INLINE __inline
 #if 0 //defined(_WIN32) && !defined(_WIN32_WCE)
 #define ALIGN __declspec(align(16))
@@ -71,7 +90,7 @@ extern struct codec_api* ci;
 /* #define USE_DOUBLE_PRECISION */
 /* use fixed point reals */
 #define FIXED_POINT
-//#define BIG_IQ_TABLE
+#define BIG_IQ_TABLE /* BIG_IQ_TABLE results in faster requantization */
 
 /* Use if target platform has address generators with autoincrement */
 //#define PREFER_POINTERS

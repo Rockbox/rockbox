@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 int8_t huffman_scale_factor(bitfile *ld);
-uint8_t huffman_spectral_data(uint8_t cb, bitfile *ld, int16_t *sp);
+uint8_t huffman_spectral_data(uint8_t cb, bitfile *ld, int16_t *sp) ICODE_ATTR_FAAD_LARGE_IRAM;
 #ifdef ERROR_RESILIENCE
 int8_t huffman_spectral_data_2(uint8_t cb, bits_t *ld, int16_t *sp);
 #endif

@@ -39,17 +39,18 @@
 
 
 /* static function declarations */
-static INLINE void huffman_sign_bits(bitfile *ld, int16_t *sp, uint8_t len);
+static INLINE void huffman_sign_bits_pair(bitfile *ld, int16_t *sp);
+static INLINE void huffman_sign_bits_quad(bitfile *ld, int16_t *sp);
 static INLINE int16_t huffman_getescape(bitfile *ld, int16_t sp);
 static uint8_t huffman_2step_quad(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_2step_quad_sign(uint8_t cb, bitfile *ld, int16_t *sp);
-static uint8_t huffman_2step_pair(uint8_t cb, bitfile *ld, int16_t *sp);
-static uint8_t huffman_2step_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp);
+static INLINE uint8_t huffman_2step_pair(uint8_t cb, bitfile *ld, int16_t *sp);
+static INLINE uint8_t huffman_2step_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_quad(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_quad_sign(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_pair(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp);
-static int16_t huffman_codebook(uint8_t i);
+static int16_t huffman_codebook(uint8_t i) ICODE_ATTR_FAAD_LARGE_IRAM;
 #ifdef ERROR_RESILIENCE
 static void vcb11_check_LAV(uint8_t cb, int16_t *sp);
 #endif
@@ -75,49 +76,51 @@ int8_t huffman_scale_factor(bitfile *ld)
 }
 
 
-hcb *hcb_table[] = {
+hcb *hcb_table[] ICONST_ATTR = {
     0, hcb1_1, hcb2_1, 0, hcb4_1, 0, hcb6_1, 0, hcb8_1, 0, hcb10_1, hcb11_1
 };
 
-hcb_2_quad *hcb_2_quad_table[] = {
+hcb_2_quad *hcb_2_quad_table[] ICONST_ATTR = {
     0, hcb1_2, hcb2_2, 0, hcb4_2, 0, 0, 0, 0, 0, 0, 0
 };
 
-hcb_2_pair *hcb_2_pair_table[] = {
+hcb_2_pair *hcb_2_pair_table[] ICONST_ATTR = {
     0, 0, 0, 0, 0, 0, hcb6_2, 0, hcb8_2, 0, hcb10_2, hcb11_2
 };
 
-hcb_bin_pair *hcb_bin_table[] = {
+hcb_bin_pair *hcb_bin_table[] ICONST_ATTR = {
     0, 0, 0, 0, 0, hcb5, 0, hcb7, 0, hcb9, 0, 0
 };
 
-uint8_t hcbN[] = { 0, 5, 5, 0, 5, 0, 5, 0, 5, 0, 6, 5 };
+uint8_t hcbN[] ICONST_ATTR = { 0, 5, 5, 0, 5, 0, 5, 0, 5, 0, 6, 5 };
 
 /* defines whether a huffman codebook is unsigned or not */
 /* Table 4.6.2 */
-uint8_t unsigned_cb[] = { 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-  /* codebook 16 to 31 */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+uint8_t unsigned_cb[] ICONST_ATTR = { 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+              /* codebook 16 to 31 */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
-int hcb_2_quad_table_size[] = { 0, 114, 86, 0, 185, 0, 0, 0, 0, 0, 0, 0 };
-int hcb_2_pair_table_size[] = { 0, 0, 0, 0, 0, 0, 126, 0, 83, 0, 210, 373 };
-int hcb_bin_table_size[] = { 0, 0, 0, 161, 0, 161, 0, 127, 0, 337, 0, 0 };
+int hcb_2_quad_table_size[] ICONST_ATTR = { 0, 114, 86, 0, 185, 0, 0, 0, 0, 0, 0, 0 };
+int hcb_2_pair_table_size[] ICONST_ATTR = { 0, 0, 0, 0, 0, 0, 126, 0, 83, 0, 210, 373 };
+int hcb_bin_table_size[] ICONST_ATTR = { 0, 0, 0, 161, 0, 161, 0, 127, 0, 337, 0, 0 };
 
-static INLINE void huffman_sign_bits(bitfile *ld, int16_t *sp, uint8_t len)
+#define FAAD_GET_SIGN(idx)          \
+        if (sp[idx])                \
+            if (faad_get1bit(ld)&1) \
+                sp[idx] = -sp[idx]; \
+
+static INLINE void huffman_sign_bits_pair(bitfile *ld, int16_t *sp)
 {
-    uint8_t i;
+    FAAD_GET_SIGN(0)
+    FAAD_GET_SIGN(1)
+}
 
-    for (i = 0; i < len; i++)
-    {
-        if(sp[i])
-        {
-            if(faad_get1bit(ld
-                DEBUGVAR(1,5,"huffman_sign_bits(): sign bit")) & 1)
-            {
-                sp[i] = -sp[i];
-            }
-        }
-    }
+static INLINE void huffman_sign_bits_quad(bitfile *ld, int16_t *sp)
+{
+    FAAD_GET_SIGN(0)
+    FAAD_GET_SIGN(1)
+    FAAD_GET_SIGN(2)
+    FAAD_GET_SIGN(3)
 }
 
 static INLINE int16_t huffman_getescape(bitfile *ld, int16_t sp)
@@ -194,12 +197,12 @@ static uint8_t huffman_2step_quad(uint8_t cb, bitfile *ld, int16_t *sp)
 static uint8_t huffman_2step_quad_sign(uint8_t cb, bitfile *ld, int16_t *sp)
 {
     uint8_t err = huffman_2step_quad(cb, ld, sp);
-    huffman_sign_bits(ld, sp, QUAD_LEN);
+    huffman_sign_bits_quad(ld, sp);
 
     return err;
 }
 
-static uint8_t huffman_2step_pair(uint8_t cb, bitfile *ld, int16_t *sp)
+static INLINE uint8_t huffman_2step_pair(uint8_t cb, bitfile *ld, int16_t *sp)
 {
     uint32_t cw;
     uint16_t offset = 0;
@@ -232,10 +235,10 @@ static uint8_t huffman_2step_pair(uint8_t cb, bitfile *ld, int16_t *sp)
     return 0;
 }
 
-static uint8_t huffman_2step_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp)
+static INLINE uint8_t huffman_2step_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp)
 {
     uint8_t err = huffman_2step_pair(cb, ld, sp);
-    huffman_sign_bits(ld, sp, PAIR_LEN);
+    huffman_sign_bits_pair(ld, sp);
 
     return err;
 }
@@ -269,7 +272,7 @@ static uint8_t huffman_binary_quad(uint8_t cb, bitfile *ld, int16_t *sp)
 static uint8_t huffman_binary_quad_sign(uint8_t cb, bitfile *ld, int16_t *sp)
 {
     uint8_t err = huffman_binary_quad(cb, ld, sp);
-    huffman_sign_bits(ld, sp, QUAD_LEN);
+    huffman_sign_bits_quad(ld, sp);
 
     return err;
 }
@@ -301,7 +304,7 @@ static uint8_t huffman_binary_pair(uint8_t cb, bitfile *ld, int16_t *sp)
 static uint8_t huffman_binary_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp)
 {
     uint8_t err = huffman_binary_pair(cb, ld, sp);
-    huffman_sign_bits(ld, sp, PAIR_LEN);
+    huffman_sign_bits_pair(ld, sp);
 
     return err;
 }

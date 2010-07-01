@@ -27,6 +27,11 @@
 
 CODEC_HEADER
 
+/* Global buffers to be used in the mdct synthesis. This way the arrays can
+ * be moved to IRAM for some targets */
+ALIGN real_t gb_time_buffer[2][1024] IBSS_ATTR_FAAD_LARGE_IRAM;
+ALIGN real_t gb_fb_intermed[2][1024] IBSS_ATTR_FAAD_LARGE_IRAM;
+
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
@@ -105,7 +110,14 @@ next_track:
         err = CODEC_ERROR;
         goto done;
     }
-
+    
+    /* Set pointer to be able to use IRAM an to avoid alloc in decoder. Must
+     * be called after NeAACDecOpen(). */
+    decoder->time_out[0]    = &gb_time_buffer[0][0];
+    decoder->time_out[1]    = &gb_time_buffer[1][0];
+    decoder->fb_intermed[0] = &gb_fb_intermed[0][0];
+    decoder->fb_intermed[1] = &gb_fb_intermed[1][0];
+    
     ci->id3->frequency = s;
 
     i = 0;

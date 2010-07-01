@@ -33,7 +33,7 @@
  *
  * Used to find offset into 2nd step table and number of extra bits to get
  */
-static hcb hcb4_1[] = {
+static hcb hcb4_1[] ICONST_ATTR_FAAD_LARGE_IRAM = {
     /* 4 bit codewords */
     { /* 00000 */ 0, 0 },
     { /*       */ 0, 0 },
@@ -85,7 +85,7 @@ static hcb hcb4_1[] = {
  *
  * Gives size of codeword and actual data (x,y,v,w)
  */
-static hcb_2_quad hcb4_2[] = {
+static hcb_2_quad hcb4_2[] ICONST_ATTR_FAAD_LARGE_IRAM = {
     /* 4 bit codewords */
     { 4,  1,  1,  1,  1 },
     { 4,  0,  1,  1,  1 },

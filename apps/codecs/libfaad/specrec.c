@@ -414,19 +414,18 @@ uint8_t window_grouping_info(NeAACDecHandle hDecoder, ic_stream *ics)
 /**/
 static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
 {
-#ifdef FIXED_POINT
+#ifndef BIG_IQ_TABLE
 /* For FIXED_POINT the iq_table is prescaled by 3 bits (iq_table[]/8) */
 /* BIG_IQ_TABLE allows you to use the full 8192 value table, if this is not
  * defined a 1026 value table and interpolation will be used
  */
-#ifndef BIG_IQ_TABLE
     static const real_t errcorr[] = {
         REAL_CONST(0), REAL_CONST(1.0/8.0), REAL_CONST(2.0/8.0), REAL_CONST(3.0/8.0),
         REAL_CONST(4.0/8.0),  REAL_CONST(5.0/8.0), REAL_CONST(6.0/8.0), REAL_CONST(7.0/8.0),
         REAL_CONST(0)
     };
     real_t x1, x2;
-#endif
+
     int16_t sgn = 1;
 
     if (q < 0)
@@ -445,7 +444,6 @@ static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
         return sgn * tab[q];
     }
 
-#ifndef BIG_IQ_TABLE
     if (q >= 8192)
     {
         *error = 17;
@@ -456,12 +454,7 @@ static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
     x1 = tab[q>>3];
     x2 = tab[(q>>3) + 1];
     return sgn * 16 * (MUL_R(errcorr[q&7],(x2-x1)) + x1);
-#else
-    *error = 17;
-    return 0;
-#endif
-
-#else
+#else /* #ifndef BIG_IQ_TABLE */
     if (q < 0)
     {
         /* tab contains a value for all possible q [0,8192] */
@@ -547,9 +540,7 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
     uint8_t g, sfb, win;
     uint16_t width, bin, k, gindex, wa, wb;
     uint8_t error = 0; /* Init error flag */
-#ifndef FIXED_POINT
     real_t scf;
-#endif
 
     k = 0;
     gindex = 0;
@@ -597,6 +588,8 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
 
 #ifndef FIXED_POINT
             scf = pow2sf_tab[exp/*+25*/] * pow2_table[frac];
+#else
+            scf = pow2_table[frac];
 #endif
 
             for (win = 0; win < ics->window_group_length[g]; win++)
@@ -612,32 +605,12 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
                     spec_data[wb+3] = iquant(quant_data[k+3], tab, &error) * scf;
                         
 #else
-                    real_t iq0 = iquant(quant_data[k+0], tab, &error);
-                    real_t iq1 = iquant(quant_data[k+1], tab, &error);
-                    real_t iq2 = iquant(quant_data[k+2], tab, &error);
-                    real_t iq3 = iquant(quant_data[k+3], tab, &error);
-
                     wb = wa + bin;
-
-                    if (exp < 0)
-                    {
-                        spec_data[wb+0] = iq0 >>= -exp;
-                        spec_data[wb+1] = iq1 >>= -exp;
-                        spec_data[wb+2] = iq2 >>= -exp;
-                        spec_data[wb+3] = iq3 >>= -exp;
-                    } else {
-                        spec_data[wb+0] = iq0 <<= exp;
-                        spec_data[wb+1] = iq1 <<= exp;
-                        spec_data[wb+2] = iq2 <<= exp;
-                        spec_data[wb+3] = iq3 <<= exp;
-                    }
-                    if (frac != 0)
-                    {
-                        spec_data[wb+0] = MUL_C(spec_data[wb+0],pow2_table[frac]);
-                        spec_data[wb+1] = MUL_C(spec_data[wb+1],pow2_table[frac]);
-                        spec_data[wb+2] = MUL_C(spec_data[wb+2],pow2_table[frac]);
-                        spec_data[wb+3] = MUL_C(spec_data[wb+3],pow2_table[frac]);
-                    }
+                 
+                    spec_data[wb+0] = MUL_C((iquant(quant_data[k+0], tab, &error)<<exp), scf);
+                    spec_data[wb+1] = MUL_C((iquant(quant_data[k+1], tab, &error)<<exp), scf);
+                    spec_data[wb+2] = MUL_C((iquant(quant_data[k+2], tab, &error)<<exp), scf);
+                    spec_data[wb+3] = MUL_C((iquant(quant_data[k+3], tab, &error)<<exp), scf);
 
 //#define SCFS_PRINT
 #ifdef SCFS_PRINT
@@ -855,11 +828,14 @@ static uint8_t allocate_channel_pair(NeAACDecHandle hDecoder,
     return 0;
 }
 
+/* used by reconstruct_single_channel() and reconstruct_channel_pair() */
+ALIGN static real_t spec_coef1[1024] IBSS_ATTR;
+ALIGN static real_t spec_coef2[1024] IBSS_ATTR;
+
 uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
                                    element *sce, int16_t *spec_data)
 {
     uint8_t retval, output_channels;
-    ALIGN static real_t spec_coef[1024];
 
 #ifdef PROFILE
     int64_t count = faad_get_ts();
@@ -893,7 +869,7 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
 
 
     /* dequantisation and scaling */
-    retval = quant_to_spec(hDecoder, ics, spec_data, spec_coef, hDecoder->frameLength);
+    retval = quant_to_spec(hDecoder, ics, spec_data, spec_coef1, hDecoder->frameLength);
     if (retval > 0)
         return retval;
 
@@ -904,14 +880,14 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
 
 
     /* pns decoding */
-    pns_decode(ics, NULL, spec_coef, NULL, hDecoder->frameLength, 0, hDecoder->object_type);
+    pns_decode(ics, NULL, spec_coef1, NULL, hDecoder->frameLength, 0, hDecoder->object_type);
 
 #ifdef MAIN_DEC
     /* MAIN object type prediction */
     if (hDecoder->object_type == MAIN)
     {
         /* intra channel prediction */
-        ic_prediction(ics, spec_coef, hDecoder->pred_stat[sce->channel], hDecoder->frameLength,
+        ic_prediction(ics, spec_coef1, hDecoder->pred_stat[sce->channel], hDecoder->frameLength,
             hDecoder->sf_index);
 
         /* In addition, for scalefactor bands coded by perceptual
@@ -938,7 +914,7 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
 #endif
 
         /* long term prediction */
-        lt_prediction(ics, &(ics->ltp), spec_coef, hDecoder->lt_pred_stat[sce->channel], hDecoder->fb,
+        lt_prediction(ics, &(ics->ltp), spec_coef1, hDecoder->lt_pred_stat[sce->channel], hDecoder->fb,
             ics->window_shape, hDecoder->window_shape_prev[sce->channel],
             hDecoder->sf_index, hDecoder->object_type, hDecoder->frameLength);
     }
@@ -946,13 +922,13 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
 
     /* tns decoding */
     tns_decode_frame(ics, &(ics->tns), hDecoder->sf_index, hDecoder->object_type,
-        spec_coef, hDecoder->frameLength);
+        spec_coef1, hDecoder->frameLength);
 
     /* drc decoding */
     if (hDecoder->drc->present)
     {
         if (!hDecoder->drc->exclude_mask[sce->channel] || !hDecoder->drc->excluded_chns_present)
-            drc_decode(hDecoder->drc, spec_coef);
+            drc_decode(hDecoder->drc, spec_coef1);
     }
 
     /* filter bank */
@@ -961,13 +937,13 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
     {
 #endif
         ifilter_bank(ics->window_sequence,ics->window_shape,
-            hDecoder->window_shape_prev[sce->channel],spec_coef,
+            hDecoder->window_shape_prev[sce->channel],spec_coef1,
             hDecoder->time_out[sce->channel], hDecoder->fb_intermed[sce->channel],
             hDecoder->object_type, hDecoder->frameLength);
 #ifdef SSR_DEC
     } else {
         ssr_decode(&(ics->ssr), hDecoder->fb, ics->window_sequence, ics->window_shape,
-            hDecoder->window_shape_prev[sce->channel], spec_coef, hDecoder->time_out[sce->channel],
+            hDecoder->window_shape_prev[sce->channel], spec_coef1, hDecoder->time_out[sce->channel],
             hDecoder->ssr_overlap[sce->channel], hDecoder->ipqf_buffer[sce->channel], hDecoder->prev_fmd[sce->channel],
             hDecoder->frameLength);
     }
@@ -1051,8 +1027,6 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
                                  element *cpe, int16_t *spec_data1, int16_t *spec_data2)
 {
     uint8_t retval;
-    ALIGN static real_t spec_coef1[1024] IBSS_ATTR;
-    ALIGN static real_t spec_coef2[1024] IBSS_ATTR;
 
 #ifdef PROFILE
     int64_t count = faad_get_ts();

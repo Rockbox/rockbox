@@ -33,9 +33,10 @@
 #include "bits.h"
 
 /* Need to be large enough to fit the largest compressed sample in a file.
- * Samples a little larger than 1 KB observed in a 256 kbps file.
+ * Samples were observed to need up to 1500 bytes (400 kbps nero aac).
  */
-uint8_t static_buffer[2048];
+#define BUFFER_SIZE 2048
+uint8_t static_buffer[BUFFER_SIZE] IBSS_ATTR;
 
 /* initialize buffer, call once before first getbits or showbits */
 void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
@@ -47,7 +48,7 @@ void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
 
     memset(ld, 0, sizeof(bitfile));
 
-    if (buffer_size == 0 || _buffer == NULL)
+    if (buffer_size == 0 || _buffer == NULL || (buffer_size+12)>BUFFER_SIZE)
     {
         ld->error = 1;
         ld->no_more_reading = 1;

@@ -28,7 +28,7 @@
 /* Binary search huffman table HCB_7 */
 
 
-static hcb_bin_pair hcb7[] = {
+static hcb_bin_pair hcb7[] ICONST_ATTR_FAAD_LARGE_IRAM = {
     { /*  0 */ 0, { 1, 2 } },
     { /*  1 */ 1, { 0, 0 } },
     { /*  2 */ 0, { 1, 2 } },
