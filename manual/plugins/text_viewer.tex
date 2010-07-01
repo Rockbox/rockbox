@@ -204,67 +204,89 @@ by using \emph{Open with} from the \emph{Context Menu}
             \item[Reflow Lines] Justify the text.
             }
         \end{description}
-    \item[Wide View] Set the viewmode.
-        \begin{description}
-            \item[No (Narrow)] Set the maximum column width to the screen width.
-            \item[Yes] Set the maximum column width to 114 pixels.
-            (Currently, \setting{Wide} and \setting{Join} cannot be selected together.)
-        \end{description}
-    \opt{lcd_bitmap}{
+    \item[Screens Per Page] Set numbers of screens per page. Available options are \setting{1} to
+      \setting{5} screens per page.
     \item[Alignment] Set the text alignment.
         \begin{description}
             \item[Right] Set the text alignment to the right.
             (Useful for displaying right-to-left languages, such as Arabic or Hebrew)
             \item[Left] Set the text alignment to the left.
         \end{description}
-    \item[Show Scrollbar] Toggle the scrollbar for the current mode. If the
-    file fits on one screen, there is no scrollbar and toggling this setting
-    has no effect.
-        \begin{description}
-            \item[Off] Turn the scrollbar off.
-            \item[On] Turn the scrollbar on.
-        \end{description}
-    \item[Overlap Pages] Set whether the last line from the previous screen is
-          retained when scrolling pages.
-        \begin{description}
-            \item[No] Set page{}-down/page{}-up to one full screen.
-            \item[Yes] Set page{}-down/page{}-up to retain one line from the
-            previous screen.
-        \end{description}
-    }
     \opt{lcd_bitmap}{
-    \item[Show Header] Select whether to show the status bar and the current file path.
+    \item[Show Header] Select whether to show the header. The header displays the file path. 
         \begin{description}
-            \item[None] Do not display the status bar or the current file path.
-            \item[File Path] Display only the current file path.
-            \item[Status bar] Display only the status bar.
-            \item[Both] Display both the status bar and the current file path.
+            \item[No] Do not display the header.
+            \item[Yes] Display the header.
         \end{description}
-        \note{If the status bar position is not set to the top of the screen then
-          \setting{Status bar} and \setting{Both} are not available.}
-
-    \item[Show Footer] Select whether to show the status bar and the page number.
+    \item[Show Footer] Select whether to show the footer. The footer dispays the page number.
         \begin{description}
-            \item[None] Do not display the status bar or the page number.
-            \item[Page Num] Display only the page number.
-            \item[Status bar] Display only the status bar.
-            \item[Both] Display both the status bar and the page number.
+            \item[No] Do not display the footer.
+            \item[Yes] Display the footer.
         \end{description}
-        \note{If the status bar position is not set to the bottom of the screen then
-          \setting{Status bar} and \setting{Both} are not available.}
 
     \item[Font] Select the font to be used by the Text Viewer.
-    }
-    \item[Scroll Mode] Change the function of the ``Scroll-up'' and
-    ``Scroll-down'' buttons.
+    \item[Show Statusbar] Select whether to show the status bar. when you select the theme settings that the status bar does not display (see \reference{ref:configure_rockbox_themes}), the status bar is not displayed even if you select \setting{Yes}.
         \begin{description}
-            \item[Scroll by Page]
-            \item[Scroll by Line]
+            \item[No] Do not display the status bar.
+            \item[Yes] Display the status bar.
         \end{description}
-    \item[Auto-scroll Speed] Control the speed of auto-scrolling in number
-      of lines per second.  Available options are \setting{1} to
-      \setting{10} lines per second. As an example,
-      \setting{4} will scroll the text at four lines per second.
+    }
+    \item[Scroll Settings] The submenu of the scrolling.
+        \begin{description}
+            \item[Horizontal] The submenu of the horizontal scrolling.
+                \begin{description}
+                    \item[Scrollbar] Toggle the horizontal scrollbar for the current mode. 
+                    If the file fits on one screen, there is no scrollbar and toggling 
+                    this setting has no efect.
+                        \begin{description}
+                            \item[No] Do not display the horizontal scroll bar.
+                            \item[Yes] Display the horizontal scroll bar.
+                        \end{description}
+                    \item[Scroll Mode] Change the function of the ``Left'' and
+    ``Right'' buttons.
+                        \begin{description}
+                            \item[Scroll by Screen] Set to move the next screen or the previous screen.
+                            \item[Scroll by Column] Set to move to the next column or the previous column.
+                        \end{description}
+                \end{description}
+            \item[Vertical] The submenu of the vertical scrolling.
+                \begin{description}
+                    \item[Scrollbar] Toggle the vertical scrollbar for the current mode. 
+                    If the file fits on one screen, there is no scrollbar and toggling 
+                    this setting has no efect.
+                        \begin{description}
+                            \item[No] Do not display the vertical scroll bar.
+                            \item[Yes] Display the vertical scroll bar.
+                        \end{description}
+                    \item[Scroll Mode] Change the function of the ``Scroll-up'' and
+    ``Scroll-down'' buttons.
+                        \begin{description}
+                            \item[Scroll by Page] Set page{}-down/page{}-up to one full screen.
+                            \item[Scroll by Line] Set line{}-down/line{}-up.
+                        \end{description}
+                    \opt{lcd_bitmap}{
+                    \item[Overlap Pages] Set whether the last line from the previous screen is
+                    retained when scrolling pages.
+                        \begin{description}
+                           \item[No] Set page{}-down/page{}-up to one full screen.
+                           \item[Yes] Set page{}-down/page{}-up to retain one line from 
+                           the previous screen.
+                        \end{description}
+                    }
+                    \item[Auto-scroll Speed] Control the speed of auto-scrolling in number
+                    of lines per second.  Available options are \setting{1} to
+                    \setting{10} lines per second. As an example,
+                    \setting{4} will scroll the text at four lines per second.
+                    \item[Left/Right Key (Narrow mode)] Change the function of the ``Left'' and
+    ``Right'' buttons when the screen is a narrow mode (i.e., one screen per page).
+                    \begin{description}
+                        \item[Previous/Next Page] Set page{}-down/page{}-up to one full screen.
+                        \item[Top/Bottom Page] Move to the top page or the bottom page.
+                    \end{description}
+                \end{description}
+        \end{description}
+    \item[Indent Spaces] Set the number of space of text indent when the line mode is \setting{Reflow Lines}. Available options are \setting{0} to
+      \setting{5} spaces. If you select \setting{0}, the blank line is displayed as an indent.
     \end{description}
 
 \item[Show Playback Menu] Display the playback menu to allow control of the
