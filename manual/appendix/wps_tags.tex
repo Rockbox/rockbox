@@ -190,23 +190,13 @@ or \config{\%D(2)}), produce the information for the next file to be played.
   \end{tagmap}
 }
 
-% this will not include the "remote hold switch" tag for targets lacking 
-% a main unit hold switch
-\opt{hold_button}{
-  \opt{remote_button_hold}{
-    \section{Hold Switches}
-      \begin{tagmap}
-        \config{\%mh} & ``h'' if the main unit hold switch is on\\
-        \config{\%mr} & ``r'' if the remote hold switch is on\\
-      \end{tagmap}
-  }
-  \nopt{remote_button_hold}{
-    \section{Hold Switch}
-      \begin{tagmap}
-        \config{\%mh} & ``h'' if the hold switch is on\\
-      \end{tagmap}
-  }
-}
+\section{Hold}
+    \begin{tagmap}
+        \config{\%mh} & ``h'' if the main unit keys are locked\\
+        \opt{remote_button_hold}{%
+            \config{\%mr} & ``r'' if the remote keys are locked\\
+        }
+    \end{tagmap}
 
 \section{Virtual LED}
   \begin{tagmap}
