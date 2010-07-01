@@ -532,7 +532,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     else if(element->type == CONDITIONAL)
     {
         int child = evalTag(info, true, element->children_count).toInt();
-        children[child]->render(info, viewport, true);
+        children[element->params_count + child]->render(info, viewport, true);
     }
     else if(element->type == SUBLINES)
     {
@@ -796,6 +796,10 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
                                 int branches)
 {
+    if(strcmp(element->tag->name, "mv") == 0)
+    {
+        int x = 5;
+    }
     if(!conditional)
     {
         return info.device()->data(QString(element->tag->name));
