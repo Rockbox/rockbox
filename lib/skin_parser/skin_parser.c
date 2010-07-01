@@ -463,6 +463,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             cursor++;
         if (*cursor)
             cursor++;
+        skin_line++;
         *document = cursor;
         return 1;
     }
@@ -628,6 +629,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             cursor++;
         if (*cursor)
             cursor++;
+        skin_line++;
     }
     
     *document = cursor;

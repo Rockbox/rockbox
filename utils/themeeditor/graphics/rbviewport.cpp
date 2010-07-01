@@ -183,6 +183,68 @@ void RBViewport::write(QString text)
     }
 }
 
+void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
+                              skin_element *id3, skin_element *noId3)
+{
+    /* Determining whether ID3 info is available */
+    skin_element* root = info.device()->data("id3available").toBool()
+                         ? id3 : noId3;
+
+    /* The line will be a linked list */
+    root = root->children[0];
+
+    int song = start + info.device()->data("pp").toInt();
+    int numSongs = info.device()->data("pe").toInt();
+
+    while(song <= numSongs && textOffset.y() + lineHeight < size.height())
+    {
+        skin_element* current = root;
+        while(current)
+        {
+
+            if(current->type == TEXT)
+            {
+                write(QString((char*)current->data));
+            }
+
+            if(current->type == TAG)
+            {
+                QString tag(current->tag->name);
+                if(tag == "pp")
+                {
+                    write(QString::number(song));
+                }
+                else if(tag == "pt")
+                {
+                    write(QObject::tr("00:00"));
+                }
+                else if(tag[0] == 'i' || tag[0] == 'f')
+                {
+                    if(song == info.device()->data("pp").toInt())
+                    {
+                        write(info.device()->data(tag).toString());
+                    }
+                    else
+                    {
+                        /* If we're not on the current track, use the next
+                         * track info
+                         */
+                        if(tag[0] == 'i')
+                            tag = QString("I") + tag.right(1);
+                        else
+                            tag = QString("F") + tag.right(1);
+                        write(info.device()->data(tag).toString());
+                    }
+                }
+            }
+
+            current = current->next;
+        }
+        newLine();
+        song++;
+    }
+}
+
 void RBViewport::alignLeft()
 {
     int y = textOffset.y();
