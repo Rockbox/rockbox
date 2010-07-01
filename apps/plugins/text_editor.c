@@ -21,19 +21,16 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-#if PLUGIN_BUFFER_SIZE > 0x45000
-#define MAX_CHARS   0x40000 /* 256 kiB */
-#else
-#define MAX_CHARS   0x6000  /* 24 kiB */
-#endif
 #define MAX_LINE_LEN 2048
 PLUGIN_HEADER
 
-static char buffer[MAX_CHARS];
-static int char_count = 0;
+static unsigned char *buffer;
+static size_t buffer_size;
+static size_t char_count = 0;
 static int line_count = 0;
 static int last_action_line = 0;
 static int last_char_index = 0;
+static bool audio_buf = false;
 
 #define ACTION_INSERT 0
 #define ACTION_GET    1
@@ -73,7 +70,7 @@ char* _do_action(int action, char* str, int line)
     {
         case ACTION_INSERT:
             len = rb->strlen(str)+1;
-            if ( char_count+ len > MAX_CHARS )
+            if ( char_count+ len > buffer_size )
                 return NULL;
             rb->memmove(&buffer[c+len],&buffer[c],char_count-c);
             rb->strcpy(&buffer[c],str);
@@ -97,7 +94,7 @@ char* _do_action(int action, char* str, int line)
                 return NULL;
             len = rb->strlen(&buffer[c])+1;
             lennew = rb->strlen(str)+1;
-            if ( char_count+ lennew-len > MAX_CHARS )
+            if ( char_count+ lennew-len > buffer_size )
                 return NULL;
             rb->memmove(&buffer[c+lennew],&buffer[c+len],char_count-c-len);
             rb->strcpy(&buffer[c],str);
@@ -272,7 +269,10 @@ int do_item_menu(int cur_sel, char* copy_buffer)
             ret = MENU_RET_SAVE;
         break;
         case 6: /* playback menu */
-            playback_control(NULL);
+            if (!audio_buf)
+                playback_control(NULL);
+            else
+                rb->splash(HZ, "Cannot restart playback");
             ret = MENU_RET_NO_UPDATE;
         break;
         default:
@@ -336,6 +336,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
+    buffer = rb->plugin_get_buffer(&buffer_size);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(1);
@@ -358,6 +359,11 @@ enum plugin_status plugin_start(const void* parameter)
         if (c && !rb->strcmp(c, ".colours"))
             edit_colors_file = true;
 #endif
+        if (buffer_size <= (size_t)rb->filesize(fd) + 0x400)
+        {
+            buffer = rb->plugin_get_audio_buffer(&buffer_size);
+            audio_buf = true;
+        }
         /* read in the file */
         while (rb->read_line(fd,temp_line,MAX_LINE_LEN) > 0)
         {
@@ -487,7 +493,10 @@ enum plugin_status plugin_start(const void* parameter)
                         case 0:
                         break;
                         case 1:
-                            playback_control(NULL);
+                            if (!audio_buf)
+                                playback_control(NULL);
+                            else
+                                rb->splash(HZ, "Cannot restart playback");
                         break;
                         case 2: //save to disk
                             if(save_changes(1))
