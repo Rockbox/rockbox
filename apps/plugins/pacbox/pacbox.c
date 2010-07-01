@@ -279,7 +279,12 @@ static bool pacbox_menu(void)
 /* Sound is emulated in ISR context, so not much is done per sound frame */
 #define NBSAMPLES    128
 static uint32_t sound_buf[NBSAMPLES];
+#if CONFIG_CPU == MCF5249
+/* Not enough to put this in IRAM */
+static int raw_buf[NBSAMPLES];
+#else
 static int raw_buf[NBSAMPLES] IBSS_ATTR;
+#endif
 
 /*
     Audio callback
