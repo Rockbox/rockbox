@@ -134,14 +134,7 @@ void tv_seek(off_t offset, int whence)
 
 static int tv_change_preferences(const struct tv_preferences *oldp)
 {
-    unsigned char bom[BOM_SIZE];
-    int cur_start_file_pos = start_file_pos;
-    off_t cur_file_pos     = file_pos + buf_pos;
-
-    file_pos  = 0;
-    buf_pos   = 0;
-    read_size = 0;
-    start_file_pos = 0;
+    bool change_file = false;
 
     /* open the new file */
     if (oldp == NULL || rb->strcmp(oldp->file_name, preferences->file_name))
@@ -152,22 +145,41 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
         fd = rb->open(preferences->file_name, O_RDONLY);
         if (fd < 0)
             return TV_CALLBACK_ERROR;
+
+        file_size = rb->filesize(fd);
+        change_file = true;
     }
 
     /*
      * When a file is UTF-8 file with BOM, if encoding is UTF-8,
      * then file size decreases only BOM_SIZE.
      */
-    if (preferences->encoding == UTF_8)
+    if (change_file || oldp->encoding != preferences->encoding)
     {
-        rb->lseek(fd, 0, SEEK_SET);
-        rb->read(fd, bom, BOM_SIZE);
-        if (rb->memcmp(bom, BOM, BOM_SIZE) == 0)
-            start_file_pos = BOM_SIZE;
+        int old_start_file_pos = start_file_pos;
+        int delta_start_file_pos;
+        off_t cur_file_pos = file_pos + buf_pos;
+
+        file_pos  = 0;
+        buf_pos   = 0;
+        read_size = 0;
+        start_file_pos = 0;
+
+        if (preferences->encoding == UTF_8)
+        {
+            unsigned char bom[BOM_SIZE];
+
+            rb->lseek(fd, 0, SEEK_SET);
+            rb->read(fd, bom, BOM_SIZE);
+            if (rb->memcmp(bom, BOM, BOM_SIZE) == 0)
+                start_file_pos = BOM_SIZE;
+        }
+
+        delta_start_file_pos = old_start_file_pos - start_file_pos;
+        file_size += delta_start_file_pos;
+        tv_seek(cur_file_pos + delta_start_file_pos, SEEK_SET);
     }
 
-    file_size = rb->filesize(fd) - start_file_pos;
-    tv_seek(cur_file_pos + cur_start_file_pos - start_file_pos, SEEK_SET);
     return TV_CALLBACK_OK;
 }
 

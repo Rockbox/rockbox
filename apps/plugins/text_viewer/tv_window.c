@@ -104,25 +104,26 @@ bool tv_traverse_lines(void)
 
 static int tv_change_preferences(const struct tv_preferences *oldp)
 {
-    bool need_vertical_scrollbar = false;
+    bool need_scrollbar = false;
 
     (void)oldp;
 
-    tv_set_layout(need_vertical_scrollbar);
+    tv_set_layout(need_scrollbar);
     tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
 
     if (tv_exist_scrollbar())
     {
         tv_seek_top();
         tv_set_read_conditions(preferences->windows, window_width);
-        if (tv_traverse_lines() && preferences->vertical_scrollbar)
+        if (tv_traverse_lines() &&
+            (preferences->vertical_scrollbar || preferences->horizontal_scrollbar))
         {
-            need_vertical_scrollbar = true;
-            tv_set_layout(need_vertical_scrollbar);
+            need_scrollbar = true;
+            tv_set_layout(need_scrollbar);
             tv_get_drawarea_info(&window_width, &window_columns, &display_lines);
         }
         tv_seek_top();
-        tv_init_scrollbar(tv_get_total_text_size(), need_vertical_scrollbar);
+        tv_init_scrollbar(tv_get_total_text_size(), need_scrollbar);
     }
 
     if (cur_window >= preferences->windows)

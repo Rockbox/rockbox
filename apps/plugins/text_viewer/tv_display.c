@@ -100,6 +100,7 @@ static struct tv_rect bookmark;
 #endif
 static struct tv_rect drawarea;
 
+static bool show_horizontal_scrollbar;
 static bool show_vertical_scrollbar;
 
 static int display_columns;
@@ -138,7 +139,7 @@ static void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
     int min_shown;
     int max_shown;
 
-    if (preferences->horizontal_scrollbar)
+    if (show_horizontal_scrollbar)
     {
         items     = preferences->windows * display_columns;
         min_shown = window * display_columns + col;
@@ -168,7 +169,8 @@ static void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
 void tv_init_scrollbar(off_t total, bool show_scrollbar)
 {
     totalsize = total;
-    show_vertical_scrollbar = show_scrollbar;
+    show_horizontal_scrollbar = (show_scrollbar && preferences->horizontal_scrollbar);
+    show_vertical_scrollbar   = (show_scrollbar && preferences->vertical_scrollbar);
 }
 
 void tv_show_bookmarks(const int *rows, int count)
@@ -251,8 +253,10 @@ void tv_end_display(void)
 void tv_set_layout(bool show_scrollbar)
 {
 #ifdef HAVE_LCD_BITMAP
-    int scrollbar_width  = (show_scrollbar)?                    TV_SCROLLBAR_WIDTH  + 1 : 0;
-    int scrollbar_height = (preferences->horizontal_scrollbar)? TV_SCROLLBAR_HEIGHT + 1 : 0;
+    int scrollbar_width  = (show_scrollbar && preferences->vertical_scrollbar)?
+                           TV_SCROLLBAR_WIDTH  + 1 : 0;
+    int scrollbar_height = (show_scrollbar && preferences->horizontal_scrollbar)?
+                           TV_SCROLLBAR_HEIGHT + 1 : 0;
 
     row_height = preferences->font->height;
 
