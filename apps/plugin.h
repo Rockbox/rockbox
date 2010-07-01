@@ -144,12 +144,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 187
+#define PLUGIN_API_VERSION 188
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 187
+#define PLUGIN_MIN_API_VERSION 188
 
 /* plugin return codes */
 enum plugin_status {
@@ -782,12 +782,10 @@ struct plugin_api {
     const char *(*get_codec_filename)(int cod_spec);
     void ** (*find_array_ptr)(void **arr, void *ptr);
     int (*remove_array_ptr)(void **arr, void *ptr);
-#if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
-int (*round_value_to_list32)(unsigned long value,
-                             const unsigned long list[],
-                             int count,
-                             bool signd);
-#endif
+    int (*round_value_to_list32)(unsigned long value,
+                                 const unsigned long list[],
+                                 int count,
+                                 bool signd);
 #endif /* CONFIG_CODEC == SWCODEC */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
     bool (*mp3info)(struct mp3entry *entry, const char *filename);

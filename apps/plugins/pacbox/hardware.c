@@ -26,6 +26,7 @@
 
 #include "plugin.h"
 #include "hardware.h"
+#include "wsg3.h"
 
 /* The main data for Pacman  */
 
@@ -140,7 +141,7 @@ void writeByte( unsigned addr, unsigned char b )
         default:
             if( addr >= 0x5040 && addr < 0x5060 ) {
                 // Sound registers
-                //SOUND sound_chip_.setRegister( addr-0x5040, b );
+                wsg3_set_register( addr-0x5040, b );
             }
             else if( addr >= 0x5060 && addr < 0x5070 ) {
                 // Sprite coordinates, x/y pairs for 8 sprites

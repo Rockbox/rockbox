@@ -123,6 +123,8 @@ void init_PacmanMachine(int dip);
 int run(void);
 void reset_PacmanMachine(void);
 void decodeROMs(void);
+void playSound( int * buf, int len );
+
 
 /**
     Tells the emulator that the status of an input device has changed.

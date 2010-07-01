@@ -299,4 +299,7 @@
 #define FPS 20
 #endif
 
+/* 16kHz sounds pretty good - use it if available */
+#define PREFERRED_SAMPLING_RATE SAMPR_16
+
 #endif

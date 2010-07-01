@@ -28,6 +28,7 @@
 #include "arcade.h"
 #include "pacbox.h"
 #include "pacbox_lcd.h"
+#include "wsg3.h"
 #include "lib/configfile.h"
 #include "lib/playback_control.h"
 
@@ -40,10 +41,12 @@ struct pacman_settings {
     int bonus;
     int ghostnames;
     int showfps;
+    int sound;
 };
 
 static struct pacman_settings settings;
 static struct pacman_settings old_settings;
+static bool sound_playing = false;
 
 #define SETTINGS_VERSION 1
 #define SETTINGS_MIN_VERSION 1
@@ -53,7 +56,7 @@ static char* difficulty_options[] = { "Normal", "Hard" };
 static char* numlives_options[] = { "1", "2", "3", "5" };
 static char* bonus_options[] = {"10000", "15000", "20000", "No Bonus"};
 static char* ghostnames_options[] = {"Normal", "Alternate"};
-static char* showfps_options[] = {"No", "Yes"};
+static char* yesno_options[] = {"No", "Yes"};
 
 static struct configdata config[] =
 {
@@ -65,7 +68,9 @@ static struct configdata config[] =
    {TYPE_ENUM, 0, 2, { .int_p = &settings.ghostnames }, "Ghost Names",
     ghostnames_options},
    {TYPE_ENUM, 0, 2, { .int_p = &settings.showfps }, "Show FPS",
-    showfps_options},
+    yesno_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.sound }, "Sound",
+    yesno_options},
 };
 
 static bool loadFile( const char * name, unsigned char * buf, int len )
@@ -173,9 +178,21 @@ static bool pacbox_menu(void)
         { "Alternate", -1 },
     };
 
+    enum
+    {
+        PBMI_DIFFICULTY = 0,
+        PBMI_PACMEN_PER_GAME,
+        PBMI_BONUS_LIFE,
+        PBMI_GHOST_NAMES,
+        PBMI_DISPLAY_FPS,
+        PBMI_SOUND,
+        PBMI_RESTART,
+        PBMI_QUIT,
+    };
+
     MENUITEM_STRINGLIST(menu, "Pacbox Menu", NULL,
                         "Difficulty", "Pacmen Per Game", "Bonus Life",
-                        "Ghost Names", "Display FPS",
+                        "Ghost Names", "Display FPS", "Sound",
                         "Restart", "Quit");
 
     rb->button_clear_queue();
@@ -189,7 +206,7 @@ static bool pacbox_menu(void)
 
         switch(result)
         {
-            case 0:
+            case PBMI_DIFFICULTY:
                 new_setting=settings.difficulty;
                 rb->set_option("Difficulty", &new_setting, INT,
                                difficulty_options , 2, NULL);
@@ -198,7 +215,7 @@ static bool pacbox_menu(void)
                     need_restart=true;
                 }
                 break;
-            case 1:
+            case PBMI_PACMEN_PER_GAME:
                 new_setting=settings.numlives;
                 rb->set_option("Pacmen Per Game", &new_setting, INT,
                                numlives_options , 4, NULL);
@@ -207,7 +224,7 @@ static bool pacbox_menu(void)
                     need_restart=true;
                 }
                 break;
-            case 2:
+            case PBMI_BONUS_LIFE:
                 new_setting=settings.bonus;
                 rb->set_option("Bonus Life", &new_setting, INT,
                                bonus_options , 4, NULL);
@@ -216,7 +233,7 @@ static bool pacbox_menu(void)
                     need_restart=true;
                 }
                 break;
-            case 3:
+            case PBMI_GHOST_NAMES:
                 new_setting=settings.ghostnames;
                 rb->set_option("Ghost Names", &new_setting, INT,
                                ghostname_options , 2, NULL);
@@ -225,11 +242,15 @@ static bool pacbox_menu(void)
                     need_restart=true;
                 }
                 break;
-            case 4: /* Show FPS */
+            case PBMI_DISPLAY_FPS:
                 rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
-            case 5: /* Restart */
+            case PBMI_SOUND:
+                rb->set_option("Sound",&settings.sound, INT,
+                               noyes, 2, NULL);
+                break;
+            case PBMI_RESTART:
                 need_restart=true;
                 menu_quit=1;
                 break;
@@ -252,22 +273,102 @@ static bool pacbox_menu(void)
          restart game
          usb connected
     */
-    return (result==6);
+    return (result==PBMI_QUIT);
 }
 
+/* Sound is emulated in ISR context, so not much is done per sound frame */
+#define NBSAMPLES    128
+static uint32_t sound_buf[NBSAMPLES];
+static int raw_buf[NBSAMPLES] IBSS_ATTR;
+
+/*
+    Audio callback
+ */
+static void get_more(unsigned char **start, size_t *size)
+{
+    int i;
+    int32_t *out;
+    int *raw;
+
+    /* Emulate the audio for the current register settings */
+    playSound(raw_buf, NBSAMPLES);
+
+    out = sound_buf;
+    raw = raw_buf;
+
+    /* Normalize the audio and convert to stereo */
+    for (i = 0; i < NBSAMPLES; i++)
+    {
+        uint32_t sample = (uint16_t)*raw++ << 6;
+        *out++ = sample | (sample << 16);
+    }
+
+    *start = (unsigned char *)sound_buf;
+    *size = NBSAMPLES*sizeof(sound_buf[0]); 
+}
+
+/*
+    Start the sound emulation
+*/
+static void start_sound(void)
+{
+    int sr_index;
+
+    if (sound_playing)
+        return;
+
+#ifndef PLUGIN_USE_IRAM    
+    /* Ensure control of PCM - stopping music isn't obligatory */
+    rb->plugin_get_audio_buffer(NULL);
+#endif
+
+    /* Get the closest rate >= to what is preferred */
+    sr_index = rb->round_value_to_list32(PREFERRED_SAMPLING_RATE,
+                        rb->hw_freq_sampr, HW_NUM_FREQ, false);
+
+    if (rb->hw_freq_sampr[sr_index] < PREFERRED_SAMPLING_RATE
+        && sr_index > 0)
+    {
+        /* Round up */
+        sr_index--;
+    }
+
+    wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
+
+    rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
+    rb->pcm_play_data(get_more, NULL, 0);
+
+    sound_playing = true;
+}
+
+/*
+    Stop the sound emulation
+*/
+static void stop_sound(void)
+{
+    if (!sound_playing)
+        return;
+
+    rb->pcm_play_stop();
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+
+    sound_playing = false;
+}
 
 /*
     Runs the game engine for one frame.
 */
 static int gameProc( void )
 {
-    int x;
     int fps;
     char str[80];
     int status;
     long end_time;
     int frame_counter = 0;
     int yield_counter = 0;
+
+    if (settings.sound)
+        start_sound();
 
     while (1)
     {
@@ -289,14 +390,25 @@ static int gameProc( void )
             || status == PACMAN_RC_MENU
 #endif
         ) {
+            bool menu_res;
+
             end_time = *rb->current_tick;
-            x = pacbox_menu();
+
+            stop_sound();
+
+            menu_res = pacbox_menu();
+
             rb->lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
             rb->lcd_remote_clear_display();
             rb->lcd_remote_update();
 #endif
-            if (x == 1) { return 1; }
+            if (menu_res)
+                return 1;
+
+            if (settings.sound)
+                start_sound();
+
             start_time += *rb->current_tick-end_time;
         }
 
@@ -368,6 +480,9 @@ static int gameProc( void )
             }
         }
     }
+
+    stop_sound();
+
     return 0;
 }
 
@@ -392,6 +507,7 @@ enum plugin_status plugin_start(const void* parameter)
     settings.bonus = 0;      /* 10000 points */
     settings.ghostnames = 0; /* Normal names */
     settings.showfps = 0;    /* Do not show FPS */
+    settings.sound = 0;      /* Sound off by default */
 
     if (configfile_load(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),

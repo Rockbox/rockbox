@@ -637,9 +637,7 @@ static const struct plugin_api rockbox_api = {
     get_codec_filename,
     find_array_ptr,
     remove_array_ptr,
-#if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
     round_value_to_list32,
-#endif
 #endif /* CONFIG_CODEC == SWCODEC */
     get_metadata,
     mp3info,
