@@ -110,11 +110,10 @@ show the information for the next song to be played.
     \config{\%fp} & File Path\\
     \config{\%fs} & File Size (in Kilobytes)\\
     \config{\%fv} & ``(avg)'' if variable bit rate or empty string if constant bit rate\\
-    \config{\%d(1)} & First directory from the end of the file path\\
-    \config{\%d(2)} & Second directory from the end of the file path\\
-    \config{\%d(3)} & Third directory from the end of the file path\\
+    \config{\%d(N)} & N-th segment from the end of the file's directory
+                       (N can be 1, 2, 3, \dots)\\
   \end{tagmap}
-Example for the \config{\%d(N)} commands: If the path is 
+Example for the \config{\%d(N)} commands: If the file is
 ``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d(1)} is ``Isola'', 
 \config{\%d(2)} is ``Kent'' and \config{\%d(3)} is ``Rock''.
 
