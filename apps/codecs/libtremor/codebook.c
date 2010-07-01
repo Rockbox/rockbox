@@ -215,6 +215,20 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
   return ret;
 }
 
+static inline long bisect_codelist(long lo, long hi, ogg_uint32_t cache,
+                                   const ogg_uint32_t *codelist)
+{
+  ogg_uint32_t testword=bitreverse(cache);
+  long p;
+  while(LIKELY(p = (hi-lo) >> 1) > 0){
+    if(codelist[lo+p] > testword)
+      hi -= p;
+    else
+      lo += p;
+  }
+  return lo;
+}
+
 STIN long decode_packed_entry_number(codebook *book, 
                                               oggpack_buffer *b){
   int  read=book->dec_maxlength;
@@ -222,8 +236,8 @@ STIN long decode_packed_entry_number(codebook *book,
   long lok = oggpack_look(b,book->dec_firsttablen);
  
   if (LIKELY(lok >= 0)) {
-    long entry = book->dec_firsttable[lok];
-    if(UNLIKELY(entry&0x80000000UL)){
+    ogg_int32_t entry = book->dec_firsttable[lok];
+    if(UNLIKELY(entry < 0)){
       lo=(entry>>15)&0x7fff;
       hi=book->used_entries-(entry&0x7fff);
     }else{
@@ -247,14 +261,7 @@ STIN long decode_packed_entry_number(codebook *book,
 
   /* bisect search for the codeword in the ordered list */
   {
-    ogg_uint32_t testword=bitreverse((ogg_uint32_t)lok);
-
-    while(hi-lo>1){
-      long p=(hi-lo)>>1;
-      long test=book->codelist[lo+p]>testword;    
-      lo+=p&(test-1);
-      hi-=p&(-test);
-    }
+    lo = bisect_codelist(lo, hi, lok, book->codelist);
 
     if(book->dec_codelengths[lo]<=read){
       oggpack_adv(b, book->dec_codelengths[lo]);
@@ -284,7 +291,6 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
       ptr = (ogg_uint32_t *)(adr&~3);
       bitend = ((adr&3)+b->headend)*8;
       while (bufptr<bufend){
-        long entry, lo, hi;
         if (UNLIKELY(cachesize<book->dec_maxlength)) {
           if (bit-cachesize+32>=bitend)
             break;
@@ -296,20 +302,10 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
           bit+=32;
         }
 
-        entry=book->dec_firsttable[cache&((1<<book->dec_firsttablen)-1)];
-        if(UNLIKELY(entry&0x80000000UL)){
-          lo=(entry>>15)&0x7fff;
-          hi=book->used_entries-(entry&0x7fff);
-          ogg_uint32_t testword=bitreverse((ogg_uint32_t)cache);
-            
-          while(LIKELY(hi-lo>1)){
-            long p=(hi-lo)>>1;
-            if (book->codelist[lo+p]>testword)
-              hi-=p;
-            else
-              lo+=p;
-          }
-          entry=lo;
+        ogg_int32_t entry = book->dec_firsttable[cache&((1<<book->dec_firsttablen)-1)];
+        if(UNLIKELY(entry < 0)){
+          const long lo = (entry>>15)&0x7fff, hi = book->used_entries-(entry&0x7fff);
+          entry = bisect_codelist(lo, hi, cache, book->codelist);
         }else
           entry--;
 
