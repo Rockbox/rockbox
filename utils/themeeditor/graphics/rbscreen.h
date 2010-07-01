@@ -79,6 +79,7 @@ public:
         if(albumArt)
         {
             albumArt->setParentItem(view);
+            albumArt->position();
             albumArt->show();
         }
     }

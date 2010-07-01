@@ -35,6 +35,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
+    void position(){ this->setPos(size.x(), size.y()); }
+
 private:
     QRectF size;
     int artWidth;

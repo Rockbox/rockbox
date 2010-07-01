@@ -796,10 +796,6 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
                                 int branches)
 {
-    if(strcmp(element->tag->name, "mv") == 0)
-    {
-        int x = 5;
-    }
     if(!conditional)
     {
         return info.device()->data(QString(element->tag->name));
