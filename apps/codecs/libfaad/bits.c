@@ -138,13 +138,13 @@ void faad_rewindbits(bitfile *ld)
 
     tmp = ld->start[0];
 #ifndef ARCH_IS_BIG_ENDIAN
-    BSWAP(tmp);
+    tmp = BSWAP(tmp);
 #endif
     ld->bufa = tmp;
 
     tmp = ld->start[1];
 #ifndef ARCH_IS_BIG_ENDIAN
-    BSWAP(tmp);
+    tmp = BSWAP(tmp);
 #endif
     ld->bufb = tmp;
     ld->bits_left = 32;
