@@ -996,6 +996,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (reset_tap) {
             tap_count = 0;
         }
+        rb->yield();
     }
 
 metronome_exit:
