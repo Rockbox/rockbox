@@ -130,6 +130,10 @@ unix:!static:libusb1 {
     DEFINES += LIBUSB1
     LIBS += -lusb-1.0
 }
+unix {
+    # explicitly link zlib, we do need it. Don't rely on implicit linking via Qt.
+    LIBS += -lz
+}
 
 unix:static {
     # force statically linking of libusb. Libraries that are appended
