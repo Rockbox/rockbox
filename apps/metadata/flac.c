@@ -86,17 +86,24 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
 
             /* totalsamples is a 36-bit field, but we assume <= 32 bits are used */
             totalsamples = get_long_be(&buf[14]);
-
-            /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-            id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
-        
-            if (id3->length <= 0)
+            
+            if(totalsamples > 0)
+            {
+                /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */        
+                id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
+                id3->bitrate = (id3->filesize * 8) / id3->length;   
+            } 
+            else if (totalsamples == 0)
+            {
+                id3->length = 0;
+                id3->bitrate = 0;
+            }
+            else 
             {
                 logf("flac length invalid!");
                 return false;
             }
 
-            id3->bitrate = ((int64_t) id3->filesize * 8) / id3->length;
         } 
         else if (type == 4)  /* 4 is the VORBIS_COMMENT block */
         {
