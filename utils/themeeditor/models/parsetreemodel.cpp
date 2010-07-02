@@ -77,11 +77,6 @@ QString ParseTreeModel::changeTree(const char *document)
     }
 
     ParseTreeNode* temp = new ParseTreeNode(test);
-    if(root && temp->genHash() == root->genHash())
-    {
-        delete temp;
-        return tr("Document Parses Successfully");
-    }
 
     if(root)
     {

@@ -33,6 +33,7 @@
 
 /* Global variables for the parser */
 int skin_line = 0;
+int viewport_line = 0;
 
 /* Auxiliary parsing functions (not visible at global scope) */
 static struct skin_element* skin_parse_viewport(char** document);
@@ -64,6 +65,7 @@ struct skin_element* skin_parse(const char* document)
     char* cursor = (char*)document; /*Keeps track of location in the document*/
     
     skin_line = 1;
+    viewport_line = 0;
 
     skin_clear_errors();
 
@@ -105,6 +107,7 @@ static struct skin_element* skin_parse_viewport(char** document)
     retval->type = VIEWPORT;
     retval->children_count = 1;
     retval->line = skin_line;
+    viewport_line = skin_line;
 
     struct skin_element** to_write = 0;
 
@@ -629,6 +632,13 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             cursor++;
         if (*cursor)
             cursor++;
+        skin_line++;
+    }
+
+    if((strcmp(tag->name, "Vf") == 0 || strcmp(tag->name, "Vb") == 0)
+        && *cursor == '\n' && skin_line == viewport_line)
+    {
+        *cursor++;
         skin_line++;
     }
     
