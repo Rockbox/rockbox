@@ -42,16 +42,19 @@ enum
 };
 
 /*
- * initialize modules
+ * initialize the action module
  *
- * [In] file
- *          read file name
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          buffer size
  *
  * return
  *     true  initialize success
  *     false initialize failure
  */
-bool tv_init(const unsigned char *file);
+bool tv_init_action(unsigned char **buf, size_t *bufsize);
 
 /*
  * finalize modules
@@ -60,6 +63,18 @@ bool tv_init(const unsigned char *file);
  *          this argument does not use
  */
 void tv_exit(void *parameter);
+
+/*
+ * load the file
+ *
+ * [In] file
+ *          read file name
+ *
+ * return
+ *     true  load success
+ *     false load failure
+ */
+bool tv_load_file(const unsigned char *file);
 
 /* draw the current page */
 void tv_draw(void);

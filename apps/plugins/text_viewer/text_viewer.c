@@ -35,13 +35,23 @@ enum plugin_status plugin_start(const void* file)
     long old_tick;
     bool done = false;
     bool display_update = true;
+    size_t size;
+    unsigned char *plugin_buf;
 
     old_tick = *rb->current_tick;
 
     if (!file)
         return PLUGIN_ERROR;
 
-    if (!tv_init(file)) {
+    /* get the plugin buffer */
+    plugin_buf = rb->plugin_get_buffer(&size);
+
+    if (!tv_init_action(&plugin_buf, &size)) {
+        rb->splash(HZ, "Error initialize");
+        return PLUGIN_ERROR;
+    }
+
+    if (!tv_load_file(file)) {
         rb->splash(HZ, "Error opening file");
         return PLUGIN_ERROR;
     }

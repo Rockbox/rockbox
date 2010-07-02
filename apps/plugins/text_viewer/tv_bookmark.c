@@ -110,9 +110,18 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
     return TV_CALLBACK_OK;
 }
 
-void tv_init_bookmark(void)
+bool tv_init_bookmark(unsigned char **buf, size_t *size)
 {
+    (void)buf;
+    (void)size;
+
     tv_add_preferences_change_listner(tv_change_preferences);
+    return true;
+}
+
+void tv_finalize_bookmark(void)
+{
+    /* no-operation function */
 }
 
 int tv_get_bookmark_positions(struct tv_screen_pos *pos_array)

@@ -28,26 +28,23 @@
 #include "tv_settings.h"
 #include "tv_window.h"
 
-bool tv_init(const unsigned char *file)
+bool tv_init_action(unsigned char **buf, size_t *size)
 {
-    size_t size;
+    /* initialize bookmarks and window modules */
+    return tv_init_bookmark(buf, size) && tv_init_window(buf, size);
+}
 
-    /* get the plugin buffer */
-    unsigned char *buf = rb->plugin_get_buffer(&size);
+static void tv_finalize_action(void)
+{
+    /* save preference and bookmarks */
+    if (!tv_save_settings())
+        rb->splash(HZ, "Can't save preferences and bookmarks");
 
-    tv_init_bookmark();
+    /* finalize bookmark modules */
+    tv_finalize_bookmark();
 
-    /* initialize modules */
-    if (!tv_init_window(&buf, &size))
-        return false;
-
-    /* load the preferences and bookmark */
-    if (!tv_load_settings(file))
-        return false;
-
-    /* select to read the page */
-    tv_select_bookmark();
-    return true;
+    /* finalize window modules */
+    tv_finalize_window();
 }
 
 void tv_exit(void *parameter)
@@ -59,7 +56,19 @@ void tv_exit(void *parameter)
         rb->splash(HZ, "Can't save preferences and bookmarks");
 
     /* finalize modules */
-    tv_finalize_window();
+    tv_finalize_action();
+}
+
+bool tv_load_file(const unsigned char *file)
+{
+    /* load the preferences and bookmark */
+    if (!tv_load_settings(file))
+        return false;
+
+    /* select to read the page */
+    tv_select_bookmark();
+
+    return true;
 }
 
 void tv_draw(void)

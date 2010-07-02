@@ -30,8 +30,23 @@
 /* Maximum amount of register possible bookmarks */
 #define TV_MAX_BOOKMARKS 16
 
-/* initialize the bookmark module */
-void tv_init_bookmark(void);
+/*
+ * initialize the bookmark module
+ *
+ * [In/Out] buf
+ *          the start pointer of the buffer
+ *
+ * [In/Out] size
+ *          buffer size
+ *
+ * return
+ *     true  initialize success
+ *     false initialize failure
+ */
+bool tv_init_bookmark(unsigned char **buf, size_t *size);
+
+/* finalize the bookmark module */
+void tv_finalize_bookmark(void);
 
 /*
  * get the positions which registered bookmarks
