@@ -46,6 +46,7 @@ void audio_set_output_source(int source)
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
         source = AUDIO_SRC_PLAYBACK;
 
+    /* route incoming audio samples to DAC */
     IIS2CONFIG = (IIS2CONFIG & ~(7 << 8)) | (txsrc_select[source+1] << 8);
 
     restore_irq(level);
@@ -73,8 +74,8 @@ void audio_input_mux(int source, unsigned flags)
             break;
 
         case AUDIO_SRC_MIC:
-        case AUDIO_SRC_LINEIN: 
-            /* recording only */
+        case AUDIO_SRC_LINEIN:
+        /* recording only */
             if (source != last_source)
             {
                 audiohw_set_recsrc(source,true);
@@ -89,10 +90,10 @@ void audio_input_mux(int source, unsigned flags)
 
             last_recording = recording;
 
+            audiohw_set_recsrc(source,recording);
             /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
             coldfire_set_dataincontrol(recording ?
                                        ((3 << 14) | (4 << 3)) : 0);
-            audiohw_set_recsrc(source, recording);
             break;
     }
 

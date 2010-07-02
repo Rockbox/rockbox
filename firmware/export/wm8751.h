@@ -25,13 +25,19 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
+/* turn off 3D Enchance feature of WM8750 for now
+#if defined(HAVE_WM8750)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | DEPTH_3D_CAP)
+#else
+*/
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
+/* #endif */
 
 extern int tenthdb2master(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-#if defined(HAVE_WM8750)
+#if defined(HAVE_WM8750) && defined(HAVE_RECORDING)
 void audiohw_set_recsrc(int source, bool recording);
 #endif
 
@@ -222,7 +228,7 @@ void audiohw_set_recsrc(int source, bool recording);
 #define ADCL_LMICBOOST_13DB         (1 << 4)
 #define ADCL_LMICBOOST_20DB         (2 << 4)
 #define ADCL_LMICBOOST_29DB         (3 << 4)
-#define ADCL_LMICBOOST(x)           ((x) & (0x3 << 7))
+#define ADCL_LMICBOOST(x)           (((x) & 0x3) << 4))
 #define ADCL_LINSEL_LINPUT1         (0 << 6)
 #define ADCL_LINSEL_LINPUT2         (1 << 6)
 #define ADCL_LINSEL_LINPUT3         (2 << 6)

@@ -84,13 +84,18 @@ static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 #endif
 
 #if CONFIG_CPU == MCF5249 && defined(HAVE_WM8750)
+/* We run codec in master mode.
+ * Codec can reconstruct all frequencies
+ * from single 11.2896 MHz master clock
+ */
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_88] = { 0x0c, 0x01 },
-    [HW_FREQ_44] = { 0x06, 0x01 },
-    [HW_FREQ_22] = { 0x04, 0x01 },
-    [HW_FREQ_11] = { 0x02, 0x01 },
+    [HW_FREQ_88] = { 0x00, 0x01 },
+    [HW_FREQ_44] = { 0x00, 0x01 },
+    [HW_FREQ_22] = { 0x00, 0x01 },
+    [HW_FREQ_11] = { 0x00, 0x01 },
 };
+
 #endif
 
 #if (CONFIG_CPU == MCF5250 || CONFIG_CPU == MCF5249) && defined(HAVE_TLV320)

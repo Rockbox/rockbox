@@ -14,26 +14,18 @@
 #define ATA_SWAP_WORDS
 
 /* define this if you have recording possibility */
-/* not implemented yet 
- * #define HAVE_RECORDING
- */
-
+#define HAVE_RECORDING
 
 /* Define bitmask of input sources - recordable bitmask can be defined
  *  explicitly if different
- * not implemented yet
  */
-
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
-
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
-/* define the bitmask of recording sample rates
- * not implemented yet
- *#define REC_SAMPR_CAPS  (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
- */
+/* define the bitmask of recording sample rates */
+#define REC_SAMPR_CAPS  (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -114,9 +106,17 @@
 #define CONFIG_TUNER_XTAL  32768
 
 
-/* we have WM8750 codec in I2S slave mode */
+/* we have WM8750 codec in I2S master mode */
 #define HAVE_WM8750
-#define CODEC_SLAVE
+
+/* clocking setup based on 11.2896 MHz master clock
+ * provided to the codec by MCU
+ * WM8750L Datasheet Table 40, page 46
+ */
+#define CODEC_SRCTRL_11025HZ (0x18 << 1)
+#define CODEC_SRCTRL_22050HZ (0x1A << 1)
+#define CODEC_SRCTRL_44100HZ (0x10 << 1)
+#define CODEC_SRCTRL_88200HZ (0x1E << 1)
 
 #define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
@@ -141,12 +141,6 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
-
-/* OF resets device instead of poweroff while charging
- * this triggers bootloader code which takes care of charging.
- * I have feeling that powering off while charging may cause
- * partition table corruption I am experiencing from time to time
- */
 
 /* define this if the hardware can be powered off while charging */
 /* #define HAVE_POWEROFF_WHILE_CHARGING */
