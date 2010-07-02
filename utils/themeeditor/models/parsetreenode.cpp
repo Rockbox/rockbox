@@ -26,6 +26,7 @@
 #include "parsetreemodel.h"
 
 #include "rbimage.h"
+#include "rbprogressbar.h"
 
 #include <iostream>
 
@@ -606,6 +607,18 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case 'r':
             /* %ar */
             viewport->alignText(RBViewport::Right);
+            return true;
+        }
+
+        return false;
+
+    case 'p':
+        switch(element->tag->name[1])
+        {
+        case 'b':
+            /* %pb */
+            new RBProgressBar(viewport, info, element->params_count,
+                              element->params);
             return true;
         }
 

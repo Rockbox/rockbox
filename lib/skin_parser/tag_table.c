@@ -124,7 +124,7 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_PEAKMETER,             "pm", "" },
     { SKIN_TOKEN_PLAYER_PROGRESSBAR,    "pf", "" },
-    { SKIN_TOKEN_PROGRESSBAR,           "pb" , BAR_PARAMS },
+    { SKIN_TOKEN_PROGRESSBAR,           "pb" , "*|iiiis" },
     { SKIN_TOKEN_VOLUME,                "pv" , BAR_PARAMS },
     
     { SKIN_TOKEN_TRACK_ELAPSED_PERCENT, "px", "" },

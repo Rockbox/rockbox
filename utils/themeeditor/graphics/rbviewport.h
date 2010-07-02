@@ -49,13 +49,17 @@ public:
                QWidget *widget);
 
     void setBGColor(QColor color){ background = color; }
+    QColor getBGColor(){ return background; }
     void setFGColor(QColor color){ foreground = color; }
+    QColor getFGColor(){ return foreground; }
     void makeCustomUI(){ customUI = true; }
     void clearCustomUI(){ customUI = false; }
 
     void newLine();
     void write(QString text);
     void alignText(Alignment align){ textAlign = align; }
+    int getTextOffset(){ return textOffset.y(); }
+    void addTextOffset(int height){ textOffset.setY(textOffset.y() + height); }
 
     void enableStatusBar(){ showStatusBar = true; }
 

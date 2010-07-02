@@ -44,7 +44,8 @@ HEADERS += models/parsetreemodel.h \
     gui/devicestate.h \
     findreplace/findreplaceform.h \
     findreplace/findreplacedialog.h \
-    graphics/rbalbumart.h
+    graphics/rbalbumart.h \
+    graphics/rbprogressbar.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -64,7 +65,8 @@ SOURCES += main.cpp \
     gui/devicestate.cpp \
     findreplace/findreplaceform.cpp \
     findreplace/findreplacedialog.cpp \
-    graphics/rbalbumart.cpp
+    graphics/rbalbumart.cpp \
+    graphics/rbprogressbar.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
