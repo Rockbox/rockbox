@@ -66,8 +66,6 @@ public:
     void showPlaylist(const RBRenderInfo& info, int start, skin_element* id3,
                       skin_element* noId3);
 
-    int declarationLine(){ return line; }
-
 private:
 
     void alignLeft();
@@ -93,8 +91,6 @@ private:
 
     bool showStatusBar;
     QPixmap statusBarTexture;
-
-    int line;
 };
 
 #endif // RBVIEWPORT_H

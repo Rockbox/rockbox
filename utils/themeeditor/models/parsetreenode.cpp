@@ -518,13 +518,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     {
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
-        /* TODO
-         * The second element of this if is a temporary hack to allow Vf and Vb
-         * tags in a viewport without forcing the first line of text down.  A
-         * proper solution to this problem needs to be worked out in the parser
-         * as soon as possible
-         */
-        if(!noBreak && element->line != viewport->declarationLine())
+        if(!noBreak)
             viewport->newLine();
     }
     else if(element->type == TEXT)
@@ -787,8 +781,8 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case 'p':
             /* %Vp */
             viewport->showPlaylist(info, element->params[0].data.numeric,
-                                   element->params[2].data.code,
-                                   element->params[1].data.code);
+                                   element->params[1].data.code,
+                                   element->params[2].data.code);
             return true;
 
         case 'I':

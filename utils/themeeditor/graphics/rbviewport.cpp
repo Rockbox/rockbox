@@ -34,7 +34,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
-    statusBarTexture(":/render/statusbar.png"), line(node->line)
+    statusBarTexture(":/render/statusbar.png")
 {
     if(!node->tag)
     {
@@ -187,17 +187,24 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
                               skin_element *id3, skin_element *noId3)
 {
     /* Determining whether ID3 info is available */
-    skin_element* root = info.device()->data("id3available").toBool()
-                         ? id3 : noId3;
+    skin_element* root = id3;
 
     /* The line will be a linked list */
-    root = root->children[0];
+    if(root->children_count > 0)
+        root = root->children[0];
 
     int song = start + info.device()->data("pp").toInt();
     int numSongs = info.device()->data("pe").toInt();
+    int halfWay = (numSongs - song) / 2 + 1 + song;
 
     while(song <= numSongs && textOffset.y() + lineHeight < size.height())
     {
+        if(song == halfWay)
+        {
+            root = noId3;
+            if(root->children_count > 0)
+                root = root->children[0];
+        }
         skin_element* current = root;
         while(current)
         {

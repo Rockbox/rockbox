@@ -114,7 +114,6 @@ ra ; Autoscore ; spin(0,10) ; 7
 ?C ; Album Art Available ; check ; true
 artwidth ; Album Art Width ; spin(0,500) ; 100
 artheight; Album Art Height ; spin(0,500) ; 100
-id3available ; ID3 Info Available ; check ; true
 
 [Hardware Status]
 bl ; Battery Level (-1 for unknown) ; spin(-1,100) ; 50
