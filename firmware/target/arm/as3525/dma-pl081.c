@@ -33,7 +33,7 @@ void dma_retain(void)
 {
     if(++dma_used == 1)
     {
-        CGU_PERI |= CGU_DMA_CLOCK_ENABLE;
+        bitset32(&CGU_PERI, CGU_DMA_CLOCK_ENABLE);
         DMAC_CONFIGURATION |= (1<<0);
     }
 }
@@ -43,7 +43,7 @@ void dma_release(void)
     if(--dma_used == 0)
     {
         DMAC_CONFIGURATION &= ~(1<<0);
-        CGU_PERI &= ~CGU_DMA_CLOCK_ENABLE;
+        bitclr32(&CGU_PERI, CGU_DMA_CLOCK_ENABLE);
     }
     if (dma_used < 0)
         panicf("dma_used < 0!");

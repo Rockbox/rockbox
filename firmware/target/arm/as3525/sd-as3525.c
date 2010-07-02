@@ -561,9 +561,9 @@ int sd_init(void)
             |   (AS3525_IDE_DIV << 2)
             |    AS3525_CLK_PLLA;       /* clock source = PLLA */
 
-    CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_NAF_CLOCK_ENABLE);
 #ifdef HAVE_MULTIDRIVE
-    CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
     CCU_IO &= ~(1<<3);           /* bits 3:2 = 01, xpd is SD interface */
     CCU_IO |= (1<<2);
 #endif

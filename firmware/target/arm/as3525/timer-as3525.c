@@ -19,7 +19,8 @@
 *
 ****************************************************************************/
 
-#include "as3525.h"
+#include "config.h"
+#include "system.h"
 #include "timer.h"
 #include "stdlib.h"
 
@@ -33,6 +34,8 @@ void INT_TIMER1(void)
 
 bool timer_set(long cycles, bool start)
 {
+    int oldstatus = disable_irq_save();
+
     if (start)
     {
         if (pfn_unregister != NULL)
@@ -50,19 +53,26 @@ bool timer_set(long cycles, bool start)
                      TIMER_PERIODIC |
                      TIMER_INT_ENABLE |
                      TIMER_32_BIT;
+
+    restore_irq(oldstatus);
+
     return true;
 }
 
 bool timer_start(void)
 {
-    CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
+    int oldstatus = disable_irq_save();
+    CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;   /* enable peripheral */
     VIC_INT_ENABLE = INTERRUPT_TIMER1;
+    restore_irq(oldstatus);
     return true;
 }
 
 void timer_stop(void)
 {
+    int oldstatus = disable_irq_save();
     TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
     VIC_INT_EN_CLEAR = INTERRUPT_TIMER1;  /* disable interrupt */
     CGU_PERI &= ~CGU_TIMER1_CLOCK_ENABLE;   /* disable peripheral */
+    restore_irq(oldstatus);
 }

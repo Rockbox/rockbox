@@ -459,6 +459,7 @@ target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
+target/arm/bits-armv4.S
 target/arm/as3525/system-as3525.c
 target/arm/as3525/memory-init.S
 target/arm/as3525/kernel-as3525.c

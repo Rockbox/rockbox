@@ -236,7 +236,7 @@ void usb_drv_init(void)
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) | 1<<2);
 
     /* AHB part */
-    CGU_PERI |= CGU_USB_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
 
     /* reset AHB */
     CCU_SRC = CCU_SRC_USB_AHB_EN;
@@ -319,7 +319,7 @@ void usb_drv_exit(void)
     USB_DEV_INTR_MASK    = 0xffffffff;
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
     CGU_USB &= ~(1<<5);
-    CGU_PERI &= ~CGU_USB_CLOCK_ENABLE;
+    bitclr32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
     /* Disable UVDD generating LDO */
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) & ~(1<<4));
     usb_disable_pll();

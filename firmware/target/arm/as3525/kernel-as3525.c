@@ -168,7 +168,7 @@ void tick_start(unsigned int interval_in_ms)
 {
     int cycles = KERNEL_TIMER_FREQ / 1000 * interval_in_ms;
 
-    CGU_PERI |= CGU_TIMER2_CLOCK_ENABLE;    /* enable peripheral */
+    bitset32(&CGU_PERI, CGU_TIMER2_CLOCK_ENABLE);    /* enable peripheral */
     VIC_INT_ENABLE = INTERRUPT_TIMER2;     /* enable interrupt */
 
     set_timer2_cycles_per_tick(cycles);

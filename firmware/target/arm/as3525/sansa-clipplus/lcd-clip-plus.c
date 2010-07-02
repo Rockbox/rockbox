@@ -28,7 +28,7 @@
 
 void lcd_hw_init(void)
 {
-    CGU_PERI |= CGU_SSP_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
 
     SSP_CPSR = AS3525_SSP_PRESCALER;    /* OF = 0x10 */
     SSP_CR0 = (1<<7) | (1<<6) | 7;  /* Motorola SPI frame format, 8 bits */

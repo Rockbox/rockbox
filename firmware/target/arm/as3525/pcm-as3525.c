@@ -103,7 +103,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     dma_size = size;
     dma_start_addr = (unsigned char*)addr;
 
-    CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
     CGU_AUDIO |= (1<<11);
 
     dma_retain();
@@ -121,7 +121,7 @@ void pcm_play_dma_stop(void)
 
     dma_release();
 
-    CGU_PERI &= ~CGU_I2SOUT_APB_CLOCK_ENABLE;
+    bitclr32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
     CGU_AUDIO &= ~(1<<11);
 }
 
@@ -137,7 +137,7 @@ void pcm_play_dma_pause(bool pause)
 
 void pcm_play_dma_init(void)
 {
-    CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
 
     I2SOUT_CONTROL = (1<<6)|(1<<3)  /* enable dma, stereo */;
 
@@ -339,7 +339,8 @@ void pcm_rec_dma_stop(void)
     I2SIN_CONTROL &= ~(1<<11); /* disable dma */
 
     CGU_AUDIO &= ~((1<<23)|(1<<11));
-    CGU_PERI &= ~(CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE);
+    bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
+                        CGU_I2SOUT_APB_CLOCK_ENABLE);
 }
 
 
@@ -354,7 +355,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     dma_retain();
 
-    CGU_PERI |= CGU_I2SIN_APB_CLOCK_ENABLE|CGU_I2SOUT_APB_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
+                        CGU_I2SOUT_APB_CLOCK_ENABLE);
     CGU_AUDIO |= ((1<<23)|(1<<11));
 
     I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */

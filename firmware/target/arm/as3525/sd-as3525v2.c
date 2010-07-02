@@ -708,7 +708,7 @@ int sd_init(void)
 {
     int ret;
 
-    CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
 
     CGU_IDE =   (1<<7)          /* AHB interface enable */
             |   (AS3525_IDE_DIV << 2)
@@ -974,7 +974,7 @@ void sd_enable(bool on)
 {
     if (on)
     {
-        CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+        bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
         CGU_IDE |= (1<<7);                  /* AHB interface enable */
         CGU_MEMSTICK |= (1<<7);             /* interface enable */
         CGU_SDSLOT |= (1<<7);               /* interface enable */
@@ -984,7 +984,7 @@ void sd_enable(bool on)
         CGU_SDSLOT &= ~(1<<7);              /* interface enable */
         CGU_MEMSTICK &= ~(1<<7);            /* interface enable */
         CGU_IDE &= ~(1<<7);                 /* AHB interface enable */
-        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
+        bitclr32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
     }
 }
 

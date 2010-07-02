@@ -122,7 +122,7 @@ static void as3525v2_connect(void)
 {
     logf("usb-drv: init as3525v2");
     /* 1) enable usb core clock */
-    CGU_PERI |= CGU_USB_CLOCK_ENABLE;
+    bitset32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
     usb_delay();
     /* 2) enable usb phy clock */
     /* PHY clock */
