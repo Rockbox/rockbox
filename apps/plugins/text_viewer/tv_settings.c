@@ -43,7 +43,7 @@
  * overlap_page_mode      1
  * header_mode            1
  * footer_mode            1
- * scroll_mode            1
+ * vertical_scroll_mode   1
  * autoscroll_speed       1
  * horizontal_scrollbar   1
  * horizontal_scroll_mode 1
@@ -86,7 +86,7 @@
  *     overlap_page_mode      1
  *     header_mode            1
  *     footer_mode            1
- *     scroll_mode            1
+ *     vertical_scroll_mode   1
  *     autoscroll_speed       1
  *     horizontal_scrollbar   1
  *     horizontal_scroll_mode 1
@@ -140,8 +140,8 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     if (rb->read(pfd, buf, read_size) < 0)
         return false;
 
-    prefs->word_mode        = *p++;
-    prefs->line_mode        = *p++;
+    prefs->word_mode = *p++;
+    prefs->line_mode = *p++;
 
     prefs->windows = *p++;
     if (version <= 1)
@@ -160,7 +160,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
 
     if (version < 7)
     {
-        prefs->statusbar   = false;
+        prefs->statusbar = false;
         if (*p > 1)
         {
             prefs->header_mode = ((*p & 1) != 0);
@@ -212,7 +212,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
         prefs->statusbar = (*p++ != 0);
 
 #ifdef HAVE_LCD_BITMAP
-    rb->memcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
+    rb->strlcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
 
     prefs->font = rb->font_get(FONT_UI);
 #endif
@@ -225,6 +225,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     unsigned char buf[TV_PREFERENCES_SIZE];
     unsigned char *p = buf;
 
+    rb->memset(buf, 0, TV_PREFERENCES_SIZE);
     *p++ = prefs->word_mode;
     *p++ = prefs->line_mode;
     *p++ = prefs->windows;
@@ -245,7 +246,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     *p++ = prefs->statusbar;
 
 #ifdef HAVE_LCD_BITMAP
-    rb->memcpy(buf + 28, prefs->font_name, MAX_PATH);
+    rb->strlcpy(buf + 28, prefs->font_name, MAX_PATH);
 #endif
 
     return (rb->write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
@@ -554,6 +555,7 @@ bool tv_save_settings(void)
     {
         /* save to current read file's preferences and bookmarks */
         res = false;
+        rb->memset(buf, 0, MAX_PATH);
         rb->strlcpy(buf, preferences->file_name, MAX_PATH);
 
         if (rb->write(tfd, buf, MAX_PATH + 2) >= 0)
