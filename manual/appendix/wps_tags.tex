@@ -53,7 +53,7 @@ show the information for the next song to be played.
         & See section \ref{ref:Viewports}\\}
 
       \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
-      \config{\%?C{\textless}\%Vd(a){\textbar}\%Vd(b){\textgreater}}
+      \config{\%?C<\%Vd(a)|\%Vd(b)>}
       will show viewport `a' if album art is found, and `b' if it isn't.\\
 
       \config{\%Vi('label',\dots)} &
@@ -75,8 +75,7 @@ show the information for the next song to be played.
   \begin{tagmap}
     \config{\%bl} & Numeric battery level in percents.
                     Can also be used in a conditional: 
-                    \config{\%?bl{\textless}-1{\textbar}0{\textbar}1{\textbar}%
-                    2{\textbar}\ldots{\textbar}N{\textgreater}},
+                    \config{\%?bl<-1|0|1|2|\ldots|N>},
                     where the value $-1$ is used when the battery level isn't
                     known (it usually is).
                     An image can also be used, the proportion of the image
@@ -94,15 +93,11 @@ show the information for the next song to be played.
 \section{Information about the file}
   \begin{tagmap}
     \config{\%fb} & File Bitrate (in kbps)\\
-    \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
-           This tag can also be used in a conditional tag, %
-           \config{\%?fc{\textless}mp1\-{\textbar}mp2\-{\textbar}mp3\-%
-           {\textbar}aiff\-{\textbar}wav\-{\textbar}ogg\-{\textbar}flac\-%
-           {\textbar}mpc\-{\textbar}a52\-{\textbar}wavpack\-{\textbar}alac\-%
-           {\textbar}aac\-{\textbar}shn\-{\textbar}sid\-{\textbar}adx\-%
-           {\textbar}nsf\-{\textbar}speex\-{\textbar}spc\-{\textbar}ape\-%
-           {\textbar}wma\-{\textbar}mod\-{\textbar}sap%
-           {\textbar}unknown{\textgreater}}.
+    \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC'').
+           This tag can also be used in a conditional tag:
+           \config{\%?fc<mp1|mp2|mp3|aiff|wav|ogg|\newline
+           flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|\newline
+           speex|spc|ape|wma|mod|sap|unknown>}.
                   The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,
            Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,
            Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE, WMA, MOD, SAP.\\
@@ -150,21 +145,20 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%ps} & ``s'' if shuffle mode is enabled\\
     \config{\%pt} & Total track time\\
     \config{\%pv} & Current volume (in dB). Can also be used in a conditional:
-           \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
-           {\textbar}N{\textgreater}}\newline
+           \config{\%?pv<0|1|2|\ldots|N>}\newline
            0 is used for mute, the last option is used for values greater than zero.
          \opt{lcd_bitmap}{This can also be used like \%pb to provide a continuous scale:
          \config{\%pv(x,y,[width],[height],image.bmp)}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
          10 seconds if no number is specified.
-         \config{\%pS(7){\textless}in the first 7 seconds of track{\textbar}in
-           the rest of the track{\textgreater}}\\
+         \config{\%pS(7)<in the first 7 seconds of track|in
+           the rest of the track>}\\
     \config{\%pE} & Track is ending. An optional number gives how many seconds
          before the end of the track the tag becomes true. The default is
          10 seconds if no number is specified.
-         \config{\%pE(7){\textless}in the last 7 seconds of track{\textbar}in
-           the rest of the track{\textgreater}}\\
+         \config{\%pE(7)<in the last 7 seconds of track|in
+           the rest of the track>}\\
     \config{\%Sp} & Current playback pitch\\
   \end{tagmap}
 
@@ -172,9 +166,7 @@ or \config{\%D(2)}), produce the information for the next file to be played.
   \begin{tagmap}
     \config{\%rp} & Song playcount\\
     \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag: %
-           \config{\%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}%
-           4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}%
-           10{\textgreater}}\\
+           \config{\%?rr<0|1|2|3|4|5|6|7|8|9|10>}\\
     \config{\%ra} & Autoscore for the song\\
   \end{tagmap}
 
@@ -186,9 +178,9 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%xf} & Crossfade setting, in the order: Off, Auto Skip, Man Skip,
            Shuffle, Shuffle and Man Skip, Always\\
     \config{\%rg} & ReplayGain value in use (x.y~dB). If used as a conditional,
-           Replaygain type in use: \config{\%?rg{\textless}Off{\textbar}Track%
-           {\textbar}Album{\textbar}TrackShuffle{\textbar}AlbumShuffle%
-           {\textbar}No tag{\textgreater}}\\
+           Replaygain type in use: \config{\%?rg<Off|Track%
+           |Album|TrackShuffle|AlbumShuffle%
+           |No tag>}\\
   }
   \end{tagmap}
 }
@@ -210,8 +202,8 @@ or \config{\%D(2)}), produce the information for the next file to be played.
   \begin{tagmap}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle, A-B\\
   \end{tagmap}
-Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
-{\textbar}A-B{\textgreater}}
+Example: \config{\%?mm<Off|All|One|Shuffle%
+|A-B>}
 
 \section{Playback Mode}
   \begin{tagmap}
@@ -219,9 +211,9 @@ Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
            Fast Forward, Rewind, Recording, Recording paused, FM Radio playing,
            FM Radio muted\\
   \end{tagmap}
-Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
-Ffwd{\textbar}Rew{\textbar}Rec{\textbar}Rec pause{\textbar}FM{\textbar}%
-FM pause{\textgreater}}
+Example: \config{\%?mp<Stop|Play|Pause|%
+Ffwd|Rew|Rec|Rec pause|FM|%
+FM pause>}
 
 \section{Current Screen}
   \begin{tagmap}
@@ -231,8 +223,8 @@ FM pause{\textgreater}}
 The tag can also be used as the switch in a conditional tag. For players without
 some capabilities (e.g. having no FM radio) some values will be never yielded.
 
-Example: \config{You are in the \%?cs{\textless}Main menu{\textbar}WPS{\textbar}%
-Recording screen{\textbar}FM Radio screen{\textgreater}}
+Example: \config{You are in the \%?cs<Main menu|WPS|%
+Recording screen|FM Radio screen>}
 
 \section{List Title (\fname{.sbs} only)}
   \begin{tagmap}
@@ -245,7 +237,7 @@ Recording screen{\textbar}FM Radio screen{\textgreater}}
 
   This tag can be used to give custom formatting to list titles.
   Define a viewport with the font and formatting desired, and then use
-  \config{\%?Lt{\textless}\%Lt{\textgreater}} to display the title within the
+  \config{\%?Lt<\%Lt>} to display the title within the
   viewport.  If \config{\%Lt} is present anywhere in the \fname{.sbs}, then the
   \config{\%Vi} viewport will not show the title.
 
@@ -263,7 +255,7 @@ The tag can be used as the switch in a conditional tag to display different thin
 depending on whether the volume is being changed. It can produce neat effects
 when used with conditional viewports.
 
-Example: \config{\%?mv(2.5){\textless}Volume changing{\textbar}\%pv{\textgreater}}
+Example: \config{\%?mv(2.5)<Volume changing|\%pv>}
 
 The example above will display the text ``Volume changing'' if the volume is
 being changed and 2.5 seconds after the volume button has been released. After
@@ -279,7 +271,7 @@ that, it will display the volume value.
 Examples:
 \begin{enumerate}
 \item As a simple tag: \config{\%St(skip length)}
-\item As a conditional: \config{\%?St(eq enabled){\textless}Eq is enabled{\textbar}Eq is disabled{\textgreater}}
+\item As a conditional: \config{\%?St(eq enabled)<Eq is enabled|Eq is disabled>}
 \end{enumerate}
 
 
@@ -318,8 +310,8 @@ Examples:
 \item Load a bitmap strip containing 5 volume icon images (all the same size)
 with image ID ``M'', and then reference the individual sub-images in a conditional:\\
 \config{\%xl(M,volume.bmp,134,153,5)}\\
-\config{\%?pv<\%xd(Ma){\textbar}\%xd(Mb){\textbar}\%xd(Mc){\textbar}%
-\%xd(Md){\textbar}\%xd(Me)>}
+\config{\%?pv<\%xd(Ma)|\%xd(Mb)|\%xd(Mc)|%
+\%xd(Md)|\%xd(Me)>}
 \end{enumerate}
 
 
@@ -371,8 +363,8 @@ that order):
 \end{enumerate}
 
 The following characters will be replaced with an underscore (\_) when looking
-for albumtitle.bmp or albumartist-albumtitle.bmp: \textbackslash{} / : \textless{}
-\textgreater{} ? * \textbar{}. Doublequotes will be replaced by single quotes.
+for albumtitle.bmp or albumartist-albumtitle.bmp: \textbackslash{} / : <
+> ? * |. Doublequotes will be replaced by single quotes.
 If no album artist is set, artist will be used instead. See \wikilink{AlbumArt}
 in the wiki for programs that will help you automate the process of putting
 album art on your \dap{}.
@@ -457,9 +449,9 @@ order left -- centre -- right. If the aligned texts overlap, they are merged.
 \section{Conditional Tags}
 
 \begin{tagmap}
-\config{\%?xx{\textless}true{\textbar}false{\textgreater}}
+\config{\%?xx<true|false>}
     & If / Else: Evaluate for true or false case \\
-\config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}\tabnlindent{}alt3{\textbar}\dots{\textbar}else{\textgreater}}
+\config{\%?xx<alt1|alt2|\tabnlindent{}alt3|\dots|else>}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
 \end{tagmap}
 
@@ -513,7 +505,7 @@ or alternate information on those that do not
 .
 
 Example:
-\config{\%?cc{\textless}\%cH:\%cM{\textbar}No clock detected{\textgreater}}
+\config{\%?cc<\%cH:\%cM|No clock detected>}
 
 \section{Text Translation}
   \begin{tagmap}
@@ -579,11 +571,11 @@ Example:
   \config{\%)}           & The character `)'\\
   \config{\%,}           & The character `,'\\
   \config{\%\%}          & The character `\%'\\
-  \config{\%{\textless}} & The character `{\textless}'\\
-  \config{\%{\textbar}}  & The character `{\textbar}'\\
-  \config{\%{\textgreater}} & The character `{\textgreater}'\\
+  \config{\%<}           & The character `<'\\
+  \config{\%|}           & The character `|'\\
+  \config{\%>}           & The character `>'\\
   \config{\%;}           & The character `;'\\
-  \config{\#}             & The character `\#'\\
+  \config{\#}            & The character `\#'\\
   \config{\%s}           & Indicate that the line should scroll. Can occur 
                            anywhere in a line (given that the text is 
                            displayed; see conditionals above). You can specify 
