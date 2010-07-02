@@ -39,6 +39,7 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_SELECT;
             break;
         case SDLK_RETURN:
+        case SDLK_p:
             new_btn = BUTTON_PLAY;
             break;
         case SDLK_LEFT:
@@ -48,6 +49,7 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_VOL_UP;
             break;
         case SDLK_ESCAPE:
+        case SDLK_r:
             new_btn = BUTTON_REC;
             break;
     }
