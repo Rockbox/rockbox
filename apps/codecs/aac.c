@@ -120,10 +120,12 @@ next_track:
      * we do not use the IRAM buffer and keep faad's internal allocation (see 
      * specrec.c). */
     needed_bufsize = decoder->frameLength;
+#ifdef SBR_DEC
     if ((decoder->sbr_present_flag == 1) || (decoder->forceUpSampling == 1))
     {
         needed_bufsize *= 2;
     }
+#endif
     if (needed_bufsize <= GB_BUF_SIZE)
     {
         decoder->time_out[0]    = &gb_time_buffer[0][0];
