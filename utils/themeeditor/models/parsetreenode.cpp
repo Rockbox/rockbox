@@ -518,7 +518,13 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     {
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
-        if(!noBreak)
+        /* TODO
+         * The second element of this if is a temporary hack to allow Vf and Vb
+         * tags in a viewport without forcing the first line of text down.  A
+         * proper solution to this problem needs to be worked out in the parser
+         * as soon as possible
+         */
+        if(!noBreak && element->line != viewport->declarationLine())
             viewport->newLine();
     }
     else if(element->type == TEXT)

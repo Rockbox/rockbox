@@ -34,7 +34,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
-    statusBarTexture(":/render/statusbar.png")
+    statusBarTexture(":/render/statusbar.png"), line(node->line)
 {
     if(!node->tag)
     {
