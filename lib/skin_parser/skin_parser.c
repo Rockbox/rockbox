@@ -638,7 +638,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     if((strcmp(tag->name, "Vf") == 0 || strcmp(tag->name, "Vb") == 0)
         && *cursor == '\n' && skin_line == viewport_line)
     {
-        *cursor++;
+        cursor++;
         skin_line++;
     }
     
