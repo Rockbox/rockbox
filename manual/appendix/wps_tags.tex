@@ -37,16 +37,19 @@ show the information for the next song to be played.
   \section{Viewports}
     \begin{tagmap}
       \nopt{lcd_non-mono}{%
-        \config{\%V(x,y,[width],[height],[font])}
+        \config{\%V(x,y,[width],\tabnlindent[height],[font])}
         & See section \ref{ref:Viewports}\\}
 
       \nopt{lcd_color}{\opt{lcd_non-mono}{%
-        \config{\%V(x,y,[width],[height],[font]) \%Vf([fgshade]) \%Vb([bgshade])}
+        \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
+        \config{\%Vf([fgshade])}\newline
+        \config{\%Vb([bgshade])}
         & See section \ref{ref:Viewports}\\}}
 
       \opt{lcd_color}{%
-        \config{\%V(x,y,[width],[height],[font])}
-        \config{\%Vf([fgcolour]) \%Vb([bgcolour])}
+        \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
+        \config{\%Vf([fgcolour])}\newline
+        \config{\%Vb([bgcolour])}
         & See section \ref{ref:Viewports}\\}
 
       \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
@@ -268,7 +271,7 @@ that, it will display the volume value.
 
 \section{Settings}
   \begin{tagmap}
-    \config{\%St(<setting name>)} & The value of the Rockbox
+    \config{\%St(<setting\tabnlindent{}name>)} & The value of the Rockbox
              setting with the specified name. See \reference{ref:config_file_options}
              for the list of the available settings.\\
   \end{tagmap}
@@ -294,7 +297,7 @@ Examples:
         & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate.\\
-    \config{\%xl(n,filename,x,y,[nimages])}
+    \config{\%xl(n,filename,x,y,\tabnlindent[nimages])}
         & Preload an image for later display (useful for when your images are displayed conditionally)\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
         & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
@@ -380,8 +383,8 @@ Once the album art files are present on your \dap, they can be displayed as
 follows.
 
   \begin{tagmap}
-    \config{\%Cl(x,y,[maxwidth],[maxheight],hor\_align,vert\_align)}
-        & Define the settings for albumart\\
+    \config{\%Cl(x,y,[maxwidth],\tabnlindent[maxheight],\tabnlindent{}hor\_align,\tabnlindent{}vert\_align)}
+        & Define the settings for album art\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate\\
         & \config{maxwidth}: Maximum height\\
@@ -456,14 +459,14 @@ order left -- centre -- right. If the aligned texts overlap, they are merged.
 \begin{tagmap}
 \config{\%?xx{\textless}true{\textbar}false{\textgreater}}
     & If / Else: Evaluate for true or false case \\
-\config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}\dots{\textbar}else{\textgreater}}
+\config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}\tabnlindent{}alt3{\textbar}\dots{\textbar}else{\textgreater}}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
 \end{tagmap}
 
 \section{Subline Tags}
 
 \begin{tagmap}
-\config{\%t{\textless}(time){\textgreater}}
+\config{\%t(time)}
     & Set the subline display cycle time (\%t(5) or \%t(3.4) formats) \\
 \config{;}
     & Split items on a line into separate sublines \\
@@ -529,7 +532,7 @@ Example:
 \opt{touchscreen}{
   \section{Touchscreen Areas (WPS only)}
     \begin{tagmap}
-      \config{\%T(x,y,[width],[height],action)}
+      \config{\%T(x,y,[width],\tabnlindent[height],action)}
       & Invoke the action specified when the user presses in the defined
       touchscreen area.\\
     \end{tagmap}
