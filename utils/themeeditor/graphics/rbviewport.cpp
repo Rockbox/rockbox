@@ -115,9 +115,9 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
 
         setPos(x, y);
         size = QRectF(0, 0, w, h);
-        debug = info.device()->data("showviewports").toBool();
     }
 
+    debug = info.device()->data("showviewports").toBool();
     lineHeight = font->lineHeight();
 }
 
