@@ -19,12 +19,11 @@
  *
  ****************************************************************************/
 
-#include <stdbool.h>
-#include "as3525.h"
+#include "config.h"
+#include "system.h"
 #include "pl081.h"
 #include "dma-target.h"
 #include "panic.h"
-#include "config.h"
 
 static int dma_used = 0;
 static void (*dma_callback[2])(void); /* 2 channels */
