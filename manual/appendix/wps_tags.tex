@@ -73,13 +73,13 @@ show the information for the next song to be played.
 
 \section{Power Related Information}
   \begin{tagmap}
-    \config{\%bl} & Numeric battery level in percents\\
-                  & Can also be used in a conditional: 
+    \config{\%bl} & Numeric battery level in percents.
+                    Can also be used in a conditional: 
                     \config{\%?bl{\textless}-1{\textbar}0{\textbar}1{\textbar}%
                     2{\textbar}\ldots{\textbar}N{\textgreater}},
                     where the value $-1$ is used when the battery level isn't
-                    known (it usually is)\\
-                    & An image can also be used, the proportion of the image
+                    known (it usually is).
+                    An image can also be used, the proportion of the image
                     shown correspinds to the battery level:
                     \config{\%bl(x,y,[width],[height],image.bmp)}\\
     \config{\%bv} & The battery level in volts\\
@@ -102,8 +102,8 @@ show the information for the next song to be played.
            {\textbar}aac\-{\textbar}shn\-{\textbar}sid\-{\textbar}adx\-%
            {\textbar}nsf\-{\textbar}speex\-{\textbar}spc\-{\textbar}ape\-%
            {\textbar}wma\-{\textbar}mod\-{\textbar}sap%
-           {\textbar}unknown{\textgreater}}.\\
-                  & The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,
+           {\textbar}unknown{\textgreater}}.
+                  The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,
            Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,
            Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE, WMA, MOD, SAP.\\
     \config{\%ff} & File Frequency (in Hz)\\
@@ -125,14 +125,14 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 
 \section{Playlist/Song Info}
   \begin{tagmap}
-    \config{\%pb} & Progress Bar\\
+    \config{\%pb} & Progress Bar.
     \opt{player}{
-          & This will display a one character ``cup''
+            This will display a one character ``cup''
             that empties as the time progresses.}
     \opt{lcd_bitmap}{
-         & This will replace the entire line with a progress bar. \\
-         & You can set the position, width and height of the progressbar %
-           (in pixels) and load a custom image for it: %
+           This will replace the entire line with a progress bar.
+           You can set the position, width and height of the progressbar
+           (in pixels) and load a custom image for it:
            \config{\%pb(x,y,[width],[height],image.bmp)}} \\
     \opt{player}{%
     \config{\%pf} & Full-line progress bar \& time display\\
@@ -149,23 +149,23 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%pr} & Remaining time in song\\
     \config{\%ps} & ``s'' if shuffle mode is enabled\\
     \config{\%pt} & Total track time\\
-    \config{\%pv} & Current volume (in dB). Can also be used in a conditional: \\
-         & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
-           {\textbar}N{\textgreater}}\\
-         & 0 is used for mute, the last option is used for values greater than zero.\\
-         \opt{lcd_bitmap}{& This can also be used like \%pb to provide a continuous scale:
+    \config{\%pv} & Current volume (in dB). Can also be used in a conditional:
+           \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
+           {\textbar}N{\textgreater}}\newline
+           0 is used for mute, the last option is used for values greater than zero.
+         \opt{lcd_bitmap}{This can also be used like \%pb to provide a continuous scale:
          \config{\%pv(x,y,[width],[height],image.bmp)}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
-         10 seconds if no number is specified.\\
-         & \config{\%pS(7){\textless}in the first 7 seconds of track{\textbar}in
+         10 seconds if no number is specified.
+         \config{\%pS(7){\textless}in the first 7 seconds of track{\textbar}in
            the rest of the track{\textgreater}}\\
     \config{\%pE} & Track is ending. An optional number gives how many seconds
          before the end of the track the tag becomes true. The default is
-         10 seconds if no number is specified.\\
-         & \config{\%pE(7){\textless}in the last 7 seconds of track{\textbar}in
+         10 seconds if no number is specified.
+         \config{\%pE(7){\textless}in the last 7 seconds of track{\textbar}in
            the rest of the track{\textgreater}}\\
-    \config{\%Sp} & Current Playback Pitch\\
+    \config{\%Sp} & Current playback pitch\\
   \end{tagmap}
 
 \section{Runtime Database}
@@ -292,22 +292,22 @@ Examples:
           This image must be exactly the same size as your LCD.\\
     }%
     \config{\%x(n,filename,x,y)}
-        & Load and display an image\\
-        & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
-        & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
-        & \config{x}: x coordinate\\
-        & \config{y}: y coordinate.\\
+        & Load and display an image\newline
+          \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
+          \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
+          \config{x}: x coordinate\newline
+          \config{y}: y coordinate.\\
     \config{\%xl(n,filename,x,y,\tabnlindent[nimages])}
-        & Preload an image for later display (useful for when your images are displayed conditionally)\\
-        & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
-        & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
-        & \config{x}: x coordinate\\
-        & \config{y}: y coordinate\\
-        & \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
+        & Preload an image for later display (useful for when your images are displayed conditionally).\newline
+          \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
+          \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
+          \config{x}: x coordinate\newline
+          \config{y}: y coordinate\newline
+          \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
-    \config{\%xd(n[i])} & Display a preloaded image\\
-        & \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\\
-        & \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
+    \config{\%xd(n[i])} & Display a preloaded image.
+          \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\newline
+          \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
           By default the first (i.e. top most) sub-image will be used.\\
   \end{tagmap}
 
@@ -384,14 +384,14 @@ follows.
 
   \begin{tagmap}
     \config{\%Cl(x,y,[maxwidth],\tabnlindent[maxheight],\tabnlindent{}hor\_align,\tabnlindent{}vert\_align)}
-        & Define the settings for album art\\
-        & \config{x}: x coordinate\\
-        & \config{y}: y coordinate\\
-        & \config{maxwidth}: Maximum height\\
-        & \config{maxheight}: Maximum width\\
-        & \config{hor\_align}: Horizontal alignment, enter as `l', `c' or `r' for
-          left, centre or right. Centre is default\\
-        & \config{vert\_align}: Vertical alignment, enter as `t', `c' or `b' for
+        & Define the settings for album art\newline
+          \config{x}: x coordinate\newline
+          \config{y}: y coordinate\newline
+          \config{maxwidth}: Maximum height\newline
+          \config{maxheight}: Maximum width\newline
+          \config{hor\_align}: Horizontal alignment, enter as `l', `c' or `r' for
+          left, centre or right. Centre is default\newline
+          \config{vert\_align}: Vertical alignment, enter as `t', `c' or `b' for
           top, centre or bottom. Centre is default\\
     \config{\%Cd}  & Display the album art as configured. \\
     \config{\%C}  & Use in a conditional to determine if an image is available. \\
@@ -482,7 +482,8 @@ display cycling round the defined sublines. See
     \opt{rtc}{
       \config{\%cd}          & Day of month from 01 to 31\\
       \config{\%ce}          & Zero padded day of month from 1 to 31\\
-      \config{\%cf}          & A conditional for 12/24 hour format. \%?cf{\textless}24 hour stuff{\textbar}12 hour stuff{\textgreater}\\
+      \config{\%cf}          & A conditional for 12/24 hour format.\newline
+                               \config{\%?cf<24 hour stuff|12 hour stuff>}\\
       \config{\%cH}          & Zero padded hour from 00 to 23 (24 hour format)\\
       \config{\%ck}          & Hour from 0 to 23 (24 hour format)\\
       \config{\%cI}          & Zero padded hour from 01 to 12 (am/pm format)\\
