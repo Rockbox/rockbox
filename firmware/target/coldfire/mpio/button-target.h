@@ -25,8 +25,10 @@
 #include "config.h"
 
 #define HAS_BUTTON_HOLD
+#define HAS_REMOTE_BUTTON_HOLD
 
 bool button_hold(void);
+bool remote_button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
@@ -41,15 +43,26 @@ int button_read_device(void);
 #define BUTTON_REC          0x00000020
 #define BUTTON_SELECT       0x00002000
 
+#define BUTTON_RC_PLAY      0x00010000
+
+#define BUTTON_RC_PREV         0x00040000
+#define BUTTON_RC_NEXT         0x00020000
+#define BUTTON_RC_VOL_UP       0x00080000
+#define BUTTON_RC_VOL_DOWN     0x00100000
+#define BUTTON_RC_SELECT       0x20000000
+
 #define BUTTON_LEFT BUTTON_PREV
 #define BUTTON_RIGHT BUTTON_NEXT
 #define BUTTON_ON BUTTON_PLAY
-#define BUTTON_REMOTE 0x0
 
 #define BUTTON_MAIN (BUTTON_PLAY|BUTTON_PREV|BUTTON_NEXT|BUTTON_VOL_UP|\
         BUTTON_VOL_DOWN|BUTTON_REC|BUTTON_SELECT)
 
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_PREV|BUTTON_RC_NEXT|\
+        BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN|BUTTON_RC_SELECT)
+
 #define POWEROFF_BUTTON BUTTON_PLAY
+#define RC_POWEROFF_BUTTON BUTTON_RC_PLAY
 #define POWEROFF_COUNT 30
 
 #endif /* _BUTTON_TARGET_H_ */
