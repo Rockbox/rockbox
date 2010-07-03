@@ -57,13 +57,13 @@ void FindReplaceDialog::closeEvent(QCloseEvent* event)
 
 void FindReplaceDialog::setupUI()
 {
-    QObject::connect(ui->findButton, SIGNAL(pressed()),
+    QObject::connect(ui->findButton, SIGNAL(clicked()),
                      this, SLOT(find()));
-    QObject::connect(ui->replaceButton, SIGNAL(pressed()),
+    QObject::connect(ui->replaceButton, SIGNAL(clicked()),
                      this, SLOT(replace()));
-    QObject::connect(ui->replaceAllButton, SIGNAL(pressed()),
+    QObject::connect(ui->replaceAllButton, SIGNAL(clicked()),
                      this, SLOT(replaceAll()));
-    QObject::connect(ui->closeButton, SIGNAL(pressed()),
+    QObject::connect(ui->closeButton, SIGNAL(clicked()),
                      this, SLOT(close()));
     QObject::connect(ui->findBox, SIGNAL(textChanged(QString)),
                      this, SLOT(textChanged()));
@@ -76,10 +76,6 @@ void FindReplaceDialog::find()
 
     if(!editor)
         return;
-
-    /* Figuring out the range to search in */
-    int begin = editor->textCursor().selectionStart();
-    int end = editor->textCursor().selectionEnd();
 
     QTextDocument::FindFlags flags = 0;
     if(ui->caseBox->isChecked())
@@ -109,7 +105,7 @@ void FindReplaceDialog::find()
     QPalette newPal;
     if(!textFound.isNull())
     {
-        newPal.setColor(QPalette::Foreground, QColor(150, 255, 150));
+        newPal.setColor(QPalette::Foreground, QColor(0, 150, 0));
         ui->statusLabel->setPalette(newPal);
         ui->statusLabel->setText(tr("Match Found"));
         editor->setTextCursor(textFound);
@@ -126,11 +122,30 @@ void FindReplaceDialog::find()
 
 void FindReplaceDialog::replace()
 {
+    if(textFound.isNull())
+        find();
 
+    if(textFound.isNull())
+        return;
+
+    editor->setTextCursor(textFound);
+    editor->insertPlainText(ui->replaceBox->text());
+    textFound = QTextCursor();
 }
 
 void FindReplaceDialog::replaceAll()
 {
+
+    do
+    {
+        if(!textFound.isNull())
+        {
+            editor->setTextCursor(textFound);
+            editor->insertPlainText(ui->replaceBox->text());
+        }
+
+        find();
+    }while(!textFound.isNull());
 
 }
 
