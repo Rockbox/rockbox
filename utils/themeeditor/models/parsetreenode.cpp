@@ -210,6 +210,8 @@ QString ParseTreeNode::genCode() const
                 }
                 buffer.append(ARGLISTCLOSESYM);
             }
+            if(element->tag->params[strlen(element->tag->params) - 1] == '\n')
+                buffer.append('\n');
             break;
 
         case TEXT:
