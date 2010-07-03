@@ -24,6 +24,7 @@ $(BOOTLINK): $(BOOTLDS)
 $(BUILDDIR)/bootloader.elf: $$(OBJ) $$(FIRMLIB) $$(BOOTLINK)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		$(FIRMLIB) -lgcc -L$(BUILDDIR)/firmware -T$(BOOTLINK) \
+                $(GLOBAL_LDOPTS) \
 		 -Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/bootloader.map
 
 $(BUILDDIR)/bootloader.bin : $(BUILDDIR)/bootloader.elf

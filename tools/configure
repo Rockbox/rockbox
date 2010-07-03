@@ -9,7 +9,10 @@
 #
 
 # global CC options for all platforms
-CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -Wl,-z,defs"
+CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
+
+# global LD options for all platforms
+GLOBAL_LDOPTS="-Wl,-z,defs"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
@@ -3097,6 +3100,7 @@ sed > Makefile \
  -e "s<@GCCOPTS@<${GCCOPTS}<g" \
  -e "s<@TARGET_INC@<${TARGET_INC}<g" \
  -e "s<@LDOPTS@<${LDOPTS}<g" \
+ -e "s<@GLOBAL_LDOPTS@<${GLOBAL_LDOPTS}<g" \
  -e "s<@LOADADDRESS@<${loadaddress}<g" \
  -e "s<@EXTRADEF@<${extradefines}<g" \
  -e "s<@APPSDIR@<${appsdir}<g" \
@@ -3176,6 +3180,7 @@ export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
 export SHARED_FLAG=@SHARED_FLAG@
 export LDOPTS=@LDOPTS@
+export GLOBAL_LDOPTS=@GLOBAL_LDOPTS@
 export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
 export UNAME=@UNAME@

@@ -164,13 +164,13 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(L
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/lib -lskin_parser \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
-		-lgcc $(BOOTBOXLDOPTS) \
+		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
 $(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
-		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc -L$(BUILDDIR)/firmware \
-		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
+		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc $(GLOBAL_LDOPTS) \
+                -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
