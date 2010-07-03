@@ -628,15 +628,17 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         switch(element->tag->name[1])
         {
         case 'd':
-            info.screen()->disableStatusBar();
+            /* %wd */
+            /* Disable SBS rendering */
             return true;
 
         case 'e':
-            info.screen()->enableStatusBar();
+            /* %we */
+            /* Totally extraneous */
             return true;
 
         case 'i':
-            info.screen()->disableStatusBar();
+            /* %wi */
             viewport->enableStatusBar();
             return true;
         }
