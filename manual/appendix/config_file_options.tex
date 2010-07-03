@@ -6,10 +6,10 @@
 % for the html output.
 \ifpdfoutput{\newcommand{\localendhead}{\endhead}}%
     {\newcommand{\localendhead}{}}
-  \rowcolors{1}{tblevenrowbgcolor}{tbloddrowbgcolor}
-  \begin{longtable}{@{}>{\raggedright}p{.35\textwidth}@{}>{\raggedright}p{.4\textwidth}@{}p{.25\textwidth}@{}}
+  \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
+  \begin{longtable}{>{\raggedright}p{.3\textwidth}>{\raggedright}p{.4\textwidth}p{.2\textwidth}}
     \toprule
-    \rowcolor{white} \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
+    \rowcolor{tblhdrbgcolor}\tblhdrstrut\textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
     \midrule\localendhead % endhead breaks with htlatex
     volume      & \opt{masd}{-78 to +18}%
                   \opt{masf}{-100 -to +12}%
