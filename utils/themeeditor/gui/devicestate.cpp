@@ -29,6 +29,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QFormLayout>
 
 
 DeviceState::DeviceState(QWidget *parent) :
@@ -39,7 +40,7 @@ DeviceState::DeviceState(QWidget *parent) :
     setWindowIcon(QIcon(":/resources/windowicon.png"));
     setWindowTitle(tr("Device Settings"));
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QFormLayout* layout = new QFormLayout(this);
     layout->addWidget(&tabs);
     this->setLayout(layout);
 
@@ -68,7 +69,7 @@ DeviceState::DeviceState(QWidget *parent) :
 
             panel = new QWidget();
             currentArea = new QScrollArea();
-            layout = new QVBoxLayout(panel);
+            layout = new QFormLayout(panel);
             currentArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
             currentArea->setWidget(panel);
             currentArea->setWidgetResizable(true);
@@ -84,18 +85,11 @@ DeviceState::DeviceState(QWidget *parent) :
         QString type = elements[2].trimmed();
         QString defVal = elements[3].trimmed();
 
-        subLayout = new QHBoxLayout();
-        if(type != "check")
-            subLayout->addWidget(new QLabel(elements[1].trimmed(),
-                                            currentArea));
-        layout->addLayout(subLayout);
-
-
         elements = type.split("(");
         if(elements[0].trimmed() == "text")
         {
             QLineEdit* temp = new QLineEdit(defVal, currentArea);
-            subLayout->addWidget(temp);
+            layout->addRow(title, temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Text, temp));
 
             temp->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
@@ -107,7 +101,7 @@ DeviceState::DeviceState(QWidget *parent) :
         else if(elements[0].trimmed() == "check")
         {
             QCheckBox* temp = new QCheckBox(title, currentArea);
-            subLayout->addWidget(temp);
+            layout->addRow(temp);
             if(defVal.toLower() == "true")
                 temp->setChecked(true);
             else
@@ -129,7 +123,7 @@ DeviceState::DeviceState(QWidget *parent) :
             temp->setMinimum(min);
             temp->setMaximum(max);
             temp->setValue(defVal.toInt());
-            subLayout->addWidget(temp);
+            layout->addRow(title, temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Slide, temp));
 
             QObject::connect(temp, SIGNAL(valueChanged(int)),
@@ -147,7 +141,7 @@ DeviceState::DeviceState(QWidget *parent) :
             temp->setMinimum(min);
             temp->setMaximum(max);
             temp->setValue(defVal.toInt());
-            subLayout->addWidget(temp);
+            layout->addRow(title, temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Spin, temp));
 
             QObject::connect(temp, SIGNAL(valueChanged(int)),
@@ -166,7 +160,7 @@ DeviceState::DeviceState(QWidget *parent) :
             temp->setMaximum(max);
             temp->setValue(defVal.toDouble());
             temp->setSingleStep(0.1);
-            subLayout->addWidget(temp);
+            layout->addRow(title, temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(DSpin, temp));
 
             QObject::connect(temp, SIGNAL(valueChanged(double)),
@@ -188,7 +182,7 @@ DeviceState::DeviceState(QWidget *parent) :
                     defIndex = i;
             }
             temp->setCurrentIndex(defIndex);
-            subLayout->addWidget(temp);
+            layout->addRow(title, temp);
             inputs.insert(tag, QPair<InputType, QWidget*>(Combo, temp));
 
             QObject::connect(temp, SIGNAL(currentIndexChanged(int)),
