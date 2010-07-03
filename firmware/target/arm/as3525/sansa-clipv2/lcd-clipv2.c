@@ -26,7 +26,7 @@
 #include "system.h"
 #include "cpu.h"
 
-void lcd_hw_init(void)
+void lcd_hw_init(int *offset)
 {
 /* DBOP initialisation, do what OF does */
     CCU_IO |= (1<<12); /* ?? */
@@ -38,6 +38,8 @@ void lcd_hw_init(void)
 
     GPIOB_DIR |= (1<<2)|(1<<5);
     GPIOB_PIN(5) = (1<<5);
+
+    *offset = 2;
 }
 
 #define LCD_DELAY 10

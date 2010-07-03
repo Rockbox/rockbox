@@ -26,7 +26,7 @@
 #include "system.h"
 #include "cpu.h"
 
-void lcd_hw_init(void)
+void lcd_hw_init(int *offset)
 {
 /* DBOP initialisation, do what OF does */
     CGU_DBOP = (1<<3) | AS3525_DBOP_DIV;
@@ -45,6 +45,8 @@ void lcd_hw_init(void)
     GPIOA_PIN(0) = (1<<0);
     GPIOA_PIN(4) = 0;
     GPIOB_PIN(6) = (1<<6);
+
+    *offset = 2;
 }
 
 #define LCD_DELAY 1

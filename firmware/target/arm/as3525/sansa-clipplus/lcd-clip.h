@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-void lcd_hw_init(void) INIT_ATTR;
+void lcd_hw_init(int *offset) INIT_ATTR;
 static inline void lcd_enable_power(bool onoff)
 {
     (void) onoff;

@@ -68,6 +68,7 @@
 /** globals **/
 
 static bool display_on; /* used by lcd_enable */
+static int offset; /* column offset */
 
 /*** hardware configuration ***/
 
@@ -135,10 +136,8 @@ bool lcd_active(void)
 void lcd_init_device(void)
 {
     int i;
-#define LCD_FULLSCREEN (128+4)
-    fb_data p_bytes[LCD_FULLSCREEN]; /* framebuffer used to clear the screen */
 
-    lcd_hw_init();
+    lcd_hw_init(&offset);
 
     /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
     lcd_write_command(LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ);
@@ -181,12 +180,12 @@ void lcd_init_device(void)
     lcd_write_command (LCD_SET_HIGHER_COLUMN_ADDRESS /*| 0*/);
     lcd_write_command (LCD_SET_LOWER_COLUMN_ADDRESS /*| 0*/);
 
+    fb_data p_bytes[LCD_WIDTH + 2 * offset];
     memset(p_bytes, 0, sizeof(p_bytes)); /* fills with 0 : pixel off */
-
     for(i = 0; i < 8; i++)
     {
         lcd_write_command (LCD_SET_PAGE_ADDRESS | (i /*& 0xf*/));
-        lcd_write_data(p_bytes, LCD_FULLSCREEN /* overscan */);
+        lcd_write_data(p_bytes, LCD_WIDTH + 2 * offset);
     }
 
     lcd_enable(true);
@@ -208,8 +207,8 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     while (bheight--)
     {
         lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
 
         lcd_write_data(data, width);
         data += stride;
@@ -234,8 +233,8 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
     while (bheight--)
     {
         lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
 
         lcd_grey_data(values, phases, width);
 
@@ -261,8 +260,8 @@ void lcd_update(void)
     for (y = 0; y < LCD_FBHEIGHT; y++)
     {
         lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | ((2 >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | (2 & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | ((offset >> 4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | (offset & 0xf));
 
         lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
     }
@@ -292,8 +291,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     for (; y <= ymax; y++)
     {
         lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2) >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset) >> 4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
 
         lcd_write_data (&lcd_framebuffer[y][x], width);
     }
