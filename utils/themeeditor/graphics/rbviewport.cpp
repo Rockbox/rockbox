@@ -113,12 +113,22 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         if(h < 0)
             h = info.screen()->getHeight() + h - y;
 
+        /* Adjusting to screen coordinates if necessary */
+        if(screen->parentItem() != 0)
+        {
+            x -= screen->parentItem()->pos().x();
+            y -= screen->parentItem()->pos().y();
+        }
+
+
         setPos(x, y);
         size = QRectF(0, 0, w, h);
     }
 
     debug = info.device()->data("showviewports").toBool();
     lineHeight = font->lineHeight();
+    if(customUI)
+        screen->setCustomUI(this);
 }
 
 RBViewport::~RBViewport()

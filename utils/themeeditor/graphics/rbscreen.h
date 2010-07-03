@@ -67,6 +67,8 @@ public:
     void setBackdrop(QString filename);
     bool hasBackdrop(){ return backdrop != 0; }
     void makeCustomUI(QString id);
+    void setCustomUI(RBViewport* viewport){ customUI = viewport; }
+    RBViewport* getCustomUI(){ return customUI; }
 
     static QColor stringToColor(QString str, QColor fallback);
 
@@ -84,10 +86,13 @@ public:
         }
     }
 
+    void breakSBS();
 
 private:
     int width;
     int height;
+    int fullWidth;
+    int fullHeight;
     QColor bgColor;
     QColor fgColor;
     QPixmap* backdrop;
@@ -102,6 +107,7 @@ private:
     QList<QString> displayedViewports;
 
     RBAlbumArt* albumArt;
+    RBViewport* customUI;
 };
 
 #endif // RBSCREEN_H

@@ -629,7 +629,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         {
         case 'd':
             /* %wd */
-            /* Disable SBS rendering */
+            info.screen()->breakSBS();
             return true;
 
         case 'e':

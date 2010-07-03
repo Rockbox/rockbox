@@ -290,7 +290,9 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         settings.insert("themebase", base.canonicalPath());
     }
 
+    /* Finding imagebase and determining remote/wps status */
     bool remote = false;
+    bool wps = false;
     if(file)
     {
         QString skinFile = *file;
@@ -304,14 +306,50 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         QString extension = decomp.last();
         if(extension[0] == 'r')
             remote = true;
+        if(extension.right(3) == "wps")
+            wps = true;
+    }
+
+    /* Rendering SBS, if necessary */
+    RBScreen* sbsScreen = 0;
+    if(wps && device->data("rendersbs").toBool())
+    {
+        QString sbsFile = settings.value(remote ? "rsbs" : "sbs", "");
+        sbsFile.replace("/.rockbox" , settings.value("themebase",""));
+
+        if(QFile::exists(sbsFile))
+        {
+            QFile sbs(sbsFile);
+            sbs.open(QFile::ReadOnly | QFile::Text);
+            ParseTreeModel sbsModel(QString(sbs.readAll()).toAscii());
+
+            if(sbsModel.root != 0)
+            {
+                RBRenderInfo sbsInfo(&sbsModel, project, &settings, device,
+                                     sbsScreen);
+
+                sbsScreen = new RBScreen(sbsInfo, remote);
+                scene->addItem(sbsScreen);
+
+                sbsInfo = RBRenderInfo(&sbsModel, project, &settings, device,
+                                       sbsScreen);
+                sbsModel.root->render(sbsInfo);
+            }
+
+        }
     }
 
     RBScreen* screen = 0;
     RBRenderInfo info(this, project, &settings, device, screen);
 
     /* Adding the screen */
-    screen = new RBScreen(info, remote);
-    scene->addItem(screen);
+    if(sbsScreen)
+        screen = new RBScreen(info, remote, sbsScreen->getCustomUI());
+    else
+        screen = new RBScreen(info, remote);
+
+    if(!sbsScreen)
+        scene->addItem(screen);
 
     info = RBRenderInfo(this, project, &settings, device, screen);
 
