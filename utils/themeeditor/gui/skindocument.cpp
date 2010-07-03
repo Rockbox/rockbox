@@ -29,6 +29,8 @@
 
 #include <iostream>
 
+#include <QDebug>
+
 SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
                            DeviceState* device, QWidget *parent)
                                :TabContent(parent), statusLabel(statusLabel),
