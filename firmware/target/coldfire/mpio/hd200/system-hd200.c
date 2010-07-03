@@ -81,7 +81,7 @@ void cf_set_cpu_frequency(long frequency)
         IDECONFIG2 = (1<<18)|(1<<16)|(1<<8)|(1<<0); /* TA /CS2 enable + CS2wait */
 
         and_l(~(0x07<<16), &ADCONFIG);
-        or_l((0x06)<<16, &ADCONFIG); /* adclk = busclk/64 */
+        or_l((0x05)<<16, &ADCONFIG); /* adclk = busclk/32 */
         break;
 
     case CPUFREQ_NORMAL:

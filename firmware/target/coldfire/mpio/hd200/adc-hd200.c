@@ -40,7 +40,7 @@ void ADC(void)
 {
     static unsigned char channel IBSS_ATTR;
     /* read current value */
-    adc_data[((channel&0x01)+1)] = ADVALUE;
+    adc_data[(channel&0x03)] = ADVALUE;
 
     /* switch channel
      *
@@ -51,10 +51,10 @@ void ADC(void)
 
     channel++;
 
-    and_l(~(3<<24),&ADCONFIG);
-    or_l( ((((channel&0x01)+1) << 8 )|(1<<7))<<16, &ADCONFIG);
+    and_l(~(0x03<<24),&ADCONFIG);
+    or_l( (((channel&0x03) << 8 )|(1<<7))<<16, &ADCONFIG);
     
-    if ( (channel & 0x01) == 0 )
+    if ( (channel & 0x03) == 0 )
         /* disable ADC interrupt */
         and_l((~(1<<6))<<16,&ADCONFIG);
 }
