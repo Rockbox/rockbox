@@ -163,6 +163,8 @@ void EditorWindow::setupUI()
     deviceDock->setWidget(deviceConfig);
     deviceDock->setFloating(true);
     deviceDock->hide();
+
+    shiftTab(-1);
 }
 
 void EditorWindow::setupMenus()

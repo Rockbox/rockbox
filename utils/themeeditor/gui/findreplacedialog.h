@@ -53,6 +53,7 @@ private:
     Ui::FindReplaceDialog *ui;
 
     QPlainTextEdit* editor;
+    QTextCursor textFound;
 };
 
 #endif // FINDREPLACEDIALOG_H

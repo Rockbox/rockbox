@@ -26,7 +26,7 @@
 
 FindReplaceDialog::FindReplaceDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::FindReplaceDialog), editor(0)
+    ui(new Ui::FindReplaceDialog), editor(0), textFound()
 {
     ui->setupUi(this);
     setupUI();
@@ -77,7 +77,50 @@ void FindReplaceDialog::find()
     if(!editor)
         return;
 
-    editor->setTextCursor(editor->document()->find(ui->findBox->text()));
+    /* Figuring out the range to search in */
+    int begin = editor->textCursor().selectionStart();
+    int end = editor->textCursor().selectionEnd();
+
+    QTextDocument::FindFlags flags = 0;
+    if(ui->caseBox->isChecked())
+        flags |= QTextDocument::FindCaseSensitively;
+    if(ui->backwardsBox->isChecked())
+        flags |= QTextDocument::FindBackward;
+
+    QTextCursor start = textFound.isNull() ? editor->textCursor() : textFound;
+
+    textFound = editor->document()->find(ui->findBox->text(), start, flags);
+
+    if(textFound.isNull() && ui->wrapBox->isChecked())
+    {
+        if(ui->backwardsBox->isChecked())
+        {
+            textFound = editor->document()
+                        ->find(ui->findBox->text(),
+                               editor->document()->toPlainText().length(),
+                               flags);
+        }
+        else
+        {
+            textFound = editor->document()->find(ui->findBox->text(), 0, flags);
+        }
+    }
+
+    QPalette newPal;
+    if(!textFound.isNull())
+    {
+        newPal.setColor(QPalette::Foreground, QColor(150, 255, 150));
+        ui->statusLabel->setPalette(newPal);
+        ui->statusLabel->setText(tr("Match Found"));
+        editor->setTextCursor(textFound);
+    }
+    else
+    {
+        newPal.setColor(QPalette::Foreground, Qt::red);
+        ui->statusLabel->setPalette(newPal);
+        ui->statusLabel->setText(tr("Match Not Found"));
+        editor->setTextCursor(start);
+    }
 
 }
 
