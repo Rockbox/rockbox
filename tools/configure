@@ -9,7 +9,7 @@
 #
 
 # global CC options for all platforms
-CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
+CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -Wl,-z,defs"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
@@ -2971,15 +2971,15 @@ if [ "$ARG_RBDIR" ]; then
 fi
 
 sed > autoconf.h \
- -e "s,@ENDIAN@,${defendian},g" \
- -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
- -e "s,^#undef DO_BOOTCHART,$use_bootchart,g" \
- -e "s,@config_rtc@,$config_rtc,g" \
- -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
- -e "s,@RBDIR@,${rbdir},g" \
- -e "s,@have_backlight@,$have_backlight,g" \
- -e "s,@have_fmradio_in@,$have_fmradio_in,g" \
- -e "s,@have_ata_poweroff@,$have_ata_poweroff,g" \
+ -e "s<@ENDIAN@<${defendian}<g" \
+ -e "s<^#undef ROCKBOX_HAS_LOGF<$use_logf<g" \
+ -e "s<^#undef DO_BOOTCHART<$use_bootchart<g" \
+ -e "s<@config_rtc@<$config_rtc<g" \
+ -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
+ -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@have_backlight@<$have_backlight<g" \
+ -e "s<@have_fmradio_in@<$have_fmradio_in<g" \
+ -e "s<@have_ata_poweroff@<$have_ata_poweroff<g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -3026,8 +3026,8 @@ fi
 
 if test "$simulator" = "yes"; then
   # add simul make stuff on the #SIMUL# line
-  simmagic1="s,@SIMUL1@,\$(SILENT)\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim,"
-  simmagic2="s,@SIMUL2@,\$(SILENT)\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim,"
+  simmagic1="s<@SIMUL1@<\$(SILENT)\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim<"
+  simmagic2="s<@SIMUL2@<\$(SILENT)\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim<"
 else
   # delete the lines that match
   simmagic1='/@SIMUL1@/D'
@@ -3059,70 +3059,70 @@ cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) -
 ### end of cmdline
 
 sed > Makefile \
- -e "s,@ROOTDIR@,${rootdir},g" \
- -e "s,@DEBUG@,${debug},g" \
- -e "s,@MEMORY@,${memory},g" \
- -e "s,@TARGET_ID@,${target_id},g" \
- -e "s,@TARGET@,${target},g" \
- -e "s,@CPU@,${t_cpu},g" \
- -e "s,@MANUFACTURER@,${t_manufacturer},g" \
- -e "s,@MODELNAME@,${modelname},g" \
- -e "s,@LANGUAGE@,${language},g" \
+ -e "s<@ROOTDIR@<${rootdir}<g" \
+ -e "s<@DEBUG@<${debug}<g" \
+ -e "s<@MEMORY@<${memory}<g" \
+ -e "s<@TARGET_ID@<${target_id}<g" \
+ -e "s<@TARGET@<${target}<g" \
+ -e "s<@CPU@<${t_cpu}<g" \
+ -e "s<@MANUFACTURER@<${t_manufacturer}<g" \
+ -e "s<@MODELNAME@<${modelname}<g" \
+ -e "s<@LANGUAGE@<${language}<g" \
  -e "s:@VOICELANGUAGE@:${voicelanguage}:g" \
- -e "s,@PWD@,${pwd},g" \
- -e "s,@HOSTCC@,${HOSTCC},g" \
- -e "s,@HOSTAR@,${HOSTAR},g" \
- -e "s,@CC@,${CC},g" \
- -e "s,@LD@,${LD},g" \
- -e "s,@AR@,${AR},g" \
- -e "s,@AS@,${AS},g" \
- -e "s,@OC@,${OC},g" \
- -e "s,@WINDRES@,${WINDRES},g" \
- -e "s,@DLLTOOL@,${DLLTOOL},g" \
- -e "s,@DLLWRAP@,${DLLWRAP},g" \
- -e "s,@RANLIB@,${RANLIB},g" \
- -e "s,@TOOL@,${tool},g" \
- -e "s,@BMP2RB_NATIVE@,${bmp2rb_native},g" \
- -e "s,@BMP2RB_MONO@,${bmp2rb_mono},g" \
- -e "s,@BMP2RB_REMOTENATIVE@,${bmp2rb_remotenative},g" \
- -e "s,@BMP2RB_REMOTEMONO@,${bmp2rb_remotemono},g" \
- -e "s,@OUTPUT@,${output},g" \
- -e "s,@APPEXTRA@,${appextra},g" \
- -e "s,@ARCHOSROM@,${archosrom},g" \
- -e "s,@FLASHFILE@,${flash},g" \
- -e "s,@PLUGINS@,${plugins},g" \
- -e "s,@CODECS@,${swcodec},g" \
- -e "s,@PROFILE_OPTS@,${PROFILE_OPTS},g" \
- -e "s,@SHARED_FLAG@,${SHARED_FLAG},g" \
- -e "s,@GCCOPTS@,${GCCOPTS},g" \
- -e "s,@TARGET_INC@,${TARGET_INC},g" \
- -e "s!@LDOPTS@!${LDOPTS}!g" \
- -e "s,@LOADADDRESS@,${loadaddress},g" \
- -e "s,@EXTRADEF@,${extradefines},g" \
- -e "s,@APPSDIR@,${appsdir},g" \
- -e "s,@FIRMDIR@,${firmdir},g" \
- -e "s,@TOOLSDIR@,${toolsdir},g" \
- -e "s,@APPS@,${apps},g" \
- -e "s,@SIMVER@,${simver},g" \
- -e "s,@GCCVER@,${gccver},g" \
- -e "s,@GCCNUM@,${gccnum},g" \
- -e "s,@UNAME@,${uname},g" \
- -e "s,@ENDIAN@,${defendian},g" \
- -e "s,@TOOLSET@,${toolset},g" \
+ -e "s<@PWD@<${pwd}<g" \
+ -e "s<@HOSTCC@<${HOSTCC}<g" \
+ -e "s<@HOSTAR@<${HOSTAR}<g" \
+ -e "s<@CC@<${CC}<g" \
+ -e "s<@LD@<${LD}<g" \
+ -e "s<@AR@<${AR}<g" \
+ -e "s<@AS@<${AS}<g" \
+ -e "s<@OC@<${OC}<g" \
+ -e "s<@WINDRES@<${WINDRES}<g" \
+ -e "s<@DLLTOOL@<${DLLTOOL}<g" \
+ -e "s<@DLLWRAP@<${DLLWRAP}<g" \
+ -e "s<@RANLIB@<${RANLIB}<g" \
+ -e "s<@TOOL@<${tool}<g" \
+ -e "s<@BMP2RB_NATIVE@<${bmp2rb_native}<g" \
+ -e "s<@BMP2RB_MONO@<${bmp2rb_mono}<g" \
+ -e "s<@BMP2RB_REMOTENATIVE@<${bmp2rb_remotenative}<g" \
+ -e "s<@BMP2RB_REMOTEMONO@<${bmp2rb_remotemono}<g" \
+ -e "s<@OUTPUT@<${output}<g" \
+ -e "s<@APPEXTRA@<${appextra}<g" \
+ -e "s<@ARCHOSROM@<${archosrom}<g" \
+ -e "s<@FLASHFILE@<${flash}<g" \
+ -e "s<@PLUGINS@<${plugins}<g" \
+ -e "s<@CODECS@<${swcodec}<g" \
+ -e "s<@PROFILE_OPTS@<${PROFILE_OPTS}<g" \
+ -e "s<@SHARED_FLAG@<${SHARED_FLAG}<g" \
+ -e "s<@GCCOPTS@<${GCCOPTS}<g" \
+ -e "s<@TARGET_INC@<${TARGET_INC}<g" \
+ -e "s<@LDOPTS@<${LDOPTS}<g" \
+ -e "s<@LOADADDRESS@<${loadaddress}<g" \
+ -e "s<@EXTRADEF@<${extradefines}<g" \
+ -e "s<@APPSDIR@<${appsdir}<g" \
+ -e "s<@FIRMDIR@<${firmdir}<g" \
+ -e "s<@TOOLSDIR@<${toolsdir}<g" \
+ -e "s<@APPS@<${apps}<g" \
+ -e "s<@SIMVER@<${simver}<g" \
+ -e "s<@GCCVER@<${gccver}<g" \
+ -e "s<@GCCNUM@<${gccnum}<g" \
+ -e "s<@UNAME@<${uname}<g" \
+ -e "s<@ENDIAN@<${defendian}<g" \
+ -e "s<@TOOLSET@<${toolset}<g" \
  -e "${simmagic1}" \
  -e "${simmagic2}" \
- -e "s,@MANUALDEV@,${manualdev},g" \
- -e "s,@ENCODER@,${ENC_CMD},g" \
- -e "s,@ENC_OPTS@,${ENC_OPTS},g" \
- -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
- -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
- -e "s,@VOICETOOLSET@,${voicetoolset},g" \
- -e "s,@LANGS@,${buildlangs},g" \
- -e "s,@USE_ELF@,${USE_ELF},g" \
- -e "s,@RBDIR@,${rbdir},g" \
- -e "s,@PREFIX@,$PREFIX,g" \
- -e "s,@CMDLINE@,$cmdline,g" \
- -e "s,@SDLCONFIG@,$sdl,g" \
+ -e "s<@MANUALDEV@<${manualdev}<g" \
+ -e "s<@ENCODER@<${ENC_CMD}<g" \
+ -e "s<@ENC_OPTS@<${ENC_OPTS}<g" \
+ -e "s<@TTS_ENGINE@<${TTS_ENGINE}<g" \
+ -e "s<@TTS_OPTS@<${TTS_OPTS}<g" \
+ -e "s<@VOICETOOLSET@<${voicetoolset}<g" \
+ -e "s<@LANGS@<${buildlangs}<g" \
+ -e "s<@USE_ELF@<${USE_ELF}<g" \
+ -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@PREFIX@<$PREFIX<g" \
+ -e "s<@CMDLINE@<$cmdline<g" \
+ -e "s<@SDLCONFIG@<$sdl<g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
