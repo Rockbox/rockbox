@@ -811,7 +811,10 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case '\0':
             /* %X */
             filename = QString(element->params[0].data.text);
-            info.screen()->setBackdrop(filename);
+            if(info.sbsScreen())
+                info.sbsScreen()->setBackdrop(filename);
+            else
+                info.screen()->setBackdrop(filename);
             return true;
         }
 

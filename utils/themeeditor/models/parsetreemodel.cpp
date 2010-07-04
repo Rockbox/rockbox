@@ -340,7 +340,7 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     }
 
     RBScreen* screen = 0;
-    RBRenderInfo info(this, project, &settings, device, screen);
+    RBRenderInfo info(this, project, &settings, device, screen, sbsScreen);
 
     /* Adding the screen */
     if(sbsScreen)
@@ -351,7 +351,7 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     if(!sbsScreen)
         scene->addItem(screen);
 
-    info = RBRenderInfo(this, project, &settings, device, screen);
+    info = RBRenderInfo(this, project, &settings, device, screen, sbsScreen);
 
 
     /* Rendering the tree */

@@ -23,9 +23,11 @@
 
 RBRenderInfo::RBRenderInfo(ParseTreeModel* model, ProjectModel* project,
                            QMap<QString, QString>* settings,
-                           DeviceState* device, RBScreen* screen)
+                           DeviceState* device, RBScreen* screen,
+                           RBScreen* sbsScreen)
                                :mProject(project), mSettings(settings),
-                               mDevice(device), mScreen(screen), mModel(model)
+                               mDevice(device), mScreen(screen),
+                               mSbsScreen(sbsScreen), mModel(model)
 {
 }
 
@@ -40,6 +42,7 @@ RBRenderInfo::RBRenderInfo(const RBRenderInfo &other)
     mSettings = other.mSettings;
     mDevice = other.mDevice;
     mScreen = other.mScreen;
+    mSbsScreen = other.mSbsScreen;
     mModel = other.mModel;
 }
 
@@ -49,6 +52,7 @@ const RBRenderInfo& RBRenderInfo::operator=(const RBRenderInfo& other)
     mSettings = other.mSettings;
     mDevice = other.mDevice;
     mScreen = other.mScreen;
+    mSbsScreen = other.mSbsScreen;
     mModel = other.mModel;
 
     return *this;
