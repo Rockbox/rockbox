@@ -22,12 +22,17 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
+#include "powermgmt.h"
 #include "synaptics-mep.h"
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
 static int int_btn = BUTTON_NONE;
+static int old_pos = -1;
+
+static int scroll_repeat = BUTTON_NONE;
+static int repeat = 0;
 
 /*
  * Generate a click sound from the player (not in headphones yet)
@@ -59,27 +64,61 @@ void button_int(void)
     int_btn = BUTTON_NONE;
 
     val = touchpad_read_device(data, 4);
-    
-    if (val == MEP_BUTTON_HEADER)
+
+    if (data[0] == MEP_BUTTON_HEADER)
     {
         /* Buttons packet */
         if (data[1] & 0x1)
             int_btn |= BUTTON_LEFT;
         if (data[1] & 0x2)
+            int_btn |= BUTTON_MENU;
+        if (data[1] & 0x4)
             int_btn |= BUTTON_RIGHT;
+        if (data[1] & 0x8)
+            int_btn |= BUTTON_VIEW;
     }
-    else if (val == MEP_ABSOLUTE_HEADER)
+    else if ((data[0] == MEP_ABSOLUTE_HEADER))
     {
-        /* Absolute packet - the finger is on the vertical strip.
-           Position ranges from 1-4095, with 1 at the bottom. */
-        val = ((data[1] >> 4) << 8) | data[2]; /* position */
+        if (data[1] & MEP_FINGER)
+        {
+            /* Absolute packet - the finger is on the horizontal strip.
+                Position ranges from 1-4095, with 1 at the bottom. */
+            val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
-        if ((val > 0) && (val <= 1365))
-            int_btn |= BUTTON_DOWN;
-        else if ((val > 1365) && (val <= 2730))
-            int_btn |= BUTTON_SELECT;
-        else if ((val > 2730) && (val <= 4095))
-            int_btn |= BUTTON_UP;
+            /* The HDD63x0 actually has 2 scrollbars. One vertical and one horizontal 
+            (where the prev, play, and next buttons are). Because of that, we need to know
+            which sensor is reporting data. */
+            if ((data[3] >> 6) == 1) /* index = 1 */
+            {
+                if ((val > 0) && (val <= 1365))
+                    int_btn |= BUTTON_PREV;
+                else if ((val > 1365) && (val <= 2730))
+                    int_btn |= BUTTON_PLAY;
+                else if ((val > 2730) && (val <= 4095))
+                    int_btn |= BUTTON_NEXT;
+            } else
+            {
+                int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
+                if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
+                if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
+
+                old_pos = scr_pos;
+
+                /* repeat button */
+                repeat = 0;
+                if (int_btn != BUTTON_NONE)
+                {
+                    if (int_btn != scroll_repeat)
+                        scroll_repeat = int_btn;
+                    else repeat = BUTTON_REPEAT;
+                }
+            }
+        }
+        else
+        {
+            old_pos = -1;
+            scroll_repeat = BUTTON_NONE;
+        }
     }
 }
 #else
@@ -104,12 +143,22 @@ int button_read_device(void)
         return BUTTON_NONE;
 
     /* Device buttons */
-    if (!(GPIOA_INPUT_VAL & 0x01)) btn |= BUTTON_MENU;
     if (!(GPIOA_INPUT_VAL & 0x02)) btn |= BUTTON_VOL_UP;
     if (!(GPIOA_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
-    if (!(GPIOA_INPUT_VAL & 0x08)) btn |= BUTTON_VIEW;
-    if (!(GPIOD_INPUT_VAL & 0x20)) btn |= BUTTON_PLAYLIST;
     if (!(GPIOD_INPUT_VAL & 0x40)) btn |= BUTTON_POWER;
+
+    /* Scrollstrip direct button post - much better response */
+    if ((btn == BUTTON_UP) || (btn == BUTTON_DOWN))
+    {
+        queue_post(&button_queue,btn|repeat,0);
+        backlight_on();
+        buttonlight_on();
+        reset_poweroff_timer();
+
+        int_btn = BUTTON_NONE;
+        repeat = BUTTON_NONE;
+        btn = BUTTON_NONE;
+    }
 
     if ((btn != btn_old) && (btn != BUTTON_NONE))
         button_click();

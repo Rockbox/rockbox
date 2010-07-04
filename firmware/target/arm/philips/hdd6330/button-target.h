@@ -28,6 +28,7 @@
 #define MEP_BUTTON_HEADER   0x19
 #define MEP_BUTTON_ID       0x9
 #define MEP_ABSOLUTE_HEADER 0x0b
+#define MEP_FINGER          0x01
 
 #define HAS_BUTTON_HOLD
 
@@ -41,18 +42,22 @@ void button_int(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER        0x00000001
-#define BUTTON_PLAYLIST     0x00000002
-#define BUTTON_MENU         0x00000004
-#define BUTTON_VIEW         0x00000008
-#define BUTTON_VOL_UP       0x00000010
-#define BUTTON_VOL_DOWN     0x00000020
-#define BUTTON_SELECT       0x00000040
-#define BUTTON_LEFT         0x00000080
-#define BUTTON_RIGHT        0x00000100
-#define BUTTON_UP           0x00000200
-#define BUTTON_DOWN         0x00000400
+#define BUTTON_MENU         0x00000002
+#define BUTTON_VIEW         0x00000004
+#define BUTTON_VOL_UP       0x00000008
+#define BUTTON_VOL_DOWN     0x00000010
+#define BUTTON_LEFT         0x00000020
+#define BUTTON_RIGHT        0x00000040
+#define BUTTON_UP           0x00000080
+#define BUTTON_DOWN         0x00000100
+#define BUTTON_NEXT         0x00000200
+#define BUTTON_PREV         0x00000400
+#define BUTTON_PLAY         0x00000800
 
-#define BUTTON_MAIN         0x00000fff
+#define BUTTON_SELECT       0x00001000
+#define BUTTON_PLAYLIST     0x00002000
+
+#define BUTTON_MAIN         0x00003fff
 
 /* No Remote control */
 #define BUTTON_REMOTE 0
