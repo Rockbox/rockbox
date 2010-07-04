@@ -1,0 +1,27 @@
+% $Id$ %
+\def\UseOption{ondavx777}
+\edef\UseOption{\UseOption,ONDA_VX777_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+%\edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
+\edef\UseOption{\UseOption,ondavx777}
+
+\newcommand{\playerman}{Onda}
+\newcommand{\playertype}{VX777}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{240}
+\newcommand{\dapdisplayheight}{400}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{ondavx777}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.vx777}}
+\newcommand{\firmwareextension}{\fname{vx777}}
+\newcommand{\screenshotsize}{6cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-ondavx777.tex}
+\input{platform/keymap-touchscreen.tex}

@@ -1,0 +1,23 @@
+\begin{enumerate}
+\item Compile the bootloader (this will generate a \fname{ccpmp.bin} file).
+
+\item Get a copy of the original \playerman{} firmware (called \fname{vx777.HXF}) from
+  \url{http://www.onda.cn/pro/download/biosexp.jsp?ITEM_ID=12628}.
+
+\item Compile ChinaChipPatcher in rbutil/chinachippatcher/ (run make in the dir).
+
+\item Run
+\begin{code} 
+    ../rbutil/chinachippatcher/chinachip VX747.HXF ccpmp.bin output.HXF ccpmp.old
+\end{code}
+    in the dir where you compiled your bootloader
+
+\item Put \fname{output.HXF} in the root of the NAND drive (boot into the OF as
+    Rockbox currently can't access the NAND storage) and name it \fname{VX777.HXF}
+
+\item Reset your player. 
+
+\end{enumerate}
+
+\note{If you want to have dual-boot capabilities, copy \fname{ccpmp.old}, name it
+      \fname{ccpmp.bin} to the root of your MicroSD card.}

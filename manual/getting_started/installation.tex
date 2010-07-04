@@ -83,6 +83,24 @@ follow the instructions at
     \end{itemize}
 \end{description}
 }
+\opt{ondavx777}{
+\begin{description}
+  \item[Current limitations.] Most Rockbox functions are usable on the
+    \playertype{}, including music playback and most plugins, but
+    there are a number of shortcomings that prevent it from being a fully
+    supported target:
+    \begin{itemize}
+      \item A MicroSD card is required to run Rockbox, since the internal
+        flash memory hasn't been figured out yet.
+      \item There is only basic touchscreen support. Further work is
+        required to make the UI more usable with a touchscreen in general.
+        \note{The touchscreen can be used in two modes, either a 3$\times$3 grid mode
+          which divides the screen into areas to emulate a set of physical
+          buttons (the default setting), or ``absolute point'' mode where the
+          touchscreen is used to point to items on the screen.\\}
+    \end{itemize}
+\end{description}
+}
 \opt{h300}{
 \begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
@@ -261,7 +279,6 @@ still available to you.\\
   update Rockbox. The build consists of a directory called
   \fname{.rockbox} which contains all of the Rockbox files, and is 
   located in the root of your \daps{} drive.
-
 \end{description}
 }
 
@@ -297,7 +314,7 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
 Prebuilt binaries for Windows, Linux and Mac OS X are
 available at the \wikilink{RockboxUtility} wiki page.\\
 
-\opt{gigabeats}{\note{Rockbox Utility does not currently support the
+\opt{gigabeats,ondavx777}{\note{Rockbox Utility does not currently support the
 \playertype{} and you will therefore need to follow the manual install
 instructions below.\\}}
 
@@ -427,6 +444,7 @@ correct version for your \dap{}.}}
  the files onto%
  \opt{gigabeats}{the main data partition of }
  \opt{cowond2}{either an SD card or the internal memory of }
+ \opt{ondavx777}{the MicroSD of }
  your \dap{}.
  \opt{cowond2}{\note{If you have chosen to extract to the internal memory, it
      will not be possible to save settings.}}
@@ -453,19 +471,22 @@ structure that Rockbox needs.\\}
  by Rockbox, in the main directory of your \daps{} drive.
 }
 
-\opt{swcodec}{\nopt{gigabeats}{
-  \subsubsection{Installing the bootloader}
-  \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
-  \opt{ipod}{\input{getting_started/ipod_install.tex}}
-  \opt{m3,m5,x5}{\input{getting_started/iaudio_install.tex}}
-  \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
-  \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
-  \opt{sansa}{\input{getting_started/sansa_install.tex}}
-  \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
-  \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
-  \opt{cowond2}{\input{getting_started/cowond2_install.tex}}
-  \opt{vibe500}{\input{getting_started/vibe500_install.tex}}
-}}
+\opt{swcodec}{%
+    \nopt{gigabeats}{%
+    \subsubsection{Installing the bootloader}
+        \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
+        \opt{ipod}{\input{getting_started/ipod_install.tex}}
+        \opt{m3,m5,x5}{\input{getting_started/iaudio_install.tex}}
+        \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
+        \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
+        \opt{sansa}{\input{getting_started/sansa_install.tex}}
+        \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
+        \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
+        \opt{cowond2}{\input{getting_started/cowond2_install.tex}}
+        \opt{vibe500}{\input{getting_started/vibe500_install.tex}}
+        \opt{ondavx777}{\input{getting_started/ondavx777_install.tex}}
+    }
+}
 
 \subsection{Finishing the install}\label{ref:finish_install}
 
@@ -495,7 +516,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2,vibe500}{
+\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2,vibe500,ondavx777}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
