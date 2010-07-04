@@ -2145,7 +2145,7 @@ short j,j1,j2,piece,i,sq,*PL;
             while (!(m & 0x88))
               {
                 u = unmap[m];
-                a[u] = ++a[u] | c;
+                a[u] = (a[u]+1) | c;
                 if (color[u] == neutral) m += d;
                 else break;
               }
@@ -2155,7 +2155,7 @@ short j,j1,j2,piece,i,sq,*PL;
           if (!((m = m0+Dir[j]) & 0x88))
             {
               u = unmap[m];
-              a[u] = ++a[u] | c;
+              a[u] = (a[u]+1) | c;
             }
     }
 }
