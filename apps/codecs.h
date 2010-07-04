@@ -44,7 +44,7 @@
 #include "thread.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC)
-#if !defined(SIMULATOR) && defined(HAVE_RECORDING)
+#ifdef HAVE_RECORDING
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
@@ -213,7 +213,7 @@ struct codec_api {
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
  
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#ifdef HAVE_RECORDING
     volatile bool   stop_encoder;
     volatile int    enc_codec_loaded; /* <0=error, 0=pending, >0=ok */
     void            (*enc_get_inputs)(struct enc_inputs *inputs);

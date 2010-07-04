@@ -167,7 +167,7 @@ struct codec_api ci = {
     __cyg_profile_func_exit,
 #endif
 
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#ifdef HAVE_RECORDING
     false,  /* stop_encoder */
     0,      /* enc_codec_loaded */
     enc_get_inputs,
@@ -179,13 +179,13 @@ struct codec_api ci = {
 
     /* file */
     (open_func)PREFIX(open),
-    close,
-    (read_func)read,
+    PREFIX(close),
+    (read_func)PREFIX(read),
     PREFIX(lseek),
-    (write_func)write,
+    (write_func)PREFIX(write),
     round_value_to_list32,
 
-#endif
+#endif /* HAVE_RECORDING */
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

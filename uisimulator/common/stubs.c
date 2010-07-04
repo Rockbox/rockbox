@@ -56,6 +56,11 @@ bool fat_ismounted(int volume)
     return true;
 }
 
+int storage_spinup_time(void)
+{
+    return 0;
+}
+
 int storage_init(void)
 {
     return 1;

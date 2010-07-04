@@ -31,6 +31,10 @@
 #include "audiohw.h"
 #include "system.h"
 
+#ifdef HAVE_RECORDING
+#include "audiohw.h"
+#endif
+
 #include "pcm.h"
 #include "pcm_sampr.h"
 
@@ -284,15 +288,18 @@ void pcm_rec_dma_stop(void)
 {
 }
 
-unsigned long pcm_rec_status(void)
-{
-    return 0;
-}
-
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
     return NULL;
 }
+
+void audiohw_set_recvol(int left, int right, int type)
+{
+    (void)left;
+    (void)right;
+    (void)type;
+}
+
 
 #endif /* HAVE_RECORDING */
 

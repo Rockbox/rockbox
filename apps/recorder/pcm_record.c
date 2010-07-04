@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "logf.h"
 #include "thread.h"
-#include <string.h>
+#include "string-extra.h"
 #include "storage.h"
 #include "usb.h"
 #include "buffer.h"
