@@ -69,7 +69,7 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
             children.append(new ParseTreeNode(data->children[i], this));
         break;
 
-    case SUBLINES:
+    case LINE_ALTERNATOR:
         for(int i = 0; i < element->children_count; i++)
         {
             children.append(new ParseTreeNode(data->children[i], this));
@@ -147,13 +147,13 @@ QString ParseTreeNode::genCode() const
                 buffer.append(children[i]->genCode());
             }
             if(openConditionals == 0
-               && !(parent && parent->element->type == SUBLINES))
+               && !(parent && parent->element->type == LINE_ALTERNATOR))
             {
                 buffer.append('\n');
             }
             break;
 
-        case SUBLINES:
+        case LINE_ALTERNATOR:
             for(int i = 0; i < children.count(); i++)
             {
                 buffer.append(children[i]->genCode());
@@ -282,7 +282,7 @@ int ParseTreeNode::genHash() const
             break;
         case VIEWPORT:
         case LINE:
-        case SUBLINES:
+        case LINE_ALTERNATOR:
         case CONDITIONAL:
             hash += element->children_count;
             break;
@@ -371,7 +371,7 @@ QVariant ParseTreeNode::data(int column) const
             case LINE:
                 return QObject::tr("Logical Line");
 
-            case SUBLINES:
+            case LINE_ALTERNATOR:
                 return QObject::tr("Alternator");
 
             case COMMENT:
@@ -419,7 +419,7 @@ QVariant ParseTreeNode::data(int column) const
             case UNKNOWN:
             case VIEWPORT:
             case LINE:
-            case SUBLINES:
+            case LINE_ALTERNATOR:
                 return QString();
 
             case CONDITIONAL:
@@ -543,7 +543,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
         int child = evalTag(info, true, element->children_count).toInt();
         children[element->params_count + child]->render(info, viewport, true);
     }
-    else if(element->type == SUBLINES)
+    else if(element->type == LINE_ALTERNATOR)
     {
         /* First we build a list of the times for each branch */
         QList<double> times;

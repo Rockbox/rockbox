@@ -325,7 +325,7 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
     int i;
 
     retval = skin_alloc_element();
-    retval->type = SUBLINES;
+    retval->type = LINE_ALTERNATOR;
     retval->next = NULL;
     retval->line = skin_line;
 

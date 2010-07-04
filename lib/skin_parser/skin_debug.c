@@ -157,7 +157,7 @@ void skin_debug_tree(struct skin_element* root)
 
             break;
 
-        case SUBLINES:
+        case LINE_ALTERNATOR:
             printf("[ Alternator on line %d with %d sublines \n", current->line,
                    current->children_count);
             debug_indent_level++;
