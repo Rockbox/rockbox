@@ -31,6 +31,7 @@
 #include <iostream>
 
 int ParseTreeNode::openConditionals = 0;
+bool ParseTreeNode::breakFlag = false;
 
 /* Root element constructor */
 ParseTreeNode::ParseTreeNode(struct skin_element* data)
@@ -520,8 +521,11 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     {
         for(int i = 0; i < children.count(); i++)
             children[i]->render(info, viewport);
-        if(!noBreak)
+        if(!noBreak && !breakFlag)
             viewport->newLine();
+
+        if(breakFlag)
+            breakFlag = false;
     }
     else if(element->type == TEXT)
     {
@@ -531,6 +535,8 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     {
         if(!execTag(info, viewport))
             viewport->write(evalTag(info).toString());
+        if(element->tag->flags & NOBREAK)
+            breakFlag = true;
     }
     else if(element->type == CONDITIONAL)
     {

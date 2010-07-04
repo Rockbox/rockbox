@@ -27,6 +27,9 @@ extern "C"
 {
 #endif
 
+    /* Flag to tell the renderer not to insert a line break */
+#define NOBREAK 0x1
+
 
 enum skin_token_type {
     
@@ -271,7 +274,7 @@ struct tag_info
     enum skin_token_type type;
     char* name;
     char* params;
-
+    int flags;
 };
 
 /* 

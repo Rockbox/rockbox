@@ -79,6 +79,7 @@ private:
     QList<ParseTreeNode*> children;
 
     static int openConditionals;
+    static bool breakFlag;
     QGraphicsItem* rendered;
 
 };
