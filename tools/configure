@@ -12,7 +12,7 @@
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
 
 # global LD options for all platforms
-GLOBAL_LDOPTS="-Wl,-z,defs"
+GLOBAL_LDOPTS=""
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
@@ -107,7 +107,7 @@ simcc () {
  ARG_ARM_THUMB=0 # can't use thumb in native builds
 
  simver=sdl
- winbuild="$crosscompile"
+ winbuild=""
  GCCOPTS='-W -Wall -g -fno-builtin'
  GCCOPTIMIZE=''
  LDOPTS='-lm' # button-sdl.c uses sqrt()
@@ -118,6 +118,11 @@ simcc () {
  # default share option, override below if needed
  SHARED_FLAG="-shared"
 
+ if [ "$win32crosscompile" = "yes" ]; then
+   LDOPTS="$LDOPTS -mconsole"
+   output="rockboxui.exe"
+   winbuild="yes"
+ else
  case $uname in
    CYGWIN*)
    echo "Cygwin host detected"
@@ -164,7 +169,9 @@ simcc () {
    exit 1
    ;;
  esac
+ fi
 
+ [ "$winbuild" != "yes" ] && GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
  sdl=`findsdl $winbuild`
 
  if [ $1 = "sdl" ]; then
@@ -182,7 +189,7 @@ simcc () {
 
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
- if test "X$crosscompile" != "Xyes"; then
+ if test "X$win32crosscompile" != "Xyes"; then
    case `uname -m` in
     x86_64|amd64)
       # fPIC is needed to make shared objects link
@@ -483,7 +490,7 @@ whichadvanced () {
         ;;
       [Ww])
         echo "Enabling Windows 32 cross-compiling"
-        crosscompile="yes"
+        win32crosscompile="yes"
         ;;
       *)
         if [ "$interact" ]; then
