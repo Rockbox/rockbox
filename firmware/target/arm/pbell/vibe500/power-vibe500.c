@@ -49,14 +49,14 @@ void power_init(void)
     /* Max touch sensivity = 0x77, Rate=80/s,NoFilter=0,
        KeyMatrix=0,Buttons=1,Relative=0,Absolute=1.
        MEP parameter 0x20 - Report Modes */
-    touchpad_set_parameter(0x20,0x7785);
+    touchpad_set_parameter(0,0x20,0x7785);
     /* MinAbsReporting=0, NotAllCapButtons=0,SingleCapButton=0,
        50msDebounce=0,MotionReporting=1 (reduce transmission overhead),
        ClipZifnoFinger=0,DisableDeceleration=0,Dribble=0.
        MEP parameter 0x21 - Enhanced Operating Configuration */
-    touchpad_set_parameter(0x21,0x0008);
+    touchpad_set_parameter(0,0x21,0x0008);
     /* Set the GPO_LEVELS = 0 - for the button lights */
-    touchpad_set_parameter(0x23,0x0000);
+    touchpad_set_parameter(0,0x23,0x0000);
 
     /* Sound unmute (on) */
     GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
@@ -100,7 +100,7 @@ void power_off(void)
     /* shutdown bit */
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x80);
     /* button lights off */
-    touchpad_set_parameter(0x22,0x0000);
+    touchpad_set_parameter(0,0x22,0x0000);
     /* ATA power off */
     ide_power_enable(false);
     /* ? - in the OF */

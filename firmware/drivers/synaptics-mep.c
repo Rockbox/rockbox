@@ -558,6 +558,10 @@ int touchpad_read_device(char *data, int len)
             }
             else if (val == MEP_ABSOLUTE_HEADER)
             {
+/* for HDD6330 an absolute packet will follow for sensor nr 0 which we ignore */
+#if defined(PHILIPS_HDD6330)
+                if ((data[3]>>6) == 0) syn_read(tmp, 4);
+#endif
                 logf(" pos %d", val);
                 logf(" z %d", data[3]);
                 logf(" finger %d", data[1] & 0x1);
@@ -583,7 +587,7 @@ int touchpad_read_device(char *data, int len)
     return val;
 }
 
-int touchpad_set_parameter(char par_nr, unsigned int param)
+int touchpad_set_parameter(char mod_nr, char par_nr, unsigned int param)
 {
     char data[4];
     int val=0;
@@ -592,7 +596,7 @@ int touchpad_set_parameter(char par_nr, unsigned int param)
     {
         syn_enable_int(false);
 
-        data[0]=0x03; /* header - addr:0,global:0,control:0,len:3 */
+        data[0]=0x03 | (mod_nr << 5); /* header - addr=mod_nr,global:0,ctrl:0,len:3 */
         data[1]=0x40+par_nr; /* parameter number */
         data[2]=(param >> 8) & 0xff; /* param_hi */
         data[3]=param & 0xff;        /* param_lo */
@@ -614,7 +618,11 @@ int touchpad_set_buttonlights(unsigned int led_mask, char brightness)
         syn_enable_int(false);
 
         /* turn on all touchpad leds */
+#if defined(PHILIPS_HDD6330)
+        data[0] = 0x25; /* HDD6330: second module */
+#else
         data[0] = 0x05;
+#endif
         data[1] = 0x31;
         data[2] = (brightness & 0xf) << 4;
         data[3] = 0x00;
