@@ -33,6 +33,9 @@
 
 #ifdef HAVE_RECORDING
 #include "audiohw.h"
+#ifdef HAVE_SPDIF_IN
+#include "spdif.h"
+#endif
 #endif
 
 #include "pcm.h"
@@ -300,6 +303,12 @@ void audiohw_set_recvol(int left, int right, int type)
     (void)type;
 }
 
+#ifdef HAVE_SPDIF_IN
+unsigned long spdif_measure_frequency(void)
+{
+    return 0;
+}
+#endif
 
 #endif /* HAVE_RECORDING */
 
