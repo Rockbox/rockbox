@@ -22,7 +22,7 @@
 #include "tag_table.h"
 
 #include <string.h>
-#define BAR_PARAMS "*|iiiiN"
+#define BAR_PARAMS "*|iiiis"
 /* The tag definition table */
 struct tag_info legal_tags[] = 
 {
@@ -124,7 +124,7 @@ struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_PEAKMETER,             "pm", "", 0 },
     { SKIN_TOKEN_PLAYER_PROGRESSBAR,    "pf", "", 0 },
-    { SKIN_TOKEN_PROGRESSBAR,           "pb" , "*|iiiis", 0 },
+    { SKIN_TOKEN_PROGRESSBAR,           "pb" , BAR_PARAMS, 0 },
     { SKIN_TOKEN_VOLUME,                "pv" , BAR_PARAMS, 0 },
     
     { SKIN_TOKEN_TRACK_ELAPSED_PERCENT, "px", "", 0 },
