@@ -25,11 +25,10 @@ if($argc < 2)
     $path = getcwd();
 else
     $path = $argv[1];
-if($path[count($path) - 1] != '/')
-    $path = $path . '/';
+$path = rtrim($path, "/");
 $dir = dir($path);
 $split = explode("/", $path);
-$last = $split[count($split) - 2];
+$last = $split[count($split) - 1];
 echo "\t<qresource prefix=\"/$last\">\n";
 while(false !== ($entry = $dir->read()))
 {
@@ -37,7 +36,7 @@ while(false !== ($entry = $dir->read()))
         continue;
     echo "\t\t";
     echo "<file alias = \"$entry\">";
-    echo $path . $entry . "</file>";
+    echo $path . '/' . $entry . "</file>";
     echo "\n";
 }
 echo "\t</qresource>\n";
