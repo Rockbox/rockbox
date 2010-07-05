@@ -12605,3 +12605,17 @@
     touchscreen: "Cancel"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Update on Stop"
+  </dest>
+  <voice>
+    *: "Update on Stop"
+  </voice>
+</phrase>

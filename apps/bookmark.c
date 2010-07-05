@@ -166,16 +166,21 @@ bool bookmark_mrb_load()
 bool bookmark_autobookmark(bool prompt_ok)
 {
     char*  bookmark;
+    bool update = false;
     if (!system_check())
         return false;
 
     audio_pause();    /* first pause playback */
+    if (global_settings.autoupdatebookmark && bookmark_exist())
+        update = true;
     bookmark = create_bookmark();
     /* Workaround for inability to speak when paused: all callers will
        just do audio_stop() when we return, so we can do it right
        away. This makes it possible to speak the "Create a Bookmark?"
        prompt and the "Bookmark Created" splash. */
     audio_stop();
+    if (update)
+        return write_bookmark(true, bookmark);
     switch (global_settings.autocreatebookmark)
     {
         case BOOKMARK_YES:

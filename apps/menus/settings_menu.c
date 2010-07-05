@@ -347,11 +347,12 @@ static int bmark_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(autocreatebookmark,
                  &global_settings.autocreatebookmark, bmark_callback);
+MENUITEM_SETTING(autoupdatebookmark, &global_settings.autoupdatebookmark, NULL);
 MENUITEM_SETTING(autoloadbookmark, &global_settings.autoloadbookmark, NULL);
 MENUITEM_SETTING(usemrb, &global_settings.usemrb, NULL);
 MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
           Icon_Bookmark,
-          &autocreatebookmark, &autoloadbookmark, &usemrb);
+          &autocreatebookmark, &autoupdatebookmark, &autoloadbookmark, &usemrb);
 /*    BOOKMARK MENU                */
 /***********************************/
 
