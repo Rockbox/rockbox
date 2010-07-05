@@ -25,6 +25,10 @@
 #include "m_pd.h"
 #include "s_stuff.h"
 
+/* Declare functions that go to IRAM. */
+void pdbox_get_more(unsigned char** start, size_t* size) ICODE_ATTR;
+int rockbox_send_dacs(void) ICODE_ATTR;
+
 /* Extern variables. */
 extern float sys_dacsr;
 extern t_sample *sys_soundout;
@@ -125,7 +129,7 @@ int rockbox_send_dacs(void)
     t_sample* right = sys_soundout + DEFDACBLKSIZE*1;
     unsigned int samples_out = 0;
     int16_t* out;
-    int sample;
+    register int sample;
 
     /* Cancel if whole buffer filled. */
     if(outbuf_fill >= OUTBUFSIZE-1)
