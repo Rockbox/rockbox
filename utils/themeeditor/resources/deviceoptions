@@ -37,6 +37,7 @@ remotewidth ; Remote Width ; spin(0,800) ; 100
 remoteheight ; Remote Height ; spin(0,800); 50
 showviewports ; Show Viewports ; check ; false
 rendersbs ; Render SBS If Available ; check ; true
+rtl ; Right-To-Left Language ; check ; false
 
 [ID3 Info]
 ia ; Artist ; text ; Current Artist

@@ -46,7 +46,6 @@ DeviceState::DeviceState(QWidget *parent) :
 
     /* Loading the tabs */
     QScrollArea* currentArea = 0;
-    QHBoxLayout* subLayout;
     QWidget* panel;
 
     QFile fin(":/resources/deviceoptions");

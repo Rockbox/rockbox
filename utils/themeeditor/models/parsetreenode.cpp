@@ -616,6 +616,26 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             /* %ar */
             viewport->alignText(RBViewport::Right);
             return true;
+
+        case 'x':
+            /* %ax */
+            return true;
+
+        case 'L':
+            /* %aL */
+            if(info.device()->data("rtl").toBool())
+                viewport->alignText(RBViewport::Right);
+            else
+                viewport->alignText(RBViewport::Left);
+            return true;
+
+        case 'R':
+            /* %aR */
+            if(info.device()->data("rtl").toBool())
+                viewport->alignText(RBViewport::Left);
+            else
+                viewport->alignText(RBViewport::Right);
+            return true;
         }
 
         return false;
@@ -811,7 +831,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case '\0':
             /* %X */
             filename = QString(element->params[0].data.text);
-            if(info.sbsScreen())
+            if(info.sbsScreen() && info.screen()->parentItem())
                 info.sbsScreen()->setBackdrop(filename);
             else
                 info.screen()->setBackdrop(filename);
