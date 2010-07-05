@@ -23,9 +23,75 @@
 
 #include <QFont>
 #include <QBrush>
+#include <QFile>
 
-RBFont::RBFont(QString file): filename(file)
+#include <QDebug>
+
+RBFont::RBFont(QString file)
 {
+
+    /* Attempting to locate the correct file name */
+    if(!QFile::exists(file))
+        file = ":/fonts/08-Schumacher-Clean.fnt";
+    header.insert("filename", file);
+
+    /* Opening the file */
+    QFile fin(file);
+    fin.open(QFile::ReadOnly);
+
+    /* Loading the header info */
+    quint16 word;
+    quint32 dword;
+
+    QDataStream data(&fin);
+    data.setByteOrder(QDataStream::LittleEndian);
+
+    /* Grabbing the magic number and version */
+    data >> dword;
+    header.insert("version", dword);
+
+    /* Max font width */
+    data >> word;
+    header.insert("maxwidth", word);
+
+    /* Font height */
+    data >> word;
+    header.insert("height", word);
+
+    /* Ascent */
+    data >> word;
+    header.insert("ascent", word);
+
+    /* Padding */
+    data >> word;
+
+    /* First character code */
+    data >> dword;
+    header.insert("firstchar", dword);
+
+    /* Default character code */
+    data >> dword;
+    header.insert("defaultchar", dword);
+
+    /* Number of characters */
+   data >> dword;
+   header.insert("size", dword);
+
+   /* Bytes of imagebits in file */
+   data >> dword;
+   header.insert("nbits", dword);
+
+   /* Longs (dword) of offset data in file */
+   data >> dword;
+   header.insert("noffset", dword);
+
+   /* Bytes of width data in file */
+   data >> dword;
+   header.insert("nwidth", dword);
+
+    fin.close();
+
+    qDebug() << header ;
 }
 
 RBFont::~RBFont()

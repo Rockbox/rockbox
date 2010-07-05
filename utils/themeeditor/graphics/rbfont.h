@@ -25,6 +25,7 @@
 #include <QString>
 #include <QFile>
 #include <QGraphicsSimpleTextItem>
+#include <QHash>
 
 class RBFont
 {
@@ -37,7 +38,7 @@ public:
     int lineHeight(){ return 8; }
 
 private:
-    QString filename;
+    QHash<QString, QVariant> header;
 };
 
 #endif // RBFONT_H
