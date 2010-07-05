@@ -40,6 +40,7 @@ rendersbs ; Render SBS If Available ; check ; true
 rtl ; Right-To-Left Language ; check ; false
 
 [ID3 Info]
+id3available ; ID3 Info Available ; check ; true
 ia ; Artist ; text ; Current Artist
 ic ; Composer ; text ; Current Composer
 iA ; Album Artist ; text ; Current Album Artist
