@@ -121,7 +121,7 @@ av_cold int ff_mdct_init(FFTContext *s, int nbits, int inverse, double scale)
  * @param output N/2 samples
  * @param input N/2 samples
  */
-void ff_imdct_half_c(FFTContext *s, FFTSample *output, const FFTSample *input)
+void fff_imdct_half_c(FFTContext *s, FFTSample *output, const FFTSample *input)
 {
     int k, n8, n4, n2, n, j;
     const uint16_t *revtab = s->revtab;
@@ -144,8 +144,8 @@ void ff_imdct_half_c(FFTContext *s, FFTSample *output, const FFTSample *input)
         in1 += 2;
         in2 -= 2;
     }
-    ff_fft_calc(s, z);
 
+    fff_fft_calc(s, z);
     /* post rotation + reordering */
     for(k = 0; k < n8; k++) {
         FFTSample r0, i0, r1, i1;
@@ -170,7 +170,7 @@ void ff_imdct_calc_c(FFTContext *s, FFTSample *output, const FFTSample *input)
     int n2 = n >> 1;
     int n4 = n >> 2;
 
-    ff_imdct_half_c(s, output+n4, input);
+    fff_imdct_half_c(s, output+n4, input);
 
     for(k = 0; k < n4; k++) {
         output[k] = -output[n2-k-1];
@@ -211,7 +211,7 @@ void ff_mdct_calc_c(FFTContext *s, FFTSample *out, const FFTSample *input)
         CMUL(x[j].re, x[j].im, re, im, -tcos[n8 + i], tsin[n8 + i]);
     }
 
-    ff_fft_calc(s, x);
+    fff_fft_calc(s, x);
 
     /* post rotation */
     for(i=0;i<n8;i++) {

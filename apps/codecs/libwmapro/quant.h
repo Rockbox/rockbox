@@ -1,0 +1,45 @@
+#ifndef _QUANT_H_
+#define _QUANT_H_
+
+#include <inttypes.h>
+
+/* This table contains unscaled integer casts of the floating point inverse
+ * quantization factors used by wma pro. The formula for calculating the 
+ * floating point value is :
+ *         quant = pow(10.0, exp/20)
+ * 'exp' is an integer value which I have exmerimentally found to fall in the 
+ * range (50,139). */
+const int32_t quant_tab[90] = {
+    0x0000013C, 0x00000163, 0x0000018E, 0x000001BF, 
+    0x000001F5, 0x00000232, 0x00000277, 0x000002C4, 
+    0x0000031A, 0x0000037B, 0x000003E8, 0x00000462, 
+    0x000004EB, 0x00000585, 0x00000631, 0x000006F2, 
+    0x000007CB, 0x000008BF, 0x000009D0, 0x00000B02, 
+    0x00000C5A, 0x00000DDC, 0x00000F8D, 0x00001173, 
+    0x00001394, 0x000015F7, 0x000018A6, 0x00001BA7, 
+    0x00001F07, 0x000022D1, 0x00002710, 0x00002BD4, 
+    0x0000312D, 0x0000372D, 0x00003DE9, 0x00004577, 
+    0x00004DF1, 0x00005773, 0x0000621F, 0x00006E18, 
+    0x00007B87, 0x00008A99, 0x00009B83, 0x0000AE7C, 
+    0x0000C3C7, 0x0000DBAA, 0x0000F678, 0x0001148B, 
+    0x00013649, 0x00015C25, 0x000186A0, 0x0001B64A, 
+    0x0001EBC5, 0x000227C6, 0x00026B19, 0x0002B6A4, 
+    0x00030B66, 0x00036A80, 0x0003D535, 0x00044CEE, 
+    0x0004D344, 0x000569FD, 0x0006131B, 0x0006D0DC, 
+    0x0007A5C3, 0x000894A5, 0x0009A0AD, 0x000ACD6A, 
+    0x000C1ED8, 0x000D9973, 0x000F4240, 0x00111EE2, 
+    0x001335AD, 0x00158DBA, 0x00182EFD, 0x001B2267, 
+    0x001E71FE, 0x00222901, 0x0026540E, 0x002B014F, 
+    0x003040A6, 0x003623E6, 0x003CBF10, 0x00442894, 
+    0x004C79A0, 0x0055CE75, 0x006046C5, 0x006C0622, 
+    0x00793472, 0x0087FE7D, 
+};
+
+#define EXP_MIN 50
+#define EXP_MAX 139
+
+/* return the correct value of quant based on exp */
+#define QUANT(exp)    quant_tab[exp - EXP_MIN]
+
+
+#endif /* _QUANT_H_ */

@@ -66,7 +66,7 @@ enum codec_status codec_main(void)
     int pktcnt = 0;             /* Count of the packets played */
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 32);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 17);
     
 
 next_track:

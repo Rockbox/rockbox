@@ -110,7 +110,7 @@ extern SINTABLE(65536);
  */
 int ff_fft_init(FFTContext *s, int nbits, int inverse);
 void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
+void fff_fft_calc_c(FFTContext *s, FFTComplex *z);
 
 void ff_fft_init_altivec(FFTContext *s);
 void ff_fft_init_mmx(FFTContext *s);
@@ -127,7 +127,7 @@ static inline void ff_fft_permute(FFTContext *s, FFTComplex *z)
  * Do a complex FFT with the parameters defined in ff_fft_init(). The
  * input data must be permuted before. No 1.0/sqrt(n) normalization is done.
  */
-static inline void ff_fft_calc(FFTContext *s, FFTComplex *z)
+static inline void fff_fft_calc(FFTContext *s, FFTComplex *z)
 {
     s->fft_calc(s, z);
 }
@@ -135,11 +135,11 @@ void ff_fft_end(FFTContext *s);
 
 /* MDCT computation */
 
-static inline void ff_imdct_calc(FFTContext *s, FFTSample *output, const FFTSample *input)
+static inline void fff_imdct_calc(FFTContext *s, FFTSample *output, const FFTSample *input)
 {
     s->imdct_calc(s, output, input);
 }
-static inline void ff_imdct_half(FFTContext *s, FFTSample *output, const FFTSample *input)
+static inline void fff_imdct_half(FFTContext *s, FFTSample *output, const FFTSample *input)
 {
     s->imdct_half(s, output, input);
 }
@@ -181,7 +181,7 @@ extern SINETABLE_CONST float * const ff_sine_windows[13];
 
 int ff_mdct_init(FFTContext *s, int nbits, int inverse, double scale);
 void ff_imdct_calc_c(FFTContext *s, FFTSample *output, const FFTSample *input);
-void ff_imdct_half_c(FFTContext *s, FFTSample *output, const FFTSample *input);
+void fff_imdct_half_c(FFTContext *s, FFTSample *output, const FFTSample *input);
 void ff_mdct_calc_c(FFTContext *s, FFTSample *output, const FFTSample *input);
 void ff_mdct_end(FFTContext *s);
 

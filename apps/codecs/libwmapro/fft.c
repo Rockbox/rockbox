@@ -101,10 +101,10 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     s2 = inverse ? 1.0 : -1.0;
 
     s->fft_permute = ff_fft_permute_c;
-    s->fft_calc    = ff_fft_calc_c;
+    s->fft_calc    = fff_fft_calc_c;
 //#if CONFIG_MDCT
     s->imdct_calc  = ff_imdct_calc_c;
-    s->imdct_half  = ff_imdct_half_c;
+    s->imdct_half  = fff_imdct_half_c;
     s->mdct_calc   = ff_mdct_calc_c;
 //#endif
     s->exptab1     = NULL;
@@ -361,7 +361,7 @@ static void (* const fft_dispatch[])(FFTComplex*) = {
     fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
 };
 
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
+void fff_fft_calc_c(FFTContext *s, FFTComplex *z)
 {
     fft_dispatch[s->nbits-2](z);
 }

@@ -14,8 +14,18 @@ IMPORT DETAILS
 
 Based on ffmpeg svn r22886 dated 15 April 2010.
 
-Currently, the files contain minimal changes from their original state in order
-to be able to compile cleanly. 
+The code is slowly being modified to convert it from floating point maths to 
+fixed point.
+
+As of 6 July 2010, the following steps are all working properly in fixed point:
+- Inverse quantization and rescaling
+- IMDCT
+- Windowing
+
+Results of comparing output wav files from the partially fixed point decoder to 
+the output wav files of ffmpeg decoder are :
+- average relative error = 0.016%
+- maximum relative error = 0.3% 
 
 COMPILING
 
