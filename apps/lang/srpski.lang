@@ -3978,7 +3978,7 @@
     mrobe100: "DISPLAY = Врати на старо"
     gigabeats: "BACK = Врати на старо"
     gogearsa9200: "LEFT = Врати на старо"
-    vibe500: "C = Врати на старо"
+    vibe500: "CANCEL = Врати на старо"
   </dest>
   <voice>
     *: none
@@ -4456,11 +4456,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Буђење траје %d:%02d"
+    alarm: "Буђење у %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Буђење траје"
+    alarm: "Буђење у"
   </voice>
 </phrase>
 <phrase>
@@ -4782,13 +4782,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 клип"
+    *: ".talk клип"
   </dest>
   <voice>
-    *: "talk mp3 клип"
+    *: "talk клип"
   </voice>
 </phrase>
 <phrase>
@@ -6819,10 +6819,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Стави следећу у ред"
+    *: "Стави као следећу у ред"
   </dest>
   <voice>
-    *: "Стави следећу у ред"
+    *: "Стави као следећу у ред"
   </voice>
 </phrase>
 <phrase>
@@ -6833,10 +6833,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Стави последњу у ред"
+    *: "Стави као последњу у ред"
   </dest>
   <voice>
-    *: "Стави последњу у ред"
+    *: "Стави као последњу у ред"
   </voice>
 </phrase>
 <phrase>
@@ -9022,7 +9022,7 @@
     *: ""
   </dest>
   <voice>
-    *: "милиапмер часова"
+    *: "милиампер часова"
   </voice>
 </phrase>
 <phrase>
@@ -9975,7 +9975,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "од"
   </voice>
 </phrase>
 <phrase>
@@ -11519,15 +11519,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Мод за интернет претраживач"
+    usb_hid: "Интернет претраживач"
   </dest>
   <voice>
     *: none
-    usb_hid: "Мод за интернет претраживач"
+    usb_hid: "Интернет претраживач"
   </voice>
 </phrase>
 <phrase>
@@ -11720,15 +11720,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Мод миша"
+    usb_hid: "Миш"
   </dest>
   <voice>
     *: none
-    usb_hid: "Мод миша"
+    usb_hid: "Миша"
   </voice>
 </phrase>
 <phrase>
@@ -11754,15 +11754,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Мод за мултимедију"
+    usb_hid: "Мултимедија"
   </dest>
   <voice>
     *: none
-    usb_hid: "Мод за мултимедију"
+    usb_hid: "Мултимедија"
   </voice>
 </phrase>
 <phrase>
@@ -12005,15 +12005,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Мод за презентације"
+    usb_hid: "Презентација"
   </dest>
   <voice>
     *: none
-    usb_hid: "Мод за презентације"
+    usb_hid: "Презентација"
   </voice>
 </phrase>
 <phrase>
@@ -12028,5 +12028,503 @@
   </dest>
   <voice>
     *: "од"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS пречица"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "WPS пречица"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio_remote: "Екран радија на даљинском"
+  </dest>
+  <voice>
+    *:none
+    radio_remote: "Екран радија на даљинском"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Појачање опсега %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Појачање опсега %d"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Основни Skin"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Основни Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Линијски излаз"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Линијски излаз"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "Скин радио екрана"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Широк"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Широк"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Основни скин на даљинском"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Основни скин на даљинском"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Скин радио екрана на даљинском"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Eкран на даљинском"
+  </dest>
+  <voice>
+    *:none
+    remote: "Eкран на даљинском"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Уски"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Уски"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Пречица прегледача фајлова"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Пречица прегледача фајлова"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Премотај уназад пре настављања"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Премотај уназад пре настављања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Необележенo>"
+  </dest>
+  <voice>
+    *: "Необележенo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Напредна подешавања конпроле тона"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Напредна подешавања конпроле тона"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3-D побољшање"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3-D побољшање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Одустани"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Одустани"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Композитор"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Фреквенција опсега %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Фреквенција опсега"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ширина опсега %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ширина опсега"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Станица:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Екран радија"
+  </dest>
+  <voice>
+    *:none
+    radio: "Екран радија"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Главни екран"
+  </dest>
+  <voice>
+    *:none
+    remote: "Главни екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "покрени ток слика"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Форсирано"
+  </dest>
+  <voice>
+    *: "Форсирано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Тонске контроле"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Тонске контроле"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Пречица"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Пречица"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Интервал хистограма"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Интервал хистограма"
   </voice>
 </phrase>
