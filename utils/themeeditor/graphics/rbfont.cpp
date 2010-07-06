@@ -24,10 +24,14 @@
 #include <QFont>
 #include <QBrush>
 #include <QFile>
+#include <QPainter>
+#include <QBitmap>
+#include <QImage>
 
-#include <QDebug>
+quint16 RBFont::maxFontSizeFor16BitOffsets = 0xFFDB;
 
 RBFont::RBFont(QString file)
+    : valid(false), imageData(0), offsetData(0), widthData(0)
 {
 
     /* Attempting to locate the correct file name */
@@ -40,6 +44,7 @@ RBFont::RBFont(QString file)
     fin.open(QFile::ReadOnly);
 
     /* Loading the header info */
+    quint8 byte;
     quint16 word;
     quint32 dword;
 
@@ -89,23 +94,120 @@ RBFont::RBFont(QString file)
    data >> dword;
    header.insert("nwidth", dword);
 
-    fin.close();
+   /* Loading the image data */
+   imageData = new quint8[header.value("nbits").toInt()];
+   for(int i = 0; i < header.value("nbits").toInt(); i++)
+   {
+       data >> byte;
+       imageData[i] = byte;
+   }
 
-    qDebug() << header ;
+   /* Aligning on 16-bit boundary */
+   if(header.value("nbits").toInt() % 2 == 1)
+       data >> byte;
+
+   /* Loading the offset table if necessary */
+   if(header.value("noffset").toInt() > 0)
+   {
+       offsetData = new quint16[header.value("noffset").toInt()];
+       for(int i = 0; i < header.value("noffset").toInt(); i++)
+       {
+           data >> word;
+           offsetData[i] = word;
+       }
+   }
+
+   /* Loading the width table if necessary */
+   if(header.value("nwidth").toInt() > 0)
+   {
+       widthData = new quint8[header.value("nwidth").toInt()];
+       for(int i = 0; i < header.value("nwidth").toInt(); i++)
+       {
+           data >> byte;
+           widthData[i] = byte;
+       }
+   }
+
+   fin.close();
+
 }
 
 RBFont::~RBFont()
 {
+    if(imageData)
+        delete[] imageData;
+    if(offsetData)
+        delete[] offsetData;
+    if(widthData)
+        delete[] widthData;
 }
 
-QGraphicsSimpleTextItem* RBFont::renderText(QString text, QColor color,
-                                            QGraphicsItem *parent)
+RBText* RBFont::renderText(QString text, QColor color, QGraphicsItem *parent)
 {
-    QGraphicsSimpleTextItem* retval = new QGraphicsSimpleTextItem(text, parent);
-    QFont font;
-    font.setFixedPitch(true);
-    font.setPixelSize(8);
-    retval->setFont(font);
-    retval->setBrush(QBrush(color));
-    return retval;
+    int firstChar = header.value("firstchar").toInt();
+    int height = header.value("height").toInt();
+    int maxWidth = header.value("maxwidth").toInt();
+
+    /* First we determine the width of the combined text */
+    QList<int> widths;
+    for(int i = 0; i < text.length(); i++)
+    {
+        if(widthData)
+            widths.append(widthData[text[i].unicode() - firstChar]);
+        else
+            widths.append(maxWidth);
+    }
+
+    int totalWidth = 0;
+    for(int i = 0; i < widths.count(); i++)
+        totalWidth += widths[i];
+
+    QImage image(totalWidth, height, QImage::Format_Indexed8);
+
+    image.setColor(0, qRgba(0,0,0,0));
+    image.setColor(1, color.rgb());
+
+    /* Drawing the text */
+    int startX = 0;
+    for(int i = 0; i < text.length(); i++)
+    {
+        unsigned int offset;
+        if(offsetData)
+            offset = offsetData[text[i].unicode() - firstChar];
+        else
+            offset = (text[i].unicode() - firstChar) * maxWidth;
+
+        int bytesHigh = height / 8;
+        if(height % 8 > 0)
+            bytesHigh++;
+
+        int bytes = bytesHigh * widths[i];
+
+        for(int byte = 0; byte < bytes; byte++)
+        {
+            int x = startX + byte % widths[i];
+            int y = byte / widths[i] * 8;
+            quint8 data = imageData[offset];
+            quint8 mask = 0x1;
+            for(int bit = 0; bit < 8; bit++)
+            {
+                if(mask & data)
+                    image.setPixel(x, y, 1);
+                else
+                    image.setPixel(x, y, 0);
+
+                y++;
+                mask <<= 1;
+                if(y >= height)
+                    break;
+            }
+
+            offset++;
+        }
+
+        startX += widths[i];
+    }
+
+    return new RBText(image, parent);
+
 }

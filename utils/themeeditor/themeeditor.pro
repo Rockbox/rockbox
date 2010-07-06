@@ -43,7 +43,8 @@ HEADERS += models/parsetreemodel.h \
     gui/devicestate.h \
     graphics/rbalbumart.h \
     graphics/rbprogressbar.h \
-    gui/findreplacedialog.h
+    gui/findreplacedialog.h \
+    graphics/rbtext.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -63,7 +64,8 @@ SOURCES += main.cpp \
     gui/devicestate.cpp \
     graphics/rbalbumart.cpp \
     graphics/rbprogressbar.cpp \
-    gui/findreplacedialog.cpp
+    gui/findreplacedialog.cpp \
+    graphics/rbtext.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

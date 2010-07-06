@@ -30,8 +30,7 @@
 #include "skin_parser.h"
 
 RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
-    : QGraphicsItem(info.screen()), font(info.screen()->getFont(0)),
-    foreground(info.screen()->foreground()),
+    : QGraphicsItem(info.screen()), foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
     statusBarTexture(":/render/statusbar.png")
@@ -42,6 +41,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         size = QRectF(0, 0, info.screen()->getWidth(),
                       info.screen()->getHeight());
         customUI = false;
+        font = screen->getFont(1);
 
         if(info.model()->rowCount(QModelIndex()) > 1)
         {
@@ -120,6 +120,10 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             y -= screen->parentItem()->pos().y();
         }
 
+        if(node->params[++param].type == skin_tag_parameter::DEFAULT)
+            font = screen->getFont(1);
+        else
+            font = screen->getFont(node->params[param].data.numeric);
 
         setPos(x, y);
         size = QRectF(0, 0, w, h);

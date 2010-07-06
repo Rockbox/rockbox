@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: rbfont.cpp 27301 2010-07-05 22:15:17Z bieber $
  *
  * Copyright (C) 2010 Robert Bieber
  *
@@ -19,34 +19,24 @@
  *
  ****************************************************************************/
 
-#ifndef RBFONT_H
-#define RBFONT_H
+#ifndef RBTEXT_H
+#define RBTEXT_H
 
-#include <QString>
-#include <QFile>
-#include <QGraphicsPixmapItem>
-#include <QHash>
+#include <QGraphicsItem>
+#include <QImage>
 
-#include "rbtext.h"
-
-class RBFont
+class RBText : public QGraphicsItem
 {
 public:
-    RBFont(QString file);
-    virtual ~RBFont();
+    RBText(const QImage& image, QGraphicsItem* parent);
 
-    RBText* renderText(QString text, QColor color,
-                                        QGraphicsItem* parent = 0);
-    int lineHeight(){ return header.value("height", 0).toInt(); }
-
-    static quint16 maxFontSizeFor16BitOffsets;
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
 
 private:
-    QHash<QString, QVariant> header;
-    bool valid;
-    quint8* imageData;
-    quint16* offsetData;
-    quint8* widthData;
+    QImage image;
+
 };
 
-#endif // RBFONT_H
+#endif // RBTEXT_H
