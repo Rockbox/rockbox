@@ -47,6 +47,7 @@ public slots:
 
 private slots:
     void colorClicked();
+    void browseFont();
 
 private:
     Ui::PreferencesDialog *ui;
@@ -54,9 +55,11 @@ private:
     void loadSettings();
     void loadColors();
     void loadFont();
+    void loadFontDir();
     void saveSettings();
     void saveColors();
     void saveFont();
+    void saveFontDir();
 
     void setupUI();
 

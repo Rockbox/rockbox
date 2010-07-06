@@ -27,6 +27,7 @@
 #include <QPainter>
 #include <QBitmap>
 #include <QImage>
+#include <QSettings>
 
 quint16 RBFont::maxFontSizeFor16BitOffsets = 0xFFDB;
 
@@ -36,7 +37,19 @@ RBFont::RBFont(QString file)
 
     /* Attempting to locate the correct file name */
     if(!QFile::exists(file))
-        file = ":/fonts/08-Schumacher-Clean.fnt";
+    {
+        /* Checking in the fonts repository */
+        QSettings settings;
+        settings.beginGroup("RBFont");
+
+        file = file.split("/").last();
+        file = settings.value("fontDir", "").toString() + "/" + file;
+
+        settings.endGroup();
+
+        if(!QFile::exists(file))
+            file = ":/fonts/08-Schumacher-Clean.fnt";
+    }
     header.insert("filename", file);
 
     /* Opening the file */

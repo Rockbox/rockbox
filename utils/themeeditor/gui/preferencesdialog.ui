@@ -23,9 +23,6 @@
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Editor</string>
@@ -251,6 +248,37 @@
            </property>
            <property name="text">
             <string>Click To Change</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Fonts</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Font Path</string>
+           </property>
+           <property name="buddy">
+            <cstring>fontBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="fontBox"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fontBrowseButton">
+           <property name="text">
+            <string>Browse...</string>
            </property>
           </widget>
          </item>
