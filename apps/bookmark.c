@@ -166,13 +166,13 @@ bool bookmark_mrb_load()
 bool bookmark_autobookmark(bool prompt_ok)
 {
     char*  bookmark;
-    bool update = false;
+    bool update;
+
     if (!is_bookmarkable_state())
         return false;
 
     audio_pause();    /* first pause playback */
-    if (global_settings.autoupdatebookmark && bookmark_exists())
-        update = true;
+    update = (global_settings.autoupdatebookmark && bookmark_exists());
     bookmark = create_bookmark();
     /* Workaround for inability to speak when paused: all callers will
        just do audio_stop() when we return, so we can do it right
