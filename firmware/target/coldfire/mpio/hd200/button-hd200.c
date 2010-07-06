@@ -26,6 +26,15 @@
 #include "backlight.h"
 #include "adc.h"
 
+static bool remote_detect(void)
+{
+    /* When there is no remote adc readout
+     * is exactly 0. We add some margin
+     * for ADC readout instability
+     */
+    return adc_scan(ADC_REMOTE)>10?true:false;
+}
+
 void button_init_device(void)
 {
     /* GPIO56 (main PLAY) 
@@ -44,7 +53,11 @@ bool button_hold(void)
 
 bool remote_button_hold(void)
 {
-    return adc_scan(ADC_REMOTE)<50?true:false;
+    /* On my remote hold gives readout of 44 */
+    if (remote_detect())
+        return adc_scan(ADC_REMOTE)<50?true:false;
+    else
+        return false;
 }
 
 /*
@@ -55,9 +68,13 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     int data = 0;
     static bool hold_button = false;
-    static bool remote_hold_button = false;
+    bool remote_hold_button = false;
 
     bool hold_button_old;
+    bool remote_present;
+
+    /* check if we have remote connected */
+    remote_present = remote_detect();
 
     /* read hold buttons status */
     hold_button_old = hold_button;
@@ -70,6 +87,7 @@ int button_read_device(void)
         backlight_hold_changed(hold_button);
 #endif
 
+    /* Skip if main hold is active */
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
@@ -110,7 +128,8 @@ int button_read_device(void)
         }
     }
 
-    if (!remote_hold_button)
+    /* Skip if remote is not present or remote_hold is active */
+    if (remote_present && !remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
 
@@ -146,6 +165,9 @@ int button_read_device(void)
         }
     }
 
+    /* PLAY buttons (both remote and main) are
+     * GPIOs not ADC
+     */
     data = GPIO1_READ;
 
     /* GPIO56 active high main PLAY/PAUSE/ON */
@@ -153,7 +175,7 @@ int button_read_device(void)
         btn |= BUTTON_PLAY;
 
     /* GPIO41 active high remote PLAY/PAUSE/ON */
-    if (!remote_hold_button && ((data & (1<<9))))
+    if (remote_present && !remote_hold_button && ((data & (1<<9))))
         btn |= BUTTON_RC_PLAY;
         
     return btn;
