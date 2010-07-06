@@ -83,6 +83,9 @@ FORMS += gui/editorwindow.ui \
     gui/findreplacedialog.ui
 RESOURCES += resources.qrc
 
+win32 {
+    RC_FILE = themeeditor.rc
+}
 macx {
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
