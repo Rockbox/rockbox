@@ -971,8 +971,9 @@ cat <<EOF
  142) YH-925              ==Packard Bell==       130) Lyre proto 1
  143) YP-S3               160) Vibe 500          131) Mini2440
 
- ==MPIO==
- 170) HD200
+ ==MPIO==                                        == Application ==
+ 170) HD200                                      200) SDL 320x240
+
 EOF
 
   buildfor=`input`;
@@ -2598,6 +2599,28 @@ fi
     t_cpu="coldfire"
     t_manufacturer="mpio"
     t_model="hd200"
+    ;;
+
+   200|app*)
+    target_id=100
+    modelname="application"
+    target="-DAPPLICATION"
+    memory=32
+    uname=`uname`
+    simcc "sdl"
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="bootloader-cowond2.bin"
+    appextra="recorder:gui:radio"
+    plugins=""
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="sdl"
+    t_model="app"
     ;;
 
    *)

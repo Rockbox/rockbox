@@ -663,7 +663,7 @@ static bool dbg_hw_info(void)
 
     while (!(action_userabort(TIMEOUT_BLOCK)));
     
-#else
+#elif (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* Define this function in your target tree */
     return __dbg_hw_info();
 #endif /* CONFIG_CPU */

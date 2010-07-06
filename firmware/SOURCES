@@ -35,6 +35,12 @@ target/hosted/sdl/lcd-sdl.c
 target/hosted/sdl/system-sdl.c
 target/hosted/sdl/thread-sdl.c
 target/hosted/sdl/timer-sdl.c
+#ifdef HAVE_TOUCHSCREEN
+target/hosted/sdl/key_to_touch-sdl.c
+#endif
+#ifdef APPLICATION
+target/hosted/sdl/app/button-application.c
+#endif
 #endif
 panic.c
 debug.c

@@ -397,6 +397,13 @@
 #define UI_LCD_POSX                 101
 #define UI_LCD_POSY                 195
 
+#elif defined(APPLICATION)
+#define UI_TITLE                    "Rockbox"
+#define UI_LCD_POSX                 0
+#define UI_LCD_POSY                 0
+#define UI_WIDTH                    LCD_WIDTH
+#define UI_HEIGHT                   LCD_HEIGHT
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

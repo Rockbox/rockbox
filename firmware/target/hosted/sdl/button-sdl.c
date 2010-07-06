@@ -31,10 +31,8 @@
 #include "misc.h"
 #include "button-sdl.h"
 #include "backlight.h"
-#ifdef SIMULATOR
 #include "sim_tasks.h"
 #include "buttonmap.h"
-#endif
 #include "debug.h"
 
 #ifdef HAVE_TOUCHSCREEN
@@ -139,6 +137,7 @@ bool gui_message_loop(void)
                             x = event.button.x;
                             y = event.button.y;
                         }
+#ifdef SIMULATOR
                         if ( background ) {
                             xybutton = xy2button( event.button.x, event.button.y );
                             if( xybutton ) {
@@ -146,6 +145,7 @@ bool gui_message_loop(void)
                                 break;
                             }
                         }
+#endif
 #ifdef HAVE_TOUCHSCREEN
                         touchscreen_event(event.button.x, event.button.y);
 #endif

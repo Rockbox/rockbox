@@ -1,8 +1,5 @@
 #ifdef SIMULATOR
 buttonmaps.c
-#ifdef HAVE_TOUCHSCREEN
-touchscreen.c
-#endif
 #if CONFIG_KEYPAD == GIGABEAT_PAD
 gigabeat.c
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD

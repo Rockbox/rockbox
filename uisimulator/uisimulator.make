@@ -18,7 +18,11 @@ SIMOBJ = $(call c2obj,$(SIMSRC))
 OTHER_SRC += $(SIMSRC)
 
 SIMLIB = $(BUILDDIR)/uisimulator/libuisimulator.a
-UIBMP = $(BUILDDIR)/UI256.bmp
+ifeq ($(MODELNAME), application)
+UIBMP=
+else
+UIBMP=$(BUILDDIR)/UI256.bmp
+endif
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 

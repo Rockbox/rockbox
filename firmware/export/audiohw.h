@@ -69,6 +69,10 @@
 #if defined(HAVE_SDL_AUDIO)
 /* #include <SDL_audio.h> gives errors in other code areas,
  * we don't really need it here, so don't. but it should maybe be fixed */
+#ifndef SIMULATOR /* simulator gets values from the target .h files */
+#define VOLUME_MIN  -990
+#define VOLUME_MAX  0
+#endif
 #endif
 
 

@@ -424,6 +424,9 @@ Lyre prototype 1 */
 #include "config/vibe500.h"
 #elif defined(MPIO_HD200)
 #include "config/mpiohd200.h"
+
+#elif defined(APPLICATION)
+#include "config/application.h"
 #else
 /* no known platform */
 #endif

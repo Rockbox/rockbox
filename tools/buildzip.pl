@@ -474,6 +474,7 @@ $year+=1900;
 # made once for all targets
 sub runone {
     my ($target, $fonts)=@_;
+    my $samedir = abs_path($install) == abs_path($rbdir);
 
     # build a full install .rockbox ($rbdir) directory
     buildzip($target, $fonts);
@@ -498,14 +499,18 @@ sub runone {
         if ($install =~ /\/dev\/null/) {
             die "ERROR: No PREFIX given\n"
         }
-        system("cp -r $rbdir \"$install\" >/dev/null");
+        if (!$samedir) {
+            system("cp -r $rbdir \"$install\" >/dev/null");
+        }
     }
     else {
         system("$ziptool $output $rbdir $target >/dev/null");
     }
 
     # remove the $rbdir afterwards
-    rmtree($rbdir);
+    if (!$samedir) {
+        rmtree($rbdir);
+    }
 };
 
 if(!$exe) {
