@@ -37,12 +37,11 @@ static bool remote_detect(void)
 
 void button_init_device(void)
 {
-    /* GPIO56 (main PLAY) 
-     * GPIO41 (remote PLAY)
-     * as general purpose inputs 
+    /* GPIO56 (main PLAY) general input
+     * GPIO41 (remote PLAY) is shared with Audio Serial Data
      */
-    or_l((1<<24)|(1<<9),&GPIO1_FUNCTION);
-    and_l(~((1<<24)|(1<<9)),&GPIO1_ENABLE);
+    or_l((1<<24),&GPIO1_FUNCTION);
+    and_l(~(1<<24),&GPIO1_ENABLE);
 }
 
 bool button_hold(void)
@@ -92,7 +91,7 @@ int button_read_device(void)
     {
         data = adc_scan(ADC_BUTTONS);
 
-        if (data < 2250) /* valid button */
+        if (data < 2300) /* valid button */
         {
 	    if (data < 900) /* middle */
             {
@@ -121,7 +120,7 @@ int button_read_device(void)
                     if (data < 1900)
                         /* 1900 - 1600 */
                         btn = BUTTON_PREV;
-                    else /* 1900 - 2250 */
+                    else /* 1900 - 2300 */
                         btn = BUTTON_SELECT;
                 }
 	    }	    
