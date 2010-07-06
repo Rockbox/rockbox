@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="0.9">
+    <dict>
+        <key>CFBundleExecutable</key>
+        <string>themeeditor</string>
+        <key>CFBundleName</key>
+        <string>Theme Editor</string>
+        <key>CFBundleShortVersionString</key>
+        <string>SVN</string>
+        <key>CFBundleIconFile</key>
+        <string>windowicon.icns</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleIdentifier</key>
+        <string>org.rockbox.themeeditor</string>
+    </dict>
+</plist>

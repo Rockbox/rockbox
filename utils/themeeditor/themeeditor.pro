@@ -88,5 +88,7 @@ macx {
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
     QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
     CONFIG+=x86 ppc
+    QMAKE_INFO_PLIST = Info.plist
+    RC_FILE = resources/windowicon.icns
 }
 
