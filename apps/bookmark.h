@@ -29,7 +29,7 @@ bool bookmark_create_menu(void);
 bool bookmark_mrb_load(void);
 bool bookmark_autoload(const char* file);
 bool bookmark_load(const char* file, bool autoload);
-bool bookmark_exist(void);
+bool bookmark_exists(void);
 
 #endif /* __BOOKMARK_H__ */
 

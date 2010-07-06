@@ -106,7 +106,7 @@ static int bookmark_menu_callback(int action,
         case ACTION_REQUEST_MENUITEM:
             if (this_item == &bookmark_load_menu_item)
             {
-                if (bookmark_exist() == 0)
+                if (!bookmark_exists())
                     return ACTION_EXIT_MENUITEM;
             }
             /* hide the bookmark menu if there is no playback */
