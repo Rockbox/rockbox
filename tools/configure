@@ -822,6 +822,7 @@ help() {
     --thumb           Build with -mthumb (for ARM builds)
     --no-thumb        The opposite of --thumb (don't use thumb even for targets
                       where this is the default
+    --prefix          Target installation directory
     --help            Shows this message (must not be used with other options)
 
 EOF
@@ -859,6 +860,7 @@ for arg in "$@"; do
 		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
+        --prefix=*)   PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
@@ -3065,7 +3067,7 @@ if [ "$ARG_ARM_EABI" = "1" ]; then
   cmdline="$cmdline--eabi "
 fi
 
-cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
+cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts --prefix=\$(PREFIX)"
 ### end of cmdline
 
 sed > Makefile \
