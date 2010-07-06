@@ -7,27 +7,62 @@
 # $Id$
 #
 
-BUILDDIR ?= .
 ifndef V
 SILENT = @
 endif
 
-SRC = skin_buffer.c skin_parser.c skin_debug.c skin_scan.c tag_table.c
-OBJ := $(patsubst %.c,$(BUILDDIR)/%.o,$(SRC))
-OUT = $(BUILDDIR)/libskin_parser.a
-CC = gcc
+CC ?= gcc
 AR = ar
-INCLUDES = -I.
+OUTPUT=libskin_parser
+TARGET_DIR ?= ./
 
-default: $(OUT)
+# construct build directory if BUILDDIR is not set.
+BUILDDIR ?= $(TARGET_DIR)build
 
-$(BUILDDIR)/%.o: %.c
+ifdef RBARCH
+CFLAGS += -arch $(RBARCH)
+OBJDIR = $(BUILDDIR)/$(RBARCH)/
+else
+OBJDIR = $(BUILDDIR)/
+endif
+
+# input files
+SOURCES := skin_buffer.c skin_debug.c skin_parser.c skin_scan.c tag_table.c
+OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(SOURCES)))
+
+all: $(OUTPUT).a
+
+$(OBJDIR)%.o: %.c
 	@echo CC $<
-	$(SILENT)$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-$(OUT): $(OBJ)
-	@echo AR $(notdir $(OUT))
-	$(SILENT)$(AR) rcs $(OUT) $(OBJ)
+ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+# some trickery to build ppc and i386 from a single call
+$(OUTPUT).a: $(TARGET_DIR)$(OUTPUT)i386.a $(TARGET_DIR)$(OUTPUT)ppc.a
+	@echo lipo $(TARGET_DIR)$@
+	$(SILENT) rm -f $(TARGET_DIR)$(OUTPUT)
+	$(SILENT)lipo -create $(TARGET_DIR)$(OUTPUT)ppc.a $(TARGET_DIR)$(OUTPUT)i386.a -output $(TARGET_DIR)$(OUTPUT).a
+
+ifneq ($(RBARCH),)
+$(OUTPUT)$(RBARCH).a: $(OBJS)
+	@echo AR $@
+	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
+else
+$(TARGET_DIR)$(OUTPUT)i386.a:
+	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) $(OUTPUT)i386.a
+
+$(TARGET_DIR)$(OUTPUT)ppc.a:
+	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) $(OUTPUT)ppc.a
+endif
+else
+$(OUTPUT).a: $(OBJS)
+	@echo AR $@
+	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
+endif
 
 clean:
-	rm -f $(OBJ) $(OUT)
+	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)$(OUTPUT)*.a
+ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+endif
+

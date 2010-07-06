@@ -14,15 +14,15 @@ INCLUDEPATH += graphics
 
 # Stuff for the parse lib
 libskin_parser.commands = @$(MAKE) \
+    TARGET_DIR=$$MYBUILDDIR CC=\"$$QMAKE_CC\" \
     BUILDDIR=$$OBJECTS_DIR \
-    -C \
-    $$RBBASE_DIR/lib/skin_parser \
-    CC=\"$$QMAKE_CC\"
+    -C $$RBBASE_DIR/lib/skin_parser \
+    libskin_parser.a
+
 QMAKE_EXTRA_TARGETS += libskin_parser
 PRE_TARGETDEPS += libskin_parser
 INCLUDEPATH += $$RBBASE_DIR/lib/skin_parser
-LIBS += -L$$OBJECTS_DIR \
-    -lskin_parser
+LIBS += -L$$MYBUILDDIR -lskin_parser
 DEPENDPATH = $$INCLUDEPATH
 HEADERS += models/parsetreemodel.h \
     models/parsetreenode.h \
@@ -82,3 +82,11 @@ FORMS += gui/editorwindow.ui \
     gui/skinviewer.ui \
     gui/findreplacedialog.ui
 RESOURCES += resources.qrc
+
+macx {
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+    QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
+    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
+    CONFIG+=x86 ppc
+}
+
