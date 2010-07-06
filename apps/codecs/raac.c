@@ -28,6 +28,13 @@
 
 CODEC_HEADER
 
+/* Global buffers to be used in the mdct synthesis. This way the arrays can
+ * be moved to IRAM for some targets */
+#define GB_BUF_SIZE 1024
+ALIGN real_t gb_time_buffer[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
+ALIGN real_t gb_fb_intermed[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
+
+
 static void init_rm(RMContext *rmctx)
 {
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
@@ -40,8 +47,9 @@ enum codec_status codec_main(void)
 {
     static NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
-    size_t n;    
-    int32_t *output;
+    size_t n;
+    void *ret;
+    int needed_bufsize;
     unsigned int i;
     unsigned char* buffer;
     int err, consumed, pkt_offset, skipped = 0;
@@ -51,8 +59,8 @@ enum codec_status codec_main(void)
     size_t resume_offset = ci->id3->offset;
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:
     err = CODEC_OK;
@@ -80,7 +88,7 @@ next_track:
         goto done;
     }   
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(decoder);
-    conf->outputFormat = FAAD_FMT_16BIT;    
+    conf->outputFormat = FAAD_FMT_16BIT; /* irrelevant, we don't convert */
     NeAACDecSetConfiguration(decoder, conf);    
     
     decoder->config.defObjectType = rmctx.codec_extradata[0];
@@ -91,7 +99,35 @@ next_track:
         DEBUGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
         err = CODEC_ERROR;
         goto done;
-    }   
+    }
+    
+    /* Set pointer to be able to use IRAM an to avoid alloc in decoder. Must
+     * be called after NeAACDecOpen(). */
+    /* A buffer of framelength or 2*frameLenght size must be allocated for
+     * time_out. If frameLength is too big or SBR/forceUpSampling is active, 
+     * we do not use the IRAM buffer and keep faad's internal allocation (see 
+     * specrec.c). */
+    needed_bufsize = decoder->frameLength;
+#ifdef SBR_DEC
+    if ((decoder->sbr_present_flag == 1) || (decoder->forceUpSampling == 1))
+    {
+        needed_bufsize *= 2;
+    }
+#endif
+    if (needed_bufsize <= GB_BUF_SIZE)
+    {
+        decoder->time_out[0]    = &gb_time_buffer[0][0];
+        decoder->time_out[1]    = &gb_time_buffer[1][0];
+    }
+    /* A buffer of with frameLength elements must be allocated for fb_intermed. 
+     * If frameLength is too big, we do not use the IRAM buffer and keep faad's 
+     * internal allocation (see specrec.c). */
+    needed_bufsize = decoder->frameLength;
+    if (needed_bufsize <= GB_BUF_SIZE)
+    {
+        decoder->fb_intermed[0] = &gb_fb_intermed[0][0];
+        decoder->fb_intermed[1] = &gb_fb_intermed[1][0];
+    }
     
     /* check for a mid-track resume and force a seek time accordingly */
     if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
@@ -172,16 +208,16 @@ seek_start:
             goto done;
         /* Decode one block - returned samples will be host-endian */                           
         for(i = 0; i < rmctx.sub_packet_cnt; i++) {
-            output = (int32_t *)NeAACDecDecode(decoder, &frame_info, buffer, rmctx.sub_packet_lengths[i]);                                           
+            ret = NeAACDecDecode(decoder, &frame_info, buffer, rmctx.sub_packet_lengths[i]);
             buffer += rmctx.sub_packet_lengths[i];                      
             if (frame_info.error > 0) {
                 DEBUGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
                 err = CODEC_ERROR;
                 goto exit;
             }
-            output = (int32_t *) output_to_PCM(decoder, decoder->time_out, output,
-                rmctx.nb_channels, decoder->frameLength, decoder->config.outputFormat);
-            ci->pcmbuf_insert(output, NULL, frame_info.samples/rmctx.nb_channels);
+            ci->pcmbuf_insert(decoder->time_out[0],
+                              decoder->time_out[1],
+                              decoder->frameLength);
             ci->set_elapsed(pkt.timestamp);            
         }                                       
         
