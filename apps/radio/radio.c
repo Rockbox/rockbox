@@ -73,6 +73,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
+#include "presets.h"
 
 #if CONFIG_TUNER
 
@@ -138,23 +139,8 @@
 
 /* presets.c needs these so keep unstatic or redo the whole thing! */
 int curr_freq; /* current frequency in Hz */
-/* these are all in presets.c... someone PLEASE rework this ! */
-int handle_radio_presets(void);
+
 static bool radio_menu(void);
-int radio_add_preset(void);
-int save_preset_list(void);
-int load_preset_list(void);
-int clear_preset_list(void);
-void next_preset(int direction);
-void set_current_preset(int preset);
-int scan_presets(void *viewports);
-int find_preset(int freq);
-void radio_save_presets(void);
-bool has_presets_changed(void);
-void talk_preset(int preset, bool fallback, bool enqueue);
-void presets_save(void);
-
-
 
 int radio_mode = RADIO_SCAN_MODE;
 static int search_dir = 0;
@@ -363,7 +349,7 @@ void next_station(int direction)
 {
     if (direction != 0 && radio_mode != RADIO_SCAN_MODE)
     {
-        next_preset(direction);
+        preset_next(direction);
         return;
     }
 
@@ -377,7 +363,7 @@ void next_station(int direction)
     if (radio_status == FMRADIO_PLAYING)
         tuner_set(RADIO_MUTE, 0);
 
-    set_current_preset(find_preset(curr_freq));
+    preset_set_current(preset_find(curr_freq));
     remember_frequency();
 }
 
@@ -482,9 +468,9 @@ int radio_screen(void)
 #endif
 
    if(radio_preset_count() < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
-        scan_presets(NULL);
+        presets_scan(NULL);
 
-    set_current_preset(find_preset(curr_freq));
+    preset_set_current(preset_find(curr_freq));
     if(radio_current_preset() != -1)
          radio_mode = RADIO_PRESET_MODE;
 
@@ -501,7 +487,7 @@ int radio_screen(void)
 
             if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
-                set_current_preset(find_preset(curr_freq));
+                preset_set_current(preset_find(curr_freq));
                 remember_frequency();
                 end_search();
                 talk = true;
@@ -535,7 +521,7 @@ int radio_screen(void)
 #endif
                 {
                     done = true;
-                    if(has_presets_changed())
+                    if(presets_have_changed())
                     {
                         if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                         {
@@ -585,7 +571,7 @@ int radio_screen(void)
                 keep_playing = true;
                 done = true;
                 ret_val = GO_TO_ROOT;
-                if(has_presets_changed())
+                if(presets_have_changed())
                 {
                     if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                     {
@@ -610,7 +596,7 @@ int radio_screen(void)
                 search_dir = button == ACTION_STD_PREVREPEAT ? -1 : 1;
                 if (radio_mode != RADIO_SCAN_MODE)
                 {
-                    next_preset(search_dir);
+                    preset_next(search_dir);
                     end_search();
                     update_screen = true;
                     talk = true;
@@ -652,7 +638,7 @@ int radio_screen(void)
             case ACTION_FM_MENU:
                 fms_fix_displays(FMS_EXIT);
                 radio_menu();
-                set_current_preset(find_preset(curr_freq));
+                preset_set_current(preset_find(curr_freq));
                 update_screen = true;
                 restore = true;
                 break;
@@ -719,7 +705,7 @@ int radio_screen(void)
 
 #ifdef FM_NEXT_PRESET
             case ACTION_FM_NEXT_PRESET:
-                next_preset(1);
+                preset_next(1);
                 end_search();
                 update_screen = true;
                 talk = true;
@@ -728,7 +714,7 @@ int radio_screen(void)
 
 #ifdef FM_PREV_PRESET
             case ACTION_FM_PREV_PRESET:
-                next_preset(-1);
+                preset_next(-1);
                 end_search();
                 update_screen = true;
                 talk = true;
@@ -753,7 +739,7 @@ int radio_screen(void)
                     keep_playing = false;
                     done = true;
                     ret_val = GO_TO_ROOT;
-                    if(has_presets_changed())
+                    if(presets_have_changed())
                     {
                         if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
                         {
@@ -762,7 +748,7 @@ int radio_screen(void)
                     }
 
                     /* Clear the preset list on exit. */
-                    clear_preset_list();
+                    preset_list_clear();
                 }
                 break;
         } /*switch(button)*/
@@ -831,7 +817,7 @@ int radio_screen(void)
                 enqueue = true;
             }
             if (radio_current_preset() >= 0)
-                talk_preset(radio_current_preset(), radio_mode == RADIO_PRESET_MODE,
+                preset_talk(radio_current_preset(), radio_mode == RADIO_PRESET_MODE,
                             enqueue);
         }
 
@@ -999,32 +985,23 @@ MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif
 #ifndef FM_PRESET
-int handle_radio_presets_menu(void)
-{
-    return handle_radio_presets();
-}
 MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET),
-                    handle_radio_presets_menu, NULL, NULL, Icon_NOICON);
+                    handle_radio_presets, NULL, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD
-int handle_radio_addpreset_menu(void)
-{
-    return radio_add_preset();
-}
 MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET),
-                    radio_add_preset, NULL, NULL, Icon_NOICON);
+                    handle_radio_add_preset, NULL, NULL, Icon_NOICON);
 #endif
 
-
 MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD),
-                    load_preset_list, NULL, NULL, Icon_NOICON);
+                    preset_list_load, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE),
-                    save_preset_list, NULL, NULL, Icon_NOICON);
+                    preset_list_save, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR),
-                    clear_preset_list, NULL, NULL, Icon_NOICON);
+                    preset_list_clear, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(scan_presets_item, MENU_FUNC_USEPARAM,
                     ID2P(LANG_FM_SCAN_PRESETS),
-                    scan_presets, NULL, NULL, Icon_NOICON);
+                    presets_scan, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
             Icon_Radio_screen,

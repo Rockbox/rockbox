@@ -40,6 +40,7 @@
 #include "talk.h"
 #include "filetree.h"
 #include "dir.h"
+#include "presets.h"
 
 static int curr_preset = -1;
 
@@ -50,7 +51,8 @@ void remember_frequency(void);
 void talk_freq(int freq, bool enqueue);
 
 #define MAX_PRESETS 64
-static bool presets_loaded = false, presets_changed = false;
+static bool presets_loaded = false;
+static bool presets_changed = false;
 static struct fmstation presets[MAX_PRESETS];
 
 static char filepreset[MAX_PATH]; /* preset filename variable */
@@ -72,14 +74,14 @@ const struct fmstation *radio_get_preset(int preset)
     return &presets[preset];
 }
 
-bool has_presets_changed(void)
+bool presets_have_changed(void)
 {
     return presets_changed;
 }
 
 
 /* Find a matching preset to freq */
-int find_preset(int freq)
+int preset_find(int freq)
 {
     int i;
     if(num_presets < 1)
@@ -95,7 +97,7 @@ int find_preset(int freq)
 
 /* Return the closest preset encountered in the search direction with
    wraparound. */
-int find_closest_preset(int freq, int direction)
+static int find_closest_preset(int freq, int direction)
 {
     int i;
     int lowpreset = 0;
@@ -143,7 +145,7 @@ int find_closest_preset(int freq, int direction)
     return closest;
 }
 
-void next_preset(int direction)
+void preset_next(int direction)
 {
     if (num_presets < 1)
         return;
@@ -160,13 +162,13 @@ void next_preset(int direction)
     remember_frequency();
 }
 
-void set_current_preset(int preset)
+void preset_set_current(int preset)
 {
     curr_preset = preset;
 }
 
 /* Speak a preset by number or by spelling its name, depending on settings. */
-void talk_preset(int preset, bool fallback, bool enqueue)
+void preset_talk(int preset, bool fallback, bool enqueue)
 {
     if (global_settings.talk_file == 1) /* number */
         talk_number(preset + 1, enqueue);
@@ -270,7 +272,7 @@ const char* radio_get_preset_name(int preset)
     return NULL;
 }
 
-int radio_add_preset(void)
+int handle_radio_add_preset(void)
 {
     char buf[MAX_FMPRESET_LEN + 1];
 
@@ -348,12 +350,12 @@ static int radio_delete_preset(void)
     return 1;
 }
 
-int load_preset_list(void)
+int preset_list_load(void)
 {
     return !rockbox_browse(FMPRESET_PATH, SHOW_FMR);
 }
 
-int save_preset_list(void)
+int preset_list_save(void)
 {
     if(num_presets > 0)
     { 
@@ -406,7 +408,7 @@ int save_preset_list(void)
     return true;
 }
 
-int clear_preset_list(void)
+int preset_list_clear(void)
 {
     /* Clear all the preset entries */
     memset(presets, 0, sizeof (presets));
@@ -457,7 +459,7 @@ static const char* presets_get_name(int selected_item, void *data,
 static int presets_speak_name(int selected_item, void * data)
 {
     (void)data;
-    talk_preset(selected_item, true, false);
+    preset_talk(selected_item, true, false);
     return 0;
 }
 
@@ -498,7 +500,7 @@ int handle_radio_presets(void)
         switch (action)
         {
             case ACTION_STD_MENU:
-                if (radio_add_preset())
+                if (handle_radio_add_preset())
                 {
                     gui_synclist_set_nb_items(&lists, num_presets);
                     gui_synclist_select_item(&lists, num_presets - 1);
@@ -531,7 +533,7 @@ int handle_radio_presets(void)
 }
 
 
-int scan_presets(void *viewports)
+int presets_scan(void *viewports)
 {
     bool do_scan = true;
     int i;
@@ -608,13 +610,13 @@ int scan_presets(void *viewports)
 void presets_save(void)
 {
     if(filepreset[0] == '\0')
-        save_preset_list();
+        preset_list_save();
     else
         radio_save_presets();
 }
 
 #ifdef HAVE_LCD_BITMAP
-static inline void draw_veritcal_line_mark(struct screen * screen,
+static inline void draw_vertical_line_mark(struct screen * screen,
                                            int x, int y, int h)
 {
     screen->set_drawmode(DRMODE_COMPLEMENT);
@@ -635,7 +637,7 @@ void presets_draw_markers(struct screen *screen,
         int freq = radio_get_preset(i)->frequency;
         int diff = freq - region_data->freq_min;
         xi = x + (w * diff)/len;
-        draw_veritcal_line_mark(screen, xi, y, h);
+        draw_vertical_line_mark(screen, xi, y, h);
     }
 }
 #endif
