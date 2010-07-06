@@ -66,7 +66,7 @@ void power_init(void)
    
     /* turn off charger by default*/
     or_l((1<<23), &GPIO_OUT);
-    and_l(~(1<<23), &GPIO_ENABLE);
+    or_l((1<<23), &GPIO_ENABLE);
     or_l((1<<23), &GPIO_FUNCTION);
 
     /* high current charge mode */
