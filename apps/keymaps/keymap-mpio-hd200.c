@@ -30,12 +30,9 @@
  * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 
-/* CONTEXT_CUSTOM's used in this file...
-
-CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
-
-
-*/
+/*****************************************************************************
+ *    Main control mappings 
+ *****************************************************************************/
 
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,           BUTTON_PREV,                   BUTTON_NONE },
@@ -83,8 +80,8 @@ static const struct button_mapping button_context_wps[]  = {
 /*  { ACTION_WPS_PITCHSCREEN,    BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                       BUTTON_ }, */ 
     { ACTION_WPS_CONTEXT,        BUTTON_SELECT|BUTTON_REPEAT,   BUTTON_SELECT },
-    { ACTION_WPS_QUICKSCREEN,    BUTTON_REC|BUTTON_REL,         BUTTON_REC },
-    { ACTION_WPS_MENU,           BUTTON_REC|BUTTON_REPEAT,      BUTTON_REC },
+    { ACTION_WPS_QUICKSCREEN,    BUTTON_REC|BUTTON_REPEAT,      BUTTON_REC },
+    { ACTION_WPS_MENU,           BUTTON_REC|BUTTON_REL,         BUTTON_REC },
 /*  { ACTION_WPS_VIEW_PLAYLIST,  BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_WPS_REC,            BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_WPS_ABSETA_PREVDIR, BUTTON_,                       BUTTON_ }, */
@@ -169,7 +166,7 @@ static const struct button_mapping button_context_radio[]  = {
 static const struct button_mapping button_context_recscreen[]  = {
 /*  { ACTION_REC_LCD,            BUTTON_,                       BUTTON_ }, */
     { ACTION_REC_PAUSE,          BUTTON_PLAY,                   BUTTON_NONE },
-    { ACTION_REC_NEWFILE,        BUTTON_REC|BUTTON_REPEAT,      BUTTON_REC },
+    { ACTION_REC_NEWFILE,        BUTTON_SELECT|BUTTON_REPEAT,   BUTTON_SELECT },
 /*  { ACTION_REC_F2,             BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_REC_F3,             BUTTON_,                       BUTTON_ }, */
 
@@ -198,8 +195,157 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+/*****************************************************************************
+ *    Remote control mappings 
+ *****************************************************************************/
+
+static const struct button_mapping button_rc_context_standard[]  = {
+    { ACTION_STD_PREV,           BUTTON_RC_PREV,                   BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_RC_PREV|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RC_NEXT,                   BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_RC_NEXT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_OK,             BUTTON_RC_SELECT|BUTTON_REL,      BUTTON_RC_SELECT },
+    { ACTION_STD_CANCEL,         BUTTON_RC_PLAY|BUTTON_RC_SELECT,  BUTTON_RC_SELECT },
+    { ACTION_STD_CONTEXT,        BUTTON_RC_SELECT|BUTTON_REPEAT,   BUTTON_RC_SELECT },
+    { ACTION_STD_MENU,           BUTTON_RC_SELECT|BUTTON_RC_PLAY,  BUTTON_RC_SELECT },
+/*  { ACTION_STD_QUICKSCREEN,    BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_STD_KEYLOCK,        BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_STD_REC,            BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_STD_HOTKEY,         BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_F3,                 BUTTON_,                          BUTTON_ }, */
+  
+    LAST_ITEM_IN_LIST
+}; /* button_context_standard */
+
+static const struct button_mapping button_rc_context_tree[]  = {
+/*  { ACTION_TREE_ROOT_INIT,     BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_TREE_PGLEFT,        BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_TREE_PGRIGHT,       BUTTON_,                          BUTTON_ }, */
+    { ACTION_TREE_STOP,          BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_RC_PLAY },
+    { ACTION_TREE_WPS,           BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_RC_PLAY },
+/*  { ACTION_TREE_HOTKEY,        BUTTON_,                          BUTTON_ }, */
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_tree */
+
+static const struct button_mapping button_rc_context_wps[]  = {
+    { ACTION_WPS_BROWSE,         BUTTON_RC_SELECT|BUTTON_REL,      BUTTON_RC_SELECT },
+    { ACTION_WPS_PLAY,           BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_RC_PLAY },
+    { ACTION_WPS_SEEKBACK,       BUTTON_RC_PREV|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_SEEKFWD,        BUTTON_RC_NEXT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,       BUTTON_RC_PREV|BUTTON_REL,        BUTTON_RC_PREV|BUTTON_REPEAT },
+    { ACTION_WPS_STOPSEEK,       BUTTON_RC_NEXT|BUTTON_REL,        BUTTON_RC_NEXT|BUTTON_REPEAT },
+    { ACTION_WPS_SKIPNEXT,       BUTTON_RC_NEXT|BUTTON_REL,        BUTTON_RC_NEXT },
+    { ACTION_WPS_SKIPPREV,       BUTTON_RC_PREV|BUTTON_REL,        BUTTON_RC_PREV },
+    { ACTION_WPS_STOP,           BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_RC_PLAY },
+    { ACTION_WPS_VOLDOWN,        BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_VOLUP,          BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_WPS_VOLUP,          BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+/*  { ACTION_WPS_PITCHSCREEN,    BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                          BUTTON_ }, */ 
+    { ACTION_WPS_CONTEXT,        BUTTON_RC_SELECT|BUTTON_REPEAT,   BUTTON_RC_SELECT },
+/*  { ACTION_WPS_QUICKSCREEN,    BUTTON_REC|BUTTON_REL,            BUTTON_REC }, */
+    { ACTION_WPS_MENU,           BUTTON_RC_SELECT|BUTTON_RC_PLAY,  BUTTON_RC_SELECT },
+/*  { ACTION_WPS_VIEW_PLAYLIST,  BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_REC,            BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_ABSETA_PREVDIR, BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_ABSETB_NEXTDIR, BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_ABRESET,        BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_WPS_HOTKEY,         BUTTON_,                          BUTTON_ }, */
+
+    LAST_ITEM_IN_LIST,
+}; /* button_context_wps */
+
+static const struct button_mapping button_rc_context_settings[]  = {
+    { ACTION_SETTINGS_INC,       BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+/*  { ACTION_SETTINGS_INCBIGSTEP,BUTTON_,                          BUTTON_ }, */
+    { ACTION_SETTINGS_DEC,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+/*  { ACTION_SETTINGS_DECBIGSTEP,BUTTON_,                          BUTTON_ }, */
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_settings */
+
+static const struct button_mapping button_rc_context_yesno[]  = {
+    { ACTION_YESNO_ACCEPT,       BUTTON_RC_SELECT,                 BUTTON_NONE },
+    { ACTION_YESNO_ACCEPT,       BUTTON_RC_PLAY,                   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_yesno */
+
+static const struct button_mapping button_rc_context_radio[]  = {
+    { ACTION_FM_MENU,            BUTTON_RC_SELECT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_FM_PRESET,          BUTTON_RC_SELECT|BUTTON_REL,      BUTTON_SELECT },
+/*  { ACTION_FM_RECORD,          BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_FM_FREEZE,          BUTTON_,                          BUTTON_ }, */
+    { ACTION_FM_STOP,            BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
+    { ACTION_FM_MODE,            BUTTON_RC_SELECT,                 BUTTON_NONE },
+    { ACTION_FM_EXIT,            BUTTON_RC_SELECT|BUTTON_RC_PLAY,  BUTTON_RC_SELECT },
+    { ACTION_FM_PLAY,            BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_PLAY },
+/*  { ACTION_FM_RECORD_DBLPRE,   BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_FM_NEXT_PRESET,     BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_FM_PREV_PRESET,     BUTTON_,                          BUTTON_ }, */
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_radio */
+
+static const struct button_mapping button_rc_context_recscreen[]  = {
+/*  { ACTION_REC_LCD,            BUTTON_,                          BUTTON_ }, */
+    { ACTION_REC_PAUSE,          BUTTON_RC_PLAY,                   BUTTON_NONE },
+    { ACTION_REC_NEWFILE,        BUTTON_RC_SELECT|BUTTON_REPEAT,   BUTTON_RC_SELECT },
+/*  { ACTION_REC_F2,             BUTTON_,                          BUTTON_ }, */
+/*  { ACTION_REC_F3,             BUTTON_,                          BUTTON_ }, */
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_recscreen */
+
+static const struct button_mapping* get_context_mapping_remote(int context)
+{
+    context ^= CONTEXT_REMOTE;
+
+    switch (context)
+    {
+        case CONTEXT_STD:
+            return button_rc_context_standard;
+
+        case CONTEXT_WPS:
+            return button_rc_context_wps;
+
+#if CONFIG_TUNER
+        case CONTEXT_FM:
+            return button_rc_context_radio;
+#endif
+
+#ifdef HAVE_RECORDING
+        case CONTEXT_RECSCREEN:
+            return button_rc_context_recscreen;
+#endif
+
+        case CONTEXT_YESNOSCREEN:
+            return button_rc_context_yesno;
+
+        case CONTEXT_SETTINGS:
+        case CONTEXT_SETTINGS_EQ:
+            return button_rc_context_settings;
+
+        case CONTEXT_TREE:
+        case CONTEXT_MAINMENU:
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
+            return button_rc_context_tree;
+
+        case CONTEXT_LIST:
+        default:
+            return button_rc_context_standard;
+    }
+}
+
 const struct button_mapping* get_context_mapping(int context)
 {
+    if (context&CONTEXT_REMOTE)
+        return get_context_mapping_remote(context);
+
     switch (context)
     {
         case CONTEXT_STD:
@@ -236,7 +382,6 @@ const struct button_mapping* get_context_mapping(int context)
 
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_EQ:
-        case CONTEXT_SETTINGS|CONTEXT_REMOTE:
             return button_context_settings;
 
         case CONTEXT_TREE:
