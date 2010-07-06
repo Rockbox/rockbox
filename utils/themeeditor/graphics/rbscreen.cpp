@@ -73,7 +73,13 @@ RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
         }
     }
 
-    fonts.insert(0, new RBFont("Nothin'"));
+    fonts.insert(0, new RBFont("Default"));
+    QString defaultFont = settings->value("font", "");
+    if(defaultFont != "")
+    {
+        defaultFont.replace("/.rockbox", settings->value("themebase", ""));
+        fonts.insert(1, new RBFont(defaultFont));
+    }
 
     if(parent == 0)
     {
