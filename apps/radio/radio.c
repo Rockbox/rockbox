@@ -734,6 +734,9 @@ int radio_screen(void)
                 talk = true;
                 break;
 #endif
+            case ACTION_NONE:
+                update_screen = true; /* so the fms updates */
+                break;
 
             default:
                 default_event_handler(button);
@@ -810,7 +813,8 @@ int radio_screen(void)
                 if (restore)
                     fms_fix_displays(FMS_ENTER);
                 FOR_NB_SCREENS(i)
-                    skin_update(fms_get(i), WPS_REFRESH_ALL);
+                    skin_update(fms_get(i), restore ? WPS_REFRESH_ALL :
+                                                      WPS_REFRESH_NON_STATIC);
                 restore = false; 
             }
         }
