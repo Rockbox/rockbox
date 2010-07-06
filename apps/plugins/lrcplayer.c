@@ -1959,14 +1959,7 @@ static void save_changes(void)
     if (!current.changed_lrc)
         return;
     rb->splash(HZ/2, "Saving changes...");
-    if (current.type > NUM_TYPES)
-    {
-        /* save changes to new .lrc8 file */
-        rb->strcpy(new_file, current.lrc_file);
-        p = rb->strrchr(new_file, '.');
-        rb->strcpy(p, extentions[LRC8]);
-    }
-    else if (current.type == TXT)
+    if (current.type == TXT || current.type > NUM_TYPES)
     {
         /* save changes to new .lrc file */
         rb->strcpy(new_file, current.lrc_file);
@@ -1994,7 +1987,10 @@ static void save_changes(void)
         }
         current.offset = 0;
         if (current.type > NUM_TYPES)
+        {
             curr = -1;
+            rb->write(fd, BOM, BOM_SIZE);
+        }
         else
             size = rb->filesize(fe);
         while (curr < size)
@@ -2005,8 +2001,7 @@ static void save_changes(void)
                 temp_lrc; temp_lrc = temp_lrc->next)
             {
                 offset = temp_lrc->file_offset;
-                if (offset == -1 ||
-                    (offset < next && temp_lrc->old_time_start == -1))
+                if (offset < next && temp_lrc->old_time_start == -1)
                 {
                     lrc_line = temp_lrc;
                     next = offset;
@@ -2014,7 +2009,7 @@ static void save_changes(void)
                 }
             }
             offset = current.offset_file_offset;
-            if (offset >= curr && offset < next)
+            if (offset >= 0 && offset < next)
             {
                 lrc_line = NULL;
                 next = offset;
@@ -2073,14 +2068,9 @@ static void save_changes(void)
 
     if (success)
     {
-        if (current.type == TXT)
+        if (current.type == TXT || current.type > NUM_TYPES)
         {
             current.type = LRC;
-            rb->strcpy(current.lrc_file, new_file);
-        }
-        else if (current.type > NUM_TYPES)
-        {
-            current.type = LRC8;
             rb->strcpy(current.lrc_file, new_file);
         }
         else
@@ -2915,14 +2905,15 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_ERROR;
         }
         ext = rb->strrchr(current.lrc_file, '.');
-        for (current.type = 0; ext && current.type < NUM_TYPES; current.type++)
+        if (!ext) ext = current.lrc_file;
+        for (current.type = 0; current.type < NUM_TYPES; current.type++)
         {
             if (!rb->strcmp(ext, extentions[current.type]))
                 break;
         }
-        if (!ext || current.type == NUM_TYPES)
+        if (current.type == NUM_TYPES)
         {
-            rb->splashf(HZ, "%s is not supported", ext? ext: current.lrc_file);
+            rb->splashf(HZ, "%s is not supported", ext);
             return PLUGIN_ERROR;
         }
         current.found_lrc = true;
