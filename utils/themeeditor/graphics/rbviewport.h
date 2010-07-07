@@ -40,6 +40,9 @@ public:
         Right
     };
 
+    static const double scrollRate;
+    static const double scrollPause;
+
     RBViewport(skin_element* node, const RBRenderInfo& info);
     virtual ~RBViewport();
 
@@ -66,6 +69,7 @@ public:
         alignRight();
         alignCenter();
     }
+    void scrollText(double time){ scrollTime = time; }
 
     void enableStatusBar(){ showStatusBar = true; }
 
@@ -101,6 +105,8 @@ private:
     RBText* leftGraphic;
     RBText* centerGraphic;
     RBText* rightGraphic;
+
+    double scrollTime;
 };
 
 #endif // RBVIEWPORT_H

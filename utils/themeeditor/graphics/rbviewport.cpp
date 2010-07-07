@@ -21,6 +21,7 @@
 
 #include <QPainter>
 #include <QPainterPath>
+#include <cmath>
 
 #include "rbviewport.h"
 #include "rbscreen.h"
@@ -29,12 +30,17 @@
 #include "tag_table.h"
 #include "skin_parser.h"
 
+/* Pause at beginning/end of scroll */
+const double RBViewport::scrollPause = 0.5;
+/* Pixels/second of text scrolling */
+const double RBViewport::scrollRate = 30;
+
 RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     : QGraphicsItem(info.screen()), foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
     statusBarTexture(":/render/statusbar.png"),
-    leftGraphic(0), centerGraphic(0), rightGraphic(0)
+    leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0)
 {
     if(!node->tag)
     {
@@ -191,6 +197,8 @@ void RBViewport::newLine()
     leftGraphic = 0;
     centerGraphic = 0;
     rightGraphic = 0;
+
+    scrollTime = 0;
 }
 
 void RBViewport::write(QString text)
@@ -287,6 +295,32 @@ void RBViewport::alignLeft()
 
     leftGraphic = font->renderText(leftText, foreground, size.width(), this);
     leftGraphic->setPos(0, y);
+
+    /* Setting scroll position if necessary */
+    int difference = leftGraphic->realWidth()
+                     - leftGraphic->boundingRect().width();
+    if(difference > 0)
+    {
+        /* Subtracting out complete cycles */
+        double totalTime = 2 * scrollPause + difference / scrollRate;
+        scrollTime -= totalTime * std::floor(scrollTime / totalTime);
+
+        /* Calculating the offset */
+        if(scrollTime < scrollPause)
+        {
+            return;
+        }
+        else if(scrollTime < scrollPause + difference / scrollRate)
+        {
+            scrollTime -= scrollPause;
+            int offset = scrollRate * scrollTime;
+            leftGraphic->setOffset(offset);
+        }
+        else
+        {
+            leftGraphic->setOffset(difference);
+        }
+    }
 }
 
 void RBViewport::alignCenter()
@@ -311,6 +345,33 @@ void RBViewport::alignCenter()
     }
 
     centerGraphic->setPos(x, y);
+
+    /* Setting scroll position if necessary */
+    int difference = centerGraphic->realWidth()
+                     - centerGraphic->boundingRect().width();
+    if(difference > 0)
+    {
+        /* Subtracting out complete cycles */
+        double totalTime = 2 * scrollPause + difference / scrollRate;
+        scrollTime -= totalTime * std::floor(scrollTime / totalTime);
+
+        /* Calculating the offset */
+        if(scrollTime < scrollPause)
+        {
+            return;
+        }
+        else if(scrollTime < scrollPause + difference / scrollRate)
+        {
+            scrollTime -= scrollPause;
+            int offset = scrollRate * scrollTime;
+            centerGraphic->setOffset(offset);
+        }
+        else
+        {
+            centerGraphic->setOffset(difference);
+        }
+    }
+
 }
 
 void RBViewport::alignRight()
@@ -329,5 +390,32 @@ void RBViewport::alignRight()
         x = 0;
 
     rightGraphic->setPos(x, y);
+
+    /* Setting scroll position if necessary */
+    int difference = rightGraphic->realWidth()
+                     - rightGraphic->boundingRect().width();
+    if(difference > 0)
+    {
+        /* Subtracting out complete cycles */
+        double totalTime = 2 * scrollPause + difference / scrollRate;
+        scrollTime -= totalTime * std::floor(scrollTime / totalTime);
+
+        /* Calculating the offset */
+        if(scrollTime < scrollPause)
+        {
+            return;
+        }
+        else if(scrollTime < scrollPause + difference / scrollRate)
+        {
+            scrollTime -= scrollPause;
+            int offset = scrollRate * scrollTime;
+            rightGraphic->setOffset(offset);
+        }
+        else
+        {
+            rightGraphic->setOffset(difference);
+        }
+    }
+
 }
 

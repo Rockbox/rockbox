@@ -29,6 +29,7 @@
 #include "rbprogressbar.h"
 
 #include <iostream>
+#include <cmath>
 
 int ParseTreeNode::openConditionals = 0;
 bool ParseTreeNode::breakFlag = false;
@@ -552,8 +553,16 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
         for(int i = 0; i < children.count() ; i++)
             times.append(findBranchTime(children[i], info));
 
+        double totalTime = 0;
+        for(int i = 0; i < children.count(); i++)
+            totalTime += times[i];
+
         /* Now we figure out which branch to select */
         double timeLeft = info.device()->data(QString("simtime")).toDouble();
+
+        /* Skipping any full cycles */
+        timeLeft -= totalTime * std::floor(timeLeft / totalTime);
+
         int branch = 0;
         while(timeLeft > 0)
         {
@@ -649,6 +658,17 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             /* %pb */
             new RBProgressBar(viewport, info, element->params_count,
                               element->params);
+            return true;
+        }
+
+        return false;
+
+    case 's':
+        switch(element->tag->name[1])
+        {
+        case '\0':
+            /* %s */
+            viewport->scrollText(info.device()->data("simtime").toDouble());
             return true;
         }
 

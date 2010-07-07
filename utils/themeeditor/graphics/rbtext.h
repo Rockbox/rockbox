@@ -34,9 +34,13 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
+    int realWidth(){ return image->width(); }
+    void setOffset(int offset){ this->offset = offset; }
+
 private:
     QImage* image;
     int maxWidth;
+    int offset;
 
 };
 

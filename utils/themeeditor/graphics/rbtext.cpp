@@ -24,7 +24,7 @@
 #include <QPainter>
 
 RBText::RBText(QImage* image, int maxWidth, QGraphicsItem *parent)
-    :QGraphicsItem(parent), image(image), maxWidth(maxWidth)
+    :QGraphicsItem(parent), image(image), maxWidth(maxWidth), offset(0)
 {
 }
 
@@ -39,8 +39,13 @@ QRectF RBText::boundingRect() const
 void RBText::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                    QWidget *widget)
 {
+    /* Making sure the offset is within bounds */
+    if(image->width() > maxWidth)
+        if(offset > image->width() - maxWidth)
+            offset = image->width() - maxWidth;
+
     if(image->width() < maxWidth)
         painter->drawImage(0, 0, *image, 0, 0, image->width(), image->height());
     else
-        painter->drawImage(0, 0, *image, 0, 0, maxWidth, image->height());
+        painter->drawImage(0, 0, *image, offset, 0, maxWidth, image->height());
 }
