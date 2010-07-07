@@ -23,6 +23,9 @@
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>
      </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Editor</string>
@@ -257,9 +260,23 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Fonts</string>
+       <string>Rendering</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QCheckBox" name="autoExpandBox">
+         <property name="text">
+          <string>Auto-Expand Parse Tree</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="autoHighlightBox">
+         <property name="text">
+          <string>Auto-Highlight Parse Tree</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>

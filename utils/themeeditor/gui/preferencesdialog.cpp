@@ -44,7 +44,7 @@ void PreferencesDialog::loadSettings()
 {
     loadColors();
     loadFont();
-    loadFontDir();
+    loadRender();
 }
 
 void PreferencesDialog::loadColors()
@@ -107,12 +107,21 @@ void PreferencesDialog::loadFont()
 
 }
 
-void PreferencesDialog::loadFontDir()
+void PreferencesDialog::loadRender()
 {
     QSettings settings;
     settings.beginGroup("RBFont");
 
     ui->fontBox->setText(settings.value("fontDir", "/").toString());
+
+    settings.endGroup();
+
+    settings.beginGroup("EditorWindow");
+
+    ui->autoExpandBox->setChecked(settings.value("autoExpandTree",
+                                                 false).toBool());
+    ui->autoHighlightBox->setChecked(settings.value("autoHighlightTree",
+                                                    false).toBool());
 
     settings.endGroup();
 }
@@ -121,7 +130,7 @@ void PreferencesDialog::saveSettings()
 {
     saveColors();
     saveFont();
-    saveFontDir();
+    saveRender();
 }
 
 void PreferencesDialog::saveColors()
@@ -159,12 +168,19 @@ void PreferencesDialog::saveFont()
     settings.endGroup();
 }
 
-void PreferencesDialog::saveFontDir()
+void PreferencesDialog::saveRender()
 {
     QSettings settings;
     settings.beginGroup("RBFont");
 
     settings.setValue("fontDir", ui->fontBox->text());
+
+    settings.endGroup();
+
+    settings.beginGroup("EditorWindow");
+
+    settings.setValue("autoExpandTree", ui->autoExpandBox->isChecked());
+    settings.setValue("autoHighlightTree", ui->autoHighlightBox->isChecked());
 
     settings.endGroup();
 }

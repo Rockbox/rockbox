@@ -55,11 +55,11 @@ private:
     void loadSettings();
     void loadColors();
     void loadFont();
-    void loadFontDir();
+    void loadRender();
     void saveSettings();
     void saveColors();
     void saveFont();
-    void saveFontDir();
+    void saveRender();
 
     void setupUI();
 

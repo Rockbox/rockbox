@@ -87,7 +87,8 @@ private:
     void setupUI();
     void setupMenus();
     void addTab(TabContent* doc);
-    void expandLine(ParseTreeModel* model, QModelIndex parent, int line);
+    void expandLine(ParseTreeModel* model, QModelIndex parent, int line,
+                    bool highlight);
     void sizeColumns();
 
     Ui::EditorWindow *ui;

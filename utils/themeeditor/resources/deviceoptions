@@ -35,6 +35,7 @@ screenwidth ; Screen Width ; spin(0,800) ; 300
 screenheight ; Screen Height ; spin(0,800) ; 200
 remotewidth ; Remote Width ; spin(0,800) ; 100
 remoteheight ; Remote Height ; spin(0,800); 50
+simtime ; Simulation Time ; fspin(0, 100000) ; 60.0
 showviewports ; Show Viewports ; check ; false
 rendersbs ; Render SBS If Available ; check ; true
 rtl ; Right-To-Left Language ; check ; false

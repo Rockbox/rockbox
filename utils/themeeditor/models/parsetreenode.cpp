@@ -553,7 +553,7 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
             times.append(findBranchTime(children[i], info));
 
         /* Now we figure out which branch to select */
-        double timeLeft = info.device()->data(QString("?pc")).toDouble();
+        double timeLeft = info.device()->data(QString("simtime")).toDouble();
         int branch = 0;
         while(timeLeft > 0)
         {
