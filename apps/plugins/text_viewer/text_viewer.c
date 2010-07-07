@@ -59,7 +59,7 @@ enum plugin_status plugin_start(const void* file)
     while (!done) {
 #ifdef HAVE_LCD_BITMAP
         if (rb->global_settings->statusbar != STATUSBAR_OFF && preferences->statusbar)
-            rb->gui_syncstatusbar_draw(rb->statusbars, true);
+            rb->sb_skin_update(SCREEN_MAIN, true);
 #endif
 
         if (display_update)

@@ -189,7 +189,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     prefs->autoscroll_speed     = *p++;
 
     if (version > 2)
-        prefs->horizontal_scrollbar = (*p != 0);
+        prefs->horizontal_scrollbar = (*p++ != 0);
     else
         prefs->horizontal_scrollbar = false;
 

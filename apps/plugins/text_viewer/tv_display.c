@@ -314,16 +314,19 @@ void tv_get_drawarea_info(int *width, int *cols, int *rows)
 static void tv_change_viewport(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    struct viewport vp;
-
     if (is_initialized_vp)
         rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
     else
         is_initialized_vp = true;
 
-    rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp);
-    vp_info = vp;
+    if (preferences->statusbar)
+        rb->memcpy(&vp_info, rb->sb_skin_get_info_vp(SCREEN_MAIN), sizeof(struct viewport));
+    else
+        rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
+
+    rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp_info);
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
+    display->set_viewport(&vp_info);
 #else
     if (!is_initialized_vp)
     {
@@ -411,7 +414,8 @@ void tv_finalize_display(void)
     }
 
     /* undo viewport */
-    rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+    if (is_initialized_vp)
+        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
 #endif
 }
 
