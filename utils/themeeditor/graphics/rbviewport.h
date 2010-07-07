@@ -84,13 +84,17 @@ private:
 
     RBScreen* screen;
 
-    QList<QGraphicsItem*> leftText;
-    QList<QGraphicsItem*> centerText;
-    QList<QGraphicsItem*> rightText;
+    QString leftText;
+    QString centerText;
+    QString rightText;
     Alignment textAlign;
 
     bool showStatusBar;
     QPixmap statusBarTexture;
+
+    RBText* leftGraphic;
+    RBText* centerGraphic;
+    RBText* rightGraphic;
 };
 
 #endif // RBVIEWPORT_H

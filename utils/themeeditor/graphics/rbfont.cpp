@@ -155,7 +155,8 @@ RBFont::~RBFont()
         delete[] widthData;
 }
 
-RBText* RBFont::renderText(QString text, QColor color, QGraphicsItem *parent)
+RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
+                           QGraphicsItem *parent)
 {
     int firstChar = header.value("firstchar").toInt();
     int height = header.value("height").toInt();
@@ -221,6 +222,6 @@ RBText* RBFont::renderText(QString text, QColor color, QGraphicsItem *parent)
         startX += widths[i];
     }
 
-    return new RBText(image, parent);
+    return new RBText(image, viewWidth, parent);
 
 }

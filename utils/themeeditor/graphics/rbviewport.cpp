@@ -33,7 +33,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     : QGraphicsItem(info.screen()), foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
-    statusBarTexture(":/render/statusbar.png")
+    statusBarTexture(":/render/statusbar.png"),
+    leftGraphic(0), centerGraphic(0), rightGraphic(0)
 {
     if(!node->tag)
     {
@@ -173,26 +174,31 @@ void RBViewport::newLine()
     textOffset.setY(textOffset.y() + lineHeight);
     textOffset.setX(0);
     textAlign = Left;
+
     leftText.clear();
     rightText.clear();
     centerText.clear();
+
+    leftGraphic = 0;
+    centerGraphic = 0;
+    rightGraphic = 0;
 }
 
 void RBViewport::write(QString text)
 {
     if(textAlign == Left)
     {
-        leftText.append(font->renderText(text, foreground, this));
+        leftText.append(text);
         alignLeft();
     }
     else if(textAlign == Center)
     {
-        centerText.append(font->renderText(text, foreground, this));
+        centerText.append(text);
         alignCenter();
     }
     else if(textAlign == Right)
     {
-        rightText.append(font->renderText(text, foreground, this));
+        rightText.append(text);
         alignRight();
     }
 }
@@ -269,50 +275,53 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
 void RBViewport::alignLeft()
 {
     int y = textOffset.y();
-    int x = 0;
 
-    for(int i = 0; i < leftText.count(); i++)
-    {
-        leftText[i]->setPos(x, y);
-        x += leftText[i]->boundingRect().width();
-    }
+    if(leftGraphic)
+        delete leftGraphic;
+
+    leftGraphic = font->renderText(leftText, foreground, size.width(), this);
+    leftGraphic->setPos(0, y);
 }
 
 void RBViewport::alignCenter()
 {
     int y = textOffset.y();
     int x = 0;
-    int width = 0;
 
-    for(int i = 0; i < centerText.count(); i++)
-        width += centerText[i]->boundingRect().width();
+    if(centerGraphic)
+        delete centerGraphic;
 
-    x = (size.width() - width) / 2;
+    centerGraphic = font->renderText(centerText, foreground, size.width(),
+                                     this);
 
-    for(int i = 0; i < centerText.count(); i++)
+    if(centerGraphic->boundingRect().width() < size.width())
     {
-        centerText[i]->setPos(x, y);
-        x += centerText[i]->boundingRect().width();
+        x = size.width() - centerGraphic->boundingRect().width();
+        x /= 2;
     }
+    else
+    {
+        x = 0;
+    }
+
+    centerGraphic->setPos(x, y);
 }
 
 void RBViewport::alignRight()
 {
-
     int y = textOffset.y();
     int x = 0;
-    int width = 0;
 
-    for(int i = 0; i < rightText.count(); i++)
-        width += rightText[i]->boundingRect().width();
+    if(rightGraphic)
+        delete rightGraphic;
 
-    x = size.width() - width;
+    rightGraphic = font->renderText(rightText, foreground, size.width(), this);
 
-    for(int i = 0; i < rightText.count(); i++)
-    {
-        rightText[i]->setPos(x, y);
-        x += rightText[i]->boundingRect().width();
-    }
+    if(rightGraphic->boundingRect().width() < size.width())
+        x = size.width() - rightGraphic->boundingRect().width();
+    else
+        x = 0;
 
+    rightGraphic->setPos(x, y);
 }
 

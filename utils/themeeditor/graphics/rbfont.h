@@ -35,7 +35,7 @@ public:
     RBFont(QString file);
     virtual ~RBFont();
 
-    RBText* renderText(QString text, QColor color,
+    RBText* renderText(QString text, QColor color, int maxWidth,
                                         QGraphicsItem* parent = 0);
     int lineHeight(){ return header.value("height", 0).toInt(); }
 

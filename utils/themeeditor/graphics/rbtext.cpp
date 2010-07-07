@@ -23,18 +23,24 @@
 
 #include <QPainter>
 
-RBText::RBText(const QImage &image, QGraphicsItem *parent)
-    :QGraphicsItem(parent), image(image)
+RBText::RBText(const QImage &image, int maxWidth, QGraphicsItem *parent)
+    :QGraphicsItem(parent), image(image), maxWidth(maxWidth)
 {
 }
 
 QRectF RBText::boundingRect() const
 {
-    return QRectF(0, 0, image.width(), image.height());
+    if(image.width() < maxWidth)
+        return QRectF(0, 0, image.width(), image.height());
+    else
+        return QRectF(0, 0, maxWidth, image.height());
 }
 
 void RBText::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                    QWidget *widget)
 {
-    painter->drawImage(0, 0, image, 0, 0, image.width(), image.height());
+    if(image.width() < maxWidth)
+        painter->drawImage(0, 0, image, 0, 0, image.width(), image.height());
+    else
+        painter->drawImage(0, 0, image, 0, 0, maxWidth, image.height());
 }

@@ -28,7 +28,7 @@
 class RBText : public QGraphicsItem
 {
 public:
-    RBText(const QImage& image, QGraphicsItem* parent);
+    RBText(const QImage& image, int maxWidth, QGraphicsItem* parent);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -36,6 +36,7 @@ public:
 
 private:
     QImage image;
+    int maxWidth;
 
 };
 
