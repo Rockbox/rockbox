@@ -474,11 +474,8 @@ $year+=1900;
 # made once for all targets
 sub runone {
     my ($target, $fonts)=@_;
-    my $samedir=0;
-    
-    if($install) {
-        $samedir = abs_path($install) == abs_path($rbdir);
-    }
+
+    my $samedir = abs_path("$install/$rbdir") eq abs_path($rbdir);
 
     # build a full install .rockbox ($rbdir) directory
     buildzip($target, $fonts);
