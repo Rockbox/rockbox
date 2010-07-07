@@ -14,15 +14,17 @@ INCLUDEPATH += graphics
 
 # Stuff for the parse lib
 libskin_parser.commands = @$(MAKE) \
-    TARGET_DIR=$$MYBUILDDIR CC=\"$$QMAKE_CC\" \
+    TARGET_DIR=$$MYBUILDDIR \
+    CC=\"$$QMAKE_CC\" \
     BUILDDIR=$$OBJECTS_DIR \
-    -C $$RBBASE_DIR/lib/skin_parser \
+    -C \
+    $$RBBASE_DIR/lib/skin_parser \
     libskin_parser.a
-
 QMAKE_EXTRA_TARGETS += libskin_parser
 PRE_TARGETDEPS += libskin_parser
 INCLUDEPATH += $$RBBASE_DIR/lib/skin_parser
-LIBS += -L$$MYBUILDDIR -lskin_parser
+LIBS += -L$$MYBUILDDIR \
+    -lskin_parser
 DEPENDPATH = $$INCLUDEPATH
 HEADERS += models/parsetreemodel.h \
     models/parsetreenode.h \
@@ -44,7 +46,8 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbalbumart.h \
     graphics/rbprogressbar.h \
     gui/findreplacedialog.h \
-    graphics/rbtext.h
+    graphics/rbtext.h \
+    graphics/rbfontcache.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -65,7 +68,8 @@ SOURCES += main.cpp \
     graphics/rbalbumart.cpp \
     graphics/rbprogressbar.cpp \
     gui/findreplacedialog.cpp \
-    graphics/rbtext.cpp
+    graphics/rbtext.cpp \
+    graphics/rbfontcache.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -82,16 +86,17 @@ FORMS += gui/editorwindow.ui \
     gui/skinviewer.ui \
     gui/findreplacedialog.ui
 RESOURCES += resources.qrc
-
-win32 {
-    RC_FILE = themeeditor.rc
-}
-macx {
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-    QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
-    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
-    CONFIG+=x86 ppc
+win32:RC_FILE = themeeditor.rc
+macx { 
+    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.4u.sdk
+    QMAKE_LFLAGS_PPC = -mmacosx-version-min=10.4 \
+        -arch \
+        ppc
+    QMAKE_LFLAGS_X86 = -mmacosx-version-min=10.4 \
+        -arch \
+        i386
+    CONFIG += x86 \
+        ppc
     QMAKE_INFO_PLIST = Info.plist
     RC_FILE = resources/windowicon.icns
 }
-

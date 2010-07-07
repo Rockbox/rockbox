@@ -60,6 +60,12 @@ public:
     void alignText(Alignment align){ textAlign = align; }
     int getTextOffset(){ return textOffset.y(); }
     void addTextOffset(int height){ textOffset.setY(textOffset.y() + height); }
+    void flushText()
+    {
+        alignLeft();
+        alignRight();
+        alignCenter();
+    }
 
     void enableStatusBar(){ showStatusBar = true; }
 

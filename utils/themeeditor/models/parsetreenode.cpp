@@ -523,6 +523,8 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
             children[i]->render(info, viewport);
         if(!noBreak && !breakFlag)
             viewport->newLine();
+        else
+            viewport->flushText();
 
         if(breakFlag)
             breakFlag = false;

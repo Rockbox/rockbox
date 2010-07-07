@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "rbfont.h"
+#include "rbfontcache.h"
 
 #include <QFont>
 #include <QBrush>
@@ -28,6 +29,8 @@
 #include <QBitmap>
 #include <QImage>
 #include <QSettings>
+
+#include <QDebug>
 
 quint16 RBFont::maxFontSizeFor16BitOffsets = 0xFFDB;
 
@@ -51,6 +54,18 @@ RBFont::RBFont(QString file)
             file = ":/fonts/08-Schumacher-Clean.fnt";
     }
     header.insert("filename", file);
+
+    /* Checking for a cache entry */
+    RBFontCache::CacheInfo* cache = RBFontCache::lookup(file);
+    if(cache)
+    {
+        imageData = cache->imageData;
+        offsetData = cache->offsetData;
+        widthData = cache->widthData;
+        header = cache->header;
+
+        return;
+    }
 
     /* Opening the file */
     QFile fin(file);
@@ -134,16 +149,18 @@ RBFont::RBFont(QString file)
 
    fin.close();
 
+   /* Caching the font data */
+   cache = new RBFontCache::CacheInfo;
+   cache->imageData = imageData;
+   cache->offsetData = offsetData;
+   cache->widthData = widthData;
+   cache->header = header;
+   RBFontCache::insert(file, cache);
+
 }
 
 RBFont::~RBFont()
 {
-    if(imageData)
-        delete[] imageData;
-    if(offsetData)
-        delete[] offsetData;
-    if(widthData)
-        delete[] widthData;
 }
 
 RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
