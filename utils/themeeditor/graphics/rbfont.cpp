@@ -109,11 +109,8 @@ RBFont::RBFont(QString file)
 
    /* Loading the image data */
    imageData = new quint8[header.value("nbits").toInt()];
-   for(int i = 0; i < header.value("nbits").toInt(); i++)
-   {
-       data >> byte;
-       imageData[i] = byte;
-   }
+   data.readRawData(reinterpret_cast<char*>(imageData),
+                    header.value("nbits").toInt());
 
    /* Aligning on 16-bit boundary */
    if(header.value("nbits").toInt() % 2 == 1)
@@ -123,22 +120,16 @@ RBFont::RBFont(QString file)
    if(header.value("noffset").toInt() > 0)
    {
        offsetData = new quint16[header.value("noffset").toInt()];
-       for(int i = 0; i < header.value("noffset").toInt(); i++)
-       {
-           data >> word;
-           offsetData[i] = word;
-       }
+       data.readRawData(reinterpret_cast<char*>(offsetData),
+                        header.value("noffset").toInt() * 2);
    }
 
    /* Loading the width table if necessary */
    if(header.value("nwidth").toInt() > 0)
    {
        widthData = new quint8[header.value("nwidth").toInt()];
-       for(int i = 0; i < header.value("nwidth").toInt(); i++)
-       {
-           data >> byte;
-           widthData[i] = byte;
-       }
+       data.readRawData(reinterpret_cast<char*>(widthData),
+                        header.value("nwidth").toInt());
    }
 
    fin.close();
