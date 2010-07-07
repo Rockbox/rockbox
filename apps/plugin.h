@@ -84,6 +84,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "scrollbar.h"
 #include "jpeg_load.h"
 #include "../recorder/bmp.h"
+#include "statusbar-skinned.h"
 #endif
 #include "statusbar.h"
 #include "menu.h"
@@ -144,12 +145,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 188
+#define PLUGIN_API_VERSION 189
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 188
+#define PLUGIN_MIN_API_VERSION 189
 
 /* plugin return codes */
 enum plugin_status {
@@ -694,6 +695,10 @@ struct plugin_api {
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
+#ifdef HAVE_LCD_BITMAP
+    struct viewport *(*sb_skin_get_info_vp)(enum screen_type screen);
+    void (*sb_skin_update)(enum screen_type screen, bool force);
+#endif
 
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);

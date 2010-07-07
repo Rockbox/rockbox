@@ -565,6 +565,11 @@ static const struct plugin_api rockbox_api = {
     /* statusbars */
     &statusbars,
     gui_syncstatusbar_draw,
+#ifdef HAVE_LCD_BITMAP
+    sb_skin_get_info_vp,
+    sb_skin_update,
+#endif
+
     /* options */
     get_settings_list,
     find_setting,
