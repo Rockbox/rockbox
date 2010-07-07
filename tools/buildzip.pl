@@ -21,7 +21,7 @@ my $ROOT="..";
 my $ziptool="zip -r9";
 my $output="rockbox.zip";
 my $verbose;
-my $install=0;
+my $install;
 my $exe;
 my $target;
 my $modelname;
@@ -475,8 +475,6 @@ $year+=1900;
 sub runone {
     my ($target, $fonts)=@_;
 
-    my $samedir = abs_path("$install/$rbdir") eq abs_path($rbdir);
-
     # build a full install .rockbox ($rbdir) directory
     buildzip($target, $fonts);
 
@@ -496,12 +494,17 @@ sub runone {
         print "$ziptool $output $rbdir $target >/dev/null\n";
     }
 
+    my $samedir = 0; # is the destination dir equal to source dir ?
+
     if($install) {
         if ($install =~ /\/dev\/null/) {
             die "ERROR: No PREFIX given\n"
         }
+
+        $samedir = abs_path("$install/$rbdir") eq abs_path($rbdir);
+
         if (!$samedir) {
-            system("cp -r $rbdir \"$install\" >/dev/null");
+            system("mkdir -p \"$install\" && cp -r $rbdir \"$install/\"");
         }
     }
     else {
