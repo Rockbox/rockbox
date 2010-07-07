@@ -1,3 +1,7 @@
+# Enabling profiling
+QMAKE_CXXFLAGS_DEBUG += -pg
+QMAKE_LFLAGS_DEBUG += -pg
+
 # build in a separate folder.
 MYBUILDDIR = $$OUT_PWD/build/
 OBJECTS_DIR = $$MYBUILDDIR/o
@@ -47,7 +51,8 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbprogressbar.h \
     gui/findreplacedialog.h \
     graphics/rbtext.h \
-    graphics/rbfontcache.h
+    graphics/rbfontcache.h \
+    graphics/rbtextcache.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -69,7 +74,8 @@ SOURCES += main.cpp \
     graphics/rbprogressbar.cpp \
     gui/findreplacedialog.cpp \
     graphics/rbtext.cpp \
-    graphics/rbfontcache.cpp
+    graphics/rbfontcache.cpp \
+    graphics/rbtextcache.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

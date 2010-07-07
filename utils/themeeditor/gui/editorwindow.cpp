@@ -22,6 +22,8 @@
 #include "editorwindow.h"
 #include "projectmodel.h"
 #include "ui_editorwindow.h"
+#include "rbfontcache.h"
+#include "rbtextcache.h"
 
 #include <QDesktopWidget>
 #include <QFileSystemModel>
@@ -49,6 +51,9 @@ EditorWindow::~EditorWindow()
         delete project;
     delete deviceConfig;
     delete deviceDock;
+
+    RBFontCache::clearCache();
+    RBTextCache::clearCache();
 }
 
 void EditorWindow::loadTabFromSkinFile(QString fileName)

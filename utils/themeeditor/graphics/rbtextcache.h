@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: rbfont.cpp 27301 2010-07-05 22:15:17Z bieber $
+ * $Id$
  *
  * Copyright (C) 2010 Robert Bieber
  *
@@ -19,28 +19,21 @@
  *
  ****************************************************************************/
 
-#include "rbtext.h"
+#ifndef RBTEXTCACHE_H
+#define RBTEXTCACHE_H
 
-#include <QPainter>
+#include <QHash>
+#include <QImage>
 
-RBText::RBText(QImage* image, int maxWidth, QGraphicsItem *parent)
-    :QGraphicsItem(parent), image(image), maxWidth(maxWidth)
+class RBTextCache
 {
-}
+public:
+    static QImage* lookup(QString key){ return cache.value(key, 0); }
+    static void insert(QString key, QImage* im){ cache.insert(key, im); }
+    static void clearCache();
 
-QRectF RBText::boundingRect() const
-{
-    if(image->width() < maxWidth)
-        return QRectF(0, 0, image->width(), image->height());
-    else
-        return QRectF(0, 0, maxWidth, image->height());
-}
+private:
+    static QHash<QString, QImage*> cache;
+};
 
-void RBText::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                   QWidget *widget)
-{
-    if(image->width() < maxWidth)
-        painter->drawImage(0, 0, *image, 0, 0, image->width(), image->height());
-    else
-        painter->drawImage(0, 0, *image, 0, 0, maxWidth, image->height());
-}
+#endif // RBTEXTCACHE_H

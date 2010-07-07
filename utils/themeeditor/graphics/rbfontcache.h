@@ -23,6 +23,7 @@
 #define RBFONTCACHE_H
 
 #include <QHash>
+#include <QVariant>
 
 class RBFontCache
 {
@@ -39,6 +40,7 @@ public:
 
     static CacheInfo* lookup(QString key){ return cache.value(key, 0); }
     static void insert(QString key, CacheInfo* data){ cache.insert(key, data); }
+    static void clearCache();
 
 private:
     static QHash<QString, CacheInfo*> cache;

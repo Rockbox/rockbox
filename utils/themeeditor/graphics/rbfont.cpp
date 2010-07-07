@@ -21,6 +21,7 @@
 
 #include "rbfont.h"
 #include "rbfontcache.h"
+#include "rbtextcache.h"
 
 #include <QFont>
 #include <QBrush>
@@ -166,6 +167,13 @@ RBFont::~RBFont()
 RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
                            QGraphicsItem *parent)
 {
+
+    /* Checking for a cache hit first */
+    QImage* image = RBTextCache::lookup(header.value("filename").toString()
+                                        + text);
+    if(image)
+        return new RBText(image, viewWidth, parent);
+
     int firstChar = header.value("firstchar").toInt();
     int height = header.value("height").toInt();
     int maxWidth = header.value("maxwidth").toInt();
@@ -184,10 +192,10 @@ RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
     for(int i = 0; i < widths.count(); i++)
         totalWidth += widths[i];
 
-    QImage image(totalWidth, height, QImage::Format_Indexed8);
+    image = new QImage(totalWidth, height, QImage::Format_Indexed8);
 
-    image.setColor(0, qRgba(0,0,0,0));
-    image.setColor(1, color.rgb());
+    image->setColor(0, qRgba(0,0,0,0));
+    image->setColor(1, color.rgb());
 
     /* Drawing the text */
     int startX = 0;
@@ -214,9 +222,9 @@ RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
             for(int bit = 0; bit < 8; bit++)
             {
                 if(mask & data)
-                    image.setPixel(x, y, 1);
+                    image->setPixel(x, y, 1);
                 else
-                    image.setPixel(x, y, 0);
+                    image->setPixel(x, y, 0);
 
                 y++;
                 mask <<= 1;
@@ -230,6 +238,7 @@ RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
         startX += widths[i];
     }
 
+    RBTextCache::insert(header.value("filename").toString() + text, image);
     return new RBText(image, viewWidth, parent);
 
 }

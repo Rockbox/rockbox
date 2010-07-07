@@ -28,14 +28,14 @@
 class RBText : public QGraphicsItem
 {
 public:
-    RBText(const QImage& image, int maxWidth, QGraphicsItem* parent);
+    RBText(QImage* image, int maxWidth, QGraphicsItem* parent);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
 private:
-    QImage image;
+    QImage* image;
     int maxWidth;
 
 };

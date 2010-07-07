@@ -22,3 +22,24 @@
 #include "rbfontcache.h"
 
 QHash<QString, RBFontCache::CacheInfo*> RBFontCache::cache;
+
+void RBFontCache::clearCache()
+{
+    QHash<QString, CacheInfo*>::iterator i;
+    for(i = cache.begin(); i != cache.end(); i++)
+    {
+        CacheInfo* c = *i;
+        if(c->imageData)
+            delete c->imageData;
+
+        if(c->offsetData)
+            delete c->offsetData;
+
+        if(c->widthData)
+            delete c->widthData;
+
+        delete c;
+    }
+
+    cache.clear();
+}

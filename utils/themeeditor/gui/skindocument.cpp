@@ -31,6 +31,8 @@
 
 #include <QDebug>
 
+const int SkinDocument::updateInterval = 500;
+
 SkinDocument::SkinDocument(QLabel* statusLabel, ProjectModel* project,
                            DeviceState* device, QWidget *parent)
                                :TabContent(parent), statusLabel(statusLabel),
@@ -70,6 +72,8 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QString file,
     /* Setting the title */
     QStringList decomposed = fileName.split('/');
     titleText = decomposed.last();
+
+    lastUpdate = QTime::currentTime();
 }
 
 SkinDocument::~SkinDocument()
@@ -161,6 +165,11 @@ void SkinDocument::setupUI()
     findReplace->hide();
 
     settingsChanged();
+
+    /* Setting up a timer to check for updates */
+    checkUpdate.setInterval(500);
+    QObject::connect(&checkUpdate, SIGNAL(timeout()),
+                     this, SLOT(codeChanged()));
 }
 
 void SkinDocument::settingsChanged()
@@ -273,8 +282,16 @@ void SkinDocument::codeChanged()
     else
         emit titleChanged(titleText);
 
-    model->render(project, device, &fileName);
-
+    if(lastUpdate.msecsTo(QTime::currentTime()) >= updateInterval)
+    {
+        model->render(project, device, &fileName);
+        checkUpdate.stop();
+        lastUpdate = QTime::currentTime();
+    }
+    else
+    {
+        checkUpdate.start();
+    }
     cursorChanged();
 
 }

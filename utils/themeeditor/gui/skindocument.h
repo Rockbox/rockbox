@@ -26,6 +26,8 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QGraphicsScene>
+#include <QTime>
+#include <QTimer>
 
 #include "findreplacedialog.h"
 
@@ -113,6 +115,10 @@ private:
     DeviceState* device;
 
     FindReplaceDialog* findReplace;
+
+    QTime lastUpdate;
+    static const int updateInterval;
+    QTimer checkUpdate;
 };
 
 #endif // SKINDOCUMENT_H
