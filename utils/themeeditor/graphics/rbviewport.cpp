@@ -171,6 +171,15 @@ void RBViewport::paint(QPainter *painter,
 
 void RBViewport::newLine()
 {
+    if(leftText != "")
+        alignLeft();
+
+    if(centerText != "")
+        alignCenter();
+
+    if(rightText != "")
+        alignRight();
+
     textOffset.setY(textOffset.y() + lineHeight);
     textOffset.setX(0);
     textAlign = Left;
@@ -189,17 +198,14 @@ void RBViewport::write(QString text)
     if(textAlign == Left)
     {
         leftText.append(text);
-        alignLeft();
     }
     else if(textAlign == Center)
     {
         centerText.append(text);
-        alignCenter();
     }
     else if(textAlign == Right)
     {
         rightText.append(text);
-        alignRight();
     }
 }
 
