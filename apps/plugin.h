@@ -695,10 +695,6 @@ struct plugin_api {
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
-#ifdef HAVE_LCD_BITMAP
-    struct viewport *(*sb_skin_get_info_vp)(enum screen_type screen);
-    void (*sb_skin_update)(enum screen_type screen, bool force);
-#endif
 
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
@@ -889,6 +885,12 @@ struct plugin_api {
 #endif
 
     const char *rbversion;
+
+#ifdef HAVE_LCD_BITMAP
+    struct viewport *(*sb_skin_get_info_vp)(enum screen_type screen);
+    void (*sb_skin_update)(enum screen_type screen, bool force);
+#endif
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
