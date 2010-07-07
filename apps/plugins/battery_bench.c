@@ -248,12 +248,14 @@ enum plugin_status plugin_start(const void* parameter)
     return main();
 }
 
+long start_tick;
+
 /* Struct for battery information */
 struct batt_info
 {
     /* the size of the struct elements is optimised to make the struct size
      * a power of 2 */
-    long ticks;
+    unsigned secs;
     int eta;
     unsigned int voltage;
     short level;
@@ -329,7 +331,7 @@ static unsigned int charge_state(void)
 static void flush_buffer(void* data)
 {
     (void)data;
-    int fd, secs;
+    int fd;
     unsigned int i;
 
     /* don't access the disk when in usb mode, or when no data is available */
@@ -342,7 +344,6 @@ static void flush_buffer(void* data)
 
     for (i = 0; i < buf_idx; i++)
     {
-        secs = bat[i].ticks/HZ;
         rb->fdprintf(fd,
                 "%02d:%02d:%02d,  %05d,     %03d%%,     "
                 "%02d:%02d,         %04d,   "
@@ -357,7 +358,7 @@ static void flush_buffer(void* data)
 #endif
                 "\n",
 
-                HMS(secs), secs, bat[i].level,
+                HMS(bat[i].secs), bat[i].secs, bat[i].level,
                 bat[i].eta / 60, bat[i].eta % 60,
                 bat[i].voltage
 #if CONFIG_CHARGING
@@ -393,7 +394,7 @@ void thread(void)
         /* add data to buffer */
         if (buf_idx < BUF_ELEMENTS)
         {
-            bat[buf_idx].ticks = *rb->current_tick;
+            bat[buf_idx].secs = (*rb->current_tick - start_tick) / HZ;
             bat[buf_idx].level = rb->battery_level();
             bat[buf_idx].eta = rb->battery_time();
             bat[buf_idx].voltage = rb->battery_voltage();
@@ -470,6 +471,7 @@ int main(void)
 {
     int button, fd;
     bool on = false;
+    start_tick = *rb->current_tick;
 #ifdef HAVE_LCD_BITMAP
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
@@ -548,8 +550,13 @@ int main(void)
                 "# Battery bench run for %s version %s\n\n"
                 ,MODEL_NAME,rb->rbversion);
 
+            rb->fdprintf(fd, "# Battery type: %d mAh      Buffer Entries: %d\n",
+                rb->global_settings->battery_capacity, (int)BUF_ELEMENTS);
+
+            rb->fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
+                HMS((unsigned)start_tick/HZ));
+
             rb->fdprintf(fd,
-                "# Battery type: %d mAh      Buffer Entries: %d\n"
                 "# Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
 #if CONFIG_CHARGING
                 ", C:"
@@ -560,9 +567,7 @@ int main(void)
 #ifdef HAVE_USB_POWER
                 ", U:"
 #endif
-                "\n"
-                ,rb->global_settings->battery_capacity,
-                (int)BUF_ELEMENTS);
+                "\n");
             rb->close(fd);
         }
         else
@@ -575,10 +580,12 @@ int main(void)
     {
         rb->close(fd);
         fd = rb->open(BATTERY_LOG, O_RDWR | O_APPEND);
-        rb->fdprintf(fd, "\n--File already present. Resuming Benchmark--\n");
+        rb->fdprintf(fd, "\n# --File already present. Resuming Benchmark--\n");
         rb->fdprintf(fd,
-            "Battery bench run for %s version %s\n\n"
+            "# Battery bench run for %s version %s\n\n"
             ,MODEL_NAME,rb->rbversion);
+        rb->fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
+            HMS((unsigned)start_tick/HZ));
         rb->close(fd);
     }
     
