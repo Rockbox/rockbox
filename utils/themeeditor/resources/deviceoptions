@@ -106,8 +106,6 @@ pp ; Playlist Position ; spin(0,1000) ; 10
 pr ; Time Remaining ; text ; 2:00
 ps ; Shuffle ; check ; true
 pt ; Total Track Time ; text ; 3:00
-pv ; Current Volume (dB) ; spin(-100,100) ; 0
-?pv ; Current Volume (Conditional) ; combo(Mute, Below 0 dB, 0 dB, Above 0 dB) ; 0 dB
 pS ; Track Starting ; check ; true
 pE ; Track Ending ; check ; false
 Sp ; Playback Pitch ; fspin(50,200) ; 100
@@ -119,6 +117,8 @@ artwidth ; Album Art Width ; spin(0,500) ; 100
 artheight; Album Art Height ; spin(0,500) ; 100
 
 [Hardware Status]
+pv ; Current Volume (dB) ; spin(-100,100) ; 0
+?pv ; Current Volume (Conditional) ; combo(Mute, Below 0 dB, 0 dB, Above 0 dB) ; 0 dB
 bl ; Battery Level (-1 for unknown) ; spin(-1,100) ; 50
 bv ; Battery Volts ; spin(0,20) ; 5
 bt ; Time Left (-1 for unknown) ; spin(-1,500); 100
