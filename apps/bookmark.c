@@ -179,8 +179,10 @@ bool bookmark_autobookmark(bool prompt_ok)
        away. This makes it possible to speak the "Create a Bookmark?"
        prompt and the "Bookmark Created" splash. */
     audio_stop();
+
     if (update)
         return write_bookmark(true, bookmark);
+
     switch (global_settings.autocreatebookmark)
     {
         case BOOKMARK_YES:
