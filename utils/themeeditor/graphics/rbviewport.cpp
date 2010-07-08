@@ -30,8 +30,6 @@
 #include "tag_table.h"
 #include "skin_parser.h"
 
-/* Pause at beginning/end of scroll */
-const double RBViewport::scrollPause = 0.5;
 /* Pixels/second of text scrolling */
 const double RBViewport::scrollRate = 30;
 
@@ -302,23 +300,18 @@ void RBViewport::alignLeft()
     if(difference > 0)
     {
         /* Subtracting out complete cycles */
-        double totalTime = 2 * scrollPause + difference / scrollRate;
+        double totalTime = 2 * difference / scrollRate;
         scrollTime -= totalTime * std::floor(scrollTime / totalTime);
 
         /* Calculating the offset */
-        if(scrollTime < scrollPause)
+        if(scrollTime < static_cast<double>(difference) / scrollRate)
         {
-            return;
-        }
-        else if(scrollTime < scrollPause + difference / scrollRate)
-        {
-            scrollTime -= scrollPause;
-            int offset = scrollRate * scrollTime;
-            leftGraphic->setOffset(offset);
+            leftGraphic->setOffset(scrollRate * scrollTime);
         }
         else
         {
-            leftGraphic->setOffset(difference);
+            scrollTime -= static_cast<double>(difference) / scrollRate;
+            leftGraphic->setOffset(difference - scrollRate * scrollTime);
         }
     }
 }
@@ -352,23 +345,18 @@ void RBViewport::alignCenter()
     if(difference > 0)
     {
         /* Subtracting out complete cycles */
-        double totalTime = 2 * scrollPause + difference / scrollRate;
+        double totalTime = 2 * difference / scrollRate;
         scrollTime -= totalTime * std::floor(scrollTime / totalTime);
 
         /* Calculating the offset */
-        if(scrollTime < scrollPause)
+        if(scrollTime < static_cast<double>(difference) / scrollRate)
         {
-            return;
-        }
-        else if(scrollTime < scrollPause + difference / scrollRate)
-        {
-            scrollTime -= scrollPause;
-            int offset = scrollRate * scrollTime;
-            centerGraphic->setOffset(offset);
+            centerGraphic->setOffset(scrollRate * scrollTime);
         }
         else
         {
-            centerGraphic->setOffset(difference);
+            scrollTime -= static_cast<double>(difference) / scrollRate;
+            centerGraphic->setOffset(difference - scrollRate * scrollTime);
         }
     }
 
@@ -397,25 +385,19 @@ void RBViewport::alignRight()
     if(difference > 0)
     {
         /* Subtracting out complete cycles */
-        double totalTime = 2 * scrollPause + difference / scrollRate;
+        double totalTime = 2 * difference / scrollRate;
         scrollTime -= totalTime * std::floor(scrollTime / totalTime);
 
         /* Calculating the offset */
-        if(scrollTime < scrollPause)
+        if(scrollTime < static_cast<double>(difference) / scrollRate)
         {
-            return;
-        }
-        else if(scrollTime < scrollPause + difference / scrollRate)
-        {
-            scrollTime -= scrollPause;
-            int offset = scrollRate * scrollTime;
-            rightGraphic->setOffset(offset);
+            rightGraphic->setOffset(scrollRate * scrollTime);
         }
         else
         {
-            rightGraphic->setOffset(difference);
+            scrollTime -= static_cast<double>(difference) / scrollRate;
+            rightGraphic->setOffset(difference - scrollRate * scrollTime);
         }
     }
-
 }
 

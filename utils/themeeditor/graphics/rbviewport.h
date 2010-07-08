@@ -41,7 +41,6 @@ public:
     };
 
     static const double scrollRate;
-    static const double scrollPause;
 
     RBViewport(skin_element* node, const RBRenderInfo& info);
     virtual ~RBViewport();
