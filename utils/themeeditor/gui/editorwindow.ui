@@ -69,6 +69,7 @@
     <addaction name="actionFile_Panel"/>
     <addaction name="separator"/>
     <addaction name="actionDevice_Configuration"/>
+    <addaction name="actionTimer"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -363,6 +364,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionTimer">
+   <property name="text">
+    <string>T&amp;imer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

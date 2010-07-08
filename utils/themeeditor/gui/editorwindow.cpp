@@ -167,7 +167,18 @@ void EditorWindow::setupUI()
     deviceDock->setObjectName("deviceDock");
     deviceDock->setWidget(deviceConfig);
     deviceDock->setFloating(true);
+    deviceDock->move(QPoint(x() + width() / 2, y() + height() / 2));
     deviceDock->hide();
+
+    /* Positioning the timer panel */
+    timerDock = new QDockWidget(tr("Timer"), this);
+    timer = new SkinTimer(deviceConfig, timerDock);
+
+    timerDock->setObjectName("timerDock");
+    timerDock->setWidget(timer);
+    timerDock->setFloating(true);
+    timerDock->move(QPoint(x() + width() / 2, y() + height() / 2));
+    timerDock->hide();
 
     shiftTab(-1);
 }
@@ -183,6 +194,8 @@ void EditorWindow::setupMenus()
                      this, SLOT(showPanel()));
     QObject::connect(ui->actionDevice_Configuration, SIGNAL(triggered()),
                      deviceDock, SLOT(show()));
+    QObject::connect(ui->actionTimer, SIGNAL(triggered()),
+                     timerDock, SLOT(show()));
 
     /* Connecting the document management actions */
     QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),

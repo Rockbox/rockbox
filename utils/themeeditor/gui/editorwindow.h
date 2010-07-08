@@ -34,6 +34,7 @@
 #include "preferencesdialog.h"
 #include "skinviewer.h"
 #include "devicestate.h"
+#include "skintimer.h"
 
 class ProjectModel;
 class TabContent;
@@ -99,6 +100,8 @@ private:
     SkinViewer* viewer;
     DeviceState* deviceConfig;
     QDockWidget* deviceDock;
+    SkinTimer* timer;
+    QDockWidget* timerDock;
 };
 
 #endif // EDITORWINDOW_H
