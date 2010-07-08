@@ -93,7 +93,7 @@ pe ; Playlist Entries ; spin(0,1000) ; 20
 pn ; Playlist Name ; text ; Current Playlist
 pp ; Playlist Position ; spin(0,1000) ; 10
 ps ; Shuffle ; check ; true
-pt ; Total Track Time ; spin(0,1000) ; 180
+?pt ; Total Track Time ; spin(0,1000) ; 180
 Sp ; Playback Pitch ; fspin(50,200) ; 100
 rp ; Song Playcount ; spin(0,10000) ; 20
 rr ; Song Rating ; spin(0,10) ; 5

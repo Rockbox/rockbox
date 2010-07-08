@@ -30,7 +30,9 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QFormLayout>
+#include <QTime>
 
+#include <cstdlib>
 
 DeviceState::DeviceState(QWidget *parent) :
     QWidget(parent), tabs(this)
@@ -227,6 +229,47 @@ QVariant DeviceState::data(QString tag, int paramCount,
         else
             return QVariant();
     }
+    else if(tag == "pc")
+    {
+        int secs = data("?pc").toInt();
+        return secsToString(secs);
+    }
+    else if(tag == "pr")
+    {
+        int secs = data("?pt").toInt() - data("?pc").toInt();
+        if(secs < 0)
+            secs = 0;
+        return secsToString(secs);
+    }
+    else if(tag == "pt")
+    {
+        int secs = data("?pt").toInt();
+        return secsToString(secs);
+    }
+    else if(tag == "px")
+    {
+        int totalTime = data("?pt").toInt();
+        int currentTime = data("?pc").toInt();
+        return currentTime * 100 / totalTime;
+    }
+    else if(tag == "pS")
+    {
+        double threshhold = paramCount > 0
+                            ? std::atof(params[0].data.text) : 10;
+        if(data("?pc").toDouble() <= threshhold)
+            return true;
+        else
+            return false;
+    }
+    else if(tag == "pE")
+    {
+        double threshhold = paramCount > 0
+                            ? std::atof(params[0].data.text) : 10;
+        if(data("?pt").toDouble() - data("?pc").toDouble() <= threshhold)
+            return true;
+        else
+            return false;
+    }
 
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));
@@ -334,4 +377,41 @@ QString DeviceState::directory(QString path, int level)
     if(index < 0)
         index = 0;
     return dirs[index];
+}
+
+QString DeviceState::secsToString(int secs)
+{
+    int hours = 0;
+    int minutes = 0;
+    while(secs >= 60)
+    {
+        minutes++;
+        secs -= 60;
+    }
+
+    while(minutes >= 60)
+    {
+        hours++;
+        minutes -= 60;
+    }
+
+    QString retval;
+
+    if(hours > 0)
+    {
+        retval += QString::number(hours);
+        if(minutes < 10)
+            retval += ":0";
+        else
+            retval += ":";
+    }
+
+    retval += QString::number(minutes);
+    if(secs < 10)
+        retval += ":0";
+    else
+        retval += ":";
+
+    retval += QString::number(secs);
+    return retval;
 }
