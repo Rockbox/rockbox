@@ -74,41 +74,26 @@ fb ; Bitrate (kbps) ; spin(1,2048) ; 256
 fc ; Codec ; combo(MP1, MP2, MP3, AIFF, WAV, OGG, FLAC, MPC, AC3, WV, ALAC, AAC, SHN, SID, ADX, NSF, Speex, SPC, APE, WMA) ; OGG
 ff ; Frequency (Hz) ; spin(1,100000) ; 42000
 fk ; Frequency (KHz) ; fspin(1, 100) ; 42
-fm ; Name ; text ; Current File Name.a
-fn ; Name (w/o extension) ; text ; Current File Name
-fp ; Path ; text ; /current/file/path/
+file ; File Path ; text ; /.rockbox/music/artist/album/01 - file.ogg
 fs ; Size (KB) ; spin(1,100000) ; 3000
 fv ; Variable Bit Rate ; check ; true
-d1 ; cd up ; text ; /current/file/
-d2 ; cd up x2 ; text ; /current/
-d3 ; cd up x3 ; text ; /
 
 [Next File Info]
 Fb ; Next File Bitrate (kbps) ; spin(1,2048) ; 256
 Fc ; Next File Codec ; combo(MP1, MP2, MP3, AIFF, WAV, OGG, FLAC, MPC, AC3, WV, ALAC, AAC, SHN, SID, ADX, NSF, Speex, SPC, APE, WMA) ; OGG
 Ff ; Next File Frequency (Hz) ; spin(1,100000) ; 42000
 Fk ; Next File Frequency (KHz) ; fspin(1, 100) ; 42
-Fm ; Next File Name ; text ; Next File Name.a
-Fn ; Next File Name (w/o extension) ; text ; Next File Name
-Fp ; Next File Path ; text ; /next/file/path/
+nextfile ; Next File Path ; text ; /.rockbox/music/artist/album/02 - nextfile.ogg
 Fs ; Next File Size (KB) ; spin(1,100000) ; 3000
 Fv ; Next File Variable Bit Rate ; check ; true
-D1 ; Next File cd up ; text ; /next/file/
-D2 ; Next File cd up x2 ; text ; /next/
-D3 ; Next File cd up x3 ; text ; /
 
 [Playlist/Song Info]
-px ; Percent Played ; spin(0,100) ; 50
-pc ; Current Time In Song ; text ; 1:00
-?pc ; Time In Song (Conditional) ; fspin(0,5000) ; 60
+?pc ; Time In Song (Seconds) ; fspin(0,5000) ; 60
 pe ; Playlist Entries ; spin(0,1000) ; 20
 pn ; Playlist Name ; text ; Current Playlist
 pp ; Playlist Position ; spin(0,1000) ; 10
-pr ; Time Remaining ; text ; 2:00
 ps ; Shuffle ; check ; true
-pt ; Total Track Time ; text ; 3:00
-pS ; Track Starting ; check ; true
-pE ; Track Ending ; check ; false
+pt ; Total Track Time ; spin(0,1000) ; 180
 Sp ; Playback Pitch ; fspin(50,200) ; 100
 rp ; Song Playcount ; spin(0,10000) ; 20
 rr ; Song Rating ; spin(0,10) ; 5

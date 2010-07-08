@@ -198,6 +198,36 @@ DeviceState::~DeviceState()
 QVariant DeviceState::data(QString tag, int paramCount,
                            skin_tag_parameter *params)
 {
+    /* Handling special cases */
+    if(tag.toLower() == "fm")
+    {
+        QString path = tag[0].isLower()
+                       ? data("file").toString() : data("nextfile").toString();
+        return fileName(path, true);
+    }
+    else if(tag.toLower() == "fn")
+    {
+        QString path = tag[0].isLower()
+                       ? data("file").toString() : data("nextfile").toString();
+        return fileName(path, false);
+    }
+    else if(tag.toLower() == "fp")
+    {
+        if(tag[0].isLower())
+            return data("file").toString();
+        else
+            return data("nextfile").toString();
+    }
+    else if(tag.toLower() == "d")
+    {
+        QString path = tag[0].isLower()
+                       ? data("file").toString() : data("nextfile").toString();
+        if(paramCount > 0)
+            return directory(path, params[0].data.numeric);
+        else
+            return QVariant();
+    }
+
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));
 
@@ -278,4 +308,30 @@ void DeviceState::setData(QString tag, QVariant data)
 void DeviceState::input()
 {
     emit settingsChanged();
+}
+
+QString DeviceState::fileName(QString path, bool extension)
+{
+    path = path.split("/").last();
+    if(!extension)
+    {
+        QString sum;
+        QStringList name = path.split(".");
+        for(int i = 0; i < name.count() - 1; i++)
+            sum.append(name[i]);
+        return sum;
+    }
+    else
+    {
+        return path;
+    }
+}
+
+QString DeviceState::directory(QString path, int level)
+{
+    QStringList dirs = path.split("/");
+    int index = dirs.count() - 1 - level;
+    if(index < 0)
+        index = 0;
+    return dirs[index];
 }

@@ -873,7 +873,8 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
 {
     if(!conditional)
     {
-        return info.device()->data(QString(element->tag->name));
+        return info.device()->data(QString(element->tag->name),
+                                   element->params_count, element->params);
     }
     else
     {
@@ -886,7 +887,8 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
         int child;
         QVariant val = info.device()->data("?" + QString(element->tag->name));
         if(val.isNull())
-            val = info.device()->data(QString(element->tag->name));
+            val = info.device()->data(QString(element->tag->name),
+                                      element->params_count, element->params);
 
         if(val.isNull())
         {

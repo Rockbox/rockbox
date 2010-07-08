@@ -59,6 +59,9 @@ private slots:
     void input();
 
 private:
+    static QString fileName(QString path, bool extension);
+    static QString directory(QString path, int level);
+
     QMap<QString, QPair<InputType, QWidget*> > inputs;
     QTabWidget tabs;
 };
