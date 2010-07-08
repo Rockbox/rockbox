@@ -69,9 +69,6 @@
 
 #define CONFIG_KEYPAD MPIO_HD200_PAD
 
-#define AB_REPEAT_ENABLE 1
-#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
-
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
@@ -118,19 +115,19 @@
 #define CODEC_SRCTRL_44100HZ (0x10 << 1)
 #define CODEC_SRCTRL_88200HZ (0x1E << 1)
 
-#define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC    50    /* capacity increment */
-#define BATTERY_TYPES_COUNT     1     /* only one type */
+#define BATTERY_TYPES_COUNT 1
+#define BATTERY_CAPACITY_DEFAULT  850  /* this is wild guess */
+#define BATTERY_CAPACITY_MIN      800  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     2500  /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC       50  /* capacity increment */
+
+#define CURRENT_NORMAL     68  /* measured during playback unboosted */
+#define CURRENT_BACKLIGHT  24  /* measured */
+#define CURRENT_RECORD     40  /* additional current while recording */
+#define CURRENT_REMOTE      0  /* additional current when remote connected */
 
 #define CONFIG_CHARGING CHARGING_MONITOR
 
-/* define current usage levels */
-/* additional current when remote connected */
-/*
-#define CURRENT_REMOTE      8 
-*/
 #ifndef SIMULATOR
 
 /* Define this if your LCD can set contrast */

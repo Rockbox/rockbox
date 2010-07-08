@@ -25,26 +25,25 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3700
+    3600
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3650
+    3500
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* from OF and measurements voltage range is 3.7-4.1 V */
-    { 3700, 3740, 3780, 3820, 3860, 3900, 3940, 3980, 4020, 4060, 4100 }
+    { 3500, 3566, 3597, 3619, 3644, 3676, 3732, 3806, 3868, 3937, 4004 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
     /* values measured over one full charging cycle */
-    3540, 3860, 3930, 3980, 4000, 4020, 4040, 4080, 4130, 4180, 4230 /* LiPo */
+    3386, 3872, 3904, 3942, 3996, 4029, 4033, 4036, 4038, 4039, 4041
 };
 
 /* 3.33V as reference */
