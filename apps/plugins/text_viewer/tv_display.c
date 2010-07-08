@@ -314,17 +314,20 @@ void tv_get_drawarea_info(int *width, int *cols, int *rows)
 static void tv_change_viewport(void)
 {
 #ifdef HAVE_LCD_BITMAP
+    bool show_statusbar = (rb->global_settings->statusbar != STATUSBAR_OFF &&
+                           preferences->statusbar);
+
     if (is_initialized_vp)
         rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
     else
         is_initialized_vp = true;
 
-    if (preferences->statusbar)
+    if (show_statusbar)
         rb->memcpy(&vp_info, rb->sb_skin_get_info_vp(SCREEN_MAIN), sizeof(struct viewport));
     else
         rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
 
-    rb->viewportmanager_theme_enable(SCREEN_MAIN, preferences->statusbar, &vp_info);
+    rb->viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp_info);
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
     display->set_viewport(&vp_info);
 #else
