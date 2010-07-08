@@ -270,6 +270,138 @@ QVariant DeviceState::data(QString tag, int paramCount,
         else
             return false;
     }
+    else if(tag == "ce")
+    {
+        return data("month");
+    }
+    else if(tag == "cH")
+    {
+        int hour = data("hour").toInt();
+        if(hour < 10)
+            return "0" + QString::number(hour);
+        else
+            return hour;
+    }
+    else if(tag == "cK")
+    {
+        return data("hour");
+    }
+    else if(tag == "cI")
+    {
+        int hour = data("hour").toInt();
+        if(hour > 12)
+            hour -= 12;
+        if(hour == 0)
+            hour = 12;
+
+        if(hour < 10)
+            return "0" + QString::number(hour);
+        else
+            return hour;
+    }
+    else if(tag == "cl")
+    {
+        int hour = data("hour").toInt();
+        if(hour > 12)
+            hour -= 12;
+        if(hour == 0)
+            hour = 12;
+
+        return hour;
+    }
+    else if(tag == "cm")
+    {
+        int month = data("?cm").toInt() + 1;
+        if(month < 10)
+            return "0" + QString::number(month);
+        else
+            return month;
+    }
+    else if(tag == "cd")
+    {
+        int day = data("day").toInt();
+        if(day < 10)
+            return "0" + QString::number(day);
+        else
+            return day;
+    }
+    else if(tag == "cM")
+    {
+        int minute = data("minute").toInt();
+        if(minute < 10)
+            return "0" + QString::number(minute);
+        else
+            return minute;
+    }
+    else if(tag == "cS")
+    {
+        int second = data("second").toInt();
+        if(second < 10)
+            return "0" + QString::number(second);
+        else
+            return second;
+    }
+    else if(tag == "cy")
+    {
+        QString year = data("cY").toString();
+        return year.right(2);
+    }
+    else if(tag == "cP")
+    {
+        if(data("hour").toInt() >= 12)
+            return "PM";
+        else
+            return "AM";
+    }
+    else if(tag == "cp")
+    {
+        if(data("hour").toInt() >= 12)
+            return "pm";
+        else
+            return "am";
+    }
+    else if(tag == "ca")
+    {
+        QString day = data("cw").toString();
+        return day.left(3);
+    }
+    else if(tag == "cb")
+    {
+        int month = data("cm").toInt();
+        switch(month)
+        {
+        case 1: return "Jan";
+        case 2: return "Feb";
+        case 3: return "Mar";
+        case 4: return "Apr";
+        case 5: return "May";
+        case 6: return "Jun";
+        case 7: return "Jul";
+        case 8: return "Aug";
+        case 9: return "Sep";
+        case 10: return "Oct";
+        case 11: return "Nov";
+        case 12: return "Dec";
+        }
+    }
+    else if(tag == "cu")
+    {
+        int day = data("?cw").toInt();
+        if(day == 0)
+            day = 7;
+        return day;
+    }
+    else if(tag == "?cu")
+    {
+        int day = data("?cw").toInt() - 1;
+        if(day == -1)
+            day = 6;
+        return day;
+    }
+    else if(tag == "cw")
+    {
+        return data("?cw");
+    }
 
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));

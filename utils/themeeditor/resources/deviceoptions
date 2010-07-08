@@ -124,27 +124,13 @@ xf ; Crossfade Type ; combo(Off, Automatic Track Skip Only, Shuffle, Shuffle or 
 
 [Clock]
 cc ; Has Realtime Clock ; check ; true
-cd ; Day of Month ; text ; 05
-ce ; Day of Month (No Padding) ; text ; 5
 cf ; 24 Hour Format ; check ; true
-cH ; 24h Hour ; text ; 09
-ck ; 24h Hour (No Padding) ; text ; 9
-cI ; 12h Hour ; text ; 09
-cl ; 12h Hour (No Padding) ; text ; 9
-cm ; Month (Padded) ; text ; 03
-?cm ; Month (Conditional) ; combo(January, February, March, April, May, Jun, July, August, September, October, November, December) ; January
-cM ; Minute (Padded) ; text ; 29
-cS ; Second (Padded) ; text ; 50
-cy ; Last Two Digits of Year (Padded) ; text ; 09
-cY ; Year ; text ; 2009
-cP ; Uppercase AM or PM ; combo(AM,PM) ; AM
-cp ; Lowercase AM or PM ; combo(am,pm) ; am
-ca ; Abbreviated Weekday Name ; combo(Sun, Mon, Tue, Thu, Fri, Sat); Tue
-cb ; Abbreviated Month Name ; combo(Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) ; Jan
-cu ; Day of Week (1..7, 1 is Monday) ; spin(1,7) ; 2
-?cu ; Day of Week (Monday First, Conditional) ; combo(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
-cw ; Day of Week (0..6, 0 is Sunday) ; spin(0,6) ; 2
-?cw ; Day of Week (Sunday First, Conditional) ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) ; Tuesday
+cY ; Year ; spin(1500,2100) ; 2010
+cm ; Month ; combo(January, February, March, April, May, Jun, July, August, September, October, November, December) ; January
+day ; Day of Month ; spin(1,31) ; 20
+?cw ; Day of Week ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) ; Tuesday
+hour ; Hour (24h) ; spin(0, 23) ; 12
+minute ; Minute ; spin(0, 59) ; 25
 
 [Recording Status]
 Rp ; Target Has Recorder ; check ; false
