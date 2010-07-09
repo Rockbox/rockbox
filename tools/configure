@@ -43,9 +43,6 @@ prefixtools () {
 }
 
 findarmgcc() {
-  # FIXME: ipod4g buttons do not work
-  [ "$ARG_ARM_EABI" != 1 -a "$modelname" = "ipod4g" ] && ARG_ARM_EABI="0"
-
   if [ "$ARG_ARM_EABI" != "0" ]; then
     prefixtools arm-elf-eabi-
     gccchoice="4.4.4"
