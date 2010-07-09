@@ -129,6 +129,10 @@ static void __reset(void)
 
 static void __shutdown(void)
 {
+    if (_charger_inserted())
+    /* if AC power do nothing */
+        return;
+
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
     {
@@ -143,15 +147,7 @@ static void __shutdown(void)
     _backlight_off();
     __reset_cookie();
 
-    if (_charger_inserted())
-    {
-        /* reset instead of power_off() */
-        __reset();
-    }
-    else
-    {
         power_off();
-    }
 }
 
 /* Print the battery voltage (and a warning message). */
@@ -271,6 +267,7 @@ static void bootmenu(void)
 
         lcd_update();
 
+        button = BUTTON_NONE;
         button = button_get_w_tmo(HZ);
 
         switch (button)
@@ -396,6 +393,7 @@ void main(void)
                 break;
 
             case EVENT_AC:
+                /* AC plug in */
                 if (!(last_event & EVENT_AC))
                 {
                     /* reset charging circuit */
@@ -406,7 +404,9 @@ void main(void)
                 if (last_event & EVENT_USB)
                 {
                     usb_enable(false);
+                    sleep(HZ);
                     ide_power_enable(false);
+                    sleep(HZ);
                 }
                    
                 if(!_battery_full())
@@ -441,12 +441,14 @@ void main(void)
 
             case EVENT_USB:
             case (EVENT_USB | EVENT_AC):
+                /* AC plug in while in USB mode */
                 if (!(last_event & EVENT_AC))
                 {
                     /* reset charger circuit */
                     and_l(~(1<<23), &GPIO_ENABLE);
                 }
 
+                /* USB plug in */
                 if (!(last_event & EVENT_USB))
                 {
                     /* init USB */
@@ -454,7 +456,8 @@ void main(void)
                     sleep(HZ/20);
                     usb_enable(true);
                 }
-
+                
+                /* display blinking USB indicator */
                 line = 0;
 
                 if (blink_toggle)
@@ -466,14 +469,17 @@ void main(void)
                 break;
 
             default:
+                /* USB unplug */
                 if (last_event & EVENT_USB)
                 {
-                    /* USB unplug */
+                    /* disable USB */
                     usb_enable(false);
+                    sleep(HZ);
                     ide_power_enable(false);
+                    sleep(HZ);
                 }
 
-                /* spurious wakeup */
+                /* spurious wakeup ?*/
                 __shutdown();
                 break;
         }
