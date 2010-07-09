@@ -198,10 +198,10 @@
     *: "Cancelled"
   </source>
   <dest>
-    *: "キャンセルしました"
+    *: "取り消しました"
   </dest>
   <voice>
-    *: "キャンセルしました"
+    *: "取り消しました"
   </voice>
 </phrase>
 <phrase>
@@ -4534,11 +4534,11 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=設定 OFF=キャンセル"
-    ipod*: "SELECT=設定 MENU=キャンセル"
-    iriverh10,iriverh10_5gb: "SELECT=設定 PREV=キャンセル"
-    gigabeats: "SELECT=設定 POWER=キャンセル"
-    vibe500: "OK=設定 C=キャンセル"
+    alarm: "PLAY=設定 OFF=取り消し"
+    ipod*: "SELECT=設定 MENU=取り消し"
+    iriverh10,iriverh10_5gb: "SELECT=設定 PREV=取り消し"
+    gigabeats: "SELECT=設定 POWER=取り消し"
+    vibe500: "OK=設定 C=取り消し"
   </dest>
   <voice>
     *: none
@@ -8104,13 +8104,13 @@
     gigabeatfx: "POWER to abort"
   </source>
   <dest>
-    *: "OFF: キャンセル"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP: キャンセル"
-    ipod*: "PLAY/PAUSE: キャンセル"
-    iaudiox5,iaudiom5: "Long PLAY: キャンセル"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: キャンセル"
-    gigabeats: "BACK: キャンセル"
-    gigabeatfx: "POWER: キャンセル"
+    *: "OFF: 取り消し"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP: 取り消し"
+    ipod*: "PLAY/PAUSE: 取り消し"
+    iaudiox5,iaudiom5: "Long PLAY: 取り消し"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: 取り消し"
+    gigabeats: "BACK: 取り消し"
+    gigabeatfx: "POWER: 取り消し"
   </dest>
   <voice>
     *: ""
@@ -12217,11 +12217,11 @@
   </source>
   <dest>
     *:none
-    radio_remote: "ラジオ画面"
+    radio_remote: "リモコンのラジオ画面"
   </dest>
   <voice>
     *:none
-    radio_remote: "ラジオ画面"
+    radio_remote: "リモコンのラジオ画面"
   </voice>
 </phrase>
 <phrase>
@@ -12238,7 +12238,7 @@
   </dest>
   <voice>
     *: none
-    radio: "ラジオ用の画面のスキン"
+    radio: "ラジオ画面用のスキン"
   </voice>
 </phrase>
 <phrase>
@@ -12255,7 +12255,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "ラジオ用のリモート画面のスキン"
+    radio_remote: "リモコンのラジオ画面用のスキン"
   </voice>
 </phrase>
 <phrase>
@@ -12440,5 +12440,112 @@
   <voice>
     *:none
     radio: "ラジオ画面"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "作曲者"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "強制"
+  </dest>
+  <voice>
+    *: "強制"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "ピクチャーフロー"
+  </dest>
+  <voice>
+    *: "ピクチャーフローを開く"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "削除"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "削除"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "取り消し"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "取り消し"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "停止時にブックマークを更新"
+  </dest>
+  <voice>
+    *: "停止時にブックマークを更新"
   </voice>
 </phrase>
