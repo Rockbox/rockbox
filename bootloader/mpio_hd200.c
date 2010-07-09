@@ -117,16 +117,6 @@ static void start_mpio_firmware(void)
     asm(" jmp 8");
 }
 
-static void __reset(void)
-{
-    asm(" move.w #0x2700,%sr");
-    __reset_cookie();
-    asm(" movec.l %d0,%vbr");
-    asm(" move.l (0), %sp");
-    asm(" movea.l (4),%a0");
-    asm(" jmp (%a0)");
-}
-
 static void __shutdown(void)
 {
     if (_charger_inserted())
