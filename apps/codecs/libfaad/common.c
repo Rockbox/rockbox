@@ -251,7 +251,7 @@ uint32_t random_int(void)
 /* precision of values in pow2_tab */
 #define POWTBL_BITS (31-(INTERP_BITS))
 #define POWTBL_PRECIS (1U<<(POWTBL_BITS))
-static const uint32_t pow2_tab[] ICONST_ATTR_FAAD_LARGE_IRAM = {
+static const uint32_t pow2_tab[] ICONST_ATTR = {
     UFIX_CONST(1.000000000000000,POWTBL_PRECIS),
     UFIX_CONST(1.010889286051701,POWTBL_PRECIS),
     UFIX_CONST(1.021897148654117,POWTBL_PRECIS),
