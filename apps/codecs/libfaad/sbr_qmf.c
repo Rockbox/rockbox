@@ -109,13 +109,13 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
         /* window and summation to create array u */
         for (n = 0; n < 64; n++)
         {
-            idx0 = qmfa->x_index + n; idx1 = n * 2;
+            idx0 = qmfa->x_index + n; idx1 = n * 2 * 5;
             u[n] = FAAD_ANALYSIS_SCALE1(
-                   MUL_F(qmfa->x[idx0      ], qmf_c[idx1]) +
-                   MUL_F(qmfa->x[idx0 +  64], qmf_c[idx1 + 2 *  64]) +
-                   MUL_F(qmfa->x[idx0 + 128], qmf_c[idx1 + 2 * 128]) +
-                   MUL_F(qmfa->x[idx0 + 192], qmf_c[idx1 + 2 * 192]) +
-                   MUL_F(qmfa->x[idx0 + 256], qmf_c[idx1 + 2 * 256]));
+                   MUL_F(qmfa->x[idx0      ], qmf_c[idx1    ]) +
+                   MUL_F(qmfa->x[idx0 +  64], qmf_c[idx1 + 2]) +
+                   MUL_F(qmfa->x[idx0 + 128], qmf_c[idx1 + 4]) +
+                   MUL_F(qmfa->x[idx0 + 192], qmf_c[idx1 + 6]) +
+                   MUL_F(qmfa->x[idx0 + 256], qmf_c[idx1 + 8]));
         }
 
         /* update ringbuffer index */
@@ -298,16 +298,16 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         /* calculate 32 output samples and window */
         for (k = 0; k < 32; k++)
         {
-            output[out++] = MUL_F(qmfs->v[qmfs->v_index + k], qmf_c[2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index +  96 + k], qmf_c[ 64 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 128 + k], qmf_c[128 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 224 + k], qmf_c[192 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 256 + k], qmf_c[256 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 352 + k], qmf_c[320 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 384 + k], qmf_c[384 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 480 + k], qmf_c[448 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 512 + k], qmf_c[512 + 2*k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 608 + k], qmf_c[576 + 2*k]);
+            output[out++] = MUL_F(qmfs->v[qmfs->v_index       + k], qmf_c[    2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  96 + k], qmf_c[1 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 128 + k], qmf_c[2 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 224 + k], qmf_c[3 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 256 + k], qmf_c[4 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 352 + k], qmf_c[5 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 384 + k], qmf_c[6 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 480 + k], qmf_c[7 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 512 + k], qmf_c[8 + 2*k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 608 + k], qmf_c[9 + 2*k*10]);
         }
 
         /* update the ringbuffer index */
@@ -368,16 +368,16 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         /* calculate 64 output samples and window */
         for (k = 0; k < 64; k++)
         {
-            output[out++] = MUL_F(qmfs->v[qmfs->v_index + k], qmf_c[k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 192 + k], qmf_c[64 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 256 + k], qmf_c[128 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 256 + 192 + k], qmf_c[128 + 64 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 512 + k], qmf_c[256 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 512 + 192 + k], qmf_c[256 + 64 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 768 + k], qmf_c[384 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 768 + 192 + k], qmf_c[384 + 64 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 1024 + k], qmf_c[512 + k]) +
-                MUL_F(qmfs->v[qmfs->v_index + 1024 + 192 + k], qmf_c[512 + 64 + k]);
+            output[out++] = MUL_F(qmfs->v[qmfs->v_index              + k], qmf_c[    k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  192       + k], qmf_c[1 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  256       + k], qmf_c[2 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  256 + 192 + k], qmf_c[3 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  512       + k], qmf_c[4 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  512 + 192 + k], qmf_c[5 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  768       + k], qmf_c[6 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index +  768 + 192 + k], qmf_c[7 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 1024       + k], qmf_c[8 + k*10]) +
+                            MUL_F(qmfs->v[qmfs->v_index + 1024 + 192 + k], qmf_c[9 + k*10]);
         }
 
         /* update the ringbuffer index */
@@ -441,18 +441,18 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         /* calculate 32 output samples and window */
         for (k = 0; k < 32; k++)
         {
-            idx0 = qmfs->v_index + k; idx1 = 2*k;
+            idx0 = qmfs->v_index + k; idx1 = 2*k*10;
             output[out++] = FAAD_SYNTHESIS_SCALE(
-                            MUL_F(qmfs->v[idx0      ], qmf_c[idx1      ]) +
-                            MUL_F(qmfs->v[idx0 +  96], qmf_c[idx1 +  64]) +
-                            MUL_F(qmfs->v[idx0 + 128], qmf_c[idx1 + 128]) +
-                            MUL_F(qmfs->v[idx0 + 224], qmf_c[idx1 + 192]) +
-                            MUL_F(qmfs->v[idx0 + 256], qmf_c[idx1 + 256]) +
-                            MUL_F(qmfs->v[idx0 + 352], qmf_c[idx1 + 320]) +
-                            MUL_F(qmfs->v[idx0 + 384], qmf_c[idx1 + 384]) +
-                            MUL_F(qmfs->v[idx0 + 480], qmf_c[idx1 + 448]) +
-                            MUL_F(qmfs->v[idx0 + 512], qmf_c[idx1 + 512]) +
-                            MUL_F(qmfs->v[idx0 + 608], qmf_c[idx1 + 576]));
+                            MUL_F(qmfs->v[idx0      ], qmf_c[idx1  ]) +
+                            MUL_F(qmfs->v[idx0 +  96], qmf_c[idx1+1]) +
+                            MUL_F(qmfs->v[idx0 + 128], qmf_c[idx1+2]) +
+                            MUL_F(qmfs->v[idx0 + 224], qmf_c[idx1+3]) +
+                            MUL_F(qmfs->v[idx0 + 256], qmf_c[idx1+4]) +
+                            MUL_F(qmfs->v[idx0 + 352], qmf_c[idx1+5]) +
+                            MUL_F(qmfs->v[idx0 + 384], qmf_c[idx1+6]) +
+                            MUL_F(qmfs->v[idx0 + 480], qmf_c[idx1+7]) +
+                            MUL_F(qmfs->v[idx0 + 512], qmf_c[idx1+8]) +
+                            MUL_F(qmfs->v[idx0 + 608], qmf_c[idx1+9]));
         }
 
         /* update ringbuffer index */
@@ -469,8 +469,8 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     ALIGN real_t imag1[32];
     ALIGN real_t real2[32]; 
     ALIGN real_t imag2[32];
-    qmf_t * pX;
-    real_t * p_buf_1, * p_buf_3;
+    qmf_t *pX;
+    real_t *p_buf_1, *p_buf_3;
 #ifndef FIXED_POINT
     real_t scale = 1.f/64.f;
 #endif
@@ -512,19 +512,21 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         p_buf_1 = qmfs->v + qmfs->v_index;
 
         /* calculate 64 output samples and window */
+
         for (k = 0; k < 64; k++)
         {
+            idx0 = k*10;
             output[out++] = FAAD_SYNTHESIS_SCALE(
-                            MUL_F(p_buf_1[k         ], qmf_c[k    ]) +
-                            MUL_F(p_buf_1[k+ 192    ], qmf_c[k+ 64]) +
-                            MUL_F(p_buf_1[k+ 256    ], qmf_c[k+128]) +
-                            MUL_F(p_buf_1[k+ 256+192], qmf_c[k+192]) +
-                            MUL_F(p_buf_1[k+ 512    ], qmf_c[k+256]) +
-                            MUL_F(p_buf_1[k+ 512+192], qmf_c[k+320]) +
-                            MUL_F(p_buf_1[k+ 768    ], qmf_c[k+384]) +
-                            MUL_F(p_buf_1[k+ 768+192], qmf_c[k+448]) +
-                            MUL_F(p_buf_1[k+1024    ], qmf_c[k+512]) +
-                            MUL_F(p_buf_1[k+1024+192], qmf_c[k+576]));
+                            MUL_F(p_buf_1[k         ], qmf_c[idx0  ]) +
+                            MUL_F(p_buf_1[k+ 192    ], qmf_c[idx0+1]) +
+                            MUL_F(p_buf_1[k+ 256    ], qmf_c[idx0+2]) +
+                            MUL_F(p_buf_1[k+ 256+192], qmf_c[idx0+3]) +
+                            MUL_F(p_buf_1[k+ 512    ], qmf_c[idx0+4]) +
+                            MUL_F(p_buf_1[k+ 512+192], qmf_c[idx0+5]) +
+                            MUL_F(p_buf_1[k+ 768    ], qmf_c[idx0+6]) +
+                            MUL_F(p_buf_1[k+ 768+192], qmf_c[idx0+7]) +
+                            MUL_F(p_buf_1[k+1024    ], qmf_c[idx0+8]) +
+                            MUL_F(p_buf_1[k+1024+192], qmf_c[idx0+9]));
         }
 
         /* update ringbuffer index */
