@@ -38,7 +38,7 @@ extern "C" {
 #pragma warning(disable:4244)
 #endif
 
-ALIGN static const real_t qmf_c[640] = {
+ALIGN static const real_t qmf_c[640] ICONST_ATTR_FAAD_LARGE_IRAM = {
     FRAC_CONST(0), FRAC_CONST(-0.00055252865047),
     FRAC_CONST(-0.00056176925738), FRAC_CONST(-0.00049475180896),
     FRAC_CONST(-0.00048752279712), FRAC_CONST(-0.00048937912498),

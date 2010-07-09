@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-void dct4_kernel(real_t * in_real, real_t * in_imag, real_t * out_real, real_t * out_imag);
+void dct4_kernel(real_t *real, real_t *imag);
 
 void DCT3_32_unscaled(real_t *y, real_t *x);
 void DCT4_32(real_t *y, real_t *x);

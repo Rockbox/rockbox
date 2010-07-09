@@ -458,14 +458,14 @@ static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
     if (q < 0)
     {
         /* tab contains a value for all possible q [0,8192] */
-        if (-q < IQ_TABLE_SIZE)
+        if (LIKELY(-q < IQ_TABLE_SIZE))
             return -tab[-q];
 
         *error = 17;
         return 0;
     } else {
         /* tab contains a value for all possible q [0,8192] */
-        if (q < IQ_TABLE_SIZE)
+        if (LIKELY(q < IQ_TABLE_SIZE))
             return tab[q];
 
         *error = 17;
@@ -523,17 +523,17 @@ ALIGN static const real_t pow2sf_tab[] = {
   - Within a scalefactor window band, the coefficients are in ascending
     spectral order.
 */
+ALIGN static const real_t pow2_table[] ICONST_ATTR =
+{
+    COEF_CONST(1.0),
+    COEF_CONST(1.1892071150027210667174999705605), /* 2^0.25 */
+    COEF_CONST(1.4142135623730950488016887242097), /* 2^0.50 */
+    COEF_CONST(1.6817928305074290860622509524664)  /* 2^0.75 */
+};
 static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
                              ic_stream *ics, int16_t *quant_data,
                              real_t *spec_data, uint16_t frame_len)
 {
-    ALIGN static const real_t pow2_table[] ICONST_ATTR =
-    {
-        COEF_CONST(1.0),
-        COEF_CONST(1.1892071150027210667174999705605), /* 2^0.25 */
-        COEF_CONST(1.4142135623730950488016887242097), /* 2^0.5 */
-        COEF_CONST(1.6817928305074290860622509524664) /* 2^0.75 */
-    };
     const real_t *tab = iq_table;
 
     (void)frame_len;
