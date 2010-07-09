@@ -402,6 +402,14 @@ QVariant DeviceState::data(QString tag, int paramCount,
     {
         return data("?cw");
     }
+    else if(tag == "cs")
+    {
+        int seconds = data("seconds").toInt();
+        if(seconds < 10)
+            return "0" + QString::number(seconds);
+        else
+            return seconds;
+    }
 
     QPair<InputType, QWidget*> found =
             inputs.value(tag, QPair<InputType, QWidget*>(Slide, 0));

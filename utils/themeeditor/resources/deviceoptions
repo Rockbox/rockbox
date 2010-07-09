@@ -131,6 +131,7 @@ day ; Day of Month ; spin(1,31) ; 20
 ?cw ; Day of Week ; combo(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) ; Tuesday
 hour ; Hour (24h) ; spin(0, 23) ; 12
 minute ; Minute ; spin(0, 59) ; 25
+second ; Second ; spin(0, 59) ; 20
 
 [Recording Status]
 Rp ; Target Has Recorder ; check ; false

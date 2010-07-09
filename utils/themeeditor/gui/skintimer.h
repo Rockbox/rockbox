@@ -24,6 +24,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QToolButton>
 
 #include "devicestate.h"
 
@@ -44,6 +45,7 @@ private slots:
     void stop();
     void tick();
     void stateChange();
+    void deviceChange();
 
 private:
     void setupUI();
@@ -53,6 +55,9 @@ private:
 
     QTimer timer;
     unsigned long int elapsedTime;
+    unsigned long int totalTime;
+
+    QList<QToolButton*> playStateButtons;
 };
 
 #endif // SKINTIMER_H
