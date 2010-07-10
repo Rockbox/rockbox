@@ -109,7 +109,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
         /* window and summation to create array u */
         for (n = 0; n < 64; n++)
         {
-            idx0 = qmfa->x_index + n; idx1 = n * 2 * 5;
+            idx0 = qmfa->x_index + n; idx1 = n * 10;
             u[n] = FAAD_ANALYSIS_SCALE1(
                    MUL_F(qmfa->x[idx0      ], qmf_c[idx1    ]) +
                    MUL_F(qmfa->x[idx0 +  64], qmf_c[idx1 + 2]) +
@@ -512,7 +512,7 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         p_buf_1 = qmfs->v + qmfs->v_index;
 
         /* calculate 64 output samples and window */
-
+#if !defined(CPU_ARM)
         for (k = 0; k < 64; k++)
         {
             idx0 = k*10;
@@ -528,6 +528,47 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
                             MUL_F(p_buf_1[k+1024    ], qmf_c[idx0+8]) +
                             MUL_F(p_buf_1[k+1024+192], qmf_c[idx0+9]));
         }
+#else
+        const real_t *qtab = qmf_c;
+        real_t *pbuf = p_buf_1;
+        for (k = 0; k < 64; k++, pbuf++)
+        {
+            real_t *pout = &output[out++];
+            asm volatile (
+               "ldmia %[qtab]!, { r0-r3 } \n\t"
+               "ldr r4, [%[pbuf]]         \n\t"
+               "smull r5, r6, r4, r0      \n\t"
+               "ldr r4, [%[pbuf], #192*4] \n\t"
+               "smlal r5, r6, r4, r1      \n\t"
+               "ldr r4, [%[pbuf], #256*4] \n\t"
+               "smlal r5, r6, r4, r2      \n\t"
+               "ldr r4, [%[pbuf], #448*4] \n\t"
+               "smlal r5, r6, r4, r3      \n\t"
+               
+               "ldmia %[qtab]!, { r0-r3 } \n\t"
+               "ldr r4, [%[pbuf], #512*4] \n\t"
+               "smlal r5, r6, r4, r0      \n\t"
+               "ldr r4, [%[pbuf], #704*4] \n\t"
+               "smlal r5, r6, r4, r1      \n\t"
+               "ldr r4, [%[pbuf], #768*4] \n\t"
+               "smlal r5, r6, r4, r2      \n\t"
+               "ldr r4, [%[pbuf], #960*4] \n\t"
+               "smlal r5, r6, r4, r3      \n\t"
+               
+               "ldmia %[qtab]!, { r0-r1 } \n\t"
+               "mov r2, #1024*4           \n\t"
+               "ldr r4, [%[pbuf], r2]     \n\t"
+               "smlal r5, r6, r4, r0      \n\t"
+               "mov r2, #1216*4           \n\t"
+               "ldr r4, [%[pbuf], r2]     \n\t"
+               "smlal r5, r6, r4, r1      \n\t"
+
+               "str r6, [%[pout]]         \n"  
+               : [qtab] "+r" (qtab)
+               : [pbuf] "r" (pbuf), [pout] "r" (pout)
+               : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory");
+        }
+#endif
 
         /* update ringbuffer index */
         qmfs->v_index -= 128;
