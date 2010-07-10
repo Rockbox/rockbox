@@ -156,8 +156,8 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
                     button_event( xybutton, true );
                     break;
                 }
-#endif
             }
+#endif
 #ifdef HAVE_TOUCHSCREEN
             touchscreen_event(event->x, event->y);
 #endif
