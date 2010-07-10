@@ -164,7 +164,7 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
             break;
         }
 
-        if (debug_wps && event->button == BUTTON_LEFT)
+        if (debug_wps && event->button == SDL_BUTTON_LEFT)
         {
             int m_x, m_y;
 
