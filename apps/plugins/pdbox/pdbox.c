@@ -22,6 +22,8 @@
 #include "plugin.h"
 #include "pdbox.h"
 
+#include "lib/helper.h"
+
 #include "PDa/src/m_pd.h"
 #include "PDa/src/s_stuff.h"
 
@@ -245,6 +247,9 @@ enum plugin_status plugin_start(const void* parameter)
     /* If having an error creating threads, bail out. */
     if(core_thread_id == 0 || gui_thread_id == 0)
         return PLUGIN_ERROR;
+    
+    /* Make backlight remain on -- making music requires attention. */
+    backlight_force_on();
 
     /* Main loop. */
     while(!quit)
@@ -255,6 +260,9 @@ enum plugin_status plugin_start(const void* parameter)
         /* Sleep to the next time slice. */
         rb->sleep(1);
     }
+    
+    /* Restore backlight. */
+    backlight_use_settings();
 
     /* Wait for threads to complete. */
     rb->thread_wait(gui_thread_id);
