@@ -248,7 +248,7 @@ echo "Select target arch:"
 echo "s   - sh       (Archos models)"
 echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
 echo "e   - arm-eabi (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
-echo "a   - arm      (older ARM toolchain, depreciated) 
+echo "a   - arm      (older ARM toolchain, deprecated) "
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m86k and arm)"
