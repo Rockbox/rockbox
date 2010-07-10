@@ -109,6 +109,12 @@ svnpaths = [ "rbutil/",
 # only used on w32.
 useupx = False
 
+# OS X: files to copy into the bundle. Workaround for out-of-tree builds.
+bundlecopy = {
+        "icons/rbutilqt.icns" : "Contents/Resources/",
+        "Info.plist"          : "Contents/"
+}
+
 # == Functions ==
 def usage(myself):
     print "Usage: %s [options]" % myself
@@ -316,10 +322,10 @@ def macdeploy(versionstring, buildfolder):
     dmgfile = program + "-" + versionstring + ".dmg"
     appbundle = buildfolder + "/" + progexe
 
-    # workaround to Qt issues when building out-of-tree. Hardcoded for simplicity.
+    # workaround to Qt issues when building out-of-tree. Copy files into bundle.
     sourcebase = buildfolder + re.sub('rbutilqt.pro$', '', project)
-    shutil.copy(sourcebase + "icons/rbutilqt.icns", appbundle + "/Contents/Resources/")
-    shutil.copy(sourcebase + "Info.plist", appbundle + "/Contents/")
+    for src in bundlecopy:
+        shutil.copy(sourcebase + src, appbundle + bundlecopy[src])
     # end of Qt workaround
 
     output = subprocess.Popen(["macdeployqt", progexe, "-dmg"], stdout=subprocess.PIPE, cwd=buildfolder)
