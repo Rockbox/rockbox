@@ -53,7 +53,8 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbtext.h \
     graphics/rbfontcache.h \
     graphics/rbtextcache.h \
-    gui/skintimer.h
+    gui/skintimer.h \
+    graphics/rbtoucharea.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -77,7 +78,8 @@ SOURCES += main.cpp \
     graphics/rbtext.cpp \
     graphics/rbfontcache.cpp \
     graphics/rbtextcache.cpp \
-    gui/skintimer.cpp
+    gui/skintimer.cpp \
+    graphics/rbtoucharea.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

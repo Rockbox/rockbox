@@ -37,6 +37,7 @@ remotewidth ; Remote Width ; spin(0,800) ; 100
 remoteheight ; Remote Height ; spin(0,800); 50
 simtime ; Simulation Time ; fspin(0, 100000) ; 60.0
 showviewports ; Show Viewports ; check ; false
+showtouch ; Show Touch Areas ; check ; true
 rendersbs ; Render SBS If Available ; check ; true
 rtl ; Right-To-Left Language ; check ; false
 

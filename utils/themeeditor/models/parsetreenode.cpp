@@ -27,6 +27,7 @@
 
 #include "rbimage.h"
 #include "rbprogressbar.h"
+#include "rbtoucharea.h"
 
 #include <iostream>
 #include <cmath>
@@ -799,6 +800,25 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             info.screen()->loadFont(x, new RBFont(filename));
             return true;
 
+        }
+
+        return false;
+
+    case 'T':
+        switch(element->tag->name[1])
+        {
+        case '\0':
+            /* %T */
+            if(element->params_count < 5)
+                return false;
+            int x = element->params[0].data.numeric;
+            int y = element->params[1].data.numeric;
+            int width = element->params[2].data.numeric;
+            int height = element->params[3].data.numeric;
+            QString action(element->params[4].data.text);
+            RBTouchArea* temp = new RBTouchArea(width, height, action, info);
+            temp->setPos(x, y);
+            return true;
         }
 
         return false;
