@@ -101,119 +101,148 @@ static void touchscreen_event(int x, int y)
 }
 #endif
 
-bool gui_message_loop(void)
+static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 {
-    SDL_Event event;
-    static int x,y,xybutton = 0;
-
-    while (SDL_WaitEvent(&event))
-    {
-        sim_enter_irq_handler();
-        switch(event.type)
-        {
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                button_event(event.key.keysym.sym, event.type == SDL_KEYDOWN);
-                break;
-#ifdef HAVE_TOUCHSCREEN
-            case SDL_MOUSEMOTION:
-                if (event.motion.state & SDL_BUTTON(1))
-                    touchscreen_event(event.motion.x, event.motion.y);
-                break;
-#endif
-            case SDL_MOUSEBUTTONDOWN:
-                switch ( event.button.button ) {
-#ifdef HAVE_SCROLLWHEEL
-                    case SDL_BUTTON_WHEELUP:
-                        button_event( SDLK_UP, true );
-                        break;
-                    case SDL_BUTTON_WHEELDOWN:
-                        button_event( SDLK_DOWN, true );
-                        break;
-#endif
-                    case SDL_BUTTON_LEFT:
-                    case SDL_BUTTON_MIDDLE:
-                        if ( mapping && background ) {
-                            x = event.button.x;
-                            y = event.button.y;
-                        }
-#ifdef SIMULATOR
-                        if ( background ) {
-                            xybutton = xy2button( event.button.x, event.button.y );
-                            if( xybutton ) {
-                                button_event( xybutton, true );
-                                break;
-                            }
-                        }
-#endif
-#ifdef HAVE_TOUCHSCREEN
-                        touchscreen_event(event.button.x, event.button.y);
-#endif
-                        break;
-
-                    default:
-                        break;
-                }
-
-                if (debug_wps && event.button.button == 1)
-                {
-                    if ( background ) 
-#ifdef HAVE_REMOTE
-                        if ( event.button.y < UI_REMOTE_POSY ) /* Main Screen */
-                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
-                        else 
-                            printf("Mouse at: (%d, %d)\n", event.button.x - UI_REMOTE_POSX -1 , event.button.y - UI_REMOTE_POSY - 1 );
-#else
-                        printf("Mouse at: (%d, %d)\n", event.button.x - UI_LCD_POSX -1 , event.button.y - UI_LCD_POSY - 1 );
-#endif
-                    else 
-                        if ( event.button.y/display_zoom < LCD_HEIGHT ) /* Main Screen */
-                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom );
-#ifdef HAVE_REMOTE
-                        else
-                            printf("Mouse at: (%d, %d)\n", event.button.x/display_zoom, event.button.y/display_zoom - LCD_HEIGHT );
-#endif
-                }
-                break;
-            case SDL_MOUSEBUTTONUP:
-                switch ( event.button.button ) {
-                    /* The scrollwheel button up events are ignored as they are queued immediately */
-                    case SDL_BUTTON_LEFT:
-                    case SDL_BUTTON_MIDDLE:
-                        if ( mapping && background ) {
-                            printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x,
 #define SQUARE(x) ((x)*(x))
-                            y, (int)sqrt( SQUARE(x-(int)event.button.x)
-                                    + SQUARE(y-(int)event.button.y))  );
-                        }
-                        if ( background && xybutton ) {
-                                button_event( xybutton, false );
-                                xybutton = 0;
-                            }
-#ifdef HAVE_TOUCHSCREEN
-                            else
-                                button_event(BUTTON_TOUCHSCREEN, false);
+    static int x,y;
+#ifdef SIMULATOR
+    static int xybutton = 0;
 #endif
-                        break;
-                    default:
-                        break;
-                }
-                break;
-                
 
-            case SDL_QUIT:
-            {
-                sim_exit_irq_handler();
-                return false;
+    if(button_up) {
+        switch ( event->button )
+        {
+        /* The scrollwheel button up events are ignored as they are queued immediately */
+        case SDL_BUTTON_LEFT:
+        case SDL_BUTTON_MIDDLE:
+            if ( mapping && background ) {
+                printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x, y,
+                (int)sqrt( SQUARE(x-(int)event->x) + SQUARE(y-(int)event->y))
+                );
             }
-            default:
-                /*printf("Unhandled event\n"); */
-                break;
+#ifdef SIMULATOR
+            if ( background && xybutton ) {
+                    button_event( xybutton, false );
+                    xybutton = 0;
+                }
+#endif
+#ifdef HAVE_TOUCHSCREEN
+                else
+                    button_event(BUTTON_TOUCHSCREEN, false);
+#endif
+            break;
         }
-        sim_exit_irq_handler();
+    } else {    /* button down */
+        switch ( event->button )
+        {
+#ifdef HAVE_SCROLLWHEEL
+        case SDL_BUTTON_WHEELUP:
+            button_event( SDLK_UP, true );
+            break;
+        case SDL_BUTTON_WHEELDOWN:
+            button_event( SDLK_DOWN, true );
+            break;
+#endif
+        case SDL_BUTTON_LEFT:
+        case SDL_BUTTON_MIDDLE:
+            if ( mapping && background ) {
+                x = event->x;
+                y = event->y;
+            }
+#ifdef SIMULATOR
+            if ( background ) {
+                xybutton = xy2button( event->x, event->y );
+                if( xybutton ) {
+                    button_event( xybutton, true );
+                    break;
+                }
+#endif
+            }
+#ifdef HAVE_TOUCHSCREEN
+            touchscreen_event(event->x, event->y);
+#endif
+            break;
+        }
+
+        if (debug_wps && event->button == BUTTON_LEFT)
+        {
+            int m_x, m_y;
+
+            if ( background )
+            {
+                m_x = event->x - 1;
+                m_y = event->y - 1;
+#ifdef HAVE_REMOTE
+                if ( event->y >= UI_REMOTE_POSY ) /* Remote Screen */
+                {
+                    m_x -= UI_REMOTE_POSX;
+                    m_y -= UI_REMOTE_POSY;
+                }
+                else
+#endif
+                {
+                    m_x -= UI_LCD_POSX;
+                    m_y -= UI_LCD_POSY;
+                }
+            }
+            else
+            {
+                m_x = event->x / display_zoom;
+                m_y = event->y / display_zoom;
+#ifdef HAVE_REMOTE
+                if ( m_y >= LCD_HEIGHT ) /* Remote Screen */
+                    m_y -= LCD_HEIGHT;
+#endif
+            }
+
+            printf("Mouse at: (%d, %d)\n", m_x, m_y);
+        }
+    }
+#undef SQUARE
+}
+
+static bool event_handler(SDL_Event *event)
+{
+    switch(event->type)
+    {
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+        button_event(event->key.keysym.sym, event->type == SDL_KEYDOWN);
+        break;
+#ifdef HAVE_TOUCHSCREEN
+    case SDL_MOUSEMOTION:
+        if (event->motion.state & SDL_BUTTON(1))
+            touchscreen_event(event->motion.x, event->motion.y);
+        break;
+#endif
+
+    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEBUTTONDOWN:
+        mouse_event(&event->button, event->type == SDL_MOUSEBUTTONUP);
+        break;
+
+    case SDL_QUIT:
+        return true;
     }
 
-    return true;
+    return false;
+}
+
+void gui_message_loop(void)
+{
+    SDL_Event event;
+    bool quit;
+
+    do {
+        /* wait for the next event */
+        while(SDL_WaitEvent(&event) == 0)
+            printf("SDL_WaitEvent() error\n");
+
+        sim_enter_irq_handler();
+        quit = event_handler(&event);
+        sim_exit_irq_handler();
+
+    } while(!quit);
 }
 
 static void button_event(int key, bool pressed)

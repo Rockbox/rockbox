@@ -26,6 +26,7 @@
 #include <inttypes.h>
 #include "system.h"
 #include "thread-sdl.h"
+#include "system-sdl.h"
 #include "sim-ui-defines.h"
 #include "lcd-sdl.h"
 #ifdef HAVE_LCD_BITMAP
@@ -69,10 +70,6 @@ void sys_poweroff(void)
 }
 
 /*
- * Button read loop */
-bool gui_message_loop(void);
-
-/*
  * This thread will read the buttons in an interrupt like fashion, and
  * also initializes SDL_INIT_VIDEO and the surfaces
  *
@@ -85,7 +82,7 @@ static int sdl_event_thread(void * param)
 {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
-    SDL_Surface *picture_surface;
+    SDL_Surface *picture_surface = NULL;
     int width, height;
 
     /* Try and load the background image. If it fails go without */
@@ -134,7 +131,10 @@ static int sdl_event_thread(void * param)
 
     /*
      * finally enter the button loop */
-    while(gui_message_loop());
+    gui_message_loop();
+
+    if(picture_surface)
+        SDL_FreeSurface(picture_surface);
 
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
@@ -151,7 +151,6 @@ void sim_do_exit(void)
 
     SDL_Quit();
     exit(EXIT_SUCCESS);
-    while(1);
 }
 
 void system_init(void)
