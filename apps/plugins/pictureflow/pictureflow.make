@@ -15,7 +15,7 @@ PICTUREFLOW_OBJ := $(call c2obj, $(PICTUREFLOW_SRC))
 
 OTHER_SRC += $(PICTUREFLOW_SRC)
 
-ifndef SIMVER
+ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
     ### lowmem targets
     ROCKS += $(PICTUREFLOW_OBJDIR)/pictureflow.ovl

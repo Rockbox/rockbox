@@ -21,7 +21,7 @@ OTHER_SRC += $(DOOM_SRC)
 
 DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing
 
-ifndef SIMVER
+ifndef APP_TYPE
 ifeq ($(TARGET), IRIVER_H100)
     DOOMCCFLAGS += -mstructure-size-boundary=8
 endif

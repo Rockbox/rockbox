@@ -8,7 +8,7 @@
 #
 
 INCLUDES += -I$(FIRMDIR) -I$(FIRMDIR)/export -I$(FIRMDIR)/drivers -I$(FIRMDIR)/include
-ifndef SIMVER
+ifndef APP_TYPE
 INCLUDES += -I$(FIRMDIR)/libc/include
 endif
 

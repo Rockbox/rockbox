@@ -103,7 +103,7 @@ simcc () {
  prefixtools "$CROSS_COMPILE"
  ARG_ARM_THUMB=0 # can't use thumb in native builds
 
- simver=sdl
+ app_type=$1
  winbuild=""
  GCCOPTS='-W -Wall -g -fno-builtin'
  GCCOPTIMIZE=''
@@ -171,7 +171,7 @@ simcc () {
  [ "$winbuild" != "yes" ] && GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
  sdl=`findsdl $winbuild`
 
- if [ $1 = "sdl" ]; then
+ if [ -n `echo $app_type | grep "sdl"` ]; then
     if [ -z "$sdl" ]; then
         echo "configure didn't find sdl-config, which indicates that you"
         echo "don't have SDL (properly) installed. Please correct and"
@@ -233,9 +233,11 @@ EOF
      echo "WARNING: Cross Compiling, cannot detect endianess. Assuming little endian!"
    fi
 
-   if [ $1 = "sdl" ]; then
+   if [ "$app_type" = "sdl-sim" ]; then
      echo "Simulator environment deemed $endian endian"
-   elif [ $1 = "checkwps" ]; then
+   elif [ "$app_type" = "sdl-app" ]; then
+     echo "Application environment deemed $endian endian"
+   elif [ "$app_type" = "checkwps" ]; then
      echo "CheckWPS environment deemed $endian endian"
    fi
 
@@ -2604,7 +2606,7 @@ fi
     target="-DAPPLICATION"
     memory=32
     uname=`uname`
-    simcc "sdl"
+    simcc "sdl-app"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2855,7 +2857,7 @@ uname=`uname`
 
 if [ "yes" = "$simulator" ]; then
   # setup compiler and things for simulator
-  simcc "sdl"
+  simcc "sdl-sim"
 
   if [ -d "simdisk" ]; then
     echo "Subdirectory 'simdisk' already present"
@@ -3136,7 +3138,7 @@ sed > Makefile \
  -e "s<@FIRMDIR@<${firmdir}<g" \
  -e "s<@TOOLSDIR@<${toolsdir}<g" \
  -e "s<@APPS@<${apps}<g" \
- -e "s<@SIMVER@<${simver}<g" \
+ -e "s<@APP_TYPE@<${app_type}<g" \
  -e "s<@GCCVER@<${gccver}<g" \
  -e "s<@GCCNUM@<${gccnum}<g" \
  -e "s<@UNAME@<${uname}<g" \
@@ -3202,7 +3204,7 @@ export DLLWRAP=@DLLWRAP@
 export RANLIB=@RANLIB@
 export PREFIX=@PREFIX@
 export PROFILE_OPTS=@PROFILE_OPTS@
-export SIMVER=@SIMVER@
+export APP_TYPE=@APP_TYPE@
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=@GCCOPTS@
 export TARGET_INC=@TARGET_INC@

@@ -24,7 +24,7 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 
 
 ifeq (,$(PREFIX))
-ifdef SIMVER
+ifeq ($(APP_TYPE),sdl-sim)
 # for sims, set simdisk/ as default
 PREFIX = simdisk
 INSTALL = --install="$(PREFIX)"
@@ -85,7 +85,7 @@ else
     include $(APPSDIR)/plugins/plugins.make
   endif
 
-  ifdef SIMVER
+  ifdef APP_TYPE
     include $(ROOTDIR)/uisimulator/uisimulator.make
   endif
 endif # bootloader
@@ -141,7 +141,7 @@ ifeq (,$(findstring bootloader,$(APPSDIR)))
 
 OBJ += $(LANG_O)
 
-ifndef SIMVER
+ifndef APP_TYPE
 
 ## target build
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
@@ -221,7 +221,7 @@ $(MAXOUTFILE):
 $(BUILDDIR)/rombox.iriver: $(BUILDDIR)/rombox.bin
 	$(call PRINTS,Build ROM file)$(MKFIRMWARE) $< $@
 
-endif # !SIMVER
+endif # !APP_TYPE
 endif # !bootloader
 
 

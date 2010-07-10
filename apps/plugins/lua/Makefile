@@ -27,7 +27,7 @@ OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DIRS = .
 
-ifndef SIMVER
+ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
     LDS := archos.lds
     OUTPUT = $(OUTDIR)/lua.ovl
@@ -41,7 +41,7 @@ endif
 
 all: $(OUTPUT)
 
-ifndef SIMVER
+ifndef APP_TYPE
 $(OBJDIR)/lua.elf: $(OBJS) $(LINKFILE)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/lua.map
@@ -50,7 +50,7 @@ $(OUTPUT): $(OBJDIR)/lua.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
-ifeq ($(SIMVER), sdl)
+ifdef APP_TYPE
 ###################################################
 # This is the SDL simulator version
 

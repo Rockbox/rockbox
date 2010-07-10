@@ -47,7 +47,7 @@ include $(APPSDIR)/codecs/libtta/libtta.make
 CODECFLAGS = $(CFLAGS) -fstrict-aliasing -I$(APPSDIR)/codecs \
 	-I$(APPSDIR)/codecs/lib -DCODEC
 
-ifndef SIMVER
+ifndef APP_TYPE
   CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
   CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file
   CODECLINK_LDS := $(CODECDIR)/codec.link
@@ -115,7 +115,7 @@ $(CODECDIR)/%.o: $(ROOTDIR)/apps/codecs/%.S
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
 		-I$(dir $<) $(CODECFLAGS) -c $< -o $@
 
-ifdef SIMVER
+ifdef APP_TYPE
  CODECLDFLAGS = $(SHARED_FLAG) # <-- from Makefile
 else
  CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
@@ -135,7 +135,7 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
-ifdef SIMVER
+ifdef APP_TYPE
 	$(SILENT)cp $(CODECDIR)/$*.elf $@
 else
 	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@

@@ -22,7 +22,7 @@ $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ) $(CODECDIR)/libtlsf.a
 
 PDBOXFLAGS = $(PLUGINFLAGS)
 PDBOXLDFLAGS = $(PLUGINLDFLAGS) 
-ifdef SIMVER
+ifdef APP_TYPE
 PDBOXLDFLAGS += -lm
 endif
 
@@ -36,7 +36,7 @@ $(PDBOXBUILDDIR)/pdbox.rock:
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PDBOXLDFLAGS)
-ifdef SIMVER
+ifdef APP_TYPE
 	$(SILENT)cp $*.elf $@
 else
 	$(SILENT)$(OC) -O binary $*.elf $@

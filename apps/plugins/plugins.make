@@ -27,7 +27,7 @@ PLUGINLIB_OBJ := $(PLUGINLIB_OBJ:.S=.o)
 PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 
 ### build data / rules
-ifndef SIMVER
+ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
 PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
@@ -81,7 +81,7 @@ $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -c $< -o $@
 
-ifdef SIMVER
+ifdef APP_TYPE
  PLUGINLDFLAGS = $(SHARED_FLAG) # <-- from Makefile
 else
  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
@@ -94,7 +94,7 @@ $(BUILDDIR)/%.rock:
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PLUGINLDFLAGS)
-ifdef SIMVER
+ifdef APP_TYPE
 	$(SILENT)cp $(BUILDDIR)/$*.elf $@
 else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@

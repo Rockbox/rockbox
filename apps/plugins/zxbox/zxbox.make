@@ -15,7 +15,7 @@ ZXBOX_OBJ := $(call c2obj, $(ZXBOX_SRC))
 
 OTHER_SRC += $(ZXBOX_SRC)
 
-ifndef SIMVER
+ifndef APP_TYPE
 ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), YES)
     ## lowmem targets
     ROCKS += $(ZXBOX_OBJDIR)/zxbox.ovl

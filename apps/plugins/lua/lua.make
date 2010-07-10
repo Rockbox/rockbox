@@ -15,7 +15,7 @@ LUA_OBJ := $(call c2obj, $(LUA_SRC))
 
 OTHER_SRC += $(LUA_SRC)
 
-ifndef SIMVER
+ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
     ### lowmem targets
     ROCKS += $(LUA_BUILDDIR)/lua.ovl

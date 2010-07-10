@@ -18,7 +18,7 @@ $(TLSFLIB): $(TLSFLIB_OBJ)
 
 TLSFLIBFLAGS = $(CODECFLAGS) -ffunction-sections
 
-ifdef SIMVER
+ifdef APP_TYPE
     TLSFLIBFLAGS += -DTLSF_STATISTIC=1
 endif
 
