@@ -77,9 +77,12 @@ void lcd_set_contrast(int val)
 /* Delay loop based on CPU frequency (FREQ>>23 is 3..22 for 32MHz..192MHz) */
 static void delay_loop(void)
 {
-    unsigned long x;
-    for (x = (unsigned)(FREQ>>23); x; x--);
+    asm volatile ("   mov  %[freq], %[freq], asr#23 \n\t"
+                  "1: subs %[freq], %[freq], #1     \n\t"
+                  "   bne  1b"
+                  : : [freq] "r" (cpu_frequency) : "memory");
 }
+
 #define DELAY delay_loop()
 
 static void ltv250qv_write(unsigned int command)
