@@ -19,12 +19,13 @@
  *
  ****************************************************************************/
 
+#include "wps.h"
+#include "wps_internals.h"
+
 #ifdef DEBUG_SKIN_ENGINE
 
 #include <stdio.h>
 #include <string.h>
-#include "wps.h"
-#include "wps_internals.h"
 #include "skin_buffer.h"
 #include "settings_list.h"
 #ifdef __PCTOOL__
