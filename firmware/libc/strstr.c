@@ -5,34 +5,35 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
  *
- * Copyright (C) 1991, 1992  Linus Torvalds
- * (from linux/lib/string.c)
+ * Copyright (C) 2002     Manuel Novoa III
+ * Copyright (C) 2000-2005 Erik Andersen <andersen@uclibc.org>
+ *
+ * Licensed under the LGPL v2.1, code originally in uclibc
  *
  ****************************************************************************/
-
 #include <string.h>
 
-/**
- * strstr - Find the first substring in a %NUL terminated string
- * @s1: The string to be searched
- * @s2: The string to search for
- */
+/* NOTE: This is the simple-minded O(len(s1) * len(s2)) worst-case approach. */
+
 char *strstr(const char *s1, const char *s2)
 {
-    int l1, l2;
+	register const char *s = s1;
+	register const char *p = s2;
 
-    l2 = strlen(s2);
-    if (!l2)
-        return (char *)s1;
-    l1 = strlen(s1);
-    while (l1 >= l2) {
-        l1--;
-        if (!memcmp(s1, s2, l2))
-            return (char *)s1;
-        s1++;
-    }
-    return NULL;
+	do {
+		if (!*p) {
+			return (char *) s1;;
+		}
+		if (*p == *s) {
+			++p;
+			++s;
+		} else {
+			p = s2;
+			if (!*s) {
+				return NULL;
+			}
+			s = ++s1;
+		}
+	} while (1);
 }
-
