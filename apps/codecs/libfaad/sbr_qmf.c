@@ -42,10 +42,12 @@
     #define FAAD_SYNTHESIS_SCALE(X) ((X)>>1)
     #define FAAD_ANALYSIS_SCALE1(X) ((X)>>4)
     #define FAAD_ANALYSIS_SCALE2(X) ((X))
+    #define FAAD_ANALYSIS_SCALE3(X) ((X))
 #else
     #define FAAD_ANALYSIS_SCALE1(X) ((X)*scale)
     #define FAAD_ANALYSIS_SCALE1(X) ((X))
     #define FAAD_ANALYSIS_SCALE2(X) (2.*(X))
+    #define FAAD_ANALYSIS_SCALE3(X) ((X)/32.0)
 #endif
 
 qmfa_info *qmfa_init(uint8_t channels)
@@ -186,42 +188,6 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
     }
 }
 
-static const complex_t qmf32_pre_twiddle[] =
-{
-    { FRAC_CONST(0.999924701839145), FRAC_CONST(-0.012271538285720) },
-    { FRAC_CONST(0.999322384588350), FRAC_CONST(-0.036807222941359) },
-    { FRAC_CONST(0.998118112900149), FRAC_CONST(-0.061320736302209) },
-    { FRAC_CONST(0.996312612182778), FRAC_CONST(-0.085797312344440) },
-    { FRAC_CONST(0.993906970002356), FRAC_CONST(-0.110222207293883) },
-    { FRAC_CONST(0.990902635427780), FRAC_CONST(-0.134580708507126) },
-    { FRAC_CONST(0.987301418157858), FRAC_CONST(-0.158858143333861) },
-    { FRAC_CONST(0.983105487431216), FRAC_CONST(-0.183039887955141) },
-    { FRAC_CONST(0.978317370719628), FRAC_CONST(-0.207111376192219) },
-    { FRAC_CONST(0.972939952205560), FRAC_CONST(-0.231058108280671) },
-    { FRAC_CONST(0.966976471044852), FRAC_CONST(-0.254865659604515) },
-    { FRAC_CONST(0.960430519415566), FRAC_CONST(-0.278519689385053) },
-    { FRAC_CONST(0.953306040354194), FRAC_CONST(-0.302005949319228) },
-    { FRAC_CONST(0.945607325380521), FRAC_CONST(-0.325310292162263) },
-    { FRAC_CONST(0.937339011912575), FRAC_CONST(-0.348418680249435) },
-    { FRAC_CONST(0.928506080473216), FRAC_CONST(-0.371317193951838) },
-    { FRAC_CONST(0.919113851690058), FRAC_CONST(-0.393992040061048) },
-    { FRAC_CONST(0.909167983090522), FRAC_CONST(-0.416429560097637) },
-    { FRAC_CONST(0.898674465693954), FRAC_CONST(-0.438616238538528) },
-    { FRAC_CONST(0.887639620402854), FRAC_CONST(-0.460538710958240) },
-    { FRAC_CONST(0.876070094195407), FRAC_CONST(-0.482183772079123) },
-    { FRAC_CONST(0.863972856121587), FRAC_CONST(-0.503538383725718) },
-    { FRAC_CONST(0.851355193105265), FRAC_CONST(-0.524589682678469) },
-    { FRAC_CONST(0.838224705554838), FRAC_CONST(-0.545324988422046) },
-    { FRAC_CONST(0.824589302785025), FRAC_CONST(-0.565731810783613) },
-    { FRAC_CONST(0.810457198252595), FRAC_CONST(-0.585797857456439) },
-    { FRAC_CONST(0.795836904608884), FRAC_CONST(-0.605511041404326) },
-    { FRAC_CONST(0.780737228572094), FRAC_CONST(-0.624859488142386) },
-    { FRAC_CONST(0.765167265622459), FRAC_CONST(-0.643831542889791) },
-    { FRAC_CONST(0.749136394523459), FRAC_CONST(-0.662415777590172) },
-    { FRAC_CONST(0.732654271672413), FRAC_CONST(-0.680600997795453) },
-    { FRAC_CONST(0.715730825283819), FRAC_CONST(-0.698376249408973) }
-};
-
 qmfs_info *qmfs_init(uint8_t channels)
 {
     qmfs_info *qmfs = (qmfs_info*)faad_malloc(sizeof(qmfs_info));
@@ -266,13 +232,8 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         /* calculate 64 samples */
         for (k = 0; k < 16; k++)
         {
-#ifdef FIXED_POINT
-            y[k] = (QMF_RE(X[l][k]) - QMF_RE(X[l][31 - k]));
-            x[k] = (QMF_RE(X[l][k]) + QMF_RE(X[l][31 - k]));
-#else
-            y[k] = (QMF_RE(X[l][k]) - QMF_RE(X[l][31 - k])) / 32.0;
-            x[k] = (QMF_RE(X[l][k]) + QMF_RE(X[l][31 - k])) / 32.0;
-#endif
+            y[k] = FAAD_ANALYSIS_SCALE3((QMF_RE(X[l][k]) - QMF_RE(X[l][31-k])));
+            x[k] = FAAD_ANALYSIS_SCALE3((QMF_RE(X[l][k]) + QMF_RE(X[l][31-k])));
         }
 
         /* even n samples */
@@ -282,7 +243,7 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 
         for (n = 8; n < 24; n++)
         {
-            qmfs->v[qmfs->v_index + n*2] = qmfs->v[qmfs->v_index + 640 + n*2] = x[n-8];
+            qmfs->v[qmfs->v_index + n*2  ] = qmfs->v[qmfs->v_index + 640 + n*2  ] = x[n-8];
             qmfs->v[qmfs->v_index + n*2+1] = qmfs->v[qmfs->v_index + 640 + n*2+1] = y[n-8];
         }
         for (n = 0; n < 16; n++)
@@ -336,13 +297,8 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         /* calculate 128 samples */
         for (k = 0; k < 32; k++)
         {
-#ifdef FIXED_POINT
-            y[k] = (QMF_RE(X[l][k]) - QMF_RE(X[l][63 - k]));
-            x[k] = (QMF_RE(X[l][k]) + QMF_RE(X[l][63 - k]));
-#else
-            y[k] = (QMF_RE(X[l][k]) - QMF_RE(X[l][63 - k])) / 32.0;
-            x[k] = (QMF_RE(X[l][k]) + QMF_RE(X[l][63 - k])) / 32.0;
-#endif
+            y[k] = FAAD_ANALYSIS_SCALE3((QMF_RE(X[l][k]) - QMF_RE(X[l][63-k])));
+            x[k] = FAAD_ANALYSIS_SCALE3((QMF_RE(X[l][k]) + QMF_RE(X[l][63-k])));
         }
 
         /* even n samples */
@@ -352,7 +308,7 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 
         for (n = 16; n < 48; n++)
         {
-            qmfs->v[qmfs->v_index + n*2]   = qmfs->v[qmfs->v_index + 1280 + n*2]   = x[n-16];
+            qmfs->v[qmfs->v_index + n*2]   = qmfs->v[qmfs->v_index + 1280 + n*2  ] = x[n-16];
             qmfs->v[qmfs->v_index + n*2+1] = qmfs->v[qmfs->v_index + 1280 + n*2+1] = y[n-16];
         }
         for (n = 0; n < 32; n++)
@@ -387,6 +343,42 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     }
 }
 #else /* #ifdef SBR_LOW_POWER */
+
+static const complex_t qmf32_pre_twiddle[] =
+{
+    { FRAC_CONST(0.999924701839145), FRAC_CONST(-0.012271538285720) },
+    { FRAC_CONST(0.999322384588350), FRAC_CONST(-0.036807222941359) },
+    { FRAC_CONST(0.998118112900149), FRAC_CONST(-0.061320736302209) },
+    { FRAC_CONST(0.996312612182778), FRAC_CONST(-0.085797312344440) },
+    { FRAC_CONST(0.993906970002356), FRAC_CONST(-0.110222207293883) },
+    { FRAC_CONST(0.990902635427780), FRAC_CONST(-0.134580708507126) },
+    { FRAC_CONST(0.987301418157858), FRAC_CONST(-0.158858143333861) },
+    { FRAC_CONST(0.983105487431216), FRAC_CONST(-0.183039887955141) },
+    { FRAC_CONST(0.978317370719628), FRAC_CONST(-0.207111376192219) },
+    { FRAC_CONST(0.972939952205560), FRAC_CONST(-0.231058108280671) },
+    { FRAC_CONST(0.966976471044852), FRAC_CONST(-0.254865659604515) },
+    { FRAC_CONST(0.960430519415566), FRAC_CONST(-0.278519689385053) },
+    { FRAC_CONST(0.953306040354194), FRAC_CONST(-0.302005949319228) },
+    { FRAC_CONST(0.945607325380521), FRAC_CONST(-0.325310292162263) },
+    { FRAC_CONST(0.937339011912575), FRAC_CONST(-0.348418680249435) },
+    { FRAC_CONST(0.928506080473216), FRAC_CONST(-0.371317193951838) },
+    { FRAC_CONST(0.919113851690058), FRAC_CONST(-0.393992040061048) },
+    { FRAC_CONST(0.909167983090522), FRAC_CONST(-0.416429560097637) },
+    { FRAC_CONST(0.898674465693954), FRAC_CONST(-0.438616238538528) },
+    { FRAC_CONST(0.887639620402854), FRAC_CONST(-0.460538710958240) },
+    { FRAC_CONST(0.876070094195407), FRAC_CONST(-0.482183772079123) },
+    { FRAC_CONST(0.863972856121587), FRAC_CONST(-0.503538383725718) },
+    { FRAC_CONST(0.851355193105265), FRAC_CONST(-0.524589682678469) },
+    { FRAC_CONST(0.838224705554838), FRAC_CONST(-0.545324988422046) },
+    { FRAC_CONST(0.824589302785025), FRAC_CONST(-0.565731810783613) },
+    { FRAC_CONST(0.810457198252595), FRAC_CONST(-0.585797857456439) },
+    { FRAC_CONST(0.795836904608884), FRAC_CONST(-0.605511041404326) },
+    { FRAC_CONST(0.780737228572094), FRAC_CONST(-0.624859488142386) },
+    { FRAC_CONST(0.765167265622459), FRAC_CONST(-0.643831542889791) },
+    { FRAC_CONST(0.749136394523459), FRAC_CONST(-0.662415777590172) },
+    { FRAC_CONST(0.732654271672413), FRAC_CONST(-0.680600997795453) },
+    { FRAC_CONST(0.715730825283819), FRAC_CONST(-0.698376249408973) }
+};
 
 #define FAAD_CMPLX_PRETWIDDLE_SUB(k) \
         (MUL_F(QMF_RE(X[l][k]), RE(qmf32_pre_twiddle[k])) - \
