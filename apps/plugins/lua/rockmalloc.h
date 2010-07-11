@@ -35,7 +35,7 @@
 #define HAVE_MREMAP 0
 #define NO_MALLINFO 1
 #define ABORT ((void) 0)
-#define DEBUG 0
+/* #define DEBUG */
 #define MORECORE rocklua_morecore
 
 void *rocklua_morecore(int size);
