@@ -203,18 +203,17 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
                   real_t *time_out, real_t *overlap,
                   uint8_t object_type, uint16_t frame_len)
 {
-    int16_t i;
-
-    const real_t *window_long = NULL;
-    const real_t *window_long_prev = NULL;
-    const real_t *window_short = NULL;
+    int32_t i, idx0, idx1;
+    real_t win0, win1, win2;
+     
+    const real_t *window_long       = NULL;
+    const real_t *window_long_prev  = NULL;
+    const real_t *window_short      = NULL;
     const real_t *window_short_prev = NULL;
 
-    uint16_t nlong = frame_len;
-    uint16_t nshort = frame_len/8;
-    uint16_t trans = nshort/2;
-
-    uint16_t nflat_ls = (nlong-nshort)/2;
+    int32_t nlong    = frame_len;
+    int32_t nshort   = frame_len/8;
+    int32_t nflat_ls = (nlong-nshort)/2;
 
 #ifdef PROFILE
     int64_t count = faad_get_ts();
@@ -232,8 +231,8 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         (void) object_type;
 #endif
 
-    /*AAC uses two different window shapes depending on spectal features*/
-    if(window_shape == 0){
+    /* AAC uses two different window shapes depending on spectal features */
+    if (window_shape == 0) {
         window_long  = sine_long_1024;
         window_short = sine_short_128;
     } else {
@@ -241,7 +240,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         window_short = kbd_short_128;            
     }
     
-    if(window_shape_prev == 0){
+    if (window_shape_prev == 0) {
         window_long_prev  = sine_long_1024;
         window_short_prev = sine_short_128;
     } else {
@@ -279,7 +278,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
     case LONG_START_SEQUENCE:
         /* perform iMDCT */
-         ff_imdct_calc(11, transf_buf, freq_in);
+        ff_imdct_calc(11, transf_buf, freq_in);
 
         /* add second half output of previous frame to windowed output of current frame */
         vector_fmul_add_add(time_out, transf_buf, window_long_prev, overlap,  nlong);
@@ -295,41 +294,72 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         break;
 
     case EIGHT_SHORT_SEQUENCE:
-         /*this could be assemblerized too, but this case is extremely uncommon*/   
+        /* this could be assemblerized too, but this case is extremely uncommon */   
          
         /* perform iMDCT for each short block */
-        ff_imdct_calc(8, transf_buf+2*nshort*0, freq_in+0*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*1, freq_in+1*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*2, freq_in+2*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*3, freq_in+3*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*4, freq_in+4*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*5, freq_in+5*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*6, freq_in+6*nshort);
-        ff_imdct_calc(8, transf_buf+2*nshort*7, freq_in+7*nshort);
+        idx0 = 0;       ff_imdct_calc(8, transf_buf            , freq_in       );
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
+        idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
 
-        /* add second half output of previous frame to windowed output of current frame */
-        for (i = 0; i < nflat_ls; i++)
-            time_out[i] = overlap[i]; 
-        for(i = 0; i < nshort; i++)
-        {
-            time_out[nflat_ls+         i] = overlap[nflat_ls+         i] + MUL_F(transf_buf[nshort*0+i],window_short_prev[i]);
-            time_out[nflat_ls+1*nshort+i] = overlap[nflat_ls+nshort*1+i] + MUL_F(transf_buf[nshort*1+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*2+i],window_short[i]);
-            time_out[nflat_ls+2*nshort+i] = overlap[nflat_ls+nshort*2+i] + MUL_F(transf_buf[nshort*3+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*4+i],window_short[i]);
-            time_out[nflat_ls+3*nshort+i] = overlap[nflat_ls+nshort*3+i] + MUL_F(transf_buf[nshort*5+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*6+i],window_short[i]);
-            if (i < trans)
-                time_out[nflat_ls+4*nshort+i] = overlap[nflat_ls+nshort*4+i] + MUL_F(transf_buf[nshort*7+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*8+i],window_short[i]);
+        /* Add second half output of previous frame to windowed output of current 
+         * frame */
+        /* Step 1: copy */
+        memcpy(time_out, overlap, nflat_ls*sizeof(real_t));
+        /* Step 2: First window half, first half of nshort */
+        for (i = 0; i < nshort/2; i++) {
+            win0 = window_short[nshort-1-i];
+            win1 = window_short[i];
+            win2 = window_short_prev[i];
+            idx0 = nflat_ls + i;
+            idx1 = i;
+            time_out[idx0] = overlap[idx0] +                                        MUL_F(transf_buf[idx1], win2); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1);
+        }
+        /* Step 3: First window half, second half of nshort */
+        for (; i < nshort; i++) {
+            win0 = window_short[nshort-1-i];
+            win1 = window_short[i];
+            idx0 = nflat_ls + i;
+            idx1 = i;
+            time_out[idx0] = overlap[idx0] +                                        MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            time_out[idx0] = overlap[idx0] + MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1);
         }
 
-        /* window the second half and save as overlap for next frame */
-        for(i = 0; i < nshort; i++)
-        {
-            if (i >= trans)
-                overlap[nflat_ls+4*nshort+i-nlong] = MUL_F(transf_buf[nshort*7+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*8+i],window_short[i]);
-            overlap[nflat_ls+5*nshort+i-nlong] = MUL_F(transf_buf[nshort*9+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*10+i],window_short[i]);
-            overlap[nflat_ls+6*nshort+i-nlong] = MUL_F(transf_buf[nshort*11+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*12+i],window_short[i]);
-            overlap[nflat_ls+7*nshort+i-nlong] = MUL_F(transf_buf[nshort*13+i],window_short[nshort-1-i]) + MUL_F(transf_buf[nshort*14+i],window_short[i]);
-            overlap[nflat_ls+8*nshort+i-nlong] = MUL_F(transf_buf[nshort*15+i],window_short[nshort-1-i]);
+        /* Window the second half and save as overlap for next frame */
+        /* Step 1: Second window half, first half of nshort */
+        for (i = 0; i < nshort/2; i++) {
+            win0 = window_short[nshort-1-i];
+            win1 = window_short[i];
+            idx0 = nflat_ls + 5*nshort + i - nlong;
+            idx1 = nshort*10 + i;
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0);
         }
+        /* Step 2: Second window half, second half of nshort */
+        for (; i < nshort; i++) {
+            win0 = window_short[nshort-1-i];
+            win1 = window_short[i];
+            idx0 = nflat_ls + 4*nshort + i - nlong;
+            idx1 = nshort*8 + i;
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0) + MUL_F(transf_buf[idx1], win1); idx0 += nshort; idx1 += (nshort<<1);
+            overlap[idx0] = MUL_F(transf_buf[idx1-nshort], win0);
+        }
+        /* Step 3: Set to zero */
         memset(overlap+nflat_ls+nshort, 0, nflat_ls*sizeof(real_t));
 
         break;
@@ -344,8 +374,12 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
         vector_fmul_add_add(time_out+nflat_ls, transf_buf+nflat_ls, window_short_prev, overlap+nflat_ls,  nshort);
 
-        for (i = 0; i < nflat_ls; i++)
-            time_out[nflat_ls+nshort+i] = overlap[nflat_ls+nshort+i] + transf_buf[nflat_ls+nshort+i];
+        /* nflat_ls can be divided by 2. */
+        idx0 = nflat_ls + nshort;
+        for (i = 0; i < nflat_ls; i+=2) {
+            time_out[idx0] = overlap[idx0] + transf_buf[idx0]; idx0++;
+            time_out[idx0] = overlap[idx0] + transf_buf[idx0]; idx0++;
+        }
 
         /* window the second half and save as overlap for next frame */
         vector_fmul_reverse(overlap, transf_buf+nlong, window_long, nlong);
