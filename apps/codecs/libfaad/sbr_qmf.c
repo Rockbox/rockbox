@@ -98,7 +98,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
 
         /* add new samples to input buffer x */
         idx0 = qmfa->x_index + 31; idx1 = idx0 + 320;
-        for (n = 32 - 1; n >= 0; n-=4)
+        for (n = 0; n < 32; n+=4)
         {
             qmfa->x[idx0--] = qmfa->x[idx1--] = (input[in++]);
             qmfa->x[idx0--] = qmfa->x[idx1--] = (input[in++]);
@@ -390,11 +390,11 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 
 #define FAAD_CMPLX_PRETWIDDLE_SUB(k) \
         (MUL_F(QMF_RE(X[l][k]), RE(qmf32_pre_twiddle[k])) - \
-         MUL_F(QMF_IM(X[l][k]), IM(qmf32_pre_twiddle[k]))) \
+         MUL_F(QMF_IM(X[l][k]), IM(qmf32_pre_twiddle[k])))
         
 #define FAAD_CMPLX_PRETWIDDLE_ADD(k) \
         (MUL_F(QMF_IM(X[l][k]), RE(qmf32_pre_twiddle[k])) + \
-         MUL_F(QMF_RE(X[l][k]), IM(qmf32_pre_twiddle[k]))) \
+         MUL_F(QMF_RE(X[l][k]), IM(qmf32_pre_twiddle[k])))
 
 void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
                           real_t *output)

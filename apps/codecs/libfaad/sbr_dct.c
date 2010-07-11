@@ -1535,7 +1535,7 @@ const uint32_t dct4_revtab[32] ICONST_ATTR = {
     x_im = imag_part; \
     tmp  = MUL_C(x_re + x_im, tab[tabidx++]); \
     out1 = MUL_C(x_re       , tab[tabidx++]) + tmp; \
-    out2 = MUL_C(x_im       , tab[tabidx++]) + tmp; \
+    out2 = MUL_C(x_im       , tab[tabidx++]) + tmp;
 
 /* size 64 only! */
 void dct4_kernel(real_t *real, real_t *imag)
