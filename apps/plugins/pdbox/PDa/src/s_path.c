@@ -10,8 +10,8 @@
  * and lists of files for all purposes.
  */ 
 
-/* #define DEBUG(x) x */
-#define DEBUG(x)
+/* #define PD_DEBUG(x) x */
+#define PD_DEBUG(x)
 void readsf_banana( void);    /* debugging */
 
 #ifdef ROCKBOX
@@ -188,7 +188,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
 	strcat(dirresult, ext);
 	sys_bashfilename(dirresult, dirresult);
 
-	DEBUG(post("looking for %s",dirresult));
+	PD_DEBUG(post("looking for %s",dirresult));
 	    /* see if we can open the file for reading */
 	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
 	{
@@ -246,7 +246,7 @@ static int do_open_via_helppath(const char *realname, t_namelist *listp)
 	strcat(dirresult, realname);
 	sys_bashfilename(dirresult, dirresult);
 
-	DEBUG(post("looking for %s",dirresult));
+	PD_DEBUG(post("looking for %s",dirresult));
 	    /* see if we can open the file for reading */
 	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(0))) >= 0)
 	{
