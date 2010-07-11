@@ -82,7 +82,7 @@ int lang_load(const char *filename, const unsigned char *builtin,
         foffset = (sub_header[4]<<8) | sub_header[5];
         if(lang_size <= max_lang_size) {
             /* initialize with builtin */
-            lang_init(builtin, dest, num_strings);
+            lang_init(builtin, dest, max_id);
             lseek(fd, foffset, SEEK_SET);
             read(fd, buffer, lang_size);
 
