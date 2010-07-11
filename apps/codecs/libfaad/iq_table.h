@@ -8243,6 +8243,8 @@ ALIGN static const real_t iq_table[IQ_TABLE_SIZE] =
 
 #else
 
+#define BIG_IQ_TABLE /* using BIG_IQ_TABLE creates faster code */
+
 #ifdef BIG_IQ_TABLE
 #define IQ_TABLE_SIZE  8192
 #else

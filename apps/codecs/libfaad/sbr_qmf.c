@@ -512,23 +512,7 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
         p_buf_1 = qmfs->v + qmfs->v_index;
 
         /* calculate 64 output samples and window */
-#if !defined(CPU_ARM)
-        for (k = 0; k < 64; k++)
-        {
-            idx0 = k*10;
-            output[out++] = FAAD_SYNTHESIS_SCALE(
-                            MUL_F(p_buf_1[k         ], qmf_c[idx0  ]) +
-                            MUL_F(p_buf_1[k+ 192    ], qmf_c[idx0+1]) +
-                            MUL_F(p_buf_1[k+ 256    ], qmf_c[idx0+2]) +
-                            MUL_F(p_buf_1[k+ 256+192], qmf_c[idx0+3]) +
-                            MUL_F(p_buf_1[k+ 512    ], qmf_c[idx0+4]) +
-                            MUL_F(p_buf_1[k+ 512+192], qmf_c[idx0+5]) +
-                            MUL_F(p_buf_1[k+ 768    ], qmf_c[idx0+6]) +
-                            MUL_F(p_buf_1[k+ 768+192], qmf_c[idx0+7]) +
-                            MUL_F(p_buf_1[k+1024    ], qmf_c[idx0+8]) +
-                            MUL_F(p_buf_1[k+1024+192], qmf_c[idx0+9]));
-        }
-#else
+#ifdef CPU_ARM
         const real_t *qtab = qmf_c;
         real_t *pbuf = p_buf_1;
         for (k = 0; k < 64; k++, pbuf++)
@@ -544,7 +528,7 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
                "smlal r5, r6, r4, r2      \n\t"
                "ldr r4, [%[pbuf], #448*4] \n\t"
                "smlal r5, r6, r4, r3      \n\t"
-               
+
                "ldmia %[qtab]!, { r0-r3 } \n\t"
                "ldr r4, [%[pbuf], #512*4] \n\t"
                "smlal r5, r6, r4, r0      \n\t"
@@ -554,7 +538,7 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
                "smlal r5, r6, r4, r2      \n\t"
                "ldr r4, [%[pbuf], #960*4] \n\t"
                "smlal r5, r6, r4, r3      \n\t"
-               
+
                "ldmia %[qtab]!, { r0-r1 } \n\t"
                "mov r2, #1024*4           \n\t"
                "ldr r4, [%[pbuf], r2]     \n\t"
@@ -563,10 +547,58 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
                "ldr r4, [%[pbuf], r2]     \n\t"
                "smlal r5, r6, r4, r1      \n\t"
 
-               "str r6, [%[pout]]         \n"  
+               "str r6, [%[pout]]         \n"
                : [qtab] "+r" (qtab)
                : [pbuf] "r" (pbuf), [pout] "r" (pout)
                : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory");
+        }
+#elif defined CPU_COLDFIRE
+        const real_t *qtab = qmf_c;
+        real_t *pbuf = p_buf_1;
+        for (k = 0; k < 64; k++, pbuf++)
+        {
+            real_t *pout = &output[out++];
+            asm volatile (
+               "move.l  (%[pbuf]), %%d5                              \n"
+
+               "movem.l (%[qtab]), %%d0-%%d4                         \n"
+               "mac.l   %%d0, %%d5, (192*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d1, %%d5, (256*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d2, %%d5, (448*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d3, %%d5, (512*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d4, %%d5, (704*4, %[pbuf]), %%d5, %%acc0   \n"
+               "lea.l   (20, %[qtab]), %[qtab]                       \n"
+
+               "movem.l (%[qtab]), %%d0-%%d4                         \n"
+               "mac.l   %%d0, %%d5, (768*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d1, %%d5, (960*4, %[pbuf]), %%d5, %%acc0   \n"
+               "mac.l   %%d2, %%d5, (1024*4, %[pbuf]), %%d5, %%acc0  \n"
+               "mac.l   %%d3, %%d5, (1216*4, %[pbuf]), %%d5, %%acc0  \n"
+               "mac.l   %%d4, %%d5, %%acc0                           \n"
+               "lea.l   (20, %[qtab]), %[qtab]                       \n"
+
+               "movclr.l %%acc0, %%d0                                \n"
+               "move.l  %%d0, (%[pout])                              \n"
+               : [qtab] "+a" (qtab)
+               : [pbuf] "a" (pbuf),
+                 [pout] "a" (pout)
+               : "d0", "d1", "d2", "d3", "d4", "d5", "memory");
+        }
+#else
+        for (k = 0; k < 64; k++)
+        {
+            idx0 = k*10;
+            output[out++] = FAAD_SYNTHESIS_SCALE(
+                            MUL_F(p_buf_1[k         ], qmf_c[idx0  ]) +
+                            MUL_F(p_buf_1[k+ 192    ], qmf_c[idx0+1]) +
+                            MUL_F(p_buf_1[k+ 256    ], qmf_c[idx0+2]) +
+                            MUL_F(p_buf_1[k+ 256+192], qmf_c[idx0+3]) +
+                            MUL_F(p_buf_1[k+ 512    ], qmf_c[idx0+4]) +
+                            MUL_F(p_buf_1[k+ 512+192], qmf_c[idx0+5]) +
+                            MUL_F(p_buf_1[k+ 768    ], qmf_c[idx0+6]) +
+                            MUL_F(p_buf_1[k+ 768+192], qmf_c[idx0+7]) +
+                            MUL_F(p_buf_1[k+1024    ], qmf_c[idx0+8]) +
+                            MUL_F(p_buf_1[k+1024+192], qmf_c[idx0+9]));
         }
 #endif
 
