@@ -2044,7 +2044,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
     skin_buffer_free_from_front(sizeof(struct wps_token)
                                 * (max_tokens - data->num_tokens));
 
-#if defined(DEBUG) || defined(SIMULATOR)
+#ifdef DEBUG_SKIN_ENGINE
     if (debug)
     {
         print_debug_info(data, fail, line_number);

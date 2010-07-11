@@ -386,7 +386,7 @@ struct gui_img* find_image(char label, struct wps_data *data);
 struct skin_viewport* find_viewport(char label, struct wps_data *data);
 
 
-#if defined(DEBUG) || defined(SIMULATOR)
+#ifdef SIMULATOR
 #define DEBUG_SKIN_ENGINE
 extern bool debug_wps;
 #endif

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#if defined(DEBUG) || defined(SIMULATOR)
+#ifdef DEBUG_SKIN_ENGINE
 
 #include <stdio.h>
 #include <string.h>
