@@ -605,7 +605,7 @@ struct user_settings
     int autoloadbookmark;   /* auto load option: 0=off, 1=ask, 2=on */
     int autocreatebookmark; /* auto create option: 0=off, 1=ask, 2=on */
     bool autoupdatebookmark;/* auto update option */
-    int usemrb;             /* use MRB list: 0=No, 1=Yes*/
+    int usemrb;             /* use MRB list: 0=No, 1=Yes, 2=One per playlist */
 
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */
