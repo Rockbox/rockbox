@@ -51,7 +51,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         if(info.model()->rowCount(QModelIndex()) > 1)
         {
             /* If there is more than one viewport in the document */
-            setVisible(false);
+            textOffset.setX(-1);
         }
         else
         {
@@ -175,6 +175,9 @@ void RBViewport::paint(QPainter *painter,
 
 void RBViewport::newLine()
 {
+    if(textOffset.x() < 0)
+        return;
+
     if(leftText != "")
         alignLeft();
 
@@ -201,6 +204,9 @@ void RBViewport::newLine()
 
 void RBViewport::write(QString text)
 {
+    if(textOffset.x() < 0)
+        return;
+
     if(textAlign == Left)
     {
         leftText.append(text);

@@ -64,6 +64,8 @@ public:
     void addTextOffset(int height){ textOffset.setY(textOffset.y() + height); }
     void flushText()
     {
+        if(textOffset.x() < 0)
+            return;
         alignLeft();
         alignRight();
         alignCenter();
