@@ -135,9 +135,13 @@ RBFont::RBFont(QString file)
    /* Loading the offset table if necessary */
    if(header.value("noffset").toInt() > 0)
    {
-       offsetData = new quint16[header.value("noffset").toInt()];
-       data.readRawData(reinterpret_cast<char*>(offsetData),
-                        header.value("noffset").toInt() * 2);
+       int bytesToRead;
+       if(header.value("nbits").toInt() > maxFontSizeFor16BitOffsets)
+           bytesToRead = 4 * header.value("noffset").toInt();
+       else
+           bytesToRead = 2 * header.value("noffset").toInt();
+       offsetData = new quint16[bytesToRead];
+       data.readRawData(reinterpret_cast<char*>(offsetData), bytesToRead);
    }
 
    /* Loading the width table if necessary */
@@ -178,6 +182,9 @@ RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
     int height = header.value("height").toInt();
     int maxWidth = header.value("maxwidth").toInt();
 
+    bool extendedSet = header.value("nbits").
+                       toUInt() > maxFontSizeFor16BitOffsets;
+
     /* First we determine the width of the combined text */
     QList<int> widths;
     for(int i = 0; i < text.length(); i++)
@@ -203,9 +210,16 @@ RBText* RBFont::renderText(QString text, QColor color, int viewWidth,
     {
         unsigned int offset;
         if(offsetData)
-            offset = offsetData[text[i].unicode() - firstChar];
+        {
+            if(extendedSet)
+                offset = reinterpret_cast<quint32*>(offsetData)[text[i].unicode() - firstChar];
+            else
+                offset = offsetData[text[i].unicode() - firstChar];
+        }
         else
+        {
             offset = (text[i].unicode() - firstChar) * maxWidth;
+        }
 
         int bytesHigh = height / 8;
         if(height % 8 > 0)
