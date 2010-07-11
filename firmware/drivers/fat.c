@@ -737,7 +737,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,)
                         cluster numbers out of bounds */
                     if ( c < 2 || c > fat_bpb->dataclusters+1 )
                         continue;
-                    LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
+                    LDEBUGF("find_free_cluster(%lx) == %x\n",startcluster,c);
                     fat_bpb->fsinfo.nextfree = c;
                     return c;
                 }
@@ -793,7 +793,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
 
         val &= 0xFFFF;
 
-        LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
+        LDEBUGF("update_fat_entry(%lx,%lx)\n",entry,val);
 
         if (entry==val)
             panicf("Creating FAT loop: %lx,%lx\n",entry,val);
@@ -817,7 +817,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
                 fat_bpb->fsinfo.freecount++;
         }
 
-        LDEBUGF("update_fat_entry: %d free clusters\n",
+        LDEBUGF("update_fat_entry: %lu free clusters\n",
                 fat_bpb->fsinfo.freecount);
 
         sec[offset] = htole16(val);
