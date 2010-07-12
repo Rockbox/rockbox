@@ -415,6 +415,24 @@ static const char *lrc_skip_space(const char *str)
     return str;
 }
 
+#ifdef HAVE_LCD_BITMAP
+static bool isbrchr(const unsigned char *str, int len)
+{
+    const unsigned char *p = "!,-.:;?　、。！，．：；？―";
+    if (isspace(*str))
+        return true;
+
+    while(*p)
+    {
+        int n = rb->utf8seek(p, 1);
+        if (len == n && !rb->strncmp(p, str, len))
+            return true;
+        p += n;
+    }
+    return false;
+}
+#endif
+
 /* calculate how many lines is needed to display and store it.
  * create cache if there is enough space in lrc_buffer. */
 static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
@@ -518,17 +536,28 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
             w = 1;
 #else
             c = ((long)rb->utf8decode(cr.str, &ch) - (long)cr.str);
-            w = rb->font_get_width(pf, ch);
-            if (cr.count && isspace(*cr.str))
+            if (rb->is_diacritic(ch, NULL))
+                w = 0;
+            else
+                w = rb->font_get_width(pf, ch);
+            if (cr.count && prefs.wrap && isbrchr(cr.str, c))
             {
                 /* remember position of last space */
                 rb->memcpy(&sp, &cr, sizeof(struct snap));
                 sp.word_count = lrc_word->count;
                 sp.word_width = lrc_word->width;
+                if (!isspace(*cr.str) && cr.width+w <= vp_lyrics[i].width)
+                {
+                    sp.count += c;
+                    sp.width += w;
+                    sp.word_count += c;
+                    sp.word_width += w;
+                    sp.str += c;
+                }
             }
             if (cr.count && cr.width+w > vp_lyrics[i].width)
             {
-                if (prefs.wrap && sp.str != NULL) /* wrap */
+                if (sp.str != NULL) /* wrap */
                 {
                     rb->memcpy(&cr, &sp, sizeof(struct snap));
                     lrc_word = lrc_line->words+cr.nword;

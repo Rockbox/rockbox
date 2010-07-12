@@ -39,6 +39,22 @@ struct view_info {
     int start;          /* possition of first line in text  */
 };
 
+static bool isbrchr(const unsigned char *str, int len)
+{
+    const unsigned char *p = "!,-.:;?　、。！，．：；？―";
+    if (isspace(*str))
+        return true;
+
+    while(*p)
+    {
+        int n = rb->utf8seek(p, 1);
+        if (len == n && !rb->strncmp(p, str, len))
+            return true;
+        p += n;
+    }
+    return false;
+}
+
 static const char* get_next_line(const char *text, struct view_info *info)
 {
     const char *ptr = text;
@@ -53,10 +69,13 @@ static const char* get_next_line(const char *text, struct view_info *info)
 #else
         unsigned short ch;
         n = ((long)rb->utf8decode(ptr, &ch) - (long)ptr);
-        w = rb->font_get_width(info->pf, ch);
+        if (rb->is_diacritic(ch, NULL))
+            w = 0;
+        else
+            w = rb->font_get_width(info->pf, ch);
 #endif
-        if (isspace(*ptr))
-            space = ptr+n;
+        if (isbrchr(ptr, n))
+            space = ptr+(isspace(*ptr) || total + w <= info->vp.width? n: 0);
         if (*ptr == '\n')
         {
             ptr += n;
