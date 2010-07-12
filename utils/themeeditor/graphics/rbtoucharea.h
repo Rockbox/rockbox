@@ -25,6 +25,7 @@
 #include <QGraphicsItem>
 
 #include "rbrenderinfo.h"
+#include "devicestate.h"
 
 class RBTouchArea : public QGraphicsItem
 {
@@ -37,11 +38,12 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     QRectF size;
     QString action;
-    RBScreen* screen;
+    DeviceState* device;
     bool debug;
 };
 

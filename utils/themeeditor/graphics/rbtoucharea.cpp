@@ -24,14 +24,18 @@
 #include "devicestate.h"
 
 #include <QPainter>
+#include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 
 RBTouchArea::RBTouchArea(int width, int height, QString action,
                          const RBRenderInfo& info)
                              : QGraphicsItem(info.screen()),
-                             size(QRectF(0, 0, width, height)), action(action)
+                             size(QRectF(0, 0, width, height)), action(action),
+                             device(info.device())
 {
     debug = info.device()->data("showtouch").toBool();
     setZValue(5);
+    setCursor(Qt::PointingHandCursor);
 }
 
 RBTouchArea::~RBTouchArea()
@@ -55,4 +59,53 @@ void RBTouchArea::paint(QPainter *painter,
         painter->setPen(Qt::NoPen);
         painter->drawRect(size);
     }
+}
+
+void RBTouchArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(action[0] == '&')
+        action = action.right(action.count() - 1);
+
+    action = action.toLower();
+
+    if(action == "play")
+    {
+        if(device->data("?mp").toInt() == 2)
+            device->setData("mp", "Play");
+        else
+            device->setData("mp", "Pause");
+    }
+    else if(action == "ffwd")
+    {
+        device->setData("mp", "Fast Forward");
+    }
+    else if(action == "rwd")
+    {
+        device->setData("mp", "Rewind");
+    }
+    else if(action == "repmode")
+    {
+        int index = device->data("?mm").toInt();
+        index = (index + 1) % 5;
+        device->setData("mm", index);
+    }
+    else if(action == "shuffle")
+    {
+        device->setData("ps", !device->data("ps").toBool());
+    }
+    else if(action == "volup")
+    {
+        device->setData("pv", device->data("pv").toInt() + 1);
+    }
+    else if(action == "voldown")
+    {
+        device->setData("pv", device->data("pv").toInt() - 1);
+    }
+    else
+    {
+        event->ignore();
+        return;
+    }
+
+    event->accept();
 }
