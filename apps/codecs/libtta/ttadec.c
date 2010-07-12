@@ -392,6 +392,10 @@ int player_init (tta_info *info) {
     unsigned int data_offset;
     unsigned int st_size;
 
+#ifdef CPU_COLDFIRE
+    coldfire_set_macsr(0); /* signed integer mode */
+#endif
+
     ttainfo = info;
 
     framelen = 0;

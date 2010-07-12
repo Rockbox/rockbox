@@ -2,3 +2,6 @@ ttadec.c
 #ifdef CPU_ARM
 filter_arm.S
 #endif
+#ifdef CPU_COLDFIRE
+filter_coldfire.S
+#endif
