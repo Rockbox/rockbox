@@ -34,7 +34,7 @@ class RBProgressBar : public QGraphicsItem
 {
 public:
     RBProgressBar(RBViewport* parent, const RBRenderInfo& info,
-                  int paramCount, skin_tag_parameter* params);
+                  int paramCount, skin_tag_parameter* params, bool pv = 0);
     virtual ~RBProgressBar();
 
     QRectF boundingRect() const;

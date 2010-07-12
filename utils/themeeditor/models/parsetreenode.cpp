@@ -660,6 +660,17 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             new RBProgressBar(viewport, info, element->params_count,
                               element->params);
             return true;
+
+        case 'v':
+            /* %pv */
+            if(element->params_count > 0)
+            {
+                new RBProgressBar(viewport, info, element->params_count,
+                                  element->params, true);
+                return true;
+            }
+            else
+                return false;
         }
 
         return false;
@@ -926,6 +937,26 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
             else
             {
                 child = ((branches - 1) * child / 100) + 1;
+            }
+        }
+        else if(QString(element->tag->name) == "pv")
+        {
+            /* ?pv gets scaled to the number of available children, sandwiched
+             * in between mute and 0/>0dB.  I assume a floor of -50dB for the
+             * time being
+             */
+            int dB = val.toInt();
+
+            if(dB < -50)
+                child = 0;
+            else if(dB == 0)
+                child = branches - 2;
+            else if(dB > 0)
+                child = branches - 1;
+            else
+            {
+                int options = branches - 3;
+                child = (options * (dB + 50)) / 50;
             }
         }
         else if(QString(element->tag->name) == "px")

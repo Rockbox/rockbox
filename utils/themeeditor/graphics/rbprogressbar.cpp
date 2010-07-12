@@ -25,7 +25,8 @@
 #include "projectmodel.h"
 
 RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
-                             int paramCount, skin_tag_parameter *params)
+                             int paramCount, skin_tag_parameter *params,
+                             bool pv)
                                  :QGraphicsItem(parent)
 {
     /* First we set everything to defaults */
@@ -72,7 +73,20 @@ RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
 
 
     /* Finally, we scale the width according to the amount played */
-    int percent = info.device()->data("px").toInt();
+    int percent;
+    if(pv)
+    {
+        percent = (info.device()->data("pv").toInt() + 50) * 100 / 56;
+    }
+    else
+    {
+        percent = info.device()->data("px").toInt();
+    }
+    if(percent > 100)
+        percent = 100;
+    if(percent < 0)
+        percent = 0;
+
     w = w * percent / 100;
 
     size = QRectF(0, 0, w, h);
