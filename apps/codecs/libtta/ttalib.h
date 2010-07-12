@@ -142,7 +142,7 @@ void    player_stop (void);     // FUNCTION: destroys memory pools
 
 /* Rockbox speciffic: unsigned char -> int32_t */
 int    get_samples (            // FUNCTION: decode PCM_BUFFER_LENGTH samples
-           int32_t  *buffer);   // into the current PCM buffer position
+           int32_t  *buffer) ICODE_ATTR;   // into the current PCM buffer position
 
 /*
  * RETURN VALUE

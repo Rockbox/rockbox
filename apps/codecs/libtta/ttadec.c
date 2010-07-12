@@ -45,31 +45,31 @@
 /******************* static variables and structures *******************/
 
 static unsigned char isobuffers[ISO_BUFFERS_SIZE + 4] IBSS_ATTR;
-static unsigned char *iso_buffers_end = isobuffers + ISO_BUFFERS_SIZE;
-static unsigned int pcm_buffer_size;
+static unsigned char * const iso_buffers_end ICONST_ATTR = isobuffers + ISO_BUFFERS_SIZE;
+static unsigned int pcm_buffer_size IBSS_ATTR;
 
-static decoder tta[MAX_NCH] IBSS_ATTR;     /* decoder state */
+static decoder tta[MAX_NCH]     IBSS_ATTR; /* decoder state */
 /* Rockbox speciffic: cache is defined in get_samples() (non static value) */
 /* static int     cache[MAX_NCH];   // decoder cache */
 
-tta_info *ttainfo;               /* currently playing file info */
+tta_info *ttainfo               IBSS_ATTR; /* currently playing file info */
 
-static unsigned int fframes;     /* number of frames in file */
-static unsigned int framelen;    /* the frame length in samples */
-static unsigned int lastlen;     /* the length of the last frame in samples */
-static unsigned int data_pos;    /* currently playing frame index */
-static unsigned int data_cur;    /* the playing position in frame */
+static unsigned int fframes     IBSS_ATTR; /* number of frames in file */
+static unsigned int framelen    IBSS_ATTR; /* the frame length in samples */
+static unsigned int lastlen     IBSS_ATTR; /* the length of the last frame in samples */
+static unsigned int data_pos    IBSS_ATTR; /* currently playing frame index */
+static unsigned int data_cur    IBSS_ATTR; /* the playing position in frame */
 
-static int maxvalue;             /* output data max value */
+static int maxvalue             IBSS_ATTR; /* output data max value */
 
 /* Rockbox speciffic: seek_table is static size */
 static unsigned int seek_table[MAX_SEEK_TABLE_SIZE]; /* the playing position table */
 static unsigned int st_state;    /* seek table status */
 
-static unsigned int frame_crc32;
-static unsigned int bit_count;
-static unsigned int bit_cache;
-static unsigned char *bitpos;
+static unsigned int frame_crc32 IBSS_ATTR;
+static unsigned int bit_count   IBSS_ATTR;
+static unsigned int bit_cache   IBSS_ATTR;
+static unsigned char *bitpos    IBSS_ATTR;
 
 /* Rockbox speciffic: deletes read_id3_tags(). */
 /* static int read_id3_tags (tta_info *info); */

@@ -142,7 +142,7 @@ static const unsigned int bit_shift[] ICONST_ATTR = {
     0x80000000, 0x80000000, 0x80000000, 0x80000000
 };
 
-static const unsigned int *shift_16 = bit_shift + 4;
+static const unsigned int * const shift_16 ICONST_ATTR = bit_shift + 4;
 
 typedef unsigned char byte;
 
