@@ -1,8 +1,13 @@
+#ifndef _WMAPRO_MATH_H_
+#define _WMAPRO_MATH_H_
+
 #include <inttypes.h>
 #include "types.h"
 
 #define fixtof16(x)       (float)((float)(x) / (float)(1 << 16))
+#define fixtof31(x)       (float)((float)(x) / (float)(1 << 31))
 #define ftofix16(x)       ((int32_t)((x) * (float)(1 << 16) + ((x) < 0 ? -0.5:0.5)))
+#define ftofix31(x)       ((int32_t)((x) * (float)(1 << 31) + ((x) < 0 ? -0.5:0.5)))
 
 static inline FIXED fixmulshift(FIXED x, FIXED y, int shamt)
 {
@@ -36,11 +41,11 @@ static inline void vector_fixmul_window(FIXED *dst, const FIXED *src0,
 }
 
 static inline void vector_fixmul_scalar(FIXED *dst, const FIXED *src, FIXED mul,
-                                        int len)
+                                        int len, int shift)
 {
     int i;
-    for(i=0; i<len; i++) {
-        dst[i] = fixmulshift(src[i],mul,32);
-    }   
-    
+    for(i=0; i<len; i++)
+        dst[i] = fixmulshift(src[i],mul,shift);   
 }
+
+#endif /* _WMAPRO_MATH_H_ */

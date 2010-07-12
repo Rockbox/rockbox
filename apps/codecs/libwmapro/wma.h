@@ -159,5 +159,11 @@ int ff_wma_run_level_decode(AVCodecContext* avctx, GetBitContext* gb,
                             int version, WMACoef *ptr, int offset,
                             int num_coefs, int block_len, int frame_len_bits,
                             int coef_nb_bits);
+int ff_wma_fix_run_level_decode(AVCodecContext* avctx, GetBitContext* gb,
+                            VLC *vlc,
+                            const int32_t *level_table, const uint16_t *run_table,
+                            int version, int32_t *ptr, int offset,
+                            int num_coefs, int block_len, int frame_len_bits,
+                            int coef_nb_bits);
 
 #endif /* AVCODEC_WMA_H */
