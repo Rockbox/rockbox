@@ -32,17 +32,23 @@ static int last_action_line = 0;
 static int last_char_index = 0;
 static bool audio_buf = false;
 
+static char temp_line[MAX_LINE_LEN];
+static char copy_buffer[MAX_LINE_LEN];
+static char filename[MAX_PATH];
+static char eol[3];
+static bool newfile;
+
 #define ACTION_INSERT 0
 #define ACTION_GET    1
 #define ACTION_REMOVE 2
 #define ACTION_UPDATE 3
 #define ACTION_CONCAT 4
 
-char* _do_action(int action, char* str, int line);
+static char* _do_action(int action, char* str, int line);
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
 #define do_action _do_action
 #else
-char* do_action(int action, char* str, int line)
+static char* do_action(int action, char* str, int line)
 {
     char *r;
     rb->cpu_boost(1);
@@ -52,7 +58,7 @@ char* do_action(int action, char* str, int line)
 }
 #endif
 
-char* _do_action(int action, char* str, int line)
+static char* _do_action(int action, char* str, int line)
 {
     int len, lennew;
     int i=0,c=0;
@@ -127,10 +133,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
     return buf;
 }
 
-char filename[MAX_PATH];
-char eol[3];
-bool newfile;
-void get_eol_string(char* fn)
+static void get_eol_string(char* fn)
 {
     int fd;
     char t;
@@ -163,7 +166,7 @@ void get_eol_string(char* fn)
     return;
 }
 
-bool save_changes(int overwrite)
+static bool save_changes(int overwrite)
 {
     int fd;
     int i;
@@ -185,10 +188,6 @@ bool save_changes(int overwrite)
         return false;
     }
 
-    if (!overwrite)
-        /* current directory may have changed */
-        rb->reload_directory();
-
     rb->lcd_clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(1);
@@ -201,11 +200,16 @@ bool save_changes(int overwrite)
     rb->cpu_boost(0);
 #endif
     rb->close(fd);
+
+    if (newfile || !overwrite)
+        /* current directory may have changed */
+        rb->reload_directory();
+
     newfile = false;
     return true;
 }
 
-void setup_lists(struct gui_synclist *lists, int sel)
+static void setup_lists(struct gui_synclist *lists, int sel)
 {
     rb->gui_synclist_init(lists,list_get_name_cb,0, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(lists,NULL);
@@ -220,7 +224,7 @@ enum {
     MENU_RET_NO_UPDATE,
     MENU_RET_UPDATE,
 };
-int do_item_menu(int cur_sel, char* copy_buffer)
+static int do_item_menu(int cur_sel)
 {
     int ret = MENU_RET_NO_UPDATE;
     MENUITEM_STRINGLIST(menu, "Line Options", NULL,
@@ -289,7 +293,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
                     || (c>='0' && c<= '9'))
 #define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
                                                    (toupper(c)) - 'A' + 10)
-int hex_to_rgb(const char* hex, int* color)
+static int my_hex_to_rgb(const char* hex, int* color)
 {   int ok = 1;
     int i;
     int red, green, blue;
@@ -319,14 +323,12 @@ int hex_to_rgb(const char* hex, int* color)
 enum plugin_status plugin_start(const void* parameter)
 {
     int fd;
-    static char temp_line[MAX_LINE_LEN];
 
     struct gui_synclist lists;
     bool exit = false;
     int button;
     bool changed = false;
     int cur_sel=0;
-    static char copy_buffer[MAX_LINE_LEN];
 #ifdef HAVE_LCD_COLOR
     bool edit_colors_file = false;
 #endif
@@ -418,7 +420,7 @@ enum plugin_status plugin_start(const void* parameter)
                                             "Extension", "Colour");
                         rb->strcpy(extension, name);
                         if (value)
-                            hex_to_rgb(value, &color);
+                            my_hex_to_rgb(value, &color);
                         else
                             color = 0;
 
@@ -465,8 +467,9 @@ enum plugin_status plugin_start(const void* parameter)
                 changed = true;
             break;
             case ACTION_STD_MENU:
-            { /* do the item menu */
-                switch (do_item_menu(cur_sel, copy_buffer))
+            {
+                /* do the item menu */
+                switch (do_item_menu(cur_sel))
                 {
                     case MENU_RET_SAVE:
                         if(save_changes(1))
