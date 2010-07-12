@@ -322,11 +322,6 @@ static void tv_change_viewport(void)
     else
         is_initialized_vp = true;
 
-    if (show_statusbar)
-        rb->memcpy(&vp_info, rb->sb_skin_get_info_vp(SCREEN_MAIN), sizeof(struct viewport));
-    else
-        rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
-
     rb->viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp_info);
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
     display->set_viewport(&vp_info);

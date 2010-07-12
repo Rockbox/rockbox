@@ -719,10 +719,6 @@ static const struct plugin_api rockbox_api = {
 
     rbversion,
 
-#ifdef HAVE_LCD_BITMAP
-    sb_skin_get_info_vp,
-#endif
-
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
