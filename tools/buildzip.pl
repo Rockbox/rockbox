@@ -46,7 +46,7 @@ sub glob_install {
 
     foreach my $src (glob($_src)) {
         unless ( -d $src || !(-e $src)) {
-            system("install -vc $opts \"$src\" \"$dest\"");
+            system("install $opts \"$src\" \"$dest\"");
             print "install $opts \"$src\" -> \"$dest\"\n" if $verbose;
         }
     }
