@@ -46,7 +46,7 @@ sub glob_install {
 
     foreach my $src (glob($_src)) {
         unless ( -d $src || !(-e $src)) {
-            system("install $opts \"$src\" \"$dest\"");
+            system("install -vc $opts \"$src\" \"$dest\"");
             print "install $opts \"$src\" -> \"$dest\"\n" if $verbose;
         }
     }
@@ -605,6 +605,7 @@ $year+=1900;
 sub runone {
     my ($target, $fonts)=@_;
 
+    # in the app the the layout is different (no .rockbox, but bin/lib/share)
     $app = ($modelname eq "application");
 
     # build a full install .rockbox ($rbdir) directory
@@ -621,11 +622,6 @@ sub runone {
         copy("$target", "$rbdir/$target");
         undef $target;
     }
-
-    if($verbose) {
-    }
-
-    my $samedir = 1; # is the destination dir equal to source dir ?
 
     if($install) {
         make_install(".rockbox", $install) or die "MKDIRFAILED\n";
