@@ -12,7 +12,7 @@ use strict;
 
 use File::Copy; # For move() and copy()
 use File::Find; # For find()
-use File::Path; # For rmtree()
+use File::Path qw(mkpath rmtree); # For rmtree()
 use Cwd 'abs_path';
 use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
 
@@ -28,8 +28,30 @@ my $modelname;
 my $incfonts;
 my $target_id; # passed in, not currently used
 my $rbdir=".rockbox"; # can be changed for special builds
+my $app;
 
 
+sub glob_mkdir {
+    my ($dir) = @_;
+    mkpath ($dir, $verbose, 0777);
+    return 1;
+}
+
+sub glob_install {
+    my ($_src, $dest, $opts) = @_;
+
+    unless ($opts) {
+        $opts = "-m 0664";
+    }
+
+    foreach my $src (glob($_src)) {
+        unless ( -d $src || !(-e $src)) {
+            system("install $opts \"$src\" \"$dest\"");
+            print "install $opts \"$src\" -> \"$dest\"\n" if $verbose;
+        }
+    }
+    return 1;
+}
 
 sub glob_copy {
     my ($pattern, $destination) = @_;
@@ -62,9 +84,116 @@ sub find_copyfile {
         my $path = $_;
         if ($path =~ $pattern && filesize($path) > 0 && !($path =~ /$rbdir/)) {
             copy($path, $destination);
+            print "cp $path $destination\n" if $verbose;
             chmod(0755, $destination.'/'.$path);
         }
     }
+}
+
+sub find_installfile {
+    my ($pattern, $destination) = @_;
+    print "find_installfile: $pattern -> $destination\n" if $verbose;
+    return sub {
+        my $path = $_;
+        if ($path =~ $pattern) {
+        print "FIND_INSTALLFILE: $path\n";
+            glob_install($path, $destination);
+        }
+    }
+}
+
+
+sub make_install {
+    my ($src, $dest) = @_;
+
+    my $bindir = $dest;
+    my $libdir = $dest;
+    my $userdir = $dest;
+
+    my @plugins = ( "games", "apps", "demos", "viewers" );
+    my @userstuff = ( "backdrops", "codepages", "docs", "fonts", "langs", "themes", "wps", "eqs", "icons" );
+    my @files = ();
+
+    if ($app) {
+        $bindir .= "/bin";
+        $libdir .= "/lib/rockbox";
+        $userdir .= "/share/rockbox";
+    } else {
+        # for non-app builds we expect the prefix to be the dir above .rockbox
+        $bindir .= "/.rockbox";
+        $libdir = $userdir = $bindir;
+    }
+    if ($dest =~ /\/dev\/null/) {
+        die "ERROR: No PREFIX given\n"
+    }
+
+    if ((!$app) && $src && (abs_path($dest) eq abs_path($src))) {
+        return 1;
+    }
+
+    # binary
+    unless ($exe eq "") {
+        unless (glob_mkdir($bindir)) {
+            return 0;
+        }
+        glob_install($exe, $bindir, "-m 0775");
+    }
+
+    # codecs
+    unless (glob_mkdir("$libdir/codecs")) {
+        return 0;
+    }
+    glob_install("$src/codecs/*", "$libdir/codecs");
+
+    # plugins
+    unless (glob_mkdir("$libdir/rocks")) {
+        return 0;
+    }
+    foreach my $t (@plugins) {
+        unless (glob_mkdir("$libdir/rocks/$t")) {
+            return 0;
+        }
+        glob_install("$src/rocks/$t/*", "$libdir/rocks/$t");
+    }
+
+    # rocks/viewers/lua
+    unless (glob_mkdir("$libdir/rocks/viewers/lua")) {
+        return 0;
+    }
+    glob_install("$src/rocks/viewers/lua/*", "$libdir/rocks/viewers/lua");
+
+    # all the rest directories
+    foreach my $t (@userstuff) {
+        unless (glob_mkdir("$userdir/$t")) {
+            return 0;
+        }
+        glob_install("$src/$t/*", "$userdir/$t");
+    }
+
+    # wps/ subfolders and bitmaps
+    opendir(DIR, $src . "/wps");
+    @files = readdir(DIR);
+    closedir(DIR);
+
+    foreach my $_dir (@files) {
+        my $dir = "wps/" . $_dir;
+        if ( -d "$src/$dir" && $_dir !~ /\.\.?/) {
+            unless (glob_mkdir("$userdir/$dir")) {
+                return 0;
+            }
+            glob_install("$src/$dir/*", "$userdir/$dir");
+        }
+    }
+
+    # rest of the files, excluding the binary
+    opendir(DIR,$src);
+    @files = readdir(DIR);
+    closedir(DIR);
+
+    foreach my $file (grep (/[a-zA-Z]+\.(txt|config|ignnore)/,@files)) {
+        glob_install("$src/$file", "$userdir/");
+    }
+    return 1;
 }
 
 # Get options
@@ -178,7 +307,9 @@ sub filesize {
 }
 
 sub buildzip {
-    my ($image, $fonts)=@_;
+    my ($image, $fonts)=@_;    
+    my $libdir = $install;
+    my $rbdir = ".rockbox";
 
     print "buildzip: image=$image fonts=$fonts\n" if $verbose;
     
@@ -191,14 +322,14 @@ sub buildzip {
     # remove old traces
     rmtree($rbdir);
 
-    mkdir $rbdir, 0777;
+    glob_mkdir($rbdir);
 
     if(!$bitmap) {
         # always disable fonts on non-bitmap targets
         $fonts = 0;
     }
     if($fonts) {
-        mkdir "$rbdir/fonts", 0777;
+        glob_mkdir("$rbdir/fonts");
         chdir "$rbdir/fonts";
         my $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
         print($cmd."\n") if $verbose;
@@ -215,25 +346,25 @@ sub buildzip {
     open(IGNORE, ">$rbdir/database.ignore")  || die "can't open database.ignore";
     close(IGNORE);
     
-    mkdir "$rbdir/langs", 0777;
-    mkdir "$rbdir/rocks", 0777;
-    mkdir "$rbdir/rocks/games", 0777;
-    mkdir "$rbdir/rocks/apps", 0777;
-    mkdir "$rbdir/rocks/demos", 0777;
-    mkdir "$rbdir/rocks/viewers", 0777;
+    glob_mkdir("$rbdir/langs");
+    glob_mkdir("$rbdir/rocks");
+    glob_mkdir("$rbdir/rocks/games");
+    glob_mkdir("$rbdir/rocks/apps");
+    glob_mkdir("$rbdir/rocks/demos");
+    glob_mkdir("$rbdir/rocks/viewers");
 
     if ($recording) {
-        mkdir "$rbdir/recpresets", 0777;
+        glob_mkdir("$rbdir/recpresets");
     }
 
     if($swcodec) {
-        mkdir "$rbdir/eqs", 0777;
+        glob_mkdir("$rbdir/eqs");
 
         glob_copy("$ROOT/apps/eqs/*.cfg", "$rbdir/eqs/"); # equalizer presets
     }
 
-    mkdir "$rbdir/wps", 0777;
-    mkdir "$rbdir/themes", 0777;
+    glob_mkdir("$rbdir/wps");
+    glob_mkdir("$rbdir/themes");
     if ($bitmap) {
         open(THEME, ">$rbdir/themes/rockbox_default_icons.cfg");
         print THEME <<STOP
@@ -251,7 +382,7 @@ STOP
         close(THEME);
     }
     
-    mkdir "$rbdir/codepages", 0777;
+    glob_mkdir("$rbdir/codepages");
 
     if($bitmap) {
         system("$ROOT/tools/codepages");
@@ -262,17 +393,16 @@ STOP
 
     glob_move('*.cp', "$rbdir/codepages/");
 
-    if($bitmap) {
-        mkdir "$rbdir/codecs", 0777;
-        if($depth > 1) {
-            mkdir "$rbdir/backdrops", 0777;
-        }
-
-        find(find_copyfile(qr/.*\.codec/, abs_path("$rbdir/codecs/")), 'apps/codecs');
-
-        # remove directory again if no codec was copied
-        rmdir("$rbdir/codecs");
+    if($bitmap && $depth > 1) {
+        glob_mkdir("$rbdir/backdrops");
     }
+
+    glob_mkdir("$rbdir/codecs");
+
+    find(find_copyfile(qr/.*\.codec/, abs_path("$rbdir/codecs/")), 'apps/codecs');
+
+    # remove directory again if no codec was copied
+    rmdir("$rbdir/codecs");
 
     find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$rbdir/rocks/")), 'apps/plugins');
 
@@ -350,7 +480,7 @@ STOP
     glob_unlink("$rbdir/rocks/*.lua"); # Clean up unwanted *.lua files (e.g. actions.lua, buttons.lua)
 
     if ($bitmap) {
-        mkdir "$rbdir/icons", 0777;
+        glob_mkdir("$rbdir/icons");
         copy("$viewer_bmpdir/viewers.${icon_w}x${icon_h}x$depth.bmp", "$rbdir/icons/viewers.bmp");
         if ($remote_depth) {
             copy("$viewer_bmpdir/remote_viewers.${remote_icon_w}x${remote_icon_h}x$remote_depth.bmp", "$rbdir/icons/remote_viewers.bmp");
@@ -400,7 +530,7 @@ STOP
         }
     }
 
-    mkdir "$rbdir/docs", 0777;
+    glob_mkdir("$rbdir/docs");
     for(("COPYING",
          "LICENSES",
          "KNOWN_ISSUES"
@@ -458,7 +588,7 @@ STOP
     glob_copy('apps/lang/*lng', "$rbdir/langs/");
 
     # copy the .lua files
-    mkdir "$rbdir/rocks/viewers/lua/", 0777;
+    glob_mkdir("$rbdir/rocks/viewers/lua/");
     glob_copy('apps/plugins/lua/*.lua', "$rbdir/rocks/viewers/lua/");
 }
 
@@ -474,6 +604,8 @@ $year+=1900;
 # made once for all targets
 sub runone {
     my ($target, $fonts)=@_;
+
+    $app = ($modelname eq "application");
 
     # build a full install .rockbox ($rbdir) directory
     buildzip($target, $fonts);
@@ -491,30 +623,23 @@ sub runone {
     }
 
     if($verbose) {
-        print "$ziptool $output $rbdir $target >/dev/null\n";
     }
 
-    my $samedir = 0; # is the destination dir equal to source dir ?
+    my $samedir = 1; # is the destination dir equal to source dir ?
 
     if($install) {
-        if ($install =~ /\/dev\/null/) {
-            die "ERROR: No PREFIX given\n"
-        }
-
-        $samedir = abs_path("$install/$rbdir") eq abs_path($rbdir);
-
-        if (!$samedir) {
-            system("mkdir -p \"$install\" && cp -r $rbdir \"$install/\"");
-        }
+        make_install(".rockbox", $install) or die "MKDIRFAILED\n";
     }
     else {
+        unless (".rockbox" eq $rbdir) {
+            move(".rockbox", $rbdir);
+            print "mv .rockbox $rbdir\n" if $verbose;
+        }
         system("$ziptool $output $rbdir $target >/dev/null");
+        print "$ziptool $output $rbdir $target >/dev/null\n" if $verbose;
     }
-
-    # remove the $rbdir afterwards
-    if (!$samedir) {
-        rmtree($rbdir);
-    }
+    rmtree(".rockbox");
+    print "rm .rockbox\n" if $verbose;
 };
 
 if(!$exe) {
@@ -529,7 +654,7 @@ if(!$exe) {
         $exe = "archos.mod";
     }
 }
-elsif($exe =~ /rockboxui/) {
+elsif(($exe =~ /rockboxui/)) {
     # simulator, exclude the exe file
     $exe = "";
 }
