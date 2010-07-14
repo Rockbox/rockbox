@@ -91,7 +91,6 @@
 #include "get_bits.h"
 #include "put_bits.h"
 #include "wmaprodata.h"
-#include "dsputil.h"
 #include "wma.h"
 #include "wmaprodec.h"
 #include "wmapro_mdct.h"
@@ -100,6 +99,9 @@
 #include "types.h"
 #include "wmapro_math.h"
 #include "codecs.h"
+
+/* Uncomment the following line to enable some debug output */
+//#define WMAPRO_DUMP_CTX_EN
 
 /* Some defines to make it compile */
 #define AVERROR_INVALIDDATA  -1
@@ -131,7 +133,7 @@ static VLC              vec4_vlc;         ///< 4 coefficients per symbol
 static VLC              vec2_vlc;         ///< 2 coefficients per symbol
 static VLC              vec1_vlc;         ///< 1 coefficient per symbol
 static VLC              coef_vlc[2];      ///< coefficient run length vlc codes
-static float            sin64[33];        ///< sinus table for decorrelation
+//static float            sin64[33];        ///< sinus table for decorrelation
 
 /**
  * @brief frame specific decoder context for a single channel
@@ -153,10 +155,8 @@ typedef struct {
     int8_t   scale_factor_idx;                        ///< index for the transmitted scale factor values (used for resampling)
     int*     scale_factors;                           ///< pointer to the scale factor values used for decoding
     uint8_t  table_idx;                               ///< index in sf_offsets for the scale factor reference block
-    float*   coeffs;                                  ///< pointer to the subframe decode buffer
-    FIXED*   fixcoeffs;
-    DECLARE_ALIGNED(16, float, out)[WMAPRO_BLOCK_MAX_SIZE + WMAPRO_BLOCK_MAX_SIZE / 2]; ///< output buffer
-    DECLARE_ALIGNED(16, FIXED, fixout)[WMAPRO_BLOCK_MAX_SIZE + WMAPRO_BLOCK_MAX_SIZE / 2]; ///< output buffer
+    FIXED*   coeffs;                                  ///< pointer to the subframe decode buffer
+    DECLARE_ALIGNED(16, FIXED, out)[WMAPRO_BLOCK_MAX_SIZE + WMAPRO_BLOCK_MAX_SIZE / 2]; ///< output buffer
 } WMAProChannelCtx;
 
 /**
@@ -166,10 +166,9 @@ typedef struct {
     uint8_t num_channels;                                     ///< number of channels in the group
     int8_t  transform;                                        ///< transform on / off
     int8_t  transform_band[MAX_BANDS];                        ///< controls if the transform is enabled for a certain band
-    float   decorrelation_matrix[WMAPRO_MAX_CHANNELS*WMAPRO_MAX_CHANNELS];
-    float*  channel_data[WMAPRO_MAX_CHANNELS];                ///< transformation coefficients
+    //float   decorrelation_matrix[WMAPRO_MAX_CHANNELS*WMAPRO_MAX_CHANNELS];
+    FIXED*  channel_data[WMAPRO_MAX_CHANNELS];                ///< transformation coefficients
     FIXED   fixdecorrelation_matrix[WMAPRO_MAX_CHANNELS*WMAPRO_MAX_CHANNELS];
-    FIXED*  fixchannel_data[WMAPRO_MAX_CHANNELS];                ///< transformation coefficients
 } WMAProChannelGrp;
 
 /**
@@ -182,10 +181,7 @@ typedef struct WMAProDecodeCtx {
     uint8_t          frame_data[MAX_FRAMESIZE +
                       FF_INPUT_BUFFER_PADDING_SIZE];///< compressed frame data
     PutBitContext    pb;                            ///< context for filling the frame_data buffer
-    FFTContext       mdct_ctx[WMAPRO_BLOCK_SIZES];  ///< MDCT context per block size
-    DECLARE_ALIGNED(16, float, tmp)[WMAPRO_BLOCK_MAX_SIZE]; ///< IMDCT output buffer
-    DECLARE_ALIGNED(16, FIXED, fixtmp)[WMAPRO_BLOCK_MAX_SIZE]; ///< IMDCT output buffer
-    float*           windows[WMAPRO_BLOCK_SIZES];   ///< windows for the different block sizes
+    DECLARE_ALIGNED(16, FIXED, tmp)[WMAPRO_BLOCK_MAX_SIZE]; ///< IMDCT input buffer
 
     /* frame size dependent frame information (set during initialization) */
     uint32_t         decode_flags;                  ///< used compression features
@@ -219,7 +215,6 @@ typedef struct WMAProDecodeCtx {
     uint32_t         frame_num;                     ///< current frame number (not used for decoding)
     GetBitContext    gb;                            ///< bitstream reader context
     int              buf_bit_size;                  ///< buffer size in bits
-    float*           samplesf;                       ///< current samplebuffer pointer
     FIXED*           samples;
     FIXED*           samples_end;                   ///< maximum samplebuffer pointer
     uint8_t          drc_gain;                      ///< gain for the DRC tool
@@ -246,6 +241,7 @@ typedef struct WMAProDecodeCtx {
  *@brief helper function to print the most important members of the context
  *@param s context
  */
+#ifdef WMAPRO_DUMP_CTX_EN
 static void av_cold dump_context(WMAProDecodeCtx *s)
 {
 #define PRINT(a, b)     printf(" %s = %d\n", a, b);
@@ -259,22 +255,7 @@ static void av_cold dump_context(WMAProDecodeCtx *s)
     PRINT("len prefix",          s->len_prefix);
     PRINT("num channels",        s->num_channels);
 }
-
-/**
- *@brief Uninitialize the decoder and free all resources.
- *@param avctx codec context
- *@return 0 on success, < 0 otherwise
- */
-av_cold int decode_end(AVCodecContext *avctx)
-{
-    WMAProDecodeCtx *s = avctx->priv_data;
-    int i;
-
-    for (i = 0; i < WMAPRO_BLOCK_SIZES; i++)
-        ff_mdct_end(&s->mdct_ctx[i]);
-
-    return 0;
-}
+#endif
 
 /**
  *@brief Initialize the decoder.
@@ -293,7 +274,6 @@ av_cold int decode_init(AVCodecContext *avctx)
     int num_possible_block_sizes;
 
     s->avctx = avctx;
-    dsputil_init(&s->dsp, avctx);
     init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
 
     avctx->sample_fmt = SAMPLE_FMT_FLT;
@@ -440,19 +420,6 @@ av_cold int decode_init(AVCodecContext *avctx)
         }
     }
 
-    /** init MDCT, FIXME: only init needed sizes */
-    for (i = 0; i < WMAPRO_BLOCK_SIZES; i++)
-        ff_mdct_init(&s->mdct_ctx[i], BLOCK_MIN_BITS+1+i, 1,
-                     1.0 / (1 << (BLOCK_MIN_BITS + i - 1))
-                     / (1 << (s->bits_per_sample - 1)));
-
-    /** init MDCT windows: simple sinus window */
-    for (i = 0; i < WMAPRO_BLOCK_SIZES; i++) {
-        const int win_idx = WMAPRO_BLOCK_MAX_BITS - i;
-        ff_init_ff_sine_windows(win_idx);
-        s->windows[WMAPRO_BLOCK_SIZES - i - 1] = ff_sine_windows[win_idx];
-    }
-
     /** calculate subwoofer cutoff values */
     for (i = 0; i < num_possible_block_sizes; i++) {
         int block_size = s->samples_per_frame >> i;
@@ -460,12 +427,15 @@ av_cold int decode_init(AVCodecContext *avctx)
                      / s->avctx->sample_rate;
         s->subwoofer_cutoffs[i] = av_clip(cutoff, 4, block_size);
     }
-
+    
+#if 0
     /** calculate sine values for the decorrelation matrix */
     for (i = 0; i < 33; i++)
         sin64[i] = sin(i*M_PI / 64.0);
-#if 0
-    if (avctx->debug & FF_DEBUG_BITSTREAM)
+#endif 
+
+#ifdef WMAPRO_DUMP_CTX_EN
+    dump_context(s);
 #endif
 
     avctx->channel_layout = channel_mask;
@@ -614,6 +584,7 @@ static int decode_tilehdr(WMAProDecodeCtx *s)
     return 0;
 }
 
+#if 0
 /**
  *@brief Calculate a decorrelation matrix from the bitstream parameters.
  *@param s codec context
@@ -682,6 +653,7 @@ static void decode_decorrelation_matrix(WMAProDecodeCtx *s,
         offset += i;
     }
 }
+#endif
 
 /**
  *@brief Decode channel transformation parameters
@@ -710,8 +682,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
         for (s->num_chgroups = 0; remaining_channels &&
              s->num_chgroups < s->channels_for_cur_subframe; s->num_chgroups++) {
             WMAProChannelGrp* chgroup = &s->chgroup[s->num_chgroups];
-            float** channel_data = chgroup->channel_data;
-            FIXED** fixchdata = chgroup->fixchannel_data;
+            FIXED** channel_data = chgroup->channel_data;
             chgroup->num_channels = 0;
             chgroup->transform = 0;
 
@@ -723,18 +694,15 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                         && get_bits1(&s->gb)) {
                         ++chgroup->num_channels;
                         s->channel[channel_idx].grouped = 1;
-                        *channel_data++ = s->channel[channel_idx].coeffs;
-                        *fixchdata++    = s->channel[channel_idx].fixcoeffs;
+                        *channel_data++    = s->channel[channel_idx].coeffs;
                     }
                 }
             } else {
                 chgroup->num_channels = remaining_channels;
                 for (i = 0; i < s->channels_for_cur_subframe; i++) {
                     int channel_idx = s->channel_indexes_for_cur_subframe[i];
-                    if (!s->channel[channel_idx].grouped) {
-                        *channel_data++ = s->channel[channel_idx].coeffs;
-                        *fixchdata++    = s->channel[channel_idx].fixcoeffs;
-                    }
+                    if (!s->channel[channel_idx].grouped)
+                        *channel_data++    = s->channel[channel_idx].coeffs;
                     s->channel[channel_idx].grouped = 1;
                 }
             }
@@ -749,22 +717,12 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                 } else {
                     chgroup->transform = 1;
                     if (s->num_channels == 2) {
-                        chgroup->decorrelation_matrix[0] =  1.0;
-                        chgroup->decorrelation_matrix[1] = -1.0;
-                        chgroup->decorrelation_matrix[2] =  1.0;
-                        chgroup->decorrelation_matrix[3] =  1.0;
-                        
                         chgroup->fixdecorrelation_matrix[0] =  0x10000;
                         chgroup->fixdecorrelation_matrix[1] = -0x10000;
                         chgroup->fixdecorrelation_matrix[2] =  0x10000;
                         chgroup->fixdecorrelation_matrix[3] =  0x10000;
                     } else {
                         /** cos(pi/4) */
-                        chgroup->decorrelation_matrix[0] =  0.70703125;
-                        chgroup->decorrelation_matrix[1] = -0.70703125;
-                        chgroup->decorrelation_matrix[2] =  0.70703125;
-                        chgroup->decorrelation_matrix[3] =  0.70703125;
-
                         chgroup->fixdecorrelation_matrix[0] =  0xB500;
                         chgroup->fixdecorrelation_matrix[1] = -0xB500;
                         chgroup->fixdecorrelation_matrix[2] =  0xB500;
@@ -772,6 +730,9 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                     }
                 }
             } else if (chgroup->num_channels > 2) {
+            	LOGF("in wmaprodec.c: Multichannel streams still not supported\n");
+            	return -1;
+#if 0
                 if (get_bits1(&s->gb)) {
                     chgroup->transform = 1;
                     if (get_bits1(&s->gb)) {
@@ -789,6 +750,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                         }
                     }
                 }
+#endif
             }
 
             /** decode transform on / off */
@@ -816,16 +778,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
  *@return 0 on success, < 0 in case of bitstream errors
  */
 static int decode_coeffs(WMAProDecodeCtx *s, int c)
-{ 
-    /* Integers 0..15 as single-precision floats.  The table saves a
-       costly int to float conversion, and storing the values as
-       integers allows fast sign-flipping. */
-    static const int fval_tab[16] = {
-        0x00000000, 0x3f800000, 0x40000000, 0x40400000,
-        0x40800000, 0x40a00000, 0x40c00000, 0x40e00000,
-        0x41000000, 0x41100000, 0x41200000, 0x41300000,
-        0x41400000, 0x41500000, 0x41600000, 0x41700000,
-    };
+{
     int vlctable;
     VLC* vlc;
     WMAProChannelCtx* ci = &s->channel[c];
@@ -833,8 +786,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
     int cur_coeff = 0;
     int num_zeros = 0;
     const uint16_t* run;
-    const float* level;
-    const FIXED* fixlevel;
+    const FIXED* level;
 
     dprintf(s->avctx, "decode coefficients for channel %i\n", c);
 
@@ -844,18 +796,15 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
     if (vlctable) {
         run = coef1_run;
         level = coef1_level;
-        fixlevel = fixcoef1_level;
     } else {
         run = coef0_run;
         level = coef0_level;
-        fixlevel = fixcoef0_level;
     }
 
     /** decode vector coefficients (consumes up to 167 bits per iteration for
       4 vector coded large values) */
     while (!rl_mode && cur_coeff + 3 < s->subframe_len) {
-        int vals[4];
-        int32_t fixvals[4];
+        int32_t vals[4];
         int i;
         unsigned int idx;
 
@@ -872,42 +821,29 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
                     v1 = get_vlc2(&s->gb, vec1_vlc.table, VLCBITS, VEC1MAXDEPTH);
                     if (v1 == HUFF_VEC1_SIZE - 1)
                         v1 += ff_wma_get_large_val(&s->gb);
-                    ((float*)vals)[i  ] = v0;
-                    ((float*)vals)[i+1] = v1;
-                    fixvals[i] = v0;
-                    fixvals[i+1] = v1;
+                        
+                    vals[i] = v0;
+                    vals[i+1] = v1;
                 } else {
-                    vals[i]   = fval_tab[symbol_to_vec2[idx] >> 4 ];
-                    vals[i+1] = fval_tab[symbol_to_vec2[idx] & 0xF];
-                    fixvals[i] = symbol_to_vec2[idx] >> 4;
-                    fixvals[i+1] = symbol_to_vec2[idx] & 0xF;
+                    vals[i] = symbol_to_vec2[idx] >> 4;
+                    vals[i+1] = symbol_to_vec2[idx] & 0xF;
                 }
             }
         } else {
-            vals[0] = fval_tab[ symbol_to_vec4[idx] >> 12      ];
-            vals[1] = fval_tab[(symbol_to_vec4[idx] >> 8) & 0xF];
-            vals[2] = fval_tab[(symbol_to_vec4[idx] >> 4) & 0xF];
-            vals[3] = fval_tab[ symbol_to_vec4[idx]       & 0xF];
-            
-            fixvals[0] = symbol_to_vec4[idx] >> 12;
-            fixvals[1] = (symbol_to_vec4[idx] >> 8) & 0xF;
-            fixvals[2] = (symbol_to_vec4[idx] >> 4) & 0xF;
-            fixvals[3] = symbol_to_vec4[idx] & 0xF;
+            vals[0] = symbol_to_vec4[idx] >> 12;
+            vals[1] = (symbol_to_vec4[idx] >> 8) & 0xF;
+            vals[2] = (symbol_to_vec4[idx] >> 4) & 0xF;
+            vals[3] = symbol_to_vec4[idx] & 0xF;
         }
 
         /** decode sign */
         for (i = 0; i < 4; i++) {
             if (vals[i]) {
                 int sign = get_bits1(&s->gb) - 1;
-                *(uint32_t*)&ci->coeffs[cur_coeff] = vals[i] ^ sign<<31;
-                ci->fixcoeffs[cur_coeff] = (sign == -1)? -fixvals[i]<<16 : fixvals[i]<<16;
-                if(ftofix16(ci->coeffs[cur_coeff]) != ci->fixcoeffs[cur_coeff]) {
-                 printf("coeff = %f, fixcoeff = %f\n", ci->coeffs[cur_coeff], fixtof16(ci->fixcoeffs[cur_coeff]));getchar();
-                }
+                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<16 : vals[i]<<16;
                 num_zeros = 0;
             } else {
                 ci->coeffs[cur_coeff] = 0;
-                ci->fixcoeffs[cur_coeff] = 0;
                 /** switch to run level mode when subframe_len / 128 zeros
                     were found in a row */
                 rl_mode |= (++num_zeros > s->subframe_len >> 8);
@@ -920,18 +856,9 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
     if (rl_mode) {
         memset(&ci->coeffs[cur_coeff], 0,
                sizeof(*ci->coeffs) * (s->subframe_len - cur_coeff));
-        memset(&ci->fixcoeffs[cur_coeff], 0,
-               sizeof(*ci->fixcoeffs) * (s->subframe_len - cur_coeff));
-
-int indx = s->gb.index;
-         if (ff_wma_run_level_decode(s->avctx, &s->gb, vlc,
+                      
+        if (ff_wma_run_level_decode(s->avctx, &s->gb, vlc,
                                     level, run, 1, ci->coeffs,
-                                    cur_coeff, s->subframe_len,
-                                    s->subframe_len, s->esc_len, 0))
-            return AVERROR_INVALIDDATA;
-s->gb.index = indx;                       
-        if (ff_wma_fix_run_level_decode(s->avctx, &s->gb, vlc,
-                                    fixlevel, run, 1, ci->fixcoeffs,
                                     cur_coeff, s->subframe_len,
                                     s->subframe_len, s->esc_len, 0))
            return AVERROR_INVALIDDATA;
@@ -1045,13 +972,10 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
 
     for (i = 0; i < s->num_chgroups; i++) {
         if (s->chgroup[i].transform) {
-            float data[WMAPRO_MAX_CHANNELS];
             const int num_channels = s->chgroup[i].num_channels;
-            float** ch_data = s->chgroup[i].channel_data;
-            float** ch_end = ch_data + num_channels;
-            FIXED fixdata[WMAPRO_MAX_CHANNELS];
-            FIXED** fixchdata = s->chgroup[i].fixchannel_data;
-            FIXED** fixchend = fixchdata + num_channels;
+            FIXED data[WMAPRO_MAX_CHANNELS];
+            FIXED** ch_data = s->chgroup[i].channel_data;
+            FIXED** ch_end = ch_data + num_channels;
             const int8_t* tb = s->chgroup[i].transform_band;
             int16_t* sfb;
 
@@ -1062,51 +986,33 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                 if (*tb++ == 1) {
                     /** multiply values with the decorrelation_matrix */
                     for (y = sfb[0]; y < FFMIN(sfb[1], s->subframe_len); y++) {
-                        const float* mat = s->chgroup[i].decorrelation_matrix;
-                        const float* data_end = data + num_channels;
-                        float* data_ptr = data;
-                        float** ch;
-                        const FIXED* fixmat = s->chgroup[i].fixdecorrelation_matrix;
-                        const FIXED* fixdata_end = fixdata + num_channels;
-                        FIXED* fixdata_ptr = fixdata;
-                        FIXED** fixch;
+                        const FIXED* mat = s->chgroup[i].fixdecorrelation_matrix;
+                        const FIXED* data_end = data + num_channels;
+                        FIXED* data_ptr = data;
+                        FIXED** ch;
                         
-                        for (ch = ch_data, fixch = fixchdata; ch < ch_end && fixch < fixchend; ch++, fixch++) {
+                        for (ch = ch_data; ch < ch_end; ch++)
                             *data_ptr++ = (*ch)[y];
-                            *fixdata_ptr++ = (*fixch)[y];
-                        }
 
-                        for (ch = ch_data, fixch = fixchdata; ch < ch_end && fixch < fixchend; ch++, fixch++) {
-                            float sum = 0;
-                            FIXED fixsum = 0;
+                        for (ch = ch_data; ch < ch_end; ch++) {
+                            FIXED sum = 0;
                             data_ptr = data;
-                            fixdata_ptr = fixdata;
-                            
-                            while (data_ptr < data_end)
-                                sum += *data_ptr++ * *mat++;
                                 
-                            while (fixdata_ptr < fixdata_end)
-                                fixsum += fixmulshift(*fixdata_ptr++, *fixmat++, 16);
+                            while (data_ptr < data_end)
+                                sum += fixmulshift(*data_ptr++, *mat++, 16);
 
                             (*ch)[y] = sum;
-                            (*fixch)[y] = fixsum;
                         }
                     }
                 } else if (s->num_channels == 2) {
 
                     int len = FFMIN(sfb[1], s->subframe_len) - sfb[0];
-                    s->dsp.vector_fmul_scalar(ch_data[0] + sfb[0],
-                                              ch_data[0] + sfb[0],
-                                              181.0 / 128, len);
-                    s->dsp.vector_fmul_scalar(ch_data[1] + sfb[0],
-                                              ch_data[1] + sfb[0],
-                                              181.0 / 128, len);
-                    vector_fixmul_scalar(fixchdata[0] + sfb[0],
-                                              fixchdata[0] + sfb[0],
-                                             0x00016A00, len, 16);
-                    vector_fixmul_scalar(fixchdata[1] + sfb[0],
-                                              fixchdata[1] + sfb[0],
-                                              0x00016A00, len,16);
+                    vector_fixmul_scalar(ch_data[0] + sfb[0],
+                                         ch_data[0] + sfb[0],
+                                         0x00016A00, len,16);
+                    vector_fixmul_scalar(ch_data[1] + sfb[0],
+		                                 ch_data[1] + sfb[0],
+		                                 0x00016A00, len,16);
 
                 }
             }
@@ -1124,26 +1030,19 @@ static void wmapro_window(WMAProDecodeCtx *s)
 
     for (i = 0; i < s->channels_for_cur_subframe; i++) {
         int c = s->channel_indexes_for_cur_subframe[i];
-        FIXED* window;
-        float* win2;
+        const FIXED* window;
         int winlen = s->channel[c].prev_block_len;
-        float* start = s->channel[c].coeffs - (winlen >> 1);
-        FIXED *xstart= s->channel[c].fixcoeffs - (winlen >> 1);
-        int j;
+        FIXED *xstart= s->channel[c].coeffs - (winlen >> 1);
 
         if (s->subframe_len < winlen) {
-            start += (winlen - s->subframe_len) >> 1;
             xstart += (winlen - s->subframe_len) >> 1;
             winlen = s->subframe_len;
         }
   
-        window = sine_windows[av_log2(winlen) - BLOCK_MIN_BITS];
-        win2 = s->windows[av_log2(winlen) - BLOCK_MIN_BITS];       
+        window = sine_windows[av_log2(winlen) - BLOCK_MIN_BITS];     
             
         winlen >>= 1;
 
-        s->dsp.vector_fmul_window(start, start, start + winlen,
-                                  win2, 0, winlen);
         vector_fixmul_window(xstart, xstart, xstart + winlen,
                                   window, 0, winlen);
 
@@ -1222,8 +1121,6 @@ static int decode_subframe(WMAProDecodeCtx *s)
         int c = s->channel_indexes_for_cur_subframe[i];
 
         s->channel[c].coeffs = &s->channel[c].out[(s->samples_per_frame >> 1)
-                                                  + offset];
-        s->channel[c].fixcoeffs = &s->channel[c].fixout[(s->samples_per_frame >> 1)
                                                   + offset];
     }
 
@@ -1322,8 +1219,6 @@ static int decode_subframe(WMAProDecodeCtx *s)
         } else {
             memset(s->channel[c].coeffs, 0,
                    sizeof(*s->channel[c].coeffs) * subframe_len);
-            memset(s->channel[c].fixcoeffs, 0,
-                   sizeof(*s->channel[c].fixcoeffs) * subframe_len);
         }
     }
 
@@ -1338,42 +1233,34 @@ static int decode_subframe(WMAProDecodeCtx *s)
             const int* sf = s->channel[c].scale_factors;
             int b;
 
-            if (c == s->lfe_channel){
+            if (c == s->lfe_channel)
                 memset(&s->tmp[cur_subwoofer_cutoff], 0, sizeof(*s->tmp) *
                        (subframe_len - cur_subwoofer_cutoff));
-                memset(&s->fixtmp[cur_subwoofer_cutoff], 0, sizeof(*s->fixtmp) *
-                       (subframe_len - cur_subwoofer_cutoff));
-            }
+                       
             /** inverse quantization and rescaling */
             for (b = 0; b < s->num_bands; b++) {
                 const int end = FFMIN(s->cur_sfb_offsets[b+1], s->subframe_len);
                 const int exp = s->channel[c].quant_step -
                             (s->channel[c].max_scale_factor - *sf++) *
                             s->channel[c].scale_factor_step;
-                const float quant = pow(10.0, exp / 20.0);
                 
                 if(exp < EXP_MIN || exp > EXP_MAX) {
                     LOGF("in wmaprodec.c : unhandled value for exp, please report sample.\n");
                     return -1;
                 }
-                const FIXED fixquant = QUANT(exp);
+                const FIXED quant = QUANT(exp);
                 int start = s->cur_sfb_offsets[b];
-           
-                s->dsp.vector_fmul_scalar(s->tmp + start,
-                                          s->channel[c].coeffs + start,
-                                          quant, end - start);                      
-                vector_fixmul_scalar(s->fixtmp+start, 
-                                     s->channel[c].fixcoeffs + start,
-                                     fixquant, end-start, 24);
+                   
+                vector_fixmul_scalar(s->tmp+start, 
+                                     s->channel[c].coeffs + start,
+                                     quant, end-start, 24);
 
                
             }
  
             /** apply imdct (ff_imdct_half == DCTIV with reverse) */
-            fff_imdct_half(&s->mdct_ctx[av_log2(subframe_len) - BLOCK_MIN_BITS],
+            imdct_half(av_log2(subframe_len)+1,
                           s->channel[c].coeffs, s->tmp);
-            imdct_half((s->mdct_ctx[av_log2(subframe_len) - BLOCK_MIN_BITS]).mdct_bits,
-                          s->channel[c].fixcoeffs, s->fixtmp);
                           
         }
     }
@@ -1482,13 +1369,9 @@ static int decode_frame(WMAProDecodeCtx *s)
     /** interleave samples and write them to the output buffer */
     for (i = 0; i < s->num_channels; i++) {
         FIXED* ptr  = s->samples + i;
-        float* fptr = s->samplesf + i;
         int incr = s->num_channels;
-        FIXED* iptr = s->channel[i].fixout;
-        float* fiptr = s->channel[i].out;
+        FIXED* iptr = s->channel[i].out;
         FIXED* iend = iptr + s->samples_per_frame;
-        float* fiend = fiptr + s->samples_per_frame;
-        int j;
         
         while (iptr < iend) {
             *ptr = *iptr++ << 1;
@@ -1499,18 +1382,12 @@ static int decode_frame(WMAProDecodeCtx *s)
         memcpy(&s->channel[i].out[0],
                &s->channel[i].out[s->samples_per_frame],
                s->samples_per_frame * sizeof(*s->channel[i].out) >> 1);
-               
-        memcpy(&s->channel[i].fixout[0],
-               &s->channel[i].fixout[s->samples_per_frame],
-               s->samples_per_frame * sizeof(*s->channel[i].fixout) >> 1);
     }
 
     if (s->skip_frame) {
         s->skip_frame = 0;
-    } else {
+    } else
         s->samples += s->num_channels * s->samples_per_frame;
-        s->samplesf += s->num_channels * s->samples_per_frame;
-    }
 
     if (len != (get_bits_count(gb) - s->frame_offset) + 2) {
         /** FIXME: not sure if this is always an error */
@@ -1686,25 +1563,6 @@ int decode_packet(AVCodecContext *avctx,
     s->packet_offset = get_bits_count(gb) & 7;
 
     return (s->packet_loss) ? AVERROR_INVALIDDATA : get_bits_count(gb) >> 3;
-}
-
-/**
- *@brief Clear decoder buffers (for seeking).
- *@param avctx codec context
- */
-static void flush(AVCodecContext *avctx)
-{
-    WMAProDecodeCtx *s = avctx->priv_data;
-    int i;
-    /** reset output buffer as a part of it is used during the windowing of a
-        new frame */
-    for (i = 0; i < s->num_channels; i++) {
-        memset(s->channel[i].out, 0, s->samples_per_frame *
-               sizeof(*s->channel[i].out));
-        memset(s->channel[i].out, 0, s->samples_per_frame *
-               sizeof(*s->channel[i].fixout));
-    }
-    s->packet_loss = 1;
 }
 
 #if 0

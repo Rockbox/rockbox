@@ -1,9 +1,6 @@
 wmaprodec.c
 wma.c
-dsputil.c
-mdct.c
 mdct_tables.c
-fft.c
 bitstream.c
 wmapro_mdct.c
 libavutil/log.c
