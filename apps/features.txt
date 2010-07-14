@@ -102,6 +102,10 @@ lcd_invert
 lcd_sleep
 #endif
 
+#if defined(HAVE_LCD_CONTRAST)
+lcd_contrast
+#endif
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 masf
 #endif
