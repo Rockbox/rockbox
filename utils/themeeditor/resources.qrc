@@ -13,6 +13,8 @@
         <file>resources/ffwd.png</file>
         <file>resources/pause.png</file>
         <file>resources/rwnd.png</file>
+        <file>resources/cursor.png</file>
+        <file>resources/lines.png</file>
     </qresource>
     <qresource prefix="/render">
         <file alias="scenebg.png">resources/render/scenebg.png</file>

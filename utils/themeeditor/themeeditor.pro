@@ -96,7 +96,11 @@ OTHER_FILES += README \
     resources/pause.xcf \
     resources/pause.png \
     resources/ffwd.xcf \
-    resources/ffwd.png
+    resources/ffwd.png \
+    resources/lines.xcf \
+    resources/lines.png \
+    resources/cursor.xcf \
+    resources/cursor.png
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \

@@ -27,14 +27,50 @@
 #include <QFile>
 #include <QSettings>
 #include <QFileDialog>
+#include <QPair>
 
 ConfigDocument::ConfigDocument(QMap<QString, QString>& settings, QString file,
                                QWidget *parent)
                                    : TabContent(parent),
                                    ui(new Ui::ConfigDocument),
-                                   filePath(file)
+                                   filePath(file), block(false)
 {
     ui->setupUi(this);
+    editor = new CodeEditor(this);
+    editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    editor->setLineWrapMode(CodeEditor::NoWrap);
+    ui->splitter->addWidget(editor);
+
+    QObject::connect(editor, SIGNAL(textChanged()),
+                     this, SLOT(textChanged()));
+
+    /* Loading the splitter status */
+    QSettings appSettings;
+    appSettings.beginGroup("ConfigDocument");
+
+    if(!appSettings.value("textVisible", true).toBool())
+    {
+        editor->setVisible(false);
+        ui->textButton->setChecked(false);
+    }
+    else
+    {
+        ui->textButton->setChecked(true);
+    }
+    if(!appSettings.value("linesVisible", false).toBool())
+    {
+        ui->scrollArea->setVisible(false);
+        ui->linesButton->setChecked(false);
+    }
+    else
+    {
+        ui->linesButton->setChecked(true);
+    }
+
+    if(!appSettings.value("splitter", QByteArray()).toByteArray().isNull())
+        ui->splitter->restoreState(appSettings.value("splitter").toByteArray());
+
+    appSettings.endGroup();
 
     /* Populating the known keys list */
     QFile fin(":/resources/configkeys");
@@ -50,20 +86,29 @@ ConfigDocument::ConfigDocument(QMap<QString, QString>& settings, QString file,
             container->append(current.trimmed());
     }
 
-    QMap<QString, QString>::iterator i;
-    for(i = settings.begin(); i != settings.end(); i++)
-        if(i.key() != "themebase")
-            addRow(i.key(), i.value());
+    /* Loading the text file */
+    QFile finT(settings.value("configfile", ""));
+    if(finT.open(QFile::Text | QFile::ReadOnly))
+    {
+        editor->setPlainText(QString(finT.readAll()));
+        finT.close();
+    }
 
     saved = toPlainText();
 
     QObject::connect(ui->addKeyButton, SIGNAL(pressed()),
                      this, SLOT(addClicked()));
+
+    QObject::connect(ui->linesButton, SIGNAL(toggled(bool)),
+                     this, SLOT(buttonChecked()));
+    QObject::connect(ui->textButton, SIGNAL(toggled(bool)),
+                     this, SLOT(buttonChecked()));
 }
 
 ConfigDocument::~ConfigDocument()
 {
     delete ui;
+    editor->deleteLater();
 }
 
 void ConfigDocument::changeEvent(QEvent *e)
@@ -171,6 +216,15 @@ bool ConfigDocument::requestClose()
 
 QString ConfigDocument::toPlainText() const
 {
+    return editor->toPlainText();
+}
+
+void ConfigDocument::syncFromBoxes()
+{
+    if(block)
+        return;
+    blockUpdates();
+
     QString buffer = "";
 
     for(int i = 0; i < keys.count(); i++)
@@ -181,7 +235,61 @@ QString ConfigDocument::toPlainText() const
         buffer += "\n";
     }
 
-    return buffer;
+    editor->setPlainText(buffer);
+}
+
+void ConfigDocument::syncFromText()
+{
+    if(block)
+        return;
+
+    blockUpdates();
+
+    QStringList lines = editor->toPlainText().split("\n");
+    QList<QPair<QString, QString> > splits;
+    for(int i = 0; i < lines.count(); i++)
+    {
+        QString line = lines[i];
+        QStringList split = line.split(":");
+        if(split.count() != 2)
+            continue;
+
+        splits.append(QPair<QString, QString>(split[0].trimmed(),
+                                              split[1].trimmed()));
+    }
+
+    while(deleteButtons.count() > splits.count())
+    {
+        deleteButtons[0]->deleteLater();
+        keys[0]->deleteLater();
+        values[0]->deleteLater();
+        containers[0]->deleteLater();
+        labels[0]->deleteLater();
+
+        deleteButtons.removeAt(0);
+        keys.removeAt(0);
+        values.removeAt(0);
+        containers.removeAt(0);
+        labels.removeAt(0);
+    }
+
+    int initialCount = deleteButtons.count();
+    for(int i = 0; i < splits.count(); i++)
+    {
+        if(i >= initialCount)
+        {
+            addRow(splits[i].first, splits[i].second);
+        }
+        else
+        {
+            int index = keys[i]->findText(splits[i].first);
+            if(index != -1)
+                keys[i]->setCurrentIndex(index);
+            else
+                keys[i]->setEditText(splits[i].first);
+            values[i]->setText(splits[i].second);
+        }
+    }
 }
 
 void ConfigDocument::addRow(QString key, QString value)
@@ -215,11 +323,11 @@ void ConfigDocument::addRow(QString key, QString value)
     QObject::connect(delButton, SIGNAL(clicked()),
                      this, SLOT(deleteClicked()));
     QObject::connect(keyEdit, SIGNAL(currentIndexChanged(QString)),
-                     this, SLOT(textChanged()));
+                     this, SLOT(boxesChanged()));
     QObject::connect(keyEdit, SIGNAL(textChanged(QString)),
-                     this, SLOT(textChanged()));
+                     this, SLOT(boxesChanged()));
     QObject::connect(valueEdit, SIGNAL(textChanged(QString)),
-                     this, SLOT(textChanged()));
+                     this, SLOT(boxesChanged()));
 
     ui->configBoxes->addLayout(layout);
 
@@ -259,10 +367,34 @@ void ConfigDocument::addClicked()
     addRow(tr("Key"), tr("Value"));
 }
 
+void ConfigDocument::boxesChanged()
+{
+    syncFromBoxes();
+    contentsChanged();
+}
+
 void ConfigDocument::textChanged()
+{
+    syncFromText();
+    contentsChanged();
+}
+
+void ConfigDocument::contentsChanged()
 {
     if(toPlainText() != saved)
         emit titleChanged(title() + "*");
     else
         emit titleChanged(title());
+}
+
+void ConfigDocument::buttonChecked()
+{
+    editor->setVisible(ui->textButton->isChecked());
+    ui->scrollArea->setVisible(ui->linesButton->isChecked());
+
+    QSettings settings;
+    settings.beginGroup("ConfigDocument");
+    settings.setValue("textVisible", ui->textButton->isChecked());
+    settings.setValue("linesVisible", ui->linesButton->isChecked());
+    settings.endGroup();
 }

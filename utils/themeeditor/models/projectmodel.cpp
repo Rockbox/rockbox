@@ -39,6 +39,8 @@ ProjectModel::ProjectModel(QString config, EditorWindow* mainWindow,
     if(!cfg.isReadable())
         return;
 
+    settings.insert("configfile", config);
+
     QTextStream fin(&cfg);
 
     /* Storing the base directory */
