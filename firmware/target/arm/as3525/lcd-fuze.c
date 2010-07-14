@@ -46,11 +46,6 @@ static int xoffset = 20;
 
 /*** hardware configuration ***/
 
-void lcd_set_contrast(int val)
-{
-    (void)val;
-}
-
 void lcd_set_invert_display(bool yesno)
 {
     r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
