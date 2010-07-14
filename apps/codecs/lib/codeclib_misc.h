@@ -42,7 +42,7 @@
 /* 64 bit multiply */
 /* #include <sys/types.h> */
 
-#if ROCKBOX_LITTLE_ENDIAN == 1
+#ifdef ROCKBOX_LITTLE_ENDIAN
 union magic {
   struct {
     int32_t lo;
@@ -50,7 +50,7 @@ union magic {
   } halves;
   int64_t whole;
 };
-#elif ROCKBOX_BIG_ENDIAN == 1
+#elif defined(ROCKBOX_BIG_ENDIAN)
 union magic {
   struct {
     int32_t hi;
