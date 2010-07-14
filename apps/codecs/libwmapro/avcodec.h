@@ -47,6 +47,11 @@
 #define AV_TIME_BASE            1000000
 #define AV_TIME_BASE_Q          (AVRational){1, AV_TIME_BASE}
 
+/* some function declarations not used in rockbox use it */
+enum PixelFormat {
+    we_can_only_play_mpeg_video_anyway = -1
+};
+
 /**
  * Identifies the syntax and semantics of the bitstream.
  * The principle is roughly:
