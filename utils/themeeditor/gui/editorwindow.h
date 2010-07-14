@@ -67,6 +67,7 @@ private slots:
     void shiftTab(int index);
     bool closeTab(int index);
     void closeCurrent();
+    void closeProject();
     void saveCurrent();
     void saveCurrentAs();
     void openFile();

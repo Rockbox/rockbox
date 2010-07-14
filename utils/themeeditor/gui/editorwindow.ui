@@ -52,6 +52,7 @@
     <addaction name="actionOpen_Project"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Document"/>
+    <addaction name="actionClose_Project"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Document"/>
     <addaction name="actionSave_Document_As"/>
@@ -372,6 +373,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close Pro&amp;ject</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
    </property>
   </action>
  </widget>

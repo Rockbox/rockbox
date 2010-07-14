@@ -205,6 +205,8 @@ void EditorWindow::setupMenus()
 
     QObject::connect(ui->actionClose_Document, SIGNAL(triggered()),
                      this, SLOT(closeCurrent()));
+    QObject::connect(ui->actionClose_Project, SIGNAL(triggered()),
+                     this, SLOT(closeProject()));
 
     QObject::connect(ui->actionSave_Document, SIGNAL(triggered()),
                      this, SLOT(saveCurrent()));
@@ -347,6 +349,31 @@ void EditorWindow::closeCurrent()
     closeTab(ui->editorTabs->currentIndex());
 }
 
+void EditorWindow::closeProject()
+{
+    if(project)
+    {
+        project->deleteLater();
+        project = 0;
+    }
+
+    for(int i = 0; i < ui->editorTabs->count(); i++)
+    {
+        TabContent* doc = dynamic_cast<TabContent*>
+                          (ui->editorTabs->widget(i));
+        if(doc->type() == TabContent::Skin)
+        {
+            dynamic_cast<SkinDocument*>(doc)->setProject(project);
+            if(i == ui->editorTabs->currentIndex())
+            {
+                viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+            }
+        }
+    }
+
+    ui->actionClose_Project->setEnabled(false);
+}
+
 void EditorWindow::saveCurrent()
 {
     if(ui->editorTabs->currentIndex() >= 0)
@@ -401,7 +428,9 @@ void EditorWindow::openProject()
     {
 
         if(project)
-            delete project;
+            project->deleteLater();
+
+        ui->actionClose_Project->setEnabled(true);
 
         project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);
