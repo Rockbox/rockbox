@@ -33,6 +33,10 @@ vox.c
 wav64.c
 tta.c
 
+#if MEMORYSIZE > 2
+wmapro.c
+#endif
+
 #ifdef HAVE_RECORDING
 
 /* encoders */
