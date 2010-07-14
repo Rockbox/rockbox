@@ -26,13 +26,16 @@
 
 #include "avutil.h"
 #include "log.h"
+/* disable sprintf functions */
+#define snprintf(...)
+#define vsnprintf snprintf
 
 #if LIBAVUTIL_VERSION_MAJOR > 50
 static
 #endif
 int av_log_level = AV_LOG_INFO;
 
-void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
+void av_log_default_callback(void* ptr, int level)
 {
     static int print_prefix=1;
     static int count;
@@ -61,9 +64,9 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
     strcpy(prev, line);
 }
 
-static void (*av_log_callback)(void*, int, const char*, va_list) = av_log_default_callback;
+static void (*av_log_callback)(void*, int = av_log_default_callback;
 
-void av_log(void* avcl, int level, const char *fmt, ...)
+void av_log(void* avcl, int level)
 {
     va_list vl;
     va_start(vl, fmt);

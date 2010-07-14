@@ -4,6 +4,7 @@
 #include "../lib/mdct_lookup.h" /* for revtab */
 #include "../lib/fft.h"     /* for FFT data structures */
 #include "codeclib.h"
+#define ROCKBOX_BIG_ENDIAN 0
 #include "../lib/codeclib_misc.h" /* for XNPROD31 */
 #include "wmapro_math.h"
 

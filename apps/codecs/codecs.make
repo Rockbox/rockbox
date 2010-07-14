@@ -37,6 +37,7 @@ include $(APPSDIR)/codecs/libspeex/libspeex.make
 include $(APPSDIR)/codecs/libtremor/libtremor.make
 include $(APPSDIR)/codecs/libwavpack/libwavpack.make
 include $(APPSDIR)/codecs/libwma/libwma.make
+include $(APPSDIR)/codecs/libwmapro/libwmapro.make
 include $(APPSDIR)/codecs/libcook/libcook.make
 include $(APPSDIR)/codecs/librm/librm.make
 include $(APPSDIR)/codecs/libatrac/libatrac.make
@@ -58,7 +59,7 @@ CODEC_CRT0 := $(CODECDIR)/codec_crt0.o
 CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \
 	$(FAADLIB) $(FFMPEGFLACLIB) $(M4ALIB) $(MADLIB) $(MUSEPACKLIB) \
 	$(SPCLIB) $(SPEEXLIB) $(TREMORLIB) $(WAVPACKLIB) $(WMALIB) $(COOKLIB) \
-	$(ATRACLIB) \
+	$(ATRACLIB) $(WMAPROLIB) \
 	$(CODECLIB)
 
 $(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS)
@@ -83,6 +84,7 @@ $(CODECDIR)/shorten.codec : $(CODECDIR)/libffmpegFLAC.a
 $(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a
 $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
 $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
+$(CODECDIR)/wmapro.codec : $(CODECDIR)/libwmapro.a $(CODECDIR)/libasf.a
 $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
 $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
 $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a

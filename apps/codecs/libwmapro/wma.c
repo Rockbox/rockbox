@@ -467,7 +467,8 @@ unsigned int ff_wma_get_large_val(GetBitContext* gb)
  * @param coef_nb_bits number of bits for escaped level codes
  * @return 0 on success, -1 otherwise
  */
-int ff_wma_run_level_decode(AVCodecContext* avctx, GetBitContext* gb,
+#define av_log(...)
+int ff_wma_run_level_decode(GetBitContext* gb,
                             VLC *vlc,
                             const int32_t *level_table, const uint16_t *run_table,
                             int version, int32_t *ptr, int offset,

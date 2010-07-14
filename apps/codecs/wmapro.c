@@ -28,7 +28,7 @@ CODEC_HEADER
 #define MAXSAMPLES  (1L << 12)  /* Max number of samples in a wma pro subframe */
 #define MAXCHANNELS 8
 #define BUFSIZE     MAXCHANNELS * MAXSAMPLES
-static int32_t decoded[BUFSIZE] IBSS_ATTR;
+int32_t decoded[BUFSIZE];
 
 AVCodecContext avctx;
 AVPacket avpkt;

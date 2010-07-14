@@ -103,13 +103,13 @@ int64_t av_rescale_rnd(int64_t a, int64_t b, int64_t c, enum AVRounding rnd){
         a0 = a0*b0 + t1a;
         a1 = a1*b1 + (t1>>32) + (a0<t1a);
         a0 += r;
-        a1 += a0<r;
+        a1 += a0<(unsigned)r;
 
         for(i=63; i>=0; i--){
 //            int o= a1 & 0x8000000000000000ULL;
             a1+= a1 + ((a0>>i)&1);
             t1+=t1;
-            if(/*o || */c <= a1){
+            if(/*o || */(unsigned)c <= a1){
                 a1 -= c;
                 t1++;
             }

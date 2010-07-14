@@ -103,6 +103,13 @@
 /* Uncomment the following line to enable some debug output */
 //#define WMAPRO_DUMP_CTX_EN
 
+#undef DEBUGF
+#ifdef WMAPRO_DUMP_CTX_EN
+#	define DEBUGF printf
+#else
+#	define DEBUGF(...)
+#endif
+
 /* Some defines to make it compile */
 #define AVERROR_INVALIDDATA  -1
 #define AVERROR_PATCHWELCOME -2
@@ -177,7 +184,6 @@ typedef struct {
 typedef struct WMAProDecodeCtx {
     /* generic decoder variables */
     AVCodecContext*  avctx;                         ///< codec context for av_log
-    DSPContext       dsp;                           ///< accelerated DSP functions
     uint8_t          frame_data[MAX_FRAMESIZE +
                       FF_INPUT_BUFFER_PADDING_SIZE];///< compressed frame data
     PutBitContext    pb;                            ///< context for filling the frame_data buffer
@@ -236,6 +242,8 @@ typedef struct WMAProDecodeCtx {
     WMAProChannelCtx channel[WMAPRO_MAX_CHANNELS];  ///< per channel data
 } WMAProDecodeCtx;
 
+/* static decode context, to avoid malloc */
+static WMAProDecodeCtx globWMAProDecCtx;
 
 /**
  *@brief helper function to print the most important members of the context
@@ -264,7 +272,7 @@ static void av_cold dump_context(WMAProDecodeCtx *s)
  */
 av_cold int decode_init(AVCodecContext *avctx)
 {
-    avctx->priv_data = malloc(sizeof(WMAProDecodeCtx));
+    avctx->priv_data = &globWMAProDecCtx;
     memset(avctx->priv_data, 0, sizeof(WMAProDecodeCtx));
     WMAProDecodeCtx *s = avctx->priv_data;
     uint8_t *edata_ptr = avctx->extradata;
@@ -276,8 +284,6 @@ av_cold int decode_init(AVCodecContext *avctx)
     s->avctx = avctx;
     init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
 
-    avctx->sample_fmt = SAMPLE_FMT_FLT;
-
     if (avctx->extradata_size >= 18) {
         s->decode_flags    = AV_RL16(edata_ptr+14);
         channel_mask       = AV_RL32(edata_ptr+2);
@@ -288,7 +294,7 @@ av_cold int decode_init(AVCodecContext *avctx)
         dprintf(avctx, "\n");
 
     } else {
-        av_log_ask_for_sample(avctx, "Unknown extradata size\n");
+        DEBUGF("Unknown extradata size\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -301,7 +307,7 @@ av_cold int decode_init(AVCodecContext *avctx)
     s->len_prefix  = (s->decode_flags & 0x40);
 
     if (!s->len_prefix) {
-        av_log_ask_for_sample(avctx, "no length prefix\n");
+        DEBUGF("no length prefix\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -325,7 +331,7 @@ av_cold int decode_init(AVCodecContext *avctx)
     s->dynamic_range_compression = (s->decode_flags & 0x80);
 
     if (s->max_num_subframes > MAX_SUBFRAMES) {
-        av_log(avctx, AV_LOG_ERROR, "invalid number of subframes %i\n",
+        DEBUGF("invalid number of subframes %i\n",
                s->max_num_subframes);
         return AVERROR_INVALIDDATA;
     }
@@ -344,10 +350,10 @@ av_cold int decode_init(AVCodecContext *avctx)
     }
 
     if (s->num_channels < 0) {
-        av_log(avctx, AV_LOG_ERROR, "invalid number of channels %d\n", s->num_channels);
+        DEBUGF("invalid number of channels %d\n", s->num_channels);
         return AVERROR_INVALIDDATA;
     } else if (s->num_channels > WMAPRO_MAX_CHANNELS) {
-        av_log_ask_for_sample(avctx, "unsupported number of channels\n");
+        DEBUGF("unsupported number of channels\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -437,8 +443,6 @@ av_cold int decode_init(AVCodecContext *avctx)
 #ifdef WMAPRO_DUMP_CTX_EN
     dump_context(s);
 #endif
-
-    avctx->channel_layout = channel_mask;
     return 0;
 }
 
@@ -469,7 +473,7 @@ static int decode_subframe_length(WMAProDecodeCtx *s, int offset)
     /** sanity check the length */
     if (subframe_len < s->min_samples_per_subframe ||
         subframe_len > s->samples_per_frame) {
-        av_log(s->avctx, AV_LOG_ERROR, "broken frame: subframe_len %i\n",
+        DEBUGF("broken frame: subframe_len %i\n",
                subframe_len);
         return AVERROR_INVALIDDATA;
     }
@@ -546,16 +550,15 @@ static int decode_tilehdr(WMAProDecodeCtx *s)
             WMAProChannelCtx* chan = &s->channel[c];
 
             if (contains_subframe[c]) {
-                if (chan->num_subframes >= MAX_SUBFRAMES) {
-                    av_log(s->avctx, AV_LOG_ERROR,
-                           "broken frame: num subframes > 31\n");
+                if (chan->num_subframes >= MAX_SUBFRAMES) { 
+                    DEBUGF("broken frame: num subframes > 31\n");
                     return AVERROR_INVALIDDATA;
                 }
                 chan->subframe_len[chan->num_subframes] = subframe_len;
                 num_samples[c] += subframe_len;
                 ++chan->num_subframes;
                 if (num_samples[c] > s->samples_per_frame) {
-                    av_log(s->avctx, AV_LOG_ERROR, "broken frame: "
+                    DEBUGF("broken frame: "
                            "channel len > samples_per_frame\n");
                     return AVERROR_INVALIDDATA;
                 }
@@ -674,8 +677,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
         int remaining_channels = s->channels_for_cur_subframe;
 
         if (get_bits1(&s->gb)) {
-            av_log_ask_for_sample(s->avctx,
-                                  "unsupported channel transform bit\n");
+                                 DEBUGF("unsupported channel transform bit\n");
             return AVERROR_INVALIDDATA;
         }
 
@@ -711,8 +713,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
             if (chgroup->num_channels == 2) {
                 if (get_bits1(&s->gb)) {
                     if (get_bits1(&s->gb)) {
-                        av_log_ask_for_sample(s->avctx,
-                                              "unsupported channel transform type\n");
+                        DEBUGF("unsupported channel transform type\n");
                     }
                 } else {
                     chgroup->transform = 1;
@@ -730,7 +731,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                     }
                 }
             } else if (chgroup->num_channels > 2) {
-            	LOGF("in wmaprodec.c: Multichannel streams still not supported\n");
+            	DEBUGF("in wmaprodec.c: Multichannel streams still not supported\n");
             	return -1;
 #if 0
                 if (get_bits1(&s->gb)) {
@@ -857,7 +858,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
         memset(&ci->coeffs[cur_coeff], 0,
                sizeof(*ci->coeffs) * (s->subframe_len - cur_coeff));
                       
-        if (ff_wma_run_level_decode(s->avctx, &s->gb, vlc,
+        if (ff_wma_run_level_decode(&s->gb, vlc,
                                     level, run, 1, ci->coeffs,
                                     cur_coeff, s->subframe_len,
                                     s->subframe_len, s->esc_len, 0))
@@ -937,8 +938,7 @@ static int decode_scale_factors(WMAProDecodeCtx* s)
 
                     i += skip;
                     if (i >= s->num_bands) {
-                        av_log(s->avctx, AV_LOG_ERROR,
-                               "invalid scale factor coding\n");
+                           DEBUGF("invalid scale factor coding\n");
                         return AVERROR_INVALIDDATA;
                     }
                     s->channel[c].scale_factors[i] += (val ^ sign) - sign;
@@ -1137,7 +1137,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
 
         if (num_fill_bits >= 0) {
             if (get_bits_count(&s->gb) + num_fill_bits > s->num_saved_bits) {
-                av_log(s->avctx, AV_LOG_ERROR, "invalid number of fill bits\n");
+                DEBUGF("invalid number of fill bits\n");
                 return AVERROR_INVALIDDATA;
             }
 
@@ -1147,7 +1147,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
 
     /** no idea for what the following bit is used */
     if (get_bits1(&s->gb)) {
-        av_log_ask_for_sample(s->avctx, "reserved bit set\n");
+        DEBUGF("reserved bit set\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -1165,7 +1165,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
         int quant_step = 90 * s->bits_per_sample >> 4;
         if ((get_bits1(&s->gb))) {
             /** FIXME: might change run level mode decision */
-            av_log_ask_for_sample(s->avctx, "unsupported quant step coding\n");
+            DEBUGF("unsupported quant step coding\n");
             return AVERROR_INVALIDDATA;
         }
         /** decode quantization step */
@@ -1181,7 +1181,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
             quant_step += ((quant + step) ^ sign) - sign;
         }
         if (quant_step < 0) {
-            av_log(s->avctx, AV_LOG_DEBUG, "negative quant step\n");
+            DEBUGF("negative quant step\n");
         }
 
         /** decode quantization step modifiers for every channel */
@@ -1245,7 +1245,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
                             s->channel[c].scale_factor_step;
                 
                 if(exp < EXP_MIN || exp > EXP_MAX) {
-                    LOGF("in wmaprodec.c : unhandled value for exp, please report sample.\n");
+                    DEBUGF("in wmaprodec.c : unhandled value for exp, please report sample.\n");
                     return -1;
                 }
                 const FIXED quant = QUANT(exp);
@@ -1272,7 +1272,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
     for (i = 0; i < s->channels_for_cur_subframe; i++) {
         int c = s->channel_indexes_for_cur_subframe[i];
         if (s->channel[c].cur_subframe >= s->channel[c].num_subframes) {
-            av_log(s->avctx, AV_LOG_ERROR, "broken subframe\n");
+            DEBUGF("broken subframe\n");
             return AVERROR_INVALIDDATA;
         }
         ++s->channel[c].cur_subframe;
@@ -1297,8 +1297,7 @@ static int decode_frame(WMAProDecodeCtx *s)
     /** check for potential output buffer overflow */
     if (s->num_channels * s->samples_per_frame > s->samples_end - s->samples) {
         /** return an error if no frame could be decoded at all */
-        av_log(s->avctx, AV_LOG_ERROR,
-               "not enough space for the output samples\n");
+           DEBUGF("not enough space for the output samples\n");
         s->packet_loss = 1;
         return 0;
     }
@@ -1317,7 +1316,7 @@ static int decode_frame(WMAProDecodeCtx *s)
 
     /** read postproc transform */
     if (s->num_channels > 1 && get_bits1(gb)) {
-        av_log_ask_for_sample(s->avctx, "Unsupported postproc transform found\n");
+        DEBUGF("Unsupported postproc transform found\n");
         s->packet_loss = 1;
         return 0;
     }
@@ -1391,7 +1390,7 @@ static int decode_frame(WMAProDecodeCtx *s)
 
     if (len != (get_bits_count(gb) - s->frame_offset) + 2) {
         /** FIXME: not sure if this is always an error */
-        av_log(s->avctx, AV_LOG_ERROR, "frame[%i] would have to skip %i bits\n",
+        DEBUGF("frame[%i] would have to skip %i bits\n",
                (int)s->frame_num, len - (get_bits_count(gb) - s->frame_offset) - 1);
         s->packet_loss = 1;
         return 0;
@@ -1443,7 +1442,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
     buflen = (s->num_saved_bits + len + 8) >> 3;
 
     if (len <= 0 || buflen > MAX_FRAMESIZE) {
-        av_log_ask_for_sample(s->avctx, "input buffer too small\n");
+        DEBUGF("input buffer too small\n");
         s->packet_loss = 1;
         return;
     }
@@ -1516,7 +1515,7 @@ int decode_packet(AVCodecContext *avctx,
         if (!s->packet_loss &&
             ((s->packet_sequence_number + 1) & 0xF) != packet_sequence_number) {
             s->packet_loss = 1;
-            av_log(avctx, AV_LOG_ERROR, "Packet loss detected! seq %x vs %x\n",
+            DEBUGF("Packet loss detected! seq %x vs %x\n",
                    s->packet_sequence_number, packet_sequence_number);
         }
         s->packet_sequence_number = packet_sequence_number;

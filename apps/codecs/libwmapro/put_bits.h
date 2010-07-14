@@ -37,7 +37,7 @@
 
 //#define ALT_BITSTREAM_WRITER
 //#define ALIGNED_BITSTREAM_WRITER
-
+#define HAVE_FAST_UNALIGNED 0
 /* buf and buf_end must be present and used by every alternative writer. */
 typedef struct PutBitContext {
 #ifdef ALT_BITSTREAM_WRITER

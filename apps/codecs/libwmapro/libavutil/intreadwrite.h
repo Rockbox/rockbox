@@ -52,24 +52,10 @@ typedef union {
  * as inline functions.
  */
 
-#if   ARCH_ARM
-#   include "arm/intreadwrite.h"
-#elif ARCH_AVR32
-#   include "avr32/intreadwrite.h"
-#elif ARCH_MIPS
-#   include "mips/intreadwrite.h"
-#elif ARCH_PPC
-#   include "ppc/intreadwrite.h"
-#elif ARCH_TOMI
-#   include "tomi/intreadwrite.h"
-#elif ARCH_X86
-#   include "x86/intreadwrite.h"
-#endif
-
 /*
  * Map AV_RNXX <-> AV_R[BL]XX for all variants provided by per-arch headers.
  */
-
+#define HAVE_BIGENDIAN 0
 #if HAVE_BIGENDIAN
 
 #   if    defined(AV_RN16) && !defined(AV_RB16)
@@ -172,6 +158,8 @@ typedef union {
 
 #endif /* !HAVE_BIGENDIAN */
 
+#define HAVE_ATTRIBUTE_PACKED 0
+#define HAVE_FAST_UNALIGNED 0
 /*
  * Define AV_[RW]N helper macros to simplify definitions not provided
  * by per-arch headers.

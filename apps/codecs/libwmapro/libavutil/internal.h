@@ -55,7 +55,8 @@
 #endif
 
 #ifndef av_alias
-#if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
+//#if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
+#if 0
 #   define av_alias __attribute__((may_alias))
 #else
 #   define av_alias
@@ -106,7 +107,8 @@
 #define LABEL_MANGLE(a) EXTERN_PREFIX #a
 
 // Use rip-relative addressing if compiling PIC code on x86-64.
-#if ARCH_X86_64 && defined(PIC)
+//#if ARCH_X86_64 && defined(PIC)
+#if 0
 #    define LOCAL_MANGLE(a) #a "(%%rip)"
 #else
 #    define LOCAL_MANGLE(a) #a
@@ -127,7 +129,8 @@
 
 /* math */
 
-#if ARCH_X86
+//#if ARCH_X86
+#if 0
 #define MASK_ABS(mask, level)\
             __asm__ volatile(\
                 "cltd                   \n\t"\
@@ -198,10 +201,10 @@
  * without modification. Used to disable the definition of strings
  * (for example AVCodec long_names).
  */
-#if CONFIG_SMALL
-#   define NULL_IF_CONFIG_SMALL(x) NULL
-#else
-#   define NULL_IF_CONFIG_SMALL(x) x
-#endif
+//#if CONFIG_SMALL
+//#   define NULL_IF_CONFIG_SMALL(x) NULL
+//#else
+//#   define NULL_IF_CONFIG_SMALL(x) x
+//#endif
 
 #endif /* AVUTIL_INTERNAL_H */
