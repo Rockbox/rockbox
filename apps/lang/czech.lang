@@ -926,11 +926,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Zapnout EQ"
+    swcodec: "Zapnutí EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Zapnout ekvalizér"
+    swcodec: "Zapnutí ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -947,7 +947,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Grafický ekvalizér, neozvučené"
+    swcodec: "Grafický ekvalizér, neozvučitelné"
   </voice>
 </phrase>
 <phrase>
@@ -7137,7 +7137,7 @@
     *: "Zobrazit informace o skladbě"
   </dest>
   <voice>
-    *: "Zobrazit informace o skladbě"
+    *: "Zobrazit informace o skladbě, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -8426,7 +8426,7 @@
     *: ""
   </dest>
   <voice>
-    *: "0"
+    *: "nula"
   </voice>
 </phrase>
 <phrase>
@@ -8440,7 +8440,7 @@
     *: ""
   </dest>
   <voice>
-    *: "1"
+    *: "jedna"
   </voice>
 </phrase>
 <phrase>
@@ -8454,7 +8454,7 @@
     *: ""
   </dest>
   <voice>
-    *: "2"
+    *: "dva"
   </voice>
 </phrase>
 <phrase>
@@ -8902,7 +8902,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milisekunda"
+    *: "milisekund"
   </voice>
 </phrase>
 <phrase>
@@ -9504,7 +9504,7 @@
     *: ""
   </dest>
   <voice>
-    *: "soubor"
+    *: "soubor, "
   </voice>
 </phrase>
 <phrase>
@@ -9518,7 +9518,7 @@
     *: ""
   </dest>
   <voice>
-    *: "složka"
+    *: "složka, "
   </voice>
 </phrase>
 <phrase>
@@ -9532,7 +9532,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "audio soubor, "
   </voice>
 </phrase>
 <phrase>
@@ -9546,7 +9546,7 @@
     *: ""
   </dest>
   <voice>
-    *: "konfigurace"
+    *: "konfigurační soubor, "
   </voice>
 </phrase>
 <phrase>
@@ -9560,7 +9560,7 @@
     *: ""
   </dest>
   <voice>
-    *: "téma"
+    *: "soubor tématu, "
   </voice>
 </phrase>
 <phrase>
@@ -9574,7 +9574,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plagin"
+    *: "plagin, "
   </voice>
 </phrase>
 <phrase>
@@ -9588,7 +9588,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "font, "
   </voice>
 </phrase>
 <phrase>
@@ -9602,7 +9602,7 @@
     *: ""
   </dest>
   <voice>
-    *: "záložka"
+    *: "záložka, "
   </voice>
 </phrase>
 <phrase>
@@ -9616,7 +9616,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmvér"
+    *: "firmvér, "
   </voice>
 </phrase>
 <phrase>
@@ -9633,7 +9633,7 @@
   </dest>
   <voice>
     *: none
-    remote: "téma dálkového ovládání"
+    remote: "soubor tématu dálkového ovládání, "
   </voice>
 </phrase>
 <phrase>
@@ -9647,7 +9647,7 @@
     *: ""
   </dest>
   <voice>
-    *: "klávesnice"
+    *: "soubor klávesnice, "
   </voice>
 </phrase>
 <phrase>
@@ -9661,7 +9661,7 @@
      *: ""
   </dest>
   <voice>
-    *: "kjůšít"
+    *: "soubor kjůšít, "
   </voice>
 </phrase>
 <phrase>
@@ -10322,7 +10322,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Barvy, neozvučené"
+    lcd_color: "Barvy, neozvučitelné"
   </voice>
 </phrase>
 <phrase>
@@ -11123,7 +11123,7 @@
     *: "Zásluhy"
   </dest>
   <voice>
-    *: "Zásluhy, neozvučené"
+    *: "Zásluhy, neozvučitelné"
   </voice>
 </phrase>
 <phrase>
@@ -12477,6 +12477,70 @@
     *: "Plugin PictureFlow"
   </dest>
   <voice>
-    *: "Plagin pikčrflou, neozvučeno"
+    *: "Plagin pikčrflou, neozvučitelné"
+  </voice>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OUKEJ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Mazat"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Mazat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Zrušit"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Zrušit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Aktualizovat při zastavení"
+  </dest>
+  <voice>
+    *: "Aktualizovat při zastavení"
   </voice>
 </phrase>
