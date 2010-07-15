@@ -22,6 +22,8 @@
 #ifndef __SYSTEM_TARGET_H_
 #define __SYSTEM_TARGET_H_
 
+#include <inttypes.h>
+
 #include "config.h"
 #include "jz4740.h"
 #include "mipsregs.h"
@@ -72,9 +74,27 @@ static inline void restore_interrupt(int status)
 #define disable_irq_save()     disable_interrupt_save(ST0_IE)
 #define restore_irq(c0_status) restore_interrupt(c0_status)
 
-#define swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
-#define swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | \
-                   ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
+static inline uint16_t swap16(uint16_t value)
+    /*
+      result[15..8] = value[ 7..0];
+      result[ 7..0] = value[15..8];
+    */
+{
+    return (value >> 8) | (value << 8);
+}
+
+static inline uint32_t swap32(uint32_t value)
+    /*
+      result[31..24] = value[ 7.. 0];
+      result[23..16] = value[15.. 8];
+      result[15.. 8] = value[23..16];
+      result[ 7.. 0] = value[31..24];
+    */
+{
+    uint32_t hi = swap16(value >> 16);
+    uint32_t lo = swap16(value & 0xffff);
+    return (lo << 16) | hi;
+}
 
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
 #define UNCACHED_ADDR(x)          UNCACHED_ADDRESS((x))
