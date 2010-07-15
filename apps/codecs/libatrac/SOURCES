@@ -2,4 +2,4 @@ atrac3.c
 #if defined(CPU_ARM)
 atrac3_arm.S
 #endif
-../lib/ffmpeg_bitstream.c
+

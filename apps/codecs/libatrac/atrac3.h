@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "ffmpeg_bitstream.h"
+#include "ffmpeg_get_bits.h"
 #include "../librm/rm.h"
 #include "codeclib.h"
 
