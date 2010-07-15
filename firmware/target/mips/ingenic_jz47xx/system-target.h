@@ -32,6 +32,9 @@
 #define CACHE_LINE_SIZE  32
 #include "mmu-mips.h"
 
+/* no optimized byteswap functions implemented for mips, yet */
+#define NEED_GENERIC_BYTESWAPS
+
 /* This one returns the old status */
 static inline int set_interrupt_status(int status, int mask)
 {
@@ -73,29 +76,6 @@ static inline void restore_interrupt(int status)
 #define set_irq_level(status)  set_interrupt_status((status), ST0_IE)
 #define disable_irq_save()     disable_interrupt_save(ST0_IE)
 #define restore_irq(c0_status) restore_interrupt(c0_status)
-
-static inline uint16_t swap16(uint16_t value)
-    /*
-      result[15..8] = value[ 7..0];
-      result[ 7..0] = value[15..8];
-    */
-{
-    return (value >> 8) | (value << 8);
-}
-
-static inline uint32_t swap32(uint32_t value)
-    /*
-      result[31..24] = value[ 7.. 0];
-      result[23..16] = value[15.. 8];
-      result[15.. 8] = value[23..16];
-      result[ 7.. 0] = value[31..24];
-    */
-{
-    uint32_t hi = swap16(value >> 16);
-    uint32_t lo = swap16(value & 0xffff);
-    return (lo << 16) | hi;
-}
-
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
 #define UNCACHED_ADDR(x)          UNCACHED_ADDRESS((x))
 #define PHYSADDR(x)               ((x) & 0x1fffffff)

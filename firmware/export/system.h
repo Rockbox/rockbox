@@ -241,9 +241,10 @@ enum {
 #include "system-target.h"
 #elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"
+#define NEED_GENERIC_BYTESWAPS
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#ifdef NEED_GENERIC_BYTESWAPS
 static inline uint16_t swap16(uint16_t value)
     /*
       result[15..8] = value[ 7..0];
@@ -276,7 +277,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return (t >> 8) | ((t ^ value) << 8);
 }
 
-#endif /* PLATFORM_HOSTED */
+#endif /* NEED_GENERIC_BYTESWAPS */
 
 #ifndef BIT_N
 #define BIT_N(n) (1U << (n))
