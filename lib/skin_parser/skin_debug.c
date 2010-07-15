@@ -70,6 +70,9 @@ void skin_error(enum skin_errorcode error)
     case INT_EXPECTED:
         error_message =  "Expected integer";
         break;
+    case DECIMAL_EXPECTED:
+        error_message =  "Expected decimal";
+        break;
     case SEPERATOR_EXPECTED:
         error_message = "Expected argument seperator";
         break;
@@ -236,8 +239,13 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
             printf("[%s]", params[i].data.text);
             break;
 
-        case NUMERIC:
-            printf("[%d]", params[i].data.numeric);
+        case INTEGER:
+            printf("[%d]", params[i].data.number);
+            break;
+            
+        case DECIMAL:
+            printf("[%d.%d]", params[i].data.number/10,
+                              params[i].data.number%10);
             break;
 
         case CODE:

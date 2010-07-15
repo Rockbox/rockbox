@@ -225,7 +225,7 @@ QVariant DeviceState::data(QString tag, int paramCount,
         QString path = tag[0].isLower()
                        ? data("file").toString() : data("nextfile").toString();
         if(paramCount > 0)
-            return directory(path, params[0].data.numeric);
+            return directory(path, params[0].data.number);
         else
             return QVariant();
     }
@@ -255,7 +255,7 @@ QVariant DeviceState::data(QString tag, int paramCount,
     else if(tag == "pS")
     {
         double threshhold = paramCount > 0
-                            ? std::atof(params[0].data.text) : 10;
+                            ? params[0].data.number / 10. : 10;
         if(data("?pc").toDouble() <= threshhold)
             return true;
         else
@@ -264,7 +264,7 @@ QVariant DeviceState::data(QString tag, int paramCount,
     else if(tag == "pE")
     {
         double threshhold = paramCount > 0
-                            ? std::atof(params[0].data.text) : 10;
+                            ? params[0].data.number / 10. : 10;
         if(data("?pt").toDouble() - data("?pc").toDouble() <= threshhold)
             return true;
         else

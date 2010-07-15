@@ -246,8 +246,12 @@ QString ParseTreeNode::genCode() const
             }
             break;
 
-        case skin_tag_parameter::NUMERIC:
-            buffer.append(QString::number(param->data.numeric, 10));
+        case skin_tag_parameter::INTEGER:
+            buffer.append(QString::number(param->data.number, 10));
+            break;
+
+        case skin_tag_parameter::DECIMAL:
+            buffer.append(QString::number(param->data.number / 10., 'f', 1));
             break;
 
         case skin_tag_parameter::DEFAULT:
@@ -318,8 +322,8 @@ int ParseTreeNode::genHash() const
         case skin_tag_parameter::CODE:
             break;
 
-        case skin_tag_parameter::NUMERIC:
-            hash += param->data.numeric * (param->data.numeric / 4);
+        case skin_tag_parameter::INTEGER:
+            hash += param->data.number * (param->data.number / 4);
             break;
 
         case skin_tag_parameter::STRING:
@@ -330,6 +334,10 @@ int ParseTreeNode::genHash() const
                 else
                     hash += param->data.text[i];
             }
+            break;
+
+        case skin_tag_parameter::DECIMAL:
+            hash += param->data.number;
             break;
         }
     }
@@ -396,8 +404,11 @@ QVariant ParseTreeNode::data(int column) const
             case skin_tag_parameter::STRING:
                 return QObject::tr("String");
 
-            case skin_tag_parameter::NUMERIC:
-                return QObject::tr("Number");
+            case skin_tag_parameter::INTEGER:
+                return QObject::tr("Integer");
+
+            case skin_tag_parameter::DECIMAL:
+                return QObject::tr("Decimal");
 
             case skin_tag_parameter::DEFAULT:
                 return QObject::tr("Default Argument");
@@ -445,11 +456,15 @@ QVariant ParseTreeNode::data(int column) const
             case skin_tag_parameter::STRING:
                 return QString(param->data.text);
 
-            case skin_tag_parameter::NUMERIC:
-                return QString::number(param->data.numeric, 10);
+            case skin_tag_parameter::INTEGER:
+                return QString::number(param->data.number, 10);
+
+            case skin_tag_parameter::DECIMAL:
+                return QString::number(param->data.number / 10., 'f', 1);
 
             case skin_tag_parameter::CODE:
                 return QObject::tr("Seriously, something's wrong here");
+
             }
         }
         else
@@ -742,10 +757,10 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             id = element->params[0].data.text;
             filename = info.settings()->value("imagepath", "") + "/" +
                        element->params[1].data.text;
-            x = element->params[2].data.numeric;
-            y = element->params[3].data.numeric;
+            x = element->params[2].data.number;
+            y = element->params[3].data.number;
             if(element->params_count > 4)
-                tiles = element->params[4].data.numeric;
+                tiles = element->params[4].data.number;
             else
                 tiles = 1;
 
@@ -758,8 +773,8 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             id = element->params[0].data.text;
             filename = info.settings()->value("imagepath", "") + "/" +
                        element->params[1].data.text;
-            x = element->params[2].data.numeric;
-            y = element->params[3].data.numeric;
+            x = element->params[2].data.number;
+            y = element->params[3].data.number;
             image = new RBImage(filename, 1, x, y, viewport);
             info.screen()->loadImage(id, new RBImage(filename, 1, x, y,
                                                      viewport));
@@ -780,10 +795,10 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         case 'l':
             /* %Cl */
-            x = element->params[0].data.numeric;
-            y = element->params[1].data.numeric;
-            maxWidth = element->params[2].data.numeric;
-            maxHeight = element->params[3].data.numeric;
+            x = element->params[0].data.number;
+            y = element->params[1].data.number;
+            maxWidth = element->params[2].data.number;
+            maxHeight = element->params[3].data.number;
             hAlign = element->params_count > 4
                      ? element->params[4].data.text[0] : 'c';
             vAlign = element->params_count > 5
@@ -805,7 +820,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         case 'l':
             /* %Fl */
-            x = element->params[0].data.numeric;
+            x = element->params[0].data.number;
             filename = info.settings()->value("themebase", "") + "/fonts/" +
                        element->params[1].data.text;
             info.screen()->loadFont(x, new RBFont(filename));
@@ -822,10 +837,10 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             /* %T */
             if(element->params_count < 5)
                 return false;
-            int x = element->params[0].data.numeric;
-            int y = element->params[1].data.numeric;
-            int width = element->params[2].data.numeric;
-            int height = element->params[3].data.numeric;
+            int x = element->params[0].data.number;
+            int y = element->params[1].data.number;
+            int width = element->params[2].data.number;
+            int height = element->params[3].data.number;
             QString action(element->params[4].data.text);
             RBTouchArea* temp = new RBTouchArea(width, height, action, info);
             temp->setPos(x, y);
@@ -863,7 +878,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         case 'p':
             /* %Vp */
-            viewport->showPlaylist(info, element->params[0].data.numeric,
+            viewport->showPlaylist(info, element->params[0].data.number,
                                    element->params[1].data.code,
                                    element->params[2].data.code);
             return true;
@@ -1016,7 +1031,7 @@ double ParseTreeNode::findBranchTime(ParseTreeNode *branch,
             if(current->element->tag->name[0] == 't'
                && current->element->tag->name[1] == '\0')
             {
-                retval = atof(current->element->params[0].data.text);
+                retval = current->element->params[0].data.number / 10.;
             }
         }
         else if(current->element->type == CONDITIONAL)

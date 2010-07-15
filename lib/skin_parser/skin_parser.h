@@ -56,6 +56,7 @@ enum skin_errorcode
     UNEXPECTED_NEWLINE,
     INSUFFICIENT_ARGS,
     INT_EXPECTED,
+    DECIMAL_EXPECTED,
     SEPERATOR_EXPECTED,
     CLOSE_EXPECTED,
     MULTILINE_EXPECTED
@@ -66,7 +67,8 @@ struct skin_tag_parameter
 {
     enum
     {
-        NUMERIC,
+        INTEGER,
+        DECIMAL, /* stored in data.number as (whole*10)+part */
         STRING,
         CODE,
         DEFAULT
@@ -74,7 +76,7 @@ struct skin_tag_parameter
 
     union
     {
-        int numeric;
+        int number;
         char* text;
         struct skin_element* code;
     } data;

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "skin_buffer.h"
 #include "skin_parser.h"
@@ -534,7 +535,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
         /* Storing the type code */
         element->params[i].type_code = *tag_args;
 
-        /* Checking a nullable argument for null */
+        /* Checking a nullable argument for null. */
         if(*cursor == DEFAULTSYM && !isdigit(cursor[1]))
         {
             if(islower(*tag_args))
@@ -557,8 +558,36 @@ static int skin_parse_tag(struct skin_element* element, char** document)
                 return 0;
             }
 
-            element->params[i].type = NUMERIC;
-            element->params[i].data.numeric = scan_int(&cursor);
+            element->params[i].type = INTEGER;
+            element->params[i].data.number = scan_int(&cursor);
+        }
+        else if(tolower(*tag_args) == 'd')
+        {
+            int val = 0;
+            bool have_point = false;
+            bool have_tenth = false;
+            while ( isdigit(*cursor) || *cursor == '.' )
+            {
+                if (*cursor != '.')
+                {
+                    val *= 10;
+                    val += *cursor - '0';
+                    if (have_point)
+                    {
+                        have_tenth = true;
+                        cursor++;
+                        break;
+                    }
+                }
+                else
+                    have_point = true;
+                cursor++;
+            }
+            if (have_tenth == false)
+                val *= 10;
+
+            element->params[i].type = DECIMAL;
+            element->params[i].data.number = val;
         }
         else if(tolower(*tag_args) == 'n' ||
                 tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')

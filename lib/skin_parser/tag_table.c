@@ -120,7 +120,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_REMOTE_HOLD,           "mr", "", 0 },
     { SKIN_TOKEN_REPEAT_MODE,           "mm", "", 0 },
     { SKIN_TOKEN_PLAYBACK_STATUS,       "mp", "", 0 },
-    { SKIN_TOKEN_BUTTON_VOLUME,         "mv", "|S", 0 },
+    { SKIN_TOKEN_BUTTON_VOLUME,         "mv", "|D", 0 },
     
     { SKIN_TOKEN_PEAKMETER,             "pm", "", 0 },
     { SKIN_TOKEN_PLAYER_PROGRESSBAR,    "pf", "", 0 },
@@ -131,8 +131,8 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_TRACK_TIME_ELAPSED,    "pc", "", 0 },
     { SKIN_TOKEN_TRACK_TIME_REMAINING,  "pr", "", 0 },
     { SKIN_TOKEN_TRACK_LENGTH,          "pt", "", 0 },
-    { SKIN_TOKEN_TRACK_STARTING,        "pS" , "|S", 0 },
-    { SKIN_TOKEN_TRACK_ENDING,          "pE" , "|S", 0 },
+    { SKIN_TOKEN_TRACK_STARTING,        "pS" , "|D", 0 },
+    { SKIN_TOKEN_TRACK_ENDING,          "pE" , "|D", 0 },
     { SKIN_TOKEN_PLAYLIST_POSITION,     "pp", "", 0 },
     { SKIN_TOKEN_PLAYLIST_ENTRIES,      "pe", "", 0 },
     { SKIN_TOKEN_PLAYLIST_NAME,         "pn", "", 0 },
@@ -161,7 +161,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_RDS_TEXT,              "tz", "", 0 },
     
     { SKIN_TOKEN_SUBLINE_SCROLL,        "s", "", 0 },
-    { SKIN_TOKEN_SUBLINE_TIMEOUT,       "t"  , "S", 0 },
+    { SKIN_TOKEN_SUBLINE_TIMEOUT,       "t"  , "D", 0 },
     
     { SKIN_TOKEN_ENABLE_THEME,          "we", "", NOBREAK },
     { SKIN_TOKEN_DISABLE_THEME,         "wd", "", NOBREAK },
@@ -196,7 +196,7 @@ struct tag_info legal_tags[] =
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S", 0 },
     { SKIN_TOKEN_LANG_IS_RTL,           "Sr" , "", 0 },
     
-    { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|S", 0 },
+    { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|D", 0 },
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", 0 },
     { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiS", NOBREAK },
     

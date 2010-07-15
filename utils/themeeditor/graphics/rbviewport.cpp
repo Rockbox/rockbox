@@ -97,24 +97,24 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             break;
         }
         /* Now we grab the info common to all viewports */
-        x = node->params[param++].data.numeric;
+        x = node->params[param++].data.number;
         if(x < 0)
             x = info.screen()->boundingRect().right() + x;
-        y = node->params[param++].data.numeric;
+        y = node->params[param++].data.number;
         if(y < 0)
             y = info.screen()->boundingRect().bottom() + y;
 
         if(node->params[param].type == skin_tag_parameter::DEFAULT)
             w = info.screen()->getWidth() - x;
         else
-            w = node->params[param].data.numeric;
+            w = node->params[param].data.number;
         if(w < 0)
             w = info.screen()->getWidth() + w - x;
 
         if(node->params[++param].type == skin_tag_parameter::DEFAULT)
             h = info.screen()->getHeight() - y;
         else
-            h = node->params[param].data.numeric;
+            h = node->params[param].data.number;
         if(h < 0)
             h = info.screen()->getHeight() + h - y;
 
@@ -128,7 +128,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         if(node->params[++param].type == skin_tag_parameter::DEFAULT)
             font = screen->getFont(1);
         else
-            font = screen->getFont(node->params[param].data.numeric);
+            font = screen->getFont(node->params[param].data.number);
 
         setPos(x, y);
         size = QRectF(0, 0, w, h);

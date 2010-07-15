@@ -41,22 +41,22 @@ RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
 
     if(paramCount > 0 && params[0].type != skin_tag_parameter::DEFAULT)
     {
-        x = params[0].data.numeric;
+        x = params[0].data.number;
     }
 
     if(paramCount > 1 && params[1].type != skin_tag_parameter::DEFAULT)
     {
-        y = params[1].data.numeric;
+        y = params[1].data.number;
     }
 
     if(paramCount > 2 && params[2].type != skin_tag_parameter::DEFAULT)
     {
-        w = params[2].data.numeric;
+        w = params[2].data.number;
     }
 
     if(paramCount > 3 && params[3].type != skin_tag_parameter::DEFAULT)
     {
-        h = params[3].data.numeric;
+        h = params[3].data.number;
     }
 
     if(paramCount > 4 && params[4].type != skin_tag_parameter::DEFAULT)
