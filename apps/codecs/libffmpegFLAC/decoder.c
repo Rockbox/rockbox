@@ -48,9 +48,6 @@
 #include "arm.h"
 #endif
 
-#define FFMAX(a,b) ((a) > (b) ? (a) : (b))
-#define FFMIN(a,b) ((a) > (b) ? (b) : (a))
-
 static const int sample_rate_table[] ICONST_ATTR =
 { 0, 0, 0, 0,
   8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
