@@ -48,6 +48,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionNew_Document"/>
+    <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Document"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="separator"/>
@@ -384,6 +385,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+W</string>
+   </property>
+  </action>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>N&amp;ew Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+N</string>
    </property>
   </action>
  </widget>

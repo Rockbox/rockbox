@@ -64,6 +64,7 @@ public slots:
 private slots:
     void showPanel();
     void newTab();
+    void newProject();
     void shiftTab(int index);
     bool closeTab(int index);
     void closeCurrent();
@@ -88,10 +89,14 @@ private:
     void saveSettings();
     void setupUI();
     void setupMenus();
+
     void addTab(TabContent* doc);
     void expandLine(ParseTreeModel* model, QModelIndex parent, int line,
                     bool highlight);
     void sizeColumns();
+
+    void loadProjectFile(QString fileName);
+    static void createFile(QString filename, QString contents);
 
     Ui::EditorWindow *ui;
     PreferencesDialog* prefs;

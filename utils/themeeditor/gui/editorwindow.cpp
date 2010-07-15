@@ -24,12 +24,16 @@
 #include "ui_editorwindow.h"
 #include "rbfontcache.h"
 #include "rbtextcache.h"
+#include "newprojectdialog.h"
 
 #include <QDesktopWidget>
 #include <QFileSystemModel>
 #include <QSettings>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QGraphicsScene>
+#include <QDir>
+#include <QFile>
 
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::EditorWindow), parseTreeSelection(0)
@@ -200,6 +204,8 @@ void EditorWindow::setupMenus()
     /* Connecting the document management actions */
     QObject::connect(ui->actionNew_Document, SIGNAL(triggered()),
                      this, SLOT(newTab()));
+    QObject::connect(ui->actionNew_Project, SIGNAL(triggered()),
+                     this, SLOT(newProject()));
     QObject::connect(ui->actionToolbarNew, SIGNAL(triggered()),
                      this, SLOT(newTab()));
 
@@ -259,6 +265,93 @@ void EditorWindow::newTab()
     SkinDocument* doc = new SkinDocument(parseStatus, project, deviceConfig);
     addTab(doc);
     ui->editorTabs->setCurrentWidget(doc);
+}
+
+void EditorWindow::newProject()
+{
+    NewProjectDialog dialog(this);
+    if(dialog.exec() == QDialog::Rejected)
+        return;
+
+    /* Assembling the new project if the dialog was accepted */
+    NewProjectDialog::NewProjectInfo info = dialog.results();
+
+    QDir path(info.path);
+    if(!path.exists())
+    {
+        QMessageBox::warning(this, tr("Error Creating Project"), tr("Error:"
+                             " Project directory does not exist"));
+        return;
+    }
+
+    if(path.exists(info.name))
+    {
+        QMessageBox::warning(this, tr("Error Creating Project"), tr("Error:"
+                             " Project directory already exists"));
+        return;
+    }
+
+    if(!path.mkdir(info.name))
+    {
+        QMessageBox::warning(this, tr("Error Creating Project"), tr("Error:"
+                             " Project directory not writeable"));
+        return;
+    }
+
+    path.cd(info.name);
+
+    /* Making standard directories */
+    path.mkdir("fonts");
+    path.mkdir("icons");
+    path.mkdir("backdrops");
+
+    /* Adding the desired wps documents */
+    path.mkdir("wps");
+    path.cd("wps");
+
+    if(info.sbs)
+        createFile(path.filePath(info.name + ".sbs"), tr("# SBS Document\n"));
+    if(info.wps)
+        createFile(path.filePath(info.name + ".wps"), tr("# WPS Document\n"));
+    if(info.fms)
+        createFile(path.filePath(info.name + ".fms"), tr("# FMS Document\n"));
+    if(info.rsbs)
+        createFile(path.filePath(info.name + ".rsbs"), tr("# RSBS Document\n"));
+    if(info.rwps)
+        createFile(path.filePath(info.name + ".rwps"), tr("# RWPS Document\n"));
+    if(info.rfms)
+        createFile(path.filePath(info.name + ".rfms"), tr("# RFMS Document\n"));
+
+    path.mkdir(info.name);
+
+    path.cdUp();
+
+    /* Adding the config file */
+    path.mkdir("themes");
+    path.cd("themes");
+
+    /* Generating the config file */
+    QString config = tr("# Config file for ") + info.name + "\n";
+    QString wpsBase = "/.rockbox/wps/";
+    if(info.sbs)
+        config.append("sbs: " + wpsBase + info.name + ".sbs\n");
+    if(info.wps)
+        config.append("wps: " + wpsBase + info.name + ".wps\n");
+    if(info.fms)
+        config.append("fms: " + wpsBase + info.name + ".fms\n");
+    if(info.rsbs)
+        config.append("rsbs: " + wpsBase + info.name + ".rsbs\n");
+    if(info.rwps)
+        config.append("rwps: " + wpsBase + info.name + ".rwps\n");
+    if(info.rfms)
+        config.append("rfms: " + wpsBase + info.name + ".rfms\n");
+
+
+    createFile(path.filePath(info.name + ".cfg"),
+               config);
+
+    /* Opening the new project */
+    loadProjectFile(path.filePath(info.name + ".cfg"));
 }
 
 void EditorWindow::shiftTab(int index)
@@ -424,47 +517,8 @@ void EditorWindow::openProject()
     fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), directory,
                                             ProjectModel::fileFilter());
 
-    if(QFile::exists(fileName))
-    {
-
-        if(project)
-            project->deleteLater();
-
-        ui->actionClose_Project->setEnabled(true);
-
-        project = new ProjectModel(fileName, this);
-        ui->projectTree->setModel(project);
-
-        if(project->getSetting("#screenwidth") != "")
-            deviceConfig->setData("screenwidth",
-                                  project->getSetting("#screenwidth"));
-        if(project->getSetting("#screenheight") != "")
-            deviceConfig->setData("screenheight",
-                                  project->getSetting("#screenheight"));
-
-        QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
-                         project, SLOT(activated(QModelIndex)));
-
-        fileName.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
-        settings.setValue("defaultDirectory", fileName);
-
-        for(int i = 0; i < ui->editorTabs->count(); i++)
-        {
-            TabContent* doc = dynamic_cast<TabContent*>
-                              (ui->editorTabs->widget(i));
-            if(doc->type() == TabContent::Skin)
-            {
-                dynamic_cast<SkinDocument*>(doc)->setProject(project);
-                if(i == ui->editorTabs->currentIndex())
-                {
-                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
-                }
-            }
-        }
-
-    }
-
     settings.endGroup();
+    loadProjectFile(fileName);
 
 }
 
@@ -656,4 +710,62 @@ void EditorWindow::sizeColumns()
     ui->parseTree->resizeColumnToContents(ParseTreeModel::lineColumn);
     ui->parseTree->resizeColumnToContents(ParseTreeModel::typeColumn);
     ui->parseTree->resizeColumnToContents(ParseTreeModel::valueColumn);
+}
+
+void EditorWindow::loadProjectFile(QString fileName)
+{
+    QSettings settings;
+    settings.beginGroup("ProjectModel");
+
+    if(QFile::exists(fileName))
+    {
+        if(project)
+            project->deleteLater();
+
+        ui->actionClose_Project->setEnabled(true);
+
+        project = new ProjectModel(fileName, this);
+        ui->projectTree->setModel(project);
+
+        if(project->getSetting("#screenwidth") != "")
+            deviceConfig->setData("screenwidth",
+                                  project->getSetting("#screenwidth"));
+        if(project->getSetting("#screenheight") != "")
+            deviceConfig->setData("screenheight",
+                                  project->getSetting("#screenheight"));
+
+        QObject::connect(ui->projectTree, SIGNAL(activated(QModelIndex)),
+                         project, SLOT(activated(QModelIndex)));
+
+        fileName.chop(fileName.length() - fileName.lastIndexOf('/') - 1);
+        settings.setValue("defaultDirectory", fileName);
+
+        for(int i = 0; i < ui->editorTabs->count(); i++)
+        {
+            TabContent* doc = dynamic_cast<TabContent*>
+                              (ui->editorTabs->widget(i));
+            if(doc->type() == TabContent::Skin)
+            {
+                dynamic_cast<SkinDocument*>(doc)->setProject(project);
+                if(i == ui->editorTabs->currentIndex())
+                {
+                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                }
+            }
+        }
+
+    }
+
+    settings.endGroup();
+
+}
+
+void EditorWindow::createFile(QString filename, QString contents)
+{
+    QFile fout(filename);
+    fout.open(QFile::WriteOnly);
+
+    fout.write(contents.toAscii());
+
+    fout.close();
 }
