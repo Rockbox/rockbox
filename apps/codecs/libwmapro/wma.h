@@ -61,11 +61,9 @@ typedef struct CoefVLCTable {
 } CoefVLCTable;
 
 
-int av_cold ff_wma_get_frame_len_bits(int sample_rate, int version,
+int ff_wma_get_frame_len_bits(int sample_rate, int version,
                                       unsigned int decode_flags);
-int ff_wma_init(AVCodecContext * avctx, int flags2);
 int ff_wma_total_gain_to_bits(int total_gain);
-int ff_wma_end(AVCodecContext *avctx);
 unsigned int ff_wma_get_large_val(GetBitContext* gb);
 int ff_wma_run_level_decode(GetBitContext* gb,
                             VLC *vlc,

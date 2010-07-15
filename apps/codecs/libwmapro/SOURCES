@@ -3,4 +3,4 @@ wma.c
 mdct_tables.c
 bitstream.c
 wmapro_mdct.c
-libavutil/mathematics.c
+//libavutil/mathematics.c

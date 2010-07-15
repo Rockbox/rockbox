@@ -1,6 +1,5 @@
-#include "avcodec.h"
+#include "../libasf/asf.h"
 
-av_cold int decode_end(AVCodecContext *avctx);
-av_cold int decode_init(AVCodecContext *avctx);
-int decode_packet(AVCodecContext *avctx,
-                  void *data, int *data_size, AVPacket* avpkt);
+int decode_init(asf_waveformatex_t *wfx);
+int decode_packet(asf_waveformatex_t *wfx,
+                  void *data, int *data_size, void* pktdata, int size);

@@ -30,27 +30,6 @@ CODEC_HEADER
 #define BUFSIZE     MAXCHANNELS * MAXSAMPLES
 int32_t decoded[BUFSIZE];
 
-AVCodecContext avctx;
-AVPacket avpkt;
-
-/* This function initialises AVCodecContext with the data needed for the wmapro
- * decoder to work. The required data is taken from asf_waveformatex_t because that's
- * what the rockbox asf metadata parser fill/work with. In the future, when the 
- * codec is being optimised for on-target playback this function should not be needed, 
- * as we will be working directly with WMAProDecodeCtx (declared in wmaprodec.c) */
-static void init_codec_ctx(AVCodecContext *avctx, asf_waveformatex_t *wfx)
-{
-    /* Copy the extra-data */
-    avctx->extradata_size = wfx->datalen;
-    avctx->extradata = (uint8_t *)malloc(wfx->datalen*sizeof(uint8_t));
-    memcpy(avctx->extradata, wfx->data, wfx->datalen*sizeof(uint8_t));
-    
-    avctx->block_align = wfx->blockalign;
-    avctx->sample_rate = wfx->rate;
-    avctx->channels    = wfx->channels;
-    
-}
-
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
@@ -64,6 +43,8 @@ enum codec_status codec_main(void)
     int packetlength = 0;       /* Logical packet size (minus the header size) */          
     int outlen = 0;             /* Number of bytes written to the output buffer */
     int pktcnt = 0;             /* Count of the packets played */
+    uint8_t *data;				/* Pointer to decoder input buffer */
+    int size;					/* Size of the input frame to the decoder */
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 17);
@@ -94,11 +75,8 @@ next_track:
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_INTERLEAVED);
     codec_set_replaygain(ci->id3);
-
-    /* Initialise the AVCodecContext */
-    init_codec_ctx(&avctx, &wfx);
     
-    if (decode_init(&avctx) < 0) {
+    if (decode_init(&wfx) < 0) {
         LOGF("(WMA PRO) Error: Unsupported or corrupt file\n");
         retval = CODEC_ERROR;
         goto done;
@@ -143,20 +121,19 @@ next_track:
            LOGF("(WMA PRO) Warning: asf_read_packet returned %d", res);
            goto done;
         } else {
-            avpkt.data = audiobuf;
-            avpkt.size = audiobufsize;
+            data = audiobuf;
+            size = audiobufsize;
             pktcnt++;
             
             /* We now loop on the packet, decoding and outputting the subframes
              * one-by-one. For more information about how wma pro structures its
              * audio frames, see libwmapro/wmaprodec.c */
-            while(avpkt.size > 0)
+            while(size > 0)
             {
                 outlen = BUFSIZE;   /* decode_packet needs to know the size of the output buffer */
-                res = decode_packet(&avctx, decoded, &outlen, &avpkt);
-                avpkt.data += res;
-                avpkt.size -= res;
-                avctx.frame_number++;
+                res = decode_packet(&wfx, decoded, &outlen, data, size);
+                data += res;
+                size -= res;
                 if(outlen) {
                     ci->yield ();
                     /* outlen now holds the size of the data in bytes - we want the

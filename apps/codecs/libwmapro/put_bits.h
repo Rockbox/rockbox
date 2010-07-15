@@ -30,10 +30,11 @@
 #include <stdlib.h>
 //#include <assert.h>
 #include "libavutil/bswap.h"
-#include "libavutil/common.h"
-#include "libavutil/intreadwrite.h"
-#include "libavutil/log.h"
-#include "mathops.h"
+//#include "libavutil/common.h"
+//#include "libavutil/intreadwrite.h"
+//#include "libavutil/log.h"
+
+#define av_log(...)
 
 //#define ALT_BITSTREAM_WRITER
 //#define ALIGNED_BITSTREAM_WRITER
@@ -267,22 +268,6 @@ static inline void put_sbits(PutBitContext *pb, int n, int32_t value)
     //assert(n >= 0 && n <= 31);
 
     put_bits(pb, n, value & ((1<<n)-1));
-}
-
-/**
- * Writes exactly 32 bits into a bitstream.
- */
-static void av_unused put_bits32(PutBitContext *s, uint32_t value)
-{
-    int lo = value & 0xffff;
-    int hi = value >> 16;
-#ifdef BITSTREAM_WRITER_LE
-    put_bits(s, 16, lo);
-    put_bits(s, 16, hi);
-#else
-    put_bits(s, 16, hi);
-    put_bits(s, 16, lo);
-#endif
 }
 
 /**

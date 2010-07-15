@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "avcodec.h"
+//#include "avcodec.h"
 #include "wma.h"
 //#include "wmadata.h"
 
@@ -74,7 +74,7 @@ static void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
  *@param decode_flags codec compression features
  *@return log2 of the number of output samples per frame
  */
-int av_cold ff_wma_get_frame_len_bits(int sample_rate, int version,
+int ff_wma_get_frame_len_bits(int sample_rate, int version,
                                       unsigned int decode_flags)
 {
 

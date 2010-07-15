@@ -48,4 +48,10 @@ static inline void vector_fixmul_scalar(FIXED *dst, const FIXED *src, FIXED mul,
         dst[i] = fixmulshift(src[i],mul,shift);   
 }
 
+static inline int av_clip(int a, int amin, int amax)
+{
+    if      (a < amin) return amin;
+    else if (a > amax) return amax;
+    else               return a;
+}
 #endif /* _WMAPRO_MATH_H_ */

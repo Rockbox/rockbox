@@ -30,10 +30,20 @@
 #include <stdlib.h>
 //#include <assert.h>
 #include "libavutil/bswap.h"
-#include "libavutil/common.h"
+//#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
-#include "libavutil/log.h"
-#include "mathops.h"
+//#include "libavutil/log.h"
+
+#define av_log(...)
+
+/* NEG_* were taken from mathops.h */
+#ifndef NEG_SSR32
+#   define NEG_SSR32(a,s) ((( int32_t)(a))>>(32-(s)))
+#endif
+
+#ifndef NEG_USR32
+#   define NEG_USR32(a,s) (((uint32_t)(a))>>(32-(s)))
+#endif
 
 #if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
 #   define ALT_BITSTREAM_READER
@@ -321,24 +331,6 @@ static inline void skip_bits_long(GetBitContext *s, int n){
 
 #endif
 
-/**
- * read mpeg1 dc style vlc (sign bit + mantisse with no MSB).
- * if MSB not set it is negative
- * @param n length in bits
- * @author BERO
- */
-static inline int get_xbits(GetBitContext *s, int n){
-    register int sign;
-    register int32_t cache;
-    OPEN_READER(re, s)
-    UPDATE_CACHE(re, s)
-    cache = GET_CACHE(re,s);
-    sign=(~cache)>>31;
-    LAST_SKIP_BITS(re, s, n)
-    CLOSE_READER(re, s)
-    return (NEG_USR32(sign ^ cache, n) ^ sign) - sign;
-}
-
 static inline int get_sbits(GetBitContext *s, int n){
     register int tmp;
     OPEN_READER(re, s)
@@ -429,13 +421,6 @@ static inline unsigned int get_bits_long(GetBitContext *s, int n){
 }
 
 /**
- * reads 0-32 bits as a signed integer.
- */
-static inline int get_sbits_long(GetBitContext *s, int n) {
-    return sign_extend(get_bits_long(s, n), n);
-}
-
-/**
  * shows 0-32 bits.
  */
 static inline unsigned int show_bits_long(GetBitContext *s, int n){
@@ -444,15 +429,6 @@ static inline unsigned int show_bits_long(GetBitContext *s, int n){
         GetBitContext gb= *s;
         return get_bits_long(&gb, n);
     }
-}
-
-static inline int check_marker(GetBitContext *s, const char *msg)
-{
-    int bit= get_bits1(s);
-    if(!bit)
-        av_log(NULL, AV_LOG_INFO, "Marker bit missing %s\n", msg);
-
-    return bit;
 }
 
 /**
@@ -594,7 +570,7 @@ void free_vlc(VLC *vlc);
  *                  read the longest vlc code
  *                  = (max_vlc_length + bits - 1) / bits
  */
-static av_always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
+static inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
                                   int bits, int max_depth)
 {
     int code;
