@@ -423,7 +423,7 @@ int shorten_init(ShortenContext* s, uint8_t *buf, int buf_size)
     get_bits(&s->gb, s->bitindex);
 
     /* shorten signature */
-    if (get_bits_long(&s->gb, 32) != bswap_32(ff_get_fourcc("ajkg"))) {
+    if ((unsigned)get_bits_long(&s->gb, 32) != bswap_32(ff_get_fourcc("ajkg"))) {
         return -1;
     }
 
