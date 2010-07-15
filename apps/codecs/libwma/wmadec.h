@@ -21,7 +21,7 @@
 #define _WMADEC_H
 
 #include <codecs/libasf/asf.h>
-#include "bitstream.h" /* For GetBitContext */
+#include "ffmpeg_get_bits.h"
 #include "types.h"
 
 //#define TRACE

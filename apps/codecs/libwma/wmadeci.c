@@ -144,7 +144,7 @@ static void init_coef_vlc(VLC *vlc,
     int i, l, j, level;
 
 
-    init_vlc(vlc, VLCBITS, n, table_bits, 1, 1, table_codes, 4, 4, 0);
+    init_vlc(vlc, VLCBITS, n, table_bits, 1, 1, table_codes, 4, 4, INIT_VLC_USE_NEW_STATIC);
 
     run_table = runtabarray[tab];
     level_table= levtabarray[tab];
@@ -522,7 +522,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
          s->hgain_vlc.table_allocated = VLCBUF4SIZE;
          init_vlc(&s->hgain_vlc, HGAINVLCBITS, sizeof(hgain_huffbits),
                   hgain_huffbits, 1, 1,
-                  hgain_huffcodes, 2, 2, 0);
+                  hgain_huffcodes, 2, 2, INIT_VLC_USE_NEW_STATIC);
     }
 
     if (s->use_exp_vlc)
@@ -533,7 +533,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
          init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(scale_huffbits),
                   scale_huffbits, 1, 1,
-                  scale_huffcodes, 4, 4, 0);
+                  scale_huffcodes, 4, 4, INIT_VLC_USE_NEW_STATIC);
     }
     else
     {
