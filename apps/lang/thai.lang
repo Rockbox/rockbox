@@ -11761,7 +11761,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "หน้ากากหลักรีโมท"
   </dest>
   <voice>
     *: none
@@ -11774,11 +11774,11 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "โหมดเลือกดู"
   </dest>
   <voice>
     *: none
@@ -11893,11 +11893,11 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "โหมดเมาส์"
   </dest>
   <voice>
     *: none
@@ -11927,11 +11927,11 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "โหมดมัลติมีเดีย"
   </dest>
   <voice>
     *: none
@@ -12037,11 +12037,11 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "โหมดนำเสนอ"
   </dest>
   <voice>
     *: none
@@ -12060,5 +12060,483 @@
   </dest>
   <voice>
     *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ตกลง"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "ปุ่มลัด WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "WPS Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "หน้าต่างรีโมทวิทยุ"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "อัตราขยายช่วงความถี่ %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "ช่องเสียงออก"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "radio screen skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ความถี่กว้าง"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "ปรับปรุงเมื่อหยุด"
+  </dest>
+  <voice>
+    *: "Update on Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ลบ"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "remote radio screen skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "หน้าจอรีโมท"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ความถี่แคบ"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "ปุ่มลัดดูไฟล์"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "เริ่มเล่นใหม่หลังเปิดเครื่อง"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rewind before resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<ลบป้าย>"
+  </dest>
+  <voice>
+    *: "Untagged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ตั้งค่าตัวปรับเสียงขั้นสูง"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "คุณภาพเสียง 3-D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ยกเลิก"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "ผู้แต่ง"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ความถี่ในช่วง %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ความกว้างของช่วง %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "สถานี:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "หน้าจอวิทยุ"
+  </dest>
+  <voice>
+    *: none
+    radio: "Radio Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "หน้าจอหลัก"
+  </dest>
+  <voice>
+    *: none
+    remote: "Main Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "พิกเจอร์โฟลว"
+  </dest>
+  <voice>
+    *: "open picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "บังคับ"
+  </dest>
+  <voice>
+    *: "Force"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "ตัวปรับเสียง"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Tone Controls"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "ปุ่มลัด"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "ช่วงเวลาฮิสโตแกรม"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Histogram interval"
   </voice>
 </phrase>
