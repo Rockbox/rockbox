@@ -247,19 +247,18 @@ static struct md5sums sansasums[] = {
 
 static unsigned int model_memory_size(int model)
 {
+    /* The OF boots with IRAM (320kB) mapped at 0x0 */
+
     if(model == MODEL_CLIPV2)
     {
         /* The decompressed Clipv2 OF is around 380kB.
-         * Since it doesn't fit in the 0x50000 bytes IRAM, the OF starts
-         * with DRAM mapped at 0x0
-         *
-         * We could use all the available memory (supposedly 8MB)
-         * but 1MB ought to be enough for our use
+         * Let's use the full IRAM (1MB on AMSv2)
          */
         return 1 << 20;
     }
     else
-    {   /* The OF boots with IRAM (320kB) mapped at 0x0 */
+    {
+        /* The IRAM is 320kB on AMSv1, and 320 will be enough on Fuzev1/Clip+ */
         return 320 << 10;
     }
 }
