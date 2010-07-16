@@ -2219,7 +2219,10 @@ static bool skin_load_fonts(struct wps_data *data)
         struct skin_font *font = &skinfonts[font_id-FONT_FIRSTUSERFONT];
         if (!font->name)
         {
-            DEBUGF("font %d not specified\n", font_id);
+            if (success)
+            {
+                DEBUGF("font %d not specified\n", font_id);
+            }
             success = false;
             continue;
         }
@@ -2238,6 +2241,7 @@ static bool skin_load_fonts(struct wps_data *data)
             DEBUGF("Unable to load font %d: '%s.fnt'\n",
                     font_id, font->name);
             success = false;
+            font->name = NULL;
             continue;
         }
 
