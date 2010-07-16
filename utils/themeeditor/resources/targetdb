@@ -1,0 +1,73 @@
+ipod12
+{
+    name   : iPod 1st/2nd Gen
+    screen : 160 x 128 @ grey
+    fm     : no
+    remote : no
+}
+
+ipod3
+{
+    name   : iPod 3rd Gen
+    screen : 160 x 128 @ grey
+    fm     : no
+    remote : no
+}
+
+ipod4
+{
+    name   : iPod 4th Gen
+    screen : 160 x 128 @ grey
+    fm     : no
+    remote : no
+}
+
+ipodmini12
+{
+    name   : iPod Mini 1st/2nd Gen
+    screen : 138 x 110 @ grey
+    fm     : no
+    remote : no
+}
+
+ipodcolor
+{
+    name   : iPod Color/Photo
+    screen : 220 x 176 @ rgb
+    fm     : no
+    remote : no
+}
+
+ipodnano1
+{
+    name   : iPod Nano 1st Gen
+    screen : 176 x 132 @ rgb
+    fm     : no
+    remote : no
+}
+
+ipodvideo
+{
+    name   : iPod Video
+    screen : 320 x 240 @ rgb
+    fm     : no
+    remote : no
+}
+
+# Olympus units
+
+mrobe100
+{
+    name   : m%:robe 100
+    screen : 160 x 128 @ mono
+    fm     : no
+    remote : 79 x 16 @ mono
+}
+
+mrobe500
+{
+    name   : m%:robe 500
+    screen : 640 x 480 @ rgb
+    fm     : no
+    remote : 79 x 16 @ mono
+}

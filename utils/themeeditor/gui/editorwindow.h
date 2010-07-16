@@ -35,6 +35,7 @@
 #include "skinviewer.h"
 #include "devicestate.h"
 #include "skintimer.h"
+#include "targetdata.h"
 
 class ProjectModel;
 class TabContent;

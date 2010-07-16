@@ -35,6 +35,7 @@ public:
     {
         QString name;
         QString path;
+        QString target;
         bool sbs;
         bool wps;
         bool fms;
@@ -46,6 +47,7 @@ public:
         {
             name = "";
             path = "";
+            target = "";
             sbs = true;
             wps = true;
             fms = false;
@@ -63,6 +65,7 @@ public:
         {
             name = other.name;
             path = other.path;
+            target = other.target;
             sbs = other.sbs;
             wps = other.wps;
             fms = other.fms;

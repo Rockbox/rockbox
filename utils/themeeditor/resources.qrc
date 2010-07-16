@@ -24,4 +24,7 @@
     <qresource prefix="/fonts">
         <file alias="08-Schumacher-Clean.fnt">resources/fonts/08-Schumacher-Clean.fnt</file>
     </qresource>
+    <qresource prefix="/targets">
+        <file alias="targetdb">resources/targetdb</file>
+    </qresource>
 </RCC>

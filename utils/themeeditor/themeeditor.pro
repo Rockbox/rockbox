@@ -55,7 +55,8 @@ HEADERS += models/parsetreemodel.h \
     graphics/rbtextcache.h \
     gui/skintimer.h \
     graphics/rbtoucharea.h \
-    gui/newprojectdialog.h
+    gui/newprojectdialog.h \
+    models/targetdata.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -81,7 +82,8 @@ SOURCES += main.cpp \
     graphics/rbtextcache.cpp \
     gui/skintimer.cpp \
     graphics/rbtoucharea.cpp \
-    gui/newprojectdialog.cpp
+    gui/newprojectdialog.cpp \
+    models/targetdata.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -102,7 +104,8 @@ OTHER_FILES += README \
     resources/lines.xcf \
     resources/lines.png \
     resources/cursor.xcf \
-    resources/cursor.png
+    resources/cursor.png \
+    resources/targetdb
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \

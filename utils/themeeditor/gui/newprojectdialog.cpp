@@ -21,6 +21,7 @@
 
 #include "newprojectdialog.h"
 #include "ui_newprojectdialog.h"
+#include "targetdata.h"
 
 #include <QSettings>
 #include <QFileDialog>
@@ -42,6 +43,13 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
 
     settings.endGroup();
 
+    /* Populating the target box */
+    TargetData targets;
+    for(int i = 0; i < targets.count(); i++)
+    {
+        ui->targetBox->insertItem(i, QIcon(), targets.name(i), targets.id(i));
+    }
+
     /* Connecting the browse button */
     QObject::connect(ui->browseButton, SIGNAL(clicked()),
                      this, SLOT(browse()));
@@ -56,6 +64,8 @@ void NewProjectDialog::accept()
 {
     status.name = ui->nameBox->text();
     status.path = ui->locationBox->text();
+    status.target = ui->targetBox->itemData(ui->targetBox->currentIndex())
+                    .toString();
     status.sbs = ui->sbsBox->isChecked();
     status.wps = ui->wpsBox->isChecked();
     status.fms = ui->fmsBox->isChecked();
@@ -77,6 +87,7 @@ void NewProjectDialog::reject()
 {
     ui->nameBox->setText(status.name);
     ui->locationBox->setText(status.path);
+    ui->targetBox->setCurrentIndex(0);
     ui->sbsBox->setChecked(status.sbs);
     ui->wpsBox->setChecked(status.wps);
     ui->fmsBox->setChecked(status.fms);
