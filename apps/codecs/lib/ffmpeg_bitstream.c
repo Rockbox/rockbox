@@ -288,14 +288,21 @@ static int build_table(VLC *vlc, int table_nb_bits, int nb_codes,
    codecs use it, there's a LUT based bit reverse function for this commented
    out above (bitswap_32) and an inline asm version in libtremor/codebook.c
    if we ever want this */
+   
+static VLCcode buf[1500]; /* worst case is wma, which has one table with 1336 entries */
+
 int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
              const void *symbols, int symbols_wrap, int symbols_size,
              int flags)
 {
-    VLCcode buf[nb_codes+1]; /* worst case from cook seems to be nb_codes == 607
-                                which would make this about 4.8k... */
+    if (nb_codes+1 > (int)(sizeof (buf)/ sizeof (VLCcode)))
+    {
+        DEBUGF("Table is larger than temp buffer!\n");
+        return -1;
+    }
+
     int i, j, ret;
 
     vlc->bits = nb_bits;
