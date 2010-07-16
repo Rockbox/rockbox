@@ -52,12 +52,12 @@ static inline bool is_leapyear(int year)
 }
 
 #ifdef HAVE_RTC_ALARM /* as3543 */
-struct {
+static struct {
     unsigned int seconds;   /* total seconds to wakeup */
-    bool enabled;           /* alarm enabled or not */
-    unsigned char flag;     /* flag used by the OF */
     int hour;               /* wake-up hour */
     int min;                /* wake-up minute */
+    bool enabled;           /* alarm enabled or not */
+    unsigned char flag;     /* flag used by the OF */
 } alarm;
 
 void rtc_set_alarm(int h, int m)
