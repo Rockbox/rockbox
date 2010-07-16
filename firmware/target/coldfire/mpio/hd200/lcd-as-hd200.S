@@ -34,8 +34,8 @@
 
 lcd_write_command:
     move.l  (4, %sp), %d0
-    move.w  %d0, LCD_BASE_ADDRESS	/* data is 1byte but CF uses word
-                                         * transfers only */
+    move.b  %d0, LCD_BASE_ADDRESS	/* transfers 1 byte to LCD */
+
     rts
 .wc_end:
     .size   lcd_write_command,.wc_end-lcd_write_command
@@ -47,11 +47,10 @@ lcd_write_command:
 
 lcd_write_command_e:
     lea.l   LCD_BASE_ADDRESS, %a0
-
     move.l  (4, %sp), %d0       /* Command */
-    move.w  %d0, (%a0)         
+    move.b  %d0, (%a0)         
     move.l  (8, %sp), %d0       /* Data */
-    move.w  %d0, (%a0)          /* Write to LCD */
+    move.b  %d0, (%a0)          /* Write to LCD */
 
     rts
 .wce_end:
@@ -79,22 +78,22 @@ lcd_write_data:
 
 .w_write:
     move.w  (%a0)+, %d1  /* load data         3 cycles*/
-    move.w  %d1, (%a1)   /* first byte        1 cycle*/
+    move.b  %d1, (%a1)   /* first byte        1 cycle*/
     lsr.l   #8, %d1      /* load second byte  1 cycle*/
-    move.w  %d1, (%a1)   /* transfer          1 cycle*/
+    move.b  %d1, (%a1)   /* transfer          1 cycle*/
     subq.l  #1, %d0      /* decrement counter 1 cycle*/
     jeq     .write_end   
     
 .l_write:
     move.l  (%a0)+, %d1  /* load data         2 cycles*/
     swap    %d1          /*                   1 cycle */
-    move.w  %d1, (%a1)   /* first byte        1 cycle*/
+    move.b  %d1, (%a1)   /* first byte        1 cycle*/
     lsr.l   #8, %d1      /*                   1 cycle */
-    move.w  %d1, (%a1)   /* second byte       1 cycle*/
+    move.b  %d1, (%a1)   /* second byte       1 cycle*/
     lsr.l   #8, %d1      /*                   1 cycle */
-    move.w  %d1, (%a1)   /* third byte        1 cycle*/
+    move.b  %d1, (%a1)   /* third byte        1 cycle*/
     lsr.l   #8, %d1      /*                   1 cycle */
-    move.w  %d1, (%a1)   /* forth byte        1 cycle*/
+    move.b  %d1, (%a1)   /* forth byte        1 cycle*/
     subq.l  #2, %d0      /* decrement counter 1 cycle*/
     bne.s   .l_write
 
@@ -113,10 +112,11 @@ lcd_mono_data:
 
 .md_loop:
     move.b  (%a0)+, %d1
-    move.w  %d1, (%a1)    /* byte transfers actually */
-    move.w  %d1, (%a1)
+    move.b  %d1, (%a1)    /* byte transfers */
+    move.b  %d1, (%a1)
     subq.l  #1, %d0
     bne.s   .md_loop
+
     rts
 .md_end:
     .size   lcd_mono_data,.md_end-lcd_mono_data
@@ -163,12 +163,12 @@ lcd_grey_data:
     not.l   %d2                 /*       negate bits */
     lsr.l   %d4, %d2            /* %d2 = ........................01234567 */
 
-    move.w  %d2, (%a3)          /* transfer first LCD byte */
+    move.b  %d2, (%a3)          /* transfer first LCD byte */
 
     movem.l %d0-%d1, (%a1)      /* store 8 new pixel phases */
     addq.l  #8, %a1
 
-    move.w  %d2, (%a3)          /* transfer second LCD byte */
+    move.b  %d2, (%a3)          /* transfer second LCD byte */
 
 .g_hend:
     cmp.l   %a1, %a2
@@ -195,12 +195,12 @@ lcd_grey_data:
     not.l   %d6                 /*       negate bits */
     lsr.l   %d4, %d6            /* %d6 = ........................01234567 */
 
-    move.w  %d6, (%a3)          /* transfer first LCD byte */
+    move.b  %d6, (%a3)          /* transfer first LCD byte */
 
     movem.l (%a0), %d7/%a4-%a6  /* fetch 2 * 8 pixel values */
     lea.l   (16, %a0), %a0
 
-    move.w  %d6, (%a3)          /* transfer second LCD byte */
+    move.b  %d6, (%a3)          /* transfer second LCD byte */
 
     add.l   %d7, %d0
     add.l   %a4, %d1
@@ -222,12 +222,12 @@ lcd_grey_data:
     add.l   %a5, %d2
     add.l   %a6, %d3
 
-    move.w  %d6, (%a3)          /* transfer first LCD byte */
+    move.b  %d6, (%a3)          /* transfer first LCD byte */
 
     movem.l %d0-%d3, (%a1)      /* store 2 * 8 new pixel phases */
     lea.l   (16, %a1), %a1      /* advance pointer */
 
-    move.w  %d6, (%a3)          /* transfer second LCD byte */
+    move.b  %d6, (%a3)          /* transfer second LCD byte */
 
     cmp.l   %a2, %a1
     bls.s   .g_line_loop
@@ -256,12 +256,12 @@ lcd_grey_data:
     not.l   %d2                 /*       negate bits */
     lsr.l   %d4, %d2            /* %d2 = ........................01234567 */
 
-    move.w  %d2, (%a3)          /* transfer first LCD byte */
+    move.b  %d2, (%a3)          /* transfer first LCD byte */
 
     movem.l %d0-%d1, (%a1)      /* store 8 new pixel phases */
     /* addq.l  #8, %a1             not needed anymore */
 
-    move.w  %d2, (%a3)          /* transfer second LCD byte */
+    move.b  %d2, (%a3)          /* transfer second LCD byte */
 
 .g_tend:
     movem.l (%sp), %d2-%d7/%a2-%a6
