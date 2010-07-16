@@ -52,31 +52,82 @@ static inline bool is_leapyear(int year)
 }
 
 #ifdef HAVE_RTC_ALARM /* as3543 */
-static int wakeup_h;
-static int wakeup_m;
-static bool alarm_enabled = false;
+struct {
+    unsigned int seconds;   /* total seconds to wakeup */
+    bool enabled;           /* alarm enabled or not */
+    unsigned char flag;     /* flag used by the OF */
+    int hour;               /* wake-up hour */
+    int min;                /* wake-up minute */
+} alarm;
 
 void rtc_set_alarm(int h, int m)
 {
-    wakeup_h = h;
-    wakeup_m = m;
+    alarm.hour = h;
+    alarm.min = m;
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
-    *h = wakeup_h;
-    *m = wakeup_m;
+    *h = alarm.hour;
+    *m = alarm.min;
+}
+
+/* Reads the AS3543 wakeup register */
+static void alarm_read(void)
+{
+    unsigned char buf[6];
+    unsigned int i;
+    int oldstatus;
+
+    /* read raw data */
+    oldstatus = disable_irq_save();
+    ascodec_read(0);
+    for (i = 0; i < sizeof(buf); i++) {
+        buf[i] = ascodec_read(AS3543_WAKEUP);
+    }
+    restore_irq(oldstatus);
+    
+    /* decode */
+    alarm.seconds = buf[0] | (buf[1] << 8) | ((buf[2] & 0x7F) << 16);
+    alarm.enabled = buf[2] & (1 << 7);
+    alarm.flag = buf[3];
+    alarm.hour = buf[4];
+    alarm.min = buf[5];
+}
+
+/* Writes the AS3543 wakeup register */
+static void alarm_write(void)
+{
+    unsigned char buf[6];
+    unsigned int i;
+    int oldstatus;
+    
+    /* encode */
+    buf[0] = alarm.seconds  & 0xFF;
+    buf[1] = (alarm.seconds >> 8) & 0xFF;
+    buf[2] = ((alarm.seconds >> 16) & 0x7F) | (alarm.enabled ? (1 << 7) : 0);
+    buf[3] = alarm.flag;
+    buf[4] = alarm.hour;
+    buf[5] = alarm.min;
+    
+    /* write raw data */
+    oldstatus = disable_irq_save();
+    ascodec_read(0);
+    for (i = 0; i < sizeof(buf); i++) {
+        ascodec_write(AS3543_WAKEUP, buf[i]);
+    }
+    restore_irq(oldstatus);
 }
 
 void rtc_alarm_poweroff(void)
 {
-    if(!alarm_enabled)
+    if(!alarm.enabled)
         return;
 
     struct tm tm;
     rtc_read_datetime(&tm);
-    int hours = wakeup_h - tm.tm_hour;
-    int mins  = wakeup_m - tm.tm_min;
+    int hours = alarm.hour - tm.tm_hour;
+    int mins  = alarm.min - tm.tm_min;
     if(mins < 0)
     {
         mins += 60;
@@ -91,26 +142,15 @@ void rtc_alarm_poweroff(void)
 
     seconds -= tm.tm_sec;
 
-    disable_irq();
+    /* write wakeup register */
+    alarm.seconds = seconds;
+    alarm.enabled = true;
+    alarm_write();
 
-    ascodec_write(AS3543_WAKEUP, seconds);
-    seconds >>= 8;
-    ascodec_write(AS3543_WAKEUP, seconds);
-    seconds >>= 8;
-    seconds |= 1<<7; /* enable bit */
-    ascodec_write(AS3543_WAKEUP, seconds);
-    
-    /* write 0x80 to prevent the OF refreshing its database from the microSD */
-    ascodec_write(AS3543_WAKEUP, 0x80);
-
-    /* write our desired time of wake up to detect power-up from RTC */
-    ascodec_write(AS3543_WAKEUP, wakeup_h);
-    ascodec_write(AS3543_WAKEUP, wakeup_m);
-
-    /* enable hearbeat watchdog */
+    /* enable heartbeat watchdog */
     ascodec_write(AS3514_SYSTEM, (1<<3) | (1<<0));
 
-    /* In_Cntr : disable hearbeat source */
+    /* In_Cntr : disable heartbeat source */
     ascodec_write_pmu(0x1a, 4, ascodec_read_pmu(0x1a, 4) & ~(3<<2));
 
     while(1);
@@ -118,31 +158,25 @@ void rtc_alarm_poweroff(void)
 
 void rtc_enable_alarm(bool enable)
 {
-    alarm_enabled = enable;
+    alarm.enabled = enable;
 }
 
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    (void) release_alarm;
-
-    /* 3 first reads give the 23 bits counter and enable bit */
-    ascodec_read(AS3543_WAKEUP); /* bits  7:0  */
-    ascodec_read(AS3543_WAKEUP); /* bits 15:8  */
-    if(!(ascodec_read(AS3543_WAKEUP) & (1<<7))) /* enable bit */
+    /* read wakeup register and check if alarm was enabled */
+    alarm_read();
+    if (!alarm.enabled) {
         return false;
-        
-    /* skip WAKEUP[3] which the OF uses for other purposes */
-    ascodec_read(AS3543_WAKEUP);
+    }
 
-    /* subsequent reads give the 16 bytes static SRAM */
-    wakeup_h = ascodec_read(AS3543_WAKEUP);
-    wakeup_m = ascodec_read(AS3543_WAKEUP);
+    alarm.enabled = !release_alarm;
+    alarm_write();
 
     struct tm tm;
     rtc_read_datetime(&tm);
 
     /* were we powered up at the programmed time ? */
-    return wakeup_h == tm.tm_hour && wakeup_m == tm.tm_min;
+    return alarm.hour == tm.tm_hour && alarm.min == tm.tm_min;
 }
 
 bool rtc_check_alarm_flag(void)
