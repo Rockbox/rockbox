@@ -51,20 +51,9 @@
 #error i2c prescaler too big!
 #endif
 
-/* Vectors */
+        b start     @ skip our data
 
-        ldr   pc, =start    /* reset vector */
-        /* next vectors are unused, halt cpu */
-1:      b 1b
-1:      b 1b
-1:      b 1b
-1:      b 1b
-1:      b 1b
-1:      b 1b
-1:      b 1b
-
-
-/* These values are filled in by mkamsboot - don't move them from offset 0x20 */
+/* These values are filled in by mkamsboot - don't move them from offset 0x4 */
 
 uclunpack_end:   .word   0 /* End of the ucl_unpack function */
 uclunpack_size:  .word   0 /* Size in bytes of the ucl_unpack function */

@@ -31,13 +31,15 @@ Layout of a Sansa AMS original firmware file:
  ----------------------  0x0
 |        HEADER        |
 |----------------------| 0x400
+|    FIRMWARE BLOCK    | (contains the OF version on some fuzev2 firmwares
+|----------------------| 0x600
 |    FIRMWARE BLOCK    |
 |----------------------| 0x400 + firmware block size
 |    LIBRARIES/DATA    |
  ----------------------  END
 
-We replace the main firmware block (bytes 0x400..0x400+firmware_size)
-as follows:
+We replace the main firmware block while preserving the potential OF version
+(bytes 0x600..0x400+firmware_size) as follows:
 
 
  ----------------------  0x0
@@ -531,10 +533,22 @@ void patch_firmware(
     unsigned int i;
 
     /* Zero the original firmware area - not needed, but helps debugging */
-    memset(buf + 0x400, 0, firmware_size);
+    memset(buf + 0x600, 0, firmware_size);
 
-    /* Insert dual-boot bootloader at offset 0 */
-    memcpy(buf + 0x400, bootloaders[model], bootloader_sizes[model]);
+    /* Insert dual-boot bootloader at offset 0x200, we preserve the OF
+     * version string located between 0x0 and 0x200 */
+    memcpy(buf + 0x600, bootloaders[model], bootloader_sizes[model]);
+
+    /* Insert vectors, they won't overwrite the OF version string */
+
+    /* Reset vector: branch 0x200 bytes away, to our dualboot code */
+    static const uint8_t b_0x200[4] = { 0x7e, 0x00, 0x00, 0xea }; // b 0x200
+    memcpy(buf + 0x400, b_0x200, sizeof(b_0x200));
+
+    /* Other vectors: infinite loops */
+    static const uint8_t b_1b[4]    = { 0xfe, 0xff, 0xff, 0xea }; // 1: b 1b
+    for (i=1; i < 8; i++)
+        memcpy(buf + 0x400 + 4*i, b_1b, sizeof(b_1b));
 
     /* We are filling the firmware buffer backwards from the end */
     p = buf + 0x400 + firmware_size;
@@ -556,20 +570,20 @@ void patch_firmware(
        in each image, along with the size in bytes */
 
     /* UCL unpack function */
-    put_uint32le(&buf[0x420], firmware_size - 1);
-    put_uint32le(&buf[0x424], sizeof(nrv2e_d8));
+    put_uint32le(&buf[0x604], firmware_size - 1);
+    put_uint32le(&buf[0x608], sizeof(nrv2e_d8));
 
     /* Compressed original firmware image */
-    put_uint32le(&buf[0x428], firmware_size - sizeof(nrv2e_d8) - 1);
-    put_uint32le(&buf[0x42c], of_packedsize);
+    put_uint32le(&buf[0x60c], firmware_size - sizeof(nrv2e_d8) - 1);
+    put_uint32le(&buf[0x610], of_packedsize);
 
     /* Compressed Rockbox image */
-    put_uint32le(&buf[0x430], firmware_size - sizeof(nrv2e_d8) - of_packedsize
+    put_uint32le(&buf[0x614], firmware_size - sizeof(nrv2e_d8) - of_packedsize
             - 1);
-    put_uint32le(&buf[0x434], rb_packedsize);
+    put_uint32le(&buf[0x618], rb_packedsize);
 
     ucl_dest = model_memory_size(model) - 1; /* last byte of memory */
-    put_uint32le(&buf[0x438], ucl_dest);
+    put_uint32le(&buf[0x61c], ucl_dest);
 
     /* Update the firmware block checksum */
     sum = calc_checksum(buf + 0x400, firmware_size);
@@ -619,8 +633,10 @@ int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
         return 0; \
     } while(0)
 
-    /* will packed data fit in the OF file ? */
-    if(packed_size > of_unpacked_size)
+    /* will packed data fit in the OF file ?
+     * XXX: we keep the first 0x200 bytes block unmodified, we just replace
+     * the ARM vectors */
+    if(packed_size + 0x200 > of_unpacked_size)
         ERROR(
             "[ERR]  Packed data (%d bytes) doesn't fit in the firmware "
             "(%d bytes)\n", packed_size, of_unpacked_size
