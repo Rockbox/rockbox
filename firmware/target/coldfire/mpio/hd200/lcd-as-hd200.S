@@ -125,16 +125,16 @@ lcd_mono_data:
     .type       lcd_grey_data,@function
 
 lcd_grey_data:
-    lea.l   (-8*4, %sp), %sp
-    movem.l  %d2-%d7/%a2-%a3, (%sp) /* save some registers */
-    movem.l (8*4+4, %sp), %a0-%a2  /* values, phases, length */
+    lea.l   (-11*4, %sp), %sp
+    movem.l  %d2-%d7/%a2-%a6, (%sp) /* save some registers */
+    movem.l (11*4+4, %sp), %a0-%a2  /* values, phases, length */
     add.l   %a2, %a2
     lea.l   (%a1, %a2.l*4), %a2    /* end address */
     lea.l   LCD_BASE_ADDRESS+2, %a3 /* LCD data port address */
     moveq.l #24, %d4            /* shift count */
     move.l  #0x204081, %d5      /* bit shuffle factor */
 
-    moveq.l #12, %d2
+    moveq.l #8, %d2
     add.l   %a1, %d2
     and.l   #0xfffffff0, %d2    /* first line bound */
     cmp.l   %d2, %a2            /* end address lower than first line bound? */
@@ -142,14 +142,14 @@ lcd_grey_data:
     move.l  %a2, %d2            /* -> adjust end address of head loop */
 1:
     cmp.l   %a1, %d2
-    bls.s   .g_head_tail_end
+    bls.s   .g_hend
 
-.g_head_tail:
+    /* process head pixels */
     movem.l (%a1), %d0-%d1      /* fetch 8 pixel phases */
 
     move.l  %d0, %d2
     and.l   #0x80808080, %d2    /* %d2 = 0.......1.......2.......3....... */
-    eor.l   %d2, %d0            
+    eor.l   %d2, %d0
     add.l   (%a0)+, %d0         /* add values to first 4 phases */
 
     move.l  %d1, %d3
@@ -170,26 +170,24 @@ lcd_grey_data:
 
     move.w  %d2, (%a3)          /* transfer second LCD byte */
 
-.g_head_tail_end:
+.g_hend:
     cmp.l   %a1, %a2
-    bls.w   .g_end
-    lea.l   (-8, %a2), %a2
+    bls.w   .g_tend
+    subq.l  #8, %a2
     cmp.l   %a1, %a2
-    bls.s   .g_line_end
+    bls.s   .g_lend
 
 .g_line_loop:
-    /* loop that utilize line transfers */
+    /* loop that utilizes line transfers */
     movem.l (%a1), %d0-%d3      /* fetch 2 * 8 pixels phases */
 
     move.l  %d0, %d6
     and.l   #0x80808080, %d6    /* %d6 = 0.......1.......2.......3....... */
     eor.l   %d6, %d0
-    add.l   (%a0)+, %d0         /* add values to first 4 phases */
 
     move.l  %d1, %d7
     and.l   #0x80808080, %d7    /* %d7 = 4.......5.......6.......7....... */
     eor.l   %d7, %d1
-    add.l   (%a0)+, %d1         /* add values to second 4 phases */
 
     lsr.l   #4, %d7             /* %d7 = ....4.......5.......6.......7... */
     or.l    %d7, %d6            /* %d6 = 0...4...1...5...2...6...3...7... */
@@ -198,17 +196,22 @@ lcd_grey_data:
     lsr.l   %d4, %d6            /* %d6 = ........................01234567 */
 
     move.w  %d6, (%a3)          /* transfer first LCD byte */
+
+    movem.l (%a0), %d7/%a4-%a6  /* fetch 2 * 8 pixel values */
+    lea.l   (16, %a0), %a0
+
     move.w  %d6, (%a3)          /* transfer second LCD byte */
+
+    add.l   %d7, %d0
+    add.l   %a4, %d1
 
     move.l  %d2, %d6
     and.l   #0x80808080, %d6    /* %d6 = 0.......1.......2.......3....... */
     eor.l   %d6, %d2
-    add.l   (%a0)+, %d2         /* add values to first 4 phases */
 
     move.l  %d3, %d7
     and.l   #0x80808080, %d7    /* %d7 = 4.......5.......6.......7....... */
     eor.l   %d7, %d3
-    add.l   (%a0)+, %d3         /* add values to second 4 phases */
 
     lsr.l   #4, %d7             /* %d7 = ....4.......5.......6.......7... */
     or.l    %d7, %d6            /* %d6 = 0...4...1...5...2...6...3...7... */
@@ -216,24 +219,53 @@ lcd_grey_data:
     not.l   %d6                 /*       negate bits */
     lsr.l   %d4, %d6            /* %d6 = ........................01234567 */
 
+    add.l   %a5, %d2
+    add.l   %a6, %d3
+
     move.w  %d6, (%a3)          /* transfer first LCD byte */
-    move.w  %d6, (%a3)          /* transfer second LCD byte */
 
     movem.l %d0-%d3, (%a1)      /* store 2 * 8 new pixel phases */
     lea.l   (16, %a1), %a1      /* advance pointer */
 
+    move.w  %d6, (%a3)          /* transfer second LCD byte */
+
     cmp.l   %a2, %a1
     bls.s   .g_line_loop
 
-.g_line_end:
-    lea.l   (8, %a2), %a2
+.g_lend:
+    addq.l  #8, %a2
     cmp.l   %a1, %a2
-    bls.s   .g_end
-    bra.w   .g_head_tail
+    bls.s   .g_tend
 
-.g_end:
-    movem.l (%sp), %d2-%d7/%a2-%a3
-    lea.l   (8*4, %sp), %sp
+    /* process tail pixels */
+    movem.l (%a1), %d0-%d1      /* fetch 8 pixel phases */
+
+    move.l  %d0, %d2
+    and.l   #0x80808080, %d2    /* %d2 = 0.......1.......2.......3....... */
+    eor.l   %d2, %d0
+    add.l   (%a0)+, %d0         /* add values to first 4 phases */
+
+    move.l  %d1, %d3
+    and.l   #0x80808080, %d3    /* %d3 = 4.......5.......6.......7....... */
+    eor.l   %d3, %d1
+    add.l   (%a0)+, %d1         /* add values to second 4 phases */
+
+    lsr.l   #4, %d3             /* %d3 = ....4.......5.......6.......7... */
+    or.l    %d3, %d2            /* %d2 = 0...4...1...5...2...6...3...7... */
+    mulu.l  %d5, %d2            /* %d2 = 01234567123.567.23..67..3...7... */
+    not.l   %d2                 /*       negate bits */
+    lsr.l   %d4, %d2            /* %d2 = ........................01234567 */
+
+    move.w  %d2, (%a3)          /* transfer first LCD byte */
+
+    movem.l %d0-%d1, (%a1)      /* store 8 new pixel phases */
+    /* addq.l  #8, %a1             not needed anymore */
+
+    move.w  %d2, (%a3)          /* transfer second LCD byte */
+
+.g_tend:
+    movem.l (%sp), %d2-%d7/%a2-%a6
+    lea.l   (11*4, %sp), %sp
     rts
 .grey_end:
     .size    lcd_grey_data,.grey_end-lcd_grey_data
