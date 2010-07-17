@@ -147,8 +147,8 @@ typedef struct WMADecodeContext
     fixed32 noise_mult; /* XXX: suppress that and integrate it in the noise array */
     /* lsp_to_curve tables */
     fixed32 lsp_cos_table[BLOCK_MAX_SIZE];
-    fixed32 *lsp_pow_m_table1;
-    fixed32 *lsp_pow_m_table2;
+    void *lsp_pow_m_table1;
+    void *lsp_pow_m_table2;
 
     /* State of current superframe decoding */
     int bit_offset;

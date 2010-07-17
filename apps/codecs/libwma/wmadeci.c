@@ -587,8 +587,8 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
     m = (u.v >> (23 - LSP_POW_BITS)) & ((1 << LSP_POW_BITS) - 1);
     /* build interpolation scale: 1 <= t < 2. */
     t.v = ((u.v << LSP_POW_BITS) & ((1 << 23) - 1)) | (127 << 23);
-    a = s->lsp_pow_m_table1[m];
-    b = s->lsp_pow_m_table2[m];
+    a = ((fixed32*)s->lsp_pow_m_table1)[m];
+    b = ((fixed32*)s->lsp_pow_m_table2)[m];
 
     /* lsp_pow_e_table contains 32.32 format */
     /* TODO:  Since we're unlikely have value that cover the whole
@@ -617,16 +617,16 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
     b = itofix32(1);
     int ix = 0;
 
-    s->lsp_pow_m_table1 = (fixed32*)&vlcbuf3[0];
-    s->lsp_pow_m_table2 = (fixed32*)&vlcbuf3[VLCBUF3SIZE];
+    s->lsp_pow_m_table1 = &vlcbuf3[0];
+    s->lsp_pow_m_table2 = &vlcbuf3[VLCBUF3SIZE];
 
     /*double check this later*/
     for(i=(1 << LSP_POW_BITS) - 1;i>=0;i--)
     {
         m = (1 << LSP_POW_BITS) + i;
         a = pow_a_table[ix++]<<4;
-        s->lsp_pow_m_table1[i] = 2 * a - b;
-        s->lsp_pow_m_table2[i] = b - a;
+        ((fixed32*)s->lsp_pow_m_table1)[i] = 2 * a - b;
+        ((fixed32*)s->lsp_pow_m_table2)[i] = b - a;
         b = a;
     }
 
