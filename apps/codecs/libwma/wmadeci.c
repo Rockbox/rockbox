@@ -47,7 +47,6 @@ fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];
 /*VLC lookup tables*/
 uint16_t *runtabarray[2], *levtabarray[2];                                        
 
-/*these could be made smaller since only one can be 1336*/
 uint16_t runtab_big[1336], runtab_small[1072], levtab_big[1336], levtab_small[1072];
 
 #define VLCBUF1SIZE 4598
@@ -59,7 +58,8 @@ uint16_t runtab_big[1336], runtab_small[1072], levtab_big[1336], levtab_small[10
 
 VLC_TYPE vlcbuf1[VLCBUF1SIZE][2];
 VLC_TYPE vlcbuf2[VLCBUF2SIZE][2];
-VLC_TYPE vlcbuf3[VLCBUF3SIZE][2];
+/* This buffer gets reused for lsp tables */
+VLC_TYPE vlcbuf3[VLCBUF3SIZE][2] __attribute__((aligned (sizeof(fixed32))));
 VLC_TYPE vlcbuf4[VLCBUF4SIZE][2];
 
 
@@ -616,6 +616,9 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
        pow_m1_4 */
     b = itofix32(1);
     int ix = 0;
+
+    s->lsp_pow_m_table1 = (fixed32*)&vlcbuf3[0];
+    s->lsp_pow_m_table2 = (fixed32*)&vlcbuf3[VLCBUF3SIZE];
 
     /*double check this later*/
     for(i=(1 << LSP_POW_BITS) - 1;i>=0;i--)
