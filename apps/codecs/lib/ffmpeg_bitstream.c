@@ -146,7 +146,7 @@ typedef struct {
     /** codeword, with the first bit-to-be-read in the msb
      * (even if intended for a little-endian bitstream reader) */
     uint32_t code;
-} VLCcode;
+} __attribute__((__packed__)) VLCcode; /* packed to save space */
 
 static int compare_vlcspec(const void *a, const void *b)
 {
@@ -291,7 +291,7 @@ static int build_table(VLC *vlc, int table_nb_bits, int nb_codes,
    out above (bitswap_32) and an inline asm version in libtremor/codebook.c
    if we ever want this */
    
-static VLCcode buf[1500]; /* worst case is wma, which has one table with 1336 entries */
+static VLCcode buf[1336+1]; /* worst case is wma, which has one table with 1336 entries */
 
 int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
