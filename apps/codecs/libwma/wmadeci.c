@@ -170,7 +170,7 @@ static void init_coef_vlc(VLC *vlc,
 int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 {
     
-    int i, flags1, flags2;
+    int i, flags2;
     fixed32 *window;
     uint8_t *extradata;
     fixed64 bps1;
@@ -206,15 +206,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     }
 
     /* extract flag infos */
-    flags1 = 0;
     flags2 = 0;
     extradata = wfx->data;
     if (s->version == 1 && wfx->datalen >= 4) {
-        flags1 = extradata[0] | (extradata[1] << 8);
         flags2 = extradata[2] | (extradata[3] << 8);
     }else if (s->version == 2 && wfx->datalen >= 6){
-        flags1 = extradata[0] | (extradata[1] << 8) |
-                 (extradata[2] << 16) | (extradata[3] << 24);
         flags2 = extradata[4] | (extradata[5] << 8);
     }
     s->use_exp_vlc = flags2 & 0x0001;

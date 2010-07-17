@@ -147,7 +147,6 @@ typedef struct WMADecodeContext
     fixed32 noise_mult; /* XXX: suppress that and integrate it in the noise array */
     /* lsp_to_curve tables */
     fixed32 lsp_cos_table[BLOCK_MAX_SIZE];
-    fixed64 lsp_pow_e_table[256];
     fixed32 lsp_pow_m_table1[(1 << LSP_POW_BITS)];
     fixed32 lsp_pow_m_table2[(1 << LSP_POW_BITS)];
 
