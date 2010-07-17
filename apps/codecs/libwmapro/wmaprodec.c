@@ -86,8 +86,8 @@
  * subframe in order to reconstruct the output samples.
  */
 
-#include "get_bits.h"
-#include "put_bits.h"
+#include "ffmpeg_get_bits.h"
+#include "ffmpeg_put_bits.h"
 #include "wmaprodata.h"
 #include "wma.h"
 #include "wmaprodec.h"

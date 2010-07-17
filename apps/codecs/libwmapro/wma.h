@@ -22,8 +22,8 @@
 #ifndef AVCODEC_WMA_H
 #define AVCODEC_WMA_H
 
-#include "get_bits.h"
-#include "put_bits.h"
+#include "ffmpeg_get_bits.h"
+#include "ffmpeg_put_bits.h"
 
 /* size of blocks */
 #define BLOCK_MIN_BITS 7
