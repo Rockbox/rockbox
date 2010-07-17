@@ -88,6 +88,7 @@ public slots:
 
 private slots:
     void browse();
+    void targetChange(int target);
 
 private:
     Ui::NewProjectDialog *ui;

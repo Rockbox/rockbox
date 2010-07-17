@@ -49,10 +49,13 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
     {
         ui->targetBox->insertItem(i, QIcon(), targets.name(i), targets.id(i));
     }
+    targetChange(0);
 
-    /* Connecting the browse button */
+    /* Connecting the browse button and target box */
     QObject::connect(ui->browseButton, SIGNAL(clicked()),
                      this, SLOT(browse()));
+    QObject::connect(ui->targetBox, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(targetChange(int)));
 }
 
 NewProjectDialog::~NewProjectDialog()
@@ -113,4 +116,42 @@ void NewProjectDialog::browse()
     path = QFileDialog::getExistingDirectory(this, "New Project Location",
                                              ui->locationBox->text());
     ui->locationBox->setText(path);
+}
+
+void NewProjectDialog::targetChange(int target)
+{
+    TargetData targets;
+
+    if(targets.fm(target))
+    {
+        ui->fmsBox->setEnabled(true);
+        ui->rfmsBox->setEnabled(true);
+    }
+    else
+    {
+        ui->fmsBox->setChecked(false);
+        ui->rfmsBox->setChecked(false);
+
+        ui->fmsBox->setEnabled(false);
+        ui->rfmsBox->setEnabled(false);
+    }
+
+    if(targets.remoteDepth(target) == TargetData::None)
+    {
+        ui->rwpsBox->setChecked(false);
+        ui->rsbsBox->setChecked(false);
+        ui->rfmsBox->setChecked(false);
+
+        ui->rsbsBox->setEnabled(false);
+        ui->rwpsBox->setEnabled(false);
+        ui->rfmsBox->setEnabled(false);
+    }
+    else
+    {
+        ui->rsbsBox->setEnabled(true);
+        ui->rwpsBox->setEnabled(true);
+        if(targets.fm(target))
+            ui->rfmsBox->setEnabled(true);
+    }
+
 }

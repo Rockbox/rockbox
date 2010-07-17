@@ -332,6 +332,7 @@ void EditorWindow::newProject()
 
     /* Generating the config file */
     QString config = tr("# Config file for ") + info.name + "\n";
+    config.append("#target: " + info.target + "\n\n");
     QString wpsBase = "/.rockbox/wps/";
     if(info.sbs)
         config.append("sbs: " + wpsBase + info.name + ".sbs\n");

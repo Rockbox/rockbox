@@ -47,6 +47,11 @@ public:
 
     QString id(int index){ return indices.key(index, ""); }
     QString name(int index){ return entries[index].name; }
+    QRect screenSize(int index){ return entries[index].size; }
+    QRect remoteSize(int index){ return entries[index].rSize; }
+    ScreenDepth screenDepth(int index){ return entries[index].depth; }
+    ScreenDepth remoteDepth(int index){ return entries[index].rDepth; }
+    bool fm(int index){ return entries[index].fm; }
 
 private:
     struct Entry
