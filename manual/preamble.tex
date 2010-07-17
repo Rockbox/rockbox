@@ -150,22 +150,33 @@
 % we want them.
 % Note: use this only for screenshots!
 % Note: leave caption empty to supress it.
+% Resulting file names in the source should consist of up to 3 parts
+% "filename-\genericimg-[\specimg|\seriesimg]"  (the third is optional)
+% filename is specified by the use of this macro in the tex file
+% \genericimg will be generated using the display's resolution (see above)
+% \specimg or \seriesimg are possible options set in the platform files
+% Files will be used in the following order: 1.filename contains \specimg part
+% 2. filename contains \seriesimg part, 3. filename without the third part
 \newcommand{\screenshot}[3]{
   \begin{figure}[H]
     \begin{center}
       \IfFileExists{#1-\genericimg-\specimg.png}
         {\includegraphics[width=\screenshotsize]{#1-\genericimg-\specimg.png}
          \typeout{Note: device specific image used}}
-        {\IfFileExists{#1-\genericimg.png}
-          {\includegraphics[width=\screenshotsize]{#1-\genericimg.png}}
-          {\IfFileExists{#1}
-            {\includegraphics[width=\screenshotsize]{#1}
-             \typeout{Warning: deprecated plain image name used}}%
-            {\typeout{Missing image: #1 (\genericimg) (\specimg)}%
-             \color{red}{\textbf{WARNING!} Image not found}%
+        {\IfFileExists{#1-\genericimg-\seriesimg.png}
+          {\includegraphics[width=\screenshotsize]{#1-\genericimg-\seriesimg.png}
+           \typeout{Note: series specific image used}}
+          {\IfFileExists{#1-\genericimg.png}
+            {\includegraphics[width=\screenshotsize]{#1-\genericimg.png}}
+            {\IfFileExists{#1}
+              {\includegraphics[width=\screenshotsize]{#1}
+               \typeout{Warning: deprecated plain image name used}}%
+              {\typeout{Missing image: #1 (\genericimg) (\specimg)}%
+               \color{red}{\textbf{WARNING!} Image not found}%
             }
           }
         }
+      }
       \if\blank{#3}\else{\label{#3}}\fi\if\blank{#2}\else{%
         \caption{#2}}\fi
     \end{center}
