@@ -48,7 +48,7 @@ fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];
 uint16_t *runtabarray[2], *levtabarray[2];                                        
 
 /*these could be made smaller since only one can be 1336*/
-uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];               
+uint16_t runtab_big[1336], runtab_small[1072], levtab_big[1336], levtab_small[1072];
 
 #define VLCBUF1SIZE 4598
 #define VLCBUF2SIZE 3574
@@ -546,8 +546,10 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             coef_vlc_table = 1;
     }
 
-    runtabarray[0] = runtab0; runtabarray[1] = runtab1;
-    levtabarray[0] = levtab0; levtabarray[1] = levtab1;
+    /* since the coef2 table is the biggest and that has index 2 in coef_vlcs
+       it's safe to always assign like this */
+    runtabarray[0] = runtab_big; runtabarray[1] = runtab_small;
+    levtabarray[0] = levtab_big; levtabarray[1] = levtab_small;
 
     s->coef_vlc[0].table = vlcbuf1;
     s->coef_vlc[0].table_allocated = VLCBUF1SIZE;
