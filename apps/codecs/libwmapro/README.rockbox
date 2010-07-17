@@ -14,27 +14,10 @@ IMPORT DETAILS
 
 Based on ffmpeg svn r22886 dated 15 April 2010.
 
-The code is slowly being modified to convert it from floating point maths to 
-fixed point.
+The decoder now (17 July 2010) uses fixed point arithmetic everywhere. It still
+doesn't work on 3 targets, namely clip, c200v2 and m200v4 due to their small 
+codec buffer compared to wma pro's needs. 
 
-As of 6 July 2010, the following steps are all working properly in fixed point:
-- Inverse quantization and rescaling
-- IMDCT
-- Windowing
-
-Results of comparing output wav files from the partially fixed point decoder to 
-the output wav files of ffmpeg decoder are :
-- average relative error = 0.016%
-- maximum relative error = 0.3% 
-
-COMPILING
-
-At the time of this writing (21 June 2010) the decoder isn't still included in
-the main build since it still only works in the simulator.
-
-A patch is included that would enable building the library and the codec for
-testing and development purposes.
-
-To apply the patch, you should cd to libwmapro directory and then execute the 
-following command :
-patch -p 0 < wmapro_mainbuild.patch
+A comparison against ffmpeg floating point decoder gives :
+0.2~0.3%  max relative error
+0.005~0.01% average relative error

@@ -16,13 +16,3 @@ OTHER_SRC += $(WMAPROLIB_SRC)
 $(WMAPROLIB): $(WMAPROLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-ifdef APP_TYPE
-# wmapro needs libm in the simulator
-$(CODECDIR)/wmapro.codec: $(CODECDIR)/wmapro.o
-	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/wmapro.elf \
-	$(filter %.o, $^) \
-	$(filter %.a, $+) \
-	-lgcc -lm $(CODECLDFLAGS)
-	$(SILENT)cp $(CODECDIR)/wmapro.elf $@
-endif
