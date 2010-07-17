@@ -19,7 +19,7 @@
 #
 #    Fitchî e walon ki rote avou tolminme kéne éndjolreye
 #
-#    Stéphane QUERTINMONT <stefane AT walon.org> - Awousse 2009
+#    Stéphane QUERTINMONT <stefane AT walon.org> - Févri 2010
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -10628,11 +10628,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "Hôte"
+    gigabeatfx: "Foite"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Hôte"
+    gigabeatfx: "Foite"
   </voice>
 </phrase>
 <phrase>
@@ -11432,6 +11432,91 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Môde taprece USB"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Môde taprece USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Môde Multimedia"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Môde Multimedia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Môde prezintaedje"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Môde prezintaedje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Môde betcheu"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Môde betcheu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Môde sori"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Môde sori"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SKIN_RAM_USAGE
   desc: how much RAM the skins are using
   user: core
@@ -11477,5 +11562,567 @@
   <voice>
     *: none
     lcd_bitmap: "Eplaeçmint del bår d' acinseur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rastrindrece"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rastrindrece"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Defini come cayet al copete del waitroûle abeye"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Defini come cayet al copete del waitroûle abeye"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Itåleye"
+  </dest>
+  <voice>
+    *: none
+    radio: "Itåleye"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Ôte"
+  </dest>
+  <voice>
+    *: none
+    radio: "Ôte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Sou"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Sou"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rapoirt"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rapoirt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 di 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 di 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 di 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 di 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limite"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Amîdré Crexhaedje"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Amîdré Crexhaedje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Otomatic"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Otomatic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Djino"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Djino"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Deur di djno"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Deur do djno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Mol do djno"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Mol do djno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tins di rlåtche"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tins di rlåtche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Passer l'atake do coron"
+  </dest>
+  <voice>
+    *: "Passer l'atake do coron"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "A vosse môde"
+  </dest>
+  <voice>
+    *: "A vosse môde"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "pea del bår ås messaedjes"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "pea del bår ås messaedjes å lon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CUSTOM_STATUSBAR
+  desc: deprecated
+  user:
+  <source>
+    *: none
+  </source>
+  <dest>
+    *: none
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Stitchî l' maxhî å coron"
+  </dest>
+  <voice>
+    *: "Stitchî l' maxhî å coron"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Stitchî l' maxhî å coron (rén k'on lijhaedje)"
+  </dest>
+  <voice>
+    *: "Stitchî l' maxhî å coron (rén k'on lijhaedje)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Intrêye a côde Mosse"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Intrêye a côde Mosse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Rén k' po l' candjmint otomatike di boket"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Rén k' po l' candjmint otomatike di boket"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Boket ki vént:"
+  </dest>
+  <voice>
+    *: "Boket ki vént:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Shuvant:"
+  </dest>
+  <voice>
+    *: "Shuvant:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "so"
+  </dest>
+  <voice>
+    *: "so"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Pea"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Pea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *:none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *:none
+    lcd_bitmap: "Pea då lon"
+  </dest>
+  <voice>
+    *:none
+    lcd_bitmap: "Pea då lon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Mwaisse waitroûle"
+  </dest>
+  <voice>
+    *:none
+    remote: "Mwaisse waitroûle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *:none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *:none
+    remote: "Waitroûle då lon"
+  </dest>
+  <voice>
+    *:none
+    remote: "Waitroûle då lon"
   </voice>
 </phrase>
