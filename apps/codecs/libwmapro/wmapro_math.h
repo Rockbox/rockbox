@@ -2,14 +2,13 @@
 #define _WMAPRO_MATH_H_
 
 #include <inttypes.h>
-#include "types.h"
 
 #define fixtof16(x)       (float)((float)(x) / (float)(1 << 16))
 #define fixtof31(x)       (float)((float)(x) / (float)(1 << 31))
 #define ftofix16(x)       ((int32_t)((x) * (float)(1 << 16) + ((x) < 0 ? -0.5:0.5)))
 #define ftofix31(x)       ((int32_t)((x) * (float)(1 << 31) + ((x) < 0 ? -0.5:0.5)))
 
-static inline FIXED fixmulshift(FIXED x, FIXED y, int shamt)
+static inline int32_t fixmulshift(int32_t x, int32_t y, int shamt)
 {
     int64_t temp;
     temp = x;
@@ -21,26 +20,26 @@ static inline FIXED fixmulshift(FIXED x, FIXED y, int shamt)
 }
 
 
-static inline void vector_fixmul_window(FIXED *dst, const FIXED *src0, 
-                                   const FIXED *src1, const FIXED *win, 
-                                   FIXED add_bias, int len)
+static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
+                                   const int32_t *src1, const int32_t *win, 
+                                   int32_t add_bias, int len)
 {
     int i, j;
     dst += len;
     win += len;
     src0+= len;
         for(i=-len, j=len-1; i<0; i++, j--) {
-        FIXED s0 = src0[i];
-        FIXED s1 = src1[j];
-        FIXED wi = win[i];
-        FIXED wj = win[j];
+        int32_t s0 = src0[i];
+        int32_t s1 = src1[j];
+        int32_t wi = win[i];
+        int32_t wj = win[j];
         dst[i] = fixmulshift(s0,-1*wj,31) - fixmulshift(s1,-1*wi,31) + (add_bias<<16);
         dst[j] = fixmulshift(s0,-1*wi,31) + fixmulshift(s1,-1*wj,31) + (add_bias<<16);
     }   
     
 }
 
-static inline void vector_fixmul_scalar(FIXED *dst, const FIXED *src, FIXED mul,
+static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, int32_t mul,
                                         int len, int shift)
 {
     int i;
