@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "ffmpeg_intreadwrite.h"
 //#include <assert.h>
 //#include "libavutil/bswap.h"
 //#include "libavutil/common.h"
@@ -56,16 +57,6 @@
 #define av_const __attribute__((const))
 #define av_always_inline inline __attribute__((always_inline))
 
-/* Coldfire cpu's support unaligned long reads */ 
-#ifdef CPU_COLDFIRE
-#define AV_RB32(x)  (*(const uint32_t*)(x))
-#else
-/* The following define is taken from libavutil/intreadwrite.h */
-#define AV_RB32(x)  ((((const uint8_t*)(x))[0] << 24) | \
-                     (((const uint8_t*)(x))[1] << 16) | \
-                     (((const uint8_t*)(x))[2] <<  8) | \
-                      ((const uint8_t*)(x))[3])
-#endif
 /* The following is taken from mathops.h */
 
 #ifndef sign_extend

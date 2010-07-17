@@ -30,7 +30,8 @@
 
 //#include "avcodec.h"
 #include "ffmpeg_get_bits.h"
-//#include "put_bits.h"
+#include "ffmpeg_put_bits.h"
+#include "ffmpeg_intreadwrite.h"
 
 #define av_log(...)
 
@@ -65,6 +66,7 @@ void ff_put_string(PutBitContext *pb, const char *string, int terminate_string)
     if(terminate_string)
         put_bits(pb, 8, 0);
 }
+#endif
 
 void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 {
@@ -74,7 +76,7 @@ void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 
     if(length==0) return;
 
-    if(CONFIG_SMALL || words < 16 || put_bits_count(pb)&7){
+    if(words < 16 || put_bits_count(pb)&7){
         for(i=0; i<words; i++) put_bits(pb, 16, AV_RB16(src + 2*i));
     }else{
         for(i=0; put_bits_count(pb)&31; i++)
@@ -86,7 +88,7 @@ void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 
     put_bits(pb, bits, AV_RB16(src + 2*words)>>(16-bits));
 }
-#endif
+
 /* VLC decoding */
 
 //#define DEBUG_VLC
