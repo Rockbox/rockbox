@@ -132,6 +132,10 @@ next_track:
             {
                 outlen = BUFSIZE;   /* decode_packet needs to know the size of the output buffer */
                 res = decode_packet(&wfx, decoded, &outlen, data, size);
+                if(res < 0) {
+                    LOGF("(WMA PRO) Error: decode_packet returned %d", res);
+                    goto done;
+                }
                 data += res;
                 size -= res;
                 if(outlen) {
