@@ -48,6 +48,8 @@ int usb_detect(void)
 
 void usb_enable(bool on)
 {
+    /* one second timeout */
+    unsigned char timeout = 10;
    
     if(on)
     {
@@ -64,7 +66,10 @@ void usb_enable(bool on)
 
         and_l(~(1<<4),&GPIO1_OUT); /* GPIO36 low */
 
-        while ( !(GPIO1_READ & (1<<5)) ) {}
+        while ( !(GPIO1_READ & (1<<5)) && timeout--)
+        {
+            sleep(HZ/10);
+        }
         sleep(HZ);
     }
 }
