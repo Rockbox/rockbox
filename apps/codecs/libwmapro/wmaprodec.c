@@ -1249,7 +1249,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
                             s->channel[c].scale_factor_step;
                 
                 if(exp < EXP_MIN || exp > EXP_MAX) {
-                    DEBUGF("in wmaprodec.c : unhandled value for exp, please report sample.\n");
+                    DEBUGF("in wmaprodec.c : unhandled value for exp (%d), please report sample.\n", exp);
                     return -1;
                 }
                 const int32_t quant = QUANT(exp);
