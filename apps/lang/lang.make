@@ -24,7 +24,7 @@ CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 # TODO: In the future generate this file within genlang or another script
 # in order to only calculate the maximum size based on the core strings.
 $(BUILDDIR)/lang/max_language_size.h: $(LANGOBJ)
-	$(call PRINTS,Create $(notdir $@))
+	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))
 	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/* | awk '{print $$5-10}' | sort -n | tail -1`" > $@
 
 $(BUILDDIR)/lang/lang_core.o: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features

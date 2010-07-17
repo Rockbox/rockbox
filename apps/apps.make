@@ -27,6 +27,6 @@ $(BUILDDIR)/apps/features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/
 		grep -v "^\#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
 
 $(BUILDDIR)/apps/genlang-features:  $(BUILDDIR)/apps/features
-	tr \\n : < $< > $@
+	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))tr \\n : < $< > $@
 
 ASMDEFS_SRC += $(APPSDIR)/core_asmdefs.c
