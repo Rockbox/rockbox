@@ -1504,10 +1504,11 @@ static bool tsc2100_debug(void)
 #define BAT_LAST_VAL  MIN(LCD_WIDTH, POWER_HISTORY_LEN)
 #define BAT_YSPACE    (LCD_HEIGHT - 20)
 
+
 static bool view_battery(void)
 {
     int view = 0;
-    int i, x, y;
+    int i, x, y, y1, y2, grid, graph;
     unsigned short maxv, minv;
 
     lcd_setfont(FONT_SYSFIXED);
@@ -1526,23 +1527,64 @@ static bool view_battery(void)
                     if (power_history[i] < minv)
                         minv = power_history[i];
                 }
-
-                lcd_putsf(0, 0, "Battery %d.%03d", power_history[0] / 1000,
+                
+                /* adjust grid scale */ 
+                if ((maxv - minv) > 50)
+                    grid = 50;
+                else
+                    grid = 5;
+                
+                /* print header */                
+                lcd_putsf(0, 0, "battery %d.%03dV", power_history[0] / 1000,
                          power_history[0] % 1000);
-                lcd_putsf(0, 1, "scale %d.%03d-%d.%03dV",
-                         minv / 1000, minv % 1000, maxv / 1000, maxv % 1000);
+                lcd_putsf(0, 1, "%d.%03d-%d.%03dV (%2dmV)",
+                          minv / 1000, minv % 1000, maxv / 1000, maxv % 1000,
+                          grid);
+                
+                i = 1;
+                while ((y = (minv - (minv % grid)+i*grid)) < maxv)
+                {
+                    graph = ((y-minv)*BAT_YSPACE)/(maxv-minv);
+                    graph = LCD_HEIGHT-1 - graph;
+             
+                    /* draw dotted horizontal grid line */      
+                    for (x=0; x<LCD_WIDTH;x=x+2)
+                        lcd_drawpixel(x,graph);
 
-                x = 0;
-                for (i = BAT_LAST_VAL - 1; i >= 0; i--) {
-                    y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
-                    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                    lcd_vline(x, LCD_HEIGHT-1, 20);
-                    lcd_set_drawmode(DRMODE_SOLID);
-                    lcd_vline(x, LCD_HEIGHT-1,
-                              MIN(MAX(LCD_HEIGHT-1 - y, 20), LCD_HEIGHT-1));
-                    x++;
+                    i++;
                 }
+                
+                x = 0;
+                /* draw plot of power history
+                 * skip empty entries
+                 */
+                for (i = BAT_LAST_VAL - 1; i > 0; i--) 
+                {
+                    if (power_history[i] && power_history[i-1])
+                    {
+                        y1 = (power_history[i] - minv) * BAT_YSPACE / 
+                            (maxv - minv);
+                        y1 = MIN(MAX(LCD_HEIGHT-1 - y1, 20), 
+                                 LCD_HEIGHT-1);
+                        y2 = (power_history[i-1] - minv) * BAT_YSPACE /
+                            (maxv - minv);
+                        y2 = MIN(MAX(LCD_HEIGHT-1 - y2, 20),
+                                 LCD_HEIGHT-1);
 
+                        lcd_set_drawmode(DRMODE_SOLID);
+
+                        /* make line thicker */
+                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL)), 
+                                     y1, 
+                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL)), 
+                                     y2);
+                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL))+1, 
+                                     y1+1, 
+                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL))+1, 
+                                     y2+1);
+                        x++;
+                    }
+                }
                 break;
 
             case 1: /* status: */
