@@ -121,7 +121,7 @@ char* scan_string(char** document)
 
         if(*cursor == '\n')
         {
-            skin_error(UNEXPECTED_NEWLINE);
+            skin_error(UNEXPECTED_NEWLINE, cursor);
             return NULL;
         }
 
