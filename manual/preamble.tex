@@ -157,6 +157,13 @@
 % \specimg or \seriesimg are possible options set in the platform files
 % Files will be used in the following order: 1.filename contains \specimg part
 % 2. filename contains \seriesimg part, 3. filename without the third part
+
+% set seriesimg if it isn't defined in the platform file to not break manuals
+\ifdefined\seriesimg
+\else
+    \newcommand{\seriesimg}{\specimg}
+\fi
+
 \newcommand{\screenshot}[3]{
   \begin{figure}[H]
     \begin{center}
