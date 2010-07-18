@@ -91,7 +91,7 @@
 #define HAVE_WM8751
 #define CODEC_SRCTRL_44100HZ     (0x40|(0x11 << 1)|1)
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */

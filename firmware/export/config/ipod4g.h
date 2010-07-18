@@ -106,7 +106,7 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8975
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* define this if you have a disk storage, i.e. something

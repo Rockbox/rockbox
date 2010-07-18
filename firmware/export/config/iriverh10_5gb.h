@@ -89,7 +89,7 @@
 /* WM8731 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* FM Tuner */
 #define CONFIG_TUNER TEA5767
@@ -102,7 +102,7 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 #define BATTERY_CAPACITY_DEFAULT 820 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */

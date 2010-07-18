@@ -81,7 +81,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x10000
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL 32768

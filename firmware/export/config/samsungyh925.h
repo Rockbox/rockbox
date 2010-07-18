@@ -130,7 +130,7 @@
 /* AK4537 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 #define BATTERY_CAPACITY_DEFAULT 900 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */

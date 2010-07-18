@@ -28,9 +28,7 @@
 
 #define AB_MARKER_NONE 0
 
-#if (AB_REPEAT_ENABLE == 1)
 #include "settings.h"
-#endif
 
 void ab_repeat_init(void);           
 #if 0 /* Currently unused */
@@ -68,11 +66,7 @@ static inline bool ab_B_marker_set(void)
 
 static inline bool ab_repeat_mode_enabled(void)
 {
-#if (AB_REPEAT_ENABLE == 2)
-    return ab_A_marker_set() || ab_B_marker_set();
-#else
     return global_settings.repeat_mode == REPEAT_AB;
-#endif
 }
 
 static inline bool ab_reached_B_marker(unsigned int song_position)

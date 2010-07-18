@@ -325,7 +325,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
                 case REPEAT_AB:
                     gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
                     break;
-#endif /* AB_REPEAT_ENABLE == 1 */
+#endif /* AB_REPEAT_ENABLE */
 
                 case REPEAT_ONE:
                     gui_statusbar_icon_play_mode(display, Icon_RepeatOne);

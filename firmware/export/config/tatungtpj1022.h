@@ -68,7 +68,7 @@
 /* Define this if you have the WM8731 audio codec */
 #define HAVE_WM8731
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */

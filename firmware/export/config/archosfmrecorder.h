@@ -71,7 +71,7 @@
 #define CONFIG_TUNER S1A0903X01
 #endif
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F

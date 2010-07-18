@@ -110,7 +110,7 @@
 /* WM8721 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* define this if you have a disk storage, i.e. something

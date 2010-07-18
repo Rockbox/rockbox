@@ -120,7 +120,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* FM Tuner */
 #define CONFIG_TUNER (SI4700|RDA5802) /* in fact SI4702 */

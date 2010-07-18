@@ -79,7 +79,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x10000
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

@@ -66,7 +66,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
-#define AB_REPEAT_ENABLE 1
+#define AB_REPEAT_ENABLE
 
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F

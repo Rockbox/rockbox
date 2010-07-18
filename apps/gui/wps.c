@@ -888,10 +888,6 @@ long gui_wps_show(void)
                     {
                         ab_jump_to_A_marker();
                         break;
-#if (AB_REPEAT_ENABLE == 2)
-                    } else {
-                        ab_reset_markers();
-#endif
                     }
                 }
                 else
@@ -915,10 +911,6 @@ long gui_wps_show(void)
                     {
                         ab_jump_to_A_marker();
                         break;
-#if (AB_REPEAT_ENABLE == 2)
-                    } else {
-                        ab_reset_markers();
-#endif
                     }
                 }
                 else
