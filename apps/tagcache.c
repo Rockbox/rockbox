@@ -2858,7 +2858,7 @@ static bool commit(void)
     
     if (tch.magic != TAGCACHE_MAGIC || rc != len)
     {
-        logf("incorrect header");
+        logf("incorrect tmpheader");
         close(tmpfd);
         remove(TAGCACHE_FILE_TEMP);
         return false;
@@ -2872,6 +2872,9 @@ static bool commit(void)
         return true;
     }
 
+    /* Fully initialize existing headers (if any) before going further. */
+    tc_stat.ready = check_all_headers();
+    
 #ifdef HAVE_EEPROM_SETTINGS
     remove(TAGCACHE_STATEFILE);
 #endif
@@ -4361,8 +4364,11 @@ static void tagcache_thread(void)
     
 #ifdef HAVE_TC_RAMCACHE
 # ifdef HAVE_EEPROM_SETTINGS
-    if (firmware_settings.initialized && firmware_settings.disk_clean)
+    if (firmware_settings.initialized && firmware_settings.disk_clean
+        && global_settings.tagcache_ram)
+    {
         check_done = tagcache_dumpload();
+    }
 
     remove(TAGCACHE_STATEFILE);
 # endif
@@ -4376,9 +4382,12 @@ static void tagcache_thread(void)
     tc_stat.initialized = true;
     
     /* Don't delay bootup with the header check but do it on background. */
-    sleep(HZ);
-    tc_stat.ready = check_all_headers();
-    tc_stat.readyvalid = true;
+    if (!tc_stat.ready)
+    {
+        sleep(HZ);
+        tc_stat.ready = check_all_headers();
+        tc_stat.readyvalid = true;
+    }
     
     while (1)
     {
