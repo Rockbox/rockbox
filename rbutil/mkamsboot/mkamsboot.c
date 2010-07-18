@@ -612,8 +612,10 @@ int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
         int of_packed_size, int of_unpacked_size, int *total_size,
         char *errstr, int errstrsize)
 {
+    /* XXX: we keep the first 0x200 bytes block unmodified, we just replace
+     * the ARM vectors */
     unsigned int packed_size = bootloader_sizes[model] + sizeof(nrv2e_d8) +
-            of_packed_size + rb_packed_size;
+            of_packed_size + rb_packed_size + 0x200;
 
     /* how much memory is available */
     unsigned int memory_size = model_memory_size(model);
@@ -632,10 +634,8 @@ int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
         return 0; \
     } while(0)
 
-    /* will packed data fit in the OF file ?
-     * XXX: we keep the first 0x200 bytes block unmodified, we just replace
-     * the ARM vectors */
-    if(packed_size + 0x200 > of_unpacked_size)
+    /* will packed data fit in the OF file ? */
+    if(packed_size > of_unpacked_size)
         ERROR(
             "[ERR]  Packed data (%d bytes) doesn't fit in the firmware "
             "(%d bytes)\n", packed_size, of_unpacked_size

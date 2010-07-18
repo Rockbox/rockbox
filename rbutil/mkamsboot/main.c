@@ -109,23 +109,25 @@ int main(int argc, char* argv[])
 
     printf("[INFO] Firmware patching has begun !\n\n");
 
-    fprintf(stderr, "[INFO] Original firmware size:   %d bytes\n",
+    fprintf(stderr, "[INFO] Original firmware size:    %8d bytes\n",
             firmware_size);
-    fprintf(stderr, "[INFO] Packed OF size:           %d bytes\n",
+    fprintf(stderr, "[INFO] Packed OF size:            %8d bytes\n",
             of_packedsize);
-    fprintf(stderr, "[INFO] Bootloader size:          %d bytes\n",
+    fprintf(stderr, "[INFO] Bootloader size:           %8d bytes\n",
             (int)bootloader_size);
-    fprintf(stderr, "[INFO] Packed bootloader size:   %d bytes\n",
+    fprintf(stderr, "[INFO] Packed bootloader size:    %8d bytes\n",
             rb_packedsize);
-    fprintf(stderr, "[INFO] Dual-boot function size:  %d bytes\n",
+    fprintf(stderr, "[INFO] Dual-boot function size:   %8d bytes\n",
             bootloader_sizes[sum.model]);
-    fprintf(stderr, "[INFO] UCL unpack function size: %u bytes\n",
+    fprintf(stderr, "[INFO] UCL unpack function size:  %8u bytes\n",
             (unsigned int)sizeof(nrv2e_d8));
+    fprintf(stderr, "[INFO] Original firmware version: %8u bytes\n",
+            0x200);
 
     patchable = check_sizes(sum.model, rb_packedsize, bootloader_size,
         of_packedsize, firmware_size, &totalsize, errstr, sizeof(errstr));
 
-    fprintf(stderr, "[INFO] Total size of new image:  %d bytes\n", totalsize);
+    fprintf(stderr, "[INFO] Total size of new image:   %8d bytes\n", totalsize);
 
     if (!patchable) {
         fprintf(stderr, "%s", errstr);
