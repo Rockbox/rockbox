@@ -16,18 +16,8 @@ agc
 alarm
 #endif
 
-#if defined(HAVE_ALBUMART)
-albumart
-#endif
-
 #if defined(HAVE_BACKLIGHT_BRIGHTNESS)
 backlight_brightness
-#endif
-
-#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
-backlight_fade_int
-#elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
-backlight_fade_bool
 #endif
 
 #if BATTERY_TYPES_COUNT > 1
@@ -54,20 +44,12 @@ dircache
 flash_storage
 #endif
 
-#if defined(HAVE_DISK_STORAGE)
-disk_storage
-#endif
-
 #if defined(HAVE_HEADPHONE_DETECTION)
 headphone_detection
 #endif
 
 #if defined(HAS_BUTTON_HOLD)
 hold_button
-#endif
-
-#if defined(HAS_REMOTE_BUTTON_HOLD)
-remote_button_hold
 #endif
 
 #if defined(HAVE_HOTKEY)
@@ -78,10 +60,6 @@ hotkey
 lcd_bitmap
 #endif
 
-#if defined(HAVE_LCD_CHARCELLS)
-lcd_charcell
-#endif
-
 #if LCD_DEPTH > 1
 lcd_non-mono
 #endif
@@ -90,20 +68,12 @@ lcd_non-mono
 lcd_color
 #endif
 
-#if defined(HAVE_LCD_FLIP)
-lcd_flip
-#endif
-
 #if defined(HAVE_LCD_INVERT)
 lcd_invert
 #endif
 
 #if defined(HAVE_LCD_SLEEP)
 lcd_sleep
-#endif
-
-#if defined(HAVE_LCD_CONTRAST)
-lcd_contrast
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -176,10 +146,6 @@ remote_ticking
 rtc
 #endif
 
-#if defined(HAVE_SCROLLWHEEL)
-scrollwheel
-#endif
-
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 serial_port
 #endif
@@ -217,6 +183,67 @@ usb_charging_enable
 #endif
 #endif
 
+#if defined(HAVE_WHEEL_ACCELERATION)
+wheel_acceleration
+#endif
+
+#if defined(HAVE_LINEOUT_POWEROFF)
+lineout_poweroff
+#endif
+
+#if defined(HAVE_TOUCHSCREEN)
+touchscreen
+#endif
+
+
+
+
+/* These features are only used by the manual so they won't break binary
+ * compatibility
+ */
+
+#if (PLUGIN_BUFFER_SIZE >= 0x80000)
+large_plugin_buffer
+#endif
+
+#if defined(AB_REPEAT_ENABLE) && !defined(ACTION_WPSAB_SINGLE)
+ab_repeat_buttons
+#endif
+
+#if defined(HAVE_ALBUMART)
+albumart
+#endif
+
+#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
+backlight_fade_int
+#elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
+backlight_fade_bool
+#endif
+
+#if defined(HAVE_DISK_STORAGE)
+disk_storage
+#endif
+
+#if defined(HAS_REMOTE_BUTTON_HOLD)
+remote_button_hold
+#endif
+
+#if defined(HAVE_LCD_CHARCELLS)
+lcd_charcell
+#endif
+
+#if defined(HAVE_LCD_FLIP)
+lcd_flip
+#endif
+
+#if defined(HAVE_LCD_CONTRAST)
+lcd_contrast
+#endif
+
+#if defined(HAVE_SCROLLWHEEL)
+scrollwheel
+#endif
+
 #if defined(HAVE_USB_POWER)
 usb_power
 #endif
@@ -230,20 +257,4 @@ usb_hid
 #if defined(HAVE_USB_HID_MOUSE)
 usb_hid_mouse
 #endif
-#endif
-
-#if defined(HAVE_WHEEL_ACCELERATION)
-wheel_acceleration
-#endif
-
-#if defined(HAVE_LINEOUT_POWEROFF)
-lineout_poweroff
-#endif
-
-#if defined(HAVE_TOUCHSCREEN)
-touchscreen
-#endif
-
-#if (PLUGIN_BUFFER_SIZE >= 0x80000)
-large_plugin_buffer
 #endif
