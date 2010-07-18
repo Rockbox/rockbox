@@ -18,7 +18,14 @@ $(ASFLIB): $(ASFLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 ASFFLAGS = $(filter-out -O%,$(CODECFLAGS))
-ASFFLAGS += -O3
+
+ifeq ($(MEMORYSIZE),2)
+    ASFFLAGS += -Os
+else ifeq ($(CPU),coldfire)
+	ASFFLAGS += -O3
+else
+	ASFFLAGS += -O2
+endif
 
 $(CODECDIR)/libasf/%.o: $(ROOTDIR)/apps/codecs/libasf/%.c
 	$(SILENT)mkdir -p $(dir $@)

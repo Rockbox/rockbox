@@ -13,8 +13,14 @@ WAVPACKLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libwavpack/SOURCES)
 WAVPACKLIB_OBJ := $(call c2obj, $(WAVPACKLIB_SRC))
 OTHER_SRC += $(WAVPACKLIB_SRC)
 
-WAVPACKFLAGS = -I$(APPSDIR)/codecs/libwavpack $(filter-out -O%,$(CODECFLAGS)) 
-WAVPACKFLAGS += -O2
+WAVPACKFLAGS = -I$(APPSDIR)/codecs/libwavpack $(filter-out -O%,$(CODECFLAGS))
+
+ifeq ($(CPU),arm)
+    WAVPACKFLAGS += -O3
+else
+    WAVPACKFLAGS += -O2
+endif
+
 
 $(WAVPACKLIB): $(WAVPACKLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)

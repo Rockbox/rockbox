@@ -18,7 +18,12 @@ $(ALACLIB): $(ALACLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 ALACFLAGS = $(filter-out -O%,$(CODECFLAGS))
-ALACFLAGS += -O3
+
+ifeq ($(CPU),arm)
+    ALACFLAGS += -O2
+else
+    ALACFLAGS += -O3
+endif
 
 $(CODECDIR)/libalac/%.o: $(ROOTDIR)/apps/codecs/libalac/%.c
 	$(SILENT)mkdir -p $(dir $@)

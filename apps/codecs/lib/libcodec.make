@@ -16,7 +16,15 @@ $(CODECLIB): $(CODECLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-CODECLIBFLAGS = $(CODECFLAGS) -ffunction-sections
+CODECLIBFLAGS = $(filter-out -O%,$(CODECFLAGS)) -ffunction-sections
+
+ifeq ($(MEMORYSIZE),2)
+    CODECLIBFLAGS += -Os
+else ifeq ($(CPU),coldfire)
+    CODECLIBFLAGS += -O2
+else
+    CODECLIBFLAGS += -O1
+endif
 
 $(CODECDIR)/lib/%.o: $(ROOTDIR)/apps/codecs/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)

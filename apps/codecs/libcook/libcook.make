@@ -16,3 +16,16 @@ OTHER_SRC += $(COOKLIB_SRC)
 $(COOKLIB): $(COOKLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
+
+COOKFLAGS = -I$(APPSDIR)/codecs/libcook $(filter-out -O%,$(CODECFLAGS))
+
+ifeq ($(CPU),coldfire)
+	COOKFLAGS += -O2
+else
+	COOKFLAGS += -O1
+endif
+
+$(CODECDIR)/libcook/%.o: $(ROOTDIR)/apps/codecs/libcook/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(COOKFLAGS) -c $< -o $@
+
