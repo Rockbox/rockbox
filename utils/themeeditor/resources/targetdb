@@ -4,6 +4,7 @@ ipod12
     screen : 160 x 128 @ grey
     fm     : no
     remote : no
+    record : yes
 }
 
 ipod3
@@ -12,6 +13,7 @@ ipod3
     screen : 160 x 128 @ grey
     fm     : no
     remote : no
+    record : yes
 }
 
 ipod4
@@ -20,6 +22,7 @@ ipod4
     screen : 160 x 128 @ grey
     fm     : no
     remote : no
+    record : yes
 }
 
 ipodmini12
@@ -28,6 +31,7 @@ ipodmini12
     screen : 138 x 110 @ grey
     fm     : no
     remote : no
+    record : yes
 }
 
 ipodcolor
@@ -36,6 +40,7 @@ ipodcolor
     screen : 220 x 176 @ rgb
     fm     : no
     remote : no
+    record : yes
 }
 
 ipodnano1
@@ -44,6 +49,7 @@ ipodnano1
     screen : 176 x 132 @ rgb
     fm     : no
     remote : no
+    record : yes
 }
 
 ipodvideo
@@ -52,6 +58,7 @@ ipodvideo
     screen : 320 x 240 @ rgb
     fm     : no
     remote : no
+    record : yes
 }
 
 # Olympus units
@@ -62,6 +69,7 @@ mrobe100
     screen : 160 x 128 @ mono
     fm     : no
     remote : 79 x 16 @ mono
+    record : yes
 }
 
 mrobe500
@@ -70,4 +78,5 @@ mrobe500
     screen : 640 x 480 @ rgb
     fm     : no
     remote : 79 x 16 @ mono
+    record : yes
 }

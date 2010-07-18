@@ -49,6 +49,7 @@ TargetData::TargetData(QString file)
         QRect rSize(0, 0, 0, 0);
         ScreenDepth rDepth = None;
         bool fm = false;
+        bool record = false;
 
         if(id == "")
             break;
@@ -119,13 +120,19 @@ TargetData::TargetData(QString file)
                     if(s.toLower() == "yes")
                         fm = true;
                 }
+                else if(key.toLower() == "record")
+                {
+                    QString s  = scanString(data, cursor);
+                    if(s.toLower() == "yes")
+                        record = true;
+                }
             }
         }
 
         /* Checking for the closing '}' and adding the entry */
         if(require('}', data, cursor))
         {
-            entries.append(Entry(name, size, depth, rSize, rDepth, fm));
+            entries.append(Entry(name, size, depth, rSize, rDepth, fm, record));
             indices.insert(id, index);
             index++;
         }

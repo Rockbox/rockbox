@@ -52,14 +52,15 @@ public:
     ScreenDepth screenDepth(int index){ return entries[index].depth; }
     ScreenDepth remoteDepth(int index){ return entries[index].rDepth; }
     bool fm(int index){ return entries[index].fm; }
+    bool canRecord(int index){ return entries[index].record; }
 
 private:
     struct Entry
     {
         Entry(QString name, QRect size, ScreenDepth depth, QRect rSize,
-              ScreenDepth rDepth, bool fm)
+              ScreenDepth rDepth, bool fm, bool record)
                   : name(name), size(size), depth(depth), rSize(rSize),
-                  rDepth(rDepth), fm(fm){ }
+                  rDepth(rDepth), fm(fm), record(record){ }
 
         QString name;
         QRect size;
@@ -67,6 +68,7 @@ private:
         QRect rSize;
         ScreenDepth rDepth;
         bool fm;
+        bool record;
     };
 
     static const QString reserved;

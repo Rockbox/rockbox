@@ -728,6 +728,28 @@ void EditorWindow::loadProjectFile(QString fileName)
         project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);
 
+        /* Setting target info if necessary */
+        TargetData targets;
+        QString target = project->getSetting("#target", "");
+        if(target != "" && targets.index(target) >= 0)
+        {
+            int index = targets.index(target);
+
+            QRect screen = targets.screenSize(index);
+            deviceConfig->setData("screenwidth", screen.width());
+            deviceConfig->setData("screenheight", screen.height());
+
+            if(targets.remoteDepth(index) != TargetData::None)
+            {
+                QRect remote = targets.remoteSize(index);
+                deviceConfig->setData("remotewidth", remote.width());
+                deviceConfig->setData("remoteheight", remote.height());
+            }
+
+            deviceConfig->setData("tp", targets.fm(index));
+            deviceConfig->setData("Rp", targets.canRecord(index));
+        }
+
         if(project->getSetting("#screenwidth") != "")
             deviceConfig->setData("screenwidth",
                                   project->getSetting("#screenwidth"));
