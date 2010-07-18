@@ -34,6 +34,7 @@
 
 /* Global variables for the parser */
 int skin_line = 0;
+char* skin_start = 0;
 int viewport_line = 0;
 
 /* Auxiliary parsing functions (not visible at global scope) */
@@ -66,6 +67,7 @@ struct skin_element* skin_parse(const char* document)
     char* cursor = (char*)document; /*Keeps track of location in the document*/
     
     skin_line = 1;
+    skin_start = (char*)document;
     viewport_line = 0;
 
     skin_clear_errors();
@@ -381,7 +383,7 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
 
         if(*cursor != MULTILINESYM && i != sublines - 1)
         {
-            skin_error(MULTILINE_EXPECTED);
+            skin_error(MULTILINE_EXPECTED, cursor);
             return NULL;
         }
         else if(i != sublines - 1)
@@ -433,7 +435,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
 
     if(!tag)
     {
-        skin_error(ILLEGAL_TAG);
+        skin_error(ILLEGAL_TAG, cursor);
         return 0;
     }
 
@@ -464,7 +466,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     /* Checking the number of arguments and allocating args */
     if(*cursor != ARGLISTOPENSYM && tag_args[0] != '|')
     {
-        skin_error(ARGLIST_EXPECTED);
+        skin_error(ARGLIST_EXPECTED, cursor);
         return 0;
     }
     else
@@ -512,7 +514,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
         /* Making sure we haven't run out of arguments */
         if(*tag_args == '\0')
         {
-            skin_error(TOO_MANY_ARGS);
+            skin_error(TOO_MANY_ARGS, cursor);
             return 0;
         }
 
@@ -545,7 +547,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             }
             else
             {
-                skin_error(DEFAULT_NOT_ALLOWED);
+                skin_error(DEFAULT_NOT_ALLOWED, cursor);
                 return 0;
             }
         }
@@ -554,7 +556,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             /* Scanning an int argument */
             if(!isdigit(*cursor) && *cursor != '-')
             {
-                skin_error(INT_EXPECTED);
+                skin_error(INT_EXPECTED, cursor);
                 return 0;
             }
 
@@ -610,12 +612,12 @@ static int skin_parse_tag(struct skin_element* element, char** document)
 
         if(*cursor != ARGLISTSEPERATESYM && i < num_args - 1)
         {
-            skin_error(SEPERATOR_EXPECTED);
+            skin_error(SEPERATOR_EXPECTED, cursor);
             return 0;
         }
         else if(*cursor != ARGLISTCLOSESYM && i == num_args - 1)
         {
-            skin_error(CLOSE_EXPECTED);
+            skin_error(CLOSE_EXPECTED, cursor);
             return 0;
         }
         else
@@ -639,7 +641,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     /* Checking for a premature end */
     if(*tag_args != '\0' && !optional)
     {
-        skin_error(INSUFFICIENT_ARGS);
+        skin_error(INSUFFICIENT_ARGS, cursor);
         return 0;
     }
     
@@ -724,7 +726,7 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
     /* Counting the children */
     if(*(cursor++) != ENUMLISTOPENSYM)
     {
-        skin_error(ARGLIST_EXPECTED);
+        skin_error(ARGLIST_EXPECTED, cursor);
         return 0;
     }
     bookmark = cursor;
@@ -768,12 +770,12 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
 
         if(i < children - 1 && *cursor != ENUMLISTSEPERATESYM)
         {
-            skin_error(SEPERATOR_EXPECTED);
+            skin_error(SEPERATOR_EXPECTED, cursor);
             return 0;
         }
         else if(i == children - 1 && *cursor != ENUMLISTCLOSESYM)
         {
-            skin_error(CLOSE_EXPECTED);
+            skin_error(CLOSE_EXPECTED, cursor);
             return 0;
         }
         else

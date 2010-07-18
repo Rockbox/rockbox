@@ -72,6 +72,7 @@ QString ParseTreeModel::changeTree(const char *document)
     {
         QString error = tr("Error on line ") +
                         QString::number(skin_error_line())
+                        + tr(", column ") + QString::number(skin_error_col())
                         + tr(": ") + QString(skin_error_message());
         return error;
     }

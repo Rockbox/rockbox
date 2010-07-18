@@ -211,7 +211,9 @@ void SkinDocument::cursorChanged()
         skin_parse(line.selectedText().toAscii());
         if(skin_error_line() > 0)
             parseStatus = tr("Error on line ") +
-                          QString::number(line.blockNumber() + 1) + tr(": ") +
+                          QString::number(line.blockNumber() + 1)
+                          + tr(", column ") + QString::number(skin_error_col())
+                          + tr(": ") +
                           skin_error_message();
         statusLabel->setText(parseStatus);
     }

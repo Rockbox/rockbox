@@ -30,14 +30,24 @@
 /* Global variables for debug output */
 int debug_indent_level = 0;
 extern int skin_line;
+extern char* skin_start;
 
 /* Global error variables */
 int error_line;
+int error_col;
 char* error_message;
 
 /* Debugging functions */
-void skin_error(enum skin_errorcode error)
+void skin_error(enum skin_errorcode error, char* cursor)
 {
+
+    error_col = 0;
+
+    while(cursor > skin_start && *cursor != '\n')
+    {
+        cursor--;
+        error_col++;
+    }
 
     error_line = skin_line;
 
@@ -91,6 +101,11 @@ int skin_error_line()
     return error_line;
 }
 
+int skin_error_col()
+{
+    return error_col;
+}
+
 char* skin_error_message()
 {
     return error_message;
@@ -99,6 +114,7 @@ char* skin_error_message()
 void skin_clear_errors()
 {
     error_line = 0;
+    error_col = 0;
     error_message = NULL;
 }
 
