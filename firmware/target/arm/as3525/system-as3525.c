@@ -305,6 +305,9 @@ void system_init(void)
 void system_reboot(void)
 {
     _backlight_off();
+
+    disable_irq();
+
     /* use watchdog to reset */
     CGU_PERI |= (CGU_WDOCNT_CLOCK_ENABLE | CGU_WDOIF_CLOCK_ENABLE);
     WDT_LOAD = 1; /* set counter to 1 */
