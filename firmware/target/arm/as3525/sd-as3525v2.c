@@ -327,9 +327,6 @@
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
 static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
-static void init_controller(void);
-static int sd_wait_for_tran_state(const int drive);
-
 static tCardInfo card_info[NUM_DRIVES];
 
 /* for compatibility */
@@ -450,6 +447,30 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
     }
     return true;
 }
+
+static int sd_wait_for_tran_state(const int drive)
+{
+    unsigned long response;
+    unsigned int timeout = current_tick + 5*HZ;
+
+    while (1)
+    {
+        while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
+
+        if (((response >> 9) & 0xf) == SD_TRAN)
+            return 0;
+
+        if(TIME_AFTER(current_tick, timeout))
+            return -10 * ((response >> 9) & 0xf);
+
+        if (TIME_AFTER(current_tick, next_yield))
+        {
+            yield();
+            next_yield = current_tick + MIN_YIELD_PERIOD;
+        }
+    }
+}
+
 
 static int sd_init_card(const int drive)
 {
@@ -757,29 +778,6 @@ int sd_init(void)
     sd_enable(false);
 #endif
     return 0;
-}
-
-static int sd_wait_for_tran_state(const int drive)
-{
-    unsigned long response;
-    unsigned int timeout = current_tick + 5*HZ;
-
-    while (1)
-    {
-        while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
-
-        if (((response >> 9) & 0xf) == SD_TRAN)
-            return 0;
-
-        if(TIME_AFTER(current_tick, timeout))
-            return -10 * ((response >> 9) & 0xf);
-
-        if (TIME_AFTER(current_tick, next_yield))
-        {
-            yield();
-            next_yield = current_tick + MIN_YIELD_PERIOD;
-        }
-    }
 }
 
 static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
