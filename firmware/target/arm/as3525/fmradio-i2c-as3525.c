@@ -158,11 +158,11 @@ void fmradio_i2c_init(void)
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
 #ifdef SANSA_FUZEV2
-    CCU_IO &= ~(1<<12);
+    bitclr32(&CCU_IO, 1<<12);
 #endif
     int ret = i2c_write_data(fm_i2c_bus, address, -1, buf, count);
 #ifdef SANSA_FUZEV2
-    CCU_IO |= 1<<12;
+    bitset32(&CCU_IO, 1<<12);
 #endif
     return ret;
 }
@@ -170,11 +170,11 @@ int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
 #ifdef SANSA_FUZEV2
-    CCU_IO &= ~(1<<12);
+    bitclr32(&CCU_IO, 1<<12);
 #endif
     int ret = i2c_read_data(fm_i2c_bus, address, -1, buf, count);
 #ifdef SANSA_FUZEV2
-    CCU_IO |= 1<<12;
+    bitset32(&CCU_IO, 1<<12);
 #endif
     return ret;
 }

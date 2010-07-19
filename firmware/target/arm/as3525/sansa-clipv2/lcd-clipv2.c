@@ -29,7 +29,7 @@
 void lcd_hw_init(int *offset)
 {
 /* DBOP initialisation, do what OF does */
-    CCU_IO |= (1<<12); /* ?? */
+    bitset32(&CCU_IO, 1<<12); /* ?? */
     CGU_DBOP |= /*(1<<3)*/ 0x18 | AS3525_DBOP_DIV;
 
     DBOP_CTRL      = 0x51004;

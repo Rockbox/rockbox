@@ -54,7 +54,7 @@ void lcd_write_reg(int reg, int value)
 
 static void as3525_dbop_init(void)
 {
-    CCU_IO |= 1<<12;
+    bitset32(&CCU_IO, 1<<12);
     CGU_DBOP |= (1<<4) | (1<<3) | AS3525_DBOP_DIV;
     DBOP_TIMPOL_01 = 0xE12FE12F;
     DBOP_TIMPOL_23 = 0xE12F0036;
