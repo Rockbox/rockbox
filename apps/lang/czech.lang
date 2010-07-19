@@ -4806,10 +4806,10 @@
     *: ".talk Clip"
   </source>
   <dest>
-    *: "Přehrávat .talk klipy"
+    *: "Talk klip, "
   </dest>
   <voice>
-    *: "Přehrávat talk klipy"
+    *: "Talk klip, "
   </voice>
 </phrase>
 <phrase>
@@ -7092,10 +7092,10 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Kontextové menu"
+    *: "Rychlá nabídka"
   </dest>
   <voice>
-    *: "Kontextové menu"
+    *: "Rychlá nabídka"
   </voice>
 </phrase>
 <phrase>
@@ -9675,7 +9675,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "Stopa"
   </voice>
 </phrase>
 <phrase>
@@ -11071,11 +11071,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastavit jako levý quickscreen bod"
+    quickscreen: "Nastavit jako levou volbu rychlé nabídky"
   </dest>
   <voice>
     *: none
-    quickscreen: "Nastavit jako levý quickscreen bod"
+    quickscreen: "Nastavit jako levou volbu rychlé nabídky"
   </voice>
 </phrase>
 <phrase>
@@ -11088,11 +11088,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastavit jako pravý quickscreen bod"
+    quickscreen: "Nastavit jako pravou volbu rychlé nabídky"
   </dest>
   <voice>
     *: none
-    quickscreen: "Nastavit jako pravý quickscreen bod"
+    quickscreen: "Nastavit jako pravou volbu rychlé nabídky"
   </voice>
 </phrase>
 <phrase>
@@ -11105,11 +11105,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastavit jako dolní quickscreen bod"
+    quickscreen: "Nastavit jako dolní volbu rychlé nabídky"
   </dest>
   <voice>
     *: none
-    quickscreen: "Nastavit jako dolní quickscreen bod"
+    quickscreen: "Nastavit jako dolní volbu rychlé nabídky"
   </voice>
 </phrase>
 <phrase>
@@ -11591,11 +11591,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastavit jako horníní quickscreen bod"
+    quickscreen: "Nastavit jako horní volbu rychlé nabídky"
   </dest>
   <voice>
     *: none
-    quickscreen: "Nastavit jako horníní quickscreen bod"
+    quickscreen: "Nastavit jako horní volbu rychlé nabídky"
   </voice>
 </phrase>
 <phrase>
