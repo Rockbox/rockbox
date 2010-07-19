@@ -52,7 +52,7 @@
 #include "disk.h"
 #endif
 
-#define VERIFY_WRITE 1
+//#define VERIFY_WRITE 1
 
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
@@ -382,6 +382,7 @@ static int sd_init_card(const int drive)
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
         return -10;
 
+#if 0 /* FIXME : it seems that reading fails on some models */
     /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_tran_state(drive) < 0)
         return -11;
@@ -393,6 +394,7 @@ static int sd_init_card(const int drive)
         return -13;
     /* Now that card is widebus make controller aware */
     MCI_CLOCK(drive) |= MCI_CLOCK_WIDEBUS;
+#endif
 
     /*
      * enable bank switching
@@ -913,8 +915,11 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     ret = sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
 
 #ifdef VERIFY_WRITE
-    if (ret) /* write failed, no point in verifying */
-        goto write_error;
+    if (ret) {
+        /* write failed, no point in verifying */
+        mutex_unlock(&sd_mtx);
+        return ret;
+    }
 
     count = saved_count;
     buf = saved_buf;
@@ -937,7 +942,6 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     }
 #endif
 
-write_error:
     mutex_unlock(&sd_mtx);
 
     return ret;
