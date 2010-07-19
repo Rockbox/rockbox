@@ -59,14 +59,20 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
-    GPIOB_DIR |= 1<<5;
-    GPIOB_PIN(5) = (1<<5);
-    buttonlight_is_on = 1;
+    if (fuzev2_variant == 0)
+    {
+        GPIOB_DIR |= 1<<5;
+        GPIOB_PIN(5) = (1<<5);
+        buttonlight_is_on = 1;
+    }
 }
 
 void _buttonlight_off(void)
 {
-    GPIOB_PIN(5) = 0;
-    GPIOB_DIR &= ~(1<<5);
-    buttonlight_is_on = 0;
+    if (fuzev2_variant == 0)
+    {
+        GPIOB_PIN(5) = 0;
+        GPIOB_DIR &= ~(1<<5);
+        buttonlight_is_on = 0;
+    }
 }

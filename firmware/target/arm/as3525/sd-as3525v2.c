@@ -430,11 +430,14 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b31 */  |                                      CMD_DONE_BIT;
 
 #ifdef SANSA_FUZEV2
-    extern int buttonlight_is_on;
-    if(buttonlight_is_on)
-        _buttonlight_on();
-    else
-        _buttonlight_off();
+    if (fuzev2_variant == 0)
+    {
+        extern int buttonlight_is_on;
+        if(buttonlight_is_on)
+            _buttonlight_on();
+        else
+            _buttonlight_off();
+    }
 #endif
     wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
 
@@ -770,6 +773,11 @@ int sd_init(void)
 
     wakeup_init(&transfer_completion_signal);
     wakeup_init(&command_completion_signal);
+
+#ifdef SANSA_FUZEV2
+    if (fuzev2_variant == 1)
+        GPIOB_DIR |= 1 << 5;
+#endif
 
 #ifdef HAVE_MULTIDRIVE
     /* clear previous irq */
