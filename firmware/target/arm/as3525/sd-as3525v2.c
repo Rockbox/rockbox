@@ -394,12 +394,21 @@ static inline bool card_detect_target(void)
 static bool send_cmd(const int drive, const int cmd, const int arg, const int flags,
         unsigned long *response)
 {
+    int card_no;
+
 #if defined(HAVE_MULTIDRIVE)
     if(sd_present(SD_SLOT_AS3525))
         GPIOB_PIN(5) = (1-drive) << 5;
 #endif
 
     MCI_ARGUMENT = arg;
+
+#ifdef SANSA_FUZEV2
+    if (fuzev2_variant == 1)
+        card_no = 1 << 16;
+    else
+#endif
+        card_no = CMD_CARD_NO(drive);
 
     /* Construct MCI_COMMAND  */
     MCI_COMMAND =
@@ -414,7 +423,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b13 */  | (TRANSFER_CMD                      ? CMD_WAIT_PRV_DAT_BIT:  0)
       /*b14     | CMD_ABRT_CMD_BIT        unused  */
       /*b15     | CMD_SEND_INIT_BIT       unused  */
-   /*b20:16 */  |                                      CMD_CARD_NO(drive)
+   /*b20:16 */  |                                      card_no
       /*b21     | CMD_SEND_CLK_ONLY       unused  */
       /*b22     | CMD_READ_CEATA          unused  */
       /*b23     | CMD_CCS_EXPECTED        unused  */
@@ -580,13 +589,26 @@ static int sd_init_card(const int drive)
     /* ACMD42  */
     if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_NO_RESP, NULL))
         return -17;
+
     /* Now that card is widebus make controller aware */
-    MCI_CTYPE |= (1<<drive);
+#ifdef SANSA_FUZEV2
+    if (fuzev2_variant == 1)
+        MCI_CTYPE |= 1<<1;
+    else
 #endif
+        MCI_CTYPE |= (1<<drive);
+
+#endif /* ! BOOTLOADER */
+
+    /*  Set low power mode  */
+#ifdef SANSA_FUZEV2
+    if (fuzev2_variant == 1)
+        MCI_CLKENA |= 1<<16;
+    else
+#endif
+        MCI_CLKENA |= 1<<(drive + 16);
 
     card_info[drive].initialized = 1;
-
-    MCI_CLKENA |= 1<<(drive + 16);      /*  Set low power mode  */
 
     return 0;
 }
@@ -682,14 +704,17 @@ static void init_controller(void)
 {
     int hcon_numcards = ((MCI_HCON>>1) & 0x1F) + 1;
     int card_mask = (1 << hcon_numcards) - 1;
+    int pwr_mask;
 
-    MCI_PWREN &= ~card_mask;            /*  power off all cards  */
+#ifdef SANSA_FUZEV2
+    if (fuzev2_variant == 1)
+        pwr_mask = 1 << 1;
+    else
+#endif
+        pwr_mask = card_mask;
 
-    MCI_CLKSRC = 0x00;                  /* All CLK_SRC_CRD set to 0*/
-    MCI_CLKDIV = 0x00;                  /* CLK_DIV_0 : bits 7:0  */
-
-    MCI_PWREN |= card_mask;             /*  power up cards  */
-    mci_delay();
+    MCI_PWREN &= ~pwr_mask;             /*  power off all cards  */
+    MCI_PWREN = pwr_mask;               /*  power up cards  */
 
     MCI_CTRL |= CTRL_RESET;
     while(MCI_CTRL & CTRL_RESET)
@@ -745,6 +770,7 @@ int sd_init(void)
 
     wakeup_init(&transfer_completion_signal);
     wakeup_init(&command_completion_signal);
+
 #ifdef HAVE_MULTIDRIVE
     /* clear previous irq */
     GPIOA_IC = EXT_SD_BITS;
@@ -754,7 +780,9 @@ int sd_init(void)
     GPIOA_IBE |= EXT_SD_BITS;
     /* enable the card detect interrupt */
     GPIOA_IE |= EXT_SD_BITS;
+#endif /* HAVE_MULTIDRIVE */
 
+#ifndef SANSA_CLIPV2
     /* Configure XPD for SD-MCI interface */
     CCU_IO |= (1<<2);
 #endif

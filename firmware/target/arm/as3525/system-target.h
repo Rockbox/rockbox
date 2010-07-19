@@ -46,6 +46,10 @@
         ? (((uintptr_t)(a)) - IRAM_ORIG) \
         : ((uintptr_t)(a))))
 
+#ifdef SANSA_FUZEV2
+extern int fuzev2_variant;
+#endif
+
 #ifdef SANSA_C200V2
 /* 0: Backlight on A5, 1: Backlight on A7 */
 extern int c200v2_variant;
