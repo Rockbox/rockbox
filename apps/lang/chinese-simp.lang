@@ -27,10 +27,10 @@
     *: "Yes"
   </source>
   <dest>
-    *: "确定"
+    *: "开启"
   </dest>
   <voice>
-    *: "确定"
+    *: "开启"
   </voice>
 </phrase>
 <phrase>
@@ -41,10 +41,10 @@
     *: "No"
   </source>
   <dest>
-    *: "取消"
+    *: "关闭"
   </dest>
   <voice>
-    *: "取消"
+    *: "关闭"
   </voice>
 </phrase>
 <phrase>
@@ -55,10 +55,10 @@
     *: "On"
   </source>
   <dest>
-    *: "开"
+    *: "开启"
   </dest>
   <voice>
-    *: "开"
+    *: "开启"
   </voice>
 </phrase>
 <phrase>
@@ -69,10 +69,10 @@
     *: "Off"
   </source>
   <dest>
-    *: "关"
+    *: "关闭"
   </dest>
   <voice>
-    *: "关"
+    *: "关闭"
   </voice>
 </phrase>
 <phrase>
@@ -83,10 +83,10 @@
     *: "Always"
   </source>
   <dest>
-    *: "总是"
+    *: "总是开启"
   </dest>
   <voice>
-    *: "总是"
+    *: "总是开启"
   </voice>
 </phrase>
 <phrase>
@@ -97,10 +97,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "读取中..."
+    *: "读取中,请稍后..."
   </dest>
   <voice>
-    *: "读取中"
+    *: "读取中 请稍后"
   </voice>
 </phrase>
 <phrase>
@@ -113,6 +113,7 @@
   </source>
   <dest>
     *: none
+    ondavx*:"拨动电源开关关机"
     soft_shutdown: "按下OFF关机"
   </dest>
   <voice>
@@ -245,11 +246,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM广播界面"
+    radio: "FM广播"
   </dest>
   <voice>
     *: none
-    radio: "FM广播界面"
+    radio: "FM广播"
   </voice>
 </phrase>
 <phrase>
@@ -434,10 +435,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "卡啦OK"
+    *: "卡啦OK模式"
   </dest>
   <voice>
-    *: "卡啦 OK "
+    *: "卡啦 OK模式"
   </voice>
 </phrase>
 <phrase>
@@ -532,11 +533,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB启用"
+    masf: "启用MDB"
   </dest>
   <voice>
     *: none
-    masf: "MDB启用"
+    masf: "启用MDB"
   </voice>
 </phrase>
 <phrase>
@@ -553,7 +554,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB强度"
+    masf: "MDB的强度"
   </voice>
 </phrase>
 <phrase>
@@ -570,7 +571,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB泛音"
+    masf: "MDB的泛音"
   </voice>
 </phrase>
 <phrase>
@@ -587,7 +588,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB中心频率"
+    masf: "MDB的中心频率"
   </voice>
 </phrase>
 <phrase>
@@ -604,7 +605,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB形状"
+    masf: "MDB的形状"
   </voice>
 </phrase>
 <phrase>
@@ -750,7 +751,7 @@
     *: "浏览.cfg文件"
   </dest>
   <voice>
-    *: "浏览.cfg文件"
+    *: "浏览设置文件"
   </voice>
 </phrase>
 <phrase>
@@ -775,10 +776,10 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "已清除"
+    *: "所有设置已恢复出厂状态"
   </dest>
   <voice>
-    *: "已清除"
+    *: "所有设置已经恢复到出厂时的状态"
   </voice>
 </phrase>
 <phrase>
@@ -1117,10 +1118,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "递归插入子目录"
+    *: "顺序插入子目录"
   </dest>
   <voice>
-    *: "递归插入子目录"
+    *: "顺序插入子目录"
   </voice>
 </phrase>
 <phrase>
@@ -1131,10 +1132,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "确认删除动态播放列表"
+    *: "删除动态播放列表时要求确认"
   </dest>
   <voice>
-    *: "确认删除动态播放列表"
+    *: "删除动态播放列表时要求确认"
   </voice>
 </phrase>
 <phrase>
@@ -1145,10 +1146,10 @@
     *: "Version"
   </source>
   <dest>
-    *: "版本"
+    *: "RB版本"
   </dest>
   <voice>
-    *: "版本"
+    *: "Rockbox的版本"
   </voice>
 </phrase>
 <phrase>
@@ -1215,7 +1216,7 @@
     *: "A-B"
   </source>
   <dest>
-    *: "A-B段"
+    *: "A-B重复段"
   </dest>
   <voice>
     *: "AB段"
@@ -1335,11 +1336,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "改歌的声音"
+    swcodec: "曲目更换提示音"
   </dest>
   <voice>
     *: none
-    swcodec: "改歌的声音"
+    swcodec: "曲目更换时发出提示音"
   </voice>
 </phrase>
 <phrase>
@@ -1477,10 +1478,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "后台更新中"
+    *: "后台更新中..."
   </dest>
   <voice>
-    *: "后台更新中"
+    *: "后台更新中..."
   </voice>
 </phrase>
 <phrase>
@@ -1505,10 +1506,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "收集运行数据"
+    *: "记录音乐播放记录"
   </dest>
   <voice>
-    *: "收集运行数据"
+    *: "记录音乐播放记录"
   </voice>
 </phrase>
 <phrase>
@@ -1533,10 +1534,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "目录排序"
+    *: "目录排序方式"
   </dest>
   <voice>
-    *: "目录排序"
+    *: "排序目录的方式"
   </voice>
 </phrase>
 <phrase>
@@ -1547,10 +1548,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "文件排序"
+    *: "文件排序方式"
   </dest>
   <voice>
-    *: "文件排序"
+    *: "排序文件的方式"
   </voice>
 </phrase>
 <phrase>
@@ -1631,10 +1632,10 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Rockbox支持的"
+    *: "仅显示Rockbox支持的"
   </dest>
   <voice>
-    *: "Rockbox支持的"
+    *: "仅显示Rockbox支持的文件"
   </voice>
 </phrase>
 <phrase>
@@ -1645,10 +1646,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "音乐文件"
+    *: "仅显示音乐文件"
   </dest>
   <voice>
-    *: "音乐文件"
+    *: "仅显示音乐文件"
   </voice>
 </phrase>
 <phrase>
@@ -1720,11 +1721,11 @@
   </source>
   <dest>
     *: none
-    remote: "正在播放界面(线控器)"
+    remote: "音乐播放界面(线控)"
   </dest>
   <voice>
     *: none
-    remote: "正在线控器播放界面"
+    remote: "线控音乐播放界面"
   </voice>
 </phrase>
 <phrase>
@@ -1786,7 +1787,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "状态栏或滚动条"
+    lcd_bitmap: "状态栏与滚动条"
   </voice>
 </phrase>
 <phrase>
@@ -1814,10 +1815,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "默认代码页"
+    *: "默认文字编码"
   </dest>
   <voice>
-    *: "默认代码页"
+    *: "默认文字编码"
   </voice>
 </phrase>
 <phrase>
@@ -2076,10 +2077,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "闲置自动关机"
+    *: "闲置自动关机时长"
   </dest>
   <voice>
-    *: "闲置自动关机"
+    *: "闲置自动关机时长"
   </voice>
 </phrase>
 <phrase>
@@ -2183,7 +2184,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "是-保存到最近的书签"
+    *: "保存到最近的书签"
   </dest>
   <voice>
     *: "是 保存到最近的书签"
@@ -2197,7 +2198,7 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "每次询问-保存到最近的书签"
+    *: "保存到最近的书签(每次询问)"
   </dest>
   <voice>
     *: "每次询问 保存到最近的书签"
@@ -2225,10 +2226,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "维护最近书签列表"
+    *: "在主界面显示最近书签列表"
   </dest>
   <voice>
-    *: "是否维护最近书签列表"
+    *: "是否在主界面显示最近书签列表"
   </voice>
 </phrase>
 <phrase>
@@ -2461,11 +2462,11 @@
   </source>
   <dest>
     *: none
-    recording: "预录时长"
+    recording: "预录制时长"
   </dest>
   <voice>
     *: none
-    recording: "预录时长"
+    recording: "预录制时长"
   </voice>
 </phrase>
 <phrase>
@@ -2529,7 +2530,7 @@
   </source>
   <dest>
     *: none
-    remote: "只是主机"
+    remote: "仅主机"
   </dest>
   <voice>
     *: none
@@ -2546,7 +2547,7 @@
   </source>
   <dest>
     *: none
-    remote: "只是线控"
+    remote: "仅线控"
   </dest>
   <voice>
     *: none
@@ -2942,7 +2943,7 @@
     *: "首次按键仅开启背光"
   </dest>
   <voice>
-    *: "首次按键仅开启背光"
+    *: "首次按键仅开启背光而不响应按键功能"
   </voice>
 </phrase>
 <phrase>
@@ -3226,11 +3227,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "允许屏幕滚动"
+    lcd_bitmap: "允许列表查看时滚动全屏"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "允许屏幕滚动"
+    lcd_bitmap: "允许列表查看时滚动整个屏幕"
   </voice>
 </phrase>
 <phrase>
@@ -3848,7 +3849,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "文件/目录已存在.覆盖?"
+    *: "文件/目录已存在,是否覆盖?"
   </dest>
   <voice>
     *: "文件/目录已存在 覆盖吗"
@@ -3921,10 +3922,10 @@
     *: "Deleted"
   </source>
   <dest>
-    *: "已刪除"
+    *: "已刪除文件"
   </dest>
   <voice>
-    *: "已刪除"
+    *: "文件已经被刪除"
   </voice>
 </phrase>
 <phrase>
@@ -3965,11 +3966,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "音调"
+    pitchscreen: "音调/速度"
   </dest>
   <voice>
     *: none
-    pitchscreen: "音调"
+    pitchscreen: "音调与速度"
   </voice>
 </phrase>
 <phrase>
@@ -4134,7 +4135,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "寻找中...已找到%d个(%s)"
+    *: "搜索中...已找到%d个(%s)"
   </dest>
   <voice>
     *: ""
@@ -4392,7 +4393,7 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "创建书签?"
+    *: "是否创建书签?"
   </dest>
   <voice>
     *: "创建书签吗"
@@ -4503,7 +4504,7 @@
   </source>
   <dest>
     *: none
-    recording: "预录"
+    recording: "预录制"
   </dest>
   <voice>
     *: none
@@ -4542,11 +4543,11 @@
   </source>
   <dest>
     *: none
-    recording: "一次"
+    recording: "仅一次"
   </dest>
   <voice>
     *: none
-    recording: "一次"
+    recording: "仅一次"
   </voice>
 </phrase>
 <phrase>
@@ -4644,11 +4645,11 @@
   </source>
   <dest>
     *: none
-    alarm: "离闹铃响起还有:%d:%02d"
+    alarm: "离闹铃还有:%d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "离闹铃响起还有%d:%02d"
+    alarm: "离闹钟响起还有%d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -4661,7 +4662,7 @@
   </source>
   <dest>
     *: none
-    alarm: "闹铃已设"
+    alarm: "已设置闹铃"
   </dest>
   <voice>
     *: none
@@ -4740,7 +4741,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "红绿蓝"
+    lcd_color: "RGB模式"
   </dest>
   <voice>
     *: none
@@ -4757,7 +4758,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "红绿蓝:%02X%02X%02X"
+    lcd_color: "RGB色彩:%02X%02X%02X"
   </dest>
   <voice>
     *: none
@@ -4774,7 +4775,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "颜色无效"
+    lcd_color: "无效的颜色"
   </dest>
   <voice>
     *: none
@@ -5001,7 +5002,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期日"
+    rtc: "周日"
   </dest>
   <voice>
     *: none
@@ -5018,7 +5019,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期一"
+    rtc: "周一"
   </dest>
   <voice>
     *: none
@@ -5035,7 +5036,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期二"
+    rtc: "周二"
   </dest>
   <voice>
     *: none
@@ -5052,7 +5053,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期三"
+    rtc: "周三"
   </dest>
   <voice>
     *: none
@@ -5069,7 +5070,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期四"
+    rtc: "周四"
   </dest>
   <voice>
     *: none
@@ -5086,7 +5087,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期五"
+    rtc: "周五"
   </dest>
   <voice>
     *: none
@@ -5103,7 +5104,7 @@
   </source>
   <dest>
     *: none
-    rtc: "星期六"
+    rtc: "周六"
   </dest>
   <voice>
     *: none
@@ -6515,7 +6516,7 @@
     *: ""
   </dest>
   <voice>
-    *: "现在播放屏幕"
+    *: "音乐播放界面"
   </voice>
 </phrase>
 <phrase>
@@ -6588,7 +6589,7 @@
   </dest>
   <voice>
     *: none
-    remote: "线控现在播放屏幕"
+    remote: "线控音乐播放界面"
   </voice>
 </phrase>
 <phrase>
@@ -6683,10 +6684,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "递归子目录?"
+    *: "顺序插入子目录中的文件?"
   </dest>
   <voice>
-    *: "递归子目录吗"
+    *: "顺序插入子目录中的文件吗"
   </voice>
 </phrase>
 <phrase>
@@ -6697,10 +6698,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "擦除动态播放列表?"
+    *: "确认要擦除动态播放列表?"
   </dest>
   <voice>
-    *: "擦除动态播放列表吗"
+    *: "确认要擦除动态播放列表吗"
   </voice>
 </phrase>
 <phrase>
@@ -7157,10 +7158,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "引导文件已改变"
+    *: "引导文件已经更新"
   </dest>
   <voice>
-    *: "引导文件已改变"
+    *: "引导文件已经被更新"
   </voice>
 </phrase>
 <phrase>
@@ -7171,10 +7172,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "现在重启?"
+    *: "现在就重启?"
   </dest>
   <voice>
-    *: "现在重启吗"
+    *: "现在就重启吗"
   </voice>
 </phrase>
 <phrase>
@@ -7287,10 +7288,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "显示索引"
+    *: "显示曲目序号"
   </dest>
   <voice>
-    *: "显示索引"
+    *: "显示曲目序号"
   </voice>
 </phrase>
 <phrase>
@@ -7315,10 +7316,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "只显示曲名"
+    *: "只显示曲目名"
   </dest>
   <voice>
-    *: "只显示曲名"
+    *: "只显示曲目名"
   </voice>
 </phrase>
 <phrase>
@@ -7385,7 +7386,7 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "不兼容机型"
+    *: "不兼容型号的插件"
   </dest>
   <voice>
     *: ""
@@ -7399,7 +7400,7 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "不兼容版本"
+    *: "不兼容版本的插件"
   </dest>
   <voice>
     *: ""
@@ -7511,7 +7512,7 @@
   </source>
   <dest>
     *: none
-    radio: "找不到设置，自动扫描?"
+    radio: "找不到设置,自动扫描?"
   </dest>
   <voice>
     *: none
@@ -7611,10 +7612,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "媒体库尚未准备好"
+    *: "媒体库尚未初始化!"
   </dest>
   <voice>
-    *: "媒体库尚未准备好"
+    *: "媒体库尚未被初始化"
   </voice>
 </phrase>
 <phrase>
@@ -7639,10 +7640,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "无效文件名!"
+    *: "文件名无效!"
   </dest>
   <voice>
-    *: "无效文件名"
+    *: "无效的文件名"
   </voice>
 </phrase>
 <phrase>
@@ -7953,7 +7954,7 @@
     *: ""
   </dest>
   <voice>
-    *: "单位每时钟"
+    *: "单位/时长"
   </voice>
 </phrase>
 <phrase>
@@ -8036,7 +8037,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "扫描文件中..."
+    *: "正在扫描文件..."
   </dest>
   <voice>
     *: "扫描文件中"
@@ -8190,11 +8191,11 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "USB连接时充电"
+    usb_charging_enable: "连接USB时充电"
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "USB连接时充电"
+    usb_charging_enable: "连接USB时充电"
   </voice>
 </phrase>
 <phrase>
@@ -8287,10 +8288,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "请注意:电量低!"
+    *: "电量低,请注意!"
   </dest>
   <voice>
-    *: "请注意 电量低"
+    *: "电量低 请注意"
   </voice>
 </phrase>
 <phrase>
@@ -8430,11 +8431,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "乱序与曲目跳转"
+    crossfade: "乱序或曲目跳转时"
   </dest>
   <voice>
     *: none
-    crossfade: "乱序与曲目跳转"
+    crossfade: "乱序或曲目跳转时"
   </voice>
 </phrase>
 <phrase>
@@ -8494,11 +8495,11 @@
   </source>
   <dest>
     *: none
-    recording: "不能写入录音目录"
+    recording: "无法写入录音目录"
   </dest>
   <voice>
     *: none
-    recording: "不能写入录音目录"
+    recording: "无法写入录音目录"
   </voice>
 </phrase>
 <phrase>
@@ -8709,10 +8710,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "添加到方式"
+    *: "添加到快捷方式"
   </dest>
   <voice>
-    *: "添加到方式"
+    *: "添加到快捷方式"
   </voice>
 </phrase>
 <phrase>
@@ -9109,11 +9110,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "耳机拔出后暂停"
+    headphone_detection: "拔出耳机后自动暂停"
   </dest>
   <voice>
     *: none
-    headphone_detection: "耳机拔出后暂停"
+    headphone_detection: "拔出耳机后自动暂停"
   </voice>
 </phrase>
 <phrase>
@@ -9138,10 +9139,10 @@
     *: "Playlist Catalog"
   </source>
   <dest>
-    *: "播放列表录"
+    *: "播放列表选项"
   </dest>
   <voice>
-    *: "播放列表录"
+    *: "播放列表选项"
   </voice>
 </phrase>
 <phrase>
@@ -9183,10 +9184,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "电池没电,请充电!"
+    *: "电池电量低,请充电!"
   </dest>
   <voice>
-    *: "电池没电 请充电"
+    *: "电池电量低 请充电"
   </voice>
 </phrase>
 <phrase>
@@ -9459,7 +9460,7 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "碟片编号"
+    *: "CD编号"
   </dest>
   <voice>
     *: ""
@@ -9549,10 +9550,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<不恢复书签>"
+    *: "<不从书签处恢复播放>"
   </dest>
   <voice>
-    *: "<不恢复书签>"
+    *: "<不从书签处恢复播放>"
   </voice>
 </phrase>
 <phrase>
@@ -9757,7 +9758,7 @@
     *: "<无效书签>"
   </dest>
   <voice>
-    *: "<无效书签>"
+    *: "这个书签无效"
   </voice>
 </phrase>
 <phrase>
@@ -9878,10 +9879,10 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "未知格式才显示"
+    *: "格式未知时才显示"
   </dest>
   <voice>
-    *: "未知格式才显示"
+    *: "格式未知时才显示"
   </voice>
 </phrase>
 <phrase>
@@ -9906,7 +9907,7 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "将时间清零?"
+    *: "将运行时间清零?"
   </dest>
   <voice>
     *: "是否将时间清零"
@@ -9923,7 +9924,7 @@
     *: "Last.fm日志"
   </dest>
   <voice>
-    *: "Last.fm日志"
+    *: "开启Last.fm日志"
   </voice>
 </phrase>
 <phrase>
@@ -11624,11 +11625,11 @@
   </source>
   <dest>
     *: none
-    radio: "Other"
+    radio: "其他地区"
   </dest>
   <voice>
     *: none
-    radio: "Other"
+    radio: "其他地区"
   </voice>
 </phrase>
 <phrase>
@@ -11658,11 +11659,11 @@
   </source>
   <dest>
     *: none
-    radio: "Italy"
+    radio: "意大利"
   </dest>
   <voice>
     *: none
-    radio: "Italy"
+    radio: "意大利"
   </voice>
 </phrase>
 <phrase>
@@ -12407,11 +12408,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM广播"
+    radio: "FM广播界面"
   </dest>
   <voice>
     *: none
-    radio: "FM广播"
+    radio: "FM广播界面"
   </voice>
 </phrase>
 <phrase>
@@ -12446,3 +12447,4 @@
   </voice>
 </phrase>
 
+c
