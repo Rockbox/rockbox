@@ -472,7 +472,7 @@ mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
   /* 31 */ v[17] = -(v[15] = MPC_DCT32_SHIFT((((((((MPC_DCT32_MUL(t171 - t172, costab16) * 2) - t173) * 2) - t174) * 2) - t175) * 2) - t176));
 }
 
-#if defined(CPU_ARM)
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
 extern void
 mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data, 
                         const MPC_SAMPLE_FORMAT * V,
@@ -485,57 +485,22 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
 {
     mpc_int32_t k;
     
-#if defined(CPU_COLDFIRE)
-    // 64=32x32-multiply assembler for Coldfire
-    for ( k = 0; k < 32; k++, D += 16, V++ ) 
-    {
-        asm volatile (
-        "movem.l (%[D]), %%d0-%%d3                    \n\t"
-        "move.l (%[V]), %%a5                          \n\t"
-        "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0 \n\t"
-        "mac.l %%d1, %%a5, (128*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, (224*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, (256*4, %[V]), %%a5, %%acc0\n\t"
-        "movem.l (4*4, %[D]), %%d0-%%d3               \n\t"
-        "mac.l %%d0, %%a5, (352*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, (384*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, (480*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, (512*4, %[V]), %%a5, %%acc0\n\t"
-        "movem.l (8*4, %[D]), %%d0-%%d3               \n\t"
-        "mac.l %%d0, %%a5, (608*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, (640*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, (736*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, (768*4, %[V]), %%a5, %%acc0\n\t"
-        "movem.l (12*4, %[D]), %%d0-%%d3              \n\t"
-        "mac.l %%d0, %%a5, (864*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, (896*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, %%acc0                     \n\t"
-        "movclr.l %%acc0, %%d0                        \n\t"
-        "lsl.l #1, %%d0                               \n\t"
-        "move.l %%d0, (%[Data])+                      \n"
-        : [Data] "+a" (Data)
-        : [V] "a" (V), [D] "a" (D)
-        : "d0", "d1", "d2", "d3", "a5");
-    }
-#else
     // 64=64x64-multiply (FIXED_POINT) or float=float*float (!FIXED_POINT) in C
     for ( k = 0; k < 32; k++, D += 16, V++ )
     {
         *Data = MPC_MULTIPLY_EX(V[  0],D[ 0],30) + MPC_MULTIPLY_EX(V[ 96],D[ 1],30)
-          + MPC_MULTIPLY_EX(V[128],D[ 2],30) + MPC_MULTIPLY_EX(V[224],D[ 3],30)
-          + MPC_MULTIPLY_EX(V[256],D[ 4],30) + MPC_MULTIPLY_EX(V[352],D[ 5],30)
-          + MPC_MULTIPLY_EX(V[384],D[ 6],30) + MPC_MULTIPLY_EX(V[480],D[ 7],30)
-          + MPC_MULTIPLY_EX(V[512],D[ 8],30) + MPC_MULTIPLY_EX(V[608],D[ 9],30)
-          + MPC_MULTIPLY_EX(V[640],D[10],30) + MPC_MULTIPLY_EX(V[736],D[11],30)
-          + MPC_MULTIPLY_EX(V[768],D[12],30) + MPC_MULTIPLY_EX(V[864],D[13],30)
-          + MPC_MULTIPLY_EX(V[896],D[14],30) + MPC_MULTIPLY_EX(V[992],D[15],30);
+              + MPC_MULTIPLY_EX(V[128],D[ 2],30) + MPC_MULTIPLY_EX(V[224],D[ 3],30)
+              + MPC_MULTIPLY_EX(V[256],D[ 4],30) + MPC_MULTIPLY_EX(V[352],D[ 5],30)
+              + MPC_MULTIPLY_EX(V[384],D[ 6],30) + MPC_MULTIPLY_EX(V[480],D[ 7],30)
+              + MPC_MULTIPLY_EX(V[512],D[ 8],30) + MPC_MULTIPLY_EX(V[608],D[ 9],30)
+              + MPC_MULTIPLY_EX(V[640],D[10],30) + MPC_MULTIPLY_EX(V[736],D[11],30)
+              + MPC_MULTIPLY_EX(V[768],D[12],30) + MPC_MULTIPLY_EX(V[864],D[13],30)
+              + MPC_MULTIPLY_EX(V[896],D[14],30) + MPC_MULTIPLY_EX(V[992],D[15],30);
         Data += 1;
         // total: 16 muls, 15 adds, 16 shifts
     }
-#endif /* COLDFIRE */
 }
-#endif /* CPU_ARM */
+#endif /* CPU_ARM || CPU_COLDFIRE */
 
 static void 
 mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, const MPC_SAMPLE_FORMAT *Y)

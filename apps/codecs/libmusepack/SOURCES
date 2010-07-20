@@ -9,3 +9,6 @@ synth_filter.c
 #if defined(CPU_ARM)
 synth_filter_arm.S
 #endif
+#if defined(CPU_COLDFIRE)
+synth_filter_coldfire.S
+#endif
