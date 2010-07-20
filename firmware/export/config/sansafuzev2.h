@@ -121,7 +121,7 @@
 #define AB_REPEAT_ENABLE
 
 /* FM Tuner - suspected to be the SI4702 */
-#define CONFIG_TUNER SI4700
+#define CONFIG_TUNER (SI4700|RDA5802)
 /* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */

@@ -1278,7 +1278,7 @@ target/arm/as3525/sansa-clipplus/backlight-clip.c
 target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipplus/powermgmt-clipplus.c
 target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
-target/arm/as3525/sansa-clipplus/tuner-clipplus.c
+target/arm/as3525/tuner-as3525v2.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_CLIPPLUS */
@@ -1364,6 +1364,7 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 
 #ifdef SANSA_FUZEV2
 #ifndef SIMULATOR
+target/arm/as3525/tuner-as3525v2.c
 target/arm/as3525/lcd-fuze.c
 target/arm/as3525/sansa-fuzev2/lcd-fuzev2.c
 target/arm/as3525/sansa-fuzev2/backlight-fuzev2.c
