@@ -38,6 +38,10 @@ bool _backlight_init(void)
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x80);
     ascodec_write_pmu(AS3543_BACKLIGHT, 2, backlight_brightness * 10);
 
+    /* needed for button light */
+    if (fuzev2_variant == 1)
+        ascodec_write_pmu(0x1a, 1, 0x30);   /* MUX_PWGD = PWM */
+
     return true;
 }
 
@@ -65,6 +69,10 @@ void _buttonlight_on(void)
         GPIOB_PIN(5) = (1<<5);
         buttonlight_is_on = 1;
     }
+    else
+    {
+        ascodec_write_pmu(0x1a, 6, 0x80);   /* PWM inverted */
+    }
 }
 
 void _buttonlight_off(void)
@@ -74,5 +82,9 @@ void _buttonlight_off(void)
         GPIOB_PIN(5) = 0;
         GPIOB_DIR &= ~(1<<5);
         buttonlight_is_on = 0;
+    }
+    else
+    {
+        ascodec_write_pmu(0x1a, 6, 0);      /* PWM not inverted */
     }
 }
