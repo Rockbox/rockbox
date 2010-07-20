@@ -963,6 +963,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     dma_release();
 
+    /* CMD lines are separate, not common, so we need to actively deselect */
+    /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        return -21;
+
 #ifndef BOOTLOADER
     sd_enable(false);
     led(false);
