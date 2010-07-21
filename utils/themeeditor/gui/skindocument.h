@@ -45,11 +45,11 @@ Q_OBJECT
 public:
     static QString fileFilter()
     {
-        return tr("WPS Files (*.wps *.rwps);;"
-                  "SBS Files (*.sbs *.rsbs);;"
-                  "FMS Files (*.fms *.rfms);;"
-                  "All Skin Files (*.wps *.rwps *.sbs "
-                  "*.rsbs *.fms *.rfms);;"
+        return tr("WPS Files (*.wps *.WPS *.rwps *.RWPS);;"
+                  "SBS Files (*.sbs *.SBS *.rsbs *.RSBS);;"
+                  "FMS Files (*.fms *.FMS *.rfms *.RFMS);;"
+                  "All Skin Files (*.wps *.WPS *.rwps *.RWPS *.sbs *.SBS "
+                  "*.rsbs *.RSBS *.fms *.FMS *.rfms *.RFMS);;"
                   "All Files (*)");
     }
 
