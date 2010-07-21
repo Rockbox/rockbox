@@ -113,7 +113,10 @@ void PreferencesDialog::loadRender()
     QSettings settings;
     settings.beginGroup("RBFont");
 
-    ui->fontBox->setText(settings.value("fontDir", "/").toString());
+    QString confDir = QDir::homePath() + "/.rbthemeeditor";
+
+    ui->fontBox->setText(settings.value("fontDir", confDir + "/fonts/")
+                         .toString());
 
     settings.endGroup();
 
@@ -129,7 +132,7 @@ void PreferencesDialog::loadRender()
     settings.beginGroup("TargetData");
 
     ui->dbBox->setText(settings.value("targetDbPath",
-                                      QDir::homePath() + "/.targetdb")
+                                      confDir + "/targetdb")
                        .toString());
 
     settings.endGroup();

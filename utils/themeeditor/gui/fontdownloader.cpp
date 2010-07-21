@@ -40,6 +40,9 @@ FontDownloader::FontDownloader(QWidget *parent, QString path) :
 
     manager = new QNetworkAccessManager();
 
+    if(!dir.exists())
+        dir.mkpath(path);
+
     if(dir.isReadable())
     {
         fout.setFileName(dir.absolutePath() + "/fonts.zip");
