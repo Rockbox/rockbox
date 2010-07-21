@@ -39,7 +39,7 @@ public:
         None
     };
 
-    TargetData(QString file = "");
+    TargetData();
     virtual ~TargetData();
 
     int count(){ return indices.count(); }
@@ -57,11 +57,12 @@ public:
 private:
     struct Entry
     {
-        Entry(QString name, QRect size, ScreenDepth depth, QRect rSize,
-              ScreenDepth rDepth, bool fm, bool record)
-                  : name(name), size(size), depth(depth), rSize(rSize),
+        Entry(QString id, QString name, QRect size, ScreenDepth depth,
+              QRect rSize, ScreenDepth rDepth, bool fm, bool record)
+                  : id(id), name(name), size(size), depth(depth), rSize(rSize),
                   rDepth(rDepth), fm(fm), record(record){ }
 
+        QString id;
         QString name;
         QRect size;
         ScreenDepth depth;

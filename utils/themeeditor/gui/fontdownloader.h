@@ -19,59 +19,41 @@
  *
  ****************************************************************************/
 
-#ifndef PREFERENCESDIALOG_H
-#define PREFERENCESDIALOG_H
+#ifndef FONTDOWNLOADER_H
+#define FONTDOWNLOADER_H
 
 #include <QDialog>
-#include <QPushButton>
+#include <QDir>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 namespace Ui {
-    class PreferencesDialog;
+    class FontDownloader;
 }
 
-class PreferencesDialog : public QDialog {
+class FontDownloader : public QDialog {
     Q_OBJECT
-public:
-    PreferencesDialog(QWidget *parent = 0);
-    virtual ~PreferencesDialog();
-
-    static void setButtonColor(QPushButton* button, QColor color)
-    {
-        QString style = "* { background:" + color.name() + "}";
-        button->setStyleSheet(style);
-    }
-
-public slots:
-    void accept();
-    void reject();
+public:    
+    FontDownloader(QWidget *parent, QString dir);
+    virtual ~FontDownloader();
 
 private slots:
-    void colorClicked();
-    void browseFont();
-    void browseDB();
-    void dlFonts();
+    void cancel();
+
+    void dataReceived();
+    void progress(qint64 bytes, qint64 available);
+    void finished();
+    void netError(QNetworkReply::NetworkError code);
 
 private:
-    Ui::PreferencesDialog *ui;
+    void closeEvent(QCloseEvent *event);
 
-    void loadSettings();
-    void loadColors();
-    void loadFont();
-    void loadRender();
-    void saveSettings();
-    void saveColors();
-    void saveFont();
-    void saveRender();
+    Ui::FontDownloader *ui;
 
-    void setupUI();
-
-    QColor fgColor;
-    QColor bgColor;
-    QColor errorColor;
-    QColor commentColor;
-    QColor escapedColor;
-    QColor tagColor;
-    QColor conditionalColor;
+    QNetworkAccessManager* manager;
+    QDir dir;
+    QFile fout;
+    QNetworkReply* reply;
 };
 
-#endif // PREFERENCESDIALOG_H
+#endif // FONTDOWNLOADER_H

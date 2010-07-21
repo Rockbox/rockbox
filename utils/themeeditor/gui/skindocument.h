@@ -50,7 +50,7 @@ public:
                   "FMS Files (*.fms *.rfms);;"
                   "All Skin Files (*.wps *.rwps *.sbs "
                   "*.rsbs *.fms *.rfms);;"
-                  "All Files (*.*)");
+                  "All Files (*)");
     }
 
     SkinDocument(QLabel* statusLabel, ProjectModel* project = 0,

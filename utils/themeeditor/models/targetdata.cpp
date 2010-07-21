@@ -22,11 +22,17 @@
 #include "targetdata.h"
 
 #include <QStringList>
+#include <QSettings>
 
 const QString TargetData::reserved = "{}:#\n";
 
-TargetData::TargetData(QString file)
+TargetData::TargetData()
 {
+    QSettings settings;
+    settings.beginGroup("TargetData");
+    QString file = settings.value("targetDbPath", "").toString();
+    settings.endGroup();
+
     if(!QFile::exists(file))
         file = ":/targets/targetdb";
 
@@ -132,7 +138,8 @@ TargetData::TargetData(QString file)
         /* Checking for the closing '}' and adding the entry */
         if(require('}', data, cursor))
         {
-            entries.append(Entry(name, size, depth, rSize, rDepth, fm, record));
+            entries.append(Entry(id, name, size, depth, rSize, rDepth,
+                                 fm, record));
             indices.insert(id, index);
             index++;
         }

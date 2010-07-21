@@ -35,7 +35,7 @@ public:
 
     static QString fileFilter()
     {
-        return QObject::tr("Project Files (*.cfg);;All Files (*.*)");
+        return QObject::tr("Project Files (*.cfg);;All Files (*)");
     }
 
     ProjectModel(QString config, EditorWindow* mainWindow, QObject *parent = 0);

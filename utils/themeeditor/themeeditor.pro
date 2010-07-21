@@ -1,6 +1,12 @@
+QT += network
+
 # Enabling profiling
 QMAKE_CXXFLAGS_DEBUG += -pg
 QMAKE_LFLAGS_DEBUG += -pg
+
+# Adding zlib dependency for QuaZip
+LIBS += -lz
+INCLUDEPATH += zlib
 
 # build in a separate folder.
 MYBUILDDIR = $$OUT_PWD/build/
@@ -15,6 +21,7 @@ RBBASE_DIR = $$replace(RBBASE_DIR,/utils/themeeditor,)
 INCLUDEPATH += gui
 INCLUDEPATH += models
 INCLUDEPATH += graphics
+INCLUDEPATH += quazip
 
 # Stuff for the parse lib
 libskin_parser.commands = @$(MAKE) \
@@ -56,7 +63,18 @@ HEADERS += models/parsetreemodel.h \
     gui/skintimer.h \
     graphics/rbtoucharea.h \
     gui/newprojectdialog.h \
-    models/targetdata.h
+    models/targetdata.h \
+    quazip/zip.h \
+    quazip/unzip.h \
+    quazip/quazipnewinfo.h \
+    quazip/quazipfileinfo.h \
+    quazip/quazipfile.h \
+    quazip/quazip.h \
+    quazip/ioapi.h \
+    quazip/crypt.h \
+    zlib/zlib.h \
+    zlib/zconf.h \
+    gui/fontdownloader.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -83,7 +101,14 @@ SOURCES += main.cpp \
     gui/skintimer.cpp \
     graphics/rbtoucharea.cpp \
     gui/newprojectdialog.cpp \
-    models/targetdata.cpp
+    models/targetdata.cpp \
+    quazip/zip.c \
+    quazip/unzip.c \
+    quazip/quazipnewinfo.cpp \
+    quazip/quazipfile.cpp \
+    quazip/quazip.cpp \
+    quazip/ioapi.c \
+    gui/fontdownloader.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -105,14 +130,17 @@ OTHER_FILES += README \
     resources/lines.png \
     resources/cursor.xcf \
     resources/cursor.png \
-    resources/targetdb
+    resources/targetdb \
+    quazip/README.ROCKBOX \
+    quazip/LICENSE.GPL
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \
     gui/skinviewer.ui \
     gui/findreplacedialog.ui \
     gui/skintimer.ui \
-    gui/newprojectdialog.ui
+    gui/newprojectdialog.ui \
+    gui/fontdownloader.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = themeeditor.rc
 macx { 

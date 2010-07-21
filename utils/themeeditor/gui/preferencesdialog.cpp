@@ -21,6 +21,7 @@
 
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
+#include "fontdownloader.h"
 
 #include <QSettings>
 #include <QColorDialog>
@@ -124,6 +125,14 @@ void PreferencesDialog::loadRender()
                                                     false).toBool());
 
     settings.endGroup();
+
+    settings.beginGroup("TargetData");
+
+    ui->dbBox->setText(settings.value("targetDbPath",
+                                      QDir::homePath() + "/.targetdb")
+                       .toString());
+
+    settings.endGroup();
 }
 
 void PreferencesDialog::saveSettings()
@@ -183,6 +192,10 @@ void PreferencesDialog::saveRender()
     settings.setValue("autoHighlightTree", ui->autoHighlightBox->isChecked());
 
     settings.endGroup();
+
+    settings.beginGroup("TargetData");
+    settings.setValue("targetDbPath", ui->dbBox->text());
+    settings.endGroup();
 }
 
 void PreferencesDialog::setupUI()
@@ -203,6 +216,10 @@ void PreferencesDialog::setupUI()
 
     QObject::connect(ui->fontBrowseButton, SIGNAL(clicked()),
                      this, SLOT(browseFont()));
+    QObject::connect(ui->browseDB, SIGNAL(clicked()),
+                     this, SLOT(browseDB()));
+    QObject::connect(ui->dlFontsButton, SIGNAL(clicked()),
+                     this, SLOT(dlFonts()));
 }
 
 void PreferencesDialog::colorClicked()
@@ -241,6 +258,21 @@ void PreferencesDialog::browseFont()
                    getExistingDirectory(this, "Font Directory",
                                         ui->fontBox->text());
     ui->fontBox->setText(path);
+}
+
+void PreferencesDialog::browseDB()
+{
+    QString path = QFileDialog::getOpenFileName(this, tr("Target DB"),
+                                                QDir(ui->dbBox->text()).
+                                                absolutePath(),
+                                                "All Files (*)");
+    ui->dbBox->setText(path);
+}
+
+void PreferencesDialog::dlFonts()
+{
+    FontDownloader* dl = new FontDownloader(this, ui->fontBox->text());
+    dl->show();
 }
 
 void PreferencesDialog::accept()
