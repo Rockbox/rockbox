@@ -307,7 +307,7 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         QString extension = decomp.last();
         if(extension[0] == 'r')
             remote = true;
-        if(extension.right(3) == "wps")
+        if(extension.right(3).toLower() == "wps")
             wps = true;
     }
 
