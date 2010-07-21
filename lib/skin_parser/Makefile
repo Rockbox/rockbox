@@ -12,7 +12,7 @@ SILENT = @
 endif
 
 CC ?= gcc
-AR = ar
+AR ?= ar
 OUTPUT=libskin_parser
 TARGET_DIR ?= ./
 
