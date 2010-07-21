@@ -23,10 +23,20 @@ INCLUDEPATH += models
 INCLUDEPATH += graphics
 INCLUDEPATH += quazip
 
+cross {
+    message("Crossbuilding for W32 binary")
+    # retrieve ar binary for w32 cross compile. This might be specific to
+    # Fedora mingw32 packages of Qt. Using member() here is needed because at
+    # least the F13 packages add ar options to the variable.
+    CROSSOPTIONS += AR=$$member(QMAKE_LIB)
+    # make sure we use the correct subsystem to prevent a console window coming up.
+    LIBS += -Wl,-subsystem,windows
+}
 # Stuff for the parse lib
 libskin_parser.commands = @$(MAKE) \
     TARGET_DIR=$$MYBUILDDIR \
     CC=\"$$QMAKE_CC\" \
+    $$CROSSOPTIONS \
     BUILDDIR=$$OBJECTS_DIR \
     -C \
     $$RBBASE_DIR/lib/skin_parser \
