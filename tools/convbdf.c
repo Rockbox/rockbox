@@ -165,6 +165,7 @@ usage(void)
     "    -n     Don't generate bitmaps as comments in .c file\n",
     "    -a N[%][!] Allow the ascent to grow N pixels/% to avoid glyph clipping\n",
     "    -d N[%][!] Allow the descent to grow N pixels/% to avoid glyph clipping\n",
+    "           An ! in the -a and -d options forces the growth; N may be negative\n",
     "    -v N   Verbosity level: 0=quite quiet, 1=more verbose, 2=even more, etc.\n",
     "    -t     Print internal tracing messages\n",
     NULL /* Must be the last element in the array */
