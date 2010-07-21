@@ -17,9 +17,7 @@ clock
     && (LCD_PIXELFORMAT != HORIZONTAL_PACKING) /* TODO */ \
     && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
-                                   (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)) \
-    &&  (PLUGIN_BUFFER_SIZE >= 0x60000 /* it needs a lot of RAM */ || \
-         PLUGIN_BUFFER_SIZE <= 0x20000) /* but we can use overlays */
+                                   (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
 rockboy
 #endif
 
