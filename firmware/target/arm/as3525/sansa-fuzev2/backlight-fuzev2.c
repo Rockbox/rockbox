@@ -39,7 +39,7 @@ bool _backlight_init(void)
     ascodec_write_pmu(AS3543_BACKLIGHT, 2, backlight_brightness * 10);
 
     /* needed for button light */
-    if (fuzev2_variant == 1)
+    if (amsv2_variant == 1)
         ascodec_write_pmu(0x1a, 1, 0x30);   /* MUX_PWGD = PWM */
 
     return true;
@@ -63,7 +63,7 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
-    if (fuzev2_variant == 0)
+    if (amsv2_variant == 0)
     {
         GPIOB_DIR |= 1<<5;
         GPIOB_PIN(5) = (1<<5);
@@ -77,7 +77,7 @@ void _buttonlight_on(void)
 
 void _buttonlight_off(void)
 {
-    if (fuzev2_variant == 0)
+    if (amsv2_variant == 0)
     {
         GPIOB_PIN(5) = 0;
         GPIOB_DIR &= ~(1<<5);

@@ -45,7 +45,7 @@
 #include "disk.h"
 #endif
 
-#ifdef SANSA_FUZEV2
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
 #include "backlight-target.h"
 #endif
 
@@ -403,8 +403,8 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
 
     MCI_ARGUMENT = arg;
 
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 1)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
         card_no = 1 << 16;
     else
 #endif
@@ -429,8 +429,8 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 0)
+#if defined(SANSA_FUZEV2)
+    if (amsv2_variant == 0)
     {
         extern int buttonlight_is_on;
         if(buttonlight_is_on)
@@ -594,8 +594,8 @@ static int sd_init_card(const int drive)
         return -17;
 
     /* Now that card is widebus make controller aware */
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 1)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
         MCI_CTYPE |= 1<<1;
     else
 #endif
@@ -604,8 +604,8 @@ static int sd_init_card(const int drive)
 #endif /* ! BOOTLOADER */
 
     /*  Set low power mode  */
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 1)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
         MCI_CLKENA |= 1<<16;
     else
 #endif
@@ -709,8 +709,8 @@ static void init_controller(void)
     int card_mask = (1 << hcon_numcards) - 1;
     int pwr_mask;
 
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 1)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
         pwr_mask = 1 << 1;
     else
 #endif
@@ -774,8 +774,8 @@ int sd_init(void)
     wakeup_init(&transfer_completion_signal);
     wakeup_init(&command_completion_signal);
 
-#ifdef SANSA_FUZEV2
-    if (fuzev2_variant == 1)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
         GPIOB_DIR |= 1 << 5;
 #endif
 

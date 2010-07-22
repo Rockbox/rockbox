@@ -189,13 +189,13 @@ static void check_model_variant(void)
     c200v2_variant = !GPIOA_PIN(7);
     GPIOA_DIR = saved_dir;
 }
-#elif defined(SANSA_FUZEV2)
-int fuzev2_variant;
+#elif defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+int amsv2_variant;
 
 static void check_model_variant(void)
 {
     GPIOB_DIR &= ~(1<<5);
-    fuzev2_variant = !!GPIOB_PIN(5);
+    amsv2_variant = !!GPIOB_PIN(5);
 }
 #else
 static inline void check_model_variant(void)

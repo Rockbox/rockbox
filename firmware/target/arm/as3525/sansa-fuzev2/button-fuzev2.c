@@ -257,7 +257,7 @@ int button_read_device(void)
         btn |= BUTTON_RIGHT;
     if (GPIOB_PIN(1) & 1<<1)
         btn |= BUTTON_HOME;
-    if (fuzev2_variant == 1)
+    if (amsv2_variant == 1)
         btn ^= BUTTON_HOME;
 
     if (gpiod6 & 1<<6)

@@ -268,14 +268,14 @@ bool __dbg_hw_info(void)
     {
         while(1)
         {
-#if defined(SANSA_C200V2) || defined(SANSA_FUZEV2)
+#if defined(SANSA_C200V2) || defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
         lcd_clear_display();
         line = 0;
         lcd_puts(0, line++, "[Submodel:]");
 #if defined(SANSA_C200V2)
         lcd_putsf(0, line++, "C200v2 variant %d", c200v2_variant);
-#elif defined(SANSA_FUZEV2)
-        lcd_putsf(0, line++, "Fuzev2 variant %d", fuzev2_variant);
+#elif defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+        lcd_putsf(0, line++, "AMSv2 variant %d", amsv2_variant);
 #endif
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);

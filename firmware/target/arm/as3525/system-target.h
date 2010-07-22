@@ -46,8 +46,8 @@
         ? (((uintptr_t)(a)) - IRAM_ORIG) \
         : ((uintptr_t)(a))))
 
-#ifdef SANSA_FUZEV2
-extern int fuzev2_variant;
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+extern int amsv2_variant;
 #endif
 
 #ifdef SANSA_C200V2
