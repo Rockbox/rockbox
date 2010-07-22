@@ -45,7 +45,7 @@
 #include "disk.h"
 #endif
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2)
 #include "backlight-target.h"
 #endif
 
