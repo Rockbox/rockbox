@@ -577,6 +577,140 @@ void synth_full(struct mad_synth *, struct mad_frame const *,
 
 /* optimised version of synth_full */
 # ifdef FPM_COLDFIRE_EMAC
+
+#define SYNTH_EMAC1(res, f1, pD) \
+    asm volatile( \
+    "movem.l (%1), %%d0-%%d7               \n\t" \
+    "move.l (%2), %%a5                     \n\t" \
+    "mac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t" \
+    "mac.l %%d7, %%a5,               %%acc0\n\t" \
+    "movclr.l %%acc0, %0                   \n\t" \
+    : "=r" (res) \
+    : "a" (*f1), "a" (*pD) \
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+    
+#define SYNTH_EMAC2(res, f1, f2, pD) \
+    asm volatile( \
+    "movem.l (%1), %%d0-%%d7                \n\t" \
+    "move.l 4(%2), %%a5                     \n\t" \
+    "msac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d7, %%a5,   (%2), %%a5, %%acc0\n\t" \
+    "movem.l (%3), %%d0-%%d7                \n\t" \
+    "mac.l  %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d7, %%a5,               %%acc0\n\t" \
+    "movclr.l %%acc0, %0                    \n\t" \
+    : "=r" (res) \
+    : "a" (*f1), "a" (*pD), "a" (*f2) \
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory");
+    
+#define SYNTH_EMAC_ODD_SBSAMPLE(f1, f2, pD1, pD2, res1, res2) \
+    asm volatile ( \
+    "movem.l (%0), %%d0-%%d7                 \n\t" \
+    "move.l 4(%2), %%a5                      \n\t" \
+    "msac.l %%d0, %%a5,  60(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d1, %%a5,  52(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d2, %%a5,  44(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d3, %%a5,  36(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d4, %%a5,  28(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d5, %%a5,  20(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d6, %%a5,  12(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d7, %%a5, 112(%3), %%a5, %%acc0\n\t" \
+    "mac.l  %%d7, %%a5, 104(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d6, %%a5,  96(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d5, %%a5,  88(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d4, %%a5,  80(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d3, %%a5,  72(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d2, %%a5,  64(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d1, %%a5, 120(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d0, %%a5,   8(%2), %%a5, %%acc1\n\t" \
+    "movem.l (%1), %%d0-%%d7                 \n\t" \
+    "mac.l  %%d7, %%a5,  16(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d6, %%a5,  24(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d5, %%a5,  32(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d4, %%a5,  40(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d3, %%a5,  48(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d2, %%a5,  56(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d1, %%a5,    (%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d0, %%a5,  60(%3), %%a5, %%acc0\n\t" \
+    "mac.l  %%d0, %%a5,  68(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d1, %%a5,  76(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d2, %%a5,  84(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d3, %%a5,  92(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d4, %%a5, 100(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d5, %%a5, 108(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d6, %%a5, 116(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d7, %%a5,                %%acc1\n\t" \
+    :                                              \
+    : "a" (*f1), "a" (*f2), "a" (*pD1), "a" (*pD2) \
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory"); \
+    asm volatile( \
+    "movclr.l %%acc0, %0\n\t" \
+    "movclr.l %%acc1, %1\n\t" \
+    : "=d" (res1), "=d" (res2) );
+    
+#define SYNTH_EMAC_EVEN_SBSAMPLE(f1, f2, pD1, pD2, res1, res2) \
+    asm volatile ( \
+    "movem.l (%0), %%d0-%%d7                 \n\t" \
+    "move.l (%2), %%a5                       \n\t" \
+    "msac.l %%d0, %%a5,  56(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d1, %%a5,  48(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d2, %%a5,  40(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d3, %%a5,  32(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d4, %%a5,  24(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d5, %%a5,  16(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d6, %%a5,   8(%2), %%a5, %%acc0\n\t" \
+    "msac.l %%d7, %%a5, 116(%3), %%a5, %%acc0\n\t" \
+    "mac.l  %%d7, %%a5, 108(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d6, %%a5, 100(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d5, %%a5,  92(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d4, %%a5,  84(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d3, %%a5,  76(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d2, %%a5,  68(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d1, %%a5,  60(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d0, %%a5,  12(%2), %%a5, %%acc1\n\t" \
+    "movem.l (%1), %%d0-%%d7                 \n\t" \
+    "mac.l  %%d7, %%a5,  20(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d6, %%a5,  28(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d5, %%a5,  36(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d4, %%a5,  44(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d3, %%a5,  52(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d2, %%a5,  60(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d1, %%a5,   4(%2), %%a5, %%acc0\n\t" \
+    "mac.l  %%d0, %%a5, 120(%3), %%a5, %%acc0\n\t" \
+    "mac.l  %%d0, %%a5,  64(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d1, %%a5,  72(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d2, %%a5,  80(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d3, %%a5,  88(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d4, %%a5,  96(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d5, %%a5, 104(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d6, %%a5, 112(%3), %%a5, %%acc1\n\t" \
+    "mac.l  %%d7, %%a5,                %%acc1\n\t" \
+    :                                              \
+    : "a" (*f1), "a" (*f2), "a" (*pD1), "a" (*pD2) \
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory"); \
+    asm volatile( \
+    "movclr.l %%acc0, %0\n\t" \
+    "movclr.l %%acc1, %1\n\t" \
+    : "=d" (res1), "=d" (res2) );
+
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
                 unsigned int nch, unsigned int ns)
@@ -612,31 +746,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
       if(s & 1)
       {
-        asm volatile(
-        "movem.l (%1), %%d0-%%d7\n\t"
-        "move.l 4(%2), %%a5\n\t"
-        "msac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d7, %%a5,   (%2), %%a5, %%acc0\n\t"
-
-        "movem.l (%3), %%d0-%%d7\n\t"
-        "mac.l  %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d7, %%a5,               %%acc0\n\t"
-        "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fx), "a" (*D0ptr), "a" (*fe)
-        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
+        SYNTH_EMAC2(hi0, fx, fe, D0ptr);
         pcm[0] = hi0 << 3; /* shift result to libmad's fixed point format */
         pcm   += 16;
 
@@ -646,99 +756,19 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           ++D1ptr;
 
           /* D[32 - sb][i] == -D[sb][31 - i] */
-          asm volatile (
-          "movem.l (%0), %%d0-%%d7\n\t"
-          "move.l 4(%2), %%a5\n\t"
-          "msac.l %%d0, %%a5,  60(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d1, %%a5,  52(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d2, %%a5,  44(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d3, %%a5,  36(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d4, %%a5,  28(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d5, %%a5,  20(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d6, %%a5,  12(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d7, %%a5, 112(%3), %%a5, %%acc0\n\t"
-          "mac.l  %%d7, %%a5, 104(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d6, %%a5,  96(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d5, %%a5,  88(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d4, %%a5,  80(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d3, %%a5,  72(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d2, %%a5,  64(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d1, %%a5, 120(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d0, %%a5,   8(%2), %%a5, %%acc1\n\t"
-          "movem.l (%1), %%d0-%%d7\n\t"
-          "mac.l  %%d7, %%a5,  16(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d6, %%a5,  24(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d5, %%a5,  32(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d4, %%a5,  40(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d3, %%a5,  48(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d2, %%a5,  56(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d1, %%a5,    (%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d0, %%a5,  60(%3), %%a5, %%acc0\n\t"
-          "mac.l  %%d0, %%a5,  68(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d1, %%a5,  76(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d2, %%a5,  84(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d3, %%a5,  92(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d4, %%a5, 100(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d5, %%a5, 108(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d6, %%a5, 116(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d7, %%a5,                %%acc1\n\t"
-          : : "a" (*fo), "a" (*fe), "a" (*D0ptr), "a" (*D1ptr)
-          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
-          asm volatile(
-          "movclr.l %%acc0, %0\n\t"
-          "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
-
+          SYNTH_EMAC_ODD_SBSAMPLE(fo, fe, D0ptr, D1ptr, hi0, hi1);
           pcm[-sb] = hi0 << 3;
           pcm[ sb] = hi1 << 3;
         }
 
         ++D0ptr;
-        asm volatile(
-        "movem.l (%1), %%d0-%%d7\n\t"
-        "move.l 4(%2), %%a5\n\t"
-        "mac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d7, %%a5,               %%acc0\n\t"
-        "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr)
-        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
+        SYNTH_EMAC1(hi0,fo,D0ptr+1);
         pcm[0] = -(hi0 << 3);
       }
       else
       {
-        asm volatile(
-        "movem.l (%1), %%d0-%%d7\n\t"
-        "move.l (%2), %%a5\n\t"
-        "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d7, %%a5,  4(%2), %%a5, %%acc0\n\t"
-
-        "movem.l (%3), %%d0-%%d7\n\t"
-        "mac.l  %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
-        "mac.l  %%d7, %%a5,               %%acc0\n\t"
-        "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fx), "a" (*D0ptr), "a" (*fe)
-        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
-        pcm[0] = hi0 << 3; /* shift result to libmad's fixed point format */
+        SYNTH_EMAC2(hi0,fe,fx,D0ptr);
+        pcm[0] = -(hi0 << 3); /* shift result to libmad's fixed point format */
         pcm   += 16;
 
         for (sb = 15; sb; sb--, fo++) {
@@ -747,69 +777,13 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           ++D1ptr;
 
           /* D[32 - sb][i] == -D[sb][31 - i] */
-          asm volatile (
-          "movem.l (%0), %%d0-%%d7\n\t"
-          "move.l (%2), %%a5\n\t"
-          "msac.l %%d0, %%a5,  56(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d1, %%a5,  48(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d2, %%a5,  40(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d3, %%a5,  32(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d4, %%a5,  24(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d5, %%a5,  16(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d6, %%a5,   8(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d7, %%a5, 116(%3), %%a5, %%acc0\n\t"
-          "mac.l  %%d7, %%a5, 108(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d6, %%a5, 100(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d5, %%a5,  92(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d4, %%a5,  84(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d3, %%a5,  76(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d2, %%a5,  68(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d1, %%a5,  60(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d0, %%a5,  12(%2), %%a5, %%acc1\n\t"
-          "movem.l (%1), %%d0-%%d7\n\t"
-          "mac.l  %%d7, %%a5,  20(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d6, %%a5,  28(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d5, %%a5,  36(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d4, %%a5,  44(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d3, %%a5,  52(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d2, %%a5,  60(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d1, %%a5,   4(%2), %%a5, %%acc0\n\t"
-          "mac.l  %%d0, %%a5, 120(%3), %%a5, %%acc0\n\t"
-          "mac.l  %%d0, %%a5,  64(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d1, %%a5,  72(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d2, %%a5,  80(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d3, %%a5,  88(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d4, %%a5,  96(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d5, %%a5, 104(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d6, %%a5, 112(%3), %%a5, %%acc1\n\t"
-          "mac.l  %%d7, %%a5,                %%acc1\n\t"
-          : : "a" (*fo), "a" (*fe), "a" (*D0ptr), "a" (*D1ptr)
-          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
-          asm volatile(
-          "movclr.l %%acc0, %0\n\t"
-          "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
-
+          SYNTH_EMAC_EVEN_SBSAMPLE(fo, fe, D0ptr, D1ptr, hi0, hi1);
           pcm[-sb] = hi0 << 3;
           pcm[ sb] = hi1 << 3;
         }
 
         ++D0ptr;
-        asm volatile(
-        "movem.l (%1), %%d0-%%d7\n\t"
-        "move.l (%2), %%a5\n\t"
-        "mac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d7, %%a5,               %%acc0\n\t"
-        "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr)
-        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
+        SYNTH_EMAC1(hi0,fo,D0ptr);
         pcm[0] = -(hi0 << 3);
       }
       pcm  += 16;
