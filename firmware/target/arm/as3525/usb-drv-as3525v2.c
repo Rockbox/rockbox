@@ -156,9 +156,9 @@ static void as3525v2_connect(void)
     GUSBCFG |= GUSBCFG_force_device_mode;
     usb_delay();
     /* 11) Do something that is probably CCU related but undocumented*/
-    CCU_USB_THINGY &= ~0x1000;
+    CCU_USB &= ~0x1000;
     usb_delay();
-    CCU_USB_THINGY &= ~0x300000;
+    CCU_USB &= ~0x300000;
     usb_delay();
     /* 12) reset usb core parameters (dev addr, speed, ...) */
     DCFG = 0;

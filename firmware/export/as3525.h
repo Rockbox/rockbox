@@ -109,7 +109,6 @@
 #define CCU_VERS          (*(volatile unsigned long *)(CCU_BASE + 0x14))
 #define CCU_SPARE1        (*(volatile unsigned long *)(CCU_BASE + 0x18))
 #define CCU_SPARE2        (*(volatile unsigned long *)(CCU_BASE + 0x1C))
-#define CCU_USB_THINGY    (*(volatile unsigned long *)(CCU_BASE + 0x20))
 
 /* DBOP */
 #define DBOP_TIMPOL_01    (*(volatile unsigned long *)(DBOP_BASE + 0x00))

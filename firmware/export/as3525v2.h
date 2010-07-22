@@ -40,4 +40,6 @@
 
 #define USB_NUM_ENDPOINTS   6
 
+#define CCU_USB         (*(volatile unsigned long *)(CCU_BASE + 0x20))
+
 #endif /* __AS3525V2_H__ */
