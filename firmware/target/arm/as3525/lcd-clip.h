@@ -20,10 +20,10 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "ascodec.h"
 
-void lcd_hw_init(int *offset) INIT_ATTR;
-static inline void lcd_enable_power(bool onoff)
-{
-    ascodec_write(AS3514_DCDC15, onoff ? 1 : 0);
-}
+/* return variant number: 0 = clipv1, old clip+, 1 = newer clip+ */
+int lcd_hw_init(void) INIT_ATTR;
+
+/* target-specific power enable */
+void lcd_enable_power(bool onoff);
+

@@ -26,7 +26,9 @@
 #include "system.h"
 #include "cpu.h"
 
-void lcd_hw_init(int *offset)
+#define LCD_DELAY 10
+
+int lcd_hw_init(void)
 {
 /* DBOP initialisation, do what OF does */
     bitset32(&CCU_IO, 1<<12); /* ?? */
@@ -39,10 +41,8 @@ void lcd_hw_init(int *offset)
     GPIOB_DIR |= (1<<2)|(1<<5);
     GPIOB_PIN(5) = (1<<5);
 
-    *offset = 2;
+    return 0;
 }
-
-#define LCD_DELAY 10
 
 void lcd_write_command(int byte)
 {
@@ -84,3 +84,9 @@ void lcd_write_data(const fb_data* p_bytes, int count)
     /* While push fifo is not empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 }
+
+void lcd_enable_power(bool onoff)
+{
+    (void) onoff;
+}
+
