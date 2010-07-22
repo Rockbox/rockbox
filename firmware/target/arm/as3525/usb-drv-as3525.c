@@ -35,8 +35,6 @@
 #include "usb_core.h"
 #include "string.h"
 
-#if defined(USE_ROCKBOX_USB)
-
 #include "usb-drv-as3525.h"
 
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
@@ -820,93 +818,3 @@ bool usb_drv_stalled(int ep, bool in)
 {
     return USB_EP_CTRL(ep, in) & USB_EP_CTRL_STALL;
 }
-
-#else
-
-void usb_attach(void)
-{
-}
-
-void usb_drv_init(void)
-{
-}
-
-void usb_drv_exit(void)
-{
-}
-
-int usb_drv_port_speed(void)
-{
-    return 0;
-}
-
-int usb_drv_request_endpoint(int type, int dir)
-{
-    (void)type;
-    (void)dir;
-
-    return -1;
-}
-
-void usb_drv_release_endpoint(int ep)
-{
-    (void)ep;
-}
-
-void usb_drv_cancel_all_transfers(void)
-{
-}
-
-void usb_drv_set_test_mode(int mode)
-{
-    (void)mode;
-}
-
-void usb_drv_set_address(int address)
-{
-    (void)address;
-}
-
-int usb_drv_recv(int ep, void *ptr, int len)
-{
-    (void)ep;
-    (void)ptr;
-    (void)len;
-
-    return -1;
-}
-
-int usb_drv_send(int ep, void *ptr, int len)
-{
-    (void)ep;
-    (void)ptr;
-    (void)len;
-
-    return -1;
-}
-
-int usb_drv_send_nonblocking(int ep, void *ptr, int len)
-{
-    (void)ep;
-    (void)ptr;
-    (void)len;
-
-    return -1;
-}
-
-void usb_drv_stall(int ep, bool stall, bool in)
-{
-    (void)ep;
-    (void)stall;
-    (void)in;
-}
-
-bool usb_drv_stalled(int ep, bool in)
-{
-    (void)ep;
-    (void)in;
-
-    return 0;
-}
-
-#endif
