@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-/* return variant number: 0 = clipv1, old clip+, 1 = newer clip+ */
+/* return variant number: 0 = clipv1, clipv2, old clip+, 1 = newer clip+ */
 int lcd_hw_init(void) INIT_ATTR;
 
 /* target-specific power enable */
