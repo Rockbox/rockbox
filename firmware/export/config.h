@@ -128,10 +128,10 @@
 #define MPIO_HD200_PAD     44
 
 /* CONFIG_REMOTE_KEYPAD */
-#define H100_REMOTE 1
-#define H300_REMOTE 2
-#define X5_REMOTE   3
-#define MROBE_REMOTE 4
+#define H100_REMOTE   1
+#define H300_REMOTE   2
+#define IAUDIO_REMOTE 3
+#define MROBE_REMOTE  4
 
 /* CONFIG_BACKLIGHT_FADING */
 /* No fading capabilities at all (yet) */

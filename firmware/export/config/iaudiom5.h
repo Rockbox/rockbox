@@ -86,6 +86,8 @@
 
 #define CONFIG_KEYPAD IAUDIO_X5M5_PAD
 
+#define CONFIG_REMOTE_KEYPAD IAUDIO_REMOTE
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
