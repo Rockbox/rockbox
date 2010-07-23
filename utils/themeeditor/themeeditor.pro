@@ -92,7 +92,8 @@ HEADERS += models/parsetreemodel.h \
     qtfindreplacedialog/findreplaceform.h \
     qtfindreplacedialog/findreplacedialog.h \
     qtfindreplacedialog/findform.h \
-    qtfindreplacedialog/finddialog.h
+    qtfindreplacedialog/finddialog.h \
+    gui/projectexporter.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -130,7 +131,8 @@ SOURCES += main.cpp \
     qtfindreplacedialog/findreplaceform.cpp \
     qtfindreplacedialog/findreplacedialog.cpp \
     qtfindreplacedialog/findform.cpp \
-    qtfindreplacedialog/finddialog.cpp
+    qtfindreplacedialog/finddialog.cpp \
+    gui/projectexporter.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -164,7 +166,8 @@ FORMS += gui/editorwindow.ui \
     gui/newprojectdialog.ui \
     gui/fontdownloader.ui \
     qtfindreplacedialog/findreplaceform.ui \
-    qtfindreplacedialog/findreplacedialog.ui
+    qtfindreplacedialog/findreplacedialog.ui \
+    gui/projectexporter.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = themeeditor.rc
 macx { 

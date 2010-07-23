@@ -25,6 +25,7 @@
 #include "rbfontcache.h"
 #include "rbtextcache.h"
 #include "newprojectdialog.h"
+#include "projectexporter.h"
 
 #include <QDesktopWidget>
 #include <QFileSystemModel>
@@ -220,6 +221,8 @@ void EditorWindow::setupMenus()
                      this, SLOT(saveCurrentAs()));
     QObject::connect(ui->actionToolbarSave, SIGNAL(triggered()),
                      this, SLOT(saveCurrent()));
+    QObject::connect(ui->actionExport_Project, SIGNAL(triggered()),
+                     this, SLOT(exportProject()));
 
     QObject::connect(ui->actionOpen_Document, SIGNAL(triggered()),
                      this, SLOT(openFile()));
@@ -466,6 +469,7 @@ void EditorWindow::closeProject()
     }
 
     ui->actionClose_Project->setEnabled(false);
+    ui->actionExport_Project->setEnabled(false);
 }
 
 void EditorWindow::saveCurrent()
@@ -478,6 +482,25 @@ void EditorWindow::saveCurrentAs()
 {
     if(ui->editorTabs->currentIndex() >= 0)
         dynamic_cast<TabContent*>(ui->editorTabs->currentWidget())->saveAs();
+}
+
+void EditorWindow::exportProject()
+{
+    QDir dir = project->getSetting("themebase", "");
+    dir.cdUp();
+    QString file = project->getSetting("configfile", "").split("/").
+                   last().split(".").first() + ".zip";
+    file = dir.filePath(file);
+
+    file = QFileDialog::getSaveFileName(this, tr("Export Project"),
+                                        file, "Zip Files (*.zip *.ZIP);;"
+                                              "All Files (*)");
+
+    if(file != "")
+    {
+        ProjectExporter* exporter = new ProjectExporter(file, project, this);
+        exporter->show();
+    }
 }
 
 void EditorWindow::openFile()
@@ -724,6 +747,7 @@ void EditorWindow::loadProjectFile(QString fileName)
             project->deleteLater();
 
         ui->actionClose_Project->setEnabled(true);
+        ui->actionExport_Project->setEnabled(true);
 
         project = new ProjectModel(fileName, this);
         ui->projectTree->setModel(project);

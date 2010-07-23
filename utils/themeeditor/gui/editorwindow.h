@@ -72,6 +72,7 @@ private slots:
     void closeProject();
     void saveCurrent();
     void saveCurrentAs();
+    void exportProject();
     void openFile();
     void openProject();
     void tabTitleChanged(QString title);
