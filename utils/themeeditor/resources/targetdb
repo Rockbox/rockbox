@@ -1,36 +1,117 @@
-ipod12
+archosfmrecorder
 {
-    name   : iPod 1st/2nd Gen
-    screen : 160 x 128 @ grey
-    fm     : no
+    name   : Archos FM Recorder
+    screen : 112 x 64 @ mono
     remote : no
+    fm     : yes
     record : yes
 }
 
-ipod3
+archosondiofm
 {
-    name   : iPod 3rd Gen
-    screen : 160 x 128 @ grey
-    fm     : no
+    name   : Archos Ondio FM
+    screen : 112 x 64 @ mono
     remote : no
+    fm     : yes
     record : yes
 }
 
-ipod4
+archosondiosp
 {
-    name   : iPod 4th Gen
-    screen : 160 x 128 @ grey
-    fm     : no
+    name   : Archos Ondio SP
+    screen : 112 x 64 @ mono
     remote : no
+    fm     : no
+    record : no
+}
+
+archosplayer
+{
+    name   : Archos Player/Studio
+    screen : 11 x 2 @ mono
+    remote : no
+    fm     : no
+    record : no
+}
+
+archosrecorder
+{
+    name   : Archos Recorder v1
+    screen : 112 x 64 @ mono
+    remote : no
+    fm     : no
     record : yes
 }
 
-ipodmini12
+archosrecorderv2
 {
-    name   : iPod Mini 1st/2nd Gen
-    screen : 138 x 110 @ grey
-    fm     : no
+    name   : Archos Recorder v2
+    screen : 112 x 64 @ mono
     remote : no
+    fm     : yes
+    record : yes
+}
+
+cowond2
+{
+    name   : Cowon D2
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+iaudiom3
+{
+    name   : iAudio M3
+    screen : 128 x 96 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+iaudiom5
+{
+    name   : iAudio M5
+    screen : 160 x 128 @ rgb
+    remote : 128 x 96 @ grey
+    fm     : no
+    record : yes
+}
+
+iaudiox5
+{
+    name   : iAudio X5
+    screen : 160 x 128 @ rgb
+    remote : 128 x 96 @ grey
+    fm     : yes
+    record : yes
+}
+
+ipod1g2g
+{
+    name   : iPod 1st and 2nd gen
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ipod3g
+{
+    name   : iPod 3rd gen
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ipod4g
+{
+    name   : iPod 4th gen Grayscale
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : yes
     record : yes
 }
 
@@ -38,45 +119,243 @@ ipodcolor
 {
     name   : iPod Color/Photo
     screen : 220 x 176 @ rgb
-    fm     : no
     remote : no
+    fm     : yes
     record : yes
 }
 
-ipodnano1
+ipodmini1g
 {
-    name   : iPod Nano 1st Gen
-    screen : 176 x 132 @ rgb
-    fm     : no
+    name   : iPod Mini 1st gen
+    screen : 138 x 110 @ rgb
     remote : no
+    fm     : no
+    record : no
+}
+
+ipodmini2g
+{
+    name   : iPod Mini 2nd gen
+    screen : 138 x 110 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ipodnano1g
+{
+    name   : iPod Nano 1st gen
+    screen : 176 x 132 @ rgb
+    remote : no
+    fm     : yes
     record : yes
+}
+
+ipodnano2g
+{
+    name   : iPod Nano 2nd gen
+    screen : 176 x 132 @ rgb
+    remote : no
+    fm     : no
+    record : no
 }
 
 ipodvideo
 {
     name   : iPod Video
     screen : 320 x 240 @ rgb
-    fm     : no
     remote : no
+    fm     : yes
     record : yes
 }
 
-# Olympus units
+iriverh10
+{
+    name   : iriver H10 20GB
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+iriverh10_5gb
+{
+    name   : iriver H10 5GB
+    screen : 128 x 128 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+iriverh100
+{
+    name   : iriver H100/115
+    screen : 160 x 128 @ rgb
+    remote : 128 x 64 @ mono
+    fm     : yes
+    record : yes
+}
+
+iriverh120
+{
+    name   : iriver H120/140
+    screen : 160 x 128 @ rgb
+    remote : 128 x 64 @ mono
+    fm     : yes
+    record : yes
+}
+
+iriverh300
+{
+    name   : iriver H320/340
+    screen : 220 x 176 @ rgb
+    remote : 128 x 64 @ mono
+    fm     : yes
+    record : yes
+}
 
 mrobe100
 {
-    name   : m%:robe 100
+    name   : Olympus M-Robe 100
     screen : 160 x 128 @ mono
-    fm     : no
     remote : 79 x 16 @ mono
-    record : yes
+    fm     : no
+    record : no
 }
 
 mrobe500
 {
-    name   : m%:robe 500
+    name   : Olympus M-Robe 500
     screen : 640 x 480 @ rgb
-    fm     : no
     remote : 79 x 16 @ mono
+    fm     : no
+    record : no
+}
+
+vibe500
+{
+    name   : Packard Bell Vibe 500
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
     record : yes
 }
+
+samsungyh820
+{
+    name   : Samsung YH-820
+    screen : 128 x 96 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+samsungyh920
+{
+    name   : Samsung YH-920
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+samsungyh925
+{
+    name   : Samsung YH-925
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+sansac200
+{
+    name   : SanDisk Sansa c200
+    screen : 132 x 80 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclip
+{
+    name   : SanDisk Sansa Clip v1
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclipv2
+{
+    name   : SanDisk Sansa Clip v2
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclipplus
+{
+    name   : SanDisk Sansa Clip+
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansae200
+{
+    name   : SanDisk Sansa e200
+    screen : 176 x 220 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansae200v2
+{
+    name   : SanDisk Sansa e200 v2
+    screen : 176 x 220 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansafuze
+{
+    name   : SanDisk Sansa Fuze
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansafuzev2
+{
+    name   : SanDisk Sansa Fuze v2
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+gigabeatfx
+{
+    name   : Toshiba Gigabeat F/X
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+gigabeats
+{
+    name   : Toshiba Gigabeat S
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+ 
