@@ -125,6 +125,16 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
                             int32_t *win,
                             unsigned int nIn);
 #else
+    #define MULTIPLY_ADD_BLOCK(y1, y2, x, c, k) \
+        y1 += fixmul31(c[k], x[k]); k++; \
+        y2 += fixmul31(c[k], x[k]); k++; \
+        y1 += fixmul31(c[k], x[k]); k++; \
+        y2 += fixmul31(c[k], x[k]); k++; \
+        y1 += fixmul31(c[k], x[k]); k++; \
+        y2 += fixmul31(c[k], x[k]); k++; \
+        y1 += fixmul31(c[k], x[k]); k++; \
+        y2 += fixmul31(c[k], x[k]); k++;
+            
     static inline void
     atrac3_iqmf_dewindowing(int32_t *out,
                             int32_t *in,
@@ -133,68 +143,18 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
     {
         int32_t i, j, s1, s2;
         
-        for (j = nIn; j != 0; j--) {
-            i = 0;
-            /*  0.. 7 */
-            s1  = fixmul31(win[i], in[i]); i++;
-            s2  = fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            /*  8..15 */
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            /* 16..23 */
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            /* 24..31 */
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            /* 32..39 */
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            /* 40..47 */
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]); i++;
-            s1 += fixmul31(win[i], in[i]); i++;
-            s2 += fixmul31(win[i], in[i]);
+        for (j = nIn; j != 0; j--, in+=2, out+=2) {
+            s1 = s2 = i = 0;
+            
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /*  0.. 7 */
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /*  8..15 */
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /* 16..23 */
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /* 24..31 */
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /* 32..39 */
+            MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /* 40..47 */
 
             out[0] = s2;
             out[1] = s1;
-    
-            in += 2;
-            out += 2;
         }
     }
 #endif
