@@ -1773,25 +1773,30 @@ static int check_feature_tag(const char *wps_bufptr, const int type)
             return 0;
 #else
             return find_false_branch(wps_bufptr);
-#endif
+#endif /* CONFIG_RTC */
+
         case WPS_TOKEN_HAVE_RECORDING:
 #ifdef HAVE_RECORDING
             return 0;
 #else
             return find_false_branch(wps_bufptr);
-#endif
+#endif /* HAVE_RECORDING */
+
         case WPS_TOKEN_HAVE_TUNER:
 #if CONFIG_TUNER
             if (radio_hardware_present())
                 return 0;
-#endif
+#endif /* CONFIG_TUNER */
+            return find_false_branch(wps_bufptr);
+
+#if CONFIG_TUNER
         case WPS_TOKEN_HAVE_RDS:
 #ifdef HAVE_RDS_CAP
             return 0;
 #else
             return find_false_branch(wps_bufptr);
-#endif
-
+#endif /* HAVE_RDS_CAP */
+#endif /* CONFIG_TUNER */
         default: /* not a tag we care about, just don't skip */
             return 0;
     }
