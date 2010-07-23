@@ -580,46 +580,50 @@ void synth_full(struct mad_synth *, struct mad_frame const *,
 
 #define SYNTH_EMAC1(res, f1, pD) \
     asm volatile( \
-    "movem.l (%1), %%d0-%%d7               \n\t" \
-    "move.l (%2), %%a5                     \n\t" \
-    "mac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t" \
-    "mac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t" \
+    "movem.l (%0), %%d0-%%d7               \n\t" \
+    "move.l (%1), %%a5                     \n\t" \
+    "mac.l %%d0, %%a5, 56(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d1, %%a5, 48(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d2, %%a5, 40(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d3, %%a5, 32(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d4, %%a5, 24(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d5, %%a5, 16(%1), %%a5, %%acc0\n\t" \
+    "mac.l %%d6, %%a5,  8(%1), %%a5, %%acc0\n\t" \
     "mac.l %%d7, %%a5,               %%acc0\n\t" \
-    "movclr.l %%acc0, %0                   \n\t" \
-    : "=r" (res) \
+    : \
     : "a" (*f1), "a" (*pD) \
-    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5"); \
+    asm volatile ( \
+    "movclr.l %%acc0, %0                   \n\t" \
+    : "=d" (res));
     
 #define SYNTH_EMAC2(res, f1, f2, pD) \
     asm volatile( \
-    "movem.l (%1), %%d0-%%d7                \n\t" \
-    "move.l 4(%2), %%a5                     \n\t" \
-    "msac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t" \
-    "msac.l %%d7, %%a5,   (%2), %%a5, %%acc0\n\t" \
-    "movem.l (%3), %%d0-%%d7                \n\t" \
-    "mac.l  %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t" \
-    "mac.l  %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t" \
+    "movem.l (%0), %%d0-%%d7                \n\t" \
+    "move.l 4(%1), %%a5                     \n\t" \
+    "msac.l %%d0, %%a5, 60(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d1, %%a5, 52(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d2, %%a5, 44(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d3, %%a5, 36(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d4, %%a5, 28(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d5, %%a5, 20(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d6, %%a5, 12(%1), %%a5, %%acc0\n\t" \
+    "msac.l %%d7, %%a5,   (%1), %%a5, %%acc0\n\t" \
+    "movem.l (%2), %%d0-%%d7                \n\t" \
+    "mac.l  %%d0, %%a5, 56(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d1, %%a5, 48(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d2, %%a5, 40(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d3, %%a5, 32(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d4, %%a5, 24(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d5, %%a5, 16(%1), %%a5, %%acc0\n\t" \
+    "mac.l  %%d6, %%a5,  8(%1), %%a5, %%acc0\n\t" \
     "mac.l  %%d7, %%a5,               %%acc0\n\t" \
-    "movclr.l %%acc0, %0                    \n\t" \
-    : "=r" (res) \
+    : \
     : "a" (*f1), "a" (*pD), "a" (*f2) \
-    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory");
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory"); \
+    asm volatile ( \
+    "movclr.l %%acc0, %0                    \n\t" \
+    : "=d" (res));
     
 #define SYNTH_EMAC_ODD_SBSAMPLE(f1, f2, pD1, pD2, res1, res2) \
     asm volatile ( \
@@ -762,12 +766,12 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         }
 
         ++D0ptr;
-        SYNTH_EMAC1(hi0,fo,D0ptr+1);
+        SYNTH_EMAC1(hi0, fo, D0ptr+1);
         pcm[0] = -(hi0 << 3);
       }
       else
       {
-        SYNTH_EMAC2(hi0,fe,fx,D0ptr);
+        SYNTH_EMAC2(hi0, fe, fx, D0ptr);
         pcm[0] = -(hi0 << 3); /* shift result to libmad's fixed point format */
         pcm   += 16;
 
@@ -783,7 +787,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         }
 
         ++D0ptr;
-        SYNTH_EMAC1(hi0,fo,D0ptr);
+        SYNTH_EMAC1(hi0, fo, D0ptr);
         pcm[0] = -(hi0 << 3);
       }
       pcm  += 16;
