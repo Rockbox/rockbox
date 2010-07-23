@@ -1078,6 +1078,10 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
     static VLC_TYPE atrac3_vlc_table[4096][2];
     static int vlcs_initialized = 0;
 
+#if defined(CPU_COLDFIRE)
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+#endif
+
     /* Take data from the RM container. */
     q->sample_rate = id3->frequency;
     q->channels = id3->channels;
