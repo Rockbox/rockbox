@@ -48,7 +48,7 @@ private slots:
     void close();
 
 private:
-    void writeZip(ProjectModel* project);
+    void writeZip(QString path, QString base = "");
 
     Ui::ProjectExporter *ui;
     QuaZip zipFile;

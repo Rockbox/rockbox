@@ -22,6 +22,11 @@
 #include "projectexporter.h"
 #include "ui_projectexporter.h"
 
+#include "quazipfile.h"
+
+#include <QTextStream>
+#include <QDir>
+
 ProjectExporter::ProjectExporter(QString path, ProjectModel* project,
                                  QWidget *parent)
                                      :QDialog(parent),
@@ -34,11 +39,20 @@ ProjectExporter::ProjectExporter(QString path, ProjectModel* project,
 
     if(zipFile.open(QuaZip::mdCreate))
     {
-        writeZip(project);
+        html += tr("<span style=\"color:orange\">Resource Check: "
+                   "Not implemented yet</span><br>");
+        ui->statusBox->document()->setHtml(html);
+        writeZip(project->getSetting("themebase", ""));
+        zipFile.close();
+
+        html += tr("<span style=\"color:green\">Project exported "
+                   "successfully</span><br>");
+        ui->statusBox->document()->setHtml(html);
     }
     else
     {
-        html += tr("<span style = \"color:red\">Error opening zip file</span><br>");
+        html += tr("<span style = \"color:red\">"
+                   "Error opening zip file</span><br>");
         ui->statusBox->document()->setHtml(html);
     }
 }
@@ -72,8 +86,46 @@ void ProjectExporter::close()
     hide();
 }
 
-void ProjectExporter::writeZip(ProjectModel *project)
+void ProjectExporter::writeZip(QString path, QString base)
 {
-    (void)project;
-    zipFile.close();
+    if(base == "")
+        base = path;
+    if(path == "")
+    {
+        html += tr("<span style = \"color:red\">"
+                   "Error: Couldn't locate project directory</span><br>");
+        ui->statusBox->document()->setHtml(html);
+        return;
+    }
+
+    QDir dir(path);
+
+    /* First adding any files in the directory */
+    QFileInfoList files = dir.entryInfoList(QDir::Files);
+    for(int i = 0; i < files.count(); i++)
+    {
+        QFileInfo current = files[i];
+
+        QString newPath = current.absoluteFilePath().replace(base, "/.rockbox");
+
+        QuaZipFile fout(&zipFile);
+        QFile fin(current.absoluteFilePath());
+
+        fin.open(QFile::ReadOnly | QFile::Text);
+        fout.open(QIODevice::WriteOnly,
+                  QuaZipNewInfo(newPath, current.absoluteFilePath()));
+
+        fout.write(fin.readAll());
+
+        fin.close();
+        fout.close();
+    }
+
+    /* Then recursively adding any directories */
+    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for(int i = 0; i < dirs.count(); i++)
+    {
+        QFileInfo current = dirs[i];
+        writeZip(current.absoluteFilePath(), base);
+    }
 }
