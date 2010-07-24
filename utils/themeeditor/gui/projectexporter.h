@@ -49,6 +49,12 @@ private slots:
 
 private:
     void writeZip(QString path, QString base = "");
+    void checkRes(ProjectModel* project);
+    void checkWPS(ProjectModel* project, QString file);
+
+    void addSuccess(QString text);
+    void addWarning(QString text);
+    void addError(QString text);
 
     Ui::ProjectExporter *ui;
     QuaZip zipFile;
