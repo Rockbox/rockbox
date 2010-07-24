@@ -58,7 +58,7 @@ static const struct skin_load_setting skins[] = {
 #if CONFIG_TUNER
     { global_settings.fms_file, "fms", fms_data_load},
 #endif
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
     { global_settings.rsbs_file, "rsbs", sb_skin_data_load},
     { global_settings.rwps_file, "rwps", wps_data_load},
 #if CONFIG_TUNER
