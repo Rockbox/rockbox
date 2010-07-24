@@ -879,7 +879,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     lcd_clear_display();
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
 #endif
 
