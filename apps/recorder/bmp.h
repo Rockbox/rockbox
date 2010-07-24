@@ -133,7 +133,7 @@ extern const unsigned short vi_pattern[4];
 #endif
 
 /* Number of data elements in a remote native bitmap width pixels wide */
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH == 2 && LCD_REMOTE_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_REMOTE_BM_WIDTH(width) (((width) + 3) >> 2)
 #else

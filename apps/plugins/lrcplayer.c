@@ -1661,7 +1661,7 @@ static void display_time(void)
 static inline void set_to_default(struct screen *display)
 {
 #if (LCD_DEPTH > 1)
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
     if (display->screen_type != SCREEN_REMOTE)
 #endif
         display->set_foreground(prefs.active_color);
@@ -1671,7 +1671,7 @@ static inline void set_to_default(struct screen *display)
 static inline void set_to_active(struct screen *display)
 {
 #if (LCD_DEPTH > 1)
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
     if (display->screen_type == SCREEN_REMOTE)
         display->set_drawmode(DRMODE_INVERSEVID);
     else
@@ -1687,7 +1687,7 @@ static inline void set_to_active(struct screen *display)
 static inline void set_to_inactive(struct screen *display)
 {
 #if (LCD_DEPTH > 1)
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
     if (display->screen_type != SCREEN_REMOTE)
 #endif
         display->set_foreground(prefs.inactive_color);
@@ -1796,7 +1796,7 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
                 display->fillrect(xpos+elapsed, ypos,
                                   w-elapsed, font_ui_height);
 #if (LCD_DEPTH > 1)
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
                 if (display->screen_type == SCREEN_REMOTE)
                     display->set_drawmode(DRMODE_INVERSEVID);
                 else
