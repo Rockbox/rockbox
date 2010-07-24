@@ -45,9 +45,6 @@
 #include "buffer.h"
 #include "splash.h"
 #include "debug_menu.h"
-#if defined(SIMULATOR) && defined(ROCKBOX_HAS_LOGF)
-#include "logfdisp.h"
-#endif
 #include "version.h"
 #include "time.h"
 #include "wps.h"
