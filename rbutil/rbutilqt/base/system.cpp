@@ -336,20 +336,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
         // get device desriptor first
         // for some reason not doing so results in bad things (tm)
         while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
-            SPDRP_DEVICEDESC,&data, (PBYTE)buffer, buffersize, &buffersize)) {
-            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-                if(buffer) free(buffer);
-                // double buffer size to avoid problems as per KB888609
-                buffer = (LPTSTR)malloc(buffersize * 2);
-            }
-            else {
-                break;
-            }
-        }
-
-        // now get the hardware id, which contains PID and VID.
-        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
-            SPDRP_LOCATION_INFORMATION,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            SPDRP_DEVICEDESC, &data, (PBYTE)buffer, buffersize, &buffersize)) {
             if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
                 if(buffer) free(buffer);
                 // double buffer size to avoid problems as per KB888609
@@ -361,8 +348,9 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
         }
         description = QString::fromWCharArray(buffer);
 
+        // now get the hardware id, which contains PID and VID.
         while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
-            SPDRP_HARDWAREID,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            SPDRP_HARDWAREID, &data, (PBYTE)buffer, buffersize, &buffersize)) {
             if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
                 if(buffer) free(buffer);
                 // double buffer size to avoid problems as per KB888609
@@ -374,7 +362,11 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
         }
 
         unsigned int vid, pid;
-        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x"), &vid, &pid) == 2) {
+        // convert buffer text to upper case to avoid depending on the case of
+        // the keys (W7 uses different casing than XP at least).
+        int len = _tcslen(buffer);
+        while(len--) buffer[len] = _totupper(buffer[len]);
+        if(_stscanf(buffer, _TEXT("USB\\VID_%x&PID_%x"), &vid, &pid) == 2) {
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
