@@ -979,11 +979,15 @@ int rockbox_browse(const char *root, int dirfilter)
                 setting = global_settings.fmr_file;
                 break;
 #endif
+            default:
+                dir = ext = setting = NULL;
+                break;
             }
 
         /* If we've found a file to center on, do it */
         if (setting)
         {
+            /* if setting != NULL, ext and dir are not used uninitialized */
             snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
             set_current_file(current);
             /* set_current_file changes dirlevel, change it back */
