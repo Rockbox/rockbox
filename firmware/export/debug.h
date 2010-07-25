@@ -21,7 +21,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "../include/_ansi.h"
+#include "gcc_extensions.h"
 
 extern void debug_init(void);
 extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);

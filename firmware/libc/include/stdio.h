@@ -1,13 +1,13 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_
 
-#include <_ansi.h>
-
 #define __need_size_t
 #include <stddef.h>
 
 #define __need___va_list
 #include <stdarg.h>
+
+#include "gcc_extensions.h"
 
 #ifndef NULL
 #define NULL    0

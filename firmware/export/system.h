@@ -25,6 +25,7 @@
 #include "cpu.h"
 #include "stdbool.h"
 #include "kernel.h"
+#include "gcc_extensions.h" /* for LIKELY/UNLIKELY */
 
 extern void system_reboot (void);
 /* Called from any UIE handler and panicf - wait for a key and return
@@ -197,15 +198,6 @@ int get_cpu_boost_counter(void);
 /* Get the type pointer from one of its members */
 #define TYPE_FROM_MEMBER(type, memberptr, membername) \
     ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
-
-/* Use to give gcc hints on which branch is most likely taken */
-#if defined(__GNUC__) && __GNUC__ >= 3
-#define LIKELY(x)   __builtin_expect(!!(x), 1)
-#define UNLIKELY(x) __builtin_expect(!!(x), 0)
-#else
-#define LIKELY(x)   (x)
-#define UNLIKELY(x) (x)
-#endif
 
 /* returns index of first set bit or 32 if no bits are set */
 int find_first_set_bit(uint32_t val);

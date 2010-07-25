@@ -22,7 +22,7 @@
 #define LOGF_H
 #include <config.h>
 #include <stdbool.h>
-#include "../include/_ansi.h"
+#include "gcc_extensions.h"
 #include "debug.h"
 
 #ifdef ROCKBOX_HAS_LOGF

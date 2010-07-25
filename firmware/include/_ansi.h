@@ -64,15 +64,4 @@
 #endif
 #endif
 
-/* Support gcc's __attribute__ facility.  */
-
-#ifdef __GNUC__
-#define _ATTRIBUTE(attrs) __attribute__ (attrs)
-#else
-#define _ATTRIBUTE(attrs)
-#endif
-
-#define ATTRIBUTE_PRINTF(fmt, arg1) _ATTRIBUTE( ( format( printf, fmt, arg1 ) ) )
-#define ATTRIBUTE_SCANF(fmt, arg1) _ATTRIBUTE( ( format( scanf, fmt, arg1 ) ) )
-
 #endif /* _ANSIDECL_H_ */

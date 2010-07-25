@@ -22,7 +22,7 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
-#include "_ansi.h"
+#include "gcc_extensions.h"
 
 void panicf( const char *fmt, ... ) ATTRIBUTE_PRINTF(1, 2);
 

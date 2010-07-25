@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2005 by Kevin Ferrare
+ * Copyright © 2010 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,24 +18,29 @@
  *
  ****************************************************************************/
 
-#ifndef _GUI_SPLASH_H_
-#define _GUI_SPLASH_H_
+#ifndef _GCC_EXTENSIONS_H_
+#define _GCC_EXTENSIONS_H_
 
-#include "screen_access.h"
-#include "gcc_extensions.h"
+/* Support for some GCC extensions */
 
-/*
- * Puts a splash message centered on all the screens for a given period
- *  - ticks : how long the splash is displayed (in rb ticks)
- *  - fmt : what to say *printf style
- */
-extern void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+/* Compile time check of format for printf/scanf like functions */
+#ifdef __GNUC__
+#define ATTRIBUTE_PRINTF(fmt, arg1) __attribute__( ( format( printf, fmt, arg1 ) ) )
+#define ATTRIBUTE_SCANF(fmt, arg1) __attribute__( ( format( scanf, fmt, arg1 ) ) )
+#else
+#define ATTRIBUTE_PRINTF(fmt, arg1)
+#define ATTRIBUTE_SCANF(fmt, arg1)
+#endif
 
-/*
- * Puts a splash message centered on all the screens for a given period
- *  - ticks : how long the splash is displayed (in rb ticks)
- *  - str : what to say, if this is a LANG_* string (from ID2P)
- *          it will be voiced
- */
-extern void splash(int ticks, const char *str);
-#endif /* _GUI_ICON_H_ */
+
+/* Use to give gcc hints on which branch is most likely taken */
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define LIKELY(x)   (x)
+#define UNLIKELY(x) (x)
+#endif
+
+
+#endif /* _GCC_EXTENSIONS_H_ */

@@ -31,7 +31,6 @@
 #define MEM 2
 #endif
 
-#include <_ansi.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include "strlcpy.h"
@@ -50,6 +49,8 @@
 #include "dsp.h"
 #endif
 #include "settings.h"
+
+#include "gcc_extensions.h"
 
 #ifdef CODEC
 #if defined(DEBUG) || defined(SIMULATOR)

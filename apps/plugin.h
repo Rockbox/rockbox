@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "string-extra.h"
+#include "gcc_extensions.h"
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
