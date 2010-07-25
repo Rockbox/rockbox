@@ -413,12 +413,11 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 
 /***********************************/
 /*    SETTINGS MENU                */
-static int language_browse(void)
-{
-    return (int)rockbox_browse(LANG_DIR, SHOW_LNG);
-}
-MENUITEM_FUNCTION(browse_langs, 0, ID2P(LANG_LANGUAGE), language_browse,
-                    NULL, NULL, Icon_Language);
+
+static struct browse_folder_info langs = { LANG_DIR, SHOW_LNG };
+
+MENUITEM_FUNCTION(browse_langs, MENU_FUNC_USEPARAM, ID2P(LANG_LANGUAGE),
+                  browse_folder, (void*)&langs, NULL, Icon_Language);
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,

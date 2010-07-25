@@ -45,6 +45,7 @@
 #include "gui/scrollbar.h"
 #include "menu_common.h"
 #include "viewport.h"
+#include "exported_menus.h"
 
 /*
  * Utility functions
@@ -594,18 +595,15 @@ static bool eq_save_preset(void)
 }
 
 /* Allows browsing of preset files */
-bool eq_browse_presets(void)
-{
-    return rockbox_browse(EQS_DIR, SHOW_CFG);
-}
+static struct browse_folder_info eqs = { EQS_DIR, SHOW_CFG };
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
                     (int(*)(void))eq_menu_graphical, NULL, lowlatency_callback, 
                     Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
                     (int(*)(void))eq_save_preset, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
-                    (int(*)(void))eq_browse_presets, NULL, lowlatency_callback,
+MENUITEM_FUNCTION(eq_browse, MENU_FUNC_USEPARAM, ID2P(LANG_EQUALIZER_BROWSE),
+                    browse_folder, (void*)&eqs, lowlatency_callback,
                     Icon_NOICON);
 
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
