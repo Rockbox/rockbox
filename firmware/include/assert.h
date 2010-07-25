@@ -2,6 +2,8 @@
         assert.h
 */
 
+#include "_ansi.h"
+
 #undef assert
 
 #ifdef NDEBUG           /* required by ANSI standard */
