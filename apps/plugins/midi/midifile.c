@@ -33,7 +33,7 @@ struct MIDIfile * loadFile(const char * filename)
 
     if(file < 0)
     {
-        printf("Could not open file");
+        midi_debug("Could not open file");
         return NULL;
     }
 
@@ -46,21 +46,21 @@ struct MIDIfile * loadFile(const char * filename)
     {
         if(fileID == ID_RIFF)
         {
-            printf("Detected RMID file");
-            printf("Looking for MThd header");
+            midi_debug("Detected RMID file");
+            midi_debug("Looking for MThd header");
             char dummy[17];
             rb->read(file, &dummy, 16);
             if(readID(file) != ID_MTHD)
             {
                 rb->close(file);
-                printf("Invalid MIDI header within RIFF.");
+                midi_debug("Invalid MIDI header within RIFF.");
                 return NULL;
             }
 
         } else
         {
             rb->close(file);
-            printf("Invalid file header chunk.");
+            midi_debug("Invalid file header chunk.");
             return NULL;
         }
     }
@@ -68,14 +68,14 @@ struct MIDIfile * loadFile(const char * filename)
     if(readFourBytes(file)!=6)
     {
         rb->close(file);
-        printf("Header chunk size invalid.");
+        midi_debug("Header chunk size invalid.");
         return NULL;
     }
 
     if(readTwoBytes(file)==2)
     {
         rb->close(file);
-        printf("MIDI file type 2 not supported");
+        midi_debug("MIDI file type 2 not supported");
         return NULL;
     }
 
@@ -84,7 +84,7 @@ struct MIDIfile * loadFile(const char * filename)
 
     int track=0;
 
-    printf("File has %d tracks.", mfload->numTracks);
+    midi_debug("File has %d tracks.", mfload->numTracks);
 
     while(! eof(file) && track < mfload->numTracks)
     {
@@ -95,7 +95,7 @@ struct MIDIfile * loadFile(const char * filename)
         {
             if(mfload->numTracks != track)
             {
-                printf("Warning: file claims to have %d tracks. I only see %d here.", mfload->numTracks, track);
+                midi_debug("Warning: file claims to have %d tracks. I only see %d here.", mfload->numTracks, track);
                 mfload->numTracks = track;
             }
             rb->close(file);
@@ -108,7 +108,7 @@ struct MIDIfile * loadFile(const char * filename)
             track++;
         } else
         {
-            printf("SKIPPING TRACK");
+            midi_debug("SKIPPING TRACK");
             int len = readFourBytes(file);
             while(--len)
                 readChar(file);
@@ -159,58 +159,58 @@ int readEvent(int file, void * dest)
                 {
                     case 0x01:  /* Generic text */
                     {
-                        printf("Text: %s", ev->evData);
+                        midi_debug("Text: %s", ev->evData);
                         break;
                     }
 
                     case 0x02:  /* A copyright string within the file */
                     {
-                        printf("Copyright: %s", ev->evData);
+                        midi_debug("Copyright: %s", ev->evData);
                         break;
                     }
 
                     case 0x03:  /* Sequence of track name */
                     {
-                        printf("Name: %s", ev->evData);
+                        midi_debug("Name: %s", ev->evData);
                         break;
                     }
 
                     case 0x04:  /* Instrument (synth) name */
                     {
-                        printf("Instrument: %s", ev->evData);
+                        midi_debug("Instrument: %s", ev->evData);
                         break;
                     }
 
                     case 0x05:  /* Lyrics. These appear on the tracks at the right times */
                     {           /* Usually only a small 'piece' of the lyrics.           */
                                 /* Maybe the sequencer should print these at play time?  */
-                        printf("Lyric: %s", ev->evData);
+                        midi_debug("Lyric: %s", ev->evData);
                         break;
                     }
 
                     case 0x06:  /* Text marker */
                     {
-                        printf("Marker: %s", ev->evData);
+                        midi_debug("Marker: %s", ev->evData);
                         break;
                     }
 
 
                     case 0x07:  /* Cue point */
                     {
-                        printf("Cue point: %s", ev->evData);
+                        midi_debug("Cue point: %s", ev->evData);
                         break;
                     }
 
                     case 0x08:  /* Program name */
                     {
-                        printf("Patch: %s", ev->evData);
+                        midi_debug("Patch: %s", ev->evData);
                         break;
                     }
 
 
                     case 0x09:  /* Device name. Very much irrelevant here, though. */
                     {
-                        printf("Port: %s", ev->evData);
+                        midi_debug("Port: %s", ev->evData);
                         break;
                     }
                 }
@@ -286,7 +286,7 @@ struct Track * readTrack(int file)
     {
         if(trackSize < dataPtr-trk->dataBlock)
         {
-            printf("Track parser memory out of bounds");
+            midi_debug("Track parser memory out of bounds");
             exit(1);
         }
         dataPtr+=sizeof(struct Event);
@@ -307,7 +307,7 @@ int readID(int file)
         id[a]=readChar(file);
     if(eof(file))
     {
-        printf("End of file reached.");
+        midi_debug("End of file reached.");
         return ID_EOF;
     }
     if(rb->strcmp(id, "MThd")==0)

@@ -103,7 +103,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
             if(mf->tracks[a] == NULL)
             {
-                printf("NULL TRACK !!!");
+                midi_debug("NULL TRACK !!!");
                 rb->splash(HZ*2, "Null Track in loader.");
                 return -1;
             }
@@ -129,10 +129,10 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     int file = rb->open(filename, O_RDONLY);
     if(file < 0)
     {
-        printf("");
-        printf("No MIDI patchset found.");
-        printf("Please install the instruments.");
-        printf("See Rockbox page for more info.");
+        midi_debug("");
+        midi_debug("No MIDI patchset found.");
+        midi_debug("Please install the instruments.");
+        midi_debug("See Rockbox page for more info.");
 
         rb->splash(HZ*2, "No Instruments");
         return -1;
@@ -144,14 +144,14 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the right patches as needed    */
     int c = 0;
     name[0] = '\0';
-    printf("Loading instruments");
+    midi_debug("Loading instruments");
     for(a=0; a<128; a++)
     {
         while(readChar(file)!=' ' && !eof(file));
         readTextBlock(file, name);
 
         rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
-/*        printf("\nLOADING: <%s> ", fn); */
+/*        midi_debug("\nLOADING: <%s> ", fn); */
 
         if(patchUsed[a]==1)
         {
@@ -176,7 +176,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the drum data  */
     int idx=0;
     char number[30];
-    printf("Loading drums");
+    midi_debug("Loading drums");
     while(!eof(file))
     {
         readTextBlock(file, number);
@@ -215,12 +215,12 @@ void setPoint(struct SynthObject * so, int pt)
 
     if(so->wf==NULL)
     {
-        printf("Crap... null waveform...");
+        midi_debug("Crap... null waveform...");
         exit(1);
     }
     if(so->wf->envRate==NULL)
     {
-        printf("Waveform has no envelope set");
+        midi_debug("Waveform has no envelope set");
         exit(1);
     }
 

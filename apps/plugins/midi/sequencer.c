@@ -219,11 +219,11 @@ inline void pressNote(int ch, int note, int vol)
     }
     if (a == MAX_VOICES)
     {
-//        printf("\nVoice kill");
-//        printf("\nToo many voices playing at once. No more left");
-//        printf("\nVOICE DUMP: ");
+//        midi_debug("\nVoice kill");
+//        midi_debug("\nToo many voices playing at once. No more left");
+//        midi_debug("\nVOICE DUMP: ");
 //        for(a=0; a<48; a++)
-//            printf("\n#%d  Ch=%d  Note=%d  curRate=%d   curOffset=%d   curPoint=%d   targetOffset=%d", a, voices[a].ch, voices[a].note, voices[a].curRate, voices[a].curOffset, voices[a].curPoint, voices[a].targetOffset);
+//            midi_debug("\n#%d  Ch=%d  Note=%d  curRate=%d   curOffset=%d   curPoint=%d   targetOffset=%d", a, voices[a].ch, voices[a].note, voices[a].curRate, voices[a].curOffset, voices[a].curPoint, voices[a].targetOffset);
         lastKill++;
         if (lastKill == MAX_VOICES)
             lastKill = 0;
@@ -258,13 +258,13 @@ inline void pressNote(int ch, int note, int vol)
         if (drumSet[note] != NULL)
         {
             if (note < 35)
-                printf("NOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
+                midi_debug("NOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
             voices[a].wf = wf;
             voices[a].delta = (((gustable[note]<<FRACTSIZE) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
             if (wf->mode & 28)
-//                printf("\nWoah, a drum patch has a loop. Stripping the loop...");
+//                midi_debug("\nWoah, a drum patch has a loop. Stripping the loop...");
             wf->mode = wf->mode & (255-28);
 
             /* Turn it on */
@@ -273,7 +273,7 @@ inline void pressNote(int ch, int note, int vol)
 
         } else
         {
-/*            printf("\nWarning: drum %d does not have a patch defined... Ignoring it", note); */
+/*            midi_debug("\nWarning: drum %d does not have a patch defined... Ignoring it", note); */
         }
     }
 }
@@ -322,7 +322,7 @@ static void sendEvent(struct Event * ev)
                     if(chLastCtrlMSB[status_low] == REG_PITCHBEND_MSB &&
                        chLastCtrlLSB[status_low] == REG_PITCHBEND_LSB)
                     {
-//                         printf("Pitch bend depth set to %d\n", d2);
+//                         midi_debug("Pitch bend depth set to %d\n", d2);
                         chPBDepth[status_low] = d2;
                     }
                     return;
@@ -403,10 +403,10 @@ int tick(void)
         struct Track * tr = mf->tracks[a];
 
         if (tr == NULL)
-            printf("NULL TRACK: %d", a);
+            midi_debug("NULL TRACK: %d", a);
 
         //BIG DEBUG STATEMENT
-        //printf("\nTrack %2d,  Event = %4d of %4d,   Delta = %5d,    Next = %4d", a, tr->pos, tr->numEvents, tr->delta, getEvent(tr, tr->pos)->delta);
+        //midi_debug("\nTrack %2d,  Event = %4d of %4d,   Delta = %5d,    Next = %4d", a, tr->pos, tr->numEvents, tr->delta, getEvent(tr, tr->pos)->delta);
 
         if (tr != NULL && (tr->pos < tr->numEvents))
         {
@@ -421,7 +421,7 @@ int tick(void)
                     sendEvent(e);
                     if ((e->status&0xF0) == MIDI_PRGM)
                     {
-/*                        printf("\nPatch Event, patch[%d] ==> %d", e->status&0xF, e->d1); */
+/*                        midi_debug("\nPatch Event, patch[%d] ==> %d", e->status&0xF, e->d1); */
                     }
                 }
                 else
@@ -429,7 +429,7 @@ int tick(void)
                     if (e->d1 == 0x51)
                     {
                         tempo = (((short)e->evData[0])<<16)|(((short)e->evData[1])<<8)|(e->evData[2]);
-/*                        printf("\nMeta-Event: Tempo Set = %d", tempo); */
+/*                        midi_debug("\nMeta-Event: Tempo Set = %d", tempo); */
                         bpm=mf->div*1000000/tempo;
                         number_of_samples=SAMPLE_RATE/bpm;
 

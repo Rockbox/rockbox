@@ -286,7 +286,7 @@ void get_more(unsigned char** start, size_t* size)
 #ifndef SYNC
     if(lastswap != swap)
     {
-        printf("Buffer miss!"); /* Comment out the printf to make missses less noticable. */
+        midi_debug("Buffer miss!"); /* Comment out the midi_debug to make missses less noticable. */
     }
 
 #else
@@ -307,12 +307,12 @@ static int midimain(const void * filename)
     int a, notes_used, vol;
     bool is_playing = true;  /* false = paused */
 
-    printf("Loading file");
+    midi_debug("Loading file");
     mf = loadFile(filename);
 
     if (mf == NULL)
     {
-        printf("Error loading file.");
+        midi_debug("Error loading file.");
         return -1;
     }
 
@@ -338,7 +338,7 @@ static int midimain(const void * filename)
         * This seems to work quite well. On a laptop, anyway.
         */
 
-    printf("Okay, starting sequencing");
+    midi_debug("Okay, starting sequencing");
 
     bpm = mf->div*1000000/tempo;
     number_of_samples = SAMPLE_RATE/bpm;
@@ -405,7 +405,7 @@ static int midimain(const void * filename)
                 /* but run through the tracks without the synth running */
                 rb->pcm_play_stop();
                 seekBackward(5);
-                printf("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
+                midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
                     rb->pcm_play_data(&get_more, NULL, 0);
                 break;
@@ -415,7 +415,7 @@ static int midimain(const void * filename)
             {
                 rb->pcm_play_stop();
                 seekForward(5);
-                printf("Skip to %d:%02d\n", playing_time/60, playing_time%60);
+                midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
                     rb->pcm_play_data(&get_more, NULL, 0);
                 break;
@@ -425,12 +425,12 @@ static int midimain(const void * filename)
             {
                 if (is_playing)
                 {
-                    printf("Paused at %d:%02d\n", playing_time/60, playing_time%60);
+                    midi_debug("Paused at %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = false;
                     rb->pcm_play_stop();
                 } else
                 {
-                    printf("Playing from %d:%02d\n", playing_time/60, playing_time%60);
+                    midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = true;
                     rb->pcm_play_data(&get_more, NULL, 0);
                 }
@@ -465,7 +465,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->cpu_boost(true);
 #endif
 
-    printf("%s", parameter);
+    midi_debug("%s", parameter);
     /*   rb->splash(HZ, true, parameter); */
 
 #ifdef RB_PROFILE
