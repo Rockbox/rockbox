@@ -258,3 +258,7 @@ usb_hid
 usb_hid_mouse
 #endif
 #endif
+
+#if defined(HAVE_SPDIF_IN)
+recording_digital
+#endif
