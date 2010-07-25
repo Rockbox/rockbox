@@ -19,60 +19,42 @@
  *
  ****************************************************************************/
 
-#ifndef PREFERENCESDIALOG_H
-#define PREFERENCESDIALOG_H
+#ifndef TARGETDOWNLOADER_H
+#define TARGETDOWNLOADER_H
 
 #include <QDialog>
-#include <QPushButton>
+#include <QDir>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 namespace Ui {
-    class PreferencesDialog;
+    class TargetDownloader;
 }
 
-class PreferencesDialog : public QDialog {
+class TargetDownloader : public QDialog {
     Q_OBJECT
-public:
-    PreferencesDialog(QWidget *parent = 0);
-    virtual ~PreferencesDialog();
-
-    static void setButtonColor(QPushButton* button, QColor color)
-    {
-        QString style = "* { background:" + color.name() + "}";
-        button->setStyleSheet(style);
-    }
-
-public slots:
-    void accept();
-    void reject();
+public:    
+    TargetDownloader(QWidget *parent, QString dir);
+    virtual ~TargetDownloader();
 
 private slots:
-    void colorClicked();
-    void browseFont();
-    void browseDB();
-    void dlFonts();
-    void dlTargetDB();
+    void cancel();
+
+    void dataReceived();
+    void progress(qint64 bytes, qint64 available);
+    void finished();
+    void netError(QNetworkReply::NetworkError code);
 
 private:
-    Ui::PreferencesDialog *ui;
+    void closeEvent(QCloseEvent *event);
 
-    void loadSettings();
-    void loadColors();
-    void loadFont();
-    void loadRender();
-    void saveSettings();
-    void saveColors();
-    void saveFont();
-    void saveRender();
+    Ui::TargetDownloader *ui;
 
-    void setupUI();
+    QNetworkAccessManager* manager;
+    QFile fout;
+    QNetworkReply* reply;
 
-    QColor fgColor;
-    QColor bgColor;
-    QColor errorColor;
-    QColor commentColor;
-    QColor escapedColor;
-    QColor tagColor;
-    QColor conditionalColor;
+    bool cancelled;
 };
 
-#endif // PREFERENCESDIALOG_H
+#endif // TARGETDOWNLOADER_H

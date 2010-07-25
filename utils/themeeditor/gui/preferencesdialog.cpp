@@ -22,6 +22,7 @@
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
 #include "fontdownloader.h"
+#include "targetdownloader.h"
 
 #include <QSettings>
 #include <QColorDialog>
@@ -223,6 +224,8 @@ void PreferencesDialog::setupUI()
                      this, SLOT(browseDB()));
     QObject::connect(ui->dlFontsButton, SIGNAL(clicked()),
                      this, SLOT(dlFonts()));
+    QObject::connect(ui->dlTargetButton, SIGNAL(clicked()),
+                     this, SLOT(dlTargetDB()));
 }
 
 void PreferencesDialog::colorClicked()
@@ -275,6 +278,12 @@ void PreferencesDialog::browseDB()
 void PreferencesDialog::dlFonts()
 {
     FontDownloader* dl = new FontDownloader(this, ui->fontBox->text());
+    dl->show();
+}
+
+void PreferencesDialog::dlTargetDB()
+{
+    TargetDownloader* dl = new TargetDownloader(this, ui->dbBox->text());
     dl->show();
 }
 

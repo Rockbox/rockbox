@@ -34,9 +34,12 @@
 
 FontDownloader::FontDownloader(QWidget *parent, QString path) :
     QDialog(parent),
-    ui(new Ui::FontDownloader), dir(path), reply(0)
+    ui(new Ui::FontDownloader), dir(path), reply(0), cancelled(false)
 {
     ui->setupUi(this);
+
+    QObject::connect(ui->cancelButton, SIGNAL(clicked()),
+                     this, SLOT(cancel()));
 
     manager = new QNetworkAccessManager();
 
@@ -91,12 +94,18 @@ FontDownloader::~FontDownloader()
 
 void FontDownloader::cancel()
 {
+    cancelled = true;
+
     if(reply)
     {
         reply->abort();
         reply->deleteLater();
         reply = 0;
     }
+    fout.close();
+    fout.remove();
+
+    close();
 }
 
 void FontDownloader::dataReceived()
@@ -115,7 +124,11 @@ void FontDownloader::progress(qint64 bytes, qint64 available)
 
 void FontDownloader::finished()
 {
+    if(cancelled)
+        return;
+
     fout.close();
+
     reply->deleteLater();
     reply = 0;
     ui->label->setText(tr("Download complete"));

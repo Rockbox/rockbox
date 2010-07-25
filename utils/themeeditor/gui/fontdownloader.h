@@ -54,6 +54,8 @@ private:
     QDir dir;
     QFile fout;
     QNetworkReply* reply;
+
+    bool cancelled;
 };
 
 #endif // FONTDOWNLOADER_H

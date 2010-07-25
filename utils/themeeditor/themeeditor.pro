@@ -23,7 +23,6 @@ INCLUDEPATH += models
 INCLUDEPATH += graphics
 INCLUDEPATH += quazip
 INCLUDEPATH += qtfindreplacedialog
-
 DEFINES += FINDREPLACE_NOLIB
 cross { 
     message("Crossbuilding for W32 binary")
@@ -95,7 +94,8 @@ HEADERS += models/parsetreemodel.h \
     qtfindreplacedialog/findreplacedialog.h \
     qtfindreplacedialog/findform.h \
     qtfindreplacedialog/finddialog.h \
-    gui/projectexporter.h
+    gui/projectexporter.h \
+    gui/targetdownloader.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -134,7 +134,8 @@ SOURCES += main.cpp \
     qtfindreplacedialog/findreplacedialog.cpp \
     qtfindreplacedialog/findform.cpp \
     qtfindreplacedialog/finddialog.cpp \
-    gui/projectexporter.cpp
+    gui/projectexporter.cpp \
+    gui/targetdownloader.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -169,7 +170,8 @@ FORMS += gui/editorwindow.ui \
     gui/fontdownloader.ui \
     qtfindreplacedialog/findreplaceform.ui \
     qtfindreplacedialog/findreplacedialog.ui \
-    gui/projectexporter.ui
+    gui/projectexporter.ui \
+    gui/targetdownloader.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = themeeditor.rc
 macx { 
