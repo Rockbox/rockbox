@@ -923,7 +923,7 @@ int rockbox_browse(const char *root, int dirfilter)
         static struct tree_context backup;
         char current[MAX_PATH];
         int last_context;
-        const char *dir, *ext, *setting;
+        const char *dir, *ext, *setting = NULL;
         
         backup = tc;
         tc.selected_item = 0;
@@ -979,19 +979,12 @@ int rockbox_browse(const char *root, int dirfilter)
                 setting = global_settings.fmr_file;
                 break;
 #endif
-            default:
-                dir = ext = setting = NULL;
-                break;
             }
 
-        if (setting)
-            snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
-        else /* reset current, the next call might use the old value */
-            current[0] = '\0';
-
         /* If we've found a file to center on, do it */
-        if (current[0] == '/')
+        if (setting)
         {
+            snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
             set_current_file(current);
             /* set_current_file changes dirlevel, change it back */
             tc.dirlevel = 0; 
