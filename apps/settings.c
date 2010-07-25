@@ -1188,33 +1188,36 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     return true;
 }
 
-
-void set_file(const char* filename, char* setting, int maxlen)
+/*
+ * Takes filename, removes the directory (assumed to be ROCKBOX_DIR) its in
+ * and the extension, and then copies the basename into setting
+ **/
+void set_file(const char* filename, char* setting, const int maxlen)
 {
     const char* fptr = strrchr(filename,'/');
+    const char* extptr;
     int len;
     int extlen = 0;
-    const char* ptr;
 
     if (!fptr)
         return;
 
     fptr++;
 
-    len = strlen(fptr);
-    ptr = fptr + len;
-    while ((*ptr != '.') && (ptr != fptr)) {
-        extlen++;
-        ptr--;
-    }
-    if(ptr == fptr) extlen = 0;
+    extptr = strrchr(fptr, '.');
 
-    if (strncasecmp(ROCKBOX_DIR, filename, strlen(ROCKBOX_DIR)) ||
-        (len-extlen > maxlen))
+    if (!extptr || extptr < fptr)
+        extlen = 0;
+    else
+        extlen = strlen(extptr);
+
+    len = strlen(fptr) - extlen;
+
+    /* error if filename isn't in ROCKBOX_DIR */
+    if (strncasecmp(ROCKBOX_DIR, filename, ROCKBOX_DIR_LEN) || (len > maxlen))
         return;
 
-    strlcpy(setting, fptr, len-extlen+1);
-
+    strlcpy(setting, fptr, len+1);
     settings_save();
 }
 

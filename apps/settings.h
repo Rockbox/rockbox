@@ -55,7 +55,7 @@ struct opt_items {
 #ifndef ROCKBOX_DIR
 #error ROCKBOX_DIR not defined (should be in autoconf.h)
 #endif
-#define ROCKBOX_DIR_LEN sizeof(ROCKBOX_DIR)
+#define ROCKBOX_DIR_LEN (sizeof(ROCKBOX_DIR)-1)
 #endif /* def __PCTOOL__ */
 
 
@@ -288,7 +288,7 @@ bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              const char* (*formatter)(char*, size_t, int, const char*),
              int32_t (*get_talk_id)(int, int));
 
-void set_file(const char* filename, char* setting, int maxlen);
+void set_file(const char* filename, char* setting, const int maxlen);
 
 bool set_option(const char* string, const void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
