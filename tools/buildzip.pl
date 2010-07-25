@@ -309,7 +309,7 @@ sub filesize {
 sub buildzip {
     my ($image, $fonts)=@_;    
     my $libdir = $install;
-    my $rbdir = ".rockbox";
+    my $temp_dir = ".rockbox";
 
     print "buildzip: image=$image fonts=$fonts\n" if $verbose;
     
@@ -320,17 +320,17 @@ sub buildzip {
     # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
 
     # remove old traces
-    rmtree($rbdir);
+    rmtree($temp_dir);
 
-    glob_mkdir($rbdir);
+    glob_mkdir($temp_dir);
 
     if(!$bitmap) {
         # always disable fonts on non-bitmap targets
         $fonts = 0;
     }
     if($fonts) {
-        glob_mkdir("$rbdir/fonts");
-        chdir "$rbdir/fonts";
+        glob_mkdir("$temp_dir/fonts");
+        chdir "$temp_dir/fonts";
         my $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
         print($cmd."\n") if $verbose;
         system($cmd);
@@ -343,30 +343,30 @@ sub buildzip {
     }
 
     # create the file so the database does not try indexing a folder
-    open(IGNORE, ">$rbdir/database.ignore")  || die "can't open database.ignore";
+    open(IGNORE, ">$temp_dir/database.ignore")  || die "can't open database.ignore";
     close(IGNORE);
     
-    glob_mkdir("$rbdir/langs");
-    glob_mkdir("$rbdir/rocks");
-    glob_mkdir("$rbdir/rocks/games");
-    glob_mkdir("$rbdir/rocks/apps");
-    glob_mkdir("$rbdir/rocks/demos");
-    glob_mkdir("$rbdir/rocks/viewers");
+    glob_mkdir("$temp_dir/langs");
+    glob_mkdir("$temp_dir/rocks");
+    glob_mkdir("$temp_dir/rocks/games");
+    glob_mkdir("$temp_dir/rocks/apps");
+    glob_mkdir("$temp_dir/rocks/demos");
+    glob_mkdir("$temp_dir/rocks/viewers");
 
     if ($recording) {
-        glob_mkdir("$rbdir/recpresets");
+        glob_mkdir("$temp_dir/recpresets");
     }
 
     if($swcodec) {
-        glob_mkdir("$rbdir/eqs");
+        glob_mkdir("$temp_dir/eqs");
 
-        glob_copy("$ROOT/apps/eqs/*.cfg", "$rbdir/eqs/"); # equalizer presets
+        glob_copy("$ROOT/apps/eqs/*.cfg", "$temp_dir/eqs/"); # equalizer presets
     }
 
-    glob_mkdir("$rbdir/wps");
-    glob_mkdir("$rbdir/themes");
+    glob_mkdir("$temp_dir/wps");
+    glob_mkdir("$temp_dir/themes");
     if ($bitmap) {
-        open(THEME, ">$rbdir/themes/rockbox_default_icons.cfg");
+        open(THEME, ">$temp_dir/themes/rockbox_default_icons.cfg");
         print THEME <<STOP
 # this config file was auto-generated to make it
 # easy to reset the icons back to default
@@ -382,7 +382,7 @@ STOP
         close(THEME);
     }
     
-    glob_mkdir("$rbdir/codepages");
+    glob_mkdir("$temp_dir/codepages");
 
     if($bitmap) {
         system("$ROOT/tools/codepages");
@@ -391,28 +391,28 @@ STOP
         system("$ROOT/tools/codepages -m");
     }
 
-    glob_move('*.cp', "$rbdir/codepages/");
+    glob_move('*.cp', "$temp_dir/codepages/");
 
     if($bitmap && $depth > 1) {
-        glob_mkdir("$rbdir/backdrops");
+        glob_mkdir("$temp_dir/backdrops");
     }
 
-    glob_mkdir("$rbdir/codecs");
+    glob_mkdir("$temp_dir/codecs");
 
-    find(find_copyfile(qr/.*\.codec/, abs_path("$rbdir/codecs/")), 'apps/codecs');
+    find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'apps/codecs');
 
     # remove directory again if no codec was copied
-    rmdir("$rbdir/codecs");
+    rmdir("$temp_dir/codecs");
 
-    find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$rbdir/rocks/")), 'apps/plugins');
+    find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$temp_dir/rocks/")), 'apps/plugins');
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
     my @viewers = <VIEWERS>;
     close VIEWERS;
 
-    open VIEWERS, ">$rbdir/viewers.config" or
-        die "can't create $rbdir/viewers.config";
+    open VIEWERS, ">$temp_dir/viewers.config" or
+        die "can't create $temp_dir/viewers.config";
 
     foreach my $line (@viewers) {
         if ($line =~ /([^,]*),([^,]*),/) {
@@ -434,24 +434,24 @@ STOP
 
             # print STDERR "$ext $plugin $dir $name $r\n";
 
-            if(-e "$rbdir/rocks/$name") {
+            if(-e "$temp_dir/rocks/$name") {
                 if($dir ne "rocks") {
                     # target is not 'rocks' but the plugins are always in that
                     # dir at first!
-                    move("$rbdir/rocks/$name", "$rbdir/rocks/$r");
+                    move("$temp_dir/rocks/$name", "$temp_dir/rocks/$r");
                 }
                 print VIEWERS $line;
             }
-            elsif(-e "$rbdir/rocks/$r") {
+            elsif(-e "$temp_dir/rocks/$r") {
                 # in case the same plugin works for multiple extensions, it
                 # was already moved to the viewers dir
                 print VIEWERS $line;
             }
 
-            if(-e "$rbdir/rocks/$oname") {
+            if(-e "$temp_dir/rocks/$oname") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well
-                move("$rbdir/rocks/$oname", "$rbdir/rocks/$dir");
+                move("$temp_dir/rocks/$oname", "$temp_dir/rocks/$dir");
             }
         }
     }
@@ -464,41 +464,41 @@ STOP
     foreach my $line (@rock_targetdirs) {
         if ($line =~ /([^,]*),(.*)/) {
             my ($plugin, $dir)=($1, $2);
-            move("$rbdir/rocks/${plugin}.rock", "$rbdir/rocks/$dir/${plugin}.rock");
-            if(-e "$rbdir/rocks/${plugin}.ovl") {
+            move("$temp_dir/rocks/${plugin}.rock", "$temp_dir/rocks/$dir/${plugin}.rock");
+            if(-e "$temp_dir/rocks/${plugin}.ovl") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well
-                move("$rbdir/rocks/${plugin}.ovl", "$rbdir/rocks/$dir");
+                move("$temp_dir/rocks/${plugin}.ovl", "$temp_dir/rocks/$dir");
             }
-            if(-e "$rbdir/rocks/${plugin}.lua") {
+            if(-e "$temp_dir/rocks/${plugin}.lua") {
                 # if this is a lua script, move it to the appropriate dir
-                move("$rbdir/rocks/${plugin}.lua", "$rbdir/rocks/$dir/");
+                move("$temp_dir/rocks/${plugin}.lua", "$temp_dir/rocks/$dir/");
             }
         }
     }
 
-    glob_unlink("$rbdir/rocks/*.lua"); # Clean up unwanted *.lua files (e.g. actions.lua, buttons.lua)
+    glob_unlink("$temp_dir/rocks/*.lua"); # Clean up unwanted *.lua files (e.g. actions.lua, buttons.lua)
 
     if ($bitmap) {
-        glob_mkdir("$rbdir/icons");
-        copy("$viewer_bmpdir/viewers.${icon_w}x${icon_h}x$depth.bmp", "$rbdir/icons/viewers.bmp");
+        glob_mkdir("$temp_dir/icons");
+        copy("$viewer_bmpdir/viewers.${icon_w}x${icon_h}x$depth.bmp", "$temp_dir/icons/viewers.bmp");
         if ($remote_depth) {
-            copy("$viewer_bmpdir/remote_viewers.${remote_icon_w}x${remote_icon_h}x$remote_depth.bmp", "$rbdir/icons/remote_viewers.bmp");
+            copy("$viewer_bmpdir/remote_viewers.${remote_icon_w}x${remote_icon_h}x$remote_depth.bmp", "$temp_dir/icons/remote_viewers.bmp");
         }
     }
 
-    copy("$ROOT/apps/tagnavi.config", "$rbdir/");
-    copy("$ROOT/apps/plugins/disktidy.config", "$rbdir/rocks/apps/");
+    copy("$ROOT/apps/tagnavi.config", "$temp_dir/");
+    copy("$ROOT/apps/plugins/disktidy.config", "$temp_dir/rocks/apps/");
 
     if($bitmap) {
-        copy("$ROOT/apps/plugins/sokoban.levels", "$rbdir/rocks/games/sokoban.levels"); # sokoban levels
-        copy("$ROOT/apps/plugins/snake2.levels", "$rbdir/rocks/games/snake2.levels"); # snake2 levels
-        copy("$ROOT/apps/plugins/rockbox-fonts.config", "$rbdir/rocks/viewers/");
+        copy("$ROOT/apps/plugins/sokoban.levels", "$temp_dir/rocks/games/sokoban.levels"); # sokoban levels
+        copy("$ROOT/apps/plugins/snake2.levels", "$temp_dir/rocks/games/snake2.levels"); # snake2 levels
+        copy("$ROOT/apps/plugins/rockbox-fonts.config", "$temp_dir/rocks/viewers/");
     }
 
-    if(-e "$rbdir/rocks/demos/pictureflow.rock") {
+    if(-e "$temp_dir/rocks/demos/pictureflow.rock") {
         copy("$ROOT/apps/plugins/bitmaps/native/pictureflow_emptyslide.100x100x16.bmp",
-             "$rbdir/rocks/demos/pictureflow_emptyslide.bmp");
+             "$temp_dir/rocks/demos/pictureflow_emptyslide.bmp");
         my ($pf_logo);
         if ($width < 200) {
             $pf_logo = "pictureflow_logo.100x18x16.bmp";
@@ -506,17 +506,17 @@ STOP
             $pf_logo = "pictureflow_logo.193x34x16.bmp";
         }
         copy("$ROOT/apps/plugins/bitmaps/native/$pf_logo",
-             "$rbdir/rocks/demos/pictureflow_splash.bmp");
+             "$temp_dir/rocks/demos/pictureflow_splash.bmp");
 
     }
 
     if($image) {
         # image is blank when this is a simulator
         if( filesize("rockbox.ucl") > 1000 ) {
-            copy("rockbox.ucl", "$rbdir/rockbox.ucl");  # UCL for flashing
+            copy("rockbox.ucl", "$temp_dir/rockbox.ucl");  # UCL for flashing
         }
         if( filesize("rombox.ucl") > 1000) {
-            copy("rombox.ucl", "$rbdir/rombox.ucl");  # UCL for flashing
+            copy("rombox.ucl", "$temp_dir/rombox.ucl");  # UCL for flashing
         }
         
         # Check for rombox.target
@@ -525,25 +525,25 @@ STOP
             my $romfile = "rombox.$2";
             if (filesize($romfile) > 1000)
             {
-                copy($romfile, "$rbdir/$romfile");
+                copy($romfile, "$temp_dir/$romfile");
             }
         }
     }
 
-    glob_mkdir("$rbdir/docs");
+    glob_mkdir("$temp_dir/docs");
     for(("COPYING",
          "LICENSES",
          "KNOWN_ISSUES"
         )) {
-        copy("$ROOT/docs/$_", "$rbdir/docs/$_.txt");
+        copy("$ROOT/docs/$_", "$temp_dir/docs/$_.txt");
     }
     if ($fonts) {
-        copy("$ROOT/docs/profontdoc.txt", "$rbdir/docs/profontdoc.txt");
+        copy("$ROOT/docs/profontdoc.txt", "$temp_dir/docs/profontdoc.txt");
     }
     for(("sample.colours",
          "sample.icons"
         )) {
-        copy("$ROOT/docs/$_", "$rbdir/docs/$_");
+        copy("$ROOT/docs/$_", "$temp_dir/docs/$_");
     }
 
     # Now do the WPS dance
@@ -560,36 +560,36 @@ STOP
     }
     
     # until buildwps.pl is fixed, manually copy the classic_statusbar theme across
-    mkdir "$rbdir/wps/classic_statusbar", 0777;
-    glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$rbdir/wps/classic_statusbar");
+    mkdir "$temp_dir/wps/classic_statusbar", 0777;
+    glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$temp_dir/wps/classic_statusbar");
     if ($swcodec) {
 		if ($depth == 16) {
-			copy("$ROOT/wps/classic_statusbar.sbs", "$rbdir/wps");
+			copy("$ROOT/wps/classic_statusbar.sbs", "$temp_dir/wps");
 		} elsif ($depth > 1) {
-			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$rbdir/wps/classic_statusbar.sbs");
+			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$temp_dir/wps/classic_statusbar.sbs");
 		} else {
-			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps/classic_statusbar.sbs");
+			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.sbs");
 		}
     } else {
-        copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$rbdir/wps/classic_statusbar.sbs");
+        copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$temp_dir/wps/classic_statusbar.sbs");
     }
-    system("touch $rbdir/wps/rockbox_none.sbs");
+    system("touch $temp_dir/wps/rockbox_none.sbs");
     if ($remote_depth != $depth) {
-		copy("$ROOT/wps/classic_statusbar.mono.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+		copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
 	} else {
-		copy("$rbdir/wps/classic_statusbar.sbs", "$rbdir/wps/classic_statusbar.rsbs");
+		copy("$temp_dir/wps/classic_statusbar.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
 	}
-    copy("$rbdir/wps/rockbox_none.sbs", "$rbdir/wps/rockbox_none.rsbs");
+    copy("$temp_dir/wps/rockbox_none.sbs", "$temp_dir/wps/rockbox_none.rsbs");
 
     # and the info file
-    copy("rockbox-info.txt", "$rbdir/rockbox-info.txt");
+    copy("rockbox-info.txt", "$temp_dir/rockbox-info.txt");
 
     # copy the already built lng files
-    glob_copy('apps/lang/*lng', "$rbdir/langs/");
+    glob_copy('apps/lang/*lng', "$temp_dir/langs/");
 
     # copy the .lua files
-    glob_mkdir("$rbdir/rocks/viewers/lua/");
-    glob_copy('apps/plugins/lua/*.lua', "$rbdir/rocks/viewers/lua/");
+    glob_mkdir("$temp_dir/rocks/viewers/lua/");
+    glob_copy('apps/plugins/lua/*.lua', "$temp_dir/rocks/viewers/lua/");
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
