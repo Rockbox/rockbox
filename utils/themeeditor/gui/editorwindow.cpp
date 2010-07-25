@@ -36,6 +36,8 @@
 #include <QDir>
 #include <QFile>
 
+const int EditorWindow::numRecent = 5;
+
 EditorWindow::EditorWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::EditorWindow), parseTreeSelection(0)
 {
@@ -56,6 +58,8 @@ EditorWindow::~EditorWindow()
         delete project;
     delete deviceConfig;
     delete deviceDock;
+    delete timer;
+    delete timerDock;
 
     RBFontCache::clearCache();
     RBTextCache::clearCache();
@@ -63,6 +67,8 @@ EditorWindow::~EditorWindow()
 
 void EditorWindow::loadTabFromSkinFile(QString fileName)
 {
+    docToTop(fileName);
+
     /* Checking to see if the file is already open */
     for(int i = 0; i < ui->editorTabs->count(); i++)
     {
@@ -114,6 +120,12 @@ void EditorWindow::loadSettings()
     QSize size = settings.value("size").toSize();
     QPoint pos = settings.value("position").toPoint();
     QByteArray state = settings.value("state").toByteArray();
+
+    /* Recent docs/projects */
+    recentDocs = settings.value("recentDocs", QStringList()).toStringList();
+    recentProjects = settings.value("recentProjects",
+                                    QStringList()).toStringList();
+
     settings.endGroup();
 
     if(!(size.isNull() || pos.isNull() || state.isNull()))
@@ -135,6 +147,11 @@ void EditorWindow::saveSettings()
     settings.setValue("position", pos());
     settings.setValue("size", size());
     settings.setValue("state", saveState());
+
+    /* Saving recent docs/projects */
+    settings.setValue("recentDocs", recentDocs);
+    settings.setValue("recentProjects", recentProjects);
+
     settings.endGroup();
 }
 
@@ -245,6 +262,30 @@ void EditorWindow::setupMenus()
                      this, SLOT(paste()));
     QObject::connect(ui->actionFind_Replace, SIGNAL(triggered()),
                      this, SLOT(findReplace()));
+
+    /* Adding the recent docs/projects menus */
+    for(int i = 0; i < numRecent; i++)
+    {
+        recentDocsMenu.append(new QAction(tr("Recent Doc"),
+                                          ui->menuRecent_Files));
+        recentDocsMenu.last()
+                ->setShortcut(QKeySequence(tr("CTRL+")
+                                           + QString::number(i + 1)));
+        QObject::connect(recentDocsMenu.last(), SIGNAL(triggered()),
+                         this, SLOT(openRecentFile()));
+        ui->menuRecent_Files->addAction(recentDocsMenu.last());
+
+
+        recentProjectsMenu.append(new QAction(tr("Recent Project"),
+                                              ui->menuRecent_Projects));
+        recentProjectsMenu.last()
+                ->setShortcut(QKeySequence(tr("CTRL+SHIFT+") +
+                                           QString::number(i + 1)));
+        QObject::connect(recentProjectsMenu.last(), SIGNAL(triggered()),
+                         this, SLOT(openRecentProject()));
+        ui->menuRecent_Projects->addAction(recentProjectsMenu.last());
+    }
+    refreshRecentMenus();
 }
 
 void EditorWindow::addTab(TabContent *doc)
@@ -546,6 +587,16 @@ void EditorWindow::openProject()
 
 }
 
+void EditorWindow::openRecentFile()
+{
+    loadTabFromSkinFile(dynamic_cast<QAction*>(QObject::sender())->text());
+}
+
+void EditorWindow::openRecentProject()
+{
+    loadProjectFile(dynamic_cast<QAction*>(QObject::sender())->text());
+}
+
 void EditorWindow::configFileChanged(QString configFile)
 {
 
@@ -743,6 +794,8 @@ void EditorWindow::loadProjectFile(QString fileName)
 
     if(QFile::exists(fileName))
     {
+        projectToTop(fileName);
+
         if(project)
             project->deleteLater();
 
@@ -815,4 +868,72 @@ void EditorWindow::createFile(QString filename, QString contents)
     fout.write(contents.toAscii());
 
     fout.close();
+}
+
+void EditorWindow::docToTop(QString file)
+{
+    if(!QFile::exists(file))
+        return;
+
+    int index = recentDocs.indexOf(file);
+    if(index == -1)
+    {
+        /* Bumping off the last file */
+        if(recentDocs.count() >= numRecent)
+            recentDocs.removeLast();
+        recentDocs.prepend(file);
+    }
+    else
+    {
+        /* Shuffling file to the top of the list */
+        recentDocs.removeAt(index);
+        recentDocs.prepend(file);
+    }
+
+    refreshRecentMenus();
+}
+
+void EditorWindow::projectToTop(QString file)
+{
+    if(!QFile::exists(file))
+        return;
+
+    int index = recentProjects.indexOf(file);
+    if(index == -1)
+    {
+        /* Bumping off the last project */
+        if(recentProjects.count() >= numRecent)
+            recentProjects.removeLast();
+        recentProjects.prepend(file);
+    }
+    else
+    {
+        /* Shuffling file to the top of the list */
+        recentProjects.removeAt(index);
+        recentProjects.prepend(file);
+    }
+
+    refreshRecentMenus();
+}
+
+void EditorWindow::refreshRecentMenus()
+{
+    /* First hiding all the menu items */
+    for(int i = 0; i < recentDocsMenu.count(); i++)
+        recentDocsMenu[i]->setVisible(false);
+    for(int i = 0; i < recentProjectsMenu.count(); i++)
+        recentProjectsMenu[i]->setVisible(false);
+
+    /* Then setting the text of and showing any available */
+    for(int i = 0; i < recentDocs.count(); i++)
+    {
+        recentDocsMenu[i]->setText(recentDocs[i]);
+        recentDocsMenu[i]->setVisible(true);
+    }
+
+    for(int i = 0; i < recentProjects.count(); i++)
+    {
+        recentProjectsMenu[i]->setText(recentProjects[i]);
+        recentProjectsMenu[i]->setVisible(true);
+    }
 }

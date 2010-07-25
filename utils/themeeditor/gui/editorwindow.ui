@@ -40,17 +40,29 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuRecent_Files">
+     <property name="title">
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuRecent_Projects">
+     <property name="title">
+      <string>Recent Projects</string>
+     </property>
+    </widget>
     <addaction name="actionNew_Document"/>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Document"/>
     <addaction name="actionOpen_Project"/>
+    <addaction name="menuRecent_Files"/>
+    <addaction name="menuRecent_Projects"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Document"/>
     <addaction name="actionClose_Project"/>
@@ -405,6 +417,28 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+X</string>
+   </property>
+  </action>
+  <action name="actionFiles">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Files</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionProjects">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Projects</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

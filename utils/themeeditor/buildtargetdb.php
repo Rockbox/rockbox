@@ -21,6 +21,18 @@
  *
  ****************************************************************************/
  
+// Printing the do-not-modify warning
+echo "# ----------------------------------------------------------- #\n";
+echo "# ----------------------------------------------------------- #\n";
+echo "# --- This file automatically generated, do not modify!   --- #\n";
+echo "# --- To add a target to the targetdb, add it to the      --- #\n";
+echo "# --- \$targets array in buildtargetdb.php and run that    --- #\n";
+echo "# --- script, ensuring that your current directory is     --- #\n";
+echo "# --- utils/themeeditor, and pipe the output into         --- #\n";
+echo "# --- utils/themeeditor/resources/targetdb                --- #\n";
+echo "# ----------------------------------------------------------- #\n";
+echo "# ----------------------------------------------------------- #\n\n";
+ 
 // This is the array of targets, with the target id as the key and the 
 // plaintext name of the target as the value
 $targets = array( 'archosfmrecorder' => 'Archos FM Recorder',
