@@ -923,6 +923,7 @@ int rockbox_browse(const char *root, int dirfilter)
         static struct tree_context backup;
         char current[MAX_PATH];
         int last_context;
+        const char *dir, *ext, *setting;
         
         backup = tc;
         tc.selected_item = 0;
@@ -930,61 +931,62 @@ int rockbox_browse(const char *root, int dirfilter)
         memcpy(tc.currdir, root, sizeof(tc.currdir));
         start_wps = false;
         last_context = curr_context;
-        
-        /* Center on the currently loaded language when browsing languages. */
-        if (dirfilter == SHOW_LNG)
+
+        /* if we are in a special settings folder, center the current setting */
+        switch(dirfilter)
         {
-            if (global_settings.lang_file[0])
-            {
-                snprintf(current, sizeof(current), LANG_DIR "/%s.lng",
-                        global_settings.lang_file);
-            }
-            else
-            {
-                strlcpy(current, LANG_DIR "/english.lng", sizeof(current));
-            }
-        }
-        /* Center on currently loaded WPS */
-        else if (dirfilter == SHOW_WPS)
-        {
-            snprintf(current, sizeof(current), WPS_DIR "/%s.wps",
-                    global_settings.wps_file);
-        }
+            case SHOW_LNG:
+                dir = LANG_DIR;
+                ext = "lng";
+                if (global_settings.lang_file[0])
+                    setting = global_settings.lang_file;
+                else
+                    setting = "english";
+                break;
+            case SHOW_WPS:
+                dir = WPS_DIR;
+                ext = "wps";
+                setting = global_settings.wps_file;
+                break;
 #ifdef HAVE_REMOTE_LCD
-        /* Center on currently loaded RWPS */
-        else if (dirfilter == SHOW_RWPS)
-        {
-            snprintf(current, sizeof(current), WPS_DIR "/%s.rwps",
-                    global_settings.rwps_file);
-        }
-        else if (dirfilter == SHOW_RSBS)
-        {
-            snprintf(current, sizeof(current), SBS_DIR "/%s.rsbs",
-                    global_settings.rsbs_file);
-        }
+            case SHOW_RWPS:
+                dir = WPS_DIR;
+                ext = "rwps";
+                setting = global_settings.rwps_file;
+                break;
+            case SHOW_RSBS:
+                dir = WPS_DIR;
+                ext = "rsbs";
+                setting = global_settings.rsbs_file;
+                break;
 #endif
 #ifdef HAVE_LCD_BITMAP
-        /* Center on the currently loaded font when browsing fonts */
-        else if (dirfilter == SHOW_FONT)
-        {
-            snprintf(current, sizeof(current), FONT_DIR "/%s.fnt",
-                    global_settings.font_file);
-        }
-        else if (dirfilter == SHOW_SBS)
-        {
-            snprintf(current, sizeof(current), SBS_DIR "/%s.sbs",
-                    global_settings.sbs_file);
-        }
+            case SHOW_FONT:
+                dir = FONT_DIR;
+                ext = "fnt";
+                setting = global_settings.font_file;
+                break;
+            case SHOW_SBS:
+                dir = WPS_DIR;
+                ext = "sbs";
+                setting = global_settings.sbs_file;
+                break;
 #endif
 #if CONFIG_TUNER
-        /* Center on the currently loaded FM preset when browsing those */
-        else if (dirfilter == SHOW_FMR)
-        {
-            snprintf(current, sizeof(current), FMPRESET_PATH "/%s.fmr",
-                    global_settings.fmr_file);
-        }
+            case SHOW_FMR:
+                dir = FMPRESET_PATH;
+                ext = "fmr";
+                setting = global_settings.fmr_file;
+                break;
 #endif
-        else /* reset current[] */
+            default:
+                dir = ext = setting = NULL;
+                break;
+            }
+
+        if (setting)
+            snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
+        else /* reset current, the next call might use the old value */
             current[0] = '\0';
 
         /* If we've found a file to center on, do it */
