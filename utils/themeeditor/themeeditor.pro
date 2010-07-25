@@ -23,6 +23,8 @@ INCLUDEPATH += models
 INCLUDEPATH += graphics
 INCLUDEPATH += quazip
 INCLUDEPATH += qtfindreplacedialog
+
+DEFINES += FINDREPLACE_NOLIB
 cross { 
     message("Crossbuilding for W32 binary")
     
