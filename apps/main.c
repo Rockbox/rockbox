@@ -112,9 +112,10 @@
 #include "m5636.h"
 #endif
 
-#ifdef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include "sim_tasks.h"
 #endif
+
 #ifdef HAVE_SDL
 #include "system-sdl.h"
 #endif

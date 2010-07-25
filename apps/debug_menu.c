@@ -460,7 +460,7 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 }
 #endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef CPU_PP
 static int perfcheck(void)
 {
@@ -663,7 +663,7 @@ static bool dbg_hw_info(void)
 
     while (!(action_userabort(TIMEOUT_BLOCK)));
     
-#elif (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#else
     /* Define this function in your target tree */
     return __dbg_hw_info();
 #endif /* CONFIG_CPU */
@@ -756,7 +756,7 @@ static bool dbg_hw_info(void)
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
+#endif /* PLATFORM_NATIVE */
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static const char* dbg_partitions_getname(int selected_item, void *data,
