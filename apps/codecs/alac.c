@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
+static int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)

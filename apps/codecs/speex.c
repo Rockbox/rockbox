@@ -35,7 +35,7 @@
 
 CODEC_HEADER
 
-spx_int16_t output[MAX_FRAME_SIZE] IBSS_ATTR;
+static spx_int16_t output[MAX_FRAME_SIZE] IBSS_ATTR;
 
 static int get_more_data(spx_ogg_sync_state *oy)
 {

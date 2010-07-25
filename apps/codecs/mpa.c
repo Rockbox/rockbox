@@ -29,32 +29,32 @@ CODEC_HEADER
 #define MPA_SYNTH_ON_COP
 #endif
 
-struct mad_stream stream IBSS_ATTR;
-struct mad_frame frame IBSS_ATTR;
-struct mad_synth synth IBSS_ATTR;
+static struct mad_stream stream IBSS_ATTR;
+static struct mad_frame frame IBSS_ATTR;
+static struct mad_synth synth IBSS_ATTR;
 
 #ifdef MPA_SYNTH_ON_COP
-volatile short die IBSS_ATTR = 0;          /*thread should die*/
+static volatile short die IBSS_ATTR = 0;          /*thread should die*/
 
 #if (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP5022)
-mad_fixed_t sbsample_prev[2][36][32] IBSS_ATTR;
+static mad_fixed_t sbsample_prev[2][36][32] IBSS_ATTR;
 #else
-mad_fixed_t sbsample_prev[2][36][32] SHAREDBSS_ATTR; 
+static mad_fixed_t sbsample_prev[2][36][32] SHAREDBSS_ATTR; 
 #endif
 
-struct semaphore synth_done_sem IBSS_ATTR;
-struct semaphore synth_pending_sem IBSS_ATTR;
+static struct semaphore synth_done_sem IBSS_ATTR;
+static struct semaphore synth_pending_sem IBSS_ATTR;
 #endif
 
 #define INPUT_CHUNK_SIZE   8192
 
-mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
-mad_fixed_t sbsample[2][36][32] IBSS_ATTR;
+static mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
+static mad_fixed_t sbsample[2][36][32] IBSS_ATTR;
 
-unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
+static unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
 /* TODO: what latency does layer 1 have? */
-int mpeg_latency[3] = { 0, 481, 529 };
-int mpeg_framesize[3] = {384, 1152, 1152};
+static int mpeg_latency[3] = { 0, 481, 529 };
+static int mpeg_framesize[3] = {384, 1152, 1152};
 
 static void init_mad(void)
 {

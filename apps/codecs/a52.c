@@ -31,8 +31,8 @@ CODEC_HEADER
 #define A52_SAMPLESPERFRAME (6*256)
 
 static a52_state_t *state;
-unsigned long samplesdone;
-unsigned long frequency;
+static unsigned long samplesdone;
+static unsigned long frequency;
 
 /* used outside liba52 */
 static uint8_t buf[3840] IBSS_ATTR;

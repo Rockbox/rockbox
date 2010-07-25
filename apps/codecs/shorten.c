@@ -28,13 +28,13 @@ CODEC_HEADER
 #define IBSS_ATTR_SHORTEN_DECODED0 IBSS_ATTR
 #endif
 
-int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR_SHORTEN_DECODED0;
-int32_t decoded1[MAX_DECODE_SIZE] IBSS_ATTR;
+static int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR_SHORTEN_DECODED0;
+static int32_t decoded1[MAX_DECODE_SIZE] IBSS_ATTR;
 
-int32_t offset0[MAX_OFFSET_SIZE] IBSS_ATTR;
-int32_t offset1[MAX_OFFSET_SIZE] IBSS_ATTR;
+static int32_t offset0[MAX_OFFSET_SIZE] IBSS_ATTR;
+static int32_t offset1[MAX_OFFSET_SIZE] IBSS_ATTR;
 
-int8_t ibuf[MAX_BUFFER_SIZE] IBSS_ATTR;
+static int8_t ibuf[MAX_BUFFER_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)

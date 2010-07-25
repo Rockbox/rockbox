@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
+static MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
 
 /* Our implementations of the mpc_reader callback functions. */
 static mpc_int32_t read_impl(mpc_reader *reader, void *ptr, mpc_int32_t size)

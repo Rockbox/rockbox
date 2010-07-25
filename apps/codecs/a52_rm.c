@@ -32,10 +32,10 @@ CODEC_HEADER
 #define A52_SAMPLESPERFRAME (6*256)
 
 static a52_state_t *state;
-unsigned long samplesdone;
-unsigned long frequency;
-RMContext rmctx;
-RMPacket pkt;
+static unsigned long samplesdone;
+static unsigned long frequency;
+static RMContext rmctx;
+static RMPacket pkt;
 
 static void init_rm(RMContext *rmctx)
 {

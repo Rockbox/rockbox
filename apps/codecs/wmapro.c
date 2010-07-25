@@ -28,7 +28,7 @@ CODEC_HEADER
 #define MAXSAMPLES  (1L << 12)  /* Max number of samples in a wma pro subframe */
 #define MAXCHANNELS 8
 #define BUFSIZE     MAXCHANNELS * MAXSAMPLES
-int32_t decoded[BUFSIZE];
+static int32_t decoded[BUFSIZE];
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)

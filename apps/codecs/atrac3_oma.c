@@ -31,7 +31,7 @@ CODEC_HEADER
 #define FRAMESIZE ci->id3->bytesperframe
 #define BITRATE   ci->id3->bitrate
 
-ATRAC3Context q IBSS_ATTR;
+static ATRAC3Context q IBSS_ATTR;
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)

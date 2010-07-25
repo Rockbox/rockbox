@@ -40,7 +40,7 @@ CODEC_HEADER
  * Others can be set, but the default is nearly always used,
  * and there is no way to determine if another was used, anyway.
  */
-const long cutoff = 500;
+static const long cutoff = 500;
 
 static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 

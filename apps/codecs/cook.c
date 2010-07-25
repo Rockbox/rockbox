@@ -28,10 +28,10 @@
 
 CODEC_HEADER
 
-RMContext rmctx;
-RMPacket pkt;
-COOKContext q IBSS_ATTR;
-int32_t rm_outbuf[2048];
+static RMContext rmctx;
+static RMPacket pkt;
+static COOKContext q IBSS_ATTR;
+static int32_t rm_outbuf[2048];
 
 static void init_rm(RMContext *rmctx)
 {

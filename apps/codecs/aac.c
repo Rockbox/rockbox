@@ -30,8 +30,8 @@ CODEC_HEADER
 /* Global buffers to be used in the mdct synthesis. This way the arrays can
  * be moved to IRAM for some targets */
 #define GB_BUF_SIZE 1024
-ALIGN real_t gb_time_buffer[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
-ALIGN real_t gb_fb_intermed[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
+static ALIGN real_t gb_time_buffer[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
+static ALIGN real_t gb_fb_intermed[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)
