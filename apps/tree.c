@@ -921,7 +921,6 @@ int rockbox_browse(const char *root, int dirfilter)
     if (dirfilter >= NUM_FILTER_MODES)
     {
         static struct tree_context backup;
-        char current[MAX_PATH];
         int last_context;
         const char *dir, *ext, *setting = NULL;
         
@@ -987,6 +986,7 @@ int rockbox_browse(const char *root, int dirfilter)
         /* If we've found a file to center on, do it */
         if (setting)
         {
+            char current[MAX_PATH];
             /* if setting != NULL, ext and dir are not used uninitialized */
             snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
             set_current_file(current);
