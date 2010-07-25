@@ -54,13 +54,13 @@ void *alloc(int size)
 
     if (size + 4 > (int)totalSize)
     {
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
-        printf("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
+        midi_debug("MALLOC BARF");
         /* We've made our point. */
 
         return NULL;
@@ -132,8 +132,8 @@ int eof(int fd)
     return size+1 == rb->lseek(fd, 0, SEEK_CUR);
 }
 
-// Here is a hacked up printf command to get the output from the game.
-int printf(const char *fmt, ...)
+/* Here is a hacked up printf command to get the output from the game. */
+int midi_debug(const char *fmt, ...)
 {
     static int p_xtpt = 0;
     char p_buf[50];

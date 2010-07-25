@@ -142,7 +142,7 @@ struct Track
     void * dataBlock;
 };
 
-int printf(const char *fmt, ...);
+int midi_debug(const char *fmt, ...);
 unsigned char readChar(int file);
 int readTwoBytes(int file);
 int readFourBytes(int file);
