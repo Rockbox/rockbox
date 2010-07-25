@@ -23,10 +23,9 @@ SRCFILE := $(call createsrc, $(TOOLSDIR)/database/SOURCES, \
 
 SRC= $(call preprocess, $(SRCFILE))
 
-FIRMINC = -I$(ROOTDIR)/firmware/include -fno-builtin
-
 INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/firmware/export \
+           -I$(ROOTDIR)/firmware/include \
            -I$(ROOTDIR)/apps \
            -I$(ROOTDIR)/apps/recorder \
            -I$(APPSDIR) \
@@ -38,7 +37,7 @@ SIMINCLUDES += -I$(FIRMDIR)/target/hosted/sdl -I$(FIRMDIR)/target/hosted \
 # Makes mkdepfile happy
 GCCOPTS+=`$(SDLCONFIG) --cflags`
 OLDGCCOPTS:=$(GCCOPTS)
-GCCOPTS+=-D__PCTOOL__  $(FIRMINC) $(SIMINCLUDES)
+GCCOPTS+=-D__PCTOOL__ -fno-builtin $(INCLUDES) $(SIMINCLUDES)
 
 LIBS=`$(SDLCONFIG) --libs` -lc
 ifneq ($(findstring MINGW,$(shell uname)),MINGW)
