@@ -773,8 +773,6 @@ void sound_settings_apply(void)
 
 void settings_apply(bool read_disk)
 {
-    
-    char buf[64];
 #ifdef HAVE_LCD_BITMAP
     int rc;
 #endif
@@ -868,6 +866,7 @@ void settings_apply(bool read_disk)
 
     if (read_disk)
     {
+        char buf[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
         /* fonts need to be loaded before the WPS */
         if (global_settings.font_file[0]
