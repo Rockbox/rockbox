@@ -82,6 +82,26 @@ static int fdbind_idx = 0;
 
 /* --- Internal cache structure control functions --- */
 
+#ifdef HAVE_EEPROM_SETTINGS
+/**
+ * Open the dircache file to save a snapshot on disk
+ */
+static int open_dircache_file(unsigned flags, int permissions)
+{
+    if (permissions != 0)
+        return open(DIRCACHE_FILE, flags, permissions);
+
+    return open(DIRCACHE_FILE, flags);
+}
+
+/**
+ * Remove the snapshot file
+ */
+static int remove_dircache_file(void)
+{
+    return remove(DIRCACHE_FILE);
+}
+#endif
 /** 
  * Internal function to allocate a new dircache_entry from memory.
  */
@@ -494,7 +514,7 @@ int dircache_load(void)
     logf("Loading directory cache");
     dircache_size = 0;
     
-    fd = open(DIRCACHE_FILE, O_RDONLY);
+    fd = open_dircache_file(O_RDONLY, 0);
     if (fd < 0)
         return -2;
         
@@ -504,7 +524,7 @@ int dircache_load(void)
     {
         logf("Dircache file header error");
         close(fd);
-        remove(DIRCACHE_FILE);
+        remove_dircache_file();
         return -3;
     }
 
@@ -513,7 +533,7 @@ int dircache_load(void)
     {
         logf("Position missmatch");
         close(fd);
-        remove(DIRCACHE_FILE);
+        remove_dircache_file();
         return -4;
     }
     
@@ -522,7 +542,7 @@ int dircache_load(void)
     appflags = maindata.appflags;
     bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
     close(fd);
-    remove(DIRCACHE_FILE);
+    remove_dircache_file();
     
     if (bytes_read != maindata.size)
     {
@@ -551,13 +571,13 @@ int dircache_save(void)
     int fd;
     unsigned long bytes_written;
 
-    remove(DIRCACHE_FILE);
+    remove_dircache_file();
     
     if (!dircache_initialized)
         return -1;
 
     logf("Saving directory cache");
-    fd = open(DIRCACHE_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    fd = open_dircache_file(O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;
@@ -585,7 +605,7 @@ int dircache_save(void)
     
     return 0;
 }
-#endif /* #if 0 */
+#endif /* HAVE_EEPROM_SETTINGS */
 
 /**
  * Internal function which scans the disk and creates the dircache structure.
@@ -709,8 +729,10 @@ int dircache_build(int last_size)
         return -3;
 
     logf("Building directory cache");
-    remove(DIRCACHE_FILE);
-    
+#ifdef HAVE_EEPROM_SETTINGS
+    remove_dircache_file();
+#endif
+
     /* Background build, dircache has been previously allocated */
     if (dircache_size > 0)
     {
