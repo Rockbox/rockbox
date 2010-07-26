@@ -1211,13 +1211,13 @@ void set_file(const char* filename, char* setting, const int maxlen)
     else
         extlen = strlen(extptr);
 
-    len = strlen(fptr) - extlen;
+    len = strlen(fptr) - extlen + 1;
 
     /* error if filename isn't in ROCKBOX_DIR */
     if (strncasecmp(ROCKBOX_DIR, filename, ROCKBOX_DIR_LEN) || (len > maxlen))
         return;
 
-    strlcpy(setting, fptr, len+1);
+    strlcpy(setting, fptr, len);
     settings_save();
 }
 
