@@ -25,10 +25,7 @@
 
 CODEC_HEADER
 
-#define MAXSAMPLES  (1L << 12)  /* Max number of samples in a wma pro subframe */
-#define MAXCHANNELS 8
-#define BUFSIZE     MAXCHANNELS * MAXSAMPLES
-static int32_t decoded[BUFSIZE];
+int32_t *dec[2]; /* pointers to the output buffers in WMAProDecodeCtx in wmaprodec.c */
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)
@@ -73,7 +70,7 @@ next_track:
     
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
-                  STEREO_MONO : STEREO_INTERLEAVED);
+                  STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
     
     if (decode_init(&wfx) < 0) {
@@ -130,8 +127,7 @@ next_track:
              * audio frames, see libwmapro/wmaprodec.c */
             while(size > 0)
             {
-                outlen = BUFSIZE;   /* decode_packet needs to know the size of the output buffer */
-                res = decode_packet(&wfx, decoded, &outlen, data, size);
+                res = decode_packet(&wfx, dec, &outlen, data, size);
                 if(res < 0) {
                     LOGF("(WMA PRO) Error: decode_packet returned %d", res);
                     goto done;
@@ -140,10 +136,8 @@ next_track:
                 size -= res;
                 if(outlen) {
                     ci->yield ();
-                    /* outlen now holds the size of the data in bytes - we want the
-                     * number of samples. */
-                    outlen /= (sizeof(int32_t) * wfx.channels);
-                    ci->pcmbuf_insert(decoded, NULL, outlen);
+                    outlen /= (2*wfx.channels);
+                    ci->pcmbuf_insert(dec[0], dec[1], outlen );
                     elapsedtime += outlen*10/(wfx.rate/100);
                     ci->set_elapsed(elapsedtime);
                     ci->yield ();

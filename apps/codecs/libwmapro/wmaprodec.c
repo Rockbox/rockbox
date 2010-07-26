@@ -236,7 +236,7 @@ typedef struct WMAProDecodeCtx {
     uint32_t         frame_num;                     ///< current frame number
     GetBitContext    gb;                            ///< bitstream reader context
     int              buf_bit_size;                  ///< buffer size in bits
-    int32_t*         samples;
+    int32_t          samples;
     int32_t*         samples_end;                   ///< maximum samplebuffer pointer
     uint8_t          drc_gain;                      ///< gain for the DRC tool
     int8_t           skip_frame;                    ///< skip output step
@@ -1282,7 +1282,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
 
                
             }
- 
+
             /** apply imdct (ff_imdct_half == DCTIV with reverse) */
             imdct_half(av_log2(subframe_len)+1,
                           s->channel[c].coeffs, s->tmp);
@@ -1319,13 +1319,18 @@ static int decode_frame(WMAProDecodeCtx *s)
     int len = 0;
     int i;
 
+
+#if 0
     /** check for potential output buffer overflow */
+    /* Rockbox : No need to check that anymore since we work directly on the
+       buffers in the WMAProDecCtx */
     if (s->num_channels * s->samples_per_frame > s->samples_end - s->samples) {
         /** return an error if no frame could be decoded at all */
            DEBUGF("not enough space for the output samples\n");
         s->packet_loss = 1;
         return 0;
     }
+#endif 
 
     /** get frame length */
     if (s->len_prefix)
@@ -1389,24 +1394,7 @@ static int decode_frame(WMAProDecodeCtx *s)
             return 0;
         }
     }
-
-    /** interleave samples and write them to the output buffer */
-    for (i = 0; i < s->num_channels; i++) {
-        int32_t* ptr  = s->samples + i;
-        int incr = s->num_channels;
-        int32_t* iptr = s->channel[i].out;
-        int32_t* iend = iptr + s->samples_per_frame;
-        
-        while (iptr < iend) {
-            *ptr = *iptr++ << 1;
-            ptr += incr;
-        }
-
-        /** reuse second half of the IMDCT output for the next frame */
-        memcpy(&s->channel[i].out[0],
-               &s->channel[i].out[s->samples_per_frame],
-               s->samples_per_frame * sizeof(*s->channel[i].out) >> 1);
-    }
+    s->samples += s->num_channels * s->samples_per_frame;
 
     if (s->skip_frame) {
         s->skip_frame = 0;
@@ -1502,7 +1490,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
  *@param avpkt input packet
  *@return number of bytes that were read from the input buffer
  */
-int decode_packet(asf_waveformatex_t *wfx, void *data, int *data_size, 
+int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size, 
 				  void* pktdata, int size)
 {
     WMAProDecodeCtx *s = &globWMAProDecCtx;
@@ -1510,10 +1498,18 @@ int decode_packet(asf_waveformatex_t *wfx, void *data, int *data_size,
     const uint8_t* buf = pktdata;
     int buf_size       = size;
     int num_bits_prev_frame;
-    int packet_sequence_number;
+    int packet_sequence_number;\
+    int i;
 
-    s->samples       = data;
-    s->samples_end   = (int32_t*)((int8_t*)data + *data_size);
+    /** reuse second half of the IMDCT output for the next frame */
+    /* NOTE : Relies on the WMAProDecCtx being static */
+    for(i = 0; i < s->num_channels; i++)
+        memcpy(&s->channel[i].out[0],
+               &s->channel[i].out[s->samples_per_frame],
+               s->samples_per_frame * sizeof(*s->channel[i].out) >> 1);
+               
+               
+    s->samples = 0;
     *data_size = 0;
 
     if (s->packet_done || s->packet_loss) {
@@ -1583,7 +1579,10 @@ int decode_packet(asf_waveformatex_t *wfx, void *data, int *data_size,
         save_bits(s, gb, remaining_bits(s, gb), 0);
     }
 
-    *data_size = (int8_t *)s->samples - (int8_t *)data;
+    dec[0] = s->channel[0].out;
+    dec[1] = s->channel[1].out;
+    
+    *data_size = s->samples;
     s->packet_offset = get_bits_count(gb) & 7;
 
 	s->frame_num++;

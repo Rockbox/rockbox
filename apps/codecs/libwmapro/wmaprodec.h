@@ -28,4 +28,4 @@
 
 int decode_init(asf_waveformatex_t *wfx);
 int decode_packet(asf_waveformatex_t *wfx,
-                  void *data, int *data_size, void* pktdata, int size);
+                  int32_t *dec[2], int *data_size, void* pktdata, int size);
