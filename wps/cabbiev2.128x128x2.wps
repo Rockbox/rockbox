@@ -1,43 +1,75 @@
-# cabbie 2.0 default
+# Cabbie 2.0 default
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
-#derived from "cabbie" (C) Yohann Misquitta
+# Derived from "cabbie" (C) Yohann Misquitta
+#
+# Disable Status Bar
 %wd
+#
+# Load Backdrop
 %X(wpsbackdrop-128x128x2.bmp)
-%xl(A,lock-160x128x2.bmp,3,114,2)
-%xl(B,battery-160x128x2.bmp,26,115,10)
-%xl(C,volume-160x128x2.bmp,49,114,10)
-%xl(D,shuffle-160x128x2.bmp,72,115)
-%xl(E,repeat-160x128x2.bmp,93,113,4)
-%xl(F,playmode-160x128x2.bmp,112,114,5)
-%ax%Cl(4,12,60,60)
-%pb(1,87,125,7,pb-128x96x2.bmp)
-# images all in the default viewport
+#
+# Preload Images
+%xl(A,lock-160x128x2.bmp,0,0,2)
+%xl(B,battery-160x128x2.bmp,0,0,10)
+%xl(C,volume-160x128x2.bmp,0,0,10)
+%xl(D,shuffle-160x128x2.bmp,0,0)
+%xl(E,repeat-160x128x2.bmp,0,0,4)
+%xl(F,playmode-160x128x2.bmp,0,0,5)
+#
+# Album Art/Info Viewport Conditional
+%?C<%Vd(a)|%Vd(b)>
+#
+# Progress Bar
+%V(1,87,125,7,-)
+%pb(0,0,125,7,pb-128x96x2.bmp)
+#
+# Hold
+%V(3,114,14,10,-)
 %?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(26,115,17,9,-)
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+#
+# Volume
+%V(49,114,16,10,-)
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+#
+# Shuffle
+%V(72,115,16,9,-)
 %?ps<%xd(D)>
+#
+# Repeat
+%V(93,113,12,13,-)
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(112,114,11,11,-)
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
-
-%?C<%Cd%Vd(a)|%Vd(b)>
-
-
-#NowPlaying - with AA
-%ax%Vl(a,70,12,-,50,1)
+#
+# Next Track Info
+%V(3,70,122,12,-)
+%s%ac%Sx(Next:) %?It<%It|%Fn>
+#
+# Time Elapsed/Remaining
+%V(3,96,122,12,-)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+#
+# Album Art
+%ax%Vl(a,4,12,60,60,-)
+%Cl(0,0,60,60,c,c)
+%Cd
+#
+# Track Info - Album Art
+%ax%Vl(a,70,12,-,50,-)
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
-%s%al%iy
-
-#NowPlaying - without AA
-%Vl(b,0,12,-,50,1)
+%s%al%?iy<%iy>
+#
+# Track Info - No Album Art
+%Vl(b,0,12,-,50,-)
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
-%s%ac%iy
-
-#next and playlist
-%V(3,70,122,12,1)
-%s%ac%Sx(Next:) %?It<%It|%Fn>
-%V(3,96,122,12,1)
-%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+%s%ac%?iy<%iy>

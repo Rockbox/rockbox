@@ -1,39 +1,74 @@
-# cabbie 2.0 default
-# ported from 160*128 greyscale port by Mark Fawcus (yapper)
+# Cabbie 2.0 default
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
-# derived from "cabbie" (C) Yohann Misquitta
+# Derived from "cabbie" (C) Yohann Misquitta
+# Ported to 138x110 greyscale by Mark Fawcus (yapper)
+#
+# Disable Status Bar
 %wd
+#
+# Load Backdrop
 %X(wpsbackdrop-138x110x2.bmp)
-%xl(A,lock-160x128x2.bmp,4,98,2)
-%xl(B,battery-160x128x2.bmp,28,99,10)
-%xl(C,volume-160x128x2.bmp,53,98,10)
-%xl(D,shuffle-160x128x2.bmp,78,97)
-%xl(E,repeat-160x128x2.bmp,102,97,4)
-%xl(F,playmode-160x128x2.bmp,123,98,5)
-%ax%Cl(5,15,55,55)
-%pb(2,75,134,6,pb-138x110x2.bmp)
-#images
+#
+# Preload Images
+%xl(A,lock-160x128x2.bmp,0,0,2)
+%xl(B,battery-160x128x2.bmp,0,0,10)
+%xl(C,volume-160x128x2.bmp,0,0,10)
+%xl(D,shuffle-160x128x2.bmp,0,0)
+%xl(E,repeat-160x128x2.bmp,0,0,4)
+%xl(F,playmode-160x128x2.bmp,0,0,5)
+#
+# Album Art/Info Viewport Conditional
+%?C<%Vd(a)|%Vd(b)>
+#
+# Progress Bar
+%V(2,75,134,6,-)
+%pb(0,0,134,6,pb-138x110x2.bmp)
+#
+# Hold
+%V(4,98,16,10,-)
 %?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(28,99,17,9,-)
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+#
+# Volume
+%V(53,98,16,10,-)
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+#
+# Shuffle
+%V(78,97,16,9,1)
 %?ps<%xd(D)>
+#
+# Repeat
+%V(102,97,12,13,-)
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(123,98,11,11,-)
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
-%?C<%Cd%Vd(a)|%Vd(b)>
-
-%ax%Vl(a,65,10,-,60,1)
+#
+# Time Elapsed/Remaining
+%V(2,82,134,13,-)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+#
+# Album Art
+%ax%Vl(a,5,15,55,55,-)
+%Cl(0,0,55,55,c,c)
+%Cd
+#
+# Track Info - Album Art
+%ax%Vl(a,65,10,-,60,-)
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
-
-%Vl(b,0,10,-,60,1)
+#
+# Track Info - No Album Art
+%Vl(b,0,10,-,60,-)
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
-
-%V(2,82,134,13,1)
-%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
