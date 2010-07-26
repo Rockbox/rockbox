@@ -1,3 +1,7 @@
+#Setting the binary name
+TARGET = rbthemeeditor
+
+# Adding network support
 QT += network
 
 # Enabling profiling
