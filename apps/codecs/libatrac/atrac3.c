@@ -124,6 +124,57 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
                             int32_t *in,
                             int32_t *win,
                             unsigned int nIn);
+#elif defined (CPU_COLDFIRE)
+    #define MULTIPLY_ADD_BLOCK \
+        "movem.l (%[win]), %%d0-%%d7             \n\t" \
+        "lea.l (8*4, %[win]), %[win]             \n\t" \
+        "mac.l %%d0, %%a5, (%[in])+, %%a5, %%acc0\n\t" \
+        "mac.l %%d1, %%a5, (%[in])+, %%a5, %%acc1\n\t" \
+        "mac.l %%d2, %%a5, (%[in])+, %%a5, %%acc0\n\t" \
+        "mac.l %%d3, %%a5, (%[in])+, %%a5, %%acc1\n\t" \
+        "mac.l %%d4, %%a5, (%[in])+, %%a5, %%acc0\n\t" \
+        "mac.l %%d5, %%a5, (%[in])+, %%a5, %%acc1\n\t" \
+        "mac.l %%d6, %%a5, (%[in])+, %%a5, %%acc0\n\t" \
+        "mac.l %%d7, %%a5, (%[in])+, %%a5, %%acc1\n\t" \
+
+
+    static inline void
+    atrac3_iqmf_dewindowing(int32_t *out,
+                            int32_t *in,
+                            int32_t *win,
+                            unsigned int nIn)
+    {
+        int32_t j;
+        int32_t *_in, *_win;
+        for (j = nIn; j != 0; j--, in+=2, out+=2) {
+            _in = in;
+            _win = win;
+            
+            asm volatile (
+            "move.l (%[in])+, %%a5                    \n\t" /* preload frist in value */
+            MULTIPLY_ADD_BLOCK /*  0.. 7 */
+            MULTIPLY_ADD_BLOCK /*  8..15 */
+            MULTIPLY_ADD_BLOCK /* 16..23 */
+            MULTIPLY_ADD_BLOCK /* 24..31 */
+            MULTIPLY_ADD_BLOCK /* 32..39 */
+                               /* 40..47 */
+            "movem.l (%[win]), %%d0-%%d7              \n\t"
+            "mac.l %%d0, %%a5, (%[in])+, %%a5, %%acc0 \n\t"
+            "mac.l %%d1, %%a5, (%[in])+, %%a5, %%acc1 \n\t"
+            "mac.l %%d2, %%a5, (%[in])+, %%a5, %%acc0 \n\t"
+            "mac.l %%d3, %%a5, (%[in])+, %%a5, %%acc1 \n\t"
+            "mac.l %%d4, %%a5, (%[in])+, %%a5, %%acc0 \n\t"
+            "mac.l %%d5, %%a5, (%[in])+, %%a5, %%acc1 \n\t"
+            "mac.l %%d6, %%a5, (%[in])+, %%a5, %%acc0 \n\t"
+            "mac.l %%d7, %%a5,                 %%acc1 \n\t"
+            "movclr.l %%acc0, %%d1                    \n\t" /* s1 */
+            "movclr.l %%acc1, %%d0                    \n\t" /* s2 */
+            "movem.l  %%d0-%%d1, (%[out])             \n\t"
+            : [in] "+a" (_in), [win] "+a" (_win)
+            : [out] "a" (out)
+            : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5", "memory");
+        }
+    }
 #else
     #define MULTIPLY_ADD_BLOCK(y1, y2, x, c, k) \
         y1 += fixmul31(c[k], x[k]); k++; \
@@ -134,7 +185,7 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
         y2 += fixmul31(c[k], x[k]); k++; \
         y1 += fixmul31(c[k], x[k]); k++; \
         y2 += fixmul31(c[k], x[k]); k++;
-            
+
     static inline void
     atrac3_iqmf_dewindowing(int32_t *out,
                             int32_t *in,
