@@ -65,7 +65,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
 
         if (size > sizeof(buf))
         {
-            DEBUGF("AIFF \"%4.4s\" chunk too large (%lu > %zd)",
+            DEBUGF("AIFF \"%4.4s\" chunk too large (%zd > %zd)",
                     (char*) &buf[0], size, sizeof(buf));
         }
 
