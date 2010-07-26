@@ -95,37 +95,34 @@
     /* Calculates: result = (X*Y)>>16 */
     #define fixmul16(X,Y) \
     ({ \
-        int32_t t1, t2; \
+        int32_t t, x = (X); \
         asm volatile ( \
-            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
-            "mulu.l  %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
-            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
-            "moveq.l #15,%[t2]       \n\t" \
-            "asl.l   %[t2],%[t1]     \n\t" /* hi <<= 15, plus one free */ \
-            "moveq.l #16,%[t2]       \n\t" \
-            "lsr.l   %[t2],%[x]      \n\t" /* (unsigned)lo >>= 16 */ \
-            "or.l    %[x],%[t1]      \n\t" /* combine result */ \
-            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
-            : [x] "d" ((X)), [y] "d" ((Y))); \
-        t1; \
+            "mac.l    %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l   %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t]     \n\t" /* get higher half */ \
+            "lsr.l    #1,%[t]         \n\t" /* hi >>= 1 to compensate emac shift */ \
+            "move.w   %[t],%[x]       \n\t" /* combine halfwords */\
+            "swap     %[x]            \n\t" \
+            : [t]"=&d"(t), [x] "+d" (x) \
+            : [y] "d" ((Y))); \
+        x; \
     })
     
     /* Calculates: result = (X*Y)>>24 */
     #define fixmul24(X,Y) \
     ({ \
-        int32_t t1, t2; \
+        int32_t t, x = (X); \
         asm volatile ( \
-            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
-            "mulu.l  %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
-            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
-            "moveq.l #7,%[t2]        \n\t" \
-            "asl.l   %[t2],%[t1]     \n\t" /* hi <<= 7, plus one free */ \
-            "moveq.l #24,%[t2]       \n\t" \
-            "lsr.l   %[t2],%[x]      \n\t" /* (unsigned)lo >>= 24 */ \
-            "or.l    %[x],%[t1]      \n\t" /* combine result */ \
-            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
-            : [x] "d" ((X)), [y] "d" ((Y))); \
-        t1; \
+            "mac.l    %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l   %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "moveq.l  #24,%[t]        \n\t" \
+            "lsr.l    %[t],%[x]       \n\t" /* (unsigned)lo >>= 24 */ \
+            "movclr.l %%acc0,%[t]     \n\t" /* get higher half */ \
+            "asl.l    #7,%[t]         \n\t" /* hi <<= 7, plus one free */ \
+            "or.l     %[x],%[t]       \n\t" /* combine result */ \
+            : [t]"=&d"(t), [x] "+d" (x) \
+            : [y] "d" ((Y))); \
+        t; \
     })
 
     /* Calculates: result = (X*Y)>>32 */
@@ -239,7 +236,7 @@ static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src,
 {
     int i;
     for(i=0; i<len; i++)
-        dst[i] = fixmul24(src[i], mul);   
+        dst[i] = fixmul24(src[i], mul);
 }
 
 static inline int av_clip(int a, int amin, int amax)
