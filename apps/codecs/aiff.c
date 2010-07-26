@@ -47,26 +47,18 @@ static const struct pcm_entry pcm_codecs[] = {
     { AIFC_FORMAT_QT_IMA_ADPCM, get_qt_ima_adpcm_codec    },
 };
 
-#define NUM_FORMATS 6
-
 #define PCM_SAMPLE_SIZE (1024*2)
 
 static int32_t samples[PCM_SAMPLE_SIZE] IBSS_ATTR;
 
 static const struct pcm_codec *get_codec(uint32_t formattag)
 {
-    int i;
-
-    for (i = 0; i < NUM_FORMATS; i++)
-    {
+    unsigned i;
+    for (i = 0; i < sizeof(pcm_codecs)/sizeof(pcm_codecs[0]); i++)
         if (pcm_codecs[i].format_tag == formattag)
-        {
-            if (pcm_codecs[i].get_codec)
-                return pcm_codecs[i].get_codec();
-            return 0;
-        }
-    }
-    return 0;
+            return pcm_codecs[i].get_codec();
+
+    return NULL;
 }
 
 enum codec_status codec_main(void)
@@ -112,7 +104,7 @@ next_track:
 
     if (memcmp(buf, "FORM", 4) != 0)
     {
-        DEBUGF("CODEC_ERROR: does not aiff format %c%c%c%c\n", buf[0], buf[1], buf[2], buf[3]);
+        DEBUGF("CODEC_ERROR: does not aiff format %4.4s\n", (char*)&buf[0]);
         status = CODEC_ERROR;
         goto done;
     }
@@ -122,7 +114,7 @@ next_track:
         is_aifc = true;
     else
     {
-        DEBUGF("CODEC_ERROR: does not aiff format %c%c%c%c\n", buf[8], buf[9], buf[10], buf[11]);
+        DEBUGF("CODEC_ERROR: does not aiff format %4.4s\n", (char*)&buf[8]);
         status = CODEC_ERROR;
         goto done;
     }
