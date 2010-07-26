@@ -29,49 +29,64 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 
+#include "debug.h"
+
 /* compressionType: AIFC QuickTime IMA ADPCM */
 #define AIFC_FORMAT_QT_IMA_ADPCM "ima4"
 
 bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
-    /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = (unsigned char *)id3->path;
+    unsigned char buf[512];
     unsigned long numChannels = 0;
     unsigned long numSampleFrames = 0;
     unsigned long numbytes = 0;
     int read_bytes;
-    int i;
     bool is_aifc = false;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) ||
-        ((read_bytes = read(fd, buf, sizeof(id3->path))) < 54) ||
-        (memcmp(buf, "FORM", 4) != 0) || (memcmp(buf + 8, "AIF", 3) != 0) ||
+    if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, &buf[0], 12) < 12) ||
+        (memcmp(&buf[0], "FORM", 4) != 0) || (memcmp(&buf[8], "AIF", 3) != 0) ||
         (!(is_aifc = (buf[11] == 'C')) && buf[11] != 'F'))
     {
         return false;
     }
 
-    i = 12;
-    while ((numbytes == 0) && (read_bytes >= 8)) 
+    while((read_bytes = read(fd, &buf[0], 8)) == 8)
     {
-        buf        += i;
-        read_bytes -= i;
+        size_t size = get_long_be(&buf[4]); /* chunkSize */
 
-        /* chunkSize */
-        i = get_long_be(&buf[4]);
-        
-        if (memcmp(buf, "COMM", 4) == 0)
+        if (memcmp(&buf[0], "SSND", 4) == 0)
         {
-            /* numChannels */
-            numChannels = ((buf[8]<<8)|buf[9]);
-            /* numSampleFrames */
-            numSampleFrames = get_long_be(&buf[10]);
+            numbytes = size - 8;
+            break;  /* assume COMM was already read */
+        }
+
+        /* odd chunk sizes must be padded */
+        size += size & 1;
+
+        if (size > sizeof(buf))
+        {
+            DEBUGF("AIFF \"%4.4s\" chunk too large (%lu > %zd)",
+                    (char*) &buf[0], size, sizeof(buf));
+        }
+
+        if (memcmp(&buf[0], "COMM", 4) == 0)
+        {
+            if (size > sizeof(buf) || read(fd, &buf[0], size) != (ssize_t)size)
+                return false;
+
+            numChannels = ((buf[0]<<8)|buf[1]);
+
+            numSampleFrames = get_long_be(&buf[2]);
+
             /* sampleRate */
-            id3->frequency = get_long_be(&buf[18]);
-            id3->frequency >>= (16+14-buf[17]);
+            id3->frequency = get_long_be(&buf[10]);
+            id3->frequency >>= (16+14-buf[9]);
+
             /* save format infos */
-            id3->bitrate = (((buf[14]<<8)|buf[15]) * numChannels * id3->frequency) / 1000;
-            if (!is_aifc || memcmp(&buf[26], AIFC_FORMAT_QT_IMA_ADPCM, 4) != 0)
+            id3->bitrate = ((buf[6]<<8)|buf[7]) * numChannels * id3->frequency;
+            id3->bitrate /= 1000;
+
+            if (!is_aifc || memcmp(&buf[18], AIFC_FORMAT_QT_IMA_ADPCM, 4) != 0)
                 id3->length = ((int64_t) numSampleFrames * 1000) / id3->frequency;
             else
             {
@@ -82,14 +97,13 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
             id3->vbr = false;   /* AIFF files are CBR */
             id3->filesize = filesize(fd);
         }
-        else if (memcmp(buf, "SSND", 4) == 0) 
+        else
         {
-            numbytes = i - 8;
+            /* skip chunk */
+            if (lseek(fd, size, SEEK_CUR) < 0)
+                return false;
         }
-
-        /* odd chunk sizes must be padded */
-        i += 8 + (i & 0x01);
     }
 
-    return ((numbytes != 0) && (numChannels != 0));
+    return numbytes && numChannels;
 }
