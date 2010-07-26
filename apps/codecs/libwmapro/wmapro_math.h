@@ -3,21 +3,187 @@
 
 #include <inttypes.h>
 
+/* rockbox: not used
 #define fixtof16(x)       (float)((float)(x) / (float)(1 << 16))
 #define fixtof31(x)       (float)((float)(x) / (float)(1 << 31))
 #define ftofix16(x)       ((int32_t)((x) * (float)(1 << 16) + ((x) < 0 ? -0.5:0.5)))
 #define ftofix31(x)       ((int32_t)((x) * (float)(1 << 31) + ((x) < 0 ? -0.5:0.5)))
+*/
 
-static inline int32_t fixmulshift(int32_t x, int32_t y, int shamt)
-{
-    int64_t temp;
-    temp = x;
-    temp *= y;
+#if defined(CPU_ARM)
+    /* Calculates: result = (X*Y)>>Z */
+    #define fixmulshift(X,Y,Z) \
+    ({ \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+            "smull %[lo], %[hi], %[x], %[y] \n\t"   /* multiply */ \
+            "mov   %[lo], %[lo], lsr %[shr] \n\t"   /* lo >>= Z */ \
+            "orr   %[lo], %[lo], %[hi], lsl %[shl]" /* lo |= (hi << (32-Z)) */ \
+            : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+            : [x]"r"(X), [y]"r"(Y), [shr]"r"(Z), [shl]"r"(32-Z)); \
+        lo; \
+    })
+     
+    /* Calculates: result = (X*Y)>>16 */
+    #define fixmul16(X,Y) \
+     ({ \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+           "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+           "mov   %[lo], %[lo], lsr #16    \n\t" /* lo >>= 16 */ \
+           "orr   %[lo], %[lo], %[hi], lsl #16"  /* lo |= (hi << 16) */ \
+           : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+           : [x]"r"(X), [y]"r"(Y)); \
+        lo; \
+     })
+     
+    /* Calculates: result = (X*Y)>>24 */
+    #define fixmul24(X,Y) \
+     ({ \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+           "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+           "mov   %[lo], %[lo], lsr #24    \n\t" /* lo >>= 24 */ \
+           "orr   %[lo], %[lo], %[hi], lsl #8"   /* lo |= (hi << 8) */ \
+           : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+           : [x]"r"(X), [y]"r"(Y)); \
+        lo; \
+     })
+     
+    /* Calculates: result = (X*Y)>>31 */
+    #define fixmul31(X,Y) \
+     ({ \
+        int32_t lo; \
+        int32_t hi; \
+        asm volatile ( \
+           "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+           "mov   %[lo], %[lo], lsr #31    \n\t" /* lo >>= 31 */ \
+           "orr   %[lo], %[lo], %[hi], lsl #1"   /* lo |= (hi << 1) */ \
+           : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+           : [x]"r"(X), [y]"r"(Y)); \
+        lo; \
+     })
+#elif defined(CPU_COLDFIRE)
+    /* Calculates: result = (X*Y)>>Z */
+    #define fixmulshift(X,Y,Z) \
+    ({ \
+        int32_t t1; \
+        int32_t t2; \
+        asm volatile ( \
+            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l  %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
+            "moveq.l #31,%[t2]       \n\t" \
+            "sub.l   %[sh],%[t2]     \n\t" /* t2 = 31 - shift */ \
+            "ble.s   1f              \n\t" \
+            "asl.l   %[t2],%[t1]     \n\t" /* hi <<= 31 - shift */ \
+            "lsr.l   %[sh],%[x]      \n\t" /* (unsigned)lo >>= shift */ \
+            "or.l    %[x],%[t1]      \n\t" /* combine result */ \
+            "bra.s   2f              \n\t" \
+         "1:                         \n\t" \
+            "neg.l   %[t2]           \n\t" /* t2 = shift - 31 */ \
+            "asr.l   %[t2],%[t1]     \n\t" /* hi >>= t2 */ \
+         "2:                         \n" \
+        : [t1]"=&d"(t1), [t2]"=&d"(t2) \
+        : [x] "d"((X)), [y] "d"((Y)), [sh]"d"((Z))); \
+        t1; \
+    })
 
-    temp >>= shamt;
+    /* Calculates: result = (X*Y)>>16 */
+    #define fixmul16(X,Y) \
+    ({ \
+        int32_t t1, t2; \
+        asm volatile ( \
+            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l  %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
+            "moveq.l #15,%[t2]       \n\t" \
+            "asl.l   %[t2],%[t1]     \n\t" /* hi <<= 15, plus one free */ \
+            "moveq.l #16,%[t2]       \n\t" \
+            "lsr.l   %[t2],%[x]      \n\t" /* (unsigned)lo >>= 16 */ \
+            "or.l    %[x],%[t1]      \n\t" /* combine result */ \
+            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
+            : [x] "d" ((X)), [y] "d" ((Y))); \
+        t1; \
+    })
+    
+    /* Calculates: result = (X*Y)>>24 */
+    #define fixmul24(X,Y) \
+    ({ \
+        int32_t t1, t2; \
+        asm volatile ( \
+            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l  %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
+            "moveq.l #7,%[t2]        \n\t" \
+            "asl.l   %[t2],%[t1]     \n\t" /* hi <<= 7, plus one free */ \
+            "moveq.l #24,%[t2]       \n\t" \
+            "lsr.l   %[t2],%[x]      \n\t" /* (unsigned)lo >>= 24 */ \
+            "or.l    %[x],%[t1]      \n\t" /* combine result */ \
+            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
+            : [x] "d" ((X)), [y] "d" ((Y))); \
+        t1; \
+    })
 
-    return (int32_t)temp;
-}
+    /* Calculates: result = (X*Y)>>32 */
+    #define fixmul31(X,Y) \
+    ({ \
+       int32_t t; \
+       asm volatile ( \
+          "mac.l %[x], %[y], %%acc0\n\t"   /* multiply */ \
+          "movclr.l %%acc0, %[t]\n\t"      /* get higher half as result */ \
+          : [t] "=d" (t) \
+          : [x] "r" ((X)), [y] "r" ((Y))); \
+       t; \
+    })
+#else
+    static inline int32_t fixmulshift(int32_t x, int32_t y, int shamt)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= shamt;
+    
+        return (int32_t)temp;
+    }
+    
+    static inline int32_t fixmul31(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 31;
+    
+        return (int32_t)temp;
+    }
+    
+    static inline int32_t fixmul24(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 24;
+    
+        return (int32_t)temp;
+    }
+    
+    static inline int32_t fixmul16(int32_t x, int32_t y)
+    {
+        int64_t temp;
+        temp = x;
+        temp *= y;
+    
+        temp >>= 16;
+    
+        return (int32_t)temp;
+    }
+#endif /* CPU_COLDFIRE, CPU_ARM */
 
 #ifdef CPU_COLDFIRE
 static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
@@ -62,18 +228,18 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
         int32_t s1 = src1[j];
         int32_t wi = -win[i];
         int32_t wj = -win[j];
-        dst[i] = fixmulshift(s0,wj,31) - fixmulshift(s1,wi,31);
-        dst[j] = fixmulshift(s0,wi,31) + fixmulshift(s1,wj,31);
+        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi);
+        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj);
     }
 }
 #endif
 
-static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, int32_t mul,
-                                        int len, int shift)
+static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
+                                        int32_t mul, int len)
 {
     int i;
     for(i=0; i<len; i++)
-        dst[i] = fixmulshift(src[i],mul,shift);   
+        dst[i] = fixmul24(src[i], mul);   
 }
 
 static inline int av_clip(int a, int amin, int amax)
