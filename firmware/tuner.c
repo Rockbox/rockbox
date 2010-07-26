@@ -28,91 +28,15 @@
 /* General region information */
 const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS] =
 {
-    [REGION_EUROPE]    = { 87500000, 108000000, 100000 },
-    [REGION_US_CANADA] = { 87900000, 107900000, 200000 },
-    [REGION_JAPAN]     = { 76000000,  90000000, 100000 },
-    [REGION_KOREA]     = { 87500000, 108000000, 200000 },
-    [REGION_ITALY]     = { 87500000, 108000000,  50000 },
-    [REGION_OTHER]     = { 87500000, 108000000,  50000 }
+    [REGION_EUROPE]    = { 87500000, 108000000, 100000, 50 },
+    [REGION_US_CANADA] = { 87900000, 107900000, 200000, 75 },
+    [REGION_JAPAN]     = { 76000000,  90000000, 100000, 50 },
+    [REGION_KOREA]     = { 87500000, 108000000, 200000, 50 },
+    [REGION_ITALY]     = { 87500000, 108000000,  50000, 50 },
+    [REGION_OTHER]     = { 87500000, 108000000,  50000, 50 }
 };
 
 #ifndef SIMULATOR
-
-/* Tuner-specific region information */
-
-#if (CONFIG_TUNER & LV24020LP)
-/* deemphasis setting for region */
-const unsigned char lv24020lp_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = 0, /* 50uS */
-    [REGION_US_CANADA] = 1, /* 75uS */
-    [REGION_JAPAN]     = 0, /* 50uS */
-    [REGION_KOREA]     = 0, /* 50uS */
-    [REGION_ITALY]     = 0, /* 50uS */
-    [REGION_OTHER]     = 0, /* 50uS */
-};
-#endif /* (CONFIG_TUNER & LV24020LP) */
-
-#if (CONFIG_TUNER & TEA5760)
-const struct tea5760_region_data tea5760_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = { 1, 0 }, /* 50uS, US/Europe band */
-    [REGION_US_CANADA] = { 0, 0 }, /* 75uS, US/Europe band */
-    [REGION_JAPAN]     = { 1, 1 }, /* 50uS, Japanese band  */
-    [REGION_KOREA]     = { 1, 0 }, /* 50uS, US/Europe band */ 
-    [REGION_ITALY]     = { 1, 0 }, /* 50uS, US/Europe band */ 
-    [REGION_OTHER]     = { 1, 0 }, /* 50uS, US/Europe band */ 
-};
-#endif /* (CONFIG_TUNER & TEA5760) */
-
-#if (CONFIG_TUNER & TEA5767)
-const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = { 0, 0 }, /* 50uS, US/Europe band */
-    [REGION_US_CANADA] = { 1, 0 }, /* 75uS, US/Europe band */
-    [REGION_JAPAN]     = { 0, 1 }, /* 50uS, Japanese band  */
-    [REGION_KOREA]     = { 0, 0 }, /* 50uS, US/Europe band */ 
-    [REGION_ITALY]     = { 0, 0 }, /* 50uS, US/Europe band */ 
-    [REGION_OTHER]     = { 0, 0 }, /* 50uS, US/Europe band */ 
-};
-#endif /* (CONFIG_TUNER & TEA5767) */
-
-#if (CONFIG_TUNER & SI4700)
-const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = { 1, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
-    [REGION_US_CANADA] = { 0, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
-    [REGION_JAPAN]     = { 1, 2, 1 }, /* 50uS, Japanese band,  100kHz spacing */
-    [REGION_KOREA]     = { 1, 0, 0 }, /* 50uS, US/Europe band, 200kHz spacing */
-    [REGION_ITALY]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
-    [REGION_OTHER]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
-};
-#endif /* (CONFIG_TUNER & SI4700) */
-
-#if (CONFIG_TUNER & RDA5802)
-const struct rda5802_region_data rda5802_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = { 1, 0 }, /* 50uS, US/Europe band */
-    [REGION_US_CANADA] = { 0, 0 }, /* 75uS, US/Europe band */
-    [REGION_JAPAN]     = { 1, 1 }, /* 50uS, Japanese band  */
-    [REGION_KOREA]     = { 1, 0 }, /* 50uS, US/Europe band */
-    [REGION_ITALY]     = { 1, 0 }, /* 50uS, US/Europe band */
-    [REGION_OTHER]     = { 1, 0 }, /* 50uS, US/Europe band */
-};
-#endif /* (CONFIG_TUNER & RDA5802) */
-
-#if (CONFIG_TUNER & IPOD_REMOTE_TUNER)
-const struct rmt_tuner_region_data
-                        rmt_tuner_region_data[TUNER_NUM_REGIONS] =
-{
-    [REGION_EUROPE]    = { 1, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
-    [REGION_US_CANADA] = { 0, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
-    [REGION_JAPAN]     = { 1, 2, 1 }, /* 50uS, Japanese band,  100kHz spacing */
-    [REGION_KOREA]     = { 1, 0, 0 }, /* 50uS, US/Europe band, 200kHz spacing */
-    [REGION_ITALY]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
-    [REGION_OTHER]     = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
-};
-#endif /* (CONFIG_TUNER & IPOD_REMOTE_TUNER) */
 
 #ifdef CONFIG_TUNER_MULTI
 int (*tuner_set)(int setting, int value);

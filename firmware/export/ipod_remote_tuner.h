@@ -48,19 +48,6 @@ extern void rmt_tuner_signal_power(unsigned char value);
 
 extern void rmt_tuner_rds_data(void);
 
-struct rmt_tuner_region_data
-{
-    /* 0: 50us, 1: 75us */
-    unsigned char deemphasis;
-    /* 0: europe, 1: japan (BL in TEA spec)*/
-    unsigned char band;
-    /* 0: us/australia (200kHz), 1: europe/japan (100kHz), 2: (50kHz) */
-    unsigned char spacing;
-} __attribute__((packed));
-
-extern const struct rmt_tuner_region_data
-                                rmt_tuner_region_data[TUNER_NUM_REGIONS];
-
 int ipod_rmt_tuner_set(int setting, int value);
 int ipod_rmt_tuner_get(int setting);
 char* ipod_get_rds_info(int setting);

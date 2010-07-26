@@ -84,6 +84,7 @@ struct fm_region_data
     int freq_min;
     int freq_max;
     int freq_step;
+    int deemphasis; /* in microseconds, usually 50 or 75 */
 };
 
 extern const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS];

@@ -59,16 +59,16 @@
 #define CHANNEL_BAND        (0x3 << 2)
     #define CHANNEL_BANDw(x)        (((x) << 2) & CHANNEL_BAND)
     #define CHANNEL_BANDr(x)        (((x) & CHANNEL_BAND) >> 2)
-    #define CHANNEL_BAND_875_1080   (0x0 << 2) /* tenth-megahertz */
-    #define CHANNEL_BAND_760_1080   (0x1 << 2)
-    #define CHANNEL_BAND_760_900    (0x2 << 2)
-    #define CHANNEL_BAND_650_760    (0x3 << 2)
+    #define CHANNEL_BAND_870_1080   (0x0) /* tenth-megahertz */
+    #define CHANNEL_BAND_760_1080   (0x1)
+    #define CHANNEL_BAND_760_900    (0x2)
+    #define CHANNEL_BAND_650_760    (0x3)
 #define CHANNEL_SPACE       (0x3 << 0)
     #define CHANNEL_SPACEw(x)  (((x) << 0) & CHANNEL_SPACE)
     #define CHANNEL_SPACEr(x)  (((x) & CHANNEL_SPACE) >> 0)
-    #define CHANNEL_SPACE_100KHZ    (0x0 << 0)
-    #define CHANNEL_SPACE_200KHZ    (0x1 << 0)
-    #define CHANNEL_SPACE_50KHZ     (0x2 << 0)
+    #define CHANNEL_SPACE_100KHZ    (0x0)
+    #define CHANNEL_SPACE_200KHZ    (0x1)
+    #define CHANNEL_SPACE_50KHZ     (0x2)
 
 /* SYSCONFIG1 (0x4) */
 #define SYSCONFIG1_DE       (0x1 << 11)
@@ -239,13 +239,16 @@ static int rda5802_tuned(void)
 
 static void rda5802_set_region(int region)
 {
-    const struct rda5802_region_data *rd = &rda5802_region_data[region];
-    uint16_t bandspacing = CHANNEL_BANDw(rd->band) |
+    const struct fm_region_data *rd = &fm_region_data[region];
+    int band = (rd->freq_min == 76000000) ?
+               CHANNEL_BAND_760_900 : CHANNEL_BAND_870_1080;
+    int deemphasis = (rd->deemphasis == 50) ? SYSCONFIG1_DE : 0;
+
+    uint16_t bandspacing = CHANNEL_BANDw(band) |
                            CHANNEL_SPACEw(CHANNEL_SPACE_50KHZ);
     uint16_t oldbs = cache[CHANNEL] & (CHANNEL_BAND | CHANNEL_SPACE);
 
-    rda5802_write_masked(SYSCONFIG1, rd->deemphasis ? SYSCONFIG1_DE : 0,
-                        SYSCONFIG1_DE);
+    rda5802_write_masked(SYSCONFIG1, deemphasis, SYSCONFIG1_DE);
     rda5802_write_masked(CHANNEL, bandspacing, CHANNEL_BAND | CHANNEL_SPACE);
     rda5802_write_cache();
 

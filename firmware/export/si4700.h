@@ -27,15 +27,6 @@
 
 #define HAVE_RADIO_REGION
 
-struct si4700_region_data
-{
-    unsigned char deemphasis; /* 0: 75us, 1: 50us */
-    unsigned char band; /* 0: us/europe, 1: japan */
-    unsigned char spacing; /* 0: us/australia (200kHz), 1: europe/japan (100kHz), 2: (50kHz) */
-} __attribute__((packed));
-
-extern const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS];
-
 struct si4700_dbg_info
 {
     uint16_t regs[16];  /* Read registers */

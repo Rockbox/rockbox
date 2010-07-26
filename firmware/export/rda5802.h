@@ -27,14 +27,6 @@
 
 #define HAVE_RADIO_REGION
 
-struct rda5802_region_data
-{
-    unsigned char deemphasis; /* 0: 75us, 1: 50us */
-    unsigned char band; /* 0: us/europe, 1: japan */
-} __attribute__((packed));
-
-extern const struct rda5802_region_data rda5802_region_data[TUNER_NUM_REGIONS];
-
 struct rda5802_dbg_info
 {
     uint16_t regs[16];  /* Read registers */

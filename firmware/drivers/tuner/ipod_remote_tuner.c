@@ -177,8 +177,9 @@ void rmt_tuner_region(int region)
 {
     if (region != old_region)
     {
+        const struct fm_region_data *rd = &fm_region_data[region];
         unsigned char data[] = {0x07, 0x08, 0x00};
-        if (region == 2)
+        if (rd->freq_min == 76000000)
         {
             data[2] = 0x02; /* japan band */
         }
@@ -378,12 +379,14 @@ int ipod_rmt_tuner_set(int setting, int value)
 
         case RADIO_REGION:
         {
-            const struct rmt_tuner_region_data *rd =
-                &rmt_tuner_region_data[value];
+            const struct fm_region_data *rd = &fm_region_data[value];
+            int band = (rd->freq_min == 76000000) ? 2 : 0;
+            int spacing = (100000 / rd->freq_step);
+            int deemphasis = (rd->deemphasis == 50) ? 1 : 0;
 
-            rmt_tuner_region(rd->band);
-            set_deltafreq(rd->spacing);
-            set_deemphasis(rd->deemphasis);
+            rmt_tuner_region(band);
+            set_deltafreq(spacing);
+            set_deemphasis(deemphasis);
             rmt_tuner_set_param(tuner_param);
             break;
         }

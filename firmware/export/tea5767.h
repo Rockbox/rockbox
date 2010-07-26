@@ -26,14 +26,6 @@
 #define HAVE_RADIO_REGION
 #define HAVE_RADIO_MUTE_TIMEOUT
 
-struct tea5767_region_data
-{
-    unsigned char deemphasis; /* 0: 50us, 1: 75us */
-    unsigned char band; /* 0: europe, 1: japan (BL in TEA spec)*/
-} __attribute__((packed));
-
-extern const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS];
-
 struct tea5767_dbg_info
 {
     unsigned char read_regs[5];

@@ -91,11 +91,12 @@ int tea5760_set(int setting, int value)
 
         case RADIO_REGION:
             {
-            const struct tea5760_region_data *rd =
-                &tea5760_region_data[value];
+            const struct fm_region_data *rd = &fm_region_data[value];
+            int band = (rd->freq_min == 76000000) ? 1 : 0;
+            int deemphasis = (rd->deemphasis == 50) ? 1 : 0;
 
-            tea5760_set_clear(4, (1<<1), rd->deemphasis);
-            tea5760_set_clear(3, (1<<5), rd->band);
+            tea5760_set_clear(3, (1<<5), band);
+            tea5760_set_clear(4, (1<<1), deemphasis);
             }
             break;
             

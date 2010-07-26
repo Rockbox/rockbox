@@ -400,14 +400,17 @@ static int si4700_tuned(void)
 
 static void si4700_set_region(int region)
 {
-    const struct si4700_region_data *rd = &si4700_region_data[region];
-    uint16_t bandspacing = SYSCONFIG2_BANDw(rd->band) |
-                           SYSCONFIG2_SPACEw(rd->spacing);
+    const struct fm_region_data *rd = &fm_region_data[region];
+
+    int band = (rd->freq_min == 76000000) ? 2 : 0;
+    int spacing = (100000 / rd->freq_step);
+    int deemphasis = (rd->deemphasis == 50) ? SYSCONFIG1_DE : 0;
+
+    uint16_t bandspacing = SYSCONFIG2_BANDw(band) |
+                           SYSCONFIG2_SPACEw(spacing);
     uint16_t oldbs = cache[SYSCONFIG2] & (SYSCONFIG2_BAND | SYSCONFIG2_SPACE);
 
-    si4700_write_masked(SYSCONFIG1,
-                        rd->deemphasis ? SYSCONFIG1_DE : 0,
-                        SYSCONFIG1_DE);
+    si4700_write_masked(SYSCONFIG1, deemphasis, SYSCONFIG1_DE);
     si4700_write_masked(SYSCONFIG2, bandspacing,
                         SYSCONFIG2_BAND | SYSCONFIG2_SPACE);
 

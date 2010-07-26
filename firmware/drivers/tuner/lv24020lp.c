@@ -938,11 +938,14 @@ int lv24020lp_set(int setting, int value)
         break;
 
     case RADIO_REGION:
-        if (lv24020lp_region_data[value])
+    {
+        const struct fm_region_data *rd = &fm_region_data[value];
+        if (rd->deemphasis == 75)
             lv24020lp_write_set(AUDIO_CTRL2, DEEMP);
         else
             lv24020lp_write_clear(AUDIO_CTRL2, DEEMP);
         break;
+    }
 
     case RADIO_FORCE_MONO:
         if (value)
