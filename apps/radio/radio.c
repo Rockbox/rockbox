@@ -422,6 +422,7 @@ int radio_screen(void)
     {
         radio_load_presets(global_settings.fmr_file);
     }
+    fms_get(SCREEN_MAIN)->state->id3 = NULL;
 #ifdef HAVE_ALBUMART
     radioart_init(true);
 #endif    
