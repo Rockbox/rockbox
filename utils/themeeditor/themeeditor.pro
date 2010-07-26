@@ -1,5 +1,6 @@
 #Setting the binary name
 TARGET = rbthemeeditor
+VERSION = 0.5
 
 # Adding network support
 QT += network
