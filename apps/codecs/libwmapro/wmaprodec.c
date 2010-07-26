@@ -288,6 +288,10 @@ int decode_init(asf_waveformatex_t *wfx)
     int log2_max_num_subframes;
     int num_possible_block_sizes;
 
+#if defined(CPU_COLDFIRE)
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+#endif
+
     init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
 
     if (wfx->datalen >= 18) {
@@ -1050,7 +1054,7 @@ static void wmapro_window(WMAProDecodeCtx *s)
         winlen >>= 1;
 
         vector_fixmul_window(xstart, xstart, xstart + winlen,
-                                  window, 0, winlen);
+                                  window, winlen);
 
         s->channel[c].prev_block_len = s->subframe_len;
         
