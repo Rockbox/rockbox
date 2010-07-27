@@ -414,6 +414,12 @@ static int runcurrent(void)
     if (remote_detect())
         current += CURRENT_REMOTE;
 #endif
+
+#if defined(HAVE_ATA_POWER_OFF) && defined(CURRENT_ATA)
+    if (ide_powered())
+        current += CURRENT_ATA;
+#endif
+
 #endif /* BOOTLOADER */
     
     return current;
