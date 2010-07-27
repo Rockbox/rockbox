@@ -111,18 +111,16 @@
     /* Calculates: result = (X*Y)>>24 */
     #define fixmul24(X,Y) \
     ({ \
-        int32_t t, x = (X); \
+        int32_t t1, t2; \
         asm volatile ( \
-            "mac.l    %[x],%[y],%%acc0\n\t" /* multiply */ \
-            "mulu.l   %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
-            "moveq.l  #24,%[t]        \n\t" \
-            "lsr.l    %[t],%[x]       \n\t" /* (unsigned)lo >>= 24 */ \
-            "movclr.l %%acc0,%[t]     \n\t" /* get higher half */ \
-            "asl.l    #7,%[t]         \n\t" /* hi <<= 7, plus one free */ \
-            "or.l     %[x],%[t]       \n\t" /* combine result */ \
-            : [t]"=&d"(t), [x] "+d" (x) \
-            : [y] "d" ((Y))); \
-        t; \
+            "mac.l    %[x],%[y],%%acc0 \n\t" /* multiply */ \
+            "move.l   %%accext01, %[t1]\n\t" /* get lower 8 bits */ \
+            "movclr.l %%acc0,%[t2]     \n\t" /* get higher 24 bits */ \
+            "asl.l    #7,%[t2]         \n\t" /* hi <<= 7, plus one free */ \
+            "move.b   %[t1],%[t2]      \n\t" /* combine result */ \
+            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
+            : [x] "d" ((X)), [y] "d" ((Y))); \
+        t2; \
     })
 
     /* Calculates: result = (X*Y)>>32 */
