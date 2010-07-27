@@ -131,8 +131,8 @@ void audiohw_set_recsrc(int source, bool recording);
 #define ENHANCE_3D_MODE3D_RECORD    (0 << 7)
 
 #define ALC1                        0x11
-#define ALC1_ALCL(x)                ((x) & (0x0f))
-#define ALC1_MAXGAIN(x)             ((x) & (0x07 << 4))
+#define ALC1_ALCL(x)                ((x) & 0x0f)
+#define ALC1_MAXGAIN(x)             (((x) & 0x07) << 4)
 #define ALC1_ALCSEL_DISABLED        (0 << 7)
 #define ALC1_ALCSEL_RIGHT           (1 << 7)
 #define ALC1_ALCSEL_LEFT            (2 << 7)
@@ -144,14 +144,14 @@ void audiohw_set_recsrc(int source, bool recording);
 
 #define ALC3                        0x13
 #define ALC3_ATK(x)                 ((x) & 0x0f)
-#define ALC3_DCY(x)                 ((x) & (0x0f << 4))
+#define ALC3_DCY(x)                 (((x) & 0x0f) << 4)
 
 #define NGAT                        0x14
 #define NGAT_NGAT                   (1 << 0)
 #define NGAT_NGG_CONST              (0 << 1)
 #define NGAT_NGG_MUTEADC            (1 << 1)
-#define NGAT_NGG(x)                 ((x) & (0x3 << 1))
-#define NGAT_NGTH(x)                ((x) & (0x1f << 3))
+#define NGAT_NGG(x)                 (((x) & 0x3) << 1)
+#define NGAT_NGTH(x)                (((x) & 0x1f) << 3)
 #endif
 
 #define ADDITIONAL1                 0x17

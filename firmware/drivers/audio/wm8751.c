@@ -98,6 +98,50 @@ static int tone_tenthdb2hw(int value)
     return value;
 }
 
+#if 0
+static int alc_tenthdb2hw(int value)
+{
+   /* -28.5dB - -6dB step 1.5dB - translate -285 - -60 step 15
+      to 0 - 15 step 1
+    */
+
+    value = 15 - (value + 60)/15;
+}
+
+
+static int alc_hldus2hw(unsigned int value)
+{
+    /* 0000 -        0us
+     * 0001 -     2670us
+     * 0010 -     5330us
+     *
+     * 1111 - 43691000us
+     */
+    return 0;
+}
+
+static int alc_dcyms2hw(int value)
+{
+    /* 0000 - 24ms
+     * 0001 - 48ms
+     * 0010 - 96ms
+     *
+     * 1010 or higher 24580ms
+     */
+    return 0;  
+}
+
+static int alc_atkms2hw(int value)
+{
+    /* 0000 -  6ms
+     * 0001 - 12ms
+     * 0010 - 24ms
+     *
+     * 1010 or higher 6140ms
+     */
+    return 0;
+}
+#endif
 
 #ifdef USE_ADAPTIVE_BASS
 static int adaptivebass2hw(int value)
@@ -110,6 +154,14 @@ static int adaptivebass2hw(int value)
 #endif
 
 #if defined(HAVE_WM8750)
+#if 0
+static int ngath_tenthdb2hw(int value)
+{
+    /* -76.5dB - -30dB in 1.5db steps   -765 - -300 in 15 steps */
+    value = 31 - (value + 300)/15;
+    return value;
+}
+#endif
 static int recvol2hw(int value)
 {
 /* convert tenth of dB of input volume (-172...300) to input register value */
@@ -317,6 +369,72 @@ void audiohw_set_depth_3d(int val)
 #endif
 
 #ifdef HAVE_RECORDING
+#if 0
+void audiohw_set_ngath(int ngath, int type, bool enable)
+{
+    /* This function controls Noise gate function
+     * of the codec. This can only run in conjunction
+     * with ALC
+     */
+
+    if(enable)
+        wmcodec_write(NGAT, NGAT_NGG(type)|NGAT_NGTH(ngath)|NGAT_NGAT);
+    else
+        wmcodec_write(NGAT, NGAT_NGG(type)|NGAT_NGTH(ngath_tenthdb2hw(ngath)));
+}
+
+
+void audiohw_set_alc(int level, unsigned int hold, int decay, int attack, bool enable)
+{
+    /* level in thenth of dB -28.5dB - -6dB in 1.5dB steps
+     * hold time in us 0us - 43691000us
+     * decay time in ms 24ms - 24580ms
+     * attack time in ms 6ms - 6140ms
+     */
+
+    if(enable)
+    {
+        wmcodec_write(ALC1, ALC1_ALCSEL_STEREO|ALC1_MAXGAIN(0x07)|
+                      ALC1_ALCL(alc_tenthdb2hw(level)));
+        wmcodec_write(ALC2, ALC2_ALCZ|ALC2_HLD(alc_hldus2hw(hold)));
+        wmcodec_write(ALC3, ALC3_DCY(alc_dcyms2hw(decay))|
+                      ALC3_ATK(alc_atkms2hw(attack)));
+    }
+    else
+    {
+        wmcodec_write(ALC1, ALC1_ALCSEL_DISABLED|ALC1_MAXGAIN(0x07)|ALC1_ALCL(alc_tenthdb2hw(level)));
+    }
+}
+
+void audiohw_set_alc(int level, unsigned int hold, int decay, int attack, bool enable)
+{
+    /* level in thenth of dB -28.5dB - -6dB in 1.5dB steps
+     * hold time in 15 steps 0ms,2.67ms,5.33ms,...,43691ms
+     * decay time in 10 steps 24ms,48ms,96ms,...,24580ms
+     * attack time in 10 steps 6ms,12ms,24ms,...,6140ms
+     */
+
+    if(enable)
+    {
+        wmcodec_write(ALC1, ALC1_ALCSEL_STEREO|ALC1_MAXGAIN(0x07)|
+                      ALC1_ALCL(alc_tenthdb2hw(level)));
+        wmcodec_write(ALC2, ALC2_ALCZ|ALC2_HLD(hold));
+        wmcodec_write(ALC3, ALC3_DCY(decay)|
+                      ALC3_ATK(attack));
+    }
+    else
+    {
+        wmcodec_write(ALC1, ALC1_ALCSEL_DISABLED|ALC1_MAXGAIN(0x07)|
+                      ALC1_ALCL(alc_tenthdb2hw(level)));
+    }
+}
+
+void audiohw_set_alc_level(int level)
+{
+    wmcodec_write(ALC1, ALC1_ALCSEL_STEREO|ALC1_MAXGAIN(0x07)|
+                  ALC1_ALCL(alc_tenthdb2hw(level)));
+}
+#endif
 void audiohw_set_recsrc(int source, bool recording)
 {
     /* INPUT1 - FM radio
