@@ -218,13 +218,13 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
     dst += len;
     win += len;
     src0+= len;
-        for(i=-len, j=len-1; i<0; i++, j--) {
-        int32_t s0 = src0[i];
-        int32_t s1 = src1[j];
-        int32_t wi = -win[i];
-        int32_t wj = -win[j];
-        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi);
-        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj);
+    for(i=-len, j=len-1; i<0; i++, j--) {
+        int32_t s0 = src0[i]; /* s0 = src0[      0 ... len-1] */
+        int32_t s1 = src1[j]; /* s1 = src1[2*len-1 ... len]   */
+        int32_t wi = -win[i]; /* wi = -win[      0 ... len-1] */
+        int32_t wj = -win[j]; /* wj = -win[2*len-1 ... len]   */
+        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi); /* dst[      0 ... len-1] */
+        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj); /* dst[2*len-1 ... len]   */
     }
 }
 #endif
@@ -232,9 +232,15 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
 static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
                                         int32_t mul, int len)
 {
+    /* len is _always_ a multiple of 4, because len is the difference of sfb's
+     * which themselves are always a multiple of 4. */
     int i;
-    for(i=0; i<len; i++)
-        dst[i] = fixmul24(src[i], mul);
+    for (i=0; i<len; i+=4) {
+        dst[i  ] = fixmul24(src[i  ], mul);
+        dst[i+1] = fixmul24(src[i+1], mul);
+        dst[i+2] = fixmul24(src[i+2], mul);
+        dst[i+3] = fixmul24(src[i+3], mul);
+    }
 }
 
 static inline int av_clip(int a, int amin, int amax)
