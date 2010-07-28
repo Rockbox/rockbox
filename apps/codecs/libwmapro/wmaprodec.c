@@ -156,7 +156,11 @@ static VLC              coef_vlc[2];      ///< coefficient run length vlc codes
 static int32_t g_tmp[WMAPRO_BLOCK_MAX_SIZE] IBSS_ATTR_WMAPRO_LARGE_IRAM;
 static int32_t g_out_ch0[WMAPRO_OUT_BUF_SIZE] IBSS_ATTR;
 static int32_t g_out_ch1[WMAPRO_OUT_BUF_SIZE] IBSS_ATTR_WMAPRO_LARGE_IRAM;
-static int32_t g_out_multichannel[WMAPRO_MAX_CHANNELS-2][WMAPRO_OUT_BUF_SIZE];
+#if MEMORYSIZE > 2
+	/* Enable multichannel for large-memory targets only */
+    static int32_t g_out_multichannel[WMAPRO_MAX_CHANNELS-2][WMAPRO_OUT_BUF_SIZE];
+#   define MC_ENABLED
+#endif
 
 /**
  * @brief frame specific decoder context for a single channel
@@ -301,8 +305,10 @@ int decode_init(asf_waveformatex_t *wfx)
     /* Use globally defined arrays. Allows IRAM usage for up to 2 channels. */
     s->channel[0].out = g_out_ch0;
     s->channel[1].out = g_out_ch1;
+#ifdef MC_ENABLED
     for (i=2; i<WMAPRO_MAX_CHANNELS; ++i)
         s->channel[i].out = g_out_multichannel[i-2];
+#endif
 
 #if defined(CPU_COLDFIRE)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
