@@ -104,9 +104,9 @@
 
 #undef DEBUGF
 #ifdef WMAPRO_DUMP_CTX_EN
-#	define DEBUGF printf
+#   define DEBUGF printf
 #else
-#	define DEBUGF(...)
+#   define DEBUGF(...)
 #endif
 
 /* Some defines to make it compile */
@@ -124,8 +124,14 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
 
-/** current decoder limitations */
+/* Enable multichannel for large-memory targets only */
+#if (MEMORYSIZE > 2)
 #define WMAPRO_MAX_CHANNELS    8                             ///< max number of handled channels
+#else
+#define WMAPRO_MAX_CHANNELS    2                             ///< max number of handled channels
+#endif
+
+/* Current decoder limitations */
 #define MAX_SUBFRAMES  32                                    ///< max number of subframes per channel
 #define MAX_BANDS      29                                    ///< max number of scale factor bands
 #define MAX_FRAMESIZE  32768                                 ///< maximum compressed frame size
@@ -156,10 +162,8 @@ static VLC              coef_vlc[2];      ///< coefficient run length vlc codes
 static int32_t g_tmp[WMAPRO_BLOCK_MAX_SIZE] IBSS_ATTR_WMAPRO_LARGE_IRAM;
 static int32_t g_out_ch0[WMAPRO_OUT_BUF_SIZE] IBSS_ATTR;
 static int32_t g_out_ch1[WMAPRO_OUT_BUF_SIZE] IBSS_ATTR_WMAPRO_LARGE_IRAM;
-#if MEMORYSIZE > 2
-	/* Enable multichannel for large-memory targets only */
+#if (WMAPRO_MAX_CHANNELS > 2)
     static int32_t g_out_multichannel[WMAPRO_MAX_CHANNELS-2][WMAPRO_OUT_BUF_SIZE];
-#   define MC_ENABLED
 #endif
 
 /**
@@ -305,7 +309,7 @@ int decode_init(asf_waveformatex_t *wfx)
     /* Use globally defined arrays. Allows IRAM usage for up to 2 channels. */
     s->channel[0].out = g_out_ch0;
     s->channel[1].out = g_out_ch1;
-#ifdef MC_ENABLED
+#if (WMAPRO_MAX_CHANNELS > 2)
     for (i=2; i<WMAPRO_MAX_CHANNELS; ++i)
         s->channel[i].out = g_out_multichannel[i-2];
 #endif
@@ -763,8 +767,8 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                     }
                 }
             } else if (chgroup->num_channels > 2) {
-            	DEBUGF("in wmaprodec.c: Multichannel streams still not supported\n");
-            	return -1;
+                DEBUGF("in wmaprodec.c: Multichannel streams still not supported\n");
+                return -1;
 #if 0
                 if (get_bits1(&s->gb)) {
                     chgroup->transform = 1;
@@ -1497,7 +1501,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
  *@return number of bytes that were read from the input buffer
  */
 int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size, 
-				  void* pktdata, int size)
+                  void* pktdata, int size)
 {
     WMAProDecodeCtx *s = &globWMAProDecCtx;
     GetBitContext* gb  = &s->pgb;
@@ -1591,7 +1595,7 @@ int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size,
     *data_size = s->samples;
     s->packet_offset = get_bits_count(gb) & 7;
 
-	s->frame_num++;
+    s->frame_num++;
     return (s->packet_loss) ? AVERROR_INVALIDDATA : get_bits_count(gb) >> 3;
 }
 
