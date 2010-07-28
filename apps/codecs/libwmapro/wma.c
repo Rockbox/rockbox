@@ -116,7 +116,7 @@ int ff_wma_run_level_decode(GetBitContext* gb,
             offset += run_table[code];
             sign = !get_bits1(gb);
             ptr[offset & coef_mask] = sign ? -level_table[code] : level_table[code];
-            ptr[offset & coef_mask] <<= 16;
+            ptr[offset & coef_mask] <<= 17;
         } else if (code == 1) {
             /** EOB */
             break;
@@ -144,7 +144,7 @@ int ff_wma_run_level_decode(GetBitContext* gb,
             }
             sign = !get_bits1(gb);
             ptr[offset & coef_mask] = sign ? -level : level;
-            ptr[offset & coef_mask] <<=16;
+            ptr[offset & coef_mask] <<=17;
         }
     }
     /** NOTE: EOB can be omitted */

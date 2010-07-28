@@ -873,7 +873,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
         for (i = 0; i < 4; i++) {
             if (vals[i]) {
                 int sign = get_bits1(&s->gb) - 1;
-                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<16 : vals[i]<<16;
+                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<17 : vals[i]<<17;
                 num_zeros = 0;
             } else {
                 ci->coeffs[cur_coeff] = 0;
