@@ -181,35 +181,26 @@
 #endif /* CPU_COLDFIRE, CPU_ARM */
 
 #if defined(CPU_COLDFIRE)
-static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
-                                   const int32_t *src1, const int32_t *win, 
-                                   int len)
-{
-    int i, j;
-    dst += len;
-    win += len;
-    src0+= len;
-        for(i=-len, j=len-1; i<0; i++, j--) {
-            int32_t s0 = src0[i];
-            int32_t s1 = src1[j];
-            int32_t wi = -win[i];
-            int32_t wj = -win[j];
-            asm volatile (
-                "mac.l    %[s0], %[wj], %%acc0\n\t"
-                "msac.l   %[s1], %[wi], %%acc0\n\t"
-                "mac.l    %[s0], %[wi], %%acc1\n\t"
-                "mac.l    %[s1], %[wj], %%acc1\n\t"
-                "movclr.l %%acc0, %[s0]\n\t"
-                "move.l   %[s0], (%[dst_i])\n\t"
-                "movclr.l %%acc1, %[s0]\n\t"
-                "move.l   %[s0], (%[dst_j])\n\t"
-                : [s0] "+r" (s0) /* this register is clobbered so specify it as an input */
-                : [dst_i] "a" (&dst[i]), [dst_j] "a" (&dst[j]),
-                  [s1] "r" (s1), [wi] "r" (wi), [wj] "r" (wj)
-                : "cc", "memory");
-    }
-}
+    #define VECT_MUL_WIN_KERNEL(i, j, s0, s1, wi, wj) \
+        asm volatile ( \
+            "mac.l    %[s0], %[wj], %%acc0 \n\t" \
+            "msac.l   %[s1], %[wi], %%acc0 \n\t" \
+            "mac.l    %[s0], %[wi], %%acc1 \n\t" \
+            "mac.l    %[s1], %[wj], %%acc1 \n\t" \
+            "movclr.l %%acc0, %[s0]        \n\t" \
+            "move.l   %[s0], (%[dst_i])    \n\t" \
+            "movclr.l %%acc1, %[s0]        \n\t" \
+            "move.l   %[s0], (%[dst_j])    \n\t" \
+            : [s0] "+r" (s0) /* register is clobbered so specify it as an input */ \
+            : [dst_i] "a" (&dst[i]), [dst_j] "a" (&dst[j]), \
+              [s1] "r" (s1), [wi] "r" (wi), [wj] "r" (wj) \
+            : "cc", "memory");
 #else
+    #define VECT_MUL_WIN_KERNEL(i, j, s0, s1, wi, wj) \
+        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi); \
+        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj);
+#endif /* CPU_COLDFIRE */
+
 static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
                                    const int32_t *src1, const int32_t *win, 
                                    int len)
@@ -223,41 +214,38 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
         int32_t s1 = src1[j]; /* s1 = src1[2*len-1 ... len]   */
         int32_t wi = -win[i]; /* wi = -win[      0 ... len-1] */
         int32_t wj = -win[j]; /* wj = -win[2*len-1 ... len]   */
-        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi); /* dst[      0 ... len-1] */
-        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj); /* dst[2*len-1 ... len]   */
+        VECT_MUL_WIN_KERNEL(i, j, s0, s1, wi, wj);
     }
 }
-#endif
 
 #if defined(CPU_ARM)
-static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
-                                        int32_t mul, int len)
-{
-    /* len is _always_ a multiple of 4, because len is the difference of sfb's
-     * which themselves are always a multiple of 4. */
-    int i;
-    for (i=0; i<len; i+=4) {
-        asm volatile (
-            "ldmia %[src]!, {r1-r4}    \n\t"
-            "smull r0, r5, r1, %[mul] \n\t"
-            "mov   r0, r0, lsr #24    \n\t"
-            "orr   r0, r0, r5, lsl #8 \n\t"
-            "smull r1, r5, r2, %[mul] \n\t"
-            "mov   r1, r1, lsr #24    \n\t"
-            "orr   r1, r1, r5, lsl #8 \n\t"
-            "smull r2, r5, r3, %[mul] \n\t"
-            "mov   r2, r2, lsr #24    \n\t"
-            "orr   r2, r2, r5, lsl #8 \n\t"
-            "smull r3, r5, r4, %[mul] \n\t"
-            "mov   r3, r3, lsr #24    \n\t"
-            "orr   r3, r3, r5, lsl #8 \n\t"
-            "stmia %[dst]!, {r0-r3}    \n"
-            : [dst]"+r"(dst), [src]"+r"(src)
-            : [mul]"r"(mul)
+    #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
+        asm volatile ( \
+            "ldmia %[src]!, {r1-r4}   \n\t" \
+            "smull r0, r5, r1, %[mul] \n\t" \
+            "mov   r0, r0, lsr #24    \n\t" \
+            "orr   r0, r0, r5, lsl #8 \n\t" \
+            "smull r1, r5, r2, %[mul] \n\t" \
+            "mov   r1, r1, lsr #24    \n\t" \
+            "orr   r1, r1, r5, lsl #8 \n\t" \
+            "smull r2, r5, r3, %[mul] \n\t" \
+            "mov   r2, r2, lsr #24    \n\t" \
+            "orr   r2, r2, r5, lsl #8 \n\t" \
+            "smull r3, r5, r4, %[mul] \n\t" \
+            "mov   r3, r3, lsr #24    \n\t" \
+            "orr   r3, r3, r5, lsl #8 \n\t" \
+            "stmia %[dst]!, {r0-r3}   \n"   \
+            : [dst]"+r"(dst), [src]"+r"(src) \
+            : [mul]"r"(mul) \
             : "r0", "r1", "r2", "r3", "r4", "r5", "memory");
-    }
-}
 #else
+    #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
+        dst[i  ] = fixmul24(src[i  ], mul); \
+        dst[i+1] = fixmul24(src[i+1], mul); \
+        dst[i+2] = fixmul24(src[i+2], mul); \
+        dst[i+3] = fixmul24(src[i+3], mul);
+#endif /* CPU_ARM */
+
 static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
                                         int32_t mul, int len)
 {
@@ -265,13 +253,9 @@ static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src,
      * which themselves are always a multiple of 4. */
     int i;
     for (i=0; i<len; i+=4) {
-        dst[i  ] = fixmul24(src[i  ], mul);
-        dst[i+1] = fixmul24(src[i+1], mul);
-        dst[i+2] = fixmul24(src[i+2], mul);
-        dst[i+3] = fixmul24(src[i+3], mul);
+        VECT_MUL_SCALAR_KERNEL(dst, src, mul);
     }
 }
-#endif /* CPU_ARM */
 
 static inline int av_clip(int a, int amin, int amax)
 {
