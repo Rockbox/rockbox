@@ -2,6 +2,12 @@
 TARGET = rbthemeeditor
 VERSION = 0.5
 
+CONFIG(debug){
+    REVISION = $$system(svnversion)
+    VERSION=$$join(VERSION,,,r)
+    VERSION=$$join(VERSION,,,$$REVISION)
+}
+
 # Adding network support
 QT += network
 
