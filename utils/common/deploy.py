@@ -289,9 +289,10 @@ def macdeploy(versionstring, buildfolder):
     appbundle = buildfolder + "/" + progexe
 
     # workaround to Qt issues when building out-of-tree. Copy files into bundle.
-    sourcebase = buildfolder + re.sub('rbutilqt.pro$', '', project)
+    sourcebase = buildfolder + re.sub('[^/]+.pro$', '', project) + "/"
+    print sourcebase
     for src in bundlecopy:
-        shutil.copy(sourcebase + src, appbundle + bundlecopy[src])
+        shutil.copy(sourcebase + src, appbundle + "/" + bundlecopy[src])
     # end of Qt workaround
 
     output = subprocess.Popen(["macdeployqt", progexe, "-dmg"], stdout=subprocess.PIPE, cwd=buildfolder)
