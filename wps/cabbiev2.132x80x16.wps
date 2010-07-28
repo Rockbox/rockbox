@@ -37,7 +37,7 @@
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 #
 # Shuffle
-%V(86,69,16,8-)
+%V(86,69,16,8,-)
 %?ps<%xd(D)>
 #
 # Repeat
