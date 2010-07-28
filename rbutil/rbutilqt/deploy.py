@@ -63,57 +63,23 @@ except ImportError:
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
 # and executable filename.
-program = "RockboxUtility"
-project = "rbutil/rbutilqt/rbutilqt.pro"
+program = ""
+project = ""
 environment = os.environ
+progexe = ""
 make = "make"
-if sys.platform == "win32":
-    progexe = "Release/" + program + ".exe"
-    make = "mingw32-make"
-elif sys.platform == "darwin":
-    progexe = program + ".app"
-    # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
-    # compatible with 10.4 requires using gcc-4.0.
-    if not "QMAKESPEC" in environment:
-        environment["QMAKESPEC"] = "macx-g++40"
-else:
-    progexe = program
+programfiles = []
 
-# all files of the program. Will get put into an archive after building
-# (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
-programfiles = [ progexe ]
-
-svnserver = "svn://svn.rockbox.org/rockbox/"
+svnserver = ""
 # Paths and files to retrieve from svn when creating a tarball.
 # This is a mixed list, holding both paths and filenames.
-svnpaths = [ "rbutil/",
-             "tools/ucl",
-             "tools/rbspeex",
-             "apps/codecs/libspeex",
-             "docs/COPYING",
-             "docs/CREDITS",
-             "tools/iriver.c",
-             "tools/Makefile",
-             "tools/mkboot.h",
-             "tools/voicefont.c",
-             "tools/VOICE_PAUSE.wav",
-             "tools/wavtrim.h",
-             "tools/iriver.h",
-             "tools/mkboot.c",
-             "tools/telechips.c",
-             "tools/telechips.h",
-             "tools/voicefont.h",
-             "tools/wavtrim.c",
-             "tools/sapi_voice.vbs" ]
+svnpaths = [ ]
 # set this to true to run upx on the resulting binary, false to skip this step.
 # only used on w32.
 useupx = False
 
 # OS X: files to copy into the bundle. Workaround for out-of-tree builds.
-bundlecopy = {
-        "icons/rbutilqt.icns" : "Contents/Resources/",
-        "Info.plist"          : "Contents/"
-}
+bundlecopy = { }
 
 # == Functions ==
 def usage(myself):
@@ -374,8 +340,9 @@ def tempclean(workfolder, nopro):
         print "Temporary files kept at %s" % workfolder
 
 
-def main():
+def deploy():
     startup = time.time()
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:sbdkh",
             ["qmake=", "project=", "tag=", "add=", "source-only", "binary-only", "dynamic", "keep-temp", "help"])
@@ -526,5 +493,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    deploy()
 
