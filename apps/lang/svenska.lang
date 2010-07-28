@@ -12440,3 +12440,111 @@
     radio: "Radioskal"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Kompositör"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Tvinga"
+  </dest>
+  <voice>
+    *: "Tvinga"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "Öppna PictureFlow"
+  </dest>
+  <voice>
+    *: "Öppna picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+# TODO: Should this be sorter?
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Ta bort"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Ta bort"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Avbryt"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Avbryt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Uppdatera bokmärke vid stopp"
+  </dest>
+  <voice>
+    *: "Uppdatera bokmärke vid stopp"
+  </voice>
+</phrase>
