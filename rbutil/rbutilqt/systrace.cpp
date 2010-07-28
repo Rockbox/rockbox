@@ -115,7 +115,7 @@ void SysTrace::flush(void)
 {
     if(repeat > 1) {
         debugbuffer.append(
-                QString("    (Last message repeasted %1 times.)\n").arg(repeat));
+                QString("    (Last message repeated %1 times.)\n").arg(repeat));
 #if !defined(NODEBUG)
         fprintf(stderr, "    (Last message repeated %i times.)\n", repeat);
 #endif
