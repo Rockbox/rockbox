@@ -25,12 +25,6 @@
 
 CODEC_HEADER
 
-/* The output buffer containing the decoded samples (channels 0 and 1)
-   BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2.
- */
-
-static uint32_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS] IBSS_ATTR;
-
 /* NOTE: WMADecodeContext is 120152 bytes (on x86) */
 static WMADecodeContext wmadec;
 
@@ -100,7 +94,7 @@ restart_track:
     resume_offset = 0;
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
-                  STEREO_MONO : STEREO_INTERLEAVED);
+                  STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
 
     /* The main decoding loop */
@@ -157,7 +151,6 @@ new_packet:
             for (i=0; i < wmadec.nb_frames; i++)
             {
                 wmares = wma_decode_superframe_frame(&wmadec,
-                                                     decoded,
                                                      audiobuf, audiobufsize);
 
                 ci->yield ();
@@ -173,7 +166,7 @@ new_packet:
                         goto new_packet;
                     }
                 } else if (wmares > 0) {
-                    ci->pcmbuf_insert(decoded, NULL, wmares);
+                    ci->pcmbuf_insert((*wmadec.frame_out)[0], (*wmadec.frame_out)[1], wmares);
                     elapsedtime += (wmares*10)/(wfx.rate/100);
                     ci->set_elapsed(elapsedtime);
                 }

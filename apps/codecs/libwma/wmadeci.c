@@ -768,7 +768,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
 
 /* return 0 if OK. return 1 if last block of frame. return -1 if
    unrecorrable error. */
-static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
+static int wma_decode_block(WMADecodeContext *s)
 {
     int n, v, a, ch, code, bsize;
     int coef_nb_bits, total_gain;
@@ -1236,20 +1236,22 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
     }
 
     for(ch = 0; ch < s->nb_channels; ++ch)
-    {
+    { 
+        /* BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2. */
+    	static uint32_t scratch_buf[BLOCK_MAX_SIZE * MAX_CHANNELS] IBSS_ATTR;
         if (s->channel_coded[ch])
         {
             int n4, index;
 
             n4 = s->block_len >>1;
 
-            ff_imdct_calc( (s->frame_len_bits - bsize + 1),
-                          (int32_t*)scratch_buffer,
+            ff_imdct_calc((s->frame_len_bits - bsize + 1),
+                          scratch_buf,
                           (*(s->coefs))[ch]);
 
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
-            wma_window(s, scratch_buffer, &((*s->frame_out)[ch][index]));
+            wma_window(s, scratch_buf, &((*s->frame_out)[ch][index]));
 
 
 
@@ -1257,7 +1259,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                channel if it is not coded */
             if (s->ms_stereo && !s->channel_coded[1])
             {
-                wma_window(s, scratch_buffer, &((*s->frame_out)[1][index]));
+                wma_window(s, scratch_buf, &((*s->frame_out)[1][index]));
             }
         }
     }
@@ -1276,11 +1278,9 @@ next:
 }
 
 /* decode a frame of frame_len samples */
-static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
+static int wma_decode_frame(WMADecodeContext *s)
 {
-    int ret, i, n, ch, incr;
-    int32_t *ptr;
-    fixed32 *iptr;
+    int ret;
 
     /* read each block */
     s->block_num = 0;
@@ -1289,7 +1289,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
 
     for(;;)
     {
-        ret = wma_decode_block(s, samples);
+        ret = wma_decode_block(s);
         if (ret < 0)
         {
 
@@ -1301,25 +1301,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
             break;
         }
     }
-
-    /* return frame with full 30-bit precision */
-    n = s->frame_len;
-    incr = s->nb_channels;
-    for(ch = 0; ch < s->nb_channels; ++ch)
-    {
-        ptr = samples + ch;
-        iptr = &((*s->frame_out)[ch][0]);
-
-        for (i=0;i<n;++i)
-        {
-            *ptr = (*iptr++);
-            ptr += incr;
-        }
-
-        memmove(&((*s->frame_out)[ch][0]), &((*s->frame_out)[ch][s->frame_len]),
-            s->frame_len * sizeof(fixed32));
-    }
-
+    
     return 0;
 }
 
@@ -1364,13 +1346,18 @@ int wma_decode_superframe_init(WMADecodeContext* s,
 */
 
 int wma_decode_superframe_frame(WMADecodeContext* s,
-                                int32_t* samples, /*output*/
                                 const uint8_t *buf,  /*input*/
                                 int buf_size)
 {
-    int pos, len;
+    int pos, len, ch;
     uint8_t *q;
     int done = 0;
+    
+    for(ch = 0; ch < s->nb_channels; ch++)
+		memmove(&((*s->frame_out)[ch][0]), 
+		        &((*s->frame_out)[ch][s->frame_len]),
+				s->frame_len * sizeof(fixed32));
+    
     if ((s->use_bit_reservoir) && (s->current_frame == 0))
     {
         if (s->last_superframe_len > 0)
@@ -1402,7 +1389,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
 
             /* this frame is stored in the last superframe and in the
                current one */
-            if (wma_decode_frame(s, samples) < 0)
+            if (wma_decode_frame(s) < 0)
             {
                 goto fail;
             }
@@ -1422,7 +1409,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
     /* If we haven't decoded a frame yet, do it now */
     if (!done)
         {
-            if (wma_decode_frame(s, samples) < 0)
+            if (wma_decode_frame(s) < 0)
             {
                 goto fail;
             }
