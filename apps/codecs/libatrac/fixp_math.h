@@ -60,25 +60,20 @@
         lo; \
      })
 #elif defined(CPU_COLDFIRE)
+    /* Calculates: result = (X*Y)>>16 */
     #define fixmul16(X,Y) \
     ({ \
-        int32_t t1, t2; \
+        int32_t t, x = (X); \
         asm volatile ( \
-            "mac.l   %[x],%[y],%%acc0\n\t" /* multiply */ \
-            "mulu.l  %[y],%[x]   \n\t"     /* get lower half, avoid emac stall */ \
-            "movclr.l %%acc0,%[t1]   \n\t" /* get higher half */ \
-            "moveq.l #15,%[t2]   \n\t" \
-            "asl.l   %[t2],%[t1] \n\t"     /* hi <<= 15, plus one free */ \
-            "moveq.l #16,%[t2]   \n\t" \
-            "lsr.l   %[t2],%[x]  \n\t"     /* (unsigned)lo >>= 16 */ \
-            "or.l    %[x],%[t1]  \n\t"     /* combine result */ \
-            : /* outputs */ \
-            [t1]"=&d"(t1), \
-            [t2]"=&d"(t2) \
-            : /* inputs */ \
-            [x] "d" ((X)), \
-            [y] "d" ((Y))); \
-        t1; \
+            "mac.l    %[x],%[y],%%acc0\n\t" /* multiply */ \
+            "mulu.l   %[y],%[x]       \n\t" /* get lower half, avoid emac stall */ \
+            "movclr.l %%acc0,%[t]     \n\t" /* get higher half */ \
+            "lsr.l    #1,%[t]         \n\t" /* hi >>= 1 to compensate emac shift */ \
+            "move.w   %[t],%[x]       \n\t" /* combine halfwords */\
+            "swap     %[x]            \n\t" \
+            : [t]"=&d"(t), [x] "+d" (x) \
+            : [y] "d" ((Y))); \
+        x; \
     })
 
     #define fixmul31(X,Y) \
