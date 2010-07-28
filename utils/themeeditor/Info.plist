@@ -3,7 +3,7 @@
 <plist version="0.9">
     <dict>
         <key>CFBundleExecutable</key>
-        <string>themeeditor</string>
+        <string>rbthemeeditor</string>
         <key>CFBundleName</key>
         <string>Theme Editor</string>
         <key>CFBundleShortVersionString</key>
