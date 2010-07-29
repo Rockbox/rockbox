@@ -90,77 +90,17 @@ uclcopy:
         str     r1, [r0]
 
 
-/* TODO : M200V4 ? */
-#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2)
-#define USB_PIN 6
-#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
-#define USB_PIN 3
-#endif
-
-#ifdef USB_PIN  /* TODO : remove this check when we'll have an USB driver */
+#ifdef SANSA_CLIPV2 /* TODO : remove this check when we'll have an USB driver */
         ldr     r0, =GPIOA
         mov     r1, #0
         str     r1, [r0, #0x400]
-        ldr     r1, [r0, #(4*(1<<USB_PIN))]
+        ldr     r1, [r0, #(4*(1<<6))]
         cmp     r1, #0
         bne     boot_of
 #endif
-#if defined(SANSA_C200V2)
-        /* Instead of checking the GPIO, check the audio master IRQ_ENRD0
-         * USB_STATUS bit on C200V2 */
-
-        ldr     r0, =CGU_PERI
-        ldr     r1, [r0]
-        /* enable i2c audio master clock */
-        orr     r1, r1, #(1<<17)
-        /* make sure 24MHz clk_main is selected */
-        bic     r1, r1, #0x7f
-        str     r1, [r0]
-
-        ldr     r0, =I2C_BASE
-        /* disable i2c interrupts */
-        mov     r1, #0
-        str     r1, [r0, #I2C_IMR]
-        /* setup prescaler */
-        mov     r1, #I2C_PRESCALER_LOW
-        str     r1, [r0, #I2C_CPSR0]
-        mov     r1, #I2C_PRESCALER_HIGH
-        str     r1, [r0, #I2C_CPSR1]
-        /* setup i2c slave address */
-        mov     r1, #(AS3514_I2C_ADDR << 1)
-        str     r1, [r0, #I2C_SLAD0]
-        mov     r2, #0x51
-        str     r2, [r0, #I2C_CNTRL]
-
-        /* wait for not busy */
-1:
-        ldr     r1, [r0, #I2C_SR]
-        tst     r1, #1
-        bne 1b
-
-        /* start read of irq_enrd0 */
-        mov     r1, #AS3514_IRQ_ENRD0
-        str     r1, [r0, #I2C_SADDR]
-        orr     r2, r2, #(1 << 1)
-        str     r2, [r0, #I2C_CNTRL]
-        mov     r1, #1
-        str     r1, [r0, #I2C_DACNT]
-
-        /* wait for transfer to finish */
-1:
-        ldr     r1, [r0, #I2C_DACNT]
-        cmp     r1, #0
-        bne     1b
-
-        /* load result and test USB_STATUS bit */
-        ldr     r1, [r0, #I2C_DATA]
-        tst     r1, #(1 << 3)
-        bne     boot_of
-#endif
-
-        /* Here are model specific tests, for dual boot without a computer */
-        /* All models use left button */
-        /* /!\ Right button for c200v2 (left button is unkwown) */
+        /* Here are model specific tests for dual boot */
+        /* All models but c200v2 use left button */
+        /* TODO: Left button for c200v2 too (needs DBOP code) */
 
 #ifdef SANSA_CLIP
 .set row, (1<<5) /* enable output on C5 */
