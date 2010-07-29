@@ -140,7 +140,8 @@ void ProjectExporter::checkRes(ProjectModel *project)
         {
             checkWPS(project, i.value());
         }
-        else if(i.value().contains("/.rockbox"))
+        else if(i.value().contains("/.rockbox")
+                && i.key() != "configfile" && i.key() != "themebase")
         {
             QString absPath = i.value().replace("/.rockbox",
                                                 settings.value("themebase"));
