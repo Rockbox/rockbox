@@ -26,6 +26,8 @@
 #include "checkwps.h"
 #include "resize.h"
 #include "wps.h"
+#include "skin_buffer.h"
+#include "skin_debug.h"
 #include "skin_engine.h"
 #include "wps_internals.h"
 #include "settings.h"
@@ -237,6 +239,8 @@ int main(int argc, char **argv)
     struct wps_data wps;
     enum screen_type screen = SCREEN_MAIN;
     struct screen* wps_screen;
+    
+    char* buffer = NULL;
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
@@ -261,13 +265,19 @@ int main(int argc, char **argv)
             wps_verbose_level++;
         }
     }
+    buffer = malloc(SKIN_BUFFER_SIZE);
+    if (!buffer)
+    {
+        printf("mallloc fail!\n");
+        return 1;
+    }
 
-    skin_buffer_init();
+    skin_buffer_init(buffer, SKIN_BUFFER_SIZE);
 #ifdef HAVE_LCD_BITMAP
     skin_font_init();
 #endif
 
-    /* Go through every wps that was thrown at us, error out at the first
+    /* Go through every skin that was thrown at us, error out at the first
      * flawed wps */
     while (argv[filearg]) {
         printf("Checking %s...\n", argv[filearg]);
@@ -285,6 +295,7 @@ int main(int argc, char **argv)
 
         if (!res) {
             printf("WPS parsing failure\n");
+            skin_error_format_message();
             return 3;
         }
 

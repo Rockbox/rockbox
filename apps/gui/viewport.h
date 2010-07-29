@@ -74,25 +74,4 @@ bool viewport_point_within_vp(const struct viewport *vp,
 
 #endif /* __PCTOOL__ */
 
-#ifdef HAVE_LCD_BITMAP
-
-/*
- * Parse a viewport definition (vp_def), which looks like:
- *
- * Screens with depth > 1:
- *   X|Y|width|height|font|foregorund color|background color
- * Screens with depth = 1:
- *   X|Y|width|height|font
- *
- * | is a separator and can be specified via the parameter
- *
- * Returns the pointer to the char after the last character parsed
- * if everything went OK or NULL if an error happened (some values
- * not specified in the definition)
- */
-const char* viewport_parse_viewport(struct viewport *vp,
-                                    enum screen_type screen,
-                                    const char *vp_def,
-                                    const char separator);
-#endif /* HAVE_LCD_BITMAP */
 #endif /* __VIEWPORT_H__ */

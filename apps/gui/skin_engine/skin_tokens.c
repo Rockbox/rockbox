@@ -167,19 +167,19 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
         unsigned long elapsed = id3->elapsed + state->ff_rewind_count;
         switch (token->type)
         {
-            case WPS_TOKEN_METADATA_ARTIST:
+            case SKIN_TOKEN_METADATA_ARTIST:
                 return id3->artist;
-            case WPS_TOKEN_METADATA_COMPOSER:
+            case SKIN_TOKEN_METADATA_COMPOSER:
                 return id3->composer;
-            case WPS_TOKEN_METADATA_ALBUM:
+            case SKIN_TOKEN_METADATA_ALBUM:
                 return id3->album;
-            case WPS_TOKEN_METADATA_ALBUM_ARTIST:
+            case SKIN_TOKEN_METADATA_ALBUM_ARTIST:
                 return id3->albumartist;
-            case WPS_TOKEN_METADATA_GROUPING:
+            case SKIN_TOKEN_METADATA_GROUPING:
                 return id3->grouping;
-            case WPS_TOKEN_METADATA_GENRE:
+            case SKIN_TOKEN_METADATA_GENRE:
                 return id3->genre_string;
-            case WPS_TOKEN_METADATA_DISC_NUMBER:
+            case SKIN_TOKEN_METADATA_DISC_NUMBER:
                 if (id3->disc_string)
                     return id3->disc_string;
                 if (id3->discnum) {
@@ -187,7 +187,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return buf;
                 }
                 return NULL;
-            case WPS_TOKEN_METADATA_TRACK_NUMBER:
+            case SKIN_TOKEN_METADATA_TRACK_NUMBER:
                 if (id3->track_string)
                     return id3->track_string;
                 if (id3->tracknum) {
@@ -195,9 +195,9 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return buf;
                 }
                 return NULL;
-            case WPS_TOKEN_METADATA_TRACK_TITLE:
+            case SKIN_TOKEN_METADATA_TRACK_TITLE:
                 return id3->title;
-            case WPS_TOKEN_METADATA_VERSION:
+            case SKIN_TOKEN_METADATA_VERSION:
                 switch (id3->id3version)
                 {
                     case ID3_VER_1_0:
@@ -214,7 +214,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                         break;
                 }
                 return NULL;
-            case WPS_TOKEN_METADATA_YEAR:
+            case SKIN_TOKEN_METADATA_YEAR:
                 if( id3->year_string )
                     return id3->year_string;
                 if (id3->year) {
@@ -222,29 +222,29 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return buf;
                 }
                 return NULL;
-            case WPS_TOKEN_METADATA_COMMENT:
+            case SKIN_TOKEN_METADATA_COMMENT:
                 return id3->comment;
-            case WPS_TOKEN_FILE_PATH:
+            case SKIN_TOKEN_FILE_PATH:
                 return id3->path;
-            case WPS_TOKEN_FILE_BITRATE:
+            case SKIN_TOKEN_FILE_BITRATE:
                 if(id3->bitrate)
                     snprintf(buf, buf_size, "%d", id3->bitrate);
                 else
                     return "?";
                 return buf;
-            case WPS_TOKEN_TRACK_TIME_ELAPSED:
+            case SKIN_TOKEN_TRACK_TIME_ELAPSED:
                 format_time(buf, buf_size, elapsed);
                 return buf;
 
-            case WPS_TOKEN_TRACK_TIME_REMAINING:
+            case SKIN_TOKEN_TRACK_TIME_REMAINING:
                 format_time(buf, buf_size, length - elapsed);
                 return buf;
 
-            case WPS_TOKEN_TRACK_LENGTH:
+            case SKIN_TOKEN_TRACK_LENGTH:
                 format_time(buf, buf_size, length);
                 return buf;
 
-            case WPS_TOKEN_TRACK_ELAPSED_PERCENT:
+            case SKIN_TOKEN_TRACK_ELAPSED_PERCENT:
                 if (length <= 0)
                     return NULL;
 
@@ -255,14 +255,14 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
                 return buf;
 
-            case WPS_TOKEN_TRACK_STARTING:
+            case SKIN_TOKEN_TRACK_STARTING:
                 {
                     unsigned long time = token->value.i * 1000;
                     if (elapsed < time)
                         return "starting";
                 }
                 return NULL;
-            case WPS_TOKEN_TRACK_ENDING:
+            case SKIN_TOKEN_TRACK_ENDING:
                 {
                     unsigned long time = token->value.i * 1000;
                     if (length - elapsed < time)
@@ -270,7 +270,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 }
                 return NULL;
 
-            case WPS_TOKEN_FILE_CODEC:
+            case SKIN_TOKEN_FILE_CODEC:
                 if (intval)
                 {
                     if(id3->codectype == AFMT_UNKNOWN)
@@ -280,10 +280,10 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 }
                 return get_codectype(id3);
 
-            case WPS_TOKEN_FILE_FREQUENCY:
+            case SKIN_TOKEN_FILE_FREQUENCY:
                 snprintf(buf, buf_size, "%ld", id3->frequency);
                 return buf;
-            case WPS_TOKEN_FILE_FREQUENCY_KHZ:
+            case SKIN_TOKEN_FILE_FREQUENCY_KHZ:
                 /* ignore remainders < 100, so 22050 Hz becomes just 22k */
                 if ((id3->frequency % 1000) < 100)
                     snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
@@ -292,7 +292,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                             id3->frequency / 1000,
                             (id3->frequency % 1000) / 100);
                 return buf;
-            case WPS_TOKEN_FILE_NAME:
+            case SKIN_TOKEN_FILE_NAME:
                 if (get_dir(buf, buf_size, id3->path, 0)) {
                     /* Remove extension */
                     char* sep = strrchr(buf, '.');
@@ -302,28 +302,28 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return buf;
                 }
                 return NULL;
-            case WPS_TOKEN_FILE_NAME_WITH_EXTENSION:
+            case SKIN_TOKEN_FILE_NAME_WITH_EXTENSION:
                 return get_dir(buf, buf_size, id3->path, 0);
-            case WPS_TOKEN_FILE_SIZE:
+            case SKIN_TOKEN_FILE_SIZE:
                 snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
                 return buf;
-            case WPS_TOKEN_FILE_VBR:
+            case SKIN_TOKEN_FILE_VBR:
                 return (id3->vbr) ? "(avg)" : NULL;
-            case WPS_TOKEN_FILE_DIRECTORY:
+            case SKIN_TOKEN_FILE_DIRECTORY:
                 return get_dir(buf, buf_size, id3->path, token->value.i);
 
 #ifdef HAVE_TAGCACHE
-        case WPS_TOKEN_DATABASE_PLAYCOUNT:
+        case SKIN_TOKEN_DATABASE_PLAYCOUNT:
             if (intval)
                 *intval = id3->playcount + 1;
             snprintf(buf, buf_size, "%ld", id3->playcount);
             return buf;
-        case WPS_TOKEN_DATABASE_RATING:
+        case SKIN_TOKEN_DATABASE_RATING:
             if (intval)
                 *intval = id3->rating + 1;
             snprintf(buf, buf_size, "%d", id3->rating);
             return buf;
-        case WPS_TOKEN_DATABASE_AUTOSCORE:
+        case SKIN_TOKEN_DATABASE_AUTOSCORE:
             if (intval)
                 *intval = id3->score + 1;
             snprintf(buf, buf_size, "%d", id3->score);
@@ -340,13 +340,13 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
         {
             /* Most tokens expect NULL on error so leave that for the default case,
              * The ones that expect "0" need to be handled */
-            case WPS_TOKEN_FILE_FREQUENCY:
-            case WPS_TOKEN_FILE_FREQUENCY_KHZ:
-            case WPS_TOKEN_FILE_SIZE:
+            case SKIN_TOKEN_FILE_FREQUENCY:
+            case SKIN_TOKEN_FILE_FREQUENCY_KHZ:
+            case SKIN_TOKEN_FILE_SIZE:
 #ifdef HAVE_TAGCACHE
-            case WPS_TOKEN_DATABASE_PLAYCOUNT:
-            case WPS_TOKEN_DATABASE_RATING:
-            case WPS_TOKEN_DATABASE_AUTOSCORE:
+            case SKIN_TOKEN_DATABASE_PLAYCOUNT:
+            case SKIN_TOKEN_DATABASE_RATING:
+            case SKIN_TOKEN_DATABASE_AUTOSCORE:
 #endif
                 if (intval)
                     *intval = 0;
@@ -397,30 +397,30 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
     switch (token->type)
     {
         /* Radio/tuner tokens */
-        case WPS_TOKEN_TUNER_TUNED:
+        case SKIN_TOKEN_TUNER_TUNED:
             if (tuner_get(RADIO_TUNED))
                 return "t";
             return NULL;
-        case WPS_TOKEN_TUNER_SCANMODE:
+        case SKIN_TOKEN_TUNER_SCANMODE:
             if (radio_scan_mode())
                 return "s";
             return NULL;
-        case WPS_TOKEN_TUNER_STEREO:
+        case SKIN_TOKEN_TUNER_STEREO:
             if (radio_is_stereo())
                 return "s";
             return NULL;
-        case WPS_TOKEN_TUNER_MINFREQ: /* changes based on "region" */
+        case SKIN_TOKEN_TUNER_MINFREQ: /* changes based on "region" */
             return format_freq_MHz(region_data->freq_min,
                             region_data->freq_step, buf, buf_size);
-        case WPS_TOKEN_TUNER_MAXFREQ: /* changes based on "region" */
+        case SKIN_TOKEN_TUNER_MAXFREQ: /* changes based on "region" */
             return format_freq_MHz(region_data->freq_max,
                             region_data->freq_step, buf, buf_size);
-        case WPS_TOKEN_TUNER_CURFREQ:
+        case SKIN_TOKEN_TUNER_CURFREQ:
             return format_freq_MHz(radio_current_frequency(),
                             region_data->freq_step, buf, buf_size);
-        case WPS_TOKEN_PRESET_NAME:
-        case WPS_TOKEN_PRESET_FREQ:
-        case WPS_TOKEN_PRESET_ID:
+        case SKIN_TOKEN_PRESET_NAME:
+        case SKIN_TOKEN_PRESET_FREQ:
+        case SKIN_TOKEN_PRESET_ID:
         {
             int preset_count = radio_preset_count();
             int cur_preset = radio_current_preset();
@@ -431,30 +431,32 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             preset %= preset_count;
             if (preset < 0)
                 preset += preset_count;
-            if (token->type == WPS_TOKEN_PRESET_NAME)
+            if (token->type == SKIN_TOKEN_PRESET_NAME)
                 snprintf(buf, buf_size, "%s", radio_get_preset(preset)->name);
-            else if (token->type == WPS_TOKEN_PRESET_FREQ)
+            else if (token->type == SKIN_TOKEN_PRESET_FREQ)
                 format_freq_MHz(radio_get_preset(preset)->frequency,
                                 region_data->freq_step, buf, buf_size);
             else
                 snprintf(buf, buf_size, "%d", preset + 1);
             return buf;
         }
-        case WPS_TOKEN_PRESET_COUNT:
+        case SKIN_TOKEN_PRESET_COUNT:
             snprintf(buf, buf_size, "%d", radio_preset_count());        
             if (intval)
                 *intval = radio_preset_count();
             return buf;
-        case WPS_TOKEN_HAVE_RDS:
+        case SKIN_TOKEN_HAVE_RDS:
 #ifdef HAVE_RDS_CAP
             return "rds";
-        case WPS_TOKEN_RDS_NAME:
+        case SKIN_TOKEN_RDS_NAME:
             return tuner_get_rds_info(RADIO_RDS_NAME);
-        case WPS_TOKEN_RDS_TEXT:
+        case SKIN_TOKEN_RDS_TEXT:
             return tuner_get_rds_info(RADIO_RDS_TEXT);
 #else
-            return NULL; /* end of the WPS_TOKEN_HAVE_RDS case */
+            return NULL; /* end of the SKIN_TOKEN_HAVE_RDS case */
 #endif /* HAVE_RDS_CAP */
+        default:
+            return NULL;
     }
     return NULL;
 }
@@ -497,8 +499,8 @@ const char *get_token_value(struct gui_wps *gwps,
 
     /* if the token is an RTC one, update the time
        and do the necessary checks */
-    if (token->type >= WPS_TOKENS_RTC_BEGIN
-        && token->type <= WPS_TOKENS_RTC_END)
+    if (token->type >= SKIN_TOKENS_RTC_BEGIN
+        && token->type <= SKIN_TOKENS_RTC_END)
     {
         tm = get_time();
 
@@ -531,44 +533,44 @@ const char *get_token_value(struct gui_wps *gwps,
 
     switch (token->type)
     {
-        case WPS_TOKEN_CHARACTER:
+        case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 return NULL;
             return &(token->value.c);
 
-        case WPS_TOKEN_STRING:
+        case SKIN_TOKEN_STRING:
             return (char*)token->value.data;
             
-        case WPS_TOKEN_TRANSLATEDSTRING:
+        case SKIN_TOKEN_TRANSLATEDSTRING:
             return (char*)P2STR(ID2P(token->value.i));
 
-        case WPS_TOKEN_PLAYLIST_ENTRIES:
+        case SKIN_TOKEN_PLAYLIST_ENTRIES:
             snprintf(buf, buf_size, "%d", playlist_amount());
             return buf;
         
-        case WPS_TOKEN_LIST_TITLE_TEXT:
+        case SKIN_TOKEN_LIST_TITLE_TEXT:
             return (char*)token->value.data;
-        case WPS_TOKEN_LIST_TITLE_ICON:
+        case SKIN_TOKEN_LIST_TITLE_ICON:
             if (intval)
                 *intval = token->value.i;
             snprintf(buf, buf_size, "%d", token->value.i);
             return buf;
 
-        case WPS_TOKEN_PLAYLIST_NAME:
+        case SKIN_TOKEN_PLAYLIST_NAME:
             return playlist_name(NULL, buf, buf_size);
 
-        case WPS_TOKEN_PLAYLIST_POSITION:
+        case SKIN_TOKEN_PLAYLIST_POSITION:
             snprintf(buf, buf_size, "%d", playlist_get_display_index());
             return buf;
 
-        case WPS_TOKEN_PLAYLIST_SHUFFLE:
+        case SKIN_TOKEN_PLAYLIST_SHUFFLE:
             if ( global_settings.playlist_shuffle )
                 return "s";
             else
                 return NULL;
             break;
 
-        case WPS_TOKEN_VOLUME:
+        case SKIN_TOKEN_VOLUME:
             snprintf(buf, buf_size, "%d", global_settings.volume);
             if (intval)
             {
@@ -593,7 +595,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             return buf;
 #ifdef HAVE_ALBUMART
-        case WPS_TOKEN_ALBUMART_FOUND:
+        case SKIN_TOKEN_ALBUMART_FOUND:
             if (data->albumart)
             {
                 int handle = -1;
@@ -609,16 +611,9 @@ const char *get_token_value(struct gui_wps *gwps,
                     return "C";
             }
             return NULL;
-            
-        case WPS_TOKEN_ALBUMART_DISPLAY:
-            if (!data->albumart)
-                return NULL;
-            if (!data->albumart->draw)
-                data->albumart->draw = true;
-            return NULL;
 #endif
 
-        case WPS_TOKEN_BATTERY_PERCENT:
+        case SKIN_TOKEN_BATTERY_PERCENT:
         {
             int l = battery_level();
 
@@ -641,14 +636,14 @@ const char *get_token_value(struct gui_wps *gwps,
             }
         }
 
-        case WPS_TOKEN_BATTERY_VOLTS:
+        case SKIN_TOKEN_BATTERY_VOLTS:
         {
             unsigned int v = battery_voltage();
             snprintf(buf, buf_size, "%d.%02d", v / 1000, (v % 1000) / 10);
             return buf;
         }
 
-        case WPS_TOKEN_BATTERY_TIME:
+        case SKIN_TOKEN_BATTERY_TIME:
         {
             int t = battery_time();
             if (t >= 0)
@@ -659,7 +654,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 
 #if CONFIG_CHARGING
-        case WPS_TOKEN_BATTERY_CHARGER_CONNECTED:
+        case SKIN_TOKEN_BATTERY_CHARGER_CONNECTED:
         {
             if(charger_input_state==CHARGER)
                 return "p";
@@ -668,7 +663,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-        case WPS_TOKEN_BATTERY_CHARGING:
+        case SKIN_TOKEN_BATTERY_CHARGING:
         {
             if (charge_state == CHARGING || charge_state == TOPOFF) {
                 return "c";
@@ -678,12 +673,12 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 #ifdef HAVE_USB_POWER
-        case WPS_TOKEN_USB_POWERED:
+        case SKIN_TOKEN_USB_POWERED:
             if (usb_powered())
                 return "u";
             return NULL;
 #endif
-        case WPS_TOKEN_BATTERY_SLEEPTIME:
+        case SKIN_TOKEN_BATTERY_SLEEPTIME:
         {
             if (get_sleep_timer() == 0)
                 return NULL;
@@ -694,7 +689,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
         }
 
-        case WPS_TOKEN_PLAYBACK_STATUS:
+        case SKIN_TOKEN_PLAYBACK_STATUS:
         {
             int status = current_playmode();
             /* music */
@@ -734,13 +729,13 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
         }
 
-        case WPS_TOKEN_REPEAT_MODE:
+        case SKIN_TOKEN_REPEAT_MODE:
             if (intval)
                 *intval = global_settings.repeat_mode + 1;
             snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
             return buf;
 
-        case WPS_TOKEN_RTC_PRESENT:
+        case SKIN_TOKEN_RTC_PRESENT:
 #if CONFIG_RTC
                 return "c";
 #else
@@ -748,41 +743,41 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
 #if CONFIG_RTC
-        case WPS_TOKEN_RTC_12HOUR_CFG:
+        case SKIN_TOKEN_RTC_12HOUR_CFG:
             if (intval)
                 *intval = global_settings.timeformat + 1;
             snprintf(buf, buf_size, "%d", global_settings.timeformat);
             return buf;
 
-        case WPS_TOKEN_RTC_DAY_OF_MONTH:
+        case SKIN_TOKEN_RTC_DAY_OF_MONTH:
             /* d: day of month (01..31) */
             snprintf(buf, buf_size, "%02d", tm->tm_mday);
             if (intval)
                 *intval = tm->tm_mday - 1;
             return buf;
 
-        case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
+        case SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
             /* e: day of month, blank padded ( 1..31) */
             snprintf(buf, buf_size, "%2d", tm->tm_mday);
             if (intval)
                 *intval = tm->tm_mday - 1;
             return buf;
 
-        case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+        case SKIN_TOKEN_RTC_HOUR_24_ZERO_PADDED:
             /* H: hour (00..23) */
             snprintf(buf, buf_size, "%02d", tm->tm_hour);
             if (intval)
                 *intval = tm->tm_hour;
             return buf;
 
-        case WPS_TOKEN_RTC_HOUR_24:
+        case SKIN_TOKEN_RTC_HOUR_24:
             /* k: hour ( 0..23) */
             snprintf(buf, buf_size, "%2d", tm->tm_hour);
             if (intval)
                 *intval = tm->tm_hour;
             return buf;
 
-        case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
+        case SKIN_TOKEN_RTC_HOUR_12_ZERO_PADDED:
             /* I: hour (01..12) */
             snprintf(buf, buf_size, "%02d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
@@ -790,7 +785,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
             return buf;
 
-        case WPS_TOKEN_RTC_HOUR_12:
+        case SKIN_TOKEN_RTC_HOUR_12:
             /* l: hour ( 1..12) */
             snprintf(buf, buf_size, "%2d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
@@ -798,107 +793,107 @@ const char *get_token_value(struct gui_wps *gwps,
                 *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
             return buf;
 
-        case WPS_TOKEN_RTC_MONTH:
+        case SKIN_TOKEN_RTC_MONTH:
             /* m: month (01..12) */
             if (intval)
                 *intval = tm->tm_mon + 1;
             snprintf(buf, buf_size, "%02d", tm->tm_mon + 1);
             return buf;
 
-        case WPS_TOKEN_RTC_MINUTE:
+        case SKIN_TOKEN_RTC_MINUTE:
             /* M: minute (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_min);
             if (intval)
                 *intval = tm->tm_min;
             return buf;
 
-        case WPS_TOKEN_RTC_SECOND:
+        case SKIN_TOKEN_RTC_SECOND:
             /* S: second (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_sec);
             if (intval)
                 *intval = tm->tm_sec;
             return buf;
 
-        case WPS_TOKEN_RTC_YEAR_2_DIGITS:
+        case SKIN_TOKEN_RTC_YEAR_2_DIGITS:
             /* y: last two digits of year (00..99) */
             snprintf(buf, buf_size, "%02d", tm->tm_year % 100);
             if (intval)
                 *intval = tm->tm_year % 100;
             return buf;
 
-        case WPS_TOKEN_RTC_YEAR_4_DIGITS:
+        case SKIN_TOKEN_RTC_YEAR_4_DIGITS:
             /* Y: year (1970...) */
             snprintf(buf, buf_size, "%04d", tm->tm_year + 1900);
             if (intval)
                 *intval = tm->tm_year + 1900;
             return buf;
 
-        case WPS_TOKEN_RTC_AM_PM_UPPER:
+        case SKIN_TOKEN_RTC_AM_PM_UPPER:
             /* p: upper case AM or PM indicator */
             if (intval)
                 *intval = tm->tm_hour/12 == 0 ? 0 : 1;
             return tm->tm_hour/12 == 0 ? "AM" : "PM";
 
-        case WPS_TOKEN_RTC_AM_PM_LOWER:
+        case SKIN_TOKEN_RTC_AM_PM_LOWER:
             /* P: lower case am or pm indicator */
             if (intval)
                 *intval = tm->tm_hour/12 == 0 ? 0 : 1;
             return tm->tm_hour/12 == 0 ? "am" : "pm";
 
-        case WPS_TOKEN_RTC_WEEKDAY_NAME:
+        case SKIN_TOKEN_RTC_WEEKDAY_NAME:
             /* a: abbreviated weekday name (Sun..Sat) */
             return str(LANG_WEEKDAY_SUNDAY + tm->tm_wday);
 
-        case WPS_TOKEN_RTC_MONTH_NAME:
+        case SKIN_TOKEN_RTC_MONTH_NAME:
             /* b: abbreviated month name (Jan..Dec) */
             return str(LANG_MONTH_JANUARY + tm->tm_mon);
 
-        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
+        case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_MON:
             /* u: day of week (1..7); 1 is Monday */
             if (intval)
                 *intval = (tm->tm_wday == 0) ? 7 : tm->tm_wday;
             snprintf(buf, buf_size, "%1d", tm->tm_wday + 1);
             return buf;
 
-        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
+        case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
             /* w: day of week (0..6); 0 is Sunday */
             if (intval)
                 *intval = tm->tm_wday + 1;
             snprintf(buf, buf_size, "%1d", tm->tm_wday);
             return buf;
 #else
-        case WPS_TOKEN_RTC_DAY_OF_MONTH:
-        case WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
-        case WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
-        case WPS_TOKEN_RTC_HOUR_24:
-        case WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED:
-        case WPS_TOKEN_RTC_HOUR_12:
-        case WPS_TOKEN_RTC_MONTH:
-        case WPS_TOKEN_RTC_MINUTE:
-        case WPS_TOKEN_RTC_SECOND:
-        case WPS_TOKEN_RTC_AM_PM_UPPER:
-        case WPS_TOKEN_RTC_AM_PM_LOWER:
-        case WPS_TOKEN_RTC_YEAR_2_DIGITS:
+        case SKIN_TOKEN_RTC_DAY_OF_MONTH:
+        case SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
+        case SKIN_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+        case SKIN_TOKEN_RTC_HOUR_24:
+        case SKIN_TOKEN_RTC_HOUR_12_ZERO_PADDED:
+        case SKIN_TOKEN_RTC_HOUR_12:
+        case SKIN_TOKEN_RTC_MONTH:
+        case SKIN_TOKEN_RTC_MINUTE:
+        case SKIN_TOKEN_RTC_SECOND:
+        case SKIN_TOKEN_RTC_AM_PM_UPPER:
+        case SKIN_TOKEN_RTC_AM_PM_LOWER:
+        case SKIN_TOKEN_RTC_YEAR_2_DIGITS:
             return "--";
-        case WPS_TOKEN_RTC_YEAR_4_DIGITS:
+        case SKIN_TOKEN_RTC_YEAR_4_DIGITS:
             return "----";
-        case WPS_TOKEN_RTC_WEEKDAY_NAME:
-        case WPS_TOKEN_RTC_MONTH_NAME:
+        case SKIN_TOKEN_RTC_WEEKDAY_NAME:
+        case SKIN_TOKEN_RTC_MONTH_NAME:
             return "---";
-        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
-        case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
+        case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_MON:
+        case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
             return "-";
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-        case WPS_TOKEN_PROGRESSBAR:
+        case SKIN_TOKEN_PROGRESSBAR:
         {
             char *end = utf8encode(data->wps_progress_pat[0], buf);
             *end = '\0';
             return buf;
         }
 
-        case WPS_TOKEN_PLAYER_PROGRESSBAR:
+        case SKIN_TOKEN_PLAYER_PROGRESSBAR:
             if(is_new_player())
             {
                 /* we need 11 characters (full line) for
@@ -916,7 +911,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
 
 #if (CONFIG_CODEC == SWCODEC)
-        case WPS_TOKEN_CROSSFADE:
+        case SKIN_TOKEN_CROSSFADE:
 #ifdef HAVE_CROSSFADE
             if (intval)
                 *intval = global_settings.crossfade + 1;
@@ -926,7 +921,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
             return buf;
 
-        case WPS_TOKEN_REPLAYGAIN:
+        case SKIN_TOKEN_REPLAYGAIN:
         {
             int val;
 
@@ -974,7 +969,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif  /* (CONFIG_CODEC == SWCODEC) */
 
 #if (CONFIG_CODEC != MAS3507D)
-        case WPS_TOKEN_SOUND_PITCH:
+        case SKIN_TOKEN_SOUND_PITCH:
         {
             int32_t pitch = sound_get_pitch();
             snprintf(buf, buf_size, "%ld.%ld",
@@ -989,7 +984,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    case WPS_TOKEN_SOUND_SPEED:
+    case SKIN_TOKEN_SOUND_SPEED:
     {
         int32_t pitch = sound_get_pitch();
         int32_t speed;
@@ -1007,7 +1002,7 @@ const char *get_token_value(struct gui_wps *gwps,
     }
 #endif
 
-        case WPS_TOKEN_MAIN_HOLD:
+        case SKIN_TOKEN_MAIN_HOLD:
 #ifdef HAS_BUTTON_HOLD
             if (button_hold())
 #else
@@ -1018,7 +1013,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 return NULL;
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
-        case WPS_TOKEN_REMOTE_HOLD:
+        case SKIN_TOKEN_REMOTE_HOLD:
             if (remote_button_hold())
                 return "r";
             else
@@ -1026,20 +1021,20 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-        case WPS_TOKEN_VLED_HDD:
+        case SKIN_TOKEN_VLED_HDD:
             if(led_read(HZ/2))
                 return "h";
             else
                 return NULL;
 #endif
-        case WPS_TOKEN_BUTTON_VOLUME:
+        case SKIN_TOKEN_BUTTON_VOLUME:
             if (global_status.last_volume_change &&
                 TIME_BEFORE(current_tick, global_status.last_volume_change +
                                           token->value.i * TIMEOUT_UNIT))
                 return "v";
             return NULL;
             
-        case WPS_TOKEN_LASTTOUCH:
+        case SKIN_TOKEN_LASTTOUCH:
             {
 #ifdef HAVE_TOUCHSCREEN
             unsigned int last_touch = touchscreen_last_touch();
@@ -1051,7 +1046,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             return NULL;
 
-        case WPS_TOKEN_SETTING:
+        case SKIN_TOKEN_SETTING:
         {
             const struct settings_list *s = settings+token->value.i;
             if (intval)
@@ -1120,14 +1115,14 @@ const char *get_token_value(struct gui_wps *gwps,
             cfg_to_string(token->value.i,buf,buf_size);
             return buf;
         }
-        case WPS_TOKEN_HAVE_TUNER:
+        case SKIN_TOKEN_HAVE_TUNER:
 #if CONFIG_TUNER
             if (radio_hardware_present())
                 return "r";
 #endif
             return NULL;
         /* Recording tokens */
-        case WPS_TOKEN_HAVE_RECORDING:
+        case SKIN_TOKEN_HAVE_RECORDING:
 #ifdef HAVE_RECORDING
             return "r";
 #else
@@ -1135,11 +1130,11 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
 #ifdef HAVE_RECORDING
-        case WPS_TOKEN_IS_RECORDING:
+        case SKIN_TOKEN_IS_RECORDING:
             if (audio_status() == AUDIO_STATUS_RECORD)
                 return "r";
             return NULL;
-        case WPS_TOKEN_REC_FREQ: /* order from REC_FREQ_CFG_VAL_LIST */
+        case SKIN_TOKEN_REC_FREQ: /* order from REC_FREQ_CFG_VAL_LIST */
         {
 #if CONFIG_CODEC == SWCODEC
             unsigned long samprk;
@@ -1227,7 +1222,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
         }
 #if CONFIG_CODEC == SWCODEC
-        case WPS_TOKEN_REC_ENCODER:
+        case SKIN_TOKEN_REC_ENCODER:
         {
             int rec_format = global_settings.rec_format+1; /* WAV, AIFF, WV, MPEG */
             if (intval)
@@ -1248,7 +1243,7 @@ const char *get_token_value(struct gui_wps *gwps,
             break;
         }
 #endif
-        case WPS_TOKEN_REC_BITRATE:
+        case SKIN_TOKEN_REC_BITRATE:
 #if CONFIG_CODEC == SWCODEC
             if (global_settings.rec_format == REC_FORMAT_MPA_L3)
             {
@@ -1317,12 +1312,12 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d", global_settings.rec_quality);
             return buf;
 #endif
-        case WPS_TOKEN_REC_MONO:
+        case SKIN_TOKEN_REC_MONO:
             if (!global_settings.rec_channels)
                 return "m";
             return NULL;
             
-        case WPS_TOKEN_REC_SECONDS:
+        case SKIN_TOKEN_REC_SECONDS:
         {
             int time = (audio_recorded_time() / HZ) % 60;
             if (intval)
@@ -1330,7 +1325,7 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%02d", time);
             return buf;
         }
-        case WPS_TOKEN_REC_MINUTES:
+        case SKIN_TOKEN_REC_MINUTES:
         {
             int time = (audio_recorded_time() / HZ) / 60;
             if (intval)
@@ -1338,7 +1333,7 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%02d", time);
             return buf;
         }
-        case WPS_TOKEN_REC_HOURS:
+        case SKIN_TOKEN_REC_HOURS:
         {
             int time = (audio_recorded_time() / HZ) / 3600;
             if (intval)
@@ -1349,7 +1344,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #endif /* HAVE_RECORDING */
 
-        case WPS_TOKEN_CURRENT_SCREEN:
+        case SKIN_TOKEN_CURRENT_SCREEN:
         {
             int curr_screen = current_screen();
 
@@ -1390,7 +1385,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
         }
 
-        case WPS_TOKEN_LANG_IS_RTL:
+        case SKIN_TOKEN_LANG_IS_RTL:
             return lang_is_rtl() ? "r" : NULL;
 
         default:

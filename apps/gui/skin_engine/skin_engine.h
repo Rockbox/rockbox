@@ -23,7 +23,10 @@
 #ifndef _SKIN_ENGINE_H
 #define _SKIN_ENGINE_H
 
-#include "skin_buffer.h"
+#ifndef PLUGIN
+
+#include "skin_fonts.h"
+#include "tag_table.h"
 
 #include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
 
@@ -39,13 +42,37 @@ enum skinnable_screens {
 };
 
 
+#ifdef HAVE_LCD_BITMAP
+#define MAIN_BUFFER ((2*LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
+                    + (SKINNABLE_SCREENS_COUNT * LCD_BACKDROP_BYTES))
+
+#if (NB_SCREENS > 1)
+#define REMOTE_BUFFER (2*(LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH*LCD_REMOTE_DEPTH/8) \
+                      + (SKINNABLE_SCREENS_COUNT * REMOTE_LCD_BACKDROP_BYTES))
+#else
+#define REMOTE_BUFFER 0
+#endif
+
+
+#define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER + SKIN_FONT_SIZE) + \
+                         (WPS_MAX_TOKENS * \
+                         (sizeof(struct wps_token) + (sizeof(struct skin_element))))
+#endif
+
+#ifdef HAVE_LCD_CHARCELLS
+#define SKIN_BUFFER_SIZE (LCD_HEIGHT * LCD_WIDTH) * 64 + \
+                         (WPS_MAX_TOKENS * \
+                         (sizeof(struct wps_token) + (sizeof(struct skin_element))))
+#endif
+
+
 #ifdef HAVE_TOUCHSCREEN
 int skin_get_touchaction(struct wps_data *data, int* edge_offset);
 void skin_disarm_touchregions(struct wps_data *data);
 #endif
 
 /* Do a update_type update of the skinned screen */
-bool skin_update(struct gui_wps *gwps, unsigned int update_type);
+void skin_update(struct gui_wps *gwps, unsigned int update_type);
 
 /*
  * setup up the skin-data from a format-buffer (isfile = false)
@@ -71,4 +98,6 @@ void skin_backdrop_init(void);
  * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()
  */
 int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout);
+#endif
+
 #endif

@@ -30,7 +30,6 @@ extern "C"
 
 /* Scanning functions */
 void skip_comment(char** document);
-void skip_whitespace(char** document);
 void skip_arglist(char** document);
 void skip_enumlist(char** document);
 char* scan_string(char** document);

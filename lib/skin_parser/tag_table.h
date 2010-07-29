@@ -27,12 +27,31 @@ extern "C"
 {
 #endif
 
+#define MAX_TAG_PARAMS 12
+
+
     /* Flag to tell the renderer not to insert a line break */
 #define NOBREAK 0x1
 
+/* constants used in line_type and as refresh_mode for wps_refresh */
+#define SKIN_REFRESH_SHIFT           16
+#define SKIN_REFRESH_STATIC          (1u<<SKIN_REFRESH_SHIFT)  /* line doesn't change over time */
+#define SKIN_REFRESH_DYNAMIC         (1u<<(SKIN_REFRESH_SHIFT+1))  /* line may change (e.g. time flag) */
+#define SKIN_REFRESH_SCROLL          (1u<<(SKIN_REFRESH_SHIFT+2))  /* line scrolls */
+#define SKIN_REFRESH_PLAYER_PROGRESS (1u<<(SKIN_REFRESH_SHIFT+3))  /* line contains a progress bar */
+#define SKIN_REFRESH_PEAK_METER      (1u<<(SKIN_REFRESH_SHIFT+4))  /* line contains a peak meter */
+#define SKIN_REFRESH_STATUSBAR       (1u<<(SKIN_REFRESH_SHIFT+5))  /* refresh statusbar */
+#define SKIN_RTC_REFRESH             (1u<<(SKIN_REFRESH_SHIFT+6))  /* refresh rtc, convert at parse time */
+#define SKIN_REFRESH_ALL             (0xffffu<<SKIN_REFRESH_SHIFT)   /* to refresh all line types */
+
+/* to refresh only those lines that change over time */
+#define SKIN_REFRESH_NON_STATIC (SKIN_REFRESH_DYNAMIC| \
+                                 SKIN_REFRESH_PLAYER_PROGRESS| \
+                                 SKIN_REFRESH_PEAK_METER)
 
 enum skin_token_type {
     
+    SKIN_TOKEN_NO_TOKEN,
     SKIN_TOKEN_UNKNOWN,
 
     /* Markers */
@@ -91,7 +110,7 @@ enum skin_token_type {
     /* The begin/end values allow us to know if a token is an RTC one.
        New RTC tokens should be added between the markers. */
 
-    SKIN_TOKENs_RTC_BEGIN, /* just the start marker, not an actual token */
+    SKIN_TOKENS_RTC_BEGIN, /* just the start marker, not an actual token */
 
     SKIN_TOKEN_RTC_DAY_OF_MONTH,
     SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,

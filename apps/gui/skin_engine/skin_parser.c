@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2007 Nicolas Pennequin, Dan Everton, Matthias Mohr
+ *               2010 Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +28,10 @@
 #include "misc.h"
 #include "plugin.h"
 #include "viewport.h"
+
+#include "skin_buffer.h"
+#include "skin_parser.h"
+#include "tag_table.h"
 
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
@@ -71,377 +76,29 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
+
+static bool isdefault(struct skin_tag_parameter *param)
+{
+    return param->type == DEFAULT;
+}
+
+
 /* which screen are we parsing for? */
 static enum screen_type curr_screen;
 
-/* level of current conditional.
-   -1 means we're not in a conditional. */
-static int level = -1;
-
-/* index of the last WPS_TOKEN_CONDITIONAL_OPTION
-    or WPS_TOKEN_CONDITIONAL_START in current level */
-static int lastcond[WPS_MAX_COND_LEVEL];
-
-/* index of the WPS_TOKEN_CONDITIONAL in current level */
-static int condindex[WPS_MAX_COND_LEVEL];
-
-/* number of condtional options in current level */
-static int numoptions[WPS_MAX_COND_LEVEL];
-
-/* line number, debug only */
-static int line_number;
-
 /* the current viewport */
+static struct skin_element *curr_viewport_element;
 static struct skin_viewport *curr_vp;
-/* the current line, linked to the above viewport */
-static struct skin_line *curr_line;
+
+struct line *curr_line;
 
 static int follow_lang_direction = 0;
 
-#if defined(DEBUG) || defined(SIMULATOR)
-/* debugging function */
-extern void print_debug_info(struct wps_data *data, int fail, int line);
-extern void debug_skin_usage(void);
-#endif
-
-/* Function for parsing of details for a token. At the moment the
-   function is called, the token type has already been set. The
-   function must fill in the details and possibly add more tokens
-   to the token array. It should return the number of chars that
-   has been consumed.
-
-   wps_bufptr points to the char following the tag (i.e. where
-   details begin).
-   token is the pointer to the 'main' token being parsed
-   */
-typedef int (*wps_tag_parse_func)(const char *wps_bufptr,
-                struct wps_token *token, struct wps_data *wps_data);
-
-struct wps_tag {
-    enum wps_token_type type;
-    const char name[3];
-    unsigned char refresh_type;
-    const wps_tag_parse_func parse_func;
-};
-static int skip_end_of_line(const char *wps_bufptr);
-/* prototypes of all special parse functions : */
-static int parse_timeout(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_progressbar(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_dir_level(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_setting_and_lang(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-
-
-static int parse_languagedirection(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
-{
-    (void)wps_bufptr;
-    (void)token;
-    (void)wps_data;
-    follow_lang_direction = 2; /* 2 because it is decremented immediatly after 
-                                  this token is parsed, after the next token it 
-                                  will be 0 again. */
-    return 0;
-}
+typedef int (*parse_function)(struct skin_element *element,
+                              struct wps_token *token,
+                              struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
-static int parse_viewport_display(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_playlistview(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_viewport(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_statusbar_enable(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_statusbar_disable(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_statusbar_inbuilt(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_image_display(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_image_load(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_font_load(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-#endif /*HAVE_LCD_BITMAP */
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-static int parse_viewportcolour(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_image_special(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-#endif
-#ifdef HAVE_ALBUMART
-static int parse_albumart_load(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-static int parse_albumart_display(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-#endif /* HAVE_ALBUMART */
-#ifdef HAVE_TOUCHSCREEN
-static int parse_touchregion(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
-#else
-static int fulline_tag_not_supported(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
-{
-    (void)token; (void)wps_data;
-    return skip_end_of_line(wps_bufptr);
-}
-#define parse_touchregion fulline_tag_not_supported
-#endif
-#ifdef CONFIG_RTC
-#define WPS_RTC_REFRESH WPS_REFRESH_DYNAMIC
-#else
-#define WPS_RTC_REFRESH WPS_REFRESH_STATIC
-#endif
-
-/* array of available tags - those with more characters have to go first
-   (e.g. "xl" and "xd" before "x"). It needs to end with the unknown token. */
-static const struct wps_tag all_tags[] = {
-
-    { WPS_TOKEN_ALIGN_CENTER,             "ac",  0,                   NULL },
-    { WPS_TOKEN_ALIGN_LEFT,               "al",  0,                   NULL },
-    { WPS_TOKEN_ALIGN_LEFT_RTL,           "aL",  0,                   NULL },
-    { WPS_TOKEN_ALIGN_RIGHT,              "ar",  0,                   NULL },
-    { WPS_TOKEN_ALIGN_RIGHT_RTL,          "aR",  0,                   NULL },
-    { WPS_NO_TOKEN,                       "ax",  0,   parse_languagedirection },
-
-    { WPS_TOKEN_BATTERY_PERCENT,          "bl",  WPS_REFRESH_DYNAMIC, parse_progressbar },
-    { WPS_TOKEN_BATTERY_VOLTS,            "bv",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_BATTERY_TIME,             "bt",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_BATTERY_SLEEPTIME,        "bs",  WPS_REFRESH_DYNAMIC, NULL },
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-    { WPS_TOKEN_BATTERY_CHARGING,         "bc",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#if CONFIG_CHARGING
-    { WPS_TOKEN_BATTERY_CHARGER_CONNECTED,"bp",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#ifdef HAVE_USB_POWER
-    { WPS_TOKEN_USB_POWERED,              "bu",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-
-    { WPS_TOKEN_RTC_PRESENT     ,             "cc", WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_12HOUR_CFG,               "cf", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,      "cH", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_HOUR_24,                  "ck", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,      "cI", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_HOUR_12,                  "cl", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_MONTH,                    "cm", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_MINUTE,                   "cM", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_SECOND,                   "cS", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_YEAR_2_DIGITS,            "cy", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_YEAR_4_DIGITS,            "cY", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_AM_PM_UPPER,              "cP", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_AM_PM_LOWER,              "cp", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_WEEKDAY_NAME,             "ca", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_MONTH_NAME,               "cb", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON,    "cu", WPS_RTC_REFRESH, NULL },
-    { WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN,    "cw", WPS_RTC_REFRESH, NULL },
-
-    /* current file */
-    { WPS_TOKEN_FILE_BITRATE,             "fb",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_CODEC,               "fc",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_FREQUENCY,           "ff",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_FREQUENCY_KHZ,       "fk",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_NAME_WITH_EXTENSION, "fm",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_NAME,                "fn",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_PATH,                "fp",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_SIZE,                "fs",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_VBR,                 "fv",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_FILE_DIRECTORY,           "d",   WPS_REFRESH_STATIC,
-                                                           parse_dir_level },
-
-    /* next file */
-    { WPS_TOKEN_FILE_BITRATE,             "Fb",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_CODEC,               "Fc",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_FREQUENCY,           "Ff",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_FREQUENCY_KHZ,       "Fk",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_NAME_WITH_EXTENSION, "Fm",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_NAME,                "Fn",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_PATH,                "Fp",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_SIZE,                "Fs",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_VBR,                 "Fv",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_FILE_DIRECTORY,           "D",   WPS_REFRESH_STATIC,
-                                                           parse_dir_level },
-
-    /* current metadata */
-    { WPS_TOKEN_METADATA_ARTIST,          "ia",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_COMPOSER,        "ic",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_ALBUM,           "id",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "iA",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_GROUPING,        "iG",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_GENRE,           "ig",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_DISC_NUMBER,     "ik",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_TRACK_NUMBER,    "in",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_TRACK_TITLE,     "it",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_VERSION,         "iv",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_YEAR,            "iy",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_METADATA_COMMENT,         "iC",  WPS_REFRESH_STATIC,  NULL },
-
-    /* next metadata */
-    { WPS_TOKEN_METADATA_ARTIST,          "Ia",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_COMPOSER,        "Ic",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_ALBUM,           "Id",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_ALBUM_ARTIST,    "IA",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_GROUPING,        "IG",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_GENRE,           "Ig",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_DISC_NUMBER,     "Ik",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_TRACK_NUMBER,    "In",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_TRACK_TITLE,     "It",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_VERSION,         "Iv",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_YEAR,            "Iy",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_METADATA_COMMENT,         "IC",  WPS_REFRESH_STATIC, NULL },
-
-#if (CONFIG_CODEC != MAS3507D)
-    { WPS_TOKEN_SOUND_PITCH,              "Sp",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#if (CONFIG_CODEC == SWCODEC)
-    { WPS_TOKEN_SOUND_SPEED,              "Ss",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-    { WPS_TOKEN_VLED_HDD,                 "lh",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-
-    { WPS_TOKEN_MAIN_HOLD,                "mh",  WPS_REFRESH_DYNAMIC, NULL },
-
-#ifdef HAS_REMOTE_BUTTON_HOLD
-    { WPS_TOKEN_REMOTE_HOLD,              "mr",  WPS_REFRESH_DYNAMIC, NULL },
-#else
-    { WPS_TOKEN_UNKNOWN,                  "mr",  0,                   NULL },
-#endif
-
-    { WPS_TOKEN_REPEAT_MODE,              "mm",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_BUTTON_VOLUME,            "mv",  WPS_REFRESH_DYNAMIC,
-                                                             parse_timeout },
-
-#ifdef HAVE_LCD_BITMAP
-    { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
-#else
-    { WPS_TOKEN_PLAYER_PROGRESSBAR,       "pf",
-      WPS_REFRESH_DYNAMIC | WPS_REFRESH_PLAYER_PROGRESS, parse_progressbar },
-#endif
-    { WPS_TOKEN_PROGRESSBAR,              "pb",  WPS_REFRESH_PLAYER_PROGRESS,
-                                                         parse_progressbar },
-
-    { WPS_TOKEN_VOLUME,                   "pv",  WPS_REFRESH_DYNAMIC, 
-                                                         parse_progressbar },
-
-    { WPS_TOKEN_TRACK_ELAPSED_PERCENT,    "px",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TRACK_TIME_ELAPSED,       "pc",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TRACK_TIME_REMAINING,     "pr",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TRACK_LENGTH,             "pt",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_TRACK_STARTING,           "pS",  WPS_REFRESH_DYNAMIC, parse_timeout },
-    { WPS_TOKEN_TRACK_ENDING,             "pE",  WPS_REFRESH_DYNAMIC, parse_timeout },
-
-    { WPS_TOKEN_PLAYLIST_POSITION,        "pp",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_PLAYLIST_ENTRIES,         "pe",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_PLAYLIST_NAME,            "pn",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_PLAYLIST_SHUFFLE,         "ps",  WPS_REFRESH_DYNAMIC, NULL },
-
-#ifdef HAVE_TAGCACHE
-    { WPS_TOKEN_DATABASE_PLAYCOUNT,       "rp",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_DATABASE_RATING,          "rr",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_DATABASE_AUTOSCORE,       "ra",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-
-#if CONFIG_CODEC == SWCODEC
-    { WPS_TOKEN_REPLAYGAIN,               "rg",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-
-    { WPS_TOKEN_HAVE_TUNER,               "tp",  WPS_REFRESH_STATIC,  NULL },
-#if CONFIG_TUNER /* Re-uses the 't' and 'T' prefixes, be careful about doubleups */
-    { WPS_TOKEN_TUNER_TUNED,              "tt",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TUNER_SCANMODE,           "tm",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TUNER_STEREO,             "ts",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_TUNER_MINFREQ,            "ta",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_TUNER_MAXFREQ,            "tb",  WPS_REFRESH_STATIC,  NULL },
-    { WPS_TOKEN_TUNER_CURFREQ,            "tf",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_PRESET_ID,                "Ti",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_PRESET_NAME,              "Tn",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_PRESET_FREQ,              "Tf",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_PRESET_COUNT,             "Tc",  WPS_REFRESH_STATIC, NULL },
-    { WPS_TOKEN_HAVE_RDS,                 "tx",  WPS_REFRESH_STATIC, NULL },
-#ifdef HAVE_RDS_CAP
-    { WPS_TOKEN_RDS_NAME,                 "ty", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_RDS_TEXT,                 "tz", WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#endif /* CONFIG_TUNER */
-
-    { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
-    { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_timeout },
-
-#ifdef HAVE_LCD_BITMAP
-    { WPS_NO_TOKEN,                       "we",  0, parse_statusbar_enable },
-    { WPS_NO_TOKEN,                       "wd",  0, parse_statusbar_disable },
-    { WPS_TOKEN_DRAW_INBUILTBAR,          "wi",  WPS_REFRESH_DYNAMIC, parse_statusbar_inbuilt },
-
-    { WPS_NO_TOKEN,                       "xl",  0,       parse_image_load },
-
-    { WPS_TOKEN_IMAGE_PRELOAD_DISPLAY,    "xd",  WPS_REFRESH_STATIC,
-                                                       parse_image_display },
-
-    { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
-    { WPS_NO_TOKEN,                       "Fl",  0,       parse_font_load },
-#ifdef HAVE_ALBUMART
-    { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
-    { WPS_TOKEN_ALBUMART_DISPLAY,         "Cd",   WPS_REFRESH_STATIC,  parse_albumart_display },
-    { WPS_TOKEN_ALBUMART_FOUND,           "C", WPS_REFRESH_STATIC, NULL },
-#endif
-
-    { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC,
-                                                    parse_viewport_display },
-    { WPS_TOKEN_UIVIEWPORT_ENABLE,        "VI",  WPS_REFRESH_STATIC,
-                                                    parse_viewport_display },
-#ifdef HAVE_LCD_BITMAP
-    { WPS_VIEWPORT_CUSTOMLIST,            "Vp",  WPS_REFRESH_STATIC, parse_playlistview },
-    { WPS_TOKEN_LIST_TITLE_TEXT,          "Lt",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_LIST_TITLE_ICON,          "Li",  WPS_REFRESH_DYNAMIC, NULL },
-#endif
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    { WPS_TOKEN_VIEWPORT_FGCOLOUR,        "Vf", WPS_REFRESH_STATIC, parse_viewportcolour },
-    { WPS_TOKEN_VIEWPORT_BGCOLOUR,        "Vb", WPS_REFRESH_STATIC, parse_viewportcolour },
-#endif
-    { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
-#endif
-#endif
-
-    { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC,
-                                                    parse_setting_and_lang },
-    { WPS_TOKEN_TRANSLATEDSTRING,         "Sx",  WPS_REFRESH_STATIC,
-                                                    parse_setting_and_lang },
-    { WPS_TOKEN_LANG_IS_RTL ,             "Sr",  WPS_REFRESH_STATIC, NULL },
-
-    { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
-    { WPS_TOKEN_CURRENT_SCREEN,           "cs",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
-
-
-    /* Recording Tokens */
-    { WPS_TOKEN_HAVE_RECORDING,         "Rp", WPS_REFRESH_STATIC, NULL },
-#ifdef HAVE_RECORDING
-    { WPS_TOKEN_IS_RECORDING,           "Rr", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_FREQ,               "Rf", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_ENCODER,            "Re", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_BITRATE,            "Rb", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_MONO,               "Rm", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_SECONDS,            "Rs", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_MINUTES,            "Rn", WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_REC_HOURS,              "Rh", WPS_REFRESH_DYNAMIC, NULL },
-#endif
-    { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }
-    /* the array MUST end with an empty string (first char is \0) */
-};
-
-
 /* add a skin_token_list item to the list chain. ALWAYS appended because some of the
  * chains require the order to be kept.
  */
@@ -459,7 +116,6 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
 }
 
 /* traverse the image linked-list for an image */
-#ifdef HAVE_LCD_BITMAP
 struct gui_img* find_image(char label, struct wps_data *data)
 {
     struct skin_token_list *list = data->images;
@@ -478,10 +134,10 @@ struct gui_img* find_image(char label, struct wps_data *data)
 /* traverse the viewport linked list for a viewport */
 struct skin_viewport* find_viewport(char label, struct wps_data *data)
 {
-    struct skin_token_list *list = data->viewports;
+    struct skin_element *list = data->tree;
     while (list)
     {
-        struct skin_viewport *vp = (struct skin_viewport *)list->token->value.data;
+        struct skin_viewport *vp = (struct skin_viewport *)list->data;
         if (vp->label == label)
             return vp;
         list = list->next;
@@ -489,6 +145,7 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
     return NULL;
 }
 
+#ifdef HAVE_LCD_BITMAP
 
 /* create and init a new wpsll item.
  * passing NULL to token will alloc a new one.
@@ -498,9 +155,10 @@ struct skin_viewport* find_viewport(char label, struct wps_data *data)
 static struct skin_token_list *new_skin_token_list_item(struct wps_token *token,
                                                         void* token_data)
 {
-    struct skin_token_list *llitem = skin_buffer_alloc(sizeof(struct skin_token_list));
+    struct skin_token_list *llitem = 
+        (struct skin_token_list *)skin_buffer_alloc(sizeof(struct skin_token_list));
     if (!token)
-        token = skin_buffer_alloc(sizeof(struct wps_token));
+        token = (struct wps_token*)skin_buffer_alloc(sizeof(struct wps_token));
     if (!llitem || !token)
         return NULL;
     llitem->next = NULL;
@@ -510,108 +168,36 @@ static struct skin_token_list *new_skin_token_list_item(struct wps_token *token,
     return llitem;
 }
 
-/* Returns the number of chars that should be skipped to jump
-   immediately after the first eol, i.e. to the start of the next line */
-static int skip_end_of_line(const char *wps_bufptr)
+static int parse_statusbar_tags(struct skin_element* element,
+                                struct wps_token *token,
+                                struct wps_data *wps_data)
 {
-    line_number++;
-    int skip = 0;
-    while(*(wps_bufptr + skip) != '\n')
-        skip++;
-    return ++skip;
-}
-
-/* Starts a new subline in the current line during parsing */
-static bool skin_start_new_subline(struct skin_line *line, int curr_token)
-{
-    struct skin_subline *subline = skin_buffer_alloc(sizeof(struct skin_subline));
-    if (!subline)
-        return false;
-
-    subline->first_token_idx = curr_token;
-    subline->next = NULL;
-
-    subline->line_type = 0;
-    subline->time_mult = 0;
-
-    line->curr_subline->last_token_idx = curr_token-1;
-    line->curr_subline->next = subline;
-    line->curr_subline = subline;
-    return true;
-}
-
-static bool skin_start_new_line(struct skin_viewport *vp, int curr_token)
-{
-    struct skin_line *line = skin_buffer_alloc(sizeof(struct skin_line));
-    struct skin_subline *subline = NULL;
-    if (!line)
-        return false;
-
-    /* init the subline */
-    subline = &line->sublines;
-    subline->first_token_idx = curr_token;
-    subline->next = NULL;
-    subline->line_type = 0;
-    subline->time_mult = 0;
-
-    /* init the new line */
-    line->curr_subline  = &line->sublines;
-    line->next          = NULL;
-    line->subline_expire_time = 0;
-
-    /* connect to curr_line and vp pointers.
-     * 1) close the previous lines subline
-     * 2) connect to vp pointer
-     * 3) connect to curr_line global pointer
-     */
-    if (curr_line)
+    (void)element;
+    if (token->type == SKIN_TOKEN_DRAW_INBUILTBAR)
     {
-        curr_line->curr_subline->last_token_idx = curr_token - 1;
-        curr_line->next = line;
-        curr_line->curr_subline = NULL;
+        token->value.data = (void*)&curr_vp->vp;
     }
-    curr_line = line;
-    if (!vp->lines)
-        vp->lines = line;
-    return true;
+    else
+    {
+        struct skin_element *def_vp = wps_data->tree;
+        struct skin_viewport *default_vp = def_vp->data;
+        if (def_vp->params_count == 0)
+        {
+            wps_data->wps_sb_tag = true;
+            wps_data->show_sb_on_wps = (token->type == SKIN_TOKEN_ENABLE_THEME);
+        }
+        if (wps_data->show_sb_on_wps)
+        {
+            viewport_set_defaults(&default_vp->vp, curr_screen);
+        }
+        else
+        {
+            viewport_set_fullscreen(&default_vp->vp, curr_screen);
+        }
+    }
+    return 0;
 }
-
-#ifdef HAVE_LCD_BITMAP
-
-static int parse_statusbar_enable(const char *wps_bufptr,
-                                  struct wps_token *token,
-                                  struct wps_data *wps_data)
-{
-    (void)token; /* Kill warnings */
-    wps_data->wps_sb_tag = true;
-    wps_data->show_sb_on_wps = true;
-    struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
-    viewport_set_defaults(&default_vp->vp, curr_screen);
-    default_vp->vp.font = FONT_UI;
-    return skip_end_of_line(wps_bufptr);
-}
-
-static int parse_statusbar_disable(const char *wps_bufptr,
-                                   struct wps_token *token,
-                                   struct wps_data *wps_data)
-{
-    (void)token; /* Kill warnings */
-    wps_data->wps_sb_tag = true;
-    wps_data->show_sb_on_wps = false;
-    struct skin_viewport *default_vp = find_viewport(VP_DEFAULT_LABEL, wps_data);
-    viewport_set_fullscreen(&default_vp->vp, curr_screen);
-    default_vp->vp.font = FONT_UI;
-    return skip_end_of_line(wps_bufptr);
-}
-
-static int parse_statusbar_inbuilt(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
-{
-    (void)wps_data;
-    token->value.data = (void*)&curr_vp->vp;
-    return skip_end_of_line(wps_bufptr);
-}
-
+            
 static int get_image_id(int c)
 {
     if(c >= 'a' && c <= 'z')
@@ -625,32 +211,20 @@ static int get_image_id(int c)
 char *get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
-    const char *end = start;
-    int bmpdirlen = strlen(bmpdir);
-
-    while (*end && *end != ',' && *end != ')')
-        end++;
-    if ( !end || (end - start) >= (buf_size - bmpdirlen - 2) )
-    {
-        buf[0] = '\0';
-        return NULL;
-    }
-
-    strcpy(buf, bmpdir);
-    buf[bmpdirlen] = '/';
-    memcpy( &buf[bmpdirlen + 1], start, end - start);
-    buf[bmpdirlen + 1 + end - start] = 0;
-
+    snprintf(buf, buf_size, "%s/%s", bmpdir, start);
+    
     return buf;
 }
 
-static int parse_image_display(const char *wps_bufptr,
+static int parse_image_display(struct skin_element *element,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    char label = wps_bufptr[1];
+    char *text = element->params[0].data.text;
+    char label = text[0];
+    char sublabel = text[1];
     int subimage;
-    struct gui_img *img;;
+    struct gui_img *img;
 
     /* sanity check */
     img = find_image(label, wps_data);
@@ -660,7 +234,7 @@ static int parse_image_display(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
 
-    if ((subimage = get_image_id(wps_bufptr[2])) != -1)
+    if ((subimage = get_image_id(sublabel)) != -1)
     {
         if (subimage >= img->num_subimages)
             return WPS_ERROR_INVALID_PARAM;
@@ -674,32 +248,24 @@ static int parse_image_display(const char *wps_bufptr,
     }
 }
 
-static int parse_image_load(const char *wps_bufptr,
+static int parse_image_load(struct skin_element *element,
                             struct wps_token *token,
                             struct wps_data *wps_data)
 {
-    const char *ptr = wps_bufptr;
     const char* filename;
     const char* id;
     int x,y;
     struct gui_img *img;
 
-    /* format: %x|n|filename.bmp|x|y|
-       or %xl|n|filename.bmp|x|y|
-       or %xl|n|filename.bmp|x|y|num_subimages|
+    /* format: %x(n,filename.bmp,x,y)
+       or %xl(n,filename.bmp,x,y)
+       or %xl(n,filename.bmp,x,y,num_subimages)
     */
 
-    if (*ptr != '(')
-        return WPS_ERROR_INVALID_PARAM;
-
-    ptr++;
-
-    if (!(ptr = parse_list("ssdd", NULL, ',', ptr, &id, &filename, &x, &y)))
-        return WPS_ERROR_INVALID_PARAM;
-
-    /* Check there is a terminating ) */
-    if (*ptr != ')' && *ptr != ',')
-        return WPS_ERROR_INVALID_PARAM;
+    id = element->params[0].data.text;
+    filename = element->params[1].data.text;
+    x = element->params[2].data.number;
+    y = element->params[3].data.number;
 
     /* check the image number and load state */
     if(find_image(*id, wps_data))
@@ -707,7 +273,7 @@ static int parse_image_load(const char *wps_bufptr,
         /* Invalid image ID */
         return WPS_ERROR_INVALID_PARAM;
     }
-    img = skin_buffer_alloc(sizeof(struct gui_img));
+    img = (struct gui_img*)skin_buffer_alloc(sizeof(struct gui_img));
     if (!img)
         return WPS_ERROR_INVALID_PARAM;
     /* save a pointer to the filename */
@@ -717,62 +283,44 @@ static int parse_image_load(const char *wps_bufptr,
     img->y = y;
     img->num_subimages = 1;
     img->always_display = false;
+ //   img->just_drawn = false;
+    img->display = -1;
 
     /* save current viewport */
     img->vp = &curr_vp->vp;
 
-    if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
+    if (token->type == SKIN_TOKEN_IMAGE_DISPLAY)
     {
         img->always_display = true;
     }
-    else if (*ptr == ',')
+    else if (element->params_count == 5)
     {
-        /* Parse the (optional) number of sub-images */
-        ptr++;
-        img->num_subimages = atoi(ptr);
+        img->num_subimages = element->params[4].data.number;
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
-        /* Check there is a terminating ) */
-        while(isdigit(*ptr))
-            ptr++;
-        if (*ptr != ')')
-            return WPS_ERROR_INVALID_PARAM;
     }
-    struct skin_token_list *item = new_skin_token_list_item(NULL, img);
+    struct skin_token_list *item = 
+            (struct skin_token_list *)new_skin_token_list_item(NULL, img);
     if (!item)
         return WPS_ERROR_INVALID_PARAM;
     add_to_ll_chain(&wps_data->images, item);
 
-    /* Skip the rest of the line */
-    return skip_end_of_line(wps_bufptr);
+    return 0;
 }
 struct skin_font {
     int id; /* the id from font_load */
     char *name;  /* filename without path and extension */
 };
 static struct skin_font skinfonts[MAXUSERFONTS];
-static int parse_font_load(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
+static int parse_font_load(struct skin_element *element,
+                           struct wps_token *token,
+                           struct wps_data *wps_data)
 {
     (void)wps_data; (void)token;
-    const char *ptr = wps_bufptr;
-    int id;
-    char *filename;
-
-    if (*ptr != '(')
-        return WPS_ERROR_INVALID_PARAM;
-
-    ptr++;
-
-    if (!(ptr = parse_list("ds", NULL, ',', ptr, &id, &filename)))
-        return WPS_ERROR_INVALID_PARAM;
-
-    /* Check there is a terminating ) */
-    if (*ptr != ')')
-        return WPS_ERROR_INVALID_PARAM;
-
-    if (id <= FONT_UI || id >= MAXFONTS-1)
-        return WPS_ERROR_INVALID_PARAM;
+    int id = element->params[0].data.number;
+    char *filename = element->params[1].data.text;
+    char *ptr;
+    
 #if defined(DEBUG) || defined(SIMULATOR)
     if (skinfonts[id-FONT_FIRSTUSERFONT].name != NULL)
     {
@@ -782,286 +330,65 @@ static int parse_font_load(const char *wps_bufptr,
     /* make sure the filename contains .fnt, 
      * we dont actually use it, but require it anyway */
     ptr = strchr(filename, '.');
-    if (!ptr || strncmp(ptr, ".fnt)", 5))
+    if (!ptr || strncmp(ptr, ".fnt", 4))
         return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
     skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
 
-    return skip_end_of_line(wps_bufptr);
+    return 0;
 }
 
-
-static int parse_viewport_display(const char *wps_bufptr,
-                                  struct wps_token *token,
-                                  struct wps_data *wps_data)
-{
-    (void)wps_data;
-    char letter = wps_bufptr[1];
-
-    if (letter < 'a' || letter > 'z')
-    {
-        /* invalid viewport tag */
-        return WPS_ERROR_INVALID_PARAM;
-    }
-    token->value.i = letter;
-    return 3;
-}
 
 #ifdef HAVE_LCD_BITMAP
-static int parse_playlistview_text(struct playlistviewer *viewer,
-                             enum info_line_type line,  char* text)
-{
-    int cur_string = 0;
-    const struct wps_tag *tag;
-    int taglen = 0;
-    const char *start = text;
-    if (*text != ',')
-        return -1;
-    text++;
-    viewer->lines[line].count = 0;
-    viewer->lines[line].scroll = false;
-    while (*text != ',' && *text != ')')
-    {
-        if (*text == '%') /* it is a token of some type */
-        {
-            text++;
-            taglen = 0;
-            switch(*text)
-            {
-                case '%':
-                case '<':
-                case '|':
-                case '>':
-                case ';':
-                case '#':
-                case '(':
-                case ')':
-                case ',':
-                    /* escaped characters */
-                    viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_CHARACTER;
-                    viewer->lines[line].strings[cur_string][0] = *text;
-                    viewer->lines[line].strings[cur_string++][1] = '\0';
-                    text++;
-                    break;
-                default:
-                for (tag = all_tags;
-                     strncmp(text, tag->name, strlen(tag->name)) != 0;
-                     tag++) ;
-                /* %s isnt stored as a tag so manually check for it */
-                if (tag->type == WPS_NO_TOKEN)
-                {
-                    if (!strncmp(tag->name, "s", 1))
-                    {
-                        viewer->lines[line].scroll = true;
-                        taglen = 1;
-                    }
-                }
-                else if (tag->type == WPS_TOKEN_UNKNOWN)
-                {
-                    int i = 0;
-                    /* just copy the string */
-                    viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
-                    while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != ',' && text[i] != ')' && text[i] != '%')
-                    {
-                        viewer->lines[line].strings[cur_string][i] = text[i];
-                        i++;
-                    }
-                    viewer->lines[line].strings[cur_string][i] = '\0';
-                    cur_string++;
-                    taglen = i;
-                }
-                else
-                {
-                    if (tag->parse_func)
-                    {
-                        /* unsupported tag, reject */
-                        return -1;
-                    }
-                    taglen = strlen(tag->name);
-                    viewer->lines[line].tokens[viewer->lines[line].count++] = tag->type;
-                }
-                text += taglen;
-            }
-        }
-        else
-        {
-            /* regular string */
-            int i = 0;
-            /* just copy the string */
-            viewer->lines[line].tokens[viewer->lines[line].count++] = WPS_TOKEN_STRING;
-            while (i<(MAX_PLAYLISTLINE_STRLEN-1) && text[i] != ',' && text[i] != ')' && text[i] != '%')
-            {
-                viewer->lines[line].strings[cur_string][i] = text[i];
-                i++;
-            }
-            viewer->lines[line].strings[cur_string][i] = '\0';
-            cur_string++;
-            text += i;
-        }
-    }
-    return text - start;
-}
 
-static int parse_playlistview(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
+static int parse_playlistview(struct skin_element *element,
+                              struct wps_token *token,
+                              struct wps_data *wps_data)
 {
     (void)wps_data;
-    /* %Vp|<use icons>|<start offset>|info line text|no info text| */
-    struct playlistviewer *viewer = skin_buffer_alloc(sizeof(struct playlistviewer));
-    char *ptr = strchr(wps_bufptr, '(');
-    int length;
-    if (!viewer || !ptr)
+    struct playlistviewer *viewer = 
+        (struct playlistviewer *)skin_buffer_alloc(sizeof(struct playlistviewer));
+    if (!viewer)
         return WPS_ERROR_INVALID_PARAM;
     viewer->vp = &curr_vp->vp;
     viewer->show_icons = true;
-    viewer->start_offset = atoi(ptr+1);
+    viewer->start_offset = element->params[0].data.number;
+    viewer->lines[0] = element->params[1].data.code;
+    viewer->lines[1] = element->params[2].data.code;
+    
     token->value.data = (void*)viewer;
-    ptr = strchr(ptr+1, ',');
-    length = parse_playlistview_text(viewer, TRACK_HAS_INFO, ptr);
-    if (length < 0)
-        return WPS_ERROR_INVALID_PARAM;
-    length = parse_playlistview_text(viewer, TRACK_HAS_NO_INFO, ptr+length);
-    if (length < 0)
-        return WPS_ERROR_INVALID_PARAM;
-
-    return skip_end_of_line(wps_bufptr);
+    
+    return 0;
 }
 #endif
 
-static int parse_viewport(const char *wps_bufptr,
-                          struct wps_token *token,
-                          struct wps_data *wps_data)
-{
-    (void)token; /* Kill warnings */
-    const char *ptr = wps_bufptr;
-
-    struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
-
-    /* check for the optional letter to signify its a hideable viewport */
-    /* %Vl|<label>|<rest of tags>| */
-    skin_vp->hidden_flags = 0;
-    skin_vp->label = VP_NO_LABEL;
-    skin_vp->lines  = NULL;
-    if (curr_line)
-    {
-        curr_line->curr_subline->last_token_idx = wps_data->num_tokens
-                        - (wps_data->num_tokens > 0 ? 1 : 0);
-    }
-
-    curr_line = NULL;
-    if (!skin_start_new_line(skin_vp, wps_data->num_tokens))
-        return WPS_ERROR_INVALID_PARAM;
-
-    if (*ptr == 'i')
-    {
-        if (*(ptr+1) == '(')
-        {
-            char label = *(ptr+2);
-            if (label >= 'a' && label <= 'z')
-            {
-                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-                skin_vp->label = VP_INFO_LABEL|label;
-                ptr += 3;
-            }
-            else
-            {
-                if (label != '-')
-                    return WPS_ERROR_INVALID_PARAM;
-                skin_vp->label = VP_INFO_LABEL|VP_DEFAULT_LABEL;
-                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-                ptr += 3;
-            }
-        }
-        else
-            return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-    }
-    else if (*ptr == 'l')
-    {
-        if (*(ptr+1) == '(')
-        {
-            char label = *(ptr+2);
-            if (label >= 'a' && label <= 'z')
-            {
-                skin_vp->hidden_flags = VP_DRAW_HIDEABLE;
-                skin_vp->label = label;
-            }
-            else
-                return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-            ptr += 3;
-        }
-    }
-    if (*ptr != ',' && *ptr != '(')
-        return WPS_ERROR_INVALID_PARAM;
-
-    ptr++;
-    struct viewport *vp = &skin_vp->vp;
-    /* format: %V|x|y|width|height|font| */
-    if (!(ptr = viewport_parse_viewport(vp, curr_screen, ptr, ',')))
-        return WPS_ERROR_INVALID_PARAM;
-
-    /* Check for trailing ) */
-    if (*ptr != ')')
-        return WPS_ERROR_INVALID_PARAM;
-    ptr++;
-
-    if (follow_lang_direction && lang_is_rtl())
-    {
-        vp->flags |= VP_FLAG_ALIGN_RIGHT;
-        vp->x = screens[curr_screen].lcdwidth - vp->width - vp->x;
-    }
-    else
-        vp->flags &= ~VP_FLAG_ALIGN_RIGHT; /* ignore right-to-left languages */
-
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    skin_vp->start_fgcolour = vp->fg_pattern;
-    skin_vp->start_bgcolour = vp->bg_pattern;
-#endif
 
-    struct skin_token_list *list = new_skin_token_list_item(NULL, skin_vp);
-    if (!list)
-        return WPS_ERROR_INVALID_PARAM;
-    add_to_ll_chain(&wps_data->viewports, list);
-    curr_vp = skin_vp;
-    /* Skip the rest of the line */
-    return ptr-wps_bufptr;
-}
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-static int parse_viewportcolour(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
+static int parse_viewportcolour(struct skin_element *element,
+                                struct wps_token *token,
+                                struct wps_data *wps_data)
 {
     (void)wps_data;
-    const char *ptr = wps_bufptr;
-    int i;
-    bool found_text;
-    struct viewport_colour *colour = skin_buffer_alloc(sizeof(struct viewport_colour));
-    uint32_t set;
-    if (*ptr != '(' || !colour)
+    struct skin_tag_parameter *param = element->params;
+    struct viewport_colour *colour = 
+        (struct viewport_colour *)skin_buffer_alloc(sizeof(struct viewport_colour));
+    if (!colour)
         return -1;
-    ptr++;
-    if (!(ptr = parse_list("c", &set, ',', ptr, &colour->colour)))
-        return -1;
-    if (*ptr != ')')
-        return -1;
-    if (!set)
+    if (isdefault(param))
+    {
         colour->colour = get_viewport_default_colour(curr_screen,
-                                        token->type == WPS_TOKEN_VIEWPORT_FGCOLOUR);
+                                   token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR);
+    }
+    else
+    {
+        if (!parse_color(param->data.text, &colour->colour))
+            return -1;
+    }
     colour->vp = &curr_vp->vp;
     token->value.data = colour;
-    /* If there havnt been any text tags between the %V() line and here use
-     * the colour as the viewport colour. fixes scrolling lines not
-     * having the correct colour */
-    i = curr_vp->lines->sublines.first_token_idx;
-    found_text = false;
-    while (!found_text && i< curr_vp->lines->sublines.last_token_idx)
+    if (element->line == curr_viewport_element->line)
     {
-        if (wps_data->tokens[i++].type != WPS_TOKEN_CHARACTER &&
-            wps_data->tokens[i++].type != WPS_TOKEN_VIEWPORT_FGCOLOUR && 
-            wps_data->tokens[i++].type != WPS_TOKEN_VIEWPORT_BGCOLOUR )
-            found_text = true;
-    }
-    if (!found_text)
-    {
-        if (token->type == WPS_TOKEN_VIEWPORT_FGCOLOUR)
+        if (token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR)
         {
             curr_vp->start_fgcolour = colour->colour;
             curr_vp->vp.fg_pattern = colour->colour;
@@ -1072,72 +399,54 @@ static int parse_viewportcolour(const char *wps_bufptr,
             curr_vp->vp.bg_pattern = colour->colour;
         }
     }
-    ptr++;
-    return ptr - wps_bufptr;
+    return 0;
 }
 
-static int parse_image_special(const char *wps_bufptr,
+static int parse_image_special(struct skin_element *element,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
     (void)wps_data; /* kill warning */
     (void)token;
-    const char *pos = NULL;
-    const char *newline;
     bool error = false;
 
-    pos = strchr(wps_bufptr + 1, ')');
-    newline = strchr(wps_bufptr, '\n');
-
-    error = (pos > newline);
-
 #if LCD_DEPTH > 1
-    if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
+    if (token->type == SKIN_TOKEN_IMAGE_BACKDROP)
     {
+        char *filename = element->params[0].data.text;
         /* format: %X|filename.bmp| or %Xd */
-        if (!strncmp(wps_bufptr, "(d)", 3))
+        if (!strcmp(filename, "d"))
         {
             wps_data->backdrop = NULL;
-            return skip_end_of_line(wps_bufptr);
+            return 0;
         }
         else if (!error)
-            wps_data->backdrop = (char*)wps_bufptr + 1;
+        {
+            wps_data->backdrop = filename;
+        }
     }
 #endif
-    if (error)
-        return WPS_ERROR_INVALID_PARAM;
     /* Skip the rest of the line */
-    return skip_end_of_line(wps_bufptr);
+    return error ? WPS_ERROR_INVALID_PARAM : 0;
 }
 #endif
 
 #endif /* HAVE_LCD_BITMAP */
 
-static int parse_setting_and_lang(const char *wps_bufptr,
-                                 struct wps_token *token,
-                                 struct wps_data *wps_data)
+static int parse_setting_and_lang(struct skin_element *element,
+                                  struct wps_token *token,
+                                  struct wps_data *wps_data)
 {
     /* NOTE: both the string validations that happen in here will
      * automatically PASS on checkwps because its too hard to get
-     * settings_list.c and englinsh.lang built for it. 
+     * settings_list.c and english.lang built for it. 
      * If that ever changes remove the #ifndef __PCTOOL__'s here 
      */
     (void)wps_data;
-    const char *ptr = wps_bufptr;
-    const char *end;
-    int i = 0;
-    char temp[64];
-
-    /* Find the setting's cfg_name */
-    if (*ptr != '(')
-        return WPS_ERROR_INVALID_PARAM;
-    ptr++;
-    end = strchr(ptr,')');
-    if (!end || (size_t)(end-ptr+1) > sizeof temp)
-        return WPS_ERROR_INVALID_PARAM;
-    strlcpy(temp, ptr,end-ptr+1);
+    char *temp = element->params[0].data.text;
+    int i;
     
-    if (token->type == WPS_TOKEN_TRANSLATEDSTRING)
+    if (token->type == SKIN_TOKEN_TRANSLATEDSTRING)
     {
 #ifndef __PCTOOL__
         i = lang_english_to_id(temp);
@@ -1159,170 +468,104 @@ static int parse_setting_and_lang(const char *wps_bufptr,
     }
     /* Store the setting number */
     token->value.i = i;
-
-    /* Skip the rest of the line */
-    return end-ptr+2;
+    return 0;
 }
 
-
-static int parse_dir_level(const char *wps_bufptr,
-                           struct wps_token *token,
-                           struct wps_data *wps_data)
-{
-    char val[] = { wps_bufptr[1], '\0' };
-    if (wps_bufptr[0] != '(' || wps_bufptr[2] != ')')
-        return WPS_ERROR_INVALID_PARAM;
-    token->value.i = atoi(val);
-    (void)wps_data; /* Kill warnings */
-    return 3;
-}
-
-static int parse_timeout(const char *wps_bufptr,
-                         struct wps_token *token,
-                         struct wps_data *wps_data)
-{
-    int skip = 0;
-    int val = 0;
-    bool have_point = false;
-    bool have_tenth = false;
-
-    (void)wps_data; /* Kill the warning */
-    if (*wps_bufptr == '(')
-    {
-        wps_bufptr++;
-        skip++;
-        while ( isdigit(*wps_bufptr) || *wps_bufptr == '.' )
-        {
-            if (*wps_bufptr != '.')
-            {
-                val *= 10;
-                val += *wps_bufptr - '0';
-                if (have_point)
-                {
-                    have_tenth = true;
-                    wps_bufptr++;
-                    skip++;
-                    break;
-                }
-            }
-            else
-                have_point = true;
-
-            wps_bufptr++;
-            skip++;
-        }
-        if (*wps_bufptr != ')')
-            return -1;
-        skip++;
-    }
-    if (have_tenth == false)
-        val *= 10;
-
-    if (val == 0 && skip == 0)
-    {
-        /* decide what to do if no value was specified */
-        switch (token->type)
-        {
-            case WPS_TOKEN_SUBLINE_TIMEOUT:
-                return -1;
-            case WPS_TOKEN_BUTTON_VOLUME:
-            case WPS_TOKEN_TRACK_STARTING:
-            case WPS_TOKEN_TRACK_ENDING:
-                val = 10;
-                break;
-        }
-    }
-    token->value.i = val;
-
-    return skip;
-}
-
-static int parse_progressbar(const char *wps_bufptr,
+static int parse_timeout_tag(struct skin_element *element,
                              struct wps_token *token,
                              struct wps_data *wps_data)
 {
-    /* %pb or %pb|filename|x|y|width|height|
-    using - for any of the params uses "sane" values */
-#ifdef HAVE_LCD_BITMAP
-    enum {
-        PB_X = 0,
-        PB_Y,
-        PB_WIDTH,
-        PB_HEIGHT,
-        PB_FILENAME,
-    };
-    const char *filename;
-    int x, y, height, width;
-    uint32_t set = 0;
-    const char *ptr = wps_bufptr;
-    struct progressbar *pb = skin_buffer_alloc(sizeof(struct progressbar));
-    struct skin_token_list *item = new_skin_token_list_item(token, pb);
-
-    if (!pb || !item)
-        return WPS_ERROR_INVALID_PARAM;
-
-    struct viewport *vp = &curr_vp->vp;
-    /* we need to know what line number (viewport relative) this pb is,
-     * so count them... */
-    int line_num = -1;
-    struct skin_line *line = curr_vp->lines;
-    while (line)
+    (void)wps_data;
+    int val = 0;
+    if (element->params_count == 0)
     {
-        line_num++;
-        line = line->next;
+        switch (token->type)
+        {
+            case SKIN_TOKEN_SUBLINE_TIMEOUT:
+                return -1;
+            case SKIN_TOKEN_BUTTON_VOLUME:
+            case SKIN_TOKEN_TRACK_STARTING:
+            case SKIN_TOKEN_TRACK_ENDING:
+            case SKIN_TOKEN_LASTTOUCH:
+                val = 10;
+                break;
+            default:
+                break;
+        }
     }
-    if (curr_vp->label != VP_DEFAULT_LABEL)
-        line_num--;
+    else
+        val = element->params[0].data.number;
+    token->value.i = val;
+    if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT)
+        curr_line->timeout = val * TIMEOUT_UNIT;
+    return 0;
+}
+
+static int parse_progressbar_tag(struct skin_element* element,
+                                 struct wps_token *token,
+                                 struct wps_data *wps_data)
+{
+#ifdef HAVE_LCD_BITMAP
+    struct progressbar *pb;
+    struct skin_token_list *item;
+    struct viewport *vp = &curr_vp->vp;
+    struct skin_tag_parameter *param = element->params;
+    
+    if (element->params_count == 0 && 
+        element->tag->type != SKIN_TOKEN_PROGRESSBAR)
+        return 0; /* nothing to do */
+    pb = (struct progressbar*)skin_buffer_alloc(sizeof(struct progressbar));
+    
+    token->value.data = pb;
+    
+    if (!pb)
+        return WPS_ERROR_INVALID_PARAM;
     pb->vp = vp;
     pb->have_bitmap_pb = false;
     pb->bm.data = NULL; /* no bitmap specified */
     pb->follow_lang_direction = follow_lang_direction > 0;
-    pb->draw = false;
-
-    if (*wps_bufptr != '(') /* regular old style */
+    
+    if (element->params_count == 0)
     {
         pb->x = 0;
         pb->width = vp->width;
         pb->height = SYSFONT_HEIGHT-2;
-        pb->y = -line_num - 1; /* Will be computed during the rendering */
-        if (token->type == WPS_TOKEN_VOLUME || token->type == WPS_TOKEN_BATTERY_PERCENT)
-            return 0; /* dont add it, let the regular token handling do the work */
-        pb->type = token->type;
-        add_to_ll_chain(&wps_data->progressbars, item);
+        pb->y = -1; /* Will be computed during the rendering */
+        pb->type = element->tag->type;
         return 0;
     }
-    ptr = wps_bufptr + 1;
-
-    if (!(ptr = parse_list("dddds", &set, ',', ptr,
-                           &x, &y, &width, &height, &filename)))
-        return WPS_ERROR_INVALID_PARAM;
-
-    if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */
-        pb->bm.data = (char*)filename;
-
-    if (LIST_VALUE_PARSED(set, PB_X)) /* x */
-        pb->x = x;
+    
+    item = new_skin_token_list_item(token, pb);
+    if (!item)
+        return -1;
+    add_to_ll_chain(&wps_data->progressbars, item);
+    
+    /* (x,y,width,height,filename) */
+    if (!isdefault(param))
+        pb->x = param->data.number;
     else
         pb->x = vp->x;
-
-    if (LIST_VALUE_PARSED(set, PB_WIDTH)) /* width */
-    {
-        /* A zero width causes a divide-by-zero error later, so reject it */
-        if (width == 0)
-            return WPS_ERROR_INVALID_PARAM;
-
-        pb->width = width;
-    }
+    param++;
+    
+    if (!isdefault(param))
+        pb->y = param->data.number;
+    else
+        pb->y = -1; /* computed at rendering */
+    param++;
+    
+    if (!isdefault(param))
+        pb->width = param->data.number;
     else
         pb->width = vp->width - pb->x;
-
-    if (LIST_VALUE_PARSED(set, PB_HEIGHT)) /* height, default to font height */
+    param++;
+    
+    if (!isdefault(param))
     {
         /* A zero height makes no sense - reject it */
-        if (height == 0)
+        if (param->data.number == 0)
             return WPS_ERROR_INVALID_PARAM;
 
-        pb->height = height;
+        pb->height = param->data.number;
     }
     else
     {
@@ -1337,30 +580,26 @@ static int parse_progressbar(const char *wps_bufptr,
 #endif
         }
     }
-
-    if (LIST_VALUE_PARSED(set, PB_Y)) /* y */
-        pb->y = y;
-    else
-        pb->y = -line_num - 1; /* Will be computed during the rendering */
-
-    if (*ptr != ')')
-        return WPS_ERROR_INVALID_PARAM;
-
-    add_to_ll_chain(&wps_data->progressbars, item);
-    if (token->type == WPS_TOKEN_VOLUME)
-        token->type = WPS_TOKEN_VOLUMEBAR;
-    else if (token->type == WPS_TOKEN_BATTERY_PERCENT)
-        token->type = WPS_TOKEN_BATTERY_PERCENTBAR;
+    param++;
+    if (!isdefault(param))
+        pb->bm.data = param->data.text;
+        
+        
+    if (token->type == SKIN_TOKEN_VOLUME)
+        token->type = SKIN_TOKEN_VOLUMEBAR;
+    else if (token->type == SKIN_TOKEN_BATTERY_PERCENT)
+        token->type = SKIN_TOKEN_BATTERY_PERCENTBAR;
     pb->type = token->type;
-
-    return ptr+1-wps_bufptr;
+        
+    return 0;
+    
 #else
-    (void)wps_bufptr;
-    if (token->type != WPS_TOKEN_VOLUME &&
-        token->type != WPS_TOKEN_BATTERY_PERCENTBAR)
+    (void)element;
+    if (token->type == SKIN_TOKEN_PROGRESSBAR ||
+        token->type == SKIN_TOKEN_PLAYER_PROGRESSBAR)
     {
         wps_data->full_line_progressbar = 
-                        token->type == WPS_TOKEN_PLAYER_PROGRESSBAR;
+                        token->type == SKIN_TOKEN_PLAYER_PROGRESSBAR;
     }
     return 0;
 
@@ -1368,32 +607,32 @@ static int parse_progressbar(const char *wps_bufptr,
 }
 
 #ifdef HAVE_ALBUMART
-static int parse_albumart_load(const char *wps_bufptr,
+static int parse_albumart_load(struct skin_element* element,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    const char *ptr = wps_bufptr;
     struct dim dimensions;
     int albumart_slot;
     bool swap_for_rtl = lang_is_rtl() && follow_lang_direction;
-    struct skin_albumart *aa = skin_buffer_alloc(sizeof(struct skin_albumart));
+    struct skin_albumart *aa = 
+        (struct skin_albumart *)skin_buffer_alloc(sizeof(struct skin_albumart));
     (void)token; /* silence warning */
     if (!aa)
-        return skip_end_of_line(wps_bufptr);
+        return -1;
 
     /* reset albumart info in wps */
     aa->width = -1;
     aa->height = -1;
     aa->xalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
     aa->yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
-    aa->vp = &curr_vp->vp;
 
-    if (*ptr != '(')
-        return WPS_ERROR_INVALID_PARAM; 
-    ptr++;
-    /* format: %Cl|x|y|[[l|c|r]mwidth]|[[t|c|b]mheight]| */
-    if (!(ptr = parse_list("dddd", NULL,',',ptr, &aa->x, &aa->y, &aa->width, &aa->height)))
-        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+    aa->x = element->params[0].data.number;
+    aa->y = element->params[1].data.number;
+    aa->width = element->params[2].data.number;
+    aa->height = element->params[3].data.number;
+    
+    aa->vp = &curr_vp->vp;
+    aa->draw_handle = -1;
 
     /* if we got here, we parsed everything ok .. ! */
     if (aa->width < 0)
@@ -1410,7 +649,6 @@ static int parse_albumart_load(const char *wps_bufptr,
         aa->x = LCD_WIDTH - (aa->x + aa->width);
 
     aa->state = WPS_ALBUMART_LOAD;
-    aa->draw = false;
     wps_data->albumart = aa;
 
     dimensions.width = aa->width;
@@ -1420,11 +658,10 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     if (0 <= albumart_slot)
         wps_data->playback_aa_slot = albumart_slot;
-
-    if (*ptr == ',')
+        
+    if (element->params_count > 4 && !isdefault(&element->params[4]))
     {
-        ptr++;
-        switch (*ptr)
+        switch (*element->params[4].data.text)
         {
             case 'l':
             case 'L':
@@ -1445,12 +682,10 @@ static int parse_albumart_load(const char *wps_bufptr,
                     aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
                 break;
         }
-        ptr++;
     }
-    if (*ptr == ',')
+    if (element->params_count > 5 && !isdefault(&element->params[5]))
     {
-        ptr++;
-        switch (*ptr)
+        switch (*element->params[5].data.text)
         {
             case 't':
             case 'T':
@@ -1465,32 +700,10 @@ static int parse_albumart_load(const char *wps_bufptr,
                 aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
                 break;
         }
-        ptr++;
     }
-    if (*ptr != ')')
-        return WPS_ERROR_INVALID_PARAM;
-
-    return skip_end_of_line(wps_bufptr);
+    return 0;
 }
 
-static int parse_albumart_display(const char *wps_bufptr,
-                                      struct wps_token *token,
-                                      struct wps_data *wps_data)
-{
-    (void)wps_bufptr;
-    (void)token;
-    if (wps_data->albumart)
-    {
-        wps_data->albumart->vp = &curr_vp->vp;
-    }
-#if 0
-    /* the old code did this so keep it here for now...
-     * this is to allow the posibility to showing the next tracks AA! */
-    if (wps_bufptr+1 == 'n')
-        return 1;
-#endif
-    return 0;
-};
 #endif /* HAVE_ALBUMART */
 
 #ifdef HAVE_TOUCHSCREEN
@@ -1520,8 +733,9 @@ static const struct touchaction touchactions[] = {
 #endif
 };
 
-static int parse_touchregion(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data)
+static int parse_touchregion(struct skin_element *element,
+                             struct wps_token *token,
+                             struct wps_data *wps_data)
 {
     (void)token;
     unsigned i, imax;
@@ -1533,7 +747,7 @@ static int parse_touchregion(const char *wps_bufptr,
     int x,y,w,h;
     char temp[20];
 
-    /* format: %T|x|y|width|height|action|
+    /* format: %T(x,y,width,height,action)
      * if action starts with & the area must be held to happen
      * action is one of:
      * play  -  play/pause playback
@@ -1554,35 +768,22 @@ static int parse_touchregion(const char *wps_bufptr,
      * voldown - decrease volume by one step
     */
 
-
-    if (*ptr != '(')
-        return WPS_ERROR_INVALID_PARAM;
-    ptr++;
-
-    if (!(ptr = parse_list("dddds", NULL, ',', ptr, &x, &y, &w, &h, &action)))
-        return WPS_ERROR_INVALID_PARAM;
-
-    /* Check there is a terminating ) */
-    if (*ptr != ')')
-        return WPS_ERROR_INVALID_PARAM;
-
-    region = skin_buffer_alloc(sizeof(struct touchregion));
+    
+    region = (struct touchregion*)skin_buffer_alloc(sizeof(struct touchregion));
     if (!region)
         return WPS_ERROR_INVALID_PARAM;
 
     /* should probably do some bounds checking here with the viewport... but later */
     region->action = ACTION_NONE;
-    region->x = x;
-    region->y = y;
-    region->width = w;
-    region->height = h;
+    region->x = element->params[0].data.number;
+    region->y = element->params[1].data.number;
+    region->width = element->params[2].data.number;
+    region->height = element->params[3].data.number;
     region->wvp = curr_vp;
     region->armed = false;
     region->reverse_bar = false;
+    action = element->params[4].data.text;
 
-    end = strchr(action, ')');
-    if (!end || (size_t)(end-action+1) > sizeof temp)
-        return WPS_ERROR_INVALID_PARAM;
     strlcpy(temp, action, end-action+1);
     action = temp;
     
@@ -1625,448 +826,45 @@ static int parse_touchregion(const char *wps_bufptr,
     if (!item)
         return WPS_ERROR_INVALID_PARAM;
     add_to_ll_chain(&wps_data->touchregions, item);
-    return skip_end_of_line(wps_bufptr);
+    return 0;
 }
 #endif
 
-/* Parse a generic token from the given string. Return the length read */
-static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
+static bool check_feature_tag(const int type)
 {
-    int skip = 0, taglen = 0, ret;
-    struct wps_token *token = wps_data->tokens + wps_data->num_tokens;
-    const struct wps_tag *tag;
-    memset(token, 0, sizeof(*token));
-
-    switch(*wps_bufptr)
-    {
-
-        case '%':
-        case '<':
-        case '|':
-        case '>':
-        case ';':
-        case '#':
-        case ')':
-        case '(':
-        case ',':
-            /* escaped characters */
-            token->type = WPS_TOKEN_CHARACTER;
-            token->value.c = *wps_bufptr;
-            taglen = 1;
-            wps_data->num_tokens++;
-            break;
-
-        case '?':
-            /* conditional tag */
-            token->type = WPS_TOKEN_CONDITIONAL;
-            level++;
-            condindex[level] = wps_data->num_tokens;
-            numoptions[level] = 1;
-            wps_data->num_tokens++;
-            ret = parse_token(wps_bufptr + 1, wps_data);
-            if (ret < 0) return ret;
-            taglen = 1 + ret;
-            break;
-
-        default:
-            /* find what tag we have */
-            for (tag = all_tags;
-                 strncmp(wps_bufptr, tag->name, strlen(tag->name)) != 0;
-                 tag++) ;
-
-            taglen = (tag->type != WPS_TOKEN_UNKNOWN) ? strlen(tag->name) : 2;
-            token->type = tag->type;
-            curr_line->curr_subline->line_type |= tag->refresh_type;
-
-            /* if the tag has a special parsing function, we call it */
-            if (tag->parse_func)
-            {
-                ret = tag->parse_func(wps_bufptr + taglen, token, wps_data);
-                if (ret < 0) return ret;
-                skip += ret;
-            }
-
-            /* Some tags we don't want to save as tokens */
-            if (tag->type == WPS_NO_TOKEN)
-                break;
-
-            /* tags that start with 'F', 'I' or 'D' are for the next file */
-            if ( *(tag->name) == 'I' || *(tag->name) == 'F' ||
-                 *(tag->name) == 'D')
-                token->next = true;
-
-            wps_data->num_tokens++;
-            break;
-    }
-
-    skip += taglen;
-    return skip;
-}
-
-
-/*
- * Returns the number of bytes to skip the buf pointer to access the false
- * branch in a _binary_ conditional
- *
- * That is:
- *  - before the '|' if we have a false branch, (%?<true|false> -> %?<|false>)
- *  - or before the closing '>' if there's no false branch (%?<true> -> %?<>)
- *
- * depending on the features of a target it's not called from check_feature_tag,
- * hence the __attribute__ or it issues compiler warnings
- *
- **/
-
-static int find_false_branch(const char *wps_bufptr) __attribute__((unused));
-static int find_false_branch(const char *wps_bufptr)
-{
-    const char *buf = wps_bufptr;
-    /* wps_bufptr is after the opening '<', hence level = 1*/
-    int level = 1;
-    char ch;
-    do
-    {
-        ch = *buf;
-        if (ch == '%')
-        {   /* filter out the characters we check later if they're printed
-             * as literals */
-            ch = *(++buf);
-            if (ch == '<' || ch == '>' || ch == '|')
-                continue;
-            /* else: some tags/printed literals we skip over */
-        }
-        else if (ch == '<') /* nested conditional */
-            level++;
-        else if (ch == '>')
-        {   /* closed our or a nested conditional,
-             * do NOT skip over the '>' so that wps_parse() sees it for closing
-             * if it is the closing one for our conditional */
-            level--;
-        }
-        else if (ch == '|' && level == 1)
-        {   /* we found our separator, point before and get out */
-            break;
-        }
-    /* if level is 0, we don't have a false branch */
-    } while (level > 0 && *(++buf));
-
-    return buf - wps_bufptr;
-}
-
-/*
- * returns the number of bytes to get the appropriate branch of a binary
- * conditional
- *
- * That means:
- *  - if a feature is available, it returns 0 to not skip anything
- *  - if the feature is not available, skip to the false branch and don't
- *    parse the true branch at all
- *
- * */
-static int check_feature_tag(const char *wps_bufptr, const int type)
-{
-    (void)wps_bufptr;
     switch (type)
     {
-        case WPS_TOKEN_RTC_PRESENT:
+        case SKIN_TOKEN_RTC_PRESENT:
 #if CONFIG_RTC
-            return 0;
+            return true;
 #else
-            return find_false_branch(wps_bufptr);
-#endif /* CONFIG_RTC */
-
-        case WPS_TOKEN_HAVE_RECORDING:
+            return false;
+#endif
+        case SKIN_TOKEN_HAVE_RECORDING:
 #ifdef HAVE_RECORDING
-            return 0;
+            return true;
 #else
-            return find_false_branch(wps_bufptr);
-#endif /* HAVE_RECORDING */
-
-        case WPS_TOKEN_HAVE_TUNER:
+            return false;
+#endif
+        case SKIN_TOKEN_HAVE_TUNER:
 #if CONFIG_TUNER
             if (radio_hardware_present())
-                return 0;
-#endif /* CONFIG_TUNER */
-            return find_false_branch(wps_bufptr);
+                return true;
+#endif
+            return false;
 
 #if CONFIG_TUNER
-        case WPS_TOKEN_HAVE_RDS:
+        case SKIN_TOKEN_HAVE_RDS:
 #ifdef HAVE_RDS_CAP
-            return 0;
+            return true;
 #else
-            return find_false_branch(wps_bufptr);
+            return false;
 #endif /* HAVE_RDS_CAP */
 #endif /* CONFIG_TUNER */
         default: /* not a tag we care about, just don't skip */
-            return 0;
+            return true;
     }
 }
-
-
-/* Parses the WPS.
-   data is the pointer to the structure where the parsed WPS should be stored.
-        It is initialised.
-   wps_bufptr points to the string containing the WPS tags */
-#define TOKEN_BLOCK_SIZE 128
-static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
-{
-    if (!data || !wps_bufptr || !*wps_bufptr)
-        return false;
-    enum wps_parse_error fail = PARSE_OK;
-    int ret;
-    int max_tokens = TOKEN_BLOCK_SIZE;
-    size_t buf_free = 0;
-    line_number = 0;
-    level = -1;
-
-    /* allocate enough RAM for a reasonable skin, grow as needed.
-     * Free any used RAM before loading the images to be 100% RAM efficient */
-    data->tokens = (struct wps_token *)skin_buffer_grab(&buf_free);
-    if (sizeof(struct wps_token)*max_tokens >= buf_free)
-        return false;
-    skin_buffer_increment(max_tokens * sizeof(struct wps_token), false);
-    data->num_tokens = 0;
-
-#if LCD_DEPTH > 1
-    /* Backdrop defaults to the setting unless %X is used, so set it now */
-    if (global_settings.backdrop_file[0])
-    {
-        data->backdrop = "-";
-    }
-#endif
-
-    while (*wps_bufptr && !fail)
-    {
-        if (follow_lang_direction)
-            follow_lang_direction--;
-        /* first make sure there is enough room for tokens */
-        if (max_tokens <= data->num_tokens + 5)
-        {
-            int extra_tokens = TOKEN_BLOCK_SIZE;
-            size_t needed = extra_tokens * sizeof(struct wps_token);
-            /* do some smarts here to grow the array a bit */
-            if (skin_buffer_freespace() < needed)
-            {
-                fail = PARSE_FAIL_LIMITS_EXCEEDED;
-                break;
-            }
-            skin_buffer_increment(needed, false);
-            max_tokens += extra_tokens;
-        }
-
-        switch(*wps_bufptr++)
-        {
-
-            /* Regular tag */
-            case '%':
-                if ((ret = parse_token(wps_bufptr, data)) < 0)
-                {
-                    fail = PARSE_FAIL_COND_INVALID_PARAM;
-                    break;
-                }
-                else if (level >= WPS_MAX_COND_LEVEL - 1)
-                {
-                    fail = PARSE_FAIL_LIMITS_EXCEEDED;
-                    break;
-                }
-                wps_bufptr += ret;
-                break;
-
-            /* Alternating sublines separator */
-            case ';':
-                if (level >= 0) /* there are unclosed conditionals */
-                {
-                    fail = PARSE_FAIL_UNCLOSED_COND;
-                    break;
-                }
-
-                if (!skin_start_new_subline(curr_line, data->num_tokens))
-                    fail = PARSE_FAIL_LIMITS_EXCEEDED;
-
-                break;
-
-            /* Conditional list start */
-            case '<':
-                if (data->tokens[data->num_tokens-2].type != WPS_TOKEN_CONDITIONAL)
-                {
-                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
-                    break;
-                }
-                wps_bufptr += check_feature_tag(wps_bufptr,
-                                    data->tokens[data->num_tokens-1].type);
-                data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_START;
-                lastcond[level] = data->num_tokens++;
-                break;
-
-            /* Conditional list end */
-            case '>':
-                if (level < 0) /* not in a conditional, invalid char */
-                {
-                    fail = PARSE_FAIL_INVALID_CHAR;
-                    break;
-                }
-
-                data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
-                if (lastcond[level])
-                    data->tokens[lastcond[level]].value.i = data->num_tokens;
-                else
-                {
-                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
-                    break;
-                }
-
-                lastcond[level] = 0;
-                data->num_tokens++;
-                data->tokens[condindex[level]].value.i = numoptions[level];
-                level--;
-                break;
-
-            /* Conditional list option */
-            case '|':
-                if (level < 0) /* not in a conditional, invalid char */
-                {
-                    fail = PARSE_FAIL_INVALID_CHAR;
-                    break;
-                }
-
-                data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_OPTION;
-                if (lastcond[level])
-                    data->tokens[lastcond[level]].value.i = data->num_tokens;
-                else
-                {
-                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
-                    break;
-                }
-
-                lastcond[level] = data->num_tokens;
-                numoptions[level]++;
-                data->num_tokens++;
-                break;
-
-            /* Comment */
-            case '#':
-                if (level >= 0) /* there are unclosed conditionals */
-                {
-                    fail = PARSE_FAIL_UNCLOSED_COND;
-                    break;
-                }
-
-                wps_bufptr += skip_end_of_line(wps_bufptr);
-                break;
-
-            /* End of this line */
-            case '\n':
-                if (level >= 0) /* there are unclosed conditionals */
-                {
-                    fail = PARSE_FAIL_UNCLOSED_COND;
-                    break;
-                }
-                /* add a new token for the \n so empty lines are correct */
-                data->tokens[data->num_tokens].type = WPS_TOKEN_CHARACTER;
-                data->tokens[data->num_tokens].value.c = '\n';
-                data->tokens[data->num_tokens].next = false;
-                data->num_tokens++;
-
-                if (!skin_start_new_line(curr_vp, data->num_tokens))
-                {
-                    fail = PARSE_FAIL_LIMITS_EXCEEDED;
-                    break;
-                }
-                line_number++;
-
-                break;
-
-            /* String */
-            default:
-                {
-                    unsigned int len = 1;
-                    const char *string_start = wps_bufptr - 1;
-
-                    /* find the length of the string */
-                    while (*wps_bufptr && *wps_bufptr != '#' &&
-                           *wps_bufptr != '%' && *wps_bufptr != ';' &&
-                           *wps_bufptr != '<' && *wps_bufptr != '>' &&
-                           *wps_bufptr != '|' && *wps_bufptr != '\n')
-                    {
-                        wps_bufptr++;
-                        len++;
-                    }
-
-                    /* look if we already have that string */
-                    char *str;
-                    bool found = false;
-                    struct skin_token_list *list = data->strings;
-                    while (list)
-                    {
-                        str = (char*)list->token->value.data;
-                        found = (strlen(str) == len &&
-                                    strncmp(string_start, str, len) == 0);
-                        if (found)
-                            break; /* break here because the list item is
-                                      used if its found */
-                        list = list->next;
-                    }
-                    /* If a matching string is found, found is true and i is
-                       the index of the string. If not, found is false */
-
-                    if (!found)
-                    {
-                        /* new string */
-                        str = (char*)skin_buffer_alloc(len+1);
-                        if (!str)
-                        {
-                            fail = PARSE_FAIL_LIMITS_EXCEEDED;
-                            break;
-                        }
-                        strlcpy(str, string_start, len+1);
-                        struct skin_token_list *item =
-                            new_skin_token_list_item(&data->tokens[data->num_tokens], str);
-                        if(!item)
-                        {
-                            fail = PARSE_FAIL_LIMITS_EXCEEDED;
-                            break;
-                        }
-                        add_to_ll_chain(&data->strings, item);
-                    }
-                    else
-                    {
-                        /* another occurrence of an existing string */
-                        data->tokens[data->num_tokens].value.data = list->token->value.data;
-                    }
-                    data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
-                    data->num_tokens++;
-                }
-                break;
-        }
-    }
-
-    if (!fail && level >= 0) /* there are unclosed conditionals */
-        fail = PARSE_FAIL_UNCLOSED_COND;
-
-    if (*wps_bufptr && !fail)
-        /* one of the limits of the while loop was exceeded */
-        fail = PARSE_FAIL_LIMITS_EXCEEDED;
-
-    /* Success! */
-    curr_line->curr_subline->last_token_idx = data->num_tokens;
-    data->tokens[data->num_tokens++].type = WPS_NO_TOKEN;
-    /* freeup unused tokens */
-    skin_buffer_free_from_front(sizeof(struct wps_token)
-                                * (max_tokens - data->num_tokens));
-
-#ifdef DEBUG_SKIN_ENGINE
-    if (debug)
-    {
-        print_debug_info(data, fail, line_number);
-        debug_skin_usage();
-    }
-#else
-    (void)debug;
-#endif
-
-    return (fail == 0);
-}
-
 
 /*
  * initial setup of wps_data; does reset everything
@@ -2075,6 +873,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr, bool debug)
  **/
 static void skin_data_reset(struct wps_data *wps_data)
 {
+    wps_data->tree = NULL;
 #ifdef HAVE_LCD_BITMAP
     wps_data->images = NULL;
     wps_data->progressbars = NULL;
@@ -2085,8 +884,6 @@ static void skin_data_reset(struct wps_data *wps_data)
 #ifdef HAVE_TOUCHSCREEN
     wps_data->touchregions = NULL;
 #endif
-    wps_data->viewports = NULL;
-    wps_data->strings = NULL;
 #ifdef HAVE_ALBUMART
     wps_data->albumart = NULL;
     if (wps_data->playback_aa_slot >= 0)
@@ -2095,8 +892,6 @@ static void skin_data_reset(struct wps_data *wps_data)
         wps_data->playback_aa_slot = -1;
     }
 #endif
-    wps_data->tokens = NULL;
-    wps_data->num_tokens = 0;
 
 #ifdef HAVE_LCD_BITMAP
     wps_data->peak_meter_enabled = false;
@@ -2119,6 +914,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 {
     (void)wps_data; /* only needed for remote targets */
     char img_path[MAX_PATH];
+    int fd;
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
 
@@ -2131,14 +927,24 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 #endif
         format = FORMAT_ANY|FORMAT_TRANSPARENT;
 
-    size_t max_buf;
-    char* imgbuf = (char*)skin_buffer_grab(&max_buf);
+    fd = open(img_path, O_RDONLY);
+    if (fd < 0)
+        return false;
+    size_t buf_size = read_bmp_file(img_path, bitmap, 0, 
+                                    format|FORMAT_RETURN_SIZE, NULL);  
+    char* imgbuf = (char*)skin_buffer_alloc(buf_size);
+    if (!imgbuf)
+    {
+        close(fd);
+        return NULL;
+    }
+    lseek(fd, 0, SEEK_SET);
     bitmap->data = imgbuf;
-    int ret = read_bmp_file(img_path, bitmap, max_buf, format, NULL);
+    int ret = read_bmp_fd(fd, bitmap, buf_size, format, NULL);
 
+    close(fd);
     if (ret > 0)
     {
-        skin_buffer_increment(ret, true);
         return true;
     }
     else
@@ -2204,14 +1010,14 @@ static bool skin_load_fonts(struct wps_data *data)
 {
     /* don't spit out after the first failue to aid debugging */
     bool success = true;
-    struct skin_token_list *vp_list;
+    struct skin_element *vp_list;
     int font_id;
     /* walk though each viewport and assign its font */
-    for(vp_list = data->viewports; vp_list; vp_list = vp_list->next)
+    for(vp_list = data->tree; vp_list; vp_list = vp_list->next)
     {
         /* first, find the viewports that have a non-sys/ui-font font */
         struct skin_viewport *skin_vp =
-                (struct skin_viewport*)vp_list->token->value.data;
+                (struct skin_viewport*)vp_list->data;
         struct viewport *vp = &skin_vp->vp;
 
 
@@ -2250,6 +1056,7 @@ static bool skin_load_fonts(struct wps_data *data)
         {
             DEBUGF("Unable to load font %d: '%s.fnt'\n",
                     font_id, font->name);
+            font->name = NULL; /* to stop trying to load it again if we fail */
             success = false;
             font->name = NULL;
             continue;
@@ -2262,6 +1069,277 @@ static bool skin_load_fonts(struct wps_data *data)
 }
 
 #endif /* HAVE_LCD_BITMAP */
+static int convert_viewport(struct wps_data *data, struct skin_element* element)
+{
+    struct skin_viewport *skin_vp = 
+        (struct skin_viewport *)skin_buffer_alloc(sizeof(struct skin_viewport));
+    struct screen *display = &screens[curr_screen];
+    
+    if (!skin_vp)
+        return CALLBACK_ERROR;
+        
+    skin_vp->hidden_flags = 0;
+    skin_vp->label = VP_NO_LABEL;
+    element->data = skin_vp;
+    curr_vp = skin_vp;
+    curr_viewport_element = element;
+    
+    viewport_set_defaults(&skin_vp->vp, curr_screen);
+    
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
+    skin_vp->start_bgcolour = skin_vp->vp.bg_pattern;
+#endif
+    
+
+    struct skin_tag_parameter *param = element->params;
+    if (element->params_count == 0) /* default viewport */
+    {
+        if (!data->tree) /* first viewport in the skin */
+            data->tree = element;
+        skin_vp->label = VP_DEFAULT_LABEL;
+        return CALLBACK_OK;
+    }
+    
+    if (element->params_count == 6)
+    {
+        if (element->tag->type == SKIN_TOKEN_UIVIEWPORT_LOAD)
+        {
+            if (isdefault(param))
+            {
+                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
+                skin_vp->label = VP_INFO_LABEL|VP_DEFAULT_LABEL;
+            }
+            else
+            {
+                skin_vp->hidden_flags = VP_NEVER_VISIBLE;
+                skin_vp->label = VP_INFO_LABEL|param->data.text[0];
+            }
+        }
+        else
+        {
+                skin_vp->hidden_flags = VP_DRAW_HIDEABLE|VP_DRAW_HIDDEN;
+                skin_vp->label = param->data.text[0];
+        }
+        param++;
+    }
+    /* x */
+    if (!isdefault(param))
+    {
+        skin_vp->vp.x = param->data.number;
+        if (param->data.number < 0)
+            skin_vp->vp.x += display->lcdwidth;
+    }
+    param++;
+    /* y */
+    if (!isdefault(param))
+    {
+        skin_vp->vp.y = param->data.number;
+        if (param->data.number < 0)
+            skin_vp->vp.y += display->lcdheight;
+    }
+    param++;
+    /* width */
+    if (!isdefault(param))
+    {
+        skin_vp->vp.width = param->data.number;
+        if (param->data.number < 0)
+            skin_vp->vp.width = (skin_vp->vp.width + display->lcdwidth) - skin_vp->vp.x;
+    }
+    else
+    {
+        skin_vp->vp.width = display->lcdwidth - skin_vp->vp.x;
+    }
+    param++;
+    /* height */
+    if (!isdefault(param))
+    {
+        skin_vp->vp.height = param->data.number;
+        if (param->data.number < 0)
+            skin_vp->vp.height = (skin_vp->vp.height + display->lcdheight) - skin_vp->vp.y;
+    }
+    else
+    {
+        skin_vp->vp.height = display->lcdheight - skin_vp->vp.y;
+    }
+    param++;
+#ifdef HAVE_LCD_BITMAP
+    /* font */
+    if (!isdefault(param))
+    {
+        skin_vp->vp.font = param->data.number;
+    }
+#endif    
+
+    return CALLBACK_OK;
+    
+}
+
+int skin_element_callback(struct skin_element* element, void* data)
+{
+    struct wps_data *wps_data = (struct wps_data *)data;
+    struct wps_token *token;
+    parse_function function = NULL;
+    
+    switch (element->type)
+    {
+        /* IMPORTANT: element params are shared, so copy them if needed
+         *            or use then NOW, dont presume they have a long lifespan
+         */
+        case TAG:
+        {
+            token = (struct wps_token*)skin_buffer_alloc(sizeof(struct wps_token));
+            memset(token, 0, sizeof(*token));
+            token->type = element->tag->type;
+            
+            if ((element->tag->flags&SKIN_REFRESH_ALL) == SKIN_RTC_REFRESH)
+            {
+#ifdef CONFIG_RTC
+                curr_line->update_mode |= SKIN_REFRESH_DYNAMIC;
+#else
+                curr_line->update_mode |= SKIN_REFRESH_STATIC;
+#endif
+            }
+            else
+                curr_line->update_mode |= element->tag->flags&SKIN_REFRESH_ALL;
+            
+            element->data = token;
+            
+            /* Some tags need special handling for the tag, so add them here */
+            switch (token->type)
+            {
+                case SKIN_TOKEN_ALIGN_LANGDIRECTION:
+                    follow_lang_direction = 2;
+                    break;
+                case SKIN_TOKEN_PROGRESSBAR:
+                case SKIN_TOKEN_VOLUME:
+                case SKIN_TOKEN_BATTERY_PERCENT:
+                case SKIN_TOKEN_PLAYER_PROGRESSBAR:
+                    function = parse_progressbar_tag;
+                    break;
+                case SKIN_TOKEN_SUBLINE_TIMEOUT:
+                case SKIN_TOKEN_BUTTON_VOLUME:
+                case SKIN_TOKEN_TRACK_STARTING:
+                case SKIN_TOKEN_TRACK_ENDING:
+                case SKIN_TOKEN_LASTTOUCH:
+                    function = parse_timeout_tag;
+                    break;
+#ifdef HAVE_LCD_BITMAP
+                case SKIN_TOKEN_DISABLE_THEME:
+                case SKIN_TOKEN_ENABLE_THEME:
+                case SKIN_TOKEN_DRAW_INBUILTBAR:
+                    function = parse_statusbar_tags;
+                    break;
+#endif
+                case SKIN_TOKEN_FILE_DIRECTORY:
+                    token->value.i = element->params[0].data.number;
+                    break;
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+                case SKIN_TOKEN_VIEWPORT_FGCOLOUR:
+                case SKIN_TOKEN_VIEWPORT_BGCOLOUR:
+                    function = parse_viewportcolour;
+                    break;
+                case SKIN_TOKEN_IMAGE_BACKDROP:
+                    function = parse_image_special;
+                    break;
+#endif
+                case SKIN_TOKEN_TRANSLATEDSTRING:
+                case SKIN_TOKEN_SETTING:
+                    function = parse_setting_and_lang;
+                    break;
+#ifdef HAVE_LCD_BITMAP
+                case SKIN_TOKEN_VIEWPORT_CUSTOMLIST:
+                    function = parse_playlistview;
+                    break;
+                case SKIN_TOKEN_LOAD_FONT:
+                    function = parse_font_load;
+                    break;
+                case SKIN_TOKEN_VIEWPORT_ENABLE:
+                case SKIN_TOKEN_UIVIEWPORT_ENABLE:
+                    token->value.i = element->params[0].data.text[0];
+                    break;
+                case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
+                    function = parse_image_display;
+                    break;
+                case SKIN_TOKEN_IMAGE_PRELOAD:
+                case SKIN_TOKEN_IMAGE_DISPLAY:
+                    function = parse_image_load;
+                    break;
+#endif
+#ifdef HAVE_TOUCHSCREEN
+                case SKIN_TOKEN_TOUCHREGION:
+                    function = parse_touchregion;
+                    break;
+#endif
+#ifdef HAVE_ALBUMART
+                case SKIN_TOKEN_ALBUMART_DISPLAY:
+                    if (wps_data->albumart)
+                        wps_data->albumart->vp = &curr_vp->vp;
+                    break;
+                case SKIN_TOKEN_ALBUMART_LOAD:
+                    function = parse_albumart_load;
+                    break;
+#endif
+                default:
+                    break;
+            }
+            if (function)
+            {
+                if (function(element, token, wps_data) < 0)
+                    return CALLBACK_ERROR;
+            }
+            /* tags that start with 'F', 'I' or 'D' are for the next file */
+            if ( *(element->tag->name) == 'I' || *(element->tag->name) == 'F' ||
+                 *(element->tag->name) == 'D')
+                token->next = true;
+            if (follow_lang_direction > 0 )
+                follow_lang_direction--;
+            break;
+        }
+        case VIEWPORT:
+            return convert_viewport(wps_data, element);
+        case LINE:
+        {
+            struct line *line = 
+                (struct line *)skin_buffer_alloc(sizeof(struct line));
+            line->update_mode = SKIN_REFRESH_STATIC;
+            line->timeout = DEFAULT_SUBLINE_TIME_MULTIPLIER * TIMEOUT_UNIT;
+            curr_line = line;
+            element->data = line;
+        }
+        break;
+        case LINE_ALTERNATOR:
+        {
+            struct line_alternator *alternator = 
+                (struct line_alternator *)skin_buffer_alloc(sizeof(struct line_alternator));
+            alternator->current_line = 0;
+#ifndef __PCTOOL__
+            alternator->last_change_tick = current_tick;
+#endif
+            element->data = alternator;
+        }
+        break;
+        case CONDITIONAL:
+        {
+            struct conditional *conditional = 
+                (struct conditional *)skin_buffer_alloc(sizeof(struct conditional));
+            conditional->last_value = -1;
+            conditional->token = element->data;
+            element->data = conditional;
+            if (!check_feature_tag(element->tag->type))
+            {
+                return FEATURE_NOT_AVAILABLE;
+            }
+            return CALLBACK_OK;
+        }
+        case TEXT:
+            curr_line->update_mode |= SKIN_REFRESH_STATIC;
+            break;
+        default:
+            break;
+    }
+    return CALLBACK_OK;
+}
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
@@ -2298,37 +1376,13 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #endif
 
+
     skin_data_reset(wps_data);
     wps_data->wps_loaded = false;
     curr_screen = screen;
-
-    /* alloc default viewport, will be fixed up later */
-    curr_vp = skin_buffer_alloc(sizeof(struct skin_viewport));
-    if (!curr_vp)
-        return false;
-    struct skin_token_list *list = new_skin_token_list_item(NULL, curr_vp);
-    if (!list)
-        return false;
-    add_to_ll_chain(&wps_data->viewports, list);
-
-
-    /* Initialise the first (default) viewport */
-    curr_vp->label         = VP_DEFAULT_LABEL;
-    curr_vp->hidden_flags  = 0;
-    curr_vp->lines         = NULL;
-
-    viewport_set_defaults(&curr_vp->vp, screen);
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    curr_vp->start_fgcolour = curr_vp->vp.fg_pattern;
-    curr_vp->start_bgcolour = curr_vp->vp.bg_pattern;
-#endif
-#ifdef HAVE_LCD_BITMAP
-    curr_vp->vp.font = FONT_UI;
-#endif
-
     curr_line = NULL;
-    if (!skin_start_new_line(curr_vp, 0))
-        return false;
+    curr_vp = NULL;
+    curr_viewport_element = NULL;
 
     if (isfile)
     {
@@ -2364,9 +1418,15 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     {
         wps_buffer = (char*)buf;
     }
-    /* parse the WPS source */
-    if (!wps_parse(wps_data, wps_buffer, isfile)) {
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    wps_data->backdrop = "-";
+#endif
+    /* parse the skin source */
+    skin_buffer_save_position();
+    wps_data->tree = skin_parse(wps_buffer, skin_element_callback, wps_data);
+    if (!wps_data->tree) {
         skin_data_reset(wps_data);
+        skin_buffer_restore_position();
         return false;
     }
 
@@ -2387,6 +1447,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         !skin_load_fonts(wps_data)) 
     {
         skin_data_reset(wps_data);
+        skin_buffer_restore_position();
         return false;
     }
 #endif
@@ -2410,8 +1471,8 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 #endif
     wps_data->wps_loaded = true;
 #ifdef DEBUG_SKIN_ENGINE
-    if (isfile && debug_wps)
-        debug_skin_usage();
+ //   if (isfile && debug_wps)
+ //       debug_skin_usage();
 #endif
     return true;
 }

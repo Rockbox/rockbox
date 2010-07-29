@@ -310,13 +310,6 @@ static void set_default_align_flags(struct viewport *vp)
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __PCTOOL__ */
 
-#ifdef HAVE_LCD_COLOR
-#define ARG_STRING(_depth) ((_depth) == 2 ? "dddddgg":"dddddcc")
-#else
-#define ARG_STRING(_depth) "dddddgg"
-#endif
-
-
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
@@ -416,81 +409,4 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 }
 
-const char* viewport_parse_viewport(struct viewport *vp,
-                                    enum screen_type screen,
-                                    const char *bufptr,
-                                    const char separator)
-{
-    /* parse the list to the viewport struct */
-    const char *ptr = bufptr;
-    uint32_t set = 0;
-
-    enum {
-        PL_X = 0,
-        PL_Y,
-        PL_WIDTH,
-        PL_HEIGHT,
-        PL_FONT,
-    };
-    
-    if (!(ptr = parse_list("ddddd", &set, separator, ptr,
-                &vp->x, &vp->y, &vp->width, &vp->height, &vp->font)))
-        return NULL;
-
-    /* X and Y *must* be set */
-    if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
-        return NULL;
-    /* check for negative values */
-    if (vp->x < 0)
-        vp->x += screens[screen].lcdwidth;
-    if (vp->y < 0)
-        vp->y += screens[screen].lcdheight;
-        
-    /* fix defaults, 
-     * and negative width/height which means "extend to edge minus value */
-    if (!LIST_VALUE_PARSED(set, PL_WIDTH))
-        vp->width = screens[screen].lcdwidth - vp->x;
-    else if (vp->width < 0)
-        vp->width = (vp->width + screens[screen].lcdwidth) - vp->x;
-    if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
-        vp->height = screens[screen].lcdheight - vp->y;
-    else if (vp->height < 0)
-        vp->height = (vp->height + screens[screen].lcdheight) - vp->y;
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    vp->fg_pattern = get_viewport_default_colour(screen, true);
-    vp->bg_pattern = get_viewport_default_colour(screen, false);
-#endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
-
-#ifdef HAVE_LCD_COLOR
-    vp->lss_pattern = global_settings.lss_color;
-    vp->lse_pattern = global_settings.lse_color;
-    vp->lst_pattern = global_settings.lst_color;
-#endif
-
-    /* Validate the viewport dimensions - we know that the numbers are
-       non-negative integers, ignore bars and assume the viewport takes them
-       * into account */
-    if ((vp->x >= screens[screen].lcdwidth) ||
-        ((vp->x + vp->width) > screens[screen].lcdwidth) ||
-        (vp->y >= screens[screen].lcdheight) ||
-        ((vp->y + vp->height) > screens[screen].lcdheight))
-    {
-        return NULL;
-    }
-
-    /* Default to using the user font if the font was an invalid number or '-'
-     * font 1 is *always* the UI font for the current screen
-     * 2 is always the first extra font    */
-    if (!LIST_VALUE_PARSED(set, PL_FONT))
-        vp->font = FONT_UI;
-
-    /* Set the defaults for fields not user-specified */
-    vp->drawmode = DRMODE_SOLID;
-#ifndef __PCTOOL__
-    set_default_align_flags(vp);
-#endif
-
-    return ptr;
-}
 #endif

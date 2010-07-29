@@ -363,20 +363,22 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     }
     switch (token->type)
     {
-        case WPS_TOKEN_METADATA_ARTIST:
+        case SKIN_TOKEN_METADATA_ARTIST:
             return *track->performer ? track->performer : NULL;
-        case WPS_TOKEN_METADATA_COMPOSER:
+        case SKIN_TOKEN_METADATA_COMPOSER:
             return *track->songwriter ? track->songwriter : NULL;
-        case WPS_TOKEN_METADATA_ALBUM:
+        case SKIN_TOKEN_METADATA_ALBUM:
             return *cue->title ? cue->title : NULL;
-        case WPS_TOKEN_METADATA_ALBUM_ARTIST:
+        case SKIN_TOKEN_METADATA_ALBUM_ARTIST:
             return *cue->performer ? cue->performer : NULL;
-        case WPS_TOKEN_METADATA_TRACK_TITLE:
+        case SKIN_TOKEN_METADATA_TRACK_TITLE:
             return *track->title ? track->title : NULL;
-        case WPS_TOKEN_METADATA_TRACK_NUMBER:
+        case SKIN_TOKEN_METADATA_TRACK_NUMBER:
             snprintf(buf, buf_size, "%d/%d",  
                      cue->curr_track_idx+offset_tracks+1, cue->track_count);
             return buf;
+        default:
+            return NULL;
     }
     return NULL;
 }

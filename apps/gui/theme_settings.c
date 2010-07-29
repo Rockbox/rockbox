@@ -30,13 +30,20 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
+#include "buffer.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
 #include "skin_engine/skin_engine.h"
-#include "skin_engine/skin_fonts.h"
+#include "skin_buffer.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
+
+static char *skin_buffer = NULL;
+void theme_init_buffer(void)
+{
+    skin_buffer = buffer_alloc(SKIN_BUFFER_SIZE);
+}
 
 
 /* call this after loading a .wps/.rwps or other skin files, so that the
@@ -71,9 +78,10 @@ void settings_apply_skins(void)
 {
     char buf[MAX_PATH];
     /* re-initialize the skin buffer before we start reloading skins */
-    skin_buffer_init();
     enum screen_type screen = SCREEN_MAIN;
     unsigned int i;
+    
+    skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
     skin_font_init();

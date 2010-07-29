@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -36,6 +37,11 @@
 int skin_line = 0;
 char* skin_start = 0;
 int viewport_line = 0;
+
+#ifdef ROCKBOX
+static skin_callback callback = NULL;
+static void* callback_data;
+#endif
 
 /* Auxiliary parsing functions (not visible at global scope) */
 static struct skin_element* skin_parse_viewport(char** document);
@@ -55,10 +61,23 @@ static int skin_parse_comment(struct skin_element* element, char** document);
 static struct skin_element* skin_parse_code_as_arg(char** document);
 
 
+static void skip_whitespace(char** document)
+{
+    while(**document == ' ' || **document == '\t')
+        (*document)++;
+}
 
+#ifdef ROCKBOX
+struct skin_element* skin_parse(const char* document, 
+                                skin_callback cb, void* cb_data)
+                                
+{
+    callback = cb;
+    callback_data = cb_data;
+#else
 struct skin_element* skin_parse(const char* document)
 {
-
+#endif
     struct skin_element* root = NULL;
     struct skin_element* last = NULL;
 
@@ -94,7 +113,6 @@ struct skin_element* skin_parse(const char* document)
             last = last->next;
 
     }
-
     return root;
 
 }
@@ -107,6 +125,8 @@ static struct skin_element* skin_parse_viewport(char** document)
     struct skin_element* retval = NULL;
 
     retval = skin_alloc_element();
+    if (!retval)
+        return NULL;
     retval->type = VIEWPORT;
     retval->children_count = 1;
     retval->line = skin_line;
@@ -129,11 +149,18 @@ static struct skin_element* skin_parse_viewport(char** document)
             skin_line++;
         }
     }
+#ifdef ROCKBOX
+    else if (callback)
+    {
+        if (callback(retval, callback_data) == CALLBACK_ERROR)
+            return NULL;
+    }
+#endif
 
     retval->children_count = 1;
     retval->children = skin_alloc_children(1);
-
-
+    if (!retval->children)
+        return NULL;
     do
     {
 
@@ -199,7 +226,6 @@ static struct skin_element* skin_parse_viewport(char** document)
                 return NULL;
 
         }
-
         /* Making sure last is at the end */
         while(last->next)
             last = last->next;
@@ -245,6 +271,8 @@ static struct skin_element* skin_parse_line_optional(char** document,
 
     /* A wrapper for the line */
     retval = skin_alloc_element();
+    if (!retval)
+        return NULL;
     retval->type = LINE;
     retval->line = skin_line;
     if(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
@@ -261,7 +289,24 @@ static struct skin_element* skin_parse_line_optional(char** document,
     }
 
     if(retval->children_count > 0)
+    {
         retval->children = skin_alloc_children(1);
+        if (!retval->children)
+            return NULL;
+    }
+
+#ifdef ROCKBOX
+    if (callback)
+    {
+        switch (callback(retval, callback_data))
+        {
+            case CALLBACK_ERROR:
+                return NULL;
+            default:
+                break;
+        }
+    }
+#endif
 
     while(*cursor != '\n' && *cursor != '\0' && *cursor != MULTILINESYM
           && !((*cursor == ARGLISTSEPERATESYM
@@ -275,11 +320,15 @@ static struct skin_element* skin_parse_line_optional(char** document,
         if(root)
         {
             current->next = skin_alloc_element();
+            if (!current->next)
+                return NULL;
             current = current->next;
         }
         else
         {
             current = skin_alloc_element();
+            if (!current)
+                return NULL;
             root = current;
         }
 
@@ -306,9 +355,10 @@ static struct skin_element* skin_parse_line_optional(char** document,
         }
     }
 
+
     /* Moving up the calling function's pointer */
     *document = cursor;
-
+    
     if(root)
         retval->children[0] = root;
     return retval;
@@ -328,6 +378,8 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
     int i;
 
     retval = skin_alloc_element();
+    if (!retval)
+        return NULL;
     retval->type = LINE_ALTERNATOR;
     retval->next = NULL;
     retval->line = skin_line;
@@ -374,6 +426,8 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
     /* ...and then we parse them */
     retval->children_count = sublines;
     retval->children = skin_alloc_children(sublines);
+    if (!retval->children)
+        return NULL;
 
     cursor = *document;
     for(i = 0; i < sublines; i++)
@@ -392,6 +446,13 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
         }
     }
 
+#ifdef ROCKBOX
+    if (callback)
+    {
+        if (callback(retval, callback_data) == CALLBACK_ERROR)
+            return NULL;
+    }
+#endif
     *document = cursor;
 
     return retval;
@@ -458,6 +519,14 @@ static int skin_parse_tag(struct skin_element* element, char** document)
        || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM)
        || (star && *cursor != ARGLISTOPENSYM))
     {
+        
+#ifdef ROCKBOX
+        if (callback)
+        {
+            if (callback(element, callback_data) == CALLBACK_ERROR)
+                return 0;
+        }
+#endif
         *document = cursor;
         return 1;
     }
@@ -507,6 +576,8 @@ static int skin_parse_tag(struct skin_element* element, char** document)
     cursor = bookmark; /* Restoring the cursor */
     element->params_count = num_args;
     element->params = skin_alloc_params(num_args);
+    if (!element->params)
+        return 0;
 
     /* Now we have to actually parse each argument */
     for(i = 0; i < num_args; i++)
@@ -587,7 +658,6 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             }
             if (have_tenth == false)
                 val *= 10;
-
             element->params[i].type = DECIMAL;
             element->params[i].data.number = val;
         }
@@ -644,7 +714,13 @@ static int skin_parse_tag(struct skin_element* element, char** document)
         skin_error(INSUFFICIENT_ARGS, cursor);
         return 0;
     }
-    
+#ifdef ROCKBOX
+    if (callback)
+    {
+        if (callback(element, callback_data) == CALLBACK_ERROR)
+            return 0;
+    }
+#endif
     *document = cursor;
 
     return 1;
@@ -691,6 +767,8 @@ static int skin_parse_text(struct skin_element* element, char** document,
     element->line = skin_line;
     element->next = NULL;
     element->data = text = skin_alloc_string(length);
+    if (!element->data)
+        return 0;
     
     for(dest = 0; dest < length; dest++)
     {
@@ -702,6 +780,14 @@ static int skin_parse_text(struct skin_element* element, char** document,
         cursor++;
     }
     text[length] = '\0';
+    
+#ifdef ROCKBOX
+    if (callback)
+    {
+        if (callback(element, callback_data) == CALLBACK_ERROR)
+            return 0;
+    }
+#endif
 
     *document = cursor;
 
@@ -715,14 +801,40 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
     char* bookmark;
     int children = 1;
     int i;
+    
+#ifdef ROCKBOX
+    bool feature_available = true;
+    char *false_branch = NULL;
+#endif
 
-    element->type = CONDITIONAL;
+    /* Some conditional tags allow for target feature checking,
+     * so to handle that call the callback as usual with type == TAG
+     * then call it a second time with type == CONDITIONAL and check the return
+     * value */
+    element->type = TAG;
     element->line = skin_line;
 
     /* Parsing the tag first */
     if(!skin_parse_tag(element, &cursor))
         return 0;
 
+    element->type = CONDITIONAL;
+#ifdef ROCKBOX
+    if (callback)
+    {
+        switch (callback(element, callback_data))
+        {
+            case FEATURE_NOT_AVAILABLE:
+                feature_available = false;
+                break;
+            case CALLBACK_ERROR:
+                return 0;
+            default:
+                break;
+        }
+    }
+#endif
+    
     /* Counting the children */
     if(*(cursor++) != ENUMLISTOPENSYM)
     {
@@ -751,16 +863,35 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
         {
             children++;
             cursor++;
+#ifdef ROCKBOX
+            if (false_branch == NULL && !feature_available)
+            {
+                false_branch = cursor;
+                children--;
+            }
+#endif
         }
         else
         {
             cursor++;
         }
     }
+#ifdef ROCKBOX
+    if (*cursor == ENUMLISTCLOSESYM && 
+        false_branch == NULL && !feature_available)
+    {
+        false_branch = cursor+1;
+        children--;
+    }
+    /* if we are skipping the true branch fix that up */
+    cursor = false_branch ? false_branch : bookmark;
+#else
     cursor = bookmark;
-
+#endif
     /* Parsing the children */
     element->children = skin_alloc_children(children);
+    if (!element->children)
+        return 0;
     element->children_count = children;
 
     for(i = 0; i < children; i++)
@@ -809,6 +940,8 @@ static int skin_parse_comment(struct skin_element* element, char** document)
     element->data = NULL;
 #else    
     element->data = text = skin_alloc_string(length);
+    if (!element->data)
+        return 0;
     /* We copy from one char past cursor to leave out the # */
     memcpy((void*)text, (void*)(cursor + 1),
            sizeof(char) * (length-1));
@@ -877,6 +1010,8 @@ struct skin_element* skin_alloc_element()
 {
     struct skin_element* retval =  (struct skin_element*)
                                    skin_buffer_alloc(sizeof(struct skin_element));
+    if (!retval)
+        return NULL;
     retval->type = UNKNOWN;
     retval->next = NULL;
     retval->tag = NULL;
@@ -886,9 +1021,21 @@ struct skin_element* skin_alloc_element()
     return retval;
 
 }
-
+/* On a ROCKBOX build we try to save space as much as possible
+ * so if we can, use a shared param pool which should be more then large
+ * enough for any tag. params should be used straight away by the callback
+ * so this is safe.
+ */
 struct skin_tag_parameter* skin_alloc_params(int count)
 {
+#ifdef ROCKBOX
+    static struct skin_tag_parameter params[MAX_TAG_PARAMS];
+    if (count <= MAX_TAG_PARAMS)
+    {
+        memset(params, 0, sizeof(params));
+        return params;
+    }
+#endif
     size_t size = sizeof(struct skin_tag_parameter) * count;
     return (struct skin_tag_parameter*)skin_buffer_alloc(size);
 

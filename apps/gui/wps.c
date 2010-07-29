@@ -175,7 +175,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
+                    skin_update(&gui_wps[i], SKIN_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -191,7 +191,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    skin_update(&gui_wps[i], WPS_REFRESH_NON_STATIC);
+                    skin_update(&gui_wps[i], SKIN_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -212,7 +212,7 @@ void fade(bool fade_in, bool updatewps)
 
 static bool update_onvol_change(struct gui_wps * gwps)
 {
-    skin_update(gwps, WPS_REFRESH_NON_STATIC);
+    skin_update(gwps, SKIN_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
     splashf(0, "Vol: %3d dB",
@@ -372,8 +372,8 @@ bool ffwd_rew(int button)
                 FOR_NB_SCREENS(i)
                 {
                     skin_update(&gui_wps[i],
-                                WPS_REFRESH_PLAYER_PROGRESS |
-                                WPS_REFRESH_DYNAMIC);
+                                SKIN_REFRESH_PLAYER_PROGRESS |
+                                SKIN_REFRESH_DYNAMIC);
                 }
 
                 break;
@@ -390,7 +390,7 @@ bool ffwd_rew(int button)
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 FOR_NB_SCREENS(i)
-                    skin_update(&gui_wps[i], WPS_REFRESH_ALL);
+                    skin_update(&gui_wps[i], SKIN_REFRESH_ALL);
 #endif
                 exit = true;
                 break;
@@ -662,7 +662,7 @@ static void gwps_enter_wps(void)
         display->backdrop_show(gwps->data->backdrop);
 #endif
         display->clear_display();
-        skin_update(gwps, WPS_REFRESH_ALL);
+        skin_update(gwps, SKIN_REFRESH_ALL);
 
 #ifdef HAVE_TOUCHSCREEN
         skin_disarm_touchregions(gui_wps[i].data);
@@ -1116,7 +1116,7 @@ long gui_wps_show(void)
 #endif
                 {
                     skin_update(&gui_wps[i], wps_sync_data.do_full_update ?
-                                            WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+                                            SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
                 }
             }
             wps_sync_data.do_full_update = false;

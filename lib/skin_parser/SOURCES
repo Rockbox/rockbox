@@ -1,6 +1,6 @@
 skin_buffer.c
 skin_parser.c
-#ifndef ROCKBOX
+#if !defined(ROCKBOX) || defined(__PCTOOL__)
 skin_debug.c
 #endif
 skin_scan.c

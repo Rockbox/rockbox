@@ -800,8 +800,8 @@ int radio_screen(void)
                 if (restore)
                     fms_fix_displays(FMS_ENTER);
                 FOR_NB_SCREENS(i)
-                    skin_update(fms_get(i), restore ? WPS_REFRESH_ALL :
-                                                      WPS_REFRESH_NON_STATIC);
+                    skin_update(fms_get(i), restore ? SKIN_REFRESH_ALL :
+                                                      SKIN_REFRESH_NON_STATIC);
                 restore = false; 
             }
         }

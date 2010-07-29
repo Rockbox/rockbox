@@ -26,6 +26,6 @@ GCCOPTS+=-D__PCTOOL__
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-$(BUILDDIR)/$(BINARY): $$(OBJ)
+$(BUILDDIR)/$(BINARY): $$(OBJ) $$(SKINLIB)
 	@echo LD $(BINARY)
-	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -o $@ $+
+	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -L$(BUILDDIR)/lib -lskin_parser -o $@ $+

@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "skin_buffer.h"
 #include "settings_list.h"
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR

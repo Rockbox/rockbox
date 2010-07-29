@@ -88,7 +88,7 @@ int skin_font_load(char* font_name)
     pf = &font->font;
     if (!font->buffer)
     {
-        pf->buffer_start = skin_buffer_alloc(SKIN_FONT_SIZE);
+        pf->buffer_start = (char*)skin_buffer_alloc(SKIN_FONT_SIZE);
         if (!pf->buffer_start)
             return -1;
         font->buffer = pf->buffer_start;

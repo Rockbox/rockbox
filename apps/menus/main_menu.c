@@ -48,7 +48,7 @@
 #include "version.h"
 #include "time.h"
 #include "wps.h"
-#include "skin_engine/skin_buffer.h"
+#include "skin_buffer.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 

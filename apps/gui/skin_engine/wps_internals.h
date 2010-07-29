@@ -24,6 +24,8 @@
  
 #ifndef _WPS_ENGINE_INTERNALS_
 #define _WPS_ENGINE_INTERNALS_
+
+
 /* Timeout unit expressed in HZ. In WPS, all timeouts are given in seconds
    (possibly with a decimal fraction) but stored as integer values.
    E.g. 2.5 is stored as 25. This means 25 tenth of a second, i.e. 25 units.
@@ -32,6 +34,8 @@
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* In TIMEOUT_UNIT's */
 
 #include "skin_tokens.h"
+#include "tag_table.h"
+#include "skin_parser.h"
 
 
 /* TODO: sort this mess out */
@@ -40,19 +44,6 @@
 #include "statusbar.h"
 #include "metadata.h"
 
-/* constants used in line_type and as refresh_mode for wps_refresh */
-#define WPS_REFRESH_STATIC          (1u<<0)  /* line doesn't change over time */
-#define WPS_REFRESH_DYNAMIC         (1u<<1)  /* line may change (e.g. time flag) */
-#define WPS_REFRESH_SCROLL          (1u<<2)  /* line scrolls */
-#define WPS_REFRESH_PLAYER_PROGRESS (1u<<3)  /* line contains a progress bar */
-#define WPS_REFRESH_PEAK_METER      (1u<<4)  /* line contains a peak meter */
-#define WPS_REFRESH_STATUSBAR       (1u<<5)  /* refresh statusbar */
-#define WPS_REFRESH_ALL       (0xffffffffu)   /* to refresh all line types */
-
-/* to refresh only those lines that change over time */
-#define WPS_REFRESH_NON_STATIC (WPS_REFRESH_DYNAMIC| \
-                                WPS_REFRESH_PLAYER_PROGRESS| \
-                                WPS_REFRESH_PEAK_METER)
 /* alignments */
 #define WPS_ALIGN_RIGHT 32
 #define WPS_ALIGN_CENTER 64
@@ -82,16 +73,16 @@ struct gui_img {
     short int y;                  /* y-pos */
     short int num_subimages;      /* number of sub-images */
     short int subimage_height;    /* height of each sub-image */
-    short int display;            /* -1 for no display, 0..n to display a subimage */
     struct bitmap bm;
     char label;
     bool loaded;            /* load state */
     bool always_display;    /* not using the preload/display mechanism */
+    int display;
 };
 
 
 struct progressbar {
-    enum wps_token_type type;
+    enum skin_token_type type;
     struct viewport *vp;
     /* regular pb */
     short x;
@@ -105,8 +96,6 @@ struct progressbar {
     /*progressbar image*/
     struct bitmap bm;
     bool have_bitmap_pb;
-    
-    bool draw;
 };
 #endif
 
@@ -157,45 +146,6 @@ enum wps_parse_error {
     PARSE_FAIL_LIMITS_EXCEEDED,
 };
 
-
-/* Description of a subline on the WPS */
-struct skin_subline {
-
-    /* Index of the first token for this subline in the token array.
-       Tokens of this subline end where tokens for the next subline
-       begin. */
-    unsigned short first_token_idx;
-    unsigned short last_token_idx;
-
-    /* Bit or'ed WPS_REFRESH_xxx */
-    unsigned char line_type;
-
-    /* How long the subline should be displayed, in 10ths of sec */
-    unsigned char time_mult;
-    
-    /* pointer to the next subline in this line */
-    struct skin_subline *next;
-};
-
-/* Description of a line on the WPS. A line is a set of sublines.
-   A subline is displayed for a certain amount of time. After that,
-   the next subline of the line is displayed. And so on. */
-struct skin_line {
-
-    /* Linked list of all the sublines on this line,
-     * a line *must* have at least one subline so no need to add an extra pointer */
-    struct skin_subline sublines;
-    /* pointer to the current subline */
-    struct skin_subline *curr_subline;
-
-    /* When the next subline of this line should be displayed
-       (absolute time value in ticks) */
-    long subline_expire_time;
-    
-    /* pointer to the next line */
-    struct skin_line *next;
-};
-
 #define VP_DRAW_HIDEABLE    0x1
 #define VP_DRAW_HIDDEN      0x2
 #define VP_DRAW_WASHIDDEN   0x4
@@ -206,7 +156,6 @@ struct skin_line {
 #define VP_INFO_LABEL       0x80
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
-    struct skin_line *lines;
     char hidden_flags;
     char label;
     unsigned start_fgcolour;
@@ -236,9 +185,6 @@ struct touchregion {
 };
 #endif
 
-#define MAX_PLAYLISTLINE_TOKENS 16
-#define MAX_PLAYLISTLINE_STRINGS    8
-#define MAX_PLAYLISTLINE_STRLEN     8
 enum info_line_type {
     TRACK_HAS_INFO = 0,
     TRACK_HAS_NO_INFO
@@ -250,36 +196,50 @@ struct playlistviewer {
 #ifdef HAVE_TC_RAMCACHE
     struct mp3entry tempid3;
 #endif
-    struct {
-        enum wps_token_type tokens[MAX_PLAYLISTLINE_TOKENS];
-        char strings[MAX_PLAYLISTLINE_STRINGS][MAX_PLAYLISTLINE_STRLEN];
-        int count;
-        bool scroll;
-    } lines[2];
+    struct skin_element *lines[2];
 };
 
 
 #ifdef HAVE_ALBUMART
 struct skin_albumart {
     /* Album art support */
-    struct viewport *vp;/* The viewport this is in */
     int x;
     int y;
     int width;
     int height;
 
-    bool draw;
     unsigned char xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
     unsigned char yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
     unsigned char state; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
+    
+    struct viewport *vp;
+    int draw_handle;
 };
 #endif
+
+
+struct line {
+    int timeout; /* if inside a line alternator */
+    unsigned update_mode;
+};
+
+struct line_alternator {
+    int current_line;
+    unsigned long last_change_tick;
+};
+
+struct conditional {
+    int last_value;
+    struct wps_token *token;
+};
+
 
 /* wps_data
    this struct holds all necessary data which describes the
    viewable content of a wps */
 struct wps_data
 {
+    struct skin_element *tree;
 #ifdef HAVE_LCD_BITMAP
     struct skin_token_list *images;
     struct skin_token_list *progressbars;
@@ -291,16 +251,10 @@ struct wps_data
 #ifdef HAVE_TOUCHSCREEN
     struct skin_token_list *touchregions;
 #endif
-    struct skin_token_list *viewports;
-    struct skin_token_list *strings;
 #ifdef HAVE_ALBUMART
     struct skin_albumart *albumart;
     int    playback_aa_slot;
 #endif
-    struct wps_token *tokens;
-    /* Total number of tokens in the WPS. During WPS parsing, this is
-       the index of the token being parsed. */
-    int num_tokens;
 
 #ifdef HAVE_LCD_BITMAP
     bool peak_meter_enabled;

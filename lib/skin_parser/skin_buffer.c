@@ -24,21 +24,19 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "skin_buffer.h"
+
 #ifdef ROCKBOX
-#define SKIN_BUFFER_SIZE (400*1024) /* Excessivly large for now */
-static unsigned char buffer[SKIN_BUFFER_SIZE];
-static unsigned char *buffer_front = NULL; /* start of the free space,
-                                              increases with allocation*/
+static size_t buf_size;
+static unsigned char *buffer_start = NULL;
+static unsigned char *buffer_front = NULL;
 #endif
 
-void skin_buffer_init(void)
+void skin_buffer_init(char* buffer, size_t size)
 {
 #if defined(ROCKBOX)
-    {
-        /* reset the buffer.... */
-        buffer_front = buffer;
-        //TODO: buf_size = size;
-    }
+    buffer_start = buffer_front = buffer;
+    buf_size = size;
 #endif
 }
 
@@ -46,7 +44,9 @@ void skin_buffer_init(void)
 void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
-#ifdef ROCKBOX    
+#ifdef ROCKBOX
+    if (size > skin_buffer_freespace())
+        return NULL;
     retval = buffer_front;
     buffer_front += size;
     /* 32-bit aligned */
@@ -62,10 +62,22 @@ void* skin_buffer_alloc(size_t size)
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void)
 {
-    return buffer_front - buffer;
+    return buffer_front - buffer_start;
 }
 size_t skin_buffer_freespace(void)
 {
-    return SKIN_BUFFER_SIZE - skin_buffer_usage();
+    return buf_size - skin_buffer_usage();
+}
+
+static unsigned char *saved_buffer_pos = NULL;
+void skin_buffer_save_position(void)
+{
+    saved_buffer_pos = buffer_front;
+}
+    
+void skin_buffer_restore_position(void)
+{
+    if (saved_buffer_pos)
+        buffer_front = saved_buffer_pos;
 }
 #endif

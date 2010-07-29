@@ -937,142 +937,23 @@ int hex_to_rgb(const char* hex, int* color)
 #endif /* HAVE_LCD_COLOR */
 
 #ifdef HAVE_LCD_BITMAP
-/* A simplified scanf - used (at time of writing) by wps parsing functions.
-
-   fmt - char array specifying the format of each list option.  Valid values
-         are:  d - int
-               s - string (sets pointer to string, without copying)
-               c - hex colour (RGB888 - e.g. ff00ff)
-               g - greyscale "colour" (0-3)
-   set_vals - if not NULL 1 is set in the bitplace if the item was read OK
-                0 if not read.
-                first item is LSB, (max 32 items! )
-                Stops parseing if an item is invalid unless the item == '-'
-   sep - list separator (e.g. ',' or '|')
-   str  - string to parse, must be terminated by 0 or sep
-   ... - pointers to store the parsed values
-
-   return value - pointer to char after parsed data, 0 if there was an error.
-
-*/
-
 /* '0'-'3' are ASCII 0x30 to 0x33 */
 #define is0123(x) (((x) & 0xfc) == 0x30)
 
-const char* parse_list(const char *fmt, uint32_t *set_vals,
-                       const char sep, const char* str, ...)
+bool parse_color(char *text, int *value)
 {
-    va_list ap;
-    const char* p = str, *f = fmt;
-    const char** s;
-    int* d;
-    bool set, is_negative;
-    int i=0;
-
-    va_start(ap, str);
-    if (set_vals)
-        *set_vals = 0;
-    while (*fmt)
-    {
-        /* Check for separator, if we're not at the start */
-        if (f != fmt)
-        {
-            if (*p != sep)
-                goto err;
-            p++;
-        }
-        set = false;
-        switch (*fmt++) 
-        {
-            case 's': /* string - return a pointer to it (not a copy) */
-                s = va_arg(ap, const char **);
-
-                *s = p;
-                while (*p && *p != sep && *p != ')')
-                    p++;
-                set = (s[0][0]!='-') && (s[0][1]!=sep && s[0][1]!=')') ;
-                break;
-
-            case 'd': /* int */
-                is_negative = false;
-                d = va_arg(ap, int*);
-
-                if (*p == '-' && isdigit(*(p+1)))
-                {
-                    is_negative = true;
-                    p++;
-                }
-                if (!isdigit(*p))
-                {
-                    if (!set_vals || *p != '-')
-                        goto err;
-                    p++;
-                }
-                else
-                {
-                    *d = *p++ - '0';
-                    while (isdigit(*p))
-                        *d = (*d * 10) + (*p++ - '0');
-                    set = true;
-                    if (is_negative)
-                        *d *= -1;
-                }
-
-                break;
-
+    (void)text; (void)value; /* silence warnings on mono bitmap */
 #ifdef HAVE_LCD_COLOR
-            case 'c': /* colour (rrggbb - e.g. f3c1a8) */
-                d = va_arg(ap, int*);
-
-                if (hex_to_rgb(p, d) < 0)
-                {
-                    if (!set_vals || *p != '-')
-                        goto err;
-                    p++;
-                }
-                else
-                {
-                    p += 6;
-                    set = true;
-                }
-
-                break;
+    if (hex_to_rgb(text, value) < 0)
+        return false;
 #endif
 
 #if LCD_DEPTH == 2 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
-            case 'g': /* greyscale colour (0-3) */
-                d = va_arg(ap, int*);
-
-                if (!is0123(*p))
-                {
-                    if (!set_vals || *p != '-')
-                        goto err;
-                    p++;
-                }
-                else
-                {
-                    *d = *p++ - '0';
-                    set = true;
-                }
-
-                break;
+    if (!is0123(*text))
+        return false;
+    *value = *text - '0';
 #endif
-
-            default:  /* Unknown format type */
-                goto err;
-                break;
-        }
-        if (set_vals && set)
-            *set_vals |= BIT_N(i);
-        i++;
-    }
-
-    va_end(ap);
-    return p;
-
-err:
-    va_end(ap);
-    return NULL;
+    return true;
 }
 
 /* only used in USB HID and set_time screen */

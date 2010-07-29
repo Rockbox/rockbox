@@ -27,7 +27,6 @@
 #include "file.h"
 #include "settings.h"
 #include "font.h"
-#include "skin_buffer.h"
 
 #ifndef _SKINFONTS_H_
 #define _SKINFONTS_H_

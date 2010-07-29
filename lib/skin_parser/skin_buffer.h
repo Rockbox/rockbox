@@ -25,11 +25,15 @@
 #include <stdlib.h>
 #ifndef _SKIN_BUFFFER_H_
 #define _SKIN_BUFFFER_H_
-void skin_buffer_init(size_t size);
+void skin_buffer_init(char* buffer, size_t size);
 /* Allocate size bytes from the buffer */
 void* skin_buffer_alloc(size_t size);
 
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void);
 size_t skin_buffer_freespace(void);
+
+/* save and restore a buffer position incase a skin fails to load */
+void skin_buffer_save_position(void);
+void skin_buffer_restore_position(void);
 #endif

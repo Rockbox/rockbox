@@ -357,6 +357,7 @@ static void init(void)
     tree_mem_init();
     filetype_init();
     playlist_init();
+    theme_init_buffer();
 
 #if CONFIG_CODEC != SWCODEC
     mp3_init( global_settings.volume,
@@ -639,6 +640,7 @@ static void init(void)
 #if CONFIG_CODEC == SWCODEC
     tdspeed_init();
 #endif /* CONFIG_CODEC == SWCODEC */
+    theme_init_buffer();
 
 #if CONFIG_CODEC != SWCODEC
     /* No buffer allocation (see buffer.c) may take place after the call to

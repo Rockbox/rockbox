@@ -24,9 +24,9 @@
 #include <stdlib.h>
 #include "string-extra.h"
 #include "settings.h"
-#include "skin_buffer.h"
 #include "wps_internals.h"
 #include "skin_engine.h"
+#include "skin_buffer.h"
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 
@@ -100,7 +100,7 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
     if (!bdrop)
         return NULL; /* too many backdrops loaded */
     
-    bdrop->buffer = skin_buffer_alloc(buf_size);
+    bdrop->buffer = (char*)skin_buffer_alloc(buf_size);
     if (!bdrop->buffer)
         return NULL;
     loaded = screens[screen].backdrop_load(filename, bdrop->buffer);

@@ -35,6 +35,7 @@ extern char* skin_start;
 /* Global error variables */
 int error_line;
 int error_col;
+char *error_line_start;
 char* error_message;
 
 /* Debugging functions */
@@ -48,6 +49,7 @@ void skin_error(enum skin_errorcode error, char* cursor)
         cursor--;
         error_col++;
     }
+    error_line_start = cursor+1;
 
     error_line = skin_line;
 
@@ -285,4 +287,42 @@ void skin_debug_indent()
     for(i = 0; i < debug_indent_level; i++)
         printf("    ");
 }
+
 #endif
+
+#define MIN(a,b) ((a<b)?(a):(b))
+void skin_error_format_message()
+{
+    int i;
+    char text[128];
+    char* line_end = strchr(error_line_start, '\n');
+    int len = MIN(line_end - error_line_start, 80);
+    if (!line_end)
+        len = strlen(error_line_start);
+    printf("Error on line %d.\n", error_line);
+    error_col--;
+    if (error_col <= 10)
+    {
+        strncpy(text, error_line_start, len);
+        text[len] = '\0';
+    }
+    else
+    {
+        int j;
+        /* make it fit nicely.. "<start few chars>...<10 chars><error>" */
+        strncpy(text, error_line_start, 6);
+        i = 5;
+        text[i++] = '.';
+        text[i++] = '.';
+        text[i++] = '.';
+        for (j=error_col-10; error_line_start[j] && error_line_start[j] != '\n'; j++)
+            text[i++] = error_line_start[j];
+        text[i] = '\0';
+        error_col = 18;
+    }
+    printf("%s\n", text);
+    for (i=0; i<error_col; i++)
+        text[i] = ' ';
+    snprintf(&text[i],64, "^ \'%s\' Here", error_message);
+    printf("%s\n", text);
+}

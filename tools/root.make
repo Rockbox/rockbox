@@ -70,6 +70,7 @@ else ifneq (,$(findstring bootbox,$(APPSDIR)))
   include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APPSDIR)))
   include $(APPSDIR)/checkwps.make
+  include $(ROOTDIR)/lib/skin_parser/skin_parser.make
 else ifneq (,$(findstring database,$(APPSDIR)))
   include $(APPSDIR)/database.make
 else
@@ -170,7 +171,8 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(L
 $(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc $(GLOBAL_LDOPTS) \
-                -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
+		-L$(BUILDDIR)/lib -lskin_parser \
+        -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@

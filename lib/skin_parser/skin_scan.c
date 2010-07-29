@@ -40,12 +40,6 @@ void skip_comment(char** document)
         (*document)++;
 }
 
-void skip_whitespace(char** document)
-{
-    while(**document == ' ' || **document == '\t')
-        (*document)++;
-}
-
 void skip_arglist(char** document)
 {
     if(**document == ARGLISTOPENSYM)
@@ -132,6 +126,8 @@ char* scan_string(char** document)
     /* Copying the string */
     cursor = *document;
     buffer = skin_alloc_string(length);
+    if (!buffer)
+        return NULL;
     buffer[length] = '\0';
     for(i = 0; i < length; i++)
     {

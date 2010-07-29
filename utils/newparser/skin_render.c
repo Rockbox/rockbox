@@ -43,7 +43,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch)
 {
     /* Tags here are ones which need to be "turned off" or cleared 
      * if they are in a conditional branch which isnt being used */
-    if (branch->type == SUBLINES)
+    if (branch->type == LINE_ALTERNATOR)
     {
         int i;
         for (i=0; i<branch->children_count; i++)
@@ -71,7 +71,6 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch)
                     break;
                 case SKIN_TOKEN_IMAGE_DISPLAY:
                 case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
-                    printf("disable image\n");
                     /* clear images */
                     break;
                 default:
@@ -109,7 +108,7 @@ void skin_render_line(struct skin_element* line,
                     do_tags_in_hidden_conditional(child->children[last_value]);
                 last_value = value;
                 
-                if (child->children[value]->type == SUBLINES)
+                if (child->children[value]->type == LINE_ALTERNATOR)
                     func = skin_render_alternator;
                 else if (child->children[value]->type == LINE)
                     func = skin_render_line;

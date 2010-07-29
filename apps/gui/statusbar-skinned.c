@@ -27,6 +27,9 @@
 #include "appevents.h"
 #include "screens.h"
 #include "screen_access.h"
+#include "strlcpy.h"
+#include "skin_parser.h"
+#include "skin_buffer.h"
 #include "skin_engine/skin_engine.h"
 #include "skin_engine/wps_internals.h"
 #include "viewport.h"
@@ -45,24 +48,53 @@ static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false
 
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
+struct wps_token *found_token;
+static int set_title_worker(char* title, enum themable_icons icon, 
+                            struct wps_data *data, struct skin_element *root)
+{
+    int retval = 0;
+    struct skin_element *element = root;
+    while (element)
+    {
+        struct wps_token *token = NULL;
+        if (element->type == CONDITIONAL)
+        {
+            struct conditional *cond = (struct conditional *)element->data;
+            token = cond->token;
+        }
+        else if (element->type == TAG)
+        {
+            token = (struct wps_token *)element->data;
+        }
+        if (token)
+        {
+            if (token->type == SKIN_TOKEN_LIST_TITLE_TEXT)
+            {
+                found_token = token;
+                token->value.data = title;
+                retval = 1;
+            }
+            else if (token->type == SKIN_TOKEN_LIST_TITLE_ICON)
+            {
+                /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
+                token->value.i = icon+2;
+            }
+        }
+        if (element->children_count)
+        {
+            int i;
+            for (i=0; i<element->children_count; i++)
+                retval |= set_title_worker(title, icon, data, element->children[i]);
+        }
+        element = element->next;
+    }
+    return retval;
+}
 
 bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
 {
-    int i;
-    bool retval = false;
-    for(i=0; i<sb_skin_data[screen].num_tokens; i++)
-    {
-        if (sb_skin_data[screen].tokens[i].type == WPS_TOKEN_LIST_TITLE_TEXT)
-        {
-            sb_skin_data[screen].tokens[i].value.data = title;
-            retval = true;
-        }
-        else if (sb_skin_data[screen].tokens[i].type == WPS_TOKEN_LIST_TITLE_ICON)
-        {
-            /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
-            sb_skin_data[screen].tokens[i].value.i = icon+2;
-        }
-    }
+    bool retval = set_title_worker(title, icon, &sb_skin_data[screen], 
+                                   sb_skin_data[screen].tree) > 0;
     return retval;
 }
     
@@ -75,18 +107,22 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
     success = buf && skin_data_load(screen, data, buf, isfile);
 
     if (success)
-    {  /* hide the sb's default viewport because it has nasty effect with stuff
+    {  
+        /* hide the sb's default viewport because it has nasty effect with stuff
         * not part of the statusbar,
         * hence .sbs's without any other vps are unsupported*/
         struct skin_viewport *vp = find_viewport(VP_DEFAULT_LABEL, data);
-        struct skin_token_list *next_vp = data->viewports->next;
-
-        if (!next_vp)
-        {    /* no second viewport, let parsing fail */
-            success = false;
+        struct skin_element *next_vp = data->tree->next;
+        
+        if (vp)
+        {
+            if (!next_vp)
+            {    /* no second viewport, let parsing fail */
+                success = false;
+            }
+            /* hide this viewport, forever */
+            vp->hidden_flags = VP_NEVER_VISIBLE;
         }
-        /* hide this viewport, forever */
-        vp->hidden_flags = VP_NEVER_VISIBLE;
         sb_set_info_vp(screen, VP_INFO_LABEL|VP_DEFAULT_LABEL);
     }
 
@@ -135,7 +171,7 @@ bool sb_set_backdrop(enum screen_type screen, char* filename)
         else
 #endif
             buf_size = LCD_BACKDROP_BYTES;
-        sb_skin[screen].data->backdrop = skin_buffer_alloc(buf_size);
+        sb_skin[screen].data->backdrop = (char*)skin_buffer_alloc(buf_size);
         if (!sb_skin[screen].data->backdrop)
             return false;          
     }
@@ -150,6 +186,8 @@ void sb_skin_update(enum screen_type screen, bool force)
 {
     static long next_update[NB_SCREENS] = {0};
     int i = screen;
+    if (!sb_skin_data[screen].wps_loaded)
+        return;
     if (TIME_AFTER(current_tick, next_update[i]) || force)
     {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -158,7 +196,7 @@ void sb_skin_update(enum screen_type screen, bool force)
         if (lcd_active() || (i != SCREEN_MAIN))
 #endif
             skin_update(&sb_skin[i], force?
-                    WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+                    SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
         next_update[i] = current_tick + update_delay; /* don't update too often */
         sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
     }
@@ -216,7 +254,30 @@ void sb_create_from_settings(enum screen_type screen)
     
     if (ptr2[0] && ptr2[0] != '-') /* from ui viewport setting */
     {
+        char *comma = ptr;
+        int param_count = 0;
         len = snprintf(ptr, remaining, "%%ax%%Vi(-,%s)\n", ptr2);
+        /* The config put the colours at the end of the viewport,
+         * they need to be stripped for the skin code though */
+        do {
+            param_count++;
+            comma = strchr(comma+1, ',');
+            
+        } while (comma && param_count < 6);
+        if (comma)
+        {
+            char *end = comma;
+            char fg[8], bg[8];
+            int i = 0;
+            comma++;
+            while (*comma != ',')
+                fg[i++] = *comma++;
+            fg[i] = '\0'; comma++; i=0;
+            while (*comma != ')')
+                bg[i++] = *comma++;
+            bg[i] = '\0'; 
+            len += snprintf(end, remaining-len, ") %%Vf(%s) %%Vb(%s)\n", fg, bg);
+        }       
     }
     else
     {
