@@ -110,7 +110,7 @@ void EditorWindow::loadConfigTab(ConfigDocument* doc)
                      this, SLOT(tabTitleChanged(QString)));
 }
 
-void EditorWindow::loadSettings()
+void  EditorWindow::loadSettings()
 {
 
     QSettings settings;
@@ -918,6 +918,16 @@ void EditorWindow::projectToTop(QString file)
 
 void EditorWindow::refreshRecentMenus()
 {
+    /* Clearing any deleted documents */
+    for(int i = 0; i < recentDocs.count(); i++)
+        if(!QFile::exists(recentDocs[i]))
+            recentDocs.removeAt(i--);
+
+    /* Clearing any deleted projects */
+    for(int i = 0; i < recentProjects.count(); i++)
+        if(!QFile::exists(recentProjects[i]))
+            recentProjects.removeAt(i--);
+
     /* First hiding all the menu items */
     for(int i = 0; i < recentDocsMenu.count(); i++)
         recentDocsMenu[i]->setVisible(false);
