@@ -26,7 +26,6 @@
 #include "screens.h"
 #include "file.h"
 #include "metadata.h"
-#include "skin_engine/skin_tokens.h"
 
 #define MAX_NAME 80    /* Max length of information strings */
 #define MAX_TRACKS 99  /* Max number of tracks in a cuesheet */
@@ -69,10 +68,6 @@ bool display_cuesheet_content(char* filename);
 
 /* finds the index of the current track played within a cuesheet */
 int cue_find_current_track(struct cuesheet *cue, unsigned long curpos);
-
-/* Get the id3 fields from the cuesheet */
-const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
-                                  int offset_tracks, char *buf, int buf_size);
 
 /* skip to next track in the cuesheet towards "direction" (which is 1 or -1) */
 bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_pos);

@@ -155,6 +155,42 @@ static int pitch_speed_enum(int range, int32_t val, int32_t normval)
 }
 #endif
 
+const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
+                                  int offset_tracks, char *buf, int buf_size)
+{
+    struct cuesheet *cue = id3?id3->cuesheet:NULL;
+    if (!cue || !cue->curr_track)
+        return NULL;
+    
+    struct cue_track_info *track = cue->curr_track;
+    if (offset_tracks)
+    {
+        if (cue->curr_track_idx+offset_tracks < cue->track_count)
+            track+=offset_tracks;
+        else
+            return NULL;
+    }
+    switch (token->type)
+    {
+        case SKIN_TOKEN_METADATA_ARTIST:
+            return *track->performer ? track->performer : NULL;
+        case SKIN_TOKEN_METADATA_COMPOSER:
+            return *track->songwriter ? track->songwriter : NULL;
+        case SKIN_TOKEN_METADATA_ALBUM:
+            return *cue->title ? cue->title : NULL;
+        case SKIN_TOKEN_METADATA_ALBUM_ARTIST:
+            return *cue->performer ? cue->performer : NULL;
+        case SKIN_TOKEN_METADATA_TRACK_TITLE:
+            return *track->title ? track->title : NULL;
+        case SKIN_TOKEN_METADATA_TRACK_NUMBER:
+            snprintf(buf, buf_size, "%d/%d",  
+                     cue->curr_track_idx+offset_tracks+1, cue->track_count);
+            return buf;
+        default:
+            return NULL;
+    }
+    return NULL;
+}
 
 /* All tokens which only need the info to return a value go in here */
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
@@ -1392,3 +1428,5 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
     }
 }
+
+

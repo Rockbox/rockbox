@@ -329,6 +329,9 @@ const char *get_token_value(struct gui_wps *gwps,
                            char *buf, int buf_size,
                            int *intval);
 
+/* Get the id3 fields from the cuesheet */
+const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
+                                  int offset_tracks, char *buf, int buf_size);
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                           char *buf, int buf_size, int limit, int *intval);
 #if CONFIG_TUNER
