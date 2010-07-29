@@ -40,11 +40,11 @@ enum codec_status codec_main(void)
     int packetlength = 0;       /* Logical packet size (minus the header size) */          
     int outlen = 0;             /* Number of bytes written to the output buffer */
     int pktcnt = 0;             /* Count of the packets played */
-    uint8_t *data;				/* Pointer to decoder input buffer */
-    int size;					/* Size of the input frame to the decoder */
+    uint8_t *data;              /* Pointer to decoder input buffer */
+    int size;                   /* Size of the input frame to the decoder */
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 17);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_FRACT);
     
 
 next_track:

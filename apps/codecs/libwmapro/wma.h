@@ -25,6 +25,8 @@
 #include "ffmpeg_get_bits.h"
 #include "ffmpeg_put_bits.h"
 
+#define WMAPRO_FRACT (17)
+
 /* size of blocks */
 #define BLOCK_MIN_BITS 7
 #define BLOCK_MAX_BITS 11

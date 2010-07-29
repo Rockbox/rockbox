@@ -877,7 +877,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
         for (i = 0; i < 4; i++) {
             if (vals[i]) {
                 int sign = get_bits1(&s->gb) - 1;
-                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<17 : vals[i]<<17;
+                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<WMAPRO_FRACT : vals[i]<<WMAPRO_FRACT;
                 num_zeros = 0;
             } else {
                 ci->coeffs[cur_coeff] = 0;
@@ -1035,7 +1035,7 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                             data_ptr = data;
                                 
                             while (data_ptr < data_end)
-                                sum += fixmul16(*data_ptr++, *mat++);
+                                sum += fixmul16(*mat++, *data_ptr++);
 
                             (*ch)[y] = sum;
                         }

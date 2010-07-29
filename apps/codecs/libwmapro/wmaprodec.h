@@ -1,4 +1,5 @@
 #include "codeclib.h"
+#include "wma.h"
 #include "../libasf/asf.h"
 
 #if   (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)

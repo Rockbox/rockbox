@@ -276,7 +276,7 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
         dst[i+1] = fixmul24(src[i+1], mul); \
         dst[i+2] = fixmul24(src[i+2], mul); \
         dst[i+3] = fixmul24(src[i+3], mul);
-#endif /* CPU_ARM */
+#endif /* CPU_ARM, CPU_COLDFIRE */
 
 static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
                                         int32_t mul, int len)
