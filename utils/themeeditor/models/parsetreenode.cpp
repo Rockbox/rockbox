@@ -560,7 +560,9 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     else if(element->type == CONDITIONAL)
     {
         int child = evalTag(info, true, element->children_count).toInt();
-        children[element->params_count + child]->render(info, viewport, true);
+        if(child < children.count())
+            children[element->params_count + child]
+                    ->render(info, viewport, true);
     }
     else if(element->type == LINE_ALTERNATOR)
     {
@@ -1016,6 +1018,8 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
 
         if(child < branches)
             return child;
+        else if(branches == 1)
+            return 2;
         else
             return branches - 1;
     }
