@@ -4,11 +4,7 @@
 #include "../lib/mdct_lookup.h" /* for revtab */
 #include "../lib/fft.h"     /* for FFT data structures */
 #include "codeclib.h"
-
- /* for XNPROD31 */
-#include "asm_arm.h"
-#include "asm_mcf5249.h"
-#include "codeclib_misc.h"
+#include "codeclib_misc.h"  /* for XNPROD31 */
 
 #include "wmapro_math.h"
 

@@ -22,8 +22,8 @@
 //#include "ivorbiscodec.h"
 //#include "os_types.h"
 
-//#include "asm_arm.h"
-//#include "asm_mcf5249.h"
+#include "asm_arm.h"
+#include "asm_mcf5249.h"
 
 
 /* Some prototypes that were not defined elsewhere */

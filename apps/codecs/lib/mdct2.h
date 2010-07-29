@@ -32,8 +32,6 @@
 #include <codecs.h>
 #endif /* ROCKBOX */
 
-#include "asm_arm.h"
-#include "asm_mcf5249.h"
 #include "codeclib_misc.h"
 
 #ifndef ICONST_ATTR_TREMOR_WINDOW

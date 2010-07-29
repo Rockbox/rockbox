@@ -20,8 +20,6 @@
 
 #include "codeclib.h"
 #include "mdct.h"
-#include "asm_arm.h"
-#include "asm_mcf5249.h"
 #include "codeclib_misc.h"
 #include "mdct_lookup.h"
 
