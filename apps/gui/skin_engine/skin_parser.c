@@ -740,11 +740,9 @@ static int parse_touchregion(struct skin_element *element,
     (void)token;
     unsigned i, imax;
     struct touchregion *region = NULL;
-    const char *ptr = wps_bufptr;
-    const char *action, *end;
+    const char *action;
     const char pb_string[] = "progressbar";
     const char vol_string[] = "volume";
-    int x,y,w,h;
     char temp[20];
 
     /* format: %T(x,y,width,height,action)
@@ -784,7 +782,7 @@ static int parse_touchregion(struct skin_element *element,
     region->reverse_bar = false;
     action = element->params[4].data.text;
 
-    strlcpy(temp, action, end-action+1);
+    strcpy(temp, action);
     action = temp;
     
     if (*action == '!')
