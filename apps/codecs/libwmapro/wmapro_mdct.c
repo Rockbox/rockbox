@@ -5,7 +5,11 @@
 #include "../lib/fft.h"     /* for FFT data structures */
 #include "codeclib.h"
 
-#include "../lib/codeclib_misc.h" /* for XNPROD31 */
+ /* for XNPROD31 */
+#include "asm_arm.h"
+#include "asm_mcf5249.h"
+#include "codeclib_misc.h"
+
 #include "wmapro_math.h"
 
 void imdct_half(unsigned int nbits, int32_t *output, const int32_t *input){
