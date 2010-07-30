@@ -31,7 +31,7 @@
 
 # Viewport tags
 
-V : Viewport declaration
+V  : Viewport declaration
 Vl : Viewport preload
 Vd : Viewport display
 Vi : Custom UI viewport
@@ -74,3 +74,157 @@ IC : Next Comment
 Iv : Next ID3 version
 Iy : Next ID3 year
 Ik : Next Disc number
+
+# Power-Related Information
+bl : Battery %
+bv : Battery volts
+bt : Battery time
+bp : "p" if charger connected
+bc : "c" if currently charging
+bs : Sleep timer
+
+# Real Time Clock
+cc : RTC Present
+cd : Day of month
+ce : Day of month blank padded
+cf : 24/12 hour format
+cH : Hour (00..23)
+ck : Hour (0..23)
+cI : Hour (01..12)
+cl : Hour (1..12)
+cm : Month (01..12)
+cM : Minute (00..59)
+cS : Second (00..60)
+cy : Last two digits of year (00..99)
+cY : Year (1970..)
+cP : AM/PM
+cp : am/pm
+ca : Sun..Sat
+cb : Jan..Dec
+cu : Day of week (1..7)
+cw : Day of week (0..6)
+
+# File Info
+fb : File bitrate
+fc : File codec
+ff : File frequency (Hz)
+fk : File frequency (KHz)
+fm : File name
+fn : File name (no extension)
+fp : File path
+fs : File Size (KB)
+fv : "(avg)" if vbr or "" if constant
+d  : Containing directories
+
+# Next File Info
+Fb : File bitrate
+Fc : File codec
+Ff : File frequency (Hz)
+Fk : File frequency (KHz)
+Fm : File name
+Fn : File name (no extension)
+Fp : File path
+Fs : File Size (KB)
+Fv : "(avg)" if vbr or "" if constant
+d  : Containing directories
+
+# Playlist/Song Info
+pb : Progress bar
+pf : Full line progress bar (Archos Player/Studio)
+px : Percentage played in song
+pc : Current time in song
+pe : Playlist entries
+pm : Peak meter
+pn : Playlist name
+pp : Playlist position
+pr : Remaining time in song
+ps : "s" if shuffle enabled
+pt : Total track time
+pv : Volume in dB
+pS : Track starting
+pE : Track ending
+Sp : Playback pitch
+
+# Playlist Viewer
+Vp : Playlist viewer
+
+# Runtime Database and Replaygain
+rg : Replaygain value in use
+rp : Song playcount
+rr : Song rating
+ra : Database autoscore
+
+# Hold Switches
+mh : "h" if hold is on
+mr : "r" if remote hold is on
+
+# Repeat Mode
+mm : Repeat mode (0-4) Off, All, One, Shuffle, A-B
+
+# Playback mode
+mp : Play status (1-9), Stop, Play, Pause, Fast Forward, Rewind, Recording, Recording Paused, FM Playing, FM Muted
+
+# Images
+X  : Set backdrop
+x  : Load and show image
+xl : Preload image
+xd : Display preloaded image
+
+# Album Art
+Cl : Define AA display settings
+C  : Display album art
+
+# Recording Screen Tokens
+Rp : Target has recording
+Rm : Recording in mono
+Rf : Recording frequency
+Re : Encoder being used
+Rb : Bitrate/Quality setting
+
+# FM Radio Tokens
+tp : Target has radio
+tt : Tuner tuned
+tm : Scan mode
+ta : Minimum frequency
+tb : Maximum frequency
+tf : Current frequency (MHz)
+Ti : Current preset
+Tn : Current preset name
+Tf : Current preset frequency
+Tc : Preset count
+tx : Target has RDS
+ty : RDS name
+tz : RDS text
+
+# Alignment
+al : Left-align
+ac : Center-align
+ar : Right-align
+
+# RTL Language Alignment
+aL : Align left on LTR, right on RTL
+aR : Align right on LTR, left on RTL
+ax : Next tag follows language direction
+
+# Scrolling
+s  : Line will scroll
+
+# Increasing/Decreasing Volume
+mv : Volume is increasing/decreasing
+
+# Showing Other Settings
+St : Value of setting
+
+# Touchscreen Areas
+T  : Declare touchscreen
+Ti : Last touchscreen pressed
+
+# Current Screen
+cs : Current screen (1..5), Menus, WPS, Recording screen, FM Radio screen, Current Playlist screen
+
+# List Title
+Lt : Title text
+Li : Title icon
+
+# Alternating Sublines
+t  : Subline time
