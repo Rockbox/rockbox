@@ -90,7 +90,7 @@ static enum screen_type curr_screen;
 static struct skin_element *curr_viewport_element;
 static struct skin_viewport *curr_vp;
 
-struct line *curr_line;
+static struct line *curr_line;
 
 static int follow_lang_direction = 0;
 
@@ -1173,7 +1173,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     
 }
 
-int skin_element_callback(struct skin_element* element, void* data)
+static int skin_element_callback(struct skin_element* element, void* data)
 {
     struct wps_data *wps_data = (struct wps_data *)data;
     struct wps_token *token;

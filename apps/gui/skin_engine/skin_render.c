@@ -322,7 +322,7 @@ static void fix_line_alignment(struct skin_draw_info *info, struct skin_element 
 }
     
 /* Draw a LINE element onto the display */
-bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
+static bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
 {
     bool needs_update = false;
     int last_value, value;
@@ -471,8 +471,8 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
     return changed_lines || ret;
 }
 
-void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
-                          struct skin_viewport* skin_viewport, unsigned long refresh_type)
+static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
+                                 struct skin_viewport* skin_viewport, unsigned long refresh_type)
 {
     struct screen *display = gwps->display;
     char linebuf[MAX_LINE];

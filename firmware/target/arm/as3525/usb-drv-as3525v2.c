@@ -100,7 +100,7 @@ static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
 static struct usb_ctrlrequest ep0_setup_pkt USB_DEVBSS_ATTR;
 /* state of EP0 */
-enum ep0state ep0_state;
+static enum ep0state ep0_state;
 
 void usb_attach(void)
 {

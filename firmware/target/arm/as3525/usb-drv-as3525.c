@@ -476,7 +476,7 @@ char *make_hex(char *data, int len)
 }
 #endif
 
-void ep_send(int ep, void *ptr, int len)
+static void ep_send(int ep, void *ptr, int len)
 {
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][0].uc_desc;
 

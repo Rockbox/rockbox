@@ -68,6 +68,7 @@
 #include "wps_internals.h"
 #include "skin_engine.h"
 #include "statusbar-skinned.h"
+#include "skin_display.h"
 
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode);
 
