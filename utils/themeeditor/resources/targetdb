@@ -1,11 +1,6 @@
 # ----------------------------------------------------------- #
 # ----------------------------------------------------------- #
 # --- This file automatically generated, do not modify!   --- #
-# --- To add a target to the targetdb, add it to the      --- #
-# --- $targets array in buildtargetdb.php and run that    --- #
-# --- script, ensuring that your current directory is     --- #
-# --- utils/themeeditor, and pipe the output into         --- #
-# --- utils/themeeditor/resources/targetdb                --- #
 # ----------------------------------------------------------- #
 # ----------------------------------------------------------- #
 
@@ -63,19 +58,10 @@ archosrecorderv2
     record : yes
 }
 
-cowond2
-{
-    name   : Cowon D2
-    screen : 320 x 240 @ rgb
-    remote : no
-    fm     : yes
-    record : no
-}
-
 iaudiom3
 {
     name   : iAudio M3
-    screen : 128 x 96 @ rgb
+    screen : 128 x 96 @ grey
     remote : no
     fm     : yes
     record : yes
@@ -84,7 +70,7 @@ iaudiom3
 iaudiom5
 {
     name   : iAudio M5
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : 128 x 96 @ grey
     fm     : no
     record : yes
@@ -102,7 +88,7 @@ iaudiox5
 ipod1g2g
 {
     name   : iPod 1st and 2nd gen
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : no
     fm     : no
     record : no
@@ -111,7 +97,7 @@ ipod1g2g
 ipod3g
 {
     name   : iPod 3rd gen
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : no
     fm     : no
     record : no
@@ -120,7 +106,7 @@ ipod3g
 ipod4g
 {
     name   : iPod 4th gen Grayscale
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : no
     fm     : yes
     record : yes
@@ -128,7 +114,7 @@ ipod4g
 
 ipodcolor
 {
-    name   : iPod Color/Photo
+    name   : iPod color/Photo
     screen : 220 x 176 @ rgb
     remote : no
     fm     : yes
@@ -138,7 +124,7 @@ ipodcolor
 ipodmini1g
 {
     name   : iPod Mini 1st gen
-    screen : 138 x 110 @ rgb
+    screen : 138 x 110 @ grey
     remote : no
     fm     : no
     record : no
@@ -147,7 +133,7 @@ ipodmini1g
 ipodmini2g
 {
     name   : iPod Mini 2nd gen
-    screen : 138 x 110 @ rgb
+    screen : 138 x 110 @ grey
     remote : no
     fm     : no
     record : no
@@ -162,18 +148,9 @@ ipodnano1g
     record : yes
 }
 
-ipodnano2g
-{
-    name   : iPod Nano 2nd gen
-    screen : 176 x 132 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
 ipodvideo
 {
-    name   : iPod Video
+    name   : iPod Video 30GB
     screen : 320 x 240 @ rgb
     remote : no
     fm     : yes
@@ -201,7 +178,7 @@ iriverh10_5gb
 iriverh100
 {
     name   : iriver H100/115
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : 128 x 64 @ mono
     fm     : yes
     record : yes
@@ -210,7 +187,7 @@ iriverh100
 iriverh120
 {
     name   : iriver H120/140
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : 128 x 64 @ mono
     fm     : yes
     record : yes
@@ -234,6 +211,177 @@ mrobe100
     record : no
 }
 
+vibe500
+{
+    name   : Packard Bell Vibe 500
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : yes
+}
+
+sansac200
+{
+    name   : SanDisk Sansa c200
+    screen : 132 x 80 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansae200
+{
+    name   : SanDisk Sansa e200
+    screen : 176 x 220 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansae200v2
+{
+    name   : SanDisk Sansa e200 v2
+    screen : 176 x 220 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansafuze
+{
+    name   : SanDisk Sansa Fuze
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+gigabeatfx
+{
+    name   : Toshiba Gigabeat F/X
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+cowond2
+{
+    name   : Cowon D2
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+zenvision
+{
+    name   : Creative Zen Vision
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+zenvisionm30gb
+{
+    name   : Creative Zen Vision%:M 30GB
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+zenvisionm60gb
+{
+    name   : Creative Zen Vision%:M 60GB
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+iaudio7
+{
+    name   : iAudio 7
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+ipodnano2g
+{
+    name   : iPod Nano 2nd gen
+    screen : 176 x 132 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+iriverifp7xx
+{
+    name   : iriver iFP-7xx
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : no
+    record : no
+}
+
+logikdax
+{
+    name   : Logik DAX
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : no
+    record : no
+}
+
+lyreproto1
+{
+    name   : Lyre Prototype 1
+    screen : 128 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+meizum3
+{
+    name   : Meizu M3
+    screen : 176 x 132 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+meizum6sl
+{
+    name   : Meizu M6SL
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+meizum6sp
+{
+    name   : Meizu M6SP
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+mini2440
+{
+    name   : Mini 2440
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
 mrobe500
 {
     name   : Olympus M-Robe 500
@@ -243,13 +391,49 @@ mrobe500
     record : no
 }
 
-vibe500
+ondavx747
 {
-    name   : Packard Bell Vibe 500
-    screen : 160 x 128 @ rgb
+    name   : Onda VX747
+    screen : 240 x 400 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+ondavx767
+{
+    name   : Onda VX767
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+ondavx777
+{
+    name   : Onda VX777
+    screen : 240 x 400 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+gogearhdd1630
+{
+    name   : Philips GoGear HDD1630
+    screen : 128 x 128 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+gogearsa9200
+{
+    name   : Philips GoGear SA9200
+    screen : 128 x 160 @ rgb
     remote : no
     fm     : no
-    record : yes
+    record : no
 }
 
 samsungyh820
@@ -264,7 +448,7 @@ samsungyh820
 samsungyh920
 {
     name   : Samsung YH-920
-    screen : 160 x 128 @ rgb
+    screen : 160 x 128 @ grey
     remote : no
     fm     : no
     record : no
@@ -279,9 +463,27 @@ samsungyh925
     record : no
 }
 
-sansac200
+samsungyps3
 {
-    name   : SanDisk Sansa c200
+    name   : Samsung YP-S3
+    screen : 176 x 220 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sansac100
+{
+    name   : SanDisk Sansa c100
+    screen : 128 x 64 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+sansac200v2
+{
+    name   : SanDisk Sansa c200 v2
     screen : 132 x 80 @ rgb
     remote : no
     fm     : yes
@@ -315,33 +517,6 @@ sansaclipplus
     record : yes
 }
 
-sansae200
-{
-    name   : SanDisk Sansa e200
-    screen : 176 x 220 @ rgb
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansae200v2
-{
-    name   : SanDisk Sansa e200 v2
-    screen : 176 x 220 @ rgb
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansafuze
-{
-    name   : SanDisk Sansa Fuze
-    screen : 220 x 176 @ rgb
-    remote : no
-    fm     : yes
-    record : yes
-}
-
 sansafuzev2
 {
     name   : SanDisk Sansa Fuze v2
@@ -351,10 +526,37 @@ sansafuzev2
     record : yes
 }
 
-gigabeatfx
+sansam200
 {
-    name   : Toshiba Gigabeat F/X
+    name   : SanDisk Sansa m200
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : no
+    record : no
+}
+
+sansam200v4
+{
+    name   : SanDisk Sansa m200 v4
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaview
+{
+    name   : SanDisk Sansa View
     screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+tatungtpj1022
+{
+    name   : Tatung Elio TPJ-1022
+    screen : 220 x 176 @ rgb
     remote : no
     fm     : no
     record : no

@@ -25,63 +25,21 @@
 echo "# ----------------------------------------------------------- #\n";
 echo "# ----------------------------------------------------------- #\n";
 echo "# --- This file automatically generated, do not modify!   --- #\n";
-echo "# --- To add a target to the targetdb, add it to the      --- #\n";
-echo "# --- \$targets array in buildtargetdb.php and run that    --- #\n";
-echo "# --- script, ensuring that your current directory is     --- #\n";
-echo "# --- utils/themeeditor, and pipe the output into         --- #\n";
-echo "# --- utils/themeeditor/resources/targetdb                --- #\n";
 echo "# ----------------------------------------------------------- #\n";
 echo "# ----------------------------------------------------------- #\n\n";
  
-// This is the array of targets, with the target id as the key and the 
-// plaintext name of the target as the value
-$targets = array( 'archosfmrecorder' => 'Archos FM Recorder',
-                  'archosondiofm' => 'Archos Ondio FM',
-                  'archosondiosp' => 'Archos Ondio SP',
-                  'archosplayer' => 'Archos Player/Studio',
-                  'archosrecorder' => 'Archos Recorder v1',
-                  'archosrecorderv2' => 'Archos Recorder v2',
-                  'cowond2' => 'Cowon D2',
-                  'iaudiom3' => 'iAudio M3',
-                  'iaudiom5' => 'iAudio M5',
-                  'iaudiox5' => 'iAudio X5',
-                  'ipod1g2g' => 'iPod 1st and 2nd gen',
-                  'ipod3g' => 'iPod 3rd gen',
-                  'ipod4g' => 'iPod 4th gen Grayscale',
-                  'ipodcolor' => 'iPod Color/Photo',
-                  'ipodmini1g' => 'iPod Mini 1st gen',
-                  'ipodmini2g' => 'iPod Mini 2nd gen',
-                  'ipodnano1g' => 'iPod Nano 1st gen',
-                  'ipodnano2g' => 'iPod Nano 2nd gen',
-                  'ipodvideo' => 'iPod Video',
-                  'iriverh10' => 'iriver H10 20GB',
-                  'iriverh10_5gb' => 'iriver H10 5GB',
-                  'iriverh100' => 'iriver H100/115',
-                  'iriverh120' => 'iriver H120/140',
-                  'iriverh300' => 'iriver H320/340',
-                  'mrobe100' => 'Olympus M-Robe 100',
-                  'mrobe500' => 'Olympus M-Robe 500',
-                  'vibe500' => 'Packard Bell Vibe 500',
-                  'samsungyh820' => 'Samsung YH-820',
-                  'samsungyh920' => 'Samsung YH-920',
-                  'samsungyh925' => 'Samsung YH-925',
-                  'sansac200' => 'SanDisk Sansa c200',
-                  'sansaclip' => 'SanDisk Sansa Clip v1',
-                  'sansaclipv2' => 'SanDisk Sansa Clip v2',
-                  'sansaclipplus' => 'SanDisk Sansa Clip+',
-                  'sansae200' => 'SanDisk Sansa e200',
-                  'sansae200v2' => 'SanDisk Sansa e200 v2',
-                  'sansafuze' => 'SanDisk Sansa Fuze',
-                  'sansafuzev2' => 'SanDisk Sansa Fuze v2',
-                  'gigabeatfx' => 'Toshiba Gigabeat F/X',
-                  'gigabeats' => 'Toshiba Gigabeat S'
-                );
+// Importing the target array
+system('./includetargets.pl');
+require('./targets.php');
+unlink('./targets.php');
 
 // Looping through all the targets
 foreach($targets as $target => $plaintext)
 {
     // Opening a cpp process
     $configfile = '../../firmware/export/config/' . $target . '.h';
+    if(!file_exists($configfile))
+        continue;
     $descriptor = array( 0 => array("pipe", "r"), //stdin
                          1 => array("pipe", "w") //stdout
                         );
@@ -122,15 +80,19 @@ STR;
     fclose($pipes[1]);
     $results = explode("\n", $results);
     
+    $base = 0;
+    while($results[$base] != 'lcd')
+        $base++;
+    
     // Header for the target
     echo $target . "\n{\n";
     echo '    name   : ' . $plaintext . "\n";
     
     // Writing the LCD dimensions
-    echo '    screen : ' . $results[7] . ' x ' . $results[8] . ' @ ';
-    if($results[9] == 1)
+    echo '    screen : ' . $results[$base + 1] . ' x ' . $results[$base + 2] . ' @ ';
+    if($results[$base + 3] == 1)
         echo 'mono';
-    else if($results[10] == 2)
+    else if($results[$base + 3] == 2)
         echo 'grey';
     else
         echo 'rgb';
@@ -138,16 +100,16 @@ STR;
     
     // Writing the remote dimensions if necessary
     echo '    remote : ';
-    if($results[12] == 0)
+    if($results[$base + 6] == 0)
     {
         echo 'no';
     }
     else
     {
-        echo $results[12] . ' x ' .$results[13] . ' @ ';
-        if($results[14] == 1)
+        echo $results[$base + 6] . ' x ' .$results[$base + 7] . ' @ ';
+        if($results[$base + 8] == 1)
             echo 'mono';
-        else if($results[14] == 2)
+        else if($results[$base + 8] == 2)
             echo 'grey';
         else
             echo 'rgb';
@@ -156,7 +118,7 @@ STR;
     
     // Writing FM capability
     echo '    fm     : ';
-    if($results[18] == 'yes')
+    if($results[$base + 12] == 'yes')
         echo 'yes';
     else
         echo 'no';
@@ -164,7 +126,7 @@ STR;
     
     // Writing record capability
     echo '    record : ';
-    if($results[22] == 'yes')
+    if($results[$base + 16] == 'yes')
         echo 'yes';
     else
         echo 'no';
