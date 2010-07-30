@@ -23,14 +23,19 @@
 #include <QTreeWidgetItem>
 
 #include "syntaxcompleter.h"
+#include "codeeditor.h"
 
-SyntaxCompleter::SyntaxCompleter(QWidget *parent) :
+SyntaxCompleter::SyntaxCompleter(CodeEditor *parent) :
     QTreeWidget(parent)
 {
     setHeaderHidden(true);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     setWordWrap(true);
     setColumnCount(2);
+
+    QObject::connect(this, SIGNAL(activated(QModelIndex)),
+                     parent, SLOT(insertTag()));
 
     QFile fin(":/resources/tagdb");
     fin.open(QFile::ReadOnly | QFile::Text);
@@ -45,13 +50,10 @@ SyntaxCompleter::SyntaxCompleter(QWidget *parent) :
         QStringList tag;
         tag.append(split[0].trimmed());
         tag.append(split[1].trimmed());
-        tags.insert(split[0].trimmed().toLower(), tag);
+        tags.insertMulti(split[0].trimmed().toLower(), tag);
     }
 
     filter("");
-
-    resizeColumnToContents(0);
-    setColumnWidth(0, columnWidth(0) + 10); // Auto-resize is too small
 
 }
 
@@ -64,13 +66,13 @@ void SyntaxCompleter::filter(QString text)
     {
         if(text.length() == 1)
         {
-            if(text[0].toLower() != i.key()[0])
+            if(text[0].toLower() != i.key()[0].toLower())
                 continue;
         }
         else if(text.length() == 2)
         {
-            if(text[0].toLower() != i.key()[0] || i.key().length() < 2
-               || text[1].toLower() != i.key()[1])
+            if(text[0].toLower() != i.key()[0].toLower() || i.key().length() < 2
+               || text[1].toLower() != i.key()[1].toLower())
                 continue;
         }
         else if(text.length() > 2)
@@ -80,4 +82,11 @@ void SyntaxCompleter::filter(QString text)
 
         addTopLevelItem(new QTreeWidgetItem(i.value()));
     }
+
+    if(topLevelItemCount() > 0)
+        setCurrentIndex(indexFromItem(topLevelItem(0)));
+
+    resizeColumnToContents(0);
+    setColumnWidth(0, columnWidth(0) + 10); // Auto-resize is too small
+    resizeColumnToContents(1);
 }

@@ -1,10 +1,76 @@
-z : Ending tag
-aa : Should come at the beginning of everything
-za : Should come after z
-y : Should come before z
-T : Test tag 1
-Ta : Test tag 2
-Tb : Test tag 3
-U : Another test
-Ua : Yet another test
-Uc : A sixth test
+###########################################################################
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+# Copyright (C) 2010 Robert Bieber
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+############################################################################/
+
+# Enter tags in the format "tag : Description"
+# Empty lines and lines beginning with '#' are ignored
+# The descriptions are going to be displayed in a little auto-complete
+# pop-up, so keep them as terse as possible
+#
+# Like the deviceoptions file, this is compiled into the executable and
+# could segfault things if improperly formatted, so be careful---treat it
+# like part of the source code, because it is.
+#
+
+# Viewport tags
+
+V : Viewport declaration
+Vl : Viewport preload
+Vd : Viewport display
+Vi : Custom UI viewport
+VI : Pick custom UI viewport
+Vf : Foreground color
+Vb : Background color
+
+# Fonts
+
+Fl : Load a font
+
+# Status Bar
+
+we : Enable status bar
+wd : Disable status bar
+wi : Display inbuilt status bar
+
+# ID3 Info
+ia : Artist
+ic : Composer
+iA : Album artist
+id : Album Name
+iG : Grouping
+in : Track #
+it : Track Title
+iC : Comment
+iv : ID3 version
+iy : ID3 year
+ik : Disc number
+
+# Next track ID3
+Ia : Next Artist
+Ic : Next Composer
+IA : Next Album artist
+Id : Next Album Name
+IG : Next Grouping
+In : Next Track #
+It : Next Track Title
+IC : Next Comment
+Iv : Next ID3 version
+Iy : Next ID3 year
+Ik : Next Disc number

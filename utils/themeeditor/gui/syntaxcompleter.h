@@ -24,11 +24,13 @@
 
 #include <QTreeWidget>
 
+class CodeEditor;
+
 class SyntaxCompleter : public QTreeWidget
 {
 Q_OBJECT
 public:
-    SyntaxCompleter(QWidget *parent = 0);
+    SyntaxCompleter(CodeEditor *parent = 0);
     void filter(QString text);
 
 signals:

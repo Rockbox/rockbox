@@ -77,6 +77,7 @@ private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void updateLineNumberArea(const QRect &, int);
     void cursorMoved();
+    void insertTag();
 
 private:
     QWidget *lineNumberArea;
@@ -87,6 +88,7 @@ private:
 
     int tagBegin;
     int tagEnd;
+    int docLength;
 };
 
 //![codeeditordefinition]

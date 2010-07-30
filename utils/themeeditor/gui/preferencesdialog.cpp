@@ -51,7 +51,7 @@ void PreferencesDialog::loadSettings()
     QSettings settings;
     settings.beginGroup("CodeEditor");
     ui->completionBox->setChecked(settings.value("completeSyntax",
-                                                 false).toBool());
+                                                 true).toBool());
     settings.endGroup();
 }
 

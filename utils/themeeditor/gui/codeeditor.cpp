@@ -107,12 +107,35 @@ void CodeEditor::cursorMoved()
     /* Closing the completer if the cursor has moved out of its bounds */
     if(completer.isVisible())
     {
+        if(document()->toPlainText().length() > docLength)
+            tagEnd++;
+        else if(document()->toPlainText().length() < docLength)
+            tagEnd--;
+
         if(textCursor().position() < tagBegin
            || textCursor().position() > tagEnd)
         {
             completer.hide();
         }
     }
+}
+
+void CodeEditor::insertTag()
+{
+    /* Clearing the typed tag and inserting one from the completer */
+    QTextCursor at(document());
+    at.setPosition(tagBegin, QTextCursor::MoveAnchor);
+    while(document()->characterAt(at.position()) == QChar('%')
+          || document()->characterAt(at.position()) == '?')
+        at.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, 1);
+
+    at.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                    tagEnd - at.position());
+    at.removeSelectedText();
+
+    at.insertText(completer.currentItem()->text(0));
+
+    completer.hide();
 }
 
 //![resizeEvent]
@@ -131,7 +154,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::keyPressEvent(QKeyEvent *event)
 {
 
-    if(!settings.value("completeSyntax", false).toBool())
+    if(!settings.value("completeSyntax", true).toBool())
     {
         QPlainTextEdit::keyPressEvent(event);
         return;
@@ -154,10 +177,22 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
                 < completer.topLevelItemCount() - 1)
                 QApplication::sendEvent(&completer, event);
         }
-        else if(event->key() == Qt::Key_Backspace)
+        else if(event->key() == Qt::Key_Backspace
+                || event->key() == Qt::Key_Delete)
         {
-            tagEnd--;
+            docLength = document()->toPlainText().length();
             QPlainTextEdit::keyPressEvent(event);
+
+            QString filterText;
+
+            for(int i = tagBegin; i < tagEnd; i++)
+            {
+                QChar c = document()->characterAt(i);
+                if(c != '%' && c != '?')
+                    filterText.append(c);
+            }
+
+            completer.filter(filterText);
         }
         else if(event->key() == Qt::Key_Escape)
         {
@@ -165,14 +200,15 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
             completer.hide();
             QPlainTextEdit::keyPressEvent(event);
         }
-        else if(event->key() == Qt::Key_Enter)
+        else if(event->key() == Qt::Key_Return)
         {
             /* The enter key inserts the currently selected tag */
+            insertTag();
         }
         else if(event->key() == Qt::Key_Question)
         {
             /* The question mark doesn't filter the list */
-            tagEnd++;
+            docLength = document()->toPlainText().length();
             QPlainTextEdit::keyPressEvent(event);
         }
         else if(event->key() == Qt::Key_Left
@@ -184,10 +220,19 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
         else
         {
             /* Otherwise, we have to filter the list */
-            tagEnd++;
+            docLength = document()->toPlainText().length();
             QPlainTextEdit::keyPressEvent(event);
 
-            QString filterText = "";
+            QString filterText;
+
+            for(int i = tagBegin; i < tagEnd; i++)
+            {
+                QChar c = document()->characterAt(i);
+                if(c != '%' && c != '?')
+                    filterText.append(c);
+            }
+
+            completer.filter(filterText);
         }
     }
     else
