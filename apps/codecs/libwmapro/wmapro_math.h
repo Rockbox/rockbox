@@ -123,7 +123,7 @@
         t2; \
     })
 
-    /* Calculates: result = (X*Y)>>32 */
+    /* Calculates: result = (X*Y)>>31 (loses one bit of precision) */
     #define fixmul31(X,Y) \
     ({ \
        int32_t t; \
