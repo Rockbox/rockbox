@@ -1,11 +1,10 @@
-#Setting the binary name
+# Setting the binary name
 TARGET = rbthemeeditor
 VERSION = 0.5
-
-CONFIG(debug){
+CONFIG(debug) { 
     REVISION = $$system(svnversion)
-    VERSION=$$join(VERSION,,,r)
-    VERSION=$$join(VERSION,,,$$REVISION)
+    VERSION = $$join(VERSION,,,r)
+    VERSION = $$join(VERSION,,,$$REVISION)
 }
 
 # Adding network support
@@ -106,7 +105,8 @@ HEADERS += models/parsetreemodel.h \
     qtfindreplacedialog/findform.h \
     qtfindreplacedialog/finddialog.h \
     gui/projectexporter.h \
-    gui/targetdownloader.h
+    gui/targetdownloader.h \
+    gui/syntaxcompleter.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -146,7 +146,8 @@ SOURCES += main.cpp \
     qtfindreplacedialog/findform.cpp \
     qtfindreplacedialog/finddialog.cpp \
     gui/projectexporter.cpp \
-    gui/targetdownloader.cpp
+    gui/targetdownloader.cpp \
+    gui/syntaxcompleter.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -171,7 +172,8 @@ OTHER_FILES += README \
     resources/targetdb \
     quazip/README.ROCKBOX \
     quazip/LICENSE.GPL \
-    qtfindreplacedialog/dialogs.pro
+    qtfindreplacedialog/dialogs.pro \
+    resources/tagdb
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \

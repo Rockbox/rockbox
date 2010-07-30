@@ -38,6 +38,9 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
+#include <QSettings>
+
+#include "syntaxcompleter.h"
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -68,15 +71,22 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void updateLineNumberArea(const QRect &, int);
+    void cursorMoved();
 
 private:
     QWidget *lineNumberArea;
     QList<int> errors;
     QColor errorColor;
+    SyntaxCompleter completer;
+    QSettings settings;
+
+    int tagBegin;
+    int tagEnd;
 };
 
 //![codeeditordefinition]

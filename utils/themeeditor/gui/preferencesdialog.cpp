@@ -47,6 +47,12 @@ void PreferencesDialog::loadSettings()
     loadColors();
     loadFont();
     loadRender();
+
+    QSettings settings;
+    settings.beginGroup("CodeEditor");
+    ui->completionBox->setChecked(settings.value("completeSyntax",
+                                                 false).toBool());
+    settings.endGroup();
 }
 
 void PreferencesDialog::loadColors()
@@ -144,6 +150,12 @@ void PreferencesDialog::saveSettings()
     saveColors();
     saveFont();
     saveRender();
+
+    QSettings settings;
+    settings.beginGroup("CodeEditor");
+    settings.setValue("completeSyntax", ui->completionBox->isChecked());
+    settings.endGroup();
+
 }
 
 void PreferencesDialog::saveColors()

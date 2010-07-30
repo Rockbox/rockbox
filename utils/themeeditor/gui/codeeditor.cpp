@@ -34,12 +34,14 @@
 ****************************************************************************/
 
 #include <QtGui>
+#include <QApplication>
 
 #include "codeeditor.h"
 
 //![constructor]
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QWidget *parent)
+    : QPlainTextEdit(parent), completer(this)
 {
     lineNumberArea = new LineNumberArea(this);
 
@@ -49,6 +51,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
             this, SLOT(updateLineNumberArea(QRect,int)));
 
     updateLineNumberAreaWidth(0);
+
+    QObject::connect(this, SIGNAL(cursorPositionChanged()),
+                     this, SLOT(cursorMoved()));
+    completer.hide();
+    settings.beginGroup("CodeEditor");
 }
 
 //![constructor]
@@ -95,6 +102,19 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 
 //![slotUpdateRequest]
 
+void CodeEditor::cursorMoved()
+{
+    /* Closing the completer if the cursor has moved out of its bounds */
+    if(completer.isVisible())
+    {
+        if(textCursor().position() < tagBegin
+           || textCursor().position() > tagEnd)
+        {
+            completer.hide();
+        }
+    }
+}
+
 //![resizeEvent]
 
 void CodeEditor::resizeEvent(QResizeEvent *e)
@@ -107,6 +127,89 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 }
 
 //![resizeEvent]
+
+void CodeEditor::keyPressEvent(QKeyEvent *event)
+{
+
+    if(!settings.value("completeSyntax", false).toBool())
+    {
+        QPlainTextEdit::keyPressEvent(event);
+        return;
+    }
+
+    if(completer.isVisible())
+    {
+        /* Handling the completer */
+        if(event->key() == Qt::Key_Up)
+        {
+            /* Up/down arrow presses get sent right along to the completer
+             * to navigate through the list
+             */
+            if(completer.currentIndex().row() > 0)
+                QApplication::sendEvent(&completer, event);
+        }
+        else if(event->key() == Qt::Key_Down)
+        {
+            if(completer.currentIndex().row()
+                < completer.topLevelItemCount() - 1)
+                QApplication::sendEvent(&completer, event);
+        }
+        else if(event->key() == Qt::Key_Backspace)
+        {
+            tagEnd--;
+            QPlainTextEdit::keyPressEvent(event);
+        }
+        else if(event->key() == Qt::Key_Escape)
+        {
+            /* Escape hides the completer */
+            completer.hide();
+            QPlainTextEdit::keyPressEvent(event);
+        }
+        else if(event->key() == Qt::Key_Enter)
+        {
+            /* The enter key inserts the currently selected tag */
+        }
+        else if(event->key() == Qt::Key_Question)
+        {
+            /* The question mark doesn't filter the list */
+            tagEnd++;
+            QPlainTextEdit::keyPressEvent(event);
+        }
+        else if(event->key() == Qt::Key_Left
+                || event->key() == Qt::Key_Right)
+        {
+            /* Left and right keys shouldn't affect tagEnd */
+            QPlainTextEdit::keyPressEvent(event);
+        }
+        else
+        {
+            /* Otherwise, we have to filter the list */
+            tagEnd++;
+            QPlainTextEdit::keyPressEvent(event);
+
+            QString filterText = "";
+        }
+    }
+    else
+    {
+        /* Deciding whether to show the completer */
+        QPlainTextEdit::keyPressEvent(event);
+        if(event->key() == Qt::Key_Percent)
+        {
+            tagBegin = textCursor().position();
+            tagEnd = textCursor().position();
+            completer.filter("");
+            completer.move(cursorRect().left(), cursorRect().bottom());
+            if(completer.frameGeometry().right() > width())
+                completer.move(width() - completer.width(), completer.y());
+            if(completer.frameGeometry().bottom() > height())
+                completer.move(completer.x(),
+                               cursorRect().top() - completer.height());
+            completer.show();
+        }
+    }
+
+}
 
 //![extraAreaPaintEvent_0]
 
