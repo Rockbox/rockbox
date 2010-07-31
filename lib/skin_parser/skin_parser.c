@@ -44,24 +44,24 @@ static void* callback_data;
 #endif
 
 /* Auxiliary parsing functions (not visible at global scope) */
-static struct skin_element* skin_parse_viewport(char** document);
-static struct skin_element* skin_parse_line(char** document);
-static struct skin_element* skin_parse_line_optional(char** document,
+static struct skin_element* skin_parse_viewport(const char** document);
+static struct skin_element* skin_parse_line(const char** document);
+static struct skin_element* skin_parse_line_optional(const char** document,
                                                      int conditional);
-static struct skin_element* skin_parse_sublines(char** document);
-static struct skin_element* skin_parse_sublines_optional(char** document,
+static struct skin_element* skin_parse_sublines(const char** document);
+static struct skin_element* skin_parse_sublines_optional(const char** document,
                                                          int conditional);
 
-static int skin_parse_tag(struct skin_element* element, char** document);
-static int skin_parse_text(struct skin_element* element, char** document,
+static int skin_parse_tag(struct skin_element* element, const char** document);
+static int skin_parse_text(struct skin_element* element, const char** document,
                            int conditional);
 static int skin_parse_conditional(struct skin_element* element,
-                                  char** document);
-static int skin_parse_comment(struct skin_element* element, char** document);
-static struct skin_element* skin_parse_code_as_arg(char** document);
+                                  const char** document);
+static int skin_parse_comment(struct skin_element* element, const char** document);
+static struct skin_element* skin_parse_code_as_arg(const char** document);
 
 
-static void skip_whitespace(char** document)
+static void skip_whitespace(const char** document)
 {
     while(**document == ' ' || **document == '\t')
         (*document)++;
@@ -70,7 +70,6 @@ static void skip_whitespace(char** document)
 #ifdef ROCKBOX
 struct skin_element* skin_parse(const char* document, 
                                 skin_callback cb, void* cb_data)
-                                
 {
     callback = cb;
     callback_data = cb_data;
@@ -83,7 +82,7 @@ struct skin_element* skin_parse(const char* document)
 
     struct skin_element** to_write = 0;
 
-    char* cursor = (char*)document; /*Keeps track of location in the document*/
+    const char* cursor = document; /*Keeps track of location in the document*/
     
     skin_line = 1;
     skin_start = (char*)document;
@@ -117,9 +116,8 @@ struct skin_element* skin_parse(const char* document)
 
 }
 
-static struct skin_element* skin_parse_viewport(char** document)
+static struct skin_element* skin_parse_viewport(const char** document)
 {
-
     struct skin_element* root = NULL;
     struct skin_element* last = NULL;
     struct skin_element* retval = NULL;
@@ -134,8 +132,8 @@ static struct skin_element* skin_parse_viewport(char** document)
 
     struct skin_element** to_write = 0;
 
-    char* cursor = *document; /* Keeps track of location in the document */
-    char* bookmark; /* Used when we need to look ahead */
+    const char* cursor = *document; /* Keeps track of location in the document */
+    const char* bookmark; /* Used when we need to look ahead */
 
     int sublines = 0; /* Flag for parsing sublines */
 
@@ -242,28 +240,24 @@ static struct skin_element* skin_parse_viewport(char** document)
 
     retval->children[0] = root;
     return retval;
-
 }
 
 /* Auxiliary Parsing Functions */
 
-static struct skin_element* skin_parse_line(char**document)
+static struct skin_element* skin_parse_line(const char**document)
 {
-
     return skin_parse_line_optional(document, 0);
-
 }
-
 
 /*
  * If conditional is set to true, then this will break upon encountering
  * SEPERATESYM.  This should only be used when parsing a line inside a
  * conditional, otherwise just use the wrapper function skin_parse_line()
  */
-static struct skin_element* skin_parse_line_optional(char** document,
+static struct skin_element* skin_parse_line_optional(const char** document,
                                                      int conditional)
 {
-    char* cursor = *document;
+    const char* cursor = *document;
 
     struct skin_element* root = NULL;
     struct skin_element* current = NULL;
@@ -364,16 +358,16 @@ static struct skin_element* skin_parse_line_optional(char** document,
     return retval;
 }
 
-static struct skin_element* skin_parse_sublines(char** document)
+static struct skin_element* skin_parse_sublines(const char** document)
 {
     return skin_parse_sublines_optional(document, 0);
 }
 
-static struct skin_element* skin_parse_sublines_optional(char** document,
+static struct skin_element* skin_parse_sublines_optional(const char** document,
                                                   int conditional)
 {
     struct skin_element* retval;
-    char* cursor = *document;
+    const char* cursor = *document;
     int sublines = 1;
     int i;
 
@@ -458,11 +452,10 @@ static struct skin_element* skin_parse_sublines_optional(char** document,
     return retval;
 }
 
-static int skin_parse_tag(struct skin_element* element, char** document)
+static int skin_parse_tag(struct skin_element* element, const char** document)
 {
-
-    char* cursor = *document + 1;
-    char* bookmark;
+    const char* cursor = *document + 1;
+    const char* bookmark;
 
     char tag_name[3];
     char* tag_args;
@@ -531,7 +524,6 @@ static int skin_parse_tag(struct skin_element* element, char** document)
         return 1;
     }
 
-
     /* Checking the number of arguments and allocating args */
     if(*cursor != ARGLISTOPENSYM && tag_args[0] != '|')
     {
@@ -599,7 +591,6 @@ static int skin_parse_tag(struct skin_element* element, char** document)
 
         /* Scanning the arguments */
         skip_whitespace(&cursor);
-
 
         /* Checking for comments */
         if(*cursor == COMMENTSYM)
@@ -705,7 +696,6 @@ static int skin_parse_tag(struct skin_element* element, char** document)
             req_args = i + 1;
             tag_args++;
         }
-
     }
 
     /* Checking for a premature end */
@@ -730,10 +720,10 @@ static int skin_parse_tag(struct skin_element* element, char** document)
  * If the conditional flag is set true, then parsing text will stop at an
  * ARGLISTSEPERATESYM.  Only set that flag when parsing within a conditional
  */
-static int skin_parse_text(struct skin_element* element, char** document,
+static int skin_parse_text(struct skin_element* element, const char** document,
                            int conditional)
 {
-    char* cursor = *document;
+    const char* cursor = *document;
     int length = 0;
     int dest;
     char *text = NULL;
@@ -794,17 +784,16 @@ static int skin_parse_text(struct skin_element* element, char** document,
     return 1;
 }
 
-static int skin_parse_conditional(struct skin_element* element, char** document)
+static int skin_parse_conditional(struct skin_element* element, const char** document)
 {
-
-    char* cursor = *document + 1; /* Starting past the "%" */
-    char* bookmark;
+    const char* cursor = *document + 1; /* Starting past the "%" */
+    const char* bookmark;
     int children = 1;
     int i;
     
 #ifdef ROCKBOX
     bool feature_available = true;
-    char *false_branch = NULL;
+    const char *false_branch = NULL;
 #endif
 
     /* Some conditional tags allow for target feature checking,
@@ -920,9 +909,9 @@ static int skin_parse_conditional(struct skin_element* element, char** document)
     return 1;
 }
 
-static int skin_parse_comment(struct skin_element* element, char** document)
+static int skin_parse_comment(struct skin_element* element, const char** document)
 {
-    char* cursor = *document;
+    const char* cursor = *document;
 #ifndef ROCKBOX
     char* text = NULL;
 #endif
@@ -957,11 +946,10 @@ static int skin_parse_comment(struct skin_element* element, char** document)
     return 1;
 }
 
-static struct skin_element* skin_parse_code_as_arg(char** document)
+static struct skin_element* skin_parse_code_as_arg(const char** document)
 {
-
     int sublines = 0;
-    char* cursor = *document;
+    const char* cursor = *document;
 
     /* Checking for sublines */
     while(*cursor != '\n' && *cursor != '\0'

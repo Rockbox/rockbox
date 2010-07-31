@@ -29,12 +29,12 @@ extern "C"
 
 
 /* Scanning functions */
-void skip_comment(char** document);
-void skip_arglist(char** document);
-void skip_enumlist(char** document);
-char* scan_string(char** document);
-int scan_int(char** document);
-int check_viewport(char* document); /* Checks for a viewport declaration */
+void skip_comment(const char** document);
+void skip_arglist(const char** document);
+void skip_enumlist(const char** document);
+char* scan_string(const char** document);
+int scan_int(const char** document);
+int check_viewport(const char* document); /* Checks for a viewport declaration */
 
 #ifdef __cplusplus
 }
