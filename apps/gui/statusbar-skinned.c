@@ -48,7 +48,6 @@ static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false
 
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
-static struct wps_token *found_token;
 static int set_title_worker(char* title, enum themable_icons icon, 
                             struct wps_data *data, struct skin_element *root)
 {
@@ -70,7 +69,6 @@ static int set_title_worker(char* title, enum themable_icons icon,
         {
             if (token->type == SKIN_TOKEN_LIST_TITLE_TEXT)
             {
-                found_token = token;
                 token->value.data = title;
                 retval = 1;
             }
