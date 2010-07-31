@@ -124,6 +124,11 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
 
+/* Define some multiple used constants */
+#define SQRT2_FRACT24   0x016A09E6 /* 0x016A09E6 = (sqrt(2)*(1<<24)) */
+#define COS_PI4_FRACT16 0x0000B505 /* 0x0000B505 = (cos(pi/4)<<16) */
+#define ONE_FRACT16     0x00010000 /* 0x00010000 = (1<<16) */
+
 /* Enable multichannel for large-memory targets only */
 #if (MEMORYSIZE > 2)
 #define WMAPRO_MAX_CHANNELS    8                             ///< max number of handled channels
@@ -646,9 +651,9 @@ static void decode_decorrelation_matrix(WMAProDecodeCtx *s,
             get_bits1(&s->gb) ? 1.0 : -1.0;
             
         if(chgroup->decorrelation_matrix[chgroup->num_channels * i + i] > 0)
-            chgroup->fixdecorrelation_matrix[chgroup->num_channels * i + i] =  0x10000;
+            chgroup->fixdecorrelation_matrix[chgroup->num_channels * i + i] =  ONE_FRACT16;
         else
-            chgroup->fixdecorrelation_matrix[chgroup->num_channels * i + i] = -0x10000;
+            chgroup->fixdecorrelation_matrix[chgroup->num_channels * i + i] = -ONE_FRACT16;
     }
 
     for (i = 1; i < chgroup->num_channels; i++) {
@@ -754,16 +759,16 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                 } else {
                     chgroup->transform = 1;
                     if (s->num_channels == 2) {
-                        chgroup->fixdecorrelation_matrix[0] =  0x10000;
-                        chgroup->fixdecorrelation_matrix[1] = -0x10000;
-                        chgroup->fixdecorrelation_matrix[2] =  0x10000;
-                        chgroup->fixdecorrelation_matrix[3] =  0x10000;
+                        chgroup->fixdecorrelation_matrix[0] =  ONE_FRACT16;
+                        chgroup->fixdecorrelation_matrix[1] = -ONE_FRACT16;
+                        chgroup->fixdecorrelation_matrix[2] =  ONE_FRACT16;
+                        chgroup->fixdecorrelation_matrix[3] =  ONE_FRACT16;
                     } else {
                         /** cos(pi/4) */
-                        chgroup->fixdecorrelation_matrix[0] =  0xB500;
-                        chgroup->fixdecorrelation_matrix[1] = -0xB500;
-                        chgroup->fixdecorrelation_matrix[2] =  0xB500;
-                        chgroup->fixdecorrelation_matrix[3] =  0xB500;
+                        chgroup->fixdecorrelation_matrix[0] =  COS_PI4_FRACT16;
+                        chgroup->fixdecorrelation_matrix[1] = -COS_PI4_FRACT16;
+                        chgroup->fixdecorrelation_matrix[2] =  COS_PI4_FRACT16;
+                        chgroup->fixdecorrelation_matrix[3] =  COS_PI4_FRACT16;
                     }
                 }
             } else if (chgroup->num_channels > 2) {
@@ -858,19 +863,19 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
                     v1 = get_vlc2(&s->gb, vec1_vlc.table, VLCBITS, VEC1MAXDEPTH);
                     if (v1 == HUFF_VEC1_SIZE - 1)
                         v1 += ff_wma_get_large_val(&s->gb);
-                        
-                    vals[i] = v0;
+
+                    vals[i  ] = v0;
                     vals[i+1] = v1;
                 } else {
-                    vals[i] = symbol_to_vec2[idx] >> 4;
+                    vals[i  ] = symbol_to_vec2[idx] >> 4;
                     vals[i+1] = symbol_to_vec2[idx] & 0xF;
                 }
             }
         } else {
-            vals[0] = symbol_to_vec4[idx] >> 12;
-            vals[1] = (symbol_to_vec4[idx] >> 8) & 0xF;
-            vals[2] = (symbol_to_vec4[idx] >> 4) & 0xF;
-            vals[3] = symbol_to_vec4[idx] & 0xF;
+            vals[0] = (symbol_to_vec4[idx] >> 12);
+            vals[1] = (symbol_to_vec4[idx] >>  8) & 0xF;
+            vals[2] = (symbol_to_vec4[idx] >>  4) & 0xF;
+            vals[3] = (symbol_to_vec4[idx]      ) & 0xF;
         }
 
         /** decode sign */
@@ -1042,14 +1047,14 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                     }
                 } else if (s->num_channels == 2) {
 
-                    /* Scale with sqrt(2). 0x016A09E6 = (sqrt(2)*(1<<24)) */
+                    /* Scale with sqrt(2) */
                     int len = FFMIN(sfb[1], s->subframe_len) - sfb[0];
                     vector_fixmul_scalar(ch_data[0] + sfb[0],
                                          ch_data[0] + sfb[0],
-                                         0x016A09E6, len);
+                                         SQRT2_FRACT24, len);
                     vector_fixmul_scalar(ch_data[1] + sfb[0],
                                          ch_data[1] + sfb[0],
-                                         0x016A09E6, len);
+                                         SQRT2_FRACT24, len);
 
                 }
             }
