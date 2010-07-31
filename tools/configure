@@ -491,12 +491,11 @@ whichadvanced () {
         echo "Enabling Windows 32 cross-compiling"
         win32crosscompile="yes"
         ;;
+      "") # Match enter press when finished with advanced options
+        cont=0
+        ;;
       *)
-        if [ "$interact" ]; then
-          cont=0
-        else
-          echo "[ERROR] Option $option unsupported"
-        fi
+        echo "[ERROR] Option $option unsupported"
         ;;
     esac
     if [ "$interact" ]; then
