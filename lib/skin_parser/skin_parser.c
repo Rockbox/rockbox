@@ -466,7 +466,7 @@ static int skin_parse_tag(struct skin_element* element, char** document)
 
     char tag_name[3];
     char* tag_args;
-    struct tag_info *tag;
+    const struct tag_info *tag;
 
     int num_args = 1;
     int i;

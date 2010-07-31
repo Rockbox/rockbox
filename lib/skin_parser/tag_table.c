@@ -24,7 +24,7 @@
 #include <string.h>
 #define BAR_PARAMS "*|iiiis"
 /* The tag definition table */
-struct tag_info legal_tags[] = 
+static const struct tag_info legal_tags[] = 
 {
     { SKIN_TOKEN_ALIGN_CENTER,          "ac", "", 0 },
     { SKIN_TOKEN_ALIGN_LEFT,            "al", "", 0 },
@@ -214,16 +214,16 @@ struct tag_info legal_tags[] =
 };
 
 /* A table of legal escapable characters */
-char legal_escape_characters[] = "%(,);#<|>";
+static const char legal_escape_characters[] = "%(,);#<|>";
 
 /*
  * Just does a straight search through the tag table to find one by
  * the given name
  */
-struct tag_info* find_tag(char* name)
+const struct tag_info* find_tag(const char* name)
 {
     
-    struct tag_info* current = legal_tags;
+    const struct tag_info* current = legal_tags;
     
     /* 
      * Continue searching so long as we have a non-empty name string
@@ -244,7 +244,7 @@ struct tag_info* find_tag(char* name)
 /* Searches through the legal escape characters string */
 int find_escape_character(char lookup)
 {
-    char* current = legal_escape_characters;
+    const char* current = legal_escape_characters;
     while(*current != lookup && *current != '\0')
         current++;
 

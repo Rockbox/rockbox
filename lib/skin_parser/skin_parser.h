@@ -101,7 +101,7 @@ struct skin_element
     void* data;
 
     /* The tag or conditional name */
-    struct tag_info *tag;
+    const struct tag_info *tag;
 
     /* Pointer to and size of an array of parameters */
     int params_count;
