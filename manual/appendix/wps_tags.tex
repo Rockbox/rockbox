@@ -161,6 +161,29 @@ or \config{\%D(2)}), produce the information for the next file to be played.
            the rest of the track>}\\
     \config{\%Sp} & Current playback pitch\\
   \end{tagmap}
+  
+\section{Playlist Viewer}
+  \begin{tagmap}
+    \config{\%Vp(start,if tag present,other)} & Display the playlist viewer in
+            the current viewport.\\
+  \end{tagmap}
+
+  \begin{itemize}
+    \item `start' is the offset relative to the currently playing track for the
+    playlist to display from (0 the current track, 1 is the next track, etc.).
+    \item `if tag present' is the skin code to display if the track has been buffered.
+    \item `other' is the skin code to display if the track hasnt been buffered,
+    essentially only the filename is know at this point.
+  \end{itemize}
+
+  The entire viewport will be used, so don't expect other tags in the same
+  viewport to work well.  Supported tags are \%pp, all tags starting with \%i,
+  most tags starting with \%f, \%pt and \%s.\\
+
+  Example: \config{\%Vp(1,\%pp - \%it,\%pp - \%fn)} -- Display the playlist
+  position, then either the track title (from the tags) or
+  the filename. The viewer will display as many tracks as will fit in the
+  viewport.
 
 \section{Runtime Database}
   \begin{tagmap}
@@ -202,8 +225,7 @@ or \config{\%D(2)}), produce the information for the next file to be played.
   \begin{tagmap}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle, A-B\\
   \end{tagmap}
-Example: \config{\%?mm<Off|All|One|Shuffle%
-|A-B>}
+Example: \config{\%?mm<Off|All|One|Shuffle|A-B>}
 
 \section{Playback Mode}
   \begin{tagmap}
@@ -211,9 +233,7 @@ Example: \config{\%?mm<Off|All|One|Shuffle%
            Fast Forward, Rewind, Recording, Recording paused, FM Radio playing,
            FM Radio muted\\
   \end{tagmap}
-Example: \config{\%?mp<Stop|Play|Pause|%
-Ffwd|Rew|Rec|Rec pause|FM|%
-FM pause>}
+Example: \config{\%?mp<Stop|Play|Pause|Ffwd|Rew|Rec|Rec pause|FM|FM pause>}
 
 \section{Current Screen}
   \begin{tagmap}
@@ -223,8 +243,7 @@ FM pause>}
 The tag can also be used as the switch in a conditional tag. For players without
 some capabilities (e.g. having no FM radio) some values will be never yielded.
 
-Example: \config{You are in the \%?cs<Main menu|WPS|%
-Recording screen|FM Radio screen>}
+Example: \config{You are in the \%?cs<Main menu|WPS|Recording screen|FM Radio screen>}
 
 \section{List Title (\fname{.sbs} only)}
   \begin{tagmap}
@@ -435,16 +454,26 @@ and must have the same name as the preset. They need to be in either
 and tuned to a preset (and not recording) in order for them to be shown.
 }
 
-\section{Alignment}
+\section{Alignment and language direction}
   \begin{tagmap}
     \config{\%al} & Align the text left\\
     \config{\%aL} & Align the text left, or to the right if RTL language is in use\\
     \config{\%ac} & Centre the text\\
     \config{\%ar} & Align the text right\\
     \config{\%aR} & Align the text right, or to the left if RTL language is in use\\
+    \config{\%ax} & The next tag should follow the set language direction. When
+                    prepended to a viewport declaration, the viewport will
+                    be horizontally mirrored if the user language is set to
+                    a RTL language. Currently the \%Cl, \%V and \%Vl tags
+                    support this.\\
+    \config{\%Sr} & Use as a conditional to define options for left to right, or
+                    right to left languages. \%?Sr<RTL|LTR>\\
   \end{tagmap}
+  
 All alignment tags may be present in one line, but they need to be in the 
 order left -- centre -- right. If the aligned texts overlap, they are merged.
+
+Example: \config{\%ax\%V(\dots)}
 
 \section{Conditional Tags}
 
