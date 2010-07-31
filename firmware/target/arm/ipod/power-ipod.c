@@ -29,6 +29,9 @@
 #include "usb.h"
 #include "lcd.h"
 #include "string.h"
+#ifdef HAVE_USB_CHARGING_ENABLE
+#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
+#endif
 
 void power_init(void)
 {

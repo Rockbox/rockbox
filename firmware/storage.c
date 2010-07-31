@@ -40,8 +40,8 @@ static unsigned int num_drives;
 #define STORAGE_MINIMUM_IDLE_TIME (HZ/10)
 #define STORAGE_DELAY_UNIT  (HZ/20)
 
-unsigned int storage_last_thread[NUM_DRIVES];
-unsigned int storage_last_activity[NUM_DRIVES];
+static unsigned int storage_last_thread[NUM_DRIVES];
+static unsigned int storage_last_activity[NUM_DRIVES];
 
 static bool storage_should_wait(int drive, int prio)
 {
