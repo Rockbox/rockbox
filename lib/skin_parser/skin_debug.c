@@ -35,7 +35,7 @@ extern char* skin_start;
 /* Global error variables */
 int error_line;
 int error_col;
-char *error_line_start;
+const char *error_line_start;
 char* error_message;
 
 /* Debugging functions */
