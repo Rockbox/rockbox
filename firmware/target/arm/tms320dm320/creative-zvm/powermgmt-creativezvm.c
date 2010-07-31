@@ -26,7 +26,7 @@
 
 /* THIS CONTAINS CURRENTLY DUMMY CODE! */
 
-unsigned short current_voltage = 3910;
+static const unsigned short current_voltage = 3910;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     0
@@ -48,9 +48,6 @@ const unsigned short percent_to_volt_charge[11] =
 {
     100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320,
 };
-void read_battery_inputs(void)
-{
-}
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)

@@ -397,15 +397,16 @@ static void setup_endpoints(void)
     ZVM_SPECIFIC;
 }
 
-void usb_helper(void)
+#if 0 /* currently unused */
+static void usb_helper(void)
 {
     if(ISP1583_GEN_INT_READ & ISP1583_INIT_INTEN_READ)
     {
         logf("Helper detected interrupt... [%d]", (int)current_tick);
         usb_drv_int();
     }
-    return;
 }
+#endif
 
 void usb_drv_init(void)
 {

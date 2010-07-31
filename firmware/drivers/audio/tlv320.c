@@ -69,14 +69,14 @@ int tenthdb2master(int db)
 #define TLV320_ADDR 0x1A
 #endif
 
-struct tlv320_info
+static struct tlv320_info
 {
     int vol_l;
     int vol_r;
 } tlv320;
 
 /* Shadow registers */
-unsigned tlv320_regs[0xf];
+static unsigned tlv320_regs[0xf];
 
 static void tlv320_write_reg(unsigned reg, unsigned value)
 {
@@ -304,8 +304,8 @@ void audiohw_disable_recording(void)
     value_pc |= PC_ADC | PC_MIC | PC_LINE; /* ADC, MIC and LINE off */
     tlv320_write_reg(REG_PC, value_pc);
 }
-#endif
 
+#ifdef HAVE_FMRADIO_IN
 void audiohw_set_monitor(bool enable)
 {
     unsigned value_aap, value_pc;
@@ -325,3 +325,6 @@ void audiohw_set_monitor(bool enable)
     tlv320_write_reg(REG_AAP, value_aap);
     tlv320_write_reg(REG_PC,  value_pc);
 }
+#endif /* HAVE_FMRADIO_IN */
+#endif /* HAVE_RECORDING */
+

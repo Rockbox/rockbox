@@ -29,7 +29,7 @@
 #define SEND_RING_SIZE      256
 #define RECEIVE_RING_SIZE   20
 
-char
+static char
     uart1_send_buffer_ring[SEND_RING_SIZE],
     uart1_receive_buffer_ring[RECEIVE_RING_SIZE];
 

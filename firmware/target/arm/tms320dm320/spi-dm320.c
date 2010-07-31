@@ -33,7 +33,7 @@
 #define GIO_BL_ENABLE  (1<<13)
 #define GIO_LCD_ENABLE (1<<5)
 
-struct mutex spi_mtx;
+static struct mutex spi_mtx;
 
 struct SPI_info {
     volatile unsigned short *setreg;
@@ -43,7 +43,7 @@ struct SPI_info {
     char divider;
 };
 
-struct SPI_info spi_targets[] =
+static struct SPI_info spi_targets[] =
 {
 #ifndef CREATIVE_ZVx
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
