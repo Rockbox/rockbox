@@ -224,7 +224,7 @@ static bool update_onvol_change(struct gui_wps * gwps)
 
 
 #ifdef HAVE_TOUCHSCREEN
-int skintouch_to_wps(struct wps_data *data)
+static int skintouch_to_wps(struct wps_data *data)
 {
     int offset = 0;
     int button = skin_get_touchaction(data, &offset);
@@ -274,7 +274,7 @@ int skintouch_to_wps(struct wps_data *data)
     }
     return button;
 }
-#endif
+#endif /* HAVE_TOUCHSCREEN */
 
 bool ffwd_rew(int button)
 {

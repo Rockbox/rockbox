@@ -109,12 +109,11 @@ void lcd_remote_off(void)
 /* This is the maximum transfer size to the remote (op 0x51= 7 bytes setup+79 
  *  bytes screen data+xor+sum 
  */
-unsigned char remote_payload[88];
-unsigned char remote_payload_size;
-bool remote_repeat_draw=false;
+static unsigned char remote_payload[88];
+static unsigned char remote_payload_size;
 
-unsigned char   remote_draw_x, remote_draw_y, 
-                remote_draw_width, remote_draw_height;
+static unsigned char remote_draw_x, remote_draw_y, 
+                     remote_draw_width, remote_draw_height;
 
 /* Monitor remote hotswap */
 static void remote_tick(void)

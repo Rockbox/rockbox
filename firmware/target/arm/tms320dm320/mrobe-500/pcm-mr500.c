@@ -127,7 +127,7 @@ size_t pcm_get_bytes_waiting(void)
 }
 
 /* Only used when debugging */
-char buffer[80];
+static char buffer[80];
 
 void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)

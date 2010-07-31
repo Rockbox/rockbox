@@ -47,8 +47,8 @@ static const char scroll_name[] = "scroll";
 static struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
 
 #ifdef HAVE_REMOTE_LCD
-struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
-struct event_queue scroll_queue;
+static struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
+static struct event_queue scroll_queue;
 #endif
 
 struct scroll_screen_info lcd_scroll_info =
