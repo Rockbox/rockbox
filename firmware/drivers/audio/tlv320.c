@@ -305,7 +305,6 @@ void audiohw_disable_recording(void)
     tlv320_write_reg(REG_PC, value_pc);
 }
 
-#ifdef HAVE_FMRADIO_IN
 void audiohw_set_monitor(bool enable)
 {
     unsigned value_aap, value_pc;
@@ -325,6 +324,5 @@ void audiohw_set_monitor(bool enable)
     tlv320_write_reg(REG_AAP, value_aap);
     tlv320_write_reg(REG_PC,  value_pc);
 }
-#endif /* HAVE_FMRADIO_IN */
 #endif /* HAVE_RECORDING */
 
