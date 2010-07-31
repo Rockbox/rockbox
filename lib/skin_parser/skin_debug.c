@@ -39,7 +39,7 @@ char *error_line_start;
 char* error_message;
 
 /* Debugging functions */
-void skin_error(enum skin_errorcode error, char* cursor)
+void skin_error(enum skin_errorcode error, const char* cursor)
 {
 
     error_col = 0;

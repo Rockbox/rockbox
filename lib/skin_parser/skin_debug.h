@@ -35,7 +35,7 @@ extern "C"
 #include "skin_parser.h"
 #ifdef SKINPARSER_DEBUG
 /* Debugging functions */
-void skin_error(enum skin_errorcode error, char* cursor);
+void skin_error(enum skin_errorcode error, const char* cursor);
 int skin_error_line(void);
 int skin_error_col(void);
 char* skin_error_message(void);
