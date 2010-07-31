@@ -25,6 +25,7 @@
 #include <limits.h>
 #include <string.h>
 #include "file.h"
+#include "format.h"
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
