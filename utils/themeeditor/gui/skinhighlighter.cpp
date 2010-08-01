@@ -75,7 +75,7 @@ void SkinHighlighter::highlightBlock(const QString& text)
                 /* Checking for normal tags */
 
                 char lookup[3];
-                struct tag_info* found = 0;
+                const struct tag_info* found = 0;
 
                 /* First checking for a two-character tag name */
                 lookup[2] = '\0';
@@ -115,7 +115,7 @@ void SkinHighlighter::highlightBlock(const QString& text)
                     return;
 
                 char lookup[3];
-                struct tag_info* found = 0;
+                const struct tag_info* found = 0;
 
                 lookup[2] = '\0';
 
