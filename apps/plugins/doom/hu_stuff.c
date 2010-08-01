@@ -227,18 +227,6 @@ extern int armor_red;
 extern int armor_yellow;
 extern int armor_green;
 
-//
-// Builtin map names.
-// The actual names can be found in DStrings.h.
-//
-// Ty 03/27/98 - externalized map name arrays - now in d_deh.c
-// and converted to arrays of pointers to char *
-// See modified HUTITLEx macros
-extern char **mapnames[];
-extern char **mapnames2[];
-extern char **mapnamesp[];
-extern char **mapnamest[];
-
 // key tables
 // jff 5/10/98 french support removed,
 // as it was not being used and couldn't be easily tested

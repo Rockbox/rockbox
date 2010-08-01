@@ -844,7 +844,7 @@ void G_Ticker (void)
             if ((netgame || demoplayback) && cmd->forwardmove > TURBOTHRESHOLD &&
                   !(gametic&31) && ((gametic>>5)&3) == i )
             {
-               extern char *player_names[];
+               extern const char *player_names[];
                /* cph - don't use sprintf, use doom_printf */
                doom_printf ("%s is turbo!", player_names[i]);
             }
@@ -2241,7 +2241,7 @@ void G_RecordDemo (const char* name)
 // byte(s) should still be skipped over or padded with 0's.
 // Lee Killough 3/1/98
 
-extern int forceOldBsp;
+extern boolean forceOldBsp;
 
 byte *G_WriteOptions(byte *demo_p)
 {
