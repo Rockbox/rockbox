@@ -1075,7 +1075,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #ifdef HAVE_TOUCHSCREEN
             unsigned int last_touch = touchscreen_last_touch();
             if (last_touch != 0xffff &&
-                TIME_BEFORE(current_tick, token->value.i) + last_touch)
+                TIME_BEFORE(current_tick, token->value.i + last_touch))
                 return "t";
 #endif
             }
