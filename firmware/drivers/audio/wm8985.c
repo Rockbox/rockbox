@@ -109,8 +109,8 @@ const struct sound_settings_info audiohw_settings[] = {
 };
 
 /* shadow registers */
-unsigned int eq1_reg;
-unsigned int eq5_reg;
+static unsigned int eq1_reg;
+static unsigned int eq5_reg;
 
 /* convert tenth of dB volume (-89..6) to master volume register value */
 int tenthdb2master(int db)
@@ -250,29 +250,37 @@ void audiohw_set_aux_vol(int vol_l, int vol_r)
     wmcodec_write(ROUTMIX, 0x111 | (vol_r << 5) );
 }
 
+#ifdef AUDIOHW_HAVE_BASS
 void audiohw_set_bass(int value)
 {
     eq1_reg = (eq1_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);
     wmcodec_write(EQ1, 0x100 | eq1_reg);
 }
+#endif /* AUDIOHW_HAVE_BASS */
 
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
 void audiohw_set_bass_cutoff(int value)
 {
     eq1_reg = (eq1_reg & ~EQ_CUTOFF_MASK) | EQ_CUTOFF_VALUE(value);
     wmcodec_write(EQ1, 0x100 | eq1_reg);
 }
+#endif /* AUDIOHW_HAVE_BASS_CUTOFF */
 
+#ifdef AUDIOHW_HAVE_TREBLE
 void audiohw_set_treble(int value)
 {
     eq5_reg = (eq5_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);
     wmcodec_write(EQ5, eq5_reg);
 }
+#endif /* AUDIOHW_HAVE_TREBLE */
 
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
 void audiohw_set_treble_cutoff(int value)
 {
     eq5_reg = (eq5_reg & ~EQ_CUTOFF_MASK) | EQ_CUTOFF_VALUE(value);
     wmcodec_write(EQ5, eq5_reg);
 }
+#endif /* AUDIOHW_HAVE_TREBLE_CUTOFF */
 
 /* Nice shutdown of WM8985 codec */
 void audiohw_close(void)
@@ -286,6 +294,7 @@ void audiohw_close(void)
     wmcodec_write(PWRMGMT2, 0x40);
 }
 
+#if 0 /* function is currently unused */
 /* Note: Disable output before calling this function */
 void audiohw_set_sample_rate(int fsel)
 {
@@ -294,6 +303,7 @@ void audiohw_set_sample_rate(int fsel)
        driver in Rockbox, so this may need to change in the future. */
     (void)fsel;
 }
+#endif
 
 #ifdef HAVE_RECORDING
 void audiohw_enable_recording(bool source_mic)

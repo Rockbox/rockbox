@@ -25,6 +25,7 @@
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
+#include "i2s.h"
 #include "pcm.h"
 
 struct dma_data

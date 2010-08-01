@@ -23,6 +23,7 @@
 #include "usb.h"
 
 #include "usb-tcc.h"
+#include "usb-target.h"
 
 #include "cpu.h"
 #include "system.h"

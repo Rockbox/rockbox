@@ -23,6 +23,7 @@
 #include "button.h"
 #include "pcf50606.h"
 #include "touchscreen.h"
+#include "touchscreen-target.h"
 #include "stdlib.h"
 #include "power-target.h"
 #include "tsc200x.h"
