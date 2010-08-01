@@ -4425,7 +4425,7 @@ static void tagcache_thread(void)
     }
 
     remove(get_user_file_path(TAGCACHE_STATEFILE, IS_FILE | NEED_WRITE,
-                buf, sizeof(buf)));
+                path, sizeof(path)));
 # endif
     
     /* Allocate space for the tagcache if found on disk. */
