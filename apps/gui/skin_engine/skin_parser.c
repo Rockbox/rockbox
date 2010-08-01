@@ -194,6 +194,12 @@ static int parse_statusbar_tags(struct skin_element* element,
         {
             viewport_set_fullscreen(&default_vp->vp, curr_screen);
         }
+#ifdef HAVE_REMOTE_LCD
+        /* viewport_set_defaults() sets the font to FONT_UI+curr_screen.
+         * This parser requires font 1 to always be the UI font, 
+         * so force it back to FONT_UI and handle the screen number at the end */
+        default_vp->vp.font = FONT_UI;
+#endif
     }
     return 0;
 }
@@ -991,6 +997,11 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
      */
     if (wps_data->backdrop)
     {
+        if (screens[curr_screen].depth == 1)
+        {
+            wps_data->backdrop = NULL;
+            return retval;
+        }
         bool needed = wps_data->backdrop[0] != '-';
         wps_data->backdrop = skin_backdrop_load(wps_data->backdrop,
                                                 bmpdir, curr_screen);
@@ -1081,6 +1092,12 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     curr_viewport_element = element;
     
     viewport_set_defaults(&skin_vp->vp, curr_screen);
+#ifdef HAVE_REMOTE_LCD
+    /* viewport_set_defaults() sets the font to FONT_UI+curr_screen.
+     * This parser requires font 1 to always be the UI font, 
+     * so force it back to FONT_UI and handle the screen number at the end */
+    skin_vp->vp.font = FONT_UI;
+#endif
     
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
