@@ -341,7 +341,7 @@ static int plugins_menu(void* param)
     MENUITEM_STRINGLIST(plugins_menu_items, ID2P(LANG_PLUGINS), NULL,
                         ID2P(LANG_PLUGIN_GAMES),
                         ID2P(LANG_PLUGIN_APPS), ID2P(LANG_PLUGIN_DEMOS));
-    char *folder;
+    const char *folder;
     int retval = GO_TO_PREVIOUS;
     int selection = 0, current = 0;
     while (retval == GO_TO_PREVIOUS)
@@ -646,7 +646,13 @@ void root_menu(void)
                     if ( action_userabort(HZ/5) ) 
                         break;
                 }
-                next_screen = load_plugin_screen(PLUGIN_DEMOS_DIR "/pictureflow.rock");
+                {
+                    char pf_path[MAX_PATH];
+                    snprintf(pf_path, sizeof(pf_path),
+                            "%s/pictureflow.rock",
+                            PLUGIN_DEMOS_DIR);
+                    next_screen = load_plugin_screen(pf_path);
+                }
                 previous_browser = GO_TO_PICTUREFLOW;
                 break;
 #endif                

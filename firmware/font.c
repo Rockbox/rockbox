@@ -36,6 +36,7 @@
 #include "panic.h"
 #include "rbunicode.h"
 #include "diacritic.h"
+#include "rbpaths.h"
 
 #define MAX_FONTSIZE_FOR_16_BIT_OFFSETS 0xFFDB
 
@@ -56,7 +57,6 @@
 #define FONT_HEADER_SIZE 36
 #endif
 
-#define GLYPH_CACHE_FILE ROCKBOX_DIR"/.glyphcache"
 
 #ifndef BOOTLOADER
 /* Font cache includes */
@@ -606,12 +606,13 @@ void glyph_cache_save(struct font* pf)
         pf = &font_ui;
     if (pf->fd >= 0 && pf == &font_ui) 
     {
-#ifdef WPSEDITOR
-        cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
-#else
-        cache_fd = creat(GLYPH_CACHE_FILE, 0666);
-#endif
-        if (cache_fd < 0) return;
+        char path[MAX_PATH];
+        const char *file = get_user_file_path(GLYPH_CACHE_FILE, IS_FILE|NEED_WRITE,
+                                       path, sizeof(path));
+
+        cache_fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        if (cache_fd < 0)
+            return;
 
         lru_traverse(&pf->cache._lru, glyph_file_write);
 
@@ -630,9 +631,10 @@ static void glyph_cache_load(struct font* pf)
         int fd;
         unsigned char tmp[2];
         unsigned short ch;
+        char path[MAX_PATH];
 
-        fd = open(GLYPH_CACHE_FILE, O_RDONLY|O_BINARY);
-
+        fd = open(get_user_file_path(GLYPH_CACHE_FILE, IS_FILE|NEED_WRITE,
+                                     path, sizeof(path)), O_RDONLY|O_BINARY);
         if (fd >= 0) {
 
             while (read(fd, tmp, 2) == 2) {

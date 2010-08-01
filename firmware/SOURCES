@@ -105,6 +105,9 @@ common/dircache.c
 #endif /* HAVE_DIRCACHE */
 common/filefuncs.c
 common/format.c
+#ifdef APPLICATION
+common/rbpaths.c
+#endif
 common/strcasecmp.c
 common/strcasestr.c
 common/strnatcmp.c

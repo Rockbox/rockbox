@@ -88,10 +88,13 @@ static int fdbind_idx = 0;
  */
 static int open_dircache_file(unsigned flags, int permissions)
 {
+    char path[MAX_PATH];
+    const char *file = get_user_file_path(DIRCACHE_FILE, IS_FILE|NEED_WRITE,
+                                path, sizeof(path));
     if (permissions != 0)
-        return open(DIRCACHE_FILE, flags, permissions);
+        return open(file, flags, permissions);
 
-    return open(DIRCACHE_FILE, flags);
+    return open(file, flags);
 }
 
 /**
@@ -99,7 +102,9 @@ static int open_dircache_file(unsigned flags, int permissions)
  */
 static int remove_dircache_file(void)
 {
-    return remove(DIRCACHE_FILE);
+    char path[MAX_PATH];
+    return remove(get_user_file_path(DIRCACHE_FILE, IS_FILE|NEED_WRITE,
+                                path, sizeof(path)));
 }
 #endif
 /** 

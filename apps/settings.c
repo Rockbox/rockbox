@@ -25,6 +25,7 @@
 #include <limits.h>
 #include "inttypes.h"
 #include "config.h"
+#include "rbpaths.h"
 #include "action.h"
 #include "crc32.h"
 #include "sound.h"
@@ -110,7 +111,6 @@ long lasttime = 0;
 [8-NVRAM_BLOCK_SIZE] data
 */
 #define NVRAM_DATA_START 8
-#define NVRAM_FILE ROCKBOX_DIR "/nvram.bin"
 static char nvram_buffer[NVRAM_BLOCK_SIZE];
 
 static bool read_nvram_data(char* buf, int max_len)
@@ -118,7 +118,9 @@ static bool read_nvram_data(char* buf, int max_len)
     unsigned crc32 = 0xffffffff;
     int var_count = 0, i = 0, buf_pos = 0;
 #ifndef HAVE_RTC_RAM
-    int fd = open(NVRAM_FILE,O_RDONLY);
+    char path[MAX_PATH];
+    int fd = open(get_user_file_path(NVRAM_FILE, IS_FILE|NEED_WRITE,
+                  path, sizeof(path)), O_RDONLY);
     int bytes;
     if (fd < 0)
         return false;
@@ -172,6 +174,7 @@ static bool write_nvram_data(char* buf, int max_len)
     char var_count = 0;
 #ifndef HAVE_RTC_RAM
     int fd;
+    char path[MAX_PATH];
 #endif
     memset(buf,0,max_len);
     /* magic, version */
@@ -195,7 +198,8 @@ static bool write_nvram_data(char* buf, int max_len)
                     max_len-NVRAM_DATA_START-1,0xffffffff);
     memcpy(&buf[4],&crc32,4);
 #ifndef HAVE_RTC_RAM
-    fd = open(NVRAM_FILE,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    fd = open(get_user_file_path(NVRAM_FILE, IS_FILE|NEED_WRITE,
+                  path, sizeof(path)),O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd >= 0)
     {
         int len = write(fd,buf,max_len);
@@ -226,8 +230,12 @@ void settings_load(int which)
         read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
     if (which&SETTINGS_HD)
     {
-        settings_load_config(CONFIGFILE,false);
-        settings_load_config(FIXEDSETTINGSFILE,false);
+        const char *file;
+        char path[MAX_PATH];
+        file = get_user_file_path(CONFIGFILE, IS_FILE|NEED_WRITE, path, sizeof(path));
+        settings_load_config(file, false);
+        file = get_user_file_path(FIXEDSETTINGSFILE, IS_FILE, path, sizeof(path));
+        settings_load_config(file, false);
     }
 }
 
@@ -334,10 +342,12 @@ bool settings_load_config(const char* file, bool apply)
                         char storage[MAX_PATH];
                         if (settings[i].filename_setting->prefix)
                         {
-                            int len = strlen(settings[i].filename_setting->prefix);
-                            if (!strncasecmp(value,
-                                             settings[i].filename_setting->prefix,
-                                             len))
+                            char prefix_dir[MAX_PATH];
+                            const char *dir = get_user_file_path(
+                                    settings[i].filename_setting->prefix,
+                                    0, prefix_dir, sizeof(prefix_dir));
+                            int len = strlen(dir);
+                            if (!strncasecmp(value, dir, len))
                             {
                                 strlcpy(storage, &value[len], MAX_PATH);
                             }
@@ -470,6 +480,10 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
             if (((char*)settings[i].setting)[0]
                 && settings[i].filename_setting->prefix)
             {
+                char path[MAX_PATH];
+                const char *prefix = get_user_file_path(
+                        settings[i].filename_setting->prefix, 0,
+                        path, sizeof(path));
                 if (((char*)settings[i].setting)[0] == '-')
                 {
                     buf[0] = '-';
@@ -477,8 +491,7 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
                 }
                 else
                 {
-                    snprintf(buf,buf_len,"%s%s%s",
-                            settings[i].filename_setting->prefix,
+                    snprintf(buf,buf_len,"%s%s%s", prefix,
                             (char*)settings[i].setting,
                             settings[i].filename_setting->suffix);
                 }
@@ -589,8 +602,11 @@ static void flush_global_status_callback(void *data)
 static void flush_config_block_callback(void *data)
 {
     (void)data;
+    char path[MAX_PATH];
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
+    settings_write_config(
+            get_user_file_path(CONFIGFILE, IS_FILE|NEED_WRITE, path, sizeof(path)),
+            SETTINGS_SAVE_CHANGED);
 }
 
 /*
@@ -634,8 +650,8 @@ int settings_save(void)
 
 bool settings_save_config(int options)
 {
-    char filename[MAX_PATH];
-    char *folder, *namebase;
+    char filename[MAX_PATH], path[MAX_PATH];
+    const char *folder, *namebase;
     switch (options)
     {
         case SETTINGS_SAVE_THEME:
@@ -663,6 +679,8 @@ bool settings_save_config(int options)
             namebase = "config";
             break;
     }
+
+    folder = get_user_file_path(folder, NEED_WRITE, path, sizeof(path));
     create_numbered_filename(filename, folder, namebase, ".cfg", 2
                              IF_CNFN_NUM_(, NULL));
 
@@ -1180,6 +1198,7 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     if (!option_screen(&item, NULL, false, NULL))
     {
         if (type == BOOL)
+
             *(bool*)variable = (temp == 1);
         else
             *(int*)variable = temp;

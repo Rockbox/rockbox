@@ -41,6 +41,7 @@
 #include "pcmbuf.h"
 #include "errno.h"
 #include "diacritic.h"
+#include "filefuncs.h"
 
 #if CONFIG_CHARGING
 #include "power.h"

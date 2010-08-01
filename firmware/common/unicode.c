@@ -27,16 +27,16 @@
  */
 
 #include <stdio.h>
+#include "config.h"
 #include "file.h"
 #include "debug.h"
 #include "rbunicode.h"
-#include "config.h"
+#include "rbpaths.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
 
-#define CODEPAGE_DIR    ROCKBOX_DIR"/codepages"
 static int default_codepage = 0;
 static int loaded_cp_table = 0;
 

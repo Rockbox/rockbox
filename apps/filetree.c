@@ -609,11 +609,12 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_ROCK:
             case FILE_ATTR_LUA:
             {
-                char *plugin = buf, *argument = NULL;
+                char *plugin = buf, *argument = NULL, lua_path[MAX_PATH];
                 int ret;
 
                 if ((file->attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
-                    plugin = VIEWERS_DIR "/lua.rock"; /* Use a #define here ? */
+                    snprintf(lua_path, sizeof(lua_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
+                    plugin = lua_path;
                     argument = buf;
                 }
 

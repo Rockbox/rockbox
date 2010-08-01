@@ -175,7 +175,7 @@ static char *filetypes_strdup(char* string)
     return buffer;
 }
 static void read_builtin_types(void);
-static void read_config(char* config_file);
+static void read_config(const char* config_file);
 #ifdef HAVE_LCD_COLOR
 /* Colors file format is similar to icons:
  * ext:hex_color
@@ -272,6 +272,7 @@ void read_viewer_theme_file(void)
 
 void  filetype_init(void)
 {
+    char path[MAX_PATH];
     /* set the directory item first */
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
@@ -280,7 +281,7 @@ void  filetype_init(void)
     
     filetype_count = 1;
     read_builtin_types();
-    read_config(VIEWERS_CONFIG);
+    read_config(get_user_file_path(VIEWERS_CONFIG, IS_FILE, path, sizeof(path)));
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
 #endif
@@ -320,7 +321,7 @@ static void read_builtin_types(void)
     }
 }
 
-static void read_config(char* config_file)
+static void read_config(const char* config_file)
 {
     char line[64], *s, *e;
     char extension[8], plugin[32];

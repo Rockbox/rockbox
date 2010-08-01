@@ -19,7 +19,12 @@ use_bootchart="#undef DO_BOOTCHART"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
-rbdir=".rockbox"
+rbdir="/.rockbox"
+need_full_path=
+bindir=
+libdir=
+bindir_full=
+libdir_full=
   
 #
 # Begin Function Definitions
@@ -2603,7 +2608,27 @@ fi
     target_id=100
     modelname="application"
     target="-DAPPLICATION"
-    memory=32
+
+    if [ -z "$PREFIX" ]; then
+        rbdir="/usr/local/share/rockbox"
+        bindir="/usr/local/bin"
+        bindir_full=$bindir
+        libdir="/usr/local/lib"
+        libdir_full=$libdir
+    else
+        rbdir=`realpath $PREFIX/share/rockbox`
+        bindir="$PREFIX/bin"
+        libdir="$PREFIX/lib"
+        if [ -d bindir ]; then
+            bindir_full=`realpath $bindir`
+        fi
+        if [ -d libdir ]; then
+            libdir_full=`realpath $libdir`
+        fi
+    fi
+    need_full_path="yes"
+
+    memory=8
     uname=`uname`
     simcc "sdl-app"
     tool="cp "
@@ -2999,7 +3024,15 @@ else
 fi
 
 if [ "$ARG_RBDIR" ]; then
-  rbdir=$ARG_RBDIR
+  if [ "$need_full_path" = "yes" ]; then
+    rbdir=`realpath $ARG_RBDIR`
+  else # prepend '/' if needed
+    if [ -z `echo $ARG_RBDIR | grep -P '/.*'` ]; then
+        rbdir="/"$ARG_RBDIR
+    else
+        rbdir=$ARG_RBDIR
+    fi
+  fi
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
@@ -3010,6 +3043,8 @@ sed > autoconf.h \
  -e "s<@config_rtc@<$config_rtc<g" \
  -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@binpath@<${bindir_full}<g" \
+ -e "s<@libpath@<${libdir_full}<g" \
  -e "s<@have_backlight@<$have_backlight<g" \
  -e "s<@have_fmradio_in@<$have_fmradio_in<g" \
  -e "s<@have_ata_poweroff@<$have_ata_poweroff<g" \
@@ -3041,7 +3076,9 @@ sed > autoconf.h \
 @have_rtc_alarm@
 
 /* root of Rockbox */
-#define ROCKBOX_DIR "/@RBDIR@"
+#define ROCKBOX_DIR "@RBDIR@"
+#define ROCKBOX_BINARY_PATH "@binpath@"
+#define ROCKBOX_LIBRARY_PATH "@libpath@"
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
@@ -3154,6 +3191,8 @@ sed > Makefile \
  -e "s<@LANGS@<${buildlangs}<g" \
  -e "s<@USE_ELF@<${USE_ELF}<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@binpath@<${bindir}<g" \
+ -e "s<@libpath@<${libdir}<g" \
  -e "s<@PREFIX@<$PREFIX<g" \
  -e "s<@CMDLINE@<$cmdline<g" \
  -e "s<@SDLCONFIG@<$sdl<g" \
@@ -3221,6 +3260,8 @@ export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 export RBDIR=@RBDIR@
+export ROCKBOX_BINARY_PATH=@binpath@
+export ROCKBOX_LIBRARY_PATH=@libpath@
 export SDLCONFIG=@SDLCONFIG@
 
 CONFIGURE_OPTIONS=@CMDLINE@

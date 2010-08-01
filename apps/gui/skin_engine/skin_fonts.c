@@ -100,7 +100,7 @@ int skin_font_load(char* font_name)
     pf->buffer_size = SKIN_FONT_SIZE;
     
     snprintf(filename, MAX_PATH, FONT_DIR "/%s.fnt", font_name);
-    strcpy(font->name, font_name);
+    get_user_file_path(filename, FORCE_BUFFER_COPY, font->name, sizeof(font->name));
     
     pf->fd = -1;
     font->font_id = font_load(pf, filename);

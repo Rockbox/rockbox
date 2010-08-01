@@ -22,13 +22,12 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
-#undef MAX_PATH /* this avoids problems when building simulator */
-#define MAX_PATH 260
-
 #include <sys/types.h>
 #include "config.h"
 #include "gcc_extensions.h"
 
+#undef MAX_PATH /* this avoids problems when building simulator */
+#define MAX_PATH 260
 #define MAX_OPEN_FILES 11
 
 #ifndef SEEK_SET

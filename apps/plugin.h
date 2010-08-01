@@ -66,6 +66,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "profile.h"
 #endif
 #include "misc.h"
+#include "filefuncs.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "dsp.h"
 #include "codecs.h"

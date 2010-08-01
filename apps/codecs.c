@@ -193,8 +193,8 @@ struct codec_api ci = {
 
 void codec_get_full_path(char *path, const char *codec_root_fn)
 {
-    snprintf(path, MAX_PATH-1, CODECS_DIR "/%s." CODEC_EXTENSION,
-             codec_root_fn);
+    snprintf(path, MAX_PATH-1, "%s/%s." CODEC_EXTENSION,
+             CODECS_DIR, codec_root_fn);
 }
 
 static int codec_load_ram(int size, struct codec_api *api)

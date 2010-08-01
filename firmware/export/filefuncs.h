@@ -28,4 +28,9 @@
 int strip_volume(const char* name, char* namecopy);
 #endif
 
+#ifndef __PCTOOL__
+bool file_exists(const char *file);
+bool dir_exists(const char *path);
+#endif
+
 #endif /* __INCLUDE_FILEFUNCS_H_ */

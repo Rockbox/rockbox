@@ -22,6 +22,7 @@
 #include "dir.h"
 #include "stdlib.h"
 #include "string.h"
+#include "debug.h"
 
 #ifdef HAVE_MULTIVOLUME
 /* returns on which volume this is, and copies the reduced name
@@ -50,3 +51,39 @@ int strip_volume(const char* name, char* namecopy)
     return volume;
 }
 #endif /* #ifdef HAVE_MULTIVOLUME */
+
+#ifndef __PCTOOL__
+/* Test file existence, using dircache of possible */
+bool file_exists(const char *file)
+{
+    int fd;
+
+#ifdef DEBUG
+    if (!file || strlen(file) <= 0)
+    {
+        DEBUGF("%s(): Invalid parameter!\n");
+        return false;
+    }
+#endif
+
+#ifdef HAVE_DIRCACHE
+    if (dircache_is_enabled())
+        return (dircache_get_entry_ptr(file) != NULL);
+#endif
+
+    fd = open(file, O_RDONLY);
+    if (fd < 0)
+        return false;
+    close(fd);
+    return true;
+}
+
+bool dir_exists(const char *path)
+{
+    DIR* d = opendir(path);
+    if (!d)
+        return false;
+    closedir(d);
+    return true;
+}
+#endif /* __PCTOOL__ */

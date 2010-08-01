@@ -30,7 +30,6 @@ my $target_id; # passed in, not currently used
 my $rbdir=".rockbox"; # can be changed for special builds
 my $app;
 
-
 sub glob_mkdir {
     my ($dir) = @_;
     mkpath ($dir, $verbose, 0777);
@@ -550,7 +549,7 @@ STOP
     if(-d "$ROOT/wps") {
 	my $wps_build_cmd="perl $ROOT/wps/wpsbuild.pl ";
 	$wps_build_cmd=$wps_build_cmd."-v " if $verbose;
-	$wps_build_cmd=$wps_build_cmd." --rbdir=$rbdir -r $ROOT -m $modelname $ROOT/wps/WPSLIST $target";
+	$wps_build_cmd=$wps_build_cmd." --tempdir=$temp_dir --rbdir=$rbdir -r $ROOT -m $modelname $ROOT/wps/WPSLIST $target";
 	print "wpsbuild: $wps_build_cmd\n" if $verbose;
         system("$wps_build_cmd");
 	print "wps_build_cmd: done\n" if $verbose;
@@ -607,6 +606,10 @@ sub runone {
 
     # in the app the the layout is different (no .rockbox, but bin/lib/share)
     $app = ($modelname eq "application");
+    unless ($app) {
+        #rbdir starts with '/', strip it
+        $rbdir = substr($rbdir, 1);
+    }
 
     # build a full install .rockbox ($rbdir) directory
     buildzip($target, $fonts);

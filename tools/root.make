@@ -24,16 +24,22 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 
 
 ifeq (,$(PREFIX))
-ifeq ($(APP_TYPE),sdl-sim)
+ifdef APP_TYPE
 # for sims, set simdisk/ as default
-PREFIX = simdisk
-INSTALL = --install="$(PREFIX)"
+ifeq ($(APP_TYPE),sdl-sim)
+RBPREFIX = simdisk
+else ifeq ($(APP_TYPE),sdl-app)
+RBPREFIX = /usr/local
+endif
+
+INSTALL = --install="$(RBPREFIX)"
 else
 # /dev/null as magic to tell it wasn't set, error out later in buildzip.pl
 INSTALL = --install=/dev/null
 endif
 else
-INSTALL = --install="$(PREFIX)"
+RBPREFIX = $(PREFIX)
+INSTALL = --install="$(RBPREFIX)"
 endif
 
 RBINFO = $(BUILDDIR)/rockbox-info.txt
@@ -280,8 +286,8 @@ voice: voicetools $(BUILDDIR)/apps/features
 endif
 
 bininstall: $(BUILDDIR)/$(BINARY)
-	@echo "Installing your rockbox binary in your '$(PREFIX)' dir"
-	$(SILENT)cp $(BINARY) "$(PREFIX)/.rockbox/"
+	@echo "Installing your rockbox binary in your '$(RBPREFIX)' dir"
+	$(SILENT)cp $(BINARY) "$(RBPREFIX)/.rockbox/"
 
 install:
 	@echo "Installing your build in your '$(PREFIX)' dir"
@@ -351,4 +357,4 @@ ifneq (reconf,$(MAKECMDGOALS))
 endif
 
 reconf:
-	$(SILENT$)PREFIX=$(PREFIX) $(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
+	$(SILENT$)$(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)

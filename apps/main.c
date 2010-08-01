@@ -131,6 +131,9 @@ static void init(void);
 #endif
 int main(int argc, char *argv[])
 {
+#ifdef APPLICATION
+    paths_init();
+#endif
     sys_handle_argv(argc, argv);
 #else
 /* main(), and various functions called by main() and init() may be
@@ -163,11 +166,17 @@ int main(void)
 
 #ifdef AUTOROCK
     {
-        static const char filename[] = PLUGIN_APPS_DIR "/autostart.rock";
-
-        if(file_exists(filename)) /* no complaint if it doesn't exist */
+        char filename[MAX_PATH];
+        const char *file = get_user_file_path(
+#ifdef APPLICATION
+                                ROCKBOX_DIR
+#else
+                                PLUGIN_APPS_DIR
+#endif
+            "/autostart.rock", NEED_WRITE|IS_FILE, filename, sizeof(filename));
+        if(file_exists(file)) /* no complaint if it doesn't exist */
         {
-            plugin_load((char*)filename, NULL); /* start if it does */
+            plugin_load(file, NULL); /* start if it does */
         }
     }
 #endif /* #ifdef AUTOROCK */

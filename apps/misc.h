@@ -84,8 +84,6 @@ int hex_to_rgb(const char* hex, int* color);
 
 char* strrsplt(char* str, int c);
 char* skip_whitespace(char* const str);
-bool file_exists(const char *file);
-bool dir_exists(const char *path);
 
 /*
  * removes the extension of filename (if it doesn't start with a .)

@@ -30,6 +30,7 @@
 #include "file.h"
 #include "string-extra.h"
 #include "misc.h"
+#include "filefuncs.h"
 #include "lang.h"
 #include "action.h"
 #include "list.h"

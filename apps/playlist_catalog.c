@@ -32,6 +32,7 @@
 #include "lang.h"
 #include "list.h"
 #include "misc.h"
+#include "filefuncs.h"
 #include "onplay.h"
 #include "playlist.h"
 #include "settings.h"
@@ -77,8 +78,13 @@ static int initialize_catalog(void)
 
         /* fall back to default directory if no or invalid config */
         if (default_dir)
-            strlcpy(playlist_dir, PLAYLIST_CATALOG_DEFAULT_DIR,
-                sizeof(playlist_dir));
+        {
+            const char *dir = get_user_file_path(PLAYLIST_CATALOG_DEFAULT_DIR,
+                                    FORCE_BUFFER_COPY|NEED_WRITE,
+                                    playlist_dir, sizeof(playlist_dir));
+            if (!dir_exists(dir))
+                mkdir(dir);
+        }
 
         playlist_dir_length = strlen(playlist_dir);
 

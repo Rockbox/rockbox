@@ -40,9 +40,6 @@
 #include "dir-win32.h"
 #endif
 
-#define MAX_PATH 260
-#define MAX_OPEN_FILES 11
-
 #include <fcntl.h>
 #include <SDL.h>
 #include <SDL_thread.h>
@@ -52,7 +49,12 @@
 #include "config.h"
 #include "ata.h" /* for IF_MV2 et al. */
 #include "thread-sdl.h"
+#include "rbpaths.h"
 
+/* keep this in sync with file.h! */
+#undef MAX_PATH /* this avoids problems when building simulator */
+#define MAX_PATH 260
+#define MAX_OPEN_FILES 11
 
 /* Windows (and potentially other OSes) distinguish binary and text files.
  * Define a dummy for the others. */
@@ -255,7 +257,7 @@ static ssize_t io_trigger_and_wait(int cmd)
     return result;
 }
 
-#ifndef __PCTOOL__
+#if !defined(__PCTOOL__) && !defined(APPLICATION)
 static const char *get_sim_pathname(const char *name)
 {
     static char buffer[MAX_PATH]; /* sufficiently big */
@@ -520,7 +522,6 @@ int sim_fsync(int fd)
 void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 {
     void *hdr;
-    char name[MAX_PATH];
     char path[MAX_PATH];
     int fd;
     int codec_count;
@@ -536,8 +537,9 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
        to find an unused filename */
     for (codec_count = 0; codec_count < 10; codec_count++)
     {
-        snprintf(name, sizeof(name), "/_temp_codec%d.dll", codec_count);
-        snprintf(path, sizeof(path), "%s", get_sim_pathname(name));
+        char name[MAX_PATH];
+        const char *_name = get_user_file_path(ROCKBOX_DIR, 0, name, sizeof(name));
+        snprintf(path, sizeof(path), "%s/_temp_codec%d.dll", get_sim_pathname(_name), codec_count);
         fd = OPEN(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
         if (fd >= 0)
             break;  /* Created a file ok */

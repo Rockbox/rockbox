@@ -742,35 +742,6 @@ char* strrsplt(char* str, int c)
     return s;
 }
 
-/* Test file existence, using dircache of possible */
-bool file_exists(const char *file)
-{
-    int fd;
-
-    if (!file || strlen(file) <= 0)
-        return false;
-
-#ifdef HAVE_DIRCACHE
-    if (dircache_is_enabled())
-        return (dircache_get_entry_ptr(file) != NULL);
-#endif
-
-    fd = open(file, O_RDONLY);
-    if (fd < 0)
-        return false;
-    close(fd);
-    return true;
-}
-
-bool dir_exists(const char *path)
-{
-    DIR* d = opendir(path);
-    if (!d)
-        return false;
-    closedir(d);
-    return true;
-}
-
 /*
  * removes the extension of filename (if it doesn't start with a .)
  * puts the result in buffer

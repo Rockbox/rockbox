@@ -52,6 +52,7 @@
 #include "talk.h"
 #include "filetypes.h"
 #include "misc.h"
+#include "filefuncs.h"
 #include "filetree.h"
 #include "tagtree.h"
 #ifdef HAVE_RECORDING
@@ -260,7 +261,8 @@ static int tree_voice_cb(int selected_item, void * data)
 
 bool check_rockboxdir(void)
 {
-    if(!dir_exists(ROCKBOX_DIR))
+    char path[MAX_PATH];
+    if(!dir_exists(get_user_file_path(ROCKBOX_DIR, 0, path, sizeof(path))))
     {   /* No need to localise this message.
            If .rockbox is missing, it wouldn't work anyway */
         int i;

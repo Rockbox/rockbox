@@ -97,7 +97,9 @@ void settings_apply_skins(void)
         CHART2(">skin load ", skins[i].suffix);
         if (skins[i].setting[0] && skins[i].setting[0] != '-')
         {
-            snprintf(buf, sizeof buf, WPS_DIR "/%s.%s",
+            char path[MAX_PATH];
+            snprintf(buf, sizeof buf, "%s/%s.%s",
+                     get_user_file_path(WPS_DIR, false, path, sizeof(path)),
                      skins[i].setting, skins[i].suffix);
             skins[i].loadfunc(screen, buf, true);
         }
