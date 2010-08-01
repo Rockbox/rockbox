@@ -418,8 +418,7 @@ next_track:
         }
 
         if (mad_frame_decode(&frame, &stream)) {
-            if (stream.error == MAD_FLAG_INCOMPLETE 
-                || stream.error == MAD_ERROR_BUFLEN) {
+            if (stream.error == MAD_ERROR_BUFLEN) {
                 /* This makes the codec support partially corrupted files */
                 if (file_end == 30)
                     break;
