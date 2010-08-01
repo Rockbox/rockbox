@@ -85,14 +85,14 @@ int tenthdb2mixer(int db)
 /* ------------------------------------------------- */
 
 static int uda1380_write_reg(unsigned char reg, unsigned short value);
-unsigned short uda1380_regs[0x30];
-short recgain_mic;
-short recgain_line;
+static unsigned short uda1380_regs[0x30];
+static short recgain_mic;
+static short recgain_line;
 
 /* Definition of a playback configuration to start with */
 
 #define NUM_DEFAULT_REGS 13
-unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
+static const unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
    REG_0,          EN_DAC | EN_INT | EN_DEC |
 #ifdef USE_WSPLL

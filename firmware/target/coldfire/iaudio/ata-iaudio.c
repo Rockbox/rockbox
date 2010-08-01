@@ -25,6 +25,7 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
+#include "ata-target.h"
 
 void ata_reset(void)
 {

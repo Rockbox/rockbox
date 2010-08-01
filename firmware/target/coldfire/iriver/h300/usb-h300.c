@@ -24,6 +24,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "usb.h"
+#include "usb-target.h"
 
 void usb_init_device(void)
 {
