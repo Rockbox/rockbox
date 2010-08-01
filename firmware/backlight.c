@@ -995,11 +995,11 @@ bool is_remote_backlight_on(bool ignore_always_off)
 void backlight_set_brightness(int val) { (void)val; }
 #endif
 
-#ifdef HAVE_BUTTONLIGHT
+#ifdef HAVE_BUTTON_LIGHT
 void buttonlight_on(void) {}
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_set_brightness(int val) { (void)val; }
 #endif
-#endif /* HAVE_BUTTONLIGHT */
+#endif /* HAVE_BUTTON_LIGHT */
 
 #endif /* defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT) */
