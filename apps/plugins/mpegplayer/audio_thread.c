@@ -579,8 +579,7 @@ static void audio_thread(void)
              * at least one byte at a time */
             audio_queue_advance_pos(MAX(len, 1));
 
-            if (stream.error == MAD_FLAG_INCOMPLETE
-                || stream.error == MAD_ERROR_BUFLEN)
+            if (stream.error == MAD_ERROR_BUFLEN)
             {
                 /* This makes the codec support partially corrupted files */
                 if (++td.mad_errors <= MPA_MAX_FRAME_SIZE)
