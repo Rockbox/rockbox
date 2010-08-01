@@ -54,7 +54,7 @@ void _backlight_set_brightness(int brightness)
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
-void _backlight_set_state (unsigned int level)
+static void _backlight_set_state (unsigned int level)
 {
     if (level == 0)
        GPGDAT &= ~GPIO_LCD_PWR;

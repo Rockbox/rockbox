@@ -21,6 +21,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "kernel.h"
+#include "led-mini2440.h"
 
 /* LED functions for debug */
 

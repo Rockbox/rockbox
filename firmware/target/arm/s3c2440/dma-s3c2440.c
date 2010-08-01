@@ -35,7 +35,7 @@ static int dma_used = 0;
 /* Status flags */
 #define STATUS_CHANNEL_ACTIVE (1<<0)
 
-struct dma_channel_state 
+static struct dma_channel_state 
 {
     volatile unsigned status;
     void (*callback)(void);
@@ -162,7 +162,7 @@ void dma_enable_channel(int channel, struct dma_request *request)
 }
 
 /* ISRs */
-inline void generic_isr (unsigned channel)
+static inline void generic_isr (unsigned channel)
 {
     if (dma_state [channel].status | STATUS_CHANNEL_ACTIVE)
     {

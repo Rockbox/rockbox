@@ -221,10 +221,12 @@ void audiohw_set_treble(int value)
 }
 */
 
+#ifdef AUDIOHW_HAVE_PRESCALER
 void audiohw_set_prescaler(int val)
 {
     (void)val;
 }
+#endif /* AUDIOHW_HAVE_PRESCALER */
 
 /**
  * Sets left and right master volume  (1(max) to 62(muted))

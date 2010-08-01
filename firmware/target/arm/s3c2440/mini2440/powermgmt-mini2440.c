@@ -58,6 +58,7 @@ unsigned int battery_adc_voltage(void)
     return 4000 * 1024 / 1000;
 }
 
+#ifdef HAVE_BATTERY_SWITCH
 unsigned int input_millivolts(void)
 {
     unsigned int batt_millivolts = battery_voltage();
@@ -65,5 +66,5 @@ unsigned int input_millivolts(void)
    /* No battery, return nominal value */
     return batt_millivolts;
 }
-
+#endif /* HAVE_BATTERY_SWITCH */
 

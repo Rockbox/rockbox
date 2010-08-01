@@ -33,6 +33,7 @@
 
 #include "system-target.h"
 #include "uart-s3c2440.h"
+#include "serial.h"
 
 #define MAX_PRINTF_BUF        1024
 

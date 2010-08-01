@@ -82,8 +82,11 @@ void touchpad_set_sensitivity(int level)
     /* No touchpad */
 }
 
+#ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void)
 {
     /* No detect */
     return false;
 }
+#endif /* HAVE_HEADPHONE_DETECTION */
+
