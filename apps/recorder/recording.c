@@ -56,6 +56,7 @@
 #include "sound_menu.h"
 #include "timefuncs.h"
 #include "debug.h"
+#include "misc.h"
 #include "filefuncs.h"
 #include "tree.h"
 #include "string.h"

@@ -45,6 +45,7 @@
 #include "time.h"
 #include "timefuncs.h"
 #endif
+#include "rbpaths.h"
 
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
