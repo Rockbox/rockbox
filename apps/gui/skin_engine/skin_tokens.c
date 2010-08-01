@@ -293,14 +293,14 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 
             case SKIN_TOKEN_TRACK_STARTING:
                 {
-                    unsigned long time = token->value.i * 1000;
+                    unsigned long time = token->value.i * (HZ/TIMEOUT_UNIT);
                     if (elapsed < time)
                         return "starting";
                 }
                 return NULL;
             case SKIN_TOKEN_TRACK_ENDING:
                 {
-                    unsigned long time = token->value.i * 1000;
+                    unsigned long time = token->value.i * (HZ/TIMEOUT_UNIT);
                     if (length - elapsed < time)
                         return "ending";
                 }
@@ -1066,7 +1066,7 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_BUTTON_VOLUME:
             if (global_status.last_volume_change &&
                 TIME_BEFORE(current_tick, global_status.last_volume_change +
-                                          token->value.i * TIMEOUT_UNIT))
+                                          token->value.i))
                 return "v";
             return NULL;
             
@@ -1075,8 +1075,7 @@ const char *get_token_value(struct gui_wps *gwps,
 #ifdef HAVE_TOUCHSCREEN
             unsigned int last_touch = touchscreen_last_touch();
             if (last_touch != 0xffff &&
-                TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +
-                                          last_touch))
+                TIME_BEFORE(current_tick, token->value.i) + last_touch))
                 return "t";
 #endif
             }
