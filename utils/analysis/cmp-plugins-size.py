@@ -72,9 +72,11 @@ def map_info(map):
     f = open(map).read() # read map content
 
     s = re.search('^PLUGIN_RAM *0x(\d|[abcdef])*', f, re.MULTILINE)
+    if not s: return (name, 0)
     plugin_start = re.sub('^PLUGIN_RAM *0x0*', '', f[s.start():s.end()])
 
     s = re.search('^\.pluginend *0x(\d|[abcdef])*', f, re.MULTILINE)
+    if not s: return (name, 0)
     plugin_end   = re.sub('^\.pluginend *0x0*', '', f[s.start():s.end()])
 
     size = int(plugin_end, 16) - int(plugin_start, 16)
