@@ -973,7 +973,6 @@ void backlight_init(void)
 
 void backlight_on(void) {}
 void backlight_off(void) {}
-void buttonlight_on(void) {}
 void backlight_set_timeout(int value) {(void)value;}
 
 bool is_backlight_on(bool ignore_always_off)
@@ -995,7 +994,12 @@ bool is_remote_backlight_on(bool ignore_always_off)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_set_brightness(int val) { (void)val; }
 #endif
+
+#ifdef HAVE_BUTTONLIGHT
+void buttonlight_on(void) {}
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_set_brightness(int val) { (void)val; }
 #endif
+#endif /* HAVE_BUTTONLIGHT */
+
 #endif /* defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT) */

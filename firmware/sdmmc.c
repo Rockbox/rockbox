@@ -18,13 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
 #include "config.h"
-#if (CONFIG_STORAGE & STORAGE_MMC)
-#include "ata_mmc.h"
-#else
 #include "sdmmc.h"
-#endif
 
 /* helper function to extract n (<=32) bits from an arbitrary position.
    counting from MSB to LSB */
