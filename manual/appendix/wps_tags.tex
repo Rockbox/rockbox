@@ -51,6 +51,10 @@ show the information for the next song to be played.
         \config{\%Vf([fgcolour])}\newline
         \config{\%Vb([bgcolour])}
         & See section \ref{ref:Viewports}\\}
+        
+      \config{\%Vl('identifier',\newline\dots)} & Preloads a viewport for later
+      display. `identifier' is a single lowercase letter (a-z) and the `\dots'
+      parameters use the same logic as the \%V tag explained above.\\
 
       \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
       \config{\%?C<\%Vd(a)|\%Vd(b)>}
