@@ -182,14 +182,15 @@ static void read_config(const char* config_file);
  * load a colors file from a theme with:
  * filetype colours: filename.colours */
 void read_color_theme_file(void) {
-    char buffer[MAX_PATH];
+    char buffer[MAX_PATH], dir[MAX_PATH];
     int fd;
     char *ext, *color;
     int i;
     for (i = 0; i < MAX_FILETYPES+1; i++) {
         custom_colors[i] = -1;
     }
-    snprintf(buffer, MAX_PATH, "%s/%s.colours", THEME_DIR, 
+    snprintf(buffer, MAX_PATH, "%s/%s.colours",
+             get_user_file_path(THEME_DIR, 0, dir, sizeof(dir)),
              global_settings.colors_file);
     fd = open(buffer, O_RDONLY);
     if (fd < 0)

@@ -988,9 +988,10 @@ int rockbox_browse(const char *root, int dirfilter)
         /* If we've found a file to center on, do it */
         if (setting)
         {
-            char current[MAX_PATH];
+            char current[MAX_PATH], _dir[MAX_PATH];
             /* if setting != NULL, ext and dir are not used uninitialized */
-            snprintf(current, sizeof(current), "%s/%s.%s", dir, setting, ext);
+            snprintf(current, sizeof(current), "%s/%s.%s",
+                     get_user_file_path(dir, 0, _dir, sizeof(_dir)), setting, ext);
             set_current_file(current);
             /* set_current_file changes dirlevel, change it back */
             tc.dirlevel = 0; 

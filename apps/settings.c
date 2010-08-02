@@ -886,10 +886,13 @@ void settings_apply(bool read_disk)
     {
         char buf[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
+        char dir[MAX_PATH];
+        const char *font_path = get_user_file_path(FONT_DIR, 0, dir, sizeof(dir));
         /* fonts need to be loaded before the WPS */
         if (global_settings.font_file[0]
             && global_settings.font_file[0] != '-') {
-            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+            
+            snprintf(buf, sizeof buf, "%s/%s.fnt", font_path,
                      global_settings.font_file);
             CHART2(">font_load ", global_settings.font_file);
             rc = font_load(NULL, buf);
@@ -902,7 +905,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_REMOTE_LCD        
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
-            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+            snprintf(buf, sizeof buf, "%s/%s.fnt", font_path,
                      global_settings.remote_font_file);
             CHART2(">font_load_remoteui ", global_settings.remote_font_file);
             rc = font_load_remoteui(buf);
@@ -914,7 +917,8 @@ void settings_apply(bool read_disk)
             font_load_remoteui(NULL);
 #endif
         if ( global_settings.kbd_file[0]) {
-            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+            snprintf(buf, sizeof buf, "%s/%s.kbd",
+                     get_user_file_path(ROCKBOX_DIR, 0, dir, sizeof(dir)),
                      global_settings.kbd_file);
             CHART(">load_kbd");
             load_kbd(buf);
@@ -922,8 +926,9 @@ void settings_apply(bool read_disk)
         }
         else
             load_kbd(NULL);
-#endif
-
+#endif /* HAVE_LCD_BITMAP */
+        /* no get_user_file_path() here because we don't really support
+         * langs that don't come with rockbox */
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
@@ -1208,8 +1213,8 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
 }
 
 /*
- * Takes filename, removes the directory (assumed to be ROCKBOX_DIR) its in
- * and the extension, and then copies the basename into setting
+ * Takes filename, removes the directory and the extension,
+ * and then copies the basename into setting, unless the basename exceeds maxlen
  **/
 void set_file(const char* filename, char* setting, const int maxlen)
 {
@@ -1233,7 +1238,7 @@ void set_file(const char* filename, char* setting, const int maxlen)
     len = strlen(fptr) - extlen + 1;
 
     /* error if filename isn't in ROCKBOX_DIR */
-    if (strncasecmp(ROCKBOX_DIR, filename, ROCKBOX_DIR_LEN) || (len > maxlen))
+    if (len > maxlen)
         return;
 
     strlcpy(setting, fptr, len);
