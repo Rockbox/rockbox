@@ -73,6 +73,21 @@ SkinDocument::SkinDocument(QLabel* statusLabel, QString file,
     QStringList decomposed = fileName.split('/');
     titleText = decomposed.last();
 
+    /* Setting the current screen device setting */
+    QString extension = titleText.split(".").last().toLower().right(3);
+    if(extension == "wps")
+    {
+        device->setData("cs", "WPS");
+    }
+    else if(extension == "sbs")
+    {
+        device->setData("cs", "Menus");
+    }
+    else if(extension == "fms")
+    {
+        device->setData("cs", "FM Radio Screen");
+    }
+
     lastUpdate = QTime::currentTime();
 }
 
