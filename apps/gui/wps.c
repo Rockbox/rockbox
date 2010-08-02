@@ -652,7 +652,8 @@ static void gwps_enter_wps(void)
 #if LCD_DEPTH > 1
         if (display->depth > 1)
         {
-            struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, gwps->data)->vp;
+            struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, 
+                                                 false, gwps->data)->vp;
             vp->fg_pattern = display->get_foreground();
             vp->bg_pattern = display->get_background();
         }

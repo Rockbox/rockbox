@@ -151,13 +151,12 @@ enum wps_parse_error {
 #define VP_DRAW_WASHIDDEN   0x4
 /* these are never drawn, nor cleared, i.e. just ignored */
 #define VP_NEVER_VISIBLE    0x8
-#define VP_DEFAULT_LABEL    '|'
-#define VP_NO_LABEL         '-'
-#define VP_INFO_LABEL       0x80
+#define VP_DEFAULT_LABEL    "|"
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     char hidden_flags;
-    char label;
+    bool is_infovp;
+    char* label;
     unsigned start_fgcolour;
     unsigned start_bgcolour;
 };
@@ -340,7 +339,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 #endif
 
 struct gui_img* find_image(char label, struct wps_data *data);
-struct skin_viewport* find_viewport(char label, struct wps_data *data);
+struct skin_viewport* find_viewport(char *label, bool uivp, struct wps_data *data);
 
 
 #ifdef SIMULATOR

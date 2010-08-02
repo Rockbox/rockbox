@@ -132,13 +132,14 @@ struct gui_img* find_image(char label, struct wps_data *data)
 #endif
 
 /* traverse the viewport linked list for a viewport */
-struct skin_viewport* find_viewport(char label, struct wps_data *data)
+struct skin_viewport* find_viewport(char *label, bool uivp, struct wps_data *data)
 {
     struct skin_element *list = data->tree;
     while (list)
     {
         struct skin_viewport *vp = (struct skin_viewport *)list->data;
-        if (vp->label == label)
+        if (vp->label && (vp->is_infovp == uivp) &&
+            !strcmp(vp->label, label))
             return vp;
         list = list->next;
     }
@@ -1086,7 +1087,8 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         return CALLBACK_ERROR;
         
     skin_vp->hidden_flags = 0;
-    skin_vp->label = VP_NO_LABEL;
+    skin_vp->label = NULL;
+    skin_vp->is_infovp = false;
     element->data = skin_vp;
     curr_vp = skin_vp;
     curr_viewport_element = element;
@@ -1118,21 +1120,22 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     {
         if (element->tag->type == SKIN_TOKEN_UIVIEWPORT_LOAD)
         {
+            skin_vp->is_infovp = true;
             if (isdefault(param))
             {
                 skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-                skin_vp->label = VP_INFO_LABEL|VP_DEFAULT_LABEL;
+                skin_vp->label = VP_DEFAULT_LABEL;
             }
             else
             {
                 skin_vp->hidden_flags = VP_NEVER_VISIBLE;
-                skin_vp->label = VP_INFO_LABEL|param->data.text[0];
+                skin_vp->label = param->data.text;
             }
         }
         else
         {
                 skin_vp->hidden_flags = VP_DRAW_HIDEABLE|VP_DRAW_HIDDEN;
-                skin_vp->label = param->data.text[0];
+                skin_vp->label = param->data.text;
         }
         param++;
     }
@@ -1269,7 +1272,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
                 case SKIN_TOKEN_VIEWPORT_ENABLE:
                 case SKIN_TOKEN_UIVIEWPORT_ENABLE:
-                    token->value.i = element->params[0].data.text[0];
+                    token->value.data = element->params[0].data.text;
                     break;
                 case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
                     function = parse_image_display;

@@ -92,13 +92,14 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #endif
         case SKIN_TOKEN_VIEWPORT_ENABLE:
         {
-            char label = token->value.i;
+            char *label = token->value.data;
             char temp = VP_DRAW_HIDEABLE;
             struct skin_element *viewport = gwps->data->tree;
             while (viewport)
             {
                 struct skin_viewport *skinvp = (struct skin_viewport*)viewport->data;
-                if (skinvp->label == label)
+                if (skinvp->label && !skinvp->is_infovp &&
+                    !strcmp(skinvp->label, label))
                 {
                     if (skinvp->hidden_flags&VP_DRAW_HIDDEN)
                     {
@@ -113,7 +114,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_UIVIEWPORT_ENABLE:
             sb_set_info_vp(gwps->display->screen_type, 
-                           token->value.i|VP_INFO_LABEL);
+                           token->value.data);
             break;
         case SKIN_TOKEN_PEAKMETER:
             data->peak_meter_enabled = true;
@@ -238,14 +239,14 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
             }
             else if (token->type == SKIN_TOKEN_VIEWPORT_ENABLE)
             {
-                char label = token->value.i&0x7f;
+                char *label = token->value.data;
                 struct skin_element *viewport;
                 for (viewport = data->tree;
                      viewport;
                      viewport = viewport->next)
                 {
                     struct skin_viewport *skin_viewport = (struct skin_viewport*)viewport->data;
-                    if ((skin_viewport->label&0x7f) != label)
+                    if (skin_viewport->label && strcmp(skin_viewport->label, label))
                         continue;
                     if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)
                     {
@@ -564,7 +565,8 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #endif
     viewport = data->tree;
     skin_viewport = (struct skin_viewport *)viewport->data;
-    if (skin_viewport->label == VP_DEFAULT_LABEL && viewport->next)
+    if (skin_viewport->label && viewport->next &&
+        !strcmp(skin_viewport->label,VP_DEFAULT_LABEL))
         refresh_mode = 0;
     
     for (viewport = data->tree;
