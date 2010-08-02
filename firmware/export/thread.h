@@ -79,9 +79,19 @@
 
 #define MAXTHREADS (BASETHREADS+TARGET_EXTRA_THREADS)
 
+/*
+ * We need more stack when we run under a host
+ * maybe more expensive C lib functions?
+ *
+ * simulator doesn't simulate stack usage anyway but well ... */
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SIMULATOR))
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+#else
+#define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+#endif
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+
+#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_ANDROID))
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
 #ifdef CPU_COLDFIRE
@@ -101,7 +111,7 @@ struct regs
     uint32_t pr;    /*    32 - Procedure register */
     uint32_t start; /*    36 - Thread start address, or NULL when started */
 };
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM) || (CONFIG_PLATFORM & PLATFORM_ANDROID)
 struct regs
 {
     uint32_t r[8];  /*  0-28 - Registers r4-r11 */

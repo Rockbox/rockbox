@@ -34,6 +34,10 @@ extern unsigned char plugin_end_addr[];
 
 extern enum codec_status codec_main(void);
 
+/* stub, the entry point is called via its reference in __header to
+ * avoid warning with certain compilers */
+int _start(void) {return 0;}
+
 enum codec_status codec_start(void)
 {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)

@@ -21,8 +21,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdbool.h>
-#include "thread-sdl.h"
-
 #include "debug.h"
 
 #include "screens.h"
@@ -35,7 +33,6 @@
 
 #include "ata.h" /* for volume definitions */
 
-extern char having_new_lcd;
 static bool storage_spinning = false;
 
 #if CONFIG_CODEC != SWCODEC
@@ -211,10 +208,13 @@ bool spdif_powered(void)
 }
 #endif
 
+#ifdef ARCHOS_PLAYER
 bool is_new_player(void)
 {
+    extern char having_new_lcd;
     return having_new_lcd;
 }
+#endif
 
 #ifdef HAVE_USB_POWER
 bool usb_powered(void)

@@ -1,0 +1,93 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2010 Thomas Martitz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+package org.rockbox;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.util.Log;
+
+public class RockboxTimer extends Timer 
+{
+	RockboxTimerTask task;
+	long interval;
+	
+	private class RockboxTimerTask extends TimerTask {
+		private RockboxTimer t;
+		public RockboxTimerTask(RockboxTimer parent) {
+			super();
+			t = parent;
+		}
+
+		@Override
+		public void run() {
+			timerTask();
+			synchronized(t) {
+				t.notify();
+			}
+		}
+	}
+	
+	public void pause()
+	{
+		cancel();
+	}
+	public void resume()
+	{
+		try {
+			schedule(task, 0, interval);
+		} catch (IllegalStateException e) {
+			/* not an error */
+		} catch (Exception e) {
+			LOG(e.toString());
+		}
+	}
+	
+	public RockboxTimer(long period_inverval_in_ms)
+	{
+		super("tick timer", false);
+		task = new RockboxTimerTask(this);
+		schedule(task, 0, period_inverval_in_ms);
+		interval = period_inverval_in_ms;
+	}
+
+	private void LOG(CharSequence text)
+	{
+		Log.d("RockboxBootloader", (String) text);	
+	}
+
+
+    /* methods called from native, keep them simple */    
+    public void java_wait_for_interrupt()
+    {
+    	synchronized(this) {
+	    	try {
+	    		this.wait();
+	    	} catch (InterruptedException e) {
+	    		/* wakeup and return */
+	    	} catch (Exception e) {
+	    		LOG(e.toString());
+	    	}
+    	}
+    }
+	public native void timerTask();
+}

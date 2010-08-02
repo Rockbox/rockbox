@@ -78,8 +78,10 @@
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
  * possible future PLATFORM_ANDROID (some OSes might need totally different
  * handling to run on them than a stand-alone application) */
-#define PLATFORM_NATIVE (1<<0)
-#define PLATFORM_HOSTED (1<<1)
+#define PLATFORM_NATIVE  (1<<0)
+#define PLATFORM_HOSTED  (1<<1)
+#define PLATFORM_ANDROID (1<<2)
+#define PLATFORM_SDL     (1<<3)
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -427,6 +429,8 @@ Lyre prototype 1 */
 
 #elif defined(APPLICATION)
 #include "config/application.h"
+#define CONFIG_CPU 0
+#define CONFIG_STORAGE 0
 #else
 /* no known platform */
 #endif
@@ -689,10 +693,16 @@ Lyre prototype 1 */
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 #define HAVE_WAKEUP_EXT_CB
 
+
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#define HAVE_PRIORITY_SCHEDULING
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define HAVE_PRIORITY_SCHEDULING
 #define HAVE_SCHEDULER_BOOSTCTRL
 #endif /* PLATFORM_NATIVE */
+
 
 #define HAVE_SEMAPHORE_OBJECTS
 

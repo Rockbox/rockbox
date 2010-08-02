@@ -14,6 +14,7 @@ CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
 # global LD options for all platforms
 GLOBAL_LDOPTS=""
 
+extradefines=""
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
 
@@ -25,7 +26,10 @@ bindir=
 libdir=
 bindir_full=
 libdir_full=
-  
+
+app_platform=
+app_lcd_width=
+app_lcd_height=
 #
 # Begin Function Definitions
 #
@@ -45,6 +49,59 @@ prefixtools () {
  AR=${prefix}ar
  AS=${prefix}as
  OC=${prefix}objcopy
+}
+
+app_get_platform() {
+    echo "Select your platform: (S)DL, (A)ndroid (default: Android)"
+    choice=`input`
+    case $choice in
+        s|S*)     app_platform="sdl" ;;
+        *|a|A*)   app_platform="android" ;;
+    esac
+
+    echo "Selected $app_platform platform"
+    echo "Select the LCD resolution seperated with enter: XxY (default: 320x480)"
+    app_lcd_width=`input`
+    if [ -z "$app_lcd_width" ]; then app_lcd_width="320"; fi
+    app_lcd_height=`input`
+    if [ -z "$app_lcd_height" ]; then app_lcd_height="480"; fi
+    echo "Selected $app_lcd_width x $app_lcd_height resolution"
+
+    app_lcd_width="#define LCD_WIDTH $app_lcd_width"
+    app_lcd_height="#define LCD_HEIGHT $app_lcd_height"
+    # setup files and paths depending on the platform
+    if [ "$app_platform" = "sdl" ]; then
+        if [ -z "$PREFIX" ]; then
+            rbdir="/usr/local/share/rockbox"
+            bindir="/usr/local/bin"
+            bindir_full=$bindir
+            libdir="/usr/local/lib"
+            libdir_full=$libdir
+        else
+            rbdir=`realpath $PREFIX/share/rockbox`
+            bindir="$PREFIX/bin"
+            libdir="$PREFIX/lib"
+            if [ -d bindir ]; then
+                bindir_full=`realpath $bindir`
+            fi
+            if [ -d libdir ]; then
+                libdir_full=`realpath $libdir`
+            fi
+        fi        
+        output="rockbox"
+        bootoutput="rockbox"
+    elif [ "$app_platform" = "android" ]; then
+        if [ -n "$PREFIX" ]; then
+            echo "WARNING: PREFIX not supported on Android. You can however use --rbdir"
+        fi
+        rbdir="/data/data/org.rockbox/app_rockbox/rockbox"
+        bindir="/data/data/org.rockbox/lib"
+        bindir_full=$bindir
+        libdir="/data/data/org.rockbox/app_rockbox"
+        libdir_full=$libdir
+        output="librockbox.so"
+        bootoutput="librockbox.so"
+    fi
 }
 
 findarmgcc() {
@@ -102,6 +159,15 @@ findsdl(){
   done
 }
 
+appcc () {
+    if [ "$1" = "sdl" ]; then
+        simcc "sdl-app"
+    elif [ "$1" = "android" ]; then
+        app_type=$1
+        androidcc
+    fi
+}
+
 simcc () {
 
  # default tool setup for native building
@@ -114,15 +180,17 @@ simcc () {
  GCCOPTIMIZE=''
  LDOPTS='-lm' # button-sdl.c uses sqrt()
 
- # default output binary name
- output="rockboxui"
+ # default output binary name, don't override app_get_platform()
+ if [ "$app_type" != "sdl-app" ]; then
+    output="rockboxui"
+ fi
 
  # default share option, override below if needed
  SHARED_FLAG="-shared"
 
  if [ "$win32crosscompile" = "yes" ]; then
    LDOPTS="$LDOPTS -mconsole"
-   output="rockboxui.exe"
+   output="$output.exe"
    winbuild="yes"
  else
  case $uname in
@@ -130,7 +198,7 @@ simcc () {
    echo "Cygwin host detected"
 
    LDOPTS="$LDOPTS -mconsole"
-   output="rockboxui.exe"
+   output="$output.exe"
    winbuild="yes"
    ;;
 
@@ -138,7 +206,7 @@ simcc () {
    echo "MinGW host detected"
 
    LDOPTS="$LDOPTS -mconsole"
-   output="rockboxui.exe"
+   output="$output.exe"
    winbuild="yes"
    ;;
 
@@ -188,6 +256,7 @@ simcc () {
         LDOPTS="$LDOPTS `$sdl --libs`"
     fi
  fi
+ 
 
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
@@ -377,6 +446,18 @@ mipselcc () {
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
  gccchoice="4.1.2"
+}
+
+androidcc () {
+    gccchoice="4.4.0"
+    prefixtools $ANDROID_NDK_PATH/build/prebuilt/linux-x86/arm-eabi-$gccchoice/bin/arm-eabi-
+    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+    GCCOPTS="$GCCOPTS -std=gnu99 -ffunction-sections -fno-short-enums -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
+    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -L$ANDROID_NDK_PATH/build/platforms/android-4/arch-arm/usr/lib/ -Wl,-rpath-link=$ANDROID_NKD_PATH/build/platforms/android-4/arch-arm/usr/lib"
+    LDOPTS="$LDOPTS -shared -nostdlib -lm -ldl -llog"
+    extradefines="$extradefines -DANDROID"
+    endian="little"
+    SHARED_FLAG="-shared"
 }
 
 whichadvanced () {
@@ -975,7 +1056,7 @@ cat <<EOF
  143) YP-S3               160) Vibe 500          131) Mini2440
 
  ==MPIO==                                        == Application ==
- 170) HD200                                      200) SDL 320x240
+ 170) HD200                                      200) Application
 
 EOF
 
@@ -2609,40 +2690,23 @@ fi
     modelname="application"
     target="-DAPPLICATION"
 
-    if [ -z "$PREFIX" ]; then
-        rbdir="/usr/local/share/rockbox"
-        bindir="/usr/local/bin"
-        bindir_full=$bindir
-        libdir="/usr/local/lib"
-        libdir_full=$libdir
-    else
-        rbdir=`realpath $PREFIX/share/rockbox`
-        bindir="$PREFIX/bin"
-        libdir="$PREFIX/lib"
-        if [ -d bindir ]; then
-            bindir_full=`realpath $bindir`
-        fi
-        if [ -d libdir ]; then
-            libdir_full=`realpath $libdir`
-        fi
-    fi
     need_full_path="yes"
+    app_get_platform
 
     memory=8
     uname=`uname`
-    simcc "sdl-app"
+
+    appcc "$app_platform"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox"
-    bootoutput="bootloader-cowond2.bin"
     appextra="recorder:gui:radio"
     plugins=""
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
-    t_manufacturer="sdl"
+    t_manufacturer="$app_platform"
     t_model="app"
     ;;
 
@@ -2732,7 +2796,7 @@ fi
     [Ii])
       appsdir='\$(ROOTDIR)/bootloader'
       apps="bootloader"
-      extradefines="-DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
+      extradefines="$extradefines -DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "e200R-installer build selected"
       ;;
@@ -2743,11 +2807,11 @@ fi
       variant=`input`
       case $variant in
         4)
-           extradefines="-DBOOTLOADER -DC200_ERASE -DC240_ERASE -ffunction-sections -fdata-sections"
+           extradefines="$extradefines -DBOOTLOADER -DC200_ERASE -DC240_ERASE -ffunction-sections -fdata-sections"
            echo "c240 eraser build selected"
         ;;
         5)
-           extradefines="-DBOOTLOADER -DC200_ERASE -DC250_ERASE -ffunction-sections -fdata-sections"
+           extradefines="$extradefines -DBOOTLOADER -DC200_ERASE -DC250_ERASE -ffunction-sections -fdata-sections"
            echo "c240 eraser build selected"
         ;;
       esac
@@ -2771,7 +2835,7 @@ fi
               output=$bootoutput
           fi
       fi
-      extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
+      extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "Bootloader build selected"
       ;;
@@ -2782,7 +2846,7 @@ fi
       fi
       debug="-DDEBUG"
       simulator="yes"
-      extradefines="-DSIMULATOR"
+      extradefines="$extradefines -DSIMULATOR"
       archosrom=""
       flash=""
       echo "Simulator build selected"
@@ -2792,7 +2856,7 @@ fi
       whichadvanced $btype
       ;;
     [Gg])
-      extradefines="-DSTUB" # for target makefile symbol EXTRA_DEFINES
+      extradefines="$extradefines -DSTUB" # for target makefile symbol EXTRA_DEFINES
       appsdir='\$(ROOTDIR)/gdb'
       apps="stub"
       case $modelname in
@@ -2815,7 +2879,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
-      extradefines="-DDEBUG"
+      extradefines="$extradefines  -DDEBUG"
       appsdir='\$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
       archosrom='';
@@ -3048,6 +3112,8 @@ sed > autoconf.h \
  -e "s<@have_backlight@<$have_backlight<g" \
  -e "s<@have_fmradio_in@<$have_fmradio_in<g" \
  -e "s<@have_ata_poweroff@<$have_ata_poweroff<g" \
+ -e "s<@lcd_width@<$app_lcd_width<g" \
+ -e "s<@lcd_height@<$app_lcd_height<g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -3075,6 +3141,10 @@ sed > autoconf.h \
 @config_rtc@
 @have_rtc_alarm@
 
+/* lcd dimensions for application builds from configure */
+@lcd_width@
+@lcd_height@
+
 /* root of Rockbox */
 #define ROCKBOX_DIR "@RBDIR@"
 #define ROCKBOX_BINARY_PATH "@binpath@"
@@ -3088,6 +3158,10 @@ if test -n "$t_cpu"; then
   if [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/"
+  fi
+  if [ -n "$app_platform" -a "$app_platform" = "android" ]; then
+    # android's gcc doesn't add this :/
+    TARGET_INC="$TARGET_INC -I$ANDROID_NDK_PATH/build/platforms/android-4/arch-arm/usr/include"
   fi
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"

@@ -33,9 +33,13 @@
 void paths_init(void)
 {
     /* make sure $HOME/.config/rockbox.org exists, it's needed for config.cfg */
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+    mkdir("/sdcard/rockbox");
+#else
     char home_path[MAX_PATH];
     snprintf(home_path, sizeof(home_path), "%s/.config/rockbox.org", getenv("HOME"));
     mkdir(home_path);
+#endif
 }
 
 const char* get_user_file_path(const char *path,
@@ -50,7 +54,11 @@ const char* get_user_file_path(const char *path,
     pos += ROCKBOX_DIR_LEN;
     if (*pos == '/') pos += 1;
 
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+    if (snprintf(buf, bufsize, "/sdcard/rockbox/%s", pos)
+#else
     if (snprintf(buf, bufsize, "%s/.config/rockbox.org/%s", getenv("HOME"), pos)
+#endif
             >= (int)bufsize)
         return NULL;
 

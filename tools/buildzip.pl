@@ -631,6 +631,8 @@ sub runone {
     }
     else {
         unless (".rockbox" eq $rbdir) {
+            mkpath($rbdir);
+            rmtree($rbdir);
             move(".rockbox", $rbdir);
             print "mv .rockbox $rbdir\n" if $verbose;
         }

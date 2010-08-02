@@ -41,7 +41,7 @@ extern bool verbose;
 
 /* Functions common to all bootloaders */
 void reset_screen(void);
-void printf(const char *format, ...);
+int printf(const char *format, ...);
 char *strerror(int error);
 void error(int errortype, int error, bool shutdown);
 int load_firmware(unsigned char* buf, char* firmware, int buffer_size);

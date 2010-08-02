@@ -4,11 +4,13 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* We don't run on hardware directly */
-#define CONFIG_PLATFORM PLATFORM_HOSTED
+#ifdef ANDROID
+#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_ANDROID)
+#else
+#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_SDL)
+#endif
 /* For Rolo and boot loader */
-/*
-#define MODEL_NUMBER 24
-*/
+#define MODEL_NUMBER 100
 
 #define MODEL_NAME   "Rockbox"
 
@@ -37,9 +39,17 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions */
+/* LCD dimensions
+ *
+ * overriden by configure for application builds */
+#ifndef LCD_WIDTH
 #define LCD_WIDTH  320
-#define LCD_HEIGHT 240
+#endif
+
+#ifndef LCD_HEIGHT
+#define LCD_HEIGHT 480
+#endif
+
 #define LCD_DEPTH  16
 #define LCD_PIXELFORMAT 565
 
@@ -62,10 +72,10 @@
 #define CONFIG_CODEC SWCODEC
 
 #define CONFIG_KEYPAD COWON_D2_PAD
+
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 /* Use SDL audio/pcm in a SDL app build */
 #define HAVE_SDL
-
-#ifdef HAVE_SDL
 #define HAVE_SDL_AUDIO
 #endif
 
@@ -92,3 +102,5 @@
 
 /* Define this if a programmable hotkey is mapped */
 //#define HAVE_HOTKEY
+
+#define BOOTDIR "/.rockbox"

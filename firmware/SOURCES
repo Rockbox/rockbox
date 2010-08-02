@@ -1698,3 +1698,14 @@ target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif
+
+
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+target/hosted/android/lcd-android.c
+target/hosted/android/button-android.c
+target/hosted/android/kernel-android.c
+target/hosted/android/pcm-android.c
+target/hosted/android/system-android.c
+drivers/audio/android.c
+thread.c
+#endif

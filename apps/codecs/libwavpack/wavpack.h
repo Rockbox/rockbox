@@ -16,7 +16,9 @@
 
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
+#if 0 // unused and causing compiler errrors
 typedef unsigned int    uint;
+#endif
 
 #include <stdio.h>
 

@@ -1,0 +1,79 @@
+# cabbie 2.0
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# (C) 2009, Maurus Cuelenaere (mcuelenaere) ported to Onda VX747
+# derived from "cabbie" (C) Yohann Misquitta
+
+%wd
+%X(wpsbackdrop-240x400x16.bmp)
+%Cl(55,50,130,130,c,c)
+%pb(22,284,199,13,pb-240x320x16.bmp)
+%T(22,284,199,13,progressbar)
+%T(90,238,60,20,playlist)
+%?Tl(2.5)<%Vd(t)|%Vd(u)>
+%V(0,0,240,330,1)
+
+
+%?C<|>
+%?C<|>
+%?C<|%s%ac%?it<%it|%fn>>
+%?C<|%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>>
+%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
+%?C<|%ac%?iy<%iy|>>
+%?C<|>
+%?C<|%ac%?ig<%ig|>>
+%?C<|%ac%?fv<%(vbr%) |>%fb kbit/s %fc>
+%?C<|>
+%?C<%s%ac%?it<%it|%fn>|>
+%?C<%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>|%ac%Sx(Next Track:)>
+%?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|%ac%s%?It<%It|%Fn>>
+%?C<|%s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>>>
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
+
+
+     %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr     
+
+%?C<%Cd>
+
+%xl(A,lock-240x320x16.bmp,11,0,2)
+%xl(B,battery-240x320x16.bmp,46,0,10)
+%xl(C,volume-240x320x16.bmp,98,0,10)
+%xl(D,shuffle-240x320x16.bmp,139,0)
+%xl(E,repeat-240x320x16.bmp,182,0,4)
+%xl(F,playmode-240x320x16.bmp,206,0,5)
+
+%V(0,372,240,-,1)
+%?mh<%xd(Aa)|%xd(Ab)>
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%?ps<%xd(D)>
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+
+%T(206,0,24,24,play)
+%T(206,0,24,24,&stop)
+%T(182,0,18,92,repmode)
+%T(139,0,37,23,shuffle)
+%T(98,0,33,23,volume)
+
+#viewport for the touch icons
+%xl(G,browser-320x240x16.bmp,0,0)
+%xl(I,pitch-320x240x16.bmp,39,0)
+%xl(H,context-320x240x16.bmp,58,0)
+%xl(J,quick-320x240x16.bmp,86,0)
+%xl(K,rew-320x240x16.bmp,115,0)
+%xl(L,ff-320x240x16.bmp,144,0)
+
+%Vl(t,70,335,-,30,1)
+%xd(G) %xd(H) %xd(I) %xd(J) %xd(K) %xd(L)
+%T(0,0,37,24,browse)
+%T(39,5,24,24,pitch)
+%T(58,0,24,24,contextmenu)
+%T(86,0,24,24,quickscreen)
+%T(115,0,24,23,&rwd)
+%T(144,0,24,23,&ffwd)
+%T(115,0,24,23,prev)
+%T(144,0,24,23,next)
+
+%Vl(u,70,335,-,30,1)
+#purposely left blank
+

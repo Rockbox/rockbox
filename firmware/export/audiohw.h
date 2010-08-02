@@ -66,7 +66,7 @@
 #elif defined(HAVE_AK4537)
 #include "ak4537.h"
 #endif
-#if defined(HAVE_SDL_AUDIO)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 /* #include <SDL_audio.h> gives errors in other code areas,
  * we don't really need it here, so don't. but it should maybe be fixed */
 #ifndef SIMULATOR /* simulator gets values from the target .h files */

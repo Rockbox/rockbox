@@ -21,6 +21,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "config.h"
 #include "gcc_extensions.h"
 
 extern void debug_init(void);
@@ -34,7 +35,11 @@ extern void ldebugf(const char* file, int line, const char *fmt, ...)
 /*  */
 #if defined(SIMULATOR) && !defined(__PCTOOL__)
 #define DEBUGF  debugf
-#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
+#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__) && defined(DEBUG)
+#elif (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#include "system-target.h"
+#define DEBUGF LOG
+#define LDEBUGF(...)
 #else
 #if defined(DEBUG)
 

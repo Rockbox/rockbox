@@ -1,0 +1,34 @@
+This folder contains the java parts needed to build an Rockbox as an
+application for android.
+
+* Build instructions
+
+Until there's a script which does all the work the procedure is documented here.
+
+First, make sure you have the ANDROID_NDK_PATH environment variable set up,
+otherwise configure will fail to find the compiler.
+
+Use this as your build folder, using '../tools/configure' etc.
+    $ ../tools/configure
+    $ make
+
+After the build finished, you need to copy librockbox.so to libs/armeabi/.
+    $ cp librockbox.so libs/armeabi
+
+For the other files (codecs, themes), you execute 'make zip'. Then you copy the
+zip to libs/armeabi, using the name libmisc.so. This is needed, since there's no 
+way to bundle stuff into apk's and have access to them from native code other
+than pretending it was a library.
+    $ make zip
+    $ cp rockbox.zip lib/armeabi/libmisc.so
+
+rockbox.zip..err, libmisc.so will be unpacked at runtime.
+
+To finish, you can follow this guide [1], or use eclipse. Simply install eclipse
+and the android plugins, then import this folder as a new Android project and run it.
+See [2] for a guide on how to set up eclipse for android development.
+
+
+    
+[1]: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/
+[2]: http://developer.android.com/sdk/installing.html

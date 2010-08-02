@@ -30,7 +30,6 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-# SIMLIB needs to be linked twice for some reason
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS)
 
