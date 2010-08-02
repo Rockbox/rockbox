@@ -920,7 +920,7 @@ bool parse_color(char *text, int *value)
 #endif
 
 #if LCD_DEPTH == 2 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
-    if (!is0123(*text))
+    if (text[1] != '\0' || !is0123(*text))
         return false;
     *value = *text - '0';
 #endif
