@@ -212,6 +212,9 @@ void _logf(const char *fmt, ...)
     char buf[1024];
     vsnprintf(buf, sizeof buf, fmt, ap);
     DEBUGF("%s\n", buf);
+    /* restart va_list otherwise the result if undefined when vuprintf is called */
+    va_end(ap);
+    va_start(ap, fmt);
 #endif
 
     vuprintf(logf_push, NULL, fmt, ap);
