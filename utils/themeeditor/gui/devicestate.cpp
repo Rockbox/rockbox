@@ -371,7 +371,7 @@ QVariant DeviceState::data(QString tag, int paramCount,
         case 4: return "Thu";
         case 5: return "Fri";
         case 6: return "Sat";
-        case 7: return tr("Error, invalid weekday number");
+        default: return tr("Error, invalid weekday number");
         }
     }
     else if(tag == "cb")
