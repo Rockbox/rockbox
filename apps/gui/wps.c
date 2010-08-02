@@ -1116,11 +1116,21 @@ long gui_wps_show(void)
                 if (lcd_active() || (i != SCREEN_MAIN))
 #endif
                 {
-                    skin_update(&gui_wps[i], wps_sync_data.do_full_update ?
-                                            SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
+                    bool full_update = false;
+#if NB_SCREENS > 1
+                    if (i==SCREEN_MAIN && wps_sync_data.do_full_update)
+                    {
+                        full_update = true;
+                        wps_sync_data.do_full_update = false;
+                    }
+#else
+                    full_update = wps_sync_data.do_full_update;
+                    wps_sync_data.do_full_update = false;
+#endif
+                    skin_update(&gui_wps[i], full_update ?
+                                     SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
                 }
             }
-            wps_sync_data.do_full_update = false;
             update = false;
         }
 

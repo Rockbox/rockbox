@@ -194,10 +194,22 @@ void sb_skin_update(enum screen_type screen, bool force)
          * so still update those */
         if (lcd_active() || (i != SCREEN_MAIN))
 #endif
-            skin_update(&sb_skin[i], force?
+        {
+            bool full_update = false;
+#if NB_SCREENS > 1
+            if (i==SCREEN_MAIN && sb_skin[i].sync_data->do_full_update)
+            {
+                full_update = true;
+                sb_skin[i].sync_data->do_full_update = false;
+            }
+#else
+            full_update = sb_skin[i].sync_data->do_full_update;
+            sb_skin[i].sync_data->do_full_update = false;
+#endif
+            skin_update(&sb_skin[i], force || full_update?
                     SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
+        }
         next_update[i] = current_tick + update_delay; /* don't update too often */
-        sb_skin[SCREEN_MAIN].sync_data->do_full_update = false;
     }
 }
 
