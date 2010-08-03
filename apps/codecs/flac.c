@@ -118,7 +118,13 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
           
             fc->filesize = ci->filesize;
             fc->min_blocksize = (buf[0] << 8) | buf[1];
-            fc->max_blocksize = (buf[2] << 8) | buf[3];
+            int max_blocksize = (buf[2] << 8) | buf[3];
+            if (max_blocksize > MAX_BLOCKSIZE)
+            {
+                LOGF("FLAC: Maximum blocksize is too large\n");
+                return false;
+            }
+            fc->max_blocksize = max_blocksize;
             fc->min_framesize = (buf[4] << 16) | (buf[5] << 8) | buf[6];
             fc->max_framesize = (buf[7] << 16) | (buf[8] << 8) | buf[9];
             fc->samplerate = (buf[10] << 12) | (buf[11] << 4) 
