@@ -156,7 +156,7 @@ struct codec_api {
     void (*configure)(int setting, intptr_t value);
 
     /* kernel/ system */
-#ifdef CPU_ARM
+#if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     void (*__div0)(void);
 #endif
     void (*sleep)(int ticks);

@@ -448,7 +448,9 @@ target/arm/memset16-arm.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 target/arm/ffs-arm.S
 #endif
+#if CONFIG_PLATFORM & PLATFORM_NATIVE
 target/arm/system-arm.c
+#endif
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101

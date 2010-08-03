@@ -345,7 +345,7 @@ static const struct plugin_api rockbox_api = {
     dir_exists,
 
     /* kernel/ system */
-#ifdef CPU_ARM
+#if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     __div0,
 #endif
     PREFIX(sleep),
