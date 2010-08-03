@@ -377,7 +377,7 @@ void audiohw_postinit(void);
  */
 void audiohw_close(void);
 
-#if defined(AUDIOHW_HAVE_CLIPPING) || defined(HAVE_SDL_AUDIO)
+#if defined(AUDIOHW_HAVE_CLIPPING) || defined(HAVE_SDL_AUDIO) || defined(ANDROID)
  /**
  * Set new volume value
  * @param val to set.
