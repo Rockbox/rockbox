@@ -19,36 +19,35 @@
  *
  ****************************************************************************/
 
-#ifndef RBALBUMART_H
-#define RBALBUMART_H
+#ifndef RBMOVABLE_H
+#define RBMOVABLE_H
 
 #include <QGraphicsItem>
 
-#include "rbmovable.h"
+/*
+ * This is a base class for scene elements that can be moved around and
+ * resized. It adds some basic functionality for showing a border around
+ * selected items and ensuring that they don't get moved out of their parent's
+ * bounding rect, as well as resizing them. It includes one pure virtual
+ * function, saveGeometry(), that is responsible for syncing the changed
+ * geometry back to the parse tree to be code gen'd into the file.
+ */
 
-class RBAlbumArt : public RBMovable
+class RBMovable : public QGraphicsItem
 {
 public:
-    RBAlbumArt(QGraphicsItem* parent, int x, int y, int maxWidth, int maxHeight,
-               int artWidth, int artHeight, char hAlign = 'c',
-               char vAlign = 'c');
+    RBMovable(QGraphicsItem* parent);
+    ~RBMovable();
 
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget);
-
-    void position(){ this->setPos(size.x(), size.y()); }
+    virtual void paint(QPainter *painter,
+                       const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
-    void saveGeometry();
+    virtual QVariant itemChange(GraphicsItemChange change,
+                                const QVariant &value);
+    /* Responsible for updating the parse tree */
+    virtual void saveGeometry() = 0;
 
-private:
-    QRectF size;
-    int artWidth;
-    int artHeight;
-    char hAlign;
-    char vAlign;
-    QPixmap texture;
 };
 
-#endif // RBALBUMART_H
+#endif // RBMOVABLE_H

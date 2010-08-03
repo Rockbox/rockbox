@@ -26,7 +26,7 @@
 #include "rbimage.h"
 
 RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
-                     : QGraphicsItem(parent), tiles(tiles), currentTile(0)
+                     : RBMovable(parent), tiles(tiles), currentTile(0)
 {
     if(QFile::exists(file))
     {
@@ -56,7 +56,7 @@ RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
 }
 
 RBImage::RBImage(const RBImage &other, QGraphicsItem* parent)
-    : QGraphicsItem(parent), tiles(other.tiles), currentTile(other.currentTile)
+    : RBMovable(parent), tiles(other.tiles), currentTile(other.currentTile)
 {
     if(other.image)
         image = new QPixmap(*(other.image));
@@ -86,4 +86,11 @@ void RBImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     painter->drawPixmap(size, *image, QRect(0, currentTile * image->height()
                                             / tiles, image->width(),
                                             image->height() / tiles));
+
+    RBMovable::paint(painter, option, widget);
+}
+
+void RBImage::saveGeometry()
+{
+
 }

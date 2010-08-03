@@ -39,7 +39,7 @@
 const double RBViewport::scrollRate = 30;
 
 RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
-    : QGraphicsItem(info.screen()), foreground(info.screen()->foreground()),
+    : RBMovable(info.screen()), foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
     statusBarTexture(":/render/statusbar.png"),
@@ -178,6 +178,8 @@ void RBViewport::paint(QPainter *painter,
 
     if(showStatusBar)
         painter->fillRect(QRectF(0, 0, size.width(), 8), statusBarTexture);
+
+    RBMovable::paint(painter, option, widget);
 }
 
 void RBViewport::newLine()
@@ -297,24 +299,9 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
     }
 }
 
-QVariant RBViewport::itemChange(GraphicsItemChange change,
-                                const QVariant &value)
+void RBViewport::saveGeometry()
 {
-    if(change == ItemPositionChange)
-    {
-        QPointF pos = value.toPointF();
-        QRectF bound = parentItem()->boundingRect();
 
-        pos.setX(qMax(0., pos.x()));
-        pos.setX(qMin(pos.x(), bound.width() - boundingRect().width()));
-
-        pos.setY(qMax(0., pos.y()));
-        pos.setY(qMin(pos.y(), bound.height() - boundingRect().height()));
-
-        return pos;
-    }
-
-    return QGraphicsItem::itemChange(change, value);
 }
 
 void RBViewport::alignLeft()

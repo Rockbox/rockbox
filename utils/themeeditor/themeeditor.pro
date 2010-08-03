@@ -106,7 +106,8 @@ HEADERS += models/parsetreemodel.h \
     qtfindreplacedialog/finddialog.h \
     gui/projectexporter.h \
     gui/targetdownloader.h \
-    gui/syntaxcompleter.h
+    gui/syntaxcompleter.h \
+    graphics/rbmovable.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -147,7 +148,8 @@ SOURCES += main.cpp \
     qtfindreplacedialog/finddialog.cpp \
     gui/projectexporter.cpp \
     gui/targetdownloader.cpp \
-    gui/syntaxcompleter.cpp
+    gui/syntaxcompleter.cpp \
+    graphics/rbmovable.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

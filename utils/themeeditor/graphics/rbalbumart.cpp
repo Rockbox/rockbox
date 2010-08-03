@@ -22,17 +22,17 @@
 #include "rbalbumart.h"
 
 #include <QPainter>
-#include <QDebug>
 
 RBAlbumArt::RBAlbumArt(QGraphicsItem *parent, int x, int y, int maxWidth,
                        int maxHeight, int artWidth, int artHeight, char hAlign,
                        char vAlign)
-                           : QGraphicsItem(parent), size(x, y, maxWidth,
-                                                         maxHeight),
+                           : RBMovable(parent), size(0, 0, maxWidth,
+                                                     maxHeight),
                            artWidth(artWidth), artHeight(artHeight),
                            hAlign(hAlign), vAlign(vAlign),
                            texture(":/render/albumart.png")
 {
+    setPos(x, y);
     hide();
 }
 
@@ -92,4 +92,11 @@ void RBAlbumArt::paint(QPainter *painter,
     }
 
     painter->fillRect(drawArea, texture);
+
+    RBMovable::paint(painter, option, widget);
+}
+
+void RBAlbumArt::saveGeometry()
+{
+
 }

@@ -24,13 +24,14 @@
 
 #include "skin_parser.h"
 #include "rbfont.h"
+#include "rbmovable.h"
 
 class RBScreen;
 class RBRenderInfo;
 
 #include <QGraphicsItem>
 
-class RBViewport : public QGraphicsItem
+class RBViewport : public RBMovable
 {
 public:
     enum Alignment
@@ -78,7 +79,7 @@ public:
                       skin_element* noId3);
 
 protected:
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void saveGeometry();
 
 private:
 

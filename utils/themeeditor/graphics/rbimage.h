@@ -25,7 +25,9 @@
 #include <QPixmap>
 #include <QGraphicsItem>
 
-class RBImage: public QGraphicsItem
+#include "rbmovable.h"
+
+class RBImage: public RBMovable
 {
 public:
     RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent = 0);
@@ -43,6 +45,9 @@ public:
             currentTile = tiles -1;
     }
 
+
+protected:
+    void saveGeometry();
 
 private:
     QPixmap* image;
