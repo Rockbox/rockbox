@@ -1409,7 +1409,6 @@ static int decode_frame(WMAProDecodeCtx *s)
             return 0;
         }
     }
-    s->samples += s->num_channels * s->samples_per_frame;
 
     if (s->skip_frame) {
         s->skip_frame = 0;

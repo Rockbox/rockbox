@@ -136,7 +136,7 @@ next_track:
                 size -= res;
                 if(outlen) {
                     ci->yield ();
-                    outlen /= (2*wfx.channels);
+                    outlen /= (wfx.channels);
                     ci->pcmbuf_insert(dec[0], dec[1], outlen );
                     elapsedtime += outlen*10/(wfx.rate/100);
                     ci->set_elapsed(elapsedtime);
