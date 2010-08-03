@@ -26,8 +26,8 @@
 #include "lcd.h"
 
 extern JNIEnv *env_ptr;
-extern jclass  RockboxActivity_class;
-extern jobject RockboxActivity_instance;
+extern jclass  RockboxService_class;
+extern jobject RockboxService_instance;
 
 static jobject Framebuffer_instance;
 static jmethodID java_lcd_update;
@@ -35,13 +35,13 @@ static jmethodID java_lcd_update;
 void lcd_init_device(void)
 {
     /* get the RockboxFramebuffer instance allocated by the activity */
-    jfieldID id = (*env_ptr)->GetFieldID(env_ptr,
-                                         RockboxActivity_class,
+    jfieldID id = (*env_ptr)->GetStaticFieldID(env_ptr,
+                                         RockboxService_class,
                                          "fb",
                                          "Lorg/rockbox/RockboxFramebuffer;");
 
-    Framebuffer_instance = (*env_ptr)->GetObjectField(env_ptr,
-                                                      RockboxActivity_instance,
+    Framebuffer_instance = (*env_ptr)->GetStaticObjectField(env_ptr,
+                                                      RockboxService_class,
                                                       id);
 
     jclass Framebuffer_class = (*env_ptr)->GetObjectClass(env_ptr,

@@ -47,21 +47,6 @@ public class RockboxTimer extends Timer
 		}
 	}
 	
-	public void pause()
-	{
-		cancel();
-	}
-	public void resume()
-	{
-		try {
-			schedule(task, 0, interval);
-		} catch (IllegalStateException e) {
-			/* not an error */
-		} catch (Exception e) {
-			LOG(e.toString());
-		}
-	}
-	
 	public RockboxTimer(long period_inverval_in_ms)
 	{
 		super("tick timer", false);
@@ -72,7 +57,7 @@ public class RockboxTimer extends Timer
 
 	private void LOG(CharSequence text)
 	{
-		Log.d("RockboxBootloader", (String) text);	
+		Log.d("Rockbox", (String) text);	
 	}
 
 

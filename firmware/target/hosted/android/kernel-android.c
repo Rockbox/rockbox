@@ -25,8 +25,6 @@
 #include "system.h"
 
 extern JNIEnv *env_ptr;
-extern jclass  RockboxActivity_class;
-extern jobject RockboxActivity_instance;
 
 static jclass  RockboxTimer_class;
 static jobject RockboxTimer_instance;

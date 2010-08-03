@@ -32,8 +32,8 @@ void system_init(void) { }
 
 /* global fields for use with various JNI calls */
 JNIEnv *env_ptr;
-jobject RockboxActivity_instance;
-jclass  RockboxActivity_class;
+jobject RockboxService_instance;
+jclass  RockboxService_class;
 
 uintptr_t *stackbegin;
 uintptr_t *stackend;
@@ -41,7 +41,7 @@ uintptr_t *stackend;
 extern int main(void);
 /* this is the entry point of the android app initially called by jni */
 JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxActivity_main(JNIEnv *env, jobject this)
+Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 {
     /* hack!!! we can't have a valid stack pointer otherwise.
      * but we don't really need it anyway, thread.c only needs it
@@ -53,7 +53,7 @@ Java_org_rockbox_RockboxActivity_main(JNIEnv *env, jobject this)
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
     env_ptr = env;
-    RockboxActivity_instance = this;
-    RockboxActivity_class = (*env)->GetObjectClass(env, this);
+    RockboxService_instance = this;
+    RockboxService_class = (*env)->GetObjectClass(env, this);
     main();
 }

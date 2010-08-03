@@ -25,8 +25,6 @@
 #include "pcm.h"
 
 extern JNIEnv *env_ptr;
-extern jclass  RockboxActivity_class;
-extern jobject RockboxActivity_instance;
 
 /* infos about our pcm chunks */
 static size_t  pcm_data_size;
