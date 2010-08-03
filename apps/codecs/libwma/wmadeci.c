@@ -30,11 +30,7 @@
 #include "wmadata.h"
 
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
-inline void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
-                         const fixed32 *window, int n);
-inline void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, 
-                        const fixed32 *src1, int len);
-                        
+
 /*declarations of statically allocated variables used to remove malloc calls*/
 
 fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
