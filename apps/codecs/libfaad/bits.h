@@ -77,7 +77,6 @@ void faad_initbits_rev(bitfile *ld, void *buffer,
                        uint32_t bits_in_buffer);
 uint8_t faad_byte_align(bitfile *ld);
 uint32_t faad_get_processed_bits(bitfile *ld);
-INLINE void faad_flushbits_ex(bitfile *ld, uint32_t bits);
 void faad_rewindbits(bitfile *ld);
 uint8_t *faad_getbitbuffer(bitfile *ld, uint32_t bits
                        DEBUGDEC);
@@ -93,6 +92,27 @@ static INLINE uint32_t getdword(void *mem)
 #else
     return *(uint32_t*)mem;
 #endif
+}
+
+static INLINE void faad_flushbits_ex(bitfile *ld, uint32_t bits)
+{
+    uint32_t tmp;
+
+    ld->bufa = ld->bufb;
+    if (ld->no_more_reading == 0)
+    {
+        tmp = getdword(ld->tail);
+        ld->tail++;
+    } else {
+        tmp = 0;
+    }
+    ld->bufb = tmp;
+    ld->bits_left += (32 - bits);
+    ld->bytes_used += 4;
+    if (ld->bytes_used == ld->buffer_size)
+        ld->no_more_reading = 1;
+    if (ld->bytes_used > ld->buffer_size)
+        ld->error = 1;
 }
 
 static INLINE uint32_t faad_showbits(bitfile *ld, uint32_t bits)

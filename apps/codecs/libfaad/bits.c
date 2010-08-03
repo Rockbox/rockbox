@@ -110,27 +110,6 @@ uint8_t faad_byte_align(bitfile *ld)
     return 0;
 }
 
-void faad_flushbits_ex(bitfile *ld, uint32_t bits)
-{
-    uint32_t tmp;
-
-    ld->bufa = ld->bufb;
-    if (ld->no_more_reading == 0)
-    {
-        tmp = getdword(ld->tail);
-        ld->tail++;
-    } else {
-        tmp = 0;
-    }
-    ld->bufb = tmp;
-    ld->bits_left += (32 - bits);
-    ld->bytes_used += 4;
-    if (ld->bytes_used == ld->buffer_size)
-        ld->no_more_reading = 1;
-    if (ld->bytes_used > ld->buffer_size)
-        ld->error = 1;
-}
-
 /* rewind to beginning */
 void faad_rewindbits(bitfile *ld)
 {
