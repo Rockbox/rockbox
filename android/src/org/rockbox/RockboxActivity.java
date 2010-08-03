@@ -97,5 +97,5 @@ public class RockboxActivity extends Activity {
 	private void LOG(CharSequence text)
 	{
 		Log.d("Rockbox", (String) text);
-	}	
+	}
 }
