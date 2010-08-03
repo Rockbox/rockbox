@@ -60,9 +60,10 @@ app_get_platform() {
     esac
 
     echo "Selected $app_platform platform"
-    echo "Select the LCD resolution seperated with enter: XxY (default: 320x480)"
+    echo "Please the LCD width (default: 320)"
     app_lcd_width=`input`
     if [ -z "$app_lcd_width" ]; then app_lcd_width="320"; fi
+    echo "Please the LCD height (default: 480)"
     app_lcd_height=`input`
     if [ -z "$app_lcd_height" ]; then app_lcd_height="480"; fi
     echo "Selected $app_lcd_width x $app_lcd_height resolution"
