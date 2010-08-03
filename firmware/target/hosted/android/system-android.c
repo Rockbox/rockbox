@@ -51,7 +51,7 @@ Java_org_rockbox_RockboxActivity_main(JNIEnv *env, jobject this)
     (void)env;
     (void)this;
     volatile uintptr_t stack = 0;
-    stackbegin = stackend = &stack;
+    stackbegin = stackend = (uintptr_t*) &stack;
     env_ptr = env;
     RockboxActivity_instance = this;
     RockboxActivity_class = (*env)->GetObjectClass(env, this);
