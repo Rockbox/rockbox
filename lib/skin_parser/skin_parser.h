@@ -27,6 +27,7 @@ extern "C"
 {
 #endif
 #include <stdlib.h>
+#include <stdbool.h>
 
 /********************************************************************
  ****** Data Structures *********************************************
@@ -139,7 +140,7 @@ struct skin_element* skin_parse(const char* document);
 /* Memory management functions */
 struct skin_element* skin_alloc_element(void);
 struct skin_element** skin_alloc_children(int count);
-struct skin_tag_parameter* skin_alloc_params(int count);
+struct skin_tag_parameter* skin_alloc_params(int count, bool use_shared_params);
 char* skin_alloc_string(int length);
 
 void skin_free_tree(struct skin_element* root);

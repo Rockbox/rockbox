@@ -300,6 +300,8 @@ int main(int argc, char **argv)
         }
 
         printf("WPS parsed OK\n\n");
+        if (wps_verbose_level>2)
+            skin_debug_tree(wps.tree);
         filearg++;
     }
     return 0;

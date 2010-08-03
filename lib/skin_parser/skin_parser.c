@@ -38,6 +38,8 @@ int skin_line = 0;
 char* skin_start = 0;
 int viewport_line = 0;
 
+static int tag_recursion_level = 0;
+
 #ifdef ROCKBOX
 static skin_callback callback = NULL;
 static void* callback_data;
@@ -121,6 +123,8 @@ static struct skin_element* skin_parse_viewport(const char** document)
     struct skin_element* root = NULL;
     struct skin_element* last = NULL;
     struct skin_element* retval = NULL;
+    
+    tag_recursion_level = 0;
 
     retval = skin_alloc_element();
     if (!retval)
@@ -467,6 +471,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     int req_args; /* To mark when we enter optional arguments */
 
     int optional = 0;
+    tag_recursion_level++;
 
     /* Checking the tag name */
     tag_name[0] = cursor[0];
@@ -567,7 +572,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 
     cursor = bookmark; /* Restoring the cursor */
     element->params_count = num_args;
-    element->params = skin_alloc_params(num_args);
+    element->params = skin_alloc_params(num_args, tag_recursion_level<=1);
     if (!element->params)
         return 0;
 
@@ -712,6 +717,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     }
 #endif
     *document = cursor;
+    tag_recursion_level--;
 
     return 1;
 }
@@ -1014,11 +1020,11 @@ struct skin_element* skin_alloc_element()
  * enough for any tag. params should be used straight away by the callback
  * so this is safe.
  */
-struct skin_tag_parameter* skin_alloc_params(int count)
+struct skin_tag_parameter* skin_alloc_params(int count, bool use_shared_params)
 {
 #ifdef ROCKBOX
     static struct skin_tag_parameter params[MAX_TAG_PARAMS];
-    if (count <= MAX_TAG_PARAMS)
+    if (use_shared_params && count <= MAX_TAG_PARAMS)
     {
         memset(params, 0, sizeof(params));
         return params;

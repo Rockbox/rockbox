@@ -120,7 +120,7 @@ void skin_clear_errors()
     error_message = NULL;
 }
 
-#ifndef ROCKBOX
+#if !defined(ROCKBOX) || defined(__PCTOOL__)
 void skin_debug_tree(struct skin_element* root)
 {
     int i;
@@ -227,7 +227,8 @@ void skin_debug_tree(struct skin_element* root)
             printf("[ Logical line on line %d\n", current->line);
 
             debug_indent_level++;
-            skin_debug_tree(current->children[0]);
+            if (current->children)
+                skin_debug_tree(current->children[0]);
             debug_indent_level--;
 
             skin_debug_indent();
