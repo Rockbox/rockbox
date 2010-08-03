@@ -77,6 +77,9 @@ public:
     void showPlaylist(const RBRenderInfo& info, int start, skin_element* id3,
                       skin_element* noId3);
 
+protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+
 private:
 
     void alignLeft();

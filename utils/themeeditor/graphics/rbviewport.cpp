@@ -21,6 +21,11 @@
 
 #include <QPainter>
 #include <QPainterPath>
+#include <QGraphicsSceneMouseEvent>
+#include <QTransform>
+
+#include <QDebug>
+
 #include <cmath>
 
 #include "rbviewport.h"
@@ -40,6 +45,8 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     statusBarTexture(":/render/statusbar.png"),
     leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0)
 {
+    setFlags(ItemIsSelectable | ItemIsMovable | ItemSendsGeometryChanges);
+
     if(!node->tag)
     {
         /* Default viewport takes up the entire screen */
@@ -288,6 +295,26 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
         newLine();
         song++;
     }
+}
+
+QVariant RBViewport::itemChange(GraphicsItemChange change,
+                                const QVariant &value)
+{
+    if(change == ItemPositionChange)
+    {
+        QPointF pos = value.toPointF();
+        QRectF bound = parentItem()->boundingRect();
+
+        pos.setX(qMax(0., pos.x()));
+        pos.setX(qMin(pos.x(), bound.width() - boundingRect().width()));
+
+        pos.setY(qMax(0., pos.y()));
+        pos.setY(qMin(pos.y(), bound.height() - boundingRect().height()));
+
+        return pos;
+    }
+
+    return QGraphicsItem::itemChange(change, value);
 }
 
 void RBViewport::alignLeft()

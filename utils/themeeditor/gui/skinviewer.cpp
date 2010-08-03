@@ -35,7 +35,6 @@ SkinViewer::SkinViewer(QWidget *parent) :
     QObject::connect(ui->zoomEvenButton, SIGNAL(pressed()),
                      this, SLOT(zoomEven()));
 
-    ui->viewer->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 SkinViewer::~SkinViewer()
