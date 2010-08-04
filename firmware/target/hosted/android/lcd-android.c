@@ -31,6 +31,9 @@ extern jobject RockboxService_instance;
 
 static jobject Framebuffer_instance;
 static jmethodID java_lcd_update;
+static jmethodID java_lcd_update_rect;
+
+static bool display_on;
 
 void lcd_init_device(void)
 {
@@ -52,13 +55,17 @@ void lcd_init_device(void)
      * our framebuffer */
 
     jmethodID java_init_lcd = (*env_ptr)->GetMethodID(env_ptr,
-                                                      Framebuffer_class,
-                                                      "java_lcd_init",
-                                                      "(IILjava/nio/ByteBuffer;)V");
-    java_lcd_update = (*env_ptr)->GetMethodID(env_ptr,
-                                              Framebuffer_class,
-                                              "java_lcd_update",
-                                              "()V");
+                                                   Framebuffer_class,
+                                                   "java_lcd_init",
+                                                   "(IILjava/nio/ByteBuffer;)V");
+    java_lcd_update      = (*env_ptr)->GetMethodID(env_ptr,
+                                                   Framebuffer_class,
+                                                   "java_lcd_update",
+                                                   "()V");
+    java_lcd_update_rect = (*env_ptr)->GetMethodID(env_ptr,
+                                                   Framebuffer_class,
+                                                   "java_lcd_update_rect",
+                                                   "(IIII)V");
 
     /* map the framebuffer to a ByteBuffer, this way lcd updates will
      * be directly feched from the framebuffer */
@@ -70,21 +77,50 @@ void lcd_init_device(void)
                                Framebuffer_instance,
                                java_init_lcd,
                                LCD_WIDTH, LCD_HEIGHT, buf);
+    display_on = true;
 }
 
-void lcd_update()
+void lcd_update(void)
 {
     /* tell the system we're ready for drawing */
-    (*env_ptr)->CallVoidMethod(env_ptr, Framebuffer_instance, java_lcd_update);
+    if (display_on)
+        (*env_ptr)->CallVoidMethod(env_ptr, Framebuffer_instance, java_lcd_update);
 }
 
 void lcd_update_rect(int x, int y, int height, int width)
 {
-    /* can't do partial updates yet */
-    (void)x; (void)y; (void)height; (void)width;
-    lcd_update();
+    if (display_on)
+    {
+        (*env_ptr)->CallVoidMethod(env_ptr, Framebuffer_instance, java_lcd_update_rect,
+                                   x, y, height, width);
+    }
 }
 
+bool lcd_active(void)
+{
+    return display_on;
+}
+
+/*
+ * (un)block lcd updates.
+ *
+ * Notice: This is called from the activity thread, so take it
+ * as interrupt context and take care what the event callback does
+ * (it shouldn't block in particular
+ *
+ * the 1s are needed due to strange naming conventions...
+ **/
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxFramebuffer_set_1lcd_1active(JNIEnv *e,
+                                                     jobject this,
+                                                     jint active)
+{
+    (void)e;
+    (void)this;
+    display_on = active != 0;
+    if (active)
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+}
 /* below is a plain copy from lcd-sdl.c */
 
 /**

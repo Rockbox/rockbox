@@ -34,21 +34,11 @@ public class RockboxFramebuffer extends View
 {
 	private Bitmap btm;
     private ByteBuffer native_buf;
-    private Handler update_handler;
-    private Runnable cb;
 
 
 	public RockboxFramebuffer(Context c)
 	{
 		super(c);
-		update_handler = new Handler();
-		cb = new Runnable() {
-			public void run()
-			{
-				btm.copyPixelsFromBuffer(native_buf);
-				invalidate();
-			}
-		};
 		btm = null;
 	}
 
@@ -66,12 +56,21 @@ public class RockboxFramebuffer extends View
 	
 	public void java_lcd_update()
 	{
-		update_handler.post(cb);
+
+		btm.copyPixelsFromBuffer(native_buf);
+		postInvalidate();
+	}
+	
+	public void java_lcd_update_rect(int x, int y, int w, int h)
+	{
+		/* can't copy a partial buffer */
+		btm.copyPixelsFromBuffer(native_buf);
+		postInvalidate(x, y, x+w, y+h);
 	}
 
 	private void LOG(CharSequence text)
 	{
-		Log.d("RockboxBootloader", (String) text);	
+		Log.d("RockboxBootloader", (String) text);
 	}
 
 	public boolean onTouchEvent(MotionEvent me)
@@ -93,6 +92,18 @@ public class RockboxFramebuffer extends View
 		return true;
 	}
 	
+	/* the two below should only be called from the activity thread */
+	public void suspend()
+	{	/* suspend, Rockbox will not make any lcd updates */
+		set_lcd_active(0);
+	}
+	public void resume()
+	{	/* make updates again, the underlying function will 
+		 * send an event */
+		set_lcd_active(1);
+	}
+
+	public native void set_lcd_active(int active);
 	public native void pixelHandler(int x, int y);
 	public native void touchHandler(int down);
 }

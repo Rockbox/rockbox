@@ -78,6 +78,7 @@ public class RockboxActivity extends Activity {
     public void onResume()
     {
     	super.onResume();
+    	
     	if (RockboxService.fb != null)
     	{
     		try {
@@ -91,7 +92,29 @@ public class RockboxActivity extends Activity {
     		} catch (Exception e) {
     			LOG(e.toString());
     		}
+    		RockboxService.fb.resume();
     	}
+    }
+    
+    /* this is also called when the backlight goes off,
+     * which is nice 
+     */
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	RockboxService.fb.suspend();
+    }
+    
+    @Override
+    protected void onStop() {
+    	super.onStop();
+    	RockboxService.fb.suspend();
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	RockboxService.fb.suspend();
     }
 
 	private void LOG(CharSequence text)

@@ -53,6 +53,10 @@
 #define LCD_DEPTH  16
 #define LCD_PIXELFORMAT 565
 
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#define HAVE_LCD_ENABLE
+#endif
+
 /* define this to indicate your device's keypad */
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
