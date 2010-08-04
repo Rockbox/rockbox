@@ -53,24 +53,21 @@ public class RockboxActivity extends Activity {
         new Thread(new Runnable()
         {
         	public void run() {
-        		while (RockboxService.fb == null)
-        		{
-					try {
-						Thread.sleep(250);
-					} catch (InterruptedException e) {
-					} catch (Exception e) {
-						LOG(e.toString());
+				try {
+	        		while (RockboxService.fb == null)
+	        			Thread.sleep(250);
+				} catch (InterruptedException e) {
+				} catch (Exception e) {
+					LOG(e.toString());
+				}
+				/* drawing needs to happen in ui thread */
+				runOnUiThread(new Runnable() 
+				{	@Override
+					public void run() {
+						setContentView(RockboxService.fb);
+						RockboxService.fb.invalidate();
 					}
-					/* drawing needs to happen in ui thread */
-					runOnUiThread(new Runnable() 
-					{	@Override
-						public void run() {
-							setContentView(RockboxService.fb);
-							RockboxService.fb.invalidate();
-						}
-					});
-        		} 
-        		
+				});
         	}
         }).start();
     }

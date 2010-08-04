@@ -27,7 +27,6 @@
 #include "system.h"
 #include "touchscreen.h"
 
-static long last_touch;
 static int last_y, last_x;
 
 static enum {
@@ -48,7 +47,6 @@ Java_org_rockbox_RockboxFramebuffer_pixelHandler(JNIEnv*env, jobject this,
     (void)this;
     last_x = x;
     last_y = y;
-    last_touch = current_tick;
 }
 
 /*
@@ -68,20 +66,11 @@ Java_org_rockbox_RockboxFramebuffer_touchHandler(JNIEnv*env, jobject this,
 
 void button_init_device(void)
 {
-    last_touch = current_tick;
 }
 
 int button_read_device(int *data)
 {
     /* get grid button/coordinates based on the current touchscreen mode */
     int btn = touchscreen_to_pixels(last_x, last_y, data);
-    if (last_state == STATE_DOWN)
-    {
-        return btn;
-    }
-    else
-    {
-        *data = last_x = last_y = 0;
-        return 0;
-    }
+    return (last_state == STATE_DOWN ? btn : 0);
 }
