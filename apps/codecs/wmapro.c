@@ -44,7 +44,7 @@ enum codec_status codec_main(void)
     int size;                   /* Size of the input frame to the decoder */
 
     /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_FRACT);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_DSP_SAMPLE_DEPTH);
     
 
 next_track:

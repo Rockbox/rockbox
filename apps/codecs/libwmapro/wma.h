@@ -26,6 +26,7 @@
 #include "ffmpeg_put_bits.h"
 
 #define WMAPRO_FRACT (17)
+#define WMAPRO_DSP_SAMPLE_DEPTH (WMAPRO_FRACT + 8)
 
 /* size of blocks */
 #define BLOCK_MIN_BITS 7

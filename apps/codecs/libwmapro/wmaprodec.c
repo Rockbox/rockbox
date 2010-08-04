@@ -125,7 +125,7 @@
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
 
 /* Define some multiple used constants */
-#define SQRT2_FRACT24   0x016A09E6 /* 0x016A09E6 = (sqrt(2)*(1<<24)) */
+#define SQRT2_FRACT16   0x00016A0A /* 0x00016A0A = (sqrt(2)*(1<<16)) */
 #define COS_PI4_FRACT16 0x0000B505 /* 0x0000B505 = (cos(pi/4)<<16) */
 #define ONE_FRACT16     0x00010000 /* 0x00010000 = (1<<16) */
 
@@ -1058,10 +1058,10 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                     int len = FFMIN(sfb[1], s->subframe_len) - sfb[0];
                     vector_fixmul_scalar(ch_data[0] + sfb[0],
                                          ch_data[0] + sfb[0],
-                                         SQRT2_FRACT24, len);
+                                         SQRT2_FRACT16, len);
                     vector_fixmul_scalar(ch_data[1] + sfb[0],
                                          ch_data[1] + sfb[0],
-                                         SQRT2_FRACT24, len);
+                                         SQRT2_FRACT16, len);
 
                 }
             }

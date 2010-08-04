@@ -223,21 +223,22 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
         asm volatile ( \
             "ldmia %[src]!, {r1-r4}   \n\t" \
             "smull r0, r5, r1, %[mul] \n\t" \
-            "mov   r0, r0, lsr #24    \n\t" \
-            "orr   r0, r0, r5, lsl #8 \n\t" \
+            "mov   r0, r0, lsr #16    \n\t" \
+            "orr   r0, r0, r5, lsl #16\n\t" \
             "smull r1, r5, r2, %[mul] \n\t" \
-            "mov   r1, r1, lsr #24    \n\t" \
-            "orr   r1, r1, r5, lsl #8 \n\t" \
+            "mov   r1, r1, lsr #16    \n\t" \
+            "orr   r1, r1, r5, lsl #16\n\t" \
             "smull r2, r5, r3, %[mul] \n\t" \
-            "mov   r2, r2, lsr #24    \n\t" \
-            "orr   r2, r2, r5, lsl #8 \n\t" \
+            "mov   r2, r2, lsr #16    \n\t" \
+            "orr   r2, r2, r5, lsl #16\n\t" \
             "smull r3, r5, r4, %[mul] \n\t" \
-            "mov   r3, r3, lsr #24    \n\t" \
-            "orr   r3, r3, r5, lsl #8 \n\t" \
+            "mov   r3, r3, lsr #16    \n\t" \
+            "orr   r3, r3, r5, lsl #16\n\t" \
             "stmia %[dst]!, {r0-r3}   \n"   \
             : [dst]"+r"(dst), [src]"+r"(src) \
             : [mul]"r"(mul) \
             : "r0", "r1", "r2", "r3", "r4", "r5", "memory");
+/* Disable ColdFire version until a correct version is written 
 #elif defined (CPU_COLDFIRE)
     #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
         int32_t tmp; \
@@ -270,12 +271,13 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
               [tmp] "=d" (tmp)                   \
             : [mul] "r" (mul)                    \
             : "d0", "d1", "d2", "d3", "memory", "cc");
+*/
 #else
     #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
-        dst[i  ] = fixmul24(src[i  ], mul); \
-        dst[i+1] = fixmul24(src[i+1], mul); \
-        dst[i+2] = fixmul24(src[i+2], mul); \
-        dst[i+3] = fixmul24(src[i+3], mul);
+        dst[i  ] = fixmul16(src[i  ], mul); \
+        dst[i+1] = fixmul16(src[i+1], mul); \
+        dst[i+2] = fixmul16(src[i+2], mul); \
+        dst[i+3] = fixmul16(src[i+3], mul);
 #endif /* CPU_ARM, CPU_COLDFIRE */
 
 static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
