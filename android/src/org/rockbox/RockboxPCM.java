@@ -56,9 +56,7 @@ public class RockboxPCM extends AudioTrack
 	    		LOG("setNotificationMarkerPosition Error");
 	    	setPlaybackPositionUpdateListener(new PCMListener(buf_len*2));
 	    }
-	}
-
-    
+	}    
 
 	int bytes2frames(int bytes) {
 		/* 1 sample is 2 bytes, 2 samples are 1 frame */
@@ -83,10 +81,18 @@ public class RockboxPCM extends AudioTrack
     	        LOG("Writing silence");
     	        /* fill with silence */
     	        write(raw_data, 0, raw_data.length);
+    	        RockboxService.startForeground();
     		}
     		play();
     	}
     	LOG("play_pause() return");
+    }
+    
+    @Override
+    public void stop() throws IllegalStateException 
+    {
+    	super.stop();
+    	RockboxService.stopForeground();
     }
 
     @SuppressWarnings("unused")

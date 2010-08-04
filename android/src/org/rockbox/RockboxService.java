@@ -19,12 +19,16 @@ import android.util.Log;
 
 public class RockboxService extends Service 
 {
+	/* this Service is really a singleton class */
 	public static RockboxFramebuffer fb = null;
+	private static RockboxService instance;
+	private Notification notification;
 	@Override
 	public void onCreate()
 	{
 	    mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		startservice();
+		instance = this;
 	}
 
 	private void do_start(Intent intent)
@@ -47,7 +51,7 @@ public class RockboxService extends Service
 	{
 		do_start(intent);
 	    /* Display a notification about us starting.  We put an icon in the status bar. */
-    	showNotification();
+    	create_notification();
 		return START_STICKY;
 	}
 
@@ -143,12 +147,14 @@ public class RockboxService extends Service
     /* heavily based on the example found on
      * http://developer.android.com/reference/android/app/Service.html
      */
-	public void showNotification() {
+    
+    private void create_notification()
+    {
 		// In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.notification);
 
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(R.drawable.rb, text,
+        notification = new Notification(R.drawable.rb, text,
                 System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
@@ -158,16 +164,31 @@ public class RockboxService extends Service
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.notification), text, contentIntent);
+    }
 
-        // Send the notification.
-        // We use a layout id because it is a unique number.  We use it later to cancel.
-        mNM.notify(R.string.notification, notification);
-        
-        /*
-         * this call makes the service run as foreground, which
-         * provides enough cpu time to do music decoding in the 
-         * background
-         */
-        startForeground(R.string.notification, notification);
+	public static void startForeground() 
+	{
+		if (instance != null) 
+		{
+	        // Send the notification.
+	        // We use a layout id because it is a unique number.  We use it later to cancel.
+	        instance.mNM.notify(R.string.notification, instance.notification);
+	        
+	        /*
+	         * this call makes the service run as foreground, which
+	         * provides enough cpu time to do music decoding in the 
+	         * background
+	         */
+	        instance.startForeground(R.string.notification, instance.notification);
+		}
+	}
+	
+	public static void stopForeground() 
+	{
+		if (instance.notification != null)
+		{
+			instance.stopForeground(true);
+			instance.mNM.cancel(R.string.notification);
+		}
 	}
 }
