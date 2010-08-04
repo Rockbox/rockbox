@@ -29,10 +29,12 @@ import android.util.Log;
 public class RockboxPCM extends AudioTrack 
 {
 	byte[] raw_data;
+	private int buf_len;
+	private PCMListener l;
 
 	private void LOG(CharSequence text)
 	{
-		Log.d("RockboxBootloader", (String) text);
+		Log.d("Rockbox", (String) text);
 	}
 
 	public RockboxPCM()
@@ -44,18 +46,11 @@ public class RockboxPCM extends AudioTrack
 			    AudioFormat.ENCODING_PCM_16BIT,
 			    24<<10,
 			    AudioTrack.MODE_STREAM);
-		int buf_len = 24<<10;
+		buf_len = 24<<10; /* in bytes */
 
-	    raw_data = new byte[buf_len*2];
-	    for(int i = 0; i < raw_data.length; i++) raw_data[i] = (byte) 0x00;
-	    /* fill with silence */
-	    write(raw_data, 0, raw_data.length);
-	    if (getState() == AudioTrack.STATE_INITIALIZED)
-	    {
-	    	if (setNotificationMarkerPosition(bytes2frames(buf_len*2)/4) != AudioTrack.SUCCESS)
-	    		LOG("setNotificationMarkerPosition Error");
-	    	setPlaybackPositionUpdateListener(new PCMListener(buf_len*2));
-	    }
+	    raw_data = new byte[buf_len]; /* in shorts */
+	    for(int i = 0; i < raw_data.length; i++) raw_data[i] = (byte)0;
+	    l = new PCMListener(buf_len);
 	}    
 
 	int bytes2frames(int bytes) {
@@ -70,28 +65,37 @@ public class RockboxPCM extends AudioTrack
 
     @SuppressWarnings("unused")
 	private void play_pause(boolean pause) {
-    	LOG("play_pause()");
     	if (pause)
+    	{
     		pause();
+    	}
     	else
     	{
     		if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
     		{
-    	        for(int i = 0; i < raw_data.length; i++) raw_data[i] = (byte) 0x00;
-    	        LOG("Writing silence");
-    	        /* fill with silence */
-    	        write(raw_data, 0, raw_data.length);
     	        RockboxService.startForeground();
+        	    if (getState() == AudioTrack.STATE_INITIALIZED)
+        	    {
+        	    	if (setNotificationMarkerPosition(bytes2frames(buf_len)/4) != AudioTrack.SUCCESS)
+        	    		LOG("setNotificationMarkerPosition Error");
+        	    	else
+        	    		setPlaybackPositionUpdateListener(l);
+        	    }
+        	    /* need to fill with silence before starting playback */
+        		write(raw_data, frames2bytes(getPlaybackHeadPosition()), raw_data.length);
     		}
     		play();
     	}
-    	LOG("play_pause() return");
     }
     
     @Override
     public void stop() throws IllegalStateException 
     {
-    	super.stop();
+    	try {
+    		super.stop();
+    	} catch (IllegalStateException e) {
+    		throw new IllegalStateException(e);
+    	}
     	RockboxService.stopForeground();
     }
 
@@ -115,30 +119,31 @@ public class RockboxPCM extends AudioTrack
    
     private class PCMListener implements OnPlaybackPositionUpdateListener {
         int max_len;
+        int refill_mark;
         byte[] buf;
 		public PCMListener(int len) {
             max_len = len;
-            buf = new byte[len/2];
+            /* refill to 100% when reached the 25% */
+            buf = new byte[max_len*3/4];
+            refill_mark = max_len - buf.length;
 		}
 		@Override
 		public void onMarkerReached(AudioTrack track) {
 			// push new data to the hardware
-			int result = 1;
-            pcmSamplesToByteArray(buf);
-			//LOG("Trying to write " + buf.length + " bytes");
+			RockboxPCM pcm = (RockboxPCM)track;
+			int result = -1;
+			pcm.pcmSamplesToByteArray(buf);
 			result = track.write(buf, 0, buf.length);
-			if (result > 0)
+			if (result >= 0)
 			{
-				//LOG(result + " bytes written");
-				track.setPlaybackPositionUpdateListener(this);
-				track.setNotificationMarkerPosition(bytes2frames(max_len)/4);
 				switch(track.getPlayState())
 				{
 				case AudioTrack.PLAYSTATE_PLAYING:
-					//LOG("State PLAYING");
-					break;
 				case AudioTrack.PLAYSTATE_PAUSED:
-					LOG("State PAUSED");
+					/* recharge */
+					setPlaybackPositionUpdateListener(this);
+					/* refill at 25% no matter of how many bytes we've written */
+					setNotificationMarkerPosition(bytes2frames(refill_mark));
 					break;
 				case AudioTrack.PLAYSTATE_STOPPED:
 					LOG("State STOPPED");
@@ -147,8 +152,8 @@ public class RockboxPCM extends AudioTrack
 			}
 			else
 			{
-				LOG("Error in onMarkerReached");
-				track.stop();
+				LOG("Error in onMarkerReached (result="+result+")");
+				stop();
 			}
 		}
 

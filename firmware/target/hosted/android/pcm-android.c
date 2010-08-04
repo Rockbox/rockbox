@@ -72,7 +72,10 @@ Java_org_rockbox_RockboxPCM_pcmSamplesToByteArray(JNIEnv *env,
     retry:
         pcm_play_get_more_callback((void**)&pcm_data_start, &pcm_data_size);
         if (pcm_data_size == 0)
+        {
+            LOG("out of data\n");
             return;
+        }
         if (remaining > pcm_data_size)
         {   /* got too little data, get more ... */
             (*env)->SetByteArrayRegion(env, arr, offset, pcm_data_size, pcm_data_start);
@@ -80,6 +83,7 @@ Java_org_rockbox_RockboxPCM_pcmSamplesToByteArray(JNIEnv *env,
             offset += pcm_data_size;
             /* we copied at least a bit */
             remaining -= pcm_data_size;
+            pcm_data_size = 0;
             /* let's get another buch of data and try again */
             goto retry;
         }
