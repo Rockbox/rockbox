@@ -633,6 +633,9 @@ static void gwps_leave_wps(void)
 #endif
     /* unhandle statusbar update delay */
     sb_skin_set_update_delay(DEFAULT_UPDATE_DELAY);
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(global_settings.touch_mode);
+#endif
 }
 
 /*
@@ -665,10 +668,12 @@ static void gwps_enter_wps(void)
         display->clear_display();
         skin_update(gwps, SKIN_REFRESH_ALL);
 
-#ifdef HAVE_TOUCHSCREEN
-        skin_disarm_touchregions(gui_wps[i].data);
-#endif
     }
+#ifdef HAVE_TOUCHSCREEN
+    skin_disarm_touchregions(gui_wps[SCREEN_MAIN].data);
+    if (!gui_wps[SCREEN_MAIN].data->touchregions)
+        touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
     /* force statusbar/skin update since we just cleared the whole screen */
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }

@@ -85,6 +85,11 @@ void fms_fix_displays(enum fms_exiting toggle_state)
             viewportmanager_theme_undo(i, skin_has_sbs(i, fms_skin[i].data));
         }
     }
+#ifdef HAVE_TOUCHSCREEN
+    if (!fms_skin[SCREEN_MAIN].data->touchregions)
+        touchscreen_set_mode(toggle_state == FMS_ENTER ? 
+                              TOUCHSCREEN_BUTTON : global_settings.touch_mode);
+#endif
 }
         
 
