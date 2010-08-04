@@ -1378,6 +1378,7 @@ const int32_t *sine_windows[6] = {
    the table should be in s.31 format, but in wma pro, all the tables are scaled
    down to preserve energy in the signal, so this downscaling is equivalent to 
    having the tables in ~s15.16 instead. */
+/* rockbox: not used
 const int32_t sincos_lookup_wmap[8064] = {
     0x0000011C, 0x00016A09, 0x000009FE, 0x000169E6, 
     0x000012DF, 0x0001698B, 0x00001BBD, 0x000168F9, 
@@ -3387,4 +3388,4 @@ const int32_t sincos_lookup_wmap[8064] = {
     0x00003FFD, 0x00000112, 0x00003FFD, 0x00000106, 
     0x00003FFE
 };
-
+*/

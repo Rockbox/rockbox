@@ -91,7 +91,7 @@
 #include "wmaprodata.h"
 #include "wma.h"
 #include "wmaprodec.h"
-#include "wmapro_mdct.h"
+//#include "wmapro_mdct.h"
 #include "mdct_tables.h"
 #include "quant.h"
 #include "wmapro_math.h"
@@ -878,11 +878,18 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
             vals[3] = (symbol_to_vec4[idx]      ) & 0xF;
         }
 
+        /* Rockbox: To be able to use rockbox' optimized mdct we need to 
+         * pre-shift the values by >>(nbits-3). */
+        const int nbits = av_log2(s->subframe_len)+1;
+        const int shift = WMAPRO_FRACT-(nbits-3);
+        
         /** decode sign */
         for (i = 0; i < 4; i++) {
             if (vals[i]) {
                 int sign = get_bits1(&s->gb) - 1;
-                ci->coeffs[cur_coeff] = (sign == -1)? -vals[i]<<WMAPRO_FRACT : vals[i]<<WMAPRO_FRACT;
+                /* Rockbox: To be able to use rockbox' optimized mdct we need
+                 * invert the sign. */
+                ci->coeffs[cur_coeff] = (sign == -1)? vals[i]<<shift : -vals[i]<<shift;
                 num_zeros = 0;
             } else {
                 ci->coeffs[cur_coeff] = 0;
@@ -1266,6 +1273,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
             get_bits_count(&s->gb) - s->subframe_offset);
 
     if (transmit_coeffs) {
+        int nbits = av_log2(subframe_len)+1;
         /** reconstruct the per channel data */
         inverse_channel_transform(s);
         for (i = 0; i < s->channels_for_cur_subframe; i++) {
@@ -1276,7 +1284,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
             if (c == s->lfe_channel)
                 memset(&s->tmp[cur_subwoofer_cutoff], 0, sizeof(*s->tmp) *
                        (subframe_len - cur_subwoofer_cutoff));
-                       
+
             /** inverse quantization and rescaling */
             for (b = 0; b < s->num_bands; b++) {
                 const int end = FFMIN(s->cur_sfb_offsets[b+1], s->subframe_len);
@@ -1299,8 +1307,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
             }
 
             /** apply imdct (ff_imdct_half == DCTIV with reverse) */
-            imdct_half(av_log2(subframe_len)+1,
-                          s->channel[c].coeffs, s->tmp);
+            ff_imdct_half(nbits,s->channel[c].coeffs, s->tmp);
                           
         }
     }

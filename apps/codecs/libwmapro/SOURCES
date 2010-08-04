@@ -2,4 +2,3 @@ wmaprodec.c
 wma.c
 mdct_tables.c
 ../lib/ffmpeg_bitstream.c
-wmapro_mdct.c
