@@ -76,7 +76,10 @@ public:
 
     TabType type() const{ return Skin; }
 
-    QGraphicsScene* scene(){ return model->render(project, device, &fileName); }
+    QGraphicsScene* scene()
+    {
+        return model->render(project, device, this, &fileName);
+    }
 
     void showFind(){ findReplace->show(); }
     void hideFind(){ findReplace->hide(); }

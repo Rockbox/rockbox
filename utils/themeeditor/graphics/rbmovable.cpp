@@ -25,7 +25,7 @@
 #include "rbmovable.h"
 
 RBMovable::RBMovable(QGraphicsItem* parent)
-    : QGraphicsItem(parent)
+    : QGraphicsItem(parent), geomChanged(false)
 {
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
 }
@@ -61,7 +61,7 @@ QVariant RBMovable::itemChange(GraphicsItemChange change, const QVariant &value)
         pos.setY(qMax(0., pos.y()));
         pos.setY(qMin(pos.y(), bound.height() - boundingRect().height()));
 
-        saveGeometry();
+        geomChanged = true;
 
         return pos;
     }
@@ -69,3 +69,17 @@ QVariant RBMovable::itemChange(GraphicsItemChange change, const QVariant &value)
     return QGraphicsItem::itemChange(change, value);
 }
 
+void RBMovable::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void RBMovable::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mouseReleaseEvent(event);
+    if(isSelected())
+    {
+        saveGeometry();
+        geomChanged = false;
+    }
+}

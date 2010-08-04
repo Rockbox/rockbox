@@ -34,16 +34,19 @@
 #include "parsetreemodel.h"
 #include "tag_table.h"
 #include "skin_parser.h"
+#include "skindocument.h"
 
 /* Pixels/second of text scrolling */
 const double RBViewport::scrollRate = 30;
 
-RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
+RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
+                       ParseTreeNode* pNode)
     : RBMovable(info.screen()), foreground(info.screen()->foreground()),
     background(info.screen()->background()), textOffset(0,0),
     screen(info.screen()), textAlign(Left), showStatusBar(false),
     statusBarTexture(":/render/statusbar.png"),
-    leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0)
+    leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0),
+    node(pNode), doc(info.document())
 {
     setFlags(ItemIsSelectable | ItemIsMovable | ItemSendsGeometryChanges);
 
@@ -67,7 +70,6 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
     }
     else
     {
-        int param = 0;
         QString ident;
         int x,y,w,h;
         /* Rendering one of the other types of viewport */
@@ -75,7 +77,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
         {
         case '\0':
             customUI = false;
-            param = 0;
+            baseParam= 0;
             break;
 
         case 'l':
@@ -85,13 +87,13 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             if(!screen->viewPortDisplayed(ident))
                 hide();
             info.screen()->loadViewport(ident, this);
-            param = 1;
+            baseParam= 1;
             break;
 
         case 'i':
             /* Custom UI Viewport */
             customUI = true;
-            param = 1;
+            baseParam= 1;
             if(node->params[0].type == skin_tag_parameter::DEFAULT)
             {
                 setVisible(true);
@@ -104,6 +106,7 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info)
             break;
         }
         /* Now we grab the info common to all viewports */
+        int param = baseParam;
         x = node->params[param++].data.number;
         if(x < 0)
             x = info.screen()->boundingRect().right() + x;
@@ -301,7 +304,15 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
 
 void RBViewport::saveGeometry()
 {
+    QRectF bounds = boundingRect();
+    QPointF origin = pos();
 
+    node->modParam(static_cast<int>(origin.x()), baseParam);
+    node->modParam(static_cast<int>(origin.y()), baseParam + 1);
+    node->modParam(static_cast<int>(bounds.width()), baseParam + 2);
+    node->modParam(static_cast<int>(bounds.height()), baseParam + 3);
+
+    doc->genCode();
 }
 
 void RBViewport::alignLeft()

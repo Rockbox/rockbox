@@ -28,8 +28,11 @@
 
 class RBScreen;
 class RBRenderInfo;
+class ParseTreeNode;
 
 #include <QGraphicsItem>
+
+class SkinDocument;
 
 class RBViewport : public RBMovable
 {
@@ -43,7 +46,8 @@ public:
 
     static const double scrollRate;
 
-    RBViewport(skin_element* node, const RBRenderInfo& info);
+    RBViewport(skin_element* node, const RBRenderInfo& info,
+               ParseTreeNode* pNode);
     virtual ~RBViewport();
 
     QPainterPath shape() const;
@@ -112,6 +116,10 @@ private:
     RBText* rightGraphic;
 
     double scrollTime;
+
+    int baseParam;
+    ParseTreeNode* node;
+    SkinDocument* doc;
 };
 
 #endif // RBVIEWPORT_H

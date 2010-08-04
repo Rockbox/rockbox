@@ -22,10 +22,11 @@
 #include "rbrenderinfo.h"
 
 RBRenderInfo::RBRenderInfo(ParseTreeModel* model, ProjectModel* project,
-                           QMap<QString, QString>* settings,
+                           SkinDocument* doc, QMap<QString, QString>* settings,
                            DeviceState* device, RBScreen* screen,
                            RBScreen* sbsScreen)
-                               :mProject(project), mSettings(settings),
+                               :mProject(project), mDoc(doc),
+                               mSettings(settings),
                                mDevice(device), mScreen(screen),
                                mSbsScreen(sbsScreen), mModel(model)
 {
@@ -41,6 +42,7 @@ RBRenderInfo::RBRenderInfo(const RBRenderInfo &other)
     mProject = other.mProject;
     mSettings = other.mSettings;
     mDevice = other.mDevice;
+    mDoc = other.mDoc;
     mScreen = other.mScreen;
     mSbsScreen = other.mSbsScreen;
     mModel = other.mModel;
@@ -51,6 +53,7 @@ const RBRenderInfo& RBRenderInfo::operator=(const RBRenderInfo& other)
     mProject = other.mProject;
     mSettings = other.mSettings;
     mDevice = other.mDevice;
+    mDoc = other.mDoc;
     mScreen = other.mScreen;
     mSbsScreen = other.mSbsScreen;
     mModel = other.mModel;

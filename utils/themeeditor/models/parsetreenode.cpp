@@ -523,7 +523,7 @@ void ParseTreeNode::render(const RBRenderInfo& info)
         return;
     }
 
-    rendered = new RBViewport(element, info);
+    rendered = new RBViewport(element, info, this);
 
     for(int i = element->params_count; i < children.count(); i++)
         children[i]->render(info, dynamic_cast<RBViewport*>(rendered));
@@ -1056,4 +1056,34 @@ double ParseTreeNode::findConditionalTime(ParseTreeNode *conditional,
     int child = conditional->evalTag(info, true,
                                      conditional->children.count()).toInt();
     return findBranchTime(conditional->children[child], info);
+}
+
+void ParseTreeNode::modParam(QVariant value, int index)
+{
+    if(element)
+    {
+        if(index < 0 || index >= children.count())
+            return;
+        children[index]->modParam(value);
+    }
+    else if(param)
+    {
+        if(value.type() == QVariant::Double)
+        {
+            param->type = skin_tag_parameter::DECIMAL;
+            param->data.number = static_cast<int>(value.toDouble() * 10);
+        }
+        else if(value.type() == QVariant::String)
+        {
+            param->type = skin_tag_parameter::STRING;
+            free(param->data.text);
+            param->data.text = strdup(value.toString().toStdString().c_str());
+        }
+        else if(value.type() == QVariant::Int)
+        {
+            param->type = skin_tag_parameter::INTEGER;
+            param->data.number = value.toInt();
+        }
+
+    }
 }

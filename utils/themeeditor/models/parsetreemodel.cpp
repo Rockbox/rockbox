@@ -271,7 +271,8 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
 }
 
 QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
-                                       DeviceState* device, const QString* file)
+                                       DeviceState* device,
+                                       SkinDocument* doc, const QString* file)
 {
     scene->clear();
 
@@ -327,14 +328,14 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
 
             if(sbsModel.root != 0)
             {
-                RBRenderInfo sbsInfo(&sbsModel, project, &settings, device,
+                RBRenderInfo sbsInfo(&sbsModel, project, doc, &settings, device,
                                      sbsScreen);
 
                 sbsScreen = new RBScreen(sbsInfo, remote);
                 scene->addItem(sbsScreen);
 
-                sbsInfo = RBRenderInfo(&sbsModel, project, &settings, device,
-                                       sbsScreen);
+                sbsInfo = RBRenderInfo(&sbsModel, project, doc, &settings,
+                                       device, sbsScreen);
                 sbsModel.root->render(sbsInfo);
             }
 
@@ -342,7 +343,7 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     }
 
     RBScreen* screen = 0;
-    RBRenderInfo info(this, project, &settings, device, screen, sbsScreen);
+    RBRenderInfo info(this, project, doc, &settings, device, screen, sbsScreen);
 
     /* Adding the screen */
     if(sbsScreen)
@@ -353,7 +354,8 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     if(!sbsScreen)
         scene->addItem(screen);
 
-    info = RBRenderInfo(this, project, &settings, device, screen, sbsScreen);
+    info = RBRenderInfo(this, project, doc,  &settings, device, screen,
+                        sbsScreen);
 
 
     /* Rendering the tree */

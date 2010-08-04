@@ -67,6 +67,8 @@ public:
     double findConditionalTime(ParseTreeNode* conditional,
                                const RBRenderInfo& info);
 
+    void modParam(QVariant value, int index = -1);
+
 private:
 
     bool execTag(const RBRenderInfo& info, RBViewport* viewport);

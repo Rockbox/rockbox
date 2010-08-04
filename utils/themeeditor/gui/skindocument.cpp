@@ -301,7 +301,7 @@ void SkinDocument::codeChanged()
 
     if(lastUpdate.msecsTo(QTime::currentTime()) >= updateInterval)
     {
-        model->render(project, device, &fileName);
+        model->render(project, device, this, &fileName);
         checkUpdate.stop();
         lastUpdate = QTime::currentTime();
     }

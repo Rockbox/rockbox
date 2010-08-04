@@ -63,7 +63,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
     QGraphicsScene* render(ProjectModel* project, DeviceState* device,
-                           const QString* file = 0);
+                           SkinDocument* doc, const QString* file = 0);
 
     static QString safeSetting(ProjectModel* project, QString key,
                                QString fallback)

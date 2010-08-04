@@ -41,12 +41,16 @@ public:
 
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 protected:
     virtual QVariant itemChange(GraphicsItemChange change,
                                 const QVariant &value);
     /* Responsible for updating the parse tree */
     virtual void saveGeometry() = 0;
+
+    bool geomChanged;
 
 };
 
