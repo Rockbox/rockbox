@@ -129,9 +129,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionToolbarNew"/>
-   <addaction name="actionToolbarOpen"/>
-   <addaction name="actionToolbarSave"/>
   </widget>
   <widget class="QDockWidget" name="projectDock">
    <property name="windowTitle">
@@ -230,6 +227,10 @@
    </property>
   </action>
   <action name="actionNew_Document">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/document-new.png</normaloff>:/resources/resources/document-new.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;New Document</string>
    </property>
@@ -238,6 +239,10 @@
    </property>
   </action>
   <action name="actionOpen_Document">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/document-open.png</normaloff>:/resources/resources/document-open.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Open Document</string>
    </property>
@@ -248,6 +253,10 @@
   <action name="actionSave_Document">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/document-save.png</normaloff>:/resources/resources/document-save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save Document</string>
@@ -270,6 +279,10 @@
   <action name="actionSave_Document_As">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/document-save-as.png</normaloff>:/resources/resources/document-save-as.png</iconset>
    </property>
    <property name="text">
     <string>Save Document &amp;As</string>
@@ -334,6 +347,10 @@
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-undo.png</normaloff>:/resources/resources/edit-undo.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Undo</string>
    </property>
@@ -342,6 +359,10 @@
    </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-redo.png</normaloff>:/resources/resources/edit-redo.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Redo</string>
    </property>
@@ -350,6 +371,10 @@
    </property>
   </action>
   <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-cut.png</normaloff>:/resources/resources/edit-cut.png</iconset>
+   </property>
    <property name="text">
     <string>C&amp;ut</string>
    </property>
@@ -358,6 +383,10 @@
    </property>
   </action>
   <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-copy.png</normaloff>:/resources/resources/edit-copy.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -366,6 +395,10 @@
    </property>
   </action>
   <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-paste.png</normaloff>:/resources/resources/edit-paste.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -374,6 +407,10 @@
    </property>
   </action>
   <action name="actionFind_Replace">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/resources/edit-find-replace.png</normaloff>:/resources/resources/edit-find-replace.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Find/Replace</string>
    </property>

@@ -207,6 +207,24 @@ void EditorWindow::setupUI()
 
 void EditorWindow::setupMenus()
 {
+    /* Adding actions to the toolbar */
+    ui->toolBar->addAction(ui->actionNew_Document);
+    ui->toolBar->addAction(ui->actionOpen_Document);
+    ui->toolBar->addAction(ui->actionSave_Document);
+    ui->toolBar->addAction(ui->actionSave_Document_As);
+
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionUndo);
+    ui->toolBar->addAction(ui->actionRedo);
+
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionCut);
+    ui->toolBar->addAction(ui->actionCopy);
+    ui->toolBar->addAction(ui->actionPaste);
+
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionFind_Replace);
+
     /* Connecting panel show actions */
     QObject::connect(ui->actionFile_Panel, SIGNAL(triggered()),
                      this, SLOT(showPanel()));
@@ -224,8 +242,6 @@ void EditorWindow::setupMenus()
                      this, SLOT(newTab()));
     QObject::connect(ui->actionNew_Project, SIGNAL(triggered()),
                      this, SLOT(newProject()));
-    QObject::connect(ui->actionToolbarNew, SIGNAL(triggered()),
-                     this, SLOT(newTab()));
 
     QObject::connect(ui->actionClose_Document, SIGNAL(triggered()),
                      this, SLOT(closeCurrent()));
@@ -236,14 +252,10 @@ void EditorWindow::setupMenus()
                      this, SLOT(saveCurrent()));
     QObject::connect(ui->actionSave_Document_As, SIGNAL(triggered()),
                      this, SLOT(saveCurrentAs()));
-    QObject::connect(ui->actionToolbarSave, SIGNAL(triggered()),
-                     this, SLOT(saveCurrent()));
     QObject::connect(ui->actionExport_Project, SIGNAL(triggered()),
                      this, SLOT(exportProject()));
 
     QObject::connect(ui->actionOpen_Document, SIGNAL(triggered()),
-                     this, SLOT(openFile()));
-    QObject::connect(ui->actionToolbarOpen, SIGNAL(triggered()),
                      this, SLOT(openFile()));
 
     QObject::connect(ui->actionOpen_Project, SIGNAL(triggered()),
@@ -409,7 +421,6 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document->setEnabled(false);
         ui->actionSave_Document_As->setEnabled(false);
         ui->actionClose_Document->setEnabled(false);
-        ui->actionToolbarSave->setEnabled(false);
         ui->fromTree->setEnabled(false);
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
@@ -424,7 +435,6 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document->setEnabled(true);
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
-        ui->actionToolbarSave->setEnabled(true);
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
         ui->actionCut->setEnabled(false);
@@ -443,7 +453,6 @@ void EditorWindow::shiftTab(int index)
         ui->actionSave_Document->setEnabled(true);
         ui->actionSave_Document_As->setEnabled(true);
         ui->actionClose_Document->setEnabled(true);
-        ui->actionToolbarSave->setEnabled(true);
         ui->fromTree->setEnabled(true);
 
         ui->actionUndo->setEnabled(true);

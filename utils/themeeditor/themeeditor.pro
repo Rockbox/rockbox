@@ -175,7 +175,14 @@ OTHER_FILES += README \
     quazip/README.ROCKBOX \
     quazip/LICENSE.GPL \
     qtfindreplacedialog/dialogs.pro \
-    resources/tagdb
+    resources/tagdb \
+    resources/document-save-as.png \
+    resources/edit-undo.png \
+    resources/edit-redo.png \
+    resources/edit-paste.png \
+    resources/edit-cut.png \
+    resources/edit-copy.png \
+    resources/edit-find-replace.png
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \
