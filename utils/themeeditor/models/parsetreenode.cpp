@@ -154,7 +154,10 @@ QString ParseTreeNode::genCode() const
                 buffer.append(children[i]->genCode());
             }
             if(openConditionals == 0
-               && !(parent && parent->element->type == LINE_ALTERNATOR))
+               && !(parent && parent->element->type == LINE_ALTERNATOR)
+               && !(children.count() > 0 &&
+                    children[children.count() - 1]->getElement()->type
+                    == COMMENT))
             {
                 buffer.append('\n');
             }
