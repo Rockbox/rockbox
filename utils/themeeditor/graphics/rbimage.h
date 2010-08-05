@@ -27,10 +27,13 @@
 
 #include "rbmovable.h"
 
+class ParseTreeNode;
+
 class RBImage: public RBMovable
 {
 public:
-    RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent = 0);
+    RBImage(QString file, int tiles, int x, int y, ParseTreeNode* node,
+            QGraphicsItem* parent = 0);
     RBImage(const RBImage& other, QGraphicsItem* parent);
     virtual ~RBImage();
 
@@ -45,6 +48,11 @@ public:
             currentTile = tiles -1;
     }
 
+    void enableMovement()
+    {
+        setFlag(ItemSendsGeometryChanges, true);
+    }
+
 
 protected:
     void saveGeometry();
@@ -55,6 +63,8 @@ private:
     int currentTile;
 
     QRectF size;
+
+    ParseTreeNode* node;
 
 };
 

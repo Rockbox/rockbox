@@ -758,6 +758,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
                 image = new RBImage(*(info.screen()->getImage(id)), viewport);
                 image->setTile(tile);
                 image->show();
+                image->enableMovement();
             }
 
             return true;
@@ -775,7 +776,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
                 tiles = 1;
 
             info.screen()->loadImage(id, new RBImage(filename, tiles, x, y,
-                                                     viewport));
+                                                     this, viewport));
             return true;
 
         case '\0':
@@ -785,10 +786,11 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
                        element->params[1].data.text;
             x = element->params[2].data.number;
             y = element->params[3].data.number;
-            image = new RBImage(filename, 1, x, y, viewport);
-            info.screen()->loadImage(id, new RBImage(filename, 1, x, y,
-                                                     viewport));
-            info.screen()->getImage(id)->show();
+            image = new RBImage(filename, 1, x, y, this, viewport);
+            info.screen()->loadImage(id, image);
+            image->show();
+            image->enableMovement();
+            
             return true;
 
         }

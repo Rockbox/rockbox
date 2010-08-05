@@ -24,10 +24,16 @@
 #include <QBitmap>
 
 #include "rbimage.h"
+#include "parsetreenode.h"
 
-RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
-                     : RBMovable(parent), tiles(tiles), currentTile(0)
+RBImage::RBImage(QString file, int tiles, int x, int y, ParseTreeNode* node,
+                 QGraphicsItem* parent)
+                     : RBMovable(parent), tiles(tiles), currentTile(0),
+                     node(node)
 {
+    /* Prevents RBMovable from interfering with initial position setting */
+    setFlag(ItemSendsGeometryChanges, false);
+
     if(QFile::exists(file))
     {
         image = new QPixmap(file);
@@ -56,7 +62,8 @@ RBImage::RBImage(QString file, int tiles, int x, int y, QGraphicsItem* parent)
 }
 
 RBImage::RBImage(const RBImage &other, QGraphicsItem* parent)
-    : RBMovable(parent), tiles(other.tiles), currentTile(other.currentTile)
+    : RBMovable(parent), tiles(other.tiles), currentTile(other.currentTile),
+    node(other.node)
 {
     if(other.image)
         image = new QPixmap(*(other.image));
@@ -90,7 +97,12 @@ void RBImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     RBMovable::paint(painter, option, widget);
 }
 
+
+
 void RBImage::saveGeometry()
 {
+    QPointF origin = pos();
 
+    node->modParam(static_cast<int>(origin.x()), 2);
+    node->modParam(static_cast<int>(origin.y()), 3);
 }
