@@ -25,12 +25,13 @@
 #include <QGraphicsItem>
 #include <QPixmap>
 
+#include "rbmovable.h"
 #include "rbrenderinfo.h"
 #include "rbviewport.h"
 #include "devicestate.h"
 #include "skin_parser.h"
 
-class RBProgressBar : public QGraphicsItem
+class RBProgressBar : public RBMovable
 {
 public:
     RBProgressBar(RBViewport* parent, const RBRenderInfo& info,
@@ -40,6 +41,9 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
+
+protected:
+    void saveGeometry();
 
 private:
     QPixmap* bitmap;

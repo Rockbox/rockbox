@@ -1065,6 +1065,9 @@ double ParseTreeNode::findConditionalTime(ParseTreeNode *conditional,
 {
     int child = conditional->evalTag(info, true,
                                      conditional->children.count()).toInt();
+    if(child >= conditional->children.count())
+        child = conditional->children.count() - 1;
+
     return findBranchTime(conditional->children[child], info);
 }
 

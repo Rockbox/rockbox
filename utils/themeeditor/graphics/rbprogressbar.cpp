@@ -27,7 +27,7 @@
 RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
                              int paramCount, skin_tag_parameter *params,
                              bool pv)
-                                 :QGraphicsItem(parent)
+                                 :RBMovable(parent)
 {
     /* First we set everything to defaults */
     bitmap = 0;
@@ -117,4 +117,11 @@ void RBProgressBar::paint(QPainter *painter,
     {
         painter->fillRect(size, color);
     }
+
+    RBMovable::paint(painter, option, widget);
+}
+
+void RBProgressBar::saveGeometry()
+{
+
 }
