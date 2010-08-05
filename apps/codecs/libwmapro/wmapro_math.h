@@ -223,40 +223,6 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
             : [dst]"+r"(dst), [src]"+r"(src) \
             : [mul]"r"(mul) \
             : "r0", "r1", "r2", "r3", "r4", "r5", "memory");
-/* Disable ColdFire version until a correct version is written 
-#elif defined (CPU_COLDFIRE)
-    #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
-        int32_t tmp; \
-        asm volatile ( \
-            "movem.l  (%[src]), %%d0-%%d3  \n\t" \
-            "mac.l    %[mul], %%d0, %%acc0 \n\t" \
-            "mac.l    %[mul], %%d1, %%acc1 \n\t" \
-            "mac.l    %[mul], %%d2, %%acc2 \n\t" \
-            "mac.l    %[mul], %%d3, %%acc3 \n\t" \
-            "move.l   %%accext01, %[tmp]   \n\t" \
-            "movclr.l %%acc0, %%d0         \n\t" \
-            "movclr.l %%acc1, %%d1         \n\t" \
-            "lsl.l    #7, %%d0             \n\t" \
-            "move.b   %[tmp], %%d0         \n\t" \
-            "swap     %[tmp]               \n\t" \
-            "lsl.l    #7, %%d1             \n\t" \
-            "move.b   %[tmp], %%d1         \n\t" \
-            "move.l   %%accext23, %[tmp]   \n\t" \
-            "movclr.l %%acc2, %%d2         \n\t" \
-            "movclr.l %%acc3, %%d3         \n\t" \
-            "lsl.l    #7, %%d2             \n\t" \
-            "move.b   %[tmp], %%d2         \n\t" \
-            "swap     %[tmp]               \n\t" \
-            "lsl.l    #7, %%d3             \n\t" \
-            "move.b   %[tmp], %%d3         \n\t" \
-            "movem.l  %%d0-%%d3, (%[dst])  \n\t" \
-            "lea.l    (4*4, %[src]), %[src]\n\t" \
-            "lea.l    (4*4, %[dst]), %[dst]\n\t" \
-            : [dst] "+a" (dst), [src] "+a" (src),\
-              [tmp] "=d" (tmp)                   \
-            : [mul] "r" (mul)                    \
-            : "d0", "d1", "d2", "d3", "memory", "cc");
-*/
 #else
     #define VECT_MUL_SCALAR_KERNEL(dst, src, mul) \
         dst[i  ] = fixmul16(src[i  ], mul); \
