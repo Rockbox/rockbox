@@ -273,6 +273,7 @@ enum skin_token_type {
  *             F - Required file name
  *             f - Nullable file name
  *             C - Required skin code
+ *             T - Required single skin tag
  *             N - any amount of strings.. must be the last param in the list
  *             \n - causes the parser to eat everything up to and including the \n
  *                  MUST be the last character of the prams string

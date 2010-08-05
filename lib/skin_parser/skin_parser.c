@@ -673,6 +673,17 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             if(!element->params[i].data.code)
                 return 0;
         }
+        else if (tolower(*tag_args) == 't')
+        {
+            struct skin_element* child = skin_alloc_element();
+            child->type = TAG;
+            if (!skin_parse_tag(child, &cursor))
+                return 0;
+            child->next = NULL;
+            element->params[i].type = CODE;
+            element->params[i].data.code = child;
+        }
+            
 
         skip_whitespace(&cursor);
 
