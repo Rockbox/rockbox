@@ -23,15 +23,19 @@
 
 #include <QPainter>
 
+#include "parsetreenode.h"
+
 RBAlbumArt::RBAlbumArt(QGraphicsItem *parent, int x, int y, int maxWidth,
-                       int maxHeight, int artWidth, int artHeight, char hAlign,
-                       char vAlign)
+                       int maxHeight, int artWidth, int artHeight,
+                       ParseTreeNode* node, char hAlign, char vAlign)
                            : RBMovable(parent), size(0, 0, maxWidth,
                                                      maxHeight),
                            artWidth(artWidth), artHeight(artHeight),
                            hAlign(hAlign), vAlign(vAlign),
-                           texture(":/render/albumart.png")
+                           texture(":/render/albumart.png"), node(node)
 {
+    setFlag(ItemSendsGeometryChanges, false);
+
     setPos(x, y);
     hide();
 }
@@ -99,4 +103,11 @@ void RBAlbumArt::paint(QPainter *painter,
 void RBAlbumArt::saveGeometry()
 {
 
+    QPointF origin = pos();
+    QRectF bounds = boundingRect();
+
+    node->modParam(static_cast<int>(origin.x()), 0);
+    node->modParam(static_cast<int>(origin.y()), 1);
+    node->modParam(static_cast<int>(bounds.width()), 2);
+    node->modParam(static_cast<int>(bounds.height()), 3);
 }

@@ -82,6 +82,7 @@ public:
         {
             albumArt->setParentItem(view);
             albumArt->show();
+            albumArt->enableMove();
         }
     }
 

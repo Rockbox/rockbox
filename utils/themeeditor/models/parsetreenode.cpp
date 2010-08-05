@@ -819,7 +819,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             height = info.device()->data("artheight").toInt();
             info.screen()->setAlbumArt(new RBAlbumArt(viewport, x, y, maxWidth,
                                                       maxHeight, width, height,
-                                                      hAlign, vAlign));
+                                                      this, hAlign, vAlign));
             return true;
         }
 
