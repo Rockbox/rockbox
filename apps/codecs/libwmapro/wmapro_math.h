@@ -182,8 +182,8 @@
             : "cc", "memory");
 #else
     #define VECT_MUL_WIN_KERNEL(i, j, s0, s1, wi, wj) \
-        dst[i] = fixmul31(s0, wj) - fixmul31(s1, wi); \
-        dst[j] = fixmul31(s0, wi) + fixmul31(s1, wj);
+        dst[i] = fixmul31(wj, s0) - fixmul31(wi, s1); \
+        dst[j] = fixmul31(wi, s0) + fixmul31(wj, s1);
 #endif /* CPU_COLDFIRE */
 
 static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
