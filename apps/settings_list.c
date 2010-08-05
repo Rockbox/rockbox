@@ -217,6 +217,8 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "15-Adobe-Helvetica"
 #elif LCD_HEIGHT <= 400
   #define DEFAULT_FONTNAME "16-Adobe-Helvetica"
+#elif LCD_HEIGHT <= 480
+  #define DEFAULT_FONTNAME "27-Adobe-Helvetica"
 #else
   #define DEFAULT_FONTNAME "12-Adobe-Helvetica"
 #endif
