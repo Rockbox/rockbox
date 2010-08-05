@@ -81,6 +81,7 @@ public:
 
 private:
     ParseTreeNode* root;
+    ParseTreeModel* sbsModel;
     struct skin_element* tree;
     QGraphicsScene* scene;
 };

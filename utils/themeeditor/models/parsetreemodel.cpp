@@ -35,7 +35,7 @@
 #include <iostream>
 
 ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
-        QAbstractItemModel(parent)
+        QAbstractItemModel(parent), sbsModel(0)
 {
     this->tree = skin_parse(document);
 
@@ -54,6 +54,8 @@ ParseTreeModel::~ParseTreeModel()
         delete root;
     if(tree)
         skin_free_tree(tree);
+    if(sbsModel)
+        sbsModel->deleteLater();
 }
 
 QString ParseTreeModel::genCode()
@@ -324,19 +326,22 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         {
             QFile sbs(sbsFile);
             sbs.open(QFile::ReadOnly | QFile::Text);
-            ParseTreeModel sbsModel(QString(sbs.readAll()).toAscii());
 
-            if(sbsModel.root != 0)
+            if(sbsModel)
+                sbsModel->deleteLater();
+            sbsModel = new ParseTreeModel(QString(sbs.readAll()).toAscii());
+
+            if(sbsModel->root != 0)
             {
-                RBRenderInfo sbsInfo(&sbsModel, project, doc, &settings, device,
+                RBRenderInfo sbsInfo(sbsModel, project, doc, &settings, device,
                                      sbsScreen);
 
                 sbsScreen = new RBScreen(sbsInfo, remote);
                 scene->addItem(sbsScreen);
 
-                sbsInfo = RBRenderInfo(&sbsModel, project, doc, &settings,
+                sbsInfo = RBRenderInfo(sbsModel, project, doc, &settings,
                                        device, sbsScreen);
-                sbsModel.root->render(sbsInfo);
+                sbsModel->root->render(sbsInfo);
             }
 
         }
