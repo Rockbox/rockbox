@@ -342,11 +342,8 @@ bool settings_load_config(const char* file, bool apply)
                         char storage[MAX_PATH];
                         if (settings[i].filename_setting->prefix)
                         {
-                            char prefix_dir[MAX_PATH];
-                            const char *dir = get_user_file_path(
-                                    settings[i].filename_setting->prefix,
-                                    0, prefix_dir, sizeof(prefix_dir));
-                            int len = strlen(dir);
+                            const char *dir = settings[i].filename_setting->prefix;
+                            size_t len = strlen(dir);
                             if (!strncasecmp(value, dir, len))
                             {
                                 strlcpy(storage, &value[len], MAX_PATH);
@@ -480,10 +477,6 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
             if (((char*)settings[i].setting)[0]
                 && settings[i].filename_setting->prefix)
             {
-                char path[MAX_PATH];
-                const char *prefix = get_user_file_path(
-                        settings[i].filename_setting->prefix, 0,
-                        path, sizeof(path));
                 if (((char*)settings[i].setting)[0] == '-')
                 {
                     buf[0] = '-';
@@ -491,7 +484,8 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
                 }
                 else
                 {
-                    snprintf(buf,buf_len,"%s%s%s", prefix,
+                    snprintf(buf,buf_len,"%s%s%s",
+                            settings[i].filename_setting->prefix,
                             (char*)settings[i].setting,
                             settings[i].filename_setting->suffix);
                 }
