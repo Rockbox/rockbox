@@ -107,23 +107,8 @@
             : [y] "d" ((Y))); \
         x; \
     })
-    
-    /* Calculates: result = (X*Y)>>24 */
-    #define fixmul24(X,Y) \
-    ({ \
-        int32_t t1, t2; \
-        asm volatile ( \
-            "mac.l    %[x],%[y],%%acc0 \n\t" /* multiply */ \
-            "move.l   %%accext01, %[t1]\n\t" /* get lower 8 bits */ \
-            "movclr.l %%acc0,%[t2]     \n\t" /* get higher 24 bits */ \
-            "asl.l    #7,%[t2]         \n\t" /* hi <<= 7, plus one free */ \
-            "move.b   %[t1],%[t2]      \n\t" /* combine result */ \
-            : [t1]"=&d"(t1), [t2]"=&d"(t2) \
-            : [x] "d" ((X)), [y] "d" ((Y))); \
-        t2; \
-    })
 
-    /* Calculates: result = (X*Y)>>31 (loses one bit of precision) */
+    /* Calculates: result = (X*Y)>>31 (may lose msb to overflow) */
     #define fixmul31(X,Y) \
     ({ \
        int32_t t; \
