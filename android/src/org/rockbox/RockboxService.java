@@ -154,7 +154,7 @@ public class RockboxService extends Service
         CharSequence text = getText(R.string.notification);
 
         // Set the icon, scrolling text and timestamp
-        notification = new Notification(R.drawable.rb, text,
+        notification = new Notification(R.drawable.icon, text,
                 System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
