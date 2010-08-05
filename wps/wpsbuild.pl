@@ -406,7 +406,7 @@ while(<WPS>) {
     }
 
     # prefix $rbdir with / if needed (needed for the theme.cfg)
-    unless ($rbdir =~ /\/.*/) {
+    unless ($rbdir =~ m/^\/.*/) {
         $rbdir = "/" . $rbdir;
     }
 
