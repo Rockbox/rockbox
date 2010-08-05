@@ -179,7 +179,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_ALBUMART
         case SKIN_TOKEN_ALBUMART_DISPLAY:
             /* now draw the AA */
-            if (data->albumart)
+            if (do_refresh && data->albumart)
             {
                 int handle = playback_current_aa_hid(data->playback_aa_slot);
 #if CONFIG_TUNER
