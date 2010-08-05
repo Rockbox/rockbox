@@ -1,36 +1,92 @@
-# cabbie 2.0 default for the Sansa e200 Series by Marc Guay
-# derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# cabbie 2.0
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# (C) 2009, Maurus Cuelenaere (mcuelenaere) ported to Onda VX747
+# derived from "cabbie" (C) Yohann Misquitta
+
+# TODO:
+#  * Touch regions
+#  * images for battery, hold button
 %wd
-%X(wpsbackdrop-176x220x16.bmp)
-%xl(A,lock-176x220x16.bmp,51,204,2)
-%xl(B,battery-176x220x16.bmp,73,206,10)
-%xl(C,volume-176x220x16.bmp,97,206,10)
-%xl(D,shuffle-176x220x16.bmp,119,207)
-%xl(E,repeat-176x220x16.bmp,144,204,4)
-%xl(F,playmode-176x220x16.bmp,159,204,5)
-%Cl(29,20,120,120,c,c)
-%pb(5,182,166,8,pb-176x220x16.bmp)
-#NowPlaying
+%X(wpsbackdrop-320x480x16.bmp)
+
+#%xl(A,lock-240x320x16.bmp,11,0,2)
+#%xl(B,battery-240x320x16.bmp,46,0,10)
+%xl(C,volume-320x480x16.bmp,91,60,10)
+%xl(D,shuffle-320x480x16.bmp,156,65)
+%xl(E,repeat-320x480x16.bmp,231,55,4)
+%xl(F,playmode-320x480x16.bmp,273,55,5)
+
+%Cl(0,0,180,180,c,c)
+
+%C?<%Vd(a)|%Vd(b)>
+#%T(22,284,199,13,progressbar)
+#%T(90,238,60,20,playlist)
+%?Tl(2.5)<%Vd(t)|%Vd(u)>
 
 
-%?C<|%s%ac%?it<%it|%fn>>
-%?C<|%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>>
-%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
-%?C<|%s%ac%?iy<%iy|>>
+# track & next track info - no AA
+%Vl(b,0,50,-,-,-)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%ac%?iy<%iy|>
 
-%?C<|%s%ac%Sx(Next Track:)>
-%?C<|%s%ac%?It<%It|%Fn>>
-%?C<|%s%ac%?Ia<%Ia|>>
+%ac%?ig<%ig|>
+%ac%?fv<%(vbr%) |>%fb kbit/s %fc
+%s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>>
+%ac%Sx(Next Track:)
+%ac%s%?It<%It|%Fn>
 
-%?C<%s%ac%?it<%it|%fn>|>
-%?C<%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>|>
-%?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|>
+# album art viewport
+%Vl(a,70,50,180,180,-)
+%?C<%Cd>
 
-%al    %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr   
-%xd(A, %mh)
-%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+# current track info - AA
+%Vl(a,0,240,-,-,-)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+
+# next track info - AA
+%Vl(a,0,338,-,-,-)
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
+
+# playtime
+%V(15,398,290,30,-)
+%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+
+# progressbar and bottom icons
+%V(0,371,-,-,-)
+%pb(20,0,280,-,pb-320x480x16.bmp)
+
+#%?mh<%xd(Aa)|%xd(Ab)>
+#%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 %?ps<%xd(D)>
 %xd(E, %mm, -1)
 %xd(F, %mp)
-%?C<%Cd>
+
+#%T(206,0,24,24,play)
+#%T(206,0,24,24,&stop)
+#%T(182,0,18,92,repmode)
+#%T(139,0,37,23,shuffle)
+#%T(98,0,33,23,volume)
+
+#viewport for the touch icons
+#%xl(G,browser-320x240x16.bmp,0,0)
+#%xl(I,pitch-320x240x16.bmp,39,0)
+#%xl(H,context-320x240x16.bmp,58,0)
+#%xl(J,quick-320x240x16.bmp,86,0)
+#%xl(K,rew-320x240x16.bmp,115,0)
+#%xl(L,ff-320x240x16.bmp,144,0)
+
+%Vl(t,70,335,-,30,1)
+#%xd(G) %xd(H) %xd(I) %xd(J) %xd(K) %xd(L)
+#%T(0,0,37,24,browse)
+#%T(39,5,24,24,pitch)
+#%T(58,0,24,24,contextmenu)
+#%T(86,0,24,24,quickscreen)
+#%T(115,0,24,23,&rwd)
+#%T(144,0,24,23,&ffwd)
+#%T(115,0,24,23,prev)
+#%T(144,0,24,23,next)

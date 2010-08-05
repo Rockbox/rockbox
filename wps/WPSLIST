@@ -292,7 +292,7 @@ RSBS:
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 
 # Preferred font (including .fnt extension - leave blank for player):
-Font.320x480x16: 16-Adobe-Helvetica.fnt
+Font.320x480x16: 27-Adobe-Helvetica.fnt
 Font.320x240x16: 15-Adobe-Helvetica.fnt
 Font.240x400x16: 16-Adobe-Helvetica.fnt
 Font.240x320x16: 15-Adobe-Helvetica.fnt
