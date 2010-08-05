@@ -367,8 +367,9 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
 
 void ParseTreeModel::paramChanged(ParseTreeNode *param)
 {
-    QModelIndex index = indexFromPointer(param);
-    emit dataChanged(index, index);
+    QModelIndex left = indexFromPointer(param);
+    QModelIndex right = createIndex(left.row(), 2, left.internalPointer());
+    emit dataChanged(left, right);
 }
 
 QModelIndex ParseTreeModel::indexFromPointer(ParseTreeNode *p)
