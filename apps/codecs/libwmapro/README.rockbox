@@ -14,10 +14,7 @@ IMPORT DETAILS
 
 Based on ffmpeg svn r22886 dated 15 April 2010.
 
-The decoder now (17 July 2010) uses fixed point arithmetic everywhere. It still
-doesn't work on 3 targets, namely clip, c200v2 and m200v4 due to their small 
-codec buffer compared to wma pro's needs. 
-
-A comparison against ffmpeg floating point decoder gives :
-0.2~0.3%  max relative error
-0.005~0.01% average relative error
+The decoder is a heavily modified version of the original ffmpeg floating point
+implementation. It's been modified to use fixed point arithmetic and now plays
+and seeks on all the targets that Rockbox supports. Currently only supports mono
+and stereo streams, streams with more than 2 channels are not yet supported.
