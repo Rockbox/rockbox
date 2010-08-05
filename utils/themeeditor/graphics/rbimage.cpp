@@ -79,11 +79,6 @@ RBImage::~RBImage()
         delete image;
 }
 
-QRectF RBImage::boundingRect() const
-{
-    return size;
-}
-
 void RBImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget)
 {

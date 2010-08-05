@@ -40,7 +40,6 @@ public:
                   ParseTreeNode* node, bool pv = 0);
     virtual ~RBProgressBar();
 
-    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
@@ -50,7 +49,6 @@ protected:
 private:
     QPixmap* bitmap;
     QColor color;
-    QRectF size;
     QRectF renderSize;
 
     ParseTreeNode* node;

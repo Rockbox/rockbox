@@ -35,7 +35,6 @@ public:
                int artWidth, int artHeight, ParseTreeNode* node,
                char hAlign = 'c', char vAlign = 'c');
 
-    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
@@ -48,7 +47,6 @@ protected:
     void saveGeometry();
 
 private:
-    QRectF size;
     int artWidth;
     int artHeight;
     char hAlign;

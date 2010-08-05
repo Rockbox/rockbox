@@ -42,7 +42,10 @@ public:
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+    virtual QRectF boundingRect() const{ return size; }
 
 protected:
     virtual QVariant itemChange(GraphicsItemChange change,
@@ -50,7 +53,30 @@ protected:
     /* Responsible for updating the parse tree */
     virtual void saveGeometry() = 0;
 
-    bool geomChanged;
+    QRectF size;
+
+private:
+    static const double handleSize;
+
+    QRectF topLeftHandle();
+    QRectF topRightHandle();
+    QRectF bottomLeftHandle();
+    QRectF bottomRightHandle();
+
+    enum{
+        None,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    } dragMode;
+    QPointF dragStartPos;
+    QRectF dragStartSize;
+    QPointF dragStartClick;
+    double dHeightMin;
+    double dHeightMax;
+    double dWidthMin;
+    double dWidthMax;
 
 };
 

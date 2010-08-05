@@ -51,7 +51,6 @@ public:
     virtual ~RBViewport();
 
     QPainterPath shape() const;
-    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
@@ -91,7 +90,6 @@ private:
     void alignCenter();
     void alignRight();
 
-    QRectF size;
     RBFont* font;
     QColor foreground;
     QColor background;

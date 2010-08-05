@@ -161,11 +161,6 @@ QPainterPath RBViewport::shape() const
     return retval;
 }
 
-QRectF RBViewport::boundingRect() const
-{
-    return size;
-}
-
 void RBViewport::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

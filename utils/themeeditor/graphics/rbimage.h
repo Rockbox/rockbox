@@ -37,7 +37,6 @@ public:
     RBImage(const RBImage& other, QGraphicsItem* parent);
     virtual ~RBImage();
 
-    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
@@ -61,8 +60,6 @@ private:
     QPixmap* image;
     int tiles;
     int currentTile;
-
-    QRectF size;
 
     ParseTreeNode* node;
 

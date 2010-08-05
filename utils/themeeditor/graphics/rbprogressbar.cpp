@@ -103,11 +103,6 @@ RBProgressBar::~RBProgressBar()
         delete bitmap;
 }
 
-QRectF RBProgressBar::boundingRect() const
-{
-    return size;
-}
-
 void RBProgressBar::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget)

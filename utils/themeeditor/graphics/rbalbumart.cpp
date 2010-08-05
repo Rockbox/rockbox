@@ -28,21 +28,15 @@
 RBAlbumArt::RBAlbumArt(QGraphicsItem *parent, int x, int y, int maxWidth,
                        int maxHeight, int artWidth, int artHeight,
                        ParseTreeNode* node, char hAlign, char vAlign)
-                           : RBMovable(parent), size(0, 0, maxWidth,
-                                                     maxHeight),
-                           artWidth(artWidth), artHeight(artHeight),
-                           hAlign(hAlign), vAlign(vAlign),
+                           : RBMovable(parent),artWidth(artWidth),
+                           artHeight(artHeight), hAlign(hAlign), vAlign(vAlign),
                            texture(":/render/albumart.png"), node(node)
 {
+    size = QRectF(0, 0, maxWidth, maxHeight);
     setFlag(ItemSendsGeometryChanges, false);
 
     setPos(x, y);
     hide();
-}
-
-QRectF RBAlbumArt::boundingRect() const
-{
-    return size;
 }
 
 void RBAlbumArt::paint(QPainter *painter,
