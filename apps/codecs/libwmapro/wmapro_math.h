@@ -53,18 +53,17 @@
         lo; \
      })
      
-    /* Calculates: result = (X*Y)>>31 */
+    /* Calculates: result = (X*Y)>>31, loose 1 bit precision */
     #define fixmul31(X,Y) \
      ({ \
         int32_t lo; \
         int32_t hi; \
         asm volatile ( \
            "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
-           "mov   %[lo], %[lo], lsr #31    \n\t" /* lo >>= 31 */ \
-           "orr   %[lo], %[lo], %[hi], lsl #1"   /* lo |= (hi << 1) */ \
+           "mov   %[hi], %[hi], lsl #1"          /* hi <<= 1 */ \
            : [lo]"=&r"(lo), [hi]"=&r"(hi) \
            : [x]"r"(X), [y]"r"(Y)); \
-        lo; \
+        hi; \
      })
 #elif defined(CPU_COLDFIRE)
     /* Calculates: result = (X*Y)>>Z */
