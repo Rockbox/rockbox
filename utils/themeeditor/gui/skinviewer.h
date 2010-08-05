@@ -25,6 +25,8 @@
 #include <QWidget>
 #include <QGraphicsScene>
 
+#include "skindocument.h"
+
 namespace Ui {
     class SkinViewer;
 }
@@ -35,18 +37,22 @@ public:
     SkinViewer(QWidget *parent = 0);
     ~SkinViewer();
 
-    void setScene(QGraphicsScene* scene);
+    void connectSkin(SkinDocument* skin);
 
 public slots:
     void zoomIn();
     void zoomOut();
     void zoomEven();
 
+private slots:
+
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::SkinViewer *ui;
+
+    SkinDocument* doc;
 };
 
 #endif // SKINVIEWER_H

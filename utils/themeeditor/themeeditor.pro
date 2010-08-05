@@ -182,7 +182,8 @@ OTHER_FILES += README \
     resources/edit-paste.png \
     resources/edit-cut.png \
     resources/edit-copy.png \
-    resources/edit-find-replace.png
+    resources/edit-find-replace.png \
+    resources/applications-system.png
 FORMS += gui/editorwindow.ui \
     gui/preferencesdialog.ui \
     gui/configdocument.ui \

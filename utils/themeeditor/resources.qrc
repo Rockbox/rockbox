@@ -23,6 +23,7 @@
         <file>resources/edit-cut.png</file>
         <file>resources/edit-paste.png</file>
         <file>resources/edit-find-replace.png</file>
+        <file>resources/applications-system.png</file>
     </qresource>
     <qresource prefix="/render">
         <file alias="scenebg.png">resources/render/scenebg.png</file>

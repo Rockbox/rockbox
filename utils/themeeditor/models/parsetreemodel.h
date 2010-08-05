@@ -53,6 +53,8 @@ public:
     QString genCode();
     /* Changes the parse tree to a new document */
     QString changeTree(const char* document);
+
+    /* Model implementation stuff */
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
     QModelIndex parent(const QModelIndex &child) const;
     int rowCount(const QModelIndex &parent) const;
@@ -74,6 +76,8 @@ public:
             return fallback;
     }
 
+    void paramChanged(ParseTreeNode* param);
+    QModelIndex indexFromPointer(ParseTreeNode* p);
 
 private:
     ParseTreeNode* root;

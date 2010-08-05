@@ -428,7 +428,7 @@ void EditorWindow::shiftTab(int index)
         ui->actionCopy->setEnabled(false);
         ui->actionPaste->setEnabled(false);
         ui->actionFind_Replace->setEnabled(false);
-        viewer->setScene(0);
+        viewer->connectSkin(0);
     }
     else if(widget->type() == TabContent::Config)
     {
@@ -441,7 +441,7 @@ void EditorWindow::shiftTab(int index)
         ui->actionCopy->setEnabled(false);
         ui->actionPaste->setEnabled(false);
         ui->actionFind_Replace->setEnabled(false);
-        viewer->setScene(0);
+        viewer->connectSkin(0);
     }
     else if(widget->type() == TabContent::Skin)
     {
@@ -465,7 +465,8 @@ void EditorWindow::shiftTab(int index)
         sizeColumns();
 
         /* Syncing the preview */
-        viewer->setScene(doc->scene());
+        viewer->connectSkin(doc);
+
 
     }
 
@@ -513,7 +514,7 @@ void EditorWindow::closeProject()
             dynamic_cast<SkinDocument*>(doc)->setProject(project);
             if(i == ui->editorTabs->currentIndex())
             {
-                viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                viewer->connectSkin(dynamic_cast<SkinDocument*>(doc));
             }
         }
     }
@@ -630,7 +631,7 @@ void EditorWindow::configFileChanged(QString configFile)
                 dynamic_cast<SkinDocument*>(doc)->setProject(project);
                 if(i == ui->editorTabs->currentIndex())
                 {
-                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                    viewer->connectSkin(dynamic_cast<SkinDocument*>(doc));
                 }
             }
         }
@@ -858,7 +859,7 @@ void EditorWindow::loadProjectFile(QString fileName)
                 dynamic_cast<SkinDocument*>(doc)->setProject(project);
                 if(i == ui->editorTabs->currentIndex())
                 {
-                    viewer->setScene(dynamic_cast<SkinDocument*>(doc)->scene());
+                    viewer->connectSkin(dynamic_cast<SkinDocument*>(doc));
                 }
             }
         }

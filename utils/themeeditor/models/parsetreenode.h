@@ -34,9 +34,11 @@
 class ParseTreeNode
 {
 public:
-    ParseTreeNode(struct skin_element* data);
-    ParseTreeNode(struct skin_element* data, ParseTreeNode* parent);
-    ParseTreeNode(struct skin_tag_parameter* data, ParseTreeNode* parent);
+    ParseTreeNode(struct skin_element* data, ParseTreeModel* model);
+    ParseTreeNode(struct skin_element* data, ParseTreeNode* parent,
+                  ParseTreeModel* model);
+    ParseTreeNode(struct skin_tag_parameter* data, ParseTreeNode* parent,
+                  ParseTreeModel* model);
     virtual ~ParseTreeNode();
 
     QString genCode() const;
@@ -83,6 +85,8 @@ private:
     static int openConditionals;
     static bool breakFlag;
     QGraphicsItem* rendered;
+
+    ParseTreeModel* model;
 
 };
 

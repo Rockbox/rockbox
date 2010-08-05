@@ -54,9 +54,38 @@ void SkinViewer::changeEvent(QEvent *e)
     }
 }
 
-void SkinViewer::setScene(QGraphicsScene *scene)
+void SkinViewer::connectSkin(SkinDocument *skin)
 {
-    ui->viewer->setScene(scene);
+    if(skin)
+    {
+        ui->viewer->setScene(skin->scene());
+        QObject::connect(skin, SIGNAL(antiSync(bool)),
+                         ui->codeGenButton, SLOT(setEnabled(bool)));
+        QObject::connect(skin, SIGNAL(antiSync(bool)),
+                         ui->codeUndoButton, SLOT(setEnabled(bool)));
+
+        QObject::connect(ui->codeGenButton, SIGNAL(pressed()),
+                         skin, SLOT(genCode()));
+        QObject::connect(ui->codeUndoButton, SIGNAL(pressed()),
+                         skin, SLOT(parseCode()));
+
+        doc = skin;
+    }
+    else
+    {
+        ui->viewer->setScene(0);
+
+        doc = 0;
+    }
+
+    bool antiSync;
+    if(skin && !skin->isSynced())
+        antiSync = true;
+    else
+        antiSync = false;
+
+    ui->codeGenButton->setEnabled(antiSync);
+    ui->codeUndoButton->setEnabled(antiSync);
 }
 
 void SkinViewer::zoomIn()

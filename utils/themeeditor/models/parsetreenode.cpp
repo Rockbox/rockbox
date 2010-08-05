@@ -36,19 +36,21 @@ int ParseTreeNode::openConditionals = 0;
 bool ParseTreeNode::breakFlag = false;
 
 /* Root element constructor */
-ParseTreeNode::ParseTreeNode(struct skin_element* data)
-    : parent(0), element(0), param(0), children()
+ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeModel* model)
+    : parent(0), element(0), param(0), children(), model(model)
 {
     while(data)
     {
-        children.append(new ParseTreeNode(data, this));
+        children.append(new ParseTreeNode(data, this, model));
         data = data->next;
     }
 }
 
 /* Normal element constructor */
-ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
-    : parent(parent), element(data), param(0), children()
+ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent,
+                             ParseTreeModel* model)
+                                 : parent(parent), element(data), param(0),
+                                 children(), model(model)
 {
     switch(element->type)
     {
@@ -58,29 +60,30 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent)
         {
             if(element->params[i].type == skin_tag_parameter::CODE)
                 children.append(new ParseTreeNode(element->params[i].data.code,
-                                              this));
+                                              this, model));
             else
-                children.append(new ParseTreeNode(&element->params[i], this));
+                children.append(new ParseTreeNode(&element->params[i], this,
+                                                  model));
         }
         break;
 
     case CONDITIONAL:
         for(int i = 0; i < element->params_count; i++)
-            children.append(new ParseTreeNode(&data->params[i], this));
+            children.append(new ParseTreeNode(&data->params[i], this, model));
         for(int i = 0; i < element->children_count; i++)
-            children.append(new ParseTreeNode(data->children[i], this));
+            children.append(new ParseTreeNode(data->children[i], this, model));
         break;
 
     case LINE_ALTERNATOR:
         for(int i = 0; i < element->children_count; i++)
         {
-            children.append(new ParseTreeNode(data->children[i], this));
+            children.append(new ParseTreeNode(data->children[i], this, model));
         }
         break;
 
 case VIEWPORT:
         for(int i = 0; i < element->params_count; i++)
-            children.append(new ParseTreeNode(&data->params[i], this));
+            children.append(new ParseTreeNode(&data->params[i], this, model));
         /* Deliberate fall-through here */
 
     case LINE:
@@ -89,7 +92,7 @@ case VIEWPORT:
             for(struct skin_element* current = data->children[i]; current;
                 current = current->next)
             {
-                children.append(new ParseTreeNode(current, this));
+                children.append(new ParseTreeNode(current, this, model));
             }
         }
         break;
@@ -100,8 +103,10 @@ case VIEWPORT:
 }
 
 /* Parameter constructor */
-ParseTreeNode::ParseTreeNode(skin_tag_parameter *data, ParseTreeNode *parent)
-    : parent(parent), element(0), param(data), children()
+ParseTreeNode::ParseTreeNode(skin_tag_parameter *data, ParseTreeNode *parent,
+                             ParseTreeModel *model)
+                                 : parent(parent), element(0), param(data),
+                                 children(), model(model)
 {
 
 }
@@ -1084,6 +1089,8 @@ void ParseTreeNode::modParam(QVariant value, int index)
             param->type = skin_tag_parameter::INTEGER;
             param->data.number = value.toInt();
         }
+
+        model->paramChanged(this);
 
     }
 }

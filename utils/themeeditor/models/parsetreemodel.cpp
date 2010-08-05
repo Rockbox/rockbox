@@ -40,7 +40,7 @@ ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
     this->tree = skin_parse(document);
 
     if(tree)
-        this->root = new ParseTreeNode(tree);
+        this->root = new ParseTreeNode(tree, this);
     else
         this->root = 0;
 
@@ -77,7 +77,7 @@ QString ParseTreeModel::changeTree(const char *document)
         return error;
     }
 
-    ParseTreeNode* temp = new ParseTreeNode(test);
+    ParseTreeNode* temp = new ParseTreeNode(test, this);
 
     if(root)
     {
@@ -363,4 +363,18 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
         root->render(info);
 
     return scene;
+}
+
+void ParseTreeModel::paramChanged(ParseTreeNode *param)
+{
+    QModelIndex index = indexFromPointer(param);
+    emit dataChanged(index, index);
+}
+
+QModelIndex ParseTreeModel::indexFromPointer(ParseTreeNode *p)
+{
+    /* Recursively finding an index for an arbitrary pointer within the tree */
+    if(!p->getParent())
+        return QModelIndex();
+    return index(p->getRow(), 0, indexFromPointer(p->getParent()));
 }

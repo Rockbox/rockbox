@@ -311,8 +311,6 @@ void RBViewport::saveGeometry()
     node->modParam(static_cast<int>(origin.y()), baseParam + 1);
     node->modParam(static_cast<int>(bounds.width()), baseParam + 2);
     node->modParam(static_cast<int>(bounds.height()), baseParam + 3);
-
-    doc->genCode();
 }
 
 void RBViewport::alignLeft()
