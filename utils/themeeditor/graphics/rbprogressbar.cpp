@@ -21,14 +21,17 @@
 
 #include <QPainter>
 
+#include "parsetreenode.h"
 #include "rbprogressbar.h"
 #include "projectmodel.h"
 
 RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
-                             int paramCount, skin_tag_parameter *params,
-                             bool pv)
-                                 :RBMovable(parent)
+                             ParseTreeNode* node, bool pv)
+                                 :RBMovable(parent), node(node)
 {
+    int paramCount = node->getElement()->params_count;
+    skin_tag_parameter* params = node->getElement()->params;
+
     /* First we set everything to defaults */
     bitmap = 0;
     color = parent->getFGColor();
@@ -70,7 +73,7 @@ RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
             bitmap = 0;
         }
     }
-
+    size = QRectF(0, 0, w, h);
 
     /* Finally, we scale the width according to the amount played */
     int percent;
@@ -89,7 +92,7 @@ RBProgressBar::RBProgressBar(RBViewport *parent, const RBRenderInfo &info,
 
     w = w * percent / 100;
 
-    size = QRectF(0, 0, w, h);
+    renderSize = QRectF(0, 0, w, h);
     setPos(x, y);
     parent->addTextOffset(h);
 }
@@ -111,11 +114,11 @@ void RBProgressBar::paint(QPainter *painter,
 {
     if(bitmap && !bitmap->isNull())
     {
-        painter->drawPixmap(size, *bitmap, size);
+        painter->drawPixmap(renderSize, *bitmap, renderSize);
     }
     else
     {
-        painter->fillRect(size, color);
+        painter->fillRect(renderSize, color);
     }
 
     RBMovable::paint(painter, option, widget);
@@ -123,5 +126,14 @@ void RBProgressBar::paint(QPainter *painter,
 
 void RBProgressBar::saveGeometry()
 {
+    QPointF origin = pos();
+    QRectF bounds = boundingRect();
 
+    node->modParam(static_cast<int>(origin.x()), 0);
+    node->modParam(static_cast<int>(origin.y()), 1);
+    node->modParam(static_cast<int>(bounds.width()), 2);
+    node->modParam(static_cast<int>(bounds.height()), 3);
+
+    if(!bitmap)
+        node->modParam(QVariant(), 4);
 }

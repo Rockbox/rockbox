@@ -682,16 +682,14 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         {
         case 'b':
             /* %pb */
-            new RBProgressBar(viewport, info, element->params_count,
-                              element->params);
+            new RBProgressBar(viewport, info, this);
             return true;
 
         case 'v':
             /* %pv */
             if(element->params_count > 0)
             {
-                new RBProgressBar(viewport, info, element->params_count,
-                                  element->params, true);
+                new RBProgressBar(viewport, info, this, true);
                 return true;
             }
             else
@@ -1075,8 +1073,24 @@ void ParseTreeNode::modParam(QVariant value, int index)
 {
     if(element)
     {
-        if(index < 0 || index >= children.count())
+        if(index < 0)
             return;
+        while(index >= children.count())
+        {
+            /* Padding children with defaults until we make the necessary
+             * parameter available
+             */
+            skin_tag_parameter* newParam = new skin_tag_parameter;
+            newParam->type = skin_tag_parameter::DEFAULT;
+            /* We'll need to manually delete the extra parameters in the
+             * destructor
+             */
+            extraParams.append(children.count());
+
+            children.append(new ParseTreeNode(newParam, this, model));
+            element->params_count++;
+        }
+
         children[index]->modParam(value);
     }
     else if(param)

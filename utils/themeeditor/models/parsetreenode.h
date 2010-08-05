@@ -88,6 +88,8 @@ private:
 
     ParseTreeModel* model;
 
+    QList<int> extraParams;
+
 };
 
 #endif // PARSETREENODE_H

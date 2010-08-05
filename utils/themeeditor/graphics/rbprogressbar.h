@@ -31,11 +31,13 @@
 #include "devicestate.h"
 #include "skin_parser.h"
 
+class ParseTreeNode;
+
 class RBProgressBar : public RBMovable
 {
 public:
     RBProgressBar(RBViewport* parent, const RBRenderInfo& info,
-                  int paramCount, skin_tag_parameter* params, bool pv = 0);
+                  ParseTreeNode* node, bool pv = 0);
     virtual ~RBProgressBar();
 
     QRectF boundingRect() const;
@@ -49,6 +51,9 @@ private:
     QPixmap* bitmap;
     QColor color;
     QRectF size;
+    QRectF renderSize;
+
+    ParseTreeNode* node;
 
 };
 
