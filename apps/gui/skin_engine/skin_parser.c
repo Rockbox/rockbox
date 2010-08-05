@@ -232,27 +232,39 @@ static int parse_image_display(struct skin_element *element,
     char sublabel = text[1];
     int subimage;
     struct gui_img *img;
+    struct image_display *id = skin_buffer_alloc(sizeof(struct image_display));
 
     /* sanity check */
     img = find_image(label, wps_data);
-    if (!img)
+    if (!img || !id)
     {
         token->value.i = label; /* so debug works */
         return WPS_ERROR_INVALID_PARAM;
     }
-
-    if ((subimage = get_image_id(sublabel)) != -1)
+    id->label = label;
+    id->offset = 0;
+    
+    if (element->params_count > 1)
     {
-        if (subimage >= img->num_subimages)
-            return WPS_ERROR_INVALID_PARAM;
-
-        /* Store sub-image number to display in high bits */
-        token->value.i = label | (subimage << 8);
-        return 4; /* We have consumed 2 bytes */
-    } else {
-        token->value.i = label;
-        return 3; /* We have consumed 1 byte */
+        id->token = element->params[1].data.code->data;
+        if (element->params_count > 2)
+            id->offset = element->params[2].data.number;
     }
+    else
+    {
+        id->token = NULL;
+        if ((subimage = get_image_id(sublabel)) != -1)
+        {
+            if (subimage >= img->num_subimages)
+                return WPS_ERROR_INVALID_PARAM;
+            id->subimage = subimage;
+            token->value.i = label | (subimage << 8);
+        } else {
+            id->subimage = 0;
+        }
+    }
+    token->value.data = id;
+    return 0;
 }
 
 static int parse_image_load(struct skin_element *element,

@@ -320,10 +320,15 @@ Examples:
           \config{y}: y coordinate\newline
           \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
-    \config{\%xd(n[i])} & Display a preloaded image.
+    \config{\%xd(n[i] [,tag] [,offset])} & Display a preloaded image.
           \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\newline
-          \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
-          By default the first (i.e. top most) sub-image will be used.\\
+          \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52). 
+          (ignored when \config{tag} is used)
+          By default the first (i.e. top most) sub-image will be used.\newline
+          \config{tag}: (optional) Another tag to calculate the subimage from e.g \config{\%xd(A, \%mh)} would
+          use the first subimage when \config{\%mh} is on and the second when it is off\newline
+          \config{offset}}: (optional) Add this number to the value from the \config{tag} when 
+          chosing the subimage (may be negative)\\
   \end{tagmap}
 
 Examples:

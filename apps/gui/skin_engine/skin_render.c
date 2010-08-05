@@ -144,11 +144,36 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
         {
-            char n = token->value.i & 0xFF;
-            int subimage = token->value.i >> 8;
+            struct image_display *id = token->value.data;
+            char n = id->label;
             struct gui_img *img = find_image(n, data);
             if (img && img->loaded)
-                img->display = subimage;
+            {
+                if (id->token == NULL)
+                {
+                    img->display = id->subimage;
+                }
+                else
+                {
+                    char buf[16];
+                    const char *out;
+                    int a = TOKEN_VALUE_ONLY;
+                    out = get_token_value(gwps, id->token, buf, sizeof(buf), &a);
+                    /* NOTE: get_token_value() returns values starting at 1! */
+                    if (a == -1)
+                        a = (out && *out) ? 1 : 2;
+                    a--;
+                    a += id->offset;
+                    /* If the token returned a value which is higher than
+                     * the amount of subimages clear the image. */
+                    if (a<0 || a >= img->num_subimages)
+                    {
+                        clear_image_pos(gwps, img);
+                    }
+                    else
+                        img->display = a;
+                }
+            }
             break;
         }
 #ifdef HAVE_ALBUMART
@@ -230,7 +255,8 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
             /* clear all pictures in the conditional and nested ones */
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
-                struct gui_img *img = find_image(token->value.i&0xFF, data);
+                struct image_display *id = token->value.data;
+                struct gui_img *img = find_image(id->label, data);
                 clear_image_pos(gwps, img);
             }
             else if (token->type == SKIN_TOKEN_PEAKMETER)

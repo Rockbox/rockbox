@@ -49,6 +49,9 @@
 #define WPS_ALIGN_CENTER 64
 #define WPS_ALIGN_LEFT 128
 
+
+#define TOKEN_VALUE_ONLY 0xDEADD0D0
+
 #ifdef HAVE_ALBUMART
 
 /* albumart definitions */
@@ -80,6 +83,12 @@ struct gui_img {
     int display;
 };
 
+struct image_display {
+    char label;
+    int subimage;
+    struct wps_token *token; /* the token to get the subimage number from */
+    int offset; /* offset into the bitmap strip to start */
+};
 
 struct progressbar {
     enum skin_token_type type;

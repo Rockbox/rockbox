@@ -27,10 +27,10 @@
 %?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|>
 
 %al    %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr   
-%?mh<%xd(Aa)|%xd(Ab)>
+%xd(A, %mh)
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 %?ps<%xd(D)>
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
-%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+%xd(E, %mm, -1)
+%xd(F, %mp)
 %?C<%Cd>
