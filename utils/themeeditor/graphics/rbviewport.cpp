@@ -56,6 +56,10 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
         customUI = false;
         font = screen->getFont(1);
 
+        /* Making sure the default viewport can't be graphically manipulated */
+        setFlag(ItemIsSelectable, false);
+        setFlag(ItemIsMovable, false);
+
         if(info.model()->rowCount(QModelIndex()) > 1)
         {
             /* If there is more than one viewport in the document */
