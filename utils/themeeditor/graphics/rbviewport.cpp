@@ -48,8 +48,6 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
     leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0),
     node(pNode), doc(info.document())
 {
-    setFlags(ItemIsSelectable | ItemIsMovable | ItemSendsGeometryChanges);
-
     if(!node->tag)
     {
         /* Default viewport takes up the entire screen */

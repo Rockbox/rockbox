@@ -80,6 +80,8 @@ public:
     QModelIndex indexFromPointer(ParseTreeNode* p);
 
 private:
+    void setChildrenUnselectable(QGraphicsItem* root);
+
     ParseTreeNode* root;
     ParseTreeModel* sbsModel;
     struct skin_element* tree;

@@ -342,8 +342,9 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
                 sbsInfo = RBRenderInfo(sbsModel, project, doc, &settings,
                                        device, sbsScreen);
                 sbsModel->root->render(sbsInfo);
-            }
 
+                setChildrenUnselectable(sbsScreen);
+            }
         }
     }
 
@@ -383,4 +384,15 @@ QModelIndex ParseTreeModel::indexFromPointer(ParseTreeNode *p)
     if(!p->getParent())
         return QModelIndex();
     return index(p->getRow(), 0, indexFromPointer(p->getParent()));
+}
+
+void ParseTreeModel::setChildrenUnselectable(QGraphicsItem *root)
+{
+    root->setFlag(QGraphicsItem::ItemIsSelectable, false);
+    root->setFlag(QGraphicsItem::ItemIsMovable, false);
+
+    QList<QGraphicsItem*> children = root->children();
+    for(QList<QGraphicsItem*>::iterator i = children.begin()
+        ; i != children.end(); i++)
+        setChildrenUnselectable(*i);
 }
