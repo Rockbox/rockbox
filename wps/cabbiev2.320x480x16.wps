@@ -20,38 +20,38 @@
 
 %Cl(0,0,180,180,c,c)
 
-%?C<%Vd(c)%?Tl(1.5)<%Vd(t)%Vd(ffrwd)|%Vd(a)>|%Vd(b)>
-
+%?C<%Vd(c)%?Tl(2.0)<%Vd(t)|%Vd(d)>|%Vd(a)%?Tl(2.0)<%Vd(t)|%Vd(b)>>
 
 # track & next track info - no AA
-%Vl(b,0,50,-,-,-)
+%Vl(a,0,60,-,110,-)
 # tap on current title info for playlist (ie. where albumart would normally be)
 %T(70,0,180,180,playlist)
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %ac%?iy<%iy|>
-
+%Vl(b,0,200,-,140,-)
 %ac%?ig<%ig|>
 %ac%?fv<%(vbr%) |>%fb kbit/s %fc
 %s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>>
 %ac%Sx(Next Track:)
 %ac%s%?It<%It|%Fn>
-
+#
 # album art viewport
+#
 %Vl(c,70,50,180,180,-)
 # tap on the cover art for playlist
 %T(0,0,180,180,playlist)
 %Cd
 
 # current track info - AA
-%Vl(a,0,240,-,-,-)
+%Vl(d,0,240,-,-,-)
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
 # next track info - AA
-%Vl(a,0,338,-,-,-)
+%Vl(d,0,338,-,-,-)
 %?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
 
 # playtime
@@ -94,7 +94,7 @@
 #
 # ff/rewind button
 #
-%Vl(ffrwd,0,422,90,58,-)
+%Vl(t,0,422,90,58,-)
 %xd(H)%xd(I)
 %T(0,0,40,58,&rwd)
 %T(0,0,40,58,prev)
