@@ -29,10 +29,10 @@
 
 #include <QAbstractItemModel>
 #include <QList>
-#include <QGraphicsScene>
 
 #include "parsetreenode.h"
 #include "devicestate.h"
+#include "rbscene.h"
 
 class ParseTreeModel : public QAbstractItemModel
 {
@@ -64,8 +64,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
-    QGraphicsScene* render(ProjectModel* project, DeviceState* device,
-                           SkinDocument* doc, const QString* file = 0);
+    RBScene* render(ProjectModel* project, DeviceState* device,
+                    SkinDocument* doc, const QString* file = 0);
 
     static QString safeSetting(ProjectModel* project, QString key,
                                QString fallback)
@@ -85,7 +85,7 @@ private:
     ParseTreeNode* root;
     ParseTreeModel* sbsModel;
     struct skin_element* tree;
-    QGraphicsScene* scene;
+    RBScene* scene;
 };
 
 

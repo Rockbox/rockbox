@@ -107,7 +107,8 @@ HEADERS += models/parsetreemodel.h \
     gui/projectexporter.h \
     gui/targetdownloader.h \
     gui/syntaxcompleter.h \
-    graphics/rbmovable.h
+    graphics/rbmovable.h \
+    graphics/rbscene.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -149,7 +150,8 @@ SOURCES += main.cpp \
     gui/projectexporter.cpp \
     gui/targetdownloader.cpp \
     gui/syntaxcompleter.cpp \
-    graphics/rbmovable.cpp
+    graphics/rbmovable.cpp \
+    graphics/rbscene.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \

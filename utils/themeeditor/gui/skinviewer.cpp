@@ -69,11 +69,15 @@ void SkinViewer::connectSkin(SkinDocument *skin)
         QObject::connect(ui->codeUndoButton, SIGNAL(pressed()),
                          skin, SLOT(parseCode()));
 
+        QObject::connect(skin->scene(), SIGNAL(mouseMoved(QString)),
+                         ui->coordinateLabel, SLOT(setText(QString)));
+
         doc = skin;
     }
     else
     {
         ui->viewer->setScene(0);
+        ui->coordinateLabel->setText("");
 
         doc = 0;
     }

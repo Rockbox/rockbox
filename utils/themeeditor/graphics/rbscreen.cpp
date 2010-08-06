@@ -19,18 +19,23 @@
  *
  ****************************************************************************/
 
+#include "rbscene.h"
 #include "rbscreen.h"
 #include "rbviewport.h"
 #include "devicestate.h"
 
 #include <QPainter>
 #include <QFile>
+#include <QGraphicsSceneHoverEvent>
+#include <QGraphicsSceneMouseEvent>
 
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
                        :QGraphicsItem(parent), backdrop(0), project(project),
                        albumArt(0), customUI(0)
 {
+
+    setAcceptHoverEvents(true);
 
     if(remote)
     {
@@ -264,4 +269,14 @@ QColor RBScreen::stringToColor(QString str, QColor fallback)
 
     return retval;
 
+}
+
+void RBScreen::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    RBScene* s = dynamic_cast<RBScene*>(scene());
+    QPoint p = event->scenePos().toPoint();
+    s->moveMouse("(" + QString::number(p.x()) + ", "
+                 + QString::number(p.y()) + ")");
+
+    QGraphicsItem::hoverMoveEvent(event);
 }

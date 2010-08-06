@@ -44,7 +44,7 @@ ParseTreeModel::ParseTreeModel(const char* document, QObject* parent):
     else
         this->root = 0;
 
-    scene = new QGraphicsScene();
+    scene = new RBScene();
 }
 
 
@@ -272,7 +272,7 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
-QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
+RBScene* ParseTreeModel::render(ProjectModel* project,
                                        DeviceState* device,
                                        SkinDocument* doc, const QString* file)
 {

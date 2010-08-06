@@ -75,7 +75,7 @@ public:
 
     TabType type() const{ return Skin; }
 
-    QGraphicsScene* scene()
+    RBScene* scene()
     {
         return model->render(project, device, this, &fileName);
     }

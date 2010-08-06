@@ -88,6 +88,9 @@ public:
 
     void breakSBS();
 
+protected:
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+
 private:
     int width;
     int height;
