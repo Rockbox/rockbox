@@ -368,6 +368,15 @@ QGraphicsScene* ParseTreeModel::render(ProjectModel* project,
     if(root)
         root->render(info);
 
+//    /* Making sure the Custom UI Viewport can't be selected */
+//    if(sbsScreen)
+//    {
+//        sbsScreen->getCustomUI()->setFlag(QGraphicsItem::ItemIsSelectable,
+//                                          false);
+//        sbsScreen->getCustomUI()->setFlag(QGraphicsItem::ItemIsMovable,
+//                                          false);
+//    }
+//
     return scene;
 }
 

@@ -542,6 +542,9 @@ void ParseTreeNode::render(const RBRenderInfo& info)
 void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
                            bool noBreak)
 {
+    if(!element)
+        return;
+
     if(element->type == LINE)
     {
         for(int i = 0; i < children.count(); i++)

@@ -107,6 +107,8 @@ void RBProgressBar::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget)
 {
+    renderSize.setHeight(size.height());
+
     if(bitmap && !bitmap->isNull())
     {
         painter->drawPixmap(renderSize, *bitmap, renderSize);
