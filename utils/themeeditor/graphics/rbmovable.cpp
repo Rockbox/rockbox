@@ -23,6 +23,8 @@
 #include <QPainter>
 #include <QDebug>
 
+#include <cmath>
+
 #include "rbmovable.h"
 
 const double RBMovable::handleSize = 7;
@@ -63,10 +65,10 @@ QVariant RBMovable::itemChange(GraphicsItemChange change, const QVariant &value)
         QPointF pos = value.toPointF();
         QRectF bound = parentItem()->boundingRect();
 
-        pos.setX(qMax(0., pos.x()));
+        pos.setX(qMax(0., floor(pos.x())));
         pos.setX(qMin(pos.x(), bound.width() - boundingRect().width()));
 
-        pos.setY(qMax(0., pos.y()));
+        pos.setY(qMax(0., floor(pos.y())));
         pos.setY(qMin(pos.y(), bound.height() - boundingRect().height()));
 
 
@@ -172,7 +174,8 @@ void RBMovable::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     case TopLeft:
         /* Dragging from the top left corner */
         absPos = event->pos() + pos();
-        dMouse = absPos - dragStartClick;
+        dMouse = QPointF(floor(absPos.x() - dragStartClick.x()),
+                         floor(absPos.y() - dragStartClick.y()));
 
         dPos.setX(qMin(dMouse.x(), dWidthMax));
         dPos.setX(qMax(dPos.x(), dWidthMin));
@@ -192,7 +195,8 @@ void RBMovable::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     case TopRight:
         /* Dragging from the top right corner */
         absPos = event->pos() + pos();
-        dMouse = absPos - dragStartClick;
+        dMouse = QPointF(floor(absPos.x() - dragStartClick.x()),
+                         floor(absPos.y() - dragStartClick.y()));
 
         dPos.setX(qMin(dMouse.x(), dWidthMax));
         dPos.setX(qMax(dPos.x(), dWidthMin));
@@ -212,7 +216,8 @@ void RBMovable::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     case BottomLeft:
         /* Dragging from the bottom left corner */
         absPos = event->pos() + pos();
-        dMouse = absPos - dragStartClick;
+        dMouse = QPointF(floor(absPos.x() - dragStartClick.x()),
+                         floor(absPos.y() - dragStartClick.y()));
 
         dPos.setX(qMin(dMouse.x(), dWidthMax));
         dPos.setX(qMax(dPos.x(), dWidthMin));
@@ -230,7 +235,8 @@ void RBMovable::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     case BottomRight:
         /* Dragging from the bottom right corner */
         absPos = event->pos() + pos();
-        dMouse = absPos - dragStartClick;
+        dMouse = QPointF(floor(absPos.x() - dragStartClick.x()),
+                         floor(absPos.y() - dragStartClick.y()));
 
         dPos.setX(qMin(dMouse.x(), dWidthMax));
         dPos.setX(qMax(dPos.x(), dWidthMin));
