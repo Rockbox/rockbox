@@ -182,6 +182,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* True Audio */
     [AFMT_TTA] =
         AFMT_ENTRY("TTA",  "tta",   NULL,          "tta\0"      ),
+    /* WMA Voice in ASF */
+    [AFMT_WMAVOICE] =
+        AFMT_ENTRY("WMAVoice",  "wmavoice",     NULL,    "wma\0wmv\0asf\0"   ),
 #endif
 };
 
@@ -297,7 +300,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         }
 
         break;
-
+    
     case AFMT_WMA:
         if (!get_asf_metadata(fd, id3))
         {

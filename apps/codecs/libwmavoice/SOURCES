@@ -1,0 +1,17 @@
+acelp_filters.c
+acelp_vectors.c
+avfft.c
+bitstream.c
+celp_filters.c
+celp_math.c
+dct.c
+fft.c
+lsp.c
+mdct.c
+rdft.c
+utils.c
+wmavoice.c
+libavutil/log.c
+libavutil/lzo.c
+libavutil/mem.c
+libavutil/mathematics.c

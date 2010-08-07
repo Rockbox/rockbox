@@ -84,6 +84,7 @@ enum
     AFMT_VOX,          /* VOX */
     AFMT_WAVE64,       /* Wave64 */
     AFMT_TTA,          /* True Audio */
+    AFMT_WMAVOICE,     /* WMA Voice in ASF */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

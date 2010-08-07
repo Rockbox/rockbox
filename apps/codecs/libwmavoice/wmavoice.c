@@ -26,7 +26,7 @@
  */
 
 #include <math.h>
-#include "avcodec.h"
+#include "wmavoice.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "wmavoice_data.h"
@@ -286,6 +286,10 @@ typedef struct {
      */
 } WMAVoiceContext;
 
+/* global decode context */
+static WMAVoiceContext globWMAVoiceCtx;
+
+
 /**
  * Set up the variable bit mode (VBM) tree from container extradata.
  * @param gb bit I/O context.
@@ -330,9 +334,10 @@ static av_cold int decode_vbmtree(GetBitContext *gb, int8_t vbm_tree[25])
 /**
  * Set up decoder with parameters from demuxer (extradata etc.).
  */
-static av_cold int wmavoice_decode_init(AVCodecContext *ctx)
+av_cold int wmavoice_decode_init(AVCodecContext *ctx)
 {
     int n, flags, pitch_range, lsp16_flag;
+    ctx->priv_data = &globWMAVoiceCtx;
     WMAVoiceContext *s = ctx->priv_data;
 
     /**
@@ -1743,7 +1748,7 @@ static int synth_superframe(AVCodecContext *ctx,
      * the wild yet. */
     if (!get_bits1(gb)) {
         av_log_missing_feature(ctx, "WMAPro-in-WMAVoice support", 1);
-        return -1;
+        return ERROR_WMAPRO_IN_WMAVOICE;
     }
 
     /* (optional) nr. of samples in superframe; always <= 480 and >= 0 */
@@ -1893,7 +1898,7 @@ static void copy_bits(PutBitContext *pb,
  *
  * For more information about frames, see #synth_superframe().
  */
-static int wmavoice_decode_packet(AVCodecContext *ctx, void *data,
+int wmavoice_decode_packet(AVCodecContext *ctx, void *data,
                                   int *data_size, AVPacket *avpkt)
 {
     WMAVoiceContext *s = ctx->priv_data;
@@ -1936,6 +1941,15 @@ static int wmavoice_decode_packet(AVCodecContext *ctx, void *data,
                 s->sframe_cache_size += s->spillover_nbits;
                 if ((res = synth_superframe(ctx, data, data_size)) == 0 &&
                     *data_size > 0) {
+                    /* convert the float values to int32 for rockbox */
+                    int i;
+                    int32_t *iptr = data;
+                    float   *fptr = data;
+                    for(i = 0; i < *data_size/sizeof(float); i++)
+                    {
+                        fptr[i] *= (float)(INT32_MAX);
+                        iptr[i] = (int32_t)fptr[i];
+                    }
                     cnt += s->spillover_nbits;
                     s->skip_bits_next = cnt & 7;
                     return cnt >> 3;
@@ -1957,12 +1971,21 @@ static int wmavoice_decode_packet(AVCodecContext *ctx, void *data,
     } else if (*data_size > 0) {
         int cnt = get_bits_count(gb);
         s->skip_bits_next = cnt & 7;
+        /* convert the float values to int32 for rockbox */
+        int i;
+        int32_t *iptr = data;
+        float   *fptr = data;
+        for(i = 0; i < *data_size/sizeof(float); i++)
+        {
+            fptr[i] *= (float)(INT32_MAX);
+            iptr[i] = (int32_t)fptr[i];
+        }
         return cnt >> 3;
     } else if ((s->sframe_cache_size = pos) > 0) {
         /* rewind bit reader to start of last (incomplete) superframe... */
         init_get_bits(gb, avpkt->data, size << 3);
         skip_bits_long(gb, (size << 3) - pos);
-        assert(get_bits_left(gb) == pos);
+        //assert(get_bits_left(gb) == pos);
 
         /* ...and cache it for spillover in next packet */
         init_put_bits(&s->pb, s->sframe_cache, SFRAME_CACHE_MAXSIZE);

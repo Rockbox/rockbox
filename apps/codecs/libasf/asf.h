@@ -7,6 +7,7 @@
 #define ASF_CODEC_ID_WMAV1      0x160
 #define ASF_CODEC_ID_WMAV2      0x161
 #define ASF_CODEC_ID_WMAPRO     0x162
+#define ASF_CODEC_ID_WMAVOICE   0x00A
 
 enum asf_error_e {
     ASF_ERROR_INTERNAL       = -1,  /* incorrect input to API calls */
@@ -33,7 +34,7 @@ struct asf_waveformatex_s {
     uint16_t bitspersample;
     uint16_t datalen;
     uint16_t numpackets;
-    uint8_t data[18];
+    uint8_t data[46];
 };
 typedef struct asf_waveformatex_s asf_waveformatex_t;
 
