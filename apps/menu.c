@@ -341,6 +341,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     const struct menu_item_ex *temp, *menu;
     int ret = 0, i;
     bool redraw_lists;
+    int old_audio_status = audio_status();
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, !hide_theme, NULL);
 
@@ -380,6 +381,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #endif
     while (!done)
     {
+        int new_old_audio_statusus;
         redraw_lists = false;
         if (!hide_theme)
         {
@@ -389,6 +391,15 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         }
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
+
+        /* query audio status to see if it changed */
+        new_old_audio_statusus = audio_status();
+        if (old_audio_status != new_old_audio_statusus)
+        {   /* force a redraw if anything changed the audio status
+             * from outside */
+            redraw_lists = true;
+            old_audio_status = new_old_audio_statusus;
+        }
         /* HZ so the status bar redraws corectly */
 
         if (menu_callback)
@@ -409,8 +420,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         }
 
         if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
-            continue;
-        if (action == ACTION_NONE)
             continue;
 #ifdef HAVE_QUICKSCREEN
         else if (action == ACTION_STD_QUICKSCREEN)

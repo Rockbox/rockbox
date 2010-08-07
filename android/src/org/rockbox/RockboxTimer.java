@@ -24,6 +24,8 @@ package org.rockbox;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class RockboxTimer extends Timer 
@@ -33,24 +35,42 @@ public class RockboxTimer extends Timer
 	
 	private class RockboxTimerTask extends TimerTask {
 		private RockboxTimer t;
-		public RockboxTimerTask(RockboxTimer parent) {
+		private TelephonyManager tm;
+		private int last_state;
+		public RockboxTimerTask(RockboxService s, RockboxTimer parent) {
 			super();
 			t = parent;
+			tm = (TelephonyManager)s.getSystemService(Context.TELEPHONY_SERVICE);
+			last_state = tm.getCallState();
 		}
 
 		@Override
 		public void run() {
 			timerTask();
+			int state = tm.getCallState();
+			if (state != last_state)
+			{
+				switch (state) {
+				case TelephonyManager.CALL_STATE_IDLE:
+					postCallHungUp();
+					break;
+				case TelephonyManager.CALL_STATE_RINGING:
+					postCallIncoming();
+				default:
+					break;
+				}
+				last_state = state;
+			}
 			synchronized(t) {
 				t.notify();
 			}
 		}
 	}
 	
-	public RockboxTimer(long period_inverval_in_ms)
+	public RockboxTimer(RockboxService instance, long period_inverval_in_ms)
 	{
 		super("tick timer", false);
-		task = new RockboxTimerTask(this);
+		task = new RockboxTimerTask(instance, this);
 		schedule(task, 0, period_inverval_in_ms);
 		interval = period_inverval_in_ms;
 	}
@@ -75,4 +95,6 @@ public class RockboxTimer extends Timer
     	}
     }
 	public native void timerTask();
+	private native void postCallIncoming();
+	private native void postCallHungUp();
 }
