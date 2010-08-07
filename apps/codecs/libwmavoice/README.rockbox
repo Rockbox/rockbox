@@ -1,0 +1,23 @@
+Library: libwmavoice
+Imported: 2010-08-07 by Mohamed Tarek
+
+This set of files form the files needed from ffmpeg's libavcodec and libavutil
+to build a standalone wma voice decoder.
+
+LICENSING INFORMATION
+
+ffmpeg is licensed under the Lesser GNU General Public License and the file
+wmavoice.c is copyright (c) 2009 Ronald S. Bultje.
+
+IMPORT DETAILS
+
+Based on ffmpeg svn r24734 dated 7 August 2010.
+
+As of 7 August 2010, libwmavoice contains just the files from ffmpeg with 
+minimum modifications to comile standalone. The decoder isn't still used in 
+rockbox in anyway.
+
+COMPILING
+
+the decoder can be compiled by issuing the "make" command from witin the 
+libwmavoice directory in any unix-line environment.

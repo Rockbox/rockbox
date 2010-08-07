@@ -39,7 +39,7 @@ av_cold void ff_kbd_window_init(float *window, float alpha, int n)
    double local_window[FF_KBD_WINDOW_MAX];
    double alpha2 = (alpha * M_PI / n) * (alpha * M_PI / n);
 
-   assert(n <= FF_KBD_WINDOW_MAX);
+   //assert(n <= FF_KBD_WINDOW_MAX);
 
    for (i = 0; i < n; i++) {
        tmp = i * (n - i) * alpha2;

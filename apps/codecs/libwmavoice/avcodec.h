@@ -1114,7 +1114,7 @@ typedef struct AVCodecContext {
      * - encoding: MUST be set by user.
      * - decoding: Set by libavcodec.
      */
-    AVRational time_base;
+    //AVRational time_base;
 
     /* video only */
     /**
@@ -1142,7 +1142,7 @@ typedef struct AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by user if known, overridden by libavcodec if known
      */
-    enum PixelFormat pix_fmt;
+    //enum PixelFormat pix_fmt;
 
     /**
      * Frame rate emulation. If not zero, the lower layer (i.e. format handler)
@@ -1693,7 +1693,7 @@ typedef struct AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
      */
-    AVRational sample_aspect_ratio;
+    //AVRational sample_aspect_ratio;
 
     /**
      * the picture in the bitstream
@@ -2738,8 +2738,8 @@ typedef struct AVCodec {
      * Will be called when seeking
      */
     void (*flush)(AVCodecContext *);
-    const AVRational *supported_framerates; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
-    const enum PixelFormat *pix_fmts;       ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
+    //const AVRational *supported_framerates; ///< array of supported framerates, or NULL if any, array is terminated by {0,0}
+    //const enum PixelFormat *pix_fmts;       ///< array of supported pixel formats, or NULL if unknown, array is terminated by -1
     /**
      * Descriptive name for the codec, meant to be more human readable than name.
      * You should use the NULL_IF_CONFIG_SMALL() macro to define it.
@@ -2781,7 +2781,7 @@ typedef struct AVHWAccel {
      *
      * Only hardware accelerated formats are supported here.
      */
-    enum PixelFormat pix_fmt;
+    //enum PixelFormat pix_fmt;
 
     /**
      * Hardware accelerated codec capabilities.
@@ -3976,7 +3976,7 @@ attribute_deprecated int av_parse_video_frame_size(int *width_ptr, int *height_p
  *
  * @deprecated Deprecated in favor of av_parse_video_rate().
  */
-attribute_deprecated int av_parse_video_frame_rate(AVRational *frame_rate, const char *str);
+//attribute_deprecated int av_parse_video_frame_rate(AVRational *frame_rate, const char *str);
 #endif
 
 /**

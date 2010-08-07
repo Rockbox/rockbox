@@ -66,7 +66,7 @@ void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 
     if(length==0) return;
 
-    if(CONFIG_SMALL || words < 16 || put_bits_count(pb)&7){
+    if(/*CONFIG_SMALL ||*/ words < 16 || put_bits_count(pb)&7){
         for(i=0; i<words; i++) put_bits(pb, 16, AV_RB16(src + 2*i));
     }else{
         for(i=0; put_bits_count(pb)&31; i++)

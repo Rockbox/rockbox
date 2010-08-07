@@ -45,7 +45,7 @@ void ff_acelp_interpolate(int16_t* out, const int16_t* in,
 {
     int n, i;
 
-    assert(frac_pos >= 0 && frac_pos < precision);
+    //assert(frac_pos >= 0 && frac_pos < precision);
 
     for (n = 0; n < length; n++) {
         int idx = 0;
