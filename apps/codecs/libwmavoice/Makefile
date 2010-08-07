@@ -31,7 +31,6 @@ get_bits.h\
 wmavoice_data.h\
 avcodec.h\
 fft.h\
-dsputil.h\
 acelp_filters.h\
 celp_filters.h\
 put_bits.h\
