@@ -381,7 +381,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #endif
     while (!done)
     {
-        int new_old_audio_statusus;
+        int new_audio_status;
         redraw_lists = false;
         if (!hide_theme)
         {
@@ -393,12 +393,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                             list_do_action_timeout(&lists, HZ));
 
         /* query audio status to see if it changed */
-        new_old_audio_statusus = audio_status();
-        if (old_audio_status != new_old_audio_statusus)
+        new_audio_status = audio_status();
+        if (old_audio_status != new_audio_status)
         {   /* force a redraw if anything changed the audio status
              * from outside */
             redraw_lists = true;
-            old_audio_status = new_old_audio_statusus;
+            old_audio_status = new_audio_status;
         }
         /* HZ so the status bar redraws corectly */
 
