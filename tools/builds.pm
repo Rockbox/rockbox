@@ -293,7 +293,7 @@ $releasenotes="/wiki/ReleaseNotes36";
     },
     'hd200' => {
         name => 'MPIO HD200',
-        status => 1,
+        status => 2,
     },
 );
 
