@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "backlight.h"
+#include "backlight-target.h"
 #include "lcd.h"
 
 void _backlight_on(void)

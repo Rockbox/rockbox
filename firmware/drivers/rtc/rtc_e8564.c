@@ -109,6 +109,7 @@ int rtc_write_datetime(const struct tm *tm)
     return 1;
 }
 
+#ifdef HAVE_RTC_ALARM
 void rtc_set_alarm(int h, int m)
 {
     unsigned char buf[4] = {0};
@@ -222,4 +223,5 @@ bool rtc_check_alarm_flag(void)
 
     return (tmp & RTC_AF);
 }
+#endif /* HAVE_RTC_ALARM */
 

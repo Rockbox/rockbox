@@ -23,6 +23,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "debug.h"
+#include "filefuncs.h"
 
 #ifdef HAVE_MULTIVOLUME
 /* returns on which volume this is, and copies the reduced name
