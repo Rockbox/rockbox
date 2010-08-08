@@ -69,6 +69,8 @@ environment = os.environ
 progexe = ""
 make = "make"
 programfiles = []
+nsisscript = ""
+nsissetup = ""
 
 svnserver = ""
 # Paths and files to retrieve from svn when creating a tarball.
@@ -90,6 +92,8 @@ def usage(myself):
     print "       -a, --add=<file>      add file to build folder before building"
     print "       -s, --source-only     only create source archive"
     print "       -b, --binary-only     only create binary archive"
+    if nsisscript != "":
+        print "       -n, --makensis=<file> path to makensis for building Windows setup program."
     if sys.platform != "darwin":
         print "       -d, --dynamic         link dynamically instead of static"
     print "       -k, --keep-temp       keep temporary folder on build failure"
@@ -235,6 +239,28 @@ def upxfile(wd="."):
     return 0
 
 
+def runnsis(versionstring, nsis, srcfolder):
+    # run script through nsis to create installer.
+    print "Running NSIS ..."
+    # Assume the generated installer gets placed in the same folder the nsi
+    # script lives in.  This seems to be a valid assumption unless the nsi
+    # script specifies a path. NSIS expects files relative to source folder so
+    # copy the relevant binaries.
+    for f in programfiles:
+        b = srcfolder + "/" + os.path.dirname(nsisscript) + "/" + os.path.dirname(f)
+        if not os.path.exists(b):
+            os.mkdir(b)
+        shutil.copy(srcfolder + "/" + f, b)
+    output = subprocess.Popen([nsis, srcfolder + "/" + nsisscript], stdout=subprocess.PIPE)
+    output.communicate()
+    if not output.returncode == 0:
+        print "NSIS failed!"
+        return -1
+    setupfile = program + "-" + versionstring + "-setup.exe"
+    shutil.copy(srcfolder + "/" + nsissetup, setupfile)
+    return 0
+
+
 def zipball(versionstring, buildfolder):
     '''package created binary'''
     print "Creating binary zipball."
@@ -345,8 +371,8 @@ def deploy():
     startup = time.time()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:sbdkh",
-            ["qmake=", "project=", "tag=", "add=", "source-only", "binary-only", "dynamic", "keep-temp", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:n:sbdkh",
+            ["qmake=", "project=", "tag=", "add=", "makensis=", "source-only", "binary-only", "dynamic", "keep-temp", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -360,6 +386,7 @@ def deploy():
     binary = True
     source = True
     keeptemp = False
+    makensis = ""
     if sys.platform != "darwin":
         static = True
     else:
@@ -375,6 +402,8 @@ def deploy():
             svnbase = svnserver + "tags/" + tag + "/"
         if o in ("-a", "--add"):
             addfiles.append(a)
+        if o in ("-n", "--makensis"):
+            makensis = a
         if o in ("-s", "--source-only"):
             binary = False
         if o in ("-b", "--binary-only"):
@@ -461,6 +490,7 @@ def deploy():
     if not build(sourcefolder) == 0:
         tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
+    buildtime = time.time() - buildstart
     if sys.platform == "win32":
         if useupx == True:
             if not upxfile(sourcefolder) == 0:
@@ -473,6 +503,8 @@ def deploy():
         if os.uname()[4].endswith("64"):
             ver += "-64bit"
         archive = tarball(ver, sourcefolder)
+    if nsisscript != "" and makensis != "":
+        runnsis(ver, makensis, sourcefolder)
 
     # remove temporary files
     tempclean(workfolder, cleanup)
@@ -484,11 +516,10 @@ def deploy():
         filestats(archivename)
     filestats(archive)
     duration = time.time() - startup
-    building = time.time() - buildstart
     durmins = (int)(duration / 60)
     dursecs = (int)(duration % 60)
-    buildmins = (int)(building / 60)
-    buildsecs = (int)(building % 60)
+    buildmins = (int)(buildtime / 60)
+    buildsecs = (int)(buildtime % 60)
     print "Overall time %smin %ssec, building took %smin %ssec." % \
         (durmins, dursecs, buildmins, buildsecs)
 
