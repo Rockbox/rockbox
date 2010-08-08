@@ -178,7 +178,7 @@ struct ftl_cxt_type
     /* Seems to be unused, but gets loaded from flash by Whimory. */
     uint8_t field_130[0x15C];
 
-} __attribute__((packed)) FTLCxtType;
+} __attribute__((packed));
 
 
 /* Keeps the state of the bank's VFL, both on flash and in memory.
@@ -363,54 +363,54 @@ const struct nand_device_info_type* ftl_nand_type;
 uint32_t ftl_banks;
 
 /* Block map, used vor pBlock to vBlock mapping */
-uint16_t ftl_map[0x2000];
+static uint16_t ftl_map[0x2000];
 
 /* VFL context for each bank */
-struct ftl_vfl_cxt_type ftl_vfl_cxt[4];
+static struct ftl_vfl_cxt_type ftl_vfl_cxt[4];
 
 /* FTL context */
-struct ftl_cxt_type ftl_cxt;
+static struct ftl_cxt_type ftl_cxt;
 
 /* Temporary data buffers for internal use by the FTL */
-uint8_t ftl_buffer[0x800] STORAGE_ALIGN_ATTR;
+static uint8_t ftl_buffer[0x800] STORAGE_ALIGN_ATTR;
 
 /* Temporary spare byte buffer for internal use by the FTL */
-union ftl_spare_data_type ftl_sparebuffer[FTL_WRITESPARE_SIZE] STORAGE_ALIGN_ATTR;
+static union ftl_spare_data_type ftl_sparebuffer[FTL_WRITESPARE_SIZE] STORAGE_ALIGN_ATTR;
 
 
 #ifndef FTL_READONLY
 
 /* Lowlevel BBT for each bank */
-uint8_t ftl_bbt[4][0x410];
+static uint8_t ftl_bbt[4][0x410];
 
 /* Erase counters for the vBlocks */
-uint16_t ftl_erasectr[0x2000];
+static uint16_t ftl_erasectr[0x2000];
 
 /* Used by ftl_log */
-uint16_t ftl_offsets[0x11][0x200];
+static uint16_t ftl_offsets[0x11][0x200];
 
 /* Structs keeping record of scattered page blocks */
-struct ftl_log_type ftl_log[0x11];
+static struct ftl_log_type ftl_log[0x11];
 
 /* Global cross-bank update sequence number of the VFL context */
-uint32_t ftl_vfl_usn;
+static uint32_t ftl_vfl_usn;
 
 /* Keeps track (temporarily) of troublesome blocks */
-struct ftl_trouble_type ftl_troublelog[5];
+static struct ftl_trouble_type ftl_troublelog[5];
 
 /* Counts erase counter page changes, after 100 of them the affected
    page will be committed to the flash. */
-uint8_t ftl_erasectr_dirt[8];
+static uint8_t ftl_erasectr_dirt[8];
 
 /* Buffer needed for copying pages around while moving or committing blocks.
    This can't be shared with ftl_buffer, because this one could be overwritten
    during the copying operation in order to e.g. commit a CXT. */
-uint8_t ftl_copybuffer[FTL_COPYBUF_SIZE][0x800] STORAGE_ALIGN_ATTR;
-union ftl_spare_data_type ftl_copyspare[FTL_COPYBUF_SIZE] STORAGE_ALIGN_ATTR;
+static uint8_t ftl_copybuffer[FTL_COPYBUF_SIZE][0x800] STORAGE_ALIGN_ATTR;
+static union ftl_spare_data_type ftl_copyspare[FTL_COPYBUF_SIZE] STORAGE_ALIGN_ATTR;
 
 /* Needed to store the old scattered page offsets in order to be able to roll
    back if something fails while compacting a scattered page block. */
-uint16_t ftl_offsets_backup[0x200] STORAGE_ALIGN_ATTR;
+static uint16_t ftl_offsets_backup[0x200] STORAGE_ALIGN_ATTR;
 
 #endif
 
@@ -421,7 +421,7 @@ static struct mutex ftl_mtx;
 
 /* Finds a device info page for the specified bank and returns its number.
    Used to check if one is present, and to read the lowlevel BBT. */
-uint32_t ftl_find_devinfo(uint32_t bank)
+static uint32_t ftl_find_devinfo(uint32_t bank)
 {
     /* Scan the last 10% of the flash for device info pages */
     uint32_t lowestBlock = ftl_nand_type->blocks
@@ -445,7 +445,7 @@ uint32_t ftl_find_devinfo(uint32_t bank)
 
 
 /* Checks if all banks have proper device info pages */
-uint32_t ftl_has_devinfo(void)
+static uint32_t ftl_has_devinfo(void)
 {
     uint32_t i;
     for (i = 0; i < ftl_banks; i++) if (ftl_find_devinfo(i) == 0) return 0;
@@ -455,7 +455,7 @@ uint32_t ftl_has_devinfo(void)
 
 /* Loads the lowlevel BBT for a bank to the specified buffer.
    This is based on some cryptic disassembly and not fully understood yet. */
-uint32_t ftl_load_bbt(uint32_t bank, uint8_t* bbt)
+static uint32_t ftl_load_bbt(uint32_t bank, uint8_t* bbt)
 {
     uint32_t i, j;
     uint32_t pagebase, page = ftl_find_devinfo(bank), page2;
@@ -489,8 +489,8 @@ uint32_t ftl_load_bbt(uint32_t bank, uint8_t* bbt)
 
 
 /* Calculates the checksums for the VFL context page of the specified bank */
-void ftl_vfl_calculate_checksum(uint32_t bank,
-                                uint32_t* checksum1, uint32_t* checksum2)
+static void ftl_vfl_calculate_checksum(uint32_t bank,
+                                       uint32_t* checksum1, uint32_t* checksum2)
 {
     uint32_t i;
     *checksum1 = 0xAABBCCDD;
@@ -505,7 +505,7 @@ void ftl_vfl_calculate_checksum(uint32_t bank,
 
 /* Checks if the checksums of the VFL context
    of the specified bank are correct */
-uint32_t ftl_vfl_verify_checksum(uint32_t bank)
+static uint32_t ftl_vfl_verify_checksum(uint32_t bank)
 {
     uint32_t checksum1, checksum2;
     ftl_vfl_calculate_checksum(bank, &checksum1, &checksum2);
@@ -520,7 +520,7 @@ uint32_t ftl_vfl_verify_checksum(uint32_t bank)
 
 #ifndef FTL_READONLY
 /* Updates the checksums of the VFL context of the specified bank */
-void ftl_vfl_update_checksum(uint32_t bank)
+static void ftl_vfl_update_checksum(uint32_t bank)
 {
     ftl_vfl_calculate_checksum(bank, &ftl_vfl_cxt[bank].checksum1,
                                &ftl_vfl_cxt[bank].checksum2);
@@ -531,7 +531,7 @@ void ftl_vfl_update_checksum(uint32_t bank)
 #ifndef FTL_READONLY
 /* Writes 8 copies of the VFL context of the specified bank to flash,
    and succeeds if at least 4 can be read back properly. */
-uint32_t ftl_vfl_store_cxt(uint32_t bank)
+static uint32_t ftl_vfl_store_cxt(uint32_t bank)
 {
     uint32_t i;
     ftl_vfl_cxt[bank].updatecount--;
@@ -575,7 +575,7 @@ uint32_t ftl_vfl_store_cxt(uint32_t bank)
 #ifndef FTL_READONLY
 /* Commits the VFL context of the specified bank to flash,
    retries until it works or all available pages have been tried */
-uint32_t ftl_vfl_commit_cxt(uint32_t bank)
+static uint32_t ftl_vfl_commit_cxt(uint32_t bank)
 {
     if (ftl_vfl_cxt[bank].nextcxtpage + 8 <= ftl_nand_type->pagesperblock)
         if (ftl_vfl_store_cxt(bank) == 0) return 0;
@@ -604,7 +604,7 @@ uint32_t ftl_vfl_commit_cxt(uint32_t bank)
 /* Returns a pointer to the most recently updated VFL context,
    used to find out the current FTL context vBlock numbers
    (planetbeing's "maxthing") */
-struct ftl_vfl_cxt_type* ftl_vfl_get_newest_cxt(void)
+static struct ftl_vfl_cxt_type* ftl_vfl_get_newest_cxt(void)
 {
     uint32_t i, maxusn;
     struct ftl_vfl_cxt_type* cxt = (struct ftl_vfl_cxt_type*)0;
@@ -621,7 +621,7 @@ struct ftl_vfl_cxt_type* ftl_vfl_get_newest_cxt(void)
 
 /* Checks if the specified pBlock is marked bad in the supplied lowlevel BBT.
    Only used while mounting the VFL. */
-uint32_t ftl_is_good_block(uint8_t* bbt, uint32_t block)
+static uint32_t ftl_is_good_block(uint8_t* bbt, uint32_t block)
 {
     if ((bbt[block >> 3] & (1 << (block & 7))) == 0) return 0;
     else return 1;
@@ -629,7 +629,7 @@ uint32_t ftl_is_good_block(uint8_t* bbt, uint32_t block)
 
 
 /* Checks if the specified vBlock could be remapped */
-uint32_t ftl_vfl_is_good_block(uint32_t bank, uint32_t block)
+static uint32_t ftl_vfl_is_good_block(uint32_t bank, uint32_t block)
 {
     uint8_t bbtentry = ftl_vfl_cxt[bank].bbt[block >> 6];
     if ((bbtentry & (1 << ((7 - (block >> 3)) & 7))) == 0) return 0;
@@ -640,7 +640,7 @@ uint32_t ftl_vfl_is_good_block(uint32_t bank, uint32_t block)
 #ifndef FTL_READONLY
 /* Sets or unsets the bad bit of the specified vBlock
    in the specified bank's VFL context */
-void ftl_vfl_set_good_block(uint32_t bank, uint32_t block, uint32_t isgood)
+static void ftl_vfl_set_good_block(uint32_t bank, uint32_t block, uint32_t isgood)
 {
     uint8_t bit = (1 << ((7 - (block >> 3)) & 7));
     if (isgood == 1) ftl_vfl_cxt[bank].bbt[block >> 6] |= bit;
@@ -650,9 +650,9 @@ void ftl_vfl_set_good_block(uint32_t bank, uint32_t block, uint32_t isgood)
 
 
 /* Tries to read a VFL context from the specified bank, pBlock and page */
-uint32_t ftl_vfl_read_page(uint32_t bank, uint32_t block,
-                           uint32_t startpage, void* databuffer,
-                           union ftl_spare_data_type* sparebuffer)
+static uint32_t ftl_vfl_read_page(uint32_t bank, uint32_t block,
+                                  uint32_t startpage, void* databuffer,
+                                  union ftl_spare_data_type* sparebuffer)
 {
     uint32_t i;
     for (i = 0; i < 8; i++)
@@ -670,7 +670,7 @@ uint32_t ftl_vfl_read_page(uint32_t bank, uint32_t block,
 
 
 /* Translates a bank and vBlock to a pBlock, following remaps */
-uint32_t ftl_vfl_get_physical_block(uint32_t bank, uint32_t block)
+static uint32_t ftl_vfl_get_physical_block(uint32_t bank, uint32_t block)
 {
     if (ftl_vfl_is_good_block(bank, block) == 1) return block;
 
@@ -685,7 +685,7 @@ uint32_t ftl_vfl_get_physical_block(uint32_t bank, uint32_t block)
 
 #ifndef FTL_READONLY
 /* Checks if remapping is scheduled for the specified bank and vBlock */
-uint32_t ftl_vfl_check_remap_scheduled(uint32_t bank, uint32_t block)
+static uint32_t ftl_vfl_check_remap_scheduled(uint32_t bank, uint32_t block)
 {
     uint32_t i;
     for (i = 0x333; i > 0 && i > ftl_vfl_cxt[bank].scheduledstart; i--)
@@ -697,7 +697,7 @@ uint32_t ftl_vfl_check_remap_scheduled(uint32_t bank, uint32_t block)
 
 #ifndef FTL_READONLY
 /* Schedules remapping for the specified bank and vBlock */
-void ftl_vfl_schedule_block_for_remap(uint32_t bank, uint32_t block)
+static void ftl_vfl_schedule_block_for_remap(uint32_t bank, uint32_t block)
 {
     if (ftl_vfl_check_remap_scheduled(bank, block) == 1)
         return;
@@ -713,7 +713,7 @@ void ftl_vfl_schedule_block_for_remap(uint32_t bank, uint32_t block)
 #ifndef FTL_READONLY
 /* Removes the specified bank and vBlock combination
    from the remap scheduled list */
-void ftl_vfl_mark_remap_done(uint32_t bank, uint32_t block)
+static void ftl_vfl_mark_remap_done(uint32_t bank, uint32_t block)
 {
     uint32_t i;
     uint32_t start = ftl_vfl_cxt[bank].scheduledstart;
@@ -734,7 +734,7 @@ void ftl_vfl_mark_remap_done(uint32_t bank, uint32_t block)
 /* Logs that there is trouble for the specified vBlock on the specified bank.
    The vBlock will be scheduled for remap
    if there is too much trouble with it. */
-void ftl_vfl_log_trouble(uint32_t bank, uint32_t vblock)
+static void ftl_vfl_log_trouble(uint32_t bank, uint32_t vblock)
 {
     uint32_t i;
     for (i = 0; i < 5; i++)
@@ -763,7 +763,7 @@ void ftl_vfl_log_trouble(uint32_t bank, uint32_t vblock)
 
 #ifndef FTL_READONLY
 /* Logs a successful erase for the specified vBlock on the specified bank */
-void ftl_vfl_log_success(uint32_t bank, uint32_t vblock)
+static void ftl_vfl_log_success(uint32_t bank, uint32_t vblock)
 {
     uint32_t i;
     for (i = 0; i < 5; i++)
@@ -783,7 +783,7 @@ void ftl_vfl_log_success(uint32_t bank, uint32_t vblock)
    not caring about data in there.
    If it worked, it will return the new pBlock number,
    if not (no more spare blocks available), it will return zero. */
-uint32_t ftl_vfl_remap_block(uint32_t bank, uint32_t block)
+static uint32_t ftl_vfl_remap_block(uint32_t bank, uint32_t block)
 {
     uint32_t i;
     uint32_t newblock = 0, newidx;
@@ -813,8 +813,8 @@ uint32_t ftl_vfl_remap_block(uint32_t bank, uint32_t block)
 
 
 /* Reads the specified vPage, dealing with all kinds of trouble */
-uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
-                      uint32_t checkempty, uint32_t remaponfail)
+static uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
+                             uint32_t checkempty, uint32_t remaponfail)
 {
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t syshyperblocks = ftl_nand_type->blocks
@@ -852,8 +852,8 @@ uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
 
 
 /* Multi-bank version of ftl_vfl_read, will read ftl_banks pages in parallel */
-uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
-                           uint32_t checkempty, uint32_t remaponfail)
+static uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
+                                  uint32_t checkempty, uint32_t remaponfail)
 {
     uint32_t i, rc = 0;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -922,8 +922,8 @@ uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffer,
 
 #ifndef FTL_READONLY
 /* Writes the specified vPage, dealing with all kinds of trouble */
-uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
-                       void* buffer, void* sparebuffer)
+static uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
+                              void* buffer, void* sparebuffer)
 {
     uint32_t i, j;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -993,7 +993,7 @@ uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
 
 
 /* Mounts the VFL on all banks */
-uint32_t ftl_vfl_open(void)
+static uint32_t ftl_vfl_open(void)
 {
     uint32_t i, j, k;
     uint32_t minusn, vflcxtidx, last;
@@ -1080,7 +1080,7 @@ uint32_t ftl_vfl_open(void)
 
 
 /* Mounts the actual FTL */
-uint32_t ftl_open(void)
+static uint32_t ftl_open(void)
 {
     uint32_t i;
     uint32_t ret;
@@ -1182,7 +1182,7 @@ uint32_t ftl_open(void)
 #ifndef FTL_READONLY
 /* Returns a pointer to the ftl_log entry for the specified vBlock,
    or null, if there is none */
-struct ftl_log_type* ftl_get_log_entry(uint32_t block)
+static struct ftl_log_type* ftl_get_log_entry(uint32_t block)
 {
     uint32_t i;
     for (i = 0; i < 0x11; i++)
@@ -1264,7 +1264,7 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
 #ifndef FTL_READONLY
 /* Performs a vBlock erase, dealing with hardware,
    remapping and all kinds of trouble */
-uint32_t ftl_erase_block_internal(uint32_t block)
+static uint32_t ftl_erase_block_internal(uint32_t block)
 {
     uint32_t i, j;
     block = block + ftl_nand_type->blocks
@@ -1308,7 +1308,7 @@ uint32_t ftl_erase_block_internal(uint32_t block)
 
 #ifndef FTL_READONLY
 /* Highlevel vBlock erase, that increments the erase counter for the block */
-uint32_t ftl_erase_block(uint32_t block)
+static uint32_t ftl_erase_block(uint32_t block)
 {
     ftl_erasectr[block]++;
     if (ftl_erasectr_dirt[block >> 10] == 100) ftl_cxt.erasedirty = 1;
@@ -1321,7 +1321,7 @@ uint32_t ftl_erase_block(uint32_t block)
 #ifndef FTL_READONLY
 /* Allocates a block from the pool,
    returning its vBlock number, or 0xFFFFFFFF on error */
-uint32_t ftl_allocate_pool_block(void)
+static uint32_t ftl_allocate_pool_block(void)
 {
     uint32_t i;
     uint32_t erasectr = 0xFFFFFFFF, bestidx = 0xFFFFFFFF, block;
@@ -1355,7 +1355,7 @@ uint32_t ftl_allocate_pool_block(void)
 
 #ifndef FTL_READONLY
 /* Releases a vBlock back into the pool */
-void ftl_release_pool_block(uint32_t block)
+static void ftl_release_pool_block(uint32_t block)
 {
     if (block >= (uint32_t)ftl_nand_type->userblocks + 0x17)
         panicf("FTL: Tried to release block %u", (unsigned)block);
@@ -1369,7 +1369,7 @@ void ftl_release_pool_block(uint32_t block)
 #ifndef FTL_READONLY
 /* Commits the location of the FTL context blocks
    to a semi-randomly chosen VFL context */
-uint32_t ftl_store_ctrl_block_list(void)
+static uint32_t ftl_store_ctrl_block_list(void)
 {
     uint32_t i;
     for (i = 0; i < ftl_banks; i++)
@@ -1382,7 +1382,7 @@ uint32_t ftl_store_ctrl_block_list(void)
 #ifndef FTL_READONLY
 /* Saves the n-th erase counter page to the flash,
    because it is too dirty or needs to be moved. */
-uint32_t ftl_save_erasectr_page(uint32_t index)
+static uint32_t ftl_save_erasectr_page(uint32_t index)
 {
     memset(&ftl_sparebuffer[0], 0xFF, 0x40);
     ftl_sparebuffer[0].meta.usn = ftl_cxt.usn;
@@ -1408,7 +1408,7 @@ uint32_t ftl_save_erasectr_page(uint32_t index)
 #ifndef FTL_READONLY
 /* Increments ftl_cxt.ftlctrlpage to the next available FTL context page,
    allocating a new context block if neccessary. */
-uint32_t ftl_next_ctrl_pool_page(void)
+static uint32_t ftl_next_ctrl_pool_page(void)
 {
     uint32_t i;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1446,8 +1446,8 @@ uint32_t ftl_next_ctrl_pool_page(void)
 
 #ifndef FTL_READONLY
 /* Copies a vPage from one location to another */
-uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
-                       uint32_t lpn, uint32_t type)
+static uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
+                              uint32_t lpn, uint32_t type)
 {
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t rc = ftl_vfl_read(source, ftl_copybuffer[0],
@@ -1467,7 +1467,7 @@ uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
 
 #ifndef FTL_READONLY
 /* Copies a pBlock to a vBlock */
-uint32_t ftl_copy_block(uint32_t source, uint32_t destination)
+static uint32_t ftl_copy_block(uint32_t source, uint32_t destination)
 {
     uint32_t i, j;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1509,7 +1509,7 @@ uint32_t ftl_copy_block(uint32_t source, uint32_t destination)
 
 #ifndef FTL_READONLY
 /* Clears ftl_log.issequential, if something violating that is written. */
-void ftl_check_still_sequential(struct ftl_log_type* entry, uint32_t page)
+static void ftl_check_still_sequential(struct ftl_log_type* entry, uint32_t page)
 {
     if (entry->pagesused != entry->pagescurrent
      || entry->pageoffsets[page] != page)
@@ -1526,7 +1526,7 @@ void ftl_check_still_sequential(struct ftl_log_type* entry, uint32_t page)
    space again. This is usually done when a scattered page block is being
    removed because it is full, but less than half of the pages in there are
    still in use and rest is just filled with old crap. */
-uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
+static uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
 {
     uint32_t i, j;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1582,7 +1582,7 @@ uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
 
 #ifndef FTL_READONLY
 /* Commits an ftl_log entry to proper blocks, no matter what's in there. */
-uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
+static uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
 {
     uint32_t i;
     uint32_t error;
@@ -1610,7 +1610,7 @@ uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
    sequentially until now, in order to be able to save a block erase by
    committing it without needing to copy it again.
    If this fails for whichever reason, it will be committed the usual way. */
-uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
+static uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
 {
     uint32_t i;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1656,7 +1656,7 @@ uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
 /* If a log entry is supplied, its scattered page block will be removed in
    whatever way seems most appropriate. Else, the oldest scattered page block
    will be freed by committing it. */
-uint32_t ftl_remove_scattered_block(struct ftl_log_type* entry)
+static uint32_t ftl_remove_scattered_block(struct ftl_log_type* entry)
 {
     uint32_t i;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1692,7 +1692,7 @@ uint32_t ftl_remove_scattered_block(struct ftl_log_type* entry)
 
 #ifndef FTL_READONLY
 /* Initialize a log entry to the values for an empty scattered page block */
-void ftl_init_log_entry(struct ftl_log_type* entry)
+static void ftl_init_log_entry(struct ftl_log_type* entry)
 {
     entry->issequential = 1;
     entry->pagescurrent = 0;
@@ -1705,7 +1705,7 @@ void ftl_init_log_entry(struct ftl_log_type* entry)
 #ifndef FTL_READONLY
 /* Allocates a log entry for the specified vBlock,
    first making space, if neccessary. */
-struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
+static struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 {
     uint32_t i;
     struct ftl_log_type* entry = ftl_get_log_entry(block);
@@ -1746,7 +1746,7 @@ struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 
 #ifndef FTL_READONLY
 /* Commits the FTL block map, erase counters, and context to flash */
-uint32_t ftl_commit_cxt(void)
+static uint32_t ftl_commit_cxt(void)
 {
     uint32_t i;
     uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
@@ -1788,7 +1788,7 @@ uint32_t ftl_commit_cxt(void)
 /* Swaps the most and least worn block on the flash,
    to better distribute wear. It will refuse to do anything
    if the wear spread is lower than 5 erases. */
-uint32_t ftl_swap_blocks(void)
+static uint32_t ftl_swap_blocks(void)
 {
     uint32_t i;
     uint32_t min = 0xFFFFFFFF, max = 0, maxidx = 0x14;

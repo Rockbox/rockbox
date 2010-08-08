@@ -41,10 +41,10 @@
 */
 
 static volatile int locked = 0;
-size_t nextsize;
-size_t dblbufsize;
-int dmamode;
-const unsigned char* dblbuf;
+static size_t nextsize;
+static size_t dblbufsize;
+static int dmamode;
+static const unsigned char* dblbuf;
 
 /* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
 static const struct div_entry {

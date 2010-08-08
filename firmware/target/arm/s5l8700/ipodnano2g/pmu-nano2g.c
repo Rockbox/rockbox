@@ -22,6 +22,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "i2c-s5l8700.h"
+#include "pmu-target.h"
 
 static struct mutex pmu_adc_mutex;
 

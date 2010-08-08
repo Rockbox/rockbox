@@ -23,12 +23,9 @@
 #include "inttypes.h"
 #include "s5l8700.h"
 #include "power.h"
-#include "ftl-target.h"
-#include <string.h>
 #include "panic.h"
 #include "pmu-target.h"
-#include "lcd.h"
-
+#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
 
 void power_off(void)
 {

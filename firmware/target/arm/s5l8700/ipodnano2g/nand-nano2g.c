@@ -84,15 +84,15 @@ static const struct nand_device_info_type nand_deviceinfotable[] =
     {0xA555D520, 8192, 3872, 0x80, 7, 2, 1, 2, 1}
 };
 
-uint8_t nand_tunk1[4];
-uint8_t nand_twp[4];
-uint8_t nand_tunk2[4];
-uint8_t nand_tunk3[4];
-uint32_t nand_type[4];
-int nand_powered = 0;
-int nand_interleaved = 0;
-int nand_cached = 0;
-long nand_last_activity_value = -1;
+static uint8_t nand_tunk1[4];
+static uint8_t nand_twp[4];
+static uint8_t nand_tunk2[4];
+static uint8_t nand_tunk3[4];
+static uint32_t nand_type[4];
+static int nand_powered = 0;
+static int nand_interleaved = 0;
+static int nand_cached = 0;
+static long nand_last_activity_value = -1;
 static long nand_stack[DEFAULT_STACK_SIZE];
 
 static struct mutex nand_mtx;
@@ -106,7 +106,7 @@ static uint8_t nand_spare[0x40] STORAGE_ALIGN_ATTR;
 static uint8_t nand_ecc[0x30] STORAGE_ALIGN_ATTR;
 
 
-uint32_t nand_unlock(uint32_t rc)
+static uint32_t nand_unlock(uint32_t rc)
 {
     led(false);
     nand_last_activity_value = current_tick;
@@ -114,13 +114,13 @@ uint32_t nand_unlock(uint32_t rc)
     return rc;
 }
 
-uint32_t ecc_unlock(uint32_t rc)
+static uint32_t ecc_unlock(uint32_t rc)
 {
     mutex_unlock(&ecc_mtx);
     return rc;
 }
 
-uint32_t nand_timeout(long timeout)
+static uint32_t nand_timeout(long timeout)
 {
     if (TIME_AFTER(current_tick, timeout)) return 1;
     else
@@ -130,7 +130,7 @@ uint32_t nand_timeout(long timeout)
     }
 }
 
-uint32_t nand_wait_rbbdone(void)
+static uint32_t nand_wait_rbbdone(void)
 {
     long timeout = current_tick + HZ / 50;
     while (!(FMCSTAT & FMCSTAT_RBBDONE))
@@ -139,7 +139,7 @@ uint32_t nand_wait_rbbdone(void)
     return 0;
 }
 
-uint32_t nand_wait_cmddone(void)
+static uint32_t nand_wait_cmddone(void)
 {
     long timeout = current_tick + HZ / 50;
     while (!(FMCSTAT & FMCSTAT_CMDDONE))
@@ -148,7 +148,7 @@ uint32_t nand_wait_cmddone(void)
     return 0;
 }
 
-uint32_t nand_wait_addrdone(void)
+static uint32_t nand_wait_addrdone(void)
 {
     long timeout = current_tick + HZ / 50;
     while (!(FMCSTAT & FMCSTAT_ADDRDONE))
@@ -157,7 +157,7 @@ uint32_t nand_wait_addrdone(void)
     return 0;
 }
 
-uint32_t nand_wait_chip_ready(uint32_t bank)
+static uint32_t nand_wait_chip_ready(uint32_t bank)
 {
     long timeout = current_tick + HZ / 50;
     while (!(FMCSTAT & (FMCSTAT_BANK0READY << bank)))
@@ -166,19 +166,19 @@ uint32_t nand_wait_chip_ready(uint32_t bank)
     return 0;
 }
 
-void nand_set_fmctrl0(uint32_t bank, uint32_t flags)
+static void nand_set_fmctrl0(uint32_t bank, uint32_t flags)
 {
     FMCTRL0 = (nand_tunk1[bank] << 16) | (nand_twp[bank] << 12)
             | (1 << 11) | 1 | (1 << (bank + 1)) | flags;
 }
 
-uint32_t nand_send_cmd(uint32_t cmd)
+static uint32_t nand_send_cmd(uint32_t cmd)
 {
     FMCMD = cmd;
     return nand_wait_rbbdone();
 }
 
-uint32_t nand_send_address(uint32_t page, uint32_t offset)
+static uint32_t nand_send_address(uint32_t page, uint32_t offset)
 {
     FMANUM = 4;
     FMADDR0 = (page << 16) | offset;
@@ -197,7 +197,7 @@ uint32_t nand_reset(uint32_t bank)
     return 0;
 }
 
-uint32_t nand_wait_status_ready(uint32_t bank)
+static uint32_t nand_wait_status_ready(uint32_t bank)
 {
     long timeout = current_tick + HZ / 50;
     nand_set_fmctrl0(bank, 0);
@@ -218,8 +218,8 @@ uint32_t nand_wait_status_ready(uint32_t bank)
     return nand_send_cmd(NAND_CMD_READ);
 }
 
-void nand_transfer_data_start(uint32_t bank, uint32_t direction,
-                              void* buffer, uint32_t size)
+static void nand_transfer_data_start(uint32_t bank, uint32_t direction,
+                                     void* buffer, uint32_t size)
 {
     nand_set_fmctrl0(bank, FMCTRL0_ENABLEDMA);
     FMDNUM = size - 1;
@@ -236,7 +236,7 @@ void nand_transfer_data_start(uint32_t bank, uint32_t direction,
     DMACOM3 = 4;
 }
 
-uint32_t nand_transfer_data_collect(uint32_t direction)
+static uint32_t nand_transfer_data_collect(uint32_t direction)
 {
     long timeout = current_tick + HZ / 50;
     while ((DMAALLST & DMAALLST_DMABUSY3))
@@ -248,15 +248,16 @@ uint32_t nand_transfer_data_collect(uint32_t direction)
     return 0;
 }
 
-uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
-                            void* buffer, uint32_t size)
+static uint32_t nand_transfer_data(uint32_t bank, uint32_t direction,
+                                   void* buffer, uint32_t size)
 {
     nand_transfer_data_start(bank, direction, buffer, size);
     uint32_t rc = nand_transfer_data_collect(direction);
     return rc;
 }
 
-void ecc_start(uint32_t size, void* databuffer, void* sparebuffer, uint32_t type)
+static void ecc_start(uint32_t size, void* databuffer, void* sparebuffer,
+                      uint32_t type)
 {
     mutex_lock(&ecc_mtx);
     ECC_INT_CLR = 1;
@@ -268,7 +269,7 @@ void ecc_start(uint32_t size, void* databuffer, void* sparebuffer, uint32_t type
     ECC_CTRL = type;
 }
 
-uint32_t ecc_collect(void)
+static uint32_t ecc_collect(void)
 {
     long timeout = current_tick + HZ / 50;
     while (!(SRCPND & INTMSK_ECC))
@@ -279,21 +280,21 @@ uint32_t ecc_collect(void)
     return ecc_unlock(ECC_RESULT);
 }
 
-uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
+static uint32_t ecc_decode(uint32_t size, void* databuffer, void* sparebuffer)
 {
     ecc_start(size, databuffer, sparebuffer, ECCCTRL_STARTDECODING);
     uint32_t rc = ecc_collect();
     return rc;
 }
 
-uint32_t ecc_encode(uint32_t size, void* databuffer, void* sparebuffer)
+static uint32_t ecc_encode(uint32_t size, void* databuffer, void* sparebuffer)
 {
     ecc_start(size, databuffer, sparebuffer, ECCCTRL_STARTENCODING);
     ecc_collect();
     return 0;
 }
 
-uint32_t nand_check_empty(uint8_t* buffer)
+static uint32_t nand_check_empty(uint8_t* buffer)
 {
     uint32_t i, count;
     count = 0;
@@ -302,7 +303,7 @@ uint32_t nand_check_empty(uint8_t* buffer)
     return 0;
 }
 
-uint32_t nand_get_chip_type(uint32_t bank)
+static uint32_t nand_get_chip_type(uint32_t bank)
 {
     mutex_lock(&nand_mtx);
     uint32_t result;
@@ -443,8 +444,9 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
     return nand_unlock(rc);
 }
 
-uint32_t nand_write_page_int(uint32_t bank, uint32_t page, void* databuffer,
-                             void* sparebuffer, uint32_t doecc, uint32_t wait)
+static uint32_t nand_write_page_int(uint32_t bank, uint32_t page,
+                                    void* databuffer, void* sparebuffer,
+                                    uint32_t doecc, uint32_t wait)
 {
     uint8_t* data = nand_data;
     uint8_t* spare = nand_spare;
@@ -674,7 +676,8 @@ uint32_t nand_write_page_collect(uint32_t bank)
     return nand_wait_status_ready(bank);
 }
 
-uint32_t nand_block_erase_fast(uint32_t page)
+#if 0 /* currently unused */
+static uint32_t nand_block_erase_fast(uint32_t page)
 {
     uint32_t i, rc = 0;
     mutex_lock(&nand_mtx);
@@ -708,6 +711,7 @@ uint32_t nand_block_erase_fast(uint32_t page)
     }
     return nand_unlock(rc);
 }
+#endif
 
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
 {

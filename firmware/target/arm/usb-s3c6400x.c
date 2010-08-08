@@ -21,6 +21,8 @@
 
 #include "config.h"
 #include "usb.h"
+#include "usb-target.h"
+#include "usb_drv.h"
 
 #define OTGBASE 0x38800000
 #define PHYBASE 0x3C400000
@@ -55,7 +57,7 @@ int usb_drv_port_speed(void)
     return (DSTS & 2) == 0 ? 1 : 0;
 }
 
-void reset_endpoints(int reinit)
+static void reset_endpoints(int reinit)
 {
     unsigned int i;
     for (i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
@@ -268,7 +270,7 @@ void usb_drv_set_address(int address)
        into the USB core, which will then call this dummy function. */
 }
 
-void ep_send(int ep, void *ptr, int length)
+static void ep_send(int ep, void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
@@ -289,7 +291,7 @@ void ep_send(int ep, void *ptr, int length)
     DIEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
 }
 
-void ep_recv(int ep, void *ptr, int length)
+static void ep_recv(int ep, void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;

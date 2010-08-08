@@ -153,15 +153,6 @@ void lcd_shutdown(void)
     }
 }
 
-
-void lcd_off(void)
-{
-}
-
-void lcd_on(void)
-{
-}
-
 /* LCD init */
 void lcd_init_device(void)
 {
