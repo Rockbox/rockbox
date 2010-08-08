@@ -248,15 +248,17 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Sim"
-    cowond2*: "MENU = Sim"
+    cowond2*: "MENU, ou topo direito = Sim"
     iriverh100,iriverh120,iriverh300: "NAVI = Sim"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Sim"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Sim"
+    mrobe500: "PLAY, POWER, ou topo direito = Sim"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Sim"
   </dest>
@@ -1811,15 +1813,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Volume do Beep"
+    swcodec: "Beep do pulo de faixa"
   </dest>
   <voice>
     *: none
-    swcodec: "Volume do Beep"
+    swcodec: "Beep do pulo de faixa"
   </voice>
 </phrase>
 <phrase>
@@ -2233,14 +2235,16 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Construindo Base de Dados... %d encontrados (OFF para retornar)"
     iriverh100,iriverh120,iriverh300: "Construindo Base de Dados... %d encontrados (STOP para retornar)"
     ipod*: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construindo Base de Dados... %d encontrados (LEFT para retornar)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
+    gogearsa9200: "Construindo Base de Dados... %d encontrados (REW para retornar)"
   </dest>
   <voice>
     *: "entradas encontradas para a base de dados"
@@ -2423,15 +2427,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Explorar Fontes"
+    lcd_bitmap: "Fontes"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Explorar Fontes"
+    lcd_bitmap: "Fontes"
   </voice>
 </phrase>
 <phrase>
@@ -2439,13 +2443,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Explorar Arquivos .wps"
+    *: "Tela de Exibição"
   </dest>
   <voice>
-    *: "Explorar Arquivos while-playing-screen"
+    *: "Tela de Exibição"
   </voice>
 </phrase>
 <phrase>
@@ -2454,15 +2458,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Explorar Arquivos .rwps"
+    remote: "Tela de Exibição Remota"
   </dest>
   <voice>
     *: none
-    remote: "Explorar arquivos remote while-playing-screen"
+    remote: "Tela de Exibição Remota"
   </voice>
 </phrase>
 <phrase>
@@ -4795,13 +4799,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: "clip mp3 .talk"
+    *: "clip .talk"
   </dest>
   <voice>
-    *: "clip mp3 talk"
+    *: "clip talk"
   </voice>
 </phrase>
 <phrase>
@@ -4921,13 +4925,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Explorar Temas"
+    *: "Explorar Arquivos de Tema"
   </dest>
   <voice>
-    *: "Explorar Temas"
+    *: "Explorar Arquivos de Tema"
   </voice>
 </phrase>
 <phrase>
@@ -11179,7 +11183,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_MODE
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -11196,7 +11200,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -11213,7 +11217,7 @@
 </phrase>
 <phrase>
   id: LANG_TOUCHSCREEN_POINT
-  desc: in Settings -> General -> System menu
+  desc: in Settings -> General -> Display -> Touchscreen Settings
   user: core
   <source>
     *: none
@@ -11446,15 +11450,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Multimédia"
+    usb_hid: "Multimídia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Multimédia"
+    usb_hid: "Multimídia"
   </voice>
 </phrase>
 <phrase>
@@ -11463,15 +11467,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Apresentação"
+    usb_hid: "Apresentação"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Apresentação"
+    usb_hid: "Apresentação"
   </voice>
 </phrase>
 <phrase>
@@ -11480,15 +11484,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Navegador"
+    usb_hid: "Navegador"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Navegador"
+    usb_hid: "Navegador"
   </voice>
 </phrase>
 <phrase>
@@ -11497,15 +11501,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Mouse"
+    usb_hid: "Mouse"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Mouse"
+    usb_hid: "Mouse"
   </voice>
 </phrase>
 <phrase>
@@ -12196,23 +12200,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOTE_FMRADIO
-  desc: in the main menu
-  user: core
-  <source>
-    *:none
-    radio_remote: "Remote FM Radio"
-  </source>
-  <dest>
-    *:none
-    radio_remote: "Rádio FM Remoto"
-  </dest>
-  <voice>
-    *:none
-    radio_remote: "Rádio FM Remoto"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -12261,5 +12248,296 @@
   <voice>
     *: none
     radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Tela de Rádio Remota"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Tela de Rádio Remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Banda %d Ganho"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ganho de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Amplo(wide)"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Amplo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Atualizar em Stop"
+  </dest>
+  <voice>
+    *: "Atualizar em Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Estreito(narrow)"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Estreito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Sem Tag>"
+  </dest>
+  <voice>
+    *: "Sem Tag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Configuração Avançada de Controle de Tone"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Configuração Avançada de Controle de Tone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Realce 3D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Realce 3-D"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Cancelar"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Cancelar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Compositor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Banda %d Frequência"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Frequência de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Banda %d Largura"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Largura de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Tela do Rádio"
+  </dest>
+  <voice>
+    *: none
+    radio: "Tela do Rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "abrir picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Forçar"
+  </dest>
+  <voice>
+    *: "Forçar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Controle de Tone"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Controle de Tone"
   </voice>
 </phrase>
