@@ -24,6 +24,9 @@ package org.rockbox;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Process;
 import android.util.Log;
 
 public class RockboxPCM extends AudioTrack 
@@ -31,6 +34,8 @@ public class RockboxPCM extends AudioTrack
 	byte[] raw_data;
 	private int buf_len;
 	private PCMListener l;
+	private HandlerThread ht;
+	private Handler h = null;
 
 	private void LOG(CharSequence text)
 	{
@@ -46,6 +51,8 @@ public class RockboxPCM extends AudioTrack
 			    AudioFormat.ENCODING_PCM_16BIT,
 			    24<<10,
 			    AudioTrack.MODE_STREAM);
+		ht = new HandlerThread("audio thread", Process.THREAD_PRIORITY_URGENT_AUDIO);
+		ht.start();
 		buf_len = 24<<10; /* in bytes */
 
 	    raw_data = new byte[buf_len]; /* in shorts */
@@ -76,10 +83,12 @@ public class RockboxPCM extends AudioTrack
     	        RockboxService.startForeground();
         	    if (getState() == AudioTrack.STATE_INITIALIZED)
         	    {
+        	    	if (h == null)
+        	    		h = new Handler(ht.getLooper());
         	    	if (setNotificationMarkerPosition(bytes2frames(buf_len)/4) != AudioTrack.SUCCESS)
         	    		LOG("setNotificationMarkerPosition Error");
         	    	else
-        	    		setPlaybackPositionUpdateListener(l);
+        	    		setPlaybackPositionUpdateListener(l, h);
         	    }
         	    /* need to fill with silence before starting playback */
         		write(raw_data, frames2bytes(getPlaybackHeadPosition()), raw_data.length);
@@ -140,10 +149,11 @@ public class RockboxPCM extends AudioTrack
 				{
 				case AudioTrack.PLAYSTATE_PLAYING:
 				case AudioTrack.PLAYSTATE_PAUSED:
-					/* recharge */
-					setPlaybackPositionUpdateListener(this);
 					/* refill at 25% no matter of how many bytes we've written */
-					setNotificationMarkerPosition(bytes2frames(refill_mark));
+					if (setNotificationMarkerPosition(bytes2frames(refill_mark)) != AudioTrack.SUCCESS)
+						LOG("Error in onMarkerReached: Could not set notification marker");
+					else /* recharge */
+						setPlaybackPositionUpdateListener(this, h);
 					break;
 				case AudioTrack.PLAYSTATE_STOPPED:
 					LOG("State STOPPED");
