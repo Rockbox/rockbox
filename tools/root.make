@@ -290,11 +290,11 @@ bininstall: $(BUILDDIR)/$(BINARY)
 	$(SILENT)cp $(BINARY) "$(RBPREFIX)/.rockbox/"
 
 install:
-	@echo "Installing your build in your '$(PREFIX)' dir"
+	@echo "Installing your build in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
 fullinstall:
-	@echo "Installing a full setup in your '$(PREFIX)' dir"
+	@echo "Installing a full setup in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
 help:
