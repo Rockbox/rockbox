@@ -75,6 +75,7 @@ public class RockboxTimer extends Timer
 		interval = period_inverval_in_ms;
 	}
 
+	@SuppressWarnings("unused")
 	private void LOG(CharSequence text)
 	{
 		Log.d("Rockbox", (String) text);	
@@ -88,9 +89,7 @@ public class RockboxTimer extends Timer
 	    	try {
 	    		this.wait();
 	    	} catch (InterruptedException e) {
-	    		/* wakeup and return */
-	    	} catch (Exception e) {
-	    		LOG(e.toString());
+	    		/* Not an error: wakeup and return */
 	    	}
     	}
     }

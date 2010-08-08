@@ -86,8 +86,6 @@ public class RockboxActivity extends Activity {
     			ViewGroup g = (ViewGroup)RockboxService.fb.getParent();
     			g.removeView(RockboxService.fb);
     			setContentView(RockboxService.fb);
-    		} catch (Exception e) {
-    			LOG(e.toString());
     		}
     		RockboxService.fb.resume();
     	}

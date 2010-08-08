@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -68,14 +67,14 @@ public class RockboxFramebuffer extends View
 		postInvalidate(x, y, x+w, y+h);
 	}
 
+	@SuppressWarnings("unused")
 	private void LOG(CharSequence text)
 	{
-		Log.d("RockboxBootloader", (String) text);
+		Log.d("Rockbox", (String) text);
 	}
 
 	public boolean onTouchEvent(MotionEvent me)
 	{
-		LOG("onTouchEvent");
 		switch (me.getAction())
 		{
 		case MotionEvent.ACTION_CANCEL:

@@ -3,7 +3,9 @@ package org.rockbox;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
@@ -15,7 +17,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -25,9 +26,9 @@ public class RockboxService extends Service
 	public static RockboxFramebuffer fb = null;
 	private static RockboxService instance;
 	private Notification notification;
-	private static final Class[] mStartForegroundSignature = new Class[] {
+	private static final Class<?>[] mStartForegroundSignature = new Class[] {
 	    int.class, Notification.class};
-	private static final Class[] mStopForegroundSignature = new Class[] {
+	private static final Class<?>[] mStopForegroundSignature = new Class[] {
 	    boolean.class};
 
 	private NotificationManager mNM;
@@ -45,7 +46,7 @@ public class RockboxService extends Service
 	        mStopForeground = getClass().getMethod("stopForeground",
 	                mStopForegroundSignature);
 	    } catch (NoSuchMethodException e) {
-	        // Running on an older platform.
+	        /* Running on an older platform: fall back to old API */
 	        mStartForeground = mStopForeground = null;
 	    }
 		startservice();
@@ -63,6 +64,11 @@ public class RockboxService extends Service
 	{
 		Log.d("Rockbox", (String) text);
 	}
+	
+	private void LOG(CharSequence text, Throwable tr)
+	{
+		Log.d("Rockbox", (String) text, tr);
+	}
 
 	public void onStart(Intent intent, int startId) {
 		do_start(intent);
@@ -71,7 +77,7 @@ public class RockboxService extends Service
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		do_start(intent);
-		return 1; /* START_STICKY */
+		return 1; /* old API compatibility: 1 == START_STICKY */
 	}
 
 	private void startservice() 
@@ -83,8 +89,8 @@ public class RockboxService extends Service
 		 * because there's no other way to ship files and have access
 		 * to them from native code
 		 */
-        try 
-        {
+		try
+		{
            BufferedOutputStream dest = null;
            BufferedInputStream is = null;
            ZipEntry entry;
@@ -127,8 +133,12 @@ public class RockboxService extends Service
 	              is.close();
 	           }
            }
-        } catch(Exception e) {
-           e.printStackTrace();
+        } catch(FileNotFoundException e) {
+        	LOG("FileNotFoundException when unzipping", e);
+        	e.printStackTrace();
+        } catch(IOException e) {
+        	LOG("IOException when unzipping", e);
+        	e.printStackTrace();
         }
 
         System.loadLibrary("rockbox");
@@ -149,36 +159,25 @@ public class RockboxService extends Service
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;
-	}    /**
-     * Class for clients to access.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with
-     * IPC.
-     */
-    public class LocalBinder extends Binder {
-        RockboxService getService() {
-            return RockboxService.this;
-        }
-    }
+	}
 
-    /* heavily based on the example found on
+    /* all below is heavily based on the examples found on
      * http://developer.android.com/reference/android/app/Service.html
      */
     
     private void create_notification()
     {
-		// In this sample, we'll use the same text for the ticker and the expanded notification
+		/* For now we'll use the same text for the ticker and the expanded notification */
         CharSequence text = getText(R.string.notification);
-
-        // Set the icon, scrolling text and timestamp
+        /* Set the icon, scrolling text and timestamp */
         notification = new Notification(R.drawable.icon, text,
                 System.currentTimeMillis());
 
-        // The PendingIntent to launch our activity if the user selects this notification
+        /* The PendingIntent to launch our activity if the user selects this notification */
         Intent intent = new Intent(this, RockboxActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        
 
-        // Set the info for the views that show in the notification panel.
+        /*  Set the info for the views that show in the notification panel. */
         notification.setLatestEventInfo(this, getText(R.string.notification), text, contentIntent);
     }
 
@@ -186,10 +185,11 @@ public class RockboxService extends Service
 	{
 		if (instance != null) 
 		{
-	        // Send the notification.
-	        // We use a layout id because it is a unique number.  We use it later to cancel.
+	        /* 
+	         * Send the notification.
+	         * We use a layout id because it is a unique number.  We use it later to cancel.
+	         */
 	        instance.mNM.notify(R.string.notification, instance.notification);
-	        
 	        /*
 	         * this call makes the service run as foreground, which
 	         * provides enough cpu time to do music decoding in the 
@@ -212,24 +212,24 @@ public class RockboxService extends Service
 	 * This is a wrapper around the new startForeground method, using the older
 	 * APIs if it is not available.
 	 */
-	void startForegroundCompat(int id, Notification notification) {
-	    // If we have the new startForeground API, then use it.
+	void startForegroundCompat(int id, Notification notification) 
+	{
 	    if (mStartForeground != null) {
 	        mStartForegroundArgs[0] = Integer.valueOf(id);
 	        mStartForegroundArgs[1] = notification;
 	        try {
 	            mStartForeground.invoke(this, mStartForegroundArgs);
 	        } catch (InvocationTargetException e) {
-	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke startForeground", e);
+	            /* Should not happen. */
+	            LOG("Unable to invoke startForeground", e);
 	        } catch (IllegalAccessException e) {
-	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke startForeground", e);
+	            /* Should not happen. */
+	            LOG("Unable to invoke startForeground", e);
 	        }
 	        return;
 	    }
 
-	    // Fall back on the old API.
+	    /* Fall back on the old API.*/
 	    setForeground(true);
 	    mNM.notify(id, notification);
 	}
@@ -238,31 +238,32 @@ public class RockboxService extends Service
 	 * This is a wrapper around the new stopForeground method, using the older
 	 * APIs if it is not available.
 	 */
-	void stopForegroundCompat(int id) {
-	    // If we have the new stopForeground API, then use it.
+	void stopForegroundCompat(int id) 
+	{
 	    if (mStopForeground != null) {
 	        mStopForegroundArgs[0] = Boolean.TRUE;
 	        try {
 	            mStopForeground.invoke(this, mStopForegroundArgs);
 	        } catch (InvocationTargetException e) {
-	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+	            /* Should not happen. */
+	            LOG("Unable to invoke stopForeground", e);
 	        } catch (IllegalAccessException e) {
-	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+	            /* Should not happen. */
+	            LOG("Unable to invoke stopForeground", e);
 	        }
 	        return;
 	    }
 
-	    // Fall back on the old API.  Note to cancel BEFORE changing the
-	    // foreground state, since we could be killed at that point.
+	    /* Fall back on the old API.  Note to cancel BEFORE changing the
+	     * foreground state, since we could be killed at that point. */
 	    mNM.cancel(id);
 	    setForeground(false);
 	}
 
 	@Override
 	public void onDestroy() {
-	    // Make sure our notification is gone.
+		super.onDestroy();
+	    /* Make sure our notification is gone. */
 	    stopForegroundCompat(R.string.notification);
 	}
 }

@@ -138,7 +138,7 @@ public class RockboxPCM extends AudioTrack
 		}
 		@Override
 		public void onMarkerReached(AudioTrack track) {
-			// push new data to the hardware
+			/* push new data to the hardware */
 			RockboxPCM pcm = (RockboxPCM)track;
 			int result = -1;
 			pcm.pcmSamplesToByteArray(buf);
@@ -169,8 +169,7 @@ public class RockboxPCM extends AudioTrack
 
 		@Override
 		public void onPeriodicNotification(AudioTrack track) {
-			// TODO Auto-generated method stub
-			
+			// TODO Auto-generated method stub			
 		}
 	}
 }
