@@ -69,10 +69,10 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
 #ifdef USEGSLIB
     grey_show(true);
-    grey_ub_gray_bitmap((fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
+    grey_ub_gray_bitmap((const unsigned char *)bm.data, (LCD_WIDTH - bm.width) >> 1,
         (LCD_HEIGHT - bm.height) >> 1, bm.width, bm.height);
 #else
-    rb->lcd_bitmap((fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
+    rb->lcd_bitmap((const fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
         (LCD_HEIGHT - bm.height) >> 1, bm.width, bm.height);
 #endif
     mylcd_ub_update();
