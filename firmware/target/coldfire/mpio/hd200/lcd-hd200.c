@@ -55,6 +55,13 @@ static bool cached_invert = false;
 static bool cached_flip = false;
 static int cached_contrast = DEFAULT_CONTRAST_SETTING;
 
+static struct mutex lcd_mtx;    /* The update functions use DMA and yield */
+
+volatile unsigned char page IBSS_ATTR;
+unsigned char column IBSS_ATTR;
+unsigned int dma_len IBSS_ATTR;
+volatile unsigned long dma_count IBSS_ATTR;
+
 /*** hardware configuration ***/
 int lcd_default_contrast(void)
 {
@@ -155,7 +162,38 @@ void lcd_init_device(void)
     lcd_set_contrast(cached_contrast);
     lcd_set_invert_display(cached_invert);
 
+    /* Configure DMA3 */
+    DAR3 = 0xf0000002; 
+    DSR3 = 1;
+    DIVR3 = 57;        /* DMA3 is mapped into vector 57 in system.c */
+    ICR9 = (6 << 2);   /* Enable DMA3 interrupt at level 6, priority 0 */
+    and_l(~(1<<17), &IMR);
+
+    mutex_init(&lcd_mtx);
+
     lcd_update();
+}
+
+/* LCD DMA ISR */
+void DMA3(void) __attribute__ ((interrupt_handler, section(".icode")));
+void DMA3(void)
+{
+    DSR3 = 1;
+
+    if (--dma_count > 0)
+    {
+        /* Setup write address in lcd controller ram*/
+        lcd_write_command(LCD_SET_PAGE | ++page);
+        lcd_write_command_e(LCD_SET_COLUMN | ((column >> 4) & 0xf), 
+                            column & 0x0f);
+
+        SAR3 = (unsigned long)&lcd_framebuffer[page][column];
+        BCR3 = dma_len;
+        DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
+             | DMA_DSIZE(DMA_SIZE_BYTE) | DMA_START;
+
+    }
 }
 
 /* Update the display.
@@ -163,16 +201,33 @@ void lcd_init_device(void)
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-   int y;
-    
-        for(y = 0;y < LCD_FBHEIGHT;y++)
-        {
-            lcd_write_command(LCD_SET_PAGE | y);
-            lcd_write_command_e(LCD_SET_COLUMN, 0);
-            lcd_write_data(lcd_framebuffer[y], LCD_WIDTH);
-        }
-    
+    mutex_lock(&lcd_mtx);
 
+    /* Setup initial address in lcd controller */
+    lcd_write_command(LCD_SET_PAGE | 0);
+    lcd_write_command_e(LCD_SET_COLUMN, 0);
+
+    /* Initial lcd ram address */
+    page = 0;
+    column = 0;
+
+    /* Number of pages to address */
+    dma_count = LCD_FBHEIGHT;
+    
+    /* Transfer size in bytes to the given page */
+    dma_len = LCD_WIDTH*2;
+
+    /* Initialize DMA transfer */
+    SAR3 = (unsigned long)lcd_framebuffer;
+    BCR3 = LCD_WIDTH*2;
+    DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
+         | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
+         | DMA_DSIZE(DMA_SIZE_BYTE) | DMA_START;
+
+    while (dma_count > 0)
+        yield();
+
+    mutex_unlock(&lcd_mtx);
 }
 
 /* Update a fraction of the display. */
@@ -191,17 +246,32 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
 
+    mutex_lock(&lcd_mtx);
+
     if (ymax >= LCD_FBHEIGHT)
         ymax = LCD_FBHEIGHT-1;
 
-    /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
-    {
-        lcd_write_command(LCD_SET_PAGE | y ); 
-        lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0x0f);
-        lcd_write_data (&lcd_framebuffer[y][x], width);
-    }
-    
+    /* Initial lcd ram address*/
+    lcd_write_command(LCD_SET_PAGE | y ); 
+    lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0x0f);
+
+    page = y;
+    column = x;
+    dma_len = width*2;
+    dma_count = ymax - y + 1;
+
+    /* Initialize DMA transfer */
+    SAR3 = (unsigned long)&lcd_framebuffer[page][column];
+    BCR3 = dma_len;
+    DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
+         | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
+         | DMA_DSIZE(DMA_SIZE_BYTE) | DMA_START;
+
+    while (dma_count > 0)
+        yield();
+
+    mutex_unlock(&lcd_mtx);
+
 }
 
 /* Helper function. */
