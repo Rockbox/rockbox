@@ -1,0 +1,32 @@
+Index: ../codecs.make
+===================================================================
+--- ../codecs.make	(revision 27762)
++++ ../codecs.make	(working copy)
+@@ -38,6 +38,7 @@
+ include $(APPSDIR)/codecs/libwavpack/libwavpack.make
+ include $(APPSDIR)/codecs/libwma/libwma.make
+ include $(APPSDIR)/codecs/libwmapro/libwmapro.make
++include $(APPSDIR)/codecs/libwmavoice/libwmavoice.make
+ include $(APPSDIR)/codecs/libcook/libcook.make
+ include $(APPSDIR)/codecs/librm/librm.make
+ include $(APPSDIR)/codecs/libatrac/libatrac.make
+@@ -79,6 +80,7 @@
+ $(CODECDIR)/ape.codec : $(CODECDIR)/libdemac.a
+ $(CODECDIR)/wma.codec : $(CODECDIR)/libwma.a $(CODECDIR)/libasf.a
+ $(CODECDIR)/wmapro.codec : $(CODECDIR)/libwmapro.a $(CODECDIR)/libasf.a
++$(CODECDIR)/wmavoice.codec : $(CODECDIR)/libwmavoice.a $(CODECDIR)/libasf.a
+ $(CODECDIR)/wavpack_enc.codec: $(CODECDIR)/libwavpack.a
+ $(CODECDIR)/asap.codec : $(CODECDIR)/libasap.a
+ $(CODECDIR)/cook.codec : $(CODECDIR)/libcook.a $(CODECDIR)/librm.a
+Index: ../SOURCES
+===================================================================
+--- ../SOURCES	(revision 27762)
++++ ../SOURCES	(working copy)
+@@ -33,6 +33,7 @@
+ wav64.c
+ tta.c
+ wmapro.c
++wmavoice.c
+ 
+ #ifdef HAVE_RECORDING
+ 

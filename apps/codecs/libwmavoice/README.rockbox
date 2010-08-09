@@ -21,3 +21,7 @@ COMPILING
 
 the decoder can be compiled by issuing the "make" command from witin the 
 libwmavoice directory in any unix-line environment.
+
+To test the decoder in the rockbox simulator, cd to libwmavoice directory then 
+execute the following command to enable building wma voice:
+patch -p 0 < wmavoice_mainbuild.patch
