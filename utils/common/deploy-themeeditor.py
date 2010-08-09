@@ -48,7 +48,6 @@ else:
 # (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
 deploy.programfiles = [ deploy.progexe ]
 deploy.nsisscript = "utils/themeeditor/themeeditor.nsi"
-deploy.nsissetup = "utils/themeeditor/rbthemeeditor-setup.exe"
 
 deploy.deploy()
 

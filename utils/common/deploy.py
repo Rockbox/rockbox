@@ -70,7 +70,6 @@ progexe = ""
 make = "make"
 programfiles = []
 nsisscript = ""
-nsissetup = ""
 
 svnserver = ""
 # Paths and files to retrieve from svn when creating a tarball.
@@ -257,7 +256,15 @@ def runnsis(versionstring, nsis, srcfolder):
         print "NSIS failed!"
         return -1
     setupfile = program + "-" + versionstring + "-setup.exe"
-    shutil.copy(srcfolder + "/" + nsissetup, setupfile)
+    # find output filename in nsis script file
+    nsissetup = ""
+    for line in open(srcfolder + "/" + nsisscript):
+        if re.match(r'^[^;]*OutFile\s+', line) != None:
+            nsissetup = re.sub(r'^[^;]*OutFile\s+"(.+)"', r'\1', line).rstrip()
+    if nsissetup == "":
+        print "Could not retrieve output file name!"
+        return -1
+    shutil.copy(srcfolder + "/" + os.path.dirname(nsisscript) + "/" + nsissetup, setupfile)
     return 0
 
 
