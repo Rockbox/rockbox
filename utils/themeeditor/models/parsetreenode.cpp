@@ -31,6 +31,9 @@
 
 #include <iostream>
 #include <cmath>
+#include <cassert>
+
+#include <QDebug>
 
 int ParseTreeNode::openConditionals = 0;
 bool ParseTreeNode::breakFlag = false;
@@ -571,9 +574,12 @@ void ParseTreeNode::render(const RBRenderInfo &info, RBViewport* viewport,
     else if(element->type == CONDITIONAL)
     {
         int child = evalTag(info, true, element->children_count).toInt();
-        if(child < children.count())
+        int max = children.count() - element->params_count;
+        if(child < max)
+        {
             children[element->params_count + child]
                     ->render(info, viewport, true);
+        }
     }
     else if(element->type == LINE_ALTERNATOR)
     {
@@ -856,8 +862,6 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             int height = element->params[3].data.number;
             QString action(element->params[4].data.text);
             RBTouchArea* temp = new RBTouchArea(width, height, action, info);
-            x += viewport->x();
-            y += viewport->y();
             temp->setPos(x, y);
             return true;
         }
@@ -914,10 +918,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case '\0':
             /* %X */
             filename = QString(element->params[0].data.text);
-            if(info.sbsScreen() && info.screen()->parentItem())
-                info.sbsScreen()->setBackdrop(filename);
-            else
-                info.screen()->setBackdrop(filename);
+            info.screen()->setBackdrop(filename);
             return true;
         }
 

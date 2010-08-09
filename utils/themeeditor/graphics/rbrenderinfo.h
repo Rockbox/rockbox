@@ -35,8 +35,7 @@ class RBRenderInfo
 public:
     RBRenderInfo(ParseTreeModel* model,  ProjectModel* project,
                  SkinDocument* doc, QMap<QString, QString>* settings,
-                 DeviceState* device, RBScreen* screen,
-                 RBScreen* sbsScreen = 0);
+                 DeviceState* device, RBScreen* screen);
     RBRenderInfo();
     RBRenderInfo(const RBRenderInfo& other);
     virtual ~RBRenderInfo();
@@ -48,7 +47,6 @@ public:
     SkinDocument* document() const{ return mDoc; }
     QMap<QString, QString>* settings() const{ return mSettings; }
     RBScreen* screen() const{ return mScreen; }
-    RBScreen* sbsScreen() const{ return mSbsScreen; }
     ParseTreeModel* model() const{ return mModel; }
 
 private:
@@ -57,7 +55,6 @@ private:
     QMap<QString, QString>* mSettings;
     DeviceState* mDevice;
     RBScreen* mScreen;
-    RBScreen* mSbsScreen;
     ParseTreeModel* mModel;
 };
 

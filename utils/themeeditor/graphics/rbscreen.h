@@ -86,6 +86,8 @@ public:
         }
     }
 
+    void setDefault(RBViewport* view){ defaultView = view; }
+    void endSbsRender();
     void breakSBS();
 
 protected:
@@ -111,6 +113,9 @@ private:
 
     RBAlbumArt* albumArt;
     RBViewport* customUI;
+    RBViewport* defaultView;
+
+    QList<QGraphicsItem*> sbsChildren;
 };
 
 #endif // RBSCREEN_H

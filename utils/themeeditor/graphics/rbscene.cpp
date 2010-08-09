@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsItem>
 
 #include <QDebug>
 
@@ -33,4 +34,3 @@ RBScene::RBScene(QObject* parent)
 RBScene::~RBScene()
 {
 }
-

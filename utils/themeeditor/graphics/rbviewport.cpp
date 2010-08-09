@@ -56,6 +56,16 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
         customUI = false;
         font = screen->getFont(1);
 
+        screen->setDefault(this);
+
+        if(screen->getCustomUI())
+        {
+            RBViewport* cui = screen->getCustomUI();
+            size = cui->boundingRect();
+            setPos(cui->pos());
+
+        }
+
         /* Making sure the default viewport can't be graphically manipulated */
         setFlag(ItemIsSelectable, false);
         setFlag(ItemIsMovable, false);
@@ -297,6 +307,12 @@ void RBViewport::showPlaylist(const RBRenderInfo &info, int start,
         newLine();
         song++;
     }
+}
+
+void RBViewport::makeFullScreen()
+{
+    size = screen->boundingRect();
+    setPos(screen->pos());
 }
 
 void RBViewport::saveGeometry()

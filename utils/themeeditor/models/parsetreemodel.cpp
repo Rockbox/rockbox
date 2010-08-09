@@ -316,7 +316,7 @@ RBScene* ParseTreeModel::render(ProjectModel* project,
     }
 
     /* Rendering SBS, if necessary */
-    RBScreen* sbsScreen = 0;
+    RBScreen* screen = 0;
     if(wps && device->data("rendersbs").toBool())
     {
         QString sbsFile = settings.value(remote ? "rsbs" : "sbs", "");
@@ -334,49 +334,37 @@ RBScene* ParseTreeModel::render(ProjectModel* project,
             if(sbsModel->root != 0)
             {
                 RBRenderInfo sbsInfo(sbsModel, project, doc, &settings, device,
-                                     sbsScreen);
+                                     screen);
 
-                sbsScreen = new RBScreen(sbsInfo, remote);
-                scene->addItem(sbsScreen);
+                screen = new RBScreen(sbsInfo, remote);
+                scene->addItem(screen);
 
                 sbsInfo = RBRenderInfo(sbsModel, project, doc, &settings,
-                                       device, sbsScreen);
+                                       device, screen);
                 sbsModel->root->render(sbsInfo);
+                screen->endSbsRender();
 
-                setChildrenUnselectable(sbsScreen);
+                setChildrenUnselectable(screen);
             }
         }
     }
 
-    RBScreen* screen = 0;
-    RBRenderInfo info(this, project, doc, &settings, device, screen, sbsScreen);
+    RBRenderInfo info(this, project, doc, &settings, device, screen);
 
     /* Adding the screen */
-    if(sbsScreen)
-        screen = new RBScreen(info, remote, sbsScreen->getCustomUI());
-    else
+    if(!screen)
+    {
         screen = new RBScreen(info, remote);
-
-    if(!sbsScreen)
         scene->addItem(screen);
+    }
 
-    info = RBRenderInfo(this, project, doc,  &settings, device, screen,
-                        sbsScreen);
+    info = RBRenderInfo(this, project, doc,  &settings, device, screen);
 
 
     /* Rendering the tree */
     if(root)
         root->render(info);
 
-//    /* Making sure the Custom UI Viewport can't be selected */
-//    if(sbsScreen)
-//    {
-//        sbsScreen->getCustomUI()->setFlag(QGraphicsItem::ItemIsSelectable,
-//                                          false);
-//        sbsScreen->getCustomUI()->setFlag(QGraphicsItem::ItemIsMovable,
-//                                          false);
-//    }
-//
     return scene;
 }
 

@@ -32,7 +32,7 @@
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
                        :QGraphicsItem(parent), backdrop(0), project(project),
-                       albumArt(0), customUI(0)
+                       albumArt(0), customUI(0), defaultView(0)
 {
 
     setAcceptHoverEvents(true);
@@ -221,11 +221,29 @@ void RBScreen::makeCustomUI(QString id)
     }
 }
 
+void RBScreen::endSbsRender()
+{
+    sbsChildren = children();
+
+    QList<int> keys = fonts.keys();
+    for(QList<int>::iterator i = keys.begin(); i != keys.end(); i++)
+    {
+        if(*i > 2)
+            fonts.remove(*i);
+    }
+
+    images.clear();
+    namedViewports.clear();
+    displayedViewports.clear();
+}
+
 void RBScreen::breakSBS()
 {
-    width = fullWidth;
-    height = fullHeight;
-    setParentItem(0);
+    for(QList<QGraphicsItem*>::iterator i = sbsChildren.begin()
+        ; i != sbsChildren.end(); i++)
+        (*i)->hide();
+    if(defaultView)
+        defaultView->makeFullScreen();
 }
 
 QColor RBScreen::stringToColor(QString str, QColor fallback)

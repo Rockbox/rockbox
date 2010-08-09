@@ -24,6 +24,8 @@
 
 #include <QGraphicsScene>
 
+class RBScreen;
+
 class RBScene : public QGraphicsScene
 {
     Q_OBJECT
