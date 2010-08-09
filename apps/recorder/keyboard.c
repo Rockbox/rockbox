@@ -328,12 +328,7 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
-#ifdef CPU_ARM
-    /* This seems to keep the sizes for ARM way down */
-    struct keyboard_parameters * volatile param = kbd_param;
-#else
     struct keyboard_parameters * const param = kbd_param;
-#endif
     struct edit_state state;
     int l; /* screen loop variable */
     unsigned short ch;
