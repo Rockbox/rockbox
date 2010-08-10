@@ -400,7 +400,7 @@ static int parse_viewportcolour(struct skin_element *element,
     }
     else
     {
-        if (!parse_color(param->data.text, &colour->colour))
+        if (!parse_color(curr_screen, param->data.text, &colour->colour))
             return -1;
     }
     colour->vp = &curr_vp->vp;

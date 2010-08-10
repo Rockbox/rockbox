@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include "config.h"
 #include "system.h"
+#include "screen_access.h"
 
 extern const unsigned char * const byte_units[];
 extern const unsigned char * const * const kbyte_units;
@@ -92,7 +93,7 @@ char* skip_whitespace(char* const str);
 char *strip_extension(char* buffer, int buffer_size, const char *filename);
 
 #ifdef HAVE_LCD_BITMAP
-bool parse_color(char *text, int *value);
+bool parse_color(enum screen_type screen, char *text, int *value);
 
 /* only used in USB HID and set_time screen */
 #if defined(USB_ENABLE_HID) || (CONFIG_RTC != 0)
