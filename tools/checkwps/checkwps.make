@@ -7,7 +7,7 @@
 # $Id$
 #
 
-FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
+FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall -DCHECKWPS
 
 SRC= $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
 

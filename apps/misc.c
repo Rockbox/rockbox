@@ -929,14 +929,13 @@ int hex_to_rgb(const char* hex, int* color)
 #ifdef HAVE_LCD_BITMAP
 /* '0'-'3' are ASCII 0x30 to 0x33 */
 #define is0123(x) (((x) & 0xfc) == 0x30)
-
+#if !defined(__PCTOOL__) || defined(CHECKWPS)
 bool parse_color(enum screen_type screen, char *text, int *value)
 {
     (void)text; (void)value; /* silence warnings on mono bitmap */
-    int depth = screens[screen].depth;
     
 #ifdef HAVE_LCD_COLOR
-    if (depth > 2)
+    if (screens[screen].depth > 2)
     {
         if (hex_to_rgb(text, value) < 0)
             return false;
@@ -946,7 +945,7 @@ bool parse_color(enum screen_type screen, char *text, int *value)
 #endif
 
 #if LCD_DEPTH == 2 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
-    if (depth == 2)
+    if (screens[screen].depth == 2)
     {
         if (text[1] != '\0' || !is0123(*text))
             return false;
@@ -956,6 +955,7 @@ bool parse_color(enum screen_type screen, char *text, int *value)
 #endif
     return false;
 }
+#endif /* !defined(__PCTOOL__) || defined(CHECKWPS) */
 
 /* only used in USB HID and set_time screen */
 #if defined(USB_ENABLE_HID) || (CONFIG_RTC != 0)
