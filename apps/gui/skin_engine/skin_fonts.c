@@ -63,6 +63,7 @@ int skin_font_load(char* font_name)
     struct font *pf;
     struct skin_font_info *font = NULL;
     char filename[MAX_PATH];
+    char tmp[MAX_PATH];
     
     if (!strcmp(font_name, global_settings.font_file))
         return FONT_UI;
@@ -70,9 +71,12 @@ int skin_font_load(char* font_name)
     if (!strcmp(font_name, global_settings.remote_font_file))
         return FONT_UI_REMOTE;
 #endif
+    snprintf(tmp, MAX_PATH, FONT_DIR "/%s.fnt", font_name);
+    get_user_file_path(tmp, FORCE_BUFFER_COPY, filename, sizeof(filename));
+    
     for(i=0;i<MAXUSERFONTS;i++)
     {
-        if (font_table[i].font_id >= 0 && !strcmp(font_table[i].name, font_name))
+        if (font_table[i].font_id >= 0 && !strcmp(font_table[i].name, filename))
         {
             font_table[i].ref_count++;
             return font_table[i].font_id;
@@ -98,9 +102,6 @@ int skin_font_load(char* font_name)
         pf->buffer_start = font->buffer;
     }
     pf->buffer_size = SKIN_FONT_SIZE;
-    
-    snprintf(filename, MAX_PATH, FONT_DIR "/%s.fnt", font_name);
-    get_user_file_path(filename, FORCE_BUFFER_COPY, font->name, sizeof(font->name));
     
     pf->fd = -1;
     font->font_id = font_load(pf, filename);
