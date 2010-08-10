@@ -195,15 +195,20 @@ void sb_skin_update(enum screen_type screen, bool force)
         if (lcd_active() || (i != SCREEN_MAIN))
 #endif
         {
-            bool full_update = false;
+            bool full_update = sb_skin[i].sync_data->do_full_update;
 #if NB_SCREENS > 1
             if (i==SCREEN_MAIN && sb_skin[i].sync_data->do_full_update)
             {
-                full_update = true;
                 sb_skin[i].sync_data->do_full_update = false;
+                /* we need to make sure the remote gets a full update
+                 * next time it is drawn also. so quick n dirty hack */
+                next_update[SCREEN_REMOTE] = 0;
+            }
+            else if (next_update[SCREEN_REMOTE] == 0)
+            {
+                full_update = true;
             }
 #else
-            full_update = sb_skin[i].sync_data->do_full_update;
             sb_skin[i].sync_data->do_full_update = false;
 #endif
             skin_update(&sb_skin[i], force || full_update?

@@ -1113,6 +1113,7 @@ long gui_wps_show(void)
 #if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
             gwps_caption_backlight(&wps_state);
 #endif
+            bool full_update = wps_sync_data.do_full_update;
             FOR_NB_SCREENS(i)
             {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -1121,15 +1122,13 @@ long gui_wps_show(void)
                 if (lcd_active() || (i != SCREEN_MAIN))
 #endif
                 {
-                    bool full_update = false;
 #if NB_SCREENS > 1
                     if (i==SCREEN_MAIN && wps_sync_data.do_full_update)
                     {
-                        full_update = true;
                         wps_sync_data.do_full_update = false;
                     }
+                    
 #else
-                    full_update = wps_sync_data.do_full_update;
                     wps_sync_data.do_full_update = false;
 #endif
                     skin_update(&gui_wps[i], full_update ?
