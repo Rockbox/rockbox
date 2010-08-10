@@ -933,6 +933,7 @@ int hex_to_rgb(const char* hex, int* color)
 bool parse_color(enum screen_type screen, char *text, int *value)
 {
     (void)text; (void)value; /* silence warnings on mono bitmap */
+    (void)screen;
     
 #ifdef HAVE_LCD_COLOR
     if (screens[screen].depth > 2)

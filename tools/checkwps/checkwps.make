@@ -7,7 +7,7 @@
 # $Id$
 #
 
-FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall -DCHECKWPS
+FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
 
 SRC= $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
 
@@ -22,7 +22,7 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(BUILDDIR)
 
 # Makes mkdepfile happy
-GCCOPTS+=-D__PCTOOL__
+GCCOPTS+=-D__PCTOOL__ -DCHECKWPS
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
