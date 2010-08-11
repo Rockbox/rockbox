@@ -184,17 +184,17 @@ static int tenthdb2reg(int db)
  * by 12 dB after processing.
  */
 
-/* all values in tenth of dB    MAS3507D    UDA1380  */
-int current_volume = 0;    /* -780..+180  -840..   0 */
-int current_balance = 0;   /* -960..+960  -840..+840 */
+/* all values in tenth of dB          MAS3507D    UDA1380  */
+static int current_volume = 0;    /* -780..+180  -840..   0 */
+static int current_balance = 0;   /* -960..+960  -840..+840 */
 #ifdef AUDIOHW_HAVE_TREBLE
-int current_treble = 0;    /* -150..+150     0.. +60 */
+static int current_treble = 0;    /* -150..+150     0.. +60 */
 #endif
 #ifdef AUDIOHW_HAVE_BASS
-int current_bass = 0;      /* -150..+150     0..+240 */
+static int current_bass = 0;      /* -150..+150     0..+240 */
 #endif
 #ifdef AUDIOHW_HAVE_EQ
-int current_eq_band_gain[AUDIOHW_EQ_BAND_NUM];
+static int current_eq_band_gain[AUDIOHW_EQ_BAND_NUM];
 #endif
 
 static void set_prescaled_volume(void)
@@ -284,8 +284,8 @@ static void set_prescaled_volume(void)
 
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-unsigned long mdb_shape_shadow = 0;
-unsigned long loudness_shadow = 0;
+static unsigned long mdb_shape_shadow = 0;
+static unsigned long loudness_shadow = 0;
 #endif
 
 void sound_set_volume(int value)
