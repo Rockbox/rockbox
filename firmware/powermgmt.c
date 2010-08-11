@@ -218,7 +218,7 @@ void set_sleep_timer(int seconds)
 
 int get_sleep_timer(void)
 {
-    if (sleeptimer_active)
+    if (sleeptimer_active && (sleeptimer_endtick >= current_tick))
         return (sleeptimer_endtick - current_tick) / HZ;
     else
         return 0;
