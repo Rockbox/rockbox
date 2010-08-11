@@ -1075,6 +1075,7 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
         lastdir[0]='\0';
         if (playlist_create(resume_file, NULL) != -1)
         {
+            char filename_buf[MAX_PATH + 1];
             const char* peek_filename;
             resume_directory(resume_file);
             if (global_settings.playlist_shuffle)
@@ -1082,13 +1083,15 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
 
             /* Check if the file is at the same spot in the directory,
                else search for it */
-            peek_filename = playlist_peek(index);
+            peek_filename = playlist_peek(index, filename_buf,
+                sizeof(filename_buf));
             
             if (peek_filename == NULL)
             {
                 /* playlist has shrunk, search from the top */
                 index = 0;
-                peek_filename = playlist_peek(index);
+                peek_filename = playlist_peek(index, filename_buf,
+                    sizeof(filename_buf));
                 if (peek_filename == NULL)
                     return false;
             }
@@ -1097,7 +1100,8 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
             {
                 for ( i=0; i < playlist_amount(); i++ )
                 {
-                    peek_filename = playlist_peek(i);
+                    peek_filename = playlist_peek(i, filename_buf,
+                        sizeof(filename_buf));
 
                     if (peek_filename == NULL)
                         return false;

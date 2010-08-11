@@ -144,7 +144,6 @@ struct directory_search_context {
 };
 
 static struct playlist_info current_playlist;
-static char now_playing[MAX_PATH+1];
 
 static void empty_playlist(struct playlist_info* playlist, bool resume);
 static void new_playlist(struct playlist_info* playlist, const char *dir,
@@ -2456,7 +2455,7 @@ bool playlist_check(int steps)
 
 /* get trackname of track that is "steps" away from current playing track.
    NULL is used to identify end of playlist */
-const char* playlist_peek(int steps)
+const char* playlist_peek(int steps, char* buf, size_t buf_size)
 {
     struct playlist_info* playlist = &current_playlist;
     int seek;
@@ -2471,11 +2470,11 @@ const char* playlist_peek(int steps)
     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
     seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
 
-    if (get_filename(playlist, index, seek, control_file, now_playing,
-            MAX_PATH+1) < 0)
+    if (get_filename(playlist, index, seek, control_file, buf,
+        buf_size) < 0)
         return NULL;
 
-    temp_ptr = now_playing;
+    temp_ptr = buf;
 
     if (!playlist->in_ram || control_file)
     {
@@ -2494,7 +2493,7 @@ const char* playlist_peek(int steps)
             /* Even though this is an invalid file, we still need to pass a
                file name to the caller because NULL is used to indicate end
                of playlist */
-            return now_playing;
+            return buf;
         }
     }
 

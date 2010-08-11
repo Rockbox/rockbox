@@ -1113,6 +1113,7 @@ static bool audio_loadcodec(bool start_play)
    actually loaded by the buffering thread. */
 static bool audio_load_track(size_t offset, bool start_play)
 {
+    char name_buf[MAX_PATH + 1];
     const char *trackname;
     int fd = -1;
 
@@ -1140,7 +1141,8 @@ static bool audio_load_track(size_t offset, bool start_play)
 
     logf("Buffering track: r%d/w%d", track_ridx, track_widx);
     /* Get track name from current playlist read position. */
-    while ((trackname = playlist_peek(last_peek_offset)) != NULL)
+    while ((trackname = playlist_peek(last_peek_offset, name_buf,
+        sizeof(name_buf))) != NULL)
     {
         /* Handle broken playlists. */
         fd = open(trackname, O_RDONLY);

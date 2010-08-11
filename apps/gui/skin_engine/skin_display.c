@@ -218,7 +218,7 @@ void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *view
     int x, length, alignment = SKIN_TOKEN_ALIGN_LEFT;
     
     struct mp3entry *pid3;
-    char buf[MAX_PATH*2], tempbuf[MAX_PATH];
+    char buf[MAX_PATH*2], tempbuf[MAX_PATH], filename_buf[MAX_PATH + 1];
     const char *filename;
 #if CONFIG_TUNER
     if (current_screen() == GO_TO_FM)
@@ -249,7 +249,8 @@ void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *view
         else
 #endif
         {
-            filename = playlist_peek(i-cur_pos);
+            filename = playlist_peek(i-cur_pos, filename_buf,
+                sizeof(filename_buf));
             if (i == cur_pos)
             {
                 pid3 = state->id3;
