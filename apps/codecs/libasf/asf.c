@@ -404,7 +404,7 @@ int asf_seek(int ms, asf_waveformatex_t* wfx)
 
         /*check the time stamp of our packet*/
         time = asf_get_timestamp(&duration);
-        DEBUGF("seeked to %d ms with duration %d\n", time, duration);
+        /*DEBUGF("seeked to %d ms with duration %d\n", time, duration);*/
 
         if (time < 0) {
             /*unknown error, try to recover*/
@@ -415,7 +415,7 @@ int asf_seek(int ms, asf_waveformatex_t* wfx)
         }
 
         if ((time+duration>=ms && time<=ms) || count > 10) {
-            DEBUGF("Found our packet! Now at %d packet\n", packet_num);
+            /*DEBUGF("Found our packet! Now at %d packet\n", packet_num);*/
             return time;
         } else {
             /*seek again*/
