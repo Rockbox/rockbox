@@ -1007,17 +1007,17 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
             else
                 child = 1;
         }
-        else if(val.type() == QVariant::String)
-        {
-            if(val.toString().length() > 0)
-                child = 0;
-            else
-                child = 1;
-        }
         else if(element->tag->name[0] == 'i' || element->tag->name[0] == 'I'
                 || element->tag->name[0] == 'f' || element->tag->name[0] == 'F')
         {
             if(info.device()->data("id3available").toBool())
+                child = 0;
+            else
+                child = 1;
+        }
+        else if(val.type() == QVariant::String)
+        {
+            if(val.toString().length() > 0)
                 child = 0;
             else
                 child = 1;
