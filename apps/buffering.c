@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <inttypes.h>
 #include "buffering.h"
 
 #include "storage.h"
@@ -31,7 +32,6 @@
 #include "thread.h"
 #include "file.h"
 #include "panic.h"
-#include "memory.h"
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
