@@ -48,6 +48,9 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
     leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0),
     node(pNode), doc(info.document())
 {
+    mirrored = info.screen()->isRtlMirrored()
+               && info.device()->data("rtl").toBool();
+
     if(!node->tag)
     {
         /* Default viewport takes up the entire screen */
@@ -147,6 +150,12 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
             y -= screen->parentItem()->pos().y();
         }
 
+        /* Mirroring if necessary */
+        if(mirrored)
+        {
+            x = parentItem()->boundingRect().width() - w - x;
+        }
+
         if(node->params[++param].type == skin_tag_parameter::DEFAULT)
             font = screen->getFont(1);
         else
@@ -226,15 +235,21 @@ void RBViewport::write(QString text)
     if(textOffset.x() < 0)
         return;
 
-    if(textAlign == Left)
+    Alignment align = textAlign;
+    if(mirrored && align == Left)
+        align = Right;
+    else if(mirrored && align == Right)
+        align = Left;
+
+    if(align == Left)
     {
         leftText.append(text);
     }
-    else if(textAlign == Center)
+    else if(align == Center)
     {
         centerText.append(text);
     }
-    else if(textAlign == Right)
+    else if(align == Right)
     {
         rightText.append(text);
     }

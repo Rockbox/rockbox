@@ -665,6 +665,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
 
         case 'x':
             /* %ax */
+            info.screen()->RtlMirror();
             return true;
 
         case 'L':

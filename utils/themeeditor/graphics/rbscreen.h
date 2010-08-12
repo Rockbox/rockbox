@@ -90,6 +90,9 @@ public:
     void endSbsRender();
     void breakSBS();
 
+    void RtlMirror(){ ax = true; }
+    bool isRtlMirrored(){ bool ret = ax; ax = false; return ret; }
+
 protected:
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 
@@ -116,6 +119,8 @@ private:
     RBViewport* defaultView;
 
     QList<QGraphicsItem*> sbsChildren;
+
+    bool ax;
 };
 
 #endif // RBSCREEN_H

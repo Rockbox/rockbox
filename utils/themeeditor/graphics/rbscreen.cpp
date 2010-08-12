@@ -32,7 +32,7 @@
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
                        :QGraphicsItem(parent), backdrop(0), project(project),
-                       albumArt(0), customUI(0), defaultView(0)
+                       albumArt(0), customUI(0), defaultView(0), ax(false)
 {
 
     setAcceptHoverEvents(true);
