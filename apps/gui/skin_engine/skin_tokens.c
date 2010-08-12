@@ -655,10 +655,12 @@ const char *get_token_value(struct gui_wps *gwps,
 
             if (intval)
             {
-                limit = MAX(limit, 2);
+                limit = MAX(limit, 3);
                 if (l > -1) {
-                    /* First enum is used for "unknown level". */
-                    *intval = (limit - 1) * l / 100 + 2;
+                    /* First enum is used for "unknown level",
+                     * last enum is used for 100%.
+                     */
+                    *intval = (limit - 2) * l / 100 + 2;
                 } else {
                     *intval = 1;
                 }
