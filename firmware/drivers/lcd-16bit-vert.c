@@ -27,9 +27,8 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include <string.h>
 #include <stdlib.h>
-#include "memory.h"
+#include "string-extra.h" /* mem*() */
 #include "file.h"
 #include "debug.h"
 #include "system.h"

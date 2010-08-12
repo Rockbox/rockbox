@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "lcd.h"
 #include "system.h"
-#include "memory.h"
+#include "string-extra.h" /* memset16() */
 #include "cpu.h"
 #include "spi.h"
 #include "spi-target.h"

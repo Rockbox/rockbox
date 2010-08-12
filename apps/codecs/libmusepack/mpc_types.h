@@ -38,7 +38,7 @@
 #endif
 
 #include <stdlib.h>
-#include <memory.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {

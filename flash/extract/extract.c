@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
+#include <inttypes.h>
 
 #define UINT8 unsigned char
 #define UINT16 unsigned short

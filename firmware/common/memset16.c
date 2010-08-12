@@ -19,8 +19,7 @@
  *
  ****************************************************************************/
 
-#include <string.h>
-#include "memory.h"
+#include "string-extra.h" /* memset16() */
 
 #define LBLOCKSIZE (sizeof(long)/2)
 #define UNALIGNED(X)   ((long)X & (sizeof(long) - 1))

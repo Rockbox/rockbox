@@ -19,11 +19,10 @@
  *
  ****************************************************************************/
 
-#ifndef _MEMORY_H_
-#define _MEMORY_H_
+#ifndef __MEMSET16_H__
+#define __MEMSET16_H__
 
-#include "inttypes.h"
+#include <string.h> /* size_t */
+extern void memset16(void *dst, int val, size_t len);
 
-void memset16(void *dst, int val, size_t len);
-
-#endif /* _MEMORY_H_ */
+#endif /* __MEMSET16_H__ */

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_thread.h>
-#include "memory.h"
+#include <inttypes.h>
 #include "system-sdl.h"
 #include "thread-sdl.h"
 #include "kernel.h"

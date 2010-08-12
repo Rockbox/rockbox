@@ -27,7 +27,7 @@
 #include "cpu.h"
 #include "string.h"
 #include "kernel.h"
-#include "memory.h"
+#include "string-extra.h" /* memset16() */
 #include "mmu-arm.h"
 #include "system-target.h"
 #include "lcd.h"
