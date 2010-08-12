@@ -157,21 +157,24 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                 {
                     char buf[16];
                     const char *out;
-                    int a = TOKEN_VALUE_ONLY;
+                    int a = img->num_subimages;
                     out = get_token_value(gwps, id->token, buf, sizeof(buf), &a);
+
                     /* NOTE: get_token_value() returns values starting at 1! */
                     if (a == -1)
                         a = (out && *out) ? 1 : 2;
                     a--;
                     a += id->offset;
+
+                    /* Clear the image, as in conditionals */
+                    clear_image_pos(gwps, img);
+
                     /* If the token returned a value which is higher than
-                     * the amount of subimages clear the image. */
-                    if (a<0 || a >= img->num_subimages)
+                     * the amount of subimages, don't draw it. */
+                    if (a >= 0 && a < img->num_subimages)
                     {
-                        clear_image_pos(gwps, img);
-                    }
-                    else
                         img->display = a;
+                    }
                 }
             }
             break;
