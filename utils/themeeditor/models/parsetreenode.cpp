@@ -935,6 +935,9 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
 {
     if(!conditional)
     {
+        if(element->tag->name[0] == 'c' && !info.device()->data("cc").toBool())
+            return QString();
+
         if(QString(element->tag->name) == "Sx")
             return element->params[0].data.text;
         return info.device()->data(QString(element->tag->name),
