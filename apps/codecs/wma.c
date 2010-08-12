@@ -73,8 +73,6 @@ restart_track:
         goto exit;
     }
 
-    DEBUGF("**************** IN WMA.C ******************\n");
-
     if (resume_offset > ci->id3->first_frame_offset)
     {
         /* Get start of current packet */
