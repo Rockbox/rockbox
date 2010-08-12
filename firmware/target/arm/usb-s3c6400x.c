@@ -318,7 +318,7 @@ static void ep_recv(int ep, void *ptr, int length)
     DOEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
 }
 
-int usb_drv_send(int endpoint, const void *ptr, int length)
+int usb_drv_send(int endpoint, void *ptr, int length)
 {
     endpoint &= 0x7f;
     endpoints[endpoint].done = false;
@@ -328,7 +328,7 @@ int usb_drv_send(int endpoint, const void *ptr, int length)
     return endpoints[endpoint].rc;
 }
 
-int usb_drv_send_nonblocking(int endpoint, const void *ptr, int length)
+int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 {
     ep_send(endpoint & 0x7f, ptr, length);
     return 0;

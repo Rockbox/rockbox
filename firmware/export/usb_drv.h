@@ -33,8 +33,8 @@ void usb_drv_attach(void);
 void usb_drv_int(void); /* Call from target INT handler */
 void usb_drv_stall(int endpoint, bool stall,bool in);
 bool usb_drv_stalled(int endpoint,bool in);
-int usb_drv_send(int endpoint, const void* ptr, int length);
-int usb_drv_send_nonblocking(int endpoint, const void* ptr, int length);
+int usb_drv_send(int endpoint, void* ptr, int length);
+int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
 int usb_drv_recv(int endpoint, void* ptr, int length);
 void usb_drv_ack(struct usb_ctrlrequest* req);
 void usb_drv_set_address(int address);
