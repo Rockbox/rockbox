@@ -81,9 +81,10 @@ show the information for the next song to be played.
                     Can also be used in a conditional: 
                     \config{\%?bl<-1|0|1|2|\ldots|N>},
                     where the value $-1$ is used when the battery level isn't
-                    known (it usually is).
+                    known (it usually is). The value $N$ is only used when the
+                    battery level is exactly 100 percent.
                     An image can also be used, the proportion of the image
-                    shown correspinds to the battery level:
+                    shown corresponds to the battery level:
                     \config{\%bl(x,y,[width],[height],image.bmp)}\\
     \config{\%bv} & The battery level in volts\\
     \config{\%bt} & Estimated battery time left\\
