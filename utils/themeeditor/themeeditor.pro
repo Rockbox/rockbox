@@ -108,7 +108,8 @@ HEADERS += models/parsetreemodel.h \
     gui/targetdownloader.h \
     gui/syntaxcompleter.h \
     graphics/rbmovable.h \
-    graphics/rbscene.h
+    graphics/rbscene.h \
+    gui/rbconsole.h
 SOURCES += main.cpp \
     models/parsetreemodel.cpp \
     models/parsetreenode.cpp \
@@ -151,7 +152,8 @@ SOURCES += main.cpp \
     gui/targetdownloader.cpp \
     gui/syntaxcompleter.cpp \
     graphics/rbmovable.cpp \
-    graphics/rbscene.cpp
+    graphics/rbscene.cpp \
+    gui/rbconsole.cpp
 OTHER_FILES += README \
     resources/windowicon.png \
     resources/appicon.xcf \
@@ -196,7 +198,8 @@ FORMS += gui/editorwindow.ui \
     qtfindreplacedialog/findreplaceform.ui \
     qtfindreplacedialog/findreplacedialog.ui \
     gui/projectexporter.ui \
-    gui/targetdownloader.ui
+    gui/targetdownloader.ui \
+    gui/rbconsole.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = themeeditor.rc
 macx { 

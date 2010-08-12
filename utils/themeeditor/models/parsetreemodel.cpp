@@ -358,6 +358,8 @@ RBScene* ParseTreeModel::render(ProjectModel* project,
         scene->addItem(screen);
     }
 
+    scene->setScreenSize(screen->boundingRect());
+
     info = RBRenderInfo(this, project, doc,  &settings, device, screen);
 
 

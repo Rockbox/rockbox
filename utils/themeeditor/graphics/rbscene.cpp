@@ -21,16 +21,38 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsItem>
-
-#include <QDebug>
+#include <QGraphicsProxyWidget>
 
 #include "rbscene.h"
+#include "rbconsole.h"
 
 RBScene::RBScene(QObject* parent)
-    : QGraphicsScene(parent)
+    : QGraphicsScene(parent), consoleProxy(0), console(0)
 {
 }
 
 RBScene::~RBScene()
 {
+    if(console)
+        console->deleteLater();
+
+    if(consoleProxy)
+        consoleProxy->deleteLater();
+}
+
+void RBScene::clear()
+{
+    QGraphicsScene::clear();
+
+    console = new RBConsole();
+    consoleProxy = addWidget(console);
+    consoleProxy->setZValue(1000);
+    consoleProxy->resize(screen.width(), screen.height());
+    consoleProxy->hide();
+}
+
+void RBScene::addWarning(QString warning)
+{
+    console->addWarning(warning);
+    console->show();
 }

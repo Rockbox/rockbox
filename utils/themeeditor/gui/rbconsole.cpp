@@ -19,51 +19,23 @@
  *
  ****************************************************************************/
 
-#ifndef RBSCENE_H
-#define RBSCENE_H
+#include "rbconsole.h"
+#include "ui_rbconsole.h"
 
-#include <QGraphicsScene>
-#include <QGraphicsProxyWidget>
-
-class RBScreen;
-class RBConsole;
-
-class RBScene : public QGraphicsScene
+RBConsole::RBConsole(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::RBConsole)
 {
-    Q_OBJECT
+    ui->setupUi(this);
+}
 
-public:
-    RBScene(QObject* parent = 0);
-    ~RBScene();
+RBConsole::~RBConsole()
+{
+    delete ui;
+}
 
-    void moveMouse(QString position){ emit mouseMoved(position); }
-
-    void setScreenSize(qreal w, qreal h)
-    {
-        screen = QRectF(0, 0, w, h);
-        if(consoleProxy)
-            consoleProxy->resize(screen.width(), screen.height());
-    }
-
-    void setScreenSize(QRectF screen){
-        this->screen = screen;
-        if(consoleProxy)
-            consoleProxy->resize(screen.width(), screen.height());
-    }
-
-    void addWarning(QString warning);
-
-public slots:
-    void clear();
-
-signals:
-    void mouseMoved(QString position);
-
-private:
-    QGraphicsProxyWidget* consoleProxy;
-    RBConsole* console;
-
-    QRectF screen;
-};
-
-#endif // RBSCENE_H
+void RBConsole::addWarning(QString warning)
+{
+    ui->output->appendHtml("<span style = \"color:orange\">" + warning
+                           + "</span>");
+}

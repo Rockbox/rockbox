@@ -19,51 +19,25 @@
  *
  ****************************************************************************/
 
-#ifndef RBSCENE_H
-#define RBSCENE_H
+#ifndef RBCONSOLE_H
+#define RBCONSOLE_H
 
-#include <QGraphicsScene>
-#include <QGraphicsProxyWidget>
+#include <QWidget>
 
-class RBScreen;
-class RBConsole;
+namespace Ui {
+    class RBConsole;
+}
 
-class RBScene : public QGraphicsScene
-{
+class RBConsole : public QWidget {
     Q_OBJECT
-
 public:
-    RBScene(QObject* parent = 0);
-    ~RBScene();
-
-    void moveMouse(QString position){ emit mouseMoved(position); }
-
-    void setScreenSize(qreal w, qreal h)
-    {
-        screen = QRectF(0, 0, w, h);
-        if(consoleProxy)
-            consoleProxy->resize(screen.width(), screen.height());
-    }
-
-    void setScreenSize(QRectF screen){
-        this->screen = screen;
-        if(consoleProxy)
-            consoleProxy->resize(screen.width(), screen.height());
-    }
+    RBConsole(QWidget *parent = 0);
+    ~RBConsole();
 
     void addWarning(QString warning);
 
-public slots:
-    void clear();
-
-signals:
-    void mouseMoved(QString position);
-
 private:
-    QGraphicsProxyWidget* consoleProxy;
-    RBConsole* console;
-
-    QRectF screen;
+    Ui::RBConsole *ui;
 };
 
-#endif // RBSCENE_H
+#endif // RBCONSOLE_H
