@@ -26,6 +26,7 @@
 #include <system.h>
 #include <inttypes.h>
 #include "config.h"
+#include "gcc_extensions.h"
 #include "lcd.h"
 #ifdef USE_ROCKBOX_USB
 #include "usb.h"
@@ -70,7 +71,7 @@ static void usb_mode(void)
 }
 #endif /* USE_ROCKBOX_USB */
 
-void main(void) __attribute__((noreturn));
+void main(void) NORETURN_ATTR;
 void main(void)
 {
     unsigned char* loadbuffer;

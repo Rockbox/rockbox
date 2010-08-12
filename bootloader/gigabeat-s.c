@@ -22,6 +22,7 @@
 #include "system.h"
 #include <stdio.h>
 #include "kernel.h"
+#include "gcc_extensions.h"
 #include "string.h"
 #include "adc.h"
 #include "powermgmt.h"
@@ -296,7 +297,7 @@ static void handle_untar(void)
 }
 
 /* Try to load the firmware and run it */
-static void __attribute__((noreturn)) handle_firmware_load(void)
+static void NORETURN_ATTR handle_firmware_load(void)
 {
     int rc = load_firmware(load_buf, BOOTFILE,
                            load_buf_size);

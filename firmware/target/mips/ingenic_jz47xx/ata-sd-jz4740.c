@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "gcc_extensions.h"
 #include "jz4740.h"
 #include "ata.h"
 #include "ata_idle_notify.h"
@@ -47,7 +48,7 @@ static const char         sd_thread_name[] = "ata/sd";
 static struct event_queue sd_queue;
 static struct mutex       sd_mtx;
 static struct wakeup      sd_wakeup;
-static void               sd_thread(void) __attribute__((noreturn));
+static void               sd_thread(void) NORETURN_ATTR;
 
 static int                use_4bit;
 static int                num_6;

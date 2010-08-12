@@ -21,6 +21,7 @@
 #include "config.h" /* for HAVE_MULTIDRIVE */
 #include "fat.h"
 #include "sdmmc.h"
+#include "gcc_extensions.h"
 #ifdef HAVE_HOTSWAP
 #include "sd-pp-target.h"
 #endif
@@ -1105,7 +1106,7 @@ sd_write_error:
     }
 }
 
-static void sd_thread(void) __attribute__((noreturn));
+static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;

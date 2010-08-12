@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 
+#include "gcc_extensions.h"
 #include "storage.h"
 #include "disk.h"
 #include "fat.h"
@@ -112,35 +113,41 @@
 #include "m5636.h"
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#define MAIN_NORETURN_ATTR NORETURN_ATTR
+#else
+/* gcc adds an implicit 'return 0;' at the end of main(), causing a warning
+ * with noreturn attribute */
+#define MAIN_NORETURN_ATTR
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include "sim_tasks.h"
 #endif
 
-#ifdef HAVE_SDL
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #include "system-sdl.h"
+#define HAVE_ARGV_MAIN
+/* Don't use SDL_main on windows -> no more stdio redirection */
+#if defined(WIN32)
+#undef main
+#endif
 #endif
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 static void init(void);
-
-#ifdef HAVE_SDL
-#if defined(WIN32) && defined(main)
-/* Don't use SDL_main on windows -> no more stdio redirection */
-#undef main
-#endif
-int main(int argc, char *argv[])
-{
-#ifdef APPLICATION
-    paths_init();
-#endif
-    sys_handle_argv(argc, argv);
-#else
 /* main(), and various functions called by main() and init() may be
  * be INIT_ATTR. These functions must not be called after the final call
  * to root_menu() at the end of main()
  * see definition of INIT_ATTR in config.h */
-int main(void)  INIT_ATTR __attribute__((noreturn));
+#ifdef HAVE_ARGV_MAIN
+int main(int argc, char *argv[]) INIT_ATTR MAIN_NORETURN_ATTR ;
+int main(int argc, char *argv[])
+{
+    sys_handle_argv(argc, argv);
+#else
+int main(void) INIT_ATTR MAIN_NORETURN_ATTR;
 int main(void)
 {
 #endif
@@ -328,6 +335,9 @@ static void init_tagcache(void)
 
 static void init(void)
 {
+#ifdef APPLICATION
+    paths_init();
+#endif
     system_init();
     kernel_init();
     buffer_init();
@@ -707,7 +717,8 @@ static void init(void)
 }
 
 #ifdef CPU_PP
-void __attribute__((noreturn)) cop_main(void)
+void cop_main(void) MAIN_NORETURN_ATTR;
+void cop_main(void)
 {
 /* This is the entry point for the coprocessor
    Anyone not running an upgraded bootloader will never reach this point,

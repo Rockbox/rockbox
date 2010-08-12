@@ -25,7 +25,7 @@
 
 /****************************************************************************
  * void rolo_restart_firmware(const unsigned char* source, unsigned char* dest,
- *                            int length) __attribute__((noreturn));
+ *                            int length) NORETURN_ATTR;
  */
     .section    .text, "ax", %progbits
     .align      2

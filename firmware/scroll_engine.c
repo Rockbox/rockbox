@@ -23,6 +23,7 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "gcc_extensions.h"
 #include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
@@ -257,7 +258,7 @@ static bool scroll_process_message(int delay)
 }
 #endif /* HAVE_REMOTE_LCD */
 
-static void scroll_thread(void) __attribute__((noreturn));
+static void scroll_thread(void) NORETURN_ATTR;
 #ifdef HAVE_REMOTE_LCD
 
 static void scroll_thread(void)

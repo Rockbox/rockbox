@@ -18,11 +18,13 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-#include "config.h"
 #ifndef __ROOT_MENU_H__
 #define __ROOT_MENU_H__
 
-void root_menu(void) __attribute__((noreturn));
+#include "config.h"
+#include "gcc_extensions.h"
+
+void root_menu(void) NORETURN_ATTR;
 
 enum {
     /* from old menu api, but still required*/

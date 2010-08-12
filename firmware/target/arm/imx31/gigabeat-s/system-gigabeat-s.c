@@ -21,6 +21,7 @@
 
 #include "kernel.h"
 #include "system.h"
+#include "gcc_extensions.h"
 #include "panic.h"
 #include "avic-imx31.h"
 #include "gpio-imx31.h"
@@ -219,9 +220,9 @@ void system_prepare_fw_start(void)
 
 #ifndef BOOTLOADER
 void rolo_restart_firmware(const unsigned char *source, unsigned char *dest,
-                           int length) __attribute__((noreturn));
+                           int length) NORETURN_ATTR;
 
-void __attribute__((noreturn))
+void NORETURN_ATTR
 rolo_restart(const unsigned char *source, unsigned char *dest, int length)
 {
     /* Some housekeeping tasks must be performed for a safe changeover */

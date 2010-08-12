@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include "config.h"
+#include "gcc_extensions.h"
 #include "pcm_record.h"
 #include "system.h"
 #include "kernel.h"
@@ -1458,7 +1461,7 @@ static void pcmrec_resume(void)
     logf("pcmrec_resume done");
 } /* pcmrec_resume */
 
-static void pcmrec_thread(void) __attribute__((noreturn));
+static void pcmrec_thread(void) NORETURN_ATTR;
 static void pcmrec_thread(void)
 {
     struct queue_event ev;

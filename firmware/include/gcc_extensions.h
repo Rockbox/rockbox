@@ -43,4 +43,11 @@
 #endif
 
 
+#if defined(__GNUC__) && (__GNUC__ >= 3 || \
+                    (__GNUC__ >= 2 && __GNUC_MINOR__ >= 5))
+#define NORETURN_ATTR __attribute__((noreturn))
+#else
+#define NORETURN_ATTR
+#endif
+
 #endif /* _GCC_EXTENSIONS_H_ */

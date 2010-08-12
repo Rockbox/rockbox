@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "gcc_extensions.h"
 #include "as3525.h"
 #include "pl180.h"  /* SD controller */
 #include "pl081.h"  /* DMA controller */
@@ -432,7 +433,7 @@ static int sd_init_card(const int drive)
     return 0;
 }
 
-static void sd_thread(void) __attribute__((noreturn));
+static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;

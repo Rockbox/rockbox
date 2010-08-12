@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include <stdio.h>
 #include "config.h"
+#include "gcc_extensions.h"
 #include "adc.h"
 #include "system.h"
 #include "lcd.h"
@@ -200,7 +201,7 @@ static void system_display_exception_info(unsigned long format,
        reliable. The system restarts, but boot often fails with ata error -42. */
 }
 
-static void UIE(void) __attribute__ ((noreturn));
+static void UIE(void) NORETURN_ATTR;
 static void UIE(void)
 {
     asm volatile("subq.l #4,%sp"); /* phony return address - never used */

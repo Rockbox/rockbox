@@ -22,6 +22,7 @@
 #include "sd.h"
 #include "system.h"
 #include <string.h>
+#include "gcc_extensions.h"
 #include "sdmmc.h"
 #include "storage.h"
 #include "led.h"
@@ -642,7 +643,7 @@ sd_write_error:
     }
 }
 
-static void sd_thread(void) __attribute__((noreturn));
+static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;

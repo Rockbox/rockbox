@@ -24,6 +24,7 @@
 #include "sd.h"
 #include "system.h"
 #include <string.h>
+#include "gcc_extensions.h"
 #include "thread.h"
 #include "panic.h"
 
@@ -575,7 +576,7 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 #endif /* HAVE_HOTSWAP */
 /*****************************************************************************/
 
-static void sd_thread(void) __attribute__((noreturn));
+static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;

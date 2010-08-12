@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "gcc_extensions.h"
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
  * by giving high priority threads more CPU time than lower priority threads
@@ -385,7 +386,7 @@ void thread_thaw(unsigned int thread_id);
 /* Wait for a thread to exit */
 void thread_wait(unsigned int thread_id);
 /* Exit the current thread */
-void thread_exit(void) __attribute__((noreturn));
+void thread_exit(void) NORETURN_ATTR;
 #if defined(DEBUG) || defined(ROCKBOX_HAS_LOGF)
 #define ALLOW_REMOVE_THREAD
 /* Remove a thread from the scheduler */

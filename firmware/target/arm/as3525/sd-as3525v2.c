@@ -23,6 +23,7 @@
 #include "config.h" /* for HAVE_MULTIVOLUME */
 #include "fat.h"
 #include "thread.h"
+#include "gcc_extensions.h"
 #include "led.h"
 #include "sdmmc.h"
 #include "system.h"
@@ -616,7 +617,7 @@ static int sd_init_card(const int drive)
     return 0;
 }
 
-static void sd_thread(void) __attribute__((noreturn));
+static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;
