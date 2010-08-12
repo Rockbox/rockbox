@@ -243,6 +243,13 @@ static int parse_image_display(struct skin_element *element,
     }
     id->label = label;
     id->offset = 0;
+    img->using_preloaded_icons = false;
+    if (!strcmp(img->bm.data, "__list_icons__"))
+    {
+        img->num_subimages = Icon_Last_Themeable;
+        img->using_preloaded_icons = true;
+        token->type = SKIN_TOKEN_IMAGE_DISPLAY_LISTICON;
+    }
     
     if (element->params_count > 1)
     {
@@ -302,7 +309,6 @@ static int parse_image_load(struct skin_element *element,
     img->y = y;
     img->num_subimages = 1;
     img->always_display = false;
- //   img->just_drawn = false;
     img->display = -1;
 
     /* save current viewport */
@@ -318,6 +324,7 @@ static int parse_image_load(struct skin_element *element,
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
     }
+    
     struct skin_token_list *item = 
             (struct skin_token_list *)new_skin_token_list_item(NULL, img);
     if (!item)
@@ -994,11 +1001,19 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
         struct gui_img *img = (struct gui_img*)list->token->value.data;
         if (img->bm.data)
         {
-            img->loaded = load_skin_bmp(wps_data, &img->bm, bmpdir);
-            if (img->loaded)
-                img->subimage_height = img->bm.height / img->num_subimages;
+            if (img->using_preloaded_icons)
+            {
+                img->loaded = true;
+                list->token->type = SKIN_TOKEN_IMAGE_DISPLAY_LISTICON;
+            }
             else
-                retval = false;
+            {
+                img->loaded = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                if (img->loaded)
+                    img->subimage_height = img->bm.height / img->num_subimages;
+                else
+                    retval = false;
+            }
         }
         list = list->next;
     }
@@ -1022,7 +1037,6 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             retval = false;
     }
 #endif /* has backdrop support */
-
     return retval;
 }
 

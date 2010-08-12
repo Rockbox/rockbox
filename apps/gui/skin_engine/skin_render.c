@@ -142,6 +142,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         }
         break;
 #ifdef HAVE_LCD_BITMAP
+        case SKIN_TOKEN_IMAGE_DISPLAY_LISTICON:
         case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
         {
             struct image_display *id = token->value.data;
@@ -163,7 +164,10 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                     /* NOTE: get_token_value() returns values starting at 1! */
                     if (a == -1)
                         a = (out && *out) ? 1 : 2;
-                    a--;
+                    if (token->type == SKIN_TOKEN_IMAGE_DISPLAY_LISTICON)
+                        a -= 2; /* 2 is added in statusbar-skinned.c! */
+                    else
+                        a--;
                     a += id->offset;
 
                     /* Clear the image, as in conditionals */

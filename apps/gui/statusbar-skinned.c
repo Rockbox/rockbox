@@ -77,6 +77,16 @@ static int set_title_worker(char* title, enum themable_icons icon,
                 /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
                 token->value.i = icon+2;
             }
+            else if (element->params_count)
+            {
+                int i;
+                for (i=0; i<element->params_count; i++)
+                {
+                    if (element->params[i].type == CODE)
+                        retval |= set_title_worker(title, icon, data, 
+                                                   element->params[i].data.code);
+                }
+            }
         }
         if (element->children_count)
         {
