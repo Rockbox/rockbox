@@ -52,6 +52,8 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
 {
     int i;
     struct skin_backdrop *bdrop = NULL;
+    char dir[MAX_PATH];
+    const char *backdrop_dir = get_user_file_path(bmpdir, 0, dir, sizeof(dir));
     char filename[MAX_PATH];
     size_t buf_size;
     bool loaded = false;
@@ -78,12 +80,12 @@ char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
                 return NULL; /* backdrop setting not set */
             }
             snprintf(filename, sizeof(filename), "%s/%s.bmp",
-                     BACKDROP_DIR, global_settings.backdrop_file);
+                     backdrop_dir, global_settings.backdrop_file);
         }
     }
     else
     {
-        get_image_filename(backdrop, bmpdir, filename, sizeof(filename));
+        get_image_filename(backdrop, backdrop_dir, filename, sizeof(filename));
     }
     
     for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
