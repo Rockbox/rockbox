@@ -1,0 +1,103 @@
+# cabbie 2.0
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# (C) 2010, Thomas Martitz ported to 480x800 touchscreens
+# derived from "cabbie" (C) Yohann Misquitta
+
+# TODO:
+#  * images for battery, hold button
+%wd
+%X(wpsbackdrop-480x800x16.bmp)
+
+#%xl(A,lock-240x320x16.bmp,11,0,2)
+#%xl(B,battery-240x320x16.bmp,46,0,10)
+%xl(C,volume-480x800x16.bmp,145,125,10)
+%xl(D,shuffle-480x800x16.bmp,240,133)
+%xl(E,repeat-480x800x16.bmp,343,121,4)
+%xl(F,playmode-480x800x16.bmp,403,119,5)
+%xl(G,popup-480x800x16.bmp,0,0)
+%xl(H,rew-480x800x16.bmp,0,5)
+%xl(I,ff-480x800x16.bmp,70,5)
+
+%Cl(0,0,275,275,c,c)
+
+%?C<%Vd(c)%?Tl(2.0)<%Vd(t)|%Vd(d)>|%Vd(a)%?Tl(2.0)<%Vd(t)|%Vd(b)>>
+
+# track & next track info - no AA
+%Vl(a,0,102,-,180,-)
+# tap on current title info for playlist (ie. where albumart would normally be)
+%T(0,0,275,275,playlist)
+
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%ac%?iy<%iy|>
+%Vl(b,0,400,-,180,-)
+%ac%?ig<%ig|>
+%ac%?fv<%(vbr%) |>%fb kbit/s %fc
+%s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>>
+%ac%Sx(Next Track:)
+%ac%s%?It<%It|%Fn>
+#
+# album art viewport
+#
+%Vl(c,102,75,275,275,-)
+# tap on the cover art for playlist
+%T(0,0,275,275,playlist)
+%Cd
+
+# current track info - AA
+%Vl(d,0,370,-,-,-)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+
+# next track info - AA
+%Vl(d,0,550,-,-,-)
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
+
+# playtime
+%V(20,660,440,36,-)
+%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+
+# progressbar and bottom icons
+%V(0,600,-,-,-)
+%pb(25,11,430,-,pb-480x800x16.bmp)
+%T(25,0,430,50,progressbar)
+
+#%?mh<%xd(Aa)|%xd(Ab)>
+#%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+# volume
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%T(145,125,88,60,volume)
+#
+# shuffle
+%?ps<%xd(D)>
+%T(237,130,100,50,shuffle)
+#
+# repeat
+%xd(E, %mm, -1)
+%T(340,121,50,70,repmode)
+#
+# playmode
+%xd(F, %mp)
+%T(400,119,70,75,play)
+%T(400,119,70,75,&stop)
+
+#
+# popup osd menu
+#
+%Vl(t,30,400,420,165,-)
+%xd(G)
+%T(10,10,160,140,browse)
+%T(170,10,144,119,quickscreen)
+%T(288,10,123,146,contextmenu)
+
+#
+# ff/rewind button
+#
+%Vl(t,0,720,150,75,-)
+%xd(H)%xd(I)
+%T(0,0,70,75,&rwd)
+%T(0,0,70,75,prev)
+%T(70,0,70,75,&ffwd)
+%T(70,0,70,75,next)
