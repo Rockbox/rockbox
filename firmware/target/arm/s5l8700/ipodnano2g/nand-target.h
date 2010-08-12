@@ -55,7 +55,7 @@ uint32_t nand_write_page_collect(uint32_t bank);
 
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank);
 uint32_t nand_reset(uint32_t bank);
-uint32_t nand_device_init(void);
+int nand_device_init(void);
 void nand_set_active(void);
 long nand_last_activity(void);
 void nand_power_up(void);

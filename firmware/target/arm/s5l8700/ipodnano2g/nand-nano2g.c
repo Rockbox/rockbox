@@ -45,8 +45,6 @@
 
 #define NAND_STATUS_READY   0x40
 
-#define NAND_DEVICEINFOTABLE_ENTRIES 33
-
 static const struct nand_device_info_type nand_deviceinfotable[] =
 {
     {0x1580F1EC, 1024, 968, 0x40, 6, 2, 1, 2, 1},
@@ -88,7 +86,7 @@ static uint8_t nand_tunk1[4];
 static uint8_t nand_twp[4];
 static uint8_t nand_tunk2[4];
 static uint8_t nand_tunk3[4];
-static uint32_t nand_type[4];
+static int nand_type[4];
 static int nand_powered = 0;
 static int nand_interleaved = 0;
 static int nand_cached = 0;
@@ -307,15 +305,15 @@ static uint32_t nand_get_chip_type(uint32_t bank)
 {
     mutex_lock(&nand_mtx);
     uint32_t result;
-    if (nand_reset(bank)) return nand_unlock(0xFFFFFFFF);
-    if (nand_send_cmd(0x90)) return nand_unlock(0xFFFFFFFF);
+    if (nand_reset(bank)) return nand_unlock(0xFFFFFFFE);
+    if (nand_send_cmd(0x90)) return nand_unlock(0xFFFFFFFD);
     FMANUM = 0;
     FMADDR0 = 0;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    if (nand_wait_cmddone()) return nand_unlock(0xFFFFFFFF);
+    if (nand_wait_cmddone()) return nand_unlock(0xFFFFFFFC);
     FMDNUM = 4;
     FMCTRL1 = FMCTRL1_DOREADDATA;
-    if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFF);
+    if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFB);
     result = FMFIFO;
     FMCTRL1 = FMCTRL1_CLEARRFIFO;
     return nand_unlock(result);
@@ -351,13 +349,9 @@ void nand_power_up(void)
     sleep(HZ / 20);
     nand_last_activity_value = current_tick;
     for (i = 0; i < 4; i++)
-    {
-        if(nand_type[i] != 0xFFFFFFFF)
-        {
-            if(nand_reset(i))
+        if (nand_type[i] >= 0)
+            if (nand_reset(i))
                 panicf("nand_power_up: nand_reset(bank=%d) failed.",(unsigned int)i);
-        }
-    }
     nand_powered = 1;
     nand_last_activity_value = current_tick;
     mutex_unlock(&nand_mtx);
@@ -516,7 +510,7 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
     {
         for (i = 0; i < 4; i++)
         {
-            if (nand_type[i] == 0xFFFFFFFF) continue;
+            if (nand_type[i] < 0) continue;
             void* databuf = (void*)0;
             void* sparebuf = (void*)0;
             if (databuffer) databuf = (void*)((uint32_t)databuffer + 0x800 * i);
@@ -534,7 +528,7 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
     led(true);
     if (!nand_powered) nand_power_up();
     uint8_t status[4];
-    for (i = 0; i < 4; i++) status[i] = (nand_type[i] == 0xFFFFFFFF);
+    for (i = 0; i < 4; i++) status[i] = (nand_type[i] < 0);
     for (i = 0; i < 4; i++)
     {
         if (!status[i])
@@ -628,7 +622,7 @@ uint32_t nand_read_page_fast(uint32_t page, void* databuffer,
                                                     + 0x40 * (i - 1))) << 1;
     }
     for (i = 0; i < 4; i++)
-        if (nand_type[i] != 0xFFFFFFFF)
+        if (nand_type[i] < 0)
             rc |= status[i] << (i << 2);
     return nand_unlock(rc);
 }
@@ -686,7 +680,7 @@ static uint32_t nand_block_erase_fast(uint32_t page)
     if (!nand_powered) nand_power_up();
     for (i = 0; i < 4; i++)
     {
-        if (nand_type[i] == 0xFFFFFFFF) continue;
+        if (nand_type[i] < 0) continue;
         nand_set_fmctrl0(i, 0);
         if (nand_send_cmd(NAND_CMD_BLOCKERASE))
         {
@@ -705,7 +699,7 @@ static uint32_t nand_block_erase_fast(uint32_t page)
     }
     for (i = 0; i < 4; i++)
     {
-        if (nand_type[i] == 0xFFFFFFFF) continue;
+        if (nand_type[i] < 0) continue;
         if (rc & (1 << i)) continue;
         if (nand_wait_status_ready(i)) rc |= 1 << i;
     }
@@ -715,7 +709,7 @@ static uint32_t nand_block_erase_fast(uint32_t page)
 
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
 {
-    if (nand_type[bank] == 0xFFFFFFFF)
+    if (nand_type[bank] < 0)
         return (struct nand_device_info_type*)0;
     return &nand_deviceinfotable[nand_type[bank]];
 }
@@ -734,7 +728,7 @@ static void nand_thread(void)
     }
 }
 
-uint32_t nand_device_init(void)
+int nand_device_init(void)
 {
     mutex_init(&nand_mtx);
     wakeup_init(&nand_wakeup);
@@ -746,7 +740,7 @@ uint32_t nand_device_init(void)
 
     /* Assume there are 0 banks, to prevent
        nand_power_up from talking with them yet. */
-    for(i = 0; i < 4; i++) nand_type[i] = 0xFFFFFFFF;
+    for (i = 0; i < 4; i++) nand_type[i] = -1;
     nand_power_up();
 
     /* Now that the flash is powered on, detect how
@@ -758,7 +752,11 @@ uint32_t nand_device_init(void)
         nand_tunk2[i] = 7;
         nand_tunk3[i] = 7;
         type = nand_get_chip_type(i);
-        if (type == 0xFFFFFFFF) continue;
+        if (type >= 0xFFFFFFF0)
+        {
+            nand_type[i] = (int)type;
+            continue;
+        }
         for (j = 0; ; j++)
         {
             if (j == ARRAYLEN(nand_deviceinfotable)) break;
@@ -773,7 +771,7 @@ uint32_t nand_device_init(void)
         nand_tunk2[i] = nand_deviceinfotable[nand_type[i]].tunk2;
         nand_tunk3[i] = nand_deviceinfotable[nand_type[i]].tunk3;
     }
-    if (nand_type[0] == 0xFFFFFFFF) return 1;
+    if (nand_type[0] < 0) return nand_type[0];
     nand_interleaved = ((nand_type[0] >> 22) & 1);
     nand_cached = ((nand_type[0] >> 23) & 1);
 
