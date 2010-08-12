@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="pt_BR">
 <context>
     <name>BootloaderInstallAms</name>
     <message>
@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; e a página wiki do &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
 </context>
 <context>
@@ -123,7 +123,7 @@
     <name>BootloaderInstallChinaChip</name>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo HXF). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo HXF). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a página wiki do &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -428,63 +428,63 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <name>BootloaderInstallMpio</name>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a página wiki do &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Transferindo arquivo do inicializador</translation>
+        <translation>Transferindo arquivo do inicializador</translation>
     </message>
     <message>
         <source>Could not open the original firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir o firmware original.</translation>
     </message>
     <message>
         <source>Could not read the original firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ler o firmware original.</translation>
     </message>
     <message>
         <source>Could not open downloaded bootloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível transferir o inicializador.</translation>
     </message>
     <message>
         <source>Place for bootloader in OF file not empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>O espaço para o inicializador no arquivo OF não está vazio.</translation>
     </message>
     <message>
         <source>Could not read the downloaded bootloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ler o inicializador transferido.</translation>
     </message>
     <message>
         <source>Bootloader checksum error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erro no checksum do inicializador.</translation>
     </message>
     <message>
         <source>Patching original firmware failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Falhou ao aplicar correção no firmware original: %1</translation>
     </message>
     <message>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">Sucesso: criado arquivo de firmware modificado</translation>
+        <translation>Sucesso: criado arquivo de firmware modificado</translation>
     </message>
     <message>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
+        <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
     </message>
     <message>
         <source>Loaded firmware file does not look like MPIO original firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>O arquivo de firmware carregado não se parece com um arquivo de firmware MPIO original.</translation>
     </message>
     <message>
         <source>Could not open output file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir o arquivo de saída.</translation>
     </message>
     <message>
         <source>Could not write output file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível escrever o arquivo de saída.</translation>
     </message>
     <message>
         <source>Unknown error number: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erro desconhecido número: %1</translation>
     </message>
 </context>
 <context>
@@ -619,7 +619,7 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; página wiki para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; e a página wiki do &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
     </message>
     <message>
         <source>Could not patch firmware</source>
@@ -1394,7 +1394,7 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
     <message>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>LTR</translation>
     </message>
 </context>
 <context>
@@ -1681,27 +1681,27 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
     </message>
     <message>
         <source>No Rockbox installation found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nenhuma instalação do Rockbox encontrada</translation>
     </message>
     <message>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível determinar a versão do Rockbox instalada. Por favor, instale uma compilação do Rockbox antes de instalar fontes.</translation>
     </message>
     <message>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível determinar a versão do Rockbox instalada. Por favor, instale uma compilação do Rockbox antes de instalar arquivos de voz.</translation>
     </message>
     <message>
         <source>Checking for update ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurando atualizações...</translation>
     </message>
     <message>
         <source>New version of Rockbox Utility available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nova versão do Utilitário Rockbox disponível.</translation>
     </message>
     <message>
         <source>Rockbox Utility is up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>O Utilitário Rockbox está atualizado.</translation>
     </message>
 </context>
 <context>
@@ -2136,23 +2136,23 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <name>System</name>
     <message>
         <source>Guest</source>
-        <translation type="unfinished">Convidado</translation>
+        <translation>Convidado</translation>
     </message>
     <message>
         <source>Admin</source>
-        <translation type="unfinished">Administrador</translation>
+        <translation>Administrador</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished">Usuário</translation>
+        <translation>Usuário</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>(no description available)</source>
-        <translation type="unfinished">(nenhuma descrição disponível)</translation>
+        <translation>(nenhuma descrição disponível)</translation>
     </message>
 </context>
 <context>
@@ -2430,9 +2430,9 @@ código de resposta HTTP: %1</translation>
     </message>
     <message numerus="yes">
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation type="unfinished">
-            <numerusform>
-        </numerusform>
+        <translation>
+            <numerusform>Tamanho %L1 kiB (%n item)</numerusform>
+            <numerusform>Tamanho %L1 kiB (%n itens)</numerusform>
         </translation>
     </message>
 </context>
@@ -2574,18 +2574,18 @@ código de resposta HTTP: %1</translation>
     <message>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Permissões insuficientes para a instalação do carregador.
+        <translation>&lt;li&gt;Permissões insuficientes para a instalação do carregador.
 É necessário privilégios de administrator.&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Detectada diferenças de alvos.
+        <translation>&lt;li&gt;Detectada diferenças de alvos.
 Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <source>Problem detected:</source>
-        <translation type="unfinished">Problema detectado:</translation>
+        <translation>Problema detectado:</translation>
     </message>
 </context>
 <context>
