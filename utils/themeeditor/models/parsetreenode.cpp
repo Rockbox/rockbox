@@ -640,6 +640,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
     int x, y, tiles, tile, maxWidth, maxHeight, width, height;
     char c, hAlign, vAlign;
     RBImage* image;
+    QPixmap temp;
 
     /* Two switch statements to narrow down the tag name */
     switch(element->tag->name[0])
@@ -774,14 +775,27 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case 'l':
             /* %xl */
             id = element->params[0].data.text;
-            filename = info.settings()->value("imagepath", "") + "/" +
-                       element->params[1].data.text;
+            if(element->params[1].data.text == QString("__list_icons__"))
+            {
+                filename = info.settings()->value("iconset", "");
+                filename.replace(".rockbox",
+                                 info.settings()->value("themebase"));
+                temp.load(filename);
+                if(!temp.isNull())
+                {
+                    tiles = temp.height() / temp.width();
+                }
+            }
+            else
+            {
+                filename = info.settings()->value("imagepath", "") + "/" +
+                           element->params[1].data.text;
+                tiles = 1;
+            }
             x = element->params[2].data.number;
             y = element->params[3].data.number;
             if(element->params_count > 4)
                 tiles = element->params[4].data.number;
-            else
-                tiles = 1;
 
             info.screen()->loadImage(id, new RBImage(filename, tiles, x, y,
                                                      this, viewport));
