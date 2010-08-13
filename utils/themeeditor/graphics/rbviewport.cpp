@@ -48,8 +48,6 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
     leftGraphic(0), centerGraphic(0), rightGraphic(0), scrollTime(0),
     node(pNode), doc(info.document())
 {
-    mirrored = info.screen()->isRtlMirrored()
-               && info.device()->data("rtl").toBool();
 
     if(!node->tag)
     {
@@ -150,12 +148,6 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
             y -= screen->parentItem()->pos().y();
         }
 
-        /* Mirroring if necessary */
-        if(mirrored)
-        {
-            x = parentItem()->boundingRect().width() - w - x;
-        }
-
         if(node->params[++param].type == skin_tag_parameter::DEFAULT)
             font = screen->getFont(1);
         else
@@ -167,6 +159,17 @@ RBViewport::RBViewport(skin_element* node, const RBRenderInfo& info,
 
     debug = info.device()->data("showviewports").toBool();
     lineHeight = font->lineHeight();
+
+    if(info.screen()->isRtlMirrored() && info.device()->data("rtl").toBool())
+    {
+        /* Mirroring the viewport */
+        double x = screen->boundingRect().width() - 2 * pos().x();
+        QTransform t;
+        t.translate(x, 0);
+        t.scale(-1, 1);
+        setTransform(t);
+    }
+
     if(customUI)
         screen->setCustomUI(this);
 }
@@ -236,10 +239,6 @@ void RBViewport::write(QString text)
         return;
 
     Alignment align = textAlign;
-    if(mirrored && align == Left)
-        align = Right;
-    else if(mirrored && align == Right)
-        align = Left;
 
     if(align == Left)
     {
