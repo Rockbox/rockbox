@@ -14,8 +14,7 @@ IMPORT DETAILS
 Based on ffmpeg svn r24734 dated 7 August 2010.
 
 As of 7 August 2010, libwmavoice contains just the files from ffmpeg with 
-minimum modifications to comile standalone. The decoder isn't still used in 
-rockbox in anyway.
+minimum modifications to compile standalone.
 
 COMPILING
 
