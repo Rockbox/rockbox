@@ -191,7 +191,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
     buf = ci->request_buffer(&bufsize, length);
     datap = buf;
 
-    if (bufsize != length) {
+    if (bufsize > length) {
         /* This should only happen with packets larger than 32KB (the
            guard buffer size).  All the streams I've seen have
            relatively small packets less than about 8KB), but I don't
