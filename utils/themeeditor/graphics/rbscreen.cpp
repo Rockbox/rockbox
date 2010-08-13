@@ -201,7 +201,11 @@ void RBScreen::setBackdrop(QString filename)
     if(QFile::exists(filename))
         backdrop = new QPixmap(filename);
     else
+    {
+        RBScene* s = dynamic_cast<RBScene*>(scene());
+        s->addWarning(QObject::tr("Image not found: ") + filename);
         backdrop = 0;
+    }
 }
 
 void RBScreen::makeCustomUI(QString id)

@@ -641,6 +641,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
     char c, hAlign, vAlign;
     RBImage* image;
     QPixmap temp;
+    RBFont* fLoad;
 
     /* Two switch statements to narrow down the tag name */
     switch(element->tag->name[0])
@@ -857,7 +858,11 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             x = element->params[0].data.number;
             filename = info.settings()->value("themebase", "") + "/fonts/" +
                        element->params[1].data.text;
-            info.screen()->loadFont(x, new RBFont(filename));
+            fLoad = new RBFont(filename);
+            if(!fLoad->isValid())
+                dynamic_cast<RBScene*>(info.screen()->scene())
+                ->addWarning(QObject::tr("Missing font file: ") + filename);
+            info.screen()->loadFont(x, fLoad);
             return true;
 
         }

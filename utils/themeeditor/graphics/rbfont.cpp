@@ -39,6 +39,8 @@ RBFont::RBFont(QString file)
     : valid(false), imageData(0), offsetData(0), widthData(0)
 {
 
+    bool badFile = false;
+
     /* Attempting to locate the correct file name */
     if(!QFile::exists(file))
     {
@@ -52,7 +54,11 @@ RBFont::RBFont(QString file)
         settings.endGroup();
 
         if(!QFile::exists(file))
+        {
             file = ":/fonts/08-Schumacher-Clean.fnt";
+
+            badFile = true;
+        }
     }
     header.insert("filename", file);
 
@@ -64,6 +70,9 @@ RBFont::RBFont(QString file)
         offsetData = cache->offsetData;
         widthData = cache->widthData;
         header = cache->header;
+
+        if(!badFile)
+            valid = true;
 
         return;
     }
@@ -161,6 +170,9 @@ RBFont::RBFont(QString file)
    cache->widthData = widthData;
    cache->header = header;
    RBFontCache::insert(file, cache);
+
+   if(!badFile)
+       valid = true;
 
 }
 

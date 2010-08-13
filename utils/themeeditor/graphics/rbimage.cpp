@@ -25,6 +25,7 @@
 
 #include "rbimage.h"
 #include "parsetreenode.h"
+#include <rbscene.h>
 
 RBImage::RBImage(QString file, int tiles, int x, int y, ParseTreeNode* node,
                  QGraphicsItem* parent)
@@ -56,6 +57,9 @@ RBImage::RBImage(QString file, int tiles, int x, int y, ParseTreeNode* node,
     }
     else
     {
+        RBScene* s = dynamic_cast<RBScene*>(scene());
+        s->addWarning(QObject::tr("Image not found: ") + file);
+
         size = QRectF(0, 0, 0, 0);
         image = 0;
     }

@@ -41,6 +41,8 @@ public:
 
     static quint16 maxFontSizeFor16BitOffsets;
 
+    bool isValid(){ return valid; }
+
 private:
     QHash<QString, QVariant> header;
     bool valid;
