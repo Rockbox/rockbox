@@ -8,7 +8,19 @@
 %xl(D,shuffle-160x128x2.bmp,72,2)
 %xl(E,repeat-160x128x2.bmp,93,0,4)
 %xl(F,playmode-160x128x2.bmp,112,1,5)
-%pb(1,61,125,7,pb-128x96x2.bmp)
+
+%V(0,10,128,48,1)%Vf(0)%Vb(3)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%Sx(Next:) %ac%It
+
+%V(0,58,128,12,1)%Vf(0)%Vb(3)
+%pb(1,3,125,7,pb-128x96x2.bmp)
+
+%V(0,70,128,12,1)%Vf(0)%Vb(3)
+%al %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr 
+
 %V(0,83,128,13,1)%Vf(0)%Vb(3)
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
@@ -16,10 +28,3 @@
 %?ps<%xd(D)>
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
-%V(0,10,128,72,1)%Vf(0)%Vb(3)
-%s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
-%s%Sx(Next:) %ac%It
-
-%al %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr 
