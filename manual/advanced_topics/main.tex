@@ -221,11 +221,15 @@ are discussed below.
 \item Lines beginning with \# are comments and will be ignored.
 \end{itemize}
 
-\note{Keep in mind that your \dap{} resolution is \dapdisplaysize{} (with
+\note{Keep in mind that your \daps{} resolution is \dapdisplaysize{} (with
   the last number giving the colour depth in bits) when
   designing your own WPS, or if you use a WPS designed for another target.
   \opt{HAVE_REMOTE_LCD}{The resolution of the remote is
-  \opt{h100,h300}{128$\times$64$\times$1}\opt{x5,m5}{128$\times$96$\times$2} pixels.}}
+      \opt{h100,h300}{128$\times$64$\times$1}%
+      \opt{iaudiox5,iaudiom5,iaudiom3}{128$\times$96$\times$2}
+      pixels.
+  }
+}
 
 \nopt{lcd_charcell}{
 \subsubsection{\label{ref:Viewports}Viewports}
