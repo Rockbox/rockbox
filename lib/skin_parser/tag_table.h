@@ -291,6 +291,10 @@ enum skin_token_type {
  *             2s
  *          will specify two strings.  An asterisk (*) at the beginning of the
  *          string will specify that you may choose to omit all arguments
+ * 
+ *          You may also group param types in [] which will tell the parser to 
+ *          accept any *one* of those types for that param. i.e [IT] will
+ *          accept either an integer or tag type. [ITs] will also accept a string or -
  *
  */
 struct tag_info

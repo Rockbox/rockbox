@@ -243,6 +243,7 @@ static int parse_image_display(struct skin_element *element,
     }
     id->label = label;
     id->offset = 0;
+    id->token = NULL;
     img->using_preloaded_icons = false;
     if (!strcmp(img->bm.data, "__list_icons__"))
     {
@@ -253,19 +254,21 @@ static int parse_image_display(struct skin_element *element,
     
     if (element->params_count > 1)
     {
-        id->token = element->params[1].data.code->data;
+        if (element->params[1].type == CODE)
+            id->token = element->params[1].data.code->data;
+        /* specify a number. 1 being the first subimage (i.e top) NOT 0 */
+        else if (element->params[1].type == INTEGER)
+            id->subimage = element->params[1].data.number - 1;
         if (element->params_count > 2)
             id->offset = element->params[2].data.number;
     }
     else
     {
-        id->token = NULL;
         if ((subimage = get_image_id(sublabel)) != -1)
         {
             if (subimage >= img->num_subimages)
                 return WPS_ERROR_INVALID_PARAM;
             id->subimage = subimage;
-            token->value.i = label | (subimage << 8);
         } else {
             id->subimage = 0;
         }

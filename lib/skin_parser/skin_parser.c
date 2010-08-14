@@ -579,6 +579,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     /* Now we have to actually parse each argument */
     for(i = 0; i < num_args; i++)
     {
+        char type_code;
         /* Making sure we haven't run out of arguments */
         if(*tag_args == '\0')
         {
@@ -600,14 +601,71 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         /* Checking for comments */
         if(*cursor == COMMENTSYM)
             skip_comment(&cursor);
-
+            
+        if (*tag_args == '[')
+        {
+            /* we need to guess which type of param it is. 
+             * guess using this priority:
+             * default > decimal/integer > single tag/code > string
+             */
+            int j=0;
+            bool canbedefault = false;
+            bool haspercent = false, number = true, hasdecimal = false;
+            char temp_params[8];
+            tag_args++;
+            while (*tag_args != ']')
+            {
+                if (*tag_args >= 'a' && *tag_args <= 'z')
+                    canbedefault = true;
+                temp_params[j++] = tolower(*tag_args++);
+            }
+            temp_params[j] = '\0';
+            j = 0;
+            while (cursor[j] != ',' && cursor[j] != ')')
+            {
+                haspercent = haspercent || (cursor[j] == '%');
+                hasdecimal = hasdecimal || (cursor[j] == '.');
+                number = number && (isdigit(cursor[j]) || (cursor[j] == '.'));
+                j++;
+            }
+            type_code = '*';
+            if (canbedefault && *cursor == DEFAULTSYM && !isdigit(cursor[1]))
+            {
+                type_code = 'i';
+            }
+            else if (number && hasdecimal && strchr(temp_params, 'd'))
+            {
+                type_code = 'd';
+            }
+            else if (number && 
+                     (strchr(temp_params, 'i') || strchr(temp_params, 'd')))
+            {
+                type_code = strchr(temp_params, 'i') ? 'i' : 'd';
+            }
+            else if (haspercent && 
+                    (strchr(temp_params, 't') || strchr(temp_params, 'c')))
+            {
+                type_code = strchr(temp_params, 't') ? 't' : 'c';
+            }
+            else if (strchr(temp_params, 's'))
+            {
+                type_code = 's';
+            }
+            if (type_code == '*')
+            {
+                skin_error(INSUFFICIENT_ARGS, cursor);
+                return 0;
+            }   
+        }
+        else
+            type_code = *tag_args;
         /* Storing the type code */
-        element->params[i].type_code = *tag_args;
+        element->params[i].type_code = type_code;
 
         /* Checking a nullable argument for null. */
         if(*cursor == DEFAULTSYM && !isdigit(cursor[1]))
         {
-            if(islower(*tag_args))
+            if(islower(type_code))
             {
                 element->params[i].type = DEFAULT;
                 cursor++;
@@ -618,7 +676,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
                 return 0;
             }
         }
-        else if(tolower(*tag_args) == 'i')
+        else if(tolower(type_code) == 'i')
         {
             /* Scanning an int argument */
             if(!isdigit(*cursor) && *cursor != '-')
@@ -630,7 +688,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             element->params[i].type = INTEGER;
             element->params[i].data.number = scan_int(&cursor);
         }
-        else if(tolower(*tag_args) == 'd')
+        else if(tolower(type_code) == 'd')
         {
             int val = 0;
             bool have_point = false;
@@ -657,15 +715,15 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             element->params[i].type = DECIMAL;
             element->params[i].data.number = val;
         }
-        else if(tolower(*tag_args) == 'n' ||
-                tolower(*tag_args) == 's' || tolower(*tag_args) == 'f')
+        else if(tolower(type_code) == 'n' ||
+                tolower(type_code) == 's' || tolower(type_code) == 'f')
         {
             /* Scanning a string argument */
             element->params[i].type = STRING;
             element->params[i].data.text = scan_string(&cursor);
 
         }
-        else if(tolower(*tag_args) == 'c')
+        else if(tolower(type_code) == 'c')
         {
             /* Recursively parsing a code argument */
             element->params[i].type = CODE;
@@ -673,7 +731,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             if(!element->params[i].data.code)
                 return 0;
         }
-        else if (tolower(*tag_args) == 't')
+        else if (tolower(type_code) == 't')
         {
             struct skin_element* child = skin_alloc_element();
             child->type = TAG;
