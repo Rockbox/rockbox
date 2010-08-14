@@ -71,11 +71,12 @@ struct skin_draw_info {
 typedef bool (*skin_render_func)(struct skin_element* alternator, struct skin_draw_info *info);
 bool skin_render_alternator(struct skin_element* alternator, struct skin_draw_info *info);
 
+#ifdef HAVE_LCD_BITMAP
 static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        struct gui_wps *gwps,
                                        struct skin_viewport* skin_viewport,
                                        unsigned long refresh_type);
-
+#endif
 
 static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                              struct skin_element *element, struct viewport* vp)

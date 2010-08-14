@@ -169,16 +169,16 @@ or \config{\%D(2)}), produce the information for the next file to be played.
   
 \section{Playlist Viewer}
   \begin{tagmap}
-    \config{\%Vp(start,if tag present,other)} & Display the playlist viewer in
+    \config{\%Vp(start,code to render)} & Display the playlist viewer in
             the current viewport.\\
   \end{tagmap}
 
   \begin{itemize}
     \item `start' is the offset relative to the currently playing track for the
     playlist to display from (0 the current track, 1 is the next track, etc.).
-    \item `if tag present' is the skin code to display if the track has been buffered.
-    \item `other' is the skin code to display if the track hasnt been buffered,
-    essentially only the filename is know at this point.
+    \item `code to render' is a line of skin code which will be displayed for
+    each line in the viewer. All text tags are supporte (including conditionals
+    and sublines)
   \end{itemize}
 
   The entire viewport will be used, so don't expect other tags in the same
