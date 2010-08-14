@@ -666,7 +666,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     display->update();
 }
 
-
+#ifdef HAVE_LCD_BITMAP
 static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        struct gui_wps *gwps,
                                        struct skin_viewport* skin_viewport,
@@ -751,3 +751,4 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
         start_item++;
     }
 }
+#endif
