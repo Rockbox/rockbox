@@ -53,7 +53,8 @@
 #define MP4_ilst FOURCC('i', 'l', 's', 't')
 #define MP4_isom FOURCC('i', 's', 'o', 'm')
 #define MP4_M4A  FOURCC('M', '4', 'A', ' ')
-#define MP4_M4B  FOURCC('M', '4', 'B', ' ')
+#define MP4_m4a  FOURCC('m', '4', 'a', ' ') /*technically its "M4A "*/
+#define MP4_M4B  FOURCC('M', '4', 'B', ' ') /*but files exist with lower case*/
 #define MP4_mdat FOURCC('m', 'd', 'a', 't')
 #define MP4_mdia FOURCC('m', 'd', 'i', 'a')
 #define MP4_mdir FOURCC('m', 'd', 'i', 'r')
@@ -569,7 +570,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 size -= 4;
                 
                 if ((id != MP4_M4A) && (id != MP4_M4B) && (id != MP4_mp42) 
-                    && (id != MP4_qt) && (id != MP4_3gp6)
+                    && (id != MP4_qt) && (id != MP4_3gp6) && (id != MP4_m4a)
                     && (id != MP4_isom))
                 {
                     DEBUGF("Unknown MP4 file type: '%c%c%c%c'\n", 

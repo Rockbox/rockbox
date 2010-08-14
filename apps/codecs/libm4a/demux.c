@@ -61,6 +61,7 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
     type = stream_read_uint32(qtmovie->stream);
     size_remaining-=4;
     if ((type != MAKEFOURCC('M','4','A',' ')) &&
+        (type != MAKEFOURCC('m','4','a',' ')) &&
         (type != MAKEFOURCC('M','4','B',' ')) &&
         (type != MAKEFOURCC('m','p','4','2')) &&
         (type != MAKEFOURCC('3','g','p','6')) &&
