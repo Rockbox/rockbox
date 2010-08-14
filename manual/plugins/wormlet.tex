@@ -31,12 +31,11 @@ Game controls:}
 %
 \multirow{2}{*}{1} & 2 key control & on \dap\ \ButtonLeft: turn left
                         \ButtonRight: turn right & {}- & {}-\\
-                    & 4 key control & on \dap\ \ButtonLeft: turn  left
-                        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
-                            {\ButtonUp}\opt{IPOD_4G_PAD}{\ButtonMenu}: turn up
-                            \ButtonRight: turn right
-                            \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
-                            {\ButtonDown}\opt{IPOD_4G_PAD}{\ButtonPlay}: turn down & {}- & {}- \\
+                    & 4 key control & on \dap\
+                        \ButtonLeft: turn  left
+                        \ButtonUp: turn up
+                        \ButtonRight: turn right
+                        \ButtonDown: turn down & {}- & {}- \\
 %
 \multirow{2}{*}{2} & Remote control & on \dap\ \ButtonLeft: turn left
                         \ButtonRight: turn right & on remote control VOL DOWN:
@@ -54,38 +53,41 @@ Game controls:}
 
 \nopt{RECORDER_PAD}{
     \begin{btnmap}
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD%
-            ,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
-        {\ButtonLeft}
-        \opt{COWON_D2_PAD}{\TouchMidLeft}
-       \opt{HAVEREMOTEKEYMAP}{& }
-        & Turn left\\
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_3G_PAD,IPOD_4G_PAD%
-            ,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
-        {\ButtonRight}
-        \opt{COWON_D2_PAD}{\TouchMidRight}
-             \opt{HAVEREMOTEKEYMAP}{& }
-        & Turn right\\
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
+        \nopt{touchscreen}{\ButtonLeft}
+        \opt{touchscreen}{\TouchMidLeft}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        Turn left
+        \\
+        
+        \nopt{touchscreen}{\ButtonRight}
+        \opt{touchscreen}{\TouchMidRight}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        Turn right
+        \\
+        
+        \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,touchscreen}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-        \opt{COWON_D2_PAD}{\TouchTopMiddle}
-            \opt{HAVEREMOTEKEYMAP}{& }
-        & Turn Up\\
-        \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-            ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-            ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
+        \opt{touchscreen}{\TouchTopMiddle}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        Turn Up
+        \\
+        
+        \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,touchscreen}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
-        \opt{COWON_D2_PAD}{\TouchBottomMiddle}
-           \opt{HAVEREMOTEKEYMAP}{& }
-        & Turn Down\\
+        \opt{touchscreen}{\TouchBottomMiddle}
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        Turn Down
+        \\
     \end{btnmap}
 }
 
@@ -125,7 +127,7 @@ game.
 Press
 \opt{RECORDER_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}%
 \opt{ONDIO_PAD}{\ButtonMenu}%
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
   ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
 \opt{COWON_D2_PAD}{\TouchCenter}
 to pause the game. Press it again to resume the game.
@@ -136,16 +138,16 @@ There are two ways to stop a running game.
 \begin{itemize}
 \item If you want to quit Wormlet entirely simply hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
-\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
-\opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+\opt{SANSA_FUZE_PAD}{Long \ButtonHome}%
 \opt{PBELL_VIBE500_PAD}{\ButtonRec}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}.
 The game will stop immediately and you will return to the game menu. 
 \item If you want to stop the game and still see the screen hit 
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
-\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}%
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
@@ -154,7 +156,7 @@ The game will stop immediately and you will return to the game menu.
 This freezes the game. If you hit
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
 \opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
-\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}%
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
@@ -163,7 +165,7 @@ This freezes the game. If you hit
 button again a new game starts with the same configuration. To return to the
 games menu you can hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
-\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}%
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{PBELL_VIBE500_PAD}{\ButtonRec}%
