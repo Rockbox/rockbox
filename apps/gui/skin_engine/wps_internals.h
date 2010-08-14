@@ -77,7 +77,7 @@ struct gui_img {
     short int num_subimages;      /* number of sub-images */
     short int subimage_height;    /* height of each sub-image */
     struct bitmap bm;
-    char label;
+    const char *label;
     bool loaded;            /* load state */
     bool always_display;    /* not using the preload/display mechanism */
     int display;
@@ -85,7 +85,7 @@ struct gui_img {
 };
 
 struct image_display {
-    char label;
+    const char *label;
     int subimage;
     struct wps_token *token; /* the token to get the subimage number from */
     int offset; /* offset into the bitmap strip to start */
@@ -348,8 +348,8 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval);
 #endif
 
-struct gui_img* find_image(char label, struct wps_data *data);
-struct skin_viewport* find_viewport(char *label, bool uivp, struct wps_data *data);
+struct gui_img* find_image(const char *label, struct wps_data *data);
+struct skin_viewport* find_viewport(const char *label, bool uivp, struct wps_data *data);
 
 
 #ifdef SIMULATOR

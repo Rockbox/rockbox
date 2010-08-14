@@ -116,13 +116,13 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
 }
 
 /* traverse the image linked-list for an image */
-struct gui_img* find_image(char label, struct wps_data *data)
+struct gui_img* find_image(const char *label, struct wps_data *data)
 {
     struct skin_token_list *list = data->images;
     while (list)
     {
         struct gui_img *img = (struct gui_img *)list->token->value.data;
-        if (img->label == label)
+        if (!strcmp(img->label,label))
             return img;
         list = list->next;
     }
@@ -132,7 +132,7 @@ struct gui_img* find_image(char label, struct wps_data *data)
 #endif
 
 /* traverse the viewport linked list for a viewport */
-struct skin_viewport* find_viewport(char *label, bool uivp, struct wps_data *data)
+struct skin_viewport* find_viewport(const char *label, bool uivp, struct wps_data *data)
 {
     struct skin_element *list = data->tree;
     while (list)
@@ -227,18 +227,21 @@ static int parse_image_display(struct skin_element *element,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    char *text = element->params[0].data.text;
-    char label = text[0];
-    char sublabel = text[1];
+    char *label = element->params[0].data.text;
+    char sublabel = label[1];
     int subimage;
     struct gui_img *img;
     struct image_display *id = skin_buffer_alloc(sizeof(struct image_display));
 
+    if (element->params_count == 1)
+    {
+        /* backwards compatability. Allow %xd(Aa) to still work */
+        label[1] = '\0';
+    }
     /* sanity check */
     img = find_image(label, wps_data);
     if (!img || !id)
     {
-        token->value.i = label; /* so debug works */
         return WPS_ERROR_INVALID_PARAM;
     }
     id->label = label;
@@ -297,7 +300,7 @@ static int parse_image_load(struct skin_element *element,
     y = element->params[3].data.number;
 
     /* check the image number and load state */
-    if(find_image(*id, wps_data))
+    if(find_image(id, wps_data))
     {
         /* Invalid image ID */
         return WPS_ERROR_INVALID_PARAM;
@@ -307,7 +310,7 @@ static int parse_image_load(struct skin_element *element,
         return WPS_ERROR_INVALID_PARAM;
     /* save a pointer to the filename */
     img->bm.data = (char*)filename;
-    img->label = *id;
+    img->label = id;
     img->x = x;
     img->y = y;
     img->num_subimages = 1;

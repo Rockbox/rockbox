@@ -146,8 +146,8 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
         {
             struct image_display *id = token->value.data;
-            char n = id->label;
-            struct gui_img *img = find_image(n, data);
+            const char* label = id->label;
+            struct gui_img *img = find_image(label, data);
             if (img && img->loaded)
             {
                 if (id->token == NULL)
