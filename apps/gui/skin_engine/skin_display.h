@@ -44,7 +44,8 @@ void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size);
 /* Evaluate the conditional that is at *token_index and return whether a skip
    has ocurred. *token_index is updated with the new position.
 */
-int evaluate_conditional(struct gui_wps *gwps, struct conditional *conditional, int num_options);
+int evaluate_conditional(struct gui_wps *gwps, int offset,
+                         struct conditional *conditional, int num_options);
 /* Display a line appropriately according to its alignment format.
    format_align contains the text, separated between left, center and right.
    line is the index of the line on the screen.

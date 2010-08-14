@@ -53,6 +53,7 @@
 #include "tdspeed.h"
 #endif
 #include "viewport.h"
+#include "tagcache.h"
 
 #include "wps_internals.h"
 #include "root_menu.h"
@@ -192,9 +193,39 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     return NULL;
 }
 
+const char* get_filename_token(struct wps_token *token, char* filename,
+                               char *buf, int buf_size)
+{
+    if (filename)
+    {
+        switch (token->type)
+        {        
+            case SKIN_TOKEN_FILE_PATH:
+                return filename;
+            case SKIN_TOKEN_FILE_NAME:
+                if (get_dir(buf, buf_size, filename, 0)) {
+                    /* Remove extension */
+                    char* sep = strrchr(buf, '.');
+                    if (NULL != sep) {
+                        *sep = 0;
+                    }
+                    return buf;
+                }
+                return NULL;
+            case SKIN_TOKEN_FILE_NAME_WITH_EXTENSION:
+                return get_dir(buf, buf_size, filename, 0);
+            case SKIN_TOKEN_FILE_DIRECTORY:
+                return get_dir(buf, buf_size, filename, token->value.i);
+            default:
+                return NULL;
+        }
+    }
+    return NULL;
+}
+
 /* All tokens which only need the info to return a value go in here */
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
-                          char *buf, int buf_size, int limit, int *intval)
+                          char *filename, char *buf, int buf_size, int limit, int *intval)
 {
     struct wps_state *state = &wps_state;
     if (id3)
@@ -260,8 +291,6 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 return NULL;
             case SKIN_TOKEN_METADATA_COMMENT:
                 return id3->comment;
-            case SKIN_TOKEN_FILE_PATH:
-                return id3->path;
             case SKIN_TOKEN_FILE_BITRATE:
                 if(id3->bitrate)
                     snprintf(buf, buf_size, "%d", id3->bitrate);
@@ -328,25 +357,11 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                             id3->frequency / 1000,
                             (id3->frequency % 1000) / 100);
                 return buf;
-            case SKIN_TOKEN_FILE_NAME:
-                if (get_dir(buf, buf_size, id3->path, 0)) {
-                    /* Remove extension */
-                    char* sep = strrchr(buf, '.');
-                    if (NULL != sep) {
-                        *sep = 0;
-                    }
-                    return buf;
-                }
-                return NULL;
-            case SKIN_TOKEN_FILE_NAME_WITH_EXTENSION:
-                return get_dir(buf, buf_size, id3->path, 0);
+            case SKIN_TOKEN_FILE_VBR:
+                return (id3->vbr) ? "(avg)" : NULL;
             case SKIN_TOKEN_FILE_SIZE:
                 snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
                 return buf;
-            case SKIN_TOKEN_FILE_VBR:
-                return (id3->vbr) ? "(avg)" : NULL;
-            case SKIN_TOKEN_FILE_DIRECTORY:
-                return get_dir(buf, buf_size, id3->path, token->value.i);
 
 #ifdef HAVE_TAGCACHE
         case SKIN_TOKEN_DATABASE_PLAYCOUNT:
@@ -367,7 +382,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 #endif
 
             default:
-                return NULL;
+                return get_filename_token(token, id3->path, buf, buf_size);
         }
     }
     else /* id3 == NULL, handle the error based on the expected return type */
@@ -388,7 +403,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     *intval = 0;
                 return "0";
             default:
-                return NULL;
+                return get_filename_token(token, filename, buf, buf_size);
         }
     }
     return buf;
@@ -498,6 +513,41 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 }
 #endif
 
+static struct mp3entry* get_mp3entry_from_offset(struct gui_wps *gwps,
+                                                 int offset, char **filename)
+{
+    struct mp3entry* pid3 = NULL;
+    struct cuesheet *cue = gwps->state->id3 ? gwps->state->id3->cuesheet:NULL;
+    const char *fname = NULL;
+    if (cue && cue->curr_track_idx + offset < cue->track_count)
+        pid3 = gwps->state->id3;
+    else if (offset == 0)
+        pid3 = gwps->state->id3;
+    else if (offset == 1)
+        pid3 = gwps->state->nid3;
+    else
+    {
+        static struct mp3entry tempid3;
+        static char filename_buf[MAX_PATH + 1];
+        fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
+        *filename = (char*)fname;
+#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_TC_RAMCACHE
+        if (tagcache_fill_tags(&tempid3, fname))
+        {
+            pid3 = &tempid3;
+        }
+        else
+#endif 
+        {
+            if (!audio_peek_track(&pid3, offset))
+                pid3 = NULL;
+        }
+#endif  
+    }
+    return pid3;
+}
+
 /* Return the tags value as text. buf should be used as temp storage if needed.
 
    intval is used with conditionals/enums: when this function is called,
@@ -508,7 +558,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
    When not treating a conditional/enum, intval should be NULL.
 */
 const char *get_token_value(struct gui_wps *gwps,
-                           struct wps_token *token,
+                           struct wps_token *token, int offset,
                            char *buf, int buf_size,
                            int *intval)
 {
@@ -520,15 +570,14 @@ const char *get_token_value(struct gui_wps *gwps,
     struct mp3entry *id3; /* Think very carefully about using this. 
                              maybe get_id3_token() is the better place? */
     const char *out_text = NULL;
+    char *filename = NULL;
 
     if (!data || !state)
         return NULL;
 
-
-    if (token->next)
-        id3 = state->nid3;
-    else
-        id3 = state->id3;
+    id3 = get_mp3entry_from_offset(gwps, token->next? 1: offset, &filename);
+    if (id3)
+        filename = id3->path;
         
 #if CONFIG_RTC
     struct tm* tm = NULL;
@@ -552,17 +601,18 @@ const char *get_token_value(struct gui_wps *gwps,
         *intval = -1;
     }
     
-    if (state->id3 && state->id3->cuesheet)
+    if (id3 && id3 == state->id3 && id3->cuesheet )
     {
-        out_text = get_cuesheetid3_token(token, state->id3, token->next?1:0, buf, buf_size);
+        out_text = get_cuesheetid3_token(token, id3, 
+                                         token->next?1:offset, buf, buf_size);
         if (out_text)
             return out_text;
     }
-    out_text = get_id3_token(token, id3, buf, buf_size, limit, intval);
+    out_text = get_id3_token(token, id3, filename, buf, buf_size, limit, intval);
     if (out_text)
         return out_text;
 #if CONFIG_TUNER
-    out_text = get_radio_token(token, 0, buf, buf_size, limit, intval);
+    out_text = get_radio_token(token, offset, buf, buf_size, limit, intval);
     if (out_text)
         return out_text;
 #endif
@@ -596,7 +646,7 @@ const char *get_token_value(struct gui_wps *gwps,
             return playlist_name(NULL, buf, buf_size);
 
         case SKIN_TOKEN_PLAYLIST_POSITION:
-            snprintf(buf, buf_size, "%d", playlist_get_display_index());
+            snprintf(buf, buf_size, "%d", playlist_get_display_index()+offset);
             return buf;
 
         case SKIN_TOKEN_PLAYLIST_SHUFFLE:

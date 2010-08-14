@@ -39,8 +39,12 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#include "viewport.h"
+#include "cuesheet.h"
 #include "language.h"
 #include "playback.h"
+#include "playlist.h"
+#include "misc.h"
 
 
 #define MAX_LINE 1024
@@ -59,10 +63,17 @@ struct skin_draw_info {
     
     char *buf;
     size_t buf_size;
+    
+    int offset; /* used by the playlist viewer */
 };
 
 typedef bool (*skin_render_func)(struct skin_element* alternator, struct skin_draw_info *info);
 bool skin_render_alternator(struct skin_element* alternator, struct skin_draw_info *info);
+
+static void skin_render_playlistviewer(struct playlistviewer* viewer,
+                                       struct gui_wps *gwps,
+                                       struct skin_viewport* skin_viewport,
+                                       unsigned long refresh_type);
 
 
 static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
@@ -159,7 +170,8 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                     char buf[16];
                     const char *out;
                     int a = img->num_subimages;
-                    out = get_token_value(gwps, id->token, buf, sizeof(buf), &a);
+                    out = get_token_value(gwps, id->token, info->offset, 
+                                          buf, sizeof(buf), &a);
 
                     /* NOTE: get_token_value() returns values starting at 1! */
                     if (a == -1)
@@ -207,7 +219,8 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             break;
         case SKIN_TOKEN_VIEWPORT_CUSTOMLIST:
             if (do_refresh)
-                draw_playlist_viewer_list(gwps, token->value.data);
+                skin_render_playlistviewer(token->value.data, gwps,
+                                           info->skin_vp, info->refresh_type);
             break;
         
 #endif /* HAVE_LCD_BITMAP */
@@ -377,7 +390,8 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
             case CONDITIONAL:
                 conditional = (struct conditional*)child->data;
                 last_value = conditional->last_value;
-                value = evaluate_conditional(info->gwps, conditional, child->children_count);
+                value = evaluate_conditional(info->gwps, info->offset, 
+                                             conditional, child->children_count);
                 
                 if (value != 1 && value >= child->children_count)
                     value = child->children_count-1;
@@ -435,7 +449,8 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 if (!do_non_text_tags(info->gwps, info, child, &info->skin_vp->vp))
                 {
                     const char *value = get_token_value(info->gwps, child->data,
-                                              tempbuf, sizeof(tempbuf), NULL);
+                                                        info->offset, tempbuf,
+                                                        sizeof(tempbuf), NULL);
                     if (value)
                     {
                         needs_update = needs_update || 
@@ -520,7 +535,8 @@ static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *
         .no_line_break = false,
         .line_scrolls = false,
         .refresh_type = refresh_type,
-        .skin_vp = skin_viewport
+        .skin_vp = skin_viewport,
+        .offset = 0
     };
     
     struct align_pos * align = &info.align;
@@ -646,4 +662,90 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     /* Restore the default viewport */
     display->set_viewport(NULL);
     display->update();
+}
+
+
+static void skin_render_playlistviewer(struct playlistviewer* viewer,
+                                       struct gui_wps *gwps,
+                                       struct skin_viewport* skin_viewport,
+                                       unsigned long refresh_type)
+{
+    struct screen *display = gwps->display;
+    char linebuf[MAX_LINE];
+    skin_render_func func = skin_render_line;
+    struct skin_element* line;
+    struct skin_draw_info info = {
+        .gwps = gwps,
+        .buf = linebuf,
+        .buf_size = sizeof(linebuf),
+        .line_number = 0,
+        .no_line_break = false,
+        .line_scrolls = false,
+        .refresh_type = refresh_type,
+        .skin_vp = skin_viewport,
+        .offset = viewer->start_offset
+    };
+    
+    struct align_pos * align = &info.align;
+    bool needs_update;
+    int cur_pos, start_item, max;
+    int nb_lines = viewport_get_nb_lines(viewer->vp);
+#if CONFIG_TUNER
+    if (current_screen() == GO_TO_FM)
+    {
+        cur_pos = radio_current_preset();
+        start_item = cur_pos + viewer->start_offset;
+        max = start_item+radio_preset_count();
+    }
+    else
+#endif
+    {
+        struct cuesheet *cue = gwps->state->id3 ? gwps->state->id3->cuesheet:NULL;
+        cur_pos = playlist_get_display_index();
+        max = playlist_amount()+1;
+        if (cue)
+            max += cue->track_count;
+        start_item = MAX(0, cur_pos + viewer->start_offset); 
+    }
+    if (max-start_item > nb_lines)
+        max = start_item + nb_lines;
+    
+    line = viewer->line;
+    while (start_item < max)
+    {
+        linebuf[0] = '\0';
+        info.no_line_break = false;
+        info.line_scrolls = false;
+        info.force_redraw = false;
+    
+        info.cur_align_start = info.buf;
+        align->left = info.buf;
+        align->center = NULL;
+        align->right = NULL;
+        
+        
+        if (line->type == LINE_ALTERNATOR)
+            func = skin_render_alternator;
+        else if (line->type == LINE)
+            func = skin_render_line;
+        
+        needs_update = func(line, &info);
+        
+        /* only update if the line needs to be, and there is something to write */
+        if (refresh_type && needs_update)
+        {
+            if (info.line_scrolls)
+            {
+                /* if the line is a scrolling one we don't want to update
+                   too often, so that it has the time to scroll */
+                if ((refresh_type & SKIN_REFRESH_SCROLL) || info.force_redraw)
+                    write_line(display, align, info.line_number, true);
+            }
+            else
+                write_line(display, align, info.line_number, false);
+        }
+        info.line_number++;
+        info.offset++;
+        start_item++;
+    }
 }

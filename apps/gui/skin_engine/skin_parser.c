@@ -385,8 +385,7 @@ static int parse_playlistview(struct skin_element *element,
     viewer->vp = &curr_vp->vp;
     viewer->show_icons = true;
     viewer->start_offset = element->params[0].data.number;
-    viewer->lines[0] = element->params[1].data.code;
-    viewer->lines[1] = element->params[2].data.code;
+    viewer->line = element->params[1].data.code;
     
     token->value.data = (void*)viewer;
     

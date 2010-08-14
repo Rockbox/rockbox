@@ -194,18 +194,11 @@ struct touchregion {
 };
 #endif
 
-enum info_line_type {
-    TRACK_HAS_INFO = 0,
-    TRACK_HAS_NO_INFO
-};
 struct playlistviewer {
     struct viewport *vp;
     bool show_icons;
     int start_offset;
-#ifdef HAVE_TC_RAMCACHE
-    struct mp3entry tempid3;
-#endif
-    struct skin_element *lines[2];
+    struct skin_element *line;
 };
 
 
@@ -334,7 +327,7 @@ char *get_image_filename(const char *start, const char* bmpdir,
 /***** wps_tokens.c ******/
 
 const char *get_token_value(struct gui_wps *gwps,
-                           struct wps_token *token,
+                           struct wps_token *token, int offset,
                            char *buf, int buf_size,
                            int *intval);
 
@@ -342,7 +335,7 @@ const char *get_token_value(struct gui_wps *gwps,
 const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
                                   int offset_tracks, char *buf, int buf_size);
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
-                          char *buf, int buf_size, int limit, int *intval);
+                          char *filename, char *buf, int buf_size, int limit, int *intval);
 #if CONFIG_TUNER
 const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval);

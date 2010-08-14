@@ -205,191 +205,6 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     }
 }
 
-void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *viewer)
-{
-    struct wps_state *state = gwps->state;
-    int lines = viewport_get_nb_lines(viewer->vp);
-    int line_height = font_get(viewer->vp->font)->height;
-    int cur_pos, max;
-    int start_item;
-    int i;
-    bool scroll = false;
-    struct wps_token *token;
-    int x, length, alignment = SKIN_TOKEN_ALIGN_LEFT;
-    
-    struct mp3entry *pid3;
-    char buf[MAX_PATH*2], tempbuf[MAX_PATH], filename_buf[MAX_PATH + 1];
-    const char *filename;
-#if CONFIG_TUNER
-    if (current_screen() == GO_TO_FM)
-    {
-        cur_pos = radio_current_preset();
-        start_item = cur_pos + viewer->start_offset;
-        max = start_item+radio_preset_count();
-    }
-    else
-#endif
-    {
-        cur_pos = playlist_get_display_index();
-        max = playlist_amount()+1;
-        start_item = MAX(0, cur_pos + viewer->start_offset); 
-    }   
-    
-    gwps->display->set_viewport(viewer->vp);
-    for(i=start_item; (i-start_item)<lines && i<max; i++)
-    {
-        int line;
-#if CONFIG_TUNER
-        if (current_screen() == GO_TO_FM)
-        {
-            pid3 = NULL;
-            line = TRACK_HAS_INFO;
-            filename = "";
-        }
-        else
-#endif
-        {
-            filename = playlist_peek(i-cur_pos, filename_buf,
-                sizeof(filename_buf));
-            if (i == cur_pos)
-            {
-                pid3 = state->id3;
-            }
-            else if (i == cur_pos+1)
-            {
-                pid3 = state->nid3;
-            }
-#if CONFIG_CODEC == SWCODEC
-            else if (i>cur_pos)
-            {
-#ifdef HAVE_TC_RAMCACHE
-                if (tagcache_fill_tags(&viewer->tempid3, filename))
-                {
-                    pid3 = &viewer->tempid3;
-                }
-                else
-#endif 
-                    if (!audio_peek_track(&pid3, i-cur_pos))
-                        pid3 = NULL;
-            }
-#endif
-            else
-            {
-                pid3 = NULL;
-            }
-            line = pid3 ? TRACK_HAS_INFO : TRACK_HAS_NO_INFO;
-        }
-        unsigned int line_len = 0;
-        if (viewer->lines[line]->children_count == 0)
-            return;
-        struct skin_element *element = viewer->lines[line]->children[0];
-        buf[0] = '\0';
-        while (element && line_len < sizeof(buf))
-        {
-            const char *out = NULL;
-            if (element->type == TEXT)
-            {
-                line_len = strlcat(buf, (char*)element->data, sizeof(buf));
-                element = element->next;
-                continue;
-            }
-            if (element->type != TAG)
-            {
-                element = element->next;
-                continue;
-            }
-            if (element->tag->type == SKIN_TOKEN_SUBLINE_SCROLL)
-                scroll = true;
-            token = (struct wps_token*)element->data;
-            out = get_id3_token(token, pid3, tempbuf, sizeof(tempbuf), -1, NULL);
-#if CONFIG_TUNER
-            if (!out)
-                out = get_radio_token(token, i-cur_pos,
-                                      tempbuf, sizeof(tempbuf), -1, NULL);
-#endif
-            if (out)
-            {
-                line_len = strlcat(buf, out, sizeof(buf));
-                element = element->next;
-                continue;
-            }
-            
-            switch (token->type)
-            {
-                case SKIN_TOKEN_ALIGN_CENTER:
-                case SKIN_TOKEN_ALIGN_LEFT:
-                case SKIN_TOKEN_ALIGN_LEFT_RTL:
-                case SKIN_TOKEN_ALIGN_RIGHT:
-                case SKIN_TOKEN_ALIGN_RIGHT_RTL:
-                    alignment = token->type;
-                    tempbuf[0] = '\0';
-                    break;
-                case SKIN_TOKEN_PLAYLIST_POSITION:
-                    snprintf(tempbuf, sizeof(tempbuf), "%d", i);
-                    break;
-                case SKIN_TOKEN_FILE_NAME:
-                    get_dir(tempbuf, sizeof(tempbuf), filename, 0);
-                    break;
-                case SKIN_TOKEN_FILE_PATH:
-                    snprintf(tempbuf, sizeof(tempbuf), "%s", filename);
-                    break;
-                default:
-                    tempbuf[0] = '\0';
-                    break;
-            }
-            if (tempbuf[0])
-            {
-                line_len = strlcat(buf, tempbuf, sizeof(buf));
-            }
-            element = element->next;
-        }
-
-        int vpwidth = viewer->vp->width;
-        length = gwps->display->getstringsize(buf, NULL, NULL);
-        if (scroll && length >= vpwidth)
-        {
-            gwps->display->puts_scroll(0, (i-start_item), buf );
-        }
-        else
-        {
-            if (length >= vpwidth)
-                x = 0;
-            else
-            {
-                switch (alignment)
-                {
-                    case SKIN_TOKEN_ALIGN_CENTER:
-                        x = (vpwidth-length)/2;
-                        break;
-                    case SKIN_TOKEN_ALIGN_LEFT_RTL:
-                        if (lang_is_rtl() && VP_IS_RTL(viewer->vp))
-                        {
-                            x = vpwidth - length;
-                            break;
-                        }
-                    case SKIN_TOKEN_ALIGN_LEFT:
-                        x = 0;
-                        break;
-                    case SKIN_TOKEN_ALIGN_RIGHT_RTL:
-                        if (lang_is_rtl() && VP_IS_RTL(viewer->vp))
-                        {
-                            x = 0;
-                            break;
-                        }
-                    case SKIN_TOKEN_ALIGN_RIGHT:
-                        x = vpwidth - length;
-                        break;
-                    default:
-                        x = 0;
-                        break;
-                }
-            }
-            gwps->display->putsxy(x, (i-start_item)*line_height, buf );
-        }
-    }
-}
-
-
 /* clears the area where the image was shown */
 void clear_image_pos(struct gui_wps *gwps, struct gui_img *img)
 {
@@ -618,7 +433,8 @@ void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 /* Evaluate the conditional that is at *token_index and return whether a skip
    has ocurred. *token_index is updated with the new position.
 */
-int evaluate_conditional(struct gui_wps *gwps, struct conditional *conditional, int num_options)
+int evaluate_conditional(struct gui_wps *gwps, int offset, 
+                         struct conditional *conditional, int num_options)
 {
     if (!gwps)
         return false;
@@ -633,7 +449,7 @@ int evaluate_conditional(struct gui_wps *gwps, struct conditional *conditional, 
 
     int intval = num_options;
     /* get_token_value needs to know the number of options in the enum */
-    value = get_token_value(gwps, conditional->token,
+    value = get_token_value(gwps, conditional->token, offset,
                             result, sizeof(result), &intval);
 
     /* intval is now the number of the enum option we want to read,
