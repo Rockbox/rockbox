@@ -6,118 +6,97 @@ pushed into each other they disappear except for triangles which form a solid
 block and crosses which allow you to choose a replacement block.
 
 \begin{btnmap}
-    \multicolumn{2}{c}{\textbf{In game}}\\\hline
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,touchscreen,IAUDIO_M3_PAD}{%
+        \ButtonUp, \ButtonDown, }%
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
+    \opt{touchscreen}{\TouchTopMiddle, \TouchBottomMiddle, }%
+    %
+    \nopt{touchscreen,IAUDIO_M3_PAD}{\ButtonLeft, \ButtonRight} 
+    \opt{touchscreen}{\TouchMidLeft, \TouchMidRight}
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        &}
+    to move around
+        \\
 
-    \opt{RECORDER_PAD,PBELL_VIBE500_PAD}{\ButtonUp, \ButtonDown, } 
-    \opt{ONDIO_PAD}{\ButtonUp, \ButtonDown, } 
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu, \ButtonPlay, }
-    \opt{IAUDIO_X5_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }
-    \opt{SANSA_E200_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{SANSA_FUZE_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{GIGABEAT_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{GIGABEAT_S_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{MROBE100_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{SANSA_C200_PAD}{\ButtonUp, \ButtonDown, }
-    \opt{COWON_D2_PAD}{\TouchTopMiddle, \TouchBottomMiddle, }
-
-    \opt{RECORDER_PAD,PBELL_VIBE500_PAD}{\ButtonLeft, \ButtonRight} 
-    \opt{ONDIO_PAD}{\ButtonLeft, \ButtonRight} 
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonLeft, \ButtonRight} 
-    \opt{IAUDIO_X5_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{IRIVER_H10_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{SANSA_E200_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{SANSA_FUZE_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{GIGABEAT_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{GIGABEAT_S_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{MROBE100_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{SANSA_C200_PAD}{\ButtonLeft, \ButtonRight}
-    \opt{COWON_D2_PAD}{\TouchMidLeft, \TouchMidRight}
-
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to move around\\
-
+    \nopt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
+        ,PBELL_VIBE500_PAD,touchscreen,IAUDIO_M3_PAD}{\ButtonSelect}
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonOff}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect + \ButtonRight}
-    \opt{IAUDIO_X5_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect{} + \ButtonRight}
     \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
-    \opt{SANSA_E200_PAD}{\ButtonSelect}
-    \opt{SANSA_FUZE_PAD}{\ButtonSelect}
-    \opt{GIGABEAT_PAD}{\ButtonSelect}
-    \opt{GIGABEAT_S_PAD}{\ButtonSelect}
-    \opt{MROBE100_PAD}{\ButtonSelect}
-    \opt{SANSA_C200_PAD}{\ButtonSelect}
-    \opt{COWON_D2_PAD}{\TouchCenter}
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to choose peg\\
+    \opt{touchscreen}{\TouchCenter}
+        %
+    \opt{HAVEREMOTEKEYMAP}{
+        &}
+    to choose peg
+        \\
 
     \opt{RECORDER_PAD}{\ButtonFTwo}
-    \opt{ONDIO_PAD}{\ButtonMenu + \ButtonRight}
+    \opt{ONDIO_PAD}{\ButtonMenu{} + \ButtonRight}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect + \ButtonLeft}
-    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_FUZE_PAD}
+        {\ButtonSelect{} + \ButtonLeft}
+    \opt{IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{Long \ButtonFF}
-    \opt{SANSA_E200_PAD}{\ButtonRec}
-    \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
     \opt{MROBE100_PAD}{\ButtonPlay}
-    \opt{SANSA_C200_PAD}{\ButtonRec}
-    \opt{COWON_D2_PAD}{\TouchTopRight}
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to restart level\\
+    \opt{touchscreen}{\TouchTopRight}
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        &}
+    to restart level
+        \\
 
     \opt{RECORDER_PAD}{\ButtonFOne}
-    \opt{ONDIO_PAD}{\ButtonMenu + \ButtonUp}
+    \opt{ONDIO_PAD}{\ButtonMenu{} + \ButtonUp}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect + \ButtonMenu}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect{} + \ButtonMenu}
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
-    \opt{IRIVER_H10_PAD}{\ButtonFF + \ButtonScrollUp}
+    \opt{IRIVER_H10_PAD}{\ButtonFF{} + \ButtonScrollUp}
     \opt{SANSA_E200_PAD}{\ButtonScrollBack}
-    \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonUp}
-    \opt{GIGABEAT_PAD}{\ButtonVolUp}
-    \opt{GIGABEAT_S_PAD}{\ButtonVolUp}
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD}{\ButtonVolUp}
     \opt{MROBE100_PAD}{\ButtonMenu}
-    \opt{SANSA_C200_PAD}{\ButtonVolUp}
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to go up a level\\
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        &}
+    to go up a level
+        \\
 
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IAUDIO_X5_PAD}{
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{
         \opt{RECORDER_PAD}{\ButtonFThree}
-        \opt{ONDIO_PAD}{\ButtonMenu + \ButtonDown}
+        \opt{ONDIO_PAD}{\ButtonMenu{} + \ButtonDown}
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-        \opt{IRIVER_H10_PAD}{\ButtonFF + \ButtonScrollDown}
+        \opt{IRIVER_H10_PAD}{\ButtonFF{} + \ButtonScrollDown}
         \opt{SANSA_E200_PAD}{\ButtonScrollFwd}
-        \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonDown}
+        \opt{SANSA_FUZE_PAD}{\ButtonSelect{} + \ButtonDown}
         \opt{SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
         \opt{MROBE100_PAD}{\ButtonDisplay}
-        \opt{COWON_D2_PAD}{\TouchBottomRight}
+        \opt{touchscreen}{\TouchBottomRight}
         \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to go down a level\\
+            &
+        \opt{HAVEREMOTEKEYMAP}{
+            &}
+        to go down a level
+            \\
     }
 
-    \opt{RECORDER_PAD}{\ButtonOff}
-    \opt{ONDIO_PAD}{\ButtonMenu + \ButtonOff}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect + \ButtonPlay}
-    \opt{IAUDIO_X5_PAD}{\ButtonPower}
-    \opt{IRIVER_H10_PAD}{\ButtonPower}
-    \opt{SANSA_E200_PAD}{\ButtonPower}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{ONDIO_PAD}{\ButtonMenu{} + \ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect{} + \ButtonPlay}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD%
+        ,SANSA_C200_PAD,COWON_D2_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-    \opt{GIGABEAT_PAD}{\ButtonPower}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
-    \opt{MROBE100_PAD}{\ButtonPower}
-    \opt{SANSA_C200_PAD}{\ButtonPower}
-    \opt{COWON_D2_PAD}{\ButtonPower}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
-      \opt{HAVEREMOTEKEYMAP}{& }
-        & to quit\\
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        &}
+    to quit
+        \\
 
 \end{btnmap}

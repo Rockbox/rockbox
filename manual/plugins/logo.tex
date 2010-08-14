@@ -2,24 +2,28 @@
 \subsection{Logo}
 Demo showing the Rockbox logo bouncing around the screen.
 \begin{btnmap}
-    \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
-        ,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
-        ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-        ,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
-        {\ButtonRight\ / \ButtonLeft}
-    \opt{COWON_D2_PAD}{\TouchMidRight{}\ /\ \TouchMidLeft}
-       \opt{HAVEREMOTEKEYMAP}{& }
-    & Increase / decrease speed on the x-axis\\
+    \nopt{touchscreen,IAUDIO_M3_PAD}{\ButtonRight\ / \ButtonLeft}%
+    \opt{touchscreen}{\TouchMidRight\ / \TouchMidLeft}
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        \opt{IRIVER_RC_H100_PAD}{\ButtonRCRew\ / \ButtonRCFF}
+        &}
+    Increase / decrease speed on the x-axis
+        \\
+
+    \nopt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,touchscreen%
+        ,IAUDIO_M3_PAD}{\ButtonUp\ / \ButtonDown}%
     \opt{PLAYER_PAD}{\ButtonOn+\ButtonRight\ / \ButtonOn+\ButtonLeft}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-        ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
-        {\ButtonUp\ / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
-    \opt{COWON_D2_PAD}{\TouchBottomMiddle{} / \TouchTopMiddle}
-       \opt{HAVEREMOTEKEYMAP}{& }
-    & Increase / decrease speed on the y-axis\\
+    \opt{touchscreen}{\TouchBottomMiddle\ / \TouchTopMiddle}
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        \opt{IRIVER_RC_H100_PAD}{\ButtonRCSource\ / \ButtonRCBitrate}
+        &}
+    Increase / decrease speed on the y-axis
+        \\
+
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
@@ -28,8 +32,10 @@ Demo showing the Rockbox logo bouncing around the screen.
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
-       \opt{HAVEREMOTEKEYMAP}{& 
-          \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
-        }
-    & Quit\\
+        &
+    \opt{HAVEREMOTEKEYMAP}{
+        \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
+        &}
+    Quit
+        \\
 \end{btnmap}
