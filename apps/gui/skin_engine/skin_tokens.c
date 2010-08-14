@@ -527,12 +527,12 @@ static struct mp3entry* get_mp3entry_from_offset(struct gui_wps *gwps,
         pid3 = gwps->state->nid3;
     else
     {
-        static struct mp3entry tempid3;
         static char filename_buf[MAX_PATH + 1];
         fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
         *filename = (char*)fname;
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_TC_RAMCACHE
+        static struct mp3entry tempid3;
         if (tagcache_fill_tags(&tempid3, fname))
         {
             pid3 = &tempid3;

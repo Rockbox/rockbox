@@ -44,6 +44,7 @@
 #include "language.h"
 #include "playback.h"
 #include "playlist.h"
+#include "root_menu.h"
 #include "misc.h"
 
 
