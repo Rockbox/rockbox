@@ -28,12 +28,13 @@
 enum orientation {
     VERTICAL          = 0x0000,   /* Vertical orientation     */
     HORIZONTAL        = 0x0001,   /* Horizontal orientation   */
+    INVERTFILL        = 0x0002,   /* Invert the fill direction */
 #ifdef HAVE_LCD_COLOR
-    FOREGROUND        = 0x0002,   /* Do not clear background pixels */
-    INNER_FILL        = 0x0004,   /* Fill inner part even if FOREGROUND */
-    INNER_BGFILL      = 0x0008,   /* Fill inner part with background
+    FOREGROUND        = 0x0020,   /* Do not clear background pixels */
+    INNER_FILL        = 0x0040,   /* Fill inner part even if FOREGROUND */
+    INNER_BGFILL      = 0x0080,   /* Fill inner part with background
                                      color even if FOREGROUND */
-    INNER_FILL_MASK   = 0x000c,
+    INNER_FILL_MASK   = 0x00c0,
 #endif
 };
 

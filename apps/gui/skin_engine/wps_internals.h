@@ -106,6 +106,11 @@ struct progressbar {
     /*progressbar image*/
     struct bitmap bm;
     bool have_bitmap_pb;
+    
+    bool invert_fill_direction;
+    bool nofill;
+    struct gui_img *slider;
+    bool horizontal;
 };
 #endif
 

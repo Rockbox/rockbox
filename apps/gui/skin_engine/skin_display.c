@@ -129,7 +129,10 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     struct wps_state *state = gwps->state;
     struct mp3entry *id3 = state->id3;
     int y = pb->y, height = pb->height;
-    unsigned long length, elapsed;
+    unsigned long length, end;
+    int flags = HORIZONTAL;
+    
+    int drawn_length, drawn_end;
     
     if (height < 0)
         height = font_get(vp->font)->height;
@@ -148,39 +151,62 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         int minvol = sound_min(SOUND_VOLUME);
         int maxvol = sound_max(SOUND_VOLUME);
         length = maxvol-minvol;
-        elapsed = global_settings.volume-minvol;
+        end = global_settings.volume-minvol;
     }
     else if (pb->type == SKIN_TOKEN_BATTERY_PERCENTBAR)
     {
         length = 100;
-        elapsed = battery_level();
+        end = battery_level();
     }
 #if CONFIG_TUNER
     else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
     {
         int min = fm_region_data[global_settings.fm_region].freq_min;
-        elapsed = radio_current_frequency() - min;
+        end = radio_current_frequency() - min;
         length = fm_region_data[global_settings.fm_region].freq_max - min;
     }
 #endif
     else if (id3 && id3->length)
     {
         length = id3->length;
-        elapsed = id3->elapsed + state->ff_rewind_count;
+        end = id3->elapsed + state->ff_rewind_count;
     }
     else
     {
         length = 1;
-        elapsed = 0;
+        end = 0;
+    }
+    
+    if (pb->nofill)
+    {
+        drawn_length = 1;
+        drawn_end = 0;
+    }
+    else
+    {
+        drawn_length = length;
+        drawn_end = end;
+    }
+    
+    if (!pb->horizontal)
+    {
+        /* we want to fill upwards which is technically inverted. */
+        flags = VERTICAL|INVERTFILL;
+    }
+    
+    if (pb->invert_fill_direction)
+    {
+        flags ^= INVERTFILL;
     }
 
+    
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, &pb->bm,
                                 pb->x, y, pb->width, pb->bm.height,
-                                length, 0, elapsed, HORIZONTAL);
+                                drawn_length, 0, drawn_end, flags);
     else
         gui_scrollbar_draw(display, pb->x, y, pb->width, height,
-                           length, 0, elapsed, HORIZONTAL);
+                           drawn_length, 0, drawn_end, flags);
 
     if (pb->type == SKIN_TOKEN_PROGRESSBAR)
     {
@@ -200,6 +226,41 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
         {
             presets_draw_markers(display, pb->x, y, pb->width, height);
+        }
+#endif
+    }
+    
+    if (pb->slider)
+    {
+        int x = pb->x, y = pb->y;
+        int width = pb->width;
+        int height = pb->height;
+        struct gui_img *img = pb->slider;
+            
+        if (flags&VERTICAL)
+        {
+            y += pb->height*end/length;
+            height = img->bm.height;
+        }
+        else
+        {
+            x += pb->width*end/length;
+            width = img->bm.width;
+        }
+#if LCD_DEPTH > 1
+        if(img->bm.format == FORMAT_MONO) {
+#endif
+            display->mono_bitmap_part(img->bm.data,
+                                      0, 0,
+                                      img->bm.width, x,
+                                      y, width, height);
+#if LCD_DEPTH > 1
+        } else {
+            display->transparent_bitmap_part((fb_data *)img->bm.data,
+                                             0, 0,
+                                             STRIDE(display->screen_type,
+                                             img->bm.width, img->bm.height),
+                                             x, y, width, height);
         }
 #endif
     }

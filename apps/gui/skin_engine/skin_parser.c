@@ -540,6 +540,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     struct skin_token_list *item;
     struct viewport *vp = &curr_vp->vp;
     struct skin_tag_parameter *param = element->params;
+    int curr_param = 0;
     
     if (element->params_count == 0 && 
         element->tag->type != SKIN_TOKEN_PROGRESSBAR)
@@ -554,6 +555,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->have_bitmap_pb = false;
     pb->bm.data = NULL; /* no bitmap specified */
     pb->follow_lang_direction = follow_lang_direction > 0;
+    pb->invert_fill_direction = false;
     
     if (element->params_count == 0)
     {
@@ -613,6 +615,41 @@ static int parse_progressbar_tag(struct skin_element* element,
     param++;
     if (!isdefault(param))
         pb->bm.data = param->data.text;
+        
+    curr_param = 5;
+    pb->invert_fill_direction = false;
+    pb->nofill = false;
+    pb->slider = NULL;
+    pb->horizontal = pb->width > pb->height;
+    while (curr_param < element->params_count)
+    {
+        param++;
+        if (!strcmp(param->data.text, "invert"))
+            pb->invert_fill_direction = true;
+        else if (!strcmp(param->data.text, "nofill"))
+            pb->nofill = true;
+        else if (!strcmp(param->data.text, "slider"))
+        {
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                pb->slider = find_image(param->data.text, wps_data);
+                if (!pb->slider)
+                    return -1;
+            }
+        }
+        else if (!strcmp(param->data.text, "vertical"))
+        {
+            pb->horizontal = false;
+            if (isdefault(&element->params[3]))
+                pb->height = vp->height - pb->x;
+        }
+        else if (!strcmp(param->data.text, "horizontal"))
+            pb->horizontal = true;
+            
+        curr_param++;
+    }
         
         
     if (token->type == SKIN_TOKEN_VOLUME)
