@@ -311,8 +311,7 @@ void EditorWindow::addTab(TabContent *doc)
                      this, SLOT(lineChanged(int)));
 
     /* Connecting to settings change events */
-    if(doc->type() == TabContent::Skin)
-        dynamic_cast<SkinDocument*>(doc)->connectPrefs(prefs);
+    doc->connectPrefs(prefs);
 }
 
 

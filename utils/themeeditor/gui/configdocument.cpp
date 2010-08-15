@@ -22,6 +22,7 @@
 #include "projectmodel.h"
 #include "configdocument.h"
 #include "ui_configdocument.h"
+#include "preferencesdialog.h"
 
 #include <QMessageBox>
 #include <QFile>
@@ -103,6 +104,8 @@ ConfigDocument::ConfigDocument(QMap<QString, QString>& settings, QString file,
                      this, SLOT(buttonChecked()));
     QObject::connect(ui->textButton, SIGNAL(toggled(bool)),
                      this, SLOT(buttonChecked()));
+
+    settingsChanged();
 }
 
 ConfigDocument::~ConfigDocument()
@@ -397,4 +400,40 @@ void ConfigDocument::buttonChecked()
     settings.setValue("textVisible", ui->textButton->isChecked());
     settings.setValue("linesVisible", ui->linesButton->isChecked());
     settings.endGroup();
+}
+
+void ConfigDocument::connectPrefs(PreferencesDialog *prefs)
+{
+    QObject::connect(prefs, SIGNAL(accepted()),
+                     this, SLOT(settingsChanged()));
+}
+
+
+void ConfigDocument::settingsChanged()
+{
+    /* Setting the editor colors */
+    QSettings settings;
+    settings.beginGroup("SkinDocument");
+
+    QColor fg = settings.value("fgColor", Qt::black).value<QColor>();
+    QColor bg = settings.value("bgColor", Qt::white).value<QColor>();
+    QPalette palette;
+    palette.setColor(QPalette::All, QPalette::Base, bg);
+    palette.setColor(QPalette::All, QPalette::Text, fg);
+    editor->setPalette(palette);
+
+    QColor highlight = settings.value("errorColor", Qt::red).value<QColor>();
+    editor->setErrorColor(highlight);
+
+    /* Setting the font */
+    QFont def("Monospace");
+    def.setStyleHint(QFont::TypeWriter);
+    QFont family = settings.value("fontFamily", def).value<QFont>();
+    family.setPointSize(settings.value("fontSize", 12).toInt());
+    editor->setFont(family);
+
+    editor->repaint();
+
+    settings.endGroup();
+
 }

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class PreferencesDialog;
+
 class TabContent : public QWidget
 {
 Q_OBJECT
@@ -24,11 +26,14 @@ public:
 
     virtual bool requestClose() = 0;
 
+    virtual void connectPrefs(PreferencesDialog* prefs) = 0;
+
 signals:
     void titleChanged(QString);
     void lineChanged(int);
 
 public slots:
+    virtual void settingsChanged() = 0;
 
 };
 

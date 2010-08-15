@@ -88,6 +88,11 @@ private slots:
     void unblockUpdates(){ block = false; }
     void buttonChecked();
 
+    void connectPrefs(PreferencesDialog *prefs);
+
+public slots:
+    void settingsChanged();
+
 private:
     void addRow(QString key, QString value);
 
