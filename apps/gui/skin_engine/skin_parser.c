@@ -228,14 +228,15 @@ static int parse_image_display(struct skin_element *element,
                                struct wps_data *wps_data)
 {
     char *label = element->params[0].data.text;
-    char sublabel = label[1];
+    char sublabel = '\0';
     int subimage;
     struct gui_img *img;
     struct image_display *id = skin_buffer_alloc(sizeof(struct image_display));
 
-    if (element->params_count == 1)
+    if (element->params_count == 1 && strlen(label) <= 2)
     {
         /* backwards compatability. Allow %xd(Aa) to still work */
+        sublabel = label[1];
         label[1] = '\0';
     }
     /* sanity check */
