@@ -918,8 +918,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case 'p':
             /* %Vp */
             viewport->showPlaylist(info, element->params[0].data.number,
-                                   element->params[1].data.code,
-                                   element->params[2].data.code);
+                                   children[1]);
             return true;
 
         case 'I':

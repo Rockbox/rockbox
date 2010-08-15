@@ -78,8 +78,8 @@ public:
 
     void enableStatusBar(){ showStatusBar = true; }
 
-    void showPlaylist(const RBRenderInfo& info, int start, skin_element* id3,
-                      skin_element* noId3);
+    void showPlaylist(const RBRenderInfo& info, int start,
+                      ParseTreeNode* lines);
 
     void makeFullScreen();
 
