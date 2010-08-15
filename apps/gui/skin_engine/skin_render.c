@@ -455,6 +455,10 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                                                         sizeof(tempbuf), NULL);
                     if (value)
                     {
+#if CONFIG_RTC
+                        if (child->tag->flags&SKIN_RTC_REFRESH)
+                            needs_update = needs_update || info->refresh_type&SKIN_REFRESH_DYNAMIC;
+#endif
                         needs_update = needs_update || 
                                 ((child->tag->flags&info->refresh_type)!=0);
                         strlcat(info->cur_align_start, value, 

@@ -1277,9 +1277,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
             memset(token, 0, sizeof(*token));
             token->type = element->tag->type;
             
-            if ((element->tag->flags&SKIN_REFRESH_ALL) == SKIN_RTC_REFRESH)
+            if (element->tag->flags&SKIN_RTC_REFRESH)
             {
-#ifdef CONFIG_RTC
+#if CONFIG_RTC
                 curr_line->update_mode |= SKIN_REFRESH_DYNAMIC;
 #else
                 curr_line->update_mode |= SKIN_REFRESH_STATIC;
