@@ -39,31 +39,22 @@ static enum {
 } last_state = STATE_UNKNOWN;
 
 /*
- * this writes in an interrupt-like fashion the last pixel coordinates
- * that the user pressed on the screen */
-JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxFramebuffer_pixelHandler(JNIEnv*env, jobject this,
-                                                        int x, int y)
-{
-    (void)env;
-    (void)this;
-    last_x = x;
-    last_y = y;
-}
-
-/*
  * this notifies us in an interrupt-like fashion whether the user just
- * began or stopped the touch action */
+ * began or stopped the touch action + where (pixel coordinates) */
 JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxFramebuffer_touchHandler(JNIEnv*env, jobject this,
-                                                        int down)
+                                                 bool down, int x, int y)
 {
     (void)env;
     (void)this;
+
     if (down)
         last_state = STATE_DOWN;
     else
         last_state = STATE_UP;
+
+    last_x = x;
+    last_y = y;
 }
 
 /*

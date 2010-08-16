@@ -80,20 +80,22 @@ public class RockboxFramebuffer extends View
 
 	public boolean onTouchEvent(MotionEvent me)
 	{
+        int x = (int) me.getX();
+        int y = (int) me.getY();
+
 		switch (me.getAction())
 		{
 		case MotionEvent.ACTION_CANCEL:
 		case MotionEvent.ACTION_UP:
-			touchHandler(0);
-			break;
+			touchHandler(false, x, y);
+			return true;
 		case MotionEvent.ACTION_MOVE:
 		case MotionEvent.ACTION_DOWN:
-			touchHandler(1);
-			break;
-		
+			touchHandler(true, x, y);
+			return true;
 		}
-		pixelHandler((int)me.getX(), (int)me.getY());
-		return true;
+
+		return false;
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -118,7 +120,6 @@ public class RockboxFramebuffer extends View
 	}
 
 	public native void set_lcd_active(int active);
-	public native void pixelHandler(int x, int y);
-	public native void touchHandler(int down);
+	public native void touchHandler(boolean down, int x, int y);
 	public native boolean buttonHandler(int keycode, boolean state);
 }
