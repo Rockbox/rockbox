@@ -293,4 +293,6 @@ keymaps/keymap-mini2440.c
 keymaps/keymap-vibe500.c
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
 keymaps/keymap-mpio-hd200.c
+#elif CONFIG_KEYPAD == ANDROID_PAD
+keymaps/keymap-android.c
 #endif

@@ -17,13 +17,31 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ***************************************************9*************************/
+ *****************************************************************************/
 
 
 #include "button.h"
+#include "android_keyevents.h"
 
 int key_to_button(int keyboard_key)
 {
-    (void)keyboard_key;
-    return BUTTON_NONE;
+    switch (keyboard_key)
+    {
+        default:
+            return BUTTON_NONE;
+        case KEYCODE_BACK:
+            return BUTTON_BACK;
+        case KEYCODE_DPAD_UP:
+            return BUTTON_DPAD_UP;
+        case KEYCODE_DPAD_DOWN:
+            return BUTTON_DPAD_DOWN;
+        case KEYCODE_DPAD_LEFT:
+            return BUTTON_DPAD_LEFT;
+        case KEYCODE_DPAD_RIGHT:
+            return BUTTON_DPAD_RIGHT;
+        case KEYCODE_DPAD_CENTER:
+            return BUTTON_DPAD_CENTER;
+        case KEYCODE_MENU:
+            return BUTTON_MENU;
+    }
 }

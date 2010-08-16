@@ -1708,6 +1708,9 @@ target/hosted/android/button-android.c
 target/hosted/android/kernel-android.c
 target/hosted/android/pcm-android.c
 target/hosted/android/system-android.c
+#ifdef APPLICATION
+target/hosted/android/app/button-application.c
+#endif
 drivers/audio/android.c
 thread.c
 #endif

@@ -22,23 +22,28 @@
 package org.rockbox;
 
 import java.nio.ByteBuffer;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class RockboxFramebuffer extends View 
+public class RockboxFramebuffer extends View
 {
 	private Bitmap btm;
     private ByteBuffer native_buf;
-
 
 	public RockboxFramebuffer(Context c)
 	{
 		super(c);
 		btm = null;
+
+		/* Needed so we can catch KeyEvents */
+		setFocusable(true);
+		requestFocus();
 	}
 
 	public void onDraw(Canvas c) 
@@ -55,7 +60,6 @@ public class RockboxFramebuffer extends View
 	
 	public void java_lcd_update()
 	{
-
 		btm.copyPixelsFromBuffer(native_buf);
 		postInvalidate();
 	}
@@ -64,6 +68,7 @@ public class RockboxFramebuffer extends View
 	{
 		/* can't copy a partial buffer */
 		btm.copyPixelsFromBuffer(native_buf);
+
 		postInvalidate(x, y, x+w, y+h);
 	}
 
@@ -90,7 +95,17 @@ public class RockboxFramebuffer extends View
 		pixelHandler((int)me.getX(), (int)me.getY());
 		return true;
 	}
-	
+
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+	    return buttonHandler(keyCode, true);
+	}
+
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+	    return buttonHandler(keyCode, false);
+	}
+
 	/* the two below should only be called from the activity thread */
 	public void suspend()
 	{	/* suspend, Rockbox will not make any lcd updates */
@@ -105,4 +120,5 @@ public class RockboxFramebuffer extends View
 	public native void set_lcd_active(int active);
 	public native void pixelHandler(int x, int y);
 	public native void touchHandler(int down);
+	public native boolean buttonHandler(int keycode, boolean state);
 }
