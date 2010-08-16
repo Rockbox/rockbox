@@ -112,6 +112,12 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
     struct wps_data *data = sb_skin[screen].data;
 
     int success;
+    /* We need to disable the theme here or else viewport_set_defaults() 
+     * (which is called in the viewport tag parser) will crash because
+     * the theme is enabled but sb_set_info_vp() isnt set untill after the sbs
+     * is parsed. This only affects the default viewport which is ignored
+     * int he sbs anyway */
+    viewportmanager_theme_enable(screen, false, NULL);
     success = buf && skin_data_load(screen, data, buf, isfile);
 
     if (success)
@@ -136,6 +142,7 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
 
     if (!success && isfile)
         sb_create_from_settings(screen);
+    viewportmanager_theme_undo(screen, false);
 }
 static char *infovp_label[NB_SCREENS];
 static char *oldinfovp_label[NB_SCREENS];
