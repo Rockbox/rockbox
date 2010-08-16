@@ -394,7 +394,7 @@ int radio_screen(void)
     int button;
     int i;
     bool stereo = false, last_stereo = false;
-    bool update_screen = true, restore = true;
+    int update_type = 0;
     bool screen_freeze = false;
     bool keep_playing = false;
     bool talk = false;
@@ -467,8 +467,11 @@ int radio_screen(void)
     if (radio_status == FMRADIO_OFF)
         radio_start();
 #endif
+    fms_fix_displays(FMS_ENTER);
+    FOR_NB_SCREENS(i)
+        skin_update(fms_get(i), SKIN_REFRESH_ALL);
 
-   if(radio_preset_count() < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
+    if(radio_preset_count() < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         presets_scan(NULL);
 
     preset_set_current(preset_find(curr_freq));
@@ -484,7 +487,7 @@ int radio_screen(void)
         if(search_dir != 0)
         {
             curr_freq = step_freq(curr_freq, search_dir);
-            update_screen = true;
+            update_type = SKIN_REFRESH_ALL;
 
             if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
@@ -496,12 +499,12 @@ int radio_screen(void)
             trigger_cpu_boost();
         }
 
-        if (!update_screen)
+        if (!update_type)
         {
             cancel_cpu_boost();
         }
 
-        button = fms_do_button_loop(update_screen);
+        button = fms_do_button_loop(update_type>0);
 
 #ifndef HAVE_NOISY_IDLE_MODE
         if (button != ACTION_NONE)
@@ -530,7 +533,7 @@ int radio_screen(void)
                         }
                     }
                 }
-                update_screen = true;
+                update_type = SKIN_REFRESH_NON_STATIC;
                 break;
 
 #ifdef FM_RECORD
@@ -551,13 +554,13 @@ int radio_screen(void)
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
                     rec_command(RECORDING_CMD_START_NEWFILE);
-                    update_screen = true;
+                    update_type = SKIN_REFRESH_ALL;
                 }
                 else
                 {
                     have_recorded = true;
                     rec_command(RECORDING_CMD_START);
-                    update_screen = true;
+                    update_type = SKIN_REFRESH_ALL;
                 }
 #endif /* SIMULATOR */
                 last_seconds = 0;
@@ -586,7 +589,7 @@ int radio_screen(void)
             case ACTION_STD_NEXT:
                 next_station(button == ACTION_STD_PREV ? -1 : 1);
                 end_search();
-                update_screen = true;
+                update_type = SKIN_REFRESH_ALL;
                 talk = true;
                 break;
 
@@ -599,30 +602,29 @@ int radio_screen(void)
                 {
                     preset_next(search_dir);
                     end_search();
-                    update_screen = true;
                     talk = true;
                 }
                 else if (dir == 0)
                 {
                     /* Starting auto scan */
                     tuner_set(RADIO_MUTE, 1);
-                    update_screen = true;
                 }
+                update_type = SKIN_REFRESH_ALL;
                 break;
-                }
+            }
 
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
                 global_settings.volume++;
                 setvol();
-                update_screen = true;
+                update_type = SKIN_REFRESH_NON_STATIC;
                 break;
 
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
                 global_settings.volume--;
                 setvol();
-                update_screen = true;
+                update_type = SKIN_REFRESH_NON_STATIC;
                 break;
 
             case ACTION_FM_PLAY:
@@ -631,7 +633,7 @@ int radio_screen(void)
                 else
                     radio_start();
 
-                update_screen = true;
+                update_type = SKIN_REFRESH_NON_STATIC;
                 talk = false;
                 talk_shutup();
                 break;
@@ -640,8 +642,8 @@ int radio_screen(void)
                 fms_fix_displays(FMS_EXIT);
                 radio_menu();
                 preset_set_current(preset_find(curr_freq));
-                update_screen = true;
-                restore = true;
+                fms_fix_displays(FMS_ENTER);
+                update_type = SKIN_REFRESH_ALL;
                 break;
 
 #ifdef FM_PRESET
@@ -649,13 +651,13 @@ int radio_screen(void)
                 if(radio_preset_count() < 1)
                 {
                     splash(HZ, ID2P(LANG_FM_NO_PRESETS));
-                    update_screen = true;
+                    update_type = SKIN_REFRESH_ALL;
                     break;
                 }
                 fms_fix_displays(FMS_EXIT);
                 handle_radio_presets();
-                update_screen = true;
-                restore = true;
+                fms_fix_displays(FMS_ENTER);
+                update_type = SKIN_REFRESH_ALL;
                 break;
 #endif /* FM_PRESET */
 
@@ -668,7 +670,7 @@ int radio_screen(void)
                 }
                 else
                 {
-                    update_screen = true;
+                    update_type = SKIN_REFRESH_ALL;
                     screen_freeze = false;
                 }
                 break;
@@ -697,7 +699,7 @@ int radio_screen(void)
                 }
                 else
                     radio_mode = RADIO_SCAN_MODE;
-                update_screen = true;
+                update_type = SKIN_REFRESH_ALL;
                 cond_talk_ids_fq(radio_mode ?
                                  LANG_PRESET : LANG_RADIO_SCAN_MODE);
                 talk = true;
@@ -708,7 +710,7 @@ int radio_screen(void)
             case ACTION_FM_NEXT_PRESET:
                 preset_next(1);
                 end_search();
-                update_screen = true;
+                update_type = SKIN_REFRESH_ALL;
                 talk = true;
                 break;
 #endif
@@ -717,19 +719,19 @@ int radio_screen(void)
             case ACTION_FM_PREV_PRESET:
                 preset_next(-1);
                 end_search();
-                update_screen = true;
+                update_type = SKIN_REFRESH_ALL;
                 talk = true;
                 break;
 #endif
             case ACTION_NONE:
-                update_screen = true; /* so the fms updates */
+                update_type = SKIN_REFRESH_NON_STATIC;
                 break;
 
             default:
                 default_event_handler(button);
 #ifdef HAVE_RDS_CAP
                 if (tuner_get(RADIO_EVENT))
-                    update_screen = true;
+                    update_type = SKIN_REFRESH_ALL;
 #endif
                 if (!tuner_get(RADIO_PRESENT))
                 {
@@ -782,7 +784,7 @@ int radio_screen(void)
 
                     if(stereo != last_stereo)
                     {
-                        update_screen = true;
+                        update_type = SKIN_REFRESH_ALL;
                         last_stereo = stereo;
                     }
                 }
@@ -790,22 +792,18 @@ int radio_screen(void)
 
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
             seconds = audio_recorded_time() / HZ;
-            if (update_screen || seconds > last_seconds || restore)
+            if (update_type || seconds > last_seconds)
             {
                 last_seconds = seconds;
 #else
-            if (update_screen || restore)
+            if (update_type)
             {
 #endif
-                if (restore)
-                    fms_fix_displays(FMS_ENTER);
                 FOR_NB_SCREENS(i)
-                    skin_update(fms_get(i), restore ? SKIN_REFRESH_ALL :
-                                                      SKIN_REFRESH_NON_STATIC);
-                restore = false; 
+                    skin_update(fms_get(i), update_type);
             }
         }
-        update_screen = false;
+        update_type = 0;
 
         if (global_settings.talk_file && talk
             && radio_status == FMRADIO_PAUSED)
