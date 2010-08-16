@@ -528,6 +528,8 @@ static int parse_timeout_tag(struct skin_element *element,
     else
         val = element->params[0].data.number;
     token->value.i = val * TIMEOUT_UNIT;
+    if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT)
+        curr_line->timeout = token->value.i;
     return 0;
 }
 
