@@ -21,6 +21,8 @@
 
 package org.rockbox;
 
+import java.util.Arrays;
+
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -56,7 +58,7 @@ public class RockboxPCM extends AudioTrack
 		buf_len = 24<<10; /* in bytes */
 
 	    raw_data = new byte[buf_len]; /* in shorts */
-	    for(int i = 0; i < raw_data.length; i++) raw_data[i] = (byte)0;
+	    Arrays.fill(raw_data, (byte) 0);
 	    l = new PCMListener(buf_len);
 	}    
 
