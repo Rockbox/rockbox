@@ -413,13 +413,10 @@ static void ft_load_font(char *file)
 
 int ft_enter(struct tree_context* c)
 {
-    int rc = 0;
+    int rc = GO_TO_PREVIOUS;
     char buf[MAX_PATH];
     struct entry *dircache = c->dircache;
     struct entry* file = &dircache[c->selected_item];
-    bool reload_dir = false;
-    bool start_wps = false;
-    bool exit_func = false;
 
     if (c->currdir[1])
         snprintf(buf,sizeof(buf),"%s/%s",c->currdir, file->name);
@@ -495,8 +492,6 @@ int ft_enter(struct tree_context* c)
                 {
                     set_file(buf, global_settings.fmr_file, MAX_FILENAME);
                     radio_load_presets(global_settings.fmr_file);
-                    if(!in_radio_screen())
-                        radio_screen();
                 }
                 /*
                  * Preset outside default folder, we can choose such only
@@ -506,8 +501,8 @@ int ft_enter(struct tree_context* c)
                 else
                 {
                     radio_load_presets(buf);
-                    radio_screen();
                 }
+                rc = GO_TO_FM;
 
                 break;
             case FILE_ATTR_FMS:
@@ -566,7 +561,7 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_BMARK:
                 splash(0, ID2P(LANG_WAIT));
                 bookmark_load(buf, false);
-                reload_dir = true;
+                rc = GO_TO_FILEBROWSER;
                 break;
 
             case FILE_ATTR_LNG:
@@ -632,9 +627,9 @@ int ft_enter(struct tree_context* c)
                         if(*c->dirfilter > NUM_FILTER_MODES)
                             /* leave sub-browsers after usb, doing
                                otherwise might be confusing to the user */
-                            exit_func = true;
+                            rc = GO_TO_ROOT;
                         else
-                            reload_dir = true;
+                            rc = GO_TO_FILEBROWSER;
                         break;
                     /*
                     case PLUGIN_ERROR:
@@ -664,10 +659,10 @@ int ft_enter(struct tree_context* c)
                     switch (plugin_load(plugin,buf))
                     {
                         case PLUGIN_USB_CONNECTED:
-                            reload_dir = true;
+                            rc = GO_TO_FILEBROWSER;
                             break;
                         case PLUGIN_GOTO_WPS:
-                            play = true;
+                            rc = GO_TO_WPS;
                             break;
                         /*
                         case PLUGIN_OK:
@@ -687,8 +682,7 @@ int ft_enter(struct tree_context* c)
             global_status.resume_index = start_index;
             global_status.resume_offset = 0;
             status_save();
-
-            start_wps = true;
+            rc = GO_TO_WPS;
         }
         else {
             if (*c->dirfilter > NUM_FILTER_MODES &&
@@ -696,18 +690,10 @@ int ft_enter(struct tree_context* c)
                 *c->dirfilter != SHOW_FONT &&
                 *c->dirfilter != SHOW_PLUGINS)
             {
-                exit_func = true;
+                rc = GO_TO_ROOT;
             }
         }
     }
-
-    if (reload_dir)
-        rc = 1;
-    if (start_wps)
-        rc = 2;
-    if (exit_func)
-        rc = 3;
-
     return rc;
 }
 

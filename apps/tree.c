@@ -682,9 +682,14 @@ static int dirbrowse()
                 switch (ft_enter(&tc))
 #endif
                 {
-                    case 1: reload_dir = true; break;
-                    case 2: start_wps = true; break;
-                    case 3: exit_func = true; break;
+                    case GO_TO_FILEBROWSER: reload_dir = true; break;
+                    case GO_TO_WPS:
+                        return GO_TO_WPS;
+#if CONFIG_TUNER
+                    case GO_TO_FM:
+                        return GO_TO_FM;
+#endif
+                    case GO_TO_ROOT: exit_func = true; break;
                     default: break;
                 }
                 restore = true;
