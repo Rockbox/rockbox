@@ -149,7 +149,7 @@ follow the instructions at
     simultaneously. Your \dap{} should enter disk mode and you can try
     reconnecting to the computer.
   }
-  \opt{x5}{
+  \opt{iaudiox5}{
     When instructed to connect/disconnect the USB cable, always use
     the USB port through the subpack, not the side `USB Host' port. The side port
     is intended to be used for USB OTG connections only (digital cameras, memory
@@ -268,7 +268,7 @@ still available to you.\\
   \dap{} how to load and start other components of Rockbox and for providing
   the dual boot function. This is the component of Rockbox that is installed
   to the flash memory of your \playerman.
-  \opt{iaudio}{\note{Dual boot does not currently work on the \playertype{}.}}}
+  \opt{iaudiom3,iaudiom5,iaudiox5}{\note{Dual boot does not currently work on the \playertype.}}}
 
 \item[The Rockbox firmware.]
   \opt{HAVE_RB_BL_IN_FLASH}{Unlike the \playerman{} firmware, which runs
@@ -476,7 +476,7 @@ structure that Rockbox needs.\\}
     \subsubsection{Installing the bootloader}
         \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
         \opt{ipod}{\input{getting_started/ipod_install.tex}}
-        \opt{m3,m5,x5}{\input{getting_started/iaudio_install.tex}}
+        \opt{iaudio}{\input{getting_started/iaudio_install.tex}}
         \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
         \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
         \opt{sansa}{\input{getting_started/sansa_install.tex}}
@@ -503,7 +503,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{m3,m5,x5}{
+\opt{iaudiom3,iaudiom5,iaudiox5}{
   After installing you \emph{need} to power-cycle the 
   \dap{} by doing the following steps.
   \begin{itemize}
@@ -600,7 +600,7 @@ you turn the unit on, Rockbox should load.}
   }
 }
 
-\opt{m3}{
+\opt{iaudiom3}{
   \fixme{Add a note about the charging trick and place it here?}
 }
 
@@ -630,7 +630,7 @@ The new build will be installed over your current build.\\
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,m5,x5,archos,mrobe100,gigabeats}{
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,archos,mrobe100,gigabeats}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and 
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
@@ -695,7 +695,7 @@ completely follow the manual uninstallation instructions below.}}
   instead of \texttt{i} for install.
 }
 
-\opt{m5,x5}{
+\opt{iaudiom3,iaudiom5,iaudiox5}{
   If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, download the original \playername{}
   firmware from the \playerman{} website, and copy it to the \fname{FIRMWARE}
@@ -727,7 +727,7 @@ completely follow the manual uninstallation instructions below.}}
 \nopt{gigabeats}{
   If you wish to clean up your disk, you may also wish to delete the
   \fname{.rockbox} directory and its contents.
-  \nopt{m5,x5}{Turn the \playerman{} off.
+  \nopt{iaudiom3,iaudiom5,iaudiox5}{Turn the \playerman{} off.
     Turn the \dap{} back on and the original \playerman{} software will load.}
 }
 

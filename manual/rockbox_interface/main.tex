@@ -9,7 +9,7 @@
 % The extension is selected in the preamble, so no further \ifpdfoutput
 % is necessary.
 \includegraphics[height=8cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-front}
-\opt{m3}{% replace with HAVEREMOTEKEYMAP when the h100 file exists or change specimg
+\opt{iaudiom3}{% replace with HAVEREMOTEKEYMAP when the h100 file exists or change specimg
   \end{center}
   % spacing between the two pictures, could possibly be improved
   \begin{center}
@@ -300,7 +300,7 @@ detail in the following paragraph.
   bottom of the unit, there is a connector for the docking station or the 
   proprietary USB connector for connecting directly to USB.}
   %
-  \opt{x5,m5}{
+  \opt{iaudiom5,iaudiox5}{
   The \dap{} is curved so that the end with the screen on it is thicker than the 
   other end.  Hold the \dap{} wih the thick end towards the top and the screen
   facing towards you.  Half way up the front of the unit on the right hand side
@@ -325,8 +325,8 @@ detail in the following paragraph.
   indicator light, which may feel a bit like a button, but is not.
   
   From the top of the \dap{} on the left hand side is the headphone socket, then the 
-  remote connector.  Below this is a cover which protects the \opt{x5}{USB host
-  connector.}\opt{m5}{USB and charging connector}.}
+  remote connector.  Below this is a cover which protects the \opt{iaudiox5}{USB
+  host connector.}\opt{iaudiom5}{USB and charging connector}.}
   %
   \opt{e200,e200v2}{
   Hold the \dap{} with the turning wheel at the front and bottom.  On the bottom left
@@ -555,7 +555,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   performed by inserting a paperclip gently into the Reset hole.
 }%
 
-\nopt{gigabeatf,m3,m5,x5,archos}
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,archos}
   {
   \subsection{Starting the original firmware}
   \label{ref:Dualboot}
