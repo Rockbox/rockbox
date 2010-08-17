@@ -60,4 +60,4 @@ echo "[DEX]        bin/classes.dex"
 $DX --dex --output=$ROCKBOX_DIR/bin/classes.dex $ROCKBOX_DIR/bin
 
 echo "[APKBUILDER] bin/Rockbox.apk"
-$APKBUILDER $ROCKBOX_DIR/bin/Rockbox.apk -u -z $ROCKBOX_DIR/bin/resources.ap_ -f $ROCKBOX_DIR/bin/classes.dex
+$APKBUILDER $ROCKBOX_DIR/bin/Rockbox.apk -u -z $ROCKBOX_DIR/bin/resources.ap_ -f $ROCKBOX_DIR/bin/classes.dex -nf $ROCKBOX_DIR/libs
