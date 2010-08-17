@@ -965,6 +965,13 @@ int rockbox_browse(const char *root, int dirfilter)
                 ext = "rsbs";
                 setting = global_settings.rsbs_file;
                 break;
+#if CONFIG_TUNER
+            case SHOW_RFMS:
+                dir = WPS_DIR;
+                ext = "rfms";
+                setting = global_settings.rfms_file;
+                break;
+#endif /* CONFIG_TUNER */
 #endif
 #ifdef HAVE_LCD_BITMAP
             case SHOW_FONT:
@@ -977,6 +984,13 @@ int rockbox_browse(const char *root, int dirfilter)
                 ext = "sbs";
                 setting = global_settings.sbs_file;
                 break;
+#if CONFIG_TUNER
+            case SHOW_FMS:
+                dir = WPS_DIR;
+                ext = "fms";
+                setting = global_settings.fms_file;
+                break;
+#endif /* CONFIG_TUNER */
 #endif
 #if CONFIG_TUNER
             case SHOW_FMR:
