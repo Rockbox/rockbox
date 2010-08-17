@@ -1227,7 +1227,7 @@ static uint32_t ftl_open(void)
     {
         uint32_t badblocks = 0;
 #ifndef FTL_READONLY
-        for (j = 0; j < (*ftl_nand_type).blocks >> 3; j++)
+        for (j = 0; j < ftl_nand_type->blocks >> 3; j++)
         {
             uint8_t bbtentry = ftl_bbt[i][j];
             for (k = 0; k < 8; k++) if ((bbtentry & (1 << k)) == 0) badblocks++;
@@ -1246,7 +1246,7 @@ static uint32_t ftl_open(void)
     }
 #ifndef FTL_READONLY
     uint32_t min = 0xFFFFFFFF, max = 0, total = 0;
-    for (i = 0; i < (*ftl_nand_type).userblocks + 23; i++)
+    for (i = 0; i < ftl_nand_type->userblocks + 23; i++)
     {
         if (ftl_erasectr[i] > max) max = ftl_erasectr[i];
         if (ftl_erasectr[i] < min) min = ftl_erasectr[i];
@@ -1290,7 +1290,7 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
     if (sector + count > ftl_nand_type->userblocks * ppb)
     {
         DEBUGF("FTL: Sector %d is out of range!\n", sector + count - 1);
-        return 1;
+        return -2;
     }
     if (count == 0) return 0;
 
@@ -1337,7 +1337,7 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
                 else if ((ret & (0xd << (j << 2))) || ftl_sparebuffer[j].user.eccmark != 0xFF)
                 {
 		            DEBUGF("FTL: Error while reading sector %d!\n", (sector + i));
-                    error = 1;
+                    error = -3;
                     memset(&((uint8_t*)buffer)[(i + j) << 11], 0, 0x800);
                 }
             i += ftl_banks - 1;
@@ -1350,7 +1350,7 @@ uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
             else if ((ret & 0x11D) != 0 || ftl_sparebuffer[0].user.eccmark != 0xFF)
             {
 	            DEBUGF("FTL: Error while reading sector %d!\n", (sector + i));
-                error = 1;
+                error = -4;
                 memset(&((uint8_t*)buffer)[i << 11], 0, 0x800);
             }
         }
@@ -1811,8 +1811,11 @@ static struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 {
     uint32_t i;
     struct ftl_log_type* entry = ftl_get_log_entry(block);
-    entry->usn = ftl_cxt.nextblockusn - 1;
-    if (entry != (struct ftl_log_type*)0) return entry;
+    if (entry != (struct ftl_log_type*)0)
+    {
+        entry->usn = ftl_cxt.nextblockusn - 1;
+        return entry;
+    }
 
     for (i = 0; i < 0x11; i++)
     {
@@ -1945,7 +1948,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
     if (sector + count > ftl_nand_type->userblocks * ppb)
     {
         DEBUGF("FTL: Sector %d is out of range!\n", sector + count - 1);
-        return 1;
+        return -2;
     }
     if (count == 0) return 0;
 
@@ -1959,7 +1962,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
             if (ftl_next_ctrl_pool_page() != 0)
             {
                 mutex_unlock(&ftl_mtx);
-                return 1;
+                return -3;
             }
             memset(ftl_buffer, 0xFF, 0x800);
             memset(&ftl_sparebuffer[0], 0xFF, 0x40);
@@ -1972,7 +1975,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
         if (i == 3)
         {
             mutex_unlock(&ftl_mtx);
-            return 1;
+            return -4;
         }
     	DEBUGF("FTL: Wrote dirty mark to %d\n", ftl_cxt.ftlctrlpage);
         ftl_cxt.clean_flag = 0;
@@ -1987,7 +1990,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
         if (logentry == (struct ftl_log_type*)0)
         {
             mutex_unlock(&ftl_mtx);
-            return 1;
+            return -5;
         }
         if (page == 0 && count - i >= ppb)
         {
@@ -2006,7 +2009,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                 if (vblock == 0xFFFFFFFF)
                 {
                     mutex_unlock(&ftl_mtx);
-                    return 1;
+                    return -6;
                 }
             }
             ftl_cxt.nextblockusn++;
@@ -2048,7 +2051,7 @@ uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
                 if (logentry == (struct ftl_log_type*)0)
                 {
                     mutex_unlock(&ftl_mtx);
-                    return 1;
+                    return -7;
                 }
             }
             uint32_t cnt = FTL_WRITESPARE_SIZE;
@@ -2142,7 +2145,7 @@ uint32_t ftl_sync(void)
     if (rc != 0)
     {
         mutex_unlock(&ftl_mtx);
-        return 1;
+        return -1;
     }
     for (i = 0; i < 5; i++)
         if (ftl_commit_cxt() == 0)
@@ -2152,7 +2155,7 @@ uint32_t ftl_sync(void)
         }
         else ftl_cxt.ftlctrlpage |= ppb - 1;
     mutex_unlock(&ftl_mtx);
-    return 1;
+    return -2;
 }
 #endif
 
@@ -2195,12 +2198,12 @@ uint32_t ftl_init(void)
     if (founddevinfo == 0)
     {
 	   	DEBUGF("FTL: No DEVICEINFO found!\n");
-        return 1;
+        return -1;
     }
     if (foundsignature != 0 && (result & 0x11F) != 0)
     {
         DEBUGF("FTL: Problem with the signature!\n");
-        return 1;
+        return -2;
     }
     if (ftl_vfl_open() == 0)
         if (ftl_open() == 0)
@@ -2208,5 +2211,5 @@ uint32_t ftl_init(void)
 
     DEBUGF("FTL: Initialization failed!\n");
 
-    return 1;
+    return -3;
 }
