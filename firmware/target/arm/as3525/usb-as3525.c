@@ -55,5 +55,11 @@ void usb_remove_int(void)
 
 int usb_detect(void)
 {
+#if CONFIG_CPU == AS3525v2
+    /* Rebooting on USB plug can crash these players in a state where
+     * hardware power off (pressing the power button) doesn't work anymore
+     * TODO: Implement USB in rockbox for these players */
+    return USB_EXTRACTED;
+#endif
     return usb_status;
 }
