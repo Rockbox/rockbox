@@ -55,7 +55,7 @@ static const struct button_mapping button_context_standard[]  = {
 
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,              BUTTON_UP|BUTTON_REL,           BUTTON_UP },
-    { ACTION_WPS_STOP,              BUTTON_HOME|BUTTON_REPEAT,      BUTTON_HOME },
+    { ACTION_WPS_STOP,              BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP },
    
     { ACTION_WPS_SKIPPREV,          BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,          BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
@@ -113,7 +113,7 @@ static const struct button_mapping button_context_list[]  = {
 
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_UP|BUTTON_REL,         BUTTON_UP },
-    { ACTION_TREE_STOP,   BUTTON_HOME|BUTTON_REPEAT,    BUTTON_HOME },
+    { ACTION_TREE_STOP,   BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
     { ACTION_TREE_HOTKEY, BUTTON_HOME|BUTTON_REL,       BUTTON_HOME },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
@@ -238,12 +238,12 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_STD_NEXT,       BUTTON_RIGHT,                      BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_FM_MENU,        BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_FM_STOP,        BUTTON_HOME|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_FM_MODE,        BUTTON_UP|BUTTON_REPEAT,           BUTTON_UP   },
+    { ACTION_FM_STOP,        BUTTON_UP|BUTTON_REPEAT,           BUTTON_UP },
+    { ACTION_FM_MODE,        BUTTON_HOME|BUTTON_REPEAT,         BUTTON_HOME },
     { ACTION_FM_EXIT,        BUTTON_DOWN|BUTTON_REL,            BUTTON_DOWN },
     { ACTION_FM_EXIT,        BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_FM_PLAY,        BUTTON_UP|BUTTON_REL,              BUTTON_UP   },
-    { ACTION_FM_PRESET,      BUTTON_HOME|BUTTON_REL,            BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_HOME|BUTTON_REL,            BUTTON_HOME },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
 
@@ -294,7 +294,7 @@ static const struct button_mapping button_context_usb_hid_mode_multimedia[] = {
     { ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_USB_HID_MULTIMEDIA_VOLUME_MUTE,         BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
     { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_PLAY_PAUSE, BUTTON_UP|BUTTON_REL,             BUTTON_UP },
-    { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       BUTTON_UP|BUTTON_REPEAT,          BUTTON_UP },
     { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_PREV, BUTTON_LEFT|BUTTON_REL,           BUTTON_LEFT },
     { ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_NEXT, BUTTON_RIGHT|BUTTON_REL,          BUTTON_RIGHT },
 
