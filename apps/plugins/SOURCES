@@ -27,7 +27,7 @@ md5sum.c
 dice.c
 disktidy.c
 flipit.c
-
+shopper.c
 
 
 #ifdef USB_ENABLE_HID
@@ -144,7 +144,6 @@ brickmania.c
 calendar.c
 maze.c
 mazezam.c
-shopper.c
 text_editor.c
 wavview.c
 robotfindskitten.c
