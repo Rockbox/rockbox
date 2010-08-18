@@ -84,6 +84,7 @@ rockpaint,apps
 search,viewers
 searchengine,viewers
 settings_dumper,apps
+shopper,viewers
 shortcuts_append,viewers
 shortcuts_view,viewers
 sliding_puzzle,games
