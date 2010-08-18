@@ -73,7 +73,7 @@
 #define AS3525_PLLA_FREQ        240000000
 #define AS3525_PLLA_SETTING     0x113B
 
-#define AS3525_PLLB_FREQ        192000000
+#define AS3525_PLLB_FREQ        192000000   /* allows 44.1kHz with 0.04% error*/
 #define AS3525_PLLB_SETTING     0x155F
 
 #define AS3525_FCLK_PREDIV      0
@@ -146,7 +146,14 @@
 #endif /* CONFIG_CPU == AS3525v2 */
 
 /* MCLK */
+#if CONFIG_CPU == AS3525v2
+/* on AMSv2 we can enable PLLB for MCLK to increase PCM sample rate accuracy
+   with no significant impact on battery life */
+#define AS3525_MCLK_SEL          AS3525_CLK_PLLB
+#else
 #define AS3525_MCLK_SEL          AS3525_CLK_PLLA
+#endif /* CONFIG_CPU == AS3525v2 */
+
 #if (AS3525_MCLK_SEL==AS3525_CLK_PLLA)
 #define AS3525_MCLK_FREQ         AS3525_PLLA_FREQ
 #elif (AS3525_MCLK_SEL==AS3525_CLK_PLLB)
