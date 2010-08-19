@@ -315,6 +315,8 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 
                 if (intval)
                 {
+                    if (limit == TOKEN_VALUE_ONLY)
+                        limit = 100; /* make it a percentage */
                     *intval = limit * elapsed / length + 1;
                 }
                 snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
@@ -619,6 +621,72 @@ const char *get_token_value(struct gui_wps *gwps,
 
     switch (token->type)
     {
+        case SKIN_TOKEN_LOGICAL_IF:
+        {
+            struct logical_if *lif = token->value.data;
+            int a = lif->num_options;
+            int b;
+            out_text = get_token_value(gwps, lif->token, offset, buf, buf_size, &a);            
+            if (a == -1 && lif->token->type != SKIN_TOKEN_VOLUME)
+                a = (out_text && *out_text) ? 1 : 0;
+            switch (lif->operand.type)
+            {
+                case STRING:
+                    if (lif->op == IF_EQUALS)
+                        return strcmp(out_text, lif->operand.data.text) == 0 ?
+                                                                    "eq" : NULL;
+                    else
+                        return NULL;
+                    break;
+                case INTEGER:
+                case DECIMAL:
+                    b = lif->operand.data.number;
+                    break;
+                case CODE:
+                {
+                    char temp_buf[MAX_PATH];
+                    const char *outb;
+                    struct wps_token *token = lif->operand.data.code->data;
+                    b = lif->num_options;
+                    outb = get_token_value(gwps, token, offset, temp_buf,
+                                           sizeof(temp_buf), &b);            
+                    if (b == -1 && lif->token->type != SKIN_TOKEN_VOLUME)
+                    {
+                        if (!out_text || !outb)
+                            return (lif->op == IF_EQUALS) ? NULL : "neq";
+                        bool equal = strcmp(out_text, outb) == 0;
+                        if (lif->op == IF_EQUALS)
+                            return equal ? "eq" : NULL;
+                        else if (lif->op == IF_NOTEQUALS)
+                            return !equal ? "neq" : NULL;
+                        else
+                            b = (outb && *outb) ? 1 : 0;
+                    }
+                }
+                break;
+                case DEFAULT:
+                    break;
+            }
+                    
+            switch (lif->op)
+            {
+                case IF_EQUALS:
+                    return a == b ? "eq" : NULL;
+                case IF_NOTEQUALS:
+                    return a != b ? "neq" : NULL;
+                case IF_LESSTHAN:
+                    return a < b ? "lt" : NULL;
+                case IF_LESSTHAN_EQ:
+                    return a <= b ? "lte" : NULL;
+                case IF_GREATERTHAN:
+                    return a > b ? "gt" : NULL;
+                case IF_GREATERTHAN_EQ:
+                    return a >= b ? "gte" : NULL;
+            }
+            return NULL;
+        }
+        break;           
+            
         case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 return NULL;
@@ -632,6 +700,8 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_PLAYLIST_ENTRIES:
             snprintf(buf, buf_size, "%d", playlist_amount());
+            if (intval)
+                *intval = playlist_amount();
             return buf;
         
         case SKIN_TOKEN_LIST_TITLE_TEXT:
@@ -647,6 +717,8 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_PLAYLIST_POSITION:
             snprintf(buf, buf_size, "%d", playlist_get_display_index()+offset);
+            if (intval)
+                *intval = playlist_get_display_index()+offset;
             return buf;
 
         case SKIN_TOKEN_PLAYLIST_SHUFFLE:
@@ -661,7 +733,11 @@ const char *get_token_value(struct gui_wps *gwps,
             if (intval)
             {
                 int minvol = sound_min(SOUND_VOLUME);
-                if (global_settings.volume == minvol)
+                if (limit == TOKEN_VALUE_ONLY)
+                {
+                    *intval = global_settings.volume;
+                }
+                else if (global_settings.volume == minvol)
                 {
                     *intval = 1;
                 }
@@ -705,14 +781,21 @@ const char *get_token_value(struct gui_wps *gwps,
 
             if (intval)
             {
-                limit = MAX(limit, 3);
-                if (l > -1) {
-                    /* First enum is used for "unknown level",
-                     * last enum is used for 100%.
-                     */
-                    *intval = (limit - 2) * l / 100 + 2;
-                } else {
-                    *intval = 1;
+                if (limit == TOKEN_VALUE_ONLY)
+                {
+                    *intval = l;
+                }
+                else
+                {
+                    limit = MAX(limit, 3);
+                    if (l > -1) {
+                        /* First enum is used for "unknown level",
+                         * last enum is used for 100%.
+                         */
+                        *intval = (limit - 2) * l / 100 + 2;
+                    } else {
+                        *intval = 1;
+                    }
                 }
             }
 

@@ -33,6 +33,8 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_ALIGN_RIGHT_RTL,       "aR", "", 0 },
     { SKIN_TOKEN_ALIGN_LANGDIRECTION,   "ax", "", 0 },
     
+    { SKIN_TOKEN_LOGICAL_IF,            "if", "TS[ITS]|D", SKIN_REFRESH_DYNAMIC },
+    
     { SKIN_TOKEN_BATTERY_PERCENT,       "bl" , BAR_PARAMS, SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_VOLTS,         "bv", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_TIME,          "bt", "", SKIN_REFRESH_DYNAMIC },

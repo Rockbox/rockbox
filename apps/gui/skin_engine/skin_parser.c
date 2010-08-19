@@ -502,7 +502,39 @@ static int parse_setting_and_lang(struct skin_element *element,
     token->value.i = i;
     return 0;
 }
-
+static int parse_logical_if(struct skin_element *element,
+                             struct wps_token *token,
+                             struct wps_data *wps_data)
+{
+    (void)wps_data;
+    char *op = element->params[1].data.text;
+    struct logical_if *lif = skin_buffer_alloc(sizeof(struct logical_if));
+    if (!lif)
+        return -1;
+    token->value.data = lif;
+    lif->token = element->params[0].data.code->data;
+    
+    if (!strcmp(op, "="))
+        lif->op = IF_EQUALS;
+    if (!strcmp(op, "!="))
+        lif->op = IF_NOTEQUALS;
+    if (!strcmp(op, "<"))
+        lif->op = IF_LESSTHAN;
+    if (!strcmp(op, "<="))
+        lif->op = IF_LESSTHAN_EQ;
+    if (!strcmp(op, ">"))
+        lif->op = IF_GREATERTHAN;
+    if (!strcmp(op, ">="))
+        lif->op = IF_GREATERTHAN_EQ;
+    
+    memcpy(&lif->operand, &element->params[2], sizeof(lif->operand));
+    if (element->params_count > 3)
+        lif->num_options = element->params[3].data.number;
+    else
+        lif->num_options = TOKEN_VALUE_ONLY;
+    return 0;
+    
+}
 static int parse_timeout_tag(struct skin_element *element,
                              struct wps_token *token,
                              struct wps_data *wps_data)
@@ -1297,6 +1329,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
             {
                 case SKIN_TOKEN_ALIGN_LANGDIRECTION:
                     follow_lang_direction = 2;
+                    break;
+                case SKIN_TOKEN_LOGICAL_IF:
+                    function = parse_logical_if;
                     break;
                 case SKIN_TOKEN_PROGRESSBAR:
                 case SKIN_TOKEN_VOLUME:

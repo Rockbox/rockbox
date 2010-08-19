@@ -621,11 +621,13 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             }
             temp_params[j] = '\0';
             j = 0;
-            while (cursor[j] != ',' && cursor[j] != ')')
+            while (cursor[j] && cursor[j] != ',' && cursor[j] != ')')
             {
                 haspercent = haspercent || (cursor[j] == '%');
                 hasdecimal = hasdecimal || (cursor[j] == '.');
-                number = number && (isdigit(cursor[j]) || (cursor[j] == '.'));
+                number = number && (isdigit(cursor[j]) || 
+                                    (cursor[j] == '.') ||
+                                    (cursor[j] == '-'));
                 j++;
             }
             type_code = '*';

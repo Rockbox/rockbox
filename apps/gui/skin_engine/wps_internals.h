@@ -50,7 +50,7 @@
 #define WPS_ALIGN_LEFT 128
 
 
-#define TOKEN_VALUE_ONLY 0xDEADD0D0
+#define TOKEN_VALUE_ONLY 0x0DEADC0D
 
 #ifdef HAVE_ALBUMART
 
@@ -223,7 +223,7 @@ struct skin_albumart {
     int draw_handle;
 };
 #endif
-
+    
 
 struct line {
     int timeout; /* if inside a line alternator */
@@ -240,6 +240,19 @@ struct conditional {
     struct wps_token *token;
 };
 
+struct logical_if {
+    struct wps_token *token;
+    enum {
+        IF_EQUALS, /* == */
+        IF_NOTEQUALS, /* != */
+        IF_LESSTHAN, /* < */
+        IF_LESSTHAN_EQ, /* <= */
+        IF_GREATERTHAN, /* > */
+        IF_GREATERTHAN_EQ /* >= */
+    } op;
+    struct skin_tag_parameter operand;
+    int num_options;
+};
 
 /* wps_data
    this struct holds all necessary data which describes the
