@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "adc.h"
 #include "adc-target.h"
+#include "system-target.h"
 
 static struct mutex adc_mtx SHAREDBSS_ATTR;
 
@@ -41,24 +42,24 @@ unsigned short adc_scan(int channel)
 
     if ((IPOD_HW_REVISION >> 16) == 1)
     {
-        int i, j;
+        int i;
         unsigned pval = GPIOB_OUTPUT_VAL;
 
         GPIOB_OUTPUT_VAL = pval | 0x04;  /* B2 -> high */
-        for (i = 32; i > 0; --i);
+        udelay(2);
 
         GPIOB_OUTPUT_VAL = pval;         /* B2 -> low */
-        for (i = 200; i > 0; --i);
+        udelay(10);
 
-        for (j = 0; j < 8; j++)
+        for (i = 0; i < 8; i++)
         {
             GPIOB_OUTPUT_VAL = pval | 0x02; /* B1 -> high */
-            for (i = 8; i > 0; --i);
+            udelay(1);
 
             data = (data << 1) | ((GPIOB_INPUT_VAL & 0x08) >> 3);
 
             GPIOB_OUTPUT_VAL = pval;     /* B1 -> low */
-            for (i = 320; i > 0; --i);
+            udelay(15);
         }
     }
     else if ((IPOD_HW_REVISION >> 16) == 2)
