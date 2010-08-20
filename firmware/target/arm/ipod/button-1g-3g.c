@@ -49,7 +49,6 @@ static int int_btn = BUTTON_NONE;
 #define WHEEL_TIMEOUT (HZ/4)
 #endif
 
-#ifdef IPOD_3G
 #define WHEELCLICKS_PER_ROTATION  96
 #define WHEEL_BASE_SENSITIVITY     6 /* Compute every ... clicks */
 #define WHEEL_REPEAT_VELOCITY     45 /* deg/s */
@@ -188,52 +187,6 @@ static void handle_scroll_wheel(int new_scroll)
 
     last_wheel_usec = usec;
 }
-#else
-static void handle_scroll_wheel(int new_scroll)
-{
-    int wheel_keycode = BUTTON_NONE;
-    static int prev_scroll = -1;
-    static int direction = 0;
-    static int count = 0;
-    static int scroll_state[4][4] = {
-        {0, 1, -1, 0},
-        {-1, 0, 0, 1},
-        {1, 0, 0, -1},
-        {0, -1, 1, 0}
-    };
-    
-    if ( prev_scroll == -1 ) {
-        prev_scroll = new_scroll;
-    }
-    else if (direction != scroll_state[prev_scroll][new_scroll]) {
-        direction = scroll_state[prev_scroll][new_scroll];
-        count = 0;
-    }
-    else {
-        backlight_on();
-        reset_poweroff_timer();
-        if (++count == 6) { /* reduce sensitivity */
-            count = 0;
-            /* 1st..3rd Gen wheel has inverse direction mapping
-             * compared to Mini 1st Gen wheel. */
-            switch (direction) {
-                case 1:
-                    wheel_keycode = BUTTON_SCROLL_BACK;
-                    break;
-                case -1:
-                    wheel_keycode = BUTTON_SCROLL_FWD;
-                    break;
-                default:
-                    /* only happens if we get out of sync */
-                    break;
-            }
-        }
-    }
-    if (wheel_keycode != BUTTON_NONE && queue_empty(&button_queue))
-        queue_post(&button_queue, wheel_keycode, 0);
-    prev_scroll = new_scroll;
-}
-#endif /* IPOD_3G */
 
 static int ipod_3g_button_read(void)
 {
