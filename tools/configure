@@ -3092,7 +3092,7 @@ if [ "$ARG_RBDIR" ]; then
   if [ "$need_full_path" = "yes" ]; then
     rbdir=`realpath $ARG_RBDIR`
   else # prepend '/' if needed
-    if [ -z `echo $ARG_RBDIR | grep -P '/.*'` ]; then
+    if [ -z `echo $ARG_RBDIR | grep '^/'` ]; then
         rbdir="/"$ARG_RBDIR
     else
         rbdir=$ARG_RBDIR
