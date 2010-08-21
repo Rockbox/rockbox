@@ -21,9 +21,7 @@
 #ifndef _APPLIMITS_H_
 #define _APPLIMITS_H_
 
-#define MAX_FILES_IN_DIR 400
 #define AVERAGE_FILENAME_LENGTH 40
 #define MAX_DIR_LEVELS 10
-#define MAX_PLAYLIST_SIZE 10000
 
 #endif
