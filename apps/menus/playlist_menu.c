@@ -41,7 +41,7 @@ int save_playlist_screen(struct playlist_info* playlist)
     char temp[MAX_PATH+1];
     int len;
 
-    playlist_get_name(playlist, temp, sizeof(temp));
+    playlist_get_name(playlist, temp, sizeof(temp)-1);
     len = strlen(temp);
 
     if (len > 4 && !strcasecmp(&temp[len-4], ".m3u"))
