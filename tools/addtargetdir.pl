@@ -39,3 +39,4 @@ for (split(/[\s\\]+/m, <STDIN>)) {
         print " \\\n  $src";
     }
 }
+print "\n";

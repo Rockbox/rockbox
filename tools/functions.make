@@ -22,33 +22,31 @@ preprocess = $(shell $(CC) $(PPCFLAGS) $(2) -E -P -x c -include config.h $(1) | 
 		grep -v '^\#' | \
 		sed -e 's:^..*:$(dir $(1))&:')
 
-preprocess2file = $(shell $(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \
-		grep -v '^\#' | grep -v "^$$" > $(2))
+preprocess2file = $(SILENT)$(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \
+		grep -v '^\#' | grep -v "^$$" > $(2)
 
-asmdefs2file = $(shell $(CC) $(PPCFLAGS) $(3) -S -x c -o - -include config.h $(1) | \
-	perl -ne 'if(/^_?AD_(\w+):$$/){$$var=$$1}else{/^\W\.(?:word|long)\W(.*)$$/ && $$var && print "\#define $$var $$1\n";$$var=0}' > $2)
+asmdefs2file = $(SILENT)$(CC) $(PPCFLAGS) $(3) -S -x c -o - -include config.h $(1) | \
+	perl -ne 'if(/^_?AD_(\w+):$$/){$$var=$$1}else{/^\W\.(?:word|long)\W(.*)$$/ && $$var && print "\#define $$var $$1\n";$$var=0}' > $(2)
 
 c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
-# calculate dependencies for a list of source files $(2) and output them
-# to a file $(1)_, to be later renamed to $(1).
-mkdepfile = $(shell \
-	perl $(TOOLSDIR)/multigcc.pl $(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h -- $(2) | \
+# calculate dependencies for a list of source files $(2) and output them to $(1)
+mkdepfile = $(SILENT)perl $(TOOLSDIR)/multigcc.pl $(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h -- $(2) | \
 	sed -e "s: lang.h: lang/lang.h:" \
 	-e 's:_asmdefs.o:_asmdefs.h:' \
 	-e "s: max_language_size.h: lang/max_language_size.h:" | \
 	$(TOOLSDIR)/addtargetdir.pl $(ROOTDIR) $(BUILDDIR) \
-	>> $(1)_)
+	>> $(1)
 
 # function to create .bmp dependencies
-bmpdepfile = $(shell \
+bmpdepfile = $(SILENT) \
 	for each in $(2); do \
 	    obj=`echo $$each | sed -e 's/\.bmp/.o/' -e 's:$(ROOTDIR):$(BUILDDIR):'`; \
 	    src=`echo $$each | sed -e 's/\.bmp/.c/' -e 's:$(ROOTDIR):$(BUILDDIR):'`; \
 	    echo $$obj: $$src; \
 	    echo $$src: $$each; \
 	done \
-	>> $(1); )
+	>> $(1)
 
 ifndef V
 SILENT:=@

@@ -110,12 +110,11 @@ $(RBINFO): $(BUILDDIR)/$(BINARY)
 
 $(DEPFILE) dep:
 	$(call PRINTS,Generating dependencies)
-	@echo foo > /dev/null # there must be a "real" command in the rule
-	$(call mkdepfile,$(DEPFILE),$(SRC))
-	$(call mkdepfile,$(DEPFILE),$(OTHER_SRC:%.lua=))
-	$(call mkdepfile,$(DEPFILE),$(ASMDEFS_SRC))
+	$(call mkdepfile,$(DEPFILE)_,$(SRC))
+	$(call mkdepfile,$(DEPFILE)_,$(OTHER_SRC:%.lua=))
+	$(call mkdepfile,$(DEPFILE)_,$(ASMDEFS_SRC))
+	$(call bmpdepfile,$(DEPFILE)_,$(BMP) $(PBMP))
 	@mv $(DEPFILE)_ $(DEPFILE)
-	$(call bmpdepfile,$(DEPFILE),$(BMP) $(PBMP))
 
 bin: $(DEPFILE) $(TOOLS) $(BUILDDIR)/$(BINARY) $(RBINFO)
 rocks: $(DEPFILE) $(TOOLS) $(ROCKS)
@@ -220,8 +219,8 @@ $(BUILDDIR)/rombox.ucl: $(BUILDDIR)/rombox.bin $(MAXOUTFILE)
 
 $(MAXOUTFILE):
 	$(call PRINTS,Creating $(@F))
-	$(SILENT)$(shell echo '#include "config.h"' > $(MAXINFILE))
-	$(SILENT)$(shell echo "ROM_START" >> $(MAXINFILE))
+	$(SILENT)echo '#include "config.h"' > $(MAXINFILE)
+	$(SILENT)echo "ROM_START" >> $(MAXINFILE)
 	$(call preprocess2file,$(MAXINFILE),$(MAXOUTFILE))
 	$(SILENT)rm $(MAXINFILE)
 
