@@ -1,25 +1,53 @@
 # cabbie 2.0 default for the Archos Series by Marianne Arnold
 # derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+#
+# Disable Status Bar
 %wd
+#
+# Load Backdrop
 %x(z,wpsbackdrop-112x64x1.bmp,0,0)
-%xl(A,lock-112x64x1.bmp,4,56,2)
-%xl(B,battery-112x64x1.bmp,22,56,9)
-%xl(C,volume-112x64x1.bmp,41,56,9)
-%xl(D,shuffle-112x64x1.bmp,59,56)
-%xl(E,repeat-112x64x1.bmp,81,56,4)
-%xl(F,playmode-112x64x1.bmp,98,56,5)
-#NowPlaying
-
+#
+# Preload Images
+%xl(A,lock-112x64x1.bmp,0,0,2)
+%xl(B,battery-112x64x1.bmp,0,0,9)
+%xl(C,volume-112x64x1.bmp,0,0,9)
+%xl(D,shuffle-112x64x1.bmp,0,0)
+%xl(E,repeat-112x64x1.bmp,0,0,4)
+%xl(F,playmode-112x64x1.bmp,0,0,5)
+#
+# Progress Bar
+%V(1,42,110,4,-)
+%pb(0,0,-,4,pb-112x64x1.bmp)
+#
+# Hold
+%V(4,56,28,8,-)
+%?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(22,56,19,8,-)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)>>
+#
+# Volume
+%V(41,56,18,8,-)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)>
+#
+# Shuffle
+%V(59,56,22,8,-)
+%?ps<%xd(D)>
+#
+# Repeat
+%V(81,56,17,8,-)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(98,56,14,8,-)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+#
+# Track Info
+%V(0,8,-,35,-)
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %t(5)%ac%s%?Fn<%Sx(Next:) %?It<%It|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>%;%t(5)%ac%s%?Fn<%Sx(Next:) %?Ia<%Ia|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>
-%pb(1,42,110,4,pb-112x64x1.bmp)
+%V(0,48,-,8,-)
 %pc%ar%pr
-#Bottom status bar
-%?mh<%xd(Aa)|%xd(Ab)>
-%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)>>
-%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)>
-%?ps<%xd(D)>
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
-%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>

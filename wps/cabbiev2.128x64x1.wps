@@ -1,41 +1,62 @@
 # cabbie 2.0 default rwps for Iriver Players by Johannes Voggenthaler (Zinc Alloy)
 # derived from cabbie 2.0 default rwps (C) 2007, Marc Guay
-
+#
+# Disable Status Bar
 %wd
-
-# progressbar viewport
-%V(0,0,128,6,1)
+#
+# Preload Images
+%xl(A,lock-128x64x1.bmp,0,0,2)
+%xl(B,battery-128x64x1.bmp,0,0,9)
+%xl(C,volume-128x64x1.bmp,0,0,9)
+%xl(D,shuffle-128x64x1.bmp,0,1)
+%xl(E,repeat-128x64x1.bmp,0,0,4)
+%xl(F,playmode-128x64x1.bmp,0,0,5)
 %x(a,pbbackground-128x64x1.bmp,1,0)
-%pb(2,1,124,4,pb-128x64x1.bmp)
-
+%xl(b,bar-128x64x1.bmp,2,0)
+#
+# Progress Bar
+%V(0,0,128,6,1)
+#%xd(a)
+%pb(2,1,123,4,pb-128x64x1.bmp)
+#
+# Separator Bar
+%V(2,52,124,1,1)
+%xd(b)
+#
+# Hold
+%V(3,56,20,8,1)
+%?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(25,56,23,8,1)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)>>
+#
+# Volume
+%V(48,56,21,8,1)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)>
+#
+# Shuffle
+%V(69,56,26,8,1)
+%?ps<%xd(D)>
+#
+# Repeat
+%V(95,56,20,8,1)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(115,56,13,8,1)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+#
+# Time Elapsed/Remaining
 %V(0,8,128,8,1)
 %?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pc
-
-# tag info viewport
+#
+# Current Track Info
 %V(0,16,128,24,1)
 %ac%s%?it<%it|%fn>
 %ac%s%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
 %ac%s%?id<%id|%?d(1)<%d(1)|%(root%)>>
-
-# next file viewport
+#
+# Next Track Info
 %V(0,42,128,8,1)
 %ac%s%Sx(Next:) %?It<%It|%Fn>
-
-# playtime info and status bar
-
-%V(2,52,124,12,1)
-%x(b,bar-128x64x1.bmp,2,0)
-%xl(A,lock-128x64x1.bmp,1,4,2)
-%xl(B,battery-128x64x1.bmp,23,4,9)
-%xl(C,volume-128x64x1.bmp,46,4,9)
-%xl(D,shuffle-128x64x1.bmp,67,5)
-%xl(E,repeat-128x64x1.bmp,93,4,4)
-%xl(F,playmode-128x64x1.bmp,113,4,5)
-
-# status bar
-%?mh<%xd(Aa)|%xd(Ab)>
-%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)>>
-%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)>
-%?ps<%xd(D)>
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
-%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
