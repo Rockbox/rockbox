@@ -40,6 +40,7 @@
 #include "sound.h"
 #include "bitswap.h"
 #include "appevents.h"
+#include "playlist.h"
 #include "cuesheet.h"
 #include "settings.h"
 #ifndef SIMULATOR
@@ -86,12 +87,6 @@ extern enum /* from mp3_playback.c */
     MPEG_ENCODER
 } mpeg_mode;
 #endif /* CONFIG_CODEC == MAS3587F */
-
-extern const char* playlist_peek(int steps);
-extern bool playlist_check(int steps);
-extern int playlist_next(int steps);
-extern int playlist_amount(void);
-extern int playlist_update_resume_info(const struct mp3entry* id3);
 
 #define MPEG_PLAY                  1
 #define MPEG_STOP                  2
@@ -914,6 +909,8 @@ static int new_file(int steps)
     int start = 0;
     int i;
     struct trackdata *track;
+    char name_buf[MAX_PATH+1];
+    const char *trackname;
 
     /* Find out how many steps to advance. The load_ahead_index field tells
        us how many playlist entries it had to skip to get to a valid one.
@@ -929,9 +926,7 @@ static int new_file(int steps)
     }
     
     do {
-        const char *trackname;
-
-        trackname = playlist_peek( start + steps );
+        trackname = playlist_peek(start + steps, name_buf, sizeof(name_buf));
         if ( !trackname )
             return -1;
         
@@ -2653,13 +2648,14 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_play(long offset)
 {
 #ifdef SIMULATOR
+    char name_buf[MAX_PATH+1];
     const char* trackname;
     int steps=0;
 
     is_playing = true;
     
     do {
-        trackname = playlist_peek( steps );
+        trackname = playlist_peek(steps, name_buf, sizeof(name_buf));
         if (!trackname)
             break;
         if(mp3info(&taginfo, trackname)) {
@@ -2740,12 +2736,13 @@ void audio_next(void)
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_NEXT, 0);
 #else /* SIMULATOR */
+    char name_buf[MAX_PATH+1];
     const char* file;
     int steps = 1;
     int index;
 
     do {
-        file = playlist_peek(steps);
+        file = playlist_peek(steps, name_buf, sizeof(name_buf));
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
@@ -2769,12 +2766,13 @@ void audio_prev(void)
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_PREV, 0);
 #else /* SIMULATOR */
+    char name_buf[MAX_PATH+1];
     const char* file;
     int steps = -1;
     int index;
 
     do {
-        file = playlist_peek(steps);
+        file = playlist_peek(steps, name_buf, sizeof(name_buf));
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
