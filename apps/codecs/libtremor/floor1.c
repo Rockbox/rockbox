@@ -274,57 +274,7 @@ static const ogg_int32_t FLOOR_fromdB_LOOKUP[256] ICONST_ATTR = {
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
 
-/* render_line and friend taken from ffmpeg (libavcodec/vorbis.c) */
-static inline void render_line_unrolled(int x, int y, int x1,
-                                        int sy, int ady, int adx,
-                                        ogg_int32_t *buf)
-{
-    int err = -adx;
-    x -= x1 - 1;
-    buf += x1 - 1;
-    while (++x < 0) {
-        err += ady;
-        if (err >= 0) {
-            err += ady - adx;
-            y   += sy;
-            buf[x] = MULT31_SHIFT15(buf[x],FLOOR_fromdB_LOOKUP[y]);
-            x++;
-        }
-        buf[x] = MULT31_SHIFT15(buf[x],FLOOR_fromdB_LOOKUP[y]);
-    }
-    if (x <= 0) {
-        if (err + ady >= 0)
-            y += sy;
-        buf[x] = MULT31_SHIFT15(buf[x],FLOOR_fromdB_LOOKUP[y]);
-    }
-}
-
-static void render_line(int x0, int y0, int x1, int y1, ogg_int32_t *buf)
-{
-    int dy  = y1 - y0;
-    int adx = x1 - x0;
-    int ady = abs(dy);
-    int sy  = dy < 0 ? -1 : 1;
-    buf[x0] = MULT31_SHIFT15(buf[x0],FLOOR_fromdB_LOOKUP[y0]);
-    if (ady*2 <= adx) { // optimized common case
-        render_line_unrolled(x0, y0, x1, sy, ady, adx, buf);
-    } else {
-        int base = dy / adx;
-        int x    = x0;
-        int y    = y0;
-        int err  = -adx;
-        ady -= abs(base) * adx;
-        while (++x < x1) {
-            y += base;
-            err += ady;
-            if (err >= 0) {
-                err -= adx;
-                y   += sy;
-            }
-            buf[x] = MULT31_SHIFT15(buf[x],FLOOR_fromdB_LOOKUP[y]);
-        }
-    }
-}
+#include "ffmpeg_render_line.h"
 
 static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in)
     ICODE_ATTR_TREMOR_NOT_MDCT;
