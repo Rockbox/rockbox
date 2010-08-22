@@ -274,6 +274,7 @@ static const ogg_int32_t FLOOR_fromdB_LOOKUP[256] ICONST_ATTR = {
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
 
+/* render_line and friend taken from ffmpeg (libavcodec/vorbis.c) */
 static inline void render_line_unrolled(int x, int y, int x1,
                                         int sy, int ady, int adx,
                                         ogg_int32_t *buf)
