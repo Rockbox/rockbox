@@ -27,25 +27,8 @@
 #define TIMEOUT_VALUE 20
 
 extern int radio_present;
-extern int tuner_frequency;
-extern int tuner_signal_power;
-extern int radio_tuned;
 
-/* update tuner state: plugged or unplugged when in radio mode */
-extern void rmt_tuner_region(int region);
-extern void rmt_tuner_set_freq(int curr_freq);
 extern void rmt_tuner_freq(void);
-extern void rmt_tuner_scan(int direction);
-
-/* tuner mode state: ON or OFF */
-extern void rmt_tuner_sleep(int state);
-
-/* parameters are stereo/mono, deemphasis, delta freq... */
-extern void rmt_tuner_set_param(unsigned char tuner_param);
-
-extern void rmt_tuner_mute(int value);
-extern void rmt_tuner_signal_power(unsigned char value);
-
 extern void rmt_tuner_rds_data(void);
 
 int ipod_rmt_tuner_set(int setting, int value);

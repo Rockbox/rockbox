@@ -35,21 +35,27 @@ static bool powered = false;
 
 static unsigned char tuner_param = 0x00, old_tuner_param = 0xFF;
 /* temp var for tests to avoid looping execution in submenus settings*/
-int mono_mode = -1, old_region = -1;
+static int mono_mode = -1, old_region = -1;
 
 int radio_present = 0;
-int tuner_frequency = 0;
-int tuner_signal_power = 0;
-int radio_tuned = 0;
-int rds_event = 0;
 
-char rds_radioname[9];
-char rds_radioinfo[65];
+static int tuner_frequency = 0;
+static int tuner_signal_power = 0;
+static bool radio_tuned = false;
+static bool rds_event = false;
 
-union FRQ {
+static char rds_radioname[9];
+static char rds_radioinfo[65];
+
+static union FRQ {
     unsigned long int frequency_radio;
     char data_frequency[4];
 }Frequency;
+
+static void rmt_tuner_signal_power(unsigned char value)
+{
+    tuner_signal_power = (int)(value);
+}
 
 void rmt_tuner_freq(void)
 {
@@ -61,15 +67,15 @@ void rmt_tuner_freq(void)
 
     memcpy(Frequency.data_frequency,tempdata,4);
     tuner_frequency = (Frequency.frequency_radio*1000);
-    radio_tuned = 1;
+    radio_tuned = true;
     rmt_tuner_signal_power(serbuf[7]);
 }
 
-void rmt_tuner_set_freq(int curr_freq)
+static void rmt_tuner_set_freq(int curr_freq)
 {
     if (curr_freq != tuner_frequency)
     {
-        radio_tuned = 0;
+        radio_tuned = false;
         tuner_signal_power = 0;
         /* clear rds name and info */
         memset(rds_radioname,' ',sizeof(rds_radioname));
@@ -94,12 +100,7 @@ void rmt_tuner_set_freq(int curr_freq)
     }
 }
 
-void rmt_tuner_signal_power(unsigned char value)
-{
-    tuner_signal_power = (int)(value);
-}
-
-void rmt_tuner_sleep(int state)
+static void rmt_tuner_sleep(int state)
 {
     if (state == 0)
     {
@@ -108,41 +109,41 @@ void rmt_tuner_sleep(int state)
         mono_mode = -1;
         old_region = -1;
         tuner_frequency = 0;
-        radio_tuned = 0;
+        radio_tuned = false;
         
         /* tuner HW on */
-        unsigned char data[] = {0x07, 0x05, 0x01};
+        const unsigned char data[] = {0x07, 0x05, 0x01};
         iap_send_pkt(data, sizeof(data));
         /* boost gain */
-        unsigned char data1[] = {0x07, 0x24, 0x06 };
+        const unsigned char data1[] = {0x07, 0x24, 0x06 };
         iap_send_pkt(data1, sizeof(data1));
         /* set volume */
         unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x00 };
         data2[4] = (char)((global_settings.volume+58) * 4);
         iap_send_pkt(data2, sizeof(data2));
         /* set rds on */
-        unsigned char data3[] = {0x07, 0x20, 0x40, 0x00, 0x00, 0x10 };
+        const unsigned char data3[] = {0x07, 0x20, 0x40, 0x00, 0x00, 0x10 };
         iap_send_pkt(data3, sizeof(data3));
     }
     else
     {
         /* unbooste gain */
-        unsigned char data[] = {0x07, 0x24, 0x00};
+        const unsigned char data[] = {0x07, 0x24, 0x00};
         iap_send_pkt(data, sizeof(data));
         /* set rds off */
-        unsigned char data1[] = {0x07, 0x20, 0x00, 0x00, 0x00, 0x00 };
+        const unsigned char data1[] = {0x07, 0x20, 0x00, 0x00, 0x00, 0x00 };
         iap_send_pkt(data1, sizeof(data1)); 
         /* stop tuner HW */
-        unsigned char data2[] = {0x07, 0x05, 0x00};
+        const unsigned char data2[] = {0x07, 0x05, 0x00};
         iap_send_pkt(data2, sizeof(data2));
     }
 }
 
-void rmt_tuner_scan(int param)
+static void rmt_tuner_scan(int param)
 {
-    unsigned char data[] = {0x07, 0x11, 0x08};  /* RSSI level */
+    const unsigned char data[] = {0x07, 0x11, 0x08};  /* RSSI level */
     unsigned char updown = 0x00;
-    radio_tuned = 0;
+    radio_tuned = false;
     iap_send_pkt(data, sizeof(data));
 
     if (param == 1)
@@ -161,7 +162,8 @@ void rmt_tuner_scan(int param)
     iap_send_pkt(data1, sizeof(data1));
 }
 
-void rmt_tuner_mute(int value)
+#if 0   /* function is not used */
+static void rmt_tuner_mute(int value)
 {
     /* mute flag off (play) */
     unsigned char data[] = {0x03, 0x09, 0x03, 0x01};
@@ -172,8 +174,9 @@ void rmt_tuner_mute(int value)
     }
     iap_send_pkt(data, sizeof(data));
 }
+#endif
 
-void rmt_tuner_region(int region)
+static void rmt_tuner_region(int region)
 {
     if (region != old_region)
     {
@@ -194,7 +197,7 @@ void rmt_tuner_region(int region)
 }
 
 /* set stereo/mono, deemphasis, delta freq... */
-void rmt_tuner_set_param(unsigned char tuner_param)
+static void rmt_tuner_set_param(unsigned char tuner_param)
 {
     if(tuner_param != old_tuner_param)
     {
@@ -279,9 +282,7 @@ static bool reply_timeout(void)
     }
     while((ipod_rmt_tuner_get(RADIO_TUNED) == 0) && (timeout < TIMEOUT_VALUE));
     
-    if (timeout >= TIMEOUT_VALUE)
-        return true;
-    else return false;
+    return (timeout >= TIMEOUT_VALUE);
 }
 
 void rmt_tuner_rds_data(void)
@@ -294,7 +295,7 @@ void rmt_tuner_rds_data(void)
     {
         strlcpy(rds_radioinfo,serbuf+5,(serbuf[0]-4));
     }
-    rds_event = 1;
+    rds_event = true;
 }
     
 /* tuner abstraction layer: set something to the tuner */
@@ -327,13 +328,13 @@ int ipod_rmt_tuner_set(int setting, int value)
             &fm_region_data[global_settings.fm_region];
 
             /* case: scan for presets, back to beginning of the band */
-            if ((radio_tuned == 1) && (value == fmr->freq_min))
+            if (radio_tuned && (value == fmr->freq_min))
             {
                 tuner_set(RADIO_FREQUENCY,value);
             }
 
             /* scan through frequencies */
-            if (radio_tuned == 1)
+            if (radio_tuned)
             {
                 if ((tuner_frequency <= fmr->freq_min)
                     && (tuner_frequency >= fmr->freq_max))
@@ -355,17 +356,17 @@ int ipod_rmt_tuner_set(int setting, int value)
                     if (reply_timeout() == true)
                         return 0;
                 }
-                radio_tuned = 0;
+                radio_tuned = false;
             }    
 
             if (tuner_frequency == value)
             {
-                radio_tuned = 1;
+                radio_tuned = true;
                 return 1;
             }
             else
             {
-                radio_tuned = 0;
+                radio_tuned = false;
                 return 0;
             }
         }
@@ -426,7 +427,7 @@ int ipod_rmt_tuner_get(int setting)
         /* radio tuned: yes no */
         case RADIO_TUNED:
             val = 0;
-            if (radio_tuned == 1)
+            if (radio_tuned)
                 val = 1;
             break;
 
@@ -441,7 +442,7 @@ int ipod_rmt_tuner_get(int setting)
             if (rds_event)
             {
                 val = 1;
-                rds_event = 0;
+                rds_event = false;
             }
             break;
     }
