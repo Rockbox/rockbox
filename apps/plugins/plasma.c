@@ -27,7 +27,6 @@
 #include "plugin.h"
 #include "lib/helper.h"
 #include "lib/pluginlib_actions.h"
-#include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -36,6 +35,7 @@
 #endif
 #include "lib/fixedpoint.h"
 
+PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
@@ -131,8 +131,10 @@ static void shades_generate(void)
 }
 #endif
 
-void cleanup(void)
+void cleanup(void *parameter)
 {
+    (void)parameter;
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (boosted)
         rb->cpu_boost(false);
@@ -142,9 +144,6 @@ void cleanup(void)
 #endif
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
-#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
-#endif
 }
 
 /*
@@ -181,15 +180,10 @@ int main(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL))
-    {
-        rb->splash(HZ, "Couldn't init greyscale display");
-        return PLUGIN_ERROR;
-    }
+    grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
     /* switch on greyscale overlay */
     grey_show(true);
 #endif
-    atexit(cleanup);
     sp1 = 4;
     sp2 = 2;
     sp3 = 4;
@@ -267,6 +261,7 @@ int main(void)
         {
             case PLA_EXIT:
             case PLA_CANCEL:
+                cleanup(NULL);
                 return PLUGIN_OK;
                 break;
 
@@ -304,7 +299,9 @@ int main(void)
 #endif
 
             default:
-                exit_on_usb(action);
+                if (rb->default_event_handler_ex(action, cleanup, NULL)
+                    == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
         }
     }
@@ -314,6 +311,8 @@ int main(void)
 
 enum plugin_status plugin_start(const void* parameter)
 {
+    int ret;
+
     (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -324,7 +323,14 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
-    return main();
+
+    ret = main();
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
+
+    return ret;
 }
 
 #endif /* HAVE_LCD_BITMAP */

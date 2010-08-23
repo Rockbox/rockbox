@@ -29,7 +29,6 @@
 #include "fractal_rect.h"
 #include "fractal_sets.h"
 #include "mandelbrot_set.h"
-#include "lib/pluginlib_exit.h"
 
 #ifdef USEGSLIB
 GREY_INFO_STRUCT
@@ -42,7 +41,7 @@ static size_t gbuf_size = 0;
 #define REDRAW_FULL         2
 #define REDRAW_FULL_OVERLAY 3
 
-
+PLUGIN_HEADER
 
 /* returns 1 if a button has been pressed, 0 otherwise */
 static int button_yield(void *ctx)
@@ -86,8 +85,9 @@ static int button_yield(void *ctx)
     }
 }
 
-static void cleanup(void)
+static void cleanup(void *parameter)
 {
+    (void)parameter;
 #ifdef USEGSLIB
     grey_release();
 #endif
@@ -109,13 +109,11 @@ enum plugin_status plugin_start(const void* parameter)
     if (!grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
-        return PLUGIN_ERROR;
+        return 0;
     }
     grey_show(true); /* switch on greyscale overlay */
 #endif
 
-    /* release greylib on exit */
-    atexit(cleanup);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
@@ -163,6 +161,9 @@ enum plugin_status plugin_start(const void* parameter)
         case FRACTAL_RC_QUIT:
 #endif
         case FRACTAL_QUIT:
+#ifdef USEGSLIB
+            grey_release();
+#endif
             return PLUGIN_OK;
 
         case FRACTAL_ZOOM_OUT:
@@ -245,13 +246,18 @@ enum plugin_status plugin_start(const void* parameter)
             break;
 
         default:
-            exit_on_usb(button);
+            if (rb->default_event_handler_ex(button, cleanup, NULL)
+                == SYS_USB_CONNECTED)
+                return PLUGIN_USB_CONNECTED;
             break;
         }
 
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
+#ifdef USEGSLIB
+    grey_release();
+#endif
     return PLUGIN_OK;
 }
 

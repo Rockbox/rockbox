@@ -41,6 +41,8 @@
 #define FIRE_XPOS 0
 #endif
 
+PLUGIN_HEADER
+
 #ifndef HAVE_LCD_COLOR
 GREY_INFO_STRUCT
         static unsigned char draw_buffer[FIRE_WIDTH];

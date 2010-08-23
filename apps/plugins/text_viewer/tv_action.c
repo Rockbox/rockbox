@@ -47,8 +47,10 @@ static void tv_finalize_action(void)
     tv_finalize_window();
 }
 
-void tv_exit(void)
+void tv_exit(void *parameter)
 {
+    (void)parameter;
+
     /* save preference and bookmarks */
     if (!tv_save_settings())
         rb->splash(HZ, "Can't save preferences and bookmarks");

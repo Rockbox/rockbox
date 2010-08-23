@@ -22,7 +22,6 @@
 #include "plugin.h"
 #include "time.h"
 #include "lib/pluginlib_actions.h"
-#include "lib/pluginlib_exit.h"
 #include "lib/xlcd.h"
 
 #include "clock.h"
@@ -31,7 +30,7 @@
 #include "clock_menu.h"
 #include "clock_settings.h"
 
-
+PLUGIN_HEADER
 
 /* Keymaps */
 const struct button_mapping* plugin_contexts[]={
@@ -57,8 +56,9 @@ const struct button_mapping* plugin_contexts[]={
 /**************************
  * Cleanup on plugin return
  *************************/
-void cleanup(void)
+void cleanup(void *parameter)
 {
+    (void)parameter;
     clock_draw_restore_colors();
     if(clock_settings.general.save_settings == 1)
         save_settings();
@@ -115,7 +115,6 @@ enum plugin_status plugin_start(const void* parameter){
     struct counter counter;
     bool exit_clock = false;
     (void)parameter;
-    atexit(cleanup);
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -175,7 +174,9 @@ enum plugin_status plugin_start(const void* parameter){
                 exit_clock=main_menu();
                 break;
             default:
-                exit_on_usb(button);
+                if(rb->default_event_handler_ex(button, cleanup, NULL)
+                   == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 if(time.second != last_second){
                     last_second=time.second;
                     redraw=true;
@@ -192,5 +193,6 @@ enum plugin_status plugin_start(const void* parameter){
         }
     }
 
+    cleanup(NULL);
     return PLUGIN_OK;
 }

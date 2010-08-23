@@ -21,12 +21,11 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/pluginlib_exit.h"
 #include "tv_action.h"
 #include "tv_button.h"
 #include "tv_preferences.h"
 
-
+PLUGIN_HEADER
 
 enum plugin_status plugin_start(const void* file)
 {
@@ -57,7 +56,6 @@ enum plugin_status plugin_start(const void* file)
         return PLUGIN_ERROR;
     }
 
-    atexit(tv_exit);
     while (!done) {
 #ifdef HAVE_LCD_BITMAP
         if (rb->global_settings->statusbar != STATUSBAR_OFF && preferences->statusbar)
@@ -81,12 +79,12 @@ enum plugin_status plugin_start(const void* file)
 
                     if (res != TV_MENU_RESULT_EXIT_MENU)
                     {
+                        tv_exit(NULL);
+                        done = true;
                         if (res == TV_MENU_RESULT_ATTACHED_USB)
                             return PLUGIN_USB_CONNECTED;
                         else if (res == TV_MENU_RESULT_ERROR)
                             return PLUGIN_ERROR;
-                        else
-                            done = true;
                     }
                 }
                 break;
@@ -197,6 +195,7 @@ enum plugin_status plugin_start(const void* file)
 #ifdef TV_QUIT2
             case TV_QUIT2:
 #endif
+                tv_exit(NULL);
                 done = true;
                 break;
 
@@ -205,7 +204,9 @@ enum plugin_status plugin_start(const void* file)
                 break;
 
             default:
-                exit_on_usb(button);
+                if (rb->default_event_handler_ex(button, tv_exit, NULL)
+                    == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 display_update = false;
                 break;
         }

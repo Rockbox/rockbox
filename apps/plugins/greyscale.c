@@ -27,7 +27,7 @@
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "lib/grey.h"
 
-
+PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -316,7 +316,9 @@ int main(void)
 
         button = rb->button_get(true);
 
-        exit_on_usb(button);
+        if (rb->default_event_handler_ex(button, cleanup, NULL) 
+            == SYS_USB_CONNECTED)
+            return PLUGIN_USB_CONNECTED;
 
         if (button & GREYSCALE_SHIFT)
         {
@@ -367,6 +369,8 @@ int main(void)
             case GREYSCALE_RC_OFF:
 #endif
             case GREYSCALE_OFF:
+
+                cleanup(NULL);
                 return PLUGIN_OK;
         }
     }
@@ -378,7 +382,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    atexit(cleanup);
     return main();
 }
 

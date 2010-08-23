@@ -2,6 +2,7 @@ gcc-support.c
 pluginlib_actions.c
 helper.c
 md5.c
+pluginlib_exit.c
 jhash.c
 configfile.c
 fixedpoint.c

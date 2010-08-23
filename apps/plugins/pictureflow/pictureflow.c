@@ -27,7 +27,6 @@
 #include <albumart.h>
 #include "lib/read_image.h"
 #include "lib/pluginlib_actions.h"
-#include "lib/pluginlib_exit.h"
 #include "lib/helper.h"
 #include "lib/configfile.h"
 #include "lib/grey.h"
@@ -35,7 +34,7 @@
 #include "lib/feature_wrappers.h"
 #include "lib/buflib.h"
 
-
+PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
@@ -2069,8 +2068,9 @@ void update_scroll_animation(void)
 /**
   Cleanup the plugin
 */
-void cleanup(void)
+void cleanup(void *parameter)
 {
+    (void) parameter;
     int i;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -2610,6 +2610,19 @@ int main(void)
     cache_version = CACHE_VERSION;
     configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
+
+#ifdef USEGSLIB
+    long grey_buf_used;
+    if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
+                   LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
+    {
+        error_wait("Greylib init failed!");
+        return PLUGIN_ERROR;
+    }
+    grey_setfont(FONT_UI);
+    buf_size -= grey_buf_used;
+    buf = (void*)(grey_buf_used + (char*)buf);
+#endif
     buflib_init(&buf_ctx, (void *)buf, buf_size);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
@@ -2828,7 +2841,9 @@ int main(void)
             }
             break;
         default:
-            exit_on_usb(button);
+            if (rb->default_event_handler_ex(button, cleanup, NULL)
+                == SYS_USB_CONNECTED)
+                return PLUGIN_USB_CONNECTED;
             break;
         }
     }
@@ -2840,7 +2855,6 @@ enum plugin_status plugin_start(const void *parameter)
 {
     int ret, i;
     (void) parameter;
-    atexit(cleanup);
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, false, NULL);
@@ -2859,21 +2873,6 @@ enum plugin_status plugin_start(const void *parameter)
     }
 #endif
 #endif
-
-#ifdef USEGSLIB
-    long grey_buf_used;
-    if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
-                   LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
-    {
-        error_wait("Greylib init failed!");
-        return PLUGIN_ERROR;
-    }
-    grey_setfont(FONT_UI);
-    buf_size -= grey_buf_used;
-    buf = (void*)(grey_buf_used + (char*)buf);
-#endif
-
-    atexit(cleanup);
     ret = main();
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
@@ -2883,5 +2882,7 @@ enum plugin_status plugin_start(const void *parameter)
             ret = PLUGIN_ERROR;
         }
     }
+
+    cleanup(NULL);
     return ret;
 }
