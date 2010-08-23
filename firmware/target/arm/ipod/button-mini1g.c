@@ -40,63 +40,150 @@
 #include "power.h"
 #include "powermgmt.h"
 
+#define WHEELCLICKS_PER_ROTATION  96
+#define WHEEL_BASE_SENSITIVITY     6 /* Compute every ... clicks */
+#define WHEEL_REPEAT_VELOCITY     45 /* deg/s */
+#define WHEEL_SMOOTHING_VELOCITY 100 /* deg/s */
+
 /* Variable to use for setting button status in interrupt handler */
 int int_btn = BUTTON_NONE;
-#ifdef HAVE_WHEEL_POSITION
-    static int wheel_position = -1;
-    static bool send_events = true;
-#endif
 
-static void handle_scroll_wheel(int new_scroll, int was_hold)
+static void handle_scroll_wheel(int new_scroll)
 {
-    int wheel_keycode = BUTTON_NONE;
-    static int prev_scroll = -1;
-    static int direction = 0;
-    static int count = 0;
-    static int scroll_state[4][4] = {
+    static const signed char scroll_state[4][4] = {
         {0, 1, -1, 0},
         {-1, 0, 0, 1},
         {1, 0, 0, -1},
         {0, -1, 1, 0}
     };
 
+    static int prev_scroll = -1;
+    static int direction = 0;
+    static int count = 0;
+    static long next_backlight_on = 0;
+
+    int wheel_keycode = BUTTON_NONE;
+    int scroll;
+
+    static unsigned long wheel_delta = 1ul << 24;
+    static unsigned long wheel_velocity = 0;
+    static unsigned long last_wheel_usec = 0;
+    static int prev_keypost = BUTTON_NONE;
+
+    unsigned long usec;
+    unsigned long v;
+
     if ( prev_scroll == -1 ) {
         prev_scroll = new_scroll;
+        return;
     }
-    else if (direction != scroll_state[prev_scroll][new_scroll]) {
-        direction = scroll_state[prev_scroll][new_scroll];
+    
+    scroll = scroll_state[prev_scroll][new_scroll];
+    prev_scroll = new_scroll;
+
+    if (direction != scroll) {
+        /* direction reversal or was hold - reset all */
+        direction = scroll;
         count = 0;
+        prev_keypost = BUTTON_NONE;
+        wheel_velocity = 0;
+        wheel_delta = 1ul << 24;
+        return;
     }
-    else if (!was_hold) {
+
+   /* poke backlight every 1/4s of activity */
+    if (TIME_AFTER(current_tick, next_backlight_on)) {
         backlight_on();
         reset_poweroff_timer();
-        if (++count == 6) { /* reduce sensitivity */
-            count = 0;
-            /* Mini 1st Gen wheel has inverse direction mapping
-             * compared to 1st..3rd Gen wheel. */
-            switch (direction) {
-                case 1:
-                    wheel_keycode = BUTTON_SCROLL_FWD;
-                    break;
-                case -1:
-                    wheel_keycode = BUTTON_SCROLL_BACK;
-                    break;
-                default:
-                    /* only happens if we get out of sync */
-                    break;
-            }
-        }
+        next_backlight_on = current_tick + HZ/4;
     }
-    if (wheel_keycode != BUTTON_NONE && queue_empty(&button_queue))
-        queue_post(&button_queue, wheel_keycode, 0);
-    prev_scroll = new_scroll;
+
+    if (++count < WHEEL_BASE_SENSITIVITY)
+        return;
+
+    count = 0;
+    /* Mini 1st Gen wheel has inverse direction mapping
+     * compared to 1st..3rd Gen wheel. */
+    switch (direction) {
+        case 1:
+            wheel_keycode = BUTTON_SCROLL_FWD;
+            break;
+        case -1:
+            wheel_keycode = BUTTON_SCROLL_BACK;
+            break;
+        default:
+            /* only happens if we get out of sync */
+            break;
+    }
+
+    /* have a keycode */
+
+    usec = USEC_TIMER;
+    v = usec - last_wheel_usec;
+
+    /* calculate deg/s based upon sensitivity-adjusted interrupt period */
+
+    if ((long)v <= 0) {
+        /* timer wrapped (no activity for awhile), skip acceleration */
+        v = 0;
+        wheel_delta = 1ul << 24;
+    }
+    else {
+        if (v > 0xfffffffful/WHEELCLICKS_PER_ROTATION) {
+            v = 0xfffffffful/WHEELCLICKS_PER_ROTATION; /* check overflow below */
+        }
+
+        v = 360000000ul*WHEEL_BASE_SENSITIVITY / (v*WHEELCLICKS_PER_ROTATION);
+
+        if (v > 0xfffffful)
+            v = 0xfffffful; /* limit to 24 bits */
+    }
+
+    if (v < WHEEL_SMOOTHING_VELOCITY) {
+        /* very slow - no smoothing */
+        wheel_velocity = v;
+        /* ensure backlight never gets stuck for an extended period if tick
+         * wrapped such that next poke is very far ahead */
+        next_backlight_on = current_tick - 1;
+    }
+    else {
+        /* some velocity filtering to smooth things out */
+        wheel_velocity = (7*wheel_velocity + v) / 8;
+    }
+
+    if (queue_empty(&button_queue)) {
+        int key = wheel_keycode;
+
+        if (v >= WHEEL_REPEAT_VELOCITY && prev_keypost == key) {
+            /* quick enough and same key is being posted more than once in a
+             * row - generate repeats - use unsmoothed v to guage */
+            key |= BUTTON_REPEAT;
+        }
+
+        prev_keypost = wheel_keycode;
+
+        /* post wheel keycode with wheel data */
+        queue_post(&button_queue, key,
+                   (wheel_velocity >= WHEEL_ACCEL_START ? (1ul << 31) : 0)
+                    | wheel_delta | wheel_velocity);
+        /* message posted - reset delta */
+        wheel_delta = 1ul << 24;
+    }
+    else {
+        /* skipped post - increment delta and limit to 7 bits */
+        wheel_delta += 1ul << 24;
+
+        if (wheel_delta > (0x7ful << 24))
+            wheel_delta = 0x7ful << 24;
+    }
+
+    last_wheel_usec = usec;
 }
 
 /* mini 1 only, mini 2G uses iPod 4G code */
 static int ipod_mini_button_read(void)
 {
     unsigned char source, wheel_source, state, wheel_state;
-    static bool was_hold = false;
     int btn = BUTTON_NONE;
 
     /* The ipodlinux source had a udelay(250) here, but testing has shown that
@@ -119,9 +206,17 @@ static int ipod_mini_button_read(void)
     GPIOA_INT_LEV = ~state;
     GPIOB_INT_LEV = ~wheel_state;
 
+   /* ack any active interrupts */
+    if (source)
+        GPIOA_INT_CLR = source;
+    if (wheel_source)
+        GPIOB_INT_CLR = wheel_source;
+
+   if (button_hold())
+        return BUTTON_NONE;
+
     /* hold switch causes all outputs to go low    */
     /* we shouldn't interpret these as key presses */
-    if ((state & 0x20)) {
         if (!(state & 0x1))
             btn |= BUTTON_SELECT;
         if (!(state & 0x2))
@@ -134,17 +229,8 @@ static int ipod_mini_button_read(void)
             btn |= BUTTON_LEFT;
 
         if (wheel_source & 0x30) {
-            handle_scroll_wheel((wheel_state & 0x30) >> 4, was_hold);
+            handle_scroll_wheel((wheel_state & 0x30) >> 4);
         }
-    }
-
-    was_hold = button_hold();
-
-    /* ack any active interrupts */
-    if (source)
-        GPIOA_INT_CLR = source;
-    if (wheel_source)
-        GPIOB_INT_CLR = wheel_source;
 
     return btn;
 }
