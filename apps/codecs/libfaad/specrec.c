@@ -606,12 +606,19 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
                         
 #else
                     wb = wa + bin;
-                 
-                    spec_data[wb+0] = MUL_C((iquant(quant_data[k+0], tab, &error)<<exp), scf);
-                    spec_data[wb+1] = MUL_C((iquant(quant_data[k+1], tab, &error)<<exp), scf);
-                    spec_data[wb+2] = MUL_C((iquant(quant_data[k+2], tab, &error)<<exp), scf);
-                    spec_data[wb+3] = MUL_C((iquant(quant_data[k+3], tab, &error)<<exp), scf);
-
+                    
+                    if (exp>=0)
+                    {
+                        spec_data[wb+0] = MUL_C((iquant(quant_data[k+0], tab, &error)<< exp), scf);
+                        spec_data[wb+1] = MUL_C((iquant(quant_data[k+1], tab, &error)<< exp), scf);
+                        spec_data[wb+2] = MUL_C((iquant(quant_data[k+2], tab, &error)<< exp), scf);
+                        spec_data[wb+3] = MUL_C((iquant(quant_data[k+3], tab, &error)<< exp), scf);
+                    } else {
+                        spec_data[wb+0] = MUL_C((iquant(quant_data[k+0], tab, &error)>>-exp), scf);
+                        spec_data[wb+1] = MUL_C((iquant(quant_data[k+1], tab, &error)>>-exp), scf);
+                        spec_data[wb+2] = MUL_C((iquant(quant_data[k+2], tab, &error)>>-exp), scf);
+                        spec_data[wb+3] = MUL_C((iquant(quant_data[k+3], tab, &error)>>-exp), scf);
+                    }
 //#define SCFS_PRINT
 #ifdef SCFS_PRINT
                     printf("%d\n", spec_data[gindex+(win*win_inc)+j+bin+0]);
