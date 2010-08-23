@@ -29,7 +29,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-PLUGIN_HEADER
+
 
 /* button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

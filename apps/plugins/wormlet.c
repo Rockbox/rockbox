@@ -23,7 +23,7 @@
 #include "lib/helper.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1

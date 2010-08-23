@@ -14,7 +14,7 @@
 #include <inttypes.h>
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 #define SAMP_PER_FRAME       1152

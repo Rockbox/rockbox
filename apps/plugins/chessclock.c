@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

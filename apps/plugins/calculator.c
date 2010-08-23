@@ -78,7 +78,7 @@ F3: equal to "="
 #ifdef HAVE_LCD_BITMAP
 #include "math.h"
 
-PLUGIN_HEADER
+
 
 
 #define M_TWOPI         (M_PI * 2.0)

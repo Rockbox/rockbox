@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 static int files, dirs, musicfiles, largestdir;
 static int lasttick;

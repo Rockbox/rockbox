@@ -28,7 +28,7 @@
  * with sample rate.
  */
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE;
 
 static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;

@@ -45,7 +45,7 @@ struct dices
 };
 
 #define PRINT_BUFFER_LENGTH MAX_DICES*4
-PLUGIN_HEADER
+
 
 static struct dices dice;
 static int sides_index;

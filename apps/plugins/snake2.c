@@ -34,7 +34,7 @@ Head and Tail are stored
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 #define WIDTH  28
 #define HEIGHT 16

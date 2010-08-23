@@ -22,7 +22,7 @@
 #include "lib/playback_control.h"
 #include "lib/display_text.h"
 
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define CLIX_BUTTON_QUIT        BUTTON_POWER

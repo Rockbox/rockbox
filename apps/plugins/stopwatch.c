@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 #ifdef HAVE_LCD_BITMAP
 #define TIMER_Y 1

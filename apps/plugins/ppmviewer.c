@@ -24,7 +24,7 @@
 
 #if defined(HAVE_LCD_COLOR)
 
-PLUGIN_HEADER
+
 
 /* Magic constants. */
 #define PPM_MAGIC1 'P'

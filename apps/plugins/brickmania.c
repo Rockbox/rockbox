@@ -41,7 +41,7 @@
 #include "pluginbitmaps/brickmania_break.h"
 #endif
 
-PLUGIN_HEADER
+
 
 
 /*

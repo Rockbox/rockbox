@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 #define MAX_LIST_SIZE 400
 #define DESC_SIZE 40

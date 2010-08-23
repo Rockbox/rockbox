@@ -48,7 +48,7 @@ V1.2 : 2003-07-30
      take a match. Later you are obliged to take at least one.)
 */
 
-PLUGIN_HEADER
+
 
 /*Pattern for the game*/
 static unsigned char smile[]={0x00, 0x11, 0x04, 0x04, 0x00, 0x11, 0x0E};    /* :-) */
@@ -144,6 +144,7 @@ enum plugin_status plugin_start(const void* parameter)
     int x,v,min;
     bool ok;
     bool go;
+    atexit(nim_exit);
 
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
@@ -193,7 +194,6 @@ enum plugin_status plugin_start(const void* parameter)
                     {
                         case BUTTON_STOP|BUTTON_REL:
                             go = true;
-                            nim_exit(NULL);
                             return PLUGIN_OK;
                             break;
 
@@ -214,9 +214,7 @@ enum plugin_status plugin_start(const void* parameter)
                             break;
 
                         default:
-                            if (rb->default_event_handler_ex(button, nim_exit,
-                                                    NULL) == SYS_USB_CONNECTED)
-                                return PLUGIN_USB_CONNECTED;
+                            exit_on_usb(button);
                             break;
                     }
                     display_first_line(x);
@@ -291,7 +289,6 @@ enum plugin_status plugin_start(const void* parameter)
             min=1;
         }
     }
-    nim_exit(NULL);
     return PLUGIN_OK;
 }
 #endif

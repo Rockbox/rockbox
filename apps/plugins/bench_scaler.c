@@ -23,7 +23,7 @@
 
 #include "plugin.h"
 #include "lib/jpeg_mem.h"
-PLUGIN_HEADER
+
 
 static unsigned char output;
 static int output_y = 0;

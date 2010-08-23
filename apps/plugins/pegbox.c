@@ -26,7 +26,7 @@
 #include "pluginbitmaps/pegbox_header.h"
 #include "pluginbitmaps/pegbox_pieces.h"
 
-PLUGIN_HEADER
+
 
 #define CONFIG_FILE_NAME "pegbox.cfg"
 

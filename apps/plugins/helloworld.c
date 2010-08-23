@@ -24,7 +24,7 @@
 
 /* This macros must always be included. Should be placed at the top by
    convention, although the actual position doesn't matter */
-PLUGIN_HEADER
+
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)

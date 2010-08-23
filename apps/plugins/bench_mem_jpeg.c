@@ -23,7 +23,7 @@
 
 #include "plugin.h"
 #include "lib/jpeg_mem.h"
-PLUGIN_HEADER
+
 
 /* a null output plugin to save memory and better isolate decode cost */
 static unsigned int get_size_null(struct bitmap *bm)

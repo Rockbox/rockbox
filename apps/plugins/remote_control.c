@@ -23,7 +23,7 @@
 
 #include "lib/pluginlib_actions.h"
 
-PLUGIN_HEADER
+
 
 #define PLUGIN_CONTINUE 10
 

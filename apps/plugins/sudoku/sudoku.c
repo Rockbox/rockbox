@@ -81,7 +81,7 @@ Example ".ss" file, and one with a saved state:
 #define BITMAP_WIDTH  BMPWIDTH_sudoku_normal
 #endif
 
-PLUGIN_HEADER
+
 
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
 static const char default_game[9][9] =

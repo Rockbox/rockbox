@@ -23,7 +23,7 @@
 #include "lib/display_text.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* size of a level in file */
 #define STAR_LEVEL_SIZE    ((STAR_WIDTH + 1) * STAR_HEIGHT + 1)

@@ -37,7 +37,7 @@
 
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 static void aes_encrypt(void* data, uint32_t size)
 {

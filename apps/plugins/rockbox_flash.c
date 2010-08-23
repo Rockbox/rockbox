@@ -25,7 +25,7 @@
 
 #if (CONFIG_CPU == SH7034) /* Only for SH targets */
 
-PLUGIN_HEADER
+
 
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */

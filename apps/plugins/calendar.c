@@ -25,7 +25,7 @@
 #include "lib/playback_control.h"
 #include "lib/configfile.h"
 
-PLUGIN_HEADER
+
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define CALENDAR_QUIT       BUTTON_OFF

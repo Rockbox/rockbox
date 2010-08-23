@@ -25,7 +25,7 @@
 #include "lib/grey.h"
 #include "lib/jpeg_mem.h"
 #include "lib/mylcd.h"
-PLUGIN_HEADER
+
 
 /* different graphics libraries */
 #if LCD_DEPTH < 8

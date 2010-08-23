@@ -64,7 +64,7 @@
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 #define ROCKLIFE_PLAY_PAUSE PLA_SELECT
 #define ROCKLIFE_INIT       PLA_DOWN

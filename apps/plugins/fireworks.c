@@ -22,7 +22,7 @@
 #include "lib/helper.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /***
  * FIREWORKS.C by ZAKK ROBERTS

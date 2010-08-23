@@ -22,7 +22,7 @@
 
 #include "shortcuts.h"
 
-PLUGIN_HEADER
+
 
 
 bool append_entry_to_file(sc_file_t *file, char *path, bool is_dir)

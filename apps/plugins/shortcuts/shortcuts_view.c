@@ -22,7 +22,7 @@
 
 #include "shortcuts.h"
 
-PLUGIN_HEADER
+
 
 enum sc_list_action_type
 {

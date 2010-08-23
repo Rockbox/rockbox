@@ -36,7 +36,7 @@
 /* Only build for (correct) target */
 #if CONFIG_CPU==SH7034 && !(CONFIG_STORAGE & STORAGE_MMC)
 
-PLUGIN_HEADER
+
 
 #ifdef HAVE_LCD_CHARCELLS /* player model */
 #define LINES    2

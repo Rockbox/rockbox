@@ -21,7 +21,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 #define EXTERN static
 #define STATIC static

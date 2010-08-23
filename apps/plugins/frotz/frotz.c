@@ -23,7 +23,7 @@
 #include "lib/pluginlib_exit.h"
 #include "lib/pluginlib_actions.h"
 
-PLUGIN_HEADER
+
 
 extern int frotz_main(void);
 extern bool hot_key_quit(void);
@@ -41,7 +41,7 @@ enum plugin_status plugin_start(const void* parameter)
     int i;
     char* ext;
 
-    PLUGINLIB_EXIT_INIT_ATEXIT(atexit_cleanup);
+    atexit(atexit_cleanup);
 
     if (!parameter)
         return PLUGIN_ERROR;

@@ -22,35 +22,33 @@
 #ifndef __PLUGINLIB_EXIT_H__
 #define __PLUGINLIB_EXIT_H__
 
-#include "config.h"
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#include "../../codecs/lib/setjmp.h"
-#else
-#include <setjmp.h>
+/* make sure we are in sync with the real definitions, especially on
+ * hosted systems */
+#include <stdlib.h>
+#include "gcc_extensions.h"
+
+/* these are actually implemented in plugin_crt0.c which all plugins link */
+extern int atexit(void (*func)(void));
+extern void exit(int status) NORETURN_ATTR;
+/* these don't call the exit handlers */
+extern void _exit(int status) NORETURN_ATTR;
+/* C99 version */
+#define _Exit _exit
+
+#ifndef EXIT_SUCCESS
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
 #endif
 
-#define _PLUGINLIB_EXIT_INIT(atexit) switch(setjmp(__exit_env))   \
-                                     {                            \
-                                         case 1:                  \
-                                             atexit               \
-                                             return PLUGIN_OK;    \
-                                         case 2:                  \
-                                             atexit               \
-                                             return PLUGIN_ERROR; \
-                                         case 0:                  \
-                                         default:                 \
-                                             break;               \
-                                     }
-
-/* Either PLUGINLIB_EXIT_INIT or PLUGINLIB_EXIT_INIT_ATEXIT needs to be placed
- * as the first line in plugin_start. The _ATEXIT version will call the named
- * no-argument function when exit() is called before exiting the plugin, to
- * allow for cleanup.
+/**
+ * helper function to handle USB connected events coming from
+ * button_get()
+ *
+ * it will exit the plugin if usb is detected, but it will call the atexit func
+ * before actually showing the usb screen
+ *
+ * it additionally handles power off as well, with the same behavior
  */
-#define PLUGINLIB_EXIT_INIT _PLUGINLIB_EXIT_INIT()
-#define PLUGINLIB_EXIT_INIT_ATEXIT(atexit) _PLUGINLIB_EXIT_INIT(atexit();)
-
-extern jmp_buf __exit_env;
-#define exit(status) longjmp(__exit_env, status != 0 ? 2 : 1)
+extern void exit_on_usb(int button);
 
 #endif /*  __PLUGINLIB_EXIT_H__ */

@@ -33,7 +33,7 @@ PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
 endif
-
+PLUGIN_CRT0 := $(BUILDDIR)/apps/plugins/plugin_crt0.o
 # multifile plugins (subdirs):
 PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
 
@@ -49,7 +49,7 @@ PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 $(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
 
 # dependency for all plugins
-$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(PLUGIN_CRT0)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)

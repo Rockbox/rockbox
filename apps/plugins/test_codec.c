@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 /* All swcodec targets have BUTTON_SELECT apart from the H10 and M3 */
 

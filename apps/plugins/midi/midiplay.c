@@ -25,7 +25,7 @@
 #include "sequencer.h"
 #include "midifile.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 /* variable button definitions */
@@ -450,7 +450,6 @@ static int midimain(const void * filename)
 enum plugin_status plugin_start(const void* parameter)
 {
     int retval;
-    PLUGINLIB_EXIT_INIT;
 
     PLUGIN_IRAM_INIT(rb)
 

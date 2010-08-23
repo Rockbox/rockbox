@@ -32,7 +32,7 @@
 #include "lib/configfile.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 struct pacman_settings {

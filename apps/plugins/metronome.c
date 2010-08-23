@@ -20,8 +20,9 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
+#include "lib/pluginlib_exit.h"
 
-PLUGIN_HEADER
+
 
 #if CONFIG_CODEC != SWCODEC
 /* tick sound from a metronome */
@@ -846,13 +847,14 @@ void timer_callback(void)
     }
 }
 
-void cleanup(void *parameter)
+void cleanup(void)
 {
-    (void)parameter;
-
     rb->timer_unregister();
     MET_PLAY_STOP; /* stop audio ISR */
     rb->led(0);
+#if CONFIG_CODEC == SWCODEC
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+#endif
 }
 
 void tap(void)
@@ -885,9 +887,9 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int button;
     static int last_button = BUTTON_NONE;
-    enum plugin_status status;
 
     (void)parameter;
+    atexit(cleanup);
 
     if (MET_IS_PLAYING)
         MET_PLAY_STOP; /* stop audio IS */
@@ -927,9 +929,7 @@ enum plugin_status plugin_start(const void* parameter)
 
             case METRONOME_QUIT:
                 /* get out of here */
-                cleanup(NULL);
-                status = PLUGIN_OK;
-                goto metronome_exit;
+                return PLUGIN_OK;
 
             case METRONOME_PAUSE:
                 if(!sound_paused)
@@ -981,12 +981,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
             default:
-                if (rb->default_event_handler_ex(button, cleanup, NULL)
-                    == SYS_USB_CONNECTED)
-                {
-                    status = PLUGIN_USB_CONNECTED;
-                    goto metronome_exit;
-                }
+                exit_on_usb(button);
                 reset_tap = false;
                 break;
 
@@ -998,11 +993,5 @@ enum plugin_status plugin_start(const void* parameter)
         }
         rb->yield();
     }
-
-metronome_exit:
-#if CONFIG_CODEC == SWCODEC
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
-#endif
-    return status;
 }
 

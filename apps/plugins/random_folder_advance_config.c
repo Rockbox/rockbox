@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "file.h"
 
-PLUGIN_HEADER
+
 
 static bool cancel;
 static int fd;

@@ -47,7 +47,7 @@ further options:
 
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* This is initialized at the start of the plugin and used to determine the
  * Appropriate game board size/legend spacing if the font is larger than a cell

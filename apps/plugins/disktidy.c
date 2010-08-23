@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "errno.h"
 
-PLUGIN_HEADER
+
 
 /* function return values */
 enum tidy_return

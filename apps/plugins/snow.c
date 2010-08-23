@@ -22,7 +22,7 @@
 #include "lib/playergfx.h"
 #include "lib/mylcd.h"
 
-PLUGIN_HEADER
+
 
 #ifdef HAVE_LCD_BITMAP
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)

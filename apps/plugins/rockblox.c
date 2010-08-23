@@ -28,7 +28,7 @@
 #include "lib/playergfx.h"
 #include "lib/mylcd.h"
 
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IPOD_3G_PAD) || \

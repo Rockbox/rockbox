@@ -34,7 +34,7 @@
 
 
 #include "plugin.h"
-PLUGIN_HEADER
+
 
 /* Images */
 #include "pluginbitmaps/matrix_bold.h"
