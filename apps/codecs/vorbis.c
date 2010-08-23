@@ -127,8 +127,6 @@ enum codec_status codec_main(void)
         goto exit;
     }
 
-    ogg_malloc_init();
-
 #if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
     if (setjmp(rb_jump_buf) != 0) {
         /* malloc failed; skip to next track */
@@ -138,6 +136,8 @@ enum codec_status codec_main(void)
 #endif
 
 next_track:
+    ogg_malloc_init();
+
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
@@ -244,6 +244,7 @@ done:
         DEBUGF("Vorbis: Memory max: %u\n", get_max_size(buf));
     }
 #endif
+    ogg_malloc_destroy();
 
     if (ci->request_next_track()) {
         /* Clean things up for the next track */
@@ -256,6 +257,5 @@ done:
     }
         
 exit:
-    ogg_malloc_destroy();
     return error;
 }
