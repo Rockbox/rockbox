@@ -395,11 +395,11 @@
   </source>
   <dest>
     *: none
-    recording: "Záznam"
+    recording: "Nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Záznam, neozvučené"
+    recording: "Nahrávání, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -1266,11 +1266,11 @@
   </source>
   <dest>
     *: none
-    masf: "Zapnout MDB"
+    masf: "Zapnutí MDB"
   </dest>
   <voice>
     *: none
-    masf: "Zapnout emdébé"
+    masf: "Zapnutí emdébé"
   </voice>
 </phrase>
 <phrase>
@@ -1567,11 +1567,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Prolínání skladeb"
+    crossfade: "Zapnutí prolínání"
   </dest>
   <voice>
     *: none
-    crossfade: "Prolínání skladeb"
+    crossfade: "Zapnutí prolínání"
   </voice>
 </phrase>
 <phrase>
@@ -2042,10 +2042,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Řadit i podle velikosti písma"
+    *: "Řadit podle malých i velkých písmen"
   </dest>
   <voice>
-    *: "Řadit i podle velikosti písma"
+    *: "Řadit podle malých i velkých písmen"
   </voice>
 </phrase>
 <phrase>
@@ -2251,7 +2251,7 @@
     gogearsa9200: "Vytvářím databázi.. %d nalezeno (REW pro návrat)"
 </dest>
   <voice>
-    *: "záznamy nalezené v databázi"
+    *: "záznamů vytvořeno do databáze"
   </voice>
 </phrase>
 <phrase>
@@ -2293,10 +2293,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Inicializovat jí nyní"
+    *: "Inicializovat teď"
   </dest>
   <voice>
-    *: "Inycializovat jí nyní"
+    *: "Inycializovat teď"
   </voice>
 </phrase>
 <phrase>
@@ -2511,11 +2511,11 @@
   </source>
   <dest>
     *: none
-    charging: "Podsvítit při nabíjení"
+    charging: "Podsvícení při nabíjení"
   </dest>
   <voice>
     *: none
-    charging: "Podsvítit při nabíjení"
+    charging: "Podsvícení při nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -2528,11 +2528,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Podsvítit při zamčených klávesách"
+    hold_button: "Podsvícení při zamčených klávesách"
   </dest>
   <voice>
     *: none
-    hold_button: "Podsvítit při zamčených klávesách"
+    hold_button: "Podsvícení při zamčených klávesách"
   </voice>
 </phrase>
 <phrase>
@@ -3470,10 +3470,10 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "Řecká (ISO-8859-7)"
+    *: "Řecké (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Řecká"
+    *: "Řecké"
   </voice>
 </phrase>
 <phrase>
@@ -3486,11 +3486,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Hebrejská (ISO-8859-8)"
+    lcd_bitmap: "Hebrejské (ISO-8859-8)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Hebrejská"
+    lcd_bitmap: "Hebrejské"
   </voice>
 </phrase>
 <phrase>
@@ -3517,11 +3517,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Thajská (ISO-8859-11)"
+    lcd_bitmap: "Thajské (ISO-8859-11)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Thajská"
+    lcd_bitmap: "Thajské"
   </voice>
 </phrase>
 <phrase>
@@ -3534,11 +3534,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Arabská (CP1256)"
+    lcd_bitmap: "Arabské (CP1256)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Arabská"
+    lcd_bitmap: "Arabské"
   </voice>
 </phrase>
 <phrase>
@@ -3549,10 +3549,10 @@
     *: "Turkish (ISO-8859-9)"
   </source>
   <dest>
-    *: "Turecká (ISO-8859-9)"
+    *: "Turecké (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turecká"
+    *: "Turecké"
   </voice>
 </phrase>
 <phrase>
@@ -3579,11 +3579,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Japonská (SJIS)"
+    lcd_bitmap: "Japonské (SJIS)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Japonská"
+    lcd_bitmap: "Japonské"
   </voice>
 </phrase>
 <phrase>
@@ -3613,11 +3613,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Korejština (KSX1001)"
+    lcd_bitmap: "Korejské (KSX1001)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Korejština"
+    lcd_bitmap: "Korejské"
   </voice>
 </phrase>
 <phrase>
@@ -4948,11 +4948,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavení záznamu"
+    recording: "Nastavení nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Nastavení záznamu"
+    recording: "Nastavení nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -5937,11 +5937,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavit adresář pro záznam"
+    recording: "Nastavit jako adresář pro nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Nastavit adresář pro záznam"
+    recording: "Nastavit jako adresář pro nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -5954,11 +5954,11 @@
   </source>
   <dest>
     *: none
-    recording: "Vymazat adresář s nahrávkami"
+    recording: "Vymazat obsah adresář s nahrávkami"
   </dest>
   <voice>
     *: none
-    recording: "Vymazat adresář s nahrávkami"
+    recording: "Vymazat obsah adresář s nahrávkami"
   </voice>
 </phrase>
 <phrase>
@@ -5971,11 +5971,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nelze zapsat do adresáře pro záznam"
+    recording: "Nelze zapsat do adresáře pro nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Nelze zapsat do adresáře pro záznam"
+    recording: "Nelze zapsat do adresáře pro nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -7092,10 +7092,10 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Rychlá nabídka"
+    *: "Kontextové menu"
   </dest>
   <voice>
-    *: "Rychlá nabídka"
+    *: "Kontextové menu"
   </voice>
 </phrase>
 <phrase>
@@ -8260,10 +8260,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Restartujte pro zapnutí"
+    *: "Pro zapnutí restartujte"
   </dest>
   <voice>
-    *: "Restartujte pro zapnutí"
+    *: "Pro zapnutí restartujte"
   </voice>
 </phrase>
 <phrase>
@@ -10288,10 +10288,10 @@
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "Středoevropský (CP1250)"
+    *: "Středoevropské (CP1250)"
   </dest>
   <voice>
-    *: "Středoevropský"
+    *: "Středoevropské, doporučeno"
   </voice>
 </phrase>
 <phrase>
