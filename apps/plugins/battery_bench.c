@@ -22,7 +22,7 @@
 
 #include "version.h"
 #include "plugin.h"
-PLUGIN_HEADER
+
 
 #define BATTERY_LOG "/battery_bench.txt"
 #define BUF_SIZE 16000

@@ -35,7 +35,7 @@ ssize_t audiobuf_size;
 
 #ifdef PLATFORM_ID
 
-PLUGIN_HEADER
+
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 #define KEY1 BUTTON_OFF

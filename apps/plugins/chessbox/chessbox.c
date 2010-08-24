@@ -49,7 +49,7 @@ struct cb_command {
 extern const fb_data chessbox_pieces[];
 
 
-PLUGIN_HEADER
+
 
 /* Tile size defined by the assigned bitmap */
 #include "pluginbitmaps/chessbox_pieces.h"

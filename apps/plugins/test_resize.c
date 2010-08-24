@@ -28,7 +28,7 @@
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_bmp.h"
 
-PLUGIN_HEADER
+
 
 const struct button_mapping *plugin_contexts[]
 = {pla_main_ctx};

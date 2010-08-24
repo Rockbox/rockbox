@@ -35,7 +35,7 @@ static size_t gbuf_size = 0;
 #define DURATION (HZ) /* longer duration gives more precise results */
 #define RND_SEED 0x43A678C3     /* arbirary */
 
-PLUGIN_HEADER
+
 
 static uint16_t rand_table[0x400];
 static int log_fd;

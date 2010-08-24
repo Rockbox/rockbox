@@ -45,7 +45,7 @@ PLUGIN_IRAM_DECLARE
 
 #define DURATION (2*HZ) /* longer duration gives more precise results */
 
-PLUGIN_HEADER
+
 
 /* Screen logging */
 static int line;

@@ -22,7 +22,7 @@
 #include "plugin.h"
 #include "lib/simple_viewer.h"
 
-PLUGIN_HEADER
+
 
 #define MIN_DESC_BUF_SIZE 0x400 /* arbitrary minimum size for description */
 

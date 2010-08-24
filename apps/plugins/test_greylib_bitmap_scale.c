@@ -44,7 +44,7 @@
 #define BMP_LOAD rb->read_bmp_file
 #endif
 
-PLUGIN_HEADER
+
 GREY_INFO_STRUCT
 static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
                    BM_SCALED_SIZE(LCD_WIDTH,0,FORMAT_NATIVE,0)];

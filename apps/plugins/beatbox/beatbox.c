@@ -26,7 +26,7 @@
 #include "midi/sequencer.h"
 #include "midi/midifile.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 /* variable button definitions */

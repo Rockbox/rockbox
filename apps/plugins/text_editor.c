@@ -22,7 +22,7 @@
 #include "lib/playback_control.h"
 
 #define MAX_LINE_LEN 2048
-PLUGIN_HEADER
+
 
 static unsigned char *buffer;
 static size_t buffer_size;

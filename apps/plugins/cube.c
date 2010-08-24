@@ -22,6 +22,7 @@
 ***************************************************************************/
 #include "plugin.h"
 #include "lib/playergfx.h"
+#include "lib/pluginlib_exit.h"
 #if LCD_DEPTH > 1
 #include "lib/mylcd.h" /* MYLCD_CFG_RB_XLCD or MYLCD_CFG_PGFX */
 #include "lib/grey.h"
@@ -31,8 +32,6 @@
 #endif
 #include "lib/xlcd.h"
 #include "lib/fixedpoint.h"
-
-PLUGIN_HEADER
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30
@@ -611,10 +610,8 @@ static void cube_draw(void)
     }
 }
 
-void cleanup(void *parameter)
+void cleanup(void)
 {
-    (void)parameter;
-
 #ifdef USEGSLIB
     grey_release();
 #elif defined HAVE_LCD_CHARCELLS
@@ -638,7 +635,7 @@ enum plugin_status plugin_start(const void* parameter)
     bool highspeed = false;
     bool paused = false;
     bool redraw = true;
-    bool exit = false;
+    bool quit = false;
 
     (void)(parameter);
 
@@ -651,6 +648,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;
     }
+
     /* init lcd_ function pointers */
     lcdfuncs.update =        rb->lcd_update;
     lcdfuncs.clear_display = rb->lcd_clear_display;
@@ -673,7 +671,8 @@ enum plugin_status plugin_start(const void* parameter)
     pgfx_display(0, 0);
 #endif
 
-    while(!exit)
+    atexit(cleanup);
+    while(!quit)
     {
         if (redraw)
         {
@@ -830,24 +829,17 @@ enum plugin_status plugin_start(const void* parameter)
             case CUBE_RC_QUIT:
 #endif
             case CUBE_QUIT:
-                exit = true;
+                exit(EXIT_SUCCESS);
                 break;
 
             default:
-                if (rb->default_event_handler_ex(button, cleanup, NULL)
-                    == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                exit_on_usb(button);
                 break;
         }
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
 
-#ifdef USEGSLIB
-    grey_release();
-#elif defined(HAVE_LCD_CHARCELLS)
-    pgfx_release();
-#endif
     return PLUGIN_OK;
 }
 

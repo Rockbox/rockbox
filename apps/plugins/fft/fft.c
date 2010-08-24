@@ -29,7 +29,7 @@
 #endif
 #include "lib/mylcd.h"
 
-PLUGIN_HEADER
+
 
 #ifndef HAVE_LCD_COLOR
 GREY_INFO_STRUCT

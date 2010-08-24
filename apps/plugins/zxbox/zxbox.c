@@ -21,7 +21,7 @@
 
 #include "zxconfig.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 #include "spkey_p.h"

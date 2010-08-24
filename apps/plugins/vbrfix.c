@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 static char   *audiobuf;
 static size_t audiobuflen;

@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "lib/playergfx.h"
 
-PLUGIN_HEADER
+
 
 #ifdef HAVE_LCD_BITMAP
 #define DISPLAY_WIDTH LCD_WIDTH

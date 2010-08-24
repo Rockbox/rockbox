@@ -25,7 +25,7 @@
 #include <lib/configfile.h>
 #include "imageviewer.h"
 
-PLUGIN_HEADER
+
 
 #ifdef USEGSLIB
 GREY_INFO_STRUCT

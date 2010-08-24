@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */

@@ -147,17 +147,21 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 190
+#define PLUGIN_API_VERSION 191
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 190
+#define PLUGIN_MIN_API_VERSION 191
 
 /* plugin return codes */
+/* internal returns start at 0x100 to make exit(1..255) work */
+#define INTERNAL_PLUGIN_RETVAL_START 0x100
 enum plugin_status {
-    PLUGIN_OK = 0,
-    PLUGIN_USB_CONNECTED,
+    PLUGIN_OK = 0, /* PLUGIN_OK == EXIT_SUCCESS */
+    /* 1...255 reserved for exit() */
+    PLUGIN_USB_CONNECTED = INTERNAL_PLUGIN_RETVAL_START,
+    PLUGIN_POWEROFF,
     PLUGIN_GOTO_WPS,
     PLUGIN_ERROR = -1,
 };
@@ -912,14 +916,14 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, plugin_start, &rb };
+        plugin_start_addr, plugin_end_addr, plugin__start, &rb };
 #else /* PLATFORM_HOSTED */
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        NULL, NULL, plugin_start, &rb };
+        NULL, NULL, plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 
 #ifdef PLUGIN_USE_IRAM
@@ -954,7 +958,7 @@ void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
 extern const struct plugin_api *rb;
-enum plugin_status plugin_start(const void* parameter)
+enum plugin_status plugin__start(const void* parameter)
     NO_PROF_ATTR;
 
 #endif /* __PCTOOL__ */

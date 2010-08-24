@@ -28,7 +28,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-PLUGIN_HEADER
+
 
 #define min(a,b) (a<b?a:b)
 

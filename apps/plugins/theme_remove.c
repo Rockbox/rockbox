@@ -20,7 +20,7 @@
 #include "plugin.h"
 #include "lib/configfile.h"
 
-PLUGIN_HEADER
+
 
 /* taken from apps/gui/wps_parser.c */
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"

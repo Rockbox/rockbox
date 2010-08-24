@@ -25,7 +25,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 ssize_t buf_size;
 static char *filename;

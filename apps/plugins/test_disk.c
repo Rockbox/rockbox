@@ -22,7 +22,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 #define TESTBASEDIR "/__TEST__"
 #define TEST_FILE   TESTBASEDIR "/test_disk.tmp"

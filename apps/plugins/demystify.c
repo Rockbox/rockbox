@@ -22,11 +22,12 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
-PLUGIN_HEADER
+
 
 #define DEFAULT_WAIT_TIME 3
 #define DEFAULT_NB_POLYGONS 7
@@ -259,10 +260,8 @@ void polygons_draw(struct polygon_fifo * polygons, struct screen * display)
     }
 }
 
-void cleanup(void *parameter)
+void cleanup(void)
 {
-    (void)parameter;
-
     backlight_use_settings();
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_use_settings();
@@ -394,7 +393,6 @@ int plugin_main(void)
         switch(action)
         {
             case DEMYSTIFY_QUIT:
-                cleanup(NULL);
                 return PLUGIN_OK;
 
             case DEMYSTIFY_ADD_POLYGON:
@@ -421,9 +419,7 @@ int plugin_main(void)
                 break;
 
             default:
-                if (rb->default_event_handler_ex(action, cleanup, NULL)
-                    == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                exit_on_usb(action);
                 break;
         }
     }
@@ -436,6 +432,8 @@ enum plugin_status plugin_start(const void* parameter)
     int ret;
 
     (void)parameter;
+    atexit(cleanup);
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif

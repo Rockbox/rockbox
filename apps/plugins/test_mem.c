@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 #if PLUGIN_BUFFER_SIZE <= 0x8000
 #define BUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */

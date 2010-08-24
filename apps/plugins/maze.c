@@ -33,7 +33,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 /* key assignments */
 

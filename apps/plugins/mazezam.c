@@ -25,7 +25,7 @@
 #include "lib/playback_control.h"
 
 /* Include standard plugin macro */
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == IPOD_3G_PAD)
 #   define MAZEZAM_MENU    BUTTON_MENU

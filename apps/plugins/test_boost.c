@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 enum plugin_status plugin_start(const void* parameter)
 {

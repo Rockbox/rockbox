@@ -33,7 +33,7 @@
 
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
-PLUGIN_HEADER
+
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

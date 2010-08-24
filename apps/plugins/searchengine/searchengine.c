@@ -23,7 +23,7 @@
 #include "token.h"
 #include "dbinterface.h"
 
-PLUGIN_HEADER
+
 
 void *audio_bufferbase;
 void *audio_bufferpointer;

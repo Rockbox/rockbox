@@ -26,7 +26,7 @@
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* save files */
 #define SCORE_FILE PLUGIN_GAMES_DIR "/blackjack.score"

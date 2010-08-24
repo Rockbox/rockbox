@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 #define FILENAME "/settings_dumper.txt"
 static int setting_count = 0;

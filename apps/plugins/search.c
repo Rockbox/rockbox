@@ -22,7 +22,7 @@
 #include "plugin.h"
 #include <ctype.h>
 
-PLUGIN_HEADER
+
 
 #define BUFFER_SIZE 16384
 

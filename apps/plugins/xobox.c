@@ -24,7 +24,7 @@
 #include "lib/helper.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 

@@ -24,7 +24,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 #define SOKOBAN_TITLE        "Sokoban"
 

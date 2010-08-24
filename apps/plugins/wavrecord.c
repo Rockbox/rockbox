@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "lib/configfile.h"
 
-PLUGIN_HEADER
+
 
 /************ Start of MAS pcm codec, raw i2c blocks ************/
 

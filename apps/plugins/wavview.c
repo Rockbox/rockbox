@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 /* temp byte buffer */
 uint8_t samples[10 * 1024]; /* read 10KB at the time */

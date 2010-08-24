@@ -31,8 +31,6 @@
 #include "lib/playback_control.h"
 #include "lib/highscore.h"
 
-PLUGIN_HEADER
-
 /* files */
 #define SCORE_FILE PLUGIN_GAMES_DIR "/bubbles.score"
 #define SAVE_FILE  PLUGIN_GAMES_DIR "/bubbles.save"

@@ -22,7 +22,7 @@
 #include "time.h"
 #include "lib/fixedpoint.h"
 
-PLUGIN_HEADER
+
 
 #define SS_TITLE       "Bouncer"
 

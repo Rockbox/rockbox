@@ -34,7 +34,7 @@
 
 /* This macros must always be included. Should be placed at the top by
    convention, although the actual position doesn't matter */
-PLUGIN_HEADER
+
 
 /*Be sure to change MESSAGES when you change the array, or bad things
   will happen.*/

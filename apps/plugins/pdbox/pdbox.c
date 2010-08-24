@@ -28,7 +28,7 @@
 #include "PDa/src/s_stuff.h"
 
 /* Welcome to the PDBox plugin */
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 /* Name of the file to open. */

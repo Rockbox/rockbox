@@ -38,7 +38,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

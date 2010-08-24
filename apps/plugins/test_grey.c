@@ -22,7 +22,7 @@
 #include "lib/grey.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
  || (CONFIG_KEYPAD == IPOD_1G2G_PAD)

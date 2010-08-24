@@ -41,7 +41,7 @@
 #include "st_stuff.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 extern boolean timingdemo, singledemo, demoplayback, fastdemo; // killough

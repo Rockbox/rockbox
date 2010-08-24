@@ -22,7 +22,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-PLUGIN_HEADER
+
 
 #define PAD_HEIGHT LCD_HEIGHT / 6    /* Recorder: 10   iRiver: 21 */
 #define PAD_WIDTH LCD_WIDTH / 50     /* Recorder: 2    iRiver: 2  */

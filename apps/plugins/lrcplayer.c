@@ -24,7 +24,7 @@
 #include "lib/helper.h"
 #include <ctype.h>
 
-PLUGIN_HEADER
+
 
 #define MAX_LINE_LEN    256
 #define LRC_BUFFER_SIZE 0x3000 /* 12 kiB */

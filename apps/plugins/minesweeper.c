@@ -25,7 +25,7 @@
 
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /* what the minesweeper() function can return */
 enum minesweeper_status {

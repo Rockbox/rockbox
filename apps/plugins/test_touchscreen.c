@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-PLUGIN_HEADER
+
 
 #if (CONFIG_KEYPAD == COWON_D2_PAD)
 #define TOUCHSCREEN_QUIT   BUTTON_POWER

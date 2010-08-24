@@ -26,7 +26,7 @@
 #include "hw.h"
 #include "pcm.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 int shut,cleanshut;

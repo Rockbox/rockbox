@@ -68,7 +68,7 @@
 #include "lib/helper.h"
 #include "pluginbitmaps/pitch_notes.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 /* Some fixed point calculation stuff */

@@ -23,12 +23,13 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
+#include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "lib/xlcd.h"
 #include "lib/configfile.h"
 
-PLUGIN_HEADER
+
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -751,9 +752,8 @@ void anim_vertical(int cur_left, int cur_right)
     last_pos = cur_y;
 }
 
-void cleanup(void *parameter)
+void cleanup(void)
 {
-    (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_DEFAULT_FG);
     rb->lcd_set_background(LCD_DEFAULT_BG);
@@ -772,6 +772,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
 
+    atexit(cleanup);
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);
@@ -892,9 +893,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
             default:
-                if (rb->default_event_handler_ex(button, cleanup, NULL)
-                    == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                exit_on_usb(button);
                 break;
         }
         if (button != BUTTON_NONE)
@@ -908,7 +907,6 @@ enum plugin_status plugin_start(const void* parameter)
             displaymsg = true;
         }
     }
-    cleanup(NULL);
     if (rb->memcmp(&osc, &osc_disk, sizeof(osc))) /* save settings if changed */
     {
         rb->memcpy(&osc_disk, &osc, sizeof(osc));

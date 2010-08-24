@@ -22,8 +22,9 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/picture.h"
+#include "lib/pluginlib_exit.h"
 
-PLUGIN_HEADER
+
 
 const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 #define NB_PICTURES 9
@@ -109,9 +110,8 @@ void patterns_deinit(struct screen* display)
 #endif /* HAVE_LCD_CHARCELLS */
 
 /*Call when the program exit*/
-void jackpot_exit(void *parameter)
+void jackpot_exit(void)
 {
-    (void)parameter;
 #ifdef HAVE_LCD_CHARCELLS
     patterns_deinit(rb->screens[SCREEN_MAIN]);
 #endif /* HAVE_LCD_CHARCELLS */
@@ -298,6 +298,7 @@ enum plugin_status plugin_start(const void* parameter)
     int action, i;
     struct jackpot game;
     (void)parameter;
+    atexit(jackpot_exit);
     rb->srand(*rb->current_tick);
 #ifdef HAVE_LCD_CHARCELLS
     patterns_init(rb->screens[SCREEN_MAIN]);
@@ -323,12 +324,9 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
             default:
-                if (rb->default_event_handler_ex(action, jackpot_exit, NULL)
-                    == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                exit_on_usb(action);
                 break;
         }
     }
-    jackpot_exit(NULL);
     return PLUGIN_OK;
 }

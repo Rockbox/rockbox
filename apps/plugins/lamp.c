@@ -25,7 +25,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
-PLUGIN_HEADER
+
 
 /* variable button definitions - only targets with a colour display */
 #if defined(HAVE_LCD_COLOR)

@@ -77,7 +77,7 @@
 #error this platform is not (yet) flashable
 #endif
 
-PLUGIN_HEADER
+
 
 #if CONFIG_KEYPAD == ONDIO_PAD /* limited keypad */
 #define KEY1 BUTTON_LEFT

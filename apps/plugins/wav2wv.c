@@ -25,7 +25,7 @@
 
 #include <codecs/libwavpack/wavpack.h>
 
-PLUGIN_HEADER
+
 
 #define SAMPLES_PER_BLOCK 22050
 

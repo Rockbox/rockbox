@@ -58,11 +58,8 @@ bool tv_init_action(unsigned char **buf, size_t *bufsize);
 
 /*
  * finalize modules
- *
- * [In] parameter
- *          this argument does not use
  */
-void tv_exit(void *parameter);
+void tv_exit(void);
 
 /*
  * load the file

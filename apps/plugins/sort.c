@@ -57,7 +57,7 @@
  * TODO: Implement a merge sort for files larger than the buffer
  ****************************************************************************/
 
-PLUGIN_HEADER
+
 
 size_t buf_size;
 static char *filename;

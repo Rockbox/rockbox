@@ -108,7 +108,7 @@
 #include "stream_thread.h"
 #include "stream_mgr.h"
 
-PLUGIN_HEADER
+
 PLUGIN_IRAM_DECLARE
 
 /* button definitions */

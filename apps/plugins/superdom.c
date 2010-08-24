@@ -22,7 +22,7 @@
 #include "lib/playback_control.h"
 #include "lib/display_text.h"
 #include "pluginbitmaps/superdom_boarditems.h"
-PLUGIN_HEADER
+
 
 extern const fb_data superdom_boarditems[];
 char buf[255];

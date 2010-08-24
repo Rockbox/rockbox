@@ -21,7 +21,7 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-PLUGIN_HEADER
+
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

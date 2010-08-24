@@ -24,7 +24,7 @@
 
 #include "lib/overlay.h"
 
-PLUGIN_HEADER
+
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)

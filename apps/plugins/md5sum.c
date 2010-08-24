@@ -22,7 +22,7 @@
 #include "plugin.h"
 #include "lib/md5.h"
 
-PLUGIN_HEADER
+
 
 #define BUFFERSIZE 16384
 

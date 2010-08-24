@@ -33,7 +33,7 @@
 #include "lib/rgb_hsv.h"
 #include "lib/playback_control.h"
 
-PLUGIN_HEADER
+
 
 /***********************************************************************
  * Buttons

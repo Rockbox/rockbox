@@ -24,7 +24,7 @@
 #include "lib/playback_control.h"
 #include "lib/pluginlib_actions.h"
 
-PLUGIN_HEADER
+
 
 /* Limits */
 #define MAX_PIECES_COUNT 5

@@ -19,10 +19,11 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
+#include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 
-PLUGIN_HEADER
+
 
 /******************************* Globals ***********************************/
 
@@ -497,8 +498,10 @@ int plugin_main(void)
             case STARFIELD_RC_QUIT:
 #endif
             case(STARFIELD_QUIT):
-            case(SYS_USB_CONNECTED):
                 return PLUGIN_OK;
+                break;
+            default:
+                exit_on_usb(button);
                 break;
         }
     }

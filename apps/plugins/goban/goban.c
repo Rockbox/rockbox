@@ -23,7 +23,7 @@
 #include "lib/playback_control.h"
 #include "lib/configfile.h"
 
-PLUGIN_HEADER
+
 
 #include "goban.h"
 #include "game.h"
