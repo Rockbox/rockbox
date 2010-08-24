@@ -12200,6 +12200,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Tela de Rádio Remota"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Tela de Rádio Remota"
+  </voice>
+</phrase>
+<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -12251,133 +12268,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KBD_OK
-  desc: in keyboad
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
   user: core
   <source>
     *: none
-    touchscreen: "OK"
+    gigabeats: "Tone Controls"
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    gigabeats: "Controle de tom"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_RADIOSCREEN
-  desc: in the theme menu
-  user: core
-  <source>
-    *: none
-    radio_remote: "Remote Radio Screen"
-  </source>
-  <dest>
-    *: none
-    radio_remote: "Tela de Rádio Remota"
-  </dest>
-  <voice>
-    *: none
-    radio_remote: "Tela de Rádio Remota"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_GAIN
-  desc: in sound_menu, hardware equalizer tone controls filter gain
-  user: core
-  <source>
-    *: none
-    gigabeats: "Band %d Gain"
-  </source>
-  <dest>
-    *: none
-    gigabeats: "Banda %d Ganho"
-  </dest>
-  <voice>
-    *: none
-    gigabeats: "Ganho de Banda"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH_WIDE
-  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
-  user: core
-  <source>
-    *: none
-    gigabeats: "Wide"
-  </source>
-  <dest>
-    *: none
-    gigabeats: "Amplo(wide)"
-  </dest>
-  <voice>
-    *: none
-    gigabeats: "Amplo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
-  desc: prompt for user to decide whether to update bookmarks
-  user: core
-  <source>
-    *: "Update on Stop"
-  </source>
-  <dest>
-    *: "Atualizar em Stop"
-  </dest>
-  <voice>
-    *: "Atualizar em Stop"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KBD_DELETE
-  desc: in keyboad
-  user: core
-  <source>
-    *: none
-    touchscreen: "Del"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "Del"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Del"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH_NARROW
-  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
-  user: core
-  <source>
-    *: none
-    gigabeats: "Narrow"
-  </source>
-  <dest>
-    *: none
-    gigabeats: "Estreito(narrow)"
-  </dest>
-  <voice>
-    *: none
-    gigabeats: "Estreito"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
-  user: core
-  <source>
-    *: "<Untagged>"
-  </source>
-  <dest>
-    *: "<Sem Tag>"
-  </dest>
-  <voice>
-    *: "Sem Tag"
+    gigabeats: "Controle de tom"
   </voice>
 </phrase>
 <phrase>
@@ -12390,11 +12294,96 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Configuração Avançada de Controle de Tone"
+    gigabeats: "Opções avançadas de controle de tom"
   </dest>
   <voice>
     *: none
-    gigabeats: "Configuração Avançada de Controle de Tone"
+    gigabeats: "Opções avançadas de controle de tom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Ganho de %d de banda"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Ganho de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Frequência de %d de banda"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Frequência de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Largura de %d de banda"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Largura de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Estreito"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Estreito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Amplo"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Amplo"
   </voice>
 </phrase>
 <phrase>
@@ -12415,68 +12404,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KBD_CANCEL
-  desc: in keyboad
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
   user: core
   <source>
-    *: none
-    touchscreen: "Cancel"
+    *: "<Untagged>"
   </source>
   <dest>
-    *: none
-    touchscreen: "Cancelar"
+    *: "<Sem etiqueta>"
   </dest>
   <voice>
-    *: none
-    touchscreen: "Cancelar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_COMPOSER
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Composer"
-  </source>
-  <dest>
-    *: "Compositor"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_FREQUENCY
-  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
-  user: core
-  <source>
-    *: none
-    gigabeats: "Band %d Frequency"
-  </source>
-  <dest>
-    *: none
-    gigabeats: "Banda %d Frequência"
-  </dest>
-  <voice>
-    *: none
-    gigabeats: "Frequência de Banda"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH
-  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
-  user: core
-  <source>
-    *: none
-    gigabeats: "Band %d Width"
-  </source>
-  <dest>
-    *: none
-    gigabeats: "Banda %d Largura"
-  </dest>
-  <voice>
-    *: none
-    gigabeats: "Largura de Banda"
+    *: "Sem etiqueta"
   </voice>
 </phrase>
 <phrase>
@@ -12497,17 +12435,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ONPLAY_PICTUREFLOW
-  desc: Onplay pictureflow
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
   user: core
   <source>
-    *: "PictureFlow"
+    *: "Composer"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "Compositor"
   </dest>
   <voice>
-    *: "abrir picture flow"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12525,19 +12463,81 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HW_EQ_TONE_CONTROLS
-  desc: in sound_menu, hardware equalizer tone controls
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "abrir picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    touchscreen: "OK"
   </source>
   <dest>
     *: none
-    gigabeats: "Controle de Tone"
+    touchscreen: "OK"
   </dest>
   <voice>
     *: none
-    gigabeats: "Controle de Tone"
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Cancelar"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Cancelar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Atualizar ao Parar"
+  </dest>
+  <voice>
+    *: "Atualizar ao Parar"
   </voice>
 </phrase>
