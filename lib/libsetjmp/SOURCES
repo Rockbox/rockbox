@@ -13,6 +13,7 @@ sh/setjmp.S
 #endif
 
 #ifdef CPU_MIPS
+#undef mips
 mips/setjmp.S
 #endif
 
