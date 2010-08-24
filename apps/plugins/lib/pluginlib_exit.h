@@ -23,11 +23,7 @@
 #define __PLUGINLIB_EXIT_H__
 
 #include "config.h"
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#include "../../codecs/lib/setjmp.h"
-#else
 #include <setjmp.h>
-#endif
 
 #define _PLUGINLIB_EXIT_INIT(atexit) switch(setjmp(__exit_env))   \
                                      {                            \

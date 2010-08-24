@@ -89,7 +89,7 @@ else
 endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
-$(BUILDDIR)/%.rock:
+$(BUILDDIR)/%.rock: $(LIBSETJMP)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

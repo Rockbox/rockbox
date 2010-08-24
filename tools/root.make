@@ -69,6 +69,11 @@ ifeq (,$(findstring checkwps,$(APPSDIR)))
   endif
 endif
 
+#included before codecs.make and plugins.make so they see $(LIBSETJMP)
+ifndef APP_TYPE
+  include $(ROOTDIR)/lib/libsetjmp/libsetjmp.make
+endif
+
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   include $(APPSDIR)/bootloader.make
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
@@ -95,6 +100,7 @@ else
   ifdef APP_TYPE
     include $(ROOTDIR)/uisimulator/uisimulator.make
   endif
+  
 endif # bootloader
 
 OBJ := $(SRC:.c=.o)

@@ -126,7 +126,7 @@ $(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECLIB
 		$(CODECLIB) \
 		-lgcc $(subst .map,-pre.map,$(CODECLDFLAGS))
 
-$(CODECDIR)/%.codec: $(CODECDIR)/%.o
+$(CODECDIR)/%.codec: $(CODECDIR)/%.o $(LIBSETJMP)
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

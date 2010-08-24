@@ -75,19 +75,3 @@ pluginlib_albumart.c
 #ifdef HAVE_TOUCHSCREEN
 pluginlib_touchscreen.c
 #endif
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-
-#ifdef CPU_ARM
-../../codecs/lib/setjmp_arm.S
-#endif
-
-#ifdef CPU_COLDFIRE
-../../codecs/lib/setjmp_cf.S
-#endif
-
-#ifdef CPU_MIPS
-../../codecs/lib/setjmp_mips.S
-#endif
-
-#endif /* PLATFORM_NATIVE */

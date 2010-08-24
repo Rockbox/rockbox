@@ -31,11 +31,7 @@
 #undef LUA_PATH_DEFAULT
 #define LUA_PATH_DEFAULT  "$/?.lua;" "$/?/init.lua;" VIEWERS_DIR"/lua/?.lua;" VIEWERS_DIR"/lua/?/init.lua;"
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#include "../../codecs/lib/setjmp.h"
-#else
 #include <setjmp.h>
-#endif
 
 #include "lib/pluginlib_exit.h"
 

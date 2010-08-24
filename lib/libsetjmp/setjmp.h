@@ -5,6 +5,7 @@
  * newlib 1.17.0, with minor changes for Rockbox.
  */
 
+#include "config.h"
 #ifdef CPU_ARM
 /*
  * All callee preserved registers:
@@ -35,15 +36,15 @@
 #endif
 #endif
 
-#if 0 /* Disabled for now, as SH doesn't have setjmp implementation (yet) */
-#ifdef  __sh__
+#ifdef  CPU_SH
+#define __SH5__ 0
 #if __SH5__
 #define _JBLEN 50
 #define _JBTYPE long long
 #else
+/* r8 through r15 (callee saved), pr, fp regs if available */
 #define _JBLEN 20
 #endif /* __SH5__ */
-#endif
 #endif
 
 #ifdef _JBLEN

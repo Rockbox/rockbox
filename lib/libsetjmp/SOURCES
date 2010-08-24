@@ -1,0 +1,19 @@
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+
+#ifdef CPU_ARM
+arm/setjmp.S
+#endif
+
+#ifdef CPU_COLDFIRE
+m68k/setjmp.S
+#endif
+
+#ifdef CPU_SH
+sh/setjmp.S
+#endif
+
+#ifdef CPU_MIPS
+mips/setjmp.S
+#endif
+
+#endif

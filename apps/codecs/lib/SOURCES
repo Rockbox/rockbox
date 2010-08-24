@@ -13,16 +13,7 @@ mdct.c
 
 #ifdef CPU_ARM
 mdct_arm.S
-setjmp_arm.S
 ../../../firmware/target/arm/support-arm.S
-#endif
-
-#ifdef CPU_COLDFIRE
-setjmp_cf.S
-#endif
-
-#ifdef CPU_MIPS
-setjmp_mips.S
 #endif
 
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
