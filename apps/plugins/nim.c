@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 
@@ -122,10 +123,8 @@ static void display_first_line(int x)
 }
 
 /* Call when the program end */
-static void nim_exit(void *parameter)
+static void nim_exit(void)
 {
-    (void)parameter;
-    
     /*Restore the old pattern*/
     rb->lcd_unlock_pattern(h1);
     rb->lcd_unlock_pattern(h2);

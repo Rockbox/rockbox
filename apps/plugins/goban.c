@@ -20,14 +20,9 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if PLUGIN_BUFFER_SIZE < 0x10000 && (CONFIG_PLATFORM & PLATFORM_NATIVE)
-
 #include "lib/overlay.h"
-
-
 
 enum plugin_status plugin_start(const void* parameter)
 {
     return run_overlay(parameter, PLUGIN_GAMES_DIR "/goban.ovl", "Goban");
 }
-#endif
