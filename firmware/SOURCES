@@ -538,7 +538,6 @@ target/arm/crt0.S
 #endif /* SIMULATOR */
 
 #elif defined(CPU_MIPS)
-#undef mips
 common/memset16.c
 target/mips/ffs-mips.S
 target/mips/memcpy-mips.S

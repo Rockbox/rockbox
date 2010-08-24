@@ -13,8 +13,6 @@ sh/setjmp.S
 #endif
 
 #ifdef CPU_MIPS
-/* Strangely something seems to do '#define mips 1' */
-#undef mips
 mips/setjmp.S
 #endif
 

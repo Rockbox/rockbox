@@ -1,5 +1,4 @@
 #include "config.h"
-#undef mips
 
 OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(MIPS)

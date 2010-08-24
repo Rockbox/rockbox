@@ -442,7 +442,8 @@ arm1176jzscc () {
 
 mipselcc () {
  prefixtools mipsel-elf-
- GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls"
+ # mips is predefined, but we want it for paths. use __mips instead
+ GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -Umips"
  GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
