@@ -35,7 +35,7 @@ text files%
 
 {\input{plugins/dice.tex}}
 
-\opt{swcodec}{\input{plugins/doom.tex}}
+\opt{swcodec}{\nopt{lowmem}{\input{plugins/doom.tex}}}
 
 {\input{plugins/flipit.tex}}
 
@@ -139,10 +139,10 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
     Frotz                 & \fname{.z1 - .z8}                &   \\
     JPEG Viewer           & \fname{.jpg, .jpeg}              &   \\
     Lua scripting language& \fname{.lua}                     &   \\
-    \opt{swcodec}{
+    \opt{swcodec}{\nopt{lowmem}{
         Midiplay          & \fname{.mid, .midi}              &   \\
         MPEG Player       & \fname{.mpg, .mpeg, .mpv, .m2v}  &   \\
-    }
+    }}
     \opt{masf}{
         \opt{lcd_bitmap}{
             Movie Player  & \fname{.rvf}                     &   \\
@@ -180,11 +180,11 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \opt{large_plugin_buffer}{\input{plugins/lua.tex}}
 
-\opt{swcodec}{\input{plugins/midiplay.tex}}
+\opt{swcodec}{\nopt{lowmem}{\input{plugins/midiplay.tex}}}
 
 \opt{archosrecorder,archosfmrecorder,ondio}{\input{plugins/movieplayer.tex}}
 
-\opt{lcd_bitmap}{\opt{swcodec}{\input{plugins/mpegplayer.tex}}}
+\opt{lcd_bitmap}{\opt{swcodec}{\nopt{lowmem}{\input{plugins/mpegplayer.tex}}}}
 
 \opt{lcd_bitmap}{\opt{lcd_color}{\input{plugins/pngviewer.tex}}}
 

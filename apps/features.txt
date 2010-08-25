@@ -262,3 +262,7 @@ usb_hid_mouse
 #if defined(HAVE_SPDIF_IN)
 recording_digital
 #endif
+
+#if MEMORYSIZE <= 2
+lowmem
+#endif
