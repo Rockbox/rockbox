@@ -218,7 +218,7 @@ static void reset_endpoints(int init)
     }
 
     setup_desc_init(setup_desc);
-    USB_OEP_SUP_PTR(0)    = (int)setup_desc;
+    USB_OEP_SUP_PTR(0)    = AS3525_PHYSICAL_ADDR((int)setup_desc);
 }
 
 void usb_drv_init(void)
@@ -427,9 +427,9 @@ int usb_drv_recv(int ep, void *ptr, int len)
         uc_desc->status   |= USB_DMA_DESC_ZERO_LEN;
         uc_desc->data_ptr  = 0;
     } else {
-        uc_desc->data_ptr  = ptr;
+        uc_desc->data_ptr  = AS3525_PHYSICAL_ADDR(ptr);
     }
-    USB_OEP_DESC_PTR(ep) = (int)&dmadescs[ep][1];
+    USB_OEP_DESC_PTR(ep) = AS3525_PHYSICAL_ADDR((int)&dmadescs[ep][1]);
     USB_OEP_STS(ep)      = USB_EP_STAT_OUT_RCVD; /* clear status */
 
     /* Make sure receive DMA is on */
@@ -504,9 +504,9 @@ static void ep_send(int ep, void *ptr, int len)
     if (len == 0)
         uc_desc->status |= USB_DMA_DESC_ZERO_LEN;
 
-    uc_desc->data_ptr  = ptr;
+    uc_desc->data_ptr  = AS3525_PHYSICAL_ADDR(ptr);
 
-    USB_IEP_DESC_PTR(ep) = (int)&dmadescs[ep][0];
+    USB_IEP_DESC_PTR(ep) = AS3525_PHYSICAL_ADDR((int)&dmadescs[ep][0]);
     USB_IEP_STS(ep)      = 0xffffffff; /* clear status */
     /* start transfer */
     USB_IEP_CTRL(ep)     |= USB_EP_CTRL_CNAK | USB_EP_CTRL_PD;
