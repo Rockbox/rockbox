@@ -25,8 +25,6 @@
 	.align  2
 
 
-#if defined(IRIVER_H300_SERIES) && !defined(SIMULATOR)
-
 	.global blit_display
 
 /*
@@ -137,8 +135,6 @@ bd_y_loop:
 	movem.l	(%sp), %d2-%d7/%a2-%a4
 	lea.l	BD_SAVE(%sp), %sp
 	rts
-
-#endif /* defined(IRIVER_H300_SERIES) && !defined(SIMULATOR) */
 
 
 /* See arcade.c for the C implementation of drawChar */
