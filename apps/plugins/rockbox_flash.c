@@ -23,10 +23,6 @@
 ****************************************************************************/
 #include "plugin.h"
 
-#if (CONFIG_CPU == SH7034) /* Only for SH targets */
-
-
-
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
@@ -957,6 +953,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-
-#endif /* SH-target */

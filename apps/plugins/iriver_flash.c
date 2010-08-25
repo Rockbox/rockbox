@@ -27,15 +27,9 @@
 unsigned char *audiobuf;
 ssize_t audiobuf_size;
 
-#ifdef IRIVER_H100_SERIES
-#define PLATFORM_ID ID_IRIVER_H100
-#else
-#undef PLATFORM_ID /* this platform is not (yet) flashable */
+#ifndef IRIVER_H100_SERIES
+#error this platform is not (yet) flashable
 #endif
-
-#ifdef PLATFORM_ID
-
-
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 #define KEY1 BUTTON_OFF
@@ -770,5 +764,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-#endif /* ifdef PLATFORM_ID */

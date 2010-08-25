@@ -21,10 +21,6 @@
 #include "lib/helper.h"
 #include "lib/pluginlib_exit.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
-
-
-
 /******************************* Globals ***********************************/
 
 /* Key assignement */
@@ -524,5 +520,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return ret;
 }
-
-#endif /* #ifdef HAVE_LCD_BITMAP */

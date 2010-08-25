@@ -33,7 +33,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 */
 
 #include "plugin.h"
-#ifdef HAVE_LCD_BITMAP
+
 #include "lib/configfile.h"
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
@@ -529,4 +529,3 @@ enum plugin_status plugin_start(const void* parameter)
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     return PLUGIN_OK;
 }
-#endif

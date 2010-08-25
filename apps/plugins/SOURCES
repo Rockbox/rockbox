@@ -150,10 +150,6 @@ robotfindskitten.c
 xobox.c
 spacerocks.c
 
-/* Plugins needing the grayscale lib on low-depth LCDs */
-fire.c
-plasma.c
-
 blackjack.c
 bounce.c
 bubbles.c
@@ -175,6 +171,10 @@ star.c
 starfield.c
 vu_meter.c
 wormlet.c
+
+/* Plugins needing the grayscale lib on low-depth LCDs */
+fire.c
+plasma.c
 
 #ifdef HAVE_LCD_COLOR
 clix.c
@@ -225,9 +225,12 @@ test_codec.c
 test_core_jpeg.c
 #endif
 test_disk.c
-test_fps.c
 #ifdef HAVE_LCD_BITMAP
+test_fps.c
 test_gfx.c
+#if LCD_DEPTH < 4 && !defined(SIMULATOR)
+test_scanrate.c
+#endif
 #ifndef HAVE_LCD_COLOR
 test_grey.c
 test_greylib_bitmap_scale.c
@@ -243,9 +246,8 @@ test_resize.c
 #if CONFIG_CODEC == SWCODEC
 test_sampr.c
 #endif
-test_scanrate.c
 #ifdef HAVE_TOUCHSCREEN
 test_touchscreen.c
 #endif
 test_viewports.c
-#endif
+#endif /* HAVE_TEST_PLUGINS */

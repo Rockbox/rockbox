@@ -22,8 +22,6 @@
 #include "lib/configfile.h"
 #include "lib/pluginlib_exit.h"
 
-#ifdef HAVE_LCD_CHARCELLS
-
 /* Euro converter for the player */
 /*
 Use:
@@ -599,5 +597,3 @@ enum plugin_status plugin_start(const void* parameter)
     }
     return PLUGIN_OK;
 }
-
-#endif

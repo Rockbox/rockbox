@@ -22,8 +22,6 @@
 #include "lib/helper.h"
 #include "lib/grey.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 PLUGIN_IRAM_DECLARE
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
@@ -385,4 +383,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-#endif

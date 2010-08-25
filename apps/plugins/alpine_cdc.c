@@ -33,11 +33,6 @@
 
 #include "plugin.h"
 
-/* Only build for (correct) target */
-#if CONFIG_CPU==SH7034 && !(CONFIG_STORAGE & STORAGE_MMC)
-
-
-
 #ifdef HAVE_LCD_CHARCELLS /* player model */
 #define LINES    2
 #define COLUMNS 11
@@ -1198,5 +1193,3 @@ enum plugin_status plugin_start(const void* parameter)
     /* now go ahead and have fun! */
     return (main(parameter)==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
-
-#endif /* CONFIG_CPU==SH7034 && !(CONFIG_STORAGE & STORAGE_MMC) */

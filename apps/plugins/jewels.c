@@ -27,10 +27,6 @@
 #include "lib/playback_control.h"
 #include "pluginbitmaps/jewels.h"
 
-#ifdef HAVE_LCD_BITMAP
-
-
-
 /* button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -1601,5 +1597,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-#endif /* HAVE_LCD_BITMAP */

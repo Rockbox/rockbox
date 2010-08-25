@@ -25,7 +25,6 @@
 #include "lib/helper.h"
 #include "lib/pluginlib_exit.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "lib/xlcd.h"
 #include "lib/configfile.h"
 
@@ -916,4 +915,3 @@ enum plugin_status plugin_start(const void* parameter)
     }
     return PLUGIN_OK;
 }
-#endif /* HAVE_LCD_BITMAP */

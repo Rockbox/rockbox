@@ -21,10 +21,6 @@
 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-
-
-
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
  || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 #define SCANRATE_DONE    BUTTON_OFF
@@ -245,5 +241,3 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     return plugin_main();
 }
-
-#endif

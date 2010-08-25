@@ -75,7 +75,7 @@ F3: equal to "="
 ---------------------------------------------------------------------------*/
 
 #include "plugin.h"
-#ifdef HAVE_LCD_BITMAP
+
 #include "math.h"
 
 
@@ -1767,5 +1767,3 @@ enum plugin_status plugin_start(const void* parameter)
     rb->button_clear_queue();
     return PLUGIN_OK;
 }
-
-#endif /* #ifdef HAVE_LCD_BITMAP */

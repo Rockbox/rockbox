@@ -22,10 +22,6 @@
 #include "plugin.h"
 #include "lib/pluginlib_bmp.h"
 
-#if defined(HAVE_LCD_COLOR)
-
-
-
 /* Magic constants. */
 #define PPM_MAGIC1 'P'
 #define PPM_MAGIC2 '3'
@@ -357,5 +353,3 @@ enum plugin_status plugin_start(const void* parameter)
     
     return PLUGIN_OK;
 }
-
-#endif

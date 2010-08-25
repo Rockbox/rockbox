@@ -23,8 +23,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "lib/xlcd.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/fixedpoint.h"
@@ -2566,5 +2564,3 @@ enum plugin_status plugin_start(const void* parameter) {
     rb->lcd_setfont(FONT_UI);
     return ret;
 }
-
-#endif

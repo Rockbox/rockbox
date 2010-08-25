@@ -20,10 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
-
-
 #define PAD_HEIGHT LCD_HEIGHT / 6    /* Recorder: 10   iRiver: 21 */
 #define PAD_WIDTH LCD_WIDTH / 50     /* Recorder: 2    iRiver: 2  */
 
@@ -587,5 +583,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return (game == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
-
-#endif /* HAVE_LCD_BITMAP */

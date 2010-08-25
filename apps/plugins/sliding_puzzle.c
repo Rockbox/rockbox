@@ -20,9 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
-
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define PUZZLE_QUIT BUTTON_OFF
@@ -818,5 +815,3 @@ enum plugin_status plugin_start(
 
     return puzzle_loop();
 }
-
-#endif

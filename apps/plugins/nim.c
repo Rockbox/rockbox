@@ -21,8 +21,6 @@
 #include "plugin.h"
 #include "lib/pluginlib_exit.h"
 
-#ifdef HAVE_LCD_CHARCELLS
-
 /* NIM game for the player
 
 Rules of nim game
@@ -290,4 +288,3 @@ enum plugin_status plugin_start(const void* parameter)
     }
     return PLUGIN_OK;
 }
-#endif

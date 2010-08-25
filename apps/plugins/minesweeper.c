@@ -21,8 +21,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "lib/playback_control.h"
 
 
@@ -926,5 +924,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-#endif

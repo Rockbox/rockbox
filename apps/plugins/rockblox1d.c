@@ -22,11 +22,6 @@
 
 #include "plugin.h"
 
-
-
-
-#ifdef HAVE_LCD_BITMAP
-
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define ONEDROCKBLOX_DOWN              BUTTON_PLAY
 #define ONEDROCKBLOX_QUIT              BUTTON_OFF
@@ -323,4 +318,3 @@ enum plugin_status plugin_start(const void* parameter)
  
     return PLUGIN_OK;
 }
-#endif

@@ -26,10 +26,6 @@
 #include "button.h"
 #include "lcd.h"
 
-#ifdef HAVE_LCD_BITMAP
-
-
-
 #define min(a,b) (a<b?a:b)
 
 /**
@@ -1928,5 +1924,3 @@ enum plugin_status plugin_start(const void* parameter )
     /* Exit the plugin */
     return ( result == SOLITAIRE_USB ) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
-
-#endif

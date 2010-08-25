@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#ifdef HAVE_LCD_BITMAP
+
 #include "lib/display_text.h"
 #include "lib/playback_control.h"
 
@@ -1162,5 +1162,3 @@ enum plugin_status plugin_start(const void* parameter)
     /* display choice menu */
     return star_menu();
 }
-
-#endif
