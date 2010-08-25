@@ -60,7 +60,7 @@ void skin_font_init(void)
 int skin_font_load(char* font_name, int glyphs)
 {
     int i;
-    int skin_font_size;
+    int skin_font_size = 0;
     struct font *pf;
     struct skin_font_info *font = NULL;
     char filename[MAX_PATH];
@@ -95,7 +95,9 @@ int skin_font_load(char* font_name, int glyphs)
     {
         if (!glyphs) 
             glyphs = GLYPHS_TO_CACHE;
+#ifndef __PCTOOL__
         skin_font_size = glyphs * get_glyph_size(filename);
+#endif
         if ( !skin_font_size )
         {
             skin_font_size = SKIN_FONT_SIZE;
@@ -104,12 +106,12 @@ int skin_font_load(char* font_name, int glyphs)
         if (!pf->buffer_start)
             return -1;
         font->buffer = pf->buffer_start;
+        pf->buffer_size = skin_font_size;
     }
     else
     {
         pf->buffer_start = font->buffer;
     }
-    pf->buffer_size = skin_font_size;
     
     pf->fd = -1;
     font->font_id = font_load(pf, filename);
@@ -120,7 +122,6 @@ int skin_font_load(char* font_name, int glyphs)
     
     return font->font_id;
 }
-
 /* unload a skin font. If a font has been loaded more than once it wont actually
  * be unloaded untill all references have been unloaded */
 void skin_font_unload(int font_id)
