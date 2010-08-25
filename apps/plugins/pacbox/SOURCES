@@ -6,8 +6,11 @@ wsg3.c
 
 #if defined(CPU_PP502x) && (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
 pacbox_arm.S
-#elif defined(CPU_COLDFIRE)
-pacbox_cf.S
-#else
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) || !defined(IRIVER_H300_SERIES)
 pacbox_lcd.c
+#endif
+
+#if defined(CPU_COLDFIRE)
+/* contains cf-specific functions, AND pacbox_lcd.c replacement for h300 only */
+pacbox_cf.S
 #endif
