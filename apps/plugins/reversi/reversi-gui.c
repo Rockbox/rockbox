@@ -39,8 +39,6 @@ further options:
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "reversi-game.h"
 #include "reversi-strategy.h"
 #include "reversi-gui.h"
@@ -802,5 +800,3 @@ enum plugin_status plugin_start(const void *parameter) {
 
     return PLUGIN_OK;
 }
-
-#endif

@@ -23,8 +23,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "fractal.h"
 #include "fractal_rect.h"
 #include "fractal_sets.h"
@@ -254,5 +252,3 @@ enum plugin_status plugin_start(const void* parameter)
     }
     return PLUGIN_OK;
 }
-
-#endif

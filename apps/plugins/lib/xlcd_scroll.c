@@ -24,7 +24,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
 
 #if (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
@@ -754,5 +753,3 @@ void xlcd_scroll_down(int count)
 
 #endif /* LCD_PIXELFORMAT, LCD_DEPTH */
 #endif /* defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE */
-
-#endif /* HAVE_LCD_BITMAP */

@@ -21,7 +21,6 @@
  *
  ****************************************************************************/
 
-#ifndef SIMULATOR
 #include "plugin.h"
 #include "overlay.h"
 
@@ -109,4 +108,3 @@ enum plugin_status run_overlay(const void* parameter,
     *(header.api) = rb;
     return header.entry_point(parameter);
 }
-#endif

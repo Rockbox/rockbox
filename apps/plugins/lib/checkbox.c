@@ -22,8 +22,6 @@
 #include "plugin.h"
 #include "checkbox.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 /*
  * Print a checkbox
  */
@@ -42,5 +40,3 @@ void checkbox(int x, int y, int width, int height, bool checked)
         rb->lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
     }
 }
-
-#endif

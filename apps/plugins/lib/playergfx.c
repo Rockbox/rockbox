@@ -23,7 +23,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_CHARCELLS /* Player only :) */
 #include "playergfx.h"
 
 /*** globals ***/
@@ -525,5 +524,3 @@ void pgfx_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
     pgfx_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
-
-#endif /* HAVE_LCD_CHARCELLS */

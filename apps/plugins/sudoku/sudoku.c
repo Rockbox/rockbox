@@ -61,8 +61,6 @@ Example ".ss" file, and one with a saved state:
 #include "plugin.h"
 #include "lib/configfile.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include <lib/playback_control.h>
 #include "sudoku.h"
 #include "generator.h"
@@ -1307,5 +1305,3 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     return rc;
 }
-
-#endif

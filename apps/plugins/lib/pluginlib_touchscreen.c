@@ -22,8 +22,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_TOUCHSCREEN
-
 #include "pluginlib_touchscreen.h"
 
 /*******************************************************************************
@@ -245,5 +243,3 @@ struct ts_raster_button_result touchscreen_raster_map_button(struct ts_raster_bu
     map->_prev_btn_state = button;
     return ret;
 }
-
-#endif /* HAVE_TOUCHSCREEN */
