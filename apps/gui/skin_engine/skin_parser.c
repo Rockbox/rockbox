@@ -343,6 +343,7 @@ static int parse_image_load(struct skin_element *element,
 struct skin_font {
     int id; /* the id from font_load */
     char *name;  /* filename without path and extension */
+    int glyphs;  /* how many glyphs to reserve room for */
 };
 static struct skin_font skinfonts[MAXUSERFONTS];
 static int parse_font_load(struct skin_element *element,
@@ -352,8 +353,13 @@ static int parse_font_load(struct skin_element *element,
     (void)wps_data; (void)token;
     int id = element->params[0].data.number;
     char *filename = element->params[1].data.text;
+    int  glyphs;
     char *ptr;
     
+    if(element->params_count > 2)
+        glyphs = element->params[2].data.number;
+    else
+        glyphs = GLYPHS_TO_CACHE;
 #if defined(DEBUG) || defined(SIMULATOR)
     if (skinfonts[id-FONT_FIRSTUSERFONT].name != NULL)
     {
@@ -367,6 +373,7 @@ static int parse_font_load(struct skin_element *element,
         return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
     skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
+    skinfonts[id-FONT_FIRSTUSERFONT].glyphs = glyphs;
 
     return 0;
 }
@@ -1160,7 +1167,8 @@ static bool skin_load_fonts(struct wps_data *data)
         {
             char *dot = strchr(font->name, '.');
             *dot = '\0';
-            font->id = skin_font_load(font->name);
+            font->id = skin_font_load(font->name,
+                       skinfonts[font_id-FONT_FIRSTUSERFONT].glyphs);
         }
 
         if (font->id < 0)

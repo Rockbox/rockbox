@@ -313,16 +313,18 @@ Additional fonts can be loaded within each screen file to be used in that
 screen. In this way not only can you have different fonts between e.g. the menu
 and the WPS, but you can use multiple fonts in each of the individual screens.\\
 
-\config{\%Fl('id',filename)}
+\config{\%Fl('id',filename,glyphs)}
 
   \begin{itemize}
     \item `id' is the number you want to use in viewport declarations, 0 and 1
        are reserved and so can't be used.
     \item `filename' is the font filename to load. Fonts should be stored in
        \fname{/.rockbox/fonts/}
+    \item `glyphs' is an optional specification of how many unique glyphs to
+       store in memory.
   \end{itemize}
 
-  An example would be: \config{\%Fl(2,12-Nimbus.fnt)}
+  An example would be: \config{\%Fl(2,12-Nimbus.fnt,100)}
 
 }
 

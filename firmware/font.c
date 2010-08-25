@@ -628,6 +628,35 @@ void glyph_cache_save(struct font* pf)
     return;
 }
 
+int get_glyph_size(const char *path)
+{
+    struct font f;
+    int overhead;
+    char buf[FONT_HEADER_SIZE];
+    
+    f.buffer_start = buf;
+    f.buffer_size = sizeof(buf);
+    f.buffer_position = buf;    
+    
+    f.fd = open(path, O_RDONLY|O_BINARY);
+    if(f.fd < 0)
+        return 0;
+    
+    read(f.fd, f.buffer_position, FONT_HEADER_SIZE);
+    f.buffer_end = f.buffer_position + FONT_HEADER_SIZE;
+    
+    if( !font_load_header(&f) )
+    {
+        close(f.fd);
+        return 0;
+    }
+    close(f.fd);
+    
+    overhead = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
+        sizeof( unsigned short);
+    return overhead + (f.maxwidth * ((f.height + 7) / 8));
+}
+
 static int ushortcmp(const void *a, const void *b)
 {
     return ((int)(*(unsigned short*)a - *(unsigned short*)b));

@@ -36,11 +36,13 @@
 #else
 #define SKIN_FONT_SIZE (1024*3)
 #endif
+#define GLYPHS_TO_CACHE 256
 
 void skin_font_init(void);
 
-/* load a font into the skin buffer. return the font id. */
-int skin_font_load(char* font_name);
+/* load a font into the skin buffer. return the font id. 
+ * reserve room for glyphs glyphs */
+int skin_font_load(char* font_name, int glyphs);
 
 /* unload a skin font. If a font has been loaded more than once it wont actually
  * be unloaded untill all references have been unloaded */

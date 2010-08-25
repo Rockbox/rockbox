@@ -121,6 +121,7 @@ void font_init(void) INIT_ATTR;
 int font_load_remoteui(const char* path);
 #endif
 int font_load(struct font* pf, const char *path);
+int get_glyph_size(const char *path);
 void font_unload(int font_id);
 
 struct font* font_get(int font);

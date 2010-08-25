@@ -57,9 +57,10 @@ void skin_font_init(void)
 }
 
 /* load a font into the skin buffer. return the font id. */
-int skin_font_load(char* font_name)
+int skin_font_load(char* font_name, int glyphs)
 {
     int i;
+    int skin_font_size;
     struct font *pf;
     struct skin_font_info *font = NULL;
     char filename[MAX_PATH];
@@ -92,7 +93,14 @@ int skin_font_load(char* font_name)
     pf = &font->font;
     if (!font->buffer)
     {
-        pf->buffer_start = (char*)skin_buffer_alloc(SKIN_FONT_SIZE);
+        if (!glyphs) 
+            glyphs = GLYPHS_TO_CACHE;
+        skin_font_size = glyphs * get_glyph_size(filename);
+        if ( !skin_font_size )
+        {
+            skin_font_size = SKIN_FONT_SIZE;
+        }
+        pf->buffer_start = (char*)skin_buffer_alloc(skin_font_size);
         if (!pf->buffer_start)
             return -1;
         font->buffer = pf->buffer_start;
@@ -101,7 +109,7 @@ int skin_font_load(char* font_name)
     {
         pf->buffer_start = font->buffer;
     }
-    pf->buffer_size = SKIN_FONT_SIZE;
+    pf->buffer_size = skin_font_size;
     
     pf->fd = -1;
     font->font_id = font_load(pf, filename);
