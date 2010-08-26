@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="clip+-front.svg"
+   sodipodi:docname="sansaclipplus-front.svg"
    style="display:inline">
   <defs
      id="defs4">
@@ -2309,11 +2309,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="168.58403"
-     inkscape:cy="323.65134"
+     inkscape:zoom="0.86143217"
+     inkscape:cx="138.03118"
+     inkscape:cy="288.47308"
      inkscape:document-units="px"
-     inkscape:current-layer="svg2"
+     inkscape:current-layer="layer5"
      showgrid="false"
      inkscape:snap-bbox="false"
      inkscape:object-nodes="false"
@@ -2326,10 +2326,10 @@
      inkscape:snap-center="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1278"
-     inkscape:window-height="725"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-width="1366"
+     inkscape:window-height="748"
+     inkscape:window-x="-2"
+     inkscape:window-y="-3"
      inkscape:window-maximized="1"
      inkscape:snap-nodes="true"
      inkscape:snap-to-guides="true"
@@ -2356,7 +2356,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -2812,20 +2812,12 @@
        style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
        xml:space="preserve"
        id="text2899"
-       y="231.3215"
-       x="-68.593719"
+       y="230.16064"
+       x="-80.202293"
        sodipodi:linespacing="100%"
        inkscape:export-filename="/home/marko/Dropbox/Public/clipplus.png"
        inkscape:export-xdpi="96.824623"
-       inkscape:export-ydpi="96.824623"><tspan
-         style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
-         id="tspan2901"
-         y="231.3215"
-         x="-68.593719">Up</tspan><tspan
-         style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
-         id="tspan2903"
-         y="257.3215"
-         x="-68.593719" /></text>
+       inkscape:export-ydpi="96.824623">Play</text>
     <text
        style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
        xml:space="preserve"
@@ -2849,19 +2841,11 @@
        xml:space="preserve"
        id="text2911"
        y="517.71954"
-       x="-95.593719"
+       x="-139.7063"
        sodipodi:linespacing="100%"
        inkscape:export-filename="/home/marko/Dropbox/Public/clipplus.png"
        inkscape:export-xdpi="96.824623"
-       inkscape:export-ydpi="96.824623"><tspan
-         style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
-         id="tspan2913"
-         y="517.71954"
-         x="-95.593719">Down</tspan><tspan
-         style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
-         id="tspan2915"
-         y="543.7196"
-         x="-95.593719" /></text>
+       inkscape:export-ydpi="96.824623">Submenu</text>
     <text
        style="font-size:26.00000191px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:100%;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000012px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Palatino Linotype;-inkscape-font-specification:Palatino Linotype"
        xml:space="preserve"
