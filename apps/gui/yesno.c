@@ -89,7 +89,23 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     
     line_shift += put_message(display, yn->main_message,
                               line_shift, vp_lines);
-
+#ifdef HAVE_TOUCHSCREEN
+    if (display->screen_type == SCREEN_MAIN)
+    {
+        int w,h;
+        int rect_w = vp->width/2, rect_h = vp->height/2;
+        int old_pattern = vp->fg_pattern;
+        vp->fg_pattern = LCD_RGBPACK(0,255,0);
+        display->drawrect(0, rect_h, rect_w, rect_h);
+        display->getstringsize(str(LANG_SET_BOOL_YES), &w, &h);
+        display->putsxy((rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_YES));
+        vp->fg_pattern = LCD_RGBPACK(255,0,0);
+        display->drawrect(rect_w, rect_h, rect_w, rect_h);
+        display->getstringsize(str(LANG_SET_BOOL_NO), &w, &h);
+        display->putsxy(rect_w + (rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_NO));
+        vp->fg_pattern = old_pattern;
+    }
+#else
     /* Space remaining for yes / no text ? */
     if(line_shift+2 <= vp_lines)
     {
@@ -100,6 +116,7 @@ static void gui_yesno_draw(struct gui_yesno * yn)
         display->puts(0, line_shift+1, str(LANG_CANCEL_WITH_ANY));
 #endif
     }
+#endif
     display->update_viewport();
     display->set_viewport(NULL);
 }
@@ -165,6 +182,23 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         button = get_action(CONTEXT_YESNOSCREEN, HZ*5);
         switch (button)
         {
+#ifdef HAVE_TOUCHSCREEN
+            case ACTION_TOUCHSCREEN:
+                {
+                    short int x, y;
+                    if (action_get_touchscreen_press_in_vp(&x, &y, yn[0].vp) == BUTTON_TOUCHSCREEN)
+                    {
+                        if (y > yn[0].vp->height/2)
+                        {
+                            if (x <= yn[0].vp->width/2)
+                                result = YESNO_YES;
+                            else
+                                result = YESNO_NO;
+                        }
+                    }
+                }
+                break;
+#endif
             case ACTION_YESNO_ACCEPT:
                 result=YESNO_YES;
                 break;
