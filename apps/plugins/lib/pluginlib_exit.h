@@ -27,8 +27,12 @@
 #include <stdlib.h>
 #include "gcc_extensions.h"
 
-/* these are actually implemented in plugin_crt0.c which all plugins link */
-extern int atexit(void (*func)(void));
+/* these are actually implemented in plugin_crt0.c which all plugins link
+ *
+ * the cygwin/mingw shared library stub also defines atexit, so give our
+ * implementation a prefix */
+#define atexit rb_atexit
+extern int rb_atexit(void (*func)(void));
 extern void exit(int status) NORETURN_ATTR;
 /* these don't call the exit handlers */
 extern void _exit(int status) NORETURN_ATTR;
