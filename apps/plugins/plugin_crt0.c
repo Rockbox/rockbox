@@ -37,7 +37,7 @@ static jmp_buf __exit_env;
 /* only 1 atexit handler for now, chain in the exit handler if you need more */
 static void (*atexit_handler)(void);
 
-int atexit(void (*fn)(void))
+int rb_atexit(void (*fn)(void))
 {
     if (atexit_handler)
         return -1;
