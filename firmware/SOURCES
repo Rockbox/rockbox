@@ -3,6 +3,7 @@ events.c
 backlight.c
 buffer.c
 general.c
+load_code.c
 powermgmt.c
 system.c
 usb.c

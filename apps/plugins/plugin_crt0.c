@@ -32,6 +32,8 @@ PLUGIN_HEADER
 #define EXIT_MAGIC 0x0CDEBABE
 
 extern enum plugin_status plugin_start(const void*);
+extern unsigned char plugin_bss_start[];
+extern unsigned char plugin_end_addr[];
 
 static jmp_buf __exit_env;
 /* only 1 atexit handler for now, chain in the exit handler if you need more */
@@ -61,6 +63,10 @@ enum plugin_status plugin__start(const void *param)
     int exit_ret;
     enum plugin_status ret;
 
+    /* zero out the bss section */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+#endif
     /* we come back here if exit() was called or the plugin returned normally */
     exit_ret = setjmp(__exit_env);
     if (exit_ret == 0)

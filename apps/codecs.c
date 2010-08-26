@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include "string-extra.h"
+#include "load_code.h"
 #include "debug.h"
 #include "button.h"
 #include "dir.h"
@@ -74,26 +75,13 @@ size_t codec_size;
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_RECORDING)
 #undef open
 static int open(const char* pathname, int flags, ...)
 {
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    int fd;
-    if (flags & O_CREAT)
-    {
-        va_list ap;
-        va_start(ap, flags);
-        fd = sim_open(pathname, flags, va_arg(ap, unsigned int));
-        va_end(ap);
-    }
-    else
-        fd = sim_open(pathname, flags);
-
-    return fd;
-#else
     return file_open(pathname, flags);
-#endif
 }
+#endif
 struct codec_api ci = {
 
     0, /* filesize */
@@ -197,62 +185,46 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
              CODECS_DIR, codec_root_fn);
 }
 
-static int codec_load_ram(int size, struct codec_api *api)
+static int codec_load_ram(void *handle, struct codec_api *api)
 {
-    struct codec_header *hdr;
+    struct codec_header *hdr = lc_get_header(handle);
     int status;
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    hdr = (struct codec_header *)codecbuf;
-        
-    if (size <= (signed)sizeof(struct codec_header)
-        || (hdr->magic != CODEC_MAGIC
-#ifdef HAVE_RECORDING
-             && hdr->magic != CODEC_ENC_MAGIC
-#endif
-            )
-        || hdr->target_id != TARGET_ID
-        || hdr->load_addr != codecbuf
-        || hdr->end_addr > codecbuf + CODEC_SIZE)
-    {
-        logf("codec header error");
-        return CODEC_ERROR;
-    }
-
-    codec_size = hdr->end_addr - codecbuf;
-
-#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    void *pd;
-    
-    hdr = sim_codec_load_ram(codecbuf, size, &pd);
-
-    if (pd == NULL)
-        return CODEC_ERROR;
 
     if (hdr == NULL
         || (hdr->magic != CODEC_MAGIC
 #ifdef HAVE_RECORDING
              && hdr->magic != CODEC_ENC_MAGIC
 #endif
-           )
-        || hdr->target_id != TARGET_ID) {
-        sim_codec_close(pd);
+            )
+        || hdr->target_id != TARGET_ID
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+        || hdr->load_addr != codecbuf
+        || hdr->end_addr > codecbuf + CODEC_SIZE
+#endif
+        )
+    {
+        logf("codec header error");
+        lc_close(handle);
         return CODEC_ERROR;
     }
 
-    codec_size = codecbuf - codecbuf;
-
-#endif /* CONFIG_PLATFORM */
     if (hdr->api_version > CODEC_API_VERSION
         || hdr->api_version < CODEC_MIN_API_VERSION) {
-        sim_codec_close(pd);
+        logf("codec api version error");
+        lc_close(handle);
         return CODEC_ERROR;
     }
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    codec_size = hdr->end_addr - codecbuf;
+#else
+    codec_size = 0;
+#endif
+
     *(hdr->api) = api;
-    cpucache_invalidate();
     status = hdr->entry_point();
 
-    sim_codec_close(pd);
+    lc_close(handle);
 
     return status;
 }
@@ -260,36 +232,37 @@ static int codec_load_ram(int size, struct codec_api *api)
 int codec_load_buf(unsigned int hid, struct codec_api *api)
 {
     int rc;
+    void *handle;
     rc = bufread(hid, CODEC_SIZE, codecbuf);
     if (rc < 0) {
         logf("error loading codec");
         return CODEC_ERROR;
     }
+    handle = lc_open_from_mem(codecbuf, rc);
+    if (handle == NULL)
+    {
+        logf("error loading codec");
+        return CODEC_ERROR;
+    }
+
     api->discard_codec();
-    return codec_load_ram(rc, api);
+    return codec_load_ram(handle, api);
 }
 
 int codec_load_file(const char *plugin, struct codec_api *api)
 {
     char path[MAX_PATH];
-    int fd;
-    int rc;
+    void *handle;
 
     codec_get_full_path(path, plugin);
-    
-    fd = open(path, O_RDONLY);
-    if (fd < 0) {
-        logf("Codec load error:%d", fd);
+
+    handle = lc_open(path, codecbuf, CODEC_SIZE);
+
+    if (handle == NULL) {
+        logf("Codec load error");
         splashf(HZ*2, "Couldn't load codec: %s", path);
-        return fd;
-    }
-    
-    rc = read(fd, &codecbuf[0], CODEC_SIZE);
-    close(fd);
-    if (rc <= 0) {
-        logf("Codec read error");
         return CODEC_ERROR;
     }
 
-    return codec_load_ram((size_t)rc, api);
+    return codec_load_ram(handle, api);
 }
