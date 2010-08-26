@@ -66,6 +66,12 @@ int key_to_button(int keyboard_button)
         case SDLK_RETURN:
             new_btn = BUTTON_SELECT;
             break;
+        case SDL_BUTTON_WHEELUP:
+            new_btn = BUTTON_SCROLL_BACK;
+            break;
+        case SDL_BUTTON_WHEELDOWN:
+            new_btn = BUTTON_SCROLL_FWD;
+            break;
     }
     return new_btn;
 }

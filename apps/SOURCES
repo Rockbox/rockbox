@@ -295,4 +295,6 @@ keymaps/keymap-vibe500.c
 keymaps/keymap-mpio-hd200.c
 #elif CONFIG_KEYPAD == ANDROID_PAD
 keymaps/keymap-android.c
+#elif CONFIG_KEYPAD == SDL_PAD
+keymaps/keymap-sdl.c
 #endif

@@ -112,9 +112,16 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
     if(button_up) {
         switch ( event->button )
         {
+#ifdef HAVE_SCROLLWHEEL
+        case SDL_BUTTON_WHEELUP:
+        case SDL_BUTTON_WHEELDOWN:
+#endif
+        case SDL_BUTTON_MIDDLE:
+        case SDL_BUTTON_RIGHT:
+            button_event( event->button, false );
+            break;
         /* The scrollwheel button up events are ignored as they are queued immediately */
         case SDL_BUTTON_LEFT:
-        case SDL_BUTTON_MIDDLE:
             if ( mapping && background ) {
                 printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x, y,
                 (int)sqrt( SQUARE(x-(int)event->x) + SQUARE(y-(int)event->y))
@@ -137,14 +144,13 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
         {
 #ifdef HAVE_SCROLLWHEEL
         case SDL_BUTTON_WHEELUP:
-            button_event( SDLK_UP, true );
-            break;
         case SDL_BUTTON_WHEELDOWN:
-            button_event( SDLK_DOWN, true );
-            break;
 #endif
-        case SDL_BUTTON_LEFT:
         case SDL_BUTTON_MIDDLE:
+        case SDL_BUTTON_RIGHT:
+            button_event( event->button, true );
+            break;
+        case SDL_BUTTON_LEFT:
             if ( mapping && background ) {
                 x = event->x;
                 y = event->y;

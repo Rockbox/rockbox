@@ -129,6 +129,7 @@
 #define PBELL_VIBE500_PAD 43
 #define MPIO_HD200_PAD     44
 #define ANDROID_PAD        45
+#define SDL_PAD            46
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1

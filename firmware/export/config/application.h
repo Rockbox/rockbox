@@ -75,10 +75,13 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-#ifdef ANDROID
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #define CONFIG_KEYPAD ANDROID_PAD
+#elif (CONFIG_PLATFORM & PLATFORM_SDL)
+#define HAVE_SCROLLWHEEL
+#define CONFIG_KEYPAD SDL_PAD
 #else
-#define CONFIG_KEYPAD COWON_D2_PAD
+#error unknown platform
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_SDL)
