@@ -109,9 +109,19 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
         }
 
         /* window and summation to create array u */
-        for (n = 0; n < 64; n++)
+        for (n = 0; n < 32; n++)
         {
-            idx0 = qmfa->x_index + n; idx1 = n * 10;
+            idx0 = qmfa->x_index + n; idx1 = n * 20;
+            u[n] = FAAD_ANALYSIS_SCALE1(
+                   MUL_F(qmfa->x[idx0      ], qmf_c[idx1    ]) +
+                   MUL_F(qmfa->x[idx0 +  64], qmf_c[idx1 + 2]) +
+                   MUL_F(qmfa->x[idx0 + 128], qmf_c[idx1 + 4]) +
+                   MUL_F(qmfa->x[idx0 + 192], qmf_c[idx1 + 6]) +
+                   MUL_F(qmfa->x[idx0 + 256], qmf_c[idx1 + 8]));
+        }
+        for (n = 32; n < 64; n++)
+        {
+            idx0 = qmfa->x_index + n; idx1 = n * 20 - 639;
             u[n] = FAAD_ANALYSIS_SCALE1(
                    MUL_F(qmfa->x[idx0      ], qmf_c[idx1    ]) +
                    MUL_F(qmfa->x[idx0 +  64], qmf_c[idx1 + 2]) +
