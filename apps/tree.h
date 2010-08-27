@@ -73,13 +73,13 @@ struct tree_context {
 void tree_drawlists(void);
 void tree_mem_init(void) INIT_ATTR;
 void tree_gui_init(void) INIT_ATTR;
-void get_current_file(char* buffer, int buffer_len);
+char* get_current_file(char* buffer, size_t buffer_len);
 void set_dirfilter(int l_dirfilter);
 void set_current_file(char *path);
 int rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);
 void resume_directory(const char *dir);
-char *getcwd(char *buf, int size);
+char *getcwd(char *buf, size_t size);
 void reload_directory(void);
 bool check_rockboxdir(void);
 struct tree_context* tree_get_context(void);

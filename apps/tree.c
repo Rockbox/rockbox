@@ -511,17 +511,17 @@ void resume_directory(const char *dir)
 
 /* Returns the current working directory and also writes cwd to buf if
    non-NULL.  In case of error, returns NULL. */
-char *getcwd(char *buf, int size)
+char *getcwd(char *buf, size_t size)
 {
     if (!buf)
         return tc.currdir;
-    else if (size > 0)
+    else if (size)
     {
-        strlcpy(buf, tc.currdir, size);
-        return buf;
+        if (strlcpy(buf, tc.currdir, size) < size)
+            return buf;
     }
-    else
-        return NULL;
+    /* size == 0, or truncation in strlcpy */
+    return NULL;
 }
 
 /* Force a reload of the directory next time directory browser is called */
@@ -530,19 +530,28 @@ void reload_directory(void)
     reload_dir = true;
 }
 
-void get_current_file(char* buffer, int buffer_len)
+char* get_current_file(char* buffer, size_t buffer_len)
 {
 #ifdef HAVE_TAGCACHE
     /* in ID3DB mode it is a bad idea to call this function */
     /* (only happens with `follow playlist') */
     if( *tc.dirfilter == SHOW_ID3DB )
-        return;
+        return NULL;
 #endif
 
     struct entry* dc = tc.dircache;
     struct entry* e = &dc[tc.selected_item];
-    snprintf(buffer, buffer_len, "%s/%s", getcwd(NULL,0),
-                                          tc.dirlength ? e->name : "");
+    if (getcwd(buffer, buffer_len))
+    {
+        if (tc.dirlength)
+        {
+            strlcat(buffer, "/", buffer_len);
+            if (strlcat(buffer, e->name, buffer_len) >= buffer_len)
+                return NULL;
+        }
+        return buffer;
+    }
+    return NULL;
 }
 
 /* Allow apps to change our dirfilter directly (required for sub browsers) 

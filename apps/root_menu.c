@@ -252,7 +252,11 @@ static int browser(void* param)
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
-            get_current_file(last_folder, MAX_PATH);
+            if (!get_current_file(last_folder, MAX_PATH))
+            {
+                last_folder[0] = '/';
+                last_folder[1] = '\0';
+            }
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
