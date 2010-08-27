@@ -42,7 +42,13 @@ static inline void lc_close(void *handle) { (void)handle; }
 
 /* don't call these directly for loading code
  * they're to be wrapped by platform specific functions */
-extern void *_lc_open(const char *filename, char *buf, size_t buf_size);
+#ifdef WIN32
+/* windows' LoadLibrary can only handle ucs2, no utf-8 */
+#define _lc_open_char wchar_t
+#else
+#define _lc_open_char char
+#endif
+extern void *_lc_open(const _lc_open_char *filename, char *buf, size_t buf_size);
 extern void *_lc_get_header(void *handle);
 extern void  _lc_close(void *handle);
 

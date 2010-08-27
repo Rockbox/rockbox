@@ -77,7 +77,7 @@ static unsigned char *bitpos    IBSS_ATTR;
 /********************* rockbox helper functions *************************/
 
 /* emulate stdio functions */
-static int fread(void *ptr, size_t size, size_t nobj)
+static size_t tta_fread(void *ptr, size_t size, size_t nobj)
 {
     size_t read_size;
     unsigned char *buffer = ci->request_buffer(&read_size, size * nobj);
@@ -90,7 +90,7 @@ static int fread(void *ptr, size_t size, size_t nobj)
     return read_size;
 }
 
-static int fseek(long offset, int origin)
+static int tta_fseek(long offset, int origin)
 {
     switch (origin)
     {
@@ -129,7 +129,7 @@ crc32 (unsigned char *buffer, unsigned int len) {
 #define GET_BINARY(value, bits) \
     while (bit_count < bits) { \
         if (bitpos == iso_buffers_end) { \
-            if (!fread(isobuffers, 1, ISO_BUFFERS_SIZE)) { \
+            if (!tta_fread(isobuffers, 1, ISO_BUFFERS_SIZE)) { \
                 ttainfo->STATE = READ_ERROR; \
                 return -1; \
             } \
@@ -149,7 +149,7 @@ crc32 (unsigned char *buffer, unsigned int len) {
     value = 0; \
     while (!(bit_cache ^ bit_mask[bit_count])) { \
         if (bitpos == iso_buffers_end) { \
-            if (!fread(isobuffers, 1, ISO_BUFFERS_SIZE)) { \
+            if (!tta_fread(isobuffers, 1, ISO_BUFFERS_SIZE)) { \
                 ttainfo->STATE = READ_ERROR; \
                 return -1; \
             } \
@@ -207,7 +207,7 @@ static int done_buffer_read(void) {
 
     if (rbytes < sizeof(int)) {
         ci->memcpy(isobuffers, bitpos, 4);
-        if (!fread(isobuffers + rbytes, 1, ISO_BUFFERS_SIZE - rbytes))
+        if (!tta_fread(isobuffers + rbytes, 1, ISO_BUFFERS_SIZE - rbytes))
             return -1;
         bitpos = isobuffers;
     }
@@ -249,10 +249,10 @@ int set_tta_info (tta_info *info)
     ci->memset (info, 0, sizeof(tta_info));
 
     /* skip id3v2 tags */
-    fseek(ci->id3->id3v2len, SEEK_SET);
+    tta_fseek(ci->id3->id3v2len, SEEK_SET);
 
     /* read TTA header */
-    if (fread (&ttahdr, 1, sizeof (ttahdr)) == 0) {
+    if (tta_fread (&ttahdr, 1, sizeof (ttahdr)) == 0) {
         info->STATE = READ_ERROR;
         return -1;
     }
@@ -374,7 +374,7 @@ int set_position (unsigned int pos, enum tta_seek_type type)
         return -1;
     }
     seek_pos = ttainfo->DATAPOS + seek_table[data_pos = pos];
-    if (fseek(seek_pos, SEEK_SET) < 0) {
+    if (tta_fseek(seek_pos, SEEK_SET) < 0) {
         ttainfo->STATE = READ_ERROR;
         return -1;
     }
@@ -418,7 +418,7 @@ int player_init (tta_info *info) {
     }
 
     /* read seek table */
-    if (!fread(seek_table, st_size, 1)) {
+    if (!tta_fread(seek_table, st_size, 1)) {
         ttainfo->STATE = READ_ERROR;
         return -1;
     }

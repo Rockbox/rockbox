@@ -25,31 +25,19 @@
 #include <sys/types.h>
 #include "config.h"
 #include "gcc_extensions.h"
+#include <fcntl.h>
+#ifdef WIN32
+/* this has SEEK_SET et al */
+#include <stdio.h>
+#endif
+
 
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 #define MAX_OPEN_FILES 11
 
-#ifndef SEEK_SET
-#define SEEK_SET 0
-#endif
-#ifndef SEEK_CUR
-#define SEEK_CUR 1
-#endif
-#ifndef SEEK_END
-#define SEEK_END 2
-#endif
-
-#ifndef O_RDONLY
-#define O_RDONLY 0
-#define O_WRONLY 1
-#define O_RDWR   2
-#define O_CREAT  4
-#define O_APPEND 8
-#define O_TRUNC  0x10
-#endif
-
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && !defined(PLUGIN) && !defined(CODEC)
+#if !defined(PLUGIN) && !defined(CODEC)
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define open(x, ...) sim_open(x, __VA_ARGS__)
 #define creat(x,m) sim_creat(x,m)
 #define remove(x) sim_remove(x)
@@ -96,4 +84,5 @@ extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+#endif /* !CODEC && !PLUGIN */
 #endif

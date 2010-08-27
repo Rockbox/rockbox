@@ -79,7 +79,13 @@ void set_current_file(char *path);
 int rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);
 void resume_directory(const char *dir);
-char *getcwd(char *buf, size_t size);
+#ifdef WIN32
+/* it takes an int on windows */
+#define getcwd_size_t int
+#else
+#define getcwd_size_t size_t
+#endif
+char *getcwd(char *buf, getcwd_size_t size);
 void reload_directory(void);
 bool check_rockboxdir(void);
 struct tree_context* tree_get_context(void);

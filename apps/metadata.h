@@ -23,8 +23,8 @@
 #define _METADATA_H
 
 #include <stdbool.h>
-#include "file.h"
 #include "config.h"
+#include "file.h"
 
 
 /* Audio file types. */

@@ -511,13 +511,13 @@ void resume_directory(const char *dir)
 
 /* Returns the current working directory and also writes cwd to buf if
    non-NULL.  In case of error, returns NULL. */
-char *getcwd(char *buf, size_t size)
+char *getcwd(char *buf, getcwd_size_t size)
 {
     if (!buf)
         return tc.currdir;
     else if (size)
     {
-        if (strlcpy(buf, tc.currdir, size) < size)
+        if ((getcwd_size_t)strlcpy(buf, tc.currdir, size) < size)
             return buf;
     }
     /* size == 0, or truncation in strlcpy */

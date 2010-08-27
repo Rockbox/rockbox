@@ -179,9 +179,10 @@ struct mydir {
 
 typedef struct mydir MYDIR;
 
-#if 1 /* maybe this needs disabling for MSVC... */
 static unsigned int rockbox2sim(int opt)
 {
+#if 0
+/* this shouldn't be needed since we use the host's versions */
     int newopt = O_BINARY;
 
     if(opt & 1)
@@ -196,8 +197,10 @@ static unsigned int rockbox2sim(int opt)
         newopt |= O_TRUNC;
 
     return newopt;
-}
+#else
+    return opt|O_BINARY;
 #endif
+}
 
 /** Simulator I/O engine routines **/
 #define IO_YIELD_THRESHOLD 512
@@ -537,7 +540,7 @@ int sim_fsync(int fd)
 void *lc_open(const char *filename, char *buf, size_t buf_size)
 {
     const char *sim_path = get_sim_pathname(filename);
-    void *handle = _lc_open((const char*)UTF8_TO_OS(sim_path), buf, buf_size);
+    void *handle = _lc_open(UTF8_TO_OS(sim_path), buf, buf_size);
 
     if (handle == NULL)
     {

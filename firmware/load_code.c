@@ -80,13 +80,12 @@ static inline char *_dlerror(void)
 #else
 /* unix */
 #include <dlfcn.h>
-#define O_BINARY 0
 #endif
 #include <stdio.h>
 #include "rbpaths.h"
 #include "general.h"
 
-void * _lc_open(const char *filename, char *buf, size_t buf_size)
+void * _lc_open(const _lc_open_char *filename, char *buf, size_t buf_size)
 {
     (void)buf;
     (void)buf_size;
@@ -116,14 +115,13 @@ void *lc_open_from_mem(void *addr, size_t blob_size)
         char name[MAX_PATH];
         const char *_name = get_user_file_path(ROCKBOX_DIR, NEED_WRITE, name, sizeof(name));
         snprintf(temp_filename, sizeof(temp_filename),
-                 "%slibtemp_binary_%d.dll", _name, i);
+                 "%s/libtemp_binary_%d.dll", _name, i);
 #endif
-        fd = open(temp_filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0766);
+        fd = open(temp_filename, O_WRONLY|O_CREAT|O_TRUNC, 0700);
         if (fd >= 0)
             break;  /* Created a file ok */
     }
 
-    DEBUGF("Creating %s\n", temp_filename);
     if (fd < 0)
     {
         DEBUGF("open failed\n");
