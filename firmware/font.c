@@ -723,7 +723,7 @@ static void glyph_cache_load(struct font* pf)
             close(fd);
         } else {
             /* load latin1 chars into cache */
-            for ( ch = 32 ; ch < 256 ; ch++ );
+            for ( ch = 32 ; ch < 256  && ch < pf->cache._capacity + 32; ch++ )
                 font_get_bits(pf, ch);
         }
     }
