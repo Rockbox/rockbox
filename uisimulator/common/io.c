@@ -58,7 +58,6 @@
 #include "debug.h"
 #include "ata.h" /* for IF_MV2 et al. */
 #include "rbpaths.h"
-#include "load_code.h"
 
 /* keep this in sync with file.h! */
 #undef MAX_PATH /* this avoids problems when building simulator */
@@ -531,28 +530,116 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
-
-void *lc_open(const char *filename, char *buf, size_t buf_size)
+void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 {
-    const char *sim_path = get_sim_pathname(filename);
-    void *handle = _lc_open((const char*)UTF8_TO_OS(sim_path), buf, buf_size);
+    void *hdr;
+    char path[MAX_PATH];
+    int fd;
+    int codec_count;
+#ifdef WIN32
+    char buf[MAX_PATH];
+#endif
 
-    if (handle == NULL)
+    *pd = NULL;
+
+    /* We have to create the dynamic link library file from ram so we
+       can simulate the codec loading. With voice and crossfade,
+       multiple codecs may be loaded at the same time, so we need
+       to find an unused filename */
+    for (codec_count = 0; codec_count < 10; codec_count++)
     {
-        DEBUGF("failed to load %s\n", filename);
-        DEBUGF("lc_open(%s): %s\n", filename, lc_last_error());
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+        /* we need that path fixed, since get_user_file_path()
+         * gives us the folder on the sdcard where we cannot load libraries
+         * from (no exec permissions)
+         */
+        snprintf(path, sizeof(path),
+                 "/data/data/org.rockbox/app_rockbox/libtemp_codec_%d.so",
+                 codec_count);
+#else
+        char name[MAX_PATH];
+        const char *_name = get_user_file_path(ROCKBOX_DIR, 0, name, sizeof(name));
+        snprintf(path, sizeof(path), "%s/_temp_codec%d.dll", get_sim_pathname(_name), codec_count);
+#endif
+        fd = OPEN(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
+        if (fd >= 0)
+            break;  /* Created a file ok */
     }
-    return handle;
+    if (fd < 0)
+    {
+        DEBUGF("failed to open for write: %s\n", path);
+        return NULL;
+    }
+
+    if (write(fd, codecptr, size) != size)
+    {
+        DEBUGF("write failed");
+        return NULL;
+    }
+    close(fd);
+
+    /* Now load the library. */
+    *pd = dlopen(path, RTLD_NOW);
+    if (*pd == NULL) 
+    {
+        DEBUGF("failed to load %s\n", path);
+#ifdef WIN32
+        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                       buf, sizeof buf, NULL);
+        DEBUGF("dlopen(%s): %s\n", path, buf);
+#else
+        DEBUGF("dlopen(%s): %s\n", path, dlerror());
+#endif
+        return NULL;
+    }
+
+    hdr = dlsym(*pd, "__header");
+    if (!hdr)
+        hdr = dlsym(*pd, "___header");
+
+    return hdr;       /* maybe NULL if symbol not present */
 }
 
-void *lc_get_header(void *handle)
+void sim_codec_close(void *pd)
 {
-    return _lc_get_header(handle);
+    dlclose(pd);
 }
 
-void lc_close(void *handle)
+void *sim_plugin_load(char *plugin, void **pd)
 {
-    _lc_close(handle);
+    void *hdr;
+    char path[MAX_PATH];
+#ifdef WIN32
+    char buf[MAX_PATH];
+#endif
+
+    snprintf(path, sizeof(path), "%s", get_sim_pathname(plugin));
+
+    *pd = NULL;
+
+    *pd = dlopen(path, RTLD_NOW);
+    if (*pd == NULL) {
+        DEBUGF("failed to load %s\n", plugin);
+#ifdef WIN32
+        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                       buf, sizeof(buf), NULL);
+        DEBUGF("dlopen(%s): %s\n", path, buf);
+#else
+        DEBUGF("dlopen(%s): %s\n", path, dlerror());
+#endif
+        return NULL;
+    }
+
+    hdr = dlsym(*pd, "__header");
+    if (!hdr)
+        hdr = dlsym(*pd, "___header");
+
+    return hdr;    /* maybe NULL if symbol not present */
+}
+
+void sim_plugin_close(void *pd)
+{
+    dlclose(pd);
 }
 
 #ifdef WIN32
