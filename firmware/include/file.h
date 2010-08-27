@@ -66,14 +66,14 @@ extern int fsync(int fd);
 extern ssize_t read(int fd, void *buf, size_t count);
 extern off_t lseek(int fildes, off_t offset, int whence);
 extern int file_creat(const char *pathname);
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(__PCTOOL__)
 /* posix compatibility function */
 static inline int creat(const char *pathname, mode_t mode)
 {
     (void)mode;
     return file_creat(pathname);
 }
-#if !defined(CODEC) && !defined(PLUGIN) && !defined(__PCTOOL__)
+#if !defined(CODEC) && !defined(PLUGIN)
 #define open(x, y, ...) file_open(x,y)
 #endif
 #endif
