@@ -632,10 +632,10 @@ void glyph_cache_save(struct font* pf)
     return;
 }
 
-int get_glyph_size(const char *path)
+int font_glyphs_to_bufsize(const char *path, int glyphs)
 {
     struct font f;
-    int overhead;
+    int bufsize;
     char buf[FONT_HEADER_SIZE];
     
     f.buffer_start = buf;
@@ -656,9 +656,13 @@ int get_glyph_size(const char *path)
     }
     close(f.fd);
     
-    overhead = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
+    bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
         sizeof( unsigned short);
-    return overhead + (f.maxwidth * ((f.height + 7) / 8));
+    bufsize += f.maxwidth * ((f.height + 7) / 8);
+    bufsize *= glyphs;
+    if ( bufsize < FONT_HEADER_SIZE )
+        bufsize = FONT_HEADER_SIZE;
+    return bufsize;
 }
 
 static int ushortcmp(const void *a, const void *b)

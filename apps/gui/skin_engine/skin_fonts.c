@@ -96,7 +96,7 @@ int skin_font_load(char* font_name, int glyphs)
         if (!glyphs) 
             glyphs = GLYPHS_TO_CACHE;
 #ifndef __PCTOOL__
-        skin_font_size = glyphs * get_glyph_size(filename);
+        skin_font_size = font_glyphs_to_bufsize(filename, glyphs);
 #endif
         if ( !skin_font_size )
         {
