@@ -36,7 +36,7 @@
 /* #define LRC_DEBUG */
 
 enum lrc_screen {
-    PLUGIN_OTHER = 10,
+    PLUGIN_OTHER = 0x200,
     LRC_GOTO_MAIN,
     LRC_GOTO_MENU,
     LRC_GOTO_EDITOR,
@@ -1719,14 +1719,14 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
         if (current.wipe && active_line && len >= 3500)
         {
             elapsed = rin * vp_lyrics[i].width / len;
+            set_to_inactive(display);
+            display->fillrect(elapsed, ypos+font_ui_height/4+1,
+                 vp_lyrics[i].width-elapsed-1, font_ui_height/2-2);
             set_to_active(display);
             display->drawrect(0, ypos+font_ui_height/4,
                               vp_lyrics[i].width, font_ui_height/2);
             display->fillrect(1, ypos+font_ui_height/4+1,
                               elapsed-1, font_ui_height/2-2);
-            set_to_inactive(display);
-            display->fillrect(elapsed, ypos+font_ui_height/4+1,
-                 vp_lyrics[i].width-elapsed-1, font_ui_height/2-2);
             set_to_default(display);
         }
         return ypos + font_ui_height;
@@ -2937,7 +2937,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (!ext) ext = current.lrc_file;
         for (current.type = 0; current.type < NUM_TYPES; current.type++)
         {
-            if (!rb->strcmp(ext, extentions[current.type]))
+            if (!rb->strcasecmp(ext, extentions[current.type]))
                 break;
         }
         if (current.type == NUM_TYPES)
