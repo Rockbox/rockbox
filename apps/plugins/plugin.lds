@@ -278,6 +278,7 @@ SECTIONS
     .bss (NOLOAD) :
     {
     	plugin_bss_start = .;
+    	_plugin_bss_start = .;
         *(.bss*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
 		*(.ibss)
