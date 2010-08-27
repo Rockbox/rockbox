@@ -348,12 +348,16 @@ static bool internal_load_font(struct font* pf, const char *path,
         if (!font_load_header(pf))
         {
             DEBUGF("Failed font header load");
+            close(pf->fd);
+            pf->fd = -1;
             return false;
         }
 
         if (!font_load_cached(pf))
         {
             DEBUGF("Failed font cache load");
+            close(pf->fd);
+            pf->fd = -1;
             return false;
         }
 
