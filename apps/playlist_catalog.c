@@ -381,9 +381,9 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
         if (f < 0)
             goto exit;
 
+        i = lseek(f, 0, SEEK_CUR);
         fs = filesize(f);
-
-        for (i=0; i<fs;)
+        while (i < fs)
         {
             int n;
 
