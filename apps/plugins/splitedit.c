@@ -214,7 +214,7 @@ static void update_data(void)
     int w, h;
 
     /* split point */
-    format_time_ms(timebuf, sizeof buf, xpos_to_time(split_x));
+    format_time_ms(timebuf, sizeof timebuf, xpos_to_time(split_x));
     rb->snprintf(buf, sizeof buf, "Split at: %s", timebuf);
 
     rb->lcd_getstringsize(buf, &w, &h);
