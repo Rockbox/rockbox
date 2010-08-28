@@ -449,6 +449,17 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
     lcd_putsxyofs(x, y, 0, str);
 }
 
+/* Formatting version of lcd_putsxy */
+void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
+{
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    lcd_putsxy(x, y, buf);
+}
+
 /*** Line oriented text output ***/
 
 /* Put a string at a given char position */
