@@ -837,21 +837,18 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     {
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
-        {
-            panicf("card not initialised (%d)", ret);
-            goto sd_transfer_error;
-        }
+            goto sd_transfer_error_no_dma;
     }
 
     if(count < 0) /* XXX: why is it signed ? */
     {
         ret = -18;
-        goto sd_transfer_error;
+        goto sd_transfer_error_no_dma;
     }
     if((start+count) > card_info[drive].numblocks)
     {
         ret = -19;
-        goto sd_transfer_error;
+        goto sd_transfer_error_no_dma;
     }
 
     /* skip SanDisk OF */
@@ -860,7 +857,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -20;
+    {
+        ret = -20;
+        goto sd_transfer_error_no_dma;
+    }
 
     last_disk_activity = current_tick;
     dma_retain();
@@ -902,14 +902,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
-            static const char *st[9] = {
-                "IDLE", "RDY", "IDENT", "STBY", "TRAN", "DATA", "RCV",
-                                                                "PRG", "DIS"};
-            if(ret <= -10)
-                panicf("wait for TRAN state failed (%s) %d",
-                                                    st[(-ret / 10) % 9], drive);
-            else
-                panicf("wait for state failed");
+            ret -= 25;
             goto sd_transfer_error;
         }
 
@@ -926,7 +919,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         unsigned long dummy; /* if we don't ask for a response, writing fails */
         if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
-            panicf("%s multiple blocks failed", write ? "write" : "read");
+        {
+            ret = -21;
+            goto sd_transfer_error;
+        }
 
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
@@ -940,8 +936,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_RESP, NULL))
         {
-            ret = -666;
-            panicf("STOP TRANSMISSION failed");
+            ret = -22;
             goto sd_transfer_error;
         }
 
@@ -967,7 +962,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        return -21;
+    {
+        ret = -23;
+        goto sd_transfer_error;
+    }
 
 #ifndef BOOTLOADER
     sd_enable(false);
@@ -977,8 +975,13 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     return 0;
 
 sd_transfer_error:
-    panicf("transfer error : %d",ret);
+
+    dma_release();
+
+sd_transfer_error_no_dma:
+
     card_info[drive].initialized = 0;
+    mutex_unlock(&sd_mtx);
     return ret;
 }
 
