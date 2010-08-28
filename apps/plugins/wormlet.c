@@ -23,7 +23,9 @@
 #include "lib/helper.h"
 #include "lib/playback_control.h"
 
-
+#ifdef DEBUG_WORMLET
+static long max_cycle;
+#endif
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
@@ -437,11 +439,6 @@ static int worm_food = WORM_PER_FOOD;
 
 /* End additional variables */
 
-#ifdef DEBUG_WORMLET
-/* just a buffer used for debug output */
-static char debugout[15];
-#endif
-
 /* the number of active worms (dead or alive) */
 static int worm_count = MAX_WORMS;
 
@@ -455,6 +452,14 @@ static bool use_remote = false;
 #define COLLISION_FOOD 2
 #define COLLISION_ARGH 3
 #define COLLISION_FIELD 4
+
+static const char *const state_desc[] = {
+    [COLLISION_NONE]  = NULL,
+    [COLLISION_WORM]  = "Wormed",
+    [COLLISION_FOOD]  = "Growing",
+    [COLLISION_ARGH]  = "Argh",
+    [COLLISION_FIELD] = "Crashed",
+};
 
 /* constants for use as directions.
    Note that the values are ordered clockwise.
@@ -491,12 +496,6 @@ static struct configdata config[] =
     {TYPE_INT, 0, 20, { .int_p = &speed }, "speed", NULL},
     {TYPE_INT, 0, 15, { .int_p = &worm_food }, "Worm Growth Per Food", NULL}
 };
-
-#ifdef DEBUG_WORMLET
-static void set_debug_out(char *str){
-    strcpy(debugout, str);
-}
-#endif
 
 /**
  * Returns the direction id in which the worm
@@ -1547,8 +1546,6 @@ static void virtual_player(struct worm *w)
  */
 static void score_board(void)
 {
-    char buf[15];
-    char* buf2 = NULL;
     int i;
     int y = 0;
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -1557,6 +1554,8 @@ static void score_board(void)
     rb->lcd_set_drawmode(DRMODE_SOLID);
     for (i = 0; i < worm_count; i++) {
         int score = get_score(&worms[i]);
+        int collision = check_collision(&worms[i]);
+        const char *state_str;
 
         /* high score */
         if (worms[i].fetch_worm_direction != virtual_player){
@@ -1565,40 +1564,20 @@ static void score_board(void)
             }
         }
 
-        /* length */
-        rb->snprintf(buf, sizeof (buf),"Len:%d", score);
-
         /* worm state */
-        switch (check_collision(&worms[i])) {
-            case COLLISION_NONE:
-                if (worms[i].growing > 0)
-                    buf2 = "Growing";
-                else {
-                    if (worms[i].alive)
-                        buf2 = "Hungry";
-                    else
-                        buf2 = "Wormed";
-                }
-                break;
-
-            case COLLISION_WORM:
-                buf2 = "Wormed";
-                break;
-
-            case COLLISION_FOOD:
-                buf2 = "Growing";
-                break;
-
-            case COLLISION_ARGH:
-                buf2 = "Argh";
-                break;
-
-            case COLLISION_FIELD:
-                buf2 = "Crashed";
-                break;
+        if (collision == COLLISION_NONE) {
+            if (worms[i].growing > 0)
+                state_str = "Growing";
+            else {
+                state_str = worms[i].alive ? "Hungry" : "Wormed";
+            }
+        } else {
+            state_str = state_desc[collision];
         }
-        rb->lcd_putsxy(FIELD_RECT_WIDTH + 3, y  , buf);
-        rb->lcd_putsxy(FIELD_RECT_WIDTH + 3, y+8, buf2);
+
+        /* length */
+        rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, y  , "Len:%d", score);
+        rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, y+8, state_str);
 
         if (!worms[i].alive){
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -1608,11 +1587,10 @@ static void score_board(void)
         }
         y += 19;
     }
-    rb->snprintf(buf , sizeof(buf), "Hs: %d", highscore);
-#ifndef DEBUG_WORMLET
-    rb->lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, buf);
+#ifdef DEBUG_WORMLET
+    rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "ticks %d", max_cycle);
 #else
-    rb->lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, debugout);
+    rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "Hs: %d", highscore);
 #endif
 }
 
@@ -1684,8 +1662,7 @@ static int run(void)
     long cycle_start = 0, cycle_end = 0;
 #ifdef DEBUG_WORMLET
     int ticks_to_max_cycle_reset = 20;
-    long max_cycle = 0;
-    char buf[20];
+    max_cycle = 0;
 #endif
 
     /* initialize the board and so on */
@@ -1811,8 +1788,6 @@ static int run(void)
                 max_cycle = cycle_duration;
                 ticks_to_max_cycle_reset = 20;
             }
-            rb->snprintf(buf, sizeof buf, "ticks %d", max_cycle);
-            set_debug_out(buf);
 #endif
         }
         /* adjust the number of ticks to wait for a button.
@@ -1855,7 +1830,6 @@ static void test_worm_food_collision(void)
     foodx[0] = 15;
     foody[0] = 12;
     for (foody[0] = 20; foody[0] > 0; foody[0] --) {
-        char buf[20];
         bool collision;
         draw_worm(&worms[0]);
         draw_food(0);
@@ -1863,8 +1837,7 @@ static void test_worm_food_collision(void)
         if (collision) {
             collision_count++;
         }
-        rb->snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        rb->lcd_putsxy(0, LCD_HEIGHT -8, buf);
+        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
         rb->lcd_update();
     }
     if (collision_count != food_size) {
@@ -1874,7 +1847,6 @@ static void test_worm_food_collision(void)
 
     foody[0] = 15;
     for (foodx[0] = 30; foodx[0] > 0; foodx[0] --) {
-        char buf[20];
         bool collision;
         draw_worm(&worms[0]);
         draw_food(0);
@@ -1882,8 +1854,7 @@ static void test_worm_food_collision(void)
         if (collision) {
             collision_count ++;
         }
-        rb->snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        rb->lcd_putsxy(0, LCD_HEIGHT -8, buf);
+        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
         rb->lcd_update();
     }
     if (collision_count != food_size * 2) {
@@ -1924,15 +1895,13 @@ static void test_worm_argh_collision(void)
 
     arghx[0] = 12;
     for (arghy[0] = 0; arghy[0] < FIELD_RECT_HEIGHT - argh_size; arghy[0]++){
-        char buf[20];
         bool collision;
         draw_argh(0);
         collision = worm_argh_collision(&worms[0], 0);
         if (collision) {
             collision_count ++;
         }
-        rb->snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        rb->lcd_putsxy(0, LCD_HEIGHT -8, buf);
+        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
         rb->lcd_update();
     }
     if (collision_count != argh_size * 2) {
@@ -1941,15 +1910,13 @@ static void test_worm_argh_collision(void)
 
     arghy[0] = 12;
     for (arghx[0] = 0; arghx[0] < FIELD_RECT_HEIGHT - argh_size; arghx[0]++){
-        char buf[20];
         bool collision;
         draw_argh(0);
         collision = worm_argh_collision(&worms[0], 0);
         if (collision) {
             collision_count ++;
         }
-        rb->snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        rb->lcd_putsxy(0, LCD_HEIGHT -8, buf);
+        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
         rb->lcd_update();
     }
     if (collision_count != argh_size * 4) {
@@ -2173,7 +2140,6 @@ static int test_specific_worm_collision(void)
     int dir;
     int x = 0;
     int y = 0;
-    char buf[20];
     rb->lcd_clear_display();
     init_worm(&worms[0], 10, 20);
     add_growing(&worms[0], 20 - INITIAL_WORM_LENGTH);
@@ -2195,8 +2161,7 @@ static int test_specific_worm_collision(void)
                 collisions ++;
             }
             rb->lcd_invertpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
-            rb->snprintf(buf, sizeof buf, "collisions %d", collisions);
-            rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
+            rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "collisions %d", collisions);
             rb->lcd_update();
         }
     }
@@ -2237,7 +2202,6 @@ static void test_make_argh(void)
     rb->lcd_update();
 
     for (seed = 0; hit < 20; seed += 2) {
-            char buf[20];
         int x, y;
         rb->srand(seed);
         x = rb->rand() % (FIELD_RECT_WIDTH  - argh_size);
@@ -2253,9 +2217,8 @@ static void test_make_argh(void)
                     failures ++;
                 }
 
-                rb->snprintf(buf, sizeof buf, "(%d;%d) fail%d try%d",
+                rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "(%d;%d) fail%d try%d",
                              x, y, failures, tries);
-                rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
                 rb->lcd_update();
                 rb->lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y,
                                    argh_size, argh_size);
@@ -2289,14 +2252,12 @@ static void test_worm_argh_collision_in_moves(void) {
 
     set_worm_dir(&worms[0], EAST);
     for (i = 0; i < 20; i++) {
-        char buf[20];
         move_worm(&worms[0]);
         draw_worm(&worms[0]);
         if (worm_argh_collision_in_moves(&worms[0], 0, 5)){
             hit_count ++;
         }
-        rb->snprintf(buf, sizeof buf, "in 5 moves hits: %d", hit_count);
-        rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
+        rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "in 5 moves hits: %d", hit_count);
         rb->lcd_update();
     }
     if (hit_count != argh_size + 5) {
