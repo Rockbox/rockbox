@@ -894,6 +894,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
 };
 
 /* plugin header */
