@@ -851,7 +851,7 @@ static fixed ICODE_ATTR vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos
     return exactpos;
 }
 
-
+#ifndef SIMULATOR
 /* Calculate the period of the note in the
      buffer using the YIN algorithm */
 /* The yin pointer is just a buffer that the algorithm uses as a work
@@ -918,7 +918,6 @@ static uint32_t ICODE_ATTR buffer_magnitude(int16_t *input)
 }
 
 /* Stop the recording when the buffer is full */
-#ifndef SIMULATOR
 static void recording_callback(int status, void **start, size_t *size)
 {
     int tail = audio_tail ^ 1;
@@ -933,7 +932,7 @@ static void recording_callback(int status, void **start, size_t *size)
 
     (void)status;
 }
-#endif
+#endif /* SIMULATOR */
 
 /* Start recording */
 static void record_data(void)
