@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "string.h"
+#include <stdio.h>
 #include <stdbool.h>
 #include "button.h"
 #include "lcd.h"

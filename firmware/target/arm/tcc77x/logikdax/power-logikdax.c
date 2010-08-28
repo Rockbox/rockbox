@@ -31,6 +31,7 @@ void power_init(void)
 
 void ide_power_enable(bool on)
 {
+    (void)on;
 }
 
 bool ide_powered(void)

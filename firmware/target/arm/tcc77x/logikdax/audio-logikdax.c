@@ -26,6 +26,7 @@
 int audio_channels = 2;
 int audio_output_source = AUDIO_SRC_PLAYBACK;
 
+#if INPUT_SRC_CAPS != 0
 void audio_set_output_source(int source)
 {
     (void)source;
@@ -36,3 +37,4 @@ void audio_input_mux(int source, unsigned flags)
     (void)source;
     (void)flags;
 }
+#endif

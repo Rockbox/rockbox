@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "backlight-target.h"
 
 #include "pcf50606.h"
 

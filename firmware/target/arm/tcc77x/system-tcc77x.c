@@ -272,7 +272,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mov     r0, #0xa5              \n\t"
 #elif defined(IAUDIO_7) || defined(SANSA_M200) 
         "mov     r0, #0xa7              \n\t"
-#elif
+#else
     #error NOT DEFINED FOR THIS TARGET!
 #endif
         "mcr     p15, 0, r0, c2, c0, 0  \n\t"

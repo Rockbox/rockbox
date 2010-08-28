@@ -193,7 +193,7 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     return NULL;
 }
 
-const char* get_filename_token(struct wps_token *token, char* filename,
+static const char* get_filename_token(struct wps_token *token, char* filename,
                                char *buf, int buf_size)
 {
     if (filename)

@@ -88,6 +88,8 @@
 #define HAVE_WM8731
 /* Codec is slave on serial bus */
 #define CODEC_SLAVE
+/* WM8731 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
