@@ -152,7 +152,6 @@ static void timer_isr(void)
 
 int plugin_main(void)
 {
-    unsigned char buf[32];
     int button;
     bool done = false;
     bool change = true;
@@ -186,9 +185,8 @@ int plugin_main(void)
         {
             /* The actual frequency is twice the displayed value */
             rb->timer_set_period(TIMER_FREQ * 5 / scan_rate);
-            rb->snprintf(buf, sizeof(buf), "f: %d.%d Hz", scan_rate / 10,
+            rb->lcd_putsxyf(TEXT_X, TEXT_Y, "f: %d.%d Hz", scan_rate / 10,
                          scan_rate % 10);
-            rb->lcd_putsxy(TEXT_X, TEXT_Y, buf);
             need_refresh = true;
             change = false;
         }

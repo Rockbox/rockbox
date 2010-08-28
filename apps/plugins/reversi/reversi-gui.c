@@ -613,7 +613,6 @@ enum plugin_status plugin_start(const void *parameter) {
     int lastbutton = BUTTON_NONE;
     int row, col;
     int w_cnt, b_cnt;
-    char msg_buf[30];
     
     /* Initialize Font Width and height */
     rb->lcd_getstringsize("0", &font_width, &font_height);
@@ -671,10 +670,8 @@ enum plugin_status plugin_start(const void *parameter) {
             /* TODO: Don't duplicate end of game check */
             if (reversi_game_is_finished(&game, cur_player)) {
                 reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
-                rb->snprintf(msg_buf, sizeof(msg_buf),
-                        "Game over. %s won.",
+                rb->splashf(HZ*2, "Game over. %s won.",
                         (w_cnt>b_cnt?"WHITE":"BLACK"));
-                rb->splash(HZ*2, msg_buf);
                 draw_screen = true; /* Must update screen after splash */
                 game_finished = true;
             }
@@ -743,10 +740,8 @@ enum plugin_status plugin_start(const void *parameter) {
                     cur_player = reversi_flipped_color(cur_player);
                     if (reversi_game_is_finished(&game, cur_player)) {
                         reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
-                        rb->snprintf(msg_buf, sizeof(msg_buf),
-                                "Game over. %s won.",
+                        rb->splashf(HZ*2, "Game over. %s won.",
                                 (w_cnt>b_cnt?"WHITE":"BLACK"));
-                        rb->splash(HZ*2, msg_buf);
                         draw_screen = true; /* Must update screen after splash */
                         game_finished = true;
                     }

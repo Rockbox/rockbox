@@ -171,7 +171,7 @@ static void build_slot_path(char *buf, size_t bufsiz, int slot_id) {
  *
  */
 static bool do_file(char *path, char *desc, bool is_load) {
-    char buf[200], desc_buf[20];
+    char desc_buf[20];
     int fd, file_mode;
     
     /* set file mode */
@@ -191,8 +191,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
         loadstate(fd);
     
         /* print out a status message so the user knows the state loaded */
-        snprintf(buf, 200, "Loaded state from \"%s\"", path);
-        rb->splash(HZ * 1, buf);
+        rb->splashf(HZ * 1, "Loaded state from \"%s\"", path);
     }
     else
     {

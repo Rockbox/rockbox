@@ -759,7 +759,6 @@ static void star_transition_update(void)
 static void star_display_board_info(int current_level)
 {
     int label_pos_y, tile_pos_y;
-    char str_info[32];
 
     if (TILE_HEIGHT > char_height)
     {
@@ -772,10 +771,9 @@ static void star_display_board_info(int current_level)
         tile_pos_y = label_pos_y + (char_height - TILE_HEIGHT) / 2;
     }
 
-    rb->snprintf(str_info, sizeof(str_info), "L:%02d", current_level + 1);
-    rb->lcd_putsxy(STAR_OFFSET_X, label_pos_y, str_info);
-    rb->snprintf(str_info, sizeof(str_info), "S:%02d", star_count);
-    rb->lcd_putsxy(LCD_WIDTH/2 - 2 * char_width, label_pos_y, str_info);
+    rb->lcd_putsxyf(STAR_OFFSET_X, label_pos_y, "L:%02d", current_level + 1);
+    rb->lcd_putsxyf(LCD_WIDTH/2 - 2 * char_width, label_pos_y, "S:%02d",
+                  star_count);
     rb->lcd_putsxy(STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH - 2 * char_width,
                    label_pos_y, "C:");
 

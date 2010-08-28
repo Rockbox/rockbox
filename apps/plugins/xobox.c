@@ -549,7 +549,7 @@ static int percentage (void)
 static void refresh_board (void)
 {
     int i, j;
-    char str[25];
+    int x;
 
 #if LCD_DEPTH>=2
     rb->lcd_set_background (LCD_BLACK);
@@ -590,21 +590,18 @@ static void refresh_board (void)
 #else
     rb->lcd_set_drawmode (DRMODE_COMPLEMENT);
 #endif
-    rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
-    rb->lcd_putsxy (BOARD_X, BOARD_Y, str);
-    rb->snprintf (str, sizeof (str), "%d%%", percentage_cache);
-    rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, str);
-    rb->snprintf (str, sizeof (str), "Score: %d", player.score);
-    rb->lcd_putsxy (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
-    rb->snprintf (str, sizeof (str),
-                 (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
+    rb->lcd_putsxyf (BOARD_X, BOARD_Y, "Level %d", player.level + 1);
+    rb->lcd_putsxyf (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, "%d%%",
+                     percentage_cache);
+    rb->lcd_putsxyf (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, "Score: %d",
+                    player.score);
 #if LCD_DEPTH>=2
-    rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 60,
-                    BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
+    x = BOARD_X + CUBE_SIZE * BOARD_W - 60;
 #else
-    rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 40,
-                    BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
+    x = BOARD_X + CUBE_SIZE * BOARD_W - 40;
 #endif
+    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8, 
+                 (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
 
 #if LCD_DEPTH>=2
     rb->lcd_set_foreground (PLR_COL);

@@ -629,8 +629,7 @@ static void jewels_drawboard(struct game_context* bj) {
 #endif
     
     /* print text */
-    rb->snprintf(str, 10, "%s %d", title, bj->level);
-    rb->lcd_putsxy(1, LCD_HEIGHT-10, str);
+    rb->lcd_putsxyf(1, LCD_HEIGHT-10, "%s %d", title, bj->level);
     
     if (bj->type == GAME_TYPE_NORMAL) {
         rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
@@ -671,8 +670,8 @@ static void jewels_drawboard(struct game_context* bj) {
 #endif
 
     /* print text */
-    rb->snprintf(str, 10, "%s %d", title, bj->level);
-    rb->lcd_putsxy(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
+    rb->lcd_putsxyf(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3,"%s %d",
+                   title, bj->level);
     
     if (bj->type == GAME_TYPE_NORMAL) {
         rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);

@@ -174,7 +174,7 @@ static void draw_piece(int x, int y, int w, int h, int color_id, bool emph) {
 
     if (settings.labeling && color_id >= 0) {
         char text[2];
-        rb->snprintf(text, 2, "%d", color_id);
+        rb->snprintf(text, sizeof(text), "%d", color_id);
 
         int fw, fh; rb->font_getstringsize(text, &fw, &fh, FONT_SYSFIXED);
         rb->lcd_putsxy(x + get_margin(fw, w), y + get_margin(fh, h), text);

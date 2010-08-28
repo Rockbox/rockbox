@@ -408,23 +408,19 @@ static void clix_draw_cell(struct clix_game_state_t* state, const int x, const i
 static void clix_draw(struct clix_game_state_t* state)
 {
     int i,j;
-    char str[30];
 
     /* Clear screen */
     rb->lcd_clear_display();
     rb->lcd_set_foreground( LCD_WHITE);
 
     rb->lcd_putsxy( MARGIN, MARGIN, "Score:");
-    rb->snprintf( str, sizeof(str), "%d", state->score);
-    rb->lcd_putsxy( 43, MARGIN, str);
+    rb->lcd_putsxyf( 43, MARGIN, "%d", state->score);
 #if LCD_WIDTH <= 100
     rb->lcd_putsxy( 75, MARGIN, "L:");
-    rb->snprintf( str, sizeof(str), "%d", state->level);
-    rb->lcd_putsxy( 90, MARGIN, str);
+    rb->lcd_putsxyf( 90, MARGIN, "%d", state->level);
 #else
     rb->lcd_putsxy( 75, MARGIN, "Level:");
-    rb->snprintf( str, sizeof(str), "%d", state->level);
-    rb->lcd_putsxy( 113, MARGIN, str);
+    rb->lcd_putsxyf( 113, MARGIN, "%d", state->level);
 #endif
     for( i = 0; i < BOARD_WIDTH; ++i)
     {

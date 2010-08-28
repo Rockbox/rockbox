@@ -977,8 +977,6 @@ static unsigned int color_chooser( unsigned int color )
     enum BaseColor current = Red;
     bool has_changed;
 
-    char str[6] = "";
-
     restore_screen();
 
     rgb2hsv( red, green, blue, &hue, &saturation, &value );
@@ -1028,18 +1026,14 @@ static unsigned int color_chooser( unsigned int color )
 #undef POSITION
         rb->lcd_set_background(COLOR_LIGHTGRAY);
         rb->lcd_setfont( FONT_SYSFIXED );
-        rb->snprintf( str, 6, "%d", hue/10 );
-        rb->lcd_putsxy( left + 117, top + 20, str );
-        rb->snprintf( str, 6, "%d.%d", saturation/255, ((saturation*100)/255)%100 );
-        rb->lcd_putsxy( left + 117, top + 30, str );
-        rb->snprintf( str, 6, "%d.%d", value/255, ((value*100)/255)%100 );
-        rb->lcd_putsxy( left + 117, top + 40, str );
-        rb->snprintf( str, 6, "%d", red );
-        rb->lcd_putsxy( left + 117, top + 50, str );
-        rb->snprintf( str, 6, "%d", green );
-        rb->lcd_putsxy( left + 117, top + 60, str );
-        rb->snprintf( str, 6, "%d", blue );
-        rb->lcd_putsxy( left + 117, top + 70, str );
+        rb->lcd_putsxyf( left + 117, top + 20, "%d", hue/10 );
+        rb->lcd_putsxyf( left + 117, top + 30, "%d.%d",
+                saturation/255, ((saturation*100)/255)%100 );
+        rb->lcd_putsxyf( left + 117, top + 40, "%d.%d",
+                value/255, ((value*100)/255)%100 );
+        rb->lcd_putsxyf( left + 117, top + 50, "%d", red );
+        rb->lcd_putsxyf( left + 117, top + 60, "%d", green );
+        rb->lcd_putsxyf( left + 117, top + 70, "%d", blue );
         rb->lcd_setfont( FONT_UI );
 
 #define CURSOR( l ) \

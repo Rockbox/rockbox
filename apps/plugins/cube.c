@@ -701,10 +701,9 @@ enum plugin_status plugin_start(const void* parameter)
             if (t_disp == DISP_TIME)
             {
                 rb->lcd_puts(5, 0, axes[curr].label);
-                rb->snprintf(buffer, sizeof(buffer), "%d %c",
+                rb->lcd_putsf(5, 1, "%d %c",
                              paused ? axes[curr].angle : axes[curr].speed,
                              highspeed ? 'H' : ' ');
-                rb->lcd_puts(5, 1, buffer);
             }
             t_disp--;
             if (t_disp == 0)

@@ -260,18 +260,14 @@ static struct configdata config[] = {
 
 static void snake_die (void)
 {
-    char pscore[17];
     rb->lcd_clear_display();
-    rb->snprintf(pscore,sizeof(pscore),"Your score: %d",score);
     rb->lcd_puts(0,0,"Oops...");
-    rb->lcd_puts(0,1, pscore);
+    rb->lcd_putsf(0,1,"Your score: %d",score);
     if (highscore_update(score, level, "", highscores, NUM_SCORES) == 0) {
         rb->lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->snprintf(pscore, sizeof(pscore),
-                    "High Score: %d", highscores[0].score);
-        rb->lcd_puts(0,2,pscore);
+        rb->lcd_putsf(0,2,"High Score: %d", highscores[0].score);
     }
     rb->lcd_update();
     rb->sleep(3*HZ);

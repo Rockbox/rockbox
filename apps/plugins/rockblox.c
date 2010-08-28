@@ -810,25 +810,18 @@ static void init_board (void)
 /* show the score, level and lines */
 static void show_details (void)
 {
-    char str[25];               /* for strings */
-
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (LCD_WHITE);
 #endif
-    rb->snprintf (str, sizeof (str), "%d", rockblox_status.score);
-    rb->lcd_putsxy (LABEL_X, SCORE_Y, str);
-    rb->snprintf (str, sizeof (str), "%d", rockblox_status.level);
-    rb->lcd_putsxy (LEVEL_X, LEVEL_Y, str);
-    rb->snprintf (str, sizeof (str), "%d", rockblox_status.lines);
-    rb->lcd_putsxy (LINES_X, LINES_Y, str);
+    rb->lcd_putsxyf (LABEL_X, SCORE_Y, "%d", rockblox_status.score);
+    rb->lcd_putsxyf (LEVEL_X, LEVEL_Y, "%d", rockblox_status.level);
+    rb->lcd_putsxyf (LINES_X, LINES_Y, "%d", rockblox_status.lines);
 #else  /* HAVE_LCD_CHARCELLS */
-    rb->snprintf (str, sizeof (str), "L%d/%d", rockblox_status.level,
+    rb->lcd_putsf (5, 0, "L%d/%d", rockblox_status.level,
             rockblox_status.lines);
-    rb->lcd_puts (5, 0, str);
-    rb->snprintf (str, sizeof (str), "S%d", rockblox_status.score);
-    rb->lcd_puts (5, 1, str);
+    rb->lcd_putsf (5, 1, "S%d", rockblox_status.score);
 #endif
 }
 
@@ -836,14 +829,10 @@ static void show_details (void)
 static void show_highscores (void)
 {
     int i;
-    char str[25];               /* for strings */
 
     for (i = 0; i<NUM_SCORES; i++)
-    {
-        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d",
-                      highscores[i].score, highscores[i].level);
-        rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i), str);
-    }
+        rb->lcd_putsxyf (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i),
+            "%06d" _SPACE "L%1d", highscores[i].score, highscores[i].level);
 }
 #endif
 

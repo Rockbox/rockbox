@@ -582,7 +582,6 @@ static int loopit(void)
 
     int show=0;
     int timeout=0;
-    char buffer[30];
 
     rb->lcd_clear_display();
     while(1)
@@ -628,9 +627,8 @@ static int loopit(void)
                       show=NUM_LAST-1;
                   break;
             }
-            rb->snprintf(buffer, 30, "%s: %d",
+            rb->lcd_putsxyf(0, LCD_HEIGHT -  8, "%s: %d",
                          values[show].what, values[show].num);
-            rb->lcd_putsxy(0, LCD_HEIGHT -  8, (unsigned char *)buffer);
             timeout--;
         }
         for(i=0, yy=y, xx=x;

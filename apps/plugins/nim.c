@@ -56,7 +56,6 @@ static unsigned char pattern3[]={0x15, 0x15, 0x15, 0x15, 0x15, 0x15, 0x15}; /*3 
 static unsigned char pattern2[]={0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14}; /*2 parts*/
 static unsigned char pattern1[]={0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10}; /*1 part*/
 
-static unsigned char str[12];   /*String use to display the first line*/
 static unsigned long hsmile,hcry,h1,h2; /*Handle for the new pattern*/
 
 static bool end;    /*If true game is finished*/
@@ -101,8 +100,7 @@ static void display_first_line(int x)
 {
     int i;
 
-    rb->snprintf(str,sizeof(str),"       =%d",x);
-    rb->lcd_puts(0,0,str);
+    rb->lcd_putsf(0,0,"       =%d",x);
 
     rb->lcd_define_pattern(h1,pattern3);
     for (i=0;i<x/3;i++)
@@ -179,8 +177,7 @@ enum plugin_status plugin_start(const void* parameter)
                 y=1;
                 display_first_line(x);
 
-                rb->snprintf(str,sizeof(str),"[%d..%d]?=%d",min,v,y);
-                rb->lcd_puts(0,1,str);
+                rb->lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
                 rb->lcd_update();
 
                 go=false;
@@ -215,8 +212,7 @@ enum plugin_status plugin_start(const void* parameter)
                             break;
                     }
                     display_first_line(x);
-                    rb->snprintf(str,sizeof(str),"[%d..%d]?=%d",min,v,y);
-                    rb->lcd_puts(0,1,str);
+                    rb->lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
                     rb->lcd_update();
                 }
 
@@ -276,8 +272,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 v=y*2;
                 x-=y;
-                rb->snprintf(str,sizeof(str),"I take=%d",y);
-                rb->lcd_puts(0,1,str);
+                rb->lcd_putsf(0,1,"I take=%d",y);
                 rb->lcd_update();
                 rb->sleep(HZ);
             }

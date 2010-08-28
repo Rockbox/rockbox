@@ -90,7 +90,6 @@ unsigned char grid_b[GRID_W][GRID_H];
 int generation = 0;
 int population = 0;
 int status_line = 0;
-char buf[30];
 
 
 static inline bool is_valid_cell(int x, int y) {
@@ -308,11 +307,10 @@ static void show_grid(char *pgrid){
         }
     }
     if(status_line){
-        rb->snprintf(buf, sizeof(buf), "g:%d p:%d", generation, population);
 #if LCD_DEPTH > 1
         rb->lcd_set_foreground( LCD_BLACK );
 #endif
-        rb->lcd_puts(0, 0, buf);
+        rb->lcd_putsf(0, 0, "g:%d p:%d", generation, population);
     }
     rb->lcd_update();
 }

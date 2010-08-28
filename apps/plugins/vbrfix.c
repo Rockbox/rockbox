@@ -29,10 +29,7 @@ char tmpname[MAX_PATH];
 
 static void xingupdate(int percent)
 {
-    char buf[32];
-
-    rb->snprintf(buf, 32, "%d%%", percent);
-    rb->lcd_puts(0, 1, buf);
+    rb->lcd_putsf(0, 1, "%d%%", percent);
     rb->lcd_update();
 }
 

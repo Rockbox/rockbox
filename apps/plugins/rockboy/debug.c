@@ -571,7 +571,7 @@ void debug_disassemble(addr a, int c)
     static int opaddr;
     static char mnemonic[256];
     static char *pattern;
-    char meow[500],buf[300];
+    char ops_str[300];
     if(!debug_trace) return;
 
     while (c > 0)
@@ -600,8 +600,7 @@ void debug_disassemble(addr a, int c)
                 case 'B':
                 case 'b':
                     ops[k] = readb(a); a++;
-                    j += snprintf(mnemonic + j,255-j,
-                        "%02Xh", ops[k++]);
+                    j += snprintf(mnemonic + j,255-j, "%02Xh", ops[k++]);
                     break;
                 case 'W':
                 case 'w':
@@ -614,8 +613,7 @@ void debug_disassemble(addr a, int c)
                 case 'O':
                 case 'o':
                     ops[k] = readb(a); a++;
-                    j += snprintf(mnemonic + j, 255-j,"%+d",
-                        (n8)(ops[k++]));
+                    j += snprintf(mnemonic + j, 255-j,"%+d", (n8)(ops[k++]));
                     break;
                 }
                 i++;
@@ -626,52 +624,19 @@ void debug_disassemble(addr a, int c)
             }
         }
         mnemonic[j] = 0;
-        snprintf(buf,299,"%04X ", opaddr);
-        strcpy(meow,buf);
         switch (operand_count[ops[0]]) {
         case 1:
-            snprintf(buf,299,"%02X       ", ops[0]);
-            strcat(meow,buf);
+            snprintf(ops_str,sizeof(ops_str),"%02X      ", ops[0]);
             break;
         case 2:
-            snprintf(buf,299,"%02X %02X    ", ops[0], ops[1]);
-            strcat(meow,buf);
+            snprintf(ops_str,sizeof(ops_str),"%02X %02X   ", ops[0], ops[1]);
             break;
         case 3:
-            snprintf(buf,299,"%02X %02X %02X ", ops[0], ops[1], ops[2]);
-            strcat(meow,buf);
+            snprintf(ops_str,sizeof(ops_str),"%02X %02X %02X", ops[0], ops[1], ops[2]);
             break;
         }
-        snprintf(buf,"%-16.16s", mnemonic);
-        strcat(meow,buf);
-                rb->lcd_putsxy(0,0,meow);
+        rb->lcd_putsxyf(0,0,"%04X %s %-16.16s", opaddr, ops_str, mnemonic);
         rb->lcd_update();        
         c--;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

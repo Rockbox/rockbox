@@ -109,7 +109,6 @@ static int readwavpeaks(const char *filename)
 
     int file;
     uint32_t total_bytes_read = 0;
-    char tstr[128];
     int hours;
     int minutes;
     int seconds;
@@ -156,25 +155,20 @@ static int readwavpeaks(const char *filename)
     rb->lcd_puts_scroll(0, 1, (unsigned char *)filename);
     rb->lcd_update();
 
-    rb->snprintf(tstr,127, "Channels: %s",
+    rb->lcd_putsf(0, 2, "Channels: %s",
                            header.numchannels == 1 ? "mono" : "stereo");
-    rb->lcd_puts(0, 2, tstr);
-
-    rb->snprintf(tstr,127, "Bits/sample: %d", header.bitspersample);
-    rb->lcd_puts(0, 3, tstr);
-
-    rb->snprintf(tstr,127, "Samplerate: %d Hz", (int)(header.samplerate));
-    rb->lcd_puts(0, 4, tstr);
+    rb->lcd_putsf(0, 3, "Bits/sample: %d", header.bitspersample);
+    rb->lcd_putsf(0, 4, "Samplerate: %"PRIu32" Hz", header.samplerate);
 
     seconds = header.datachunksize / header.byterate;
     hours = seconds / 3600;
     seconds -= hours * 3600;
     minutes = seconds / 60;
     seconds -= minutes * 60;
-    rb->snprintf(tstr,127, "Length (hh:mm:ss): %02d:%02d:%02d", hours,
-                                                                minutes,
-                                                                seconds);
-    rb->lcd_puts(0, 5, tstr);
+
+    rb->lcd_putsf(0, 5, "Length (hh:mm:ss): %02d:%02d:%02d", hours,
+                                                             minutes,
+                                                             seconds);
     rb->lcd_puts(0, 6, "Searching for peaks... ");
     rb->lcd_update();
 
@@ -246,10 +240,9 @@ static int readwavpeaks(const char *filename)
         }
 
         /* update progress */
-        rb->snprintf(tstr,127, "Searching for peaks... %d%%",(int)
+        rb->lcd_putsf(0, 6, "Searching for peaks... %"PRIu32"%%",
             (total_bytes_read / ((header.datachunksize +
                                  sizeof(struct wav_header)) / 100)));
-        rb->lcd_puts(0, 6, tstr);
         rb->lcd_update();
 
         /* allow user to abort */

@@ -1826,7 +1826,6 @@ static int spacerocks_menu(void)
 
 static int spacerocks_game_loop(void)
 {
-    char str[20];
     int button;
     int end;
     int position;
@@ -1861,8 +1860,7 @@ static int spacerocks_game_loop(void)
                 break;
 
             case PAUSE_MODE:
-                rb->snprintf(str, sizeof(str), "score %d ", current_score);
-                rb->lcd_putsxy(1,LCD_HEIGHT-8, str);
+                rb->lcd_putsxyf(1,LCD_HEIGHT-8, "score %d ", current_score);
                 rb->lcd_putsxy(CENTER_LCD_X - 15,
                                CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, "pause");
                 draw_and_move_missiles();
@@ -1871,8 +1869,7 @@ static int spacerocks_game_loop(void)
                 break;
 
             case PLAY_MODE:
-                rb->snprintf(str, sizeof(str), "score %d ", current_score);
-                rb->lcd_putsxy(1, LCD_HEIGHT-8, str);
+                rb->lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
                 draw_and_move_missiles();
                 draw_lives();
                 check_collisions();
@@ -1880,11 +1877,10 @@ static int spacerocks_game_loop(void)
                 break;
 
             case SHOW_LEVEL:
-                rb->snprintf(str, sizeof(str), "score %d ", current_score);
-                rb->lcd_putsxy(1, LCD_HEIGHT-8, str);
-                rb->snprintf(str, sizeof(str), "stage %d ", current_level);
-                rb->lcd_putsxy(CENTER_LCD_X - 20,
-                               CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, str);
+                rb->lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
+                rb->lcd_putsxyf(CENTER_LCD_X - 20,
+                               CENTER_LCD_Y + CENTER_LCD_Y/2 - 4,
+                               "stage %d ", current_level);
                 draw_lives();
                 draw_and_move_ship();
                 show_level_timeout--;

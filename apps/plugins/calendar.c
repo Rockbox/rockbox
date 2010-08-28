@@ -451,7 +451,6 @@ static void draw_calendar(struct shown *shown)
     int w, h;
     int x, y, pos, days_per_month, j;
     int wday;
-    char buffer[12];
     const char *monthname[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -472,10 +471,6 @@ static void draw_calendar(struct shown *shown)
     y = Y_OFFSET + h;
     for (j = 1; j <= days_per_month; j++)
     {
-        if ( (day_has_memo[j]) || (wday_has_memo[wday]) )
-            rb->snprintf(buffer, 4, "%02d.", j);
-        else
-            rb->snprintf(buffer, 4, "%02d", j);
         if (shown->mday == j)
         {
             rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -487,7 +482,10 @@ static void draw_calendar(struct shown *shown)
         {
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
-        rb->lcd_putsxy(x, y, buffer);
+        if ( (day_has_memo[j]) || (wday_has_memo[wday]) )
+            rb->lcd_putsxyf(x, y, "%02d.", j);
+        else
+            rb->lcd_putsxyf(x, y, "%02d", j);
         x += CELL_WIDTH;
         wday++;
         if (wday >= 7)
@@ -504,9 +502,8 @@ static void draw_calendar(struct shown *shown)
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_vline(LCD_WIDTH-w*8-10, LCD_HEIGHT-h-3, LCD_HEIGHT-1);
     rb->lcd_hline(LCD_WIDTH-w*8-10, LCD_WIDTH-1, LCD_HEIGHT-h-3);
-    rb->snprintf(buffer, sizeof(buffer), "%s %04d",
+    rb->lcd_putsxyf(LCD_WIDTH-w*8-8, LCD_HEIGHT-h-1, "%s %04d",
                  monthname[shown->mon-1], shown->year);
-    rb->lcd_putsxy(LCD_WIDTH-w*8-8, LCD_HEIGHT-h-1, buffer);
     rb->lcd_update();
 }
 

@@ -559,7 +559,6 @@ static void DoUserDialog(char* filename)
 {
     tImageHeader ImageHeader;
     tFlashInfo FlashInfo;
-    static char buf[MAX_PATH];
     int button;
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
@@ -612,8 +611,7 @@ static void DoUserDialog(char* filename)
     bl_version = BootloaderVersion();
     if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
-        rb->snprintf(buf, sizeof(buf), "Bootloader V%d", bl_version);
-        rb->lcd_puts(0, 0, buf);
+        rb->lcd_putsf(0, 0, "Bootloader V%d", bl_version);
         rb->lcd_puts(0, 1, "Hint: You're not  ");
         rb->lcd_puts(0, 2, "using the latest  ");
         rb->lcd_puts(0, 3, "bootloader.       ");
@@ -722,10 +720,9 @@ static void DoUserDialog(char* filename)
     if (rc)
     {   /* errors */
         rb->lcd_clear_display();
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 0, "Error:");
         rb->lcd_puts(0, 1, "Programming fail!");
-        rb->lcd_puts(0, 2, buf);
+        rb->lcd_putsf(0, 2, "%d errors", rc);
         rb->lcd_update();
         button = WaitForButton();
     }
@@ -743,10 +740,9 @@ static void DoUserDialog(char* filename)
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 0, "Error:");
         rb->lcd_puts(0, 1, "Verify fail!");
-        rb->lcd_puts(0, 2, buf);
+        rb->lcd_putsf(0, 2, "%d errors", rc);
         rb->lcd_puts(0, 3, "Use safe image");
         rb->lcd_puts(0, 4, "if booting hangs:");
         rb->lcd_puts(0, 5, "F1 during power-on");

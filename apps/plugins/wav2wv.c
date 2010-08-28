@@ -58,7 +58,6 @@ static void wvupdate (int32_t start_tick,
 {
     int32_t elapsed_ticks = *rb->current_tick - start_tick;
     int compression = 0, progress = 0, realtime = 0;
-    char buf[32];
 
     if (total_samples)
         progress = (int)(((int64_t) samples_converted * 100 +
@@ -72,18 +71,11 @@ static void wvupdate (int32_t start_tick,
         compression = (int)(((int64_t)(bytes_read - bytes_written) * 100 +
             (bytes_read/2)) / bytes_read);
 
-    rb->snprintf(buf, 32, "elapsed time: %ld secs",
+    rb->lcd_putsf(0, 2, "elapsed time: %ld secs",
                  (long)(elapsed_ticks + (HZ/2)) / HZ);
-    rb->lcd_puts(0, 2, (unsigned char *)buf);
-
-    rb->snprintf(buf, 32, "progress: %d%%", progress);
-    rb->lcd_puts(0, 4, (unsigned char *)buf);
-
-    rb->snprintf(buf, 32, "realtime: %d%%  ", realtime);
-    rb->lcd_puts(0, 6, (unsigned char *)buf);
-
-    rb->snprintf(buf, 32, "compression: %d%%  ", compression);
-    rb->lcd_puts(0, 8, (unsigned char *)buf);
+    rb->lcd_putsf(0, 4, "progress: %d%%", progress);
+    rb->lcd_putsf(0, 6, "realtime: %d%%  ", realtime);
+    rb->lcd_putsf(0, 8, "compression: %d%%  ", compression);
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();

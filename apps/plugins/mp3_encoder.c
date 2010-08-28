@@ -2137,15 +2137,13 @@ void set_scale_facs(int *mdct_freq)
 void compress(void)
 {
   int      i, gr, gr_cnt;
-  char     stg[20];
   uint32_t max;
 
   while(1)
   {
     if((frames & 7) == 0)
     { rb->lcd_clear_display();
-      rb->snprintf(stg, 20, "Frame %d / %d", frames, wav_size/SAMPL2/8);
-      rb->lcd_putsxy(4, 20, stg);
+      rb->lcd_putsxyf(4, 20, "Frame %d / %d", frames, wav_size/SAMPL2/8);
       rb->lcd_update();
     }
     /* encode one mp3 frame in this loop */
@@ -2496,7 +2494,6 @@ enum plugin_status plugin_start(const void* parameter)
     int   rat, srat, nrat; /* for rate selection */
     int   cont = 1, butt;
     long  tim  = 0;
-    char  stg[40];
     static const char* bstrg[] = {
         "64", "80", "96", "112", "128", "160", "192", "224", "256", "320"
     };
@@ -2568,18 +2565,15 @@ enum plugin_status plugin_start(const void* parameter)
         else
         {
             rb->close(wavfile);
-            rb->snprintf(stg, 20, "WaveOpen failed %d", wave_open());
-            rb->lcd_putsxy(0, 20, stg);
+            rb->lcd_putsxyf(0, 20, "WaveOpen failed %d", wave_open());
             rb->lcd_update();
             rb->sleep(5*HZ);
         }
 
         rb->lcd_clear_display();
-        rb->snprintf(stg, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
-        rb->lcd_putsxy(0, 30, stg);
+        rb->lcd_putsxyf(0, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
         tim = frames * SAMP_PER_FRAME * 100 / 44100; /* unit=.01s */
-        rb->snprintf(stg, 30, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
-        rb->lcd_putsxy(0, 20, stg);
+        rb->lcd_putsxyf(0, 20, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
         rb->lcd_update();
         rb->sleep(5*HZ);
     }

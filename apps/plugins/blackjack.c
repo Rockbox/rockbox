@@ -946,7 +946,6 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
                                        signed int upper_limit,
                                        signed int start) {
     int button;
-    char str[9];
     bool breakout = false, changed = false;
     unsigned int w, h;
     signed int amount;
@@ -968,8 +967,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
 #if LCD_HEIGHT <= 64
     rb->lcd_clear_display();
     rb->lcd_puts(0, 1, message);
-    rb->snprintf(str, 9, "$%d", amount);
-    rb->lcd_puts(0, 2, str);
+    rb->lcd_putsf(0, 2, "$%d", amount);
     rb->lcd_puts(0, 3, "RIGHT: +1");
     rb->lcd_puts(0, 4, "LEFT:  -1");
     rb->lcd_puts(0, 5, "UP:   +10");
@@ -983,8 +981,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
     rb->lcd_drawrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
                      37*w / 2, 8*h -3);
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 4*h - 1, message);
-    rb->snprintf(str, 9, "$%d", amount);
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, str);
+    rb->lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
@@ -1063,15 +1060,14 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
         }
 
         if(changed) {
-            rb->snprintf(str, 9, "$%d", amount);
 #if LCD_HEIGHT <= 64
-            rb->lcd_puts(0, 2, str);
+            rb->lcd_putsf(0, 2, "$%d", amount);
             rb->lcd_update();
 #else
             rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
             rb->lcd_fillrect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, str);
+            rb->lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
             rb->lcd_update_rect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
 #endif
             changed = false;

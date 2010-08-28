@@ -556,8 +556,6 @@ int WaitForButton(void)
 /* helper for DoUserDialog() */
 void ShowFlashInfo(tFlashInfo* pInfo)
 {
-    char buf[32];
-    
     if (!pInfo->manufacturer)
     {
         rb->lcd_puts(0, 0, "Flash: M=?? D=??");
@@ -565,16 +563,14 @@ void ShowFlashInfo(tFlashInfo* pInfo)
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "Flash: M=%02x D=%02x",
+        rb->lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
             pInfo->manufacturer, pInfo->id);
-        rb->lcd_puts(0, 0, buf);
         
         
         if (pInfo->size)
         {
             rb->lcd_puts(0, 1, pInfo->name);
-            rb->snprintf(buf, sizeof(buf), "Size: %d KB", pInfo->size / 1024);
-            rb->lcd_puts(0, 2, buf);
+            rb->lcd_puts(0, 2, "Size: %d KB", pInfo->size / 1024);
         }
         else
         {
@@ -591,7 +587,6 @@ void ShowFlashInfo(tFlashInfo* pInfo)
 void DoUserDialog(char* filename)
 {
     tFlashInfo FlashInfo;
-    char buf[32];
     char default_filename[32];
     int button;
     int rc; /* generic return code */
@@ -761,8 +756,7 @@ void DoUserDialog(char* filename)
         rb->lcd_clear_display();
         rb->lcd_puts(0, 0, "Panic:");
         rb->lcd_puts(0, 1, "Programming fail!");
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
-        rb->lcd_puts(0, 2, buf);
+        rb->lcd_putsf(0, 2, "%d errors", rc);
         rb->lcd_update();
         button = WaitForButton();
     }
@@ -782,8 +776,7 @@ void DoUserDialog(char* filename)
     {
         rb->lcd_puts(0, 0, "Panic:");
         rb->lcd_puts(0, 1, "Verify fail!");
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
-        rb->lcd_puts(0, 2, buf);
+        rb->lcd_putsf(0, 2, "%d errors", rc);
     }
     rb->lcd_puts(0, 7, "Any key to exit");
     rb->lcd_update();

@@ -496,11 +496,8 @@ static void draw_cursor(void)
 /* draw the info panel ... duh */
 static void draw_info_panel(void)
 {
-    char s[16];
-    
     rb->lcd_puts( 6, 0, "Flips" );
-    rb->snprintf( s, sizeof(s), "%d", moves );
-    rb->lcd_puts( 6, 1, s );
+    rb->lcd_putsf( 6, 1, "%d", moves );
 }
 
 #endif /* LCD */

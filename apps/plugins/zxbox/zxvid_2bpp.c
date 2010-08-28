@@ -41,8 +41,6 @@ void init_spect_scr(void)
 }
 void update_screen(void)
 {
-    char str[80];
-
     fb_data *frameb;
     int y=0;
     int x=0;
@@ -106,8 +104,7 @@ void update_screen(void)
         int TPF = HZ/50;/* ticks per frame */
         if ((*rb->current_tick-start_time) > TPF )
             percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
-        rb->snprintf(str,sizeof(str),"%d %%",percent);
-        rb->lcd_putsxy(0,0,str);
+        rb->lcd_putsxyf(0,0,"%d %%",percent);
     }
 
 

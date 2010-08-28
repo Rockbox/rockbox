@@ -465,7 +465,6 @@ void save_settings(void) {
 }
 
 void change_volume(int delta) {
-    char curr_vol[5];
     int minvol = rb->sound_min(SOUND_VOLUME);
     int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
@@ -475,8 +474,7 @@ void change_volume(int delta) {
     if (vol != rb->global_settings->volume) {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
-        rb->snprintf(curr_vol, sizeof(curr_vol), "%d", vol);
-        rb->lcd_putsxy(0,0, curr_vol);
+        rb->lcd_putsxyf(0,0, "%d", vol);
         rb->lcd_update();
         rb->sleep(HZ/12);
     }

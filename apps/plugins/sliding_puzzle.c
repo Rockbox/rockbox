@@ -489,8 +489,7 @@ static void move_spot(int x, int y)
                    moves_y, s);
 #else
     (void)w;
-    rb->snprintf(s, sizeof(s), "Moves: %d", moves);
-    rb->lcd_putsxy(3, moves_y, s);
+    rb->lcd_putsxyf(3, moves_y, "Moves: %d", moves);
 #endif
     for(i=1;i<=4;i++)
     {
@@ -532,8 +531,7 @@ static void draw_playfield(void)
 #else
     (void)w;
     rb->lcd_hline(0, LCD_WIDTH-1, IMAGE_HEIGHT);
-    rb->snprintf(s, sizeof(s), "Moves: %d", moves);
-    rb->lcd_putsxy(3, moves_y, s);
+    rb->lcd_putsxyf(3, moves_y, "Moves: %d", moves);
 #endif
 
     /* draw spots to the lcd */

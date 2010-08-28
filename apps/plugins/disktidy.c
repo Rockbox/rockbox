@@ -160,15 +160,12 @@ bool tidy_remove_item(char *item, int attr)
 
 void tidy_lcd_status(const char *name, int *removed)
 {
-    char text[24]; /* "Cleaned up nnnnn items" */
-
     /* display status text */
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Working ...");
     rb->lcd_puts(0, 1, name);
-    rb->snprintf(text, 24, "Cleaned up %d items", *removed);
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_puts(0, 2, text);
+    rb->lcd_putsf(0, 2, "Cleaned up %d items", *removed);
 #endif
     rb->lcd_update();
 }

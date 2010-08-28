@@ -982,14 +982,11 @@ static void update_screen(void)
 #define BOARD_WIDTH LCD_WIDTH
 #define BOARD_HEIGHT (LCD_HEIGHT - STAT_HEIGHT)
     rb->lcd_putsxy(STAT_X + 4, STAT_Y + 4, "Level");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.index + 1);
-    rb->lcd_putsxy(STAT_X + 7, STAT_Y + 14, buf);
+    rb->lcd_putsxyf(STAT_X + 7, STAT_Y + 14, "%d", current_info.level.index + 1);
     rb->lcd_putsxy(STAT_X + 41, STAT_Y + 4, "Moves");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.moves);
-    rb->lcd_putsxy(STAT_X + 44, STAT_Y + 14, buf);
+    rb->lcd_putsxyf(STAT_X + 44, STAT_Y + 14, "%d", current_info.level.moves);
     rb->lcd_putsxy(STAT_X + 79, STAT_Y + 4, "Pushes");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.pushes);
-    rb->lcd_putsxy(STAT_X + 82, STAT_Y + 14, buf);
+    rb->lcd_putsxyf(STAT_X + 82, STAT_Y + 14, "%d", current_info.level.pushes);
 
     rb->lcd_drawrect(STAT_X, STAT_Y, 38, STAT_HEIGHT);
     rb->lcd_drawrect(STAT_X + 37, STAT_Y, 39, STAT_HEIGHT);
@@ -1005,18 +1002,15 @@ static void update_screen(void)
 #define BOARD_WIDTH (LCD_WIDTH - STAT_WIDTH)
 #define BOARD_HEIGHT LCD_HEIGHT
     rb->lcd_putsxy(STAT_X + 1, STAT_Y + 2, "Level");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.index + 1);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 12, buf);
+    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 12, "%d", current_info.level.index + 1);
     rb->lcd_putsxy(STAT_X + 1, STAT_Y + 23, "Moves");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.moves);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 33, buf);
+    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 33, "%d", current_info.level.moves);
 #if STAT_WIDTH < 38
     rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Push");
 #else
     rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Pushes");
 #endif
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.pushes);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 54, buf);
+    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 54, "%d", current_info.level.pushes);
 
     rb->lcd_drawrect(STAT_X, STAT_Y + 0, STAT_WIDTH, 64);
     rb->lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 21);

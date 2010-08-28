@@ -598,11 +598,9 @@ int screen[X_MAX + 1][Y_MAX + 1];
  *
  *****************************************************************************/
 
-static void drawchar(int x, int y, char c)
+static inline void drawchar(int x, int y, char c)
 {
-  char str[2];
-  rb->snprintf(str, sizeof(str), "%c", c);
-  rb->lcd_putsxy(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, str);
+  rb->lcd_putsxyf(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, "%c", c);
 }
 
 static void draw(struct screen_object o)

@@ -1359,8 +1359,7 @@ int load_image(char *filename, struct image_info *info,
 
     } else {
         if (!running_slideshow) {
-            rb->snprintf(print, sizeof(print), "loading %lu bytes", (unsigned long)image_size);
-            rb->lcd_puts(0, 1, print);
+            rb->lcd_putsf(0, 1, "loading %zu bytes", image_size);
             rb->lcd_update();
         }
 
@@ -1388,14 +1387,10 @@ int load_image(char *filename, struct image_info *info,
         if (!decoder->error) {
 
             if (!running_slideshow) {
-                rb->snprintf(print, sizeof(print), "image %dx%d",
+                rb->lcd_putsf(0, 2, "image %dx%d",
                              decoder->infoPng.width, decoder->infoPng.height);
-                rb->lcd_puts(0, 2, print);
-                rb->lcd_update();
-
-                rb->snprintf(print, sizeof(print), "decoding %d*%d",
+                rb->lcd_putsf(0, 3, "decoding %d*%d",
                              decoder->infoPng.width, decoder->infoPng.height);
-                rb->lcd_puts(0, 3, print);
                 rb->lcd_update();
             }
 
@@ -1481,9 +1476,7 @@ int get_image(struct image_info *info, int ds)
     if (ds > 1) {
         if (!running_slideshow)
         {
-            rb->snprintf(print, sizeof(print), "resizing %d*%d",
-                         info->width, info->height);
-            rb->lcd_puts(0, 3, print);
+            rb->lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
             rb->lcd_update();
         }
         struct bitmap bmp_src, bmp_dst;

@@ -97,7 +97,6 @@ static fb_data rgb_linebuf[LCD_WIDTH];  /* Line buffer for scrolling when
 #endif
 
 /* my memory pool (from the mp3 buffer) */
-static char print[32]; /* use a common snprintf() buffer */
 /* the remaining free part of the buffer for loaded+resized images */
 static unsigned char* buf;
 static size_t buf_size;
@@ -777,9 +776,7 @@ static int load_and_show(char* filename, struct image_info *info)
 
         if(!running_slideshow)
         {
-            rb->snprintf(print, sizeof(print), "showing %dx%d",
-                            info->width, info->height);
-            rb->lcd_puts(0, 3, print);
+            rb->lcd_putsf(0, 3, "showing %dx%d", info->width, info->height);
             rb->lcd_update();
         }
 

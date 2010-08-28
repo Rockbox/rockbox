@@ -773,7 +773,6 @@ static void pegbox_draw_board(struct game_context* pb)
 {
     unsigned int r, c, type;
     pb->num_left = 0;
-    char str[5];
 
     rb->lcd_clear_display();
 #ifdef WIDE_LAYOUT
@@ -819,15 +818,11 @@ static void pegbox_draw_board(struct game_context* pb)
     }
 
 #ifdef WIDE_LAYOUT
-    rb->snprintf(str, 3, "%d", pb->level);
-    rb->lcd_putsxy(TEXT_X, LEVEL_TEXT_Y, str);
-    rb->snprintf(str, 3, "%d", pb->num_left);
-    rb->lcd_putsxy(TEXT_X, PEGS_TEXT_Y, str);
+    rb->lcd_putsxyf(TEXT_X, LEVEL_TEXT_Y, "%d", pb->level);
+    rb->lcd_putsxyf(TEXT_X, PEGS_TEXT_Y, "%d", pb->num_left);
 #else
-    rb->snprintf(str, 3, "%d", pb->level);
-    rb->lcd_putsxy(LEVEL_TEXT_X, TEXT_Y, str);
-    rb->snprintf(str, 3, "%d", pb->num_left);
-    rb->lcd_putsxy(PEGS_TEXT_X, TEXT_Y, str);
+    rb->lcd_putsxyf(LEVEL_TEXT_X, TEXT_Y, "%d", pb->level);
+    rb->lcd_putsxyf(PEGS_TEXT_X, TEXT_Y, "%d", pb->num_left);
 #endif /*WIDE_LAYOUT*/
 
 #ifdef HAVE_LCD_COLOR

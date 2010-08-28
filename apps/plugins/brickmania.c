@@ -1573,11 +1573,11 @@ static int brickmania_game_loop(void)
 
             /* write life num */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-            rb->snprintf(s, sizeof(s), "L:%d", life);
+    #define LIFE_STR "L:%d"
 #else
-            rb->snprintf(s, sizeof(s), "Life: %d", life);
+    #define LIFE_STR "Life: %d"
 #endif
-            rb->lcd_putsxy(0, 0, s);
+            rb->lcd_putsxyf(0, 0, LIFE_STR, life);
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L%d", level+1);

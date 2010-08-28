@@ -157,10 +157,7 @@ int load_image(char *filename, struct image_info *info,
     if(!running_slideshow)
     {
         rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_update();
-
-        rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
-        rb->lcd_puts(0, 1, print);
+        rb->lcd_putsf(0, 1, "loading %d bytes", filesize);
         rb->lcd_update();
     }
 
@@ -195,9 +192,7 @@ int load_image(char *filename, struct image_info *info,
 
     if(!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), "image %dx%d",
-                        p_jpg->x_size, p_jpg->y_size);
-        rb->lcd_puts(0, 2, print);
+        rb->lcd_putsf(0, 2, "image %dx%d", p_jpg->x_size, p_jpg->y_size);
         rb->lcd_update();
     }
 
@@ -269,9 +264,7 @@ int get_image(struct image_info *info, int ds)
 
     if(!running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), "decoding %d*%d",
-                        info->width, info->height);
-        rb->lcd_puts(0, 3, print);
+        rb->lcd_putsf(0, 3, "decoding %d*%d", info->width, info->height);
         rb->lcd_update();
     }
 

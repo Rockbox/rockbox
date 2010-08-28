@@ -125,7 +125,6 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
                     bool show_level)
 {
     int i, w, h;
-    char str[30];
 #ifdef HAVE_LCD_COLOR
     unsigned bgcolor = rb->lcd_get_background();
     unsigned fgcolor = rb->lcd_get_foreground();
@@ -155,14 +154,11 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
             rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
         }
 #endif
-        rb->snprintf (str, sizeof (str), "%d)", i+1);
-        rb->lcd_putsxy (MARGIN,3*h + h*i, str);
-        rb->snprintf (str, sizeof (str), "%d", scores[i].score);
-        rb->lcd_putsxy (LCD_WIDTH/4-w/4,3*h + h*i, str);
+        rb->lcd_putsxyf (MARGIN,3*h + h*i, "%d)", i+1);
+        rb->lcd_putsxyf (LCD_WIDTH/4-w/4,3*h + h*i, "%d", scores[i].score);
         
         if(show_level) {
-            rb->snprintf (str, sizeof (str), "%d", scores[i].level);
-            rb->lcd_putsxy (LCD_WIDTH*3/4-w/4,3*h + h*i, str);
+            rb->lcd_putsxyf (LCD_WIDTH*3/4-w/4,3*h + h*i, "%d", scores[i].level);
         }
         
         if(i == position) {

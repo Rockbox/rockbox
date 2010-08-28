@@ -3454,7 +3454,6 @@ void cleanup(void *fd)
 
 int play_file(char* filename)
 {
-    char buf[32];
     int button;
     int fd;
     int wanted, got;
@@ -3540,11 +3539,9 @@ int play_file(char* filename)
     time = bytes / (samplerate * 2 * channels);
 
     rb->lcd_puts(0, 0, "Playing WAV file");
-    rb->snprintf(buf, sizeof(buf), "%dHz %s", samplerate,
+    rb->lcd_putsf(0, 1, "%dHz %s", samplerate,
                  (channels == 1) ? "mono" : "stereo");
-    rb->lcd_puts(0, 1, buf);
-    rb->snprintf(buf, sizeof(buf), "Length: %d:%02d", time / 60, time % 60);
-    rb->lcd_puts(0, 2, buf);
+    rb->lcd_putsf(0, 2, "Length: %d:%02d", time / 60, time % 60);
     rb->lcd_update();
 
     rb->sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */

@@ -187,8 +187,6 @@ int wait_for_button(void)
 /* helper for DoUserDialog() */
 void ShowFlashInfo(struct flash_info* pInfo)
 {
-    char buf[32];
-    
     if (!pInfo->manufacturer)
     {
         rb->lcd_puts(0, 0, "Flash: M=?? D=??");
@@ -196,16 +194,14 @@ void ShowFlashInfo(struct flash_info* pInfo)
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "Flash: M=%02x D=%02x",
+        rb->lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
             pInfo->manufacturer, pInfo->id);
-        rb->lcd_puts(0, 0, buf);
         
         
         if (pInfo->size)
         {
             rb->lcd_puts(0, 1, pInfo->name);
-            rb->snprintf(buf, sizeof(buf), "Size: %d KB", pInfo->size / 1024);
-            rb->lcd_puts(0, 2, buf);
+            rb->lcd_putsf(0, 2, "Size: %d KB", pInfo->size / 1024);
         }
         else
         {
@@ -235,11 +231,9 @@ bool show_info(void)
 
 bool confirm(const char *msg)
 {
-    char buf[128];
     bool ret;
     
-    rb->snprintf(buf, sizeof buf, "%s ([PLAY] to CONFIRM)", msg);
-    rb->splash(0, buf);
+    rb->splashf(0, "%s ([PLAY] to CONFIRM)", msg);
     
     ret = (wait_for_button() == BUTTON_ON);
     show_info();
@@ -338,7 +332,6 @@ static int get_section_address(int section)
 int flash_rockbox(const char *filename, int section)
 {
     struct flash_header hdr;
-    char buf[64];
     int pos, i, len, rc;
     unsigned long checksum, sum;
     unsigned char *p8;
@@ -378,9 +371,8 @@ int flash_rockbox(const char *filename, int section)
 
         if (pos+sizeof(struct flash_header) != *p32)
         {
-            rb->snprintf(buf, sizeof(buf), "Incorrect relocation: 0x%08lx/0x%08lx",
+            rb->splashf(HZ*10, "Incorrect relocation: 0x%08lx/0x%08lx",
                          *p32, pos+sizeof(struct flash_header));
-            rb->splash(HZ*10, buf);
             return -1;
         }
         
@@ -393,9 +385,7 @@ int flash_rockbox(const char *filename, int section)
         if (i + pos < SEC_SIZE)
             return -1;
         
-        rb->snprintf(buf, sizeof(buf), "Erasing...  %d%%", 
-                     (i+SEC_SIZE)*100/len);
-        rb->lcd_puts(0, 3, buf);
+        rb->lcd_putsf(0, 3, "Erasing...  %d%%", (i+SEC_SIZE)*100/len);
         rb->lcd_update();
         
         rc = cfi_erase_sector(FB + (i + pos)/2);
@@ -408,8 +398,7 @@ int flash_rockbox(const char *filename, int section)
     // rb->strncpy(hdr.version, rb->rbversion , sizeof(hdr.version)-1);
     p16 = (uint16_t *)&hdr;
     
-    rb->snprintf(buf, sizeof(buf), "Programming...");
-    rb->lcd_puts(0, 4, buf);
+    rb->lcd_puts(0, 4, "Programming...");
     rb->lcd_update();
     
     pos = get_section_address(section)/2;
@@ -424,9 +413,7 @@ int flash_rockbox(const char *filename, int section)
     {
         if (i % SEC_SIZE == 0)
         {
-            rb->snprintf(buf, sizeof(buf), "Programming...  %d%%",
-                         (i+1)*100/(len/2));
-            rb->lcd_puts(0, 4, buf);
+            rb->lcd_putsf(0, 4, "Programming...  %d%%", (i+1)*100/(len/2));
             rb->lcd_update();
         }
         
@@ -434,8 +421,7 @@ int flash_rockbox(const char *filename, int section)
     }
     
     /* Verify */
-    rb->snprintf(buf, sizeof(buf), "Verifying");
-    rb->lcd_puts(0, 5, buf);
+    rb->lcd_puts(0, 5, "Verifying");
     rb->lcd_update();
     
     p8 = (char *)get_section_address(section);
@@ -560,12 +546,9 @@ int flash_bootloader(const char *filename)
 int flash_original_fw(int len)
 {
     unsigned char reset_vector[8];
-    char buf[32];
     int pos, i, rc;
     unsigned char *p8;
     uint16_t *p16;
-    
-    (void)buf;
     
     rb->lcd_puts(0, 3, "Critical section...");
     rb->lcd_update();
@@ -586,13 +569,11 @@ int flash_original_fw(int len)
     for (i = 1; i < BOOTLOADER_ERASEGUARD && (i-1)*4096 < len; i++)
     {
         rc = cfi_erase_sector(FB + (SEC_SIZE/2) * i);
-        rb->snprintf(buf, sizeof(buf), "Erase: 0x%03x  (%d)", i, rc);
-        rb->lcd_puts(0, 5, buf);
+        rb->lcd_putsf(0, 5, "Erase: 0x%03x  (%d)", i, rc);
         rb->lcd_update();
     }
     
-    rb->snprintf(buf, sizeof(buf), "Programming");
-    rb->lcd_puts(0, 6, buf);
+    rb->lcd_puts(0, 6, "Programming");
     rb->lcd_update();
     
     pos = 0x00000008/2;
@@ -600,8 +581,7 @@ int flash_original_fw(int len)
     for (i = 0; i < len/2 && pos + i < (BOOTLOADER_ENTRYPOINT/2); i++)
         cfi_program_word(FB + pos + i, p16[i]);
     
-    rb->snprintf(buf, sizeof(buf), "Verifying");
-    rb->lcd_puts(0, 7, buf);
+    rb->lcd_puts(0, 7, "Verifying");
     rb->lcd_update();
     
     /* Verify reset vectors. */
@@ -623,8 +603,7 @@ int flash_original_fw(int len)
         if (p8[i] != audiobuf[i])
         {
             rb->splash(HZ*3, "Verify failed!");
-            rb->snprintf(buf, sizeof buf, "at: 0x%08x", i);
-            rb->splash(HZ*10, buf);
+            rb->splashf(HZ*10, "at: 0x%08x", i);
             return -5;
         }
     }

@@ -1009,10 +1009,6 @@ void setvidmode(void)
 
 void lcd_refreshline(void)
 {
-#ifdef HAVE_LCD_COLOR
-    char frameout[30];
-#endif
-
     if (!(R_LCDC & 0x80))
         return; /* should not happen... */
 
@@ -1112,8 +1108,8 @@ void lcd_refreshline(void)
     {
         if(options.showstats)
         {
-            snprintf(frameout,sizeof(frameout),"FPS: %d Frameskip: %d ",options.fps, options.frameskip);
-            rb->lcd_putsxy(0,LCD_HEIGHT-10,frameout);
+            rb->lcd_putsxyf(0,LCD_HEIGHT-10,"FPS: %d Frameskip: %d ",
+                    options.fps, options.frameskip);
             rb->lcd_update_rect(0,LCD_HEIGHT-10, LCD_WIDTH, 10);
         }
 

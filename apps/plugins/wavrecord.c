@@ -3480,7 +3480,6 @@ static bool update_wav_header(char *filename, int sample_rate,
 static int record_file(char *filename)
 {
     bool recording, saving;
-    char buf[32];
     int fd, low_water, i;
     int bytes_written;
     int button;
@@ -3514,8 +3513,6 @@ static int record_file(char *filename)
     
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, filename);
-    rb->snprintf(buf, sizeof(buf), "%sHz 16bit %s",
-                 samplerate_str[reccfg.samplerate], channel_str[reccfg.channels]);
 
     switch (reccfg.source)
     {
@@ -3535,12 +3532,18 @@ static int record_file(char *filename)
 #ifdef HAVE_SPDIF_REC
         case WAV_SRC_SPDIF:
             rb->mas_codec_writereg(0, 0x01);
-            rb->snprintf(buf, sizeof(buf), "16bit %s",
-                         channel_str[reccfg.channels]);
             break;
 #endif
     }
-    rb->lcd_puts(0, 1, buf);
+
+#ifdef HAVE_SPDIF_REC
+    if (reccfg.source == WAV_SRC_SPDIF)
+        rb->lcd_putsf(0, 1, "16bit %s", channel_str[reccfg.channels]);
+    else
+#endif
+        rb->lcd_putsf(0, 1, "%sHz 16bit %s",
+             samplerate_str[reccfg.samplerate], channel_str[reccfg.channels]);
+
     rb->lcd_update();
     
     mas = 0x0060                /* no framing, little endian */
@@ -3649,8 +3652,7 @@ static int record_file(char *filename)
             recording = false;
             saving = true;
         }
-        rb->snprintf(buf, sizeof(buf), "Bytes: %d", num_rec_bytes);
-        rb->lcd_puts(0, 2, buf);
+        rb->lcd_puts(0, 2, "Bytes: %d", num_rec_bytes);
         rb->lcd_update();
     }
     /* read sample rate from MAS */
