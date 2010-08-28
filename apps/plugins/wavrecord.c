@@ -3652,7 +3652,7 @@ static int record_file(char *filename)
             recording = false;
             saving = true;
         }
-        rb->lcd_puts(0, 2, "Bytes: %d", num_rec_bytes);
+        rb->lcd_putsf(0, 2, "Bytes: %d", num_rec_bytes);
         rb->lcd_update();
     }
     /* read sample rate from MAS */

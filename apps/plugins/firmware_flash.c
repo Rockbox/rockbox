@@ -570,7 +570,7 @@ void ShowFlashInfo(tFlashInfo* pInfo)
         if (pInfo->size)
         {
             rb->lcd_puts(0, 1, pInfo->name);
-            rb->lcd_puts(0, 2, "Size: %d KB", pInfo->size / 1024);
+            rb->lcd_putsf(0, 2, "Size: %d KB", pInfo->size / 1024);
         }
         else
         {
