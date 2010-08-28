@@ -219,6 +219,17 @@ void LCDFN(putsxy)(int x, int y, const unsigned char *str)
     LCDFN(putsxyofs)(x, y, 0, str);
 }
 
+/* Formatting version of LCDFN(putsxy) */
+void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
+{
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    LCDFN(putsxy)(x, y, buf);
+}
+
 static void LCDFN(putsxyofs_style)(int xpos, int ypos,
                                    const unsigned char *str, int style,
                                    int w, int h, int offset)

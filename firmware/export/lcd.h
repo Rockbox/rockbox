@@ -191,6 +191,7 @@ extern void lcd_update_viewport(void);
 extern void lcd_clear_viewport(void);
 extern void lcd_clear_display(void);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
+extern void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...);
 extern void lcd_puts(int x, int y, const unsigned char *string);
 extern void lcd_putsf(int x, int y, const unsigned char *fmt, ...);
 extern void lcd_puts_style(int x, int y, const unsigned char *string, int style);

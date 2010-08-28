@@ -723,6 +723,7 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
 
     lcd_putsf,
+    lcd_putsxyf,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
