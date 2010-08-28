@@ -125,7 +125,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
 
     if (buf)
     {
-        if (strlen(tbuf))
+        if (*tbuf)
             snprintf(buf, buf_size, "%d%s%s%s", value, str(LANG_POINT),
                      tbuf, P2STR(units[unit_no]));
         else
