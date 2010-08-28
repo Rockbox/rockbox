@@ -1143,7 +1143,11 @@ void init_everything(void)
     sample_rate = rb->rec_freq_sampr[sample_rate];
     rb->pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
     rb->pcm_init_recording();
-    
+
+    /* avoid divsion by zero */
+    if(tuner_settings.lowest_freq == 0)
+        tuner_settings.lowest_freq = period2freq(BUFFER_SIZE / 4);
+
     /* GUI */
 #if LCD_DEPTH > 1
     front_color = rb->lcd_get_foreground();
