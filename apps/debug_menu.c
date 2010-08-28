@@ -1262,7 +1262,6 @@ extern unsigned char serbuf[];
 #else /* !HAVE_LCD_BITMAP */
 bool dbg_ports(void)
 {
-    char buf[32];
     int button;
     int adc_battery_voltage;
     int currval = 0;
@@ -1271,40 +1270,14 @@ bool dbg_ports(void)
 
     while(1)
     {
-        switch(currval)
-        {
-        case 0:
-            snprintf(buf, 32, "PADR: %04x", (unsigned short)PADR);
-            break;
-        case 1:
-            snprintf(buf, 32, "PBDR: %04x", (unsigned short)PBDR);
-            break;
-        case 2:
-            snprintf(buf, 32, "AN0: %03x", adc_read(0));
-            break;
-        case 3:
-            snprintf(buf, 32, "AN1: %03x", adc_read(1));
-            break;
-        case 4:
-            snprintf(buf, 32, "AN2: %03x", adc_read(2));
-            break;
-        case 5:
-            snprintf(buf, 32, "AN3: %03x", adc_read(3));
-            break;
-        case 6:
-            snprintf(buf, 32, "AN4: %03x", adc_read(4));
-            break;
-        case 7:
-            snprintf(buf, 32, "AN5: %03x", adc_read(5));
-            break;
-        case 8:
-            snprintf(buf, 32, "AN6: %03x", adc_read(6));
-            break;
-        case 9:
-            snprintf(buf, 32, "AN7: %03x", adc_read(7));
-            break;
+        if (currval == 0) {
+            lcd_putsf(0, 0, "PADR: %04x", (unsigned short)PADR);
+        } else if (currval == 1) {
+            lcd_putsf(0, 0, "PBDR: %04x", (unsigned short)PBDR);
+        } else {
+            int idx = currval - 2; /* idx < 7 */
+            lcd_putsf(0, 0, "AN%d: %03x", idx, adc_read(idx));
         }
-        lcd_puts(0, 0, buf);
 
         battery_read_info(&adc_battery_voltage, NULL);
         lcd_putsf(0, 1, "Batt: %d.%03dV", adc_battery_voltage / 1000,
