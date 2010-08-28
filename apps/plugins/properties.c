@@ -178,7 +178,7 @@ static bool _dir_properties(DPS* dps)
             rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
             rb->lcd_putsf(0,4,"Files: %d", dps->fc);
             log = human_size_log(dps->bc);
-            rb->lcd_putsf(0,5,"Size: %lld %cB", dps->bc >> (10*log),
+            rb->lcd_putsf(0,5,"Size: %ld %cB", (long) (dps->bc >> (10*log)),
                                                human_size_prefix[log]);
             rb->lcd_update();
 
@@ -216,8 +216,8 @@ static bool dir_properties(char* selected_file)
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
     log = human_size_log(dps.bc);
-    rb->snprintf(str_size, sizeof str_size, "Size: %lld %cB",
-                 dps.bc >> (log*10), human_size_prefix[log]);
+    rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
+                 (long) (dps.bc >> (log*10)), human_size_prefix[log]);
     num_properties = 4;
     return true;
 }
