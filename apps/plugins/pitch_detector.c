@@ -634,11 +634,11 @@ static void draw_bar(fixed wrong_by_cents)
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(front_color);
 #endif
-    rb->lcd_putsf(lbl_x_minus_50    ,bar_grad_y, "%d", -50);
-    rb->lcd_putsf(lbl_x_minus_20    ,bar_grad_y, "%d", -20);
-    rb->lcd_putsf(lbl_x_0           ,bar_grad_y, "%d",   0);
-    rb->lcd_putsf(lbl_x_20          ,bar_grad_y, "%d",  20);
-    rb->lcd_putsf(lbl_x_50          ,bar_grad_y, "%d",  50);
+    rb->lcd_putsxyf(lbl_x_minus_50    ,bar_grad_y, "%d", -50);
+    rb->lcd_putsxyf(lbl_x_minus_20    ,bar_grad_y, "%d", -20);
+    rb->lcd_putsxyf(lbl_x_0           ,bar_grad_y, "%d",   0);
+    rb->lcd_putsxyf(lbl_x_20          ,bar_grad_y, "%d",  20);
+    rb->lcd_putsxyf(lbl_x_50          ,bar_grad_y, "%d",  50);
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));   /* Color screens */
@@ -715,7 +715,7 @@ static void display_frequency (fixed freq)
 #if LCD_DEPTH > 1
             rb->lcd_set_foreground(front_color);
 #endif
-            rb->lcd_putsf(0, HZ_Y, "%s : %d cents (%d.%02dHz)",
+            rb->lcd_putsxyf(0, HZ_Y, "%s : %d cents (%d.%02dHz)",
                          notes[note].name, fp_round(ldf) ,fixed2int(orig_freq),
                          fp_round(fp_mul(fp_frac(orig_freq),
                                          int2fixed(DISPLAY_HZ_PRECISION))));
