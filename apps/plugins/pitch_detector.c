@@ -724,6 +724,7 @@ static void display_frequency (fixed freq)
     rb->lcd_update();
 }
 
+#ifndef SIMULATOR
 /*-----------------------------------------------------------------------
  * Functions for the Yin algorithm
  *
@@ -851,7 +852,6 @@ static fixed ICODE_ATTR vec_quadint_min(fixed *x, unsigned bufsize, unsigned pos
     return exactpos;
 }
 
-#ifndef SIMULATOR
 /* Calculate the period of the note in the
      buffer using the YIN algorithm */
 /* The yin pointer is just a buffer that the algorithm uses as a work
