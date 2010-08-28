@@ -35,7 +35,7 @@ struct view_info {
     const char *text;   /* displayed text */
     int display_lines;  /* number of lines can be displayed */
     int line_count;     /* number of lines */
-    int line;           /* current fisrt line */
+    int line;           /* current first line */
     int start;          /* possition of first line in text  */
 };
 
