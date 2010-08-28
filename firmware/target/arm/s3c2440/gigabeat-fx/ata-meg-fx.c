@@ -95,10 +95,8 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
 
 //#define GIGABEAT_DEBUG_ATA
 #ifdef GIGABEAT_DEBUG_ATA
-        static int line = 0;
-        static char str[256];
-        snprintf(str, sizeof(str), "ODD DMA to %08x, %d", buf, wordcount);
-        lcd_puts(10, line, str);
+        static unsigned line = 0;
+        lcd_putsf(10, line, "ODD DMA to %08x, %d", buf, wordcount);
         line = (line+1) % 32;
         lcd_update();
 #endif

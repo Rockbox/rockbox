@@ -988,10 +988,7 @@ static void serial_restart_output(int ep)
     if (blen)
     {
 #ifdef LCD_DEBUG
-        char s[20];
-        snprintf(s, sizeof(s), "o%03lx/%03x", block - serial_out_fifo.buf,
-                 blen);
-        lcd_puts(0, 2, s);
+        lcd_putsf(0, 2, "o%03lx/%03x", block - serial_out_fifo.buf, blen);
         lcd_update();
 #endif
         usb_send_block(block, blen, serial_free_out_fifo, ep);

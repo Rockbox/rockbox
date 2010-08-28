@@ -43,7 +43,6 @@ bool __dbg_ports(void)
 bool __dbg_hw_info(void)
 {
     int line = 0, i, oldline;
-    char buf[100];
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
@@ -61,24 +60,17 @@ bool __dbg_hw_info(void)
         if (button_get_w_tmo(HZ/20) == (BUTTON_POWER|BUTTON_REL))
             break;
 
-        snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
-            (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "current tick: %08lx Seconds running: %08ld",
+            current_tick, current_tick/HZ);
             
-        snprintf(buf, sizeof(buf), "GPIOA: 0x%08x  GPIOB: 0x%08x",
-            (unsigned int)GPIOA, (unsigned int)GPIOB);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIOC: 0x%08x  GPIOD: 0x%08x",
-            (unsigned int)GPIOC, (unsigned int)GPIOD);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIOE: 0x%08x",
-            (unsigned int)GPIOE);  lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "GPIOA: 0x%08lx  GPIOB: 0x%08lx", GPIOA, GPIOB);
+        lcd_putsf(0, line++, "GPIOC: 0x%08lx  GPIOD: 0x%08lx", GPIOC, GPIOD);
+        lcd_putsf(0, line++, "GPIOE: 0x%08lx",                 GPIOE);
 
         for (i = 0; i<4; i++)
-        {
-            snprintf(buf, sizeof(buf), "ADC%d: 0x%04x", i, adc_read(i));
-                lcd_puts(0, line++, buf);
-        }
+            lcd_putsf(0, line++, "ADC%d: 0x%04x", i, adc_read(i));
         
-        snprintf(buf, sizeof(buf), "STS: 0x%08x  SRC: 0x%08x",
-            (unsigned int)STS, (unsigned int)SRC);  lcd_puts(0, line++, buf);
+        lcd_putsf(0, line++, "STS: 0x%08lx  SRC: 0x%08lx", STS, SRC);
         
         lcd_update();
     }

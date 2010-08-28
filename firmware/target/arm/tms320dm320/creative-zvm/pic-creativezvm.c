@@ -255,18 +255,14 @@ void GIO0(void)
         break;
     }
 #ifdef BUTTON_DEBUG
-    unsigned char weergvn[10];
 #ifdef BOOTLOADER
     lcd_set_foreground((sw ? LCD_RGBPACK(255,0,0) : LCD_RGBPACK(0,255,0) ));
 #endif
-    snprintf(weergvn, sizeof(char)*10, "%x",
+    lcd_putsxyf(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*10, "%x",
              (unsigned int)((msg[3] << 24) |
                             (msg[2] << 16) | (msg[1] << 8) | msg[0]));
-    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*10,
-               weergvn);
-    snprintf(weergvn, sizeof(char)*10, "%x", btn);
-    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*7,
-               weergvn);
+    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*7, "%x",
+             btn);
 #ifdef BOOTLOADER
     lcd_set_foreground(LCD_BLACK);
 #endif
