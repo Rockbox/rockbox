@@ -39,25 +39,17 @@ char str_duration[32];
 
 int num_properties;
 
-static char* filesize2string(long long size, char* pstr, int len)
+static const char human_size_prefix[4] = { '\0', 'K', 'M', 'G' };
+static unsigned human_size_log(long long size)
 {
-    /* margin set at 10K boundary: 10239 B +1 => 10 KB
-       routine below is 200 bytes smaller than cascaded if/else :)
-       not using build-in function because of huge values (long long) */
-    const char* kgb[4] = { "B", "KB", "MB", "GB" };
-    int i = 0;
-    while(true)
-    {
-        if((size < 10240) || (i > 2))
-        {
-            /* depends on the order in the above array */
-            rb->snprintf(pstr, len, "%ld %s", (long)size, kgb[i]);
-            break;
-        }
+    const size_t n = sizeof(human_size_prefix)/sizeof(human_size_prefix[0]);
+
+    unsigned i;
+    /* margin set at 10K boundary: 10239 B +1 => 10 KB */
+    for(i=0; i < n-1 && size >= 10*1024; i++)
         size >>= 10; /* div by 1024 */
-        i++;
-    }
-    return pstr;
+
+    return i;
 }
 
 static bool file_properties(char* selected_file)
@@ -79,12 +71,13 @@ static bool file_properties(char* selected_file)
         {
             if(!rb->strcmp(entry->d_name, selected_file+dirlen))
             {
-                rb->snprintf(str_dirname, sizeof str_dirname, "Path: %s",
-                             tstr);
+                unsigned log;
+                rb->snprintf(str_dirname, sizeof str_dirname, "Path: %s", tstr);
                 rb->snprintf(str_filename, sizeof str_filename, "Name: %s",
                              selected_file+dirlen);
-                rb->snprintf(str_size, sizeof str_size, "Size: %s",
-                             filesize2string(entry->size, tstr, sizeof tstr));
+                log = human_size_log(entry->size);
+                rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
+                             entry->size >> (log*10), human_size_prefix[log]);
                 rb->snprintf(str_date, sizeof str_date, "Date: %04d/%02d/%02d",
                     ((entry->wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
                     ((entry->wrtdate >> 5 ) & 0x0F),        /* month   */
@@ -145,8 +138,6 @@ typedef struct {
     unsigned int dc;
     unsigned int fc;
     long long bc;
-    char tstr[64];
-    char tstr2[64];
 } DPS;
 
 static bool _dir_properties(DPS* dps)
@@ -173,6 +164,8 @@ static bool _dir_properties(DPS* dps)
 
         if (entry->attribute & ATTR_DIRECTORY)
         {
+            unsigned log;
+
             if (!rb->strcmp((char *)entry->d_name, ".") ||
                 !rb->strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
@@ -182,13 +175,11 @@ static bool _dir_properties(DPS* dps)
             rb->lcd_puts(0,0,"SCANNING...");
             rb->lcd_puts(0,1,dps->dirname);
             rb->lcd_puts(0,2,entry->d_name);
-            rb->snprintf(dps->tstr, 64, "Directories: %d", dps->dc);
-            rb->lcd_puts(0,3,dps->tstr);
-            rb->snprintf(dps->tstr, 64, "Files: %d", dps->fc);
-            rb->lcd_puts(0,4,dps->tstr);
-            rb->snprintf(dps->tstr, 64, "Size: %s",
-                filesize2string(dps->bc, dps->tstr2, 64));
-            rb->lcd_puts(0,5,dps->tstr);
+            rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
+            rb->lcd_putsf(0,4,"Files: %d", dps->fc);
+            log = human_size_log(dps->bc);
+            rb->lcd_putsf(0,5,"Size: %lld %cB", dps->bc >> (10*log),
+                                               human_size_prefix[log]);
             rb->lcd_update();
 
              /* recursion */
@@ -209,21 +200,24 @@ static bool _dir_properties(DPS* dps)
 
 static bool dir_properties(char* selected_file)
 {
-    DPS dps;
-    char tstr[64];
+    unsigned log;
+    DPS dps = {
+        .len = MAX_PATH,
+        .dc  = 0,
+        .fc  = 0,
+        .bc  = 0,
+    };
     rb->strlcpy(dps.dirname, selected_file, MAX_PATH);
-    dps.len = MAX_PATH;
-    dps.dc = 0;
-    dps.fc = 0;
-    dps.bc = 0;
+
     if(false == _dir_properties(&dps))
         return false;
 
     rb->strlcpy(str_dirname, selected_file, MAX_PATH);
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
-    rb->snprintf(str_size, sizeof str_size, "Size: %s",
-                 filesize2string(dps.bc, tstr, sizeof tstr));
+    log = human_size_log(dps.bc);
+    rb->snprintf(str_size, sizeof str_size, "Size: %lld %cB",
+                 dps.bc >> (log*10), human_size_prefix[log]);
     num_properties = 4;
     return true;
 }
