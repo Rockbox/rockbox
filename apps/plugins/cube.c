@@ -621,7 +621,6 @@ void cleanup(void)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    char buffer[30];
     int t_disp = 0;
 #ifdef USEGSLIB
     unsigned char *gbuf;
@@ -686,6 +685,7 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_BITMAP
         if (t_disp > 0)
         {
+            char buffer[30];
             t_disp--;
             rb->snprintf(buffer, sizeof(buffer), "%s: %d %s",
                          axes[curr].label,
