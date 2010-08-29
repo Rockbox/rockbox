@@ -49,6 +49,8 @@ enum codec_status codec_main(void)
 
   next_track:
 
+  /* Clean and initialize decoder structures */
+   memset(&demux_res , 0, sizeof(demux_res));
   if (codec_init()) {
     LOGF("ALAC: Error initialising codec\n");
     retval = CODEC_ERROR;

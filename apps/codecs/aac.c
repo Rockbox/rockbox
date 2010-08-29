@@ -69,8 +69,10 @@ enum codec_status codec_main(void)
 next_track:
     err = CODEC_OK;
 
+    /* Clean and initialize decoder structures */
+    memset(&demux_res , 0, sizeof(demux_res));
     if (codec_init()) {
-        LOGF("FAAD: Codec init error\n");
+        printf("FAAD: Codec init error\n");
         err = CODEC_ERROR;
         goto exit;
     }
@@ -88,7 +90,7 @@ next_track:
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
-        LOGF("FAAD: File init error\n");
+        printf("FAAD: File init error\n");
         err = CODEC_ERROR;
         goto done;
     }
@@ -97,7 +99,7 @@ next_track:
     decoder = NeAACDecOpen();
 
     if (!decoder) {
-        LOGF("FAAD: Decode open error\n");
+        printf("FAAD: Decode open error\n");
         err = CODEC_ERROR;
         goto done;
     }
@@ -108,7 +110,7 @@ next_track:
 
     err = NeAACDecInit2(decoder, demux_res.codecdata, demux_res.codecdata_len, &s, &c);
     if (err) {
-        LOGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
+        printf("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
         err = CODEC_ERROR;
         goto done;
     }
@@ -189,7 +191,7 @@ next_track:
         /* Lookup the length (in samples and bytes) of block i */
         if (!get_sample_info(&demux_res, i, &sample_duration, 
                              &sample_byte_size)) {
-            LOGF("AAC: get_sample_info error\n");
+            printf("AAC: get_sample_info error\n");
             err = CODEC_ERROR;
             goto done;
         }
@@ -208,7 +210,7 @@ next_track:
         }
         else if (file_offset == 0)
         {
-            LOGF("AAC: get_sample_offset error\n");
+            printf("AAC: get_sample_offset error\n");
             err = CODEC_ERROR;
             goto done;
         }
@@ -221,7 +223,7 @@ next_track:
 
         /* NeAACDecDecode may sometimes return NULL without setting error. */
         if (ret == NULL || frame_info.error > 0) {
-            LOGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
+            printf("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
             err = CODEC_ERROR;
             goto done;
         }
@@ -282,7 +284,7 @@ next_track:
     err = CODEC_OK;
 
 done:
-    LOGF("AAC: Decoded %lu samples\n", (unsigned long)sound_samples_done);
+    printf("AAC: Decoded %lu samples\n", (unsigned long)sound_samples_done);
 
     if (ci->request_next_track())
         goto next_track;
