@@ -172,6 +172,10 @@ static inline void wake_core(int core)
 #define HAVE_CPUCACHE_FLUSH
 #endif
 
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
+extern unsigned char probed_ramsize;
+#endif
+
 #endif /* CPU_PP */
 
 #endif /* SYSTEM_TARGET_H */

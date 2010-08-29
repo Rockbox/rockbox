@@ -137,6 +137,24 @@ pad_skip:
     mov    r1, #0
     str    r1, [r2]
 
+#if defined(IPOD_VIDEO)
+    /* detect 32mb vs 64mb model */
+    /* we do this here because after SDRAM is remapped, we already assumed */
+    /* its size to be whatever we were compiled for. */
+
+    mov    r2, #0x12000000
+    mov    r3, #64
+    strb   r3, [r2, #-1]   /* first write 64 to last byte of first 32MB bank */
+
+    mov    r2, #0x14000000
+    mov    r3, #32
+    strb   r3, [r2, #-1]   /* now write 32 to last byte of second 32MB bank */
+
+    /* now the last word of the first 32MB bank tells you the RAM size */
+    /* since on a 32MB model both writes will touch the same actual location */
+    /* this is read later on in boot */
+#endif
+
     mov    r2, #0x40000000
     ldr    r3, =remap_start
     ldr    r4, =remap_end

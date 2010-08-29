@@ -42,6 +42,10 @@ extern void SERIAL0(void);
 static struct corelock cpufreq_cl SHAREDBSS_ATTR;
 #endif
 
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
+unsigned char probed_ramsize;
+#endif
+
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
     if(CURRENT_CORE == CPU)
@@ -517,6 +521,13 @@ void system_init(void)
 #endif
 #else
         pp_set_cpu_frequency(CPUFREQ_MAX);
+#endif
+
+#if defined(IPOD_VIDEO)
+        /* crt0-pp.S wrote the ram size to the last byte of the first 32MB
+           ram bank. See the comment there for how we determine it. */
+        volatile unsigned char *end32 = (volatile unsigned char *)0x01ffffff;
+        probed_ramsize = *end32;
 #endif
     }
 
