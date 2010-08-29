@@ -172,6 +172,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
     int j;
     uint32_t numentries;
     size_t size_remaining = chunk_len - 8;
+    bool got_codec_data = false;
 
     /* version */
     stream_read_uint8(qtmovie->stream);
@@ -185,11 +186,11 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
     numentries = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
 
-    if (numentries != 1)
+    /* if (numentries != 1)
     {
         DEBUGF("only expecting one entry in sample description atom!\n");
         return false;
-    }
+    } */
 
     for (i = 0; i < numentries; i++)
     {
@@ -250,6 +251,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
                   entry_remaining,
                   ((char*)qtmovie->res->codecdata) + 12);
           entry_remaining -= entry_remaining;
+          got_codec_data = true;
 
           if (entry_remaining)
               stream_skip(qtmovie->stream, entry_remaining);
@@ -284,6 +286,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
                DEBUGF("curpos=%ld, j=%d - Skipping %ld bytes\n",qtmovie->stream->ci->curpos,j,j-qtmovie->stream->ci->curpos);
                stream_skip(qtmovie->stream,j-qtmovie->stream->ci->curpos);
              }
+             got_codec_data = true;
              entry_remaining-=sub_chunk_len;
           } else {
               DEBUGF("Error reading esds\n");
@@ -293,13 +296,16 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           DEBUGF("entry_remaining=%ld\n",(long)entry_remaining);
           stream_skip(qtmovie->stream,entry_remaining);
 
+        } else if (qtmovie->res->format==MAKEFOURCC('f','r','e','e')) {
+            /* Skip "filler" atom */
+            stream_skip(qtmovie->stream,entry_remaining);
         } else {
-            DEBUGF("expecting 'alac' or 'mp4a' data format, got %c%c%c%c\n",
+            DEBUGF("expecting 'alac', 'mp4a' or 'free' data format, got %c%c%c%c\n",
                  SPLITFOURCC(qtmovie->res->format));
             return false;
         }
     }
-    return true;
+    return got_codec_data;
 }
 
 static bool read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
