@@ -142,7 +142,7 @@ sub make_install {
     unless (glob_mkdir("$libdir/codecs")) {
         return 0;
     }
-    glob_install("$src/codecs/*", "$libdir/codecs");
+    glob_install("$src/codecs/*", "$libdir/codecs", "-m 0755");
 
     # plugins
     unless (glob_mkdir("$libdir/rocks")) {
@@ -152,7 +152,7 @@ sub make_install {
         unless (glob_mkdir("$libdir/rocks/$t")) {
             return 0;
         }
-        glob_install("$src/rocks/$t/*", "$libdir/rocks/$t");
+        glob_install("$src/rocks/$t/*", "$libdir/rocks/$t", "-m 0755");
     }
 
     # rocks/viewers/lua
