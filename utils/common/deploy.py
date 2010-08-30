@@ -82,6 +82,25 @@ useupx = False
 # OS X: files to copy into the bundle. Workaround for out-of-tree builds.
 bundlecopy = { }
 
+# DLL files to ignore when searching for required DLL files.
+systemdlls = ['advapi32.dll',
+        'comdlg32.dll',
+        'gdi32.dll',
+        'imm32.dll',
+        'kernel32.dll',
+        'msvcrt.dll',
+        'msvcrt.dll',
+        'netapi32.dll',
+        'ole32.dll',
+        'oleaut32.dll',
+        'setupapi.dll',
+        'shell32.dll',
+        'user32.dll',
+        'winmm.dll',
+        'winspool.drv',
+        'ws2_32.dll']
+
+
 # == Functions ==
 def usage(myself):
     print "Usage: %s [options]" % myself
@@ -238,19 +257,22 @@ def upxfile(wd="."):
     return 0
 
 
-def runnsis(versionstring, nsis, srcfolder):
+def runnsis(versionstring, nsis, script, srcfolder):
     # run script through nsis to create installer.
     print "Running NSIS ..."
+
     # Assume the generated installer gets placed in the same folder the nsi
     # script lives in.  This seems to be a valid assumption unless the nsi
     # script specifies a path. NSIS expects files relative to source folder so
-    # copy the relevant binaries.
-    for f in programfiles:
-        b = srcfolder + "/" + os.path.dirname(nsisscript) + "/" + os.path.dirname(f)
-        if not os.path.exists(b):
-            os.mkdir(b)
-        shutil.copy(srcfolder + "/" + f, b)
-    output = subprocess.Popen([nsis, srcfolder + "/" + nsisscript], stdout=subprocess.PIPE)
+    # copy progexe. Additional files are injected into the nsis script.
+
+    # FIXME: instead of copying binaries around copy the NSI file and inject
+    # the correct paths.
+    b = srcfolder + "/" + os.path.dirname(script) + "/" + os.path.dirname(progexe)
+    if not os.path.exists(b):
+        os.mkdir(b)
+    shutil.copy(srcfolder + "/" + progexe, b)
+    output = subprocess.Popen([nsis, srcfolder + "/" + script], stdout=subprocess.PIPE)
     output.communicate()
     if not output.returncode == 0:
         print "NSIS failed!"
@@ -258,14 +280,68 @@ def runnsis(versionstring, nsis, srcfolder):
     setupfile = program + "-" + versionstring + "-setup.exe"
     # find output filename in nsis script file
     nsissetup = ""
-    for line in open(srcfolder + "/" + nsisscript):
+    for line in open(srcfolder + "/" + script):
         if re.match(r'^[^;]*OutFile\s+', line) != None:
             nsissetup = re.sub(r'^[^;]*OutFile\s+"(.+)"', r'\1', line).rstrip()
     if nsissetup == "":
         print "Could not retrieve output file name!"
         return -1
-    shutil.copy(srcfolder + "/" + os.path.dirname(nsisscript) + "/" + nsissetup, setupfile)
+    shutil.copy(srcfolder + "/" + os.path.dirname(script) + "/" + nsissetup, setupfile)
     return 0
+
+
+def nsisfileinject(nsis, outscript, filelist):
+    '''Inject files in filelist into NSIS script file after the File line
+       containing the main binary. This assumes that the main binary is present
+       in the NSIS script and that all additiona files (dlls etc) to get placed
+       into $INSTDIR.'''
+    output = open(outscript, "w")
+    for line in open(nsis, "r"):
+        output.write(line)
+	# inject files after the progexe binary. Match the basename only to avoid path mismatches.
+	if re.match(r'^\s*File\s*.*' + os.path.basename(progexe), line, re.IGNORECASE):
+            for f in filelist:
+                injection = "    File /oname=$INSTDIR\\" + os.path.basename(f) + " " + os.path.normcase(f) + "\n"
+                output.write(injection)
+            output.write("    ; end of injected files\n")
+    output.close()
+
+
+def finddlls(program, extrapaths = []):
+    '''Check program for required DLLs. Find all required DLLs except ignored
+       ones and return a list of DLL filenames (including path).'''
+    # ask objdump about dependencies.
+    output = subprocess.Popen(["objdump", "-x", program], stdout=subprocess.PIPE)
+    cmdout = output.communicate()
+
+    # create list of used DLLs. Store as lower case as W32 is case-insensitive.
+    dlls = []
+    for line in cmdout[0].split('\n'):
+        if re.match(r'\s*DLL Name', line) != None:
+            dll = re.sub(r'^\s*DLL Name:\s+([a-zA-Z_\-0-9\.]+).*$', r'\1', line)
+            dlls.append(dll.lower())
+
+    # find DLLs in extrapaths and PATH environment variable.
+    dllpaths = []
+    for file in dlls:
+        if file in systemdlls:
+            print file + ": System DLL"
+            continue
+        dllpath = ""
+        for path in extrapaths:
+            if os.path.exists(path + "/" + file):
+                dllpath = re.sub(r"\\", r"/", path + "/" + file)
+		print file + ": found at " + dllpath
+                dllpaths.append(dllpath)
+                break
+        if dllpath == "":
+            try:
+                dllpath = re.sub(r"\\", r"/", which.which(file))
+		print file + ": found at " + dllpath
+		dllpaths.append(dllpath)
+            except:
+                print file + ": NOT FOUND."
+    return dllpaths
 
 
 def zipball(versionstring, buildfolder):
@@ -278,7 +354,10 @@ def zipball(versionstring, buildfolder):
     os.mkdir(outfolder)
     # move program files to output folder
     for f in programfiles:
-        shutil.copy(buildfolder + "/" + f, outfolder)
+        if re.match(r'^(/|[a-zA-Z]:)', f) != None:
+            shutil.copy(f, outfolder)
+        else:
+            shutil.copy(buildfolder + "/" + f, outfolder)
     # create zipball from output folder
     zf = zipfile.ZipFile(archivename, mode='w', compression=zipfile.ZIP_DEFLATED)
     for root, dirs, files in os.walk(outfolder):
@@ -503,15 +582,20 @@ def deploy():
             if not upxfile(sourcefolder) == 0:
                 tempclean(workfolder, cleanup and not keeptemp)
                 sys.exit(1)
+        dllfiles = finddlls(sourcefolder + "/" + progexe, [os.path.dirname(qm)])
+        if dllfiles.count > 0:
+            programfiles.extend(dllfiles)
         archive = zipball(ver, sourcefolder)
+        # only when running native right now.
+        if nsisscript != "" and makensis != "":
+            nsisfileinject(sourcefolder + "/" + nsisscript, sourcefolder + "/" + nsisscript + ".tmp", dllfiles)
+            runnsis(ver, makensis, nsisscript + ".tmp", sourcefolder)
     elif sys.platform == "darwin":
         archive = macdeploy(ver, sourcefolder)
     else:
         if os.uname()[4].endswith("64"):
             ver += "-64bit"
         archive = tarball(ver, sourcefolder)
-    if nsisscript != "" and makensis != "":
-        runnsis(ver, makensis, sourcefolder)
 
     # remove temporary files
     tempclean(workfolder, cleanup)
