@@ -173,7 +173,7 @@ int format(
             ch = *fmt++;
             switch(ch) {
                 case 'd':
-                    szval = szsign = va_arg (ap, long);
+                    szval = szsign = va_arg (ap, ssize_t);
                     if (szval < 0)
                         szval = -szval;
                     do
