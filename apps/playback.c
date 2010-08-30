@@ -1862,12 +1862,8 @@ static void audio_reset_buffer(void)
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
-
-#ifdef DEBUG
     if(pcmbuf_size > filebuflen)
-        panicf("Not enough memory for pcmbuf_init() : %d > %d",
-                (int)pcmbuf_size, (int)filebuflen);
-#endif
+        panicf("%s(): EOM (%d > %d)", __func__, (int)pcmbuf_size, (int)filebuflen);
 
     filebuflen -= pcmbuf_size;
 
