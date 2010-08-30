@@ -48,6 +48,7 @@
 #include "metadata.h"
 #include "splash.h"
 #include "talk.h"
+#include "panic.h"
 
 #ifdef HAVE_RECORDING
 #include "pcm_record.h"
