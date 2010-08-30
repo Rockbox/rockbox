@@ -1864,7 +1864,7 @@ static void audio_reset_buffer(void)
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
     if(pcmbuf_size > filebuflen)
-        panicf("%s(): EOM (%d > %d)", __func__, (int)pcmbuf_size, (int)filebuflen);
+        panicf("%s(): EOM (%zu > %zu)", __func__, pcmbuf_size, filebuflen);
 
     filebuflen -= pcmbuf_size;
 
