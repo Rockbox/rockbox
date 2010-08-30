@@ -26,9 +26,6 @@
 #include "hw.h"
 #include "pcm.h"
 
-
-PLUGIN_IRAM_DECLARE
-
 int shut,cleanshut;
 char *errormsg;
 
@@ -380,8 +377,6 @@ static int gnuboy_main(const char *rom)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    PLUGIN_IRAM_INIT(rb)
-
     rb->lcd_setfont(0);
 
     rb->lcd_clear_display();

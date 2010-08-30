@@ -22,8 +22,6 @@
 #include "lib/helper.h"
 #include "lib/grey.h"
 
-PLUGIN_IRAM_DECLARE
-
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define FPS_QUIT BUTTON_MENU
@@ -344,7 +342,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     /* standard stuff */
-    PLUGIN_IRAM_INIT(rb)
     (void)parameter;
     
     log_init();

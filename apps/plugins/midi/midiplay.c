@@ -26,8 +26,6 @@
 #include "midifile.h"
 
 
-PLUGIN_IRAM_DECLARE
-
 /* variable button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BTN_QUIT         BUTTON_OFF
@@ -450,8 +448,6 @@ static int midimain(const void * filename)
 enum plugin_status plugin_start(const void* parameter)
 {
     int retval;
-
-    PLUGIN_IRAM_INIT(rb)
 
     if (parameter == NULL)
     {

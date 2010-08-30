@@ -32,9 +32,6 @@
 #include "lib/configfile.h"
 #include "lib/playback_control.h"
 
-
-PLUGIN_IRAM_DECLARE
-
 struct pacman_settings {
     int difficulty;
     int numlives;
@@ -492,8 +489,6 @@ static int gameProc( void )
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-
-    PLUGIN_IRAM_INIT(rb)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);

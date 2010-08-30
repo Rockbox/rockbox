@@ -147,12 +147,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 191
+#define PLUGIN_API_VERSION 192
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 191
+#define PLUGIN_MIN_API_VERSION 192
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -183,7 +183,9 @@ struct plugin_api {
     void (*lcd_clear_display)(void);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
+    void (*lcd_putsxyf)(int x, int y, const unsigned char *fmt, ...);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
+    void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_stop_scroll)(void);
 #ifdef HAVE_LCD_CHARCELLS
@@ -496,8 +498,10 @@ struct plugin_api {
     void (*trigger_cpu_boost)(void);
     void (*cancel_cpu_boost)(void);
 #endif
-#if NUM_CORES > 1
+#ifdef HAVE_CPUCACHE_FLUSH
     void (*cpucache_flush)(void);
+#endif
+#ifdef HAVE_CPUCACHE_INVALIDATE
     void (*cpucache_invalidate)(void);
 #endif
     bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
@@ -769,10 +773,6 @@ struct plugin_api {
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
-#ifdef PLUGIN_USE_IRAM
-    void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
-                             char *iedata, size_t iedata_size);
-#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
@@ -894,9 +894,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
-    void (*lcd_putsxyf)(int x, int y, const unsigned char *fmt, ...);
 };
 
 /* plugin header */
@@ -928,31 +925,10 @@ extern unsigned char plugin_end_addr[];
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
         NULL, NULL, plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
-
-#ifdef PLUGIN_USE_IRAM
-/* Declare IRAM variables */
-#define PLUGIN_IRAM_DECLARE \
-    extern char iramcopy[]; \
-    extern char iramstart[]; \
-    extern char iramend[]; \
-    extern char iedata[]; \
-    extern char iend[];
-/* Initialize IRAM */
-#define PLUGIN_IRAM_INIT(api) \
-    (api)->plugin_iram_init(iramstart, iramcopy, iramend-iramstart, \
-                            iedata, iend-iedata);
-#else
-#define PLUGIN_IRAM_DECLARE
-#define PLUGIN_IRAM_INIT(api)
-#endif /* PLUGIN_USE_IRAM */
 #endif /* PLUGIN */
 
 int plugin_load(const char* plugin, const void* parameter);
 void* plugin_get_audio_buffer(size_t *buffer_size);
-#ifdef PLUGIN_USE_IRAM
-void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
-                      char *iedata, size_t iedata_size);
-#endif
 
 /* plugin_tsr,
     callback returns true to allow the new plugin to load,

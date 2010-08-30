@@ -29,8 +29,6 @@
  */
 
 
-PLUGIN_IRAM_DECLARE;
-
 static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;
 static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
 
@@ -297,8 +295,6 @@ enum plugin_status plugin_start(const void *parameter)
 
     /* Disable all talking before initializing IRAM */
     rb->talk_disable(true);
-
-    PLUGIN_IRAM_INIT(rb);
 
     while (!exit)
     {

@@ -41,9 +41,6 @@
 #include "st_stuff.h"
 #include "lib/helper.h"
 
-
-PLUGIN_IRAM_DECLARE
-
 extern boolean timingdemo, singledemo, demoplayback, fastdemo; // killough
 
 int filearray[9];
@@ -662,8 +659,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
    /* Disable all talking before initializing IRAM */
    rb->talk_disable(true);
-
-   PLUGIN_IRAM_INIT(rb)
 
    (void)parameter;
 

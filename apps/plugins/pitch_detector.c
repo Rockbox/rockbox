@@ -69,8 +69,6 @@
 #include "pluginbitmaps/pitch_notes.h"
 
 
-PLUGIN_IRAM_DECLARE
-
 /* Some fixed point calculation stuff */
 typedef int32_t fixed_data;
 struct _fixed
@@ -1056,12 +1054,10 @@ static void init_everything(void)
     /* Disable all talking before initializing IRAM */
     rb->talk_disable(true);
 
-    PLUGIN_IRAM_INIT(rb);
-
     load_settings();
     rb->storage_sleep();
 
-    /* Stop all playback (if no IRAM, otherwise IRAM_INIT would have) */
+    /* Stop all playback */
     rb->plugin_get_audio_buffer(NULL);
 
     /* --------- Init the audio recording ----------------- */

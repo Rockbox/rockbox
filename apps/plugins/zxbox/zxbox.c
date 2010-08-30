@@ -20,10 +20,6 @@
  ****************************************************************************/
 
 #include "zxconfig.h"
-
-
-PLUGIN_IRAM_DECLARE
-
 #include "spkey_p.h"
 
 spkeyboard kb_mkey;
@@ -61,8 +57,6 @@ long start_time IBSS_ATTR = 0;
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    PLUGIN_IRAM_INIT(rb)
-
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif

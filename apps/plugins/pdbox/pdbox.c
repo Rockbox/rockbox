@@ -29,8 +29,6 @@
 
 /* Welcome to the PDBox plugin */
 
-PLUGIN_IRAM_DECLARE
-
 /* Name of the file to open. */
 char* filename;
 
@@ -159,8 +157,6 @@ void core_thread(void)
 /* Plug-in entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    PLUGIN_IRAM_INIT(rb)
-
     /* Memory pool variables. */
     size_t mem_size;
     void* mem_pool;

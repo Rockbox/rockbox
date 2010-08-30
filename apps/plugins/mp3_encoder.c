@@ -15,8 +15,6 @@
 #include "plugin.h"
 
 
-PLUGIN_IRAM_DECLARE
-
 #define SAMP_PER_FRAME       1152
 #define SAMPL2                576
 #define SBLIMIT                32
@@ -2503,8 +2501,6 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
         return PLUGIN_ERROR;
-
-    PLUGIN_IRAM_INIT(rb)
 
     enc_buffer = rb->plugin_get_audio_buffer(&enc_buffer_size);
 

@@ -109,7 +109,9 @@ static const struct plugin_api rockbox_api = {
     lcd_clear_display,
     lcd_getstringsize,
     lcd_putsxy,
+    lcd_putsxyf,
     lcd_puts,
+    lcd_putsf,
     lcd_puts_scroll,
     lcd_stop_scroll,
 #ifdef HAVE_LCD_CHARCELLS
@@ -382,8 +384,10 @@ static const struct plugin_api rockbox_api = {
     trigger_cpu_boost,
     cancel_cpu_boost,
 #endif
-#if NUM_CORES > 1
+#ifdef HAVE_CPUCACHE_FLUSH
     cpucache_flush,
+#endif
+#ifdef HAVE_CPUCACHE_INVALIDATE
     cpucache_invalidate,
 #endif
     timer_register,
@@ -620,9 +624,6 @@ static const struct plugin_api rockbox_api = {
     plugin_get_audio_buffer,
     plugin_tsr,
     plugin_get_current_filename,
-#ifdef PLUGIN_USE_IRAM
-    plugin_iram_init,
-#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -721,9 +722,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    lcd_putsf,
-    lcd_putsxyf,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -918,23 +916,6 @@ void* plugin_get_audio_buffer(size_t *buffer_size)
     return audiobuf;
 #endif
 }
-
-#ifdef PLUGIN_USE_IRAM
-/* Initializes plugin IRAM */
-void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
-                      char *iedata, size_t iedata_size)
-{
-    /* We need to stop audio playback in order to use codec IRAM */
-    audio_hard_stop();
-    memcpy(iramstart, iramcopy, iram_size);
-    memset(iedata, 0, iedata_size);
-    memset(iramcopy, 0, iram_size);
-#if NUM_CORES > 1
-    /* writeback cleared iedata and iramcopy areas */
-    cpucache_flush();
-#endif
-}
-#endif /* PLUGIN_USE_IRAM */
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
    runs from timer or own thread. The callback is registered to later
