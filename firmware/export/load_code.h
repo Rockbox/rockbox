@@ -28,7 +28,7 @@
 extern void *lc_open(const char *filename, char *buf, size_t buf_size);
 /* header is always at the beginning of the blob, and handle actually points
  * to the start of the blob */
-static inline char *lc_open_from_mem(void* addr, size_t blob_size)
+static inline void *lc_open_from_mem(void* addr, size_t blob_size)
 {
     (void)blob_size;
     cpucache_invalidate();
