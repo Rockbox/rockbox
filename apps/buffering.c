@@ -779,7 +779,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     {
         LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
-        h->ridx = h->data + newpos;
+        h->ridx = ringbuf_add(h->data, newpos - h->offset);
         return;
     }
 
