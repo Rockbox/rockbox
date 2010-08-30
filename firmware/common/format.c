@@ -42,6 +42,8 @@ int format(
     long lval, lsign;
     unsigned int uval;
     unsigned long ulval;
+    size_t uszval;
+    ssize_t szval, szsign;
     bool ok = true;
 
     tmpbuf[sizeof tmpbuf - 1] = '\0';
@@ -162,6 +164,40 @@ int format(
 
                 default:
                     *--str = 'l';
+                    *--str = ch;
+            }
+
+            break;
+
+        case 'z':
+            ch = *fmt++;
+            switch(ch) {
+                case 'd':
+                    szval = szsign = va_arg (ap, long);
+                    if (szval < 0)
+                        szval = -szval;
+                    do
+                    {
+                        *--str = (szval % 10) + '0';
+                        szval /= 10;
+                    }
+                    while (szval > 0);
+                    if (szsign < 0)
+                        *--str = '-';
+                    break;
+
+                case 'u':
+                    uszval = va_arg(ap, size_t);
+                    do
+                    {
+                        *--str = (uszval % 10) + '0';
+                        uszval /= 10;
+                    }
+                    while (uszval > 0);
+                    break;
+
+                default:
+                    *--str = 'z';
                     *--str = ch;
             }
 
