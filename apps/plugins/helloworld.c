@@ -18,13 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "plugin.h"
 
 /* welcome to the example rockbox plugin */
 
-/* This macros must always be included. Should be placed at the top by
-   convention, although the actual position doesn't matter */
-
+/* mandatory include for all plugins */
+#include "plugin.h"
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
@@ -33,8 +31,11 @@ enum plugin_status plugin_start(const void* parameter)
        this to avoid the compiler warning about it */
     (void)parameter;
 
+    /* "rb->" marks a plugin api call. Rockbox offers many of its built-in
+     * functions to plugins */
     /* now go ahead and have fun! */
     rb->splash(HZ*2, "Hello world!");
 
+    /* tell Rockbox that we have completed successfully */
     return PLUGIN_OK;
 }
