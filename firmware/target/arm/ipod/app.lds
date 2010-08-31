@@ -192,7 +192,11 @@ SECTIONS
     
     .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
+#ifdef IPOD_VIDEO
+        audiobufend_lds = .;
+#else
         audiobufend = .;
+#endif
         _audiobufend = .;
     } > DRAM
 

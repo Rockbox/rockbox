@@ -422,6 +422,13 @@ static void init(void)
 #endif
 
     system_init();
+#if defined(IPOD_VIDEO)
+    audiobufend=(unsigned char *)audiobufend_lds;
+    if(MEM==64 && probed_ramsize!=64)
+    {
+        audiobufend -= (32<<20);
+    }
+#endif
     kernel_init();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

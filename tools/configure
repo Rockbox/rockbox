@@ -1467,6 +1467,7 @@ fi
     target_id=15
     modelname="ipodvideo"
     target="-DIPOD_VIDEO"
+    memory=64 # always. This is reduced at runtime if needed
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipvd"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"

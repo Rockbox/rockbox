@@ -1601,12 +1601,10 @@ static bool view_battery(void)
                 lcd_putsf(0, 7, "Headphone: %s",
                          headphone ? "connected" : "disconnected");
 #ifdef IPOD_VIDEO
-                x = (adc_read(ADC_4066_ISTAT) * 2400) /
-#if MEM == 64
-                (1024 * 2);
-#else
-                (1024 * 3);
-#endif
+                if(probed_ramsize == 64)
+                    x = (adc_read(ADC_4066_ISTAT) * 2400) / (1024 * 2);
+                else
+                    x = (adc_read(ADC_4066_ISTAT) * 2400) / (1024 * 3);
                 lcd_putsf(0, 8, "Ibat: %d mA", x);
                 lcd_putsf(0, 9, "Vbat * Ibat: %d mW", x * y / 1000);
 #endif

@@ -24,7 +24,12 @@
 #include "config.h"
 /* defined in linker script */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(IPOD_VIDEO)
+extern unsigned char *audiobufend_lds[];
+unsigned char *audiobufend;
+#else
 extern unsigned char audiobufend[];
+#endif
 #else
 extern unsigned char *audiobufend;
 #endif
