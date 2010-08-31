@@ -31,6 +31,7 @@
 #include "fmradio_i2c.h"
 #include "button-target.h"
 #include "backlight-target.h"
+#include "lcd.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
