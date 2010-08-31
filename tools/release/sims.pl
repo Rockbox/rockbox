@@ -227,7 +227,6 @@ runone("mini2440");
 runone("ondavx747");
 runone("ondavx747p");
 runone("ondavx777");
-runone("sansac200v2");
 runone("sansam200v4");
 runone("zenvision");
 runone("zenvisionm30gb");
