@@ -314,6 +314,8 @@ void system_exception_wait(void)
 {
     /* make sure lcd+backlight are on */
     _backlight_panic_on();
+    /* make sure screen content is up to date */
+    lcd_update();
     /* wait until button release (if a button is pressed) */
     while(button_read_device());
     /* then wait until next button press */
