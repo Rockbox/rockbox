@@ -509,10 +509,16 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
     }
     if (element->children[alternator->current_line]->children_count == 0)
     {
+        int old_line = alternator->current_line;
+        int line = alternator->current_line+1;
         /* skip empty sublines */
-        alternator->current_line++;
-        if (alternator->current_line >= element->children_count)
-            alternator->current_line = 0;
+        while (line!=old_line && element->children[line]->children_count == 0)
+        {
+            line++;
+            if (line >= element->children_count)
+                line = 0;
+        }
+        alternator->current_line = line;
         changed_lines = true;
     }
     
