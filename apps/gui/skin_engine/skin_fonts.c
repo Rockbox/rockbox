@@ -85,6 +85,7 @@ int skin_font_load(char* font_name, int glyphs)
         else if (!font && font_table[i].font_id == -1)
         {
             font = &font_table[i];
+            strcpy(font_table[i].name, filename);
         }
     }
     if (!font)
