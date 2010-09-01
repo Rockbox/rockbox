@@ -244,7 +244,9 @@ enum tidy_return tidy_removedir(char *path, int *path_length)
                 /* silent error */
                 continue;
 
-            if (entry->attribute & ATTR_DIRECTORY)
+            
+            struct dirinfo info = rb->dir_get_info(dir, entry);
+            if (info.attribute & ATTR_DIRECTORY)
             {
                 /* dir ignore "." and ".." */
                 if ((rb->strcmp(entry->d_name, ".") != 0) && \
@@ -297,6 +299,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
         while((status == TIDY_RETURN_OK) && ((entry = rb->readdir(dir)) != 0))
         /* walk directory */
         {
+            struct dirinfo info = rb->dir_get_info(dir, entry);
             /* check for user input and usb connect */
             button = rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
             if (button == ACTION_STD_CANCEL)
@@ -312,7 +315,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
 
             rb->yield();
 
-            if (entry->attribute & ATTR_DIRECTORY)
+            if (info.attribute & ATTR_DIRECTORY)
             {
                 /* directory ignore "." and ".." */
                 if ((rb->strcmp(entry->d_name, ".") != 0) && \
@@ -326,7 +329,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
                         /* silent error */
                         continue;
 
-                    if (tidy_remove_item(entry->d_name, entry->attribute))
+                    if (tidy_remove_item(entry->d_name, info.attribute))
                     {
                         /* delete dir */
                         tidy_removedir(path, path_length);
@@ -347,7 +350,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
             {
                 /* file */
                 del = 0;
-                if (tidy_remove_item(entry->d_name, entry->attribute))
+                if (tidy_remove_item(entry->d_name, info.attribute))
                 {
                     /* get absolute path */
                     /* returns an error if path is too long */

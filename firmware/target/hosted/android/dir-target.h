@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Maurus Cuelenaere
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,21 +19,19 @@
  *
  ****************************************************************************/
 
-#ifndef __INCLUDE_FILEFUNCS_H_
-#define __INCLUDE_FILEFUNCS_H_
+#ifndef __DIR_TARGET_H__
+#define __DIR_TARGET_H__
 
-#include <stdbool.h>
-#include "config.h"
-#include "dir.h"
+#include <dirent.h>
 
-#ifdef HAVE_MULTIVOLUME
-int strip_volume(const char* name, char* namecopy);
-#endif
+#define opendir     _opendir
+#define mkdir       _mkdir
+#define closedir    _closedir
+#define readdir     _readdir
 
-#ifndef __PCTOOL__
-bool file_exists(const char *file);
-bool dir_exists(const char *path);
-#endif
-extern struct dirinfo dir_get_info(struct DIR* parent, struct dirent *entry);
+extern DIR* _opendir(const char* name);
+extern int  _mkdir(const char* name);
+extern int  _closedir(DIR* dir);
+extern struct dirent *_readdir(DIR* dir);
 
-#endif /* __INCLUDE_FILEFUNCS_H_ */
+#endif /* __DIR_TARGET_H__ */

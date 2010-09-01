@@ -95,7 +95,9 @@ static void hash_dir( int out, const char *path )
             char childpath[MAX_PATH];
             rb->snprintf( childpath, MAX_PATH, "%s/%s",
                           rb->strcmp( path, "/" ) ? path : "", entry->d_name );
-            if( entry->attribute & ATTR_DIRECTORY )
+            
+            struct dirinfo info = rb->dir_get_info(dir, entry);
+            if (info.attribute & ATTR_DIRECTORY)
             {
                 if( rb->strcmp( entry->d_name, "." )
                     && rb->strcmp( entry->d_name, ".." ) )

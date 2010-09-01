@@ -203,14 +203,10 @@ static inline void call_tick_tasks(void)
 }
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && !defined(PLUGIN) && !defined(CODEC)
-#define sleep(x) sim_sleep(x)
-#endif
-
 /* kernel functions */
 extern void kernel_init(void) INIT_ATTR;
 extern void yield(void);
-extern void sleep(int ticks);
+extern unsigned sleep(unsigned ticks);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 extern void tick_start(unsigned int interval_in_ms) INIT_ATTR;

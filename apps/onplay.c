@@ -26,7 +26,6 @@
 
 #include "debug.h"
 #include "lcd.h"
-#include "dir.h"
 #include "file.h"
 #include "audio.h"
 #include "menu.h"
@@ -63,6 +62,7 @@
 #include "statusbar-skinned.h"
 #include "pitchscreen.h"
 #include "viewport.h"
+#include "filefuncs.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -484,14 +484,14 @@ static int remove_dir(char* dirname, int len)
         entry = readdir(dir);
         if (!entry)
             break;
-
+        struct dirinfo info = dir_get_info(dir, entry);
         dirname[dirlen] ='\0';
         /* inform the user which dir we're deleting */
         splash(0, dirname);
 
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
-        if (entry->attribute & ATTR_DIRECTORY)
+        if (info.attribute & ATTR_DIRECTORY)
         {   /* remove a subdirectory */
             if (!strcmp((char *)entry->d_name, ".") ||
                 !strcmp((char *)entry->d_name, ".."))
@@ -783,6 +783,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target,
         if (!entry)
             break;
 
+        struct dirinfo info = dir_get_info(srcdir, entry);
         /* append name to current directory */
         snprintf(src+srcdirlen, srclen-srcdirlen, "/%s", entry->d_name);
         snprintf(target+targetdirlen, targetlen-targetdirlen, "/%s",
@@ -790,7 +791,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target,
 
         DEBUGF("Copy %s to %s\n", src, target);
 
-        if (entry->attribute & ATTR_DIRECTORY)
+        if (info.attribute & ATTR_DIRECTORY)
         {   /* copy/move a subdirectory */
             if (!strcmp((char *)entry->d_name, ".") ||
                 !strcmp((char *)entry->d_name, ".."))

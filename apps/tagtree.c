@@ -51,7 +51,7 @@
 #include "audio.h"
 #include "appevents.h"
 #include "storage.h"
-#include "dir_uncached.h"
+#include "dir.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 

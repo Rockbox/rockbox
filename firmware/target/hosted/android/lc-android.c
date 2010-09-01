@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Maurus Cuelenaere
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,21 +19,22 @@
  *
  ****************************************************************************/
 
-#ifndef __INCLUDE_FILEFUNCS_H_
-#define __INCLUDE_FILEFUNCS_H_
+#include <string.h> /* size_t */
+#include "load_code.h"
 
-#include <stdbool.h>
-#include "config.h"
-#include "dir.h"
+/* the load_code wrappers simply wrap, nothing to do */
+void *lc_open(const char *filename, char *buf, size_t buf_size)
+{
+    return _lc_open(filename, buf, buf_size);
+}
 
-#ifdef HAVE_MULTIVOLUME
-int strip_volume(const char* name, char* namecopy);
-#endif
+void *lc_get_header(void *handle)
+{
+    return _lc_get_header(handle);
+}
 
-#ifndef __PCTOOL__
-bool file_exists(const char *file);
-bool dir_exists(const char *path);
-#endif
-extern struct dirinfo dir_get_info(struct DIR* parent, struct dirent *entry);
+void lc_close(void *handle)
+{
+    _lc_close(handle);
+}
 
-#endif /* __INCLUDE_FILEFUNCS_H_ */

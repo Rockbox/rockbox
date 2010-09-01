@@ -124,8 +124,8 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
                  ce->startcluster,
                  &(file->fatfile),
                  NULL);
-        file->size = ce->size;
-        file->attr = ce->attribute;
+        file->size = ce->info.size;
+        file->attr = ce->info.attribute;
         file->cacheoffset = -1;
         file->fileoffset = 0;
 
@@ -169,8 +169,8 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
                      entry->startcluster,
                      &(file->fatfile),
                      &(dir->fatdir));
-            file->size = file->trunc ? 0 : entry->size;
-            file->attr = entry->attribute;
+            file->size = file->trunc ? 0 : entry->info.size;
+            file->attr = entry->info.attribute;
             break;
         }
     }

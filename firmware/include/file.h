@@ -37,7 +37,7 @@
 #define MAX_OPEN_FILES 11
 
 #if !defined(PLUGIN) && !defined(CODEC)
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #define open(x, ...) sim_open(x, __VA_ARGS__)
 #define creat(x,m) sim_creat(x,m)
 #define remove(x) sim_remove(x)

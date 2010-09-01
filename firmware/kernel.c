@@ -213,7 +213,7 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
 /****************************************************************************
  * Thread stuff
  ****************************************************************************/
-void sleep(int ticks)
+unsigned sleep(unsigned ticks)
 {
 #if defined(CPU_PP) && defined(BOOTLOADER)
     unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
@@ -229,6 +229,7 @@ void sleep(int ticks)
     sleep_thread(ticks);
     switch_thread();
 #endif
+    return 0;
 }
 
 void yield(void)

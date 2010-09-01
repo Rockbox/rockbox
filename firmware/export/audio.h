@@ -35,11 +35,6 @@
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
-
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-#define audio_play(x) sim_audio_play(x)
-#endif
-
 #define AUDIO_STATUS_PLAY       0x0001
 #define AUDIO_STATUS_PAUSE      0x0002
 #define AUDIO_STATUS_RECORD     0x0004

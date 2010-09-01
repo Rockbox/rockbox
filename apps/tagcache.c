@@ -4222,6 +4222,8 @@ static bool check_dir(const char *dirname, int add_files)
             success = true;
             break ;
         }
+
+        struct dirinfo info = dir_get_info(dir, entry);
         
         if (!strcmp((char *)entry->d_name, ".") ||
             !strcmp((char *)entry->d_name, ".."))
@@ -4234,14 +4236,14 @@ static bool check_dir(const char *dirname, int add_files)
                  entry->d_name);
         
         processed_dir_count++;
-        if (entry->attribute & ATTR_DIRECTORY)
+        if (info.attribute & ATTR_DIRECTORY)
             check_dir(curpath, add_files);
         else if (add_files)
         {
             tc_stat.curentry = curpath;
             
             /* Add a new entry to the temporary db file. */
-            add_tagcache(curpath, (entry->wrtdate << 16) | entry->wrttime
+            add_tagcache(curpath, (info.wrtdate << 16) | info.wrttime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
                          , dir->internal_entry
 #endif

@@ -21,18 +21,20 @@
 #ifndef _DIR_UNCACHED_H_
 #define _DIR_UNCACHED_H_
 
+#include "config.h"
+
+struct dirinfo {
+    int attribute;
+    long size;
+    unsigned short wrtdate;
+    unsigned short wrttime;
+};
+
+#ifndef APPLICATION
 #include <stdbool.h>
 #include "file.h"
 
-#define ATTR_READ_ONLY   0x01
-#define ATTR_HIDDEN      0x02
-#define ATTR_SYSTEM      0x04
-#define ATTR_VOLUME_ID   0x08
-#define ATTR_DIRECTORY   0x10
-#define ATTR_ARCHIVE     0x20
-#define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
-
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #define dirent_uncached sim_dirent
 #define DIR_UNCACHED SIM_DIR
 #define opendir_uncached sim_opendir
@@ -46,11 +48,8 @@
 
 struct dirent_uncached {
     unsigned char d_name[MAX_PATH];
-    int attribute;
-    long size;
+    struct dirinfo info;
     long startcluster;
-    unsigned short wrtdate; /*  Last write date */ 
-    unsigned short wrttime; /*  Last write time */
 };
 #endif
 
@@ -92,5 +91,6 @@ extern struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir);
 extern int release_dirs(int volume);
 
 #endif /* DIRFUNCTIONS_DEFINED */
+#endif
 
 #endif

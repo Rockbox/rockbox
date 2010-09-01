@@ -55,20 +55,16 @@
 #define LOGF_ENABLE
 #include "logf.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #define PREFIX(_x_) sim_ ## _x_
+#else
+#define PREFIX(_x_) _x_
+#endif
+
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #if CONFIG_CODEC == SWCODEC
 unsigned char codecbuf[CODEC_SIZE];
 #endif
-void *sim_codec_load_ram(char* codecptr, int size, void **pd);
-void sim_codec_close(void *pd);
-
-#else /* !PLATFORM_HOSTED */
-
-#define PREFIX
-#define sim_codec_close(x)
-
 #endif
 
 size_t codec_size;
@@ -110,7 +106,7 @@ struct codec_api ci = {
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     __div0,
 #endif
-    PREFIX(sleep),
+    sleep,
     yield,
 
 #if NUM_CORES > 1

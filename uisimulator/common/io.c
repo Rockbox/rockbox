@@ -158,13 +158,18 @@ extern const char *sim_root_dir;
 
 static int num_openfiles = 0;
 
-struct sim_dirent {
-    unsigned char d_name[MAX_PATH];
+/* from dir.h */
+struct dirinfo {
     int attribute;
     long size;
+    unsigned short wrtdate;
+    unsigned short wrttime;
+};
+
+struct sim_dirent {
+    unsigned char d_name[MAX_PATH];
+    struct dirinfo info;
     long startcluster;
-    unsigned short wrtdate; /*  Last write date */
-    unsigned short wrttime; /*  Last write time */
 };
 
 struct dirstruct {
@@ -329,14 +334,14 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 
 #define ATTR_DIRECTORY 0x10
 
-    secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
-    secret.size = s.st_size;
+    secret.info.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
+    secret.info.size = s.st_size;
 
     tm = localtime(&(s.st_mtime));
-    secret.wrtdate = ((tm->tm_year - 80) << 9) |
+    secret.info.wrtdate = ((tm->tm_year - 80) << 9) |
                         ((tm->tm_mon + 1) << 5) |
                         tm->tm_mday;
-    secret.wrttime = (tm->tm_hour << 11) |
+    secret.info.wrttime = (tm->tm_hour << 11) |
                         (tm->tm_min << 5) |
                         (tm->tm_sec >> 1);
     return &secret;

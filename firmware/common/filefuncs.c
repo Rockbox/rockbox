@@ -23,6 +23,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "debug.h"
+#include "file.h"
 #include "filefuncs.h"
 
 #ifdef HAVE_MULTIVOLUME
@@ -87,4 +88,12 @@ bool dir_exists(const char *path)
     closedir(d);
     return true;
 }
+
+#if !(CONFIG_PLATFORM & PLATFORM_ANDROID)
+struct dirinfo dir_get_info(struct DIR* parent, struct dirent *entry)
+{
+    (void)parent;
+    return entry->info;
+}
+#endif
 #endif /* __PCTOOL__ */

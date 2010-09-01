@@ -153,10 +153,10 @@ static void check_file_thumbnails(struct tree_context* c)
     while((entry = readdir(dir)) != 0) /* walk directory */
     {
         int ext_pos;
-
+        struct dirinfo info = dir_get_info(dir, entry);
         ext_pos = strlen((char *)entry->d_name) - strlen(file_thumbnail_ext);
         if (ext_pos <= 0 /* too short to carry ".talk" */
-            || (entry->attribute & ATTR_DIRECTORY) /* no file */
+            || (info.attribute & ATTR_DIRECTORY) /* no file */
             || strcasecmp((char *)&entry->d_name[ext_pos], file_thumbnail_ext))
         {   /* or doesn't end with ".talk", no candidate */
             continue;
@@ -284,15 +284,17 @@ int ft_load(struct tree_context* c, const char* tempdir)
     for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
         int len;
         struct dirent *entry = readdir(dir);
+        struct dirinfo info;
         struct entry* dptr =
             (struct entry*)(c->dircache + i * sizeof(struct entry));
         if (!entry)
             break;
 
+        info = dir_get_info(dir, entry);
         len = strlen((char *)entry->d_name);
 
         /* skip directories . and .. */
-        if ((entry->attribute & ATTR_DIRECTORY) &&
+        if ((info.attribute & ATTR_DIRECTORY) &&
             (((len == 1) && (!strncmp((char *)entry->d_name, ".", 1))) ||
              ((len == 2) && (!strncmp((char *)entry->d_name, "..", 2))))) {
             i--;
@@ -300,7 +302,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         }
 
         /* Skip FAT volume ID */
-        if (entry->attribute & ATTR_VOLUME_ID) {
+        if (info.attribute & ATTR_VOLUME_ID) {
             i--;
             continue;
         }
@@ -308,12 +310,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
         /* filter out dotfiles and hidden files */
         if (*c->dirfilter != SHOW_ALL &&
             ((entry->d_name[0]=='.') ||
-            (entry->attribute & ATTR_HIDDEN))) {
+            (info.attribute & ATTR_HIDDEN))) {
             i--;
             continue;
         }
 
-        dptr->attr = entry->attribute;
+        dptr->attr = info.attribute;
 
         /* check for known file types */
         if ( !(dptr->attr & ATTR_DIRECTORY) )
@@ -362,8 +364,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
         }
         dptr->name = &c->name_buffer[name_buffer_used];
         dptr->time_write =
-            (long)entry->wrtdate<<16 |
-            (long)entry->wrttime; /* in one # */
+            (long)info.wrtdate<<16 |
+            (long)info.wrttime; /* in one # */
         strcpy(dptr->name, (char *)entry->d_name);
         name_buffer_used += len + 1;
 

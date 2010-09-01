@@ -1703,7 +1703,9 @@ target/coldfire/mpio/fmradio_i2c-mpio.c
 
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+target/hosted/android/fs-android.c
 target/hosted/android/lcd-android.c
+target/hosted/android/lc-android.c
 target/hosted/android/button-android.c
 target/hosted/android/kernel-android.c
 target/hosted/android/pcm-android.c

@@ -159,7 +159,7 @@ struct codec_api {
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     void (*__div0)(void);
 #endif
-    void (*sleep)(int ticks);
+    unsigned (*sleep)(unsigned ticks);
     void (*yield)(void);
 
 #if NUM_CORES > 1

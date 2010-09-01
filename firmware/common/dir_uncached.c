@@ -171,7 +171,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
             if (fat_ismounted(dir->volumecounter))
             {
                 memset(theent, 0, sizeof(*theent));
-                theent->attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
+                theent->info.attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
                 snprintf(theent->d_name, sizeof(theent->d_name), 
                          VOL_NAMES, dir->volumecounter);
                 return theent;
@@ -187,11 +187,11 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
         return NULL;
 
     strlcpy(theent->d_name, entry.name, sizeof(theent->d_name));
-    theent->attribute = entry.attr;
-    theent->size = entry.filesize;
+    theent->info.attribute = entry.attr;
+    theent->info.wrtdate = entry.wrtdate;
+    theent->info.wrttime = entry.wrttime;
+    theent->info.size = entry.filesize;
     theent->startcluster = entry.firstcluster;
-    theent->wrtdate = entry.wrtdate;
-    theent->wrttime = entry.wrttime;
 
     return theent;
 }

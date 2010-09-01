@@ -28,6 +28,7 @@
 #include "misc.h"
 #include "lcd.h"
 #include "file.h"
+#include "filefuncs.h"
 #ifndef __PCTOOL__
 #include "lang.h"
 #include "dir.h"
@@ -708,11 +709,12 @@ void check_bootfile(bool do_rolo)
     {
         if(!strcasecmp(entry->d_name, BOOTFILE))
         {
+            struct dirinfo info = dir_get_info(dir, entry);
             /* found the bootfile */
             if(wrtdate && do_rolo)
             {
-                if((entry->wrtdate != wrtdate) ||
-                   (entry->wrttime != wrttime))
+                if((info.wrtdate != wrtdate) ||
+                   (info.wrttime != wrttime))
                 {
                     static const char *lines[] = { ID2P(LANG_BOOT_CHANGED),
                                                    ID2P(LANG_REBOOT_NOW) };
@@ -722,8 +724,8 @@ void check_bootfile(bool do_rolo)
                     rolo_load(BOOTDIR "/" BOOTFILE);
                 }
             }
-            wrtdate = entry->wrtdate;
-            wrttime = entry->wrttime;
+            wrtdate = info.wrtdate;
+            wrttime = info.wrttime;
         }
     }
     closedir(dir);

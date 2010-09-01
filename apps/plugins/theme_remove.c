@@ -236,7 +236,8 @@ static int remove_dir(char* dirname, int len)
 
         /* append name to current directory */
         rb->snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
-        if (entry->attribute & ATTR_DIRECTORY)
+        struct dirinfo info = rb->dir_get_info(dir, entry);
+        if (info.attribute & ATTR_DIRECTORY)
         {
             /* remove a subdirectory */
             if (!rb->strcmp((char *)entry->d_name, ".") ||

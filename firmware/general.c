@@ -22,7 +22,7 @@
 #include "config.h"
 #include <stdio.h>
 #include "general.h"
-
+#include "file.h"
 #include "dir.h"
 #include "limits.h"
 #include "stdlib.h"

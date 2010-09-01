@@ -69,22 +69,23 @@ static bool file_properties(char* selected_file)
     {
         while(0 != (entry = rb->readdir(dir)))
         {
+            struct dirinfo info = rb->dir_get_info(dir, entry);
             if(!rb->strcmp(entry->d_name, selected_file+dirlen))
             {
                 unsigned log;
                 rb->snprintf(str_dirname, sizeof str_dirname, "Path: %s", tstr);
                 rb->snprintf(str_filename, sizeof str_filename, "Name: %s",
                              selected_file+dirlen);
-                log = human_size_log(entry->size);
+                log = human_size_log(info.size);
                 rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
-                             entry->size >> (log*10), human_size_prefix[log]);
+                             info.size >> (log*10), human_size_prefix[log]);
                 rb->snprintf(str_date, sizeof str_date, "Date: %04d/%02d/%02d",
-                    ((entry->wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
-                    ((entry->wrtdate >> 5 ) & 0x0F),        /* month   */
-                    ((entry->wrtdate      ) & 0x1F));       /* day     */
+                    ((info.wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
+                    ((info.wrtdate >> 5 ) & 0x0F),        /* month   */
+                    ((info.wrtdate      ) & 0x1F));       /* day     */
                 rb->snprintf(str_time, sizeof str_time, "Time: %02d:%02d",
-                    ((entry->wrttime >> 11) & 0x1F),        /* hour    */
-                    ((entry->wrttime >> 5 ) & 0x3F));       /* minutes */
+                    ((info.wrttime >> 11) & 0x1F),        /* hour    */
+                    ((info.wrttime >> 5 ) & 0x3F));       /* minutes */
 
                 num_properties = 5;
 
@@ -158,11 +159,12 @@ static bool _dir_properties(DPS* dps)
     /* walk through the directory content */
     while(result && (0 != (entry = rb->readdir(dir))))
     {
+        struct dirinfo info = rb->dir_get_info(dir, entry);
         /* append name to current directory */
         rb->snprintf(dps->dirname+dirlen, dps->len-dirlen, "/%s",
                      entry->d_name);
 
-        if (entry->attribute & ATTR_DIRECTORY)
+        if (info.attribute & ATTR_DIRECTORY)
         {
             unsigned log;
 
@@ -188,7 +190,7 @@ static bool _dir_properties(DPS* dps)
         else
         {
             dps->fc++; /* new file */
-            dps->bc += entry->size;
+            dps->bc += info.size;
         }
         if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
             result = false;
@@ -290,7 +292,8 @@ enum plugin_status plugin_start(const void* parameter)
         {
             if(!rb->strcmp(entry->d_name, file+dirlen))
             {
-                its_a_dir = entry->attribute & ATTR_DIRECTORY ? true : false;
+                struct dirinfo info = rb->dir_get_info(dir, entry);
+                its_a_dir = info.attribute & ATTR_DIRECTORY ? true : false;
                 found = true;
                 break;
             }

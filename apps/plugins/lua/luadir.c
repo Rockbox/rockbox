@@ -56,8 +56,9 @@ static int dir_iter (lua_State *L) {
     luaL_argcheck (L, !d->closed, 1, "closed directory");
 
     if ((entry = rb->readdir (d->dir)) != NULL) {
+        struct dirinfo info = rb->dir_get_info(d->dir, entry);
         lua_pushstring (L, entry->d_name);
-        lua_pushboolean (L, entry->attribute & ATTR_DIRECTORY);
+        lua_pushboolean (L, info.attribute & ATTR_DIRECTORY);
         return 2;
     } else {
         /* no more entries => close directory */

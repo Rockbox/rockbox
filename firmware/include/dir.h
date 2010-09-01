@@ -41,6 +41,15 @@
 
 #endif
 
+#define ATTR_READ_ONLY   0x01
+#define ATTR_HIDDEN      0x02
+#define ATTR_SYSTEM      0x04
+#define ATTR_VOLUME_ID   0x08
+#define ATTR_DIRECTORY   0x10
+#define ATTR_ARCHIVE     0x20
+#define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
+
+#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_SDL))
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"
 # define DIR DIR_CACHED
@@ -61,6 +70,10 @@
 # define closedir closedir_uncached
 # define mkdir mkdir_uncached
 # define rmdir rmdir_uncached
+#endif
+#else
+#include "dir_uncached.h"
+#include "dir-target.h"
 #endif
 
 #endif

@@ -101,7 +101,7 @@ void sidPoke(int reg, unsigned char val) ICODE_ATTR;
 #define rel 13
 
 enum { 
-    adc, _and, asl, bcc, bcs, beq, bit, bmi, bne, bpl, brk, bvc, bvs, clc,
+    adc, _and, asl, bcc, bcs, beq, bit, bmi, bne, bpl, _brk, bvc, bvs, clc,
     cld, cli, clv, cmp, cpx, cpy, dec, dex, dey, eor, inc, inx, iny, jmp,
     jsr, lda, ldx, ldy, lsr, _nop, ora, pha, php, pla, plp, rol, ror, rti,
     rts, sbc, sec, sed, sei, sta, stx, sty, tax, tay, tsx, txa, txs, tya,
@@ -204,7 +204,7 @@ static const float decayReleaseTimes[16] ICONST_ATTR =
 };
 
 static const int opcodes[256] ICONST_ATTR = {
-    brk,ora,xxx,xxx,xxx,ora,asl,xxx,php,ora,asl,xxx,xxx,ora,asl,xxx,
+    _brk,ora,xxx,xxx,xxx,ora,asl,xxx,php,ora,asl,xxx,xxx,ora,asl,xxx,
     bpl,ora,xxx,xxx,xxx,ora,asl,xxx,clc,ora,xxx,xxx,xxx,ora,asl,xxx,
     jsr,_and,xxx,xxx,bit,_and,rol,xxx,plp,_and,rol,xxx,bit,_and,rol,xxx,
     bmi,_and,xxx,xxx,xxx,_and,rol,xxx,sec,_and,xxx,xxx,xxx,_and,rol,xxx,
@@ -908,7 +908,7 @@ static inline void cpuParse(void)
             setflags(FLAG_N,bval&0x80);
             setflags(FLAG_V,bval&0x40);
             break;
-        case brk:
+        case _brk:
             pc=0;           /* Just quit the emulation */
             break;
         case clc:

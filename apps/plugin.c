@@ -59,7 +59,7 @@
 #include "usbstack/usb_hid.h"
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #define PREFIX(_x_) sim_ ## _x_
 #else
 #define PREFIX
@@ -349,7 +349,7 @@ static const struct plugin_api rockbox_api = {
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     __div0,
 #endif
-    PREFIX(sleep),
+    sleep,
     yield,
     &current_tick,
     default_event_handler,
@@ -529,7 +529,7 @@ static const struct plugin_api rockbox_api = {
     playlist_insert_track,
     playlist_insert_directory,
     playlist_shuffle,
-    PREFIX(audio_play),
+    audio_play,
     audio_stop,
     audio_pause,
     audio_resume,
@@ -722,6 +722,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    dir_get_info,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -940,11 +941,11 @@ static int open_wrapper(const char* pathname, int flags, ...)
     {
         va_list ap;
         va_start(ap, flags);
-        fd = sim_open(pathname, flags, va_arg(ap, unsigned int));
+        fd = open(pathname, flags, va_arg(ap, unsigned int));
         va_end(ap);
     }
     else
-        fd = sim_open(pathname, flags);
+        fd = open(pathname, flags);
 #else
     fd = file_open(pathname,flags);
 #endif
