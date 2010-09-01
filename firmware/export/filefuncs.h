@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 #include "config.h"
+#include "file.h"
 #include "dir.h"
 
 #ifdef HAVE_MULTIVOLUME
@@ -34,6 +35,6 @@ int strip_volume(const char* name, char* namecopy);
 bool file_exists(const char *file);
 bool dir_exists(const char *path);
 #endif
-extern struct dirinfo dir_get_info(struct DIR* parent, struct dirent *entry);
+extern struct dirinfo dir_get_info(DIR* parent, struct dirent *entry);
 
 #endif /* __INCLUDE_FILEFUNCS_H_ */

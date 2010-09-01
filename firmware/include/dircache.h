@@ -21,6 +21,7 @@
 #ifndef _DIRCACHE_H
 #define _DIRCACHE_H
 
+#include "config.h"
 #include "dir_uncached.h"
 
 #ifdef HAVE_DIRCACHE

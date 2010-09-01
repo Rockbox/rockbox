@@ -894,7 +894,7 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    struct dirinfo (*dir_get_info)(struct DIR* parent, struct dirent *entry);
+    struct dirinfo (*dir_get_info)(DIR* parent, struct dirent *entry);
 };
 
 /* plugin header */

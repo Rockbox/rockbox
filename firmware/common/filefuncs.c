@@ -90,7 +90,7 @@ bool dir_exists(const char *path)
 }
 
 #if !(CONFIG_PLATFORM & PLATFORM_ANDROID)
-struct dirinfo dir_get_info(struct DIR* parent, struct dirent *entry)
+struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
 {
     (void)parent;
     return entry->info;
