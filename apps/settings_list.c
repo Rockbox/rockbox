@@ -763,7 +763,7 @@ const struct settings_list settings[] = {
 #endif
                   "max files in dir", UNIT_INT, 50, 10000, 50,
                   NULL, NULL, NULL),
-#if BATTERY_CAPACITY_INC > 0
+#if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
     INT_SETTING(0, battery_capacity, LANG_BATTERY_CAPACITY,
                 BATTERY_CAPACITY_DEFAULT, "battery capacity", UNIT_MAH,
                 BATTERY_CAPACITY_MIN, BATTERY_CAPACITY_MAX,

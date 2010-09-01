@@ -12,7 +12,7 @@ backlight-sim.c
 #if (CONFIG_PLATFORM & PLATFORM_SDL)
 io.c
 sim_tasks.c
+powermgmt-sim.c
 #endif
 /* this is still needed for application since it has some stubs */
-powermgmt-sim.c
 stubs.c

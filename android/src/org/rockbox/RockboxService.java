@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -16,7 +18,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -36,6 +41,9 @@ public class RockboxService extends Service
 	private Method mStopForeground;
 	private Object[] mStartForegroundArgs = new Object[2];
 	private Object[] mStopForegroundArgs = new Object[1];
+	private IntentFilter itf;
+	private BroadcastReceiver batt_monitor;
+	private int battery_level;
 	@Override
 	public void onCreate()
 	{
@@ -161,6 +169,43 @@ public class RockboxService extends Service
 		return null;
 	}
 
+	
+	@SuppressWarnings("unused")
+	/*
+	 * Sets up the battery monitor which receives the battery level
+	 * about each 30 seconds
+	 */
+	private void initBatteryMonitor()
+	{
+		itf = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		batt_monitor = new BroadcastReceiver() 
+		{			
+			@Override
+			public void onReceive(Context context, Intent intent) 
+			{
+				/* we get literally spammed with battery statuses 
+				 * if we don't delay the re-attaching
+				 */
+				TimerTask tk = new TimerTask() {
+					public void run() {
+						registerReceiver(batt_monitor, itf);
+					}
+				};
+				Timer t = new Timer();
+				context.unregisterReceiver(this);
+				int rawlevel = intent.getIntExtra("level", -1);
+				int scale = intent.getIntExtra("scale", -1);
+				if (rawlevel >= 0 && scale > 0)
+					battery_level = (rawlevel * 100) / scale;
+				else
+					battery_level = -1;
+				/* query every 30s should be sufficient */ 
+				t.schedule(tk, 30000);
+			}
+		};
+		registerReceiver(batt_monitor, itf);
+	}
+	
     /* all below is heavily based on the examples found on
      * http://developer.android.com/reference/android/app/Service.html
      */

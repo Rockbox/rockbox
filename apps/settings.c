@@ -852,7 +852,10 @@ void settings_apply(bool read_disk)
 #endif
     set_poweroff_timeout(global_settings.poweroff);
 
+#if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
     set_battery_capacity(global_settings.battery_capacity);
+#endif
+
 #if BATTERY_TYPES_COUNT > 1
     set_battery_type(global_settings.battery_type);
 #endif
