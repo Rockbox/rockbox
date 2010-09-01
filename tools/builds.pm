@@ -114,7 +114,6 @@ $releasenotes="/wiki/ReleaseNotes36";
     'ipodvideo' => {
         name => 'iPod Video 30GB',
         status => 3,
-        ram => 32,
     },
     'ipodvideo64mb' => {
         name => 'iPod Video 60/80GB',
@@ -123,7 +122,6 @@ $releasenotes="/wiki/ReleaseNotes36";
         manual => 'ipodvideo',
         voice => 'ipodvideo',
         configname => 'ipodvideo',
-        ram => 64,
     },
     'iriverh10' => {
         name => 'iriver H10 20GB',
