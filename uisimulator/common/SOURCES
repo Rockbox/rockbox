@@ -9,10 +9,10 @@ fmradio.c
 backlight-sim.c
 #endif
 
-#if !(CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 io.c
+sim_tasks.c
 #endif
 /* this is still needed for application since it has some stubs */
 powermgmt-sim.c
-sim_tasks.c
 stubs.c

@@ -121,11 +121,8 @@
 #define MAIN_NORETURN_ATTR
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-#include "sim_tasks.h"
-#endif
-
 #if (CONFIG_PLATFORM & PLATFORM_SDL)
+#include "sim_tasks.h"
 #include "system-sdl.h"
 #define HAVE_ARGV_MAIN
 /* Don't use SDL_main on windows -> no more stdio redirection */
@@ -350,7 +347,9 @@ static void init(void)
     show_logo();
     button_init();
     backlight_init();
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
     sim_tasks_init();
+#endif
     lang_init(core_language_builtin, language_strings, 
               LANG_LAST_INDEX_IN_ARRAY);
 #ifdef DEBUG
