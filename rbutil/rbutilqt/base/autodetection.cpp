@@ -98,12 +98,6 @@ bool Autodetection::detect()
                 if(m_device.isEmpty())
                 {
                     m_device = info.target();
-                    // special case for video64mb. This is a workaround, and
-                    // should get replaced when autodetection is reworked.
-                    if(m_device == "ipodvideo" && info.ram() == 64)
-                    {
-                        m_device = "ipodvideo64mb";
-                    }
                 }
                 m_mountpoint = mounts.at(i);
                 qDebug() << "[Autodetect] rockbox-info.txt detected:"
@@ -267,7 +261,7 @@ QStringList Autodetection::mountpoints()
     endmntent(mn);
 
 #else
-#error Unknown Plattform
+#error Unknown Platform
 #endif
     return tempList;
 }

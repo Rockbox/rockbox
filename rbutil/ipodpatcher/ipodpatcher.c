@@ -1696,12 +1696,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
             ipod->modelstr="Video (aka 5th Generation)";
             ipod->modelnum = 5;
             ipod->modelname = "ipvd";
-            if(ipod->ramsize == 64) {
-                ipod->targetname = "ipodvideo64mb";
-            }
-            else {
-                ipod->targetname = "ipodvideo";
-            }
+            ipod->targetname = "ipodvideo";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodvideo;
             ipod->bootloader_len = LEN_ipodvideo;
