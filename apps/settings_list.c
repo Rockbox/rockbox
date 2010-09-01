@@ -763,7 +763,15 @@ const struct settings_list settings[] = {
 #endif
                   "max files in dir", UNIT_INT, 50, 10000, 50,
                   NULL, NULL, NULL),
-#if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
+/* use this setting for user code even if there's no exchangable battery
+ * support enabled */
+#ifdef BATTERY_CAPACITY_DEFAULT
+/* define min/max/inc for this file if there's only one battery */
+#ifndef BATTERY_CAPACITY_MIN
+#define BATTERY_CAPACITY_MIN BATTERY_CAPACITY_DEFAULT
+#define BATTERY_CAPACITY_MAX BATTERY_CAPACITY_DEFAULT
+#define BATTERY_CAPACITY_INC 0
+#endif
     INT_SETTING(0, battery_capacity, LANG_BATTERY_CAPACITY,
                 BATTERY_CAPACITY_DEFAULT, "battery capacity", UNIT_MAH,
                 BATTERY_CAPACITY_MIN, BATTERY_CAPACITY_MAX,
