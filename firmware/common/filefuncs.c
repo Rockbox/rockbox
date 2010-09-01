@@ -54,7 +54,6 @@ int strip_volume(const char* name, char* namecopy)
 }
 #endif /* #ifdef HAVE_MULTIVOLUME */
 
-#ifndef __PCTOOL__
 /* Test file existence, using dircache of possible */
 bool file_exists(const char *file)
 {
@@ -89,10 +88,10 @@ bool dir_exists(const char *path)
     return true;
 }
 
-#endif /* __PCTOOL__ */
-
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
 {
     (void)parent;
     return entry->info;
 }
+#endif

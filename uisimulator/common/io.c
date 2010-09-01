@@ -347,6 +347,13 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     return &secret;
 }
 
+struct dirinfo dir_get_info(DIR* parent, struct sim_dirent *entry)
+{
+    (void)parent;
+    return entry->info;
+}
+
+
 void sim_closedir(MYDIR *dir)
 {
     free(dir->name);
