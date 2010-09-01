@@ -39,6 +39,7 @@ uintptr_t *stackbegin;
 uintptr_t *stackend;
 
 extern int main(void);
+extern void powermgmt_init_target(void);
 /* this is the entry point of the android app initially called by jni */
 JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
@@ -56,7 +57,8 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     RockboxService_instance = this;
     RockboxService_class = (*env)->GetObjectClass(env, this);
 
-
+    /* no better place yet, most of powermgmt.c is #ifdef'd out for non-native
+     * builds */
     powermgmt_init_target();
     main();
 }
