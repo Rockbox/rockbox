@@ -89,11 +89,10 @@ bool dir_exists(const char *path)
     return true;
 }
 
-#if !(CONFIG_PLATFORM & PLATFORM_ANDROID)
+#endif /* __PCTOOL__ */
+
 struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
 {
     (void)parent;
     return entry->info;
 }
-#endif
-#endif /* __PCTOOL__ */
