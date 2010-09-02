@@ -17,6 +17,7 @@ $(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
 PACKAGE=org.rockbox
 PACKAGE_PATH=org/rockbox
 ANDROID_DIR=$(ROOTDIR)/android
+BINLIB_DIR=$(BUILDDIR)/libs/armeabi
 
 
 java2class = $(addsuffix .class,$(basename $(subst $(ANDROID_DIR),$(BUILDDIR),$(1))))
@@ -38,20 +39,27 @@ R_OBJ		:= $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
 JAVA_SRC	:= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/*.java)
 JAVA_OBJ	:= $(call java2class,$(subst /src/,/bin/,$(JAVA_SRC)))
 
-LIBS		:= $(BUILDDIR)/libs/armeabi/$(BINARY) $(BUILDDIR)/libs/armeabi/libmisc.so
+LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
 TEMP_APK	:= $(BUILDDIR)/bin/_Rockbox.apk
+TEMP_APK2	:= $(BUILDDIR)/bin/__Rockbox.apk
 APK			:= $(BUILDDIR)/bin/Rockbox.apk
+
+_DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
+DIRS		:= $(subst ___,bin,$(_DIRS))
+DIRS		+= $(subst ___,gen,$(_DIRS))
+DIRS		+= $(subst ___,data,$(_DIRS))
+DIRS		+= $(BUILDDIR)/libs/armeabi
 
 $(R_JAVA): $(MANIFEST)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$<))$(AAPT) package -f -m -J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res -I $(ANDROID_PLATFORM)/android.jar -F $(BUILDDIR)/bin/resources.ap_
 
 $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class: $(R_JAVA)
-	$(call PRINTS,JAVAC $(subst $(BUILDDIR)/,,$<))javac -d $(BUILDDIR)/bin \
+	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
 	-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin -sourcepath \
 	$(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
 
 $(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java
-	$(call PRINTS,JAVAC $(subst $(BUILDDIR)/,,$<))javac -d $(BUILDDIR)/bin \
+	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
 	-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin -sourcepath \
 	$(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
 
@@ -62,13 +70,13 @@ $(BUILDDIR)/bin/classes.dex: classes
 
 dex: $(BUILDDIR)/bin/classes.dex
 
-$(BUILDDIR)/libs/armeabi/$(BINARY): $(BUILDDIR)/$(BINARY)
+$(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@
 
 $(BUILDDIR)/_rockbox.zip: zip
 	$(SILENT)mv $(BUILDDIR)/rockbox.zip $@
 
-$(BUILDDIR)/libs/armeabi/libmisc.so: $(BUILDDIR)/_rockbox.zip
+$(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/_rockbox.zip
 	$(call PRINTS,CP rockbox.zip)cp $^ $@
 
 libs: $(LIBS)
@@ -81,7 +89,11 @@ $(APK): $(TEMP_APK)
 	$(SILENT)rm -f $@
 	$(call PRINTS,SIGN $(subst $(BUILDDIR)/,,$@))jarsigner \
 	-keystore "$(HOME)/.android/debug.keystore" -storepass "android" \
-	-keypass "android" -signedjar bin/__Rockbox.apk $^ "androiddebugkey"
-	$(SILENT)$(ZIPALIGN) -v 4 bin/__Rockbox.apk $@ > /dev/null
+	-keypass "android" -signedjar $(TEMP_APK2) $^ "androiddebugkey"
+	$(SILENT)$(ZIPALIGN) -v 4 $(TEMP_APK2) $@ > /dev/null
+	$(SILENT)rm $(TEMP_APK) $(TEMP_APK2)
 
-apk: $(APK)
+dirs:
+	$(SILENT)mkdir -p $(DIRS)
+
+apk: dirs $(APK)
