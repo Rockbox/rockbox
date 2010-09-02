@@ -503,12 +503,7 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
     char result[128];
     const char *value;
 
-    /* treat ?xx<true> constructs as if they had 2 options. 
-     * (i.e ?xx<true|false>) */
-    if (num_options < 2)
-        num_options = 2;
-
-    int intval = num_options;
+    int intval = num_options < 2 ? 2 : num_options;
     /* get_token_value needs to know the number of options in the enum */
     value = get_token_value(gwps, conditional->token, offset,
                             result, sizeof(result), &intval);
@@ -516,11 +511,15 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
     /* intval is now the number of the enum option we want to read,
        starting from 1. If intval is -1, we check if value is empty. */
     if (intval == -1)
-        intval = (value && *value) ? 1 : num_options;
+    {
+        if (num_options == 1) /* so %?AA<true> */
+            intval = (value && *value) ? 1 : 0; /* returned as 0 for true, -1 for false */
+        else
+            intval = (value && *value) ? 1 : num_options;
+    }
     else if (intval > num_options || intval < 1)
         intval = num_options;
-        
-    conditional->last_value = intval -1;
+
     return intval -1;
 }
 
