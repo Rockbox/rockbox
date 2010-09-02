@@ -236,22 +236,10 @@
 #endif
 
 /****************************** Plugin Entry Point ****************************/
-int main(void);
-bool exit_tsr(bool);
-void thread(void);
-
-
-enum plugin_status plugin_start(const void* parameter)
-{
-    (void)parameter;
-    
-    return main();
-}
-
-long start_tick;
+static long start_tick;
 
 /* Struct for battery information */
-struct batt_info
+static struct batt_info
 {
     /* the size of the struct elements is optimised to make the struct size
      * a power of 2 */
@@ -269,7 +257,7 @@ static struct event_queue thread_q;
 static bool in_usb_mode;
 static unsigned int buf_idx;
 
-bool exit_tsr(bool reenter)
+static bool exit_tsr(bool reenter)
 {
     long button;
     (void)reenter;
@@ -305,7 +293,7 @@ bool exit_tsr(bool reenter)
 #define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
 
 /* use long for aligning */
-unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
+static unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
 static unsigned int charge_state(void)
@@ -378,7 +366,7 @@ static void flush_buffer(void* data)
 }
 
 
-void thread(void)
+static void thread(void)
 {
     bool exit = false;
     char *exit_reason = "unknown";
@@ -467,8 +455,9 @@ static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, in
 }
 #endif
 
-int main(void)
+enum plugin_status plugin_start(const void* parameter)
 {
+    (void)parameter;
     int button, fd;
     bool on = false;
     start_tick = *rb->current_tick;
