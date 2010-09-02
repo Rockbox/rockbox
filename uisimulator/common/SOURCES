@@ -11,6 +11,6 @@ backlight-sim.c
 
 io.c
 sim_tasks.c
+/* this is still needed for application since it has some stubs */
 powermgmt-sim.c
 stubs.c
-/* this is still needed for application since it has some stubs */
