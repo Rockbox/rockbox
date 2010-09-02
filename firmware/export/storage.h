@@ -64,7 +64,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
  */
     #define storage_num_drives() NUM_DRIVES
     #if (CONFIG_STORAGE == 0) /* application */
-        #define STORANGE_FUNCTION(NAME) (stub_## NAME)
+        #define STORAGE_FUNCTION(NAME) (stub_## NAME)
         #define storage_spindown stub_storage_spindown
         #define storage_sleep stub_storage_sleep
         #define storage_spin stub_storage_spin
