@@ -63,11 +63,11 @@
 #
 # Track Info - No Album Art
 %Vl(b,0,50,-,96,1)
-%?C<|%s%ac%?it<%it|%fn>>
-%?C<|%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>>
-%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
-%?C<|%s%ac%?iy<%iy|>>
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%?iy<%iy|>
 
-%?C<|%s%ac%Sx(Next Track:)>
-%?C<|%s%ac%?It<%It|%Fn>>
-%?C<|%s%ac%?Ia<%Ia|>>
+%s%ac%Sx(Next Track:)>
+%s%ac%?It<%It|%Fn>
+%s%ac%?Ia<%Ia|>
