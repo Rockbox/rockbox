@@ -33,8 +33,6 @@
  *   extract a field of the register
  * - bitm(reg_name,field_name)
  *   build a bitmask for the field
- * - make(reg_name,field_name,value)
- *   build the value of the field (doesn't mask)
  */
 #define extract(reg_name, field_name) \
     ((reg_name >> reg_name##_##field_name##_bitp) & reg_name##_##field_name##_bits)

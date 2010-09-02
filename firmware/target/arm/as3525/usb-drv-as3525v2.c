@@ -36,6 +36,8 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
+#define panicf(...) ({logf(__VA_ARGS__); DCTL |= DCTL_sftdiscon; /* disconnect */})
+
 static int __in_ep_list[NUM_IN_EP] = {IN_EP_LIST};
 static int __out_ep_list[NUM_OUT_EP] = {OUT_EP_LIST};
 static int __in_ep_list_ep0[NUM_IN_EP + 1] = {0, IN_EP_LIST};
@@ -77,6 +79,7 @@ struct usb_endpoint
     bool busy; /* true is a transfer is pending */
     int status; /* completion status (0 for success) */
     struct wakeup complete; /* wait object */
+    void *buffer; /* buffer address */
 };
 
 /* state of EP0 (to correctly schedule setup packet enqueing) */
@@ -108,7 +111,7 @@ void usb_attach(void)
     usb_enable(true);
 }
 
-static void usb_delay(void)
+static inline void usb_delay(void)
 {
     int i = 0;
     while(i < 0x300)
@@ -126,7 +129,7 @@ static void as3525v2_connect(void)
     usb_delay();
     /* 2) enable usb phy clock */
     /* PHY clock */
-    CGU_USB = 1<<5 /* enable */
+    CGU_USB = 1<<5  /* enable */
         | (CLK_DIV(AS3525_PLLA_FREQ, 60000000)) << 2
         | 1; /* source = PLLA */
     usb_delay();
@@ -177,10 +180,13 @@ static void enable_device_interrupts(void)
     GOTGINT = 0xffffffff;
     /* Enable interrupts */
     GINTMSK = GINTMSK_usbreset
-                | GINTMSK_enumdone
-                | GINTMSK_inepintr
-                | GINTMSK_outepintr
-                | GINTMSK_disconnect;
+            | GINTMSK_enumdone
+            | GINTMSK_inepintr
+            | GINTMSK_outepintr
+            | GINTMSK_disconnect
+            | GINTMSK_usbsuspend
+            | GINTMSK_wkupintr
+            | GINTMSK_otgintr;
 }
 
 static void flush_tx_fifos(int nums)
@@ -197,12 +203,27 @@ static void flush_tx_fifos(int nums)
     udelay(1);
 }
 
+static void flush_rx_fifo(void)
+{
+    unsigned int i = 0;
+    
+    GRSTCTL = GRSTCTL_rxfflsh_flush;
+    while(GRSTCTL & GRSTCTL_rxfflsh_flush && i < 0x300)
+        i++;
+    if(GRSTCTL & GRSTCTL_rxfflsh_flush)
+        panicf("usb-drv: hang of flush rx fifo");
+    /* wait 3 phy clocks */
+    udelay(1);
+}
+
 static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
     /* setup DMA */
-    clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
-    DOEPDMA(0) = (unsigned long)&ep0_setup_pkt; /* virtual address=physical address */
+    //memset(&ep0_setup_pkt, 0, sizeof ep0_setup_pkt);
+    //clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
+    clean_dcache();
+    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&ep0_setup_pkt); /* virtual address=physical address */
 
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
@@ -214,11 +235,8 @@ static void prepare_setup_ep0(void)
                 | 8;
 
     /* Enable endpoint, clear nak */
-    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
-
-    if(!(DOEPCTL(0) & DEPCTL_epena))
-        panicf("usb-drv: failed to enable EP0 !");
     ep0_state = EP0_WAIT_SETUP;
+    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;    
 }
 
 static void handle_ep0_complete(bool is_ack)
@@ -259,7 +277,6 @@ static void handle_ep0_setup(void)
     if(ep0_state != EP0_WAIT_SETUP)
     {
         logf("usb-drv: EP0 SETUP while in state %d", ep0_state);
-        DCTL |= DCTL_sftdiscon;
         return;
     }
     /* determine is there is a data phase */
@@ -269,24 +286,38 @@ static void handle_ep0_setup(void)
     else
         /* yes: wait ack and data */
         ep0_state = EP0_WAIT_DATA_ACK;
+    logf("usb-drv: EP0 state updated to %d", ep0_state);
 }
 
 static void reset_endpoints(void)
 {
     int i, ep;
     /* disable all endpoints except EP0 */
-    FOR_EACH_IN_EP(i, ep)
+    FOR_EACH_IN_EP_AND_EP0(i, ep)
+    {
+        endpoints[ep][DIR_IN].active = false;
+        endpoints[ep][DIR_IN].busy = false;
+        if(endpoints[ep][DIR_IN].wait)
+            wakeup_signal(&endpoints[ep][DIR_IN].complete);
+        endpoints[ep][DIR_IN].wait = false;
         if(DIEPCTL(ep) & DEPCTL_epena)
             DIEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
         else
             DIEPCTL(ep) = 0;
+    }
     
-    FOR_EACH_OUT_EP(i, ep)
+    FOR_EACH_OUT_EP_AND_EP0(i, ep)
+    {
+        endpoints[ep][DIR_OUT].active = false;
+        endpoints[ep][DIR_OUT].busy = false;
+        if(endpoints[ep][DIR_OUT].wait)
+            wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+        endpoints[ep][DIR_OUT].wait = false;
         if(DOEPCTL(ep) & DEPCTL_epena)
             DOEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
         else
             DOEPCTL(ep) = 0;
-
+    }
     /* 64 bytes packet size, active endpoint */
     DOEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
     DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
@@ -325,7 +356,7 @@ static void core_dev_init(void)
     /* Restart the phy clock */
     PCGCCTL = 0;
     /* Set phy speed : high speed */
-    DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_hs;
+    DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_fs;
     
     /* Check hardware capabilities */
     if(extract(GHWCFG2, arch) != GHWCFG2_ARCH_INTERNAL_DMA)
@@ -345,14 +376,6 @@ static void core_dev_init(void)
     if(GRXFSIZ != DATA_FIFO_DEPTH)
         panicf("usb-drv: wrong data fifo size");
     #endif /* USE_CUSTOM_FIFO_LAYOUT */
-
-    /* do some logging */
-    /*
-    logf("hwcfg1: %08lx", GHWCFG1);
-    logf("hwcfg2: %08lx", GHWCFG2);
-    logf("hwcfg3: %08lx", GHWCFG3);
-    logf("hwcfg4: %08lx", GHWCFG4);
-    */
 
     if(USB_NUM_ENDPOINTS != extract(GHWCFG2, num_ep))
         panicf("usb-drv: wrong endpoint number");
@@ -378,17 +401,6 @@ static void core_dev_init(void)
 
     reset_endpoints();
 
-    /* fixme: threshold tweaking only takes place if we use multiple tx fifos it seems */
-    /* only dump them for now, leave threshold disabled */
-    /*
-    logf("threshold control:");
-    logf("  non_iso_thr_en: %d", (DTHRCTL & DTHRCTL_non_iso_thr_en) ? 1 : 0);
-    logf("  iso_thr_en: %d", (DTHRCTL & DTHRCTL_iso_thr_en) ? 1 : 0);
-    logf("  tx_thr_len: %lu", extract(DTHRCTL, tx_thr_len));
-    logf("  rx_thr_en: %d", (DTHRCTL & DTHRCTL_rx_thr_en) ? 1 : 0);
-    logf("  rx_thr_len: %lu", extract(DTHRCTL, rx_thr_len));
-    */
-
     /* enable USB interrupts */
     enable_device_interrupts();
 }
@@ -399,11 +411,12 @@ static void core_init(void)
     DCTL |= DCTL_sftdiscon;
     /* Select UTMI+ 16 */
     GUSBCFG |= GUSBCFG_phy_if;
+    GUSBCFG = (GUSBCFG & ~bitm(GUSBCFG, toutcal)) | 7 << GUSBCFG_toutcal_bitp;
     
     /* fixme: the current code is for internal DMA only, the clip+ architecture
      *        define the internal DMA model */
     /* Set burstlen and enable DMA*/
-    GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR4 << GAHBCFG_hburstlen_bitp)
+    GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR << GAHBCFG_hburstlen_bitp)
                 | GAHBCFG_dma_enable;
     /* Disable HNP and SRP, not sure it's useful because we already forced dev mode */
     GUSBCFG &= ~(GUSBCFG_srpcap | GUSBCFG_hnpcapp);
@@ -469,13 +482,14 @@ static void handle_ep_int(int ep, bool dir_in)
             {
                 endpoint->busy = false;
                 endpoint->status = 0;
-                /* works even for PE0 */
+                /* works even for EP0 */
                 int transfered = endpoint->len - (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                invalidate_dcache_range((void *)DIEPDMA(ep), transfered);
-                DIEPCTL(ep) |= DEPCTL_snak;
+                //invalidate_dcache_range(endpoint->buffer, transfered);
+                invalidate_dcache();
+                //DIEPCTL(ep) |= DEPCTL_snak;
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
@@ -493,7 +507,7 @@ static void handle_ep_int(int ep, bool dir_in)
                 endpoint->status = 1;
                 /* for safety, act as if no bytes as been transfered */
                 endpoint->len = 0;
-                DIEPCTL(ep) |= DEPCTL_snak;
+                //DIEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
                 wakeup_signal(&endpoint->complete);
             }
@@ -517,13 +531,14 @@ static void handle_ep_int(int ep, bool dir_in)
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                invalidate_dcache_range((void *)DOEPDMA(ep), transfered);
+                //invalidate_dcache_range(endpoint->buffer, transfered);
+                invalidate_dcache();
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
                     handle_ep0_complete(endpoint->len == 0);
-                else
-                    DOEPCTL(ep) |= DEPCTL_snak;
+                //else
+                //    DOEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
                 wakeup_signal(&endpoint->complete);
             }
@@ -536,16 +551,14 @@ static void handle_ep_int(int ep, bool dir_in)
             if((DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits) != 0)
             {
                 logf("usb-drv: ignore spurious setup (xfersize=%ld)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+                prepare_setup_ep0();
             }
             else
             {
-                DOEPCTL(ep) |= DEPCTL_snak;
-                logf("DOEPCTL0=%lx", DOEPCTL(ep));
-                logf("DOEPTSIZE0=%lx", DOEPTSIZ(ep));
-                if(DOEPDMA(ep) != 8 + (unsigned long)&ep0_setup_pkt)
-                    panicf("usb-drv: EP0 wrong DMA adr (%lx vs %lx)", (unsigned long)&ep0_setup_pkt, DOEPDMA(ep));
+                //DOEPCTL(ep) |= DEPCTL_snak;
                 /* handle the set address here because of a bug in the usb core */
-                invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);
+                //invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);
+                invalidate_dcache();
                 /* handle EP0 state */
                 handle_ep0_setup();
                 logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
@@ -590,10 +603,11 @@ void INT_USB(void)
         logf("usb-drv: bus reset");
 
         /* Clear the Remote Wakeup Signalling */
-        //DCTL &= ~DCTL_rmtwkupsig;
+        DCTL &= ~DCTL_rmtwkupsig;
 
         /* Flush FIFOs */
         flush_tx_fifos(0x10);
+        flush_rx_fifo();
 
         reset_endpoints();
 
@@ -617,6 +631,22 @@ void INT_USB(void)
         prepare_setup_ep0();
     }
 
+    if(sts & GINTMSK_usbsuspend)
+    {
+        logf("usb-drv: suspend");
+    }
+
+    if(sts & GINTMSK_wkupintr)
+    {
+        logf("usb-drv: wake up");
+    }
+    
+    if(sts & GINTMSK_otgintr)
+    {
+        logf("usb-drv: otg int");
+        GOTGINT = 0xffffffff;
+    }
+
     if(sts & (GINTMSK_outepintr | GINTMSK_inepintr))
     {
         handle_ep_ints();
@@ -629,7 +659,7 @@ void INT_USB(void)
         usb_enable(false);        
     }
 
-    GINTSTS = GINTSTS;
+    GINTSTS = sts;
 }
 
 int usb_drv_port_speed(void)
@@ -692,11 +722,13 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     if(endpoint->busy)
         logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
+
+    if(dir_in)
+        logf("GNPTXSTS=%lx", GNPTXSTS);
     
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
-    DEPCTL |= DEPCTL_usbactep;
 
     int mps = 64;
     int nb_packets = (len + mps - 1) / mps;
@@ -705,14 +737,14 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
         DEPTSIZ = 1 << DEPTSIZ_pkcnt_bitp;
     else
         DEPTSIZ = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
-    clean_dcache_range(ptr, len);
-    DEPDMA = (unsigned long)ptr;
-    DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
+    //clean_dcache_range(ptr, len);
+    clean_dcache();
+    DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
 
-    /* fixme: check if endpoint was really enabled ? */
-    if((DEPCTL & DEPCTL_epena) == 0)
-        panicf("usb-drv: couldn't start xfer on EP%d %s", ep, dir_in ? "IN" : "OUT");
+    logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
     
+    DEPCTL |= DEPCTL_epena | DEPCTL_cnak | DEPCTL_usbactep;
+
     if(blocking)
         wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
     if(endpoint->status != 0)
