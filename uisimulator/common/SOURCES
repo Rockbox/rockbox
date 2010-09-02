@@ -1,4 +1,4 @@
-#ifndef APPLICATION
+#ifdef SIMULATOR
 lcd-common.c
 #ifdef HAVE_LCD_CHARCELLS
 font-player.c
@@ -9,10 +9,8 @@ fmradio.c
 backlight-sim.c
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_SDL)
 io.c
 sim_tasks.c
 powermgmt-sim.c
-#endif
-/* this is still needed for application since it has some stubs */
 stubs.c
+/* this is still needed for application since it has some stubs */

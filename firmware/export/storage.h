@@ -51,12 +51,31 @@ struct storage_info
     char *revision;
 };
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(CONFIG_STORAGE_MULTI)
+#if (CONFIG_STORAGE == 0)
+/* stubs for the plugin api */
+static inline void stub_storage_sleep(void) {}
+static inline void stub_storage_spin(void) {}
+static inline void stub_storage_spindown(int timeout) { (void)timeout; }
+#endif
+
+#if defined(CONFIG_STORAGE) && !defined(CONFIG_STORAGE_MULTI)
 /* storage_spindown, storage_sleep and storage_spin are passed as
  * pointers, which doesn't work with argument-macros.
  */
     #define storage_num_drives() NUM_DRIVES
-    #if (CONFIG_STORAGE & STORAGE_ATA)
+    #if (CONFIG_STORAGE == 0) /* application */
+        #define STORANGE_FUNCTION(NAME) (stub_## NAME)
+        #define storage_spindown stub_storage_spindown
+        #define storage_sleep stub_storage_sleep
+        #define storage_spin stub_storage_spin
+
+        #define storage_enable(on)
+        #define storage_sleepnow()
+        #define storage_disk_is_active()
+        #define storage_soft_reset()
+        #define storage_init()
+        #define storage_close()
+    #elif (CONFIG_STORAGE & STORAGE_ATA)
         #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
         #define storage_sleep ata_sleep

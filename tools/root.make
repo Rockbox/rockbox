@@ -97,8 +97,12 @@ else
     include $(APPSDIR)/plugins/plugins.make
   endif
 
-  ifdef APP_TYPE
+  ifneq (,$(findstring sdl,$(APP_TYPE)))
     include $(ROOTDIR)/uisimulator/uisimulator.make
+  endif
+
+  ifneq (,$(findstring android, $(APP_TYPE)))
+	include $(ROOTDIR)/android/android.make
   endif
   
 endif # bootloader
