@@ -902,7 +902,8 @@ show_menu:
         if (dir) {
             entry = rb->readdir(dir);
             while (entry) {
-                if (!(entry->attribute & ATTR_DIRECTORY)) {
+                struct dirinfo info = rb->dir_get_info(dir, entry);
+                if (!(info.attribute & ATTR_DIRECTORY)) {
                     rb->snprintf(filename,sizeof(filename),"%s%s",dirpath,entry->d_name);
                     test_track(filename);
                     log_text("", true);
