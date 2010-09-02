@@ -34,16 +34,9 @@
 
 #define CGU_SDSLOT         (*(volatile unsigned long *)(CGU_BASE + 0x3C))
 
-#ifdef USB_NUM_ENDPOINTS
 #undef USB_NUM_ENDPOINTS
-#endif
-
-#ifdef USB_DEVBSS_ATTR
-#undef USB_DEVBSS_ATTR
-#endif
 
 #define USB_NUM_ENDPOINTS   6
-#define USB_DEVBSS_ATTR     __attribute__((aligned(32)))
 
 #define CCU_USB         (*(volatile unsigned long *)(CCU_BASE + 0x20))
 

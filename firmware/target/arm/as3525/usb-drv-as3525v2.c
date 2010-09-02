@@ -36,8 +36,6 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-#define panicf(...) ({logf(__VA_ARGS__); DCTL |= DCTL_sftdiscon; /* disconnect */})
-
 static int __in_ep_list[NUM_IN_EP] = {IN_EP_LIST};
 static int __out_ep_list[NUM_OUT_EP] = {OUT_EP_LIST};
 static int __in_ep_list_ep0[NUM_IN_EP + 1] = {0, IN_EP_LIST};
@@ -101,7 +99,7 @@ enum ep0state
 /* endpoints[ep_num][DIR_IN/DIR_OUT] */
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
-static struct usb_ctrlrequest ep0_setup_pkt USB_DEVBSS_ATTR;
+static struct usb_ctrlrequest ep0_setup_pkt __attribute__((aligned(32)));
 /* state of EP0 */
 static enum ep0state ep0_state;
 
