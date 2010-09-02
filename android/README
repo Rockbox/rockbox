@@ -3,39 +3,41 @@ application for android.
 
 * Prerequisites
 
-Download and install the Android SDK[1] and NDK[2]. After you extracted the SDK, you need to run <sdk-dir>/tools/android in order to install the actual platform sdk from the available packages tab (SDK Platform Android 1.5 or above should work). In the virtual devices tab you can also setup a emulator.
+Download and install the Android SDK[1] and NDK[2].
+After you extracted the SDK, you need to run <sdk-dir>/tools/android in order to
+install the actual platform sdk from the available packages tab (SDK Platform
+Android 1.5 or above should work).
+In the virtual devices tab you can also setup a emulator.
 
 
-Then, make sure you have the ANDROID_NDK_PATH (pointing to the NDK's root directory) environment variable set up,
-otherwise configure will fail to find the compiler.
-
+Then, make sure you have the ANDROID_SDK_PATH and ANDROID_NDK_PATH (pointing to
+the each's root directory) environment variables set up, otherwise configure will fail to find the compiler and
+compiling the java files will fail.
 
 * Build instructions
 
-Until there's a script which does all the work the procedure is documented here.
-
 Use this as your build folder, using '../tools/configure' etc.
-    $ ../tools/configure
+    $ ../tools/configure # type 200, then chose A for android and your screen resolution
     $ make
 
-After the build finished, you need to copy librockbox.so to libs/armeabi/ (create that dir if it doesn't exit)
-    $ mkdir -p libs/armeabi
-    $ cp librockbox.so libs/armeabi
+After the build finished, you can create a Rockbox.apk in bin/
+    $ make apk
 
-For the other files (codecs, themes), you execute 'make zip'. Then you copy the
-zip to libs/armeabi, using the name libmisc.so. This is needed, since there's no 
-way to bundle stuff into apk's and have access to them from native code other
-than pretending it was a library.
-    $ make zip
-    $ cp rockbox.zip libs/armeabi/libmisc.so
-
-rockbox.zip..err, libmisc.so will be unpacked at runtime.
-
-To finish, you can follow this guide [3], or use eclipse. Simply install eclipse
-and the android plugins, then import this folder as a new Android project and run it.
-See [4] for a guide on how to set up eclipse for android development.
+You can install that on the device
+    $ $ANDROID_SDK_PATH/tools/adb install -r bin/Rockbox.apk
 
 
+NOTE: make apk needs creates a debug signed .apk, not suitable for distribution.
+It expects that this key already exists.
+You should be able to generate it with "keytool" using the following options:
+* Keystore name: "debug.keystore"
+* Keystore password: "android"
+* Key alias: "androiddebugkey"
+* Key password: "android"
+* CN: "CN=Android Debug,O=Android,C=US"
+* validity: 365 days
+
+Google docs mention the SDK tools can generate it as well, but I haven't found how yet.    
 
 [1]: http://developer.android.com/sdk/index.html 
 [2]: http://developer.android.com/sdk/ndk/index.html
