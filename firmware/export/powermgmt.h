@@ -22,6 +22,7 @@
 #define _POWERMGMT_H_
 
 #include <stdbool.h>
+#include "config.h"
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 

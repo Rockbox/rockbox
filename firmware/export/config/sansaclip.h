@@ -158,6 +158,9 @@
 #define CURRENT_BACKLIGHT  13
 #define CURRENT_RECORD     CURRENT_NORMAL
 
+/* maximum charging current */
+#define CURRENT_MAX_CHG   150
+
 /* Define this to the CPU frequency */
 #define CPU_FREQ      248000000
 

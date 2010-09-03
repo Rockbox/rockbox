@@ -154,6 +154,9 @@
 #define CURRENT_BACKLIGHT  25
 #define CURRENT_RECORD     CURRENT_NORMAL
 
+/* maximum charging current */
+#define CURRENT_MAX_CHG   200
+
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
 
