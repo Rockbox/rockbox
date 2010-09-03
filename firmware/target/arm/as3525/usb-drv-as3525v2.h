@@ -229,9 +229,9 @@
 #define DCFG_devspd_hs_phy_hs   0 /** High speed PHY running at high speed */
 #define DCFG_devspd_hs_phy_fs   1 /** High speed PHY running at full speed */
 #define DCFG_nzstsouthshk       (1 << 2) /** Non Zero Length Status OUT Handshake */
-#define DCFG_devadr_bitp        4 /** Device Address */
+#define DCFG_devadr_bitp        5 /** Device Address */
 #define DCFG_devadr_bits        0x7f
-#define DCFG_perfrint_bitp      11 /** Periodic Frame Interval */
+#define DCFG_perfrint_bitp      12 /** Periodic Frame Interval */
 #define DCFG_perfrint_bits      0x3
 #define DCFG_FRAME_INTERVAL_80  0
 #define DCFG_FRAME_INTERVAL_85  1
