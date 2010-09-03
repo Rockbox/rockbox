@@ -31,7 +31,7 @@
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
 #define BATT_CHG_I          CHG_I_150MA
-#define CHARGER_TOTAL_TIMER (6*3600*2)  /* about 1.5 * capacity / current */
+#define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
 
 #elif defined(SANSA_CLIPPLUS)
 
