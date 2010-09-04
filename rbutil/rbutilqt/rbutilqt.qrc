@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/" >
         <file>../../docs/CREDITS</file>
-        <file>docs/gpl-2.0.html</file>
+        <file>../../docs/gpl-2.0.html</file>
     </qresource>
      <qresource>
         <file alias="builtin/VOICE_PAUSE.wav">../../tools/VOICE_PAUSE.wav</file>

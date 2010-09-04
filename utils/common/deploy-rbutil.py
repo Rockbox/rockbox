@@ -28,6 +28,7 @@ deploy.svnpaths = \
              "tools/rbspeex",
              "apps/codecs/libspeex",
              "docs/COPYING",
+             "docs/gpl-2.0.html",
              "docs/CREDITS",
              "tools/iriver.c",
              "tools/Makefile",
