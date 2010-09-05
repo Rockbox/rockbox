@@ -262,11 +262,7 @@ void system_init(void)
 #endif
                   AS3525_PCLK_SEL);
 
-#if CONFIG_CPU == AS3525
-    cpu_frequency = CPUFREQ_DEFAULT;    /* fastbus */
-#else
-    cpu_frequency = CPUFREQ_MAX;
-#endif
+    set_cpu_frequency(CPUFREQ_DEFAULT);
 
 #if 0 /* the GPIO clock is already enabled by the dualboot function */
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
@@ -367,16 +363,14 @@ void set_cpu_frequency(long frequency)
         while(adc_read(ADC_CVDD) < 470); /* 470 * .0025 = 1.175V */
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
+        CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
+                    (AS3525_FCLK_PREDIV  << 2) |
+                     AS3525_FCLK_SEL);
+
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
-
-#ifdef ASYNCHRONOUS_BUS
-            "orr r0, r0, #3<<30      \n"   /* asynchronous bus clocking */
-#else
             "bic r0, r0, #3<<30      \n"   /* clear bus bits */
             "orr r0, r0, #1<<30      \n"   /* synchronous bus clocking */
-#endif
-
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
@@ -390,6 +384,8 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
+        /* FCLK is unused so put it to the lowest freq we can */
+        CGU_PROC = ((0xf << 4) | (0x3 << 2) | AS3525_CLK_MAIN);
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Decreasing frequency so reduce voltage after change */
