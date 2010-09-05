@@ -64,6 +64,8 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <CoreServices/CoreServices.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/usb/IOUSBLib.h>
 #endif
 
 #include "utils.h"
@@ -227,7 +229,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
     QMap<uint32_t, QString> usbids;
     // usb pid detection
     qDebug() << "[System] Searching for USB devices";
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX)
 #if defined(LIBUSB1)
     libusb_device **devs;
     int res;
@@ -311,6 +313,84 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
         b = b->next;
     }
 #endif
+#endif
+
+#if defined(Q_OS_MACX)
+    kern_return_t result = KERN_FAILURE;
+    CFMutableDictionaryRef usb_matching_dictionary;
+    io_iterator_t usb_iterator = IO_OBJECT_NULL;
+    usb_matching_dictionary = IOServiceMatching(kIOUSBDeviceClassName);
+    result = IOServiceGetMatchingServices(kIOMasterPortDefault, usb_matching_dictionary,
+                                          &usb_iterator);
+    if(result) {
+        qDebug() << "[System] USB: IOKit: Could not get matching services.";
+        return usbids;
+    }
+
+    io_object_t usbCurrentObj;
+    while((usbCurrentObj = IOIteratorNext(usb_iterator))) {
+        uint32_t id;
+        QString name;
+        /* get vendor ID */
+        CFTypeRef vidref = NULL;
+        int vid = 0;
+        vidref = IORegistryEntryCreateCFProperty(usbCurrentObj, CFSTR("idVendor"),
+                                kCFAllocatorDefault, 0);
+        CFNumberGetValue((CFNumberRef)vidref, kCFNumberIntType, &vid);
+        CFRelease(vidref);
+
+        /* get product ID */
+        CFTypeRef pidref = NULL;
+        int pid = 0;
+        pidref = IORegistryEntryCreateCFProperty(usbCurrentObj, CFSTR("idProduct"),
+                                kCFAllocatorDefault, 0);
+        CFNumberGetValue((CFNumberRef)pidref, kCFNumberIntType, &pid);
+        CFRelease(pidref);
+        id = vid << 16 | pid;
+
+        /* get product vendor */
+        char vendor_buf[256];
+        CFIndex vendor_buflen = 256;
+        CFTypeRef vendor_name_ref = NULL;
+
+        vendor_name_ref = IORegistryEntrySearchCFProperty(usbCurrentObj,
+                                 kIOServicePlane, CFSTR("USB Vendor Name"),
+                                 kCFAllocatorDefault, 0);
+        if(vendor_name_ref != NULL) {
+            CFStringGetCString((CFStringRef)vendor_name_ref, vendor_buf, vendor_buflen,
+                               kCFStringEncodingUTF8);
+            name += QString::fromUtf8(vendor_buf) + " ";
+            CFRelease(vendor_name_ref);
+        }
+        else {
+            name += QObject::tr("(unknown vendor name) ");
+        }
+
+        /* get product name */
+        char product_buf[256];
+        CFIndex product_buflen = 256;
+        CFTypeRef product_name_ref = NULL;
+
+        product_name_ref = IORegistryEntrySearchCFProperty(usbCurrentObj,
+                                kIOServicePlane, CFSTR("USB Product Name"),
+                                kCFAllocatorDefault, 0);
+        if(product_name_ref != NULL) {
+            CFStringGetCString((CFStringRef)product_name_ref, product_buf, product_buflen,
+                               kCFStringEncodingUTF8);
+            name += QString::fromUtf8(product_buf);
+            CFRelease(product_name_ref);
+        }
+        else {
+            name += QObject::tr("(unknown product name)");
+        }
+
+        if(id) {
+            usbids.insert(id, name);
+            qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
+        }
+
+    }
+    IOObjectRelease(usb_iterator);
 #endif
 
 #if defined(Q_OS_WIN32)

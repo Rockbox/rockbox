@@ -132,10 +132,10 @@ DEFINES += RBUTIL _LARGEFILE64_SOURCE
 win32 {
     LIBS += -lsetupapi -lnetapi32
 }
-unix:!static:!libusb1 {
+unix:!static:!libusb1:!macx {
     LIBS += -lusb
 }
-unix:!static:libusb1 {
+unix:!static:libusb1:!macx {
     DEFINES += LIBUSB1
     LIBS += -lusb-1.0
 }
@@ -144,7 +144,7 @@ unix {
     LIBS += -lz
 }
 
-unix:static {
+unix:!macx:static {
     # force statically linking of libusb. Libraries that are appended
     # later will get linked dynamically again.
     LIBS += -Wl,-Bstatic -lusb -Wl,-Bdynamic
