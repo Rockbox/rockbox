@@ -141,11 +141,20 @@ unix:static {
     LIBS += -Wl,-Bstatic -lusb -Wl,-Bdynamic
 }
 
-macx {
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+# if -config intel is specified use 10.5 SDK and don't build for PPC
+macx:!intel {
+    CONFIG += ppc
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
     QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
-    CONFIG+=x86 ppc
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+}
+macx:intel {
+    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.5 -arch i386
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+}
+macx {
+    CONFIG += x86
     LIBS += -L/usr/local/lib -lz \
             -framework IOKit -framework CoreFoundation -framework Carbon \
             -framework SystemConfiguration -framework CoreServices
