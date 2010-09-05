@@ -620,7 +620,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     if (!isdefault(param))
         pb->x = param->data.number;
     else
-        pb->x = vp->x;
+        pb->x = 0;
     param++;
     
     if (!isdefault(param))
