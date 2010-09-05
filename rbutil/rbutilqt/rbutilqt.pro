@@ -51,9 +51,24 @@ message("Rockbox Base dir: "$$RBBASE_DIR)
 mac {
     RBLIBPOSTFIX = -universal
 }
+# check for system speex. Add a custom rule for pre-building librbspeex if not
+# found. Newer versions of speex are split up into libspeex and libspeexdsp,
+# and some distributions package them separately. Check for both and fall back
+# to librbspeex if not found.
+# NOTE: keep adding the linker option after -lrbspeex, otherwise linker errors
+# occur if the linker defaults to --as-needed
+# (see http://www.gentoo.org/proj/en/qa/asneeded.xml)
+#
+# Always use our own copy when building statically. Don't search for libspeex
+# on Mac, since we don't deploy statically there.
+!static:unix:!mac {
+    LIBSPEEX = $$system(pkg-config --silence-errors --libs speex speexdsp)
+}
+
 rbspeex.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
-        librbspeex$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+        librbspeex$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\" \
+        SYS_SPEEX=\"$$LIBSPEEX\"
 libucl.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
         libucl$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
@@ -91,13 +106,7 @@ DEPENDPATH = $$INCLUDEPATH
 
 LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lmkmpioboot -lucl
 
-# check for system speex. Add a custom rule for pre-building librbspeex if not
-# found. Newer versions of speex are split up into libspeex and libspeexdsp,
-# and some distributions package them separately. Check for both and fall back
-# to librbspeex if not found.
-# NOTE: keep this after -lrbspeex, otherwise linker errors occur if the linker
-# defaults to --as-needed (see http://www.gentoo.org/proj/en/qa/asneeded.xml)
-LIBSPEEX = $$system(pkg-config --silence-errors --libs speex speexdsp)
+# Add a (possibly found) libspeex now, don't do this before -lrbspeex!
 !static:!isEmpty(LIBSPEEX) {
     LIBS += $$LIBSPEEX
 }
