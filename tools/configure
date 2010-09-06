@@ -95,6 +95,16 @@ app_get_platform() {
         if [ -n "$PREFIX" ]; then
             echo "WARNING: PREFIX not supported on Android. You can however use --rbdir"
         fi
+        if [ -z "$ANDROID_SDK_PATH" ]; then
+            echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
+            echo "environment variable point to the root directory of the Android SDK."
+            exit
+        fi
+        if [ -z "$ANDROID_NDK_PATH" ]; then
+            echo "ERROR: You need the Android NDK installed and have the ANDROID_NDK_PATH"
+            echo "environment variable point to the root directory of the Android NDK."
+            exit
+        fi
         rbdir="/data/data/org.rockbox/app_rockbox/rockbox"
         bindir="/data/data/org.rockbox/lib"
         bindir_full=$bindir
