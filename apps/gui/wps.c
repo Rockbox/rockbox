@@ -227,7 +227,8 @@ static bool update_onvol_change(struct gui_wps * gwps)
 static int skintouch_to_wps(struct wps_data *data)
 {
     int offset = 0;
-    int button = skin_get_touchaction(data, &offset);
+    struct touchregion *region;
+    int button = skin_get_touchaction(data, &offset, &region);
     switch (button)
     {
         case ACTION_STD_PREV:
@@ -271,6 +272,13 @@ static int skintouch_to_wps(struct wps_data *data)
             setvol();
         }
         return ACTION_TOUCHSCREEN;
+        case ACTION_SETTINGS_INC:
+        case ACTION_SETTINGS_DEC:
+        {
+            const struct settings_list *setting = region->extradata;
+            option_select_next_val(setting, button == ACTION_SETTINGS_DEC, true);
+        }
+        return ACTION_REDRAW;
     }
     return button;
 }

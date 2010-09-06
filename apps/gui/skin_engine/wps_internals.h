@@ -196,6 +196,7 @@ struct touchregion {
     int action;              /* action this button will return */
     bool armed;              /* A region is armed on press. Only armed regions are triggered
                                 on repeat or release. */
+    void* extradata;
 };
 #endif
 

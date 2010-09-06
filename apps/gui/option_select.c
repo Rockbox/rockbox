@@ -225,7 +225,7 @@ static int option_talk(int selected_item, void * data)
     return 0;
 }
 
-#if defined(HAVE_QUICKSCREEN) || defined(HAVE_RECORDING)
+#if defined(HAVE_QUICKSCREEN) || defined(HAVE_RECORDING) || defined(HAVE_TOUCHSCREEN)
    /* only the quickscreen and recording trigger needs this */
 void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply)

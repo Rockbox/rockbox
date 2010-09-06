@@ -826,6 +826,9 @@ static const struct touchaction touchactions[] = {
     {"contextmenu", ACTION_STD_CONTEXT},{"quickscreen", ACTION_STD_QUICKSCREEN },
     /* not really WPS specific, but no equivilant ACTION_STD_* */
     {"voldown", ACTION_WPS_VOLDOWN},    {"volup", ACTION_WPS_VOLUP},
+    
+    /* generic settings changers */
+    {"setting_inc", ACTION_SETTINGS_INC}, {"setting_dec", ACTION_SETTINGS_DEC}, 
 
     /* WPS specific actions */
     {"browse", ACTION_WPS_BROWSE },
@@ -888,6 +891,7 @@ static int parse_touchregion(struct skin_element *element,
     region->wvp = curr_vp;
     region->armed = false;
     region->reverse_bar = false;
+    region->extradata = NULL;
     action = element->params[4].data.text;
 
     strcpy(temp, action);
@@ -922,6 +926,27 @@ static int parse_touchregion(struct skin_element *element,
             if (!strcmp(touchactions[i].s, action))
             {
                 region->action = touchactions[i].action;
+                if (region->action == ACTION_SETTINGS_INC ||
+                    region->action == ACTION_SETTINGS_DEC)
+                {
+                    if (element->params_count < 6)
+                    {
+                        return WPS_ERROR_INVALID_PARAM;
+                    }
+                    else
+                    {
+                        char *name = element->params[5].data.text;
+                        int j;
+                        /* Find the setting */
+                        for (j=0; j<nb_settings; j++)
+                            if (settings[j].cfg_name &&
+                                !strcmp(settings[j].cfg_name, name))
+                                break;
+                        if (j==nb_settings)
+                            return WPS_ERROR_INVALID_PARAM;
+                        region->extradata = &settings[j];
+                    }
+                }
                 break;
             }
         }

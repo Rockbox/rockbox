@@ -40,7 +40,8 @@ void skin_disarm_touchregions(struct wps_data *data)
  * egde_offset is a percentage value for the position of the touch
  * inside the bar for regions which arnt WPS_TOUCHREGION_ACTION type.
  */
-int skin_get_touchaction(struct wps_data *data, int* edge_offset)
+int skin_get_touchaction(struct wps_data *data, int* edge_offset,
+                         struct touchregion **retregion)
 {
     int returncode = ACTION_NONE;
     short x,y;
@@ -84,6 +85,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset)
                         {
                             last_action = r->action;
                             returncode = r->action;
+                            if (retregion)
+                                *retregion = r;
                         }
                         if (pressed)
                             r->armed = true;
@@ -99,6 +102,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset)
                                 *edge_offset = 100 - *edge_offset;
                         }
                         returncode = r->type;
+                        if (retregion)
+                            *retregion = r;
                         break;
                 }
             }

@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "font.h"
 #include "icon.h"
+#include "option_select.h"
 
 
 /* currently only one wps_state is needed */
@@ -359,6 +360,7 @@ void sb_bypass_touchregions(bool enable)
 
 int sb_touch_to_button(int context)
 {
+    struct touchregion *region;
     static int last_context = -1;
     int button, offset;
     if (bypass_sb_touchregions)
@@ -367,7 +369,7 @@ int sb_touch_to_button(int context)
     if (last_context != context)
         skin_disarm_touchregions(&sb_skin_data[SCREEN_MAIN]);
     last_context = context;
-    button = skin_get_touchaction(&sb_skin_data[SCREEN_MAIN], &offset);
+    button = skin_get_touchaction(&sb_skin_data[SCREEN_MAIN], &offset, &region);
     
     switch (button)
     {
@@ -377,6 +379,13 @@ int sb_touch_to_button(int context)
         case ACTION_WPS_VOLDOWN:
             return ACTION_LIST_VOLDOWN;
 #endif
+        case ACTION_SETTINGS_INC:
+        case ACTION_SETTINGS_DEC:
+        {
+            const struct settings_list *setting = region->extradata;
+            option_select_next_val(setting, button == ACTION_SETTINGS_DEC, true);
+        }
+        return ACTION_REDRAW;
         /* TODO */
     }
     return button;

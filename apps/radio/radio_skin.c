@@ -30,6 +30,7 @@
 #include "action.h"
 #include "appevents.h"
 #include "statusbar-skinned.h"
+#include "option_select.h"
 
 
 extern struct wps_state     wps_state; /* from wps.c */
@@ -116,9 +117,10 @@ int fms_do_button_loop(bool update_screen)
     int button = skin_wait_for_action(fms_skin, CONTEXT_FM, 
                                       update_screen ? TIMEOUT_NOBLOCK : HZ/5);
 #ifdef HAVE_TOUCHSCREEN
+    struct touchregion *region;
     int offset;
     if (button == ACTION_TOUCHSCREEN)
-        button = skin_get_touchaction(&fms_skin_data[SCREEN_MAIN], &offset);
+        button = skin_get_touchaction(&fms_skin_data[SCREEN_MAIN], &offset, &region);
     switch (button)
     {
         case ACTION_WPS_STOP:
@@ -136,6 +138,13 @@ int fms_do_button_loop(bool update_screen)
         case WPS_TOUCHREGION_SCROLLBAR:
             /* TODO */
             break;
+        case ACTION_SETTINGS_INC:
+        case ACTION_SETTINGS_DEC:
+        {
+            const struct settings_list *setting = region->extradata;
+            option_select_next_val(setting, button == ACTION_SETTINGS_DEC, true);
+        }
+        return ACTION_REDRAW;
     }   
 #endif
     return button;
