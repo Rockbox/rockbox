@@ -118,7 +118,13 @@ extern void audiohw_set_sampr_dividers(int fsel);
 #define AS3514_ADC_0      0x2e
 #define AS3514_ADC_1      0x2f
 
+#ifdef HAVE_AS3543
+#define AS3514_UID_0      0x38
+#define AS3514_UID_LEN    8
+#else
 #define AS3514_UID_0      0x30
+#define AS3514_UID_LEN    16
+#endif
 
 /*different volume ranges for different AMS chips*/
 #if CONFIG_CPU == AS3525v2 

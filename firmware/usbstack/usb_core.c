@@ -307,17 +307,17 @@ static void set_serial_descriptor(void)
 #elif defined(HAVE_AS3514)
 static void set_serial_descriptor(void)
 {
-    unsigned char serial[16];
+    unsigned char serial[AS3514_UID_LEN];
     /* Align 32 digits right in the 40-digit serial number */
     short* p = &usb_string_iSerial.wString[1];
     int i;
 
-    ascodec_readbytes(AS3514_UID_0, 0x10, serial);
-    for(i = 0; i < 16; i++) {
+    ascodec_readbytes(AS3514_UID_0, AS3514_UID_LEN, serial);
+    for(i = 0; i < AS3514_UID_LEN; i++) {
         *p++ = hex[(serial[i] >> 4) & 0xF];
         *p++ = hex[(serial[i] >> 0) & 0xF];
     }
-    usb_string_iSerial.bLength = 68;
+    usb_string_iSerial.bLength = 36 + (2 * AS3514_UID_LEN);
 }
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 /* If we don't know the device serial number, use the one
