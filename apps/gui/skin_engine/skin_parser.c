@@ -944,7 +944,7 @@ static int parse_touchregion(struct skin_element *element,
                                 break;
                         if (j==nb_settings)
                             return WPS_ERROR_INVALID_PARAM;
-                        region->extradata = &settings[j];
+                        region->extradata = (void*)&settings[j];
                     }
                 }
                 break;
