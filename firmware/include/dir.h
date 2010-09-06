@@ -72,8 +72,8 @@
 # define rmdir rmdir_uncached
 #endif
 #else
-#include "dir_uncached.h"
 #include "dir-target.h"
+#include "dir_uncached.h"
 #endif
 
 #endif

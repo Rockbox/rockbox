@@ -30,7 +30,6 @@ struct dirinfo {
     unsigned short wrttime;
 };
 
-#ifndef APPLICATION
 #include <stdbool.h>
 #include "file.h"
 
@@ -91,6 +90,5 @@ extern struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir);
 extern int release_dirs(int volume);
 
 #endif /* DIRFUNCTIONS_DEFINED */
-#endif
 
 #endif

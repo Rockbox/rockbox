@@ -35,4 +35,6 @@ extern int  _closedir(DIR* dir);
 extern struct dirent *_readdir(DIR* dir);
 extern void fat_size(unsigned long *size, unsigned long *free);
 
+#define DIRFUNCTIONS_DEFINED
+
 #endif /* __DIR_TARGET_H__ */
