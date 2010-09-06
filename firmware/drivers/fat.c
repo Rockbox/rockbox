@@ -296,7 +296,9 @@ void fat_init(void)
 #endif
 }
 
-int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
+/* fat_mount_internal is split out of fat_mount() to avoid having both the sector
+ * buffer used here and the sector buffer used by update_fsinfo() on stack */
+static int fat_mount_internal(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;
@@ -443,6 +445,20 @@ int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
         fat_bpb->fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
         fat_bpb->fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
     }
+    return 0;
+}
+
+int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
+{
+#ifndef HAVE_MULTIVOLUME
+    const int volume = 0;
+#endif
+    struct bpb* fat_bpb = &fat_bpbs[volume];
+    int rc;
+
+    rc = fat_mount_internal(IF_MV2(volume,) IF_MD2(drive,) startsector);
+
+    if(rc!=0) return rc;
 
     /* calculate freecount if unset */
     if ( fat_bpb->fsinfo.freecount == 0xffffffff )
@@ -1101,9 +1117,9 @@ static int write_long_name(struct fat_file* file,
                            unsigned int numentries,
                            const unsigned char* name,
                            const unsigned char* shortname,
-                           bool is_directory)
+                           bool is_directory,
+                           unsigned char *sector_buffer)
 {
-    unsigned char buf[SECTOR_SIZE];
     unsigned char* entry;
     unsigned int idx = firstentry % DIR_ENTRIES_PER_SECTOR;
     unsigned int sector = firstentry / DIR_ENTRIES_PER_SECTOR;
@@ -1120,7 +1136,7 @@ static int write_long_name(struct fat_file* file,
     if (rc<0)
         return rc * 10 - 1;
 
-    rc = fat_readwrite(file, 1, buf, false);
+    rc = fat_readwrite(file, 1, sector_buffer, false);
     if (rc<1)
         return rc * 10 - 2;
 
@@ -1147,25 +1163,25 @@ static int write_long_name(struct fat_file* file,
             if (rc<0)
                 return rc * 10 - 3;
 
-            rc = fat_readwrite(file, 1, buf, true);
+            rc = fat_readwrite(file, 1, sector_buffer, true);
             if (rc<1)
                 return rc * 10 - 4;
 
             /* read next sector */
-            rc = fat_readwrite(file, 1, buf, false);
+            rc = fat_readwrite(file, 1, sector_buffer, false);
             if (rc<0) {
                 LDEBUGF("Failed writing new sector: %d\n",rc);
                 return rc * 10 - 5;
             }
             if (rc==0)
                 /* end of dir */
-                memset(buf, 0, sizeof buf);
+                memset(sector_buffer, 0, SECTOR_SIZE);
 
             sector++;
             idx = 0;
         }
 
-        entry = buf + idx * DIR_ENTRY_SIZE;
+        entry = sector_buffer + idx * DIR_ENTRY_SIZE;
 
         /* verify this entry is free */
         if (entry[0] && entry[0] != 0xe5 )
@@ -1234,7 +1250,7 @@ static int write_long_name(struct fat_file* file,
     if (rc<0)
         return rc * 10 - 6;
 
-    rc = fat_readwrite(file, 1, buf, true);
+    rc = fat_readwrite(file, 1, sector_buffer, true);
     if (rc<1)
         return rc * 10 - 7;
 
@@ -1411,7 +1427,8 @@ static int add_dir_entry(struct fat_dir* dir,
             firstentry, sector);
 
     rc = write_long_name(&dir->file, firstentry,
-                         entries_needed, name, shortname, is_directory);
+                         entries_needed, name,
+                         shortname, is_directory, buf);
     if (rc < 0)
         return rc * 10 - 7;
 
@@ -1690,6 +1707,23 @@ int fat_create_file(const char* name,
     return rc;
 }
 
+/* noinline because this is only split out of fat_create_dir to make sure
+ * the sector buffer doesn't remain on the stack, to avoid nasty stack
+ * overflows later on (when flush_fat() is called */
+static __attribute__((noinline)) int fat_clear_cluster(int sector,
+                                                       struct bpb *fat_bpb)
+{
+    unsigned char buf[SECTOR_SIZE];
+    int i,rc;
+    memset(buf, 0, sizeof buf);
+    for(i = 0;i < (int)fat_bpb->bpb_secperclus;i++) {
+        rc = transfer(IF_MV2(fat_bpb,) sector + i, 1, buf, true );
+        if (rc < 0)
+            return rc * 10 - 2;
+    }
+    return 0;
+}
+
 int fat_create_dir(const char* name,
                    struct fat_dir* newdir,
                    struct fat_dir* dir)
@@ -1699,8 +1733,6 @@ int fat_create_dir(const char* name,
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned char buf[SECTOR_SIZE];
-    int i;
     long sector;
     int rc;
     struct fat_file dummyfile;
@@ -1724,13 +1756,11 @@ int fat_create_dir(const char* name,
     update_fat_entry(IF_MV2(fat_bpb,) newdir->file.firstcluster, FAT_EOF_MARK);
 
     /* Clear the entire cluster */
-    memset(buf, 0, sizeof buf);
     sector = cluster2sec(IF_MV2(fat_bpb,) newdir->file.firstcluster);
-    for(i = 0;i < (int)fat_bpb->bpb_secperclus;i++) {
-        rc = transfer(IF_MV2(fat_bpb,) sector + i, 1, buf, true );
-        if (rc < 0)
-            return rc * 10 - 2;
-    }
+    rc = fat_clear_cluster(sector,fat_bpb);
+    if (rc < 0)
+        return rc;
+
 
     /* Then add the "." entry */
     rc = add_dir_entry(newdir, &dummyfile, ".", true, true);
@@ -1939,7 +1969,6 @@ int fat_rename(struct fat_file* file,
     int rc;
     struct fat_dir olddir;
     struct fat_file newfile = *file;
-    unsigned char buf[SECTOR_SIZE];
     unsigned char* entry = NULL;
     unsigned short* clusptr = NULL;
     unsigned int parentcluster;
@@ -1986,6 +2015,7 @@ int fat_rename(struct fat_file* file,
     /* if renaming a directory, update the .. entry to make sure
        it points to its parent directory (we don't check if it was a move) */
     if(FAT_ATTR_DIRECTORY == attr) {
+        unsigned char buf[SECTOR_SIZE];
         /* open the dir that was renamed, we re-use the olddir struct */
         rc = fat_opendir(IF_MV2(file->volume,) &olddir, newfile.firstcluster,
                                                                           NULL);
