@@ -228,7 +228,7 @@ $releasenotes="/wiki/ReleaseNotes36";
     },
     'sansaclip' => {
         name => 'SanDisk Sansa Clip v1',
-        status => 2,
+        status => 3,
     },
     'sansaclipv2' => {
         name => 'SanDisk Sansa Clip v2',
