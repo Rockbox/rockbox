@@ -1657,7 +1657,7 @@ void init_invadrox(void)
 }
 
 
-inline bool handle_buttons(void)
+static inline bool handle_buttons(void)
 {
     static unsigned int oldbuttonstate = 0;
 
