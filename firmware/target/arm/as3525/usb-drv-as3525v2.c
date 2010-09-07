@@ -292,7 +292,7 @@ static void reset_endpoints(void)
             wakeup_signal(&endpoints[ep][DIR_IN].complete);
         endpoints[ep][DIR_IN].wait = false;
         if(DIEPCTL(ep) & DEPCTL_epena)
-            DIEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
+            DIEPCTL(ep) = DEPCTL_snak;
         else
             DIEPCTL(ep) = 0;
     }
@@ -305,7 +305,7 @@ static void reset_endpoints(void)
             wakeup_signal(&endpoints[ep][DIR_OUT].complete);
         endpoints[ep][DIR_OUT].wait = false;
         if(DOEPCTL(ep) & DEPCTL_epena)
-            DOEPCTL(ep) =  DEPCTL_epdis | DEPCTL_snak;
+            DOEPCTL(ep) =  DEPCTL_snak;
         else
             DOEPCTL(ep) = 0;
     }
@@ -331,7 +331,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         endpoints[ep][DIR_IN].wait = false;
         endpoints[ep][DIR_IN].busy = false;
         wakeup_signal(&endpoints[ep][DIR_IN].complete);
-        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis | DEPCTL_snak;
+        DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
     FOR_EACH_OUT_EP_EX(cancel_ep0, i, ep)
     {
@@ -339,7 +339,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         endpoints[ep][DIR_OUT].wait = false;
         endpoints[ep][DIR_OUT].busy = false;
         wakeup_signal(&endpoints[ep][DIR_OUT].complete);
-        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_epdis | DEPCTL_snak;
+        DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
     
     restore_irq(flags);
@@ -708,7 +708,8 @@ int usb_drv_request_endpoint(int type, int dir)
     }
 
     unsigned long data = DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp)
-                        | (usb_drv_mps_by_type(type) << DEPCTL_mps_bitp);
+                        | (usb_drv_mps_by_type(type) << DEPCTL_mps_bitp)
+                        | DEPCTL_usbactep | DEPCTL_snak;
     unsigned long mask = ~(bitm(DEPCTL, eptype) | bitm(DEPCTL, mps));
     
     if(dir == USB_DIR_IN) DIEPCTL(ep) = (DIEPCTL(ep) & mask) | data;
