@@ -680,12 +680,12 @@ bool aliens_down, aliens_right, hit_left_border, hit_right_border;
 #if (LCD_DEPTH >= 8)
 
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-inline fb_data get_pixel(int x, int y)
+static inline fb_data get_pixel(int x, int y)
 {
     return rb->lcd_framebuffer[x*LCD_HEIGHT+y];
 }
 #else
-inline fb_data get_pixel(int x, int y)
+static inline fb_data get_pixel(int x, int y)
 {
     return rb->lcd_framebuffer[ytab[y] + x];
 }
@@ -698,7 +698,7 @@ static const unsigned char shifts[4] = {
     6, 4, 2, 0
 };
 /* Horizontal packing */
-inline fb_data get_pixel(int x, int y)
+static inline fb_data get_pixel(int x, int y)
 {
     return (rb->lcd_framebuffer[ytab[y] + (x >> 2)] >> shifts[x & 3]) & 3;
 }
@@ -707,7 +707,7 @@ inline fb_data get_pixel(int x, int y)
 static const unsigned char shifts[4] = {
     0, 2, 4, 6
 };
-inline fb_data get_pixel(int x, int y)
+static inline fb_data get_pixel(int x, int y)
 {
     return (rb->lcd_framebuffer[ytab[y] + x] >> shifts[y & 3]) & 3;
 }
@@ -739,7 +739,7 @@ void draw_number(int x, int y, int num, int digits)
 }
 
 
-inline void draw_score(void)
+static inline void draw_score(void)
 {
     draw_number(SCORENUM_X, SCORENUM_Y, score, 4);
     if (score > hiscore.score) {
@@ -787,7 +787,7 @@ void draw_lives(void)
 }
 
 
-inline void draw_aliens(void)
+static inline void draw_aliens(void)
 {
     int i;
 
@@ -805,7 +805,7 @@ inline void draw_aliens(void)
 
 
 /* Return false if there is no next alive alien (round is over) */
-inline bool next_alien(void)
+static inline bool next_alien(void)
 {
     bool ret = true;
 
@@ -954,7 +954,7 @@ bool move_aliens(void)
 }
 
 
-inline void draw_ship(void)
+static inline void draw_ship(void)
 {
     /* Erase old ship */
     if (old_ship_x < ship_x) {
@@ -988,7 +988,7 @@ inline void draw_ship(void)
 }
 
 
-inline void fire_alpha(int xc, int yc, fb_data color)
+static inline void fire_alpha(int xc, int yc, fb_data color)
 {
     int oldmode = rb->lcd_get_drawmode();
 
@@ -1180,7 +1180,7 @@ void move_fire(void)
 
 
 /* Return a BOMBER alien */
-inline int random_bomber(void)
+static inline int random_bomber(void)
 {
     int i, col;
 
@@ -1206,7 +1206,7 @@ inline int random_bomber(void)
 }
 
 
-inline void draw_bomb(int i)
+static inline void draw_bomb(int i)
 {
     rb->lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
                         bombs[i].frame * BOMB_HEIGHT,
@@ -1367,7 +1367,7 @@ void move_bombs(void)
 }
 
 
-inline void move_ship(void)
+static inline void move_ship(void)
 {
     ship_dir += ship_acc;
     if (ship_dir > max_ship_speed) {
