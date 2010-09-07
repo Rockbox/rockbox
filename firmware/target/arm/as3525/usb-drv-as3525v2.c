@@ -99,7 +99,10 @@ enum ep0state
 /* endpoints[ep_num][DIR_IN/DIR_OUT] */
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
-static struct usb_ctrlrequest ep0_setup_pkt __attribute__((aligned(32)));
+static struct usb_ctrlrequest __ep0_setup_pkt __attribute__((aligned(32)));
+static struct usb_ctrlrequest *_ep0_setup_pkt = AS3525_UNCACHED_ADDR(&__ep0_setup_pkt);
+
+#define ep0_setup_pkt (*_ep0_setup_pkt)
 /* state of EP0 */
 static enum ep0state ep0_state;
 
@@ -126,10 +129,11 @@ static void as3525v2_connect(void)
     bitset32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
     usb_delay();
     /* 2) enable usb phy clock */
+    CCU_USB = (CCU_USB & ~(3<<24)) | (1 << 24); /* ?? */
     /* PHY clock */
     CGU_USB = 1<<5  /* enable */
-        | (CLK_DIV(AS3525_PLLA_FREQ, 60000000)) << 2
-        | 1; /* source = PLLA */
+        | 0 << 2
+        | 0; /* source = PLLA */
     usb_delay();
     /* 3) clear "stop pclk" */
     PCGCCTL &= ~0x1;
@@ -168,6 +172,10 @@ static void as3525v2_connect(void)
 
 static void as3525v2_disconnect(void)
 {
+    /* Disable clock */
+    CGU_USB = 0;
+    usb_delay();
+    bitclr32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
 }
 
 static void enable_device_interrupts(void)
@@ -201,27 +209,12 @@ static void flush_tx_fifos(int nums)
     udelay(1);
 }
 
-static void flush_rx_fifo(void)
-{
-    unsigned int i = 0;
-    
-    GRSTCTL = GRSTCTL_rxfflsh_flush;
-    while(GRSTCTL & GRSTCTL_rxfflsh_flush && i < 0x300)
-        i++;
-    if(GRSTCTL & GRSTCTL_rxfflsh_flush)
-        panicf("usb-drv: hang of flush rx fifo");
-    /* wait 3 phy clocks */
-    udelay(1);
-}
-
 static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
     /* setup DMA */
-    //memset(&ep0_setup_pkt, 0, sizeof ep0_setup_pkt);
-    //clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
-    clean_dcache();
-    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&ep0_setup_pkt); /* virtual address=physical address */
+    clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
+    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&__ep0_setup_pkt); /* virtual address=physical address */
 
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
@@ -319,8 +312,6 @@ static void reset_endpoints(void)
     /* 64 bytes packet size, active endpoint */
     DOEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
     DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
-    
-    prepare_setup_ep0();
 }
 
 static void cancel_all_transfers(bool cancel_ep0)
@@ -354,7 +345,7 @@ static void core_dev_init(void)
     /* Restart the phy clock */
     PCGCCTL = 0;
     /* Set phy speed : high speed */
-    DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_fs;
+    DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_hs;
     
     /* Check hardware capabilities */
     if(extract(GHWCFG2, arch) != GHWCFG2_ARCH_INTERNAL_DMA)
@@ -391,6 +382,10 @@ static void core_dev_init(void)
             panicf("usb-drv: EP%d is no OUT or BIDIR", ep);
     }
 
+    /* Setup FIFOs */
+    GRXFSIZ = 1024;
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(1024, 1024);
+
     /* Setup interrupt masks for endpoints */
     /* Setup interrupt masks */
     DOEPMSK = DOEPINT_setup | DOEPINT_xfercompl | DOEPINT_ahberr;
@@ -398,6 +393,8 @@ static void core_dev_init(void)
     DAINTMSK = 0xffffffff;
 
     reset_endpoints();
+
+    prepare_setup_ep0();
 
     /* enable USB interrupts */
     enable_device_interrupts();
@@ -485,9 +482,7 @@ static void handle_ep_int(int ep, bool dir_in)
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                //invalidate_dcache_range(endpoint->buffer, transfered);
-                invalidate_dcache();
-                //DIEPCTL(ep) |= DEPCTL_snak;
+                invalidate_dcache_range(endpoint->buffer, transfered);
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
@@ -505,7 +500,6 @@ static void handle_ep_int(int ep, bool dir_in)
                 endpoint->status = 1;
                 /* for safety, act as if no bytes as been transfered */
                 endpoint->len = 0;
-                //DIEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
                 wakeup_signal(&endpoint->complete);
             }
@@ -529,14 +523,11 @@ static void handle_ep_int(int ep, bool dir_in)
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                //invalidate_dcache_range(endpoint->buffer, transfered);
-                invalidate_dcache();
+                invalidate_dcache_range(endpoint->buffer, transfered);
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
                     handle_ep0_complete(endpoint->len == 0);
-                //else
-                //    DOEPCTL(ep) |= DEPCTL_snak;
                 usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
                 wakeup_signal(&endpoint->complete);
             }
@@ -553,13 +544,10 @@ static void handle_ep_int(int ep, bool dir_in)
             }
             else
             {
-                //DOEPCTL(ep) |= DEPCTL_snak;
-                /* handle the set address here because of a bug in the usb core */
-                //invalidate_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);
-                invalidate_dcache();
                 /* handle EP0 state */
                 handle_ep0_setup();
                 logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
+                /* handle set address */
                 if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
                         ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
                     usb_drv_set_address(ep0_setup_pkt.wValue);
@@ -605,12 +593,15 @@ void INT_USB(void)
 
         /* Flush FIFOs */
         flush_tx_fifos(0x10);
-        flush_rx_fifo();
 
-        reset_endpoints();
+        /* Flush the Learning Queue */
+        GRSTCTL = GRSTCTL_intknqflsh;
 
         /* Reset Device Address */
         DCFG &= ~bitm(DCFG, devadr);
+
+        reset_endpoints();
+        prepare_setup_ep0();
 
         usb_core_bus_reset();
     }
@@ -624,19 +615,6 @@ void INT_USB(void)
             logf("usb-drv: HS");
         else
             logf("usb-drv: FS");
-
-        /* fixme: change EP0 mps here */
-        prepare_setup_ep0();
-    }
-
-    if(sts & GINTMSK_usbsuspend)
-    {
-        logf("usb-drv: suspend");
-    }
-
-    if(sts & GINTMSK_wkupintr)
-    {
-        logf("usb-drv: wake up");
     }
     
     if(sts & GINTMSK_otgintr)
@@ -720,9 +698,6 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     if(endpoint->busy)
         logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
-
-    if(dir_in)
-        logf("GNPTXSTS=%lx", GNPTXSTS);
     
     endpoint->busy = true;
     endpoint->len = len;
@@ -732,12 +707,16 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     int nb_packets = (len + mps - 1) / mps;
 
     if(len == 0)
+    {
+        DEPDMA = 0x10000000;
         DEPTSIZ = 1 << DEPTSIZ_pkcnt_bitp;
+    }
     else
+    {
+        clean_dcache_range(ptr, len);
+        DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
         DEPTSIZ = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
-    //clean_dcache_range(ptr, len);
-    clean_dcache();
-    DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
+    }
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
     
