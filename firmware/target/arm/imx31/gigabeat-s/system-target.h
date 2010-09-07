@@ -73,6 +73,6 @@ struct ARM_REGS {
     int cpsr;
 } regs;
 
-inline void dumpregs(void);
+void dumpregs(void);
 
 #endif /* SYSTEM_TARGET_H */

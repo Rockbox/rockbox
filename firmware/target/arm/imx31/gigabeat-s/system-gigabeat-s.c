@@ -235,7 +235,7 @@ rolo_restart(const unsigned char *source, unsigned char *dest, int length)
 #endif /* BOOTLOADER */
 
 
-inline void dumpregs(void) 
+void dumpregs(void)
 {
     asm volatile ("mov %0,r0\n\t"
                   "mov %1,r1\n\t"
