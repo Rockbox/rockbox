@@ -731,11 +731,9 @@ void usb_drv_cancel_all_transfers()
 static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocking)
 {
     ep = EP_NUM(ep);
-    if(ep != 0)
-    {
-        _logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
-            len, dir_in, blocking);
-    }
+    
+    logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
+        len, dir_in, blocking);
     
     volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
     volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
@@ -746,18 +744,15 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     #define DEPDMA  *epdma
 
     if(endpoint->busy)
-        _logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
+        logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
     
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
-    endpoint->status = true;
+    endpoint->status = 0;
 
     DEPCTL &= ~DEPCTL_stall;
     DEPCTL |= DEPCTL_usbactep;
-
-    if(ep != 0)
-        _logf("usb-drv: depctl=%lx", DEPCTL);
 
     int mps = usb_drv_mps_by_type(extract(DEPCTL, eptype));
     int nb_packets = (len + mps - 1) / mps;
@@ -777,9 +772,6 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
     
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
-
-    if(ep != 0)
-        _logf("usb-drv: depctl=%lx", DEPCTL);
 
     if(blocking)
         wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
