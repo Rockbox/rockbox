@@ -192,7 +192,7 @@ void ev_poll(void)
 }
 
 /* New frameskip, makes more sense to me and performs as well */
-inline void vid_begin(void)
+void vid_begin(void)
 {
     static int skip = 0;
     if (skip<options.frameskip)

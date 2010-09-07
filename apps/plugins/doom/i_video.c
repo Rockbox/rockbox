@@ -435,7 +435,7 @@ static inline unsigned int read_scroll_wheel(void)
 }
 #endif
 
-inline void getkey()
+static inline void getkey()
 {
    event_t event;
    /* Same button handling as rockboy */
@@ -609,7 +609,7 @@ inline void getkey()
    }
 }
 
-inline void I_StartTic (void)
+void I_StartTic (void)
 {
    getkey();
 }

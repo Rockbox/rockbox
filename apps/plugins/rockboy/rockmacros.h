@@ -30,7 +30,7 @@ void *my_malloc(size_t size);
 
 extern int shut,cleanshut;
 void vid_init(void);
-inline void vid_begin(void);
+void vid_begin(void);
 void die(char *message, ...);
 void doevents(void) ICODE_ATTR;
 void ev_poll(void);

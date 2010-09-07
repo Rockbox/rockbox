@@ -186,7 +186,7 @@ static inline void setPW(int ch, int msb, int lsb)
     computeDeltas(ch);
 }
 
-inline void pressNote(int ch, int note, int vol)
+static inline void pressNote(int ch, int note, int vol)
 {
     static int lastKill = 0;
 /* Silences all channels but one, for easy debugging, for me. */
