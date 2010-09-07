@@ -51,12 +51,7 @@ void buflib_buffer_in(struct buflib_context *ctx, int size);
 
 
 
-/* always_inline is due to this not getting inlined when not optimizing, which
- * leads to an unresolved reference since it doesn't exist as a non-inline
- * function
- */
-extern inline __attribute__((always_inline))
-void* buflib_get_data(struct buflib_context *context, int handle)
+static inline void* buflib_get_data(struct buflib_context *context, int handle)
 {
     return (void*)(context->handle_table[-handle].ptr);
 }
