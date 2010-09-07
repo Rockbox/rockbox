@@ -71,11 +71,10 @@
 
 /* Some fixed point calculation stuff */
 typedef int32_t fixed_data;
-struct _fixed
+typedef struct
 {
     fixed_data a;
-};
-typedef struct _fixed fixed;
+} fixed;
 #define FIXED_PRECISION 18
 #define FP_MAX ((fixed) {0x7fffffff})
 #define FP_MIN ((fixed) {-0x80000000})
@@ -83,8 +82,11 @@ typedef struct _fixed fixed;
 #define int2mantissa(x) ((fixed){x})
 #define fixed2int(x)    ((int)((x).a >> FIXED_PRECISION))
 #define fixed2float(x)  (((float)(x).a) / ((float)(1 << FIXED_PRECISION)))
-#define float2fixed(x) \
-    ((fixed){(fixed_data)(x * (float)(1 << FIXED_PRECISION))})
+
+/* cast in tables confuse gcc -std=gnu99 */
+#define float2fixed_decl(x) {(fixed_data)(x * (float)(1 << FIXED_PRECISION))}
+#define float2fixed(x) ((fixed)float2fixed_decl(x))
+
 /* I adapted these ones from the Rockbox fixed point library */
 #define fp_mul(x, y) \
     ((fixed){(((int64_t)((x).a)) * ((int64_t)((y).a))) >> (FIXED_PRECISION)})
@@ -150,20 +152,20 @@ typedef struct _fixed fixed;
 #define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
 static const fixed yin_threshold_table[] IDATA_ATTR =
 {
-    float2fixed(0.01),
-    float2fixed(0.02),
-    float2fixed(0.03),
-    float2fixed(0.04),
-    float2fixed(0.05),
-    float2fixed(0.10),
-    float2fixed(0.15),
-    float2fixed(0.20),
-    float2fixed(0.25),
-    float2fixed(0.30),
-    float2fixed(0.35),
-    float2fixed(0.40),
-    float2fixed(0.45),
-    float2fixed(0.50),
+    float2fixed_decl(0.01),
+    float2fixed_decl(0.02),
+    float2fixed_decl(0.03),
+    float2fixed_decl(0.04),
+    float2fixed_decl(0.05),
+    float2fixed_decl(0.10),
+    float2fixed_decl(0.15),
+    float2fixed_decl(0.20),
+    float2fixed_decl(0.25),
+    float2fixed_decl(0.30),
+    float2fixed_decl(0.35),
+    float2fixed_decl(0.40),
+    float2fixed_decl(0.45),
+    float2fixed_decl(0.50),
 };
 
 /* Structure for the reference frequency (frequency of A)
@@ -178,17 +180,17 @@ static const struct
     const fixed logratio; /* log2(factor)    */
 }  freq_A[] =
 {
-    {435, float2fixed(1.011363636), float2fixed( 0.016301812)},
-    {436, float2fixed(1.009090909), float2fixed( 0.013056153)},
-    {437, float2fixed(1.006818182), float2fixed( 0.009803175)},
-    {438, float2fixed(1.004545455), float2fixed( 0.006542846)},
-    {439, float2fixed(1.002272727), float2fixed( 0.003275132)},
-    {440, float2fixed(1.000000000), float2fixed( 0.000000000)},
-    {441, float2fixed(0.997727273), float2fixed(-0.003282584)},
-    {442, float2fixed(0.995454545), float2fixed(-0.006572654)},
-    {443, float2fixed(0.993181818), float2fixed(-0.009870244)},
-    {444, float2fixed(0.990909091), float2fixed(-0.013175389)},
-    {445, float2fixed(0.988636364), float2fixed(-0.016488123)},
+    {435, float2fixed_decl(1.011363636), float2fixed_decl( 0.016301812)},
+    {436, float2fixed_decl(1.009090909), float2fixed_decl( 0.013056153)},
+    {437, float2fixed_decl(1.006818182), float2fixed_decl( 0.009803175)},
+    {438, float2fixed_decl(1.004545455), float2fixed_decl( 0.006542846)},
+    {439, float2fixed_decl(1.002272727), float2fixed_decl( 0.003275132)},
+    {440, float2fixed_decl(1.000000000), float2fixed_decl( 0.000000000)},
+    {441, float2fixed_decl(0.997727273), float2fixed_decl(-0.003282584)},
+    {442, float2fixed_decl(0.995454545), float2fixed_decl(-0.006572654)},
+    {443, float2fixed_decl(0.993181818), float2fixed_decl(-0.009870244)},
+    {444, float2fixed_decl(0.990909091), float2fixed_decl(-0.013175389)},
+    {445, float2fixed_decl(0.988636364), float2fixed_decl(-0.016488123)},
 };
 
 /* Index of the entry for 440 Hz in the table (default frequency for A) */
@@ -266,18 +268,18 @@ static const struct
     const fixed logfreq; /* log2(frequency)             */
 } notes[] =
 {
-    {"A" , float2fixed(440.0000000f), float2fixed(8.781359714f)},
-    {"A#", float2fixed(466.1637615f), float2fixed(8.864693047f)},
-    {"B" , float2fixed(493.8833013f), float2fixed(8.948026380f)},
-    {"C" , float2fixed(523.2511306f), float2fixed(9.031359714f)},
-    {"C#", float2fixed(554.3652620f), float2fixed(9.114693047f)},
-    {"D" , float2fixed(587.3295358f), float2fixed(9.198026380f)},
-    {"D#", float2fixed(622.2539674f), float2fixed(9.281359714f)},
-    {"E" , float2fixed(659.2551138f), float2fixed(9.364693047f)},
-    {"F" , float2fixed(698.4564629f), float2fixed(9.448026380f)},
-    {"F#", float2fixed(739.9888454f), float2fixed(9.531359714f)},
-    {"G" , float2fixed(783.9908720f), float2fixed(9.614693047f)},
-    {"G#", float2fixed(830.6093952f), float2fixed(9.698026380f)},
+    {"A" , float2fixed_decl(440.0000000f), float2fixed_decl(8.781359714f)},
+    {"A#", float2fixed_decl(466.1637615f), float2fixed_decl(8.864693047f)},
+    {"B" , float2fixed_decl(493.8833013f), float2fixed_decl(8.948026380f)},
+    {"C" , float2fixed_decl(523.2511306f), float2fixed_decl(9.031359714f)},
+    {"C#", float2fixed_decl(554.3652620f), float2fixed_decl(9.114693047f)},
+    {"D" , float2fixed_decl(587.3295358f), float2fixed_decl(9.198026380f)},
+    {"D#", float2fixed_decl(622.2539674f), float2fixed_decl(9.281359714f)},
+    {"E" , float2fixed_decl(659.2551138f), float2fixed_decl(9.364693047f)},
+    {"F" , float2fixed_decl(698.4564629f), float2fixed_decl(9.448026380f)},
+    {"F#", float2fixed_decl(739.9888454f), float2fixed_decl(9.531359714f)},
+    {"G" , float2fixed_decl(783.9908720f), float2fixed_decl(9.614693047f)},
+    {"G#", float2fixed_decl(830.6093952f), float2fixed_decl(9.698026380f)},
 };
 
 /* GUI */
