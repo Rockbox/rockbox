@@ -31,7 +31,7 @@
 #include "panic.h"
 #include "mmu-arm.h"
 #include "system.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
@@ -312,6 +312,12 @@ static void reset_endpoints(void)
     /* 64 bytes packet size, active endpoint */
     DOEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
     DIEPCTL(0) = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
+    /* Setup next chain for IN eps */
+    FOR_EACH_IN_EP_AND_EP0(i, ep)
+    {
+        int next_ep = __in_ep_list_ep0[(i + 1) % (NUM_IN_EP + 1)];
+        DIEPCTL(ep) = (DIEPCTL(ep) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
+    }
 }
 
 static void cancel_all_transfers(bool cancel_ep0)
@@ -472,7 +478,6 @@ static void handle_ep_int(int ep, bool dir_in)
             panicf("usb-drv: ahb error on EP%d IN", ep);
         if(DIEPINT(ep) & DIEPINT_xfercompl)
         {
-            logf("usb-drv: xfer complete on EP%d IN", ep);
             if(endpoint->busy)
             {
                 endpoint->busy = false;
@@ -482,7 +487,6 @@ static void handle_ep_int(int ep, bool dir_in)
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                invalidate_dcache_range(endpoint->buffer, transfered);
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
@@ -550,7 +554,10 @@ static void handle_ep_int(int ep, bool dir_in)
                 /* handle set address */
                 if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
                         ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
-                    usb_drv_set_address(ep0_setup_pkt.wValue);
+                {
+                    /* Set address now */
+                    DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt.wValue << DCFG_devadr_bitp);
+                }
                 usb_core_control_request(&ep0_setup_pkt);
             }
         }
@@ -657,17 +664,62 @@ int usb_drv_port_speed(void)
     }
 }
 
+static unsigned long usb_drv_mps_by_type(int type)
+{
+    bool hs = usb_drv_port_speed();
+    switch(type)
+    {
+        case USB_ENDPOINT_XFER_CONTROL: return 64;
+        case USB_ENDPOINT_XFER_BULK: return hs ? 512 : 64;
+        case USB_ENDPOINT_XFER_INT: return hs ? 1024 : 64;
+        case USB_ENDPOINT_XFER_ISOC: return hs ? 1024 : 1023;
+        default: return 0;
+    }
+}
+
 int usb_drv_request_endpoint(int type, int dir)
 {
-    (void) type;
-    (void) dir;
+    int i, ep, ret = -1;
     logf("usb-drv: request endpoint (type=%d,dir=%s)", type, dir == USB_DIR_IN ? "IN" : "OUT");
-    return -1;
+
+    if(dir == USB_DIR_IN)
+        FOR_EACH_IN_EP(i, ep)
+        {
+            if(endpoints[ep][DIR_IN].active)
+                continue;
+            endpoints[ep][DIR_IN].active = true;
+            ret = ep | dir;
+            break;
+        }
+    else
+        FOR_EACH_OUT_EP(i, ep)
+        {
+            if(endpoints[ep][DIR_OUT].active)
+                continue;
+            endpoints[ep][DIR_OUT].active = true;
+            ret = ep | dir;
+            break;
+        }
+    
+    if(ret == -1)
+    {
+        logf("usb-drv: request failed");
+        return -1;
+    }
+
+    unsigned long data = DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp)
+                        | (usb_drv_mps_by_type(type) << DEPCTL_mps_bitp);
+    unsigned long mask = ~(bitm(DEPCTL, eptype) | bitm(DEPCTL, mps));
+    
+    if(dir == USB_DIR_IN) DIEPCTL(ep) = (DIEPCTL(ep) & mask) | data;
+    else DOEPCTL(ep) = (DOEPCTL(ep) & mask) | data;
+
+    return ret;
 }
 
 void usb_drv_release_endpoint(int ep)
 {
-    //logf("usb-drv: release EP%d %s", EP_NUM(ep), EP_DIR(ep) == DIR_IN ? "IN" : "OUT");
+    logf("usb-drv: release EP%d %s", EP_NUM(ep), EP_DIR(ep) == DIR_IN ? "IN" : "OUT");
     endpoints[EP_NUM(ep)][EP_DIR(ep)].active = false;
 }
 
@@ -679,8 +731,11 @@ void usb_drv_cancel_all_transfers()
 static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocking)
 {
     ep = EP_NUM(ep);
-    logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
-        len, dir_in, blocking);
+    if(ep != 0)
+    {
+        _logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
+            len, dir_in, blocking);
+    }
     
     volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
     volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
@@ -690,20 +745,21 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     #define DEPTSIZ *eptsiz
     #define DEPDMA  *epdma
 
-    if(DEPCTL & DEPCTL_stall)
-    {
-        logf("usb-drv: cannot receive/send on a stalled endpoint");
-        return -1;
-    }
-
     if(endpoint->busy)
-        logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
+        _logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
     
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
+    endpoint->status = true;
 
-    int mps = 64;
+    DEPCTL &= ~DEPCTL_stall;
+    DEPCTL |= DEPCTL_usbactep;
+
+    if(ep != 0)
+        _logf("usb-drv: depctl=%lx", DEPCTL);
+
+    int mps = usb_drv_mps_by_type(extract(DEPCTL, eptype));
     int nb_packets = (len + mps - 1) / mps;
 
     if(len == 0)
@@ -713,14 +769,17 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     }
     else
     {
-        clean_dcache_range(ptr, len);
         DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
         DEPTSIZ = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
+        clean_dcache_range(ptr, len);
     }
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
     
-    DEPCTL |= DEPCTL_epena | DEPCTL_cnak | DEPCTL_usbactep;
+    DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
+
+    if(ep != 0)
+        _logf("usb-drv: depctl=%lx", DEPCTL);
 
     if(blocking)
         wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
@@ -751,31 +810,33 @@ int usb_drv_send_nonblocking(int ep, void *ptr, int len)
 
 void usb_drv_set_test_mode(int mode)
 {
-    (void) mode;
+    /* there is a perfect matching between usb test mode code
+     * and the register field value */
+    DCTL = (DCTL & ~bitm(DCTL, tstctl)) | (mode << DCTL_tstctl_bitp);
 }
 
 void usb_drv_set_address(int address)
 {
-    /* ignore it if addres is already set */
-    if(extract(DCFG, devadr) == 0)
-    {
-        logf("usb-drv: set address %x", address);
-        DCFG = (DCFG & ~bitm(DCFG, devadr)) | (address << DCFG_devadr_bitp);
-    }
+    (void) address;
 }
 
 void usb_drv_stall(int ep, bool stall, bool in)
 {
-    (void) ep;
-    (void) stall;
-    (void) in;
     logf("usb-drv: %sstall EP%d %s", stall ? "" : "un", ep, in ? "IN" : "OUT");
+    if(in)
+    {
+        if(stall) DIEPCTL(ep) |= DEPCTL_stall;
+        else DIEPCTL(ep) &= ~DEPCTL_stall;
+    }
+    else
+    {
+        if(stall) DOEPCTL(ep) |= DEPCTL_stall;
+        else DOEPCTL(ep) &= ~DEPCTL_stall;
+    }
 }
 
 bool usb_drv_stalled(int ep, bool in)
 {
-    (void) ep;
-    (void) in;
-    return true;
+    return (in ? DIEPCTL(ep) : DOEPCTL(ep)) & DEPCTL_stall ? true : false;
 }
 
