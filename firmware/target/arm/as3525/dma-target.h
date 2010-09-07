@@ -37,7 +37,7 @@ void dma_init(void) INIT_ATTR;
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
                         size_t size, int nwords, void (*callback)(void));
-inline void dma_disable_channel(int channel);
+void dma_disable_channel(int channel);
 
 void dma_retain(void);
 void dma_release(void);

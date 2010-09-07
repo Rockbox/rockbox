@@ -56,7 +56,7 @@ void dma_init(void)
     VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
-inline void dma_disable_channel(int channel)
+void dma_disable_channel(int channel)
 {
     DMAC_CH_CONFIGURATION(channel) &= ~(1<<0);
 }
