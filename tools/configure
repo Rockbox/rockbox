@@ -9,7 +9,7 @@
 #
 
 # global CC options for all platforms
-CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe"
+CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99"
 
 # global LD options for all platforms
 GLOBAL_LDOPTS=""
@@ -464,7 +464,7 @@ androidcc () {
     gccchoice="4.4.0"
     prefixtools $ANDROID_NDK_PATH/build/prebuilt/linux-x86/arm-eabi-$gccchoice/bin/arm-eabi-
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
-    GCCOPTS="$GCCOPTS -std=gnu99 -ffunction-sections -fno-short-enums -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
+    GCCOPTS="$GCCOPTS -ffunction-sections -fno-short-enums -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
     GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -L$ANDROID_NDK_PATH/build/platforms/android-4/arch-arm/usr/lib/ -Wl,-rpath-link=$ANDROID_NKD_PATH/build/platforms/android-4/arch-arm/usr/lib"
     LDOPTS="$LDOPTS -shared -nostdlib -lm -ldl -llog"
     extradefines="$extradefines -DANDROID"
