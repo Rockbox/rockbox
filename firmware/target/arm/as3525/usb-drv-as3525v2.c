@@ -36,8 +36,8 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-static const int in_ep_list[NUM_IN_EP + 1] = {0, IN_EP_LIST};
-static const int out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
+static const uint8_t in_ep_list[NUM_IN_EP + 1] = {0, IN_EP_LIST};
+static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 
 /* iterate through each in/out ep except EP0
  * 'i' is the counter, 'ep' is the actual value */
