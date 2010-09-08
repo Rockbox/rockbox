@@ -35,29 +35,59 @@ void ttb_init(void);
 void enable_mmu(void);
 void map_section(unsigned int pa, unsigned int va, int mb, int flags);
 
-/* Cleans entire DCache */
+/* Note for the function names
+ *
+ * ARM refers to the cache coherency functions as (in the CPU manuals):
+ *  clean (write-back)
+ *  clean and invalidate (write-back and removing the line from cache)
+ *  invalidate (removing from cache without write-back)
+ *
+ * The deprecated functions below don't follow the above (which is why
+ * they're deprecated).
+ *
+ * This names have been proven to cause confusion, therefore we use:
+ *  commit
+ *  commit and discard
+ *  discard
+ */
+
+/* Commits entire DCache */
+void commit_dcache(void);
+/* deprecated alias */
 void clean_dcache(void);
 
-/* Invalidate entire DCache */
-/* will do writeback */
+/* Commit and discard entire DCache, will do writeback */
+void commit_discard_dcache(void);
+/* deprecated alias */
 void invalidate_dcache(void);
 
-/* Invalidate DCache for this range  */
-/* will do writeback */
+/* Write DCache back to RAM for the given range and remove cache lines
+ * from DCache afterwards */
+void commit_discard_dcache_range(const void *base, unsigned int size);
+/* deprecated alias */
 void invalidate_dcache_range(const void *base, unsigned int size);
 
-/* clean DCache for this range  */
-/* forces DCache writeback for the specified range */
+/* Write DCache back to RAM for the given range */
+void commit_dcache_range(const void *base, unsigned int size);
+/* deprecated alias */
 void clean_dcache_range(const void *base, unsigned int size);
 
-/* Dump DCache for this range  */
-/* Will *NOT* do write back except for buffer ends not on a line boundary */
+/*
+ * Remove cache lines for the given range from DCache
+ * will *NOT* do write back except for buffer edges not on a line boundary
+ */
+void discard_dcache_range(const void *base, unsigned int size);
+/* deprecated alias */
 void dump_dcache_range(const void *base, unsigned int size);
 
-/* Invalidate entire ICache and DCache */
-/* will do writeback */
+/* Discards the entire ICache, and commit+discards the entire DCache */
+void commit_discard_idcache(void);
+/* deprecated alias */
 void invalidate_idcache(void);
 
+#define HAVE_CPUCACHE_COMMIT_DISCARD
+#define HAVE_CPUCACHE_COMMIT
+/* deprecated alias */
 #define HAVE_CPUCACHE_INVALIDATE
 #define HAVE_CPUCACHE_FLUSH
 

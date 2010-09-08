@@ -28,15 +28,18 @@
 #if 0 /* unused */
 
 /*
- * Invalidate DCache for this range
- * will do write back
- * void invalidate_dcache_range(const void *base, unsigned int size)
+ * Write DCache back to RAM for the given range and remove cache lines
+ * from DCache afterwards
+ * void commit_discard_dcache_range(const void *base, unsigned int size);
  */
     .section   .text, "ax", %progbits
     .align      2
-    .global     invalidate_dcache_range
-    .type       invalidate_dcache_range, %function
-    @ MVA format: 31:5 = Modified virtual address, 4:0 = Ignored
+    .global     commit_discard_dcache_range
+    .type       commit_discard_dcache_range, %function
+    .global     invalidate_dcache_range @ Alias, deprecated
+
+    @ MVA format: 31:5 = Modified virtual address, 4:0 = SBZ
+commit_discard_dcache_range:
 invalidate_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
@@ -45,20 +48,22 @@ invalidate_dcache_range:
     mcrrhi  p15, 0, r1, r0, c14     @ Clean and invalidate DCache range
     mcrhi   p15, 0, r2, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
-    .size   invalidate_dcache_range, .-invalidate_dcache_range
+    .size   commit_discard_dcache_range, .-commit_discard_dcache_range
 
 #endif /* unused function */
 
 /*
- * clean DCache for this range
- * forces DCache writeback for the specified range
- * void clean_dcache_range(const void *base, unsigned int size);
+ * Write DCache back to RAM for the given range
+ * void commit_dcache_range(const void *base, unsigned int size);
  */
     .section   .text, "ax", %progbits
     .align      2
-    .global     clean_dcache_range
-    .type       clean_dcache_range, %function
-    @ MVA format: 31:5 = Modified virtual address, 4:0 = Ignored
+    .global     commit_dcache_range
+    .type       commit_dcache_range, %function
+    .global     clean_dcache_range  @ Alias, deprecated
+
+    @ MVA format: 31:5 = Modified virtual address, 4:0 = SBZ
+commit_dcache_range:
 clean_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
@@ -67,20 +72,22 @@ clean_dcache_range:
     mcrrhi  p15, 0, r1, r0, c12     @ Clean DCache range
     mcrhi   p15, 0, r2, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
-    .size   clean_dcache_range, .-clean_dcache_range
+    .size   commit_dcache_range, .-commit_dcache_range
 
 /*
- * Dump DCache for this range
+ * Remove cache lines for the given range from DCache
  * will *NOT* do write back except for buffer edges not on a line boundary
- * void dump_dcache_range(const void *base, unsigned int size);
+ * void discard_dcache_range(const void *base, unsigned int size);
  */
     .section   .text, "ax", %progbits
     .align      2
-    .global     dump_dcache_range
-    .type       dump_dcache_range, %function
-    @ MVA format (mcr):  31:5 = Modified virtual address, 4:0 = SBZ
-    @ MVA format (mcrr): 31:5 = Modified virtual address, 4:0 = Ignored
- dump_dcache_range:
+    .global     discard_dcache_range
+    .type       discard_dcache_range, %function
+    .global     dump_dcache_range   @ Alias, deprecated
+
+    @ MVA format: 31:5 = Modified virtual address, 4:0 = SBZ
+discard_dcache_range:
+dump_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
     bxls    lr                      @ 
@@ -100,52 +107,63 @@ clean_dcache_range:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
-    .size   dump_dcache_range, .-dump_dcache_range
+    .size   discard_dcache_range, .-discard_dcache_range
 
 
 /*
- * Cleans entire DCache
- * void clean_dcache(void);
+ * Write entire DCache back to RAM
+ * void commit_dcache(void);
  */
     .section   .text, "ax", %progbits
     .align      2
-    .global     clean_dcache
-    .type       clean_dcache, %function
-    .global     cpucache_flush      @ Alias
+    .global     commit_dcache
+    .type       commit_dcache, %function
+    .global     cpucache_commit     @ Alias
+    .global     clean_dcache        @ Alias, deprecated
+    .global     cpucache_flush      @ Alias, deprecated
+
+commit_dcache:
+cpucache_commit:
 clean_dcache:
 cpucache_flush:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c10, 0  @ Clean entire DCache
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
-    .size   clean_dcache, .-clean_dcache
+    .size   commit_dcache, .-commit_dcache
 
 /*
- * Invalidate entire DCache
- * will do writeback
- * void invalidate_dcache(void);
+ * Clean and invalidate entire DCache, will do writeback
+ * void commit_discard_dcache(void);
  */
-    .section   .text, "ax", %progbits
+    .section   .icode, "ax", %progbits
     .align      2
-    .global     invalidate_dcache
-    .type       invalidate_dcache, %function
+    .global     commit_discard_dcache
+    .type       commit_discard_dcache, %function
+    .global     invalidate_dcache   @ Alias, deprecated
+
+commit_discard_dcache:
 invalidate_dcache:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c14, 0  @ Clean and invalidate entire DCache
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
-    .size   invalidate_dcache, .-invalidate_dcache
+    .size   commit_discard_dcache, .-commit_discard_dcache
     
+
 /*
- * Invalidate entire ICache and DCache
- * will do writeback
- * void invalidate_idcache(void);
+ * Discards the entire ICache, and commit+discards the entire DCache
+ * void commit_discard_idcache(void);
  */
     .section   .icode, "ax", %progbits
     .align      2
-    .global     invalidate_idcache
-    .type       invalidate_idcache, %function
-    .global     cpucache_invalidate @ Alias
+    .global     commit_discard_idcache
+    .type       commit_discard_idcache, %function
+    .global     cpucache_commit_discard @ Alias
+    .global     invalidate_idcache      @ Alias, deprecated
+    .global     cpucache_invalidate     @ Alias, deprecated
+
+commit_discard_idcache:
 invalidate_idcache:
 cpucache_invalidate:
     mov     r0, #0                  @
@@ -155,4 +173,4 @@ cpucache_invalidate:
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
     mcr     p15, 0, r0, c7, c5, 4   @ Flush prefetch buffer (IMB)
     bx      lr                      @
-    .size   invalidate_idcache, .-invalidate_idcache
+    .size   commit_discard_idcache, .-commit_discard_idcache

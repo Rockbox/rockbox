@@ -62,7 +62,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
-void ICODE_ATTR __attribute__((naked)) cpucache_flush(void)
+void ICODE_ATTR __attribute__((naked)) cpucache_commit(void)
 {
     asm volatile(
         "mov    r0, #0xf0000000 \n"
@@ -70,14 +70,15 @@ void ICODE_ATTR __attribute__((naked)) cpucache_flush(void)
         "add    r1, r0, #0x2000 \n" /* r1 = CACHE_FLUSH_BASE + CACHE_SIZE */
         "mov    r2, #0          \n"
     "1:                         \n"
-        "str    r2, [r0], #16   \n" /* Flush */
+        "str    r2, [r0], #16   \n" /* Commit */
         "cmp    r0, r1          \n"
         "blo    1b              \n"
         "bx     lr              \n"
     );
 }
+void cpucache_flush(void) __attribute__((alias("cpucache_commit")));
 
-void ICODE_ATTR  __attribute__((naked)) cpucache_invalidate(void)
+void ICODE_ATTR  __attribute__((naked)) cpucache_commit_discard(void)
 {
     asm volatile(
         "mov    r0, #0xf0000000 \n"
@@ -86,13 +87,14 @@ void ICODE_ATTR  __attribute__((naked)) cpucache_invalidate(void)
         "add    r1, r0, #0x2000 \n" /* r2 = CACHE_FLUSH_BASE + CACHE_SIZE */
         "mov    r3, #0          \n"
     "1:                         \n"
-        "str    r3, [r0], #16   \n" /* Flush */
-        "str    r3, [r2], #16   \n" /* Invalidate */
+        "str    r3, [r0], #16   \n" /* Commit */
+        "str    r3, [r2], #16   \n" /* Discard */
         "cmp    r0, r1          \n"
         "blo    1b              \n"
         "bx     lr              \n"
     );
 }
+void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
 
 static void ipod_init_cache(void)
 {

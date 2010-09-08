@@ -168,6 +168,9 @@ static inline void wake_core(int core)
 
 /** cache functions **/
 #ifndef BOOTLOADER
+#define HAVE_CPUCACHE_COMMIT_DISCARD
+#define HAVE_CPUCACHE_COMMIT
+/* deprecated alias */
 #define HAVE_CPUCACHE_INVALIDATE
 #define HAVE_CPUCACHE_FLUSH
 #endif

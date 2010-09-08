@@ -194,6 +194,8 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
+#define HAVE_CPUCACHE_COMMIT_DISCARD
+/* deprecated alias */
 #define HAVE_CPUCACHE_INVALIDATE
 
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000

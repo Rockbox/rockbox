@@ -369,10 +369,12 @@ void coldfire_set_dataincontrol(unsigned long value)
     restore_irq(level);
 }
 
-void cpucache_invalidate(void)
+void cpucache_commit_discard(void)
 {
    asm volatile ("move.l #0x01000000,%d0\n"
                  "movec.l %d0,%cacr\n"
                  "move.l #0x80000000,%d0\n"
                  "movec.l %d0,%cacr");
 }
+
+void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));

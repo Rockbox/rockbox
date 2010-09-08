@@ -282,16 +282,28 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 
 /* Just define these as empty if not declared */
 #ifdef HAVE_CPUCACHE_INVALIDATE
+void cpucache_commit_discard(void);
+/* deprecated alias */
 void cpucache_invalidate(void);
 #else
+static inline void cpucache_commit_discard(void)
+{
+}
+/* deprecated alias */
 static inline void cpucache_invalidate(void)
 {
 }
 #endif
 
 #ifdef HAVE_CPUCACHE_FLUSH
+void cpucache_commit(void);
+/* deprecated alias */
 void cpucache_flush(void);
 #else
+static inline void cpucache_commit(void)
+{
+}
+/* deprecated alias */
 static inline void cpucache_flush(void)
 {
 }
