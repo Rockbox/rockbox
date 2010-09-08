@@ -736,11 +736,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     dma_retain();
 
     if(aligned)
-    {
+    {   /* direct transfer, indirect is always uncached */
         if(write)
-            clean_dcache_range(buf, count * SECTOR_SIZE);
+            commit_dcache_range(buf, count * SECTOR_SIZE);
         else
-            dump_dcache_range(buf, count * SECTOR_SIZE);
+            discard_dcache_range(buf, count * SECTOR_SIZE);
     }
 
     while(count)
