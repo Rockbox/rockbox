@@ -185,7 +185,7 @@ static void enable_device_interrupts(void)
 static void flush_tx_fifos(int nums)
 {
     unsigned int i = 0;
-    
+
     GRSTCTL = (nums << GRSTCTL_txfnum_bitp)
             | GRSTCTL_txfflsh_flush;
     while(GRSTCTL & GRSTCTL_txfflsh_flush && i < 0x300)
@@ -213,7 +213,7 @@ static void prepare_setup_ep0(void)
 
     /* Enable endpoint, clear nak */
     ep0_state = EP0_WAIT_SETUP;
-    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;    
+    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 static void handle_ep0_complete(bool is_ack)
@@ -284,7 +284,7 @@ static void reset_endpoints(void)
         else
             DIEPCTL(ep) = 0;
     }
-    
+
     FOR_EACH_OUT_EP_AND_EP0(i, ep)
     {
         endpoints[ep][DIR_OUT].active = false;
@@ -332,7 +332,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         wakeup_signal(&endpoints[ep][DIR_OUT].complete);
         DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
-    
+
     restore_irq(flags);
 }
 
@@ -344,7 +344,7 @@ static void core_dev_init(void)
     PCGCCTL = 0;
     /* Set phy speed : high speed */
     DCFG = (DCFG & ~bitm(DCFG, devspd)) | DCFG_devspd_hs_phy_hs;
-    
+
     /* Check hardware capabilities */
     if(extract(GHWCFG2, arch) != GHWCFG2_ARCH_INTERNAL_DMA)
         panicf("usb-drv: wrong architecture (%ld)", extract(GHWCFG2, arch));
@@ -405,7 +405,7 @@ static void core_init(void)
     /* Select UTMI+ 16 */
     GUSBCFG |= GUSBCFG_phy_if;
     GUSBCFG = (GUSBCFG & ~bitm(GUSBCFG, toutcal)) | 7 << GUSBCFG_toutcal_bitp;
-    
+
     /* fixme: the current code is for internal DMA only, the clip+ architecture
      *        define the internal DMA model */
     /* Set burstlen and enable DMA*/
@@ -416,7 +416,7 @@ static void core_init(void)
 
     /* perform device model specific init */
     core_dev_init();
-    
+
     /* Reconnect */
     DCTL &= ~DCTL_sftdiscon;
 }
@@ -614,7 +614,7 @@ void INT_USB(void)
         else
             logf("usb-drv: FS");
     }
-    
+
     if(sts & GINTMSK_otgintr)
     {
         logf("usb-drv: otg int");
@@ -630,7 +630,7 @@ void INT_USB(void)
     {
         panicf("usb-drv: disconnect");
         cancel_all_transfers(true);
-        usb_enable(false);        
+        usb_enable(false);
     }
 
     GINTSTS = sts;
@@ -692,7 +692,7 @@ int usb_drv_request_endpoint(int type, int dir)
             ret = ep | dir;
             break;
         }
-    
+
     if(ret == -1)
     {
         logf("usb-drv: request failed");
@@ -703,7 +703,7 @@ int usb_drv_request_endpoint(int type, int dir)
                         | (usb_drv_mps_by_type(type) << DEPCTL_mps_bitp)
                         | DEPCTL_usbactep | DEPCTL_snak;
     unsigned long mask = ~(bitm(DEPCTL, eptype) | bitm(DEPCTL, mps));
-    
+
     if(dir == USB_DIR_IN) DIEPCTL(ep) = (DIEPCTL(ep) & mask) | data;
     else DOEPCTL(ep) = (DOEPCTL(ep) & mask) | data;
 
@@ -724,10 +724,10 @@ void usb_drv_cancel_all_transfers()
 static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocking)
 {
     ep = EP_NUM(ep);
-    
+
     logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
         len, dir_in, blocking);
-    
+
     volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
     volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
     volatile unsigned long *epdma = dir_in ? &DIEPDMA(ep) : &DOEPDMA(ep);
@@ -738,7 +738,7 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     if(endpoint->busy)
         logf("usb-drv: EP%d %s is already busy", ep, dir_in ? "IN" : "OUT");
-    
+
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
@@ -766,7 +766,7 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     }
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
-    
+
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
 
     if(blocking)
