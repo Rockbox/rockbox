@@ -98,10 +98,9 @@ enum ep0state
 /* endpoints[ep_num][DIR_IN/DIR_OUT] */
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
-static struct usb_ctrlrequest __ep0_setup_pkt __attribute__((aligned(32)));
-static struct usb_ctrlrequest *_ep0_setup_pkt = AS3525_UNCACHED_ADDR(&__ep0_setup_pkt);
+static struct usb_ctrlrequest _ep0_setup_pkt __attribute__((aligned(32)));
+static struct usb_ctrlrequest *ep0_setup_pkt = AS3525_UNCACHED_ADDR(&_ep0_setup_pkt);
 
-#define ep0_setup_pkt (*_ep0_setup_pkt)
 /* state of EP0 */
 static enum ep0state ep0_state;
 
@@ -132,7 +131,7 @@ static void as3525v2_connect(void)
     /* PHY clock */
     CGU_USB = 1<<5  /* enable */
         | 0 << 2
-        | 0; /* source = PLLA */
+        | 0; /* source = ? (24MHz crystal?) */
     usb_delay();
     /* 3) clear "stop pclk" */
     PCGCCTL &= ~0x1;
@@ -212,7 +211,7 @@ static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
     /* setup DMA */
-    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&__ep0_setup_pkt); /* virtual address=physical address */
+    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&_ep0_setup_pkt);
 
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
@@ -269,7 +268,7 @@ static void handle_ep0_setup(void)
         return;
     }
     /* determine is there is a data phase */
-    if(ep0_setup_pkt.wLength == 0)
+    if(ep0_setup_pkt->wLength == 0)
         /* no: wait for ack */
         ep0_state = EP0_WAIT_ACK;
     else
@@ -547,15 +546,15 @@ static void handle_ep_int(int ep, bool dir_in)
             {
                 /* handle EP0 state */
                 handle_ep0_setup();
-                logf("  rt=%x r=%x", ep0_setup_pkt.bRequestType, ep0_setup_pkt.bRequest);
+                logf("  rt=%x r=%x", ep0_setup_pkt->bRequestType, ep0_setup_pkt->bRequest);
                 /* handle set address */
-                if(ep0_setup_pkt.bRequestType == USB_TYPE_STANDARD &&
-                        ep0_setup_pkt.bRequest == USB_REQ_SET_ADDRESS)
+                if(ep0_setup_pkt->bRequestType == USB_TYPE_STANDARD &&
+                        ep0_setup_pkt->bRequest == USB_REQ_SET_ADDRESS)
                 {
                     /* Set address now */
-                    DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt.wValue << DCFG_devadr_bitp);
+                    DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
                 }
-                usb_core_control_request(&ep0_setup_pkt);
+                usb_core_control_request(ep0_setup_pkt);
             }
         }
         /* clear interrupts */
