@@ -640,34 +640,31 @@ void INT_USB(void)
 
 int usb_drv_port_speed(void)
 {
-    switch(extract(DSTS, enumspd))
-    {
-        case DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ:
-            return 1;
-        case DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ:
-        case DSTS_ENUMSPD_FS_PHY_48MHZ:
-            return 0;
-            break;
-        case DSTS_ENUMSPD_LS_PHY_6MHZ:
-            panicf("usb-drv: LS is not supported");
-            return 0;
-        default:
-            panicf("usb-drv: wtf is this speed ?");
-            return 0;
-    }
+    static const uint8_t speed[4] = {
+        [DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ] = 1,
+        [DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ] = 0,
+        [DSTS_ENUMSPD_FS_PHY_48MHZ]          = 0,
+        [DSTS_ENUMSPD_LS_PHY_6MHZ]           = 0,
+    };
+
+    unsigned enumspd = extract(DSTS, enumspd);
+
+    if(enumspd == DSTS_ENUMSPD_LS_PHY_6MHZ)
+        panicf("usb-drv: LS is not supported");
+
+    return speed[enumspd & 3];
 }
 
 static unsigned long usb_drv_mps_by_type(int type)
 {
-    bool hs = usb_drv_port_speed();
-    switch(type)
-    {
-        case USB_ENDPOINT_XFER_CONTROL: return 64;
-        case USB_ENDPOINT_XFER_BULK: return hs ? 512 : 64;
-        case USB_ENDPOINT_XFER_INT: return hs ? 1024 : 64;
-        case USB_ENDPOINT_XFER_ISOC: return hs ? 1024 : 1023;
-        default: return 0;
-    }
+    static const uint16_t mps[4][2] = {
+        /*         type                 fs      hs   */
+        [USB_ENDPOINT_XFER_CONTROL] = { 64,     64   },
+        [USB_ENDPOINT_XFER_ISOC]    = { 1023,   1024 },
+        [USB_ENDPOINT_XFER_BULK]    = { 64,     512  },
+        [USB_ENDPOINT_XFER_INT]     = { 64,     1024 },
+    };
+    return mps[type & 3][usb_drv_port_speed() & 1];
 }
 
 int usb_drv_request_endpoint(int type, int dir)
