@@ -77,7 +77,6 @@ struct usb_endpoint
     bool busy; /* true is a transfer is pending */
     int status; /* completion status (0 for success) */
     struct wakeup complete; /* wait object */
-    void *buffer; /* buffer address */
 };
 
 /* state of EP0 (to correctly schedule setup packet enqueing) */
@@ -213,7 +212,6 @@ static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
     /* setup DMA */
-    clean_dcache_range((void*)&ep0_setup_pkt, sizeof ep0_setup_pkt);  /* force write back */
     DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&__ep0_setup_pkt); /* virtual address=physical address */
 
     /* Setup EP0 OUT with the following parameters:
@@ -389,8 +387,8 @@ static void core_dev_init(void)
     }
 
     /* Setup FIFOs */
-    GRXFSIZ = 1024;
-    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(1024, 1024);
+    GRXFSIZ = 512;
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512, 512);
 
     /* Setup interrupt masks for endpoints */
     /* Setup interrupt masks */
@@ -527,7 +525,6 @@ static void handle_ep_int(int ep, bool dir_in)
                 logf("len=%d reg=%ld xfer=%d", endpoint->len,
                     (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
                     transfered);
-                invalidate_dcache_range(endpoint->buffer, transfered);
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
@@ -767,7 +764,10 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     {
         DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
         DEPTSIZ = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
-        clean_dcache_range(ptr, len);
+        if(dir_in)
+            clean_dcache_range(ptr, len);
+        else
+            invalidate_dcache_range(ptr, len);
     }
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
