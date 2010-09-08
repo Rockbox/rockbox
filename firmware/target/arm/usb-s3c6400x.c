@@ -49,7 +49,7 @@ struct ep_type
     struct wakeup complete;
 } ;
 
-static struct ep_type endpoints[5];
+static struct ep_type endpoints[USB_NUM_ENDPOINTS];
 static struct usb_ctrlrequest ctrlreq USB_DEVBSS_ATTR;
 
 int usb_drv_port_speed(void)
@@ -106,7 +106,7 @@ int usb_drv_request_endpoint(int type, int dir)
     if (dir == USB_DIR_IN) ep = 1;
     else ep = 2;
 
-    while (ep < 5)
+    while (ep < USB_NUM_ENDPOINTS)
     {
         if (!endpoints[ep].active)
         {
@@ -219,7 +219,7 @@ void INT_USB_FUNC(void)
             }
 
     if (ints & 0x80000)  /* OUT EP event */
-        for (i = 0; i < 5; i += 2)
+        for (i = 0; i < USB_NUM_ENDPOINTS; i += 2)
             if ((epints = DOEPINT(i)))
             {
                 if (epints & 1)  /* Transfer completed */
