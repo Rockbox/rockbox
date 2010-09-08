@@ -531,6 +531,7 @@ int sim_fsync(int fd)
 #endif
 }
 
+#ifndef __PCTOOL__
 
 void *lc_open(const char *filename, char *buf, size_t buf_size)
 {
