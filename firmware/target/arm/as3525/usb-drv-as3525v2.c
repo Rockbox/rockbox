@@ -285,6 +285,7 @@ static void reset_endpoints(void)
     {
         endpoints[ep][DIR_IN].active = false;
         endpoints[ep][DIR_IN].busy = false;
+        endpoints[ep][DIR_IN].status = -1;
         if(endpoints[ep][DIR_IN].wait)
             wakeup_signal(&endpoints[ep][DIR_IN].complete);
         endpoints[ep][DIR_IN].wait = false;
@@ -298,6 +299,7 @@ static void reset_endpoints(void)
     {
         endpoints[ep][DIR_OUT].active = false;
         endpoints[ep][DIR_OUT].busy = false;
+        endpoints[ep][DIR_OUT].status = -1;
         if(endpoints[ep][DIR_OUT].wait)
             wakeup_signal(&endpoints[ep][DIR_OUT].complete);
         endpoints[ep][DIR_OUT].wait = false;
@@ -324,7 +326,7 @@ static void cancel_all_transfers(bool cancel_ep0)
     unsigned i, ep;
     FOR_EACH_IN_EP_EX(cancel_ep0, i, ep)
     {
-        endpoints[ep][DIR_IN].status = 1;
+        endpoints[ep][DIR_IN].status = -1;
         endpoints[ep][DIR_IN].wait = false;
         endpoints[ep][DIR_IN].busy = false;
         wakeup_signal(&endpoints[ep][DIR_IN].complete);
@@ -332,7 +334,7 @@ static void cancel_all_transfers(bool cancel_ep0)
     }
     FOR_EACH_OUT_EP_EX(cancel_ep0, i, ep)
     {
-        endpoints[ep][DIR_OUT].status = 1;
+        endpoints[ep][DIR_OUT].status = -1;
         endpoints[ep][DIR_OUT].wait = false;
         endpoints[ep][DIR_OUT].busy = false;
         wakeup_signal(&endpoints[ep][DIR_OUT].complete);
@@ -498,7 +500,7 @@ static void handle_ep_int(int ep, bool dir_in)
             if(endpoint->busy)
             {
                 endpoint->busy = false;
-                endpoint->status = 1;
+                endpoint->status = -1;
                 /* for safety, act as if no bytes as been transfered */
                 endpoint->len = 0;
                 usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
@@ -746,7 +748,7 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     endpoint->busy = true;
     endpoint->len = len;
     endpoint->wait = blocking;
-    endpoint->status = 0;
+    endpoint->status = -1;
 
     DEPCTL &= ~DEPCTL_stall;
     DEPCTL |= DEPCTL_usbactep;
@@ -774,9 +776,11 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
 
     if(blocking)
+    {
         wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
-    if(endpoint->status != 0)
-        return -1;
+        return endpoint->status;
+    }
+
     return 0;
 
     #undef DEPCTL
@@ -831,4 +835,3 @@ bool usb_drv_stalled(int ep, bool in)
 {
     return (in ? DIEPCTL(ep) : DOEPCTL(ep)) & DEPCTL_stall;
 }
-
