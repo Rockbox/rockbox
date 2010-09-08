@@ -36,37 +36,26 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-static int __in_ep_list[NUM_IN_EP] = {IN_EP_LIST};
-static int __out_ep_list[NUM_OUT_EP] = {OUT_EP_LIST};
-static int __in_ep_list_ep0[NUM_IN_EP + 1] = {0, IN_EP_LIST};
-static int __out_ep_list_ep0[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
+static const int in_ep_list[NUM_IN_EP + 1] = {0, IN_EP_LIST};
+static const int out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 
 /* iterate through each in/out ep except EP0
- * 'counter' is the counter, 'ep' is the actual value */
-#define FOR_EACH_EP(list, size, counter, ep) \
-    for(counter = 0, ep = (list)[0]; \
-        counter < (size); \
-        counter++, ep = (list)[counter])
- 
-#define FOR_EACH_IN_EP_EX(include_ep0, counter, ep) \
-    FOR_EACH_EP(include_ep0 ? __in_ep_list_ep0 : __in_ep_list, \
-        include_ep0 ? NUM_IN_EP + 1: NUM_IN_EP, counter, ep)
+ * 'i' is the counter, 'ep' is the actual value */
+#define FOR_EACH_EP(list, start, i, ep) \
+    for(ep = list[i = start]; \
+        i < (sizeof(list)/sizeof(*list)); \
+        i++, ep = list[i])
 
-#define FOR_EACH_OUT_EP_EX(include_ep0, counter, ep) \
-    FOR_EACH_EP(include_ep0 ? __out_ep_list_ep0 : __out_ep_list, \
-        include_ep0 ? NUM_OUT_EP + 1: NUM_OUT_EP, counter, ep)
- 
-#define FOR_EACH_IN_EP(counter, ep) \
-    FOR_EACH_IN_EP_EX(false, counter, ep)
+#define FOR_EACH_IN_EP_EX(include_ep0, i, ep) \
+    FOR_EACH_EP(in_ep_list, (include_ep0) ? 0 : 1, i, ep)
 
-#define FOR_EACH_IN_EP_AND_EP0(counter, ep) \
-    FOR_EACH_IN_EP_EX(true, counter, ep)
+#define FOR_EACH_OUT_EP_EX(include_ep0, i, ep) \
+    FOR_EACH_EP(out_ep_list, (include_ep0) ? 0 : 1, i, ep)
 
-#define FOR_EACH_OUT_EP(counter, ep) \
-    FOR_EACH_OUT_EP_EX(false, counter, ep)
-
-#define FOR_EACH_OUT_EP_AND_EP0(counter, ep) \
-    FOR_EACH_OUT_EP_EX(true, counter, ep)
+#define FOR_EACH_IN_EP(i, ep)           FOR_EACH_IN_EP_EX (false, i, ep)
+#define FOR_EACH_IN_EP_AND_EP0(i, ep)   FOR_EACH_IN_EP_EX (true,  i, ep)
+#define FOR_EACH_OUT_EP(i, ep)          FOR_EACH_OUT_EP_EX(false, i, ep)
+#define FOR_EACH_OUT_EP_AND_EP0(i, ep)  FOR_EACH_OUT_EP_EX(true,  i, ep)
 
 /* store per endpoint, per direction, information */
 struct usb_endpoint
@@ -279,7 +268,8 @@ static void handle_ep0_setup(void)
 
 static void reset_endpoints(void)
 {
-    int i, ep;
+    unsigned i;
+    int ep;
     /* disable all endpoints except EP0 */
     FOR_EACH_IN_EP_AND_EP0(i, ep)
     {
@@ -314,7 +304,7 @@ static void reset_endpoints(void)
     /* Setup next chain for IN eps */
     FOR_EACH_IN_EP_AND_EP0(i, ep)
     {
-        int next_ep = __in_ep_list_ep0[(i + 1) % (NUM_IN_EP + 1)];
+        int next_ep = in_ep_list[(i + 2) % (NUM_IN_EP + 1)];
         DIEPCTL(ep) = (DIEPCTL(ep) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
     }
 }
@@ -323,7 +313,9 @@ static void cancel_all_transfers(bool cancel_ep0)
 {
     logf("usb-drv: cancel all transfers");
     int flags = disable_irq_save();
-    unsigned i, ep;
+    int ep;
+    unsigned i;
+
     FOR_EACH_IN_EP_EX(cancel_ep0, i, ep)
     {
         endpoints[ep][DIR_IN].status = -1;
@@ -346,7 +338,8 @@ static void cancel_all_transfers(bool cancel_ep0)
 
 static void core_dev_init(void)
 {
-    unsigned int i, ep;
+    int ep;
+    unsigned int i;
     /* Restart the phy clock */
     PCGCCTL = 0;
     /* Set phy speed : high speed */
@@ -677,7 +670,8 @@ static unsigned long usb_drv_mps_by_type(int type)
 
 int usb_drv_request_endpoint(int type, int dir)
 {
-    int i, ep, ret = -1;
+    int ep, ret = -1;
+    unsigned i;
     logf("usb-drv: request endpoint (type=%d,dir=%s)", type, dir == USB_DIR_IN ? "IN" : "OUT");
 
     if(dir == USB_DIR_IN)
