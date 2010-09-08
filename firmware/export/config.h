@@ -288,7 +288,7 @@ Lyre prototype 1 */
 #define USBOTG_ARC      5020 /* PortalPlayer 502x */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
-#define USBOTG_AS3525v2 3535 /* AMS AS3525v2 */
+#define USBOTG_AS3525v2 3535 /* AMS AS3525v2 FIXME : same than S3C6400X */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701 */
 
 /* Multiple cores */
@@ -928,7 +928,7 @@ Lyre prototype 1 */
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define USB_HAS_BULK
-#elif CONFIG_USBOTG == USBOTG_S3C6400X
+#elif CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_AS3525v2
 #define USB_HAS_BULK
 //#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */

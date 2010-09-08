@@ -40,4 +40,7 @@
 
 #define CCU_USB         (*(volatile unsigned long *)(CCU_BASE + 0x20))
 
+#undef USB_DEVBSS_ATTR
+#define USB_DEVBSS_ATTR __attribute__((aligned(32)));
+
 #endif /* __AS3525V2_H__ */
