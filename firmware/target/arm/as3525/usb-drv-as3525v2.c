@@ -466,9 +466,10 @@ static void handle_ep_int(int ep, bool dir_in)
     struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
     if(dir_in)
     {
-        if(DIEPINT(ep) & DIEPINT_ahberr)
+        unsigned long sts = DIEPINT(ep);
+        if(sts & DIEPINT_ahberr)
             panicf("usb-drv: ahb error on EP%d IN", ep);
-        if(DIEPINT(ep) & DIEPINT_xfercompl)
+        if(sts & DIEPINT_xfercompl)
         {
             if(endpoint->busy)
             {
@@ -487,7 +488,7 @@ static void handle_ep_int(int ep, bool dir_in)
                 wakeup_signal(&endpoint->complete);
             }
         }
-        if(DIEPINT(ep) & DIEPINT_timeout)
+        if(sts & DIEPINT_timeout)
         {
             panicf("usb-drv: timeout on EP%d IN", ep);
             if(endpoint->busy)
@@ -501,13 +502,14 @@ static void handle_ep_int(int ep, bool dir_in)
             }
         }
         /* clear interrupts */
-        DIEPINT(ep) = DIEPINT(ep);
+        DIEPINT(ep) = sts;
     }
     else
     {
-        if(DOEPINT(ep) & DOEPINT_ahberr)
+        unsigned long sts = DOEPINT(ep);
+        if(sts & DOEPINT_ahberr)
             panicf("usb-drv: ahb error on EP%d OUT", ep);
-        if(DOEPINT(ep) & DOEPINT_xfercompl)
+        if(sts & DOEPINT_xfercompl)
         {
             logf("usb-drv: xfer complete on EP%d OUT", ep);
             if(endpoint->busy)
@@ -527,7 +529,7 @@ static void handle_ep_int(int ep, bool dir_in)
                 wakeup_signal(&endpoint->complete);
             }
         }
-        if(DOEPINT(ep) & DOEPINT_setup)
+        if(sts & DOEPINT_setup)
         {
             logf("usb-drv: setup on EP%d OUT", ep);
             if(ep != 0)
@@ -553,7 +555,7 @@ static void handle_ep_int(int ep, bool dir_in)
             }
         }
         /* clear interrupts */
-        DOEPINT(ep) = DOEPINT(ep);
+        DOEPINT(ep) = sts;
     }
 }
 
