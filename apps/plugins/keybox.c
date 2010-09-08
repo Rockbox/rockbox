@@ -554,10 +554,10 @@ static int keybox(void)
             return FILE_OPEN_ERROR;
         bytes_read = rb->read(fd, &buffer, sizeof(buffer));
 
+        rb->close(fd);
+
         if (parse_buffer())
             return 0;
-
-        rb->close(fd);
     }
 
     while (!done)
