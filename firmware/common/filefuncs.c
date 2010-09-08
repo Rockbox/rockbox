@@ -26,6 +26,7 @@
 #include "file.h"
 #include "filefuncs.h"
 
+#ifndef __PCTOOL__
 #ifdef HAVE_MULTIVOLUME
 /* returns on which volume this is, and copies the reduced name
    (sortof a preprocessor for volume-decorated pathnames) */
@@ -88,7 +89,9 @@ bool dir_exists(const char *path)
     return true;
 }
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#endif /* __PCTOOL__ */
+
+#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_SDL))
 struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
 {
     (void)parent;
