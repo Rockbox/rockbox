@@ -481,14 +481,14 @@ static void handle_ep_int(int ep, bool dir_in)
                 endpoint->busy = false;
                 endpoint->status = 0;
                 /* works even for EP0 */
-                int transfered = endpoint->len - (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
-                logf("len=%d reg=%ld xfer=%d", endpoint->len,
-                    (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
-                    transfered);
+                int size = (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+                int transfered = endpoint->len - size;
+                logf("len=%d reg=%ld xfer=%d", endpoint->len, size, transfered);
                 /* handle EP0 state if necessary,
                  * this is a ack if length is 0 */
                 if(ep == 0)
                     handle_ep0_complete(endpoint->len == 0);
+                endpoint->len = size;
                 usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
                 wakeup_signal(&endpoint->complete);
             }
@@ -830,6 +830,6 @@ void usb_drv_stall(int ep, bool stall, bool in)
 
 bool usb_drv_stalled(int ep, bool in)
 {
-    return (in ? DIEPCTL(ep) : DOEPCTL(ep)) & DEPCTL_stall ? true : false;
+    return (in ? DIEPCTL(ep) : DOEPCTL(ep)) & DEPCTL_stall;
 }
 
