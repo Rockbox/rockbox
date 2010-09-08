@@ -767,7 +767,7 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
         if(dir_in)
             clean_dcache_range(ptr, len);
         else
-            invalidate_dcache_range(ptr, len);
+            dump_dcache_range(ptr, len);
     }
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
