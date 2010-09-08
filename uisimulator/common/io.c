@@ -27,7 +27,7 @@
 #include <time.h>
 #include "config.h"
 
-#define HAVE_STATVFS (0 == (CONFIG_PLATFORM & PLATFORM_ANDROID) && !defined(WIN32))
+#define HAVE_STATVFS (!defined(WIN32))
 
 #if HAVE_STATVFS
 #include <sys/statvfs.h>
@@ -45,14 +45,9 @@
 #endif
 
 #include <fcntl.h>
-#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #include <SDL.h>
 #include <SDL_thread.h>
 #include "thread-sdl.h"
-#else
-#define sim_thread_unlock() NULL
-#define sim_thread_lock(a)
-#endif
 #include "thread.h"
 #include "kernel.h"
 #include "debug.h"
@@ -535,18 +530,6 @@ int sim_fsync(int fd)
     return fsync(fd);
 #endif
 }
-
-
-#ifndef __PCTOOL__
-#ifdef WIN32
-/* sim-win32 */
-#define dlopen(_x_, _y_) LoadLibraryW(UTF8_TO_OS(_x_))
-#define dlsym(_x_, _y_) (void *)GetProcAddress(_x_, _y_)
-#define dlclose(_x_) FreeLibrary(_x_)
-#else
-/* sim-x11 */
-#include <dlfcn.h>
-#endif
 
 
 void *lc_open(const char *filename, char *buf, size_t buf_size)
