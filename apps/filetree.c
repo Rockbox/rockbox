@@ -290,9 +290,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if (!entry)
             break;
 
-        DEBUGF("aaa\n");
         info = dir_get_info(dir, entry);
-        DEBUGF("ccc\n");
         len = strlen((char *)entry->d_name);
 
         /* skip directories . and .. */
