@@ -461,102 +461,101 @@ void usb_drv_exit(void)
     cpu_boost(0);
 }
 
-static void handle_ep_int(int ep, bool dir_in)
+static void handle_ep_in_int(int ep)
 {
-    struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
-    if(dir_in)
+    struct usb_endpoint *endpoint = &endpoints[ep][DIR_IN];
+    unsigned long sts = DIEPINT(ep);
+    if(sts & DIEPINT_ahberr)
+        panicf("usb-drv: ahb error on EP%d IN", ep);
+    if(sts & DIEPINT_xfercompl)
     {
-        unsigned long sts = DIEPINT(ep);
-        if(sts & DIEPINT_ahberr)
-            panicf("usb-drv: ahb error on EP%d IN", ep);
-        if(sts & DIEPINT_xfercompl)
+        if(endpoint->busy)
         {
-            if(endpoint->busy)
-            {
-                endpoint->busy = false;
-                endpoint->status = 0;
-                /* works even for EP0 */
-                int size = (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
-                int transfered = endpoint->len - size;
-                logf("len=%d reg=%ld xfer=%d", endpoint->len, size, transfered);
-                /* handle EP0 state if necessary,
-                 * this is a ack if length is 0 */
-                if(ep == 0)
-                    handle_ep0_complete(endpoint->len == 0);
-                endpoint->len = size;
-                usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
-                wakeup_signal(&endpoint->complete);
-            }
+            endpoint->busy = false;
+            endpoint->status = 0;
+            /* works even for EP0 */
+            int size = (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+            int transfered = endpoint->len - size;
+            logf("len=%d reg=%ld xfer=%d", endpoint->len, size, transfered);
+            /* handle EP0 state if necessary,
+             * this is a ack if length is 0 */
+            if(ep == 0)
+                handle_ep0_complete(endpoint->len == 0);
+            endpoint->len = size;
+            usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
+            wakeup_signal(&endpoint->complete);
         }
-        if(sts & DIEPINT_timeout)
-        {
-            panicf("usb-drv: timeout on EP%d IN", ep);
-            if(endpoint->busy)
-            {
-                endpoint->busy = false;
-                endpoint->status = -1;
-                /* for safety, act as if no bytes as been transfered */
-                endpoint->len = 0;
-                usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
-                wakeup_signal(&endpoint->complete);
-            }
-        }
-        /* clear interrupts */
-        DIEPINT(ep) = sts;
     }
-    else
+    if(sts & DIEPINT_timeout)
     {
-        unsigned long sts = DOEPINT(ep);
-        if(sts & DOEPINT_ahberr)
-            panicf("usb-drv: ahb error on EP%d OUT", ep);
-        if(sts & DOEPINT_xfercompl)
+        panicf("usb-drv: timeout on EP%d IN", ep);
+        if(endpoint->busy)
         {
-            logf("usb-drv: xfer complete on EP%d OUT", ep);
-            if(endpoint->busy)
-            {
-                endpoint->busy = false;
-                endpoint->status = 0;
-                /* works even for EP0 */
-                int transfered = endpoint->len - (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
-                logf("len=%d reg=%ld xfer=%d", endpoint->len,
-                    (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
-                    transfered);
-                /* handle EP0 state if necessary,
-                 * this is a ack if length is 0 */
-                if(ep == 0)
-                    handle_ep0_complete(endpoint->len == 0);
-                usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
-                wakeup_signal(&endpoint->complete);
-            }
+            endpoint->busy = false;
+            endpoint->status = -1;
+            /* for safety, act as if no bytes as been transfered */
+            endpoint->len = 0;
+            usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
+            wakeup_signal(&endpoint->complete);
         }
-        if(sts & DOEPINT_setup)
-        {
-            logf("usb-drv: setup on EP%d OUT", ep);
-            if(ep != 0)
-                panicf("usb-drv: setup not on EP0, this is impossible");
-            if((DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits) != 0)
-            {
-                logf("usb-drv: ignore spurious setup (xfersize=%ld)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
-                prepare_setup_ep0();
-            }
-            else
-            {
-                /* handle EP0 state */
-                handle_ep0_setup();
-                logf("  rt=%x r=%x", ep0_setup_pkt->bRequestType, ep0_setup_pkt->bRequest);
-                /* handle set address */
-                if(ep0_setup_pkt->bRequestType == USB_TYPE_STANDARD &&
-                        ep0_setup_pkt->bRequest == USB_REQ_SET_ADDRESS)
-                {
-                    /* Set address now */
-                    DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
-                }
-                usb_core_control_request(ep0_setup_pkt);
-            }
-        }
-        /* clear interrupts */
-        DOEPINT(ep) = sts;
     }
+    /* clear interrupts */
+    DIEPINT(ep) = sts;
+}
+
+static void handle_ep_out_int(int ep)
+{
+    struct usb_endpoint *endpoint = &endpoints[ep][DIR_OUT];
+    unsigned long sts = DOEPINT(ep);
+    if(sts & DOEPINT_ahberr)
+        panicf("usb-drv: ahb error on EP%d OUT", ep);
+    if(sts & DOEPINT_xfercompl)
+    {
+        logf("usb-drv: xfer complete on EP%d OUT", ep);
+        if(endpoint->busy)
+        {
+            endpoint->busy = false;
+            endpoint->status = 0;
+            /* works even for EP0 */
+            int transfered = endpoint->len - (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+            logf("len=%d reg=%ld xfer=%d", endpoint->len,
+                (DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits),
+                transfered);
+            /* handle EP0 state if necessary,
+             * this is a ack if length is 0 */
+            if(ep == 0)
+                handle_ep0_complete(endpoint->len == 0);
+            usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
+            wakeup_signal(&endpoint->complete);
+        }
+    }
+    if(sts & DOEPINT_setup)
+    {
+        logf("usb-drv: setup on EP%d OUT", ep);
+        if(ep != 0)
+            panicf("usb-drv: setup not on EP0, this is impossible");
+        if((DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits) != 0)
+        {
+            logf("usb-drv: ignore spurious setup (xfersize=%ld)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+            prepare_setup_ep0();
+        }
+        else
+        {
+            /* handle EP0 state */
+            handle_ep0_setup();
+            logf("  rt=%x r=%x", ep0_setup_pkt->bRequestType, ep0_setup_pkt->bRequest);
+            /* handle set address */
+            if(ep0_setup_pkt->bRequestType == USB_TYPE_STANDARD &&
+                    ep0_setup_pkt->bRequest == USB_REQ_SET_ADDRESS)
+            {
+                /* Set address now */
+                DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
+            }
+            usb_core_control_request(ep0_setup_pkt);
+        }
+    }
+    /* clear interrupts */
+    DOEPINT(ep) = sts;
 }
 
 static void handle_ep_ints(void)
@@ -568,10 +567,11 @@ static void handle_ep_ints(void)
 
     FOR_EACH_IN_EP_AND_EP0(i, ep)
         if(daint & DAINT_IN_EP(ep))
-            handle_ep_int(ep, true);
+            handle_ep_in_int(ep);
+
     FOR_EACH_OUT_EP_AND_EP0(i, ep)
         if(daint & DAINT_OUT_EP(ep))
-            handle_ep_int(ep, false);
+            handle_ep_out_int(ep);
 
     /* write back to clear status */
     DAINT = daint;
