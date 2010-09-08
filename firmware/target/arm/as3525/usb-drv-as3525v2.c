@@ -60,12 +60,12 @@ static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 /* store per endpoint, per direction, information */
 struct usb_endpoint
 {
-    bool active; /* true is endpoint has been requested (true for EP0) */
     unsigned int len; /* length of the data buffer */
+    struct wakeup complete; /* wait object */
+    int8_t status; /* completion status (0 for success) */
+    bool active; /* true is endpoint has been requested (true for EP0) */
     bool wait; /* true if usb thread is blocked on completion */
     bool busy; /* true is a transfer is pending */
-    int status; /* completion status (0 for success) */
-    struct wakeup complete; /* wait object */
 };
 
 /* state of EP0 (to correctly schedule setup packet enqueing) */
