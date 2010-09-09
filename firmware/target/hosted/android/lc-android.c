@@ -23,7 +23,7 @@
 #include "load_code.h"
 
 /* the load_code wrappers simply wrap, nothing to do */
-void *lc_open(const char *filename, char *buf, size_t buf_size)
+void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
     return _lc_open(filename, buf, buf_size);
 }

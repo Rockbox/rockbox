@@ -51,6 +51,7 @@
 #include "settings.h"
 
 #include "gcc_extensions.h"
+#include "load_code.h"
 
 #ifdef CODEC
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -240,11 +241,7 @@ struct codec_api {
 
 /* codec header */
 struct codec_header {
-    unsigned long magic; /* RCOD or RENC */
-    unsigned short target_id;
-    unsigned short api_version;
-    unsigned char *load_addr;
-    unsigned char *end_addr;
+    struct lc_header lc_hdr; /* must be first */
     enum codec_status(*entry_point)(void);
     struct codec_api **api;
 };
@@ -261,27 +258,27 @@ extern unsigned char plugin_end_addr[];
 #define CODEC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
-        CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, codec_start, &ci };
+        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        plugin_start_addr, plugin_end_addr }, codec_start, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
-        CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, codec_start, &ci };
+        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        plugin_start_addr, plugin_end_addr }, codec_start, &ci };
 
 #else /* def SIMULATOR */
 /* decoders */
 #define CODEC_HEADER \
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
-        CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        NULL, NULL, codec_start, &ci };
+        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
+        codec_start, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header = { \
-        CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        NULL, NULL, codec_start, &ci };
+        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
+        codec_start, &ci };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 

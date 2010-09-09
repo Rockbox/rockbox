@@ -181,7 +181,8 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
 
 static int codec_load_ram(void *handle, struct codec_api *api)
 {
-    struct codec_header *hdr = lc_get_header(handle);
+    struct codec_header *c_hdr = lc_get_header(handle);
+    struct lc_header    *hdr   = c_hdr ? &c_hdr->lc_hdr : NULL;
     int status;
 
     if (hdr == NULL
@@ -215,8 +216,8 @@ static int codec_load_ram(void *handle, struct codec_api *api)
     codec_size = 0;
 #endif
 
-    *(hdr->api) = api;
-    status = hdr->entry_point();
+    *(c_hdr->api) = api;
+    status = c_hdr->entry_point();
 
     lc_close(handle);
 

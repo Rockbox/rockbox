@@ -53,6 +53,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "thread.h"
 #include "button.h"
 #include "action.h"
+#include "load_code.h"
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
@@ -895,15 +896,17 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     struct dirinfo (*dir_get_info)(DIR* parent, struct dirent *entry);
+
+    /* load code api for overlay */
+    void* (*lc_open)(const char *filename, unsigned char *buf, size_t buf_size);
+    void* (*lc_open_from_mem)(void* addr, size_t blob_size);
+    void* (*lc_get_header)(void *handle);
+    void  (*lc_close)(void *handle);
 };
 
 /* plugin header */
 struct plugin_header {
-    unsigned long magic;
-    unsigned short target_id;
-    unsigned short api_version;
-    unsigned char *load_addr;
-    unsigned char *end_addr;
+    struct lc_header lc_hdr; /* must be the first */
     enum plugin_status(*entry_point)(const void*);
     const struct plugin_api **api;
 };
@@ -916,15 +919,15 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
-        PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, plugin__start, &rb };
+        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
+        plugin_start_addr, plugin_end_addr }, plugin__start, &rb };
 #else /* PLATFORM_HOSTED */
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
-        PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        NULL, NULL, plugin__start, &rb };
+        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL },
+        plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
 

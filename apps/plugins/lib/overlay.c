@@ -47,64 +47,56 @@
 enum plugin_status run_overlay(const void* parameter,
                                unsigned char *filename, unsigned char *name)
 {
-    int fd, readsize;
     size_t audiobuf_size;
     unsigned char *audiobuf;
-    static struct plugin_header header;
-
-    fd = rb->open(filename, O_RDONLY);
-    if (fd < 0)
-    {
-        rb->splashf(2*HZ, "Can't open %s", filename);
-        return PLUGIN_ERROR;
-    }
-    readsize = rb->read(fd, &header, sizeof(header));
-    rb->close(fd);
-    /* Close for now. Less code than doing it in all error checks.
-     * Would need to seek back anyway. */
-
-    if (readsize != sizeof(header))
-    {
-        rb->splashf(2*HZ, "Reading %s overlay failed.", name);
-        return PLUGIN_ERROR;
-    }
-    if (header.magic != PLUGIN_MAGIC || header.target_id != TARGET_ID)
-    {
-        rb->splashf(2*HZ, "%s overlay: Incompatible model.", name);
-        return PLUGIN_ERROR;
-    }
-    if (header.api_version != PLUGIN_API_VERSION) 
-    {
-        rb->splashf(2*HZ, "%s overlay: Incompatible version.", name);
-        return PLUGIN_ERROR;
-    }
+    void *handle;
+    struct plugin_header *p_hdr;
+    struct lc_header     *hdr;
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
-    if (header.load_addr < audiobuf ||
-        header.end_addr > audiobuf + audiobuf_size)
+    if (!audiobuf)
     {
-        rb->splashf(2*HZ, "%s overlay doesn't fit into memory.", name);
-        return PLUGIN_ERROR;
+        rb->splash(2*HZ, "Can't optain memory");
+        goto error;
     }
 
-    fd = rb->open(filename, O_RDONLY);
-    if (fd < 0)
+    handle = rb->lc_open(filename, audiobuf, audiobuf_size);
+    if (!handle)
     {
         rb->splashf(2*HZ, "Can't open %s", filename);
-        return PLUGIN_ERROR;
+        goto error;
     }
-    readsize = rb->read(fd, header.load_addr, header.end_addr - header.load_addr);
-    rb->close(fd);
 
-    if (readsize < 0)
+    p_hdr = rb->lc_get_header(handle);
+    if (!p_hdr)
     {
-        rb->splashf(2*HZ, "Reading %s overlay failed.", name);
-        return PLUGIN_ERROR;
+        rb->splash(2*HZ, "Can't get header");
+        goto error_close;
     }
-    /* Zero out bss area */
-    rb->memset(header.load_addr + readsize, 0,
-               header.end_addr - (header.load_addr + readsize));
+    else
+        hdr = &p_hdr->lc_hdr;
 
-    *(header.api) = rb;
-    return header.entry_point(parameter);
+    if (hdr->magic != PLUGIN_MAGIC || hdr->target_id != TARGET_ID)
+    {
+        rb->splashf(2*HZ, "%s overlay: Incompatible model.", name);
+        goto error_close;
+    }
+
+    
+    if (hdr->api_version > PLUGIN_API_VERSION
+        || hdr->api_version < PLUGIN_MIN_API_VERSION)
+    {
+        rb->splashf(2*HZ, "%s overlay: Incompatible version.", name);
+        goto error_close;
+    }
+
+    rb->lc_close(handle);
+
+    *(p_hdr->api) = rb;
+    return p_hdr->entry_point(parameter);
+
+error_close:
+    rb->lc_close(handle);
+error:
+    return PLUGIN_ERROR;
 }

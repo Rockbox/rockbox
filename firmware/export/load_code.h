@@ -20,17 +20,21 @@
  ****************************************************************************/
 
 
+#ifndef __LOAD_CODE_H__
+#define __LOAD_CODE_H__
+
 #include "config.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "system.h"
 
-extern void *lc_open(const char *filename, char *buf, size_t buf_size);
+extern void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
 /* header is always at the beginning of the blob, and handle actually points
- * to the start of the blob */
+ * to the start of the blob (the header is there) */
 static inline void *lc_open_from_mem(void* addr, size_t blob_size)
 {
     (void)blob_size;
+    /* commit dcache and discard icache */
     cpucache_invalidate();
     return addr;
 }
@@ -48,14 +52,27 @@ static inline void lc_close(void *handle) { (void)handle; }
 #else
 #define _lc_open_char char
 #endif
-extern void *_lc_open(const _lc_open_char *filename, char *buf, size_t buf_size);
+extern void *_lc_open(const _lc_open_char *filename, unsigned char *buf, size_t buf_size);
 extern void *_lc_get_header(void *handle);
 extern void  _lc_close(void *handle);
 
-extern void *lc_open(const char *filename, char *buf, size_t buf_size);
-/* not possiible on hosted platforms */
+extern void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
 extern void *lc_open_from_mem(void *addr, size_t blob_size);
 extern void *lc_get_header(void *handle);
 extern void  lc_close(void *handle);
 extern const char* lc_last_error(void);
 #endif
+
+/* this struct needs to be the first part of other headers
+ * (lc_open() casts the other header to this one to load to the correct
+ * address)
+ */
+struct lc_header {
+    unsigned long magic;
+    unsigned short target_id;
+    unsigned short api_version;
+    unsigned char *load_addr;
+    unsigned char *end_addr;
+};
+
+#endif /* __LOAD_CODE_H__ */

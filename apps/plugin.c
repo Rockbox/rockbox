@@ -723,12 +723,18 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     dir_get_info,
+
+    lc_open,
+    lc_open_from_mem,
+    lc_get_header,
+    lc_close,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
 {
     int rc, i;
-    struct plugin_header *hdr;
+    struct plugin_header *p_hdr;
+    struct lc_header     *hdr;
 
 #if LCD_DEPTH > 1
     fb_data* old_backdrop;
@@ -754,7 +760,10 @@ int plugin_load(const char* plugin, const void* parameter)
         return -1;
     }
 
-    hdr = lc_get_header(current_plugin_handle);
+    p_hdr = lc_get_header(current_plugin_handle);
+
+    hdr = p_hdr ? &p_hdr->lc_hdr : NULL;
+    
 
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
@@ -782,7 +791,7 @@ int plugin_load(const char* plugin, const void* parameter)
     plugin_size = 0;
 #endif
 
-    *(hdr->api) = &rockbox_api;
+    *(p_hdr->api) = &rockbox_api;
 
 #if defined HAVE_LCD_BITMAP && LCD_DEPTH > 1
     old_backdrop = lcd_get_backdrop();
@@ -806,7 +815,7 @@ int plugin_load(const char* plugin, const void* parameter)
     open_files = 0;
 #endif
 
-    rc = hdr->entry_point(parameter);
+    rc = p_hdr->entry_point(parameter);
 
     if (!pfn_tsr_exit)
     {   /* close handle if plugin is no tsr one */

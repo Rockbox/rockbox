@@ -526,7 +526,7 @@ int sim_fsync(int fd)
 
 #ifndef __PCTOOL__
 
-void *lc_open(const char *filename, char *buf, size_t buf_size)
+void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
     const char *sim_path = get_sim_pathname(filename);
     void *handle = _lc_open(UTF8_TO_OS(sim_path), buf, buf_size);
