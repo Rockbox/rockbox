@@ -153,16 +153,17 @@ invalidate_dcache:
 
 /*
  * Discards the entire ICache, and commit+discards the entire DCache
- * void commit_discard_idcache(void);
+ * void cpucache_commit_discard(void);
  */
     .section   .icode, "ax", %progbits
     .align      2
-    .global     commit_discard_idcache
-    .type       commit_discard_idcache, %function
-    .global     cpucache_commit_discard @ Alias
+    .global     cpucache_commit_discard
+    .type       cpucache_commit_discard, %function
+    .global     commit_discard_idcache  @ Alias
     .global     invalidate_idcache      @ Alias, deprecated
     .global     cpucache_invalidate     @ Alias, deprecated
 
+cpucache_commit_discard:
 commit_discard_idcache:
 invalidate_idcache:
 cpucache_invalidate:
