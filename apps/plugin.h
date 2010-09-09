@@ -926,7 +926,7 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
-        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL },
+        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL }, \
         plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
