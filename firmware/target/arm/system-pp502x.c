@@ -193,7 +193,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
    to extend the funtions to do alternate cache configurations. */
 
 #ifndef BOOTLOADER
-void ICODE_ATTR cpucache_flush(void)
+void ICODE_ATTR cpucache_commit(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
@@ -202,8 +202,9 @@ void ICODE_ATTR cpucache_flush(void)
         nop; nop; nop; nop;
     }
 }
+void cpucache_flush(void) __attribute__((alias("cpucache_commit")));
 
-void ICODE_ATTR cpucache_invalidate(void)
+void ICODE_ATTR cpucache_commit_discard(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
@@ -212,6 +213,7 @@ void ICODE_ATTR cpucache_invalidate(void)
         nop; nop; nop; nop;
     }
 }
+void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
 
 static void init_cache(void)
 {
