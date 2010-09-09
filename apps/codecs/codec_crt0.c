@@ -47,10 +47,10 @@ enum codec_status codec_start(void)
 #endif
     ci->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
 #endif
-#if NUM_CORES > 1
-    /* writeback cleared iedata and bss areas */
-    ci->cpucache_flush();
-#endif
+    /* writeback cleared iedata and bss areas, invalidate icache for
+     * copied code */
+    ci->cpucache_invalidate();
+
     return codec_main();
 }
 

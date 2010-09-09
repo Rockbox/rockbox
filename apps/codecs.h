@@ -78,12 +78,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 34
+#define CODEC_API_VERSION 35
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 34
+#define CODEC_MIN_API_VERSION 35
 
 /* codec return codes */
 enum codec_status {
@@ -176,10 +176,8 @@ struct codec_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif /* NUM_CORES */
 
-#if NUM_CORES > 1
     void (*cpucache_flush)(void);
     void (*cpucache_invalidate)(void);
-#endif
 
     /* strings and memory */
     char* (*strcpy)(char *dst, const char *src);

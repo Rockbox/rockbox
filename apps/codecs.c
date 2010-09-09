@@ -118,10 +118,8 @@ struct codec_api ci = {
     semaphore_release,
 #endif
 
-#if NUM_CORES > 1
     cpucache_flush,
     cpucache_invalidate,
-#endif
 
     /* strings and memory */
     strcpy,
