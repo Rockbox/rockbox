@@ -33,11 +33,15 @@ import android.util.Log;
 
 public class RockboxPCM extends AudioTrack 
 {
-	byte[] raw_data;
-	private int buf_len;
+	private byte[] raw_data;
 	private PCMListener l;
 	private HandlerThread ht;
 	private Handler h = null;
+	private static final int samplerate = 44100;
+    /* should be CHANNEL_OUT_STEREO in 2.0 and above */
+	private static final int channels = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
+	private static final int encoding = AudioFormat.ENCODING_PCM_16BIT;
+	private static final int buf_len  = getMinBufferSize(44100, channels, encoding);
 
 	private void LOG(CharSequence text)
 	{
@@ -46,20 +50,13 @@ public class RockboxPCM extends AudioTrack
 
 	public RockboxPCM()
 	{
-		super(AudioManager.STREAM_MUSIC, 
-			    44100,
-			    /* should be CHANNEL_OUT_STEREO in 2.0 and above */
-			    AudioFormat.CHANNEL_CONFIGURATION_STEREO,
-			    AudioFormat.ENCODING_PCM_16BIT,
-			    24<<10,
-			    AudioTrack.MODE_STREAM);
+		super(AudioManager.STREAM_MUSIC, samplerate,  channels, encoding,
+				buf_len, AudioTrack.MODE_STREAM);
 		ht = new HandlerThread("audio thread", Process.THREAD_PRIORITY_URGENT_AUDIO);
 		ht.start();
-		buf_len = 24<<10; /* in bytes */
-
-	    raw_data = new byte[buf_len]; /* in shorts */
-	    Arrays.fill(raw_data, (byte) 0);
-	    l = new PCMListener(buf_len);
+		raw_data = new byte[buf_len]; /* in shorts */
+		Arrays.fill(raw_data, (byte) 0);
+		l = new PCMListener(buf_len);
 	}    
 
 	int bytes2frames(int bytes) {
