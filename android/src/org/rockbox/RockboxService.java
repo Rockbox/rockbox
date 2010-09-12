@@ -52,10 +52,10 @@ public class RockboxService extends Service
     public static RockboxFramebuffer fb = null;
     private static RockboxService instance;
     private Notification notification;
-    private static final Class<?>[] mStartForegroundSignature = new Class[] {
-        int.class, Notification.class};
-    private static final Class<?>[] mStopForegroundSignature = new Class[] {
-        boolean.class};
+    private static final Class<?>[] mStartForegroundSignature = 
+        new Class[] { int.class, Notification.class };
+    private static final Class<?>[] mStopForegroundSignature = 
+        new Class[] { boolean.class };
 
     private NotificationManager mNM;
     private Method mStartForeground;
@@ -89,7 +89,8 @@ public class RockboxService extends Service
     private void do_start(Intent intent)
     {
         LOG("Start Service");
-        /* Display a notification about us starting.  We put an icon in the status bar. */
+        /* Display a notification about us starting.  
+         * We put an icon in the status bar. */
         create_notification();
     }
 
@@ -127,9 +128,11 @@ public class RockboxService extends Service
            BufferedOutputStream dest = null;
            BufferedInputStream is = null;
            ZipEntry entry;
-           File file = new File("/data/data/org.rockbox/lib/libmisc.so");
+           File file = new File("/data/data/org.rockbox/" +
+           		"lib/libmisc.so");
            /* use arbitary file to determine whether extracting is needed */
-           File file2 = new File("/data/data/org.rockbox/app_rockbox/rockbox/codecs/mpa.codec");
+           File file2 = new File("/data/data/org.rockbox/" +
+           		"app_rockbox/rockbox/codecs/mpa.codec");
            if (!file2.exists() || (file.lastModified() > file2.lastModified()))
            {
                ZipFile zipfile = new ZipFile(file);
@@ -150,7 +153,8 @@ public class RockboxService extends Service
                       }
                       continue;
                   }
-                  is = new BufferedInputStream(zipfile.getInputStream(entry), BUFFER);
+                  is = new BufferedInputStream(zipfile.getInputStream(entry),
+                          BUFFER);
                   int count;
                   byte data[] = new byte[BUFFER];
                   folder = new File(new File(entry.getName()).getParent());
@@ -240,18 +244,22 @@ public class RockboxService extends Service
     
     private void create_notification()
     {
-        /* For now we'll use the same text for the ticker and the expanded notification */
+        /* For now we'll use the same text for the ticker and the 
+         * expanded notification */
         CharSequence text = getText(R.string.notification);
         /* Set the icon, scrolling text and timestamp */
         notification = new Notification(R.drawable.icon, text,
                 System.currentTimeMillis());
 
-        /* The PendingIntent to launch our activity if the user selects this notification */
+        /* The PendingIntent to launch our activity if the user selects
+         * this notification */
         Intent intent = new Intent(this, RockboxActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent contentIntent = 
+                PendingIntent.getActivity(this, 0, intent, 0);
 
         /*  Set the info for the views that show in the notification panel. */
-        notification.setLatestEventInfo(this, getText(R.string.notification), text, contentIntent);
+        notification.setLatestEventInfo(this, 
+                getText(R.string.notification), text, contentIntent);
     }
 
     public static void startForeground() 
@@ -260,7 +268,8 @@ public class RockboxService extends Service
         {
             /* 
              * Send the notification.
-             * We use a layout id because it is a unique number.  We use it later to cancel.
+             * We use a layout id because it is a unique number.  
+             * We use it later to cancel.
              */
             instance.mNM.notify(R.string.notification, instance.notification);
             /*
@@ -268,7 +277,8 @@ public class RockboxService extends Service
              * provides enough cpu time to do music decoding in the 
              * background
              */
-            instance.startForegroundCompat(R.string.notification, instance.notification);
+            instance.startForegroundCompat(R.string.notification, 
+                    instance.notification);
         }
     }
     

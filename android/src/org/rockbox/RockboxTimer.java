@@ -34,12 +34,13 @@ public class RockboxTimer extends Timer
     long interval;
     
     private class RockboxTimerTask extends TimerTask {
-        private RockboxTimer t;
+        private RockboxTimer timer;
         private TelephonyManager tm;
         private int last_state;
-        public RockboxTimerTask(RockboxService s, RockboxTimer parent) {
+        public RockboxTimerTask(RockboxService s, RockboxTimer parent) 
+        {
             super();
-            t = parent;
+            timer = parent;
             tm = (TelephonyManager)s.getSystemService(Context.TELEPHONY_SERVICE);
             last_state = tm.getCallState();
         }
@@ -63,8 +64,8 @@ public class RockboxTimer extends Timer
                 }
                 last_state = state;
             }
-            synchronized(t) { 
-                t.notify(); 
+            synchronized(timer) { 
+                timer.notify(); 
             }
         }
     }

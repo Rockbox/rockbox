@@ -39,11 +39,13 @@ public class RockboxPCM extends AudioTrack
     private Handler h = null;
     private static final int samplerate = 44100;
     /* should be CHANNEL_OUT_STEREO in 2.0 and above */
-    private static final int channels = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
-    private static final int encoding = AudioFormat.ENCODING_PCM_16BIT;
+    private static final int channels = 
+            AudioFormat.CHANNEL_CONFIGURATION_STEREO;
+    private static final int encoding = 
+            AudioFormat.ENCODING_PCM_16BIT;
     /* 24k is plenty, but some devices may have a higher minimum */
     private static final int buf_len  = 
-           Math.max(24<<10, getMinBufferSize(samplerate, channels, encoding));
+            Math.max(24<<10, getMinBufferSize(samplerate, channels, encoding));
 
     private void LOG(CharSequence text)
     {
@@ -54,7 +56,8 @@ public class RockboxPCM extends AudioTrack
     {
         super(AudioManager.STREAM_MUSIC, samplerate,  channels, encoding,
                 buf_len, AudioTrack.MODE_STREAM);
-        ht = new HandlerThread("audio thread", Process.THREAD_PRIORITY_URGENT_AUDIO);
+        ht = new HandlerThread("audio thread", 
+                Process.THREAD_PRIORITY_URGENT_AUDIO);
         ht.start();
         raw_data = new byte[buf_len]; /* in shorts */
         Arrays.fill(raw_data, (byte) 0);
@@ -88,13 +91,15 @@ public class RockboxPCM extends AudioTrack
                 {
                     if (h == null)
                         h = new Handler(ht.getLooper());
-                    if (setNotificationMarkerPosition(bytes2frames(buf_len)/4) != AudioTrack.SUCCESS)
+                    if (setNotificationMarkerPosition(bytes2frames(buf_len)/4)
+                            != AudioTrack.SUCCESS)
                         LOG("setNotificationMarkerPosition Error");
                     else
                         setPlaybackPositionUpdateListener(l, h);
                 }
                 /* need to fill with silence before starting playback */
-                write(raw_data, frames2bytes(getPlaybackHeadPosition()), raw_data.length);
+                write(raw_data, frames2bytes(getPlaybackHeadPosition()), 
+                        raw_data.length);
             }
             play();
         }
@@ -115,9 +120,11 @@ public class RockboxPCM extends AudioTrack
     private void set_volume(int volume)
     {
         /* volume comes from 0..-990 from Rockbox */
-        /* TODO volume is in dB, but this code acts as if it were in %, convert? */
+        /* TODO:
+         * volume is in dB, but this code acts as if it were in %,  convert? */
         float fvolume;
-        /* special case min and max volume to not suffer from floating point accuracy */
+        /* special case min and max volume to not suffer from 
+         * floating point accuracy */
         if (volume == 0)
             fvolume = 1.0f;
         else if (volume == -990)
@@ -155,10 +162,15 @@ public class RockboxPCM extends AudioTrack
                 {
                     case AudioTrack.PLAYSTATE_PLAYING:
                     case AudioTrack.PLAYSTATE_PAUSED:
-                        /* refill at 25% no matter of how many bytes we've written */
-                        if (setNotificationMarkerPosition(bytes2frames(refill_mark)) 
-                                != AudioTrack.SUCCESS)
-                            LOG("Error in onMarkerReached: Could not set notification marker");
+                        /* refill at 25% no matter of how many 
+                         * bytes we've written */
+                        if (setNotificationMarkerPosition(
+                                bytes2frames(refill_mark)) 
+                                    != AudioTrack.SUCCESS)
+                        {
+                            LOG("Error in onMarkerReached: " +
+                            		"Could not set notification marker");
+                        }
                         else /* recharge */
                             setPlaybackPositionUpdateListener(this, h);
                         break;
