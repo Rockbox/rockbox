@@ -41,7 +41,9 @@ public class RockboxPCM extends AudioTrack
     /* should be CHANNEL_OUT_STEREO in 2.0 and above */
     private static final int channels = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
     private static final int encoding = AudioFormat.ENCODING_PCM_16BIT;
-    private static final int buf_len  = getMinBufferSize(44100, channels, encoding);
+    /* 24k is plenty, but some devices may have a higher minimum */
+    private static final int buf_len  = 
+           Math.max(24<<10, getMinBufferSize(samplerate, channels, encoding));
 
     private void LOG(CharSequence text)
     {
