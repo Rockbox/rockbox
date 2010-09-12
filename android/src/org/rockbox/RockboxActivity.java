@@ -29,7 +29,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class RockboxActivity extends Activity {
+public class RockboxActivity extends Activity 
+{
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -49,71 +50,75 @@ public class RockboxActivity extends Activity {
          * 
          * In order to get the fb, we need to let the Service start up
          * run, we can wait in a separate thread for fb to get ready
-		 * This thread waits for the fb to become ready */
+         * This thread waits for the fb to become ready */
         new Thread(new Runnable()
         {
-        	public void run() {
-				try {
-	        		while (RockboxService.fb == null)
-	        			Thread.sleep(250);
-				} catch (InterruptedException e) {
-				} catch (Exception e) {
-					LOG(e.toString());
-				}
-				/* drawing needs to happen in ui thread */
-				runOnUiThread(new Runnable() 
-				{	@Override
-					public void run() {
-						setContentView(RockboxService.fb);
-						RockboxService.fb.invalidate();
-					}
-				});
-        	}
+            public void run() 
+            {
+                try {
+                    while (RockboxService.fb == null)
+                        Thread.sleep(250);
+                } catch (InterruptedException e) {
+                } catch (Exception e) {
+                    LOG(e.toString());
+                }
+                /* drawing needs to happen in ui thread */
+                runOnUiThread(new Runnable() 
+                {    @Override
+                    public void run() {
+                        setContentView(RockboxService.fb);
+                        RockboxService.fb.invalidate();
+                    }
+                });
+            }
         }).start();
     }
     
     public void onResume()
     {
-    	super.onResume();
-    	
-    	if (RockboxService.fb != null)
-    	{
-    		try {
-    			setContentView(RockboxService.fb);
-    		} catch (IllegalStateException e) {
-    			/* we are already using the View,
-    			 * need to remove it and re-attach it */
-    			ViewGroup g = (ViewGroup)RockboxService.fb.getParent();
-    			g.removeView(RockboxService.fb);
-    			setContentView(RockboxService.fb);
-    		}
-    		RockboxService.fb.resume();
-    	}
+        super.onResume();
+        
+        if (RockboxService.fb != null)
+        {
+            try {
+                setContentView(RockboxService.fb);
+            } catch (IllegalStateException e) {
+                /* we are already using the View,
+                 * need to remove it and re-attach it */
+                ViewGroup g = (ViewGroup)RockboxService.fb.getParent();
+                g.removeView(RockboxService.fb);
+                setContentView(RockboxService.fb);
+            }
+            RockboxService.fb.resume();
+        }
     }
     
     /* this is also called when the backlight goes off,
      * which is nice 
      */
     @Override
-    protected void onPause() {
-    	super.onPause();
-    	RockboxService.fb.suspend();
+    protected void onPause() 
+    {
+        super.onPause();
+        RockboxService.fb.suspend();
     }
     
     @Override
-    protected void onStop() {
-    	super.onStop();
-    	RockboxService.fb.suspend();
+    protected void onStop() 
+    {
+        super.onStop();
+        RockboxService.fb.suspend();
     }
     
     @Override
-    protected void onDestroy() {
-    	super.onDestroy();
-    	RockboxService.fb.suspend();
+    protected void onDestroy() 
+    {
+        super.onDestroy();
+        RockboxService.fb.suspend();
     }
 
-	private void LOG(CharSequence text)
-	{
-		Log.d("Rockbox", (String) text);
-	}
+    private void LOG(CharSequence text)
+    {
+        Log.d("Rockbox", (String) text);
+    }
 }

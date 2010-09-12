@@ -30,70 +30,73 @@ import android.util.Log;
 
 public class RockboxTimer extends Timer 
 {
-	RockboxTimerTask task;
-	long interval;
-	
-	private class RockboxTimerTask extends TimerTask {
-		private RockboxTimer t;
-		private TelephonyManager tm;
-		private int last_state;
-		public RockboxTimerTask(RockboxService s, RockboxTimer parent) {
-			super();
-			t = parent;
-			tm = (TelephonyManager)s.getSystemService(Context.TELEPHONY_SERVICE);
-			last_state = tm.getCallState();
-		}
+    RockboxTimerTask task;
+    long interval;
+    
+    private class RockboxTimerTask extends TimerTask {
+        private RockboxTimer t;
+        private TelephonyManager tm;
+        private int last_state;
+        public RockboxTimerTask(RockboxService s, RockboxTimer parent) {
+            super();
+            t = parent;
+            tm = (TelephonyManager)s.getSystemService(Context.TELEPHONY_SERVICE);
+            last_state = tm.getCallState();
+        }
 
-		@Override
-		public void run() {
-			timerTask();
-			int state = tm.getCallState();
-			if (state != last_state)
-			{
-				switch (state) {
-				case TelephonyManager.CALL_STATE_IDLE:
-					postCallHungUp();
-					break;
-				case TelephonyManager.CALL_STATE_RINGING:
-					postCallIncoming();
-				default:
-					break;
-				}
-				last_state = state;
-			}
-			synchronized(t) {
-				t.notify();
-			}
-		}
-	}
-	
-	public RockboxTimer(RockboxService instance, long period_inverval_in_ms)
-	{
-		super("tick timer", false);
-		task = new RockboxTimerTask(instance, this);
-		schedule(task, 0, period_inverval_in_ms);
-		interval = period_inverval_in_ms;
-	}
+        @Override
+        public void run() 
+        {
+            timerTask();
+            int state = tm.getCallState();
+            if (state != last_state)
+            {
+                switch (state) 
+                {
+                    case TelephonyManager.CALL_STATE_IDLE:
+                        postCallHungUp();
+                        break;
+                    case TelephonyManager.CALL_STATE_RINGING:
+                        postCallIncoming();
+                    default:
+                        break;
+                }
+                last_state = state;
+            }
+            synchronized(t) { 
+                t.notify(); 
+            }
+        }
+    }
+    
+    public RockboxTimer(RockboxService instance, long period_inverval_in_ms)
+    {
+        super("tick timer");
+        task = new RockboxTimerTask(instance, this);
+        schedule(task, 0, period_inverval_in_ms);
+        interval = period_inverval_in_ms;
+    }
 
-	@SuppressWarnings("unused")
-	private void LOG(CharSequence text)
-	{
-		Log.d("Rockbox", (String) text);	
-	}
+    @SuppressWarnings("unused")
+    private void LOG(CharSequence text)
+    {
+        Log.d("Rockbox", (String) text);    
+    }
 
 
     /* methods called from native, keep them simple */    
     public void java_wait_for_interrupt()
     {
-    	synchronized(this) {
-	    	try {
-	    		this.wait();
-	    	} catch (InterruptedException e) {
-	    		/* Not an error: wakeup and return */
-	    	}
-    	}
+        synchronized(this) 
+        {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                /* Not an error: wakeup and return */
+            }
+        }
     }
-	public native void timerTask();
-	private native void postCallIncoming();
-	private native void postCallHungUp();
+    public native void timerTask();
+    private native void postCallIncoming();
+    private native void postCallHungUp();
 }
