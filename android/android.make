@@ -9,7 +9,7 @@
 
 .SECONDEXPANSION: # $$(JAVA_OBJ) is not populated until after this
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
-
+.PHONY: apk classes clean dex dirs libs
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS)
@@ -42,7 +42,9 @@ JAVA_OBJ	:= $(call java2class,$(subst /src/,/bin/,$(JAVA_SRC)))
 LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
 TEMP_APK	:= $(BUILDDIR)/bin/_Rockbox.apk
 TEMP_APK2	:= $(BUILDDIR)/bin/__Rockbox.apk
-APK			:= $(BUILDDIR)/bin/Rockbox.apk
+DEX		:= $(BUILDDIR)/bin/classes.dex
+AP_		:= $(BUILDDIR)/bin/resources.ap_
+APK		:= $(BUILDDIR)/bin/Rockbox.apk
 
 _DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
 DIRS		:= $(subst ___,bin,$(_DIRS))
@@ -50,8 +52,8 @@ DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
 DIRS		+= $(BUILDDIR)/libs/armeabi
 
-$(R_JAVA): $(MANIFEST)
-	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$<))$(AAPT) package -f -m -J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res -I $(ANDROID_PLATFORM)/android.jar -F $(BUILDDIR)/bin/resources.ap_
+$(R_JAVA) $(AP_): $(MANIFEST)
+	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m -J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res -I $(ANDROID_PLATFORM)/android.jar -F $(AP_)
 
 $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class: $(R_JAVA)
 	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
@@ -63,12 +65,12 @@ $(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.ja
 	-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin -sourcepath \
 	$(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
 
-classes: $(R_OBJ) $(JAVA_OBJ)
-
-$(BUILDDIR)/bin/classes.dex: classes
+$(DEX): $(R_OBJ) $(JAVA_OBJ)
 	$(call PRINTS,DX $(subst $(BUILDDIR)/,,$@))$(DX) --dex --output=$@ $(BUILDDIR)/bin
 
-dex: $(BUILDDIR)/bin/classes.dex
+classes: $(R_OBJ) $(JAVA_OBJ)
+
+dex: $(DEX)
 
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@
@@ -83,7 +85,7 @@ libs: $(LIBS)
 
 $(TEMP_APK): libs dex
 	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
-	-u -z $(BUILDDIR)/bin/resources.ap_ -f $(BUILDDIR)/bin/classes.dex -nf $(BUILDDIR)/libs
+	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
 
 $(APK): $(TEMP_APK)
 	$(SILENT)rm -f $@
@@ -97,3 +99,7 @@ dirs:
 	$(SILENT)mkdir -p $(DIRS)
 
 apk: dirs $(APK)
+
+clean::
+	$(SILENT)rm -f $(BUILDDIR)/bin/$(PACKAGE_PATH)/*.class $(R_JAVA) $(TEMP_APK) $(TEMP_APK2) $(APK) $(DEX) $(BUILDDIR)/_rockbox.zip $(AP_) $(LIBS)
+
