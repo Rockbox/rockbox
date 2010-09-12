@@ -91,7 +91,7 @@ public class RockboxService extends Service
 	private void startservice() 
 	{
         fb = new RockboxFramebuffer(this);
-		final int BUFFER = 2048;
+		final int BUFFER = 8*1024;
 		/* the following block unzips libmisc.so, which contains the files 
 		 * we ship, such as themes. It's needed to put it into a .so file
 		 * because there's no other way to ship files and have access
@@ -124,7 +124,7 @@ public class RockboxService extends Service
 	            	  }
 	            	  continue;
 	              }
-	              is = new BufferedInputStream(zipfile.getInputStream(entry));
+	              is = new BufferedInputStream(zipfile.getInputStream(entry), BUFFER);
 	              int count;
 	              byte data[] = new byte[BUFFER];
 	              folder = new File(new File(entry.getName()).getParent());
