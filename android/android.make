@@ -75,15 +75,14 @@ dex: $(DEX)
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@
 
-$(BUILDDIR)/_rockbox.zip: zip
-	$(SILENT)mv $(BUILDDIR)/rockbox.zip $@
+$(BUILDDIR)/rockbox.zip:
 
-$(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/_rockbox.zip
+$(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 	$(call PRINTS,CP rockbox.zip)cp $^ $@
 
 libs: $(LIBS)
 
-$(TEMP_APK): libs dex
+$(TEMP_APK): $(LIBS) $(DEX)
 	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
 	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
 
@@ -95,10 +94,12 @@ $(APK): $(TEMP_APK)
 	$(SILENT)$(ZIPALIGN) -v 4 $(TEMP_APK2) $@ > /dev/null
 	$(SILENT)rm $(TEMP_APK) $(TEMP_APK2)
 
-dirs:
-	$(SILENT)mkdir -p $(DIRS)
+$(DIRS):
+	$(SILENT)mkdir -p $@
 
-apk: dirs $(APK)
+dirs: $(DIRS)
+
+apk: $(DIRS) $(APK)
 
 clean::
 	$(SILENT)rm -f $(BUILDDIR)/bin/$(PACKAGE_PATH)/*.class $(R_JAVA) $(TEMP_APK) $(TEMP_APK2) $(APK) $(DEX) $(BUILDDIR)/_rockbox.zip $(AP_) $(LIBS)
