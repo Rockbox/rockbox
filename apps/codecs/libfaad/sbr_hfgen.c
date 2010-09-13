@@ -503,11 +503,11 @@ static void calc_aliasing_degree(sbr_info *sbr, real_t *rxx, real_t *deg)
 
     for (k = 2; k < sbr->k0; k++)
     {
-        deg[k] = 0.0;
+        deg[k] = COEF_CONST(0.0);
 
         if ((k % 2 == 0) && (rxx[k] < COEF_CONST(0.0)))
         {
-            if (rxx[k-1] < 0.0)
+            if (rxx[k-1] < COEF_CONST(0.0))
             {
                 deg[k] = COEF_CONST(1.0);
 
