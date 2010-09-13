@@ -167,9 +167,11 @@ extern struct codec_api* ci;
 #ifdef FIXED_POINT
 #define DIV_R(A, B) (((int64_t)A << REAL_BITS)/B)
 #define DIV_C(A, B) (((int64_t)A << COEF_BITS)/B)
+#define DIV_Q(A, B) (((int64_t)A << Q2_BITS  )/B)
 #else
 #define DIV_R(A, B) ((A)/(B))
 #define DIV_C(A, B) ((A)/(B))
+#define DIV_Q(A, B) ((A)/(B))
 #endif
 
 #ifndef SBR_LOW_POWER

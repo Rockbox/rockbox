@@ -224,34 +224,34 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
 
     for (j = offset; j < len + offset; j++)
     {
-        real_t buf_j = ((QMF_RE(buffer[j][bd])+(1<<(exp-1)))>>exp);
-        real_t buf_j_1 = ((QMF_RE(buffer[j-1][bd])+(1<<(exp-1)))>>exp);
-        real_t buf_j_2 = ((QMF_RE(buffer[j-2][bd])+(1<<(exp-1)))>>exp);
+        real_t buf_j   = (QMF_RE(buffer[j  ][bd]))>>exp);
+        real_t buf_j_1 = (QMF_RE(buffer[j-1][bd]))>>exp);
+        real_t buf_j_2 = (QMF_RE(buffer[j-2][bd]))>>exp);
 
         /* normalisation with rounding */
-        r01 += MUL_R(buf_j, buf_j_1);
-        r02 += MUL_R(buf_j, buf_j_2);
+        r01 += MUL_R(buf_j  , buf_j_1);
+        r02 += MUL_R(buf_j  , buf_j_2);
         r11 += MUL_R(buf_j_1, buf_j_1);
     }
     RE(ac->r12) = r01 -
-        MUL_R(((QMF_RE(buffer[len+offset-1][bd])+(1<<(exp-1)))>>exp), ((QMF_RE(buffer[len+offset-2][bd])+(1<<(exp-1)))>>exp)) +
-        MUL_R(((QMF_RE(buffer[offset-1][bd])+(1<<(exp-1)))>>exp), ((QMF_RE(buffer[offset-2][bd])+(1<<(exp-1)))>>exp));
+        MUL_R(((QMF_RE(buffer[len+offset-1][bd]))>>exp), ((QMF_RE(buffer[len+offset-2][bd]))>>exp)) +
+        MUL_R(((QMF_RE(buffer[    offset-1][bd]))>>exp), ((QMF_RE(buffer[    offset-2][bd]))>>exp));
     RE(ac->r22) = r11 -
-        MUL_R(((QMF_RE(buffer[len+offset-2][bd])+(1<<(exp-1)))>>exp), ((QMF_RE(buffer[len+offset-2][bd])+(1<<(exp-1)))>>exp)) +
-        MUL_R(((QMF_RE(buffer[offset-2][bd])+(1<<(exp-1)))>>exp), ((QMF_RE(buffer[offset-2][bd])+(1<<(exp-1)))>>exp));
+        MUL_R(((QMF_RE(buffer[len+offset-2][bd]))>>exp), ((QMF_RE(buffer[len+offset-2][bd]))>>exp)) +
+        MUL_R(((QMF_RE(buffer[    offset-2][bd]))>>exp), ((QMF_RE(buffer[    offset-2][bd]))>>exp));
 #else
     for (j = offset; j < len + offset; j++)
     {
-        r01 += QMF_RE(buffer[j][bd]) * QMF_RE(buffer[j-1][bd]);
-        r02 += QMF_RE(buffer[j][bd]) * QMF_RE(buffer[j-2][bd]);
+        r01 += QMF_RE(buffer[j  ][bd]) * QMF_RE(buffer[j-1][bd]);
+        r02 += QMF_RE(buffer[j  ][bd]) * QMF_RE(buffer[j-2][bd]);
         r11 += QMF_RE(buffer[j-1][bd]) * QMF_RE(buffer[j-1][bd]);
     }
     RE(ac->r12) = r01 -
         QMF_RE(buffer[len+offset-1][bd]) * QMF_RE(buffer[len+offset-2][bd]) +
-        QMF_RE(buffer[offset-1][bd]) * QMF_RE(buffer[offset-2][bd]);
+        QMF_RE(buffer[    offset-1][bd]) * QMF_RE(buffer[    offset-2][bd]);
     RE(ac->r22) = r11 -
         QMF_RE(buffer[len+offset-2][bd]) * QMF_RE(buffer[len+offset-2][bd]) +
-        QMF_RE(buffer[offset-2][bd]) * QMF_RE(buffer[offset-2][bd]);
+        QMF_RE(buffer[    offset-2][bd]) * QMF_RE(buffer[    offset-2][bd]);
 #endif
     RE(ac->r01) = r01;
     RE(ac->r02) = r02;
@@ -268,7 +268,6 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 #ifdef FIXED_POINT
     const real_t rel = FRAC_CONST(0.999999); // 1 / (1 + 1e-6f);
     uint32_t mask, exp;
-    real_t pow2_to_exp;
 #else
     const real_t rel = 1 / (1 + 1e-6f);
 #endif
@@ -288,13 +287,11 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     }
 
     exp = wl_min_lzc(mask);
-   
-    pow2_to_exp = 1<<(exp-1);
 
-    temp2_r = (QMF_RE(buffer[offset-2][bd]) + pow2_to_exp) >> exp;
-    temp2_i = (QMF_IM(buffer[offset-2][bd]) + pow2_to_exp) >> exp;
-    temp3_r = (QMF_RE(buffer[offset-1][bd]) + pow2_to_exp) >> exp;
-    temp3_i = (QMF_IM(buffer[offset-1][bd]) + pow2_to_exp) >> exp;
+    temp2_r = (QMF_RE(buffer[offset-2][bd])) >> exp;
+    temp2_i = (QMF_IM(buffer[offset-2][bd])) >> exp;
+    temp3_r = (QMF_RE(buffer[offset-1][bd])) >> exp;
+    temp3_i = (QMF_IM(buffer[offset-1][bd])) >> exp;
     // Save these because they are needed after loop
     temp4_r = temp2_r;
     temp4_i = temp2_i;
@@ -307,8 +304,8 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
         temp1_i = temp2_i; // temp1_i = (QMF_IM(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
         temp2_r = temp3_r; // temp2_r = (QMF_RE(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
         temp2_i = temp3_i; // temp2_i = (QMF_IM(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
-        temp3_r = (QMF_RE(buffer[j][bd]) + pow2_to_exp) >> exp;
-        temp3_i = (QMF_IM(buffer[j][bd]) + pow2_to_exp) >> exp;
+        temp3_r = (QMF_RE(buffer[j][bd])) >> exp;
+        temp3_i = (QMF_IM(buffer[j][bd])) >> exp;
         r01r += MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i);
         r01i += MUL_R(temp3_i, temp2_r) - MUL_R(temp3_r, temp2_i);
         r02r += MUL_R(temp3_r, temp1_r) + MUL_R(temp3_i, temp1_i);
@@ -404,7 +401,7 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 static void calc_prediction_coef(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
                                  complex_t *alpha_0, complex_t *alpha_1, uint8_t k)
 {
-    real_t tmp;
+    real_t tmp, mul;
     acorr_coef ac;
 
     auto_correlation(sbr, &ac, Xlow, k, sbr->numTimeSlotsRate + 6);
@@ -415,14 +412,15 @@ static void calc_prediction_coef(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
         IM(alpha_1[k]) = 0;
     } else {
 #ifdef FIXED_POINT
+        mul = DIV_R(REAL_CONST(1.0), ac.det);
         tmp = (MUL_R(RE(ac.r01), RE(ac.r12)) - MUL_R(IM(ac.r01), IM(ac.r12)) - MUL_R(RE(ac.r02), RE(ac.r11)));
-        RE(alpha_1[k]) = DIV_R(tmp, ac.det);
+        RE(alpha_1[k]) = MUL_R(tmp, mul);
         tmp = (MUL_R(IM(ac.r01), RE(ac.r12)) + MUL_R(RE(ac.r01), IM(ac.r12)) - MUL_R(IM(ac.r02), RE(ac.r11)));
-        IM(alpha_1[k]) = DIV_R(tmp, ac.det);
+        IM(alpha_1[k]) = MUL_R(tmp, mul);
 #else
-        tmp = REAL_CONST(1.0) / ac.det;
-        RE(alpha_1[k]) = (MUL_R(RE(ac.r01), RE(ac.r12)) - MUL_R(IM(ac.r01), IM(ac.r12)) - MUL_R(RE(ac.r02), RE(ac.r11))) * tmp;
-        IM(alpha_1[k]) = (MUL_R(IM(ac.r01), RE(ac.r12)) + MUL_R(RE(ac.r01), IM(ac.r12)) - MUL_R(IM(ac.r02), RE(ac.r11))) * tmp;
+        mul = REAL_CONST(1.0) / ac.det;
+        RE(alpha_1[k]) = (MUL_R(RE(ac.r01), RE(ac.r12)) - MUL_R(IM(ac.r01), IM(ac.r12)) - MUL_R(RE(ac.r02), RE(ac.r11))) * mul;
+        IM(alpha_1[k]) = (MUL_R(IM(ac.r01), RE(ac.r12)) + MUL_R(RE(ac.r01), IM(ac.r12)) - MUL_R(IM(ac.r02), RE(ac.r11))) * mul;
 #endif
     }
 
@@ -432,10 +430,11 @@ static void calc_prediction_coef(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
         IM(alpha_0[k]) = 0;
     } else {
 #ifdef FIXED_POINT
+        mul = DIV_R(REAL_CONST(1.0), RE(ac.r11));
         tmp = -(RE(ac.r01) + MUL_R(RE(alpha_1[k]), RE(ac.r12)) + MUL_R(IM(alpha_1[k]), IM(ac.r12)));
-        RE(alpha_0[k]) = DIV_R(tmp, RE(ac.r11));
+        RE(alpha_0[k]) = MUL_R(tmp, mul);
         tmp = -(IM(ac.r01) + MUL_R(IM(alpha_1[k]), RE(ac.r12)) - MUL_R(RE(alpha_1[k]), IM(ac.r12)));
-        IM(alpha_0[k]) = DIV_R(tmp, RE(ac.r11));
+        IM(alpha_0[k]) = MUL_R(tmp, mul);
 #else
         tmp = 1.0f / RE(ac.r11);
         RE(alpha_0[k]) = -(RE(ac.r01) + MUL_R(RE(alpha_1[k]), RE(ac.r12)) + MUL_R(IM(alpha_1[k]), IM(ac.r12))) * tmp;
@@ -457,7 +456,7 @@ static void calc_prediction_coef_lp(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
                                     complex_t *alpha_0, complex_t *alpha_1, real_t *rxx)
 {
     uint8_t k;
-    real_t tmp;
+    real_t tmp, mul;
     acorr_coef ac;
 
     for (k = 1; k < sbr->f_master[0]; k++)
@@ -469,11 +468,11 @@ static void calc_prediction_coef_lp(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
             RE(alpha_0[k]) = 0;
             RE(alpha_1[k]) = 0;
         } else {
+            mul = DIV_R(REAL_CONST(1.0), ac.det);
             tmp = MUL_R(RE(ac.r01), RE(ac.r22)) - MUL_R(RE(ac.r12), RE(ac.r02));
-            RE(alpha_0[k]) = DIV_R(tmp, (-ac.det));
-
+            RE(alpha_0[k]) = -MUL_R(tmp, mul);
             tmp = MUL_R(RE(ac.r01), RE(ac.r12)) - MUL_R(RE(ac.r02), RE(ac.r11));
-            RE(alpha_1[k]) = DIV_R(tmp, ac.det);
+            RE(alpha_1[k]) = MUL_R(tmp, mul);
         }
 
         if ((RE(alpha_0[k]) >= REAL_CONST(4)) || (RE(alpha_1[k]) >= REAL_CONST(4)))
@@ -489,7 +488,7 @@ static void calc_prediction_coef_lp(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
         } else {
             rxx[k] = DIV_C(RE(ac.r01), RE(ac.r11));
             rxx[k] = -rxx[k];
-            if (rxx[k] > COEF_CONST(1.0)) rxx[k] = COEF_CONST(1.0);
+            if (rxx[k] > COEF_CONST( 1.0)) rxx[k] = COEF_CONST(1.0);
             if (rxx[k] < COEF_CONST(-1.0)) rxx[k] = COEF_CONST(-1.0);
         }
     }
@@ -581,7 +580,7 @@ static void calc_chirp_factors(sbr_info *sbr, uint8_t ch)
         if (sbr->bwArray[ch][i] < COEF_CONST(0.015625))
             sbr->bwArray[ch][i] = COEF_CONST(0.0);
 
-        if (sbr->bwArray[ch][i] >= COEF_CONST(0.99609375))
+        if (sbr->bwArray[ch][i] > COEF_CONST(0.99609375))
             sbr->bwArray[ch][i] = COEF_CONST(0.99609375);
 
         sbr->bwArray_prev[ch][i] = sbr->bwArray[ch][i];

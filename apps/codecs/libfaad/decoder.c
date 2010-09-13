@@ -35,7 +35,9 @@
 #include "mp4.h"
 #include "syntax.h"
 #include "error.h"
+/* rockbox: not used
 #include "output.h"
+*/
 #include "filtbank.h"
 #include "drc.h"
 #ifdef SBR_DEC

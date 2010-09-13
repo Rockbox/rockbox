@@ -38,8 +38,6 @@ static void gen_rand_vector(real_t *spec, int16_t scale_factor, uint16_t size,
 
 #ifdef FIXED_POINT
 
-#define DIV(A, B) (((int64_t)A << REAL_BITS)/B)
-
 #define step(shift) \
     if ((0x40000000l >> shift) + root <= value)       \
     {                                                 \
@@ -126,7 +124,7 @@ static INLINE void gen_rand_vector(real_t *spec, int16_t scale_factor, uint16_t 
     energy = fp_sqrt(energy);
     if (energy > 0)
     {
-        scale = DIV(REAL_CONST(1),energy);
+        scale = DIV_R(REAL_CONST(1), energy);
 
         exp = scale_factor >> 2;
         frac = scale_factor & 3;
