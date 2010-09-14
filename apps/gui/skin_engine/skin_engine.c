@@ -61,7 +61,9 @@ void settings_apply_skins(void)
         FOR_NB_SCREENS(j)
             skin_get_gwps(i, j);
     }
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     skin_backdrops_preload(); /* should maybe check the retval here... */
+#endif
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     FOR_NB_SCREENS(i)
@@ -72,8 +74,7 @@ void settings_apply_skins(void)
 
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
-int sb_preproccess(enum screen_type screen, struct wps_data *data);
-int sb_postproccess(enum screen_type screen, struct wps_data *data);
+
 struct wps_state     wps_state               = { .id3 = NULL };
 static struct gui_skin_helper {
     int (*preproccess)(enum screen_type screen, struct wps_data *data);
@@ -143,10 +144,11 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
     if (!loading_a_sbs && skins[skin][screen].data.wps_loaded == false)
     {
         char buf[MAX_PATH*2], path[MAX_PATH];
-        char *setting, *ext;
+        char *setting = NULL, *ext = NULL;
         switch (skin)
         {
             case CUSTOM_STATUSBAR:
+#ifdef HAVE_LCD_BITMAP
                 if (skin_buffer == NULL)
                 {
                     /* still loading, buffers not initialised yet,
@@ -171,6 +173,9 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
                     setting = global_settings.sbs_file;
                     ext = "sbs";
                 }
+#else
+                return &skins[skin][screen].gui_wps;
+#endif /* HAVE_LCD_BITMAP */
                 break;
             case WPS:
 #if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1

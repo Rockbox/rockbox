@@ -340,10 +340,10 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 #ifdef HAVE_ALBUMART
     /* now draw the AA */
     if (data->albumart && data->albumart->vp == vp
-	    && data->albumart->draw_handle >= 0)
+        && data->albumart->draw_handle >= 0)
     {
         draw_album_art(gwps, data->albumart->draw_handle, false);
-		data->albumart->draw_handle = -1;
+        data->albumart->draw_handle = -1;
     }
 #endif
 
@@ -354,7 +354,7 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 
 bool draw_player_progress(struct gui_wps *gwps)
 {
-    struct wps_state *state = gwps->state;
+    struct wps_state *state = skin_get_global_state();
     struct screen *display = gwps->display;
     unsigned char progress_pattern[7];
     int pos = 0;
@@ -404,7 +404,7 @@ void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
         {0x0e, 0x0e, 0x02, 0x0e}, /* 9 */
     };
 
-    struct wps_state *state = gwps->state;
+    struct wps_state *state = skin_get_global_state();
     struct screen *display = gwps->display;
     struct wps_data *data = gwps->data;
     unsigned char progress_pattern[7];

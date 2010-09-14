@@ -56,6 +56,7 @@
 #include "tagcache.h"
 
 #include "wps_internals.h"
+#include "skin_engine.h"
 #include "root_menu.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"

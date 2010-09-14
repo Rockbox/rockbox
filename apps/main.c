@@ -73,6 +73,7 @@
 #include "scrobbler.h"
 #include "icon.h"
 #include "viewport.h"
+#include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
 

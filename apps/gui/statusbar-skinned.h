@@ -51,13 +51,17 @@ int sb_touch_to_button(int context);
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
 int sb_get_backdrop(enum screen_type screen);
 #endif
+int sb_preproccess(enum screen_type screen, struct wps_data *data);
+int sb_postproccess(enum screen_type screen, struct wps_data *data);
 
 #else /* CHARCELL */
 #define sb_skin_init()
 #define sb_skin_data_load(a,b,c)
 #define sb_skin_set_update_delay(a)
 #define sb_skin_set_state(a,b)
-#define sb_create_from_settings(a)
+#define sb_create_from_settings NULL
+#define sb_preproccess NULL
+#define sb_postproccess NULL
 #endif
 void do_sbs_update_callback(void *param);
 #endif /* __STATUSBAR_SKINNED_H__ */
