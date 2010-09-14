@@ -73,7 +73,8 @@ void skin_disarm_touchregions(struct wps_data *data);
 #endif
 
 /* Do a update_type update of the skinned screen */
-void skin_update(struct gui_wps *gwps, unsigned int update_type);
+void skin_update(enum skinnable_screens skin, enum screen_type screen,
+                 unsigned int update_type);
 
 /*
  * setup up the skin-data from a format-buffer (isfile = false)
@@ -92,13 +93,28 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
  * reuse buffers if the file is already loaded */
 char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen);
 void skin_backdrop_init(void);
-
+int skin_backdrop_assign(char* backdrop, char *bmpdir,
+                          enum screen_type screen);
+bool skin_backdrops_preload(void);
+void skin_backdrop_show(int backdrop_id);
+void skin_backdrop_load_setting(void);
+void skin_backdrop_unload(int backdrop_id);
 
 /* do the button loop as often as required for the peak meters to update
  * with a good refresh rate. 
  * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()
  */
-int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout);
-#endif
+int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 
+void skin_load(enum skinnable_screens skin, enum screen_type screen,
+               const char *buf, bool isfile);
+struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
+struct wps_state *skin_get_global_state(void);
+void gui_sync_skin_init(void);
+
+
+bool skin_do_full_update(enum skinnable_screens skin, enum screen_type screen);
+void skin_request_full_update(enum skinnable_screens skin);
+
+#endif /* !PLUGIN */
 #endif

@@ -358,7 +358,7 @@ static void init(void)
     /* Keep the order of this 3 (viewportmanager handles statusbars)
      * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
-    gui_sync_wps_init();
+    gui_sync_skin_init();
     sb_skin_init();
     viewportmanager_init();
 
@@ -510,7 +510,7 @@ static void init(void)
     sb_skin_init();
     CHART("<sb_skin_init");
     CHART(">gui_sync_wps_init");
-    gui_sync_wps_init();
+    gui_sync_skin_init();
     CHART("<gui_sync_wps_init");
     CHART(">viewportmanager_init");
     viewportmanager_init();

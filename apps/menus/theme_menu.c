@@ -40,6 +40,7 @@
 #include "appevents.h"
 #include "viewport.h"
 #include "statusbar-skinned.h"
+#include "skin_engine/skin_engine.h"
 
 #if LCD_DEPTH > 1
 /**
@@ -49,7 +50,7 @@ static int clear_main_backdrop(void)
 {
     global_settings.backdrop_file[0] = '-';
     global_settings.backdrop_file[1] = '\0';
-    sb_set_backdrop(SCREEN_MAIN, NULL);
+    skin_backdrop_load_setting();
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
     viewportmanager_theme_undo(SCREEN_MAIN, true);
     settings_save();

@@ -40,13 +40,6 @@
 #include "icon.h"
 #include "option_select.h"
 
-
-/* currently only one wps_state is needed */
-extern struct wps_state     wps_state; /* from wps.c */
-static struct gui_wps       sb_skin[NB_SCREENS]      = {{ .data = NULL }};
-static struct wps_data      sb_skin_data[NB_SCREENS] = {{ .wps_loaded = 0 }};
-static struct wps_sync_data sb_skin_sync_data        = { .do_full_update = false };
-
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
 static int set_title_worker(char* title, enum themable_icons icon, 
@@ -102,26 +95,26 @@ static int set_title_worker(char* title, enum themable_icons icon,
 
 bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
 {
-    bool retval = set_title_worker(title, icon, &sb_skin_data[screen], 
-                                   sb_skin_data[screen].tree) > 0;
+    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
+    bool retval = data->wps_loaded && 
+        set_title_worker(title, icon, data, data->tree) > 0;
     return retval;
 }
     
-
-void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
+int sb_preproccess(enum screen_type screen, struct wps_data *data)
 {
-    struct wps_data *data = sb_skin[screen].data;
-
-    int success;
+    (void)data;
     /* We need to disable the theme here or else viewport_set_defaults() 
      * (which is called in the viewport tag parser) will crash because
      * the theme is enabled but sb_set_info_vp() isnt set untill after the sbs
      * is parsed. This only affects the default viewport which is ignored
      * int he sbs anyway */
     viewportmanager_theme_enable(screen, false, NULL);
-    success = buf && skin_data_load(screen, data, buf, isfile);
-
-    if (success)
+    return 1;
+}
+int sb_postproccess(enum screen_type screen, struct wps_data *data)
+{
+    if (data->wps_loaded)
     {  
         /* hide the sb's default viewport because it has nasty effect with stuff
         * not part of the statusbar,
@@ -133,18 +126,17 @@ void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile)
         {
             if (!next_vp)
             {    /* no second viewport, let parsing fail */
-                success = false;
+                return 0;
             }
             /* hide this viewport, forever */
             vp->hidden_flags = VP_NEVER_VISIBLE;
         }
         sb_set_info_vp(screen, VP_DEFAULT_LABEL);
     }
-
-    if (!success && isfile)
-        sb_create_from_settings(screen);
     viewportmanager_theme_undo(screen, false);
+    return 1;
 }
+
 static char *infovp_label[NB_SCREENS];
 static char *oldinfovp_label[NB_SCREENS];
 void sb_set_info_vp(enum screen_type screen, char *label)
@@ -154,6 +146,7 @@ void sb_set_info_vp(enum screen_type screen, char *label)
     
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
+    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
     if (oldinfovp_label[screen] &&
         strcmp(oldinfovp_label[screen], infovp_label[screen]))
     {
@@ -162,48 +155,26 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
         viewportmanager_theme_enable(screen, false, NULL);
         viewportmanager_theme_undo(screen, true);
     }        
-    return &find_viewport(infovp_label[screen], true, sb_skin[screen].data)->vp;
+    return &find_viewport(infovp_label[screen], true, data)->vp;
 }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-char* sb_get_backdrop(enum screen_type screen)
+int sb_get_backdrop(enum screen_type screen)
 {
-    return sb_skin[screen].data->backdrop;
-}
-
-bool sb_set_backdrop(enum screen_type screen, char* filename)
-{
-    if (!filename)
-    {
-        sb_skin[screen].data->backdrop = NULL;
-        return true;
-    }
-    else if (!sb_skin[screen].data->backdrop)
-    {
-        /* need to make room on the buffer */
-        size_t buf_size;
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-        if (screen == SCREEN_REMOTE)
-            buf_size = REMOTE_LCD_BACKDROP_BYTES;
-        else
-#endif
-            buf_size = LCD_BACKDROP_BYTES;
-        sb_skin[screen].data->backdrop = (char*)skin_buffer_alloc(buf_size);
-        if (!sb_skin[screen].data->backdrop)
-            return false;          
-    }
-  
-    if (!screens[screen].backdrop_load(filename, sb_skin[screen].data->backdrop))
-        sb_skin[screen].data->backdrop = NULL;
-    return sb_skin[screen].data->backdrop != NULL;
+    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
+    if (data->wps_loaded)
+        return data->backdrop_id;
+    else
+        return -1;
 }
         
 #endif
 void sb_skin_update(enum screen_type screen, bool force)
 {
+    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
     static long next_update[NB_SCREENS] = {0};
     int i = screen;
-    if (!sb_skin_data[screen].wps_loaded)
+    if (!data->wps_loaded)
         return;
     if (TIME_AFTER(current_tick, next_update[i]) || force)
     {
@@ -213,24 +184,9 @@ void sb_skin_update(enum screen_type screen, bool force)
         if (lcd_active() || (i != SCREEN_MAIN))
 #endif
         {
-            bool full_update = sb_skin[i].sync_data->do_full_update;
-#if NB_SCREENS > 1
-            if (i==SCREEN_MAIN && sb_skin[i].sync_data->do_full_update)
-            {
-                sb_skin[i].sync_data->do_full_update = false;
-                /* we need to make sure the remote gets a full update
-                 * next time it is drawn also. so quick n dirty hack */
-                next_update[SCREEN_REMOTE] = 0;
-            }
-            else if (next_update[SCREEN_REMOTE] == 0)
-            {
-                full_update = true;
-            }
-#else
-            sb_skin[i].sync_data->do_full_update = false;
-#endif
-            skin_update(&sb_skin[i], force || full_update?
-                    SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
+            bool full_update = skin_do_full_update(CUSTOM_STATUSBAR, screen);
+            skin_update(CUSTOM_STATUSBAR, screen, force || 
+                        full_update ? SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
         }
         next_update[i] = current_tick + update_delay; /* don't update too often */
     }
@@ -241,7 +197,7 @@ void do_sbs_update_callback(void *param)
     (void)param;
     /* the WPS handles changing the actual id3 data in the id3 pointers
      * we imported, we just want a full update */
-    sb_skin_sync_data.do_full_update = true;
+    skin_request_full_update(CUSTOM_STATUSBAR);
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
 }
@@ -257,9 +213,10 @@ void sb_skin_set_update_delay(int delay)
  *  - ui viewport
  *  - backdrop
  */
-void sb_create_from_settings(enum screen_type screen)
+char* sb_create_from_settings(enum screen_type screen)
 {
-    char buf[128], *ptr, *ptr2;
+    static char buf[128];
+    char *ptr, *ptr2;
     int len, remaining = sizeof(buf);
     int bar_position = statusbar_position(screen);
     ptr = buf;
@@ -329,7 +286,7 @@ void sb_create_from_settings(enum screen_type screen)
         len = snprintf(ptr, remaining, "%%ax%%Vi(-,0,%d,-,%d,1)\n", 
                        y, height);
     }
-    sb_skin_data_load(screen, buf, false);
+    return buf;
 }
 
 void sb_skin_init(void)
@@ -338,16 +295,6 @@ void sb_skin_init(void)
     FOR_NB_SCREENS(i)
     {
         oldinfovp_label[i] = NULL;
-#ifdef HAVE_ALBUMART
-        sb_skin_data[i].albumart = NULL;
-        sb_skin_data[i].playback_aa_slot = -1;
-#endif
-        sb_skin[i].data = &sb_skin_data[i];
-        sb_skin[i].display = &screens[i];
-        /* Currently no seperate wps_state needed/possible
-           so use the only available ( "global" ) one */
-        sb_skin[i].state = &wps_state;
-        sb_skin[i].sync_data = &sb_skin_sync_data;
     }
 }
 
@@ -367,9 +314,10 @@ int sb_touch_to_button(int context)
         return ACTION_TOUCHSCREEN;
     
     if (last_context != context)
-        skin_disarm_touchregions(&sb_skin_data[SCREEN_MAIN]);
+        skin_disarm_touchregions(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data);
     last_context = context;
-    button = skin_get_touchaction(&sb_skin_data[SCREEN_MAIN], &offset, &region);
+    button = skin_get_touchaction(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data,
+                                  &offset, &region);
     
     switch (button)
     {

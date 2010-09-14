@@ -74,18 +74,21 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode);
 
 /* update a skinned screen, update_type is WPS_REFRESH_* values.
  * Usually it should only be WPS_REFRESH_NON_STATIC
- * A full update will be done if required (state.do_full_update == true)
+ * A full update will be done if required (skin_do_full_update() == true)
  */
-void skin_update(struct gui_wps *gwps, unsigned int update_type)
+void skin_update(enum skinnable_screens skin, enum screen_type screen,
+                 unsigned int update_type)
 {
+    struct gui_wps *gwps = skin_get_gwps(skin, screen);
     /* This maybe shouldnt be here, 
      * This is also safe for skined screen which dont use the id3 */
-    struct mp3entry *id3 = gwps->state->id3;
+    struct mp3entry *id3 = skin_get_global_state()->id3;
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
-    gwps->sync_data->do_full_update |= cuesheet_update;
+    if (cuesheet_update)
+        skin_request_full_update(skin);
  
-    skin_render(gwps, gwps->sync_data->do_full_update ?
-                                        SKIN_REFRESH_ALL : update_type);
+    skin_render(gwps, skin_do_full_update(skin, screen) ? 
+                        SKIN_REFRESH_ALL : update_type);
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -126,7 +129,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 {
     struct screen *display = gwps->display;
     struct viewport *vp = pb->vp;
-    struct wps_state *state = gwps->state;
+    struct wps_state *state = skin_get_global_state();
     struct mp3entry *id3 = state->id3;
     int y = pb->y, height = pb->height;
     unsigned long length, end;
@@ -729,11 +732,10 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
 
 /* do the button loop as often as required for the peak meters to update
  * with a good refresh rate. 
- * gwps is really gwps[NB_SCREENS]! don't wrap this if FOR_NB_SCREENS()
  */
-int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
+int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
 {
-    (void)gwps; /* silence charcell warning */
+    (void)skin; /* silence charcell warning */
     int button = ACTION_NONE;
 #ifdef HAVE_LCD_BITMAP
     int i;
@@ -744,7 +746,7 @@ int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
     bool pm=false;
     FOR_NB_SCREENS(i)
     {
-       if(gwps[i].data->peak_meter_enabled)
+       if(skin_get_gwps(skin, i)->data->peak_meter_enabled)
            pm = true;
     }
 
@@ -763,8 +765,8 @@ int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
             if (TIME_AFTER(current_tick, next_refresh)) {
                 FOR_NB_SCREENS(i)
                 {
-                    if(gwps[i].data->peak_meter_enabled)
-                        skin_update(&gwps[i], SKIN_REFRESH_PEAK_METER);
+                    if(skin_get_gwps(skin, i)->data->peak_meter_enabled)
+                        skin_update(skin, i, SKIN_REFRESH_PEAK_METER);
                     next_refresh += HZ / PEAK_METER_FPS;
                 }
             }
@@ -781,3 +783,6 @@ int skin_wait_for_action(struct gui_wps *gwps, int context, int timeout)
     }
     return button;
 }
+
+
+

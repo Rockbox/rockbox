@@ -266,7 +266,10 @@ struct wps_data
     struct skin_token_list *progressbars;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    char *backdrop;
+    struct {
+        char *backdrop;
+        int backdrop_id;
+    };
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
@@ -305,18 +308,6 @@ struct wps_state
     bool is_fading;
 };
 
-/* Holds data for all screens in a skin. */
-struct wps_sync_data
-{
-    /* suitable for the viewportmanager, possibly only temporary here
-     * needs to be same for all screens! can't be split up for screens
-     * due to what viewportmanager_set_statusbar() accepts
-     * (FIXME?) */
-    int statusbars;
-    /* indicates whether the skin needs a full update for all screens */
-    bool do_full_update;
-};
-
 /* change the ff/rew-status
    if ff_rew = true then we are in skipping mode
    else we are in normal mode */
@@ -334,9 +325,6 @@ struct gui_wps
 {
     struct screen *display;
     struct wps_data *data;
-    struct wps_state *state;
-    /* must point to the same struct for all screens */
-    struct wps_sync_data *sync_data;
 };
 
 /* gui_wps end */

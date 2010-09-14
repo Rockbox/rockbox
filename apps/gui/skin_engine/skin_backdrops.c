@@ -30,88 +30,164 @@
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 
+#define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
 static struct skin_backdrop {
     char name[MAX_PATH];
     char *buffer;
     enum screen_type screen;
-} backdrops[SKINNABLE_SCREENS_COUNT*NB_SCREENS];
+} backdrops[NB_BDROPS];
+
+#define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
 
 void skin_backdrop_init(void)
 {
     int i;
-    for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
+    for (i=0; i<NB_BDROPS; i++)
     {
         backdrops[i].name[0] = '\0';
         backdrops[i].buffer = NULL;
     }
 }
 
-/* load a backdrop into the skin buffer.
- * reuse buffers if the file is already loaded */
-char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen)
+int skin_backdrop_assign(char* backdrop, char *bmpdir,
+                         enum screen_type screen)
 {
-    int i;
-    struct skin_backdrop *bdrop = NULL;
     char dir[MAX_PATH];
     char filename[MAX_PATH];
-    size_t buf_size;
-    bool loaded = false;
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-    if (screen == SCREEN_REMOTE)
-        buf_size = REMOTE_LCD_BACKDROP_BYTES;
-    else
-#endif
-        buf_size = LCD_BACKDROP_BYTES;
-
+    int i, free = -1;
+    if (!backdrop)
+        return -1;
     if (backdrop[0] == '-')
     {
+        filename[0] = '-';
+        filename[1] = '\0';
+        filename[2] = '\0'; /* we check this later to see if we actually have an
+                               image to load. != '\0' means display the image */
 #if NB_SCREENS > 1
         if (screen == SCREEN_REMOTE)
         {
-            return NULL; /* remotes don't have a backdrop setting (yet!) */
+            filename[0] = '\0';
         }
-        else
 #endif
-        {
-            char settings_bdrop = global_settings.backdrop_file[0];
-            if (settings_bdrop == '\0' || settings_bdrop == '-')
-            {
-                return NULL; /* backdrop setting not set */
-            }
-            snprintf(filename, sizeof(filename), "%s/%s.bmp",
-                     get_user_file_path(BACKDROP_DIR, 0, dir, sizeof(dir)),
-                     global_settings.backdrop_file);
-        }
     }
     else
     {
         const char *bd_dir = get_user_file_path(bmpdir, 0, dir, sizeof(dir));
         get_image_filename(backdrop, bd_dir, filename, sizeof(filename));
     }
-    
-    for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
+    for (i=0; i<NB_BDROPS; i++)
     {
+        if (!backdrops[i].name[0] && free < 0)
+            free = i;
         if (!strcmp(backdrops[i].name, filename) && backdrops[i].screen == screen)
         {
-            return backdrops[i].buffer;
-        }
-        else if (!bdrop && backdrops[i].buffer == NULL)
-        {
-            bdrop = &backdrops[i];
+            break;
         }
     }
-    if (!bdrop)
-        return NULL; /* too many backdrops loaded */
-    
-    bdrop->buffer = (char*)skin_buffer_alloc(buf_size);
-    if (!bdrop->buffer)
-        return NULL;
-    loaded = screens[screen].backdrop_load(filename, bdrop->buffer);
-    bdrop->screen = screen;
-    strlcpy(bdrop->name, filename, sizeof(bdrop->name));
-    
-    return loaded ? bdrop->buffer : NULL;
+    if (i < NB_BDROPS)
+        return i;
+    else if (free >= 0)
+    {
+        strlcpy(backdrops[free].name, filename,
+                sizeof (backdrops[free].name));
+        backdrops[free].buffer = NULL;
+        backdrops[free].screen = screen;
+        return free;
+    }
+    return -1;
 }
+
+bool skin_backdrops_preload(void)
+{
+    bool retval = true;
+    int i;
+    char *filename;
+    for (i=0; i<NB_BDROPS; i++)
+    {
+        if (backdrops[i].name[0] && !backdrops[i].buffer)
+        {
+            size_t buf_size;
+            bool loaded = false;
+            enum screen_type screen = backdrops[i].screen;
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+            if (screen == SCREEN_REMOTE)
+                buf_size = REMOTE_LCD_BACKDROP_BYTES;
+            else
+#endif
+                buf_size = LCD_BACKDROP_BYTES;
+
+            filename = backdrops[i].name;
+            if (screen == SCREEN_MAIN && global_settings.backdrop_file[0] &&
+                global_settings.backdrop_file[0] != '-' && filename[0] == '-')
+            {
+                char dir[MAX_PATH];
+                char* temp = filename+2; /* slightly hacky to get a buffer */
+                size_t size = sizeof(backdrops[i].name) - 2;
+                snprintf(temp, size, "%s/%s.bmp",
+                         get_user_file_path(BACKDROP_DIR, 0, dir, sizeof(dir)),
+                         global_settings.backdrop_file);
+                filename = temp;
+            }
+            if (*filename && *filename != '-')
+            {
+                backdrops[i].buffer = (char*)skin_buffer_alloc(buf_size);
+                loaded = backdrops[i].buffer && 
+                         screens[screen].backdrop_load(filename, backdrops[i].buffer);
+                if (!loaded)
+                    retval = false;
+            }
+            if (backdrops[i].name[0] == '-' && loaded)
+                backdrops[i].name[2] = '.';
+        }
+    }
+    return retval;
+}
+
+void skin_backdrop_show(int backdrop_id)
+{
+    if (backdrop_id < 0)
+        return;
+    enum screen_type screen = backdrops[backdrop_id].screen;
+    if (backdrops[backdrop_id].name[0] == '-' &&
+        backdrops[backdrop_id].name[2] == '\0')
+        return;
+    if (backdrops[backdrop_id].buffer)
+        screens[screen].backdrop_show(backdrops[backdrop_id].buffer);
+}
+
+void skin_backdrop_unload(int backdrop_id)
+{
+    backdrops[backdrop_id].buffer = NULL;
+}
+
+void skin_backdrop_load_setting(void)
+{
+    int i;
+    char filename[MAX_PATH], dir[MAX_PATH];
+    for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
+    {
+        if (backdrops[i].name[0] == '-' && backdrops[i].screen == SCREEN_MAIN)
+        {
+            if (global_settings.backdrop_file[0] &&
+                global_settings.backdrop_file[0] != '-')
+            {
+                if (!backdrops[i].buffer)
+                    backdrops[i].buffer = (char*)skin_buffer_alloc(LCD_BACKDROP_BYTES);
+                snprintf(filename, sizeof filename, "%s/%s.bmp",
+                         get_user_file_path(BACKDROP_DIR, 0, dir, sizeof(dir)),
+                         global_settings.backdrop_file);
+                bool loaded = backdrops[i].buffer && 
+                              screens[SCREEN_MAIN].backdrop_load(filename,
+                                                            backdrops[i].buffer);
+                backdrops[i].name[2] = loaded ? '.' : '\0';
+                return;
+            }
+            else
+                backdrops[i].name[2] = '\0';
+        }
+    }
+}
+    
 #else
 
 void skin_backdrop_init(void)

@@ -50,10 +50,6 @@ int radio_current_preset(void);
 int radio_preset_count(void);
 const struct fmstation *radio_get_preset(int preset);
 
-/* skin functions */
-void fms_data_load(enum screen_type screen, const char *buf, bool isfile);
-void fms_skin_init(void);
-
 /* callbacks for the radio settings */
 void set_radio_region(int region);
 void toggle_mono_mode(bool mono);

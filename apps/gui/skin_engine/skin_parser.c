@@ -447,26 +447,27 @@ static int parse_image_special(struct skin_element *element,
 {
     (void)wps_data; /* kill warning */
     (void)token;
-    bool error = false;
 
 #if LCD_DEPTH > 1
+    char *filename;
     if (token->type == SKIN_TOKEN_IMAGE_BACKDROP)
     {
-        char *filename = element->params[0].data.text;
-        /* format: %X|filename.bmp| or %Xd */
-        if (!strcmp(filename, "d"))
+        if (isdefault(&element->params[0]))
         {
-            wps_data->backdrop = NULL;
-            return 0;
+            filename = "-";
         }
-        else if (!error)
+        else
         {
-            wps_data->backdrop = filename;
+            filename = element->params[0].data.text;
+            /* format: %X(filename.bmp) or %X(d) */
+            if (!strcmp(filename, "d"))
+                filename = NULL;
         }
+        wps_data->backdrop = filename;
     }
 #endif
-    /* Skip the rest of the line */
-    return error ? WPS_ERROR_INVALID_PARAM : 0;
+
+    return 0;
 }
 #endif
 
@@ -1010,6 +1011,8 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->progressbars = NULL;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    if (wps_data->backdrop_id >= 0)
+        skin_backdrop_unload(wps_data->backdrop_id);
     wps_data->backdrop = NULL;
 #endif
 #ifdef HAVE_TOUCHSCREEN
@@ -1128,23 +1131,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    /* Backdrop load scheme:
-     * 1) %X|filename|
-     * 2) load the backdrop from settings
-     */
-    if (wps_data->backdrop)
-    {
-        if (screens[curr_screen].depth == 1)
-        {
-            wps_data->backdrop = NULL;
-            return retval;
-        }
-        bool needed = wps_data->backdrop[0] != '-';
-        wps_data->backdrop = skin_backdrop_load(wps_data->backdrop,
-                                                bmpdir, curr_screen);
-        if (!wps_data->backdrop && needed)
-            retval = false;
-    }
+    wps_data->backdrop_id = skin_backdrop_assign(wps_data->backdrop, bmpdir, curr_screen);
 #endif /* has backdrop support */
     return retval;
 }
@@ -1575,6 +1562,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     wps_data->backdrop = "-";
+    wps_data->backdrop_id = -1;
 #endif
     /* parse the skin source */
     skin_buffer_save_position();

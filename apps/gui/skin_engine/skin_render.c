@@ -749,7 +749,8 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
     else
 #endif
     {
-        struct cuesheet *cue = gwps->state->id3 ? gwps->state->id3->cuesheet:NULL;
+        struct cuesheet *cue = skin_get_global_state()->id3 ? 
+                               skin_get_global_state()->id3->cuesheet : NULL;
         cur_pos = playlist_get_display_index();
         max = playlist_amount()+1;
         if (cue)

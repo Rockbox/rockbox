@@ -56,6 +56,7 @@
 #include "language.h"
 #endif
 #include "statusbar-skinned.h"
+#include "skin_engine/skin_engine.h"
 #include "debug.h"
 
 #define VPSTACK_DEPTH 16
@@ -118,7 +119,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-        screens[screen].backdrop_show(sb_get_backdrop(screen));
+        skin_backdrop_show(sb_get_backdrop(screen));
 #endif
         if (LIKELY(after_boot[screen]) && (!was_enabled[screen] || force))
         {

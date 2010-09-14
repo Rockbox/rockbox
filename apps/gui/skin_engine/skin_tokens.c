@@ -515,18 +515,18 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 }
 #endif
 
-static struct mp3entry* get_mp3entry_from_offset(struct gui_wps *gwps,
-                                                 int offset, char **filename)
+static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
 {
     struct mp3entry* pid3 = NULL;
-    struct cuesheet *cue = gwps->state->id3 ? gwps->state->id3->cuesheet:NULL;
+    struct wps_state *state = skin_get_global_state();
+    struct cuesheet *cue = state->id3 ? state->id3->cuesheet : NULL;
     const char *fname = NULL;
     if (cue && cue->curr_track_idx + offset < cue->track_count)
-        pid3 = gwps->state->id3;
+        pid3 = state->id3;
     else if (offset == 0)
-        pid3 = gwps->state->id3;
+        pid3 = state->id3;
     else if (offset == 1)
-        pid3 = gwps->state->nid3;
+        pid3 = state->nid3;
     else
     {
         static char filename_buf[MAX_PATH + 1];
@@ -568,7 +568,7 @@ const char *get_token_value(struct gui_wps *gwps,
         return NULL;
 
     struct wps_data *data = gwps->data;
-    struct wps_state *state = gwps->state;
+    struct wps_state *state = skin_get_global_state();
     struct mp3entry *id3; /* Think very carefully about using this. 
                              maybe get_id3_token() is the better place? */
     const char *out_text = NULL;
@@ -577,7 +577,7 @@ const char *get_token_value(struct gui_wps *gwps,
     if (!data || !state)
         return NULL;
 
-    id3 = get_mp3entry_from_offset(gwps, token->next? 1: offset, &filename);
+    id3 = get_mp3entry_from_offset(token->next? 1: offset, &filename);
     if (id3)
         filename = id3->path;
         

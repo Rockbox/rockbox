@@ -1017,7 +1017,7 @@ MENUITEM_FUNCTION(add_to_faves_item, MENU_FUNC_USEPARAM, ID2P(LANG_ADD_TO_FAVES)
 #if LCD_DEPTH > 1
 static bool set_backdrop(void)
 {
-    /* load the image */
+    /* load the image 
     if(sb_set_backdrop(SCREEN_MAIN, selected_file)) {
         splash(HZ, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file,
@@ -1026,7 +1026,10 @@ static bool set_backdrop(void)
     } else {
         splash(HZ, str(LANG_BACKDROP_FAILED));
         return false;
-    }
+    }*/
+    set_file(selected_file, (char *)global_settings.backdrop_file,
+        MAX_FILENAME);
+    skin_backdrop_load_setting();
     return true;
 }
 MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),

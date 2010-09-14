@@ -422,7 +422,7 @@ int radio_screen(void)
     {
         radio_load_presets(global_settings.fmr_file);
     }
-    fms_get(SCREEN_MAIN)->state->id3 = NULL;
+    skin_get_global_state()->id3 = NULL;
 #ifdef HAVE_ALBUMART
     radioart_init(true);
 #endif    
@@ -469,7 +469,7 @@ int radio_screen(void)
 #endif
     fms_fix_displays(FMS_ENTER);
     FOR_NB_SCREENS(i)
-        skin_update(fms_get(i), SKIN_REFRESH_ALL);
+        skin_update(FM_SCREEN, i, SKIN_REFRESH_ALL);
 
     if(radio_preset_count() < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         presets_scan(NULL);
@@ -800,7 +800,7 @@ int radio_screen(void)
             {
 #endif
                 FOR_NB_SCREENS(i)
-                    skin_update(fms_get(i), update_type);
+                    skin_update(FM_SCREEN, i, update_type);
             }
         }
         update_type = 0;
