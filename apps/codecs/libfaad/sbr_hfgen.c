@@ -206,7 +206,7 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
     /* A pre-shift of >>2 is needed to avoid overflow when multiply-adding
      * the FRACT-variables buffer -- FRACT part is 31 bits. After the
      * calculation has been finished the result 'ac.det' needs to be 
-     * post-shifted by <<(2*exp). */
+     * post-shifted by <<(4*exp). */
 
     for (j = offset; j < len + offset; j++)
     {
@@ -269,7 +269,7 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     /* A pre-shift of >>2 is needed to avoid overflow when multiply-adding
      * the FRACT-variables buffer -- FRACT part is 31 bits. After the
      * calculation has been finished the result 'ac.det' needs to be 
-     * post-shifted by <<(2*exp). */
+     * post-shifted by <<(4*exp). */
 
     temp2_r = (QMF_RE(buffer[offset-2][bd])) >> exp;
     temp2_i = (QMF_IM(buffer[offset-2][bd])) >> exp;
