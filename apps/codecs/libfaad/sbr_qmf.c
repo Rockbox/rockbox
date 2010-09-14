@@ -44,10 +44,10 @@
     #define FAAD_ANALYSIS_SCALE2(X) ((X))
     #define FAAD_ANALYSIS_SCALE3(X) ((X))
 #else
-    #define FAAD_SYNTHESIS_SCALE(X) ((X)*scale)
+    #define FAAD_SYNTHESIS_SCALE(X) ((X)/64.0f)
     #define FAAD_ANALYSIS_SCALE1(X) ((X))
-    #define FAAD_ANALYSIS_SCALE2(X) (2.*(X))
-    #define FAAD_ANALYSIS_SCALE3(X) ((X)/32.0)
+    #define FAAD_ANALYSIS_SCALE2(X) (2.0f*(X))
+    #define FAAD_ANALYSIS_SCALE3(X) ((X)/32.0f)
 #endif
 
 qmfa_info *qmfa_init(uint8_t channels)
@@ -403,9 +403,6 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 {
     ALIGN real_t x1[32];
     ALIGN real_t x2[32];
-#ifndef FIXED_POINT
-    real_t scale = 1.f/64.f;
-#endif
     int32_t n, k, idx0, idx1, out = 0;
     uint32_t l;
 
@@ -473,9 +470,6 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     ALIGN real_t imag2[32];
     qmf_t *pX;
     real_t *p_buf_1, *p_buf_3;
-#ifndef FIXED_POINT
-    real_t scale = 1.f/64.f;
-#endif
     int32_t n, k, idx0, idx1, out = 0;
     uint32_t l;
     
