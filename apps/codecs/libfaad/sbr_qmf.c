@@ -44,7 +44,7 @@
     #define FAAD_ANALYSIS_SCALE2(X) ((X))
     #define FAAD_ANALYSIS_SCALE3(X) ((X))
 #else
-    #define FAAD_ANALYSIS_SCALE1(X) ((X)*scale)
+    #define FAAD_SYNTHESIS_SCALE(X) ((X)*scale)
     #define FAAD_ANALYSIS_SCALE1(X) ((X))
     #define FAAD_ANALYSIS_SCALE2(X) (2.*(X))
     #define FAAD_ANALYSIS_SCALE3(X) ((X)/32.0)

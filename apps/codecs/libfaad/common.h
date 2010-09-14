@@ -95,11 +95,6 @@ extern struct codec_api* ci;
 /* Use if target platform has address generators with autoincrement */
 //#define PREFER_POINTERS
 
-#ifdef _WIN32_WCE
-#define FIXED_POINT
-#endif
-
-
 #define ERROR_RESILIENCE
 
 
@@ -328,7 +323,7 @@ char *strchr(), *strrchr();
       *y2 = MUL_F(x2, c1) - MUL_F(x1, c2);
   }
 
-
+/* rockbox: must be commented to build for non-FP
   #if defined(_WIN32) && !defined(__MINGW32__)
     #define HAS_LRINTF
     static INLINE int lrintf(float f)
@@ -355,7 +350,7 @@ char *strchr(), *strrchr();
         return i;
     }
   #endif
-
+*/
 
   #ifdef __ICL /* only Intel C compiler has fmath ??? */
 

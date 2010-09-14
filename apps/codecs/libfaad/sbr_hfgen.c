@@ -146,23 +146,15 @@ void hf_generation(sbr_info *sbr, qmf_t Xlow[MAX_NTSRHFG][64],
 #endif
 
 #ifdef SBR_LOW_POWER
-                    QMF_RE(Xhigh[l + offset][k]) =
-                        temp3_r
-                      +(MUL_R(a0_r, temp2_r) +
-                        MUL_R(a1_r, temp1_r));
+                    QMF_RE(Xhigh[l + offset][k]) = temp3_r +
+                                (MUL_R(a0_r, temp2_r) + MUL_R(a1_r, temp1_r));
 #else
-                    QMF_RE(Xhigh[l + offset][k]) =
-                        temp3_r
-                      +(MUL_R(a0_r, temp2_r) -
-                        MUL_R(a0_i, temp2_i) +
-                        MUL_R(a1_r, temp1_r) -
-                        MUL_R(a1_i, temp1_i));
-                    QMF_IM(Xhigh[l + offset][k]) =
-                        temp3_i
-                      +(MUL_R(a0_i, temp2_r) +
-                        MUL_R(a0_r, temp2_i) +
-                        MUL_R(a1_i, temp1_r) +
-                        MUL_R(a1_r, temp1_i));
+                    QMF_RE(Xhigh[l + offset][k]) = temp3_r +
+                                (MUL_R(a0_r, temp2_r) - MUL_R(a0_i, temp2_i) +
+                                 MUL_R(a1_r, temp1_r) - MUL_R(a1_i, temp1_i));
+                    QMF_IM(Xhigh[l + offset][k]) = temp3_i +
+                                (MUL_R(a0_i, temp2_r) + MUL_R(a0_r, temp2_i) +
+                                 MUL_R(a1_i, temp1_r) + MUL_R(a1_r, temp1_i));
 #endif
                 }
             } else {
@@ -199,6 +191,7 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
                              uint8_t bd, uint8_t len)
 {
     real_t r01 = 0, r02 = 0, r11 = 0;
+    real_t tmp1, tmp2;
     int8_t j;
     uint8_t offset = sbr->tHFAdj;
 #ifdef FIXED_POINT
@@ -233,12 +226,13 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
         r02 += MUL_R(buf_j  , buf_j_2);
         r11 += MUL_R(buf_j_1, buf_j_1);
     }
-    RE(ac->r12) = r01 -
-        MUL_R(((QMF_RE(buffer[len+offset-1][bd]))>>exp), ((QMF_RE(buffer[len+offset-2][bd]))>>exp)) +
-        MUL_R(((QMF_RE(buffer[    offset-1][bd]))>>exp), ((QMF_RE(buffer[    offset-2][bd]))>>exp));
-    RE(ac->r22) = r11 -
-        MUL_R(((QMF_RE(buffer[len+offset-2][bd]))>>exp), ((QMF_RE(buffer[len+offset-2][bd]))>>exp)) +
-        MUL_R(((QMF_RE(buffer[    offset-2][bd]))>>exp), ((QMF_RE(buffer[    offset-2][bd]))>>exp));
+    tmp1 = (QMF_RE(buffer[len+offset-1][bd]))>>exp;
+    tmp2 = (QMF_RE(buffer[    offset-1][bd]))>>exp;
+    RE(ac->r12) = r01 - MUL_R(tmp1, tmp1) + MUL_R(tmp2, tmp2);
+
+    tmp1 = (QMF_RE(buffer[len+offset-2][bd]))>>exp;
+    tmp2 = (QMF_RE(buffer[    offset-2][bd]))>>exp;
+    RE(ac->r22) = r11 - MUL_R(tmp1, tmp1) + MUL_R(tmp2, tmp2);
 #else
     for (j = offset; j < len + offset; j++)
     {
@@ -246,12 +240,13 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
         r02 += QMF_RE(buffer[j  ][bd]) * QMF_RE(buffer[j-2][bd]);
         r11 += QMF_RE(buffer[j-1][bd]) * QMF_RE(buffer[j-1][bd]);
     }
-    RE(ac->r12) = r01 -
-        QMF_RE(buffer[len+offset-1][bd]) * QMF_RE(buffer[len+offset-2][bd]) +
-        QMF_RE(buffer[    offset-1][bd]) * QMF_RE(buffer[    offset-2][bd]);
-    RE(ac->r22) = r11 -
-        QMF_RE(buffer[len+offset-2][bd]) * QMF_RE(buffer[len+offset-2][bd]) +
-        QMF_RE(buffer[    offset-2][bd]) * QMF_RE(buffer[    offset-2][bd]);
+    tmp1 = (QMF_RE(buffer[len+offset-1][bd]));
+    tmp2 = (QMF_RE(buffer[    offset-1][bd]));
+    RE(ac->r12) = r01 - tmp1*tmp1 + tmp2*tmp2;
+
+    tmp1 = (QMF_RE(buffer[len+offset-2][bd]));
+    tmp2 = (QMF_RE(buffer[    offset-2][bd]));
+    RE(ac->r22) = r11 - tmp1*tmp1 + tmp2*tmp2;
 #endif
     RE(ac->r01) = r01;
     RE(ac->r02) = r02;
@@ -313,30 +308,13 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
         r11r += MUL_R(temp2_r, temp2_r) + MUL_R(temp2_i, temp2_i);
     }
 
-    // These are actual values in temporary variable at this point
-    // temp1_r = (QMF_RE(buffer[len+offset-1-2][bd] + (1<<(exp-1))) >> exp;
-    // temp1_i = (QMF_IM(buffer[len+offset-1-2][bd] + (1<<(exp-1))) >> exp;
-    // temp2_r = (QMF_RE(buffer[len+offset-1-1][bd] + (1<<(exp-1))) >> exp;
-    // temp2_i = (QMF_IM(buffer[len+offset-1-1][bd] + (1<<(exp-1))) >> exp;
-    // temp3_r = (QMF_RE(buffer[len+offset-1][bd]) + (1<<(exp-1))) >> exp;
-    // temp3_i = (QMF_IM(buffer[len+offset-1][bd]) + (1<<(exp-1))) >> exp;
-    // temp4_r = (QMF_RE(buffer[offset-2][bd]) + (1<<(exp-1))) >> exp;
-    // temp4_i = (QMF_IM(buffer[offset-2][bd]) + (1<<(exp-1))) >> exp;
-    // temp5_r = (QMF_RE(buffer[offset-1][bd]) + (1<<(exp-1))) >> exp;
-    // temp5_i = (QMF_IM(buffer[offset-1][bd]) + (1<<(exp-1))) >> exp;
-
-    RE(ac->r12) = r01r -
-        (MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i)) +
-        (MUL_R(temp5_r, temp4_r) + MUL_R(temp5_i, temp4_i));
-    IM(ac->r12) = r01i -
-        (MUL_R(temp3_i, temp2_r) - MUL_R(temp3_r, temp2_i)) +
-        (MUL_R(temp5_i, temp4_r) - MUL_R(temp5_r, temp4_i));
-    RE(ac->r22) = r11r -
-        (MUL_R(temp2_r, temp2_r) + MUL_R(temp2_i, temp2_i)) +
-        (MUL_R(temp4_r, temp4_r) + MUL_R(temp4_i, temp4_i));
-
+    RE(ac->r12) = r01r - (MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i)) +
+                         (MUL_R(temp5_r, temp4_r) + MUL_R(temp5_i, temp4_i));
+    IM(ac->r12) = r01i - (MUL_R(temp3_i, temp2_r) - MUL_R(temp3_r, temp2_i)) +
+                         (MUL_R(temp5_i, temp4_r) - MUL_R(temp5_r, temp4_i));
+    RE(ac->r22) = r11r - (MUL_R(temp2_r, temp2_r) + MUL_R(temp2_i, temp2_i)) +
+                         (MUL_R(temp4_r, temp4_r) + MUL_R(temp4_i, temp4_i));
 #else
-
     temp2_r = QMF_RE(buffer[offset-2][bd]);
     temp2_i = QMF_IM(buffer[offset-2][bd]);
     temp3_r = QMF_RE(buffer[offset-1][bd]);
@@ -349,10 +327,10 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 
     for (j = offset; j < len + offset; j++)
     {
-        temp1_r = temp2_r; // temp1_r = QMF_RE(buffer[j-2][bd];
-        temp1_i = temp2_i; // temp1_i = QMF_IM(buffer[j-2][bd];
-        temp2_r = temp3_r; // temp2_r = QMF_RE(buffer[j-1][bd];
-        temp2_i = temp3_i; // temp2_i = QMF_IM(buffer[j-1][bd];
+        temp1_r = temp2_r;
+        temp1_i = temp2_i;
+        temp2_r = temp3_r;
+        temp2_i = temp3_i;
         temp3_r = QMF_RE(buffer[j][bd]);
         temp3_i = QMF_IM(buffer[j][bd]);
         r01r += temp3_r * temp2_r + temp3_i * temp2_i;
@@ -362,30 +340,13 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
         r11r += temp2_r * temp2_r + temp2_i * temp2_i;
     }
 
-    // These are actual values in temporary variable at this point
-    // temp1_r = QMF_RE(buffer[len+offset-1-2][bd];
-    // temp1_i = QMF_IM(buffer[len+offset-1-2][bd];
-    // temp2_r = QMF_RE(buffer[len+offset-1-1][bd];
-    // temp2_i = QMF_IM(buffer[len+offset-1-1][bd];
-    // temp3_r = QMF_RE(buffer[len+offset-1][bd]);
-    // temp3_i = QMF_IM(buffer[len+offset-1][bd]);
-    // temp4_r = QMF_RE(buffer[offset-2][bd]);
-    // temp4_i = QMF_IM(buffer[offset-2][bd]);
-    // temp5_r = QMF_RE(buffer[offset-1][bd]);
-    // temp5_i = QMF_IM(buffer[offset-1][bd]);
-
-    RE(ac->r12) = r01r -
-        (temp3_r * temp2_r + temp3_i * temp2_i) +
-        (temp5_r * temp4_r + temp5_i * temp4_i);
-    IM(ac->r12) = r01i -
-        (temp3_i * temp2_r - temp3_r * temp2_i) +
-        (temp5_i * temp4_r - temp5_r * temp4_i);
-    RE(ac->r22) = r11r -
-        (temp2_r * temp2_r + temp2_i * temp2_i) +
-        (temp4_r * temp4_r + temp4_i * temp4_i);
-
+    RE(ac->r12) = r01r - (temp3_r * temp2_r + temp3_i * temp2_i) +
+                         (temp5_r * temp4_r + temp5_i * temp4_i);
+    IM(ac->r12) = r01i - (temp3_i * temp2_r - temp3_r * temp2_i) +
+                         (temp5_i * temp4_r - temp5_r * temp4_i);
+    RE(ac->r22) = r11r - (temp2_r * temp2_r + temp2_i * temp2_i) +
+                         (temp4_r * temp4_r + temp4_i * temp4_i);
 #endif
-
     RE(ac->r01) = r01r;
     IM(ac->r01) = r01i;
     RE(ac->r02) = r02r;
