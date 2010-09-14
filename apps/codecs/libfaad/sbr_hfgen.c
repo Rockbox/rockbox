@@ -196,24 +196,17 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
     uint8_t offset = sbr->tHFAdj;
 #ifdef FIXED_POINT
     const real_t rel = FRAC_CONST(0.999999); // 1 / (1 + 1e-6f);
-    uint32_t maxi = 0;
-    uint32_t pow2, exp;
+    uint32_t exp = 2;
 #else
     const real_t rel = 1 / (1 + 1e-6f);
 #endif
 
 
 #ifdef FIXED_POINT
-    mask = 0;
-
-    for (j = (offset-2); j < (len + offset); j++)
-    {
-        real_t x;
-        x = QMF_RE(buffer[j][bd])>>REAL_BITS;
-        mask |= x ^ (x >> 31);
-    }
-
-    exp = wl_min_lzc(mask);
+    /* A pre-shift of >>2 is needed to avoid overflow when multiply-adding
+     * the FRACT-variables buffer -- FRACT part is 31 bits. After the
+     * calculation has been finished the result 'ac.det' needs to be 
+     * post-shifted by <<(2*exp). */
 
     for (j = offset; j < len + offset; j++)
     {
@@ -253,6 +246,9 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac,
     RE(ac->r11) = r11;
 
     ac->det = MUL_R(RE(ac->r11), RE(ac->r22)) - MUL_F(MUL_R(RE(ac->r12), RE(ac->r12)), rel);
+#ifdef FIXED_POINT
+    ac->det <<= (4*exp);
+#endif
 }
 #else
 static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTSRHFG][64],
@@ -262,7 +258,7 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     real_t temp1_r, temp1_i, temp2_r, temp2_i, temp3_r, temp3_i, temp4_r, temp4_i, temp5_r, temp5_i;
 #ifdef FIXED_POINT
     const real_t rel = FRAC_CONST(0.999999); // 1 / (1 + 1e-6f);
-    uint32_t mask, exp;
+    uint32_t exp = 2;
 #else
     const real_t rel = 1 / (1 + 1e-6f);
 #endif
@@ -270,18 +266,10 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     uint8_t offset = sbr->tHFAdj;
 
 #ifdef FIXED_POINT
-    mask = 0;
-
-    for (j = (offset-2); j < (len + offset); j++)
-    {
-        real_t x;
-        x = QMF_RE(buffer[j][bd])>>REAL_BITS;
-        mask |= x ^ (x >> 31);
-        x = QMF_IM(buffer[j][bd])>>REAL_BITS;
-        mask |= x ^ (x >> 31);
-    }
-
-    exp = wl_min_lzc(mask);
+    /* A pre-shift of >>2 is needed to avoid overflow when multiply-adding
+     * the FRACT-variables buffer -- FRACT part is 31 bits. After the
+     * calculation has been finished the result 'ac.det' needs to be 
+     * post-shifted by <<(2*exp). */
 
     temp2_r = (QMF_RE(buffer[offset-2][bd])) >> exp;
     temp2_i = (QMF_IM(buffer[offset-2][bd])) >> exp;
@@ -295,25 +283,25 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
 
     for (j = offset; j < len + offset; j++)
     {
-        temp1_r = temp2_r; // temp1_r = (QMF_RE(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
-        temp1_i = temp2_i; // temp1_i = (QMF_IM(buffer[offset-2][bd] + (1<<(exp-1))) >> exp;
-        temp2_r = temp3_r; // temp2_r = (QMF_RE(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
-        temp2_i = temp3_i; // temp2_i = (QMF_IM(buffer[offset-1][bd] + (1<<(exp-1))) >> exp;
+        temp1_r = temp2_r;
+        temp1_i = temp2_i;
+        temp2_r = temp3_r;
+        temp2_i = temp3_i;
         temp3_r = (QMF_RE(buffer[j][bd])) >> exp;
         temp3_i = (QMF_IM(buffer[j][bd])) >> exp;
-        r01r += MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i);
-        r01i += MUL_R(temp3_i, temp2_r) - MUL_R(temp3_r, temp2_i);
-        r02r += MUL_R(temp3_r, temp1_r) + MUL_R(temp3_i, temp1_i);
-        r02i += MUL_R(temp3_i, temp1_r) - MUL_R(temp3_r, temp1_i);
-        r11r += MUL_R(temp2_r, temp2_r) + MUL_R(temp2_i, temp2_i);
+        r01r += MUL_F(temp3_r, temp2_r) + MUL_F(temp3_i, temp2_i);
+        r01i += MUL_F(temp3_i, temp2_r) - MUL_F(temp3_r, temp2_i);
+        r02r += MUL_F(temp3_r, temp1_r) + MUL_F(temp3_i, temp1_i);
+        r02i += MUL_F(temp3_i, temp1_r) - MUL_F(temp3_r, temp1_i);
+        r11r += MUL_F(temp2_r, temp2_r) + MUL_F(temp2_i, temp2_i);
     }
 
-    RE(ac->r12) = r01r - (MUL_R(temp3_r, temp2_r) + MUL_R(temp3_i, temp2_i)) +
-                         (MUL_R(temp5_r, temp4_r) + MUL_R(temp5_i, temp4_i));
-    IM(ac->r12) = r01i - (MUL_R(temp3_i, temp2_r) - MUL_R(temp3_r, temp2_i)) +
-                         (MUL_R(temp5_i, temp4_r) - MUL_R(temp5_r, temp4_i));
-    RE(ac->r22) = r11r - (MUL_R(temp2_r, temp2_r) + MUL_R(temp2_i, temp2_i)) +
-                         (MUL_R(temp4_r, temp4_r) + MUL_R(temp4_i, temp4_i));
+    RE(ac->r12) = r01r - (MUL_F(temp3_r, temp2_r) + MUL_F(temp3_i, temp2_i)) +
+                         (MUL_F(temp5_r, temp4_r) + MUL_F(temp5_i, temp4_i));
+    IM(ac->r12) = r01i - (MUL_F(temp3_i, temp2_r) - MUL_F(temp3_r, temp2_i)) +
+                         (MUL_F(temp5_i, temp4_r) - MUL_F(temp5_r, temp4_i));
+    RE(ac->r22) = r11r - (MUL_F(temp2_r, temp2_r) + MUL_F(temp2_i, temp2_i)) +
+                         (MUL_F(temp4_r, temp4_r) + MUL_F(temp4_i, temp4_i));
 #else
     temp2_r = QMF_RE(buffer[offset-2][bd]);
     temp2_i = QMF_IM(buffer[offset-2][bd]);
@@ -353,7 +341,10 @@ static void auto_correlation(sbr_info *sbr, acorr_coef *ac, qmf_t buffer[MAX_NTS
     IM(ac->r02) = r02i;
     RE(ac->r11) = r11r;
 
-    ac->det = MUL_R(RE(ac->r11), RE(ac->r22)) - MUL_F(rel, (MUL_R(RE(ac->r12), RE(ac->r12)) + MUL_R(IM(ac->r12), IM(ac->r12))));
+    ac->det = MUL_F(RE(ac->r11), RE(ac->r22)) - MUL_F(rel, (MUL_F(RE(ac->r12), RE(ac->r12)) + MUL_F(IM(ac->r12), IM(ac->r12))));
+#ifdef FIXED_POINT
+    ac->det <<= (4*exp);
+#endif
 }
 #endif
 
