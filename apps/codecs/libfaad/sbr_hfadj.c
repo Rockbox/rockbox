@@ -156,10 +156,10 @@ static void estimate_current_envelope(sbr_info *sbr, sbr_hfadj_info *adj,
                 for (i = l_i + sbr->tHFAdj; i < u_i + sbr->tHFAdj; i++)
                 {
                     tmp  = QMF_RE(Xsbr[i][m + sbr->kx]);
-                    nrg += MUL_R(tmp, tmp);
+                    nrg += MUL_R(tmp, (tmp>>REAL_BITS));
 #ifndef SBR_LOW_POWER
                     tmp  = QMF_IM(Xsbr[i][m + sbr->kx]);
-                    nrg += MUL_R(tmp, tmp);
+                    nrg += MUL_R(tmp, (tmp>>REAL_BITS));
 #endif
                 }
 
@@ -192,10 +192,10 @@ static void estimate_current_envelope(sbr_info *sbr, sbr_hfadj_info *adj,
                         for (j = k_l; j < k_h; j++)
                         {
                             tmp  = QMF_RE(Xsbr[i][j]);
-                            nrg += MUL_R(tmp, tmp);
+                            nrg += MUL_R(tmp, (tmp>>REAL_BITS));
 #ifndef SBR_LOW_POWER
                             tmp  = QMF_IM(Xsbr[i][j]);
-                            nrg += MUL_R(tmp, tmp);
+                            nrg += MUL_R(tmp, (tmp>>REAL_BITS));
 #endif
                         }
                     }
