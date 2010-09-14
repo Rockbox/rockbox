@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "icon.h"
-
+#include "skin_engine/skin_engine.h"
 
 void sb_skin_data_load(enum screen_type screen, const char *buf, bool isfile);
 
