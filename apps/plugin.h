@@ -87,7 +87,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "scrollbar.h"
 #include "jpeg_load.h"
 #include "../recorder/bmp.h"
-#include "statusbar-skinned.h"
 #endif
 #include "statusbar.h"
 #include "menu.h"
