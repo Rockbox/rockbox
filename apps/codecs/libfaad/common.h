@@ -285,9 +285,10 @@ char *strchr(), *strrchr();
 
   #include <math.h>
 
-  #define MUL_R(A,B) ((A)*(B))
-  #define MUL_C(A,B) ((A)*(B))
-  #define MUL_F(A,B) ((A)*(B))
+  #define MUL_R(A,B)  ((A)*(B))
+  #define MUL_C(A,B)  ((A)*(B))
+  #define MUL_F(A,B)  ((A)*(B))
+  #define MUL_Q2(A,B) ((A)*(B))
 
   /* Complex multiplication */
   static INLINE void ComplexMult(real_t *y1, real_t *y2,
@@ -306,9 +307,10 @@ char *strchr(), *strrchr();
 
   typedef float real_t;
 
-  #define MUL_R(A,B) ((A)*(B))
-  #define MUL_C(A,B) ((A)*(B))
-  #define MUL_F(A,B) ((A)*(B))
+  #define MUL_R(A,B)  ((A)*(B))
+  #define MUL_C(A,B)  ((A)*(B))
+  #define MUL_F(A,B)  ((A)*(B))
+  #define MUL_Q2(A,B) ((A)*(B))
 
   #define REAL_CONST(A) ((real_t)(A))
   #define COEF_CONST(A) ((real_t)(A))
