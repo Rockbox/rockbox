@@ -2675,7 +2675,7 @@ fi
     t_model="vibe500"
     ;;
 
-   170|hd200)
+   170|mpiohd200)
     target_id=69
     modelname="mpiohd200"
     target="-DMPIO_HD200"
