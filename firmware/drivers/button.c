@@ -69,14 +69,14 @@ static bool remote_filter_first_keypress;
 static bool phones_present = false;
 #endif
 
-/* how long until repeat kicks in, in ticks */
-#define REPEAT_START      30
+/* how long until repeat kicks in, in centiseconds */
+#define REPEAT_START      (30*HZ/100)
 
-/* the speed repeat starts at, in ticks */
-#define REPEAT_INTERVAL_START   16
+/* the speed repeat starts at, in centiseconds */
+#define REPEAT_INTERVAL_START   (16*HZ/100)
 
-/* speed repeat finishes at, in ticks */
-#define REPEAT_INTERVAL_FINISH  5
+/* speed repeat finishes at, in centiseconds */
+#define REPEAT_INTERVAL_FINISH  (5*HZ/100)
 
 #ifdef HAVE_BUTTON_DATA
 static int button_read(int *data);
