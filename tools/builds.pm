@@ -289,7 +289,7 @@ $releasenotes="/wiki/ReleaseNotes36";
         name => 'Creative Zen Vision:M 60GB',
         status => 1,
     },
-    'hd200' => {
+    'mpiohd200' => {
         name => 'MPIO HD200',
         status => 2,
     },
