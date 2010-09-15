@@ -121,7 +121,8 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
             int max_blocksize = (buf[2] << 8) | buf[3];
             if (max_blocksize > MAX_BLOCKSIZE)
             {
-                LOGF("FLAC: Maximum blocksize is too large\n");
+                LOGF("FLAC: Maximum blocksize is too large (%d > %d)\n",
+                     max_blocksize, MAX_BLOCKSIZE);
                 return false;
             }
             fc->max_blocksize = max_blocksize;
