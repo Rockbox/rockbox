@@ -26,7 +26,6 @@
 void usb_drv_startup(void);
 void usb_drv_usb_detect_event(void); /* Target implemented */
 void usb_drv_int_enable(bool enable); /* Target implemented */
-void usb_drv_reset(void);
 void usb_drv_init(void);
 void usb_drv_exit(void);
 void usb_drv_attach(void);
