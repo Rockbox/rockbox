@@ -705,7 +705,7 @@ const char *get_token_value(struct gui_wps *gwps,
             if (intval)
                 *intval = playlist_amount();
             return buf;
-        
+#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_LIST_TITLE_TEXT:
             return sb_get_title(gwps->display->screen_type);
         case SKIN_TOKEN_LIST_TITLE_ICON:
@@ -713,7 +713,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 *intval = sb_get_icon(gwps->display->screen_type);
             snprintf(buf, buf_size, "%d",sb_get_icon(gwps->display->screen_type));
             return buf;
-
+#endif
         case SKIN_TOKEN_PLAYLIST_NAME:
             return playlist_name(NULL, buf, buf_size);
 

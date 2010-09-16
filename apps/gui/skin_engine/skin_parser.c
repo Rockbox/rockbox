@@ -1373,7 +1373,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     function = parse_statusbar_tags;
                     break;
                 case SKIN_TOKEN_LIST_TITLE_TEXT:
+#ifndef __PCTOOL__
                     sb_skin_has_title(curr_screen);
+#endif
                     break;
 #endif
                 case SKIN_TOKEN_FILE_DIRECTORY:
