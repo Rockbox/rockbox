@@ -42,73 +42,39 @@
 
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
-static int set_title_worker(char* title, enum themable_icons icon, 
-                            struct wps_data *data, struct skin_element *root)
-{
-    int retval = 0;
-    struct skin_element *element = root;
-    while (element)
-    {
-        struct wps_token *token = NULL;
-        if (element->type == CONDITIONAL)
-        {
-            struct conditional *cond = (struct conditional *)element->data;
-            token = cond->token;
-        }
-        else if (element->type == TAG)
-        {
-            token = (struct wps_token *)element->data;
-        }
-        if (token)
-        {
-            if (token->type == SKIN_TOKEN_LIST_TITLE_TEXT)
-            {
-                token->value.data = title;
-                retval = 1;
-            }
-            else if (token->type == SKIN_TOKEN_LIST_TITLE_ICON)
-            {
-                /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
-                token->value.i = icon+2;
-            }
-            else if (element->params_count)
-            {
-                int i;
-                for (i=0; i<element->params_count; i++)
-                {
-                    if (element->params[i].type == CODE)
-                        retval |= set_title_worker(title, icon, data, 
-                                                   element->params[i].data.code);
-                }
-            }
-        }
-        if (element->children_count)
-        {
-            int i;
-            for (i=0; i<element->children_count; i++)
-                retval |= set_title_worker(title, icon, data, element->children[i]);
-        }
-        element = element->next;
-    }
-    return retval;
-}
+
+static bool sbs_has_title[NB_SCREENS];
+static char* sbs_title[NB_SCREENS];
+static enum themable_icons sbs_icon[NB_SCREENS];
 
 bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
 {
-    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
-    bool retval = data->wps_loaded && 
-        set_title_worker(title, icon, data, data->tree) > 0;
-    return retval;
+    sbs_title[screen] = title;
+    /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */
+    sbs_icon[screen] = icon + 2;
+    return sbs_has_title[screen];
+}
+
+void sb_skin_has_title(enum screen_type screen)
+{
+    sbs_has_title[screen] = true;
+}
+
+const char* sb_get_title(enum screen_type screen)
+{
+    return sbs_has_title[screen] ? sbs_title[screen] : NULL;
+}
+enum themable_icons sb_get_icon(enum screen_type screen)
+{
+    return sbs_has_title[screen] ? sbs_icon[screen] : Icon_NOICON + 2;
 }
     
 int sb_preproccess(enum screen_type screen, struct wps_data *data)
 {
     (void)data;
-    /* We need to disable the theme here or else viewport_set_defaults() 
-     * (which is called in the viewport tag parser) will crash because
-     * the theme is enabled but sb_set_info_vp() isnt set untill after the sbs
-     * is parsed. This only affects the default viewport which is ignored
-     * int he sbs anyway */
+    int i;
+    FOR_NB_SCREENS(i)
+        sbs_has_title[i] = false;
     viewportmanager_theme_enable(screen, false, NULL);
     return 1;
 }

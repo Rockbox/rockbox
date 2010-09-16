@@ -57,6 +57,7 @@
 
 #include "wps_internals.h"
 #include "skin_engine.h"
+#include "statusbar-skinned.h"
 #include "root_menu.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
@@ -706,11 +707,11 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
         
         case SKIN_TOKEN_LIST_TITLE_TEXT:
-            return (char*)token->value.data;
+            return sb_get_title(gwps->display->screen_type);
         case SKIN_TOKEN_LIST_TITLE_ICON:
             if (intval)
-                *intval = token->value.i;
-            snprintf(buf, buf_size, "%d", token->value.i);
+                *intval = sb_get_icon(gwps->display->screen_type);
+            snprintf(buf, buf_size, "%d",sb_get_icon(gwps->display->screen_type));
             return buf;
 
         case SKIN_TOKEN_PLAYLIST_NAME:

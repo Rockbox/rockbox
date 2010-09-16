@@ -1372,6 +1372,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_DRAW_INBUILTBAR:
                     function = parse_statusbar_tags;
                     break;
+                case SKIN_TOKEN_LIST_TITLE_TEXT:
+                    sb_skin_has_title(curr_screen);
+                    break;
 #endif
                 case SKIN_TOKEN_FILE_DIRECTORY:
                     token->value.i = element->params[0].data.number;
