@@ -31,7 +31,8 @@ change to customise your listening experience.
   \opt{ipodvideo}{\\Remark: Lowering the volume below -57~dB will also affect the line-out 
   and the recording gain.}
   \opt{cowond2}{\\Remark: Lowering the volume below -57~dB will also affect the line-out.}
-  
+
+\nopt{gigabeats}{  
 \section{Bass}
   This setting emphasises
   \nopt{h100,h300}{or suppresses}
@@ -72,6 +73,66 @@ change to customise your listening experience.
   The setting has a range from 1 to 4, where a bigger number affects a smaller
   range of treble frequencies. The actual cutoff frequency used for each setting
   value will vary with sample rate.
+}
+}
+
+\opt{gigabeats}{
+\section{Tone Controls}
+  There is a five-band equalizer built into your \dap{} that allows you to
+  control various different parameters for each band.  This equalizer is
+  implemented in hardware, and therefore does not tax the processor when in use.
+  Rockbox also features a more advanced five-band equalizer (see
+  \reference{ref:EQ}) that is implemented in software and allows more fine
+  grained control, but also requires more processor time. 
+
+  \begin{description}
+  \item[Band 1 Gain.]
+        This band acts as a low shelf filter that boosts or lowers all
+        frequencies below a certain frequency limit, much as a ``bass''
+        control found on ordinary stereo systems does. The ``gain'' parameter
+        controls how much the loudness of the band is adjusted. Positive
+        numbers make the EQ band louder, while negative numbers make that EQ
+        band quieter.
+  \item[Bands 2-4 Gain.]
+        These bands act as peaking filters that boost or lower a frequency
+        range centered at a certain frequency. Graphic equalizers in home
+        stereos are usually peaking filters. The ``gain'' parameter controls
+        how much each band is adjusted as with the the low shelf filter.
+  \item[Band 5 Gain.]
+        Band 5 acts as a high shelf filter, boosting or lowering all
+        frequencies above a certain frequency limit, much like a ``treble''
+        control found on ordinary stereo systems does. As with the other bands,
+        ``gain'' controls how much each band is adjusted.
+  \item[Advanced Tone Control Settings.]
+        This submenu allows you to change advanced parameters for each band.
+  \end{description}
+  
+  As a general guide, EQ band 1 should be used for low frequencies, EQ bands 2
+  to 4 should be used for mids, and EQ band 5 should be used for highs.\\*
+
+  \subsection{Advanced Tone Control Settings}
+    As in the previous menu, the ``gain'' setting controls how much the
+    loudness of the band is adjusted.  In addition the following parameters
+    can be adjusted:  
+
+  \begin{description}
+    \item[Band 1 Frequency.]
+        The ``frequency'' parameter sets where the shelving starts to take
+        effect. For example, a cutoff frequency of 80~Hz will adjust only very
+        low frequencies. A cutoff frequency of 175~Hz, on the other hand, will
+        adjust a much wider range of bass frequencies.
+  \item[Bands 2-4 Frequency.]
+        The ``frequency'' parameter for these bands sets the centre frequency of
+        the range that is affected by the gain set.
+  \item[Bands 2-4 Width.]
+        This parameter sets the width of the range around the centre frequency
+        that is affected by the tone control. The possible settings are
+        ``wide'' or ``narrow''.
+  \item[Band 5 Frequency.]
+        This works just as for band 1 frequency, except that it affects the
+        high frequency end of the spectrum instead of the low.
+  \end{description}
+
 }
 
 \section{Balance}
@@ -265,15 +326,17 @@ change to customise your listening experience.
   \screenshot{configure_rockbox/images/ss-equalizer}{The graphical equalizer}{}
   Rockbox features a parametric equalizer (EQ). As the name suggests, a
   parametric EQ lets you control several different parameters for each
-  band of the EQ. In some ways the EQ is similar to the \setting{Bass}
-  and \setting{Treble} settings described earlier, but the EQ allows you to
-  control the sound much more carefully.\\
+  band of the EQ. \nopt{gigabeats}{In some ways the EQ is similar to the
+  \setting{Bass} and \setting{Treble} settings described earlier, but the EQ
+  allows you to control the sound much more carefully.} \opt{gigabeats}{The EQ
+  is similar to the \setting{Tone Controls} described above, but allows more
+  delicate control.}\\
 
   Rockbox's parametric EQ is composed of five different bands:
   \begin{description}
   \item[Band 0: Low shelf filter.]
         The low shelf filter boosts or lowers all frequencies below a certain
-        frequency limit, much like what a ``bass'' control found on ordinary
+        frequency limit, much as the ``bass'' control found on ordinary
         stereo systems does.
         Adjust the ``cutoff'' frequency parameter to decide where the shelving
         starts to take effect. For example, a cutoff frequency of 50~Hz will
@@ -301,7 +364,7 @@ change to customise your listening experience.
         frequencies.
   \item[Band 4: High shelf filter.]
         A high shelf filter boosts or lowers all frequencies above a certain
-        frequency limit, much like what a ``treble'' control found on ordinary
+        frequency limit, much as the ``treble'' control found on ordinary
         stereo systems does.
         The high shelf filter is adjusted the same way as the low shelf filter,
         except that it works on the high end of the frequency spectrum rather
