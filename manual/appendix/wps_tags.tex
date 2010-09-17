@@ -493,7 +493,27 @@ Example: \config{\%ax\%V(\dots)}
     & If / Else: Evaluate for true or false case \\
 \config{\%?xx<alt1|alt2|\tabnlindent{}alt3|\dots|else>}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
+\config{\%if(tag, operator, operand, [option count])}
+    & Allows very simple comparisons with other tags.\newline
+      \config{tag}: the tag to check against.\newline
+      \config{operator}: the comparison to perform - possible options are =, !=,
+        >, >=, <, <=\newline
+      \config{operand}: either a second tag, a number, or text.\newline
+      \config{[option count]}: optional parameter used to select which parameter
+        of a tag to use when the tag has multiple options, e.g. \%?pv<a|b|c|d>\\
 \end{tagmap}
+
+Examples of the \%if tag:\\
+
+\config{\%?if(\%pv, >=, 0)<Clipping possible|Volume OK>} will display ``Clipping
+  possible'' if the volume is higher than or equal to 0 dB, ``Volume OK'' if it
+  is lower.\\
+
+\config{\%?if(\%ia, =, \%Ia)<same artist>} -- this artist and the next artist
+  are the same.\\
+
+\note{When performing a comparison against a string tag such as \%ia, only = and
+  != work, and the comparison is not case sensitive.}
 
 \section{Subline Tags}
 
