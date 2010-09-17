@@ -104,7 +104,7 @@ MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
 
-#ifdef HAVE_PIUTCHSCREEN
+#ifdef HAVE_PITCHSCREEN
 static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 {
     switch (action)
