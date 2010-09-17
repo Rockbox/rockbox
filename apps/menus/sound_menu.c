@@ -104,6 +104,7 @@ MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
 
+#ifdef HAVE_PIUTCHSCREEN
 static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 {
     switch (action)
@@ -118,6 +119,8 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 }
     MENUITEM_SETTING(timestretch_enabled,
                      &global_settings.timestretch_enabled, timestretch_callback);
+#endif
+
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, lowlatency_callback);
 
@@ -178,7 +181,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
+#ifdef HAVE_PITCHSCREEN
           ,&timestretch_enabled
+#endif
           ,&compressor_menu
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

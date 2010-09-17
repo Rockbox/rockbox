@@ -364,7 +364,9 @@ struct user_settings
     int  keyclick;          /* keyclick volume */
     int  keyclick_repeats;  /* keyclick on repeats */
     bool dithering_enabled;
+#ifdef HAVE_PITCHSCREEN
     bool timestretch_enabled;
+#endif
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_RECORDING

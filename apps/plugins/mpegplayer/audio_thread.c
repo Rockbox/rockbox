@@ -483,7 +483,9 @@ static void audio_thread(void)
 
     td.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
                                                     CODEC_IDX_AUDIO);
+#ifdef HAVE_PITCHSCREEN
     rb->sound_set_pitch(PITCH_SPEED_100);
+#endif
     rb->dsp_configure(td.dsp, DSP_RESET, 0);
     rb->dsp_configure(td.dsp, DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
 

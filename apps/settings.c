@@ -992,7 +992,9 @@ void settings_apply(bool read_disk)
     }
 
     dsp_dither_enable(global_settings.dithering_enabled);
+#ifdef HAVE_PITCHSCREEN
     dsp_timestretch_enable(global_settings.timestretch_enabled);
+#endif
     dsp_set_compressor(global_settings.compressor_threshold,
                        global_settings.compressor_makeup_gain,
                        global_settings.compressor_ratio,

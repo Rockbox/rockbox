@@ -216,7 +216,9 @@ static int treble;                                  /* A/V */
 #endif
 
 /* Settings applicable to audio codec only */
+#ifdef HAVE_PITCHSCREEN
 static int32_t  pitch_ratio = PITCH_SPEED_100;
+#endif
 static int  channels_mode;
        long dsp_sw_gain;
        long dsp_sw_cross;
@@ -240,12 +242,14 @@ static bool crossfeed_enabled;
 
 #define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
 
+#ifdef HAVE_PITCHSCREEN
 static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
 static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
 
 static int32_t *big_sample_buf = NULL;
 static int32_t *big_resample_buf = NULL;
 static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
+#endif
 
 static int sample_buf_count;
 static int32_t *sample_buf;
@@ -274,6 +278,7 @@ static inline int32_t clip_sample_16(int32_t sample)
     return sample;
 }
 
+#ifdef HAVE_PITCHSCREEN
 int32_t sound_get_pitch(void)
 {
     return pitch_ratio;
@@ -347,6 +352,7 @@ bool dsp_timestretch_available()
 {
     return (global_settings.timestretch_enabled && big_sample_buf_count > 0);
 }
+#endif
 
 /* Convert count samples to the internal format, if needed.  Updates src
  * to point past the samples "consumed" and dst is set to point to the
@@ -1225,8 +1231,10 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
         dsp->input_samples(samples, src, tmp);
 
+#ifdef HAVE_PITCHSCREEN
         if (dsp->tdspeed_active)
             samples = tdspeed_doit(tmp, samples);
+#endif
         
         int chunk_offset = 0;
         while (samples > 0)
@@ -1294,8 +1302,10 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 /* dsp_input_size MUST be called afterwards */
 int dsp_output_count(struct dsp_config *dsp, int count)
 {
+#ifdef HAVE_PITCHSCREEN
     if (dsp->tdspeed_active)
         count = tdspeed_est_output_size();
+#endif
     if (dsp->resample)
     {
         count = (int)(((unsigned long)count * NATIVE_FREQUENCY
@@ -1329,8 +1339,10 @@ int dsp_input_count(struct dsp_config *dsp, int count)
                       dsp->data.resample_data.delta) >> 16);
     }
 
+#ifdef HAVE_PITCHSCREEN
     if (dsp->tdspeed_active)
         count = tdspeed_est_input_size(count);
+#endif
 
     return count;
 }
@@ -1373,13 +1385,17 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
          */
+#ifdef HAVE_PITCHSCREEN
         if (dsp == &AUDIO_DSP)
             dsp->frequency = pitch_ratio * dsp->codec_frequency / PITCH_SPEED_100;
         else
+#endif
             dsp->frequency = dsp->codec_frequency;
 
         resampler_new_delta(dsp);
+#ifdef HAVE_PITCHSCREEN
         tdspeed_setup(dsp);
+#endif
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
@@ -1409,7 +1425,9 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         dsp->stereo_mode = value;
         dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
         dsp_update_functions(dsp);
+#ifdef HAVE_PITCHSCREEN
         tdspeed_setup(dsp);
+#endif
         break;
 
     case DSP_RESET:
@@ -1434,7 +1452,9 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
         dsp_update_functions(dsp);
         resampler_new_delta(dsp);
+#ifdef HAVE_PITCHSCREEN
         tdspeed_setup(dsp);
+#endif
         if (dsp == &AUDIO_DSP)
             release_gain = UNITY;
         break;
@@ -1444,7 +1464,9 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
                sizeof (dsp->data.resample_data));
         resampler_new_delta(dsp);
         dither_init(dsp);
+#ifdef HAVE_PITCHSCREEN
         tdspeed_setup(dsp);
+#endif
         if (dsp == &AUDIO_DSP)
             release_gain = UNITY;
         break;

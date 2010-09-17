@@ -678,8 +678,8 @@ struct plugin_api {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-    (CONFIG_CODEC == SWCODEC)
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
+     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHSCREEN)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
 

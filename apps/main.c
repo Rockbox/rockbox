@@ -399,7 +399,7 @@ static void init(void)
 #endif /* CONFIG_CODEC != SWCODEC */
 
     scrobbler_init();
-#if CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC && defined (HAVE_PITCHSCREEN)
     tdspeed_init();
 #endif /* CONFIG_CODEC == SWCODEC */
 
@@ -663,7 +663,7 @@ static void init(void)
     tree_mem_init();
     filetype_init();
     scrobbler_init();
-#if CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC && defined (HAVE_PITCHSCREEN)
     tdspeed_init();
 #endif /* CONFIG_CODEC == SWCODEC */
     theme_init_buffer();

@@ -120,7 +120,7 @@ char* get_dir(char* buf, int buf_size, const char* path, int level)
     return buf;
 }
 
-#if (CONFIG_CODEC != MAS3507D)
+#if (CONFIG_CODEC != MAS3507D) && defined (HAVE_PITCHSCREEN)
 /* A helper to determine the enum value for pitch/speed.
 
    When there are two choices (i.e. boolean), return 1 if the value is
@@ -1141,7 +1141,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif  /* (CONFIG_CODEC == SWCODEC) */
 
-#if (CONFIG_CODEC != MAS3507D)
+#if (CONFIG_CODEC != MAS3507D) && defined (HAVE_PITCHSCREEN)
         case SKIN_TOKEN_SOUND_PITCH:
         {
             int32_t pitch = sound_get_pitch();
@@ -1156,7 +1156,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 
-#if CONFIG_CODEC == SWCODEC
+#if (CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHSCREEN)
     case SKIN_TOKEN_SOUND_SPEED:
     {
         int32_t pitch = sound_get_pitch();

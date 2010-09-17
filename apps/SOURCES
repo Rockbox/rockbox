@@ -157,7 +157,9 @@ codec_thread.c
 playback.c
 codecs.c
 dsp.c
+#ifdef HAVE_PITCHSCREEN
 tdspeed.c
+#endif
 #ifdef HAVE_RECORDING
 enc_config.c
 recorder/pcm_record.c

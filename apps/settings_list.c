@@ -1371,9 +1371,11 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
 
+#ifdef HAVE_PITCHSCREEN
     /* timestretch */
     OFFON_SETTING(F_SOUNDSETTING, timestretch_enabled, LANG_TIMESTRETCH, false,
                   "timestretch enabled", dsp_timestretch_enable),
+#endif
 
     /* compressor */
     INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_threshold,
