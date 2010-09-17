@@ -364,7 +364,9 @@ void pcm_set_frequency(unsigned int samplerate)
     int index;
 
 #ifdef CONFIG_SAMPR_TYPES
+#ifdef HAVE_RECORDING
     unsigned int type = samplerate & SAMPR_TYPE_MASK;
+#endif
     samplerate &= ~SAMPR_TYPE_MASK;
 
 #ifdef HAVE_RECORDING

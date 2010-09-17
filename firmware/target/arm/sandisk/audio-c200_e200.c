@@ -45,8 +45,12 @@ void audio_set_output_source(int source)
 void audio_input_mux(int source, unsigned flags)
 {
     static int last_source = AUDIO_SRC_PLAYBACK;
+#ifdef HAVE_RECORDING
     static bool last_recording = false;
     bool recording = flags & SRCF_RECORDING;
+#else
+    (void) flags;
+#endif
 
     switch (source)
     {
@@ -56,11 +60,16 @@ void audio_input_mux(int source, unsigned flags)
             audio_channels = 2;
             if (source != last_source)
             {
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
                 audiohw_set_monitor(false);
+#endif
+#ifdef HAVE_RECORDING
                 audiohw_disable_recording();
+#endif
             }
             break;
 
+#if defined(HAVE_RECORDING) && (INPUT_SRC_CAPS & SRC_CAP_MIC)
         case AUDIO_SRC_MIC:             /* recording only */
             audio_channels = 1;
             if (source != last_source)
@@ -69,26 +78,39 @@ void audio_input_mux(int source, unsigned flags)
                 audiohw_enable_recording(true);  /* source mic */
             }
             break;
+#endif
 
+#if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             audio_channels = 2;
 
-            if (source == last_source && recording == last_recording)
+            if (source == last_source
+#ifdef HAVE_RECORDING
+                    && recording == last_recording
+#endif
+                )
                 break;
 
+#ifdef HAVE_RECORDING
             last_recording = recording;
-
             if (recording)
             {
                 audiohw_set_monitor(false);
                 audiohw_enable_recording(false);
             }
+#endif
             else
             {
+#ifdef HAVE_RECORDING
                 audiohw_disable_recording();
+#endif
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
                 audiohw_set_monitor(true); /* line 1 analog audio path */
+#endif
+
             }
             break;
+#endif /* (INPUT_SRC_CAPS & SRC_CAP_FMRADIO) */
     } /* end switch */
 
     last_source = source;
@@ -164,6 +186,7 @@ void audiohw_set_sampr_dividers(int fsel)
     IISDIV = (IISDIV & ~0xc000003f) | regvals[fsel].iisdiv;
 }
 
+#ifdef HAVE_RECORDING
 unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate)
 {
     /* Check if the samplerate is in the list of recordable rates.
@@ -175,3 +198,4 @@ unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate)
 
     return samplerate * 2; /* Recording rates are 1/2 the codec clock */
 }
+#endif
