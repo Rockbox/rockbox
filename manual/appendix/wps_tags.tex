@@ -3,6 +3,9 @@
 Themeing is discussed in detail in section \reference{ref:ConfiguringtheWPS},
 what follows is a list of the available tags.
 
+\note{The ``bar-type tags'' (such as \%pb, \%pv, \%bl etc.) can be further
+  themed -- see \reference{ref:bar_tags}.}
+
 \section{Status Bar}
 \begin{tagmap}
   \config{\%we} & Display Status Bar\\
@@ -624,6 +627,38 @@ Example:
   use a 1 second timeout.  It can also be used as a conditional, and can be
   used with conditional viewports.
 }
+
+\section{\label{ref:bar_tags}Bar Tags}
+  Some tags can be used to display a bar which draws according to the value of
+  the tag. To use these tags like a bar you need to use the following parameters
+  (\%XX should be replaced with the actual tag).
+
+\begin{tagmap}
+  \config{\%XX(x, y, width, filename, [options])}
+    & Draw the specified tag as a bar\newline
+      \config{x}: x co-ordinate at which to start drawing the bar.\newline
+      \config{y}: y co-ordinate at which to start drawing the bar.\newline
+      \config{width}: width of the bar (- for the full viewport width).\newline
+      \config{height}: height of the bar (- to set to the font height for
+        horizontal bars and to the viewport height for vertical bars).\newline
+      \config{options}: any of the options set out below.\\
+\end{tagmap}
+
+\subsection{Options}
+\begin{description}
+  \item[horizontal] -- force the bar to be drawn horizontally.
+  \item[vertical] -- force the bar to be drawn vertically.
+  \item[invert] -- invert the draw direction (i.e. right to left, or top to
+    bottom).
+  \item[slider] -- draw an preloaded image over the top of the bar. This must be
+    followed by the label of the desired image.
+  \item[nofill] -- don't draw the fill bar, only the empty image (for the
+    desired effect use with the ``slider'' option).
+\end{description}
+
+Example: \config{\%pb(0,0,-,-,-,nofill, slider, slider\_image, invert)} -- draw
+a horizontal progressbar which doesn't fill and draws the image
+``slider\_image'' which moves right to left.
 
 \section{Other Tags}
 \begin{tagmap}
