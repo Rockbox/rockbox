@@ -164,6 +164,7 @@ QString System::osVersionString(void)
 {
     QString result;
 #if defined(Q_OS_WIN32)
+    SYSTEM_INFO sysinfo;
     OSVERSIONINFO osvi;
     ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -175,14 +176,22 @@ QString System::osVersionString(void)
             .arg(QString::fromWCharArray(osvi.szCSDVersion));
     else
         result += QString("build %1").arg(osvi.dwBuildNumber);
+    result += QString("<br/>CPU: %1, %2 processor(s)").arg(sysinfo.dwProcessorType)
+              .arg(sysinfo.dwNumberOfProcessors);
 #endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     struct utsname u;
     int ret;
     ret = uname(&u);
 
-    result = QString("CPU: %1<br/>System: %2<br/>Release: %3<br/>Version: %4")
-        .arg(u.machine).arg(u.sysname).arg(u.release).arg(u.version);
+#if defined(Q_OS_MACX)
+    ItemCount cores = MPProcessors();
+#else
+    long cores = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+    result = QString("CPU: %1, %2 processor(s)").arg(u.machine).arg(cores);
+    result += QString("<br/>System: %2<br/>Release: %3<br/>Version: %4")
+        .arg(u.sysname).arg(u.release).arg(u.version);
 #if defined(Q_OS_MACX)
     SInt32 major;
     SInt32 minor;
