@@ -169,6 +169,7 @@ QString System::osVersionString(void)
     ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osvi);
+    GetSystemInfo(&sysinfo);
 
     result = QString("Windows version %1.%2, ").arg(osvi.dwMajorVersion).arg(osvi.dwMinorVersion);
     if(osvi.szCSDVersion)
