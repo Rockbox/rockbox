@@ -137,11 +137,8 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
     int defSong = 0;
     int numChannels = 1;
     int durations[MAX_SONGS];
-    int loops[MAX_SONGS];
-    for (i = 0; i < MAX_SONGS; i++) {
+    for (i = 0; i < MAX_SONGS; i++)
         durations[i] = -1;
-        loops[i] = 0;
-    }
     
     /* use id3v2 buffer for our strings */
     char* buffer = id3->id3v2buf;
@@ -225,10 +222,7 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
             int durationTemp = ASAP_ParseDuration(p);
             if (durationTemp < 0 || duration_index >= MAX_SONGS)
                 return false;
-            durations[duration_index] = durationTemp;
-            if (strstr(p, "LOOP") != NULL)
-                loops[duration_index] = 1;
-            duration_index++;
+            durations[duration_index++] = durationTemp;
         }
     }    
     
