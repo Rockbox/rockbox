@@ -2399,13 +2399,11 @@ int playlist_shuffle(int random_seed, int start_index)
 {
     struct playlist_info* playlist = &current_playlist;
 
-    unsigned int seek_pos = 0;
     bool start_current = false;
 
     if (start_index >= 0 && global_settings.play_selected)
     {
         /* store the seek position before the shuffle */
-        seek_pos = playlist->indices[start_index];
         playlist->index = playlist->first_index = start_index;
         start_current = true;
     }
