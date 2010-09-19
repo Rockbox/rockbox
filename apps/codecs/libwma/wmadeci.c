@@ -595,15 +595,14 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
 
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
 {
-    fixed32 wdel, a, b, temp, temp2;
+    fixed32 wdel, a, b, temp2;
     int i, m;
 
-    wdel = fixdiv32(M_PI_F, itofix32(frame_len));
-    temp = fixdiv32(itofix32(1),     itofix32(frame_len));
+    wdel = fixdiv32(itofix32(1),     itofix32(frame_len));
     for (i=0; i<frame_len; ++i)
     {
         /* TODO: can probably reuse the trig_init values here */
-        fsincos((temp*i)<<15, &temp2);
+        fsincos((wdel*i)<<15, &temp2);
         /* get 3 bits headroom + 1 bit from not doubleing the values */
         s->lsp_cos_table[i] = temp2>>3;
 
@@ -637,7 +636,7 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
                              fixed32 *lsp)
 {
     int i, j;
-    fixed32 p, q, w, v, val_max, temp, temp2;
+    fixed32 p, q, w, v, val_max, temp2;
 
     val_max = 0;
     for(i=0;i<n;++i)
@@ -654,7 +653,6 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
         {
             /* w is 5.27 format, lsp is in 16.16, temp2 becomes 5.27 format */
             temp2 = ((w - (lsp[j - 1]<<11)));
-            temp = q;
 
             /* q is 16.16 format, temp2 is 5.27, q becomes 16.16 */
             q = fixmul32b(q, temp2 )<<4;
