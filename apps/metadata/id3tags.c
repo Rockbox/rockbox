@@ -655,7 +655,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
     int buffersize = sizeof(entry->id3v2buf);
     unsigned char global_flags;
     int flags;
-    int skip;
     bool global_unsynch = false;
     bool unsynch = false;
     int i, j;
@@ -787,8 +786,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
 
         if(flags)
         {
-            skip = 0;
-
             if (version >= ID3_VER_2_4) {
                 if(flags & 0x0040) { /* Grouping identity */
                     lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
