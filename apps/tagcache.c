@@ -680,7 +680,7 @@ static bool open_files(struct tagcache_search *tcs, int tag)
 
         snprintf(fn, sizeof fn, TAGCACHE_FILE_INDEX, tag);
         file = get_user_file_path(fn, IS_FILE | NEED_WRITE, path, sizeof(path));
-        tcs->idxfd[tag] = open(fn, O_RDONLY);
+        tcs->idxfd[tag] = open(file, O_RDONLY);
     }
     
     if (tcs->idxfd[tag] < 0)
