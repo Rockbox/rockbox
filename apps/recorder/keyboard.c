@@ -453,7 +453,6 @@ int kbd_input(char* text, int buflen)
         const int button_screen = 0;
 #endif
         struct keyboard_parameters *pm;
-        struct screen *sc;
 
         state.len_utf8 = utf8length(state.text);
 
@@ -492,10 +491,12 @@ int kbd_input(char* text, int buflen)
         button_screen = (get_action_statuscode(NULL) & ACTION_REMOTE) ? 1 : 0;
 #endif
         pm = &param[button_screen];
-        sc = &screens[button_screen];
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
+        {
+            struct screen *sc = &screens[button_screen];
             button = keyboard_touchscreen(pm, sc, &state);
+        }
 #endif
 
         /* Remap some buttons to allow to move
