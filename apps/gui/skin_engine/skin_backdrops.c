@@ -63,12 +63,6 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
         filename[1] = '\0';
         filename[2] = '\0'; /* we check this later to see if we actually have an
                                image to load. != '\0' means display the image */
-#if NB_SCREENS > 1
-        if (screen == SCREEN_REMOTE)
-        {
-            filename[0] = '\0';
-        }
-#endif
     }
     else
     {
@@ -150,8 +144,8 @@ void skin_backdrop_show(int backdrop_id)
     enum screen_type screen = backdrops[backdrop_id].screen;
     if (backdrops[backdrop_id].name[0] == '-' &&
         backdrops[backdrop_id].name[2] == '\0')
-        return;
-    if (backdrops[backdrop_id].buffer)
+        screens[screen].backdrop_show(NULL);
+    else if (backdrops[backdrop_id].buffer)
         screens[screen].backdrop_show(backdrops[backdrop_id].buffer);
 }
 
@@ -185,6 +179,13 @@ void skin_backdrop_load_setting(void)
             else
                 backdrops[i].name[2] = '\0';
         }
+#if NB_SCREENS > 1
+        else if (backdrops[i].name[0] == '-')
+        {
+            backdrops[i].name[2] = '\0';
+            return;
+        }
+#endif
     }
 }
     
