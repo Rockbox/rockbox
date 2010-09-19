@@ -353,7 +353,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
     unsigned long header;
     long bytecount;
     int num_offsets;
-    int frames_per_entry;
     int i;
     long offset;
     int j;
@@ -527,13 +526,13 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         /* We don't parse the TOC, since we don't yet know how to (FIXME) */
         num_offsets = bytes2int(0, 0, vbrheader[18], vbrheader[19]);
-        frames_per_entry = bytes2int(0, 0, vbrheader[24], vbrheader[25]);
         DEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
                info->bitrate, info->frame_size, info->frame_size);
         DEBUGF("Frame count: %lx\n", info->frame_count);
         DEBUGF("Byte count: %lx\n", info->byte_count);
         DEBUGF("Offsets: %d\n", num_offsets);
-        DEBUGF("Frames/entry: %d\n", frames_per_entry);
+        DEBUGF("Frames/entry: %d\n",
+                bytes2int(0, 0, vbrheader[24], vbrheader[25]));
 
         offset = 0;
 
