@@ -36,7 +36,7 @@ enum {
 void radio_load_presets(char *filename);
 void radio_save_presets(void);
 void radio_init(void) INIT_ATTR;
-int radio_screen(void);
+void radio_screen(void);
 void radio_start(void);
 void radio_pause(void);
 void radio_stop(void);
