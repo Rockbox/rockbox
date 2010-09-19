@@ -322,7 +322,7 @@
          <item>
           <widget class="QCheckBox" name="cacheOfflineMode">
            <property name="toolTip">
-            <string>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</string>
+            <string>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</string>
            </property>
            <property name="text">
             <string>O&amp;ffline mode</string>

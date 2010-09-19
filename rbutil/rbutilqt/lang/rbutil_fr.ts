@@ -1176,11 +1176,11 @@ Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translat
     </message>
     <message>
         <location filename="../configurefrm.ui" line="325"/>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Ceci essaiera d&apos;utiliser toutes les informations du cache, même les informations de mise à jour.
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Ceci essaiera d&apos;utiliser toutes les informations du cache, même les informations de mise à jour.
 Utilisez cette option si vous voulez installer sans connexion réseau.
 Note : l&apos;installation que vous voudrez réaliser plus tard doit d&apos;abord être faite avec un accès réseau
-pour télécharger tous les fichiers néecessaires dans le cache.</translation>
+pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="328"/>

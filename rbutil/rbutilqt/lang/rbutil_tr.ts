@@ -1161,8 +1161,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="325"/>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Bu se�enek, g�ncellemeler dahil t�m bilgilerin �nbellekten alinmasini saglar. Bu se�enegi sadece ag baglantisi olmadan kurulum yapmak i�in kullanin. Not: Daha sonra ag baglantisiyla ayni kurulumu yapmak i�in gerekli t�m dosyalari �nbellege indirmeniz gerekmektedir.</translation>
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Bu se�enek, g�ncellemeler dahil t�m bilgilerin �nbellekten alinmasini saglar. Bu se�enegi sadece ag baglantisi olmadan kurulum yapmak i�in kullanin. Not: Daha sonra ag baglantisiyla ayni kurulumu yapmak i�in gerekli t�m dosyalari �nbellege indirmeniz gerekmektedir.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="328"/>

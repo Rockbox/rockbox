@@ -1159,8 +1159,8 @@ You need to change your player to UMS mode for installation. </source>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="325"/>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>所有资料, 包括更新资料, 将会从本机缓冲里拿取. 不要选择此模式如果你不需要下线安装. 注意: 你需要先用网络做至少一次安装才可以下载到需要的文件.</translation>
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;所有资料, 包括更新资料, 将会从本机缓冲里拿取. 不要选择此模式如果你不需要下线安装. 注意: 你需要先用网络做至少一次安装才可以下载到需要的文件.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="328"/>

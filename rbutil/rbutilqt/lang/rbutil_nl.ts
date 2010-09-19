@@ -1171,10 +1171,10 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="325"/>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates.
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates.
 Gebruik enkel deze optie als u wilt installeren zonder netwerk verbinding.
-Pas op: u moet eerst deze installatie doen met een internet verbinding om ze later opnieuw te kunnen uitvoeren vanuit cache.</translation>
+Pas op: u moet eerst deze installatie doen met een internet verbinding om ze later opnieuw te kunnen uitvoeren vanuit cache.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="328"/>

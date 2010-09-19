@@ -941,8 +941,8 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation>Отключить локальный кэш &amp;скачивания</translation>
     </message>
     <message>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Эта функция попытается использовать всю информацию из кэша, даже информацию об обновлениях. Используйте эту возможность только если вы хотите устанавливать без подключения к сети. Примечание: Вам необходимо выполнить такую-же установку, которую вы хотите выполнить потом, пока подключение к сети действует, чтобы загрузить все нужные файлы в кэш.</translation>
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Эта функция попытается использовать всю информацию из кэша, даже информацию об обновлениях. Используйте эту возможность только если вы хотите устанавливать без подключения к сети. Примечание: Вам необходимо выполнить такую-же установку, которую вы хотите выполнить потом, пока подключение к сети действует, чтобы загрузить все нужные файлы в кэш.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>O&amp;ffline mode</source>

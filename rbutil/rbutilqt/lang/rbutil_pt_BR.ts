@@ -941,8 +941,8 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
         <translation>&amp;Desabilitar cache local de transferência</translation>
     </message>
     <message>
-        <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Isto tentará usar toda a informação do cache, incluindo informação de atualizações. Somente use esta opção se você quer instalar sem uma conecção de rede. Nota: primeiro você precisa fazer a mesma instalação que você quer efetuar posteriormente, com acesso a rede para que sejam transferidos para o cache todos os arquivos necessários.</translation>
+        <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Isto tentará usar toda a informação do cache, incluindo informação de atualizações. Somente use esta opção se você quer instalar sem uma conecção de rede. Nota: primeiro você precisa fazer a mesma instalação que você quer efetuar posteriormente, com acesso a rede para que sejam transferidos para o cache todos os arquivos necessários.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>O&amp;ffline mode</source>
