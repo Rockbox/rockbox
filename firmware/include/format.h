@@ -22,7 +22,7 @@
 #ifndef __FORMAT_H__
 #define __FORMAT_H__
 
-int format(
+void format(
     /* call 'push()' for each output letter */
     int (*push)(void *userp, unsigned char data),
     void *userp,
@@ -31,7 +31,7 @@ int format(
 
 /* callback function is called for every output character (byte) with userp and
  * should return 0 when ch is a char other than '\0' that should stop printing */
-int vuprintf(int (*push)(void *userp, unsigned char data),
+void vuprintf(int (*push)(void *userp, unsigned char data),
               void *userp, const char *fmt, va_list ap);
 
 #endif /* __FORMAT_H__ */

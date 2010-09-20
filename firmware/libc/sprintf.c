@@ -57,7 +57,6 @@ static int sprfunc(void *ptr, unsigned char letter)
 
 int snprintf(char *buf, size_t size, const char *fmt, ...)
 {
-    bool ok;
     va_list ap;
     struct for_snprintf pr;
 
@@ -66,7 +65,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
     pr.max = size;
 
     va_start(ap, fmt);
-    ok = format(sprfunc, &pr, fmt, ap);
+    format(sprfunc, &pr, fmt, ap);
     va_end(ap);
 
     /* make sure it ends with a trailing zero */
@@ -77,14 +76,13 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
 
 int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 {
-    bool ok;
     struct for_snprintf pr;
 
     pr.ptr = (unsigned char *)buf;
     pr.bytes = 0;
     pr.max = size;
 
-    ok = format(sprfunc, &pr, fmt, ap);
+    format(sprfunc, &pr, fmt, ap);
 
     /* make sure it ends with a trailing zero */
     pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';

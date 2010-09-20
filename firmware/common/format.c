@@ -29,7 +29,7 @@
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
-int format(
+void format(
     /* call 'push()' for each output letter */
     int (*push)(void *userp, unsigned char data),
     void *userp,
@@ -220,7 +220,6 @@ int format(
     else
         ok=push(userp, ch);
     }
-    return ok; /* true means good */
 }
 
 struct for_fprintf {
@@ -244,7 +243,6 @@ static int fprfunc(void *pr, unsigned char letter)
 
 int fdprintf(int fd, const char *fmt, ...)
 {
-    bool ok;
     va_list ap;
     struct for_fprintf fpr;
 
@@ -252,13 +250,13 @@ int fdprintf(int fd, const char *fmt, ...)
     fpr.bytes=0;
 
     va_start(ap, fmt);
-    ok = format(fprfunc, &fpr, fmt, ap);
+    format(fprfunc, &fpr, fmt, ap);
     va_end(ap);
 
     return fpr.bytes; /* return 0 on error */
 }
 
-int vuprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap)
+void vuprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap)
 {
-    return format(push, userp, fmt, ap);
+    format(push, userp, fmt, ap);
 }
