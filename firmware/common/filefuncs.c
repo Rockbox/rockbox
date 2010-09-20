@@ -61,9 +61,9 @@ bool file_exists(const char *file)
     int fd;
 
 #ifdef DEBUG
-    if (!file || strlen(file) <= 0)
+    if (!file || !*file)
     {
-        DEBUGF("%s(): Invalid parameter!\n");
+        DEBUGF("%s(%p): Invalid parameter!\n", __func__, file);
         return false;
     }
 #endif
