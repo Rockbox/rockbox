@@ -449,7 +449,7 @@ Veuillez vous référer à http://www.rockbox.org/wiki/IpodConversionToFAT32</tr
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="231"/>
         <source>Error: could not retrieve device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: impossible de récupérer le nom du périphérique</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="247"/>
@@ -535,47 +535,47 @@ Veuillez vous référer à http://www.rockbox.org/wiki/IpodConversionToFAT32</tr
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader nécessite que vous fournissiez un fichier contenant le firmware originel (fichier hin). Vous devez télécharger ce fichier vous-même pour des raisons légales. Veuillez vous référer au &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; et à la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; pour obtenir ce fichier.&lt;br/&gt;Appuyez sur Ok pour continuer et parcourir les fichiers votre ordinateur pour indiquer le fichier du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="52"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Téléchargement du bootloader</translation>
+        <translation>Téléchargement du bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="79"/>
         <source>Could not open the original firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier du firmware originel.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="82"/>
         <source>Could not read the original firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire le fichier du firmware originel.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="85"/>
         <source>Loaded firmware file does not look like MPIO original firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le contenu du fichier du firmware originel ne ressemble pas à un firmware MPIO.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="100"/>
         <source>Could not open output file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier de sortie.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="103"/>
         <source>Could not write output file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;écrire le fichier de sortie.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="106"/>
         <source>Unknown error number: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur inconnue: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="88"/>
         <source>Could not open downloaded bootloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier du bootloader téléchargé.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
@@ -585,28 +585,28 @@ Veuillez vous référer à http://www.rockbox.org/wiki/IpodConversionToFAT32</tr
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
         <source>Could not read the downloaded bootloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire le fichier du bootloader téléchargé.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="97"/>
         <source>Bootloader checksum error.</source>
-        <translation type="unfinished"></translation>
+        <translation>La vérification de la somme de contrôle du bootloader a échoué.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="110"/>
         <location filename="../base/bootloaderinstallmpio.cpp" line="111"/>
         <source>Patching original firmware failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de la modification du firmware: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="118"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">Le firmware a été modifié avec succès</translation>
+        <translation>Le firmware a été modifié avec succès</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="126"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
+        <translation>Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
     </message>
 </context>
 <context>
@@ -681,7 +681,7 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="247"/>
         <source>Error: could not retrieve device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: impossible de récupérer le nom du périphérique</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="263"/>
@@ -785,7 +785,7 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="152"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
+        <translation>Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
     </message>
 </context>
 <context>
@@ -836,7 +836,7 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../configure.cpp" line="469"/>
         <source>Proxy Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection du proxy</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="470"/>
@@ -1739,7 +1739,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <location filename="../main.cpp" line="71"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1821,12 +1821,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <location filename="../rbutilqt.cpp" line="805"/>
         <location filename="../rbutilqt.cpp" line="883"/>
         <source>No Rockbox installation found</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune installation de Rockbox n&apos;a été trouvé</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="806"/>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de déterminer la version de Rockbox installée. Veuillez installer Rockbox avant d&apos;installer les polices.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="812"/>
@@ -1836,7 +1836,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="884"/>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de déterminer la version de Rockbox installée. Veuillez installer Rockbox avant d&apos;installer les fichiers de voix.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="899"/>
@@ -1861,12 +1861,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="1036"/>
         <source>No uninstall method for this target known.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune méthode de désinstallation n&apos;est connue pour cette plateforme.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1042"/>
         <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilitaire Rockbox ne peut pas désinstaller le bootloader. Essayez de faire une mise à jour normale du firmware pour enlever le bootloader.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1072"/>
@@ -1916,7 +1916,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="1274"/>
         <source>Checking for update ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification des mise à jours...</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1334"/>
@@ -1931,12 +1931,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="1337"/>
         <source>New version of Rockbox Utility available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une nouvelle version de l&apos;utilitaire Rockbox est disponible.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1340"/>
         <source>Rockbox Utility is up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilitaire Rockbox est à jour.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="337"/>
@@ -1967,12 +1967,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="85"/>
         <source>Wine detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Wine détecté !</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="86"/>
         <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il semblerait que vous essayiez de faire fonctionner ce programme avec Wine. Ne faites pas cela car cela va échouer. Utilisez la version native pour Linux à la place.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="218"/>
@@ -2675,28 +2675,28 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/system.cpp" line="119"/>
         <source>Guest</source>
-        <translation type="unfinished">Invité</translation>
+        <translation>Invité</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="122"/>
         <source>Admin</source>
-        <translation type="unfinished">Administrateur</translation>
+        <translation>Administrateur</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="125"/>
         <source>User</source>
-        <translation type="unfinished">Utilisateur</translation>
+        <translation>Utilisateur</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="128"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="257"/>
         <location filename="../base/system.cpp" line="302"/>
         <source>(no description available)</source>
-        <translation type="unfinished">(aucune description disponible)</translation>
+        <translation>(aucune description disponible)</translation>
     </message>
 </context>
 <context>
@@ -3215,8 +3215,8 @@ Code de réponse HHTP: %1</translation>
         <location filename="../base/utils.cpp" line="184"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Permissions insuffisantes pour installation le bootloader.
-Les privilèges administrateurs sont recquis.&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Permissions insuffisantes pour installation le bootloader.
+Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="196"/>
@@ -3227,7 +3227,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../base/utils.cpp" line="203"/>
         <source>Problem detected:</source>
-        <translation type="unfinished">Problème détecté:</translation>
+        <translation>Problème détecté:</translation>
     </message>
 </context>
 <context>
