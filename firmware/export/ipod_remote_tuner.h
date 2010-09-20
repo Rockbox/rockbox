@@ -28,8 +28,8 @@
 
 extern int radio_present;
 
-extern void rmt_tuner_freq(void);
-extern void rmt_tuner_rds_data(void);
+extern void rmt_tuner_freq(const unsigned char *serbuf);
+extern void rmt_tuner_rds_data(const unsigned char *serbuf);
 
 int ipod_rmt_tuner_set(int setting, int value);
 int ipod_rmt_tuner_get(int setting);

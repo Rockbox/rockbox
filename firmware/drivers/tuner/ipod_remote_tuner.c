@@ -57,7 +57,7 @@ static void rmt_tuner_signal_power(unsigned char value)
     tuner_signal_power = (int)(value);
 }
 
-void rmt_tuner_freq(void)
+void rmt_tuner_freq(const unsigned char *serbuf)
 {
     char tempdata[4];
     tempdata[0] = serbuf[6];
@@ -285,7 +285,7 @@ static bool reply_timeout(void)
     return (timeout >= TIMEOUT_VALUE);
 }
 
-void rmt_tuner_rds_data(void)
+void rmt_tuner_rds_data(const unsigned char *serbuf)
 {
     if (serbuf[3] == 0x1E)
     {

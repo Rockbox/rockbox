@@ -122,6 +122,10 @@
 #include "usb_core.h"    
 #endif
 
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+#include "iap.h"
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -1182,7 +1186,7 @@ bool dbg_ports(void)
 #endif
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
-extern unsigned char serbuf[];
+        const unsigned char *serbuf = iap_get_serbuf();
         lcd_putsf(0, line++, "IAP PACKET: %02x %02x %02x %02x %02x %02x %02x %02x", 
          serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
          serbuf[6], serbuf[7]);
