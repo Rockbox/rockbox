@@ -7,14 +7,8 @@ STARTUP(target/arm/tcc77x/crt0.o)
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE
-                                                                                                                                              
-#ifdef DEBUG
-#define STUBOFFSET 0x10000
-#else
-#define STUBOFFSET 0
-#endif
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - CODECSIZE
 
 #define DRAMORIG 0x20000000
 #define IRAMORIG 0x00000000

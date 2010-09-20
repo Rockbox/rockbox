@@ -6,12 +6,6 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/tms320dm320/crt0.o)
 
-#ifdef DEBUG
-#define STUBOFFSET 0x10000
-#else
-#define STUBOFFSET 0
-#endif
-
 #ifndef LCD_NATIVE_WIDTH
 #define LCD_NATIVE_WIDTH LCD_WIDTH
 #endif
@@ -33,9 +27,9 @@ STARTUP(target/arm/tms320dm320/crt0.o)
  */
 #define LCD_TTB_AREA    0x100000*((LCD_BUFFER_SIZE>>19)+1)
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET
+#define DRAMSIZE (MEMORYSIZE * 0x100000)
 
-#define DRAMORIG        0x00900000 + STUBOFFSET
+#define DRAMORIG        0x00900000
 #define IRAMORIG        0x00000000
 #define IRAMSIZE        0x4000
 

@@ -5,15 +5,8 @@ OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 
-#ifdef DEBUG
-#define STUBOFFSET 0x10000
-#else
-#define STUBOFFSET 0
-#endif
-
-
-#define DRAMORIG      0x80004000 + STUBOFFSET
-#define DRAMSIZE      (MEMORYSIZE * 0x100000 - STUBOFFSET)
+#define DRAMORIG      0x80004000
+#define DRAMSIZE      (MEMORYSIZE * 0x100000)
 #define IRAMORIG      0x80000000
 #define IRAMSIZE      16K
 
