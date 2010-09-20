@@ -367,7 +367,6 @@ bool settings_load_config(const char* file, bool apply)
     } /* while(...) */
 
     close(fd);
-    settings_save();
     if (apply)
     {
         settings_apply(true);
