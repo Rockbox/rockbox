@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (c) 2010 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,47 +18,35 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DEBUG_H
-#define DEBUG_H
+
+
 
 #include "config.h"
-#include "gcc_extensions.h"
+#ifdef DEBUG
+#include <android/log.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-extern void debug_init(void);
-extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);
-extern void ldebugf(const char* file, int line, const char *fmt, ...)
-                    ATTRIBUTE_PRINTF(3, 4);
+#define LOG_TAG "Rockbox"
 
-#ifndef CODEC                    
-#ifdef __GNUC__
+void debug_init(void) {}
 
-/*  */
-#if (SIMULATOR) && !defined(__PCTOOL__) \
-    || ((CONFIG_PLATFORM & PLATFORM_ANDROID) && defined(DEBUG))
-#define DEBUGF  debugf
-#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
-#else
-#if defined(DEBUG)
+void debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+	__android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
+    va_end(ap);
+}
 
-#ifdef HAVE_GDB_API
-void breakpoint(void);
-#endif
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    char buf[1024];
+    snprintf(buf, sizeof(buf), "%s:%d %s", file, line, fmt);
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG " L", buf, ap);
+    va_end(ap);
+}
 
-#define DEBUGF  debugf
-#define LDEBUGF debugf
-#else
-#define DEBUGF(...) do { } while(0)
-#define LDEBUGF(...) do { } while(0)
-#endif
-#endif
-
-
-#else
-
-#define DEBUGF debugf
-#define LDEBUGF debugf
-
-#endif /* GCC */
-
-#endif /* CODEC */
 #endif

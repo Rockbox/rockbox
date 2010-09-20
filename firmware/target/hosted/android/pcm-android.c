@@ -22,6 +22,7 @@
 #include <jni.h>
 #include <stdbool.h>
 #include <system.h>
+#include "debug.h"
 #include "pcm.h"
 
 extern JNIEnv *env_ptr;
@@ -73,7 +74,7 @@ Java_org_rockbox_RockboxPCM_pcmSamplesToByteArray(JNIEnv *env,
         pcm_play_get_more_callback((void**)&pcm_data_start, &pcm_data_size);
         if (pcm_data_size == 0)
         {
-            LOG("out of data\n");
+            DEBUGF("out of data\n");
             return;
         }
         if (remaining > pcm_data_size)

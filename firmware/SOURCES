@@ -20,7 +20,10 @@ rolo.c
 #endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
 thread.c
 timer.c
+debug.c
 #endif /* PLATFORM_NATIVE */
+panic.c
+
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c
@@ -43,8 +46,6 @@ target/hosted/sdl/key_to_touch-sdl.c
 target/hosted/sdl/app/button-application.c
 #endif
 #endif
-panic.c
-debug.c
 
 /* Standard library */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
@@ -1707,6 +1708,9 @@ target/hosted/android/fs-android.c
 target/hosted/android/lcd-android.c
 target/hosted/android/lc-android.c
 target/hosted/android/button-android.c
+#ifdef DEBUG
+target/hosted/android/debug-android.c
+#endif
 target/hosted/android/kernel-android.c
 target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c

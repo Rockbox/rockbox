@@ -35,7 +35,6 @@ static char debugbuf[400];
 #endif
 #endif
 
-#ifndef SIMULATOR /* allow non archos platforms to display output */
 #include "kernel.h"
 #include "system.h"
 #include "debug.h"
@@ -257,4 +256,3 @@ void debugf(const char *fmt, ...)
 #endif
 }
 
-#endif

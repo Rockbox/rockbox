@@ -28,11 +28,6 @@
 
 void power_off(void);
 
-#include <android/log.h>
-#define LOG_TAG "Rockbox"
-#define LOG(args...) \
-	__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, ##args);
-
 #endif /* __SYSTEM_TARGET_H__ */
 
 #define NEED_GENERIC_BYTESWAPS
