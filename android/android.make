@@ -37,7 +37,7 @@ R_JAVA		:= $(BUILDDIR)/gen/$(PACKAGE_PATH)/R.java
 R_OBJ		:= $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
 
 JAVA_SRC	:= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/*.java)
-JAVA_OBJ	:= $(call java2class,$(subst /src/,/bin/,$(JAVA_SRC)))
+JAVA_OBJ	:= $(call java2class,$(subst $(ANDROID)/src/$(PACKAGE_PATH),$(ANDROID)/bin/$(PACKAGE_PATH),$(JAVA_SRC)))
 
 LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
 TEMP_APK	:= $(BUILDDIR)/bin/_Rockbox.apk
