@@ -20,24 +20,18 @@ Use this as your build folder, using '../tools/configure' etc.
     $ ../tools/configure # type 200, then chose A for android and your screen resolution
     $ make
 
-After the build finished, you can create a Rockbox.apk in bin/
+After the build finished, build the zip file:
+    $ make zip
+
+Create a debug signing key:
+    $ keytool -genkey -alias androiddebugkey -keystore $HOME/.android/debug.keystore -storepass android -keypass android -validity 365 -dname "CN=Android Debug,O=Android,C=US"
+
+Then, you can create a Rockbox.apk which ends up in bin/
     $ make apk
 
-You can install that on the device
+You can install that on the device:
     $ $ANDROID_SDK_PATH/tools/adb install -r bin/Rockbox.apk
 
-
-NOTE: make apk needs creates a debug signed .apk, not suitable for distribution.
-It expects that this key already exists.
-You should be able to generate it with "keytool" using the following options:
-* Keystore name: "debug.keystore"
-* Keystore password: "android"
-* Key alias: "androiddebugkey"
-* Key password: "android"
-* CN: "CN=Android Debug,O=Android,C=US"
-* validity: 365 days
-
-Google docs mention the SDK tools can generate it as well, but I haven't found how yet.    
 
 [1]: http://developer.android.com/sdk/index.html 
 [2]: http://developer.android.com/sdk/ndk/index.html
