@@ -652,12 +652,9 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
         }
 
         /* Timeout so we can determine if play status has changed */
-        button = get_action(CONTEXT_TREE,HZ/2);
-        bool res = gui_synclist_do_button(&playlist_lists,
-                                          &button,
-                                          LIST_WRAP_UNLESS_HELD);
+        bool res = list_do_action(CONTEXT_LIST, HZ/2,
+                            &playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
         viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
-
         if (res)
         {
             bool reload = playlist_buffer_needs_reload(&viewer.buffer,
@@ -841,8 +838,8 @@ bool search_playlist(void)
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
-        button = get_action(CONTEXT_LIST, HZ/4);
-        if (gui_synclist_do_button(&playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
+        if (list_do_action(CONTEXT_LIST, HZ/4,
+                           &playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
         {
