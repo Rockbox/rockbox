@@ -20,16 +20,10 @@ Use this as your build folder, using '../tools/configure' etc.
     $ ../tools/configure # type 200, then chose A for android and your screen resolution
     $ make
 
-After the build finished, build the zip file:
-    $ make zip
-
-Create a debug signing key:
-    $ keytool -genkey -alias androiddebugkey -keystore $HOME/.android/debug.keystore -storepass android -keypass android -validity 365 -dname "CN=Android Debug,O=Android,C=US"
-
-Then, you can create a Rockbox.apk which ends up in bin/
+After the build finished, build the apk file:
     $ make apk
 
-You can install that on the device:
+You can install that on your device or emulator with the following command:
     $ $ANDROID_SDK_PATH/tools/adb install -r bin/Rockbox.apk
 
 
