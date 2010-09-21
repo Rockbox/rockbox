@@ -386,7 +386,7 @@ bool eq_menu_graphical(void)
     bool has_changed = false;
     int button;
     int *setting;
-    int current_band, x, y, step, fast_step, min, max, voice_unit;
+    int current_band, x, y, step, fast_step, min, max;
     enum eq_slider_mode mode;
     char buf[24];
     int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
@@ -436,7 +436,6 @@ bool eq_menu_graphical(void)
                 fast_step = EQ_GAIN_FAST_STEP;
                 min = EQ_GAIN_MIN;
                 max = EQ_GAIN_MAX;
-                voice_unit = UNIT_DB;
             
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_GAIN), "(dB)");
@@ -451,7 +450,6 @@ bool eq_menu_graphical(void)
                 fast_step = EQ_CUTOFF_FAST_STEP;
                 min = EQ_CUTOFF_MIN;
                 max = EQ_CUTOFF_MAX;
-                voice_unit = UNIT_HERTZ;
 
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF), "(Hz)");
@@ -466,7 +464,6 @@ bool eq_menu_graphical(void)
                 fast_step = EQ_Q_FAST_STEP;
                 min = EQ_Q_MIN;
                 max = EQ_Q_MAX;
-                voice_unit = UNIT_INT;
 
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_EQUALIZER_BAND_Q), "");
