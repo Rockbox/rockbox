@@ -135,7 +135,6 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
     /* set defaults */
     int numSongs = 1;
     int defSong = 0;
-    int numChannels = 1;
     int durations[MAX_SONGS];
     for (i = 0; i < MAX_SONGS; i++)
         durations[i] = -1;
@@ -213,10 +212,6 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
             if (parse_dec(&defSong, p, 0, MAX_SONGS) == false)
                 return false; 
         }
-        else if (strcmp(line, "STEREO") == 0)
-        {
-            numChannels = 2;
-        }       
         else if (strcmp(line, "TIME") == 0) 
         {
             int durationTemp = ASAP_ParseDuration(p);
