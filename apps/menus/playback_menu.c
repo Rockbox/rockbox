@@ -215,15 +215,11 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 static int playback_callback(int action,const struct menu_item_ex *this_item)
 {
     static bool old_shuffle = false;
-    static int old_repeat_mode = 0;
-    (void)this_item;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
             if (this_item == &shuffle_item)
                 old_shuffle = global_settings.playlist_shuffle;
-            else if (this_item == &repeat_mode)
-                old_repeat_mode = global_settings.repeat_mode;
             break;
         case ACTION_EXIT_MENUITEM: /* on exit */
             if ((this_item == &shuffle_item) &&
