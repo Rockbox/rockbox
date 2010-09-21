@@ -283,22 +283,11 @@ static int talk_menu_item(int selected_item, void *data)
 void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
 {
-    int setting_id, oldval;
+    int setting_id;
     const struct settings_list *setting =
             find_setting(temp->variable, &setting_id);
     char *title;
     char padded_title[MAX_PATH];
-    int var_type = setting->flags&F_T_MASK;
-    if (var_type == F_T_INT || var_type == F_T_UINT)
-    {
-        oldval = *(int*)setting->setting;
-    }
-    else if (var_type == F_T_BOOL)
-    {
-        oldval = *(bool*)setting->setting;
-    }
-    else
-        oldval = 0;
     if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
         title = temp->callback_and_desc->desc;
     else
