@@ -388,7 +388,6 @@ bool eq_menu_graphical(void)
     int *setting;
     int current_band, x, y, step, fast_step, min, max, voice_unit;
     enum eq_slider_mode mode;
-    enum eq_type current_type;
     char buf[24];
     int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
     FOR_NB_SCREENS(i)
@@ -420,7 +419,6 @@ bool eq_menu_graphical(void)
     
     /* Start off editing gain on the first band */
     mode = GAIN;
-    current_type = LOW_SHELF;
     current_band = 0;
     
     while (!exit_request) {
