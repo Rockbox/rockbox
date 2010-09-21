@@ -65,7 +65,7 @@ int lang_load(const char *filename, const unsigned char *builtin,
     int retcode=0;
     unsigned char lang_header[HEADER_SIZE];
     unsigned char sub_header[SUBHEADER_SIZE];
-    unsigned int id, num_strings, foffset;
+    unsigned int id, foffset;
 
     if(fd < 0)
         return 1;
@@ -77,7 +77,9 @@ int lang_load(const char *filename, const unsigned char *builtin,
         lseek(fd, user_num * SUBHEADER_SIZE, SEEK_CUR);
         read(fd, sub_header, SUBHEADER_SIZE);
         /* read in information about the requested lang */
-        num_strings = (sub_header[0]<<8) | sub_header[1];
+#if 0   /* unused */
+        unsigned int num_strings = (sub_header[0]<<8) | sub_header[1];
+#endif
         lang_size = (sub_header[2]<<8) | sub_header[3];
         foffset = (sub_header[4]<<8) | sub_header[5];
         if(lang_size <= max_lang_size) {
