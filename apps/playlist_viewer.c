@@ -653,7 +653,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
 
         /* Timeout so we can determine if play status has changed */
         bool res = list_do_action(CONTEXT_LIST, HZ/2,
-                            &playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
+                            &playlist_lists, &button, LIST_WRAP_UNLESS_HELD);
         viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
         if (res)
         {
