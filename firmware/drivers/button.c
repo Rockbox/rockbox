@@ -38,17 +38,8 @@
 #else
 #include "button-target.h"
 #endif
-
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
-#endif
-
-#if 0
-/* Older than MAX_EVENT_AGE button events are going to be ignored.
- * Used to prevent for example volume going up uncontrollable when events
- * are getting queued and UI is lagging too much.
- */
-#define MAX_EVENT_AGE  HZ
 #endif
 
 struct event_queue button_queue;
@@ -72,11 +63,27 @@ static bool phones_present = false;
 /* how long until repeat kicks in, in centiseconds */
 #define REPEAT_START      (30*HZ/100)
 
+#ifndef HAVE_TOUCHSCREEN
+/* the next two make repeat "accelerate", which is nice for lists
+ * which begin to scroll a bit faster when holding until the
+ * real list accerelation kicks in (this smoothes acceleration)
+ */
+
 /* the speed repeat starts at, in centiseconds */
 #define REPEAT_INTERVAL_START   (16*HZ/100)
-
 /* speed repeat finishes at, in centiseconds */
 #define REPEAT_INTERVAL_FINISH  (5*HZ/100)
+#else
+/*
+ * on touchscreen it's different, scrolling is done by swiping over the
+ * screen (potentially very quickly) and is completely different from button
+ * targets
+ * So, on touchscreen we don't want to artifically slow down early repeats,
+ * it'd have the contrary effect of making rockbox appear lagging
+ */
+#define REPEAT_INTERVAL_START   (3*HZ/100)
+#define REPEAT_INTERVAL_FINISH  (3*HZ/100)
+#endif
 
 #ifdef HAVE_BUTTON_DATA
 static int button_read(int *data);
@@ -101,6 +108,35 @@ static int btn_detect_callback(struct timeout *tmo)
     return 0;
 }
 #endif
+
+static bool button_try_post(int button, int data)
+{
+#ifdef HAVE_TOUCHSCREEN
+    /* one can swipe over the scren very quickly,
+     * for this to work we want to forget about old presses and
+     * only respect the very latest ones */
+    const int force_post = true;
+#else
+    /* Only post events if the queue is empty,
+     * to avoid afterscroll effects.
+     * i.e. don't post new buttons if previous ones haven't been
+     * processed yet */
+    const int force_post = false;
+#endif
+
+    bool ret = queue_empty(&button_queue);
+    if (!ret && force_post)
+    {
+        queue_remove_from_head(&button_queue, button);
+        ret = true;
+    }
+
+    if (ret)
+        queue_post(&button_queue, button, data);
+
+    /* on touchscreen we posted unconditionally */
+    return ret;
+}
 
 static void button_tick(void)
 {
@@ -127,9 +163,7 @@ static void button_tick(void)
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
-    {
-        queue_post(&button_queue, btn, 0);
-    }
+        button_try_post(btn, 0);
 #endif
 
 #ifdef HAVE_BUTTON_DATA
@@ -137,7 +171,6 @@ static void button_tick(void)
 #else
     btn = button_read();
 #endif
-
 #if defined(HAVE_HEADPHONE_DETECTION)
     if (headphones_inserted() != phones_present)
     {
@@ -156,17 +189,17 @@ static void button_tick(void)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, data);
+                button_try_post(BUTTON_REL | diff, data);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, data);
+                button_try_post(BUTTON_REL | diff, data);
             else
                 skip_release = false;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, data);
+        button_try_post(BUTTON_REL | diff, data);
 #endif
     }
     else
@@ -233,6 +266,13 @@ static void button_tick(void)
                         /* initial repeat */
                         count = REPEAT_INTERVAL_START;
                     }
+#ifdef HAVE_TOUCHSCREEN
+                    else if (lastdata != data && btn == lastbtn)
+                    {   /* only coordinates changed, post anyway */
+                        if (touchscreen_get_mode() == TOUCHSCREEN_POINT)
+                            post = true;
+                    }
+#endif
                 }
             }
             if ( post )
@@ -241,9 +281,8 @@ static void button_tick(void)
                 {
                     /* Only post repeat events if the queue is empty,
                      * to avoid afterscroll effects. */
-                    if (queue_empty(&button_queue))
+                    if (button_try_post(BUTTON_REPEAT | btn, data))
                     {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, data);
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         skip_remote_release = false;
@@ -264,7 +303,7 @@ static void button_tick(void)
                             || (remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
                             )
-                            queue_post(&button_queue, btn, data);
+                            button_try_post(btn, data);
                         else
                             skip_remote_release = true;
                     }
@@ -275,11 +314,11 @@ static void button_tick(void)
                                 || (btn & BUTTON_REMOTE)
 #endif
                            )
-                            queue_post(&button_queue, btn, data);
+                            button_try_post(btn, data);
                         else
                             skip_release = true;
 #else /* no backlight, nothing to skip */
-                    queue_post(&button_queue, btn, data);
+                    button_try_post(btn, data);
 #endif
                     post = false;
                 }
@@ -350,12 +389,6 @@ long button_get(bool block)
     {
         queue_wait(&button_queue, &ev);
         
-#if 0
-        /* Ignore if the event was too old and for simplicity, just
-         * wait for a new button_get() request. */
-        if (current_tick - ev.tick > MAX_EVENT_AGE)
-            return BUTTON_NONE;
-#endif
         button_data = ev.data;
         return ev.id;
     }
