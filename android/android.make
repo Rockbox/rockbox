@@ -78,7 +78,7 @@ dex: $(DEX)
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@
 
-$(BINLIB_DIR)/libmisc.so:
+$(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 	$(call PRINTS,CP rockbox.zip)cp $^ $@
 
 libs: $(LIBS)
