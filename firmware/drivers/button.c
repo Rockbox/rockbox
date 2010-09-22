@@ -81,8 +81,8 @@ static bool phones_present = false;
  * So, on touchscreen we don't want to artifically slow down early repeats,
  * it'd have the contrary effect of making rockbox appear lagging
  */
-#define REPEAT_INTERVAL_START   (3*HZ/100)
-#define REPEAT_INTERVAL_FINISH  (3*HZ/100)
+#define REPEAT_INTERVAL_START   (5*HZ/100)
+#define REPEAT_INTERVAL_FINISH  (5*HZ/100)
 #endif
 
 #ifdef HAVE_BUTTON_DATA
