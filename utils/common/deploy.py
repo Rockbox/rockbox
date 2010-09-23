@@ -318,7 +318,7 @@ def finddlls(program, extrapaths = []):
     dlls = []
     for line in cmdout[0].split('\n'):
         if re.match(r'\s*DLL Name', line) != None:
-            dll = re.sub(r'^\s*DLL Name:\s+([a-zA-Z_\-0-9\.]+).*$', r'\1', line)
+            dll = re.sub(r'^\s*DLL Name:\s+([a-zA-Z_\-0-9\.\+]+).*$', r'\1', line)
             dlls.append(dll.lower())
 
     # find DLLs in extrapaths and PATH environment variable.
