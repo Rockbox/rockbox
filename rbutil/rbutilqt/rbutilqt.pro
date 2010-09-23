@@ -132,6 +132,9 @@ DEFINES += RBUTIL _LARGEFILE64_SOURCE
 win32 {
     LIBS += -lsetupapi -lnetapi32
 }
+win32:static {
+    QMAKE_LFLAGS += -static-libgcc -static-libstdc++
+}
 unix:!static:!libusb1:!macx {
     LIBS += -lusb
 }
