@@ -155,7 +155,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->callback_speak_item = NULL;
     gui_list->nb_items = 0;
     gui_list->selected_item = 0;
-    gui_list->hide_selection = false;
     FOR_NB_SCREENS(i)
     {
         gui_list->start_item[i] = 0;

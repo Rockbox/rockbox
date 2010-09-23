@@ -47,6 +47,14 @@
 /* these are static to make scrolling work */
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
 
+#ifdef HAVE_TOUCHSCREEN
+static enum {
+    SCROLL_NONE,    /* no scrolling */
+    SCROLL_BAR,     /* scroll by using the scrollbar */
+    SCROLL_SWIPE,   /* scroll by wiping over the screen */
+} scroll_mode;
+#endif
+
 int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
                              int text_pos, struct screen * display,
                              struct viewport *vp);
@@ -232,7 +240,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         }
 #endif
         /* draw the selected line */
-        if(!list->hide_selection && i >= list->selected_item
+        if(
+#ifdef HAVE_TOUCHSCREEN
+            /* don't draw it during scrolling */
+            scroll_mode == SCROLL_NONE &&
+#endif
+                i >= list->selected_item
                 && i <  list->selected_item + list->selected_size
                 && list->show_selection_marker)
         {/* The selected item must be displayed scrolling */
@@ -311,11 +324,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 
 #if defined(HAVE_TOUCHSCREEN)
 /* This needs to be fixed if we ever get more than 1 touchscreen on a target. */
-static enum {
-    SCROLL_NONE,    /* no scrolling */
-    SCROLL_BAR,     /* scroll by using the scrollbar */
-    SCROLL_SWIPE,   /* scroll by wiping over the screen */
-} scroll_mode;
 
 static bool released = false;
 
@@ -390,10 +398,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     int line, list_width = list_text_vp->width;
 
     released = (button&BUTTON_REL) != 0;
-    gui_list->hide_selection = (scroll_mode != SCROLL_NONE);
 
-
-    
     if (global_settings.scrollbar == SCROLLBAR_RIGHT)
         list_width += SCROLLBAR_WIDTH;
 
@@ -511,8 +516,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 {
                     scroll_mode = SCROLL_NONE;
                     redraw = true;
-                    /* don't draw the selection during scrolling */
-                    gui_list->hide_selection = false;
                 }
 
                 /* select current item */
