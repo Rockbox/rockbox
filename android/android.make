@@ -41,17 +41,19 @@ JAVA_SRC	:= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/*.java)
 JAVA_OBJ	:= $(call java2class,$(subst $(ANDROID)/src/$(PACKAGE_PATH),$(ANDROID)/bin/$(PACKAGE_PATH),$(JAVA_SRC)))
 
 LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
-TEMP_APK	:= $(BUILDDIR)/bin/_Rockbox.apk
-TEMP_APK2	:= $(BUILDDIR)/bin/__Rockbox.apk
+TEMP_APK	:= $(BUILDDIR)/bin/_rockbox.apk
+TEMP_APK2	:= $(BUILDDIR)/bin/__rockbox.apk
 DEX		:= $(BUILDDIR)/bin/classes.dex
 AP_		:= $(BUILDDIR)/bin/resources.ap_
-APK		:= $(BUILDDIR)/bin/Rockbox.apk
+APK		:= $(BUILDDIR)/rockbox.apk
 
 _DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
 DIRS		:= $(subst ___,bin,$(_DIRS))
 DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
 DIRS		+= $(BUILDDIR)/libs/armeabi
+
+CLEANOBJS += bin gen libs data
 
 $(R_JAVA) $(AP_): $(MANIFEST)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m \
@@ -106,6 +108,3 @@ $(DIRS):
 dirs: $(DIRS)
 
 apk: $(APK)
-
-clean::
-	$(SILENT)rm -f $(BUILDDIR)/bin/$(PACKAGE_PATH)/*.class $(R_JAVA) $(TEMP_APK) $(TEMP_APK2) $(APK) $(DEX) $(BUILDDIR)/_rockbox.zip $(AP_) $(LIBS)

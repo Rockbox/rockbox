@@ -16,22 +16,20 @@ compiling the java files will fail.
 
 * Build instructions
 
-Use this as your build folder, using '../tools/configure' etc.
-    $ ../tools/configure # type 200, then chose A for android and your screen resolution
-    $ make
+1. Create a separate build folder. Do not build in this source directory.
 
+2. Run "../tools/configure". Choose target 200, then chose 'A' for Android
+   and input your screen resolution.
 
-After the build finished, build the zip file which contains codecs and themes (the binary is a separate file):
-    $ make zip
+3. Run "make"
 
-Once you have the zip, pack it and the binary into the apk
-    $ make apk
+4. Run "make zip". This has to be run the first time, and any time themes
+   or plugins have changed. Otherwise you may skip it.
 
-Side note: You don't necessarily need to recreate the zip once you have it, only if you're unsure or if you know its content changed. 
-Not recreating it will save time because it's only unzipped on the device if it's newer than what's on the device
+5. Run "make apk"
 
-You can install that on your device or emulator with the following command:
-    $ $ANDROID_SDK_PATH/tools/adb install -r bin/Rockbox.apk
+6. Optional. Install on your target/emulator, using the following command:
+   "$ANDROID_SDK_PATH/tools/adb install -r rockbox.apk"
 
 
 [1]: http://developer.android.com/sdk/index.html 

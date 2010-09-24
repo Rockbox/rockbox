@@ -53,7 +53,12 @@ prefixtools () {
 
 app_get_platform() {
     echo "Select your platform: (S)DL, (A)ndroid (default: Android)"
-    choice=`input`
+    if [ -z "$ARG_PLATFORM" ]; then
+        choice=`input`
+    else
+        choice="$APP_PLATFORM"
+    fi
+
     case $choice in
         s|S*)     app_platform="sdl" ;;
         *|a|A*)   app_platform="android" ;;
@@ -61,10 +66,18 @@ app_get_platform() {
 
     echo "Selected $app_platform platform"
     echo "Enter the LCD width (default: 320)"
-    app_lcd_width=`input`
+    if [ -z "$ARG_LCDWIDTH" ]; then
+        app_lcd_width=`input`
+    else
+        app_lcd_width=`$ARG_LCDWIDTH`
+    fi
     if [ -z "$app_lcd_width" ]; then app_lcd_width="320"; fi
     echo "Enter the LCD height (default: 480)"
-    app_lcd_height=`input`
+    if [ -z "$ARG_LCDHEIGHT" ]; then
+        app_lcd_height=`input`
+    else
+        app_lcd_height="$ARG_LCDHEIGHT"
+    fi
     if [ -z "$app_lcd_height" ]; then app_lcd_height="480"; fi
     echo "Selected $app_lcd_width x $app_lcd_height resolution"
 
@@ -945,6 +958,9 @@ for arg in "$@"; do
 		--no-ccache)  ARG_CCACHE=0;;
 		--encopts=*)  ARG_ENCOPTS=`echo "$arg" | cut -d = -f 2`;;
 		--language=*) ARG_LANG=`echo "$arg" | cut -d = -f 2`;;
+		--lcdwidth=*) ARG_LCDWIDTH=`echo "$arg" | cut -d = -f 2`;;
+		--lcdheight=*) ARG_LCDHEIGHT=`echo "$arg" | cut -d = -f 2`;;
+		--platform=*) ARG_PLATFORM=`echo "$arg" | cut -d = -f 2`;;
 		--ram=*)      ARG_RAM=`echo "$arg" | cut -d = -f 2`;;
 		--rbdir=*)    ARG_RBDIR=`echo "$arg" | cut -d = -f 2`;;
 		--target=*)   ARG_TARGET=`echo "$arg" | cut -d = -f 2`;;
@@ -956,7 +972,7 @@ for arg in "$@"; do
 		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
-        --prefix=*)   PREFIX=`echo "$arg" | cut -d = -f 2`;;
+                --prefix=*)   PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
