@@ -192,6 +192,18 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
     wmcodec_write(ROUT2VOL, ROUT2VOL_RO2VU | ROUT2VOL_RO2ZC | vol_r);
 }
 
+void audiohw_enable_lineout(bool enable)
+{
+    if (enable) {
+        /* Enable lineout */
+        wm8975_regs[PWRMGMT2] |=  (PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
+    } else {
+        /* Disable lineout */
+        wm8975_regs[PWRMGMT2] &= ~(PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
+    }
+    wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
+}
+
 void audiohw_set_bass(int value)
 {
     const int regvalues[] = {
