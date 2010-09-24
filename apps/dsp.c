@@ -173,7 +173,9 @@ struct dsp_config
     int  sample_bytes;
     int  stereo_mode;
     int32_t  tdspeed_percent; /* Speed% * PITCH_SPEED_PRECISION */
+#ifdef HAVE_PITCHSCREEN
     bool tdspeed_active;  /* Timestretch is in use */
+#endif
     int  frac_bits;
 #ifdef HAVE_SW_TONE_CONTROLS
     /* Filter struct for software bass/treble controls */
@@ -242,18 +244,18 @@ static bool crossfeed_enabled;
 
 #define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
 
-#ifdef HAVE_PITCHSCREEN
 static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
 static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
 
+#ifdef HAVE_PITCHSCREEN
 static int32_t *big_sample_buf = NULL;
 static int32_t *big_resample_buf = NULL;
 static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
 #endif
 
-static int sample_buf_count;
-static int32_t *sample_buf;
-static int32_t *resample_buf;
+static int sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+static int32_t *sample_buf = small_sample_buf;
+static int32_t *resample_buf = small_resample_buf;
 
 #define SAMPLE_BUF_LEFT_CHANNEL 0
 #define SAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2)
