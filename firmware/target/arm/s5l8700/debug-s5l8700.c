@@ -99,25 +99,21 @@ bool __dbg_hw_info(void)
         }
         else if(state==1)
         {
+            pmu_ldo_set_voltage(5, 0x10);
             _DEBUG_PRINTF("PMU:");
             for(i=0;i<7;i++)
             {
-                if(i == 1)
-                {
-                    _DEBUG_PRINTF("ldo %d: %dmV (CLICKWHEEL)",i,900 + pmu_read(0x2d + (i << 1))*100);
-                }
-                else if(i == 3)
-                {
-                    _DEBUG_PRINTF("ldo %d: %dmV (AUDIO)",i,900 + pmu_read(0x2d + (i << 1))*100);
-                }
-                else if(i == 4)
-                {
-                    _DEBUG_PRINTF("ldo %d: %dmV (NAND)",i,900 + pmu_read(0x2d + (i << 1))*100);
-                }
-                else
-                {
-                    _DEBUG_PRINTF("ldo %d: %dmV",i,900 + pmu_read(0x2d + (i << 1))*100);
-                }
+                char *device[] = {"(unknown)", 
+                                  "(CLICKWHEEL)", 
+                                  "(LCD)",
+                                  "(AUDIO)",
+                                  "(NAND)",
+                                  "(unknown)",
+                                  "(ACCESSORY)"};
+                _DEBUG_PRINTF("ldo%d %s: %dmV %s",i,
+                    pmu_read(0x2e + (i << 1))?" on":"off",
+                    900 + pmu_read(0x2d + (i << 1))*100,
+                    device[i]);
             }
             _DEBUG_PRINTF("cpu voltage: %dmV",625 + pmu_read(0x1e)*25);
             _DEBUG_PRINTF("memory voltage: %dmV",625 + pmu_read(0x22)*25);
