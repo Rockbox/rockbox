@@ -119,14 +119,14 @@ sub make_install {
         $userdir .= "/share/rockbox";
     } else {
         # for non-app builds we expect the prefix to be the dir above .rockbox
-        $bindir .= "/.rockbox";
+        $bindir .= "/$rbdir";
         $libdir = $userdir = $bindir;
     }
     if ($dest =~ /\/dev\/null/) {
         die "ERROR: No PREFIX given\n"
     }
 
-    if ((!$app) && $src && (abs_path($dest) eq abs_path($src))) {
+    if ((!$app) && $src && (abs_path($bindir) eq abs_path($src))) {
         return 1;
     }
 
@@ -663,12 +663,14 @@ sub runone {
     }
     if($target && ($target !~ /(mod|ajz|wma)\z/i)) {
         # On some targets, the image goes into .rockbox.
-        copy("$target", "$rbdir/$target");
+        copy("$target", ".rockbox/$target");
         undef $target;
     }
 
     if($install) {
         make_install(".rockbox", $install) or die "MKDIRFAILED\n";
+        rmtree(".rockbox");
+        print "rm .rockbox\n" if $verbose;
     }
     else {
         unless (".rockbox" eq $rbdir) {
@@ -679,9 +681,9 @@ sub runone {
         }
         system("$ziptool $output $rbdir $target >/dev/null");
         print "$ziptool $output $rbdir $target >/dev/null\n" if $verbose;
+        rmtree("$rbdir");
+        print "rm $rbdir\n" if $verbose;
     }
-    rmtree(".rockbox");
-    print "rm .rockbox\n" if $verbose;
 };
 
 if(!$exe) {
