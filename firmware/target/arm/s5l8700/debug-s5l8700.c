@@ -99,7 +99,6 @@ bool __dbg_hw_info(void)
         }
         else if(state==1)
         {
-            pmu_ldo_set_voltage(5, 0x10);
             _DEBUG_PRINTF("PMU:");
             for(i=0;i<7;i++)
             {
