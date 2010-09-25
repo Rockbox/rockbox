@@ -133,13 +133,17 @@
 #define PLUGIN_BUFFER_SIZE 0x80000
 
 #define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN    400   /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX    400  /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC    50    /* capacity increment */
-#define BATTERY_TYPES_COUNT     1     /* only one type */
+#define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     500 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      10 /* capacity increment */
+#define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define current usage levels */
+#define CURRENT_NORMAL     21  /* playback @48MHz clock, backlight off */
+#define CURRENT_BACKLIGHT  23  /* maximum brightness */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
