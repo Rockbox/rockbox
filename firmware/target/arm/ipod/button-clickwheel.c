@@ -39,6 +39,9 @@
 #include "serial.h"
 #include "power.h"
 #include "powermgmt.h"
+#if defined(IPOD_NANO2G)
+#include "pmu-target.h"
+#endif
 
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */
 #define WHEEL_REPEAT_TIMEOUT     250000 /* timeout for button repeat = 250ms */
@@ -368,6 +371,7 @@ int button_read_device(void)
             /* lock -> disable wheel sensor */
             DEV_EN &= ~DEV_OPTO;
 #elif CONFIG_CPU==S5L8701
+            pmu_ldo_power_off(1); /* disable clickwheel power supply */
             CLICKWHEEL00 = 0;
             CLICKWHEEL10 = 0;
 #endif
@@ -379,6 +383,7 @@ int button_read_device(void)
             DEV_EN |= DEV_OPTO;
             opto_i2c_init();
 #elif CONFIG_CPU==S5L8701
+            pmu_ldo_power_on(1); /* enable clickwheel power supply */
             CLICKWHEEL00 = 0x280000;
             CLICKWHEEL10 = 3;
 #endif
