@@ -70,6 +70,8 @@
 #include "tuner.h"
 #endif
 
+#define NOINLINE __attribute__ ((noinline))
+
 extern struct wps_state wps_state;
 
 static const char* get_codectype(const struct mp3entry* id3)
@@ -552,9 +554,13 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
     return pid3;
 }
 
-static const char* get_lif_token_value(struct gui_wps *gwps,
-                                       struct logical_if *lif,
-                                       int offset, char *buf, int buf_size)
+/* Don't inline this; it was broken out of get_token_value to reduce stack
+ * usage.
+ */
+static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
+                                                struct logical_if *lif,
+                                                int offset, char *buf,
+                                                int buf_size)
 {
     int a = lif->num_options;
     int b;
