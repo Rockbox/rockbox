@@ -382,11 +382,9 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
     struct skin_element *child = line->children[0];
     struct conditional *conditional;
     skin_render_func func = skin_render_line;
-    char tempbuf[128];
     int old_refresh_mode = info->refresh_type;
     while (child)
     {
-        tempbuf[0] = '\0';
         switch (child->type)
         {
             case CONDITIONAL:
@@ -447,6 +445,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 }
                 if (!do_non_text_tags(info->gwps, info, child, &info->skin_vp->vp))
                 {
+                    static char tempbuf[128];
                     const char *value = get_token_value(info->gwps, child->data,
                                                         info->offset, tempbuf,
                                                         sizeof(tempbuf), NULL);
