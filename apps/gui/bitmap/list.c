@@ -372,14 +372,14 @@ static int gui_synclist_touchscreen_scrolling(struct gui_synclist * gui_list, in
     const int screen = screens[SCREEN_MAIN].screen_type;
     const int difference = position - last_position;
     const int nb_lines = viewport_get_nb_lines(&list_text[screen]);
-    if(nb_lines < gui_list->nb_items && difference != 0) // only scroll if needed
+    if(nb_lines < gui_list->nb_items && difference != 0) /* only scroll if needed */
     {
         int new_start_item;
         new_start_item = gui_list->start_item[screen] - difference;
-        // check if new_start_item is bigger than list item count
+        /* check if new_start_item is bigger than list item count */
         if(new_start_item > gui_list->nb_items - nb_lines)
             new_start_item = gui_list->nb_items - nb_lines;
-        // set new_start_item to 0 if it's negative
+        /* set new_start_item to 0 if it's negative */
         if(new_start_item < 0)
             new_start_item = 0;
         gui_list->start_item[screen] = new_start_item;
@@ -397,6 +397,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     const bool old_released = released;
     int line, list_width = list_text_vp->width;
 
+    /* make sure it is inside the UI viewport */    
+    if (!viewport_point_within_vp(sb_skin_get_info_vp(screen), x, y))
+        return BUTTON_NONE;
+
     released = (button&BUTTON_REL) != 0;
 
     if (global_settings.scrollbar == SCROLLBAR_RIGHT)
@@ -408,7 +412,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     if (x > list_text_vp->x + list_width)
         return ACTION_NONE;
 
-    /* make sure it is inside the UI viewport */
     if (list_display_title(gui_list, screen) &&
         viewport_point_within_vp(&title_text[screen], x, y) && 
         button == BUTTON_REL && scroll_mode == SCROLL_NONE)
@@ -517,7 +520,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                     scroll_mode = SCROLL_NONE;
                     redraw = true;
                 }
-
+                
                 /* select current item */
                 gui_synclist_select_item(gui_list, list_start_item+line);
                 if (last_position == 0)
