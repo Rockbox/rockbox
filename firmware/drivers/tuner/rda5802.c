@@ -190,7 +190,7 @@ void rda5802_init(void)
 
         // write initialisation values
         memcpy(cache, initvals, sizeof(cache));
-        rda5802_write(16);
+        rda5802_write(14);
         sleep(HZ * 70 / 1000);
     }
 }
