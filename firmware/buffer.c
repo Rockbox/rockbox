@@ -72,19 +72,22 @@ void *buffer_alloc(size_t size)
 
 #ifdef BUFFER_ALLOC_DEBUG
     retval +=sizeof(struct buffer_start_marker);
-    end=(struct buffer_end_marker*)(audiobuf - sizeof(struct buffer_end_marker));
-    if(end->magic == BUF_MAGIC)
+    if(size>0)
     {
-        end->last=0;
-    }
-    start=(struct buffer_start_marker*)audiobuf;
-    start->magic = BUF_MAGIC;
-    start->buffer_size = size;
-    end=(struct buffer_end_marker*)(audiobuf+sizeof(struct buffer_start_marker)+size);
-    end->magic = BUF_MAGIC;
-    end->last = 1;
+        end=(struct buffer_end_marker*)(audiobuf - sizeof(struct buffer_end_marker));
+        if(end->magic == BUF_MAGIC)
+        {
+            end->last=0;
+        }
+        start=(struct buffer_start_marker*)audiobuf;
+        start->magic = BUF_MAGIC;
+        start->buffer_size = size;
+        end=(struct buffer_end_marker*)(audiobuf+sizeof(struct buffer_start_marker)+size);
+        end->magic = BUF_MAGIC;
+        end->last = 1;
 
-    audiobuf = ((unsigned char *)end) + sizeof(struct buffer_end_marker);
+        audiobuf = ((unsigned char *)end) + sizeof(struct buffer_end_marker);
+    }
 
     logf("Alloc %x %d",(unsigned int)retval,size);
 #else /* !BUFFER_ALLOC_DEBUG */
