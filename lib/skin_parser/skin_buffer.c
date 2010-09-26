@@ -45,12 +45,12 @@ void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
 #ifdef ROCKBOX
+    /* 32-bit aligned */
+    size = (size + 3) & ~3;
     if (size > skin_buffer_freespace())
         return NULL;
     retval = buffer_front;
     buffer_front += size;
-    /* 32-bit aligned */
-    buffer_front = (void *)(((unsigned long)buffer_front + 3) & ~3);
 #else
     retval = malloc(size);
 #endif
