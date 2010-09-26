@@ -66,7 +66,7 @@ bool VoiceFileCreator::createVoiceFile()
     QUrl genlangUrl = SystemInfo::value(SystemInfo::GenlangUrl).toString()
             +"?lang=" + m_lang + "&t=" + target + "&rev=" + version + "&f=" + features;
 
-    qDebug() << "downloading " << genlangUrl;
+    qDebug() << "[VoiceFileCreator] downloading " << genlangUrl;
 
     //download the correct genlang output
     QTemporaryFile *downloadFile = new QTemporaryFile(this);
@@ -88,7 +88,7 @@ bool VoiceFileCreator::createVoiceFile()
 
 void VoiceFileCreator::downloadDone(bool error)
 {
-    qDebug() << "Voice creator::downloadDone, error:" << error;
+    qDebug() << "[VoiceFileCreator] download done, error:" << error;
 
     // update progress bar
     emit logProgress(1,1);

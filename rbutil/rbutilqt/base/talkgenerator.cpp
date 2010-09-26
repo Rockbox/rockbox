@@ -129,6 +129,8 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
     int maxThreadCount = QThreadPool::globalInstance()->maxThreadCount();
     if ((m_tts->capabilities() & TTSBase::RunInParallel) == 0)
         QThreadPool::globalInstance()->setMaxThreadCount(1);
+    qDebug() << "[TalkGenerator] Maximum number of threads used:"
+             << QThreadPool::globalInstance()->maxThreadCount();
 
     connect(&ttsFutureWatcher, SIGNAL(progressValueChanged(int)), 
             this, SLOT(ttsProgress(int)));

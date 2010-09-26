@@ -195,8 +195,10 @@ QStringList TTSSapi::getVoiceList(QString language)
 TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
 {
     (void) errStr;
-    QString query = "SPEAK\t"+wavfile+"\t"+text+"\r\n";
-    qDebug() << "voicing" << query;
+    QString query = "SPEAK\t"+wavfile+"\t"+text;
+    qDebug() << "[TTSSapi] voicing" << query;
+    // append newline to query. Done now to keep debug output more readable.
+    query.append("\r\n");
     *voicestream << query;
     *voicestream << "SYNC\tbla\r\n";
     voicestream->flush();
