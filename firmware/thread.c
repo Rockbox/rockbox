@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "cpu.h"
 #include "string.h"
+#include "buffer.h"
 #ifdef RB_PROFILE
 #include <profile.h>
 #endif
@@ -1159,6 +1160,16 @@ void switch_thread(void)
     /* Check if the current thread stack is overflown */
     if (UNLIKELY(thread->stack[0] != DEADBEEF) && thread->stack_size > 0)
         thread_stkov(thread);
+
+#ifdef BUFFER_ALLOC_DEBUG
+    /* Check if the current thread just did bad things with buffer_alloc()ed
+     * memory */
+    {
+        static char name[32];
+        thread_get_name(name, 32, thread);
+        buffer_alloc_check(name);
+    }
+#endif
 
 #if NUM_CORES > 1
     /* Run any blocking operations requested before switching/sleeping */
