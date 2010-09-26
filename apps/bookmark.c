@@ -927,6 +927,8 @@ static bool play_bookmark(const char* bookmark)
         sound_set_pitch(bm.pitch);
         dsp_set_timestretch(bm.speed);
 #endif
+        if (!warn_on_pl_erase())
+            return false;
         return bookmark_play(global_temp_buffer, bm.resume_index,
             bm.resume_offset, bm.resume_seed, global_filename);
     }
