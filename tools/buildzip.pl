@@ -702,7 +702,10 @@ elsif(($exe =~ /rockboxui/)) {
     # simulator, exclude the exe file
     $exe = "";
 }
+elsif($exe eq "librockbox.so") {
+    # android, exclude the binary
+    $exe="";
+}
 
 runone($exe, $incfonts);
-
 
