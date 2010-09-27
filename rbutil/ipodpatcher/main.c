@@ -398,15 +398,6 @@ int main(int argc, char* argv[])
     if (ipod.ramsize > 0) { printf("(%dMB RAM) ",ipod.ramsize); }
     printf("(\"%s\")\n",ipod.macpod ? "macpod" : "winpod");
 
-    if (ipod.ipod_directory[ipod.ososimage].vers == 0x10000) {
-        fprintf(stderr,"[ERR]  *** ipodpatcher does not support the 2nd Generation Nano! ***\n");
-#ifdef WITH_BOOTOBJS
-        printf("Press ENTER to exit ipodpatcher :");
-        fgets(yesno,4,stdin);
-#endif
-        return 0;
-    }
-
     if (ipod.macpod) {
         print_macpod_warning();
     }
