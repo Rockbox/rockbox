@@ -424,6 +424,7 @@ static const struct tag_resolver taglist[] = {
     { "TAL",  3, offsetof(struct mp3entry, album), NULL, false },
     { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum, false },
     { "TPOS", 4, offsetof(struct mp3entry, disc_string), &parsediscnum, false },
+    { "TPA",  3, offsetof(struct mp3entry, disc_string), &parsediscnum, false },
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum, false },
     { "TDRC", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
