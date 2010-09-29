@@ -27,10 +27,8 @@
 
 #include "../imageviewer.h"
 
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR)
 #define resize_bitmap   smooth_resize_bitmap
-#elif defined(USEGSLIB)
-#define resize_bitmap   grey_resize_bitmap
 #else
 #define resize_bitmap   simple_resize_bitmap
 #endif
@@ -64,38 +62,6 @@ static ssize_t buf_images_size;
 struct bitmap bmp;
 
 /************************* Implementation ***************************/
-
-#ifdef USEGSLIB
-/* copied & pasted from lib/pluginlib_bmp.c. */
-static void grey_resize_bitmap(struct bitmap *src, struct bitmap *dst)
-{
-    const int srcw = src->width;
-    const int srch = src->height;
-    const int dstw = dst->width;
-    const int dsth = dst->height;
-    unsigned char *srcd = src->data;
-    unsigned char *dstd = dst->data;
-
-    const long xrstep = ((srcw-1) << 8) / (dstw-1);
-    const long yrstep = ((srch-1) << 8) / (dsth-1);
-    unsigned char *src_row, *dst_row;
-    long xr, yr = 0;
-    int src_x, src_y, dst_x, dst_y;
-    for (dst_y=0; dst_y < dsth; dst_y++)
-    {
-        src_y = (yr >> 8);
-        src_row = &srcd[src_y * srcw];
-        dst_row = &dstd[dst_y * dstw];
-        for (xr=0,dst_x=0; dst_x < dstw; dst_x++)
-        {
-            src_x = (xr >> 8);
-            dst_row[dst_x] = src_row[src_x];
-            xr += xrstep;
-        }
-        yr += yrstep;
-    }
-}
-#endif /* USEGSLIB */
 
 bool img_ext(const char *ext)
 {
