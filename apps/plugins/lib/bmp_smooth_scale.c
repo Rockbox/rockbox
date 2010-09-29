@@ -78,10 +78,17 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
     fb_data *sptr, *dptr;
     int x, y, end;
     int val_y = 0, val_x;
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    const int sw = src_bmp->height;
+    const int sh = src_bmp->width;
+    const int dw = dest_bmp->height;
+    const int dh = dest_bmp->width;
+#else
     const int sw = src_bmp->width;
     const int sh = src_bmp->height;
     const int dw = dest_bmp->width;
     const int dh = dest_bmp->height;
+#endif
     const int inc_x = (sw << 16) / dw;
     const int inc_y = (sh << 16) / dh;
     const int Cp_x = ((dw << 14) / sw) + 1;
