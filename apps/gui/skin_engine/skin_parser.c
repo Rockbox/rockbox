@@ -248,11 +248,8 @@ static int parse_image_display(struct skin_element *element,
     id->label = label;
     id->offset = 0;
     id->token = NULL;
-    img->using_preloaded_icons = false;
-    if (!strcmp(img->bm.data, "__list_icons__"))
+    if (img->using_preloaded_icons)
     {
-        img->num_subimages = Icon_Last_Themeable;
-        img->using_preloaded_icons = true;
         token->type = SKIN_TOKEN_IMAGE_DISPLAY_LISTICON;
     }
     
@@ -317,6 +314,7 @@ static int parse_image_load(struct skin_element *element,
     img->num_subimages = 1;
     img->always_display = false;
     img->display = -1;
+    img->using_preloaded_icons = false;
 
     /* save current viewport */
     img->vp = &curr_vp->vp;
@@ -330,6 +328,12 @@ static int parse_image_load(struct skin_element *element,
         img->num_subimages = element->params[4].data.number;
         if (img->num_subimages <= 0)
             return WPS_ERROR_INVALID_PARAM;
+    }
+
+    if (!strcmp(img->bm.data, "__list_icons__"))
+    {
+        img->num_subimages = Icon_Last_Themeable;
+        img->using_preloaded_icons = true;
     }
     
     struct skin_token_list *item = 
@@ -1064,7 +1068,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     fd = open(img_path, O_RDONLY);
     if (fd < 0)
         return false;
-    size_t buf_size = read_bmp_file(img_path, bitmap, 0, 
+    size_t buf_size = read_bmp_fd(fd, bitmap, 0, 
                                     format|FORMAT_RETURN_SIZE, NULL);  
     char* imgbuf = (char*)skin_buffer_alloc(buf_size);
     if (!imgbuf)
