@@ -26,8 +26,7 @@
 #include "file.h"
 #include "system.h"
 
-#if LCD_DEPTH > 1  /* save is only available for color, resize for >1bpp */
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) && LCD_DEPTH > 1
 #define LE16(x) (htole16(x))&0xff, ((htole16(x))>>8)&0xff
 #define LE32(x) (htole32(x))&0xff, ((htole32(x))>>8)&0xff, ((htole32(x))>>16)&0xff, ((htole32(x))>>24)&0xff
 /**
@@ -134,7 +133,6 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
         yr += yrstep;
     }
 }
-#endif /* LCD_DEPTH > 1 */
 
 #include "wrappers.h"
 
