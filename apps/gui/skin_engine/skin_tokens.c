@@ -537,7 +537,7 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
         fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
         *filename = (char*)fname;
 #if CONFIG_CODEC == SWCODEC
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         static struct mp3entry tempid3;
         if (tagcache_fill_tags(&tempid3, fname))
         {

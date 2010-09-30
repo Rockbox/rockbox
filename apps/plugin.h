@@ -874,7 +874,7 @@ struct plugin_api {
                            int tag, char *buf, long size);
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
     long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
 #endif

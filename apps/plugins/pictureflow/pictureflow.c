@@ -948,7 +948,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
         struct mp3entry id3;
         int fd;
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         if (rb->tagcache_fill_tags(&id3, tcs.result))
         {
             rb->strlcpy(id3.path, tcs.result, sizeof(id3.path));

@@ -703,7 +703,7 @@ static const struct plugin_api rockbox_api = {
     tagcache_retrieve,
     tagcache_search_finish,
     tagcache_get_numeric,
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     tagcache_fill_tags,
 #endif
 #endif
