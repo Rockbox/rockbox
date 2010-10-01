@@ -410,41 +410,40 @@ enum plugin_status plugin_start(const void* parameter)
                 if (edit_colors_file && line_count)
                 {
                     char *name = temp_line, *value = NULL;
-                    char extension[MAX_LINE_LEN];
+                    char extension[16];
                     int color, old_color;
                     bool temp_changed = false;
+
+                    MENUITEM_STRINGLIST(menu, "Edit What?", NULL,
+                                        "Extension", "Colour");
+
                     rb->settings_parseline(temp_line, &name, &value);
-                    if (line_count)
+                    rb->strlcpy(extension, name, sizeof(extension));
+                    if (value)
+                        my_hex_to_rgb(value, &color);
+                    else
+                        color = 0;
+
+                    switch (rb->do_menu(&menu, NULL, NULL, false))
                     {
-                        MENUITEM_STRINGLIST(menu, "Edit What?", NULL,
-                                            "Extension", "Colour");
-                        rb->strcpy(extension, name);
-                        if (value)
-                            my_hex_to_rgb(value, &color);
-                        else
-                            color = 0;
+                        case 0:
+                            temp_changed = !rb->kbd_input(extension, sizeof(extension));
+                            break;
+                        case 1:
+                            old_color = color;
+                            rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
+                            temp_changed = (value == NULL) || (color != old_color);
+                            break;
+                    }
 
-                        switch (rb->do_menu(&menu, NULL, NULL, false))
-                        {
-                            case 0:
-                                temp_changed = !rb->kbd_input(extension,MAX_LINE_LEN);
-                                break;
-                            case 1:
-                                old_color = color;
-                                rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
-                                temp_changed = (value == NULL) || (color != old_color);
-                                break;
-                        }
-
-                        if (temp_changed)
-                        {
-                            rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
-                                         extension, RGB_UNPACK_RED(color),
-                                         RGB_UNPACK_GREEN(color),
-                                         RGB_UNPACK_BLUE(color));
-                            do_action(ACTION_UPDATE, temp_line, cur_sel);
-                            changed = true;
-                        }
+                    if (temp_changed)
+                    {
+                        rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
+                                     extension, RGB_UNPACK_RED(color),
+                                     RGB_UNPACK_GREEN(color),
+                                     RGB_UNPACK_BLUE(color));
+                        do_action(ACTION_UPDATE, temp_line, cur_sel);
+                        changed = true;
                     }
                 }
                 else
