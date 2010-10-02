@@ -654,17 +654,19 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
         /* Timeout so we can determine if play status has changed */
         bool res = list_do_action(CONTEXT_LIST, HZ/2,
                             &playlist_lists, &button, LIST_WRAP_UNLESS_HELD);
+        /* during moving, another redraw is going to be needed,
+         * since viewer.selected_track is updated too late (after the first draw)
+         * drawing the moving item needs it */
         viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
         if (res)
         {
             bool reload = playlist_buffer_needs_reload(&viewer.buffer,
                     viewer.selected_track);
-            if(reload)
-            {
+            if (reload)
                 playlist_buffer_load_entries_screen(&viewer.buffer,
                     button == ACTION_STD_NEXT ? FORWARD : BACKWARD);
+            if (reload || viewer.moving_track >= 0)
                 gui_synclist_draw(&playlist_lists);
-            }
         }
         switch (button)
         {
