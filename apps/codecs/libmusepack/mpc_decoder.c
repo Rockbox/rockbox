@@ -208,7 +208,7 @@ void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
     *(YR+=IDX) = *(YL+=IDX) = 0;
 
 #define REQUANT_SILENCE \
-    for (n = 0; n < 12; n+=4, YL += 32, YR += 32) { \
+    for (n = 0; n < 36; n+=4, YL += 32, YR += 32) { \
         REQUANT_SILENCE_SAMPLES( 0); \
         REQUANT_SILENCE_SAMPLES(32); \
         REQUANT_SILENCE_SAMPLES(32); \
