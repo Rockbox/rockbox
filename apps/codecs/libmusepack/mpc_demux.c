@@ -239,6 +239,7 @@ static mpc_status mpc_demux_seek_init(mpc_demux * d)
     return MPC_STATUS_OK;
 }
 
+/* rockbox: do not use
 static void mpc_demux_ST(mpc_demux * d)
 {
     mpc_uint64_t tmp;
@@ -300,15 +301,14 @@ static void mpc_demux_SP(mpc_demux * d, int size, int block_size)
     mpc_demux_seek(d, (ptr - size) * 8 + cur, 11);
     st_head_size = mpc_bits_get_block(&d->bits_reader, &b);
     if (memcmp(b.key, "ST", 2) == 0) {
-/* rockbox: not used
         d->chap_pos = (ptr - size + b.size + st_head_size) * 8 + cur;
         d->chap_nb = -1;
-*/
         mpc_demux_fill(d, (mpc_uint32_t) b.size, 0);
         mpc_demux_ST(d);
     }
     mpc_demux_seek(d, cur, 11 + block_size);
 }
+*/
 /* rockbox: not used
 static void mpc_demux_chap_find(mpc_demux * d)
 {
@@ -458,10 +458,12 @@ static mpc_status mpc_demux_header(mpc_demux * d)
                 streaminfo_gain(&d->si, &d->bits_reader);
             else if (memcmp(b.key, "EI", 2) == 0)
                 streaminfo_encoder_info(&d->si, &d->bits_reader);
+/* rockbox: do not use
             else if (memcmp(b.key, "SO", 2) == 0)
                 mpc_demux_SP(d, size, (mpc_uint32_t) b.size);
             else if (memcmp(b.key, "ST", 2) == 0)
                 mpc_demux_ST(d);
+*/
             d->bits_reader.buff += b.size;
             size = mpc_bits_get_block(&d->bits_reader, &b);
         }
