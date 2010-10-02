@@ -897,10 +897,10 @@ resistor.220x176x16.bmp
 resistor.176x220x16.bmp
 #elif (LCD_WIDTH >= 160)
 resistor.160x128x16.bmp
-#elif (LCD_WIDTH >= 132)
-resistor.132x80x16.bmp
-#elif (LCD_WIDTH >= 128)
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96)
 resistor.128x128x16.bmp
+#else
+resistor.68x20x16.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

@@ -13,8 +13,7 @@ TODO:
 /* Defining player-specific constants */
 
 #if defined(HAVE_LCD_COLOR)
-#define    RESISTOR_BMP_X           0 
-/* The BMPs are now the exact width of the screen */
+#define    RESISTOR_BMP_X           ((LCD_WIDTH - BMPWIDTH_resistor) / 2)
 
 #if LCD_WIDTH >= 320 && LCD_HEIGHT >= 240 /* iPod video or larger */
 #define    RESISTOR_BMP_Y           3
@@ -37,7 +36,7 @@ TODO:
 #elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 128 /* GoGear */
 #define RESISTOR_BMP_Y             3
 
-#elif LCD_WIDTH >= 132 && LCD_HEIGHT >= 80 /* c200 */
+#else /* Small screens */
 #define RESISTOR_BMP_Y             0
 /* And along with the tiny screen comes a whole bunch of exceptions */
 
@@ -74,21 +73,6 @@ TODO:
 
 #include "pluginbitmaps/resistor.h"
 
-#if LCD_WIDTH == 132 && LCD_HEIGHT == 80
-/* Proboably not the best solution */
-/* Special for the c200 */
-#define band_width                 5
-#define band_height                16
-
-#define first_band_x               50
-#define second_band_x              60
-#define third_band_x               70
-#define fourth_band_x              80
-#define universal_y                2
-
-#else /* LCD_WIDTH == 132 && LCD_HEIGHT == 80 */
-/* Everything else */
-
 #define band_width                 (BMPWIDTH_resistor/15)
 #define band_height                (BMPHEIGHT_resistor*9/10)
 
@@ -98,39 +82,28 @@ TODO:
 #define fourth_band_x              (3*BMPWIDTH_resistor/4 + RESISTOR_BMP_X - band_width/2)
 #define universal_y                (RESISTOR_BMP_Y+(BMPHEIGHT_resistor)/2 - band_height/2)
 
-#endif /* LCD_WIDTH == 132 && LCD_HEIGHT == 80 */
+#if LCD_WIDTHT <= 128
+#define total_resistance_str_x     1
+#define tolerance_str_x            1
+#define resistance_val_x           1
+#define r_to_c_out_str_x           1
+#else /* LCD_WIDTHT <= 128 */
+#define total_resistance_str_x     (LCD_WIDTH/14)
+#define tolerance_str_x            (LCD_WIDTH/14)
+#define resistance_val_x           (LCD_WIDTH/14)
+#define r_to_c_out_str_x           (LCD_WIDTH/14)
+#endif
+
 
 #if LCD_HEIGHT <= 128
-#define total_resistance_str_x     1
 #define total_resistance_str_y     (BMPHEIGHT_resistor + RESISTOR_BMP_Y + 3)
-
-#define tolerance_str_x            1
 #define tolerance_str_y            total_resistance_str_y + 20
-#define resistance_val_x           1
 #define resistance_val_y           total_resistance_str_y + 20
-#define r_to_c_out_str_x           1
 #define r_to_c_out_str_y           total_resistance_str_y + 30
-
-#elif LCD_WIDTH == 132 && LCD_HEIGHT == 80 /* Special for the c200 */
-#define total_resistance_str_x     0
-#define total_resistance_str_y     BMPHEIGHT_resistor + 1
-
-#define tolerance_str_x            0
-#define tolerance_str_y            total_resistance_str_y + 8
-#define resistance_val_x           0
-#define resistance_val_y           tolerance_resistance_str_y + 8
-#define r_to_c_out_str_x           0
-#define r_to_c_out_str_y           tolerance_resistance_str_y + 16
-
 #else /* LCD_HEIGHT <= 128 */
-#define total_resistance_str_x     (LCD_WIDTH/14)
 #define total_resistance_str_y     (2*RESISTOR_BMP_Y + BMPHEIGHT_resistor)
-
-#define tolerance_str_x            (LCD_WIDTH/14)
 #define tolerance_str_y            (total_resistance_str_y + 15)
-#define resistance_val_x           (LCD_WIDTH/14)
 #define resistance_val_y           (total_resistance_str_y + 15)
-#define r_to_c_out_str_x           (LCD_WIDTH/14)
 #define r_to_c_out_str_y           (total_resistance_str_y + 25)
 /* tolerance_str and resistance_val will never be shown at the same time */
 
