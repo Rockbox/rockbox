@@ -28,6 +28,7 @@ dice.c
 disktidy.c
 flipit.c
 shopper.c
+resistor.c
 
 
 #ifdef USB_ENABLE_HID

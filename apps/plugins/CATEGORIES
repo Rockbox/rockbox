@@ -73,6 +73,7 @@ ppmviewer,viewers
 properties,viewers
 random_folder_advance_config,apps
 remote_control,apps
+resistor,apps
 reversi,games
 robotfindskitten,games
 rockblox,games
