@@ -82,7 +82,7 @@ TODO:
 #define fourth_band_x              (3*BMPWIDTH_resistor/4 + RESISTOR_BMP_X - band_width/2)
 #define universal_y                (RESISTOR_BMP_Y+(BMPHEIGHT_resistor)/2 - band_height/2)
 
-#if LCD_WIDTHT <= 128
+#if LCD_WIDDHT <= 128
 #define total_resistance_str_x     1
 #define tolerance_str_x            1
 #define resistance_val_x           1
