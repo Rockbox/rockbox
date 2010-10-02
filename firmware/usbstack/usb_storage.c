@@ -37,7 +37,7 @@
  * is useful for USBCV MSC tests, as those are destructive.
  * This won't work right if the device doesn't have a card slot.
  */
-//#define ONLY_EXPOSE_CARD_SLOT
+//#define HIDE_FIRST_DRIVE
 
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
