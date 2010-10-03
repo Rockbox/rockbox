@@ -151,6 +151,9 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
 
     screen->set_drawmode(DRMODE_SOLID);
 
+    if (flags & INNER_NOFILL)
+        return;
+
 #ifdef HAVE_LCD_COLOR
     if (infill == INNER_BGFILL)
     {
@@ -190,7 +193,12 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x,
 
     /* clear pixels in progress bar */
     screen->fillrect(x, y, width, height);
-    
+
+    screen->set_drawmode(DRMODE_SOLID);
+
+    if (flags & INNER_NOFILL)
+        return;
+
     if (flags & INVERTFILL)
     {
         min_shown = items - max_shown;
@@ -203,8 +211,6 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x,
         inner_len = height;
 
     scrollbar_helper(min_shown, max_shown, items, inner_len, &size, &start);
-
-    screen->set_drawmode(DRMODE_SOLID);
 
     if (flags & HORIZONTAL) {
         x += start;

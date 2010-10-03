@@ -135,8 +135,6 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     unsigned long length, end;
     int flags = HORIZONTAL;
     
-    int drawn_length, drawn_end;
-    
     if (height < 0)
         height = font_get(vp->font)->height;
 
@@ -180,17 +178,6 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         end = 0;
     }
     
-    if (pb->nofill)
-    {
-        drawn_length = 1;
-        drawn_end = 0;
-    }
-    else
-    {
-        drawn_length = length;
-        drawn_end = end;
-    }
-    
     if (!pb->horizontal)
     {
         /* we want to fill upwards which is technically inverted. */
@@ -202,37 +189,19 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         flags ^= INVERTFILL;
     }
 
-    
+    if (pb->nofill)
+    {
+        flags |= INNER_NOFILL;
+    }
+
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, &pb->bm,
                                 pb->x, y, pb->width, pb->bm.height,
-                                drawn_length, 0, drawn_end, flags);
+                                length, 0, end, flags);
     else
         gui_scrollbar_draw(display, pb->x, y, pb->width, height,
-                           drawn_length, 0, drawn_end, flags);
+                           length, 0, end, flags);
 
-    if (pb->type == SKIN_TOKEN_PROGRESSBAR)
-    {
-        if (id3 && id3->length)
-        {
-#ifdef AB_REPEAT_ENABLE
-            if (ab_repeat_mode_enabled())
-                ab_draw_markers(display, id3->length,
-                                pb->x, y, pb->width, height);
-#endif
-
-            if (id3->cuesheet)
-                cue_draw_markers(display, id3->cuesheet, id3->length,
-                                 pb->x, y+1, pb->width, height-2);
-        }
-#if 0 /* disable for now CONFIG_TUNER */
-        else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
-        {
-            presets_draw_markers(display, pb->x, y, pb->width, height);
-        }
-#endif
-    }
-    
     if (pb->slider)
     {
         int x = pb->x, y = pb->y;
@@ -264,6 +233,28 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
                                              STRIDE(display->screen_type,
                                              img->bm.width, img->bm.height),
                                              x, y, width, height);
+        }
+#endif
+    }
+
+    if (pb->type == SKIN_TOKEN_PROGRESSBAR)
+    {
+        if (id3 && id3->length)
+        {
+#ifdef AB_REPEAT_ENABLE
+            if (ab_repeat_mode_enabled())
+                ab_draw_markers(display, id3->length,
+                                pb->x, y, pb->width, height);
+#endif
+
+            if (id3->cuesheet)
+                cue_draw_markers(display, id3->cuesheet, id3->length,
+                                 pb->x, y+1, pb->width, height-2);
+        }
+#if 0 /* disable for now CONFIG_TUNER */
+        else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+        {
+            presets_draw_markers(display, pb->x, y, pb->width, height);
         }
 #endif
     }
@@ -783,6 +774,3 @@ int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
     }
     return button;
 }
-
-
-
