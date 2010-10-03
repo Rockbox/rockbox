@@ -50,10 +50,6 @@ static int max_line;
 static int remote_line;
 static int remote_max_line;
 #endif
-#if LCD_DEPTH < 4
-static unsigned char *gbuf;
-static size_t gbuf_size;
-#endif
 
 static void log_init(void)
 {
@@ -104,6 +100,8 @@ static void time_main_update(void)
     const int part14_w = LCD_WIDTH/2;   /* x-size for 1/4 update test */
     const int part14_y = LCD_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = LCD_HEIGHT/2;  /* y-size for 1/4 update test */
+
+    log_text("Main LCD Update");
 
     /* Test 1: full LCD update */
     frame_count = 0;
@@ -182,6 +180,8 @@ static void time_main_yuv(void)
     const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
     
+    log_text("Main LCD YUV");
+
     rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
 
     /* Test 1: full LCD update */
@@ -231,6 +231,8 @@ static void time_remote_update(void)
     const int part14_w = LCD_REMOTE_WIDTH/2;   /* x-size for 1/4 update test */
     const int part14_y = LCD_REMOTE_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = LCD_REMOTE_HEIGHT/2;  /* y-size for 1/4 update test */
+
+    log_text("Remote LCD Update");
 
     /* Test 1: full LCD update */
     frame_count = 0;
@@ -284,52 +286,67 @@ static void time_greyscale(void)
     long time_1, time_2;
     int frames_1, frames_2;
     int fps, load;
+    size_t gbuf_size;
+    unsigned char *gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP,
-                   LCD_WIDTH, LCD_HEIGHT, NULL))
+#if NUM_CORES > 1
+    int i;
+    for (i = 0; i < NUM_CORES; i++)
     {
-        log_text("greylib: out of memory.");
-        return;
-    }
-    make_grey_rect(LCD_WIDTH, LCD_HEIGHT);
-
-    /* Test 1 - greyscale overlay not yet enabled */
-    frames_1 = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
-    {
-        grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
-        frames_1++;
-    }
-    time_1 = time_end - time_start;
-    
-    /* Test 2 - greyscale overlay enabled */
-    grey_show(true);
-    frames_2 = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
-    {
-        grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
-        frames_2++;
-    }
-    time_2 = time_end - time_start;
-
-    grey_release();
-    fps = calc_tenth_fps(frames_2, time_2);
-    load = 100 - (100 * frames_2 * time_1) / (frames_1 * time_2);
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
-    log_text(str);
-
-    if (load > 0 && load < 100)
-    {
-        rb->snprintf(str, sizeof(str), "CPU load: %d%%", load);
+        rb->snprintf(str, sizeof(str), "Greyscale (%s)",
+                     (i > 0) ? "COP" : "CPU");
         log_text(str);
+#else
+    const int i = 0;
+    log_text("Greyscale library");
+    {
+#endif
+
+        if (!grey_init(gbuf, gbuf_size, (i > 0) ? GREY_ON_COP : 0,
+                       LCD_WIDTH, LCD_HEIGHT, NULL))
+        {
+            log_text("greylib: out of memory.");
+            return;
+        }
+        make_grey_rect(LCD_WIDTH, LCD_HEIGHT);
+
+        /* Test 1 - greyscale overlay not yet enabled */
+        frames_1 = 0;
+        rb->sleep(0); /* sync to tick */
+        time_start = *rb->current_tick;
+        while((time_end = *rb->current_tick) - time_start < DURATION)
+        {
+            grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
+            frames_1++;
+        }
+        time_1 = time_end - time_start;
+    
+        /* Test 2 - greyscale overlay enabled */
+        grey_show(true);
+        frames_2 = 0;
+        rb->sleep(0); /* sync to tick */
+        time_start = *rb->current_tick;
+        while((time_end = *rb->current_tick) - time_start < DURATION)
+        {
+            grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
+            frames_2++;
+        }
+        time_2 = time_end - time_start;
+
+        grey_release();
+        fps = calc_tenth_fps(frames_2, time_2);
+        load = 100 - (100 * frames_2 * time_1) / (frames_1 * time_2);
+        rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+        log_text(str);
+
+        if (load > 0 && load < 100)
+        {
+            rb->snprintf(str, sizeof(str), "CPU load: %d%%", load);
+            log_text(str);
+        }
+        else
+            log_text("CPU load err (boost?)");
     }
-    else
-        log_text("CPU load err (boost?)");
 }
 #endif
 
@@ -350,18 +367,14 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     backlight_force_on(); /* backlight control in lib/helper.c */
 
-    log_text("Main LCD Update");
     time_main_update();
 #if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
-    log_text("Main LCD YUV");
     time_main_yuv();
 #endif
 #if LCD_DEPTH < 4
-    log_text("Greyscale library");
     time_greyscale();
 #endif
 #ifdef HAVE_REMOTE_LCD
-    log_text("Remote LCD Update");
     time_remote_update();
 #endif
 
