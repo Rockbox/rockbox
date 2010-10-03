@@ -39,12 +39,12 @@ TODO:
 #else /* Small screens */
 #define RESISTOR_BMP_Y             0
 
-#endif /* HAVE_LCD_COLOR */
+#endif
 
-#else
+#else /* HAVE_LCD_COLOR */
 
 #define    USE_TEXT_ONLY
-#endif
+#endif /* HAVE_LCD_COLOR */
 
 #define total_resistance_str_x     1
 #define tolerance_str_x            1
@@ -242,10 +242,14 @@ void draw_resistor(enum color firstband_color,
                    enum color thirdband_color,
                    enum color fourthband_color)
 {
+    unsigned int fg;
+
     rb->lcd_clear_display();
     display->set_viewport(&bitmap_vp);
     rb->lcd_bitmap_transparent(resistor, RESISTOR_BMP_X, 0, 
                                BMPWIDTH_resistor, BMPHEIGHT_resistor);
+
+    fg = rb->lcd_get_foreground();
         
     if(firstband_color != RES_NONE) {
         rb->lcd_set_foreground(band_data[firstband_color].color_value);
@@ -279,7 +283,7 @@ void draw_resistor(enum color firstband_color,
         rb->lcd_drawrect(fourth_band_x, universal_y, band_width, band_height);
     }
     
-    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_foreground(fg);
             
     rb->lcd_update();
     return;
