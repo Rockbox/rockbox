@@ -369,6 +369,7 @@ bool settings_load_config(const char* file, bool apply)
     close(fd);
     if (apply)
     {
+        settings_save();
         settings_apply(true);
         settings_apply_skins();
     }
