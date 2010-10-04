@@ -12544,3 +12544,31 @@
     *: "Aggiorna allo Stop"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Avvia Sfoglia File Da Qui"
+  </dest>
+  <voice>
+    *: "Avvia Sfoglia File Da Qui"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Avvia Sfoglia File Da /"
+  </dest>
+  <voice>
+    *: "Avvia Sfoglia File Dalla Radice"
+  </voice>
+</phrase>
