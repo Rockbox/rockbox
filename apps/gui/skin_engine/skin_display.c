@@ -181,7 +181,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     if (!pb->horizontal)
     {
         /* we want to fill upwards which is technically inverted. */
-        flags = VERTICAL|INVERTFILL;
+        flags = INVERTFILL;
     }
     
     if (pb->invert_fill_direction)
@@ -209,15 +209,29 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         int height = pb->height;
         struct gui_img *img = pb->slider;
             
-        if (flags&VERTICAL)
+        if ((flags&HORIZONTAL) == 0)
         {
-            y += pb->height*end/length;
             height = img->bm.height;
+            if (flags&INVERTFILL)
+                y += pb->height - pb->height*end/length;
+            else
+                y += pb->height*end/length;
+#if 0 /* maybe add this in later, make the slider bmp overlap abit */
+            if ((flags&INNER_NOFILL) == 0)
+                y -= img->bm.height/2;
+#endif
         }
         else
         {
-            x += pb->width*end/length;
-            width = img->bm.width;
+            width = img->bm.width;            
+            if (flags&INVERTFILL)
+                x += pb->width - pb->width*end/length;
+            else
+                x += pb->width*end/length;
+#if 0 /* maybe add this in later, make the slider bmp overlap abit */
+            if ((flags&INNER_NOFILL) == 0)
+                x -= img->bm.width/2;
+#endif
         }
 #if LCD_DEPTH > 1
         if(img->bm.format == FORMAT_MONO) {
