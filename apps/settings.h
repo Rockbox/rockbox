@@ -810,6 +810,7 @@ struct user_settings
 #endif
     } hw_eq_bands[AUDIOHW_EQ_BAND_NUM];
 #endif /* AUDIOHW_HAVE_EQ */
+    char start_directory[2*MAX_FILENAME+1];
 };
 
 /** global variables **/

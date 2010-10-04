@@ -545,7 +545,8 @@ char* get_current_file(char* buffer, size_t buffer_len)
     {
         if (tc.dirlength)
         {
-            strlcat(buffer, "/", buffer_len);
+            if (buffer[strlen(buffer)-1] != '/')
+                strlcat(buffer, "/", buffer_len);
             if (strlcat(buffer, e->name, buffer_len) >= buffer_len)
                 return NULL;
         }

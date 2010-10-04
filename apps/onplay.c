@@ -1045,6 +1045,16 @@ static bool set_recdir(void)
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
                   set_recdir, NULL, clipboard_callback, Icon_Recording);
 #endif
+static bool set_startdir(void)
+{
+    snprintf(global_settings.start_directory, 
+             sizeof(global_settings.start_directory),
+             "%s/", selected_file);
+    settings_save();
+    return false;
+}
+MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_SET_AS_START_DIR),
+                  set_startdir, NULL, clipboard_callback, Icon_file_view_menu);
 
 static int clipboard_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -1097,7 +1107,8 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                 else if ((selected_file_attr & ATTR_DIRECTORY))
                 {
                     /* only for directories */
-                    if (this_item == &delete_dir_item
+                    if (this_item == &delete_dir_item ||
+                        this_item == &set_startdir_item
 #ifdef HAVE_RECORDING
                      || this_item == &set_recdir_item
 #endif
@@ -1162,7 +1173,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_RECORDING
            &set_recdir_item,
 #endif
-           &add_to_faves_item,
+           &set_startdir_item, &add_to_faves_item,
          );
 static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
 {

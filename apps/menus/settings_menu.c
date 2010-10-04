@@ -103,6 +103,15 @@ MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
 #ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
 #endif
+static int clear_start_directory(void)
+{
+    strcpy(global_settings.start_directory, "/");
+    settings_save();
+    splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
+    return false;
+}
+MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR), 
+                  clear_start_directory, NULL, NULL, Icon_file_view_menu);
 static int fileview_callback(int action,const struct menu_item_ex *this_item)
 {
     static int oldval;
@@ -124,8 +133,9 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
                 &sort_case, &sort_dir, &sort_file, &interpret_numbers,
                 &dirfilter, &show_filename_ext, &browse_current,
 #ifdef HAVE_LCD_BITMAP
-                &show_path_in_browser
+                &show_path_in_browser,
 #endif
+                &clear_start_directory_item
                 );
 /*    FILE VIEW MENU               */
 /***********************************/

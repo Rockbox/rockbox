@@ -115,6 +115,10 @@ static int browser(void* param)
             {
                 strcpy(folder, current_track_path);
             }
+            else if (!strcmp(last_folder, "/"))
+            {
+                strcpy(folder, global_settings.start_directory);
+            }
             else
             {
 #ifdef HAVE_HOTSWAP
@@ -142,9 +146,9 @@ static int browser(void* param)
                         break;
                     }
                 }
-            if (!in_hotswap)
+                if (!in_hotswap)
 #endif
-                strcpy(folder, last_folder);
+                    strcpy(folder, last_folder);
             }
         break;
 #ifdef HAVE_TAGCACHE
@@ -252,7 +256,8 @@ static int browser(void* param)
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
-            if (!get_current_file(last_folder, MAX_PATH))
+            if (!get_current_file(last_folder, MAX_PATH) ||
+                !strchr(&last_folder[1], '/'))
             {
                 last_folder[0] = '/';
                 last_folder[1] = '\0';
