@@ -403,9 +403,6 @@ void cb_progress(int current, int total)
 #define VSCROLL (LCD_HEIGHT/8)
 #define HSCROLL (LCD_WIDTH/10)
 
-#define ZOOM_IN  100 /* return codes for below function */
-#define ZOOM_OUT 101
-
 /* Pan the viewing window right - move image to the left and fill in
    the right-hand side */
 static void pan_view_right(struct image_info *info)

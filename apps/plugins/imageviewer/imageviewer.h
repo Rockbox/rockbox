@@ -382,9 +382,14 @@
 #define MIN_MEM 120000
 
 /* State code for output with return. */
-#define PLUGIN_OTHER    10
-#define PLUGIN_ABORT    11
-#define PLUGIN_OUTOFMEM 12
+enum {
+    PLUGIN_OTHER = 0x200,
+    PLUGIN_ABORT,
+    PLUGIN_OUTOFMEM,
+
+    ZOOM_IN,
+    ZOOM_OUT,
+};
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
 #define DISK_SPINDOWN
