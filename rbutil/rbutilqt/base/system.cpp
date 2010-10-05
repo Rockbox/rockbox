@@ -509,33 +509,40 @@ QUrl System::systemProxy(void)
     CFDictionaryRef dictref;
     CFStringRef stringref;
     CFNumberRef numberref;
-    int enable;
-    int port;
+    int enable = 0;
+    int port = 0;
     unsigned int bufsize = 0;
     char *buf;
     QUrl proxy;
 
     dictref = SCDynamicStoreCopyProxies(NULL);
-    stringref = (CFStringRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPProxy);
+    if(dictref == NULL)
+        return proxy;
     numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPEnable);
-    CFNumberGetValue(numberref, kCFNumberIntType, &enable);
+    if(numberref != NULL)
+        CFNumberGetValue(numberref, kCFNumberIntType, &enable);
     if(enable == 1) {
-        // get number of characters. CFStringGetLength uses UTF-16 code pairs
-        bufsize = CFStringGetLength(stringref) * 2 + 1;
-        buf = (char*)malloc(sizeof(char) * bufsize);
-        if(buf == NULL) {
-            qDebug() << "[System] can't allocate memory for proxy string!";
-            CFRelease(dictref);
-            return QUrl("");
-        }
-        CFStringGetCString(stringref, buf, bufsize, kCFStringEncodingUTF16);
-        numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPPort);
-        CFNumberGetValue(numberref, kCFNumberIntType, &port);
-        proxy.setScheme("http");
-        proxy.setHost(QString::fromUtf16((unsigned short*)buf));
-        proxy.setPort(port);
+        // get proxy string
+        stringref = (CFStringRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPProxy);
+        if(stringref != NULL) {
+            // get number of characters. CFStringGetLength uses UTF-16 code pairs
+            bufsize = CFStringGetLength(stringref) * 2 + 1;
+            buf = (char*)malloc(sizeof(char) * bufsize);
+            if(buf == NULL) {
+                qDebug() << "[System] can't allocate memory for proxy string!";
+                CFRelease(dictref);
+                return QUrl("");
+            }
+            CFStringGetCString(stringref, buf, bufsize, kCFStringEncodingUTF16);
+            numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPPort);
+            if(numberref != NULL)
+                CFNumberGetValue(numberref, kCFNumberIntType, &port);
+            proxy.setScheme("http");
+            proxy.setHost(QString::fromUtf16((unsigned short*)buf));
+            proxy.setPort(port);
 
-        free(buf);
+            free(buf);
+            }
     }
     CFRelease(dictref);
 
