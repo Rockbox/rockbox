@@ -159,6 +159,12 @@ static struct skin_element* skin_parse_viewport(const char** document)
     }
 #endif
 
+    if (check_viewport(cursor))
+    {
+        retval->children_count = 0;
+        *document = cursor;
+        return retval;
+    }
     retval->children_count = 1;
     retval->children = skin_alloc_children(1);
     if (!retval->children)
