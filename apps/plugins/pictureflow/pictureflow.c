@@ -410,7 +410,7 @@ static int extra_fade;
 
 static int albumtxt_x = 0;
 static int albumtxt_dir = -1;
-static int prev_center_index = -1;
+static int prev_albumtxt_index = -1;
 
 static int start_index_track_list = 0;
 static int track_list_visible_entries = 0;
@@ -418,6 +418,7 @@ static int track_list_y;
 static int track_list_h;
 static int track_scroll_x = 0;
 static int track_scroll_dir = 1;
+static int last_selected_track;
 
 /*
     Proposals for transitions:
@@ -1119,6 +1120,8 @@ bool create_albumart_cache(void)
         format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
     for (i=0; i < album_count; i++)
     {
+        draw_progressbar(i);
+
         rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x.pfraw",
                      mfnv(get_album_name(i)));
         /* delete existing cache, so it's a true rebuild */
@@ -1127,7 +1130,6 @@ bool create_albumart_cache(void)
                 continue;
             rb->remove(pfraw_file);
         }
-        draw_progressbar(i);
         if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
             rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
 
@@ -2105,7 +2107,6 @@ void update_scroll_animation(void)
 */
 void cleanup(void)
 {
-    int i;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -2116,8 +2117,6 @@ void cleanup(void)
 #ifdef USEGSLIB
     grey_release();
 #endif
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_undo(i, false);
 }
 
 /**
@@ -2149,7 +2148,7 @@ int settings_menu(void)
     };
 
     do {
-        selection=rb->do_menu(&settings_menu,&selection, NULL, true);
+        selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 rb->set_bool("Show FPS", &show_fps);
@@ -2248,7 +2247,7 @@ int main_menu(void)
 #endif
                                             "Settings", "Return", "Quit");
     while (1)  {
-        switch (rb->do_menu(&main_menu,&selection, NULL, true)) {
+        switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
@@ -2373,19 +2372,20 @@ static void track_list_yh(int char_height)
 void reset_track_list(void)
 {
     int char_height = rb->screens[SCREEN_MAIN]->getcharheight();
+    int total_height;
     track_list_yh(char_height);
     track_list_visible_entries = fmin( track_list_h/char_height , track_count );
     start_index_track_list = 0;
-    track_scroll_x = 0;
-    track_scroll_dir = 1;
     selected_track = 0;
+    last_selected_track = -1;
 
     /* let the tracklist start more centered
      * if the screen isn't filled with tracks */
-    if (track_count*char_height < track_list_h)
+    total_height = track_count*char_height;
+    if (total_height < track_list_h)
     {
-        track_list_h = track_count * char_height;
-        track_list_y = LCD_HEIGHT / 2  - (track_list_h / 2);
+        track_list_y += (track_list_h - total_height) / 2;
+        track_list_h = total_height;
     }
 }
 
@@ -2411,8 +2411,12 @@ void show_track_list(void)
         mylcd_getstringsize(get_track_name(track_i), &titletxt_w, NULL);
         titletxt_x = (LCD_WIDTH-titletxt_w)/2;
         if ( track_i == selected_track ) {
+            if (selected_track != last_selected_track) {
+                last_selected_track = selected_track;
+                track_scroll_x = 0;
+                track_scroll_dir = -1;
+            }
             draw_gradient(titletxt_y, titletxt_h);
-            mylcd_set_foreground(G_BRIGHT(255));
             if (titletxt_w > LCD_WIDTH ) {
                 if ( titletxt_w + track_scroll_x <= LCD_WIDTH )
                     track_scroll_dir = 1;
@@ -2420,13 +2424,13 @@ void show_track_list(void)
                 track_scroll_x += track_scroll_dir*2;
                 titletxt_x = track_scroll_x;
             }
-            mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+            color = 255;
         }
         else {
             color = 250 - (abs(selected_track - track_i) * 200 / track_count);
-            mylcd_set_foreground(G_BRIGHT(color));
-            mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
         }
+        mylcd_set_foreground(G_BRIGHT(color));
+        mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
         titletxt_y += titletxt_h;
     }
 }
@@ -2435,8 +2439,6 @@ void select_next_track(void)
 {
     if (  selected_track < track_count - 1 ) {
         selected_track++;
-        track_scroll_x = 0;
-        track_scroll_dir = 1;
         if (selected_track==(track_list_visible_entries+start_index_track_list))
             start_index_track_list++;
     }
@@ -2446,8 +2448,6 @@ void select_prev_track(void)
 {
     if (selected_track > 0 ) {
         if (selected_track==start_index_track_list) start_index_track_list--;
-        track_scroll_x = 0;
-        track_scroll_dir = 1;
         selected_track--;
     }
 }
@@ -2506,6 +2506,7 @@ void draw_album_text(void)
     if (show_album_name == ALBUM_NAME_HIDE)
         return;
 
+    int albumtxt_index;
     int albumtxt_w, albumtxt_h;
     int albumtxt_y = 0;
 
@@ -2516,25 +2517,26 @@ void draw_album_text(void)
         c = ((slide_frame & 0xffff )/ 255);
         if (step < 0) c = 255-c;
         if (c > 128 ) { /* half way to next slide .. still not perfect! */
-            albumtxt = get_album_name(center_index+step);
+            albumtxt_index = center_index+step;
             c = (c-128)*2;
         }
         else {
-            albumtxt = get_album_name(center_index);
+            albumtxt_index = center_index;
             c = (128-c)*2;
         }
     }
     else {
+        albumtxt_index = center_index;
         c= 255;
-        albumtxt = get_album_name(center_index);
     }
+    albumtxt = get_album_name(albumtxt_index);
 
     mylcd_set_foreground(G_BRIGHT(c));
     mylcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
-    if (center_index != prev_center_index) {
+    if (albumtxt_index != prev_albumtxt_index) {
         albumtxt_x = 0;
         albumtxt_dir = -1;
-        prev_center_index = center_index;
+        prev_albumtxt_index = albumtxt_index;
     }
 
     if (show_album_name == ALBUM_NAME_TOP)
@@ -2845,12 +2847,10 @@ int main(void)
 
 enum plugin_status plugin_start(const void *parameter)
 {
-    int ret, i;
+    int ret;
     (void) parameter;
     atexit(cleanup);
 
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_enable(i, false, NULL);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
