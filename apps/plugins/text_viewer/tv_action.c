@@ -174,8 +174,6 @@ unsigned tv_menu(void)
     if (res == TV_MENU_RESULT_EXIT_MENU)
     {
         tv_convert_fpos(cur_file_pos, &cur_pos);
-        if (preferences->vertical_scroll_mode == VS_PAGE)
-            cur_pos.line = 0;
 
         tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);
     }

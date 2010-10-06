@@ -60,7 +60,7 @@ enum plugin_status plugin_start(const void* file)
     atexit(tv_exit);
     while (!done) {
 #ifdef HAVE_LCD_BITMAP
-        if (rb->global_settings->statusbar != STATUSBAR_OFF && preferences->statusbar)
+        if (preferences->statusbar)
             rb->send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 #endif
 

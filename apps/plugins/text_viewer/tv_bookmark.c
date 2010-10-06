@@ -166,6 +166,30 @@ void tv_create_system_bookmark(void)
     }
 }
 
+static const char* get_bookmark_name(int selected, void * data,
+                                     char * buffer, size_t buffer_len)
+{
+    (void)data;
+    struct tv_bookmark_info *bookmark = &bookmarks[selected];
+    rb->snprintf(buffer, buffer_len,
+#ifdef HAVE_LCD_BITMAP
+                 "%cPage: %d  Line: %d",
+#else
+                 "%cP:%d  L:%d",
+#endif
+                 (bookmark->flag & TV_BOOKMARK_SYSTEM)? '*' : ' ',
+                 bookmark->pos.page + 1, bookmark->pos.line + 1);
+    return buffer;
+}
+
+static int list_action_callback(int action, struct gui_synclist *lists)
+{
+    (void) lists;
+    if (action == ACTION_STD_OK)
+        return ACTION_STD_CANCEL;
+    return action;
+}
+
 void tv_select_bookmark(void)
 {
     int i;
@@ -185,32 +209,18 @@ void tv_select_bookmark(void)
         select_pos = bookmarks[0].pos;
     else
     {
-        int selected = -1;
-        struct opt_items items[bookmark_count];
-        unsigned char names[bookmark_count][24];
+        struct simplelist_info info;
 
         rb->qsort(bookmarks, bookmark_count, sizeof(struct tv_bookmark_info), bm_comp);
 
-        for (i = 0; i < bookmark_count; i++)
-        {
-            rb->snprintf(names[i], sizeof(names[0]),
-#if CONFIG_KEYPAD != PLAYER_PAD
-                         "%cPage: %d  Line: %d",
-#else
-                         "%cP:%d  L:%d",
-#endif
-                         (bookmarks[i].flag & TV_BOOKMARK_SYSTEM)? '*' : ' ',
-                         bookmarks[i].pos.page + 1,
-                         bookmarks[i].pos.line + 1);
-            items[i].string = names[i];
-            items[i].voice_id = -1;
-        }
+        rb->simplelist_info_init(&info, "Select bookmark",
+                                 bookmark_count, bookmarks);
+        info.get_name = get_bookmark_name;
+        info.action_callback = list_action_callback;
+        rb->simplelist_show_list(&info);
 
-        rb->set_option("Select bookmark", &selected, INT, items,
-                       bookmark_count, NULL);
-
-        if (selected >= 0 && selected < bookmark_count)
-            select_pos = bookmarks[selected].pos;
+        if (info.selection >= 0 && info.selection < bookmark_count)
+            select_pos = bookmarks[info.selection].pos;
         else
         {
             /* when does not select any bookmarks, move to the current page */

@@ -111,7 +111,6 @@ void tv_seek(off_t offset, int whence)
                 return;
             }
             file_pos += buf_pos;
-            whence = SEEK_SET;
             break;
 
         default:
