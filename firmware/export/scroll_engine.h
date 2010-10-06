@@ -56,6 +56,7 @@ struct scrollinfo
     int y;      /* Position of the line on the screen (char co-ordinates) */
     int offset;
     int startx;
+    int y_offset; /* y offset of the line, used for pixel-accurate list scrolling */
 #ifdef HAVE_LCD_BITMAP
     int width;  /* length of line in pixels */
     int style; /* line style */

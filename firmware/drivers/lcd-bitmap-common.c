@@ -284,8 +284,8 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 /*** Line oriented text output ***/
 
 /* put a string at a given char position */
-void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
-                              int style, int offset)
+void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
+                              int style, int x_offset, int y_offset)
 {
     int xpos, ypos, w, h;
     LCDFN(scroll_stop_line)(current_vp, y);
@@ -294,8 +294,14 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
 
     LCDFN(getstringsize)(str, &w, &h);
     xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
-    ypos = y * h;
-    LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, offset);
+    ypos = y * h + y_offset;
+    LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, x_offset);
+}
+
+void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
+                              int style, int x_offset)
+{
+    LCDFN(puts_style_xyoffset)(x, y, str, style, x_offset, 0);
 }
 
 void LCDFN(puts)(int x, int y, const unsigned char *str)
@@ -326,8 +332,8 @@ void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
 
 /*** scrolling ***/
 
-void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
-                                     int style, int offset)
+void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string,
+                                     int style, int x_offset, int y_offset)
 {
     struct scrollinfo* s;
     char *end;
@@ -343,7 +349,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
     if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
     if (!string)
         return;
-    LCDFN(puts_style_offset)(x, y, string, style, offset);
+    LCDFN(puts_style_xyoffset)(x, y, string, style, x_offset, y_offset);
 
     LCDFN(getstringsize)(string, &w, &h);
 
@@ -381,8 +387,9 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 
     s->vp = current_vp;
     s->y = y;
-    s->offset = offset;
+    s->offset = x_offset;
     s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
+    s->y_offset = y_offset;
     s->backward = false;
 
     LCDFN(scroll_info).lines++;
@@ -429,7 +436,7 @@ void LCDFN(scroll_fn)(void)
 
         pf = font_get(current_vp->font);
         xpos = s->startx;
-        ypos = s->y * pf->height;
+        ypos = s->y * pf->height + s->y_offset;
 
         if (s->bidir) { /* scroll bidirectional */
             if (s->offset <= 0) {
@@ -456,4 +463,10 @@ void LCDFN(scroll_fn)(void)
                                     pf->height);
     }
     LCDFN(set_viewport)(old_vp);
+}
+
+void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
+                                     int style, int x_offset)
+{
+    LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, x_offset, 0);
 }

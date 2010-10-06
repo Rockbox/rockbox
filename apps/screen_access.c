@@ -168,8 +168,10 @@ struct screen screens[NB_SCREENS] =
         .hline=&lcd_hline,
         .scroll_step=&lcd_scroll_step,
         .puts_style_offset=&lcd_puts_style_offset,
+        .puts_style_xyoffset=&lcd_puts_style_xyoffset,
         .puts_scroll_style=&lcd_puts_scroll_style,
         .puts_scroll_style_offset=&lcd_puts_scroll_style_offset,
+        .puts_scroll_style_xyoffset=&lcd_puts_scroll_style_xyoffset,
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -257,8 +259,10 @@ struct screen screens[NB_SCREENS] =
         .hline=&lcd_remote_hline,
         .scroll_step=&lcd_remote_scroll_step,
         .puts_style_offset=&lcd_remote_puts_style_offset,
+        .puts_style_xyoffset=&lcd_remote_puts_style_xyoffset,
         .puts_scroll_style=&lcd_remote_puts_scroll_style,
         .puts_scroll_style_offset=&lcd_remote_puts_scroll_style_offset,
+        .puts_scroll_style_xyoffset=&lcd_remote_puts_scroll_style_xyoffset,
 #endif /* 1 */
 
 #if 0 /* no charcell remote LCDs so far */

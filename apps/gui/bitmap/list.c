@@ -48,11 +48,16 @@
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
 
 #ifdef HAVE_TOUCHSCREEN
+/* difference in pixels between draws, above it means enough to start scrolling */
+#define SCROLL_BEGIN_THRESHOLD 3 
+
 static enum {
     SCROLL_NONE,    /* no scrolling */
     SCROLL_BAR,     /* scroll by using the scrollbar */
     SCROLL_SWIPE,   /* scroll by wiping over the screen */
 } scroll_mode;
+
+static int y_offset;
 #endif
 
 int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
@@ -157,8 +162,29 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         list_text_vp->height -= line_height;
     }
 
+
     start = list_start_item;
     end = start + viewport_get_nb_lines(list_text_vp);
+
+#ifdef HAVE_TOUCHSCREEN
+    if (list->selected_item == 0)
+        y_offset = 0; /* reset in case it's a new list */
+
+    int draw_offset = y_offset;
+    /* draw some extra items to not have empty lines at the top and bottom */
+    if (y_offset > 0)
+    {
+        /* make it negative for more consistent apparence when switching
+         * directions */
+        draw_offset -= line_height;
+        if (start > 0)
+            start--;
+    }
+    else if (y_offset < 0)
+        end++;
+#else
+    #define draw_offset 0
+#endif
 
     /* draw the scrollbar if its needed */
     if (global_settings.scrollbar &&
@@ -216,6 +242,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int text_pos = 0;
+        int line = i - start;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
@@ -285,36 +312,36 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             if (item_offset> item_width - (list_text_vp->width - text_pos))
             {
                 /* don't scroll */
-                display->puts_style_offset(0, i-start, entry_name,
-                        style, item_offset);
+                display->puts_style_xyoffset(0, line, entry_name,
+                        style, item_offset, draw_offset);
             }
             else
             {
-                display->puts_scroll_style_offset(0, i-start, entry_name,
-                        style, item_offset);
+                display->puts_scroll_style_xyoffset(0, line, entry_name,
+                        style, item_offset, draw_offset);
             }
         }
         else
         {
             if (list->scroll_all)
-                display->puts_scroll_style_offset(0, i-start, entry_name,
-                        style, item_offset);
+                display->puts_scroll_style_xyoffset(0, line, entry_name,
+                        style, item_offset, draw_offset);
             else
-                display->puts_style_offset(0, i-start, entry_name,
-                        style, item_offset);
+                display->puts_style_xyoffset(0, line, entry_name,
+                        style, item_offset, draw_offset);
         }
         /* do the icon */
         display->set_viewport(&list_icons);
         if (list->callback_get_item_icon && global_settings.show_icons)
         {
             screen_put_icon_with_offset(display, show_cursor?1:0,
-                                    (i-start),show_cursor?ICON_PADDING:0,0,
+                                    (line),show_cursor?ICON_PADDING:0,draw_offset,
                                     list->callback_get_item_icon(i, list->data));
         }
         if (show_cursor && i >= list->selected_item &&
                 i <  list->selected_item + list->selected_size)
         {
-            screen_put_icon(display, 0, i-start, Icon_Cursor);
+            screen_put_icon_with_offset(display, 0, line, 0, draw_offset, Icon_Cursor);
         }
     }
     display->set_viewport(parent);
@@ -343,6 +370,8 @@ static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
     if (nb_lines <  gui_list->nb_items)
     {
         scroll_mode = SCROLL_BAR;
+        /* scrollbar scrolling is still line based */
+        y_offset = 0;
         int scrollbar_size = nb_lines*
             font_get(gui_list->parent[screen]->font)->height;
         int actual_y = y - list_text[screen].y;
@@ -365,17 +394,49 @@ static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
 }
 
 /*
- * returns the number of scrolled items since the last call
+ * returns the number of pixel scrolled since the last call
  **/
-static int gui_synclist_touchscreen_scrolling(struct gui_synclist * gui_list, int position)
+static int gui_synclist_touchscreen_scrolling(struct gui_synclist * gui_list, int line_height, int position)
 {
-    const int screen = screens[SCREEN_MAIN].screen_type;
-    const int difference = position - last_position;
+    /* fixme */
+    const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
     const int nb_lines = viewport_get_nb_lines(&list_text[screen]);
-    if(nb_lines < gui_list->nb_items && difference != 0) /* only scroll if needed */
+    /* in pixels */
+    const int difference = position - last_position;
+
+    /* make selecting items easier */
+    if (abs(difference) < SCROLL_BEGIN_THRESHOLD && scroll_mode == SCROLL_NONE)
+        return 0;
+
+    /* does the list even scroll? if no, return but still show
+     * the caller that we would scroll */
+    if (nb_lines >= gui_list->nb_items)
+        return difference;
+
+    const int old_start = gui_list->start_item[screen];
+    int new_start_item = -1;
+    int line_diff = 0;
+
+    /* don't scroll at the edges of the list */
+    if ((old_start == 0 && difference > 0)
+     || (old_start == (gui_list->nb_items - nb_lines) && difference < 0))
     {
-        int new_start_item;
-        new_start_item = gui_list->start_item[screen] - difference;
+        y_offset = 0;
+        return difference;
+    }
+
+    /* add up y_offset over time and translate to lines
+     * if scrolled enough */
+    y_offset += difference;
+    if (abs(y_offset) > line_height)
+    {
+        line_diff = y_offset/line_height;
+        y_offset -= line_diff * line_height;
+    }
+
+    if(line_diff != 0)
+    {
+        new_start_item = old_start - line_diff;
         /* check if new_start_item is bigger than list item count */
         if(new_start_item > gui_list->nb_items - nb_lines)
             new_start_item = gui_list->nb_items - nb_lines;
@@ -384,22 +445,23 @@ static int gui_synclist_touchscreen_scrolling(struct gui_synclist * gui_list, in
             new_start_item = 0;
         gui_list->start_item[screen] = new_start_item;
     }
+
     return difference;
 }
 
 unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
 {
     short x, y;
-    const int button = action_get_touchscreen_press(&x, &y);
-    const int screen = SCREEN_MAIN;
+    const enum screen_type screen = SCREEN_MAIN;
+    struct viewport *info_vp = sb_skin_get_info_vp(screen);
+    const int button = action_get_touchscreen_press_in_vp(&x, &y, info_vp);
     const int list_start_item = gui_list->start_item[screen];
     const struct viewport *list_text_vp = &list_text[screen];
     const bool old_released = released;
     int line, list_width = list_text_vp->width;
 
-    /* make sure it is inside the UI viewport */    
-    if (!viewport_point_within_vp(sb_skin_get_info_vp(screen), x, y))
-        return BUTTON_NONE;
+    if (button == ACTION_NONE || button == ACTION_UNKNOWN)
+        return ACTION_NONE;
 
     released = (button&BUTTON_REL) != 0;
 
@@ -473,15 +535,18 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
             int actual_y;
 
             actual_y = y - list_text_vp->y;
-            line = actual_y / line_height;
+            /* selection needs to be corrected if an items are only
+             * partly visible */
+            line = (actual_y - y_offset) / line_height;
             
             /* Pressed below the list*/
             if (list_start_item + line >= gui_list->nb_items)
+            {
+                /* don't collect last_position outside of the list area
+                 * it'd break selecting after such a situation */
+                last_position = 0;
                 return ACTION_NONE;
-            
-            /* Pressed a border */
-            if(UNLIKELY(actual_y % line_height == 0))
-                return ACTION_NONE;
+            }
 
             if (released)
             {
@@ -524,9 +589,9 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 /* select current item */
                 gui_synclist_select_item(gui_list, list_start_item+line);
                 if (last_position == 0)
-                    last_position = line;
+                    last_position = actual_y;
                 else
-                    result = gui_synclist_touchscreen_scrolling(gui_list, line);
+                    result = gui_synclist_touchscreen_scrolling(gui_list, line_height, actual_y);
 
                 /* Start scrolling once the pen is moved without
                  * releasing it inbetween */
@@ -536,7 +601,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                     scroll_mode = SCROLL_SWIPE;
                 }
 
-                last_position = line;
+                last_position = actual_y;
 
                 return redraw ? ACTION_REDRAW:ACTION_NONE;
             }
