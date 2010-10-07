@@ -12548,3 +12548,31 @@
     *: "Uppdatera bokmärke vid stopp"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Starta filhanteraren här"
+  </dest>
+  <voice>
+    *: "Starta filhanteraren här"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Starta filhanteraren i /"
+  </dest>
+  <voice>
+    *: "Starta filhanteraren i rotkatalogen"
+  </voice>
+</phrase>
