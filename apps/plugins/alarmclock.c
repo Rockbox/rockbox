@@ -31,12 +31,14 @@ static bool tomorrow = false;
 static int alarm[2] = {0, 0}, maxval[2] = {24, 60}, prev_tick = 3600 * 24;
 static bool quit = false, usb = false, waiting = false, done = false;
 
-static inline int get_button(void) {
+static inline int get_button(void)
+{
     return pluginlib_getaction(HZ/2, plugin_contexts,
                                ARRAYLEN(plugin_contexts));
 }
 
-int rem_seconds(void) {
+static int rem_seconds(void)
+{
     int seconds = (((alarm[0] - rb->get_time()->tm_hour) * 3600)
                   +((alarm[1] - rb->get_time()->tm_min)  * 60)
                   -(rb->get_time()->tm_sec));
@@ -48,7 +50,8 @@ int rem_seconds(void) {
     return seconds + (tomorrow ? 24 * 3600 : 0);
 }
 
-void draw_centered_string(struct screen * display, char * string) {
+static void draw_centered_string(struct screen * display, char * string)
+{
     int w, h;
     display->getstringsize(string, &w, &h);
 
@@ -62,7 +65,8 @@ void draw_centered_string(struct screen * display, char * string) {
     }
 }
 
-void draw(struct screen * display) {
+static void draw(struct screen * display)
+{
     char info[128];
     display->clear_display();
 
@@ -85,19 +89,21 @@ void draw(struct screen * display) {
     draw_centered_string(display, info);
 }
 
-bool can_play(void) {
+static bool can_play(void)
+{
     int audio_status = rb->audio_status();
     if ((!audio_status && rb->global_status->resume_index != -1)
         && (rb->playlist_resume() != -1)) {
         return true;
     }
-    else if (audio_status & AUDIO_STATUS_PAUSE)
+    else if (audio_status & AUDIO_STATUS_PLAY)
         return true;
 
     return false;
 }
 
-void play(void) {
+static void play(void)
+{
     int audio_status = rb->audio_status();
     if (!audio_status && rb->global_status->resume_index != -1) {
         if (rb->playlist_resume() != -1) {
@@ -105,8 +111,14 @@ void play(void) {
                 rb->global_status->resume_offset);
         }
     }
-    else if (audio_status & AUDIO_STATUS_PAUSE)
+    else if (audio_status & AUDIO_STATUS_PLAY)
         rb->audio_resume();
+}
+
+static void pause(void)
+{
+    if (rb->audio_status() & AUDIO_STATUS_PLAY)
+        rb->audio_pause();
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -116,11 +128,11 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     if (!can_play()) {
-        rb->splash(4*HZ, "No track to resume! This plugin will resume a track "
-                         "at a specific time. Therefore, you need to first play"
-                         " one, and then pause it and start the plugin again.");
-        quit = true;
+        rb->splash(HZ*2, "No track to resume! "
+                         "Play or pause one first.");
+        return PLUGIN_ERROR;
     }
+    pause();
 
     while(!quit) {
         button = get_button();
@@ -184,4 +196,3 @@ enum plugin_status plugin_start(const void* parameter)
     return (usb) ? PLUGIN_USB_CONNECTED
                  : (done ? PLUGIN_GOTO_WPS : PLUGIN_OK);
 }
-
