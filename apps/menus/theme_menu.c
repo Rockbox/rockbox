@@ -86,19 +86,22 @@ static struct colour_info
  */
 static int set_color_func(void* color)
 {
-    int res, c = (intptr_t)color, banned_color=-1;
-    
+    int res, c = (intptr_t)color, banned_color=-1, old_color;
     /* Don't let foreground be set the same as background and vice-versa */
     if (c == COLOR_BG)
         banned_color = *colors[COLOR_FG].setting;
     else if (c == COLOR_FG)
         banned_color = *colors[COLOR_BG].setting;
 
+    old_color = *colors[c].setting;
     res = (int)set_color(&screens[SCREEN_MAIN],str(colors[c].lang_id),
                          colors[c].setting, banned_color);
-    settings_save();
-    settings_apply(false);
-    settings_apply_skins();
+    if (old_color != *colors[c].setting)
+    {
+        settings_save();
+        settings_apply(false);
+        settings_apply_skins();
+    }
     return res;
 }
 
@@ -112,6 +115,7 @@ static int reset_color(void)
     
     settings_save();
     settings_apply(false);
+    settings_apply_skins();
     return 0;
 }
 MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),
