@@ -196,7 +196,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, &pb->bm,
-                                pb->x, y, pb->width, pb->bm.height,
+                                pb->x, y, pb->width, height,
                                 length, 0, end, flags);
     else
         gui_scrollbar_draw(display, pb->x, y, pb->width, height,
@@ -204,49 +204,43 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 
     if (pb->slider)
     {
-        int x = pb->x, y = pb->y;
-        int width = pb->width;
-        int height = pb->height;
+        int xoff = 0, yoff = 0;
+        int w = pb->width, h = height;
         struct gui_img *img = pb->slider;
-            
-        if ((flags&HORIZONTAL) == 0)
+
+        if (flags&HORIZONTAL)
         {
-            height = img->bm.height;
+            w = img->bm.width;
+            xoff = pb->width * end / length;
             if (flags&INVERTFILL)
-                y += pb->height - pb->height*end/length;
-            else
-                y += pb->height*end/length;
+                xoff = pb->width - xoff;
 #if 0 /* maybe add this in later, make the slider bmp overlap abit */
-            if ((flags&INNER_NOFILL) == 0)
-                y -= img->bm.height/2;
+            xoff -= w / 2;
 #endif
         }
         else
         {
-            width = img->bm.width;            
+            h = img->bm.height;
+            yoff = height * end / length;
             if (flags&INVERTFILL)
-                x += pb->width - pb->width*end/length;
-            else
-                x += pb->width*end/length;
+                yoff = height - yoff;
 #if 0 /* maybe add this in later, make the slider bmp overlap abit */
-            if ((flags&INNER_NOFILL) == 0)
-                x -= img->bm.width/2;
+            yoff -= h / 2;
 #endif
         }
 #if LCD_DEPTH > 1
         if(img->bm.format == FORMAT_MONO) {
 #endif
             display->mono_bitmap_part(img->bm.data,
-                                      0, 0,
-                                      img->bm.width, x,
-                                      y, width, height);
+                                      0, 0, img->bm.width,
+                                      pb->x + xoff, y + yoff, w, h);
 #if LCD_DEPTH > 1
         } else {
             display->transparent_bitmap_part((fb_data *)img->bm.data,
                                              0, 0,
                                              STRIDE(display->screen_type,
                                              img->bm.width, img->bm.height),
-                                             x, y, width, height);
+                                             pb->x + xoff, y + yoff, w, h);
         }
 #endif
     }

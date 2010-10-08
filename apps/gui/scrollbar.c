@@ -224,6 +224,15 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x,
             starty = start;
     }
 
+    if (bm->width < startx)
+        width = 0;
+    else if (bm->width < startx + width)
+        width = bm->width - startx;
+    if (bm->height < starty)
+        height = 0;
+    else if (bm->height < starty + height)
+        height = bm->height - starty;
+
 #if LCD_DEPTH > 1
     if (bm->format == FORMAT_MONO)
 #endif
