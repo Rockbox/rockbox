@@ -689,7 +689,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         {
             pb->horizontal = false;
             if (isdefault(&element->params[3]))
-                pb->height = vp->height - pb->x;
+                pb->height = vp->height - pb->y;
         }
         else if (!strcmp(param->data.text, "horizontal"))
             pb->horizontal = true;
