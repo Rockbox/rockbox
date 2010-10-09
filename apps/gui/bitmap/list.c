@@ -190,8 +190,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     if (global_settings.scrollbar &&
         viewport_get_nb_lines(list_text_vp) < list->nb_items)
     {
-        struct viewport vp;
-        vp = *list_text_vp;
+        struct viewport vp = *list_text_vp;
         vp.width = SCROLLBAR_WIDTH;
         vp.height = line_height * viewport_get_nb_lines(list_text_vp);
         vp.x = parent->x;
@@ -369,7 +368,6 @@ static int gui_synclist_touchscreen_scrollbar(struct gui_synclist * gui_list,
 
     if (nb_lines <  gui_list->nb_items)
     {
-        scroll_mode = SCROLL_BAR;
         /* scrollbar scrolling is still line based */
         y_offset = 0;
         int scrollbar_size = nb_lines*
@@ -456,53 +454,60 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     struct viewport *info_vp = sb_skin_get_info_vp(screen);
     const int button = action_get_touchscreen_press_in_vp(&x, &y, info_vp);
     const int list_start_item = gui_list->start_item[screen];
+    const int line_height = font_get(gui_list->parent[screen]->font)->height;
     const struct viewport *list_text_vp = &list_text[screen];
     const bool old_released = released;
+    const bool show_title = list_display_title(gui_list, screen);
+    const bool show_cursor = !global_settings.cursor_style &&
+                        gui_list->show_selection_marker;
+    const bool on_title_clicked = show_title && y < line_height;
+    int icon_width = 0;
     int line, list_width = list_text_vp->width;
 
     if (button == ACTION_NONE || button == ACTION_UNKNOWN)
         return ACTION_NONE;
 
-    released = (button&BUTTON_REL) != 0;
+    /* x and y are relative to info_vp */
+    if (global_settings.show_icons)
+        icon_width += get_icon_width(screen);
+    if (show_cursor)
+        icon_width += get_icon_width(screen);
 
-    if (global_settings.scrollbar == SCROLLBAR_RIGHT)
-        list_width += SCROLLBAR_WIDTH;
+    released = (button&BUTTON_REL) != 0;
 
     if (button == BUTTON_NONE)
         return ACTION_NONE;
 
-    if (x > list_text_vp->x + list_width)
-        return ACTION_NONE;
-
-    if (list_display_title(gui_list, screen) &&
-        viewport_point_within_vp(&title_text[screen], x, y) && 
-        button == BUTTON_REL && scroll_mode == SCROLL_NONE)
-        return ACTION_STD_CANCEL;
-
-    if (x < list_text_vp->x)
+    if (on_title_clicked)
     {
-        /* Top left corner is GO_TO_ROOT */
-        if (y<list_text[SCREEN_MAIN].y)
+        if (x < icon_width)
         {
+            /* Top left corner is GO_TO_ROOT */
             if (button == BUTTON_REL)
                 return ACTION_STD_MENU;
             else if (button == (BUTTON_REPEAT|BUTTON_REL))
                 return ACTION_STD_CONTEXT;
-            else
-                return ACTION_NONE;
+            return ACTION_NONE;
         }
-        /* Scroll bar */
-        else if(global_settings.scrollbar == SCROLLBAR_LEFT)
-            return gui_synclist_touchscreen_scrollbar(gui_list, y);
+        else /* click on title text is cancel */
+            if (button == BUTTON_REL && scroll_mode == SCROLL_NONE)
+                return ACTION_STD_CANCEL;
     }
-    else
+    else /* list area clicked */
     {
-        int line_height = font_get(gui_list->parent[screen]->font)->height;
-        /* add a small margin to prevent accidental selection */
-        int x_end = list_text_vp->x + list_text_vp->width - line_height;
-
+        const int actual_y = y - (show_title ? line_height : 0);
+        bool on_scrollbar_clicked;
+        switch (global_settings.scrollbar)
+        {
+            case SCROLLBAR_LEFT:
+                on_scrollbar_clicked = x <= SCROLLBAR_WIDTH; break;
+            case SCROLLBAR_RIGHT:
+                on_scrollbar_clicked = x > (icon_width + list_width); break;
+            default:
+                on_scrollbar_clicked = false; break;
+        }
         /* conditions for scrollbar scrolling:
-         *    * pen is on the scrollbar (x > x_end-scrollbar width)
+         *    * pen is on the scrollbar
          *      AND scrollbar is on the right (left case is handled above)
          * OR * pen is in the somewhere else but we did scrollbar scrolling before
          *
@@ -511,10 +516,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
          * via swiping the screen
          **/
 
-        if (!released && scroll_mode != SCROLL_SWIPE
-            && ((scroll_mode == SCROLL_BAR
-                || (x > x_end && global_settings.scrollbar == SCROLLBAR_RIGHT))))
+        if (!released && scroll_mode < SCROLL_SWIPE &&
+            (on_scrollbar_clicked || scroll_mode == SCROLL_BAR))
         {
+            scroll_mode = SCROLL_BAR;
             return gui_synclist_touchscreen_scrollbar(gui_list, y);
         }
 
@@ -530,13 +535,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
          * | will bring up the context menu of it.                  |
          * |--------------------------------------------------------|
          */
-        if (y > list_text_vp->y || button & BUTTON_REPEAT)
+        if (actual_y > 0 || button & BUTTON_REPEAT)
         {
-            int actual_y;
-
-            actual_y = y - list_text_vp->y;
             /* selection needs to be corrected if an items are only
-             * partly visible */
+             * partially visible */
             line = (actual_y - y_offset) / line_height;
             
             /* Pressed below the list*/
