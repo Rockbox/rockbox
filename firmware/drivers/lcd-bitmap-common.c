@@ -84,7 +84,7 @@ static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
 /*
  * draws the borders of the viewport, or of current_vp if vp == NULL
  **/
-void LCDFN(draw_viewport)(const struct viewport *vp)
+void LCDFN(draw_viewport_rect)(const struct viewport *vp)
 {
     if (vp == NULL)
         LCDFN(drawrect)(0, 0, current_vp->width, current_vp->height);
@@ -95,7 +95,7 @@ void LCDFN(draw_viewport)(const struct viewport *vp)
 /*
  * fills the rectangle formed by vp or by current_vp if vp == NULL
  **/
-void LCDFN(fill_viewport)(const struct viewport *vp)
+void LCDFN(fill_viewport_rect)(const struct viewport *vp)
 {
     if (vp == NULL)
         LCDFN(fillrect)(0, 0, current_vp->width, current_vp->height);
