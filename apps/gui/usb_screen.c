@@ -241,7 +241,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
     }
 }
 
-void gui_usb_screen_run(void)
+void gui_usb_screen_run(bool early_usb)
 {
     int i;
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
@@ -262,14 +262,18 @@ void gui_usb_screen_run(void)
     usb_keypad_mode = global_settings.usb_keypad_mode;
 #endif
 
-    /* The font system leaves the .fnt fd's open, so we need for force close them all */
+    if(!early_usb)
+    {
+        /* The font system leaves the .fnt fd's open, so we need for force close them all */
 #ifdef HAVE_LCD_BITMAP
-    font_reset(NULL);
+        font_reset(NULL);
 #ifdef HAVE_REMOTE_LCD
-    font_load_remoteui(NULL);
+        font_load_remoteui(NULL);
 #endif
-    skin_font_init(); /* unload all the skin fonts */
+        skin_font_init(); /* unload all the skin fonts */
 #endif
+    }
+
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
@@ -324,9 +328,12 @@ void gui_usb_screen_run(void)
     status_set_usb(false);
 #endif /* HAVE_LCD_CHARCELLS */
 #ifdef HAVE_LCD_BITMAP
-    /* Not pretty, reload all settings so fonts are loaded again correctly */
-    settings_apply(true);
-    settings_apply_skins();
+    if(!early_usb)
+    {
+        /* Not pretty, reload all settings so fonts are loaded again correctly */
+        settings_apply(true);
+        settings_apply_skins();
+    }
 #endif
 
     FOR_NB_SCREENS(i)
