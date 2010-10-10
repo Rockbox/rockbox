@@ -82,10 +82,6 @@ void fatal_error(void)
     }
 }
 
-/* aes_decrypt() and readfw() functions taken from iLoader.
-   (C) Michael Sparmann and licenced under GPL v2 or later. 
-*/
-
 static void aes_decrypt(void* data, uint32_t size)
 {
     uint32_t ptr, i;
@@ -196,9 +192,9 @@ void main(void)
     lcd_set_background(LCD_BLACK);
     lcd_clear_display();
 
-//    button_init();
+    button_init();
 
-    btn=0; /* TODO */
+    btn = button_status();
 
     /* Enable bootloader messages */
     if (btn==BUTTON_RIGHT)
