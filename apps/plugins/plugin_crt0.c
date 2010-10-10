@@ -90,10 +90,13 @@ enum plugin_status plugin__start(const void *param)
 
     /* zero out the bss section */
     rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+
+#ifdef HAVE_CPUCACHE_INVALIDATE
     /* Some parts of bss may be used via a no-cache alias (at least
      * portalplayer has this). If we don't clear the cache, those aliases
      * may read garbage */
     rb->cpucache_invalidate();
+#endif /* HAVE_CPUCACHE_INVALIDATE */
 #endif
 
     /* we come back here if exit() was called or the plugin returned normally */
