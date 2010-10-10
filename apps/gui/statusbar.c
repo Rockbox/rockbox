@@ -280,7 +280,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
     {
         display->set_viewport(vp);
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
+        display->fill_viewport(NULL);
         display->set_drawmode(DRMODE_SOLID);
 
         if (bar->info.battery_state)

@@ -507,6 +507,8 @@ extern void lcd_hline(int x1, int x2, int y);
 extern void lcd_vline(int x, int y1, int y2);
 extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
+extern void lcd_draw_viewport(const struct viewport *vp);
+extern void lcd_fill_viewport(const struct viewport *vp);
 extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,

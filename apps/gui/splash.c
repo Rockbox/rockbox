@@ -163,7 +163,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #endif
         vp.drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-    screen->fillrect(0, 0, vp.width, vp.height);
+    screen->fill_viewport(NULL);
 
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
@@ -174,7 +174,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #endif
         vp.drawmode = DRMODE_SOLID;
 
-    screen->drawrect(0, 0, vp.width, vp.height);
+    screen->draw_viewport(NULL);
 
     /* prepare putting the text */
     y = RECT_SPACING;

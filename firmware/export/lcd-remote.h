@@ -178,6 +178,8 @@ extern void lcd_remote_hline(int x1, int x2, int y);
 extern void lcd_remote_vline(int x, int y1, int y2);
 extern void lcd_remote_drawrect(int x, int y, int width, int height);
 extern void lcd_remote_fillrect(int x, int y, int width, int height);
+extern void lcd_remote_draw_viewport(const struct viewport *vp);
+extern void lcd_remote_fill_viewport(const struct viewport *vp);
 extern void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x,
                                    int src_y, int stride, int x, int y,
                                    int width, int height);

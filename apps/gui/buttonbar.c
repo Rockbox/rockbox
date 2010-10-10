@@ -66,16 +66,17 @@ static void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     struct viewport vp = bb_vp[display->screen_type];
 
     button_width = display->lcdwidth/BUTTONBAR_MAX_BUTTONS;
-    vp.width = button_width;
+    vp.width = button_width-1;
     vp.x = button_width * num;
     display->set_viewport(&vp);
-    display->fillrect(0, 0, button_width - 1, vp.height);
+    display->fill_viewport(NULL);
     if(buttonbar->caption[num][0] != 0)
     {
         display->getstringsize(buttonbar->caption[num], &fw, &fh);
         display->putsxy((button_width - fw)/2,
                         (vp.height-fh)/2, buttonbar->caption[num]);
     }
+    display->set_viewport(NULL);
 }
 
 void gui_buttonbar_set(struct gui_buttonbar * buttonbar,
