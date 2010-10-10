@@ -715,7 +715,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static void skin_render_playlistviewer(struct playlistviewer* viewer,
+static __attribute__((noinline)) void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        struct gui_wps *gwps,
                                        struct skin_viewport* skin_viewport,
                                        unsigned long refresh_type)
