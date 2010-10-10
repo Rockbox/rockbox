@@ -482,9 +482,13 @@ static int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
 {
     struct skin_element *element=line;
     struct wps_token *token;
-    int retval = -1;
+    int retval = DEFAULT_SUBLINE_TIME_MULTIPLIER*TIMEOUT_UNIT;
     if (element->type == LINE)
+    {
+        if (element->children_count == 0)
+            return retval; /* empty line, so force redraw */
         element = element->children[0];
+    }
     while (element)
     {
         if (element->type == TAG &&
@@ -517,27 +521,21 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
     unsigned old_refresh = info->refresh_type;
     if (info->refresh_type == SKIN_REFRESH_ALL)
     {
-        alternator->current_line = 0;
-        alternator->last_change_tick = current_tick;
+        alternator->current_line = element->children_count-1;
         changed_lines = true;
     }
-    else
+    else if (TIME_AFTER(current_tick, alternator->next_change_tick))
     {
-        struct skin_element *current_line = element->children[alternator->current_line];
-        struct line *line = (struct line *)current_line->data;
-        int next_change = alternator->last_change_tick + line->timeout;
-        if (TIME_AFTER(current_tick, next_change))
-        {
-            alternator->last_change_tick = current_tick;
-            changed_lines = true;
-        }
+        changed_lines = true;
     }
+
     if (changed_lines)
     {
         struct skin_element *current_line = element->children[alternator->current_line];
         int start = alternator->current_line;
         int try_line = start;
         bool suitable = false;
+        int rettimeout = DEFAULT_SUBLINE_TIME_MULTIPLIER*TIMEOUT_UNIT;
         
         /* find a subline which has at least one token in it,
          * and that line doesnt have a timeout set to 0 through conditionals */
@@ -548,8 +546,9 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
             if (element->children[try_line]->children_count != 0)
             {
                 current_line = element->children[try_line];
-                if ((current_line->children[0]->type != CONDITIONAL) || 
-                    get_subline_timeout(info->gwps, current_line->children[0]) > 0)
+                rettimeout = get_subline_timeout(info->gwps, 
+                                                 current_line->children[0]);
+                if (rettimeout > 0)
                 {
                     suitable = true;
                 }
@@ -558,7 +557,10 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
         while (try_line != start && !suitable);
         
         if (suitable)
+        {
             alternator->current_line = try_line;
+            alternator->next_change_tick = current_tick + rettimeout;
+        }
 
         info->refresh_type = SKIN_REFRESH_ALL;
         info->force_redraw = true;

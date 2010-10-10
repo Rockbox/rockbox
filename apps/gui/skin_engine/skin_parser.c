@@ -572,8 +572,6 @@ static int parse_timeout_tag(struct skin_element *element,
     else
         val = element->params[0].data.number;
     token->value.i = val * TIMEOUT_UNIT;
-    if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT)
-        curr_line->timeout = token->value.i;
     return 0;
 }
 
@@ -1457,7 +1455,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
             struct line *line = 
                 (struct line *)skin_buffer_alloc(sizeof(struct line));
             line->update_mode = SKIN_REFRESH_STATIC;
-            line->timeout = DEFAULT_SUBLINE_TIME_MULTIPLIER * TIMEOUT_UNIT;
             curr_line = line;
             element->data = line;
         }
@@ -1468,7 +1465,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 (struct line_alternator *)skin_buffer_alloc(sizeof(struct line_alternator));
             alternator->current_line = 0;
 #ifndef __PCTOOL__
-            alternator->last_change_tick = current_tick;
+            alternator->next_change_tick = current_tick;
 #endif
             element->data = alternator;
         }

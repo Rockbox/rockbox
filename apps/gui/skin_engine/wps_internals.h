@@ -227,13 +227,12 @@ struct skin_albumart {
     
 
 struct line {
-    int timeout; /* if inside a line alternator */
     unsigned update_mode;
 };
 
 struct line_alternator {
     int current_line;
-    unsigned long last_change_tick;
+    unsigned long next_change_tick;
 };
 
 struct conditional {
