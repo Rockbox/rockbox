@@ -53,6 +53,10 @@ enum codec_status codec_start(void)
     }
 #endif /* PLUGIN_USE_IRAM */
     ci->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+    /* Some parts of bss may be used via a no-cache alias (at least
+     * portalplayer has this). If we don't clear the cache, those aliases
+     * may read garbage */
+    ci->cpucache_invalidate();
 #endif
 
     return codec_main();
