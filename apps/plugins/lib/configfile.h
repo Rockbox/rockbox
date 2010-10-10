@@ -30,7 +30,7 @@ struct configdata
 {
     int type;      /* See TYPE_ macros above */
     int min;       /* Min value for integers, should be 0 for enums */
-    int max;       /* Max value for enums and integers,
+    int max;       /* Max value for integers, value count for enums,
                       buffer size for strings  */
     union
     {
