@@ -27,8 +27,10 @@
 
 #include "../imageviewer.h"
 
-#if defined(HAVE_LCD_COLOR)
+#ifdef HAVE_LCD_COLOR
 #define resize_bitmap   smooth_resize_bitmap
+#elif defined(USEGSLIB)
+#define resize_bitmap   grey_resize_bitmap
 #else
 #define resize_bitmap   simple_resize_bitmap
 #endif

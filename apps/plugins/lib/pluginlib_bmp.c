@@ -26,7 +26,7 @@
 #include "file.h"
 #include "system.h"
 
-#if defined(HAVE_LCD_COLOR) && LCD_DEPTH > 1
+#if defined(HAVE_LCD_COLOR)
 #define LE16(x) (htole16(x))&0xff, ((htole16(x))>>8)&0xff
 #define LE32(x) (htole32(x))&0xff, ((htole32(x))>>8)&0xff, ((htole32(x))>>16)&0xff, ((htole32(x))>>24)&0xff
 /**
@@ -90,18 +90,11 @@ int save_bmp_file( char* filename, struct bitmap *bm )
 /**
    Very simple image scale from src to dst (nearest neighbour).
    Source and destination dimensions are read from the struct bitmap.
-
-   FB_DATA define is to properly scale with greylib
+   FIXME: this doesn't work well for LCD_DEPTH<4
 */
-#if LCD_DEPTH > 8
-#define FB_DATA fb_data
-#else
-#define FB_DATA unsigned char
-#endif
 void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
 {
-#if defined(LCD_STRIDEFORMAT) && \
-    (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
     const int srcw = src->height;
     const int srch = src->width;
     const int dstw = dst->height;
@@ -112,18 +105,18 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
     const int dstw = dst->width;
     const int dsth = dst->height;
 #endif
-    const FB_DATA *srcd = (FB_DATA *)(src->data);
-    const FB_DATA *dstd = (FB_DATA *)(dst->data);
+    const fb_data *srcd = (fb_data *)(src->data);
+    const fb_data *dstd = (fb_data *)(dst->data);
     const long xrstep = ((srcw-1) << 8) / (dstw-1);
     const long yrstep = ((srch-1) << 8) / (dsth-1);
-    FB_DATA *src_row, *dst_row;
+    fb_data *src_row, *dst_row;
     long xr, yr = 0;
     int src_x, src_y, dst_x, dst_y;
     for (dst_y=0; dst_y < dsth; dst_y++)
     {
         src_y = (yr >> 8);
-        src_row = (FB_DATA *)&srcd[src_y * srcw];
-        dst_row = (FB_DATA *)&dstd[dst_y * dstw];
+        src_row = (fb_data *)&srcd[src_y * srcw];
+        dst_row = (fb_data *)&dstd[dst_y * dstw];
         for (xr=0,dst_x=0; dst_x < dstw; dst_x++)
         {
             src_x = (xr >> 8);
@@ -133,6 +126,40 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
         yr += yrstep;
     }
 }
+
+#if (LCD_DEPTH < 4)
+/**
+   Same as simple_resize_bitmap except this is for use with greylib.
+*/
+void grey_resize_bitmap(struct bitmap *src, struct bitmap *dst)
+{
+    const int srcw = src->width;
+    const int srch = src->height;
+    const int dstw = dst->width;
+    const int dsth = dst->height;
+    const long xrstep = ((srcw-1) << 8) / (dstw-1);
+    const long yrstep = ((srch-1) << 8) / (dsth-1);
+    unsigned char *srcd = src->data;
+    unsigned char *dstd = dst->data;
+    unsigned char *src_row, *dst_row;
+    long xr, yr = 0;
+    int src_x, src_y, dst_x, dst_y;
+    for (dst_y=0; dst_y < dsth; dst_y++)
+    {
+        src_y = (yr >> 8);
+        src_row = &srcd[src_y * srcw];
+        dst_row = &dstd[dst_y * dstw];
+        for (xr=0,dst_x=0; dst_x < dstw; dst_x++)
+        {
+            src_x = (xr >> 8);
+            dst_row[dst_x] = src_row[src_x];
+            xr += xrstep;
+        }
+        yr += yrstep;
+    }
+}
+#endif
+
 
 #include "wrappers.h"
 

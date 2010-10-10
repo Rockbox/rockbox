@@ -37,10 +37,19 @@ int save_bmp_file( char* filename, struct bitmap *bm );
 */
 void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
 
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+/**
+   Same as simple_resize_bitmap except this is for use with greylib.
+*/
+void grey_resize_bitmap(struct bitmap *src, struct bitmap *dst);
+#endif
+
+#ifdef HAVE_LCD_COLOR
 /**
    Advanced image scale from src to dst (bilinear) based on imlib2.
    Source and destination dimensions are read from the struct bitmap.
  */
 void smooth_resize_bitmap(struct bitmap *src,  struct bitmap *dst);
+#endif
 
 #endif
