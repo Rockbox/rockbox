@@ -49,9 +49,9 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
 
     p = id3->id3v2buf;
     
-    /* Copy Title as artist */
+    /* Copy Title */
     strcpy(p, &buf[0x00]);
-    id3->artist = p;
+    id3->title = p;
     p += strlen(p)+1;
 
     id3->bitrate = filesize(fd)/1024; /* size in kb */
