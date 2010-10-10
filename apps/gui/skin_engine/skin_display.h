@@ -36,9 +36,6 @@ void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *view
 void clear_image_pos(struct gui_wps *gwps, struct gui_img *img);
 void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage);
 void wps_display_images(struct gui_wps *gwps, struct viewport* vp);
-#else
-bool draw_player_progress(struct gui_wps *gwps);
-void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size);
 #endif
 
 /* Evaluate the conditional that is at *token_index and return whether a skip

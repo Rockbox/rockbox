@@ -83,10 +83,14 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 {
 #ifndef HAVE_LCD_BITMAP
     (void)vp; /* silence warnings */
+    (void)info;
 #endif    
     struct wps_token *token = (struct wps_token *)element->data;
+
+#ifdef HAVE_LCD_BITMAP
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
+#endif
     switch (token->type)
     {   
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -137,22 +141,14 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #endif
         case SKIN_TOKEN_VOLUMEBAR:
         case SKIN_TOKEN_BATTERY_PERCENTBAR:
+#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_PROGRESSBAR:
         {
-#ifdef HAVE_LCD_BITMAP
             struct progressbar *bar = (struct progressbar*)token->value.data;
             if (do_refresh)
                 draw_progressbar(gwps, info->line_number, bar);
-#else /* HAVE_LCD_CHARCELL */
-            if (do_refresh)
-            {
-                if (data->full_line_progressbar)
-                    draw_player_fullbar(gwps, info->buf, info->buf_size);
-                else
-                    draw_player_progress(gwps);
-            }
-#endif
         }
+#endif
         break;
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_IMAGE_DISPLAY_LISTICON:
