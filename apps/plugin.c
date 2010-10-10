@@ -828,8 +828,6 @@ int plugin_load(const char* plugin, const void* parameter)
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
-    button_clear_queue();
-
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
 #if LCD_DEPTH > 1
