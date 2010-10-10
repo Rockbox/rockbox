@@ -199,7 +199,7 @@ static const struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|D", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIiiS|S", 0|NOBREAK },
+    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIIIS|S", 0|NOBREAK },
     
     { SKIN_TOKEN_HAVE_RECORDING,        "Rp"   , "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_IS_RECORDING,          "Rr"   , "", SKIN_REFRESH_DYNAMIC },
