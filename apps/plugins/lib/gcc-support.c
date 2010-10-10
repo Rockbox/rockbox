@@ -22,7 +22,7 @@
 ****************************************************************************/
 #include "plugin.h"
 
-#ifdef CPU_ARM
+#if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 void __attribute__((naked)) __div0(void)
 {
     asm volatile("bx %0" : : "r"(rb->__div0));

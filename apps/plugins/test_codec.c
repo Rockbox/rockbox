@@ -615,7 +615,7 @@ static void init_ci(void)
     ci.semaphore_release = rb->semaphore_release;
 #endif
 
-#ifdef CPU_ARM
+#if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
     ci.__div0 = rb->__div0;
 #endif
 }
