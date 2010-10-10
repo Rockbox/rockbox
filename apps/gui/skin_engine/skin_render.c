@@ -78,7 +78,7 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        unsigned long refresh_type);
 #endif
 
-static __attribute__((noinline))  bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
+static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                              struct skin_element *element, struct viewport* vp)
 {
 #ifndef HAVE_LCD_BITMAP
@@ -234,7 +234,7 @@ static __attribute__((noinline))  bool do_non_text_tags(struct gui_wps *gwps, st
                 
 
 
-static __attribute__((noinline))  void do_tags_in_hidden_conditional(struct skin_element* branch,
+static void do_tags_in_hidden_conditional(struct skin_element* branch,
                                           struct skin_draw_info *info)
 {
 #ifdef HAVE_LCD_BITMAP
@@ -328,7 +328,7 @@ static __attribute__((noinline))  void do_tags_in_hidden_conditional(struct skin
     }
 }
     
-static __attribute__((noinline))  void fix_line_alignment(struct skin_draw_info *info, struct skin_element *element)
+static void fix_line_alignment(struct skin_draw_info *info, struct skin_element *element)
 {
     struct align_pos *align = &info->align;
     char *cur_pos = info->cur_align_start + strlen(info->cur_align_start);
@@ -371,7 +371,7 @@ static __attribute__((noinline))  void fix_line_alignment(struct skin_draw_info 
 }
     
 /* Draw a LINE element onto the display */
-static __attribute__((noinline))  bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
+static bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
 {
     bool needs_update = false;
     int last_value, value;
@@ -478,7 +478,7 @@ static __attribute__((noinline))  bool skin_render_line(struct skin_element* lin
     return needs_update;
 }
 
-static __attribute__((noinline))  int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
+static int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
 {
     struct skin_element *element=line;
     struct wps_token *token;
@@ -514,7 +514,7 @@ static __attribute__((noinline))  int get_subline_timeout(struct gui_wps *gwps, 
     return retval;
 }
 
-bool __attribute__((noinline))  skin_render_alternator(struct skin_element* element, struct skin_draw_info *info)
+bool skin_render_alternator(struct skin_element* element, struct skin_draw_info *info)
 {
     bool changed_lines = false;
     struct line_alternator *alternator = (struct line_alternator*)element->data;
@@ -570,7 +570,7 @@ bool __attribute__((noinline))  skin_render_alternator(struct skin_element* elem
     return changed_lines || ret;
 }
 
-static __attribute__((noinline))  void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
+static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
                                  struct skin_viewport* skin_viewport, unsigned long refresh_type)
 {
     struct screen *display = gwps->display;
@@ -715,7 +715,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static __attribute__((noinline))  void skin_render_playlistviewer(struct playlistviewer* viewer,
+static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        struct gui_wps *gwps,
                                        struct skin_viewport* skin_viewport,
                                        unsigned long refresh_type)
