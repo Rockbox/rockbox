@@ -829,6 +829,9 @@ static const struct touchaction touchactions[] = {
     {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
     {"menu", ACTION_STD_MENU },         {"cancel", ACTION_STD_CANCEL },
     {"contextmenu", ACTION_STD_CONTEXT},{"quickscreen", ACTION_STD_QUICKSCREEN },
+    
+    /* list/tree actions */
+    { "resumeplayback", ACTION_TREE_WPS}, /* returns to previous music, WPS/FM */
     /* not really WPS specific, but no equivilant ACTION_STD_* */
     {"voldown", ACTION_WPS_VOLDOWN},    {"volup", ACTION_WPS_VOLUP},
     
