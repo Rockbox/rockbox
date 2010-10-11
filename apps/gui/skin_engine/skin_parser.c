@@ -1313,10 +1313,14 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     {
         skin_vp->vp.font = param->data.number;
     }
-#endif    
+#endif
+    if ((unsigned) skin_vp->vp.x >= (unsigned) display->lcdwidth ||
+        skin_vp->vp.width + skin_vp->vp.x > display->lcdwidth ||
+        (unsigned) skin_vp->vp.y >= (unsigned) display->lcdheight ||
+        skin_vp->vp.height + skin_vp->vp.y > display->lcdheight)
+        return CALLBACK_ERROR;
 
     return CALLBACK_OK;
-    
 }
 
 static int skin_element_callback(struct skin_element* element, void* data)
