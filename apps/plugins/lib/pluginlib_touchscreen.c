@@ -129,7 +129,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
             }
             
             /* Draw bounding box around the button location. */
-            lcd->draw_viewport_rect(NULL);
+            lcd->draw_border_viewport();
         }
     }
     lcd->set_viewport(NULL); /* Go back to the default viewport */

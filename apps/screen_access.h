@@ -117,8 +117,8 @@ struct screen
     void (*update_viewport_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
     void (*drawrect)(int x, int y, int width, int height);
-    void (*fill_viewport_rect)(const struct viewport *vp);
-    void (*draw_viewport_rect)(const struct viewport *vp);
+    void (*fill_viewport)(void);
+    void (*draw_border_viewport)(void);
     void (*drawpixel)(int x, int y);
     void (*drawline)(int x1, int y1, int x2, int y2);
     void (*vline)(int x, int y1, int y2);

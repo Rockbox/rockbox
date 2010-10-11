@@ -69,7 +69,7 @@ static void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     vp.width = button_width-1;
     vp.x = button_width * num;
     display->set_viewport(&vp);
-    display->fill_viewport_rect(NULL);
+    display->fill_viewport();
     if(buttonbar->caption[num][0] != 0)
     {
         display->getstringsize(buttonbar->caption[num], &fw, &fh);
