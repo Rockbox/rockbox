@@ -35,17 +35,19 @@ its subdirectories will be scanned and added to the database.
 \subsection{\label{ref:databasemenu}The Database Menu}
 
 \begin{description}
-  \opt{swcodec}{
+  \opt{tc_ramcache}{
   \item[Load To RAM]
-    The database can either be kept on disk (to save memory), or
+    The database can either be kept on \disk{} (to save memory), or
     loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
     the database to RAM, allowing faster browsing and searching. Setting this
-    option to \setting{No} keeps the database on the disk, meaning slower 
+    option to \setting{No} keeps the database on the \disk{}, meaning slower 
     browsing but it does not use extra RAM and saves some battery on boot up. 
     
+    \opt{HAVE_DISK_STORAGE}{
     \note{If you browse your music frequently using the database, you should
       load to RAM, as this will reduce the overall battery consumption because
       the disk will not need to spin on each search.}
+    }
   }
   
 \item[Auto Update]
