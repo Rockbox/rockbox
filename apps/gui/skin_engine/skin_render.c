@@ -700,8 +700,9 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             display->clear_viewport();
         }
         /* render */
-        skin_render_viewport(viewport->children[0], gwps,
-                             skin_viewport, vp_refresh_mode);
+        if (viewport->children_count)
+            skin_render_viewport(viewport->children[0], gwps,
+                                 skin_viewport, vp_refresh_mode);
         refresh_mode = old_refresh_mode;
     }
     
