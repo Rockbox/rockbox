@@ -634,7 +634,7 @@ Example:
   (\%XX should be replaced with the actual tag).
 
 \begin{tagmap}
-  \config{\%XX(x, y, width, filename, [options])}
+  \config{\%XX(x, y, width, height, [options])}
     & Draw the specified tag as a bar\newline
       \config{x}: x co-ordinate at which to start drawing the bar.\newline
       \config{y}: y co-ordinate at which to start drawing the bar.\newline
@@ -646,6 +646,8 @@ Example:
 
 \subsection{Options}
 \begin{description}
+  \item[image] -- the next option is either the filename or image label to
+    use for the fill image.
   \item[horizontal] -- force the bar to be drawn horizontally.
   \item[vertical] -- force the bar to be drawn vertically.
   \item[invert] -- invert the draw direction (i.e. right to left, or top to

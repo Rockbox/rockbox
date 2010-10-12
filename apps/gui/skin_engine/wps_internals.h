@@ -103,9 +103,8 @@ struct progressbar {
     short width;
     short height;
     bool  follow_lang_direction;
-    /*progressbar image*/
-    struct bitmap bm;
-    bool have_bitmap_pb;
+    
+    struct gui_img *image;
     
     bool invert_fill_direction;
     bool nofill;
@@ -263,7 +262,6 @@ struct wps_data
     struct skin_element *tree;
 #ifdef HAVE_LCD_BITMAP
     struct skin_token_list *images;
-    struct skin_token_list *progressbars;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     struct {
