@@ -43,6 +43,7 @@
     y = x - (b<<1);\
 }
 
+
 /* standard BUTTERFLIES package.  Note, we actually manually inline this
    in all the TRANSFORM macros below anyway */
 #define FFT_FFMPEG_INCL_OPTIMISED_BUTTERFLIES
@@ -59,197 +60,313 @@
 
 #define FFT_FFMPEG_INCL_OPTIMISED_TRANSFORM
 
-/* on ARM, all the TRANSFORM_etc inlines use the following registers:
-   r5,r6,r7,r8,r9,r10,r4,r12
+static inline FFTComplex* TRANSFORM( FFTComplex* z, int n, FFTSample wre, FFTSample wim )
+{
+    register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
+    z += n*2; /* z[o2] */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XPROD31_R(r_re, r_im, wre, wim, t1,t2);
+    
+    z += n; /* z[o3] */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
+    
+    BF_OPT(t1, t5, t5, t1);
+    BF_OPT(t6, t2, t2, t6);
+
+    {    
+        register FFTSample rt0temp asm("r4");
+        /*{*/
+        /*   BF_OPT(t1, t5, t5, t1);*/
+        /*    BF_OPT(t6, t2, t2, t6);*/
+        /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/
+        /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/
+        /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/
+        /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/
+        /*}*/
+        z -= n*3;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(rt0temp, r_re, r_re, t5);
+        BF_OPT(t2,      r_im, r_im, t2);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory" );
+        z += n;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(t5, r_re, r_re, t6);
+        BF_OPT(t6, r_im, r_im, t1);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* my_z[0] = rt0temp; my_z[1] = t2; */
+        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
+    }
+    z += n;
    
-   inputs are: z, n, STEP
-   
-   NOTE THAT THESE MACROS ACTUALLY CHANGE z INPUT INPLACE-
-   so sequential actions, z += n*3, z -= n*2 etc etc matter
-*/
-   
-
-#define TRANSFORM_POST_STORE( z, n ) {\
-    /*{*/\
-    /*   BF_OPT(t1, t5, t5, t1);*/\
-    /*    BF_OPT(t6, t2, t2, t6);*/\
-    /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/\
-    /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/\
-    /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/\
-    /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/\
-    /*}*/\
-    z -= n*3;\
-    /* r_re = my_z[0]; r_im = my_z[1]; */\
-    {\
-        register FFTSample rt0temp asm("r4");\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        BF_OPT(rt0temp, r_re, r_re, t5);\
-        BF_OPT(t2,      r_im, r_im, t2);\
-        /* my_z[0] = r_re; my_z[1] = r_im; */\
-        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im));\
-        z += n;\
-        /* r_re = my_z[0]; r_im = my_z[1]; */\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        BF_OPT(t5, r_re, r_re, t6);\
-        BF_OPT(t6, r_im, r_im, t1);\
-        /* my_z[0] = r_re; my_z[1] = r_im; */\
-        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im));\
-        z += n;\
-        /* my_z[0] = rt0temp; my_z[1] = t2; */\
-        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2));\
-        z += n;\
-    }\
-    /* my_z[0] = t5; my_z[1] = t6; */\
-    asm volatile( "stmia %[my_z], {%[t5],%[t6]}\n\t"::[my_z] "r" (z), [t5] "r" (t5), [t6] "r" (t6));\
-    z -= n*3;\
+    /* my_z[0] = t5; my_z[1] = t6; */
+    asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
+    z -= n*3;
+    return(z);
 }
 
-#define TRANSFORM( z, n, wre_arg, wim_arg )\
-{\
-    FFTSample wre = wre_arg, wim = wim_arg;\
-    register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
-    z += n*2; /* z[o2] */\
-    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-    XPROD31_R(r_re, r_im, wre, wim, t1,t2);\
-    \
-    z += n; /* z[o3] */\
-    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-    XNPROD31_R(r_re, r_im, wre, wim, t5,t6);\
-    \
-    BF_OPT(t1, t5, t5, t1);\
-    BF_OPT(t6, t2, t2, t6);\
-    TRANSFORM_POST_STORE( z, n );\
+static inline FFTComplex* TRANSFORM_W01( FFTComplex* z, int n, const FFTSample* w )
+{
+    register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
+    
+    /* load wre,wim into t5,t6 */
+    asm volatile( "ldmia %[w], {%[wre], %[wim]}\n\t":[wre] "=r" (t5), [wim] "=r" (t6):[w] "r" (w));
+    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XPROD31_R(r_re, r_im, t5 /*wre*/, t6 /*wim*/, t1,t2);
+
+    z += n; /* z[o3] */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XNPROD31_R(r_re, r_im, t5 /*wre*/, t6 /*wim*/, t5,t6);
+    
+    BF_OPT(t1, t5, t5, t1);
+    BF_OPT(t6, t2, t2, t6);
+    {
+        register FFTSample rt0temp asm("r4");
+        /*{*/
+        /*   BF_OPT(t1, t5, t5, t1);*/
+        /*    BF_OPT(t6, t2, t2, t6);*/
+        /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/
+        /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/
+        /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/
+        /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/
+        /*}*/
+        z -= n*3;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(rt0temp, r_re, r_re, t5);
+        BF_OPT(t2,      r_im, r_im, t2);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(t5, r_re, r_re, t6);
+        BF_OPT(t6, r_im, r_im, t1);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* my_z[0] = rt0temp; my_z[1] = t2; */
+        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
+    }
+    z += n;
+
+    /* my_z[0] = t5; my_z[1] = t6; */
+    asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
+    z -= n*3;
+    return(z);
 }
 
-#define TRANSFORM_W01( z, n, w )\
-{\
-    register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
-    \
-    {\
-        register FFTSample wre asm("r4"),wim asm("r12");\
-        asm volatile( "ldmia %[w], {%[wre], %[wim]}\n\t":[wre] "=r" (wre), [wim] "=r" (wim):[w] "r" (w));\
-        z += n*2; /* z[o2] -- 2n * 2 since complex numbers */\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        XPROD31_R(r_re, r_im, wre, wim, t1,t2);\
-\
-        z += n; /* z[o3] */\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        XNPROD31_R(r_re, r_im, wre, wim, t5,t6);\
-    }\
-    \
-    BF_OPT(t1, t5, t5, t1);\
-    BF_OPT(t6, t2, t2, t6);\
-    TRANSFORM_POST_STORE( z, n );\
+static inline FFTComplex* TRANSFORM_W10( FFTComplex* z, int n, const FFTSample* w )
+{
+    register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
+    
+    /* load wim,wre into t5,t6 */
+    asm volatile( "ldmia %[w], {%[wim], %[wre]}\n\t":[wim] "=r" (t5), [wre] "=r" (t6):[w] "r" (w));
+    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XPROD31_R(r_re, r_im, t6 /*wim*/, t5 /*wre*/, t1,t2);
+
+    z += n; /* z[o3] */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    XNPROD31_R(r_re, r_im, t6 /*wim*/, t5 /*wre*/, t5,t6);
+    
+    BF_OPT(t1, t5, t5, t1);
+    BF_OPT(t6, t2, t2, t6);
+    {
+        register FFTSample rt0temp asm("r4");
+        /*{*/
+        /*   BF_OPT(t1, t5, t5, t1);*/
+        /*    BF_OPT(t6, t2, t2, t6);*/
+        /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/
+        /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/
+        /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/
+        /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/
+        /*}*/
+        z -= n*3;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(rt0temp, r_re, r_re, t5);
+        BF_OPT(t2,      r_im, r_im, t2);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(t5, r_re, r_re, t6);
+        BF_OPT(t6, r_im, r_im, t1);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* my_z[0] = rt0temp; my_z[1] = t2; */
+        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
+    }
+    z += n;
+
+    /* my_z[0] = t5; my_z[1] = t6; */
+    asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
+    z -= n*3;
+    return(z);
 }
 
-//static inline void TRANSFORM_W10(int32_t * z, unsigned int n, const int32_t * w)
-#define TRANSFORM_W10( z, n, w )\
-{\
-    register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
-    \
-    {\
-        register FFTSample wim asm("r4"),wre asm("r12");\
-        asm volatile( "ldmia %[w], {%[wim], %[wre]}\n\t":[wim] "=r" (wim), [wre] "=r" (wre):[w] "r" (w));\
-        z += n*2; /* z[o2] -- 2n * 2 since complex numbers */\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        XPROD31_R(r_re, r_im, wre, wim, t1,t2);\
-\
-        z += n; /* z[o3] */\
-        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-        XNPROD31_R(r_re, r_im, wre, wim, t5,t6);\
-    }\
-    \
-    BF_OPT(t1, t5, t5, t1);\
-    BF_OPT(t6, t2, t2, t6);\
-    TRANSFORM_POST_STORE( z, n );\
+static inline FFTComplex* TRANSFORM_EQUAL( FFTComplex* z, int n )
+{
+    register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
+
+    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
+    asm volatile( "ldmia %[my_z], {%[t5],%[t6]}\n\t":[t5] "=r" (t5), [t6] "=r" (t6):[my_z] "r" (z));
+    z += n; /* z[o3] */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+
+/**/
+/*t2 = MULT32(cPI2_8, t5);*/
+/*t1 = MULT31(cPI2_8, t6);*/
+/*t6 = MULT31(cPI2_8, r_re);*/
+/*t5 = MULT32(cPI2_8, r_im);*/
+
+/*t1 = ( t1 + (t2<<1) );*/
+/*t2 = ( t1 - (t2<<2) );*/
+/*t6 = ( t6 + (t5<<1) );*/
+/*t5 = ( t6 - (t5<<2) );*/
+/**/
+    t2   = MULT31(cPI2_8, t5);
+    t6   = MULT31(cPI2_8, t6);
+    r_re = MULT31(cPI2_8, r_re);
+    t5   = MULT31(cPI2_8, r_im);
+    
+    t1 = ( t6 + t2 );
+    t2 = ( t6 - t2 );
+    t6 = ( r_re + t5 );
+    t5 = ( r_re - t5 );
+    
+    BF_OPT(t1, t5, t5, t1);
+    BF_OPT(t6, t2, t2, t6);
+    {
+        register FFTSample rt0temp asm("r4");
+        /*{*/
+        /*   BF_OPT(t1, t5, t5, t1);*/
+        /*    BF_OPT(t6, t2, t2, t6);*/
+        /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/
+        /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/
+        /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/
+        /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/
+        /*}*/
+        z -= n*3;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(rt0temp, r_re, r_re, t5);
+        BF_OPT(t2,      r_im, r_im, t2);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(t5, r_re, r_re, t6);
+        BF_OPT(t6, r_im, r_im, t1);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* my_z[0] = rt0temp; my_z[1] = t2; */
+        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
+    }
+    z += n;
+
+    /* my_z[0] = t5; my_z[1] = t6; */
+    asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
+    z -= n*3;
+    return(z);
 }
 
-#define TRANSFORM_EQUAL( z, n )\
-{\
-    register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
-\
-    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */\
-    asm volatile( "ldmia %[my_z], {%[t5],%[t6]}\n\t":[t5] "=r" (t5), [t6] "=r" (t6):[my_z] "r" (z));\
-    z += n; /* z[o3] */\
-    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));\
-\
-/**/\
-/*t2 = MULT32(cPI2_8, t5);*/\
-/*t1 = MULT31(cPI2_8, t6);*/\
-/*t6 = MULT31(cPI2_8, r_re);*/\
-/*t5 = MULT32(cPI2_8, r_im);*/\
-\  
-/*t1 = ( t1 + (t2<<1) );*/\
-/*t2 = ( t1 - (t2<<2) );*/\
-/*t6 = ( t6 + (t5<<1) );*/\
-/*t5 = ( t6 - (t5<<2) );*/\
-/**/\
-    t2   = MULT31(cPI2_8, t5);\
-    t6   = MULT31(cPI2_8, t6);\
-    r_re = MULT31(cPI2_8, r_re);\
-    t5   = MULT31(cPI2_8, r_im);\
-    \
-    t1 = ( t6 + t2 );\
-    t2 = ( t6 - t2 );\
-    t6 = ( r_re + t5 );\
-    t5 = ( r_re - t5 );\
-    \
-    BF_OPT(t1, t5, t5, t1);\
-    BF_OPT(t6, t2, t2, t6);\
-    TRANSFORM_POST_STORE( z, n );\
-}
+static inline FFTComplex* TRANSFORM_ZERO( FFTComplex* z, int n )
+{
+    register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"), r_re asm("r8"), r_im asm("r9");
 
-#define TRANSFORM_ZERO( z,n )\
-{\
-    register FFTSample t1 asm("r5"),t2 asm("r6"),t5 asm("r7"),t6 asm("r8"),r_re asm("r9"),r_im asm("r10");\
-\
-    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */\
-    asm volatile( "ldmia %[my_z], {%[t1],%[t2]}\n\t":[t1] "=r" (t1), [t2] "=r" (t2):[my_z] "r" (z));\
-    z += n; /* z[o3] */\
-    asm volatile( "ldmia %[my_z], {%[t5],%[t6]}\n\t":[t5] "=r" (t5), [t6] "=r" (t6):[my_z] "r" (z));\
-\
-    BF_OPT(t1, t5, t5, t1);\
-    BF_OPT(t6, t2, t2, t6);\
-    TRANSFORM_POST_STORE( z, n );\
+    z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
+    asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+    z += n; /* z[o3] */
+    asm volatile( "ldmia %[my_z], {%[t5],%[t6]}\n\t":[t5] "=r" (t5), [t6] "=r" (t6):[my_z] "r" (z));
+
+    BF_OPT(t1, t5, t5, r_re);
+    BF_OPT(t6, t2, r_im, t6);
+    {
+        register FFTSample rt0temp asm("r4");
+        /*{*/
+        /*   BF_OPT(t1, t5, t5, t1);*/
+        /*    BF_OPT(t6, t2, t2, t6);*/
+        /*    BF_OPT(a2.re, a0.re, a0.re, t5);*/
+        /*    BF_OPT(a2.im, a0.im, a0.im, t2);*/
+        /*    BF_OPT(a3.re, a1.re, a1.re, t6);*/
+        /*    BF_OPT(a3.im, a1.im, a1.im, t1);*/
+        /*}*/
+        z -= n*3;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(rt0temp, r_re, r_re, t5);
+        BF_OPT(t2,      r_im, r_im, t2);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* r_re = my_z[0]; r_im = my_z[1]; */
+        asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
+        BF_OPT(t5, r_re, r_re, t6);
+        BF_OPT(t6, r_im, r_im, t1);
+        /* my_z[0] = r_re; my_z[1] = r_im; */
+        asm volatile( "stmia %[my_z], {%[r_re],%[r_im]}\n\t"::[my_z] "r" (z), [r_re] "r" (r_re), [r_im] "r" (r_im):"memory");
+        z += n;
+        /* my_z[0] = rt0temp; my_z[1] = t2; */
+        asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
+    }
+    z += n;
+
+    /* my_z[0] = t5; my_z[1] = t6; */
+    asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
+    z -= n*3;
+    return(z);
 }
 
 #define FFT_FFMPEG_INCL_OPTIMISED_FFT4
-#define fft4(z_arg)\
-{\
-    /* input[0..7] -> output[0..7] */\
-    fixed32 * m = (fixed32 *) ( ( z_arg ) );\
-    /* load r1=z[0],r2=z[1],...,r8=z[7] */\
-    asm volatile(\
-      "ldmia %[z], {r1-r8}\n\t"\
-      "add r1,r1,r3\n\t"         /* r1 :=t1 */\
-      "sub r3,r1,r3, lsl #1\n\t" /* r3 :=t3 */\
-      "sub r7,r7,r5\n\t"         /* r10:=t8 */\
-      "add r5,r7,r5, lsl #1\n\t" /* r5 :=t6 */\
-      \
-      "add r1,r1,r5\n\t"                 /* r1 = o[0] */\
-      "sub r5,r1,r5, lsl #1\n\t"         /* r5 = o[4] */\
-      \
-      "add r2,r2,r4\n\t"         /* r2 :=t2 */\
-      "sub r4,r2,r4, lsl #1\n\t" /* r9 :=t4 */\
-      \
-      "add r12,r6,r8\n\t"        /* r10:=t5 */\
-      "sub r6,r6,r8\n\t"         /* r6 :=t7 */\
-      \
-      "sub r8,r4,r7\n\t"                 /* r8 = o[7]*/ \
-      "add r4,r4,r7\n\t"                 /* r4 = o[3]*/ \
-      "sub r7,r3,r6\n\t"                 /* r7 = o[6]*/ \
-      "add r3,r3,r6\n\t"                 /* r3 = o[2]*/ \
-      "sub r6,r2,r12\n\t"                /* r6 = o[5]*/ \
-      "add r2,r2,r12\n\t"                /* r2 = o[1]*/ \
-      \
-      "stmia %[z], {r1-r8}\n\t"\
-      : /* outputs */\
-      : /* inputs */ [z] "r" (m)\
-      : /* clobbers */\
-      "r1","r2","r3","r4","r5","r6","r7","r8","r12","memory"\
-   );\
+static inline FFTComplex* fft4(FFTComplex * z)
+{
+    FFTSample temp;
+    
+    /* input[0..7] -> output[0..7] */
+    /* load r1=z[0],r2=z[1],...,r8=z[7] */
+    asm volatile(
+      "ldmia %[z], {r1-r8}\n\t"
+      "add r1,r1,r3\n\t"         /* r1 :=t1 */
+      "sub r3,r1,r3, lsl #1\n\t" /* r3 :=t3 */
+      "sub r7,r7,r5\n\t"         /* r10:=t8 */
+      "add r5,r7,r5, lsl #1\n\t" /* r5 :=t6 */
+      
+      "add r1,r1,r5\n\t"                 /* r1 = o[0] */
+      "sub r5,r1,r5, lsl #1\n\t"         /* r5 = o[4] */
+      
+      "add r2,r2,r4\n\t"         /* r2 :=t2 */
+      "sub r4,r2,r4, lsl #1\n\t" /* r9 :=t4 */
+      
+      "add %[temp],r6,r8\n\t"        /* r10:=t5 */
+      "sub r6,r6,r8\n\t"         /* r6 :=t7 */
+      
+      "sub r8,r4,r7\n\t"                 /* r8 = o[7]*/ 
+      "add r4,r4,r7\n\t"                 /* r4 = o[3]*/ 
+      "sub r7,r3,r6\n\t"                 /* r7 = o[6]*/ 
+      "add r3,r3,r6\n\t"                 /* r3 = o[2]*/ 
+      "sub r6,r2,%[temp]\n\t"                /* r6 = o[5]*/ 
+      "add r2,r2,%[temp]\n\t"                /* r2 = o[1]*/ 
+      
+      "stmia %[z]!, {r1-r8}\n\t"
+      : /* outputs */ [z] "+r" (z), [temp] "=r" (temp)
+      : /* inputs */
+      : /* clobbers */
+      "r1","r2","r3","r4","r5","r6","r7","r8","memory"
+   );
+   return z;
 }
-
 
 #define FFT_FFMPEG_INCL_OPTIMISED_FFT8
         /* The chunk of asm below is equivalent to the following:
@@ -279,12 +396,14 @@
         // Finally save out z[4].re, z[4].im, z[0].re and z[0].im
         // ...
         */
-static inline void fft8( FFTComplex * z )
+static inline void fft8(FFTComplex * z)
 {
-    fft4(z);
+    FFTComplex* m4 = fft4(z);
     {
-        FFTSample temp;
-        fixed32 * m4 = (fixed32 *)(&(z[4].re));
+        /* note that we increment z_ptr on the final stmia, which 
+           leaves z_ptr pointing to z[1].re ready for the Transform step */
+           
+        register FFTSample temp;
 
         asm volatile(
             /* read in z[4].re thru z[7].im */
@@ -323,18 +442,15 @@ static inline void fft8( FFTComplex * z )
             "add r8,r8,r2\n\t"
             "sub r2,r8,r2,lsl #1\n\t"
 
-            "stmia %[z_ptr],{r7,r8}\n\t" /* write out z[0].re, z[0].im */
+            "stmia %[z_ptr]!,{r7,r8}\n\t" /* write out z[0].re, z[0].im */
             "stmdb %[z4_ptr], {r1,r2}\n\t" /* write out z[4].re, z[4].im */
-            : [z4_ptr] "+r" (m4), [temp] "=r" (temp)
-            : [z_ptr] "r" (z)
+            : [z4_ptr] "+r" (m4), [temp] "=r" (temp), [z_ptr] "+r" (z)
+            :
             : "r1","r2","r3","r4","r5","r6","r7","r8","memory"
         );
     }
 
-    z++;
     TRANSFORM_EQUAL(z,2);
 }
 
-
 #endif // CPU_ARM
-

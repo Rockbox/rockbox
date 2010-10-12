@@ -202,7 +202,7 @@ static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 */
 
 #ifndef FFT_FFMPEG_INCL_OPTIMISED_TRANSFORM
-static inline void TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTSample wim)
+static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTSample wim)
 {
     register FFTSample t1,t2,t5,t6,r_re,r_im;
     r_re = z[n*2].re;
@@ -212,9 +212,10 @@ static inline void TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTS
     r_im = z[n*3].im;
     XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
+    return z+1;
 }
 
-static inline void TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample * w)
+static inline FFTComplex* TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample * w)
 {
     register const FFTSample wre=w[0],wim=w[1];
     register FFTSample t1,t2,t5,t6,r_re,r_im;
@@ -225,9 +226,10 @@ static inline void TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample
     r_im = z[n*3].im;
     XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
+    return z+1;
 }
 
-static inline void TRANSFORM_W10(FFTComplex * z, unsigned int n, const FFTSample * w)
+static inline FFTComplex* TRANSFORM_W10(FFTComplex * z, unsigned int n, const FFTSample * w)
 {
     register const FFTSample wim=w[0],wre=w[1];
     register FFTSample t1,t2,t5,t6,r_re,r_im;
@@ -238,9 +240,10 @@ static inline void TRANSFORM_W10(FFTComplex * z, unsigned int n, const FFTSample
     r_im = z[n*3].im;
     XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
+    return z+1;
 }
 
-static inline void TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
+static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
 {
     register FFTSample t1,t2,t5,t6,temp1,temp2;
     register FFTSample * my_z = (FFTSample *)(z);
@@ -256,9 +259,10 @@ static inline void TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
     t5 = ( temp2 - t5 );
     my_z -= n*6;
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
+    return z+1;
 }
 
-static inline void TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
+static inline FFTComplex* TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
 {
     FFTSample t1,t2,t5,t6;
     t1 = z[n*2].re;
@@ -266,6 +270,7 @@ static inline void TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
     t5 = z[n*3].re;
     t6 = z[n*3].im;
     BUTTERFLIES(z[0],z[n],z[n*2],z[n*3]);
+    return z+1;
 }
 #endif
 
@@ -282,17 +287,14 @@ void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg)
     register const FFTSample *w_end = sincos_lookup0+1024;
 
     /* first two are special (well, first one is special, but we need to do pairs) */
-    TRANSFORM_ZERO(z,n);
-    z++;
-    TRANSFORM_W10(z,n,w);
+    z = TRANSFORM_ZERO(z,n);
+    z = TRANSFORM_W10(z,n,w);
     w += STEP;
     /* first pass forwards through sincos_lookup0*/
     do {
-        z++;
-        TRANSFORM_W10(z,n,w);
+        z = TRANSFORM_W10(z,n,w);
         w += STEP;
-        z++;
-        TRANSFORM_W10(z,n,w);
+        z = TRANSFORM_W10(z,n,w);
         w += STEP;
     } while(LIKELY(w < w_end));
     /* second half: pass backwards through sincos_lookup0*/
@@ -300,11 +302,9 @@ void pass(FFTComplex *z_arg, unsigned int STEP_arg, unsigned int n_arg)
     w_end=sincos_lookup0;
     while(LIKELY(w>w_end))
     {
-        z++;
-        TRANSFORM_W01(z,n,w);
+        z = TRANSFORM_W01(z,n,w);
         w -= STEP;
-        z++;
-        TRANSFORM_W01(z,n,w);
+        z = TRANSFORM_W01(z,n,w);
         w -= STEP;
     }
 }
