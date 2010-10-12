@@ -403,6 +403,14 @@ void usb_init_device(void)
     unsigned int i;
     for (i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
         wakeup_init(&endpoints[i].complete);
+
+    /* Power up the core clocks to allow writing
+       to some registers needed to power it down */
+    PWRCON &= ~0x4000;
+    PWRCONEXT &= ~0x800;
+    PCGCCTL = 0;
+    INTMSK |= INTMSK_USB_OTG;
+
     usb_drv_exit();
 }
 
