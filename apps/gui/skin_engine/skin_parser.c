@@ -600,6 +600,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->bm.data = NULL; /* no bitmap specified */
     pb->follow_lang_direction = follow_lang_direction > 0;
     pb->nofill = false;
+    pb->nobar = false;
     pb->slider = NULL;
     pb->invert_fill_direction = false;
     pb->horizontal = true;
@@ -676,6 +677,8 @@ static int parse_progressbar_tag(struct skin_element* element,
             pb->invert_fill_direction = true;
         else if (!strcmp(param->data.text, "nofill"))
             pb->nofill = true;
+        else if (!strcmp(param->data.text, "nobar"))
+            pb->nobar = true;
         else if (!strcmp(param->data.text, "slider"))
         {
             if (curr_param+1 < element->params_count)

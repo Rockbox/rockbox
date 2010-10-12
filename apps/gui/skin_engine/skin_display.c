@@ -131,7 +131,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     struct viewport *vp = pb->vp;
     struct wps_state *state = skin_get_global_state();
     struct mp3entry *id3 = state->id3;
-    int y = pb->y, height = pb->height;
+    int x = pb->x, y = pb->y, width = pb->width, height = pb->height;
     unsigned long length, end;
     int flags = HORIZONTAL;
     
@@ -194,29 +194,48 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         flags |= INNER_NOFILL;
     }
 
-    if (pb->have_bitmap_pb)
-        gui_bitmap_scrollbar_draw(display, &pb->bm,
-                                pb->x, y, pb->width, height,
-                                length, 0, end, flags);
-    else
-        gui_scrollbar_draw(display, pb->x, y, pb->width, height,
-                           length, 0, end, flags);
+    if (pb->slider)
+    {
+        struct gui_img *img = pb->slider;
+        /* clear the slider */
+        screen_clear_area(display, x, y, width, height);
+
+        /* shrink the bar so the slider is inside bounds */
+        if (flags&HORIZONTAL)
+        {
+            width -= img->bm.width;
+            x += img->bm.width / 2;
+        }
+        else
+        {
+            height -= img->bm.height;
+            y += img->bm.height / 2;
+        }
+    }
+    if (!pb->nobar)
+    {
+        if (pb->have_bitmap_pb)
+            gui_bitmap_scrollbar_draw(display, &pb->bm,
+                                    x, y, width, height,
+                                    length, 0, end, flags);
+        else
+            gui_scrollbar_draw(display, x, y, width, height,
+                               length, 0, end, flags);
+    }
 
     if (pb->slider)
     {
         int xoff = 0, yoff = 0;
-        int w = pb->width, h = height;
+        int w = width, h = height;
         struct gui_img *img = pb->slider;
 
         if (flags&HORIZONTAL)
         {
             w = img->bm.width;
-            xoff = pb->width * end / length;
+            xoff = width * end / length;
             if (flags&INVERTFILL)
-                xoff = pb->width - xoff;
-#if 0 /* maybe add this in later, make the slider bmp overlap abit */
+                xoff = width - xoff;
             xoff -= w / 2;
-#endif
         }
         else
         {
@@ -224,23 +243,21 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
             yoff = height * end / length;
             if (flags&INVERTFILL)
                 yoff = height - yoff;
-#if 0 /* maybe add this in later, make the slider bmp overlap abit */
             yoff -= h / 2;
-#endif
         }
 #if LCD_DEPTH > 1
         if(img->bm.format == FORMAT_MONO) {
 #endif
             display->mono_bitmap_part(img->bm.data,
                                       0, 0, img->bm.width,
-                                      pb->x + xoff, y + yoff, w, h);
+                                      x + xoff, y + yoff, w, h);
 #if LCD_DEPTH > 1
         } else {
             display->transparent_bitmap_part((fb_data *)img->bm.data,
                                              0, 0,
                                              STRIDE(display->screen_type,
                                              img->bm.width, img->bm.height),
-                                             pb->x + xoff, y + yoff, w, h);
+                                             x + xoff, y + yoff, w, h);
         }
 #endif
     }
@@ -251,18 +268,17 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         {
 #ifdef AB_REPEAT_ENABLE
             if (ab_repeat_mode_enabled())
-                ab_draw_markers(display, id3->length,
-                                pb->x, y, pb->width, height);
+                ab_draw_markers(display, id3->length, x, y, width, height);
 #endif
 
             if (id3->cuesheet)
                 cue_draw_markers(display, id3->cuesheet, id3->length,
-                                 pb->x, y+1, pb->width, height-2);
+                                 x, y+1, width, height-2);
         }
 #if 0 /* disable for now CONFIG_TUNER */
         else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
         {
-            presets_draw_markers(display, pb->x, y, pb->width, height);
+            presets_draw_markers(display, x, y, width, height);
         }
 #endif
     }

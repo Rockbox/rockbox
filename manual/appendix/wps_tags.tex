@@ -650,15 +650,21 @@ Example:
   \item[vertical] -- force the bar to be drawn vertically.
   \item[invert] -- invert the draw direction (i.e. right to left, or top to
     bottom).
-  \item[slider] -- draw an preloaded image over the top of the bar. This must be
+  \item[slider] -- draw an preloaded image over the top of the bar so that
+    the centre of the image matches current position. This must be
     followed by the label of the desired image.
   \item[nofill] -- don't draw the fill bar, only the empty image (for the
     desired effect use with the ``slider'' option).
+  \item[nobar] -- don't draw the bar entirely including frame (for use
+    with the ``slider'' option).
 \end{description}
 
 Example: \config{\%pb(0,0,-,-,-,nofill, slider, slider\_image, invert)} -- draw
 a horizontal progressbar which doesn't fill and draws the image
 ``slider\_image'' which moves right to left.
+
+Note: if the slider option is used, the bar will be shrank so that the slider will fit
+ inside the specified width and height.
 
 \section{Other Tags}
 \begin{tagmap}

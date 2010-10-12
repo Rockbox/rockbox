@@ -109,6 +109,7 @@ struct progressbar {
     
     bool invert_fill_direction;
     bool nofill;
+    bool nobar;
     struct gui_img *slider;
     bool horizontal;
 };
