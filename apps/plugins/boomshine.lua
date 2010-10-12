@@ -313,7 +313,7 @@ function start_round(level, goal, nrBalls, total)
 end
 
 -- Helper function to display a message
-function display_message(...)
+function display_message(to, ...)
     local message = string.format(...)
     local _, w, h = rb.font_getstringsize(message, rb.FONT_UI)
     local x, y = (rb.LCD_WIDTH - w) / 2, (rb.LCD_HEIGHT - h) / 2
@@ -321,13 +321,29 @@ function display_message(...)
     rb.lcd_clear_display()
     set_foreground(DEFAULT_FOREGROUND_COLOR)
     if w > rb.LCD_WIDTH then
-        rb.lcd_puts_scroll(x/w, y/h, message)
+        rb.lcd_puts_scroll(0, y/h, message)
     else
         rb.lcd_putsxy(x, y, message)
     end
+    if to == -1 then
+        local msg = "Press button to exit"
+        w = rb.font_getstringsize(msg, rb.FONT_UI)
+        x = (rb.LCD_WIDTH - w) / 2
+        if x < 0 then
+            rb.lcd_puts_scroll(0, y/h + 1, msg)
+        else
+            rb.lcd_putsxy(x, y + h, msg)
+        end
+    end
     rb.lcd_update()
 
-    rb.sleep(rb.HZ * 2)
+    if to == -1 then
+        rb.sleep(rb.HZ/2)
+        rb.button_clear_queue()
+        rb.button_get(1)
+    else
+        rb.sleep(to)
+    end
 
     rb.lcd_stop_scroll() -- Stop our scrolling message
 end
@@ -341,26 +357,26 @@ local idx, highscore = 1, 0
 while levels[idx] ~= nil do
     local goal, nrBalls = levels[idx][1], levels[idx][2]
 
-    display_message("Level %d: get %d out of %d balls", idx, goal, nrBalls)
+    display_message(rb.HZ*2, "Level %d: get %d out of %d balls", idx, goal, nrBalls)
 
     local exit, score, nrExpandedBalls = start_round(idx, goal, nrBalls, highscore)
     if exit then
         break -- Exiting..
     else
         if nrExpandedBalls >= goal then
-            display_message("You won!")
+            display_message(rb.HZ*2, "You won!")
             idx = idx + 1
             highscore = highscore + score
         else
-            display_message("You lost!")
+            display_message(rb.HZ*2, "You lost!")
         end
     end
 end
 
 if idx > #levels then
-    display_message("You finished the game with %d points!", highscore)
+    display_message(-1, "You finished the game with %d points!", highscore)
 else
-    display_message("You made it till level %d with %d points!", idx, highscore)
+    display_message(-1, "You made it till level %d with %d points!", idx, highscore)
 end
 
 -- Restore user backlight settings
