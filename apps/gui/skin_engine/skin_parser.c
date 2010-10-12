@@ -619,7 +619,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         return -1;
     add_to_ll_chain(&wps_data->progressbars, item);
     
-    /* (x,y,width,height,filename) */
+    /* (x, y, width, height, ...) */
     if (!isdefault(param))
         pb->x = param->data.number;
     else
@@ -659,11 +659,15 @@ static int parse_progressbar_tag(struct skin_element* element,
 #endif
         }
     }
-    param++;
-    if (!isdefault(param))
-        pb->bm.data = param->data.text;
-        
-    curr_param = 5;
+    /* optional params, first is the image filename if it isnt recognised as a keyword */
+    
+    curr_param = 4;
+    if (isdefault(&element->params[curr_param]))
+    {
+        param++;
+        curr_param++;
+    }
+
     pb->horizontal = pb->width > pb->height;
     while (curr_param < element->params_count)
     {
@@ -679,9 +683,20 @@ static int parse_progressbar_tag(struct skin_element* element,
                 curr_param++;
                 param++;
                 pb->slider = find_image(param->data.text, wps_data);
-                if (!pb->slider)
-                    return -1;
             }
+            else /* option needs the next param */
+                return -1;
+        }
+        else if (!strcmp(param->data.text, "image"))
+        {
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                pb->bm.data = param->data.text;
+            }
+            else /* option needs the next param */
+                return -1;
         }
         else if (!strcmp(param->data.text, "vertical"))
         {
@@ -691,6 +706,8 @@ static int parse_progressbar_tag(struct skin_element* element,
         }
         else if (!strcmp(param->data.text, "horizontal"))
             pb->horizontal = true;
+        else if (curr_param == 4)
+            pb->bm.data = param->data.text;
             
         curr_param++;
     }
