@@ -34,6 +34,7 @@ int key_to_button(int keyboard_key)
             new_btn = BUTTON_TOPLEFT;
             break;
         case SDLK_KP8:
+        case SDLK_UP:
             new_btn = BUTTON_TOPMIDDLE;
             break;
         case SDLK_KP9:

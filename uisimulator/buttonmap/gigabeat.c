@@ -46,8 +46,6 @@ int key_to_button(int keyboard_button)
             break;
         case SDLK_KP_PLUS:
         case SDLK_F8:
-            new_btn = BUTTON_POWER;
-            break;
         case SDLK_ESCAPE:
             new_btn = BUTTON_POWER;
             break;
@@ -65,9 +63,11 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_MENU;
             break;
         case SDLK_KP9:
+        case SDLK_PAGEUP:
             new_btn = BUTTON_VOL_UP;
             break;
         case SDLK_KP3:
+        case SDLK_PAGEDOWN:
             new_btn = BUTTON_VOL_DOWN;
             break;
     }

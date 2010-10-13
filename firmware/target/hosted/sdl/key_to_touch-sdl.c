@@ -51,21 +51,23 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
                 }
             }
             break;
-#ifndef CONFIG_PLATFORM
+#ifndef APPLICATION
         case SDLK_KP7:
         case SDLK_7:
+        case SDLK_HOME:
             new_btn = BUTTON_TOPLEFT;
             break;
         case SDLK_KP8:
         case SDLK_8:
         case SDLK_UP:
 #ifdef HAVE_SCROLLWHEEL
-        case SDL_BUTTON_WHEELDOWN:
+        case SDL_BUTTON_WHEELUP:
 #endif
             new_btn = BUTTON_TOPMIDDLE;
             break;
         case SDLK_KP9:
         case SDLK_9:
+        case SDLK_PAGEUP:
             new_btn = BUTTON_TOPRIGHT;
             break;
         case SDLK_KP4:
@@ -85,6 +87,7 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
             break;
         case SDLK_KP1:
         case SDLK_j:
+        case SDLK_END:
             new_btn = BUTTON_BOTTOMLEFT;
             break;
         case SDLK_KP2:
@@ -97,6 +100,7 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
             break;
         case SDLK_KP3:
         case SDLK_l:
+        case SDLK_PAGEDOWN:
             new_btn = BUTTON_BOTTOMRIGHT;
             break;
 #endif
