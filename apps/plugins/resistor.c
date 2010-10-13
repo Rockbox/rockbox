@@ -167,7 +167,7 @@ static int powi(int num, int exp)
 
 static enum color get_band_rtoc(int in_val)
 {
-    int return_color = 0;
+    int return_color = RES_INVALID;
     switch(in_val) {
         case 0:
             return_color = RES_BLACK;
@@ -808,7 +808,8 @@ static void resistance_to_color(void)
     rb->lcd_clear_display();
     rb->splash(HZ/2, "Resistance to Colour");
     MENUITEM_STRINGLIST(r_to_c_menu, "Select unit to use:", NULL, 
-                        "Ohms", "Kiloohms (KOhms)", "Megaohms (MOhms)");
+                        "Ohms", "Kiloohms (KOhms)", "Megaohms (MOhms)",
+                        "Gigaohms (GOhms)");
     MENUITEM_STRINGLIST(r_to_c_menu_tol, "Tolerance to display:", NULL,
                         "5%", "10%", "1%", "2%", "20%");
       
@@ -848,19 +849,23 @@ static void resistance_to_color(void)
         
         switch(menu_selection) {
             case 0:
+                power_ten=0;
                 units_used = RES_BLACK;
                 break;
             case 1: /* KOhms */
+                power_ten=3;
                 units_used = RES_ORANGE;
-                kbd_input_int *= 1000;
                 break;
             case 2: /* MOhms */
+                power_ten=6;
                 units_used = RES_BLUE;
-                kbd_input_int *= 1000000;
+                break;
+            case 3: /* GOhms */
+                power_ten=9;
+                units_used = RES_WHITE;
                 break;
             }
 
-        power_ten=0;
         temp=kbd_input_int;
         while(temp>=100)
         {
@@ -869,10 +874,19 @@ static void resistance_to_color(void)
         }
         first_band_int=temp/10;
         second_band_int=temp%10;
-        
+
         first_band = get_band_rtoc(first_band_int);
         second_band = get_band_rtoc(second_band_int);
         multiplier = get_band_rtoc(power_ten);
+
+        if( first_band == RES_INVALID
+         || second_band == RES_INVALID
+         || multiplier == RES_INVALID)
+        {
+            rb->splashf(HZ, "%d %s can not be represented",
+                        in_resistance_int,band_data[units_used].unit);
+            return;
+        }
         
         rb->lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
