@@ -617,7 +617,17 @@ static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *
             func = skin_render_line;
         
         needs_update = func(line, &info);
-        
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+        if (skin_viewport->vp.fg_pattern != skin_viewport->start_fgcolour ||
+            skin_viewport->vp.bg_pattern != skin_viewport->start_bgcolour)
+        {
+            /* 2bit lcd drivers need lcd_set_viewport() to be called to change
+             * the colour, 16bit doesnt. But doing this makes static text
+             * get the new colour also */
+            needs_update = true;
+            display->set_viewport(&skin_viewport->vp);
+        }
+#endif
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {
