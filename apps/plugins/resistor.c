@@ -791,7 +791,7 @@ static void resistance_to_color(void)
     int temp;
     int in_resistance_int;
     
-    int power_ten;
+    int power_ten=0;
     int first_band_int = 0;
     int second_band_int = 0;
     
