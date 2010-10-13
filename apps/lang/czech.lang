@@ -1584,11 +1584,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Pouze ruční posun po stopách"
+    crossfade: "Pouze ruční posun po skladbách"
   </dest>
   <voice>
     *: none
-    crossfade: "Pouze ruční posun po stopách"
+    crossfade: "Pouze ruční posun po skladbách"
   </voice>
 </phrase>
 <phrase>
@@ -1821,11 +1821,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pípnutí při posunu po stopách"
+    swcodec: "Pípnutí při posunu po skladbách"
   </dest>
   <voice>
     *: none
-    swcodec: "Pípnutí při posunu po stopách"
+    swcodec: "Pípnutí při posunu po skladbách"
   </voice>
 </phrase>
 <phrase>
@@ -9675,7 +9675,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Stopa"
+    *: "Skladba"
   </voice>
 </phrase>
 <phrase>
@@ -10801,10 +10801,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Přeskočit délku"
+    *: "Přeskakování ve skladbách"
   </dest>
   <voice>
-    *: "Přeskočit délku"
+    *: "Přeskakování ve skladbách"
   </voice>
 </phrase>
 <phrase>
@@ -10815,10 +10815,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Přeskočit skladbu"
+    *: "O celou skladbu"
   </dest>
   <voice>
-    *: "Přeskočit skladbu"
+    *: "O celou skladbu"
   </voice>
 </phrase>
 <phrase>
@@ -11244,10 +11244,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Zabránit přeskakování skladeb"
+    *: "Zabránit přeskakování celých skladeb"
   </dest>
   <voice>
-    *: "Zabránit přeskakování skladeb"
+    *: "Zabránit přeskakování celých skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -11861,10 +11861,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Přeskočit na závěr"
+    *: "Na závěr skladby"
   </dest>
   <voice>
-    *: "Přeskočit na závěr"
+    *: "Na závěr skladby"
   </voice>
 </phrase>
 <phrase>
@@ -11984,11 +11984,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Automatická změna pouze stopy"
+    crossfade: "Automatická změna pouze skladby"
   </dest>
   <voice>
     *: none
-    crossfade: "Automatická změna pouze stopy"
+    crossfade: "Automatická změna pouze skladby"
   </voice>
 </phrase>
 <phrase>
@@ -11999,10 +11999,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Další stopa:"
+    *: "Další skladba:"
   </dest>
   <voice>
-    *: "Další stopa:"
+    *: "Další skladba:"
   </voice>
 </phrase>
 <phrase>
@@ -12543,5 +12543,33 @@
   </dest>
   <voice>
     *: "Aktualizovat při zastavení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Začít prohlížení souborů zde"
+  </dest>
+  <voice>
+    *: "Začít prohlížení souborů zde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Začít prohlížení souborů na rootu"
+  </dest>
+  <voice>
+    *: "Začít prohlížení souborů na růtu"
   </voice>
 </phrase>
