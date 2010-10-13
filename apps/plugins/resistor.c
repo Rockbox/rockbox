@@ -86,8 +86,8 @@ enum color {
     RES_INVALID = -1,
 };
 
-int common_values[] = { 0, 1, 10, 15, 22, 27, 33, 39, 47, 51, 68, 82 };
-int power_ratings[] = { 125, 250, 500, 1000, 2000, 3000, 5000, 10000, 50000 };
+static int common_values[] = { 0, 1, 10, 15, 22, 27, 33, 39, 47, 51, 68, 82 };
+static int power_ratings[] = { 125, 250, 500, 1000, 2000, 3000, 5000, 10000, 50000 };
 /* All in mW */
     
 #ifndef LCD_RGBPACK
@@ -95,7 +95,7 @@ int power_ratings[] = { 125, 250, 500, 1000, 2000, 3000, 5000, 10000, 50000 };
 #define LCD_RGBPACK(x,y,z) 0
 #endif
 
-struct band_data
+static struct band_data
 {
     enum color color;
     char *name;
@@ -121,69 +121,42 @@ struct band_data
     { RES_NONE,   "[None]",  -1                       ,-1,    -1,       0, 20 }
 };
 
-char *unit_abbrev;
-char tolerance_str [14];	
-char power_rating_str [10];
-int r_to_c_first_band;
-int r_to_c_second_band;
-int r_to_c_third_band;
+static char *unit_abbrev;
 
-char str [4][7];
+static struct viewport screen_vp;
+static struct viewport bitmap_vp;
+static struct viewport text_vp;
+static struct screen *display;
 
-struct viewport screen_vp;
-struct viewport bitmap_vp;
-struct viewport text_vp;
-struct screen *display;
+static int lineno;
 
-int lineno;
-
-void get_power_rating_str(int in_rating) 
+static char *get_power_rating_str(int in_rating) 
 {
-switch(in_rating) {
-    case 125:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "1/8 Watt");
-        break;
-    case 250:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "1/4 Watt");
-        break;
-    case 500:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "1/2 Watt");
-        break;
-    case 1000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "1 Watt");
-        break;
-    case 2000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "2 Watt");
-        break;
-    case 3000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "3 Watt");
-        break;
-    case 5000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "5 Watt");
-        break;
-    case 10000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "10 Watt");
-        break;
-    case 500000:
-        rb->snprintf(power_rating_str, sizeof(power_rating_str), "50 Watt");
-        break;
+    switch(in_rating) {
+        case 125:
+            return "1/8 Watt";
+        case 250:
+            return "1/4 Watt";
+        case 500:
+            return "1/2 Watt";
+        case 1000:
+            return "1 Watt";
+        case 2000:
+            return "2 Watt";
+        case 3000:
+            return "3 Watt";
+        case 5000:
+            return "5 Watt";
+        case 10000:
+            return "10 Watt";
+        case 500000:
+            return "50 Watt";
+        default: 
+            return "Unknown";
     }
 }
 
-int get_power_ten(int in_val)
-{
-    int power = 0;
-    if(in_val <= 9 && in_val >= 0) { power = 0; }
-    else if(in_val <= 99 && in_val >= 10) {power = 1;}
-    else if(in_val <= 999 && in_val >= 100) {power = 2;}
-    else if(in_val <= 9999 && in_val >= 1000) {power = 3;}
-    else if(in_val <= 99999 && in_val >= 10000) {power = 4;}
-    else if(in_val <= 999999 && in_val >= 100000) {power = 5;}
-    else if(in_val <= 9999999 && in_val >= 1000000) {power = 6;}   
-    return power;
-}
-
-int powi(int num, int exp)
+static int powi(int num, int exp)
 {
     int i, product = 1;
     for (i = 0; i < exp; i++) {
@@ -192,7 +165,7 @@ int powi(int num, int exp)
     return product;
 }
 
-enum color get_band_rtoc(int in_val)
+static enum color get_band_rtoc(int in_val)
 {
     int return_color = 0;
     switch(in_val) {
@@ -230,14 +203,16 @@ enum color get_band_rtoc(int in_val)
     return return_color;
 }
 
-void get_tolerance_str(enum color color)
+static char *get_tolerance_str(enum color color)
 {
+    static char tolerance_str [14];	
     rb->snprintf(tolerance_str, sizeof(tolerance_str), "%d%% tolerance",
                  band_data[color].tolerance);
+    return tolerance_str;
 }
 
 #ifndef USE_TEXT_ONLY
-void draw_resistor(enum color firstband_color,
+static void draw_resistor(enum color firstband_color,
                    enum color secondband_color,
                    enum color thirdband_color,
                    enum color fourthband_color)
@@ -290,7 +265,7 @@ void draw_resistor(enum color firstband_color,
 }
 #endif
 
-void draw_resistor_text(enum color firstband_color,
+static void draw_resistor_text(enum color firstband_color,
                         enum color secondband_color,
                         enum color thirdband_color,
                         enum color fourthband_color)
@@ -307,7 +282,7 @@ void draw_resistor_text(enum color firstband_color,
 }
     
 
-int calculate_resistance(enum color first_band,
+static int calculate_resistance(enum color first_band,
                          enum color second_band, 
                          enum color third_band)
 {
@@ -325,7 +300,7 @@ int calculate_resistance(enum color first_band,
     return total_resistance_centiunits;
 }
 
-enum color do_first_band_menu(void)
+static enum color do_first_band_menu(void)
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
@@ -373,7 +348,7 @@ enum color do_first_band_menu(void)
     return band_color_selection;
 }
             
-enum color do_second_band_menu(void) 
+static enum color do_second_band_menu(void) 
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
@@ -421,7 +396,7 @@ enum color do_second_band_menu(void)
     return band_color_selection;
 }
     
-enum color do_third_band_menu(void) 
+static enum color do_third_band_menu(void) 
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
@@ -466,7 +441,7 @@ enum color do_third_band_menu(void)
     return band_color_selection;
 }
             
-enum color do_fourth_band_menu(void) 
+static enum color do_fourth_band_menu(void) 
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
@@ -498,7 +473,7 @@ enum color do_fourth_band_menu(void)
     return band_color_selection;
 }
 
-void display_helpfile(void)
+static void display_helpfile(void)
 {
     rb->lcd_clear_display();
     /* some information obtained from wikipedia */
@@ -591,7 +566,7 @@ void display_helpfile(void)
     return;
 }
     
-void led_resistance_calc(void)
+static void led_resistance_calc(void)
 {
     backlight_force_on();
     int voltage_menu_selection, button_press, j, k, l, foreward_current = 0;
@@ -770,7 +745,8 @@ void led_resistance_calc(void)
                      "Rounded/displayed: [%d %s]", rounded_resistance, 
                      band_data[multiplier].unit);
         rb->snprintf(power_rating_out_str, sizeof(power_rating_out_str), 
-                     "Recommended: %s or greater", power_rating_str);
+                     "Recommended: %s or greater",
+                     get_power_rating_str(rounded_power_rating));
 
         display->set_viewport(&text_vp);
         rb->lcd_puts_scroll(resistance_val_x, lineno++, true_current_out_str);
@@ -796,7 +772,7 @@ void led_resistance_calc(void)
 }
 
         
-void resistance_to_color(void) 
+static void resistance_to_color(void) 
 {
     backlight_force_on();
     int menu_selection;
@@ -921,7 +897,7 @@ void resistance_to_color(void)
     rb->lcd_clear_display();
 }
     
-void color_to_resistance(void) 
+static void color_to_resistance(void) 
 {
     backlight_force_on();
     bool quit = false;
@@ -955,7 +931,6 @@ void color_to_resistance(void)
         total_resistance_centiunits = calculate_resistance(first_band, 
                                                            second_band,
                                                            third_band);
-        get_tolerance_str(fourth_band);      
 
         rb->lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
@@ -982,8 +957,9 @@ void color_to_resistance(void)
         }
         display->set_viewport(&text_vp);
         rb->lcd_puts_scroll(total_resistance_str_x, lineno++,
-                       total_resistance_str);
-        rb->lcd_puts_scroll(tolerance_str_x, lineno++, tolerance_str);
+                            total_resistance_str);
+        rb->lcd_puts_scroll(tolerance_str_x, lineno++,
+                            get_tolerance_str(fourth_band));
         rb->lcd_update();
                     
         button_input = rb->button_get(true);
