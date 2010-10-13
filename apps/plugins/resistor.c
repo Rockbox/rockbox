@@ -113,9 +113,9 @@ static struct band_data
     { RES_YELLOW, "Yellow", LCD_RGBPACK(255, 255, 0),   4,  1000,  "KOhms",-1 },
     { RES_GREEN,  "Green",  LCD_RGBPACK(0, 128, 0),     5, 10000,  "KOhms",-1 },
     { RES_BLUE,   "Blue",   LCD_RGBPACK(0, 0, 255),     6,   100,  "MOhms",-1 },
-    { RES_VIOLET, "Violet", LCD_RGBPACK(153, 51, 255),  7,    -1,       0, -1 },
-    { RES_GREY,   "Grey",   LCD_RGBPACK(192, 192, 192), 8,    -1,       0, -1 },
-    { RES_WHITE,  "White",  LCD_RGBPACK(255, 255, 255), 9,    -1,       0, -1 },
+    { RES_VIOLET, "Violet", LCD_RGBPACK(153, 51, 255),  7,  1000,  "MOhms",-1 },
+    { RES_GREY,   "Grey",   LCD_RGBPACK(192, 192, 192), 8, 10000,  "MOhms",-1 },
+    { RES_WHITE,  "White",  LCD_RGBPACK(255, 255, 255), 9,   100,  "GOhms",-1 },
     { RES_GOLD,   "Gold",   LCD_RGBPACK(146, 146, 0),  -1,    10,  "Ohms",  5 },
     { RES_SILVER, "Silver", LCD_RGBPACK(213, 213, 213),-1,     1,  "Ohms", 10 },
     { RES_NONE,   "[None]",  -1                       ,-1,    -1,       0, 20 }
@@ -399,7 +399,8 @@ static enum color do_third_band_menu(void)
             
     MENUITEM_STRINGLIST(colors_menu_third, "Third band colour:", NULL, 
                         "Black", "Brown", "Red", "Orange", "Yellow",
-                         "Green", "Blue", "Silver", "Gold");
+                         "Green", "Blue", "Violet", "Grey", "White",
+                         "Silver", "Gold");
     band_selection = rb->do_menu(&colors_menu_third, &band_selection, NULL, 
                                 false);
     switch(band_selection) {
@@ -424,10 +425,19 @@ static enum color do_third_band_menu(void)
         case 6: /* Blue */
             band_color_selection = RES_BLUE;
             break;
-        case 7: /* Silver */
+        case 7: /* Violet */
+            band_color_selection = RES_VIOLET;
+            break;
+        case 8: /* Grey */
+            band_color_selection = RES_GREY;
+            break;
+        case 9: /* White */
+            band_color_selection = RES_WHITE;
+            break;
+        case 10: /* Silver */
             band_color_selection = RES_SILVER;
             break;
-        case 8: /* Gold */
+        case 11: /* Gold */
             band_color_selection= RES_GOLD;
             break;
         default:
