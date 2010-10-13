@@ -603,6 +603,7 @@ void led_resistance_calc(void)
 
     int resistance = 0;
     int rounded_resistance = 0;
+    int temp;
     int power_rating_in = 0;
     int rounded_power_rating = 0;
     int out_int = 0;
@@ -737,40 +738,15 @@ void led_resistance_calc(void)
         
         get_power_rating_str(rounded_power_rating);    
                  
-        power_ten = get_power_ten(rounded_resistance);
-        if(rounded_resistance / powi(10, power_ten) == 1) {
-            while(rounded_resistance /powi(10, power_ten) == 1) {
-                power_ten--;
-                }
-            }
-        
-        if(rounded_resistance/powi(10, power_ten) != (int)rounded_resistance) {
-            power_ten--; }
-        rounded_resistance /= powi(10, power_ten);
-    
-        if(rounded_resistance < 10) {
-            first_band_int = rounded_resistance; }
-        else { first_band_int = rounded_resistance /10; }
-        second_band_int += rounded_resistance % 10;
-    
-        if(first_band_int == 10) {
-            first_band_int /= 10;
-            second_band_int = 0;
+        power_ten=0;
+        temp=rounded_resistance;
+        while(temp>=100)
+        {
+            temp/=10;
             power_ten++;
-            }
-    
-        if(first_band_int > 10) {
-            int temp;
-            temp = first_band_int /10;
-            second_band_int = first_band_int % 10;
-            first_band_int = temp;
-            }
-        rounded_resistance *= 10;
-        
-        if(rounded_resistance >= 1000) {
-            rounded_resistance /= 10; } 
-            /*kludge, maybe. But it fixes the problem (100 ohms graphically,
-              1000 ohms in text displayed */
+        }
+        first_band_int=temp/10;
+        second_band_int=temp%10;
         
         first_band = get_band_rtoc(first_band_int);
         second_band = get_band_rtoc(second_band_int);
@@ -830,6 +806,7 @@ void resistance_to_color(void)
     bool quit = false;
     char kbd_buffer [10];
     int kbd_input_int;
+    int temp;
     int in_resistance_int;
     
     int power_ten;
@@ -900,36 +877,17 @@ void resistance_to_color(void)
                 kbd_input_int *= 1000000;
                 break;
             }
-            
-        power_ten = get_power_ten(kbd_input_int);
-        if(kbd_input_int / powi(10, power_ten) == 1) {
-            while(kbd_input_int /powi(10, power_ten) == 1) {
-                power_ten--;
-                }
-            }
-            
-        if(kbd_input_int / powi(10, power_ten) != (int)kbd_input_int) {
-            power_ten--; }
-        kbd_input_int /= powi(10, power_ten);
-        
-        if(kbd_input_int < 10) {
-            first_band_int = kbd_input_int; }
-        else { first_band_int = kbd_input_int /10; }
-        second_band_int += kbd_input_int % 10;
-        
-        if(first_band_int == 10) {
-            first_band_int /= 10;
-            second_band_int = 0;
+
+        power_ten=0;
+        temp=kbd_input_int;
+        while(temp>=100)
+        {
+            temp/=10;
             power_ten++;
-            }
+        }
+        first_band_int=temp/10;
+        second_band_int=temp%10;
         
-        if(first_band_int > 10) {
-            int temp;
-            temp = first_band_int /10;
-            second_band_int = first_band_int % 10;
-            first_band_int = temp;
-            }
-            
         first_band = get_band_rtoc(first_band_int);
         second_band = get_band_rtoc(second_band_int);
         multiplier = get_band_rtoc(power_ten);
