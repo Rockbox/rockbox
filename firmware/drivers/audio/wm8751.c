@@ -190,6 +190,15 @@ void audiohw_preinit(void)
     GPIOL_OUTPUT_VAL |= 0x10; /* disable */
 #endif
 
+#ifdef MPIO_HD200
+    /* control headphone output
+     * disabled on startup
+     */
+    and_l((1<<25),&GPIO1_OUT);
+    or_l((1<<25), &GPIO1_ENABLE);
+    or_l((1<<25), &GPIO1_FUNCTION);
+#endif
+
     /*
      * 1. Switch on power supplies.
      *    By default the WM8751 is in Standby Mode, the DAC is
@@ -274,6 +283,11 @@ void audiohw_postinit(void)
     GPIOL_OUTPUT_VAL &= ~0x10;
     GPIOL_OUTPUT_EN  |=  0x10;
 #endif
+
+#ifdef MPIO_HD200
+   /* enable headphone output */
+   or_l((1<<25),&GPIO1_OUT);
+#endif
 }
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
@@ -326,6 +340,11 @@ void audiohw_close(void)
 {
     /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
     audiohw_mute(true);
+
+#ifdef MPIO_HD200
+    /* disable headphone out */
+    and_l(~(1<<25), &GPIO1_OUT);
+#endif
 
     /* 2. Disable all output buffers. */
     wmcodec_write(PWRMGMT2, 0x0);

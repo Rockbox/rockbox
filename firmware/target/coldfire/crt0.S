@@ -278,7 +278,7 @@ start:
 
 #ifdef MPIO_HD200
     /* Set KEEP_ACT */
-    move.l #0x02200000,%d0
+    move.l #0x00200000,%d0
     or.l %d0,(0xb4,%a1)
     or.l %d0,(0xb8,%a1)
     or.l %d0,(0xbc,%a1)
