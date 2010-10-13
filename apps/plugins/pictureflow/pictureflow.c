@@ -848,20 +848,20 @@ void create_track_index(const int slide_index)
         int len = 0, fn_idx = 0;
 
         avail -= sizeof(struct track_data);
-        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
+        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
         disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
 
         if (disc_num < 0)
             disc_num = 0;
 retry:
-        if (track_num >= 0)
+        if (track_num > 0)
         {
             if (disc_num)
                 fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d.%02d: %s", disc_num, track_num + 1, tcs.result);
+                    "%d.%02d: %s", disc_num, track_num, tcs.result);
             else
                 fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d: %s", track_num + 1, tcs.result);
+                    "%d: %s", track_num, tcs.result);
         }
         else
         {
@@ -910,7 +910,7 @@ retry:
 
         avail -= len;
         tracks--;
-        tracks->sort = ((disc_num - 1) << 24) + (track_num << 14) + track_count;
+        tracks->sort = (disc_num << 24) + (track_num << 14) + track_count;
         tracks->name_idx = string_index;
         tracks->seek = tcs.result_seek;
 #if PF_PLAYBACK_CAPABLE
