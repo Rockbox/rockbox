@@ -851,11 +851,11 @@ static void resistance_to_color(void)
                 units_used = RES_BLACK;
                 break;
             case 1: /* KOhms */
-                units_used = RES_RED;
+                units_used = RES_ORANGE;
                 kbd_input_int *= 1000;
                 break;
             case 2: /* MOhms */
-                units_used = RES_GREEN;
+                units_used = RES_BLUE;
                 kbd_input_int *= 1000000;
                 break;
             }
