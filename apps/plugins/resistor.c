@@ -108,16 +108,16 @@ static struct band_data
 {
     { RES_BLACK,  "Black",  LCD_RGBPACK(0, 0, 0),       0,   100,   "Ohms",-1 },
     { RES_BROWN,  "Brown",  LCD_RGBPACK(118, 78, 0),    1,  1000,   "Ohms", 1 },
-    { RES_RED,    "Red",    LCD_RGBPACK(255, 0, 0),     2, 10000,  "KOhms", 2 },
+    { RES_RED,    "Red",    LCD_RGBPACK(255, 0, 0),     2, 10000,   "Ohms", 2 },
     { RES_ORANGE, "Orange", LCD_RGBPACK(255, 199, 76),  3,   100,  "KOhms",-1 },
     { RES_YELLOW, "Yellow", LCD_RGBPACK(255, 255, 0),   4,  1000,  "KOhms",-1 },
-    { RES_GREEN,  "Green",  LCD_RGBPACK(0, 128, 0),     5, 10000,  "MOhms",-1 },
+    { RES_GREEN,  "Green",  LCD_RGBPACK(0, 128, 0),     5, 10000,  "KOhms",-1 },
     { RES_BLUE,   "Blue",   LCD_RGBPACK(0, 0, 255),     6,   100,  "MOhms",-1 },
     { RES_VIOLET, "Violet", LCD_RGBPACK(153, 51, 255),  7,    -1,       0, -1 },
     { RES_GREY,   "Grey",   LCD_RGBPACK(192, 192, 192), 8,    -1,       0, -1 },
     { RES_WHITE,  "White",  LCD_RGBPACK(255, 255, 255), 9,    -1,       0, -1 },
-    { RES_GOLD,   "Gold",   LCD_RGBPACK(146, 146, 0),  -1,     1,  "Ohms",  5 },
-    { RES_SILVER, "Silver", LCD_RGBPACK(213, 213, 213),-1,    10,  "Ohms", 10 },
+    { RES_GOLD,   "Gold",   LCD_RGBPACK(146, 146, 0),  -1,    10,  "Ohms",  5 },
+    { RES_SILVER, "Silver", LCD_RGBPACK(213, 213, 213),-1,     1,  "Ohms", 10 },
     { RES_NONE,   "[None]",  -1                       ,-1,    -1,       0, 20 }
 };
 
@@ -290,10 +290,6 @@ static int calculate_resistance(enum color first_band,
     int units = band_data[second_band].resistance_value;
     int multiplier = band_data[third_band].multiplier;
     int total_resistance_centiunits = (10 * tens + units ) * multiplier;   
-    
-    if(total_resistance_centiunits == 100000) {
-        total_resistance_centiunits /= 1000; }
-        /* Kludge, I know, but it fixes the '1000 KOhms' issue */
     
     unit_abbrev = band_data[third_band].unit;
 
@@ -950,7 +946,7 @@ static void color_to_resistance(void)
         else
         {
             rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
-                         "Resistance: %d.%d %s",
+                         "Resistance: %d.%2.2d %s",
                          total_resistance_centiunits/100,
                          total_resistance_centiunits%100,
                          unit_abbrev);
