@@ -303,7 +303,7 @@ static void reset_endpoints(void)
     /* Setup next chain for IN eps */
     FOR_EACH_IN_EP_AND_EP0(i, ep)
     {
-        int next_ep = in_ep_list[(i + 2) % (NUM_IN_EP + 1)];
+        int next_ep = in_ep_list[(i + 1) % (NUM_IN_EP + 1)];
         DIEPCTL(ep) = (DIEPCTL(ep) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
     }
 }
