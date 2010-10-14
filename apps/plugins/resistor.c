@@ -199,7 +199,7 @@ static enum color get_band_rtoc(int in_val)
         case 9:
             return_color = RES_WHITE;
             break;
-        }
+    }
     return return_color;
 }
 
@@ -388,7 +388,7 @@ static enum color do_second_band_menu(void)
         default:
             band_color_selection = RES_INVALID;
             break;
-                    }
+    }
     return band_color_selection;
 }
     
@@ -443,7 +443,7 @@ static enum color do_third_band_menu(void)
         default:
             band_color_selection = RES_INVALID;
             break;
-                    }
+    }
     return band_color_selection;
 }
             
@@ -475,7 +475,7 @@ static enum color do_fourth_band_menu(void)
         default:
             band_color_selection = RES_INVALID;
             break;
-                    }
+    }
     return band_color_selection;
 }
 
@@ -559,13 +559,13 @@ static void display_helpfile(void)
         "own", "judgement", "when", "using", "these", "output", "values.",
         "Power", "rating", "and", "displayed", "resistance", "are", "rounded",
         "up", "to", "the", "nearest", "common", "value."
-        };
+    };
     static struct style_text formatting[] = {
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 3, TEXT_UNDERLINE },
         { 159, TEXT_UNDERLINE },
         LAST_STYLE_ITEM
-        };
+    };
             
     display_text(ARRAYLEN(helpfile_text), helpfile_text, formatting,
                  NULL, true);
@@ -651,7 +651,7 @@ static void led_resistance_calc(void)
             case 5:
                 led_voltage = 460;
                 break;
-            }
+        }
         switch(fwd_current_selection) {
             case 0: /* 20mA */
                 foreward_current = 2; /* 20mA * 100 */
@@ -663,7 +663,7 @@ static void led_resistance_calc(void)
                 rb->kbd_input(fwd_kbd_buffer, sizeof(fwd_kbd_buffer));
                 foreward_current = ((rb->atoi(fwd_kbd_buffer))/10);
                 break;
-            }
+        }
         
         if(foreward_current == 0) break;
 
@@ -678,7 +678,7 @@ static void led_resistance_calc(void)
         if(led_voltage > input_voltage) {
             rb->splash(HZ, "Problem: LED voltage is higher than the source.");
             break;
-            }
+        }
         
         for(j = 0; j < total_common_values; j++) {
             for(k = 1; k < 5; k++) {
@@ -686,16 +686,16 @@ static void led_resistance_calc(void)
                     rounded_resistance = (common_values[j] * powi(10, k)); 
                                           /* perfect match */
                     break;
-                    }
+                }
                 else if(resistance >= (common_values[j] * powi(10, k)) && 
                         resistance <= (common_values[j+1] * powi(10, k))) {
                     rounded_resistance = (common_values[j+1] * powi(10, k));
                            /* the higher resistance, to be safe */
                     break;
-                    }
-                else { break; }
                 }
+                else { break; }
             }
+        }
             
         if(rounded_resistance == 0) 
         {
@@ -708,21 +708,20 @@ static void led_resistance_calc(void)
             if((int)power_rating_in == power_ratings[l]) {
                 rounded_power_rating = (power_ratings[l]);
                 break;
-                }
+            }
             else if(power_rating_in >= power_ratings[l] && 
                     power_rating_in <= power_ratings[l+1]) {
                 rounded_power_rating = power_ratings[l+1];
                 break;
-                }
-            else { break; }
             }
+            else { break; }
+        }
         
         get_power_rating_str(rounded_power_rating);    
                  
         power_ten=0;
         temp=rounded_resistance;
-        while(temp>=100)
-        {
+        while(temp>=100) {
             temp/=10;
             power_ten++;
         }
@@ -769,8 +768,8 @@ static void led_resistance_calc(void)
                 quit = true;
                 backlight_use_settings();
                 break;
-            }
         }
+    }
     display->set_viewport(&text_vp);
     rb->lcd_stop_scroll();
     display->set_viewport(&screen_vp);
@@ -842,7 +841,7 @@ static void resistance_to_color(void)
             case 4: /* 20% */
                 fourth_band = RES_NONE;
                 break;
-            }
+        }
             
         kbd_input_int = rb->atoi(kbd_buffer);
         in_resistance_int = kbd_input_int;
@@ -864,11 +863,10 @@ static void resistance_to_color(void)
                 power_ten=9;
                 units_used = RES_WHITE;
                 break;
-            }
+        }
 
         temp=kbd_input_int;
-        while(temp>=100)
-        {
+        while(temp>=100) {
             temp/=10;
             power_ten++;
         }
@@ -881,8 +879,7 @@ static void resistance_to_color(void)
 
         if( first_band == RES_INVALID
          || second_band == RES_INVALID
-         || multiplier == RES_INVALID)
-        {
+         || multiplier == RES_INVALID) {
             rb->splashf(HZ, "%d %s can not be represented",
                         in_resistance_int,band_data[units_used].unit);
             return;
@@ -909,8 +906,8 @@ static void resistance_to_color(void)
                 quit = true;
                 backlight_use_settings();
                 break;
-            }
         }
+    }
     display->set_viewport(&text_vp);
     rb->lcd_stop_scroll();
     display->set_viewport(&screen_vp);
@@ -959,16 +956,14 @@ static void color_to_resistance(void)
 #endif                     
         draw_resistor_text(first_band, second_band, third_band, fourth_band);
 
-        if(total_resistance_centiunits % 100 == 0)
-        {
+        if(total_resistance_centiunits % 100 == 0) {
             /* No decimals */
             rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
                          "Resistance: %d %s",
                          total_resistance_centiunits/100,
                          unit_abbrev);
         }
-        else
-        {
+        else {
             rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
                          "Resistance: %d.%2.2d %s",
                          total_resistance_centiunits/100,
@@ -992,8 +987,8 @@ static void color_to_resistance(void)
                 quit = true;
                 backlight_use_settings();
                 break;
-            }                   
-        }
+        }                   
+    }
     display->set_viewport(&text_vp);
     rb->lcd_stop_scroll();
     display->set_viewport(&screen_vp);
@@ -1045,7 +1040,7 @@ enum plugin_status plugin_start(const void* nothing)
                 break;
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
-            }
         }
+    }
     return PLUGIN_OK;
 }
