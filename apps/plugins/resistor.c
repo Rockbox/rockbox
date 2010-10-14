@@ -524,7 +524,7 @@ static void display_helpfile(void)
         "", "How to use this calculator", "", /* 3 */
         /* -- */
         "This", "calculator", "has", "three", "modes:", "",
-        "Resistance", "to", "coulor", "codes,", "",
+        "Resistance", "to", "colour", "codes,", "",
         "Colour", "codes", "to", "resistance", "",
         "and", "LED", "resistance", "calculator", "", "",
         /* -- */
