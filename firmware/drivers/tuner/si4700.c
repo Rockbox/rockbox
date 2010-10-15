@@ -309,6 +309,10 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG1_GPIO1 | SYSCONFIG1_GPIO2 |
                             SYSCONFIG1_GPIO3);
 #endif
+        /* set mono->stereo switching RSSI range to lowest setting */
+        si4700_write_masked(SYSCONFIG1, SYSCONFIG1_BLNDADJ_19_37_RSSI, 
+                            SYSCONFIG1_BLNDADJ);
+
         si4700_write_masked(SYSCONFIG2,
                             SYSCONFIG2_SKEETHw(SEEK_THRESHOLD) |
                             SYSCONFIG2_VOLUMEw(0xF),
