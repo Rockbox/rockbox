@@ -1098,8 +1098,7 @@ static void init_everything(void)
     rb->talk_disable(false);
 }
 
-
-enum plugin_status plugin_start(const void* parameter) NO_PROF_ATTR
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
