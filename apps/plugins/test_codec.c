@@ -601,10 +601,8 @@ static void init_ci(void)
     ci.profile_func_exit = rb->profile_func_exit;
 #endif
 
-#if NUM_CORES > 1
     ci.cpucache_invalidate = rb->cpucache_invalidate;
     ci.cpucache_flush = rb->cpucache_flush;
-#endif
 
 #if NUM_CORES > 1
     ci.create_thread = rb->create_thread;

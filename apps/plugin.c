@@ -344,6 +344,7 @@ static const struct plugin_api rockbox_api = {
     mkdir,
     rmdir,
     dir_exists,
+    dir_get_info,
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -384,12 +385,15 @@ static const struct plugin_api rockbox_api = {
     trigger_cpu_boost,
     cancel_cpu_boost,
 #endif
-#ifdef HAVE_CPUCACHE_FLUSH
+
     cpucache_flush,
-#endif
-#ifdef HAVE_CPUCACHE_INVALIDATE
     cpucache_invalidate,
-#endif
+
+    lc_open,
+    lc_open_from_mem,
+    lc_get_header,
+    lc_close,
+
     timer_register,
     timer_unregister,
     timer_set_period,
@@ -722,12 +726,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    dir_get_info,
-
-    lc_open,
-    lc_open_from_mem,
-    lc_get_header,
-    lc_close,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
