@@ -143,7 +143,7 @@ void screen_put_iconxy(struct screen * display,
         icon -= Icon_Last_Themeable;
         if (!viewer_icons_loaded[screen] || 
            (global_status.viewer_icon_count * height > iconset->height) ||
-           (icon * height > iconset->height))
+           (icon * height + height > iconset->height))
         {
             screen_put_iconxy(display, xpos, ypos, Icon_Questionmark);
             return;
