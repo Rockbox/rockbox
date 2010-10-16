@@ -277,6 +277,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
                                 long *buf, int n){
   long *bufptr = buf;
   long *bufend = buf + n;
+  const unsigned int cachemask = (1<<book->dec_firsttablen)-1;
 
   while (bufptr<bufend) {
     if (b->headend > 8) {
@@ -302,7 +303,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
           bit+=32;
         }
 
-        ogg_int32_t entry = book->dec_firsttable[cache&((1<<book->dec_firsttablen)-1)];
+        ogg_int32_t entry = book->dec_firsttable[cache&cachemask];
         if(UNLIKELY(entry < 0)){
           const long lo = (entry>>15)&0x7fff, hi = book->used_entries-(entry&0x7fff);
           entry = bisect_codelist(lo, hi, cache, book->codelist);
