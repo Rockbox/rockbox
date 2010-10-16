@@ -11031,7 +11031,7 @@
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: Generic use of 'right
+  desc: Generic use of 'right'
   user: core
   <source>
     *: "Right"
@@ -12478,7 +12478,7 @@
 </phrase>
 <phrase>
   id: LANG_KBD_OK
-  desc: in keyboad
+  desc: in keyboard
   user: core
   <source>
     *: none
@@ -12495,7 +12495,7 @@
 </phrase>
 <phrase>
   id: LANG_KBD_DELETE
-  desc: in keyboad
+  desc: in keyboard
   user: core
   <source>
     *: none
@@ -12512,7 +12512,7 @@
 </phrase>
 <phrase>
   id: LANG_KBD_CANCEL
-  desc: in keyboad
+  desc: in keyboard
   user: core
   <source>
     *: none

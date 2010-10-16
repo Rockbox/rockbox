@@ -11035,7 +11035,7 @@
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: Generic use of 'right
+  desc: Generic use of 'right'
   user: core
   <source>
     *: "Right"
