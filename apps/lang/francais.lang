@@ -46,7 +46,7 @@
 #
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
 #    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008, Oct 2008
-#    Dec 2008, Fév 2009, Août 2009, Nov 2009, Fev 2010
+#    Dec 2008, Fév 2009, Août 2009, Nov 2009, Fev 2010, Oct 2010
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -10727,10 +10727,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Exploration d'une piste par saut"
+    *: "Exploration de piste par saut"
   </dest>
   <voice>
-    *: "Exploration d'une piste par saut"
+    *: "Exploration de piste par saut"
   </voice>
 </phrase>
 <phrase>
@@ -10961,7 +10961,7 @@
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: Generic use of 'right
+  desc: Generic use of 'right'
   user: core
   <source>
     *: "Right"
@@ -11995,7 +11995,7 @@
   </source>
   <dest>
     *: none
-    morse_input: "Utiliser les impulsions du Morse"
+    morse_input: "Utiliser les impulsions Morse"
   </dest>
   <voice>
     *: none
@@ -12027,10 +12027,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Titre suivant :"
+    *: "Titre suivant:"
   </dest>
   <voice>
-    *: "Titre suivant :"
+    *: "Titre suivant:"
   </voice>
 </phrase>
 <phrase>
@@ -12041,10 +12041,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Suivant :"
+    *: "Suivant:"
   </dest>
   <voice>
-    *: "Suivant :"
+    *: "Suivant:"
   </voice>
 </phrase>
 <phrase>
@@ -12164,6 +12164,57 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Touche d'accès rapide"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Touche d'accès rapide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Pendant l'écran de lecture"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Pendant l'écran de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Pendant la navigation des fichiers"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Pendant la navigation des fichiers"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_RESUME_REWIND
   desc: in playback settings menu
   user: core
@@ -12181,17 +12232,54 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
   user: core
   <source>
-    *: "<Untagged>"
+    *:none
+    radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *: "<Inconnu>"
+    *:none
+    radio_remote: "Ecran radio pour télécommande"
   </dest>
   <voice>
-    *: "Inconnu"
+    *:none
+    radio_remote: "écran radio pour télécommande"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "habillage écran radio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "habillage écran radio télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -12204,11 +12292,96 @@
   </source>
   <dest>
     *: none
-    radio: "Station :"
+    radio: "Station:"
   </dest>
   <voice>
     *: none
     radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Egaliseur intégré"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "égaliseur intégré"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Réglages avancés"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Réglages avancés de l'égaliseur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Gain Bande %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Gain par bande"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Fréquence Bande %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Fréquence par bande"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Largeur Bande %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Largeur par bande"
   </voice>
 </phrase>
 <phrase>
@@ -12263,6 +12436,37 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Inconnu>"
+  </dest>
+  <voice>
+    *: "Inconnu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *:none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *:none
+    radio: "Ecran radio"
+  </dest>
+  <voice>
+    *:none
+    radio: "écran radio"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_ID3_COMPOSER
   desc: in tag viewer
   user: core
@@ -12274,5 +12478,126 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Forcer"
+  </dest>
+  <voice>
+    *: "Forcer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "Ouvrir picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Suppr"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "supprimer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboad
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Annuler"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Annuler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Mise à jour sur arrêt de lecture"
+  </dest>
+  <voice>
+    *: "Mise à jour sur arrêt de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Démarrer navigation fichiers ici"
+  </dest>
+  <voice>
+    *: "Démarrer navigation des fichiers ici"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Démarrer navigation fichiers à la racine"
+  </dest>
+  <voice>
+    *: "Démarrer la navigation fichiers à la racine"
   </voice>
 </phrase>
