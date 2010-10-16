@@ -198,8 +198,7 @@ enum Iconset {
 #endif
 };
 
-static void load_icons(const char* filename, enum Iconset iconset, 
-    bool allow_disable)
+static void load_icons(const char* filename, enum Iconset iconset)
 {
     int size_read;
     bool *loaded_ok = NULL;
@@ -235,7 +234,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
     }
     
     *loaded_ok = false;
-    if (!allow_disable || (filename[0] && filename[0] != '-'))
+    if (filename[0] && filename[0] != '-')
     {
         char path[MAX_PATH];
         
@@ -251,32 +250,34 @@ static void load_icons(const char* filename, enum Iconset iconset,
 
 void icons_init(void)
 {
-    load_icons(global_settings.icon_file, Iconset_Mainscreen, true);
+    load_icons(global_settings.icon_file, Iconset_Mainscreen);
     
-    if (*global_settings.viewers_icon_file)
+    if (global_settings.viewers_icon_file[0] &&
+        global_settings.viewers_icon_file[0] != '-')
     {
-        load_icons(global_settings.viewers_icon_file, 
-                   Iconset_Mainscreen_viewers, true);
+        load_icons(global_settings.viewers_icon_file,
+                   Iconset_Mainscreen_viewers);
         read_viewer_theme_file();
     }
     else
     {
-        load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers, false);
+        load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers);
     }
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     load_icons(global_settings.remote_icon_file, 
-               Iconset_Remotescreen, true);
+               Iconset_Remotescreen);
     
-    if (*global_settings.remote_viewers_icon_file)
+    if (global_settings.remote_viewers_icon_file[0] &&
+        global_settings.remote_viewers_icon_file[0] != '-')
     {
         load_icons(global_settings.remote_viewers_icon_file,
-                   Iconset_Remotescreen_viewers, true);
+                   Iconset_Remotescreen_viewers);
     }
     else
     {
         load_icons(DEFAULT_REMOTE_VIEWER_BMP,
-                   Iconset_Remotescreen_viewers, false);
+                   Iconset_Remotescreen_viewers);
     }
 #endif
 }
