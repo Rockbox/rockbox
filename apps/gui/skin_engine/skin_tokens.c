@@ -555,7 +555,7 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
 }
 
 #ifdef HAVE_LCD_CHARCELLS
-void format_player_progress(struct gui_wps *gwps)
+static void format_player_progress(struct gui_wps *gwps)
 {
     struct wps_state *state = skin_get_global_state();
     struct screen *display = gwps->display;
@@ -591,7 +591,7 @@ void format_player_progress(struct gui_wps *gwps)
     display->define_pattern(gwps->data->wps_progress_pat[0], progress_pattern);
 }
 
-void format_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
+static void format_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 {
     static const unsigned char numbers[10][4] = {
         {0x0e, 0x0a, 0x0a, 0x0e}, /* 0 */
@@ -603,7 +603,7 @@ void format_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
         {0x0e, 0x08, 0x0e, 0x0e}, /* 6 */
         {0x0e, 0x02, 0x04, 0x08}, /* 7 */
         {0x0e, 0x0e, 0x0a, 0x0e}, /* 8 */
-        {0x0e, 0x0e, 0x02, 0x0e}, /* 9 */
+        {0x0e, 0x0e, 0x02, 0x0e}  /* 9 */
     };
 
     struct wps_state *state = skin_get_global_state();
