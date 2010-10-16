@@ -88,7 +88,7 @@ static struct gui_skin_helper {
 #endif
 };
     
-struct gui_skin {
+static struct gui_skin {
     struct gui_wps      gui_wps;
     struct wps_data     data;
     char                *buffer_start;
