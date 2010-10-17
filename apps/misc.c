@@ -57,6 +57,10 @@
 #include "yesno.h"
 #include "viewport.h"
 
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#endif
+
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
 #endif
@@ -376,10 +380,14 @@ bool list_stop_handler(void)
 {
     bool ret = false;
 
+#if CONFIG_TUNER
+    radio_stop();
+#endif
+
     /* Stop the music if it is playing */
-    if(audio_status()) 
+    if(audio_status())
     {
-        if (!global_settings.party_mode) 
+        if (!global_settings.party_mode)
         {
             if (global_settings.fade_on_stop)
                 fade(false, false);
