@@ -621,7 +621,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #if CONFIG_PLATFORM & PLATFORM_ANDROID
         /* stop playback if we receive a call */
         case SYS_CALL_INCOMING:
-            resume = (audio_status() & AUDIO_STATUS_PLAY) != 0;
+            resume = audio_status() == AUDIO_STATUS_PLAY;
             list_stop_handler();
             return SYS_CALL_INCOMING;
         /* resume playback if needed */
