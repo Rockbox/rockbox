@@ -3679,11 +3679,11 @@
   </source>
   <dest>
     *: none
-    rtc: "12 uurs klok"
+    rtc: "12 uur klok"
   </dest>
   <voice>
     *: none
-    rtc: "12 uurs Klok"
+    rtc: "12 uur Klok"
   </voice>
 </phrase>
 <phrase>
@@ -3696,11 +3696,11 @@
   </source>
   <dest>
     *: none
-    rtc: "24 uurs klok"
+    rtc: "24 uur klok"
   </dest>
   <voice>
     *: none
-    rtc: "24 uurs klok"
+    rtc: "24 uur klok"
   </voice>
 </phrase>
 <phrase>
@@ -3711,10 +3711,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Max aantal bestanden in bladerscherm"
+    *: "Max aantal bestanden in bestandsbeheer"
   </dest>
   <voice>
-    *: "Max aantal bestanden in bladerscherm"
+    *: "Max aantal bestanden in bestandsbeheer"
   </voice>
 </phrase>
 <phrase>
@@ -12546,5 +12546,33 @@
   </dest>
   <voice>
     *: "Forceer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Start bestandsbeheer op /"
+  </dest>
+  <voice>
+    *: "Start bestandsbeheer aan het begin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Start bestandsbeheer hier"
+  </dest>
+  <voice>
+    *: "Start bestandsbeheer hier"
   </voice>
 </phrase>
