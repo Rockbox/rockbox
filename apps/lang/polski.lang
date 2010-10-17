@@ -12552,3 +12552,31 @@
     *: "Moc"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Rozpocznij Przeglądanie Plików w /"
+  </dest>
+  <voice>
+    *: "Rozpocznij Przeglądanie Plików w katalogu głównym"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Rozpocznij Przeglądanie Plików Tutaj"
+  </dest>
+  <voice>
+    *: "Rozpocznij Przeglądanie Plików Tutaj"
+  </voice>
+  </phrase>
