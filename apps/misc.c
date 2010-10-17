@@ -57,7 +57,7 @@
 #include "yesno.h"
 #include "viewport.h"
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
 #include "radio.h"
 #endif
 
