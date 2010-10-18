@@ -35,6 +35,7 @@ static struct skin_backdrop {
     char name[MAX_PATH];
     char *buffer;
     enum screen_type screen;
+    bool loaded;
 } backdrops[NB_BDROPS];
 
 #define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
@@ -46,6 +47,7 @@ void skin_backdrop_init(void)
     {
         backdrops[i].name[0] = '\0';
         backdrops[i].buffer = NULL;
+        backdrops[i].loaded = false;
     }
 }
 
@@ -101,7 +103,6 @@ bool skin_backdrops_preload(void)
         if (backdrops[i].name[0] && !backdrops[i].buffer)
         {
             size_t buf_size;
-            bool loaded = false;
             enum screen_type screen = backdrops[i].screen;
 #if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
             if (screen == SCREEN_REMOTE)
@@ -125,12 +126,12 @@ bool skin_backdrops_preload(void)
             if (*filename && *filename != '-')
             {
                 backdrops[i].buffer = (char*)skin_buffer_alloc(buf_size);
-                loaded = backdrops[i].buffer && 
+                backdrops[i].loaded = backdrops[i].buffer && 
                          screens[screen].backdrop_load(filename, backdrops[i].buffer);
-                if (!loaded)
+                if (!backdrops[i].loaded)
                     retval = false;
             }
-            if (backdrops[i].name[0] == '-' && loaded)
+            if (backdrops[i].name[0] == '-' && backdrops[i].loaded)
                 backdrops[i].name[2] = '.';
         }
     }
@@ -142,9 +143,12 @@ void skin_backdrop_show(int backdrop_id)
     if (backdrop_id < 0)
         return;
     enum screen_type screen = backdrops[backdrop_id].screen;
-    if (backdrops[backdrop_id].name[0] == '-' &&
-        backdrops[backdrop_id].name[2] == '\0')
+    if ((backdrops[backdrop_id].loaded == false) ||
+        (backdrops[backdrop_id].name[0] == '-' &&
+        backdrops[backdrop_id].name[2] == '\0'))
+    {
         screens[screen].backdrop_show(NULL);
+    }
     else if (backdrops[backdrop_id].buffer)
         screens[screen].backdrop_show(backdrops[backdrop_id].buffer);
 }
