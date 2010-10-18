@@ -236,7 +236,7 @@ int main(int argc, char **argv)
     int res;
     int filearg = 1;
 
-    struct wps_data wps;
+    struct wps_data wps={0};
     enum screen_type screen = SCREEN_MAIN;
     struct screen* wps_screen;
     
