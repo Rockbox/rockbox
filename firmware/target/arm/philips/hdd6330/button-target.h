@@ -53,11 +53,7 @@ void button_int(void);
 #define BUTTON_NEXT         0x00000200
 #define BUTTON_PREV         0x00000400
 #define BUTTON_PLAY         0x00000800
-
-#define BUTTON_SELECT       0x00001000
-#define BUTTON_PLAYLIST     0x00002000
-
-#define BUTTON_MAIN         0x00003fff
+#define BUTTON_MAIN         0x00000fff
 
 /* No Remote control */
 #define BUTTON_REMOTE 0

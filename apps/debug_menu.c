@@ -994,9 +994,11 @@ static bool dbg_spdif(void)
 
 /* This is temporary until the SA9200 touchpad works */
 #elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || \
-      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) || \
-      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)
+      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
 #   define DEBUG_CANCEL  BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)
+#   define DEBUG_CANCEL  BUTTON_PREV
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
 #   define DEBUG_CANCEL  BUTTON_PLAY
