@@ -194,7 +194,7 @@ void audiohw_preinit(void)
     /* control headphone output
      * disabled on startup
      */
-    and_l((1<<25),&GPIO1_OUT);
+    and_l(~(1<<25),&GPIO1_OUT);
     or_l((1<<25), &GPIO1_ENABLE);
     or_l((1<<25), &GPIO1_FUNCTION);
 #endif
