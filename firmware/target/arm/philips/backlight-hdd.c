@@ -36,14 +36,24 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
+#if defined(PHILIPS_HDD6330)
+    GPO32_ENABLE |= 0x400;
+    GPO32_VAL    |= 0x400;
+#else
     GPO32_VAL    &= ~0x1000000;
     GPO32_ENABLE &= ~0x1000000;
+#endif
 }
 
 void _backlight_off(void)
 {
+#if defined(PHILIPS_HDD6330)
+    GPO32_ENABLE |= 0x400;
+    GPO32_VAL    &= ~0x400;
+#else
     GPO32_VAL    |= 0x1000000;
     GPO32_ENABLE |= 0x1000000;
+#endif
 }
 
 #ifdef HAVE_BUTTON_LIGHT
