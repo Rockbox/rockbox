@@ -20,7 +20,7 @@
 # - Jose Ramon Garcia
 # - Robert Menes
 # - Chelo Sacristán
-# - Francisco Vila, 2009
+# - Francisco Vila, 2009, 2010
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -11227,10 +11227,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Queue Last Shuffled"
+    *: "Encolar última aleatoria"
   </dest>
   <voice>
-    *: "Queue Last Shuffled"
+    *: "Encolar última aleatoria"
   </voice>
 </phrase>
 <phrase>
@@ -11257,11 +11257,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Release Time"
+    swcodec: "Tiempo de salida"
   </dest>
   <voice>
     *: none
-    swcodec: "Release Time"
+    swcodec: "Tiempo de salida"
   </voice>
 </phrase>
 <phrase>
@@ -11274,11 +11274,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Threshold"
+    swcodec: "Umbral"
   </dest>
   <voice>
     *: none
-    swcodec: "Threshold"
+    swcodec: "Umbral"
   </voice>
 </phrase>
 <phrase>
@@ -11291,11 +11291,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Ganancia de compensación"
   </dest>
   <voice>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Ganancia de compensación"
   </voice>
 </phrase>
 <phrase>
@@ -11325,11 +11325,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll Bar Position"
+    lcd_bitmap: "Posición de la barra de desplazamiento"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar position"
+    lcd_bitmap: "Posición de la barra de desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -11342,11 +11342,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Statusbar"
+    remote: "Barra de estado del mando"
   </dest>
   <voice>
     *: none
-    remote: "Remote Statusbar"
+    remote: "Barra de estado del mando"
   </voice>
 </phrase>
 <phrase>
@@ -11363,7 +11363,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote statusbar skin"
+    remote: "Aspecto de la barra de estado del mando"
   </voice>
 </phrase>
 <phrase>
@@ -11376,11 +11376,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Knee"
+    swcodec: "Codo"
   </dest>
   <voice>
     *: none
-    swcodec: "Knee"
+    swcodec: "Codo"
   </voice>
 </phrase>
 <phrase>
@@ -11393,11 +11393,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Auto"
+    swcodec: "Automático"
   </dest>
   <voice>
     *: none
-    swcodec: "Auto"
+    swcodec: "Automático"
   </voice>
 </phrase>
 <phrase>
@@ -11408,10 +11408,10 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Insert Last Shuffled"
+    *: "Insertar la última aleatoria"
   </dest>
   <voice>
-    *: "Insert Last Shuffled"
+    *: "Insertar la última aleatoria"
   </voice>
 </phrase>
 <phrase>
@@ -11424,11 +11424,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Soft Knee"
+    swcodec: "Codo suave"
   </dest>
   <voice>
     *: none
-    swcodec: "Soft Knee"
+    swcodec: "Codo suave"
   </voice>
 </phrase>
 <phrase>
@@ -11439,10 +11439,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Next:"
+    *: "Siguiente:"
   </dest>
   <voice>
-    *: "Next:"
+    *: "Siguiente:"
   </voice>
 </phrase>
 <phrase>
@@ -11455,11 +11455,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Ratio"
+    swcodec: "Proporción"
   </dest>
   <voice>
     *: none
-    swcodec: "Ratio"
+    swcodec: "Proporción"
   </voice>
 </phrase>
 <phrase>
@@ -11472,11 +11472,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "Modo de teclado USB"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "Modo de teclado u s b"
   </voice>
 </phrase>
 <phrase>
@@ -11489,11 +11489,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "Codo duro"
   </dest>
   <voice>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "Codo duro"
   </voice>
 </phrase>
 <phrase>
@@ -11506,11 +11506,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Establecer como elemento de la pantalla rápida principal"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Establecer como elemento de la pantalla rápida principal"
   </voice>
 </phrase>
 <phrase>
@@ -11523,11 +11523,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "Tasa"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "Tasa"
   </voice>
 </phrase>
 <phrase>
@@ -11589,10 +11589,10 @@
     *: "Right"
   </source>
   <dest>
-    *: "Right"
+    *: "Derecha"
   </dest>
   <voice>
-    *: "Right"
+    *: "Derecha"
   </voice>
 </phrase>
 <phrase>
@@ -11605,11 +11605,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Semitono"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Semitono"
   </voice>
 </phrase>
 <phrase>
@@ -11622,11 +11622,11 @@
   </source>
   <dest>
     *: none
-    radio: "Other"
+    radio: "Otras"
   </dest>
   <voice>
     *: none
-    radio: "Other"
+    radio: "Otras"
   </voice>
 </phrase>
 <phrase>
@@ -11639,11 +11639,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "Límite"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "Límite"
   </voice>
 </phrase>
 <phrase>
@@ -11656,11 +11656,11 @@
   </source>
   <dest>
     *: none
-    radio: "Italy"
+    radio: "Italia"
   </dest>
   <voice>
     *: none
-    radio: "Italy"
+    radio: "Italia"
   </voice>
 </phrase>
 <phrase>
@@ -11673,11 +11673,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "Calibrar"
   </dest>
   <voice>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "Calibrar"
   </voice>
 </phrase>
 <phrase>
@@ -11694,7 +11694,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "10 to 1"
+    swcodec: "10 a 1"
   </voice>
 </phrase>
 <phrase>
@@ -11707,11 +11707,11 @@
   </source>
   <dest>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "Usar entrada Morse"
   </dest>
   <voice>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "Usar entrada Morse"
   </voice>
 </phrase>
 <phrase>
@@ -11724,11 +11724,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "Reiniciar calibración"
   </dest>
   <voice>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "Reiniciar calibración"
   </voice>
 </phrase>
 <phrase>
@@ -11745,7 +11745,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "2 to 1"
+    swcodec: "2 a 1"
   </voice>
 </phrase>
 <phrase>
@@ -11775,11 +11775,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Limit"
+    swcodec: "Límite"
   </dest>
   <voice>
     *: none
-    swcodec: "Limit"
+    swcodec: "Límite"
   </voice>
 </phrase>
 <phrase>
@@ -11807,10 +11807,10 @@
     *: "Custom"
   </source>
   <dest>
-    *: "Custom"
+    *: "Personalizado"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Personalizado"
   </voice>
 </phrase>
 <phrase>
@@ -11823,11 +11823,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll Bar Width"
+    lcd_bitmap: "Ancho de la barra de desplazamiento"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar width"
+    lcd_bitmap: "Ancho de la barra de desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -11838,10 +11838,10 @@
     *: "Skin RAM usage:"
   </source>
   <dest>
-    *: "Skin RAM usage:"
+    *: "Uso de RAM de la piel:"
   </dest>
   <voice>
-    *: "Skin RAM usage"
+    *: "Uso de RAM de la piel"
   </voice>
 </phrase>
 <phrase>
@@ -11852,10 +11852,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Skip to Outro"
+    *: "Saltar a Outro"
   </dest>
   <voice>
-    *: "Skip to Outro"
+    *: "Saltar a Outro"
   </voice>
 </phrase>
 <phrase>
@@ -11868,11 +11868,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "Sólo cambio automático de pistas"
   </dest>
   <voice>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "Sólo cambio automático de pistas"
   </voice>
 </phrase>
 <phrase>
@@ -11883,10 +11883,10 @@
     *: "Bottom"
   </source>
   <dest>
-    *: "Bottom"
+    *: "Abajo"
   </dest>
   <voice>
-    *: "Bottom"
+    *: "Abajo"
   </voice>
 </phrase>
 <phrase>
@@ -11899,11 +11899,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Timestretch"
+    swcodec: "Ajuste de tiempo"
   </dest>
   <voice>
     *: none
-    swcodec: "Timestretch"
+    swcodec: "Ajuste de tiempo"
   </voice>
 </phrase>
 <phrase>
@@ -11920,7 +11920,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "6 to 1"
+    swcodec: "6 a 1"
   </voice>
 </phrase>
 <phrase>
@@ -11933,11 +11933,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Compresor"
   </dest>
   <voice>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Compresor"
   </voice>
 </phrase>
 <phrase>
@@ -11948,10 +11948,10 @@
     *: "Left"
   </source>
   <dest>
-    *: "Left"
+    *: "Izquierda"
   </dest>
   <voice>
-    *: "Left"
+    *: "Izquierda"
   </voice>
 </phrase>
 <phrase>
@@ -11964,11 +11964,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "Ajustes de la pantalla táctil"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "Ajustes de la pantalla táctil"
   </voice>
 </phrase>
 <phrase>
@@ -11979,10 +11979,10 @@
     *: "Top"
   </source>
   <dest>
-    *: "Top"
+    *: "Arriba"
   </dest>
   <voice>
-    *: "Top"
+    *: "Arriba"
   </voice>
 </phrase>
 <phrase>
@@ -11995,11 +11995,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Speed"
+    swcodec: "Velocidad"
   </dest>
   <voice>
     *: none
-    swcodec: "Speed"
+    swcodec: "Velocidad"
   </voice>
 </phrase>
 <phrase>
@@ -12010,10 +12010,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Next Track:"
+    *: "Siguiente:"
   </dest>
   <voice>
-    *: "Next Track:"
+    *: "Siguiente:"
   </voice>
 </phrase>
 <phrase>
@@ -12030,7 +12030,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "4 to 1"
+    swcodec: "4 a 1"
   </voice>
 </phrase>
 <phrase>
@@ -12329,7 +12329,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Emisora:"
   </voice>
 </phrase>
 <phrase>
@@ -12410,11 +12410,11 @@
   </source>
   <dest>
     *: none
-    radio_remote: "Pantalla de rádio del mando"
+    radio_remote: "Pantalla de radio del mando"
   </dest>
   <voice>
     *: none
-    radio_remote: "Pantalla de rádio del mando"
+    radio_remote: "Pantalla de radio del mando"
   </voice>
 </phrase>
 <phrase>
@@ -12428,7 +12428,7 @@
     *: "Compositor"
   </dest>
   <voice>
-    *: ""
+    *: "Compositor"
   </voice>
 </phrase>
 <phrase>
@@ -12441,11 +12441,11 @@
   </source>
   <dest>
     *: none
-    radio: "Pantalla de rádio"
+    radio: "Pantalla de radio"
   </dest>
   <voice>
     *: none
-    radio: "Pantalla de rádio"
+    radio: "Pantalla de radio"
   </voice>
 </phrase>
 <phrase>
