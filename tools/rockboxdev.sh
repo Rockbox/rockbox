@@ -195,7 +195,9 @@ build() {
     echo "ROCKBOXDEV: $toolname/make install"
     $make install
 
-    rm -rf $builddir
+    echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
+    cd ..
+    rm -rf build-$toolname $toolname-$version
 }
 
 ##############################################################################
