@@ -12528,3 +12528,45 @@
     recording_histogram: "Интервал хистограма"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Обнови при заустављању"
+  </dest>
+  <voice>
+    *: "Обнови при заустављању"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Покрени прегледач фајлова у /"
+  </dest>
+  <voice>
+    *: "Покрени прегледач фајлова у основном фолдеру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Покрени прегледач фајлова у овом фолдеру"
+  </dest>
+  <voice>
+    *: "Покрени прегледач фајлова у овом фолдеру"
+  </voice>
+</phrase>
