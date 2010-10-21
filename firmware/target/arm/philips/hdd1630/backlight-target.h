@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: backlight-target.h 24112 2009-12-25 04:05:01Z lowlight $
  *
  * Copyright (C) 2008 by Mark Arigo
  *

@@ -708,9 +708,9 @@ target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/adc-pp5020.c
-target/arm/philips/backlight-hdd.c
 target/arm/philips/power-hdd.c
 target/arm/philips/fmradio_i2c-hdd.c
+target/arm/philips/hdd1630/backlight-hdd1630.c
 target/arm/philips/hdd1630/button-hdd1630.c
 target/arm/philips/hdd1630/lcd-hdd1630.c
 target/arm/philips/hdd1630/lcd-as-hdd1630.S
@@ -729,9 +729,9 @@ target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/adc-pp5020.c
-target/arm/philips/backlight-hdd.c
 target/arm/philips/power-hdd.c
 target/arm/philips/fmradio_i2c-hdd.c
+target/arm/philips/hdd6330/backlight-hdd6330.c
 target/arm/philips/hdd6330/button-hdd6330.c
 target/arm/philips/hdd6330/lcd-hdd6330.c
 target/arm/philips/hdd6330/powermgmt-hdd6330.c
