@@ -51,6 +51,8 @@ meizu-m6sl.c
 gogear-sa9200.c
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 gogear-hdd1630.c
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+gogear-hdd6330.c
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 onda-vx747.c
 #elif CONFIG_KEYPAD == ONDAVX777_PAD

@@ -333,6 +333,13 @@
 #define UI_LCD_POSX                 143 /* x position of lcd */
 #define UI_LCD_POSY                 27   /* y position of lcd */
 
+#elif defined(PHILIPS_HDD6330)
+#define UI_TITLE                    "Philips GoGear HDD63X0"
+#define UI_WIDTH                    400 /* width of GUI window */
+#define UI_HEIGHT                   614 /* height of GUI window */
+#define UI_LCD_POSX                 89  /* x position of lcd */
+#define UI_LCD_POSY                 113 /* y position of lcd */
+
 #elif defined(SANSA_M200V4)
 #define UI_TITLE                    "sansa m200v4"
 #define UI_WIDTH                    350 /* width of GUI window */
