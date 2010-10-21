@@ -156,10 +156,18 @@ cpu:
     mov    r1, #WAKE
     str    r1, [r0]
 
-#if defined(SANSA_C200) || defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
+#if defined(SANSA_C200) || defined(PHILIPS_HDD1630)
     /* Magic for loading the c200 OF */
     ldr    r0, =0xb00d10ad
     mov    r1, #0x700
+    ldr    r2, =0xfff0
+    mov    r3, #0x7
+#endif
+
+#if defined(PHILIPS_HDD6330)
+    /* Magic for loading the HDD6XX0 OF */
+    ldr    r0, =0xb00d10ad
+    mov    r1, #0x800
     ldr    r2, =0xfff0
     mov    r3, #0x7
 #endif

@@ -29,9 +29,10 @@
 #include "logf.h"
 
 static int int_btn = BUTTON_NONE;
+#ifndef BOOTLOADER
 static int old_pos = -1;
-
 static int scroll_repeat = BUTTON_NONE;
+#endif
 static int repeat = 0;
 
 /*
