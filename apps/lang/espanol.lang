@@ -12476,3 +12476,96 @@
     *: "Forzar"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Aceptar"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Aceptar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Actualizar al parar"
+  </dest>
+  <voice>
+    *: "Actualizar al parar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Supr"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Suprimir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Cancelar"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Cancelar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Iniciar examinador en /"
+  </dest>
+  <voice>
+    *: "Iniciar examinador de archivos en la raíz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Iniciar examinador aquí"
+  </dest>
+  <voice>
+    *: "Iniciar examinador aquí"
+  </voice>
+</phrase>
