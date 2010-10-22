@@ -277,8 +277,10 @@ start:
 #endif
 
 #ifdef MPIO_HD200
-    /* Set KEEP_ACT */
-    move.l #0x00200000,%d0
+    /* Set KEEP_ACT
+     * Set GPIO57 high to remove hissing nois on startup
+     */
+    move.l #0x02200000,%d0
     or.l %d0,(0xb4,%a1)
     or.l %d0,(0xb8,%a1)
     or.l %d0,(0xbc,%a1)
