@@ -319,15 +319,18 @@ void main(void)
     /* this is default mode after power_init() */
     bool high_current_charging = true;
 
+    /* setup GPIOs related to power functions */
     power_init();
 
     system_init();
     kernel_init();
 
+    /* run at 45MHz */
     set_cpu_frequency(CPUFREQ_NORMAL);
-    coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
 
+    /* IRQs are needed by button driver */
     enable_irq();
+
     lcd_init();
 
     /* only lowlevel functions no queue init */
@@ -337,8 +340,8 @@ void main(void)
     /* setup font system*/
     font_init();
     lcd_setfont(FONT_SYSFIXED);
-    
-    /* buttons reading */
+
+     /* buttons reading init*/
     adc_init();
     button_init();
 

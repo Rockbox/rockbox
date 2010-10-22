@@ -91,4 +91,7 @@ void adc_init(void)
 
     /* create tick task which enables ADC interrupt */
     tick_add_task(adc_tick);
+
+    /* let the interrupt handler fill readout array */
+    sleep(2);
 }
