@@ -70,7 +70,9 @@ static int initialize_catalog(void)
         bool default_dir = true;
 
         /* directory config is of the format: "dir: /path/to/dir" */
-        if (global_settings.playlist_catalog_dir[0])
+        if (global_settings.playlist_catalog_dir[0] &&
+            strcmp(global_settings.playlist_catalog_dir,
+                   PLAYLIST_CATALOG_DEFAULT_DIR))
         {
             strcpy(playlist_dir, global_settings.playlist_catalog_dir);
             default_dir = false;

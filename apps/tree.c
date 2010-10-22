@@ -563,9 +563,9 @@ void set_dirfilter(int l_dirfilter)
 }
 
 /* Selects a file and update tree context properly */
-void set_current_file(char *path)
+void set_current_file(const char *path)
 {
-    char *name;
+    const char *name;
     int i;
 
 #ifdef HAVE_TAGCACHE
@@ -580,9 +580,7 @@ void set_current_file(char *path)
     name = strrchr(path+1,'/');
     if (name)
     {
-        *name = 0;
-        strcpy(tc.currdir, path);
-        *name = '/';
+        strlcpy(tc.currdir, path, name - path + 1);
         name++;
     }
     else
@@ -929,6 +927,7 @@ bool create_playlist(void)
 
 int rockbox_browse(const char *root, int dirfilter)
 {
+    static char current[MAX_PATH];
     int ret_val = 0;
     int *last_filter = tc.dirfilter;
     tc.dirfilter = &dirfilter;
@@ -939,7 +938,7 @@ int rockbox_browse(const char *root, int dirfilter)
     {
         static struct tree_context backup;
         int last_context;
-        const char *dir, *ext, *setting = NULL;
+        const char *ext, *setting;
         
         backup = tc;
         tc.selected_item = 0;
@@ -952,7 +951,6 @@ int rockbox_browse(const char *root, int dirfilter)
         switch(dirfilter)
         {
             case SHOW_LNG:
-                dir = LANG_DIR;
                 ext = "lng";
                 if (global_settings.lang_file[0])
                     setting = global_settings.lang_file;
@@ -960,24 +958,20 @@ int rockbox_browse(const char *root, int dirfilter)
                     setting = "english";
                 break;
             case SHOW_WPS:
-                dir = WPS_DIR;
                 ext = "wps";
                 setting = global_settings.wps_file;
                 break;
 #ifdef HAVE_REMOTE_LCD
             case SHOW_RWPS:
-                dir = WPS_DIR;
                 ext = "rwps";
                 setting = global_settings.rwps_file;
                 break;
             case SHOW_RSBS:
-                dir = WPS_DIR;
                 ext = "rsbs";
                 setting = global_settings.rsbs_file;
                 break;
 #if CONFIG_TUNER
             case SHOW_RFMS:
-                dir = WPS_DIR;
                 ext = "rfms";
                 setting = global_settings.rfms_file;
                 break;
@@ -985,18 +979,15 @@ int rockbox_browse(const char *root, int dirfilter)
 #endif
 #ifdef HAVE_LCD_BITMAP
             case SHOW_FONT:
-                dir = FONT_DIR;
                 ext = "fnt";
                 setting = global_settings.font_file;
                 break;
             case SHOW_SBS:
-                dir = WPS_DIR;
                 ext = "sbs";
                 setting = global_settings.sbs_file;
                 break;
 #if CONFIG_TUNER
             case SHOW_FMS:
-                dir = WPS_DIR;
                 ext = "fms";
                 setting = global_settings.fms_file;
                 break;
@@ -1004,23 +995,20 @@ int rockbox_browse(const char *root, int dirfilter)
 #endif
 #if CONFIG_TUNER
             case SHOW_FMR:
-                dir = FMPRESET_PATH;
                 ext = "fmr";
                 setting = global_settings.fmr_file;
                 break;
 #endif
             default:
-                dir = ext = setting = NULL;
+                ext = setting = NULL;
                 break;
-            }
+        }
 
         /* If we've found a file to center on, do it */
         if (setting)
         {
-            char current[MAX_PATH], _dir[MAX_PATH];
-            /* if setting != NULL, ext and dir are not used uninitialized */
-            snprintf(current, sizeof(current), "%s/%s.%s",
-                     get_user_file_path(dir, 0, _dir, sizeof(_dir)), setting, ext);
+            /* if setting != NULL, ext is initialized */
+            snprintf(current, sizeof(current), "%s/%s.%s", root, setting, ext);
             set_current_file(current);
             /* set_current_file changes dirlevel, change it back */
             tc.dirlevel = 0; 
@@ -1032,11 +1020,10 @@ int rockbox_browse(const char *root, int dirfilter)
     }
     else
     {
-        static char buf[MAX_PATH];
         if (dirfilter != SHOW_ID3DB)
             tc.dirfilter = &global_settings.dirfilter;
-        strcpy(buf,root);
-        set_current_file(buf);
+        strcpy(current,root);
+        set_current_file(current);
         ret_val = dirbrowse();
     }
     tc.dirfilter = last_filter;

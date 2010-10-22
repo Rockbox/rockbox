@@ -75,7 +75,7 @@ void tree_mem_init(void) INIT_ATTR;
 void tree_gui_init(void) INIT_ATTR;
 char* get_current_file(char* buffer, size_t buffer_len);
 void set_dirfilter(int l_dirfilter);
-void set_current_file(char *path);
+void set_current_file(const char *path);
 int rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);
 void resume_directory(const char *dir);

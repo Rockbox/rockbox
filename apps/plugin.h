@@ -831,7 +831,7 @@ struct plugin_api {
 #endif
     int (*show_logo)(void);
     struct tree_context* (*tree_get_context)(void);
-    void (*set_current_file)(char* path);
+    void (*set_current_file)(const char* path);
     void (*set_dirfilter)(int l_dirfilter);
 
 #ifdef HAVE_WHEEL_POSITION
