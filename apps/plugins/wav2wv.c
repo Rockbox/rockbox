@@ -123,6 +123,7 @@ static int wav2wv(const char *infile)
 
     if (rb->read (in_fd, &raw_header, sizeof (raw_header)) != sizeof (raw_header)) {
         rb->splash(HZ*2, "could not read file!");
+        rb->close (in_fd);
         return true;
     }
 
@@ -135,6 +136,7 @@ static int wav2wv(const char *infile)
         rb->strncmp (native_header.data_ckID, "data", 4) ||
         native_header.FormatTag != 1 || native_header.BitsPerSample != 16) {
             rb->splash(HZ*2, "incompatible wav file!");
+            rb->close (in_fd);
             return true;
     }
 
@@ -266,6 +268,7 @@ static int wav2wv(const char *infile)
     else
         rb->splash(HZ*3, "operation successful");
 
+    rb->reload_directory();
     return error;
 }
 
@@ -290,6 +293,5 @@ enum plugin_status plugin_start(const void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
-    /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
-    return PLUGIN_USB_CONNECTED;
+    return PLUGIN_OK;
 }
