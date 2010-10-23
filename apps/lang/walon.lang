@@ -12063,15 +12063,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Pea"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Pea"
   </voice>
 </phrase>
@@ -12080,15 +12080,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Pea då lon"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Pea då lon"
   </voice>
 </phrase>
@@ -12097,15 +12097,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Mwaisse waitroûle"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Mwaisse waitroûle"
   </voice>
 </phrase>
@@ -12114,15 +12114,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Waitroûle då lon"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Waitroûle då lon"
   </voice>
 </phrase>

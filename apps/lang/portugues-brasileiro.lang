@@ -12034,15 +12034,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base"
   </voice>
 </phrase>
@@ -12051,15 +12051,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base Remota"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base Remota"
   </voice>
 </phrase>
@@ -12068,15 +12068,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Tela Principal"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Tela Principal"
   </voice>
 </phrase>
@@ -12085,15 +12085,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Tela Remota"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Tela Remota"
   </voice>
 </phrase>

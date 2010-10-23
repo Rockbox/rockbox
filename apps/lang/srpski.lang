@@ -12069,15 +12069,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio_remote: "Екран радија на даљинском"
   </dest>
   <voice>
-    *:none
+    *: none
     radio_remote: "Екран радија на даљинском"
   </voice>
 </phrase>
@@ -12103,15 +12103,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Основни Skin"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Основни Skin"
   </voice>
 </phrase>
@@ -12188,15 +12188,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Основни скин на даљинском"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Основни скин на даљинском"
   </voice>
 </phrase>
@@ -12222,15 +12222,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Eкран на даљинском"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Eкран на даљинском"
   </voice>
 </phrase>
@@ -12420,15 +12420,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio: "Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio: "Екран радија"
   </dest>
   <voice>
-    *:none
+    *: none
     radio: "Екран радија"
   </voice>
 </phrase>
@@ -12437,15 +12437,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Главни екран"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Главни екран"
   </voice>
 </phrase>

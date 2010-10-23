@@ -12066,7 +12066,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
@@ -12083,7 +12083,7 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
@@ -12100,15 +12100,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Ecran principal"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "écran principal"
   </voice>
 </phrase>
@@ -12117,15 +12117,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Ecran télécommande"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "écran télécommande"
   </voice>
 </phrase>
@@ -12236,15 +12236,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio_remote: "Ecran radio pour télécommande"
   </dest>
   <voice>
-    *:none
+    *: none
     radio_remote: "écran radio pour télécommande"
   </voice>
 </phrase>
@@ -12454,15 +12454,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio: "Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio: "Ecran radio"
   </dest>
   <voice>
-    *:none
+    *: none
     radio: "écran radio"
   </voice>
 </phrase>

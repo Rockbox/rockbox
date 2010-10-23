@@ -12044,15 +12044,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </voice>
 </phrase>
@@ -12061,15 +12061,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </voice>
 </phrase>
