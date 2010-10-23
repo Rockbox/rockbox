@@ -12037,15 +12037,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base "
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base "
   </voice>
 </phrase>
@@ -12054,15 +12054,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base Per Telecomando"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Skin Base Per Telecomando"
   </voice>
 </phrase>
@@ -12071,15 +12071,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Schermo Principale"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Schermo Principale"
   </voice>
 </phrase>
@@ -12088,15 +12088,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Schermo Telecomando"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Schermo Telecomando"
   </voice>
 </phrase>
@@ -12207,15 +12207,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio_remote: "Schermo Telecomando Radio"
   </dest>
   <voice>
-    *:none
+    *: none
     radio_remote: "Schermo Telecomando Radio"
   </voice>
 </phrase>
@@ -12425,15 +12425,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio: "Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio: "Schermo Radio"
   </dest>
   <voice>
-    *:none
+    *: none
     radio: "Schermo Radio"
   </voice>
 </phrase>

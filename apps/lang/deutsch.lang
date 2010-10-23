@@ -12055,15 +12055,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Basisskin (SBS)"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Basisskin"
   </voice>
 </phrase>
@@ -12072,15 +12072,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Fernbedienungs-SBS"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Fernbedienungs-SBS"
   </voice>
 </phrase>
@@ -12157,15 +12157,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio_remote: "Fernbedienungsradioanzeige"
   </dest>
   <voice>
-    *:none
+    *: none
     radio_remote: "Fernbedienungsradioanzeige"
   </voice>
 </phrase>
@@ -12406,15 +12406,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio: "Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio: "Radioanzeige"
   </dest>
   <voice>
-    *:none
+    *: none
     radio: "Radioanzeige"
   </voice>
 </phrase>

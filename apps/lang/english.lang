@@ -12112,15 +12112,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Base Skin"
   </voice>
 </phrase>
@@ -12129,15 +12129,15 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </dest>
   <voice>
-    *:none
+    *: none
     lcd_bitmap: "Remote Base Skin"
   </voice>
 </phrase>
@@ -12146,15 +12146,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Main Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Main Screen"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Main Screen"
   </voice>
 </phrase>
@@ -12163,15 +12163,15 @@
   desc: in the main menu
   user: core
   <source>
-    *:none
+    *: none
     remote: "Remote Screen"
   </source>
   <dest>
-    *:none
+    *: none
     remote: "Remote Screen"
   </dest>
   <voice>
-    *:none
+    *: none
     remote: "Remote Screen"
   </voice>
 </phrase>
@@ -12282,15 +12282,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </dest>
   <voice>
-    *:none
+    *: none
     radio_remote: "Remote Radio Screen"
   </voice>
 </phrase>
@@ -12500,15 +12500,15 @@
   desc: in the theme menu
   user: core
   <source>
-    *:none
+    *: none
     radio: "Radio Screen"
   </source>
   <dest>
-    *:none
+    *: none
     radio: "Radio Screen"
   </dest>
   <voice>
-    *:none
+    *: none
     radio: "Radio Screen"
   </voice>
 </phrase>
