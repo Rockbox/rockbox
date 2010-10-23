@@ -2491,6 +2491,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int   rat, srat, nrat; /* for rate selection */
     int   cont = 1, butt;
+    int   ret;
     long  tim  = 0;
     static const char* bstrg[] = {
         "64", "80", "96", "112", "128", "160", "192", "224", "256", "320"
@@ -2544,7 +2545,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(cont)
     {
-        if(wave_open() == 0)
+        ret = wave_open();
+        if(ret == 0)
         {
             init_mp3_encoder_engine(true, brate[srat], cfg.samplerate);
             get_mp3_filename(wav_filename);
@@ -2557,11 +2559,12 @@ enum plugin_status plugin_start(const void* parameter)
 
             rb->close(wavfile);
             rb->close(mp3file);
+            rb->reload_directory();
         }
         else
         {
             rb->close(wavfile);
-            rb->lcd_putsxyf(0, 20, "WaveOpen failed %d", wave_open());
+            rb->lcd_putsxyf(0, 20, "WaveOpen failed %d", ret);
             rb->lcd_update();
             rb->sleep(5*HZ);
         }
