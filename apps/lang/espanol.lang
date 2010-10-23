@@ -9180,7 +9180,7 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bitrate"
+    recording_swcodec: "Tasa de bits"
   </dest>
   <voice>
     *: none
@@ -11578,7 +11578,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Human Interface Device"
+    usb_hid: "Dispositivo de interfaz humano USB"
   </voice>
 </phrase>
 <phrase>
@@ -12058,10 +12058,10 @@
     *: "of"
   </source>
   <dest>
-    *: "of"
+    *: "de"
   </dest>
   <voice>
-    *: "of"
+    *: "de"
   </voice>
 </phrase>
 <phrase>
@@ -12214,6 +12214,7 @@
   </dest>
   <voice>
     *: none
+    hotkey: "Tecla rápida del examinador de archivos"
   </voice>
 </phrase>
 <phrase>
@@ -12241,10 +12242,10 @@
     *: "<Untagged>"
   </source>
   <dest>
-    *: "<Untagged>"
+    *: "<Sin etiqueta>"
   </dest>
   <voice>
-    *: "Untagged"
+    *: "Sin etiqueta"
   </voice>
 </phrase>
 <phrase>
@@ -12329,7 +12330,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Emisora:"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -12428,7 +12429,7 @@
     *: "Compositor"
   </dest>
   <voice>
-    *: "Compositor"
+    *: ""
   </voice>
 </phrase>
 <phrase>
