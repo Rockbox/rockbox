@@ -43,6 +43,8 @@ public class RockboxFramebuffer extends View
 
         /* Needed so we can catch KeyEvents */
         setFocusable(true);
+        setFocusableInTouchMode(true);
+        setClickable(true);
         requestFocus();
     }
 
@@ -113,7 +115,13 @@ public class RockboxFramebuffer extends View
         set_lcd_active(0);
     }
     public void resume()
-    {    /* make updates again, the underlying function will 
+    {    
+        /* Needed so we can catch KeyEvents */
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        setClickable(true);
+        requestFocus();
+        /* make updates again, the underlying function will 
          * send an event */
         set_lcd_active(1);
     }
