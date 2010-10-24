@@ -21,9 +21,6 @@
 # - Tomer Shalev
 # - Sasha Khamkov
 
-<options>
-  rtl: 1
-</options>
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -4807,13 +4804,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".mp3 הקרא קטעי"
+    *: ".talk Clip"
   </dest>
   <voice>
-    *: ".mp3 הקרא קטעי"
+    *: ".talk Clip"
   </voice>
 </phrase>
 <phrase>
@@ -7926,8 +7923,6 @@
     *: "זמן"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -11460,15 +11455,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "מצב מולטימדיה"
+    usb_hid: "מולטימדיה"
   </dest>
   <voice>
     *: none
-    usb_hid: "מצב מולטימדיה"
+    usb_hid: "מולטימדיה"
   </voice>
 </phrase>
 <phrase>
@@ -11477,15 +11472,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "מצב מצגת"
+    usb_hid: "מצגת"
   </dest>
   <voice>
     *: none
-    usb_hid: "מצב מצגת"
+    usb_hid: "מצגת"
   </voice>
 </phrase>
 <phrase>
@@ -11494,15 +11489,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "מצב דפדפן"
+    usb_hid: "דפדפן"
   </dest>
   <voice>
     *: none
-    usb_hid: "מצב דפדפן"
+    usb_hid: "דפדפן"
   </voice>
 </phrase>
 <phrase>
@@ -11511,15 +11506,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "מצב עכבר"
+    usb_hid: "עכבר"
   </dest>
   <voice>
     *: none
-    usb_hid: "מצב עכבר"
+    usb_hid: "עכבר"
   </voice>
 </phrase>
 <phrase>
@@ -12071,5 +12066,511 @@
   <voice>
     *: none
     lcd_bitmap: "Remote Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "אישור"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "אישור"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "WPS Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "מסך רדיו בשלט"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "מסך רדיו בשלט"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band %d Gain"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band %d Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "רחב"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "רחב"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "עדכן בעצירה"
+  </dest>
+  <voice>
+    *: "עדכן בעצירה"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "מחק"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "מחק"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "מסך שלט"
+  </dest>
+  <voice>
+    *: none
+    remote: "מסך שלט"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "צר"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "צר"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rewind before resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Untagged>"
+  </dest>
+  <voice>
+    *: "Untagged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "ביטול"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "ביטול"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "מלחין"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Start File Browser at /"
+  </dest>
+  <voice>
+    *: "Start File Browser at root"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band %d Width"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: ":תחנה"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Radio Screen"
+  </dest>
+  <voice>
+    *: none
+    radio: "מסך רדיו"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Main Screen"
+  </dest>
+  <voice>
+    *: none
+    remote: "מסך ראשי"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "open picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Force"
+  </dest>
+  <voice>
+    *: "Force"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Tone Controls"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Tone Controls"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Start File Browser Here"
+  </dest>
+  <voice>
+    *: "Start File Browser Here"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Histogram interval"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Histogram interval"
   </voice>
 </phrase>
