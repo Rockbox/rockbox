@@ -31,12 +31,13 @@
 
 static int last_y, last_x;
 static int last_btns;
+static long last_button_tick;
 
 static enum {
     STATE_UNKNOWN,
     STATE_UP,
     STATE_DOWN,
-} last_state = STATE_UNKNOWN;
+} last_touch_state = STATE_UNKNOWN;
 
 /*
  * this notifies us in an interrupt-like fashion whether the user just
@@ -49,9 +50,9 @@ Java_org_rockbox_RockboxFramebuffer_touchHandler(JNIEnv*env, jobject this,
     (void)this;
 
     if (down)
-        last_state = STATE_DOWN;
+        last_touch_state = STATE_DOWN;
     else
-        last_state = STATE_UP;
+        last_touch_state = STATE_UP;
 
     last_x = x;
     last_y = y;
@@ -73,15 +74,16 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jobject this,
         return false;
 
     if (state)
+    {
         last_btns |= button;
-    else
-        last_btns &= ~button;
-
+        last_button_tick = current_tick;
+    }
     return true;
 }
 
 void button_init_device(void)
 {
+    last_button_tick = 0;
 }
 
 int button_read_device(int *data)
@@ -94,8 +96,10 @@ int button_read_device(int *data)
      *         touchscreen_to_pixels() */
     int touch = touchscreen_to_pixels(last_x, last_y, data);
 
-    if (last_state == STATE_DOWN)
+    if (last_touch_state == STATE_DOWN)
         btn |= touch;
 
+    if (TIME_AFTER(current_tick, last_button_tick+5))
+        last_btns = 0;
     return btn;
 }
