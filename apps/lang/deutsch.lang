@@ -12548,3 +12548,45 @@
     *: "Erzwingen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Beim Stoppen aktualisieren"
+  </dest>
+  <voice>
+    *: "Beim Stoppen aktualisieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Dateibrowser in / starten"
+  </dest>
+  <voice>
+    *: "Dateibrowser im Hauptverzeichnis starten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Dateibrowser hier starten"
+  </dest>
+  <voice>
+    *: "Dateibrowser hier starten"
+  </voice>
+</phrase>
