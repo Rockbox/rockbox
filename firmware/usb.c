@@ -71,7 +71,11 @@ static int usb_mmc_countdown = 0;
 /* FIXME: The extra 0x800 is consumed by fat_mount() when the fsinfo
    needs updating */
 #ifdef USB_FULL_INIT
+#ifdef IPOD_NANO2G
+static long usb_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
+#else
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
+#endif
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 #ifndef USB_STATUS_BY_EVENT
