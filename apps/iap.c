@@ -148,7 +148,7 @@ void iap_send_pkt(const unsigned char * data, int len)
     }
 }    
 
-int iap_getc(unsigned char x)
+bool iap_getc(unsigned char x)
 {
     static unsigned char last_x = 0;
     static bool newpkt = true;

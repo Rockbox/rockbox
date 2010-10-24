@@ -20,10 +20,12 @@
 #ifndef __IAP_H__
 #define __IAP_H__
 
+#include <stdbool.h>
+
 #define RX_BUFLEN 260
 #define TX_BUFLEN 128
 
-extern int iap_getc(unsigned char x);
+extern bool iap_getc(unsigned char x);
 extern void iap_setup(int ratenum);
 extern void iap_bitrate_set(int ratenum);
 extern void iap_periodic(void);
