@@ -144,6 +144,33 @@ static const unsigned short cent_interp[] =
 /* or that of the timestretching algorithm                         */
 static bool at_limit = false;
 
+/*
+ *
+ * The pitchscreen is divided into 3 viewports (each row is a viewport)
+ * Then each viewport is again divided into 3 colums, each showsing some infos
+ * Additionally, on touchscreen, each cell represents a button
+ *
+ * Below a sketch describing what each cell will show (what's drawn on it)
+ * --------------------------
+ * |      |        |        | <-- pitch up in the middle (text and button)
+ * |      |        |        | <-- arrows for mode toggling on the sides for touchscreen
+ * |------------------------|
+ * |      |        |        | <-- semitone/speed up/down on the sides
+ * |      |        |        | <-- reset pitch&speed in the middle
+ * |------------------------|
+ * |      |        |        | <-- pitch down in the middle
+ * |      |        |        | <-- Two "OK" for exit on the sides for touchscreen
+ * |------------------------|
+ *
+ * 
+ */
+
+/*
+ * Fixes the viewports so they represent the 3 rows, and adds a little margin
+ * on all sides for the icons (which are drawn outside of the grid
+ *
+ * The modified viewports need to be passed to the touchscreen handling function
+ **/
 static void pitchscreen_fix_viewports(struct viewport *parent,
         struct viewport pitch_viewports[PITCH_ITEM_COUNT])
 {
@@ -152,24 +179,23 @@ static void pitchscreen_fix_viewports(struct viewport *parent,
     for (i = 0; i < PITCH_ITEM_COUNT; i++)
     {
         pitch_viewports[i] = *parent;
-        pitch_viewports[i].height = font_height;
-
-        if (i == PITCH_TOP || i == PITCH_BOTTOM)
-            pitch_viewports[i].flags |= VP_FLAG_ALIGN_CENTER;
+        pitch_viewports[i].height = parent->height / PITCH_ITEM_COUNT;
+        pitch_viewports[i].x += ICON_BORDER;
+        pitch_viewports[i].width -= 2*ICON_BORDER;
     }
-    pitch_viewports[PITCH_TOP].y += ICON_BORDER;
+    pitch_viewports[PITCH_TOP].y      += ICON_BORDER;
+    pitch_viewports[PITCH_TOP].height -= ICON_BORDER;
 
-    pitch_viewports[PITCH_MID].x += ICON_BORDER;
-    pitch_viewports[PITCH_MID].width = parent->width - ICON_BORDER*2;
-    pitch_viewports[PITCH_MID].height = parent->height - ICON_BORDER*2 
-                                        - font_height * 2;
     if(pitch_viewports[PITCH_MID].height < font_height * 2)
         pitch_viewports[PITCH_MID].height = font_height * 2;
-    pitch_viewports[PITCH_MID].y += parent->height / 2 -
-            pitch_viewports[PITCH_MID].height / 2;
 
-    pitch_viewports[PITCH_BOTTOM].y += parent->height - font_height 
-                                       - ICON_BORDER;
+    pitch_viewports[PITCH_MID].y = pitch_viewports[PITCH_TOP].y
+                                 + pitch_viewports[PITCH_TOP].height;
+
+    pitch_viewports[PITCH_BOTTOM].y = pitch_viewports[PITCH_MID].y
+                                    + pitch_viewports[PITCH_MID].height;
+
+    pitch_viewports[PITCH_BOTTOM].height -= ICON_BORDER;
 }
 
 /* must be called before pitchscreen_draw, or within
@@ -207,29 +233,54 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     bool show_lang_pitch;
 
      /* "Pitch up/Pitch down" - hide for a small screen,
-      * the text is drawn centered automatically */
+      * the text is drawn centered automatically
+      *
+      * note: this assumes 5 lines always fit on a touchscreen (should be
+      * reasonable) */
     if (max_lines >= 5)
     {
+        int w, h;
+        struct viewport *vp = &pitch_viewports[PITCH_TOP];
+        display->set_viewport(vp);
+        display->clear_viewport();
+#ifdef HAVE_TOUCHSCREEN
+        /* two arrows in the top row, left and right column */
+        char *arrows[] = { "<", ">"};
+        display->getstringsize(arrows[0], &w, &h);
+        display->putsxy(0, vp->height/2 - h/2, arrows[0]);
+        display->putsxy(vp->width - w, vp->height/2 - h/2, arrows[1]);
+#endif
         /* UP: Pitch Up */
-        display->set_viewport(&pitch_viewports[PITCH_TOP]);
         if (global_settings.pitch_mode_semitone)
             ptr = str(LANG_PITCH_UP_SEMITONE);
         else
             ptr = str(LANG_PITCH_UP);
-        display->clear_viewport();
+
+        display->getstringsize(ptr, &w, NULL);
         /* draw text */
-        display->putsxy(0, 0, ptr);
+        display->putsxy(vp->width/2 - w/2, 0, ptr);
         display->update_viewport();
 
         /* DOWN: Pitch Down */
-        display->set_viewport(&pitch_viewports[PITCH_BOTTOM]);
+        vp = &pitch_viewports[PITCH_BOTTOM];
+        display->set_viewport(vp);
+        display->clear_viewport();
+
+#ifdef HAVE_TOUCHSCREEN
+        ptr = str(LANG_KBD_OK);
+        display->getstringsize(ptr, &w, &h);
+        /* one OK in the middle first column of the vp (at half height) */
+        display->putsxy(vp->width/6 - w/2, vp->height/2 - h/2, ptr);
+        /* one OK in the middle of the last column of the vp (at half height) */
+        display->putsxy(5*vp->width/6 - w/2, vp->height/2 - h/2, ptr);
+#endif
         if (global_settings.pitch_mode_semitone)
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
         else
             ptr = str(LANG_PITCH_DOWN);
-        display->clear_viewport();
+        display->getstringsize(ptr, &w, &h);
         /* draw text */
-        display->putsxy(0, 0, ptr);
+        display->putsxy(vp->width/2 - w/2, vp->height - h, ptr);
         display->update_viewport();
     }
 
@@ -573,6 +624,91 @@ static int32_t pitch_increase_semitone(int32_t pitch,
     return new_semitone;
 }
 
+#ifdef HAVE_TOUCHSCREEN
+/*
+ * Check for touchscreen presses as per sketch above in this file
+ * 
+ * goes through each row of the, checks whether the touchscreen
+ * was pressed in it. Then it looks the columns of each row for specific actions
+ */
+static int pitchscreen_do_touchscreen(struct viewport vps[])
+{
+    short x, y;
+    struct viewport *this_vp = &vps[PITCH_TOP];
+    int ret;
+    ret = action_get_touchscreen_press_in_vp(&x, &y, this_vp);
+
+    /* top row */
+    if (ret > ACTION_UNKNOWN)
+    {   /* press on top row, left or right column
+         * only toggle mode if released */
+        int column = this_vp->width / 3;
+        if ((x < column || x > (2*column)) && (ret == BUTTON_REL))
+            return ACTION_PS_TOGGLE_MODE;
+
+        
+        else if (x >= column && x <= (2*column))
+        {   /* center column pressed */
+            if (ret == BUTTON_REPEAT)
+                return ACTION_PS_INC_BIG;
+            else if (ret == BUTTON_TOUCHSCREEN)
+                return ACTION_PS_INC_SMALL;
+        }
+        return ACTION_NONE;
+    }
+
+    /* now the center row */
+    this_vp = &vps[PITCH_MID];
+    ret = action_get_touchscreen_press_in_vp(&x, &y, this_vp);
+
+    if (ret > ACTION_UNKNOWN)
+    {
+        int column = this_vp->width / 3;
+
+        if (x < column)
+        {   /* left column */
+            if (ret & BUTTON_REL)
+                return ACTION_PS_NUDGE_LEFTOFF;
+            else if (ret & BUTTON_REPEAT)
+                return ACTION_PS_SLOWER;
+            return ACTION_PS_NUDGE_LEFT;
+        }
+        else if (x > (2*column))
+        {   /* right column */
+            if (ret & BUTTON_REL)
+                return ACTION_PS_NUDGE_LEFTOFF;
+            else if (ret & BUTTON_REPEAT)
+                return ACTION_PS_FASTER;
+            return ACTION_PS_NUDGE_LEFT;
+        }
+        /* center column was pressed */
+        return ACTION_PS_RESET;
+    }
+
+    /* now the bottom row */
+    this_vp = &vps[PITCH_BOTTOM];
+    ret = action_get_touchscreen_press_in_vp(&x, &y, this_vp);
+
+    if (ret > ACTION_UNKNOWN)
+    {
+        int column = this_vp->width / 3;
+
+        /* left or right column is exit */
+        if ((x < column || x > (2*column)) && (ret == BUTTON_REL))
+            return ACTION_PS_EXIT;
+        else if (x >= column && x <= (2*column))
+        {   /* center column was pressed */
+            if (ret == BUTTON_REPEAT)
+                return ACTION_PS_DEC_BIG;
+            else if (ret == BUTTON_TOUCHSCREEN)
+                return ACTION_PS_DEC_SMALL;
+        }
+        return ACTION_NONE;
+    }
+    return ACTION_NONE;
+}
+
+#endif
 /*
     returns:
     0 on exit
@@ -649,6 +785,14 @@ int gui_syncpitchscreen_run(void)
         new_speed = 0;
 #endif
         button = get_action(CONTEXT_PITCHSCREEN, HZ);
+        
+#ifdef HAVE_TOUCHSCREEN
+        if (button == ACTION_TOUCHSCREEN)
+        {
+            FOR_NB_SCREENS(i)
+                button = pitchscreen_do_touchscreen(pitch_viewports[i]);
+        }
+#endif
         switch (button)
         {
             case ACTION_PS_INC_SMALL:
