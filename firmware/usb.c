@@ -71,7 +71,7 @@ static int usb_mmc_countdown = 0;
 
 /* Make sure there's enough stack space for screendump */
 #ifdef USB_FULL_INIT
-static long usb_stack[(DEFAULT_STACK_SIZE + SECTOR_SIZE + BMP_LINESIZE)/sizeof(long)];
+static long usb_stack[(DEFAULT_STACK_SIZE + SECTOR_SIZE + DUMP_BMP_LINESIZE)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 #ifndef USB_STATUS_BY_EVENT

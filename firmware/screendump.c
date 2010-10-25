@@ -50,7 +50,7 @@
 #endif /* LCD_DEPTH != 16 */
 
 #define BMP_HEADERSIZE (54 + 4 * BMP_NUMCOLORS)
-#define BMP_DATASIZE   (BMP_LINESIZE * (LCD_HEIGHT+LCD_SPLIT_LINES))
+#define BMP_DATASIZE   (DUMP_BMP_LINESIZE * (LCD_HEIGHT+LCD_SPLIT_LINES))
 #define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
 
 static const unsigned char bmpheader[] =
@@ -64,7 +64,7 @@ static const unsigned char bmpheader[] =
     LE32_CONST(LCD_WIDTH),      /* Width in pixels */
     LE32_CONST(LCD_HEIGHT+LCD_SPLIT_LINES),  /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
-    LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
+    LE16_CONST(DUMP_BMP_BPP),   /* Bits per pixel 1/4/8/16/24 */
     LE32_CONST(BMP_COMPRESSION),/* Compression mode */
     LE32_CONST(BMP_DATASIZE),   /* Size of bitmap data */
     0xc4, 0x0e, 0x00, 0x00,     /* Horizontal resolution (pixels/meter) */
@@ -113,10 +113,10 @@ void screen_dump(void)
 #endif
 #if LCD_DEPTH <= 8
     unsigned char *dst, *dst_end;
-    unsigned char linebuf[BMP_LINESIZE];
+    unsigned char linebuf[DUMP_BMP_LINESIZE];
 #elif LCD_DEPTH <= 16
     unsigned short *dst, *dst_end;
-    unsigned short linebuf[BMP_LINESIZE/2];
+    unsigned short linebuf[DUMP_BMP_LINESIZE/2];
 #endif
 
 #if CONFIG_RTC
@@ -141,13 +141,13 @@ void screen_dump(void)
         /* BMP image goes bottom up */
         for (y = LCD_HEIGHT - 1; y >= 0; y--)
         {                                  
-            memset(linebuf, 0, BMP_LINESIZE);
+            memset(linebuf, 0, DUMP_BMP_LINESIZE);
 
 #if defined(HAVE_LCD_SPLIT) && (LCD_SPLIT_LINES == 2)
             if (y == LCD_SPLIT_POS - 1)
             {
-                write(fd, linebuf, BMP_LINESIZE);
-                write(fd, linebuf, BMP_LINESIZE);
+                write(fd, linebuf, DUMP_BMP_LINESIZE);
+                write(fd, linebuf, DUMP_BMP_LINESIZE);
             }
 #endif     
             dst = linebuf;
@@ -228,7 +228,7 @@ void screen_dump(void)
             while (dst < dst_end);
 
 #endif /* LCD_DEPTH */
-            write(fd, linebuf, BMP_LINESIZE);
+            write(fd, linebuf, DUMP_BMP_LINESIZE);
         }
     }
     close(fd);
