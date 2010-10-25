@@ -418,6 +418,13 @@ static uint16_t ftl_offsets_backup[0x200] STORAGE_ALIGN_ATTR;
 
 static struct mutex ftl_mtx;
 
+/* Pages per hyperblock (ftl_nand_type->pagesperblock * ftl_banks) */
+static uint32_t ppb;
+
+/* Reserved hyperblocks (ftl_nand_type->blocks
+                       - ftl_nand_type->userblocks - 0x17) */
+static uint32_t syshyperblocks;
+
 
 
 /* Finds a device info page for the specified bank and returns its number.
@@ -826,9 +833,6 @@ static uint32_t ftl_vfl_read(uint32_t vpage, void* buffer, void* sparebuffer,
     DEBUGF("FTL: VFL: Reading page %d\n", vpage);
 #endif
 
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
-    uint32_t syshyperblocks = ftl_nand_type->blocks
-                            - ftl_nand_type->userblocks - 0x17;
     uint32_t abspage = vpage + ppb * syshyperblocks;
     if (abspage >= ftl_nand_type->blocks * ppb || abspage < ppb)
     {
@@ -875,9 +879,6 @@ static uint32_t ftl_vfl_read_fast(uint32_t vpage, void* buffer, void* sparebuffe
 #endif
 
     uint32_t i, rc = 0;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
-    uint32_t syshyperblocks = ftl_nand_type->blocks
-                            - ftl_nand_type->userblocks - 0x17;
     uint32_t abspage = vpage + ppb * syshyperblocks;
     if (abspage + ftl_banks - 1 >= ftl_nand_type->blocks * ppb || abspage < ppb)
 	{
@@ -951,9 +952,6 @@ static uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
     DEBUGF("FTL: VFL: Writing page %d\n", vpage);
 #endif
 
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
-    uint32_t syshyperblocks = ftl_nand_type->blocks
-                            - ftl_nand_type->userblocks - 0x17;
     uint32_t abspage = vpage + ppb * syshyperblocks;
     if (abspage + count > ftl_nand_type->blocks * ppb || abspage < ppb)
 	{
@@ -962,9 +960,9 @@ static uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
         return 4;
 	}
 
-    uint32_t bank[5];
-    uint32_t block[5];
-    uint32_t physpage[5];
+    static uint32_t bank[5];
+    static uint32_t block[5];
+    static uint32_t physpage[5];
 
     for (i = 0; i < count; i++, abspage++)
     {
@@ -1033,9 +1031,6 @@ static uint32_t ftl_vfl_open(void)
        as we won't need it again after mounting */
     uint8_t bbt[0x410];
 #endif
-
-    uint32_t syshyperblocks = ftl_nand_type->blocks
-                            - ftl_nand_type->userblocks - 0x18;
 
     for (i = 0; i < ftl_banks; i++)
 #ifndef FTL_READONLY
@@ -1117,7 +1112,6 @@ static uint32_t ftl_open(void)
 {
     uint32_t i;
     uint32_t ret;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     struct ftl_vfl_cxt_type* cxt = ftl_vfl_get_newest_cxt();
 
     uint32_t ftlcxtblock = 0xffffffff;
@@ -1281,7 +1275,6 @@ static struct ftl_log_type* ftl_get_log_entry(uint32_t block)
 uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer)
 {
     uint32_t i, j;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t error = 0;
 
 #ifdef FTL_TRACE
@@ -1513,7 +1506,6 @@ static uint32_t ftl_save_erasectr_page(uint32_t index)
 static uint32_t ftl_next_ctrl_pool_page(void)
 {
     uint32_t i;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     if (++ftl_cxt.ftlctrlpage % ppb != 0) return 0;
     for (i = 0; i < 3; i++)
         if ((ftl_cxt.ftlctrlblocks[i] + 1) * ppb == ftl_cxt.ftlctrlpage)
@@ -1552,7 +1544,6 @@ static uint32_t ftl_next_ctrl_pool_page(void)
 static uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
                               uint32_t lpn, uint32_t type)
 {
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t rc = ftl_vfl_read(source, ftl_copybuffer[0],
                                &ftl_copyspare[0], 1, 1) & 0x11F;
     memset(&ftl_copyspare[0], 0xFF, 0x40);
@@ -1573,7 +1564,6 @@ static uint32_t ftl_copy_page(uint32_t source, uint32_t destination,
 static uint32_t ftl_copy_block(uint32_t source, uint32_t destination)
 {
     uint32_t i, j;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t error = 0;
     ftl_cxt.nextblockusn++;
     for (i = 0; i < ppb; i += FTL_COPYBUF_SIZE)
@@ -1632,7 +1622,6 @@ static void ftl_check_still_sequential(struct ftl_log_type* entry, uint32_t page
 static uint32_t ftl_compact_scattered(struct ftl_log_type* entry)
 {
     uint32_t i, j;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t error;
     struct ftl_log_type backup;
     if (entry->pagescurrent == 0)
@@ -1716,7 +1705,6 @@ static uint32_t ftl_commit_scattered(struct ftl_log_type* entry)
 static uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
 {
     uint32_t i;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
 
     if (entry->issequential != 1
      || entry->pagescurrent != entry->pagesused)
@@ -1762,7 +1750,6 @@ static uint32_t ftl_commit_sequential(struct ftl_log_type* entry)
 static uint32_t ftl_remove_scattered_block(struct ftl_log_type* entry)
 {
     uint32_t i;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t age = 0xFFFFFFFF, used = 0;
     if (entry == NULL)
     {
@@ -1855,7 +1842,6 @@ static struct ftl_log_type* ftl_allocate_log_entry(uint32_t block)
 static uint32_t ftl_commit_cxt(void)
 {
     uint32_t i;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     uint32_t mappages = (ftl_nand_type->userblocks + 0x3ff) >> 10;
     uint32_t ctrpages = (ftl_nand_type->userblocks + 23 + 0x3ff) >> 10;
     uint32_t endpage = ftl_cxt.ftlctrlpage + mappages + ctrpages + 1;
@@ -1894,7 +1880,7 @@ static uint32_t ftl_commit_cxt(void)
 
 #ifndef FTL_READONLY
 /* Swaps the most and least worn block on the flash,
-   to better distribute wear. It will refuse to do anything
+   to better distribute wear. It will not do anything
    if the wear spread is lower than 5 erases. */
 static uint32_t ftl_swap_blocks(void)
 {
@@ -1940,7 +1926,6 @@ static uint32_t ftl_swap_blocks(void)
 uint32_t ftl_write(uint32_t sector, uint32_t count, const void* buffer)
 {
     uint32_t i, j, k;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
 
 #ifdef FTL_TRACE
     DEBUGF("FTL: Writing %d sectors starting at %d\n", count, sector);
@@ -2119,7 +2104,6 @@ uint32_t ftl_sync(void)
 {
     uint32_t i;
     uint32_t rc = 0;
-    uint32_t ppb = ftl_nand_type->pagesperblock * ftl_banks;
     if (ftl_cxt.clean_flag == 1) return 0;
 
     mutex_lock(&ftl_mtx);
@@ -2177,6 +2161,8 @@ uint32_t ftl_init(void)
     for (i = 0; i < 4; i++)
         if (nand_get_device_type(i) != 0) ftl_banks = i + 1;
     ftl_nand_type = nand_get_device_type(0);
+    ppb = ftl_nand_type->pagesperblock * ftl_banks;
+    syshyperblocks = ftl_nand_type->blocks - ftl_nand_type->userblocks - 0x17;
     foundsignature = 0;
     blockwiped = 1;
     for (i = 0; i < ftl_nand_type->pagesperblock; i++)

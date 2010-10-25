@@ -39,6 +39,20 @@
 #define LE16_CONST(x) (x)&0xff, ((x)>>8)&0xff
 #define LE32_CONST(x) (x)&0xff, ((x)>>8)&0xff, ((x)>>16)&0xff, ((x)>>24)&0xff
 
+#if LCD_DEPTH <= 4
+#define BMP_BPP 4
+#define BMP_LINESIZE ((LCD_WIDTH/2 + 3) & ~3)
+#elif LCD_DEPTH <= 8
+#define BMP_BPP 8
+#define BMP_LINESIZE ((LCD_WIDTH + 3) & ~3)
+#elif LCD_DEPTH <= 16
+#define BMP_BPP 16
+#define BMP_LINESIZE ((LCD_WIDTH*2 + 3) & ~3)
+#else
+#define BMP_BPP 24
+#define BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
+#endif
+
 
 #ifdef BOOTLOADER
 

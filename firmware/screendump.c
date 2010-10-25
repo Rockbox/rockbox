@@ -49,20 +49,6 @@
 #endif /* LCD_DEPTH > 8 */
 #endif /* LCD_DEPTH != 16 */
 
-#if LCD_DEPTH <= 4
-#define BMP_BPP 4
-#define BMP_LINESIZE ((LCD_WIDTH/2 + 3) & ~3)
-#elif LCD_DEPTH <= 8
-#define BMP_BPP 8
-#define BMP_LINESIZE ((LCD_WIDTH + 3) & ~3)
-#elif LCD_DEPTH <= 16
-#define BMP_BPP 16
-#define BMP_LINESIZE ((LCD_WIDTH*2 + 3) & ~3)
-#else
-#define BMP_BPP 24
-#define BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
-#endif
-
 #define BMP_HEADERSIZE (54 + 4 * BMP_NUMCOLORS)
 #define BMP_DATASIZE   (BMP_LINESIZE * (LCD_HEIGHT+LCD_SPLIT_LINES))
 #define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
@@ -115,7 +101,7 @@ static void (*screen_dump_hook)(int fh) = NULL;
 void screen_dump(void)
 {
     int fd, y;
-    char filename[MAX_PATH];
+    char filename[32];
 
     fb_data *src;
 #if LCD_DEPTH == 1

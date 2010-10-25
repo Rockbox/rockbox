@@ -65,7 +65,8 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     DIR_UNCACHED* dir;
     struct dirent_uncached* entry;
     int fd;
-    char pathnamecopy[MAX_PATH];
+    int pathnamesize = strlen(pathname) + 1;
+    char pathnamecopy[pathnamesize];
     char* name;
     struct filedesc* file = NULL;
     int rc;
@@ -133,7 +134,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     }
 #endif
 
-    strlcpy(pathnamecopy, pathname, sizeof(pathnamecopy));
+    strlcpy(pathnamecopy, pathname, pathnamesize);
 
     /* locate filename */
     name=strrchr(pathnamecopy+1,'/');
