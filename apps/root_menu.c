@@ -257,7 +257,8 @@ static int browser(void* param)
     {
         case GO_TO_FILEBROWSER:
             if (!get_current_file(last_folder, MAX_PATH) ||
-                !strchr(&last_folder[1], '/'))
+                (!strchr(&last_folder[1], '/') &&
+                 global_settings.start_directory[1] != '\0'))
             {
                 last_folder[0] = '/';
                 last_folder[1] = '\0';
