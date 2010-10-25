@@ -9,8 +9,13 @@ OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/s5l8700/crt0.o)
 
+#ifdef IPOD_NANO2G
+#define DRAMORIG 0x08000000 + ((MEMORYSIZE - 1) * 0x100000)
+#define DRAMSIZE 0x00100000
+#else
 #define DRAMORIG 0x08000000
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
+#endif
 
 #define IRAMORIG 0x22000000
 #if CONFIG_CPU==S5L8701
@@ -39,19 +44,25 @@ MEMORY
 #if defined(IPOD_NANO2G) || defined(MEIZU_M6SL)
 #define LOAD_AREA IRAM
 #else
+#define NEEDS_INTVECT_COPYING
 #define LOAD_AREA FLASH
 #endif
 
 SECTIONS
 {
+#ifdef NEEDS_INTVECT_COPYING
   .intvect : {
     _intvectstart = . ;
     *(.intvect)
     _intvectend = _newstart ;  
   } >IRAM AT> LOAD_AREA
   _intvectcopy = LOADADDR(.intvect) ;
+#endif
 
   .text : {
+#ifndef NEEDS_INTVECT_COPYING
+    *(.intvect)
+#endif
     *(.init.text)
     *(.text*)
     *(.glue_7*)
@@ -90,12 +101,8 @@ SECTIONS
      _fiqstackend = .;
   } > IRAM
 
-  . = DRAMORIG;
-#ifdef IPOD_NANO2G
-  /* The bss section is too large for IRAM - we just move it 12MB into the
-     DRAM */
-  . += (12*1024*1024);
-#endif
+  /* The bss section is too large for IRAM on the Nano 2G, thanks to the FTL.
+     We just move it 31MB into the DRAM */
   .bss (NOLOAD) : {
      _edata = .;
      *(.bss*);
@@ -104,5 +111,9 @@ SECTIONS
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;
+#ifdef IPOD_NANO2G
   } > DRAM
+#else
+  } > IRAM
+#endif
 }

@@ -49,11 +49,7 @@
     .global    _newstart
     /* Exception vectors */
 start:
-#if CONFIG_CPU==S5L8701 && defined(BOOTLOADER)
-    b newstart2
-#else
     b _newstart
-#endif
     ldr pc, =undef_instr_handler
     ldr pc, =software_int_handler
     ldr pc, =prefetch_abort_handler
@@ -66,9 +62,11 @@ start:
 #endif
     .ltorg
 _newstart:
+#if CONFIG_CPU!=S5L8701 || !defined(BOOTLOADER)
     ldr pc, =newstart2 // we do not want to execute from 0x0 as iram will be mapped there
     .section .init.text,"ax",%progbits
 newstart2:
+#endif
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
 #ifdef ROCKBOX_BIG_ENDIAN
@@ -77,7 +75,7 @@ newstart2:
     orr r0, r0, r1
     mcr 15, 0, r0, c1, c0, 0 // set bigendian
 #endif
-             
+
     ldr r1, =0x3c800000 // disable watchdog
     mov r0, #0xa5
     str r0, [r1]
