@@ -496,7 +496,6 @@ enum tidy_return tidy_lcd_menu(void)
 
             case 1:
             {
-                bool show_icons = rb->global_settings->show_icons;
                 struct simplelist_info list;
                 rb->simplelist_info_init(&list, "Files to Clean",
                                          tidy_type_count, NULL);
@@ -504,7 +503,6 @@ enum tidy_return tidy_lcd_menu(void)
                 list.get_name = get_name;
                 list.action_callback = list_action_callback;
                 rb->simplelist_show_list(&list);
-                rb->global_settings->show_icons = show_icons;
             }
             break;
 

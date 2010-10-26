@@ -331,7 +331,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         }
         /* do the icon */
         display->set_viewport(&list_icons);
-        if (list->callback_get_item_icon && global_settings.show_icons)
+        if (list->callback_get_item_icon != NULL)
         {
             screen_put_icon_with_offset(display, show_cursor?1:0,
                                     (line),show_cursor?ICON_PADDING:0,draw_offset,
@@ -468,7 +468,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
         return ACTION_NONE;
 
     /* x and y are relative to info_vp */
-    if (global_settings.show_icons)
+    if (gui_list->callback_get_item_icon != NULL)
         icon_width += get_icon_width(screen);
     if (show_cursor)
         icon_width += get_icon_width(screen);
