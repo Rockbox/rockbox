@@ -50,4 +50,9 @@ long ramdisk_last_disk_activity(void);
 int ramdisk_num_drives(int first_drive);
 #endif
 
+#ifdef HAVE_HOTSWAP
+bool ramdisk_removable(IF_MD(int drive));
+bool ramdisk_present(IF_MD(int drive));
+#endif
+
 #endif
