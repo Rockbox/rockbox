@@ -135,10 +135,10 @@
 #define HAVE_BUTTON_LIGHT
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
 
-#define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN     630 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX     630 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC       0 /* capacity increment */
+#define BATTERY_CAPACITY_DEFAULT 840 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN     800 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    1200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      20 /* capacity increment */
 #define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* Hardware controlled charging */
@@ -190,7 +190,7 @@
 #define HAVE_USBSTACK
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0471
-#define USB_PRODUCT_ID 0x014C
+#define USB_PRODUCT_ID 0x014B
 #define HAVE_USB_HID_MOUSE
 
 /* Define this if you have adjustable CPU frequency */
@@ -202,6 +202,12 @@
 #define BOOTDIR "/.rockbox"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
+
+/* DMA is used only for reading on PP502x because although reads are ~8x faster
+ * writes appear to be ~25% slower.
+ */
+/* TODO: it does not work - it hangs the player */
+/* #define HAVE_ATA_DMA */
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
