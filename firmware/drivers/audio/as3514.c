@@ -164,7 +164,7 @@ void audiohw_preinit(void)
 #else
     /* as3514/as3515 */
 
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
     /* Set ADC off, mixer on, DAC on, line out on, line in off, mic off */
     /* Turn on SUM, DAC */
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_LOUT_on | 
@@ -173,7 +173,7 @@ void audiohw_preinit(void)
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
     /* Turn on SUM, DAC */
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_SUM_on);
-#endif /* SANSA_E200V2 || SANSA_FUZE */
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
 
     /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on, 
        IBR_LSP max reduction (50%), taken from c200v2 OF
@@ -222,7 +222,7 @@ void audiohw_preinit(void)
     /* Headphone ON, MUTE, Min volume */
     as3514_write(AS3514_HPH_OUT_L, HPH_OUT_L_HP_ON | HPH_OUT_L_HP_MUTE | 0x00);
 
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
     /* Line Out Stereo, MUTE, Min volume */
     as3514_write(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_SE_ST | 
         LINE_OUT_L_LO_SES_DM_MUTE | 0x00);
@@ -236,14 +236,14 @@ static void audiohw_mute(bool mute)
 {
     if (mute) {
         as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
         as3514_set(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
-#endif /* SANSA_E200V2 || SANSA_FUZE */
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
     } else {
         as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
         as3514_clear(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
-#endif /* SANSA_E200V2 || SANSA_FUZE */
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
     }
 }
 
@@ -256,11 +256,11 @@ void audiohw_postinit(void)
     ascodec_suppressor_on(false);
 #endif
 
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
     /* Set line out volume to 0dB */
     as3514_write_masked(AS3514_LINE_OUT_R, 0x1b, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_LINE_OUT_L, 0x1b, AS3514_VOL_MASK);
-#endif /* SANSA_E200V2 || SANSA_FUZE */
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
 
     audiohw_mute(false);
 }
