@@ -803,6 +803,9 @@ enum plugin_status plugin_start(const void* parameter)
     dspbuffer = wavbuffer + buffer_size / 2;
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
+    /* Align codec_mallocbuf to pointer size, tlsf wants that */
+    codec_mallocbuf = (void*)(((intptr_t)codec_mallocbuf +
+                       sizeof(intptr_t)-1) & ~(sizeof(intptr_t)-1));
     audiobuf = SKIPBYTES(codec_mallocbuf, CODEC_SIZE);
     audiosize -= CODEC_SIZE;
 
