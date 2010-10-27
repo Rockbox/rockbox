@@ -51,8 +51,7 @@ void gui_synclist_scroll_stop(struct gui_synclist *lists)
 void list_draw(struct screen *display, struct gui_synclist *gui_list)
 {
     int text_pos;
-    bool draw_icons = (gui_list->callback_get_item_icon != NULL &&
-                       global_settings.show_icons);
+    bool draw_icons = (gui_list->callback_get_item_icon != NULL);
     bool draw_cursor;
     int i;
     int lines;
