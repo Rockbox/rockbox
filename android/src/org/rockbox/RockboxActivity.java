@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 public class RockboxActivity extends Activity 
 {
+    private ProgressDialog loadingdialog;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 

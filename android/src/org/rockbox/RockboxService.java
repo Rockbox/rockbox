@@ -38,6 +38,7 @@ import java.util.zip.ZipFile;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -82,13 +83,14 @@ public class RockboxService extends Service
             /* Running on an older platform: fall back to old API */
             mStartForeground = mStopForeground = null;
         }
-        startservice();
         instance = this;
+        startservice();
     }
 
     private void do_start(Intent intent)
     {
         LOG("Start Service");
+        
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
         create_notification();
@@ -116,74 +118,75 @@ public class RockboxService extends Service
 
     private void startservice() 
     {
-        fb = new RockboxFramebuffer(this);
         final int BUFFER = 8*1024;
-        /* the following block unzips libmisc.so, which contains the files 
-         * we ship, such as themes. It's needed to put it into a .so file
-         * because there's no other way to ship files and have access
-         * to them from native code
-         */
-        try
-        {
-           BufferedOutputStream dest = null;
-           BufferedInputStream is = null;
-           ZipEntry entry;
-           File file = new File("/data/data/org.rockbox/" +
-           		"lib/libmisc.so");
-           /* use arbitary file to determine whether extracting is needed */
-           File file2 = new File("/data/data/org.rockbox/" +
-           		"app_rockbox/rockbox/codecs/mpa.codec");
-           if (!file2.exists() || (file.lastModified() > file2.lastModified()))
-           {
-               ZipFile zipfile = new ZipFile(file);
-               Enumeration<? extends ZipEntry> e = zipfile.entries();
-               File folder;
-               while(e.hasMoreElements()) 
-               {
-                  entry = (ZipEntry) e.nextElement();
-                  LOG("Extracting: " +entry);
-                  if (entry.isDirectory())
-                  {
-                      folder = new File(entry.getName());
-                      LOG("mkdir "+ entry);
-                      try {
-                          folder.mkdirs();
-                      } catch (SecurityException ex) {
-                          LOG(ex.getMessage());
-                      }
-                      continue;
-                  }
-                  is = new BufferedInputStream(zipfile.getInputStream(entry),
-                          BUFFER);
-                  int count;
-                  byte data[] = new byte[BUFFER];
-                  folder = new File(new File(entry.getName()).getParent());
-                  LOG("" + folder.getAbsolutePath());
-                  if (!folder.exists())
-                      folder.mkdirs();
-                  FileOutputStream fos = new FileOutputStream(entry.getName());
-                  dest = new BufferedOutputStream(fos, BUFFER);
-                  while ((count = is.read(data, 0, BUFFER)) != -1)
-                     dest.write(data, 0, count);
-                  dest.flush();
-                  dest.close();
-                  is.close();
-               }
-           }
-        } catch(FileNotFoundException e) {
-            LOG("FileNotFoundException when unzipping", e);
-            e.printStackTrace();
-        } catch(IOException e) {
-            LOG("IOException when unzipping", e);
-            e.printStackTrace();
-        }
-
-        System.loadLibrary("rockbox");
-
+        final Context me = this;
         Thread rb = new Thread(new Runnable()
         {
             public void run()
             {
+		        /* the following block unzips libmisc.so, which contains the files 
+		         * we ship, such as themes. It's needed to put it into a .so file
+		         * because there's no other way to ship files and have access
+		         * to them from native code
+		         */
+		        try
+		        {
+		           BufferedOutputStream dest = null;
+		           BufferedInputStream is = null;
+		           ZipEntry entry;
+		           File file = new File("/data/data/org.rockbox/" +
+		           		"lib/libmisc.so");
+		           /* use arbitary file to determine whether extracting is needed */
+		           File file2 = new File("/data/data/org.rockbox/" +
+		           		"app_rockbox/rockbox/codecs/mpa.codec");
+		           if (!file2.exists() || (file.lastModified() > file2.lastModified()))
+		           {
+		               ZipFile zipfile = new ZipFile(file);
+		               Enumeration<? extends ZipEntry> e = zipfile.entries();
+		               File folder;
+		               while(e.hasMoreElements()) 
+		               {
+		                  entry = (ZipEntry) e.nextElement();
+		                  LOG("Extracting: " +entry);
+		                  if (entry.isDirectory())
+		                  {
+		                      folder = new File(entry.getName());
+		                      LOG("mkdir "+ entry);
+		                      try {
+		                          folder.mkdirs();
+		                      } catch (SecurityException ex) {
+		                          LOG(ex.getMessage());
+		                      }
+		                      continue;
+		                  }
+		                  is = new BufferedInputStream(zipfile.getInputStream(entry),
+		                          BUFFER);
+		                  int count;
+		                  byte data[] = new byte[BUFFER];
+		                  folder = new File(new File(entry.getName()).getParent());
+		                  LOG("" + folder.getAbsolutePath());
+		                  if (!folder.exists())
+		                      folder.mkdirs();
+		                  FileOutputStream fos = new FileOutputStream(entry.getName());
+		                  dest = new BufferedOutputStream(fos, BUFFER);
+		                  while ((count = is.read(data, 0, BUFFER)) != -1)
+		                     dest.write(data, 0, count);
+		                  dest.flush();
+		                  dest.close();
+		                  is.close();
+		               }
+		           }
+		        } catch(FileNotFoundException e) {
+		            LOG("FileNotFoundException when unzipping", e);
+		            e.printStackTrace();
+		        } catch(IOException e) {
+		            LOG("IOException when unzipping", e);
+		            e.printStackTrace();
+		        }
+		
+		        System.loadLibrary("rockbox");
+
+        		fb = new RockboxFramebuffer(me);
                 main();
             }
         },"Rockbox thread");
