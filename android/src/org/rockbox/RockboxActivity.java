@@ -22,6 +22,7 @@
 package org.rockbox;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +43,11 @@ public class RockboxActivity extends Activity
                        ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         final Intent intent = new Intent(this, 
                 RockboxService.class);
+        loadingdialog = new ProgressDialog(this);
+        loadingdialog.setMessage("Rockbox Loading. Please wait...");
+        loadingdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loadingdialog.setCancelable(false);
+        loadingdialog.show();
         startService(intent);
         /* Now it gets a bit tricky:
          * The service is started in the same thread as we are now,
@@ -67,6 +73,7 @@ public class RockboxActivity extends Activity
                 runOnUiThread(new Runnable() 
                 {    @Override
                     public void run() {
+                		loadingdialog.dismiss();
                         setContentView(RockboxService.fb);
                         RockboxService.fb.invalidate();
                     }
