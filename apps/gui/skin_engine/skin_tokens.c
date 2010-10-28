@@ -1377,6 +1377,12 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
             }
             return NULL;
+        case SKIN_TOKEN_HAVE_TOUCH:
+#ifdef HAVE_TOUCHSCREEN
+            return "t";
+#else
+            return NULL;
+#endif
 
         case SKIN_TOKEN_SETTING:
         {

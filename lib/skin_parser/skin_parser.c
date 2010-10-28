@@ -877,6 +877,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
 #ifdef ROCKBOX
     bool feature_available = true;
     const char *false_branch = NULL;
+    const char *conditional_end = NULL;
 #endif
 
     /* Some conditional tags allow for target feature checking,
@@ -955,6 +956,12 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         false_branch = cursor+1;
         children--;
     }
+    if (element->tag->flags&FEATURE_TAG)
+    {
+        if (feature_available)
+            children--;
+    }
+    conditional_end = cursor;
     /* if we are skipping the true branch fix that up */
     cursor = false_branch ? false_branch : bookmark;
 #else
@@ -969,7 +976,13 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     for(i = 0; i < children; i++)
     {
         element->children[i] = skin_parse_code_as_arg(&cursor);
+        if (element->children[i] == NULL)
+            return 0;
         skip_whitespace(&cursor);
+#ifdef ROCKBOX
+        if ((element->tag->flags&FEATURE_TAG) && feature_available)
+            cursor = conditional_end;
+#endif
 
         if(i < children - 1 && *cursor != ENUMLISTSEPERATESYM)
         {
@@ -986,7 +999,6 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
             cursor++;
         }
     }
-
     *document = cursor;
 
     return 1;

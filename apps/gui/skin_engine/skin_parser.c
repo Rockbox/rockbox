@@ -1031,6 +1031,12 @@ static bool check_feature_tag(const int type)
                 return true;
 #endif
             return false;
+        case SKIN_TOKEN_HAVE_TOUCH:
+#ifdef HAVE_TOUCHSCREEN
+            return true;
+#else
+            return false;
+#endif
 
 #if CONFIG_TUNER
         case SKIN_TOKEN_HAVE_RDS:
