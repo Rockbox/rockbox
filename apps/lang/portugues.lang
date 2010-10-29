@@ -10849,7 +10849,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Skin da Barra de Estado"
+    *: "Visual da Barra de Estado"
   </voice>
 </phrase>
 <phrase>
@@ -10930,11 +10930,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Skin Base"
+    lcd_bitmap: "Visual Base"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Skin Base"
+    lcd_bitmap: "Visual Base"
   </voice>
 </phrase>
 <phrase>
@@ -11016,7 +11016,7 @@
   </dest>
   <voice>
     *: none
-    remote: "skin da barra de estado remota"
+    remote: "visual da barra de estado remota"
   </voice>
 </phrase>
 <phrase>
@@ -11255,11 +11255,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Skin da Base Remota"
+    lcd_bitmap: "Visual da Base Remota"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Skin da Base Remota"
+    lcd_bitmap: "Visual da Base Remota"
   </voice>
 </phrase>
 <phrase>
@@ -11268,15 +11268,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Browser"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Navegador"
+    usb_hid: "Navegador"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Navegador"
+    usb_hid: "Navegador"
   </voice>
 </phrase>
 <phrase>
@@ -11616,15 +11616,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Mouse"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Rato"
+    usb_hid: "Rato"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Rato"
+    usb_hid: "Rato"
   </voice>
 </phrase>
 <phrase>
@@ -11650,15 +11650,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo Multimédia"
+    usb_hid: "Multimédia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo Multimédia"
+    usb_hid: "Multimédia"
   </voice>
 </phrase>
 <phrase>
@@ -11700,10 +11700,10 @@
     *: "Skin RAM usage:"
   </source>
   <dest>
-    *: "Uso de RAM da Skin:"
+    *: "Uso de RAM do Visual:"
   </dest>
   <voice>
-    *: "Uso de RAM da Skin"
+    *: "Uso de RAM do Visual"
   </voice>
 </phrase>
 <phrase>
@@ -12020,15 +12020,15 @@
   user: core
   <source>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Presentation"
   </source>
   <dest>
     *: none
-    usb_hid: "Modo de Apresentação"
+    usb_hid: "Apresentação"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo de Apresentação"
+    usb_hid: "Apresentação"
   </voice>
 </phrase>
 <phrase>
@@ -12069,10 +12069,502 @@
   </source>
   <dest>
     *: none
-    recording: "Tipo de Botão de Arranque
+    recording: "Tipo de Botão de Arranque"
   </dest>
   <voice>
     *: none
     recording: "Tipo de Botão de Arranque"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Atalho do WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Atalho do WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Ecrã do Rádio Remoto"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Ecrã do Rádio Remoto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Banda de Ganho %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Banda de Ganho"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Linha de Saída"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Linha de Saída"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "visual do ecrã de rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Largo"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Largo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Actualizar ao Parar"
+  </dest>
+  <voice>
+    *: "Actualizar ao Parar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "visual do ecrã do rádio remoto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Ecrã Remoto"
+  </dest>
+  <voice>
+    *: none
+    remote: "Ecrã Remoto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Estreito"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Estreito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Atalho do Explorador de Ficheiros"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Atalho do Explorador de Ficheiros"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Recuar antes de Resumir"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Recuar antes de Resumir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Opções de Controlo Avançado de Tons"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Opções de Controlo Avançado de Tons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Melhoramento 3-D"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Melhoramento 3-D"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Cancelar"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Cancelar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Compositor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Iniciar Explorador de Ficheiros na /"
+  </dest>
+  <voice>
+    *: "Iniciar Explorador de Ficheiros na raíz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Banda de Frequência %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Banda de Frequência"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Largura de Banda %d"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Largura de Banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Estação:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Ecrã do Rádio"
+  </dest>
+  <voice>
+    *: none
+    radio: "Ecrã do Rádio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Ecrã Principal"
+  </dest>
+  <voice>
+    *: none
+    remote: "Ecrã Principal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "abrir picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Forçar"
+  </dest>
+  <voice>
+    *: "Forçar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Controlo de Tons"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Controlo de Tons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Tecla de Atalho"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Tecla de Atalho"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Iniciar Explorador de Ficheiros aqui"
+  </dest>
+  <voice>
+    *: "Iniciar Explorador de Ficheiros aqui"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Intervalo do Histograma"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Intervalo do Histograma"
   </voice>
 </phrase>
