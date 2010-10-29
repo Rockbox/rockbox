@@ -85,6 +85,10 @@ bzrversion() {
     echo "${version}${mod}"
 }
 
+# XXX: Don't run the scripts and just display the release version
+echo "3.7"
+exit 0
+
 #
 # First locate the top of the src tree (passed in usually)
 #
