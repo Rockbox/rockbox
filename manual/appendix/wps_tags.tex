@@ -15,6 +15,23 @@ what follows is a list of the available tags.
 These tags override the player setting for the display of the status bar.
 They must be noted on their own line (which will not be shown in the WPS).
 
+\section{Hardware Capabilities}
+\begin{tagmap}
+    \config{\%cc} & Check for presence of a real time clock, returns ``c''
+                   when used unconditionally\\
+    \config{\%tp} & Does this target have a radio?\\
+    \config{\%Tp} & Indicates that the target has a touchscreen\\
+\end{tagmap}
+With the above tags it is possible to find out about the presence of certain
+hardware and make the theme adapt to it. This can be very useful for designing
+a theme that works on multiple targets with differing hardware capabilities, e.g.
+targets that do and do not have a clock. When used conditionally, the ``true''
+branch is completely ignored if it does not apply.
+
+Example:
+\config{\%?cc<\%cH:\%cM|No clock detected>}
+
+
 \section{Information from the track tags}
   \begin{tagmap}
     \config{\%ia} & Artist\\
@@ -440,9 +457,6 @@ Examples:
 \opt{radio}{
 \section{FM Radio}
   \begin{tagmap}
-    \config{\%tp} & Does this target have a radio? If it doesn't, the ``true''
-      branch of this conditional is completly ignored so you don't need to
-      worry about tags which are not recognized on non radio targets.\\
     \config{\%tt} & Is the tuner tuned?\\
     \config{\%tm} & Scan or preset mode? Scan is ``true'', preset is ``false''.\\
     \config{\%ts} & Is the station in stereo?\\
@@ -531,10 +545,9 @@ Allows grouping of several items (sublines) onto one line, with the
 display cycling round the defined sublines. See
 \reference{ref:AlternatingSublines} for details. 
 
-
+\opt{rtc}{
 \section{Time and Date}
     \begin{tagmap}
-    \opt{rtc}{
       \config{\%cd}          & Day of month from 01 to 31\\
       \config{\%ce}          & Zero padded day of month from 1 to 31\\
       \config{\%cf}          & A conditional for 12/24 hour format.\newline
@@ -554,21 +567,8 @@ display cycling round the defined sublines. See
       \config{\%cb}          & Month name\\
       \config{\%cu}          & Day of week from 1 to 7, 1 is Monday\\
       \config{\%cw}          & Day of week from 0 to 6, 0 is Sunday\\
-    }
-      \config{\%cc}          & Check for presence of the clock hardware\\
     \end{tagmap}
-The \%cc tag returns ``c'' if the necessary hardware is present and can also be
-used as a conditional. This can be very useful for designing a WPS that works on
-multiple targets, some with and some without a clock. By using this tag as a
-conditional it is possible to display current date and time on those targets that
-support this
-\opt{rtc}{ (like the \playertype)},
-or alternate information on those that do not
-\nopt{rtc}{ (like the \playertype)}%
-.
-
-Example:
-\config{\%?cc<\%cH:\%cM|No clock detected>}
+}
 
 \section{Text Translation}
   \begin{tagmap}
@@ -586,10 +586,6 @@ Example:
 
 
 \opt{touchscreen}{
-  \section{Target Has A Touchscreen?}
-    \begin{tagmap}
-      \config{\%Tp} & Indicates that the target has a touchscreen.\\
-    \end{tagmap}
   \section{Touchscreen Areas}
     \begin{tagmap}
       \config{\%T(x,y,[width],\tabnlindent[height],action)}
