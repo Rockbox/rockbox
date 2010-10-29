@@ -109,7 +109,7 @@ $releasenotes="/wiki/ReleaseNotes37";
     },
     'ipodnano2g' => {
         name => 'iPod Nano 2nd gen',
-        status => 2,
+        status => 3,
     },
     'ipodvideo' => {
         name => 'iPod Video 30GB',
