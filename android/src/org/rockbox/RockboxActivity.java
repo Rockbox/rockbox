@@ -52,7 +52,7 @@ public class RockboxActivity extends Activity
         /* Now it gets a bit tricky:
          * The service is started in the same thread as we are now,
          * but the service also initializes the framebuffer
-         * Unforunately, this happens *after* any of the default 
+         * Unfortunately, this happens *after* any of the default 
          * startup methods of an activity, so we need to poll for it 
          * 
          * In order to get the fb, we need to let the Service start up
@@ -71,7 +71,7 @@ public class RockboxActivity extends Activity
                 }
                 /* drawing needs to happen in ui thread */
                 runOnUiThread(new Runnable() 
-                {    @Override
+                {    
                     public void run() {
                 		loadingdialog.dismiss();
                         setContentView(RockboxService.fb);

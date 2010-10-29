@@ -64,6 +64,7 @@ public class RockboxService extends Service
     private Object[] mStopForegroundArgs = new Object[1];
     private IntentFilter itf;
     private BroadcastReceiver batt_monitor;
+    @SuppressWarnings("unused")
     private int battery_level;
 
     @Override
@@ -118,7 +119,6 @@ public class RockboxService extends Service
     private void startservice() 
     {
         final int BUFFER = 8*1024;
-        final Context me = this;
         Thread rb = new Thread(new Runnable()
         {
             public void run()
@@ -135,7 +135,7 @@ public class RockboxService extends Service
 		           ZipEntry entry;
 		           File file = new File("/data/data/org.rockbox/" +
 		           		"lib/libmisc.so");
-		           /* use arbitary file to determine whether extracting is needed */
+		           /* use arbitrary file to determine whether extracting is needed */
 		           File file2 = new File("/data/data/org.rockbox/" +
 		           		"app_rockbox/rockbox/codecs/mpa.codec");
 		           if (!file2.exists() || (file.lastModified() > file2.lastModified()))
@@ -184,8 +184,6 @@ public class RockboxService extends Service
 		        }
 		
 		        System.loadLibrary("rockbox");
-
-        		fb = new RockboxFramebuffer(me);
                 main();
             }
         },"Rockbox thread");

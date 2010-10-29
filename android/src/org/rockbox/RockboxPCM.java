@@ -148,7 +148,7 @@ public class RockboxPCM extends AudioTrack
             buf = new byte[max_len*3/4];
             refill_mark = max_len - buf.length;
         }
-        @Override
+
         public void onMarkerReached(AudioTrack track) 
         {
             /* push new data to the hardware */
@@ -186,7 +186,6 @@ public class RockboxPCM extends AudioTrack
             }
         }
 
-        @Override
         public void onPeriodicNotification(AudioTrack track) 
         {            
         }

@@ -36,37 +36,34 @@ public class RockboxFramebuffer extends View
     private Bitmap btm;
     private ByteBuffer native_buf;
 
-    public RockboxFramebuffer(Context c)
+    public RockboxFramebuffer(Context c, int lcd_width, 
+                              int lcd_height, ByteBuffer native_fb)
     {
         super(c);
-        btm = null;
 
         /* Needed so we can catch KeyEvents */
         setFocusable(true);
         setFocusableInTouchMode(true);
         setClickable(true);
+        btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
+        native_buf = native_fb;
         requestFocus();
     }
 
     public void onDraw(Canvas c) 
     {
-        if (btm != null)
-            c.drawBitmap(btm, 0.0f, 0.0f, null);
+        c.drawBitmap(btm, 0.0f, 0.0f, null);
     }
     
-    public void java_lcd_init(int lcd_width, int lcd_height, ByteBuffer native_fb)
-    {
-        btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
-        native_buf = native_fb;
-    }
-    
-    public void java_lcd_update()
+    @SuppressWarnings("unused")
+    private void java_lcd_update()
     {
         btm.copyPixelsFromBuffer(native_buf);
         postInvalidate();
     }
     
-    public void java_lcd_update_rect(int x, int y, int w, int h)
+    @SuppressWarnings("unused")
+    private void java_lcd_update_rect(int x, int y, int w, int h)
     {
         /* can't copy a partial buffer */
         btm.copyPixelsFromBuffer(native_buf);
