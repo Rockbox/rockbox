@@ -25,7 +25,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,16 +42,18 @@ public class RockboxActivity extends Activity
                        ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         final Intent intent = new Intent(this, 
                 RockboxService.class);
+        /* prepare a please wait dialog in case we need
+         * to wait for unzipping libmisc.so
+         */
         loadingdialog = new ProgressDialog(this);
-        loadingdialog.setMessage("Rockbox Loading. Please wait...");
+        loadingdialog.setMessage("Rockbox is loading. Please wait...");
         loadingdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loadingdialog.setCancelable(false);
-        loadingdialog.show();
         startService(intent);
         /* Now it gets a bit tricky:
          * The service is started in the same thread as we are now,
          * but the service also initializes the framebuffer
-         * Unfortunately, this happens *after* any of the default 
+         * Unfortunately, this happens *after* any of the default
          * startup methods of an activity, so we need to poll for it 
          * 
          * In order to get the fb, we need to let the Service start up
@@ -62,18 +63,37 @@ public class RockboxActivity extends Activity
         {
             public void run() 
             {
+                int i = 0;
                 try {
-                    while (RockboxService.fb == null)
+                    while (true)
+                    {
                         Thread.sleep(250);
+                        if (RockboxService.fb != null)
+                            break;
+                        /* if it's still null show the please wait dialog 
+                         * but not before 0.5s are over */
+                        if (!loadingdialog.isShowing() && i > 0)
+                        {
+                            runOnUiThread(new Runnable()
+                            {
+                                public void run()
+                                {
+                                    loadingdialog.show(); 
+                                }
+                            });                           
+                        }
+                        else 
+                            i++ ;
+                    }
                 } catch (InterruptedException e) {
-                } catch (Exception e) {
-                    LOG(e.toString());
                 }
                 /* drawing needs to happen in ui thread */
                 runOnUiThread(new Runnable() 
-                {    
+                {
                     public void run() {
                 		loadingdialog.dismiss();
+                		if (RockboxService.fb == null)
+                		    throw new IllegalStateException("FB NULL");
                         setContentView(RockboxService.fb);
                         RockboxService.fb.invalidate();
                     }
@@ -96,8 +116,9 @@ public class RockboxActivity extends Activity
                 ViewGroup g = (ViewGroup)RockboxService.fb.getParent();
                 g.removeView(RockboxService.fb);
                 setContentView(RockboxService.fb);
+            } finally {
+                RockboxService.fb.resume();
             }
-            RockboxService.fb.resume();
         }
     }
     
@@ -123,10 +144,5 @@ public class RockboxActivity extends Activity
     {
         super.onDestroy();
         RockboxService.fb.suspend();
-    }
-
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String) text);
     }
 }
