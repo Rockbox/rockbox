@@ -584,6 +584,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                     temp->function->param);
                     else
                         return_value = temp->function->function();
+                    if (!(menu->flags&MENU_EXITAFTERTHISMENU) ||
+                            (temp->flags&MENU_EXITAFTERTHISMENU))
+                    {
+                        init_menu_lists(menu, &lists, selected, true, vps);
+                    }
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
                         if (return_value != 0)
