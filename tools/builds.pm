@@ -224,12 +224,12 @@ $releasenotes="/wiki/ReleaseNotes37";
     },
     'sansaclipv2' => {
         name => 'SanDisk Sansa Clip v2',
-        status => 2,
+        status => 3,
         icon => 'sansaclip',
     },
     'sansaclipplus' => {
         name => 'SanDisk Sansa Clip+',
-        status => 2,
+        status => 3,
     },
     'sansae200' => {
         name => 'SanDisk Sansa e200',
@@ -246,7 +246,7 @@ $releasenotes="/wiki/ReleaseNotes37";
     },
     'sansafuzev2' => {
         name => 'SanDisk Sansa Fuze v2',
-        status => 2,
+        status => 3,
         icon => 'sansafuze',
     },
     'sansam200' => {
