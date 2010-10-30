@@ -66,7 +66,7 @@
 #define CONFIG_RTC RTC_AS3514
 
 /* Define if the device can wake from an RTC alarm */
-#define HAVE_RTC_ALARM
+/* #define HAVE_RTC_ALARM */
 #endif
 
 /* There is no hardware tone control */
