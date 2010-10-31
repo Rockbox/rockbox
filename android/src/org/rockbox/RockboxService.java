@@ -311,30 +311,26 @@ public class RockboxService extends Service
 
     public void startForeground() 
     {
-        if (instance != null) 
-        {
-            /* 
-             * Send the notification.
-             * We use a layout id because it is a unique number.  
-             * We use it later to cancel.
-             */
-            instance.mNM.notify(R.string.notification, instance.notification);
-            /*
-             * this call makes the service run as foreground, which
-             * provides enough cpu time to do music decoding in the 
-             * background
-             */
-            instance.startForegroundCompat(R.string.notification, 
-                    instance.notification);
-        }
+        /* 
+         * Send the notification.
+         * We use a layout id because it is a unique number.  
+         * We use it later to cancel.
+         */
+        mNM.notify(R.string.notification, instance.notification);
+        /*
+         * this call makes the service run as foreground, which
+         * provides enough cpu time to do music decoding in the 
+         * background
+         */
+        startForegroundCompat(R.string.notification, notification);
     }
     
     public void stopForeground() 
     {
-        if (instance.notification != null)
+        if (notification != null)
         {
-            instance.stopForegroundCompat(R.string.notification);
-            instance.mNM.cancel(R.string.notification);
+            stopForegroundCompat(R.string.notification);
+            mNM.cancel(R.string.notification);
         }
     }
 
