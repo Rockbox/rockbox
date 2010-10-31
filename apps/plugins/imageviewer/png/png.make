@@ -19,7 +19,7 @@ PNG_OBJ := $(call c2obj, $(PNG_SRC))
 OTHER_SRC += $(PNG_SRC)
 
 # Use -O3 for png plugin : it gives a bigger file but very good performances
-PNGFLAGS = $(PLUGINFLAGS) -O3 -DNO_GZCOMPRESS -DNO_GZIP
+PNGFLAGS = $(PLUGINFLAGS) -Os
 
 $(PNGBUILDDIR)/png.rock: $(PNG_OBJ)
 

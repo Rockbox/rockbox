@@ -1,5 +1,3 @@
 bmp
 jpeg
-#ifdef HAVE_LCD_COLOR
 png
-#endif

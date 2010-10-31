@@ -23,7 +23,3 @@
  ****************************************************************************/
 
 #include "../imageviewer.h"
-
-#define OUT_OF_MEMORY   9900
-#define FILE_TOO_LARGE  9910
-

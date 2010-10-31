@@ -1,7 +1,6 @@
-adler32.c
-crc32_png.c
-inffast.c
-inflate.c
-inftrees.c
+crc32.c
+tinflate.c
+tinfzlib.c
+png_decoder.c
 png.c
 png_ui.c
