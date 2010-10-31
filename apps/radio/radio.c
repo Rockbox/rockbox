@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "mas.h"
 #include "settings.h"
 #include "button.h"
 #include "status.h"

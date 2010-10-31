@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: dac.h 24158 2010-01-03 11:31:14Z Buschel $
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
@@ -18,12 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _DAC_H_
-#define _DAC_H_
+#ifndef _DAC3550A_H_
+#define _DAC3550A_H_
 
 #include "config.h"
-
-#ifdef HAVE_DAC3550A
 
 /*
     DAC I2C defs
@@ -38,11 +36,12 @@
 #define DAC_AVOL        2
 #define DAC_GCFG        3
 
+/* function prototypes */
+extern int  tenthdb2reg(int db);
 extern int  dac_volume(unsigned int left, unsigned int right, bool deemph);
 extern void dac_enable(bool enable);
 extern void dac_line_in(bool enable);
 extern void dac_init(void);
 
-#endif
+#endif /* _DAC3550A_H_ */
 
-#endif

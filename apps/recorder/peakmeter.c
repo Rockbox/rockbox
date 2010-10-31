@@ -22,7 +22,6 @@
 #if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
 #include <stdlib.h> /* sim uses rand for peakmeter simulation */
 #endif
-#include "mas.h"
 #include "thread.h"
 #include "kernel.h"
 #include "settings.h"

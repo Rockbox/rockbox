@@ -77,7 +77,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "recording.h"
 #endif
 #else
-#include "mas.h"
+#include "mas35xx.h"
 #endif /* CONFIG_CODEC == SWCODEC */
 #include "settings.h"
 #include "timer.h"

@@ -175,7 +175,7 @@ drivers/led.c
 drivers/button.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_DAC3550A
-drivers/dac.c
+drivers/audio/dac3550a.c
 #endif
 #ifdef HAVE_SERIAL
 drivers/serial.c
@@ -289,9 +289,6 @@ drivers/tuner/rda5802.c
 #endif /* BOOTLOADER */
 
 /* Sound */
-#if CONFIG_CODEC != SWCODEC
-mp3_playback.c
-#endif /* CONFIG_CODEC != SWCODEC */
 sound.c
 
 #if CONFIG_CODEC == SWCODEC
@@ -303,15 +300,6 @@ pcm.c
 enc_base.c
 #endif /* HAVE_RECORDING */
 #endif /* BOOTLOADER */
-
-#else  /* !SWCODEC */
-
-#ifndef BOOTLOADER
-#ifndef SIMULATOR
-drivers/mas.c
-#endif /* SIMULATOR */
-#endif /* BOOTLOADER */
-
 #endif /* SWCODEC */
 
 /* Audio codec */
@@ -574,6 +562,8 @@ target/sh/archos/player/lcd-player.c
 target/sh/archos/player/power-player.c
 target/sh/archos/player/powermgmt-player.c
 target/sh/archos/player/usb-player.c
+target/sh/archos/mascodec-archos.c
+target/sh/archos/audio-archos.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
 
@@ -588,6 +578,8 @@ target/sh/archos/recorder/button-recorder.c
 target/sh/archos/recorder/power-recorder.c
 target/sh/archos/recorder/powermgmt-recorder.c
 target/sh/archos/recorder/usb-recorder.c
+target/sh/archos/mascodec-archos.c
+target/sh/archos/audio-archos.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
 
@@ -602,6 +594,8 @@ target/sh/archos/fm_v2/button-fm_v2.c
 target/sh/archos/fm_v2/power-fm_v2.c
 target/sh/archos/fm_v2/powermgmt-fm_v2.c
 target/sh/archos/fm_v2/usb-fm_v2.c
+target/sh/archos/mascodec-archos.c
+target/sh/archos/audio-archos.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
 
@@ -614,6 +608,8 @@ target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/powermgmt-ondio.c
 target/sh/archos/ondio/usb-ondio.c
+target/sh/archos/mascodec-archos.c
+target/sh/archos/audio-archos.c
 #if (CONFIG_TUNER & TEA5767)
 target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif

@@ -22,6 +22,7 @@
 #define __PEAKMETER_H__
 
 #define PEAK_METER_FPS 20
+#define MAX_PEAK 0x8000
 
 /*#define PM_DEBUG */
 #ifdef PM_DEBUG 

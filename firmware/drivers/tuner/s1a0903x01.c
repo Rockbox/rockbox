@@ -27,7 +27,7 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
 #include "sound.h"
-#include "mas.h"
+#include "mas35xx.h"
 #include "power.h"
 
 #define DEFAULT_IN1 0x100003 /* Mute */

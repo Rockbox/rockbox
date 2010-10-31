@@ -40,7 +40,113 @@ void audio_set_buffer_margin(int seconds)
 {
      (void)seconds;
 }
-#endif
+
+/* firmware/target/sh/archos/audio-archos.c */
+
+/* list of tracks in memory */
+#define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
+#define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
+
+static bool paused; /* playback is paused */
+static bool playing; /* We are playing an MP3 stream */
+
+bool audio_is_initialized = false;
+
+void mp3_init(int volume, int bass, int treble, int balance, int loudness,
+              int avc, int channel_config, int stereo_width,
+              int mdb_strength, int mdb_harmonics,
+              int mdb_center, int mdb_shape, bool mdb_enable,
+              bool superbass)
+{
+    (void)volume;
+    (void)bass;
+    (void)treble;
+    (void)balance;
+    (void)loudness;
+    (void)avc;
+    (void)channel_config;
+    (void)stereo_width;
+    (void)mdb_strength;
+    (void)mdb_harmonics;
+    (void)mdb_center;
+    (void)mdb_shape;
+    (void)mdb_enable;
+    (void)superbass;
+    audio_is_initialized = true;
+
+    playing = false;
+    paused = true;
+}
+
+void mp3_play_pause(bool play)
+{
+    (void)play;
+}
+
+void mp3_play_stop(void)
+{
+}
+
+unsigned char* mp3_get_pos(void)
+{
+    return NULL;
+}
+
+void mp3_play_data(const unsigned char* start, int size,
+    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
+)
+{
+    (void)start; (void)size; (void)get_more;
+}
+
+/* firmware/drivers/audio/mas35xx.c */
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+void audiohw_set_loudness(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_avc(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_mdb_strength(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_mdb_harmonics(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_mdb_center(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_mdb_shape(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_mdb_enable(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_superbass(int value)
+{
+    (void)value;
+}
+
+void audiohw_set_pitch(unsigned long value)
+{
+    (void)value;
+}
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+#endif /* CODEC != SWCODEC */
 
 int fat_startsector(void)
 {

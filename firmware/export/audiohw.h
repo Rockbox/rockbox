@@ -59,6 +59,9 @@
 #include "as3514.h"
 #elif defined(HAVE_MAS35XX)
 #include "mas35xx.h"
+#if defined(HAVE_DAC3550A)
+#include "dac3550a.h"
+#endif /* HAVE_DAC3550A */
 #elif defined(HAVE_TSC2100)
 #include "tsc2100.h"
 #elif defined(HAVE_JZ4740_CODEC)

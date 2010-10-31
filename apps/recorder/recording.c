@@ -42,7 +42,6 @@
 #include "pcm_record.h"
 #include "recording.h"
 #include "mp3_playback.h"
-#include "mas.h"
 #include "button.h"
 #include "kernel.h"
 #include "settings.h"

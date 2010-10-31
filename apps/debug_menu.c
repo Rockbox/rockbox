@@ -61,7 +61,6 @@
 #include "rtc.h"
 #include "storage.h"
 #include "fat.h"
-#include "mas.h"
 #include "eeprom_24cxx.h"
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 #include "sdmmc.h"

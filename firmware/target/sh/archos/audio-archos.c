@@ -28,12 +28,8 @@
 #include <kernel.h>
 #include "mp3_playback.h"
 #include "sound.h"
-#ifndef SIMULATOR
 #include "i2c.h"
-#include "mas.h"
-#include "dac.h"
 #include "system.h"
-#endif
 #include "audiohw.h"
 
 /* hacking into mpeg.c, recording is still there */
@@ -56,14 +52,12 @@ extern unsigned shadow_codec_reg0;
 static bool paused; /* playback is paused */
 static bool playing; /* We are playing an MP3 stream */
 
-#ifndef SIMULATOR
 /* for measuring the play time */
 static long playstart_tick;
 static long cumulative_ticks;
 
 /* the registered callback function to ask for more mp3 data */
 static void (*callback_for_more)(unsigned char**, size_t*);
-#endif /* #ifndef SIMULATOR */
 
 /* list of tracks in memory */
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
@@ -76,8 +70,6 @@ bool audio_is_initialized = false;
 /* dirty calls to mpeg.c */
 extern void playback_tick(void);
 extern void rec_tick(void);
-
-#ifndef SIMULATOR
 
 unsigned long mas_version_code;
 
@@ -132,7 +124,6 @@ static void postpone_dma_tick(void)
     TSTR |= 0x02; /* Start timer 1 */
 }
 #endif
-
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void demand_irq_enable(bool on)
@@ -328,7 +319,6 @@ static void init_playback(void)
     DEBUGF("MAS Decoding application started\n");
 }
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
-#endif /* SIMULATOR */
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int avc, int channel_config, int stereo_width,
@@ -336,23 +326,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass)
 {
-#ifdef SIMULATOR
-    (void)volume;
-    (void)bass;
-    (void)treble;
-    (void)balance;
-    (void)loudness;
-    (void)avc;
-    (void)channel_config;
-    (void)stereo_width;
-    (void)mdb_strength;
-    (void)mdb_harmonics;
-    (void)mdb_center;
-    (void)mdb_shape;
-    (void)mdb_enable;
-    (void)superbass;
-    audio_is_initialized = true;
-#else
 #if CONFIG_CODEC == MAS3507D
     unsigned long val;
     (void)loudness;
@@ -469,7 +442,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     sound_set(SOUND_MDB_ENABLE, mdb_enable);
     sound_set(SOUND_SUPERBASS, superbass);
 #endif
-#endif /* !SIMULATOR */
 
     playing = false;
     paused = true;
@@ -477,7 +449,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 
 void mp3_shutdown(void)
 {
-#ifndef SIMULATOR
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned long val = 1;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &val, 1); /* Mute */
@@ -486,13 +457,9 @@ void mp3_shutdown(void)
 #if CONFIG_CODEC == MAS3507D
     dac_volume(0, 0, false);
 #endif
-
-#endif
 }
 
 /* new functions, to be exported to plugin API */
-
-#ifndef SIMULATOR
 
 void mp3_play_init(void)
 {
@@ -594,25 +561,3 @@ unsigned char* mp3_get_pos(void)
 {
     return (unsigned char*)SAR3;
 }
-#else  /* #ifndef SIMULATOR */
-
-void mp3_play_pause(bool play)
-{
-    (void)play;
-}
-void mp3_play_stop(void)
-{
-}
-
-unsigned char* mp3_get_pos(void)
-{
-    return NULL;
-}
-
-void mp3_play_data(const unsigned char* start, int size,
-    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
-)
-{
-    (void)start; (void)size; (void)get_more;
-}
-#endif 

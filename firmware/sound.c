@@ -26,16 +26,17 @@
 #include "logf.h"
 #include "system.h"
 #include "i2c.h"
-#include "mas.h"  
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if CONFIG_CPU == PNX0101
 #include "pnx0101.h"
-#endif
-#include "dac.h"
+#endif /* CONFIG_CPU == PNX101 */
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
+#else /* !CONFIG_CODEC == HWCODEC */
+#include "mas35xx.h"
+#include "dac3550a.h"
 #endif
-#endif
+#endif /* !SIMULATOR */
 
 /* TODO
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
@@ -162,18 +163,6 @@ void sound_set_dsp_callback(int (*func)(int, intptr_t))
 }
 #endif
 
-#if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
-/* convert tenth of dB volume (-780..+180) to dac3550 register value */
-static int tenthdb2reg(int db)
-{
-    if (db < -540)                  /* 3 dB steps */
-        return (db + 780) / 30;
-    else                            /* 1.5 dB steps */
-        return (db + 660) / 15;
-}
-#endif
-
-
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 /*
  * The prescaler compensates for any kind of boosts, to prevent clipping.
@@ -281,12 +270,6 @@ static void set_prescaled_volume(void)
 #endif /* !HAVE_SDL_AUDIO */
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
-
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-static unsigned long mdb_shape_shadow = 0;
-static unsigned long loudness_shadow = 0;
-#endif
 
 void sound_set_volume(int value)
 {
@@ -620,86 +603,64 @@ void sound_set_loudness(int value)
 {
     if(!audio_is_initialized)
         return;
-    loudness_shadow = (loudness_shadow & 0x04) |
-                       (MAX(MIN(value * 4, 0x44), 0) << 8);
-    mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
+
+    audiohw_set_loudness(value);
 }
 
 void sound_set_avc(int value)
 {
     if(!audio_is_initialized)
         return;
-    int tmp;
 
-    static const uint16_t avc_vals[] =
-    {
-        (0x1 << 8) | (0x8 << 12), /* 20ms */
-        (0x2 << 8) | (0x8 << 12), /* 2s */
-        (0x4 << 8) | (0x8 << 12), /* 4s */
-        (0x8 << 8) | (0x8 << 12), /* 8s */
-    };
-    switch (value) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-            tmp = avc_vals[value -1];
-            break;
-        case -1: /* turn off and then turn on again to decay quickly */
-            tmp = mas_codec_readreg(MAS_REG_KAVC);
-            mas_codec_writereg(MAS_REG_KAVC, 0);
-            break;
-        default: /* off */
-            tmp = 0;
-            break;
-    }
-    mas_codec_writereg(MAS_REG_KAVC, tmp);     
+    audiohw_set_avc(value);
 }
 
 void sound_set_mdb_strength(int value)
 {
     if(!audio_is_initialized)
         return;
-    mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8); 
+
+    audiohw_set_mdb_strength(value);
 }
 
 void sound_set_mdb_harmonics(int value)
 {
     if(!audio_is_initialized)
         return;
-    int tmp = value * 127 / 100;
-    mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0x7f) << 8);
+
+    audiohw_set_mdb_harmonics(value);
 }
 
 void sound_set_mdb_center(int value)
 {
     if(!audio_is_initialized)
         return;
-    mas_codec_writereg(MAS_REG_KMDB_FC, (value/10) << 8);
+
+    audiohw_set_mdb_center(value);
 }
 
 void sound_set_mdb_shape(int value)
 {
     if(!audio_is_initialized)
         return;
-    mdb_shape_shadow = (mdb_shape_shadow & 0x02) | ((value/10) << 8);
-    mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+
+    audiohw_set_mdb_shape(value);
 }
 
 void sound_set_mdb_enable(int value)
 {
     if(!audio_is_initialized)
         return;
-    mdb_shape_shadow = (mdb_shape_shadow & ~0x02) | (value?2:0);
-    mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+
+    audiohw_set_mdb_enable(value);
 }
 
 void sound_set_superbass(int value)
 {
     if(!audio_is_initialized)
         return;
-    loudness_shadow = (loudness_shadow & ~0x04) | (value?4:0);
-    mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
+
+    audiohw_set_superbass(value);
 }
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
@@ -847,11 +808,7 @@ void sound_set_pitch(int32_t pitch)
         /* Calculate the new (bogus) frequency */
         val = 18432 * PITCH_SPEED_100 / pitch;
 
-        mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
-
-        /* We must tell the MAS that the frequency has changed.
-         * This will unfortunately cause a short silence. */
-        mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+        audiohw_set_pitch(val);
 
         last_pitch = pitch;
     }

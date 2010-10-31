@@ -46,9 +46,9 @@
 
 #include "i2c.h"
 
-#include "mas.h"
+#include "mas35xx.h"
 
-#include "dac.h"
+#include "dac3550a.h"
 
 #include "sh7034.h"
 

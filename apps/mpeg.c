@@ -45,7 +45,7 @@
 #include "settings.h"
 #ifndef SIMULATOR
 #include "i2c.h"
-#include "mas.h"
+#include "mas35xx.h"
 #include "system.h"
 #include "usb.h"
 #include "file.h"
@@ -53,7 +53,7 @@
 #endif /* !SIMULATOR */
 #ifdef HAVE_LCD_BITMAP
 #include "lcd.h"
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
 #define MPEG_SWAP_CHUNKSIZE  0x2000
 #define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we
