@@ -277,7 +277,6 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
                                 long *buf, int n){
   long *bufptr = buf;
   long *bufend = buf + n;
-  const unsigned int cachemask = (1<<book->dec_firsttablen)-1;
 
   while (bufptr<bufend) {
     if (b->headend > 8) {
@@ -286,34 +285,42 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
       unsigned long adr;
       ogg_uint32_t cache = 0;
       int cachesize = 0;
+      const unsigned int cachemask = (1<<book->dec_firsttablen)-1;
+      const int          book_dec_maxlength = book->dec_maxlength;
+      const ogg_uint32_t *book_dec_firsttable = book->dec_firsttable;
+      const long         book_used_entries = book->used_entries;
+      const ogg_uint32_t *book_codelist = book->codelist;
+      const char         *book_dec_codelengths = book->dec_codelengths;
 
       adr = (unsigned long)b->headptr;
       bit = (adr&3)*8+b->headbit;
-      ptr = (ogg_uint32_t *)(adr&~3);
+      ptr = (ogg_uint32_t*)(adr&~3);
       bitend = ((adr&3)+b->headend)*8;
       while (bufptr<bufend){
-        if (UNLIKELY(cachesize<book->dec_maxlength)) {
+        if (UNLIKELY(cachesize<book_dec_maxlength)) {
           if (bit-cachesize+32>=bitend)
             break;
           bit-=cachesize;
-          cache=letoh32(ptr[bit>>5]) >> (bit&31);
-          if (bit&31)
-            cache|=letoh32(ptr[(bit>>5)+1]) << (32-(bit&31));
+          cache = letoh32(ptr[bit>>5]);
+          if (bit&31) {
+            cache >>= (bit&31);
+            cache |= letoh32(ptr[(bit>>5)+1]) << (32-(bit&31));
+          }
           cachesize=32;
           bit+=32;
         }
 
-        ogg_int32_t entry = book->dec_firsttable[cache&cachemask];
+        ogg_int32_t entry = book_dec_firsttable[cache&cachemask];
         if(UNLIKELY(entry < 0)){
-          const long lo = (entry>>15)&0x7fff, hi = book->used_entries-(entry&0x7fff);
-          entry = bisect_codelist(lo, hi, cache, book->codelist);
+          const long lo = (entry>>15)&0x7fff, hi = book_used_entries-(entry&0x7fff);
+          entry = bisect_codelist(lo, hi, cache, book_codelist);
         }else
           entry--;
 
-        *bufptr++=entry;
-        int l=book->dec_codelengths[entry];
-        cachesize-=l;
-        cache>>=l;
+        *bufptr++ = entry;
+        int l = book_dec_codelengths[entry];
+        cachesize -= l;
+        cache >>= l;
       }
 
       adr=(unsigned long)b->headptr;
