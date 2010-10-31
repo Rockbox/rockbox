@@ -24,7 +24,6 @@ package org.rockbox;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -167,15 +166,15 @@ public class RockboxActivity extends Activity
     	if (hostcallback !=  null)
     	{
     		LOG("Something has gone wrong");
-    	}
-    	hostcallback = callback;
-    	startActivityForResult(i, 0);
+        }
+        hostcallback = callback;
+        startActivityForResult(i, 0);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-    	hostcallback.onComplete(resultCode, data);
-    	hostcallback = null;
+        hostcallback.onComplete(resultCode, data);
+        hostcallback = null;
     }
 
     private void LOG(CharSequence text)

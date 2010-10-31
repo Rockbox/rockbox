@@ -26,8 +26,8 @@
 #include <stdio.h>
 #include <system.h>
 
-extern JNIEnv *env_ptr;
-static jclass    RockboxKeyboardInput_class = NULL;
+extern JNIEnv   *env_ptr;
+static jclass    RockboxKeyboardInput_class;
 static jobject   RockboxKeyboardInput_instance;
 static jmethodID kbd_inputfunc, kbd_result;
 
@@ -38,18 +38,24 @@ static void kdb_init(void)
     if (RockboxKeyboardInput_class == NULL)
     {
         /* get the class and its constructor */
-        RockboxKeyboardInput_class = e->FindClass(env_ptr, "org/rockbox/RockboxKeyboardInput");
-        jmethodID constructor = e->GetMethodID(env_ptr, RockboxKeyboardInput_class, "<init>", "()V");
-        RockboxKeyboardInput_instance = e->NewObject(env_ptr, RockboxKeyboardInput_class, constructor);
+        RockboxKeyboardInput_class = e->FindClass(env_ptr,
+                                            "org/rockbox/RockboxKeyboardInput");
+        jmethodID constructor = e->GetMethodID(env_ptr,
+                                               RockboxKeyboardInput_class,
+                                               "<init>", "()V");
+        RockboxKeyboardInput_instance = e->NewObject(env_ptr,
+                                                     RockboxKeyboardInput_class,
+                                                     constructor);
         kbd_inputfunc = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                    "kbd_input", "(Ljava/lang/String;)V");
-        kbd_result = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                    "get_result", "()Ljava/lang/String;");
+                                       "kbd_input", "(Ljava/lang/String;)V");
+        kbd_result =    e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
+                                       "get_result", "()Ljava/lang/String;");
     }
     /* need to get it every time incase the activity died/restarted */
     kbd_is_usable = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                "is_usable", "()Z");
-    while (!e->CallBooleanMethod(env_ptr, RockboxKeyboardInput_instance, kbd_is_usable))
+                                   "is_usable", "()Z");
+    while (!e->CallBooleanMethod(env_ptr, RockboxKeyboardInput_instance,
+                                                            kbd_is_usable))
         sleep(HZ/10);
 }
 
@@ -61,11 +67,12 @@ int kbd_input(char* text, int buflen)
     const char* retchars;
     kdb_init();
 
-    e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance, kbd_inputfunc, str);
+    e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance,kbd_inputfunc,str);
 
     do {
         sleep(HZ/10);
-        ret = e->CallObjectMethod(env_ptr, RockboxKeyboardInput_instance, kbd_result);
+        ret = e->CallObjectMethod(env_ptr, RockboxKeyboardInput_instance,
+                                                                    kbd_result);
     } while (!ret);
     
     e->ReleaseStringUTFChars(env_ptr, str, NULL);

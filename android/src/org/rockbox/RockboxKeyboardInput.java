@@ -22,48 +22,43 @@
 package org.rockbox;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.util.Log;
 
 public class RockboxKeyboardInput
 {
-	private BroadcastReceiver b;
 	private String result;
 	
     public RockboxKeyboardInput()
     {
-    	result = null;
+        result = null;
     }    
 
     public void kbd_input(String text) 
     {
-    	RockboxActivity a = (RockboxActivity) RockboxService.get_instance().get_activity();
-    	Intent kbd = new Intent(a, KeyboardActivity.class);
-    	kbd.putExtra("value", text);
-    	a.waitForActivity(kbd, new HostCallback(){
-
-			@Override
-			public void onComplete(int resultCode, Intent data) {
-				if (resultCode == Activity.RESULT_OK)
-				{
-					result = data.getStringExtra("value");
-				}
-				else {
-					result = "";
-				}
-			}
-		});
+        RockboxActivity a = (RockboxActivity) RockboxService.get_instance().get_activity();
+        Intent kbd = new Intent(a, KeyboardActivity.class);
+        kbd.putExtra("value", text);
+        a.waitForActivity(kbd, new HostCallback()
+        {
+            public void onComplete(int resultCode, Intent data) 
+            {
+                if (resultCode == Activity.RESULT_OK)
+                {
+                    result = data.getStringExtra("value");
+                }
+                else {
+                    result = "";
+                }
+            }
+        });
     }
-	public String get_result()
+    public String get_result()
     {
-    	return result;
+        return result;
     }
-	
-	public boolean is_usable()
-	{
-		return RockboxService.get_instance().get_activity() != null;
-	}
     
-
+    public boolean is_usable()
+    {
+        return RockboxService.get_instance().get_activity() != null;
+    }
 }
