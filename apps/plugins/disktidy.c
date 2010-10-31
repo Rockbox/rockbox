@@ -36,6 +36,8 @@ enum tidy_return
 #define MAX_TYPES 64
 struct tidy_type {
     char filestring[64];
+    int  pre;
+    int  post;
     bool directory;
     bool remove;
 } tidy_types[MAX_TYPES];
@@ -46,6 +48,7 @@ bool tidy_loaded_and_changed = false;
 #define CUSTOM_FILES  PLUGIN_APPS_DIR "/disktidy_custom.config"
 void add_item(const char* name, int index)
 {
+    char *a;
     rb->strcpy(tidy_types[index].filestring, name);
     if (name[rb->strlen(name)-1] == '/')
     {
@@ -54,6 +57,17 @@ void add_item(const char* name, int index)
     }
     else
         tidy_types[index].directory = false;
+    a = rb->strchr(name, '*');
+    if (a)
+    {
+        tidy_types[index].pre = a - name;
+        tidy_types[index].post = rb->strlen(a+1);
+    }
+    else
+    {
+        tidy_types[index].pre = -1;
+        tidy_types[index].post = -1;
+    }
 }
 static int find_file_string(const char *file, char *last_group)
 {
@@ -89,9 +103,7 @@ static int find_file_string(const char *file, char *last_group)
         /* shift items up one */
         for (i=tidy_type_count;i>idx_last_group;i--)
         {
-            rb->strcpy(tidy_types[i].filestring, tidy_types[i-1].filestring);
-            tidy_types[i].directory = tidy_types[i-1].directory;
-            tidy_types[i].remove = tidy_types[i-1].remove;
+            rb->memcpy(&tidy_types[i], &tidy_types[i-1], sizeof(struct tidy_type));
         }
         tidy_type_count++;
         add_item(file, idx_last_group+1);
@@ -132,22 +144,33 @@ bool tidy_load_file(const char* file)
     return true;
 }
 
+static bool match(struct tidy_type *tidy_type, char *string, int len)
+{
+    char *pattern = tidy_type->filestring;
+    if (tidy_type->pre < 0)
+    {
+        /* no '*', just compare. */
+        return (rb->strcmp(pattern, string) == 0);
+    }
+    /* pattern is too long for the string. avoid 'ab*bc' matching 'abc'. */
+    if (len < tidy_type->pre + tidy_type->post)
+        return false;
+    /* pattern has '*', compare former part of '*' to the begining of
+       the string and compare next part of '*' to the end of string. */
+    return (rb->strncmp(pattern, string, tidy_type->pre) == 0 &&
+            rb->strcmp(pattern + tidy_type->pre + 1,
+                        string + len - tidy_type->post) == 0);
+}
+
 bool tidy_remove_item(char *item, int attr)
 {
     int i;
-    char *file;
-    bool ret = false, rem = false;
+    int len;
+    bool ret = false;
+    len = rb->strlen(item);
     for (i=0; ret == false && i < tidy_type_count; i++)
     {
-        file = tidy_types[i].filestring;
-        if (file[rb->strlen(file)-1] == '*')
-        {
-            if (!rb->strncmp(file, item, rb->strlen(file)-1))
-                rem = true;
-        }
-        else if (!rb->strcmp(file, item))
-            rem = true;
-        if (rem)
+        if (match(&tidy_types[i], item, len))
         {
             if (!tidy_types[i].remove)
                 return false;
