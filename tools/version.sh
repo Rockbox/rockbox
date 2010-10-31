@@ -90,24 +90,27 @@ bzrversion() {
 #
 if [ -n "$1" ]; then TOP=$1; else TOP=..; fi
 
-# If the VERSIONFILE exisits we use that
-VERSIONFILE=docs/VERSION
-if [ -r $TOP/$VERSIONFILE ]; then VER=`cat $TOP/$VERSIONFILE`; 
-else
-    # Ok, we need to derive it from the Version Control system
-    if [ -d "$TOP/.git" ]; then
-	VER=`gitversion $TOP`
-    elif [ -d "$TOP/.bzr" ]; then
-	VER=`bzrversion $TOP`
+# setting VERSION var on commandline has precedence
+if [ -z $VERSION ]; then
+    # If the VERSIONFILE exisits we use that
+    VERSIONFILE=docs/VERSION
+    if [ -r $TOP/$VERSIONFILE ]; then VER=`cat $TOP/$VERSIONFILE`; 
     else
-	VER=`svnversion_safe $TOP`;
-	if [ "$VER" = "unknown" ]; then
-        # try getting it from a subdir to test if perhaps they are symlinked
-        # from the root
-        VER=`svnversion_safe $TOP/tools`;
-	fi
+        # Ok, we need to derive it from the Version Control system
+        if [ -d "$TOP/.git" ]; then
+	    VER=`gitversion $TOP`
+        elif [ -d "$TOP/.bzr" ]; then
+	    VER=`bzrversion $TOP`
+        else
+	    VER=`svnversion_safe $TOP`;
+	    if [ "$VER" = "unknown" ]; then
+            # try getting it from a subdir to test if perhaps they are symlinked
+            # from the root
+                VER=`svnversion_safe $TOP/tools`;
+	    fi
+        fi
     fi
-fi
 VERSION=$VER-`date -u +%y%m%d`
+fi
 echo $VERSION
 
