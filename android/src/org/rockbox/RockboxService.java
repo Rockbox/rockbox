@@ -35,6 +35,7 @@ import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -61,6 +62,7 @@ public class RockboxService extends Service
     /* locals needed for the c code and rockbox state */
     private RockboxFramebuffer fb = null;
     private boolean mRockboxRunning = false;
+    private Activity current_activity = null; 
     
     private Notification notification;
     private static final Class<?>[] mStartForegroundSignature = 
@@ -113,6 +115,16 @@ public class RockboxService extends Service
     	fb = newfb;
         mRockboxRunning = true;
     }
+    
+    public Activity get_activity()
+    {
+    	return current_activity;
+    }
+    public void set_activity(Activity a)
+    {
+    	current_activity = a;
+    }
+    
 
     private void do_start(Intent intent)
     {

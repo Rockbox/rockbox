@@ -116,7 +116,11 @@ player/keyboard.c
 #ifdef HAVE_LCD_BITMAP
 recorder/bmp.c
 recorder/icons.c
+#if (CONFIG_PLATFORM&PLATFORM_ANDROID)
+hosted/keyboard.c
+#else
 recorder/keyboard.c
+#endif
 recorder/peakmeter.c
 #if defined(HAVE_ALBUMART) || defined(HAVE_JPEG)
 recorder/resize.c

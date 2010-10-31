@@ -24,7 +24,9 @@ package org.rockbox;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,6 +43,7 @@ public class RockboxActivity extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
                        ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        final Activity thisActivity = this;
         final Intent intent = new Intent(this, RockboxService.class);
         /* prepare a please wait dialog in case we need
          * to wait for unzipping libmisc.so
@@ -95,7 +98,8 @@ public class RockboxActivity extends Activity
                 		loadingdialog.dismiss();
                 		if (rbservice.get_fb() == null)
                 		    throw new IllegalStateException("FB NULL");
-                        setContentView(rbservice.get_fb());
+                        rbservice.set_activity(thisActivity);
+                		setContentView(rbservice.get_fb());
                         rbservice.get_fb().invalidate();
                     }
                 });
@@ -111,6 +115,7 @@ public class RockboxActivity extends Activity
     
     public void onResume()
     {
+    	
         super.onResume();
         if (isRockboxRunning())
         {
@@ -123,6 +128,7 @@ public class RockboxActivity extends Activity
                 g.removeView(rbservice.get_fb());
                 setContentView(rbservice.get_fb());
             } finally {
+            	rbservice.set_activity(this);
                 rbservice.get_fb().resume();
             }
         }
@@ -135,6 +141,7 @@ public class RockboxActivity extends Activity
     protected void onPause() 
     {
         super.onPause();
+        rbservice.set_activity(null);
         rbservice.get_fb().suspend();
     }
     
@@ -142,6 +149,7 @@ public class RockboxActivity extends Activity
     protected void onStop() 
     {
         super.onStop();
+        rbservice.set_activity(null);
         rbservice.get_fb().suspend();
     }
     
@@ -149,6 +157,29 @@ public class RockboxActivity extends Activity
     protected void onDestroy() 
     {
         super.onDestroy();
+        rbservice.set_activity(null);
         rbservice.get_fb().suspend();
+    }
+    
+    private HostCallback hostcallback = null;
+    public void waitForActivity(Intent i, HostCallback callback)
+    {
+    	if (hostcallback !=  null)
+    	{
+    		LOG("Something has gone wrong");
+    	}
+    	hostcallback = callback;
+    	startActivityForResult(i, 0);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+    	hostcallback.onComplete(resultCode, data);
+    	hostcallback = null;
+    }
+
+    private void LOG(CharSequence text)
+    {
+        Log.d("Rockbox", (String) text);
     }
 }

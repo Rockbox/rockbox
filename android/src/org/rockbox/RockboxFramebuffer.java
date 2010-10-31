@@ -118,12 +118,11 @@ public class RockboxFramebuffer extends View
         setFocusableInTouchMode(true);
         setClickable(true);
         requestFocus();
-        /* make updates again, the underlying function will 
-         * send an event */
         set_lcd_active(1);
     }
 
     public native void set_lcd_active(int active);
     public native void touchHandler(boolean down, int x, int y);
     public native boolean buttonHandler(int keycode, boolean state);
+    
 }
