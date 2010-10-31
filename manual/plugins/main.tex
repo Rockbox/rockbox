@@ -148,8 +148,10 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
             Movie Player  & \fname{.rvf}                     &   \\
         }
     }
-    \opt{lcd_color}{
+    \opt{lcd_bitmap}{
         PNG viewer        & \fname{.png}                     &   \\
+    }
+    \opt{lcd_color}{
         PPM viewer        & \fname{.ppm}                     &   \\
     }
     \opt{lcd_bitmap}{
@@ -187,7 +189,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \opt{lcd_bitmap}{\opt{swcodec}{\nopt{lowmem}{\input{plugins/mpegplayer.tex}}}}
 
-\opt{lcd_bitmap}{\opt{lcd_color}{\input{plugins/pngviewer.tex}}}
+\opt{lcd_bitmap}{\input{plugins/pngviewer.tex}}
 
 \opt{lcd_color}{\input{plugins/ppmviewer.tex}}
 
