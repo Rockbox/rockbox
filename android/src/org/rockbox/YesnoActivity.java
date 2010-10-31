@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 
 public class YesnoActivity extends Activity 
 {
@@ -18,20 +17,20 @@ public class YesnoActivity extends Activity
     		.setMessage(getIntent().getStringExtra("value"))
     		.setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() 
     		{
-    			public void onClick(DialogInterface dialog, int whichButton) {
-    				setResult(RESULT_OK, getIntent());
-    				finish();
-    			}
-    		})
+    		    public void onClick(DialogInterface dialog, int whichButton) {
+                    setResult(RESULT_OK, getIntent());
+                    finish();
+                }
+            })
 
-    		.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() 
-    		{
-    			public void onClick(DialogInterface dialog, int whichButton) 
-    			{
-    				setResult(RESULT_CANCELED, getIntent());
-    				finish();
-    			}
-    		})
-    		.show();
+            .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() 
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+                    setResult(RESULT_CANCELED, getIntent());
+                    finish();
+                }
+            })
+            .show();
     }
 }
