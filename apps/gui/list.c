@@ -550,6 +550,7 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
 {
@@ -563,32 +564,38 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 #else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
-    if (global_settings.list_accel_start_delay)
-    {
-        int start_delay = global_settings.list_accel_start_delay * (HZ/2);
-        int accel_wait = global_settings.list_accel_wait * HZ/2;
 
-        if (get_action_statuscode(NULL)&ACTION_REPEAT)
+    if (action != ACTION_TOUCHSCREEN)
+    {
+        if (global_settings.list_accel_start_delay)
         {
-            if (!last_accel_tick)
-                last_accel_tick = current_tick + start_delay;
-            else if (TIME_AFTER(current_tick, last_accel_tick + accel_wait))
+            int start_delay = global_settings.list_accel_start_delay * (HZ/2);
+            int accel_wait = global_settings.list_accel_wait * HZ/2;
+
+            if (get_action_statuscode(NULL)&ACTION_REPEAT)
             {
-                last_accel_tick = current_tick;
-                next_item_modifier++;
+                if (!last_accel_tick)
+                    last_accel_tick = current_tick + start_delay;
+                else if (TIME_AFTER(current_tick, last_accel_tick + accel_wait))
+                {
+                    last_accel_tick = current_tick;
+                    next_item_modifier++;
+                }
             }
-        }
-        else if (last_accel_tick)
-        {
-            next_item_modifier = 1;
-            last_accel_tick = 0;
+            else if (last_accel_tick)
+            {
+                next_item_modifier = 1;
+                last_accel_tick = 0;
+            }
         }
     }
 #endif
-
 #if defined(HAVE_TOUCHSCREEN)
     if (action == ACTION_TOUCHSCREEN)
         action = *actionptr = gui_synclist_do_touchscreen(lists);
+    else if (action > ACTION_TOUCHSCREEN_MODE)
+        /* cancel kinetic if we got a normal button event */
+        _gui_synclist_stop_kinetic_scrolling();
 #endif
 
     switch (wrap)

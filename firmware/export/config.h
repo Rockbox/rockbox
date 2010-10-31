@@ -901,6 +901,12 @@ Lyre prototype 1 */
 #endif
 #endif /* HAVE_HEADPHONE_DETECTION */
 
+#ifdef HAVE_TOUCHSCREEN
+/* Timeout objects required for kinetic list scrolling */
+#undef  INCLUDE_TIMEOUT_API
+#define INCLUDE_TIMEOUT_API
+#endif /* HAVE_TOUCHSCREEN */
+
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
 /* USB charging support in the USB stack requires timeout objects */
 #ifndef INCLUDE_TIMEOUT_API

@@ -176,7 +176,9 @@ extern bool gui_synclist_do_button(struct gui_synclist * lists,
 
 #if  defined(HAVE_TOUCHSCREEN)
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
-unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
+extern unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
+/* only for private use in gui/list.c */
+extern void _gui_synclist_stop_kinetic_scrolling(void);
 #endif
 
 /* If the list has a pending postponed scheduled announcement, that
