@@ -1,17 +1,18 @@
 % $Id$ %
 \subsection{Disk Tidy}
-  Disk Tidy deletes junk files left behind by Windows, Linux or OS X after a USB
-  connection. Select the OS's files you want to delete in the `Files to Clean'
-  menu and select `Start Cleaning' to begin to process. The settings
-  are stored in \fname{.rockbox/rocks/apps/disktidy.config}, in a plain text
-  file that is user-modifiable to allow more entries to be added.
+  Disk Tidy deletes junk files commonly left behind by Windows, Linux and
+  OS X after connecting your \dap{} over USB. Select the files you want to
+  delete in the ``Files to Clean'' menu and select ``Start Cleaning'' to begin
+  the process. The settings are stored in the plain text file
+  \fname{.rockbox/rocks/apps/disktidy.config} that is user-modifiable to allow
+  custom entries to be added.
   
-  You can use up to one '*' as a wild-card character which matches any string.
-  the first '*' is recognized as a wild-card character and any additional '*' are 
-  literal '*'.
+  The asterisk character (``*'') can be used a wild-card which will match any
+  string; however only the first asterisk will be recognised as a wild-card 
+  with any additional uses being taken as literal.\\*
   
-  \warn{Be careful when you use custom entries.
-  You could accidentally delete important files.}
+  \warn{Be careful when you use custom entries as you could accidentally delete
+        important files.}
 
   \subsubsection{Available Options}
   \begin{description}
@@ -24,7 +25,8 @@
       \fname{/System Volume Information}.
     \item[Mac] selects OS X files. Default files are \fname{.\_*}, \fname{.DS\_Store} and
       \fname{/.Trashes}.
-    \item[Other] selects additional files added in by the user.
+    \item[Other] selects additional files added to the configuration file by the
+                 user.
   \end{description}
   
   \begin{btnmap}
