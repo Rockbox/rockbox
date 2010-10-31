@@ -465,10 +465,10 @@ static void qs_set_default(void* setting, void* defaultval)
 #endif
 #ifdef HAVE_TOUCHSCREEN
 
-#if defined(APPLICATION)
- || defined(ONDA_VX747)
- || defined(ONDA_VX767)
- || defined(ONDA_VX747P)
+#if defined(APPLICATION) \
+ || defined(ONDA_VX747)  \
+ || defined(ONDA_VX767)  \
+ || defined(ONDA_VX747P) \
  || defined(ONDA_VX777)
 
 #define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_POINT
