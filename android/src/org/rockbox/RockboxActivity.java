@@ -32,6 +32,7 @@ import android.view.WindowManager;
 public class RockboxActivity extends Activity 
 {
     private ProgressDialog loadingdialog;
+    private RockboxService rbservice;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -40,8 +41,7 @@ public class RockboxActivity extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
                        ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        final Intent intent = new Intent(this, 
-                RockboxService.class);
+        final Intent intent = new Intent(this, RockboxService.class);
         /* prepare a please wait dialog in case we need
          * to wait for unzipping libmisc.so
          */
@@ -50,6 +50,7 @@ public class RockboxActivity extends Activity
         loadingdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loadingdialog.setCancelable(false);
         startService(intent);
+        rbservice = RockboxService.get_instance();
         /* Now it gets a bit tricky:
          * The service is started in the same thread as we are now,
          * but the service also initializes the framebuffer
@@ -68,8 +69,8 @@ public class RockboxActivity extends Activity
                     while (true)
                     {
                         Thread.sleep(250);
-                        if (RockboxService.fb != null)
-                            break;
+                        if (isRockboxRunning())
+                        	break;
                         /* if it's still null show the please wait dialog 
                          * but not before 0.5s are over */
                         if (!loadingdialog.isShowing() && i > 0)
@@ -92,32 +93,37 @@ public class RockboxActivity extends Activity
                 {
                     public void run() {
                 		loadingdialog.dismiss();
-                		if (RockboxService.fb == null)
+                		if (rbservice.get_fb() == null)
                 		    throw new IllegalStateException("FB NULL");
-                        setContentView(RockboxService.fb);
-                        RockboxService.fb.invalidate();
+                        setContentView(rbservice.get_fb());
+                        rbservice.get_fb().invalidate();
                     }
                 });
             }
         }).start();
     }
+    private boolean isRockboxRunning()
+    {
+        if (rbservice == null)
+        	rbservice = RockboxService.get_instance();
+        return (rbservice!= null && rbservice.isRockboxRunning() == true);    	
+    }
     
     public void onResume()
     {
         super.onResume();
-        
-        if (RockboxService.fb != null)
+        if (isRockboxRunning())
         {
             try {
-                setContentView(RockboxService.fb);
+                setContentView(rbservice.get_fb());
             } catch (IllegalStateException e) {
                 /* we are already using the View,
                  * need to remove it and re-attach it */
-                ViewGroup g = (ViewGroup)RockboxService.fb.getParent();
-                g.removeView(RockboxService.fb);
-                setContentView(RockboxService.fb);
+                ViewGroup g = (ViewGroup)rbservice.get_fb().getParent();
+                g.removeView(rbservice.get_fb());
+                setContentView(rbservice.get_fb());
             } finally {
-                RockboxService.fb.resume();
+                rbservice.get_fb().resume();
             }
         }
     }
@@ -129,20 +135,20 @@ public class RockboxActivity extends Activity
     protected void onPause() 
     {
         super.onPause();
-        RockboxService.fb.suspend();
+        rbservice.get_fb().suspend();
     }
     
     @Override
     protected void onStop() 
     {
         super.onStop();
-        RockboxService.fb.suspend();
+        rbservice.get_fb().suspend();
     }
     
     @Override
     protected void onDestroy() 
     {
         super.onDestroy();
-        RockboxService.fb.suspend();
+        rbservice.get_fb().suspend();
     }
 }

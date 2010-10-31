@@ -46,11 +46,22 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
+/* This class is used as the main glue between java and c.
+ * All access should be done through RockboxService.get_instance() for safety.
+ */
+
 public class RockboxService extends Service 
 {
-    /* this Service is really a singleton class */
-    public static RockboxFramebuffer fb = null;
-    private static RockboxService instance;
+    /* this Service is really a singleton class - well almost.
+     * To do it properly this line should be instance = new RockboxService()
+     * but apparently that doesnt work with the way android Services are created.
+     */
+    private static RockboxService instance = null;
+    
+    /* locals needed for the c code and rockbox state */
+    private RockboxFramebuffer fb = null;
+    private boolean mRockboxRunning = false;
+    
     private Notification notification;
     private static final Class<?>[] mStartForegroundSignature = 
         new Class[] { int.class, Notification.class };
@@ -70,6 +81,7 @@ public class RockboxService extends Service
     @Override
     public void onCreate()
     {
+   		instance = this;
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         try 
         {
@@ -83,8 +95,23 @@ public class RockboxService extends Service
             /* Running on an older platform: fall back to old API */
             mStartForeground = mStopForeground = null;
         }
-        instance = this;
         startservice();
+    }
+    
+    public static RockboxService get_instance()
+    {
+    	return instance;
+    }
+    
+    public RockboxFramebuffer get_fb()
+    {
+    	return fb;
+    }
+    /* framebuffer is initialised by the native code(!) so this is needed */
+    public void set_fb(RockboxFramebuffer newfb)
+    {
+    	fb = newfb;
+        mRockboxRunning = true;
     }
 
     private void do_start(Intent intent)
@@ -190,8 +217,16 @@ public class RockboxService extends Service
         rb.setDaemon(false);
         rb.start();
     }
-
     private native void main();
+    
+    /* returns true once rockbox is up and running.
+     * This is considered done once the framebuffer is initialised
+     */
+    public boolean isRockboxRunning()
+    {
+    	return mRockboxRunning;
+    }
+
     @Override
     public IBinder onBind(Intent intent) 
     {
@@ -262,7 +297,7 @@ public class RockboxService extends Service
                 getText(R.string.notification), text, contentIntent);
     }
 
-    public static void startForeground() 
+    public void startForeground() 
     {
         if (instance != null) 
         {
@@ -282,7 +317,7 @@ public class RockboxService extends Service
         }
     }
     
-    public static void stopForeground() 
+    public void stopForeground() 
     {
         if (instance.notification != null)
         {

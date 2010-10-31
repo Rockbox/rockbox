@@ -86,7 +86,7 @@ public class RockboxPCM extends AudioTrack
         {
             if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
             {
-                RockboxService.startForeground();
+                RockboxService.get_instance().startForeground();
                 if (getState() == AudioTrack.STATE_INITIALIZED)
                 {
                     if (h == null)
@@ -113,7 +113,7 @@ public class RockboxPCM extends AudioTrack
         } catch (IllegalStateException e) {
             throw new IllegalStateException(e);
         }
-        RockboxService.stopForeground();
+        RockboxService.get_instance().stopForeground();
     }
 
     @SuppressWarnings("unused")
