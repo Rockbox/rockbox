@@ -791,12 +791,6 @@ int sound_val2phys(int setting, int value)
    The pitch value precision is based on PITCH_SPEED_PRECISION (in dsp.h)
 */
 
-#ifdef SIMULATOR
-static
-#else
-extern
-#endif
-        unsigned long shadow_io_control_main;
 static int last_pitch = PITCH_SPEED_100;
 
 void sound_set_pitch(int32_t pitch)
