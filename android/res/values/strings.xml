@@ -6,4 +6,6 @@
 <string name="OK">OK</string>
 <string name="Cancel">Cancel</string>
 <string name="KbdInputTitle">Rockbox Keyboard Input</string>
+<string name="Yes">Yes</string>
+<string name="No">No</string>
 </resources>

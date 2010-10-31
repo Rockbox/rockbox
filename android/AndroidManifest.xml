@@ -17,7 +17,8 @@
       	</activity>
         <service android:name=".RockboxService"/>
 
-    <activity android:name="KeyboardActivity" android:launchMode="singleTop"></activity>
+    <activity android:name="KeyboardActivity"></activity>
+    <activity android:name="YesnoActivity"></activity>
 </application>
 <uses-sdk android:minSdkVersion="4" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>

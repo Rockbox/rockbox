@@ -23,6 +23,7 @@ public class KeyboardActivity extends Activity
     		.setTitle(R.string.KbdInputTitle)
     		.setView(addView)
     		.setIcon(R.drawable.icon)
+    		.setCancelable(false)
     		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() 
     		{
     			public void onClick(DialogInterface dialog, int whichButton) {

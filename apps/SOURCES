@@ -89,7 +89,11 @@ gui/statusbar.c
 #ifdef HAVE_LCD_BITMAP
 gui/statusbar-skinned.c
 #endif
+#if (CONFIG_PLATFORM&PLATFORM_ANDROID)
+hosted/yesno.c
+#else
 gui/yesno.c
+#endif
 gui/viewport.c
 
 gui/skin_engine/skin_backdrops.c
