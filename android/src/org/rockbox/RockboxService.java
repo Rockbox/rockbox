@@ -21,14 +21,14 @@
 
 package org.rockbox;
 
+import org.rockbox.Helper.RunForegroundManager;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,9 +36,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -62,21 +59,10 @@ public class RockboxService extends Service
     /* locals needed for the c code and rockbox state */
     private RockboxFramebuffer fb = null;
     private boolean mRockboxRunning = false;
-    private Activity current_activity = null; 
-    
-    private Notification notification;
-    private static final Class<?>[] mStartForegroundSignature = 
-        new Class[] { int.class, Notification.class };
-    private static final Class<?>[] mStopForegroundSignature = 
-        new Class[] { boolean.class };
-
-    private NotificationManager mNM;
-    private Method mStartForeground;
-    private Method mStopForeground;
-    private Object[] mStartForegroundArgs = new Object[2];
-    private Object[] mStopForegroundArgs = new Object[1];
+    private Activity current_activity = null;
     private IntentFilter itf;
     private BroadcastReceiver batt_monitor;
+    private RunForegroundManager fg_runner;
     @SuppressWarnings("unused")
     private int battery_level;
 
@@ -84,19 +70,6 @@ public class RockboxService extends Service
     public void onCreate()
     {
    		instance = this;
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        try 
-        {
-            mStartForeground = getClass().getMethod("startForeground",
-                    mStartForegroundSignature);
-            mStopForeground = getClass().getMethod("stopForeground",
-                    mStopForegroundSignature);
-        } 
-        catch (NoSuchMethodException e) 
-        {
-            /* Running on an older platform: fall back to old API */
-            mStartForeground = mStopForeground = null;
-        }
         startservice();
     }
     
@@ -132,7 +105,11 @@ public class RockboxService extends Service
         
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
-        create_notification();
+        try {
+            fg_runner = new RunForegroundManager(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void LOG(CharSequence text)
@@ -285,105 +262,14 @@ public class RockboxService extends Service
         registerReceiver(batt_monitor, itf);
     }
     
-    /* all below is heavily based on the examples found on
-     * http://developer.android.com/reference/android/app/Service.html
-     */
-    
-    private void create_notification()
+    public void startForeground()
     {
-        /* For now we'll use the same text for the ticker and the 
-         * expanded notification */
-        CharSequence text = getText(R.string.notification);
-        /* Set the icon, scrolling text and timestamp */
-        notification = new Notification(R.drawable.icon, text,
-                System.currentTimeMillis());
-
-        /* The PendingIntent to launch our activity if the user selects
-         * this notification */
-        Intent intent = new Intent(this, RockboxActivity.class);
-        PendingIntent contentIntent = 
-                PendingIntent.getActivity(this, 0, intent, 0);
-
-        /*  Set the info for the views that show in the notification panel. */
-        notification.setLatestEventInfo(this, 
-                getText(R.string.notification), text, contentIntent);
-    }
-
-    public void startForeground() 
-    {
-        /* 
-         * Send the notification.
-         * We use a layout id because it is a unique number.  
-         * We use it later to cancel.
-         */
-        mNM.notify(R.string.notification, instance.notification);
-        /*
-         * this call makes the service run as foreground, which
-         * provides enough cpu time to do music decoding in the 
-         * background
-         */
-        startForegroundCompat(R.string.notification, notification);
+        fg_runner.startForeground();
     }
     
-    public void stopForeground() 
+    public void stopForeground()
     {
-        if (notification != null)
-        {
-            stopForegroundCompat(R.string.notification);
-            mNM.cancel(R.string.notification);
-        }
-    }
-
-    /**
-     * This is a wrapper around the new startForeground method, using the older
-     * APIs if it is not available.
-     */
-    void startForegroundCompat(int id, Notification notification) 
-    {
-        if (mStartForeground != null) {
-            mStartForegroundArgs[0] = Integer.valueOf(id);
-            mStartForegroundArgs[1] = notification;
-            try {
-                mStartForeground.invoke(this, mStartForegroundArgs);
-            } catch (InvocationTargetException e) {
-                /* Should not happen. */
-                LOG("Unable to invoke startForeground", e);
-            } catch (IllegalAccessException e) {
-                /* Should not happen. */
-                LOG("Unable to invoke startForeground", e);
-            }
-            return;
-        }
-
-        /* Fall back on the old API.*/
-        setForeground(true);
-        mNM.notify(id, notification);
-    }
-
-    /**
-     * This is a wrapper around the new stopForeground method, using the older
-     * APIs if it is not available.
-     */
-    void stopForegroundCompat(int id) 
-    {
-        if (mStopForeground != null) {
-            mStopForegroundArgs[0] = Boolean.TRUE;
-            try {
-                mStopForeground.invoke(this, mStopForegroundArgs);
-            } catch (InvocationTargetException e) {
-                /* Should not happen. */
-                LOG("Unable to invoke stopForeground", e);
-            } catch (IllegalAccessException e) {
-                /* Should not happen. */
-                LOG("Unable to invoke stopForeground", e);
-            }
-            return;
-        }
-
-        /* Fall back on the old API.  Note to cancel BEFORE changing the
-         * foreground state, since we could be killed at that point. */
-        mNM.cancel(id);
-        setForeground(false);
+        fg_runner.stopForeground();
     }
 
     @Override
@@ -391,6 +277,6 @@ public class RockboxService extends Service
     {
         super.onDestroy();
         /* Make sure our notification is gone. */
-        stopForegroundCompat(R.string.notification);
+        stopForeground();
     }
 }
