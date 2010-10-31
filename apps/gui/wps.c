@@ -1045,18 +1045,18 @@ long gui_wps_show(void)
                 exit = true;
                 break;
 #endif
-            case SYS_POWEROFF:
-                default_event_handler(SYS_POWEROFF);
-                break;
             case ACTION_WPS_VIEW_PLAYLIST:
                 gwps_leave_wps();
                 return GO_TO_PLAYLIST_VIEWER;
                 break;
             default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-                    gwps_leave_wps();
-                    return GO_TO_ROOT;
+                switch(default_event_handler(button))
+                {   /* music has been stopped by the default handler */
+                    case SYS_USB_CONNECTED:
+                    case SYS_CALL_INCOMING:
+                    case BUTTON_MULTIMEDIA_STOP:
+                        gwps_leave_wps();
+                        return GO_TO_ROOT;
                 }
                 update = true;
                 break;

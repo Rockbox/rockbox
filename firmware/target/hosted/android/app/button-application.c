@@ -45,3 +45,24 @@ int key_to_button(int keyboard_key)
             return BUTTON_MENU;
     }
 }
+
+unsigned multimedia_to_button(int keyboard_key)
+{
+    switch (keyboard_key)
+    {
+        case KEYCODE_MEDIA_PLAY_PAUSE:
+            return BUTTON_MULTIMEDIA_PLAYPAUSE;
+        case KEYCODE_MEDIA_STOP:
+            return BUTTON_MULTIMEDIA_STOP;
+        case KEYCODE_MEDIA_NEXT:
+            return BUTTON_MULTIMEDIA_NEXT;
+        case KEYCODE_MEDIA_PREVIOUS:
+            return BUTTON_MULTIMEDIA_PREV;
+        case KEYCODE_MEDIA_REWIND:
+            return BUTTON_MULTIMEDIA_REW;
+        case KEYCODE_MEDIA_FAST_FORWARD:
+            return BUTTON_MULTIMEDIA_FFWD;
+        default:
+            return 0;
+    }
+}

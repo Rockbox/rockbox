@@ -139,6 +139,7 @@ public class RockboxService extends Service
         {
             public void run()
             {
+                LOG("main");
 		        /* the following block unzips libmisc.so, which contains the files 
 		         * we ship, such as themes. It's needed to put it into a .so file
 		         * because there's no other way to ship files and have access
@@ -276,6 +277,7 @@ public class RockboxService extends Service
     public void onDestroy() 
     {
         super.onDestroy();
+        fb.destroy();
         /* Make sure our notification is gone. */
         stopForeground();
     }

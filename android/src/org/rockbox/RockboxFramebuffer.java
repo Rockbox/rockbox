@@ -23,6 +23,8 @@ package org.rockbox;
 
 import java.nio.ByteBuffer;
 
+import org.rockbox.Helper.MediaButtonReceiver;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,6 +37,7 @@ public class RockboxFramebuffer extends View
 {
     private Bitmap btm;
     private ByteBuffer native_buf;
+    private MediaButtonReceiver media_monitor;
 
     public RockboxFramebuffer(Context c, int lcd_width, 
                               int lcd_height, ByteBuffer native_fb)
@@ -47,6 +50,8 @@ public class RockboxFramebuffer extends View
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
         native_buf = native_fb;
         requestFocus();
+        media_monitor = new MediaButtonReceiver(c);
+        media_monitor.register();
         /* the service needs to know the about us */
         ((RockboxService)c).set_fb(this);
     }
@@ -120,6 +125,12 @@ public class RockboxFramebuffer extends View
         setClickable(true);
         requestFocus();
         set_lcd_active(1);
+    }
+
+    public void destroy()
+    {
+        suspend();
+        media_monitor.unregister();
     }
 
     public native void set_lcd_active(int active);

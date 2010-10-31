@@ -650,10 +650,20 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             }
 #endif
         }
-        else if(default_event_handler(action) == SYS_USB_CONNECTED)
+        else
         {
-            ret = MENU_ATTACHED_USB;
-            done = true;
+            switch(default_event_handler(action))
+            {
+                case SYS_USB_CONNECTED:
+                    ret = MENU_ATTACHED_USB;
+                    done = true;
+                    break;
+                case SYS_CALL_HUNG_UP:
+                case BUTTON_MULTIMEDIA_PLAYPAUSE:
+                /* remove splash from playlist_resume() */
+                    redraw_lists = true;
+                    break;
+            }
         }
 
         if (redraw_lists && !done)

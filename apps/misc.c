@@ -529,6 +529,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #if CONFIG_PLATFORM & PLATFORM_ANDROID
     static bool resume = false;
 #endif
+
     switch(event)
     {
         case SYS_BATTERY_UPDATE:
@@ -629,10 +630,44 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (resume && playlist_resume() != -1)
             {
                 playlist_start(global_status.resume_index,
-                    global_status.resume_offset);
+                               global_status.resume_offset);
             }
             resume = false;
             return SYS_CALL_HUNG_UP;
+#endif
+#ifdef HAVE_MULTIMEDIA_KEYS
+        /* multimedia keys on keyboards, headsets */
+        case BUTTON_MULTIMEDIA_PLAYPAUSE:
+        {
+            int status = audio_status();
+            if (status & AUDIO_STATUS_PLAY)
+            {
+                if (status & AUDIO_STATUS_PAUSE)
+                    audio_resume();
+                else
+                    audio_pause();
+            }
+            else
+                if (playlist_resume() != -1)
+                {
+                    playlist_start(global_status.resume_index,
+                                   global_status.resume_offset);
+                }
+            return event;
+        }
+        case BUTTON_MULTIMEDIA_NEXT:
+            audio_next();
+            return event;
+        case BUTTON_MULTIMEDIA_PREV:
+            audio_prev();
+            return event;
+        case BUTTON_MULTIMEDIA_STOP:
+            list_stop_handler();
+            return event;
+        case BUTTON_MULTIMEDIA_REW:
+        case BUTTON_MULTIMEDIA_FFWD:
+            /* not supported yet, needs to be done in the WPS */
+            return 0;
 #endif
     }
     return 0;

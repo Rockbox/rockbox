@@ -69,6 +69,21 @@ int button_apply_acceleration(const unsigned int data);
 #define BUTTON_REL         0x02000000
 #define BUTTON_REPEAT      0x04000000
 #define BUTTON_TOUCHSCREEN 0x08000000
+#define BUTTON_MULTIMEDIA  0x10000000
+
+#define BUTTON_MULTIMEDIA_PLAYPAUSE (BUTTON_MULTIMEDIA|0x01)
+#define BUTTON_MULTIMEDIA_STOP      (BUTTON_MULTIMEDIA|0x02)
+#define BUTTON_MULTIMEDIA_PREV      (BUTTON_MULTIMEDIA|0x04)
+#define BUTTON_MULTIMEDIA_NEXT      (BUTTON_MULTIMEDIA|0x08)
+#define BUTTON_MULTIMEDIA_REW       (BUTTON_MULTIMEDIA|0x10)
+#define BUTTON_MULTIMEDIA_FFWD      (BUTTON_MULTIMEDIA|0x20)
+
+#define BUTTON_MULTIMEDIA_ALL       (BUTTON_MULTIMEDIA_PLAYPAUSE| \
+                                     BUTTON_MULTIMEDIA_STOP| \
+                                     BUTTON_MULTIMEDIA_PREV| \
+                                     BUTTON_MULTIMEDIA_NEXT| \
+                                     BUTTON_MULTIMEDIA_REW | \
+                                     BUTTON_MULTIMEDIA_FFWD)
 
 #ifdef HAVE_TOUCHSCREEN
 int touchscreen_last_touch(void);

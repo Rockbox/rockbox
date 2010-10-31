@@ -28,6 +28,7 @@
 #undef button_init_device
 void button_init_device(void);
 int button_read_device(int *data);
+unsigned multimedia_to_button(int keyboard_key);
 
 /* Main unit's buttons */
 #define BUTTON_MENU        0x00000001

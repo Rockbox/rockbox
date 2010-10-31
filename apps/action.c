@@ -183,8 +183,9 @@ static int get_action_worker(int context, int timeout,
     else
         button = button_get_w_tmo(timeout);
 
-    /* Data from sys events can be pulled with button_get_data */
-    if (button == BUTTON_NONE || button & SYS_EVENT)
+    /* Data from sys events can be pulled with button_get_data
+     * multimedia button presses don't go through the action system */
+    if (button == BUTTON_NONE || button & (SYS_EVENT|BUTTON_MULTIMEDIA))
         return button;
     /* Don't send any buttons through untill we see the release event */
     if (wait_for_release)
