@@ -464,6 +464,18 @@ static void qs_set_default(void* setting, void* defaultval)
 }
 #endif
 #ifdef HAVE_TOUCHSCREEN
+
+#if defined(APPLICATION)
+ || defined(ONDA_VX747)
+ || defined(ONDA_VX767)
+ || defined(ONDA_VX747P)
+ || defined(ONDA_VX777)
+
+#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_POINT
+#else
+#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_BUTTON
+#endif
+
 static void tsc_load_from_cfg(void* setting, char*value)
 {
     struct touchscreen_parameter *var = (struct touchscreen_parameter*) setting;
@@ -1711,7 +1723,7 @@ const struct settings_list settings[] = {
                   audiohw_enable_speaker),
 #endif
 #ifdef HAVE_TOUCHSCREEN
-    CHOICE_SETTING(0, touch_mode, LANG_TOUCHSCREEN_MODE, TOUCHSCREEN_BUTTON,
+    CHOICE_SETTING(0, touch_mode, LANG_TOUCHSCREEN_MODE, DEFAULT_TOUCHSCREEN_MODE,
                    "touchscreen mode", "point,grid", NULL, 2,
                    ID2P(LANG_TOUCHSCREEN_POINT), ID2P(LANG_TOUCHSCREEN_GRID)),
     CUSTOM_SETTING(0, ts_calibration_data, -1, 
