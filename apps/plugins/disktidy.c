@@ -267,7 +267,6 @@ enum tidy_return tidy_removedir(char *path, int *path_length)
                 /* silent error */
                 continue;
 
-            
             struct dirinfo info = rb->dir_get_info(dir, entry);
             if (info.attribute & ATTR_DIRECTORY)
             {
@@ -275,7 +274,7 @@ enum tidy_return tidy_removedir(char *path, int *path_length)
                 if ((rb->strcmp(entry->d_name, ".") != 0) && \
                     (rb->strcmp(entry->d_name, "..") != 0))
                 {
-                    tidy_removedir(path, path_length);
+                    status = tidy_removedir(path, path_length);
                 }
             }
             else
@@ -284,7 +283,7 @@ enum tidy_return tidy_removedir(char *path, int *path_length)
                 removed++;
                 rb->remove(path);
             }
-            
+
             /* restore path */
             tidy_path_remove_entry(path, old_path_length, path_length);
         }
@@ -307,7 +306,6 @@ enum tidy_return tidy_clean(char *path, int *path_length)
     struct dirent *entry;
     enum tidy_return status = TIDY_RETURN_OK;
     int button;
-    int del; /* has the item been deleted */
     DIR *dir;
     int old_path_length = *path_length;
 
@@ -344,8 +342,6 @@ enum tidy_return tidy_clean(char *path, int *path_length)
                 if ((rb->strcmp(entry->d_name, ".") != 0) && \
                     (rb->strcmp(entry->d_name, "..") != 0))
                 {
-                    del = 0;
-
                     /* get absolute path */
                     /* returns an error if path is too long */
                     if(!tidy_path_append_entry(path, entry, path_length))
@@ -355,11 +351,9 @@ enum tidy_return tidy_clean(char *path, int *path_length)
                     if (tidy_remove_item(entry->d_name, info.attribute))
                     {
                         /* delete dir */
-                        tidy_removedir(path, path_length);
-                        del = 1;
+                        status = tidy_removedir(path, path_length);
                     }
-
-                    if (del == 0)
+                    else
                     {
                         /* dir not deleted so clean it */
                         status = tidy_clean(path, path_length);
@@ -372,7 +366,6 @@ enum tidy_return tidy_clean(char *path, int *path_length)
             else
             {
                 /* file */
-                del = 0;
                 if (tidy_remove_item(entry->d_name, info.attribute))
                 {
                     /* get absolute path */
@@ -384,8 +377,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
                     removed++; /* increment removed files counter */
                     /* delete file */
                     rb->remove(path);
-                    del = 1;
-                    
+
                     /* restore path */
                     tidy_path_remove_entry(path, old_path_length, path_length);
                 }
