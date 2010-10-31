@@ -182,23 +182,17 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
 #define MAGANG( _mag, _ang )\
 {\
       register int temp;\
-      asm( "cmp %[mag], #0\n\t"\
-           "cmpgt %[ang], #0\n\t"\
-           "subgt %[ang], %[mag], %[ang]\n\t"\
-           "bgt 1f\n\t"\
+      asm( "mov %[temp], %[ang]\n\t"\
            "cmp %[mag], #0\n\t"\
-           "cmple %[ang], #0\n\t"\
-           "addgt %[temp], %[mag], %[ang]\n\t"\
-           "suble %[temp], %[mag], %[ang]\n\t"\
+           "rsble %[temp], %[temp], #0\n\t"\
            "cmp %[ang], #0\n\t"\
+           "subgt %[ang], %[mag], %[temp]\n\t"\
            "movle %[ang], %[mag]\n\t"\
-           "movle %[mag], %[temp]\n\t"\
-           "movgt %[ang], %[temp]\n\t"\
-           "1:\n\t"\
+           "addle %[mag], %[mag], %[temp]\n\t"\
            : [mag] "+r" ( ( _mag ) ), [ang] "+r" ( ( _ang ) ), [temp] "=&r" (temp)\
            :\
            : "cc" );\
-}         
+}
 
 static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
 {
@@ -224,27 +218,71 @@ static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
                       [A0] "r" (A0), [A1] "r" (A1), [A2] "r" (A2), [A3] "r" (A3) 
                     : "memory" );
     }
-}    
+}
+
+#elif defined CPU_COLDFIRE
+
+#define MAGANG( _mag, _ang, _pcmA, _pcmM, _off )\
+{\
+    int temp;\
+    asm volatile( "move.l %[ang], %[temp]\n\t"\
+                  "tst.l %[mag]\n\t"\
+                  "bgt.s 1f\n\t"\
+                  "neg.l %[temp]\n\t"\
+                  "1:\n\t"\
+                  "tst.l %[ang]\n\t"\
+                  "bgt.s 2f\n\t"\
+                  "add.l %[mag], %[temp]\n\t"\
+                  "move.l %[temp], (" #_off ", %[pcmM])\n\t"\
+                  ".word 0x51fa\n\t" /* trapf.w, shadow next insn */ \
+                  "2:\n\t"\
+                  "sub.l %[temp], %[mag]\n\t"\
+                  "move.l %[mag], (%[pcmA])+\n\t"\
+                  : [mag] "+r" ( ( _mag ) ), [ang] "+d" ( ( _ang ) ), [temp] "=&d" (temp),\
+                    [pcmA] "+a" (pcmA)\
+                  : [pcmM] "a" (pcmM)\
+                  : "cc", "memory" );\
+}
+static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, unsigned int n)
+{
+    ogg_int32_t * const pcmMend = pcmM + n/2;
+    while(LIKELY(pcmM < pcmMend))
+    {
+      register int M0 asm("a2"),M1 asm("a3"),M2 asm("a4"),M3 asm("a5");
+      register int A0 asm("d2"),A1 asm("d3"),A2 asm("d4"),A3 asm("d5");
+      asm volatile( "movem.l (%[pcmM]), %[M0]-%[M3]\n\t"
+                    "movem.l (%[pcmA]), %[A0]-%[A3]\n\t"
+                    : [M0] "=r" (M0), [M1] "=r" (M1), [M2] "=r" (M2), [M3] "=r" (M3),
+                      [A0] "=r" (A0), [A1] "=r" (A1), [A2] "=r" (A2), [A3] "=r" (A3)
+                    : [pcmM] "a" (pcmM), [pcmA] "a" (pcmA) );
+
+      MAGANG( M0, A0, pcmA, pcmM, 0 );
+      MAGANG( M1, A1, pcmA, pcmM, 4 );
+      MAGANG( M2, A2, pcmA, pcmM, 8 );
+      MAGANG( M3, A3, pcmA, pcmM, 12 );
+
+      asm volatile( "lea.l (4*4, %[pcmM]), %[pcmM]\n\t"
+                    : [pcmM] "+a" (pcmM));
+    }
+}
 #else
 static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
 {
     int j;
     for(j=0;j<n/2;j++){
-      ogg_int32_t mag = pcmM[j], ang = pcmA[j];
-      if(mag>0)
+      ogg_int32_t mag = pcmM[j], ang = pcmA[j], _ang;
+        if(mag>0)
+          _ang = ang;
+        else
+          _ang = -ang;
+
         if(ang>0)
-          pcmA[j]=mag-ang;
+          pcmA[j]=mag-_ang;
         else{
           pcmA[j]=mag;
-          pcmM[j]=mag+ang;
+          pcmM[j]=mag+_ang;
         }
-      else
-        if(ang>0)
-          pcmA[j]=mag+ang;
-        else{
-          pcmA[j]=mag;
-          pcmM[j]=mag-ang;
-        }
+
     }
 }
 #endif
