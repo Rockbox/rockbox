@@ -40,7 +40,6 @@ public class RockboxFramebuffer extends View
                               int lcd_height, ByteBuffer native_fb)
     {
         super(c);
-
         /* Needed so we can catch KeyEvents */
         setFocusable(true);
         setFocusableInTouchMode(true);
@@ -48,6 +47,8 @@ public class RockboxFramebuffer extends View
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
         native_buf = native_fb;
         requestFocus();
+        /* the service needs to know the about us */
+        ((RockboxService)c).set_fb(this);
     }
 
     public void onDraw(Canvas c) 

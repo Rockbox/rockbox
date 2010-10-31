@@ -77,10 +77,6 @@ void lcd_init_device(void)
                                                    RockboxFramebuffer_class,
                                                    "java_lcd_update_rect",
                                                    "(IIII)V");
-
-    jmethodID fbsetter = e->GetMethodID(env_ptr,RockboxService_class,
-                                        "set_fb", "(Lorg/rockbox/RockboxFramebuffer;)V");
-    e->CallVoidMethod(env_ptr, RockboxService_instance, fbsetter, RockboxFramebuffer_instance);
     display_on = true;
 }
 
