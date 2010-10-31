@@ -68,7 +68,7 @@ int kbd_input(char* text, int buflen)
         ret = e->CallObjectMethod(env_ptr, RockboxKeyboardInput_instance, kbd_result);
     } while (!ret);
     
-    e->ReleaseStringChars(env_ptr, str, NULL);
+    e->ReleaseStringUTFChars(env_ptr, str, NULL);
     retchars = e->GetStringUTFChars(env_ptr, ret, 0);
     if (retchars[0])
         snprintf(text, buflen, retchars);
