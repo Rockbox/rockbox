@@ -31,19 +31,18 @@
 #include "lcd.h"
 #include <lib/pluginlib_bmp.h>
 #include "tinf.h"
-#include "png.h"
+#include "../imageviewer.h"
 #include "png_decoder.h"
 #include "bmp.h"
 
 /* decoder context struct */
 static LodePNG_Decoder decoder;
 
-/* my memory pool (from the mp3 buffer) */
-static char print[128]; /* use a common snprintf() buffer */
+static char print[32]; /* use a common snprintf() buffer */
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
-static fb_data *disp[9];
-static fb_data *disp_buf;
+static unsigned char *disp[9];
+static unsigned char *disp_buf;
 
 #if defined(HAVE_LCD_COLOR)
 #define resize_bitmap   smooth_resize_bitmap
@@ -64,16 +63,16 @@ bool img_ext(const char *ext)
 void draw_image_rect(struct image_info *info,
                      int x, int y, int width, int height)
 {
-    fb_data **pdisp = (fb_data**)info->data;
+    unsigned char **pdisp = (unsigned char **)info->data;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap_part(*pdisp, info->x + x, info->y + y,
+    rb->lcd_bitmap_part((fb_data *)*pdisp, info->x + x, info->y + y,
                         STRIDE(SCREEN_MAIN, info->width, info->height), 
                         x + MAX(0, (LCD_WIDTH-info->width)/2),
                         y + MAX(0, (LCD_HEIGHT-info->height)/2),
                         width, height);
 #else
-    mylcd_ub_gray_bitmap_part((const unsigned char*)*pdisp,
+    mylcd_ub_gray_bitmap_part(*pdisp,
                               info->x + x, info->y + y, info->width,
                               x + MAX(0, (LCD_WIDTH-info->width)/2),
                               y + MAX(0, (LCD_HEIGHT-info->height)/2),
@@ -102,9 +101,8 @@ int load_image(char *filename, struct image_info *info,
     int w, h; /* used to center output */
     LodePNG_Decoder *p_decoder = &decoder;
 
-    unsigned char *memory, *memory_max; 
-    static size_t memory_size, file_size;
-    static unsigned char *image;
+    unsigned char *memory, *memory_max, *image;
+    size_t memory_size, file_size;
 
     /* cleanup */
     memset(&disp, 0, sizeof(disp));
@@ -239,16 +237,16 @@ int load_image(char *filename, struct image_info *info,
     info->x_size = p_decoder->infoPng.width;
     info->y_size = p_decoder->infoPng.height;
 
-    disp_buf = (fb_data *)(p_decoder->buf + p_decoder->native_img_size);
-    disp_buf = (fb_data *)ALIGN_UP((uintptr_t)disp_buf,4);
-    *buf_size = memory_max - (unsigned char*)disp_buf;
+    p_decoder->native_img_size = (p_decoder->native_img_size + 3) & ~3;
+    disp_buf = p_decoder->buf + p_decoder->native_img_size;
+    *buf_size = memory_max - disp_buf;
 
     return PLUGIN_OK;
 }
 
 int get_image(struct image_info *info, int ds)
 {
-    fb_data **p_disp = &disp[ds]; /* short cut */
+    unsigned char **p_disp = &disp[ds]; /* short cut */
     LodePNG_Decoder *p_decoder = &decoder;
 
     info->width = p_decoder->infoPng.width / ds;
@@ -270,33 +268,28 @@ int get_image(struct image_info *info, int ds)
         }
         struct bitmap bmp_src, bmp_dst;
 
-        int size = info->width * info->height;
+        int size = img_mem(ds);
 
-        if ((unsigned char *)(disp_buf + size) >= p_decoder->buf + p_decoder->buf_size) {
+        if (disp_buf + size >= p_decoder->buf + p_decoder->buf_size) {
             /* have to discard the current */
             int i;
             for (i=1; i<=8; i++)
                 disp[i] = NULL; /* invalidate all bitmaps */
 
             /* start again from the beginning of the buffer */
-            disp_buf = (fb_data *)(p_decoder->buf + p_decoder->native_img_size);
-            disp_buf = (fb_data *)ALIGN_UP((uintptr_t)disp_buf,4);
+            disp_buf = p_decoder->buf + p_decoder->native_img_size;
         }
 
         *p_disp = disp_buf;
-#ifdef USEGSLIB
-        disp_buf = (fb_data *)((unsigned char *)disp_buf + size);
-#else
         disp_buf += size;
-#endif
 
         bmp_src.width = p_decoder->infoPng.width;
         bmp_src.height = p_decoder->infoPng.height;
-        bmp_src.data = (unsigned char *)p_decoder->buf;
+        bmp_src.data = p_decoder->buf;
 
         bmp_dst.width = info->width;
         bmp_dst.height = info->height;
-        bmp_dst.data = (unsigned char *)*p_disp;
+        bmp_dst.data = *p_disp;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(true);
         resize_bitmap(&bmp_src, &bmp_dst);
@@ -305,7 +298,7 @@ int get_image(struct image_info *info, int ds)
         resize_bitmap(&bmp_src, &bmp_dst);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
     } else {
-        *p_disp = (fb_data *)p_decoder->buf;
+        *p_disp = p_decoder->buf;
     }
 
     return PLUGIN_OK;

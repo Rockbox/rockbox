@@ -199,7 +199,7 @@ static void setBitOfReversedStream0(size_t* bitpointer,
      */
     if (bit)
         bitstream[(*bitpointer) >> 3] |=  (bit << (7 - ((*bitpointer) & 0x7)));
-   
+
     (*bitpointer)++;
 }
 
@@ -408,7 +408,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
 #ifdef HAVE_LCD_COLOR
     struct uint8_rgb *line_buf = (struct uint8_rgb *)(out + w * h * FB_DATA_SZ);
 #else
-    uint8_t *line_buf = (unsigned char *)(out + w * h * FB_DATA_SZ);
+    uint8_t *line_buf = (unsigned char *)(out + w * h);
 #endif
 
     struct bitmap bm = {
@@ -428,585 +428,585 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
     const struct custom_format *cformat = &format_native;
 #endif
 
-void (*output_row_8)(uint32_t, void*, struct scaler_context*) = cformat->output_row_8;
+    void (*output_row_8)(uint32_t, void*, struct scaler_context*) = cformat->output_row_8;
 
 #ifdef HAVE_LCD_COLOR
-struct uint8_rgb *pixel;
+    struct uint8_rgb *pixel;
 #else
-unsigned char *pixel;
+    unsigned char *pixel;
 #endif
 
 #ifdef HAVE_LCD_COLOR
-        if (infoIn->color.bitDepth == 8)
+    if (infoIn->color.bitDepth == 8)
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    /* reset line buf */
-                    pixel = line_buf;
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                /* reset line buf */
+                pixel = line_buf;
 
-                    for (x = 0; x < w ; x++) {
-                        value = in[i++];
-                        if (infoIn->color.key_defined)
-                            if ( (uint8_t)value == (uint8_t)infoIn->color.key_r )
-                                value = infoIn->background_r; /* full transparent */
+                for (x = 0; x < w ; x++) {
+                    value = in[i++];
+                    if (infoIn->color.key_defined)
+                        if ( (uint8_t)value == (uint8_t)infoIn->color.key_r )
+                            value = infoIn->background_r; /* full transparent */
 
-                        pixel->red = (uint8_t)value;
-                        pixel->green = (uint8_t)value;
-                        pixel->blue = (uint8_t)value;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    pixel->red = (uint8_t)value;
+                    pixel->green = (uint8_t)value;
+                    pixel->blue = (uint8_t)value;
+                    pixel++;
                 }
-                break;
-            case PNG_COLORTYPE_RGB: /*RGB color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = 3*i++;
-
-                        /* tRNs & bKGD */
-                        if (infoIn->color.key_defined &&
-                            in[j] == (uint8_t)infoIn->color.key_r &&
-                            in[j + 1] == (uint8_t)infoIn->color.key_g &&
-                            in[j + 2] == (uint8_t)infoIn->color.key_b)
-                        {
-                            pixel->red = (uint8_t)infoIn->background_r;
-                            pixel->green = (uint8_t)infoIn->background_g;
-                            pixel->blue = (uint8_t)infoIn->background_b;
-                        }
-                        else
-                        {
-                            pixel->red = in[j];
-                            pixel->green = in[j + 1];
-                            pixel->blue = in[j + 2];
-                        }
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    /* reset line buf */
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        if (in[i] >= infoIn->color.palettesize)
-                        {
-                            decoder->error = 46;
-                            return;
-                        }
-
-                        j = in[i++]<<2;
-                        alpha = infoIn->color.palette[j + 3];
-                        alpha_complement = (256 - alpha);
-
-                        /* tRNS and bKGD */
-                        pixel->red = (infoIn->color.palette[j] * alpha +
-                                      alpha_complement*infoIn->background_r)>>8;
-                        pixel->green = (infoIn->color.palette[j + 1] * alpha +
-                                        alpha_complement*infoIn->background_g)>>8;
-                        pixel->blue = (infoIn->color.palette[j + 2] * alpha + 
-                                       alpha_complement*infoIn->background_b)>>8;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)(line_buf),&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        alpha = in[(i << 1) + 1];
-                        alpha_complement = (256 - alpha)*infoIn->background_r;
-                        value = (alpha * in[i++ << 1] + alpha_complement)>>8;
-                        pixel->red = (uint8_t)(value);
-                        pixel->green = (uint8_t)value;
-                        pixel->blue = (uint8_t)value;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = i++ << 2;
-                        alpha = in[j + 3];
-                        alpha_complement = (256 - alpha);
-                        pixel->red = (in[j] * alpha + 
-                                      alpha_complement*infoIn->background_r)>>8;
-                        pixel->green = (in[j + 1] * alpha +
-                                        alpha_complement*infoIn->background_g)>>8;
-                        pixel->blue = (in[j + 2] * alpha +
-                                       alpha_complement*infoIn->background_b)>>8;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_RGB: /*RGB color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = 3*i++;
+
+                    /* tRNs & bKGD */
+                    if (infoIn->color.key_defined &&
+                        in[j] == (uint8_t)infoIn->color.key_r &&
+                        in[j + 1] == (uint8_t)infoIn->color.key_g &&
+                        in[j + 2] == (uint8_t)infoIn->color.key_b)
+                    {
+                        pixel->red = (uint8_t)infoIn->background_r;
+                        pixel->green = (uint8_t)infoIn->background_g;
+                        pixel->blue = (uint8_t)infoIn->background_b;
+                    }
+                    else
+                    {
+                        pixel->red = in[j];
+                        pixel->green = in[j + 1];
+                        pixel->blue = in[j + 2];
+                    }
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                /* reset line buf */
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    if (in[i] >= infoIn->color.palettesize)
+                    {
+                        decoder->error = 46;
+                        return;
+                    }
+
+                    j = in[i++]<<2;
+                    alpha = infoIn->color.palette[j + 3];
+                    alpha_complement = (256 - alpha);
+
+                    /* tRNS and bKGD */
+                    pixel->red = (infoIn->color.palette[j] * alpha +
+                                  alpha_complement*infoIn->background_r)>>8;
+                    pixel->green = (infoIn->color.palette[j + 1] * alpha +
+                                    alpha_complement*infoIn->background_g)>>8;
+                    pixel->blue = (infoIn->color.palette[j + 2] * alpha + 
+                                   alpha_complement*infoIn->background_b)>>8;
+                    pixel++;
+                }
+                output_row_8(y,(void *)(line_buf),&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    alpha = in[(i << 1) + 1];
+                    alpha_complement = (256 - alpha)*infoIn->background_r;
+                    value = (alpha * in[i++ << 1] + alpha_complement)>>8;
+                    pixel->red = (uint8_t)(value);
+                    pixel->green = (uint8_t)value;
+                    pixel->blue = (uint8_t)value;
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = i++ << 2;
+                    alpha = in[j + 3];
+                    alpha_complement = (256 - alpha);
+                    pixel->red = (in[j] * alpha + 
+                                  alpha_complement*infoIn->background_r)>>8;
+                    pixel->green = (in[j + 1] * alpha +
+                                    alpha_complement*infoIn->background_g)>>8;
+                    pixel->blue = (in[j + 2] * alpha +
+                                   alpha_complement*infoIn->background_b)>>8;
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
-        else if (infoIn->color.bitDepth == 16)
+    }
+    else if (infoIn->color.bitDepth == 16)
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        value = (in[i<<1]<<8)|in[(i << 1) + 1];
-                        i++;
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    value = (in[i<<1]<<8)|in[(i << 1) + 1];
+                    i++;
 
-                        /* tRNS and bKGD */
-                        if (infoIn->color.key_defined &&
-                            value == infoIn->color.key_r)
-                            value = infoIn->background_r<<8;
-                        
-                        pixel->red = 
-                        pixel->green =
-                        pixel->blue = (uint8_t)(value>>8);
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_RGB: /*RGB color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = 6 * i++;
+                    /* tRNS and bKGD */
+                    if (infoIn->color.key_defined &&
+                        value == infoIn->color.key_r)
+                        value = infoIn->background_r<<8;
 
-                        /* tRNS and bKGD */
-                        if (infoIn->color.key_defined &&
-                            ((uint16_t)(in[j]<<8|in[j + 1])  == 
-                                infoIn->color.key_r) &&
-                            ((uint16_t)(in[j + 2]<<8|in[j + 3]) == 
-                                infoIn->color.key_g) &&
-                            ((uint16_t)(in[j + 4]<<8|in[j + 5]) == 
-                                infoIn->color.key_b))
-                        {
-                            pixel->red = (uint8_t)infoIn->background_r;
-                            pixel->green = (uint8_t)infoIn->background_g;
-                            pixel->blue = (uint8_t)infoIn->background_b;
-                        }
-                        else
-                        {
-                            pixel->red = in[j];
-                            pixel->green = in[j + 2];
-                            pixel->blue = in[j + 4];
-                        }
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    pixel->red = 
+                    pixel->green =
+                    pixel->blue = (uint8_t)(value>>8);
+                    pixel++;
                 }
-                break;
-            case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        alpha = in[(i << 2) + 2];
-                        alpha_complement = (256-alpha)*infoIn->background_r;
-                        value = (in[i++ << 2] * alpha + alpha_complement)>>8;
-                        pixel->red = (uint8_t)value;
-                        pixel->green = (uint8_t)value;
-                        pixel->blue = (uint8_t)value;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = i++ << 3;
-                        alpha = in[j + 6];
-                        alpha_complement = (256-alpha);
-                        pixel->red = (in[j] * alpha +
-                                      alpha_complement*infoIn->background_r)>>8;
-                        pixel->green = (in[j + 2] * alpha +
-                                        alpha_complement*infoIn->background_g)>>8;
-                        pixel->blue = (in[j + 4] * alpha +
-                                       alpha_complement*infoIn->background_b)>>8;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_RGB: /*RGB color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = 6 * i++;
+
+                    /* tRNS and bKGD */
+                    if (infoIn->color.key_defined &&
+                        ((uint16_t)(in[j]<<8|in[j + 1])  == 
+                            infoIn->color.key_r) &&
+                        ((uint16_t)(in[j + 2]<<8|in[j + 3]) == 
+                            infoIn->color.key_g) &&
+                        ((uint16_t)(in[j + 4]<<8|in[j + 5]) == 
+                            infoIn->color.key_b))
+                    {
+                        pixel->red = (uint8_t)infoIn->background_r;
+                        pixel->green = (uint8_t)infoIn->background_g;
+                        pixel->blue = (uint8_t)infoIn->background_b;
+                    }
+                    else
+                    {
+                        pixel->red = in[j];
+                        pixel->green = in[j + 2];
+                        pixel->blue = in[j + 4];
+                    }
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    alpha = in[(i << 2) + 2];
+                    alpha_complement = (256-alpha)*infoIn->background_r;
+                    value = (in[i++ << 2] * alpha + alpha_complement)>>8;
+                    pixel->red = (uint8_t)value;
+                    pixel->green = (uint8_t)value;
+                    pixel->blue = (uint8_t)value;
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = i++ << 3;
+                    alpha = in[j + 6];
+                    alpha_complement = (256-alpha);
+                    pixel->red = (in[j] * alpha +
+                                  alpha_complement*infoIn->background_r)>>8;
+                    pixel->green = (in[j + 2] * alpha +
+                                    alpha_complement*infoIn->background_g)>>8;
+                    pixel->blue = (in[j + 4] * alpha +
+                                   alpha_complement*infoIn->background_b)>>8;
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
-        else /*infoIn->bitDepth is less than 8 bit per channel*/
+    }
+    else /*infoIn->bitDepth is less than 8 bit per channel*/
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
-                        
-                        /* tRNS and bKGD */ 
-                        if (infoIn->color.key_defined)
-                            if ( value == infoIn->color.key_r )
-                                value = infoIn->background_r; /* full transparent */
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
 
-                        /* scale value from 0 to 255 */
-                        value = (value * 255) / ((1 << infoIn->color.bitDepth) - 1);
+                    /* tRNS and bKGD */ 
+                    if (infoIn->color.key_defined)
+                        if ( value == infoIn->color.key_r )
+                            value = infoIn->background_r; /* full transparent */
 
-                        pixel->red = (uint8_t)value;
-                        pixel->green = (uint8_t)value;
-                        pixel->blue = (uint8_t)value;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    /* scale value from 0 to 255 */
+                    value = (value * 255) / ((1 << infoIn->color.bitDepth) - 1);
+
+                    pixel->red = (uint8_t)value;
+                    pixel->green = (uint8_t)value;
+                    pixel->blue = (uint8_t)value;
+                    pixel++;
                 }
-                break;
-            case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
-                        if (value >= infoIn->color.palettesize)
-                        {
-                            decoder->error = 47;
-                            return;
-                        }
-
-                        j = value << 2;
- 
-                        /* tRNS and bKGD */
-                        alpha = infoIn->color.palette[j + 3];
-                        alpha_complement = (256 - alpha);
-                        pixel->red = (alpha * infoIn->color.palette[j] + 
-                                      alpha_complement*infoIn->background_r)>>8;
-                        pixel->green = (alpha * infoIn->color.palette[j + 1] + 
-                                        alpha_complement*infoIn->background_g)>>8;
-                        pixel->blue = (alpha * infoIn->color.palette[j + 2] + 
-                                       alpha_complement*infoIn->background_b)>>8;
-                        pixel++;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
+                    if (value >= infoIn->color.palettesize)
+                    {
+                        decoder->error = 47;
+                        return;
+                    }
+
+                    j = value << 2;
+
+                    /* tRNS and bKGD */
+                    alpha = infoIn->color.palette[j + 3];
+                    alpha_complement = (256 - alpha);
+                    pixel->red = (alpha * infoIn->color.palette[j] + 
+                                  alpha_complement*infoIn->background_r)>>8;
+                    pixel->green = (alpha * infoIn->color.palette[j + 1] + 
+                                    alpha_complement*infoIn->background_g)>>8;
+                    pixel->blue = (alpha * infoIn->color.palette[j + 2] + 
+                                   alpha_complement*infoIn->background_b)>>8;
+                    pixel++;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
+    }
 #else /* greyscale targets */
-struct uint8_rgb px_rgb; /* for rgb(a) -> greyscale conversion */
-uint8_t background_grey; /* for rgb background -> greyscale background */
+    struct uint8_rgb px_rgb; /* for rgb(a) -> greyscale conversion */
+    uint8_t background_grey; /* for rgb background -> greyscale background */
 
-        if (infoIn->color.bitDepth == 8)
+    if (infoIn->color.bitDepth == 8)
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++ ) {
-                        value = in[i++];
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++ ) {
+                    value = in[i++];
 
-                        /* transparent color defined in tRNS chunk */
-                        if (infoIn->color.key_defined)
-                            if ( (uint8_t)value == (uint8_t)infoIn->color.key_r )
-                                value = infoIn->background_r;
+                    /* transparent color defined in tRNS chunk */
+                    if (infoIn->color.key_defined)
+                        if ( (uint8_t)value == (uint8_t)infoIn->color.key_r )
+                            value = infoIn->background_r;
 
-                        *pixel++ = (uint8_t)value;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    *pixel++ = (uint8_t)value;
                 }
-                break;
-            case PNG_COLORTYPE_RGB: /*RGB color*/
-                /* convert background rgb color to greyscale */
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                background_grey = brightness(px_rgb);
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGB: /*RGB color*/
+            /* convert background rgb color to greyscale */
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            background_grey = brightness(px_rgb);
 
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = 3*i++;
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = 3*i++;
 
-                        /* tRNs & bKGD */
-                        if (infoIn->color.key_defined &&
-                            in[j] == (uint8_t)infoIn->color.key_r &&
-                            in[j + 1] == (uint8_t)infoIn->color.key_g &&
-                            in[j + 2] == (uint8_t)infoIn->color.key_b)
-                        {
-                            *pixel = background_grey;
-                        }
-                        else
-                        {
-                            /* rgb -> greyscale */
-                            px_rgb.red = in[j];
-                            px_rgb.green = in[j + 1];
-                            px_rgb.blue = in[j + 2];
-                            *pixel = brightness(px_rgb);
-                        }
-                        pixel++;
-
+                    /* tRNs & bKGD */
+                    if (infoIn->color.key_defined &&
+                        in[j] == (uint8_t)infoIn->color.key_r &&
+                        in[j + 1] == (uint8_t)infoIn->color.key_g &&
+                        in[j + 2] == (uint8_t)infoIn->color.key_b)
+                    {
+                        *pixel = background_grey;
                     }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
-                i = 0;
-                /* calculate grey value of rgb background */
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                background_grey = brightness(px_rgb);
-
-                for (y = 0 ; y < h ; y++) {
-                    /* reset line buf */
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        if (in[i] >= infoIn->color.palettesize)
-                        {
-                            decoder->error = 46;
-                            return;
-                        }
-
-                        j = in[i++] << 2;
-                        alpha = infoIn->color.palette[j + 3];
-                        alpha_complement = (256 - alpha);
-
-                        /* tRNS and bKGD */
-                        px_rgb.red = (alpha * infoIn->color.palette[j] +
-                                      alpha_complement*background_grey)>>8;
-                        px_rgb.green = (alpha * infoIn->color.palette[j + 1] +
-                                        alpha_complement*background_grey)>>8;
-                        px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
-                                       alpha_complement*background_grey)>>8;
-
-                        *pixel++ = brightness(px_rgb);
-                    }
-                    output_row_8(y,(void *)(line_buf),&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        alpha = in[(i << 1) + 1];
-                        alpha_complement = ((256 - alpha)*infoIn->background_r);
-                        *pixel++ = (alpha * in[i++ << 1] + alpha_complement)>>8;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                background_grey = brightness(px_rgb);
-
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = i++ << 2;
-                        alpha = in[j + 3];
-                        alpha_complement = ((256 - alpha)*background_grey);
-
+                    else
+                    {
+                        /* rgb -> greyscale */
                         px_rgb.red = in[j];
                         px_rgb.green = in[j + 1];
                         px_rgb.blue = in[j + 2];
-                        *pixel++ = (alpha * brightness(px_rgb) + 
-                                    alpha_complement)>>8;
+                        *pixel = brightness(px_rgb);
                     }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    pixel++;
+
                 }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
+            i = 0;
+            /* calculate grey value of rgb background */
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            background_grey = brightness(px_rgb);
+
+            for (y = 0 ; y < h ; y++) {
+                /* reset line buf */
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    if (in[i] >= infoIn->color.palettesize)
+                    {
+                        decoder->error = 46;
+                        return;
+                    }
+
+                    j = in[i++] << 2;
+                    alpha = infoIn->color.palette[j + 3];
+                    alpha_complement = (256 - alpha);
+
+                    /* tRNS and bKGD */
+                    px_rgb.red = (alpha * infoIn->color.palette[j] +
+                                  alpha_complement*background_grey)>>8;
+                    px_rgb.green = (alpha * infoIn->color.palette[j + 1] +
+                                    alpha_complement*background_grey)>>8;
+                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
+                                   alpha_complement*background_grey)>>8;
+
+                    *pixel++ = brightness(px_rgb);
+                }
+                output_row_8(y,(void *)(line_buf),&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    alpha = in[(i << 1) + 1];
+                    alpha_complement = ((256 - alpha)*infoIn->background_r);
+                    *pixel++ = (alpha * in[i++ << 1] + alpha_complement)>>8;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            background_grey = brightness(px_rgb);
+
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = i++ << 2;
+                    alpha = in[j + 3];
+                    alpha_complement = ((256 - alpha)*background_grey);
+
+                    px_rgb.red = in[j];
+                    px_rgb.green = in[j + 1];
+                    px_rgb.blue = in[j + 2];
+                    *pixel++ = (alpha * brightness(px_rgb) + 
+                                alpha_complement)>>8;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
-        else if (infoIn->color.bitDepth == 16)
+    }
+    else if (infoIn->color.bitDepth == 16)
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        /* specification states that we have to compare
-                         * colors for simple transparency in 16bits
-                         * even if we scale down to 8bits later
-                         */
-                        value = in[i<<1]<<8|in[(i << 1) + 1];
-                        i++;
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    /* specification states that we have to compare
+                     * colors for simple transparency in 16bits
+                     * even if we scale down to 8bits later
+                     */
+                    value = in[i<<1]<<8|in[(i << 1) + 1];
+                    i++;
 
-                        /* tRNS and bKGD */
-                        if (infoIn->color.key_defined &&
-                            value == infoIn->color.key_r)
-                            value = infoIn->background_r<<8;
+                    /* tRNS and bKGD */
+                    if (infoIn->color.key_defined &&
+                        value == infoIn->color.key_r)
+                        value = infoIn->background_r<<8;
 
-                        /* we take upper 8bits */
-                        *pixel++ = (uint8_t)(value>>8);
-                    }
-
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    /* we take upper 8bits */
+                    *pixel++ = (uint8_t)(value>>8);
                 }
-                break;
-            case PNG_COLORTYPE_RGB: /*RGB color*/
-                i = 0;
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                background_grey = brightness(px_rgb);
 
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = 6 * i++;
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGB: /*RGB color*/
+            i = 0;
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            background_grey = brightness(px_rgb);
 
-                        /* tRNS and bKGD */
-                        if (infoIn->color.key_defined &&
-                            (uint16_t)(in[j]<<8|in[j + 1]) == 
-                                infoIn->color.key_r &&
-                            (uint16_t)(in[j + 2]<<8|in[j + 3]) ==
-                                infoIn->color.key_g &&
-                            (uint16_t)(in[j + 4]<<8|in[j + 5]) ==
-                                infoIn->color.key_b)
-                        {
-                            *pixel = background_grey;
-                        }
-                        else
-                        {
-                            /* we take only upper byte of 16bit value */
-                            px_rgb.red = in[j];
-                            px_rgb.green = in[j + 2];
-                            px_rgb.blue = in[j + 4];
-                            *pixel = brightness(px_rgb);
-                        }
-                        pixel++;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = 6 * i++;
+
+                    /* tRNS and bKGD */
+                    if (infoIn->color.key_defined &&
+                        (uint16_t)(in[j]<<8|in[j + 1]) == 
+                            infoIn->color.key_r &&
+                        (uint16_t)(in[j + 2]<<8|in[j + 3]) ==
+                            infoIn->color.key_g &&
+                        (uint16_t)(in[j + 4]<<8|in[j + 5]) ==
+                            infoIn->color.key_b)
+                    {
+                        *pixel = background_grey;
                     }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        alpha = in[(i << 2) + 2];
-                        alpha_complement = (256 - alpha)*infoIn->background_r;
-                        *pixel++ = (alpha * in[i++ << 2] + alpha_complement)>>8;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                background_grey = brightness(px_rgb);
-
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        j = i++ << 3;
-                        alpha = in[j + 6];
-                        alpha_complement = (256 - alpha)*background_grey;
+                    else
+                    {
+                        /* we take only upper byte of 16bit value */
                         px_rgb.red = in[j];
                         px_rgb.green = in[j + 2];
                         px_rgb.blue = in[j + 4];
-                        *pixel++ = (alpha * brightness(px_rgb) + alpha_complement)>>8;
+                        *pixel = brightness(px_rgb);
                     }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    pixel++;
                 }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_GREYA: /*greyscale with alpha*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    alpha = in[(i << 2) + 2];
+                    alpha_complement = (256 - alpha)*infoIn->background_r;
+                    *pixel++ = (alpha * in[i++ << 2] + alpha_complement)>>8;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        case PNG_COLORTYPE_RGBA: /*RGB with alpha*/
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            background_grey = brightness(px_rgb);
+
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    j = i++ << 3;
+                    alpha = in[j + 6];
+                    alpha_complement = (256 - alpha)*background_grey;
+                    px_rgb.red = in[j];
+                    px_rgb.green = in[j + 2];
+                    px_rgb.blue = in[j + 4];
+                    *pixel++ = (alpha * brightness(px_rgb) + alpha_complement)>>8;
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
-        else /*infoIn->bitDepth is less than 8 bit per channel*/
+    }
+    else /*infoIn->bitDepth is less than 8 bit per channel*/
+    {
+        switch (infoIn->color.colorType)
         {
-            switch (infoIn->color.colorType)
-            {
-            case PNG_COLORTYPE_GREY: /*greyscale color*/
-                i = 0;
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
+        case PNG_COLORTYPE_GREY: /*greyscale color*/
+            i = 0;
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
 
-                        /* tRNS and bKGD */
-                        if (infoIn->color.key_defined)
-                            if ( value == infoIn->color.key_r )
-                                value = infoIn->background_r; /* full transparent */
+                    /* tRNS and bKGD */
+                    if (infoIn->color.key_defined)
+                        if ( value == infoIn->color.key_r )
+                            value = infoIn->background_r; /* full transparent */
 
-                        /*scale value from 0 to 255*/
-                        value = (value * 255) / ((1 << infoIn->color.bitDepth) - 1);
- 
-                        *pixel++ = (unsigned char)value;
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
+                    /*scale value from 0 to 255*/
+                    value = (value * 255) / ((1 << infoIn->color.bitDepth) - 1);
+
+                    *pixel++ = (unsigned char)value;
                 }
-                break;
-            case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
-                i = 0;
-                px_rgb.red = infoIn->background_r;
-                px_rgb.green = infoIn->background_g;
-                px_rgb.blue = infoIn->background_b;
-                uint8_t background_grey = brightness(px_rgb);
-
-                for (y = 0 ; y < h ; y++) {
-                    pixel = line_buf;
-                    for (x = 0 ; x < w ; x++) {
-                        value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
-                        if (value >= infoIn->color.palettesize)
-                        {
-                            decoder->error = 47;
-                            return;
-                        }
-
-                        j = value << 2;
-
-                        /* tRNS and bKGD */
-                        alpha = infoIn->color.palette[j + 3];
-                        alpha_complement = (256 - alpha) * background_grey;
-
-                        px_rgb.red = (alpha * infoIn->color.palette[j] + 
-                                      alpha_complement)>>8;
-                        px_rgb.green = (alpha * infoIn->color.palette[j + 1] + 
-                                        alpha_complement)>>8;
-                        px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
-                                       alpha_complement)>>8;
-                        *pixel++ = brightness(px_rgb);
-                    }
-                    output_row_8(y,(void *)line_buf,&ctx);
-                }
-                break;
-            default:
-                break;
+                output_row_8(y,(void *)line_buf,&ctx);
             }
+            break;
+        case PNG_COLORTYPE_PALETTE: /*indexed color (palette)*/
+            i = 0;
+            px_rgb.red = infoIn->background_r;
+            px_rgb.green = infoIn->background_g;
+            px_rgb.blue = infoIn->background_b;
+            uint8_t background_grey = brightness(px_rgb);
+
+            for (y = 0 ; y < h ; y++) {
+                pixel = line_buf;
+                for (x = 0 ; x < w ; x++) {
+                    value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
+                    if (value >= infoIn->color.palettesize)
+                    {
+                        decoder->error = 47;
+                        return;
+                    }
+
+                    j = value << 2;
+
+                    /* tRNS and bKGD */
+                    alpha = infoIn->color.palette[j + 3];
+                    alpha_complement = (256 - alpha) * background_grey;
+
+                    px_rgb.red = (alpha * infoIn->color.palette[j] + 
+                                  alpha_complement)>>8;
+                    px_rgb.green = (alpha * infoIn->color.palette[j + 1] + 
+                                    alpha_complement)>>8;
+                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
+                                   alpha_complement)>>8;
+                    *pixel++ = brightness(px_rgb);
+                }
+                output_row_8(y,(void *)line_buf,&ctx);
+            }
+            break;
+        default:
+            break;
         }
+    }
 #endif
 }
 
@@ -1097,13 +1097,13 @@ static uint8_t unfilterScanline(uint8_t* recon,
      * disjoint.
      */
 
-/* storage space for cached portion of scanline */
-unsigned char cache[512+16];
+    /* storage space for cached portion of scanline */
+    unsigned char cache[512+16];
 
-/* ptr to second element of the cache */
-unsigned char *cache_1 = cache + bytewidth;
-unsigned char *p_cache = cache + 256 + 8; /* half way */
-unsigned char *p_cache_1 = p_cache + bytewidth;
+    /* ptr to second element of the cache */
+    unsigned char *cache_1 = cache + bytewidth;
+    unsigned char *p_cache = cache + 256 + 8; /* half way */
+    unsigned char *p_cache_1 = p_cache + bytewidth;
 
     size_t i;
     switch (filterType)
@@ -1192,7 +1192,7 @@ unsigned char *p_cache_1 = p_cache + bytewidth;
                 memcpy(recon, cache, length);
             }
         }
-        else       
+        else
             /* for(i = 0; i < length; i++) recon[i] = scanline[i]; */
             memcpy(recon, scanline, length * sizeof(uint8_t));
         break;
@@ -1519,7 +1519,7 @@ static void Adam7_deinterlace(uint8_t* out,
                         /* note that this function assumes the out buffer 
                          * is completely 0, use setBitOfReversedStream
                          * otherwise*/
-                        setBitOfReversedStream0(&obp, out, bit);                     
+                        setBitOfReversedStream0(&obp, out, bit);
                     }
                 }
         }
@@ -1832,7 +1832,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                 }
                 decoder->infoPng.background_r = 
                     decoder->infoPng.color.palette[(data[0]<<2)];
-                
+
                 decoder->infoPng.background_g =
                     decoder->infoPng.color.palette[(data[0]<<2) | 1];
 
@@ -1880,7 +1880,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                  */
                 decoder->error = 69;
                 break;
-            } 
+            }
             unknown = true;
         }
 
@@ -2007,7 +2007,7 @@ void LodePNG_inspect(LodePNG_Decoder* decoder, uint8_t *in, size_t inlength)
         decoder->error = 29;
         return;
     }
- 
+
     /* read the values given in the header */
     decoder->infoPng.width = in[16]<<24|in[17]<<16|in[18]<<8|in[19];
     decoder->infoPng.height = in[20]<<24|in[21]<<16|in[22]<<8|in[23];
@@ -2080,7 +2080,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
     /* one line more as temp buffer for conversion */
 #ifdef HAVE_LCD_COLOR
     decoder->native_img_size = decoder->infoPng.width *
-                               (decoder->infoPng.height)*FB_DATA_SZ;
+                               decoder->infoPng.height * FB_DATA_SZ;
     line_buf_size = decoder->infoPng.width * sizeof(struct uint8_rgb);
 #else
     decoder->native_img_size = decoder->infoPng.width *
@@ -2134,11 +2134,9 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
     {
         /* calculate 'corrected' image size */
 #ifdef HAVE_LCD_COLOR
-        c_native_img_size = dim_dst.width *
-                            (dim_dst.height)*FB_DATA_SZ;
+        c_native_img_size = dim_dst.width * dim_dst.height * FB_DATA_SZ;
 #else
-        c_native_img_size = dim_dst.width *
-                            dim_dst.height;
+        c_native_img_size = dim_dst.width * dim_dst.height;
 #endif
         /* check memory constraints
          * do the correction only if there is enough
@@ -2165,15 +2163,15 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
             decoder->infoPng.width = img_dst.width;
             decoder->infoPng.height = img_dst.height;
             decoder->native_img_size = c_native_img_size;
-    
+
             /* copy back corrected image to the begining of the buffer */
             memcpy(img_src.data, img_dst.data, decoder->native_img_size);
         }
     }
-
 #endif /* (LCD_PIXEL_ASPECT_HEIGHT != 1 || LCD_PIXEL_ASPECT_WIDTH != 1) */
-time = *rb->current_tick - time;
-if (pf_progress) pf_progress(100, 100);
+
+    time = *rb->current_tick - time;
+    if (pf_progress) pf_progress(100, 100);
 }
 
 void LodePNG_Decoder_init(LodePNG_Decoder* decoder,
