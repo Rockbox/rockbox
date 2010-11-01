@@ -101,6 +101,9 @@ mpc_demux_fill(mpc_demux * d, mpc_uint32_t min_bytes, int flags)
             memmove(d->buffer + offset, d->bits_reader.buff, unread_bytes);
             d->bits_reader.buff = d->buffer + offset;
             d->bytes_total = unread_bytes + offset;
+            /* reset Coldfire optimized read when rebuffering */
+            d->bits_reader.buffered_addr = 0;
+            d->bits_reader.buffered_code = 0;
         }
         bytes2read = d->r->read(d->r, d->buffer + d->bytes_total, bytes2read);
         if (flags & MPC_BUFFER_SWAP){
