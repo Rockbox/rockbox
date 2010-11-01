@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 */
 
 /* workaround gcc 3.4.6 -std=gnu99 */
-#ifndef __ASSEMBLER
+#ifndef __ASSEMBLER__
 #define __ASSEMBLER__
 #endif
 
