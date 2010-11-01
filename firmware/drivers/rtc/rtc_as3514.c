@@ -142,6 +142,10 @@ void rtc_alarm_poweroff(void)
 
     seconds -= tm.tm_sec;
 
+    /* disable MCLK, it is a wakeup source and prevents proper shutdown */
+    CGU_AUDIO = (2 << 0) | (1 << 11);
+    CGU_PLLBSUP = (1 << 2) | (1 << 3);
+
     /* write wakeup register */
     alarm.seconds = seconds;
     alarm.enabled = true;
