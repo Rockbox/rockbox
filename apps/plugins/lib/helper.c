@@ -107,3 +107,15 @@ void backlight_brightness_use_setting(void)
     rb->backlight_set_brightness(rb->global_settings->brightness);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+void buttonlight_brightness_set(int brightness)
+{
+    rb->buttonlight_set_brightness(brightness);
+}
+
+void buttonlight_brightness_use_setting(void)
+{
+    rb->buttonlight_set_brightness(rb->global_settings->buttonlight_brightness);
+}
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */

@@ -123,40 +123,36 @@
 #ifdef HAVE_LCD_COLOR
 /* RGB color sets */
 #define NUM_COLORSETS   2
-static int colorset[NUM_COLORSETS][3] = { { 255, 255, 255 } ,    /* white */
-                                          { 255,   0,   0 } };   /* red */
+static unsigned colorset[NUM_COLORSETS] = {
+    LCD_RGBPACK(255, 255, 255),    /* white */
+    LCD_RGBPACK(255,   0,   0),    /* red */
+};
 #endif /* HAVE_LCD_COLOR */
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
+    enum plugin_status status = PLUGIN_OK;
     long button;
     (void)parameter;
 
 #ifdef HAVE_LCD_COLOR
     int cs = 0;
     bool quit = false;
+    bool update = true;
 #endif /* HAVE_LCD_COLOR */
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    short old_brightness = rb->global_settings->brightness;
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    short old_buttonlight_brightness =
-            rb->global_settings->buttonlight_brightness;
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
-
 #if LCD_DEPTH > 1
-    unsigned bg_color=rb->lcd_get_background();
+    unsigned bg_color = rb->lcd_get_background();
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background(LCD_WHITE);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    rb->backlight_set_brightness(MAX_BRIGHTNESS_SETTING);
+    backlight_brightness_set(MAX_BRIGHTNESS_SETTING);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    rb->buttonlight_set_brightness(MAX_BRIGHTNESS_SETTING);
+    buttonlight_brightness_set(MAX_BRIGHTNESS_SETTING);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_LCD_INVERT
@@ -175,23 +171,26 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_COLOR
     do
     {
-        if(cs < 0)
-            cs = NUM_COLORSETS-1;
-        if(cs >= NUM_COLORSETS)
-            cs = 0;
-        rb->lcd_set_background( LCD_RGBPACK( colorset[cs][0],
-                                colorset[cs][1],
-                                colorset[cs][2] ) );
-        rb->lcd_clear_display();
-        rb->lcd_update();
+        if(update)
+        {
+            if(cs < 0)
+                cs = NUM_COLORSETS-1;
+            if(cs >= NUM_COLORSETS)
+                cs = 0;
+            rb->lcd_set_background(colorset[cs]);
+            rb->lcd_clear_display();
+            rb->lcd_update();
+            update = false;
+        }
 
-        switch((button = rb->button_get(true)))
+        switch((button = rb->button_get_w_tmo(HZ*30)))
         {
             case LAMP_RIGHT:
 #ifdef LAMP_NEXT
             case LAMP_NEXT:
 #endif /* LAMP_NEXT */
                 cs++;
+                update = true;
                 break;
 
             case LAMP_LEFT:
@@ -199,25 +198,24 @@ enum plugin_status plugin_start(const void* parameter)
             case LAMP_PREV:
 #endif /* LAMP_PREV */
                 cs--;
+                update = true;
                 break;
 
-            case (LAMP_RIGHT|BUTTON_REPEAT):
-            case (LAMP_RIGHT|BUTTON_REL):
-            case (LAMP_LEFT|BUTTON_REPEAT):
-            case (LAMP_LEFT|BUTTON_REL):
-#ifdef LAMP_NEXT
-            case (LAMP_NEXT|BUTTON_REPEAT):
-            case (LAMP_NEXT|BUTTON_REL):
-#endif /* LAMP_NEXT */
-#ifdef LAMP_PREV
-            case (LAMP_PREV|BUTTON_REPEAT):
-            case (LAMP_PREV|BUTTON_REL):
-#endif /* LAMP_PREV */
-                /* eat these... */
-                break;    
             default:
-                    quit = true;
+                if(button)
+                {
+                    if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    {
+                        status = PLUGIN_USB_CONNECTED;
+                        quit = true;
+                    }
+                    if(!(button & (BUTTON_REL|BUTTON_REPEAT))
+                        && !IS_SYSEVENT(button))
+                        quit = true;
+                }
+                break;
         }
+        rb->reset_poweroff_timer();
     } while (!quit);
 
 #else /* HAVE_LCD_COLOR */
@@ -226,10 +224,18 @@ enum plugin_status plugin_start(const void* parameter)
     /* wait */
     do
     {
-        button = rb->button_get(false);
-        if (button && !IS_SYSEVENT(button))
-            break;
-        rb->yield();
+        button = rb->button_get_w_tmo(HZ*30);
+        if(button)
+        {
+            if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+                status = PLUGIN_USB_CONNECTED;
+                break;
+            }
+            if(!IS_SYSEVENT(button))
+                break;
+        }
+        rb->reset_poweroff_timer();
     } while (1);
 
 #endif /*HAVE_LCD_COLOR */
@@ -245,15 +251,14 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_LCD_INVERT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    rb->backlight_set_brightness(old_brightness);
+    backlight_brightness_use_setting();
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    rb->buttonlight_set_brightness(old_buttonlight_brightness);
+    buttonlight_brightness_use_setting();
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background(bg_color);
 #endif
-    return PLUGIN_OK;
+    return status;
 }
-
