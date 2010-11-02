@@ -163,7 +163,8 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN_REPEAT,      BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
-#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+#elif (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
     { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
     { PLA_DOWN,             BUTTON_DOWN,                        BUTTON_NONE },
     { PLA_LEFT,             BUTTON_PREV,                        BUTTON_NONE },
@@ -322,7 +323,8 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_RC_MODE,                     BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE},
     {PLA_SELECT_REPEAT,     BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+#elif (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_CANCEL,            BUTTON_MENU,                        BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},

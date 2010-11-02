@@ -81,6 +81,24 @@
 #define BTN_UP           BUTTON_SCROLL_UP
 #define BTN_DOWN         BUTTON_SCROLL_DOWN
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_NEXT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_NEXT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
 #define BTN_QUIT         BUTTON_PLAY
 #define BTN_RIGHT        BUTTON_RIGHT

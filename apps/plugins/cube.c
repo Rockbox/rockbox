@@ -244,6 +244,16 @@
 #define CUBE_PAUSE         BUTTON_SELECT
 #define CUBE_HIGHSPEED     BUTTON_VIEW
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_NEXT          BUTTON_NEXT
+#define CUBE_PREV          BUTTON_PREV
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_RIGHT
+
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_NEXT          BUTTON_NEXT
