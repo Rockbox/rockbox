@@ -21,7 +21,12 @@
 
 #include "config.h"
 
+#if defined(CPU_S5L870X)
+    /* Moving this asm routine to iram is (little) faster on S5L870x. */
+    .section .icode, "ax", %progbits
+#else
     .section .text, "ax", %progbits
+#endif
 
 /****************************************************************************
  * void mpc_decoder_windowing_D(...)
