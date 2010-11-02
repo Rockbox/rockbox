@@ -2,14 +2,14 @@
 #include "wma.h"
 #include "../libasf/asf.h"
 
-#if   (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
+#if   (CONFIG_CPU == MCF5250)
 /* Enough IRAM but performance suffers with ICODE_ATTR. */
 #define IBSS_ATTR_WMAPRO_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_WMAPRO_LARGE_IRAM
 #define ICONST_ATTR_WMAPRO_LARGE_IRAM ICONST_ATTR
 #define ICONST_ATTR_WMAPRO_WIN_VS_TMP
 
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X)
 /* Enough IRAM to move additional data and code to it. */
 #define IBSS_ATTR_WMAPRO_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_WMAPRO_LARGE_IRAM  ICODE_ATTR

@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 
-#if   (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
+#if   (CONFIG_CPU == MCF5250)
 /* Enough IRAM but performance suffers with ICODE_ATTR. */
 #define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_MPC_LARGE_IRAM
@@ -55,7 +55,7 @@ extern "C" {
 /* Keep the data arrays of bitsreadr.c in IRAM. */
 #define ICONST_ATTR_MPC_BITSREADER ICONST_ATTR
 
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X)
 /* Enough IRAM to move additional data and code to it. */
 #define IBSS_ATTR_MPC_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_MPC_LARGE_IRAM  ICODE_ATTR
