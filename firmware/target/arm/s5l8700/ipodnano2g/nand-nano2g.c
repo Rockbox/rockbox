@@ -772,8 +772,8 @@ int nand_device_init(void)
         nand_tunk3[i] = nand_deviceinfotable[nand_type[i]].tunk3;
     }
     if (nand_type[0] < 0) return nand_type[0];
-    nand_interleaved = ((nand_type[0] >> 22) & 1);
-    nand_cached = ((nand_type[0] >> 23) & 1);
+    nand_interleaved = ((nand_deviceinfotable[nand_type[0]].id >> 22) & 1);
+    nand_cached = ((nand_deviceinfotable[nand_type[0]].id >> 23) & 1);
 
     nand_last_activity_value = current_tick;
     create_thread(nand_thread, nand_stack,
