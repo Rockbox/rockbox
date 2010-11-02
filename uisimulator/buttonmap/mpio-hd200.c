@@ -30,13 +30,13 @@ int key_to_button(int keyboard_button)
     switch (keyboard_button)
     {
         case SDLK_UP:
-            new_btn = BUTTON_PREV;
+            new_btn = BUTTON_REW;
             break;
         case SDLK_DOWN:
-            new_btn = BUTTON_NEXT;
+            new_btn = BUTTON_FF;
             break;
         case SDLK_SPACE:
-            new_btn = BUTTON_SELECT;
+            new_btn = BUTTON_FUNC;
             break;
         case SDLK_RETURN:
         case SDLK_p:
@@ -61,7 +61,7 @@ struct button_map bm[] = {
     { SDLK_RETURN,  369, 305, 20, "Play/Stop" },
     { SDLK_UP,      353, 168,  10, "Rew" },
     { SDLK_DOWN,    353, 198,  10, "FF" },
-    { SDLK_SPACE,   353, 186,  10, "Select" },
+    { SDLK_SPACE,   353, 186,  10, "Func" },
     { SDLK_LEFT,     123, 67, 20, "Vol Down" },
     { SDLK_RIGHT,     206, 67, 20, "Vol Up" },
     { SDLK_h,     369, 402, 30, "Hold" },

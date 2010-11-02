@@ -233,7 +233,7 @@ static void bootmenu(void)
 
     printf("=========================");
     printf("");
-    printf(" [FF] [PREV] to move ");
+    printf(" [FF] [REW] to move ");
     printf(" [PLAY] to confirm ");
 
     /* content of menu and keys handling */
@@ -262,16 +262,16 @@ static void bootmenu(void)
 
         switch (button)
         {
-            case BUTTON_PREV:
-            case BUTTON_RC_PREV:
+            case BUTTON_REW:
+            case BUTTON_RC_REW:
                 if (option > rockbox)
                     option--;
                 else
                     option = shutdown;
                 break;
 
-            case BUTTON_NEXT:
-            case BUTTON_RC_NEXT:
+            case BUTTON_FF:
+            case BUTTON_RC_FF:
                 if (option < shutdown)
                     option++;
                 else
