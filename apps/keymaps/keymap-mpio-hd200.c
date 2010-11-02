@@ -150,10 +150,10 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,            BUTTON_FUNC|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_FM_PRESET,          BUTTON_FUNC|BUTTON_REL,        BUTTON_FUNC },
-/*  { ACTION_FM_RECORD,          BUTTON_,                       BUTTON_ }, */
+/*  { ACTION_FM_RECORD,          BUTTON_,      BUTTON_ }, */
 /*  { ACTION_FM_FREEZE,          BUTTON_,                       BUTTON_ }, */
-    { ACTION_FM_STOP,            BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
-    { ACTION_FM_MODE,            BUTTON_FUNC,                   BUTTON_NONE },
+    { ACTION_FM_STOP,            BUTTON_REC|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_FM_MODE,            BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
     { ACTION_FM_EXIT,            BUTTON_REC|BUTTON_REL,         BUTTON_REC },
     { ACTION_FM_PLAY,            BUTTON_PLAY|BUTTON_REL,        BUTTON_PLAY },
 /*  { ACTION_FM_RECORD_DBLPRE,   BUTTON_,                       BUTTON_ }, */

@@ -134,6 +134,14 @@
 #define FM_PLAY
 #define FM_MODE
 
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
+#define FM_MENU
+#define FM_STOP
+#define FM_EXIT
+#define FM_PLAY
+#define FM_MODE
+#define FM_STOP
+
 #endif
 
 /* presets.c needs these so keep unstatic or redo the whole thing! */
