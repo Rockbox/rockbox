@@ -122,18 +122,21 @@ battery_bench.c
 crypt_firmware.c
 #endif
 
-#if (CONFIG_CODEC == SWCODEC)
-metronome.c
-#endif
-
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
 wavplay.c
 #endif
+
 #if (CONFIG_CODEC == MAS3587F)
 wavrecord.c
 #endif
 
 #endif /* PLATFORM_NATIVE */
+
+
+
+#if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR) /* Not for hwcodec sims */
+metronome.c
+#endif
 
 
 
