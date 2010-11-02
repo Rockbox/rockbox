@@ -113,7 +113,7 @@
 #define ONEDROCKBLOX_QUIT              BUTTON_REC
 
 #elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
-#define ONEDROCKBLOX_DOWN              BUTTON_SELECT
+#define ONEDROCKBLOX_DOWN              BUTTON_FUNC
 #define ONEDROCKBLOX_QUIT              (BUTTON_REC | BUTTON_PLAY)
 
 #elif defined(HAVE_TOUCHSCREEN)

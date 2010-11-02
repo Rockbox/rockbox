@@ -405,17 +405,17 @@ enum {
 #define BJACK_LEFT          BUTTON_PREV
 
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define BJACK_SELECT_NAME    "SELECT"
-#define BJACK_STAY_NAME     "RIGHT"
+#define BJACK_SELECT_NAME   "FUNC"
+#define BJACK_STAY_NAME     "VOL +"
 #define BJACK_RESUME_NAME   "PLAY"
 #define BJACK_QUIT_NAME     "REC+PLAY"
-#define BJACK_DOUBLE_NAME   "LEFT"
-#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_DOUBLE_NAME   "VOL -"
+#define BJACK_SELECT        BUTTON_FUNC
 #define BJACK_QUIT          (BUTTON_REC|BUTTON_PLAY)
 #define BJACK_STAY          BUTTON_VOL_UP
 #define BJACK_DOUBLEDOWN    BUTTON_VOL_DOWN
-#define BJACK_UP            BUTTON_PREV
-#define BJACK_DOWN          BUTTON_NEXT
+#define BJACK_UP            BUTTON_REW
+#define BJACK_DOWN          BUTTON_FF
 #define BJACK_RIGHT         BUTTON_VOL_UP
 #define BJACK_LEFT          BUTTON_VOL_DOWN
 

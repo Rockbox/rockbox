@@ -197,8 +197,8 @@ const unsigned char rockbox16x7[] = {
 #define LP_QUIT  (BUTTON_REC|BUTTON_PLAY)
 #define LP_DEC_X BUTTON_VOL_DOWN
 #define LP_INC_X BUTTON_VOL_UP
-#define LP_DEC_Y BUTTON_PREV
-#define LP_INC_Y BUTTON_NEXT
+#define LP_DEC_Y BUTTON_REW
+#define LP_INC_Y BUTTON_FF
 
 #else
 #define LP_QUIT BUTTON_OFF

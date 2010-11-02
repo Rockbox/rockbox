@@ -367,14 +367,14 @@
 #define CB_MENU    BUTTON_MENU
 
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define CB_SELECT  BUTTON_SELECT
-#define CB_UP      BUTTON_PREV
-#define CB_DOWN    BUTTON_NEXT
+#define CB_SELECT  BUTTON_FUNC
+#define CB_UP      BUTTON_REW
+#define CB_DOWN    BUTTON_FF
 #define CB_LEFT    BUTTON_VOL_DOWN
 #define CB_RIGHT   BUTTON_VOL_UP
 #define CB_PLAY    BUTTON_PLAY
 #define CB_LEVEL   BUTTON_REC
-#define CB_MENU    (BUTTON_SELECT | BUTTON_REPEAT)
+#define CB_MENU    (BUTTON_FUNC | BUTTON_REPEAT)
 
 #else
 #error No keymap defined!

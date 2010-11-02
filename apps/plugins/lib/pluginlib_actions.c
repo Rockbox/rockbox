@@ -191,12 +191,12 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_LEFT_REPEAT,       BUTTON_PREV|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_NEXT|BUTTON_REPEAT,         BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
-    { PLA_UP,                BUTTON_PREV,                       BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_NEXT,                       BUTTON_NONE},
+    { PLA_UP,                BUTTON_REW,                        BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_FF,                         BUTTON_NONE},
     { PLA_LEFT,              BUTTON_VOL_DOWN,                   BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_VOL_UP,                     BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_PREV|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_NEXT|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_REW|BUTTON_REPEAT,          BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_FF|BUTTON_REPEAT,           BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE},
 #else
@@ -361,9 +361,9 @@ const struct button_mapping pla_main_ctx[] =
 #elif (CONFIG_KEYPAD == MPIO_HD200_PAD)                                      
     {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE},
     {PLA_EXIT,              (BUTTON_REC|BUTTON_PLAY),           BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
-    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_FUNC,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_FUNC|BUTTON_REL,             BUTTON_FUNC},
+    {PLA_SELECT_REPEAT,     BUTTON_FUNC|BUTTON_REPEAT,          BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined

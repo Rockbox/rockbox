@@ -120,7 +120,7 @@
 
 #elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
 #define BTN_MENU BUTTON_REC
-#define BTN_FIRE BUTTON_SELECT
+#define BTN_FIRE BUTTON_PLAY
 
 #elif defined(HAVE_TOUCHSCREEN)
     /* This is a touchscreen target */

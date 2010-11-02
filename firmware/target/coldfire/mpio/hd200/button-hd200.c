@@ -113,15 +113,15 @@ int button_read_device(void)
                         /* 1200 - 900 */
                         btn = BUTTON_VOL_UP;
                     else /* 1600 - 1200 */
-                        btn = BUTTON_NEXT;
+                        btn = BUTTON_FF;
                 }
                 else /* 1600 - 2250 */
                 {
                     if (data < 1900)
                         /* 1900 - 1600 */
-                        btn = BUTTON_PREV;
+                        btn = BUTTON_REW;
                     else /* 1900 - 2300 */
-                        btn = BUTTON_SELECT;
+                        btn = BUTTON_FUNC;
                 }
 	    }	    
         }
@@ -148,7 +148,7 @@ int button_read_device(void)
                         btn = BUTTON_RC_VOL_UP;
                 }
                 else /* 950 - 650 */
-                    btn = BUTTON_RC_NEXT;
+                    btn = BUTTON_RC_FF;
             }
             else /* 2050 - 950 */
             {
@@ -156,10 +156,10 @@ int button_read_device(void)
                 {
                     if (data < 1350)
                         /* 1350 - 900 */
-                        btn = BUTTON_RC_PREV;
+                        btn = BUTTON_RC_REW;
                 }
                 else /* 2050 - 1900 */
-                    btn = BUTTON_RC_SELECT;
+                    btn = BUTTON_RC_FUNC;
             }
         }
     }

@@ -212,8 +212,8 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_QUIT (BUTTON_REC|BUTTON_PLAY)
 #define SNAKE_LEFT BUTTON_VOL_DOWN
 #define SNAKE_RIGHT BUTTON_VOL_UP
-#define SNAKE_UP   BUTTON_PREV
-#define SNAKE_DOWN BUTTON_NEXT
+#define SNAKE_UP   BUTTON_REW
+#define SNAKE_DOWN BUTTON_FF
 #define SNAKE_PLAYPAUSE BUTTON_PLAY
 
 #else
