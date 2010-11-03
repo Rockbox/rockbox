@@ -22,7 +22,7 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(BUILDDIR)
 
 # Makes mkdepfile happy
-GCCOPTS+=-D__PCTOOL__ -DCHECKWPS
+GCCOPTS+=-D__PCTOOL__ -DCHECKWPS -g
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 

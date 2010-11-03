@@ -958,7 +958,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     }
     if (element->tag->flags&FEATURE_TAG)
     {
-        if (feature_available)
+        if (feature_available && children > 1)
             children--;
     }
     conditional_end = cursor;
