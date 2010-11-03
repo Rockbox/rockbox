@@ -294,6 +294,25 @@ struct load_slide_event_data {
     int cache_index;
 };
 
+enum pf_scroll_line_type {
+    PF_SCROLL_TRACK = 0,
+    PF_SCROLL_ALBUM,
+    PF_MAX_SCROLL_LINES
+};
+
+struct pf_scroll_line_info {
+    long ticks;         /* number of ticks between each move */
+    long delay;         /* number of ticks to delay starting scrolling */
+    int step;           /* pixels to move */
+    long next_scroll;   /* tick of the next move */
+};
+
+struct pf_scroll_line {
+    int width;          /* width of the string */
+    int offset;         /* x coordinate of the string */
+    int step;           /* 0 if scroll is disabled. otherwise, pixels to move */
+    long start_tick;    /* tick when to start scrolling */
+};
 
 struct pfraw_header {
     int32_t width;          /* bmap width in pixels */
@@ -408,17 +427,15 @@ static bool thread_is_running;
 static int cover_animation_keyframe;
 static int extra_fade;
 
-static int albumtxt_x = 0;
-static int albumtxt_dir = -1;
+static struct pf_scroll_line_info scroll_line_info;
+static struct pf_scroll_line scroll_lines[PF_MAX_SCROLL_LINES];
 static int prev_albumtxt_index = -1;
+static int last_selected_track = -1;
 
 static int start_index_track_list = 0;
 static int track_list_visible_entries = 0;
 static int track_list_y;
 static int track_list_h;
-static int track_scroll_x = 0;
-static int track_scroll_dir = 1;
-static int last_selected_track;
 
 /*
     Proposals for transitions:
@@ -719,6 +736,74 @@ const struct custom_format format_transposed = {
 static const struct button_mapping* get_context_map(int context)
 {
     return pf_contexts[context & ~CONTEXT_PLUGIN];
+}
+
+/* scrolling */
+static void init_scroll_lines(void)
+{
+    int i;
+    static const char scroll_tick_table[16] = {
+     /* Hz values:
+        1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
+        100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
+    };
+
+    scroll_line_info.ticks = scroll_tick_table[rb->global_settings->scroll_speed];
+    scroll_line_info.step = rb->global_settings->scroll_step;
+    scroll_line_info.delay = rb->global_settings->scroll_delay / (HZ / 10);
+    scroll_line_info.next_scroll = *rb->current_tick;
+    for (i = 0; i < PF_MAX_SCROLL_LINES; i++)
+        scroll_lines[i].step = 0;
+}
+
+static void set_scroll_line(const char *str, enum pf_scroll_line_type type)
+{
+    struct pf_scroll_line *s = &scroll_lines[type];
+    s->width = mylcd_getstringsize(str, NULL, NULL);
+    s->step = 0;
+    s->offset = 0;
+    s->start_tick = *rb->current_tick + scroll_line_info.delay;
+    if (LCD_WIDTH - s->width < 0)
+        s->step = scroll_line_info.step;
+    else
+        s->offset = (LCD_WIDTH - s->width) / 2;
+}
+
+static int get_scroll_line_offset(enum pf_scroll_line_type type)
+{
+    return scroll_lines[type].offset;
+}
+
+static void update_scroll_lines(void)
+{
+    int i;
+
+    if (TIME_BEFORE(*rb->current_tick, scroll_line_info.next_scroll))
+        return;
+
+    scroll_line_info.next_scroll = *rb->current_tick + scroll_line_info.ticks;
+
+    for (i = 0; i < PF_MAX_SCROLL_LINES; i++)
+    {
+        struct pf_scroll_line *s = &scroll_lines[i];
+        if (s->step && TIME_BEFORE(s->start_tick, *rb->current_tick))
+        {
+            s->offset -= s->step;
+
+            if (s->offset >= 0) {
+                /* at beginning of line */
+                s->offset = 0;
+                s->step = scroll_line_info.step;
+                s->start_tick = *rb->current_tick + scroll_line_info.delay * 2;
+            }
+            if (s->offset <= LCD_WIDTH - s->width) {
+                /* at end of line */
+                s->offset = LCD_WIDTH - s->width;
+                s->step = -scroll_line_info.step;
+                s->start_tick = *rb->current_tick + scroll_line_info.delay * 2;
+            }
+        }
+    }
 }
 
 /* Create the lookup table with the scaling values for the reflections */
@@ -2408,29 +2493,23 @@ void show_track_list(void)
     for (;track_i < track_list_visible_entries+start_index_track_list;
          track_i++)
     {
-        mylcd_getstringsize(get_track_name(track_i), &titletxt_w, NULL);
-        titletxt_x = (LCD_WIDTH-titletxt_w)/2;
+        char *trackname = get_track_name(track_i);
         if ( track_i == selected_track ) {
             if (selected_track != last_selected_track) {
+                set_scroll_line(trackname, PF_SCROLL_TRACK);
                 last_selected_track = selected_track;
-                track_scroll_x = 0;
-                track_scroll_dir = -1;
             }
             draw_gradient(titletxt_y, titletxt_h);
-            if (titletxt_w > LCD_WIDTH ) {
-                if ( titletxt_w + track_scroll_x <= LCD_WIDTH )
-                    track_scroll_dir = 1;
-                else if ( track_scroll_x >= 0 ) track_scroll_dir = -1;
-                track_scroll_x += track_scroll_dir*2;
-                titletxt_x = track_scroll_x;
-            }
+            titletxt_x = get_scroll_line_offset(PF_SCROLL_TRACK);
             color = 255;
         }
         else {
+            titletxt_w = mylcd_getstringsize(trackname, NULL, NULL);
+            titletxt_x = (LCD_WIDTH-titletxt_w)/2;
             color = 250 - (abs(selected_track - track_i) * 200 / track_count);
         }
         mylcd_set_foreground(G_BRIGHT(color));
-        mylcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+        mylcd_putsxy(titletxt_x,titletxt_y,trackname);
         titletxt_y += titletxt_h;
     }
 }
@@ -2507,8 +2586,8 @@ void draw_album_text(void)
         return;
 
     int albumtxt_index;
-    int albumtxt_w, albumtxt_h;
-    int albumtxt_y = 0;
+    int char_height;
+    int albumtxt_x, albumtxt_y;
 
     char *albumtxt;
     int c;
@@ -2532,29 +2611,19 @@ void draw_album_text(void)
     albumtxt = get_album_name(albumtxt_index);
 
     mylcd_set_foreground(G_BRIGHT(c));
-    mylcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
     if (albumtxt_index != prev_albumtxt_index) {
-        albumtxt_x = 0;
-        albumtxt_dir = -1;
+        set_scroll_line(albumtxt, PF_SCROLL_ALBUM);
         prev_albumtxt_index = albumtxt_index;
     }
 
+    char_height = rb->screens[SCREEN_MAIN]->getcharheight();
     if (show_album_name == ALBUM_NAME_TOP)
-        albumtxt_y = albumtxt_h / 2;
+        albumtxt_y = char_height / 2;
     else
-        albumtxt_y = LCD_HEIGHT - albumtxt_h - albumtxt_h/2;
+        albumtxt_y = LCD_HEIGHT - char_height - char_height/2;
 
-    if (albumtxt_w > LCD_WIDTH ) {
-        mylcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
-        if ( pf_state == pf_idle || pf_state == pf_show_tracks ) {
-            if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
-            else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
-            albumtxt_x += albumtxt_dir;
-        }
-    }
-    else {
-        mylcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
-    }
+    albumtxt_x = get_scroll_line_offset(PF_SCROLL_ALBUM);
+    mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
 }
 
 /**
@@ -2593,6 +2662,7 @@ int main(void)
         backlight_force_on();     /* backlight control in lib/helper.c */
     }
 
+    init_scroll_lines();
     init_reflect_table();
 
     ALIGN_BUFFER(buf, buf_size, 4);
@@ -2681,6 +2751,8 @@ int main(void)
 
         /* Initial rendering */
         instant_update = false;
+
+        update_scroll_lines();
 
         /* Handle states */
         switch ( pf_state ) {
