@@ -157,6 +157,15 @@
 #define ZX_SELECT       BUTTON_SELECT
 #define ZX_MENU         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_MENU         BUTTON_MENU
+
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #define ZX_UP           BUTTON_UP
 #define ZX_DOWN         BUTTON_DOWN

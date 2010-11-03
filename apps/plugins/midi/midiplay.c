@@ -164,6 +164,14 @@
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_PLAY         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_MENU
+
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_NEXT
