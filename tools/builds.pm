@@ -59,7 +59,7 @@ $releasenotes="/wiki/ReleaseNotes37";
     },
     'gogearhdd6330' => {
         name => 'Philips GoGear HDD6330',
-        status => 1,
+        status => 2,
     },
     'gogearsa9200' => {
         name => 'Philips GoGear SA9200',
