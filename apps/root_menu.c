@@ -639,7 +639,15 @@ void root_menu(void)
             case GO_TO_ROOT:
                 if (last_screen != GO_TO_ROOT)
                     selected = get_selection(last_screen);
+#if (CONFIG_PLATFORM&PLATFORM_ANDROID)
+                /* When we are in the main menu we want the hardware BACK
+                 * button to be handled by Android instead of rockbox */
+                android_ignore_back_button(true);
+#endif
                 next_screen = do_menu(&root_menu_, &selected, NULL, false);
+#if (CONFIG_PLATFORM&PLATFORM_ANDROID)
+                android_ignore_back_button(false);
+#endif
                 if (next_screen != GO_TO_PREVIOUS)
                     last_screen = GO_TO_ROOT;
                 break;

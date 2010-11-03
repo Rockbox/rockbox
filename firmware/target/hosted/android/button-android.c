@@ -71,30 +71,40 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jobject this,
     unsigned button = 0;
 
     if (!state)
+    {
         button = multimedia_to_button((int)keycode);
-
-    if (button)
-    {   /* multimeida buttons are handled differently */
-        queue_post(&button_queue, button, 0);
-        return true;
+        if (!button)
+            button = dpad_to_button((int)keycode);
+        if (button)
+            queue_post(&button_queue, button, 0);
     }
 
-    button = key_to_button(keycode);
+    if (!button)
+    {   
+        button = key_to_button(keycode);
+    }
 
     if (button == BUTTON_NONE)
+    {
+        last_btns = button;
         return false;
+    }
 
     if (state)
     {
         last_btns |= button;
-        last_button_tick = current_tick;
     }
+    else
+    {
+        last_btns &= (~button);
+        return false;
+    }
+        
     return true;
 }
 
 void button_init_device(void)
 {
-    last_button_tick = 0;
 }
 
 int button_read_device(int *data)
@@ -110,7 +120,5 @@ int button_read_device(int *data)
     if (last_touch_state == STATE_DOWN)
         btn |= touch;
 
-    if (TIME_AFTER(current_tick, last_button_tick+5))
-        last_btns = 0;
     return btn;
 }

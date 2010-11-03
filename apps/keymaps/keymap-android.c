@@ -38,15 +38,14 @@
  */
 
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,        BUTTON_DPAD_UP,                 BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,  BUTTON_DPAD_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_NEXT,        BUTTON_DPAD_DOWN,               BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,  BUTTON_DPAD_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_STD_PREV,        BUTTON_DPAD_UP|BUTTON_REL,        BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_DPAD_DOWN|BUTTON_REL,      BUTTON_NONE },
 
-    { ACTION_STD_OK,          BUTTON_DPAD_CENTER|BUTTON_REL,  BUTTON_DPAD_CENTER },
-    { ACTION_STD_OK,          BUTTON_DPAD_RIGHT|BUTTON_REL,   BUTTON_DPAD_RIGHT },
-    { ACTION_STD_CANCEL,      BUTTON_BACK,                    BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_DPAD_LEFT|BUTTON_REL,    BUTTON_DPAD_LEFT },
+    { ACTION_STD_OK,          BUTTON_DPAD_CENTER,               BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_DPAD_RIGHT|BUTTON_REL,     BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_BACK,                      BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_BACK|BUTTON_REPEAT,        BUTTON_BACK },
+    { ACTION_STD_CANCEL,      BUTTON_DPAD_LEFT|BUTTON_REL,      BUTTON_NONE },
 
     { ACTION_STD_CONTEXT,     BUTTON_MENU,                    BUTTON_NONE },
 
@@ -78,12 +77,10 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 };
 
 static const struct button_mapping button_context_settings[]  = {
-    { ACTION_SETTINGS_INC,          BUTTON_DPAD_RIGHT,                BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_DPAD_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_DPAD_LEFT,                 BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DPAD_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_OK,                BUTTON_DPAD_CENTER,               BUTTON_NONE },
-    { ACTION_STD_CANCEL,            BUTTON_BACK,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_DPAD_RIGHT|BUTTON_REL,   BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_DPAD_LEFT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_STD_OK,                BUTTON_DPAD_CENTER,             BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_BACK,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
@@ -124,24 +121,13 @@ static const struct button_mapping button_context_quickscreen[]  = {
 
 static const struct button_mapping button_context_pitchscreen[]  = {
 
-    { ACTION_PS_INC_SMALL, BUTTON_DPAD_RIGHT,                BUTTON_NONE },
-    { ACTION_PS_INC_BIG,   BUTTON_DPAD_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_PS_DEC_SMALL, BUTTON_DPAD_LEFT,                 BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,   BUTTON_DPAD_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_PS_EXIT,      BUTTON_BACK,                      BUTTON_NONE },
+    { ACTION_PS_INC_SMALL, BUTTON_DPAD_RIGHT|BUTTON_REL,  BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL, BUTTON_DPAD_LEFT|BUTTON_REL,   BUTTON_NONE },
+    { ACTION_PS_EXIT,      BUTTON_BACK,                   BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
-static const struct button_mapping button_context_keyboard[]  = {
-    { ACTION_KBD_PAGE_FLIP,    BUTTON_MENU,                        BUTTON_NONE },
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_DPAD_LEFT,                   BUTTON_NONE },
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_DPAD_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_DPAD_RIGHT,                  BUTTON_NONE },
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_DPAD_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
-
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_keyboard */
 
 static const struct button_mapping button_context_radio[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
@@ -181,8 +167,6 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_SETTINGS_TIME:
             return button_context_time;
 
-        case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;
         case CONTEXT_FM:
             return button_context_radio;
         case CONTEXT_BOOKMARKSCREEN:
@@ -191,8 +175,6 @@ const struct button_mapping* target_get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
-        case CONTEXT_KEYBOARD:
-            return button_context_keyboard;
     }
     return button_context_standard;
 }

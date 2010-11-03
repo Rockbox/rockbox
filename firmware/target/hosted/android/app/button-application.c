@@ -23,26 +23,24 @@
 #include "button.h"
 #include "android_keyevents.h"
 
+static bool ignore_back_button = false;
+void android_ignore_back_button(bool yes)
+{
+    ignore_back_button = yes;
+}
+
 int key_to_button(int keyboard_key)
 {
     switch (keyboard_key)
     {
-        default:
-            return BUTTON_NONE;
         case KEYCODE_BACK:
-            return BUTTON_BACK;
-        case KEYCODE_DPAD_UP:
-            return BUTTON_DPAD_UP;
-        case KEYCODE_DPAD_DOWN:
-            return BUTTON_DPAD_DOWN;
-        case KEYCODE_DPAD_LEFT:
-            return BUTTON_DPAD_LEFT;
-        case KEYCODE_DPAD_RIGHT:
-            return BUTTON_DPAD_RIGHT;
-        case KEYCODE_DPAD_CENTER:
-            return BUTTON_DPAD_CENTER;
+            return ignore_back_button ? BUTTON_NONE : BUTTON_BACK;
         case KEYCODE_MENU:
             return BUTTON_MENU;
+        case KEYCODE_DPAD_CENTER:
+            return BUTTON_DPAD_CENTER;
+        default:
+            return BUTTON_NONE;
     }
 }
 
@@ -66,3 +64,25 @@ unsigned multimedia_to_button(int keyboard_key)
             return 0;
     }
 }
+
+unsigned dpad_to_button(int keyboard_key)
+{
+    switch (keyboard_key)
+    {
+        /* These buttons only post a single release event.
+         * doing otherwise will cause action.c to lock up waiting for
+         * a release (because android sends press/unpress to us too quickly
+         */
+        case KEYCODE_DPAD_UP:
+            return BUTTON_DPAD_UP|BUTTON_REL;
+        case KEYCODE_DPAD_DOWN:
+            return BUTTON_DPAD_DOWN|BUTTON_REL;
+        case KEYCODE_DPAD_LEFT:
+            return BUTTON_DPAD_LEFT|BUTTON_REL;
+        case KEYCODE_DPAD_RIGHT:
+            return BUTTON_DPAD_RIGHT|BUTTON_REL;
+        default:
+            return BUTTON_NONE;
+    }
+}
+    
