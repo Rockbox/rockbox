@@ -537,7 +537,8 @@ Rockbox uses highpass triangular distribution noise as the dithering noise
 source, and a third order noise shaper.
 }
 
-\opt{pitchscreen}{
+\opt{swcodec}{%
+\opt{pitchscreen}{%
 \section{Timestretch}
 Enabling \setting{Timestretch} allows you to change the playback speed without
 it affecting the pitch of the recording. After enabling this feature and
@@ -545,6 +546,7 @@ rebooting, you can access this via the \setting{Pitch Screen}. This function is
 intended for speech playback and may significantly dilute your listening
 experience with more complex audio. See \reference{sec:pitchscreen} for more
 details about how to use the feature.
+}
 }
 
 \opt{swcodec}{
