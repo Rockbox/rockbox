@@ -4166,6 +4166,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     ipod*,sansac200*: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
@@ -4173,11 +4174,13 @@
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
     rtc: "ВЫКЛ. = Отмена"
+    mrobe500: "ВЫКЛ. = Отмена"
     iriverh100,iriverh120,iriverh300: "СТОП = Отмена"
     ipod*,sansac200*: "МЕНЮ = Отмена"
     iaudiox5,iaudiom5: "ЗАПИСЬ = Отмена"
@@ -4185,6 +4188,7 @@
     gigabeatfx: "ВЫКЛ. = Отмена"
     mrobe100: "ПОКАЗ. = Отмена"
     gigabeats: "НАЗАД = Отмена"
+    gogearsa9200: "ЛЕВО = Отмена"
     vibe500: "C = Отмена"
   </dest>
   <voice>
@@ -7460,12 +7464,16 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
   </source>
   <dest>
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     iriverh100,iriverh120,iriverh300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Построение базы... %d найдено (ВЛЕВО для отмены)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Построение базы... %d найдено (ПРЕД. для отмены)"
+    gogearsa9200: "Построение базы... %d найдено (РЕВЕРС. для отмены)"
   </dest>
   <voice>
     *: "найдено записей в базе"
@@ -8178,15 +8186,19 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "ВОСПР. = Да"
+    cowond2*: "МЕНЮ или прав. верх. = Да"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Да"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Да"
+    mrobe500: "ВОСПР., ВЫКЛ или прав. верх. = Да"
     archosplayer: "(ВОСПР./СТОП)"
     vibe500: "OK = Да"
   </dest>
@@ -8201,15 +8213,19 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     rtc: "ВКЛ. = Установить"
+    mrobe500: "СЕРДЦЕ = Установить"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Установить"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Установить"
+    gogearsa9200: "ВОСПР. = Установить"
     vibe500: "OK = Установить"
   </dest>
   <voice>
@@ -12531,5 +12547,33 @@
   <voice>
     *: none
     recording_histogram: "Интервал гистограммы"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Начинать показ файлов с /"
+  </dest>
+  <voice>
+    *: "Начинать показ файлов с корня"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Начинать показ файлов здесь"
+  </dest>
+  <voice>
+    *: "Начинать показ файлов здесь"
   </voice>
 </phrase>
