@@ -38,11 +38,23 @@
 #include "skin_buffer.h"
 #include "statusbar-skinned.h"
 
+static bool skins_initialising = true;
+
+/* Hosted platforms use the host malloc to manage the buffer */
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
 static char *skin_buffer = NULL;
 void theme_init_buffer(void)
 {
     skin_buffer = buffer_alloc(SKIN_BUFFER_SIZE);
+    skins_initialising = false;
 }
+#else 
+#define skin_buffer NULL
+void theme_init_buffer(void)
+{
+    skins_initialising = false;
+}
+#endif
 
 void settings_apply_skins(void)
 {
@@ -149,7 +161,7 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         {
             case CUSTOM_STATUSBAR:
 #ifdef HAVE_LCD_BITMAP
-                if (skin_buffer == NULL)
+                if (skins_initialising)
                 {
                     /* still loading, buffers not initialised yet,
                      * viewport manager calls into the sbs code, not really

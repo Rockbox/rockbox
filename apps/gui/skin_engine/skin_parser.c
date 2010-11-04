@@ -1613,11 +1613,15 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     wps_data->backdrop_id = -1;
 #endif
     /* parse the skin source */
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
     skin_buffer_save_position();
+#endif
     wps_data->tree = skin_parse(wps_buffer, skin_element_callback, wps_data);
     if (!wps_data->tree) {
         skin_data_reset(wps_data);
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
         skin_buffer_restore_position();
+#endif
         return false;
     }
 
@@ -1639,7 +1643,9 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         !skin_load_fonts(wps_data)) 
     {
         skin_data_reset(wps_data);
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
         skin_buffer_restore_position();
+#endif
         return false;
     }
 #endif

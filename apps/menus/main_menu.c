@@ -147,7 +147,9 @@ enum infoscreenorder
     INFO_DISK1, /* capacity or internal capacity/free on hotswap */
     INFO_DISK2, /* free space or external capacity/free on hotswap */
     INFO_BUFFER,
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
     INFO_SKIN_USAGE, /* ram usage of the skins */
+#endif
     INFO_VERSION,
     INFO_COUNT
 };
@@ -157,7 +159,9 @@ static const char* info_getname(int selected_item, void *data,
 {
     struct info_data *info = (struct info_data*)data;
     char s1[32];
+#if defined(HAVE_MULTIVOLUME) || ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
     char s2[32];
+#endif
     if (info->new_data)
     {
         fat_size(IF_MV2(0,) &info->size, &info->free);
@@ -242,12 +246,14 @@ static const char* info_getname(int selected_item, void *data,
             snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
         case INFO_SKIN_USAGE:
             output_dyn_value(s1, sizeof s1, skin_buffer_usage(), byte_units, true);
             output_dyn_value(s2, sizeof s2, skin_buffer_usage()
                                             +skin_buffer_freespace(), byte_units, true);
             snprintf(buffer, buffer_len, "%s %s / %s", str(LANG_SKIN_RAM_USAGE), s1, s2);
             break;
+#endif
     }
     return buffer;
 }
@@ -328,10 +334,12 @@ static int info_speak_item(int selected_item, void * data)
             output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
             break;
+#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
         case INFO_SKIN_USAGE:
             talk_id(LANG_SKIN_RAM_USAGE, false);
             output_dyn_value(NULL, 0, skin_buffer_usage(), byte_units, true);
             break;
+#endif
             
     }
     return 0;

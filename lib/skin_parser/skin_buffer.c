@@ -8,7 +8,7 @@
  * $Id: skin_buffer.c 25962 2010-05-12 09:31:40Z jdgordon $
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
- * Copyright (C) 2009 Jonathan Gordon
+ * Copyright (C) 2010 Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,17 +26,72 @@
 
 #include "skin_buffer.h"
 
+/****************************************************************************
+ * 
+ *  This code handles buffer allocation for the entire skin system.
+ *  This needs to work in 3 different situations:
+ *    1) as a stand alone library. ROCKBOX isnt defined, alloc using malloc()
+ *       and free the skin elements only (no callbacks doing more allocation)
+ *    2) ROCKBOX builds for normal targets, alloc from a single big buffer
+ *       which origionally came from the audio buffer, likely to run out of
+ *       room with large themes. No need to free anything, just restore to
+ *       the start of our buffer
+ *    3) ROCKBOX "application/hosted" builds, alloc using the hosts malloc().
+ *       We need to keep track of all allocations so they can be free()'d easily
+ * 
+ * 
+ ****************************************************************************/
+
+
 #ifdef ROCKBOX
+#include "config.h"
+
+# if (CONFIG_PLATFORM&PLATFORM_HOSTED)
+#   define USE_HOST_MALLOC
+# else
+#   define USE_ROCKBOX_ALLOC
+# endif
+
+#endif
+
+#ifdef USE_ROCKBOX_ALLOC
 static size_t buf_size;
 static unsigned char *buffer_start = NULL;
 static unsigned char *buffer_front = NULL;
 #endif
 
+#ifdef USE_HOST_MALLOC
+
+struct malloc_object {
+    void* object;
+    struct malloc_object *next;
+};
+struct malloc_object *first = NULL, *last = NULL;
+
+void skin_free_malloced(void)
+{
+    struct malloc_object *obj = first, *this;
+    while (obj)
+    {
+        this = obj;
+        obj = this->next;
+        free(this->object);
+        free(this);
+    }
+    first = NULL;
+    last = NULL;
+}
+
+#endif
+
 void skin_buffer_init(char* buffer, size_t size)
 {
-#if defined(ROCKBOX)
+#ifdef USE_ROCKBOX_ALLOC
     buffer_start = buffer_front = buffer;
     buf_size = size;
+#elif defined(USE_HOST_MALLOC)
+    (void)buffer; (void)size;
+    skin_free_malloced();    
 #endif
 }
 
@@ -44,13 +99,24 @@ void skin_buffer_init(char* buffer, size_t size)
 void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
-#ifdef ROCKBOX
+#ifdef USE_ROCKBOX_ALLOC
     /* 32-bit aligned */
     size = (size + 3) & ~3;
     if (size > skin_buffer_freespace())
         return NULL;
     retval = buffer_front;
     buffer_front += size;
+#elif defined(USE_HOST_MALLOC)
+    struct malloc_object *obj = malloc(sizeof (struct malloc_object));
+    if (!obj)
+        return NULL;
+    obj->object = malloc(size);
+    obj->next = NULL;
+    if (last == NULL)
+        first = last = obj;
+    else
+        last->next = obj;
+    retval = obj->object;
 #else
     retval = malloc(size);
 #endif
@@ -58,7 +124,7 @@ void* skin_buffer_alloc(size_t size)
 }
 
 
-#ifdef ROCKBOX
+#ifdef USE_ROCKBOX_ALLOC
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void)
 {
