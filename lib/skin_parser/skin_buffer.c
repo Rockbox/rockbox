@@ -66,9 +66,9 @@ struct malloc_object {
     void* object;
     struct malloc_object *next;
 };
-struct malloc_object *first = NULL, *last = NULL;
+static struct malloc_object *first = NULL, *last = NULL;
 
-void skin_free_malloced(void)
+static void skin_free_malloced(void)
 {
     struct malloc_object *obj = first, *this;
     while (obj)
@@ -116,6 +116,7 @@ void* skin_buffer_alloc(size_t size)
         first = last = obj;
     else
         last->next = obj;
+    last = obj;
     retval = obj->object;
 #else
     retval = malloc(size);
