@@ -96,7 +96,7 @@ static void touchscreen_event(int x, int y)
         mouse_coords = (x << 16) | y;
         button_event(BUTTON_TOUCHSCREEN, true);
         if (debug_wps)
-            printf("Mouse at: (%d, %d)\n", x, y);
+            printf("Mouse at 1: (%d, %d)\n", x, y);
     }
 }
 #endif
@@ -193,15 +193,15 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
             }
             else
             {
-                m_x = event->x / display_zoom;
-                m_y = event->y / display_zoom;
+                m_x = event->x;
+                m_y = event->y;
 #ifdef HAVE_REMOTE
                 if ( m_y >= LCD_HEIGHT ) /* Remote Screen */
                     m_y -= LCD_HEIGHT;
 #endif
             }
 
-            printf("Mouse at: (%d, %d)\n", m_x, m_y);
+            printf("Mouse at 2: (%d, %d)\n", m_x, m_y);
         }
     }
 #undef SQUARE
@@ -218,15 +218,23 @@ static bool event_handler(SDL_Event *event)
 #ifdef HAVE_TOUCHSCREEN
     case SDL_MOUSEMOTION:
         if (event->motion.state & SDL_BUTTON(1))
-            touchscreen_event(event->motion.x, event->motion.y);
+        {
+            int x = event->motion.x / display_zoom;
+            int y = event->motion.y / display_zoom;
+            touchscreen_event(x, y);
+        }
         break;
 #endif
 
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN:
-        mouse_event(&event->button, event->type == SDL_MOUSEBUTTONUP);
+    {
+        SDL_MouseButtonEvent *mev = &event->button;
+        mev->x /= display_zoom;
+        mev->y /= display_zoom;
+        mouse_event(mev, event->type == SDL_MOUSEBUTTONUP);
         break;
-
+    }
     case SDL_QUIT:
         return true;
     }
