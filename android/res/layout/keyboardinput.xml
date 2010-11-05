@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<AbsoluteLayout android:id="@+id/AbsoluteLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"><EditText android:layout_height="wrap_content" android:text="Some Text" android:layout_width="fill_parent" android:id="@+id/KbdInput"></EditText>
-</AbsoluteLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"> 
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent"	
+	<EditText android:layout_height="wrap_content" 
+		android:text="Some Text" 
+		android:layout_width="fill_parent" 
+		android:id="@+id/KbdInput">
+	</EditText>
+</LinearLayout>

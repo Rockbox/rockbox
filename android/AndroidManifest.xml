@@ -1,36 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.rockbox"
-      android:versionCode="1"
-      android:versionName="1.0"
-      android:installLocation="auto">
-    <application android:icon="@drawable/launcher" android:label="@string/app_name" android:debuggable="true">
-        <activity android:name=".RockboxActivity"
-                  android:launchMode="singleTask"
-                  android:label="@string/app_name"
-                  android:screenOrientation="portrait"
-                  android:configChanges="orientation|keyboardHidden" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-      	</activity>
-        <service android:name=".RockboxService"/>
-        <receiver android:name=".Helper.MediaButtonReceiver$MediaReceiver"
-				  android:enabled="true"
-				  android:exported="true">
-    		<intent-filter>
-        		<action android:name="android.intent.action.MEDIA_BUTTON" />
-    		</intent-filter>
+	package="org.rockbox"
+	android:versionCode="1"
+	android:versionName="1.0"
+	android:installLocation="auto">
+	<application android:icon="@drawable/launcher" 
+		android:label="@string/app_name" 
+		android:debuggable="true">
+
+		<activity android:name=".RockboxActivity"
+			android:launchMode="singleTask"
+			android:label="@string/app_name"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>		
+
+		<activity android:name="KeyboardActivity" 
+				  android:theme="@android:style/Theme.Dialog">
+		</activity>
+		
+		<activity android:name="YesnoActivity" 
+				  android:theme="@android:style/Theme.Dialog">
+		</activity>
+
+		<service android:name=".RockboxService"/>
+
+		<receiver android:name=".Helper.MediaButtonReceiver$MediaReceiver"
+			android:enabled="true"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MEDIA_BUTTON" />
+			</intent-filter>
 		</receiver>
 
-    <activity android:name="KeyboardActivity" android:theme="@android:style/Theme.Dialog"></activity>
-    <activity android:name="YesnoActivity" android:theme="@android:style/Theme.Dialog"></activity>
-</application>
-<uses-sdk android:minSdkVersion="4" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+	</application>
 
-
-
+	<uses-sdk android:minSdkVersion="4" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 
 </manifest> 
