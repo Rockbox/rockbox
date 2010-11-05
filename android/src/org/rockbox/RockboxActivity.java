@@ -49,6 +49,10 @@ public class RockboxActivity extends Activity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        /* Do not try starting the service if it's already running */
+        if (isRockboxRunning())
+            return;
+
         /* prepare a please wait dialog in case we need
          * to wait for unzipping libmisc.so
          */
