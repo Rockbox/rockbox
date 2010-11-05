@@ -26,12 +26,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class RockboxActivity extends Activity 
 {
@@ -58,31 +60,28 @@ public class RockboxActivity extends Activity
         loadingdialog.show();
 
         Intent intent = new Intent(this, RockboxService.class);
-        intent.putExtra("callback", new ResultReceiver(null) {
+        intent.putExtra("callback", new ResultReceiver(new Handler(getMainLooper())) {
             @Override
             protected void onReceiveResult(final int resultCode, final Bundle resultData)
             {
-                runOnUiThread(new Runnable()
-                {
-                    public void run() {
-                        switch (resultCode) {
-                            case RockboxService.RESULT_LIB_LOADED:
-                                rbservice = RockboxService.get_instance();
-                                loadingdialog.setIndeterminate(true);
-                                break;
-                            case RockboxService.RESULT_LIB_LOAD_PROGRESS:
-                                loadingdialog.setIndeterminate(false);
-                                loadingdialog.setMax(resultData.getInt("max", 100));
-                                loadingdialog.setProgress(resultData.getInt("value", 0));
-                                break;
-                            case RockboxService.RESULT_FB_INITIALIZED:
-                                attachFramebuffer();
-                                loadingdialog.dismiss();
-                                break;
-                        }
-
-                    }
-                });
+                switch (resultCode) {
+                    case RockboxService.RESULT_LIB_LOADED:
+                        rbservice = RockboxService.get_instance();
+                        loadingdialog.setIndeterminate(true);
+                        break;
+                    case RockboxService.RESULT_LIB_LOAD_PROGRESS:
+                        loadingdialog.setIndeterminate(false);
+                        loadingdialog.setMax(resultData.getInt("max", 100));
+                        loadingdialog.setProgress(resultData.getInt("value", 0));
+                        break;
+                    case RockboxService.RESULT_FB_INITIALIZED:
+                        attachFramebuffer();
+                        loadingdialog.dismiss();
+                        break;
+                    case RockboxService.RESULT_ERROR_OCCURED:
+                        Toast.makeText(RockboxActivity.this, resultData.getString("error"), Toast.LENGTH_LONG);
+                        break;
+                }
             }
         });
         startService(intent);
