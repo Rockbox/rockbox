@@ -21,8 +21,6 @@
 
 package org.rockbox;
 
-import org.rockbox.Helper.RunForegroundManager;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,13 +33,17 @@ import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.rockbox.Helper.RunForegroundManager;
+
 import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 /* This class is used as the main glue between java and c.
@@ -65,12 +67,16 @@ public class RockboxService extends Service
     private RunForegroundManager fg_runner;
     @SuppressWarnings("unused")
     private int battery_level;
+    private ResultReceiver resultReceiver;
+
+    public static final int RESULT_LIB_LOADED = 0;
+    public static final int RESULT_LIB_LOAD_PROGRESS = 1;
+    public static final int RESULT_FB_INITIALIZED = 2;
 
     @Override
     public void onCreate()
     {
    		instance = this;
-        startservice();
     }
     
     public static RockboxService get_instance()
@@ -87,6 +93,8 @@ public class RockboxService extends Service
     {
     	fb = newfb;
         mRockboxRunning = true;
+        if (resultReceiver != null)
+            resultReceiver.send(RESULT_FB_INITIALIZED, null);
     }
     
     public Activity get_activity()
@@ -97,11 +105,14 @@ public class RockboxService extends Service
     {
     	current_activity = a;
     }
-    
 
     private void do_start(Intent intent)
     {
         LOG("Start Service");
+
+        if (intent.hasExtra("callback"))
+            resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
+        startservice();
         
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
@@ -140,6 +151,7 @@ public class RockboxService extends Service
             public void run()
             {
                 LOG("main");
+                Bundle progressData = new Bundle();
 		        /* the following block unzips libmisc.so, which contains the files 
 		         * we ship, such as themes. It's needed to put it into a .so file
 		         * because there's no other way to ship files and have access
@@ -160,6 +172,7 @@ public class RockboxService extends Service
 		               ZipFile zipfile = new ZipFile(file);
 		               Enumeration<? extends ZipEntry> e = zipfile.entries();
 		               File folder;
+		               progressData.putInt("max", zipfile.size());
 		               while(e.hasMoreElements()) 
 		               {
 		                  entry = (ZipEntry) e.nextElement();
@@ -190,6 +203,10 @@ public class RockboxService extends Service
 		                  dest.flush();
 		                  dest.close();
 		                  is.close();
+		                  if (resultReceiver != null) {
+		                      progressData.putInt("value", progressData.getInt("value", 0) + 1);
+		                      resultReceiver.send(RESULT_LIB_LOAD_PROGRESS, progressData);
+		                  }
 		               }
 		           }
 		        } catch(FileNotFoundException e) {
@@ -201,7 +218,10 @@ public class RockboxService extends Service
 		        }
 		
 		        System.loadLibrary("rockbox");
+		        if (resultReceiver != null)
+		            resultReceiver.send(RESULT_LIB_LOADED, null);
                 main();
+		        throw new IllegalStateException("native main() returned!");
             }
         },"Rockbox thread");
         rb.setDaemon(false);

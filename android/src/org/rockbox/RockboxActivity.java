@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,79 +37,61 @@ public class RockboxActivity extends Activity
 {
     private ProgressDialog loadingdialog;
     private RockboxService rbservice;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
-                       ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        final Activity thisActivity = this;
-        final Intent intent = new Intent(this, RockboxService.class);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         /* prepare a please wait dialog in case we need
          * to wait for unzipping libmisc.so
          */
         loadingdialog = new ProgressDialog(this);
         loadingdialog.setMessage("Rockbox is loading. Please wait...");
-        loadingdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loadingdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        loadingdialog.setIndeterminate(true);
         loadingdialog.setCancelable(false);
-        startService(intent);
-        rbservice = RockboxService.get_instance();
-        /* Now it gets a bit tricky:
-         * The service is started in the same thread as we are now,
-         * but the service also initializes the framebuffer
-         * Unfortunately, this happens *after* any of the default
-         * startup methods of an activity, so we need to poll for it 
-         * 
-         * In order to get the fb, we need to let the Service start up
-         * run, we can wait in a separate thread for fb to get ready
-         * This thread waits for the fb to become ready */
-        new Thread(new Runnable()
-        {
-            public void run() 
+        loadingdialog.show();
+
+        Intent intent = new Intent(this, RockboxService.class);
+        intent.putExtra("callback", new ResultReceiver(null) {
+            @Override
+            protected void onReceiveResult(final int resultCode, final Bundle resultData)
             {
-                int i = 0;
-                try {
-                    while (true)
-                    {
-                        Thread.sleep(250);
-                        if (isRockboxRunning())
-                        	break;
-                        /* if it's still null show the please wait dialog 
-                         * but not before 0.5s are over */
-                        if (!loadingdialog.isShowing() && i > 0)
-                        {
-                            runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
-                                    loadingdialog.show(); 
-                                }
-                            });                           
-                        }
-                        else 
-                            i++ ;
-                    }
-                } catch (InterruptedException e) {
-                }
-                /* drawing needs to happen in ui thread */
-                runOnUiThread(new Runnable() 
+                runOnUiThread(new Runnable()
                 {
                     public void run() {
-                		loadingdialog.dismiss();
-                		if (rbservice.get_fb() == null)
-                		    throw new IllegalStateException("FB NULL");
-                        attachFramebuffer();
+                        switch (resultCode) {
+                            case RockboxService.RESULT_LIB_LOADED:
+                                rbservice = RockboxService.get_instance();
+                                loadingdialog.setIndeterminate(true);
+                                break;
+                            case RockboxService.RESULT_LIB_LOAD_PROGRESS:
+                                loadingdialog.setIndeterminate(false);
+                                loadingdialog.setMax(resultData.getInt("max", 100));
+                                loadingdialog.setProgress(resultData.getInt("value", 0));
+                                break;
+                            case RockboxService.RESULT_FB_INITIALIZED:
+                                attachFramebuffer();
+                                loadingdialog.dismiss();
+                                break;
+                        }
+
                     }
                 });
             }
-        }).start();
+        });
+        startService(intent);
     }
+
     private boolean isRockboxRunning()
     {
         if (rbservice == null)
-        	rbservice = RockboxService.get_instance();
+            rbservice = RockboxService.get_instance();
         return (rbservice!= null && rbservice.isRockboxRunning() == true);    	
     }
 
