@@ -74,7 +74,8 @@ void tuner_init(void)
     #if (CONFIG_TUNER & TEA5767)
         TUNER_TYPE_CASE(TEA5767,
                         tea5767_set,
-                        tea5767_get)
+                        tea5767_get,
+                        tea5767_init())
     #endif
     #if (CONFIG_TUNER & S1A0903X01)
         TUNER_TYPE_CASE(S1A0903X01,
