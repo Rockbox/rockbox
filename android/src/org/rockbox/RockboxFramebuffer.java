@@ -49,7 +49,6 @@ public class RockboxFramebuffer extends View
         setClickable(true);
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
         native_buf = native_fb;
-        requestFocus();
         media_monitor = new MediaButtonReceiver(c);
         media_monitor.register();
         /* the service needs to know the about us */
@@ -60,7 +59,7 @@ public class RockboxFramebuffer extends View
     {
         c.drawBitmap(btm, 0.0f, 0.0f, null);
     }
-    
+
     @SuppressWarnings("unused")
     private void java_lcd_update()
     {
@@ -112,29 +111,29 @@ public class RockboxFramebuffer extends View
         return buttonHandler(keyCode, false);
     }
 
-    /* the two below should only be called from the activity thread */
-    public void suspend()
-    {    /* suspend, Rockbox will not make any lcd updates */
-        set_lcd_active(0);
-    }
-    public void resume()
-    {    
-        /* Needed so we can catch KeyEvents */
-        setFocusable(true);
-        setFocusableInTouchMode(true);
-        setClickable(true);
-        requestFocus();
-        set_lcd_active(1);
-    }
-
     public void destroy()
     {
-        suspend();
+        set_lcd_active(0);
         media_monitor.unregister();
     }
 
-    public native void set_lcd_active(int active);
-    public native void touchHandler(boolean down, int x, int y);
-    public native boolean buttonHandler(int keycode, boolean state);
-    
+    @Override
+    protected void onWindowVisibilityChanged(int visibility)
+    {
+        super.onWindowVisibilityChanged(visibility);
+
+        switch (visibility) {
+            case VISIBLE:
+                set_lcd_active(1);
+                break;
+            case GONE:
+            case INVISIBLE:
+                set_lcd_active(0);
+                break;
+        }
+    }
+
+    private native void set_lcd_active(int active);
+    private native void touchHandler(boolean down, int x, int y);
+    private native boolean buttonHandler(int keycode, boolean state);
 }

@@ -27,6 +27,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -98,9 +99,7 @@ public class RockboxActivity extends Activity
                 		loadingdialog.dismiss();
                 		if (rbservice.get_fb() == null)
                 		    throw new IllegalStateException("FB NULL");
-                        rbservice.set_activity(thisActivity);
-                		setContentView(rbservice.get_fb());
-                        rbservice.get_fb().invalidate();
+                        attachFramebuffer();
                     }
                 });
             }
@@ -112,26 +111,29 @@ public class RockboxActivity extends Activity
         	rbservice = RockboxService.get_instance();
         return (rbservice!= null && rbservice.isRockboxRunning() == true);    	
     }
-    
+
+    private void attachFramebuffer()
+    {
+        View rbFramebuffer = rbservice.get_fb();
+        try {
+            setContentView(rbFramebuffer);
+        } catch (IllegalStateException e) {
+            /* we are already using the View,
+             * need to remove it and re-attach it */
+            ViewGroup g = (ViewGroup) rbFramebuffer.getParent();
+            g.removeView(rbFramebuffer);
+            setContentView(rbFramebuffer);
+        } finally {
+            rbFramebuffer.requestFocus();
+            rbservice.set_activity(this);
+        }
+    }
+
     public void onResume()
     {
-    	
         super.onResume();
         if (isRockboxRunning())
-        {
-            try {
-                setContentView(rbservice.get_fb());
-            } catch (IllegalStateException e) {
-                /* we are already using the View,
-                 * need to remove it and re-attach it */
-                ViewGroup g = (ViewGroup)rbservice.get_fb().getParent();
-                g.removeView(rbservice.get_fb());
-                setContentView(rbservice.get_fb());
-            } finally {
-            	rbservice.set_activity(this);
-                rbservice.get_fb().resume();
-            }
-        }
+            attachFramebuffer();
     }
     
     /* this is also called when the backlight goes off,
@@ -142,7 +144,6 @@ public class RockboxActivity extends Activity
     {
         super.onPause();
         rbservice.set_activity(null);
-        rbservice.get_fb().suspend();
     }
     
     @Override
@@ -150,7 +151,6 @@ public class RockboxActivity extends Activity
     {
         super.onStop();
         rbservice.set_activity(null);
-        rbservice.get_fb().suspend();
     }
     
     @Override
@@ -158,7 +158,6 @@ public class RockboxActivity extends Activity
     {
         super.onDestroy();
         rbservice.set_activity(null);
-        rbservice.get_fb().suspend();
     }
     
     private HostCallback hostcallback = null;
