@@ -46,11 +46,11 @@
 #ifdef ROCKBOX
 #include "config.h"
 
-# if (CONFIG_PLATFORM&PLATFORM_HOSTED)
+#ifdef APPLICATION
 #   define USE_HOST_MALLOC
-# else
+#else
 #   define USE_ROCKBOX_ALLOC
-# endif
+#endif
 
 #endif
 

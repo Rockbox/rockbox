@@ -40,18 +40,18 @@
 
 static bool skins_initialising = true;
 
-/* Hosted platforms use the host malloc to manage the buffer */
-#if ((CONFIG_PLATFORM&PLATFORM_HOSTED) == 0)
+/* App uses the host malloc to manage the buffer */
+#ifdef APPLICATION
+#define skin_buffer NULL
+void theme_init_buffer(void)
+{
+    skins_initialising = false;
+}
+#else
 static char *skin_buffer = NULL;
 void theme_init_buffer(void)
 {
     skin_buffer = buffer_alloc(SKIN_BUFFER_SIZE);
-    skins_initialising = false;
-}
-#else 
-#define skin_buffer NULL
-void theme_init_buffer(void)
-{
     skins_initialising = false;
 }
 #endif
