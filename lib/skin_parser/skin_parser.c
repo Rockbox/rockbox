@@ -144,7 +144,8 @@ static struct skin_element* skin_parse_viewport(const char** document)
     /* Parsing out the viewport tag if there is one */
     if(check_viewport(cursor))
     {
-        skin_parse_tag(retval, &cursor);
+        if (!skin_parse_tag(retval, &cursor))
+            return NULL;
         if(*cursor == '\n')
         {
             cursor++;
