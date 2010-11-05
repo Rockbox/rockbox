@@ -238,13 +238,12 @@ mpc_decoder_windowing_D:
     /* store Data[01..15] */
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
-    str r8, [r0]                /* store Data */
     /* store Data[31..17] */
     mov r10, r10, lsr #16
     orr r10, r10, r11, lsl #16  /* (lo>>16) || (hi<<16) */
     rsb r10, r10, #0            /* r10 = -r10 */
     str r10, [r0, lr]           /* store Data */
-    add r0, r0, #4              /* r0++ */
+    str r8, [r0], #4            /* store Data */
     /* correct adresses for next loop */
     sub r12, r12, #4            /* r12 = V-- */
     add r1, r1, #4              /* r1  = V++ */
@@ -441,13 +440,12 @@ mpc_decoder_windowing_D:
     /* store Data[01..15] */
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
-    str r8, [r0]                /* store Data */
     /* store Data[31..17] */
     mov r10, r10, lsr #16
     orr r10, r10, r11, lsl #16  /* (lo>>16) || (hi<<16) */
     rsb r10, r10, #0            /* r10 = -r10 */
     str r10, [r0, lr]           /* store Data */
-    add r0, r0, #4              /* r0++ */
+    str r8, [r0], #4            /* store Data */
     /* correct adresses for next loop */
     sub r12, r12, #4            /* r12 = V-- */
     add r1, r1, #4              /* r1  = V++ */
@@ -641,11 +639,10 @@ mpc_decoder_windowing_D:
     rsb r11, r11, #0            /* r11 = -r11 */
     /* store Data[01..15] */
     mov r9, r9, lsl #2
-    str r9, [r0]                /* store Data */
     /* store Data[31..17] */
     mov r11, r11, lsl #2
     str r11, [r0, lr]           /* store Data */
-    add r0, r0, #4              /* r0++ */
+    str r9, [r0], #4            /* store Data */
     /* next loop */
     subs lr, lr, #8
     bgt .loop15
