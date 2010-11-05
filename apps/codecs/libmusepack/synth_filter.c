@@ -46,10 +46,16 @@
 
 #if defined(MPC_FIXED_POINT)
     #if defined(CPU_ARM)
-      // do not up-scale D-values to achieve higher speed in smull/mlal
-      // operations. saves ~14/8 = 1.75 cycles per multiplication
-      #define D(value)  (value)
-      
+      #if ARM_ARCH >= 6
+        // on ARMv6 we use 32*32=64>>32 multiplies (smmul/smmla) so we need to scale up the D coefficients
+        // the ARM11 multiplier doesn't have early termination so the magnitude of the multiplicands does not
+        // matter for speed.
+        #define D(value)  (value << (14))
+      #else
+        // do not up-scale D-values to achieve higher speed in smull/mlal
+        // operations. saves ~14/8 = 1.75 cycles per multiplication
+        #define D(value)  (value)
+      #endif
       // in this configuration a post-shift by >>16 is needed after synthesis
     #else
       // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
