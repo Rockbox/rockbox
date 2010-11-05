@@ -87,7 +87,7 @@ $(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 
 libs: $(LIBS)
 
-$(TEMP_APK): $(DIRS) $(LIBS) $(DEX)
+$(TEMP_APK): $(AP_) $(DIRS) $(LIBS) $(DEX)
 	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
 	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
 
