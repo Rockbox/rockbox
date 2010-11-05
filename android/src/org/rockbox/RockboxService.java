@@ -110,7 +110,7 @@ public class RockboxService extends Service
     {
         LOG("Start Service");
 
-        if (intent.hasExtra("callback"))
+        if (intent != null && intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
         if (!rbLibLoaded)
             startservice();
