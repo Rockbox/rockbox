@@ -61,6 +61,7 @@ public class RockboxService extends Service
     /* locals needed for the c code and rockbox state */
     private RockboxFramebuffer fb = null;
     private boolean mRockboxRunning = false;
+    private volatile boolean rbLibLoaded;
     private Activity current_activity = null;
     private IntentFilter itf;
     private BroadcastReceiver batt_monitor;
@@ -112,7 +113,8 @@ public class RockboxService extends Service
 
         if (intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
-        startservice();
+        if (!rbLibLoaded)
+            startservice();
         
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
@@ -218,6 +220,7 @@ public class RockboxService extends Service
 		        }
 		
 		        System.loadLibrary("rockbox");
+		        rbLibLoaded = true;
 		        if (resultReceiver != null)
 		            resultReceiver.send(RESULT_LIB_LOADED, null);
                 main();
