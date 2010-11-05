@@ -24,8 +24,8 @@
     		</intent-filter>
 		</receiver>
 
-    <activity android:name="KeyboardActivity"></activity>
-    <activity android:name="YesnoActivity"></activity>
+    <activity android:name="KeyboardActivity" android:theme="@android:style/Theme.Dialog"></activity>
+    <activity android:name="YesnoActivity" android:theme="@android:style/Theme.Dialog"></activity>
 </application>
 <uses-sdk android:minSdkVersion="4" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
