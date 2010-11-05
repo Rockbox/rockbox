@@ -630,8 +630,11 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                         && !is_kinetic_over());
     int icon_width = 0;
     int line, list_width = list_text_vp->width;
+    static bool wait_for_release = false;
 
     released = (button&BUTTON_REL) != 0;
+    if (released)
+        wait_for_release = false;
 
     if (button == ACTION_NONE || button == ACTION_UNKNOWN)
     {
@@ -738,21 +741,23 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 return ACTION_NONE;
             }
 
+            if (button & BUTTON_REPEAT && scroll_mode == SCROLL_NONE
+                && !wait_for_release)
+            {
+                /* held a single line for a while, bring up the context menu */
+                gui_synclist_select_item(gui_list, list_start_item + line);
+                /* don't sent context repeatedly */
+                wait_for_release = true;
+                return ACTION_STD_CONTEXT;
+            }
             if (released && !cancelled_kinetic)
             {
                 /* Pen was released anywhere on the screen */
                 last_position = 0;
                 if (scroll_mode == SCROLL_NONE)
                 {
+                    /* select current line */
                     gui_synclist_select_item(gui_list, list_start_item + line);
-                    /* If BUTTON_REPEAT is set, then the pen was hold on
-                     * the same line for some time
-                     *  -> context menu
-                     * otherwise,
-                     *  -> select
-                     **/
-                    if (button & BUTTON_REPEAT)
-                        return ACTION_STD_CONTEXT;
                     return ACTION_STD_OK;
                 }
                 else
