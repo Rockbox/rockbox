@@ -140,7 +140,7 @@ int tea5767_get(int setting)
 void tea5767_init(void)
 {
 /* save binsize by only detecting presence for targets where it may be absent */
-#if defined(PHILIPS_HDD1630)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     unsigned char buf[5];
     unsigned char chipid;
 
