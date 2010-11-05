@@ -66,11 +66,12 @@ struct malloc_object {
     void* object;
     struct malloc_object *next;
 };
-static struct malloc_object *first = NULL, *last = NULL;
+static struct malloc_object *malloced_head = NULL, *malloced_tail = NULL;
 
 static void skin_free_malloced(void)
 {
-    struct malloc_object *obj = first, *this;
+    struct malloc_object *obj = malloced_head;
+    struct malloc_object *this;
     while (obj)
     {
         this = obj;
@@ -78,8 +79,8 @@ static void skin_free_malloced(void)
         free(this->object);
         free(this);
     }
-    first = NULL;
-    last = NULL;
+    malloced_head = NULL;
+    malloced_tail = NULL;
 }
 
 #endif
@@ -91,7 +92,7 @@ void skin_buffer_init(char* buffer, size_t size)
     buf_size = size;
 #elif defined(USE_HOST_MALLOC)
     (void)buffer; (void)size;
-    skin_free_malloced();    
+    skin_free_malloced();
 #endif
 }
 
@@ -112,11 +113,11 @@ void* skin_buffer_alloc(size_t size)
         return NULL;
     obj->object = malloc(size);
     obj->next = NULL;
-    if (last == NULL)
-        first = last = obj;
+    if (malloced_tail == NULL)
+        malloced_head = malloced_tail = obj;
     else
-        last->next = obj;
-    last = obj;
+        malloced_tail->next = obj;
+    malloced_tail = obj;
     retval = obj->object;
 #else
     retval = malloc(size);
