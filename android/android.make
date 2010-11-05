@@ -57,7 +57,7 @@ DIRS		+= $(BUILDDIR)/libs/armeabi
 
 CLEANOBJS += bin gen libs data
 
-$(R_JAVA) $(AP_): $(MANIFEST)
+$(R_JAVA) $(AP_): $(MANIFEST) $(DIRS)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m \
 		-J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res \
 		-I $(ANDROID_PLATFORM)/android.jar -F $(AP_)
