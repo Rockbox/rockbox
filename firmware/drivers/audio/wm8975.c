@@ -320,19 +320,19 @@ void audiohw_set_recvol(int left, int right, int type)
 void audiohw_set_monitor(bool enable)
 {
     if (enable) {
-        // set volume to 0 dB
+        /* set volume to 0 dB */
         wm8975_regs[LOUTMIX1] &= ~LOUTMIX1_LI2LOVOL_MASK;
         wm8975_regs[LOUTMIX1] |= LOUTMIX1_LI2LOVOL(2);
         wm8975_regs[ROUTMIX2] &= ~ROUTMIX2_RI2ROVOL_MASK;
         wm8975_regs[ROUTMIX2] |= ROUTMIX2_RI2ROVOL(2);
-        // set mux to line input
+        /* set mux to line input */
         wm8975_write_and(LOUTMIX1, ~7);
         wm8975_write_and(ROUTMIX1, ~7);
-        // enable bypass
+        /* enable bypass */
         wm8975_write_or(LOUTMIX1, LOUTMIX1_LI2LO);
         wm8975_write_or(ROUTMIX2, ROUTMIX2_RI2RO);
     } else {
-        // disable bypass
+        /* disable bypass */
         wm8975_write_and(LOUTMIX1, ~LOUTMIX1_LI2LO);
         wm8975_write_and(ROUTMIX2, ~ROUTMIX2_RI2RO);
     }
