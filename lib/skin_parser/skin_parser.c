@@ -261,7 +261,7 @@ static struct skin_element* skin_parse_line(const char**document)
 
 /*
  * If conditional is set to true, then this will break upon encountering
- * SEPERATESYM.  This should only be used when parsing a line inside a
+ * SEPARATESYM.  This should only be used when parsing a line inside a
  * conditional, otherwise just use the wrapper function skin_parse_line()
  */
 static struct skin_element* skin_parse_line_optional(const char** document,
@@ -280,9 +280,9 @@ static struct skin_element* skin_parse_line_optional(const char** document,
     retval->type = LINE;
     retval->line = skin_line;
     if(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
-       && !(conditional && (*cursor == ARGLISTSEPERATESYM
+       && !(conditional && (*cursor == ARGLISTSEPARATESYM
                             || *cursor == ARGLISTCLOSESYM
-                            || *cursor == ENUMLISTSEPERATESYM
+                            || *cursor == ENUMLISTSEPARATESYM
                             || *cursor == ENUMLISTCLOSESYM)))
     {
         retval->children_count = 1;
@@ -313,9 +313,9 @@ static struct skin_element* skin_parse_line_optional(const char** document,
 #endif
 
     while(*cursor != '\n' && *cursor != '\0' && *cursor != MULTILINESYM
-          && !((*cursor == ARGLISTSEPERATESYM
+          && !((*cursor == ARGLISTSEPARATESYM
                 || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTSEPARATESYM
                 || *cursor == ENUMLISTCLOSESYM)
                && conditional)
           && !(check_viewport(cursor) && cursor != *document))
@@ -390,9 +390,9 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
 
     /* First we count the sublines */
     while(*cursor != '\0' && *cursor != '\n'
-          && !((*cursor == ARGLISTSEPERATESYM
+          && !((*cursor == ARGLISTSEPARATESYM
                 || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTSEPARATESYM
                 || *cursor == ENUMLISTCLOSESYM)
                && conditional)
           && !(check_viewport(cursor) && cursor != *document))
@@ -565,7 +565,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         {
             skip_arglist(&cursor);
         }
-        else if(*cursor == ARGLISTSEPERATESYM)
+        else if(*cursor == ARGLISTSEPARATESYM)
         {
             num_args++;
             cursor++;
@@ -753,9 +753,9 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 
         skip_whitespace(&cursor);
 
-        if(*cursor != ARGLISTSEPERATESYM && i < num_args - 1)
+        if(*cursor != ARGLISTSEPARATESYM && i < num_args - 1)
         {
-            skin_error(SEPERATOR_EXPECTED, cursor);
+            skin_error(SEPARATOR_EXPECTED, cursor);
             return 0;
         }
         else if(*cursor != ARGLISTCLOSESYM && i == num_args - 1)
@@ -801,7 +801,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 
 /*
  * If the conditional flag is set true, then parsing text will stop at an
- * ARGLISTSEPERATESYM.  Only set that flag when parsing within a conditional
+ * ARGLISTSEPARATESYM.  Only set that flag when parsing within a conditional
  */
 static int skin_parse_text(struct skin_element* element, const char** document,
                            int conditional)
@@ -814,9 +814,9 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     /* First figure out how much text we're copying */
     while(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
           && *cursor != COMMENTSYM
-          && !((*cursor == ARGLISTSEPERATESYM
+          && !((*cursor == ARGLISTSEPARATESYM
                 || *cursor == ARGLISTCLOSESYM
-                || *cursor == ENUMLISTSEPERATESYM
+                || *cursor == ENUMLISTSEPARATESYM
                 || *cursor == ENUMLISTCLOSESYM)
                && conditional))
     {
@@ -932,7 +932,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
                 break;
             cursor++;
         }
-        else if(*cursor == ENUMLISTSEPERATESYM)
+        else if(*cursor == ENUMLISTSEPARATESYM)
         {
             children++;
             cursor++;
@@ -984,9 +984,9 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
             cursor = conditional_end;
 #endif
 
-        if(i < children - 1 && *cursor != ENUMLISTSEPERATESYM)
+        if(i < children - 1 && *cursor != ENUMLISTSEPARATESYM)
         {
-            skin_error(SEPERATOR_EXPECTED, cursor);
+            skin_error(SEPARATOR_EXPECTED, cursor);
             return 0;
         }
         else if(i == children - 1 && *cursor != ENUMLISTCLOSESYM)
@@ -1048,7 +1048,7 @@ static struct skin_element* skin_parse_code_as_arg(const char** document)
 
     /* Checking for sublines */
     while(*cursor != '\n' && *cursor != '\0'
-          && *cursor != ENUMLISTSEPERATESYM && *cursor != ARGLISTSEPERATESYM
+          && *cursor != ENUMLISTSEPARATESYM && *cursor != ARGLISTSEPARATESYM
           && *cursor != ENUMLISTCLOSESYM && *cursor != ARGLISTCLOSESYM)
     {
         if(*cursor == MULTILINESYM)

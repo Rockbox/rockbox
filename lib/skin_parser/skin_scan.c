@@ -101,7 +101,7 @@ char* scan_string(const char** document)
     char* buffer = NULL;
     int i;
 
-    while(*cursor != ARGLISTSEPERATESYM && *cursor != ARGLISTCLOSESYM &&
+    while(*cursor != ARGLISTSEPARATESYM && *cursor != ARGLISTCLOSESYM &&
           *cursor != '\0')
     {
         if(*cursor == COMMENTSYM)

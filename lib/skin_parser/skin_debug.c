@@ -85,14 +85,14 @@ void skin_error(enum skin_errorcode error, const char* cursor)
     case DECIMAL_EXPECTED:
         error_message =  "Expected decimal";
         break;
-    case SEPERATOR_EXPECTED:
-        error_message = "Expected argument seperator";
+    case SEPARATOR_EXPECTED:
+        error_message = "Expected argument separator";
         break;
     case CLOSE_EXPECTED:
         error_message = "Expected list close";
         break;
     case MULTILINE_EXPECTED:
-        error_message = "Expected subline seperator";
+        error_message = "Expected subline separator";
         break;
     };
 
