@@ -24,6 +24,7 @@
 #include <jni.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <system.h>
 
 extern JNIEnv   *env_ptr;
@@ -75,13 +76,12 @@ int kbd_input(char* text, int buflen)
                                                                     kbd_result);
     } while (!ret);
     
-    e->ReleaseStringUTFChars(env_ptr, str, NULL);
     retchars = e->GetStringUTFChars(env_ptr, ret, 0);
     if (retchars[0])
-        snprintf(text, buflen, retchars);
+        strncpy(text, retchars, buflen);
     e->ReleaseStringUTFChars(env_ptr, ret, retchars);
     
-    return retchars[0]?0:1; /* return 0 on success */
+    return text[0] ? 0 : 1; /* return 0 on success */
 }
 
 int load_kbd(unsigned char* filename)

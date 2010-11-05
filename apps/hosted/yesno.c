@@ -95,8 +95,6 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     jboolean ret;
     
     e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func, message);
-    e->ReleaseStringUTFChars(env_ptr, message, NULL);
-    
 
     do {
         sleep(HZ/10);
