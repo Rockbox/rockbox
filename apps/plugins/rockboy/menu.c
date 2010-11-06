@@ -11,6 +11,9 @@
 #include "rtc-gb.h"
 #include "pcm.h"
 
+#define MAX_SLOTS   5
+#define DESC_SIZE   20
+
 /* load/save state function declarations */
 static void do_opt_menu(void);
 static void do_slot_menu(bool is_load);
@@ -22,6 +25,7 @@ static void munge_name(char *buf, size_t bufsiz);
 static int getbutton(char *text)
 {
     int fw, fh;
+    int button;
     rb->lcd_clear_display();
     rb->font_getstringsize(text, &fw, &fh,0);
     rb->lcd_putsxy(LCD_WIDTH/2-fw/2, LCD_HEIGHT/2-fh/2, text);
@@ -31,11 +35,10 @@ static int getbutton(char *text)
     while (rb->button_get(false) != BUTTON_NONE)
         rb->yield();
 
-    int button;
     while(true)
     {
         button = rb->button_get(true);
-        button=button&0x00000FFF;
+        button = button&(BUTTON_MAIN|BUTTON_REMOTE);
 
         return button;
     }
@@ -171,7 +174,7 @@ static void build_slot_path(char *buf, size_t bufsiz, int slot_id) {
  *
  */
 static bool do_file(char *path, char *desc, bool is_load) {
-    char desc_buf[20];
+    char desc_buf[DESC_SIZE];
     int fd, file_mode;
     
     /* set file mode */
@@ -185,7 +188,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
     if (is_load)
     {
         /* load description */
-        read(fd, desc_buf, 20);
+        read(fd, desc_buf, sizeof(desc_buf));
     
         /* load state */
         loadstate(fd);
@@ -196,12 +199,12 @@ static bool do_file(char *path, char *desc, bool is_load) {
     else
     {
         /* build description buffer */
-        memset(desc_buf, 0, 20);
+        memset(desc_buf, 0, sizeof(desc_buf));
         if (desc)
-            strlcpy(desc_buf, desc, 20);
+            strlcpy(desc_buf, desc, sizeof(desc_buf));
 
         /* save state */
-        write(fd, desc_buf, 20);
+        write(fd, desc_buf, sizeof(desc_buf));
         savestate(fd);
     }
     
@@ -218,18 +221,20 @@ static bool do_file(char *path, char *desc, bool is_load) {
  * Returns true on success and false on failure.
  */
 static bool do_slot(int slot_id, bool is_load) {
-    char path_buf[256], desc_buf[20];
+    char path_buf[256], desc_buf[DESC_SIZE];
   
     /* build slot filename, clear desc buf */
-    build_slot_path(path_buf, 256, slot_id);
-    memset(desc_buf, 0, 20);
+    build_slot_path(path_buf, sizeof(path_buf), slot_id);
+    memset(desc_buf, 0, sizeof(desc_buf));
 
     /* if we're saving to a slot, then get a brief description */
     if (!is_load)
-        if ( (rb->kbd_input(desc_buf, 20) < 0) || !strlen(desc_buf) )
-        {
-            strlcpy(desc_buf, "Untitled", 20);
-        }
+    {
+        if ( rb->kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
+            return false;
+        if ( !strlen(desc_buf) )
+            strlcpy(desc_buf, "Untitled", sizeof(desc_buf));
+    }
 
     /* load/save file */
     return do_file(path_buf, desc_buf, is_load);
@@ -243,26 +248,26 @@ static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id) {
     int fd;
 
     /* get slot file path */
-    build_slot_path(buf, 256, slot_id);
+    build_slot_path(buf, sizeof(buf), slot_id);
 
     /* attempt to open slot */
     if ((fd = open(buf, O_RDONLY)) >= 0)
     {
         /* this slot has a some data in it, read it */
-        if (read(fd, buf, 20) > 0)
+        if (read(fd, buf, DESC_SIZE) == DESC_SIZE)
         {
-            buf[20] = '\0';
-            snprintf(info_buf, info_bufsiz, "%d. %s", slot_id + 1, buf);
+            buf[DESC_SIZE] = '\0';
+            strlcpy(info_buf, buf, info_bufsiz);
         }
         else
-            snprintf(info_buf, info_bufsiz, "%d. ERROR", slot_id + 1);
+            strlcpy(info_buf, "ERROR", info_bufsiz);
 
         close(fd);
     }
     else
     {
         /* if we couldn't open the file, then the slot is empty */
-        snprintf(info_buf, info_bufsiz, "%d. %s", slot_id + 1, "<Empty>");
+        strlcpy(info_buf, "<Empty>", info_bufsiz);
     }
 }
 
@@ -272,10 +277,10 @@ static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id) {
 static const char* slot_get_name(int selected_item, void * data,
                                  char * buffer, size_t buffer_len)
 {
-    const char (*items)[20] = data;
-    (void) buffer;
-    (void) buffer_len;
-    return items[selected_item];
+    const char (*items)[DESC_SIZE] = data;
+    snprintf(buffer, buffer_len, "%d. %s",
+                selected_item + 1, items[selected_item]);
+    return buffer;
 }
 
 /*
@@ -294,7 +299,7 @@ static int list_action_callback(int action, struct gui_synclist *lists)
  */
 static void do_slot_menu(bool is_load) {
     bool done=false;
-    char items[5][20];
+    char items[MAX_SLOTS][DESC_SIZE];
     int result;
     int i;
     int num_items = sizeof(items) / sizeof(*items);
@@ -302,7 +307,7 @@ static void do_slot_menu(bool is_load) {
 
     /* create menu items */
     for (i = 0; i < num_items; i++)
-        slot_info(items[i], 20, i);
+        slot_info(items[i], sizeof(*items), i);
 
     rb->simplelist_info_init(&info, NULL, num_items, (void *)items);
     info.get_name = slot_get_name;
