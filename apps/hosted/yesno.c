@@ -24,22 +24,34 @@
 #include <jni.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <system.h>
 #include "yesno.h"
 #include "settings.h"
 #include "lang.h"
+#include "kernel.h"
 
 extern JNIEnv   *env_ptr;
 static jclass    RockboxYesno_class = NULL;
 static jobject   RockboxYesno_instance = NULL;
-static jmethodID yesno_func, result_ready, yesno_result;
+static jmethodID yesno_func;
+static struct wakeup    yesno_wakeup;
+static bool      ret;
+
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxYesno_put_1result(JNIEnv *env, jobject this, jboolean result)
+{
+    (void)env;
+    (void)this;
+    ret = (bool)result;
+    wakeup_signal(&yesno_wakeup);
+}
 
 static void yesno_init(void)
 {
     JNIEnv e = *env_ptr;
-    jmethodID yesno_is_usable;
+    static jmethodID yesno_is_usable;
     if (RockboxYesno_class == NULL)
     {
+        wakeup_init(&yesno_wakeup);
         /* get the class and its constructor */
         RockboxYesno_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxYesno");
@@ -51,14 +63,10 @@ static void yesno_init(void)
                                                      constructor);
         yesno_func = e->GetMethodID(env_ptr, RockboxYesno_class,
                                        "yesno_display", "(Ljava/lang/String;)V");
-        yesno_result =    e->GetMethodID(env_ptr, RockboxYesno_class,
-                                       "get_result", "()Z");
-        result_ready =    e->GetMethodID(env_ptr, RockboxYesno_class,
-                                       "result_ready", "()Z");
+        yesno_is_usable = e->GetMethodID(env_ptr, RockboxYesno_class,
+                                       "is_usable", "()Z");
     }
     /* need to get it every time incase the activity died/restarted */
-    yesno_is_usable = e->GetMethodID(env_ptr, RockboxYesno_class,
-                                   "is_usable", "()Z");
     while (!e->CallBooleanMethod(env_ptr, RockboxYesno_instance,
                                  yesno_is_usable))
         sleep(HZ/10);
@@ -92,16 +100,13 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     
     JNIEnv e = *env_ptr;
     jstring message = build_message(main_message);
-    jboolean ret;
     
     e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func, message);
-
-    do {
-        sleep(HZ/10);
-        ret = e->CallBooleanMethod(env_ptr, RockboxYesno_instance, result_ready);
-    } while (!ret);
     
-    ret = e->CallBooleanMethod(env_ptr, RockboxYesno_instance, yesno_result);
+    wakeup_wait(&yesno_wakeup, TIMEOUT_BLOCK);
+
+    e->DeleteLocalRef(env_ptr, message);
+
     return ret ? YESNO_YES : YESNO_NO;
 }
 

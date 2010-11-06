@@ -26,15 +26,8 @@ import android.content.Intent;
 
 public class RockboxYesno
 {
-	private boolean result;
-	private boolean have_result;
-	
-    public RockboxYesno()
-    {
-    	have_result = false;
-    }    
-
-    public void yesno_display(String text) 
+    @SuppressWarnings("unused")
+    private void yesno_display(String text) 
     {
         RockboxActivity a = (RockboxActivity) RockboxService.get_instance().get_activity();
         Intent kbd = new Intent(a, YesnoActivity.class);
@@ -43,30 +36,16 @@ public class RockboxYesno
         {
             public void onComplete(int resultCode, Intent data) 
             {
-                if (resultCode == Activity.RESULT_OK)
-                {
-                    result = true;
-                    have_result = true;
-                }
-                else {
-                    result = false;
-                    have_result = true;
-                }
+                put_result(resultCode == Activity.RESULT_OK);
             }
         });
     }
 
-    public boolean result_ready()
-    {
-        return have_result;
-    }
-    public boolean get_result()
-    {
-        return result;
-    }
-    
-    public boolean is_usable()
+    @SuppressWarnings("unused")
+    private boolean is_usable()
     {
         return RockboxService.get_instance().get_activity() != null;
     }
+    
+    private native void put_result(boolean result);
 }

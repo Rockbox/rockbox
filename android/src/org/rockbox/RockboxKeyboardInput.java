@@ -43,21 +43,13 @@ public class RockboxKeyboardInput
         {
             public void onComplete(int resultCode, Intent data) 
             {
-                if (resultCode == Activity.RESULT_OK)
-                {
-                    result = data.getStringExtra("value");
-                }
-                else {
-                    result = "";
-                }
+                put_result(resultCode == Activity.RESULT_OK, 
+                           data.getStringExtra("value"));
             }
         });
     }
-    public String get_result()
-    {
-        return result;
-    }
     
+    private native void put_result(boolean accepted, String new_string);
     public boolean is_usable()
     {
         return RockboxService.get_instance().get_activity() != null;

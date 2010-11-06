@@ -23,21 +23,40 @@
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
 #include <jni.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <system.h>
+#include "string-extra.h"
+#include "kernel.h"
 
-extern JNIEnv   *env_ptr;
-static jclass    RockboxKeyboardInput_class;
-static jobject   RockboxKeyboardInput_instance;
-static jmethodID kbd_inputfunc, kbd_result;
+extern JNIEnv          *env_ptr;
+static jclass           RockboxKeyboardInput_class;
+static jobject          RockboxKeyboardInput_instance;
+static jmethodID        kbd_inputfunc;
+static struct wakeup    kbd_wakeup;
+static bool             accepted;
+static jstring          new_string;
+
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxKeyboardInput_put_1result(JNIEnv *env, jobject this,
+                                                  jboolean _accepted,
+                                                  jstring _new_string)
+{
+    (void)env;(void)this;
+
+    accepted = (bool)_accepted;
+    if (accepted)
+    {
+        new_string = _new_string;
+        (*env)->NewGlobalRef(env, new_string); /* prevet GC'ing */
+    }
+    wakeup_signal(&kbd_wakeup);
+}
 
 static void kdb_init(void)
 {
     JNIEnv e = *env_ptr;
-    jmethodID kbd_is_usable;
+    static jmethodID kbd_is_usable;
     if (RockboxKeyboardInput_class == NULL)
     {
+        wakeup_init(&kbd_wakeup);
         /* get the class and its constructor */
         RockboxKeyboardInput_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxKeyboardInput");
@@ -49,12 +68,11 @@ static void kdb_init(void)
                                                      constructor);
         kbd_inputfunc = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
                                        "kbd_input", "(Ljava/lang/String;)V");
-        kbd_result =    e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                       "get_result", "()Ljava/lang/String;");
+        kbd_is_usable = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
+                                       "is_usable", "()Z");
     }
+
     /* need to get it every time incase the activity died/restarted */
-    kbd_is_usable = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                   "is_usable", "()Z");
     while (!e->CallBooleanMethod(env_ptr, RockboxKeyboardInput_instance,
                                                             kbd_is_usable))
         sleep(HZ/10);
@@ -64,24 +82,22 @@ int kbd_input(char* text, int buflen)
 {
     JNIEnv e = *env_ptr;
     jstring str = e->NewStringUTF(env_ptr, text);
-    jobject ret;
-    const char* retchars;
+    const char *utf8_string;
     kdb_init();
 
     e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance,kbd_inputfunc,str);
 
-    do {
-        sleep(HZ/10);
-        ret = e->CallObjectMethod(env_ptr, RockboxKeyboardInput_instance,
-                                                                    kbd_result);
-    } while (!ret);
+    wakeup_wait(&kbd_wakeup, TIMEOUT_BLOCK);
+
+    if (accepted)
+    {
+        utf8_string = e->GetStringUTFChars(env_ptr, new_string, 0);
+        strlcpy(text, utf8_string, buflen);
+        e->ReleaseStringUTFChars(env_ptr, new_string, utf8_string);
+        e->DeleteGlobalRef(env_ptr, new_string);
+    }
     
-    retchars = e->GetStringUTFChars(env_ptr, ret, 0);
-    if (retchars[0])
-        strncpy(text, retchars, buflen);
-    e->ReleaseStringUTFChars(env_ptr, ret, retchars);
-    
-    return text[0] ? 0 : 1; /* return 0 on success */
+    return !accepted; /* return 0 on success */
 }
 
 int load_kbd(unsigned char* filename)
