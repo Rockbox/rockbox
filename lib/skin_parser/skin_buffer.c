@@ -63,8 +63,8 @@ static unsigned char *buffer_front = NULL;
 #ifdef USE_HOST_MALLOC
 
 struct malloc_object {
-    void* object;
     struct malloc_object *next;
+    char buf[0];
 };
 static struct malloc_object *malloced_head = NULL, *malloced_tail = NULL;
 
@@ -76,7 +76,6 @@ static void skin_free_malloced(void)
     {
         this = obj;
         obj = this->next;
-        free(this->object);
         free(this);
     }
     malloced_head = NULL;
@@ -108,17 +107,16 @@ void* skin_buffer_alloc(size_t size)
     retval = buffer_front;
     buffer_front += size;
 #elif defined(USE_HOST_MALLOC)
-    struct malloc_object *obj = malloc(sizeof (struct malloc_object));
-    if (!obj)
-        return NULL;
-    obj->object = malloc(size);
+    size_t malloc_size = sizeof(struct malloc_object) + size;
+    struct malloc_object *obj = malloc(malloc_size);
+    retval = &obj->buf;
     obj->next = NULL;
     if (malloced_tail == NULL)
         malloced_head = malloced_tail = obj;
     else
         malloced_tail->next = obj;
     malloced_tail = obj;
-    retval = obj->object;
+    
 #else
     retval = malloc(size);
 #endif
