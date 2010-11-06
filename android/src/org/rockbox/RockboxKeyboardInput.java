@@ -33,12 +33,11 @@ import android.widget.EditText;
 
 public class RockboxKeyboardInput
 {
-    public void kbd_input(final String text)
+    public void kbd_input(final String text, final String ok, final String cancel)
     {
         final Activity c = RockboxService.get_instance().get_activity();
 
         c.runOnUiThread(new Runnable() {
-            @Override
             public void run()
             {
                 LayoutInflater inflater = LayoutInflater.from(c);
@@ -50,7 +49,7 @@ public class RockboxKeyboardInput
                     .setView(addView)
                     .setIcon(R.drawable.icon)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener()
+                    .setPositiveButton(ok, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             EditText input = (EditText)((Dialog)dialog)
@@ -59,7 +58,7 @@ public class RockboxKeyboardInput
                             put_result(true, s.toString());
                         }
                     })
-                    .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener()
+                    .setNegativeButton(cancel, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int whichButton)
                         {

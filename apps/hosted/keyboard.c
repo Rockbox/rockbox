@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include "string-extra.h"
 #include "kernel.h"
+#include "lang.h"
 
 extern JNIEnv          *env_ptr;
 static jclass           RockboxKeyboardInput_class;
@@ -67,7 +68,10 @@ static void kdb_init(void)
                                                      RockboxKeyboardInput_class,
                                                      constructor);
         kbd_inputfunc = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
-                                       "kbd_input", "(Ljava/lang/String;)V");
+                                       "kbd_input",
+                                       "(Ljava/lang/String;"
+                                       "Ljava/lang/String;"
+                                       "Ljava/lang/String;)V");
         kbd_is_usable = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
                                        "is_usable", "()Z");
     }
@@ -80,12 +84,15 @@ static void kdb_init(void)
 
 int kbd_input(char* text, int buflen)
 {
-    JNIEnv e = *env_ptr;
-    jstring str = e->NewStringUTF(env_ptr, text);
+    JNIEnv e            = *env_ptr;
+    jstring str         = e->NewStringUTF(env_ptr, text);
+    jstring ok_text     = e->NewStringUTF(env_ptr, str(LANG_KBD_OK));
+    jstring cancel_text = e->NewStringUTF(env_ptr, str(LANG_KBD_CANCEL));
     const char *utf8_string;
     kdb_init();
 
-    e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance,kbd_inputfunc,str);
+    e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance,kbd_inputfunc,
+                      str, ok_text, cancel_text);
 
     wakeup_wait(&kbd_wakeup, TIMEOUT_BLOCK);
 
@@ -96,6 +103,9 @@ int kbd_input(char* text, int buflen)
         e->ReleaseStringUTFChars(env_ptr, new_string, utf8_string);
         e->DeleteGlobalRef(env_ptr, new_string);
     }
+    e->DeleteGlobalRef(env_ptr, str);
+    e->DeleteGlobalRef(env_ptr, ok_text);
+    e->DeleteGlobalRef(env_ptr, cancel_text);
     
     return !accepted; /* return 0 on success */
 }

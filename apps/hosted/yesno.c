@@ -62,7 +62,10 @@ static void yesno_init(void)
                                                      RockboxYesno_class,
                                                      constructor);
         yesno_func = e->GetMethodID(env_ptr, RockboxYesno_class,
-                                       "yesno_display", "(Ljava/lang/String;)V");
+                                       "yesno_display",
+                                       "(Ljava/lang/String;"
+                                       "Ljava/lang/String;"
+                                       "Ljava/lang/String;)V");
         yesno_is_usable = e->GetMethodID(env_ptr, RockboxYesno_class,
                                        "is_usable", "()Z");
     }
@@ -100,12 +103,17 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     
     JNIEnv e = *env_ptr;
     jstring message = build_message(main_message);
-    
-    e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func, message);
+    jstring yes = (*env_ptr)->NewStringUTF(env_ptr, str(LANG_SET_BOOL_YES));
+    jstring no  = (*env_ptr)->NewStringUTF(env_ptr, str(LANG_SET_BOOL_NO));
+
+    e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func,
+                      message, yes, no);
     
     wakeup_wait(&yesno_wakeup, TIMEOUT_BLOCK);
 
     e->DeleteLocalRef(env_ptr, message);
+    e->DeleteLocalRef(env_ptr, yes);
+    e->DeleteLocalRef(env_ptr, no);
 
     return ret ? YESNO_YES : YESNO_NO;
 }

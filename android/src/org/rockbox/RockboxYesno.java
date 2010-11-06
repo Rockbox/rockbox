@@ -28,12 +28,11 @@ import android.content.DialogInterface;
 public class RockboxYesno
 {
     @SuppressWarnings("unused")
-    private void yesno_display(final String text)
+    private void yesno_display(final String text, final String yes, final String no)
     {
         final Activity c = RockboxService.get_instance().get_activity();
 
         c.runOnUiThread(new Runnable() {
-            @Override
             public void run()
             {
                 new AlertDialog.Builder(c)
@@ -41,14 +40,14 @@ public class RockboxYesno
                 .setIcon(R.drawable.icon)
                 .setCancelable(false)
                 .setMessage(text)
-                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener()
+                .setPositiveButton(yes, new DialogInterface.OnClickListener()
                 {
                     public void onClick(DialogInterface dialog, int whichButton)
                     {
                         put_result(true);
                     }
                 })
-                .setNegativeButton(R.string.No, new DialogInterface.OnClickListener()
+                .setNegativeButton(no, new DialogInterface.OnClickListener()
                 {
                     public void onClick(DialogInterface dialog, int whichButton)
                     {
