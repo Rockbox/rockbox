@@ -23,33 +23,57 @@ package org.rockbox;
 
 
 import android.app.Activity;
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.text.Editable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 
 public class RockboxKeyboardInput
 {
-	private String result;
-	
-    public RockboxKeyboardInput()
+    public void kbd_input(final String text)
     {
-        result = null;
-    }    
+        final Activity c = RockboxService.get_instance().get_activity();
 
-    public void kbd_input(String text) 
-    {
-        RockboxActivity a = (RockboxActivity) RockboxService.get_instance().get_activity();
-        Intent kbd = new Intent(a, KeyboardActivity.class);
-        kbd.putExtra("value", text);
-        a.waitForActivity(kbd, new HostCallback()
-        {
-            public void onComplete(int resultCode, Intent data) 
+        c.runOnUiThread(new Runnable() {
+            @Override
+            public void run()
             {
-                put_result(resultCode == Activity.RESULT_OK, 
-                           data.getStringExtra("value"));
+                LayoutInflater inflater = LayoutInflater.from(c);
+                View addView = inflater.inflate(R.layout.keyboardinput, null);
+                EditText input = (EditText) addView.findViewById(R.id.KbdInput);
+                input.setText(text);
+                new AlertDialog.Builder(c)
+                    .setTitle(R.string.KbdInputTitle)
+                    .setView(addView)
+                    .setIcon(R.drawable.icon)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            EditText input = (EditText)((Dialog)dialog)
+                                                    .findViewById(R.id.KbdInput);
+                            Editable s = input.getText();
+                            put_result(true, s.toString());
+                        }
+                    })
+                    .setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int whichButton)
+                        {
+                            put_result(false, "");
+                        }
+                    })
+                    .show();
             }
         });
     }
-    
+
     private native void put_result(boolean accepted, String new_string);
+
+    @SuppressWarnings("unused")
     public boolean is_usable()
     {
         return RockboxService.get_instance().get_activity() != null;

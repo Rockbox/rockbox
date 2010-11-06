@@ -19,14 +19,6 @@
 			</intent-filter>
 		</activity>		
 
-		<activity android:name="KeyboardActivity" 
-				  android:theme="@android:style/Theme.Dialog">
-		</activity>
-		
-		<activity android:name="YesnoActivity" 
-				  android:theme="@android:style/Theme.Dialog">
-		</activity>
-
 		<service android:name=".RockboxService"/>
 
 		<receiver android:name=".Helper.MediaButtonReceiver$MediaReceiver"

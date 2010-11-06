@@ -145,23 +145,6 @@ public class RockboxActivity extends Activity
         super.onDestroy();
         rbservice.set_activity(null);
     }
-    
-    private HostCallback hostcallback = null;
-    public void waitForActivity(Intent i, HostCallback callback)
-    {
-    	if (hostcallback !=  null)
-    	{
-    		LOG("Something has gone wrong");
-        }
-        hostcallback = callback;
-        startActivityForResult(i, 0);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        hostcallback.onComplete(resultCode, data);
-        hostcallback = null;
-    }
 
     private void LOG(CharSequence text)
     {

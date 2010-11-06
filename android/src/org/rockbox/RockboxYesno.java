@@ -22,21 +22,40 @@
 package org.rockbox;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 public class RockboxYesno
 {
     @SuppressWarnings("unused")
-    private void yesno_display(String text) 
+    private void yesno_display(final String text)
     {
-        RockboxActivity a = (RockboxActivity) RockboxService.get_instance().get_activity();
-        Intent kbd = new Intent(a, YesnoActivity.class);
-        kbd.putExtra("value", text);
-        a.waitForActivity(kbd, new HostCallback()
-        {
-            public void onComplete(int resultCode, Intent data) 
+        final Activity c = RockboxService.get_instance().get_activity();
+
+        c.runOnUiThread(new Runnable() {
+            @Override
+            public void run()
             {
-                put_result(resultCode == Activity.RESULT_OK);
+                new AlertDialog.Builder(c)
+                .setTitle(R.string.KbdInputTitle)
+                .setIcon(R.drawable.icon)
+                .setCancelable(false)
+                .setMessage(text)
+                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        put_result(true);
+                    }
+                })
+                .setNegativeButton(R.string.No, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        put_result(false);
+                    }
+                })
+                .show();
             }
         });
     }
