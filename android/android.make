@@ -55,9 +55,11 @@ DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
 DIRS		+= $(BUILDDIR)/libs/armeabi
 
+RES		:= $(wildcard $(ANDROID_DIR)/res/*/*)
+
 CLEANOBJS += bin gen libs data
 
-$(R_JAVA) $(AP_): $(MANIFEST) $(DIRS)
+$(R_JAVA) $(AP_): $(MANIFEST) $(DIRS) $(RES)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m \
 		-J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res \
 		-I $(ANDROID_PLATFORM)/android.jar -F $(AP_)
