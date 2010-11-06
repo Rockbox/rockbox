@@ -37,7 +37,6 @@ import android.widget.Toast;
 
 public class RockboxActivity extends Activity 
 {
-    private ProgressDialog loadingdialog;
     private RockboxService rbservice;
 
     /** Called when the activity is first created. */
@@ -49,38 +48,41 @@ public class RockboxActivity extends Activity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        /* Do not try starting the service if it's already running */
-        if (isRockboxRunning())
-            return;
-
-        /* prepare a please wait dialog in case we need
-         * to wait for unzipping libmisc.so
-         */
-        loadingdialog = new ProgressDialog(this);
-        loadingdialog.setMessage("Rockbox is loading. Please wait...");
-        loadingdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        loadingdialog.setIndeterminate(true);
-        loadingdialog.setCancelable(false);
-        loadingdialog.show();
-
         Intent intent = new Intent(this, RockboxService.class);
         intent.putExtra("callback", new ResultReceiver(new Handler(getMainLooper())) {
+            private ProgressDialog loadingdialog;
+
+            private void createProgressDialog()
+            {
+                loadingdialog = new ProgressDialog(RockboxActivity.this);
+                loadingdialog.setMessage("Rockbox is loading. Please wait...");
+                loadingdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                loadingdialog.setIndeterminate(true);
+                loadingdialog.setCancelable(false);
+                loadingdialog.show();
+            }
+
             @Override
             protected void onReceiveResult(final int resultCode, final Bundle resultData)
             {
                 switch (resultCode) {
                     case RockboxService.RESULT_LIB_LOADED:
                         rbservice = RockboxService.get_instance();
-                        loadingdialog.setIndeterminate(true);
+                        if (loadingdialog != null)
+                            loadingdialog.setIndeterminate(true);
                         break;
                     case RockboxService.RESULT_LIB_LOAD_PROGRESS:
+                        if (loadingdialog == null)
+                            createProgressDialog();
+
                         loadingdialog.setIndeterminate(false);
                         loadingdialog.setMax(resultData.getInt("max", 100));
                         loadingdialog.setProgress(resultData.getInt("value", 0));
                         break;
                     case RockboxService.RESULT_FB_INITIALIZED:
                         attachFramebuffer();
-                        loadingdialog.dismiss();
+                        if (loadingdialog != null)
+                            loadingdialog.dismiss();
                         break;
                     case RockboxService.RESULT_ERROR_OCCURED:
                         Toast.makeText(RockboxActivity.this, resultData.getString("error"), Toast.LENGTH_LONG);
