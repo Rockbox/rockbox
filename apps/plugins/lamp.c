@@ -25,42 +25,56 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
-
-
-/* variable button definitions - only targets with a colour display */
-#if defined(HAVE_LCD_COLOR)
+/* variable button definitions.
+ - only targets with a colour display
+    LAMP_LEFT / LAMP_RIGHT: change the color
+    LAMP_NEXT / LAMP_PREV:  (optional) change the color
+ - only targets which can set brightness
+    LAMP_UP / LAMP_DOWN:    change the brightness
+*/
+#if defined(HAVE_LCD_COLOR) || defined(HAVE_BACKLIGHT_BRIGHTNESS)
 #if (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
-#   define LAMP_NEXT       BUTTON_SCROLL_FWD
-#   define LAMP_PREV       BUTTON_SCROLL_BACK
+#   define LAMP_UP         BUTTON_SCROLL_FWD
+#   define LAMP_DOWN       BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
-#   define LAMP_NEXT       BUTTON_SCROLL_FWD
-#   define LAMP_PREV       BUTTON_SCROLL_BACK
+#   define LAMP_UP         BUTTON_SCROLL_FWD
+#   define LAMP_DOWN       BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
@@ -81,14 +95,20 @@
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #   define LAMP_LEFT       BUTTON_PREV
 #   define LAMP_RIGHT      BUTTON_NEXT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
 #   define LAMP_LEFT       BUTTON_VOL_DOWN
@@ -103,11 +123,17 @@
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
 #   define LAMP_LEFT       BUTTON_PREV
 #   define LAMP_RIGHT      BUTTON_NEXT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == MPIO_HD200_PAD
+#   define LAMP_UP         BUTTON_REW
+#   define LAMP_DOWN       BUTTON_FF
 
 #else
 #   error Missing key definitions for this keypad
 #endif
-#endif
+#endif /* HAVE_LCD_COLOR || HAVE_BACKLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_TOUCHSCREEN
 # ifndef LAMP_LEFT
@@ -116,11 +142,11 @@
 # ifndef LAMP_RIGHT
 #   define LAMP_RIGHT      BUTTON_MIDRIGHT
 # endif
-# ifndef LAMP_NEXT
-#   define LAMP_NEXT       BUTTON_TOPMIDDLE
+# ifndef LAMP_UP
+#   define LAMP_UP         BUTTON_TOPMIDDLE
 # endif
-# ifndef LAMP_PREV
-#   define LAMP_PREV       BUTTON_BOTTOMMIDDLE
+# ifndef LAMP_DOWN
+#   define LAMP_DOWN       BUTTON_BOTTOMMIDDLE
 # endif
 #endif
 
@@ -138,12 +164,12 @@ enum plugin_status plugin_start(const void* parameter)
 {
     enum plugin_status status = PLUGIN_OK;
     long button;
+    bool quit = false;
     (void)parameter;
 
 #ifdef HAVE_LCD_COLOR
     int cs = 0;
-    bool quit = false;
-    bool update = true;
+    bool update = false;
 #endif /* HAVE_LCD_COLOR */
 
 #if LCD_DEPTH > 1
@@ -153,6 +179,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    int current_brightness = MAX_BRIGHTNESS_SETTING;
     backlight_brightness_set(MAX_BRIGHTNESS_SETTING);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
@@ -172,9 +199,12 @@ enum plugin_status plugin_start(const void* parameter)
     buttonlight_force_on();
 #endif /* HAVE_BUTTON_LIGHT */
 
-#ifdef HAVE_LCD_COLOR
+    rb->lcd_clear_display();
+    rb->lcd_update();
+
     do
     {
+#ifdef HAVE_LCD_COLOR
         if(update)
         {
             if(cs < 0)
@@ -186,9 +216,11 @@ enum plugin_status plugin_start(const void* parameter)
             rb->lcd_update();
             update = false;
         }
+#endif /* HAVE_LCD_COLOR */
 
         switch((button = rb->button_get_w_tmo(HZ*30)))
         {
+#ifdef HAVE_LCD_COLOR
             case LAMP_RIGHT:
 #ifdef LAMP_NEXT
             case LAMP_NEXT:
@@ -204,45 +236,38 @@ enum plugin_status plugin_start(const void* parameter)
                 cs--;
                 update = true;
                 break;
+#endif /* HAVE_LCD_COLOR */
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+            case LAMP_UP:
+            case (LAMP_UP|BUTTON_REPEAT):
+                if (current_brightness < MAX_BRIGHTNESS_SETTING)
+                    backlight_brightness_set(++current_brightness);
+                break;
+
+            case LAMP_DOWN:
+            case (LAMP_DOWN|BUTTON_REPEAT):
+                if (current_brightness > MIN_BRIGHTNESS_SETTING)
+                    backlight_brightness_set(--current_brightness);
+                break;
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+            case BUTTON_NONE:
+                /* time out */
+                break;
 
             default:
-                if(button)
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-                    if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    {
-                        status = PLUGIN_USB_CONNECTED;
-                        quit = true;
-                    }
-                    if(!(button & (BUTTON_REL|BUTTON_REPEAT))
-                        && !IS_SYSEVENT(button))
-                        quit = true;
+                    status = PLUGIN_USB_CONNECTED;
+                    quit = true;
                 }
+                if(!(button & (BUTTON_REL|BUTTON_REPEAT))
+                    && !IS_SYSEVENT(button))
+                    quit = true;
                 break;
         }
         rb->reset_poweroff_timer();
     } while (!quit);
-
-#else /* HAVE_LCD_COLOR */
-    rb->lcd_clear_display();
-    rb->lcd_update();
-    /* wait */
-    do
-    {
-        button = rb->button_get_w_tmo(HZ*30);
-        if(button)
-        {
-            if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
-            {
-                status = PLUGIN_USB_CONNECTED;
-                break;
-            }
-            if(!IS_SYSEVENT(button))
-                break;
-        }
-        rb->reset_poweroff_timer();
-    } while (1);
-
-#endif /*HAVE_LCD_COLOR */
 
     /* restore */
     backlight_use_settings();
