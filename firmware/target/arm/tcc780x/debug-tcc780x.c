@@ -35,7 +35,7 @@
 #define STS    (*(volatile unsigned long *)0xF3001008)
 #define SRC    (*(volatile unsigned long *)0xF3001010)
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
     return false;
 }

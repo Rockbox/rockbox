@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2010 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,11 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DEBUG_TARGET_H
-#define DEBUG_TARGET_H
+#if CONFIG_KEYPAD == RECORDER_PAD
+#   define DEBUG_CANCEL  BUTTON_OFF
 
-#define DEBUG_CANCEL  BUTTON_BACK
-bool __dbg_hw_info(void);
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#   define DEBUG_CANCEL  BUTTON_MENU
+#endif
 bool dbg_ports(void);
-
-#endif /* DEBUG_TARGET_H */

@@ -31,7 +31,7 @@
 #include "debug-target.h"
 #include "adc.h"
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
     return false;
 }

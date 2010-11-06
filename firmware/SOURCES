@@ -398,6 +398,7 @@ target/sh/memset-sh.S
 target/sh/strlen-sh.S
 target/sh/system-sh.c
 target/sh/archos/descramble.S
+target/sh/debug-sh.c
 #endif /* SIMULATOR */
 
 #elif defined(CPU_COLDFIRE)
@@ -421,6 +422,7 @@ target/coldfire/system-coldfire.c
 target/coldfire/timer-coldfire.c
 #ifndef BOOTLOADER
 target/coldfire/pcm-coldfire.c
+target/coldfire/debug-coldfire.c
 #endif /* BOOTLOADER */
 #if CONFIG_I2C == I2C_COLDFIRE
 target/coldfire/i2c-coldfire.c
@@ -503,6 +505,7 @@ target/arm/system-pp502x.c
 target/arm/crt0-pp-bl.S
 #else
 target/arm/pcm-pp.c
+target/arm/debug-pp.c
 #if !defined(SANSA_E200) && !defined(SANSA_C200)
 target/arm/audio-pp.c
 #endif /* SANSA_E200 */

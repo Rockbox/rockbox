@@ -129,7 +129,7 @@ static void display_enabled_clocks(void)
             (clkgr & CPM_CLKGR_UART0) ? "stopped" : "running");
 }
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
     return false;
 }

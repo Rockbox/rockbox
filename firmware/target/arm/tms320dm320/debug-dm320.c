@@ -36,7 +36,7 @@
 #include "m66591.h"
 #endif
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
 #if defined(MROBE_500)
     int line = 0;
