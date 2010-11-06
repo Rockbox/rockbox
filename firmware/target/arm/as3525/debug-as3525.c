@@ -433,7 +433,7 @@ end:
     return false;
 }
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
     int line, btn, i;
 

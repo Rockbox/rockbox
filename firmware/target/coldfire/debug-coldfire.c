@@ -28,6 +28,9 @@
 #include "powermgmt.h"
 #include "adc.h"
 #include "debug-target.h"
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#include "lcd-remote.h"
+#endif
 
 bool dbg_ports(void)
 {
