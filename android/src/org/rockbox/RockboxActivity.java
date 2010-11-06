@@ -55,7 +55,7 @@ public class RockboxActivity extends Activity
             private void createProgressDialog()
             {
                 loadingdialog = new ProgressDialog(RockboxActivity.this);
-                loadingdialog.setMessage("Rockbox is loading. Please wait...");
+                loadingdialog.setMessage(getString(R.string.rockbox_extracting));
                 loadingdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 loadingdialog.setIndeterminate(true);
                 loadingdialog.setCancelable(false);

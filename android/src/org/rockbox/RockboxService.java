@@ -207,7 +207,7 @@ public class RockboxService extends Service
     		            e.printStackTrace();
     		            if (resultReceiver != null) {
     		                Bundle bundle = new Bundle();
-    		                bundle.putString("error", "Error occured during extraction!");
+                            bundle.putString("error", getString(R.string.error_extraction));
     		                resultReceiver.send(RESULT_ERROR_OCCURED, bundle);
     		            }
     		        }
