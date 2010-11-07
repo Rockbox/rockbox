@@ -103,7 +103,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 # endif
 
 /* possible DCT speed optimization */
-# ifdef FPM_COLDFIRE_EMAC
+# if defined(FPM_COLDFIRE_EMAC)
 /* This is a Coldfire version of the OPT_SPEED optimisation below, but in the
    case of Coldfire it doesn't loose no additional precision. */
 #  define MUL(x, y) \
@@ -538,15 +538,10 @@ mad_fixed_t const D[17][32] ICONST_ATTR = {
 # include "D.dat"
 };
 
-# if defined(ASO_SYNTH)
-void synth_full(struct mad_synth *, struct mad_frame const *,
-                unsigned int, unsigned int);
-# else
 /*
  * NAME:        synth->full()
  * DESCRIPTION: perform full frequency PCM synthesis
  */
-
 /* optimised version of synth_full */
 # ifdef FPM_COLDFIRE_EMAC
 
@@ -1059,9 +1054,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
     }
   }
 }
-
-# endif
-# endif
+# endif /* FPM_COLDFIRE_EMAC, FPM_ARM */
 
 #if 0 /* rockbox: unused */
 /*

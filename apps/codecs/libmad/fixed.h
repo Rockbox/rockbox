@@ -110,8 +110,6 @@ typedef mad_fixed_t mad_sample_t;
 #  define mad_f_mul(x, y)       ((x) * (y))
 #  define mad_f_scale64
 
-#  undef ASO_ZEROCHECK
-
 # elif defined(FPM_64BIT)
 
 /*

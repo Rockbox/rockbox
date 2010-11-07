@@ -392,7 +392,7 @@ mad_fixed_t const imdct_s[6][6] ICONST_ATTR = {
 # include "imdct_s.dat"
 };
 
-# if !defined(ASO_IMDCT)
+# if !defined(FPM_ARM)
 /*
  * windowing coefficients for long blocks
  * derived from section 2.4.3.4.10.3 of ISO/IEC 11172-3
@@ -422,7 +422,7 @@ mad_fixed_t const window_l[36] ICONST_ATTR = {
   MAD_F(0x04cfb0e2) /* 0.300705800 */, MAD_F(0x03768962) /* 0.216439614 */,
   MAD_F(0x0216a2a2) /* 0.130526192 */, MAD_F(0x00b2aa3e) /* 0.043619387 */,
 };
-# endif  /* ASO_IMDCT */
+# endif  /* FPM_ARM */
 
 /*
  * windowing coefficients for short blocks
@@ -1580,9 +1580,6 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
       a = xr[-1 - i];
       b = xr[     i];
 
-# if defined(ASO_ZEROCHECK)
-      if (a | b) {
-# endif
 # if defined(CPU_COLDFIRE)
       (void)hi, (void)lo;
       asm volatile ("mac.l %[a], %[csi], %%acc0\n\t"
@@ -1608,210 +1605,19 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
 
         xr[     i] = MAD_F_MLZ(hi, lo);
 # endif
-# if defined(ASO_ZEROCHECK)
-      }
-# endif
     }
   }
 }
 #endif
 
-# if defined(ASO_IMDCT)
+# if defined(FPM_ARM)
 void III_imdct_l(mad_fixed_t const [18], mad_fixed_t [36], unsigned int);
 # else
-#  if 0
-static
-void fastsdct(mad_fixed_t const x[9], mad_fixed_t y[18])
-{
-  mad_fixed_t a0,  a1,  a2,  a3,  a4,  a5,  a6,  a7,  a8,  a9,  a10, a11, a12;
-  mad_fixed_t a13, a14, a15, a16, a17, a18, a19, a20, a21, a22, a23, a24, a25;
-  mad_fixed_t m0,  m1,  m2,  m3,  m4,  m5,  m6,  m7;
-
-  enum {
-    c0 =  MAD_F(0x1f838b8d),  /* 2 * cos( 1 * PI / 18) */
-    c1 =  MAD_F(0x1bb67ae8),  /* 2 * cos( 3 * PI / 18) */
-    c2 =  MAD_F(0x18836fa3),  /* 2 * cos( 4 * PI / 18) */
-    c3 =  MAD_F(0x1491b752),  /* 2 * cos( 5 * PI / 18) */
-    c4 =  MAD_F(0x0af1d43a),  /* 2 * cos( 7 * PI / 18) */
-    c5 =  MAD_F(0x058e86a0),  /* 2 * cos( 8 * PI / 18) */
-    c6 = -MAD_F(0x1e11f642)   /* 2 * cos(16 * PI / 18) */
-  };
-
-  a0 = x[3] + x[5];
-  a1 = x[3] - x[5];
-  a2 = x[6] + x[2];
-  a3 = x[6] - x[2];
-  a4 = x[1] + x[7];
-  a5 = x[1] - x[7];
-  a6 = x[8] + x[0];
-  a7 = x[8] - x[0];
-
-  a8  = a0  + a2;
-  a9  = a0  - a2;
-  a10 = a0  - a6;
-  a11 = a2  - a6;
-  a12 = a8  + a6;
-  a13 = a1  - a3;
-  a14 = a13 + a7;
-  a15 = a3  + a7;
-  a16 = a1  - a7;
-  a17 = a1  + a3;
-
-  m0 = mad_f_mul(a17, -c3);
-  m1 = mad_f_mul(a16, -c0);
-  m2 = mad_f_mul(a15, -c4);
-  m3 = mad_f_mul(a14, -c1);
-  m4 = mad_f_mul(a5,  -c1);
-  m5 = mad_f_mul(a11, -c6);
-  m6 = mad_f_mul(a10, -c5);
-  m7 = mad_f_mul(a9,  -c2);
-
-  a18 =     x[4] + a4;
-  a19 = 2 * x[4] - a4;
-  a20 = a19 + m5;
-  a21 = a19 - m5;
-  a22 = a19 + m6;
-  a23 = m4  + m2;
-  a24 = m4  - m2;
-  a25 = m4  + m1;
-
-  /* output to every other slot for convenience */
-
-  y[ 0] = a18 + a12;
-  y[ 2] = m0  - a25;
-  y[ 4] = m7  - a20;
-  y[ 6] = m3;
-  y[ 8] = a21 - m6;
-  y[10] = a24 - m1;
-  y[12] = a12 - 2 * a18;
-  y[14] = a23 + m0;
-  y[16] = a22 + m7;
-}
-
-static inline
-void sdctII(mad_fixed_t const x[18], mad_fixed_t X[18])
-{
-  mad_fixed_t tmp[9];
-  int i;
-
-  /* scale[i] = 2 * cos(PI * (2 * i + 1) / (2 * 18)) */
-  static mad_fixed_t const scale[9] = {
-    MAD_F(0x1fe0d3b4), MAD_F(0x1ee8dd47), MAD_F(0x1d007930),
-    MAD_F(0x1a367e59), MAD_F(0x16a09e66), MAD_F(0x125abcf8),
-    MAD_F(0x0d8616bc), MAD_F(0x08483ee1), MAD_F(0x02c9fad7)
-  };
-
-  /* divide the 18-point SDCT-II into two 9-point SDCT-IIs */
-
-  /* even input butterfly */
-
-  for (i = 0; i < 9; i += 3) {
-    tmp[i + 0] = x[i + 0] + x[18 - (i + 0) - 1];
-    tmp[i + 1] = x[i + 1] + x[18 - (i + 1) - 1];
-    tmp[i + 2] = x[i + 2] + x[18 - (i + 2) - 1];
-  }
-
-  fastsdct(tmp, &X[0]);
-
-  /* odd input butterfly and scaling */
-
-  for (i = 0; i < 9; i += 3) {
-    tmp[i + 0] = mad_f_mul(x[i + 0] - x[18 - (i + 0) - 1], scale[i + 0]);
-    tmp[i + 1] = mad_f_mul(x[i + 1] - x[18 - (i + 1) - 1], scale[i + 1]);
-    tmp[i + 2] = mad_f_mul(x[i + 2] - x[18 - (i + 2) - 1], scale[i + 2]);
-  }
-
-  fastsdct(tmp, &X[1]);
-
-  /* output accumulation */
-
-  for (i = 3; i < 18; i += 8) {
-    X[i + 0] -= X[(i + 0) - 2];
-    X[i + 2] -= X[(i + 2) - 2];
-    X[i + 4] -= X[(i + 4) - 2];
-    X[i + 6] -= X[(i + 6) - 2];
-  }
-}
-
-static inline
-void dctIV(mad_fixed_t const y[18], mad_fixed_t X[18])
-{
-  mad_fixed_t tmp[18];
-  int i;
-
-  /* scale[i] = 2 * cos(PI * (2 * i + 1) / (4 * 18)) */
-  static mad_fixed_t const scale[18] = {
-    MAD_F(0x1ff833fa), MAD_F(0x1fb9ea93), MAD_F(0x1f3dd120),
-    MAD_F(0x1e84d969), MAD_F(0x1d906bcf), MAD_F(0x1c62648b),
-    MAD_F(0x1afd100f), MAD_F(0x1963268b), MAD_F(0x1797c6a4),
-    MAD_F(0x159e6f5b), MAD_F(0x137af940), MAD_F(0x11318ef3),
-    MAD_F(0x0ec6a507), MAD_F(0x0c3ef153), MAD_F(0x099f61c5),
-    MAD_F(0x06ed12c5), MAD_F(0x042d4544), MAD_F(0x0165547c)
-  };
-
-  /* scaling */
-
-  for (i = 0; i < 18; i += 3) {
-    tmp[i + 0] = mad_f_mul(y[i + 0], scale[i + 0]);
-    tmp[i + 1] = mad_f_mul(y[i + 1], scale[i + 1]);
-    tmp[i + 2] = mad_f_mul(y[i + 2], scale[i + 2]);
-  }
-
-  /* SDCT-II */
-
-  sdctII(tmp, X);
-
-  /* scale reduction and output accumulation */
-
-  X[0] /= 2;
-  for (i = 1; i < 17; i += 4) {
-    X[i + 0] = X[i + 0] / 2 - X[(i + 0) - 1];
-    X[i + 1] = X[i + 1] / 2 - X[(i + 1) - 1];
-    X[i + 2] = X[i + 2] / 2 - X[(i + 2) - 1];
-    X[i + 3] = X[i + 3] / 2 - X[(i + 3) - 1];
-  }
-  X[17] = X[17] / 2 - X[16];
-}
-
-/*
- * NAME:        imdct36
- * DESCRIPTION: perform X[18]->x[36] IMDCT using Szu-Wei Lee's fast algorithm
- */
-static inline
-void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
-{
-  mad_fixed_t tmp[18];
-  int i;
-
-  /* DCT-IV */
-
-  dctIV(x, tmp);
-
-  /* convert 18-point DCT-IV to 36-point IMDCT */
-
-  for (i =  0; i <  9; i += 3) {
-    y[i + 0] =  tmp[9 + (i + 0)];
-    y[i + 1] =  tmp[9 + (i + 1)];
-    y[i + 2] =  tmp[9 + (i + 2)];
-  }
-  for (i =  9; i < 27; i += 3) {
-    y[i + 0] = -tmp[36 - (9 + (i + 0)) - 1];
-    y[i + 1] = -tmp[36 - (9 + (i + 1)) - 1];
-    y[i + 2] = -tmp[36 - (9 + (i + 2)) - 1];
-  }
-  for (i = 27; i < 36; i += 3) {
-    y[i + 0] = -tmp[(i + 0) - 27];
-    y[i + 1] = -tmp[(i + 1) - 27];
-    y[i + 2] = -tmp[(i + 2) - 27];
-  }
-}
-#  else
 /*
  * NAME:        imdct36
  * DESCRIPTION: perform X[18]->x[36] IMDCT
  */
-
-# if defined(CPU_COLDFIRE)
+#  if defined(CPU_COLDFIRE)
 /* emac optimized imdct36, it is very ugly and i hope to replace it soon.
  * for now it is actually somewhat faster than the stock implementation. 
  */
@@ -2476,7 +2282,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
   /* pfew */
 }
 
-#else
+#  else /* if defined(CPU_COLDFIRE) */
 
 static inline
 void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
@@ -2732,9 +2538,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
   MAD_F_MLA(hi, lo, X[17], -MAD_F(0x00b2aa3e));
   x[26] = x[27] = MAD_F_MLZ(hi, lo) + t5;
 }
-#endif /* CPU_COLDFIRE */
-
-#  endif
+#  endif /* CPU_COLDFIRE */
 
 /*
  * NAME:        III_imdct_l()
@@ -2754,39 +2558,8 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
 
   switch (block_type) {
   case 0:  /* normal window */
-# if defined(ASO_INTERLEAVE1)
-    {
-      register mad_fixed_t tmp1, tmp2;
-
-      tmp1 = window_l[0];
-      tmp2 = window_l[1];
-
-      for (i = 0; i < 34; i += 2) {
-        z[i + 0] = mad_f_mul(z[i + 0], tmp1);
-        tmp1 = window_l[i + 2];
-        z[i + 1] = mad_f_mul(z[i + 1], tmp2);
-        tmp2 = window_l[i + 3];
-      }
-
-      z[34] = mad_f_mul(z[34], tmp1);
-      z[35] = mad_f_mul(z[35], tmp2);
-    }
-# elif defined(ASO_INTERLEAVE2)
-    {
-      register mad_fixed_t tmp1, tmp2;
-
-      tmp1 = z[0];
-      tmp2 = window_l[0];
-
-      for (i = 0; i < 35; ++i) {
-        z[i] = mad_f_mul(tmp1, tmp2);
-        tmp1 = z[i + 1];
-        tmp2 = window_l[i + 1];
-      }
-
-      z[35] = mad_f_mul(tmp1, tmp2);
-    }
-# elif 1
+# if 1
+    /* loop unrolled implementation */
     for (i = 0; i < 36; i += 4) {
       z[i + 0] = mad_f_mul(z[i + 0], window_l[i + 0]);
       z[i + 1] = mad_f_mul(z[i + 1], window_l[i + 1]);
@@ -2794,6 +2567,7 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
       z[i + 3] = mad_f_mul(z[i + 3], window_l[i + 3]);
     }
 # else
+    /* reference implementation */
     for (i =  0; i < 36; ++i) z[i] = mad_f_mul(z[i], window_l[i]);
 # endif
     break;
@@ -2821,7 +2595,7 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
     break;
   }
 }
-# endif  /* ASO_IMDCT */
+# endif  /* FPM_ARM */
 
 /*
  * NAME:        III_imdct_s()
@@ -2923,43 +2697,10 @@ void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],
                  mad_fixed_t sample[18][32], unsigned int sb)
 {
   unsigned int i;
-
-# if defined(ASO_INTERLEAVE2)
-  {
-    register mad_fixed_t tmp1, tmp2;
-
-    tmp1 = overlap[0];
-    tmp2 = overlap[1];
-
-    for (i = 0; i < 16; i += 2) {
-      sample[i + 0][sb] = output[i + 0 +  0] + tmp1;
-      overlap[i + 0]    = output[i + 0 + 18];
-      tmp1 = overlap[i + 2];
-
-      sample[i + 1][sb] = output[i + 1 +  0] + tmp2;
-      overlap[i + 1]    = output[i + 1 + 18];
-      tmp2 = overlap[i + 3];
-    }
-
-    sample[16][sb] = output[16 +  0] + tmp1;
-    overlap[16]    = output[16 + 18];
-    sample[17][sb] = output[17 +  0] + tmp2;
-    overlap[17]    = output[17 + 18];
-  }
-# elif 0
-  for (i = 0; i < 18; i += 2) {
-    sample[i + 0][sb] = output[i + 0 +  0] + overlap[i + 0];
-    overlap[i + 0]    = output[i + 0 + 18];
-
-    sample[i + 1][sb] = output[i + 1 +  0] + overlap[i + 1];
-    overlap[i + 1]    = output[i + 1 + 18];
-  }
-# else
   for (i = 0; i < 18; ++i) {
     sample[i][sb] = output[i +  0] + overlap[i];
     overlap[i]    = output[i + 18];
   }
-# endif
 }
 #endif
 
@@ -2972,35 +2713,10 @@ void III_overlap_z(mad_fixed_t overlap[18],
                    mad_fixed_t sample[18][32], unsigned int sb)
 {
   unsigned int i;
-
-# if defined(ASO_INTERLEAVE2)
-  {
-    register mad_fixed_t tmp1, tmp2;
-
-    tmp1 = overlap[0];
-    tmp2 = overlap[1];
-
-    for (i = 0; i < 16; i += 2) {
-      sample[i + 0][sb] = tmp1;
-      overlap[i + 0]    = 0;
-      tmp1 = overlap[i + 2];
-
-      sample[i + 1][sb] = tmp2;
-      overlap[i + 1]    = 0;
-      tmp2 = overlap[i + 3];
-    }
-
-    sample[16][sb] = tmp1;
-    overlap[16]    = 0;
-    sample[17][sb] = tmp2;
-    overlap[17]    = 0;
-  }
-# else
   for (i = 0; i < 18; ++i) {
     sample[i][sb] = overlap[i];
     overlap[i]    = 0;
   }
-# endif
 }
 
 /*
@@ -3011,30 +2727,8 @@ static
 void III_freqinver(mad_fixed_t sample[18][32], unsigned int sb)
 {
   unsigned int i;
-
-# if 1 || defined(ASO_INTERLEAVE1) || defined(ASO_INTERLEAVE2)
-  {
-    register mad_fixed_t tmp1, tmp2;
-
-    tmp1 = sample[1][sb];
-    tmp2 = sample[3][sb];
-
-    for (i = 1; i < 13; i += 4) {
-      sample[i + 0][sb] = -tmp1;
-      tmp1 = sample[i + 4][sb];
-      sample[i + 2][sb] = -tmp2;
-      tmp2 = sample[i + 6][sb];
-    }
-
-    sample[13][sb] = -tmp1;
-    tmp1 = sample[17][sb];
-    sample[15][sb] = -tmp2;
-    sample[17][sb] = -tmp1;
-  }
-# else
-  for (i = 1; i < 18; i += 2)
-    sample[i][sb] = -sample[i][sb];
-# endif
+   for (i = 1; i < 18; i += 2)
+     sample[i][sb] = -sample[i][sb];
 }
 
 /*

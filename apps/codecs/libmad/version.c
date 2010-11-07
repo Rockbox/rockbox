@@ -58,19 +58,6 @@ char const mad_build[] = ""
   "FPM_DEFAULT "
 # endif
 
-# if defined(ASO_IMDCT)
-  "ASO_IMDCT "
-# endif
-# if defined(ASO_INTERLEAVE1)
-  "ASO_INTERLEAVE1 "
-# endif
-# if defined(ASO_INTERLEAVE2)
-  "ASO_INTERLEAVE2 "
-# endif
-# if defined(ASO_ZEROCHECK)
-  "ASO_ZEROCHECK "
-# endif
-
 # if defined(OPT_SPEED)
   "OPT_SPEED "
 # elif defined(OPT_ACCURACY)

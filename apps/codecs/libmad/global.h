@@ -30,7 +30,6 @@
 #define FPM_COLDFIRE_EMAC
 #elif defined(CPU_ARM)
 #define FPM_ARM
-#define ASO_IMDCT
 #elif defined(CPU_MIPS)
 #define FPM_MIPS
 #else
