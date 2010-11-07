@@ -131,21 +131,24 @@ public class RockboxActivity extends Activity
     protected void onPause() 
     {
         super.onPause();
-        rbservice.set_activity(null);
+        if (rbservice != null)
+        	rbservice.set_activity(null);
     }
     
     @Override
     protected void onStop() 
     {
         super.onStop();
-        rbservice.set_activity(null);
+        if (rbservice != null)
+        	rbservice.set_activity(null);
     }
     
     @Override
     protected void onDestroy() 
     {
         super.onDestroy();
-        rbservice.set_activity(null);
+        if (rbservice != null)
+        	rbservice.set_activity(null);
     }
 
     private void LOG(CharSequence text)
