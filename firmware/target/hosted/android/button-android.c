@@ -28,10 +28,9 @@
 #include "kernel.h"
 #include "system.h"
 #include "touchscreen.h"
-#include "debug.h"
+
 static int last_y, last_x;
 static int last_btns;
-static long last_button_tick;
 
 static enum {
     STATE_UNKNOWN,
