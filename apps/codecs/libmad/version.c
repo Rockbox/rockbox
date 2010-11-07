@@ -81,10 +81,6 @@ char const mad_build[] = ""
   "OPT_SSO "
 # endif
 
-# if defined(OPT_DCTO)  /* never defined here */
-  "OPT_DCTO "
-# endif
-
 # if defined(OPT_STRICT)
   "OPT_STRICT "
 # endif

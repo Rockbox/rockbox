@@ -90,14 +90,12 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
  * saved in the PCM buffer. 14 + 12 + 2 == 28 bits.
  */
 
-/* FPM_DEFAULT without OPT_SSO will actually lose accuracy and performance */
-
+/* FPM_DEFAULT without OPT_SSO will actually not work. */
 # if defined(FPM_DEFAULT) && !defined(OPT_SSO)
 #  define OPT_SSO
 # endif
 
 /* second SSO shift, with rounding */
-
 # if defined(OPT_SSO)
 #  define SHIFT(x)  (((x) + (1L << 11)) >> 12)
 # else
@@ -105,12 +103,9 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 # endif
 
 /* possible DCT speed optimization */
-
-/* This is a Coldfire version of the OPT_SPEED optimisation below, but in the
-   case of Coldfire it doesn't lose any more precision than we would ordinarily
-   lose, */
 # ifdef FPM_COLDFIRE_EMAC
-#  define OPT_DCTO
+/* This is a Coldfire version of the OPT_SPEED optimisation below, but in the
+   case of Coldfire it doesn't loose no additional precision. */
 #  define MUL(x, y) \
     ({ \
        mad_fixed64hi_t hi; \
@@ -120,8 +115,21 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
                     : [a] "r" ((x)), [b] "r" ((y))); \
        hi; \
      })
+# elif defined(FPM_ARM)
+/* This is an ARM version of the OPT_SPEED optimisation below. This
+   implementation will loose 1 bit of accuracy. */
+#  define MUL(x, y) \
+    ({ \
+       mad_fixed64lo_t lo; \
+       mad_fixed64hi_t hi; \
+       asm volatile ( \
+          "smull %[lo], %[hi], %[a], %[b]\n\t" /* hi = result */ \
+          "mov %[hi], %[hi], lsl #1"   /* hi <<= 1 */ \
+          : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+          : [a]"r"(x), [b]"r"(y)); \
+       hi; \
+    })
 # elif defined(OPT_SPEED) && defined(MAD_F_MLX)
-#  define OPT_DCTO
 #  define MUL(x, y)  \
     ({ mad_fixed64hi_t hi;  \
        mad_fixed64lo_t lo;  \
@@ -129,8 +137,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
        hi << (32 - MAD_F_SCALEBITS - 3);  \
     })
 # else
-#  undef OPT_DCTO
-#  define MUL(x, y)  mad_f_mul((x), (y))
+#  define MUL(x, y)  mad_f_mul((x), (y>>3))
 # endif
 
 /*
@@ -166,72 +173,37 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
   mad_fixed_t t176;
 
   /* costab[i] = cos(PI / (2 * 32) * i) */
-
-# if defined(OPT_DCTO)
-#  define costab1       MAD_F(0x7fd8878e)
-#  define costab2       MAD_F(0x7f62368f)
-#  define costab3       MAD_F(0x7e9d55fc)
-#  define costab4       MAD_F(0x7d8a5f40)
-#  define costab5       MAD_F(0x7c29fbee)
-#  define costab6       MAD_F(0x7a7d055b)
-#  define costab7       MAD_F(0x78848414)
-#  define costab8       MAD_F(0x7641af3d)
-#  define costab9       MAD_F(0x73b5ebd1)
-#  define costab10      MAD_F(0x70e2cbc6)
-#  define costab11      MAD_F(0x6dca0d14)
-#  define costab12      MAD_F(0x6a5d98a4)
-#  define costab13      MAD_F(0x66cf8120)
-#  define costab14      MAD_F(0x62f201ac)
-#  define costab15      MAD_F(0x5ed77c8a)
-#  define costab16      MAD_F(0x5a82799a)
-#  define costab17      MAD_F(0x55f5a4d2)
-#  define costab18      MAD_F(0x5133cc94)
-#  define costab19      MAD_F(0x4c3fdff4)
-#  define costab20      MAD_F(0x471cece7)
-#  define costab21      MAD_F(0x41ce1e65)
-#  define costab22      MAD_F(0x3c56ba70)
-#  define costab23      MAD_F(0x36ba2014)
-#  define costab24      MAD_F(0x30fbc54d)
-#  define costab25      MAD_F(0x2b1f34eb)
-#  define costab26      MAD_F(0x25280c5e)
-#  define costab27      MAD_F(0x1f19f97b)
-#  define costab28      MAD_F(0x18f8b83c)
-#  define costab29      MAD_F(0x12c8106f)
-#  define costab30      MAD_F(0x0c8bd35e)
-#  define costab31      MAD_F(0x0647d97c)
-# else
-#  define costab1       MAD_F(0x0ffb10f2)  /* 0.998795456 */
-#  define costab2       MAD_F(0x0fec46d2)  /* 0.995184727 */
-#  define costab3       MAD_F(0x0fd3aac0)  /* 0.989176510 */
-#  define costab4       MAD_F(0x0fb14be8)  /* 0.980785280 */
-#  define costab5       MAD_F(0x0f853f7e)  /* 0.970031253 */
-#  define costab6       MAD_F(0x0f4fa0ab)  /* 0.956940336 */
-#  define costab7       MAD_F(0x0f109082)  /* 0.941544065 */
-#  define costab8       MAD_F(0x0ec835e8)  /* 0.923879533 */
-#  define costab9       MAD_F(0x0e76bd7a)  /* 0.903989293 */
-#  define costab10      MAD_F(0x0e1c5979)  /* 0.881921264 */
-#  define costab11      MAD_F(0x0db941a3)  /* 0.857728610 */
-#  define costab12      MAD_F(0x0d4db315)  /* 0.831469612 */
-#  define costab13      MAD_F(0x0cd9f024)  /* 0.803207531 */
-#  define costab14      MAD_F(0x0c5e4036)  /* 0.773010453 */
-#  define costab15      MAD_F(0x0bdaef91)  /* 0.740951125 */
-#  define costab16      MAD_F(0x0b504f33)  /* 0.707106781 */
-#  define costab17      MAD_F(0x0abeb49a)  /* 0.671558955 */
-#  define costab18      MAD_F(0x0a267993)  /* 0.634393284 */
-#  define costab19      MAD_F(0x0987fbfe)  /* 0.595699304 */
-#  define costab20      MAD_F(0x08e39d9d)  /* 0.555570233 */
-#  define costab21      MAD_F(0x0839c3cd)  /* 0.514102744 */
-#  define costab22      MAD_F(0x078ad74e)  /* 0.471396737 */
-#  define costab23      MAD_F(0x06d74402)  /* 0.427555093 */
-#  define costab24      MAD_F(0x061f78aa)  /* 0.382683432 */
-#  define costab25      MAD_F(0x0563e69d)  /* 0.336889853 */
-#  define costab26      MAD_F(0x04a5018c)  /* 0.290284677 */
-#  define costab27      MAD_F(0x03e33f2f)  /* 0.242980180 */
-#  define costab28      MAD_F(0x031f1708)  /* 0.195090322 */
-#  define costab29      MAD_F(0x0259020e)  /* 0.146730474 */
-#  define costab30      MAD_F(0x01917a5c)  /* 0.098017140 */
-#  define costab31      MAD_F(0x00c8fb30)  /* 0.049067674 */
-# endif
+#define costab1   MAD_F(0x7fd8878e) /* 0.998795456 */
+#define costab2   MAD_F(0x7f62368f) /* 0.995184727 */
+#define costab3   MAD_F(0x7e9d55fc) /* 0.989176510 */
+#define costab4   MAD_F(0x7d8a5f40) /* 0.980785280 */
+#define costab5   MAD_F(0x7c29fbee) /* 0.970031253 */
+#define costab6   MAD_F(0x7a7d055b) /* 0.956940336 */
+#define costab7   MAD_F(0x78848414) /* 0.941544065 */
+#define costab8   MAD_F(0x7641af3d) /* 0.923879533 */
+#define costab9   MAD_F(0x73b5ebd1) /* 0.903989293 */
+#define costab10  MAD_F(0x70e2cbc6) /* 0.881921264 */
+#define costab11  MAD_F(0x6dca0d14) /* 0.857728610 */
+#define costab12  MAD_F(0x6a5d98a4) /* 0.831469612 */
+#define costab13  MAD_F(0x66cf8120) /* 0.803207531 */
+#define costab14  MAD_F(0x62f201ac) /* 0.773010453 */
+#define costab15  MAD_F(0x5ed77c8a) /* 0.740951125 */
+#define costab16  MAD_F(0x5a82799a) /* 0.707106781 */
+#define costab17  MAD_F(0x55f5a4d2) /* 0.671558955 */
+#define costab18  MAD_F(0x5133cc94) /* 0.634393284 */
+#define costab19  MAD_F(0x4c3fdff4) /* 0.595699304 */
+#define costab20  MAD_F(0x471cece7) /* 0.555570233 */
+#define costab21  MAD_F(0x41ce1e65) /* 0.514102744 */
+#define costab22  MAD_F(0x3c56ba70) /* 0.471396737 */
+#define costab23  MAD_F(0x36ba2014) /* 0.427555093 */
+#define costab24  MAD_F(0x30fbc54d) /* 0.382683432 */
+#define costab25  MAD_F(0x2b1f34eb) /* 0.336889853 */
+#define costab26  MAD_F(0x25280c5e) /* 0.290284677 */
+#define costab27  MAD_F(0x1f19f97b) /* 0.242980180 */
+#define costab28  MAD_F(0x18f8b83c) /* 0.195090322 */
+#define costab29  MAD_F(0x12c8106f) /* 0.146730474 */
+#define costab30  MAD_F(0x0c8bd35e) /* 0.098017140 */
+#define costab31  MAD_F(0x0647d97c) /* 0.049067674 */
 
   t0   = in[0]  + in[31];  t16  = MUL(in[0]  - in[31], costab1);
   t1   = in[15] + in[16];  t17  = MUL(in[15] - in[16], costab31);
