@@ -1174,11 +1174,12 @@ bool save_pfraw(char* filename, struct bitmap *bm)
     int fh = rb->creat( filename , 0666);
     if( fh < 0 ) return false;
     rb->write( fh, &bmph, sizeof( struct pfraw_header ) );
+    pix_t *data = (pix_t*)( bm->data );
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        pix_t *d = (pix_t*)( bm->data ) + (y*bm->width);
-        rb->write( fh, d, sizeof( pix_t ) * bm->width );
+        rb->write( fh, data , sizeof( pix_t ) * bm->width );
+        data += bm->width;
     }
     rb->close( fh );
     return true;
@@ -1199,8 +1200,6 @@ bool create_albumart_cache(void)
     char albumart_file[MAX_PATH];
     unsigned int format = FORMAT_NATIVE;
     bool update = (cache_version == CACHE_UPDATE);
-    cache_version = CACHE_REBUILD;
-    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     if (resize)
         format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
     for (i=0; i < album_count; i++)
@@ -1211,8 +1210,10 @@ bool create_albumart_cache(void)
                      mfnv(get_album_name(i)));
         /* delete existing cache, so it's a true rebuild */
         if(rb->file_exists(pfraw_file)) {
-            if(update)
+            if(update) {
+                slides++;
                 continue;
+            }
             rb->remove(pfraw_file);
         }
         if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
@@ -1234,10 +1235,12 @@ bool create_albumart_cache(void)
         if (!save_pfraw(pfraw_file, &input_bmp))
         {
             rb->splash(HZ, "Could not write bmp");
+            continue;
         }
         slides++;
         if ( rb->button_get(false) == PF_MENU ) return false;
     }
+    draw_progressbar(i);
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
         rb->splash(2*HZ, "No album art found");
@@ -1516,8 +1519,8 @@ int read_pfraw(char* filename, int prio)
     else
         rb->read(fh, &bmph, sizeof(struct pfraw_header));
 
-    int size =  sizeof(struct bitmap) + sizeof( pix_t ) *
-                bmph.width * bmph.height;
+    int size =  sizeof(struct dim) +
+                sizeof( pix_t ) * bmph.width * bmph.height;
 
     int hid;
     while (!(hid = buflib_alloc(&buf_ctx, size)) && free_slide_prio(prio));
@@ -1928,6 +1931,7 @@ void render_slide(struct slide_data *slide, const int alpha)
         }
         rb->yield(); /* allow audio to play when fast scrolling */
         bmp = surface(slide->slide_index); /* resync surface due to yield */
+        src = (pix_t*)(sizeof(struct dim) + (char *)bmp);
         ptr = &src[column * bmp->height];
         p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;
         plim = MIN(sh * PFREAL_ONE, p + (LCD_HEIGHT/2) * dy);
@@ -2006,7 +2010,7 @@ void show_previous_slide(void)
         }
     } else if ( step > 0 ) {
         target = center_index;
-        start_animation();
+        step = (target <= center_slide.slide_index) ? -1 : 1;
     } else {
         target = fmax(0, center_index - 2);
     }
@@ -2025,7 +2029,7 @@ void show_next_slide(void)
         }
     } else if ( step < 0 ) {
         target = center_index;
-        start_animation();
+        step = (target < center_slide.slide_index) ? -1 : 1;
     } else {
         target = fmin(center_index + 2, number_of_slides - 1);
     }
@@ -2044,45 +2048,46 @@ void render_all_slides(void)
     int nleft = num_slides;
     int nright = num_slides;
 
+    int alpha;
     int index;
     if (step == 0) {
         /* no animation, boring plain rendering */
         for (index = nleft - 2; index >= 0; index--) {
-            int alpha = (index < nleft - 2) ? 256 : 128;
+            alpha = (index < nleft - 2) ? 256 : 128;
             alpha -= extra_fade;
             if (alpha > 0 )
                 render_slide(&left_slides[index], alpha);
         }
         for (index = nright - 2; index >= 0; index--) {
-            int alpha = (index < nright - 2) ? 256 : 128;
+            alpha = (index < nright - 2) ? 256 : 128;
             alpha -= extra_fade;
             if (alpha > 0 )
                 render_slide(&right_slides[index], alpha);
         }
     } else {
         /* the first and last slide must fade in/fade out */
+
+        /* if step<0 and nleft==1, left_slides[0] is fading in  */
+        alpha = ((step > 0) ? 0 : ((nleft == 1) ? 256 : 128)) - fade / 2;
         for (index = nleft - 1; index >= 0; index--) {
-            int alpha = 256;
-            if (index == nleft - 1)
-                alpha = (step > 0) ? 0 : 128 - fade / 2;
-            if (index == nleft - 2)
-                alpha = (step > 0) ? 128 - fade / 2 : 256 - fade / 2;
-            if (index == nleft - 3)
-                alpha = (step > 0) ? 256 - fade / 2 : 256;
-            render_slide(&left_slides[index], alpha);
+            if (alpha > 0)
+                render_slide(&left_slides[index], alpha);
+            alpha += 128;
+            if (alpha > 256) alpha = 256;
         }
+        /* if step>0 and nright==1, right_slides[0] is fading in  */
+        alpha = ((step > 0) ? ((nright == 1) ? 128 : 0) : -128) + fade / 2;
         for (index = nright - 1; index >= 0; index--) {
-            int alpha = (index < nright - 2) ? 256 : 128;
-            if (index == nright - 1)
-                alpha = (step > 0) ? fade / 2 : 0;
-            if (index == nright - 2)
-                alpha = (step > 0) ? 128 + fade / 2 : fade / 2;
-            if (index == nright - 3)
-                alpha = (step > 0) ? 256 : 128 + fade / 2;
-            render_slide(&right_slides[index], alpha);
+            if (alpha > 0)
+                render_slide(&right_slides[index], alpha);
+            alpha += 128;
+            if (alpha > 256) alpha = 256;
         }
     }
-    render_slide(&center_slide, 256);
+    alpha = 256;
+    if (step != 0 && num_slides <= 2) /* fading out center slide */
+        alpha = (step > 0) ? 256 - fade / 2 : 128 + fade / 2;
+    render_slide(&center_slide, alpha);
 }
 
 
@@ -2142,6 +2147,7 @@ void update_scroll_animation(void)
     if (center_index == target) {
         reset_slides();
         pf_state = pf_idle;
+        slide_frame = center_index << 16;
         step = 0;
         fade = 256;
         return;
@@ -2285,6 +2291,8 @@ int settings_menu(void)
             case 7:
                 cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
+                configfile_save(CONFIG_FILE, config,
+                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
                 rb->splash(HZ, "Cache will be rebuilt on next restart");
                 break;
             case 8:
@@ -2298,7 +2306,6 @@ int settings_menu(void)
                 return PLUGIN_USB_CONNECTED;
         }
     } while ( selection >= 0 );
-    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     return 0;
 }
 
@@ -2678,16 +2685,23 @@ int main(void)
     ALIGN_BUFFER(buf, buf_size, 4);
     number_of_slides  = album_count;
     if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
+        cache_version = CACHE_REBUILD;
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
         error_wait("Could not create album art cache");
         return PLUGIN_ERROR;
     }
 
     if (!create_empty_slide(cache_version != CACHE_VERSION)) {
+        cache_version = CACHE_REBUILD;
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
         error_wait("Could not load the empty slide");
         return PLUGIN_ERROR;
     }
-    cache_version = CACHE_VERSION;
-    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+    if (cache_version != CACHE_VERSION)
+    {
+        cache_version = CACHE_VERSION;
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+    }
 
     buflib_init(&buf_ctx, (void *)buf, buf_size);
 
