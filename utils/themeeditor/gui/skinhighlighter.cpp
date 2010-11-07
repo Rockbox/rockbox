@@ -43,12 +43,12 @@ void SkinHighlighter::highlightBlock(const QString& text)
         /* Checking for delimiters */
         if(c == ARGLISTOPENSYM
            || c == ARGLISTCLOSESYM
-           || c == ARGLISTSEPERATESYM)
+           || c == ARGLISTSEPARATESYM)
             setFormat(i, 1, tag);
 
         if(c == ENUMLISTOPENSYM
            || c == ENUMLISTCLOSESYM
-           || c == ENUMLISTSEPERATESYM)
+           || c == ENUMLISTSEPARATESYM)
             setFormat(i, 1, conditional);
 
         /* Checking for comments */

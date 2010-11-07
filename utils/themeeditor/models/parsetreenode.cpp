@@ -141,7 +141,7 @@ QString ParseTreeNode::genCode() const
                 {
                     buffer.append(children[i]->genCode());
                     if(i != element->params_count - 1)
-                        buffer.append(ARGLISTSEPERATESYM);
+                        buffer.append(ARGLISTSEPARATESYM);
                 }
                 buffer.append(ARGLISTCLOSESYM);
                 buffer.append('\n');
@@ -191,7 +191,7 @@ QString ParseTreeNode::genCode() const
                 {
                     buffer.append(children[i]->genCode());
                     if( i != element->params_count - 1)
-                        buffer.append(ARGLISTSEPERATESYM);
+                        buffer.append(ARGLISTSEPARATESYM);
                     buffer.append(ARGLISTCLOSESYM);
                 }
             }
@@ -202,7 +202,7 @@ QString ParseTreeNode::genCode() const
             {
                 buffer.append(children[i]->genCode());
                 if(i != children.count() - 1)
-                    buffer.append(ENUMLISTSEPERATESYM);
+                    buffer.append(ENUMLISTSEPARATESYM);
             }
             buffer.append(ENUMLISTCLOSESYM);
             openConditionals--;
@@ -220,7 +220,7 @@ QString ParseTreeNode::genCode() const
                 {
                     buffer.append(children[i]->genCode());
                     if(i != children.count() - 1)
-                        buffer.append(ARGLISTSEPERATESYM);
+                        buffer.append(ARGLISTSEPARATESYM);
                 }
                 buffer.append(ARGLISTCLOSESYM);
             }
