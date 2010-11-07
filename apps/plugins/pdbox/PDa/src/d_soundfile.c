@@ -727,11 +727,7 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
 
     canvas_makefilename(canvas, filenamebuf, buf2, MAXPDSTRING);
     sys_bashfilename(buf2, buf2);
-#ifdef ROCKBOX
-    if ((fd = open(buf2, BINCREATE)) < 0)
-#else
     if ((fd = open(buf2, BINCREATE, 0666)) < 0)
-#endif
     	return (-1);
 
     if (write(fd, headerbuf, headersize) < headersize)

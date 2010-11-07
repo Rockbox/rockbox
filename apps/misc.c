@@ -920,7 +920,7 @@ int open_utf8(const char* pathname, int flags)
     int fd;
     unsigned char bom[BOM_SIZE];
 
-    fd = open(pathname, flags);
+    fd = open(pathname, flags, 0666);
     if(fd < 0)
         return fd;
 

@@ -1484,7 +1484,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
       if (strcmp(outfilename, "-"))
       {
          fileout = open(outfilename, firstfile ? O_WRONLY | O_CREAT :
-                                                 O_WRONLY | O_APPEND);
+                                                 O_WRONLY | O_APPEND, 0666);
          if (fileout < 0)
          {
             printf( "Could not open -dehout file %s\n... using stdout.\n",

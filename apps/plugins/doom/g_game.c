@@ -2770,7 +2770,7 @@ boolean G_CheckDemoStatus (void)
       int endtime = I_GetTime ();
       // killough -- added fps information and made it work for longer demos:
       unsigned realtics = endtime-starttime;
-      int fd=open(GAMEBASE "timedemo.txt",O_WRONLY | O_CREAT);
+      int fd=open(GAMEBASE "timedemo.txt",O_WRONLY | O_CREAT,0666);
       fdprintf (fd,"Timed %d gametics in %d realtics = %d frames per second",
                (unsigned) gametic, realtics,
                (unsigned) gametic * TICRATE/ realtics);

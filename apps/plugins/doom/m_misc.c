@@ -96,7 +96,7 @@ boolean M_WriteFile(char const* name,void* source,int length)
    int handle;
    int count;
 
-   handle = open ( name, O_WRONLY | O_CREAT | O_TRUNC);
+   handle = open ( name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
    if (handle == -1)
       return false;
@@ -805,7 +805,7 @@ void M_SaveDefaults (void)
    uint32_t magic = DOOM_CONFIG_MAGIC;
    uint32_t ver = DOOM_CONFIG_VERSION;
 
-   fd = open (GAMEBASE"default.dfg", O_WRONLY|O_CREAT|O_TRUNC);
+   fd = open (GAMEBASE"default.dfg", O_WRONLY|O_CREAT|O_TRUNC, 0666);
    if (fd<0)
       return; // can't write the file, but don't complain
 

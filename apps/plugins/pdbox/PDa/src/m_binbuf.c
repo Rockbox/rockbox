@@ -641,7 +641,7 @@ static int binbuf_doopen(char *s, int mode)
     mode |= O_BINARY;
 #endif
     sys_bashfilename(s, namebuf);
-    return (open(namebuf, mode));
+    return (open(namebuf, mode, 0666));
 }
 
 #ifndef ROCKBOX

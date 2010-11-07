@@ -721,7 +721,7 @@ cache;
 
       // Use cached translucency filter if it's available
 
-      if ((cachefd<0) ? cachefd = open(GAMEBASE"tranmap.dat",O_WRONLY | O_CREAT) , 1 :
+      if ((cachefd<0) ? cachefd = open(GAMEBASE"tranmap.dat",O_WRONLY | O_CREAT, 0666) , 1 :
             read(cachefd, &cache, sizeof(cache)) != sizeof(cache) ||
             cache.pct != tran_filter_pct ||
             memcmp(cache.playpal, playpal, sizeof cache.playpal) ||
