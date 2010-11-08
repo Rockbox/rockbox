@@ -99,7 +99,9 @@
 #include "pcf50605.h"
 #endif
 #include "appevents.h"
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "debug-target.h"
+#endif
 
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
       || (CONFIG_CPU == AS3525 && defined(CONFIG_CHARGING)) \
