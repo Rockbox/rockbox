@@ -364,7 +364,7 @@ static const struct button_mapping* get_context_mapping_remote( int context )
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return remote_button_context_tree;
 
-#ifdef CONFIG_TUNER
+#if CONFIG_TUNER
         case CONTEXT_FM:
             return remote_button_context_radio;
 #endif
