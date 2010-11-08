@@ -47,11 +47,6 @@ static bool rds_event = false;
 static char rds_radioname[9];
 static char rds_radioinfo[65];
 
-static union FRQ {
-    unsigned long int frequency_radio;
-    char data_frequency[4];
-}Frequency;
-
 static void rmt_tuner_signal_power(unsigned char value)
 {
     tuner_signal_power = (int)(value);
@@ -59,14 +54,9 @@ static void rmt_tuner_signal_power(unsigned char value)
 
 void rmt_tuner_freq(const unsigned char *serbuf)
 {
-    char tempdata[4];
-    tempdata[0] = serbuf[6];
-    tempdata[1] = serbuf[5];
-    tempdata[2] = serbuf[4];
-    tempdata[3] = serbuf[3];
-
-    memcpy(Frequency.data_frequency,tempdata,4);
-    tuner_frequency = (Frequency.frequency_radio*1000);
+    unsigned int khz = (serbuf[3] << 24) | (serbuf[4] << 16) |
+                       (serbuf[5] << 8) | serbuf[6];
+    tuner_frequency = khz *1000 ;
     radio_tuned = true;
     rmt_tuner_signal_power(serbuf[7]);
 }
@@ -85,16 +75,11 @@ static void rmt_tuner_set_freq(int curr_freq)
         
         if (curr_freq != 0)
         {
-            curr_freq =  curr_freq / 1000;
-            char tempdata[4];
-        
-            Frequency.frequency_radio = curr_freq;
-            tempdata[0] = Frequency.data_frequency[3];
-            tempdata[1] = Frequency.data_frequency[2];
-            tempdata[2] = Frequency.data_frequency[1];
-            tempdata[3] = Frequency.data_frequency[0];
-
-            memcpy(data+2,tempdata,4);
+            unsigned int khz = curr_freq / 1000;
+            data[2] = (khz >> 24) & 0xFF;
+            data[3] = (khz >> 16) & 0xFF;
+            data[4] = (khz >>  8) & 0xFF;
+            data[5] = (khz >>  0) & 0xFF;
             iap_send_pkt(data, sizeof(data));
         }
     }
