@@ -1,7 +1,7 @@
 /*
  * apokeysnd.c - another POKEY sound emulator
  *
- * Copyright (C) 2007-2009  Piotr Fusik
+ * Copyright (C) 2007-2010  Piotr Fusik
  *
  * This file is part of ASAP (Another Slight Atari Player),
  * see http://asap.sourceforge.net
@@ -469,13 +469,14 @@ FUNC(void, PokeySound_StartFrame, (P(ASAP_State PTR, ast)))
 
 FUNC(void, PokeySound_EndFrame, (P(ASAP_State PTR, ast), P(int, current_cycle)))
 {
+    V(int, clk) = ASAP_MAIN_CLOCK(ast);
     end_frame(ast, ADDRESSOF ast _ base_pokey, current_cycle);
     if (ast _ extra_pokey_mask != 0)
         end_frame(ast, ADDRESSOF ast _ extra_pokey, current_cycle);
     ast _ sample_offset += current_cycle * ASAP_SAMPLE_RATE;
     ast _ sample_index = 0;
-    ast _ samples = TO_INT(ast _ sample_offset / ASAP_MAIN_CLOCK);
-    ast _ sample_offset %= ASAP_MAIN_CLOCK;
+    ast _ samples = TO_INT(ast _ sample_offset / clk);
+    ast _ sample_offset %= clk;
 }
 
 /* Fills buffer with samples from delta_buffer. */

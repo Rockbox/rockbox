@@ -22,8 +22,9 @@ but the current version has a completely new original emulation core.
 ASAP includes the following programs:
 
 - asapconv - portable command-line converter {asapwin=}
-- WASAP - tiny player for Windows {asapwin=}
+- WASAP - tiny player for Windows {asapwin=}{asapwince=}
 - plugin for http://koti.welho.com/hylinen/apollo/[Apollo] {asapwin=}
+- plugin for http://audacious-media-player.org/[Audacious]
 - plugin for http://foobar2000.org/[foobar2000] {asapwin=}
 - plugin for http://hp.vector.co.jp/authors/VA032810/[GSPlayer] {asapwin=}{asapwince=}
 - plugin for http://moc.daper.net/[MOC]
@@ -31,15 +32,20 @@ ASAP includes the following programs:
 - plugin for http://www.microsoft.com/windows/windowsmedia/player/[Windows Media Player] {asapwin=}
 - plugin for http://xbmc.org/[XBMC] {asapwin=}
 - plugin for http://xmms.org/[XMMS]
-- plugin for http://www.un4seen.com/[XMPlay] {asapwin=}
+- plugin for http://www.un4seen.com/xmplay.html[XMPlay] {asapwin=}
+- add-on for http://www.un4seen.com/bass.html[BASS] (for http://www.aimp.ru/[AIMP] and http://www.un4seen.com/bass_showcase.php[other players]) {asapwin=}
 - POKEY sound emulation DLL for http://raster.infos.cz/atari/rmt/rmt.htm[Raster Music Tracker] {asapwin=}
+- Windows Explorer extension - shows metadata {asapwin=}
 - Java version of ASAP2WAV - command-line converter to WAV files {asapjava=}
 - Java applet - for web pages {asapjava=}{asapwww?(see link:applet.html[online demo])}
 - Java midlet - for mobile devices {asapjava=}
 - C# version of ASAP2WAV
-- experimental JScript version of ASAP2WAV running in Windows Script Host {asapjavascript=}
+- JavaScript version of ASAP2WAV running in http://en.wikipedia.org/wiki/Windows_Script_Host[Windows Script Host], https://developer.mozilla.org/en/Rhino_Shell[Rhino Shell], http://code.google.com/p/v8/[V8 Shell], http://en.wikipedia.org/wiki/JScript_.NET[JScript .NET] and http://en.wikipedia.org/wiki/JaegerMonkey[JaegerMonkey] {asapjavascript=}
 - experimental JavaScript version of ASAP2WAV running in Firefox {asapjavascript=}
 - Flash player - for web pages {asapflash=}{asapwww?(see link:flash.html[online demo])}
+- asapplay - simple command-line player in C#
+- http://www.silverlight.net/[Silverlight] player - for web pages {asapwww?(see link:silverlight.html[online demo])}
+- AndroidASAP - for mobile devices
 
 {asapports}The summary of the differences between the above versions is in link:PORTS.xml[this table].
 
@@ -117,7 +123,7 @@ include::win32/USAGE[]
 endif::asapwin[]
 
 ifdef::asapwince[]
-include::gsplayer/USAGE[]
+include::win32/wince/USAGE[]
 endif::asapwince[]
 
 include::NEWS[]

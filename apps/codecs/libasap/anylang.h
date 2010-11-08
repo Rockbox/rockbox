@@ -156,7 +156,7 @@
 #define EMPTY_STRING(s)         (s) = string.Empty
 #define SUBSTR(s, i)            (s).Substring(i)
 #define BYTES_TO_STRING(dest, src, src_offset, len) \
-                                (dest) = System.Text.Encoding.ASCII.GetString(src, src_offset, len)
+                                (dest) = System.Text.Encoding.UTF8.GetString(src, src_offset, len)
 #define SUBSTRING(dest, src, src_offset, len) \
                                 (dest) = (src).Substring(src_offset, len)
 
