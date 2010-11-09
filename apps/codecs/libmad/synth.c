@@ -105,7 +105,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 /* possible DCT speed optimization */
 # if defined(FPM_COLDFIRE_EMAC)
 /* This is a Coldfire version of the OPT_SPEED optimisation below, but in the
-   case of Coldfire it doesn't loose no additional precision. */
+   case of Coldfire it does not loose additional precision. */
 #  define MUL(x, y) \
     ({ \
        mad_fixed64hi_t hi; \
