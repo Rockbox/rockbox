@@ -46,8 +46,14 @@
 #else
 #define MAX_FILETYPES 128
 #endif
+/* max viewer plugins */
+#ifdef HAVE_LCD_BITMAP
+#define MAX_VIEWERS 56
+#else
+#define MAX_VIEWERS 24
+#endif
 
-/* a table for the know file types */
+/* a table for the known file types */
 static const struct filetype inbuilt_filetypes[] = {
     { "mp3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp2", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
@@ -134,7 +140,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "rsbs", FILE_ATTR_RSBS, Icon_Wps,   VOICE_EXT_RSBS },
 #if CONFIG_TUNER
     { "rfms", FILE_ATTR_RFMS, Icon_Wps, VOICE_EXT_RFMS },
-#endif    
+#endif
 #endif
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
@@ -150,7 +156,6 @@ void tree_get_filetypes(const struct filetype** types, int* count)
     *count = sizeof(inbuilt_filetypes) / sizeof(*inbuilt_filetypes);
 }
 
-/* mask for dynamic filetype info in attribute */
 #define ROCK_EXTENSION "rock"
 
 struct file_type {
@@ -165,14 +170,31 @@ static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
 static int custom_colors[MAX_FILETYPES+1];
 #endif
+/* index array to filetypes used in open with list. */
+static int viewers[MAX_VIEWERS];
 static int filetype_count = 0;
 static unsigned char highest_attr = 0;
+static int viewer_count = 0;
 
 static char *filetypes_strdup(char* string)
 {
     char *buffer = (char*)buffer_alloc(strlen(string)+1);
     strcpy(buffer, string);
     return buffer;
+}
+static char *filetypes_store_plugin(char *plugin, int n)
+{
+    int i;
+    /* if the plugin is in the list already, use it. */
+    for (i=0; i<viewer_count; i++)
+    {
+        if (!strcmp(filetypes[viewers[i]].plugin, plugin))
+            return filetypes[viewers[i]].plugin;
+    }
+    /* otherwise, allocate buffer */
+    if (viewer_count < MAX_VIEWERS)
+        viewers[viewer_count++] = n;
+    return filetypes_strdup(plugin);
 }
 static void read_builtin_types(void);
 static void read_config(const char* config_file);
@@ -279,7 +301,8 @@ void  filetype_init(void)
     filetypes[0].plugin = NULL;
     filetypes[0].attr   = 0;
     filetypes[0].icon   = Icon_Folder;
-    
+
+    viewer_count = 0;
     filetype_count = 1;
     read_builtin_types();
     read_config(get_user_file_path(VIEWERS_CONFIG, IS_FILE, path, sizeof(path)));
@@ -325,14 +348,14 @@ static void read_builtin_types(void)
 static void read_config(const char* config_file)
 {
     char line[64], *s, *e;
-    char extension[8], plugin[32];
+    char *extension, *plugin;
     int fd = open(config_file, O_RDONLY);
     if (fd < 0)
         return;
-    /* config file is in the for 
+    /* config file is in the format
        <extension>,<plugin>,<icon code>
        ignore line if either of the first two are missing */
-    while (read_line(fd, line, 64) > 0)
+    while (read_line(fd, line, sizeof line) > 0)
     {
         if (filetype_count >= MAX_FILETYPES)
         {
@@ -346,30 +369,31 @@ static void read_config(const char* config_file)
         if (!e)
             continue;
         *e = '\0';
-        strcpy(extension, s);
-    
+        extension = s;
+
         /* get the plugin */
         s = e+1;
         e = strchr(s, ',');
         if (!e)
             continue;
         *e = '\0';
-        
-        strcpy(plugin, s);
+        plugin = s;
+
         /* ok, store this plugin/extension, check icon after */
-        filetypes[filetype_count].extension = filetypes_strdup(extension);
-        filetypes[filetype_count].plugin = filetypes_strdup(plugin);
-        filetypes[filetype_count].attr = highest_attr +1;
-        filetypes[filetype_count].icon = Icon_Questionmark;
+        struct file_type *file_type = &filetypes[filetype_count];
+        file_type->extension = filetypes_strdup(extension);
+        file_type->plugin = filetypes_store_plugin(plugin, filetype_count);
+        file_type->attr = highest_attr +1;
+        file_type->icon = Icon_Questionmark;
         highest_attr++;
         /* get the icon */
         s = e+1;
         if (*s == '*')
-            filetypes[filetype_count].icon = atoi(s+1);
+            file_type->icon = atoi(s+1);
         else if (*s == '-')
-            filetypes[filetype_count].icon = Icon_NOICON;
+            file_type->icon = Icon_NOICON;
         else if (*s >= '0' && *s <= '9')
-            filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
+            file_type->icon = Icon_Last_Themeable + atoi(s);
         filetype_count++;
     }
     close(fd);
@@ -450,45 +474,40 @@ char* filetype_get_plugin(const struct entry* file)
     return plugin_name;
 }
 
-bool  filetype_supported(int attr)
+bool filetype_supported(int attr)
 {
     return find_attr(attr) >= 0;
 }
 
 /**** Open With Screen ****/
 struct cb_data {
-    int *items;
     const char *current_file;
 };
 
 static enum themable_icons openwith_get_icon(int selected_item, void * data)
 {
-    struct cb_data *info = (struct cb_data *)data;
-    int *items = info->items;
-    return filetypes[items[selected_item]].icon;
+    (void)data;
+    return filetypes[viewers[selected_item]].icon;
 }
 
 static const char* openwith_get_name(int selected_item, void * data,
                                      char * buffer, size_t buffer_len)
 {
-    (void)buffer; (void)buffer_len;
-    struct cb_data *info = (struct cb_data *)data;
-    int *items = info->items;
-    const char *s = strrchr(filetypes[items[selected_item]].plugin, '/');
+    (void)data; (void)buffer; (void)buffer_len;
+    const char *s = strrchr(filetypes[viewers[selected_item]].plugin, '/');
     if (s)
         return s+1;
-    else return filetypes[items[selected_item]].plugin;
+    else return filetypes[viewers[selected_item]].plugin;
 }
 
 static int openwith_action_callback(int action, struct gui_synclist *lists)
 {
     struct cb_data *info = (struct cb_data *)lists->data;
-    int *items = info->items;
     int i;
     if (action == ACTION_STD_OK)
     {
         char plugin[MAX_PATH];
-        i = items[gui_synclist_get_sel_pos(lists)];
+        i = viewers[gui_synclist_get_sel_pos(lists)];
         snprintf(plugin, MAX_PATH, "%s/%s.%s",
                     PLUGIN_DIR, filetypes[i].plugin, ROCK_EXTENSION);
         plugin_load(plugin, info->current_file);
@@ -499,34 +518,17 @@ static int openwith_action_callback(int action, struct gui_synclist *lists)
 
 int filetype_list_viewers(const char* current_file)
 {
-    int i, count = 0;
-    int items[MAX_FILETYPES];
     struct simplelist_info info;
-    struct cb_data data = { items, current_file };
-    for (i=0; i<filetype_count && count < MAX_FILETYPES; i++)
-    {
-        if (filetypes[i].plugin)
-        {
-            int j;
-            for (j=0;j<count;j++) /* check if the plugin is in the list yet */
-            {
-                if (!strcmp(filetypes[i].plugin,filetypes[items[j]].plugin))
-                    break;
-            }
-            if (j<count) 
-                continue; /* it is so grab the next plugin */
-            items[count++] = i;
-        }
-    }
+    struct cb_data data = { current_file };
 #ifndef HAVE_LCD_BITMAP
-    if (count == 0)
+    if (viewer_count == 0)
     {
         /* FIX: translation! */
         splash(HZ*2, "No viewers found");
         return PLUGIN_OK;
     }
 #endif
-    simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), count, &data);
+    simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), viewer_count, &data);
     info.action_callback = openwith_action_callback;
     info.get_name = openwith_get_name;
     info.get_icon = global_settings.show_icons?openwith_get_icon:NULL;
@@ -538,7 +540,7 @@ int filetype_load_plugin(const char* plugin, char* file)
     int i;
     char plugin_name[MAX_PATH];
     char *s;
-    
+
     for (i=0;i<filetype_count;i++)
     {
         if (filetypes[i].plugin)
