@@ -89,6 +89,27 @@ detail in the following paragraph.
   used in Rockbox. 
   }
   %
+  \opt{mpiohd200}{
+  Hold or lay the \dap{} so that the side with the LCD is facing towards you.
+  On the right hand side there is a rocker at the top which serves as
+  \ButtonRew{} and \ButtonFF{} when pressed in the appropriate direction.
+  Pressing the rocker down functions as \ButtonFunc{}. Below the rocker there are
+  two buttons \ButtonRec{} and \ButtonPlay{}. At the bottom of the right panel
+  there is the \ButtonHold{} switch which you can slide up and down.
+
+  On the top pannel of the \dap{} there is another rocker which serves as the 
+  \ButtonVolUp{} and \ButtonVolDown{} when pressed on the right and left side 
+  respectively.
+
+  On the left hand side of the \dap{} there is headphone mini jack plug at the top
+  and a small hole at the bottom, the reset switch. In the event that your \dap{}
+  hard locks, you can reset it by inserting a paper clip into the hole where the 
+  reset switch is.
+
+  On the bottom pannel of the \dap{}, from left to right, you can find the
+  following: power jack, line-in jack and USB port (under rubber cover).
+  }
+  %
   \opt{ipod4g,ipodcolor,ipodvideo,ipodmini}{ 
   The main controls on the \dap{} are a slightly indented scroll wheel 
   with a flat round button in the center. Hold the \dap{} with these controls 
@@ -497,6 +518,7 @@ detail in the following paragraph.
 To turn on and off your Rockbox enabled \dap{} use the following keys:
     \begin{btnmap}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
+      \opt{MPIO_HD200_PAD}{Long \ButtonPlay}%
       \opt{IPOD_4G_PAD}{\ButtonMenu{} / \ButtonSelect}%
       \opt{IPOD_3G_PAD}{\ButtonMenu{} / \ButtonPlay}%
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}%
@@ -514,6 +536,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           \\
 
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Long \ButtonOff}%
+      \opt{MPIO_HD200_PAD}{Long \ButtonPlay}%
       \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonPlay}%
       \opt{ONDIO_PAD,recorderv2fm}{Long \ButtonOff}%
       \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}%
@@ -550,7 +573,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   {\ButtonPower} until the \dap{} shuts off or reboots.
 }%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD,IRIVER_H10_PAD,MROBE100_PAD
-,PBELL_VIBE500_PAD}{%
+,PBELL_VIBE500_PAD,MPIO_HD200_PAD}{%
   In the unlikely event of a software failure, a hardware reset can be
   performed by inserting a paperclip gently into the Reset hole.
 }%
@@ -598,6 +621,15 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     and then press the \ButtonOn{} button.
     }
 
+  \opt{mpiohd200}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    when the \dap{} is turned off, press and hold the \ButtonRec{} button,
+    and then press the \ButtonPlay{} button. This will bring you to the
+    short menu where you can choose among: Boot Rockbox, Boot MPIO firmware
+    and Shutdown. Select the option you need with \ButtonRew{} and \ButtonFF{}
+    and confirm with long \ButtonPlay{}.
+    }
   \opt{h10,h10_5gb}
     {
     Rockbox has a dual-boot feature. It loads the original firmware from

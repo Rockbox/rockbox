@@ -1,0 +1,27 @@
+% $Id$ %
+
+  Installing the bootloader is the trickiest part of the installation.
+  As explained above, we cannot distribute the bootloader directly, and
+  thus need to patch a compatible version of the MPIO firmware, which
+  can be downloaded as described above.
+
+
+\begin{enumerate}
+   \item Download official rockbox bootloader for MPIO HD200 from
+   \url {http://download.rockbox.org/bootloader/mpio/hd200/}
+   and save it to your desktop. The archive contains three files: bootloader.mpio, 
+   bootloader.map and rockbox-info.txt. The first file is actual bootloader, two
+   others can be used for debugging and are irrelevant for end user.
+   \item Build mkmpioboot tool (rbutil/mkmpioboot directory in rockbox source tree)
+   \item Process previously downloaded official firmware to include rockbox bootloader.
+   Open terminal window and type the following command:
+     \begin{code}
+       mkmpioboot HD200_UPG.SYS bootloader.mpio HD200_UPG.rb
+     \end{code}
+   \item Copy \fname{HD200\_UPG.rb} to the SYSTEM folder of your \dap{} and rename back to
+   \fname{HD200\_UPG.SYS}
+   \item Safe eject your \dap{}
+   \item Connect Wall charger and turn on the device. This should trigger firmware
+   upgrade process which will install rockbox bootloader to the flash memory of the
+   player.
+\end{enumerate}

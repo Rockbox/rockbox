@@ -1,0 +1,31 @@
+% $Id$ %
+\def\UseOption{mpiohd200}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+\edef\UseOption{\UseOption,MPIO_HD200_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_DISK_STORAGE}
+\edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
+\edef\UseOption{\UseOption,mpio}
+\edef\UseOption{\UseOption,MPIO_RC_HD200_PAD}
+\edef\UseOption{\UseOption,HAVEREMOTEKEYMAP}
+
+\newcommand{\playerman}{MPIO}
+\newcommand{\playertype}{HD200}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{128}
+\newcommand{\dapdisplayheight}{128}
+\newcommand{\dapdisplaydepth}{2}
+\newcommand{\specimg}{mpiohd200}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.mpio}}
+\newcommand{\firmwareextension}{\fname{mpio}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{hard disk}
+
+% link external keymap file
+\input{platform/keymap-mpiohd200.tex}
+\input{platform/remote-keymap-mpiohd200.tex}
+

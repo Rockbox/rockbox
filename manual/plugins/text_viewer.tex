@@ -19,6 +19,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{COWON_D2_PAD}{\ButtonMinus{} / }%
     \opt{touchscreen}{\TouchTopMiddle}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCUp}
     }
@@ -34,6 +35,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{COWON_D2_PAD}{\ButtonPlus{} / }%
     \opt{touchscreen}{\TouchBottomMiddle}
     \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCDown}
     }
@@ -41,8 +43,10 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay+\ButtonLeft}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchMidLeft}
-    \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD}{\ButtonLeft}
+    \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD}
+        {\ButtonLeft}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCLeft}
     }
@@ -51,8 +55,10 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay+\ButtonRight}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchMidRight}
-    \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD}{\ButtonRight}
+    \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD}
+        {\ButtonRight}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCRight}
     }
@@ -61,10 +67,11 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollBack}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
+        \opt{MPIO_HD200_PAD}{FIXME}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonUp}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line up\\
@@ -72,27 +79,32 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
+        \opt{MPIO_HD200_PAD}{FIXME}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonDown}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line down\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
+        GIGABEAT_S_PAD,MPIO_HD200_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
         \opt{GIGABEAT_S_PAD}{\ButtonLeft}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
+        \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column left\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
+        GIGABEAT_S_PAD,MPIO_HD200_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
         \opt{GIGABEAT_S_PAD}{\ButtonRight}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
+        \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column right\\
     }
@@ -106,6 +118,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{SANSA_CLIP_PAD}{\ButtonHome}
     \opt{SANSA_FUZE_PAD}{\ButtonDown+\ButtonSelect}
     \opt{MROBE100_PAD}{\ButtonDisplay}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchCenter}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCMode}
@@ -123,6 +136,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{COWON_D2_PAD}{\ButtonMenu+\ButtonPlus}
     \opt{SANSA_FUZE_PAD}{\ButtonUp+\ButtonSelect}
     \opt{PBELL_VIBE500_PAD}{\ButtonPower}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCPlay+\ButtonRCMode}
     }
@@ -137,6 +151,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{SANSA_FUZE_PAD}{Long \ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{COWON_D2_PAD}{\ButtonMenu{} / }%
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchTopRight}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCPlay}
@@ -153,6 +168,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{COWON_D2_PAD}{\ButtonPower{} / }%
     \opt{touchscreen}{\TouchTopLeft}
     \opt{IAUDIO_M3_PAD,PBELL_VIBE500_PAD}{\ButtonRec}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCRec}
         \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
@@ -329,6 +345,7 @@ stores its settings, the current position and bookmarks in
     \opt{COWON_D2_PAD}{\ButtonMenu+\ButtonPlus}%
     \opt{SANSA_FUZE_PAD}{\ButtonUp+\ButtonSelect}%
     \opt{IAUDIO_M3_PAD}{\ButtonRCPlay+\ButtonRCMode}.
+    \opt{MPIO_HD200_PAD}{FIXME}
     The bookmark will be displayed as shown below. To delete the bookmark
     press the same button again.
 

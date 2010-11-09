@@ -361,6 +361,29 @@ filesystem.\\*
   files using \fname{unzip}.
 }
 
+\opt{mpiohd200}{
+  Rockbox Utility will ask you for a compatible copy of the original
+  firmware. This is because for legal reasons we cannot distribute
+  the bootloader directly. Instead, we have to patch the MPIO firmware
+  with the Rockbox bootloader.
+
+  Download a supported version of the MPIO firmware for your 
+  \playername{} from the MPIO website, links can be found on 
+  \wikilink{MPIOHD200Port}.
+
+  \warn{The only tested version of the original firmware is 1.30.05
+  and as such is the only supported version}
+
+  If the file that you downloaded is a \fname{.zip} file, use an unzip
+  utility like mentioned in the prerequisites section to extract
+  the \fname{.SYS} from the \fname{.zip} file
+  to your desktop. Likewise, if the file that you downloaded is an
+  \fname{.exe} file, double-click on the \fname{.exe} file to extract
+  the \fname{.SYS} file to your desktop.
+  When running Linux you should be able to extract \fname{.exe}
+  files using \fname{unzip}.
+}
+
 \subsubsection{Choosing a Rockbox version}\label{sec:choosing_version}
 
 There are three different versions of Rockbox available from the
@@ -467,6 +490,7 @@ structure that Rockbox needs.\\}
     \nopt{gigabeats}{%
     \subsubsection{Installing the bootloader}
         \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
+        \opt{mpiohd200}{\input{getting_started/mpio_install.tex}}
         \opt{ipod}{\input{getting_started/ipod_install.tex}}
         \opt{iaudio}{\input{getting_started/iaudio_install.tex}}
         \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
@@ -533,7 +557,20 @@ structure that Rockbox needs.\\}
   firmware process usually takes a minute or so.). You are now ready to go.
 \end{itemize}
 }
+\opt{mpiohd200}{
+  \begin{itemize}
+  \item Safely eject /unmount your \dap{}.
 
+  \item \warn{Before proceeding further, make sure that your player has a full charge
+  or that it is connected to the power adaptor. Interrupting the next step
+  due to a power failure most likely will brick your \dap{}.}
+  Update your \daps{} firmware with the patched bootloader. To do this, turn
+  the jukebox on. The update process should start automaticaly. The \playerman{} will
+  display animation indicating that the firmware update is in progress. Do \emph{not}
+  interrupt this process. When the firmware update is complete the player will restart.
+  (The update firmware process usually takes a minute or so.). You are now ready to go.
+\end{itemize}
+}
 \opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
 
 
@@ -716,6 +753,11 @@ completely follow the manual uninstallation instructions below.}}
       Copy an unmodified original firmware to your player and update it.
 }
 
+\opt{mpiohd200}{
+    If you want to remove the Rockbox bootloader, simply flash an unpatched
+    \playerman{} firmware.
+}
+
 \nopt{gigabeats}{
   If you wish to clean up your disk, you may also wish to delete the
   \fname{.rockbox} directory and its contents.
@@ -764,13 +806,14 @@ completely follow the manual uninstallation instructions below.}}
   the update if the filename is correct, including case. Make sure that the patched
   Iriver firmware is called \fname{.hex}.}
 
-\nopt{h100,h300}{\item[``File Not Found'']}
-\opt{h100,h300}{\item[``-1 error'']}
+\nopt{h100,h300,mpiohd200}{\item[``File Not Found'']}
+\opt{h100,h300,mpiohd200}{\item[``-1 error'']}
   If you receive a
-  \nopt{h100,h300}{``File Not Found''}\opt{h100,h300}{``-1 error''} from the
-  bootloader, then the bootloader cannot find the Rockbox firmware. This is
-  usually a result of not extracting the contents of the \fname{.zip} file
-  to the proper location, and should not happen when Rockbox has been
+  \nopt{h100,h300,mpiohd200}{``File Not Found''}
+  \opt{h100,h300,mpiohd200}{``-1 error''} 
+  from the bootloader, then the bootloader cannot find the Rockbox firmware. 
+  This is usually a result of not extracting the contents of the \fname{.zip} 
+  file to the proper location, and should not happen when Rockbox has been
   installed with Rockbox Utility.
 
   To fix this, either install Rockbox with the Rockbox Utility which will take care

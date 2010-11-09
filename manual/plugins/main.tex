@@ -1,5 +1,9 @@
 % $Id$ %
 \chapter{Plugins}\label{ref:plugins}
+\opt{mpiohd200}{%
+\fixme{The manual for MPIO HD200 is incomplete. Keymap definitions for plugins are missing.}\\
+
+}
 Plugins are programs that Rockbox can load and run. Only one plugin can
 be loaded at a time. Plugins have exclusive control over the user interface.
 This means you cannot switch back and forth between a plugin and Rockbox. When
@@ -41,7 +45,7 @@ text files%
 
 \opt{lcd_bitmap}{\input{plugins/goban.tex}}
 
-\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,sansac200}{
+\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,sansac200,mpiohd200}{
   \input{plugins/invadrox.tex}}}
 
 {\input{plugins/jackpot.tex}}
@@ -198,7 +202,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \opt{lcd_bitmap}{\nopt{%
   ONDIO_PAD%,m200, % not enough buttons for keymap
   ,ipod1g2g,ipod3g,ipod4g,ipodmini% horizontal pixelformat not implemented
-  ,iaudiom3%,mpiohd2000, % vertical interleaved pixelformat not implemented
+  ,iaudiom3,mpiohd200, % vertical interleaved pixelformat not implemented
   ,mrobe100% lcd size/depth not implemented
   }{
   \input{plugins/rockboy.tex}}}

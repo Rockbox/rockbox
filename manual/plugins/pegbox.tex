@@ -6,13 +6,16 @@ pushed into each other they disappear except for triangles which form a solid
 block and crosses which allow you to choose a replacement block.
 
 \begin{btnmap}
-    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,touchscreen,IAUDIO_M3_PAD}{%
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,touchscreen,IAUDIO_M3_PAD%
+        ,MPIO_HD200_PAD}{%
         \ButtonUp, \ButtonDown, }%
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
+    \opt{MPIO_HD200_PAD}{FIXME, FIXME}
     \opt{touchscreen}{\TouchTopMiddle, \TouchBottomMiddle, }%
     %
-    \nopt{touchscreen,IAUDIO_M3_PAD}{\ButtonLeft, \ButtonRight} 
+    \nopt{touchscreen,MPIO_HD200_PAD,IAUDIO_M3_PAD}{\ButtonLeft, \ButtonRight}
+    \opt{MPIO_HD200_PAD}{FIXME,FIXME}
     \opt{touchscreen}{\TouchMidLeft, \TouchMidRight}
         &
     \opt{HAVEREMOTEKEYMAP}{
@@ -21,11 +24,13 @@ block and crosses which allow you to choose a replacement block.
         \\
 
     \nopt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
-        ,PBELL_VIBE500_PAD,touchscreen,IAUDIO_M3_PAD}{\ButtonSelect}
+        ,PBELL_VIBE500_PAD,touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD}%
+        {\ButtonSelect}
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect{} + \ButtonRight}
     \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchCenter}
         &
     \opt{HAVEREMOTEKEYMAP}{
@@ -43,6 +48,7 @@ block and crosses which allow you to choose a replacement block.
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
     \opt{MROBE100_PAD}{\ButtonPlay}
+    \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchTopRight}
         &
     \opt{HAVEREMOTEKEYMAP}{
@@ -61,6 +67,7 @@ block and crosses which allow you to choose a replacement block.
     \opt{MROBE100_PAD}{\ButtonMenu}
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
+    \opt{MPIO_HD200_PAD}{FIXME}
         &
     \opt{HAVEREMOTEKEYMAP}{
         &}
@@ -78,6 +85,7 @@ block and crosses which allow you to choose a replacement block.
         \opt{MROBE100_PAD}{\ButtonDisplay}
         \opt{touchscreen}{\TouchBottomRight}
         \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
+        \opt{MPIO_HD200_PAD}{FIXME}
             &
         \opt{HAVEREMOTEKEYMAP}{
             &}
@@ -93,6 +101,7 @@ block and crosses which allow you to choose a replacement block.
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
+    \opt{MPIO_HD200_PAD}{FIXME}
         &
     \opt{HAVEREMOTEKEYMAP}{
         &}

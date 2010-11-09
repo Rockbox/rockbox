@@ -20,7 +20,7 @@ change to customise your listening experience.
   \opt{player}{minimum of -78~dB to a maximum of +18~dB.}%
   \opt{recorder,recorderv2fm,ondio}{minimum of -100~dB to a maximum of +12~dB.}%
   \opt{h100,h300}{minimum of -84~dB to a maximum of 0~dB.}%
-  \opt{iaudiom3,iaudiom5,iaudiox5,ipod3g,ipod4g,gigabeatf,mrobe100}{%
+  \opt{iaudiom3,iaudiom5,iaudiox5,ipod3g,ipod4g,gigabeatf,mrobe100,mpiohd200}{%
       minimum of -73~dB to a maximum of +6~dB.}%
   \opt{ipodnano}{minimum of -72~dB to a maximum of +6~dB.}%
   \opt{ipodvideo,cowond2}{minimum of -89~dB to a maximum of +6~dB.}%
@@ -41,7 +41,8 @@ change to customise your listening experience.
   \opt{masd}{The minimum setting is -15~dB and the maximum is 15~dB.}%
   \opt{masf}{The minimum setting is -12~dB and the maximum is 12~dB.}%
   \opt{h100,h300}{The minimum setting is 0~dB and the maximum is 24~dB.}%
-  \opt{ipodnano,ipodnano2g,ipodcolor}{The minimum setting is -6~dB and the maximum is 9~dB.}%
+  \opt{ipodnano,ipodnano2g,ipodcolor,mpiohd200}{%
+      The minimum setting is -6~dB and the maximum is 9~dB.}%
   \opt{ipodvideo}{The minimum setting is -12~dB and the maximum is 12~dB.}%
   \opt{iaudiom3,iaudiom5,iaudiox5,sansa,sansaAMS,h10,h10_5gb,vibe500}{%
       The minimum setting is -24~dB and the maximum is 24~dB.}
@@ -62,7 +63,8 @@ change to customise your listening experience.
   \opt{masd}{The minimum setting is -15~dB and the maximum is 15~dB.}%
   \opt{masf}{The minimum setting is -12~dB and the maximum is 12~dB.}%
   \opt{h100,h300}{The minimum setting is 0~dB and the maximum is 6~dB.}%
-  \opt{ipodnano,ipodnano2g,ipodcolor}{The minimum setting is -6~dB and the maximum is 9~dB.}%
+  \opt{ipodnano,ipodnano2g,ipodcolor,mpiohd200}{%
+      The minimum setting is -6~dB and the maximum is 9~dB.}%
   \opt{ipodvideo}{The minimum setting is -12~dB and the maximum is 12~dB.}%
   \opt{iaudiom3,iaudiom5,iaudiox5,sansa,sansaAMS,h10,h10_5gb,vibe500}{%
       The minimum setting is -24~dB and the maximum is 24~dB.}
@@ -389,6 +391,7 @@ change to customise your listening experience.
       \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
       \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
       \opt{PBELL_VIBE500_PAD}{\ButtonUp}
+      \opt{MPIO_HD200_PAD}{\ButtonVolUp}
       \opt{touchscreen}{\TouchMidRight}
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -404,6 +407,7 @@ change to customise your listening experience.
       \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
       \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
       \opt{PBELL_VIBE500_PAD}{\ButtonDown}
+      \opt{MPIO_HD200_PAD}{\ButtonVolDown}
       \opt{touchscreen}{\TouchMidLeft}
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -417,7 +421,7 @@ change to customise your listening experience.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
           ,SANSA_CLIP_PAD}{\ButtonUp}
-      \opt{IRIVER_H10_PAD}{\ButtonRew}
+      \opt{IRIVER_H10_PAD,MPIO_HD200_PAD}{\ButtonRew}
       \opt{touchscreen}{\ActionStdPrev}
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -432,7 +436,7 @@ change to customise your listening experience.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
           ,SANSA_CLIP_PAD}{\ButtonDown}
-      \opt{IRIVER_H10_PAD}{\ButtonFF}
+      \opt{IRIVER_H10_PAD,MPIO_HD200_PAD}{\ButtonFF}
       \opt{touchscreen}{\ActionStdNext}
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -446,6 +450,7 @@ change to customise your listening experience.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_X5_PAD%
           ,SANSA_C200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD%
           ,SANSA_FUZE_PAD,MROBE100_PAD,SANSA_CLIP_PAD}{\ButtonSelect}
+      \opt{MPIO_HD200_PAD}{\ButtonFunc}
       \opt{PBELL_VIBE500_PAD}{\ButtonOK}
       \opt{IRIVER_H10_PAD}{\ButtonRight}
       \opt{IAUDIO_M3_PAD}{\ButtonPlay}
@@ -463,7 +468,7 @@ change to customise your listening experience.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
       \opt{IAUDIO_X5_PAD}{\ButtonPower/\ButtonRec}
-      \opt{IAUDIO_M3_PAD}{\ButtonRec}
+      \opt{IAUDIO_M3_PAD,MPIO_HD200_PAD}{\ButtonRec}
       \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD}{\ButtonLeft}
       \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,MROBE100_PAD,SANSA_CLIP_PAD}{\ButtonPower}
       \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
