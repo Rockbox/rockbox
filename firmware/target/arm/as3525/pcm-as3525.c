@@ -177,6 +177,8 @@ void pcm_dma_apply_settings(void)
     cgu_audio |=  (AS3525_MCLK_SEL << 0);   /* set i2sout MCLK_SEL */
     cgu_audio &= ~(0x1ff << 2);             /* clear i2sout divider */
     cgu_audio |= mclk_divider() << 2;       /* set new i2sout divider */
+    cgu_audio &= ~(1 << 23);                /* clear I2SI_MCLK_EN */
+    cgu_audio &= ~(1 << 24);                /* clear I2SI_MCLK2PAD_EN */
     CGU_AUDIO = cgu_audio;                  /* write back register */
 }
 
@@ -338,7 +340,7 @@ void pcm_rec_dma_stop(void)
 
     I2SIN_CONTROL &= ~(1<<11); /* disable dma */
 
-    CGU_AUDIO &= ~((1<<23)|(1<<11));
+    CGU_AUDIO &= ~(1<<11);
     bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
                         CGU_I2SOUT_APB_CLOCK_ENABLE);
 }
@@ -357,7 +359,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
                         CGU_I2SOUT_APB_CLOCK_ENABLE);
-    CGU_AUDIO |= ((1<<23)|(1<<11));
+    CGU_AUDIO |= (1<<11);
 
     I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */
 
@@ -374,13 +376,6 @@ void pcm_rec_dma_close(void)
 
 void pcm_rec_dma_init(void)
 {
-    int cgu_audio = CGU_AUDIO;              /* read register */
-    cgu_audio &= ~(3 << 12);                /* clear i2sin MCLK_SEL */
-    cgu_audio |=  (AS3525_MCLK_SEL << 12);  /* set i2sin MCLK_SEL */
-    cgu_audio &= ~(0x1ff << 14);            /* clear i2sin divider */
-    cgu_audio |= mclk_divider() << 14;      /* set new i2sin divider */
-    CGU_AUDIO = cgu_audio;                  /* write back register */
-
     /* i2c clk src = I2SOUTIF, sdata src = AFE,
      * data valid at positive edge of SCLK */
     I2SIN_CONTROL = (1<<2);
