@@ -65,8 +65,11 @@
 /* LCD dimensions */
 #define CONFIG_LCD LCD_ONDAVX767
 
-#define LCD_WIDTH  320
-#define LCD_HEIGHT 240
+/* this are not actually the correct dimensions (480x272 is correct)
+ * should be fixed once there's a working LCD driver */
+#define LCD_WIDTH  480
+#define LCD_HEIGHT 272
+#define LCD_DPI    128
 
 #define LCD_DEPTH  16   /* 16bit colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */

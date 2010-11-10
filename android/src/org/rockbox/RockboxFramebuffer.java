@@ -28,16 +28,20 @@ import org.rockbox.Helper.MediaButtonReceiver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 public class RockboxFramebuffer extends View
 {
     private Bitmap btm;
     private ByteBuffer native_buf;
     private MediaButtonReceiver media_monitor;
+    private final DisplayMetrics metrics;
+    private final ViewConfiguration view_config;
 
     public RockboxFramebuffer(Context c, int lcd_width, 
                               int lcd_height, ByteBuffer native_fb)
@@ -53,6 +57,9 @@ public class RockboxFramebuffer extends View
         media_monitor.register();
         /* the service needs to know the about us */
         ((RockboxService)c).set_fb(this);
+        
+        metrics = c.getResources().getDisplayMetrics();
+        view_config = ViewConfiguration.get(c);
     }
 
     public void onDraw(Canvas c) 
@@ -131,6 +138,18 @@ public class RockboxFramebuffer extends View
                 set_lcd_active(0);
                 break;
         }
+    }
+ 
+    @SuppressWarnings("unused")
+    private int getDpi()
+    {
+        return metrics.densityDpi;
+    }
+    
+    @SuppressWarnings("unused")
+    private int getScrollThreshold()
+    {
+        return view_config.getScaledTouchSlop();
     }
 
     private native void set_lcd_active(int active);

@@ -87,9 +87,11 @@
 #if _RESOLUTION == _LCD_RES_VGA 
 #define LCD_NATIVE_WIDTH 480
 #define LCD_NATIVE_HEIGHT 640
+#define LCD_DPI 216
 #else
 #define LCD_NATIVE_WIDTH 240
 #define LCD_NATIVE_HEIGHT 320
+#define LCD_DPI 108
 #endif
 
 /* choose the lcd orientation. CONFIG_ORIENTATION defined in config.h */

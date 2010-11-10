@@ -19,6 +19,7 @@
 #undef HAVE_ATA_POWER_OFF
 
 #undef CONFIG_LCD
+#undef LCD_DPI /* likely to be too different on a PC */
 
 #undef CONFIG_LED
 

@@ -111,3 +111,9 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
     SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, first, steps);
 }
 
+int lcd_get_dpi(void)
+{
+    /* TODO: find a way to query it from the OS, SDL doesn't support it
+     * directly; for now assume the more or less standard 96 */
+    return 96;
+}

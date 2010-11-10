@@ -25,6 +25,7 @@
 #include "touchscreen.h"
 #include "string.h"
 #include "logf.h"
+#include "lcd.h"
 
 /* Size of the 'dead zone' around each 3x3 button */
 #define BUTTON_MARGIN_X (int)(LCD_WIDTH * 0.03)
@@ -167,3 +168,33 @@ enum touchscreen_mode touchscreen_get_mode(void)
 {
     return current_mode;
 }
+
+
+#if ((CONFIG_PLATFORM & PLATFORM_ANDROID) == 0)
+/* android has an API for this */
+
+#define TOUCH_SLOP      16u
+#define REFERENCE_DPI   160
+
+int touchscreen_get_scroll_threshold(void)
+{
+#ifdef LCD_DPI
+    const int dpi = LCD_DPI;
+#else
+    const int dpi = lcd_get_dpi();
+#endif
+
+    /* Inspired by Android calculation
+     *
+     * float density = real dpi / reference dpi (=160)
+     * int threshold = (int) (density * TOUCH_SLOP + 0.5f);(original calculation)
+     *
+     * + 0.5f is for rounding, we use fixed point math to achieve that
+     */
+
+    int result = dpi * (TOUCH_SLOP<<1) / REFERENCE_DPI;
+    result += result & 1; /* round up if needed */
+    return result>>1;
+}
+
+#endif

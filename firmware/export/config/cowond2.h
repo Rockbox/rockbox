@@ -75,6 +75,7 @@
 /* LCD dimensions */
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
+#define LCD_DPI    160
 #define LCD_DEPTH  16
 #define LCD_PIXELFORMAT 565
 

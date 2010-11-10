@@ -35,6 +35,8 @@ static jmethodID java_lcd_update;
 static jmethodID java_lcd_update_rect;
 
 static bool display_on;
+static int dpi;
+static int scroll_threshold;
 
 void lcd_init_device(void)
 {
@@ -77,6 +79,20 @@ void lcd_init_device(void)
                                                    RockboxFramebuffer_class,
                                                    "java_lcd_update_rect",
                                                    "(IIII)V");
+
+    jmethodID get_dpi    = e->GetMethodID(env_ptr,
+                                          RockboxFramebuffer_class,
+                                          "getDpi", "()I");
+
+    jmethodID get_scroll_threshold
+                         = e->GetMethodID(env_ptr,
+                                          RockboxFramebuffer_class,
+                                          "getScrollThreshold", "()I");
+
+    dpi              = e->CallIntMethod(env_ptr, RockboxFramebuffer_instance,
+                                        get_dpi);
+    scroll_threshold = e->CallIntMethod(env_ptr, RockboxFramebuffer_instance,
+                                        get_scroll_threshold);
     display_on = true;
 }
 
@@ -99,6 +115,16 @@ void lcd_update_rect(int x, int y, int height, int width)
 bool lcd_active(void)
 {
     return display_on;
+}
+
+int lcd_get_dpi(void)
+{
+    return dpi;
+}
+
+int touchscreen_get_scroll_threshold(void)
+{
+    return scroll_threshold;
 }
 
 /*

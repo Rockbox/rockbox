@@ -486,15 +486,25 @@ void _gui_synclist_stop_kinetic_scrolling(void)
  * otherwise it returns true even if it didn't actually scroll,
  * but scrolling mode shouldn't be changed
  **/
+
+ 
+static int scroll_begin_threshold;
+static int threshold_accumulation;
 static bool swipe_scroll(struct gui_synclist * gui_list, int line_height, int difference)
 {
     /* fixme */
     const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
     const int nb_lines = viewport_get_nb_lines(&list_text[screen]);
 
+    if (UNLIKELY(scroll_begin_threshold == 0))
+        scroll_begin_threshold = touchscreen_get_scroll_threshold();
+
     /* make selecting items easier */
-    if (abs(difference) < SCROLL_BEGIN_THRESHOLD && scroll_mode == SCROLL_NONE)
+    threshold_accumulation += abs(difference);
+    if (threshold_accumulation < scroll_begin_threshold && scroll_mode == SCROLL_NONE)
         return false;
+
+    threshold_accumulation = 0;
 
     /* does the list even scroll? if no, return but still show
      * the caller that we would scroll */

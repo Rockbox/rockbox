@@ -79,6 +79,7 @@
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 400
 #endif
+#define LCD_DPI    155
 
 #define LCD_DEPTH  16   /* 16bit colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */

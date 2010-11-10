@@ -50,5 +50,6 @@ void touchscreen_set_mode(enum touchscreen_mode mode);
 enum touchscreen_mode touchscreen_get_mode(void);
 void touchscreen_disable_mapping(void);
 void touchscreen_reset_mapping(void);
+int touchscreen_get_scroll_threshold(void);
 
 #endif /* __TOUCHSCREEN_INCLUDE_H_ */
