@@ -93,6 +93,47 @@ atrac3_iqmf_matrixing:
  *      }
  * Note: r12 is a scratch register and can be used without restorage.
  ****************************************************************************/
+
+/* To be called as first block to call smull for initial filling of the result
+ * registers lr/r9 and r12/r8. */
+#define DEWIN_8_SAMPLES_MUL_ASM \
+    ldmia r2!, {r4, r5};            /* load win[0..1] */ \
+    ldmia r1!, {r6, r7};            /* load in [0..1] */ \
+    smull lr , r9, r4, r6;          /* s1 = win[0] * in[0] */ \
+    smull r12, r8, r5, r7;          /* s2 = win[1] * in[1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */
+
+/* Called after first block. Will always multiply-add to the result registers 
+ * lr/r9 and r12/r8. */
+#define DEWIN_8_SAMPLES_MLA_ASM \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
+    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
+    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
+    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
+    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */
+
     .align  2
     .global atrac3_iqmf_dewindowing
     .type   atrac3_iqmf_dewindowing, %function
@@ -105,108 +146,13 @@ atrac3_iqmf_dewindowing:
     stmfd   sp!, {r4-r9, lr}        /* save non-scratch registers */
     
 .iqmf_dewindow_outer_loop:          /* outer loop 0...counter-1 */
-    /*  0.. 7 */
-    ldmia r2!, {r4, r5}             /* load win[0..1] */
-    ldmia r1!, {r6, r7}             /* load in[0..1] */
-    smull lr , r9, r4, r6           /* s1 = win[0] * in[0] */
-    smull r12, r8, r5, r7           /* s2 = win[1] * in[1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    /*  8..15 */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    /* 16..23 */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    /* 24..31 */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    /* 32..39 */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    /* 40..47 */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
-    ldmia r2!, {r4, r5}             /* load win[i...i+1] */
-    ldmia r1!, {r6, r7}             /* load in[i...i+1] */
-    smlal lr , r9, r4, r6           /* s1 = win[i  ] * in[i  ] */
-    smlal r12, r8, r5, r7           /* s2 = win[i+1] * in[i+1] */
+    
+    DEWIN_8_SAMPLES_MUL_ASM         /*  0.. 7, use "MUL" macro here! */
+    DEWIN_8_SAMPLES_MLA_ASM         /*  8..15 */
+    DEWIN_8_SAMPLES_MLA_ASM         /* 16..23 */
+    DEWIN_8_SAMPLES_MLA_ASM         /* 24..31 */
+    DEWIN_8_SAMPLES_MLA_ASM         /* 32..39 */
+    DEWIN_8_SAMPLES_MLA_ASM         /* 40..47 */
 
     mov   lr , lr , lsr #31
     orr   r9, lr , r9, lsl #1       /* s1 = low>>31 || hi<<1 */
