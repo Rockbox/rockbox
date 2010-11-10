@@ -58,7 +58,7 @@ static VLC          spectral_coeff_tab[7];
 #if defined(CPU_ARM) && (ARM_ARCH >= 5)  /*ARMv5e+ uses 32x16 multiplication*/
 static int16_t      qmf_window[48] IBSS_ATTR  __attribute__ ((aligned (32))); 
 #else
-static int32_t      qmf_window[48] IBSS_ATTR;
+static int32_t      qmf_window[48] IBSS_ATTR __attribute__ ((aligned (16)));
 #endif
 static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR __attribute__((aligned(16)));
 static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR __attribute__((aligned(16)));
@@ -134,7 +134,7 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
                             int16_t *win,
                             unsigned int nIn)
     {
-         //atrac3_iqmf_dewindowing_armv5e(out, in, win, nIn);
+         atrac3_iqmf_dewindowing_armv5e(out, in, win, nIn);
 
     }
                             
@@ -143,7 +143,7 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
     extern void
     atrac3_iqmf_dewindowing(int32_t *out,
                             int32_t *in,
-                            int16_t *win,
+                            int32_t *win,
                             unsigned int nIn);    
                             
 #elif defined (CPU_COLDFIRE)
