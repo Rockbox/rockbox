@@ -55,7 +55,11 @@
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
 static VLC          spectral_coeff_tab[7];
+#if defined(CPU_ARM) && (ARM_ARCH >= 5)  /*ARMv5e+ uses 32x16 multiplication*/
+static int16_t      qmf_window[48] IBSS_ATTR  __attribute__ ((aligned (32))); 
+#else
 static int32_t      qmf_window[48] IBSS_ATTR;
+#endif
 static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR __attribute__((aligned(16)));
 static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR __attribute__((aligned(16)));
 static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR;
@@ -118,12 +122,30 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
  *      }
  */
  
-#if defined(CPU_ARM)
+#if defined(CPU_ARM) && (ARM_ARCH >= 5)
+    extern void
+    atrac3_iqmf_dewindowing_armv5e(int32_t *out,
+                            int32_t *in,
+                            int16_t *win,
+                            unsigned int nIn);
+    static inline void
+    atrac3_iqmf_dewindowing(int32_t *out,
+                            int32_t *in,
+                            int16_t *win,
+                            unsigned int nIn)
+    {
+         //atrac3_iqmf_dewindowing_armv5e(out, in, win, nIn);
+
+    }
+                            
+                            
+#elif defined(CPU_ARM) 
     extern void
     atrac3_iqmf_dewindowing(int32_t *out,
                             int32_t *in,
-                            int32_t *win,
-                            unsigned int nIn);
+                            int16_t *win,
+                            unsigned int nIn);    
+                            
 #elif defined (CPU_COLDFIRE)
     #define MULTIPLY_ADD_BLOCK \
         "movem.l (%[win]), %%d0-%%d7             \n\t" \
@@ -206,7 +228,9 @@ static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
 
             out[0] = s2;
             out[1] = s1;
+            
         }
+        
     }
 #endif
 
@@ -244,6 +268,7 @@ atrac3_imdct_windowing(int32_t *buffer,
  
 static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
 {
+
     /* Restore the delay buffer */
     memcpy(temp, delayBuf, 46*sizeof(int32_t));
 
@@ -274,6 +299,7 @@ static void IMLT(int32_t *pInput, int32_t *pOutput)
 
     /* Windowing. */
     atrac3_imdct_windowing(pOutput, window_lookup);
+   
 }
 
 
@@ -320,9 +346,13 @@ static void init_atrac3_transforms(void)
     /* Generate the QMF window. */
     for (i=0 ; i<24; i++) {
         s = qmf_48tap_half_fix[i] << 1;
-        qmf_window[i] = s;
-        qmf_window[47 - i] = s;
+        #if defined(CPU_ARM) && (ARM_ARCH >= 5)
+        qmf_window[i] = qmf_window[47-i] = (int16_t)((s+(1<<15))>>16);
+        #else
+        qmf_window[i] = qmf_window[47-i] = s;
+        #endif
     }
+    
 }
 
 
@@ -1229,7 +1259,7 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
         vlcs_initialized = 1;
 
     }
-
+	
     init_atrac3_transforms();
 
     /* init the joint-stereo decoding data */

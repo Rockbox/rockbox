@@ -67,6 +67,7 @@ typedef struct {
 } channel_unit;
 
 typedef struct {
+    int32_t             outSamples[2048];
     GetBitContext       gb;
     //@{
     /** stream data */
@@ -90,8 +91,7 @@ typedef struct {
     int                 weighting_delay[6];
     //@}
     //@{
-    /** data buffers */
-    int32_t             outSamples[2048];
+    /** data buffers */    
     uint8_t             decoded_bytes_buffer[1024];
     int32_t             tempBuf[1070];
     //@}

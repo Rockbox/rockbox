@@ -1,5 +1,8 @@
 atrac3.c
 #if defined(CPU_ARM)
 atrac3_arm.S
+#if (ARM_ARCH >= 5)
+atrac3_armv5e.S
+#endif
 #endif
 

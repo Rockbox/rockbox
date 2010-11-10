@@ -30,7 +30,7 @@ CODEC_HEADER
 
 static RMContext rmctx;
 static RMPacket pkt;
-static ATRAC3Context q IBSS_ATTR;
+static ATRAC3Context q IBSS_ATTR __attribute__ ((aligned (32)));
 
 static void init_rm(RMContext *rmctx)
 {
