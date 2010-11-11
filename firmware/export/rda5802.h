@@ -26,6 +26,7 @@
 #define _RDA5802_H_
 
 #define HAVE_RADIO_REGION
+#define HAVE_RADIO_RSSI
 
 struct rda5802_dbg_info
 {

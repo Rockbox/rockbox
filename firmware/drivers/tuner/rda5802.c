@@ -34,6 +34,10 @@
 
 #define I2C_ADR 0x20
 
+/* define RSSI range */
+#define RSSI_MIN 0
+#define RSSI_MAX 70
+
 /** Registers and bits **/
 #define POWERCFG    0x2
 #define CHANNEL     0x3
@@ -263,6 +267,12 @@ static bool rda5802_st(void)
     return (rda5802_read_reg(READCHAN) & READCHAN_ST);
 }
 
+static int rda5802_rssi(void)
+{
+    uint16_t status = rda5802_read_reg(STATUSRSSI);
+    return STATUSRSSI_RSSIr(status);
+}
+
 /* tuner abstraction layer: set something to the tuner */
 int rda5802_set(int setting, int value)
 {
@@ -322,6 +332,18 @@ int rda5802_get(int setting)
 
     case RADIO_STEREO:
         val = rda5802_st();
+        break;
+
+    case RADIO_RSSI:
+        val = rda5802_rssi();
+        break;
+
+    case RADIO_RSSI_MIN:
+        val = RSSI_MIN;
+        break;
+
+    case RADIO_RSSI_MAX:
+        val = RSSI_MAX;
         break;
     }
 

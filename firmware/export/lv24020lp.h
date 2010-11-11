@@ -25,6 +25,7 @@
 
 /* Define additional tuner messages here */
 #define HAVE_RADIO_REGION
+#define HAVE_RADIO_RSSI
 
 #define LV24020LP_CTRL_STAT (RADIO_GET_CHIP_FIRST+0)
 #define LV24020LP_REG_STAT  (RADIO_GET_CHIP_FIRST+1)

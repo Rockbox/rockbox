@@ -50,6 +50,10 @@ extern int si4700_st(void);
 
 #define I2C_ADR 0x20
 
+/* define RSSI range */
+#define RSSI_MIN 0
+#define RSSI_MAX 70
+
 /** Registers and bits - "x" denotes Si4702/03 only (so they say) **/
 #define DEVICEID    0x0
 #define CHIPID      0x1
@@ -197,7 +201,7 @@ extern int si4700_st(void);
 #define STATUSRSSI_BLERA    (0x3 <<  9) /* x */
 #define STATUSRSSI_ST       (0x1 <<  8)
 #define STATUSRSSI_RSSI     (0xff << 0)
-    #define STATUSRSSI_RSSIr(x) ((x) & 0xff)
+#define STATUSRSSI_RSSIr(x) ((x) & 0xff)
 
 /* READCHAN (0xB) */
 #define READCHAN_BLERB      (0x3 << 14) /* x */
@@ -480,6 +484,18 @@ int si4700_get(int setting)
 
         case RADIO_STEREO:
             val = si4700_st();
+            break;
+    
+        case RADIO_RSSI:
+            val = STATUSRSSI_RSSIr(si4700_read_reg(STATUSRSSI));
+            break;
+
+        case RADIO_RSSI_MIN:
+            val = RSSI_MIN;
+            break;
+
+        case RADIO_RSSI_MAX:
+            val = RSSI_MAX;
             break;
     }
 

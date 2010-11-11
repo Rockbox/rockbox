@@ -12647,3 +12647,20 @@
     *: "Start File Browser at root"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Signal strength:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Signal strength:"
+  </voice>
+</phrase>

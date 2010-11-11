@@ -27,6 +27,7 @@
 #include "tuner.h"
 
 #define HAVE_RADIO_REGION
+#define HAVE_RADIO_RSSI
 
 struct tea5760_dbg_info
 {

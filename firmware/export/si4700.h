@@ -26,6 +26,7 @@
 #define _SI4700_H_
 
 #define HAVE_RADIO_REGION
+#define HAVE_RADIO_RSSI
 
 struct si4700_dbg_info
 {

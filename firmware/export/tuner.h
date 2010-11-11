@@ -46,6 +46,9 @@ enum
     RADIO_STEREO,
     /* RADIO_EVENT is an event that requests a screen update */
     RADIO_EVENT,
+    RADIO_RSSI,
+    RADIO_RSSI_MIN,
+    RADIO_RSSI_MAX,
 
     /* Put new general-purpose readback values above this line */
     __RADIO_GET_STANDARD_LAST

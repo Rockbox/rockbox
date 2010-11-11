@@ -35,6 +35,10 @@
 
 static struct mutex tuner_mtx;
 
+/* define RSSI range */
+#define RSSI_MIN 5
+#define RSSI_MAX 75
+
 /* define to enable tuner logging */
 #undef SANYO_TUNER_LOG_FILE
 #undef SANYO_TUNER_LOGF
@@ -966,6 +970,8 @@ int lv24020lp_set(int setting, int value)
 int lv24020lp_get(int setting)
 {
     int val = -1;
+    const unsigned char fst[7] = {0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f};
+    unsigned char fst_ndx, fs;
 
     mutex_lock(&tuner_mtx);
 
@@ -993,6 +999,22 @@ int lv24020lp_get(int setting)
             tuner_power(false);
         break;
         }
+
+    case RADIO_RSSI:
+        fs = RSS_FS(lv24020lp_read(RADIO_STAT));
+        for(fst_ndx=0; fst_ndx<7; fst_ndx++)
+            if(fs == fst[fst_ndx])
+                break;
+        val = 75 - 10*fst_ndx;
+        break;
+
+    case RADIO_RSSI_MIN:
+        val = RSSI_MIN;
+        break;
+
+    case RADIO_RSSI_MAX:
+        val = RSSI_MAX;
+        break;
 
     default:
         val = lv24020lp_debug_info(setting);

@@ -34,6 +34,10 @@
 #define I2C_ADR 0xC0
 #endif
 
+/* define RSSI range */
+#define RSSI_MIN 10
+#define RSSI_MAX 55
+
 static bool tuner_present = true;
 static unsigned char write_bytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
 
@@ -131,6 +135,18 @@ int tea5767_get(int setting)
 
         case RADIO_STEREO:
             val = read_bytes[2] >> 7;
+            break;
+        
+        case RADIO_RSSI:
+            val = 10 + 3*(read_bytes[3] >> 4);
+            break;
+
+        case RADIO_RSSI_MIN:
+            val = RSSI_MIN;
+            break;
+
+        case RADIO_RSSI_MAX:
+            val = RSSI_MAX;
             break;
     }
 

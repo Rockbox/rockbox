@@ -12580,3 +12580,20 @@
     *: "Rozpocznij Przeglądanie Plików Tutaj"
   </voice>
   </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Poziom sygnału:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Poziom sygnału:"
+  </voice>
+</phrase>

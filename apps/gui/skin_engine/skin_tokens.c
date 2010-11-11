@@ -475,6 +475,17 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
         case SKIN_TOKEN_TUNER_CURFREQ:
             return format_freq_MHz(radio_current_frequency(),
                             region_data->freq_step, buf, buf_size);
+#ifdef HAVE_RADIO_RSSI
+        case SKIN_TOKEN_TUNER_RSSI:
+            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI));
+            return buf;
+        case SKIN_TOKEN_TUNER_RSSI_MIN:
+            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI_MIN));
+            return buf;
+        case SKIN_TOKEN_TUNER_RSSI_MAX:
+            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI_MAX));
+            return buf;
+#endif
         case SKIN_TOKEN_PRESET_NAME:
         case SKIN_TOKEN_PRESET_FREQ:
         case SKIN_TOKEN_PRESET_ID:

@@ -25,6 +25,7 @@
 
 #define HAVE_RADIO_REGION
 #define HAVE_RADIO_MUTE_TIMEOUT
+#define HAVE_RADIO_RSSI
 
 struct tea5767_dbg_info
 {
