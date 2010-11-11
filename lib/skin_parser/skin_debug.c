@@ -135,46 +135,45 @@ void skin_debug_tree(struct skin_element* root)
         switch(current->type)
         {
         case UNKNOWN:
-            printf("[ Unknown element.. error\n]");
+            printf("* Unknown element.. error *\n");
             break;
 
         case VIEWPORT:
-            printf("[ Viewport \n");
+            printf("{ Viewport \n");
 
             debug_indent_level++;
             skin_debug_tree(current->children[0]);
             debug_indent_level--;
 
-            printf("]");
+            printf("}");
             break;
 
         case TEXT:
             text = current->data;
-            printf("[ Plain text on line %d : %s ]\n", current->line, text);
+            printf("* Plain text on line %d: \"%s\"\n", current->line, text);
             break;
 
         case COMMENT:
-            text = current->data;
-            printf("[ Comment on line %d: ", current->line);
-            for(i = 0; i < (int)strlen(text); i++)
-            {
-                if(text[i] == '\n')
-                    printf("\\n");
-                else
-                    printf("%c", text[i]);
-            }
-            printf(" ]\n");
+            printf("# Comment on line %d\n ", current->line);
             break;
 
         case TAG:
-            printf("[ %s tag on line %d with %d arguments\n",
-                   current->tag->name,
-                   current->line, current->params_count);
-            debug_indent_level++;
-            skin_debug_params(current->params_count, current->params);
-            debug_indent_level--;
-            skin_debug_indent();
-            printf("]\n");
+            if (current->params_count)
+            {
+                printf("( %%%s tag on line %d with %d arguments\n",
+                       current->tag->name,
+                       current->line, current->params_count);
+                debug_indent_level++;
+                skin_debug_params(current->params_count, current->params);
+                debug_indent_level--;
+                skin_debug_indent();
+                printf(")\n");
+            }
+            else
+            {
+                printf("[ %%%s tag on line %d ]\n",
+                       current->tag->name, current->line);
+            }
 
             break;
 
@@ -193,22 +192,14 @@ void skin_debug_tree(struct skin_element* root)
             break;
 
         case CONDITIONAL:
-            printf("[ Conditional tag on line %d with %d enumerations \n",
-                   current->line, current->children_count - 1);
+            printf("< Conditional tag %%?%s on line %d with %d enumerations \n",
+                   current->tag->name, current->line, current->children_count);
             debug_indent_level++;
 
-            skin_debug_indent();
-            printf("[ Condition tag \n");
-            debug_indent_level++;
-            skin_debug_tree(current->children[0]);
-            debug_indent_level--;
-            skin_debug_indent();
-            printf("]\n");
-
-            for(i = 1; i < current->children_count; i++)
+            for(i = 0; i < current->children_count; i++)
             {
                 skin_debug_indent();
-                printf("[ Enumeration %d\n", i - 1);
+                printf("[ Enumeration %d\n", i);
                 debug_indent_level++;
                 skin_debug_tree(current->children[i]);
                 debug_indent_level--;
@@ -218,7 +209,7 @@ void skin_debug_tree(struct skin_element* root)
 
             debug_indent_level--;
             skin_debug_indent();
-            printf("]\n");
+            printf(">\n");
 
 
             break;
@@ -251,29 +242,28 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
         switch(params[i].type)
         {
         case DEFAULT:
-            printf("[-]");
+            printf("-");
             break;
 
         case STRING:
-            printf("[%s]", params[i].data.text);
+            printf("string: \"%s\"", params[i].data.text);
             break;
 
         case INTEGER:
-            printf("[%d]", params[i].data.number);
+            printf("integer: %d", params[i].data.number);
             break;
             
         case DECIMAL:
-            printf("[%d.%d]", params[i].data.number/10,
+            printf("decimal: %d.%d", params[i].data.number/10,
                               params[i].data.number%10);
             break;
 
         case CODE:
-            printf("[ WPS Code: \n");
+            printf("Skin Code: \n");
             debug_indent_level++;
             skin_debug_tree(params[i].data.code);
             debug_indent_level--;
             skin_debug_indent();
-            printf("]");
             break;
         }
 
