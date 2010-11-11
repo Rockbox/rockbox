@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/helper.h"
 #include "loader.h"
 #include "rockmacros.h"
 #include "input.h"
@@ -426,6 +427,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
+    /* ignore backlight time out */
+    backlight_force_on();
+
     gnuboy_main(parameter);
 
 #ifdef HAVE_WHEEL_POSITION
@@ -435,6 +439,8 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
+
+    backlight_use_settings();
 
     if(shut&&!cleanshut)
     {

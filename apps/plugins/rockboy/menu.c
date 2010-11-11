@@ -4,6 +4,7 @@
 /* Note: this file only exposes one function: do_user_menu().        */
 /*********************************************************************/
 
+#include "lib/helper.h"
 #include "button.h"
 #include "rockmacros.h"
 #include "mem.h"
@@ -46,18 +47,18 @@ static int getbutton(char *text)
 
 static void setupkeys(void)
 {
-    options.UP=getbutton    ("Press Up");
-    options.DOWN=getbutton  ("Press Down");
-    options.LEFT=getbutton  ("Press Left");
-    options.RIGHT=getbutton ("Press Right");
+    options.UP      = getbutton("Press Up");
+    options.DOWN    = getbutton("Press Down");
+    options.LEFT    = getbutton("Press Left");
+    options.RIGHT   = getbutton("Press Right");
 
-    options.A=getbutton     ("Press A");
-    options.B=getbutton     ("Press B");
+    options.A       = getbutton("Press A");
+    options.B       = getbutton("Press B");
 
-    options.START=getbutton ("Press Start");
-    options.SELECT=getbutton("Press Select");
+    options.START   = getbutton("Press Start");
+    options.SELECT  = getbutton("Press Select");
 
-    options.MENU=getbutton  ("Press Menu");
+    options.MENU    = getbutton("Press Menu");
 }
 
 /*
@@ -79,6 +80,8 @@ int do_user_menu(void) {
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
+
+    backlight_use_settings();
 
     /* Clean out the button Queue */
     while (rb->button_get(false) != BUTTON_NONE) 
@@ -127,6 +130,9 @@ int do_user_menu(void) {
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
+
+    /* ignore backlight time out */
+    backlight_force_on();
 
     return ret;
 }
