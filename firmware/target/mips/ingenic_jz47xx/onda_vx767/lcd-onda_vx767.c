@@ -71,7 +71,12 @@ static void _display_pin_init(void)
          __gpio_set_pin(PIN_UNK_N); \
          SLCD_SET_DATA(val); \
          WAIT_ON_SLCD;
-         
+
+/* Note: this has been confirmed non-working
+ * and needs some tweaking from a VX767 owner.
+ * (this was reverse engineered from the OF so
+ * "should" be correct) */
+
 static void _display_init(void)
 {
     int i;
