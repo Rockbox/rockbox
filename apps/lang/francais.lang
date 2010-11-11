@@ -12601,3 +12601,20 @@
     *: "Démarrer la navigation fichiers à la racine"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Puissance du signal:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Puissance du signal:"
+  </voice>
+</phrase>
