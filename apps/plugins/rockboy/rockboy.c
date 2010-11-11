@@ -57,277 +57,277 @@ void *my_malloc(size_t size)
 
 static void setoptions (void)
 {
-   int fd;
-   DIR* dir;
-   char optionsave[sizeof(savedir)+sizeof(optionname)];
+    int fd;
+    DIR* dir;
+    char optionsave[sizeof(savedir)+sizeof(optionname)];
 
     dir=rb->opendir(savedir);
     if(!dir)
-      rb->mkdir(savedir);
+        rb->mkdir(savedir);
     else
-      rb->closedir(dir);
+        rb->closedir(dir);
 
-   snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
+    snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 
     fd = open(optionsave, O_RDONLY);
     if(fd < 0) /* no options to read, set defaults */
     {
 #ifdef HAVE_TOUCHSCREEN
-        options.LEFT=BUTTON_MIDLEFT;
-        options.RIGHT=BUTTON_MIDRIGHT;
+        options.LEFT    = BUTTON_MIDLEFT;
+        options.RIGHT   = BUTTON_MIDRIGHT;
 #else
-        options.LEFT=BUTTON_LEFT;
-        options.RIGHT=BUTTON_RIGHT;
+        options.LEFT    = BUTTON_LEFT;
+        options.RIGHT   = BUTTON_RIGHT;
 #endif
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_ON;
-        options.B=BUTTON_OFF;
-        options.START=BUTTON_REC;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MODE;
+        options.A       = BUTTON_ON;
+        options.B       = BUTTON_OFF;
+        options.START   = BUTTON_REC;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_MODE;
 
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_REC;
-        options.B=BUTTON_MODE;
-        options.START=BUTTON_ON;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_OFF;
+        options.A       = BUTTON_REC;
+        options.B       = BUTTON_MODE;
+        options.START   = BUTTON_ON;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_OFF;
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_F1;
-        options.B=BUTTON_F2;
-        options.START=BUTTON_F3;
-        options.SELECT=BUTTON_PLAY;
-        options.MENU=BUTTON_OFF;
+        options.A       = BUTTON_F1;
+        options.B       = BUTTON_F2;
+        options.START   = BUTTON_F3;
+        options.SELECT  = BUTTON_PLAY;
+        options.MENU    = BUTTON_OFF;
 
 #elif CONFIG_KEYPAD == IPOD_4G_PAD
-        options.UP=BUTTON_MENU;
-        options.DOWN=BUTTON_PLAY;
+        options.UP      = BUTTON_MENU;
+        options.DOWN    = BUTTON_PLAY;
 
-        options.A=BUTTON_NONE;
-        options.B=BUTTON_NONE;
-        options.START=BUTTON_SELECT;
-        options.SELECT=BUTTON_NONE;
-        options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+        options.A       = BUTTON_NONE;
+        options.B       = BUTTON_NONE;
+        options.START   = BUTTON_SELECT;
+        options.SELECT  = BUTTON_NONE;
+        options.MENU    = (BUTTON_SELECT | BUTTON_REPEAT);
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_PLAY;
-        options.B=BUTTON_EQ;
-        options.START=BUTTON_MODE;
-        options.SELECT=(BUTTON_SELECT | BUTTON_REL);
-        options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_EQ;
+        options.START   = BUTTON_MODE;
+        options.SELECT  = (BUTTON_SELECT | BUTTON_REL);
+        options.MENU    = (BUTTON_SELECT | BUTTON_REPEAT);
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_VOL_UP;
-        options.B=BUTTON_VOL_DOWN;
-        options.START=BUTTON_A;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MENU;
-      
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_A;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_MENU;
+
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_SELECT;
-        options.B=BUTTON_REC;
-        options.START=BUTTON_SCROLL_BACK;
-        options.SELECT=BUTTON_SCROLL_FWD;
-        options.MENU=BUTTON_POWER;
+        options.A       = BUTTON_SELECT;
+        options.B       = BUTTON_REC;
+        options.START   = BUTTON_SCROLL_BACK;
+        options.SELECT  = BUTTON_SCROLL_FWD;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_SELECT;
-        options.B=BUTTON_HOME;
-        options.START=BUTTON_SCROLL_BACK;
-        options.SELECT=BUTTON_SCROLL_FWD;
-        options.MENU=BUTTON_POWER;
+        options.A       = BUTTON_SELECT;
+        options.B       = BUTTON_HOME;
+        options.START   = BUTTON_SCROLL_BACK;
+        options.SELECT  = BUTTON_SCROLL_FWD;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_SELECT;
-        options.B=BUTTON_REC;
-        options.START=BUTTON_VOL_DOWN;
-        options.SELECT=BUTTON_VOL_UP;
-        options.MENU=BUTTON_POWER;
+        options.A       = BUTTON_SELECT;
+        options.B       = BUTTON_REC;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_SELECT;
-        options.B=BUTTON_HOME;
-        options.START=BUTTON_VOL_DOWN;
-        options.SELECT=BUTTON_VOL_UP;
-        options.MENU=BUTTON_POWER;
+        options.A       = BUTTON_SELECT;
+        options.B       = BUTTON_HOME;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_PLAY;
-        options.B=BUTTON_REC;
-        options.START=BUTTON_SELECT;
-        options.SELECT=BUTTON_NONE;
-        options.MENU=BUTTON_POWER;  
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_REC;
+        options.START   = BUTTON_SELECT;
+        options.SELECT  = BUTTON_NONE;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-        options.UP=BUTTON_SCROLL_UP;
-        options.DOWN=BUTTON_SCROLL_DOWN;
+        options.UP      = BUTTON_SCROLL_UP;
+        options.DOWN    = BUTTON_SCROLL_DOWN;
 
-        options.A=BUTTON_PLAY;
-        options.B=BUTTON_FF;
-        options.START=BUTTON_REW;
-        options.SELECT=BUTTON_NONE;
-        options.MENU=BUTTON_POWER;
-        
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_FF;
+        options.START   = BUTTON_REW;
+        options.SELECT  = BUTTON_NONE;
+        options.MENU    = BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == MROBE500_PAD
-        options.MENU=BUTTON_POWER;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == COWON_D2_PAD
-        options.A=BUTTON_PLUS;
-        options.B=BUTTON_MINUS;
-        options.MENU=BUTTON_MENU;
+        options.A       = BUTTON_PLUS;
+        options.B       = BUTTON_MINUS;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_VOL_UP;
-        options.B=BUTTON_VOL_DOWN;
-        options.START=BUTTON_PLAY;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MENU;
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_PLAY;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_MENU;
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_CUSTOM;
-        options.B=BUTTON_PLAY;
-        options.START=BUTTON_BACK;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MENU;
+        options.A       = BUTTON_CUSTOM;
+        options.B       = BUTTON_PLAY;
+        options.START   = BUTTON_BACK;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_VOL_UP;
-        options.B=BUTTON_VOL_DOWN;
-        options.START=BUTTON_VIEW;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MENU;
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_VIEW;
+        options.SELECT  = BUTTON_SELECT;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-		options.UP=BUTTON_UP;
-		options.DOWN=BUTTON_DOWN;
-		options.A=BUTTON_VOL_UP;
-		options.B=BUTTON_VOL_DOWN;
-		options.START=BUTTON_NEXT;
-		options.SELECT=BUTTON_PLAY;
-		options.MENU=BUTTON_MENU;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_NEXT;
+        options.SELECT  = BUTTON_PLAY;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_VOL_UP;
-        options.B=BUTTON_VOL_DOWN;
-        options.START=BUTTON_RIGHT;
-        options.SELECT=BUTTON_LEFT;
-        options.MENU=BUTTON_MENU;
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_RIGHT;
+        options.SELECT  = BUTTON_LEFT;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == ONDAVX747_PAD
-        options.A=BUTTON_VOL_UP;
-        options.B=BUTTON_VOL_DOWN;
-        options.MENU=BUTTON_MENU;  
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.MENU    = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
-        options.MENU=BUTTON_POWER;
+        options.MENU    = BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_PLAY;
-        options.B=BUTTON_FFWD;
-        options.START=BUTTON_REW;
-        options.SELECT=BUTTON_RIGHT;
-        options.MENU=BUTTON_LEFT;
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_FFWD;
+        options.START   = BUTTON_REW;
+        options.SELECT  = BUTTON_RIGHT;
+        options.MENU    = BUTTON_LEFT;
 
 #elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
 
-        options.A=BUTTON_PLAY;
-        options.B=BUTTON_REW;
-        options.START=BUTTON_REC;
-        options.SELECT=BUTTON_FFWD;
-        options.MENU=BUTTON_NONE;        
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_REW;
+        options.START   = BUTTON_REC;
+        options.SELECT  = BUTTON_FFWD;
+        options.MENU    = BUTTON_NONE;
 
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-        options.UP=      BUTTON_OK;
-        options.DOWN=    BUTTON_CANCEL;
-        options.LEFT=    BUTTON_PREV;
-        options.RIGHT=   BUTTON_NEXT;
+        options.UP     = BUTTON_OK;
+        options.DOWN   = BUTTON_CANCEL;
+        options.LEFT   = BUTTON_PREV;
+        options.RIGHT  = BUTTON_NEXT;
 
-        options.A=       BUTTON_POWER;
-        options.B=       BUTTON_REC;
-        options.START=   BUTTON_PLAY;
-        options.SELECT=  BUTTON_UP;
-        options.MENU=    BUTTON_MENU;
+        options.A      = BUTTON_POWER;
+        options.B      = BUTTON_REC;
+        options.START  = BUTTON_PLAY;
+        options.SELECT = BUTTON_UP;
+        options.MENU   = BUTTON_MENU;
 
 #else
 #error No Keymap Defined!
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-        options.UP=BUTTON_TOPMIDDLE;
-        options.DOWN=BUTTON_BOTTOMMIDDLE;
-        options.START=BUTTON_TOPRIGHT;
-        options.SELECT=BUTTON_CENTER;
+        options.UP      = BUTTON_TOPMIDDLE;
+        options.DOWN    = BUTTON_BOTTOMMIDDLE;
+        options.START   = BUTTON_TOPRIGHT;
+        options.SELECT  = BUTTON_CENTER;
 #if CONFIG_KEYPAD == MROBE500_PAD
-        options.A=BUTTON_BOTTOMLEFT;
-        options.B=BUTTON_BOTTOMRIGHT;
+        options.A       = BUTTON_BOTTOMLEFT;
+        options.B       = BUTTON_BOTTOMRIGHT;
 #elif CONFIG_KEYPAD != COWON_D2_PAD
-        options.A=BUTTON_BOTTOMLEFT;
-        options.B=BUTTON_BOTTOMRIGHT;
-        options.MENU=BUTTON_TOPLEFT;
+        options.A       = BUTTON_BOTTOMLEFT;
+        options.B       = BUTTON_BOTTOMRIGHT;
+        options.MENU    = BUTTON_TOPLEFT;
 #endif
 #endif
 
-      options.maxskip=4;
-      options.fps=0;
-      options.showstats=0;
+        options.maxskip=4;
+        options.fps=0;
+        options.showstats=0;
 #if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
-      options.scaling=0;
+        options.scaling=0;
 #else
-      options.scaling=1;
+        options.scaling=1;
 #endif
-      options.sound=1;
-      options.pal=0;
-   }
-   else
-      read(fd,&options, sizeof(options));
+        options.sound=1;
+        options.pal=0;
+    }
+    else
+        read(fd,&options, sizeof(options));
 
     close(fd);
 }
@@ -443,7 +443,7 @@ enum plugin_status plugin_start(const void* parameter)
     }
     if(!rb->audio_status())
         rockboy_pcm_close();
-        
+
     rb->splash(HZ/2, "Closing Rockboy");
 
     savesettings();
