@@ -1124,7 +1124,7 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     char* imgbuf = (char*)skin_buffer_alloc(buf_size);
     if (!imgbuf)
     {
-        DEBUGF("Not enough skin buffer: need %ld more.\n", 
+        DEBUGF("Not enough skin buffer: need %zd more.\n", 
                 buf_size - skin_buffer_freespace());
         close(fd);
         return NULL;
