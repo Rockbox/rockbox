@@ -296,6 +296,8 @@ void skin_error_format_message()
 {
     int i;
     char text[128];
+    if (!error_line_start)
+        return;
     char* line_end = strchr(error_line_start, '\n');
     int len = MIN(line_end - error_line_start, 80);
     if (!line_end)

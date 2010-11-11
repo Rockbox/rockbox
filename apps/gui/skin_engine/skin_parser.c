@@ -1115,12 +1115,17 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
 
     fd = open(img_path, O_RDONLY);
     if (fd < 0)
+    {
+        DEBUGF("Couldn't open %s\n", img_path);
         return false;
+    }
     size_t buf_size = read_bmp_fd(fd, bitmap, 0, 
                                     format|FORMAT_RETURN_SIZE, NULL);  
     char* imgbuf = (char*)skin_buffer_alloc(buf_size);
     if (!imgbuf)
     {
+        DEBUGF("Not enough skin buffer: need %ld more.\n", 
+                buf_size - skin_buffer_freespace());
         close(fd);
         return NULL;
     }
