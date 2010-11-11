@@ -11,7 +11,7 @@
 #include "rtc-gb.h"
 #include "pcm.h"
 
-#define MAX_SLOTS   5
+#define SLOT_COUNT  50
 #define DESC_SIZE   20
 
 /* load/save state function declarations */
@@ -169,7 +169,7 @@ static void build_slot_path(char *buf, size_t bufsiz, int slot_id) {
  *
  * Returns true on success and false on failure.
  *
- * @desc is a brief user-provided description (<20 bytes) of the state.
+ * @desc is a brief user-provided description of the state.
  * If no description is provided, set @desc to NULL.
  *
  */
@@ -215,35 +215,11 @@ static bool do_file(char *path, char *desc, bool is_load) {
     return true;
 }
 
-/*
- * do_slot - load or save game data in the given slot
- *
- * Returns true on success and false on failure.
- */
-static bool do_slot(int slot_id, bool is_load) {
-    char path_buf[256], desc_buf[DESC_SIZE];
-  
-    /* build slot filename, clear desc buf */
-    build_slot_path(path_buf, sizeof(path_buf), slot_id);
-    memset(desc_buf, 0, sizeof(desc_buf));
-
-    /* if we're saving to a slot, then get a brief description */
-    if (!is_load)
-    {
-        if ( rb->kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
-            return false;
-        if ( !strlen(desc_buf) )
-            strlcpy(desc_buf, "Untitled", sizeof(desc_buf));
-    }
-
-    /* load/save file */
-    return do_file(path_buf, desc_buf, is_load);
-}
-
 /* 
  * get information on the given slot
  */
-static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id) {
+static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id,
+                        bool number) {
     char buf[256];
     int fd;
 
@@ -259,16 +235,42 @@ static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id) {
             buf[DESC_SIZE] = '\0';
             strlcpy(info_buf, buf, info_bufsiz);
         }
-        else
+        else if(number)
             strlcpy(info_buf, "ERROR", info_bufsiz);
 
         close(fd);
     }
-    else
+    else if(number)
     {
         /* if we couldn't open the file, then the slot is empty */
         strlcpy(info_buf, "<Empty>", info_bufsiz);
     }
+}
+
+/*
+ * do_slot - load or save game data in the given slot
+ *
+ * Returns true on success and false on failure.
+ */
+static bool do_slot(int slot_id, bool is_load) {
+    char path_buf[256], desc_buf[DESC_SIZE];
+  
+    /* build slot filename, clear desc buf */
+    build_slot_path(path_buf, sizeof(path_buf), slot_id);
+    memset(desc_buf, 0, sizeof(desc_buf));
+
+    /* if we're saving to a slot, then get a brief description */
+    if (!is_load)
+    {
+        slot_info(desc_buf, sizeof(desc_buf), slot_id, false);
+        if ( rb->kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
+            return false;
+        if ( !strlen(desc_buf) )
+            strlcpy(desc_buf, "Untitled", sizeof(desc_buf));
+    }
+
+    /* load/save file */
+    return do_file(path_buf, desc_buf, is_load);
 }
 
 /* 
@@ -299,17 +301,16 @@ static int list_action_callback(int action, struct gui_synclist *lists)
  */
 static void do_slot_menu(bool is_load) {
     bool done=false;
-    char items[MAX_SLOTS][DESC_SIZE];
+    char items[SLOT_COUNT][DESC_SIZE];
     int result;
     int i;
-    int num_items = sizeof(items) / sizeof(*items);
     struct simplelist_info info;
 
     /* create menu items */
-    for (i = 0; i < num_items; i++)
-        slot_info(items[i], sizeof(*items), i);
+    for (i = 0; i < SLOT_COUNT; i++)
+        slot_info(items[i], sizeof(*items), i, true);
 
-    rb->simplelist_info_init(&info, NULL, num_items, (void *)items);
+    rb->simplelist_info_init(&info, NULL, SLOT_COUNT, (void *)items);
     info.get_name = slot_get_name;
     info.action_callback = list_action_callback;
 
@@ -319,7 +320,7 @@ static void do_slot_menu(bool is_load) {
             break;
 
         result = info.selection;
-        if (result<num_items && result >= 0 )
+        if (result<SLOT_COUNT && result >= 0 )
             done = do_slot(result, is_load);
         else
             done = true;
@@ -384,13 +385,16 @@ static void do_opt_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(menu, "Options", NULL,
-                        "Max Frameskip", "Sound", "Stats", "Set Keys (Buggy)",
+                        "Max Frameskip", "Sound", "Volume", "Stats", "Set Keys (Buggy)",
 #ifdef HAVE_LCD_COLOR
                         "Screen Size", "Screen Rotate", "Set Palette",
 #endif
                         );
 
     options.dirty=1; /* Assume that the settings have been changed */
+
+    struct viewport *parentvp = NULL;
+    const struct settings_list* vol = rb->find_setting(&rb->global_settings->volume, NULL);
 
     while(!done)
     {
@@ -407,24 +411,27 @@ static void do_opt_menu(void)
                 rb->set_option("Sound", &options.sound, INT, onoff, 2, NULL );
                 if(options.sound) sound_dirty();
                 break;
-            case 2: /* Stats */
+            case 2: /* Volume */
+                rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
+                break;
+            case 3: /* Stats */
                 rb->set_option("Stats", &options.showstats, INT, onoff, 2, NULL );
                 break;
-            case 3: /* Keys */
+            case 4: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR
-            case 4: /* Screen Size */
+            case 5: /* Screen Size */
                 rb->set_option("Screen Size", &options.scaling, INT, scaling,
                     sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
-            case 5: /* Screen rotate */
+            case 6: /* Screen rotate */
                 rb->set_option("Screen Rotate", &options.rotate, INT, rotate,
                     sizeof(rotate)/sizeof(*rotate), NULL );
                 setvidmode();
                 break;
-            case 6: /* Palette */
+            case 7: /* Palette */
                 rb->set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
                 set_pal();
                 break;
