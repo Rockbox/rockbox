@@ -52,22 +52,6 @@ Java_org_rockbox_RockboxTimer_timerTask(JNIEnv *env, jobject this)
     call_tick_tasks();
 }
 
-JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxTimer_postCallIncoming(JNIEnv *env, jobject this)
-{
-    (void)env;
-    (void)this;
-    queue_broadcast(SYS_CALL_INCOMING, 0);
-}
-
-JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxTimer_postCallHungUp(JNIEnv *env, jobject this)
-{
-    (void)env;
-    (void)this;
-    queue_broadcast(SYS_CALL_HUNG_UP, 0);
-}
-
 void tick_start(unsigned int interval_in_ms)
 {
     JNIEnv e = *env_ptr;
@@ -76,7 +60,7 @@ void tick_start(unsigned int interval_in_ms)
     jmethodID constructor = e->GetMethodID(env_ptr,
                                            RockboxTimer_class,
                                            "<init>",
-                                           "(Lorg/rockbox/RockboxService;J)V");
+                                           "(Landroid/content/Context;J)V");
     /* the constructor will do the tick_start */
     RockboxTimer_instance = e->NewObject(env_ptr,
                                          RockboxTimer_class,

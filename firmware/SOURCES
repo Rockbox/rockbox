@@ -1714,6 +1714,7 @@ target/hosted/android/kernel-android.c
 target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c
 target/hosted/android/system-android.c
+target/hosted/android/telephony-android.c
 #ifdef APPLICATION
 target/hosted/android/app/button-application.c
 #endif

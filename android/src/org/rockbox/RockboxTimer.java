@@ -25,57 +25,32 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class RockboxTimer extends Timer 
-{
-    RockboxTimerTask task;
-    long interval;
-    
+{    
     private class RockboxTimerTask extends TimerTask {
         private RockboxTimer timer;
-        private TelephonyManager tm;
-        private int last_state;
-        public RockboxTimerTask(RockboxService s, RockboxTimer parent) 
+        public RockboxTimerTask(RockboxTimer parent) 
         {
             super();
             timer = parent;
-            tm = (TelephonyManager)s.getSystemService(Context.TELEPHONY_SERVICE);
-            last_state = tm.getCallState();
         }
 
         @Override
         public void run() 
         {
             timerTask();
-            int state = tm.getCallState();
-            if (state != last_state)
-            {
-                switch (state) 
-                {
-                    case TelephonyManager.CALL_STATE_IDLE:
-                        postCallHungUp();
-                        break;
-                    case TelephonyManager.CALL_STATE_RINGING:
-                        postCallIncoming();
-                    default:
-                        break;
-                }
-                last_state = state;
-            }
             synchronized(timer) { 
                 timer.notify(); 
             }
         }
     }
     
-    public RockboxTimer(RockboxService instance, long period_inverval_in_ms)
+    public RockboxTimer(Context c, long period_inverval_in_ms)
     {
         super("tick timer");
-        task = new RockboxTimerTask(instance, this);
-        schedule(task, 0, period_inverval_in_ms);
-        interval = period_inverval_in_ms;
+        schedule(new RockboxTimerTask(this), 0, period_inverval_in_ms);
     }
 
     @SuppressWarnings("unused")
@@ -98,6 +73,4 @@ public class RockboxTimer extends Timer
         }
     }
     public native void timerTask();
-    private native void postCallIncoming();
-    private native void postCallHungUp();
 }

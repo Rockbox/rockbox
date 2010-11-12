@@ -24,10 +24,6 @@
 #include "config.h"
 #include "system.h"
 
-void system_exception_wait(void) { }
-void system_reboot(void) { }
-void power_off(void) { }
-void system_init(void) { }
 
 
 /* global fields for use with various JNI calls */
@@ -40,6 +36,21 @@ uintptr_t *stackend;
 
 extern int main(void);
 extern void powermgmt_init_target(void);
+extern void telephony_init_device(void);
+
+void system_exception_wait(void) { }
+void system_reboot(void) { }
+void power_off(void) { }
+
+void system_init(void)
+{
+    /* no better place yet, most of powermgmt.c is #ifdef'd out for non-native
+     * builds */
+    powermgmt_init_target();
+    /* also no better place yet */
+    telephony_init_device();
+}
+
 /* this is the entry point of the android app initially called by jni */
 JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
@@ -57,8 +68,5 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     RockboxService_instance = this;
     RockboxService_class = (*env)->GetObjectClass(env, this);
 
-    /* no better place yet, most of powermgmt.c is #ifdef'd out for non-native
-     * builds */
-    powermgmt_init_target();
     main();
 }
