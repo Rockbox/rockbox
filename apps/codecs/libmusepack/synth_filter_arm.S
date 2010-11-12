@@ -164,7 +164,7 @@ mpc_decoder_windowing_D:
      * r10 = lo, r11 = hi of 31..17
      * r12 = V[31..16]
      *****************************************/
-    mov lr, #15
+    mov lr, #15*8
     add r12, r1, #30*4          /* r12 = V[31] */
 .loop15:
     ldmia r2!, { r3-r6 }        /* load D[00..03] */
@@ -238,21 +238,19 @@ mpc_decoder_windowing_D:
     /* store Data[01..15] */
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
-    str r8, [r0]                /* store Data */
     /* store Data[31..17] */
-    add r0, r0, lr, asl #3      /* r0 = r0 + 2*lr [words] */
     mov r10, r10, lsr #16
     orr r10, r10, r11, lsl #16  /* (lo>>16) || (hi<<16) */
     rsb r10, r10, #0            /* r10 = -r10 */
-    str r10, [r0], #4           /* store Data */
-    sub r0, r0, lr, asl #3      /* r0 = r0 - 2*lr [words] */
+    str r10, [r0, lr]           /* store Data */
+    str r8, [r0], #4            /* store Data */
     /* correct adresses for next loop */
     sub r12, r12, #4            /* r12 = V-- */
     add r1, r1, #4              /* r1  = V++ */
     /* next loop */
-    subs lr, lr, #1
+    subs lr, lr, #8
     bgt .loop15
-    
+
     /******************************************
      * V[16] with internal symmetry
      *****************************************/
@@ -293,7 +291,6 @@ mpc_decoder_windowing_D:
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
     str r8, [r0], #4            /* store Data */
-    add r1, r1, #4              /* V++ */
     
     ldmpc regs=r4-r11
 #elif ARM_ARCH < 6 /* arm9 and above */
@@ -365,7 +362,7 @@ mpc_decoder_windowing_D:
      * r10 = lo, r11 = hi of 31..17
      * r12 = V[31..16]
      *****************************************/
-    mov lr, #15
+    mov lr, #15*8
     add r12, r1, #30*4          /* r12 = V[31] */
 .loop15:
     ldmia r2!, { r3-r4 }        /* load D[00..01] */
@@ -443,19 +440,17 @@ mpc_decoder_windowing_D:
     /* store Data[01..15] */
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
-    str r8, [r0]                /* store Data */
     /* store Data[31..17] */
-    add r0, r0, lr, asl #3      /* r0 = r0 + 2*lr [words] */
     mov r10, r10, lsr #16
     orr r10, r10, r11, lsl #16  /* (lo>>16) || (hi<<16) */
     rsb r10, r10, #0            /* r10 = -r10 */
-    str r10, [r0], #4           /* store Data */
-    sub r0, r0, lr, asl #3      /* r0 = r0 - 2*lr [words] */
+    str r10, [r0, lr]           /* store Data */
+    str r8, [r0], #4            /* store Data */
     /* correct adresses for next loop */
     sub r12, r12, #4            /* r12 = V-- */
     add r1, r1, #4              /* r1  = V++ */
     /* next loop */
-    subs lr, lr, #1
+    subs lr, lr, #8
     bgt .loop15
     
     /******************************************
@@ -498,7 +493,6 @@ mpc_decoder_windowing_D:
     mov r8, r8, lsr #16
     orr r8, r8, r9, lsl #16     /* (lo>>16) || (hi<<16) */
     str r8, [r0], #4            /* store Data */
-    add r1, r1, #4              /* V++ */
     
     ldmpc regs=r4-r11
 #else
@@ -645,11 +639,10 @@ mpc_decoder_windowing_D:
     rsb r11, r11, #0            /* r11 = -r11 */
     /* store Data[01..15] */
     mov r9, r9, lsl #2
-    str r9, [r0]                /* store Data */
     /* store Data[31..17] */
     mov r11, r11, lsl #2
     str r11, [r0, lr]           /* store Data */
-    add r0, r0, #4              /* r0++ */
+    str r9, [r0], #4            /* store Data */
     /* next loop */
     subs lr, lr, #8
     bgt .loop15
