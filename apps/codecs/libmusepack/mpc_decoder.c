@@ -525,7 +525,8 @@ void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r)
     for ( n = 0; n < Max_used_Band; n++ ) {
         mpc_int16_t *q = d->Q[n].L, Res = d->Res_L[n];
         do {
-            mpc_int32_t k;
+            mpc_uint32_t nbit;
+            mpc_int32_t k, dc;
             const mpc_lut_data *Table;
             switch (Res) {
                 case  -2: case  -3: case  -4: case  -5: case  -6: case  -7: case  -8: case  -9:
@@ -564,8 +565,10 @@ void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r)
                         q[k] = mpc_bits_huff_lut(r, Table);
                     break;
                 case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15: case 16: case 17:
+                    nbit = Res_bit[Res];
+                    dc   = Dc[Res];
                     for ( k = 0; k < 36; k++ )
-                        q[k] = (mpc_int32_t)mpc_bits_read(r, Res_bit[Res]) - Dc[Res];
+                        q[k] = (mpc_int32_t)mpc_bits_read(r, nbit) - dc;
                     break;
                 default:
                     return;
@@ -683,7 +686,8 @@ void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r, mpc_bo
         mpc_int16_t *q = d->Q[n].L, Res = d->Res_L[n];
         static const int thres[] = {0, 0, 3, 0, 0, 1, 3, 4, 8};
         do {
-            mpc_int32_t k = 0, idx = 1;
+            mpc_uint32_t nbit;
+            mpc_int32_t k = 0, idx = 1, dc;
             if (Res != 0) {
                 if (Res == 2) {
                     Tables[0] = & mpc_can_Q [0][0];
@@ -736,12 +740,19 @@ void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r, mpc_bo
                         q[k] = mpc_bits_can_dec(r, Tables[idx > thres[Res]]);
                         idx = (idx >> 1) + absi(q[k]);
                     }
-                } else {
+                } else if (Res == 9) {
+                    dc = Dc[Res];
                     for ( ; k < 36; k++ ) {
                         q[k] = (unsigned char) mpc_bits_can_dec(r, & mpc_can_Q9up);
-                        if (Res != 9)
-                            q[k] = (q[k] << (Res - 9)) | mpc_bits_read(r, Res - 9);
-                        q[k] -= Dc[Res];
+                        q[k] -= dc;
+                    }
+                } else {
+                    nbit = (Res - 9);
+                    dc = Dc[Res];
+                    for ( ; k < 36; k++ ) {
+                        q[k] = (unsigned char) mpc_bits_can_dec(r, & mpc_can_Q9up);
+                        q[k] = (q[k] << nbit) | mpc_bits_read(r, nbit);
+                        q[k] -= dc;
                     }
                 }
             }
