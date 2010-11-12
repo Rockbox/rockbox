@@ -132,7 +132,10 @@ public class RockboxActivity extends Activity
     {
         super.onPause();
         if (rbservice != null)
+        {
         	rbservice.set_activity(null);
+        	rbservice.get_fb().dispatchWindowVisibilityChanged(View.INVISIBLE);
+        }
     }
     
     @Override
