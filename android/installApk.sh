@@ -1,7 +1,7 @@
 #!/bin/sh
 ADB="$ANDROID_SDK_PATH/tools/adb"
 
-if [ "$1" == "-r" ]; then
+if [ "$1" = "-r" ]; then
     echo 'pm uninstall org.rockbox; exit' | $ADB shell
 fi
 $ADB install rockbox.apk
