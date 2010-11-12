@@ -1682,17 +1682,17 @@ target/arm/usb-fw-pp502x.c
 #ifdef MPIO_HD200
 #ifndef SIMULATOR
 /* TODO: currently including all files */
-target/coldfire/mpio/hd200/adc-hd200.c
+target/coldfire/ata-as-coldfire.S
+target/coldfire/mpio/system-mpio.c
+target/coldfire/mpio/power-mpio.c
+target/coldfire/mpio/backlight-mpio.c
+target/coldfire/mpio/usb-mpio.c
+target/coldfire/mpio/ata-mpio.c
+target/coldfire/mpio/adc-mpio.c
 target/coldfire/mpio/hd200/button-hd200.c
 target/coldfire/mpio/hd200/lcd-hd200.c
 target/coldfire/mpio/hd200/lcd-as-hd200.S
-target/coldfire/mpio/hd200/power-hd200.c
 target/coldfire/mpio/hd200/powermgmt-hd200.c
-target/coldfire/mpio/hd200/backlight-hd200.c
-target/coldfire/mpio/hd200/system-hd200.c
-target/coldfire/mpio/hd200/usb-hd200.c
-target/coldfire/mpio/ata-mpio.c
-target/coldfire/ata-as-coldfire.S
 #ifndef BOOTLOADER
 target/coldfire/mpio/audio-mpio.c
 target/coldfire/wmcodec-coldfire.c
