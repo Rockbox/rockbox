@@ -66,9 +66,9 @@
    // by the correct amount to have proper scaled output
    #define D(value)  MAKE_MPC_SAMPLE((double)value*(double)(0x1000))
 #endif
-    
+
 // Di_opt coefficients are +/- 2^17 (pre-shifted by <<16)
-static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
+static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR __attribute__((aligned(16))) = {
 /*           0        1        2         3         4         5          6          7         8         9       10        11       12       13      14     15  */
 /*  0 */  D( 0), -D( 29),  D(213), -D( 459),  D(2037), -D(5153),  D( 6574), -D(37489), D(75038),  D(37489), D(6574),  D(5153), D(2037),  D(459), D(213), D(29),
 /*  1 */ -D( 1), -D( 31),  D(218), -D( 519),  D(2000), -D(5517),  D( 5959), -D(39336), D(74992),  D(35640), D(7134),  D(4788), D(2063),  D(401), D(208), D(26),

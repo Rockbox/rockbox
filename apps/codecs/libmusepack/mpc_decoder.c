@@ -62,8 +62,10 @@ extern const mpc_can_data mpc_can_Q9up;
 
 //Decoder globals (g_Y_L and g_Y_R do not fit into iram for all targets)
 static mpc_decoder g_mpc_decoder                 IBSS_ATTR;
-static MPC_SAMPLE_FORMAT g_Y_L[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM;
-static MPC_SAMPLE_FORMAT g_Y_R[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM;
+static MPC_SAMPLE_FORMAT g_V_L[MPC_V_MEM + 960 ] IBSS_ATTR                __attribute__((aligned(16)));
+static MPC_SAMPLE_FORMAT g_Y_L[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM __attribute__((aligned(16)));
+static MPC_SAMPLE_FORMAT g_V_R[MPC_V_MEM + 960 ] IBSS_ATTR                __attribute__((aligned(16)));
+static MPC_SAMPLE_FORMAT g_Y_R[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM __attribute__((aligned(16)));
 
 //SV7 globals (decoding results for bundled quantizers (3- and 5-step))
 static const mpc_int32_t g_sv7_idx30[] ICONST_ATTR = 
@@ -236,9 +238,13 @@ static void mpc_decoder_setup(mpc_decoder *d)
 
     d->__r1 = 1;
     d->__r2 = 1;
+    d->V_L = g_V_L;
+    d->V_R = g_V_R;
     d->Y_L = g_Y_L;
     d->Y_R = g_Y_R;
-    
+
+    memset(d->V_L, 0, sizeof(g_V_L));
+    memset(d->V_R, 0, sizeof(g_V_R));
     memset(d->Y_L, 0, sizeof(g_Y_L));
     memset(d->Y_R, 0, sizeof(g_Y_R));
 

@@ -87,8 +87,8 @@ struct mpc_decoder_t {
     mpc_uint8_t   SCF_shift[256];
 #endif
 
-    MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960];
-    MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960];
+    MPC_SAMPLE_FORMAT *V_L;
+    MPC_SAMPLE_FORMAT *V_R;
     MPC_SAMPLE_FORMAT *Y_L;
     MPC_SAMPLE_FORMAT *Y_R;
     MPC_SAMPLE_FORMAT SCF[256]; ///< holds adapted scalefactors (for clipping prevention)
