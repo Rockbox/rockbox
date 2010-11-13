@@ -34,19 +34,19 @@
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
 
     Notes:
-    - not all possible PCM sample rates are enabled (no support in codec driver)
     - pcm_play_dma_pause is untested, not sure if implemented the right way
     - pcm_play_dma_stop is untested, not sure if implemented the right way
     - recording is not implemented
 */
 
 static volatile int locked = 0;
+static const int zerosample = 0;
+static unsigned char dblbuf[1024];
+static const unsigned char* queuedbuf;
+static size_t queuedsize;
+static const unsigned char* nextbuf;
 static size_t nextsize;
-static size_t dblbufsize;
-static int dmamode;
-static const unsigned char* dblbuf;
 
-/* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
 static const struct div_entry {
     int             pdiv, mdiv, sdiv, cdiv;
 } div_table[HW_NUM_FREQ] = {
@@ -55,7 +55,6 @@ static const struct div_entry {
     [HW_FREQ_22] = {   2,   41,    4,    4},
     [HW_FREQ_44] = {   2,   41,    3,    4},
     [HW_FREQ_88] = {   2,   41,    2,    4},
-#if 0   /* disabled because the codec driver does not support it (yet) */
     [HW_FREQ_8 ] = {   2,   12,    3,    9},
     [HW_FREQ_16] = {   2,   12,    2,    9},
     [HW_FREQ_32] = {   2,   12,    1,    9},
@@ -63,8 +62,8 @@ static const struct div_entry {
     [HW_FREQ_24] = {   2,   12,    3,    3},
     [HW_FREQ_48] = {   2,   12,    2,    3},
     [HW_FREQ_96] = {   2,   12,    1,    3},
-#endif
 #else
+/* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
     [HW_FREQ_11] = {  26,  189,    3,    8},
     [HW_FREQ_22] = {  50,   98,    2,    8},
     [HW_FREQ_44] = {  37,  151,    1,    9},
@@ -97,146 +96,50 @@ void pcm_play_unlock(void)
     }
 }
 
-static const void* dma_callback(void) ICODE_ATTR __attribute__((used));
-static const void* dma_callback(void)
+void INT_DMA(void) ICODE_ATTR;
+void INT_DMA(void)
 {
-    if (dmamode)
+    DMACOM0 = 7;
+    while (!(DMACON0 & (1 << 18)))
     {
-        void *dma_start_addr;
-        pcm_play_get_more_callback(&dma_start_addr, &nextsize);
-
-        if (nextsize != 0)
+        if (queuedsize)
         {
-            if (nextsize >= 4096)
-            {
-                dblbufsize = (nextsize >> 4) & ~3;
-                nextsize = nextsize - dblbufsize;
-                dblbuf = dma_start_addr + nextsize;
-                dmamode = 0;
-            }
-            nextsize = (nextsize >> 1) - 1;
-            clean_dcache();
-            return dma_start_addr;
+            memcpy(dblbuf, queuedbuf, queuedsize);
+            DMABASE0 = (unsigned int)dblbuf;
+            DMATCNT0 = queuedsize / 2 - 1;
+            queuedsize = 0;
         }
         else
         {
-            nextsize = -1;
-            return 0;
+            if (!nextsize) pcm_play_get_more_callback((void**)&nextbuf, &nextsize);
+            if (!nextsize) break;
+            queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
+            nextsize -= queuedsize;
+            queuedbuf = nextbuf + nextsize;
+            DMABASE0 = (unsigned int)nextbuf;
+            DMATCNT0 = nextsize / 2 - 1;
+            nextsize = 0;
         }
-    }
-    else
-    {
-        dmamode = 1;
-        nextsize = (dblbufsize >> 1) - 1;
-        return dblbuf;
+        clean_dcache();
+        DMACOM0 = 4;
+        DMACOM0 = 7;
     }
 }
 
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked)) ICODE_ATTR;
-void fiq_handler(void)
+void pcm_play_dma_start(const void* addr, size_t size)
 {
-    asm volatile (
-        "cmn    r11, #1                            \n"
-        "strne  r10, [r8]                          \n"  /* DMABASE0 */
-        "strne  r11, [r8,#0x08]                    \n"  /* DMATCNT0 */
-        "strne  r9, [r8,#0x14]                     \n"  /* DMACOM0 */
-        "moveq  r10, #5                            \n"  /* STOP DMA */
-        "streq  r10, [r8,#0x14]                    \n"  /* DMACOM0 */
-        "mov    r10, #7                            \n"  /* CLEAR IRQ */
-        "str    r10, [r8,#0x14]                    \n"  /* DMACOM0 */
-        "mov    r11, #0x39C00000                   \n"  /* SRCPND */
-        "mov    r10, #0x00000400                   \n"  /* INT_DMA */
-        "str    r10, [r11]                         \n"  /* ACK FIQ */
-        "stmfd  sp!, {r0-r3,lr}                    \n"
-        "bl     dma_callback                       \n"
-        "mov    r10, r0                            \n"
-        "ldmfd  sp!, {r0-r3,lr}                    \n"
-        "ldr    r11, =nextsize                     \n"
-        "ldr    r11, [r11]                         \n"
-        "subs   pc, lr, #4                         \n"
-    );
-}
+    /* DMA channel on */
+    nextbuf = (const unsigned char*)addr;
+    nextsize = size;
+    queuedsize = 0;
+    DMABASE0 = (unsigned int)(&zerosample);
+    DMATCNT0 = 0;
+    DMACOM0 = 4;
 
-void bootstrap_fiq(const void* addr, size_t tcnt) __attribute__((naked,noinline));
-void bootstrap_fiq(const void* addr, size_t tcnt)
-{
-    (void)addr;
-    (void)tcnt;
-    asm volatile (
-        "add    r2, lr, #4        \n"
-        "mrs    r3, cpsr          \n"
-        "msr    cpsr_c, #0xD1     \n"  /* FIQ mode, IRQ/FIQ disabled */
-        "mov    r8, #0x38400000   \n"  /* DMA BASE */
-        "mov    r9, #4            \n"  /* START DMA */
-        "mov    r10, r0           \n"
-        "mov    r11, r1           \n"
-        "mov    r0, #0            \n"
-        "ldr    r12, =fiq_handler \n"
-        "ldr    sp, =_fiqstackend \n"
-        "mov    lr, r2            \n"
-        "msr    spsr_all, r3      \n"
-        "bx     r12               \n"
-    );
-}
-
-void pcm_play_dma_start(const void *addr_in, size_t size)
-{
-    unsigned char* addr = (unsigned char*)addr_in;
-
-    /* S1: DMA channel 0 set */
-    DMACON0 = (0 << 30) |       /* DEVSEL */
-              (1 << 29) |       /* DIR */
-              (0 << 24) |       /* SCHCNT */
-              (1 << 22) |       /* DSIZE */
-              (0 << 19) |       /* BLEN */
-              (0 << 18) |       /* RELOAD */
-              (0 << 17) |       /* HCOMINT */
-              (1 << 16) |       /* WCOMINT */
-              (0 << 0);         /* OFFSET */
-
-#ifdef IPOD_NANO2G
-    PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x77720000;
-    PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
-
-    I2STXCON = (1 << 20) |  /* undocumented */
-               (0 << 16) |  /* burst length */
-               (0 << 15) |  /* 0 = falling edge */
-               (0 << 13) |  /* 0 = basic I2S format */
-               (0 << 12) |  /* 0 = MSB first */
-               (0 << 11) |  /* 0 = left channel for low polarity */
-               (5 << 8) |   /* MCLK divider */
-               (0 << 5) |   /* 0 = 16-bit */
-               (2 << 3) |   /* bit clock per frame */
-               (1 << 0);    /* channel index */
-#else
-    /* S2: IIS Tx mode set */
-    I2STXCON = (DMA_IISOUT_BLEN << 16) |  /* burst length */
-               (0 << 15) |  /* 0 = falling edge */
-               (0 << 13) |  /* 0 = basic I2S format */
-               (0 << 12) |  /* 0 = MSB first */
-               (0 << 11) |  /* 0 = left channel for low polarity */
-               (3 << 8) |   /* MCLK divider */
-               (0 << 5) |   /* 0 = 16-bit */
-               (0 << 3) |   /* bit clock per frame */
-               (1 << 0);    /* channel index */
-#endif
-    
-    /* S3: DMA channel 0 on */
-    clean_dcache();
-    if (size >= 4096)
-    {
-        dblbufsize = (size >> 4) & ~3;
-        size = size - dblbufsize;
-        dblbuf = addr + size;
-        dmamode = 0;
-    }
-    else dmamode = 1;
-    bootstrap_fiq(addr, (size >> 1) - 1);
-
-    /* S4: IIS Tx clock on */
+    /* IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
     
-    /* S5: IIS Tx on */
+    /* IIS Tx on */
     I2STXCOM = (1 << 3) |   /* 1 = transmit mode on */
                (1 << 2) |   /* 1 = I2S interface enable */
                (1 << 1) |   /* 1 = DMA request enable */
@@ -248,9 +151,6 @@ void pcm_play_dma_stop(void)
     /* DMA channel off */
     DMACOM0 = 5;
     
-    /* TODO Some time wait */
-    /* LRCK half cycle wait */
-
     /* IIS Tx off */
     I2STXCOM = (1 << 3) |   /* 1 = transmit mode on */
                (0 << 2) |   /* 1 = I2S interface enable */
@@ -269,37 +169,9 @@ void pcm_play_dma_pause(bool pause)
     }
 }
 
-void pcm_play_dma_init(void)
+static void pcm_dma_set_freq(enum hw_freq_indexes idx)
 {
-    /* configure IIS pins */
-#ifdef IPOD_NANO2G
-    PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x22220000;
-    PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
-#else
-    PCON7 = (PCON7 & ~(0x0FFFFF00)) | 0x02222200;
-#endif
-
-    /* enable clock to the IIS module */
-    PWRCON &= ~(1 << 6);
-
-    /* Enable the DMA FIQ */
-    INTMOD |= (1 << 10);
-    INTMSK |= (1 << 10);
-    
-    audiohw_preinit();
-}
-
-void pcm_postinit(void)
-{
-    audiohw_postinit();
-}
-
-/* set the configured PCM frequency */
-void pcm_dma_apply_settings(void)
-{
-  //    audiohw_set_frequency(pcm_sampr);
-    
-    struct div_entry div = div_table[pcm_fsel];
+    struct div_entry div = div_table[idx];
 
     PLLCON &= ~4;
     PLLCON &= ~0x10;
@@ -322,6 +194,74 @@ void pcm_dma_apply_settings(void)
              (2 << 5) |         /* MCLK_SEL = PLL1 */
              (1 << 4) |         /* MCLK_DIV_ON */
              (div.cdiv - 1);    /* MCLK_DIV_VAL */
+}
+
+void pcm_play_dma_init(void)
+{
+    /* configure IIS pins */
+#ifdef IPOD_NANO2G
+    PCON5 = (PCON5 & ~(0xFFFF0000)) | 0x77720000;
+    PCON6 = (PCON6 & ~(0x0F000000)) | 0x02000000;
+#else
+    PCON7 = (PCON7 & ~(0x0FFFFF00)) | 0x02222200;
+#endif
+
+    /* configure DMA channel */
+    DMACON0 = (0 << 30) |       /* DEVSEL */
+              (1 << 29) |       /* DIR */
+              (0 << 24) |       /* SCHCNT */
+              (1 << 22) |       /* DSIZE */
+              (0 << 19) |       /* BLEN */
+              (0 << 18) |       /* RELOAD */
+              (0 << 17) |       /* HCOMINT */
+              (1 << 16) |       /* WCOMINT */
+              (0 << 0);         /* OFFSET */
+
+    /* Enable the DMA IRQ */
+    INTMSK |= (1 << 10);
+
+    /* setup PLL */
+    pcm_dma_set_freq(HW_FREQ_44);
+    
+    /* enable clock to the IIS module */
+    PWRCON &= ~(1 << 6);
+
+    /* configure IIS core */
+#ifdef IPOD_NANO2G
+    I2STXCON = (1 << 20) |  /* undocumented */
+               (0 << 16) |  /* burst length */
+               (0 << 15) |  /* 0 = falling edge */
+               (0 << 13) |  /* 0 = basic I2S format */
+               (0 << 12) |  /* 0 = MSB first */
+               (0 << 11) |  /* 0 = left channel for low polarity */
+               (5 << 8) |   /* MCLK divider */
+               (0 << 5) |   /* 0 = 16-bit */
+               (2 << 3) |   /* bit clock per frame */
+               (1 << 0);    /* channel index */
+#else
+    I2STXCON = (DMA_IISOUT_BLEN << 16) |  /* burst length */
+               (0 << 15) |  /* 0 = falling edge */
+               (0 << 13) |  /* 0 = basic I2S format */
+               (0 << 12) |  /* 0 = MSB first */
+               (0 << 11) |  /* 0 = left channel for low polarity */
+               (3 << 8) |   /* MCLK divider */
+               (0 << 5) |   /* 0 = 16-bit */
+               (0 << 3) |   /* bit clock per frame */
+               (1 << 0);    /* channel index */
+#endif
+
+    audiohw_preinit();
+}
+
+void pcm_postinit(void)
+{
+    audiohw_postinit();
+}
+
+/* set the configured PCM frequency */
+void pcm_dma_apply_settings(void)
+{
+    pcm_dma_set_freq(pcm_fsel);    
 }
 
 size_t pcm_get_bytes_waiting(void)
