@@ -43,7 +43,7 @@
 /* I/O error has occurred */
 #define PCMREC_E_IO                     0x80008000
 #ifdef DEBUG
-/* encoder has written past end of allotted space */
+/* encoder has written past end of alloccated space */
 #define PCMREC_E_CHUNK_OVF              0x80010000
 #endif /* DEBUG */
 
