@@ -182,8 +182,11 @@ void system_reboot(void)
 #endif
 }
 
+extern void post_mortem_stub(void);
+
 void system_exception_wait(void)
 {
+    post_mortem_stub();
     while(1);
 }
 

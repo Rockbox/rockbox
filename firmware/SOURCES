@@ -1496,6 +1496,7 @@ target/arm/s5l8700/udacodec-meizu.c
 #ifdef IPOD_NANO2G
 #ifndef SIMULATOR
 target/arm/ipod/button-clickwheel.c
+target/arm/s5l8700/postmortemstub.S
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/dma-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
