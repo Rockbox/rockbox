@@ -53,7 +53,15 @@ static unsigned short wm8975_regs[] =
     [LINVOL]   = LINVOL_LZCEN | 23, /* 0dB */
     [RINVOL]   = RINVOL_RIVU | RINVOL_RZCEN | 23, /* 0dB */
     [DAPCTRL]  = DAPCTRL_DACMU,
+/* This reduces the popping noise during codec powerup
+   noticably, especially with high-impedance loads.
+   We might want to change this for all targets,
+   but it has only been tested on iPod Nano 2G so far. */
+#ifdef IPOD_NANO2G
+    [PWRMGMT1] = PWRMGMT1_VMIDSEL_500K | PWRMGMT1_VREF,
+#else
     [PWRMGMT1] = PWRMGMT1_VMIDSEL_5K | PWRMGMT1_VREF,
+#endif
     [PWRMGMT2] = PWRMGMT2_DACL | PWRMGMT2_DACR | PWRMGMT2_LOUT1 
                  | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2,
 };
@@ -126,6 +134,37 @@ static void audiohw_mute(bool mute)
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
+/* This reduces the popping noise during codec powerup
+   noticably, especially with high-impedance loads.
+   We might want to change this for all targets,
+   but it has only been tested on iPod Nano 2G so far. */
+#ifdef IPOD_NANO2G
+void audiohw_preinit(void)
+{
+    wmcodec_write(RESET, RESET_RESET);
+
+    wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
+                         | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
+
+#ifndef IPOD_NANO2G
+    wmcodec_write(SAMPCTRL, WM8975_44100HZ);
+#endif
+
+    wmcodec_write(LOUTMIX1, LOUTMIX1_LD2LO | LOUTMIX1_LI2LOVOL(5));
+    wmcodec_write(ROUTMIX2, ROUTMIX2_RD2RO | ROUTMIX2_RI2ROVOL(5));
+
+    wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
+    wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
+}
+
+void audiohw_postinit(void)
+{
+    wm8975_regs[PWRMGMT1] &= ~PWRMGMT1_VMIDSEL_MASK;
+    wm8975_regs[PWRMGMT1] |= PWRMGMT1_VMIDSEL_50K;
+    wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
+    audiohw_mute(false);
+}
+#else
 void audiohw_preinit(void)
 {
     /* POWER UP SEQUENCE */
@@ -170,7 +209,7 @@ void audiohw_postinit(void)
 {
     audiohw_mute(false);
 }
-
+#endif
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
