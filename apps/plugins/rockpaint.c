@@ -418,7 +418,7 @@ struct incdec_ctx incdec_y = { ROWS, { 1, 4}, true };
 /* Maximum string size allowed for the text tool */
 #define MAX_TEXT 256
 
-typedef union
+union buf
 {
     /* Used by fill and gradient algorithms */
     struct
@@ -452,9 +452,10 @@ typedef union
         int fw_buf[30];
         char fontname_buf[30][MAX_PATH];
     } text;
-} buf;
+};
 
-static buf *buffer;
+static union buf *buffer;
+static bool audio_buf = false;
 
 /* Current filename */
 static char filename[MAX_PATH];
@@ -2530,7 +2531,10 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_PLAYBACK_CONTROL:
-                playback_control( NULL );
+                if (!audio_buf)
+                    playback_control( NULL );
+                else
+                    rb->splash(HZ, "Cannot restart playback");
                 break;
 
             case MAIN_MENU_EXIT:
@@ -2957,19 +2961,20 @@ static int save_bitmap( char *file )
 enum plugin_status plugin_start(const void* parameter)
 {
     size_t buffer_size;
-    buffer = (buf*) (((uintptr_t)rb->plugin_get_buffer(&buffer_size) + 3) & ~3);
+    unsigned char *temp;
+    temp = rb->plugin_get_buffer(&buffer_size);
     if (buffer_size < sizeof(*buffer) + 3)
     {
         /* steal from audiobuffer if plugin buffer is too small */
-        buffer = (buf*)
-             (((uintptr_t)rb->plugin_get_audio_buffer(&buffer_size) + 3) & ~3);
-
+        temp = rb->plugin_get_audio_buffer(&buffer_size);
         if (buffer_size < sizeof(*buffer) + 3)
         {
             rb->splash(HZ, "Not enough memory");
             return PLUGIN_ERROR;
         }
+        audio_buf = true;
     }
+    buffer = (union buf*) (((uintptr_t)temp + 3) & ~3);
 
     rb->lcd_set_foreground(COLOR_WHITE);
     rb->lcd_set_backdrop(NULL);
