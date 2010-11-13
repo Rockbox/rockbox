@@ -2153,8 +2153,6 @@ uint32_t ftl_init(void)
 {
     mutex_init(&ftl_mtx);
     uint32_t i;
-    uint32_t result = 0;
-    uint32_t foundsignature, founddevinfo, blockwiped, repaired, skip;
     if (nand_device_init() != 0) //return 1;
         panicf("FTL: Lowlevel NAND driver init failed!");
     ftl_banks = 0;
@@ -2163,34 +2161,11 @@ uint32_t ftl_init(void)
     ftl_nand_type = nand_get_device_type(0);
     ppb = ftl_nand_type->pagesperblock * ftl_banks;
     syshyperblocks = ftl_nand_type->blocks - ftl_nand_type->userblocks - 0x17;
-    foundsignature = 0;
-    blockwiped = 1;
-    for (i = 0; i < ftl_nand_type->pagesperblock; i++)
-    {
-        result = nand_read_page(0, i, ftl_buffer, NULL, 1, 1);
-        if ((result & 0x11F) == 0)
-        {
-            blockwiped = 0;
-            if (((uint32_t*)ftl_buffer)[0] != 0x41303034) continue;
-            foundsignature = 1;
-            break;
-        }
-        else if ((result & 2) != 2) blockwiped = 0;
-    }
 
-    founddevinfo = ftl_has_devinfo();
-
-    repaired = 0;
-    skip = 0;
-    if (founddevinfo == 0)
+    if (!ftl_has_devinfo())
     {
 	   	DEBUGF("FTL: No DEVICEINFO found!\n");
         return -1;
-    }
-    if (foundsignature != 0 && (result & 0x11F) != 0)
-    {
-        DEBUGF("FTL: Problem with the signature!\n");
-        return -2;
     }
     if (ftl_vfl_open() == 0)
         if (ftl_open() == 0)
@@ -2198,5 +2173,5 @@ uint32_t ftl_init(void)
 
     DEBUGF("FTL: Initialization failed!\n");
 
-    return -3;
+    return -2;
 }
