@@ -204,13 +204,28 @@ int mkdir_uncached(const char *name)
     char *basename;
     char *parent;
     struct dirent_uncached *entry;
-    struct fat_dir newdir;
+    int dd;
+    DIR_UNCACHED* pdir = opendirs;
+    struct fat_dir *newdir;
     int rc;
 
     if ( name[0] != '/' ) {
         DEBUGF("mkdir: Only absolute paths supported right now\n");
         return -1;
     }
+    /* find a free dir descriptor */
+    for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
+        if ( !pdir->busy )
+            break;
+
+    if ( dd == MAX_OPEN_DIRS ) {
+        DEBUGF("Too many dirs open\n");
+        errno = EMFILE;
+        return -5;
+    }
+
+    pdir->busy = true;
+    newdir = &pdir->fatdir;
 
     strlcpy(namecopy, name, sizeof(namecopy));
 
@@ -230,11 +245,13 @@ int mkdir_uncached(const char *name)
     
     if(!dir) {
         DEBUGF("mkdir: can't open parent dir\n");
+        pdir->busy = false;
         return -2;
     }    
 
     if(basename[0] == 0) {
         DEBUGF("mkdir: Empty dir name\n");
+        pdir->busy = false;
         errno = EINVAL;
         return -3;
     }
@@ -245,14 +262,16 @@ int mkdir_uncached(const char *name)
             DEBUGF("mkdir error: file exists\n");
             errno = EEXIST;
             closedir_uncached(dir);
+            pdir->busy = false;
             return - 4;
         }
     }
 
-    memset(&newdir, 0, sizeof(struct fat_dir));
+    memset(newdir, 0, sizeof(struct fat_dir));
     
-    rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
+    rc = fat_create_dir(basename, newdir, &(dir->fatdir));
     closedir_uncached(dir);
+    pdir->busy = false;
     
     return rc;
 }

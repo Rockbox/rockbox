@@ -1967,7 +1967,7 @@ int fat_rename(struct fat_file* file,
                 int attr)
 {
     int rc;
-    struct fat_dir olddir;
+    struct fat_file olddir_file;
     struct fat_file newfile = *file;
     unsigned char* entry = NULL;
     unsigned short* clusptr = NULL;
@@ -1987,11 +1987,6 @@ int fat_rename(struct fat_file* file,
         DEBUGF("File has no dir cluster!\n");
         return -2;
     }
-
-    /* create a temporary file handle */
-    rc = fat_opendir(IF_MV2(file->volume,) &olddir, file->dircluster, NULL);
-    if (rc < 0)
-        return rc * 10 - 1;
 
     /* create new name */
     rc = add_dir_entry(dir, &newfile, newname, false, false);
@@ -2016,18 +2011,17 @@ int fat_rename(struct fat_file* file,
        it points to its parent directory (we don't check if it was a move) */
     if(FAT_ATTR_DIRECTORY == attr) {
         unsigned char buf[SECTOR_SIZE];
-        /* open the dir that was renamed, we re-use the olddir struct */
-        rc = fat_opendir(IF_MV2(file->volume,) &olddir, newfile.firstcluster,
-                                                                          NULL);
+        /* open the dir that was renamed, we re-use the olddir_file struct */
+        rc = fat_open(IF_MV2(volume,) newfile.firstcluster, &olddir_file, NULL);
         if (rc < 0)
             return rc * 10 - 6;
 
         /* get the first sector of the dir */
-        rc = fat_seek(&olddir.file, 0);
+        rc = fat_seek(&olddir_file, 0);
         if (rc < 0)
             return rc * 10 - 7;
 
-        rc = fat_readwrite(&olddir.file, 1, buf, false);
+        rc = fat_readwrite(&olddir_file, 1, buf, false);
         if (rc < 0)
             return rc * 10 - 8;
 
@@ -2051,11 +2045,11 @@ int fat_rename(struct fat_file* file,
         *clusptr = htole16(parentcluster & 0xffff);
 
         /* write back this sector */
-        rc = fat_seek(&olddir.file, 0);
+        rc = fat_seek(&olddir_file, 0);
         if (rc < 0)
             return rc * 10 - 7;
 
-        rc = fat_readwrite(&olddir.file, 1, buf, true);
+        rc = fat_readwrite(&olddir_file, 1, buf, true);
         if (rc < 1)
             return rc * 10 - 8;
     }
