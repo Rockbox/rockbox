@@ -2012,7 +2012,7 @@ int fat_rename(struct fat_file* file,
     if(FAT_ATTR_DIRECTORY == attr) {
         unsigned char buf[SECTOR_SIZE];
         /* open the dir that was renamed, we re-use the olddir_file struct */
-        rc = fat_open(IF_MV2(volume,) newfile.firstcluster, &olddir_file, NULL);
+        rc = fat_open(IF_MV2(file->volume,) newfile.firstcluster, &olddir_file, NULL);
         if (rc < 0)
             return rc * 10 - 6;
 
