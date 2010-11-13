@@ -407,6 +407,14 @@ static fb_data save_buffer[ ROWS*COLS ];
 extern fb_data rockpaint[];
 extern fb_data rockpaint_hsvrgb[];
 
+struct incdec_ctx {
+    int max;
+    int step[2];
+    bool wrap;
+};
+struct incdec_ctx incdec_x = { COLS, { 1, 4}, true };
+struct incdec_ctx incdec_y = { ROWS, { 1, 4}, true };
+
 /* Maximum string size allowed for the text tool */
 #define MAX_TEXT 256
 
@@ -450,6 +458,27 @@ static buf *buffer;
 
 /* Current filename */
 static char filename[MAX_PATH];
+
+static bool incdec_value(int *pval, struct incdec_ctx *ctx, bool inc, bool bigstep)
+{
+    bool of = true;
+    int step = ctx->step[bigstep?1:0];
+    step = inc?step: -step;
+    *pval += step;
+    if (ctx->wrap)
+    {
+        if (*pval < 0) *pval += ctx->max;
+        else if (*pval >= ctx->max) *pval -= ctx->max;
+        else of = false;
+    }
+    else
+    {
+        if (*pval < 0) *pval = 0;
+        else if (*pval > ctx->max) *pval = ctx->max;
+        else of = false;
+    }
+    return of;
+}
 
 /* Font preview buffer */
 //#define FONT_PREVIEW_WIDTH ((LCD_WIDTH-30)/8)
@@ -982,6 +1011,12 @@ static unsigned int color_chooser( unsigned int color )
     int hue, saturation, value;
     int r, g, b; /* temp variables */
     int i, top, left;
+    int button;
+    int *pval;
+    static struct incdec_ctx ctxs[] = {
+        { 3600, { 10, 100}, true },  /* hue */
+        { 0xff, {  1,   8}, false }, /* the others */
+    };
 
     enum BaseColor { Hue = 0, Saturation = 1, Value = 2,
                      Red = 3, Green = 4, Blue = 5 };
@@ -1058,123 +1093,49 @@ static unsigned int color_chooser( unsigned int color )
 
         rb->lcd_update();
 
-        switch( rb->button_get(true) )
+        switch( button = rb->button_get(true) )
         {
             case ROCKPAINT_UP:
                 current = ( current + 5 )%6;
                 break;
 
             case ROCKPAINT_DOWN:
-                current = (current + 1 )%6;
+                current = ( current + 1 )%6;
                 break;
 
             case ROCKPAINT_LEFT:
-                has_changed = true;
-                switch( current )
-                {
-                    case Hue:
-                        hue = ( hue + 3600 - 10 )%3600;
-                        break;
-                    case Saturation:
-                        if( saturation ) saturation--;
-                        break;
-                    case Value:
-                        if( value ) value--;
-                        break;
-                    case Red:
-                        if( red ) red--;
-                        break;
-                    case Green:
-                        if( green ) green--;
-                        break;
-                    case Blue:
-                        if( blue ) blue--;
-                        break;
-                }
-                break;
-
             case ROCKPAINT_LEFT|BUTTON_REPEAT:
-                has_changed = true;
-                switch( current )
-                {
-                    case Hue:
-                        hue = ( hue + 3600 - 100 )%3600;
-                        break;
-                    case Saturation:
-                        if( saturation >= 8 ) saturation-=8;
-                        else saturation = 0;
-                        break;
-                    case Value:
-                        if( value >= 8 ) value-=8;
-                        else value = 0;
-                        break;
-                    case Red:
-                        if( red >= 8 ) red-=8;
-                        else red = 0;
-                        break;
-                    case Green:
-                        if( green >= 8 ) green-=8;
-                        else green = 0;
-                        break;
-                    case Blue:
-                        if( blue >= 8 ) blue-=8;
-                        else blue = 0;
-                        break;
-                }
-                break;
-
             case ROCKPAINT_RIGHT:
-                has_changed = true;
-                switch( current )
-                {
-                    case Hue:
-                        hue = ( hue + 10 )%3600;
-                        break;
-                    case Saturation:
-                        if( saturation < 0xff ) saturation++;
-                        break;
-                    case Value:
-                        if( value < 0xff ) value++;
-                        break;
-                    case Red:
-                        if( red < 0xff ) red++;
-                        break;
-                    case Green:
-                        if( green < 0xff ) green++;
-                        break;
-                    case Blue:
-                        if( blue < 0xff ) blue++;
-                        break;
-                }
-                break;
-
             case ROCKPAINT_RIGHT|BUTTON_REPEAT:
                 has_changed = true;
                 switch( current )
                 {
                     case Hue:
-                        hue = ( hue + 100 )%3600;
+                        pval = &hue;
                         break;
                     case Saturation:
-                        if( saturation < 0xff - 8 ) saturation+=8;
-                        else saturation = 0xff;
+                        pval = &saturation;
                         break;
                     case Value:
-                        if( value < 0xff - 8 ) value+=8;
-                        else value = 0xff;
+                        pval = &value;
                         break;
                     case Red:
-                        if( red < 0xff - 8 ) red+=8;
-                        else red = 0xff;
+                        pval = &red;
                         break;
                     case Green:
-                        if( green < 0xff - 8 ) green+=8;
-                        else green = 0xff;
+                        pval = &green;
                         break;
                     case Blue:
-                        if( blue < 0xff - 8 ) blue+=8;
-                        else blue = 0xff;
+                        pval = &blue;
                         break;
+                    default:
+                        pval = NULL;
+                        break;
+                }
+                if (pval)
+                {
+                    incdec_value(pval, &ctxs[(current != Hue? 1: 0)],
+                        (button&ROCKPAINT_RIGHT), (button&BUTTON_REPEAT));
                 }
                 break;
 
@@ -1549,26 +1510,18 @@ static void draw_text( int x, int y )
                     {
                         case ROCKPAINT_LEFT:
                         case ROCKPAINT_LEFT | BUTTON_REPEAT:
-                            x-=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                            if (x<0) x=COLS-1;
-                            break;
-
                         case ROCKPAINT_RIGHT:
                         case ROCKPAINT_RIGHT | BUTTON_REPEAT:
-                            x+=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                            if (x>=COLS) x=0;
+                            incdec_value(&x, &incdec_x,
+                                (button&ROCKPAINT_RIGHT), (button&BUTTON_REPEAT));
                             break;
 
                         case ROCKPAINT_UP:
                         case ROCKPAINT_UP | BUTTON_REPEAT:
-                            y-=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                            if (y<0) y=ROWS-1;
-                            break;
-
                         case ROCKPAINT_DOWN:
                         case ROCKPAINT_DOWN | BUTTON_REPEAT:
-                            y+=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                            if (y>=ROWS-1) y=0;
+                            incdec_value(&y, &incdec_y,
+                                (button&ROCKPAINT_DOWN), (button&BUTTON_REPEAT));
                             break;
 
                         case ROCKPAINT_DRAW:
@@ -2426,38 +2379,24 @@ static void toolbar( void )
 
             case ROCKPAINT_LEFT:
             case ROCKPAINT_LEFT | BUTTON_REPEAT:
-                inv_cursor(false);
-                x-=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                if (x<0) x=COLS-1;
-                inv_cursor(true);
-                break;
-
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_RIGHT | BUTTON_REPEAT:
                 inv_cursor(false);
-                x+=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                if (x>=COLS) x=0;
+                incdec_value(&x, &incdec_x,
+                    (button&ROCKPAINT_RIGHT), (button&BUTTON_REPEAT));
                 inv_cursor(true);
                 break;
 
             case ROCKPAINT_UP:
             case ROCKPAINT_UP | BUTTON_REPEAT:
-                inv_cursor(false);
-                y-=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                if (y<LCD_HEIGHT-TB_HEIGHT)
-                {
-                    return;
-                }
-                inv_cursor(true);
-                break;
-
             case ROCKPAINT_DOWN:
             case ROCKPAINT_DOWN | BUTTON_REPEAT:
                 inv_cursor(false);
-                y+=bspeed * ( button & BUTTON_REPEAT ? 4 : 1 );
-                if (y>=LCD_HEIGHT)
+                if (incdec_value(&y, &incdec_y,
+                        (button&ROCKPAINT_DOWN), (button&BUTTON_REPEAT))
+                    || y < LCD_HEIGHT-TB_HEIGHT)
                 {
-                    y = 0;
+                    /* went out of region. exit toolbar. */
                     return;
                 }
                 inv_cursor(true);
@@ -2569,8 +2508,13 @@ static void goto_menu(void)
                 for(multi = 0; multi<3; multi++)
                     if(bspeed == times_list[multi]) break;
                 rb->set_option( "Brush Speed", &multi, INT, times_options, 3, NULL );
-                if( multi >= 0 )
+                if( multi >= 0 ) {
                     bspeed = times_list[multi];
+                    incdec_x.step[0] = bspeed;
+                    incdec_x.step[1] = bspeed * 4;
+                    incdec_y.step[0] = bspeed;
+                    incdec_y.step[1] = bspeed * 4;
+                }
                 break;
 
             case MAIN_MENU_COLOR:
@@ -2617,7 +2561,7 @@ static void reset_tool( void )
 static bool rockpaint_loop( void )
 {
     int button=0,i,j;
-    int accelaration;
+    bool bigstep;
 
     x = 10;
     toolbar();
@@ -2627,19 +2571,7 @@ static bool rockpaint_loop( void )
 
     while (!quit) {
         button = rb->button_get(true);
-
-        if( tool == Brush && prev_x != -1 )
-        {
-            accelaration = 1;
-        }
-        else if( button & BUTTON_REPEAT )
-        {
-            accelaration = 4;
-        }
-        else
-        {
-            accelaration = 1;
-        }
+        bigstep = (button & BUTTON_REPEAT) && !(tool == Brush && prev_x != -1);
 
         switch(button)
         {
@@ -2846,33 +2778,22 @@ static bool rockpaint_loop( void )
 
             case ROCKPAINT_LEFT:
             case ROCKPAINT_LEFT | BUTTON_REPEAT:
-                inv_cursor(false);
-                x-=bspeed * accelaration;
-                if (x<0) x=COLS-1;
-                inv_cursor(true);
-                break;
-
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_RIGHT | BUTTON_REPEAT:
                 inv_cursor(false);
-                x+=bspeed * accelaration;
-                if (x>=COLS) x=0;
+                incdec_value(&x, &incdec_x,
+                    (button&ROCKPAINT_RIGHT), bigstep);
                 inv_cursor(true);
                 break;
 
             case ROCKPAINT_UP:
             case ROCKPAINT_UP | BUTTON_REPEAT:
-                inv_cursor(false);
-                y-=bspeed * accelaration;
-                if (y<0) y=ROWS-1;
-                inv_cursor(true);
-                break;
-
             case ROCKPAINT_DOWN:
             case ROCKPAINT_DOWN | BUTTON_REPEAT:
                 inv_cursor(false);
-                y+=bspeed * accelaration;
-                if (y>=ROWS)
+                if (incdec_value(&y, &incdec_y,
+                        (button&ROCKPAINT_DOWN), bigstep)
+                    && (button&ROCKPAINT_DOWN))
                 {
                     toolbar();
                     restore_screen();
