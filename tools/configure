@@ -24,8 +24,6 @@ rbdir="/.rockbox"
 need_full_path=
 bindir=
 libdir=
-bindir_full=
-libdir_full=
 
 app_platform=
 app_lcd_width=
@@ -87,21 +85,25 @@ app_get_platform() {
     app_lcd_height="#define LCD_HEIGHT $app_lcd_height"
     # setup files and paths depending on the platform
     if [ "$app_platform" = "sdl" ]; then
-        if [ -z "$PREFIX" ]; then
+        if [ -z "$ARG_PREFIX" ]; then
             rbdir="/usr/local/share/rockbox"
             bindir="/usr/local/bin"
-            bindir_full=$bindir
             libdir="/usr/local/lib"
-            libdir_full=$libdir
         else
-            rbdir=`realpath $PREFIX/share/rockbox`
-            bindir="$PREFIX/bin"
-            libdir="$PREFIX/lib"
-            if [ -d bindir ]; then
-                bindir_full=`realpath $bindir`
-            fi
-            if [ -d libdir ]; then
-                libdir_full=`realpath $libdir`
+            if [ -d "$ARG_PREFIX" ]; then
+                if [ -z `echo $ARG_PREFIX | grep "^/"` ]; then
+                    ARG_PREFIX=`realpath $ARG_PREFIX`
+                    if [ "0" != "$?" ]; then
+                        echo "ERROR: Could not get prefix path (is realpath installed?)."
+                        exit
+                    fi
+                fi
+                rbdir="$ARG_PREFIX/share/rockbox"
+                bindir="$ARG_PREFIX/bin"
+                libdir="$ARG_PREFIX/lib"
+            else
+                echo "ERROR: PREFIX does not does not exist"
+                exit
             fi
         fi        
         output="rockbox"
@@ -122,9 +124,7 @@ app_get_platform() {
         fi
         rbdir="/data/data/org.rockbox/app_rockbox/rockbox"
         bindir="/data/data/org.rockbox/lib"
-        bindir_full=$bindir
         libdir="/data/data/org.rockbox/app_rockbox"
-        libdir_full=$libdir
         output="librockbox.so"
         bootoutput="librockbox.so"
     fi
@@ -953,6 +953,7 @@ ARG_TYPE=
 ARG_VOICE=
 ARG_ARM_EABI=
 ARG_ARM_THUMB=
+ARG_PREFIX="$PREFIX"
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -974,7 +975,7 @@ for arg in "$@"; do
 		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
-                --prefix=*)   PREFIX=`echo "$arg" | cut -d = -f 2`;;
+        --prefix=*)   ARG_PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
@@ -3119,15 +3120,6 @@ else
 fi
 
 if [ "$ARG_RBDIR" ]; then
-  if [ "$need_full_path" = "yes" ]; then
-    rbdir=`realpath $ARG_RBDIR`
-  else # prepend '/' if needed
-    if [ -z `echo $ARG_RBDIR | grep '^/'` ]; then
-        rbdir="/"$ARG_RBDIR
-    else
-        rbdir=$ARG_RBDIR
-    fi
-  fi
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
@@ -3138,8 +3130,8 @@ sed > autoconf.h \
  -e "s<@config_rtc@<$config_rtc<g" \
  -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
- -e "s<@binpath@<${bindir_full}<g" \
- -e "s<@libpath@<${libdir_full}<g" \
+ -e "s<@binpath@<${bindir}<g" \
+ -e "s<@libpath@<${libdir}<g" \
  -e "s<@have_backlight@<$have_backlight<g" \
  -e "s<@have_fmradio_in@<$have_fmradio_in<g" \
  -e "s<@have_ata_poweroff@<$have_ata_poweroff<g" \
@@ -3237,8 +3229,12 @@ fi
 if [ "$modelname" = "application" ]; then
   cmdline="$cmdline--lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
 fi
+if [ -n "$ARG_PREFIX" ]; then
+  cmdline="$cmdline--prefix=\$(PREFIX) "
+fi
 
-cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts --prefix=\$(PREFIX)"
+cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
+
 ### end of cmdline
 
 sed > Makefile \
@@ -3306,7 +3302,7 @@ sed > Makefile \
  -e "s<@RBDIR@<${rbdir}<g" \
  -e "s<@binpath@<${bindir}<g" \
  -e "s<@libpath@<${libdir}<g" \
- -e "s<@PREFIX@<$PREFIX<g" \
+ -e "s<@PREFIX@<$ARG_PREFIX<g" \
  -e "s<@CMDLINE@<$cmdline<g" \
  -e "s<@SDLCONFIG@<$sdl<g" \
 <<EOF

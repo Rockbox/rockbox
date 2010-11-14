@@ -18,8 +18,8 @@ use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DT
 
 my $ROOT="..";
 
-my $ziptool="zip -r9";
-my $output="rockbox.zip";
+my $ziptool;
+my $output;
 my $verbose;
 my $install;
 my $exe;
@@ -27,7 +27,7 @@ my $target;
 my $modelname;
 my $incfonts;
 my $target_id; # passed in, not currently used
-my $rbdir=".rockbox"; # can be changed for special builds
+my $rbdir; # can be non-.rockbox for special builds
 my $app;
 
 sub glob_mkdir {
@@ -197,16 +197,30 @@ sub make_install {
 
 # Get options
 GetOptions ( 'r|root=s'		=> \$ROOT,
-	     'z|ziptool=s'	=> \$ziptool,
+	     'z|ziptool:s'	=> \$ziptool,
 	     'm|modelname=s' => \$modelname,  # The model name as used in ARCHOS in the root makefile
 	     'i|id=s'		=> \$target_id,  # The target id name as used in TARGET_ID in the root makefile
-	     'o|output=s'	=> \$output,
+	     'o|output:s'	=> \$output,
 	     'f|fonts=s'	=> \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
 	     'v|verbose'	=> \$verbose,
 	     'install=s'		=> \$install, # install destination
-	     'rbdir=s'          => \$rbdir, # If we want to put in a different directory
+	     'rbdir:s'          => \$rbdir, # If we want to put in a different directory
     );
 
+# GetOptions() doesn't remove the params from @ARGV if their value was ""
+# Thus we use the ":" for those for which we use a default value in case of ""
+# and assign the default value afterwards
+if ($ziptool eq '') {
+    $ziptool = "zip -r9";
+}
+if ($output eq '') {
+    $output = "rockbox.zip"
+}
+if ($rbdir eq '') {
+    $rbdir = ".rockbox";
+}
+
+# Now @ARGV shuold be free of any left-overs GetOptions left
 ($target, $exe) = @ARGV;
 
 my $firmdir="$ROOT/firmware";
