@@ -206,7 +206,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(PLUGIN_USE_IRAM)
         read_test  (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
         write_test (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
-        memset_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
+        memset_test(buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
         memcpy_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
 #endif
 
