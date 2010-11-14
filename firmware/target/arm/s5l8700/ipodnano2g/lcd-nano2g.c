@@ -520,28 +520,29 @@ void lcd_wakeup(void)
 
     for(unsigned int i=0;i<lcd_init_sequence_length;i+=2)
     {
-	switch(lcd_init_sequence[i])
-	{
-		case CMD8:
-			s5l_lcd_write_cmd(lcd_init_sequence[i+1]);
-			break;
-		case DATA8:
-			s5l_lcd_write_data(lcd_init_sequence[i+1]);
-			break;
-		case CMD16:
-			s5l_lcd_write_wcmd(lcd_init_sequence[i+1]);
-			break;
-		case DATA16:
-			s5l_lcd_write_wdata(lcd_init_sequence[i+1]);
-			break;
-		case SLEEP:
-			sleep(lcd_init_sequence[i+1]);
-			break;
-		default:
-			break;
-	}
+	    switch(lcd_init_sequence[i])
+	    {
+		    case CMD8:
+			    s5l_lcd_write_cmd(lcd_init_sequence[i+1]);
+			    break;
+		    case DATA8:
+			    s5l_lcd_write_data(lcd_init_sequence[i+1]);
+			    break;
+		    case CMD16:
+			    s5l_lcd_write_wcmd(lcd_init_sequence[i+1]);
+			    break;
+		    case DATA16:
+			    s5l_lcd_write_wdata(lcd_init_sequence[i+1]);
+			    break;
+		    case SLEEP:
+			    sleep(lcd_init_sequence[i+1]);
+			    break;
+		    default:
+			    break;
+	    }
     }
     lcd_ispowered = true;
+    send_event(LCD_EVENT_ACTIVATION, NULL);
 }
 
 void lcd_awake(void)
