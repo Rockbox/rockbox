@@ -205,7 +205,12 @@ static int get_action_worker(int context, int timeout,
             pcmbuf_beep(4000, KEYCLICK_DURATION, 2500*global_settings.keyclick);
 #endif
 
-    if ((context != last_context) && ((last_button & BUTTON_REL) == 0))
+    if ((context != last_context) && ((last_button & BUTTON_REL) == 0)
+#ifdef HAVE_SCROLLWHEEL
+        /* Scrollwheel doesn't generate release events  */
+        && !(last_button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD))
+#endif
+        )
     {
         if (button & BUTTON_REL)
         {

@@ -115,13 +115,13 @@ static bool button_try_post(int button, int data)
     /* one can swipe over the scren very quickly,
      * for this to work we want to forget about old presses and
      * only respect the very latest ones */
-    const int force_post = true;
+    const bool force_post = true;
 #else
     /* Only post events if the queue is empty,
      * to avoid afterscroll effects.
      * i.e. don't post new buttons if previous ones haven't been
-     * processed yet */
-    const int force_post = false;
+     * processed yet - but always post releases */
+    const bool force_post = button & BUTTON_REL;
 #endif
 
     bool ret = queue_empty(&button_queue);
