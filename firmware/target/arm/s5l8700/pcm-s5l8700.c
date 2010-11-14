@@ -41,7 +41,7 @@
 
 static volatile int locked = 0;
 static const int zerosample = 0;
-static unsigned char dblbuf[1024];
+static unsigned char dblbuf[1024] IBSS_ATTR;
 static const unsigned char* queuedbuf;
 static size_t queuedsize;
 static const unsigned char* nextbuf;
