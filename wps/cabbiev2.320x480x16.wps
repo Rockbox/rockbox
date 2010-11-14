@@ -13,10 +13,10 @@
 %xl(C,volume-320x480x16.bmp,91,71,10)
 %xl(D,shuffle-320x480x16.bmp,156,76)
 %xl(E,repeat-320x480x16.bmp,231,66,4)
-%xl(F,playmode-320x480x16.bmp,273,66,5)
+%xl(F,playmode-320x480x16.bmp,273,68,5)
 %xl(G,popup-320x480x16.bmp,0,0)
-%xl(H,rew-320x480x16.bmp,0,6)
-%xl(I,ff-320x480x16.bmp,45,6)
+%xl(H,rew-320x480x16.bmp,0,8)
+%xl(I,ff-320x480x16.bmp,45,8)
 
 %Cl(0,0,180,180,c,c)
 
@@ -94,7 +94,7 @@
 #
 # ff/rewind button
 #
-%Vl(t,0,422,90,58,-)
+%Vl(t,0,420,90,58,-)
 %xd(H)%xd(I)
 %T(0,0,40,58,&rwd)
 %T(0,0,40,58,prev)
