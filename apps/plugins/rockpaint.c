@@ -1587,7 +1587,7 @@ static void draw_line( int x1, int y1, int x2, int y2 )
         yerr <<= 1;
 
         /* to leave off the last pixel of the line, leave off the "+ 1" */
-        for (i = abs(deltay) + 1; i; --i)
+        for (i = err + 1; i; --i)
         {
             draw_pixel(x, y);
             y += ystep;
@@ -1605,7 +1605,7 @@ static void draw_line( int x1, int y1, int x2, int y2 )
         xerr <<= 1;
         yerr <<= 1;
 
-        for (i = abs(deltax) + 1; i; --i)
+        for (i = err + 1; i; --i)
         {
             draw_pixel(x, y);
             x += xstep;
@@ -1677,6 +1677,7 @@ static void draw_curve( int x1, int y1, int x2, int y2,
         a3 = buffer->bezier[i].x3; \
         b3 = buffer->bezier[i].y3; \
         d = buffer->bezier[i].depth;
+
         PUSH( x1<<4, y1<<4, xb<<4, yb<<4, x2<<4, y2<<4, 0 );
         while( i )
         {
@@ -1936,123 +1937,102 @@ static void draw_fill( int x0, int y0 )
 }
 
 /* For preview purposes only */
+/* use same algorithm as draw_line() to draw line. */
 static void line_gradient( int x1, int y1, int x2, int y2 )
 {
-    int r1, g1, b1;
-    int r2, g2, b2;
     int h1, s1, v1, h2, s2, v2, r, g, b;
-    int w, h, x, y;
+    int xerr = x2 - x1, yerr = y2 - y1, xstep, ystep;
+    int i, delta, err;
+    fb_data color1, color2;
 
-    bool a = false;
-
-    x1 <<= 1;
-    y1 <<= 1;
-    x2 <<= 1;
-    y2 <<= 1;
-
-    w = x1 - x2;
-    h = y1 - y2;
-
-    if( w == 0 && h == 0 )
+    if( xerr == 0 && yerr == 0 )
     {
-        draw_pixel( x1>>1, y1>>1 );
+        draw_pixel( x1, y1 );
         return;
     }
 
-    r1 = RGB_UNPACK_RED( rp_colors[ bgdrawcolor ] );
-    g1 = RGB_UNPACK_GREEN( rp_colors[ bgdrawcolor ] );
-    b1 = RGB_UNPACK_BLUE( rp_colors[ bgdrawcolor ] );
-    r2 = RGB_UNPACK_RED( rp_colors[ drawcolor ] );
-    g2 = RGB_UNPACK_GREEN( rp_colors[ drawcolor ] );
-    b2 = RGB_UNPACK_BLUE( rp_colors[ drawcolor ] );
+    xstep = xerr > 0 ? 1 : -1;
+    ystep = yerr > 0 ? 1 : -1;
+    xerr = abs(xerr) << 1;
+    yerr = abs(yerr) << 1;
 
-    if( w < 0 )
-    {
-        w *= -1;
-        a = true;
-    }
-    if( h < 0 )
-    {
-        h *= -1;
-        a = !a;
-    }
-    if( a )
-    {
-        r = r1;
-        r1 = r2;
-        r2 = r;
-        g = g1;
-        g1 = g2;
-        g2 = g;
-        b = b1;
-        b1 = b2;
-        b2 = b;
-    }
+    color1 = rp_colors[ bgdrawcolor ];
+    color2 = rp_colors[ drawcolor ];
 
-    rgb2hsv( r1, g1, b1, &h1, &s1, &v1 );
-    rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
+    r = RGB_UNPACK_RED( color1 );
+    g = RGB_UNPACK_GREEN( color1 );
+    b = RGB_UNPACK_BLUE( color1 );
+    rgb2hsv( r, g, b, &h1, &s1, &v1 );
 
-    if( w > h )
+    r = RGB_UNPACK_RED( color2 );
+    g = RGB_UNPACK_GREEN( color2 );
+    b = RGB_UNPACK_BLUE( color2 );
+    rgb2hsv( r, g, b, &h2, &s2, &v2 );
+
+    if( xerr > yerr )
     {
-        if( x1 > x2 )
+        err = xerr>>1;
+        delta = err+1;
+        /* to leave off the last pixel of the line, leave off the "+ 1" */
+        for (i = delta; i; --i)
         {
-            x = x2;
-            y = y2;
-            x2 = x1;
-            y2 = y1;
-            x1 = x;
-            y1 = y;
-        }
-        w = x1 - x2;
-        h = y1 - y2;
-        while( x1 <= x2 )
-        {
-            hsv2rgb( h1+((h2-h1)*(x1-x2))/w,
-                     s1+((s2-s1)*(x1-x2))/w,
-                     v1+((v2-v1)*(x1-x2))/w,
+            hsv2rgb( h2+((h1-h2)*i)/delta,
+                     s2+((s1-s2)*i)/delta,
+                     v2+((v1-v2)*i)/delta,
                      &r, &g, &b );
             rp_colors[ drawcolor ] = LCD_RGBPACK( r, g, b );
             rb->lcd_set_foreground( rp_colors[ drawcolor ] );
-            draw_pixel( (x1+1)>>1, (y1+1)>>1 );
-            x1+=2;
-            y1 = y2 - ( x2 - x1 ) * h / w;
+            draw_pixel(x1, y1);
+            x1 += xstep;
+            err -= yerr;
+            if (err < 0) {
+                y1 += ystep;
+                err += xerr;
+            }
         }
     }
-    else /* h > w */
+    else /* yerr >= xerr */
     {
-        if( y1 > y2 )
+        err = yerr>>1;
+        delta = err+1;
+        for (i = delta; i; --i)
         {
-            x = x2;
-            y = y2;
-            x2 = x1;
-            y2 = y1;
-            x1 = x;
-            y1 = y;
-        }
-        w = x1 - x2;
-        h = y1 - y2;
-        while( y1 <= y2 )
-        {
-            hsv2rgb( h1+((h2-h1)*(y1-y2))/h,
-                     s1+((s2-s1)*(y1-y2))/h,
-                     v1+((v2-v1)*(y1-y2))/h,
+            hsv2rgb( h2+((h1-h2)*i)/delta,
+                     s2+((s1-s2)*i)/delta,
+                     v2+((v1-v2)*i)/delta,
                      &r, &g, &b );
             rp_colors[ drawcolor ] = LCD_RGBPACK( r, g, b );
             rb->lcd_set_foreground( rp_colors[ drawcolor ] );
-            draw_pixel( (x1+1)>>1, (y1+1)>>1 );
-            y1+=2;
-            x1 = x2 - ( y2 - y1 ) * w / h;
+            draw_pixel(x1, y1);
+            y1 += ystep;
+            err -= xerr;
+            if (err < 0) {
+                x1 += xstep;
+                err += yerr;
+            }
         }
     }
-    if( a )
-    {
-        rp_colors[ drawcolor ] = LCD_RGBPACK( r1, g1, b1 );
-    }
-    else
-    {
-        rp_colors[ drawcolor ] = LCD_RGBPACK( r2, g2, b2 );
-    }
+    rp_colors[ drawcolor ] = color2;
 }
+
+/* macros used by linear_gradient() and radial_gradient(). */
+#define PUSH( _x, _y ) \
+    save_buffer[(_x)+(_y)*COLS] = mark_color; \
+    buffer->coord[i].x = (short)(_x); \
+    buffer->coord[i].y = (short)(_y); \
+    i++;
+#define POP( _x, _y ) \
+    i--; \
+    _x = (int)buffer->coord[i].x; \
+    _y = (int)buffer->coord[i].y;
+#define PUSH2( _x, _y ) \
+    j--; \
+    buffer->coord[j].x = (short)(_x); \
+    buffer->coord[j].y = (short)(_y);
+#define POP2( _x, _y ) \
+    _x = (int)buffer->coord[j].x; \
+    _y = (int)buffer->coord[j].y; \
+    j++;
 
 static void linear_gradient( int x1, int y1, int x2, int y2 )
 {
@@ -2062,16 +2042,19 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
     int r2 = RGB_UNPACK_RED( rp_colors[ drawcolor ] );
     int g2 = RGB_UNPACK_GREEN( rp_colors[ drawcolor ] );
     int b2 = RGB_UNPACK_BLUE( rp_colors[ drawcolor ] );
+    fb_data color = rp_colors[ drawcolor ];
 
     int h1, s1, v1, h2, s2, v2, r, g, b;
 
     /* radius^2 */
     int radius2 = ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 );
-    int dist2, i=0;
+    int dist2, i=0, j=COLS*ROWS;
 
     /* We only propagate the gradient to neighboring pixels with the same
      * color as ( x1, y1 ) */
-    unsigned int prev_color = save_buffer[ x1+y1*COLS ];
+    fb_data prev_color = save_buffer[ x1+y1*COLS ];
+    /* to mark pixel that the pixel is already in LIFO. */
+    fb_data mark_color = ~prev_color;
 
     int x = x1;
     int y = y1;
@@ -2081,22 +2064,18 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
     {
         line_gradient( x1, y1, x2, y2 );
     }
+    if( rp_colors[ drawcolor ] == rp_colors[ bgdrawcolor ] )
+    {
+        draw_fill( x1, y1 );
+        return;
+    }
 
     rgb2hsv( r1, g1, b1, &h1, &s1, &v1 );
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
-#define PUSH( x0, y0 ) \
-    buffer->coord[i].x = (short)(x0); \
-    buffer->coord[i].y = (short)(y0); \
-    i++;
-#define POP( a, b ) \
-    i--; \
-    a = (int)buffer->coord[i].x; \
-    b = (int)buffer->coord[i].y;
-
     PUSH( x, y );
 
-    while( i != 0 )
+    while( i > 0 )
     {
         POP( x, y );
 
@@ -2115,14 +2094,13 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
         }
         else
         {
-            rp_colors[ drawcolor ] = LCD_RGBPACK( r2, g2, b2 );
+            rp_colors[ drawcolor ] = color;
         }
         if( rp_colors[ drawcolor ] == prev_color )
         {
-            if( rp_colors[ drawcolor ])
-                rp_colors[ drawcolor ]--; /* GRUIK */
-            else
-                rp_colors[ drawcolor ]++; /* GRUIK */
+            /* "mark" that pixel was checked. correct color later. */
+            PUSH2( x, y );
+            rp_colors[ drawcolor ] = mark_color;
         }
         rb->lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
@@ -2144,10 +2122,15 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
             PUSH( x, y+1 );
         }
     }
-#undef PUSH
-#undef POP
-
-    rp_colors[ drawcolor ] = LCD_RGBPACK( r2, g2, b2 );
+    while (j < COLS*ROWS)
+    {
+        /* correct color. */
+        POP2( x, y );
+        rp_colors[ drawcolor ] = prev_color;
+        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        draw_pixel( x, y );
+    }
+    rp_colors[ drawcolor ] = color;
 }
 
 static void radial_gradient( int x1, int y1, int x2, int y2 )
@@ -2158,16 +2141,19 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
     int r2 = RGB_UNPACK_RED( rp_colors[ drawcolor ] );
     int g2 = RGB_UNPACK_GREEN( rp_colors[ drawcolor ] );
     int b2 = RGB_UNPACK_BLUE( rp_colors[ drawcolor ] );
+    fb_data color = rp_colors[ drawcolor ];
 
     int h1, s1, v1, h2, s2, v2, r, g, b;
 
     /* radius^2 */
     int radius2 = ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 );
-    int dist2, i=0;
+    int dist2, i=0, j=COLS*ROWS;
 
     /* We only propagate the gradient to neighboring pixels with the same
      * color as ( x1, y1 ) */
-    unsigned int prev_color = save_buffer[ x1+y1*COLS ];
+    fb_data prev_color = save_buffer[ x1+y1*COLS ];
+    /* to mark pixel that the pixel is already in LIFO. */
+    fb_data mark_color = ~prev_color;
 
     int x = x1;
     int y = y1;
@@ -2177,26 +2163,23 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
     {
         line_gradient( x1, y1, x2, y2 );
     }
+    if( rp_colors[ drawcolor ] == rp_colors[ bgdrawcolor ] )
+    {
+        draw_fill( x1, y1 );
+        return;
+    }
 
     rgb2hsv( r1, g1, b1, &h1, &s1, &v1 );
     rgb2hsv( r2, g2, b2, &h2, &s2, &v2 );
 
-#define PUSH( x0, y0 ) \
-    buffer->coord[i].x = (short)(x0); \
-    buffer->coord[i].y = (short)(y0); \
-    i++;
-#define POP( a, b ) \
-    i--; \
-    a = (int)buffer->coord[i].x; \
-    b = (int)buffer->coord[i].y;
-
     PUSH( x, y );
 
-    while( i != 0 )
+    while( i > 0 )
     {
         POP( x, y );
 
-        if( ( dist2 = (x1-(x))*(x1-(x))+(y1-(y))*(y1-(y)) ) < radius2 )
+        dist2 = ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 );
+        if( dist2 < radius2 )
         {
             hsv2rgb( h1+((h2-h1)*dist2)/radius2,
                      s1+((s2-s1)*dist2)/radius2,
@@ -2206,14 +2189,13 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
         }
         else
         {
-            rp_colors[ drawcolor ] = LCD_RGBPACK( r2, g2, b2 );
+            rp_colors[ drawcolor ] = color;
         }
         if( rp_colors[ drawcolor ] == prev_color )
         {
-            if( rp_colors[ drawcolor ])
-                rp_colors[ drawcolor ]--; /* GRUIK */
-            else
-                rp_colors[ drawcolor ]++; /* GRUIK */
+            /* "mark" that pixel was checked. correct color later. */
+            PUSH2( x, y );
+            rp_colors[ drawcolor ] = mark_color;
         }
         rb->lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
@@ -2235,11 +2217,21 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
             PUSH( x, y+1 );
         }
     }
+    while (j < COLS*ROWS)
+    {
+        /* correct color. */
+        POP2( x, y );
+        rp_colors[ drawcolor ] = prev_color;
+        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        draw_pixel( x, y );
+    }
+    rp_colors[ drawcolor ] = color;
+}
+
 #undef PUSH
 #undef POP
-
-    rp_colors[ drawcolor ] = LCD_RGBPACK( r2, g2, b2 );
-}
+#undef PUSH2
+#undef POP2
 
 static void draw_toolbars(bool update)
 {
