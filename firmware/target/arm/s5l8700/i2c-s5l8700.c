@@ -58,7 +58,7 @@ void i2c_init(void)
              (0 << 6) | /* CLKSEL = PCLK/16 */
              (1 << 5) | /* INT_EN */
              (1 << 4) | /* IRQ clear */
-             (7 << 0);  /* CK_REG */
+             (3 << 0);  /* CK_REG */
 
     /* serial output on */
     IICSTAT = (1 << 4);
@@ -72,7 +72,7 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     /* START */
     IICDS = slave & ~1;
     IICSTAT = 0xF0;
-    IICCON = 0xB7;
+    IICCON = 0xB3;
     while ((IICCON & 0x10) == 0)
         if (TIME_AFTER(current_tick, timeout))
         {
@@ -84,7 +84,7 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     if (address >= 0) {
         /* write address */
         IICDS = address;
-        IICCON = 0xB7;
+        IICCON = 0xB3;
         while ((IICCON & 0x10) == 0)
             if (TIME_AFTER(current_tick, timeout))
             {
@@ -96,7 +96,7 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
     /* write data */
     while (len--) {
         IICDS = *data++;
-        IICCON = 0xB7;
+        IICCON = 0xB3;
         while ((IICCON & 0x10) == 0)
             if (TIME_AFTER(current_tick, timeout))
             {
@@ -107,7 +107,7 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
 
     /* STOP */
     IICSTAT = 0xD0;
-    IICCON = 0xB7;
+    IICCON = 0xB3;
     while ((IICSTAT & (1 << 5)) != 0)
         if (TIME_AFTER(current_tick, timeout))
         {
@@ -128,7 +128,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         /* START */
         IICDS = slave & ~1;
         IICSTAT = 0xF0;
-        IICCON = 0xB7;
+        IICCON = 0xB3;
         while ((IICCON & 0x10) == 0)
             if (TIME_AFTER(current_tick, timeout))
             {
@@ -138,7 +138,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 
         /* write address */
         IICDS = address;
-        IICCON = 0xB7;
+        IICCON = 0xB3;
         while ((IICCON & 0x10) == 0)
             if (TIME_AFTER(current_tick, timeout))
             {
@@ -150,7 +150,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
     /* (repeated) START */
     IICDS = slave | 1;
     IICSTAT = 0xB0;
-    IICCON = 0xB7;
+    IICCON = 0xB3;
     while ((IICCON & 0x10) == 0)
         if (TIME_AFTER(current_tick, timeout))
         {
@@ -159,7 +159,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         }
     
     while (len--) {
-        IICCON = (len == 0) ? 0x37 : 0xB7; /* NACK or ACK */
+        IICCON = (len == 0) ? 0x33 : 0xB3; /* NAK or ACK */
         while ((IICCON & 0x10) == 0)
             if (TIME_AFTER(current_tick, timeout))
             {
@@ -171,7 +171,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 
     /* STOP */
     IICSTAT = 0x90;
-    IICCON = 0xB7;
+    IICCON = 0xB3;
     while ((IICSTAT & (1 << 5)) != 0)
         if (TIME_AFTER(current_tick, timeout))
         {
