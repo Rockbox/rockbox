@@ -100,7 +100,6 @@ static const uint16_t initvals[16] = {
 };
 
 static bool tuner_present = false;
-static int curr_frequency = 87500000; /* Current station frequency (HZ) */
 static uint16_t cache[16];
 
 /* reads <len> registers from radio at offset 0x0A into cache */
@@ -208,8 +207,6 @@ static void rda5802_set_frequency(int freq)
     int start = CHANNEL_BANDr(cache[CHANNEL]) & 1 ? 76000000 : 87000000;
     int chan = (freq - start) / 50000;
 
-    curr_frequency = freq;
-
     for (i = 0; i < 5; i++) {
         /* tune and wait a bit */
         rda5802_write_masked(CHANNEL, CHANNEL_CHANw(chan) | CHANNEL_TUNE,
@@ -250,16 +247,9 @@ static void rda5802_set_region(int region)
 
     uint16_t bandspacing = CHANNEL_BANDw(band) |
                            CHANNEL_SPACEw(CHANNEL_SPACE_50KHZ);
-    uint16_t oldbs = cache[CHANNEL] & (CHANNEL_BAND | CHANNEL_SPACE);
-
     rda5802_write_masked(SYSCONFIG1, deemphasis, SYSCONFIG1_DE);
     rda5802_write_masked(CHANNEL, bandspacing, CHANNEL_BAND | CHANNEL_SPACE);
     rda5802_write_cache();
-
-    /* Retune if this region change would change the channel number. */
-    if (oldbs != bandspacing) {
-        rda5802_set_frequency(curr_frequency);
-    }
 }
 
 static bool rda5802_st(void)

@@ -213,7 +213,6 @@ extern int si4700_st(void);
 /* 4702/03: RDS Block A-D data */
 
 static bool tuner_present = false;
-static int curr_frequency = 87500000; /* Current station frequency (HZ) */
 static uint16_t cache[16];
 
 /* reads <len> registers from radio at offset 0x0A into cache */
@@ -380,8 +379,6 @@ static void si4700_set_frequency(int freq)
     int chan = (freq - bands[band]) / spacings[space];
     int readchan;
 
-    curr_frequency = freq;
-
     do
     {
         /* tuning should be done within 60 ms according to the datasheet */
@@ -416,15 +413,9 @@ static void si4700_set_region(int region)
 
     uint16_t bandspacing = SYSCONFIG2_BANDw(band) |
                            SYSCONFIG2_SPACEw(spacing);
-    uint16_t oldbs = cache[SYSCONFIG2] & (SYSCONFIG2_BAND | SYSCONFIG2_SPACE);
-
     si4700_write_masked(SYSCONFIG1, deemphasis, SYSCONFIG1_DE);
     si4700_write_masked(SYSCONFIG2, bandspacing,
                         SYSCONFIG2_BAND | SYSCONFIG2_SPACE);
-
-    /* Retune if this region change would change the channel number. */
-    if (oldbs != bandspacing)
-        si4700_set_frequency(curr_frequency);
 }
 
 /* tuner abstraction layer: set something to the tuner */
