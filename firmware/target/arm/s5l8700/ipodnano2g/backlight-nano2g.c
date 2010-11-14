@@ -27,6 +27,7 @@
 #include "pmu-target.h"
 
 #ifdef HAVE_LCD_SLEEP
+bool lcd_active(void);
 void lcd_awake(void);
 void lcd_update(void);
 #endif
@@ -38,11 +39,13 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
-    if(pmu_read(0x29) == 1) return;
 #ifdef HAVE_LCD_SLEEP
-    lcd_awake();
-    lcd_update();
-    sleep(HZ/10);
+    if (!lcd_active())
+    {
+        lcd_awake();
+        lcd_update();
+        sleep(HZ/8);
+    }
 #endif
     pmu_write(0x29, 1);
 }

@@ -26,6 +26,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "pmu-target.h"
+#include "power.h"
 
 
 /* The Nano 2G has two different LCD types.  What we call "type 0"
@@ -205,191 +206,13 @@ unsigned short lcd_init_sequence_0[] = {
 };
 
 unsigned short lcd_init_sequence_1[] = {
-    CMD8,  0x01,
-    DATA8, 0x00,
-    SLEEP, 0,
-    CMD8,  0xB1,
-    DATA8, 0x16,
-    DATA8, 0x03,
-    CMD8,  0xB2,
-    DATA8, 0x17,
-    DATA8, 0x03,
-    CMD8,  0xB4,
-    DATA8, 0x00,
-    CMD8,  0xB6,
-    DATA8, 0x01,
-    CMD8,  0xB7,
-    DATA8, 0x00,
-    DATA8, 0x00,
-    DATA8, 0x02,
-    DATA8, 0x00,
-    DATA8, 0x06,
-    DATA8, 0x26,
-    DATA8, 0x2D,
-    DATA8, 0x27,
-    DATA8, 0x55,
-    DATA8, 0x27,
-    CMD8,  0xB8,
-    DATA8, 0x10,
-    CMD8,  0xB9,
-    DATA8, 0x52,
-    DATA8, 0x12,
-    DATA8, 0x03,
-    CMD8,  0xC0,
-    DATA8, 0x0A,
-    DATA8, 0x10,
-    DATA8, 0x10,
-    CMD8,  0xC2,
-    DATA8, 0x14,
-    DATA8, 0x23,
-    CMD8,  0xC3,
-    DATA8, 0x12,
-    DATA8, 0x23,
-    CMD8,  0xC6,
-    DATA8, 0x48,
-    CMD8,  0xE0,
-    DATA8, 0x20,
-    DATA8, 0x71,
-    DATA8, 0x17,
-    DATA8, 0x09,
-    DATA8, 0x70,
-    DATA8, 0x0C,
-    DATA8, 0x13,
-    DATA8, 0x25,
-    CMD8,  0xE1,
-    DATA8, 0x37,
-    DATA8, 0x00,
-    DATA8, 0x63,
-    DATA8, 0x11,
-    DATA8, 0xD9,
-    DATA8, 0x00,
-    DATA8, 0x12,
-    DATA8, 0x01,
-    CMD8,  0xE2,
-    DATA8, 0x42,
-    DATA8, 0x42,
-    DATA8, 0x60,
-    DATA8, 0x08,
-    DATA8, 0xB4,
-    DATA8, 0x07,
-    DATA8, 0x0E,
-    DATA8, 0x90,
-    CMD8,  0xE3,
-    DATA8, 0x47,
-    DATA8, 0x60,
-    DATA8, 0x66,
-    DATA8, 0x09,
-    DATA8, 0x6A,
-    DATA8, 0x02,
-    DATA8, 0x0E,
-    DATA8, 0x09,
-    CMD8,  0xE4,
-    DATA8, 0x11,
-    DATA8, 0x40,
-    DATA8, 0x03,
-    DATA8, 0x0A,
-    DATA8, 0xC1,
-    DATA8, 0x0D,
-    DATA8, 0x17,
-    DATA8, 0x30,
-    CMD8,  0xE5,
-    DATA8, 0x00,
-    DATA8, 0x30,
-    DATA8, 0x77,
-    DATA8, 0x1C,
-    DATA8, 0xFB,
-    DATA8, 0x00,
-    DATA8, 0x13,
-    DATA8, 0x07,
-    CMD8,  0xE6,
-    DATA8, 0x01,
-    CMD8,  0x35,
-    DATA8, 0x00,
-    CMD8,  0x36,
-    DATA8, 0x00,
-    CMD8,  0xF2,
-    DATA8, 0x40,
-    CMD8,  0xF3,
-    DATA8, 0x50,
-    CMD8,  0xFB,
-    DATA8, 0x01,
     CMD8,  0x11,
-    DATA8, 0x00,
-    SLEEP, 0,
-    CMD8,  0x3A,
-    DATA8, 0x65,
+    DATA16, 0x00,
     CMD8,  0x29,
-    DATA8, 0x00,
+    DATA16, 0x00,
 };
 
-unsigned short lcd_init_sequence_2[] = {
-    CMD8,  0x01,
-    SLEEP, 0,
-    CMD8,  0x11,
-    SLEEP, 0,
-    CMD8,  0x3a,
-    DATA8, 0x65,
-    CMD8,  0xab,
-    CMD8,  0x35,
-    DATA8, 0x00,
-    CMD8,  0xf2,
-    DATA8, 0x01,
-    CMD8,  0xe0,
-    DATA8, 0x71,
-    DATA8, 0x76,
-    DATA8, 0x25,
-    DATA8, 0x01,
-    DATA8, 0xa5,
-    DATA8, 0x09,
-    DATA8, 0x15,
-    DATA8, 0x11,
-    CMD8,  0xe1,
-    DATA8, 0x40,
-    DATA8, 0x21,
-    DATA8, 0x64,
-    DATA8, 0x13,
-    DATA8, 0xf3,
-    DATA8, 0x0b,
-    DATA8, 0x00,
-    DATA8, 0x00,
-    CMD8,  0xe2,
-    DATA8, 0x71,
-    DATA8, 0x65,
-    DATA8, 0x24,
-    DATA8, 0x08,
-    DATA8, 0x97,
-    DATA8, 0x01,
-    DATA8, 0x15,
-    DATA8, 0x11,
-    CMD8,  0xe3,
-    DATA8, 0x51,
-    DATA8, 0x01,
-    DATA8, 0x62,
-    DATA8, 0x13,
-    DATA8, 0xf3,
-    DATA8, 0x0b,
-    DATA8, 0x00,
-    DATA8, 0x00,
-    CMD8,  0xe4,
-    DATA8, 0x71,
-    DATA8, 0x57,
-    DATA8, 0x31,
-    DATA8, 0x01,
-    DATA8, 0x82,
-    DATA8, 0x04,
-    DATA8, 0x1f,
-    DATA8, 0x11,
-    CMD8,  0xe5,
-    DATA8, 0x64,
-    DATA8, 0x41,
-    DATA8, 0x64,
-    DATA8, 0x19,
-    DATA8, 0xb3,
-    DATA8, 0x09,
-    DATA8, 0x00,
-    DATA8, 0x00,
-    CMD8,  0x29,
-};
+
 
 #endif /* HAVE_LCD_SLEEP */
 
@@ -478,45 +301,31 @@ void lcd_wakeup(void)
 {
     unsigned short *lcd_init_sequence;
     unsigned int lcd_init_sequence_length;
-    int type = lcd_type;
 
-    pmu_ldo_set_voltage(2, 17);
     PWRCONEXT &= ~0x80;
-    PCON2 = 0x33333333;
-    PCON3 = 0x11113333;
-    PCON4 = 0x33333333;
     PCON13 &= ~0xf;    /* Set pin 0 to input */
     PCON14 &= ~0xf0;   /* Set pin 1 to input */
 
-    if((((PDAT13 & 1) == 1) && ((PDAT14 & 2) == 2))||
-       (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 0)))
-    {
-        type = 2; /* there is a third lcd type which behaves like type 7 (LDS176) but needs to be initialized differently */
-    }
+    pmu_write(0x2b, 1);
 
-    if(type == 0)
+    if (lcd_type == 0)
     {
+        /* reset the lcd chip */
+
+        LCD_RST_TIME = 0x7FFF;
+        LCD_DRV_RST = 0;
+        sleep(0);
+        LCD_DRV_RST = 1;
+        sleep(HZ / 100);
+
         lcd_init_sequence = lcd_init_sequence_0;
         lcd_init_sequence_length = (sizeof(lcd_init_sequence_0) - 1)/sizeof(unsigned short);
     }
-    else if(type == 1)
+    else
     {
         lcd_init_sequence = lcd_init_sequence_1;
         lcd_init_sequence_length = (sizeof(lcd_init_sequence_1) - 1)/sizeof(unsigned short);
     }
-    else
-    {
-        lcd_init_sequence = lcd_init_sequence_2;
-        lcd_init_sequence_length = (sizeof(lcd_init_sequence_2) - 1)/sizeof(unsigned short);
-    }
-
-    /* reset the lcd chip */
-
-    LCD_RST_TIME = 0x7FFF;
-    LCD_DRV_RST = 0;
-    sleep(0);
-    LCD_DRV_RST = 1;
-    sleep(HZ / 100);
 
     for(unsigned int i=0;i<lcd_init_sequence_length;i+=2)
     {
@@ -578,12 +387,7 @@ void lcd_shutdown(void)
         s5l_lcd_write_wdata(0);
     }
 
-    PCON2 = 0;
-    PCON3 = 0;
-    PCON4 = 0;
     PWRCONEXT |= 0x80;
-    sleep(HZ / 20);
-    pmu_ldo_set_voltage(2, 1);
 
     lcd_ispowered = false;
 }
