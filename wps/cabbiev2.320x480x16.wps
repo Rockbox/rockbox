@@ -85,11 +85,11 @@
 #
 # popup osd menu
 #
-%Vl(t,22,242,277,110,-)
+%Vl(t,22,241,276,111,-)
 %xd(G)
-%T(10,10,115,90,browse)
+%T(10,10,110,90,browse)
 %T(120,10,73,90,quickscreen)
-%T(195,10,70,90,contextmenu)
+%T(194,10,70,90,contextmenu)
 
 #
 # ff/rewind button
