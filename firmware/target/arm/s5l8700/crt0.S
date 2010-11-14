@@ -136,9 +136,11 @@ start_loc:
     ldr r0, =0x1ad200   // pdiv=0x1a, mdiv=0xd2 sdiv=0
 #endif
     str r0, [r1,#0x04]  // PLL0PMS
-    ldr r0, =8100
+    mov r0, #0
+    str r0, [r1,#0x08]  // PLL1PMS
+    ldr r0, =280
     str r0, [r1,#0x14]  // PLL0LCNT
-    mov r0, #1
+    mov r0, #3
     str r0, [r1,#0x24]  // PLLCON
 1:
     ldr r0, [r1,#0x20]  // PLLLOCK
@@ -148,6 +150,8 @@ start_loc:
     str r0, [r1,#0x3c]  // CLKCON2
     ldr r0, =0x20803180 // FCLK_CPU = 200MHz, HCLK = 100MHz, PCLK = 50MHz, other clocks off
     str r0, [r1]        // CLKCON
+    mov r0, #0x37       // SCLK = 25MHz
+    str r0, [r1,#0x10]  // CLKCON3
 
     ldr r2, =0xc0000078
     mrc 15, 0, r0, c1, c0, 0
