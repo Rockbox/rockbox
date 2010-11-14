@@ -51,17 +51,18 @@ static const struct div_entry {
     int             pdiv, mdiv, sdiv, cdiv;
 } div_table[HW_NUM_FREQ] = {
 #ifdef IPOD_NANO2G
-    [HW_FREQ_11] = {   2,   41,    5,    4},
-    [HW_FREQ_22] = {   2,   41,    4,    4},
-    [HW_FREQ_44] = {   2,   41,    3,    4},
-    [HW_FREQ_88] = {   2,   41,    2,    4},
-    [HW_FREQ_8 ] = {   2,   12,    3,    9},
-    [HW_FREQ_16] = {   2,   12,    2,    9},
-    [HW_FREQ_32] = {   2,   12,    1,    9},
-    [HW_FREQ_12] = {   2,   12,    4,    3},
-    [HW_FREQ_24] = {   2,   12,    3,    3},
-    [HW_FREQ_48] = {   2,   12,    2,    3},
-    [HW_FREQ_96] = {   2,   12,    1,    3},
+    [HW_FREQ_11] = {   0,   41,    3,    8},
+    [HW_FREQ_22] = {   0,   41,    3,    4},
+    [HW_FREQ_44] = {   0,   41,    3,    2},
+    [HW_FREQ_88] = {   0,   41,    3,    1},
+    [HW_FREQ_8 ] = {   0,    2,    1,    9},
+    [HW_FREQ_16] = {   0,    2,    0,    9},
+    [HW_FREQ_32] = {   2,    2,    0,    9},
+    [HW_FREQ_64] = {   6,    2,    0,    9},
+    [HW_FREQ_12] = {   0,    2,    2,    3},
+    [HW_FREQ_24] = {   0,    2,    1,    3},
+    [HW_FREQ_48] = {   0,    2,    0,    3},
+    [HW_FREQ_96] = {   2,    2,    0,    3},
 #else
 /* table of recommended PLL/MCLK dividers for mode 256Fs from the datasheet */
     [HW_FREQ_11] = {  26,  189,    3,    8},
@@ -173,19 +174,14 @@ static void pcm_dma_set_freq(enum hw_freq_indexes idx)
 {
     struct div_entry div = div_table[idx];
 
-    PLLCON &= ~4;
-    PLLCON &= ~0x10;
-    PLLCON &= 0x3f;
-    PLLCON |= 4;
-
     /* configure PLL1 and MCLK for the desired sample rate */
     PLL1PMS = (div.pdiv << 16) |
               (div.mdiv << 8) |
               (div.sdiv << 0);
-    PLL1LCNT = 7500;    /* no idea what to put here */
+    PLL1LCNT = 280;    /* 150 microseconds */
 
     /* enable PLL1 and wait for lock */
-    PLLCON |= (1 << 1);
+    PLLCON |= 1 << 1;
     while ((PLLLOCK & (1 << 1)) == 0);
 
     /* configure MCLK */
@@ -234,7 +230,7 @@ void pcm_play_dma_init(void)
                (0 << 13) |  /* 0 = basic I2S format */
                (0 << 12) |  /* 0 = MSB first */
                (0 << 11) |  /* 0 = left channel for low polarity */
-               (5 << 8) |   /* MCLK divider */
+               (3 << 8) |   /* MCLK divider */
                (0 << 5) |   /* 0 = 16-bit */
                (2 << 3) |   /* bit clock per frame */
                (1 << 0);    /* channel index */
