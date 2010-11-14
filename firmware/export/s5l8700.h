@@ -107,10 +107,11 @@
 #define ADM_S1BASE              (*(REG32_PTR_T)(0x39000064))     /* Start Address for Sequential Block 1 Area */
 
 /* 05. CLOCK & POWER MANAGEMENT */
-#define CLKCON                  (*(REG32_PTR_T)(0x3C500000))     /* Clock control Register */
-#define PLL0PMS                 (*(REG32_PTR_T)(0x3C500004))     /* PLL PMS value Register */
-#define PLL1PMS                 (*(REG32_PTR_T)(0x3C500008))     /* PLL PMS value Register */
-#define PLL2PMS                 (*(REG32_PTR_T)(0x3C50000C))     /* PLL PMS value Register  - S5L8701 only? */
+#define CLKCON                  (*(REG32_PTR_T)(0x3C500000))     /* Clock control register */
+#define PLL0PMS                 (*(REG32_PTR_T)(0x3C500004))     /* PLL PMS value register */
+#define PLL1PMS                 (*(REG32_PTR_T)(0x3C500008))     /* PLL PMS value register */
+#define PLL2PMS                 (*(REG32_PTR_T)(0x3C50000C))     /* PLL PMS value register  - S5L8701 only? */
+#define CLKCON3                 (*(REG32_PTR_T)(0x3C500010))     /* Clock control register 3 */
 #define PLL0LCNT                (*(REG32_PTR_T)(0x3C500014))     /* PLL0 lock count register */
 #define PLL1LCNT                (*(REG32_PTR_T)(0x3C500018))     /* PLL1 lock count register */
 #define PLL2LCNT                (*(REG32_PTR_T)(0x3C50001C))     /* PLL2 lock count register - S5L8701 only? */
@@ -121,8 +122,8 @@
 #define SWRCON                  (*(REG32_PTR_T)(0x3C500030))     /* Software reset control register */
 #define RSTSR                   (*(REG32_PTR_T)(0x3C500034))     /* Reset status register */
 #define DSPCLKMD                (*(REG32_PTR_T)(0x3C500038))     /* DSP clock mode register */
-#define CLKCON2                 (*(REG32_PTR_T)(0x3C50003C))     /* clock control register 2 */
-#define PWRCONEXT               (*(REG32_PTR_T)(0x3C500040))
+#define CLKCON2                 (*(REG32_PTR_T)(0x3C50003C))     /* Clock control register 2 */
+#define PWRCONEXT               (*(REG32_PTR_T)(0x3C500040))     /* Clock power control register 2 */
 
 /* 06. INTERRUPT CONTROLLER UNIT */
 #define SRCPND                  (*(REG32_PTR_T)(0x39C00000))     /* Indicates the interrupt request status. */
