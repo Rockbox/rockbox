@@ -21,10 +21,15 @@
 #include <stdbool.h>
 
 #include "config.h"
+#include "kernel.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "pmu-target.h"
 
+#ifdef HAVE_LCD_SLEEP
+void lcd_awake(void);
+void lcd_update(void);
+#endif
 
 void _backlight_set_brightness(int brightness)
 {
@@ -33,6 +38,12 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
+    if(pmu_read(0x29) == 1) return;
+#ifdef HAVE_LCD_SLEEP
+    lcd_awake();
+    lcd_update();
+    sleep(HZ/10);
+#endif
     pmu_write(0x29, 1);
 }
 

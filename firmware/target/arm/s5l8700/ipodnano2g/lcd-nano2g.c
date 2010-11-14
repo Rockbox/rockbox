@@ -57,13 +57,341 @@
 #define R_ROW_ADDR_SET            0x2b
 #define R_MEMORY_WRITE            0x2c
 
-
 /** globals **/
 
 int lcd_type; /* also needed in debug-s5l8700.c */
 static int xoffset; /* needed for flip */
+static bool lcd_ispowered;
 
-/** hardware access functions */
+#ifdef HAVE_LCD_SLEEP
+
+#define SLEEP	0
+#define CMD8	1
+#define CMD16	2
+#define DATA8	3
+#define DATA16	4
+
+unsigned short lcd_init_sequence_0[] = {
+    CMD16,  0x00a4,
+    DATA16, 0x0001,
+    SLEEP,  0x0000,
+    CMD16,  0x0001,
+    DATA16, 0x0100,
+    CMD16,  0x0002,
+    DATA16, 0x0300,
+    CMD16,  0x0003,
+    DATA16, 0x1230,
+    CMD16,  0x0008,
+    DATA16, 0x0404,
+    CMD16,  0x0008,
+    DATA16, 0x0404,
+    CMD16,  0x000e,
+    DATA16, 0x0010,
+    CMD16,  0x0070,
+    DATA16, 0x1000,
+    CMD16,  0x0071,
+    DATA16, 0x0001,
+    CMD16,  0x0030,
+    DATA16, 0x0002,
+    CMD16,  0x0031,
+    DATA16, 0x0400,
+    CMD16,  0x0032,
+    DATA16, 0x0007,
+    CMD16,  0x0033,
+    DATA16, 0x0500,
+    CMD16,  0x0034,
+    DATA16, 0x0007,
+    CMD16,  0x0035,
+    DATA16, 0x0703,
+    CMD16,  0x0036,
+    DATA16, 0x0507,
+    CMD16,  0x0037,
+    DATA16, 0x0005,
+    CMD16,  0x0038,
+    DATA16, 0x0407,
+    CMD16,  0x0039,
+    DATA16, 0x000e,
+    CMD16,  0x0040,
+    DATA16, 0x0202,
+    CMD16,  0x0041,
+    DATA16, 0x0003,
+    CMD16,  0x0042,
+    DATA16, 0x0000,
+    CMD16,  0x0043,
+    DATA16, 0x0200,
+    CMD16,  0x0044,
+    DATA16, 0x0707,
+    CMD16,  0x0045,
+    DATA16, 0x0407,
+    CMD16,  0x0046,
+    DATA16, 0x0505,
+    CMD16,  0x0047,
+    DATA16, 0x0002,
+    CMD16,  0x0048,
+    DATA16, 0x0004,
+    CMD16,  0x0049,
+    DATA16, 0x0004,
+    CMD16,  0x0060,
+    DATA16, 0x0202,
+    CMD16,  0x0061,
+    DATA16, 0x0003,
+    CMD16,  0x0062,
+    DATA16, 0x0000,
+    CMD16,  0x0063,
+    DATA16, 0x0200,
+    CMD16,  0x0064,
+    DATA16, 0x0707,
+    CMD16,  0x0065,
+    DATA16, 0x0407,
+    CMD16,  0x0066,
+    DATA16, 0x0505,
+    CMD16,  0x0068,
+    DATA16, 0x0004,
+    CMD16,  0x0069,
+    DATA16, 0x0004,
+    CMD16,  0x0007,
+    DATA16, 0x0001,
+    CMD16,  0x0018,
+    DATA16, 0x0001,
+    CMD16,  0x0010,
+    DATA16, 0x1690,
+    CMD16,  0x0011,
+    DATA16, 0x0100,
+    CMD16,  0x0012,
+    DATA16, 0x0117,
+    CMD16,  0x0013,
+    DATA16, 0x0f80,
+    CMD16,  0x0012,
+    DATA16, 0x0137,
+    CMD16,  0x0020,
+    DATA16, 0x0000,
+    CMD16,  0x0021,
+    DATA16, 0x0000,
+    CMD16,  0x0050,
+    DATA16, 0x0000,
+    CMD16,  0x0051,
+    DATA16, 0x00af,
+    CMD16,  0x0052,
+    DATA16, 0x0000,
+    CMD16,  0x0053,
+    DATA16, 0x0083,
+    CMD16,  0x0090,
+    DATA16, 0x0003,
+    CMD16,  0x0091,
+    DATA16, 0x0000,
+    CMD16,  0x0092,
+    DATA16, 0x0101,
+    CMD16,  0x0098,
+    DATA16, 0x0400,
+    CMD16,  0x0099,
+    DATA16, 0x1302,
+    CMD16,  0x009a,
+    DATA16, 0x0202,
+    CMD16,  0x009b,
+    DATA16, 0x0200,
+    SLEEP,  0x0000,
+    CMD16,  0x0007,
+    DATA16, 0x0021,
+    CMD16,  0x0012,
+    DATA16, 0x0137,
+    SLEEP,  0x0000,
+    CMD16,  0x0007,
+    DATA16, 0x0021,
+    CMD16,  0x0012,
+    DATA16, 0x1137,
+    SLEEP,  0x0000,
+    CMD16,  0x0007,
+    DATA16, 0x0233,
+};
+
+unsigned short lcd_init_sequence_1[] = {
+    CMD8,  0x01,
+    DATA8, 0x00,
+    SLEEP, 0,
+    CMD8,  0xB1,
+    DATA8, 0x16,
+    DATA8, 0x03,
+    CMD8,  0xB2,
+    DATA8, 0x17,
+    DATA8, 0x03,
+    CMD8,  0xB4,
+    DATA8, 0x00,
+    CMD8,  0xB6,
+    DATA8, 0x01,
+    CMD8,  0xB7,
+    DATA8, 0x00,
+    DATA8, 0x00,
+    DATA8, 0x02,
+    DATA8, 0x00,
+    DATA8, 0x06,
+    DATA8, 0x26,
+    DATA8, 0x2D,
+    DATA8, 0x27,
+    DATA8, 0x55,
+    DATA8, 0x27,
+    CMD8,  0xB8,
+    DATA8, 0x10,
+    CMD8,  0xB9,
+    DATA8, 0x52,
+    DATA8, 0x12,
+    DATA8, 0x03,
+    CMD8,  0xC0,
+    DATA8, 0x0A,
+    DATA8, 0x10,
+    DATA8, 0x10,
+    CMD8,  0xC2,
+    DATA8, 0x14,
+    DATA8, 0x23,
+    CMD8,  0xC3,
+    DATA8, 0x12,
+    DATA8, 0x23,
+    CMD8,  0xC6,
+    DATA8, 0x48,
+    CMD8,  0xE0,
+    DATA8, 0x20,
+    DATA8, 0x71,
+    DATA8, 0x17,
+    DATA8, 0x09,
+    DATA8, 0x70,
+    DATA8, 0x0C,
+    DATA8, 0x13,
+    DATA8, 0x25,
+    CMD8,  0xE1,
+    DATA8, 0x37,
+    DATA8, 0x00,
+    DATA8, 0x63,
+    DATA8, 0x11,
+    DATA8, 0xD9,
+    DATA8, 0x00,
+    DATA8, 0x12,
+    DATA8, 0x01,
+    CMD8,  0xE2,
+    DATA8, 0x42,
+    DATA8, 0x42,
+    DATA8, 0x60,
+    DATA8, 0x08,
+    DATA8, 0xB4,
+    DATA8, 0x07,
+    DATA8, 0x0E,
+    DATA8, 0x90,
+    CMD8,  0xE3,
+    DATA8, 0x47,
+    DATA8, 0x60,
+    DATA8, 0x66,
+    DATA8, 0x09,
+    DATA8, 0x6A,
+    DATA8, 0x02,
+    DATA8, 0x0E,
+    DATA8, 0x09,
+    CMD8,  0xE4,
+    DATA8, 0x11,
+    DATA8, 0x40,
+    DATA8, 0x03,
+    DATA8, 0x0A,
+    DATA8, 0xC1,
+    DATA8, 0x0D,
+    DATA8, 0x17,
+    DATA8, 0x30,
+    CMD8,  0xE5,
+    DATA8, 0x00,
+    DATA8, 0x30,
+    DATA8, 0x77,
+    DATA8, 0x1C,
+    DATA8, 0xFB,
+    DATA8, 0x00,
+    DATA8, 0x13,
+    DATA8, 0x07,
+    CMD8,  0xE6,
+    DATA8, 0x01,
+    CMD8,  0x35,
+    DATA8, 0x00,
+    CMD8,  0x36,
+    DATA8, 0x00,
+    CMD8,  0xF2,
+    DATA8, 0x40,
+    CMD8,  0xF3,
+    DATA8, 0x50,
+    CMD8,  0xFB,
+    DATA8, 0x01,
+    CMD8,  0x11,
+    DATA8, 0x00,
+    SLEEP, 0,
+    CMD8,  0x3A,
+    DATA8, 0x65,
+    CMD8,  0x29,
+    DATA8, 0x00,
+};
+
+unsigned short lcd_init_sequence_2[] = {
+    CMD8,  0x01,
+    SLEEP, 0,
+    CMD8,  0x11,
+    SLEEP, 0,
+    CMD8,  0x3a,
+    DATA8, 0x65,
+    CMD8,  0xab,
+    CMD8,  0x35,
+    DATA8, 0x00,
+    CMD8,  0xf2,
+    DATA8, 0x01,
+    CMD8,  0xe0,
+    DATA8, 0x71,
+    DATA8, 0x76,
+    DATA8, 0x25,
+    DATA8, 0x01,
+    DATA8, 0xa5,
+    DATA8, 0x09,
+    DATA8, 0x15,
+    DATA8, 0x11,
+    CMD8,  0xe1,
+    DATA8, 0x40,
+    DATA8, 0x21,
+    DATA8, 0x64,
+    DATA8, 0x13,
+    DATA8, 0xf3,
+    DATA8, 0x0b,
+    DATA8, 0x00,
+    DATA8, 0x00,
+    CMD8,  0xe2,
+    DATA8, 0x71,
+    DATA8, 0x65,
+    DATA8, 0x24,
+    DATA8, 0x08,
+    DATA8, 0x97,
+    DATA8, 0x01,
+    DATA8, 0x15,
+    DATA8, 0x11,
+    CMD8,  0xe3,
+    DATA8, 0x51,
+    DATA8, 0x01,
+    DATA8, 0x62,
+    DATA8, 0x13,
+    DATA8, 0xf3,
+    DATA8, 0x0b,
+    DATA8, 0x00,
+    DATA8, 0x00,
+    CMD8,  0xe4,
+    DATA8, 0x71,
+    DATA8, 0x57,
+    DATA8, 0x31,
+    DATA8, 0x01,
+    DATA8, 0x82,
+    DATA8, 0x04,
+    DATA8, 0x1f,
+    DATA8, 0x11,
+    CMD8,  0xe5,
+    DATA8, 0x64,
+    DATA8, 0x41,
+    DATA8, 0x64,
+    DATA8, 0x19,
+    DATA8, 0xb3,
+    DATA8, 0x09,
+    DATA8, 0x00,
+    DATA8, 0x00,
+    CMD8,  0x29,
+};
+
+#endif /* HAVE_LCD_SLEEP */
 
 static inline void s5l_lcd_write_cmd_data(int cmd, int data)
 {
@@ -84,7 +412,21 @@ static inline void s5l_lcd_write_cmd(unsigned short cmd)
     LCD_WCMD = cmd;
 }
 
-static inline void s5l_lcd_write_data(int data)
+static inline void s5l_lcd_write_wcmd(unsigned short cmd)
+{
+    while (LCD_STATUS & 0x10);
+    LCD_WCMD = cmd >> 8;
+    while (LCD_STATUS & 0x10);
+    LCD_WCMD = cmd & 0xff;
+}
+
+static inline void s5l_lcd_write_data(unsigned short data)
+{
+    while (LCD_STATUS & 0x10);
+    LCD_WDATA = data & 0xff;
+}
+
+static inline void s5l_lcd_write_wdata(unsigned short data)
 {
     while (LCD_STATUS & 0x10);
     LCD_WDATA = data >> 8;
@@ -125,6 +467,89 @@ void lcd_set_flip(bool yesno)
     }
 }
 
+bool lcd_active(void)
+{
+    return lcd_ispowered;
+}
+
+#ifdef HAVE_LCD_SLEEP
+
+void lcd_wakeup(void)
+{
+    unsigned short *lcd_init_sequence;
+    unsigned int lcd_init_sequence_length;
+    int type = lcd_type;
+
+    pmu_ldo_set_voltage(2, 17);
+    PWRCONEXT &= ~0x80;
+    PCON2 = 0x33333333;
+    PCON3 = 0x11113333;
+    PCON4 = 0x33333333;
+    PCON13 &= ~0xf;    /* Set pin 0 to input */
+    PCON14 &= ~0xf0;   /* Set pin 1 to input */
+
+    if((((PDAT13 & 1) == 1) && ((PDAT14 & 2) == 2))||
+       (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 0)))
+    {
+        type = 2; /* there is a third lcd type which behaves like type 7 (LDS176) but needs to be initialized differently */
+    }
+
+    if(type == 0)
+    {
+        lcd_init_sequence = lcd_init_sequence_0;
+        lcd_init_sequence_length = (sizeof(lcd_init_sequence_0) - 1)/sizeof(unsigned short);
+    }
+    else if(type == 1)
+    {
+        lcd_init_sequence = lcd_init_sequence_1;
+        lcd_init_sequence_length = (sizeof(lcd_init_sequence_1) - 1)/sizeof(unsigned short);
+    }
+    else
+    {
+        lcd_init_sequence = lcd_init_sequence_2;
+        lcd_init_sequence_length = (sizeof(lcd_init_sequence_2) - 1)/sizeof(unsigned short);
+    }
+
+    /* reset the lcd chip */
+
+    LCD_RST_TIME = 0x7FFF;
+    LCD_DRV_RST = 0;
+    sleep(0);
+    LCD_DRV_RST = 1;
+    sleep(HZ / 100);
+
+    for(unsigned int i=0;i<lcd_init_sequence_length;i+=2)
+    {
+	switch(lcd_init_sequence[i])
+	{
+		case CMD8:
+			s5l_lcd_write_cmd(lcd_init_sequence[i+1]);
+			break;
+		case DATA8:
+			s5l_lcd_write_data(lcd_init_sequence[i+1]);
+			break;
+		case CMD16:
+			s5l_lcd_write_wcmd(lcd_init_sequence[i+1]);
+			break;
+		case DATA16:
+			s5l_lcd_write_wdata(lcd_init_sequence[i+1]);
+			break;
+		case SLEEP:
+			sleep(lcd_init_sequence[i+1]);
+			break;
+		default:
+			break;
+	}
+    }
+    lcd_ispowered = true;
+}
+
+void lcd_awake(void)
+{
+    if(!lcd_active()) lcd_wakeup();
+}
+#endif
+
 void lcd_shutdown(void)
 {
     pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
@@ -145,12 +570,26 @@ void lcd_shutdown(void)
     else
     {
         s5l_lcd_write_cmd(R_DISPLAY_OFF);
-        s5l_lcd_write_data(0);
-        s5l_lcd_write_data(0);
+        s5l_lcd_write_wdata(0);
+        s5l_lcd_write_wdata(0);
         s5l_lcd_write_cmd(R_SLEEP_IN);
-        s5l_lcd_write_data(0);
-        s5l_lcd_write_data(0);
+        s5l_lcd_write_wdata(0);
+        s5l_lcd_write_wdata(0);
     }
+
+    PCON2 = 0;
+    PCON3 = 0;
+    PCON4 = 0;
+    PWRCONEXT |= 0x80;
+    sleep(HZ / 20);
+    pmu_ldo_set_voltage(2, 1);
+
+    lcd_ispowered = false;
+}
+
+void lcd_sleep(void)
+{
+    lcd_shutdown();
 }
 
 /* LCD init */
@@ -166,17 +605,8 @@ void lcd_init_device(void)
     else
         lcd_type = 1;  /* Similar to LDS176 - aka "type 7" */
 
-    /* Now init according to lcd type */
-    if (lcd_type == 0) {
-        /* TODO */
-
-        /* Entry Mode: AM=0, I/D1=1, I/D0=1, ORG=0, HWM=1, BGR=1 */
-        s5l_lcd_write_cmd_data(R_ENTRY_MODE, 0x1230); 
-    } else {
-        /* TODO */
-    }
+    lcd_ispowered = true;
 }
-
 
 /*** Update functions ***/
 
@@ -209,12 +639,12 @@ void lcd_update(void)
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_data(0);            /* Start column */
-        s5l_lcd_write_data(LCD_WIDTH-1);  /* End column */
+        s5l_lcd_write_wdata(0);            /* Start column */
+        s5l_lcd_write_wdata(LCD_WIDTH-1);  /* End column */
 
         s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_data(0);            /* Start row */
-        s5l_lcd_write_data(LCD_HEIGHT-1); /* End row */
+        s5l_lcd_write_wdata(0);            /* Start row */
+        s5l_lcd_write_wdata(LCD_HEIGHT-1); /* End row */
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
@@ -254,12 +684,12 @@ void lcd_update_rect(int x, int y, int width, int height)
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_data(x0);            /* Start column */
-        s5l_lcd_write_data(x1);            /* End column */
+        s5l_lcd_write_wdata(x0);            /* Start column */
+        s5l_lcd_write_wdata(x1);            /* End column */
 
         s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_data(y0);            /* Start row */
-        s5l_lcd_write_data(y1);            /* End row */
+        s5l_lcd_write_wdata(y0);            /* Start row */
+        s5l_lcd_write_wdata(y1);            /* End row */
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
@@ -337,12 +767,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_data(x0);            /* Start column */
-        s5l_lcd_write_data(x1);            /* End column */
+        s5l_lcd_write_wdata(x0);            /* Start column */
+        s5l_lcd_write_wdata(x1);            /* End column */
 
         s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_data(y0);            /* Start row */
-        s5l_lcd_write_data(y1);            /* End row */
+        s5l_lcd_write_wdata(y0);            /* Start row */
+        s5l_lcd_write_wdata(y1);            /* End row */
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
