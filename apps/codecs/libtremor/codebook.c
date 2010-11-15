@@ -195,7 +195,7 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
 
 #ifdef CPU_COLDFIRE
   ret = x;
-  asm ("swap  %[r]" : [r] "+r" (ret));   /* swap halfwords */
+  asm ("swap  %[r]" : [r] "+d" (ret));   /* swap halfwords */
 #else
   ret = (x>>16) | (x<<16);
 #endif
