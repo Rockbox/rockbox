@@ -38,4 +38,10 @@
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 
+static inline void udelay(unsigned usecs)
+{
+    unsigned stop = USEC_TIMER + usecs;
+    while (TIME_BEFORE(USEC_TIMER, stop));
+}
+
 #endif /* SYSTEM_TARGET_H */

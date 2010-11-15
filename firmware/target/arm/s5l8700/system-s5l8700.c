@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "system-target.h"
 #ifdef IPOD_NANO2G
 #include "storage.h"
 #include "pmu-target.h"
@@ -208,7 +209,7 @@ void set_cpu_frequency(long frequency)
         /* Vcore = 1.000V */
         pmu_write(0x1e, 0xf);
         /* Allow for voltage to stabilize */
-        sleep(HZ / 100);
+        udelay(100);
         /* FCLK_CPU = PLL0, HCLK = PLL0 / 2 */
         CLKCON = (CLKCON & ~0xFF00FF00) | 0x20003100;
         /* PCLK = HCLK / 2 */
