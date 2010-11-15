@@ -37,7 +37,13 @@ int main(int argc, char *argv[])
     char *infile, *bootfile, *outfile;
     int origin = 0xe0000;   /* MPIO HD200 bootloader address */
 
-    if(argc < 3) {
+    fprintf(stderr,
+"mkmpioboot Version " VERSION "\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"\n");
+
+ if(argc < 3) {
         usage();
     }
 

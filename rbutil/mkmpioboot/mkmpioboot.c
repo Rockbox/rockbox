@@ -26,13 +26,37 @@
 #include <string.h>
 #include "mkmpioboot.h"
 
-#define OF_FIRMWARE_LEN 0x100000 /* size of HD200_UPG.SYS file */
-#define MPIO_STRING_OFFSET 0xfffe0
+#define OF_FIRMWARE_LEN 0x100000 /* size of the OF file */
+#define MPIO_STRING_OFFSET 0xfffe0 /* offset of the version string in OF */
+#define BOOTLOADER_MAX_SIZE 0x1f800 /* free space size */
 
-/* We support only 1.30.05 version of OF for now */
-static char *mpio_string = "HD200  HDD Audio Ver113005";
+/* Descriptive name of these models */
+const char* model_names[] = {
+    [MODEL_HD200] = "MPIO HD200",
+    [MODEL_HD300] = "MPIO HD300",
+};
 
-/* MPIO HD200 firmware is plain binary image
+/* Model names used in the Rockbox header in ".mpio" files - these match the
+   -add parameter to the "scramble" tool */
+static const char* rb_model_names[] = {
+    [MODEL_HD200] = "hd20",
+    [MODEL_HD300] = "hd30",
+};
+
+/* Model numbers used to initialise the checksum in the Rockbox header in
+   ".mpio" files - these are the same as MODEL_NUMBER in config-target.h */
+static const int rb_model_num[] = {
+    [MODEL_HD200] = 69,
+    [MODEL_HD300] = 70,
+};
+
+/* Strings which indentify OF version */
+static const char* of_model_string[] = {
+    [MODEL_HD200] = "HD200  HDD Audio Ver113005",
+    [MODEL_HD300] = "HD300  HDD Audio Ver113006",
+};
+
+/* MPIO HD200 and HD300 firmware is plain binary image
  * 4 bytes of initial SP (loaded on reset)
  * 4 bytes of initial PC (loaded on reset)
  * binary image with entry point 0x00000008
@@ -49,9 +73,9 @@ static unsigned int get_uint32be(unsigned char* p)
     return ((p[0] << 24) | (p[1] << 16) | (p[2]<<8) | p[3]);
 }
 
-static long checksum(unsigned char* buf, unsigned long length)
+static long checksum(unsigned char* buf, int model, unsigned long length)
 {
-    unsigned long chksum = 69; /* MPIO HD200 model number */
+    unsigned long chksum = model;
     unsigned long i;
     
     if(buf == NULL)
@@ -70,21 +94,24 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     FILE *f;
     int i;
     int len;
+    int model_index;
     unsigned long file_checksum;
-    unsigned char header_checksum[4];
+    unsigned char header[8];
 
     memset(image, 0xff, sizeof(image));
 
     /* First, read the mpio original firmware into the image */
     f = fopen(infile, "rb");
-    if(!f) {
-        perror(infile);
+    if(!f)
+    {
+        fprintf(stderr, "[ERR]  Can not open %s file for reading\n", infile);
         return -1;
     }
 
     i = fread(image, 1, OF_FIRMWARE_LEN, f);
-    if(i < OF_FIRMWARE_LEN) {
-        perror(infile);
+    if(i < OF_FIRMWARE_LEN)
+    {
+        fprintf(stderr, "[ERR]  %s file read error\n", infile);        
         fclose(f);
         return -2;
     }
@@ -95,25 +122,44 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
      * of the version string in firmware 
      */
 
-    if (strcmp((char*)(image + MPIO_STRING_OFFSET),mpio_string) != 0)
+    for(model_index = 0; model_index < NUM_MODELS; model_index++)
+        if (strcmp(of_model_string[model_index],
+            (char*)(image + MPIO_STRING_OFFSET)) == 0)
+            break;
+
+    if(model_index == NUM_MODELS)
     {
-        perror("Loaded firmware file does not look like MPIO OF file!");
+        fprintf(stderr, "[ERR]  Unknown MPIO original firmware version\n");
         return -3;
     }
 
+    fprintf(stderr, "[INFO] Loading original firmware file for %s\n",
+            model_names[model_index]);
+
     /* Now, read the boot loader into the image */
     f = fopen(bootfile, "rb");
-    if(!f) {
-        perror(bootfile);
-        fclose(f);
+    if(!f)
+    {
+        fprintf(stderr, "[ERR]  Can not open %s file for reading\n", bootfile);
         return -4;
     }
+
+    fprintf(stderr, "[INFO] Loading Rockbox bootloader file\n");
 
     /* get bootloader size
      * excluding header
      */
     fseek(f, 0, SEEK_END);
     len = ftell(f) - 8;
+
+    if (len > BOOTLOADER_MAX_SIZE)
+    {
+        fprintf(stderr, "[ERR]  Bootloader doesn't fit in firmware file.\n");
+        fprintf(stderr, "[ERR]  This bootloader is %d bytes long\n", len);
+        fprintf(stderr, "[ERR]  and maximum allowed size is %d bytes\n",
+                BOOTLOADER_MAX_SIZE);
+        return -5;
+    }
 
     /* Now check if the place we want to put
      * our bootloader is free
@@ -122,24 +168,33 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     {
         if (image[origin+i] != 0)
         {
-            perror("Place for bootloader in OF file not empty");
-            return -5;
+            fprintf(stderr, "[ERR]  Place for bootloader in OF file not empty\n");
+            return -6;
         }
     }
 
     fseek(f, 0, SEEK_SET);
 
-    /* get bootloader checksum from the header*/
-    fread(header_checksum,1,4,f);
+    /* get bootloader header*/
+    fread(header,1,8,f);
+
+    if ( memcmp(header + 4, rb_model_names[model_index], 4) != 0 )
+    {
+        fprintf(stderr, "[ERR]  Original firmware and rockbox bootloader mismatch!\n");
+        fprintf(stderr, "[ERR]  Double check that you have bootloader for %s\n",
+                model_names[model_index]);
+        return -7;
+    }
 
     /* omit header */
     fseek(f, 8, SEEK_SET);
 
     i = fread(image + origin, 1, len, f);
-    if(i < len) {
-        perror(bootfile);
+    if(i < len)
+    {
+        fprintf(stderr, "[ERR]  %s file read error\n", bootfile);
         fclose(f);
-        return -6;
+        return -8;
     }
 
     fclose(f);
@@ -147,19 +202,22 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     /* calculate checksum and compare with data
      * from header
      */
-    file_checksum = checksum(image + origin, len);
+    file_checksum = checksum(image + origin, rb_model_num[model_index], len);
 
-    if ( file_checksum != get_uint32be(header_checksum) )
+    if ( file_checksum != get_uint32be(header) )
     {
-        printf("Bootloader checksum error\n");
-        return -7;
+        fprintf(stderr,"[ERR]  Bootloader checksum error\n");
+        return -9;
     }
 
     f = fopen(outfile, "wb");
-    if(!f) {
-        perror(outfile);
-        return -8;
+    if(!f)
+    {
+        fprintf(stderr, "[ERR]  Can not open %s file for writing\n" ,outfile);
+        return -10;
     }
+
+    fprintf(stderr, "[INFO] Patching reset vector\n");
 
     /* Patch the stack pointer address */    
     image[0] = image[origin + 0];
@@ -174,14 +232,16 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     image[7] = image[origin + 7];
 
     i = fwrite(image, 1, OF_FIRMWARE_LEN, f);
-    if(i < OF_FIRMWARE_LEN) {
-        perror(outfile);
+    if(i < OF_FIRMWARE_LEN)
+    {
+        fprintf(stderr,"[ERR]  %s file write error\n", outfile);
         fclose(f);
-        return -9;
+        return -11;
     }
 
-    printf("Wrote 0x%x bytes in %s\n", OF_FIRMWARE_LEN, outfile);
-    
+    fprintf(stderr,"[INFO] Wrote 0x%x bytes in %s\n", OF_FIRMWARE_LEN, outfile);
+    fprintf(stderr,"[INFO] Patching succeeded!\n");
+   
     fclose(f);
     
     return 0;

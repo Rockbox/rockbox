@@ -28,6 +28,15 @@
 extern "C" {
 #endif
 
+/* Supported models */
+enum {
+    MODEL_UNKNOWN = -1,
+    MODEL_HD200 = 0,
+    MODEL_HD300,
+
+    NUM_MODELS
+};
+
 int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, int origin);
 
 #ifdef __cplusplus
