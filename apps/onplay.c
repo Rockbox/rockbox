@@ -1038,7 +1038,8 @@ MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
 {
-    strlcpy(global_settings.rec_directory, selected_file, MAX_FILENAME+1);
+    strlcpy(global_settings.rec_directory, selected_file,
+            sizeof(global_settings.rec_directory));
     settings_save();
     return false;
 }

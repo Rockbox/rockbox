@@ -42,6 +42,7 @@ struct opt_items {
 
 /** Setting values defines **/
 #define MAX_FILENAME 32
+#define MAX_PATHNAME 80
 
 
 enum {
@@ -417,7 +418,7 @@ struct user_settings
     int rec_split_method; /* time/filesize */
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
-    char rec_directory[MAX_FILENAME+1];
+    char rec_directory[MAX_PATHNAME+1];
     int cliplight; /* 0 = off
                       1 = main lcd
                       2 = main and remote lcd
@@ -531,7 +532,7 @@ struct user_settings
     unsigned char rsbs_file[MAX_FILENAME+1];  /* last remote statusbar skin */
 #endif
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
-    unsigned char playlist_catalog_dir[MAX_FILENAME+1];
+    unsigned char playlist_catalog_dir[MAX_PATHNAME+1];
     int skip_length; /* skip length */
     int max_files_in_dir; /* Max entries in directory (file browser) */
     int max_files_in_playlist; /* Max entries in playlist */
@@ -810,7 +811,7 @@ struct user_settings
 #endif
     } hw_eq_bands[AUDIOHW_EQ_BAND_NUM];
 #endif /* AUDIOHW_HAVE_EQ */
-    char start_directory[2*MAX_FILENAME+1];
+    char start_directory[MAX_PATHNAME+1];
 };
 
 /** global variables **/
