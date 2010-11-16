@@ -33,6 +33,8 @@
 #include "lib/rgb_hsv.h"
 #include "lib/playback_control.h"
 
+#include "pluginbitmaps/rockpaint.h"
+#include "pluginbitmaps/rockpaint_hsvrgb.h"
 
 
 /***********************************************************************
@@ -265,9 +267,6 @@
 #define COLOR_BROWN        LCD_RGBPACK(128,64,0)
 #define COLOR_LIGHTBROWN   LCD_RGBPACK(255,128,64)
 
-#define SPLASH_SCREEN PLUGIN_APPS_DIR "/rockpaint/splash.bmp"
-#define ROCKPAINT_TITLE_FONT  2
-
 /***********************************************************************
  * Program Colors
  ***********************************************************************/
@@ -340,14 +339,15 @@
 static void draw_pixel(int x,int y);
 static void draw_line( int x1, int y1, int x2, int y2 );
 static void draw_rect( int x1, int y1, int x2, int y2 );
+static void draw_rect_full( int x1, int y1, int x2, int y2 );
 static void draw_toolbars(bool update);
 static void inv_cursor(bool update);
 static void restore_screen(void);
 static void clear_drawing(void);
+static void reset_tool(void);
 static void goto_menu(void);
 static int load_bitmap( const char *filename );
 static int save_bitmap( char *filename );
-static void draw_rect_full( int x1, int y1, int x2, int y2 );
 
 /***********************************************************************
  * Global variables
@@ -366,7 +366,6 @@ static int x=0, y=0; /* cursor position */
 static int prev_x=-1, prev_y=-1; /* previous saved cursor position */
 static int prev_x2=-1, prev_y2=-1;
 static int prev_x3=-1, prev_y3=-1;
-static int tool_mode=-1;
 
 
 static int bsize=1; /* brush size */
@@ -388,7 +387,14 @@ enum Tools { Brush = 0, /* Regular brush */
              RadialGradient = 13
            };
 
+enum States { State0 = 0, /* initial state */
+              State1,
+              State2,
+              State3,
+            };
+
 enum Tools tool = Brush;
+enum States state = State0;
 
 static bool quit=false;
 static int gridsize=0;
@@ -404,8 +410,10 @@ static fb_data rp_colors[18] =
 
 static fb_data save_buffer[ ROWS*COLS ];
 
-extern fb_data rockpaint[];
-extern fb_data rockpaint_hsvrgb[];
+struct tool_func {
+    void (*state_func)(void);
+    void (*preview_func)(void);
+};
 
 struct incdec_ctx {
     int max;
@@ -975,6 +983,7 @@ static bool browse_fonts( char *dst, int dst_size )
                 break;
 
             case ROCKPAINT_LEFT:
+            case ROCKPAINT_QUIT:
                 return false;
 
             case ROCKPAINT_RIGHT:
@@ -1206,7 +1215,7 @@ static void color_picker( int x, int y )
         if( y >= ROWS - PSIZE ) y -= PSIZE + 2;
         rb->lcd_drawrect( x + 2, y + 2, PSIZE - 2, PSIZE - 2 );
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_drawrect( x + 3, y + 3, PSIZE - 4, PSIZE - 4 );
+        rb->lcd_fillrect( x + 3, y + 3, PSIZE - 4, PSIZE - 4 );
 #undef PSIZE
         rb->lcd_set_foreground( rp_colors[ drawcolor ] );
     }
@@ -1414,10 +1423,10 @@ static void draw_rot_90_deg( int x1, int y1, int x2, int y2, int direction )
 }
 
 static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
-                                  int src_y2, int x1, int y1, int mode )
+                                  int src_y2, int x1, int y1, int cut )
 {
     int i, width, height;
-    if( mode == SELECT_MENU_CUT )
+    if( cut )
     {
         i = drawcolor;
         drawcolor = bgdrawcolor;
@@ -1907,6 +1916,8 @@ static void draw_fill( int x0, int y0 )
     short y = y0;
     unsigned int prev_color = save_buffer[ x0+y0*COLS ];
 
+    if( preview )
+        return;
     if( prev_color == rp_colors[ drawcolor ] ) return;
 
     PUSH( x, y );
@@ -2063,6 +2074,7 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
     if( preview )
     {
         line_gradient( x1, y1, x2, y2 );
+        return;
     }
     if( rp_colors[ drawcolor ] == rp_colors[ bgdrawcolor ] )
     {
@@ -2162,6 +2174,7 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
     if( preview )
     {
         line_gradient( x1, y1, x2, y2 );
+        return;
     }
     if( rp_colors[ drawcolor ] == rp_colors[ bgdrawcolor ] )
     {
@@ -2351,13 +2364,7 @@ static void toolbar( void )
                     i = ( x - TB_TL_LEFT )/(TB_TL_SIZE+TB_TL_SPACING);
                     j = ( y - (TOP+TB_TL_TOP) )/(TB_TL_SIZE+TB_TL_SPACING);
                     tool = i*2+j;
-                    prev_x = -1;
-                    prev_y = -1;
-                    prev_x2 = -1;
-                    prev_y2 = -1;
-                    prev_x3 = -1;
-                    prev_y3 = -1;
-                    preview = false;
+                    reset_tool();
                 }
                 else if( x >= TB_MENU_LEFT && y >= TOP+TB_MENU_TOP-2)
                 {
@@ -2550,13 +2557,268 @@ static void reset_tool( void )
     prev_y2 = -1;
     prev_x3 = -1;
     prev_y3 = -1;
-    tool_mode = -1;
-    preview = false;
+    /* reset state */
+    state = State0;
+    /* always preview color picker */
+    preview = (tool == ColorPicker);
 }
+
+/* brush tool */
+static void state_func_brush(void)
+{
+    if( state == State0 )
+    {
+        state = State1;
+    }
+    else
+    {
+        state = State0;
+    }
+}
+
+/* fill tool */
+static void state_func_fill(void)
+{
+    draw_fill( x, y );
+    restore_screen();
+}
+
+/* select rectangle tool */
+static void state_func_select(void)
+{
+    int mode;
+    if( state == State0 )
+    {
+        prev_x = x;
+        prev_y = y;
+        preview = true;
+        state = State1;
+    }
+    else if( state == State1 )
+    {
+        mode = rb->do_menu( &select_menu, NULL, NULL, false );
+        switch( mode )
+        {
+            case SELECT_MENU_CUT:
+            case SELECT_MENU_COPY:
+                prev_x2 = x;
+                prev_y2 = y;
+                if( prev_x < x ) x = prev_x;
+                if( prev_y < y ) y = prev_y;
+                prev_x3 = abs(prev_x2 - prev_x);
+                prev_y3 = abs(prev_y2 - prev_y);
+                copy_to_clipboard();
+                state = (mode == SELECT_MENU_CUT? State2: State3);
+                break;
+
+            case SELECT_MENU_INVERT:
+                draw_invert( prev_x, prev_y, x, y );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_HFLIP:
+                draw_hflip( prev_x, prev_y, x, y );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_VFLIP:
+                draw_vflip( prev_x, prev_y, x, y );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_ROTATE90:
+                draw_rot_90_deg( prev_x, prev_y, x, y, 1 );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_ROTATE180:
+                draw_hflip( prev_x, prev_y, x, y );
+                draw_vflip( prev_x, prev_y, x, y );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_ROTATE270:
+                draw_rot_90_deg( prev_x, prev_y, x, y, -1 );
+                reset_tool();
+                break;
+
+            case SELECT_MENU_CANCEL:
+                reset_tool();
+                break;
+
+            default:
+                break;
+        }
+        restore_screen();
+    }
+    else
+    {
+        preview = false;
+        draw_paste_rectangle( prev_x, prev_y, prev_x2, prev_y2,
+                              x, y, state == State2 );
+        reset_tool();
+        restore_screen();
+    }
+}
+
+static void preview_select(void)
+{
+    if( state == State1 )
+    {
+        /* we are defining the selection */
+        draw_select_rectangle( prev_x, prev_y, x, y );
+    }
+    else
+    {
+        /* we are pasting the selected data */
+        draw_paste_rectangle( prev_x, prev_y, prev_x2, prev_y2,
+                              x, y, state == State2 );
+        draw_select_rectangle( x, y, x+prev_x3, y+prev_y3 );
+    }
+}
+
+/* color picker tool */
+static void state_func_picker(void)
+{
+    preview = false;
+    color_picker( x, y );
+    reset_tool();
+}
+
+static void preview_picker(void)
+{
+    color_picker( x, y );
+}
+
+/* curve tool */
+static void state_func_curve(void)
+{
+    if( state == State0 )
+    {
+        prev_x = x;
+        prev_y = y;
+        preview = true;
+        state = State1;
+    }
+    else if( state == State1 )
+    {
+        prev_x2 = x;
+        prev_y2 = y;
+        state = State2;
+    }
+    else if( state == State2 )
+    {
+        prev_x3 = x;
+        prev_y3 = y;
+        state = State3;
+    }
+    else
+    {
+        preview = false;
+        draw_curve( prev_x, prev_y, prev_x2, prev_y2,
+                   prev_x3, prev_y3, x, y );
+        reset_tool();
+        restore_screen();
+    }
+}
+
+static void preview_curve(void)
+{
+    if( state == State1 )
+    {
+        draw_line( prev_x, prev_y, x, y );
+    }
+    else
+    {
+        draw_curve( prev_x, prev_y, prev_x2, prev_y2,
+                   prev_x3, prev_y3, x, y );
+    }
+}
+
+/* text tool */
+static void state_func_text(void)
+{
+    draw_text( x, y );
+}
+
+/* tools which take 2 point */
+static void preview_2point(void);
+static void state_func_2point(void)
+{
+    if( state == State0 )
+    {
+        prev_x = x;
+        prev_y = y;
+        state = State1;
+        preview = true;
+    }
+    else
+    {
+        preview = false;
+        preview_2point();
+        reset_tool();
+        restore_screen();
+    }
+}
+
+static void preview_2point(void)
+{
+    if( state == State1 )
+    {
+        switch( tool )
+        {
+            case Line:
+                draw_line( prev_x, prev_y, x, y );
+                break;
+            case Rectangle:
+                draw_rect( prev_x, prev_y, x, y );
+                break;
+            case RectangleFull:
+                draw_rect_full( prev_x, prev_y, x, y );
+                break;
+            case Oval:
+                draw_oval_empty( prev_x, prev_y, x, y );
+                break;
+            case OvalFull:
+                draw_oval_full( prev_x, prev_y, x, y );
+                break;
+            case LinearGradient:
+                linear_gradient( prev_x, prev_y, x, y );
+                break;
+            case RadialGradient:
+                radial_gradient( prev_x, prev_y, x, y );
+                break;
+            default:
+                break;
+        }
+        if( !preview )
+        {
+            reset_tool();
+            restore_screen();
+        }
+    }
+}
+
+static const struct tool_func tools[14] = {
+    [Brush]           = { state_func_brush,  NULL },
+    [Fill]            = { state_func_fill,   NULL },
+    [SelectRectangle] = { state_func_select, preview_select },
+    [ColorPicker]     = { state_func_picker, preview_picker },
+    [Line]            = { state_func_2point, preview_2point },
+    [Unused]          = { NULL, NULL },
+    [Curve]           = { state_func_curve,  preview_curve },
+    [Text]            = { state_func_text,   NULL },
+    [Rectangle]       = { state_func_2point, preview_2point },
+    [RectangleFull]   = { state_func_2point, preview_2point },
+    [Oval]            = { state_func_2point, preview_2point },
+    [OvalFull]        = { state_func_2point, preview_2point },
+    [LinearGradient]  = { state_func_2point, preview_2point },
+    [RadialGradient]  = { state_func_2point, preview_2point },
+};
 
 static bool rockpaint_loop( void )
 {
-    int button=0,i,j;
+    int button = 0, i, j;
     bool bigstep;
 
     x = 10;
@@ -2567,187 +2829,46 @@ static bool rockpaint_loop( void )
 
     while (!quit) {
         button = rb->button_get(true);
-        bigstep = (button & BUTTON_REPEAT) && !(tool == Brush && prev_x != -1);
+        bigstep = (button & BUTTON_REPEAT) && !(tool == Brush && state == State1);
 
         switch(button)
         {
             case ROCKPAINT_QUIT:
-                rb->lcd_set_drawmode(DRMODE_SOLID);
-                return PLUGIN_OK;
+                if (state != State0)
+                {
+                    reset_tool();
+                    restore_screen();
+                    inv_cursor(true);
+                }
+                else
+                {
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                    return PLUGIN_OK;
+                }
+                break;
 
             case ROCKPAINT_MENU:
-                inv_cursor(false);
                 goto_menu();
                 restore_screen();
                 inv_cursor(true);
                 break;
 
             case ROCKPAINT_DRAW:
-                inv_cursor(false);
-                switch( tool )
+                if( tools[tool].state_func )
                 {
-                    case Brush:
-                        if( prev_x == -1 ) prev_x = 1;
-                        else prev_x = -1;
-                        break;
-
-                    case SelectRectangle:
-                    case Line:
-                    case Curve:
-                    case Rectangle:
-                    case RectangleFull:
-                    case Oval:
-                    case OvalFull:
-                    case LinearGradient:
-                    case RadialGradient:
-                        /* Curve uses 4 points, others use 2 */
-                        if( prev_x == -1 || prev_y == -1 )
-                        {
-                            prev_x = x;
-                            prev_y = y;
-                            preview = true;
-                        }
-                        else if( tool == Curve
-                                 && ( prev_x2 == -1 || prev_y2 == -1 ) )
-                        {
-                            prev_x2 = x;
-                            prev_y2 = y;
-                        }
-                        else if( tool == SelectRectangle
-                                 && ( prev_x2 == -1 || prev_y2 == -1 ) )
-                        {
-                            tool_mode = rb->do_menu( &select_menu,
-                                                     NULL, NULL, false );
-                            switch( tool_mode )
-                            {
-                                case SELECT_MENU_CUT:
-                                case SELECT_MENU_COPY:
-                                    prev_x2 = x;
-                                    prev_y2 = y;
-                                    copy_to_clipboard();
-                                    if( prev_x < x ) x = prev_x;
-                                    if( prev_y < y ) y = prev_y;
-                                    break;
-
-                                case SELECT_MENU_INVERT:
-                                    draw_invert( prev_x, prev_y, x, y );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_HFLIP:
-                                    draw_hflip( prev_x, prev_y, x, y );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_VFLIP:
-                                    draw_vflip( prev_x, prev_y, x, y );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_ROTATE90:
-                                    draw_rot_90_deg( prev_x, prev_y, x, y, 1 );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_ROTATE180:
-                                    draw_hflip( prev_x, prev_y, x, y );
-                                    draw_vflip( prev_x, prev_y, x, y );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_ROTATE270:
-                                    draw_rot_90_deg( prev_x, prev_y, x, y, -1 );
-                                    reset_tool();
-                                    break;
-
-                                case SELECT_MENU_CANCEL:
-                                    reset_tool();
-                                    break;
-
-                                default:
-                                    break;
-                            }
-                            restore_screen();
-                        }
-                        else if( tool == Curve
-                                 && ( prev_x3 == -1 || prev_y3 == -1 ) )
-                        {
-                            prev_x3 = x;
-                            prev_y3 = y;
-                        }
-                        else
-                        {
-                            preview = false;
-                            switch( tool )
-                            {
-                                case SelectRectangle:
-                                    draw_paste_rectangle( prev_x, prev_y,
-                                                          prev_x2, prev_y2,
-                                                          x, y, tool_mode );
-                                    break;
-                                case Line:
-                                    draw_line( prev_x, prev_y, x, y );
-                                    break;
-                                case Curve:
-                                    draw_curve( prev_x, prev_y,
-                                               prev_x2, prev_y2,
-                                               prev_x3, prev_y3,
-                                               x, y );
-                                    break;
-                                case Rectangle:
-                                    draw_rect( prev_x, prev_y, x, y );
-                                    break;
-                                case RectangleFull:
-                                    draw_rect_full( prev_x, prev_y, x, y );
-                                    break;
-                                case Oval:
-                                    draw_oval_empty( prev_x, prev_y, x, y );
-                                    break;
-                                case OvalFull:
-                                    draw_oval_full( prev_x, prev_y, x, y );
-                                    break;
-                                case LinearGradient:
-                                    linear_gradient( prev_x, prev_y, x, y );
-                                    break;
-                                case RadialGradient:
-                                    radial_gradient( prev_x, prev_y, x, y );
-                                    break;
-                                default:
-                                    break;
-                            }
-                            reset_tool();
-                            restore_screen();
-                        }
-                        break;
-
-                    case Fill:
-                        draw_fill( x, y );
-                        restore_screen();
-                        break;
-
-                    case ColorPicker:
-                        color_picker( x, y );
-                        break;
-
-                    case Text:
-                        draw_text( x, y );
-                        break;
-
-                    default:
-                        break;
+                    inv_cursor(false);
+                    tools[tool].state_func();
+                    inv_cursor(true);
                 }
-                inv_cursor(true);
                 break;
 
             case ROCKPAINT_DRAW|BUTTON_REPEAT:
-                if( tool == Curve )
+                if( tool == Curve && state != State0 )
                 {
                     /* 3 point bezier curve */
                     preview = false;
-                    draw_curve( prev_x, prev_y,
-                               prev_x2, prev_y2,
-                               -1, -1,
-                               x, y );
+                    draw_curve( prev_x, prev_y, prev_x2, prev_y2,
+                               -1, -1, x, y );
                     reset_tool();
                     restore_screen();
                     inv_cursor( true );
@@ -2755,17 +2876,9 @@ static bool rockpaint_loop( void )
                 break;
 
             case ROCKPAINT_TOOLBAR:
-                i = x; j = y;
-                x = 10;
-                toolbar();
-                x = i; y = j;
-                restore_screen();
-                inv_cursor(true);
-                break;
-
             case ROCKPAINT_TOOLBAR2:
                 i = x; j = y;
-                x = 110;
+                x = (button == ROCKPAINT_TOOLBAR2) ? 110: 10;
                 toolbar();
                 x = i; y = j;
                 restore_screen();
@@ -2802,97 +2915,16 @@ static bool rockpaint_loop( void )
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
-        if( tool == Brush && prev_x == 1 )
+        if( tool == Brush && state == State1 )
         {
             inv_cursor(false);
             draw_brush( x, y );
             inv_cursor(true);
         }
-        if( preview || tool == ColorPicker )
-            /* always preview color picker */
+        if( preview && tools[tool].preview_func )
         {
             restore_screen();
-            switch( tool )
-            {
-                case SelectRectangle:
-                    if( prev_x2 == -1 || prev_y2 == -1 )
-                    {
-                        /* we are defining the selection */
-                        draw_select_rectangle( prev_x, prev_y, x, y );
-                    }
-                    else
-                    {
-                        /* we are pasting the selected data */
-                        draw_paste_rectangle( prev_x, prev_y, prev_x2,
-                                              prev_y2, x, y, tool_mode );
-                        prev_x3 = prev_x2-prev_x;
-                        if( prev_x3 < 0 ) prev_x3 *= -1;
-                        prev_y3 = prev_y2-prev_y;
-                        if( prev_y3 < 0 ) prev_y3 *= -1;
-                        draw_select_rectangle( x, y, x+prev_x3, y+prev_y3 );
-                        prev_x3 = -1;
-                        prev_y3 = -1;
-                    }
-                    break;
-
-                case Brush:
-                    break;
-
-                case Line:
-                    draw_line( prev_x, prev_y, x, y );
-                    break;
-
-                case Curve:
-                    if( prev_x2 == -1 || prev_y2 == -1 )
-                    {
-                        draw_line( prev_x, prev_y, x, y );
-                    }
-                    else
-                    {
-                        draw_curve( prev_x, prev_y,
-                                   prev_x2, prev_y2,
-                                   prev_x3, prev_y3,
-                                   x, y );
-                    }
-                    break;
-
-                case Rectangle:
-                    draw_rect( prev_x, prev_y, x, y );
-                    break;
-
-                case RectangleFull:
-                    draw_rect_full( prev_x, prev_y, x, y );
-                    break;
-
-                case Oval:
-                    draw_oval_empty( prev_x, prev_y, x, y );
-                    break;
-
-                case OvalFull:
-                    draw_oval_full( prev_x, prev_y, x, y );
-                    break;
-
-                case Fill:
-                    break;
-
-                case ColorPicker:
-                    preview = true;
-                    color_picker( x, y );
-                    preview = false;
-                    break;
-
-                case LinearGradient:
-                    line_gradient( prev_x, prev_y, x, y );
-                    break;
-
-                case RadialGradient:
-                    line_gradient( prev_x, prev_y, x, y );
-                    break;
-
-                case Text:
-                default:
-                    break;
-            }
+            tools[tool].preview_func();
             inv_cursor( true );
         }
         if( gridsize > 0 )
