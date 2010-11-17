@@ -456,9 +456,8 @@ union buf
         char text[MAX_TEXT];
         char font[MAX_PATH];
         char old_font[MAX_PATH];
-        int fh_buf[30];
-        int fw_buf[30];
-        char fontname_buf[30][MAX_PATH];
+        int fh_buf[80];
+        int fw_buf[80];
     } text;
 };
 
@@ -703,19 +702,20 @@ static bool browse( char *dst, int dst_size, const char *start )
     struct gui_synclist browse_list;
     int item_count = 0, selected, button;
     struct tree_context backup;
-    struct entry *dc;
+    struct entry *dc, *e;
     bool reload = true;
     int dirfilter = SHOW_ALL;
-    int *indexes = (int *) buffer->clipboard;
+    int *indexes = (int *) buffer;
+    size_t bbuf_len, len;
 
     char *a;
 
     rb->strcpy( bbuf, start );
-    a = bbuf+rb->strlen(bbuf)-1;
-    if( *a != '/' )
+    bbuf_len = rb->strlen(bbuf);
+    if( bbuf[bbuf_len-1] != '/' )
     {
-        a[1] = '/';
-        a[2] = '\0';
+        bbuf[bbuf_len++] = '/';
+        bbuf[bbuf_len] = '\0';
     }
     bbuf_s[0] = '\0';
 
@@ -729,9 +729,8 @@ static bool browse( char *dst, int dst_size, const char *start )
     if( *a != '/' )
     {
         *++a = '/';
-        *++a = '\0';
     }
-    rb->strcpy( a, dc[tree->selected_item].name );
+    rb->strcpy( a+1, dc[tree->selected_item].name );
     tree->dirfilter = &dirfilter;
     while( 1 )
     {
@@ -743,14 +742,13 @@ static bool browse( char *dst, int dst_size, const char *start )
             selected = 0;
             for( i = 0; i < tree->filesindir ; i++)
             {
+                e = &dc[i];
                 /* only displayes directories and .bmp files */
-                if( ((dc[i].attr & ATTR_DIRECTORY ) &&
-                      rb->strcmp( dc[i].name, "." ) &&
-                      rb->strcmp( dc[i].name, ".." )) ||
-                    ( !(dc[i].attr & ATTR_DIRECTORY) &&
-                        check_extention( dc[i].name, ".bmp" ) ) )
+                if( ( e->attr & ATTR_DIRECTORY ) ||
+                    ( !(e->attr & ATTR_DIRECTORY) &&
+                        check_extention( e->name, ".bmp" ) ) )
                 {
-                    if( !rb->strcmp( dc[i].name, bbuf_s ) )
+                    if( bbuf_s[0] && !rb->strcmp( e->name, bbuf_s ) )
                         selected = item_count;
                     indexes[item_count++] = i;
                 }
@@ -774,40 +772,40 @@ static bool browse( char *dst, int dst_size, const char *start )
                     rb->set_current_file( backup.currdir );
                     return false;
                 }
-                rb->strcpy( bbuf_s, ".." );
-            case ACTION_STD_OK:
-                if( button == ACTION_STD_OK )
-                {
-                    selected = rb->gui_synclist_get_sel_pos( &browse_list );
-                    if( selected < 0 || selected >= item_count )
-                        break;
-                    struct entry* e = &dc[indexes[selected]];
-                    rb->strlcpy( bbuf_s, e->name, sizeof( bbuf_s ) );
-                    if( !( e->attr & ATTR_DIRECTORY ) )
-                    {
-                        *tree = backup;
-                        rb->set_current_file( backup.currdir );
-                        rb->snprintf( dst, dst_size, "%s%s", bbuf, bbuf_s );
-                        return true;
-                    }
-                }
-                if( !rb->strcmp( bbuf_s, "." ) ) break;
-                a = bbuf+rb->strlen(bbuf);
-                if( !rb->strcmp( bbuf_s, ".." ) )
-                {
-                    a--;
-                    if( a == bbuf ) break;
-                    if( *a == '/' ) a--;
-                    while( *a != '/' ) a--;
-                    rb->strcpy( bbuf_s, ++a );
-                    /* select parent directory */
-                    bbuf_s[rb->strlen(bbuf_s)-1] = '\0';
-                    *a = '\0';
-                    reload = true;
-                    break;
-                }
-                rb->snprintf( a, bbuf+sizeof(bbuf)-a, "%s/", bbuf_s );
+                a = bbuf + bbuf_len - 1;
+                if( a == bbuf ) break;
+                while( *a == '/' ) a--;
+                *(a+1) = '\0';
+                while( *a != '/' ) a--;
+                /* select parent directory */
+                rb->strcpy( bbuf_s, ++a );
+                *a = '\0';
+                bbuf_len = a - bbuf;
                 reload = true;
+                break;
+
+            case ACTION_STD_OK:
+                selected = rb->gui_synclist_get_sel_pos( &browse_list );
+                if( selected < 0 || selected >= item_count )
+                    break;
+                e = &dc[indexes[selected]];
+                if( !( e->attr & ATTR_DIRECTORY ) )
+                {
+                    rb->snprintf( dst, dst_size, "%s%s", bbuf, e->name );
+                    *tree = backup;
+                    rb->set_current_file( backup.currdir );
+                    return true;
+                }
+                len = rb->strlen(e->name);
+                if (bbuf_len + len + 2 < (int)sizeof(bbuf))
+                {
+                    bbuf_s[0] = '\0';
+                    rb->strcpy( bbuf+bbuf_len, e->name );
+                    bbuf_len += len;
+                    bbuf[bbuf_len++] = '/';
+                    bbuf[bbuf_len] = '\0';
+                    reload = true;
+                }
                 break;
 
             case ACTION_STD_MENU:
@@ -827,13 +825,16 @@ static bool browse( char *dst, int dst_size, const char *start )
  ***********************************************************************/
 static bool browse_fonts( char *dst, int dst_size )
 {
-#define WIDTH ( LCD_WIDTH - 20 )
-#define HEIGHT ( LCD_HEIGHT - 20 )
 #define LINE_SPACE 2
-    int top, top_inside = 0, left;
+#define fh_buf buffer->text.fh_buf
+#define fw_buf buffer->text.fw_buf
 
-    DIR *d;
-    struct dirent *de;
+    struct tree_context backup;
+    struct entry *dc, *e;
+    int dirfilter = SHOW_FONT;
+
+    int top = 0;
+
     int fvi = 0; /* first visible item */
     int lvi = 0; /* last visible item */
     int si = 0; /* selected item */
@@ -844,16 +845,27 @@ static bool browse_fonts( char *dst, int dst_size )
     int b_need_redraw = 1; /* Do we need to redraw ? */
 
     int cp = 0; /* current position */
-    int fh; /* font height */
+    int sp = 0; /* selected position */
+    int fh, fw; /* font height, width */
 
-    #define fh_buf buffer->text.fh_buf /* 30 might not be enough ... */
-    #define fw_buf buffer->text.fw_buf
-    int fw;
-    #define fontname_buf buffer->text.fontname_buf
+    char *a;
 
     rb->snprintf( buffer->text.old_font, MAX_PATH,
                   FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
+
+    tree = rb->tree_get_context();
+    backup = *tree;
+    dc = tree->dircache;
+    a = backup.currdir+rb->strlen(backup.currdir)-1;
+    if( *a != '/' )
+    {
+        *++a = '/';
+    }
+    rb->strcpy( a+1, dc[tree->selected_item].name );
+    tree->dirfilter = &dirfilter;
+    rb->strcpy( bbuf, FONT_DIR "/" );
+    rb->set_current_file( bbuf );
 
     while( 1 )
     {
@@ -861,13 +873,8 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             /* we don't need to redraw ... but we need to unselect
              * the previously selected item */
-            cp = top_inside + LINE_SPACE;
-            for( i = 0; i+fvi < osi; i++ )
-            {
-                cp += fh_buf[i] + LINE_SPACE;
-            }
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect( left+10, cp, fw_buf[i], fh_buf[i] );
+            rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, fh_buf[osi-fvi] );
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
 
@@ -875,91 +882,77 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             b_need_redraw = 0;
 
-            d = rb->opendir( FONT_DIR "/" );
-            if( !d )
-            {
-                return false;
-            }
-            top_inside = draw_window( HEIGHT, WIDTH, &top, &left, "Fonts" );
-            i = 0;
-            li = -1;
-            while( i < fvi )
-            {
-                rb->readdir( d );
-                i++;
-            }
-            cp = top_inside+LINE_SPACE;
-
             rb->lcd_set_foreground(COLOR_BLACK);
             rb->lcd_set_background(COLOR_LIGHTGRAY);
+            rb->lcd_clear_display();
 
-            while( cp < top+HEIGHT )
+            rb->font_getstringsize( "Fonts", NULL, &fh, FONT_UI );
+            rb->lcd_putsxy( 2, 2, "Fonts" );
+            top = fh + 4 + LINE_SPACE;
+
+            for( i = 0; fvi < lvi && nvih > 0; i++, fvi++ )
             {
-                de = rb->readdir( d );
-                if( !de )
-                {
-                    li = i-1;
-                    break;
-                }
-                if( !check_extention( de->d_name, ".fnt" ) )
-                    continue;
-                rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
-                              de->d_name );
+                nvih -= fh_buf[i] + LINE_SPACE;
+            }
+            nvih = 0;
+            i = fvi;
+            li = -1;
+
+            cp = top;
+            while( cp < LCD_HEIGHT && i < tree->filesindir )
+            {
+                e = &dc[i];
+                rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
                 rb->font_load(NULL, bbuf );
-                rb->font_getstringsize( de->d_name, &fw, &fh, FONT_UI );
-                if( nvih > 0 )
-                {
-                    nvih -= fh;
-                    fvi++;
-                    if( nvih < 0 ) nvih = 0;
-                    i++;
-                    continue;
-                }
-                if( cp + fh >= top+HEIGHT )
+                rb->font_getstringsize( e->name, &fw, &fh, FONT_UI );
+                if( cp + fh >= LCD_HEIGHT )
                 {
                     nvih = fh;
                     break;
                 }
-                rb->lcd_putsxy( left+10, cp, de->d_name );
+                rb->lcd_putsxy( 10, cp, e->name );
                 fh_buf[i-fvi] = fh;
                 fw_buf[i-fvi] = fw;
                 cp += fh + LINE_SPACE;
-                rb->strcpy( fontname_buf[i-fvi], bbuf );
                 i++;
             }
             lvi = i-1;
+            if( i >= tree->filesindir )
+            {
+                li = i-1;
+            }
             if( li == -1 )
             {
-                if( !(de = rb->readdir( d ) ) )
+                if( !nvih )
                 {
-                    li = lvi;
-                }
-                else if( !nvih && check_extention( de->d_name, ".fnt" ) )
-                {
-                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
-                          de->d_name );
+                    e = &dc[i];
+                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
                     rb->font_load(NULL, bbuf );
-                    rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
+                    rb->font_getstringsize( e->name, NULL, &fh, FONT_UI );
                     nvih = fh;
                 }
             }
             rb->font_load(NULL, buffer->text.old_font );
-            rb->closedir( d );
+            if( lvi-fvi < tree->filesindir-1 )
+            {
+                rb->gui_scrollbar_draw( rb->screens[SCREEN_MAIN], 0, top,
+                                       9, cp-LINE_SPACE-top,
+                                       tree->filesindir-1, fvi, lvi, VERTICAL);
+            }
         }
 
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        cp = top_inside + LINE_SPACE;
+        sp = top;
         for( i = 0; i+fvi < si; i++ )
         {
-            cp += fh_buf[i] + LINE_SPACE;
+            sp += fh_buf[i] + LINE_SPACE;
         }
-        rb->lcd_fillrect( left+10, cp, fw_buf[i], fh_buf[i] );
+        rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, fh_buf[si-fvi] );
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
-        rb->lcd_update_rect( left, top, WIDTH, HEIGHT );
+        rb->lcd_update();
 
         osi = si;
-        i = fvi;
         switch( rb->button_get(true) )
         {
             case ROCKPAINT_UP:
@@ -967,9 +960,11 @@ static bool browse_fonts( char *dst, int dst_size )
                 if( si > 0 )
                 {
                     si--;
-                    if( si<fvi )
+                    if( si < fvi )
                     {
                         fvi = si;
+                        nvih = 0;
+                        b_need_redraw = 1;
                     }
                 }
                 break;
@@ -979,32 +974,29 @@ static bool browse_fonts( char *dst, int dst_size )
                 if( li == -1 || si < li )
                 {
                     si++;
+                    if( si > lvi )
+                    {
+                        b_need_redraw = 1;
+                    }
                 }
                 break;
 
             case ROCKPAINT_LEFT:
             case ROCKPAINT_QUIT:
+                *tree = backup;
+                rb->set_current_file( backup.currdir );
                 return false;
 
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_DRAW:
-                rb->snprintf( dst, dst_size, "%s", fontname_buf[si-fvi] );
+                rb->snprintf( dst, dst_size, FONT_DIR "/%s", dc[si].name );
+                *tree = backup;
+                rb->set_current_file( backup.currdir );
                 return true;
-        }
-
-        if( i != fvi || si > lvi )
-        {
-            b_need_redraw = 1;
-        }
-
-        if( si<=lvi )
-        {
-            nvih = 0;
         }
     }
 #undef fh_buf
 #undef fw_buf
-#undef fontname_buf
 #undef WIDTH
 #undef HEIGHT
 #undef LINE_SPACE
