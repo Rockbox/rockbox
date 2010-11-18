@@ -369,8 +369,8 @@ void set_cpu_frequency(long frequency)
 
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
-            "bic r0, r0, #3<<30      \n"   /* clear bus bits */
-            "orr r0, r0, #1<<30      \n"   /* synchronous bus clocking */
+            "orr r0, r0, #3<<30      \n"   /* asynchronous bus clocking */
+            /* synchronous bus clocking had issues on some players */
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
