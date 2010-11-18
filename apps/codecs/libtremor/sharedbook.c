@@ -391,7 +391,13 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
         c->dec_codelengths[sortindex[n++]]=s->lengthlist[i];
     
     _ogg_free(sortindex);
+/* Use a larger cache size when we have a large codec buffer, helps decoding
+   speed especially on targets with slow memory and high bitrate files */ 
+#if CODEC_SIZE < 0x100000
     c->dec_firsttablen=_ilog(c->used_entries)-4; /* this is magic */
+#else
+    c->dec_firsttablen=_ilog(c->used_entries)+1; /* this is magic */
+#endif
     if(c->dec_firsttablen<5)c->dec_firsttablen=5;
     if(c->dec_firsttablen>8)c->dec_firsttablen=8;
     
