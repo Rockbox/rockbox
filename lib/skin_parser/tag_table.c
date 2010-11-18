@@ -153,7 +153,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_TUNER_MINFREQ,         "ta", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_TUNER_MAXFREQ,         "tb", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_TUNER_CURFREQ,         "tf", "", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_TUNER_RSSI,            "tr", "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_TUNER_RSSI,            "tr", BAR_PARAMS, SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TUNER_RSSI_MIN,        "tl", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_TUNER_RSSI_MAX,        "th", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_PRESET_ID,             "Ti", "", SKIN_REFRESH_STATIC },

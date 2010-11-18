@@ -162,9 +162,22 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 #if CONFIG_TUNER
     else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
     {
-        int min = fm_region_data[global_settings.fm_region].freq_min;
-        end = radio_current_frequency() - min;
-        length = fm_region_data[global_settings.fm_region].freq_max - min;
+#ifdef HAVE_RADIO_RSSI
+        if (pb->type == SKIN_TOKEN_TUNER_RSSI_BAR)
+        {
+            int val = tuner_get(RADIO_RSSI);
+            int min = tuner_get(RADIO_RSSI_MIN);
+            int max = tuner_get(RADIO_RSSI_MAX);
+            end = val - min;
+            length = max - min;
+        }
+        else
+#endif
+        {
+            int min = fm_region_data[global_settings.fm_region].freq_min;
+            end = radio_current_frequency() - min;
+            length = fm_region_data[global_settings.fm_region].freq_max - min;
+        }
     }
 #endif
     else if (id3 && id3->length)

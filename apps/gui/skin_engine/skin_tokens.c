@@ -478,6 +478,20 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 #ifdef HAVE_RADIO_RSSI
         case SKIN_TOKEN_TUNER_RSSI:
             snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI));
+            if (intval)
+            {
+                int val = tuner_get(RADIO_RSSI);
+                int min = tuner_get(RADIO_RSSI_MIN);
+                int max = tuner_get(RADIO_RSSI_MAX);
+                if (limit == TOKEN_VALUE_ONLY)
+                {
+                    *intval = val;
+                }
+                else 
+                {
+                    *intval = 1+(limit-1)*(val-min)/(max-1-min);
+                }
+            }
             return buf;
         case SKIN_TOKEN_TUNER_RSSI_MIN:
             snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI_MIN));

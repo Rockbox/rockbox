@@ -67,6 +67,9 @@ int tuner_set(int setting, int value)
 int tuner_get(int setting)
 {
     int val = 0;
+#ifdef HAVE_RADIO_RSSI
+    static int rssi = 0, rssidiff = 2;
+#endif
     
     switch(setting)
     {
@@ -83,6 +86,29 @@ int tuner_get(int setting)
             if(frequency == 99500000)
                 val = mono?0:1;
             break;
+            
+#ifdef HAVE_RADIO_RSSI
+        case RADIO_RSSI_MIN:
+            val = 5;
+            break;
+        case RADIO_RSSI_MAX:
+            val = 75;
+            break;
+        case RADIO_RSSI:
+            rssi += rssidiff;
+            if (rssi >= 75)
+            {
+                rssi = 75;
+                rssidiff = -2;
+            }
+            else if (rssi < 5)
+            {
+                rssi = 5;
+                rssidiff = 2;
+            }
+            val = rssi;
+            break;
+#endif
 
         case RADIO_ALL: /* debug query */
             break;

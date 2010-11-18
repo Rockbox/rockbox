@@ -252,6 +252,7 @@ enum skin_token_type {
     SKIN_TOKEN_TUNER_RSSI,
     SKIN_TOKEN_TUNER_RSSI_MIN,
     SKIN_TOKEN_TUNER_RSSI_MAX,
+    SKIN_TOKEN_TUNER_RSSI_BAR,
     SKIN_TOKEN_PRESET_ID, /* "id" of this preset.. really the array element number */
     SKIN_TOKEN_PRESET_NAME,
     SKIN_TOKEN_PRESET_FREQ,
