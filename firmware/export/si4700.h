@@ -24,6 +24,7 @@
 
 #ifndef _SI4700_H_
 #define _SI4700_H_
+#include <stdint.h>
 
 #define HAVE_RADIO_REGION
 #define HAVE_RADIO_RSSI

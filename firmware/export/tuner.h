@@ -94,7 +94,7 @@ extern const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS];
 
 #if CONFIG_TUNER
 
-#ifdef CONFIG_TUNER_MULTI
+#if !defined(SIMULATOR) && defined(CONFIG_TUNER_MULTI)
 extern int tuner_detect_type(void);
 extern int (*tuner_set)(int setting, int value);
 extern int (*tuner_get)(int setting);
@@ -138,7 +138,7 @@ extern int (*tuner_get)(int setting);
 #include "ipod_remote_tuner.h"
 #endif
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR)
 #undef tuner_set
 int tuner_set(int setting, int value);
 #undef tuner_get
