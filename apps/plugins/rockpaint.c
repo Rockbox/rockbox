@@ -25,7 +25,6 @@
  *  - implement 2 layers with alpha colors
  *  - take brush width into account when drawing shapes
  *  - handle bigger than screen bitmaps
- *  - cache fonts when building the font preview (else it only works well on simulators because they have "fast" disk read)
  */
 
 #include "plugin.h"
@@ -455,9 +454,14 @@ union buf
     {
         char text[MAX_TEXT];
         char font[MAX_PATH];
-        char old_font[MAX_PATH];
-        int fh_buf[80];
-        int fw_buf[80];
+        bool initialized;
+        size_t cache_used;
+        /* fonts from cache_first to cache_last are stored. */
+        int cache_first;
+        int cache_last;
+        /* save these so that cache can be re-used next time. */
+        int fvi;
+        int si;
     } text;
 };
 
@@ -487,11 +491,6 @@ static bool incdec_value(int *pval, struct incdec_ctx *ctx, bool inc, bool bigst
     }
     return of;
 }
-
-/* Font preview buffer */
-//#define FONT_PREVIEW_WIDTH ((LCD_WIDTH-30)/8)
-//#define FONT_PREVIEW_HEIGHT 1000
-//static unsigned char fontpreview[FONT_PREVIEW_WIDTH*FONT_PREVIEW_HEIGHT];
 
 /***********************************************************************
  * Offscreen buffer/Text/Fonts handling
@@ -797,7 +796,7 @@ static bool browse( char *dst, int dst_size, const char *start )
                     return true;
                 }
                 len = rb->strlen(e->name);
-                if (bbuf_len + len + 2 < (int)sizeof(bbuf))
+                if( bbuf_len + len + 2 < (int)sizeof(bbuf) )
                 {
                     bbuf_s[0] = '\0';
                     rb->strcpy( bbuf+bbuf_len, e->name );
@@ -823,35 +822,52 @@ static bool browse( char *dst, int dst_size, const char *start )
  * on the simulators, disk spins too much on real targets -> rendered
  * font buffer needed.
  ***********************************************************************/
+/*
+ * cache font preview handling assumes:
+ * - fvi doesn't decrease by more than 1.
+ *   In other words, cache_first-1 must be cached before cache_first-2 is cached.
+ * - there is enough space to store all preview currently displayed.
+ */
 static bool browse_fonts( char *dst, int dst_size )
 {
 #define LINE_SPACE 2
-#define fh_buf buffer->text.fh_buf
-#define fw_buf buffer->text.fw_buf
+#define PREVIEW_SIZE(x) ((x)->size)
+#define PREVIEW_NEXT(x) (struct font_preview *)((char*)(x) + PREVIEW_SIZE(x))
 
     struct tree_context backup;
     struct entry *dc, *e;
     int dirfilter = SHOW_FONT;
+
+    struct font_preview {
+        unsigned short width;
+        unsigned short height;
+        size_t size;    /* to avoid calculating size each time. */
+        fb_data preview[0];
+    } *font_preview = NULL;
 
     int top = 0;
 
     int fvi = 0; /* first visible item */
     int lvi = 0; /* last visible item */
     int si = 0; /* selected item */
-    int osi = 0; /* old selected item */
     int li = 0; /* last item */
     int nvih = 0; /* next visible item height */
     int i;
-    int b_need_redraw = 1; /* Do we need to redraw ? */
+    bool need_redraw = true; /* Do we need to redraw ? */
+    bool reset_font = false;
+    bool ret = false;
 
     int cp = 0; /* current position */
     int sp = 0; /* selected position */
     int fh, fw; /* font height, width */
 
+    unsigned char *cache = (unsigned char *) buffer + sizeof(buffer->text);
+    size_t cache_size = sizeof(*buffer) - sizeof(buffer->text);
+    size_t cache_used = 0;
+    int cache_first = 0, cache_last = -1;
     char *a;
 
-    rb->snprintf( buffer->text.old_font, MAX_PATH,
-                  FONT_DIR "/%s.fnt",
+    rb->snprintf( bbuf_s, MAX_PATH, FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
 
     tree = rb->tree_get_context();
@@ -867,20 +883,30 @@ static bool browse_fonts( char *dst, int dst_size )
     rb->strcpy( bbuf, FONT_DIR "/" );
     rb->set_current_file( bbuf );
 
+    if( buffer->text.initialized )
+    {
+        cache_used = buffer->text.cache_used;
+        cache_first = buffer->text.cache_first;
+        cache_last = buffer->text.cache_last;
+        fvi = buffer->text.fvi;
+        si = buffer->text.si;
+    }
+    buffer->text.initialized = true;
+
     while( 1 )
     {
-        if( !b_need_redraw )
+        if( !need_redraw )
         {
             /* we don't need to redraw ... but we need to unselect
              * the previously selected item */
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, fh_buf[osi-fvi] );
+            rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
 
-        if( b_need_redraw )
+        if( need_redraw )
         {
-            b_need_redraw = 0;
+            need_redraw = false;
 
             rb->lcd_set_foreground(COLOR_BLACK);
             rb->lcd_set_background(COLOR_LIGHTGRAY);
@@ -890,69 +916,121 @@ static bool browse_fonts( char *dst, int dst_size )
             rb->lcd_putsxy( 2, 2, "Fonts" );
             top = fh + 4 + LINE_SPACE;
 
-            for( i = 0; fvi < lvi && nvih > 0; i++, fvi++ )
+            font_preview = (struct font_preview *) cache;
+            /* get first font preview to be displayed. */
+            for( i = cache_first; i < cache_last && i < fvi; i++ )
             {
-                nvih -= fh_buf[i] + LINE_SPACE;
+                font_preview = PREVIEW_NEXT(font_preview);
+            }
+            for( ; fvi < lvi && nvih > 0; fvi++ )
+            {
+                nvih -= font_preview->height + LINE_SPACE;
+                font_preview = PREVIEW_NEXT(font_preview);
             }
             nvih = 0;
             i = fvi;
-            li = -1;
 
             cp = top;
-            while( cp < LCD_HEIGHT && i < tree->filesindir )
+            while( cp <= LCD_HEIGHT+LINE_SPACE && i < tree->filesindir )
             {
                 e = &dc[i];
-                rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
-                rb->font_load(NULL, bbuf );
-                rb->font_getstringsize( e->name, &fw, &fh, FONT_UI );
+                if( i < cache_first || i > cache_last )
+                {
+                    size_t siz;
+                    reset_font = true;
+                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
+                    rb->font_load(NULL, bbuf );
+                    rb->font_getstringsize( e->name, &fw, &fh, FONT_UI );
+                    if( fw > LCD_WIDTH ) fw = LCD_WIDTH;
+                    siz = (sizeof(struct font_preview) + fw*fh*FB_DATA_SZ+3) & ~3;
+                    if( i < cache_first )
+                    {
+                        /* insert font preview to the top. */
+                        cache_used = 0;
+                        for( ; cache_first <= cache_last; cache_first++ )
+                        {
+                            font_preview = (struct font_preview *) (cache + cache_used);
+                            size_t size = PREVIEW_SIZE(font_preview);
+                            if( cache_used + size >= cache_size - siz )
+                                break;
+                            cache_used += size;
+                        }
+                        cache_last = cache_first-1;
+                        cache_first = i;
+                        rb->memmove( cache+siz, cache, cache_used );
+                        font_preview = (struct font_preview *) cache;
+                    }
+                    else /* i > cache_last */
+                    {
+                        /* add font preview to the bottom. */
+                        font_preview = (struct font_preview *) cache;
+                        while( cache_used >= cache_size - siz )
+                        {
+                            cache_used -= PREVIEW_SIZE(font_preview);
+                            font_preview = PREVIEW_NEXT(font_preview);
+                            cache_first++;
+                        }
+                        cache_last = i;
+                        rb->memmove( cache, font_preview, cache_used );
+                        font_preview = (struct font_preview *) (cache + cache_used);
+                    }
+                    cache_used += siz;
+                    /* create preview cache. */
+                    font_preview->width = fw;
+                    font_preview->height = fh;
+                    font_preview->size = siz;
+                    /* clear with background. */
+                    for( siz = fw*fh; siz > 0; )
+                    {
+                        font_preview->preview[--siz] = COLOR_LIGHTGRAY;
+                    }
+                    buffer_putsxyofs( font_preview->preview,
+                        fw, fh, 0, 0, 0, e->name );
+                }
+                else
+                {
+                    fw = font_preview->width;
+                    fh = font_preview->height;
+                }
                 if( cp + fh >= LCD_HEIGHT )
                 {
                     nvih = fh;
                     break;
                 }
-                rb->lcd_putsxy( 10, cp, e->name );
-                fh_buf[i-fvi] = fh;
-                fw_buf[i-fvi] = fw;
+                rb->lcd_bitmap( font_preview->preview, 10, cp, fw, fh );
                 cp += fh + LINE_SPACE;
                 i++;
+                font_preview = PREVIEW_NEXT(font_preview);
             }
             lvi = i-1;
-            if( i >= tree->filesindir )
+            li = tree->filesindir-1;
+            if( reset_font )
             {
-                li = i-1;
+                rb->font_load(NULL, bbuf_s );
+                reset_font = false;
             }
-            if( li == -1 )
-            {
-                if( !nvih )
-                {
-                    e = &dc[i];
-                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
-                    rb->font_load(NULL, bbuf );
-                    rb->font_getstringsize( e->name, NULL, &fh, FONT_UI );
-                    nvih = fh;
-                }
-            }
-            rb->font_load(NULL, buffer->text.old_font );
-            if( lvi-fvi < tree->filesindir-1 )
+            if( lvi-fvi+1 < tree->filesindir )
             {
                 rb->gui_scrollbar_draw( rb->screens[SCREEN_MAIN], 0, top,
-                                       9, cp-LINE_SPACE-top,
-                                       tree->filesindir-1, fvi, lvi, VERTICAL);
+                                       9, LCD_HEIGHT-top,
+                                       tree->filesindir, fvi, lvi+1, VERTICAL );
             }
         }
 
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
         sp = top;
-        for( i = 0; i+fvi < si; i++ )
+        font_preview = (struct font_preview *) cache;
+        for( i = cache_first; i < si; i++ )
         {
-            sp += fh_buf[i] + LINE_SPACE;
+            if( i >= fvi )
+                sp += font_preview->height + LINE_SPACE;
+            font_preview = PREVIEW_NEXT(font_preview);
         }
-        rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, fh_buf[si-fvi] );
+        rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
         rb->lcd_update();
 
-        osi = si;
         switch( rb->button_get(true) )
         {
             case ROCKPAINT_UP:
@@ -964,42 +1042,43 @@ static bool browse_fonts( char *dst, int dst_size )
                     {
                         fvi = si;
                         nvih = 0;
-                        b_need_redraw = 1;
+                        need_redraw = true;
                     }
                 }
                 break;
 
             case ROCKPAINT_DOWN:
             case ROCKPAINT_DOWN|BUTTON_REPEAT:
-                if( li == -1 || si < li )
+                if( si < li )
                 {
                     si++;
                     if( si > lvi )
                     {
-                        b_need_redraw = 1;
+                        need_redraw = true;
                     }
                 }
                 break;
 
-            case ROCKPAINT_LEFT:
-            case ROCKPAINT_QUIT:
-                *tree = backup;
-                rb->set_current_file( backup.currdir );
-                return false;
-
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_DRAW:
+                ret = true;
                 rb->snprintf( dst, dst_size, FONT_DIR "/%s", dc[si].name );
+                /* fall through */
+            case ROCKPAINT_LEFT:
+            case ROCKPAINT_QUIT:
+                buffer->text.cache_used = cache_used;
+                buffer->text.cache_first = cache_first;
+                buffer->text.cache_last = cache_last;
+                buffer->text.fvi = fvi;
+                buffer->text.si = si;
                 *tree = backup;
                 rb->set_current_file( backup.currdir );
-                return true;
+                return ret;
         }
     }
-#undef fh_buf
-#undef fw_buf
-#undef WIDTH
-#undef HEIGHT
 #undef LINE_SPACE
+#undef PREVIEW_SIZE
+#undef PREVIEW_NEXT
 }
 
 /***********************************************************************
@@ -1481,9 +1560,7 @@ static void draw_text( int x, int y )
 {
     int selected = 0;
     buffer->text.text[0] = '\0';
-    rb->snprintf( buffer->text.old_font, MAX_PATH,
-                  FONT_DIR "/%s.fnt",
-                  rb->global_settings->font_file );
+    buffer->text.font[0] = '\0';
     while( 1 )
     {
         switch( rb->do_menu( &text_menu, &selected, NULL, NULL ) )
@@ -1545,7 +1622,13 @@ static void draw_text( int x, int y )
             case TEXT_MENU_CANCEL:
             default:
                 restore_screen();
-                rb->font_load(NULL, buffer->text.old_font );
+                if( buffer->text.font[0] )
+                {
+                    rb->snprintf( buffer->text.font, MAX_PATH,
+                                  FONT_DIR "/%s.fnt",
+                                  rb->global_settings->font_file );
+                    rb->font_load(NULL, buffer->text.font );
+                }
                 return;
         }
     }
@@ -2357,6 +2440,10 @@ static void toolbar( void )
                     j = ( y - (TOP+TB_TL_TOP) )/(TB_TL_SIZE+TB_TL_SPACING);
                     tool = i*2+j;
                     reset_tool();
+                    if( tool == Text )
+                    {
+                        buffer->text.initialized = false;
+                    }
                 }
                 else if( x >= TB_MENU_LEFT && y >= TOP+TB_MENU_TOP-2)
                 {
