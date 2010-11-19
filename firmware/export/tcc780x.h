@@ -21,6 +21,8 @@
 #ifndef __TCC780X_H__
 #define __TCC780X_H__
 
+#define CACHEALIGN_BITS (5)
+
 #define TTB_SIZE      (0x4000)
 /* must be 16Kb (0x4000) aligned */
 #define TTB_BASE_ADDR (0x20000000 + (MEMORYSIZE*1024*1024) - TTB_SIZE)

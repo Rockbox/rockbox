@@ -26,6 +26,8 @@
 
 /* insert differences here */
 
+#define CACHEALIGN_BITS (5)
+
 #ifndef IRAM_SIZE   /* protect in case the define name changes */
 #   error IRAM_SIZE not defined !
 #endif

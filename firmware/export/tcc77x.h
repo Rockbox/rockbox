@@ -21,6 +21,8 @@
 #ifndef __TCC77X_H__
 #define __TCC77X_H__
 
+#define CACHEALIGN_BITS (5)
+
 /* General-purpose IO */
 
 #define GPIOA      (*(volatile unsigned long *)0x80000300)

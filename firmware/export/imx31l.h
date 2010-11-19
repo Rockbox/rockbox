@@ -38,7 +38,6 @@
 #define FRAME         ((void *)(FRAME_PHYS_ADDR+0x100000-CSD0_BASE_ADDR))
 
 #define CACHEALIGN_BITS     5
-#define CACHEALIGN_SIZE     32
 #define NOCACHE_BASE        CSD0_BASE_ADDR
 
 /* USBOTG */
