@@ -766,57 +766,55 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 #elif defined(FPM_ARM)
 
 #define PROD_O(hi, lo, f, ptr) \
-  ({                           \
-    mad_fixed_t *__p = (f);    \
-    asm volatile (             \
-        "ldmia   %2!, {r0, r1, r2, r3} \n\t" \
-        "ldr     r4, [%3,  #0]  \n\t" \
-        "smull   %0, %1, r0, r4 \n\t" \
-        "ldr     r4, [%3, #56]  \n\t" \
-        "smlal   %0, %1, r1, r4 \n\t" \
-        "ldr     r4, [%3, #48]  \n\t" \
-        "smlal   %0, %1, r2, r4 \n\t" \
-        "ldr     r4, [%3, #40]  \n\t" \
-        "smlal   %0, %1, r3, r4 \n\t" \
-        "ldmia   %2, {r0, r1, r2, r3} \n\t" \
-        "ldr     r4, [%3, #32]  \n\t" \
-        "smlal   %0, %1, r0, r4 \n\t" \
-        "ldr     r4, [%3, #24]  \n\t" \
-        "smlal   %0, %1, r1, r4 \n\t" \
-        "ldr     r4, [%3, #16]  \n\t" \
-        "smlal   %0, %1, r2, r4 \n\t" \
-        "ldr     r4, [%3, #8]   \n\t" \
-        "smlal   %0, %1, r3, r4 \n\t" \
+  ({                             \
+    mad_fixed_t *__p = (f);        \
+    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
+        "ldr     r4, [%3,  #0]\n\t"   \
+        "ldr     r12, [%3, #56]\n\t"   \
+        "smull   %0, %1, r0, r4\n\t"  \
+        "ldr     r4, [%3, #48]\n\t"   \
+        "smlal   %0, %1, r1, r12\n\t"  \
+        "ldr     r12, [%3, #40]\n\t"   \
+        "smlal   %0, %1, r2, r4\n\t"  \
+        "smlal   %0, %1, r3, r12\n\t"  \
+        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
+        "ldr     r4, [%3, #32]\n\t"   \
+        "ldr     r12, [%3, #24]\n\t"   \
+        "smlal   %0, %1, r0, r4\n\t"  \
+        "ldr     r4, [%3, #16]\n\t"   \
+        "smlal   %0, %1, r1, r12\n\t"  \
+        "ldr     r12, [%3, #8]\n\t"    \
+        "smlal   %0, %1, r2, r4\n\t"  \
+        "smlal   %0, %1, r3, r12\n\t"  \
         : "=&r" (lo), "=&r" (hi), "+r" (__p) \
         : "r" (ptr)     \
-        : "r0", "r1", "r2", "r3", "r4", "memory"); \
+        : "r0", "r1", "r2", "r3", "r4", "r12"); \
   })
 
 #define PROD_A(hi, lo, f, ptr) \
-  ({                           \
-    mad_fixed_t *__p = (f);    \
-    asm volatile (             \
-        "ldmia   %2!, {r0, r1, r2, r3} \n\t" \
-        "ldr     r4, [%3,  #0]  \n\t" \
-        "smlal   %0, %1, r0, r4 \n\t" \
-        "ldr     r4, [%3, #56]  \n\t" \
-        "smlal   %0, %1, r1, r4 \n\t" \
-        "ldr     r4, [%3, #48]  \n\t" \
-        "smlal   %0, %1, r2, r4 \n\t" \
-        "ldr     r4, [%3, #40]  \n\t" \
-        "smlal   %0, %1, r3, r4 \n\t" \
-        "ldmia   %2, {r0, r1, r2, r3} \n\t" \
-        "ldr     r4, [%3, #32]  \n\t" \
-        "smlal   %0, %1, r0, r4 \n\t" \
-        "ldr     r4, [%3, #24]  \n\t" \
-        "smlal   %0, %1, r1, r4 \n\t" \
-        "ldr     r4, [%3, #16]  \n\t" \
-        "smlal   %0, %1, r2, r4 \n\t" \
-        "ldr     r4, [%3, #8]   \n\t" \
-        "smlal   %0, %1, r3, r4 \n\t" \
+  ({                             \
+    mad_fixed_t *__p = (f);        \
+    asm("ldmia   %2!, {r0, r1, r2, r3}\n\t" \
+        "ldr     r4, [%3,  #0]\n\t"   \
+        "ldr     r12, [%3, #56]\n\t"   \
+        "smlal   %0, %1, r0, r4\n\t"  \
+        "ldr     r4, [%3, #48]\n\t"   \
+        "smlal   %0, %1, r1, r12\n\t"  \
+        "ldr     r12, [%3, #40]\n\t"   \
+        "smlal   %0, %1, r2, r4\n\t"  \
+        "smlal   %0, %1, r3, r12\n\t"  \
+        "ldmia   %2, {r0, r1, r2, r3}\n\t" \
+        "ldr     r4, [%3, #32]\n\t"   \
+        "ldr     r12, [%3, #24]\n\t"   \
+        "smlal   %0, %1, r0, r4\n\t"  \
+        "ldr     r4, [%3, #16]\n\t"   \
+        "smlal   %0, %1, r1, r12\n\t"  \
+        "ldr     r12, [%3, #8]\n\t"    \
+        "smlal   %0, %1, r2, r4\n\t"  \
+        "smlal   %0, %1, r3, r12\n\t"  \
         : "+r" (lo), "+r" (hi), "+r" (__p) \
-        : "r" (ptr) \
-        : "r0", "r1", "r2", "r3", "r4", "memory"); \
+        : "r" (ptr)     \
+        : "r0", "r1", "r2", "r3", "r4", "r12"); \
   })
 
 void synth_full_odd_sbsample (mad_fixed_t *pcm,
