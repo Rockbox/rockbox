@@ -102,10 +102,10 @@ app_get_platform() {
                 bindir="$ARG_PREFIX/bin"
                 libdir="$ARG_PREFIX/lib"
             else
-                echo "ERROR: PREFIX does not does not exist"
+                echo "ERROR: PREFIX does not exist"
                 exit
             fi
-        fi        
+        fi
         output="rockbox"
         bootoutput="rockbox"
     elif [ "$app_platform" = "android" ]; then
@@ -3120,6 +3120,13 @@ else
 fi
 
 if [ "$ARG_RBDIR" ]; then
+  if [ "$need_full_path" != "yes" ]; then
+    if [ -z `echo $ARG_RBDIR | grep '^/'` ]; then
+        rbdir="/"$ARG_RBDIR
+    else
+        rbdir=$ARG_RBDIR
+    fi
+  fi
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
