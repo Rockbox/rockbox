@@ -158,10 +158,6 @@ static inline void wake_core(int core)
     ((typeof (a))((uintptr_t)(a) | UNCACHED_BASE_ADDR))
 #endif /* BOOTLOADER */
 
-/* Certain data needs to be out of the way of cache line interference
- * such as data for COP use or for use with UNCACHED_ADDR */
-#define PROC_NEEDS_CACHEALIGN
-
 #if defined(CPU_PP502x) && defined(HAVE_ATA_DMA)
 #define STORAGE_WANTS_ALIGN
 #endif
