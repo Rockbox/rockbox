@@ -12570,3 +12570,20 @@
     *: "Iniciar examinador aquí"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Intensidad de la señal:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Intesidad de la señal:"
+  </voice>
+</phrase>
