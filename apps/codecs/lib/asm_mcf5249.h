@@ -21,9 +21,6 @@
 
 #if defined(CPU_COLDFIRE)
 
-/* attribute for 16-byte alignment */
-#define LINE_ATTR   __attribute__ ((aligned (16)))
-
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
 
@@ -338,7 +335,4 @@ static inline int32_t CLIP_TO_15(register int32_t x) {
 
 #endif
 */
-#else
-#define LINE_ATTR
 #endif
-
