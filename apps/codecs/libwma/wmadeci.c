@@ -1232,7 +1232,7 @@ static int wma_decode_block(WMADecodeContext *s)
     for(ch = 0; ch < s->nb_channels; ++ch)
     { 
         /* BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2. */
-    	static uint32_t scratch_buf[BLOCK_MAX_SIZE * MAX_CHANNELS] IBSS_ATTR;
+        static uint32_t scratch_buf[BLOCK_MAX_SIZE * MAX_CHANNELS] IBSS_ATTR;
         if (s->channel_coded[ch])
         {
             int n4, index;
@@ -1348,9 +1348,9 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
     int done = 0;
     
     for(ch = 0; ch < s->nb_channels; ch++)
-		memmove(&((*s->frame_out)[ch][0]), 
-		        &((*s->frame_out)[ch][s->frame_len]),
-				s->frame_len * sizeof(fixed32));
+        memmove(&((*s->frame_out)[ch][0]), 
+                &((*s->frame_out)[ch][s->frame_len]),
+                s->frame_len * sizeof(fixed32));
     
     if ((s->use_bit_reservoir) && (s->current_frame == 0))
     {

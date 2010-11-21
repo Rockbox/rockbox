@@ -1259,7 +1259,7 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
         vlcs_initialized = 1;
 
     }
-	
+
     init_atrac3_transforms();
 
     /* init the joint-stereo decoding data */
