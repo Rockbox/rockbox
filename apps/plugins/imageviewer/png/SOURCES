@@ -3,4 +3,3 @@ tinflate.c
 tinfzlib.c
 png_decoder.c
 png.c
-png_ui.c

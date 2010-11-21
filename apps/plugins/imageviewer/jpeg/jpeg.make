@@ -10,12 +10,18 @@
 JPEGSRCDIR := $(IMGVSRCDIR)/jpeg
 JPEGBUILDDIR := $(IMGVBUILDDIR)/jpeg
 
-ROCKS += $(JPEGBUILDDIR)/jpeg.rock
-
 JPEG_SRC := $(call preprocess, $(JPEGSRCDIR)/SOURCES)
 JPEG_OBJ := $(call c2obj, $(JPEG_SRC))
 
-# add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(JPEG_SRC)
 
-$(JPEGBUILDDIR)/jpeg.rock: $(JPEG_OBJ)
+ROCKS += $(JPEGBUILDDIR)/jpeg.ovl
+
+$(JPEGBUILDDIR)/jpeg.refmap: $(JPEG_OBJ)
+$(JPEGBUILDDIR)/jpeg.link: $(PLUGIN_LDS) $(JPEGBUILDDIR)/jpeg.refmap
+$(JPEGBUILDDIR)/jpeg.ovl: $(JPEG_OBJ)
+
+# special pattern rule for compiling image decoder with extra flags
+$(JPEGBUILDDIR)/%.o: $(JPEGSRCDIR)/%.c $(JPEGSRCDIR)/jpeg.make
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(IMGDECFLAGS) -c $< -o $@

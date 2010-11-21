@@ -10,18 +10,19 @@
 PNGSRCDIR := $(IMGVSRCDIR)/png
 PNGBUILDDIR := $(IMGVBUILDDIR)/png
 
-ROCKS += $(PNGBUILDDIR)/png.rock
-
 PNG_SRC := $(call preprocess, $(PNGSRCDIR)/SOURCES)
 PNG_OBJ := $(call c2obj, $(PNG_SRC))
 
-# add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(PNG_SRC)
 
-# Use -O3 for png plugin : it gives a bigger file but very good performances
-PNGFLAGS = $(PLUGINFLAGS) -Os
+ROCKS += $(PNGBUILDDIR)/png.ovl
 
-$(PNGBUILDDIR)/png.rock: $(PNG_OBJ)
+$(PNGBUILDDIR)/png.refmap: $(PNG_OBJ)
+$(PNGBUILDDIR)/png.link: $(PNG_OBJ) $(PNGBUILDDIR)/png.refmap
+$(PNGBUILDDIR)/png.ovl: $(PNG_OBJ)
+
+# Use -O3 for png plugin : it gives a bigger file but very good performances
+PNGFLAGS = $(IMGDECFLAGS) -Os
 
 # Compile PNG plugin with extra flags (adapted from ZXBox)
 $(PNGBUILDDIR)/%.o: $(PNGSRCDIR)/%.c $(PNGSRCDIR)/png.make

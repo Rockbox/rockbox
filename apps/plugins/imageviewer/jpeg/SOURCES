@@ -1,4 +1,3 @@
-jpeg_ui.c
 jpeg.c
 jpeg_decoder.c
 #ifdef HAVE_LCD_COLOR

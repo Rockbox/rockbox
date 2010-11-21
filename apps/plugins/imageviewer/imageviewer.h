@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * user intereface of image viewers (jpeg, png, etc.)
+ * user intereface of image viewer.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 
-#ifndef _IMGVIEW_IMGVIEW_H
-#define _IMGVIEW_IMGVIEW_H
+#ifndef _IMAGE_VIEWER_H
+#define _IMAGE_VIEWER_H
 
 #include "plugin.h"
 
@@ -384,6 +384,13 @@
 
 #include <lib/mylcd.h>
 
+#if defined(USEGSLIB) && defined(IMGDEC)
+#undef mylcd_ub_
+#undef myxlcd_ub_
+#define mylcd_ub_(fn)       iv->fn
+#define myxlcd_ub_(fn)      iv->fn
+#endif
+
 /* Min memory allowing us to use the plugin buffer
  * and thus not stopping the music
  * *Very* rough estimation:
@@ -413,7 +420,6 @@ enum {
 /* Settings. jpeg needs these */
 struct imgview_settings
 {
-    /* include all settings for varias decoders as using same setting file. */
 #ifdef HAVE_LCD_COLOR
     int jpeg_colour_mode;
     int jpeg_dither_mode;
@@ -421,7 +427,7 @@ struct imgview_settings
     int ss_timeout;
 };
 
-/* structure passed to decoder. */
+/* structure passed to image decoder. */
 struct image_info {
     int x_size, y_size; /* set size of loaded image in load_image(). */
     int width, height;  /* set size of resized image in get_image(). */
@@ -429,34 +435,78 @@ struct image_info {
     void *data;         /* use freely in decoder. not touched in ui. */
 };
 
-/* callback updating a progress meter while image decoding */
-extern void cb_progress(int current, int total);
-
-extern struct imgview_settings settings;
-extern bool slideshow_enabled;
-extern bool running_slideshow;
+struct imgdec_api {
+    const struct imgview_settings *settings;
+    bool slideshow_enabled;   /* run slideshow */
+    bool running_slideshow;   /* loading image because of slideshw */
 #ifdef DISK_SPINDOWN
-extern bool immediate_ata_off;
+    bool immediate_ata_off;   /* power down disk after loading */
 #endif
 #ifdef USE_PLUG_BUF
-extern bool plug_buf;
+    bool plug_buf;  /* are we using the plugin buffer or the audio buffer? */
 #endif
 
-/* functions need to be implemented in each image decoders. */
-/* return true if ext is supported by the decoder. */
-extern bool img_ext(const char *ext);
-/* return needed size of buffer to store downscaled image by ds */
-extern int img_mem(int ds);
-/* load image from filename. set width and height of info properly. also, set
- * buf_size to remaining size of buf after load image. it is used to caluclate
- * min downscale. */
-extern int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size);
-/* downscale loaded image by ds. note that buf to store reszied image is not
- * provided. return PLUGIN_ERROR for error. ui will skip to next image. */
-extern int get_image(struct image_info *info, int ds);
-/* draw part of image */
-extern void draw_image_rect(struct image_info *info,
-                            int x, int y, int width, int height);
+    /* callback updating a progress meter while image decoding */
+    void (*cb_progress)(int current, int total);
 
-#endif /* _IMGVIEW_IMGVIEW_H */
+#ifdef USEGSLIB
+    void (*gray_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                              int stride, int x, int y, int width, int height);
+#endif
+};
+
+/* functions need to be implemented in each image decoders. */
+struct image_decoder {
+    /* if unscaled image can be always displayed when there isn't enough memory
+     * for resized image. e.g. when using native format to store image. */
+    const bool unscaled_avail;
+
+    /* return needed size of buffer to store downscaled image by ds */
+    int (*img_mem)(int ds);
+    /* load image from filename. set width and height of info properly. also, set
+     * buf_size to remaining size of buf after load image. it is used to caluclate
+     * min downscale. */
+    int (*load_image)(char *filename, struct image_info *info,
+                      unsigned char *buf, ssize_t *buf_size);
+    /* downscale loaded image by ds. note that buf to store reszied image is not
+     * provided. return PLUGIN_ERROR for error. ui will skip to next image. */
+    int (*get_image)(struct image_info *info, int ds);
+    /* draw part of image */
+    void (*draw_image_rect)(struct image_info *info,
+                            int x, int y, int width, int height);
+};
+
+#define IMGDEC_API_VERSION  (PLUGIN_API_VERSION << 4 | 0)
+
+/* image decoder header */
+struct imgdec_header {
+    struct lc_header lc_hdr; /* must be the first */
+    const struct image_decoder *decoder;
+    const struct plugin_api **api;
+    const struct imgdec_api **img_api;
+};
+
+#ifdef IMGDEC
+extern const struct imgdec_api *iv;
+extern const struct image_decoder image_decoder;
+
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#define IMGDEC_HEADER \
+        const struct plugin_api *rb DATA_ATTR; \
+        const struct imgdec_api *iv DATA_ATTR; \
+        const struct imgdec_header __header \
+        __attribute__ ((section (".header")))= { \
+        { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
+        plugin_start_addr, plugin_end_addr }, &image_decoder, &rb, &iv };
+#else /* PLATFORM_HOSTED */
+#define IMGDEC_HEADER \
+        const struct plugin_api *rb DATA_ATTR; \
+        const struct imgdec_api *iv DATA_ATTR; \
+        const struct imgdec_header __header \
+        __attribute__((visibility("default"))) = { \
+        { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
+        NULL, NULL }, &image_decoder, &rb, &iv };
+#endif /* CONFIG_PLATFORM */
+#endif
+
+#endif /* _IMAGE_VIEWER_H */

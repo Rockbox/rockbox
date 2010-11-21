@@ -69,20 +69,8 @@ static struct jpeg jpg; /* too large for stack */
 
 /************************* Implementation ***************************/
 
-bool img_ext(const char *ext)
-{
-    if(!ext)
-        return false;
-    if(!rb->strcasecmp(ext,".jpg") ||
-       !rb->strcasecmp(ext,".jpe") ||
-       !rb->strcasecmp(ext,".jpeg"))
-            return true;
-    else
-            return false;
-}
-
-void draw_image_rect(struct image_info *info,
-                     int x, int y, int width, int height)
+static void draw_image_rect(struct image_info *info,
+                            int x, int y, int width, int height)
 {
     struct t_disp* pdisp = (struct t_disp*)info->data;
 #ifdef HAVE_LCD_COLOR
@@ -92,7 +80,7 @@ void draw_image_rect(struct image_info *info,
         x + MAX(0, (LCD_WIDTH - info->width) / 2),
         y + MAX(0, (LCD_HEIGHT - info->height) / 2),
         width, height,
-        settings.jpeg_colour_mode, settings.jpeg_dither_mode);
+        iv->settings->jpeg_colour_mode, iv->settings->jpeg_dither_mode);
 #else
     mylcd_ub_gray_bitmap_part(
         pdisp->bitmap[0], info->x + x, info->y + y, pdisp->stride,
@@ -102,7 +90,7 @@ void draw_image_rect(struct image_info *info,
 #endif
 }
 
-int img_mem(int ds)
+static int img_mem(int ds)
 {
     int size;
     struct jpeg *p_jpg = &jpg;
@@ -121,8 +109,8 @@ int img_mem(int ds)
     return size;
 }
 
-int load_image(char *filename, struct image_info *info,
-               unsigned char *buf, ssize_t *buf_size)
+static int load_image(char *filename, struct image_info *info,
+                      unsigned char *buf, ssize_t *buf_size)
 {
     int fd;
     int filesize;
@@ -154,7 +142,7 @@ int load_image(char *filename, struct image_info *info,
         return PLUGIN_OUTOFMEM;
     }
 
-    if(!running_slideshow)
+    if(!iv->running_slideshow)
     {
         rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
         rb->lcd_putsf(0, 1, "loading %d bytes", filesize);
@@ -164,13 +152,13 @@ int load_image(char *filename, struct image_info *info,
     rb->read(fd, buf_jpeg, filesize);
     rb->close(fd);
 
-    if(!running_slideshow)
+    if(!iv->running_slideshow)
     {
         rb->lcd_puts(0, 2, "decoding markers");
         rb->lcd_update();
     }
 #ifdef DISK_SPINDOWN
-    else if(immediate_ata_off)
+    else if(iv->immediate_ata_off)
     {
         /* running slideshow and time is long enough: power down disk */
         rb->storage_sleep();
@@ -190,7 +178,7 @@ int load_image(char *filename, struct image_info *info,
         default_huff_tbl(p_jpg); /* use default */
     build_lut(p_jpg); /* derive Huffman and other lookup-tables */
 
-    if(!running_slideshow)
+    if(!iv->running_slideshow)
     {
         rb->lcd_putsf(0, 2, "image %dx%d", p_jpg->x_size, p_jpg->y_size);
         rb->lcd_update();
@@ -202,7 +190,7 @@ int load_image(char *filename, struct image_info *info,
     return PLUGIN_OK;
 }
 
-int get_image(struct image_info *info, int ds)
+static int get_image(struct image_info *info, int ds)
 {
     int w, h; /* used to center output */
     int size; /* decompressed image size */
@@ -262,7 +250,7 @@ int get_image(struct image_info *info, int ds)
     buf_images += size;
     buf_images_size -= size;
 
-    if(!running_slideshow)
+    if(!iv->running_slideshow)
     {
         rb->lcd_putsf(0, 3, "decoding %d*%d", info->width, info->height);
         rb->lcd_update();
@@ -275,10 +263,10 @@ int get_image(struct image_info *info, int ds)
     time = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
-    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progress);
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, iv->cb_progress);
     rb->cpu_boost(false);
 #else
-    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progress);
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, iv->cb_progress);
 #endif
     if (status)
     {
@@ -287,7 +275,7 @@ int get_image(struct image_info *info, int ds)
     }
     time = *rb->current_tick - time;
 
-    if(!running_slideshow)
+    if(!iv->running_slideshow)
     {
         rb->snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
         rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
@@ -297,3 +285,13 @@ int get_image(struct image_info *info, int ds)
 
     return PLUGIN_OK;
 }
+
+const struct image_decoder image_decoder = {
+    false,
+    img_mem,
+    load_image,
+    get_image,
+    draw_image_rect,
+};
+
+IMGDEC_HEADER

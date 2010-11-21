@@ -10,7 +10,50 @@
 IMGVSRCDIR := $(APPSDIR)/plugins/imageviewer
 IMGVBUILDDIR := $(BUILDDIR)/apps/plugins/imageviewer
 
-# include actual viewer's make file
+ROCKS += $(IMGVBUILDDIR)/imageviewer.rock
+
+IMGV_SRC := $(call preprocess, $(IMGVSRCDIR)/SOURCES)
+IMGV_OBJ := $(call c2obj, $(IMGV_SRC))
+
+# add source files to OTHER_SRC to get automatic dependencies
+OTHER_SRC += $(IMGV_SRC)
+
+$(IMGVBUILDDIR)/imageviewer.rock: $(IMGV_OBJ)
+
+IMGDECFLAGS = $(PLUGINFLAGS) -DIMGDEC
+
+# include decoder's make from each subdir
 IMGVSUBDIRS := $(call preprocess, $(IMGVSRCDIR)/SUBDIRS)
 $(foreach dir,$(IMGVSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
+
+IMGDECLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.refmap
+
+ifndef APP_TYPE
+    IMGDEC_OUTLDS = $(IMGVBUILDDIR)/%.link
+    IMGDEC_OVLFLAGS = -T$(IMGVBUILDDIR)/$*.link -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.map
+else
+    IMGDEC_OVLFLAGS = $(PLUGINLDFLAGS)
+endif
+
+$(IMGVBUILDDIR)/%.ovl: $(IMGDEC_OUTLDS)
+	$(call PRINTS,LD $(@F))$(CC) $(IMGDECFLAGS) -o $(IMGVBUILDDIR)/$*.elf \
+		$(filter-out $(PLUGIN_CRT0),$(filter %.o, $^)) \
+		$(filter %.a, $+) \
+		-lgcc $(IMGDEC_OVLFLAGS)
+ifdef APP_TYPE
+	$(SILENT)cp $(IMGVBUILDDIR)/$*.elf $@
+else
+	$(SILENT)$(OC) -O binary $(IMGVBUILDDIR)/$*.elf $@
+endif
+
+# rule to create reference map for image decoder
+$(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+	$(call PRINTS,LD $(@F))$(CC) $(IMGDECFLAGS) -o /dev/null \
+		$(filter %.o, $^) \
+		$(filter %.a, $+) \
+		-lgcc $(IMGDECLDFLAGS)
+
+$(IMGVBUILDDIR)/%.link: $(PLUGIN_LDS) $(IMGVBUILDDIR)/%.refmap
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DIMGVDECODER_OFFSET=$(shell \
+		$(TOOLSDIR)/ovl_offset.pl $(IMGVBUILDDIR)/$*.refmap))
 

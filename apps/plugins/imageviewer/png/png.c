@@ -50,18 +50,13 @@ static unsigned char *disp_buf;
 #define resize_bitmap   grey_resize_bitmap
 #endif
 
-bool img_ext(const char *ext)
-{
-    if (!ext)
-        return false;
-    if (!rb->strcasecmp(ext,".png"))
-        return true;
-    else
-        return false;
-}
+#if defined(USEGSLIB) && (CONFIG_PLATFORM & PLATFORM_HOSTED)
+/* hack: fix error "undefined reference to `_grey_info'". */
+GREY_INFO_STRUCT
+#endif /* USEGSLIB */
 
-void draw_image_rect(struct image_info *info,
-                     int x, int y, int width, int height)
+static void draw_image_rect(struct image_info *info,
+                            int x, int y, int width, int height)
 {
     unsigned char **pdisp = (unsigned char **)info->data;
 
@@ -80,7 +75,7 @@ void draw_image_rect(struct image_info *info,
 #endif
 }
 
-int img_mem(int ds)
+static int img_mem(int ds)
 {
     LodePNG_Decoder *p_decoder = &decoder;
 
@@ -93,8 +88,8 @@ int img_mem(int ds)
 #endif
 }
 
-int load_image(char *filename, struct image_info *info,
-               unsigned char *buf, ssize_t *buf_size)
+static int load_image(char *filename, struct image_info *info,
+                      unsigned char *buf, ssize_t *buf_size)
 {
     int fd;
     long time = 0; /* measured ticks */
@@ -122,7 +117,7 @@ int load_image(char *filename, struct image_info *info,
 
     DEBUGF("reading file '%s'\n", filename);
 
-    if (!running_slideshow) {
+    if (!iv->running_slideshow) {
         rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
         rb->lcd_update();
     }
@@ -132,7 +127,7 @@ int load_image(char *filename, struct image_info *info,
         rb->close(fd);
 
     } else {
-        if (!running_slideshow) {
+        if (!iv->running_slideshow) {
             rb->lcd_putsf(0, 1, "loading %zu bytes", file_size);
             rb->lcd_update();
         }
@@ -142,12 +137,12 @@ int load_image(char *filename, struct image_info *info,
         rb->read(fd, image, file_size);
         rb->close(fd);
 
-        if (!running_slideshow) {
+        if (!iv->running_slideshow) {
             rb->lcd_puts(0, 2, "decoding image");
             rb->lcd_update();
         }
 #ifdef DISK_SPINDOWN
-        else if (immediate_ata_off) {
+        else if (iv->immediate_ata_off) {
             /* running slideshow and time is long enough: power down disk */
             rb->storage_sleep();
         }
@@ -167,7 +162,7 @@ int load_image(char *filename, struct image_info *info,
 
         if (!p_decoder->error) {
 
-            if (!running_slideshow) {
+            if (!iv->running_slideshow) {
                 rb->lcd_putsf(0, 2, "image %dx%d",
                               p_decoder->infoPng.width,
                               p_decoder->infoPng.height);
@@ -181,16 +176,16 @@ int load_image(char *filename, struct image_info *info,
             time = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
-            LodePNG_decode(p_decoder, image, file_size, cb_progress);
+            LodePNG_decode(p_decoder, image, file_size, iv->cb_progress);
             rb->cpu_boost(false);
 #else
-            LodePNG_decode(p_decoder, image, file_size, cb_progress);
+            LodePNG_decode(p_decoder, image, file_size, iv->cb_progress);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
             time = *rb->current_tick - time;
         }
     }
 
-    if (!running_slideshow && !p_decoder->error)
+    if (!iv->running_slideshow && !p_decoder->error)
     {
         rb->snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
         rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
@@ -200,7 +195,7 @@ int load_image(char *filename, struct image_info *info,
 
     if (p_decoder->error) {
 #ifdef USE_PLUG_BUF
-        if (plug_buf && (p_decoder->error == FILE_TOO_LARGE ||
+        if (iv->plug_buf && (p_decoder->error == FILE_TOO_LARGE ||
             p_decoder->error == OUT_OF_MEMORY ||
             p_decoder->error == TINF_DATA_ERROR))
             return PLUGIN_OUTOFMEM;
@@ -244,7 +239,7 @@ int load_image(char *filename, struct image_info *info,
     return PLUGIN_OK;
 }
 
-int get_image(struct image_info *info, int ds)
+static int get_image(struct image_info *info, int ds)
 {
     unsigned char **p_disp = &disp[ds]; /* short cut */
     LodePNG_Decoder *p_decoder = &decoder;
@@ -261,7 +256,7 @@ int get_image(struct image_info *info, int ds)
 
     /* assign image buffer */
     if (ds > 1) {
-        if (!running_slideshow)
+        if (!iv->running_slideshow)
         {
             rb->lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
             rb->lcd_update();
@@ -303,3 +298,13 @@ int get_image(struct image_info *info, int ds)
 
     return PLUGIN_OK;
 }
+
+const struct image_decoder image_decoder = {
+    true,
+    img_mem,
+    load_image,
+    get_image,
+    draw_image_rect,
+};
+
+IMGDEC_HEADER

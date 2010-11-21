@@ -470,8 +470,11 @@ STOP
 
     find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$temp_dir/rocks/")), 'apps/plugins');
 
-    open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
-        die "can't open viewers.config";
+    # exclude entries for the image file types not supported by the imageviewer for the target.
+    my $viewers = "$ROOT/apps/plugins/viewers.config";
+    my $c="cat $viewers | gcc $cppdef -I. -I$firmdir/export -E -P -include config.h -";
+
+    open VIEWERS, "$c|" or die "can't open viewers.config";
     my @viewers = <VIEWERS>;
     close VIEWERS;
 

@@ -1,11 +1,23 @@
 % $Id$ %
-\subsection{PNG viewer}
-This plugin opens \fname{.png} files from the \setting{File Browser} to
-display them.
-\opt{swcodec}{
-  \note{When an audio file is playing the size of the image is limited as 
-  the decoding process needs to share memory with audio tracks. To be able to
-  view a bigger file you may need to stop playback.\\}
+\subsection{Image Viewer}
+This plugin opens image files from the \setting{File Browser} to display them\nopt{lcd_color}{ using Rockbox's greyscale library}. Supported formats are as follows.
+
+\begin{table}
+  \begin{rbtabular}{.60\textwidth}{llX}%
+      {\textbf{Format}& \textbf{File-extension(s)}}%
+      {}{}
+    BMP         & \fname{.bmp}                  \\
+    JPEG        & \fname{.jpg, .jpe, .jpeg}     \\
+    PNG         & \fname{.png}                  \\
+  \end{rbtabular}
+\end{table}
+
+\opt{large_plugin_buffer}{
+\par
+\note{
+When an audio file is playing the size of the image is limited as 
+the decoding process needs to share memory with audio tracks. To be able to
+view a bigger file you may need to stop playback.}
 }
 \nopt{large_plugin_buffer}{%
 \note{This plugin will cause playback to stop.}%
@@ -22,6 +34,7 @@ display them.
       ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
       ,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
       {/ \ButtonLeft\ / \ButtonRight}
+    \opt{touchscreen}{\TouchTopMiddle{} / \TouchBottomMiddle{}/ \TouchMidLeft{} / \TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move around in zoomed in image\\
     \opt{RECORDER_PAD}{\ButtonPlay}
@@ -32,6 +45,7 @@ display them.
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolUp}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonUp}
+    \opt{touchscreen}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom in\\
     \opt{RECORDER_PAD}{\ButtonOn}
@@ -43,6 +57,7 @@ display them.
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
     \opt{MROBE100_PAD}{\ButtonPlay}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonDown}
+    \opt{touchscreen}{\TouchTopLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom out\\
     \opt{RECORDER_PAD}{\ButtonFThree}
@@ -58,8 +73,9 @@ display them.
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonRight}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonRight}
+    \opt{touchscreen}{\TouchBottomRight}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Next png in directory\\
+    & Next image in directory\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonRec}
@@ -72,8 +88,9 @@ display them.
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     \opt{MROBE100_PAD}{\ButtonDisplay+\ButtonLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonLeft}
+    \opt{touchscreen}{\TouchBottomLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Previous png in directory\\
+    & Previous image in directory\\
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{%currently only defined for the sansa pads
         \ButtonRec
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -84,12 +101,12 @@ display them.
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
+    \opt{touchscreen}{\TouchCenter}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
        }
-    & Show menu / Abort while decoding \\
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
-        ,PBELL_VIBE500_PAD}{%
+    & Show menu / Abort \\
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{
         \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
         \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
@@ -109,5 +126,17 @@ The menu has the following entries.
 \item[Show Playback Menu.] From the playback menu you can control the
 playback of the currently loaded playlist and change the volume of your \dap.
 }
+\opt{lcd_color}{
+\item[Display Options.] From this menu you can force the viewer to render the
+image in greyscale using the \setting{Greyscale} option or set the method of
+dithering used in the \setting{Dithering} submenu. These settings only take affect
+for JPEG images.
+}
 \item[Quit.] Quits the viewer and returns to the \setting{File Browser}.
 \end{description}
+
+\note{
+Progressive scan and other unusual JPEG files are not supported, and will
+result in various ``unsupported xx'' messages. Processing could also fail if the
+image is too big to decode which will be explained by a respective message.
+}

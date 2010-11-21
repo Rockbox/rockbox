@@ -10,12 +10,18 @@
 BMPSRCDIR := $(IMGVSRCDIR)/bmp
 BMPBUILDDIR := $(IMGVBUILDDIR)/bmp
 
-ROCKS += $(BMPBUILDDIR)/bmp.rock
-
 BMP_SRC := $(call preprocess, $(BMPSRCDIR)/SOURCES)
 BMP_OBJ := $(call c2obj, $(BMP_SRC))
 
-# add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(BMP_SRC)
 
-$(BMPBUILDDIR)/bmp.rock: $(BMP_OBJ)
+ROCKS += $(BMPBUILDDIR)/bmp.ovl
+
+$(BMPBUILDDIR)/bmp.refmap: $(BMP_OBJ)
+$(BMPBUILDDIR)/bmp.link: $(PLUGIN_LDS) $(BMPBUILDDIR)/bmp.refmap
+$(BMPBUILDDIR)/bmp.ovl: $(BMP_OBJ)
+
+# special pattern rule for compiling image decoder with extra flags
+$(BMPBUILDDIR)/%.o: $(BMPSRCDIR)/%.c $(BMPSRCDIR)/bmp.make
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(IMGDECFLAGS) -c $< -o $@
