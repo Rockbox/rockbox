@@ -36,7 +36,7 @@
 #define TEST_TIME 10 /* in seconds */
 
 static unsigned char* audiobuf;
-static ssize_t audiobuflen;
+static size_t audiobuflen;
 
 static unsigned short frnd_buffer;
 static int line = 0;
@@ -207,7 +207,7 @@ static bool file_speed(int chunksize, bool align)
     long filesize = 0;
     long size, time;
     
-    if (chunksize >= audiobuflen)
+    if ((unsigned)chunksize >= audiobuflen)
         return false;
 
     log_text("--------------------", true);
@@ -432,7 +432,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->closedir(dir);
     }
 
-    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuflen);
+    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
     /* align start and length to 32 bit */
     align = (-(int)audiobuf) & 3;
     audiobuf += align;
