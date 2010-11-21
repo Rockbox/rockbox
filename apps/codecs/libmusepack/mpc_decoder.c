@@ -62,10 +62,10 @@ extern const mpc_can_data mpc_can_Q9up;
 
 //Decoder globals (g_Y_L and g_Y_R do not fit into iram for all targets)
 static mpc_decoder g_mpc_decoder                 IBSS_ATTR;
-static MPC_SAMPLE_FORMAT g_V_L[MPC_V_MEM + 960 ] IBSS_ATTR                __attribute__((aligned(16)));
-static MPC_SAMPLE_FORMAT g_Y_L[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM __attribute__((aligned(16)));
-static MPC_SAMPLE_FORMAT g_V_R[MPC_V_MEM + 960 ] IBSS_ATTR                __attribute__((aligned(16)));
-static MPC_SAMPLE_FORMAT g_Y_R[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM __attribute__((aligned(16)));
+static MPC_SAMPLE_FORMAT g_V_L[MPC_V_MEM + 960 ] IBSS_ATTR                MEM_ALIGN_ATTR;
+static MPC_SAMPLE_FORMAT g_Y_L[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM MEM_ALIGN_ATTR;
+static MPC_SAMPLE_FORMAT g_V_R[MPC_V_MEM + 960 ] IBSS_ATTR                MEM_ALIGN_ATTR;
+static MPC_SAMPLE_FORMAT g_Y_R[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM MEM_ALIGN_ATTR;
 
 //SV7 globals (decoding results for bundled quantizers (3- and 5-step))
 static const mpc_int32_t g_sv7_idx30[] ICONST_ATTR = 
