@@ -321,7 +321,7 @@ static inline void cpucache_flush(void)
     #undef CACHEALIGN_SIZE
 #endif
 #ifdef CACHEALIGN_BITS
-    /* CACHEALIGN_BITS = 2 ^ CACHEALIGN_BITS */
+    /* CACHEALIGN_SIZE = 2 ^ CACHEALIGN_BITS */
     #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
 #else
     /* FIXME: set to maximum known cache alignment of supported CPUs */
