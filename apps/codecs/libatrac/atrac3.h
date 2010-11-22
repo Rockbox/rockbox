@@ -61,13 +61,13 @@ typedef struct {
     int32_t           *spectrum;
     int32_t           *IMDCT_buf;
 
-    int32_t           delayBuf1[46]; ///<qmf delay buffers
-    int32_t           delayBuf2[46];
-    int32_t           delayBuf3[46];
+    int32_t           delayBuf1[46] MEM_ALIGN_ATTR; ///<qmf delay buffers
+    int32_t           delayBuf2[46] MEM_ALIGN_ATTR;
+    int32_t           delayBuf3[46] MEM_ALIGN_ATTR;
 } channel_unit;
 
 typedef struct {
-    int32_t             outSamples[2048];
+    int32_t             outSamples[2048] MEM_ALIGN_ATTR;
     GetBitContext       gb;
     //@{
     /** stream data */
@@ -92,8 +92,8 @@ typedef struct {
     //@}
     //@{
     /** data buffers */    
-    uint8_t             decoded_bytes_buffer[1024];
-    int32_t             tempBuf[1070];
+    uint8_t             decoded_bytes_buffer[1024] MEM_ALIGN_ATTR;
+    int32_t             tempBuf[1070]              MEM_ALIGN_ATTR;
     //@}
     //@{
     /** extradata */

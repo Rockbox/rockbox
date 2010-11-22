@@ -52,7 +52,7 @@ static const int32_t qmf_48tap_half_fix[24] = {
 
 /* mdct window scaled by 2^31 */
 /* Remark: The preceding sign corrects the sign of the hexadecimal values */
-static const int32_t window_lookup[128] ICONST_ATTR  = {
+static const int32_t window_lookup[128] ICONST_ATTR MEM_ALIGN_ATTR = {
     -0xffffb10c, -0xfffd394b, -0xfff8494f, -0xfff0e025, -0xffe6fc5f, -0xffda9c15, 
     -0xffcbbce6, -0xffba5bf4, -0xffa675e8, -0xff9006f0, -0xff770aba, -0xff5b7c7e, 
     -0xff3d56f2, -0xff1c9452, -0xfef92e59, -0xfed31e45, -0xfeaa5cd5, -0xfe7ee247, 

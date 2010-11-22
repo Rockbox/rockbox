@@ -54,15 +54,17 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-static VLC          spectral_coeff_tab[7];
-#if defined(CPU_ARM) && (ARM_ARCH >= 5)  /*ARMv5e+ uses 32x16 multiplication*/
-static int16_t      qmf_window[48] IBSS_ATTR  __attribute__ ((aligned (32))); 
+#if defined(CPU_ARM) && (ARM_ARCH >= 5)  
+    #define QMFWIN_TYPE int16_t /* ARMv5e+ uses 32x16 multiplication */
 #else
-static int32_t      qmf_window[48] IBSS_ATTR __attribute__ ((aligned (16)));
+    #define QMFWIN_TYPE int32_t
 #endif
-static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR __attribute__((aligned(16)));
-static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR __attribute__((aligned(16)));
-static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR;
+
+static VLC          spectral_coeff_tab[7];
+static QMFWIN_TYPE  qmf_window[48]            IBSS_ATTR MEM_ALIGN_ATTR; 
+static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
+static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR MEM_ALIGN_ATTR;
+static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
 static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
 
 
