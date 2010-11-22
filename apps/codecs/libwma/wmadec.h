@@ -130,7 +130,7 @@ typedef struct WMADecodeContext
     uint8_t ms_stereo; /* true if mid/side stereo mode */
     uint8_t channel_coded[MAX_CHANNELS]; /* true if channel is coded */
     int exponents_bsize[MAX_CHANNELS];      // log2 ratio frame/exp. length
-    fixed32 exponents[MAX_CHANNELS][BLOCK_MAX_SIZE];
+    fixed32 exponents[MAX_CHANNELS][BLOCK_MAX_SIZE] MEM_ALIGN_ATTR;
     fixed32 max_exponent[MAX_CHANNELS];
     int16_t coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
     fixed32 (*coefs)[MAX_CHANNELS][BLOCK_MAX_SIZE];
@@ -139,14 +139,14 @@ typedef struct WMADecodeContext
     fixed32 (*frame_out)[MAX_CHANNELS][BLOCK_MAX_SIZE*2];
 
     /* last frame info */
-    uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4]; /* padding added */
+    uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4] MEM_ALIGN_ATTR; /* padding added */
     int last_bitoffset;
     int last_superframe_len;
     fixed32 *noise_table;
     int noise_index;
     fixed32 noise_mult; /* XXX: suppress that and integrate it in the noise array */
     /* lsp_to_curve tables */
-    fixed32 lsp_cos_table[BLOCK_MAX_SIZE];
+    fixed32 lsp_cos_table[BLOCK_MAX_SIZE] MEM_ALIGN_ATTR;
     void *lsp_pow_m_table1;
     void *lsp_pow_m_table2;
 
