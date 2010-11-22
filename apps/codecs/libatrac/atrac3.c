@@ -666,7 +666,7 @@ static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
     if (ONE_16 == gain) {
         /* gain1 = 1.0 -> no multiplication needed, just adding */
         /* Remark: This path is called >90%. */
-        do {
+        while (i<256) {
             pOut[i] = pIn[i] + pPrev[i]; i++;
             pOut[i] = pIn[i] + pPrev[i]; i++;
             pOut[i] = pIn[i] + pPrev[i]; i++;
@@ -675,11 +675,11 @@ static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
             pOut[i] = pIn[i] + pPrev[i]; i++;
             pOut[i] = pIn[i] + pPrev[i]; i++;
             pOut[i] = pIn[i] + pPrev[i]; i++;
-        } while (i<256);
+        };
     } else {
         /* gain1 != 1.0 -> we need to do a multiplication */
         /* Remark: This path is called seldom. */
-        do {
+        while (i<256) {
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
@@ -688,7 +688,7 @@ static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
             pOut[i] = fixmul16(pIn[i], gain) + pPrev[i]; i++;
-        } while (i<256);
+        };
     }
 }
 
