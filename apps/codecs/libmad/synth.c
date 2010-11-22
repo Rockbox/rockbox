@@ -534,7 +534,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 # endif
 
 static
-mad_fixed_t const D[17][32] ICONST_ATTR = {
+mad_fixed_t const D[17][32] ICONST_ATTR MEM_ALIGN_ATTR = {
 # include "D.dat"
 };
 

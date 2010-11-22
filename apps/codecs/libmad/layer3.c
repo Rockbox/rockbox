@@ -22,7 +22,7 @@
 # ifdef HAVE_CONFIG_H
 #  include "config.h"
 # endif
-
+     
 # include "global.h"
 
 # include <string.h>
@@ -349,7 +349,7 @@ unsigned long const rq_table[8207] = {
  *
  * root_table[3 + x] = 2^(x/4)
  */
-mad_fixed_t const root_table[7] ICONST_ATTR = {
+mad_fixed_t const root_table[7] ICONST_ATTR MEM_ALIGN_ATTR = {
   MAD_F(0x09837f05) /* 2^(-3/4) == 0.59460355750136 */,
   MAD_F(0x0b504f33) /* 2^(-2/4) == 0.70710678118655 */,
   MAD_F(0x0d744fcd) /* 2^(-1/4) == 0.84089641525371 */,
@@ -367,14 +367,14 @@ mad_fixed_t const root_table[7] ICONST_ATTR = {
  * cs[i] =    1 / sqrt(1 + c[i]^2)
  * ca[i] = c[i] / sqrt(1 + c[i]^2)
  */
-mad_fixed_t const cs[8] ICONST_ATTR = {
+mad_fixed_t const cs[8] ICONST_ATTR MEM_ALIGN_ATTR = {
   +MAD_F(0x0db84a81) /* +0.857492926 */, +MAD_F(0x0e1b9d7f) /* +0.881741997 */,
   +MAD_F(0x0f31adcf) /* +0.949628649 */, +MAD_F(0x0fbba815) /* +0.983314592 */,
   +MAD_F(0x0feda417) /* +0.995517816 */, +MAD_F(0x0ffc8fc8) /* +0.999160558 */,
   +MAD_F(0x0fff964c) /* +0.999899195 */, +MAD_F(0x0ffff8d3) /* +0.999993155 */
 };
 
-mad_fixed_t const ca[8] ICONST_ATTR = {
+mad_fixed_t const ca[8] ICONST_ATTR MEM_ALIGN_ATTR = {
   -MAD_F(0x083b5fe7) /* -0.514495755 */, -MAD_F(0x078c36d2) /* -0.471731969 */,
   -MAD_F(0x05039814) /* -0.313377454 */, -MAD_F(0x02e91dd1) /* -0.181913200 */,
   -MAD_F(0x0183603a) /* -0.094574193 */, -MAD_F(0x00a7cb87) /* -0.040965583 */,
@@ -388,7 +388,7 @@ mad_fixed_t const ca[8] ICONST_ATTR = {
  * imdct_s[i/even][k] = cos((PI / 24) * (2 *       (i / 2) + 7) * (2 * k + 1))
  * imdct_s[i /odd][k] = cos((PI / 24) * (2 * (6 + (i-1)/2) + 7) * (2 * k + 1))
  */
-mad_fixed_t const imdct_s[6][6] ICONST_ATTR = {
+mad_fixed_t const imdct_s[6][6] ICONST_ATTR MEM_ALIGN_ATTR = {
 # include "imdct_s.dat"
 };
 
@@ -400,7 +400,7 @@ mad_fixed_t const imdct_s[6][6] ICONST_ATTR = {
  * window_l[i] = sin((PI / 36) * (i + 1/2))
  */
 static
-mad_fixed_t const window_l[36] ICONST_ATTR = {
+mad_fixed_t const window_l[36] ICONST_ATTR MEM_ALIGN_ATTR = {
   MAD_F(0x00b2aa3e) /* 0.043619387 */, MAD_F(0x0216a2a2) /* 0.130526192 */,
   MAD_F(0x03768962) /* 0.216439614 */, MAD_F(0x04cfb0e2) /* 0.300705800 */,
   MAD_F(0x061f78aa) /* 0.382683432 */, MAD_F(0x07635284) /* 0.461748613 */,
@@ -430,7 +430,7 @@ mad_fixed_t const window_l[36] ICONST_ATTR = {
  *
  * window_s[i] = sin((PI / 12) * (i + 1/2))
  */
-mad_fixed_t const window_s[12] ICONST_ATTR = {
+mad_fixed_t const window_s[12] ICONST_ATTR MEM_ALIGN_ATTR = {
   MAD_F(0x0216a2a2) /* 0.130526192 */, MAD_F(0x061f78aa) /* 0.382683432 */,
   MAD_F(0x09bd7ca0) /* 0.608761429 */, MAD_F(0x0cb19346) /* 0.793353340 */,
   MAD_F(0x0ec835e8) /* 0.923879533 */, MAD_F(0x0fdcf549) /* 0.991444861 */,

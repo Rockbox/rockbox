@@ -29,11 +29,11 @@ struct mad_pcm {
   unsigned int samplerate;              /* sampling frequency (Hz) */
   unsigned short channels;              /* number of channels */
   unsigned short length;                /* number of samples per channel */
-  mad_fixed_t samples[2][1152];         /* PCM output samples [ch][sample] */
+  mad_fixed_t samples[2][1152] MEM_ALIGN_ATTR;         /* PCM output samples [ch][sample] */
 };
 
 struct mad_synth {
-  mad_fixed_t filter[2][2][2][16][8];   /* polyphase filterbank outputs */
+  mad_fixed_t filter[2][2][2][16][8] MEM_ALIGN_ATTR;   /* polyphase filterbank outputs */
                                         /* [ch][eo][peo][s][v] */
 
   unsigned int phase;                   /* current processing phase */
