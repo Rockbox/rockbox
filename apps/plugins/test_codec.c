@@ -867,8 +867,10 @@ show_menu:
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 menu:
-    result = rb->do_menu(&menu, &selection, NULL, false);
+#endif 
 
+    result = rb->do_menu(&menu, &selection, NULL, false);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
     if (result == BOOST)
     {
@@ -876,6 +878,8 @@ menu:
                         boost_settings, 2, NULL);
         goto menu;
     }
+    if(boost)
+        rb->cpu_boost(true);
 #endif
 
     if (result == QUIT)
@@ -883,11 +887,6 @@ menu:
         res = PLUGIN_OK;
         goto exit;
     }
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    if(boost)
-        rb->cpu_boost(true);
-#endif
 
     scandir = 0;
 
