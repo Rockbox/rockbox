@@ -1685,6 +1685,12 @@ static void audio_stop_playback(void)
         /* Save the current playing spot, or NULL if the playlist has ended */
         playlist_update_resume_info(id3);
 
+        /* Now it's good time to send track finish events.  Do this
+           only if this hasn't been done already as part of a track
+           switch. */
+        if (id3 == thistrack_id3)
+            send_event(PLAYBACK_EVENT_TRACK_FINISH, thistrack_id3);
+
         /* TODO: Create auto bookmark too? */
 
         prev_track_elapsed = othertrack_id3->elapsed;
