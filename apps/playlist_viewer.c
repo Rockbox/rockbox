@@ -652,7 +652,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
         }
 
         /* Timeout so we can determine if play status has changed */
-        bool res = list_do_action(CONTEXT_LIST, HZ/2,
+        bool res = list_do_action(CONTEXT_TREE, HZ/2,
                             &playlist_lists, &button, LIST_WRAP_UNLESS_HELD);
         /* during moving, another redraw is going to be needed,
          * since viewer.selected_track is updated too late (after the first draw)
