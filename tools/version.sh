@@ -86,7 +86,7 @@ bzrversion() {
 }
 
 # XXX: Don't run the scripts and just display the release version
-echo "3.7"
+echo "3.7.1"
 exit 0
 
 #
