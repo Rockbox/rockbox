@@ -768,6 +768,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
 
 static long read_numeric_tag(int tag, int idx_id, const struct index_entry *idx)
 {
+#ifdef __PCTOOL__
     if (! COMMAND_QUEUE_IS_EMPTY)
     {
         /* Attempt to find tag data through store-to-load forwarding in
@@ -802,6 +803,7 @@ static long read_numeric_tag(int tag, int idx_id, const struct index_entry *idx)
             return result;
         }
     }
+#endif
 
     return idx->tag_seek[tag];
 }
