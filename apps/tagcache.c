@@ -764,31 +764,75 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
     return true;
 }
 
-static long check_virtual_tags(int tag, const struct index_entry *idx)
+#define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
+
+static long read_numeric_tag(int tag, int idx_id, const struct index_entry *idx)
+{
+    if (! COMMAND_QUEUE_IS_EMPTY)
+    {
+        /* Attempt to find tag data through store-to-load forwarding in
+           command queue */
+        long result = -1;
+
+        mutex_lock(&command_queue_mutex);
+
+        int ridx = command_queue_widx;
+
+        while (ridx != command_queue_ridx)
+        {
+            if (--ridx < 0)
+                ridx = TAGCACHE_COMMAND_QUEUE_LENGTH - 1;
+            
+            if (command_queue[ridx].command == CMD_UPDATE_NUMERIC
+                && command_queue[ridx].idx_id == idx_id
+                && command_queue[ridx].tag == tag)
+            {
+                result = command_queue[ridx].data;
+                break;
+            }
+        }
+
+        mutex_unlock(&command_queue_mutex);
+
+        if (result >= 0)
+        {
+            logf("read_numeric_tag: "
+                 "Recovered tag %d value %lX from write queue",
+                 tag, result);
+            return result;
+        }
+    }
+
+    return idx->tag_seek[tag];
+}
+
+
+static long check_virtual_tags(int tag, int idx_id, 
+                               const struct index_entry *idx)
 {
     long data = 0;
     
     switch (tag) 
     {
         case tag_virt_length_sec:
-            data = (idx->tag_seek[tag_length]/1000) % 60;
+            data = (read_numeric_tag(tag_length, idx_id, idx)/1000) % 60;
             break;
         
         case tag_virt_length_min:
-            data = (idx->tag_seek[tag_length]/1000) / 60;
+            data = (read_numeric_tag(tag_length, idx_id, idx)/1000) / 60;
             break;
         
         case tag_virt_playtime_sec:
-            data = (idx->tag_seek[tag_playtime]/1000) % 60;
+            data = (read_numeric_tag(tag_playtime, idx_id, idx)/1000) % 60;
             break;
         
         case tag_virt_playtime_min:
-            data = (idx->tag_seek[tag_playtime]/1000) / 60;
+            data = (read_numeric_tag(tag_playtime, idx_id, idx)/1000) / 60;
             break;
         
         case tag_virt_autoscore:
-            if (idx->tag_seek[tag_length] == 0 
-                || idx->tag_seek[tag_playcount] == 0)
+            if (read_numeric_tag(tag_length, idx_id, idx) == 0 
+                || read_numeric_tag(tag_playcount, idx_id, idx) == 0)
             {
                 data = 0;
             }
@@ -804,19 +848,23 @@ static long check_virtual_tags(int tag, const struct index_entry *idx)
                      autoscore = 100 * (alpha / playcout + beta / length / playcount)
                    Both terms should be small enough to avoid any overflow
                 */
-                data = 100 * (idx->tag_seek[tag_playtime] / idx->tag_seek[tag_length])
-                     + (100 * (idx->tag_seek[tag_playtime] % idx->tag_seek[tag_length])) / idx->tag_seek[tag_length];
-                data /=  idx->tag_seek[tag_playcount];
+                data = 100 * (read_numeric_tag(tag_playtime, idx_id, idx) 
+                              / read_numeric_tag(tag_length, idx_id, idx))
+                       + (100 * (read_numeric_tag(tag_playtime, idx_id, idx) 
+                                 % read_numeric_tag(tag_length, idx_id, idx)))
+                         / read_numeric_tag(tag_length, idx_id, idx);
+                data /=  read_numeric_tag(tag_playcount, idx_id, idx);
             }
             break;
         
         /* How many commits before the file has been added to the DB. */
         case tag_virt_entryage:
-            data = current_tcmh.commitid - idx->tag_seek[tag_commitid] - 1;
+            data = current_tcmh.commitid 
+                   - read_numeric_tag(tag_commitid, idx_id, idx) - 1;
             break;
         
         default:
-            data = idx->tag_seek[tag];
+            data = read_numeric_tag(tag, idx_id, idx);
     }
     
     return data;
@@ -835,7 +883,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     if (!get_index(tcs->masterfd, tcs->idx_id, &idx, true))
         return -2;
     
-    return check_virtual_tags(tag, &idx);
+    return check_virtual_tags(tag, tcs->idx_id, &idx);
 }
 
 inline static bool str_ends_with(const char *str1, const char *str2)
@@ -945,7 +993,7 @@ static bool check_clauses(struct tagcache_search *tcs,
             char buf[256];
             char *str = NULL;
             
-            seek = check_virtual_tags(clause[i]->tag, idx);
+            seek = check_virtual_tags(clause[i]->tag, tcs->idx_id, idx);
             
             if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
             {
@@ -975,7 +1023,7 @@ static bool check_clauses(struct tagcache_search *tcs,
             int seek;
             char str[256];
             
-            seek = check_virtual_tags(clause[i]->tag, idx);
+            seek = check_virtual_tags(clause[i]->tag, tcs->idx_id, idx);
                 
             memset(str, 0, sizeof str);
             if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
@@ -1603,9 +1651,9 @@ static struct tagfile_entry *get_tag(const struct index_entry *entry, int tag)
     return (struct tagfile_entry *)&hdr->tags[tag][entry->tag_seek[tag]];
 }
 
-static long get_tag_numeric(const struct index_entry *entry, int tag)
+static long get_tag_numeric(const struct index_entry *entry, int tag, int idx_id)
 {
-    return check_virtual_tags(tag, entry);
+    return check_virtual_tags(tag, idx_id, entry);
 }
 
 static char* get_tag_string(const struct index_entry *entry, int tag)
@@ -1640,16 +1688,16 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->albumartist  = get_tag_string(entry, tag_albumartist);
     id3->grouping     = get_tag_string(entry, tag_grouping);
 
-    id3->length     = get_tag_numeric(entry, tag_length);
-    id3->playcount  = get_tag_numeric(entry, tag_playcount);
-    id3->rating     = get_tag_numeric(entry, tag_rating);
-    id3->lastplayed = get_tag_numeric(entry, tag_lastplayed);
-    id3->score      = get_tag_numeric(entry, tag_virt_autoscore) / 10;
-    id3->year       = get_tag_numeric(entry, tag_year);
+    id3->length     = get_tag_numeric(entry, tag_length, idx_id);
+    id3->playcount  = get_tag_numeric(entry, tag_playcount, idx_id);
+    id3->rating     = get_tag_numeric(entry, tag_rating, idx_id);
+    id3->lastplayed = get_tag_numeric(entry, tag_lastplayed, idx_id);
+    id3->score      = get_tag_numeric(entry, tag_virt_autoscore, idx_id) / 10;
+    id3->year       = get_tag_numeric(entry, tag_year, idx_id);
 
-    id3->discnum = get_tag_numeric(entry, tag_discnumber);
-    id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
-    id3->bitrate = get_tag_numeric(entry, tag_bitrate);
+    id3->discnum = get_tag_numeric(entry, tag_discnumber, idx_id);
+    id3->tracknum = get_tag_numeric(entry, tag_tracknumber, idx_id);
+    id3->bitrate = get_tag_numeric(entry, tag_bitrate, idx_id);
     if (id3->bitrate == 0)
         id3->bitrate = 1;
 
@@ -3102,8 +3150,6 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
     return modify_numeric_entry(tcs->masterfd, tcs->idx_id, tag, data);
 }
 #endif
-
-#define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
 
 static bool command_queue_is_full(void)
 {
