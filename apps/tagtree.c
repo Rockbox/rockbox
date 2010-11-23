@@ -652,6 +652,9 @@ static void tagtree_buffer_event(void *data)
 
     logf("be:%s", id3->path);
     
+    while (! tagcache_is_usable())
+        yield();
+
     if (!tagcache_find_index(&tcs, id3->path))
     {
         logf("tc stat: not found: %s", id3->path);
