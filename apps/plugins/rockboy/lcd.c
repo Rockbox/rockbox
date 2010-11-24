@@ -1108,8 +1108,13 @@ void lcd_refreshline(void)
     {
         if(options.showstats)
         {
-            rb->lcd_putsxyf(0,LCD_HEIGHT-10,"FPS: %d Frameskip: %d ",
-                    options.fps, options.frameskip);
+            if(options.showstats==1) {
+                rb->lcd_putsxyf(0,LCD_HEIGHT-10," %d %d ",
+                        options.fps, options.frameskip);
+            } else {
+                rb->lcd_putsxyf(0,LCD_HEIGHT-10," FPS: %d Frameskip: %d ",
+                        options.fps, options.frameskip);
+            }
             rb->lcd_update_rect(0,LCD_HEIGHT-10, LCD_WIDTH, 10);
         }
 

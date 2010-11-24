@@ -349,6 +349,12 @@ static void do_opt_menu(void)
         { "On" , -1 },
     };
 
+    static const struct opt_items stats[3] = {
+        { "Off", -1 },
+        { "Short" , -1 },
+        { "Full" , -1 },
+    };
+
     static const struct opt_items frameskip[]= {
         { "0 Max", -1 },
         { "1 Max", -1 },
@@ -440,7 +446,7 @@ static void do_opt_menu(void)
                 rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
                 break;
             case 3: /* Stats */
-                rb->set_option("Stats", &options.showstats, INT, onoff, 2, NULL );
+                rb->set_option("Stats", &options.showstats, INT, stats, 3, NULL );
                 break;
             case 4: /* Keys */
                 setupkeys();
