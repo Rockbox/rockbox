@@ -12577,3 +12577,20 @@
     *: "Начинать показ файлов здесь"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Signal strength:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Мощьность сигнала:"
+  </voice>
+</phrase>
