@@ -71,7 +71,7 @@
 #define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        255
+#define MAX_CONTRAST_SETTING        127
 #define DEFAULT_CONTRAST_SETTING    85
 
 #if 0   /* not enough room for a 16 bits framebuffer */

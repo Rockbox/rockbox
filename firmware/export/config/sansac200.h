@@ -76,7 +76,7 @@
 #define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        255
+#define MAX_CONTRAST_SETTING        127
 #define DEFAULT_CONTRAST_SETTING    85
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
