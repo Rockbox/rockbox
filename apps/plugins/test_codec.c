@@ -891,7 +891,11 @@ menu:
     scandir = 0;
 
     if ((checksum = (result == CHECKSUM || result == CHECKSUM_DIR)))
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        result -= 7;
+#else
         result -= 6;
+#endif
 
     if ((use_dsp = ((result >= SPEED_TEST_WITH_DSP)
                    && (result <= WRITE_WAV_WITH_DSP)))) {
