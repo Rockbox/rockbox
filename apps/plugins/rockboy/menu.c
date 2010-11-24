@@ -11,6 +11,7 @@
 #include "save.h"
 #include "rtc-gb.h"
 #include "pcm.h"
+#include "emu.h"
 
 #define SLOT_COUNT  50
 #define DESC_SIZE   20
@@ -89,7 +90,7 @@ int do_user_menu(void) {
 
     MENUITEM_STRINGLIST(menu, "Rockboy Menu", NULL,
                         "Load Game", "Save Game",
-                        "Options", "Quit");
+                        "Options", "Reset", "Quit");
 
     rockboy_pcm_init();
 
@@ -108,7 +109,11 @@ int do_user_menu(void) {
             case 2: /* Options */
                 do_opt_menu();
                 break;
-            case 3: /* Quit */
+            case 3: /* Reset */
+                emu_reset();
+                done=true;
+                break;
+            case 4: /* Quit */
                 ret = USER_MENU_QUIT;
                 done=true;
                 break;
