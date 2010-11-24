@@ -357,6 +357,20 @@ static void do_opt_menu(void)
         { "4 Max", -1 },
         { "5 Max", -1 },
         { "6 Max", -1 },
+        { "7 Max", -1 },
+        { "8 Max", -1 },
+        { "9 Max", -1 },
+        { "10 Max", -1 },
+        { "11 Max", -1 },
+        { "12 Max", -1 },
+        { "13 Max", -1 },
+        { "14 Max", -1 },
+        { "15 Max", -1 },
+        { "16 Max", -1 },
+        { "17 Max", -1 },
+        { "18 Max", -1 },
+        { "19 Max", -1 },
+        { "20 Max", -1 },
     };
     
 #ifdef HAVE_LCD_COLOR
