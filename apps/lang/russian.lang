@@ -12587,10 +12587,10 @@
   </source>
   <dest>
     *: none
-    radio: "Signal strength:"
+    radio: "Мощность сигнала:"
   </dest>
   <voice>
     *: none
-    radio: "Мощьность сигнала:"
+    radio: "Мощность сигнала"
   </voice>
 </phrase>
