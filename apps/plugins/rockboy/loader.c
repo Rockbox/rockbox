@@ -102,6 +102,7 @@ static const unsigned char ramsize_table[5] =
 static const char *romfile;
 static char sramfile[500];
 static char rtcfile[500];
+static char snfile[500];
 static char saveprefix[500];
 
 static int forcebatt, nobatt;
@@ -269,6 +270,24 @@ static void rtc_load(void)
     close(fd);
 }
 
+void sn_save(void)
+{
+    int fd;    
+    if ((fd = open(snfile, O_WRONLY | O_CREAT, 0666)) < 0)
+        return;
+    savestate(fd);
+    close(fd);
+}
+
+void sn_load(void)
+{
+    int fd;    
+    if ((fd = open(snfile, O_RDONLY, 0666)) < 0)
+        return;
+    loadstate(fd);
+    close(fd);
+}
+
 void cleanup(void)
 {
     sram_save();
@@ -289,6 +308,8 @@ void loader_init(const char *s)
 
     strcpy(rtcfile, saveprefix);
     strcat(rtcfile, ".rtc");
+    strcpy(snfile, saveprefix);
+    strcat(snfile, ".sn");
     
     sram_load();
     rtc_load();

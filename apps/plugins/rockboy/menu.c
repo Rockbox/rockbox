@@ -12,6 +12,7 @@
 #include "rtc-gb.h"
 #include "pcm.h"
 #include "emu.h"
+#include "loader.h"
 
 #define SLOT_COUNT  50
 #define DESC_SIZE   20
@@ -115,6 +116,7 @@ int do_user_menu(void) {
                 break;
             case 4: /* Quit */
                 ret = USER_MENU_QUIT;
+                if(options.autosave) sn_save();
                 done=true;
                 break;
             default:
@@ -416,7 +418,8 @@ static void do_opt_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(menu, "Options", NULL,
-                        "Max Frameskip", "Sound", "Volume", "Stats", "Set Keys (Buggy)",
+                        "Max Frameskip", "Autosave", "Sound", "Volume", 
+                        "Stats", "Set Keys (Buggy)",
 #ifdef HAVE_LCD_COLOR
                         "Screen Size", "Screen Rotate", "Set Palette",
 #endif
@@ -437,32 +440,35 @@ static void do_opt_menu(void)
                 rb->set_option("Max Frameskip", &options.maxskip, INT, frameskip, 
                     sizeof(frameskip)/sizeof(*frameskip), NULL );
                 break;
-            case 1: /* Sound */
+            case 1: /* Autosave */
+                rb->set_option("Autosave", &options.autosave, INT, onoff, 2, NULL );
+                break;
+            case 2: /* Sound */
                 if(options.sound>1) options.sound=1;
                 rb->set_option("Sound", &options.sound, INT, onoff, 2, NULL );
                 if(options.sound) sound_dirty();
                 break;
-            case 2: /* Volume */
+            case 3: /* Volume */
                 rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
                 break;
-            case 3: /* Stats */
+            case 4: /* Stats */
                 rb->set_option("Stats", &options.showstats, INT, stats, 3, NULL );
                 break;
-            case 4: /* Keys */
+            case 5: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR
-            case 5: /* Screen Size */
+            case 6: /* Screen Size */
                 rb->set_option("Screen Size", &options.scaling, INT, scaling,
                     sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
-            case 6: /* Screen rotate */
+            case 7: /* Screen rotate */
                 rb->set_option("Screen Rotate", &options.rotate, INT, rotate,
                     sizeof(rotate)/sizeof(*rotate), NULL );
                 setvidmode();
                 break;
-            case 7: /* Palette */
+            case 8: /* Palette */
                 rb->set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
                 set_pal();
                 break;

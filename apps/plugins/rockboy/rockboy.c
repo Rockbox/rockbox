@@ -71,8 +71,17 @@ static void setoptions (void)
     snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 
     fd = open(optionsave, O_RDONLY);
-    if(fd < 0) /* no options to read, set defaults */
+
+    int optionssize = sizeof(options);
+    int filesize = 0;
+    if(fd >= 0)
+        filesize = rb->filesize(fd);
+
+    /* don't read the option file if the size
+     * is not as expected to avoid crash */
+    if(fd < 0 || filesize!=optionssize)
     {
+        // no options to read, set defaults
 #ifdef HAVE_TOUCHSCREEN
         options.LEFT    = BUTTON_MIDLEFT;
         options.RIGHT   = BUTTON_MIDRIGHT;
@@ -378,6 +387,7 @@ static int gnuboy_main(const char *rom)
     rb->lcd_puts(0,4,"Emu run");
     rb->lcd_clear_display();
     rb->lcd_update();
+    if(options.autosave) sn_load();
     emu_run();
 
     /* never reached */

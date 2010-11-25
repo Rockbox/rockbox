@@ -91,6 +91,7 @@ struct options {
    int UP, DOWN, LEFT, RIGHT;
    int frameskip, fps, maxskip;
    int sound, scaling, showstats;
+   int autosave;
    int rotate;
    int pal;
    int dirty;
