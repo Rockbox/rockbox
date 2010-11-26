@@ -248,6 +248,7 @@ bool get_asap_metadata(int fd, struct mp3entry* id3)
 
     id3->vbr = false;
     id3->filesize = filelength;
-    
+    id3->genre_string = id3_get_num_genre(36);
+
     return true;
 }

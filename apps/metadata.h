@@ -108,7 +108,6 @@ enum
 #define CODEC_EXTENSION "codec"
 
 #ifdef HAVE_RECORDING
-#define ENCODER_SUFFIX  "_enc"
 enum rec_format_indexes
 {
     __REC_FORMAT_START_INDEX = -1,
@@ -139,11 +138,11 @@ extern const int rec_format_afmt[REC_NUM_FORMATS];
 /* get AFMT_* corresponding REC_FORMAT_* */
 extern const int afmt_rec_format[AFMT_NUM_CODECS];
 
-#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
-    { label, root_fname, enc_root_fname, ext_list }
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
+    { label, root_fname, enc_root_fname, func, ext_list }
 #else /* !HAVE_RECORDING */
-#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
-    { label, root_fname, ext_list }
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
+    { label, root_fname, func, ext_list }
 #endif /* HAVE_RECORDING */
 
 #else /* !SWCODEC */
@@ -154,6 +153,7 @@ extern const int afmt_rec_format[AFMT_NUM_CODECS];
 
 /** Database of audio formats **/
 /* record describing the audio format */
+struct mp3entry;
 struct afmt_entry
 {
     const char *label;      /* format label */
@@ -163,7 +163,8 @@ struct afmt_entry
     const char *codec_enc_root_fn; /* filename of encoder codec */
 #endif
 #endif
-    const char *ext_list;   /* double NULL terminated extension
+    bool (*parse_func)(int fd, struct mp3entry *id3); /* return true on success */
+    const char *ext_list;    /* NULL terminated extension
                                list for type with the first as
                                the default for recording */
 };

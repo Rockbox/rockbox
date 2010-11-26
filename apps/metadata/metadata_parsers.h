@@ -23,8 +23,7 @@ char* id3_get_num_genre(unsigned int genre_num);
 int getid3v2len(int fd);
 bool setid3v1title(int fd, struct mp3entry *entry);
 void setid3v2title(int fd, struct mp3entry *entry);
-bool get_mp3_metadata(int fd, struct mp3entry* id3, const char *filename);
-
+bool get_mp3_metadata(int fd, struct mp3entry* id3);
 bool get_adx_metadata(int fd, struct mp3entry* id3);
 bool get_aiff_metadata(int fd, struct mp3entry* id3);
 bool get_flac_metadata(int fd, struct mp3entry* id3);

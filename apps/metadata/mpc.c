@@ -211,5 +211,7 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
 
     id3->filesize = filesize(fd);
     id3->bitrate = id3->filesize * 8 / id3->length;
+
+    read_ape_tags(fd, id3);
     return true;
 }

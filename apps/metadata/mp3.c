@@ -163,14 +163,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
  * about an MP3 file and updates it's entry accordingly.
  *
   Note, that this returns true for successful, false for error! */
-bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename)
+bool get_mp3_metadata(int fd, struct mp3entry *entry)
 {
-#if CONFIG_CODEC != SWCODEC
-    memset(entry, 0, sizeof(struct mp3entry));
-#endif
-
-    strlcpy(entry->path, filename, sizeof(entry->path));
-
     entry->title = NULL;
     entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);

@@ -91,5 +91,7 @@ bool get_monkeys_metadata(int fd, struct mp3entry* id3)
 
     id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
     id3->bitrate = (id3->filesize * 8) / id3->length;
+
+    read_ape_tags(fd, id3);
     return true;
 }
