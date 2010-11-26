@@ -56,11 +56,10 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   asm volatile ("mac.l %[x], %[y], %%acc0;"  /* multiply */
                 "mulu.l %[y], %[x];"         /* get lower half, avoid emac stall */
                 "movclr.l %%acc0, %[r];"     /* get higher half */
-                "asl.l #8, %[r];"            /* hi<<16, plus one free */
-                "asl.l #8, %[r];"
+                "swap %[r];"                 /* hi<<16, plus one free */
                 "lsr.l #8, %[x];"            /* (unsigned)lo >> 15 */
                 "lsr.l #7, %[x];"
-                "or.l %[x], %[r];"           /* logical-or results */
+                "move.w %[x], %[r];"         /* logical-or results */
                 : [r] "=&d" (r), [x] "+d" (x)
                 : [y] "d" (y)
                 : "cc");
