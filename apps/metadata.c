@@ -312,6 +312,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         return false;
     }
 
+    lseek(fd, 0, SEEK_SET);
     strlcpy(id3->path, trackname, sizeof(id3->path));
     /* We have successfully read the metadata from the file */
     return true;
