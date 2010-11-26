@@ -81,7 +81,7 @@ static void setoptions (void)
      * is not as expected to avoid crash */
     if(fd < 0 || filesize!=optionssize)
     {
-        // no options to read, set defaults
+    /* no options to read, set defaults */
 #ifdef HAVE_TOUCHSCREEN
         options.LEFT    = BUTTON_MIDLEFT;
         options.RIGHT   = BUTTON_MIDRIGHT;
