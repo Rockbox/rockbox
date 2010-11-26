@@ -372,6 +372,13 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MIN_FF_REWIND_STEP (TS_SECOND/2)
 #define OSD_MIN_UPDATE_INTERVAL (HZ/2)
 
+enum video_action
+{
+    VIDEO_STOP = 0,
+    VIDEO_PREV,
+    VIDEO_NEXT,
+};
+
 /* OSD status - same order as icon array */
 enum osd_status_enum
 {
@@ -1452,7 +1459,7 @@ static void osd_stop(void)
 
     osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
     osd_set_status(OSD_STATUS_STOPPED | OSD_NODRAW);
-    osd_show(OSD_HIDE | OSD_NODRAW);
+    osd_show(OSD_HIDE);
 
     stream_stop();
 
@@ -1496,6 +1503,53 @@ static void osd_seek(int btn)
     stream_seek(time, SEEK_SET);
 }
 
+/* has this file the extension .mpg ? */
+static bool is_videofile(const char* file)
+{
+    const char* ext = rb->strrchr(file, '.');
+    if (ext && !rb->strcasecmp(ext, ".mpg"))
+        return true;
+
+    return false;
+}
+
+/* deliver the next/previous video file in the current directory.
+   returns 0 if there is none. */
+static bool get_videofile(int direction, char* videofile, size_t bufsize)
+{
+    struct tree_context *tree = rb->tree_get_context();
+    struct entry *dircache = tree->dircache;
+    int i, step, end, found = 0;
+    char *videoname = rb->strrchr(videofile, '/') + 1;
+    size_t rest = bufsize - (videoname - videofile) - 1;
+
+    if (direction == VIDEO_NEXT) {
+        i = 0;
+        step = 1;
+        end = tree->filesindir;
+    } else {
+        i = tree->filesindir-1;
+        step = -1;
+        end = -1;
+    }
+    for (; i != end; i += step)
+    {
+        const char* name = dircache[i].name;
+        if (!rb->strcmp(name, videoname)) {
+            found = 1;
+            continue;
+        }
+        if (found && rb->strlen(name) <= rest &&
+            !(dircache[i].attr & ATTR_DIRECTORY) && is_videofile(name))
+        {
+            rb->strcpy(videoname, name);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 #ifdef HAVE_HEADPHONE_DETECTION
 /* Handle SYS_PHONE_PLUGGED/UNPLUGGED */
 static void osd_handle_phone_plug(bool inserted)
@@ -1531,8 +1585,10 @@ static void osd_handle_phone_plug(bool inserted)
 }
 #endif
 
-static void button_loop(void)
+static int button_loop(void)
 {
+    int next_action = (settings.play_mode == 0) ? VIDEO_STOP : VIDEO_NEXT;
+
     rb->lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
@@ -1550,7 +1606,7 @@ static void button_loop(void)
     /* Start playback at the specified starting time */
     if (osd_play(settings.resume_time) < STREAM_OK) {
         rb->splash(HZ*2, "Playback failed");
-        return;
+        return VIDEO_STOP;
     }
 
     /* Gently poll the video player for EOS and handle UI */
@@ -1629,6 +1685,8 @@ static void button_loop(void)
 
             result = mpeg_menu();
 
+            next_action = (settings.play_mode == 0) ? VIDEO_STOP : VIDEO_NEXT;
+
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
@@ -1641,6 +1699,7 @@ static void button_loop(void)
             switch (result)
             {
             case MPEG_MENU_QUIT:
+                next_action = VIDEO_STOP;
                 osd_stop();
                 break;
 
@@ -1679,6 +1738,7 @@ static void button_loop(void)
 #endif
         case ACTION_STD_CANCEL:
         {
+            next_action = VIDEO_STOP;
             osd_stop();
             break;
             } /* MPEG_STOP: */
@@ -1718,7 +1778,40 @@ static void button_loop(void)
         case MPEG_RC_FF:
 #endif
         {
-            osd_seek(button);
+            int old_button = button;
+            if (settings.play_mode != 0)
+            {
+                /* if button has been released: skip to next/previous file */
+                button = rb->button_get_w_tmo(OSD_MIN_UPDATE_INTERVAL);
+            }
+            switch (button)
+            {
+            case MPEG_RW | BUTTON_REL:
+            {
+                /* release within 3 seconds: skip to previous file, else
+                   start the current video from the beginning */
+                osd_stop();
+                if ( stream_get_resume_time() > 3*TS_SECOND ) {
+                    osd_play(0);
+                    osd_show(OSD_SHOW);
+                } else {
+                    next_action = VIDEO_PREV;
+                }
+                break;
+                }
+            case MPEG_FF | BUTTON_REL:
+            {
+                osd_stop();
+                next_action = VIDEO_NEXT;
+                break;
+                }
+            default:
+            {
+                button = old_button;
+                osd_seek(button);
+                break;
+                }
+            }
             break;
             } /* MPEG_RW: MPEG_FF: */
 
@@ -1750,13 +1843,18 @@ static void button_loop(void)
 #endif
 
     rb->lcd_setfont(FONT_UI);
+
+    return next_action;
 }
 
 enum plugin_status plugin_start(const void* parameter)
 {
+    static char videofile[MAX_PATH];
+
     int status = PLUGIN_ERROR; /* assume failure */
     int result;
     int err;
+    bool quit = false;
     const char *errstring;
 
     if (parameter == NULL) {
@@ -1777,46 +1875,76 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_clear_display();
     rb->lcd_update();
 
+    rb->strcpy(videofile, (const char*) parameter);
+
     if (stream_init() < STREAM_OK) {
         DEBUGF("Could not initialize streams\n");
     } else {
-        rb->splash(0, "Loading...");
-        init_settings((char*)parameter);
+        while (!quit)
+        {
+            int next_action = VIDEO_STOP;
 
-        err = stream_open((char *)parameter);
+            init_settings(videofile);
+            err = stream_open(videofile);
 
-        if (err >= STREAM_OK) {
-            /* start menu */
-            rb->lcd_clear_display();
-            rb->lcd_update();
-            result = mpeg_start_menu(stream_get_duration());
+            if (err >= STREAM_OK) {
+                /* start menu */
+                rb->lcd_clear_display();
+                rb->lcd_update();
+                result = mpeg_start_menu(stream_get_duration());
 
-            if (result != MPEG_START_QUIT) {
-                /* Enter button loop and process UI */
-                button_loop();
+                if (result != MPEG_START_QUIT) {
+                    /* Enter button loop and process UI */
+                    next_action = button_loop();
+                }
+
+                stream_close();
+
+                rb->lcd_clear_display();
+                rb->lcd_update();
+
+                save_settings();
+                status = PLUGIN_OK;
+
+                mpeg_menu_sysevent_handle();
+            } else {
+                DEBUGF("Could not open %s\n", videofile);
+                switch (err)
+                {
+                case STREAM_UNSUPPORTED:
+                    errstring = "Unsupported format";
+                    break;
+                default:
+                    errstring = "Error opening file: %d";
+                }
+
+                rb->splashf(HZ*2, errstring, err);
+                status = PLUGIN_ERROR;
             }
 
-            stream_close();
-
-            rb->lcd_clear_display();
-            rb->lcd_update();
-
-            save_settings();
-            status = PLUGIN_OK;
-
-            mpeg_menu_sysevent_handle();
-        } else {
-            DEBUGF("Could not open %s\n", (char*)parameter);
-            switch (err)
+            /* return value of button_loop says, what's next */
+            switch (next_action)
             {
-            case STREAM_UNSUPPORTED:
-                errstring = "Unsupported format";
+            case VIDEO_NEXT:
+            {
+                if (!get_videofile(VIDEO_NEXT, videofile, sizeof(videofile))) {
+                    /* quit after finished the last videofile */
+                    quit = true;
+                }
                 break;
-            default:
-                errstring = "Error opening file: %d";
+                }
+            case VIDEO_PREV:
+            {
+                get_videofile(VIDEO_PREV, videofile, sizeof(videofile));
+                /* if there is no previous file, play the same videofile */
+                break;
+                }
+            case VIDEO_STOP:
+            {
+                quit = true;
+                break;
+                }
             }
-
-            rb->splashf(HZ*2, errstring, err);
         }
     }
 

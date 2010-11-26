@@ -62,6 +62,7 @@ enum mpeg_setting_id
     MPEG_SETTING_DISPLAY_SETTINGS,
     MPEG_SETTING_AUDIO_SETTINGS,
     MPEG_SETTING_ENABLE_START_MENU,
+    MPEG_SETTING_PLAY_MODE,
     MPEG_SETTING_CLEAR_RESUMES,
 };
 
@@ -83,6 +84,7 @@ struct mpeg_settings {
 #if MPEG_OPTION_DITHERING_ENABLED
     int displayoptions;
 #endif
+    int play_mode;             /* play single file or all files in directory */
     /* Audio options - simple on/off specification */
     int tone_controls;
     int channel_modes;

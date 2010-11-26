@@ -1213,6 +1213,7 @@ int parser_init_stream(void)
 
 void parser_close_stream(void)
 {
+    str_send_msg(&video_str, STREAM_CLOSE, 0);
     stream_remove_streams();
     parser_init_state();
 }

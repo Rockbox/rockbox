@@ -503,6 +503,12 @@ static void video_thread_msg(struct video_thread_data *td)
             reply = true;
             break;
 
+        case STREAM_CLOSE:
+            vo_cleanup();
+            mpeg2_close(td->mpeg2dec);
+            reply = true;
+            break;
+
         case VIDEO_DISPLAY_IS_VISIBLE:
             reply = vo_is_visible();
             break;

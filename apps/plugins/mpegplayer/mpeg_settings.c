@@ -275,6 +275,7 @@ static struct configdata config[] =
     {TYPE_INT, 0, 2, { .int_p = &settings.crossfeed }, "Crossfeed", NULL},
     {TYPE_INT, 0, 2, { .int_p = &settings.equalizer }, "Equalizer", NULL},
     {TYPE_INT, 0, 2, { .int_p = &settings.dithering }, "Dithering", NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.play_mode }, "Play mode", NULL},
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     {TYPE_INT, -1, INT_MAX, { .int_p = &settings.backlight_brightness },
      "Backlight brightness", NULL},
@@ -284,6 +285,11 @@ static struct configdata config[] =
 static const struct opt_items noyes[2] = {
     { "No", -1 },
     { "Yes", -1 },
+};
+
+static const struct opt_items singleall[2] = {
+    { "Single", -1 },
+    { "All", -1 },
 };
 
 static const struct opt_items enabledisable[2] = {
@@ -1191,7 +1197,7 @@ static void mpeg_settings(void)
 
     MENUITEM_STRINGLIST(menu, "Settings", mpeg_menu_sysevent_callback,
                         "Display Options", "Audio Options",
-                        "Resume Options", clear_str);
+                        "Resume Options", "Play Mode", clear_str);
 
     rb->button_clear_queue();
 
@@ -1219,6 +1225,11 @@ static void mpeg_settings(void)
             resume_options();
             break;
 
+        case MPEG_SETTING_PLAY_MODE:
+            mpeg_set_option("Play mode", &settings.play_mode,
+                            INT, singleall, 2, NULL);
+            break;
+
         case MPEG_SETTING_CLEAR_RESUMES:
             clear_resume_count();
             break;
@@ -1239,6 +1250,7 @@ void init_settings(const char* filename)
     settings.showfps = 0;     /* Do not show FPS */
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
+    settings.play_mode = 0;   /* Play single video */
     settings.resume_options = MPEG_RESUME_MENU_ALWAYS; /* Enable start menu */
     settings.resume_count = 0;
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
