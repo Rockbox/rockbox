@@ -147,8 +147,8 @@ extern const int afmt_rec_format[AFMT_NUM_CODECS];
 
 #else /* !SWCODEC */
 
-#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
-    { label, ext_list }
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
+    { label, func, ext_list }
 #endif /* CONFIG_CODEC == SWCODEC */
 
 /** Database of audio formats **/
