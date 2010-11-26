@@ -1893,7 +1893,7 @@ static bool dbg_save_roms(void)
     fd = creat("/internal_rom_000000-3FFFFF.bin", 0666);
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
     fd = creat("/internal_rom_000000-3FFFFF.bin", 0666);
-#elif defined(MPIO_HD200)
+#elif defined(MPIO_HD200) || defined(MPIO_HD300)
     fd = creat("/internal_rom_000000-1FFFFF.bin", 0666);
 #endif
     if(fd >= 0)

@@ -130,6 +130,7 @@
 #define MPIO_HD200_PAD     44
 #define ANDROID_PAD        45
 #define SDL_PAD            46
+#define MPIO_HD300_PAD     47
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -428,6 +429,8 @@ Lyre prototype 1 */
 #include "config/vibe500.h"
 #elif defined(MPIO_HD200)
 #include "config/mpiohd200.h"
+#elif defined(MPIO_HD300)
+#include "config/mpiohd300.h"
 
 #elif defined(APPLICATION)
 #include "config/application.h"

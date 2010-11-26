@@ -1701,6 +1701,27 @@ target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* SIMULATOR */
 #endif
 
+#ifdef MPIO_HD300
+#ifndef SIMULATOR
+/* TODO: currently including all files */
+target/coldfire/ata-as-coldfire.S
+target/coldfire/mpio/system-mpio.c
+target/coldfire/mpio/power-mpio.c
+target/coldfire/mpio/backlight-mpio.c
+target/coldfire/mpio/usb-mpio.c
+target/coldfire/mpio/ata-mpio.c
+target/coldfire/mpio/adc-mpio.c
+target/coldfire/mpio/hd300/button-hd300.c
+target/coldfire/mpio/hd300/lcd-hd300.c
+target/coldfire/mpio/hd300/lcd-as-hd300.S
+target/coldfire/mpio/hd300/powermgmt-hd300.c
+#ifndef BOOTLOADER
+target/coldfire/mpio/audio-mpio.c
+target/coldfire/wmcodec-coldfire.c
+target/coldfire/mpio/fmradio_i2c-mpio.c
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 target/hosted/android/fs-android.c

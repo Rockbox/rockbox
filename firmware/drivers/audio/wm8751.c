@@ -565,6 +565,7 @@ void audiohw_set_recsrc(int source, bool recording)
         }
         break;
 
+#if (INPUT_SRC_CAPS & SRC_CAP_LINEIN)
     case AUDIO_SRC_LINEIN:
 #ifdef AUDIOHW_HAVE_DEPTH_3D
         wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
@@ -599,7 +600,8 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO);
         wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO);
         break;
-
+#endif
+#if (INPUT_SRC_CAPS & SRC_CAP_MIC)
     case AUDIO_SRC_MIC:
 #ifdef AUDIOHW_HAVE_DEPTH_3D
           wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
@@ -634,7 +636,8 @@ void audiohw_set_recsrc(int source, bool recording)
         /* route DAC signal to output mixer */
         wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO);
         wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO);
-
+        break;
+#endif
     } /* switch(source) */
 }
 

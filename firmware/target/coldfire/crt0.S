@@ -63,14 +63,14 @@ start:
     move.l  #0x00000180,%d0 /* CSCR0 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x088,%a0)
         
-#ifdef MPIO_HD200
+#if (defined MPIO_HD200) || (defined MPIO_HD300)
     /* Chip select 3 - LCD controller */
-    /* values taken from original firmware except base address*/
+    /* FIXME Check if we really need this 2 wait states! */
     move.l  #0xf0000000,%d0 /* CSAR3 - Base = 0xf0000000 */
     move.l  %d0,(0x0a4,%a0)
     moveq.l #0x1,%d0        /* CSMR3 - 64K */
     move.l  %d0,(0x0a8,%a0)
-    move.l  #0x00000980,%d0 /* CSCR3 - 1 wait state, 16 bits no bursts */
+    move.l  #0x00000980,%d0 /* CSCR3 - 2 wait states, 16 bits no bursts */
     move.l  %d0,(0x0ac,%a0)
 #elif !(defined IAUDIO_M3)
     /* Chip select 1 - LCD controller */
@@ -276,7 +276,7 @@ start:
     or.l %d0,(0xbc,%a1)
 #endif
 
-#ifdef MPIO_HD200
+#if (defined MPIO_HD200) || (defined MPIO_HD300)
     /* Set KEEP_ACT
      * Set GPIO57 high to remove hissing nois on startup
      */

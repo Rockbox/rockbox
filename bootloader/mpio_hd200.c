@@ -263,7 +263,9 @@ static void bootmenu(void)
         switch (button)
         {
             case BUTTON_REW:
+#ifdef MPIO_HD200
             case BUTTON_RC_REW:
+#endif
                 if (option > rockbox)
                     option--;
                 else
@@ -271,7 +273,9 @@ static void bootmenu(void)
                 break;
 
             case BUTTON_FF:
+#ifdef MPIO_HD200
             case BUTTON_RC_FF:
+#endif
                 if (option < shutdown)
                     option++;
                 else
@@ -279,8 +283,10 @@ static void bootmenu(void)
                 break;
 
             case BUTTON_PLAY:
+#ifdef MPIO_HD200
             case BUTTON_RC_PLAY:
             case (BUTTON_PLAY|BUTTON_REC):
+#endif
                 reset_screen();
 
                 switch (option)
@@ -360,7 +366,11 @@ void main(void)
         event = EVENT_NONE;
         button = button_get_w_tmo(HZ);
 
-        if ( (button & BUTTON_PLAY) || (button & BUTTON_RC_PLAY) )
+        if ( (button & BUTTON_PLAY)
+#ifdef MPIO_HD200
+             || (button & BUTTON_RC_PLAY)
+#endif
+           )
             event |= EVENT_ON;
  
         if ( usb_detect() == USB_INSERTED )

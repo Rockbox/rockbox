@@ -28,7 +28,8 @@
 #elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
 #   define DEBUG_CANCEL  BUTTON_RC_REC
 
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD) || \
+    (CONFIG_KEYPAD == MPIO_HD300_PAD)
 #   define DEBUG_CANCEL  BUTTON_REC
 #endif
 bool dbg_ports(void);

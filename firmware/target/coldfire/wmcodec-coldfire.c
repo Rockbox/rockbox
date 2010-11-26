@@ -32,7 +32,7 @@
 #include "i2s.h"
 #include "wmcodec.h"
 
-#if defined(MPIO_HD200)
+#if defined(MPIO_HD200) || defined(MPIO_HD300)
 #define I2C_CODEC_ADDRESS 0x34
 #define I2C_IFACE I2C_IFACE_1
 #endif

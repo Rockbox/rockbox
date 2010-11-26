@@ -36,9 +36,15 @@ void audio_set_output_source(int source)
     static const unsigned char txsrc_select[AUDIO_NUM_SOURCES+1] =
     {
         [AUDIO_SRC_PLAYBACK+1] = 3, /* PDOR3        */
+#if (INPUT_SRC_CAPS & SRC_CAP_MIC)
         [AUDIO_SRC_MIC+1]      = 4, /* IIS1 RcvData */
+#endif
+#if (INPUT_SRC_CAPS & SRC_CAP_LINEIN)
         [AUDIO_SRC_LINEIN+1]   = 4, /* IIS1 RcvData */
+#endif
+#if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
         [AUDIO_SRC_FMRADIO+1]  = 4, /* IIS1 RcvData */
+#endif
     };
 
     int level = set_irq_level(DMA_IRQ_LEVEL);
@@ -74,7 +80,9 @@ void audio_input_mux(int source, unsigned flags)
             break;
 
         case AUDIO_SRC_MIC:
+#if (INPUT_SRC_CAPS & SRC_CAP_LINEIN)
         case AUDIO_SRC_LINEIN:
+#endif
         /* recording only */
             if (source != last_source)
             {

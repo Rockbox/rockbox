@@ -122,7 +122,9 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+#ifdef HAVE_LCD_SHUTDOWN
     lcd_shutdown();
+#endif
     set_irq_level(DISABLE_INTERRUPTS);
     and_l(~(1<<21), &GPIO1_OUT); /* pull KEEPACT low */
     asm("halt");
