@@ -30,11 +30,11 @@
 #endif
 
 #define LOOP_REPEAT_DRAM 256
-static volatile int buf_dram[BUF_SIZE];
+static volatile int buf_dram[BUF_SIZE]           MEM_ALIGN_ATTR;
 
 #if defined(PLUGIN_USE_IRAM)
 #define LOOP_REPEAT_IRAM 1024
-static volatile int buf_iram[BUF_SIZE] IBSS_ATTR;
+static volatile int buf_iram[BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 #endif
 
 /* (Byte per loop * loops)>>20 * ticks per s * 10 / ticks = dMB per s */
