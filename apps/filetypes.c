@@ -196,6 +196,21 @@ static char *filetypes_store_plugin(char *plugin, int n)
         viewers[viewer_count++] = n;
     return filetypes_strdup(plugin);
 }
+
+static int find_extension(const char* extension)
+{
+    int i;
+    if (!extension)
+        return -1;
+    for (i=1; i<filetype_count; i++)
+    {
+        if (filetypes[i].extension &&
+            !strcasecmp(extension, filetypes[i].extension))
+            return i;
+    }
+    return -1;
+}
+
 static void read_builtin_types(void);
 static void read_config(const char* config_file);
 #ifdef HAVE_LCD_COLOR
@@ -231,15 +246,9 @@ void read_color_theme_file(void) {
             hex_to_rgb(color, &custom_colors[MAX_FILETYPES]);
             continue;
         }
-        for (i=1; i<filetype_count; i++)
-        {
-            if (filetypes[i].extension &&
-                !strcasecmp(ext, filetypes[i].extension))
-            {
-                hex_to_rgb(color, &custom_colors[i]);
-                break;
-            }
-        }
+        i = find_extension(ext);
+        if (i >= 0)
+            hex_to_rgb(color, &custom_colors[i]);
     }
     close(fd);
 }
@@ -268,23 +277,19 @@ void read_viewer_theme_file(void)
     {
         if (!settings_parseline(buffer, &ext, &icon))
             continue;
-        for (i=0; i<filetype_count; i++)
+        i = find_extension(ext);
+        if (i >= 0)
         {
-            if (filetypes[i].extension &&
-                !strcasecmp(ext, filetypes[i].extension))
+            if (*icon == '*')
+                custom_filetype_icons[i] = atoi(icon+1);
+            else if (*icon == '-')
+                custom_filetype_icons[i] = Icon_NOICON;
+            else if (*icon >= '0' && *icon <= '9')
             {
-                if (*icon == '*')
-                    custom_filetype_icons[i] = atoi(icon+1);
-                else if (*icon == '-')
-                    custom_filetype_icons[i] = Icon_NOICON;
-                else if (*icon >= '0' && *icon <= '9')
-                {
-                    int number = atoi(icon);
-                    if (number > global_status.viewer_icon_count)
-                        global_status.viewer_icon_count++;
-                    custom_filetype_icons[i] = Icon_Last_Themeable + number;
-                }
-                break;
+                int number = atoi(icon);
+                if (number > global_status.viewer_icon_count)
+                    global_status.viewer_icon_count++;
+                custom_filetype_icons[i] = Icon_Last_Themeable + number;
             }
         }
     }
@@ -363,7 +368,7 @@ static void read_config(const char* config_file)
             break;
         }
         rm_whitespaces(line);
-        /* get the extention */
+        /* get the extension */
         s = line;
         e = strchr(s, ',');
         if (!e)
@@ -406,12 +411,10 @@ int filetype_get_attr(const char* file)
     if (!extension)
         return 0;
     extension++;
-    for (i=0; i<filetype_count; i++)
-    {
-        if (filetypes[i].extension && 
-            !strcasecmp(extension, filetypes[i].extension))
-            return (filetypes[i].attr<<8)&FILE_ATTR_MASK;
-    }
+
+    i = find_extension(extension);
+    if (i >= 0)
+        return (filetypes[i].attr<<8)&FILE_ATTR_MASK;
     return 0;
 }
 
@@ -440,13 +443,10 @@ int filetype_get_color(const char * name, int attr)
     if (!extension)
         return custom_colors[MAX_FILETYPES];
     extension++;
-    
-    for (i=1; i<filetype_count; i++)
-    {
-        if (filetypes[i].extension && 
-            !strcasecmp(extension, filetypes[i].extension))
-            return custom_colors[i];
-    }
+
+    i = find_extension(extension);
+    if (i >= 0)
+        return custom_colors[i];
     return custom_colors[MAX_FILETYPES];
 }
 #endif
