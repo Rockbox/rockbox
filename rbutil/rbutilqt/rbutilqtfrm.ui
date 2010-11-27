@@ -370,7 +370,7 @@
         <item row="1" column="1">
          <widget class="QLabel" name="labelThemes">
           <property name="text">
-           <string>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox' look can be customized by themes. You can choose and install several officially distributed themes.</string>
+           <string>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos;s look can be customized by themes. You can choose and install several officially distributed themes.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -726,7 +726,7 @@
            <item row="0" column="2">
             <widget class="QPushButton" name="buttonDownloadManual">
              <property name="text">
-              <string>Down&amp;load</string>
+              <string>&amp;Download</string>
              </property>
             </widget>
            </item>
@@ -750,7 +750,7 @@
       </widget>
       <widget class="QWidget" name="info">
        <attribute name="title">
-        <string>Inf&amp;o</string>
+        <string>&amp;Info</string>
        </attribute>
        <layout class="QGridLayout">
         <item row="0" column="0">
@@ -818,7 +818,7 @@
    </widget>
    <widget class="QMenu" name="menuA_ctions">
     <property name="title">
-     <string>Action&amp;s</string>
+     <string>&amp;Actions</string>
     </property>
     <widget class="QMenu" name="menuInstallation">
      <property name="title">
@@ -885,7 +885,7 @@
   </action>
   <action name="actionE_xit">
    <property name="text">
-    <string>E&amp;xit</string>
+    <string>&amp;Exit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>

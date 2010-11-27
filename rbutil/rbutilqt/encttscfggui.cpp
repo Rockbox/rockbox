@@ -361,7 +361,7 @@ void EncTtsCfgGui::browse(QObject* settingObj)
     //current path
     QString curPath = setting->current().toString();
     // show file dialog
-    QString exe = QFileDialog::getOpenFileName(this, tr("Select excutable"), curPath, "*");
+    QString exe = QFileDialog::getOpenFileName(this, tr("Select executable"), curPath, "*");
     if(!QFileInfo(exe).isExecutable())
         return;
     // set new value, gui will update automatically
