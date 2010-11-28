@@ -3950,6 +3950,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3959,6 +3960,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Nastaviť"
     gogearsa9200: "PLAY = Nastaviť"
     vibe500: "OK = Nastaviť"
+    mpiohd300: "ENTER = Nastaviť"
   </dest>
   <voice>
     *: none
@@ -3974,7 +3976,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3988,7 +3990,7 @@
     rtc: "OFF = Vrátiť"
     mrobe500: "POWER = Vrátiť"
     iriverh100,iriverh120,iriverh300: "STOP = Vrátiť"
-    ipod*,sansac200*: "MENU = Vrátiť"
+    ipod*,sansac200*,mpiohd300: "MENU = Vrátiť"
     iaudiox5,iaudiom5: "RECORD = Vrátiť"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Vrátiť"
     gigabeatfx: "POWER = Vrátiť"

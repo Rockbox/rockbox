@@ -4450,7 +4450,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -4464,7 +4464,7 @@
     rtc: "OFF:取消"
     mrobe500: "电源:取消"
     iriverh100,iriverh120,iriverh300: "STOP:取消"
-    ipod*,sansac200*: "MENU:取消"
+    ipod*,sansac200*,mpiohd300: "MENU:取消"
     iaudiox5,iaudiom5: "RECORD:取消"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
     gigabeatfx: "POWER:取消"
@@ -8554,6 +8554,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -8563,6 +8564,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT:设置"
     gogearsa9200: "PLAY:设置"
     vibe500: "OK:设置"
+    mpiohd300: "ENTER:设置"
   </dest>
   <voice>
     *: none

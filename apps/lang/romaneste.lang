@@ -1503,7 +1503,7 @@
     *: none
     rtc: "OFF = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -1515,7 +1515,7 @@
     *: none
     rtc: "OFF pentru anulare"
     iriverh100,iriverh120,iriverh300: "STOP pentru anulare"
-    ipod*,sansac200*,gogearsa9200: "MENU pentru anulare"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU pentru anulare"
     iaudiox5,iaudiom5: "RECORD pentru anulare"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV pentru anulare"
     gigabeatfx: "POWER pentru anulare"
@@ -4714,6 +4714,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -4721,6 +4722,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Setat"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Setat"
     vibe500: "OK = Setat"
+    mpiohd300: "ENTER = Setat"
   </dest>
   <voice>
     *: none

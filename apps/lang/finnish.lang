@@ -4449,7 +4449,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -4463,7 +4463,7 @@
     rtc: "OFF = Peruuta"
     mrobe500: "POWER = Peruuta"
     iriverh100,iriverh120,iriverh300: "STOP = Peruuta"
-    ipod*,sansac200*: "MENU = Peruuta"
+    ipod*,sansac200*,mpiohd300: "MENU = Peruuta"
     iaudiox5,iaudiom5: "RECORD = Peruuta"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Peruuta"
     gigabeatfx: "POWER = Peruuta"
@@ -9589,6 +9589,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -9598,6 +9599,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Aseta"
     gogearsa9200: "PLAY = Aseta"
     vibe500: "OK = Aseta"
+    mpiohd300: "ENTER = Aseta"
   </dest>
   <voice>
     *: none

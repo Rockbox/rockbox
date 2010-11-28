@@ -4093,7 +4093,7 @@
   <source>
     *: "OFF = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -4102,7 +4102,7 @@
   <dest>
     *: "OFF tagasi pöördumiseks"
     iriverh100,iriverh120,iriverh300: "STOP tagasi pöördumiseks"
-    ipod*,sansac200*: "MENU tagasi pöördumiseks"
+    ipod*,sansac200*,mpiohd300: "MENU tagasi pöördumiseks"
     iaudiox5: "RECORD tagasi pöördumiseks"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV tagasi pöördumiseks"
     gigabeatfx: "POWER tagasi pöördumiseks"

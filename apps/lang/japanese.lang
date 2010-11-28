@@ -3956,6 +3956,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3965,6 +3966,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = 設定"
     gogearsa9200: "PLAY = 設定"
     vibe500: "OK = 設定"
+    mpiohd300: "ENTER = 設定"
   </dest>
   <voice>
     *: none
@@ -3980,7 +3982,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3994,7 +3996,7 @@
     rtc: "OFF = 元に戻す"
     mrobe500: "POWER = 元に戻す"
     iriverh100,iriverh120,iriverh300: "STOP = 元に戻す"
-    ipod*,sansac200*: "MENU = 元に戻す"
+    ipod*,sansac200*,mpiohd300: "MENU = 元に戻す"
     iaudiox5,iaudiom5: "RECORD = 元に戻す"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 元に戻す"
     gigabeatfx: "POWER = 元に戻す"

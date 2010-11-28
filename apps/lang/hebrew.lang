@@ -3958,6 +3958,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3967,6 +3968,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "קבע = SELECT"
     gogearsa9200: "קבע = PLAY"
     vibe500: "קבע = OK"
+    mpiohd300: "קבע = ENTER"
   </dest>
   <voice>
     *: none
@@ -3982,7 +3984,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3996,7 +3998,7 @@
     rtc: "החזר = OFF"
     mrobe500: "החזר = POWER"
     iriverh100,iriverh120,iriverh300: "החזר = STOP"
-    ipod*,sansac200*: "החזר = MENU"
+    ipod*,sansac200*,mpiohd300: "החזר = MENU"
     iaudiox5,iaudiom5: "החזר = RECORD"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "החזר = PREV"
     gigabeatfx: "החזר = POWER"

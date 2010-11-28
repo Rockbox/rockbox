@@ -4450,7 +4450,7 @@
     *: none
     rtc: "OFF = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -4462,7 +4462,7 @@
     *: none
     rtc: "OFF = 返回"
     iriverh100,iriverh120,iriverh300: "STOP = 返回"
-    ipod*,sansac200*,gogearsa9200: "MENU = 返回"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = 返回"
     iaudiox5,iaudiom5: "RECORD = 回去"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 返回"
     gigabeatfx: "POWER = 返回"
@@ -8529,6 +8529,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -8536,6 +8537,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = 設定"
     vibe500: "OK = 設定"
+    mpiohd300: "ENTER = 設定"
   </dest>
   <voice>
     *: none

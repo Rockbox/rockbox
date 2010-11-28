@@ -3958,6 +3958,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3967,6 +3968,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Ustaw"
     gogearsa9200:"PLAY = Ustaw"
     vibe500: "OK = Ustaw"
+    mpiohd300: "ENTER = Ustaw"
   </dest>
   <voice>
     *: none
@@ -3982,7 +3984,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3996,7 +3998,7 @@
     rtc: "OFF = Przywróć"
     mrobe500: "POWER = Przywróć"
     iriverh100,iriverh120,iriverh300: "STOP = Przywróć"
-    ipod*,sansac200*: "MENU = Przywróć"
+    ipod*,sansac200*,mpiohd300: "MENU = Przywróć"
     iaudiox5,iaudiom5: "RECORD = Przywróć"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Przywróć"
     gigabeatfx: "POWER = Przywróć"

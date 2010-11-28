@@ -3929,6 +3929,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3938,6 +3939,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Beállít"
     gogearsa9200: "PLAY = Beállít"
     vibe500: "OK = Beállít"
+    mpiohd300: "ENTER = Beállít"
   </dest>
   <voice>
     *: none
@@ -3952,7 +3954,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3966,7 +3968,7 @@
     rtc: "KI = mégsem"
     mrobe500: "POWER = mégsem"
     iriverh100,iriverh120,iriverh300: "STOP = mégsem"
-    ipod*,sansac200*: "MENU = mégsem"
+    ipod*,sansac200*,mpiohd300: "MENU = mégsem"
     iaudiox5,iaudiom5: "RECORD = mégsem"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = mégsem"
     gigabeatfx: "POWER = mégsem"

@@ -3947,6 +3947,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3956,6 +3957,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: " SELECT = Desa"
     gogearsa9200: "PLAY = Desa"
     vibe500: "OK = Desa"
+    mpiohd300: "ENTER = Desa"
   </dest>
   <voice>
     *: none
@@ -3970,7 +3972,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3984,7 +3986,7 @@
     rtc: "OFF = Cancel·la"
     mrobe500: "POWER = Cancel·la"
     iriverh100,iriverh120,iriverh300: "STOP = Cancel·la"
-    ipod*,sansac200*: "MENU = Cancel·la"
+    ipod*,sansac200*,mpiohd300: "MENU = Cancel·la"
     iaudiox5,iaudiom5: "RECORD = Cancel·la"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Cancel·la"
     gigabeatfx: "POWER = Cancel·la"

@@ -3933,6 +3933,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -3942,6 +3943,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Постави"
     gogearsa9200: "PLAY = Постави"
     vibe500: "OK = Постави"
+    mpiohd300: "ENTER = Постави"
   </dest>
   <voice>
     *: none
@@ -3957,7 +3959,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3971,7 +3973,7 @@
     rtc: "OFF = Врати на старо"
     mrobe500: "POWER = Врати на старо"
     iriverh100,iriverh120,iriverh300: "STOP = Врати на старо"
-    ipod*,sansac200*: "MENU = Врати на старо"
+    ipod*,sansac200*,mpiohd300: "MENU = Врати на старо"
     iaudiox5,iaudiom5: "RECORD = Врати на старо"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Врати на старо"
     gigabeatfx: "POWER = Врати на старо"

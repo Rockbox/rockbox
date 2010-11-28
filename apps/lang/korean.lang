@@ -4459,7 +4459,7 @@
     *: none
     rtc: "OFF = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200: "MENU = Revert"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "A = Revert"
@@ -4471,7 +4471,7 @@
     *: none
     rtc: "[끔]: 원상태 복구"
     iriverh100,iriverh120,iriverh300: "[정지]: 원상태 복구"
-    ipod*,sansac200*,gogearsa9200: "[메뉴]: 원상태 복구"
+    ipod*,sansac200*,gogearsa9200,mpiohd300: "[메뉴]: 원상태 복구"
     iaudiox5,iaudiom5: "[녹음]: 원상태 복구"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "[이전]: 원상태 복구"
     gigabeatfx: "[전원]: 원상태 복구"
@@ -9715,6 +9715,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -9722,6 +9723,7 @@
     iriverh100,iriverh120,iriverh300: "[네비] = 설정"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "[선택] = 설정"
     vibe500: "OK = 설정"
+    mpiohd300: "ENTER = 설정"
   </dest>
   <voice>
     *: none

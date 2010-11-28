@@ -4318,10 +4318,12 @@
   <source>
     *: "OFF To Revert"
     vibe500: "CANCEL To Revert"
+    mpiohd300: "MENU To Revert"
   </source>
   <dest>
     *: "OFF Por Malvalidigi"
     vibe500: "C Por Malvalidigi"
+    mpiohd300: "MENU Por Malvalidigi"
   </dest>
   <voice>
     *: ""

@@ -4168,7 +4168,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -4182,7 +4182,7 @@
     rtc: "ВЫКЛ. = Отмена"
     mrobe500: "ВЫКЛ. = Отмена"
     iriverh100,iriverh120,iriverh300: "СТОП = Отмена"
-    ipod*,sansac200*: "МЕНЮ = Отмена"
+    ipod*,sansac200*,mpiohd300: "МЕНЮ = Отмена"
     iaudiox5,iaudiom5: "ЗАПИСЬ = Отмена"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "ПРЕД. = Отмена"
     gigabeatfx: "ВЫКЛ. = Отмена"
@@ -8218,6 +8218,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -8227,6 +8228,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Установить"
     gogearsa9200: "ВОСПР. = Установить"
     vibe500: "OK = Установить"
+    mpiohd300: "ENTER = Установить"
   </dest>
   <voice>
     *: none

@@ -1966,6 +1966,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -1975,6 +1976,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Ayarlandı"
     gogearsa9200: "PLAY = Ayarlandı"
     vibe500: "OK = Ayarlandı"
+    mpiohd300: "ENTER = Ayarlandı"
   </dest>
   <voice>
     *: none
@@ -1989,7 +1991,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -2003,7 +2005,7 @@
     rtc: "OFF = Geri Döndür"
     mrobe500: "POWER = Geri Döndür"
     iriverh100,iriverh120,iriverh300: "STOP = Geri Döndür"
-    ipod*,sansac200*: "MENU = Geri Döndür"
+    ipod*,sansac200*,mpiohd300: "MENU = Geri Döndür"
     iaudiox5,iaudiom5: "RECORD = Geri Döndür"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Geri Döndür"
     gigabeatfx: "POWER = Geri Döndür"

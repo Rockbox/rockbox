@@ -3744,7 +3744,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3758,7 +3758,7 @@
     rtc: "SLUK = Fortryd"
     mrobe500: "TÆND/SLUK = Fortryd"
     iriverh100,iriverh120,iriverh300: "STOP = Fortryd"
-    ipod*,sansac200*: "MENU = Fortryd"
+    ipod*,sansac200*,mpiohd300: "MENU = Fortryd"
     iaudiox5,iaudiom5: "OPTAG = Fortryd"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "FORRIGE = Fortryd"
     gigabeatfx: "TÆND/SLUK = Fortryd"
@@ -9621,6 +9621,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
     gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
+    mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
@@ -9630,6 +9631,7 @@
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "VÆLG = Indstil"
     gogearsa9200: "SPIL = Indstil"
     vibe500: "OK = Indstil"
+    mpiohd300: "ENTER = Indstil"
   </dest>
   <voice>
     *: none
