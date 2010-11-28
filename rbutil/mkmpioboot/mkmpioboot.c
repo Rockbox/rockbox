@@ -31,7 +31,7 @@
 #define BOOTLOADER_MAX_SIZE 0x1f800 /* free space size */
 
 /* Descriptive name of these models */
-const char* model_names[] = {
+static const char* model_names[] = {
     [MODEL_HD200] = "MPIO HD200",
     [MODEL_HD300] = "MPIO HD300",
 };
