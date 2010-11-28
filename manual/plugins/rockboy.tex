@@ -109,15 +109,17 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     \item[Set Keys (BUGGY)]
     Select this option to set a new keymapping.
     \opt{lcd_color}{
+        \note{The direction keys are set for the normal screen orientation,
+        not the rotated orientation.}
         \item[Screen Size.]
-        Chose whether the original aspect ratio should be kept when scaling
+        Choose whether the original aspect ratio should be kept when scaling
         the picture to the screen%
         % targets with bigger displays than the original gameboy
         \opt{gigabeat,h300,ipodcolor,ipodvideo,e200,e200v2}{
             or whether it should be displayed unscaled%
         }.
         \item[Screen Rotate.]
-        Rotate the displayed picture by 90 degrees.
+        Rotate the displayed picture and direction keys by 90 degrees.
         \item[Set Palette.]
         Pick one of a few predefined colour palettes.
     }

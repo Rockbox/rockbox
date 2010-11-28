@@ -134,10 +134,34 @@ void ev_poll(void)
 #else
     if(released) {
         ev.type = EV_RELEASE;
-        if(released & options.LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
+#ifdef HAVE_LCD_COLOR
+        if (options.rotate == 1) /* if screen is rotated, rotate direction keys */
+        {
+            if(released & options.LEFT) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(released & options.RIGHT) {ev.code=PAD_UP; ev_postevent(&ev);}
+            if(released & options.DOWN) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+            if(released & options.UP) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+        }
+        else if (options.rotate == 2) /* if screen is rotated, rotate direction keys */
+        {
+            if(released & options.LEFT) {ev.code=PAD_UP; ev_postevent(&ev);}
+            if(released & options.RIGHT) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(released & options.DOWN) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+            if(released & options.UP) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        }
+        else /* screen is not rotated, do not rotate direction keys */
+        {
+            if(released & options.LEFT) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+            if(released & options.RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+            if(released & options.DOWN) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(released & options.UP) {ev.code=PAD_UP; ev_postevent(&ev);}
+        }
+#else
+        if(released & options.LEFT) {ev.code=PAD_LEFT; ev_postevent(&ev);}
         if(released & options.RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(released & options.DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(released & options.UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+        if(released & options.DOWN) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+        if(released & options.UP) {ev.code=PAD_UP; ev_postevent(&ev);}
+#endif
         if(released & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(released & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(released & options.START) {
@@ -151,10 +175,34 @@ void ev_poll(void)
     }
     if(pressed) { /* button press */
         ev.type = EV_PRESS;
-        if(pressed & options.LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
-        if(pressed & options.RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(pressed & options.DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(pressed & options.UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+#ifdef HAVE_LCD_COLOR
+        if (options.rotate == 1) /* if screen is rotated, rotate direction keys */
+        {
+            if(pressed & options.LEFT) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(pressed & options.RIGHT) {ev.code=PAD_UP; ev_postevent(&ev);}
+            if(pressed & options.DOWN) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+            if(pressed & options.UP) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+        }
+        else if (options.rotate == 2) /* if screen is rotated, rotate direction keys */
+        {
+            if(pressed & options.LEFT) {ev.code=PAD_UP; ev_postevent(&ev);}
+            if(pressed & options.RIGHT) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(pressed & options.DOWN) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+            if(pressed & options.UP) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        }
+        else /* screen is not rotated, do not rotate direction keys */
+        {
+            if(pressed & options.LEFT) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+            if(pressed & options.RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+            if(pressed & options.DOWN) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+            if(pressed & options.UP) {ev.code=PAD_UP; ev_postevent(&ev);}
+        }
+#else
+        if(pressed & options.LEFT) {ev.code=PAD_LEFT; ev_postevent(&ev);}
+        if(pressed & options.RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        if(pressed & options.DOWN) {ev.code=PAD_DOWN; ev_postevent(&ev);}
+        if(pressed & options.UP) {ev.code=PAD_UP; ev_postevent(&ev);}
+#endif
         if(pressed & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(pressed & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(pressed & options.START) {
