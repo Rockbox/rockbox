@@ -140,7 +140,7 @@
        <item row="1" column="0">
         <widget class="QRadioButton" name="radioSystemProxy">
          <property name="text">
-          <string>Use &amp;System values</string>
+          <string>Use S&amp;ystem values</string>
          </property>
         </widget>
        </item>
@@ -210,7 +210,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>&amp;Password</string>
+             <string>Pass&amp;word</string>
             </property>
             <property name="buddy">
              <cstring>proxyPass</cstring>
@@ -255,7 +255,7 @@
         <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>&amp;Cache</string>
+       <string>Cac&amp;he</string>
       </attribute>
       <attribute name="toolTip">
        <string>Download cache settings</string>
@@ -283,7 +283,7 @@
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>&amp;Path</string>
+            <string>P&amp;ath</string>
            </property>
            <property name="buddy">
             <cstring>cachePath</cstring>
@@ -325,7 +325,7 @@
             <string>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</string>
            </property>
            <property name="text">
-            <string>&amp;Offline mode</string>
+            <string>O&amp;ffline mode</string>
            </property>
           </widget>
          </item>

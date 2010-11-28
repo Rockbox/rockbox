@@ -726,7 +726,7 @@
            <item row="0" column="2">
             <widget class="QPushButton" name="buttonDownloadManual">
              <property name="text">
-              <string>&amp;Download</string>
+              <string>Down&amp;load</string>
              </property>
             </widget>
            </item>
@@ -750,7 +750,7 @@
       </widget>
       <widget class="QWidget" name="info">
        <attribute name="title">
-        <string>&amp;Info</string>
+        <string>Inf&amp;o</string>
        </attribute>
        <layout class="QGridLayout">
         <item row="0" column="0">
@@ -818,7 +818,7 @@
    </widget>
    <widget class="QMenu" name="menuA_ctions">
     <property name="title">
-     <string>&amp;Actions</string>
+     <string>Action&amp;s</string>
     </property>
     <widget class="QMenu" name="menuInstallation">
      <property name="title">
@@ -885,7 +885,7 @@
   </action>
   <action name="actionE_xit">
    <property name="text">
-    <string>&amp;Exit</string>
+    <string>E&amp;xit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>

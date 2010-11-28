@@ -1097,12 +1097,12 @@ Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </tr
     <message>
         <location filename="../configurefrm.ui" line="133"/>
         <source>&amp;No Proxy</source>
-        <translation>&amp;Pas de proxy</translation>
+        <translation>P&amp;as de proxy</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="143"/>
         <source>Use &amp;System values</source>
-        <translation>Utiliser les valeurs du &amp;système</translation>
+        <translation>Utiliser les valeurs du s&amp;ystème</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="150"/>
@@ -1131,7 +1131,7 @@ Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </tr
     </message>
     <message>
         <location filename="../configurefrm.ui" line="213"/>
-        <source>&amp;Password</source>
+        <source>Pass&amp;word</source>
         <translation>&amp;Mot de passe</translation>
     </message>
     <message>
@@ -1141,7 +1141,7 @@ Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </tr
     </message>
     <message>
         <location filename="../configurefrm.ui" line="258"/>
-        <source>&amp;Cache</source>
+        <source>Cac&amp;he</source>
         <translation>&amp;Cache</translation>
     </message>
     <message>
@@ -1161,7 +1161,7 @@ Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </tr
     </message>
     <message>
         <location filename="../configurefrm.ui" line="286"/>
-        <source>&amp;Path</source>
+        <source>P&amp;ath</source>
         <translation>&amp;Chemin</translation>
     </message>
     <message>
@@ -1184,7 +1184,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     </message>
     <message>
         <location filename="../configurefrm.ui" line="328"/>
-        <source>&amp;Offline mode</source>
+        <source>O&amp;ffline mode</source>
         <translation>Mode &amp;hors-ligne</translation>
     </message>
     <message>
@@ -1625,7 +1625,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../installwindowfrm.ui" line="65"/>
         <source>&amp;Current Build</source>
-        <translation>&amp;Version actuelle</translation>
+        <translation>Version a&amp;ctuelle</translation>
     </message>
     <message>
         <location filename="../installwindowfrm.ui" line="75"/>
@@ -2294,13 +2294,13 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="729"/>
-        <source>&amp;Download</source>
-        <translation>&amp;Télécharger</translation>
+        <source>Down&amp;load</source>
+        <translation>Télé&amp;charger</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="753"/>
-        <source>&amp;Info</source>
-        <translation>&amp;Info</translation>
+        <source>Inf&amp;o</source>
+        <translation>Inf&amp;o</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="773"/>
@@ -2344,7 +2344,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="888"/>
-        <source>&amp;Exit</source>
+        <source>E&amp;xit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
@@ -2370,8 +2370,8 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="821"/>
-        <source>&amp;Actions</source>
-        <translation>&amp;Actions</translation>
+        <source>Action&amp;s</source>
+        <translation>Action&amp;s</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="911"/>
@@ -2522,12 +2522,12 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../rbutilqtfrm.ui" line="1047"/>
         <source>&amp;System Info</source>
-        <translation>&amp;Informations système</translation>
+        <translation>Informations &amp;système</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="920"/>
         <source>&amp;Complete Installation</source>
-        <translation>&amp;Installation complète</translation>
+        <translation>Installation &amp;complète</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="90"/>
@@ -2547,7 +2547,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../rbutilqtfrm.ui" line="929"/>
         <source>&amp;Minimal Installation</source>
-        <translation>&amp;Installation minimale</translation>
+        <translation>Installation &amp;minimale</translation>
     </message>
 </context>
 <context>
