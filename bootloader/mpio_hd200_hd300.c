@@ -175,6 +175,9 @@ static void rb_boot(void)
     /* boost to speedup rb image loading */
     cpu_boost(true);
 
+    printf("Rockbox boot loader");
+    printf("Version " RBVERSION);
+
     rc = storage_init();
     if(rc)
     {

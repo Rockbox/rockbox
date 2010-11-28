@@ -64,5 +64,5 @@ show_logo.c
 main-pp.c
 show_logo.c
 #elif defined(MPIO_HD200) || defined(MPIO_HD300)
-mpio_hd200.c
+mpio_hd200_hd300.c
 #endif
