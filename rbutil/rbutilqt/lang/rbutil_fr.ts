@@ -120,7 +120,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="226"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Débranchez de l&apos;USB et du courant&lt;/li&gt;&lt;li&gt;Maintenez &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pour éteindre le lecteur&lt;/li&gt;&lt;li&gt;Basculez l&apos;interrupteur&lt;/li&gt;&lt;li&gt;Maintenez &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pour démarrer avec Rockbox&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="232"/>
@@ -207,7 +207,7 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="118"/>
         <source>Original bootloader restored successfully.</source>
-        <translation>Le bootloadezr original a été restauré avec succès.</translation>
+        <translation>Le bootloader original a été restauré avec succès.</translation>
     </message>
 </context>
 <context>
@@ -320,7 +320,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="225"/>
         <source>Uninstallation not possible, only installation info removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Désinstallation impossible, seules les infos d&apos;installation sont supprimées</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="246"/>
@@ -580,7 +580,7 @@ Veuillez vous référer à http://www.rockbox.org/wiki/IpodConversionToFAT32</tr
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
         <source>Place for bootloader in OF file not empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de place libre pour le bootloader dans le firmware original.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
@@ -842,7 +842,8 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
         <location filename="../configure.cpp" line="470"/>
         <source>The System Proxy settings are invalid!
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les paramètres système Proxy sont non valides !
+L&apos;Utilitaire Rockbox ne peut pas fonctionner avec ces réglages proxy. Vérifier que le proxy soit correctement paramétré. Notez que les scripts &quot;proxy auto-config (PAC)&quot; ne sont pas supportés. Si votre système en utilise vous devez effectuer un paramétrage manuel.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="571"/>
@@ -1370,7 +1371,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../base/encoders.cpp" line="167"/>
         <source>Use Narrowband:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser le bas débit:</translation>
     </message>
 </context>
 <context>
@@ -1724,7 +1725,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../progressloggergui.cpp" line="145"/>
         <source>Save system trace log</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder l&apos;historique de la trace système</translation>
     </message>
     <message>
         <location filename="../progressloggergui.cpp" line="104"/>
@@ -1978,7 +1979,8 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <location filename="../rbutilqt.cpp" line="249"/>
         <source>Can&apos;t get version information.
 Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de récupérer les informations de version.
+Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="567"/>
@@ -2313,7 +2315,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../rbutilqtfrm.ui" line="808"/>
         <source>&amp;Troubleshoot</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dépannage</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="896"/>
@@ -2323,7 +2325,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../rbutilqtfrm.ui" line="1052"/>
         <source>System &amp;Trace</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Trace système</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="873"/>
@@ -2577,7 +2579,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
         <location filename="../systrace.cpp" line="76"/>
         <location filename="../systrace.cpp" line="85"/>
         <source>Save system trace log</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde de la trace système</translation>
     </message>
 </context>
 <context>
@@ -2585,12 +2587,12 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../systracefrm.ui" line="14"/>
         <source>System Trace</source>
-        <translation type="unfinished"></translation>
+        <translation>Trace système</translation>
     </message>
     <message>
         <location filename="../systracefrm.ui" line="20"/>
         <source>System State trace</source>
-        <translation type="unfinished"></translation>
+        <translation>Trace état du système</translation>
     </message>
     <message>
         <location filename="../systracefrm.ui" line="46"/>
@@ -2610,7 +2612,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../systracefrm.ui" line="79"/>
         <source>Save &amp;previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder &amp;la précédente</translation>
     </message>
 </context>
 <context>
@@ -3221,7 +3223,8 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
         <location filename="../base/utils.cpp" line="196"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;Incohérence de cibles d&apos;installation détectée.
+Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="203"/>
@@ -3453,7 +3456,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message utf8="true">
         <location filename="../aboutbox.ui" line="57"/>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Installeur et utilitaire d&apos;entretien du firmware libre pour lecteurs audio Rockbox.&lt;br/&gt;© 2005 - 2010 L&apos;équipe Rockbox.&lt;br/&gt;Publié sous Licence Publique Générale GNU GPL v2.&lt;br/&gt;Icônes utilisées grâce au &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="77"/>
