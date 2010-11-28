@@ -793,7 +793,6 @@ off_t filesize(int fd)
 }
 
 
-#ifdef HAVE_HOTSWAP
 /* release all file handles on a given volume "by force", to avoid leaks */
 int release_files(int volume)
 {
@@ -814,4 +813,3 @@ int release_files(int volume)
     }
     return closed; /* return how many we did */
 }
-#endif /* #ifdef HAVE_HOTSWAP */

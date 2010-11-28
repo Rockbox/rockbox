@@ -36,7 +36,6 @@
 
 static DIR_UNCACHED opendirs[MAX_OPEN_DIRS];
 
-#ifdef HAVE_HOTSWAP
 // release all dir handles on a given volume "by force", to avoid leaks
 int release_dirs(int volume)
 {
@@ -57,7 +56,6 @@ int release_dirs(int volume)
     }
     return closed; /* return how many we did */
 }
-#endif /* #ifdef HAVE_HOTSWAP */
 
 DIR_UNCACHED* opendir_uncached(const char* name)
 {

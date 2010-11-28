@@ -41,6 +41,7 @@ struct partinfo* disk_partinfo(int partition);
 void disk_init_subsystem(void); /* Initialises mutexes */
 int disk_mount_all(void); /* returns the # of successful mounts */
 int disk_mount(int drive);
+int disk_unmount_all(void);
 int disk_unmount(int drive);
 
 /* The number of 512-byte sectors in a "logical" sector. Needed for ipod 5.5G */

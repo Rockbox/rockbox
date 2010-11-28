@@ -23,10 +23,8 @@
 #include "storage.h"
 #include "debug.h"
 #include "fat.h"
-#ifdef HAVE_HOTSWAP
 #include "dir.h" /* for release_dirs() */
 #include "file.h" /* for release_files() */
-#endif
 #include "disk.h"
 #include <string.h>
 
@@ -235,12 +233,13 @@ int disk_mount(int drive)
     return mounted;
 }
 
-#ifdef HAVE_HOTSWAP
 int disk_unmount(int drive)
 {
     int unmounted = 0;
     int i;
+#ifdef HAVE_HOTSWAP
     mutex_lock(&disk_mutex);
+#endif
     for (i=0; i<NUM_VOLUMES; i++)
     {
         if (vol_drive[i] == drive)
@@ -252,8 +251,28 @@ int disk_unmount(int drive)
             fat_unmount(i, false);
         }
     }
+#ifdef HAVE_HOTSWAP
     mutex_unlock(&disk_mutex);
+#endif
 
     return unmounted;
 }
-#endif /* #ifdef HAVE_HOTSWAP */
+
+int disk_unmount_all(void)
+{
+#ifndef HAVE_MULTIDRIVE
+    return disk_unmount(0);
+#else  /* HAVE_MULTIDRIVE */
+    int unmounted = 0;
+    int i;
+    for (i = 0; i < NUM_DRIVES; i++)
+    {
+#ifdef HAVE_HOTSWAP
+        if (storage_present(i))
+#endif
+            unmounted += disk_unmount(i);
+    }
+
+    return unmounted;
+#endif  /* HAVE_MULTIDRIVE */
+}

@@ -131,6 +131,7 @@ static inline void usb_slave_mode(bool on)
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(THREAD_ID_CURRENT, PRIORITY_REALTIME);
 #endif
+        disk_unmount_all();
         usb_attach();
     }
     else /* usb_state == USB_INSERTED (only!) */
@@ -172,6 +173,7 @@ static inline void usb_slave_mode(bool on)
     if(on)
     {
         DEBUGF("Entering USB slave mode\n");
+        disk_unmount_all();
         storage_soft_reset();
         storage_init();
         storage_enable(false);
