@@ -739,8 +739,8 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
     {
         case STRING:
             if (lif->op == IF_EQUALS)
-                return strcmp(out_text, lif->operand.data.text) == 0 ?
-                                                            "eq" : NULL;
+                return (out_text && strcmp(out_text, lif->operand.data.text) == 0)
+                                    ? "eq" : NULL;
             else
                 return NULL;
             break;
