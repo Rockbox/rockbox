@@ -279,7 +279,8 @@ Lyre prototype 1 */
 #define RTC_S35390A  15
 #define RTC_JZ47XX   16 /* Ingenic Jz47XX */
 #define RTC_NANO2G   17 /* This seems to be a PCF5063x */
-#define RTC_D2       18 /* Either PCF50606 or PCF50635 */ 
+#define RTC_D2       18 /* Either PCF50606 or PCF50635 */
+#define RTC_S35380A  19 
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */

@@ -73,7 +73,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* Define this if you have RTC */
-#define CONFIG_RTC RTC_S35390A
+#define CONFIG_RTC RTC_S35380A
 
 #define CONFIG_LCD LCD_S1D15E06
 
