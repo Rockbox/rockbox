@@ -93,12 +93,16 @@ static const struct button_mapping button_context_wps[]  = {
 }; /* button_context_wps */
 
 static const struct button_mapping button_context_settings[]  = {
-    { ACTION_SETTINGS_INC,       BUTTON_FF,                 BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT, BUTTON_FF|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_UP,                 BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
 /*    { ACTION_SETTINGS_INCBIGSTEP,BUTTON_,                       BUTTON_ }, */
-    { ACTION_SETTINGS_DEC,       BUTTON_REW,               BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT, BUTTON_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_DOWN,               BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_DOWN|BUTTON_REPEAT, BUTTON_NONE },
 /*  { ACTION_SETTINGS_DECBIGSTEP,BUTTON_,                       BUTTON_ }, */
+    { ACTION_STD_PREV,           BUTTON_REW,                    BUTTON_NONE  },
+    { ACTION_STD_PREVREPEAT,     BUTTON_REW|BUTTON_REPEAT,      BUTTON_NONE  },
+    { ACTION_STD_NEXT,           BUTTON_FF,                     BUTTON_NONE  },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_FF|BUTTON_REPEAT,       BUTTON_NONE  },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
@@ -115,6 +119,12 @@ static const struct button_mapping button_context_bmark[]  = {
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
+
+static const struct button_mapping button_context_time[]  = {
+    { ACTION_STD_CANCEL,       BUTTON_MENU,  BUTTON_NONE },
+    { ACTION_STD_OK,           BUTTON_ENTER,   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
+}; /* button_context_time */
 
 /*
 static const struct button_mapping button_context_quickscreen[]  = {
@@ -153,13 +163,13 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PRESET,          BUTTON_ENTER|BUTTON_REL,        BUTTON_ENTER },
 /*  { ACTION_FM_RECORD,          BUTTON_,      BUTTON_ }, */
 /*  { ACTION_FM_FREEZE,          BUTTON_,                       BUTTON_ }, */
-    { ACTION_FM_STOP,            BUTTON_REC|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_FM_STOP,            BUTTON_MENU|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_FM_MODE,            BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
-    { ACTION_FM_EXIT,            BUTTON_REC|BUTTON_REL,         BUTTON_REC },
+    { ACTION_FM_EXIT,            BUTTON_MENU|BUTTON_REL,         BUTTON_MENU },
     { ACTION_FM_PLAY,            BUTTON_PLAY|BUTTON_REL,        BUTTON_PLAY },
 /*  { ACTION_FM_RECORD_DBLPRE,   BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_FM_NEXT_PRESET,     BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_FM_PREV_PRESET,     BUTTON_,                       BUTTON_ }, */
+    { ACTION_FM_NEXT_PRESET,     BUTTON_FF,                       BUTTON_NONE },
+    { ACTION_FM_PREV_PRESET,     BUTTON_REW,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
@@ -237,6 +247,9 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_EQ:
             return button_context_settings;
+
+        case CONTEXT_SETTINGS_TIME:
+            return button_context_time;
 
         case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
