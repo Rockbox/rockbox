@@ -6,7 +6,7 @@
 // http://en.wikipeia.org/wiki/Rijndael_mix_columns
 // http://en.wikipedia.org/wiki/Rijndael_S-box
 // This code is public domain, or any OSI-approved license, your choice. No warranty.
-#include "aes128_impl.h"
+#include "crypto.h"
  
 // Here are all the lookup tables for the row shifts, rcon, s-boxes, and galois field multiplications
 byte shift_rows_table[]     = {0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11};
@@ -234,3 +234,51 @@ int main(void)
   return 0;
 }
 */
+
+void cbc_mac(
+    byte *in_data, /* Input data */
+    byte *out_data, /* Output data (or NULL) */
+    int nr_blocks, /* Number of blocks to encrypt/decrypt (one block=16 bytes) */
+    byte key[16], /* Key */
+    byte iv[16], /* Initialisation Vector */
+    byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
+    int encrypt /* 1 to encrypt, 0 to decrypt */
+    )
+{
+    byte feedback[16];
+    memcpy(feedback, iv, 16);
+
+    if(encrypt)
+    {
+        /* for each block */
+        for(int i = 0; i < nr_blocks; i++)
+        {
+            /* xor it with feedback */
+            xor_(feedback, &in_data[i * 16], 16);
+            /* encrypt it using aes */
+            EncryptAES(feedback, key, feedback);
+            /* write cipher to output */
+            if(out_data)
+                memcpy(&out_data[i * 16], feedback, 16);
+        }
+        if(out_cbc_mac)
+            memcpy(out_cbc_mac, feedback, 16);
+    }
+    else
+    {
+        /* nothing to do ? */
+        if(out_data == NULL)
+            return;
+
+        /* for each block */
+        for(int i = 0; i < nr_blocks; i++)
+        {
+            /* decrypt it using aes */
+            DecryptAES(&in_data[i * 16], key, &out_data[i * 16]);
+            /* xor it with iv */
+            xor_(&out_data[i * 16], feedback, 16);
+            /* copy cipher to iv */
+            memcpy(feedback, &in_data[i * 16], 16);
+        }
+    }
+}

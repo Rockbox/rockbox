@@ -38,7 +38,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include "aes128_impl.h"
+#include "crypto.h"
 
 #if 1 /* ANSI colors */
 
@@ -78,9 +78,6 @@ uint8_t *buf; /* file content */
 char out_prefix[PREFIX_SIZE];
 const char *key_file;
 
-#define SB_INST_OP(inst)    (((inst) >> 8) & 0xff)
-#define SB_INST_UNK(inst)   ((inst) & 0xff)
-
 #define SB_INST_NOP     0x0
 #define SB_INST_TAG     0x1
 #define SB_INST_LOAD    0x2
@@ -91,7 +88,9 @@ const char *key_file;
 
 struct sb_instruction_header_t
 {
-    uint32_t inst;
+    uint8_t checksum;
+    uint8_t opcode;
+    uint16_t zero_except_for_tag;
 } __attribute__((packed));
 
 struct sb_instruction_load_t
@@ -114,6 +113,7 @@ struct sb_instruction_call_t
 {
     struct sb_instruction_header_t hdr;
     uint32_t addr;
+    uint32_t zero;
     uint32_t arg;
 } __attribute__((packed));
 
@@ -163,6 +163,12 @@ static void print_key(byte key[16])
 {
     for(int i = 0; i < 16; i++)
         printf("%02X ", key[i]);
+}
+
+static void print_sha1(byte sha[20])
+{
+    for(int i = 0; i < 20; i++)
+        printf("%02X ", sha[i]);
 }
 
 /* verify the firmware header */
@@ -242,55 +248,16 @@ static key_array_t read_keys(int num_keys)
     return keys;
 }
 
-static void cbc_mac(
-    byte *in_data, /* Input data */
-    byte *out_data, /* Output data (or NULL) */
-    int nr_blocks, /* Number of blocks to encrypt/decrypt (one block=16 bytes) */
-    byte key[16], /* Key */
-    byte iv[16], /* Initialisation Vector */
-    byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
-    int encrypt /* 1 to encrypt, 0 to decrypt */
-    )
-{
-    byte feedback[16];
-    memcpy(feedback, iv, 16);
-
-    if(encrypt)
-    {
-        /* for each block */
-        for(int i = 0; i < nr_blocks; i++)
-        {
-            /* xor it with feedback */
-            xor_(feedback, &in_data[i * 16], 16);
-            /* encrypt it using aes */
-            EncryptAES(feedback, key, feedback);
-            /* write cipher to output */
-            if(out_data)
-                memcpy(&out_data[i * 16], feedback, 16);
-        }
-        if(out_cbc_mac)
-            memcpy(out_cbc_mac, feedback, 16);
-    }
-    else
-    {
-        /* nothing to do ? */
-        if(out_data == NULL)
-            bugp("can't ask to decrypt with no output buffer");
-
-        /* for each block */
-        for(int i = 0; i < nr_blocks; i++)
-        {
-            /* decrypt it using aes */
-            DecryptAES(&in_data[i * 16], key, &out_data[i * 16]);
-            /* xor it with iv */
-            xor_(&out_data[i * 16], feedback, 16);
-            /* copy cipher to iv */
-            memcpy(feedback, &in_data[i * 16], 16);
-        }
-    }
-}
-
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
+
+static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
+{
+    uint8_t sum = 90;
+    byte *ptr = (byte *)hdr;
+    for(int i = 1; i < 16; i++)
+        sum += ptr[i];
+    return sum;
+}
 
 static void extract_section(int data_sec, char name[5], byte *buf, int size, const char *indent)
 {
@@ -308,62 +275,77 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
     while(pos < size)
     {
         struct sb_instruction_header_t *hdr = (struct sb_instruction_header_t *)&buf[pos];
-        if(SB_INST_OP(hdr->inst) == SB_INST_LOAD)
+        printf("%s", indent);
+        uint8_t checksum = instruction_checksum(hdr);
+        if(checksum != hdr->checksum)
+        {
+            color(GREY);
+            printf("[Bad checksum]");
+        }
+        
+        if(hdr->opcode == SB_INST_LOAD)
         {
             struct sb_instruction_load_t *load = (struct sb_instruction_load_t *)&buf[pos];
             color(RED);
-            printf("%sLOAD", indent);
+            printf("LOAD");
             color(OFF);printf(" | ");
             color(BLUE);
-            printf("addr=%#08x", load->addr);
+            printf("addr=0x%08x", load->addr);
             color(OFF);printf(" | ");
             color(GREEN);
-            printf("len=%#08x", load->len);
+            printf("len=0x%08x", load->len);
             color(OFF);printf(" | ");
             color(YELLOW);
-            printf("crc=%#08x\n", load->crc);
-            color(OFF);
+            printf("crc=0x%08x", load->crc);
+            /* data is padded to 16-byte boundary with random data and crc'ed with it */
+            uint32_t computed_crc = crc(&buf[pos + sizeof(struct sb_instruction_load_t)],
+                ROUND_UP(load->len, 16));
+            color(RED);
+            if(load->crc == computed_crc)
+                printf("  Ok\n");
+            else
+                printf("  Failed (crc=0x%08x)\n", computed_crc);
 
             pos += load->len + sizeof(struct sb_instruction_load_t);
             // unsure about rounding
             pos = ROUND_UP(pos, 16);
         }
-        else if(SB_INST_OP(hdr->inst) == SB_INST_FILL)
+        else if(hdr->opcode == SB_INST_FILL)
         {
             struct sb_instruction_fill_t *fill = (struct sb_instruction_fill_t *)&buf[pos];
             color(RED);
-            printf("%sFILL", indent);
+            printf("FILL");
             color(OFF);printf(" | ");
             color(BLUE);
-            printf("addr=%#08x", fill->addr);
+            printf("addr=0x%08x", fill->addr);
             color(OFF);printf(" | ");
             color(GREEN);
-            printf("len=%#08x", fill->len);
+            printf("len=0x%08x", fill->len);
             color(OFF);printf(" | ");
             color(YELLOW);
-            printf("pattern=%#08x\n", fill->pattern);
+            printf("pattern=0x%08x\n", fill->pattern);
             color(OFF);
 
             pos += sizeof(struct sb_instruction_fill_t);
             // fixme: useless as pos is a multiple of 16 and fill struct is 4-bytes wide ?
             pos = ROUND_UP(pos, 16);
         }
-        else if(SB_INST_OP(hdr->inst) == SB_INST_CALL ||
-                SB_INST_OP(hdr->inst) == SB_INST_JUMP)
+        else if(hdr->opcode == SB_INST_CALL ||
+                hdr->opcode == SB_INST_JUMP)
         {
-            int is_call = (SB_INST_OP(hdr->inst) == SB_INST_CALL);
+            int is_call = (hdr->opcode == SB_INST_CALL);
             struct sb_instruction_call_t *call = (struct sb_instruction_call_t *)&buf[pos];
             color(RED);
             if(is_call)
-                printf("%sCALL", indent);
+                printf("CALL");
             else
-                printf("%sJUMP", indent);
+                printf("JUMP");
             color(OFF);printf(" | ");
             color(BLUE);
-            printf("addr=%#08x", call->addr);
+            printf("addr=0x%08x", call->addr);
             color(OFF);printf(" | ");
             color(GREEN);
-            printf("arg=%#08x\n", call->arg);
+            printf("arg=0x%08x\n", call->arg);
             color(OFF);
 
             pos += sizeof(struct sb_instruction_call_t);
@@ -373,7 +355,7 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
         else
         {
             color(RED);
-            printf("Unknown instruction %d at address %#08lx\n", SB_INST_OP(hdr->inst), (unsigned long)pos);
+            printf("Unknown instruction %d at address 0x%08lx\n", hdr->opcode, (unsigned long)pos);
             break;
         }
     }
@@ -381,12 +363,27 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
 
 static void extract(unsigned long filesize)
 {
+    struct sha_1_params_t sha_1_params;
     /* Basic header info */
     color(BLUE);
     printf("Basic info:\n");
     color(GREEN);
     printf("\tHeader SHA-1: ");
-    printhex(0, 20);
+    byte *hdr_sha1 = &buf[0];
+    color(YELLOW);
+    print_sha1(hdr_sha1);
+    /* Check SHA1 sum */
+    byte computed_sha1[20];
+    sha_1_init(&sha_1_params);
+    sha_1_update(&sha_1_params, &buf[0x14], 0x4C);
+    sha_1_finish(&sha_1_params);
+    sha_1_output(&sha_1_params, computed_sha1);
+    color(RED);
+    if(memcmp(hdr_sha1, computed_sha1, 20) == 0)
+        printf(" Ok\n");
+    else
+        printf(" Failed\n");
+    color(GREEN);
     printf("\tFlags: ");
     printhex(0x18, 4);
     printf("\tTotal file size : %ld\n", filesize);
@@ -448,6 +445,7 @@ static void extract(unsigned long filesize)
             /* copy the cbc mac */
             byte hdr_cbc_mac[16];
             memcpy(hdr_cbc_mac, &buf[0x60 + 16 * num_chunks + 32 * i], 16);
+            color(YELLOW);
             print_key(hdr_cbc_mac);
             /* check it */
             byte computed_cbc_mac[16];
@@ -464,14 +462,17 @@ static void extract(unsigned long filesize)
             printf("\t\tEncrypted key     : ");
             byte (*encrypted_key)[16];
             encrypted_key = (key_array_t)&buf[0x60 + 16 * num_chunks + 32 * i + 16];
+            color(YELLOW);
             print_key(*encrypted_key);
             printf("\n");
+            color(GREEN);
             /* decrypt */
             byte decrypted_key[16];
             byte iv[16];
             memcpy(iv, buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
             cbc_mac(*encrypted_key, decrypted_key, 1, keys[i], iv, NULL, 0);
             printf("\t\tDecrypted key     : ");
+            color(YELLOW);
             print_key(decrypted_key);
             /* cross-check or copy */
             if(i == 0)
@@ -532,11 +533,32 @@ static void extract(unsigned long filesize)
     
     /* final signature */
     color(BLUE);
-    printf("Final signature:\n\t");
+    printf("Final signature:\n");
     color(GREEN);
+    printf("\tEncrypted signature:\n");
+    color(YELLOW);
+    printf("\t\t");
     printhex(filesize - 32, 16);
-    printf("\t");
+    printf("\t\t");
     printhex(filesize - 16, 16);
+    /* decrypt it */
+    byte *encrypted_block = &buf[filesize - 32];
+    byte decrypted_block[32];
+    cbc_mac(encrypted_block, decrypted_block, 2, real_key, buf, NULL, 0);
+    color(GREEN);
+    printf("\tDecrypted SHA-1:\n\t\t");
+    color(YELLOW);
+    print_sha1(decrypted_block);
+    /* check it */
+    sha_1_init(&sha_1_params);
+    sha_1_update(&sha_1_params, buf, filesize - 32);
+    sha_1_finish(&sha_1_params);
+    sha_1_output(&sha_1_params, computed_sha1);
+    color(RED);
+    if(memcmp(decrypted_block, computed_sha1, 20) == 0)
+        printf(" Ok\n");
+    else
+        printf(" Failed\n");
 }
 
 int main(int argc, const char **argv)
