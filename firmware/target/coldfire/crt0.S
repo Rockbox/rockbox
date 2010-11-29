@@ -65,12 +65,11 @@ start:
         
 #if (defined MPIO_HD200) || (defined MPIO_HD300)
     /* Chip select 3 - LCD controller */
-    /* FIXME Check if we really need this 2 wait states! */
     move.l  #0xf0000000,%d0 /* CSAR3 - Base = 0xf0000000 */
     move.l  %d0,(0x0a4,%a0)
     moveq.l #0x1,%d0        /* CSMR3 - 64K */
     move.l  %d0,(0x0a8,%a0)
-    move.l  #0x00000980,%d0 /* CSCR3 - 2 wait states, 16 bits no bursts */
+    move.l  #0x00000180,%d0 /* CSCR3 - no wait states, 16 bits no bursts */
     move.l  %d0,(0x0ac,%a0)
 #elif !(defined IAUDIO_M3)
     /* Chip select 1 - LCD controller */
