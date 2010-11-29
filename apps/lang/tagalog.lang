@@ -246,9 +246,10 @@
  user: core
  <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
  </source>
@@ -257,6 +258,7 @@
     cowond2*: "MENU = Oo"
     iriverh100,iriverh120,iriverh300: "NAVI = Oo"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Oo"
+    mrobe500: "PLAY, POWER, or top-right = Oo"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Oo"
  </dest>
@@ -4783,10 +4785,10 @@
  desc: "talkbox" mode for directories + files
  user: core
  <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
  </source>
  <dest>
-    *: ".usapan mp3 klip"
+    *: ".talk klip"
  </dest>
  <voice>
     *: "talk mp3 clip"
@@ -11476,5 +11478,1115 @@
   </dest>
   <voice>
     *: "Top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Queue Last Shuffled"
+  </dest>
+  <voice>
+    *: "Queue Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "statusbar balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Release Oras"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Release Oras"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "WPS Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "WPS Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Pasukan"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pasukan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band %d Makakuha Ng"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Makakuha Ng"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Kabuuan Makakuha Ng"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Kabuuan Makakuha Ng"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Base Balat"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Base Balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "radio screen balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Malawak"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Malawak"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    remote: ""
+  </source>
+  <dest>
+    *: none
+    remote: ""
+  </dest>
+  <voice>
+    *: none
+    remote: "remote statusbar balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Awto"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Awto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Update sa Stop"
+  </dest>
+  <voice>
+    *: "Update sa Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Ipasok Ang Huling Shuffled"
+  </dest>
+  <voice>
+    *: "Ipasok Ang Huling Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Soft Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Soft Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Susunod:"
+  </dest>
+  <voice>
+    *: "Susunod:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Proporsyon"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Proporsyon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hard Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hard Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Itakda Bilang Top Quickscreen Item"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Itakda Bilang Top Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Remote Base sa Balat"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Remote Base sa Balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Browser"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "remote radio screen balat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Screen"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Makitid"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Makitid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Iba Pang"
+  </dest>
+  <voice>
+    *: none
+    radio: "Iba Pang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rewind Bago Resume"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Rewind bago resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Untagged>"
+  </dest>
+  <voice>
+    *: "Untagged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Italya"
+  </dest>
+  <voice>
+    *: none
+    radio: "Italya"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Gamitin ang Morse Code Input"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Gamitin ang Morse Code Input"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "3-D Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kanselahin"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kanselahin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Kompositor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Simulan ang File Browser sa /"
+  </dest>
+  <voice>
+    *: "Start File Browser sa root"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band% d Dalas"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Dalas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Lakas ng signal:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Lakas ng signal:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Band% d Lapad"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Band Lapad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Mouse"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Mouse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limitasyon"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limitasyon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Multimedia"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Multimedia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Pasadya"
+  </dest>
+  <voice>
+    *: "Pasadya"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Estasyon:"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Skip to Outro"
+  </dest>
+  <voice>
+    *: "Skip to Outro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Radio Screen"
+  </dest>
+  <voice>
+    *: none
+    radio: "Radio Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Main Screen"
+  </dest>
+  <voice>
+    *: none
+    remote: "Main Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "open picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Force"
+  </dest>
+  <voice>
+    *: "Force"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Compressor"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Compressor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Tone Controls"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Tone Controls"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hotkey"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hotkey"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Next Track:"
+  </dest>
+  <voice>
+    *: "Next Track:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Presentation"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Presentation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "of"
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Start File Browser Here"
+  </dest>
+  <voice>
+    *: "Start File Browser Here"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    recording_histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    recording_histogram: "Histogram interval"
+  </dest>
+  <voice>
+    *: none
+    recording_histogram: "Histogram interval"
   </voice>
 </phrase>
