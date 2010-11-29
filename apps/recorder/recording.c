@@ -621,7 +621,8 @@ char *rec_create_filename(char *buffer)
         pref = prestr[global_settings.rec_source];
     }
 
-    strcpy(buffer, global_settings.rec_directory);
+    strcpy(buffer, !strcmp(global_settings.rec_directory, "/")?
+                        "": global_settings.rec_directory);
 
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));

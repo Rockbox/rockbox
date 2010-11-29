@@ -3536,7 +3536,8 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
             if (recurse)
             {
                 /* recursively add directories */
-                snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
+                snprintf(buf, sizeof(buf), "%s/%s",
+                            dirname[1]? dirname: "", files[i].name);
                 result = playlist_directory_tracksearch(buf, recurse,
                     callback, context);
                 if (result < 0)
@@ -3562,7 +3563,8 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
         }
         else if ((files[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
-            snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
+            snprintf(buf, sizeof(buf), "%s/%s",
+                        dirname[1]? dirname: "", files[i].name);
 
             if (callback(buf, context) != 0)
             {
