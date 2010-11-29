@@ -28,7 +28,7 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-#define SLIDER_BASE_SENSITIVITY 6
+#define SLIDER_BASE_SENSITIVITY 8
 
 /* GPI7 H-L, GPI6 H-L, GPI7 L-H, GPI6 L-H */
 #define SLIDER_GPIO_MASK ((1<<15)|(1<<14)|(1<<7)|(1<<6))
