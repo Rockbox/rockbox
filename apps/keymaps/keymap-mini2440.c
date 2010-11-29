@@ -108,11 +108,9 @@ static const struct button_mapping button_context_wps[]  = {
 }; /* button_context_wps */
 
 static const struct button_mapping button_context_list[]  = {
-    { ACTION_LISTTREE_PGUP,      BUTTON_A|BUTTON_UP,                 BUTTON_A },
-    { ACTION_LISTTREE_PGUP,      BUTTON_UP|BUTTON_REL,               BUTTON_A|BUTTON_UP },
+    { ACTION_LISTTREE_PGUP,      BUTTON_A|BUTTON_UP,                 BUTTON_NONE },
     { ACTION_LISTTREE_PGUP,      BUTTON_A|BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_LISTTREE_PGDOWN,    BUTTON_A|BUTTON_DOWN,               BUTTON_A },
-    { ACTION_LISTTREE_PGDOWN,    BUTTON_DOWN|BUTTON_REL,             BUTTON_A|BUTTON_DOWN },
+    { ACTION_LISTTREE_PGDOWN,    BUTTON_A|BUTTON_DOWN,               BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,    BUTTON_A|BUTTON_DOWN|BUTTON_REPEAT, BUTTON_NONE },
 #ifdef HAVE_VOLUME_IN_LIST
     { ACTION_LIST_VOLUP,         BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
@@ -136,14 +134,10 @@ static const struct button_mapping button_context_tree[]  = {
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     { ACTION_NONE,              BUTTON_A,                              BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_A|BUTTON_LEFT,                  BUTTON_A },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,                BUTTON_A|BUTTON_LEFT },
-    { ACTION_TREE_PGLEFT,       BUTTON_A|BUTTON_LEFT,                  BUTTON_LEFT|BUTTON_REL },
+    { ACTION_TREE_PGLEFT,       BUTTON_A|BUTTON_LEFT,                  BUTTON_NONE },
     { ACTION_TREE_ROOT_INIT,    BUTTON_A|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_A|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_A|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_A|BUTTON_RIGHT,                 BUTTON_A },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,               BUTTON_A|BUTTON_RIGHT },
-    { ACTION_TREE_PGRIGHT,      BUTTON_A|BUTTON_RIGHT,                 BUTTON_RIGHT|BUTTON_REL },
+    { ACTION_TREE_PGRIGHT,      BUTTON_A|BUTTON_RIGHT,                 BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_A|BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
@@ -153,11 +147,9 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
     { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 

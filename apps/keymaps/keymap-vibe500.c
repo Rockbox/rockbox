@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2009 by Szymon Dziok
  *
@@ -89,11 +89,9 @@ static const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_STD_CANCEL,        BUTTON_PREV|BUTTON_REL,     BUTTON_PREV },
     { ACTION_TREE_ROOT_INIT,    BUTTON_PREV|BUTTON_REPEAT,  BUTTON_PREV },
     { ACTION_TREE_PGLEFT,       BUTTON_PREV|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_PREV|BUTTON_REL,     BUTTON_PREV|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_NEXT,                BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_NEXT|BUTTON_REL,     BUTTON_NEXT },
     { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REL,     BUTTON_NEXT|BUTTON_REPEAT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_tree_scroll_lr */

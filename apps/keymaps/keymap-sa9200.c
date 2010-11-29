@@ -130,11 +130,9 @@ static const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
-    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-
     { ACTION_TREE_PGLEFT,       BUTTON_PREV,                    BUTTON_NONE },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_PREV|BUTTON_REPEAT,      BUTTON_PREV },
     { ACTION_TREE_PGLEFT,       BUTTON_PREV|BUTTON_REPEAT,      BUTTON_NONE },
-
     { ACTION_TREE_PGRIGHT,      BUTTON_NEXT,                    BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REPEAT,      BUTTON_NONE },
 
@@ -147,13 +145,10 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
-    { ACTION_TREE_ROOT_INIT,    BUTTON_MENU,                    BUTTON_NONE },
 
-    { ACTION_TREE_PGLEFT,       BUTTON_PREV,                    BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_PREV|BUTTON_REL,         BUTTON_PREV|BUTTON_REPEAT },
-
-    { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REPEAT,      BUTTON_NONE  },
-    { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REL,         BUTTON_NEXT|BUTTON_REPEAT },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_PREV|BUTTON_REPEAT,      BUTTON_PREV },
+    { ACTION_TREE_PGLEFT,       BUTTON_PREV|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_NEXT|BUTTON_REPEAT,      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };

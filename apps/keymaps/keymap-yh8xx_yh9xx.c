@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: keymap-h1x0_h3x0.c 17847 2008-06-28 18:10:04Z bagder $
+ * $Id$
  *
  * Copyright (C) 2006 Jonathan Gordon
  *
@@ -124,27 +124,19 @@ static const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
-    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-
-    { ACTION_TREE_PGLEFT,       BUTTON_REC|BUTTON_LEFT,         BUTTON_REC },
+    { ACTION_TREE_PGLEFT,       BUTTON_REC|BUTTON_LEFT,         BUTTON_NONE },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_REC|BUTTON_LEFT|BUTTON_REPEAT,BUTTON_REC|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_REC|BUTTON_LEFT|BUTTON_REPEAT,BUTTON_NONE },
-
-    { ACTION_TREE_PGRIGHT,      BUTTON_REC|BUTTON_RIGHT,        BUTTON_REC },
+    { ACTION_TREE_PGRIGHT,      BUTTON_REC|BUTTON_RIGHT,        BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_REC|BUTTON_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE)
 };
 
 static const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
-    { ACTION_NONE,              BUTTON_LEFT,                    BUTTON_NONE },
-    { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
-    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
-
+    { ACTION_TREE_ROOT_INIT,    BUTTON_REW|BUTTON_REPEAT,      BUTTON_REW },
     { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REL,         BUTTON_REW|BUTTON_REPEAT },
-    
     { ACTION_TREE_PGRIGHT,      BUTTON_FFWD|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_FFWD|BUTTON_REL,        BUTTON_FFWD|BUTTON_REPEAT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE)
 };
