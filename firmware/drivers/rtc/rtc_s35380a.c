@@ -40,15 +40,17 @@
 #define CLOCK_CORR_REG  6
 #define FREE_REG        7
 
-/* STATUS_REG1 flags */
-#define STATUS_REG1_POC   0x80
-#define STATUS_REG1_BLD   0x40
-#define STATUS_REG1_INT2  0x20
-#define STATUS_REG1_INT1  0x10
-#define STATUS_REG1_SC1   0x08
-#define STATUS_REG1_SC0   0x04
-#define STATUS_REG1_H1224 0x02
-#define STATUS_REG1_RESET 0x01
+/* STATUS_REG1 flags
+ * bits order is reversed
+ */
+#define STATUS_REG1_POC   0x01
+#define STATUS_REG1_BLD   0x02
+#define STATUS_REG1_INT2  0x04
+#define STATUS_REG1_INT1  0x08
+#define STATUS_REG1_SC1   0x10
+#define STATUS_REG1_SC0   0x20
+#define STATUS_REG1_H1224 0x40
+#define STATUS_REG1_RESET 0x80
 
 
 static void reverse_bits(unsigned char* v, int size)
@@ -76,6 +78,10 @@ void rtc_init(void)
         status_reg |= STATUS_REG1_RESET;
         i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
     }
+
+    /* setup 24h time format */
+    status_reg = STATUS_REG1_H1224;
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
 }
 
 int rtc_read_datetime(struct tm *tm)
