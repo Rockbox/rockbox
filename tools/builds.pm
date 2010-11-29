@@ -289,6 +289,10 @@ $releasenotes="/wiki/ReleaseNotes371";
         name => 'MPIO HD200',
         status => 2,
     },
+    'mpiohd300' => {
+        name => 'MPIO HD300',
+        status => 1,
+    },
 );
 
 sub manualname {
