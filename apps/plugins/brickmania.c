@@ -259,6 +259,14 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP BUTTON_REW
 #define DOWN BUTTON_FF
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define QUIT (BUTTON_REC|BUTTON_REPEAT)
+#define LEFT BUTTON_REW
+#define RIGHT BUTTON_FF
+#define SELECT BUTTON_ENTER
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

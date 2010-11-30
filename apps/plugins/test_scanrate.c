@@ -74,6 +74,13 @@
 #define SCANRATE_INC     BUTTON_VOL_UP
 #define SCANRATE_DEC     BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define SCANRATE_DONE    BUTTON_PLAY
+#define SCANRATE_FASTINC BUTTON_UP
+#define SCANRATE_FASTDEC BUTTON_DOWN
+#define SCANRATE_INC     BUTTON_FF
+#define SCANRATE_DEC     BUTTON_REW
+
 #endif
 
 /* Default refresh rates in 1/10 Hz */
@@ -88,6 +95,8 @@
 #elif defined MPIO_HD200
 #define DEFAULT_SCAN_RATE 1460
 #define NEED_BOOST
+#elif defined MPIO_HD300
+#define DEFAULT_SCAN_RATE 730
 #elif defined IAUDIO_M5
 #define DEFAULT_SCAN_RATE 730
 #elif defined IPOD_1G2G

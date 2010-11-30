@@ -306,6 +306,18 @@ static void setoptions (void)
         options.SELECT = BUTTON_UP;
         options.MENU   = BUTTON_MENU;
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_REW;
+        options.RIGHT  = BUTTON_FF;
+
+        options.A      = BUTTON_MENU;
+        options.B      = BUTTON_ENTER;
+        options.START  = BUTTON_PLAY;
+        options.SELECT = (BUTTON_ENTER | BUTTON_REPEAT);
+        options.MENU   = (BUTTON_MENU | BUTTON_REPEAT);
+
 #else
 #error No Keymap Defined!
 #endif

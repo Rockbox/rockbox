@@ -217,6 +217,14 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_DOWN BUTTON_FF
 #define SNAKE_PLAYPAUSE BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define SNAKE_QUIT (BUTTON_REC|BUTTON_REPEAT)
+#define SNAKE_LEFT BUTTON_REW
+#define SNAKE_RIGHT BUTTON_FF
+#define SNAKE_UP   BUTTON_UP
+#define SNAKE_DOWN BUTTON_DOWN
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

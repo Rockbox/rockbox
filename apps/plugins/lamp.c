@@ -130,6 +130,10 @@
 #   define LAMP_UP         BUTTON_REW
 #   define LAMP_DOWN       BUTTON_FF
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
+
 #else
 #   error Missing key definitions for this keypad
 #endif

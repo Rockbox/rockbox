@@ -250,6 +250,15 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN  BUTTON_FF
 #define PAUSE BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+
+#define QUIT  BUTTON_REC
+#define LEFT  BUTTON_MENU
+#define RIGHT BUTTON_ENTER
+#define UP    BUTTON_UP
+#define DOWN  BUTTON_DOWN
+#define PAUSE BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

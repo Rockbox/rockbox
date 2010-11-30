@@ -168,6 +168,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION BUTTON_FUNC
 #define ACTIONTEXT "FUNC"
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define QUIT BUTTON_REC
+#define ACTION BUTTON_ENTER
+#define ACTIONTEXT "ENTER"
+
 #else
 #error No keymap defined!
 #endif

@@ -344,6 +344,18 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_PLAY|BUTTON_REW)
 #define FLIPIT_TOGGLE       (BUTTON_PLAY|BUTTON_FF)
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+
+#define FLIPIT_LEFT         BUTTON_REW
+#define FLIPIT_RIGHT        BUTTON_FF
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         (BUTTON_REC|BUTTON_REPEAT)
+#define FLIPIT_SHUFFLE      BUTTON_PLAY
+#define FLIPIT_SOLVE        BUTTON_MENU
+#define FLIPIT_STEP_BY_STEP BUTTON_REC
+#define FLIPIT_TOGGLE       BUTTON_ENTER
+
 #else
 #error No keymap defined!
 #endif

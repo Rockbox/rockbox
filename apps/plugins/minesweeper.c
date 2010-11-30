@@ -277,6 +277,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_DISCOVER BUTTON_FUNC
 #   define MINESWP_INFO     BUTTON_REC
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#   define MINESWP_LEFT     BUTTON_MENU
+#   define MINESWP_RIGHT    BUTTON_ENTER
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_REC
+#   define MINESWP_TOGGLE   BUTTON_PLAY
+#   define MINESWP_DISCOVER BUTTON_FF
+#   define MINESWP_INFO     BUTTON_REW
+
 #else
 #error No keymap defined!
 #endif

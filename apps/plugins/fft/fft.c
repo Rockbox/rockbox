@@ -232,6 +232,14 @@ GREY_INFO_STRUCT
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT        (BUTTON_REC | BUTTON_PLAY)
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#   define FFT_PREV_GRAPH   BUTTON_REW
+#   define FFT_NEXT_GRAPH   BUTTON_FF
+#   define FFT_ORIENTATION  BUTTON_REC
+#   define FFT_WINDOW       BUTTON_ENTER
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT        (BUTTON_REC | BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

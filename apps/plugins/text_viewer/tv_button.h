@@ -402,6 +402,17 @@
 #define TV_AUTOSCROLL   BUTTON_PLAY
 #define TV_BOOKMARK     BUTTON_REC
 
+/* MPIO HD300 keys */
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define TV_QUIT         BUTTON_REC
+#define TV_SCROLL_UP    BUTTON_UP
+#define TV_SCROLL_DOWN  BUTTON_DOWN
+#define TV_SCREEN_LEFT  BUTTON_REW
+#define TV_SCREEN_RIGHT BUTTON_FF
+#define TV_MENU         (BUTTON_MENU | BUTTON_REPEAT)
+#define TV_AUTOSCROLL   BUTTON_ENTER
+#define TV_BOOKMARK     BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

@@ -223,6 +223,12 @@
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "REC"
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define BATTERY_ON  BUTTON_PLAY
+#define BATTERY_OFF BUTTON_REC
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF_TXT "REC"
+
 #else
 #error No keymap defined!
 #endif

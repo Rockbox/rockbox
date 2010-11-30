@@ -91,6 +91,14 @@
 #define GREY_UP   BUTTON_VOL_UP
 #define GREY_DOWN BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define GREY_QUIT (BUTTON_REC|BUTTON_REPEAT)
+#define GREY_OK   BUTTON_PLAY
+#define GREY_PREV BUTTON_REW
+#define GREY_NEXT BUTTON_FF
+#define GREY_UP   BUTTON_UP
+#define GREY_DOWN BUTTON_DOWN
+
 #else
 #error unsupported keypad
 #endif

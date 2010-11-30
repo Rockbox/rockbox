@@ -299,6 +299,16 @@
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_FUNC
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define CUBE_QUIT          BUTTON_REC
+#define CUBE_NEXT          BUTTON_FF
+#define CUBE_PREV          BUTTON_REW
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_ENTER
+
 #else
 #error No keymap defined!
 #endif

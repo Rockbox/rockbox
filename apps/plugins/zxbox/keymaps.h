@@ -207,6 +207,15 @@
 #define ZX_LEFT         BUTTON_VOL_DOWN
 #define ZX_RIGHT        BUTTON_VOL_UP
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+
+#define ZX_MENU         (BUTTON_REC|BUTTON_REPEAT)
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_SELECT       BUTTON_ENTER
+#define ZX_LEFT         BUTTON_REW
+#define ZX_RIGHT        BUTTON_FF
+
 #else
 #error Keymap not defined!
 

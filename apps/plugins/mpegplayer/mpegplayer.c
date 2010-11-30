@@ -336,6 +336,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_RW         BUTTON_REW
 #define MPEG_FF         BUTTON_FF
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_PAUSE      (BUTTON_PLAY | BUTTON_REL)
+#define MPEG_STOP       (BUTTON_PLAY | BUTTON_REPEAT)
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_REW
+#define MPEG_FF         BUTTON_FF
+
 #else
 #error No keymap defined!
 #endif

@@ -349,6 +349,16 @@
 #define ROCKBLOX_DROP          BUTTON_PLAY
 #define ROCKBLOX_RESTART       BUTTON_REC
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define ROCKBLOX_OFF           (BUTTON_REC|BUTTON_REPEAT)
+#define ROCKBLOX_ROTATE_CCW    BUTTON_REW
+#define ROCKBLOX_ROTATE_CW     BUTTON_FF
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_MENU
+#define ROCKBLOX_RIGHT         BUTTON_ENTER
+#define ROCKBLOX_DROP          BUTTON_PLAY
+#define ROCKBLOX_RESTART       BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif

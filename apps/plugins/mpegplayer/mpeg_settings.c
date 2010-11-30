@@ -224,6 +224,14 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_DOWN        BUTTON_VOL_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_REC
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_ENTER
+#define MPEG_START_TIME_LEFT        BUTTON_REW
+#define MPEG_START_TIME_RIGHT       BUTTON_FF
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif

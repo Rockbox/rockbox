@@ -386,6 +386,16 @@
 #define CB_LEVEL   BUTTON_REC
 #define CB_MENU    (BUTTON_FUNC | BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define CB_SELECT  BUTTON_ENTER
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_REW
+#define CB_RIGHT   BUTTON_FF
+#define CB_PLAY    BUTTON_PLAY
+#define CB_LEVEL   BUTTON_REC
+#define CB_MENU    (BUTTON_MENU | BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

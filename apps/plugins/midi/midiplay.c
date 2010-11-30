@@ -209,6 +209,14 @@
 #define BTN_DOWN         BUTTON_FF
 #define BTN_PLAY         BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+#define BTN_QUIT         (BUTTON_REC | BUTTON_REPEAT)
+#define BTN_RIGHT        BUTTON_FF
+#define BTN_LEFT         BUTTON_REW
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif
