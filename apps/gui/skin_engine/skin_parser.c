@@ -526,18 +526,18 @@ static int parse_logical_if(struct skin_element *element,
     token->value.data = lif;
     lif->token = element->params[0].data.code->data;
     
-    if (!strcmp(op, "="))
+    if (!strncmp(op, "=", 1))
         lif->op = IF_EQUALS;
-    if (!strcmp(op, "!="))
+    else if (!strncmp(op, "!=", 2))
         lif->op = IF_NOTEQUALS;
-    if (!strcmp(op, "<"))
-        lif->op = IF_LESSTHAN;
-    if (!strcmp(op, "<="))
-        lif->op = IF_LESSTHAN_EQ;
-    if (!strcmp(op, ">"))
-        lif->op = IF_GREATERTHAN;
-    if (!strcmp(op, ">="))
+    else if (!strncmp(op, ">=", 2))
         lif->op = IF_GREATERTHAN_EQ;
+    else if (!strncmp(op, "<=", 2))
+        lif->op = IF_LESSTHAN_EQ;
+    else if (!strncmp(op, ">", 2))
+        lif->op = IF_GREATERTHAN;
+    else if (!strncmp(op, "<", 1))
+        lif->op = IF_LESSTHAN;
     
     memcpy(&lif->operand, &element->params[2], sizeof(lif->operand));
     if (element->params_count > 3)
