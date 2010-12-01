@@ -74,7 +74,7 @@ typedef struct
 
 #define EV_CURRENT  1 /* Current version */
 
-#define EF_ARM_HASENTRY     0x0
+#define EF_ARM_HASENTRY     0x00000002
 
 #define SHN_UNDEF   0 /* Undefined section */
 
