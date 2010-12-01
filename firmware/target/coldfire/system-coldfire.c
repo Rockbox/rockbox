@@ -158,6 +158,11 @@ default_interrupt (ADC);  /* A/D converter */
 #define EXCP_BUTTON_MASK        0x01000010
 #define EXCP_BUTTON_VALUE       0x01000000 /* Play button and !hold */
 #define EXCP_PLLCR              0x10800000
+#elif defined(MPIO_HD300)
+#define EXCP_BUTTON_GPIO_READ GPIO1_READ
+#define EXCP_BUTTON_MASK        0x01080000
+#define EXCP_BUTTON_VALUE       0x01080000 /* Play button and !hold */
+#define EXCP_PLLCR              0x10800000
 #else
 #define EXCP_BUTTON_GPIO_READ   GPIO1_READ
 #define EXCP_BUTTON_MASK        0x00000022
