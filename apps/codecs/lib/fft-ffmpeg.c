@@ -54,6 +54,7 @@
 
 /* asm-optimised functions and/or macros */
 #include "fft-ffmpeg_arm.h"
+#include "fft-ffmpeg_cf.h"
 
 #ifndef ICODE_ATTR_TREMOR_MDCT
 #define ICODE_ATTR_TREMOR_MDCT ICODE_ATTR
