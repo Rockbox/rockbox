@@ -38,7 +38,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+
 #include "crypto.h"
+#include "elf.h"
 
 #if 1 /* ANSI colors */
 
@@ -117,7 +119,7 @@ struct sb_instruction_call_t
     uint32_t arg;
 } __attribute__((packed));
 
-static void *xmalloc(size_t s) /* malloc helper */
+void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
 	void * r = malloc(s);
 	if(!r) bugp("malloc");
@@ -259,9 +261,31 @@ static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
     return sum;
 }
 
+static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
+{
+    FILE *f = user;
+    fseek(f, addr, SEEK_SET);
+    fwrite(buf, count, 1, f);
+}
+
+static void extract_elf_section(struct elf_params_t *elf, int count, const char *prefix)
+{
+    char *filename = xmalloc(strlen(prefix) + 32);
+    sprintf(filename, "%s.%d.elf", prefix, count);
+    printf("write %s\n", filename);
+    
+    FILE *fd = fopen(filename, "wb");
+    free(filename);
+    
+    if(fd == NULL)
+        return ;
+    elf_output(elf, elf_write, fd);
+    fclose(fd);
+}
+
 static void extract_section(int data_sec, char name[5], byte *buf, int size, const char *indent)
 {
-    char filename[PREFIX_SIZE + 16];
+    char filename[PREFIX_SIZE + 32];
     snprintf(filename, sizeof filename, "%s%s.bin", out_prefix, name);
     FILE *fd = fopen(filename, "wb");
     if (fd != NULL) {
@@ -270,6 +294,13 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
     }
     if(data_sec)
         return;
+
+    snprintf(filename, sizeof filename, "%s%s", out_prefix, name);
+
+    /* elf construction */
+    struct elf_params_t elf;
+    elf_init(&elf);
+    int elf_count = 0;
     /* Pretty print the content */
     int pos = 0;
     while(pos < size)
@@ -306,6 +337,10 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             else
                 printf("  Failed (crc=0x%08x)\n", computed_crc);
 
+            /* elf construction */
+            elf_add_load_section(&elf, load->addr, load->len,
+                &buf[pos + sizeof(struct sb_instruction_load_t)]);
+
             pos += load->len + sizeof(struct sb_instruction_load_t);
             // unsure about rounding
             pos = ROUND_UP(pos, 16);
@@ -325,6 +360,9 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             color(YELLOW);
             printf("pattern=0x%08x\n", fill->pattern);
             color(OFF);
+
+            /* elf construction */
+            elf_add_fill_section(&elf, fill->addr, fill->len, fill->pattern);
 
             pos += sizeof(struct sb_instruction_fill_t);
             // fixme: useless as pos is a multiple of 16 and fill struct is 4-bytes wide ?
@@ -348,6 +386,12 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             printf("arg=0x%08x\n", call->arg);
             color(OFF);
 
+            /* elf construction */
+            elf_set_start_addr(&elf, call->addr);
+            extract_elf_section(&elf, elf_count++, filename);
+            elf_release(&elf);
+            elf_init(&elf);
+
             pos += sizeof(struct sb_instruction_call_t);
             // fixme: useless as pos is a multiple of 16 and call struct is 4-bytes wide ?
             pos = ROUND_UP(pos, 16);
@@ -359,6 +403,10 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             break;
         }
     }
+
+    if(elf_is_empty(&elf))
+        extract_elf_section(&elf, elf_count++, filename);
+    elf_release(&elf);
 }
 
 static void extract(unsigned long filesize)
