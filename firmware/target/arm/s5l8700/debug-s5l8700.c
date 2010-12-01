@@ -56,7 +56,7 @@ bool __dbg_hw_info(void)
     for(i=0;i<4;i++)
     {
         nand_devicetype[i] = nand_get_device_type(i);
-	if(nand_devicetype[i] != NULL) nand_bank_count++;
+        if(nand_devicetype[i] != NULL) nand_bank_count++;
     }
 #endif
 

@@ -70,7 +70,7 @@ synth_full_odd_sbsample:
     ldmia   r1!, {r11, r12, sp, lr}
     smlal   r6, r7, r11, r10
 
-    ldr     r10, [r4, #88]	/*;;1 cycle stall on arm9, but we free up r11*/
+    ldr     r10, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r11*/
     smlal   r8, r9, r11, r10
     
     ldr     r10, [r3, #28]
@@ -88,13 +88,13 @@ synth_full_odd_sbsample:
     
     rsbs    r6, r6, #0
     rsc     r7, r7, #0
-	
-	/* ;; PROD_A and even half of SB_SAMPLE*/
+    
+    /* ;; PROD_A and even half of SB_SAMPLE*/
     ldr     r10, [r3, #0]
     ldmia   r2!, {r11, r12, sp, lr}
     smlal   r6, r7, r11, r10
     
-    ldr     r10, [r4, #60]	/*;;1 cycle stall on arm9, but we free up r11*/
+    ldr     r10, [r4, #60]  /*;;1 cycle stall on arm9, but we free up r11*/
     smlal   r8, r9, r11, r10    
     ldr     r11, [r3, #56]
     ldr     r10, [r3, #48]
@@ -113,7 +113,7 @@ synth_full_odd_sbsample:
     ldmia   r2!, {r11, r12, sp, lr}
     smlal   r6, r7, r11, r10
 
-    ldr     r10, [r4, #92]	/*;;1 cycle stall on arm9, but we free up r11*/
+    ldr     r10, [r4, #92]  /*;;1 cycle stall on arm9, but we free up r11*/
     smlal   r8, r9, r11, r10
     
     ldr     r10, [r3, #24]
@@ -173,12 +173,12 @@ synth_full_even_sbsample:
     ldr     r10, [r4, #84]
     smlal   r8, r9, r12, sp
     smlal   r8, r9, lr, r10
-	
+    
     ldr     r10, [r3, #32]
     ldmia   r1!, {r11, r12, sp, lr}
 
     smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #92]	
+    ldr     r10, [r4, #92]  
     smlal   r8, r9, r11, r10
     ldr     r10, [r3, #24]
     ldr     r11, [r3, #16]
@@ -199,7 +199,7 @@ synth_full_even_sbsample:
     ldr     r10, [r3, #4]
     ldmia   r2!, {r11, r12, sp, lr}
     smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #120]	/*;;1 cycle stall on arm9, but we free up r11*/
+    ldr     r10, [r4, #120] /*;;1 cycle stall on arm9, but we free up r11*/
     smlal   r8, r9, r11, r10
     ldr     r10, [r3, #60]
     ldr     r11, [r3, #52]
@@ -219,7 +219,7 @@ synth_full_even_sbsample:
     ldr     r10, [r3, #36]
     ldmia   r2!, {r11, r12, sp, lr}
     smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #88]	/*;;1 cycle stall on arm9, but we free up r11*/    
+    ldr     r10, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r11*/    
     smlal   r8, r9, r11, r10
     
     ldr     r10, [r3, #28]
