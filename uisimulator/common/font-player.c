@@ -539,7 +539,7 @@ static unsigned char font_player_oldlcd[256][7] = {
 
 unsigned char (*font_player)[256][7] = &font_player_newlcd;
 
-void font_init()
+void font_init(void)
 {
     if (is_new_player())
         font_player = &font_player_newlcd;

@@ -17,7 +17,11 @@
  *
  ****************************************************************************/
 
+#ifndef __FONT_PLAYER_H__
+#define __FONT_PLAYER_H__
+
 extern unsigned char (*font_player)[256][7];
 
-void font_init();
+void font_init(void);
 
+#endif /* __FONT_PLAYER_H__ */
