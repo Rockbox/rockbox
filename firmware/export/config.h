@@ -496,7 +496,8 @@ Lyre prototype 1 */
 #define ARM_ARCH 6 /* ARMv6 */
 
 #elif defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
-  || (CONFIG_CPU == AT91SAM9260) || (CONFIG_CPU == AS3525v2)
+  || (CONFIG_CPU == AT91SAM9260) || (CONFIG_CPU == AS3525v2) \
+  || (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 
