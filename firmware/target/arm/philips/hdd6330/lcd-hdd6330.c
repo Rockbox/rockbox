@@ -30,14 +30,7 @@ static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
-    int i = 0;
-    while (LCD2_PORT & LCD2_BUSY_MASK)
-    {
-        if (i < 2000)
-            i++;
-        else
-            LCD2_PORT &= ~LCD2_BUSY_MASK;
-    }
+    while (LCD2_PORT & LCD2_BUSY_MASK);
 }
 
 /* send LCD data */
@@ -48,17 +41,11 @@ static void lcd_send_data(unsigned data)
 }
 
 /* send LCD command */
-static void lcd_send_cmd(unsigned cmd)
+static void lcd_send_reg(unsigned reg)
 {
     lcd_wait_write();
-    LCD2_PORT = LCD2_CMD_MASK | (cmd & 0xff);
+    LCD2_PORT = LCD2_CMD_MASK | (reg & 0xff);
     lcd_wait_write();
-}
-
-static inline void lcd_send_pixel(unsigned pixel)
-{
-    lcd_send_data(pixel >> 8);
-    lcd_send_data(pixel);
 }
 
 void lcd_init_device(void)
@@ -118,42 +105,83 @@ void lcd_update(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    const fb_data *addr;
-    
+    unsigned long *addr;
+    int new_x, new_width;
+
+    /* Ensure x and width are both even - so we can read 32-bit aligned 
+       data from lcd_framebuffer */
+    new_x = x&~1;
+    new_width = width&~1;
+    if (new_x+new_width < x+width) new_width += 2;
+    x = new_x;
+    width = new_width;
+
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
-    addr = &lcd_framebuffer[y][x];
-
-    lcd_send_cmd(0x01);
+    lcd_send_reg(0x01);
     lcd_send_data(0x48);
 
-    lcd_send_cmd(0x05);
+    lcd_send_reg(0x05);
     lcd_send_data(0x0f);
 
-    lcd_send_cmd(0x08);
+    lcd_send_reg(0x08);
     lcd_send_data(y);
 
-    lcd_send_cmd(0x09);
+    lcd_send_reg(0x09);
     lcd_send_data(y + height - 1);
 
-    lcd_send_cmd(0x0a);
+    lcd_send_reg(0x0a);
     lcd_send_data(x + 16);
 
-    lcd_send_cmd(0x0b);
+    lcd_send_reg(0x0b);
     lcd_send_data(x + width - 1 + 16);
 
-    lcd_send_cmd(0x06);
-    do {
-        int w = width;
-        do {
-            lcd_send_pixel(*addr++);
-        } while (--w > 0);
-        addr += LCD_WIDTH - width;
-    } while (--height > 0);
+    lcd_send_reg(0x06);
+
+    addr = (unsigned long*)&lcd_framebuffer[y][x];
+
+    while (height > 0) 
+    {
+        int c, r;
+        int h, pixels_to_write;
+
+        pixels_to_write = (width * height) * 2;
+        h = height;
+
+        /* calculate how much we can do in one go */
+        if (pixels_to_write > 0x10000) 
+        {
+            h = (0x10000/2) / width;
+            pixels_to_write = (width * h) * 2;
+        }
+
+        LCD2_BLOCK_CTRL = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL = 0x34000000;
+
+        /* for each row */
+        for (r = 0; r < h; r++) 
+        {
+            /* for each column */
+            for (c = 0; c < width; c += 2) 
+            {
+                while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
+
+                /* output 2 pixels */
+                LCD2_BLOCK_DATA = *addr++;
+            }
+            addr += (LCD_WIDTH - width)/2;
+        }
+
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
+
+        height -= h;
+    }
 }
