@@ -1,7 +1,22 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ctype.h>
+
+static inline bool my_isspace(char c)
+{
+    return (c == ' ') || (c == '\t') || (c == '\n');
+}
+
+static inline bool my_isdigit(char c)
+{
+    return (c >= '0') && (c <= '9');
+}
+
+static inline bool my_isxdigit(char c)
+{
+    return ((c >= '0') && (c <= '9'))
+        || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'));
+}
 
 static int parse_dec(int (*peek)(void *userp),
                      void (*pop)(void *userp),
@@ -21,7 +36,7 @@ static int parse_dec(int (*peek)(void *userp),
     }
 
     ch = (*peek)(userp);
-    if (!isdigit(ch))
+    if (!my_isdigit(ch))
         return -1;
 
     do
@@ -30,7 +45,7 @@ static int parse_dec(int (*peek)(void *userp),
         (*pop)(userp);
         n++;
         ch = (*peek)(userp);
-    } while (isdigit(ch));
+    } while (my_isdigit(ch));
 
     *vp = minus ? -v : v;
     return n;
@@ -46,7 +61,7 @@ static int parse_chars(int (*peek)(void *userp),
 
     char *pt=vp;
 
-    while (!isspace((*peek)(userp)))
+    while (!my_isspace((*peek)(userp)))
     {
         if(fake==false)
             *(pt++) = (*peek)(userp);
@@ -71,7 +86,7 @@ static int parse_hex(int (*peek)(void *userp),
     char ch;
     
     ch = (*peek)(userp);
-    if (!isxdigit(ch))
+    if (!my_isxdigit(ch))
         return -1;
 
     do
@@ -86,7 +101,7 @@ static int parse_hex(int (*peek)(void *userp),
         (*pop)(userp);
         n++;
         ch = (*peek)(userp);
-    } while (isxdigit(ch));
+    } while (my_isxdigit(ch));
 
     *vp = v;
     return n;
@@ -97,7 +112,7 @@ static int skip_spaces(int (*peek)(void *userp),
                        void *userp)
 {
     int n = 0;
-    while (isspace((*peek)(userp))) {
+    while (my_isspace((*peek)(userp))) {
         n++;
         (*pop)(userp);
     }
