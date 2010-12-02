@@ -30,62 +30,42 @@
 #endif
 
 #define LOOP_REPEAT_DRAM 256
+static int loop_repeat_dram = LOOP_REPEAT_DRAM;
 static volatile int buf_dram[BUF_SIZE]           MEM_ALIGN_ATTR;
 
 #if defined(PLUGIN_USE_IRAM)
-#define LOOP_REPEAT_IRAM 1024
+#define LOOP_REPEAT_IRAM 256
+static int loop_repeat_iram = LOOP_REPEAT_DRAM;
 static volatile int buf_iram[BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 #endif
 
 /* (Byte per loop * loops)>>20 * ticks per s * 10 / ticks = dMB per s */
-#define dMB_PER_SEC(cnt, delta) ((((BUF_SIZE*sizeof(int)*cnt)>>20)*HZ*10)/delta)
+#define dMB_PER_SEC(buf_size, cnt, delta) ((((buf_size*sizeof(int)*cnt)>>20)*HZ*10)/delta)
 
-void memset_test(volatile int *buf, int buf_size, int loop_cnt,
-                 int line, char *ramtype)
+static void memset_test(volatile int *buf, int buf_size, int loop_cnt)
 {
-    int delta, dMB, i;
-    int last_tick = *rb->current_tick;
-
-    for(i=0; i < loop_cnt; i++)
+    size_t buf_bytes = buf_size*sizeof(buf[0]);
+    for(int i = 0; i < loop_cnt; i++)
     {
-        memset((void *)buf, 0xff, buf_size*sizeof(int));
+        memset((void*)buf, 0xff, buf_bytes);
     }
-
-    delta = *rb->current_tick - last_tick;
-    delta = delta>0 ? delta : delta+1;
-    dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s st: %3d.%d MB/s (%3d ticks for %d MB)", 
-                          ramtype, dMB/10, dMB%10, delta,
-                          (loop_cnt*BUF_SIZE*4)>>20);
 }
 
-void memcpy_test(volatile int *buf, int buf_size, int loop_cnt,
-                 int line, char *ramtype)
+static void memcpy_test(volatile int *buf, int buf_size, int loop_cnt)
 {
-    int delta, dMB, i;
-    int last_tick = *rb->current_tick;
+    /* half-size memcpy since memory regions must not overlap */
+    void* half_buf = (void*)(&buf[buf_size/2]);
+    size_t half_buf_bytes = buf_size * sizeof(buf[0]) / 2;
 
     /* double loop count to compensate for half size memcpy */
-    for(i=0; i < loop_cnt*2; i++)
+    for(int i = 0; i < loop_cnt*2; i++)
     {
-        memcpy((void *)buf+(buf_size*sizeof(int)/2), 
-               (void *)buf, buf_size*sizeof(int)/2);
+        memcpy((void*)&buf[0], half_buf, half_buf_bytes);
     }
-
-    delta = *rb->current_tick - last_tick;
-    delta = delta>0 ? delta : delta+1;
-    dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s cp: %3d.%d MB/s (%3d ticks for %d MB)", 
-                          ramtype, dMB/10, dMB%10, delta,
-                          (loop_cnt*BUF_SIZE*4)>>21);
 }
 
-void write_test(volatile int *buf, int buf_size, int loop_cnt, 
-                int line, char *ramtype)
+static void write_test(volatile int *buf, int buf_size, int loop_cnt)
 {
-    int delta, dMB;
-    int last_tick = *rb->current_tick;
-    
 #if defined(CPU_ARM)
     asm volatile (
             "mov r0, #0           \n"
@@ -108,10 +88,9 @@ void write_test(volatile int *buf, int buf_size, int loop_cnt,
             : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory", "cc"
         );
 #else
-    int i, j;
-    for(i = 0; i < loop_cnt; i++)
+    for(int i = 0; i < loop_cnt; i++)
     {
-        for (j = 0; j < buf_size; j+=4)
+        for(int j = 0; j < buf_size; j+=4)
         {
             buf[j  ] = j;
             buf[j+1] = j+1;
@@ -120,20 +99,10 @@ void write_test(volatile int *buf, int buf_size, int loop_cnt,
         }
     }
 #endif
-    delta = *rb->current_tick - last_tick;
-    delta = delta>0 ? delta : delta+1;
-    dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s wr: %3d.%d MB/s (%3d ticks for %d MB)", 
-                          ramtype, dMB/10, dMB%10, delta,
-                          (loop_cnt*BUF_SIZE*4)>>20);
 }
 
-void read_test(volatile int *buf, int buf_size, int loop_cnt, 
-               int line, char *ramtype)
+static void read_test(volatile int *buf, int buf_size, int loop_cnt)
 {
-    int delta, dMB;
-    int last_tick = *rb->current_tick;
-    
 #if defined(CPU_ARM)
     asm volatile (
             "mov r6, %[loops]      \n"
@@ -142,8 +111,8 @@ void read_test(volatile int *buf, int buf_size, int loop_cnt,
             "mov r5, %[size]       \n"
         ".inner_loop_write:        \n"
             "ldmia r4!, {r0-r3}    \n"
-            "ldmia r4!, {r0-r3}    \n"
             "subs r5, r5, #8       \n"
+            "ldmia r4!, {r0-r3}    \n"
             "bgt .inner_loop_write \n"
             "subs r6, r6, #1       \n"
             "bgt .outer_loop_write \n"
@@ -152,10 +121,10 @@ void read_test(volatile int *buf, int buf_size, int loop_cnt,
             : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory", "cc"
         );
 #else
-    int i, j, x;
-    for(i = 0; i < loop_cnt; i++)
+    int x;
+    for(int i = 0; i < loop_cnt; i++)
     {
-        for(j = 0; j < buf_size; j+=4)
+        for(int j = 0; j < buf_size; j+=4)
         {
             x = buf[j  ];
             x = buf[j+2];
@@ -164,14 +133,56 @@ void read_test(volatile int *buf, int buf_size, int loop_cnt,
         }
     }
 #endif
-    delta = *rb->current_tick - last_tick;
-    delta = delta>0 ? delta : delta+1;
-    dMB   = dMB_PER_SEC(loop_cnt, delta);
-    rb->screens[0]->putsf(0, line, "%s rd: %3d.%d MB/s (%3d ticks for %d MB)", 
-                          ramtype, dMB/10, dMB%10, delta, 
-                          (loop_cnt*BUF_SIZE*4)>>20);
 }
 
+enum test_type {
+    READ,
+    WRITE,
+    MEMSET,
+    MEMCPY,
+};
+
+static const char tests[][3] = {
+    [READ] = "rd",
+    [WRITE] = "wr",
+    [MEMSET] = "ms",
+    [MEMCPY] = "mc",
+};
+
+static int line;
+#define TEST_MEM_PRINTF(...) rb->screens[0]->putsf(0, line++, __VA_ARGS__)
+
+static int test(volatile int *buf, int buf_size, int loop_cnt,
+            char *ramtype, enum test_type type)
+{    
+    int delta, dMB;
+    int last_tick = *rb->current_tick;
+    int ret = 0;
+
+    switch(type)
+    {
+        case READ:     read_test(buf, buf_size, loop_cnt); break;
+        case WRITE:   write_test(buf, buf_size, loop_cnt); break;
+        case MEMSET: memset_test(buf, buf_size, loop_cnt); break;
+        case MEMCPY: memcpy_test(buf, buf_size, loop_cnt); break;
+    }
+    
+    delta = *rb->current_tick - last_tick;
+
+    if (delta <= 10)
+    {
+        TEST_MEM_PRINTF("DELTA TOO LOW, RESULT INACCURATE");
+        ret = 1;
+    }
+
+    delta = delta>0 ? delta : delta+1;
+    dMB   = dMB_PER_SEC(buf_size, loop_cnt, delta);
+    TEST_MEM_PRINTF("%s %s: %3d.%d MB/s (%3d ticks for %d MB)", 
+                          ramtype, tests[type], dMB/10, dMB%10, delta, 
+                          (loop_cnt*buf_size*sizeof(buf[0]))>>20);
+
+    return ret;
+}
 
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -185,29 +196,33 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     
     rb->screens[0]->clear_display();
-    rb->screens[0]->putsf(0, 0, "patience, may take some seconds...");
+    TEST_MEM_PRINTF("patience, may take some seconds...");
     rb->screens[0]->update();
 
     while (!done)
     {
-        int line = 0;
-
+        line = 0;
+        int ret;
         rb->screens[0]->clear_display();
-        rb->screens[0]->putsf(0, line++, "%s", boost?"boosted":"unboosted");
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        rb->screens[0]->putsf(0, line++, "clock: %d Hz", *rb->cpu_frequency);
+        TEST_MEM_PRINTF("%s", boost?"boosted":"unboosted");
+        TEST_MEM_PRINTF("clock: %d Hz", *rb->cpu_frequency);
 #endif
-        rb->screens[0]->putsf(0, line++, "loop#: %d", ++count);
+        TEST_MEM_PRINTF("loop#: %d", ++count);
 
-        read_test  (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
-        write_test (buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
-        memset_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
-        memcpy_test(buf_dram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "DRAM");
+        ret = 0;
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", READ);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", WRITE);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", MEMSET);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", MEMCPY);
+        if (ret != 0) loop_repeat_dram += LOOP_REPEAT_DRAM;
 #if defined(PLUGIN_USE_IRAM)
-        read_test  (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
-        write_test (buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
-        memset_test(buf_iram, BUF_SIZE, LOOP_REPEAT_IRAM, line++, "IRAM");
-        memcpy_test(buf_iram, BUF_SIZE, LOOP_REPEAT_DRAM, line++, "IRAM");
+        ret = 0;
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", READ);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", WRITE);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", MEMSET);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", MEMCPY);
+        if (ret != 0) loop_repeat_iram += LOOP_REPEAT_IRAM;
 #endif
 
         rb->screens[0]->update();
