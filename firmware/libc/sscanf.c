@@ -1,22 +1,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
-
-static inline bool isspace(char c)
-{
-    return (c == ' ') || (c == '\t') || (c == '\n');
-}
-
-static inline bool isdigit(char c)
-{
-    return (c >= '0') && (c <= '9');
-}
-
-static inline bool isxdigit(char c)
-{
-    return ((c >= '0') && (c <= '9'))
-        || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'));
-}
+#include <ctype.h>
 
 static int parse_dec(int (*peek)(void *userp),
                      void (*pop)(void *userp),

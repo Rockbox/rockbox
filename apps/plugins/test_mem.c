@@ -188,7 +188,9 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
     bool done = false;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     bool boost = false;
+#endif
     int count = 0;
 
 #ifdef HAVE_LCD_BITMAP
@@ -204,7 +206,7 @@ enum plugin_status plugin_start(const void* parameter)
         line = 0;
         int ret;
         rb->screens[0]->clear_display();
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         TEST_MEM_PRINTF("%s", boost?"boosted":"unboosted");
         TEST_MEM_PRINTF("clock: %d Hz", *rb->cpu_frequency);
 #endif

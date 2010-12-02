@@ -434,7 +434,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
     /* align start and length to 32 bit */
-    align = (-(int)audiobuf) & 3;
+    align = (-(intptr_t)audiobuf) & 3;
     audiobuf += align;
     audiobuflen = (audiobuflen - align) & ~3;
 

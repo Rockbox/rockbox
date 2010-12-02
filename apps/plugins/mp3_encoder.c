@@ -903,7 +903,7 @@ int read_samples(uint32_t *buffer, int num_samples)
   return samples;
 }
 
-inline uint32_t myswap32(uint32_t val)
+static inline uint32_t myswap32(uint32_t val)
 {
   const uint8_t* v = (const uint8_t*)&val;
 

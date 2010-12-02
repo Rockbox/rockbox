@@ -202,7 +202,8 @@ simcc () {
 
  app_type=$1
  winbuild=""
- GCCOPTS='-W -Wall -g -fno-builtin'
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef// -e s/-O//`
+ GCCOPTS="$GCCOPTS -fno-builtin -g"
  GCCOPTIMIZE=''
  LDOPTS='-lm' # button-sdl.c uses sqrt()
 
