@@ -142,18 +142,18 @@ enum test_type {
     MEMCPY,
 };
 
-static const char tests[][3] = {
-    [READ] = "rd",
-    [WRITE] = "wr",
-    [MEMSET] = "ms",
-    [MEMCPY] = "mc",
+static const char tests[][7] = {
+    [READ] = "read  ",
+    [WRITE] = "write ",
+    [MEMSET] = "memset",
+    [MEMCPY] = "memcpy",
 };
 
 static int line;
 #define TEST_MEM_PRINTF(...) rb->screens[0]->putsf(0, line++, __VA_ARGS__)
 
 static int test(volatile int *buf, int buf_size, int loop_cnt,
-            char *ramtype, enum test_type type)
+                enum test_type type)
 {    
     int delta, dMB;
     int last_tick = *rb->current_tick;
@@ -171,15 +171,16 @@ static int test(volatile int *buf, int buf_size, int loop_cnt,
 
     if (delta <= 10)
     {
-        TEST_MEM_PRINTF("DELTA TOO LOW, RESULT INACCURATE");
+        /* The loop_cnt will be increased for the next measurement set until 
+         * each measurement at least takes 10 ticks. This is to ensure a
+         * minimum accuracy. */
         ret = 1;
     }
 
     delta = delta>0 ? delta : delta+1;
     dMB   = dMB_PER_SEC(buf_size, loop_cnt, delta);
-    TEST_MEM_PRINTF("%s %s: %3d.%d MB/s (%3d ticks for %d MB)", 
-                          ramtype, tests[type], dMB/10, dMB%10, delta, 
-                          (loop_cnt*buf_size*sizeof(buf[0]))>>20);
+    TEST_MEM_PRINTF("%s: %3d.%d MB/s (%3d ms)", 
+        tests[type], dMB/10, dMB%10, delta*10);
 
     return ret;
 }
@@ -212,19 +213,23 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
         TEST_MEM_PRINTF("loop#: %d", ++count);
 
+        TEST_MEM_PRINTF("DRAM cnt: %d size: %d MB", loop_repeat_dram, 
+            (loop_repeat_dram*BUF_SIZE*sizeof(buf_dram[0]))>>20);
         ret = 0;
-        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", READ);
-        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", WRITE);
-        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", MEMSET);
-        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, "DRAM", MEMCPY);
-        if (ret != 0) loop_repeat_dram += LOOP_REPEAT_DRAM;
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, READ);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, WRITE);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, MEMSET);
+        ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, MEMCPY);
+        if (ret != 0) loop_repeat_dram *= 2;
 #if defined(PLUGIN_USE_IRAM)
+        TEST_MEM_PRINTF("IRAM cnt: %d size: %d MB", loop_repeat_iram, 
+            (loop_repeat_iram*BUF_SIZE*sizeof(buf_iram[0]))>>20);
         ret = 0;
-        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", READ);
-        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", WRITE);
-        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", MEMSET);
-        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, "IRAM", MEMCPY);
-        if (ret != 0) loop_repeat_iram += LOOP_REPEAT_IRAM;
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, READ);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, WRITE);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, MEMSET);
+        ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, MEMCPY);
+        if (ret != 0) loop_repeat_iram *= 2;
 #endif
 
         rb->screens[0]->update();
