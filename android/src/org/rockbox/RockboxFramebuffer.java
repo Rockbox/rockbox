@@ -28,6 +28,7 @@ import org.rockbox.Helper.MediaButtonReceiver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,6 +39,7 @@ import android.view.ViewConfiguration;
 public class RockboxFramebuffer extends View
 {
     private Bitmap btm;
+    private Rect rect;
     private ByteBuffer native_buf;
     private MediaButtonReceiver media_monitor;
     private final DisplayMetrics metrics;
@@ -52,6 +54,7 @@ public class RockboxFramebuffer extends View
         setFocusableInTouchMode(true);
         setClickable(true);
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
+        rect = new Rect();
         native_buf = native_fb;
         media_monitor = new MediaButtonReceiver(c);
         media_monitor.register();
@@ -64,22 +67,11 @@ public class RockboxFramebuffer extends View
 
     public void onDraw(Canvas c) 
     {
-        c.drawBitmap(btm, 0.0f, 0.0f, null);
-    }
-
-    @SuppressWarnings("unused")
-    private void java_lcd_update()
-    {
+        /* can't copy a partial buffer :( */
         btm.copyPixelsFromBuffer(native_buf);
-        postInvalidate();
-    }
-    
-    @SuppressWarnings("unused")
-    private void java_lcd_update_rect(int x, int y, int w, int h)
-    {
-        /* can't copy a partial buffer */
-        btm.copyPixelsFromBuffer(native_buf);
-        postInvalidate(x, y, x+w, y+h);
+        c.getClipBounds(rect);
+        c.drawBitmap(btm, rect, rect, null);
+        post_update_done();
     }
 
     @SuppressWarnings("unused")
@@ -152,6 +144,7 @@ public class RockboxFramebuffer extends View
         return view_config.getScaledTouchSlop();
     }
 
+    private native void post_update_done();
     private native void set_lcd_active(int active);
     private native void touchHandler(boolean down, int x, int y);
     private native boolean buttonHandler(int keycode, boolean state);
