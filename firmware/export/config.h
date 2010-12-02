@@ -441,6 +441,10 @@ Lyre prototype 1 */
 /* no known platform */
 #endif
 
+#ifndef CONFIG_PLATFORM
+#define CONFIG_PLATFORM PLATFORM_NATIVE
+#endif
+
 /* keep this include after the target configs */
 #ifdef SIMULATOR
 #include "config/sim.h"
@@ -516,10 +520,6 @@ Lyre prototype 1 */
 
 #if !defined(CONFIG_BACKLIGHT_FADING)
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
-#endif
-
-#ifndef CONFIG_PLATFORM
-#define CONFIG_PLATFORM PLATFORM_NATIVE
 #endif
 
 #ifndef CONFIG_TUNER
