@@ -441,13 +441,13 @@ Lyre prototype 1 */
 /* no known platform */
 #endif
 
-#ifndef CONFIG_PLATFORM
-#define CONFIG_PLATFORM PLATFORM_NATIVE
-#endif
-
 /* keep this include after the target configs */
 #ifdef SIMULATOR
 #include "config/sim.h"
+#endif
+
+#ifndef CONFIG_PLATFORM
+#define CONFIG_PLATFORM PLATFORM_NATIVE
 #endif
 
 /* setup basic macros from capability masks */
