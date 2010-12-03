@@ -404,7 +404,7 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
         }
     }
 
-    if(elf_is_empty(&elf))
+    if(!elf_is_empty(&elf))
         extract_elf_section(&elf, elf_count++, filename);
     elf_release(&elf);
 }
