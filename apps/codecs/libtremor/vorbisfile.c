@@ -717,13 +717,13 @@ STATICIRAM_NOT_MDCT int _fetch_and_process_packet(OggVorbis_File *vf,
         if(result>0){
           /* got a packet.  process it */
           granulepos=op.granulepos;
-          if(!vorbis_synthesis(&vf->vb,&op,1)){ /* lazy check for lazy
-                                                      header handling.  The
-                                                      header packets aren't
-                                                      audio, so if/when we
-                                                      submit them,
-                                                      vorbis_synthesis will
-                                                      reject them */
+          if(!vorbis_synthesis(&vf->vb,&op)){ /* lazy check for lazy
+                                                 header handling.  The
+                                                 header packets aren't
+                                                 audio, so if/when we
+                                                 submit them,
+                                                 vorbis_synthesis will
+                                                 reject them */
 
             /* suck in the synthesis data and track bitrate */
             {
@@ -1444,9 +1444,9 @@ int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos){
       
       /* remove the packet from packet queue and track its granulepos */
       ogg_stream_packetout(vf->os,NULL);
-      vorbis_synthesis(&vf->vb,&op,0);  /* set up a vb with
-                                           only tracking, no
-                                           pcm_decode */
+      vorbis_synthesis_trackonly(&vf->vb,&op);  /* set up a vb with
+                                                   only tracking, no
+                                                   pcm_decode */
       vorbis_synthesis_blockin(&vf->vd,&vf->vb); 
       
       /* end of logical stream case is hard, especially with exact
