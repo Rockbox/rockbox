@@ -647,7 +647,16 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             if(status==0) {
                 if(cur_cmd.count==0) {
                     //logf("data sent, now send csw");
-                    send_csw(UMS_STATUS_GOOD);
+                    if(cur_cmd.last_result!=0) {
+                        /* The last read failed. */
+                        send_csw(UMS_STATUS_FAIL);
+                        cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
+                        cur_sense_data.asc=ASC_READ_ERROR;
+                        cur_sense_data.ascq=0;
+                        return;
+                    }
+                    else
+                        send_csw(UMS_STATUS_GOOD);
                 }
                 else {
                     send_and_read_next();
@@ -716,14 +725,6 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
 
 static void send_and_read_next(void)
 {
-    if(cur_cmd.last_result!=0) {
-        /* The last read failed. */
-        send_csw(UMS_STATUS_FAIL);
-        cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
-        cur_sense_data.asc=ASC_READ_ERROR;
-        cur_sense_data.ascq=0;
-        return;
-    }
     send_block_data(cur_cmd.data[cur_cmd.data_select],
                     MIN(READ_BUFFER_SIZE,cur_cmd.count*SECTOR_SIZE));
 
@@ -741,10 +742,13 @@ static void send_and_read_next(void)
                 ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-        cur_cmd.last_result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
+        int result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
                 cur_cmd.sector,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                 cur_cmd.data[cur_cmd.data_select]);
+        if(cur_cmd.last_result == 0)
+            cur_cmd.last_result = result;
+
 #endif
     }
 }
