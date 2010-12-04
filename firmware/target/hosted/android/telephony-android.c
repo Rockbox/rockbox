@@ -24,7 +24,7 @@
 #include "kernel.h"
 
 extern JNIEnv *env_ptr;
-extern RockboxService_instance;
+extern jobject RockboxService_instance;
 
 
 void telephony_init_device(void)
