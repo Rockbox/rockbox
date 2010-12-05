@@ -735,6 +735,7 @@ target/arm/philips/fmradio_i2c-hdd.c
 target/arm/philips/hdd6330/backlight-hdd6330.c
 target/arm/philips/hdd6330/button-hdd6330.c
 target/arm/philips/hdd6330/lcd-hdd6330.c
+target/arm/philips/hdd6330/lcd-as-hdd6330.S
 target/arm/philips/hdd6330/powermgmt-hdd6330.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */

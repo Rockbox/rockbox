@@ -80,21 +80,102 @@ void lcd_yuv_set_options(unsigned options)
     lcd_yuv_options = options;
 }
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+/*   YUV- > RGB565 conversion
+ *   |R|   |1.000000 -0.000001  1.402000| |Y'|
+ *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
+ *   |B|   |1.000000  1.772000  0.000000| |Pr|
+ *   Scaled, normalized, rounded and tweaked to yield RGB 565:
+ *   |R|   |74   0 101| |Y' -  16| >> 9
+ *   |G| = |74 -24 -51| |Cb - 128| >> 8
+ *   |B|   |74 128   0| |Cr - 128| >> 9
+*/
+
+extern void lcd_yuv_write_inner_loop(unsigned char const * const ysrc,
+                                     unsigned char const * const usrc,
+                                     unsigned char const * const vsrc,
+                                     int width);
+
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    int h;
+
+    width = (width + 1) & ~1;
+
+    lcd_send_reg(0x01);
+    lcd_send_data(0x48);
+
+    lcd_send_reg(0x05);
+    lcd_send_data(0x0f);
+
+    lcd_send_reg(0x08);
+    lcd_send_data(y);
+
+    lcd_send_reg(0x09);
+    lcd_send_data(y + height - 1);
+
+    lcd_send_reg(0x0a);
+    lcd_send_data(x + 16);
+
+    lcd_send_reg(0x0b);
+    lcd_send_data(x + width - 1 + 16);
+
+    lcd_send_reg(0x06);
+
+    const int stride_div_csub_x = stride/CSUB_X;
+
+    h=0;
+    while (1)
+    {
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+
+        const int uvoffset = stride_div_csub_x * (src_y/CSUB_Y) +
+                             (src_x/CSUB_X);
+
+        const unsigned char *usrc = src[1] + uvoffset;
+        const unsigned char *vsrc = src[2] + uvoffset;
+
+        int pixels_to_write;
+
+        if (h==0)
+        {
+            while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+            LCD2_BLOCK_CONFIG = 0;
+
+            if (height == 0) break;
+
+            pixels_to_write = (width * height) * 2;
+            h = height;
+
+            /* calculate how much we can do in one go */
+            if (pixels_to_write > 0x10000)
+            {
+                h = (0x10000/2) / width;
+                pixels_to_write = (width * h) * 2;
+            }
+
+            height -= h;
+            LCD2_BLOCK_CTRL = 0x10000080;
+            LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+            LCD2_BLOCK_CTRL = 0x34000000;
+        }
+
+        lcd_yuv_write_inner_loop(ysrc,usrc,vsrc,width);
+
+        src_y++;
+        h--;
+    }
+
+    while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+    LCD2_BLOCK_CONFIG = 0;
 }
- 
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
@@ -146,7 +227,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     addr = (unsigned long*)&lcd_framebuffer[y][x];
 
-    while (height > 0) 
+    while (height > 0)
     {
         int c, r;
         int h, pixels_to_write;
