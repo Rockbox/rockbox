@@ -8,6 +8,7 @@ else
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 OUTPUT=sansapatcher.exe
 CROSS=
+CFLAGS+=-D__USE_MINGW_ANSI_STDIO=1
 else
 OUTPUT=sansapatcher
 CROSS=i586-mingw32msvc-
