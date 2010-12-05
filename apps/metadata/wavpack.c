@@ -84,19 +84,19 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
     /* check up to 16 headers before we give up finding one with audio */
 
     for (i = 0; i < 16; ++i) {
+        uint32_t meta_bytes = get_long_le(&buf [4]) - 24;
         uint32_t trial_totalsamples = get_long_le(&buf[12]);
         uint32_t blockindex = get_long_le(&buf[16]);
         uint32_t blocksamples = get_long_le(&buf[20]);
         uint32_t flags = get_long_le(&buf[24]);
 
-        if (totalsamples == (uint32_t) -1 && trial_totalsamples != (uint32_t) -1 && blockindex == 0)
+        if (totalsamples == (uint32_t) -1 && blockindex == 0)
             totalsamples = trial_totalsamples;
 
         if (blocksamples) {
             int srindx = ((buf [26] >> 7) & 1) + ((buf [27] << 1) & 14);
 
             if (srindx == 15) {
-                uint32_t meta_bytes = buf [4] + (buf [5] << 8) + (buf [6] << 16) - 24;
                 uint32_t meta_size;
 
                 id3->frequency = 44100;
@@ -134,7 +134,7 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
             /* if the total number of samples is still unknown, make a guess on the high side (for now) */
 
             if (totalsamples == (uint32_t) -1) {
-                totalsamples = filesize (fd) * 3;
+                totalsamples = id3->filesize * 3;
 
                 if (!(flags & HYBRID_FLAG))
                     totalsamples /= 2;
@@ -144,20 +144,14 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
             }
 
             id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
-            id3->bitrate = filesize (fd) / (id3->length / 8);
+            id3->bitrate = id3->filesize / (id3->length / 8);
 
             read_ape_tags(fd, id3);
             return true;
         }
         else {   /* block did not contain audio, so seek to the end and see if there's another */
-            uint32_t meta_bytes = buf [4] + (buf [5] << 8) + (buf [6] << 16) - 24;
-
             if ((meta_bytes > 0 && lseek(fd, meta_bytes, SEEK_CUR) < 0) ||
-                read(fd, buf, 32) < 32)
-                    break;
-
-            if (memcmp (buf, "wvpk", 4) != 0 || buf [9] != 4 ||
-                buf [8] < 2 || buf [8] > 0x10)
+                read(fd, buf, 32) < 32 || memcmp (buf, "wvpk", 4) != 0)
                     break;
         }
     }
