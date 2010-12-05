@@ -69,6 +69,8 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
             return NULL;
         }
 
+        wps->block_bytes_left = wps->wphdr.ckSize - 24;
+
         if ((wps->wphdr.flags & UNKNOWN_FLAGS) || wps->wphdr.version < MIN_STREAM_VERS ||
             wps->wphdr.version > MAX_STREAM_VERS) {
                 strcpy_loc (error, "invalid WavPack file!");
@@ -170,6 +172,8 @@ uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t sa
 
                 if (bcount == (uint32_t) -1)
                     break;
+
+                wps->block_bytes_left = wps->wphdr.ckSize - 24;
 
                 if (wps->wphdr.version < MIN_STREAM_VERS || wps->wphdr.version > MAX_STREAM_VERS) {
                     strcpy_loc (wpc->error_message, "invalid WavPack file!");

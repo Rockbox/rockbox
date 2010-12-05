@@ -205,6 +205,7 @@ typedef struct {
 
     int num_terms, mute_error;
     uint32_t sample_index, crc;
+    int32_t block_bytes_left;
 
     uchar int32_sent_bits, int32_zeros, int32_ones, int32_dups;
     uchar float_flags, float_shift, float_max_exp, float_norm_exp;
