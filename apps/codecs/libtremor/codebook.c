@@ -38,6 +38,8 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
   s->entries=oggpack_read(opb,24);
   if(s->entries==-1)goto _eofout;
 
+  if(_ilog(s->dim)+_ilog(s->entries)>24)goto _eofout;
+
   /* codeword ordering.... length ordered or unordered? */
   switch((int)oggpack_read(opb,1)){
   case 0:
