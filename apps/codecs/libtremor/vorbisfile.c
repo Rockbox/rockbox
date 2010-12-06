@@ -1423,7 +1423,7 @@ int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos){
   int thisblock,lastblock=0;
   int ret=ov_pcm_seek_page(vf,pos);
   if(ret<0)return(ret);
-  _make_decode_ready(vf);
+  if((ret=_make_decode_ready(vf)))return ret;
 
   /* discard leading packets we don't need for the lapping of the
      position we want; don't decode them */
