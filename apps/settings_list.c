@@ -1423,7 +1423,8 @@ const struct settings_list settings[] = {
                   "treble cutoff", SOUND_TREBLE_CUTOFF),
 #endif
 #ifdef HAVE_DIRCACHE
-    OFFON_SETTING(F_BANFROMQS,dircache,LANG_DIRCACHE_ENABLE,false,"dircache",NULL),
+    /*enable dircache for all targets > 2MB of RAM by default*/
+    OFFON_SETTING(F_BANFROMQS,dircache,LANG_DIRCACHE_ENABLE,true,"dircache",NULL),
     SYSTEM_SETTING(NVRAM(4),dircache_size,0),
 #endif
 
