@@ -34,13 +34,13 @@ struct dirinfo {
 #include "file.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_SDL)
-#define dirent_uncached sim_dirent
-#define DIR_UNCACHED SIM_DIR
-#define opendir_uncached sim_opendir
-#define readdir_uncached sim_readdir
-#define closedir_uncached sim_closedir
-#define mkdir_uncached sim_mkdir
-#define rmdir_uncached sim_rmdir
+#   define dirent_uncached sim_dirent
+#   define DIR_UNCACHED SIM_DIR
+#   define opendir_uncached sim_opendir
+#   define readdir_uncached sim_readdir
+#   define closedir_uncached sim_closedir
+#   define mkdir_uncached sim_mkdir
+#   define rmdir_uncached sim_rmdir
 #endif
 
 #ifndef DIRENT_DEFINED
@@ -54,6 +54,7 @@ struct dirent_uncached {
 
 #include "fat.h"
 
+#ifndef DIR_DEFINED
 typedef struct {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     bool busy;
@@ -69,6 +70,24 @@ typedef struct {
     char *name;
 #endif
 } DIR_UNCACHED;
+#endif
+
+
+#if defined(APPLICATION)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#include "dir-target.h"
+#endif
+# undef opendir_uncached
+# define opendir_uncached app_opendir
+# undef mkdir_uncached
+# define mkdir_uncached app_mkdir
+# undef rmdir_uncached
+# define rmdir_uncached app_rmdir
+/* defined in rbpaths.c */
+extern DIR_UNCACHED* app_opendir(const char* name);
+extern int app_rmdir(const char* name);
+extern int app_mkdir(const char* name);
+#endif
 
 #ifdef HAVE_HOTSWAP
 char *get_volume_name(int volume);

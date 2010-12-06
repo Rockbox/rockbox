@@ -29,6 +29,7 @@
 #include "dir-target.h"
 #include "file.h"
 #include "dir.h"
+#include "rbpaths.h"
 
 
 long filesize(int fd)

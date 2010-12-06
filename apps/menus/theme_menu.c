@@ -246,11 +246,9 @@ static struct browse_folder_info themes = {THEME_DIR, SHOW_CFG};
 
 int browse_folder(void *param)
 {
-    char path[MAX_PATH];
     const struct browse_folder_info *info =
         (const struct browse_folder_info*)param;
-    return rockbox_browse(get_user_file_path(info->dir, 0, path, sizeof(path)),
-                          info->show_options);
+    return rockbox_browse(info->dir, info->show_options);
 }
 
 #ifdef HAVE_LCD_BITMAP

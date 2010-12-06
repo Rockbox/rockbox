@@ -228,12 +228,9 @@ static void load_icons(const char* filename, enum Iconset iconset)
     if (filename[0] && filename[0] != '-')
     {
         char path[MAX_PATH];
-        char temp[MAX_PATH];
-        const char * fname;
         
-        snprintf(path, sizeof(path), "%s/%s.bmp", ICON_DIR, filename);
-        fname = get_user_file_path(path, IS_FILE, temp, sizeof(temp));
-        size_read = read_bmp_file(fname, bmp, IMG_BUFSIZE, bmpformat, NULL);
+        snprintf(path, sizeof(path), ICON_DIR "/%s.bmp", filename);
+        size_read = read_bmp_file(path, bmp, IMG_BUFSIZE, bmpformat, NULL);
         if (size_read > 0)
         {
             *loaded_ok = true;

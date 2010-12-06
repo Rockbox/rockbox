@@ -37,20 +37,38 @@
 #define MAX_OPEN_FILES 11
 
 #if !defined(PLUGIN) && !defined(CODEC)
-#if (CONFIG_PLATFORM & PLATFORM_SDL)
-#define open(x, ...) sim_open(x, __VA_ARGS__)
-#define creat(x,m) sim_creat(x,m)
-#define remove(x) sim_remove(x)
-#define rename(x,y) sim_rename(x,y)
-#define filesize(x) sim_filesize(x)
-#define fsync(x) sim_fsync(x)
-#define ftruncate(x,y) sim_ftruncate(x,y)
-#define lseek(x,y,z) sim_lseek(x,y,z)
-#define read(x,y,z) sim_read(x,y,z)
-#define write(x,y,z) sim_write(x,y,z)
-#define close(x) sim_close(x)
-extern int sim_creat(const char *pathname, mode_t mode);
-extern int sim_open(const char *pathname, int flags, ...);
+#if defined(APPLICATION)
+#   define open(x, ...)    app_open(x, __VA_ARGS__)
+#   define creat(x,m)      app_creat(x, m)
+#   define remove(x)       app_remove(x)
+#   define rename(x,y)     app_rename(x,y)
+extern int app_open(const char *name, int o, ...);
+extern int app_creat(const char *name, mode_t mode);
+extern int app_remove(const char* pathname);
+extern int app_rename(const char* path, const char* newname);
+#   if (CONFIG_PLATFORM & PLATFORM_SDL)
+#   define filesize(x) sim_filesize(x)
+#   define fsync(x) sim_fsync(x)
+#   define ftruncate(x,y) sim_ftruncate(x,y)
+#   define lseek(x,y,z) sim_lseek(x,y,z)
+#   define read(x,y,z) sim_read(x,y,z)
+#   define write(x,y,z) sim_write(x,y,z)
+#   define close(x) sim_close(x)
+#   endif
+#elif defined(SIMULATOR)
+#   define open(x, ...) sim_open(x, __VA_ARGS__)
+#   define creat(x,m) sim_creat(x,m)
+#   define remove(x) sim_remove(x)
+#   define rename(x,y) sim_rename(x,y)
+#   define filesize(x) sim_filesize(x)
+#   define fsync(x) sim_fsync(x)
+#   define ftruncate(x,y) sim_ftruncate(x,y)
+#   define lseek(x,y,z) sim_lseek(x,y,z)
+#   define read(x,y,z) sim_read(x,y,z)
+#   define write(x,y,z) sim_write(x,y,z)
+#   define close(x) sim_close(x)
+extern int sim_open(const char *name, int o, ...);
+extern int sim_creat(const char *name, mode_t mode);
 #endif
 
 typedef int (*open_func)(const char* pathname, int flags, ...);

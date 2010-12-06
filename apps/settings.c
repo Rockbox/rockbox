@@ -118,9 +118,7 @@ static bool read_nvram_data(char* buf, int max_len)
     unsigned crc32 = 0xffffffff;
     int var_count = 0, i = 0, buf_pos = 0;
 #ifndef HAVE_RTC_RAM
-    char path[MAX_PATH];
-    int fd = open(get_user_file_path(NVRAM_FILE, IS_FILE|NEED_WRITE,
-                  path, sizeof(path)), O_RDONLY);
+    int fd = open(NVRAM_FILE, O_RDONLY);
     int bytes;
     if (fd < 0)
         return false;
@@ -174,7 +172,6 @@ static bool write_nvram_data(char* buf, int max_len)
     char var_count = 0;
 #ifndef HAVE_RTC_RAM
     int fd;
-    char path[MAX_PATH];
 #endif
     memset(buf,0,max_len);
     /* magic, version */
@@ -198,8 +195,7 @@ static bool write_nvram_data(char* buf, int max_len)
                     max_len-NVRAM_DATA_START-1,0xffffffff);
     memcpy(&buf[4],&crc32,4);
 #ifndef HAVE_RTC_RAM
-    fd = open(get_user_file_path(NVRAM_FILE, IS_FILE|NEED_WRITE,
-                  path, sizeof(path)),O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    fd = open(NVRAM_FILE,O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd >= 0)
     {
         int len = write(fd,buf,max_len);
@@ -230,12 +226,8 @@ void settings_load(int which)
         read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
     if (which&SETTINGS_HD)
     {
-        const char *file;
-        char path[MAX_PATH];
-        file = get_user_file_path(CONFIGFILE, IS_FILE|NEED_WRITE, path, sizeof(path));
-        settings_load_config(file, false);
-        file = get_user_file_path(FIXEDSETTINGSFILE, IS_FILE, path, sizeof(path));
-        settings_load_config(file, false);
+        settings_load_config(CONFIGFILE, false);
+        settings_load_config(FIXEDSETTINGSFILE, false);
     }
 }
 
@@ -596,11 +588,8 @@ static void flush_global_status_callback(void *data)
 static void flush_config_block_callback(void *data)
 {
     (void)data;
-    char path[MAX_PATH];
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    settings_write_config(
-            get_user_file_path(CONFIGFILE, IS_FILE|NEED_WRITE, path, sizeof(path)),
-            SETTINGS_SAVE_CHANGED);
+    settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
 }
 
 /*
@@ -644,7 +633,7 @@ int settings_save(void)
 
 bool settings_save_config(int options)
 {
-    char filename[MAX_PATH], path[MAX_PATH];
+    char filename[MAX_PATH];
     const char *folder, *namebase;
     switch (options)
     {
@@ -673,8 +662,6 @@ bool settings_save_config(int options)
             namebase = "config";
             break;
     }
-
-    folder = get_user_file_path(folder, NEED_WRITE, path, sizeof(path));
     create_numbered_filename(filename, folder, namebase, ".cfg", 2
                              IF_CNFN_NUM_(, NULL));
 
@@ -884,13 +871,11 @@ void settings_apply(bool read_disk)
     {
         char buf[MAX_PATH];
 #ifdef HAVE_LCD_BITMAP
-        char dir[MAX_PATH];
-        const char *font_path = get_user_file_path(FONT_DIR, 0, dir, sizeof(dir));
         /* fonts need to be loaded before the WPS */
         if (global_settings.font_file[0]
             && global_settings.font_file[0] != '-') {
             
-            snprintf(buf, sizeof buf, "%s/%s.fnt", font_path,
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
             CHART2(">font_load ", global_settings.font_file);
             rc = font_load(NULL, buf);
@@ -903,7 +888,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_REMOTE_LCD        
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
-            snprintf(buf, sizeof buf, "%s/%s.fnt", font_path,
+            snprintf(buf, sizeof buf, FONT_DIR "%s.fnt",
                      global_settings.remote_font_file);
             CHART2(">font_load_remoteui ", global_settings.remote_font_file);
             rc = font_load_remoteui(buf);
@@ -915,8 +900,7 @@ void settings_apply(bool read_disk)
             font_load_remoteui(NULL);
 #endif
         if ( global_settings.kbd_file[0]) {
-            snprintf(buf, sizeof buf, "%s/%s.kbd",
-                     get_user_file_path(ROCKBOX_DIR, 0, dir, sizeof(dir)),
+            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
                      global_settings.kbd_file);
             CHART(">load_kbd");
             load_kbd(buf);
@@ -925,8 +909,6 @@ void settings_apply(bool read_disk)
         else
             load_kbd(NULL);
 #endif /* HAVE_LCD_BITMAP */
-        /* no get_user_file_path() here because we don't really support
-         * langs that don't come with rockbox */
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);

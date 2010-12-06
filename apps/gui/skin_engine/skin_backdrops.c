@@ -54,7 +54,6 @@ void skin_backdrop_init(void)
 int skin_backdrop_assign(char* backdrop, char *bmpdir,
                          enum screen_type screen)
 {
-    char dir[MAX_PATH];
     char filename[MAX_PATH];
     int i, free = -1;
     if (!backdrop)
@@ -68,8 +67,7 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
     }
     else
     {
-        const char *bd_dir = get_user_file_path(bmpdir, 0, dir, sizeof(dir));
-        get_image_filename(backdrop, bd_dir, filename, sizeof(filename));
+        get_image_filename(backdrop, bmpdir, filename, sizeof(filename));
     }
     for (i=0; i<NB_BDROPS; i++)
     {
@@ -115,12 +113,9 @@ bool skin_backdrops_preload(void)
             if (screen == SCREEN_MAIN && global_settings.backdrop_file[0] &&
                 global_settings.backdrop_file[0] != '-' && filename[0] == '-')
             {
-                char dir[MAX_PATH];
                 char* temp = filename+2; /* slightly hacky to get a buffer */
                 size_t size = sizeof(backdrops[i].name) - 2;
-                snprintf(temp, size, "%s/%s.bmp",
-                         get_user_file_path(BACKDROP_DIR, 0, dir, sizeof(dir)),
-                         global_settings.backdrop_file);
+                snprintf(temp, size, BACKDROP_DIR "/%s.bmp", global_settings.backdrop_file);
                 filename = temp;
             }
             if (*filename && *filename != '-')
@@ -161,7 +156,7 @@ void skin_backdrop_unload(int backdrop_id)
 void skin_backdrop_load_setting(void)
 {
     int i;
-    char filename[MAX_PATH], dir[MAX_PATH];
+    char filename[MAX_PATH];
     for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
     {
         if (backdrops[i].name[0] == '-' && backdrops[i].screen == SCREEN_MAIN)
@@ -171,8 +166,7 @@ void skin_backdrop_load_setting(void)
             {
                 if (!backdrops[i].buffer)
                     backdrops[i].buffer = (char*)skin_buffer_alloc(LCD_BACKDROP_BYTES);
-                snprintf(filename, sizeof filename, "%s/%s.bmp",
-                         get_user_file_path(BACKDROP_DIR, 0, dir, sizeof(dir)),
+                snprintf(filename, sizeof filename, BACKDROP_DIR "/%s.bmp",
                          global_settings.backdrop_file);
                 bool loaded = backdrops[i].buffer && 
                               screens[SCREEN_MAIN].backdrop_load(filename,

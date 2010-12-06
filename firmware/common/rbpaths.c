@@ -22,13 +22,47 @@
 
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
+#include <stdarg.h>
 #include "rbpaths.h"
 #include "file.h" /* MAX_PATH */
-#include "dir.h"
 #include "gcc_extensions.h"
 #include "string-extra.h"
 #include "filefuncs.h"
 
+#undef open
+#undef creat
+#undef remove
+#undef rename
+#undef opendir
+#undef mkdir
+#undef rmdir
+
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#include "dir-target.h"
+#define opendir opendir_android
+#define mkdir   mkdir_android
+#define rmdir   rmdir_android
+#elif (CONFIG_PLATFORM & PLATFORM_SDL)
+#define open    sim_open
+#define remove  sim_remove
+#define rename  sim_rename
+#define opendir sim_opendir
+#define mkdir   sim_mkdir
+#define rmdir   sim_rmdir
+extern int sim_open(const char* name, int o, ...);
+extern int sim_remove(const char* name);
+extern int sim_rename(const char* old, const char* new);
+extern DIR* sim_opendir(const char* name);
+extern int sim_mkdir(const char* name);
+extern int sim_rmdir(const char* name);
+#endif
+
+/* flags for get_user_file_path() */
+/* whether you need write access to that file/dir, especially true
+ * for runtime generated files (config.cfg) */
+#define NEED_WRITE          (1<<0)
+/* file or directory? */
+#define IS_FILE             (1<<1)
 
 void paths_init(void)
 {
@@ -42,14 +76,28 @@ void paths_init(void)
 #endif
 }
 
-const char* get_user_file_path(const char *path,
-                               unsigned flags,
-                               char* buf,
-                               const size_t bufsize)
+static bool try_path(const char* filename, unsigned flags)
+{
+    if (flags & IS_FILE)
+    {
+        if (file_exists(filename))
+            return true;
+    }
+    else
+    {
+        if (dir_exists(filename))
+            return true;
+    }
+    return false;
+}
+
+static const char* _get_user_file_path(const char *path,
+                                       unsigned flags,
+                                       char* buf,
+                                       const size_t bufsize)
 {
     const char *ret = path;
     const char *pos = path;
-    printf("%s(): looking for %s\n", __func__, path);
     /* replace ROCKBOX_DIR in path with $HOME/.config/rockbox.org */
     pos += ROCKBOX_DIR_LEN;
     if (*pos == '/') pos += 1;
@@ -66,27 +114,99 @@ const char* get_user_file_path(const char *path,
      * write access is needed */
     if (flags & NEED_WRITE)
         ret = buf;
-    else
-    {
-        if (flags & IS_FILE)
-        {
-            if (file_exists(buf))
-                ret = buf;
-        }
-        else
-        {
-            if (dir_exists(buf))
-                ret = buf;
-        }
-    }
-
-    /* make a copy if we're about to return the path*/
-    if (UNLIKELY((flags & FORCE_BUFFER_COPY) && (ret != buf)))
-    {
-        strlcpy(buf, ret, bufsize);
+    else if (try_path(buf, flags))
         ret = buf;
+        
+    if (ret != buf) /* not found in $HOME, try ROCKBOX_BASE_DIR, !NEED_WRITE only */
+    {
+        if (snprintf(buf, bufsize, ROCKBOX_SHARE_PATH "/%s", pos) >= (int)bufsize)
+            return NULL;
+
+        if (try_path(buf, flags))
+            ret = buf;
     }
 
-    printf("%s(): %s\n", __func__, ret);
     return ret;
 }
+
+int app_open(const char *name, int o, ...)
+{
+    char realpath[MAX_PATH];
+    va_list ap;
+    int fd;
+    
+    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
+    {
+        int flags = IS_FILE;
+        if (o & (O_CREAT|O_RDWR|O_TRUNC|O_WRONLY))
+            flags |= NEED_WRITE;
+        name = _get_user_file_path(name, flags, realpath, sizeof(realpath));
+    }
+    va_start(ap, o);
+    fd = open(name, o, ap);
+    va_end(ap);
+    
+    return fd;
+    
+}
+
+int app_creat(const char* name, mode_t mode)
+{
+    return app_open(name, O_CREAT|O_WRONLY|O_TRUNC, mode);
+}
+
+int app_remove(const char *name)
+{
+    char realpath[MAX_PATH];
+    const char *fname = name;
+    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
+    {
+        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+    }
+    return remove(fname);
+}
+
+int app_rename(const char *old, const char *new)
+{
+    char realpath[MAX_PATH];
+    const char *fname = old;
+    if (!strncmp(ROCKBOX_DIR, old, ROCKBOX_DIR_LEN))
+    {
+        fname = _get_user_file_path(old, 0, realpath, sizeof(realpath));
+    }
+    return rename(fname, new);
+}
+
+DIR *app_opendir(const char *name)
+{
+    char realpath[MAX_PATH];
+    const char *fname = name;
+    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
+    {
+        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+    }
+    return opendir(fname);
+}
+
+int app_mkdir(const char* name)
+{
+    char realpath[MAX_PATH];
+    const char *fname = name;
+    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
+    {
+        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+    }
+    return mkdir(fname);
+}
+
+int app_rmdir(const char* name)
+{
+    char realpath[MAX_PATH];
+    const char *fname = name;
+    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
+    {
+        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+    }
+    return rmdir(fname);
+}
+

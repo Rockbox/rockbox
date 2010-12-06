@@ -1439,12 +1439,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     /* process random folder advance */
     if (global_settings.next_folder == FOLDER_ADVANCE_RANDOM)
     {
-        char folder_advance_list[MAX_PATH];
-        get_user_file_path(ROCKBOX_DIR, FORCE_BUFFER_COPY,
-                folder_advance_list, sizeof(folder_advance_list));
-        strlcat(folder_advance_list, "/folder_advance_list.dat",
-                sizeof(folder_advance_list));
-        int fd = open(folder_advance_list, O_RDONLY);
+        int fd = open(ROCKBOX_DIR "/folder_advance_list.dat", O_RDONLY);
         if (fd >= 0)
         {
             char buffer[MAX_PATH];
@@ -1914,8 +1909,7 @@ void playlist_init(void)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->current = true;
-    get_user_file_path(PLAYLIST_CONTROL_FILE, IS_FILE|NEED_WRITE|FORCE_BUFFER_COPY,
-            playlist->control_filename,
+    strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
     playlist->fd = -1;
     playlist->control_fd = -1;

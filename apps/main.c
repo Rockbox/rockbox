@@ -172,13 +172,13 @@ int main(void)
 #ifdef AUTOROCK
     {
         char filename[MAX_PATH];
-        const char *file = get_user_file_path(
+        const char *file = 
 #ifdef APPLICATION
                                 ROCKBOX_DIR
 #else
                                 PLUGIN_APPS_DIR
 #endif
-            "/autostart.rock", NEED_WRITE|IS_FILE, filename, sizeof(filename));
+                                    "/autostart.rock";
         if(file_exists(file)) /* no complaint if it doesn't exist */
         {
             plugin_load(file, NULL); /* start if it does */

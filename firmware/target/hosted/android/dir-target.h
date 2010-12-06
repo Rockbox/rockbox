@@ -24,10 +24,21 @@
 
 #include <dirent.h>
 
-#define opendir     _opendir
-#define mkdir       _mkdir
-#define closedir    _closedir
-#define readdir     _readdir
+#define dirent_uncached dirent
+#define DIR_UNCACHED DIR
+#define opendir_uncached _opendir
+#define readdir_uncached _readdir
+#define closedir_uncached _closedir
+#define mkdir_uncached _mkdir
+#define rmdir_uncached rmdir
+
+#define dirent_android dirent
+#define DIR_android DIR
+#define opendir_android _opendir
+#define readdir_android _readdir
+#define closedir_android _closedir
+#define mkdir_android _mkdir
+#define rmdir_android rmdir
 
 extern DIR* _opendir(const char* name);
 extern int  _mkdir(const char* name);
@@ -36,5 +47,7 @@ extern struct dirent *_readdir(DIR* dir);
 extern void fat_size(unsigned long *size, unsigned long *free);
 
 #define DIRFUNCTIONS_DEFINED
+#define DIRENT_DEFINED
+#define DIR_DEFINED
 
 #endif /* __DIR_TARGET_H__ */

@@ -293,7 +293,6 @@ static const char *get_sim_pathname(const char *name)
 MYDIR *sim_opendir(const char *name)
 {
     DIR_T *dir;
-
     dir = (DIR_T *) OPENDIR(get_sim_pathname(name));
 
     if (dir)

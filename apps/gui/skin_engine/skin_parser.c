@@ -1646,8 +1646,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         strlcpy(bmpdir, buf, dot - buf + 1);
     }
     else
-    {   /* fall back to backdrop dir for built-in themes */
-        /* no get_user_file_path(), assuming we ship bmps for built-in themes */
+    {
         snprintf(bmpdir, MAX_PATH, "%s", BACKDROP_DIR);
     }
     /* load the bitmaps that were found by the parsing */

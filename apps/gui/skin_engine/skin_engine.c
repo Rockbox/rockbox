@@ -155,7 +155,7 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
 {
     if (!loading_a_sbs && skins[skin][screen].data.wps_loaded == false)
     {
-        char buf[MAX_PATH*2], path[MAX_PATH];
+        char buf[MAX_PATH*2];
         char *setting = NULL, *ext = NULL;
         switch (skin)
         {
@@ -226,9 +226,7 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         buf[0] = '\0'; /* force it to reload the default */
         if (strcmp(setting, "rockbox_failsafe"))
         {
-            snprintf(buf, sizeof buf, "%s/%s.%s",
-                 get_user_file_path(WPS_DIR, false, path, sizeof(path)),
-                 setting, ext);
+            snprintf(buf, sizeof buf, WPS_DIR "/%s.%s", setting, ext);
         }
         cpu_boost(true);
         skin_load(skin, screen, buf, true);

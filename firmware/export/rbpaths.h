@@ -26,17 +26,6 @@
 #include "autoconf.h"
 #include "string-extra.h"
 
-/* flags for get_user_file_path() */
-/* whether you need write access to that file/dir, especially true
- * for runtime generated files (config.cfg) */
-#define NEED_WRITE          (1<<0)
-/* file or directory? */
-#define IS_FILE             (1<<1)
-/* make sure the path is copied into the passed buffer (it may return
- * the passed path directly otherwise, e.g. always on target builds) */
-#define FORCE_BUFFER_COPY   (1<<2)
-
-
 
 /* name of directory where configuration, fonts and other data
  * files are stored */
@@ -67,35 +56,17 @@
 #define REC_BASE_DIR        "/"
 #define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
 
-#ifndef PLUGIN
-static inline __attribute__((always_inline)) const char* get_user_file_path(const char *path,
-                               unsigned flags,
-                               char* buf,
-                               const size_t bufsize)
-{
-    if (flags & FORCE_BUFFER_COPY)
-    {
-        strlcpy(buf, path, bufsize);
-        return buf;
-    }
-    return path;
-}
-#endif
-
 #define paths_init()
 #else /* application */
 
-#define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
-#define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
+#define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rocks"
+#define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/codecs"
 
 #define REC_BASE_DIR        ROCKBOX_DIR  "/"
 #define PLAYLIST_CATALOG_DEFAULT_DIR ROCKBOX_DIR "/Playlists"
 
 extern void paths_init(void);
-extern const char* get_user_file_path(const char *path,
-                               unsigned flags,
-                               char* buf,
-                               const size_t bufsize);
+
 #endif /* APPLICATION */
 
 #define LANG_DIR            ROCKBOX_DIR "/langs"

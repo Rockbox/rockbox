@@ -81,11 +81,9 @@ static int initialize_catalog(void)
         /* fall back to default directory if no or invalid config */
         if (default_dir)
         {
-            const char *dir = get_user_file_path(PLAYLIST_CATALOG_DEFAULT_DIR,
-                                    FORCE_BUFFER_COPY|NEED_WRITE,
-                                    playlist_dir, sizeof(playlist_dir));
-            if (!dir_exists(dir))
-                mkdir(dir);
+            strcpy(playlist_dir, PLAYLIST_CATALOG_DEFAULT_DIR);
+            if (!dir_exists(playlist_dir))
+                mkdir(playlist_dir);
         }
 
         playlist_dir_length = strlen(playlist_dir);

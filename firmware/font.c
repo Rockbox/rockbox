@@ -613,11 +613,7 @@ void glyph_cache_save(struct font* pf)
         pf = &font_ui;
     if (pf->fd >= 0 && pf == &font_ui) 
     {
-        char path[MAX_PATH];
-        const char *file = get_user_file_path(GLYPH_CACHE_FILE, IS_FILE|NEED_WRITE,
-                                       path, sizeof(path));
-
-        cache_fd = open(file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
         if (cache_fd < 0)
             return;
 
@@ -678,7 +674,6 @@ static void glyph_cache_load(struct font* pf)
         int i, size;
         unsigned char tmp[2];
         unsigned short ch;
-        char path[MAX_PATH];
         unsigned short glyphs[MAX_SORT];
         unsigned short glyphs_lru_order[MAX_SORT];
         int glyph_file_skip=0, glyph_file_size=0;
@@ -687,8 +682,7 @@ static void glyph_cache_load(struct font* pf)
         if ( sort_size > MAX_SORT )
              sort_size = MAX_SORT;
 
-        fd = open(get_user_file_path(GLYPH_CACHE_FILE, IS_FILE|NEED_WRITE,
-                                     path, sizeof(path)), O_RDONLY|O_BINARY);
+        fd = open(GLYPH_CACHE_FILE, O_RDONLY|O_BINARY);
         if (fd >= 0) {
             
             /* only read what fits */
