@@ -151,7 +151,8 @@ public class RockboxService extends Service
         {
             public void run()
             {
-                File rockboxDir = new File("/data/data/org.rockbox/app_rockbox/rockbox/");
+                String rockboxDirPath = "/data/data/org.rockbox/app_rockbox/rockbox";
+                File rockboxDir = new File(rockboxDirPath);
 
 		        /* the following block unzips libmisc.so, which contains the files 
 		         * we ship, such as themes. It's needed to put it into a .so file
@@ -174,7 +175,11 @@ public class RockboxService extends Service
     	                while(e.hasMoreElements())
     	                {
     	                   ZipEntry entry = (ZipEntry) e.nextElement();
-    	                   File file = new File(entry.getName());
+    	                   File file;
+    	                   /* strip off /.rockbox when extracting */
+    	                   String fileName = entry.getName();
+    	                   int slashIndex = fileName.indexOf('/', 1);
+    	                   file = new File(rockboxDirPath + fileName.substring(slashIndex));
 
     	                   if (!entry.isDirectory())
     	                   {
