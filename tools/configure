@@ -24,6 +24,7 @@ rbdir="/.rockbox"
 need_full_path=
 bindir=
 libdir=
+sharedir=
 
 app_platform=
 app_lcd_width=
@@ -86,7 +87,7 @@ app_get_platform() {
     # setup files and paths depending on the platform
     if [ "$app_platform" = "sdl" ]; then
         if [ -z "$ARG_PREFIX" ]; then
-            rbdir="/usr/local/share/rockbox"
+            sharedir="/usr/local/share/rockbox"
             bindir="/usr/local/bin"
             libdir="/usr/local/lib"
         else
@@ -98,7 +99,7 @@ app_get_platform() {
                         exit
                     fi
                 fi
-                rbdir="$ARG_PREFIX/share/rockbox"
+                sharedir="$ARG_PREFIX/share/rockbox"
                 bindir="$ARG_PREFIX/bin"
                 libdir="$ARG_PREFIX/lib"
             else
@@ -122,7 +123,7 @@ app_get_platform() {
             echo "environment variable point to the root directory of the Android NDK."
             exit
         fi
-        rbdir="/data/data/org.rockbox/app_rockbox/rockbox"
+        sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
         bindir="/data/data/org.rockbox/lib"
         libdir="/data/data/org.rockbox/app_rockbox"
         output="librockbox.so"
@@ -3144,14 +3145,7 @@ else
   defendian="ROCKBOX_LITTLE_ENDIAN"
 fi
 
-if [ "$ARG_RBDIR" ]; then
-  if [ "$need_full_path" != "yes" ]; then
-    if [ -z `echo $ARG_RBDIR | grep '^/'` ]; then
-        rbdir="/"$ARG_RBDIR
-    else
-        rbdir=$ARG_RBDIR
-    fi
-  fi
+if [ "$ARG_RBDIR" != "" ]; then
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
@@ -3162,6 +3156,7 @@ sed > autoconf.h \
  -e "s<@config_rtc@<$config_rtc<g" \
  -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@sharepath@<${sharedir}<g" \
  -e "s<@binpath@<${bindir}<g" \
  -e "s<@libpath@<${libdir}<g" \
  -e "s<@have_backlight@<$have_backlight<g" \
@@ -3202,6 +3197,7 @@ sed > autoconf.h \
 
 /* root of Rockbox */
 #define ROCKBOX_DIR "@RBDIR@"
+#define ROCKBOX_SHARE_PATH "@sharepath@"
 #define ROCKBOX_BINARY_PATH "@binpath@"
 #define ROCKBOX_LIBRARY_PATH "@libpath@"
 
@@ -3332,6 +3328,7 @@ sed > Makefile \
  -e "s<@LANGS@<${buildlangs}<g" \
  -e "s<@USE_ELF@<${USE_ELF}<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
+ -e "s<@sharepath@<${sharedir}<g" \
  -e "s<@binpath@<${bindir}<g" \
  -e "s<@libpath@<${libdir}<g" \
  -e "s<@PREFIX@<$ARG_PREFIX<g" \
@@ -3401,7 +3398,8 @@ export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 export RBDIR=@RBDIR@
-export ROCKBOX_BINARY_PATH=@binpath@
+export ROCKBOX_SHARE_PATH=@sharepath@
+export ROCKBOX_LIBRARY_PATH=@libpath@
 export ROCKBOX_LIBRARY_PATH=@libpath@
 export SDLCONFIG=@SDLCONFIG@
 

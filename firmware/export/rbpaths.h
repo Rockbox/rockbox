@@ -59,8 +59,8 @@
 #define paths_init()
 #else /* application */
 
-#define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rocks"
-#define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/codecs"
+#define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
+#define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 
 #define REC_BASE_DIR        ROCKBOX_DIR  "/"
 #define PLAYLIST_CATALOG_DEFAULT_DIR ROCKBOX_DIR "/Playlists"
