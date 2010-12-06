@@ -24,6 +24,8 @@
 #include "rtc.h" 
 #include "i2c-coldfire.h"
 
+#include "lcd.h"
+#include "font.h"
 /*  Driver for the Seiko S35380A real-time clock chip with i2c interface
 
     This driver was derived from rtc_s3539a.c and adapted for the MPIO HD300
@@ -52,6 +54,17 @@
 #define STATUS_REG1_H1224 0x40
 #define STATUS_REG1_RESET 0x80
 
+/* STATUS_REG2 flags
+ * bits order is reversed
+ */
+#define STATUS_REG2_TEST   0x01
+#define STATUS_REG2_INT2AE 0x02
+#define STATUS_REG2_INT2ME 0x04
+#define STATUS_REG2_INT2FE 0x08
+#define STATUS_REG2_32kE   0x10
+#define STATUS_REG2_INT1AE 0x20
+#define STATUS_REG2_INT1ME 0x40
+#define STATUS_REG2_INT1FE 0x80
 
 static void reverse_bits(unsigned char* v, int size)
 {
@@ -82,6 +95,13 @@ void rtc_init(void)
     /* setup 24h time format */
     status_reg = STATUS_REG1_H1224;
     i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
+
+#ifdef HAVE_RTC_ALARM
+    rtc_check_alarm_started(false);
+#endif
+    /* disable all alarms */
+    status_reg = 0;
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &status_reg, 1);
 }
 
 int rtc_read_datetime(struct tm *tm)
@@ -105,7 +125,7 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_mday = buf[2];
     tm->tm_mon = buf[1] - 1;
     tm->tm_year = buf[0] + 100;
-    
+
     return ret;
 }
 
@@ -132,3 +152,81 @@ int rtc_write_datetime(const struct tm *tm)
     return ret;
 }
 
+#ifdef HAVE_RTC_ALARM
+void rtc_set_alarm(int h, int m)
+{
+    /* 1) get the date
+     * 2) compare h:m with current time
+          if alarm time < current time set day += 1
+       3) check day if it is not needed to wrap around
+       4) set the validity bits
+       5) write to alarm register
+     */
+
+    unsigned char buf[3];
+    unsigned char reg;
+
+    /* 0x80 - validity flag */
+    buf[2] = DEC2BCD(m) | 0x80;
+    buf[1] = DEC2BCD(h) | 0x80;
+    buf[0] = 0;
+
+    reverse_bits(buf, sizeof(buf));
+
+    reg = STATUS_REG2_INT1AE;
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (INT1_REG<<1), buf, sizeof(buf));
+}
+
+void rtc_get_alarm(int *h, int *m)
+{
+    unsigned char buf[3];
+    unsigned char reg,reg2;
+
+    i2c_read(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
+
+    reg2 = reg | STATUS_REG2_INT1AE;
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg2, 1);
+    i2c_read(I2C_IFACE_1, RTC_ADDR | (INT1_REG<<1), buf, sizeof(buf));
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
+
+    reverse_bits(buf, sizeof(buf));
+
+    *h = BCD2DEC(buf[1] & 0x3f); /* mask out A1HE and PM/AM flag */
+    *m = BCD2DEC(buf[2] & 0x7f); /* mask out A1mE */    
+}
+
+bool rtc_check_alarm_flag(void)
+{
+    unsigned char status_reg;
+    i2c_read(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
+
+    return (status_reg & (STATUS_REG1_INT1 | STATUS_REG1_INT2));
+}
+
+void rtc_enable_alarm(bool enable)
+{
+    unsigned char status_reg2;
+    status_reg2 = enable ? STATUS_REG2_INT1AE:0;
+    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &status_reg2, 1);
+}
+
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    static bool run_before = false, alarm_state;
+    bool rc;
+
+    if (run_before)
+    {
+        rc = alarm_state;
+        alarm_state &= ~release_alarm;
+    }
+    else
+    {
+        rc = rtc_check_alarm_flag();
+        run_before = true;
+    }
+
+    return rc;
+}
+#endif
