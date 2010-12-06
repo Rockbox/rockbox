@@ -106,7 +106,7 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
       int quantvals=0;
       switch(s->maptype){
       case 1:
-        quantvals=_book_maptype1_quantvals(s);
+        quantvals=(s->dim==0?0:_book_maptype1_quantvals(s));
         break;
       case 2:
         quantvals=s->entries*s->dim;
