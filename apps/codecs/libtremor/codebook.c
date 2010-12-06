@@ -279,7 +279,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
   long *bufend = buf + n;
 
   while (bufptr<bufend) {
-    if (b->headend > 8) {
+    if(b->endbyte < b->storage - 8) {
       ogg_uint32_t *ptr;
       unsigned long bit, bitend;
       unsigned long adr;
@@ -292,10 +292,10 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
       const ogg_uint32_t *book_codelist = book->codelist;
       const char         *book_dec_codelengths = book->dec_codelengths;
 
-      adr = (unsigned long)b->headptr;
-      bit = (adr&3)*8+b->headbit;
+      adr = (unsigned long)b->ptr;
+      bit = (adr&3)*8+b->endbit;
       ptr = (ogg_uint32_t*)(adr&~3);
-      bitend = ((adr&3)+b->headend)*8;
+      bitend = ((adr&3)+(b->storage-b->endbyte))*8;
       while (bufptr<bufend){
         if (UNLIKELY(cachesize<book_dec_maxlength)) {
           if (bit-cachesize+32>=bitend)
@@ -323,11 +323,11 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
         cache >>= l;
       }
 
-      adr=(unsigned long)b->headptr;
+      adr=(unsigned long)b->ptr;
       bit-=(adr&3)*8+cachesize;
-      b->headend-=(bit/8);
-      b->headptr+=bit/8;
-      b->headbit=bit%8;
+      b->endbyte+=bit/8;
+      b->ptr+=bit/8;
+      b->endbit=bit&7;
     } else {
       long r = decode_packed_entry_number(book, b);
       if (r == -1) return bufptr-buf;
@@ -336,7 +336,6 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
   }
   return n;
 }
-
 
 /* Decode side is specced and easier, because we don't need to find
    matches using different criteria; we simply read and map.  There are
@@ -570,3 +569,4 @@ long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
   }
   return(0);
 }
+
