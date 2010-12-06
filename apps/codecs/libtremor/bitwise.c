@@ -503,11 +503,13 @@ long oggpackB_read1(oggpack_buffer *b){
   b->endbit=1;
   return -1L;
 }
-
+#endif
+/* moved to ogg.h for inlining
 long oggpack_bytes(oggpack_buffer *b){
   return(b->endbyte+(b->endbit+7)/8);
 }
-
+*/
+#if 0
 long oggpack_bits(oggpack_buffer *b){
   return(b->endbyte*8+b->endbit);
 }

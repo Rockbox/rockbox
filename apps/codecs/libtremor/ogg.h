@@ -128,7 +128,7 @@ extern void  oggpack_writeclear(oggpack_buffer *b); */
 extern void  oggpack_readinit(oggpack_buffer *b,unsigned char *buf,int bytes);
 /* extern void  oggpack_write(oggpack_buffer *b,unsigned long value,int bits); */
 
-//extern long  oggpack_look(oggpack_buffer *b,int bits);
+/* extern long  oggpack_look(oggpack_buffer *b,int bits); */
 static inline long oggpack_look(oggpack_buffer *b,int bits){
   unsigned long ret;
   unsigned long m;
@@ -162,7 +162,7 @@ static inline long oggpack_look(oggpack_buffer *b,int bits){
 
 extern long  oggpack_look1(oggpack_buffer *b);
 
-//extern void  oggpack_adv(oggpack_buffer *b,int bits);
+/* extern void  oggpack_adv(oggpack_buffer *b,int bits); */
 static inline void oggpack_adv(oggpack_buffer *b,int bits){
   bits+=b->endbit;
 
@@ -182,8 +182,11 @@ static inline void oggpack_adv(oggpack_buffer *b,int bits){
 extern void  oggpack_adv1(oggpack_buffer *b);
 extern long  oggpack_read(oggpack_buffer *b,int bits);
 extern long  oggpack_read1(oggpack_buffer *b);
+/* extern long  oggpack_bytes(oggpack_buffer *b); */
+static inline long oggpack_bytes(oggpack_buffer *b){
+  return(b->endbyte+(b->endbit+7)/8);
+}
 #if 0
-extern long  oggpack_bytes(oggpack_buffer *b);
 extern long  oggpack_bits(oggpack_buffer *b);
 extern unsigned char *oggpack_get_buffer(oggpack_buffer *b);
 
