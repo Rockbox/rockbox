@@ -119,7 +119,7 @@ app_get_platform() {
             exit
         fi
         if [ -z "$ANDROID_NDK_PATH" ]; then
-            echo "ERROR: You need the Android NDK installed and have the ANDROID_NDK_PATH"
+            echo "ERROR: You need the Android NDK installed (r5 or higher) and have the ANDROID_NDK_PATH"
             echo "environment variable point to the root directory of the Android NDK."
             exit
         fi
@@ -478,12 +478,16 @@ mipselcc () {
 }
 
 androidcc () {
-    gccchoice="4.4.0"
-    prefixtools $ANDROID_NDK_PATH/build/prebuilt/linux-x86/arm-eabi-$gccchoice/bin/arm-eabi-
+    gccchoice="4.4.3"
+    gcctarget="arm-linux-androideabi-"
+    gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/linux-x86
+    PATH=$PATH:$gccprefix/bin prefixtools $gcctarget
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
-    GCCOPTS="$GCCOPTS -ffunction-sections -fno-short-enums -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
-    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -L$ANDROID_NDK_PATH/build/platforms/android-4/arch-arm/usr/lib/ -Wl,-rpath-link=$ANDROID_NKD_PATH/build/platforms/android-4/arch-arm/usr/lib"
-    LDOPTS="$LDOPTS -shared -nostdlib -lm -ldl -llog"
+    GCCOPTS="$GCCOPTS -ffunction-sections -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
+		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
+    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack \
+		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
+    LDOPTS="$LDOPTS -shared -nostdlib -ldl -llog"
     extradefines="$extradefines -DANDROID"
     endian="little"
     SHARED_FLAG="-shared"
@@ -3209,10 +3213,6 @@ if test -n "$t_cpu"; then
   if [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/"
-  fi
-  if [ -n "$app_platform" -a "$app_platform" = "android" ]; then
-    # android's gcc doesn't add this :/
-    TARGET_INC="$TARGET_INC -I$ANDROID_NDK_PATH/build/platforms/android-4/arch-arm/usr/include"
   fi
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
