@@ -112,6 +112,20 @@ static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   for(j=0;j<acc;j++)
     if(info->booklist[j]>=ci->books)goto errout;
 
+  /* verify the phrasebook is not specifying an impossible or
+     inconsistent partitioning scheme. */
+  {
+    int entries = ci->book_param[info->groupbook]->entries;
+    int dim = ci->book_param[info->groupbook]->dim;
+    int partvals = 1;
+    while(dim>0){
+      partvals *= info->partitions;
+      if(partvals > entries) goto errout;
+      dim--;
+    }
+    if(partvals != entries) goto errout;
+  }
+
   return(info);
  errout:
   res0_free_info(info);
