@@ -3150,6 +3150,11 @@ else
 fi
 
 if [ "$ARG_RBDIR" != "" ]; then
+    if [ -z `echo $ARG_RBDIR | grep '^/'` ]; then
+        rbdir="/"$ARG_RBDIR
+    else
+        rbdir=$ARG_RBDIR
+    fi 
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
@@ -3399,7 +3404,7 @@ export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 export RBDIR=@RBDIR@
 export ROCKBOX_SHARE_PATH=@sharepath@
-export ROCKBOX_LIBRARY_PATH=@libpath@
+export ROCKBOX_BINARY_PATH=@binpath@
 export ROCKBOX_LIBRARY_PATH=@libpath@
 export SDLCONFIG=@SDLCONFIG@
 
