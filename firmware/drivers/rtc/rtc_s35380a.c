@@ -66,6 +66,35 @@
 #define STATUS_REG2_INT1ME 0x40
 #define STATUS_REG2_INT1FE 0x80
 
+/* REALTIME_DATA register bytes */
+#define TIME_YEAR     0
+#define TIME_MONTH    1
+#define TIME_DAY      2
+#define TIME_WEEKDAY  3
+#define TIME_HOUR     4
+#define TIME_MINUTE   5
+#define TIME_SECOND   6
+#define TIME_REG_SIZE 7
+
+/* INT1, INT2 register bytes */
+#define ALARM_WEEKDAY  0
+#define ALARM_HOUR     1
+#define ALARM_MINUTE   2
+#define ALARM_REG_SIZE 3
+
+/* INT1, INT2 register bits */
+#define A1WE 0x80
+#define A1HE 0x80
+#define A1mE 0x80
+
+#define A2WE 0x80
+#define A2HE 0x80
+#define A2mE 0x80
+
+#define AMPM 0x40
+
+static bool int_flag;
+
 static void reverse_bits(unsigned char* v, int size)
 {
     static const unsigned char flipnibble[] =
@@ -79,75 +108,88 @@ static void reverse_bits(unsigned char* v, int size)
     }
 }    
 
+static inline void rtc_reset(void)
+{
+    unsigned char reg = STATUS_REG1_RESET;
+    i2c_write(I2C_IFACE_1, RTC_ADDR|(STATUS_REG1<<1), &reg, 1);
+}
+
 void rtc_init(void)
 {
-    unsigned char status_reg;
-    i2c_read(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
+    unsigned char reg;
+    static bool initialized = false;
 
-    if ( (status_reg & STATUS_REG1_POC) ||
-         (status_reg & STATUS_REG1_BLD) )
-    {
-        /* perform rtc reset*/
-        status_reg |= STATUS_REG1_RESET;
-        i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
-    }
+    if ( initialized )
+        return;
+
+    i2c_read(I2C_IFACE_1, RTC_ADDR|(STATUS_REG1<<1), &reg, 1);
+
+    /* cache INT1, INT2 flags as reading the register seem to clear
+     * this bits (which is not described in datasheet)
+     */
+    int_flag = ((reg & STATUS_REG1_INT1) || (reg & STATUS_REG1_INT2));
+
+    /* test POC and BLD flags */
+    if ( (reg & STATUS_REG1_POC) || (reg & STATUS_REG1_BLD))
+        rtc_reset();
+
+    i2c_read(I2C_IFACE_1, RTC_ADDR|(STATUS_REG2<<1), &reg, 1);
+
+    /* test TEST flag */
+    if ( reg & STATUS_REG2_TEST )
+        rtc_reset();
 
     /* setup 24h time format */
-    status_reg = STATUS_REG1_H1224;
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
+    reg = STATUS_REG1_H1224;
+    i2c_write(I2C_IFACE_1, RTC_ADDR|(STATUS_REG1<<1), &reg, 1);
 
-#ifdef HAVE_RTC_ALARM
-    rtc_check_alarm_started(false);
-#endif
-    /* disable all alarms */
-    status_reg = 0;
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &status_reg, 1);
+    initialized = true;
 }
 
 int rtc_read_datetime(struct tm *tm)
 {
-    unsigned char buf[7];
+    unsigned char buf[TIME_REG_SIZE];
     unsigned int i;
     int ret;
 
-    ret = i2c_read(I2C_IFACE_1, RTC_ADDR | (REALTIME_DATA1<<1), buf, sizeof(buf));
+    ret = i2c_read(I2C_IFACE_1, RTC_ADDR|(REALTIME_DATA1<<1), buf, sizeof(buf));
     reverse_bits(buf, sizeof(buf));
 
-    buf[4] &= 0x3f; /* mask out p.m. flag */
+    buf[TIME_HOUR] &= 0x3f; /* mask out p.m. flag */
 
     for (i = 0; i < sizeof(buf); i++)
         buf[i] = BCD2DEC(buf[i]);
 
-    tm->tm_sec = buf[6];
-    tm->tm_min = buf[5];
-    tm->tm_hour = buf[4];
-    tm->tm_wday = buf[3];
-    tm->tm_mday = buf[2];
-    tm->tm_mon = buf[1] - 1;
-    tm->tm_year = buf[0] + 100;
+    tm->tm_sec  = buf[TIME_SECOND];
+    tm->tm_min  = buf[TIME_MINUTE];
+    tm->tm_hour = buf[TIME_HOUR];
+    tm->tm_wday = buf[TIME_WEEKDAY];
+    tm->tm_mday = buf[TIME_DAY];
+    tm->tm_mon  = buf[TIME_MONTH] - 1;
+    tm->tm_year = buf[TIME_YEAR] + 100;
 
     return ret;
 }
 
 int rtc_write_datetime(const struct tm *tm)
 {
-    unsigned char buf[7];
+    unsigned char buf[TIME_REG_SIZE];
     unsigned int i;
     int ret;
 
-    buf[6] = tm->tm_sec;
-    buf[5] = tm->tm_min;
-    buf[4] = tm->tm_hour;
-    buf[3] = tm->tm_wday;
-    buf[2] = tm->tm_mday;
-    buf[1] = tm->tm_mon + 1;
-    buf[0] = tm->tm_year - 100;
+    buf[TIME_SECOND]  = tm->tm_sec;
+    buf[TIME_MINUTE]  = tm->tm_min;
+    buf[TIME_HOUR]    = tm->tm_hour;
+    buf[TIME_WEEKDAY] = tm->tm_wday;
+    buf[TIME_DAY]     = tm->tm_mday;
+    buf[TIME_MONTH]   = tm->tm_mon + 1;
+    buf[TIME_YEAR]    = tm->tm_year - 100;
 
     for (i = 0; i < sizeof(buf); i++)
         buf[i] = DEC2BCD(buf[i]);
 
     reverse_bits(buf, sizeof(buf));
-    ret = i2c_write(I2C_IFACE_1, RTC_ADDR | (REALTIME_DATA1<<1), buf, sizeof(buf));
+    ret = i2c_write(I2C_IFACE_1, RTC_ADDR|(REALTIME_DATA1<<1), buf, sizeof(buf));
 
     return ret;
 }
@@ -155,75 +197,76 @@ int rtc_write_datetime(const struct tm *tm)
 #ifdef HAVE_RTC_ALARM
 void rtc_set_alarm(int h, int m)
 {
-    /* 1) get the date
-     * 2) compare h:m with current time
-          if alarm time < current time set day += 1
-       3) check day if it is not needed to wrap around
-       4) set the validity bits
-       5) write to alarm register
+    unsigned char buf[ALARM_REG_SIZE];
+
+    /* INT1 register can be accessed only when IN1AE flag is set */
+    rtc_enable_alarm(true);
+
+    /* A1mE, A1HE - validity flags */
+    buf[ALARM_MINUTE]  = DEC2BCD(m) | A1mE;
+    buf[ALARM_HOUR]    = DEC2BCD(h) | A1HE;
+    buf[ALARM_WEEKDAY] = 0;
+
+    /* AM/PM flag have to be set properly regardles of
+     * time format used (H1224 flag in STATUS_REG1)
+     * this is not described in datasheet for s35380a
+     * but is somehow described in datasheet for s35390a
      */
-
-    unsigned char buf[3];
-    unsigned char reg;
-
-    /* 0x80 - validity flag */
-    buf[2] = DEC2BCD(m) | 0x80;
-    buf[1] = DEC2BCD(h) | 0x80;
-    buf[0] = 0;
+    if ( h >= 12 )
+        buf[ALARM_HOUR] |= AMPM;
 
     reverse_bits(buf, sizeof(buf));
-
-    reg = STATUS_REG2_INT1AE;
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (INT1_REG<<1), buf, sizeof(buf));
+    i2c_write(I2C_IFACE_1, RTC_ADDR|(INT1_REG<<1), buf, sizeof(buf));
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
-    unsigned char buf[3];
-    unsigned char reg,reg2;
+    unsigned char buf[ALARM_REG_SIZE];
 
-    i2c_read(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
+    /* INT1 alarm register can be accessed only when INT1AE is set */
+    rtc_enable_alarm(true);
 
-    reg2 = reg | STATUS_REG2_INT1AE;
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg2, 1);
-    i2c_read(I2C_IFACE_1, RTC_ADDR | (INT1_REG<<1), buf, sizeof(buf));
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &reg, 1);
-
+    /* read the content of INT1 register */
+    i2c_read(I2C_IFACE_1, RTC_ADDR|(INT1_REG<<1), buf, sizeof(buf));
     reverse_bits(buf, sizeof(buf));
 
-    *h = BCD2DEC(buf[1] & 0x3f); /* mask out A1HE and PM/AM flag */
-    *m = BCD2DEC(buf[2] & 0x7f); /* mask out A1mE */    
+    *h = BCD2DEC(buf[ALARM_HOUR] & 0x3f); /* mask out A1HE and PM/AM flag */
+    *m = BCD2DEC(buf[ALARM_MINUTE] & 0x7f); /* mask out A1mE */
+
+    rtc_enable_alarm(false);
 }
 
 bool rtc_check_alarm_flag(void)
 {
-    unsigned char status_reg;
-    i2c_read(I2C_IFACE_1, RTC_ADDR | (STATUS_REG1<<1), &status_reg, 1);
+    unsigned char reg;
+    i2c_read(I2C_IFACE_1, RTC_ADDR|(STATUS_REG1<<1), &reg, 1);
 
-    return (status_reg & (STATUS_REG1_INT1 | STATUS_REG1_INT2));
+    return ((reg & STATUS_REG1_INT1) || (reg & STATUS_REG1_INT2));
 }
 
 void rtc_enable_alarm(bool enable)
 {
-    unsigned char status_reg2;
-    status_reg2 = enable ? STATUS_REG2_INT1AE:0;
-    i2c_write(I2C_IFACE_1, RTC_ADDR | (STATUS_REG2<<1), &status_reg2, 1);
+    unsigned char reg = 0;
+
+    if (enable)
+        reg = STATUS_REG2_INT1AE;
+
+    i2c_write(I2C_IFACE_1, RTC_ADDR|(STATUS_REG2<<1), &reg, 1);
 }
 
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    static bool run_before = false, alarm_state;
+    static bool run_before;
     bool rc;
 
     if (run_before)
     {
-        rc = alarm_state;
-        alarm_state &= ~release_alarm;
+        rc = int_flag;
+        int_flag &= ~release_alarm;
     }
     else
     {
-        rc = rtc_check_alarm_flag();
+        rc = int_flag;
         run_before = true;
     }
 
