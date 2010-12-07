@@ -101,6 +101,7 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
     s->q_delta=oggpack_read(opb,32);
     s->q_quant=oggpack_read(opb,4)+1;
     s->q_sequencep=oggpack_read(opb,1);
+    if(s->q_sequencep==-1)goto _eofout;
 
     {
       int quantvals=0;

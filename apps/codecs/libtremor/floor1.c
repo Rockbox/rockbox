@@ -80,6 +80,7 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   info->partitions=oggpack_read(opb,5); /* only 0 to 31 legal */
   for(j=0;j<info->partitions;j++){
     info->partitionclass[j]=oggpack_read(opb,4); /* only 0 to 15 legal */
+    if(info->partitionclass[j]<0)goto err_out;
     if(maxclass<info->partitionclass[j])maxclass=info->partitionclass[j];
   }
 
@@ -102,6 +103,7 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   /* read the post list */
   info->mult=oggpack_read(opb,2)+1;     /* only 1,2,3,4 legal now */ 
   rangebits=oggpack_read(opb,4);
+  if(rangebits<0)goto err_out;
 
   for(j=0,k=0;j<info->partitions;j++){
     count+=info->class_dim[info->partitionclass[j]]; 

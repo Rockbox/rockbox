@@ -128,19 +128,24 @@ static int ilog(unsigned int v){
 
 /* also responsible for range checking */
 static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb){
-  int i;
+  int i,b;
   vorbis_info_mapping0 *info=(vorbis_info_mapping0 *)_ogg_calloc(1,sizeof(*info));
   codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
   memset(info,0,sizeof(*info));
 
-  if(oggpack_read(opb,1))
+  b=oggpack_read(opb,1);
+  if(b<0)goto err_out;
+  if(b){
     info->submaps=oggpack_read(opb,4)+1;
-  else
+    if(info->submaps<=0)goto err_out;
+  }else
     info->submaps=1;
 
-  if(oggpack_read(opb,1)){
+  b=oggpack_read(opb,1);
+  if(b<0)goto err_out;
+  if(b){
     info->coupling_steps=oggpack_read(opb,8)+1;
-
+    if(info->coupling_steps<=0)goto err_out;
     for(i=0;i<info->coupling_steps;i++){
       int testM=info->coupling_mag[i]=oggpack_read(opb,ilog(vi->channels));
       int testA=info->coupling_ang[i]=oggpack_read(opb,ilog(vi->channels));
@@ -154,21 +159,22 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
 
   }
 
-  if(oggpack_read(opb,2)>0)goto err_out; /* 2,3:reserved */
+  if(oggpack_read(opb,2)!=0)goto err_out; /* 2,3:reserved */
     
   if(info->submaps>1){
     for(i=0;i<vi->channels;i++){
       info->chmuxlist[i]=oggpack_read(opb,4);
-      if(info->chmuxlist[i]>=info->submaps)goto err_out;
+      if(info->chmuxlist[i]>=info->submaps || info->chmuxlist[i]<0)goto err_out;
     }
   }
   for(i=0;i<info->submaps;i++){
     int temp=oggpack_read(opb,8);
     if(temp>=ci->times)goto err_out;
     info->floorsubmap[i]=oggpack_read(opb,8);
-    if(info->floorsubmap[i]>=ci->floors)goto err_out;
+    if(info->floorsubmap[i]>=ci->floors || info->floorsubmap[i]<0)goto err_out;
     info->residuesubmap[i]=oggpack_read(opb,8);
-    if(info->residuesubmap[i]>=ci->residues)goto err_out;
+    if(info->residuesubmap[i]>=ci->residues || info->residuesubmap[i]<0)
+      goto err_out;
   }
 
   return info;
