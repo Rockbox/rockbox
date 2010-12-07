@@ -97,16 +97,27 @@ static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   info->partitions=oggpack_read(opb,6)+1;
   info->groupbook=oggpack_read(opb,8);
 
+  /* check for premature EOP */
+  if(info->groupbook<0)goto errout;
+
   for(j=0;j<info->partitions;j++){
     int cascade=oggpack_read(opb,3);
-    if(oggpack_read(opb,1))
-      cascade|=(oggpack_read(opb,5)<<3);
+    int cflag=oggpack_read(opb,1);
+    if(cflag<0) goto errout;
+    if(cflag){
+      int c=oggpack_read(opb,5);
+      if(c<0) goto errout;
+      cascade|=(c<<3);
+    }
     info->secondstages[j]=cascade;
 
     acc+=icount(cascade);
   }
-  for(j=0;j<acc;j++)
-    info->booklist[j]=oggpack_read(opb,8);
+  for(j=0;j<acc;j++){
+    int book=oggpack_read(opb,8);
+    if(book<0) goto errout;
+    info->booklist[j]=book;
+  }
 
   if(info->groupbook>=ci->books)goto errout;
   for(j=0;j<acc;j++){
