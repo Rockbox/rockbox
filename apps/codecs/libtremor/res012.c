@@ -109,8 +109,10 @@ static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
     info->booklist[j]=oggpack_read(opb,8);
 
   if(info->groupbook>=ci->books)goto errout;
-  for(j=0;j<acc;j++)
+  for(j=0;j<acc;j++){
     if(info->booklist[j]>=ci->books)goto errout;
+    if(ci->book_param[info->booklist[j]]->maptype==0)goto errout;
+  }
 
   /* verify the phrasebook is not specifying an impossible or
      inconsistent partitioning scheme. */

@@ -67,6 +67,10 @@ static inline int ilog(register unsigned int v){
   return(ret);
 }
 
+static int icomp(const void *a,const void *b){
+  return(**(int **)a-**(int **)b);
+}
+
 static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
   int j,k,count=0,maxclass=-1,rangebits;
@@ -110,15 +114,22 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   info->postlist[0]=0;
   info->postlist[1]=1<<rangebits;
 
+  /* don't allow repeated values in post list as they'd result in
+     zero-length segments */
+  {
+    int *sortpointer[VIF_POSIT+2];
+    for(j=0;j<count+2;j++)sortpointer[j]=info->postlist+j;
+    qsort(sortpointer,count+2,sizeof(*sortpointer),icomp);
+
+    for(j=1;j<count+2;j++)
+      if(*sortpointer[j-1]==*sortpointer[j])goto err_out;
+  }
+
   return(info);
   
  err_out:
   floor1_free_info(info);
   return(NULL);
-}
-
-static int icomp(const void *a,const void *b){
-  return(**(int **)a-**(int **)b);
 }
 
 static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
