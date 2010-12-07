@@ -143,11 +143,10 @@ int app_open(const char *name, int o, ...)
         name = _get_user_file_path(name, flags, realpath, sizeof(realpath));
     }
     va_start(ap, o);
-    fd = open(name, o, ap);
+    fd = open(name, o, va_arg(ap, unsigned int));
     va_end(ap);
     
     return fd;
-    
 }
 
 int app_creat(const char* name, mode_t mode)
