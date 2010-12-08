@@ -249,8 +249,9 @@ static inline void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
   ogg_int32_t qexp=*qexpp;
 
   asm("mov     r0,%3;"
-      "mov     r1,%5,asr#1;"
+      "movs    r1,%5,asr#1;"
       "add     r0,r0,r1,lsl#3;"
+      "beq 2f;\n"
       "1:"
       
       "ldmdb   r0!,{r1,r3};"
@@ -273,9 +274,10 @@ static inline void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
       "cmp     r0,%3;\n"
       "bhi     1b;\n"
       
+      "2:"
       // odd filter assymetry
       "ands    r0,%5,#1;\n"
-      "beq     2f;\n"
+      "beq     3f;\n"
       "add     r0,%3,%5,lsl#2;\n"
       
       "ldr     r1,[r0,#-4];\n"
@@ -287,7 +289,7 @@ static inline void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
       "umull   %1,r3,r0,%1;\n"       //pi*=labs(ilsp[j+1]-wi)
       
       "cmn     r2,r3;\n"             // shift down 16?
-      "beq     2f;\n"
+      "beq     3f;\n"
       "add     %2,%2,#16;\n"
       "mov     %0,%0,lsr #16;\n"
       "orr     %0,%0,r2,lsl #16;\n"
@@ -301,7 +303,7 @@ static inline void lsp_loop_asm(ogg_uint32_t *qip,ogg_uint32_t *pip,
       //}
 
       /* normalize to max 16 sig figs */
-      "2:"
+      "3:"
       "mov     r2,#0;"
       "orr     r1,%0,%1;"
       "tst     r1,#0xff000000;"

@@ -200,16 +200,19 @@ static void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
 
 #else
 
-    qi*=labs(ilsp[0]-wi);
-    pi*=labs(ilsp[1]-wi);
+    j=1;
+    if(m>1){
+      qi*=labs(ilsp[0]-wi);
+      pi*=labs(ilsp[1]-wi);
 
-    for(j=3;j<m;j+=2){
-      if(!(shift=MLOOP_1[(pi|qi)>>25]))
-        if(!(shift=MLOOP_2[(pi|qi)>>19]))
-          shift=MLOOP_3[(pi|qi)>>16];
-      qi=(qi>>shift)*labs(ilsp[j-1]-wi);
-      pi=(pi>>shift)*labs(ilsp[j]-wi);
-      qexp+=shift;
+      for(j+=2;j<m;j+=2){
+        if(!(shift=MLOOP_1[(pi|qi)>>25]))
+          if(!(shift=MLOOP_2[(pi|qi)>>19]))
+            shift=MLOOP_3[(pi|qi)>>16];
+        qi=(qi>>shift)*labs(ilsp[j-1]-wi);
+        pi=(pi>>shift)*labs(ilsp[j]-wi);
+        qexp+=shift;
+      }
     }
     if(!(shift=MLOOP_1[(pi|qi)>>25]))
       if(!(shift=MLOOP_2[(pi|qi)>>19]))
