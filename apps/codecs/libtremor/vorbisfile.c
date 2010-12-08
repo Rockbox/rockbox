@@ -902,7 +902,7 @@ static int _ov_open1(void *f,OggVorbis_File *vf,const char *initial,
        for second stage of seekable stream open; this saves having to
        seek/reread first link's serialnumber data then. */
     vf->serialnos=_ogg_calloc(serialno_list_size+2,sizeof(*vf->serialnos));
-    vf->serialnos[0]=vf->current_serialno;
+    vf->serialnos[0]=vf->current_serialno=vf->os.serialno;
     vf->serialnos[1]=serialno_list_size;
     memcpy(vf->serialnos+2,serialno_list,serialno_list_size*sizeof(*vf->serialnos));
 
@@ -910,7 +910,6 @@ static int _ov_open1(void *f,OggVorbis_File *vf,const char *initial,
     vf->dataoffsets=_ogg_calloc(1,sizeof(*vf->dataoffsets));
     vf->offsets[0]=0;
     vf->dataoffsets[0]=vf->offset;
-    vf->current_serialno=vf->os.serialno;
 
     vf->ready_state=PARTOPEN;
   }

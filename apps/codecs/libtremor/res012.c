@@ -135,6 +135,7 @@ static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
     int entries = ci->book_param[info->groupbook]->entries;
     int dim = ci->book_param[info->groupbook]->dim;
     int partvals = 1;
+    if (dim<1) goto errout;
     while(dim>0){
       partvals *= info->partitions;
       if(partvals > entries) goto errout;
@@ -322,7 +323,7 @@ int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
         if(s==0){
           /* fetch the partition word */
           int temp=vorbis_book_decode(look->phrasebook,&vb->opb);
-	  if(temp==-1 || temp>info->partvals)goto eopbreak;
+	  if(temp==-1 || temp>=info->partvals)goto eopbreak;
           partword[l]=look->decodemap[temp];
           if(partword[l]==NULL)goto errout;
         }
