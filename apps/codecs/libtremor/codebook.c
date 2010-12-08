@@ -42,12 +42,17 @@ static_codebook *vorbis_staticbook_unpack(oggpack_buffer *opb){
 
   /* codeword ordering.... length ordered or unordered? */
   switch((int)oggpack_read(opb,1)){
-  case 0:
+  case 0:{
+    long unused;
+    /* allocated but unused entries? */
+    unused=oggpack_read(opb,1);
+    if((s->entries*(unused?1:5)+7)>>3>opb->storage-oggpack_bytes(opb))
+      goto _eofout;
     /* unordered */
     s->lengthlist=(long *)_ogg_malloc(sizeof(*s->lengthlist)*s->entries);
 
     /* allocated but unused entries? */
-    if(oggpack_read(opb,1)){
+    if(unused){
       /* yes, unused entries */
 
       for(i=0;i<s->entries;i++){
@@ -68,17 +73,22 @@ static_codebook *vorbis_staticbook_unpack(oggpack_buffer *opb){
     }
     
     break;
+  }
   case 1:
     /* ordered */
     {
       long length=oggpack_read(opb,5)+1;
+      if(length==0)goto _eofout;
       s->lengthlist=(long *)_ogg_malloc(sizeof(*s->lengthlist)*s->entries);
 
       for(i=0;i<s->entries;){
 	long num=oggpack_read(opb,_ilog(s->entries-i));
 	if(num==-1)goto _eofout;
-	if(length>32)goto _errout;
-	for(j=0;j<num && i<s->entries;j++,i++)
+	if(length>32 || num>s->entries-i ||
+	   (num>0 && (num-1)>>(length>>1)>>((length+1)>>1))>0){
+	  goto _errout;
+	}
+	for(j=0;j<num;j++,i++)
 	  s->lengthlist[i]=length;
 	length++;
       }
@@ -116,6 +126,8 @@ static_codebook *vorbis_staticbook_unpack(oggpack_buffer *opb){
       }
       
       /* quantized values */
+      if((quantvals*s->q_quant+7)>>3>opb->storage-oggpack_bytes(opb))
+        goto _eofout;
       s->quantlist=(long *)_ogg_malloc(sizeof(*s->quantlist)*quantvals);
       for(i=0;i<quantvals;i++)
         s->quantlist[i]=oggpack_read(opb,s->q_quant);
