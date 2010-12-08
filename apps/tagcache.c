@@ -384,7 +384,7 @@ static long find_entry_ram(const char *filename,
     static long last_pos = 0;
     int i;
     
-    /* Check if we tagcache is loaded into ram. */
+    /* Check if tagcache is loaded into ram. */
     if (!tc_stat.ramcache)
         return -1;
 
