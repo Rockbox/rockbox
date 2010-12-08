@@ -193,7 +193,7 @@ static void _add_serialno(ogg_page *og,ogg_uint32_t **serialno_list, int *n){
 }
 
 /* returns nonzero if found */
-static int _lookup_serialno(long s, ogg_uint32_t *serialno_list, int n){
+static int _lookup_serialno(ogg_uint32_t s, ogg_uint32_t *serialno_list, int n){
   if(serialno_list){
     while(n--){
       if(*serialno_list == (ogg_uint32_t) s) return 1;
@@ -204,7 +204,7 @@ static int _lookup_serialno(long s, ogg_uint32_t *serialno_list, int n){
 }
 
 static int _lookup_page_serialno(ogg_page *og, ogg_uint32_t *serialno_list, int n){
-  long s = ogg_page_serialno(og);
+  ogg_uint32_t s = ogg_page_serialno(og);
   return _lookup_serialno(s,serialno_list,n);
 }
 
@@ -245,12 +245,12 @@ static ogg_int64_t _get_prev_page_serial(OggVorbis_File *vf,
         ret_gran=ogg_page_granulepos(&og);
         offset=ret;
 
-        if(ret_serialno == (ogg_uint32_t) *serialno){
+        if((ogg_uint32_t)ret_serialno == (ogg_uint32_t)*serialno){
           prefoffset=ret;
           *granpos=ret_gran;
         }
 
-        if(!_lookup_serialno(ret_serialno,serial_list,serial_n)){
+        if(!_lookup_serialno((ogg_uint32_t)ret_serialno,serial_list,serial_n)){
           /* we fell off the end of the link, which means we seeked
              back too far and shouldn't have been looking in that link
              to begin with.  If we found the preferred serial number,
@@ -1201,6 +1201,36 @@ int ov_raw_seek(OggVorbis_File *vf,ogg_int64_t pos){
   return OV_EBADLINK;
 }
 
+/* rescales the number x from the range of [0,from] to [0,to]
+   x is in the range [0,from]
+   from, to are in the range [1, 1<<62-1] */
+ogg_int64_t rescale64(ogg_int64_t x, ogg_int64_t from, ogg_int64_t to){
+  ogg_int64_t frac=0;
+  ogg_int64_t ret=0;
+  int i;
+  if(x >= from) return to;
+  if(x <= 0) return 0;
+
+  for(i=0;i<64;i++){
+    if(x>=from){
+      frac|=1;
+      x-=from;
+    }
+    x<<=1;
+    frac<<=1;
+  }
+
+  for(i=0;i<64;i++){
+    if(frac & 1){
+      ret+=to;
+    }
+    frac>>=1;
+    ret>>=1;
+  }
+
+  return ret;
+}
+
 /* Page granularity seek (faster than sample granularity because we
    don't do the last bit of decode to find a specific sample).
 
@@ -1246,8 +1276,9 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
         bisect=begin;
       }else{
         /* take a (pretty decent) guess. */
-        bisect=begin +
-          (target-begintime)*(end-begin)/(endtime-begintime) - CHUNKSIZE;
+        bisect=begin + rescale64(target-begintime,
+				 endtime-begintime,
+				 end-begin) - CHUNKSIZE;
         if(bisect<begin+CHUNKSIZE)
           bisect=begin;
       }
