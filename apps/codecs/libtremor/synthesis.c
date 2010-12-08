@@ -28,13 +28,17 @@
 static ogg_int32_t *ipcm_vect[CHANNELS] IBSS_ATTR;
 
 static inline int _vorbis_synthesis1(vorbis_block *vb,ogg_packet *op,int decodep){
-  vorbis_dsp_state     *vd=vb->vd;
-  private_state        *b=(private_state *)vd->backend_state;
-  vorbis_info          *vi=vd->vi;
-  codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
-  oggpack_buffer       *opb=&vb->opb;
+  vorbis_dsp_state     *vd= vb ? vb->vd : 0;
+  private_state        *b= vd ? (private_state *)vd->backend_state: 0;
+  vorbis_info          *vi= vd ? vd->vi : 0;
+  codec_setup_info     *ci= vi ? (codec_setup_info *)vi->codec_setup : 0;
+  oggpack_buffer       *opb=vb ? &vb->opb : 0;
   int                   type,mode,i;
  
+  if (!vd || !b || !vi || !ci || !opb) {
+    return OV_EBADPACKET;
+  }
+
   /* first things first.  Make sure decode is ready */
   _vorbis_block_ripcord(vb);
   oggpack_readinit(opb,op->packet,op->bytes);
@@ -50,6 +54,10 @@ static inline int _vorbis_synthesis1(vorbis_block *vb,ogg_packet *op,int decodep
   if(mode==-1)return(OV_EBADPACKET);
   
   vb->mode=mode;
+  if(!ci->mode_param[mode]){
+    return(OV_EBADPACKET);
+  }
+
   vb->W=ci->mode_param[mode]->blockflag;
   if(vb->W){
     vb->lW=oggpack_read(opb,1);

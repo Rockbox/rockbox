@@ -26,9 +26,9 @@
 
 /* unpacks a codebook from the packet buffer into the codebook struct,
    readies the codebook auxiliary structures for decode *************/
-int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
+static_codebook *vorbis_staticbook_unpack(oggpack_buffer *opb){
   long i,j;
-  memset(s,0,sizeof(*s));
+  static_codebook *s=_ogg_calloc(1,sizeof(*s));
 
   /* make sure alignment is correct */
   if(oggpack_read(opb,24)!=0x564342)goto _eofout;
@@ -75,17 +75,18 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
       s->lengthlist=(long *)_ogg_malloc(sizeof(*s->lengthlist)*s->entries);
 
       for(i=0;i<s->entries;){
-        long num=oggpack_read(opb,_ilog(s->entries-i));
-        if(num==-1)goto _eofout;
-        for(j=0;j<num && i<s->entries;j++,i++)
-          s->lengthlist[i]=length;
-        length++;
+	long num=oggpack_read(opb,_ilog(s->entries-i));
+	if(num==-1)goto _eofout;
+	if(length>32)goto _errout;
+	for(j=0;j<num && i<s->entries;j++,i++)
+	  s->lengthlist[i]=length;
+	length++;
       }
     }
     break;
   default:
     /* EOF */
-    return(-1);
+    goto _eofout;
   }
   
   /* Do we have a mapping to unpack? */
@@ -127,12 +128,12 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
   }
 
   /* all set */
-  return(0);
+  return(s);
   
  _errout:
  _eofout:
-  vorbis_staticbook_clear(s);
-  return(-1); 
+  vorbis_staticbook_destroy(s);
+  return(NULL); 
 }
 
 /* the 'eliminate the decode tree' optimization actually requires the
