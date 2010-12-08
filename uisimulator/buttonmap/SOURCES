@@ -63,5 +63,7 @@ samsung-yh820_yh92x.c
 pbell-vibe500.c
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
 mpio-hd200.c
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
+mpio-hd300.c
 #endif
 #endif /* SIMULATOR */

@@ -404,6 +404,13 @@
 #define UI_LCD_POSX                 101
 #define UI_LCD_POSY                 195
 
+#elif defined(MPIO_HD300)
+#define UI_TITLE                    "MPIO HD300"
+#define UI_WIDTH                    286 /* width of GUI window */
+#define UI_HEIGHT                   524 /* height of GUI window */
+#define UI_LCD_POSX                 64
+#define UI_LCD_POSY                 127
+
 #elif defined(APPLICATION)
 #define UI_TITLE                    "Rockbox"
 #define UI_LCD_POSX                 0
