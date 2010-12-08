@@ -95,7 +95,7 @@ typedef struct vorbis_info_residue0{
   int    partvals;         /* partitions ^ groupbook dim */
   int    groupbook;        /* huffbook for partitioning */
   int    secondstages[64]; /* expanded out to pointers in lookup */
-  int    booklist[256];    /* list of second stage books */
+  int    booklist[512];    /* list of second stage books */
 } vorbis_info_residue0;
 
 /* Mapping backend generic *****************************************/
