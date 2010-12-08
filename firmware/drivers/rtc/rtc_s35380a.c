@@ -24,8 +24,6 @@
 #include "rtc.h" 
 #include "i2c-coldfire.h"
 
-#include "lcd.h"
-#include "font.h"
 /*  Driver for the Seiko S35380A real-time clock chip with i2c interface
 
     This driver was derived from rtc_s3539a.c and adapted for the MPIO HD300
