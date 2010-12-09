@@ -492,6 +492,7 @@ void main(void)
                     /* init USB */
                     ide_power_enable(true);
                     sleep(HZ/20);
+                    ata_enable(false);
                     usb_enable(true);
                 }
                 
@@ -512,6 +513,7 @@ void main(void)
                 {
                     /* disable USB */
                     usb_enable(false);
+                    ata_enable(true);
                     sleep(HZ);
                     ide_power_enable(false);
                     sleep(HZ);

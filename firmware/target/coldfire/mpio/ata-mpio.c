@@ -39,13 +39,22 @@ void ata_reset(void)
 
 void ata_enable(bool on)
 {
-    (void)on;
+    /* GPO36  /reset line of GL811E */
+    if (on)
+        and_l(~(1<<4), &GPIO1_OUT);
+    else
+        or_l((1<<4), &GPIO1_OUT);
+
+    or_l((1<<4), &GPIO1_ENABLE);
+    or_l((1<<4), &GPIO1_FUNCTION);
 }
 
-/* to be fixed */
 bool ata_is_coldstart(void)
 {
-    return true;
+    /* check if ATA reset line is configured
+     * as GPIO
+     */
+    return (GPIO_FUNCTION & (1<<19)) == 0;
 }
 
 void ata_device_init(void)

@@ -30,9 +30,6 @@ void usb_init_device(void)
     /* GPIO42 is USB detect input
      * but it also serves as MCLK2 for DAC
      */
-    and_l(~(1<<4), &GPIO1_OUT);           /* GPIO36 low */
-    or_l((1<<4), &GPIO1_ENABLE);          /* GPIO36 */
-    or_l((1<<4)|(1<<5), &GPIO1_FUNCTION); /* GPIO36 GPIO37 */
 
      /* GPIO22 GPIO30 high */
     or_l((1<<22)|(1<<30), &GPIO_OUT);
@@ -48,28 +45,16 @@ int usb_detect(void)
 
 void usb_enable(bool on)
 {
-    /* one second timeout */
-    unsigned char timeout = 10;
-   
     if(on)
     {
-        and_l(~(1<<30),&GPIO_OUT);  /* GPIO30 low */
-        and_l(~(1<<22),&GPIO_OUT);  /* GPIO22 low */
-
-        or_l((1<<4),&GPIO1_OUT);    /* GPIO36 high */
-
+        /* Turn on power for GL811E bridge */
+        and_l(~((1<<30)|(1<<22)),&GPIO_OUT);  /* GPIO30 low */
+                                              /* GPIO22 low */
     }
     else
     {
-        or_l((1<<22),&GPIO_OUT);  /* GPIO22 high */
-        or_l((1<<30),&GPIO_OUT);  /* GPIO30 high */
-
-        and_l(~(1<<4),&GPIO1_OUT); /* GPIO36 low */
-
-        while ( !(GPIO1_READ & (1<<5)) && timeout--)
-        {
-            sleep(HZ/10);
-        }
-        sleep(HZ);
+        /* Turn off power */
+        or_l((1<<30)|(1<<22),&GPIO_OUT);  /* GPIO22 high */
+                                          /* GPIO30 high */
     }
 }
