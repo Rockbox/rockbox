@@ -27,6 +27,8 @@
 #define restore_irq(level) (void)level
 
 void power_off(void);
+void wait_for_interrupt(void);
+void interrupt(void);
 
 #endif /* __SYSTEM_TARGET_H__ */
 

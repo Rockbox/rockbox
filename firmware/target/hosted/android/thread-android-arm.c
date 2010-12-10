@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include <jni.h>
+#include <system.h>
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
  *---------------------------------------------------------------------------
@@ -89,7 +90,6 @@ static inline void load_context(const void* addr)
  * wait_for_interrupt is implemented in kernel-android.c
  **/
 
-extern void wait_for_interrupt(void);
 static inline void core_sleep(void)
 {
     wait_for_interrupt();
