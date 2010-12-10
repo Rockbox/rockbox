@@ -76,6 +76,9 @@
 #include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
+#if defined(APPLICATION) && (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#include "notification.h"
+#endif
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -333,11 +336,11 @@ static void init_tagcache(void)
 
 static void init(void)
 {
+    system_init();
+    kernel_init();
 #ifdef APPLICATION
     paths_init();
 #endif
-    system_init();
-    kernel_init();
     buffer_init();
     enable_irq();
     lcd_init();
@@ -350,6 +353,9 @@ static void init(void)
     backlight_init();
 #if (CONFIG_PLATFORM & PLATFORM_SDL)
     sim_tasks_init();
+#endif
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+    notification_init();
 #endif
     lang_init(core_language_builtin, language_strings, 
               LANG_LAST_INDEX_IN_ARRAY);

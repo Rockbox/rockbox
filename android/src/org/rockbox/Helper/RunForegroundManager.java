@@ -12,6 +12,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 public class RunForegroundManager
 {
@@ -25,34 +26,32 @@ public class RunForegroundManager
 
     public RunForegroundManager(Service service) throws Exception
     {
+        mCurrentService = service;
         mNM = (NotificationManager)
                         service.getSystemService(Service.NOTIFICATION_SERVICE);
-        /* For now we'll use the same text for the ticker and the 
-         * expanded notification */
-        CharSequence text = service.getText(R.string.notification);
-        /* Set the icon, scrolling text and timestamp */
-        mNotification = new Notification(R.drawable.icon, text,
-                System.currentTimeMillis());
-
-        /* The PendingIntent to launch our activity if the user selects
-         * this notification */
+        RemoteViews views = new RemoteViews(service.getPackageName(), R.layout.statusbar);
+        /* create Intent for clicking on the expanded notifcation area */
         Intent intent = new Intent(service, RockboxActivity.class);
-        PendingIntent contentIntent = 
-                PendingIntent.getActivity(service, 0, intent, 0);
+        intent = intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        /*  Set the info for the views that show in the notification panel. */
-        mNotification.setLatestEventInfo(service, 
-                service.getText(R.string.notification), text, contentIntent);
-        
+        mNotification = new Notification();
+        mNotification.tickerText = service.getString(R.string.notification);
+        mNotification.icon = R.drawable.notification;
+        mNotification.contentView = views;
+        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+        mNotification.contentIntent = PendingIntent.getActivity(service, 0, intent, 0);
+
         try {
             api = new newForegroundApi(R.string.notification, mNotification);
         } catch (NoSuchMethodException e) {
             /* Fall back on the old API */
             api = new oldForegroundApi();
         }
-        mCurrentService = service; 
     }
-    
+    private void LOG(CharSequence text)
+    {
+        Log.d("Rockbox", (String)text);
+    }
     private void LOG(CharSequence text, Throwable tr)
     {
         Log.d("Rockbox", (String)text, tr);
@@ -83,6 +82,14 @@ public class RunForegroundManager
         api.stopForeground();
     }
 
+    public void updateNotification(String title, String content, String ticker)
+    {
+        RemoteViews views = mNotification.contentView;
+        views.setTextViewText(R.id.title, title);
+        views.setTextViewText(R.id.content, content);
+        mNotification.tickerText = ticker;
+        mNM.notify(R.string.notification, mNotification);
+    }
 
     private interface IRunForeground 
     {

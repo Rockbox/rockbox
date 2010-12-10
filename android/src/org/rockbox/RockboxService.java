@@ -117,10 +117,13 @@ public class RockboxService extends Service
         
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
-        try {
-            fg_runner = new RunForegroundManager(this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (fg_runner == null)
+        {
+            try {
+                fg_runner = new RunForegroundManager(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

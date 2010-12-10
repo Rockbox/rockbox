@@ -8,6 +8,9 @@
 #
 
 INCLUDES += -I$(APPSDIR) $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
+ifdef APP_TYPE
+	INCLUDES += -I$(APPSDIR)/hosted
+endif
 SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 
 # apps/features.txt is a file that (is preprocessed and) lists named features

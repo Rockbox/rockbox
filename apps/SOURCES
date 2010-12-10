@@ -91,6 +91,7 @@ gui/statusbar-skinned.c
 #endif
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
 hosted/yesno.c
+hosted/notification.c
 #else
 gui/yesno.c
 #endif
