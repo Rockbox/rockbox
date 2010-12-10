@@ -59,7 +59,7 @@
 
 /* Voice thread variables */
 static unsigned int voice_thread_id = 0;
-static long voice_stack[0x7c0/sizeof(long)] IBSS_ATTR_VOICE_STACK;
+static long voice_stack[(DEFAULT_STACK_SIZE + 0x3C0)/sizeof(long)] IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice";
 
 /* Voice thread synchronization objects */
