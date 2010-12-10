@@ -180,7 +180,14 @@ int button_read_device(void)
 #ifndef BOOTLOADER
     /* Only main hold affects backlight */
     if (hold_button != hold_button_old)
+    {
         backlight_hold_changed(hold_button);
+
+        if ( hold_button )
+            disable_scrollstrip_interrupts();
+        else
+            enable_scrollstrip_interrupts();
+    }
 #endif
 
     /* Skip if main hold is active */
@@ -207,28 +214,26 @@ int button_read_device(void)
                 if (data > 950)
                     btn |= BUTTON_REC;
         }
-    }
-    
-    /* Handle GPIOs buttons
-     *
-     * GPIO56 active high PLAY/PAUSE/ON
-     * GPIO45 active low ENTER
-     * GPIO41 active low MENU
-     */
+
+        /* Handle GPIOs buttons
+         *
+         * GPIO56 active high PLAY/PAUSE/ON
+         * GPIO45 active low ENTER
+         * GPIO41 active low MENU
+         */
  
-   data = GPIO1_READ;
+       data = GPIO1_READ;
    
-    if (!hold_button)
-    {
-        if (data & (1<<24))
-            btn |= BUTTON_PLAY;
+       if (data & (1<<24))
+           btn |= BUTTON_PLAY;
 
-        if (!(data & (1<<13)))
-            btn |= BUTTON_ENTER;
+       if (!(data & (1<<13)))
+           btn |= BUTTON_ENTER;
 
-        if (!(data & (1<<9)))
-            btn |= BUTTON_MENU;
-    }
+       if (!(data & (1<<9)))
+           btn |= BUTTON_MENU;
+
+    } /* !button_hold() */
 
     return btn;
 }
