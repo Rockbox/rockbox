@@ -210,8 +210,22 @@ void lcd_update(void)
     lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
     lcd_write_command(LCD_CNTL_DATA_WRITE);
 
-    /* Copy display bitmap to hardware */
-    lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
+    /* lcd can't handle the speed of DMA transfer when boosted */
+    if ( cpu_frequency > 60000000 )
+    {
+        /* Copy display bitmap to hardware */
+        lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
+    }
+    else
+    {
+        /* Copy display bitmap to hardware using DMA */
+        DSR3 = 1;
+        DAR3 = 0xf0000002;
+        SAR3 = (unsigned long)lcd_framebuffer;
+        BCR3 = LCD_WIDTH*LCD_FBHEIGHT;
+        DCR3 = DMA_BWC(1) | DMA_SINC | DMA_SSIZE(DMA_SIZE_BYTE) |
+               DMA_DSIZE(DMA_SIZE_BYTE) | DMA_START;
+    }
 }
 
 /* Update a fraction of the display. */
