@@ -55,6 +55,7 @@ static bool get_other_asap_metadata(int fd, struct mp3entry *id3)
     return true;
 }
 #endif /* CONFIG_CODEC == SWCODEC */
+bool write_metadata_log = false;
 
 const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 {
@@ -291,6 +292,19 @@ bool mp3info(struct mp3entry *entry, const char *filename)
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 {
     const struct afmt_entry *entry;
+    int logfd = 0;
+    DEBUGF("Read metadata for %s\n", trackname);
+    if (write_metadata_log)
+    {
+        logfd = open("/metadata.log", O_WRONLY | O_APPEND | O_CREAT, 0666);
+        if (logfd >= 0)
+        {
+            write(logfd, trackname, strlen(trackname));
+            write(logfd, "\n", 1);
+            close(logfd);
+        }
+    }
+    
     /* Clear the mp3entry to avoid having bogus pointers appear */
     memset(id3, 0, sizeof(struct mp3entry));
 
