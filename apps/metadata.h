@@ -246,6 +246,7 @@ struct mp3entry {
     unsigned long offset;  /* bytes played */
     int index;             /* playlist index */
 
+#ifdef HAVE_TAGCACHE
     /* runtime database fields */
     long tagcache_idx;     /* 0=invalid, otherwise idx+1 */
     int rating;
@@ -253,6 +254,7 @@ struct mp3entry {
     long playcount;
     long lastplayed;
     long playtime;
+#endif
     
     /* replaygain support */
     
