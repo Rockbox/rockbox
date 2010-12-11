@@ -428,39 +428,7 @@ static inline void lcd_write_pixel(fb_data pixel)
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    int x,y;
-    fb_data* p = &lcd_framebuffer[0][0];
-
-    if (lcd_type==0) {
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_START_POS, 0);
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_END_POS,   LCD_WIDTH-1);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  0);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    LCD_HEIGHT-1);
-
-        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  0);
-        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   0);
-
-        s5l_lcd_write_cmd(0);
-        s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
-    } else {
-        s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_wdata(0);            /* Start column */
-        s5l_lcd_write_wdata(LCD_WIDTH-1);  /* End column */
-
-        s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_wdata(0);            /* Start row */
-        s5l_lcd_write_wdata(LCD_HEIGHT-1); /* End row */
-
-        s5l_lcd_write_cmd(R_MEMORY_WRITE);
-    }
-
-
-    /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_HEIGHT; y++) {
-        for (x = 0; x < LCD_WIDTH; x++) {
-            lcd_write_pixel(*(p++));
-        }
-    }
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */
