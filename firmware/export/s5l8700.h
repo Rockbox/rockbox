@@ -609,17 +609,17 @@
 #define LCD_BASE 0x38600000
 #endif
 
-#define LCD_CON                 (*(REG16_PTR_T)(LCD_BASE+0x00))  /* Control register. */
-#define LCD_WCMD                (*(REG16_PTR_T)(LCD_BASE+0x04))  /* Write command register. */
-#define LCD_RCMD                (*(REG16_PTR_T)(LCD_BASE+0x0C))  /* Read command register. */
-#define LCD_RDATA               (*(REG16_PTR_T)(LCD_BASE+0x10))  /* Read data register. */
-#define LCD_DBUFF               (*(REG16_PTR_T)(LCD_BASE+0x14))  /* Read Data buffer */
-#define LCD_INTCON              (*(REG16_PTR_T)(LCD_BASE+0x18))  /* Interrupt control register */
-#define LCD_STATUS              (*(REG16_PTR_T)(LCD_BASE+0x1C))  /* LCD Interface status 0106 */
-#define LCD_PHTIME              (*(REG16_PTR_T)(LCD_BASE+0x20))  /* Phase time register 0060 */
-#define LCD_RST_TIME            (*(REG16_PTR_T)(LCD_BASE+0x24))  /* Reset active period 07FF */
-#define LCD_DRV_RST             (*(REG16_PTR_T)(LCD_BASE+0x28))  /* Reset drive signal */
-#define LCD_WDATA               (*(REG16_PTR_T)(LCD_BASE+0x40))  /* Write data register FIXME */
+#define LCD_CON                 (*(REG32_PTR_T)(LCD_BASE+0x00))  /* Control register. */
+#define LCD_WCMD                (*(REG32_PTR_T)(LCD_BASE+0x04))  /* Write command register. */
+#define LCD_RCMD                (*(REG32_PTR_T)(LCD_BASE+0x0C))  /* Read command register. */
+#define LCD_RDATA               (*(REG32_PTR_T)(LCD_BASE+0x10))  /* Read data register. */
+#define LCD_DBUFF               (*(REG32_PTR_T)(LCD_BASE+0x14))  /* Read Data buffer */
+#define LCD_INTCON              (*(REG32_PTR_T)(LCD_BASE+0x18))  /* Interrupt control register */
+#define LCD_STATUS              (*(REG32_PTR_T)(LCD_BASE+0x1C))  /* LCD Interface status 0106 */
+#define LCD_PHTIME              (*(REG32_PTR_T)(LCD_BASE+0x20))  /* Phase time register 0060 */
+#define LCD_RST_TIME            (*(REG32_PTR_T)(LCD_BASE+0x24))  /* Reset active period 07FF */
+#define LCD_DRV_RST             (*(REG32_PTR_T)(LCD_BASE+0x28))  /* Reset drive signal */
+#define LCD_WDATA               (*(REG32_PTR_T)(LCD_BASE+0x40))  /* Write data register (0x40...0x5C) FIXME */
 
 /* 27. CLCD CONTROLLER */
 #define LCDCON1                 (*(REG32_PTR_T)(0x39200000))     /* LCD control 1 register */
