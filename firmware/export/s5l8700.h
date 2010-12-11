@@ -25,7 +25,7 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-#define TIMER_FREQ  47923200L
+#define TIMER_FREQ  (1843200 * 4 * 26 / 1 / 4) /* 47923200 Hz */
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 

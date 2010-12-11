@@ -25,18 +25,18 @@
 #include "mmu-arm.h"
 
 #define CPUFREQ_SLEEP      32768
-#define CPUFREQ_DEFAULT 47923200
-#define CPUFREQ_NORMAL  47923200
-#define CPUFREQ_MAX    191692800
+#define CPUFREQ_MAX     (1843200 * 4 * 26 / 1) /* 191692800 Hz */
+#define CPUFREQ_DEFAULT (CPUFREQ_MAX/4)        /*  47923200 Hz */
+#define CPUFREQ_NORMAL  (CPUFREQ_MAX/4)
 
 #define STORAGE_WANTS_ALIGN
 
-#define inl(a) (*(volatile unsigned long *) (a))
+#define inl(a)    (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
-#define inb(a) (*(volatile unsigned char *) (a))
+#define inb(a)    (*(volatile unsigned char *) (a))
 #define outb(a,b) (*(volatile unsigned char *) (b) = (a))
-#define inw(a) (*(volatile unsigned short *) (a))
-#define outw(a,b) (*(volatile unsigned short *) (b) = (a))
+#define inw(a)    (*(volatile unsigned short*) (a))
+#define outw(a,b) (*(volatile unsigned short*) (b) = (a))
 
 static inline void udelay(unsigned usecs)
 {
