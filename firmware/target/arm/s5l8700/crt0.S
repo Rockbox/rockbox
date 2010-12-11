@@ -131,7 +131,7 @@ start_loc:
     mov r0, #0
     str r0, [r1,#0x24]  // PLLCON
 #ifdef IPOD_NANO2G
-    ldr r0, =0x21200    // pdiv=2, mdiv=0x12 sdiv=0
+    ldr r0, =0x021200   // pdiv=2, mdiv=0x12 sdiv=0, 192 MHz
 #else
     ldr r0, =0x1ad200   // pdiv=0x1a, mdiv=0xd2 sdiv=0
 #endif
@@ -251,6 +251,10 @@ start_loc:
     orr r0, r0, #0x5
     orr r0, r0, #0x1000
     mcr 15, 0, r0, c1, c0, 0 // re-enable protection unit and caches
+
+    ldr r1, =0x38200000
+    ldr r0, =0x006A49A5 // default: settings from Apple FW (96 MHz HCLK)
+    str r0, [r1, #0x10] // MIUSDPARA
 
 #else
 
