@@ -202,17 +202,16 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    int y;
+
+    /* Setup initial PAGE and COLUMN address
+     * the addressing circuit will take care of the rest
+     */
+    lcd_write_command_ex(LCD_CNTL_PAGE, 0, -1);
+    lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
+    lcd_write_command(LCD_CNTL_DATA_WRITE);
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_FBHEIGHT; y++)
-    {
-        lcd_write_command_ex(LCD_CNTL_PAGE, y, -1);
-        lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
-
-        lcd_write_command(LCD_CNTL_DATA_WRITE);
-        lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
-    }
+    lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
 }
 
 /* Update a fraction of the display. */
