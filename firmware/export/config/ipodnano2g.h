@@ -149,7 +149,7 @@
 #define CONFIG_CHARGING CHARGING_MONITOR
 
 /* define current usage levels */
-#define CURRENT_NORMAL     21  /* playback @48MHz clock, backlight off */
+#define CURRENT_NORMAL     17  /* playback @48MHz clock, lcd sleep*/
 #define CURRENT_BACKLIGHT  23  /* maximum brightness */
 
 /* define this if the unit can be powered or charged via USB */
