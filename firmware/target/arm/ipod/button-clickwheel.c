@@ -335,7 +335,7 @@ bool headphones_inserted(void)
     return (GPIOA_INPUT_VAL & 0x80)?true:false;
 }
 #else
-void INT_WHEEL(void)
+void INT_SPI(void)
 {
     int clickwheel_events = WHEELINT;
 
@@ -380,16 +380,22 @@ void button_init_device(void)
 
 bool button_hold(void)
 {
+#if CONFIG_CPU==S5L8701
+    return ((PDAT14 & (1 << 6)) == 0);
+#elif CONFIG_CPU==S5L8702
     //TODO: Implement
-    //return ((PDAT14 & (1 << 6)) == 0);
     return false;
+#endif
 }
 
 bool headphones_inserted(void)
 {
+#if CONFIG_CPU==S5L8701
+    return ((PDAT14 & (1 << 5)) == 0);
+#elif CONFIG_CPU==S5L8702
     //TODO: Implement
-    //return ((PDAT14 & (1 << 5)) == 0);
     return false;
+#endif
 }
 #endif
 
