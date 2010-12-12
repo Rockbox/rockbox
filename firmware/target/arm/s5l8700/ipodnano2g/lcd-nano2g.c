@@ -219,14 +219,10 @@ unsigned short lcd_init_sequence_1[] = {
 static inline void s5l_lcd_write_cmd_data(int cmd, int data)
 {
     while (LCD_STATUS & 0x10);
-    LCD_WCMD = cmd >> 8;
-    while (LCD_STATUS & 0x10);
-    LCD_WCMD = cmd & 0xff;
+    LCD_WCMD = cmd;
 
     while (LCD_STATUS & 0x10);
-    LCD_WDATA = data >> 8;
-    while (LCD_STATUS & 0x10);
-    LCD_WDATA = data & 0xff;
+    LCD_WDATA = data;
 }
 
 static inline void s5l_lcd_write_cmd(unsigned short cmd)
@@ -238,23 +234,19 @@ static inline void s5l_lcd_write_cmd(unsigned short cmd)
 static inline void s5l_lcd_write_wcmd(unsigned short cmd)
 {
     while (LCD_STATUS & 0x10);
-    LCD_WCMD = cmd >> 8;
-    while (LCD_STATUS & 0x10);
-    LCD_WCMD = cmd & 0xff;
+    LCD_WCMD = cmd;
 }
 
 static inline void s5l_lcd_write_data(unsigned short data)
 {
     while (LCD_STATUS & 0x10);
-    LCD_WDATA = data & 0xff;
+    LCD_WDATA = data;
 }
 
 static inline void s5l_lcd_write_wdata(unsigned short data)
 {
     while (LCD_STATUS & 0x10);
-    LCD_WDATA = data >> 8;
-    while (LCD_STATUS & 0x10);
-    LCD_WDATA = data & 0xff;
+    LCD_WDATA = data;
 }
 
 /*** hardware configuration ***/
@@ -409,6 +401,8 @@ void lcd_init_device(void)
         lcd_type = 0;  /* Similar to ILI9320 - aka "type 2" */
     else
         lcd_type = 1;  /* Similar to LDS176 - aka "type 7" */
+        
+    LCD_CON |= 0x100;  /* use 16 bit bus width, little endian */
 
     lcd_ispowered = true;
 }
@@ -417,8 +411,7 @@ void lcd_init_device(void)
 
 static inline void lcd_write_pixel(fb_data pixel)
 {
-    LCD_WDATA = pixel >> 8;
-    LCD_WDATA = pixel; /* no need to &0xff here, only lower 8 bit used */
+    LCD_WDATA = pixel;
 }
 
 /* Update the display.
