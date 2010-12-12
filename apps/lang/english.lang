@@ -63,9 +63,10 @@
 # H320/H340         iriverh300
 # H10               iriverh10
 # IFP 7XX           iriverifp7xx
-# iaudio
+# iaudio/Cowon
 # X5                iaudiox5
 # M5                iaudiom5
+# D2                cowond2*
 # ipod
 # All iPods         ipod*
 # 4G Color/Photo    ipodcolor
@@ -76,21 +77,26 @@
 # mini              ipodmini1g
 # mini 2G           ipodmini2g
 # Toshiba
+# All gigabeats     gigabeat*
 # Gigabeat Fxx      gigabeatfx
 # Gigabeat Sxx      gigabeats
-#
 # Sandisk
-# Sansa E200        sansae200
+# Sansa E200        sansae200*
 # Sansa C200        sansac200*
-#
+# Sansa Fuze        sansafuze*
+# Sansa Clip        sansaclip*
 # Olympus
 # m:robe 100        mrobe100
-#
+# m:robe 500        mrobe500
+# Mpio
+# HD200             mpiohd200
+# HD300             mpiohd300
 # Packard Bell
 # Vibe 500          vibe500
-#
 # Philips
 # GoGear SA9200     gogearsa9200
+# Samsung
+# YH820/YH920/YH925 samsungyh*
 
 <phrase>
   id: LANG_SET_BOOL_YES
