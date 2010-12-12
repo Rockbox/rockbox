@@ -6615,7 +6615,7 @@
     archosplayer: "Buf:"
   </source>
   <dest>
-    *: "Tampon :"
+    *: "Tampon:"
     archosplayer: "Tamp.:"
   </dest>
   <voice>
@@ -6632,7 +6632,7 @@
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "Batterie : %d%% %dh %dm"
+    *: "Batterie: %d%% %dh %dm"
     archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
@@ -6648,7 +6648,7 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Disque :"
+    *: "Disque:"
   </dest>
   <voice>
     *: "Disque"
@@ -6662,7 +6662,7 @@
     *: "Free:"
   </source>
   <dest>
-    *: "Libre :"
+    *: "Libre:"
   </dest>
   <voice>
     *: "Espace disque libre:"
@@ -7932,7 +7932,7 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Mode :"
+    *: "Mode:"
   </dest>
   <voice>
     *: ""
@@ -8306,11 +8306,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batterie : en charge..."
+    charging: "Batterie: en charge..."
   </dest>
   <voice>
     *: none
-    charging: "Batterie : en charge"
+    charging: "Batterie: en charge"
   </voice>
 </phrase>
 <phrase>
@@ -8323,7 +8323,7 @@
   </source>
   <dest>
     *: none
-    archosrecorder: "Batterie : charge max."
+    archosrecorder: "Batterie: charge max."
   </dest>
   <voice>
     *: none
@@ -8340,7 +8340,7 @@
   </source>
   <dest>
     *: none
-    charging: "Batterie : charge persistante"
+    charging: "Batterie: charge persistante"
   </dest>
   <voice>
     *: none
@@ -9735,7 +9735,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Mode édition : %s %s"
+    swcodec: "Mode édition: %s %s"
   </dest>
   <voice>
     *: none
@@ -9786,7 +9786,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mode :"
+    lcd_bitmap: "Mode:"
   </dest>
   <voice>
     *: none
@@ -10858,7 +10858,7 @@
   </source>
   <dest>
     *: none
-    recording: "Nom de fichier :"
+    recording: "Nom de fichier:"
   </dest>
   <voice>
     *: none
@@ -10892,7 +10892,7 @@
   </source>
   <dest>
     *: none
-    recording: "Temps de coupe :"
+    recording: "Temps de coupe:"
   </dest>
   <voice>
     *: none
@@ -10909,7 +10909,7 @@
   </source>
   <dest>
     *: none
-    recording: "Taille :"
+    recording: "Taille:"
   </dest>
   <voice>
     *: none
@@ -11554,7 +11554,7 @@
     *: "Skin RAM usage:"
   </source>
   <dest>
-    *: "Tampon du thème :"
+    *: "Tampon du thème:"
   </dest>
   <voice>
     *: "Tampon du thème utilisé"
