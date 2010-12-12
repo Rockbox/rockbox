@@ -66,6 +66,7 @@ doom
 
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
 midi
+mikmod
 #endif
 
 /* beatbox */
