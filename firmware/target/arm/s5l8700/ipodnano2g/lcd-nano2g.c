@@ -417,10 +417,8 @@ void lcd_init_device(void)
 
 static inline void lcd_write_pixel(fb_data pixel)
 {
-    while (LCD_STATUS & 0x10);
-    LCD_WDATA = (pixel & 0xff00) >> 8;
-    while (LCD_STATUS & 0x10);
-    LCD_WDATA = pixel & 0xff;
+    LCD_WDATA = pixel >> 8;
+    LCD_WDATA = pixel; /* no need to &0xff here, only lower 8 bit used */
 }
 
 /* Update the display.
@@ -435,9 +433,10 @@ void lcd_update(void)
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int xx,yy;
     int y0, x0, y1, x1;
     fb_data* p;
+    
+    width = (width + 1) & ~1;       /* ensure width is even */
 
     x0 = x;                         /* start horiz */
     y0 = y;                         /* start vert */
@@ -467,15 +466,29 @@ void lcd_update_rect(int x, int y, int width, int height)
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
 
-
     /* Copy display bitmap to hardware */
     p = &lcd_framebuffer[y0][x0];
-    yy = height;
-    for (yy = y0; yy <= y1; yy++) {
-        for (xx = x0; xx <= x1; xx++) {
+    if (LCD_WIDTH == width)
+    {
+        x1 = height*LCD_WIDTH/4;
+        do {
+            while (LCD_STATUS & 0x08); /* wait while FIFO is half full */
             lcd_write_pixel(*(p++));
-        }
-        p += LCD_WIDTH - width;
+            lcd_write_pixel(*(p++));
+            lcd_write_pixel(*(p++));
+            lcd_write_pixel(*(p++));
+        } while (--x1 > 0);
+    } else {
+        y1 = height;
+        do {
+            x1 = width/2; /* width is forced to even to allow speed up */
+            do {
+                while (LCD_STATUS & 0x08); /* wait while FIFO is half full */
+                lcd_write_pixel(*(p++));
+                lcd_write_pixel(*(p++));
+            } while (--x1 > 0 );
+            p += LCD_WIDTH - width;
+        } while (--y1 > 0 );
     }
 }
 
@@ -616,6 +629,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
             }
 
             /* output 2 pixels */
+            while (LCD_STATUS & 0x08); /* wait while FIFO is half full */
             lcd_write_pixel((red1 << 11) | (green1 << 5) | blue1);
             lcd_write_pixel((red2 << 11) | (green2 << 5) | blue2);
         }
