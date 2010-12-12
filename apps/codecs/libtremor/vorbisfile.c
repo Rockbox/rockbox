@@ -1276,8 +1276,8 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
       }else{
         /* take a (pretty decent) guess. */
         bisect=begin + rescale64(target-begintime,
-				 endtime-begintime,
-				 end-begin) - CHUNKSIZE;
+                                 endtime-begintime,
+                                 end-begin) - CHUNKSIZE;
         if(bisect<begin+CHUNKSIZE)
           bisect=begin;
       }

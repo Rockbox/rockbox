@@ -361,7 +361,7 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
           }
         }
 
-	fit_value[i]=(val+predicted)&0x7fff;;
+        fit_value[i]=(val+predicted)&0x7fff;;
         fit_value[look->loneighbor[i-2]]&=0x7fff;
         fit_value[look->hineighbor[i-2]]&=0x7fff;
 
@@ -401,7 +401,7 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
       int hy=fit_value[current]&0x7fff;
       if(hy==fit_value[current]){
         
-	hx=info->postlist[current];
+        hx=info->postlist[current];
         hy*=info->mult;
         /* guard lookup against out-of-range values */
         hy=(hy<0?0:hy>255?255:hy);
