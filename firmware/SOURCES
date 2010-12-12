@@ -1504,6 +1504,7 @@ target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/dma-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
+target/arm/s5l8700/ipodnano2g/lcd-asm-nano2g.S
 target/arm/s5l8700/ipodnano2g/powermgmt-nano2g.c
 target/arm/s5l8700/ipodnano2g/power-nano2g.c
 target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
