@@ -24,14 +24,12 @@
 #include "usb-target.h"
 #include "usb_drv.h"
 
-#define OTGBASE 0x38800000
-#define PHYBASE 0x3C400000
-#include "usb-s3c6400x.h"
-
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
+
+#include "usb-s3c6400x.h"
 
 #ifdef HAVE_USBSTACK
 #include "usb_ch9.h"
@@ -72,7 +70,7 @@ static void reset_endpoints(int reinit)
     DOEPCTL0 = 0x8000;  /* EP0 OUT ACTIVE */
     DOEPTSIZ0 = 0x20080040;  /* EP0 OUT Transfer Size:
                                 64 Bytes, 1 Packet, 1 Setup Packet */
-    DOEPDMA0 = (uint32_t)&ctrlreq;
+    DOEPDMA0 = &ctrlreq;
     DOEPCTL0 |= 0x84000000;  /* EP0 OUT ENABLE CLEARNAK */
     if (reinit)
     {
@@ -139,10 +137,13 @@ static void usb_reset(void)
     DCTL = 0x802;  /* Soft Disconnect */
 
     OPHYPWR = 0;  /* PHY: Power up */
+    OPHYUNK1 = 1;
+    OPHYUNK2 = 0xE3F;
+    OPHYCLK = SYNOPSYSOTG_CLOCK;
     ORSTCON = 1;  /* PHY: Assert Software Reset */
     for (i = 0; i < 50; i++);
     ORSTCON = 0;  /* PHY: Deassert Software Reset */
-    OPHYCLK = 0;  /* PHY: 48MHz clock */
+    OPHYUNK3 = 0x600;
 
     GRSTCTL = 1;  /* OTG: Assert Software Reset */
     while (GRSTCTL & 1);  /* Wait for OTG to ack reset */
@@ -150,7 +151,7 @@ static void usb_reset(void)
 
     GRXFSIZ = 0x00000200;  /* RX FIFO: 512 bytes */
     GNPTXFSIZ = 0x02000200;  /* Non-periodic TX FIFO: 512 bytes */
-    GAHBCFG = 0x27;  /* OTG AHB config: Unmask ints, burst length 4, DMA on */
+    GAHBCFG = SYNOPSYSOTG_AHBCFG;
     GUSBCFG = 0x1408;  /* OTG: 16bit PHY and some reserved bits */
 
     DCFG = 4;  /* Address 0 */
@@ -375,12 +376,16 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
 void usb_drv_init(void)
 {
     /* Enable USB clock */
+#if CONFIG_CPU==S5L8701
     PWRCON &= ~0x4000;
     PWRCONEXT &= ~0x800;
-    PCGCCTL = 0;
-
-    /* unmask irq */
     INTMSK |= INTMSK_USB_OTG;
+#elif CONFIG_CPU==S5L8702
+    PWRCON(0) &= ~0x4;
+    PWRCON(1) &= ~0x8;
+    VIC0INTENABLE |= 1 << 19;
+#endif
+    PCGCCTL = 0;
 
     /* reset the beast */
     usb_reset();
@@ -394,8 +399,13 @@ void usb_drv_exit(void)
     PCGCCTL = 1;  /* Shut down PHY clock */
     OPHYPWR = 0xF;  /* PHY: Power down */
     
+#if CONFIG_CPU==S5L8701
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;
+#elif CONFIG_CPU==S5L8702
+    PWRCON(0) |= 0x4;
+    PWRCON(1) |= 0x8;
+#endif
 }
 
 void usb_init_device(void)
@@ -406,10 +416,16 @@ void usb_init_device(void)
 
     /* Power up the core clocks to allow writing
        to some registers needed to power it down */
+    PCGCCTL = 0;
+#if CONFIG_CPU==S5L8701
     PWRCON &= ~0x4000;
     PWRCONEXT &= ~0x800;
-    PCGCCTL = 0;
     INTMSK |= INTMSK_USB_OTG;
+#elif CONFIG_CPU==S5L8702
+    PWRCON(0) &= ~0x4;
+    PWRCON(1) &= ~0x8;
+    VIC0INTENABLE |= 1 << 19;
+#endif
 
     usb_drv_exit();
 }
@@ -441,8 +457,13 @@ void usb_init_device(void)
     PCGCCTL = 1;  /* Shut down PHY clock */
     OPHYPWR = 0xF;  /* PHY: Power down */
     
+#if CONFIG_CPU==S5L8701
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;
+#elif CONFIG_CPU==S5L8702
+    PWRCON(0) |= 0x4;
+    PWRCON(1) |= 0x8;
+#endif
 }
 
 void usb_enable(bool on)

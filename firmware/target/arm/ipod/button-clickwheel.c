@@ -39,7 +39,7 @@
 #include "serial.h"
 #include "power.h"
 #include "powermgmt.h"
-#if defined(IPOD_NANO2G)
+#if defined(IPOD_NANO2G) || defined(IPOD_6G)
 #include "pmu-target.h"
 #endif
 
@@ -49,18 +49,8 @@
 
 #ifdef CPU_PP
 #define CLICKWHEEL_DATA   (*(volatile unsigned long*)(0x7000c140))
-#elif CONFIG_CPU==S5L8701
-#define PCON15       (*((volatile uint32_t*)(0x3CF000F0)))
-#define PUNK15       (*((volatile uint32_t*)(0x3CF000FC)))
-#define WHEEL00      (*((volatile uint32_t*)(0x3C200000)))
-#define WHEEL04      (*((volatile uint32_t*)(0x3C200004)))
-#define WHEEL08      (*((volatile uint32_t*)(0x3C200008)))
-#define WHEEL0C      (*((volatile uint32_t*)(0x3C20000C)))
-#define WHEEL10      (*((volatile uint32_t*)(0x3C200010)))
-#define WHEELINT     (*((volatile uint32_t*)(0x3C200014)))
-#define WHEELRX      (*((volatile uint32_t*)(0x3C200018)))
-#define WHEELTX      (*((volatile uint32_t*)(0x3C20001C)))
-#define CLICKWHEEL_DATA   (*(volatile unsigned long*)(0x3c200018))
+#elif CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702
+#define CLICKWHEEL_DATA   WHEELRX
 #else
 #error CPU architecture not supported!
 #endif
@@ -93,7 +83,7 @@ int int_btn = BUTTON_NONE;
     static bool send_events = true;
 #endif
 
-#if CONFIG_CPU==S5L8701
+#if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702
 static struct wakeup button_init_wakeup;
 #endif
 
@@ -265,7 +255,7 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
-#if CONFIG_CPU==S5L8701
+#if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702
         else if ((status & 0x8000FFFF) == 0x8000023A)
         {
             if (status & 0x00010000)
@@ -345,7 +335,7 @@ bool headphones_inserted(void)
     return (GPIOA_INPUT_VAL & 0x80)?true:false;
 }
 #else
-void INT_SPI(void)
+void INT_WHEEL(void)
 {
     int clickwheel_events = WHEELINT;
 
@@ -359,6 +349,7 @@ void INT_SPI(void)
 
 void s5l_clickwheel_init(void)
 {
+#if CONFIG_CPU==S5L8701
     PWRCONEXT &= ~1;
     PCON15 = (PCON15 & ~0xFFFF0000) | 0x22220000;
     PUNK15 = 0xF0;
@@ -370,24 +361,35 @@ void s5l_clickwheel_init(void)
     WHEELTX = 0x8000023A;
     WHEEL04 |= 1;
     PDAT10 &= ~2;
+#elif CONFIG_CPU==S5L8702
+    //TODO: Implement
+#endif
 }
 
 void button_init_device(void)
 {
     wakeup_init(&button_init_wakeup);
+#if CONFIG_CPU==S5L8701
     INTMSK |= (1<<26);
+#elif CONFIG_CPU==S5L8702
+    //TODO: Implement
+#endif
     s5l_clickwheel_init();
     wakeup_wait(&button_init_wakeup, HZ / 10);
 }
 
 bool button_hold(void)
 {
-    return ((PDAT14 & (1 << 6)) == 0);
+    //TODO: Implement
+    //return ((PDAT14 & (1 << 6)) == 0);
+    return false;
 }
 
 bool headphones_inserted(void)
 {
-    return ((PDAT14 & (1 << 5)) != 0);
+    //TODO: Implement
+    //return ((PDAT14 & (1 << 5)) == 0);
+    return false;
 }
 #endif
 
@@ -419,6 +421,8 @@ int button_read_device(void)
             WHEEL00 = 0;
             WHEEL10 = 0;
             PWRCONEXT |= 1;
+#elif CONFIG_CPU==S5L8702
+            //TODO: Implement
 #endif
         }
         else
@@ -430,6 +434,8 @@ int button_read_device(void)
 #elif CONFIG_CPU==S5L8701
             pmu_ldo_power_on(1); /* enable clickwheel power supply */
             s5l_clickwheel_init();
+#elif CONFIG_CPU==S5L8702
+            //TODO: Implement
 #endif
         }
     }

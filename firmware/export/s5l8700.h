@@ -571,6 +571,8 @@
 #define PDAT13                  (*(REG32_PTR_T)(0x3CF000D4))     /* The data register for port 13 */
 #define PCON14                  (*(REG32_PTR_T)(0x3CF000E0))     /* Configures the pins of port 14 */
 #define PDAT14                  (*(REG32_PTR_T)(0x3CF000E4))     /* The data register for port 14 */
+#define PCON15                  (*(REG32_PTR_T)(0x3CF000F0))     /* Configures the pins of port 15 */
+#define PUNK15                  (*(REG32_PTR_T)(0x3CF000FC))     /* Unknown thing for port 15 */
 #define PCON_ASRAM              (*(REG32_PTR_T)(0x3CF000F0))     /* Configures the pins of port nor flash */
 #define PCON_SDRAM              (*(REG32_PTR_T)(0x3CF000F4))     /* Configures the pins of port sdram */
 
@@ -686,9 +688,9 @@
 #define REG_TWO                 (*(REG32_PTR_T)(0x3D100004))     /* Receive the other 8 bits from a fuse box */
 
 
-/* Hardware AES crypto unit - S5L8701 only */
 #if CONFIG_CPU==S5L8701
 
+/* Hardware AES crypto unit - S5L8701 only */
 #define ICONSRCPND              (*(REG32_PTR_T)(0x39C00000))
 #define ICONINTPND              (*(REG32_PTR_T)(0x39C00010))
 #define AESCONTROL              (*(REG32_PTR_T)(0x39800000))
@@ -708,5 +710,21 @@
 #define HASHCTRL                (*(REG32_PTR_T)(0x3C600000))
 #define HASHRESULT               ((REG32_PTR_T)(0x3C600020))
 #define HASHDATAIN               ((REG32_PTR_T)(0x3C600040))
+
+/* Clickwheel controller - S5L8701 only */
+#define WHEEL00      (*((uint32_t volatile*)(0x3C200000)))
+#define WHEEL04      (*((uint32_t volatile*)(0x3C200004)))
+#define WHEEL08      (*((uint32_t volatile*)(0x3C200008)))
+#define WHEEL0C      (*((uint32_t volatile*)(0x3C20000C)))
+#define WHEEL10      (*((uint32_t volatile*)(0x3C200010)))
+#define WHEELINT     (*((uint32_t volatile*)(0x3C200014)))
+#define WHEELRX      (*((uint32_t volatile*)(0x3C200018)))
+#define WHEELTX      (*((uint32_t volatile*)(0x3C20001C)))
+
+/* Synopsys OTG - S5L8701 only */
+#define OTGBASE 0x38800000
+#define PHYBASE 0x3C400000
+#define SYNOPSYSOTG_CLOCK 0
+#define SYNOPSYSOTG_AHBCFG 0x27
 
 #endif /* CONFIG_CPU==S5L8701 */
