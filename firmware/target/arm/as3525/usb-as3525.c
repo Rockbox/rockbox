@@ -68,11 +68,14 @@ int usb_detect(void)
      * hardware power off (pressing the power button) doesn't work anymore
      * TODO: Implement USB in rockbox for these players */
     return USB_EXTRACTED;
-#endif
+#elif defined(USB_DETECT_BY_DRV)
     if(bus_activity && connected)
         return USB_INSERTED;
     else if(connected)
         return USB_POWERED;
     else
         return USB_EXTRACTED;
+#else
+    return connected?USB_INSERTED:USB_EXTRACTED;
+#endif
 }
