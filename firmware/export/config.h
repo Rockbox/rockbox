@@ -724,8 +724,11 @@ Lyre prototype 1 */
 #if CONFIG_CPU != IMX31L
 #define INCLUDE_TIMEOUT_API
 #endif
-#endif /* HAVE_USBSTACK */
+#endif /* HAVE_USBSTACK && USBOTG_ARC */
 
+#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_AS3525
+#define USB_DETECT_BY_DRV
+#endif /* HAVE_USBSTACK && USBOTG_AS3525 */
 
 #endif /* BOOTLOADER */
 

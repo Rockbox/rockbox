@@ -29,7 +29,8 @@
 #include "power.h"
 #include "as3525.h"
 
-static int usb_status = USB_EXTRACTED;
+static bool bus_activity = 0;
+static bool connected = 0;
 
 void usb_enable(bool on)
 {
@@ -45,12 +46,19 @@ void usb_enable(bool on)
 
 void usb_insert_int(void)
 {
-    usb_status = USB_INSERTED;
+    connected = 1;
 }
 
 void usb_remove_int(void)
 {
-    usb_status = USB_EXTRACTED;
+    connected = 0;
+    bus_activity = 0;
+}
+
+void usb_drv_usb_detect_event(void)
+{
+    /* Bus activity seen */
+    bus_activity = 1;
 }
 
 int usb_detect(void)
@@ -61,5 +69,10 @@ int usb_detect(void)
      * TODO: Implement USB in rockbox for these players */
     return USB_EXTRACTED;
 #endif
-    return usb_status;
+    if(bus_activity && connected)
+        return USB_INSERTED;
+    else if(connected)
+        return USB_POWERED;
+    else
+        return USB_EXTRACTED;
 }
