@@ -82,15 +82,15 @@ static_codebook *vorbis_staticbook_unpack(oggpack_buffer *opb){
       s->lengthlist=(long *)_ogg_malloc(sizeof(*s->lengthlist)*s->entries);
 
       for(i=0;i<s->entries;){
-        long num=oggpack_read(opb,_ilog(s->entries-i));
-        if(num==-1)goto _eofout;
-        if(length>32 || num>s->entries-i ||
-          (num>0 && (num-1)>>(length>>1)>>((length+1)>>1))>0){
-          goto _errout;
-        }
-    for(j=0;j<num;j++,i++)
-      s->lengthlist[i]=length;
-    length++;
+	long num=oggpack_read(opb,_ilog(s->entries-i));
+	if(num==-1)goto _eofout;
+	if(length>32 || num>s->entries-i ||
+	   (num>0 && (num-1)>>(length>>1)>>((length+1)>>1))>0){
+	  goto _errout;
+	}
+	for(j=0;j<num;j++,i++)
+	  s->lengthlist[i]=length;
+	length++;
       }
     }
     break;
@@ -459,7 +459,7 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
         entry = decode_packed_entry_number(book,b);
         if(entry==-1)return(-1);
         t     = book->valuelist+entry*book->dim;
-        for (j=0;i<n && j<book->dim;){
+	for (j=0;i<n && j<book->dim;){
           a[i++]=t[j++]>>shift;
         }
       }
@@ -469,7 +469,7 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
         entry = decode_packed_entry_number(book,b);
         if(entry==-1)return(-1);
         t     = book->valuelist+entry*book->dim;
-        for (j=0;i<n && j<book->dim;){
+	for (j=0;i<n && j<book->dim;){
           a[i++]=t[j++]<<shift;
         }
       }
