@@ -335,7 +335,7 @@ bool headphones_inserted(void)
     return (GPIOA_INPUT_VAL & 0x80)?true:false;
 }
 #else
-void INT_SPI(void)
+void INT_WHEEL(void)
 {
     int clickwheel_events = WHEELINT;
 
