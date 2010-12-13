@@ -48,38 +48,34 @@ lcd_yuv_write_inner_loop:
     ldrb r7, [r1], #1                   @ *usrc++
     ldrb r8, [r2], #1                   @ *vsrc++
 
-    add r10, r8, r8, asl #2             @ 101* vsrc
+    sub r7, r7, #128                    @ Cb -= 128
+    sub r8, r8, #128                    @ Cr -= 128
+
+    add r10, r8, r8, asl #2             @ Cr*101
     add r10, r10, r8, asl #5
     add r10, r10, r8, asl #6
-    sub r10, r10, #0x3600
-    sub r10, r10, #0x0020               @ -13856 (ROUNDOFFSR)
 
-    add r11, r8, r8, asl #1             @ 51*vsrc + 24*usrc
+    add r11, r8, r8, asl #1             @ Cr*51 + Cb*24
     add r11, r11, r11, asl #4
     add r11, r11, r7, asl #3
     add r11, r11, r7, asl #4
-    mov r12, #0x2100
-    add r12, r12, #0x60                 @ +8544 (ROUNDOFFSG) - r11
-    rsb r11, r11, r12
 
-    mov r12, r7, asl #7                 @ 128 * usrc
-    sub r12, r12, #0x4300
-    sub r12, r12, #0x00a0               @ -17312 (ROUNDOFFSB)
+    add r12, r7, #2                     @ r12 = bu = (Cb*128 + 256) >> 9
+    mov r12, r12, asr #2
+    add r10, r10, #256                  @ r10 = rv = (Cr*101 + 256) >> 9
+    mov r10, r10, asr #9
+    rsb r11, r11, #128                  @ r11 = guv = (-r11 + 128) >> 8
+    mov r11, r11, asr #8
 
 @ pixel_1
-    ldrb r8, [r0], #1                   @ *ysrc++
-    mov r7, r8, asl #1
-    add r7, r7, r8, asl #3
-    add r7, r7, r8, asl #6              @ ysrc * 74
+    ldrb r7, [r0], #1                   @ *ysrc++
+    sub r7, r7, #16                     @ Y = (Y' - 16) * 37
+    add r8, r7, r7, asl #2
+    add r7, r8, r7, asl #5
 
-    add r9, r10, r7
-    mov r9, r9, asr #9                  @ R
-
-    add r8, r11, r7
-    mov r8, r8, asr #8                  @ G
-
-    add r7, r12, r7
-    mov r7, r7, asr #9                  @ B
+    add r9, r10, r7, asr #8             @ R = (Y >> 8) + rv
+    add r8, r11, r7, asr #7             @ G = (Y >> 7) + guv
+    add r7, r12, r7, asr #8             @ B = (Y >> 8) + bu
 
     cmp r9, #31                         @ clamp R
     mvnhi r9, r9, asr #31
@@ -101,19 +97,14 @@ lcd_yuv_write_inner_loop:
     add r6, r7, r6, lsr #8
 
 @ pixel_2
-    ldrb r8, [r0], #1                   @ *ysrc++
-    mov r7, r8, asl #1
-    add r7, r7, r8, asl #3
-    add r7, r7, r8, asl #6              @ ysrc * 74
+    ldrb r7, [r0], #1                   @ *ysrc++
+    sub r7, r7, #16                     @ Y = (Y' - 16) * 37
+    add r8, r7, r7, asl #2
+    add r7, r8, r7, asl #5
 
-    add r9, r10, r7
-    mov r9, r9, asr #9                  @ R
-
-    add r8, r11, r7
-    mov r8, r8, asr #8                  @ G
-
-    add r7, r12, r7
-    mov r7, r7, asr #9                  @ B
+    add r9, r10, r7, asr #8             @ R = (Y >> 8) + rv
+    add r8, r11, r7, asr #7             @ G = (Y >> 7) + guv
+    add r7, r12, r7, asr #8             @ B = (Y >> 8) + bu
 
     cmp r9, #31                         @ clamp R
     mvnhi r9, r9, asr #31
