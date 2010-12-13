@@ -143,6 +143,7 @@ unsigned short lcd_init_sequence_0[] = {
 unsigned short lcd_init_sequence_1[] = {
     CMD16,  0x0011, DATA16, 0x0000,
     CMD16,  0x0029, DATA16, 0x0000,
+    SLEEP,  0x0000,
 };
 
 
