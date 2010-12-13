@@ -1953,6 +1953,7 @@
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -1960,6 +1961,7 @@
     ipod*: "SELECT=लगा MENU=बंद"
     iriverh10,iriverh10_5gb: "SELECT=लगा PREV=बंद"
     vibe500: "OK=लगा C=बंद"
+    mpiohd300: "ENTER=लगा MENU=बंद"
   </dest>
   <voice>
     *: none

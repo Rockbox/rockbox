@@ -2687,10 +2687,12 @@
   <source>
     *: "PLAY=Set OFF=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=Ok OFF=Abbrächu"
     vibe500: "OK=Ok C=Abbrächu"
+    mpiohd300: "ENTER=Ok MENU=Abbrächu"
   </dest>
   <voice>
     *: ""

@@ -4546,10 +4546,12 @@
   <source>
     *: "PLAY=Set OFF=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: "LEGI=Validigi OFF=Malvalidigi"
     vibe500: "OK=Validigi C=Malvalidigi"
+    mpiohd300: "ENTER=Validigi MENU=Malvalidigi"
   </dest>
   <voice>
     *: ""

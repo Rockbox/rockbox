@@ -4531,6 +4531,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4539,6 +4540,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Defini PREV=Rinoncî"
     gigabeats: "SELECT=Defini POWER=Rinoncî"
     vibe500: "OK=Set C=Rinoncî"
+    mpiohd300: "ENTER=Defini MENU=Rinoncî"
   </dest>
   <voice>
     *: none

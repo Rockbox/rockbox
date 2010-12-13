@@ -4697,6 +4697,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4705,6 +4706,7 @@
     iriverh10,iriverh10_5gb: "SELECT=设置 PREV=取消"
     gigabeats: "SELECT=设置 POWER=取消"
     vibe500: "OK=设置 C=取消"
+    mpiohd300: "ENTER=设置 MENU=取消"
   </dest>
   <voice>
    *: none

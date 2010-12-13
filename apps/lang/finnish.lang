@@ -4700,6 +4700,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4708,6 +4709,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Aseta PREV=Peruuta"
     gigabeats: "SELECT=Aseta POWER=Peruuta"
     vibe500: "OK=Aseta C=Peruuta"
+    mpiohd300: "ENTER=Aseta MENU=Peruuta"
   </dest>
   <voice>
     *: none

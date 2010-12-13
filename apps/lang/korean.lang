@@ -4720,6 +4720,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4728,6 +4729,7 @@
     iriverh10,iriverh10_5gb: "[선택]: 설정   [이전]: 취소"
     gigabeats: "[선택]: 설정   [꺼짐]: 취소"
     vibe500: "OK: 설정   C: 취소"
+    mpiohd300: "ENTER: 설정   MENU: 취소"
   </dest>
   <voice>
     *: none

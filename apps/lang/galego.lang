@@ -3050,10 +3050,12 @@
   <source>
     *: "PLAY=Set OFF=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=Acepta OFF=Anula"
     vibe500: "OK=Acepta C=Anula"
+    mpiohd300: "ENTER=Acepta MENU=Anula"
   </dest>
   <voice>
     *: ""

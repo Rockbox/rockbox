@@ -4334,11 +4334,13 @@
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </dest>
   <voice>
     *: ""

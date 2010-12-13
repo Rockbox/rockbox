@@ -4510,6 +4510,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4518,6 +4519,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Постави PREV=Одустани"
     gigabeats: "SELECT=Постави POWER=Одустани"
     vibe500: "OK=Постави C=Одустани"
+    mpiohd300: "ENTER=Постави MENU=Одустани"
   </dest>
   <voice>
     *: none

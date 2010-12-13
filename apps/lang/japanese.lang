@@ -4533,6 +4533,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: none
@@ -4541,6 +4542,7 @@
     iriverh10,iriverh10_5gb: "SELECT=設定 PREV=取り消し"
     gigabeats: "SELECT=設定 POWER=取り消し"
     vibe500: "OK=設定 C=取り消し"
+    mpiohd300: "ENTER=設定 MENU=取り消し"
   </dest>
   <voice>
     *: none

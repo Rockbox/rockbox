@@ -1761,10 +1761,12 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
+    mpiohd300: "ENTER=Set MENU=Cancel"
   </source>
   <dest>
     *: "PLAY=nastavi OFF=Odpovej"
     vibe500: "OK=nastavi C=Odpovej"
+    mpiohd300: "ENTER=nastavi MENU=Odpovej"
   </dest>
   <voice>
     *: ""
