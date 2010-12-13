@@ -22,10 +22,44 @@
 #include "config.h"
 
     .section .icode, "ax", %progbits
+    
+/****************************************************************************
+ * void lcd_write_line(const fb_data *addr, 
+ *                     int pixelcount, 
+ *                     const unsigned int lcd_base_addr);
+ * 
+ * Writes pixelcount pixels from src-pointer (lcd_framebuffer) to LCD dataport.
+ */
+    .align  2
+    .global lcd_write_line
+    .type   lcd_write_line, %function
+                                      /* r0 = addr, must be aligned */
+                                      /* r1 = pixel count, must be even */
+lcd_write_line:                       /* r2 = LCD_BASE */
+    stmfd   sp!, {r4-r6, lr}          /* save non-scratch registers */
+    add     r12, r2, #0x40            /* LCD_WDATA = LCD data port */
+
+.loop:
+    ldmia r0!, {r3, r5}               /* read 2 pixel (=8 byte) */
+
+    /* wait for FIFO half full */
+.fifo_wait:
+    ldr     lr, [r2, #0x1C]           /* while (LCD_STATUS & 0x08); */
+    tst     lr, #0x8
+    bgt     .fifo_wait
+    
+    mov     r4, r3, asr #16           /* r3 = 1st pixel, r4 = 2nd pixel */
+    mov     r6, r5, asr #16           /* r5 = 3rd pixel, r6 = 4th pixel */
+    stmia   r12, {r3-r6}              /* write pixels (lowest 16 bit used) */
+
+    subs    r1, r1, #4
+    bgt     .loop
+
+    ldmpc   regs=r4-r6
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
- *                                    unsigned LCD_BASE,
+ *                                    const unsigned LCD_BASE,
  *                                    int width,
  *                                    int stride);
  *

@@ -312,10 +312,12 @@ void lcd_init_device(void)
     PCON13 &= ~0xf;    /* Set pin 0 to input */
     PCON14 &= ~0xf0;   /* Set pin 1 to input */
 
-    if (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 2))
-        lcd_type = 0;  /* Similar to ILI9320 - aka "type 2" */
-    else
-        lcd_type = 1;  /* Similar to LDS176 - aka "type 7" */
+    if (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 2)) {
+        lcd_type = 0;       /* Similar to ILI9320 - aka "type 2" */
+    } else {
+        lcd_type = 1;       /* Similar to LDS176  - aka "type 7" */
+        LCD_PHTIME = 0x22;  /* Set Phase Time reg (relevant for LCD IF speed) */
+    }
         
     LCD_CON |= 0x100;  /* use 16 bit bus width, little endian */
 
@@ -337,6 +339,11 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
+/* Line write helper function. */
+extern void lcd_write_line(const fb_data *addr, 
+                           int pixelcount,
+                           const unsigned int lcd_base_addr);
+
 /* Update a fraction of the display. */
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
@@ -344,7 +351,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     int y0, x0, y1, x1;
     fb_data* p;
     
-    width = (width + 1) & ~1;       /* ensure width is even */
+    /* Both x and width need to be preprocessed due to asm optimizations */
+    x     = x & ~1;                 /* ensure x is even */
+    width = (width + 3) & ~3;       /* ensure width is a multiple of 4 */
 
     x0 = x;                         /* start horiz */
     y0 = y;                         /* start vert */
@@ -376,33 +385,22 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     /* Copy display bitmap to hardware */
     p = &lcd_framebuffer[y0][x0];
-    if (LCD_WIDTH == width)
-    {
-        x1 = height*LCD_WIDTH/4;
-        do {
-            while (LCD_STATUS & 0x08); /* wait while FIFO is half full */
-            lcd_write_pixel(*(p++));
-            lcd_write_pixel(*(p++));
-            lcd_write_pixel(*(p++));
-            lcd_write_pixel(*(p++));
-        } while (--x1 > 0);
+    if (LCD_WIDTH == width) {
+        /* Write all lines at once */
+        lcd_write_line(p, height*LCD_WIDTH, LCD_BASE);
     } else {
         y1 = height;
         do {
-            x1 = width/2; /* width is forced to even to allow speed up */
-            do {
-                while (LCD_STATUS & 0x08); /* wait while FIFO is half full */
-                lcd_write_pixel(*(p++));
-                lcd_write_pixel(*(p++));
-            } while (--x1 > 0 );
-            p += LCD_WIDTH - width;
+            /* Write a single line */
+            lcd_write_line(p, width, LCD_BASE);
+            p += LCD_WIDTH;
         } while (--y1 > 0 );
     }
 }
 
 /* Line write helper function for lcd_yuv_blit. Writes two lines of yuv420. */
 extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
-                                   unsigned lcd_baseadress,
+                                   const unsigned int lcd_baseadress,
                                    int width,
                                    int stride);
 
