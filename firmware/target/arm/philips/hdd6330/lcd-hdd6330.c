@@ -24,6 +24,16 @@
 #include "kernel.h"
 #include "system.h"
 
+/* register defines for Philips LCD 220x176x16 - model: LPH9165-2 */
+#define LCD_REG_UNKNOWN_00        0x00
+#define LCD_REG_UNKNOWN_01        0x01
+#define LCD_REG_UNKNOWN_05        0x05
+#define LCD_REG_WRITE_DATA_2_GRAM 0x06
+#define LCD_REG_HORIZ_ADDR_START  0x08
+#define LCD_REG_HORIZ_ADDR_END    0x09
+#define LCD_REG_VERT_ADDR_START   0x0a
+#define LCD_REG_VERT_ADDR_END     0x0b
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
@@ -50,7 +60,12 @@ static void lcd_send_reg(unsigned reg)
 
 void lcd_init_device(void)
 {
-    /* init handled by the OF bootloader */
+    lcd_send_reg(LCD_REG_UNKNOWN_00);
+    lcd_send_data(0x00);
+    lcd_send_reg(LCD_REG_UNKNOWN_01);
+    lcd_send_data(0x48);
+    lcd_send_reg(LCD_REG_UNKNOWN_05);
+    lcd_send_data(0x0f);
 }
 
 /*** hardware configuration ***/
@@ -66,7 +81,9 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    (void)yesno;
+    int invert = (yesno) ? 0x40 : 0x00;
+    lcd_send_reg(LCD_REG_UNKNOWN_00);
+    lcd_send_data(invert);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -107,25 +124,19 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
     width = (width + 1) & ~1;
 
-    lcd_send_reg(0x01);
-    lcd_send_data(0x48);
-
-    lcd_send_reg(0x05);
-    lcd_send_data(0x0f);
-
-    lcd_send_reg(0x08);
+    lcd_send_reg(LCD_REG_HORIZ_ADDR_START);
     lcd_send_data(y);
 
-    lcd_send_reg(0x09);
+    lcd_send_reg(LCD_REG_HORIZ_ADDR_END);
     lcd_send_data(y + height - 1);
 
-    lcd_send_reg(0x0a);
+    lcd_send_reg(LCD_REG_VERT_ADDR_START);
     lcd_send_data(x + 16);
 
-    lcd_send_reg(0x0b);
+    lcd_send_reg(LCD_REG_VERT_ADDR_END);
     lcd_send_data(x + width - 1 + 16);
 
-    lcd_send_reg(0x06);
+    lcd_send_reg(LCD_REG_WRITE_DATA_2_GRAM);
 
     const int stride_div_csub_x = stride/CSUB_X;
 
@@ -205,25 +216,19 @@ void lcd_update_rect(int x, int y, int width, int height)
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
-    lcd_send_reg(0x01);
-    lcd_send_data(0x48);
-
-    lcd_send_reg(0x05);
-    lcd_send_data(0x0f);
-
-    lcd_send_reg(0x08);
+    lcd_send_reg(LCD_REG_HORIZ_ADDR_START);
     lcd_send_data(y);
 
-    lcd_send_reg(0x09);
+    lcd_send_reg(LCD_REG_HORIZ_ADDR_END);
     lcd_send_data(y + height - 1);
 
-    lcd_send_reg(0x0a);
+    lcd_send_reg(LCD_REG_VERT_ADDR_START);
     lcd_send_data(x + 16);
 
-    lcd_send_reg(0x0b);
+    lcd_send_reg(LCD_REG_VERT_ADDR_END);
     lcd_send_data(x + width - 1 + 16);
 
-    lcd_send_reg(0x06);
+    lcd_send_reg(LCD_REG_WRITE_DATA_2_GRAM);
 
     addr = (unsigned long*)&lcd_framebuffer[y][x];
 
