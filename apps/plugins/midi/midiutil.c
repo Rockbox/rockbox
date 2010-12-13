@@ -54,8 +54,7 @@ void *alloc(int size)
 
     if (size + 4 > (int)totalSize)
     {
-        midi_debug("MALLOC BARF");
-        midi_debug("MALLOC BARF");
+        midi_debug("Out of Memory");
         midi_debug("MALLOC BARF");
         midi_debug("MALLOC BARF");
         midi_debug("MALLOC BARF");
