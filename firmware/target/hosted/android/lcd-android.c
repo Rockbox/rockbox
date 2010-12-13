@@ -39,11 +39,13 @@ static bool display_on;
 static int dpi;
 static int scroll_threshold;
 static struct wakeup lcd_wakeup;
+static struct mutex lcd_mtx;
 
 void lcd_init_device(void)
 {
     JNIEnv e = *env_ptr;
     wakeup_init(&lcd_wakeup);
+    mutex_init(&lcd_mtx);
     RockboxFramebuffer_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxFramebuffer");
     /* instantiate a RockboxFramebuffer instance
@@ -114,8 +116,10 @@ void lcd_update(void)
     /* tell the system we're ready for drawing */
     if (display_on)
     {
+        mutex_lock(&lcd_mtx);
         (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, postInvalidate1);
         wakeup_wait(&lcd_wakeup, TIMEOUT_BLOCK);
+        mutex_unlock(&lcd_mtx);
     }
 }
 
@@ -123,9 +127,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     if (display_on)
     {
+        mutex_lock(&lcd_mtx);
         (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, postInvalidate2,
                                   (jint)x, (jint)y, (jint)x+width, (jint)y+height);
         wakeup_wait(&lcd_wakeup, TIMEOUT_BLOCK);
+        mutex_unlock(&lcd_mtx);
     }
 }
 
