@@ -731,6 +731,7 @@ static bool browse( char *dst, int dst_size, const char *start )
     }
     rb->strcpy( a+1, dc[tree->selected_item].name );
     tree->dirfilter = &dirfilter;
+    tree->browse = NULL;
     while( 1 )
     {
         if( reload )
@@ -880,6 +881,7 @@ static bool browse_fonts( char *dst, int dst_size )
     }
     rb->strcpy( a+1, dc[tree->selected_item].name );
     tree->dirfilter = &dirfilter;
+    tree->browse = NULL;
     rb->strcpy( bbuf, FONT_DIR "/" );
     rb->set_current_file( bbuf );
 

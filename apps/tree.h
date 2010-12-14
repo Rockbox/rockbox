@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <applimits.h>
 #include <file.h>
+#include "icon.h"
 
 struct entry {
     short attr; /* FAT attributes + file type flags */
@@ -31,6 +32,26 @@ struct entry {
     char *name;
 };
 
+
+#define BROWSE_SELECTONLY   0x0001  /* exit on selecting a file */
+#define BROWSE_SELECTED     0x0100  /* this bit is set if user selected item */
+
+struct tree_context;
+
+struct browse_context {
+    int dirfilter;
+    unsigned flags;             /* ored BROWSE_* */
+    bool (*callback_show_item)(char *name, int attr, struct tree_context *tc);
+                                /* callback function to determine to show/hide
+                                   the item for custom browser */
+    char *title;                /* title of the browser. if set to NULL,
+                                   directory name is used. */
+    enum themable_icons icon;   /* title icon */
+    const char *root;           /* full path of start directory */
+    const char *selected;       /* name of selected file in the root */
+    char *buf;                  /* buffer to store selected file */
+    size_t bufsize;             /* size of the buffer */
+};
 
 /* browser context for file or db */
 struct tree_context {
@@ -68,6 +89,7 @@ struct tree_context {
     int dentry_size;
     bool dirfull;
     int sort_dir; /* directory sort order */
+    struct browse_context *browse;
 };
 
 void tree_drawlists(void);
@@ -76,7 +98,11 @@ void tree_gui_init(void) INIT_ATTR;
 char* get_current_file(char* buffer, size_t buffer_len);
 void set_dirfilter(int l_dirfilter);
 void set_current_file(const char *path);
-int rockbox_browse(const char *root, int dirfilter);
+void browse_context_init(struct browse_context *browse,
+                         int dirfilter, unsigned flags,
+                         char *title, enum themable_icons icon,
+                         const char *root, const char *selected);
+int rockbox_browse(struct browse_context *browse);
 bool create_playlist(void);
 void resume_directory(const char *dir);
 #ifdef WIN32

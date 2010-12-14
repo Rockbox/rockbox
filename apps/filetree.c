@@ -269,12 +269,16 @@ int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
     int name_buffer_used = 0;
+    bool (*callback_show_item)(char *, int, struct tree_context *) = NULL;
     DIR *dir;
 
     if (tempdir)
         dir = opendir(tempdir);
     else
+    {
         dir = opendir(c->currdir);
+        callback_show_item = c->browse? c->browse->callback_show_item: NULL;
+    }
     if(!dir)
         return -1; /* not a directory */
 
@@ -351,7 +355,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
             (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK &&
-                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA))
+                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA) ||
+            (callback_show_item && !callback_show_item(entry->d_name, dptr->attr, c)))
         {
             i--;
             continue;

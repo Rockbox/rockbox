@@ -96,6 +96,7 @@ static int browser(void* param)
 #ifdef HAVE_TAGCACHE
     struct tree_context* tc = tree_get_context();
 #endif
+    struct browse_context browse;
     int filter = SHOW_SUPPORTED;
     char folder[MAX_PATH] = "/";
     /* stuff needed to remember position in file browser */
@@ -104,7 +105,7 @@ static int browser(void* param)
 #ifdef HAVE_TAGCACHE
     static int last_db_dirlevel = 0, last_db_selection = 0;
 #endif
-    
+
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
@@ -247,12 +248,10 @@ static int browser(void* param)
             tc->selected_item = last_db_selection;
         break;
 #endif
-        case GO_TO_BROWSEPLUGINS:
-            filter = SHOW_PLUGINS;
-            strlcpy(folder, PLUGIN_DIR, MAX_PATH);
-        break;
     }
-    ret_val = rockbox_browse(folder, filter);
+
+    browse_context_init(&browse, filter, 0, NULL, NOICON, folder, NULL);
+    ret_val = rockbox_browse(&browse);
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
@@ -352,8 +351,11 @@ static int plugins_menu(void* param)
                         ID2P(LANG_PLUGIN_GAMES),
                         ID2P(LANG_PLUGIN_APPS), ID2P(LANG_PLUGIN_DEMOS));
     const char *folder;
+    struct browse_context browse;
+    char *title;
     int retval = GO_TO_PREVIOUS;
     int selection = 0, current = 0;
+
     while (retval == GO_TO_PREVIOUS)
     {
         selection = do_menu(&plugins_menu_items, &current, NULL, false);
@@ -361,17 +363,22 @@ static int plugins_menu(void* param)
         {
             case 0:
                 folder = PLUGIN_GAMES_DIR;
+                title = str(LANG_PLUGIN_GAMES);
                 break;
             case 1:
                 folder = PLUGIN_APPS_DIR;
+                title = str(LANG_PLUGIN_APPS);
                 break;
             case 2:
                 folder = PLUGIN_DEMOS_DIR;
+                title = str(LANG_PLUGIN_DEMOS);
                 break;
             default:
                 return selection;
         }
-        retval = rockbox_browse(folder, SHOW_PLUGINS);
+        browse_context_init(&browse, SHOW_PLUGINS, 0,
+                            title, Icon_Plugin, folder, NULL);
+        retval = rockbox_browse(&browse);
     }
     return retval;
 }

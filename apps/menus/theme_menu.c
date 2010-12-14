@@ -246,9 +246,85 @@ static struct browse_folder_info themes = {THEME_DIR, SHOW_CFG};
 
 int browse_folder(void *param)
 {
+    const char *ext, *setting;
+    int lang_id = -1;
+    char selected[MAX_FILENAME+10];
     const struct browse_folder_info *info =
         (const struct browse_folder_info*)param;
-    return rockbox_browse(info->dir, info->show_options);
+    struct browse_context browse;
+    browse_context_init(&browse, info->show_options, 0,
+                        NULL, NOICON, info->dir, NULL);
+
+    /* if we are in a special settings folder, center the current setting */
+    switch(info->show_options)
+    {
+        case SHOW_LNG:
+            ext = "lng";
+            if (global_settings.lang_file[0])
+                setting = global_settings.lang_file;
+            else
+                setting = "english";
+            lang_id = LANG_LANGUAGE;
+            break;
+        case SHOW_WPS:
+            ext = "wps";
+            setting = global_settings.wps_file;
+            lang_id = LANG_WHILE_PLAYING;
+            break;
+#ifdef HAVE_LCD_BITMAP
+        case SHOW_FONT:
+            ext = "fnt";
+            setting = global_settings.font_file;
+            lang_id = LANG_CUSTOM_FONT;
+            break;
+        case SHOW_SBS:
+            ext = "sbs";
+            setting = global_settings.sbs_file;
+            lang_id = LANG_BASE_SKIN;
+            break;
+#if CONFIG_TUNER
+        case SHOW_FMS:
+            ext = "fms";
+            setting = global_settings.fms_file;
+            lang_id = LANG_RADIOSCREEN;
+            break;
+#endif /* CONFIG_TUNER */
+#endif
+#ifdef HAVE_REMOTE_LCD
+        case SHOW_RWPS:
+            ext = "rwps";
+            setting = global_settings.rwps_file;
+            lang_id = LANG_REMOTE_WHILE_PLAYING;
+            break;
+        case SHOW_RSBS:
+            ext = "rsbs";
+            setting = global_settings.rsbs_file;
+            lang_id = LANG_REMOTE_BASE_SKIN;
+            break;
+#if CONFIG_TUNER
+        case SHOW_RFMS:
+            ext = "rfms";
+            setting = global_settings.rfms_file;
+            lang_id = LANG_REMOTE_RADIOSCREEN;
+            break;
+#endif /* CONFIG_TUNER */
+#endif
+        default:
+            ext = setting = NULL;
+            break;
+    }
+
+    /* If we've found a file to center on, do it */
+    if (setting)
+    {
+        /* if setting != NULL, ext is initialized */
+        snprintf(selected, sizeof(selected), "%s.%s", setting, ext);
+        browse.selected = selected;
+        browse.icon = Icon_Questionmark;
+        browse.title = str(lang_id);
+    }
+
+    return rockbox_browse(&browse);
 }
 
 #ifdef HAVE_LCD_BITMAP

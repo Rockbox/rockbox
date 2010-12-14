@@ -417,18 +417,12 @@ static int update_dir(void)
 #endif
     {
 #ifdef HAVE_LCD_BITMAP
-        if (global_settings.show_path_in_browser && 
-            *(tc.dirfilter) == SHOW_PLUGINS)
+        if (tc.browse && tc.browse->title)
         {
-            char *title;
-            if (!strcmp(tc.currdir, PLUGIN_GAMES_DIR))
-                title = str(LANG_PLUGIN_GAMES);
-            else if (!strcmp(tc.currdir, PLUGIN_APPS_DIR))
-                title = str(LANG_PLUGIN_APPS);
-            else if (!strcmp(tc.currdir, PLUGIN_DEMOS_DIR))
-                title = str(LANG_PLUGIN_DEMOS);
-            else title = str(LANG_PLUGINS);
-            gui_synclist_set_title(&tree_lists, title, Icon_Plugin);
+            int icon = tc.browse->icon;
+            if (icon == NOICON)
+                icon = filetype_get_icon(ATTR_DIRECTORY);
+            gui_synclist_set_title(&tree_lists, tc.browse->title, icon);
         }
         else if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
@@ -616,7 +610,7 @@ void set_current_file(const char *path)
 
 
 /* main loop, handles key events */
-static int dirbrowse()
+static int dirbrowse(void)
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -653,7 +647,7 @@ static int dirbrowse()
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
         splash(HZ*2, ID2P(LANG_NO_FILES));
-        return GO_TO_PREVIOUS;  /* No files found for rockbox_browser() */
+        return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
     
     gui_synclist_draw(&tree_lists);
@@ -682,6 +676,14 @@ static int dirbrowse()
                 /* nothing to do if no files to display */
                 if ( numentries == 0 )
                     break;
+
+                if ((tc.browse->flags & BROWSE_SELECTONLY) &&
+                    !(dircache[tc.selected_item].attr & ATTR_DIRECTORY))
+                {
+                    tc.browse->flags |= BROWSE_SELECTED;
+                    get_current_file(tc.browse->buf, tc.browse->bufsize);
+                    return GO_TO_PREVIOUS;
+                }
 
 #ifdef HAVE_TAGCACHE
                 switch (id3db?tagtree_enter(&tc):ft_enter(&tc))
@@ -780,6 +782,11 @@ static int dirbrowse()
                 bool hotkey = button == ACTION_TREE_HOTKEY;
                 int onplay_result;
                 int attr = 0;
+
+                /* no context menu while in select only mode
+                   to prevent recursive call */
+                if ((tc.browse->flags & BROWSE_SELECTONLY))
+                    break;
 
                 if(!numentries)
                     onplay_result = onplay(NULL, 0, curr_context, hotkey);
@@ -924,108 +931,77 @@ bool create_playlist(void)
     return true;
 }
 
-int rockbox_browse(const char *root, int dirfilter)
+void browse_context_init(struct browse_context *browse,
+                         int dirfilter, unsigned flags,
+                         char *title, enum themable_icons icon,
+                         const char *root, const char *selected)
+{
+    browse->dirfilter = dirfilter;
+    browse->flags = flags;
+    browse->callback_show_item = NULL;
+    browse->title = title;
+    browse->icon = icon;
+    browse->root = root;
+    browse->selected = selected;
+    browse->buf = NULL;
+    browse->bufsize = 0;
+}
+
+#define NUM_TC_BACKUP   3
+static struct tree_context backups[NUM_TC_BACKUP];
+/* do not make backup if it is not recursive call */
+static int backup_count = -1;
+int rockbox_browse(struct browse_context *browse)
 {
     static char current[MAX_PATH];
     int ret_val = 0;
-    int *last_filter = tc.dirfilter;
+    int dirfilter = browse->dirfilter;
+
+    if (backup_count >= NUM_TC_BACKUP)
+        return GO_TO_PREVIOUS;
+    if (backup_count >= 0)
+        backups[backup_count] = tc;
+    backup_count++;
+
     tc.dirfilter = &dirfilter;
     tc.sort_dir = global_settings.sort_dir;
-    
+
     reload_dir = true;
-    if (dirfilter >= NUM_FILTER_MODES)
+    if (*tc.dirfilter >= NUM_FILTER_MODES)
     {
-        static struct tree_context backup;
         int last_context;
-        const char *ext, *setting;
-        
-        backup = tc;
+
+        tc.browse = browse;
         tc.selected_item = 0;
         tc.dirlevel = 0;
-        memcpy(tc.currdir, root, sizeof(tc.currdir));
+        strlcpy(tc.currdir, browse->root, sizeof(tc.currdir));
         start_wps = false;
         last_context = curr_context;
 
-        /* if we are in a special settings folder, center the current setting */
-        switch(dirfilter)
+        if (browse->selected)
         {
-            case SHOW_LNG:
-                ext = "lng";
-                if (global_settings.lang_file[0])
-                    setting = global_settings.lang_file;
-                else
-                    setting = "english";
-                break;
-            case SHOW_WPS:
-                ext = "wps";
-                setting = global_settings.wps_file;
-                break;
-#ifdef HAVE_REMOTE_LCD
-            case SHOW_RWPS:
-                ext = "rwps";
-                setting = global_settings.rwps_file;
-                break;
-            case SHOW_RSBS:
-                ext = "rsbs";
-                setting = global_settings.rsbs_file;
-                break;
-#if CONFIG_TUNER
-            case SHOW_RFMS:
-                ext = "rfms";
-                setting = global_settings.rfms_file;
-                break;
-#endif /* CONFIG_TUNER */
-#endif
-#ifdef HAVE_LCD_BITMAP
-            case SHOW_FONT:
-                ext = "fnt";
-                setting = global_settings.font_file;
-                break;
-            case SHOW_SBS:
-                ext = "sbs";
-                setting = global_settings.sbs_file;
-                break;
-#if CONFIG_TUNER
-            case SHOW_FMS:
-                ext = "fms";
-                setting = global_settings.fms_file;
-                break;
-#endif /* CONFIG_TUNER */
-#endif
-#if CONFIG_TUNER
-            case SHOW_FMR:
-                ext = "fmr";
-                setting = global_settings.fmr_file;
-                break;
-#endif
-            default:
-                ext = setting = NULL;
-                break;
-        }
-
-        /* If we've found a file to center on, do it */
-        if (setting)
-        {
-            /* if setting != NULL, ext is initialized */
-            snprintf(current, sizeof(current), "%s/%s.%s", root, setting, ext);
+            snprintf(current, sizeof(current), "%s/%s",
+                browse->root, browse->selected);
             set_current_file(current);
             /* set_current_file changes dirlevel, change it back */
             tc.dirlevel = 0; 
         }
 
         ret_val = dirbrowse();
-        tc = backup;
         curr_context = last_context;
     }
     else
     {
         if (dirfilter != SHOW_ID3DB)
             tc.dirfilter = &global_settings.dirfilter;
-        strcpy(current,root);
+        tc.browse = browse;
+        strcpy(current, browse->root);
         set_current_file(current);
         ret_val = dirbrowse();
     }
-    tc.dirfilter = last_filter;
+    backup_count--;
+    if (backup_count >= 0)
+        tc = backups[backup_count];
     return ret_val;
 }
 

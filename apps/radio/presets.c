@@ -353,7 +353,13 @@ static int radio_delete_preset(void)
 
 int preset_list_load(void)
 {
-    return !rockbox_browse(FMPRESET_PATH, SHOW_FMR);
+    char selected[MAX_PATH];
+    struct browse_context browse;
+    snprintf(selected, sizeof(selected), "%s.%s", global_settings.fmr_file, "fmr");
+    browse_context_init(&browse, SHOW_FMR, 0,
+                        str(LANG_FM_PRESET_LOAD), NOICON,
+                        FMPRESET_PATH, selected);
+    return !rockbox_browse(&browse);
 }
 
 int preset_list_save(void)

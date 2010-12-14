@@ -234,6 +234,7 @@ static bool tv_font_setting(void)
     rb->strlcat(backup.currdir, "/", MAX_PATH);
     rb->strlcat(backup.currdir, dc[tree->selected_item].name, MAX_PATH);
     tree->dirfilter = &dirfilter;
+    tree->browse = NULL;
     rb->snprintf(font_path, MAX_PATH, "%s/", FONT_DIR);
     rb->set_current_file(font_path);
     count = tree->filesindir;
