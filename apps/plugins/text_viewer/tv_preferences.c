@@ -28,6 +28,8 @@ static struct tv_preferences prefs;
 /* read-only preferences pointer, for access by other files */
 const struct tv_preferences * const preferences = &prefs;
 
+bool preferences_changed = false;
+
 static int listner_count = 0;
 
 #define TV_MAX_LISTNERS 5
@@ -89,6 +91,11 @@ bool tv_set_preferences(const struct tv_preferences *new_prefs)
 void tv_copy_preferences(struct tv_preferences *copy_prefs)
 {
     rb->memcpy(copy_prefs, preferences, sizeof(struct tv_preferences));
+}
+
+bool tv_compare_preferences(struct tv_preferences *copy_prefs)
+{
+    return rb->memcmp(copy_prefs, preferences, sizeof(struct tv_preferences)) != 0;
 }
 
 void tv_set_default_preferences(struct tv_preferences *p)

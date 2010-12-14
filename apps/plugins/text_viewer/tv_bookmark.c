@@ -32,7 +32,6 @@ enum {
     TV_BOOKMARK_USER   = 2,
 };
 
-#define SERIALIZE_BOOKMARK_SIZE 8
 
 struct tv_bookmark_info {
     struct tv_screen_pos pos;
@@ -287,11 +286,8 @@ bool tv_deserialize_bookmarks(int fd)
     return res;
 }
 
-static bool tv_write_bookmark_info(int fd, const struct tv_bookmark_info *b)
+static void tv_write_bookmark_info(unsigned char *p, const struct tv_bookmark_info *b)
 {
-    unsigned char buf[SERIALIZE_BOOKMARK_SIZE];
-    unsigned char *p = buf;
-
     *p++ = b->pos.file_pos >> 24;
     *p++ = b->pos.file_pos >> 16;
     *p++ = b->pos.file_pos >> 8;
@@ -302,21 +298,17 @@ static bool tv_write_bookmark_info(int fd, const struct tv_bookmark_info *b)
 
     *p++ = b->pos.line;
     *p   = b->flag;
-
-    return (rb->write(fd, buf, SERIALIZE_BOOKMARK_SIZE) >= 0);
 }
 
-int tv_serialize_bookmarks(int fd)
+int tv_serialize_bookmarks(unsigned char *buf)
 {
     int i;
 
-    if (rb->write(fd, &bookmark_count, 1) < 0)
-        return 0;
+    buf[0] = bookmark_count;
 
     for (i = 0; i < bookmark_count; i++)
     {
-        if (!tv_write_bookmark_info(fd, &bookmarks[i]))
-            break;
+        tv_write_bookmark_info(buf + i * SERIALIZE_BOOKMARK_SIZE + 1, &bookmarks[i]);
     }
     return i * SERIALIZE_BOOKMARK_SIZE + 1;
 }

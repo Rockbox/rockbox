@@ -28,6 +28,9 @@
 #include "tv_settings.h"
 #include "tv_window.h"
 
+bool bookmarks_changed = false;
+bool scrolled = false;
+
 bool tv_init_action(unsigned char **buf, size_t *size)
 {
     /* initialize bookmarks and window modules */
@@ -36,10 +39,6 @@ bool tv_init_action(unsigned char **buf, size_t *size)
 
 static void tv_finalize_action(void)
 {
-    /* save preference and bookmarks */
-    if (!tv_save_settings())
-        rb->splash(HZ, "Can't save preferences and bookmarks");
-
     /* finalize bookmark modules */
     tv_finalize_bookmark();
 
@@ -50,8 +49,19 @@ static void tv_finalize_action(void)
 void tv_exit(void)
 {
     /* save preference and bookmarks */
-    if (!tv_save_settings())
-        rb->splash(HZ, "Can't save preferences and bookmarks");
+    DEBUGF("preferences_changed=%d\tbookmarks_changed=%d\tscrolled=%d\n",preferences_changed,bookmarks_changed,scrolled);
+    if  ( preferences_changed || bookmarks_changed
+#ifndef HAVE_DISK_STORAGE
+         || scrolled
+#endif
+        )
+    {
+        DEBUGF("Saving settings\n");
+        if (!tv_save_settings())
+            rb->splash(HZ, "Can't save preferences and bookmarks");
+    }
+    else
+        DEBUGF("Skip saving settings\n");
 
     /* finalize modules */
     tv_finalize_action();
@@ -95,6 +105,7 @@ void tv_scroll_up(unsigned mode)
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
+    scrolled = true;
 }
 
 void tv_scroll_down(unsigned mode)
@@ -111,6 +122,7 @@ void tv_scroll_down(unsigned mode)
 #endif
     }
     tv_move_screen(offset_page, offset_line, SEEK_CUR);
+    scrolled = true;
 }
 
 void tv_scroll_left(unsigned mode)
@@ -130,6 +142,7 @@ void tv_scroll_left(unsigned mode)
         offset_window--;
     }
     tv_move_window(offset_window, offset_column);
+    scrolled = true;
 }
 
 void tv_scroll_right(unsigned mode)
@@ -149,6 +162,7 @@ void tv_scroll_right(unsigned mode)
         offset_window++;
     }
     tv_move_window(offset_window, offset_column);
+    scrolled = true;
 }
 
 void tv_top(void)
@@ -186,4 +200,5 @@ unsigned tv_menu(void)
 void tv_add_or_remove_bookmark(void)
 {
     tv_toggle_bookmark();
+    bookmarks_changed = true;
 }

@@ -29,6 +29,7 @@
 
 /* Maximum amount of register possible bookmarks */
 #define TV_MAX_BOOKMARKS 16
+#define SERIALIZE_BOOKMARK_SIZE 8
 
 /*
  * initialize the bookmark module
@@ -83,7 +84,7 @@ void tv_create_system_bookmark(void);
  * Return
  *     the size of the result
  */
-int tv_serialize_bookmarks(int fd);
+int tv_serialize_bookmarks(unsigned char *buf);
 
 /*
  * deserialize the bookmark array

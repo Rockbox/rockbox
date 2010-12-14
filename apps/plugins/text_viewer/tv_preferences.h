@@ -104,6 +104,7 @@ struct tv_preferences {
  *     global pointer to the preferences (read-only)
  */
 extern const struct tv_preferences * const preferences;
+extern bool preferences_changed;
 
 /*
  * change the preferences
@@ -124,6 +125,15 @@ bool tv_set_preferences(const struct tv_preferences *new_prefs);
  *          the preferences in copy destination
  */
 void tv_copy_preferences(struct tv_preferences *copy_prefs);
+
+/*
+ * compare the preferences structs (binary)
+ *
+ * return
+ *     true  differs
+ *     false identical
+ */
+bool tv_compare_preferences(struct tv_preferences *copy_prefs);
 
 /*
  * set the default settings

@@ -63,6 +63,7 @@ bool tv_load_settings(const unsigned char *file_name);
 
 /*
  * save the settings at each file
+ * supposed to be called only once at plugin exit
  *
  * return
  *     true  success
