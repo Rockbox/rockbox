@@ -783,7 +783,7 @@ static int dirbrowse(void)
                 int onplay_result;
                 int attr = 0;
 
-                if (tc.browse->flags & BROWSE_NO_CONTEXT)
+                if (tc.browse->flags & BROWSE_NO_CONTEXT_MENU)
                     break;
 
                 if(!numentries)

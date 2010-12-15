@@ -33,9 +33,9 @@ struct entry {
 };
 
 
-#define BROWSE_SELECTONLY   0x0001  /* exit on selecting a file */
-#define BROWSE_NO_CONTEXT   0x0002  /* disable context menu */
-#define BROWSE_SELECTED     0x0100  /* this bit is set if user selected item */
+#define BROWSE_SELECTONLY       0x0001  /* exit on selecting a file */
+#define BROWSE_NO_CONTEXT_MENU  0x0002  /* disable context menu */
+#define BROWSE_SELECTED         0x0100  /* this bit is set if user selected item */
 
 struct tree_context;
 

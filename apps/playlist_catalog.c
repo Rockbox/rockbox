@@ -119,7 +119,7 @@ static int display_playlists(char* playlist, bool view)
     int result = -1;
 
     browse_context_init(&browse, SHOW_M3U,
-                        BROWSE_SELECTONLY|(view? 0: BROWSE_NO_CONTEXT),
+                        BROWSE_SELECTONLY|(view? 0: BROWSE_NO_CONTEXT_MENU),
                         str(LANG_CATALOG), NOICON,
                         playlist_dir, most_recent_playlist);
 
