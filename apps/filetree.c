@@ -351,6 +351,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #if CONFIG_TUNER
             (*c->dirfilter == SHOW_FMR && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMR) ||
 #endif
+            (*c->dirfilter == SHOW_M3U && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_CFG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||

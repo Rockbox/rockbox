@@ -783,9 +783,7 @@ static int dirbrowse(void)
                 int onplay_result;
                 int attr = 0;
 
-                /* no context menu while in select only mode
-                   to prevent recursive call */
-                if ((tc.browse->flags & BROWSE_SELECTONLY))
+                if (tc.browse->flags & BROWSE_NO_CONTEXT)
                     break;
 
                 if(!numentries)

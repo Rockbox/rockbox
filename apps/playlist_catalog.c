@@ -44,8 +44,6 @@
 #include "playlist_catalog.h"
 #include "talk.h"
 
-#define MAX_PLAYLISTS 400
-
 /* Use for recursive directory search */
 struct add_track_context {
     int fd;
@@ -111,203 +109,44 @@ static int initialize_catalog(void)
 
     return 0;
 }
-/* Use the filetree functions to retrieve the list of playlists in the
-   directory */
-static int create_playlist_list(char** playlists, int num_items,
-                                int* num_playlists)
-{
-    int result = -1;
-    int num_files = 0;
-    int index = 0;
-    int i;
-    bool most_recent = false;
-    struct entry *files;
-    struct tree_context* tc = tree_get_context();
-    int dirfilter = *(tc->dirfilter);
-
-    *num_playlists = 0;
-
-    /* use the tree browser dircache to load only playlists */
-    *(tc->dirfilter) = SHOW_PLAYLIST;
-
-    if (ft_load(tc, playlist_dir) < 0)
-    {
-        splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), playlist_dir);
-        goto exit;
-    }
-
-    files = (struct entry*) tc->dircache;
-    num_files = tc->filesindir;
-
-    /* we've overwritten the dircache so tree browser will need to be
-       reloaded */
-    reload_directory();
-
-    /* if it exists, most recent playlist will always be index 0 */
-    if (most_recent_playlist[0] != '\0')
-    {
-        index = 1;
-        most_recent = true;
-    }
-
-    for (i=0; i<num_files && index<num_items; i++)
-    {
-        if (files[i].attr & FILE_ATTR_M3U)
-        {
-            if (most_recent && !strncmp(files[i].name, most_recent_playlist,
-                sizeof(most_recent_playlist)))
-            {
-                playlists[0] = files[i].name;
-                most_recent = false;
-            }
-            else
-            {
-                playlists[index] = files[i].name;
-                index++;
-            }
-        }
-    }
-
-    *num_playlists = index;
-
-    /* we couldn't find the most recent playlist, shift all playlists up */
-    if (most_recent)
-    {
-        for (i=0; i<index-1; i++)
-            playlists[i] = playlists[i+1];
-
-        (*num_playlists)--;
-
-        most_recent_playlist[0] = '\0';
-    }
-
-    result = 0;
-
-exit:
-    *(tc->dirfilter) = dirfilter;
-    return result;
-}
-
-/* Callback for gui_synclist */
-static const char* playlist_callback_name(int selected_item, void* data,
-                                          char* buffer, size_t buffer_len)
-{
-    char** playlists = (char**) data;
-
-    strlcpy(buffer, playlists[selected_item], buffer_len);
-
-    if (buffer[0] != '.' && !(global_settings.show_filename_ext == 1
-        || (global_settings.show_filename_ext == 3
-            && global_settings.dirfilter == 0)))
-    {
-        char* dot = strrchr(buffer, '.');
-
-        if (dot != NULL)
-        {
-            *dot = '\0';
-        }
-    }
-
-    return buffer;
-}
-
-static int playlist_callback_voice(int selected_item, void* data)
-{
-    char** playlists = (char**) data;
-    talk_file_or_spell(playlist_dir, playlists[selected_item], NULL, false);
-    return 0;
-}
 
 /* Display all playlists in catalog.  Selected "playlist" is returned.
    If "view" mode is set then we're not adding anything into playlist. */
 static int display_playlists(char* playlist, bool view)
 {
+    struct browse_context browse;
+    char selected_playlist[MAX_PATH];
     int result = -1;
-    int num_playlists = 0;
-    bool exit = false;
-    char temp_buf[MAX_PATH];
-    char* playlists[MAX_PLAYLISTS];
-    struct gui_synclist playlist_lists;
 
-    if (create_playlist_list(playlists, MAX_PLAYLISTS,
-            &num_playlists) != 0)
-        return -1;
+    browse_context_init(&browse, SHOW_M3U,
+                        BROWSE_SELECTONLY|(view? 0: BROWSE_NO_CONTEXT),
+                        str(LANG_CATALOG), NOICON,
+                        playlist_dir, most_recent_playlist);
 
-    if (num_playlists <= 0)
+    browse.buf = selected_playlist;
+    browse.bufsize = sizeof(selected_playlist);
+
+    rockbox_browse(&browse);
+
+    if (browse.flags & BROWSE_SELECTED)
     {
-        splash(HZ*2, ID2P(LANG_CATALOG_NO_PLAYLISTS));
-        return -1;
-    }
+        strlcpy(most_recent_playlist, selected_playlist+playlist_dir_length+1,
+            sizeof(most_recent_playlist));
 
-    if (!playlist)
-        playlist = temp_buf;
-
-    gui_synclist_init(&playlist_lists, playlist_callback_name, playlists,
-                       false, 1, NULL);
-    if(global_settings.talk_menu)
-        gui_synclist_set_voice_callback(&playlist_lists,
-                                        playlist_callback_voice);
-    gui_synclist_set_nb_items(&playlist_lists, num_playlists);
-    gui_synclist_draw(&playlist_lists);
-    gui_synclist_speak_item(&playlist_lists);
-
-    while (!exit)
-    {
-        int button;
-        char* sel_file;
-        list_do_action(CONTEXT_LIST,HZ/2,
-                       &playlist_lists, &button,LIST_WRAP_UNLESS_HELD);
-        sel_file = playlists[gui_synclist_get_sel_pos(&playlist_lists)];
-
-        switch (button)
+        if (view)
         {
-            case ACTION_STD_CANCEL:
-                exit = true;
-                break;
-
-            case ACTION_STD_OK:
-                snprintf(playlist, MAX_PATH, "%s/%s", playlist_dir, sel_file);
-
-                if (view)
-                {
-                    /* In view mode, selecting a playlist starts playback */
-                    ft_play_playlist(playlist, playlist_dir, sel_file);
-                }
-
-                result = 0;
-                exit = true;
-                break;
-
-            case ACTION_STD_CONTEXT:
-                /* context menu only available in view mode */
-                if (view)
-                {
-                    snprintf(playlist, MAX_PATH, "%s/%s", playlist_dir,
-                        sel_file);
-
-                    if (onplay(playlist, FILE_ATTR_M3U,
-                            CONTEXT_TREE, false) != ONPLAY_OK)
-                    {
-                        result = 0;
-                        exit = true;
-                    }
-                    else
-                    {
-                        gui_synclist_draw(&playlist_lists);
-                        gui_synclist_speak_item(&playlist_lists);
-                    }
-                }
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-                    result = -1;
-                    exit = true;
-                }
-                break;
+            char *filename = strrchr(selected_playlist, '/')+1;
+            /* In view mode, selecting a playlist starts playback */
+            ft_play_playlist(selected_playlist, playlist_dir, filename);
+            result = 0;
+        }
+        else
+        {
+            result = 0;
+            strlcpy(playlist, selected_playlist, MAX_PATH);
         }
     }
+
     return result;
 }
 
@@ -443,16 +282,21 @@ bool catalog_view_playlists(void)
 
     if (initialize_catalog() == -1)
         return false;
+
     in_cat_viewer = true;
     retval = (display_playlists(NULL, true) != -1);
     in_cat_viewer = false;
     return retval;
 }
 
+static bool in_add_to_playlist = false;
 bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name)
 {
+    int result;
     char playlist[MAX_PATH];
+    if (in_add_to_playlist)
+        return false;
 
     if (initialize_catalog() == -1)
         return false;
@@ -478,16 +322,16 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
     }
     else
     {
-        if (display_playlists(playlist, false) == -1)
+        in_add_to_playlist = true;
+        result = display_playlists(playlist, false);
+        in_add_to_playlist = false;
+
+        if (result == -1)
             return false;
     }
 
     if (add_to_playlist(playlist, new_playlist, sel, sel_attr) == 0)
-    {
-        strlcpy(most_recent_playlist, playlist+playlist_dir_length+1,
-            sizeof(most_recent_playlist));
         return true;
-    }
     else
         return false;
 }
