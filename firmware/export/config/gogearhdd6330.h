@@ -71,7 +71,7 @@
 #endif
 
 /* define this if you can flip your LCD */
-/* #define HAVE_LCD_FLIP */
+#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT

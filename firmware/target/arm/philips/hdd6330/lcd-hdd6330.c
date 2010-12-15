@@ -37,6 +37,9 @@
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
+/* Used for flip offset correction */
+static int x_offset;
+
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
@@ -66,6 +69,8 @@ void lcd_init_device(void)
     lcd_send_data(0x48);
     lcd_send_reg(LCD_REG_UNKNOWN_05);
     lcd_send_data(0x0f);
+
+    x_offset = 16;
 }
 
 /*** hardware configuration ***/
@@ -89,7 +94,10 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    (void)yesno;
+    int flip = (yesno) ? 0x88 : 0x48;
+    x_offset = (yesno) ? 4 : 16;
+    lcd_send_reg(LCD_REG_UNKNOWN_01);
+    lcd_send_data(flip);
 }
 
 void lcd_yuv_set_options(unsigned options)
@@ -131,10 +139,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     lcd_send_data(y + height - 1);
 
     lcd_send_reg(LCD_REG_VERT_ADDR_START);
-    lcd_send_data(x + 16);
+    lcd_send_data(x + x_offset);
 
     lcd_send_reg(LCD_REG_VERT_ADDR_END);
-    lcd_send_data(x + width - 1 + 16);
+    lcd_send_data(x + width - 1 + x_offset);
 
     lcd_send_reg(LCD_REG_WRITE_DATA_2_GRAM);
 
@@ -223,10 +231,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_send_data(y + height - 1);
 
     lcd_send_reg(LCD_REG_VERT_ADDR_START);
-    lcd_send_data(x + 16);
+    lcd_send_data(x + x_offset);
 
     lcd_send_reg(LCD_REG_VERT_ADDR_END);
-    lcd_send_data(x + width - 1 + 16);
+    lcd_send_data(x + width - 1 + x_offset);
 
     lcd_send_reg(LCD_REG_WRITE_DATA_2_GRAM);
 
