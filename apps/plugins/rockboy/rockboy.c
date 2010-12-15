@@ -464,13 +464,14 @@ enum plugin_status plugin_start(const void* parameter)
 
     backlight_use_settings();
 
+    if(!rb->audio_status())
+        rockboy_pcm_close();
+
     if(shut&&!cleanshut)
     {
         rb->splash(HZ/2, errormsg);
         return PLUGIN_ERROR;
     }
-    if(!rb->audio_status())
-        rockboy_pcm_close();
 
     rb->splash(HZ/2, "Closing Rockboy");
 
