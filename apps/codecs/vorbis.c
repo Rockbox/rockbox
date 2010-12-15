@@ -184,7 +184,7 @@ next_track:
          vf.ready_state = OPENED;
          vf.links = 1;
     } else {
-         DEBUGF("Vorbis: ov_open failed: %d", error);
+         DEBUGF("Vorbis: ov_open failed: %d\n", error);
          error = CODEC_ERROR;
          goto done;
     }
