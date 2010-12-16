@@ -52,7 +52,7 @@ void ata_enable(bool on)
     if (on)
     {
         and_l(~(1<<4), &GPIO1_OUT);
-#ifndef BOOTLADER
+#ifndef BOOTLOADER
         if ( !init )
         {
             ide_power_enable(false);
