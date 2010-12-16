@@ -146,6 +146,7 @@ static bool _dir_properties(DPS* dps)
     /* recursively scan directories in search of files
        and informs the user of the progress */
     bool result;
+    static long lasttick=0;
     int dirlen;
     DIR* dir;
     struct dirent* entry;
@@ -173,16 +174,20 @@ static bool _dir_properties(DPS* dps)
                 continue; /* skip these */
 
             dps->dc++; /* new directory */
-            rb->lcd_clear_display();
-            rb->lcd_puts(0,0,"SCANNING...");
-            rb->lcd_puts(0,1,dps->dirname);
-            rb->lcd_puts(0,2,entry->d_name);
-            rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
-            rb->lcd_putsf(0,4,"Files: %d", dps->fc);
-            log = human_size_log(dps->bc);
-            rb->lcd_putsf(0,5,"Size: %ld %cB", (long) (dps->bc >> (10*log)),
-                                               human_size_prefix[log]);
-            rb->lcd_update();
+            if (*rb->current_tick - lasttick > (HZ/8))
+            {
+                lasttick = *rb->current_tick;
+                rb->lcd_clear_display();
+                rb->lcd_puts(0,0,"SCANNING...");
+                rb->lcd_puts(0,1,dps->dirname);
+                rb->lcd_puts(0,2,entry->d_name);
+                rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
+                rb->lcd_putsf(0,4,"Files: %d", dps->fc);
+                log = human_size_log(dps->bc);
+                rb->lcd_putsf(0,5,"Size: %ld %cB", (long) (dps->bc >> (10*log)),
+                                                human_size_prefix[log]);
+                rb->lcd_update();
+            }
 
              /* recursion */
             result = _dir_properties(dps);
@@ -211,8 +216,16 @@ static bool dir_properties(char* selected_file)
     };
     rb->strlcpy(dps.dirname, selected_file, MAX_PATH);
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
     if(false == _dir_properties(&dps))
         return false;
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
 
     rb->strlcpy(str_dirname, selected_file, MAX_PATH);
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
