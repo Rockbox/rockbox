@@ -64,9 +64,9 @@ eq_filter:
     mov r1, r0                 @ fix input history
     smlal r10, r11, r5, r0     @ acc += b1*x[i - 1]
     ldr r0, [r9]               @ load input and fix history in same operation
-    smlal r10, r11, r4, r0     @ acc += b0*x[i]
     smlal r10, r11, r7, r2     @ acc += a1*y[i - 1]
     smlal r10, r11, r8, r3     @ acc += a2*y[i - 2]
+    smlal r10, r11, r4, r0     @ acc += b0*x[i] /* avoid stall on arm9*/
     mov r3, r2                 @ fix output history
     mov r2, r11, asl r12       @ get upper part of result and shift left
 #ifdef HIGH_PRECISION
