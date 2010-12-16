@@ -39,12 +39,38 @@ void ata_reset(void)
 
 void ata_enable(bool on)
 {
+    static bool init = true;
+
+    /* Ide power toggling is a nasty hack to allow USB bridge operation
+     * in rockbox. For some reason GL811E bridge doesn't like the state
+     * in which rockbox leaves drive (and vice versa). The only way
+     * I found out to recover is to do disk power cycle (I tried toggling
+     * reset line of the disk but it doesn't work).
+     */
+
     /* GPO36  /reset line of GL811E */
     if (on)
+    {
         and_l(~(1<<4), &GPIO1_OUT);
+#ifndef BOOTLADER
+        if ( !init )
+        {
+            ide_power_enable(false);
+            sleep(1);
+            ide_power_enable(true);
+        }
+#endif
+        init = false;
+    }
     else
+    {
+#ifndef BOOTLOADER
+        ide_power_enable(false);
+        sleep(1);
+        ide_power_enable(true);
+#endif
         or_l((1<<4), &GPIO1_OUT);
-
+    }
     or_l((1<<4), &GPIO1_ENABLE);
     or_l((1<<4), &GPIO1_FUNCTION);
 }
