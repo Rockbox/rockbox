@@ -391,7 +391,7 @@ bool button_hold(void)
 bool headphones_inserted(void)
 {
 #if CONFIG_CPU==S5L8701
-    return ((PDAT14 & (1 << 5)) == 0);
+    return ((PDAT14 & (1 << 5)) != 0);
 #elif CONFIG_CPU==S5L8702
     //TODO: Implement
     return false;
