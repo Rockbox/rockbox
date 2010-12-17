@@ -1264,10 +1264,10 @@ static struct hotkey_assignment hotkey_items[] = {
             ONPLAY_RELOAD_DIR },
     { HOTKEY_INSERT,            LANG_INSERT,
             HOTKEY_FUNC(playlist_insert_func, (intptr_t*)PLAYLIST_INSERT),
-            ONPLAY_START_PLAY },
+            ONPLAY_RELOAD_DIR },
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
-            ONPLAY_OK },
+            ONPLAY_RELOAD_DIR },
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
     { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
             HOTKEY_FUNC(NULL, NULL),
