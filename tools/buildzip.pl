@@ -126,7 +126,7 @@ sub make_install {
         die "ERROR: No PREFIX given\n"
     }
 
-    if ((!$app) && $src && (abs_path($bindir) eq abs_path($src))) {
+    if ((!$app) && -e $bindir && -e $src && (abs_path($bindir) eq abs_path($src))) {
         return 1;
     }
 
