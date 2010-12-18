@@ -1512,14 +1512,28 @@ static void osd_seek(int btn)
     stream_seek(time, SEEK_SET);
 }
 
-/* has this file the extension .mpg ? */
+/* Has this file one of the supported extensions? */
 static bool is_videofile(const char* file)
 {
-    const char* ext = rb->strrchr(file, '.');
-    if (ext && !rb->strcasecmp(ext, ".mpg"))
-        return true;
+    static const char * const extensions[] =
+    {
+        /* Should match apps/plugins/viewers.config */
+        "mpg", "mpeg", "mpv", "m2v"
+    };
 
-    return false;
+    const char* ext = rb->strrchr(file, '.');
+    int i;
+
+    if (!ext)
+        return false;
+
+    for (i = ARRAYLEN(extensions) - 1; i >= 0; i--)
+    {
+        if (!rb->strcasecmp(ext + 1, extensions[i]))
+            break;
+    }
+
+    return i >= 0;
 }
 
 /* deliver the next/previous video file in the current directory.
