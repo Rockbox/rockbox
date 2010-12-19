@@ -319,8 +319,9 @@ void lcd_init_device(void)
     } else {
         lcd_type   = 1;     /* Similar to LDS176  - aka "type 7" */
         LCD_CON   |= 0x100; /* use 16 bit bus width, little endian */
-        LCD_PHTIME = 0x022; /* Set Phase Time reg (relevant for LCD IF speed) */
     }
+    
+    LCD_PHTIME = 0x22;  /* Set Phase Time reg (relevant for LCD IF speed) */
 
     lcd_ispowered = true;
 }
