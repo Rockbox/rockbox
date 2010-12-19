@@ -314,13 +314,13 @@ void lcd_init_device(void)
     PCON14 &= ~0xf0;   /* Set pin 1 to input */
 
     if (((PDAT13 & 1) == 0) && ((PDAT14 & 2) == 2)) {
-        lcd_type = 0;       /* Similar to ILI9320 - aka "type 2" */
+        lcd_type   = 0;     /* Similar to ILI9320 - aka "type 2" */
+        LCD_CON   |= 0x180; /* use 16 bit bus width, big endian */
     } else {
-        lcd_type = 1;       /* Similar to LDS176  - aka "type 7" */
-        LCD_PHTIME = 0x22;  /* Set Phase Time reg (relevant for LCD IF speed) */
+        lcd_type   = 1;     /* Similar to LDS176  - aka "type 7" */
+        LCD_CON   |= 0x100; /* use 16 bit bus width, little endian */
+        LCD_PHTIME = 0x022; /* Set Phase Time reg (relevant for LCD IF speed) */
     }
-        
-    LCD_CON |= 0x100;  /* use 16 bit bus width, little endian */
 
     lcd_ispowered = true;
 }
