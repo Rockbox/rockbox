@@ -59,6 +59,13 @@ except ImportError:
     print "Fatal: This script requires the which package to run."
     print "       See http://code.google.com/p/which/."
     sys.exit(-5)
+cpus = 1
+try:
+    import multiprocessing
+    cpus = multiprocessing.cpu_count()
+    print "Info: %s cores found." % cpus
+except ImportError:
+    print "Warning: multiprocessing module not found. Assuming 1 core."
 
 # == Global stuff ==
 # Windows nees some special treatment. Differentiate between program name
@@ -223,7 +230,11 @@ def qmake(qmake="qmake", projfile=project, wd=".", static=True):
 def build(wd="."):
     # make
     print "Building ..."
-    output = subprocess.Popen([make], stdout=subprocess.PIPE, cwd=wd)
+    command = [make]
+    if cpus > 1:
+        command.append("-j")
+        command.append(str(cpus))
+    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd)
     while True:
         c = output.stdout.readline()
         sys.stdout.write(".")
