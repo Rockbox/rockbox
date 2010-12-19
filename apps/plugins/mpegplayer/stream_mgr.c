@@ -668,13 +668,51 @@ void stream_clear_notify(struct stream *str, int for_msg)
     }
 }
 
+/* Special handling for certain messages since they involve multiple
+ * operations behind the scenes */
+static intptr_t send_video_msg(long id, intptr_t data)
+{
+    intptr_t retval = 0;
+
+    if (video_str.thread != 0 && disk_buf.in_file >= 0)
+    {
+
+        switch (id)
+        {
+        case VIDEO_DISPLAY_SHOW:
+            if (data != 0 && disk_buf_status() == STREAM_STOPPED)
+            {   /* Only prepare image if showing and not playing */
+                parser_prepare_image(str_parser.last_seek_time);
+            }
+            break;
+
+        case VIDEO_PRINT_FRAME:
+            if (data)
+                break;
+        case VIDEO_PRINT_THUMBNAIL:
+            if (disk_buf_status() != STREAM_STOPPED)
+                break; /* Prepare image if not playing */
+
+            if (!parser_prepare_image(str_parser.last_seek_time))
+                return false; /* Preparation failed */
+
+            /* Image ready - pass message to video thread */
+            break;
+        }
+
+        retval = str_send_msg(&video_str, id, data);
+    }
+
+    return retval;
+}
+
 /* Show/hide the video output */
 bool stream_show_vo(bool show)
 {
     bool vis;
     stream_mgr_lock();
 
-    vis = parser_send_video_msg(VIDEO_DISPLAY_SHOW, show);
+    vis = send_video_msg(VIDEO_DISPLAY_SHOW, show);
 #ifndef HAVE_LCD_COLOR
     grey_show(show);
 #endif
@@ -688,7 +726,7 @@ bool stream_vo_is_visible(void)
 {
     bool vis;
     stream_mgr_lock();
-    vis = parser_send_video_msg(VIDEO_DISPLAY_IS_VISIBLE, 0);
+    vis = send_video_msg(VIDEO_DISPLAY_IS_VISIBLE, 0);
     stream_mgr_unlock();
     return vis;
 }
@@ -721,7 +759,7 @@ void stream_vo_set_clip(const struct vo_rect *rc)
         rc = &stream_mgr.parms.rc;
     }
 
-    parser_send_video_msg(VIDEO_SET_CLIP_RECT, (intptr_t)rc);
+    send_video_msg(VIDEO_SET_CLIP_RECT, (intptr_t)rc);
 
     stream_mgr_unlock();
 }
@@ -750,7 +788,7 @@ bool stream_display_thumb(const struct vo_rect *rc)
     stream_mgr_lock();
 
     stream_mgr.parms.rc = *rc;
-    retval = parser_send_video_msg(VIDEO_PRINT_THUMBNAIL,
+    retval = send_video_msg(VIDEO_PRINT_THUMBNAIL,
                 (intptr_t)&stream_mgr.parms.rc);
 
     stream_mgr_unlock();
@@ -763,7 +801,7 @@ bool stream_draw_frame(bool no_prepare)
     bool retval;
     stream_mgr_lock();
 
-    retval = parser_send_video_msg(VIDEO_PRINT_FRAME, no_prepare);
+    retval = send_video_msg(VIDEO_PRINT_FRAME, no_prepare);
 
     stream_mgr_unlock();
 

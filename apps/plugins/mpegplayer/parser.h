@@ -86,7 +86,7 @@ off_t mpeg_stream_stream_seek_PTS(uint32_t time, int id);
 /* General parsing */
 bool parser_init(void);
 void str_initialize(struct stream *str, off_t pos);
-intptr_t parser_send_video_msg(long id, intptr_t data);
+bool parser_prepare_image(uint32_t time);
 bool parser_get_video_size(struct vo_ext *sz);
 int parser_init_stream(void);
 void parser_close_stream(void);

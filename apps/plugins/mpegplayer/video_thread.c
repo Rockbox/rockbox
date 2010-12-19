@@ -124,7 +124,8 @@ static int video_str_scan(struct video_thread_data *td,
     tmp_str.hdr.pos = sd->sk.pos;
     tmp_str.hdr.limit = sd->sk.pos + sd->sk.len;
 
-    mpeg2_reset(td->mpeg2dec, false);
+    /* Fully reset if obtaining size for a new stream */
+    mpeg2_reset(td->mpeg2dec, td->ev.id == VIDEO_GET_SIZE);
     mpeg2_skip(td->mpeg2dec, 1);
 
     while (1)
@@ -503,12 +504,6 @@ static void video_thread_msg(struct video_thread_data *td)
             reply = true;
             break;
 
-        case STREAM_CLOSE:
-            vo_cleanup();
-            mpeg2_close(td->mpeg2dec);
-            reply = true;
-            break;
-
         case VIDEO_DISPLAY_IS_VISIBLE:
             reply = vo_is_visible();
             break;
@@ -605,8 +600,9 @@ static void video_thread_msg(struct video_thread_data *td)
         case VIDEO_GET_SIZE:
         {
             if (td->state != TSTATE_INIT)
-                break;
+                break; /* Can only use after a reset was issued */
 
+            /* This will reset the decoder in full for this particular event */
             if (init_sequence(td))
             {
                 reply = true;

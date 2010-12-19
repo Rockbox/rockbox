@@ -116,9 +116,11 @@ static inline void yuv_blit(uint8_t * const * buf, int src_x, int src_y,
 
 void vo_draw_frame(uint8_t * const * buf)
 {
-    if (vo.flags == 0)
+    if ((vo.flags & (VO_NON_NULL_RECT | VO_VISIBLE)) !=
+        (VO_NON_NULL_RECT | VO_VISIBLE))
     {
-        /* Frame is hidden - copout */
+        /* Frame is hidden - either by being set invisible or is clipped
+         * away - copout */
         DEBUGF("vo hidden\n");
         return;
     }

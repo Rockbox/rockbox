@@ -564,84 +564,6 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
     return pos;
 }
 
-static bool prepare_image(uint32_t time)
-{
-    struct stream_scan sk;
-    int tries;
-    int result;
-
-    stream_scan_init(&sk);
-
-    if (!str_send_msg(&video_str, STREAM_NEEDS_SYNC, time))
-    {
-        DEBUGF("Image was ready\n");
-        return true; /* Should already have the image */
-    }
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true); /* No interference with trigger_cpu_boost */
-#endif
-
-    str_send_msg(&video_str, STREAM_RESET, 0);
-
-    sk.pos = parser_can_seek() ?
-                mpeg_parser_seek_PTS(time, video_str.id) : 0;
-    sk.len = sk.pos;
-    sk.dir = SSCAN_REVERSE;
-
-    tries = 1;
-try_again:
-
-    if (mpeg_parser_scan_start_code(&sk, MPEG_START_GOP))
-    {
-        DEBUGF("GOP found at: %ld\n", sk.pos);
-
-        unsigned id = mpeg_parser_scan_pes(&sk);
-
-        if (id != video_str.id && sk.pos > 0)
-        {
-            /* Not part of our stream */
-            DEBUGF("  wrong stream: 0x%02x\n", id);
-            goto try_again;
-        }
-
-        /* This will hit the PES header since it's known to be there */
-        uint32_t pts = mpeg_parser_scan_pts(&sk, id);
-
-        if (pts == INVALID_TIMESTAMP || pts > time)
-        {
-            DEBUGF("  wrong timestamp: %u\n", (unsigned)pts);
-            goto try_again;
-        }
-    }
-
-    str_parser.parms.sd.time = time;
-    str_parser.parms.sd.sk.pos = MAX(sk.pos, 0);
-    str_parser.parms.sd.sk.len = 1024*1024;
-    str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
-
-    DEBUGF("thumb pos:%ld len:%ld\n", str_parser.parms.sd.sk.pos,
-           (long)str_parser.parms.sd.sk.len);
-
-    result = str_send_msg(&video_str, STREAM_SYNC,
-                          (intptr_t)&str_parser.parms.sd);
-
-    if (result != STREAM_PERFECT_MATCH)
-    {
-        /* Two tries should be all that is nescessary to find the exact frame
-         * if the first GOP actually started later than the timestamp - the
-         * GOP just prior must then start on or earlier. */
-        if (++tries <= 2)
-            goto try_again;
-    }
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
-#endif
-
-    return result > STREAM_OK;
-}
-
 static void prepare_audio(uint32_t time)
 {
     off_t pos;
@@ -1037,41 +959,82 @@ static int parse_elementary(struct stream *str, enum stream_parse_mode type)
     return STREAM_OK;
 }
 
-intptr_t parser_send_video_msg(long id, intptr_t data)
+bool parser_prepare_image(uint32_t time)
 {
-    intptr_t retval = 0;
+    struct stream_scan sk;
+    int tries;
+    int result;
 
-    if (video_str.thread != 0 && disk_buf.in_file >= 0)
+    stream_scan_init(&sk);
+
+    if (!str_send_msg(&video_str, STREAM_NEEDS_SYNC, time))
     {
-        /* Hook certain messages since they involve multiple operations
-         * behind the scenes */
-        switch (id)
-        {
-        case VIDEO_DISPLAY_SHOW:
-            if (data != 0 && disk_buf_status() == STREAM_STOPPED)
-            {   /* Only prepare image if showing and not playing */
-                prepare_image(str_parser.last_seek_time);
-            }
-            break;
-
-        case VIDEO_PRINT_FRAME:
-            if (data)
-                break;
-        case VIDEO_PRINT_THUMBNAIL:
-            if (disk_buf_status() != STREAM_STOPPED)
-                break; /* Prepare image if not playing */
-
-            if (!prepare_image(str_parser.last_seek_time))
-                return false; /* Preparation failed */
-
-            /* Image ready - pass message to video thread */
-            break;
-        }
-
-        retval = str_send_msg(&video_str, id, data);
+        DEBUGF("Image was ready\n");
+        return true; /* Should already have the image */
     }
 
-    return retval;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true); /* No interference with trigger_cpu_boost */
+#endif
+
+    str_send_msg(&video_str, STREAM_RESET, 0);
+
+    sk.pos = parser_can_seek() ?
+                mpeg_parser_seek_PTS(time, video_str.id) : 0;
+    sk.len = sk.pos;
+    sk.dir = SSCAN_REVERSE;
+
+    tries = 1;
+try_again:
+
+    if (mpeg_parser_scan_start_code(&sk, MPEG_START_GOP))
+    {
+        DEBUGF("GOP found at: %ld\n", sk.pos);
+
+        unsigned id = mpeg_parser_scan_pes(&sk);
+
+        if (id != video_str.id && sk.pos > 0)
+        {
+            /* Not part of our stream */
+            DEBUGF("  wrong stream: 0x%02x\n", id);
+            goto try_again;
+        }
+
+        /* This will hit the PES header since it's known to be there */
+        uint32_t pts = mpeg_parser_scan_pts(&sk, id);
+
+        if (pts == INVALID_TIMESTAMP || pts > time)
+        {
+            DEBUGF("  wrong timestamp: %u\n", (unsigned)pts);
+            goto try_again;
+        }
+    }
+
+    str_parser.parms.sd.time = time;
+    str_parser.parms.sd.sk.pos = MAX(sk.pos, 0);
+    str_parser.parms.sd.sk.len = 1024*1024;
+    str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
+
+    DEBUGF("thumb pos:%ld len:%ld\n", str_parser.parms.sd.sk.pos,
+           (long)str_parser.parms.sd.sk.len);
+
+    result = str_send_msg(&video_str, STREAM_SYNC,
+                          (intptr_t)&str_parser.parms.sd);
+
+    if (result != STREAM_PERFECT_MATCH)
+    {
+        /* Two tries should be all that is nescessary to find the exact frame
+         * if the first GOP actually started later than the timestamp - the
+         * GOP just prior must then start on or earlier. */
+        if (++tries <= 2)
+            goto try_again;
+    }
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+
+    return result > STREAM_OK;
 }
 
 /* Seek parser to the specified time and return absolute time.
@@ -1095,7 +1058,7 @@ void parser_prepare_streaming(void)
     DEBUGF("parser_prepare_streaming\n");
 
     /* Prepare initial video frame */
-    prepare_image(str_parser.last_seek_time);
+    parser_prepare_image(str_parser.last_seek_time);
 
     /* Sync audio stream */
     if (audio_str.start_pts != INVALID_TIMESTAMP)
@@ -1215,7 +1178,6 @@ int parser_init_stream(void)
 
 void parser_close_stream(void)
 {
-    str_send_msg(&video_str, STREAM_CLOSE, 0);
     stream_remove_streams();
     parser_init_state();
 }
