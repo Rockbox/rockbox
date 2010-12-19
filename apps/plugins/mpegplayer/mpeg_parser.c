@@ -1144,6 +1144,7 @@ int parser_init_stream(void)
     if (!init_video_info())
     {
         /* Cannot determine video size, etc. */
+        parser_init_state();
         return STREAM_UNSUPPORTED;
     }
 
@@ -1157,6 +1158,7 @@ int parser_init_stream(void)
         if (video_str.start_pts == INVALID_TIMESTAMP)
         {
             /* Must have video at least */
+            parser_init_state();
             return STREAM_UNSUPPORTED;
         }
 

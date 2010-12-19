@@ -592,7 +592,7 @@ static int stream_on_close(void)
 
     stream_mgr_lock();
 
-    /* Any open file? */
+    /* Any open file that was accepted for playback? */
     if (stream_mgr.filename != NULL)
     {
         /* Yes - hide video */
@@ -602,11 +602,12 @@ static int stream_on_close(void)
         stream_on_stop(false);
         /* Tell parser file is finished */
         parser_close_stream();
-        /* Close file */
-        disk_buf_close();
         /* Reinitialize manager */
         stream_mgr_init_state();
     }
+
+    /* Let disk buffer reset itself - file might be open even if no good */
+    disk_buf_close();
 
     stream_mgr_unlock();
 
