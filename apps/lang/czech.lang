@@ -430,7 +430,7 @@
     *: "Playlisty"
   </dest>
   <voice>
-    *: "Plejlisty"
+    *: "Plejlisty, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -444,7 +444,7 @@
     *: "Pluginy"
   </dest>
   <voice>
-    *: "Plaginy, neozvučené"
+    *: "Plaginy, neozvučitelné"
   </voice>
 </phrase>
 <phrase>
@@ -5139,11 +5139,11 @@
   </source>
   <dest>
     *: none
-    radio: "Předvolba"
+    radio: "Předvolby"
   </dest>
   <voice>
     *: none
-    radio: "Předvolba"
+    radio: "Předvolby"
   </voice>
 </phrase>
 <phrase>
@@ -5258,7 +5258,7 @@
   </source>
   <dest>
     *: none
-    radio: "Vyhledávám %d.%02d MHz"
+    radio: "Ladím %d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -5292,11 +5292,11 @@
   </source>
   <dest>
     *: none
-    radio: "Vyhledat"
+    radio: "Ladění"
   </dest>
   <voice>
     *: none
-    radio: "Vyhledat"
+    radio: "Ladění"
   </voice>
 </phrase>
 <phrase>
@@ -6677,9 +6677,9 @@
   </dest>
   <voice>
     *: none
-    multivolume: "há dé 1"
-    sansae200*,sansac200*,sansafuze*: "mikro es dé"
-    archosondio*: "em em cé"
+    multivolume: "hárdisk há dé 1"
+    sansae200*,sansac200*,sansafuze*: "paměťová karta mikro es dé"
+    archosondio*: "paměťová karta em em cé"
   </voice>
 </phrase>
 <phrase>
@@ -10398,11 +10398,11 @@
   </source>
   <dest>
     *: none
-    multivolume: "Nepřítomný"
+    multivolume: "Není"
   </dest>
   <voice>
     *: none
-    multivolume: "Nepřítomný"
+    multivolume: "Není"
   </voice>
 </phrase>
 <phrase>  
@@ -12575,5 +12575,22 @@
   </dest>
   <voice>
     *: "Začít prohlížení souborů na růtu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Síla signálu:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Síla signálu"
   </voice>
 </phrase>
