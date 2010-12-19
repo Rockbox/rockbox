@@ -1873,8 +1873,7 @@ static int button_loop(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     static char videofile[MAX_PATH];
-
-    int status = PLUGIN_ERROR; /* assume failure */
+    int status = PLUGIN_OK; /* assume success */
     int result;
     int err;
     bool quit = false;
@@ -1901,7 +1900,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->strcpy(videofile, (const char*) parameter);
 
     if (stream_init() < STREAM_OK) {
+        /* Fatal because this should not fail */
         DEBUGF("Could not initialize streams\n");
+        status = PLUGIN_ERROR;
     } else {
         while (!quit)
         {
@@ -1927,10 +1928,11 @@ enum plugin_status plugin_start(const void* parameter)
                 rb->lcd_update();
 
                 save_settings();
-                status = PLUGIN_OK;
 
                 mpeg_menu_sysevent_handle();
             } else {
+                /* Problem with file; display message about it - not
+                 * considered a plugin error */
                 DEBUGF("Could not open %s\n", videofile);
                 switch (err)
                 {
@@ -1942,7 +1944,11 @@ enum plugin_status plugin_start(const void* parameter)
                 }
 
                 rb->splashf(HZ*2, errstring, err);
-                status = PLUGIN_ERROR;
+
+                if (settings.play_mode != 0) {
+                    /* Try the next file if the play mode is not single play */
+                    next_action = VIDEO_NEXT;
+                }
             }
 
             /* return value of button_loop says, what's next */
