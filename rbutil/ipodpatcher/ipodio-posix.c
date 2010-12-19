@@ -167,12 +167,11 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
     /* set value to match. In case of the Ipod this is "iPodUserClientDevice". */
     CFMutableDictionaryRef sub_dict;
     sub_dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    if(sub_dict == NULL)
+        return -1;
     CFDictionarySetValue(sub_dict, CFSTR(kIOPropertySCSITaskDeviceCategory),
                          CFSTR("iPodUserClientDevice"));
     CFDictionarySetValue(match_dict, CFSTR(kIOPropertyMatchKey), sub_dict);
-
-    if(sub_dict == NULL)
-        return -1;
 
     /* get an iterator for searching for the service. */
     kern_return_t kr;
