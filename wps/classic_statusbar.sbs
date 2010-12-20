@@ -96,7 +96,7 @@
 %?Rm<%xd(ca)|%xd(cb)>
 
 # Clock on RTC able targets, and disk access
-%V(-43,0,31,8,0) # align on the right with room for 5 SYSFONT digits
+%V(-50,0,38,8,0) # align on the right with room for 5 SYSFONT digits
 %?cc<%?ca<%?St(time format)<%cH|%cI>:%cM|--:-->|>
 
 # disk access icon
