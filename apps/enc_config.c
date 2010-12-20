@@ -302,7 +302,7 @@ static void enc_rec_settings_changed(struct encoder_config *cfg)
 {
     struct encoder_config enc_config;
     struct encoder_caps caps;
-    long table[MAX(CHN_NUM_MODES, REC_NUM_FREQ)];
+    long table[MAX((int)CHN_NUM_MODES, (int)REC_NUM_FREQ)];
     int n;
 
     if (cfg == NULL)
