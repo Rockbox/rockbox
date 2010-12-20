@@ -210,13 +210,10 @@ void lcd_update(void)
     lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
     lcd_write_command(LCD_CNTL_DATA_WRITE);
 
-    /* lcd can't handle the speed of DMA transfer when boosted */
-    if ( cpu_frequency > 60000000 )
-    {
-        /* Copy display bitmap to hardware */
-        lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
-    }
-    else
+    /* lcd can't handle the speed of DMA transfer when boosted
+     * 11 MHz in bootloader hangs for unknown reason
+     */
+    if ( cpu_frequency == CPUFREQ_NORMAL )
     {
         /* Copy display bitmap to hardware using DMA */
         DSR3 = 1;
@@ -226,6 +223,12 @@ void lcd_update(void)
         DCR3 = DMA_BWC(1) | DMA_SINC | DMA_SSIZE(DMA_SIZE_BYTE) |
                DMA_DSIZE(DMA_SIZE_BYTE) | DMA_START;
     }
+    else
+    {
+        /* Copy display bitmap to hardware */
+        lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
+    }
+
 }
 
 /* Update a fraction of the display. */
