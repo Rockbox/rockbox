@@ -330,8 +330,9 @@ static uint32_t stream_seek_intl(uint32_t time, int whence,
     {
         bool wb;
 
-        /* Place streams in a non-running state - keep them on actl */
-        actl_stream_broadcast(STREAM_STOP, 0);
+        /* Place streams in a non-running state - keep them on actl if
+         * still there */
+        actl_stream_broadcast(STREAM_PAUSE, 0);
 
         /* Stop all buffering or else risk clobbering random-access data */
         wb = disk_buf_send_msg(STREAM_STOP, 0);
@@ -557,7 +558,8 @@ static void stream_on_seek(struct stream_seek_data *skd)
 
         stream_mgr_lock();
 
-        if (stream_can_seek())
+        /* Either seeking must be possible or a full rewind must be done */
+        if (stream_can_seek() || time_from_whence(time, whence) == 0)
         {
             bool buffer;
 
