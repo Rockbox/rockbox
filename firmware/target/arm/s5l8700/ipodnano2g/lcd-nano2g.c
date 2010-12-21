@@ -321,7 +321,7 @@ void lcd_init_device(void)
         LCD_CON   |= 0x100; /* use 16 bit bus width, little endian */
     }
     
-    LCD_PHTIME = 0x22;  /* Set Phase Time reg (relevant for LCD IF speed) */
+    LCD_PHTIME = 0x00; /* Set Phase Time (faster LCD IF than Apple OF) */
 
     lcd_ispowered = true;
 }
