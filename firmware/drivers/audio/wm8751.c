@@ -547,9 +547,6 @@ void audiohw_set_recsrc(int source, bool recording)
             /* turn off ADC, PGA */
             wmcodec_write(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_50K);
 
-            wmcodec_write(LOUT1, LOUT1_BITS);
-            wmcodec_write(ROUT1, ROUT1_BITS);
-
            /* turn on DAC and output stage */
             wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
                           PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
