@@ -74,7 +74,7 @@ int usb_detect(void)
     else if(connected)
         return USB_POWERED;
     else
-        return USB_EXTRACTED;
+        return USB_UNPOWERED;
 #else
     return connected?USB_INSERTED:USB_EXTRACTED;
 #endif
