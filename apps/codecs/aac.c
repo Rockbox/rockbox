@@ -43,7 +43,7 @@ enum codec_status codec_main(void)
      * the sampling frequency).
      */
     size_t n;
-    static demux_res_t demux_res;
+    demux_res_t demux_res;
     stream_t input_stream;
     uint32_t sound_samples_done;
     uint32_t elapsed_time;
@@ -55,7 +55,7 @@ enum codec_status codec_main(void)
     int needed_bufsize;
     unsigned int i;
     unsigned char* buffer;
-    static NeAACDecFrameInfo frame_info;
+    NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
     int err;
     uint32_t s = 0;
