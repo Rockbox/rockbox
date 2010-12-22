@@ -51,7 +51,7 @@ private
                 self.codec = "Atrac3"
             when /true.+/
                 self.codec = "True Audio"
-            when /toolame.+/
+            when /toolame.+/, /pegase_l2.+/
                 self.codec = "MP2"
             when /atrack1.+/
                 self.codec = "Atrac1"
@@ -61,6 +61,8 @@ private
                 self.codec = "WMA Lossless"
             when /speex.+/
                 self.codec = "Speex"
+            when /pegase_l1.+/
+                self.codec = "MP1"
             else
                 self.codec = "CODEC UNKNOWN (#{name})"
         end
@@ -129,7 +131,7 @@ public
         test = Regexp.new(/[.\d]+MHz needed for realtime/)
         self.mhz_needed = nil
         if (text_block[5] != nil && text_block[5].length > 0)
-            self.mhz_needed = text_block[5].match(test)[1].to_f
+            self.mhz_needed = text_block[5].match(test)[0].to_f
         elsif (cpu_freq)
             # if not given, calculate it as per passed cpu frequency
             # duration to microseconds
