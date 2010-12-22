@@ -228,4 +228,30 @@ void list_enum_items(void **list,
                      list_enum_callback_t callback,
                      intptr_t data);
 
+
+/** System events **/
+
+/* Clear event */
+void mpeg_sysevent_clear(void);
+
+/* Set to ACTION_STD_CANCEL */
+void mpeg_sysevent_set(void);
+
+/* Get event code */
+long mpeg_sysevent(void);
+
+/* Call with a system event code and used as menu callback */
+int mpeg_sysevent_callback(int btn, const struct menu_item_ex *menu);
+
+/* Handle recorded event */
+void mpeg_sysevent_handle(void);
+
+
+/** Buttons **/
+
+/* Get button codes while remembering important events for later
+ * processing; return of ACTION_STD_CANCEL means plugin should
+ * abort and handle the event */
+int mpeg_button_get(int timeout);
+
 #endif /* MPEG_MISC_H */

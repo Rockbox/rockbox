@@ -315,39 +315,6 @@ static const struct opt_items globaloff[2] = {
 #endif
 
 static void mpeg_settings(void);
-static long mpeg_menu_sysevent_id;
-
-void mpeg_menu_sysevent_clear(void)
-{
-    mpeg_menu_sysevent_id = 0;
-}
-
-int mpeg_menu_sysevent_callback(int btn, const struct menu_item_ex *menu)
-{
-    switch (btn)
-    {
-    case SYS_USB_CONNECTED:
-    case SYS_POWEROFF:
-        mpeg_menu_sysevent_id = btn;
-        return ACTION_STD_CANCEL;
-    }
-
-    return btn;
-    (void)menu;
-}
-
-long mpeg_menu_sysevent(void)
-{
-    return mpeg_menu_sysevent_id;
-}
-
-void mpeg_menu_sysevent_handle(void)
-{
-    long id = mpeg_menu_sysevent();
-    if (id != 0)
-        rb->default_event_handler(id);
-}
-
 static bool mpeg_set_option(const char* string,
                             void* variable,
                             enum optiontype type,
@@ -355,14 +322,14 @@ static bool mpeg_set_option(const char* string,
                             int numoptions,
                             void (*function)(int))
 {
-    mpeg_menu_sysevent_clear();
+    mpeg_sysevent_clear();
 
     /* This eats SYS_POWEROFF - :\ */
     bool usb = rb->set_option(string, variable, type, options, numoptions,
                               function);
 
     if (usb)
-        mpeg_menu_sysevent_id = ACTION_STD_CANCEL;
+        mpeg_sysevent_set();
 
     return usb;
 }
@@ -375,13 +342,13 @@ static bool mpeg_set_int(const char *string, const char *unit,
                          int max,
                          const char* (*formatter)(char*, size_t, int, const char*))
 {
-    mpeg_menu_sysevent_clear();
+    mpeg_sysevent_clear();
 
     bool usb = rb->set_int(string, unit, voice_unit, variable, function,
                            step, min, max, formatter);
 
     if (usb)
-        mpeg_menu_sysevent_id = ACTION_STD_CANCEL;
+        mpeg_sysevent_set();
 
     return usb;
 }
@@ -778,11 +745,7 @@ static int get_start_time(uint32_t duration)
 
     while (slider_state < STATE9)
     {
-        mpeg_menu_sysevent_clear();
-        button = tmo == TIMEOUT_BLOCK ?
-            rb->button_get(true) : rb->button_get_w_tmo(tmo);
-
-        button = mpeg_menu_sysevent_callback(button, NULL);
+        button = mpeg_button_get(tmo);
 
         switch (button)
         {
@@ -922,7 +885,7 @@ static int show_start_menu(uint32_t duration)
     char hms_str[32];
     struct hms hms;
 
-    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
                         "Play from beginning", resume_str, "Set start time",
                         "Settings", "Quit mpegplayer");
 
@@ -935,7 +898,7 @@ static int show_start_menu(uint32_t duration)
 
     while (!menu_quit)
     {
-        mpeg_menu_sysevent_clear();
+        mpeg_sysevent_clear();
         result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
@@ -972,7 +935,7 @@ static int show_start_menu(uint32_t duration)
             break;
         }
 
-        if (mpeg_menu_sysevent() != 0)
+        if (mpeg_sysevent() != 0)
         {
             result = MPEG_START_QUIT;
             menu_quit = true;
@@ -985,7 +948,7 @@ static int show_start_menu(uint32_t duration)
 /* Return the desired resume action */
 int mpeg_start_menu(uint32_t duration)
 {
-    mpeg_menu_sysevent_clear();
+    mpeg_sysevent_clear();
 
     switch (settings.resume_options)
     {
@@ -1008,12 +971,12 @@ int mpeg_menu(void)
 {
     int result;
 
-    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
                         "Settings", "Resume playback", "Quit mpegplayer");
 
     rb->button_clear_queue();
 
-    mpeg_menu_sysevent_clear();
+    mpeg_sysevent_clear();
 
     result = rb->do_menu(&menu, NULL, NULL, false);
 
@@ -1033,7 +996,7 @@ int mpeg_menu(void)
         break;
     }
 
-    if (mpeg_menu_sysevent() != 0)
+    if (mpeg_sysevent() != 0)
         result = MPEG_MENU_QUIT;
 
     return result;
@@ -1045,7 +1008,7 @@ static void display_options(void)
     int result;
     bool menu_quit = false;
 
-    MENUITEM_STRINGLIST(menu, "Display Options", mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Display Options", mpeg_sysevent_callback,
 #if MPEG_OPTION_DITHERING_ENABLED
                         "Dithering",
 #endif
@@ -1059,7 +1022,7 @@ static void display_options(void)
 
     while (!menu_quit)
     {
-        mpeg_menu_sysevent_clear();
+        mpeg_sysevent_clear();
         result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
@@ -1108,7 +1071,7 @@ static void display_options(void)
             break;
         }
 
-        if (mpeg_menu_sysevent() != 0)
+        if (mpeg_sysevent() != 0)
             menu_quit = true;
     }
 }
@@ -1119,7 +1082,7 @@ static void audio_options(void)
     int result;
     bool menu_quit = false;
 
-    MENUITEM_STRINGLIST(menu, "Audio Options", mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Audio Options", mpeg_sysevent_callback,
                         "Tone Controls", "Channel Modes", "Crossfeed",
                         "Equalizer", "Dithering");
 
@@ -1127,7 +1090,7 @@ static void audio_options(void)
 
     while (!menu_quit)
     {
-        mpeg_menu_sysevent_clear();
+        mpeg_sysevent_clear();
         result = rb->do_menu(&menu, &selected, NULL, false);
 
         switch (result)
@@ -1167,7 +1130,7 @@ static void audio_options(void)
             break;
         }
 
-        if (mpeg_menu_sysevent() != 0)
+        if (mpeg_sysevent() != 0)
             menu_quit = true;
     }
 }
@@ -1203,7 +1166,7 @@ static void mpeg_settings(void)
     bool menu_quit = false;
     static char clear_str[32];
 
-    MENUITEM_STRINGLIST(menu, "Settings", mpeg_menu_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "Settings", mpeg_sysevent_callback,
                         "Display Options", "Audio Options",
                         "Resume Options", "Play Mode", clear_str);
 
@@ -1211,7 +1174,7 @@ static void mpeg_settings(void)
 
     while (!menu_quit)
     {
-        mpeg_menu_sysevent_clear();
+        mpeg_sysevent_clear();
 
         /* Format and add resume option to the menu display */
         rb->snprintf(clear_str, sizeof(clear_str),
@@ -1247,7 +1210,7 @@ static void mpeg_settings(void)
             break;
         }
 
-        if (mpeg_menu_sysevent() != 0)
+        if (mpeg_sysevent() != 0)
             menu_quit = true;
     }
 }

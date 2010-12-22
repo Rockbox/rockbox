@@ -162,3 +162,58 @@ void list_enum_items(void **list,
             list++; /* Item still there */
     }
 }
+
+
+/** System events **/
+static long mpeg_sysevent_id;
+
+void mpeg_sysevent_clear(void)
+{
+    mpeg_sysevent_id = 0;
+}
+
+void mpeg_sysevent_set(void)
+{
+    /* Nonzero and won't invoke anything in default event handler */
+    mpeg_sysevent_id = ACTION_STD_CANCEL;
+}
+
+long mpeg_sysevent(void)
+{
+    return mpeg_sysevent_id;
+}
+
+int mpeg_sysevent_callback(int btn, const struct menu_item_ex *menu)
+{
+    switch (btn)
+    {
+    case SYS_USB_CONNECTED:
+    case SYS_POWEROFF:
+        mpeg_sysevent_id = btn;
+        return ACTION_STD_CANCEL;
+    }
+
+    return btn;
+    (void)menu;
+}
+
+void mpeg_sysevent_handle(void)
+{
+    long id = mpeg_sysevent();
+    if (id != 0)
+        rb->default_event_handler(id);
+}
+
+
+/** Buttons **/
+
+int mpeg_button_get(int timeout)
+{
+    int button;
+
+    mpeg_sysevent_clear();
+    button = timeout == TIMEOUT_BLOCK ? rb->button_get(true) :
+                rb->button_get_w_tmo(timeout);
+    return mpeg_sysevent_callback(button, NULL);
+}
+
