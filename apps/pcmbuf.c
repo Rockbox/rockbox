@@ -273,31 +273,37 @@ static void commit_chunk(bool flush_next_time)
 
 /* Set priority of the codec thread */
 #ifdef HAVE_PRIORITY_SCHEDULING
-static void boost_codec_thread(bool boost)
+/*
+ * expects pcm_fill_state in tenth-% units (e.g. full pcm buffer is 10) */
+static void boost_codec_thread(int pcm_fill_state)
 {
+    static const int prios[11] = {
+        PRIORITY_PLAYBACK_MAX,      /*   0 - 10% */
+        PRIORITY_PLAYBACK_MAX+1,    /*  10 - 20% */
+        PRIORITY_PLAYBACK_MAX+3,    /*  20 - 30% */
+        PRIORITY_PLAYBACK_MAX+5,    /*  30 - 40% */
+        PRIORITY_PLAYBACK_MAX+7,    /*  40 - 50% */
+        PRIORITY_PLAYBACK_MAX+8,    /*  50 - 60% */
+        PRIORITY_PLAYBACK_MAX+9,    /*  60 - 70% */
+        /* raiseing priority above 70% shouldn't be needed */
+        PRIORITY_PLAYBACK,          /*  70 - 80% */
+        PRIORITY_PLAYBACK,          /*  80 - 90% */
+        PRIORITY_PLAYBACK,          /*  90 -100% */
+        PRIORITY_PLAYBACK,          /*      100% */
+    };
+    int new_prio = prios[pcm_fill_state];
+
     /* Keep voice and codec threads at the same priority or else voice
      * will starve if the codec thread's priority is boosted. */
-    if (boost)
+    if (new_prio != codec_thread_priority)
     {
-        int priority = (PRIORITY_PLAYBACK - PRIORITY_PLAYBACK_MAX)*pcmbuf_unplayed_bytes
-                          / (2*NATIVE_FREQUENCY) + PRIORITY_PLAYBACK_MAX;
-
-        if (priority != codec_thread_priority)
-        {
-            codec_thread_priority = priority;
-            thread_set_priority(codec_thread_id, priority);
-            voice_thread_set_priority(priority);
-        }
-    }
-    else if (codec_thread_priority != PRIORITY_PLAYBACK)
-    {
-        thread_set_priority(codec_thread_id, PRIORITY_PLAYBACK);
-        voice_thread_set_priority(PRIORITY_PLAYBACK);
-        codec_thread_priority = PRIORITY_PLAYBACK;
+        thread_set_priority(codec_thread_id, new_prio);
+        voice_thread_set_priority(new_prio);
+        codec_thread_priority = new_prio;
     }
 }
 #else
-#define boost_codec_thread(boost) do{}while(0)
+#define boost_codec_thread(pcm_fill_state) do{}while(0)
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
 /* Return true if the PCM buffer is able to receive new data.
@@ -324,18 +330,10 @@ static bool prepare_insert(size_t length)
         if (thread_get_current() == codec_thread_id)
 #endif /* SIMULATOR */
         {
-            if (pcmbuf_unplayed_bytes <= pcmbuf_watermark)
-            {
-                /* Fill PCM buffer by boosting cpu */
+            /* boost cpu if necessary */
+            if (pcmbuf_unplayed_bytes < pcmbuf_watermark)
                 trigger_cpu_boost();
-                /* If buffer is critically low, override UI priority, else
-                   set back to the original priority. */
-                boost_codec_thread(LOW_DATA(2));
-            }
-            else
-            {
-                boost_codec_thread(false);
-            }
+            boost_codec_thread(pcmbuf_unplayed_bytes*10/pcmbuf_size);
         }
 
 #ifdef HAVE_CROSSFADE
@@ -681,8 +679,9 @@ void pcmbuf_play_stop(void)
     flush_pcmbuf = false;
     DISPLAY_DESC("play_stop");
 
-    /* Can unboost the codec thread here no matter who's calling */
-    boost_codec_thread(false);
+    /* Can unboost the codec thread here no matter who's calling,
+     * pretend full pcm buffer to unboost */
+    boost_codec_thread(10);
 }
 
 void pcmbuf_pause(bool pause)
