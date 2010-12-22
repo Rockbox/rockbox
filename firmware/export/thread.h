@@ -375,8 +375,8 @@ unsigned int create_thread(void (*function)(void),
 void trigger_cpu_boost(void);
 void cancel_cpu_boost(void);
 #else
-#define trigger_cpu_boost()
-#define cancel_cpu_boost()
+#define trigger_cpu_boost() do { } while(0)
+#define cancel_cpu_boost() do { } while(0)
 #endif
 /* Return thread entry from id */
 struct thread_entry *thread_id_entry(unsigned int thread_id);
