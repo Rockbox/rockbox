@@ -836,9 +836,9 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "ldr     %[_3], [%[rev]]              \r\n" /* _3=r0r1            */
                 "smuad   %[out], %[_0], %[_2]         \r\n" /* out=f0*i0 + f1*i1  */
                 "smladx  %[out], %[_1], %[_3], %[out] \r\n" /* out+=r1*i2 + r0*i3 */
-                : [out]"=&r"(output),
+                : [out]"=r"(output),
                   [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
-                  [_2]"=&r"(_2), [_3]"=&r"(_3)
+                  [_2]"=&r"(_2), [_3]"=r"(_3)
                 : [fwd]"r"(fwd), [rev]"r"(rev),
                   [interp]"r"(interp));
                 /* Apply voice envelope */
@@ -852,7 +852,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "smulwb  %[amp_0], %[out], %[vvol_0]  \r\n" /* (32x16->48)[47:16]->[31:0] */
                 "smulwb  %[amp_1], %[out], %[vvol_1]  \r\n"
                 : [out]"+r"(output),
-                  [amp_0]"=r"(amp_0), [amp_1]"=r"(amp_1)
+                  [amp_0]"=&r"(amp_0), [amp_1]"=r"(amp_1)
                 : [vvol_0]"r"(voice->volume[0]),
                   [vvol_1]"r"(voice->volume[1]));
 
@@ -889,7 +889,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "mul    %[amp_0], %[out], %[vvol_0]   \r\n"
                 "mul    %[amp_1], %[out], %[vvol_1]   \r\n"
                 : [out]"+r"(output),
-                  [amp_0]"=r"(amp_0), [amp_1]"=r"(amp_1)
+                  [amp_0]"=&r"(amp_0), [amp_1]"=r"(amp_1)
                 : [vvol_0]"r"((int)voice->volume[0]),
                   [vvol_1]"r"((int)voice->volume[1]));
 
@@ -930,7 +930,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                     "smultb  %[_3],  %[_1], %[_3]          \r\n" /* _3=r0*i3  */
                     : [out]"=r"(output),
                       [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
-                      [_2]"=&r"(_2), [_3]"=&r"(_3)
+                      [_2]"=&r"(_2), [_3]"=r"(_3)
                     : [fwd]"r"(fwd), [rev]"r"(rev),
                       [interp]"r"(interp));
                     asm volatile (
@@ -956,7 +956,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "mul     %[amp_0], %[out], %[vvol_0]   \r\n"
                 "mul     %[amp_1], %[out], %[vvol_1]   \r\n"
                 : [out]"+r"(output),
-                  [amp_1]"=r"(amp_1), [amp_0]"=r"(amp_0)
+                  [amp_0]"=&r"(amp_0), [amp_1]"=r"(amp_1)
                 : [vvol_0]"r"((int)voice->volume[0]),
                   [vvol_1]"r"((int)voice->volume[1]));
 
@@ -989,7 +989,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                     "mov     %[_3], %[_3], asr #12         \r\n"
                     "mov     %[_3], %[_3], asl #1          \r\n"
                     "add     %[out], %[_3], %[_2], asr #16 \r\n"
-                    : [out]"=r"(output),
+                    : [out]"=&r"(output),
                       [_0]"=&r"(amp_0), [_1]"=&r"(amp_1),
                       [_2]"=&r"(_2), [_3]"=&r"(_3)
                     : [fwd]"r"(fwd), [rev]"r"(rev),
@@ -1008,8 +1008,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                     "bic     %[out], %[out], #0x1          \r\n"
                     "mul     %[amp_0], %[out], %[vvol_0]   \r\n"
                     "mul     %[amp_1], %[out], %[vvol_1]   \r\n"
-                : [out]"+r"(output), [amp_0]"+r"(amp_0),
-                  [amp_1]"=r"(amp_1)
+                : [out]"+r"(output),
+                  [amp_0]"+r"(amp_0), [amp_1]"=r"(amp_1)
                 : [vvol_0]"r"((int)voice->volume[0]),
                   [vvol_1]"r"((int)voice->volume[1]));
 
@@ -1137,7 +1137,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             "mul    %[amp_1], %[amp_0], %[envx] \r\n"
             "mov    %[amp_0], %[amp_1], asr #11 \r\n"
             "mov    %[amp_1], %[amp_0], asr #8  \r\n"
-            : [amp_0]"+r"(amp_0), [amp_1]"=&r"(amp_1)
+            : [amp_0]"+r"(amp_0), [amp_1]"=r"(amp_1)
             : [envx]"r"(voice->envx));
 
             prev_outx = amp_0;
@@ -1146,7 +1146,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             asm volatile(
             "mul    %[amp_1], %[amp_0], %[vol_1] \r\n"
             "mul    %[amp_0], %[vol_0], %[amp_0] \r\n"
-            : [amp_0]"+r"(amp_0), [amp_1]"+r"(amp_1)
+            : [amp_0]"+r"(amp_0), [amp_1]"=&r"(amp_1)
             : [vol_0]"r"((int)voice->volume[0]),
               [vol_1]"r"((int)voice->volume[1]));
         #else /* Unoptimized CPU */
@@ -1385,7 +1385,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         asm volatile (
         "mul     %[amp_0], %[gvol_0], %[chans_0] \r\n"
         "mul     %[amp_1], %[gvol_1], %[chans_1] \r\n"
-        : [amp_0]"=&r"(amp_0), [amp_1]"=&r"(amp_1)
+        : [amp_0]"=&r"(amp_0), [amp_1]"=r"(amp_1)
         : [gvol_0]"r"(global_vol_0), [gvol_1]"r"(global_vol_1),
           [chans_0]"r"(chans_0), [chans_1]"r"(chans_1));
         asm volatile (
