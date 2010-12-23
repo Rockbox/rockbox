@@ -67,20 +67,27 @@ mac {
 
 rbspeex.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
-        librbspeex$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\" \
+        librbspeex$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC\" \
         SYS_SPEEX=\"$$LIBSPEEX\"
 libucl.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
-        libucl$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+        libucl$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC\"
 libmkamsboot.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
-        libmkamsboot$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+        APPVERSION=\"rbutil\" \
+        libmkamsboot$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC\"
 libmktccboot.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
-        libmktccboot$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+        libmktccboot$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC\"
 libmkmpioboot.commands = @$(MAKE) \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
-        libmkmpioboot$$RBLIBPOSTFIX CC=\"$$QMAKE_CC\"
+        APPVERSION=\"rbutil\" \
+        libmkmpioboot$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC\"
 QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
 PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
 
