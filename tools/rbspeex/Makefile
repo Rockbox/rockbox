@@ -72,7 +72,7 @@ $(DEPFILE): $(SOURCES)
 
 $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
 	@echo AR $(OUT)/librbspeex$(RBARCH).a
-	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
+	$(SILENT)$(AR) rucs $@ $+ > /dev/null 2>&1
 
 librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
 	$(SILENT)cp $(OUT)/librbspeex.a $(TARGET_DIR)librbspeex$(RBARCH).a

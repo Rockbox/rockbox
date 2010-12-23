@@ -54,7 +54,7 @@ $(OBJDIR)%.o: %.c
 
 libmkmpioboot$(RBARCH).a: $(LIBOBJS)
 	@echo AR $@
-	$(SILENT)$(AR) ruc $(TARGET_DIR)$@ $^
+	$(SILENT)$(AR) rucs $(TARGET_DIR)$@ $^
 
 # building the standalone executable
 $(OUTPUT): $(OBJS) $(EXTRADEPS)

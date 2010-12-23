@@ -21,17 +21,16 @@ OUT = $(TARGET_DIR)build$(RBARCH)
 
 SOURCES = alloc.c io.c n2b_99.c n2b_d.c n2b_ds.c n2b_to.c n2d_99.c	\
 	n2d_d.c n2d_ds.c n2d_to.c n2e_99.c n2e_d.c n2e_ds.c n2e_to.c ucl_crc.c	\
-	ucl_dll.c ucl_init.c ucl_ptr.c ucl_str.c ucl_util.c
+	ucl_init.c ucl_ptr.c ucl_str.c ucl_util.c #ucl_dll.c
 
-OBJS = $(OUT)/alloc.o $(OUT)/io.o $(OUT)/n2b_99.o $(OUT)/n2b_d.o $(OUT)/n2b_ds.o $(OUT)/n2b_to.o $(OUT)/n2d_99.o	\
-	$(OUT)/n2d_d.o $(OUT)/n2d_ds.o $(OUT)/n2d_to.o $(OUT)/n2e_99.o $(OUT)/n2e_d.o $(OUT)/n2e_ds.o $(OUT)/n2e_to.o $(OUT)/ucl_crc.o	\
-	$(OUT)/ucl_dll.o $(OUT)/ucl_init.o $(OUT)/ucl_ptr.o $(OUT)/ucl_str.o $(OUT)/ucl_util.o
+OBJS =  $(addprefix $(OUT)/,$(SOURCES:%.c=%.o))
 
-# we don't use $(AR) and $(RANLIB) below since we want the _native_ tools
-# not the cross-compiler tools
+# This Makefile is _not_ used to build uclpack for Rockbox builds anymore (they
+# use tools.make), so we can use $(CC) and $(AR) here.
+
 libucl$(RBARCH).a: $(OUT) $(OBJS)
-	$(SILENT)ar ruv $(TARGET_DIR)$@ $(OBJS) >/dev/null 2>&1
-	$(SILENT)ranlib $(TARGET_DIR)$@
+	@echo AR $@
+	$(SILENT)$(AR) rucs $(TARGET_DIR)$@ $(OBJS) >/dev/null 2>&1
 
 $(OUT)/%.o: %.c
 	@echo CC $<
