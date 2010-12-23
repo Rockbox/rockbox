@@ -48,6 +48,7 @@
 #define ATTR_DIRECTORY   0x10
 #define ATTR_ARCHIVE     0x20
 #define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
+#define ATTR_LINK        0x80
 
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"

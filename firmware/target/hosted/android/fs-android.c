@@ -105,26 +105,37 @@ struct dirinfo dir_get_info(struct DIR* _parent, struct dirent *dir)
 {
     struct __dir *parent = (struct __dir*)_parent;
     struct stat s;
-    struct tm *tm;
+    struct tm *tm = NULL;
     struct dirinfo ret;
     char path[MAX_PATH];
 
     snprintf(path, sizeof(path), "%s/%s", parent->path, dir->d_name);
-    stat(path, &s);
     memset(&ret, 0, sizeof(ret));
 
-    if (S_ISDIR(s.st_mode))
+    if (!stat(path, &s))
     {
-        ret.attribute = ATTR_DIRECTORY;
+        if (S_ISDIR(s.st_mode))
+        {
+            ret.attribute = ATTR_DIRECTORY;
+        }
+        ret.size = s.st_size;
+        tm = localtime(&(s.st_mtime));
     }
 
-    ret.size = s.st_size;
-    tm = localtime(&(s.st_mtime));
-    ret.wrtdate = ((tm->tm_year - 80) << 9) |
-                        ((tm->tm_mon + 1) << 5) |
-                        tm->tm_mday;
-    ret.wrttime = (tm->tm_hour << 11) |
-                        (tm->tm_min << 5) |
-                        (tm->tm_sec >> 1);
+    if (!lstat(path, &s) && S_ISLNK(s.st_mode))
+    {
+        ret.attribute |= ATTR_LINK;
+    }
+
+    if (tm)
+    {
+        ret.wrtdate = ((tm->tm_year - 80) << 9) |
+                            ((tm->tm_mon + 1) << 5) |
+                            tm->tm_mday;
+        ret.wrttime = (tm->tm_hour << 11) |
+                            (tm->tm_min << 5) |
+                            (tm->tm_sec >> 1);
+    }
+
     return ret;
 }

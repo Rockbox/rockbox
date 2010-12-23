@@ -60,6 +60,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef APPLICATION
+#include <unistd.h> /* readlink() */
+#endif
 #include "config.h"
 #include "ata_idle_notify.h"
 #include "thread.h"
@@ -77,6 +80,7 @@
 #include "dir.h"
 #include "filefuncs.h"
 #include "structec.h"
+#include "debug.h"
 
 #ifndef __PCTOOL__
 #include "lang.h"
@@ -4189,6 +4193,88 @@ static void __attribute__ ((noinline)) check_ignore(const char *dirname,
     *unignore = file_exists(newpath);
 }
 
+static struct search_roots_ll {
+    const char *path;
+    struct search_roots_ll * next;
+} roots_ll;
+
+#ifdef APPLICATION
+/*
+ * This adds a path to the search roots, possibly during traveling through
+ * the filesystem. It only adds if the path is not inside an already existing
+ * search root.
+ *
+ * Returns true if it added the path to the search roots
+ * 
+ * Windows 2000 and greater supports symlinks, but they don't provide
+ * realpath() or readlink(), and symlinks are rarely used on them so
+ * ignore this for windows for now
+ **/
+static bool add_search_root(const char *name)
+{
+    (void)name;
+#ifndef WIN32
+    struct search_roots_ll *this, *prev = NULL;
+    char target[MAX_PATH];
+    char _abs_target[MAX_PATH];
+    char * abs_target;
+    ssize_t len;
+
+    len = readlink(name, target, sizeof(target));
+    if (len < 0)
+        return false;
+
+    target[len] = '\0';
+    /* realpath(target, NULL) doesn't work on android ... */
+    abs_target = realpath(target, _abs_target);
+    if (abs_target == NULL)
+        return false;
+
+    for(this = &roots_ll; this; prev = this, this = this->next)
+    {
+        size_t root_len = strlen(this->path);
+        /* check if the link target is inside of an existing search root
+         * don't add if target is inside, we'll scan it later */
+        if (!strncmp(this->path, abs_target, root_len))
+            return false;
+    }
+
+    if (prev)
+    {
+        size_t len = strlen(abs_target) + 1; /* count \0 */
+        this = malloc(sizeof(struct search_roots_ll) + len );
+        if (!this || len > MAX_PATH)
+        {
+            logf("Error at adding a search root: %s", this ? "path too long":"OOM");
+            free(this);
+            prev->next = NULL;
+        }
+        this->path = ((char*)this) + sizeof(struct search_roots_ll);
+        strcpy((char*)this->path, abs_target); /* ok to cast const away here */
+        this->next = NULL;
+        prev->next = this;
+        logf("Added %s to the search roots\n", abs_target);
+        return true;
+    }
+#endif
+    return false;
+}
+
+static int free_search_roots(struct search_roots_ll * start)
+{
+    int ret = 0;
+    if (start->next)
+    {
+        ret += free_search_roots(start->next);
+        ret += sizeof(struct search_roots_ll);
+        free(start->next);
+    }
+    return ret;
+}
+#else /* native, simulator */
+#define add_search_root(a) do {} while(0)
+#define free_search_roots(a) do {} while(0)
+#endif
 
 static bool check_dir(const char *dirname, int add_files)
 {
@@ -4203,7 +4289,6 @@ static bool check_dir(const char *dirname, int add_files)
         logf("tagcache: opendir(%s) failed", dirname);
         return false;
     }
-    
     /* check for a database.ignore and database.unignore */
     check_ignore(dirname, &ignore, &unignore);
 
@@ -4218,31 +4303,35 @@ static bool check_dir(const char *dirname, int add_files)
     while (!check_event_queue())
 #endif
     {
-        struct dirent *entry;
-
-        entry = readdir(dir);
-    
+        struct dirent *entry = readdir(dir);
         if (entry == NULL)
         {
             success = true;
-            break ;
+            break;
         }
 
-        struct dirinfo info = dir_get_info(dir, entry);
-        
         if (!strcmp((char *)entry->d_name, ".") ||
             !strcmp((char *)entry->d_name, ".."))
             continue;
 
+        struct dirinfo info = dir_get_info(dir, entry);
+
         yield();
         
         len = strlen(curpath);
-        snprintf(&curpath[len], sizeof(curpath) - len, "/%s",
-                 entry->d_name);
-        
+        /* don't add an extra / for curpath == / */
+        if (len <= 1) len = 0;
+        snprintf(&curpath[len], sizeof(curpath) - len, "/%s", entry->d_name);
+
         processed_dir_count++;
         if (info.attribute & ATTR_DIRECTORY)
-            check_dir(curpath, add_files);
+        {   /* don't follow symlinks to dirs, but try to add it as a search root
+             * this makes able to avoid looping in recursive symlinks */
+            if (info.attribute & ATTR_LINK)
+                add_search_root(curpath);
+            else
+                check_dir(curpath, add_files);
+        }
         else if (add_files)
         {
             tc_stat.curentry = curpath;
@@ -4320,10 +4409,19 @@ void tagcache_build(const char *path)
     memset(&header, 0, sizeof(struct tagcache_header));
     write(cachefd, &header, sizeof(struct tagcache_header));
 
-    if (strcmp("/", path) != 0)
-        strcpy(curpath, path);
-    ret = check_dir(path, true);
-    
+    ret = true;
+    roots_ll.path = path;
+    roots_ll.next = NULL;
+    struct search_roots_ll * this;
+    /* check_dir might add new roots */
+    for(this = &roots_ll; this; this = this->next)
+    {
+        strcpy(curpath, this->path);
+        ret = ret && check_dir(this->path, true);
+    }
+    if (roots_ll.next)
+        free_search_roots(roots_ll.next);
+
     /* Write the header. */
     header.magic = TAGCACHE_MAGIC;
     header.datasize = data_size;

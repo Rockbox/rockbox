@@ -28,6 +28,7 @@
 #include "config.h"
 
 #define HAVE_STATVFS (!defined(WIN32))
+#define HAVE_LSTAT   (!defined(WIN32))
 
 #if HAVE_STATVFS
 #include <sys/statvfs.h>
@@ -314,7 +315,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     static struct sim_dirent secret;
     STAT_T s;
     DIRENT_T *x11 = READDIR(dir->dir);
-    struct tm* tm;
+    struct tm tm;
 
     if(!x11)
         return (struct sim_dirent *)0;
@@ -324,20 +325,35 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     /* build file name */
     snprintf(buffer, sizeof(buffer), "%s/%s", 
         get_sim_pathname(dir->name), secret.d_name);
-    STAT(buffer, &s); /* get info */
+    if (STAT(buffer, &s)) /* get info */
+        return NULL;
 
 #define ATTR_DIRECTORY 0x10
 
-    secret.info.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
-    secret.info.size = s.st_size;
+    secret.info.attribute = 0;
 
-    tm = localtime(&(s.st_mtime));
-    secret.info.wrtdate = ((tm->tm_year - 80) << 9) |
-                        ((tm->tm_mon + 1) << 5) |
-                        tm->tm_mday;
-    secret.info.wrttime = (tm->tm_hour << 11) |
-                        (tm->tm_min << 5) |
-                        (tm->tm_sec >> 1);
+    if (S_ISDIR(s.st_mode))
+        secret.info.attribute = ATTR_DIRECTORY;
+
+    secret.info.size = s.st_size;
+    
+    if (localtime_r(&(s.st_mtime), &tm) == NULL)
+        return NULL;
+    secret.info.wrtdate = ((tm.tm_year - 80) << 9) |
+                        ((tm.tm_mon + 1) << 5) |
+                        tm.tm_mday;
+    secret.info.wrttime = (tm.tm_hour << 11) |
+                        (tm.tm_min << 5) |
+                        (tm.tm_sec >> 1);
+
+#ifdef HAVE_LSTAT
+#define ATTR_LINK      0x80
+    if (!lstat(buffer, &s) && S_ISLNK(s.st_mode))
+    {
+        secret.info.attribute |= ATTR_LINK;
+    }
+#endif
+
     return &secret;
 }
 
