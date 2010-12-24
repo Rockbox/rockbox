@@ -26,62 +26,74 @@
 /* NOTE: Defined the base to be original firmware compatible if needed -
  * ie. the day and year as it would interpret a DAY register value of zero. */
 
-/* Days passed since midnight 01 Jan, 1601 to midnight on the base date. */
+/* None of this code concerns itself with (year mod 100) = 0 leap year
+ * exceptions because all (year mod 4) = 0 years in the relevant range are
+ * leap years. A base year of 1901 to an end date of 28 Feb 2100 are ok. */
+
 #ifdef TOSHIBA_GIGABEAT_S
     /* Gigabeat S seems to be 1 day behind the ususual - this will
      * make the RTC match file dates created by retailos. */
-    #define RTC_BASE_DAY_COUNT  138425
-    #define RTC_BASE_MONTH      12
-    #define RTC_BASE_DAY        31
+    #define RTC_BASE_WDAY       1      /* Monday */
+    #define RTC_BASE_YDAY       364    /* 31 Dec */
     #define RTC_BASE_YEAR       1979
 #elif 1
-    #define RTC_BASE_DAY_COUNT  138426
-    #define RTC_BASE_MONTH      1
-    #define RTC_BASE_DAY        1
+    #define RTC_BASE_WDAY       2      /* Tuesday */
+    #define RTC_BASE_YDAY       0      /* 01 Jan */
     #define RTC_BASE_YEAR       1980
 #else
-    #define RTC_BASE_DAY_COUNT  134774
-    #define RTC_BASE_MONTH      1
-    #define RTC_BASE_DAY        1
+    #define RTC_BASE_WDAY       4      /* Thursday */
+    #define RTC_BASE_YDAY       0      /* 01 Jan */
     #define RTC_BASE_YEAR       1970
 #endif
+
+/* Reference year for leap calculation - year that is on or before the base
+ * year and immediately follows a leap year */
+#define RTC_REF_YEAR_OFFS    ((RTC_BASE_YEAR - 1) & 3)
+#define RTC_REF_YEAR         (RTC_BASE_YEAR - RTC_REF_YEAR_OFFS)
 
 enum rtc_registers_indexes
 {
     RTC_REG_TIME = 0,
     RTC_REG_DAY,
     RTC_REG_TIME2,
-    RTC_NUM_REGS,
+    RTC_NUM_REGS_RD = 3,
+    RTC_NUM_REGS_WR = 2,
 };
 
-/* was it an alarm that triggered power on ? */
-static bool alarm_start = false;
-
-static const unsigned char rtc_registers[RTC_NUM_REGS] =
+static const unsigned char rtc_registers[RTC_NUM_REGS_RD] =
 {
     [RTC_REG_TIME]  = MC13783_RTC_TIME,
     [RTC_REG_DAY]   = MC13783_RTC_DAY,
     [RTC_REG_TIME2] = MC13783_RTC_TIME,
 };
 
-static const unsigned char month_table[2][12] =
+/* was it an alarm that triggered power on ? */
+static bool alarm_start = false;
+
+static const unsigned short month_table[13] =
 {
-    { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
-    { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
+    /* Since 1 Jan, how many days have passed this year? (non-leap)
+    +31   28   31   30   31   30   31   31   30   31   30   31 */
+    0,  31,  59,  90, 120, 151, 181, 212, 243, 273, 304, 334, 365
 };
 
-/* Get number of leaps since the reference date of 1601/01/01 */
-static int get_leap_count(int d)
+static bool read_time_and_day(uint32_t regs[RTC_NUM_REGS_RD])
 {
-    int lm = (d + 1) / 146097;
-    int lc = (d + 1 - lm) / 36524;
-    int ly = (d + 1 - lm + lc) / 1461;
-    return ly - lc + lm;
-}
+    /* Read time, day, time - 2nd read of time should be the same or
+     * greater */
+    do
+    {
+        if (mc13783_read_regs(rtc_registers, regs,
+                              RTC_NUM_REGS_RD) < RTC_NUM_REGS_RD)
+        {
+            /* Couldn't read registers */
+            return false;
+        }
+    }
+    /* If TOD counter turned over - reread */
+    while (regs[RTC_REG_TIME2] < regs[RTC_REG_TIME]);
 
-static int is_leap_year(int y)
-{
-    return (y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0) ? 1 : 0;
+    return true;
 }
 
 /** Public APIs **/
@@ -97,114 +109,110 @@ void rtc_init(void)
 
 int rtc_read_datetime(struct tm *tm)
 {
-    uint32_t regs[RTC_NUM_REGS];
-    int year, leap, month, day, hour, min;
+    uint32_t regs[RTC_NUM_REGS_RD];
+    int year, month, yday, x, n;
 
-    /* Read time, day, time - 2nd read of time should be the same or
-     * greater */
-    do
-    {
-        if (mc13783_read_regs(rtc_registers, regs,
-                              RTC_NUM_REGS) < RTC_NUM_REGS)
-        {
-            /* Couldn't read registers */
-            return 0;
-        }
-    }
-    /* If TOD counter turned over - reread */
-    while (regs[RTC_REG_TIME2] < regs[RTC_REG_TIME]);
+    if (!read_time_and_day(regs))
+        return 0;
 
-    /* TOD: = 0 to 86399 */
-    hour = regs[RTC_REG_TIME] / 3600;
-    regs[RTC_REG_TIME] -= hour*3600;
-    tm->tm_hour = hour;
+    /* TOD: 0 to 86399 */
+    x = regs[RTC_REG_TIME];
 
-    min = regs[RTC_REG_TIME] / 60;
-    regs[RTC_REG_TIME] -= min*60;
-    tm->tm_min = min;
+    /* Hour */
+    n = x / 3600;
+    tm->tm_hour = n;
 
-    tm->tm_sec = regs[RTC_REG_TIME];
+    /* Minute */
+    x -= n*3600;
+    n = x / 60;
+    tm->tm_min = n;
+
+    /* Second */
+    x -= n*60;
+    tm->tm_sec = x;
 
     /* DAY: 0 to 32767 */
-    day = regs[RTC_REG_DAY] + RTC_BASE_DAY_COUNT;
+    x = regs[RTC_REG_DAY];
 
     /* Weekday */
-    tm->tm_wday = (day + 1) % 7; /* 1601/01/01 = Monday */
+    tm->tm_wday = (x + RTC_BASE_WDAY) % 7;
 
-    /* Get number of leaps for today */
-    leap = get_leap_count(day);
-    year = (day - leap) / 365;
+    /* Year */
+    x += RTC_REF_YEAR_OFFS*365 + RTC_BASE_YDAY;
 
-    /* Get number of leaps for yesterday */
-    leap = get_leap_count(day - 1);
+    /* Lag year increment by subtracting leaps since the reference year
+     * on 31 Dec of each leap year, essentially removing them from the
+     * calculation */
+    n = (x + 1) / 1461;
+    year = (x - n) / 365;
 
-    /* Get day number for year 0-364|365 */
-    day = day - leap - year * 365;
+    /* Year day */
+    yday = x - n - year*365;
 
-    year += 1601;
+    /* If (x + 1) mod 1461 == 0, then it is yday 365 of a leap year */
+    if (n * 1461 - 1 == x)
+        yday++;
 
-    /* Get the current month */
-    leap = is_leap_year(year);
+    tm->tm_yday = x = yday;
 
-    for (month = 0; month < 12; month++)
+    if (((year + RTC_REF_YEAR) & 3) == 0 && x >= month_table[2])
     {
-        int days = month_table[leap][month];
+        if (x > month_table[2])
+            yday--; /* 1 Mar or after; lag date by one day */
 
-        if (day < days)
-            break;
-
-        day -= days;
+        x--; /* 29 Feb or after, lag month by one day */
     }
 
-    tm->tm_mday = day + 1; /* 1 to 31 */
+    /* Get the current month */
+    month = x >> 5; /* yday / 32, close enough */
+
+    if (month_table[month + 1] <= x)
+        month++; /* Round to next */
+
+    tm->tm_mday = yday - month_table[month] + 1; /* 1 to 31 */
     tm->tm_mon = month; /* 0 to 11 */
-    tm->tm_year = year % 100 + 100;
+
+    /* {BY to (BY+89 or 90)} - 1900 */
+    tm->tm_year = year + RTC_REF_YEAR - 1900;
 
     return 7;
 }
 
 int rtc_write_datetime(const struct tm *tm)
 {
-    uint32_t regs[2];
-    int year, leap, month, day, i, base_yearday;
+    uint32_t regs[RTC_NUM_REGS_WR];
+    int year, month, x;
 
-    regs[RTC_REG_TIME] = tm->tm_sec +
-                         tm->tm_min*60 +
-                         tm->tm_hour*3600;
+    /* Convert time of day into seconds since midnight */
+    x = tm->tm_sec + tm->tm_min*60 + tm->tm_hour*3600;
 
-    year = tm->tm_year - 100;
+    /* Keep in range (it throws off the PMIC counters otherwise) */
+    regs[RTC_REG_TIME] = MAX(0, MIN(86399, x));
 
-    if (year < RTC_BASE_YEAR - 1900)
-        year += 2000;
-    else
-        year += 1900;
+    year = tm->tm_year + 1900;
 
-    /* Get number of leaps for day before base */
-    leap = get_leap_count(RTC_BASE_DAY_COUNT - 1);
+    /* Get the number of days elapsed from 1 Jan of reference year to 1 Jan of
+     * this year */
+    x = year - RTC_REF_YEAR;
+    x = x*365 + (x >> 2);
 
-    /* Get day number for base year 0-364|365 */
-    base_yearday = RTC_BASE_DAY_COUNT - leap -
-                    (RTC_BASE_YEAR - 1601) * 365;
-
-    /* Get the number of days elapsed from reference */
-    for (i = RTC_BASE_YEAR, day = 0; i < year; i++)
-    {
-        day += is_leap_year(i) ? 366 : 365;
-    }
-
-    /* Find the number of days passed this year up to the 1st of the
-     * month. */
-    leap = is_leap_year(year);
+    /* Add the number of days passed this year since 1 Jan and offset by the
+     * base yearday and the reference offset in days from the base */
     month = tm->tm_mon;
+    x += month_table[month] + tm->tm_mday - RTC_REF_YEAR_OFFS*365
+            - RTC_BASE_YDAY;
 
-    for (i = 0; i < month; i++)
-    {
-        day += month_table[leap][i];
+    if ((year & 3) != 0 || month < 2) {
+        /* Sub one day because tm_mday starts at 1, otherwise the offset is
+         * required because of 29 Feb */
+        x--;
     }
 
-    regs[RTC_REG_DAY] = day + tm->tm_mday - 1 - base_yearday;
+    /* Keep in range */
+    regs[RTC_REG_DAY] = MAX(0, MIN(32767, x));
 
-    if (mc13783_write_regs(rtc_registers, regs, 2) == 2)
+    if (mc13783_write_regs(rtc_registers, regs, RTC_NUM_REGS_WR)
+        == RTC_NUM_REGS_WR)
     {
         return 7;
     }
@@ -238,20 +246,24 @@ bool rtc_check_alarm_started(bool release_alarm)
 
 void rtc_set_alarm(int h, int m)
 {
-    int day = mc13783_read(MC13783_RTC_DAY);
-    int tod = mc13783_read(MC13783_RTC_TIME);
+    uint32_t regs[RTC_NUM_REGS_RD];
+    uint32_t tod;
 
-    if (h*3600 + m*60 < tod)
-        day++;
+    if (!read_time_and_day(regs))
+        return;
 
-    mc13783_write(MC13783_RTC_DAY_ALARM, day);
-    mc13783_write(MC13783_RTC_ALARM, h*3600 + m*60);
+    tod = h*3600 + m*60;
+
+    if (tod < regs[RTC_REG_TIME])
+        regs[RTC_REG_DAY]++;
+
+    mc13783_write(MC13783_RTC_DAY_ALARM, regs[RTC_REG_DAY]);
+    mc13783_write(MC13783_RTC_ALARM, tod);
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
-    int tod = mc13783_read(MC13783_RTC_ALARM);
+    uint32_t tod = mc13783_read(MC13783_RTC_ALARM);
     *h = tod / 3600;
     *m = tod % 3600 / 60;
 }
-
