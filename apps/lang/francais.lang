@@ -7163,10 +7163,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Montrer infos tags"
+    *: "Infos sur le titre joué"
   </dest>
   <voice>
-    *: "Montrer les infos des tags"
+    *: "Infos sur le titre joué"
   </voice>
 </phrase>
 <phrase>
