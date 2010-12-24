@@ -1139,7 +1139,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING),ID2P(LANG_STOP_RECORDING_AND_SHUTDOWN)),
     CHOICE_SETTING(F_RECSETTING, rec_split_method, LANG_SPLIT_MEASURE, 0,
                    "rec split method", "Time,Filesize", NULL, 2,
-                   ID2P(LANG_TIME), ID2P(LANG_REC_SIZE)),
+                   ID2P(LANG_TIME), ID2P(LANG_FILESIZE)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_source, LANG_RECORDING_SOURCE,
         INT(0), "rec source",
         &HAVE_MIC_REC_(",mic") 

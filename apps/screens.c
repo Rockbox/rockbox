@@ -629,6 +629,7 @@ static const int id3_headers[]=
     LANG_ID3_TRACK_GAIN,
     LANG_ID3_ALBUM_GAIN,
 #endif
+    LANG_FILESIZE,
     LANG_ID3_PATH,
 };
 
@@ -738,6 +739,10 @@ static const char* id3_get_info(int selected_item, void* data,
                 break;    
             case LANG_ID3_COMPOSER:
                 val=id3->composer;
+                break;
+            case LANG_FILESIZE: /* not LANG_ID3_FILESIZE because the string is shared */
+                output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, true);
+                val=buffer;
                 break;
         }
         return val && *val ? val : NULL;

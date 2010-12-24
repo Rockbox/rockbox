@@ -5960,19 +5960,19 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Filesize"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -12672,5 +12672,19 @@
   <voice>
     *: none
     radio: "Signal strength:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filesize"
+  </dest>
+  <voice>
+    *: "Filesize"
   </voice>
 </phrase>
