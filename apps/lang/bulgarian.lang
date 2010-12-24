@@ -3016,19 +3016,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Размер на файла"
   </dest>
   <voice>
     *: none
-    recording: none
   </voice>
 </phrase>
 <phrase>
@@ -10842,5 +10839,19 @@
   <voice>
     *: none
     gigabeatfx: "High"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Размер на файла"
+  </dest>
+  <voice>
+    *: "Размер на файла"
   </voice>
 </phrase>

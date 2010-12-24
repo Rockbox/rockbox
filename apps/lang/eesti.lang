@@ -7353,16 +7353,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "Filesize"
+    *: none
   </source>
   <dest>
-    *: "Failisuurus"
+    *: none
   </dest>
   <voice>
-    *: "Filesize"
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -7907,5 +7907,19 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Failisuurus"
+  </dest>
+  <voice>
+    *: "Failisuurus"
   </voice>
 </phrase>

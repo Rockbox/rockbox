@@ -7881,19 +7881,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Tiedostokoko"
   </dest>
   <voice>
     *: none
-    recording: "Tiedostokoko"
   </voice>
 </phrase>
 <phrase>
@@ -11520,5 +11517,19 @@
   <voice>
     *: none
     swcodec: "Nopeus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Tiedostokoko"
+  </dest>
+  <voice>
+    *: "Tiedostokoko"
   </voice>
 </phrase>

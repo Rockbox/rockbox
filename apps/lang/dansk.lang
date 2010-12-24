@@ -7699,19 +7699,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Filestørrelse"
   </dest>
   <voice>
     *: none
-    recording: "Filestørrelse"
   </voice>
 </phrase>
 <phrase>
@@ -12597,5 +12594,19 @@
   <voice>
     *: none
     recording_histogram: "Histogram interval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filestørrelse"
+  </dest>
+  <voice>
+    *: "Filestørrelse"
   </voice>
 </phrase>

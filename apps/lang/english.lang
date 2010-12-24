@@ -5964,15 +5964,15 @@
   user: core
   <source>
     *: none
-    recording: ""
+    recording:
   </source>
   <dest>
     *: none
-    recording: ""
+    recording:
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording:
   </voice>
 </phrase>
 <phrase>

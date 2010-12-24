@@ -5878,19 +5878,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Tamanho do Arquivo"
   </dest>
   <voice>
     *: none
-    recording: "Tamanho do Arquivo"
   </voice>
 </phrase>
 <phrase>
@@ -12543,5 +12540,19 @@
   </dest>
   <voice>
     *: "Atualizar ao Parar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Tamanho do Arquivo"
+  </dest>
+  <voice>
+    *: "Tamanho do Arquivo"
   </voice>
 </phrase>

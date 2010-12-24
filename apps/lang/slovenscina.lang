@@ -3756,19 +3756,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Filesize"
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
   </voice>
 </phrase>
 <phrase>

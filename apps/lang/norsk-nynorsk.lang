@@ -7614,19 +7614,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Filstorleik"
   </dest>
   <voice>
     *: none
-    recording: "Filstorleik"
   </voice>
 </phrase>
 <phrase>
@@ -10767,5 +10764,19 @@
   <voice>
     *: none
     gigabeatfx: "Høg"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filstorleik"
+  </dest>
+  <voice>
+    *: "Filstorleik"
   </voice>
 </phrase>

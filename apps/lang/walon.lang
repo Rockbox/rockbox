@@ -5882,19 +5882,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Grandeu do fitchî"
   </dest>
   <voice>
     *: none
-    recording: "Grandeu do fitchî"
   </voice>
 </phrase>
 <phrase>
@@ -12128,5 +12125,19 @@
   <voice>
     *: none
     remote: "Waitroûle då lon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Grandeu do fitchî"
+  </dest>
+  <voice>
+    *: "Grandeu do fitchî"
   </voice>
 </phrase>

@@ -8117,19 +8117,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "檔案大小"
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
   </voice>
 </phrase>
 <phrase>
@@ -11235,5 +11232,19 @@
   <voice>
     *: none
     touchscreen: "Touchscreen 選擇"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "檔案大小"
+  </dest>
+  <voice>
+    *: "檔案大小"
   </voice>
 </phrase>

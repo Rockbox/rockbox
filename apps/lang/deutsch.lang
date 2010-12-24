@@ -5882,19 +5882,16 @@
 </phrase>
 <phrase>
   id: LANG_REC_SIZE
-  desc: in record timesplit options
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    recording: "Filesize"
   </source>
   <dest>
     *: none
-    recording: "Dateigröße"
   </dest>
   <voice>
     *: none
-    recording: "Dateigröße"
   </voice>
 </phrase>
 <phrase>
@@ -12592,5 +12589,19 @@
   </dest>
   <voice>
     *: "Dateibrowser hier starten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer 
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Dateigröße"
+  </dest>
+  <voice>
+    *: "Dateigröße"
   </voice>
 </phrase>
