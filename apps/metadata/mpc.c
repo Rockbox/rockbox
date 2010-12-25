@@ -21,6 +21,7 @@
  ****************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
 #include <inttypes.h>
 #include "system.h"
 #include "metadata.h"

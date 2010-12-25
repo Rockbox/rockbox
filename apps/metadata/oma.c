@@ -42,6 +42,7 @@
  * CODEC SUPPORT: Only ATRAC3 codec is currently supported!
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
