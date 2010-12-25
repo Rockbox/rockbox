@@ -59,10 +59,10 @@ void add_item(const char* name, int index)
     }
     else
         entry->directory = false;
-    a = rb->strchr(name, '*');
+    a = rb->strchr(entry->filestring, '*');
     if (a)
     {
-        entry->pre = a - name;
+        entry->pre = a - entry->filestring;
         entry->post = rb->strlen(a+1);
     }
     else
