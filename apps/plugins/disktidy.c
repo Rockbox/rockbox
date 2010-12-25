@@ -530,6 +530,36 @@ enum tidy_return tidy_lcd_menu(void)
     return status;
 }
 
+/* Creates a file and writes information about what files to
+   delete and what to keep to it.
+   Returns true iff the file was successfully created.
+*/
+static bool save_config(const char *file_name)
+{
+    int fd, i;
+    bool result;
+
+    fd = rb->creat(file_name, 0666);
+    result = (fd >= 0);
+
+    if (result)
+    {
+        for (i=0; i<tidy_type_count; i++)
+        {
+	    rb->fdprintf(fd, "%s%s: %s\n", tidy_types[i].filestring,
+	                 tidy_types[i].directory ? "/" : "",
+	                 tidy_types[i].remove ? "yes" : "no");
+        }
+        rb->close(fd);
+    }
+    else
+    {
+        DEBUGF("Could not create file %s\n", file_name);
+    }
+
+    return result;
+}
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -547,18 +577,7 @@ enum plugin_status plugin_start(const void* parameter)
     status = tidy_lcd_menu();
     if (tidy_loaded_and_changed)
     {
-        int fd = rb->creat(CUSTOM_FILES, 0666);
-        int i;
-        if (fd >= 0)
-        {
-            for(i=0;i<tidy_type_count;i++)
-            {
-                rb->fdprintf(fd, "%s%c: %s\n", tidy_types[i].filestring,
-                             tidy_types[i].directory?'/':'\0',
-                             tidy_types[i].remove?"yes":"no");
-            }
-            rb->close(fd);
-        }
+        save_config(CUSTOM_FILES);
     }
     if (status == TIDY_RETURN_ABORT)
         return PLUGIN_OK;
