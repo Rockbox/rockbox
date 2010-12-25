@@ -228,7 +228,10 @@ void tidy_path_remove_entry(char *path, int old_path_length, int *path_length)
     *path_length = old_path_length;
 }
 
-/* path is assumed to be array of size MAX_PATH */
+/* Removes the directory specified by 'path'. This includes recursively
+   removing all files and directories in that directory.
+   path is assumed to be array of size MAX_PATH.
+*/
 enum tidy_return tidy_removedir(char *path, int *path_length)
 {
     /* delete directory */
