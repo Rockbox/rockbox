@@ -179,7 +179,8 @@ bool tidy_remove_item(char *item, int attr)
                 return false;
             if (attr&ATTR_DIRECTORY)
                 ret = tidy_types[i].directory;
-            else ret = true;
+            else
+                ret = !tidy_types[i].directory;
         }
     }
     return ret;
