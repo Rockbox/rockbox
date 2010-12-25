@@ -383,7 +383,8 @@ enum tidy_return tidy_clean(char *path, int *path_length)
 
                     removed++; /* increment removed files counter */
                     /* delete file */
-                    rb->remove(path);
+                    if (rb->remove(path) != 0)
+                        DEBUGF("Could not delete file %s\n", path);
 
                     /* restore path */
                     tidy_path_remove_entry(path, old_path_length, path_length);
