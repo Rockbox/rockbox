@@ -309,6 +309,14 @@ MYDIR *sim_opendir(const char *name)
     return (MYDIR *)0;
 }
 
+#if defined(WIN32)
+static inline struct tm* localtime_r (const time_t *clock, struct tm *result) {
+       if (!clock || !result) return NULL;
+       memcpy(result,localtime(clock),sizeof(*result));
+       return result;
+}
+#endif
+
 struct sim_dirent *sim_readdir(MYDIR *dir)
 {
     char buffer[MAX_PATH]; /* sufficiently big */
@@ -346,7 +354,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
                         (tm.tm_min << 5) |
                         (tm.tm_sec >> 1);
 
-#ifdef HAVE_LSTAT
+#if HAVE_LSTAT
 #define ATTR_LINK      0x80
     if (!lstat(buffer, &s) && S_ISLNK(s.st_mode))
     {
