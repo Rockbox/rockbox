@@ -46,29 +46,32 @@ bool tidy_loaded_and_changed = false;
 
 #define DEFAULT_FILES PLUGIN_APPS_DIR "/disktidy.config"
 #define CUSTOM_FILES  PLUGIN_APPS_DIR "/disktidy_custom.config"
+
 void add_item(const char* name, int index)
 {
     char *a;
-    rb->strcpy(tidy_types[index].filestring, name);
+    struct tidy_type *entry = tidy_types + index;
+    rb->strcpy(entry->filestring, name);
     if (name[rb->strlen(name)-1] == '/')
     {
-        tidy_types[index].directory = true;
-        tidy_types[index].filestring[rb->strlen(name)-1] = '\0';
+        entry->directory = true;
+        entry->filestring[rb->strlen(name)-1] = '\0';
     }
     else
-        tidy_types[index].directory = false;
+        entry->directory = false;
     a = rb->strchr(name, '*');
     if (a)
     {
-        tidy_types[index].pre = a - name;
-        tidy_types[index].post = rb->strlen(a+1);
+        entry->pre = a - name;
+        entry->post = rb->strlen(a+1);
     }
     else
     {
-        tidy_types[index].pre = -1;
-        tidy_types[index].post = -1;
+        entry->pre = -1;
+        entry->post = -1;
     }
 }
+
 static int find_file_string(const char *file, char *last_group)
 {
     char temp[MAX_PATH];
