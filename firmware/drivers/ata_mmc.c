@@ -760,7 +760,7 @@ int mmc_write_sectors(IF_MD2(int drive,)
 bool mmc_disk_is_active(void)
 {
     /* this is correct unless early return from write gets implemented */
-    return mmc_mutex.locked;
+    return mutex_test(&mmc_mutex);
 }
 
 static void mmc_thread(void)

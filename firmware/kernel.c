@@ -827,9 +827,8 @@ int queue_broadcast(long id, intptr_t data)
  * Simple mutex functions ;)
  ****************************************************************************/
 
-static inline void mutex_set_thread(struct mutex *mtx, struct thread_entry *td)
-        __attribute__((always_inline));
-static inline void mutex_set_thread(struct mutex *mtx, struct thread_entry *td)
+static inline void __attribute__((always_inline))
+mutex_set_thread(struct mutex *mtx, struct thread_entry *td)
 {
 #ifdef HAVE_PRIORITY_SCHEDULING
     mtx->blocker.thread = td;
@@ -838,9 +837,8 @@ static inline void mutex_set_thread(struct mutex *mtx, struct thread_entry *td)
 #endif
 }
 
-static inline struct thread_entry* mutex_get_thread(struct mutex *mtx)
-        __attribute__((always_inline));
-static inline struct thread_entry* mutex_get_thread(struct mutex *mtx)
+static inline struct thread_entry * __attribute__((always_inline))
+mutex_get_thread(volatile struct mutex *mtx)
 {
 #ifdef HAVE_PRIORITY_SCHEDULING
     return mtx->blocker.thread;
@@ -855,8 +853,7 @@ void mutex_init(struct mutex *m)
 {
     corelock_init(&m->cl);
     m->queue = NULL;
-    m->count = 0;
-    m->locked = false;
+    m->recursion = 0;
     mutex_set_thread(m, NULL);
 #ifdef HAVE_PRIORITY_SCHEDULING
     m->blocker.priority = PRIORITY_IDLE;
@@ -873,18 +870,18 @@ void mutex_lock(struct mutex *m)
     if(current == mutex_get_thread(m))
     {
         /* current thread already owns this mutex */
-        m->count++;
+        m->recursion++;
         return;
     }
 
     /* lock out other cores */
     corelock_lock(&m->cl);
 
-    if(LIKELY(!m->locked))
+    /* must read thread again inside cs (a multiprocessor concern really) */
+    if(LIKELY(mutex_get_thread(m) == NULL))
     {
         /* lock is open */
         mutex_set_thread(m, current);
-        m->locked = true;
         corelock_unlock(&m->cl);
         return;
     }
@@ -912,10 +909,10 @@ void mutex_unlock(struct mutex *m)
                   mutex_get_thread(m)->name,
                   thread_id_entry(THREAD_ID_CURRENT)->name);
 
-    if(m->count > 0)
+    if(m->recursion > 0)
     {
         /* this thread still owns lock */
-        m->count--;
+        m->recursion--;
         return;
     }
 
@@ -927,7 +924,6 @@ void mutex_unlock(struct mutex *m)
     {
         /* no threads waiting - open the lock */
         mutex_set_thread(m, NULL);
-        m->locked = false;
         corelock_unlock(&m->cl);
         return;
     }
