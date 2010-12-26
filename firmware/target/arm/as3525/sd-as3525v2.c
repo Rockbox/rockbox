@@ -571,6 +571,8 @@ static int sd_init_card(const int drive)
                  MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
         return -11;
 
+    mci_delay();
+
     sd_parse_csd(&card_info[drive]);
 
     if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
