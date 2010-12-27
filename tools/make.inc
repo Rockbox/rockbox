@@ -11,7 +11,7 @@ $(OBJDIR)/%.o: %.c
 
 $(OBJDIR)/%.o: %.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $<)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $<)$(CC) $(CFLAGS) $(ASMFLAGS) -c $< -o $@
 
 # The echo stuff last in the dep update shell magic is to prevent any compiler
 # errors/warnings to cause an error code to get returned and thus stop the

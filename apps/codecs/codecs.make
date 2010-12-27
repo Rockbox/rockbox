@@ -109,7 +109,7 @@ $(CODECDIR)/%.o: $(ROOTDIR)/apps/codecs/%.c
 $(CODECDIR)/%.o: $(ROOTDIR)/apps/codecs/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
-		-I$(dir $<) $(CODECFLAGS) -c $< -o $@
+		-I$(dir $<) $(CODECFLAGS) $(ASMFLAGS) -c $< -o $@
 
 ifdef APP_TYPE
  CODECLDFLAGS = $(SHARED_FLAG) # <-- from Makefile

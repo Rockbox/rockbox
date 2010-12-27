@@ -31,4 +31,4 @@ $(CODECDIR)/libtta/%.o: $(ROOTDIR)/apps/codecs/libtta/%.c
 
 $(CODECDIR)/libtta/%.o: $(ROOTDIR)/apps/codecs/libtta/%.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(TTAFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(TTAFLAGS) $(ASMFLAGS) -c $< -o $@

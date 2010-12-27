@@ -19,7 +19,7 @@ OBJS= 	../../crt0.o ../../system.o main.o ../../panic.o ../../drivers/lcd.o \
 	../../debug.o ../../common/sprintf.o
 
 %.o: %.S
-	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
+	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) $(ASMFLAGS) -c $<
 
 
 all : archos.mod
