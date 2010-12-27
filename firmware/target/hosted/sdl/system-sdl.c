@@ -84,6 +84,7 @@ static int sdl_event_thread(void * param)
 
     SDL_Surface *picture_surface = NULL;
     int width, height;
+    int depth;
 
     /* Try and load the background image. If it fails go without */
     if (background) {
@@ -115,9 +116,12 @@ static int sdl_event_thread(void * param)
             height = SIM_LCD_HEIGHT;
         }
     }
-   
-    
-    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
+
+    depth = LCD_DEPTH;
+    if (depth < 8)
+        depth = 16;
+
+    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
         panicf("%s", SDL_GetError());
     }
 

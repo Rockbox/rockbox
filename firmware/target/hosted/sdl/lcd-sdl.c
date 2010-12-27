@@ -30,10 +30,40 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,
                      unsigned long (*getpixel)(int, int))
 {
+    SDL_Rect dest;
+#if LCD_DEPTH >= 8 && (LCD_PIXELFORMAT == RGB565) \
+    && !defined(LCD_STRIDEFORMAT) && !defined(HAVE_LCD_SPLIT)
+    SDL_Rect src;
+    (void)max_x;
+    (void)max_y;
+    (void)getpixel;
+    /* Update complete screen via one blit operation (fast) */
+    SDL_Surface *lcd = SDL_CreateRGBSurfaceFrom(lcd_framebuffer, LCD_FBWIDTH,
+                                                LCD_FBHEIGHT, LCD_DEPTH,
+                                                LCD_FBWIDTH * LCD_DEPTH/8,
+                                                0, 0, 0, 0);
+    src.x = x_start;
+    src.y = y_start;
+    src.w = width;
+    src.h = height;
+
+    if (display_zoom == 1) {
+        dest = src;
+        SDL_BlitSurface(lcd, &src, surface, &dest);
+    } else {
+        /* Note: SDL_SoftStretch is currently marked as DO NOT USE
+           but there are no real alternatives for efficent zooming. */
+        dest.x = src.x * display_zoom;
+        dest.y = src.y * display_zoom;
+        dest.w = src.w * display_zoom;
+        dest.h = src.h * display_zoom;
+        SDL_SoftStretch(lcd, &src, surface, &dest);
+    }
+    SDL_FreeSurface(lcd);
+#else
     int x, y;
     int xmax, ymax;
-    SDL_Rect dest;
-
+    /* Very slow pixel-by-pixel drawing */
     ymax = y_start + height;
     xmax = x_start + width;
 
@@ -41,8 +71,6 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
         xmax = max_x;
     if(ymax >= max_y)
         ymax = max_y;
-
-    SDL_LockSurface(surface);
 
     dest.w = display_zoom;
     dest.h = display_zoom;
@@ -69,8 +97,7 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
         }
 #endif
     }
-
-    SDL_UnlockSurface(surface);
+#endif
 }
 
 void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,

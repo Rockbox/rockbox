@@ -370,6 +370,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_force_on(); /* backlight control in lib/helper.c */
 
     time_main_update();
+    rb->sleep(HZ);
 #if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
     time_main_yuv();
 #endif
