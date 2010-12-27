@@ -116,7 +116,7 @@ bool cfi_erase_sector(volatile uint16_t* pAddr)
 
 
 /* address must be in an erased location */
-inline bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
+static inline bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 {
     unsigned timeout = 85; /* the timeout loop should be no less than 20us */
     
