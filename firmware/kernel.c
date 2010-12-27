@@ -274,7 +274,7 @@ void yield(void)
  * more efficent to reject the majority of cases that don't need this
  * called.
  */
-static void queue_release_sender(struct thread_entry **sender,
+static void queue_release_sender(struct thread_entry * volatile * sender,
                                  intptr_t retval)
 {
     struct thread_entry *thread = *sender;
@@ -427,8 +427,11 @@ void queue_init(struct event_queue *q, bool register_queue)
 
     corelock_init(&q->cl);
     q->queue = NULL;
-    q->read = 0;
-    q->write = 0;
+    /* What garbage is in write is irrelevant because of the masking design-
+     * any other functions the empty the queue do this as well so that
+     * queue_count and queue_empty return sane values in the case of a
+     * concurrent change without locking inside them. */
+    q->read = q->write;
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     q->send = NULL; /* No message sending by default */
     IF_PRIO( q->blocker_p = NULL; )
@@ -484,8 +487,7 @@ void queue_delete(struct event_queue *q)
     }
 #endif
 
-    q->read = 0;
-    q->write = 0;
+    q->read = q->write;
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
@@ -510,29 +512,31 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
     /* auto-reply */
     queue_do_auto_reply(q->send);
-    
-    if (q->read == q->write)
+
+    while(1)
     {
-        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
+        struct thread_entry *current;
 
-        do
-        {
-            IF_COP( current->obj_cl = &q->cl; )
-            current->bqp = &q->queue;
+        rd = q->read;
+        if (rd != q->write) /* A waking message could disappear */
+            break;
 
-            block_thread(current);
+        current = thread_id_entry(THREAD_ID_CURRENT);
 
-            corelock_unlock(&q->cl);
-            switch_thread();
+        IF_COP( current->obj_cl = &q->cl; )
+        current->bqp = &q->queue;
 
-            oldlevel = disable_irq_save();
-            corelock_lock(&q->cl);
-        }
-        /* A message that woke us could now be gone */
-        while (q->read == q->write);
+        block_thread(current);
+
+        corelock_unlock(&q->cl);
+        switch_thread();
+
+        oldlevel = disable_irq_save();
+        corelock_lock(&q->cl);
     } 
 
-    rd = q->read++ & QUEUE_LENGTH_MASK;
+    q->read = rd + 1;
+    rd &= QUEUE_LENGTH_MASK;
     *ev = q->events[rd];
 
     /* Get data for a waiting thread if one */
@@ -545,6 +549,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 {
     int oldlevel;
+    unsigned int rd, wr;
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
@@ -558,7 +563,9 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     /* Auto-reply */
     queue_do_auto_reply(q->send);
 
-    if (q->read == q->write && ticks > 0)
+    rd = q->read;
+    wr = q->write;
+    if (rd == wr && ticks > 0)
     {
         struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
 
@@ -572,13 +579,17 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
         oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
+
+        rd = q->read;
+        wr = q->write;
     }
 
     /* no worry about a removed message here - status is checked inside
        locks - perhaps verify if timeout or false alarm */
-    if (q->read != q->write)
+    if (rd != wr)
     {
-        unsigned int rd = q->read++ & QUEUE_LENGTH_MASK;
+        q->read = rd + 1;
+        rd &= QUEUE_LENGTH_MASK;
         *ev = q->events[rd];
         /* Get data for a waiting thread if one */
         queue_do_fetch_sender(q->send, rd);
@@ -700,13 +711,16 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 {
     if(q->send && q->send->curr_sender)
     {
+        struct queue_sender_list *sender;
+
         int oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
+
+        sender = q->send;
+
         /* Double-check locking */
-        IF_COP( if(LIKELY(q->send && q->send->curr_sender)) )
-        {
-            queue_release_sender(&q->send->curr_sender, retval);
-        }
+        if(LIKELY(sender && sender->curr_sender))
+            queue_release_sender(&sender->curr_sender, retval);
 
         corelock_unlock(&q->cl);
         restore_irq(oldlevel);
@@ -716,6 +730,8 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 
 bool queue_peek(struct event_queue *q, struct queue_event *ev)
 {
+    unsigned int rd;
+
     if(q->read == q->write)
          return false;
 
@@ -724,9 +740,10 @@ bool queue_peek(struct event_queue *q, struct queue_event *ev)
     int oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
-    if(q->read != q->write)
+    rd = q->read;
+    if(rd != q->write)
     {
-        *ev = q->events[q->read & QUEUE_LENGTH_MASK];
+        *ev = q->events[rd & QUEUE_LENGTH_MASK];
         have_msg = true;
     }
 
@@ -756,8 +773,7 @@ void queue_clear(struct event_queue* q)
        dequeued sent message will be handled by owning thread */
     queue_release_all_senders(q);
 
-    q->read = 0;
-    q->write = 0;
+    q->read = q->write;
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);

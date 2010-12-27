@@ -269,7 +269,7 @@ struct thread_entry
     /* Only enabled when using queue_send for now */
 #endif
 #if defined(HAVE_EXTENDED_MESSAGING_AND_NAME) || NUM_CORES > 1
-    intptr_t retval;           /* Return value from a blocked operation/
+    volatile intptr_t retval;  /* Return value from a blocked operation/
                                   misc. use */
 #endif
 #ifdef HAVE_PRIORITY_SCHEDULING
