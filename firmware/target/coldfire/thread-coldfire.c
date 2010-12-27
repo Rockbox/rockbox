@@ -95,3 +95,17 @@ static inline void core_sleep(void)
     /* Supervisor mode, interrupts enabled upon wakeup */
     asm volatile ("stop #0x2000");
 };
+
+/*---------------------------------------------------------------------------
+ * Call this from asm to make sure the sp is pointing to the
+ * correct place before the context is saved.
+ *---------------------------------------------------------------------------
+ */
+static inline void _profile_thread_stopped(int current_thread)
+{
+    asm volatile ("move.l %[id], -(%%sp)\n\t"
+                  "jsr profile_thread_stopped\n\t"
+                  "addq.l #4, %%sp\n\t"
+                  :: [id] "r" (current_thread)
+                  : "cc", "memory");
+}

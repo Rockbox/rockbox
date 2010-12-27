@@ -1150,14 +1150,7 @@ void switch_thread(void)
 
 #ifdef RB_PROFILE
 #ifdef CPU_COLDFIRE
-    /* Call this from asm to make sure the sp is pointing to the
-       correct place before the context is saved */
-    uint16_t id = thread->id & THREAD_ID_SLOT_MASK;
-    asm volatile ("move.l %[id], -(%%sp)\n\t"
-                  "jsr profile_thread_stopped\n\t"
-                  "addq.l #4, %%sp\n\t"
-                  :: [id] "r" (id)
-                  : "cc", "memory");
+    _profile_thread_stopped(thread->id & THREAD_ID_SLOT_MASK);
 #else
     profile_thread_stopped(thread->id & THREAD_ID_SLOT_MASK);
 #endif
