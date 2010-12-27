@@ -137,7 +137,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
         sim_exit_irq_handler();
     }
     
-    return 1;
+    return interval;
 }
 
 void tick_start(unsigned int interval_in_ms)
