@@ -1509,7 +1509,7 @@ static struct thread_entry * find_empty_thread_slot(void)
 
 /*---------------------------------------------------------------------------
  * Return the thread_entry pointer for a thread_id. Return the current
- * thread if the ID is 0 (alias for current).
+ * thread if the ID is (unsigned int)-1 (alias for current).
  *---------------------------------------------------------------------------
  */
 struct thread_entry * thread_id_entry(unsigned int thread_id)
