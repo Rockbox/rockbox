@@ -22,7 +22,7 @@
 
 
 
-static int files, dirs, musicfiles, largestdir;
+static int files, dirs, audiofiles, m3ufiles, imagefiles, videofiles, largestdir;
 static int lasttick;
 static bool cancel;
 
@@ -114,6 +114,12 @@ static bool cancel;
 #error No keymap defined!
 #endif
 
+/* we don't have yet a filetype attribute for image files */
+const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
+
+/* neither for video ones */
+const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
+
 void prn(const char *str, int y)
 {
     rb->lcd_puts(0,y,str);
@@ -132,14 +138,20 @@ void update_screen(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    rb->snprintf(buf, sizeof(buf), "Files: %d", files);
+    rb->snprintf(buf, sizeof(buf), "Total Files: %d", files);
     prn(buf,0);
-    rb->snprintf(buf, sizeof(buf), "Music: %d", musicfiles);
+    rb->snprintf(buf, sizeof(buf), "Audio: %d", audiofiles);
     prn(buf,1);
-    rb->snprintf(buf, sizeof(buf), "Dirs: %d", dirs);
+    rb->snprintf(buf, sizeof(buf), "Playlists: %d", m3ufiles);
     prn(buf,2);
-    rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
+    rb->snprintf(buf, sizeof(buf), "Images: %d", imagefiles);
     prn(buf,3);
+    rb->snprintf(buf, sizeof(buf), "Videos: %d", videofiles);
+    prn(buf,4);
+    rb->snprintf(buf, sizeof(buf), "Directories: %d", dirs);
+    prn(buf,5);
+    rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
+    prn(buf,6);
 #else
     rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
     prn(buf,0);
@@ -177,15 +189,49 @@ void traversedir(char* location, char* name)
                     dirs++;
                 }
                 else {
+                    files_in_dir++; files++;
+
+                    /* get the filetype from the filename */
                     int attr = rb->filetype_get_attr(entry->d_name);
-                    if ((attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+                    switch (attr & FILE_ATTR_MASK)
                     {
-                        musicfiles++; 
-                    }
-                    files++; files_in_dir++;
-                    }
+                    case FILE_ATTR_AUDIO:
+                        audiofiles++;
+                        break;
+
+                    case FILE_ATTR_M3U:
+                        m3ufiles++;
+                        break;
+ 
+                    default:
+                    {
+                        /* use hardcoded filetype_exts to count
+                         * image and video files until we get
+                         * new attributes added to filetypes.h */
+                        char *ptr = rb->strrchr(entry->d_name,'.');
+                        if(ptr) {
+                            unsigned i;
+                            ptr++;
+                            for(i=0;i<ARRAYLEN(image_exts);i++) {
+                                if(!rb->strcasecmp(ptr,image_exts[i])) {
+                                    imagefiles++; break;
+                                }
+                            }
+
+                            if (i >= ARRAYLEN(image_exts)) {
+                                /* not found above - try video files */
+                                for(i=0;i<ARRAYLEN(video_exts);i++) {
+                                    if(!rb->strcasecmp(ptr,video_exts[i])) {
+                                        videofiles++; break;
+                                    }
+                                }
+                            }
+                        }
+                        } /* default: */
+                    } /* switch */
                 }
             }
+
             if (*rb->current_tick - lasttick > (HZ/2)) {
                 update_screen();
                 lasttick = *rb->current_tick;
@@ -217,7 +263,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     files = 0;
     dirs = 0;
-    musicfiles = 0;
+    audiofiles = 0;
+    m3ufiles = 0;
+    imagefiles = 0;
+    videofiles = 0;
     largestdir = 0;
     cancel = false;
 
