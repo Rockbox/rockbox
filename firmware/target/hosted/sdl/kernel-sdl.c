@@ -39,8 +39,14 @@ static SDL_cond *sim_thread_cond;
 /* Mutex to serialize changing levels and exclude other threads while
  * inside a handler */
 static SDL_mutex *sim_irq_mtx;
+/* Level: 0 = enabled, not 0 = disabled */
 static int interrupt_level = HIGHEST_IRQ_LEVEL;
+/* How many handers waiting? Not strictly needed because CondSignal is a
+ * noop if no threads were waiting but it filters-out calls to functions
+ * with higher overhead and provides info when debugging. */
 static int handlers_pending = 0;
+/* 1 = executing a handler; prevents CondSignal calls in set_irq_level
+ * while in a handler */
 static int status_reg = 0;
 
 /* Nescessary logic:
@@ -57,7 +63,8 @@ int set_irq_level(int level)
 
     if (status_reg == 0 && level == 0 && oldlevel != 0)
     {
-        /* Not in a handler and "interrupts" are being reenabled */
+        /* Not in a handler and "interrupts" are going from disabled to
+         * enabled; signal any pending handlers still waiting */
         if (handlers_pending > 0)
             SDL_CondSignal(sim_thread_cond);
     }
@@ -73,17 +80,19 @@ void sim_enter_irq_handler(void)
     SDL_LockMutex(sim_irq_mtx);
     handlers_pending++;
 
-    if(interrupt_level != 0)
-    {
-        /* "Interrupts" are disabled. Wait for reenable */
+    /* Check each time before proceeding: disabled->enabled->...->disabled
+     * is possible on an app thread before a handler thread is ever granted
+     * the mutex; a handler can also leave "interrupts" disabled during
+     * its execution */
+    while (interrupt_level != 0)
         SDL_CondWait(sim_thread_cond, sim_irq_mtx);
-    }
 
     status_reg = 1;
 }
 
 void sim_exit_irq_handler(void)
 {
+    /* If any others are waiting, give the signal */
     if (--handlers_pending > 0)
         SDL_CondSignal(sim_thread_cond);
 
