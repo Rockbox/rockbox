@@ -13,6 +13,7 @@ use strict;
 use File::Copy; # For move() and copy()
 use File::Find; # For find()
 use File::Path qw(mkpath rmtree); # For rmtree()
+use Cwd;
 use Cwd 'abs_path';
 use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
 
@@ -29,6 +30,7 @@ my $incfonts;
 my $target_id; # passed in, not currently used
 my $rbdir; # can be non-.rockbox for special builds
 my $app;
+my $mklinks;
 
 sub glob_mkdir {
     my ($dir) = @_;
@@ -81,10 +83,16 @@ sub find_copyfile {
     print "find_copyfile: $pattern -> $destination\n" if $verbose;
     return sub {
         my $path = $_;
+        my $source = getcwd();
         if ($path =~ $pattern && filesize($path) > 0 && !($path =~ /$rbdir/)) {
-            copy($path, $destination);
-            print "cp $path $destination\n" if $verbose;
-            chmod(0755, $destination.'/'.$path);
+            if($mklinks) {
+                print "link $path $destination\n" if $verbose;
+                symlink($source.'/'.$path, $destination.'/'.$path);
+            } else {
+                print "cp $path $destination\n" if $verbose;
+                copy($path, $destination);
+                chmod(0755, $destination.'/'.$path);
+            } 
         }
     }
 }
@@ -205,6 +213,7 @@ GetOptions ( 'r|root=s'		=> \$ROOT,
 	     'v|verbose'	=> \$verbose,
 	     'install=s'		=> \$install, # install destination
 	     'rbdir:s'          => \$rbdir, # If we want to put in a different directory
+	     'l|link'           => \$mklinks, # If we want to create links instead of copying files
     );
 
 # GetOptions() doesn't remove the params from @ARGV if their value was ""
@@ -695,9 +704,15 @@ sub runone {
     }
 
     if($install) {
-        make_install(".rockbox", $install) or die "MKDIRFAILED\n";
-        rmtree(".rockbox");
-        print "rm .rockbox\n" if $verbose;
+        if($mklinks) {
+            my $cwd = getcwd();
+            symlink("$cwd/.rockbox", "$install/.rockbox");
+            print "link .rockbox $install\n" if $verbose;
+        } else {
+            make_install(".rockbox", $install) or die "MKDIRFAILED\n";
+            rmtree(".rockbox");
+            print "rm .rockbox\n" if $verbose;
+        }
     }
     else {
         unless (".rockbox" eq $rbdir) {
