@@ -114,15 +114,6 @@ static bool cancel;
 #error No keymap defined!
 #endif
 
-/* TODO: Better get the exts from the filetypes var in tree.c */
-const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg","oga",
-        "wav","flac","ac3","a52","mpc","wv","m4a","m4b","mp4",
-        "shn","aif","aiff","wma","wmv","asf","spx","ape","mac",
-        "sid","mod","nsf","nsfe","spc","adx","sap","rm","at3",
-        "ra","rmvb","oma","aa3","dmc","dlt","mpt","mpd","rmt",
-        "tmc","tm8","tm2","cm3","cmc","cmr","cms","mmf","au",
-        "snd","vox","w64"};
-
 void prn(const char *str, int y)
 {
     rb->lcd_puts(0,y,str);
@@ -186,17 +177,12 @@ void traversedir(char* location, char* name)
                     dirs++;
                 }
                 else {
-                    char *ptr = rb->strrchr(entry->d_name,'.'); 
+                    int attr = rb->filetype_get_attr(entry->d_name);
+                    if ((attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+                    {
+                        musicfiles++; 
+                    }
                     files++; files_in_dir++;
-                    /* Might want to only count .mp3, .ogg etc. */
-                    if(ptr){
-                        unsigned i;
-                        ptr++;
-                        for(i=0;i<sizeof(music_exts)/sizeof(char*);i++)
-                            if(!rb->strcasecmp(ptr,music_exts[i])){
-                                musicfiles++; break;
-                            }
-                        
                     }
                 }
             }
@@ -222,6 +208,7 @@ void traversedir(char* location, char* name)
         largestdir = files_in_dir;
 }
 
+/* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
     int button;
