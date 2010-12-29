@@ -317,8 +317,8 @@ static const struct plugin_api rockbox_api = {
     PREFIX(creat),
 #endif
     (write_func)PREFIX(write),
-    remove,
-    rename,
+    PREFIX(remove),
+    PREFIX(rename),
     PREFIX(ftruncate),
     PREFIX(filesize),
     fdprintf,
@@ -338,11 +338,11 @@ static const struct plugin_api rockbox_api = {
     crc_32,
 
     /* dir */
-    opendir,
-    closedir,
-    readdir,
-    mkdir,
-    rmdir,
+    (opendir_func)PREFIX(opendir),
+    (closedir_func)PREFIX(closedir),
+    (readdir_func)PREFIX(readdir),
+    PREFIX(mkdir),
+    PREFIX(rmdir),
     dir_exists,
     dir_get_info,
 

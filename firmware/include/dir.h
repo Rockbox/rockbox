@@ -72,4 +72,9 @@
 # define rmdir rmdir_uncached
 #endif
 
+
+typedef DIR* (*opendir_func)(const char* name);
+typedef int (*closedir_func)(DIR* dir);
+typedef struct dirent* (*readdir_func)(DIR* dir);
+
 #endif
