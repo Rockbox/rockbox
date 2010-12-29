@@ -114,19 +114,17 @@
                       /* *5/8 = 240MHz      120, 80, 60, 48, 40  */
 //#define AS3525_PLLA_SETTING     0x2630
 
-#define AS3525_FCLK_PREDIV    2 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
+#define AS3525_FCLK_PREDIV    0 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
                                 /* 0 gives you the PLLA 1st line choices, 1 the 2nd line etc. */
 
-#define AS3525_FCLK_FREQ      186000000   /* Boosted FCLK frequency - over 200MHz */
-                                          /* requires CVDDp bumped to 1.2V        */
-#define AS3525_DRAM_FREQ       31000000            /* Initial DRAM frequency  */
-#define AS3525_DRAM_FREQ_BOOSTED 62000000
+#define AS3525_FCLK_FREQ      248000000            /* Boosted FCLK frequency  */
+#define AS3525_DRAM_FREQ       62000000            /* Initial DRAM frequency  */
 /* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
 
 #endif  /* CONFIG_CPU == AS3525v2 */
 
 #define AS3525_PCLK_FREQ      (AS3525_DRAM_FREQ/1)   /* PCLK divided from DRAM freq */
-#define AS3525_PCLK_FREQ_BOOSTED (AS3525_DRAM_FREQ_BOOSTED/1)
+
 #define AS3525_DBOP_FREQ      (AS3525_PCLK_FREQ/1)   /* DBOP divided from PCLK freq */
 
 /** ****************************************************************************/
@@ -171,9 +169,6 @@
          /*unable to use AS3525_PCLK_DIV1 != 0 successfuly so far*/
 #define AS3525_PCLK_DIV1         (CLK_DIV(AS3525_DRAM_FREQ, AS3525_PCLK_FREQ) - 1)/* div = 1/(n+1)*/ 
 #define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_DRAM_FREQ) - 1) /*div=1/(n+1)*/
-#define AS3525_PCLK_DIV1_BOOSTED (CLK_DIV(AS3525_DRAM_FREQ_BOOSTED, AS3525_PCLK_FREQ_BOOSTED) - 1)
-#define AS3525_PCLK_DIV0_BOOSTED (CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ_BOOSTED) - 1)
-
 #else
 
 #define AS3525_PCLK_SEL          AS3525_CLK_FCLK
@@ -184,10 +179,8 @@
    /* PCLK as Source */
   #define AS3525_DBOP_DIV        (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) /*div=1/(n+1)*/
   #define AS3525_I2C_PRESCALER   CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)
-  #define AS3525_I2C_PRESCALER_BOOSTED   CLK_DIV(AS3525_PCLK_FREQ_BOOSTED, AS3525_I2C_FREQ)
   #define AS3525_I2C_FREQ        400000
   #define AS3525_SD_IDENT_DIV    ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1)
-  #define AS3525_SD_IDENT_DIV_BOOSTED    ((CLK_DIV(AS3525_PCLK_FREQ_BOOSTED, AS3525_SD_IDENT_FREQ) / 2) - 1)
   #define AS3525_SD_IDENT_FREQ   400000      /* must be between 100 & 400 kHz */
   #define AS3525_SSP_PRESCALER   ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ) + 1) & ~1)    /* must be an even number */
   #define AS3525_SSP_FREQ        12000000

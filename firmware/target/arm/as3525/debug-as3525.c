@@ -182,12 +182,7 @@ static int calc_freq(int clk)
                     return 0;
             }
         case CLK_I2C:
-#if CONFIG_CPU == AS3525
-            if (cpu_frequency == CPUFREQ_MAX)
-                return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER_BOOSTED;
-            else
-#endif
-                return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER;
+            return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER;
         case CLK_I2SI:
             switch((CGU_AUDIO>>12) & 3) {
                 case 0:
@@ -223,7 +218,7 @@ static int calc_freq(int clk)
         case CLK_SD_MCLK_MSD:
             if(!(MCI_SD & (1<<8)))
                 return 0;
-            else if(MCI_SD & (1<<10)) /* bypass */
+            else if(MCI_SD & (1<<10))
                 return calc_freq(CLK_PCLK);
             else
             return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)+1)*2);
@@ -352,7 +347,7 @@ bool __dbg_hw_info(void)
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
 #ifdef HAVE_MULTIDRIVE
         lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
-            ((calc_freq(CLK_PCLK)/ 1000000) /
+            ((AS3525_PCLK_FREQ/ 1000000) /
             ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
