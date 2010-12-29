@@ -40,7 +40,7 @@ static SDL_cond *sim_thread_cond;
  * inside a handler */
 static SDL_mutex *sim_irq_mtx;
 /* Level: 0 = enabled, not 0 = disabled */
-static int interrupt_level = HIGHEST_IRQ_LEVEL;
+static int volatile interrupt_level = HIGHEST_IRQ_LEVEL;
 /* How many handers waiting? Not strictly needed because CondSignal is a
  * noop if no threads were waiting but it filters-out calls to functions
  * with higher overhead and provides info when debugging. */
