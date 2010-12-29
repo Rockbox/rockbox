@@ -226,5 +226,8 @@
  */
 #define HAVE_ATA_DMA
 
+/* Define this, if you can switch on/off the lineout */
+#define HAVE_LINEOUT_POWEROFF
+
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
