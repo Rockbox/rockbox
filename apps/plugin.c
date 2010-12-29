@@ -314,7 +314,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     (creat_func)creat_wrapper,
 #else
-    (creat_func)creat,
+    PREFIX(creat),
 #endif
     (write_func)PREFIX(write),
     remove,
