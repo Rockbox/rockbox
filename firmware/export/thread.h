@@ -201,8 +201,8 @@ struct thread_list
 #ifdef HAVE_PRIORITY_SCHEDULING
 struct blocker
 {
-    struct thread_entry *thread;   /* thread blocking other threads
-                                      (aka. object owner) */
+    struct thread_entry * volatile thread; /* thread blocking other threads
+                                              (aka. object owner) */
     int priority;                  /* highest priority waiter */
     struct thread_entry * (*wakeup_protocol)(struct thread_entry *thread);
 };
