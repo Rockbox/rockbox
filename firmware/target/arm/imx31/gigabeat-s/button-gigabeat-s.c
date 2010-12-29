@@ -31,16 +31,20 @@
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
-static uint32_t int_btn     = BUTTON_NONE;
-static bool hold_button     = false;
 #ifdef BOOTLOADER
 static bool initialized     = false;
-#else
+#endif
+
+static int  ext_btn         = BUTTON_NONE; /* Buttons not on KPP */
+static bool hold_button     = false;
+#ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
+
 #define _button_hold() (GPIO3_DR & 0x10)
 
-static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
+/* Scan the keypad port and return the pressed buttons */
+static int kpp_scan(void)
 {
     static const struct key_mask_shift
     {
@@ -53,19 +57,9 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
         { 0x1f, 7 }, /* BUTTON_VOL_UP...BUTTON_NEXT */
     };
 
-    int col;
-    /* Power button is handled separately on PMIC, remote read in headphone
-     * jack driver. */
-#ifdef HAVE_HEADPHONE_DETECTION
-    int button = int_btn & (BUTTON_POWER | BUTTON_REMOTE);
-#else
-    int button = int_btn & BUTTON_POWER;
-#endif
-
+    int button = BUTTON_NONE;
     int oldlevel = disable_irq_save();
-
-    /* 1. Disable both (depress and release) keypad interrupts. */
-    KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
+    int col;
 
     for (col = 0; col < 3; col++) /* Col */
     {
@@ -106,17 +100,9 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
      *    clear the KPKD synchronizer chain by writing "1" to KDSC register */
     KPP_KPSR = KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKR | KPP_KPSR_KPKD;
 
-    /* 10. Re-enable the appropriate keypad interrupt(s) so that the KDIE
-     *     detects a key hold condition, or the KRIE detects a key-release
-     *     event. */
-    if ((button & ~BUTTON_POWER) != BUTTON_NONE)
-        KPP_KPSR |= KPP_KPSR_KRIE;
-    else
-        KPP_KPSR |= KPP_KPSR_KDIE;
-
-    int_btn = button;
-
     restore_irq(oldlevel);
+
+    return button;
 }
 
 bool button_hold(void)
@@ -129,7 +115,7 @@ bool button_hold(void)
 void button_headphone_set(int button)
 {
     int oldstatus = disable_irq_save();
-    int_btn = (int_btn & ~BUTTON_REMOTE) | button;
+    ext_btn = (ext_btn & ~BUTTON_REMOTE) | button;
     restore_irq(oldstatus);
 }
 #endif
@@ -148,19 +134,19 @@ int button_read_device(void)
     }
 #endif
 
-    /* Enable the keypad interrupt to cause it to fire if a key is down.
-     * KPP_HANDLER will clear and disable it after the scan. If no key
-     * is depressed then this bit will already be set in waiting for the
-     * first key down event. */
-    KPP_KPSR |= KPP_KPSR_KDIE;
+    int button = ext_btn;
+
+    /* Check status for key down flag and scan port if so indicated. */
+    if (KPP_KPSR & KPP_KPSR_KPKD)
+        button |= kpp_scan();
 
 #ifdef HAVE_HEADPHONE_DETECTION
     /* If hold, ignore any pressed button. Remote has its own hold
      * switch, so return state regardless. */
-    return hold_button ? (int_btn & BUTTON_REMOTE) : int_btn;
+    return hold_button ? (button & BUTTON_REMOTE) : button;
 #else
     /* If hold, ignore any pressed button.  */
-    return hold_button ? BUTTON_NONE : int_btn;
+    return hold_button ? BUTTON_NONE : button;
 #endif
 }
 
@@ -170,16 +156,15 @@ void button_power_event(void)
     bool pressed =
         (mc13783_read(MC13783_INTERRUPT_SENSE1) & MC13783_ONOFD1S) == 0;
 
-    /* Prevent KPP_HANDLER from changing things */
     int oldlevel = disable_irq_save();
 
     if (pressed)
     {
-        int_btn |= BUTTON_POWER;
+        ext_btn |= BUTTON_POWER;
     }
     else
     {
-        int_btn &= ~BUTTON_POWER;
+        ext_btn &= ~BUTTON_POWER;
     }
 
     restore_irq(oldlevel);
@@ -216,9 +201,7 @@ void button_init_device(void)
 
     /* 5. Clear the KPKD Status Flag and Synchronizer chain.
      * 6. Set the KDIE control bit bit. */
-    KPP_KPSR = KPP_KPSR_KDIE | KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKD;
-
-    avic_enable_int(INT_KPP, INT_TYPE_IRQ, INT_PRIO_DEFAULT, KPP_HANDLER);
+    KPP_KPSR = KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKD;
 
     button_power_event();
     mc13783_enable_event(MC13783_ONOFD1_EVENT);
@@ -231,12 +214,13 @@ void button_init_device(void)
 #ifdef BUTTON_DRIVER_CLOSE
 void button_close_device(void)
 {
-    int oldlevel = disable_irq_save();
+    if (!initialized)
+        return;
 
-    avic_disable_int(INT_KPP);
-    KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
-    int_btn = BUTTON_NONE;
+    /* Assumes HP detection is not available */
+    initialized = false;
 
-    restore_irq(oldlevel);
+    mc13783_disable_event(MC13783_ONOFD1_EVENT);
+    ext_btn = BUTTON_NONE;
 }
 #endif /* BUTTON_DRIVER_CLOSE */
