@@ -670,9 +670,9 @@ void thread_get_name(char *buffer, int size,
     {
         /* Display thread name if one or ID if none */
         bool named = thread->name && *thread->name;
-        const char *fmt = named ? "%s" : "%08lX";
+        const char *fmt = named ? "%s" : "%04lX";
         intptr_t name = named ?
-            (intptr_t)thread->name : (intptr_t)thread;
+            (intptr_t)thread->name : (intptr_t)thread->id;
         snprintf(buffer, size, fmt, name);
     }
 }
