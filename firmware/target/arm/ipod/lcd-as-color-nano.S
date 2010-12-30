@@ -136,7 +136,7 @@ lcd_yuv_write_inner_loop:
     orr r6, r6, r7, lsl #24             @ swap bytes and add pixels simultaneously
     mov r7, r7, lsr #8
     orr r6, r6, r7, lsl #16
-#if 0
+#if 1
 11:                                     @ while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
     ldr r11, [r4, #0x20]                @
     tst r11, #0x1000000                 @

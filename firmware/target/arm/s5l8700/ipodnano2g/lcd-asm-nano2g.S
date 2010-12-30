@@ -19,6 +19,15 @@
  *
  ****************************************************************************/
 
+/**************************************************************************** 
+ * #define FORCE_FIFO_WAIT
+ *
+ * This is not needed in YUV blitting when the LCD IF is fast enough. In this
+ * case YUV-to-RGB conversion per pixel needs longer than the transfer of a 
+ * pixel via the LCD IF. For iPod nano 2G this is true if the LCD IF is 
+ * configured to use LCD_PHTIME = 0x00 (see lcd-nano2g.c).
+ ****************************************************************************/
+
 #include "config.h"
 
     .section .icode, "ax", %progbits
@@ -185,13 +194,13 @@ lcd_write_yuv420_lines:
     /* calculate pixel_2 and pack with pixel_1 before writing */
     orr         r5, r5, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r5, r5, r6, lsl #11   /* r5 = pixel_2 */
-
+#ifdef FORCE_FIFO_WAIT
     /* wait for FIFO half full */
 .fifo_wait1:
     ldr         r3, [lr, #-0x24]      /* while (LCD_STATUS & 0x08); */
     tst         r3, #0x8
     bgt         .fifo_wait1
-
+#endif
     stmia       lr, {r4,r5}           /* write pixel_1 and pixel_2 */
 
     subs        r7, r7, #2            /* check for loop end */
@@ -265,13 +274,13 @@ lcd_write_yuv420_lines:
     /* calculate pixel_2 and pack with pixel_1 before writing */
     orr         r5, r5, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r5, r5, r6, lsl #11   /* r5 = pixel_2 */
-
+#ifdef FORCE_FIFO_WAIT
     /* wait for FIFO half full */
 .fifo_wait2:
     ldr         r3, [lr, #-0x24]      /* while (LCD_STATUS & 0x08); */
     tst         r3, #0x8
     bgt         .fifo_wait2
-
+#endif
     stmia       lr, {r4,r5}           /* write pixel_1 and pixel_2 */
 
     subs        r7, r7, #2            /* check for loop end */
