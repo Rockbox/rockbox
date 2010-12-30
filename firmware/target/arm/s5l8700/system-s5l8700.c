@@ -28,6 +28,20 @@
 #include "pmu-target.h"
 #endif
 
+/* MIUSDPARA_BOOST taken from OF (see crt0.S). MIUSDPARA_UNBOOST is derived
+ * from MIUSDPARA_BOOST due to the fact that the minimum allowed DRAM timings 
+ * are fix, but HCLK clock cycle time is doubled in unboosted state. */
+#if   defined(IPOD_NANO2G)
+    #define MIUSDPARA_BOOST   0x006A49A5
+    #define MIUSDPARA_UNBOOST 0x006124D1
+#elif defined(MEIZU_M3)
+    #define MIUSDPARA_BOOST   0x006A491D
+    #define MIUSDPARA_UNBOOST 0x0061248D
+#elif defined(MEIZU_M6SP)
+    #define MIUSDPARA_BOOST   0x006A4965
+    #define MIUSDPARA_UNBOOST 0x00612491
+#endif
+
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
@@ -210,6 +224,8 @@ void set_cpu_frequency(long frequency)
         pmu_write(0x1e, 0xf);
         /* Allow for voltage to stabilize */
         udelay(100);
+        /* Configure for 96 MHz HCLK */
+        MIUSDPARA = MIUSDPARA_BOOST;
         /* FCLK_CPU = PLL0, HCLK = PLL0 / 2 */
         CLKCON = (CLKCON & ~0xFF00FF00) | 0x20003100;
         /* PCLK = HCLK / 2 */
@@ -235,6 +251,8 @@ void set_cpu_frequency(long frequency)
         CLKCON2 &= ~0x200;
         /* FCLK_CPU = OFF, HCLK = PLL0 / 4 */
         CLKCON = (CLKCON & ~0xFF00FF00) | 0x80003300;
+        /* Configure for 48 MHz HCLK */
+        MIUSDPARA = MIUSDPARA_UNBOOST;
         /* Vcore = 0.900V */
         pmu_write(0x1e, 0xb);
     }
