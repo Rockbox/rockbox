@@ -169,7 +169,7 @@ static int test(volatile int *buf, int buf_size, int loop_cnt,
     
     delta = *rb->current_tick - last_tick;
 
-    if (delta <= 10)
+    if (delta <= 20)
     {
         /* The loop_cnt will be increased for the next measurement set until 
          * each measurement at least takes 10 ticks. This is to ensure a
