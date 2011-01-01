@@ -270,6 +270,17 @@ static void play_stop_pcm(void)
     SSI_STCR2 &= ~SSI_STCR_TFEN0; /* Disable TX */
     SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN); /* Disable transmission, SSI */
 
+    if (pcm_playing)
+    {
+        /* Stopping: clear buffer info to ensure 0-size readbacks when
+         * stopped */
+        unsigned long dsa = 0;
+        dma_play_bd.buf_addr = NULL;
+        dma_play_bd.mode.count = 0;
+        clean_dcache_range(&dsa, sizeof(dsa));
+        sdma_write_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
+    }
+
     /* Clear any pending callback */
     dma_play_data.callback_pending = 0;
 }
@@ -462,6 +473,17 @@ void pcm_rec_dma_stop(void)
 
     SSI_SCR1 &= ~SSI_SCR_RE;      /* Disable RX */
     SSI_SRCR1 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
+
+    if (pcm_recording)
+    {
+        /* Stopping: clear buffer info to ensure 0-size readbacks when
+         * stopped */
+        unsigned long pda = 0;
+        dma_rec_bd.buf_addr = NULL;
+        dma_rec_bd.mode.count = 0;
+        clean_dcache_range(&pda, sizeof(pda));
+        sdma_write_words(&pda, CHANNEL_CONTEXT_ADDR(DMA_REC_CH_NUM)+0x0a, 1);
+    }
 
     /* Clear any pending callback */
     dma_rec_data.callback_pending = 0;
