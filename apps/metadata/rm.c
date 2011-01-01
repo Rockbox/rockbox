@@ -374,7 +374,13 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                         return -1;
                     else
                         skipped += temp;
+                } 
+                else
+                {
+                    DEBUGF("Unknown header signature :\"%s\"\n", fourcc2str(v));
+                    return -1;
                 }
+                    
 
                 break;
 
