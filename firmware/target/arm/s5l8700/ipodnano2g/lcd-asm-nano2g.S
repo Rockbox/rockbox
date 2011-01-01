@@ -49,7 +49,7 @@ lcd_write_line:                       /* r2 = LCD_BASE */
     add     r12, r2, #0x40            /* LCD_WDATA = LCD data port */
 
 .loop:
-    ldmia r0!, {r3, r5}               /* read 2 pixel (=8 byte) */
+    ldmia r0!, {r3, r5}               /* read 4 pixels (=8 byte) */
 
     /* wait for FIFO half full */
 .fifo_wait:
