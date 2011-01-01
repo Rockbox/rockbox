@@ -341,22 +341,12 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
-/* Line write helper function. */
-extern void lcd_write_line(const fb_data *addr, 
-                           int pixelcount,
-                           const unsigned int lcd_base_addr);
-
-/* Update a fraction of the display. */
-void lcd_update_rect(int, int, int, int) ICODE_ATTR;
-void lcd_update_rect(int x, int y, int width, int height)
+/* Helper function to set up drawing region and start drawing */
+static void lcd_setup_drawing_region(int, int, int, int) ICODE_ATTR;
+static void lcd_setup_drawing_region(int x, int y, int width, int height)
 {
     int y0, x0, y1, x1;
-    fb_data* p;
     
-    /* Both x and width need to be preprocessed due to asm optimizations */
-    x     = x & ~1;                 /* ensure x is even */
-    width = (width + 3) & ~3;       /* ensure width is a multiple of 4 */
-
     x0 = x;                         /* start horiz */
     y0 = y;                         /* start vert */
     x1 = (x + width) - 1;           /* max horiz */
@@ -384,19 +374,36 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
+}
+
+/* Line write helper function. */
+extern void lcd_write_line(const fb_data *addr, 
+                           int pixelcount,
+                           const unsigned int lcd_base_addr);
+
+/* Update a fraction of the display. */
+void lcd_update_rect(int, int, int, int) ICODE_ATTR;
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    fb_data* p;
+    
+    /* Both x and width need to be preprocessed due to asm optimizations */
+    x     = x & ~1;                 /* ensure x is even */
+    width = (width + 3) & ~3;       /* ensure width is a multiple of 4 */
+
+    lcd_setup_drawing_region(x, y, width, height);
 
     /* Copy display bitmap to hardware */
-    p = &lcd_framebuffer[y0][x0];
+    p = &lcd_framebuffer[y][x];
     if (LCD_WIDTH == width) {
         /* Write all lines at once */
         lcd_write_line(p, height*LCD_WIDTH, LCD_BASE);
     } else {
-        y1 = height;
         do {
             /* Write a single line */
             lcd_write_line(p, width, LCD_BASE);
             p += LCD_WIDTH;
-        } while (--y1 > 0 );
+        } while (--height > 0 );
     }
 }
 
@@ -411,38 +418,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    unsigned int z, y0, x0, y1, x1;;
+    unsigned int z;
     unsigned char const * yuv_src[3];
     
     width = (width + 1) & ~1;       /* ensure width is even */
 
-    x0 = x;                         /* start horiz */
-    y0 = y;                         /* start vert */
-    x1 = (x + width) - 1;           /* max horiz */
-    y1 = (y + height) - 1;          /* max vert */
-
-    if (lcd_type==0) {
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_START_POS, x0);
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_END_POS,   x1);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  y0);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    y1);
-
-        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  (x1 << 8) | x0);
-        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   (y1 << 8) | y0);
-
-        s5l_lcd_write_cmd(0);
-        s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
-    } else {
-        s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_data(x0);            /* Start column */
-        s5l_lcd_write_data(x1);            /* End column */
-
-        s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_data(y0);            /* Start row */
-        s5l_lcd_write_data(y1);            /* End row */
-
-        s5l_lcd_write_cmd(R_MEMORY_WRITE);
-    }
+    lcd_setup_drawing_region(x, y, width, height);
 
     z = stride * src_y;
     yuv_src[0] = src[0] + z + src_x;
