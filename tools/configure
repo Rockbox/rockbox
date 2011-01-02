@@ -1068,32 +1068,31 @@ cat <<EOF
   6) AV300                                       26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
  ==Cowon/iAudio==         40) Gigabeat F/X       28) Nano 2G
- 30) X5/X5V/X5L           41) Gigabeat S
- 31) M5/M5L                                      ==SanDisk==
- 32) 7                    ==Olympus=             50) Sansa e200
- 33) D2                   70) M:Robe 500         51) Sansa e200R
- 34) M3/M3L               71) M:Robe 100         52) Sansa c200
-                                                 53) Sansa m200
- ==Creative==             ==Philips==            54) Sansa c100
- 90) Zen Vision:M 30GB    100) GoGear SA9200     55) Sansa Clip
- 91) Zen Vision:M 60GB    101) GoGear HDD1630/   56) Sansa e200v2
- 92) Zen Vision                HDD1830           57) Sansa m200v4
-                          102) GoGear HDD6330    58) Sansa Fuze
- ==Onda==                                        59) Sansa c200v2
- 120) VX747               ==Meizu==              60) Sansa Clipv2
- 121) VX767               110) M6SL              61) Sansa View
- 122) VX747+              111) M6SP              62) Sansa Clip+
- 123) VX777               112) M3                63) Sansa Fuze v2
- 
-                                                 ==Logik==
- ==Samsung==              ==Tatung==             80) DAX 1GB MP3/DAB
- 140) YH-820              150) Elio TPJ-1022
- 141) YH-920                                     ==Lyre project==
- 142) YH-925              ==Packard Bell==       130) Lyre proto 1
- 143) YP-S3               160) Vibe 500          131) Mini2440
-
- ==MPIO==                                        == Application ==
- 170) HD200                                      200) Application
+ 30) X5/X5V/X5L           41) Gigabeat S         29) Classic/6G
+ 31) M5/M5L
+ 32) 7                    ==Olympus=             ==SanDisk==
+ 33) D2                   70) M:Robe 500         50) Sansa e200
+ 34) M3/M3L               71) M:Robe 100         51) Sansa e200R
+                                                 52) Sansa c200
+ ==Creative==             ==Philips==            53) Sansa m200
+ 90) Zen Vision:M 30GB    100) GoGear SA9200     54) Sansa c100
+ 91) Zen Vision:M 60GB    101) GoGear HDD1630/   55) Sansa Clip
+ 92) Zen Vision                HDD1830           56) Sansa e200v2
+                          102) GoGear HDD6330    57) Sansa m200v4
+ ==Onda==                                        58) Sansa Fuze
+ 120) VX747               ==Meizu==              59) Sansa c200v2
+ 121) VX767               110) M6SL              60) Sansa Clipv2
+ 122) VX747+              111) M6SP              61) Sansa View
+ 123) VX777               112) M3                62) Sansa Clip+
+                                                 63) Sansa Fuze v2
+ ==Samsung==              ==Tatung==
+ 140) YH-820              150) Elio TPJ-1022     ==Logik==
+ 141) YH-920                                     80) DAX 1GB MP3/DAB
+ 142) YH-925              ==Packard Bell==       
+ 143) YP-S3               160) Vibe 500          ==Lyre project==
+                                                 130) Lyre proto 1
+ ==MPIO==                 == Application ==      131) Mini2440
+ 170) HD200               200) Application
  171) HD300
 
 EOF
@@ -1658,6 +1657,29 @@ fi
     t_cpu="arm"
     t_manufacturer="s5l8700"
     t_model="ipodnano2g"
+    ;;
+
+   29|ipod6g)
+    target_id=71
+    modelname="ipod6g"
+    target="-DIPOD_6G"
+    memory=64 # always
+    arm926ejscc
+    tool="$rootdir/tools/scramble -add=ip6g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.ipod"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    bootoutput="bootloader-$modelname.ipod"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8702"
+    t_model="ipod6g"
     ;;
 
    30|iaudiox5)

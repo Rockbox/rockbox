@@ -93,7 +93,8 @@ static inline void load_context(const void* addr)
 
 #if defined(CPU_TCC780X) || defined(CPU_TCC77X) /* Single core only for now */ \
 || CONFIG_CPU == IMX31L || CONFIG_CPU == DM320 || CONFIG_CPU == AS3525 \
-|| CONFIG_CPU == S3C2440 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2
+|| CONFIG_CPU == S3C2440 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2 \
+|| CONFIG_CPU == S5L8702
 /* Use the generic ARMv4/v5/v6 wait for IRQ */
 static inline void core_sleep(void)
 {

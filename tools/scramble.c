@@ -125,7 +125,8 @@ void usage(void)
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
     printf("\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
-           "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30)\n");
+           "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
+           "\t                   ip6g)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -332,6 +333,8 @@ int main (int argc, char** argv)
             modelnum = 69;
         else if (!strcmp(&argv[1][5], "hd30")) /* MPIO HD300 */
             modelnum = 70;
+        else if (!strcmp(&argv[1][5], "ip6g")) /* iPod Classic/6G */
+            modelnum = 71;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

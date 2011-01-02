@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define ASM
 #include "config.h"
 #include "cpu.h"
 
@@ -27,7 +28,7 @@
 /* MMU present but unused */
 #define HAVE_TEST_AND_CLEAN_CACHE
 
-#elif CONFIG_CPU == DM320 || CONFIG_CPU == AS3525v2
+#elif CONFIG_CPU == DM320 || CONFIG_CPU == AS3525v2 || CONFIG_CPU == S5L8702
 #define USE_MMU
 #define HAVE_TEST_AND_CLEAN_CACHE
 

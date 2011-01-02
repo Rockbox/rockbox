@@ -71,6 +71,10 @@ OUTPUT_FORMAT(elf32-littlemips)
 #else
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE - TTB_SIZE)
 #endif
+#elif CONFIG_CPU==S5L8702
+#define ASM
+#include "cpu.h"
+#define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE)
 #endif
 
  /* default to full RAM (minus codecs&plugins) unless specified otherwise */
@@ -149,6 +153,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMORIG 0x08000000
 #define IRAMORIG (0x00000000 + (48*1024))
 #define IRAMSIZE (128*1024)
+
+#elif CONFIG_CPU==S5L8702
+/* S5L8702 have 256KB of IRAM */
+#define DRAMORIG 0x08000000
+#define IRAMORIG (0x00000000 + (56*1024))
+#define IRAMSIZE (200*1024)
 
 #elif CONFIG_CPU == JZ4732
 #define DRAMORIG 0x80004000 + STUBOFFSET

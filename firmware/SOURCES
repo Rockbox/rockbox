@@ -333,6 +333,8 @@ drivers/audio/mas35xx.c
 drivers/audio/ak4537.c
 #elif defined(HAVE_UDA1341)
 drivers/audio/uda1341.c
+#elif defined(HAVE_CS42L55)
+drivers/audio/cs42l55.c
 #endif /* defined(HAVE_*) */
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
@@ -455,6 +457,8 @@ target/arm/i2c-telechips.c
 /* no i2c driver yet */
 #elif CONFIG_I2C == I2C_S5L8700
 target/arm/s5l8700/i2c-s5l8700.c
+#elif CONFIG_I2C == I2C_S5L8702
+target/arm/s5l8702/i2c-s5l8702.c
 #endif
 
 #if CONFIG_CPU == PNX0101
@@ -525,8 +529,10 @@ target/arm/tcc77x/crt0.S
 target/arm/tcc780x/crt0.S
 #elif CONFIG_CPU==IMX31L
 target/arm/imx31/crt0.S
-#elif defined(CPU_S5L870X)
+#elif CONFIG_CPU==S5L8700 || CONFIG_CPU==S5L8701
 target/arm/s5l8700/crt0.S
+#elif CONFIG_CPU==S5L8702
+target/arm/s5l8702/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
@@ -1441,13 +1447,7 @@ target/arm/tcc780x/cowond2/audio-cowond2.c
 #endif /* COWON_D2 */
 
 #ifdef CPU_S5L870X
-target/arm/s5l8700/system-s5l8700.c
 target/arm/mmu-arm.S
-#ifndef SIMULATOR
-#ifndef BOOTLOADER
-target/arm/s5l8700/timer-s5l8700.c
-#endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif
 
 #ifdef MEIZU_M6SL
@@ -1504,6 +1504,7 @@ target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/postmortemstub.S
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/dma-s5l8700.c
+target/arm/s5l8700/system-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-asm-nano2g.S
@@ -1515,11 +1516,40 @@ target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
 #ifndef BOOTLOADER
 target/arm/usb-s3c6400x.c
+target/arm/s5l8700/timer-s5l8700.c
 target/arm/s5l8700/debug-s5l8700.c
 target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/adc-nano2g.c
+#endif
+#endif
+#endif
+
+#ifdef IPOD_6G
+#ifndef SIMULATOR
+target/arm/ipod/button-clickwheel.c
+target/arm/s5l8702/ipod6g/cscodec-ipod6g.c
+target/arm/s5l8702/ipod6g/backlight-ipod6g.c
+target/arm/s5l8702/ipod6g/powermgmt-ipod6g.c
+target/arm/s5l8702/ipod6g/power-ipod6g.c
+target/arm/s5l8702/kernel-s5l8702.c
+target/arm/s5l8702/system-s5l8702.c
+target/arm/s5l8702/ipod6g/lcd-ipod6g.c
+target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
+target/arm/s5l8702/ipod6g/ata-ipod6g.c
+#if 0 //TODO
+target/arm/s5l8702/postmortemstub.S
+#endif
+target/arm/s5l8702/ipod6g/pmu-ipod6g.c
+target/arm/s5l8702/ipod6g/rtc-ipod6g.c
+#ifndef BOOTLOADER
+target/arm/usb-s3c6400x.c
+target/arm/s5l8702/timer-s5l8702.c
+target/arm/s5l8702/debug-s5l8702.c
+target/arm/s5l8702/pcm-s5l8702.c
+target/arm/s5l8702/ipod6g/audio-ipod6g.c
+target/arm/s5l8702/ipod6g/adc-ipod6g.c
 #endif
 #endif
 #endif
