@@ -576,6 +576,7 @@ struct user_settings
     bool tagcache_ram;        /* load tagcache to ram? */
 #endif
     bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
+    bool autoresume_enable;   /* enable autoupdate feature? */
     bool runtimedb;           /* runtime database active? */
 #endif /* HAVE_TAGCACHE */
 

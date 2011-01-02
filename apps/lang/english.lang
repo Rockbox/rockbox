@@ -12685,3 +12685,31 @@
     *: "Filesize"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Enable automatic resume"
+  </dest>
+  <voice>
+    *: "Enable automatic resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Yes (requires initialized database)"
+  </dest>
+  <voice>
+    *: "Yes (requires initialized database)"
+  </voice>
+</phrase>

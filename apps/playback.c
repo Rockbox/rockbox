@@ -992,13 +992,27 @@ long audio_filebufused(void)
 /* Update track info after successful a codec track change */
 static void audio_update_trackinfo(void)
 {
+    bool resume = false;
+
     /* Load the curent track's metadata into curtrack_id3 */
     if (CUR_TI->id3_hid >= 0)
         copy_mp3entry(thistrack_id3, bufgetid3(CUR_TI->id3_hid));
 
     /* Reset current position */
     thistrack_id3->elapsed = 0;
-    thistrack_id3->offset = 0;
+
+#ifdef HAVE_TAGCACHE
+    /* Resume all manually selected tracks if so configured */
+    resume = global_settings.autoresume_enable && !automatic_skip;
+#endif
+
+    if (!resume)
+    {
+        thistrack_id3->offset = 0;
+    }
+
+    logf("audio_update_trackinfo: Set offset for %s to %lX\n",
+         thistrack_id3->title, thistrack_id3->offset);
 
     /* Update the codec API */
     ci.filesize = CUR_TI->filesize;
@@ -1210,6 +1224,9 @@ static bool audio_load_track(size_t offset, bool start_play)
             {    
                 copy_mp3entry(thistrack_id3, id3);
                 thistrack_id3->offset = offset;
+                logf("audio_load_track: set offset for %s to %lX\n",
+                     thistrack_id3->title,
+                     offset);
             }
             else
                 memset(thistrack_id3, 0, sizeof(struct mp3entry));
@@ -1415,8 +1432,14 @@ static void audio_finish_load_track(void)
         return;
     }
 
-    /* All required data is now available for the codec. */
-    tracks[track_widx].taginfo_ready = true;
+    /* All required data is now available for the codec -- unless the
+       autoresume feature is in effect.  In the latter case, the codec
+       must wait until after PLAYBACK_EVENT_TRACK_BUFFER, which may
+       generate a resume position.  */
+#ifdef HAVE_TAGCACHE
+    if (! global_settings.autoresume_enable)
+#endif
+        tracks[track_widx].taginfo_ready = true;
 
     if (start_play)
     {
@@ -1424,9 +1447,16 @@ static void audio_finish_load_track(void)
         buf_request_buffer_handle(tracks[track_widx].audio_hid);
     }
 
-    track_widx = (track_widx + 1) & MAX_TRACK_MASK;
-
     send_event(PLAYBACK_EVENT_TRACK_BUFFER, track_id3);
+
+#ifdef HAVE_TAGCACHE
+    /* In case the autoresume feature has been enabled, finally all
+       required data is available for the codec. */
+    if (global_settings.autoresume_enable)
+        tracks[track_widx].taginfo_ready = true;
+#endif
+
+    track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
     /* load next track */
     LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER");

@@ -1257,6 +1257,9 @@ const struct settings_list settings[] = {
                    ID2P(LANG_RANDOM)),
 
 #ifdef HAVE_TAGCACHE
+    BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME_ENABLE, false,
+                 "autoresume enable", off_on,
+                 LANG_AUTORESUME_ENABLE_YES, LANG_SET_BOOL_NO, NULL),
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
                   "gather runtime data", NULL),
 #endif

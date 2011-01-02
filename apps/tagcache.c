@@ -195,7 +195,7 @@ static const char *tagfile_entry_ec   = "ll";
 /**
  Note: This should be (1 + TAG_COUNT) amount of l's.
  */
-static const char *index_entry_ec     = "lllllllllllllllllllll";
+static const char *index_entry_ec     = "llllllllllllllllllllll";
 
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
@@ -1695,6 +1695,13 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     if (id3->bitrate == 0)
         id3->bitrate = 1;
 
+    if (global_settings.autoresume_enable)
+    {
+        id3->offset = get_tag_numeric(entry, tag_lastoffset, idx_id);
+        logf("tagcache_fill_tags: Set offset for %s to %lX\n", 
+             id3->title, id3->offset);
+    }
+    
     return true;
 }
 #endif
@@ -2315,6 +2322,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                 tmpdb_copy_tag(tag_playtime);
                 tmpdb_copy_tag(tag_lastplayed);
                 tmpdb_copy_tag(tag_commitid);
+                tmpdb_copy_tag(tag_lastoffset);
                 
                 /* Avoid processing this entry again. */
                 idx.flag |= FLAG_RESURRECTED;

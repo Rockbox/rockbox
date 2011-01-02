@@ -53,6 +53,8 @@
 #include "storage.h"
 #include "dir.h"
 
+#define str_or_empty(x) (x ? x : "(NULL)")
+
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
 static int tagtree_play_folder(struct tree_context* c);
@@ -168,6 +170,8 @@ static int current_entry_count;
 
 static struct tree_context *tc;
 
+extern bool automatic_skip; /* Who initiated in-progress skip? (C/A-) */
+
 static int get_token_str(char *buf, int size)
 {
     /* Find the start. */
@@ -239,6 +243,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "playcount", tag_playcount);
     MATCH(tag, buf, "rating", tag_rating);
     MATCH(tag, buf, "lastplayed", tag_lastplayed);
+    MATCH(tag, buf, "lastoffset", tag_lastoffset);
     MATCH(tag, buf, "commitid", tag_commitid);
     MATCH(tag, buf, "entryage", tag_virt_entryage);
     MATCH(tag, buf, "autoscore", tag_virt_autoscore);
@@ -647,7 +652,7 @@ static void tagtree_buffer_event(void *data)
     struct mp3entry *id3 = (struct mp3entry*)data;
     
     /* Do not gather data unless proper setting has been enabled. */
-    if (!global_settings.runtimedb)
+    if (!global_settings.runtimedb && !global_settings.autoresume_enable)
         return;
 
     logf("be:%s", id3->path);
@@ -661,12 +666,30 @@ static void tagtree_buffer_event(void *data)
         return;
     }
     
-    id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
-    if (!id3->rating)
-        id3->rating = tagcache_get_numeric(&tcs, tag_rating);
-    id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
-    id3->score      = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
-    id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
+    if (global_settings.runtimedb)
+    {
+        id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
+        if (!id3->rating)
+            id3->rating = tagcache_get_numeric(&tcs, tag_rating);
+        id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
+        id3->score      = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
+        id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
+        
+        logf("-> %ld/%ld", id3->playcount, id3->playtime);
+    }
+    
+    if (global_settings.autoresume_enable)
+    {
+        /* Load current file resume offset if not already defined (by
+           another resume mechanism) */
+        if (id3->offset == 0)
+        {
+            id3->offset = tagcache_get_numeric(&tcs, tag_lastoffset);
+
+            logf("tagtree_buffer_event: Set offset for %s to %lX\n", 
+                 str_or_empty(id3->title), id3->offset);
+        }
+    }
     
     /* Store our tagcache index pointer. */
     id3->tagcache_idx = tcs.idx_id+1;
@@ -676,16 +699,14 @@ static void tagtree_buffer_event(void *data)
 
 static void tagtree_track_finish_event(void *data)
 {
-    long playcount;
-    long playtime;
     long lastplayed;
     long tagcache_idx;
     struct mp3entry *id3 = (struct mp3entry*)data;
     
     /* Do not gather data unless proper setting has been enabled. */
-    if (!global_settings.runtimedb)
+    if (!global_settings.runtimedb && !global_settings.autoresume_enable)
     {
-        logf("runtimedb gathering not enabled");
+        logf("runtimedb gathering and autoresume not enabled");
         return;
     }
     
@@ -704,7 +725,6 @@ static void tagtree_track_finish_event(void *data)
         return;
     }
     
-    playcount = id3->playcount + 1;
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
@@ -712,17 +732,37 @@ static void tagtree_track_finish_event(void *data)
         return;
     }
     
-    /* Ignore the last 15s (crossfade etc.) */
-    playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
-    
-    logf("ube:%s", id3->path);
-    logf("-> %ld/%ld", playcount, playtime);
-    logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
+    if (global_settings.runtimedb)
+    {
+        long playcount;
+        long playtime;
 
-    /* Queue the updates to the tagcache system. */
-    tagcache_update_numeric(tagcache_idx, tag_playcount, playcount);
-    tagcache_update_numeric(tagcache_idx, tag_playtime, playtime);
-    tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
+        playcount = id3->playcount + 1;
+        
+        /* Ignore the last 15s (crossfade etc.) */
+        playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
+        
+        logf("ube:%s", id3->path);
+        logf("-> %ld/%ld", playcount, playtime);
+        logf("-> %ld/%ld/%ld", id3->elapsed, id3->length,
+             MIN(id3->length, id3->elapsed + 15 * 1000));
+
+        /* Queue the updates to the tagcache system. */
+        tagcache_update_numeric(tagcache_idx, tag_playcount, playcount);
+        tagcache_update_numeric(tagcache_idx, tag_playtime, playtime);
+        tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
+    }
+
+    if (global_settings.autoresume_enable)
+    {
+        unsigned long offset
+            = automatic_skip ? 0 : id3->offset;
+
+        tagcache_update_numeric(tagcache_idx, tag_lastoffset, offset);
+
+        logf("tagtree_track_finish_event: Save offset for %s: %lX",  
+             str_or_empty(id3->title), offset);
+    }
 }
 
 bool tagtree_export(void)

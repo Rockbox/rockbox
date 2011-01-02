@@ -32,7 +32,7 @@
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
     tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
-    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
+    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime, tag_lastoffset,
     /* Real tags end here, count them. */
     TAG_COUNT,
     /* Virtual tags */
@@ -50,7 +50,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480d
+#define TAGCACHE_MAGIC  0x5443480e
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
@@ -103,6 +103,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_tracknumber) | (1LU << tag_length) | (1LU << tag_bitrate) | \
     (1LU << tag_playcount) | (1LU << tag_rating) | (1LU << tag_playtime) | \
     (1LU << tag_lastplayed) | (1LU << tag_commitid) | (1LU << tag_mtime) | \
+    (1LU << tag_lastoffset) | \
     (1LU << tag_virt_length_min) | (1LU << tag_virt_length_sec) | \
     (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
     (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
