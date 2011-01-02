@@ -170,7 +170,9 @@ static int current_entry_count;
 
 static struct tree_context *tc;
 
+#if CONFIG_CODEC == SWCODEC 
 extern bool automatic_skip; /* Who initiated in-progress skip? (C/A-) */
+#endif
 
 static int get_token_str(char *buf, int size)
 {
@@ -677,7 +679,8 @@ static void tagtree_buffer_event(void *data)
         
         logf("-> %ld/%ld", id3->playcount, id3->playtime);
     }
-    
+ 
+ #if CONFIG_CODEC == SWCODEC   
     if (global_settings.autoresume_enable)
     {
         /* Load current file resume offset if not already defined (by
@@ -690,7 +693,8 @@ static void tagtree_buffer_event(void *data)
                  str_or_empty(id3->title), id3->offset);
         }
     }
-    
+ #endif
+ 
     /* Store our tagcache index pointer. */
     id3->tagcache_idx = tcs.idx_id+1;
     
@@ -753,6 +757,7 @@ static void tagtree_track_finish_event(void *data)
         tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
     }
 
+#if CONFIG_CODEC == SWCODEC 
     if (global_settings.autoresume_enable)
     {
         unsigned long offset
@@ -763,6 +768,7 @@ static void tagtree_track_finish_event(void *data)
         logf("tagtree_track_finish_event: Save offset for %s: %lX",  
              str_or_empty(id3->title), offset);
     }
+#endif
 }
 
 bool tagtree_export(void)
