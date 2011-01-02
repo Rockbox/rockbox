@@ -448,6 +448,19 @@ static int fat_mount_internal(IF_MV2(int volume,) IF_MD2(int drive,) long starts
     return 0;
 }
 
+#ifdef MAX_LOG_SECTOR_SIZE
+int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume))
+{
+#ifdef HAVE_MULTIVOLUME
+    if(!fat_bpbs[volume].mounted)
+        return 0;
+    return fat_bpbs[volume].bpb_bytspersec;
+#else
+    return fat_bpbs[0].bpb_bytspersec;
+#endif
+}
+#endif
+
 int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
 {
 #ifndef HAVE_MULTIVOLUME

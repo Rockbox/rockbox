@@ -99,6 +99,7 @@ extern void fat_unlock(void);
 #endif
 
 extern void fat_init(void);
+extern int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
 extern int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector);
 extern int fat_unmount(int volume, bool flush);
 extern void fat_size(IF_MV2(int volume,) /* public for info */
