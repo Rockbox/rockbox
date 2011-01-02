@@ -25,6 +25,40 @@
 #include "config.h" /* for HAVE_MULTIVOLUME or not */
 #include "mv.h" /* for IF_MV() and friends */
 
+#ifndef ATA_OUT8
+#define ATA_OUT8(reg, data) (reg) = (data)
+#endif
+#ifndef ATA_OUT16
+#define ATA_OUT16(reg, data) (reg) = (data)
+#endif
+#ifndef ATA_IN8
+#define ATA_IN8(reg) (reg)
+#endif
+#ifndef ATA_IN16
+#define ATA_IN16(reg) (reg)
+#endif
+#ifndef ATA_SWAP_IDENTIFY
+#define ATA_SWAP_IDENTIFY(word) (word)
+#endif
+
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_DRQ      0x08
+#define STATUS_ERR      0x01
+#define STATUS_DF       0x20
+#define ERROR_IDNF      0x10
+#define ERROR_ABRT      0x04
+
+#define TEST_PATTERN1   0xa5
+#define TEST_PATTERN2   0x5a
+#define TEST_PATTERN3   0xaa
+#define TEST_PATTERN4   0x55
+
+#define ATA_FEATURE     ATA_ERROR
+
+#define ATA_STATUS      ATA_COMMAND
+#define ATA_ALT_STATUS  ATA_CONTROL
+
 struct storage_info;
 
 void ata_enable(bool on);

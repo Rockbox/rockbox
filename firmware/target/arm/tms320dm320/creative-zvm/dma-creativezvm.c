@@ -25,6 +25,7 @@
 #include "system.h"
 #include "dma-target.h"
 #include "dm320.h"
+#include "ata.h"
 #include "ata-target.h"
 #include <stdbool.h>
 
