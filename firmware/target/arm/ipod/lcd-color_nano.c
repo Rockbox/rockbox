@@ -32,6 +32,9 @@
 #include "system.h"
 #include "hwcompat.h"
 
+/*** macros ***/
+#define SWAP_INT(X,Y) {int tmp=X; X=Y; Y=tmp;}
+
 /* LCD command codes for HD66789R */
 #define LCD_CNTL_RAM_ADDR_SET           0x21
 #define LCD_CNTL_WRITE_TO_GRAM          0x22
@@ -120,241 +123,164 @@ void lcd_init_device(void)
 #endif
 }
 
-/*** update functions ***/
-extern void lcd_yuv_write_inner_loop(unsigned char const * const ysrc,
-                                     unsigned char const * const usrc,
-                                     unsigned char const * const vsrc,
-                                     int width);
+/* Helper function to set up drawing region and start drawing */
+static void lcd_setup_drawing_region(int x, int y, int width, int height)
+{
+    int y0, x0, y1, x1;
+    
+    /* calculate the drawing region */
+#if CONFIG_LCD == LCD_IPODNANO
+    y0 = x;                         /* start horiz */
+    x0 = y;                         /* start vert */
+    y1 = (x + width) - 1;           /* max horiz */
+    x1 = (y + height) - 1;          /* max vert */
+#elif CONFIG_LCD == LCD_IPODCOLOR
+    y0 = y;                         /* start vert */
+    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
+    y1 = (y + height) - 1;          /* end vert */
+    x1 = (x0 - width) + 1;          /* end horiz */
+#endif
 
-#define CSUB_X 2
-#define CSUB_Y 2
+    /* setup the drawing region */
+    if (lcd_type == 0) {
+        lcd_cmd_data(0x12, y0);      /* start vert */
+        lcd_cmd_data(0x13, x0);      /* start horiz */
+        lcd_cmd_data(0x15, y1);      /* end vert */
+        lcd_cmd_data(0x16, x1);      /* end horiz */
+    } else {
+        if (y1 < y0) SWAP_INT(y0,y1) /* swap max horiz < start horiz */
+        if (x1 < x0) SWAP_INT(x0,x1) /* swap max vert  < start vert  */
+
+        /* max horiz << 8 | start horiz */
+        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
+        /* max vert << 8 | start vert */
+        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (x1 << 8) | x0);
+
+        /* start vert = max vert */
+#if CONFIG_LCD == LCD_IPODCOLOR
+        x0 = x1;
+#endif
+
+        /* position cursor (set AD0-AD15) */
+        /* start vert << 8 | start horiz */
+        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
+
+        /* start drawing */
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK;
+        LCD2_PORT = (LCD2_CMD_MASK|LCD_CNTL_WRITE_TO_GRAM);
+    }
+}
+
+/* Line write helper function for lcd_yuv_blit. Writes two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   const unsigned int lcd_baseadress,
+                                   int width,
+                                   int stride);
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    int h;
-    int y0, x0, y1, x1;
+    int z;
+    unsigned char const * yuv_src[3];
 
-    width = (width + 1) & ~1;
+    width  = (width  + 1) & ~1; /* ensure width is even  */
+    height = (height + 1) & ~1; /* ensure height is even */
 
-    /* calculate the drawing region */
-#if CONFIG_LCD == LCD_IPODNANO
-    y0 = x;                         /* start horiz */
-    x0 = y;                         /* start vert */
-    y1 = (x + width) - 1;           /* max horiz */
-    x1 = (y + height) - 1;          /* max vert */
-#elif CONFIG_LCD == LCD_IPODCOLOR
-    y0 = y;                         /* start vert */
-    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
-    y1 = (y + height) - 1;          /* end vert */
-    x1 = (x0 - width) + 1;          /* end horiz */
-#endif
+    lcd_setup_drawing_region(x, y, width, height);
 
-    /* setup the drawing region */
-    if (lcd_type == 0) {
-        lcd_cmd_data(0x12, y0);      /* start vert */
-        lcd_cmd_data(0x13, x0);      /* start horiz */
-        lcd_cmd_data(0x15, y1);      /* end vert */
-        lcd_cmd_data(0x16, x1);      /* end horiz */
-    } else {
-        /* swap max horiz < start horiz */
-        if (y1 < y0) {
-            int t;
-            t = y0;
-            y0 = y1;
-            y1 = t;
-        }
-
-        /* swap max vert < start vert */
-        if (x1 < x0) {
-            int t;
-            t = x0;
-            x0 = x1;
-            x1 = t;
-        }
-
-        /* max horiz << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
-        /* max vert << 8 | start vert */
-        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (x1 << 8) | x0);
-
-        /* start vert = max vert */
-#if CONFIG_LCD == LCD_IPODCOLOR
-        x0 = x1;
-#endif
-
-        /* position cursor (set AD0-AD15) */
-        /* start vert << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
-
-        /* start drawing */
-        lcd_wait_write();
-        LCD2_PORT = LCD2_CMD_MASK;
-        LCD2_PORT = (LCD2_CMD_MASK|LCD_CNTL_WRITE_TO_GRAM);
-    }
-
-    const int stride_div_csub_x = stride/CSUB_X;
-
-    h=0;
-    while (1)
-    {
-        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-
-        const int uvoffset = stride_div_csub_x * (src_y/CSUB_Y) +
-                             (src_x/CSUB_X);
-
-        const unsigned char *usrc = src[1] + uvoffset;
-        const unsigned char *vsrc = src[2] + uvoffset;
-
-        int pixels_to_write;
-
-        if (h==0)
-        {
-            while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
-            LCD2_BLOCK_CONFIG = 0;
-
-            if (height == 0) break;
-
-            pixels_to_write = (width * height) * 2;
-            h = height;
-
-            /* calculate how much we can do in one go */
-            if (pixels_to_write > 0x10000)
-            {
-                h = (0x10000/2) / width;
-                pixels_to_write = (width * h) * 2;
-            }
-
-            height -= h;
-            LCD2_BLOCK_CTRL = 0x10000080;
-            LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
-            LCD2_BLOCK_CTRL = 0x34000000;
-        }
-
-        lcd_yuv_write_inner_loop(ysrc,usrc,vsrc,width);
-
-        src_y++;
-        h--;
-    }
-
-    while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
-    LCD2_BLOCK_CONFIG = 0;
-}
-
-
-/* Update a fraction of the display. */
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    int y0, x0, y1, x1;
-    int newx,newwidth;
-    unsigned long *addr;
-
-    /* Ensure x and width are both even - so we can read 32-bit aligned 
-       data from lcd_framebuffer */
-    newx=x&~1;
-    newwidth=width&~1;
-    if (newx+newwidth < x+width) { newwidth+=2; }
-    x=newx; width=newwidth;
-
-    /* calculate the drawing region */
-#if CONFIG_LCD == LCD_IPODNANO
-    y0 = x;                         /* start horiz */
-    x0 = y;                         /* start vert */
-    y1 = (x + width) - 1;           /* max horiz */
-    x1 = (y + height) - 1;          /* max vert */
-#elif CONFIG_LCD == LCD_IPODCOLOR
-    y0 = y;                         /* start vert */
-    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
-    y1 = (y + height) - 1;          /* end vert */
-    x1 = (x0 - width) + 1;          /* end horiz */
-#endif
-    /* setup the drawing region */
-    if (lcd_type == 0) {
-        lcd_cmd_data(0x12, y0);      /* start vert */
-        lcd_cmd_data(0x13, x0);      /* start horiz */
-        lcd_cmd_data(0x15, y1);      /* end vert */
-        lcd_cmd_data(0x16, x1);      /* end horiz */
-    } else {
-        /* swap max horiz < start horiz */
-        if (y1 < y0) {
-            int t;
-            t = y0;
-            y0 = y1;
-            y1 = t;
-        }
-
-        /* swap max vert < start vert */
-        if (x1 < x0) {
-            int t;
-            t = x0;
-            x0 = x1;
-            x1 = t;
-        }
-
-        /* max horiz << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
-        /* max vert << 8 | start vert */
-        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (x1 << 8) | x0);
-
-        /* start vert = max vert */
-#if CONFIG_LCD == LCD_IPODCOLOR
-        x0 = x1;
-#endif
-
-        /* position cursor (set AD0-AD15) */
-        /* start vert << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
-
-        /* start drawing */
-        lcd_wait_write();
-        LCD2_PORT = LCD2_CMD_MASK;
-        LCD2_PORT = (LCD2_CMD_MASK|LCD_CNTL_WRITE_TO_GRAM);
-    }
-
-    addr = (unsigned long*)&lcd_framebuffer[y][x];
+    z = stride * src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
     while (height > 0) {
-        int c, r;
-        int h, pixels_to_write;
+        int r, h, pixels_to_write;
 
         pixels_to_write = (width * height) * 2;
         h = height;
 
         /* calculate how much we can do in one go */
         if (pixels_to_write > 0x10000) {
-            h = (0x10000/2) / width;
+            h = ((0x10000/2) / width) & ~1; /* ensure h is even */
+            pixels_to_write = (width * h) * 2;
+        }
+        
+        LCD2_BLOCK_CTRL   = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL   = 0x34000000;
+
+        r = h>>1; /* lcd_write_yuv420_lines writes two lines at once */
+        do {
+            lcd_write_yuv420_lines(yuv_src, LCD2_BASE, width, stride);
+            yuv_src[0] += stride << 1;
+            yuv_src[1] += stride >> 1;
+            yuv_src[2] += stride >> 1;
+        } while (--r > 0);
+        
+        /* transfer of pixels_to_write bytes finished */
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
+        
+        height -= h;
+    }
+}
+
+/* Helper function writes 'count' consecutive pixels from src to LCD IF */
+static void lcd_write_line(int count, unsigned long *src)
+{
+    do {
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK)); /* FIFO wait */
+        LCD2_BLOCK_DATA = *src++;                     /* output 2 pixels */
+        count -= 2;
+    } while (count > 0);
+}
+
+/* Update a fraction of the display. */
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    unsigned long *addr;
+
+    /* Ensure both x and width are even to be able to read 32-bit aligned 
+     * data from lcd_framebuffer */
+    x     =  x & ~1;            /* use the smaller even number */
+    width = (width + 1) & ~1;   /* use the bigger even number  */
+
+    lcd_setup_drawing_region(x, y, width, height);
+
+    addr = (unsigned long*)&lcd_framebuffer[y][x];
+
+    while (height > 0) {
+        int r, h, pixels_to_write;
+
+        pixels_to_write = (width * height) * 2;
+        h = height;
+
+        /* calculate how much we can do in one go */
+        if (pixels_to_write > 0x10000) {
+            h = ((0x10000/2) / width) & ~1; /* ensure h is even */
             pixels_to_write = (width * h) * 2;
         }
 
-        LCD2_BLOCK_CTRL = 0x10000080;
+        LCD2_BLOCK_CTRL   = 0x10000080;
         LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
-        LCD2_BLOCK_CTRL = 0x34000000;
+        LCD2_BLOCK_CTRL   = 0x34000000;
 
         if (LCD_WIDTH == width) {
-            /* for each row and column in a single loop */
-            for (r = 0; r < h*width; r += 2) {
-                    while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
-    
-                    /* output 2 pixels */
-                    LCD2_BLOCK_DATA = *addr++;
-            }
+            /* for each row and column in a single call */
+            lcd_write_line(h*width, addr);
+            addr += LCD_WIDTH/2*h;
         } else {
             /* for each row */
             for (r = 0; r < h; r++) {
-                /* for each column */
-                for (c = 0; c < width; c += 2) {
-                    while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
-    
-                    /* output 2 pixels */
-                    LCD2_BLOCK_DATA = *addr++;
-                }
-                addr += (LCD_WIDTH - width)/2;
+                lcd_write_line(width, addr);
+                addr += LCD_WIDTH/2;
             }
         }
 
+        /* transfer of pixels_to_write bytes finished */
         while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
         LCD2_BLOCK_CONFIG = 0;
 
