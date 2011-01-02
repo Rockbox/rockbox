@@ -39,33 +39,6 @@
 #define ATA_SELECT      (*((volatile unsigned char*)ATA_IOBASE + 6))
 #define ATA_COMMAND     (*((volatile unsigned char*)ATA_IOBASE + 7))
 
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-
-#define ERROR_ABRT      0x04
-#define ERROR_IDNF      0x10
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
-
-#define READ_PATTERN1_MASK 0xff
-#define READ_PATTERN2_MASK 0xff
-#define READ_PATTERN3_MASK 0xff
-#define READ_PATTERN4_MASK 0xff
-
-#define SET_REG(reg,val) reg = (val)
-#define SET_16BITREG(reg,val) reg = (val)
-
 extern volatile unsigned char* ata_control;
 
 void ata_reset(void);

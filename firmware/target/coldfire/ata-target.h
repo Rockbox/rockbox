@@ -37,32 +37,10 @@
 #define ATA_SELECT      (*((volatile unsigned short*)(ATA_IOBASE + 0x2c)))
 #define ATA_COMMAND     (*((volatile unsigned short*)(ATA_IOBASE + 0x2e)))
 
-#define STATUS_BSY      0x8000
-#define STATUS_RDY      0x4000
-#define STATUS_DF       0x2000
-#define STATUS_DRQ      0x0800
-#define STATUS_ERR      0x0100
-
-#define ERROR_ABRT      0x0400
-#define ERROR_IDNF      0x1000
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa500
-#define READ_PATTERN2 0x5a00
-#define READ_PATTERN3 0xaa00
-#define READ_PATTERN4 0x5500
-
-#define READ_PATTERN1_MASK 0xff00
-#define READ_PATTERN2_MASK 0xff00
-#define READ_PATTERN3_MASK 0xff00
-#define READ_PATTERN4_MASK 0xff00
-
-#define SET_REG(reg,val) reg = ((val) << 8)
-#define SET_16BITREG(reg,val) reg = (val)
+#define ATA_OUT8(reg,val) reg = ((val) << 8)
+#define ATA_OUT16(reg,val) reg = swap16(val)
+#define ATA_IN8(reg) ((reg) >> 8)
+#define ATA_IN16(reg) (swap16(reg))
 
 void ata_reset(void);
 void ata_enable(bool on);

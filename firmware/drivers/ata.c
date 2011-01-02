@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <inttypes.h>
 #include "ata.h"
 #include "kernel.h"
 #include "thread.h"
@@ -34,7 +35,37 @@
 #include "ata-target.h"
 #include "storage.h"
 
-#define SECTOR_SIZE     (512)
+
+#ifndef ATA_OUT8
+#define ATA_OUT8(reg, data) (reg) = (data)
+#endif
+#ifndef ATA_OUT16
+#define ATA_OUT16(reg, data) (reg) = (data)
+#endif
+#ifndef ATA_IN8
+#define ATA_IN8(reg) (reg)
+#endif
+#ifndef ATA_IN16
+#define ATA_IN16(reg) (reg)
+#endif
+#ifndef ATA_SWAP_IDENTIFY
+#define ATA_SWAP_IDENTIFY(word) (word)
+#endif
+
+#define SECTOR_SIZE     512
+
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_DRQ      0x08
+#define STATUS_ERR      0x01
+#define STATUS_DF       0x20
+#define ERROR_IDNF      0x10
+#define ERROR_ABRT      0x04
+
+#define TEST_PATTERN1   0xa5
+#define TEST_PATTERN2   0x5a
+#define TEST_PATTERN3   0xaa
+#define TEST_PATTERN4   0x55
 
 #define ATA_FEATURE     ATA_ERROR
 
@@ -210,7 +241,7 @@ STATICIRAM ICODE_ATTR int wait_for_bsy(void)
     
     do 
     {
-        if (!(ATA_STATUS & STATUS_BSY))
+        if (!(ATA_IN8(ATA_STATUS) & STATUS_BSY))
             return 1;
         last_disk_activity = current_tick;
         yield();
@@ -230,7 +261,7 @@ STATICIRAM ICODE_ATTR int wait_for_rdy(void)
     
     do 
     {
-        if (ATA_ALT_STATUS & STATUS_RDY)
+        if (ATA_IN8(ATA_ALT_STATUS) & STATUS_RDY)
             return 1;
         last_disk_activity = current_tick;
         yield();
@@ -244,14 +275,14 @@ STATICIRAM ICODE_ATTR int wait_for_start_of_transfer(void)
     if (!wait_for_bsy())
         return 0;
 
-    return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
+    return (ATA_IN8(ATA_ALT_STATUS) & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
 STATICIRAM ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_ALT_STATUS & 
+    return (ATA_IN8(ATA_ALT_STATUS) & 
             (STATUS_BSY|STATUS_RDY|STATUS_DF|STATUS_DRQ|STATUS_ERR))
            == STATUS_RDY;
 }    
@@ -279,8 +310,8 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
         unsigned char* bufend = buf + wordcount*2;
         do
         {
-            tmp = ATA_DATA;
-#if defined(ATA_SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
+            tmp = ATA_IN16(ATA_DATA);
+#if defined(ROCKBOX_LITTLE_ENDIAN)
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
 #else
@@ -295,11 +326,7 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
         unsigned short* wbufend = wbuf + wordcount;
         do
         {
-#ifdef ATA_SWAP_WORDS
-            *wbuf = swap16(ATA_DATA);
-#else
-            *wbuf = ATA_DATA;
-#endif
+            *wbuf = ATA_IN16(ATA_DATA);
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 }
@@ -315,15 +342,14 @@ STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
         const unsigned char* bufend = buf + wordcount*2;
         do
         {
-#if defined(ATA_SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
+#if defined(ROCKBOX_LITTLE_ENDIAN)
             tmp = (unsigned short) *buf++;
             tmp |= (unsigned short) *buf++ << 8;
-            SET_16BITREG(ATA_DATA, tmp);
 #else
             tmp = (unsigned short) *buf++ << 8;
             tmp |= (unsigned short) *buf++;
-            SET_16BITREG(ATA_DATA, tmp);
 #endif
+            ATA_OUT16(ATA_DATA, tmp);
         } while (buf < bufend); /* tail loop is faster */
     }
     else
@@ -332,11 +358,7 @@ STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
         unsigned short* wbufend = wbuf + wordcount;
         do
         {
-#ifdef ATA_SWAP_WORDS
-            SET_16BITREG(ATA_DATA, swap16(*wbuf));
-#else
-            SET_16BITREG(ATA_DATA, *wbuf);
-#endif
+            ATA_OUT16(ATA_DATA, *wbuf);
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 }
@@ -389,7 +411,7 @@ static int ata_transfer_sectors(unsigned long start,
 
     timeout = current_tick + READWRITE_TIMEOUT;
 
-    SET_REG(ATA_SELECT, ata_device);
+    ATA_OUT8(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
         ret = -3;
@@ -412,39 +434,39 @@ static int ata_transfer_sectors(unsigned long start,
 #ifdef HAVE_LBA48
         if (lba48)
         {
-            SET_REG(ATA_NSECTOR, count >> 8);
-            SET_REG(ATA_NSECTOR, count & 0xff);
-            SET_REG(ATA_SECTOR, (start >> 24) & 0xff); /* 31:24 */
-            SET_REG(ATA_SECTOR, start & 0xff); /* 7:0 */
-            SET_REG(ATA_LCYL, 0); /* 39:32 */
-            SET_REG(ATA_LCYL, (start >> 8) & 0xff); /* 15:8 */
-            SET_REG(ATA_HCYL, 0); /* 47:40 */
-            SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
-            SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
+            ATA_OUT8(ATA_NSECTOR, count >> 8);
+            ATA_OUT8(ATA_NSECTOR, count & 0xff);
+            ATA_OUT8(ATA_SECTOR, (start >> 24) & 0xff); /* 31:24 */
+            ATA_OUT8(ATA_SECTOR, start & 0xff); /* 7:0 */
+            ATA_OUT8(ATA_LCYL, 0); /* 39:32 */
+            ATA_OUT8(ATA_LCYL, (start >> 8) & 0xff); /* 15:8 */
+            ATA_OUT8(ATA_HCYL, 0); /* 47:40 */
+            ATA_OUT8(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
+            ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device);
 #ifdef HAVE_ATA_DMA
             if (write)
-                SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA_EXT : CMD_WRITE_MULTIPLE_EXT);
+                ATA_OUT8(ATA_COMMAND, usedma ? CMD_WRITE_DMA_EXT : CMD_WRITE_MULTIPLE_EXT);
             else
-                SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
+                ATA_OUT8(ATA_COMMAND, usedma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
 #else
-            SET_REG(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE_EXT : CMD_READ_MULTIPLE_EXT);
+            ATA_OUT8(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE_EXT : CMD_READ_MULTIPLE_EXT);
 #endif
         }
         else
 #endif
         {
-            SET_REG(ATA_NSECTOR, count & 0xff); /* 0 means 256 sectors */
-            SET_REG(ATA_SECTOR, start & 0xff);
-            SET_REG(ATA_LCYL, (start >> 8) & 0xff);
-            SET_REG(ATA_HCYL, (start >> 16) & 0xff);
-            SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+            ATA_OUT8(ATA_NSECTOR, count & 0xff); /* 0 means 256 sectors */
+            ATA_OUT8(ATA_SECTOR, start & 0xff);
+            ATA_OUT8(ATA_LCYL, (start >> 8) & 0xff);
+            ATA_OUT8(ATA_HCYL, (start >> 16) & 0xff);
+            ATA_OUT8(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
 #ifdef HAVE_ATA_DMA
             if (write)
-                SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_MULTIPLE);
+                ATA_OUT8(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_MULTIPLE);
             else
-                SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
+                ATA_OUT8(ATA_COMMAND, usedma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
 #else
-            SET_REG(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE : CMD_READ_MULTIPLE);
+            ATA_OUT8(ATA_COMMAND, write ? CMD_WRITE_MULTIPLE : CMD_READ_MULTIPLE);
 #endif
         }
 
@@ -501,10 +523,10 @@ static int ata_transfer_sectors(unsigned long start,
                 }
 
                 /* read the status register exactly once per loop */
-                status = ATA_STATUS;
-                error = ATA_ERROR;
+                status = ATA_IN8(ATA_STATUS);
+                error = ATA_IN8(ATA_ERROR);
 
-                if (count >= multisectors )
+                if (count >= multisectors)
                     sectors = multisectors;
                 else
                     sectors = count;
@@ -543,7 +565,7 @@ static int ata_transfer_sectors(unsigned long start,
         if(!ret && !wait_for_end_of_transfer()) {
             int error;
 
-            error = ATA_ERROR;
+            error = ATA_IN8(ATA_ERROR);
             perform_soft_reset();
             ret = -4;
             /* no point retrying IDNF, sector no. was invalid */
@@ -767,20 +789,23 @@ int ata_write_sectors(IF_MD2(int drive,)
 static int check_registers(void)
 {
     int i;
-    if ( ATA_STATUS & STATUS_BSY )
+    wait_for_bsy();
+    if (ATA_IN8(ATA_STATUS) & STATUS_BSY)
             return -1;
 
     for (i = 0; i<64; i++) {
-        SET_REG(ATA_NSECTOR, WRITE_PATTERN1);
-        SET_REG(ATA_SECTOR,  WRITE_PATTERN2);
-        SET_REG(ATA_LCYL,    WRITE_PATTERN3);
-        SET_REG(ATA_HCYL,    WRITE_PATTERN4);
+        ATA_OUT8(ATA_NSECTOR, TEST_PATTERN1);
+        ATA_OUT8(ATA_SECTOR,  TEST_PATTERN2);
+        ATA_OUT8(ATA_LCYL,    TEST_PATTERN3);
+        ATA_OUT8(ATA_HCYL,    TEST_PATTERN4);
 
-        if (((ATA_NSECTOR & READ_PATTERN1_MASK) == READ_PATTERN1) &&
-            ((ATA_SECTOR & READ_PATTERN2_MASK) == READ_PATTERN2) &&
-            ((ATA_LCYL & READ_PATTERN3_MASK) == READ_PATTERN3) &&
-            ((ATA_HCYL & READ_PATTERN4_MASK) == READ_PATTERN4))
+        if ((ATA_IN8(ATA_NSECTOR) == TEST_PATTERN1) &&
+            (ATA_IN8(ATA_SECTOR) == TEST_PATTERN2) &&
+            (ATA_IN8(ATA_LCYL) == TEST_PATTERN3) &&
+            (ATA_IN8(ATA_HCYL) == TEST_PATTERN4))
             return 0;
+
+        sleep(1);
     }
     return -2;
 }
@@ -790,12 +815,12 @@ static int freeze_lock(void)
     /* does the disk support Security Mode feature set? */
     if (identify_info[82] & 2)
     {
-        SET_REG(ATA_SELECT, ata_device);
+        ATA_OUT8(ATA_SELECT, ata_device);
 
         if (!wait_for_rdy())
             return -1;
 
-        SET_REG(ATA_COMMAND, CMD_SECURITY_FREEZE_LOCK);
+        ATA_OUT8(ATA_COMMAND, CMD_SECURITY_FREEZE_LOCK);
 
         if (!wait_for_rdy())
             return -2;
@@ -822,14 +847,14 @@ static int ata_perform_sleep(void)
         return 0;
     }
 
-    SET_REG(ATA_SELECT, ata_device);
+    ATA_OUT8(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
         return -1;
     }
 
-    SET_REG(ATA_COMMAND, CMD_SLEEP);
+    ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
 
     if (!wait_for_rdy())
     {
@@ -989,7 +1014,7 @@ static int ata_hard_reset(void)
     ata_reset();
 
     /* state HRR2 */
-    SET_REG(ATA_SELECT, ata_device); /* select the right device */
+    ATA_OUT8(ATA_SELECT, ata_device); /* select the right device */
     ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
@@ -1010,15 +1035,15 @@ static int perform_soft_reset(void)
     int ret;
     int retry_count;
 
-    SET_REG(ATA_SELECT, SELECT_LBA | ata_device );
-    SET_REG(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
+    ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device );
+    ATA_OUT8(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
 
 #ifdef HAVE_ATA_DMA
     /* DMA requires INTRQ be enabled */
-    SET_REG(ATA_CONTROL, 0);
+    ATA_OUT8(ATA_CONTROL, 0);
 #else
-    SET_REG(ATA_CONTROL, CONTROL_nIEN);
+    ATA_OUT8(ATA_CONTROL, CONTROL_nIEN);
 #endif
     sleep(1); /* >2ms */
 
@@ -1089,15 +1114,15 @@ static int ata_power_on(void)
 static int master_slave_detect(void)
 {
     /* master? */
-    SET_REG(ATA_SELECT, 0);
-    if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
+    ATA_OUT8(ATA_SELECT, 0);
+    if (ATA_IN8(ATA_STATUS) & (STATUS_RDY|STATUS_BSY)) {
         ata_device = 0;
         DEBUGF("Found master harddisk\n");
     }
     else {
         /* slave? */
-        SET_REG(ATA_SELECT, SELECT_DEVICE1);
-        if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
+        ATA_OUT8(ATA_SELECT, SELECT_DEVICE1);
+        if (ATA_IN8(ATA_STATUS) & (STATUS_RDY|STATUS_BSY)) {
             ata_device = SELECT_DEVICE1;
             DEBUGF("Found slave harddisk\n");
         }
@@ -1111,13 +1136,13 @@ static int identify(void)
 {
     int i;
 
-    SET_REG(ATA_SELECT, ata_device);
+    ATA_OUT8(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("identify() - not RDY\n");
         return -1;
     }
-    SET_REG(ATA_COMMAND, CMD_IDENTIFY);
+    ATA_OUT8(ATA_COMMAND, CMD_IDENTIFY);
 
     if (!wait_for_start_of_transfer())
     {
@@ -1128,11 +1153,7 @@ static int identify(void)
     for (i=0; i<SECTOR_SIZE/2; i++) {
         /* the IDENTIFY words are already swapped, so we need to treat
            this info differently that normal sector data */
-#if defined(ROCKBOX_BIG_ENDIAN) && !defined(ATA_SWAP_WORDS)
-        identify_info[i] = swap16(ATA_DATA);
-#else
-        identify_info[i] = ATA_DATA;
-#endif
+        identify_info[i] = ATA_SWAP_IDENTIFY(ATA_IN16(ATA_DATA));
     }
 
     return 0;
@@ -1140,15 +1161,15 @@ static int identify(void)
 
 static int set_multiple_mode(int sectors)
 {
-    SET_REG(ATA_SELECT, ata_device);
+    ATA_OUT8(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("set_multiple_mode() - not RDY\n");
         return -1;
     }
 
-    SET_REG(ATA_NSECTOR, sectors);
-    SET_REG(ATA_COMMAND, CMD_SET_MULTIPLE_MODE);
+    ATA_OUT8(ATA_NSECTOR, sectors);
+    ATA_OUT8(ATA_COMMAND, CMD_SET_MULTIPLE_MODE);
 
     if (!wait_for_rdy())
     {
@@ -1221,7 +1242,7 @@ static int set_features(void)
     features[4].parameter = dma_mode;
 #endif /* HAVE_ATA_DMA */
 
-    SET_REG(ATA_SELECT, ata_device);
+    ATA_OUT8(ATA_SELECT, ata_device);
 
     if (!wait_for_rdy()) {
         DEBUGF("set_features() - not RDY\n");
@@ -1230,19 +1251,19 @@ static int set_features(void)
 
     for (i=0; i < (int)(sizeof(features)/sizeof(features[0])); i++) {
         if (identify_info[features[i].id_word] & BIT_N(features[i].id_bit)) {
-            SET_REG(ATA_FEATURE, features[i].subcommand);
-            SET_REG(ATA_NSECTOR, features[i].parameter);
-            SET_REG(ATA_COMMAND, CMD_SET_FEATURES);
+            ATA_OUT8(ATA_FEATURE, features[i].subcommand);
+            ATA_OUT8(ATA_NSECTOR, features[i].parameter);
+            ATA_OUT8(ATA_COMMAND, CMD_SET_FEATURES);
 
             if (!wait_for_rdy()) {
                 DEBUGF("set_features() - CMD failed\n");
                 return -10 - i;
             }
 
-            if((ATA_ALT_STATUS & STATUS_ERR) && (i != 1)) {
+            if((ATA_IN8(ATA_ALT_STATUS) & STATUS_ERR) && (i != 1)) {
                 /* some CF cards don't like advanced powermanagement
                    even if they mark it as supported - go figure... */
-                if(ATA_ERROR & ERROR_ABRT) {
+                if(ATA_IN8(ATA_ERROR) & ERROR_ABRT) {
                     return -20 - i;
                 }
             }
@@ -1327,7 +1348,7 @@ int ata_init(void)
 
 #ifdef HAVE_ATA_DMA
         /* DMA requires INTRQ be enabled */
-        SET_REG(ATA_CONTROL, 0);
+        ATA_OUT8(ATA_CONTROL, 0);
 #endif
 
         /* first try, hard reset at cold start only */
@@ -1335,9 +1356,9 @@ int ata_init(void)
 
         if (rc)
         {   /* failed? -> second try, always with hard reset */
-            DEBUGF("ata: init failed, retrying...\n");
-            rc  = init_and_check(true);
-            if (rc)
+//            DEBUGF("ata: init failed, retrying...\n");
+//            rc  = init_and_check(true);
+//            if (rc)
                 return rc;
         }
 
@@ -1469,7 +1490,6 @@ void ata_get_info(IF_MD2(int drive,)struct storage_info *info)
 #endif
     int i;
     info->sector_size = SECTOR_SIZE;
-    info->num_sectors= total_sectors;
 
     src = (unsigned short*)&identify_info[27];
     dest = (unsigned short*)vendor;

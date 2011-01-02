@@ -44,32 +44,6 @@ void copy_read_sectors(unsigned char* buf, int wordcount);
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x0E)))
 #define ATA_CONTROL     (*((volatile unsigned char*)(0x20000000 + 0x1C)))
 
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-#define ERROR_ABRT      0x04
-#define ERROR_IDNF      0x10
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
-
-#define READ_PATTERN1_MASK 0xff
-#define READ_PATTERN2_MASK 0xff
-#define READ_PATTERN3_MASK 0xff
-#define READ_PATTERN4_MASK 0xff
-
-#define SET_REG(reg,val) reg = (val)
-#define SET_16BITREG(reg,val) reg = (val)
-
 void ata_reset(void);
 void ata_device_init(void);
 bool ata_is_coldstart(void);

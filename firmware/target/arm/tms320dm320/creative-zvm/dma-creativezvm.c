@@ -62,7 +62,7 @@ void dma_ata_read(unsigned char* buf, int shortcount)
     while((unsigned long)buf & 0x1F)
     {
         unsigned short tmp;
-        tmp = ATA_DATA;
+        tmp = ATA_IN16(ATA_DATA);
         *buf++ = tmp & 0xFF;
         *buf++ = tmp >> 8;
         shortcount--;
@@ -86,7 +86,7 @@ void dma_ata_read(unsigned char* buf, int shortcount)
     if(shortcount % 2)
     {
         unsigned short tmp;
-        tmp = ATA_DATA;
+        tmp = ATA_IN16(ATA_DATA);
         *buf++ = tmp & 0xFF;
         *buf++ = tmp >> 8;
     }
@@ -102,7 +102,7 @@ void dma_ata_write(unsigned char* buf, int wordcount)
         unsigned short tmp;
         tmp = (unsigned short) *buf++;
         tmp |= (unsigned short) *buf++ << 8;
-        SET_16BITREG(ATA_DATA, tmp);
+        ATA_OUT16(ATA_DATA, tmp);
         wordcount--;
     }
 
