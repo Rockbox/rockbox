@@ -899,7 +899,8 @@ void settings_apply(bool read_disk)
         else
             font_load_remoteui(NULL);
 #endif
-        if ( global_settings.kbd_file[0]) {
+        if ( global_settings.kbd_file[0]
+             && global_settings.kbd_file[0] != '-') {
             snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
                      global_settings.kbd_file);
             CHART(">load_kbd");
