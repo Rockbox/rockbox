@@ -27,6 +27,7 @@
 #include "dm320.h"
 #include "ata.h"
 #include "ata-target.h"
+#include "ata-defines.h"
 #include <stdbool.h>
 
 #define CS1_START       0x50000000

@@ -32,6 +32,7 @@
 #include "string.h"
 #include "buffer.h"
 #include "logf.h"
+#include "ata-defines.h"
 
 #undef ata_read_sectors
 #undef ata_write_sectors

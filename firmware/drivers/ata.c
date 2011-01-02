@@ -33,6 +33,7 @@
 #include "string.h"
 #include "ata_idle_notify.h"
 #include "ata-target.h"
+#include "ata-defines.h"
 #include "storage.h"
 
 #define SECTOR_SIZE     512
