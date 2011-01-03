@@ -765,10 +765,10 @@ static int check_registers(void)
         ATA_OUT8(ATA_LCYL,    TEST_PATTERN3);
         ATA_OUT8(ATA_HCYL,    TEST_PATTERN4);
 
-        if ((ATA_IN8(ATA_NSECTOR) == TEST_PATTERN1) &&
-            (ATA_IN8(ATA_SECTOR) == TEST_PATTERN2) &&
-            (ATA_IN8(ATA_LCYL) == TEST_PATTERN3) &&
-            (ATA_IN8(ATA_HCYL) == TEST_PATTERN4))
+        if (((ATA_IN8(ATA_NSECTOR) & 0xff) == TEST_PATTERN1) &&
+            ((ATA_IN8(ATA_SECTOR) & 0xff) == TEST_PATTERN2) &&
+            ((ATA_IN8(ATA_LCYL) & 0xff) == TEST_PATTERN3) &&
+            ((ATA_IN8(ATA_HCYL) & 0xff) == TEST_PATTERN4))
             return 0;
 
         sleep(1);
