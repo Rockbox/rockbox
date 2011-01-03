@@ -344,6 +344,14 @@ void main(void)
     bool blink_toggle = false;
 
     int button;
+
+    /* hold status variables
+     * this two must have different
+     * values in the begining
+     */
+    bool hold = false;
+    bool last_hold = true;
+
     unsigned int event = EVENT_NONE;
     unsigned int last_event = EVENT_NONE;
 
@@ -364,20 +372,19 @@ void main(void)
 
     lcd_init();
 
-    /* only lowlevel functions no queue init */
-    _backlight_init();
-    _backlight_hw_on();
-
-    /* setup font system*/
+    /* setup font system */
     font_init();
     lcd_setfont(FONT_SYSFIXED);
 
-     /* buttons reading init*/
+     /* buttons reading init */
     adc_init();
     button_init();
 
     usb_init();
     cpu_idle_mode(true);
+
+    /* lowlevel init only */
+    _backlight_init();
 
     /* Handle wakeup event. Possibilities are:
      * RTC alarm (HD300)
@@ -387,6 +394,21 @@ void main(void)
      */
     while(1)
     {
+        /* check hold status */
+        hold = button_hold();
+
+        /* backlight handling
+         * change only on hold toggle */
+        if ( hold != last_hold )
+        {
+            if ( hold )
+                _backlight_hw_off();
+            else
+                _backlight_hw_on();
+
+            last_hold = hold;
+        }
+
         /* read buttons */
         event = EVENT_NONE;
         button = button_get_w_tmo(HZ);
@@ -407,6 +429,7 @@ void main(void)
         if ( _rtc_alarm() )
             event |= EVENT_RTC;
 #endif
+
         reset_screen();
         switch (event)
         {
