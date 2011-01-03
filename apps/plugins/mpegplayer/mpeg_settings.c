@@ -601,20 +601,37 @@ static void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
 
 static bool display_thumb_image(const struct vo_rect *rc)
 {
+    bool retval = true;
+    unsigned ltgray = MYLCD_LIGHTGRAY;
+    unsigned dkgray = MYLCD_DARKGRAY;
+
+    int oldcolor = mylcd_get_foreground();
+
     if (!stream_display_thumb(rc))
     {
-        mylcd_splash(0, "Frame not available");
-        return false;
+        /* Display "No Frame" and erase any border */
+        const char * const str = "No Frame";
+        int x, y, w, h;
+
+        mylcd_getstringsize(str, &w, &h);
+        x = (rc->r + rc->l - w) / 2;
+        y = (rc->b + rc->t - h) / 2;
+        mylcd_putsxy(x, y, str);
+
+        mylcd_update_rect(x, y, w, h);
+
+        ltgray = dkgray = mylcd_get_background();
+        retval = false;
     }
 
-    /* Draw a raised border around the frame */
-    int oldcolor = mylcd_get_foreground();
-    mylcd_set_foreground(MYLCD_LIGHTGRAY);
+    /* Draw a raised border around the frame (or erase if no frame) */
+
+    mylcd_set_foreground(ltgray);
 
     mylcd_hline(rc->l-1, rc->r-1, rc->t-1);
     mylcd_vline(rc->l-1, rc->t, rc->b-1);
 
-    mylcd_set_foreground(MYLCD_DARKGRAY);
+    mylcd_set_foreground(dkgray);
 
     mylcd_hline(rc->l-1, rc->r, rc->b);
     mylcd_vline(rc->r, rc->t-1, rc->b);
@@ -626,7 +643,7 @@ static bool display_thumb_image(const struct vo_rect *rc)
     mylcd_update_rect(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
     mylcd_update_rect(rc->r, rc->t, 1, rc->b - rc->t);
 
-    return true;
+    return retval;
 }
 
 /* Add an amount to the specified time - with saturation */

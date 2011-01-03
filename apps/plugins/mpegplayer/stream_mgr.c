@@ -695,8 +695,8 @@ static intptr_t send_video_msg(long id, intptr_t data)
             if (disk_buf_status() != STREAM_STOPPED)
                 break; /* Prepare image if not playing */
 
-            if (!parser_prepare_image(str_parser.last_seek_time))
-                return false; /* Preparation failed */
+            /* Ignore return and try video thread anyway */
+            parser_prepare_image(str_parser.last_seek_time);
 
             /* Image ready - pass message to video thread */
             break;
@@ -766,6 +766,25 @@ void stream_vo_set_clip(const struct vo_rect *rc)
     stream_mgr_unlock();
 }
 
+bool stream_vo_get_clip(struct vo_rect *rc)
+{
+    bool retval;
+
+    if (!rc)
+        return false;
+
+    stream_mgr_lock();
+
+    retval = send_video_msg(VIDEO_GET_CLIP_RECT,
+                            (intptr_t)&stream_mgr.parms.rc);
+
+    *rc = stream_mgr.parms.rc;
+
+    stream_mgr_unlock();
+
+    return retval;
+}
+
 #ifndef HAVE_LCD_COLOR
 /* Show/hide the gray video overlay (independently of vo visibility). */
 void stream_gray_show(bool show)
@@ -804,6 +823,23 @@ bool stream_draw_frame(bool no_prepare)
     stream_mgr_lock();
 
     retval = send_video_msg(VIDEO_PRINT_FRAME, no_prepare);
+
+    stream_mgr_unlock();
+
+    return retval;
+}
+
+bool stream_set_callback(long id, void *fn)
+{
+    bool retval = false;
+
+    stream_mgr_lock();
+
+    switch (id)
+    {
+    case VIDEO_SET_POST_FRAME_CALLBACK:
+        retval =  send_video_msg(id, (intptr_t)fn);
+    }
 
     stream_mgr_unlock();
 

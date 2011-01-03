@@ -41,6 +41,7 @@ struct vo_data
     unsigned flags;
     struct vo_rect rc_vid;
     struct vo_rect rc_clip;
+    void (*post_draw_callback)(void);
 };
 
 #if NUM_CORES > 1
@@ -80,9 +81,10 @@ static inline void video_unlock(void)
 
 
 /* Draw a black rectangle if no video frame is available */
-static void vo_draw_black(void)
+static void vo_draw_black(struct vo_rect *rc)
 {
     int foreground;
+    int x, y, w, h;
 
     video_lock();
 
@@ -90,10 +92,30 @@ static void vo_draw_black(void)
 
     mylcd_set_foreground(MYLCD_BLACK);
 
-    mylcd_fillrect(vo.output_x, vo.output_y, vo.output_width,
-                   vo.output_height);
-    mylcd_update_rect(vo.output_x, vo.output_y, vo.output_width,
-                      vo.output_height);
+    if (rc)
+    {
+        x = rc->l;
+        y = rc->t;
+        w = rc->r - rc->l;
+        h = rc->b - rc->t;
+    }
+    else
+    {
+#if LCD_WIDTH >= LCD_HEIGHT
+        x = vo.output_x;
+        y = vo.output_y;
+        w = vo.output_width;
+        h = vo.output_height;
+#else
+        x = LCD_WIDTH - vo.output_height - vo.output_y;
+        y = vo.output_x;
+        w = vo.output_height;
+        h = vo.output_width;
+#endif
+    }
+
+    mylcd_fillrect(x, y, w, h);
+    mylcd_update_rect(x, y, w, h);
 
     mylcd_set_foreground(foreground);
 
@@ -122,19 +144,22 @@ void vo_draw_frame(uint8_t * const * buf)
         /* Frame is hidden - either by being set invisible or is clipped
          * away - copout */
         DEBUGF("vo hidden\n");
-        return;
     }
     else if (buf == NULL)
     {
         /* No frame exists - draw black */
-        vo_draw_black();
+        vo_draw_black(NULL);
         DEBUGF("vo no frame\n");
-        return;
+    }
+    else
+    {
+        yuv_blit(buf, 0, 0, vo.image_width,
+                 vo.output_x, vo.output_y, vo.output_width,
+                 vo.output_height);
     }
 
-    yuv_blit(buf, 0, 0, vo.image_width,
-             vo.output_x, vo.output_y, vo.output_width,
-             vo.output_height);
+    if (vo.post_draw_callback)
+        vo.post_draw_callback();
 }
 
 static inline void vo_rect_clear_inl(struct vo_rect *rc)
@@ -348,13 +373,13 @@ bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
     int thumb_width, thumb_height;
     int thumb_uv_width, thumb_uv_height;
 
-    if (buf == NULL)
-        return false;
-
     /* Obtain rectangle as clipped to the screen */
     vo_rect_set_ext(&thumb_rc, 0, 0, LCD_WIDTH, LCD_HEIGHT);
     if (!vo_rect_intersect(&thumb_rc, rc, &thumb_rc))
         return true;
+
+    if (buf == NULL)
+        goto no_thumb_exit;
 
     DEBUGF("thumb_rc: %d, %d, %d, %d\n", thumb_rc.l, thumb_rc.t,
            thumb_rc.r, thumb_rc.b);
@@ -377,7 +402,7 @@ bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
             )
     {
         DEBUGF("thumb: insufficient buffer\n");
-        return false;
+        goto no_thumb_exit;
     }
 
     yuv[0] = mem;
@@ -411,6 +436,10 @@ bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
 #endif /* LCD_WIDTH >= LCD_HEIGHT */
 
     return true;
+
+no_thumb_exit:
+    vo_draw_black(&thumb_rc);
+    return false;
 }
 
 void vo_setup(const mpeg2_sequence_t * sequence)
@@ -510,6 +539,20 @@ void vo_set_clip_rect(const struct vo_rect *rc)
     vo.output_y = rc_out.t;
     vo.output_width = rc_out.r - rc_out.l;
     vo.output_height = rc_out.b - rc_out.t;
+}
+
+bool vo_get_clip_rect(struct vo_rect *rc)
+{
+    rc->l = vo.output_x;
+    rc->t = vo.output_y;
+    rc->r = rc->l + vo.output_width;
+    rc->b = rc->t + vo.output_height;
+    return (vo.flags & VO_NON_NULL_RECT) != 0;
+}
+
+void vo_set_post_draw_callback(void (*cb)(void))
+{
+    vo.post_draw_callback = cb;
 }
 
 #if NUM_CORES > 1

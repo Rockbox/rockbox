@@ -106,6 +106,9 @@ bool stream_show_vo(bool show);
 /* Set the visible section of video */
 void stream_vo_set_clip(const struct vo_rect *rc);
 
+/* Return current visible section of video */
+bool stream_vo_get_clip(struct vo_rect *rc);
+
 #ifndef HAVE_LCD_COLOR
 void stream_gray_show(bool show);
 #endif
@@ -148,6 +151,11 @@ static inline uint32_t stream_get_duration(void)
 
 static inline bool stream_can_seek(void)
     { return parser_can_seek(); }
+
+static inline void stream_video_stats(struct video_output_stats *s)
+    { video_thread_get_stats(s); }
+
+bool stream_set_callback(long id, void * fn);
 
 /* Keep the disk spinning (for seeking and browsing) */
 static inline void stream_keep_disk_active(void)

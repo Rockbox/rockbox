@@ -37,20 +37,22 @@ struct video_thread_data
     int    state;           /* Thread state */
     int    status;          /* Media status */
     struct queue_event ev;  /* Our event queue to receive commands */
-    int    num_drawn;       /* Number of frames drawn since reset */
-    int    num_skipped;     /* Number of frames skipped since reset */
     uint32_t eta_stream;    /* Current time of stream */
     uint32_t eta_video;     /* Time that frame has been scheduled for */
     int32_t eta_early;      /* How early has the frame been decoded? */
     int32_t eta_late;       /* How late has the frame been decoded? */
     int frame_drop_level;   /* Drop severity */
     int skip_level;         /* Skip severity */
-    long last_showfps;      /* Last time the FPS display was updated */
     long last_render;       /* Last time a frame was drawn */
     uint32_t curr_time;     /* Current due time of frame */
     uint32_t period;        /* Frame period in clock ticks */
     int      syncf_perfect; /* Last sync fit result */
 };
+
+/* Number drawn since reset */
+static int video_num_drawn SHAREDBSS_ATTR;
+/* Number skipped since reset */
+static int video_num_skipped SHAREDBSS_ATTR;
 
 /* TODO: Check if 4KB is appropriate - it works for my test streams,
    so maybe we can reduce it. */
@@ -59,35 +61,6 @@ static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 static struct event_queue video_str_queue SHAREDBSS_ATTR;
 static struct queue_sender_list video_str_queue_send SHAREDBSS_ATTR;
 struct stream video_str IBSS_ATTR;
-
-static void draw_fps(struct video_thread_data *td)
-{
-    uint32_t start;
-    uint32_t clock_ticks = stream_get_ticks(&start);
-    int fps = 0;
-    int buf_pct;
-    char str[80];
-
-    clock_ticks -= start;
-    if (clock_ticks != 0)
-        fps = muldiv_uint32(CLOCK_RATE*100, td->num_drawn, clock_ticks);
-
-    buf_pct = muldiv_uint32(100, pcm_output_used(), PCMOUT_BUFSIZE);
-
-    rb->snprintf(str, sizeof(str), "v:%d.%02d %d %d a:%02d%% %d %d  ",
-                 /* Video information */
-                 fps / 100, fps % 100, td->num_skipped,
-                 td->info->display_picture->temporal_reference,
-                 /* Audio information */
-                 buf_pct, pcm_underruns, pcm_skipped);
-    mylcd_putsxy(0, 0, str);
-
-    vo_lock();
-    mylcd_update_rect(0, 0, LCD_WIDTH, 8);
-    vo_unlock();
-
-    td->last_showfps = *rb->current_tick;
-}
 
 #if defined(DEBUG) || defined(SIMULATOR)
 static unsigned char pic_coding_type_char(unsigned type)
@@ -452,6 +425,31 @@ sync_finished:
     return retval;
 }
 
+static bool frame_print_handler(struct video_thread_data *td)
+{
+    bool retval;
+    uint8_t * const * buf = NULL;
+
+    if (td->info != NULL && td->info->display_fbuf != NULL &&
+        td->syncf_perfect > 0)
+        buf = td->info->display_fbuf->buf;
+
+    if (td->ev.id == VIDEO_PRINT_THUMBNAIL)
+    {
+        /* Print a thumbnail of whatever was last decoded - scale and
+         * position to fill the specified rectangle */
+        retval = vo_draw_frame_thumb(buf, (struct vo_rect *)td->ev.data);
+    }
+    else
+    {
+        /* Print the last frame decoded */
+        vo_draw_frame(buf);
+        retval = buf != NULL;
+    }
+
+    return retval;
+}
+
 /* This only returns to play or quit */
 static void video_thread_msg(struct video_thread_data *td)
 {
@@ -520,8 +518,7 @@ static void video_thread_msg(struct video_thread_data *td)
 
             if (td->ev.data)
             {
-                if (td->info != NULL && td->info->display_fbuf != NULL)
-                    vo_draw_frame(td->info->display_fbuf->buf);
+                frame_print_handler(td);
             }
             else
             {
@@ -547,10 +544,9 @@ static void video_thread_msg(struct video_thread_data *td)
             td->eta_late = 0;
             td->frame_drop_level = 0;
             td->skip_level = 0;
-            td->num_drawn = 0;
-            td->num_skipped = 0;
-            td->last_showfps = *rb->current_tick - HZ;
-            td->last_render = td->last_showfps;
+            td->last_render = *rb->current_tick - HZ;
+            video_num_drawn = 0;
+            video_num_skipped = 0;
 
             reply = true;
             break;
@@ -573,28 +569,17 @@ static void video_thread_msg(struct video_thread_data *td)
             str_data_notify_received(&video_str);
             break;
 
+        case VIDEO_PRINT_FRAME:
         case VIDEO_PRINT_THUMBNAIL:
-            /* Print a thumbnail of whatever was last decoded - scale and
-             * position to fill the specified rectangle */
-            if (td->info != NULL && td->info->display_fbuf != NULL)
-            {
-                vo_draw_frame_thumb(td->info->display_fbuf->buf,
-                                    (struct vo_rect *)td->ev.data);
-                reply = true;
-            }
+            reply = frame_print_handler(td);
             break;
 
         case VIDEO_SET_CLIP_RECT:
             vo_set_clip_rect((const struct vo_rect *)td->ev.data);
             break;
 
-        case VIDEO_PRINT_FRAME:
-            /* Print the last frame decoded */
-            if (td->info != NULL && td->info->display_fbuf != NULL)
-            {
-                vo_draw_frame(td->info->display_fbuf->buf);
-                reply = true;
-            }
+        case VIDEO_GET_CLIP_RECT:
+            reply = vo_get_clip_rect((struct vo_rect *)td->ev.data);
             break;
 
         case VIDEO_GET_SIZE:
@@ -619,6 +604,11 @@ static void video_thread_msg(struct video_thread_data *td)
             }
 
             reply = video_str_scan(td, (struct str_sync_data *)td->ev.data);
+            break;
+
+        case VIDEO_SET_POST_FRAME_CALLBACK:
+            vo_set_post_draw_callback((void (*)(void))td->ev.data);
+            reply = true;
             break;
 
         case STREAM_QUIT:
@@ -802,6 +792,8 @@ static void video_thread(void)
             if (td.info->display_fbuf == NULL)
                 break; /* No picture */
 
+            td.syncf_perfect = 1; /* yes, a frame exists */
+
             /* Get presentation times in audio samples - quite accurate
                enough - add previous frame duration if not stamped */
             td.curr_time = (td.info->display_picture->flags & PIC_FLAG_TAGS) ?
@@ -902,8 +894,8 @@ static void video_thread(void)
             {
                 /* This frame was set to skip so skip it after having updated
                    timing information */
-                td.num_skipped++;
                 td.eta_early = INT32_MIN;
+                video_num_skipped++;
                 goto picture_skip;
             }
 
@@ -913,8 +905,8 @@ static void video_thread(void)
                 /* Render drop was set previously but nothing was dropped in the
                    decoder or it's been to long since drawing the last frame. */
                 td.skip_level = 0;
-                td.num_skipped++;
                 td.eta_early = INT32_MIN;
+                video_num_skipped++;
                 goto picture_skip;
             }
 
@@ -970,18 +962,11 @@ static void video_thread(void)
         picture_draw:
             /* Record last frame time */
             td.last_render = *rb->current_tick;
+
             vo_draw_frame(td.info->display_fbuf->buf);
-            td.num_drawn++;
+            video_num_drawn++;
 
         picture_skip:
-            if (!settings.showfps)
-                break;
-
-            if (TIME_BEFORE(*rb->current_tick, td.last_showfps + HZ))
-                break;
-
-            /* Calculate and display fps */
-            draw_fps(&td);
             break;
             }
 
@@ -1032,3 +1017,19 @@ void video_thread_exit(void)
         video_str.thread = 0;
     }
 }
+
+
+/** Misc **/
+void video_thread_get_stats(struct video_output_stats *s)
+{
+    uint32_t start;
+    uint32_t now = stream_get_ticks(&start);
+    s->num_drawn = video_num_drawn;
+    s->num_skipped = video_num_skipped;
+
+    s->fps = 0;
+
+    if (now > start)
+        s->fps = muldiv_uint32(CLOCK_RATE*100, s->num_drawn, now - start);
+}
+

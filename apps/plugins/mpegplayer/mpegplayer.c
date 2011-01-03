@@ -380,6 +380,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP (TS_SECOND/2)
 #define OSD_MIN_UPDATE_INTERVAL (HZ/2)
+#define FPS_UPDATE_INTERVAL (HZ) /* Get new FPS reading each second */
 
 enum video_action
 {
@@ -457,9 +458,25 @@ struct osd
     uint32_t curr_time;
     unsigned auto_refresh;
     unsigned flags;
+    int font;
+};
+
+struct fps
+{
+    /* FPS Display */
+    struct vo_rect rect;    /* OSD coordinates */
+    int pf_x;               /* Screen coordinates */
+    int pf_y;
+    int pf_width;
+    int pf_height;
+    long update_tick;       /* When to next update FPS reading */
+    #define FPS_FORMAT  "%d.%02d"
+    #define FPS_DIMSTR  "999.99" /* For establishing rect size */
+    #define FPS_BUFSIZE sizeof("999.99")
 };
 
 static struct osd osd;
+static struct fps fps NOCACHEBSS_ATTR; /* Accessed on other processor */
 
 static void osd_show(unsigned show);
 
@@ -573,6 +590,12 @@ static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int min,
                         min, max, val);
 }
 
+static void draw_setfont(int font)
+{
+    osd.font = font;
+    mylcd_setfont(font);
+}
+
 #ifdef LCD_PORTRAIT
 /* Portrait displays need rotated text rendering */
 
@@ -646,7 +669,7 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
     unsigned short ch;
     unsigned short *ucs;
     int ofs = MIN(x, 0);
-    struct font* pf = rb->font_get(FONT_UI);
+    struct font* pf = rb->font_get(osd.font);
 
     ucs = rb->bidi_l2v(str, 1);
 
@@ -696,6 +719,96 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 }
 #endif /* LCD_PORTRAIT */
 
+/** FPS Display **/
+
+/* Post-frame callback (on video thread) - update the FPS rectangle from the
+ * framebuffer */
+static void fps_post_frame_callback(void)
+{
+    vo_lock();
+    mylcd_update_rect(fps.pf_x, fps.pf_y,
+                      fps.pf_width, fps.pf_height);
+    vo_unlock();
+}
+
+/* Set up to have the callback only update the intersection of the video
+ * rectangle and the FPS text rectangle - if they don't intersect, then
+ * the callback is set to NULL */
+static void fps_update_post_frame_callback(void)
+{
+    void (*cb)(void) = NULL;
+
+    if (settings.showfps) {
+        struct vo_rect cliprect;
+
+        if (stream_vo_get_clip(&cliprect)) {
+            /* Oriented screen coordinates -> OSD coordinates */
+            vo_rect_offset(&cliprect, -osd.x, -osd.y);
+
+            if (vo_rect_intersect(&cliprect, &cliprect, &fps.rect)) {
+                int x = cliprect.l;
+                int y = cliprect.t;
+                int width = cliprect.r - cliprect.l;
+                int height = cliprect.b - cliprect.t;
+
+                /* OSD coordinates -> framebuffer coordinates */
+                fps.pf_x = _X;
+                fps.pf_y = _Y;
+                fps.pf_width = _W;
+                fps.pf_height = _H;
+
+                cb = fps_post_frame_callback;
+            }
+        }
+    }
+
+    stream_set_callback(VIDEO_SET_POST_FRAME_CALLBACK, cb);
+}
+
+/* Refresh the FPS display */
+static void fps_refresh(void)
+{
+    char str[FPS_BUFSIZE];
+    struct video_output_stats stats;
+    int w, h, sw;
+    long tick;
+
+    tick = *rb->current_tick;
+
+    if (TIME_BEFORE(tick, fps.update_tick))
+        return;
+
+    fps.update_tick = tick + FPS_UPDATE_INTERVAL;
+
+    stream_video_stats(&stats);
+
+    rb->snprintf(str, FPS_BUFSIZE, FPS_FORMAT,
+                 stats.fps / 100, stats.fps % 100);
+
+    w = fps.rect.r - fps.rect.l;
+    h = fps.rect.b - fps.rect.t;
+
+    draw_clear_area(fps.rect.l, fps.rect.t, w, h);
+    mylcd_getstringsize(str, &sw, NULL);
+    draw_putsxy_oriented(fps.rect.r - sw, fps.rect.t, str);
+
+    vo_lock();
+    draw_update_rect(fps.rect.l, fps.rect.t, w, h);
+    vo_unlock();
+}
+
+/* Initialize the FPS display */
+static void fps_init(void)
+{
+    fps.update_tick = *rb->current_tick;
+    fps.rect.l = fps.rect.t = 0;
+    mylcd_getstringsize(FPS_DIMSTR, &fps.rect.r, &fps.rect.b);
+    vo_rect_offset(&fps.rect, -osd.x, -osd.y);
+    fps_update_post_frame_callback();
+}
+
+/** OSD **/
+
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /* So we can refresh the overlay */
 static void osd_lcd_enable_hook(void* param)
@@ -743,7 +856,7 @@ static void osd_text_init(void)
     int phys;
     int spc_width;
 
-    mylcd_setfont(FONT_UI);
+    draw_setfont(FONT_UI);
 
     osd.x = 0;
     osd.width = SCREEN_WIDTH;
@@ -812,7 +925,7 @@ static void osd_text_init(void)
 #endif
     osd.y = SCREEN_HEIGHT - osd.height;
 
-    mylcd_setfont(FONT_SYSFIXED);
+    draw_setfont(FONT_SYSFIXED);
 }
 
 static void osd_init(void)
@@ -835,6 +948,7 @@ static void osd_init(void)
     osd.auto_refresh = OSD_REFRESH_TIME;
     osd.next_auto_refresh = *rb->current_tick;
     osd_text_init();
+    fps_init();
 }
 
 #ifdef HAVE_HEADPHONE_DETECTION
@@ -1047,6 +1161,9 @@ static void osd_refresh(int hint)
 
     tick = *rb->current_tick;
 
+    if (settings.showfps)
+        fps_refresh();
+
     if (hint == OSD_REFRESH_DEFAULT) {
         /* The default which forces no updates */
 
@@ -1116,7 +1233,7 @@ static void osd_refresh(int hint)
     oldfg = mylcd_get_foreground();
     oldbg = mylcd_get_background();
 
-    mylcd_setfont(FONT_UI);
+    draw_setfont(FONT_UI);
     mylcd_set_foreground(osd.fgcolor);
     mylcd_set_background(osd.bgcolor);
 
@@ -1140,7 +1257,7 @@ static void osd_refresh(int hint)
     }
 
     /* Go back to defaults */
-    mylcd_setfont(FONT_SYSFIXED);
+    draw_setfont(FONT_SYSFIXED);
     mylcd_set_foreground(oldfg);
     mylcd_set_background(oldbg);
 
@@ -1391,6 +1508,7 @@ static int osd_play(uint32_t time)
         osd_backlight_on_video_mode(true);
         osd_backlight_brightness_video_mode(true);
         stream_show_vo(true);
+
         retval = stream_play();
 
         if (retval >= STREAM_OK)
@@ -1746,6 +1864,8 @@ static int button_loop(void)
             result = mpeg_menu();
 
             next_action = (settings.play_mode == 0) ? VIDEO_STOP : VIDEO_NEXT;
+
+            fps_update_post_frame_callback();
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
