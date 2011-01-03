@@ -289,8 +289,11 @@ static void init_times(struct stream *str)
 
     str->start_pts = INVALID_TIMESTAMP;
 
-    /* Probe many for video because of B-frames */
-    for (i = STREAM_IS_VIDEO(str->id) ? 5 : 1; i > 0;)
+    /* Probe for many for the start because a stamp or two could be anomalous.
+     * Video also can also have things out of order. How many? There isn't any
+     * "right" value but just a few seems suffient to filter some bad cases.
+     * Too many and file loading could take too long. */
+    for (i = 5; i > 0;)
     {
         switch (parser_get_next_data(&tmp_str, STREAM_PM_RANDOM_ACCESS))
         {
