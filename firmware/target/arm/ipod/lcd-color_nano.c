@@ -32,9 +32,6 @@
 #include "system.h"
 #include "hwcompat.h"
 
-/*** macros ***/
-#define SWAP_INT(X,Y) {int tmp=X; X=Y; Y=tmp;}
-
 /* LCD command codes for HD66789R */
 #define LCD_CNTL_RAM_ADDR_SET           0x21
 #define LCD_CNTL_WRITE_TO_GRAM          0x22
@@ -136,9 +133,9 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
     x1 = (y + height) - 1;          /* max vert */
 #elif CONFIG_LCD == LCD_IPODCOLOR
     y0 = y;                         /* start vert */
-    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
+    x0 = LCD_WIDTH - (x + width);   /* start horiz */
     y1 = (y + height) - 1;          /* end vert */
-    x1 = (x0 - width) + 1;          /* end horiz */
+    x1 = (x0 + width) - 1;          /* end horiz */
 #endif
 
     /* setup the drawing region */
@@ -148,9 +145,6 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
         lcd_cmd_data(0x15, y1);      /* end vert */
         lcd_cmd_data(0x16, x1);      /* end horiz */
     } else {
-        if (y1 < y0) SWAP_INT(y0,y1) /* swap max horiz < start horiz */
-        if (x1 < x0) SWAP_INT(x0,x1) /* swap max vert  < start vert  */
-
         /* max horiz << 8 | start horiz */
         lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
         /* max vert << 8 | start vert */
