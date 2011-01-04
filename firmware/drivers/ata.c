@@ -1456,6 +1456,7 @@ void ata_get_info(IF_MD2(int drive,)struct storage_info *info)
 #endif
     int i;
     info->sector_size = SECTOR_SIZE;
+    info->num_sectors = total_sectors;
 
     src = (unsigned short*)&identify_info[27];
     dest = (unsigned short*)vendor;
