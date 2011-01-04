@@ -291,7 +291,7 @@ static bool init_times(struct stream *str)
     tmp_str.hdr.pos = 0;
     tmp_str.hdr.limit = max_probe;
 
-    /* Probe for many for the start because some stamps could be anoamlous.
+    /* Probe for many for the start because some stamps could be anomalous.
      * Video also can also have things out of order. Just see what it's got.
      */
     while (1)
