@@ -272,44 +272,51 @@ static bool init_video_info(void)
     return false;
 }
 
-static void init_times(struct stream *str)
+static bool init_times(struct stream *str)
 {
-    int i;
     struct stream tmp_str;
     const ssize_t filesize = disk_buf_filesize();
     const ssize_t max_probe = MIN(512*1024, filesize);
+    bool found_stream;
 
     /* Simply find the first earliest timestamp - this will be the one
      * used when streaming anyway */
     DEBUGF("Finding start_pts: 0x%02x\n", str->id);
 
+    found_stream = false;
+    str->start_pts = INVALID_TIMESTAMP;
+    str->end_pts = INVALID_TIMESTAMP;
+
     tmp_str.id = str->id;
     tmp_str.hdr.pos = 0;
     tmp_str.hdr.limit = max_probe;
 
-    str->start_pts = INVALID_TIMESTAMP;
-
-    /* Probe for many for the start because a stamp or two could be anomalous.
-     * Video also can also have things out of order. How many? There isn't any
-     * "right" value but just a few seems sufficient to filter some bad cases.
-     * Too many and file loading could take too long. */
-    for (i = 5; i > 0;)
+    /* Probe for many for the start because some stamps could be anoamlous.
+     * Video also can also have things out of order. Just see what it's got.
+     */
+    while (1)
     {
         switch (parser_get_next_data(&tmp_str, STREAM_PM_RANDOM_ACCESS))
         {
         case STREAM_DATA_END:
             break;
         case STREAM_OK:
+            found_stream = true;
             if (tmp_str.pkt_flags & PKT_HAS_TS)
             {
                 if (tmp_str.pts < str->start_pts)
                    str->start_pts = tmp_str.pts;
-                i--; /* Decrement timestamp counter */
             }
             continue;
         }
 
         break;
+    }
+
+    if (!found_stream)
+    {
+        DEBUGF("   stream not found:0x%02x\n", str->id);
+        return false;
     }
 
     DEBUGF("  start:%u\n", (unsigned)str->start_pts);
@@ -320,33 +327,27 @@ static void init_times(struct stream *str)
      * precise time at the end of the last frame for the stream. */
     DEBUGF("Finding end_pts: 0x%02x\n", str->id);
 
-    str->end_pts = INVALID_TIMESTAMP;
+    str_parser.parms.sd.time = MAX_TIMESTAMP;
+    str_parser.parms.sd.sk.pos = filesize - max_probe;
+    str_parser.parms.sd.sk.len = max_probe;
+    str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
 
-    if (str->start_pts != INVALID_TIMESTAMP)
+    str_send_msg(str, STREAM_RESET, 0);
+
+    if (str_send_msg(str, STREAM_FIND_END_TIME,
+            (intptr_t)&str_parser.parms.sd) == STREAM_PERFECT_MATCH)
     {
-        str_parser.parms.sd.time = MAX_TIMESTAMP;
-        str_parser.parms.sd.sk.pos = filesize - max_probe;
-        str_parser.parms.sd.sk.len = max_probe;
-        str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
-
-        str_send_msg(str, STREAM_RESET, 0);
-
-        if (str_send_msg(str, STREAM_FIND_END_TIME,
-                (intptr_t)&str_parser.parms.sd) == STREAM_PERFECT_MATCH)
-        {
-            str->end_pts = str_parser.parms.sd.time;
-            DEBUGF("  end:%u\n", (unsigned)str->end_pts);
-        }
+        str->end_pts = str_parser.parms.sd.time;
+        DEBUGF("  end:%u\n", (unsigned)str->end_pts);
     }
 
-    /* End must be greater than start. If the start PTS is found, the end PTS
-     * must be valid too. If the start PTS was invalid, then the end will never
-     * be scanned above. */
-    if (str->start_pts >= str->end_pts || str->end_pts == INVALID_TIMESTAMP)
-    {
-        str->start_pts = INVALID_TIMESTAMP;
-        str->end_pts = INVALID_TIMESTAMP;
-    }
+    return true;
+}
+
+static bool check_times(const struct stream *str)
+{
+    return str->start_pts < str->end_pts &&
+        str->end_pts != INVALID_TIMESTAMP;
 }
 
 /* Return the best-fit file offset of a timestamp in the PES where
@@ -1118,10 +1119,7 @@ int parser_init_stream(void)
     {
         /* Initalize start_pts and end_pts with the length (in 45kHz units) of
          * the movie. INVALID_TIMESTAMP if the time could not be determined */
-        init_times(&audio_str);
-        init_times(&video_str);
-
-        if (video_str.start_pts == INVALID_TIMESTAMP)
+        if (!init_times(&video_str) || !check_times(&video_str))
         {
             /* Must have video at least */
             parser_init_state();
@@ -1130,14 +1128,27 @@ int parser_init_stream(void)
 
         str_parser.flags |= STREAMF_CAN_SEEK;
 
-        if (audio_str.start_pts != INVALID_TIMESTAMP)
+        if (init_times(&audio_str))
         {
-            /* Overall duration is maximum span */
-            str_parser.start_pts = MIN(audio_str.start_pts, video_str.start_pts);
-            str_parser.end_pts = MAX(audio_str.end_pts, video_str.end_pts);
-
             /* Audio will be part of playback pool */
             stream_add_stream(&audio_str);
+
+            if (check_times(&audio_str))
+            {
+                /* Overall duration is maximum span */
+                str_parser.start_pts = MIN(audio_str.start_pts, video_str.start_pts);
+                str_parser.end_pts = MAX(audio_str.end_pts, video_str.end_pts);
+            }
+            else
+            {
+                /* Bad times on audio - use video times */
+                str_parser.start_pts = video_str.start_pts;
+                str_parser.end_pts = video_str.end_pts;
+
+                /* Questionable: could use bitrate seek and match video to that */
+                audio_str.start_pts = video_str.start_pts;
+                audio_str.end_pts = video_str.end_pts;
+            }
         }
         else
         {
