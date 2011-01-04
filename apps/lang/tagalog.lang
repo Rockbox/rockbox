@@ -5863,7 +5863,7 @@
 <phrase>
  id: LANG_REC_SIZE
   desc: deprecated
-  user:
+  user: core
  <source>
     *: none
  </source>
@@ -12601,5 +12601,33 @@
   </dest>
   <voice>
     *: "Dami salansan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Oo (kailangan initialize database)"
+  </dest>
+  <voice>
+    *: "Oo (kailangan initialize database)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Paganahin ang awtomatikong resume"
+  </dest>
+  <voice>
+    *: "Paganahin ang awtomatikong resume"
   </voice>
 </phrase>
