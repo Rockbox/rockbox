@@ -5863,7 +5863,7 @@
 <phrase>
  id: LANG_REC_SIZE
   desc: deprecated
-  user: core
+  user:
  <source>
     *: none
  </source>
