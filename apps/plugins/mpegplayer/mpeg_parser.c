@@ -291,7 +291,7 @@ static void init_times(struct stream *str)
 
     /* Probe for many for the start because a stamp or two could be anomalous.
      * Video also can also have things out of order. How many? There isn't any
-     * "right" value but just a few seems suffient to filter some bad cases.
+     * "right" value but just a few seems sufficient to filter some bad cases.
      * Too many and file loading could take too long. */
     for (i = 5; i > 0;)
     {
