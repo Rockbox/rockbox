@@ -18,6 +18,7 @@
 # - Joao (FS#446)
 # - Rui Marinho
 # - Rui Araújo
+# - Gabriel Maia
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -12581,5 +12582,50 @@
   </dest>
   <voice>
     *: "Tamanho de Ficheiro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Sim (requer base de dados inicializada)"
+  </dest>
+  <voice>
+    *: "Sim (requer base de dados inicializada)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Força do sinal:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Força do sinal:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Habilitar retoma da reprodução automática"
+  </dest>
+  <voice>
+    *: "Habilitar retoma da reprodução automática"
   </voice>
 </phrase>
