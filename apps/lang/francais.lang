@@ -42,11 +42,7 @@
 #   (Retour aux minuscules quand nécessaire plus quelques changements mineurs dans 
 #    les entrées vocales par Simon Descarpentries (Siltaar) <siltaar chez fdn.fr> Mar 07)
 #    
-#    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#
-#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008, Oct 2008
-#    Dec 2008, Fév 2009, Août 2009, Nov 2009, Fev 2010, Oct 2010
+#    Refonte totale du fichier par Mustapha Senhaji en 2005 (moos) <moos75 AT gmail.com>
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -12631,5 +12627,33 @@
   </dest>
   <voice>
     *: "Taille du fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Activer la reprise automatique"
+  </dest>
+  <voice>
+    *: "Activer la reprise automatique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Oui (nécessite l'activation de la base de données)"
+  </dest>
+  <voice>
+    *: "Oui (nécessite l'activation de la base de données)"
   </voice>
 </phrase>
