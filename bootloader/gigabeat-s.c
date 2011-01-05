@@ -71,11 +71,15 @@ static bool pause_if_button_pressed(bool pre_usb)
         if (pre_usb && !usb_plugged())
             return false;
 
-        /* Exit if no button or only the menu (settings reset) button */
+        /* Exit if no button or only select buttons that have other
+         * functions */
         switch (button)
         {
-        case BUTTON_MENU:
-        case BUTTON_NONE:
+        case USB_BL_INSTALL_MODE_BTN:
+            if (!pre_usb)
+                break;    /* Only before USB detect */
+        case BUTTON_MENU: /* Settings reset */
+        case BUTTON_NONE: /* Nothing pressed */
             return true;
         }
 

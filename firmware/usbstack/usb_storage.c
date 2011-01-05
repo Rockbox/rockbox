@@ -32,6 +32,8 @@
 #include "usb_storage.h"
 #include "timefuncs.h"
 
+/* For sector filter macro definitions */
+#include "usb-target.h"
 
 /* Enable the following define to export only the SD card slot. This
  * is useful for USBCV MSC tests, as those are destructive.
@@ -45,6 +47,15 @@
 
 #ifndef SECTOR_SIZE
 #define SECTOR_SIZE 512
+#endif
+
+/* These defaults allow the operation */
+#ifndef USBSTOR_READ_SECTORS_FILTER
+#define USBSTOR_READ_SECTORS_FILTER() ({ 0; })
+#endif
+
+#ifndef USBSTOR_WRITE_SECTORS_FILTER
+#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; }) 
 #endif
 
 /* the ARC driver currently supports up to 64k USB transfers. This is
@@ -342,23 +353,6 @@ static void yearday_to_daymonth(int yd, int y, int *d, int *m)
     *m = i;
 }
 
-#ifdef TOSHIBA_GIGABEAT_S
-
-/* The Gigabeat S factory partition table contains invalid values for the
-   "active" flag in the MBR.  This prevents at least the Linux kernel from
-   accepting the partition table, so we fix it on-the-fly. */
-
-static void fix_mbr(unsigned char* mbr)
-{
-    unsigned char* p = mbr + 0x1be;
-
-    p[0x00] &= 0x80;
-    p[0x10] &= 0x80;
-    p[0x20] &= 0x80;
-    p[0x30] &= 0x80;
-}
-#endif
-
 static bool check_disk_present(IF_MD_NONVOID(int volume))
 {
 #ifdef USB_USE_RAMDISK
@@ -491,14 +485,7 @@ void usb_storage_init_connection(void)
 
     int i;
     for(i=0;i<storage_num_drives();i++) {
-#ifdef TOSHIBA_GIGABEAT_S
-        /* As long as the Gigabeat S is a non-removable device, we need
-           to mark the device as locked to avoid usb_storage_try_release_ata()
-           to leave MSC mode while the device is in use */
-        locked[i] = true;
-#else
         locked[i] = false;
-#endif
         ejected[i] = !check_disk_present(IF_MD(i));
         queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
@@ -549,10 +536,15 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                         cur_cmd.data[cur_cmd.data_select],
                         MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                int result = storage_write_sectors(IF_MD2(cur_cmd.lun,)
+                int result = USBSTOR_WRITE_SECTORS_FILTER();
+
+                if (result == 0) {
+                    result = storage_write_sectors(IF_MD2(cur_cmd.lun,)
                         cur_cmd.sector,
                         MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);
+                }
+
                 if(result != 0) {
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
@@ -725,6 +717,11 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
 
 static void send_and_read_next(void)
 {
+    int result = USBSTOR_READ_SECTORS_FILTER();
+
+    if(result != 0 && cur_cmd.last_result == 0)
+        cur_cmd.last_result = result;
+
     send_block_data(cur_cmd.data[cur_cmd.data_select],
                     MIN(READ_BUFFER_SIZE,cur_cmd.count*SECTOR_SIZE));
 
@@ -742,7 +739,7 @@ static void send_and_read_next(void)
                 ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-        int result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
+        result = storage_read_sectors(IF_MD2(cur_cmd.lun,)
                 cur_cmd.sector,
                 MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                 cur_cmd.data[cur_cmd.data_select]);
@@ -1104,12 +1101,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                         cur_cmd.sector,
                         MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);
-
-#ifdef TOSHIBA_GIGABEAT_S
-                if(cur_cmd.sector == 0) {
-                    fix_mbr(cur_cmd.data[cur_cmd.data_select]);
-                }
-#endif
 #endif
                 send_and_read_next();
             }
@@ -1262,9 +1253,5 @@ static void fill_inquiry(IF_MD_NONVOID(int lun))
     tb.inquiry->Versions = 4; /* SPC-2 */
     tb.inquiry->Format = 2; /* SPC-2/3 inquiry format */
 
-#ifdef TOSHIBA_GIGABEAT_S
-    tb.inquiry->DeviceTypeModifier = 0;
-#else
     tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
-#endif
 }

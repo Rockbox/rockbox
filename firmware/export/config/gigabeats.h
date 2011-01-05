@@ -190,8 +190,17 @@
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
-#define USBPOWER_BUTTON     BUTTON_MENU
-#define USBPOWER_BTN_IGNORE BUTTON_POWER
+#define USBPOWER_BUTTON             BUTTON_MENU
+
+#ifndef BOOTLOADER
+#define USBPOWER_BTN_IGNORE         BUTTON_POWER
+#else
+/* Disable charging-only mode detection in bootloader */
+#define USBPOWER_BTN_IGNORE         (BUTTON_MAIN | BUTTON_REMOTE)
+#endif
+
+/* Button that exposures boot partition rather than data during session */
+#define USB_BL_INSTALL_MODE_BTN     BUTTON_VOL_DOWN
 
 /* define this if the unit has a battery switch or battery can be removed
  * when running */

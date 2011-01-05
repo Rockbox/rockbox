@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
 #include "system.h"
 #include "kernel.h"
 #include "ata.h"
@@ -31,8 +30,10 @@
 #include "ccm-imx31.h"
 #include "avic-imx31.h"
 #include "power-gigabeat-s.h"
+#include <string.h>
 
 static int usb_status = USB_EXTRACTED;
+static bool bootloader_install_mode = false;
 
 static void enable_transceiver(bool enable)
 {
@@ -106,6 +107,16 @@ void usb_enable(bool on)
 
 void usb_attach(void)
 {
+    bootloader_install_mode = false;
+
+    if (usb_core_driver_enabled(USB_DRIVER_MASS_STORAGE))
+    {
+        /* Check if this will be bootloader install mode, exposing the
+         * boot partition instead of the data partition */
+        bootloader_install_mode =
+            (button_status() & USB_BL_INSTALL_MODE_BTN) != 0;
+    }
+
     usb_drv_attach();
 }
 
@@ -132,4 +143,35 @@ void usb_drv_usb_detect_event(void)
 {
     if (usb_drv_powered())
         usb_status_event(USB_INSERTED);
+}
+
+/* Called when reading the MBR */
+void usb_fix_mbr(unsigned char *mbr)
+{
+    unsigned char* p = mbr + 0x1be;
+    char tmp[16];
+
+    /* The Gigabeat S factory partition table contains invalid values for the
+       "active" flag in the MBR.  This prevents at least the Linux kernel
+       from accepting the partition table, so we fix it on-the-fly. */
+    p[0x00] &= 0x80;
+    p[0x10] &= 0x80;
+    p[0x20] &= 0x80;
+    p[0x30] &= 0x80;
+
+    if (bootloader_install_mode)
+        return;
+
+    /* Windows ignores the partition flags and mounts the first partition it
+       sees when the device reports itself as removable. Swap the partitions
+       so the data partition appears to be partition 0. Mark the boot
+       partition 0 as hidden and make it partition 1. */
+
+    /* Mark the first partition as hidden */
+    p[0x04] |= 0x10;
+
+    /* Swap first and second partitions */
+    memcpy(tmp, &p[0x00], 16);
+    memcpy(&p[0x00], &p[0x10], 16);
+    memcpy(&p[0x10], tmp, 16);
 }
