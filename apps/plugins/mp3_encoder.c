@@ -893,12 +893,25 @@ int wave_open(void)
   return 0;
 }
 
-int read_samples(uint32_t *buffer, int num_samples)
+int read_samples(uint16_t *buffer, int num_samples)
 {
-  int s, samples = rb->read(wavfile, buffer, 4 * num_samples) / 4;
+  uint16_t tmpbuf[SAMP_PER_FRAME*2]; /*  SAMP_PER_FRAME*MAX_CHANNELS */
+  int byte_per_sample = cfg.channels * 2; /* requires bits_per_sample==16 */
+  int s, samples = rb->read(wavfile, tmpbuf, byte_per_sample * num_samples) / byte_per_sample;
   /* Pad last sample with zeros */
-  for(s=samples; s<num_samples; s++)
-    buffer[s] = 0;
+  memset(tmpbuf + samples*cfg.channels, 0, (num_samples-samples)*cfg.channels);
+
+  if (cfg.channels==1)
+  {
+    /* interleave the mono samples to stereo as required by encoder */
+    for(s=0; s<num_samples; s++)
+        buffer[2*s] = tmpbuf[s];
+  }
+  else
+  {
+    /* interleaving is correct for stereo */
+    memcpy(buffer, tmpbuf, sizeof(tmpbuf));
+  }
 
   return samples;
 }
@@ -2163,7 +2176,7 @@ void compress(void)
     memcpy(mfbuf, mfbuf + 2*cfg.granules*576, 4*512);
 
     /* read new samples to iram for further processing */
-    if(read_samples((uint32_t*)(mfbuf + 2*512), SAMP_PER_FRAME) == 0)
+    if(read_samples((mfbuf + 2*512), SAMP_PER_FRAME) == 0)
       break;
 
     /* swap bytes if neccessary */
@@ -2181,10 +2194,6 @@ void compress(void)
         mfbuf[i/2+512] = (short)(((int)mfbuf[i+0] + mfbuf[i+2]) >> 1);
         mfbuf[i/2+513] = (short)(((int)mfbuf[i+1] + mfbuf[i+3]) >> 1);
       }
-
-    if(cfg.channels == 1) /* mix left and right channels to mono */
-      for(i=2*512; i<2*512+2*SAMP_PER_FRAME; i+=2)
-        mfbuf[i] = mfbuf[i+1] = (short)(((int)mfbuf[i] + mfbuf[i+1]) >> 1);
 
     cfg.ResvSize = 0;
     gr_cnt = cfg.granules * cfg.channels;
@@ -2560,7 +2569,7 @@ enum plugin_status plugin_start(const void* parameter)
         ret = wave_open();
         if(ret == 0)
         {
-            init_mp3_encoder_engine(true, brate[srat], cfg.samplerate);
+            init_mp3_encoder_engine((cfg.channels==2), brate[srat], cfg.samplerate);
             get_mp3_filename(wav_filename);
             mp3file = rb->open(mp3_name , O_WRONLY|O_CREAT|O_TRUNC, 0666);
             frames  = 0;
