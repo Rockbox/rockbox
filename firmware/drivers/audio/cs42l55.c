@@ -30,7 +30,7 @@
 #include "cs42l55.h"
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -58,  12, -25},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -60,  12, -25},
     [SOUND_BASS]          = {"dB", 1, 15,-105, 120,   0},
     [SOUND_TREBLE]        = {"dB", 1, 15,-105, 120,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
@@ -40,21 +40,22 @@ const struct sound_settings_info audiohw_settings[] = {
 
 static int bass, treble;
 
-/* convert tenth of dB volume (-580..120) to master volume register value */
+/* convert tenth of dB volume (-600..120) to master volume register value */
 int tenthdb2master(int db)
 {
-    /* +12 to -58dB 1dB steps */
+    /* -60dB to +12dB in 1dB steps */
     /* 0001100 == +12dB (0xc) */
     /* 0000000 == 0dB   (0x0) */
-    /* 1000100 == -58dB (0x44) */
+    /* 1000100 == -60dB (0x44, this is actually -58dB) */
 
     if (db < VOLUME_MIN) return HPACTL_HPAMUTE;
-    return db & HPACTL_HPAVOL_MASK;
+    return (db / 10) & HPACTL_HPAVOL_MASK;
 }
 
 static void cscodec_setbits(int reg, unsigned char off, unsigned char on)
 {
-    cscodec_write(reg, (cscodec_read(reg) & ~off) | on);
+    unsigned char data = (cscodec_read(reg) & ~off) | on;
+    cscodec_write(reg, data);
 }
 
 static void audiohw_mute(bool mute)
@@ -122,10 +123,10 @@ void audiohw_postinit(void)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    /* +12 to -58dB 1dB steps */
+    /* -60dB to +12dB in 1dB steps */
     /* 0001100 == +12dB (0xc) */
     /* 0000000 == 0dB   (0x0) */
-    /* 1000100 == -58dB (0x44) */
+    /* 1000100 == -60dB (0x44, this is actually -58dB) */
 
     cscodec_setbits(HPACTL, HPACTL_HPAVOL_MASK, vol_l << HPACTL_HPAVOL_SHIFT);
     cscodec_setbits(HPBCTL, HPBCTL_HPBVOL_MASK, vol_r << HPBCTL_HPBVOL_SHIFT);
@@ -133,10 +134,10 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    /* +12 to -58dB 1dB steps */
+    /* -60dB to +12dB in 1dB steps */
     /* 0001100 == +12dB (0xc) */
     /* 0000000 == 0dB   (0x0) */
-    /* 1000100 == -58dB (0x44) */
+    /* 1000100 == -60dB (0x44, this is actually -58dB) */
 
     cscodec_setbits(LINEACTL, LINEACTL_LINEAVOL_MASK,
                     vol_l << LINEACTL_LINEAVOL_SHIFT);
