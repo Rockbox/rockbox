@@ -30,11 +30,11 @@ else
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=http://mirrors.kernel.org/gnu
+    GNU_MIRROR=ftpmirror.gnu.org
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc bzip2 make patch makeinfo"
+reqtools="gcc bzip2 gzip make patch makeinfo"
 
 ##############################################################################
 # Functions:
@@ -95,19 +95,19 @@ build() {
     version="$3"
     patch="$4"
     configure_params="$5"
-    needs_gmp="$6"
+    needs_libs="$6"
 
     patch_url="http://www.rockbox.org/gcc"
 
     case $toolname in
         gcc)
             file="gcc-core-$version.tar.bz2"
-            url="$GNU_MIRROR/gcc/gcc-$version"
+            url="$GNU_MIRROR/gcc/releases/gcc-$version"
             ;;
 
         binutils)
             file="binutils-$version.tar.bz2"
-            url="$GNU_MIRROR/binutils"
+            url="$GNU_MIRROR/binutils/releases/"
             ;;
 
         *)
@@ -157,25 +157,34 @@ build() {
         fi
     fi
 
-    # kludge to avoid having to install GMP and MPFR for new gcc
-    if test -n "$needs_gmp"; then
+    # kludge to avoid having to install GMP, MPFR and MPC, for new gcc
+    if test -n "$needs_libs"; then
         cd "gcc-$version"
-        if test ! -d gmp; then
+        if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
-            if test ! -f $dlwhere/gmp-5.0.1.tar.bz2; then
-                getfile "gmp-5.0.1.tar.bz2" "$GNU_MIRROR/gmp"
+            if test ! -f $dlwhere/gmp-4.3.2.tar.bz2; then
+                getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gcc/infrastructure"
             fi
-            tar xjf $dlwhere/gmp-5.0.1.tar.bz2
-            ln -s gmp-5.0.1 gmp
+            tar xjf $dlwhere/gmp-4.3.2.tar.bz2
+            ln -s gmp-4.3.2 gmp
         fi
 
-        if test ! -d mpfr; then
+        if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
             if test ! -f $dlwhere/mpfr-2.4.2.tar.bz2; then
-                getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
+                getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/gcc/infrastructure"
             fi
             tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
             ln -s mpfr-2.4.2 mpfr
+        fi
+
+        if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
+            echo "ROCKBOXDEV: Getting MPC"
+            if test ! -f $dlwhere/mpc-0.8.1.tar.gz; then
+                getfile "mpc-0.8.1.tar.gz" "$GNU_MIRROR/gcc/infrastructure"
+            fi
+            tar xzf $dlwhere/mpc-0.8.1.tar.gz
+            ln -s mpc-0.8.1 mpc
         fi
         cd $builddir
     fi
@@ -253,7 +262,7 @@ echo "e   - arm-eabi (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
 echo "a   - arm      (older ARM toolchain, deprecated) "
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
-echo "(Example: \"s m a\" will build sh, m86k and arm)"
+echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
 
 selarch=`input`
@@ -312,7 +321,7 @@ do
                     ;;
             esac
             build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff" "$binopts"
-            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts" "needs_gmp"
+            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts" "gmp mpfr"
             ;;
 
         *)
