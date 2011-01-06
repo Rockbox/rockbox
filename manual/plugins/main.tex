@@ -146,6 +146,9 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
         Midiplay          & \fname{.mid, .midi}              &   \\
         MPEG Player       & \fname{.mpg, .mpeg, .mpv, .m2v}  &   \\
     }}
+    \opt{swcodec}{
+        MP3 Encoder       & \fname{.wav}                     & x \\
+    }
     \opt{masf}{
         \opt{lcd_bitmap}{
             Movie Player  & \fname{.rvf}                     &   \\
@@ -186,6 +189,9 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \opt{archosrecorder,archosfmrecorder,ondio}{\input{plugins/movieplayer.tex}}
 
 \opt{lcd_bitmap}{\opt{swcodec}{\nopt{lowmem}{\input{plugins/mpegplayer.tex}}}}
+
+\opt{swcodec}{\nopt{lowmem}{\input{plugins/mp3_encoder.tex}}}
+
 
 \opt{lcd_color}{\input{plugins/ppmviewer.tex}}
 
