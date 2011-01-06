@@ -30,7 +30,7 @@ else
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=ftpmirror.gnu.org
+    GNU_MIRROR=ftp://gcc.gnu.org/pub
 fi
 
 # These are the tools this script requires and depends upon.
@@ -107,7 +107,7 @@ build() {
 
         binutils)
             file="binutils-$version.tar.bz2"
-            url="$GNU_MIRROR/binutils/releases/"
+            url="$GNU_MIRROR/binutils/releases"
             ;;
 
         *)
