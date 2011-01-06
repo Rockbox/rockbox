@@ -12575,6 +12575,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Potenza segnale:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Potenza segnale:"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FILESIZE
   desc: in record timesplit options and in track information viewer 
   user: core
@@ -12586,5 +12603,33 @@
   </dest>
   <voice>
     *: "Dimensione file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Abilita Riprendi Automatico"
+  </dest>
+  <voice>
+    *: "Abilita Riprendi Automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Sì (richiede database inizializzato)"
+  </dest>
+  <voice>
+    *: "Sì (richiede database inizializzato)"
   </voice>
 </phrase>
