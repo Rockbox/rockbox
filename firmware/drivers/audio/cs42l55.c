@@ -128,8 +128,10 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0000000 == 0dB   (0x0) */
     /* 1000100 == -60dB (0x44, this is actually -58dB) */
 
-    cscodec_setbits(HPACTL, HPACTL_HPAVOL_MASK, vol_l << HPACTL_HPAVOL_SHIFT);
-    cscodec_setbits(HPBCTL, HPBCTL_HPBVOL_MASK, vol_r << HPBCTL_HPBVOL_SHIFT);
+    cscodec_setbits(HPACTL, HPACTL_HPAVOL_MASK | HPACTL_HPAMUTE,
+                    vol_l << HPACTL_HPAVOL_SHIFT);
+    cscodec_setbits(HPBCTL, HPBCTL_HPBVOL_MASK | HPBCTL_HPBMUTE,
+                    vol_r << HPBCTL_HPBVOL_SHIFT);
 }
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
@@ -139,9 +141,9 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
     /* 0000000 == 0dB   (0x0) */
     /* 1000100 == -60dB (0x44, this is actually -58dB) */
 
-    cscodec_setbits(LINEACTL, LINEACTL_LINEAVOL_MASK,
+    cscodec_setbits(LINEACTL, LINEACTL_LINEAVOL_MASK | LINEACTL_LINEAMUTE,
                     vol_l << LINEACTL_LINEAVOL_SHIFT);
-    cscodec_setbits(LINEBCTL, LINEBCTL_LINEBVOL_MASK,
+    cscodec_setbits(LINEBCTL, LINEBCTL_LINEBVOL_MASK | LINEBCTL_LINEBMUTE,
                     vol_r << LINEBCTL_LINEBVOL_SHIFT);
 }
 
