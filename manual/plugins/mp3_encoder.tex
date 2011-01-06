@@ -1,7 +1,7 @@
 \subsection{MP3 Encoder}
-This plugin allows to encode a \fname{.wav} file to MP3 format. Supported input 
-format is uncompressed, linear PCM with 16 bit per sample and maximum 2 channels. 
-Allowed sample rates are 16, 22.05, 24, 32, 44.1 and 48~kHz.
+This plugin encodes a \fname{.wav} file to MP3 format. The supported
+input format is uncompressed, linear PCM with 16 bit per sample and a maximum
+of 2 channels. Allowed sample rates are 16, 22.05, 24, 32, 44.1 and 48~kHz.
 The user will be asked to select the desired output bitrate of the compressed
 MP3 file. 
 
@@ -17,12 +17,12 @@ valid for mono files.
 
 The output \fname{.mp3} file is written to the same path as the \fname{.wav} 
 file using the same filename. To use this plugin, open the \setting{Context Menu} 
-(see \reference{ref:Contextmenu}) upon a \fname{.wav} file and select 
+(see \reference{ref:Contextmenu}) on a \fname{.wav} file and select 
 \setting{Open With\dots $\rightarrow$ mp3\_encoder}.
 
 \note{
 The encoder will choose the appropriate bitstream format from the sample rate
-of the input file. Output bitstream format is MPEG~1 Layer~3 for 32, 44.1 and 
-48~kHz, and MPEG~2 Layer~3 for 16, 22.05 and 24~kHz. MPEG~2.5 Layer~3 is not 
-supported.
+of the input file. The output bitstream format is MPEG~1 Layer~3 for 32, 44.1
+and 48~kHz, and MPEG~2 Layer~3 for 16, 22.05 and 24~kHz. MPEG~2.5 Layer~3 is
+not supported.
 }
