@@ -802,7 +802,19 @@ static const int16_t win[18][4] = {
   {   529, -831,-3747,-2387 },
   {   362, -471,-3579,-2747 },
   {   134, -146,-3352,-3072 } };
-
+  
+static char* mp3_enc_err[] = {
+  /* 0 */ "",
+  /* 1 */ "Cannot open file.",
+  /* 2 */ "'RIFF' missing.",
+  /* 3 */ "'WAVE' missing.",
+  /* 4 */ "'fmt ' missing.",
+  /* 5 */ "Linear PCM required.",
+  /* 6 */ "16 bit per sample required.",
+  /* 7 */ "<=2 channels required.",
+  /* 8 */ "'data' missing.",
+  /* 9 */ "32/44.1/48 kHz required."
+};
 
 static const char* wav_filename;
 static int         mp3file, wavfile, wav_size, frames;
@@ -881,10 +893,17 @@ int wave_open(void)
   wBlockAlign     = Read16BitsLowHigh(wavfile);
   bits_per_samp   = Read16BitsLowHigh(wavfile);
   
-  if(wFormatTag != 0x0001)         return -5;
-  if(bits_per_samp != 16)          return -6;
-  if(cfg.channels > 2)             return -7;
+  if(wFormatTag != 0x0001)         return -5; /* linear PCM required */
+  if(bits_per_samp != 16)          return -6; /* 16 bps required */
+  if(cfg.channels > 2)             return -7; /* <=2 channels required */
   if(!checkString(wavfile,"data")) return -8;
+  
+  /* FIXME: sample rates != 32/44.1/48 kHz do not encode properly as those
+   * need MPEG2 format with different setup of the encoder. This MPEG2 setup
+   * is buggy. */
+  if((cfg.samplerate != 32000) &&
+     (cfg.samplerate != 44100) &&
+     (cfg.samplerate != 48000))    return -9;
   
   header_size = 0x28;
   wav_size = rb->filesize(wavfile);
@@ -2063,9 +2082,16 @@ void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
   cfg.byte_order = order_bigEndian;
 #endif
 
-  if(bitrate < 96 && stereo && sample_rate >= 32000)
+  cfg.samplerate    = sample_rate;
+  cfg.channels      = stereo ? 2 : 1;
+  cfg.mpg.mode      = stereo ? 0 : 3; /* 0=stereo, 3=mono */
+  cfg.mpg.bitrate   = stereo ? bitrate : bitrate > 160 ? 160 : bitrate;
+  cfg.mpg.smpl_id   = find_samplerate_index(cfg.samplerate, &cfg.mpg.type);
+  cfg.mpg.bitr_id   = find_bitrate_index(cfg.mpg.type, cfg.mpg.bitrate);
+  cfg.mpg.num_bands = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
+  
+  if(0 == cfg.mpg.type)
   { /* use MPEG2 format */
-    sample_rate >>= 1;
     cfg.resample  = 1;
     cfg.granules  = 1;
   }
@@ -2074,14 +2100,6 @@ void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
     cfg.resample  = 0;
     cfg.granules  = 2;
   }
-
-  cfg.samplerate    = sample_rate;
-  cfg.channels      = stereo ? 2 : 1;
-  cfg.mpg.mode      = stereo ? 0 : 3; /* 0=stereo, 3=mono */
-  cfg.mpg.bitrate   = stereo ? bitrate : bitrate > 160 ? 160 : bitrate;
-  cfg.mpg.smpl_id   = find_samplerate_index(cfg.samplerate, &cfg.mpg.type);
-  cfg.mpg.bitr_id   = find_bitrate_index(cfg.mpg.type, cfg.mpg.bitrate);
-  cfg.mpg.num_bands = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
 
   scalefac = sfBand[cfg.mpg.smpl_id + 3*cfg.mpg.type];
 
@@ -2585,14 +2603,16 @@ enum plugin_status plugin_start(const void* parameter)
         else
         {
             rb->close(wavfile);
+            rb->lcd_clear_display();
             rb->lcd_putsxyf(0, 20, "WaveOpen failed %d", ret);
+            rb->lcd_putsxyf(0, 30, "%s", mp3_enc_err[-ret]);
             rb->lcd_update();
             rb->sleep(5*HZ);
         }
 
         rb->lcd_clear_display();
         rb->lcd_putsxyf(0, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
-        tim = frames * SAMP_PER_FRAME * 100 / 44100; /* unit=.01s */
+        tim = frames * SAMP_PER_FRAME * 100 / cfg.samplerate; /* unit=.01s */
         rb->lcd_putsxyf(0, 20, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
         rb->lcd_update();
         rb->sleep(5*HZ);
