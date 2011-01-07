@@ -36,6 +36,7 @@
 
 #define _DEBUG_PRINTF(a, varargs...) lcd_putsf(0, line++, (a), ##varargs);
 
+extern int lcd_type;
 bool __dbg_hw_info(void)
 {
     int line;
@@ -56,6 +57,9 @@ bool __dbg_hw_info(void)
         {
             _DEBUG_PRINTF("CPU:");
             _DEBUG_PRINTF("current_tick: %d", (unsigned int)current_tick);
+            line++;
+
+            _DEBUG_PRINTF("LCD type: %d", lcd_type);
             line++;
         }
         else if(state==1)
