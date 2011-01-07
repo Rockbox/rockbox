@@ -980,8 +980,6 @@ static void record_and_get_pitch(void)
                         record_data();
                     }
                     break;
-
-                break;
             }
         }
 
