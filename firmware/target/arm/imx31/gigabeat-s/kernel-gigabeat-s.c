@@ -85,3 +85,8 @@ void tick_stop(void)
     ccm_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
 }
 
+
+void kernel_audio_locking(bool locking)
+{
+    dvfs_int_mask(locking);
+}

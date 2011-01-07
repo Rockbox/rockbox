@@ -51,6 +51,9 @@ void tick_stop(void);
 void kernel_device_init(void);
 void system_halt(void);
 
+/* Handle some audio lockout related tasks */
+void kernel_audio_locking(bool locking);
+
 #define KDEV_INIT
 
 struct ARM_REGS {

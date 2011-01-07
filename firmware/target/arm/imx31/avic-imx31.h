@@ -67,6 +67,11 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype);
 #define AVIC_NIL_ENABLE  (-1)
 void avic_set_ni_level(int level);
 
+static inline void avic_mask_int(enum IMX31_INT_LIST ints)
+    { AVIC_INTDISNUM = ints; }
+
+static inline void avic_unmask_int(enum IMX31_INT_LIST ints)
+    { AVIC_INTENNUM = ints; }
 
 /* Call a service routine while allowing preemption by interrupts of higher
  * priority. Avoid using any app or other SVC stack by doing it with a mini

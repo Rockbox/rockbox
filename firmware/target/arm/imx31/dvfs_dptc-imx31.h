@@ -128,6 +128,7 @@ void dvfs_wfi_monitor(bool on);
 void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value);
 void dvfs_set_lt_detect(enum DVFS_LT_SIGS index, bool edge);
 void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert);
+void dvfs_int_mask(bool mask);
 
 unsigned int dvfs_dptc_get_voltage(void);
 unsigned int dvfs_get_level(void);

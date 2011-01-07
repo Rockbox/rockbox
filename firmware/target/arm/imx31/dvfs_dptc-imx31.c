@@ -612,6 +612,22 @@ void dvfs_dptc_stop(void)
 }
 
 
+/* Mask the DVFS interrupt without affecting running status */
+void dvfs_int_mask(bool mask)
+{
+    if (mask)
+    {
+        /* Just disable, not running = already disabled */
+        avic_mask_int(INT_CCM_DVFS);
+    }
+    else if (dvfs_running)
+    {
+        /* DVFS is running; unmask it */
+        avic_unmask_int(INT_CCM_DVFS);
+    }
+}
+
+
 /* Set a signal load tracking weight */
 void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value)
 {

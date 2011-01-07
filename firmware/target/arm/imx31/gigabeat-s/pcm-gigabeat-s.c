@@ -109,20 +109,33 @@ static void play_dma_callback(void)
 
 void pcm_play_lock(void)
 {
+    /* Need to prevent DVFS from causing interrupt priority inversion if audio
+     * is locked and a DVFS interrupt fires, blocking reenabling of audio by a 
+     * low-priority mode for at least the duration of the lengthy DVFS routine.
+     * Not really an issue with state changes but lockout when playing.
+     *
+     * Keep direct use of DVFS code away from here though. This could provide
+     * more services in the future anyway. */
+    kernel_audio_locking(true);
     ++dma_play_data.locked;
 }
 
 void pcm_play_unlock(void)
 {
-    if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
+    if (--dma_play_data.locked == 0)
     {
-        int oldstatus = disable_irq_save();
-        int pending = dma_play_data.callback_pending;
-        dma_play_data.callback_pending = 0;
-        restore_irq(oldstatus);
+        if (dma_play_data.state != 0)
+        {
+            int oldstatus = disable_irq_save();
+            int pending = dma_play_data.callback_pending;
+            dma_play_data.callback_pending = 0;
+            restore_irq(oldstatus);
 
-        if (pending != 0)
-            play_dma_callback();
+            if (pending != 0)
+                play_dma_callback();
+        }
+
+        kernel_audio_locking(false);
     }
 }
 
@@ -442,20 +455,26 @@ static void rec_dma_callback(void)
 
 void pcm_rec_lock(void)
 {
+    kernel_audio_locking(true);    
     ++dma_rec_data.locked;
 }
 
 void pcm_rec_unlock(void)
 {
-    if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
+    if (--dma_rec_data.locked == 0)
     {
-        int oldstatus = disable_irq_save();
-        int pending = dma_rec_data.callback_pending;
-        dma_rec_data.callback_pending = 0;
-        restore_irq(oldstatus);
+        if (dma_rec_data.state != 0)
+        {
+            int oldstatus = disable_irq_save();
+            int pending = dma_rec_data.callback_pending;
+            dma_rec_data.callback_pending = 0;
+            restore_irq(oldstatus);
 
-        if (pending != 0)
-            rec_dma_callback();
+            if (pending != 0)
+                rec_dma_callback();
+        }
+
+        kernel_audio_locking(false);
     }
 }
 
