@@ -101,7 +101,7 @@
 #define THDATA1      (*((uint32_t volatile*)(0x3C70010C)))
 #define THPRE        (*((uint32_t volatile*)(0x3C700110)))
 #define THCNT        (*((uint32_t volatile*)(0x3C700114)))
-#define USEC_TIMER   TFCNT
+#define USEC_TIMER   TECNT
 
 
 /////USB/////
