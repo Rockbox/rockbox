@@ -59,10 +59,56 @@
 #include "usbstack/usb_hid.h"
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_SDL)
+#if defined (SIMULATOR)
 #define PREFIX(_x_) sim_ ## _x_
+#elif defined (APPLICATION)
+#define PREFIX(_x_) app_ ## _x_
 #else
 #define PREFIX
+#endif
+
+#if defined (APPLICATION)
+/* For symmetry reasons (we want app_ and sim_ to behave similarly), some
+ * wrappers are needed */
+static int app_close(int fd)
+{
+    return close(fd);
+}
+
+static ssize_t app_read(int fd, void *buf, size_t count)
+{
+    return read(fd,buf,count);
+}
+
+static off_t app_lseek(int fd, off_t offset, int whence)
+{
+    return lseek(fd,offset,whence);
+}
+
+static ssize_t app_write(int fd, const void *buf, size_t count)
+{
+    return write(fd,buf,count);
+}
+
+static int app_ftruncate(int fd, off_t length)
+{
+    return ftruncate(fd,length);
+}
+
+static off_t app_filesize(int fd)
+{
+    return filesize(fd);
+}
+
+static int app_closedir(DIR *dirp)
+{
+    return closedir(dirp);
+}
+
+static struct dirent *app_readdir(DIR *dirp)
+{
+    return readdir(dirp);
+}
 #endif
 
 #if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
