@@ -41,6 +41,7 @@ static const int zerosample = 0;
 static unsigned char dblbuf[WATERMARK * 4] IBSS_ATTR;
 struct dma_lli lli[(CHUNKSIZE - WATERMARK + LLIMAX - 1) / LLIMAX + 1]
        __attribute__((aligned(16)));
+struct dma_lli* lastlli;
 static const unsigned char* dataptr;
 static size_t remaining;
 
@@ -75,7 +76,6 @@ void INT_DMAC0C0(void)
     }
     uint32_t lastsize = MIN(WATERMARK * 4, remaining);
     remaining -= lastsize;
-    struct dma_lli* lastlli;
     if (remaining) lastlli = &lli[ARRAYLEN(lli) - 1];
     else lastlli = lli;
     uint32_t chunksize = MIN(CHUNKSIZE * 4 - lastsize, remaining);
@@ -155,11 +155,12 @@ void pcm_dma_apply_settings(void)
 
 size_t pcm_get_bytes_waiting(void)
 {
-    int bytes = remaining + (DMAC0C0LLI.control & 0xfff) * 2;
-    const struct dma_lli* lli = DMAC0C0LLI.nextlli;
+    int bytes = remaining;
+    const struct dma_lli* lli = &DMAC0C0LLI;
     while (lli)
     {
         bytes += (lli->control & 0xfff) * 2;
+        if (lli == lastlli) break;
         lli = lli->nextlli;
     }
     return bytes;
