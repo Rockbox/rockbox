@@ -73,7 +73,6 @@ enum thread_states
     TSTATE_DECODE,          /* is in a decoding state */
     TSTATE_RENDER,          /* is in a rendering state */
     TSTATE_RENDER_WAIT,     /* is waiting to render */
-    TSTATE_RENDER_WAIT_END, /* is waiting on remaining data */
 };
 
 /* Commands that streams respond to */

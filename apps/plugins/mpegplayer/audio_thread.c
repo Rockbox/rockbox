@@ -112,7 +112,7 @@ static inline void audiodesc_queue_add_tail(void)
     audio_queue.write++;
 }
 
-/* Increments the queue tail position - leaves one slot as current */
+/* Increments the queue head position - leaves one slot as current */
 static inline bool audiodesc_queue_remove_head(void)
 {
     if (audio_queue.write == audio_queue.read)
@@ -375,8 +375,6 @@ static void audio_thread_msg(struct audio_thread_data *td)
             case TSTATE_INIT:
                 td->state = TSTATE_DECODE;
             case TSTATE_DECODE:
-            case TSTATE_RENDER_WAIT:
-            case TSTATE_RENDER_WAIT_END:
                 break;
 
             case TSTATE_EOS:
@@ -455,7 +453,6 @@ static void audio_thread_msg(struct audio_thread_data *td)
             {
             case TSTATE_DECODE:
             case TSTATE_RENDER_WAIT:
-            case TSTATE_RENDER_WAIT_END:
                 /* These return when in playing state */
                 return;
             }
@@ -512,7 +509,6 @@ static void audio_thread(void)
             /* These states are the only ones that should return */
             case TSTATE_DECODE:          goto audio_decode;
             case TSTATE_RENDER_WAIT:     goto render_wait;
-            case TSTATE_RENDER_WAIT_END: goto render_wait_end;
             /* Anything else is interpreted as an exit */
             default:
             {
@@ -538,29 +534,28 @@ static void audio_thread(void)
         case STREAM_DATA_END:
         {
             if (audio_queue.used > MAD_BUFFER_GUARD)
-                break;
+                break; /* Still have frames to decode */
 
-            /* Used up remainder of compressed audio buffer.
-             * Force any residue to play if audio ended before
-             * reaching the threshold */
-            td.state = TSTATE_RENDER_WAIT_END;
+            /* Used up remainder of compressed audio buffer. Wait for
+             * samples on PCM buffer to finish playing. */
             audio_queue_reset();
 
-        render_wait_end:
-            pcm_output_drain();
-
-            while (pcm_output_used() > (ssize_t)PCMOUT_LOW_WM)
+            while (1)
             {
+                if (pcm_output_empty())
+                {
+                    td.state = TSTATE_EOS;
+                    stream_generate_event(&audio_str, STREAM_EV_COMPLETE, 0);
+                    break;
+                }
+
+                pcm_output_drain();
                 str_get_msg_w_tmo(&audio_str, &td.ev, 1);
+
                 if (td.ev.id != SYS_TIMEOUT)
-                    goto message_process;
+                    break;
             }
 
-            td.state = TSTATE_EOS;
-            if (td.status == STREAM_PLAYING)
-                stream_generate_event(&audio_str, STREAM_EV_COMPLETE, 0);
-
-            rb->yield();
             goto message_wait;
             } /* STREAM_DATA_END: */
         }
@@ -606,11 +601,9 @@ static void audio_thread(void)
 
             /* This is too hard - bail out */
             td.state = TSTATE_EOS;
-
-            if (td.status == STREAM_PLAYING)
-                stream_generate_event(&audio_str, STREAM_EV_COMPLETE, 0);
-
             td.status = STREAM_ERROR;
+            stream_generate_event(&audio_str, STREAM_EV_COMPLETE, 0);
+
             goto message_wait;
         }
 
@@ -643,15 +636,15 @@ static void audio_thread(void)
     render_wait:
         if (synth.pcm.length > 0)
         {
-            struct pcm_frame_header *dst_hdr = pcm_output_get_buffer();
             const char *src[2] =
                 { (char *)synth.pcm.samples[0], (char *)synth.pcm.samples[1] };
             int out_count = (synth.pcm.length * CLOCK_RATE
                                 + (td.samplerate - 1)) / td.samplerate;
-            ssize_t size = sizeof(*dst_hdr) + out_count*4;
+            unsigned char *out_buf;
+            ssize_t size = out_count*4;
 
             /* Wait for required amount of free buffer space */
-            while (pcm_output_free() < size)
+            while ((out_buf = pcm_output_get_buffer(&size)) == NULL)
             {
                 /* Wait one frame */
                 int timeout = out_count*HZ / td.samplerate;
@@ -660,21 +653,17 @@ static void audio_thread(void)
                     goto message_process;
             }
 
-            out_count = rb->dsp_process(td.dsp, dst_hdr->data, src,
-                                        synth.pcm.length);
+            out_count = rb->dsp_process(td.dsp, out_buf, src, synth.pcm.length);
 
             if (out_count <= 0)
                 break;
 
-            dst_hdr->size = sizeof(*dst_hdr) + out_count*4;
-            dst_hdr->time = audio_queue.curr->time;
+            /* Make this data available to DMA */
+            pcm_output_commit_data(out_count*4, audio_queue.curr->time);
 
             /* As long as we're on this timestamp, the time is just
                incremented by the number of samples */
             audio_queue.curr->time += out_count;
-
-            /* Make this data available to DMA */
-            pcm_output_add_data();
         }
 
         rb->yield();

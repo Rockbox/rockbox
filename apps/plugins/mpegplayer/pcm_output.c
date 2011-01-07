@@ -36,20 +36,29 @@ static struct pcm_frame_header * ALIGNED_ATTR(4) pcmbuf_tail IBSS_ATTR;
 
 /* Bytes */
 static ssize_t  pcmbuf_curr_size IBSS_ATTR; /* Size of currently playing frame */
-static uint64_t pcmbuf_read      IBSS_ATTR; /* Number of bytes read by DMA */
-static uint64_t pcmbuf_written   IBSS_ATTR; /* Number of bytes written by source */
+static ssize_t  pcmbuf_read      IBSS_ATTR; /* Number of bytes read by DMA */
+static ssize_t  pcmbuf_written   IBSS_ATTR; /* Number of bytes written by source */
 static ssize_t  pcmbuf_threshold IBSS_ATTR; /* Non-silence threshold */
 
 /* Clock */
-static uint32_t clock_base   IBSS_ATTR; /* Our base clock */
 static uint32_t clock_start  IBSS_ATTR; /* Clock at playback start */
-static int32_t  clock_adjust IBSS_ATTR; /* Clock drift adjustment */
+static uint32_t volatile clock_tick IBSS_ATTR; /* Our base clock */
+static uint32_t volatile clock_time IBSS_ATTR; /* Timestamp adjusted */
 
-int pcm_skipped = 0;
-int pcm_underruns = 0;
+static int pcm_skipped = 0;
+static int pcm_underruns = 0;
 
 /* Small silence clip. ~5.80ms @ 44.1kHz */
 static int16_t silence[256*2] ALIGNED_ATTR(4) = { 0 };
+
+/* Delete all buffer contents */
+static void pcm_reset_buffer(void)
+{
+    pcmbuf_threshold = PCMOUT_PLAY_WM;
+    pcmbuf_curr_size = pcmbuf_read = pcmbuf_written = 0;
+    pcmbuf_head = pcmbuf_tail = pcm_buffer;
+    pcm_skipped = pcm_underruns = 0;
+}
 
 /* Advance a PCM buffer pointer by size bytes circularly */
 static inline void pcm_advance_buffer(struct pcm_frame_header **p,
@@ -60,15 +69,16 @@ static inline void pcm_advance_buffer(struct pcm_frame_header **p,
         *p = SKIPBYTES(*p, -PCMOUT_BUFSIZE);
 }
 
-/* Inline internally but not externally */
-inline ssize_t pcm_output_used(void)
+/* Return physical space used */
+static inline ssize_t pcm_output_bytes_used(void)
 {
-    return (ssize_t)(pcmbuf_written - pcmbuf_read);
+    return pcmbuf_written - pcmbuf_read; /* wrap-safe */
 }
 
-inline ssize_t pcm_output_free(void)
+/* Return physical space free */
+static inline ssize_t pcm_output_bytes_free(void)
 {
-    return (ssize_t)(PCMOUT_BUFSIZE - pcmbuf_written + pcmbuf_read);
+    return PCMOUT_BUFSIZE - pcm_output_bytes_used();
 }
 
 /* Audio DMA handler */
@@ -80,7 +90,7 @@ static void get_more(unsigned char **start, size_t *size)
     pcmbuf_read += pcmbuf_curr_size;
     pcmbuf_curr_size = 0;
 
-    sz = pcm_output_used();
+    sz = pcm_output_bytes_used();
 
     if (sz > pcmbuf_threshold)
     {
@@ -89,16 +99,15 @@ static void get_more(unsigned char **start, size_t *size)
         while (1)
         {
             uint32_t time = pcmbuf_head->time;
-            int32_t offset = time - (clock_base + clock_adjust);
+            int32_t offset = time - clock_time;
 
             sz = pcmbuf_head->size;
 
-            if (sz < (ssize_t)(sizeof(pcmbuf_head) + 4) ||
+            if (sz < (ssize_t)(PCM_HDR_SIZE + 4) ||
                 (sz & 3) != 0)
             {
                 /* Just show a warning about this - will never happen
-                 * without a bug in the audio thread code or a clobbered
-                 * buffer */
+                 * without a corrupted buffer */
                 DEBUGF("get_more: invalid size (%ld)\n", (long)sz);
             }
 
@@ -108,11 +117,12 @@ static void get_more(unsigned char **start, size_t *size)
                 pcm_advance_buffer(&pcmbuf_head, sz);
                 pcmbuf_read += sz;
                 pcm_skipped++;
-                if (pcmbuf_read < pcmbuf_written)
+                if (pcm_output_bytes_used() > 0)
                     continue;
 
                 /* Ran out so revert to default watermark */
                 pcmbuf_threshold = PCMOUT_PLAY_WM;
+                pcm_underruns++;
             }
             else if (offset < 100*CLOCK_RATE/1000)
             {
@@ -122,15 +132,15 @@ static void get_more(unsigned char **start, size_t *size)
                 pcm_advance_buffer(&pcmbuf_head, sz);
                 pcmbuf_curr_size = sz;
 
-                sz -= sizeof (struct pcm_frame_header);
+                sz -= PCM_HDR_SIZE;
 
                 *size = sz;
 
                 /* Audio is time master - keep clock synchronized */
-                clock_adjust = time - clock_base;
+                clock_time = time + (sz >> 2);
 
                 /* Update base clock */
-                clock_base += sz >> 2;
+                clock_tick += sz >> 2;
                 return;
             }
             /* Frame will be dropped - play silence clip */
@@ -150,22 +160,57 @@ static void get_more(unsigned char **start, size_t *size)
     *start = (unsigned char *)silence;
     *size = sizeof (silence);
 
-    clock_base += sizeof (silence) / 4;
+    clock_tick += sizeof (silence) / 4;
+    clock_time += sizeof (silence) / 4;
 
-    if (pcmbuf_read > pcmbuf_written)
+    if (sz < 0)
         pcmbuf_read = pcmbuf_written;
 }
 
-struct pcm_frame_header * pcm_output_get_buffer(void)
+/** Public interface **/
+
+/* Return a buffer pointer if at least size bytes are available and if so,
+ * give the actual free space */
+unsigned char * pcm_output_get_buffer(ssize_t *size)
 {
-    return pcmbuf_tail;
+    ssize_t sz = *size;
+    ssize_t free = pcm_output_bytes_free() - PCM_HDR_SIZE;
+
+    if (sz >= 0 && free >= sz)
+    {
+        *size = free; /* return actual free space (- header) */
+        return pcmbuf_tail->data;
+    }
+
+    /* Leave *size alone so caller doesn't have to reinit */
+    return NULL;
 }
 
-void pcm_output_add_data(void)
+/* Commit the buffer returned by pcm_ouput_get_buffer; timestamp is PCM
+ * clock time units, not video format time units */
+bool pcm_output_commit_data(ssize_t size, uint32_t timestamp)
 {
-    size_t size = pcmbuf_tail->size;
+    if (size <= 0 || (size & 3))
+        return false; /* invalid */
+
+    size += PCM_HDR_SIZE;
+
+    if (size > pcm_output_bytes_free())
+        return false; /* too big */
+
+    pcmbuf_tail->size = size;
+    pcmbuf_tail->time = timestamp;
+
     pcm_advance_buffer(&pcmbuf_tail, size);
     pcmbuf_written += size;
+
+    return true;
+}
+
+/* Returns 'true' if the buffer is completely empty */
+bool pcm_output_empty(void)
+{
+    return pcm_output_bytes_used() <= 0;
 }
 
 /* Flushes the buffer - clock keeps counting */
@@ -182,10 +227,7 @@ void pcm_output_flush(void)
     if (playing)
         rb->pcm_play_stop();
 
-    pcmbuf_threshold = PCMOUT_PLAY_WM;
-    pcmbuf_curr_size = pcmbuf_read = pcmbuf_written = 0;
-    pcmbuf_head = pcmbuf_tail = pcm_buffer;
-    pcm_skipped = pcm_underruns = 0;
+    pcm_reset_buffer();
 
     /* Restart if playing state was current */
     if (playing && !paused)
@@ -201,25 +243,54 @@ void pcm_output_set_clock(uint32_t time)
 {
     rb->pcm_play_lock();
 
-    clock_base = time;
     clock_start = time;
-    clock_adjust = 0;
+    clock_tick = time;
+    clock_time = time;
 
     rb->pcm_play_unlock();
 }
 
+/* Return the clock as synchronized by audio frame timestamps */
 uint32_t pcm_output_get_clock(void)
 {
-    return clock_base + clock_adjust
-        - (rb->pcm_get_bytes_waiting() >> 2);
+    uint32_t time, rem;
+
+    /* Reread if data race detected - rem will be 0 if driver hasn't yet
+     * updated to the new buffer size. Also be sure pcm state doesn't
+     * cause indefinite loop.
+     *
+     * FYI: NOT scrutinized for rd/wr reordering on different cores. */
+    do
+    {
+        time = clock_time;
+        rem = rb->pcm_get_bytes_waiting() >> 2;
+    }
+    while (UNLIKELY(time != clock_time ||
+        (rem == 0 && rb->pcm_is_playing() && !rb->pcm_is_paused())));
+
+    return time - rem;
+
 }
 
+/* Return the raw clock as counted from the last pcm_output_set_clock
+ * call */
 uint32_t pcm_output_get_ticks(uint32_t *start)
 {
+    uint32_t tick, rem;
+
+    /* Same procedure as pcm_output_get_clock */
+    do
+    {
+        tick = clock_tick;
+        rem = rb->pcm_get_bytes_waiting() >> 2;
+    }
+    while (UNLIKELY(tick != clock_tick ||
+        (rem == 0 && rb->pcm_is_playing() && !rb->pcm_is_paused())));
+
     if (start)
         *start = clock_start;
 
-    return clock_base - (rb->pcm_get_bytes_waiting() >> 2);
+    return tick - rem;
 }
 
 /* Pauses/Starts pcm playback - and the clock */
@@ -267,12 +338,13 @@ bool pcm_output_init(void)
     if (pcm_buffer == NULL)
         return false;
 
-    pcmbuf_threshold = PCMOUT_PLAY_WM;
-    pcmbuf_head = pcm_buffer;
-    pcmbuf_tail = pcm_buffer;
     pcmbuf_end  = SKIPBYTES(pcm_buffer, PCMOUT_BUFSIZE);
-    pcmbuf_curr_size = pcmbuf_read = pcmbuf_written = 0;
 
+    pcm_reset_buffer();
+
+    /* Some targets could play at the movie frequency without resampling but
+     * as of now DSP assumes a certain frequency (always 44100Hz) so
+     * resampling will be needed for other movie audio rates. */
     rb->pcm_set_frequency(NATIVE_FREQUENCY);
 
 #if INPUT_SRC_CAPS != 0

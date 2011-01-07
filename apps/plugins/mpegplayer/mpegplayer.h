@@ -51,14 +51,13 @@
 /* Define this as "1" to have a test tone instead of silence clip */
 #define SILENCE_TEST_TONE 0
 
+/* NOTE: Sizes make no frame header allowance when considering duration */
 #define PCMOUT_BUFSIZE       (CLOCK_RATE/2*4) /* 1/2s */
-#define PCMOUT_GUARD_SAMPLES ((CLOCK_RATE*576+7999)/8000) /* Worst upsampling case */
-#define PCMOUT_GUARD_SIZE    (PCMOUT_GUARD_SAMPLES*4 + sizeof (struct pcm_frame_header))
+#define PCMOUT_GUARD_SIZE    (PCMOUT_BUFSIZE) /* guarantee contiguous sizes */
 #define PCMOUT_ALLOC_SIZE    (PCMOUT_BUFSIZE + PCMOUT_GUARD_SIZE)
                              /* Start pcm playback @ 25% full */
 #define PCMOUT_PLAY_WM       (PCMOUT_BUFSIZE/4)
-                             /* No valid audio frame is smaller */
-#define PCMOUT_LOW_WM        (sizeof (struct pcm_frame_header))
+#define PCMOUT_LOW_WM        (0)
 
 /** disk buffer **/
 #define DISK_BUF_LOW_WATERMARK (1024*1024)
