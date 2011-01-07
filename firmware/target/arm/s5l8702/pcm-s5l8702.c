@@ -29,21 +29,17 @@
 #include "pcm.h"
 #include "pcm_sampr.h"
 #include "mmu-arm.h"
-
-/* S5L8702 PCM driver tunables: */
-#define LLIMAX (2047)    /* Maximum number of samples per LLI */
-#define CHUNKSIZE (8700) /* Maximum number of samples to handle with one IRQ */
-                         /* (bigger chunks will be segmented internally)     */
-#define WATERMARK (512)  /* Number of remaining samples to schedule IRQ at */
+#include "pcm-target.h"
 
 static volatile int locked = 0;
 static const int zerosample = 0;
-static unsigned char dblbuf[WATERMARK * 4] IBSS_ATTR;
-struct dma_lli lli[(CHUNKSIZE - WATERMARK + LLIMAX - 1) / LLIMAX + 1]
-       __attribute__((aligned(16)));
-struct dma_lli* lastlli;
+static unsigned char dblbuf[2][PCM_WATERMARK * 4];
+static int active_dblbuf;
+struct dma_lli pcm_lli[PCM_LLICOUNT] __attribute__((aligned(16)));
+static struct dma_lli* lastlli;
 static const unsigned char* dataptr;
-static size_t remaining;
+size_t pcm_remaining;
+size_t pcm_chunksize;
 
 /* Mask the DMA interrupt */
 void pcm_play_lock(void)
@@ -66,54 +62,63 @@ void INT_DMAC0C0(void) ICODE_ATTR;
 void INT_DMAC0C0(void)
 {
     DMAC0INTTCCLR = 1;
-    if (!remaining) pcm_play_get_more_callback((void**)&dataptr, &remaining);
-    if (!remaining)
+    if (!pcm_remaining)
     {
-        lli->nextlli = NULL;
-        lli->control = 0x75249000;
+        pcm_play_get_more_callback((void**)&dataptr, &pcm_remaining);
+        pcm_chunksize = pcm_remaining;
+    }
+    if (!pcm_remaining)
+    {
+        pcm_lli->nextlli = NULL;
+        pcm_lli->control = 0x75249000;
         clean_dcache();
         return;
     }
-    uint32_t lastsize = MIN(WATERMARK * 4, remaining);
-    remaining -= lastsize;
-    if (remaining) lastlli = &lli[ARRAYLEN(lli) - 1];
-    else lastlli = lli;
-    uint32_t chunksize = MIN(CHUNKSIZE * 4 - lastsize, remaining);
-    if (remaining > chunksize && chunksize > remaining - WATERMARK * 4)
-        chunksize = remaining - WATERMARK * 4;
-    remaining -= chunksize;
+    uint32_t lastsize = MIN(PCM_WATERMARK * 4, pcm_remaining / 2 + 1) & ~1;
+    pcm_remaining -= lastsize;
+    if (pcm_remaining) lastlli = &pcm_lli[ARRAYLEN(pcm_lli) - 1];
+    else lastlli = pcm_lli;
+    uint32_t chunksize = MIN(PCM_CHUNKSIZE * 4 - lastsize, pcm_remaining);
+    if (pcm_remaining > chunksize && chunksize > pcm_remaining - PCM_WATERMARK * 8)
+        chunksize = pcm_remaining - PCM_WATERMARK * 8;
+    pcm_remaining -= chunksize;
     bool last = !chunksize;
     int i = 0;
     while (chunksize)
     {
-        uint32_t thislli = MIN(LLIMAX * 4, chunksize);
+        uint32_t thislli = MIN(PCM_LLIMAX * 4, chunksize);
         chunksize -= thislli;
-        lli[i].srcaddr = (void*)dataptr;
-        lli[i].dstaddr = (void*)((int)&I2STXDB0);
-        lli[i].nextlli = chunksize ? &lli[i + 1] : lastlli;
-        lli[i].control = (chunksize ? 0x75249000 : 0xf5249000) | (thislli / 2);
+        pcm_lli[i].srcaddr = (void*)dataptr;
+        pcm_lli[i].dstaddr = (void*)((int)&I2STXDB0);
+        pcm_lli[i].nextlli = chunksize ? &pcm_lli[i + 1] : lastlli;
+        pcm_lli[i].control = (chunksize ? 0x75249000 : 0xf5249000) | (thislli / 2);
         dataptr += thislli;
         i++;
     }
-    if (!remaining) memcpy(dblbuf, dataptr, lastsize);
-    lastlli->srcaddr = remaining ? dataptr : dblbuf;
+    if (!pcm_remaining)
+    {
+        memcpy(dblbuf[active_dblbuf], dataptr, lastsize);
+        lastlli->srcaddr = dblbuf[active_dblbuf];
+        active_dblbuf ^= 1;
+    }
+    else lastlli->srcaddr = dataptr;
     lastlli->dstaddr = (void*)((int)&I2STXDB0);
-    lastlli->nextlli = last ? NULL : lli;
+    lastlli->nextlli = last ? NULL : pcm_lli;
     lastlli->control = (last ? 0xf5249000 : 0x75249000) | (lastsize / 2);
     dataptr += lastsize;
     clean_dcache();
-    if (!(DMAC0C0CONFIG & 1) && (lli[0].control & 0xfff))
+    if (!(DMAC0C0CONFIG & 1) && (pcm_lli[0].control & 0xfff))
     {
-        DMAC0C0LLI = lli[0];
+        DMAC0C0LLI = pcm_lli[0];
         DMAC0C0CONFIG = 0x8a81;
     }
-    else DMAC0C0NEXTLLI = lli;
+    else DMAC0C0NEXTLLI = pcm_lli;
 }
 
 void pcm_play_dma_start(const void* addr, size_t size)
 {
     dataptr = (const unsigned char*)addr;
-    remaining = size;
+    pcm_remaining = size;
     I2STXCOM = 0xe;
     DMAC0CONFIG |= 4;
     INT_DMAC0C0();
@@ -155,7 +160,7 @@ void pcm_dma_apply_settings(void)
 
 size_t pcm_get_bytes_waiting(void)
 {
-    int bytes = remaining;
+    int bytes = pcm_remaining;
     const struct dma_lli* lli = (const struct dma_lli*)((int)&DMAC0C0LLI);
     while (lli)
     {
