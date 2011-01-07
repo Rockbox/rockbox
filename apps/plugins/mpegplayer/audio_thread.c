@@ -375,6 +375,7 @@ static void audio_thread_msg(struct audio_thread_data *td)
             case TSTATE_INIT:
                 td->state = TSTATE_DECODE;
             case TSTATE_DECODE:
+            case TSTATE_RENDER_WAIT:
                 break;
 
             case TSTATE_EOS:
