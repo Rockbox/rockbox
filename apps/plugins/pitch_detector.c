@@ -420,6 +420,7 @@ static void set_min_freq(int new_freq)
     settings.sample_size = (settings.sample_size + 3) & ~3;
 }
 
+/* Displays the menu. Returns true iff the user selects 'quit'. */
 static bool main_menu(void)
 {
     int selection = 0;
@@ -972,7 +973,7 @@ static void record_and_get_pitch(void)
 
                 case PLA_CANCEL:
                     rb->pcm_stop_recording();
-                    quit = main_menu() != 0;
+                    quit = main_menu();
                     if(!quit)
                     {
                         redraw = true;
