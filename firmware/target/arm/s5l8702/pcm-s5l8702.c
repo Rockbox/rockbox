@@ -156,7 +156,7 @@ void pcm_dma_apply_settings(void)
 size_t pcm_get_bytes_waiting(void)
 {
     int bytes = remaining;
-    const struct dma_lli* lli = &DMAC0C0LLI;
+    const struct dma_lli* lli = (const struct dma_lli*)((int)&DMAC0C0LLI);
     while (lli)
     {
         bytes += (lli->control & 0xfff) * 2;
