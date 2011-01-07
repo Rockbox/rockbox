@@ -36,6 +36,8 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
+    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   2},
+    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
 };
 
 static int bass, treble;
@@ -157,24 +159,56 @@ void audiohw_enable_lineout(bool enable)
                         PWRCTL2_PDN_LINA_ALWAYS | PWRCTL2_PDN_LINB_ALWAYS);
 }
 
+static void handle_dsp_power()
+{
+    if (bass || treble)
+    {
+        cscodec_setbits(PLAYCTL, PLAYCTL_PDN_DSP, 0);
+        cscodec_setbits(BTCTL, 0, BTCTL_TCEN);
+    }
+    else
+    {
+        cscodec_setbits(BTCTL, BTCTL_TCEN, 0);
+        cscodec_setbits(PLAYCTL, 0, PLAYCTL_PDN_DSP);
+    }
+}
+
 void audiohw_set_bass(int value)
 {
     bass = value;
-    if (bass || treble) cscodec_setbits(PLAYCTL, PLAYCTL_PDN_DSP, 0);
-    else cscodec_setbits(PLAYCTL, 0, PLAYCTL_PDN_DSP);
+    handle_dsp_power();
     if (value >= -105 && value <= 120)
         cscodec_setbits(TONECTL, TONECTL_BASS_MASK,
-                        (value / 15) << TONECTL_BASS_SHIFT);
+                        (8 - value / 15) << TONECTL_BASS_SHIFT);
 }
 
 void audiohw_set_treble(int value)
 {
     treble = value;
-    if (bass || treble) cscodec_setbits(PLAYCTL, PLAYCTL_PDN_DSP, 0);
-    else cscodec_setbits(PLAYCTL, 0, PLAYCTL_PDN_DSP);
+    handle_dsp_power();
     if (value >= -105 && value <= 120)
         cscodec_setbits(TONECTL, TONECTL_TREB_MASK,
-                        (value / 15) << TONECTL_TREB_SHIFT);
+                        (8 - value / 15) << TONECTL_TREB_SHIFT);
+}
+
+void audiohw_set_bass_cutoff(int value)
+{
+    cscodec_setbits(BTCTL, BTCTL_BASSCF_MASK,
+                    (value - 1) << BTCTL_BASSCF_SHIFT);
+}
+
+void audiohw_set_treble_cutoff(int value)
+{
+    cscodec_setbits(BTCTL, BTCTL_TREBCF_MASK,
+                    (value - 1) << BTCTL_TREBCF_SHIFT);
+}
+
+void audiohw_set_prescaler(int value)
+{
+    cscodec_setbits(MSTAVOL, MSTAVOL_VOLUME_MASK,
+                    (-value / 5) << MSTAVOL_VOLUME_SHIFT);
+    cscodec_setbits(MSTBVOL, MSTBVOL_VOLUME_MASK,
+                    (-value / 5) << MSTBVOL_VOLUME_SHIFT);
 }
 
 /* Nice shutdown of CS42L55 codec */

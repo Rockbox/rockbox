@@ -26,7 +26,8 @@
 #define VOLUME_MIN -580
 #define VOLUME_MAX  120
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP \
+                    | TREBLE_CUTOFF_CAP | PRESCALER_CAP)
 
 extern int tenthdb2master(int db);
 
@@ -269,11 +270,13 @@ extern void audiohw_enable_lineout(bool enable);
 #define BTCTL                   0x16
 #define BTCTL_TCEN              (1 << 0)
 #define BTCTL_BASSCF_MASK       (3 << 1)
+#define BTCTL_BASSCF_SHIFT      1
 #define BTCTL_BASSCF_50         (0 << 1)
 #define BTCTL_BASSCF_100        (1 << 1)
 #define BTCTL_BASSCF_200        (2 << 1)
 #define BTCTL_BASSCF_250        (3 << 1)
 #define BTCTL_TREBCF_MASK       (3 << 3)
+#define BTCTL_TREBCF_SHIFT      3
 #define BTCTL_TREBCF_5000       (0 << 3)
 #define BTCTL_TREBCF_7000       (1 << 3)
 #define BTCTL_TREBCF_10000      (2 << 3)
