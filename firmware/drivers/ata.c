@@ -36,9 +36,6 @@
 #include "ata-defines.h"
 #include "storage.h"
 
-#define ATA_HAVE_BBT
-#define ATA_BBT_PAGES 2304
-
 #define SECTOR_SIZE     512
 
 #define SELECT_DEVICE1  0x10
@@ -80,23 +77,6 @@
 
 #ifdef ATA_DRIVER_CLOSE
 static unsigned int ata_thread_id = 0;
-#endif
-
-#ifdef ATA_HAVE_BBT
-uint16_t ata_bbt[ATA_BBT_PAGES][0x20];
-uint64_t virtual_sectors;
-uint32_t ata_last_offset;
-uint64_t ata_last_phys;
-int ata_rw_sectors_internal(unsigned long sector, int count, void* buffer, int write);
-int ata_rw_chunk(unsigned long sector, int count, void* buffer, int write);
-
-void ata_bbt_read_sectors(uint32_t sector, int count, void* buffer)
-{
-    int rc = ata_rw_sectors_internal(sector * 8, count * 8, buffer, 0);
-    if (rc < 0)
-        panicf("ATA: Error %d while reading BBT (sector %u, count %d)",
-               rc, (unsigned)sector, count);
-}
 #endif
 
 #if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
@@ -355,109 +335,6 @@ static int ata_transfer_sectors(unsigned long start,
                                 void* inbuf,
                                 int write)
 {
-#ifdef ATA_HAVE_BBT
-char* orig = (char*)inbuf;
-    int realcount = incount;
-    incount = (incount + 7) / 8;
-    unsigned long startoffs = start & 7;
-    start /= 8;
-    if (start + incount > (unsigned)(virtual_sectors / 8)) return -9;
-    while (realcount)
-    {
-        uint32_t offset;
-        uint32_t l0idx = start >> 15;
-        uint32_t l0offs = start & 0x7fff;
-        uint32_t cnt = MIN((unsigned)incount, 0x8000 - l0offs);
-        uint32_t l0data = ata_bbt[0][l0idx << 1];
-        uint32_t base = ata_bbt[0][(l0idx << 1) | 1] << 12;
-        if (l0data < 0x8000) offset = l0data + base;
-        else
-        {
-            uint32_t l1idx = (start >> 10) & 0x1f;
-            uint32_t l1offs = start & 0x3ff;
-            cnt = MIN((unsigned)incount, 0x400 - l1offs);
-            uint32_t l1data = ata_bbt[l0data & 0x7fff][l1idx];
-            if (l1data < 0x8000) offset = l1data + base;
-            else
-            {
-                uint32_t l2idx = (start >> 5) & 0x1f;
-                uint32_t l2offs = start & 0x1f;
-                cnt = MIN((unsigned)incount, 0x20 - l2offs);
-                uint32_t l2data = ata_bbt[l1data & 0x7fff][l2idx];
-                if (l2data < 0x8000) offset = l2data + base;
-                else
-                {
-                    uint32_t l3idx = start & 0x1f;
-                    uint32_t l3data = ata_bbt[l2data & 0x7fff][l3idx];
-                    for (cnt = 1; cnt < (unsigned)incount && l3idx + cnt < 0x20; cnt++)
-                        if (ata_bbt[l2data & 0x7fff][l3idx + cnt] != l3data)
-                            break;
-                    offset = l3data + base;
-                }
-            }
-        }
-        uint64_t phys = start + offset;
-        if (offset != ata_last_offset && phys - ata_last_phys < 64) ata_soft_reset();
-        ata_last_offset = offset;
-        ata_last_phys = phys + cnt;
-        cnt = MIN(cnt * 8, (unsigned)realcount);
-        int rc = ata_rw_sectors_internal(phys * 8 + startoffs, cnt, inbuf, write);
-        if (rc < 0) return rc;
-        inbuf += cnt * SECTOR_SIZE;
-        start += cnt / 8;
-        incount -= cnt / 8;
-        realcount -= cnt;
-    }
-    return 0;
-}
-
-int ata_rw_sectors_internal(unsigned long start,
-                            int incount,
-                            void* inbuf,
-                            int write)
-{
-    if (start + incount > total_sectors) return -9;
-    while (incount)
-    {
-        uint32_t cnt = MIN(lba48 ? 65536 : 256, incount);
-        int rc = -1;
-        int tries = 3;
-        while (tries-- && rc < 0)
-        {
-            rc = ata_rw_chunk(start, cnt, inbuf, write);
-            if (rc < 0) ata_soft_reset();
-        }
-        if (rc < 0)
-        {
-            void* buf = inbuf;
-            unsigned long sect;
-            for (sect = start; sect < start + cnt; sect++)
-            {
-                rc = -1;
-                tries = 3;
-                while (tries-- && rc < 0)
-                {
-                    rc = ata_rw_chunk(sect, 1, buf, write);
-                    if (rc < 0) ata_soft_reset();
-                }
-                if (rc < 0) break;
-                inbuf += SECTOR_SIZE;
-            }
-        }
-        if (rc < 0) return rc;
-        inbuf += SECTOR_SIZE * cnt;
-        start += cnt;
-        incount -= cnt;
-    }
-    return 0;
-}
-
-int ata_rw_chunk(unsigned long start,
-                 int incount,
-                 void* inbuf,
-                 int write)
-{
-#endif
     int ret = 0;
     long timeout;
     int count;
@@ -1512,31 +1389,6 @@ int ata_init(void)
 
         mutex_lock(&ata_mtx); /* Balance unlock below */
 
-#ifdef ATA_HAVE_BBT
-        memset(ata_bbt, 0, sizeof(ata_bbt));
-        uint32_t* buf = (uint32_t*)(ata_bbt[ARRAYLEN(ata_bbt) - 64]);
-        ata_bbt_read_sectors(0, 1, buf);
-        if (!memcmp(buf, "emBIbbth", 8))
-        {
-            virtual_sectors = ((((uint64_t)buf[0x1fd]) << 32) | buf[0x1fc]) * 8;
-            uint32_t count = buf[0x1ff];
-            if (count > (ATA_BBT_PAGES >> 6))
-                panicf("ATA: BBT too big! (%d pages, limit: %d)",
-                       (unsigned)(count << 6), ATA_BBT_PAGES);
-            uint32_t i;
-            uint32_t cnt;
-            for (i = 0; i < count; i += cnt)
-            {
-                uint32_t phys = buf[0x200 + i];
-                for (cnt = 1; cnt < count; cnt++)
-                    if (buf[0x200 + i + cnt] != phys + cnt)
-                        break;
-                ata_bbt_read_sectors(phys, cnt, ata_bbt[i << 6]);
-            }
-        }
-        else virtual_sectors = total_sectors;
-#endif
-
         last_disk_activity = current_tick;
 #ifdef ATA_DRIVER_CLOSE
         ata_thread_id =
@@ -1604,11 +1456,7 @@ void ata_get_info(IF_MD2(int drive,)struct storage_info *info)
 #endif
     int i;
     info->sector_size = SECTOR_SIZE;
-#ifdef ATA_HAVE_BBT
-    info->num_sectors = virtual_sectors;
-#else
     info->num_sectors = total_sectors;
-#endif
 
     src = (unsigned short*)&identify_info[27];
     dest = (unsigned short*)vendor;

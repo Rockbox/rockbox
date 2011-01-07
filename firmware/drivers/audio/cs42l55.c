@@ -159,7 +159,7 @@ void audiohw_enable_lineout(bool enable)
                         PWRCTL2_PDN_LINA_ALWAYS | PWRCTL2_PDN_LINB_ALWAYS);
 }
 
-static void handle_dsp_power()
+static void handle_dsp_power(void)
 {
     if (bass || treble)
     {
