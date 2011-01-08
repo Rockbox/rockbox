@@ -28,8 +28,8 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-//TODO: Figure out
-#define TIMER_FREQ  (1843200 * 4 * 26 / 1 / 4) /* 47923200 Hz */
+//TODO: Figure out exact value
+#define TIMER_FREQ  216000000
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
