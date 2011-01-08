@@ -420,7 +420,7 @@ static void set_min_freq(int new_freq)
     settings.sample_size = (settings.sample_size + 3) & ~3;
 }
 
-/* Displays the menu. Returns true if the user selects 'quit'. */
+/* Displays the menu. Returns true iff the user selects 'quit'. */
 static bool main_menu(void)
 {
     int selection = 0;
