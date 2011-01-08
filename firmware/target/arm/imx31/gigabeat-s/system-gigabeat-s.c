@@ -139,7 +139,7 @@ void system_exception_wait(void)
 
 void INIT_ATTR system_init(void)
 {
-    static const int disable_clocks[] =
+    static const enum IMX31_CG_LIST disable_clocks[] INITDATA_ATTR =
     {
         /* CGR0 */
         CG_SD_MMC1,

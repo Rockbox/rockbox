@@ -53,9 +53,6 @@ SECTIONS
         *(.irodata)
         *(.idata)
         *(.data*)
-        . = ALIGN(0x4);
-        *(.sdmacode)
-        . = ALIGN(0x4);
         _dataend = . ;
     } > DRAM
 

@@ -835,9 +835,11 @@ Lyre prototype 1 */
  * from crashes to freezes to exploding daps.
  */
 #define INIT_ATTR       __attribute__ ((section(".init")))
+#define INITDATA_ATTR   __attribute__ ((section(".initdata")))
 #define HAVE_INIT_ATTR
 #else
 #define INIT_ATTR
+#define INITDATA_ATTR
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)

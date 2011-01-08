@@ -111,7 +111,7 @@ SECTIONS
         . = ALIGN(4);
         _initstart = .;
         *(.init)
-        *(.sdmacode)
+        *(.initdata)
         _initend = .;
     } > INIT AT> DRAM
 

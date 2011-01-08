@@ -294,7 +294,7 @@
 /*!
  * Code download
  */
-static __attribute__((aligned(4), section(".sdmacode")))
+static __attribute__((aligned(4))) INITDATA_ATTR
     const short sdma_code_2[RAM_CODE_SIZE_2] =
 {
     0x0870, 0x0011, 0x5010, 0xc0ec, 0x7d61, 0x5ac0, 0x5bc8, 0x5ef8,
