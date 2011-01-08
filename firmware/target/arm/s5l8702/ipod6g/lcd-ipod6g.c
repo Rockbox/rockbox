@@ -56,7 +56,7 @@ static inline void s5l_lcd_write_cmd_data(int cmd, int data)
     LCD_WCMD = cmd;
 
     while (LCD_STATUS & 0x10);
-    LCD_WDATA = data;
+    LCD_WDATA = (data & 0xff) | ((data & 0x7f00) << 1);
 }
 
 static inline void s5l_lcd_write_cmd(unsigned short cmd)
@@ -103,7 +103,7 @@ void lcd_shutdown(void)
     pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
     pmu_write(0x29, 0);
 
-    if (lcd_type == 3)
+    if (lcd_type & 2)
     {
         s5l_lcd_write_cmd_data(0x7, 0x172);
         s5l_lcd_write_cmd_data(0x30, 0x3ff);
@@ -187,8 +187,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  y0);
         s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    y1);
 
-        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  (x1 << 8) | x0);
-        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   (y1 << 8) | y0);
+        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  x0);
+        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   y0);
 
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
@@ -253,10 +253,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
         s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  y0);
         s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    y1);
 
-        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  (x1 << 8) | x0);
-        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   (y1 << 8) | y0);
+        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  x0);
+        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   y0);
 
-        s5l_lcd_write_cmd(0);
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
