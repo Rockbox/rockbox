@@ -1433,7 +1433,6 @@ static int jewels_main(struct game_context* bj) {
     int button;
     int position;
     bool selected = false;
-    bool no_movesavail;
     int x=0, y=0;
 
     bool loaded = jewels_loadgame(bj);
@@ -1443,8 +1442,6 @@ static int jewels_main(struct game_context* bj) {
 
     resume_file = false;
     while(true) {
-        no_movesavail = false;
-
         /* refresh the board */
         jewels_drawboard(bj);
 
@@ -1470,7 +1467,6 @@ static int jewels_main(struct game_context* bj) {
                 if(selected) {
                     bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
                     selected = false;
-                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
                     x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                 }
@@ -1481,7 +1477,6 @@ static int jewels_main(struct game_context* bj) {
                 if(selected) {
                     bj->score += jewels_swapjewels(bj, x, y, SWAP_RIGHT);
                     selected = false;
-                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
                     x = (x+1)%BJ_WIDTH;
                 }
@@ -1492,7 +1487,6 @@ static int jewels_main(struct game_context* bj) {
                 if(selected) {
                     bj->score += jewels_swapjewels(bj, x, y, SWAP_DOWN);
                     selected = false;
-                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
                     y = (y+1)%(BJ_HEIGHT-1);
                 }
@@ -1503,7 +1497,6 @@ static int jewels_main(struct game_context* bj) {
                 if(selected) {
                     bj->score += jewels_swapjewels(bj, x, y, SWAP_UP);
                     selected = false;
-                    if (!jewels_movesavail(bj)) no_movesavail = true;
                 } else {
                     y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
                 }
@@ -1569,7 +1562,7 @@ static int jewels_main(struct game_context* bj) {
                 }
         }
 
-        if (no_movesavail) {
+        if (!jewels_movesavail(bj)) {
             switch(bj->type) {
                 case GAME_TYPE_NORMAL:
                     rb->splash(HZ*2, "Game Over!");
