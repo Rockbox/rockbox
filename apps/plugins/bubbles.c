@@ -205,7 +205,9 @@ enum {
 #define ROW_HEIGHT    (BUBBLE_WIDTH-(BUBBLE_WIDTH-EMBLEM_WIDTH)/2)
 #endif
 
+#if !defined(ROW_INDENT)
 #define ROW_INDENT    (BUBBLE_WIDTH/2)
+#endif
 
 #define TEXT_LINES (LCD_HEIGHT/8)
 

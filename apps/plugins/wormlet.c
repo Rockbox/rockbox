@@ -358,7 +358,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ARGH_SIZE 5
 #define SPEED 9
 #define MAX_WORM_SEGMENTS 128
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+#elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
+      ((LCD_WIDTH == 128) && (LCD_HEIGHT == 160))
 #define FOOD_SIZE 4
 #define ARGH_SIZE 5
 #define SPEED 8
