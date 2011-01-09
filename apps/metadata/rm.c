@@ -375,10 +375,17 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                     else
                         skipped += temp;
                 } 
+                else if (v == FOURCC('L','S','D',':'))
+                {
+                    DEBUGF("Real audio lossless is not supported.");
+                    return -1;
+                }
                 else
                 {
+                    /* We shall not abort with -1 here. *.rm file often seem
+                     * to have a second media properties header that contains
+                     * other metadata. */
                     DEBUGF("Unknown header signature :\"%s\"\n", fourcc2str(v));
-                    return -1;
                 }
                     
 
