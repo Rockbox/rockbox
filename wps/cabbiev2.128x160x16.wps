@@ -1,0 +1,67 @@
+# cabbie 2.0 default
+# (C) 2007-2010 Johannes Voggenthaler (Zinc Alloy)
+#derived from "cabbie" (C) Yohann Misquitta
+#Ported to GoGear SA9200 by Michael Carr (Strife89)
+%wd
+#Load Images
+%X(wpsbackdrop-128x160x16.bmp)
+%xl(A,lock-176x132x16.bmp,0,0,2)
+%xl(B,battery-176x132x16.bmp,0,0,10)
+%xl(C,volume-176x132x16.bmp,0,0,10)
+%xl(D,shuffle-176x132x16.bmp,0,0)
+%xl(E,repeat-176x132x16.bmp,0,0,4)
+%xl(F,playmode-176x132x16.bmp,0,0,5)
+
+#Image Viewports
+#Hold Image
+%V(9,142,13,10,1)
+%?mh<%xd(Aa)|%xd(Ab)>
+
+#Battery Image
+%V(28,143,16,9,1)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+
+#Volume Image
+%V(48,143,13,9,1)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+
+#Shuffle Image
+%V(72,143,15,8,1)
+%?ps<%xd(D)>
+
+#Repeat Image
+%V(90,140,11,15,1)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+
+#Playmode Image
+%V(106,141,10,11,1)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+
+%?C<%C%Vd(a)|%Vd(b)>
+
+#NowPlaying - AA
+%Vl(a,5,88,118,24,1)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+#Album Art
+%Vl(a,5,15,118,70,1)
+%Cl(0,0,118,70)
+%Cd
+
+#Now Playing - NOAA
+%Vl(b,0,15,-,84,1)
+
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+
+%s%acNext Track:
+%s%ac%?It<%It|%Fn>
+
+#Time and Playlist Info
+%V(8,126,112,12,1)
+%al%pc%ac%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr%ar%pr
+
+#Progressbar
+%V(8,116,112,8,1)
+%pb(0,0,112,8,pb-128x160x16.bmp)

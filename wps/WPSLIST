@@ -288,6 +288,7 @@ Font.160x128x2: 12-Adobe-Helvetica.fnt
 Font.160x128x1: 12-Adobe-Helvetica.fnt
 Font.138x110x2: 12-Adobe-Helvetica.fnt
 Font.128x128x16: 12-Adobe-Helvetica.fnt
+Font.128x160x16: 12-Adobe-Helvetica.fnt
 Font.128x128x2: 12-Adobe-Helvetica.fnt
 Font.132x80x16: 11-Sazanami-Mincho.fnt
 Font.128x64x1: 08-Rockfont.fnt
@@ -309,6 +310,7 @@ backdrop.480x800x16: backdrops/cabbiev2.480x800x16.bmp
 backdrop.320x480x16: backdrops/cabbiev2.320x480x16.bmp
 backdrop.320x240x16: backdrops/cabbiev2.320x240x16.bmp
 backdrop.128x128x16: backdrops/cabbiev2.128x128x16.bmp
+backdrop.128x160x16: backdrops/cabbiev2.128x160x16.bmp
 backdrop.132x80x16: backdrops/cabbiev2.132x80x16.bmp 
 backdrop.138x110x2: backdrops/cabbiev2.138x110x2.bmp
 backdrop.160x128x16: backdrops/cabbiev2.160x128x16.bmp
@@ -324,6 +326,7 @@ selector type.480x800x16: bar (gradient)
 selector type.320x480x16: bar (gradient)
 selector type.320x240x16: bar (gradient)
 selector type.128x128x16: bar (gradient)
+selector type.128x160x16: bar (gradient)
 selector type.132x80x16:  bar (gradient)
 selector type.220x176x16: bar (gradient)
 selector type.160x128x16: bar (gradient)
@@ -338,7 +341,8 @@ selector type.138x110x2: bar (inverse)
 iconset.480x800x16: icons/tango_small.bmp 
 iconset.320x480x16: icons/tango_small.bmp 
 iconset.320x240x16: icons/tango_small.bmp 
-iconset.128x128x16: icons/tango_small.bmp 
+iconset.128x128x16: icons/tango_small.bmp
+iconset.128x160x16: icons/tango_small.bmp
 iconset.132x80x16: icons/tango_small.bmp 
 iconset.138x110x2: icons/tango_small_mono.bmp
 iconset.160x128x16: icons/tango_small.bmp 
@@ -354,6 +358,7 @@ viewers iconset.480x800x16: icons/tango_small_viewers.bmp
 viewers iconset.320x480x16: icons/tango_small_viewers.bmp
 viewers iconset.320x240x16: icons/tango_small_viewers.bmp
 viewers iconset.128x128x16: icons/tango_small_viewers.bmp
+viewers iconset.128x160x16: icons/tango_small_viewers.bmp
 viewers iconset.132x80x16: icons/tango_small_viewers.bmp
 viewers iconset.138x110x2: icons/tango_small_viewers_mono.bmp
 viewers iconset.160x128x16: icons/tango_small_viewers.bmp
