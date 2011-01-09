@@ -27,6 +27,9 @@ static const char *decoder_names[MAX_IMAGE_TYPES] = {
     "bmp",
     "jpeg",
     "png",
+#ifdef HAVE_LCD_COLOR
+    "ppm"
+#endif
 };
 
 /* check file type by extention */
@@ -41,6 +44,9 @@ enum image_type get_image_type(const char *name)
         { ".jpe",   IMAGE_JPEG },
         { ".jpeg",  IMAGE_JPEG },
         { ".png",   IMAGE_PNG  },
+#ifdef HAVE_LCD_COLOR
+        { ".ppm",   IMAGE_PPM  },
+#endif
     };
 
     const char *ext = rb->strrchr(name, '.');

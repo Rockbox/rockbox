@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * load image decoder.
+ * Copyright (C) 2010 Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,31 +19,26 @@
  *
  ****************************************************************************/
 
-#ifndef _IMAGE_DECODER_H
-#define _IMAGE_DECODER_H
+/* Magic constants. */
+#define PPM_MAGIC1 'P'
+#define PPM_MAGIC2 '3'
+#define RPPM_MAGIC2 '6'
+#define PPM_FORMAT (PPM_MAGIC1 * 256 + PPM_MAGIC2)
+#define RPPM_FORMAT (PPM_MAGIC1 * 256 + RPPM_MAGIC2)
 
-#include "imageviewer.h"
+#define PPM_OVERALLMAXVAL 65535
 
-enum image_type {
-    IMAGE_UNKNOWN = -1,
-    IMAGE_BMP = 0,
-    IMAGE_JPEG,
-    IMAGE_PNG,
-#ifdef HAVE_LCD_COLOR
-    IMAGE_PPM,
-#endif
-    MAX_IMAGE_TYPES
+#define ppm_error(...) rb->splashf(HZ*2, __VA_ARGS__ )
+
+struct ppm_info {
+    int x;
+    int y;
+    int maxval;
+    int format;
+    unsigned char *buf;
+    size_t buf_size;
+    unsigned int native_img_size;
 };
 
-struct loader_info {
-    enum image_type type;
-    const struct imgdec_api *iv;
-    unsigned char* buffer;
-    size_t size;
-};
-
-enum image_type get_image_type(const char *name);
-const struct image_decoder *load_decoder(struct loader_info *loader_info);
-void release_decoder(void);
-
-#endif /* _IMAGE_DECODER_H */
+/* public prototype */
+int read_ppm(int fd, struct ppm_info *ppm);

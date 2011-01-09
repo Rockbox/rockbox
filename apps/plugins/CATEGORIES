@@ -71,7 +71,7 @@ pitch_detector,apps
 plasma,demos
 png,viewers
 pong,games
-ppmviewer,viewers
+ppm,viewers
 properties,viewers
 random_folder_advance_config,apps
 remote_control,apps
