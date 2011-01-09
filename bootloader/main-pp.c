@@ -608,7 +608,7 @@ void* main(void)
         }
 #endif
 
-#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) || defined(PHILIPS_SA9200)
         printf("Trying /System/OF.ebn");
         rc=load_mi4(loadbuffer, "/System/OF.ebn", MAX_LOADSIZE);
         if (rc < EOK) {
