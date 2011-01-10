@@ -30,7 +30,7 @@ else
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=ftp://gcc.gnu.org/pub
+    GNU_MIRROR=http://mirrors.kernel.org/gnu
 fi
 
 # These are the tools this script requires and depends upon.
@@ -102,12 +102,12 @@ build() {
     case $toolname in
         gcc)
             file="gcc-core-$version.tar.bz2"
-            url="$GNU_MIRROR/gcc/releases/gcc-$version"
+            url="$GNU_MIRROR/gcc/gcc-$version"
             ;;
 
         binutils)
             file="binutils-$version.tar.bz2"
-            url="$GNU_MIRROR/binutils/releases"
+            url="$GNU_MIRROR/binutils"
             ;;
 
         *)
@@ -163,7 +163,7 @@ build() {
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
             if test ! -f $dlwhere/gmp-4.3.2.tar.bz2; then
-                getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gcc/infrastructure"
+                getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gmp"
             fi
             tar xjf $dlwhere/gmp-4.3.2.tar.bz2
             ln -s gmp-4.3.2 gmp
@@ -172,7 +172,7 @@ build() {
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
             if test ! -f $dlwhere/mpfr-2.4.2.tar.bz2; then
-                getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/gcc/infrastructure"
+                getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
             fi
             tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
             ln -s mpfr-2.4.2 mpfr
@@ -181,7 +181,7 @@ build() {
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
             if test ! -f $dlwhere/mpc-0.8.1.tar.gz; then
-                getfile "mpc-0.8.1.tar.gz" "$GNU_MIRROR/gcc/infrastructure"
+                getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/mpc/download"
             fi
             tar xzf $dlwhere/mpc-0.8.1.tar.gz
             ln -s mpc-0.8.1 mpc
