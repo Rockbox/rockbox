@@ -97,6 +97,7 @@ void _backlight_hw_enable(bool on)
     {
         GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
         GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
+        sleep(HZ/20);
     }
     enabled = on;
 }
