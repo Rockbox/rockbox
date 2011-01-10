@@ -164,10 +164,22 @@ enum {
 
 /* 12x12 bubbles (GoGear SA9200) */
 #elif (LCD_HEIGHT == 160) && (LCD_WIDTH == 128)
-#define XOFS          33
+#define XOFS          16
+#define YOFS          32
 #define ROW_HEIGHT    10
 #define ROW_INDENT     6
 #define MAX_FPS       30
+
+/* custom text positioning */
+#define LEVEL_TXT_X      2
+#define LEVEL_TXT_WIDTH 31
+#define LEVEL_TXT_Y      3
+#define SCORE_TXT_X     34
+#define SCORE_TXT_WIDTH 31
+#define SCORE_TXT_Y      3
+#define NEXT_BB_X       81
+#define NEXT_BB_WIDTH   31
+#define NEXT_BB_Y        2
 
 /* 10x10 bubbles (iPod Mini) */
 #elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)

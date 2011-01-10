@@ -139,6 +139,9 @@ bubbles_background.176x132x16.bmp
 #elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
 bubbles_emblem.160x128x16.bmp
 bubbles_background.160x128x16.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 160)
+bubbles_emblem.160x128x16.bmp
+bubbles_background.128x160x16.bmp
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
 bubbles_emblem.160x128x16.bmp
 bubbles_background.128x128x16.bmp
@@ -492,6 +495,8 @@ rockblox_background.176x220x16.bmp
 rockblox_background.176x132x16.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 rockblox_background.160x128x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 160)
+rockblox_background.128x160x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT >= 128)
 rockblox_background.128x128x16.bmp
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
