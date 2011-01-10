@@ -509,6 +509,10 @@ static void bcm_command(unsigned cmd)
 
 static void bcm_powerdown(void)
 {
+    /* Immediately switch off the backlight to avoid flashing. */
+    _backlight_hw_enable(false);
+    
+    /* Not sure what this does. */
     bcm_write32(0x10001400, bcm_read32(0x10001400) & ~0xF0);
 
     /* Blanks the LCD and decreases power consumption
