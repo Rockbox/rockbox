@@ -118,9 +118,8 @@
 #define CODEC_SRCTRL_44100HZ (0x10 << 1)
 #define CODEC_SRCTRL_88200HZ (0x1E << 1)
 
-/* copied from HD200 for now needs calibration */
 #define BATTERY_TYPES_COUNT 1
-#define BATTERY_CAPACITY_DEFAULT  850  /* this is wild guess */
+#define BATTERY_CAPACITY_DEFAULT  1200  /* this is wild guess */
 #define BATTERY_CAPACITY_MIN      800  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX     2500  /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC       50  /* capacity increment */
