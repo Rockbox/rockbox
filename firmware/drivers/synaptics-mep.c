@@ -608,6 +608,39 @@ int touchpad_set_parameter(char mod_nr, char par_nr, unsigned int param)
     return val;
 }
 
+#if 0
+/* Not used normally, but useful for pulling settings or determining
+   which parameters are supported */
+int touchpad_get_parameter(char mod_nr, char par_nr, unsigned int *param_p)
+{
+    char data[4];
+    int val = 0;
+
+    if (syn_status)
+    {
+        syn_enable_int(false);
+
+        /* 'Get MEP Parameter' command packet */
+        data[0]=0x01 | (mod_nr << 5); /* header - addr=mod_nr,global:0,ctrl:0,len:1 */
+        data[1]=0x40+par_nr; /* parameter number */
+        syn_send(data,2);
+
+        /* Must not be an error packet; check size */
+        if (syn_read(data,4) == 3)
+        {
+            /* ACK: param_hi[15:8], param_lo[7:0] */
+            if (param_p)
+                *param_p = ((unsigned int)data[2] << 8) | data[3];
+            val = 3;
+        }
+
+        syn_enable_int(true);
+    }
+
+    return val;
+}
+#endif
+
 int touchpad_set_buttonlights(unsigned int led_mask, char brightness)
 {
     char data[6];

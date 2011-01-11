@@ -66,6 +66,8 @@ void power_init(void)
     {
         logf("touchpad not ready");
     }
+
+    /* Setups specifically for buttons are handled in button-sa9200.c */
 #endif
 }
 

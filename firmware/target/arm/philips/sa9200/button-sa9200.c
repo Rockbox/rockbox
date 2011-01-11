@@ -32,10 +32,52 @@ static int int_btn = BUTTON_NONE;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 
+/* Capacitive buttons - lowest setting is still very sensitive */
+static const signed char button_sensitivity = -8; /* -8 to 7 */
+
+/* Strip - decent amount of contact needed */
+static const signed char strip_sensitivity = 0; /* -8 to 7 */
+static const unsigned char strip_pressure = 25; /* 0 to 255 */
+
 void button_init_device(void)
 {
     /* The touchpad is powered on and initialized in power-sa9200.c
        since it needs to be ready for both buttons and button lights. */
+
+    /* perform button-specific inits here */
+
+    /* Besides $00, only common parameters $20 and $21 are supported */
+
+    /* Report modes:
+     * [15:12] cap btn sens : xxxx,
+     * [11: 8] pos sen sens : xxxx,
+     * [ 7: 6] rate: 10 (40 rps),
+     * [    5] no filter: 0,
+     * [    4] reserved: 0,
+     * [    3] en scr: 0,
+     * [    2] en btns: 1,
+     * [    1] en rel: 0,
+     * [    0] en abs: 1 */
+    touchpad_set_parameter(0, 0x20,
+        ((button_sensitivity & 0xf) << 12) |
+        ((strip_sensitivity & 0xf) << 8) |
+        (0x2 << 6) |
+        (0x1 << 2) |
+        (0x1 << 0));
+
+    /* Enhanced operating configuration:
+     * [15: 9] reserved : 0000000
+     * [    8] Min abs reporting : 0
+     * [    7] reserved : 0
+     * [    6] not all cap btns : 1
+     * [    5] single cap btn : 0
+     * [    4] en 50ms debounce : 1
+     * [    3] motion reporting : 0
+     * [    2] clip z if no finger : 0
+     * [    1] disable decel : 0
+     * [    0] enable dribble : 0 */
+    touchpad_set_parameter(0, 0x21,
+        (0x1 << 6) | (0x1 << 4));
 }
 
 /*
@@ -43,7 +85,7 @@ void button_init_device(void)
  */
 void button_int(void)
 {
-    char data[4];
+    unsigned char data[4];
     int val;
 
     int_btn = BUTTON_NONE;
@@ -59,7 +101,7 @@ void button_int(void)
         if (data[1] & 0x8) int_btn |= BUTTON_LEFT;
         if (data[2] & 0x1) int_btn |= BUTTON_MENU;
     }
-    else if (val == MEP_ABSOLUTE_HEADER)
+    else if (val == MEP_ABSOLUTE_HEADER && data[3] >= strip_pressure)
     {
         /* Absolute packet - the finger is on the vertical strip.
            Position ranges from 1-4095, with 1 at the bottom. */

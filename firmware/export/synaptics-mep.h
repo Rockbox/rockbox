@@ -25,5 +25,6 @@ int touchpad_init(void);
 int touchpad_read_device(char *data, int len);
 int touchpad_set_buttonlights(unsigned int led_mask, char brightness);
 int touchpad_set_parameter(char mod_nr, char par_nr, unsigned int param);
+int touchpad_get_parameter(char mod_nr, char par_nr, unsigned int *param_p);
 
 #endif
