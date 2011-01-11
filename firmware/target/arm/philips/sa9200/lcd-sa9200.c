@@ -84,6 +84,15 @@ static inline void lcd_wait_write(void)
     while (LCD1_CONTROL & LCD1_BUSY_MASK);
 }
 
+/* send LCD pixel */
+static inline void lcd_send_pixel(unsigned pixel)
+{
+    lcd_wait_write();
+    *(volatile uint8_t *)&LCD1_DATA = pixel >> 8;
+    lcd_wait_write();
+    *(volatile uint8_t *)&LCD1_DATA = pixel;
+}
+
 /* send LCD data */
 static void lcd_send_data(unsigned data)
 {
@@ -129,11 +138,14 @@ void lcd_init_device(void)
     udelay(30000);
 #endif
 
+    /* Already on */
     power_on = true;
     display_on = true;
-    invert = false;
-    flip = false;
-    contrast = DEFAULT_CONTRAST_SETTING;
+
+    /* Reset the options */
+    lcd_set_invert_display(false);
+    lcd_set_flip(false);
+    lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
 }
 
 #ifdef HAVE_LCD_SLEEP
@@ -493,7 +505,8 @@ void lcd_update(void)
 
     do
     {
-        lcd_send_data(*addr++);
+        lcd_send_pixel(*addr++);
+        lcd_send_pixel(*addr++);
     }
     while (addr < end);
 }
@@ -527,11 +540,25 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_write_reg(R_RAM_ADDR_SET, (y << 8) | x);
     lcd_send_command(R_WRITE_DATA_2_GRAM);
 
-    do {
-        int w = width;
-        do {
-            lcd_send_data(*addr++);
-        } while (--w > 0);
+    do
+    {
+        int w = width - 1;
+
+        if (w > 0)
+        {
+            do
+            {
+                lcd_send_pixel(*addr++);
+                lcd_send_pixel(*addr++);
+                w -= 2;
+            }
+            while (w > 0);
+        }
+
+        if (w == 0)
+            lcd_send_pixel(*addr++); /* odd width */
+
         addr += LCD_WIDTH - width;
-    } while (--height > 0);
+    }
+    while (--height > 0);
 }
