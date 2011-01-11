@@ -97,9 +97,9 @@ static void lcd_send_data(unsigned data)
 static void lcd_send_command(unsigned cmd)
 {
     lcd_wait_write();
-    LCD1_CMD = cmd >> 8;
+    LCD1_CMD = 0;
     lcd_wait_write();
-    LCD1_CMD = cmd & 0xff;
+    LCD1_CMD = cmd;
 }
 
 static void lcd_write_reg(unsigned reg, unsigned data)
@@ -401,25 +401,101 @@ void lcd_yuv_set_options(unsigned options)
 }
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                            int width,
+                            int stride);
+void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
+                                    int width,
+                                    int stride,
+                                    int x_screen,
+                                    int y_screen);
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    const unsigned char *yuv_src[3];
+    const unsigned char *ysrc_max;
+    int options;
+
+    if (!display_on)
+        return;
+
+    width &= ~1;
+    height &= ~1;
+
+    /* calculate the drawing region */
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
+
+    /* convert YUV coordinates to screen coordinates */
+    y = LCD_WIDTH - 1 - y;
+
+    /* 2px strip: cursor moves left, then down in gram */
+    /* BGR=1, MDT1-0=00, I/D1-0=10, AM=0 */
+    lcd_write_reg(R_ENTRY_MODE, 0x1020);
+
+    yuv_src[0] = src[0] + src_y * stride + src_x;
+    yuv_src[1] = src[1] + (src_y * stride >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+    ysrc_max = yuv_src[0] + height * stride;
+
+    /* cache options setting */
+    options = lcd_yuv_options;
+
+    do
+    {
+        /* max horiz << 8 | start horiz */
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (y << 8) | (y - 1));
+
+        /* position cursor (set AD0-AD15) */
+        lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | y);
+
+        /* start drawing */
+        lcd_send_command(R_WRITE_DATA_2_GRAM);
+
+        if (options & LCD_YUV_DITHER)
+        {
+            lcd_write_yuv420_lines_odither(yuv_src, width, stride,
+                                           y, x);
+        }
+        else
+        {
+            lcd_write_yuv420_lines(yuv_src, width, stride);
+        }
+
+        y -= 2; /* move strip by "down" 2 px */
+        yuv_src[0] += stride << 1;
+        yuv_src[1] += stride >> 1;
+        yuv_src[2] += stride >> 1;
+    }
+    while (yuv_src[0] < ysrc_max);
+
+    /* back to normal right, then down cursor in gram */
+    /* BGR=1, MDT1-0=00, I/D1-0=11, AM=0 */
+    lcd_write_reg(R_ENTRY_MODE, 0x1030);
 }
  
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    const fb_data *addr, *end;
+
+    if (!display_on)
+        return;
+
+    addr = &lcd_framebuffer[0][0];
+    end = &lcd_framebuffer[LCD_HEIGHT - 1][LCD_WIDTH];
+
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_WIDTH - 1) << 8);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_HEIGHT - 1) << 8);
+    lcd_write_reg(R_RAM_ADDR_SET, 0);
+    lcd_send_command(R_WRITE_DATA_2_GRAM);
+
+    do
+    {
+        lcd_send_data(*addr++);
+    }
+    while (addr < end);
 }
 
 /* Update a fraction of the display. */
@@ -432,18 +508,23 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x;
+    if (x < 0)
+        width += x, x = 0;
+    if (width <= 0)
+        return; /* Nothing left to do. */
 
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-
-    if ((width <= 0) || (height <= 0))
+    if (y < 0)
+        height += y, y = 0;
+    if (height <= 0)
         return; /* Nothing left to do. */
 
     addr = &lcd_framebuffer[y][x];
 
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((y + height -1) << 8) | y);
-    lcd_write_reg(R_RAM_ADDR_SET, ((y & 0xff) << 8) | (x & 0xff));
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((y + height - 1) << 8) | y);
+    lcd_write_reg(R_RAM_ADDR_SET, (y << 8) | x);
     lcd_send_command(R_WRITE_DATA_2_GRAM);
 
     do {

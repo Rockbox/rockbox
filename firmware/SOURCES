@@ -700,6 +700,7 @@ target/arm/usb-fw-pp502x.c
 target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/philips/sa9200/button-sa9200.c
 target/arm/philips/sa9200/lcd-sa9200.c
+target/arm/philips/sa9200/lcd-as-sa9200.S
 target/arm/philips/sa9200/power-sa9200.c
 target/arm/philips/sa9200/powermgmt-sa9200.c
 #endif /* SIMULATOR */
