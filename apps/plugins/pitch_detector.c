@@ -300,7 +300,7 @@ static struct tuner_settings
 /* Settings loading and saving(adapted from the clock plugin)      */
 /*=================================================================*/
 
-#define SETTINGS_FILENAME PLUGIN_APPS_DIR "/.pitch_settings"
+#define SETTINGS_FILENAME PLUGIN_APPS_DIR "/.pitch_detector_settings"
 
 /* The settings as they exist on the hard disk, so that
  * we can know at saving time if changes have been made */
