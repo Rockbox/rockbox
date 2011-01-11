@@ -30,6 +30,8 @@
 static int int_btn = BUTTON_NONE;
 
 #ifndef BOOTLOADER
+static bool hold_button_old = false;
+
 void button_init_device(void)
 {
     /* The touchpad is powered on and initialized in power-sa9200.c
@@ -72,8 +74,10 @@ void button_int(void)
     }
 }
 #else
-void button_init_device(void){}
-#endif /* bootloader */
+void button_init_device(void)
+{
+}
+#endif /* BOOTLOADER */
 
 bool button_hold(void)
 {
@@ -86,8 +90,18 @@ bool button_hold(void)
 int button_read_device(void)
 {
     int btn = int_btn;
+    bool hold = !(GPIOL_INPUT_VAL & 0x40);
 
-    if (button_hold())
+#ifndef BOOTLOADER
+    /* Backlight hold handling */
+    if (hold != hold_button_old)
+    {
+        hold_button_old = hold;
+        backlight_hold_changed(hold);
+    }
+#endif
+
+    if (hold)
         return BUTTON_NONE;
 
     if (!(GPIOB_INPUT_VAL & 0x20)) btn |= BUTTON_POWER;
