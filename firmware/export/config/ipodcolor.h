@@ -58,6 +58,9 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
+/* Define this if the LCD can shut down */
+#define HAVE_LCD_SHUTDOWN
+
 /* LCD stays visible without backlight - simulator hint */
 #define HAVE_TRANSFLECTIVE_LCD
 

@@ -31,6 +31,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "hwcompat.h"
+#include "backlight-target.h"
 
 /* LCD command codes for HD66789R */
 #define LCD_CNTL_RAM_ADDR_SET           0x21
@@ -39,7 +40,7 @@
 #define LCD_CNTL_VERT_RAM_ADDR_POS      0x45
 
 /*** globals ***/
-int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
+int lcd_type = 1; /* 0,2 = "old" Color/Photo; 1,3 = similar to HD66789R */
 
 static inline void lcd_wait_write(void)
 {
@@ -48,7 +49,7 @@ static inline void lcd_wait_write(void)
 
 static void lcd_cmd_data(unsigned cmd, unsigned data)
 {
-    if (lcd_type == 0) {  /* 16 bit transfers */
+    if ((lcd_type&1) == 0) {  /* 16 bit transfers */
         lcd_wait_write();
         LCD2_PORT = LCD2_CMD_MASK | cmd;
         lcd_wait_write();
@@ -91,22 +92,11 @@ void lcd_init_device(void)
     if (IPOD_HW_REVISION == 0x60000) {
         lcd_type = 0;
     } else {
-        int gpio_a01, gpio_a04;
-
-        /* A01 */
-        gpio_a01 = (GPIOA_INPUT_VAL & 0x2) >> 1;
-        /* A04 */
-        gpio_a04 = (GPIOA_INPUT_VAL & 0x10) >> 4;
-
-        if (((gpio_a01 << 1) | gpio_a04) == 0 || ((gpio_a01 << 1) | gpio_a04) == 2) {
-            lcd_type = 0;
-        } else {
-            lcd_type = 1;
-        }
+        lcd_type = (GPIOA_INPUT_VAL & 0x2) | ((GPIOA_INPUT_VAL & 0x10) >> 4);
     }
-    if (lcd_type == 0) {
+    if ((lcd_type&1) == 0) {
         lcd_cmd_data(0xef, 0x0);
-        lcd_cmd_data(0x1, 0x0);
+        lcd_cmd_data(0x01, 0x0);
         lcd_cmd_data(0x80, 0x1);
         lcd_cmd_data(0x10, 0xc);
         lcd_cmd_data(0x18, 0x6);
@@ -114,11 +104,48 @@ void lcd_init_device(void)
         lcd_cmd_data(0x7e, 0x5);
         lcd_cmd_data(0x7f, 0x1);
     }
-
 #elif CONFIG_LCD == LCD_IPODNANO
     /* iPodLinux doesn't appear have any LCD init code for the Nano */
 #endif
 }
+
+#ifdef HAVE_LCD_SHUTDOWN
+void lcd_shutdown(void) {
+    /* Immediately switch off the backlight to avoid flashing. */
+#if defined(IPOD_NANO)
+    _backlight_hw_enable(false);
+#elif defined(IPOD_COLOR)
+    _backlight_off();
+#endif
+
+    if ((lcd_type&1) == 0) {
+        /* lcd_type 0 and 2 */
+        lcd_cmd_data(0x00EF, 0x0000);
+        lcd_cmd_data(0x0080, 0x0000); udelay(1000);
+        lcd_cmd_data(0x0001, 0x0001);
+    } else if (lcd_type == 1) {
+        /* lcd_type 1 */
+        lcd_cmd_data(0x0007, 0x0236); sleep( 40*HZ/1000);
+        lcd_cmd_data(0x0007, 0x0226); sleep( 40*HZ/1000);
+        lcd_cmd_data(0x0007, 0x0204);
+        lcd_cmd_data(0x0010, 0x7574); sleep(200*HZ/1000);
+        lcd_cmd_data(0x0010, 0x7504); sleep( 50*HZ/1000);
+        lcd_cmd_data(0x0010, 0x0501);
+    } else {
+        /* lcd_type 3 */
+        lcd_cmd_data(0x0007, 0x4016); sleep( 20*HZ/1000);
+        lcd_cmd_data(0x0059, 0x0011); sleep( 20*HZ/1000);
+        lcd_cmd_data(0x0059, 0x0003); sleep( 20*HZ/1000);
+        lcd_cmd_data(0x0059, 0x0002); sleep( 20*HZ/1000);
+        lcd_cmd_data(0x0010, 0x6360); sleep(200*HZ/1000);
+        lcd_cmd_data(0x0010, 0x6300); sleep( 50*HZ/1000);
+        lcd_cmd_data(0x0010, 0x0300);
+        lcd_cmd_data(0x0059, 0x0000);
+        lcd_cmd_data(0x0007, 0x4004);
+        lcd_cmd_data(0x0010, 0x0301);
+    }
+}
+#endif
 
 /* Helper function to set up drawing region and start drawing */
 static void lcd_setup_drawing_region(int x, int y, int width, int height)
@@ -139,7 +166,7 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
 #endif
 
     /* setup the drawing region */
-    if (lcd_type == 0) {
+    if ((lcd_type&1) == 0) {
         lcd_cmd_data(0x12, y0);      /* start vert */
         lcd_cmd_data(0x13, x0);      /* start horiz */
         lcd_cmd_data(0x15, y1);      /* end vert */

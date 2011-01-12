@@ -52,14 +52,14 @@ void _backlight_on(void)
 {
     /* brightness full */
     outl(0x80000000 | (brightness << 16), 0x7000a010);
-    /* GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08); */
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
     enabled = true;
 }
 
 void _backlight_off(void)
 {
     outl(0x80000000, 0x7000a010);
-    /* GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08); */
+    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
     enabled = false;
 }
 
