@@ -290,20 +290,8 @@ do
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.16.1"
-            patch=""
-            case $system in
-                CYGWIN* | Darwin | FreeBSD | Interix | SunOS)
-                    patch="gcc-3.4.6.patch"
-                    ;;
-                Linux)
-                    machine=`uname -m`
-                    if [ "$machine" = "x86_64" ]; then
-                        patch="gcc-3.4.6-amd64.patch"
-                    fi
-                    ;;
-            esac
-            build "gcc" "m68k-elf" "3.4.6" "$patch"
+            build "binutils" "m68k-elf" "2.20.1"
+            build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf" "gmp mpfr mpc"
             ;;
 
         [Aa])
