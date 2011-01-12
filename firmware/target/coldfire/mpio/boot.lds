@@ -70,7 +70,7 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-    .bss DRAMORIG+0x800000:
+    .bss DRAMORIG+0x800000 (NOLOAD) :
     {
        _edata = .;
         *(.ibss)
