@@ -61,7 +61,7 @@ cat <<EOF
  * All done!
 
 Please set the following environment variables before running tools/configure:
-export \$ANDROID_SDK_PATH=$SDK_PATH
-export \$ANDROID_NDK_PATH=$NDK_PATH
+export ANDROID_SDK_PATH=$SDK_PATH
+export ANDROID_NDK_PATH=$NDK_PATH
 
 EOF
