@@ -18,12 +18,7 @@ $(TTALIB): $(TTALIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 TTAFLAGS = $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(CPU),coldfire)
-    TTAFLAGS += -O3
-else
-    TTAFLAGS += -O2
-endif
+TTAFLAGS += -O2
 
 $(CODECDIR)/libtta/%.o: $(ROOTDIR)/apps/codecs/libtta/%.c
 	$(SILENT)mkdir -p $(dir $@)

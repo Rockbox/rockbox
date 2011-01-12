@@ -21,8 +21,6 @@ WMAFLAGS = -I$(APPSDIR)/codecs/libwma $(filter-out -O%,$(CODECFLAGS))
 
 ifeq ($(MEMORYSIZE),2)
     WMAFLAGS += -Os
-else ifeq ($(CPU),coldfire)
-    WMAFLAGS += -O3
 else
     WMAFLAGS += -O2
 endif

@@ -22,7 +22,7 @@ ALACFLAGS = $(filter-out -O%,$(CODECFLAGS))
 ifeq ($(CPU),arm)
     ALACFLAGS += -O2
 else
-    ALACFLAGS += -O3
+    ALACFLAGS += -O1
 endif
 
 $(CODECDIR)/libalac/%.o: $(ROOTDIR)/apps/codecs/libalac/%.c

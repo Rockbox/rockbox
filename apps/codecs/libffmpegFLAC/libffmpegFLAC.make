@@ -15,11 +15,7 @@ OTHER_SRC += $(FFMPEGFLACLIB_SRC)
 
 # libffmpegFLAC is faster on ARM-targets with -O2 than -O1
 FFMPEGFLACFLAGS = -I$(APPSDIR)/codecs/libffmpegFLAC $(filter-out -O%,$(CODECFLAGS))
-ifeq ($(CPU),arm)
-   FFMPEGFLACFLAGS += -O2
-else
-   FFMPEGFLACFLAGS += -O1
-endif
+FFMPEGFLACFLAGS += -O2
 
 $(FFMPEGFLACLIB): $(FFMPEGFLACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)

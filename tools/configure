@@ -381,10 +381,10 @@ calmrisccc () {
 
 coldfirecc () {
  prefixtools m68k-elf-
- GCCOPTS="$CCOPTS -m5206e -Wa\,-m5249 -malign-int -mstrict-align"
+ GCCOPTS="$CCOPTS -mcpu=5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
- gccchoice="3.4.6"
+ gccchoice="4.5.2"
 }
 
 arm7tdmicc () {

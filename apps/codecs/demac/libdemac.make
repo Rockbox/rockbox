@@ -27,7 +27,12 @@ $(DEMACLIB): $(DEMACLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 DEMACFLAGS = $(filter-out -O%,$(CODECFLAGS))
-DEMACFLAGS += -O3
+
+ifeq ($(CPU),coldfire)
+    DEMACFLAGS += -O2
+else
+    DEMACFLAGS += -O3
+endif
 
 $(CODECDIR)/ape_free_iram.h: $(CODECDIR)/ape-pre.map
 	$(call PRINTS,GEN $(@F))perl -an \

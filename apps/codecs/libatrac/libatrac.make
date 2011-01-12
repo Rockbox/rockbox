@@ -16,3 +16,16 @@ OTHER_SRC += $(ATRACLIB_SRC)
 $(ATRACLIB): $(ATRACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
+
+ATRACFLAGS = -I$(APPSDIR)/codecs/libatrac $(filter-out -O%,$(CODECFLAGS))
+# not tuned for arm
+ifeq ($(CPU),coldfire)
+    ATRACFLAGS += -O2
+else
+    ATRACFLAGS += -O1
+endif
+
+$(CODECDIR)/libatrac/%.o: $(ROOTDIR)/apps/codecs/libatrac/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(ATRACFLAGS) -c $< -o $@
+

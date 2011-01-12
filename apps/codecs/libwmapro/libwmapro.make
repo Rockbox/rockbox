@@ -20,7 +20,7 @@ $(WMAPROLIB): $(WMAPROLIB_OBJ)
 WMAPROFLAGS = -I$(APPSDIR)/codecs/libwmapro $(filter-out -O%,$(CODECFLAGS))
 
 ifeq ($(CPU),coldfire)
-	WMAPROFLAGS += -O2
+	WMAPROFLAGS += -O3
 else
 	WMAPROFLAGS += -O1
 endif

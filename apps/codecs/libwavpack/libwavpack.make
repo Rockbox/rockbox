@@ -18,7 +18,7 @@ WAVPACKFLAGS = -I$(APPSDIR)/codecs/libwavpack $(filter-out -O%,$(CODECFLAGS))
 ifeq ($(CPU),arm)
     WAVPACKFLAGS += -O3
 else
-    WAVPACKFLAGS += -O2
+    WAVPACKFLAGS += -O1
 endif
 
 

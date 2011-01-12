@@ -20,11 +20,7 @@ $(FAADLIB): $(FAADLIB_OBJ)
 
 # libfaad is faster on ARM with -O2, use -O1 for other CPUs
 FAADFLAGS = -I$(APPSDIR)/codecs/libfaad $(filter-out -O%,$(CODECFLAGS)) 
-ifeq ($(CPU),arm)
-   FAADFLAGS += -O2
-else
-   FAADFLAGS += -O1
-endif
+FAADFLAGS += -O2
 
 $(CODECDIR)/libfaad/%.o: $(ROOTDIR)/apps/codecs/libfaad/%.c
 	$(SILENT)mkdir -p $(dir $@)
