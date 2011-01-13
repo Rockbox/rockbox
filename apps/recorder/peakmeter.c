@@ -930,6 +930,21 @@ void peak_meter_screen(struct screen *display, int x, int y, int height)
     peak_meter_draw(display, &scales[display->screen_type], x, y,
                         display->getwidth() - x, height);
 }
+
+/* sets *left and *right to the current *unscaled* values */
+void peak_meter_current_vals(int *left, int *right)
+{
+    static int left_level = 0, right_level = 0;
+    if (level_check){
+        /* only read the volume info from MAS if peek since last read*/
+        left_level  = peak_meter_read_l(); 
+        right_level = peak_meter_read_r();
+        level_check = false;
+    }
+    *left = left_level;
+    *right = right_level;
+}
+
 /**
  * Draws a peak meter in the specified size at the specified position.
  * @param int x - The x coordinate. 
@@ -944,7 +959,7 @@ void peak_meter_screen(struct screen *display, int x, int y, int height)
 static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
                          int x, int y, int width, int height) 
 {
-    static int left_level = 0, right_level = 0;
+    int left_level = 0, right_level = 0;
     int left = 0, right = 0;
     int meterwidth = width - 3;
     int i, delta;
@@ -964,12 +979,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     if (peak_meter_enabled) {
 
 
-        if (level_check){
-            /* only read the volume info from MAS if peek since last read*/
-            left_level  = peak_meter_read_l(); 
-            right_level = peak_meter_read_r();
-            level_check = false;
-        }
+        peak_meter_current_vals(&left_level, &right_level);
 
         /* scale the samples dBfs */    
         left  = peak_meter_scale_value(left_level, meterwidth);

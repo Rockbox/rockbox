@@ -34,6 +34,8 @@ extern void pm_reset_clipcount(void);
 extern void pm_activate_clipcount(bool active);
 
 extern void peak_meter_enable(bool enable);
+/* sets *left and *right to the current *unscaled* values */
+extern void peak_meter_current_vals(int *left, int *right);
 
 extern void peak_meter_playback(bool playback);
 extern int  peak_meter_draw_get_btn(int action_context, int x[], int y[],

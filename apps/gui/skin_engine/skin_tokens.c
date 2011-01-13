@@ -59,6 +59,7 @@
 #include "skin_engine.h"
 #include "statusbar-skinned.h"
 #include "root_menu.h"
+#include "peakmeter.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #include "pcm_record.h"
@@ -1267,6 +1268,23 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
 
+#ifdef HAVE_LCD_BITMAP
+        /* peakmeter */
+        case SKIN_TOKEN_PEAKMETER_LEFT:
+        case SKIN_TOKEN_PEAKMETER_RIGHT:
+        {
+            int left, right, val;
+            peak_meter_current_vals(&left, &right);
+            val = token->type == SKIN_TOKEN_PEAKMETER_LEFT ?
+                    left : right;
+            val = peak_meter_scale_value(val, limit==1 ? MAX_PEAK : limit);
+            if (intval)
+                *intval = val;
+            snprintf(buf, buf_size, "%d", val);
+            data->peak_meter_enabled = true;
+            return buf;
+        }
+#endif
 
 #if (CONFIG_CODEC == SWCODEC)
         case SKIN_TOKEN_CROSSFADE:

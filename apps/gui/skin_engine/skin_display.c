@@ -42,6 +42,7 @@
 #include "playlist.h"
 #include "audio.h"
 #include "tagcache.h"
+#include "peakmeter.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -158,6 +159,15 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     {
         length = 100;
         end = battery_level();
+    }
+    else if (pb->type == SKIN_TOKEN_PEAKMETER_LEFTBAR ||
+             pb->type == SKIN_TOKEN_PEAKMETER_RIGHTBAR)
+    {
+        int left, right, val;
+        peak_meter_current_vals(&left, &right);
+        val = pb->type == SKIN_TOKEN_PEAKMETER_LEFTBAR ? left : right;
+        length = MAX_PEAK;
+        end = peak_meter_scale_value(val, length);
     }
 #if CONFIG_TUNER
     else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))

@@ -139,6 +139,12 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                 draw_peakmeters(gwps, info->line_number, vp);
             break;
 #endif
+#ifdef HAVE_LCD_BITMAP
+        case SKIN_TOKEN_PEAKMETER_LEFTBAR:
+        case SKIN_TOKEN_PEAKMETER_RIGHTBAR:
+            data->peak_meter_enabled = true;
+            /* fall through to the progressbar code */
+#endif
         case SKIN_TOKEN_VOLUMEBAR:
         case SKIN_TOKEN_BATTERY_PERCENTBAR:
 #ifdef HAVE_LCD_BITMAP
