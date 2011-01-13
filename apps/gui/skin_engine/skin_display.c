@@ -42,7 +42,6 @@
 #include "playlist.h"
 #include "audio.h"
 #include "tagcache.h"
-#include "peakmeter.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
