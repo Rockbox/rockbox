@@ -43,6 +43,7 @@
 #include "misc.h"
 #include "led.h"
 #ifdef HAVE_LCD_BITMAP
+#include "peakmeter.h"
 /* Image stuff */
 #include "albumart.h"
 #endif
@@ -59,7 +60,6 @@
 #include "skin_engine.h"
 #include "statusbar-skinned.h"
 #include "root_menu.h"
-#include "peakmeter.h"
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #include "pcm_record.h"
