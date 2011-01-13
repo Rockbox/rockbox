@@ -290,7 +290,13 @@ do
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.20.1"
+            binopts=""
+            case $system in
+                Darwin)
+                    binopts="--disable-werror"
+                    ;;
+            esac
+            build "binutils" "m68k-elf" "2.20.1" "" "$binopts"
             build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf" "gmp mpfr mpc"
             ;;
 
