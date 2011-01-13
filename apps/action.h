@@ -246,6 +246,7 @@ enum {
      * being used, but are nice additions if the touchscreen is used */
     ACTION_TOUCH_SHUFFLE,
     ACTION_TOUCH_REPMODE,
+    ACTION_TOUCH_MUTE,
 #endif    
 
     /* USB HID codes */

@@ -880,6 +880,7 @@ static const struct touchaction touchactions[] = {
     { "resumeplayback", ACTION_TREE_WPS}, /* returns to previous music, WPS/FM */
     /* not really WPS specific, but no equivilant ACTION_STD_* */
     {"voldown", ACTION_WPS_VOLDOWN},    {"volup", ACTION_WPS_VOLUP},
+    {"mute", ACTION_TOUCH_MUTE },
     
     /* generic settings changers */
     {"setting_inc", ACTION_SETTINGS_INC}, {"setting_dec", ACTION_SETTINGS_DEC}, 
@@ -945,7 +946,7 @@ static int parse_touchregion(struct skin_element *element,
     region->wvp = curr_vp;
     region->armed = false;
     region->reverse_bar = false;
-    region->extradata = NULL;
+    region->data = NULL;
     action = element->params[4].data.text;
 
     strcpy(temp, action);
@@ -998,7 +999,7 @@ static int parse_touchregion(struct skin_element *element,
                                 break;
                         if (j==nb_settings)
                             return WPS_ERROR_INVALID_PARAM;
-                        region->extradata = (void*)&settings[j];
+                        region->data = (void*)&settings[j];
                     }
                 }
                 break;
@@ -1011,6 +1012,13 @@ static int parse_touchregion(struct skin_element *element,
     if (!item)
         return WPS_ERROR_INVALID_PARAM;
     add_to_ll_chain(&wps_data->touchregions, item);
+    
+    if (region->action == ACTION_TOUCH_MUTE)
+    {
+        region->value = global_settings.volume;
+    }
+        
+    
     return 0;
 }
 #endif
