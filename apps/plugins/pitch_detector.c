@@ -294,7 +294,18 @@ static struct tuner_settings
     int      freq_A;        /* Index of the frequency of A */
     bool     use_sharps;
     bool     display_hz;
+    int      key_transposition; /* Which note to display as 'C'. */
+        /* 0=C, 1=D-flat, 2=D, ..., 11=B. This is useful if you  */
+        /* use a transposing instrument. In that case, this      */
+        /* setting tells which 'real' note is played by the      */
+        /* instrument if you play a written 'C'. Thus, this      */
+        /* setting is the number of semitones from the real 'C'  */
+        /* up to the 'instrument key'.                           */
 } settings;
+
+/* By default, the real 'C' is displayed as 'C' */
+#define DEFAULT_KEY_TRANSPOSITION 0
+
 
 /*=================================================================*/
 /* Settings loading and saving(adapted from the clock plugin)      */
@@ -326,6 +337,7 @@ static void tuner_settings_reset(void)
         .freq_A = DEFAULT_FREQ_A,
         .use_sharps = true,
         .display_hz = false,
+        .key_transposition = DEFAULT_KEY_TRANSPOSITION,
     };
 }
 
@@ -406,6 +418,22 @@ static const struct opt_items accidental_text[] =
     { "Sharp", -1 },
 };
 
+static const struct opt_items transpose_text[] =
+{
+    { "C (Concert Pitch)", -1 },
+    { "D-flat", -1 },
+    { "D", -1 },
+    { "E-flat", -1 },
+    { "E", -1 },
+    { "F", -1 },
+    { "G-flat", -1 },
+    { "G", -1 },
+    { "A-flat", -1 },
+    { "A", -1 },
+    { "B-flat", -1 },
+    { "B", -1 },
+};
+
 static void set_min_freq(int new_freq)
 {
     settings.sample_size = freq2period(new_freq) * 4;
@@ -442,6 +470,7 @@ static bool main_menu(void)
                         "Lowest Frequency",
                         "Algorithm Pickiness",
                         "Accidentals",
+                        "Key Transposition",
                         "Display Frequency (Hz)",
                         "Frequency of A (Hz)",
                         "Reset Settings",
@@ -484,10 +513,15 @@ static bool main_menu(void)
                                BOOL, accidental_text, 2, NULL);
                 break;
             case 6:
+                rb->set_option("Key Transposition",
+                              &settings.key_transposition,
+                              INT, transpose_text, 12, NULL);
+                break;
+            case 7:
                 rb->set_bool("Display Frequency (Hz)",
                              &settings.display_hz);
                 break;
-            case 7:
+            case 8:
                 freq_val = freq_A[settings.freq_A].frequency;
                 rb->set_int("Frequency of A (Hz)",
                     "Hz", UNIT_INT, &freq_val, NULL,
@@ -495,13 +529,13 @@ static bool main_menu(void)
                     NULL);
                 settings.freq_A = freq_val - freq_A[0].frequency;
                 break;
-            case 8:
+            case 9:
                 reset = false;
                 rb->set_bool("Reset Tuner Settings?", &reset);
                 if (reset)
                     tuner_settings_reset();
                 break;
-            case 9:
+            case 10:
                 exit_tuner = true;
                 done = true;
                 break;
@@ -703,7 +737,13 @@ static void display_frequency (fixed freq)
     draw_bar(ldf);                /* The red bar */
     if(fp_round(freq) != 0)
     {
-        draw_note(notes[note].name);
+        /* Raise the displayed pitch an octave minus key_transposition */
+        /* semitones, effectively lowering it.  Note that the pitch    */
+        /* displayed alongside the frequency is unaffected.            */
+        int transposition = 12 - settings.key_transposition;
+
+        draw_note(notes[(note + transposition) % 12].name);
+
         if(settings.display_hz)
         {
 #if LCD_DEPTH > 1
