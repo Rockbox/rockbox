@@ -44,8 +44,8 @@
 #include "i2c.h"
 #include "backlight-target.h"
 #endif
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "usb.h"
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "usb_drv.h"
 #endif
 #include "usb-target.h"
@@ -515,17 +515,8 @@ static int handle_usb(int connect_timeout)
 
     return usb;
 }
-#else /* !HAVE_BOOTLOADER_USB_MODE */
-
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-    || defined (SANSA_VIEW)
-/* Ignore cable state */
-static int handle_usb(int connect_timeout)
-{
-    return USB_EXTRACTED;
-    (void)connect_timeout;
-}
-#else
+#elif (defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
+    || defined (SANSA_VIEW)) && !defined(USB_ROCKBOX_USB)
 /* Return USB_INSERTED if cable present */
 static int handle_usb(int connect_timeout)
 {
@@ -546,6 +537,14 @@ static int handle_usb(int connect_timeout)
     return usb;
     (void)connect_timeout;
 }
+#else
+/* Ignore cable state */
+static int handle_usb(int connect_timeout)
+{
+    return USB_EXTRACTED;
+    (void)connect_timeout;
+}
+#else
 #endif
 
 #endif /* HAVE_BOOTLOADER_USB_MODE */
@@ -692,7 +691,8 @@ void* main(void)
         pinfo = disk_partinfo(1);
         if(pinfo->type == PARTITION_TYPE_OS2_HIDDEN_C_DRIVE)
         {
-            rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE, usb);
+            rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE,
+                               usb == USB_INSERTED);
             if (rc < EOK) {
                 printf("Can't load from partition");
                 printf(strerror(rc));

@@ -75,4 +75,4 @@ int usb_detect(void)
 }
 
 /* No different for now */
-void usb_plugged(void) __attribute__((alias("usb_detect")));
+bool usb_plugged(void) __attribute__((alias("usb_detect")));
