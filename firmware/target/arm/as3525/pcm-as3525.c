@@ -37,6 +37,7 @@
 
 static void *dma_start_addr;
 static size_t      dma_size;   /* in 4*32 bits */
+static size_t      play_sub_size;  /* size of subtransfer */
 static void dma_callback(void);
 static int locked = 0;
 static bool is_playing = false;
@@ -70,8 +71,7 @@ static void play_start_pcm(void)
     if(size > MAX_TRANSFER)
         size = MAX_TRANSFER;
 
-    dma_size -= size;
-    dma_start_addr += size;
+    play_sub_size = size;
 
     clean_dcache_range((void*)addr, size);  /* force write back */
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
@@ -81,6 +81,10 @@ static void play_start_pcm(void)
 
 static void dma_callback(void)
 {
+    dma_size -= play_sub_size;
+    dma_start_addr += play_sub_size;
+    play_sub_size = 0; /* Might get called again if locked */
+
     if(locked)
     {
         play_callback_pending = is_playing;
@@ -123,16 +127,22 @@ void pcm_play_dma_stop(void)
 
     bitclr32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
     CGU_AUDIO &= ~(1<<11);
+
+    play_callback_pending = false;
 }
 
 void pcm_play_dma_pause(bool pause)
 {
-    is_playing = !pause;
-
     if(pause)
+    {
+        is_playing = false;
         dma_disable_channel(1);
+        play_callback_pending = false;
+    }
     else
+    {
         play_start_pcm();
+    }
 }
 
 void pcm_play_dma_init(void)
@@ -343,6 +353,8 @@ void pcm_rec_dma_stop(void)
     CGU_AUDIO &= ~(1<<11);
     bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
                         CGU_I2SOUT_APB_CLOCK_ENABLE);
+
+    rec_callback_pending = false;
 }
 
 
