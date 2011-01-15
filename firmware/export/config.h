@@ -693,7 +693,7 @@ Lyre prototype 1 */
 #if (CONFIG_CODEC == SWCODEC)
 #ifdef BOOTLOADER
 
-#if CONFIG_CPU == IMX31L
+#ifdef HAVE_BOOTLOADER_USB_MODE
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
 #define USB_STATUS_BY_EVENT
@@ -964,8 +964,8 @@ Lyre prototype 1 */
 #ifdef BOOTLOADER
 
 /* enable usb storage for targets that do bootloader usb */
-#if  (defined(TOSHIBA_GIGABEAT_S) || \
-     (defined(CREATIVE_ZVx) || \
+#if defined(HAVE_BOOTLOADER_USB_MODE) || \
+    ((defined(CREATIVE_ZVx) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
      (CONFIG_USBOTG == USBOTG_JZ4740) || defined(IPOD_NANO2G) || \
      CONFIG_USBOTG == USBOTG_AS3525

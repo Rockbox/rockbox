@@ -178,9 +178,10 @@ struct wakeup
 
 
 /* global tick variable */
-#if defined(CPU_PP) && defined(BOOTLOADER)
-/* We don't enable interrupts in the iPod bootloader, so we need to fake
-   the current_tick variable */
+#if defined(CPU_PP) && defined(BOOTLOADER) && \
+    !defined(HAVE_BOOTLOADER_USB_MODE)
+/* We don't enable interrupts in the PP bootloader unless USB mode is
+   enabled for it, so we need to fake the current_tick variable */
 #define current_tick (signed)(USEC_TIMER/10000)
 
 static inline void call_tick_tasks(void)

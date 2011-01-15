@@ -46,7 +46,7 @@
 
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
-     (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_ENABLE_STORAGE)) || \
+     (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) || \
      (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx))) || \
      (defined(HAVE_USBSTACK) && (defined(OLYMPUS_MROBE_500))) || \
      (defined(HAVE_USBSTACK) && (defined(IPOD_NANO2G))) || \

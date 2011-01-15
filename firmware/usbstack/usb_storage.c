@@ -451,8 +451,8 @@ void usb_storage_init_connection(void)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
-    defined(BOOTLOADER) || CONFIG_CPU == DM320
+#if (CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
+     defined(BOOTLOADER) || CONFIG_CPU == DM320) && !defined(CPU_PP502x)
     static unsigned char _cbw_buffer[MAX_CBW_SIZE]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     cbw_buffer = (void *)_cbw_buffer;

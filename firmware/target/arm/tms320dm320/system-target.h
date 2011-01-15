@@ -34,4 +34,13 @@ void udelay(int usec);
 void dm320_set_io (char pin_num, bool input, bool invert, bool irq, bool irqany,
                     bool chat, char func_num );
 
+#if defined(CREATIVE_ZVx) && defined(BOOTLOADER)
+#define SLEEP_KERNEL_HOOK(ticks) \
+    ({ \    /* hacky.. */
+    long _sleep_ticks = current_tick + ticks + 1; \
+    while (TIME_BEFORE(current_tick, _sleep_ticks)) \
+        switch_thread(); \
+    true; }) /* handled here */
+#endif
+
 #endif /* SYSTEM_TARGET_H */

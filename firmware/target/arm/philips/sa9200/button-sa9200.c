@@ -119,6 +119,10 @@ void button_int(void)
 void button_init_device(void)
 {
 }
+
+void button_int(void)
+{
+}
 #endif /* BOOTLOADER */
 
 bool button_hold(void)

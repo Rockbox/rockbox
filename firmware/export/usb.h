@@ -55,6 +55,9 @@ enum {
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
     USB_CHARGER_UPDATE,      /* Event */
 #endif
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    USB_HANDLED,             /* Bootloader status code */
+#endif
 };
 
 #ifdef HAVE_USB_POWER

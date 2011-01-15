@@ -508,8 +508,12 @@ target/arm/system-pp5002.c
 target/arm/system-pp502x.c
 #endif
 #ifdef BOOTLOADER
-target/arm/crt0-pp-bl.S
+#ifdef HAVE_BOOTLOADER_USB_MODE
+target/arm/crt0-pp502x-bl-usb.S
 #else
+target/arm/crt0-pp-bl.S
+#endif /* HAVE_BOOTLOADER_USB_MODE */
+#else /* !BOOTLOADER */
 target/arm/pcm-pp.c
 target/arm/debug-pp.c
 #if !defined(SANSA_E200) && !defined(SANSA_C200)

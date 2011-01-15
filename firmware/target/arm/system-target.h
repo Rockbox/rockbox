@@ -141,7 +141,7 @@ static inline void wake_core(int core)
 }
 #endif
 
-#ifdef BOOTLOADER
+#if defined(BOOTLOADER) && !defined(HAVE_BOOTLOADER_USB_MODE)
 /* All addresses within rockbox are in IRAM in the bootloader so
    are therefore uncached */
 #define UNCACHED_ADDR(a) (a)
@@ -163,7 +163,7 @@ static inline void wake_core(int core)
 #endif
 
 /** cache functions **/
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 #define HAVE_CPUCACHE_COMMIT_DISCARD
 #define HAVE_CPUCACHE_COMMIT
 /* deprecated alias */
@@ -174,6 +174,30 @@ static inline void wake_core(int core)
 #if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
 extern unsigned char probed_ramsize;
 #endif
+
+
+#ifdef BOOTLOADER
+#if defined(TATUNG_TPJ1022)
+    /* Some targets don't like yielding in the bootloader - force
+     * yield() to return without a context switch. */
+#define YIELD_KERNEL_HOOK() true
+#endif
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+void tick_stop(void);
+void system_prepare_fw_start(void);
+
+#else /* !HAVE_BOOTLOADER_USB_MODE */
+
+    /* Busy "sleep" without a tick */
+#define SLEEP_KERNEL_HOOK(ticks) \
+    ({ unsigned _stop = USEC_TIMER + ((ticks) + 1) * (1000000/HZ); \
+       while (TIME_BEFORE(USEC_TIMER, _stop))                      \
+          switch_thread();                                         \
+       true; })
+#endif /* HAVE_BOOTLOADER_USB_MODE */
+
+#endif /* BOOTLOADER */
 
 #endif /* CPU_PP */
 

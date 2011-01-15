@@ -106,6 +106,18 @@
 #define USB_GPIO_INT_CLR     GPIO_INT_CLR(USB_GPIO)
 #define USB_GPIO_HI_INT_MASK GPIO_HI_INT_MASK(USB_GPIO)
 
+/* Enable raw status pin read only - not interrupt */
+void usb_pin_init(void)
+{
+    GPIO_CLEAR_BITWISE(USB_GPIO_OUTPUT_EN, USB_GPIO_MASK);
+    GPIO_SET_BITWISE(USB_GPIO_ENABLE, USB_GPIO_MASK);
+#ifdef USB_FIREWIRE_HANDLING
+    /* GPIO C bit 1 is firewire detect */
+    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_EN, 0x02);
+    GPIO_SET_BITWISE(GPIOC_ENABLE, 0x02);
+#endif
+}
+
 void usb_init_device(void)
 {
     /* enable usb module */
@@ -140,12 +152,12 @@ void usb_init_device(void)
     DEV_INIT2 &= ~INIT_USB;
 #endif
 
-    /* These set INV_LEV to the inserted level so it will fire if already
+    usb_pin_init();
+
+    /* These set INT_LEV to the inserted level so it will fire if already
      * inserted at the time they are enabled. */
 #ifdef USB_STATUS_BY_EVENT
     GPIO_CLEAR_BITWISE(USB_GPIO_INT_EN, USB_GPIO_MASK);
-    GPIO_CLEAR_BITWISE(USB_GPIO_OUTPUT_EN, USB_GPIO_MASK);
-    GPIO_SET_BITWISE(USB_GPIO_ENABLE, USB_GPIO_MASK);
     GPIO_WRITE_BITWISE(USB_GPIO_INT_LEV, USB_GPIO_VAL, USB_GPIO_MASK);
     USB_GPIO_INT_CLR = USB_GPIO_MASK;
     GPIO_SET_BITWISE(USB_GPIO_INT_EN, USB_GPIO_MASK);
@@ -154,23 +166,12 @@ void usb_init_device(void)
 #ifdef USB_FIREWIRE_HANDLING
     /* GPIO C bit 1 is firewire detect */
     GPIO_CLEAR_BITWISE(GPIOC_INT_EN, 0x02);
-    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_EN, 0x02);
-    GPIO_SET_BITWISE(GPIOC_ENABLE, 0x02);
     GPIO_WRITE_BITWISE(GPIOC_INT_LEV, 0x00, 0x02);
     GPIOC_INT_CLR = 0x02;
     GPIO_SET_BITWISE(GPIOC_INT_EN, 0x02);
     CPU_HI_INT_EN = GPIO0_MASK;
 #endif
     CPU_INT_EN = HI_MASK;
-#else
-    /* No interrupt - setup pin read only (BOOTLOADER) */
-    GPIO_CLEAR_BITWISE(USB_GPIO_OUTPUT_EN, USB_GPIO_MASK);
-    GPIO_SET_BITWISE(USB_GPIO_ENABLE, USB_GPIO_MASK);
-#ifdef USB_FIREWIRE_HANDLING
-    /* GPIO C bit 1 is firewire detect */
-    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_EN, 0x02);
-    GPIO_SET_BITWISE(GPIOC_ENABLE, 0x02);
-#endif
 #endif /* USB_STATUS_BY_EVENT */
 }
 
@@ -185,10 +186,12 @@ void usb_enable(bool on)
     }
     else {
         usb_core_exit();
+#ifndef BOOTLOADER
         /* Disable USB devices */
         DEV_EN &=~ DEV_USB0;
         DEV_EN &=~ DEV_USB1;
         DEV_INIT2 &=~ INIT_USB;
+#endif
     }
 }
 
@@ -197,7 +200,7 @@ void usb_attach(void)
     usb_drv_attach();
 }
 
-static bool usb_pin_state(void)
+bool usb_plugged(void)
 {
     return (USB_GPIO_INPUT_VAL & USB_GPIO_MASK) == USB_GPIO_VAL;
 }
@@ -226,11 +229,26 @@ void usb_insert_int(void)
  * invalid bus reset when unplugging by checking the pin state. */
 void usb_drv_usb_detect_event(void)
 {
-    if(usb_pin_state()) {
+    if(usb_plugged()) {
         usb_status_event(USB_INSERTED);
     }
 }
 #endif /* USB_STATUS_BY_EVENT */
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+/* Replacement function that returns all unused memory after the bootloader
+ * because the storage driver uses the audio buffer */
+extern unsigned char freebuffer[];
+extern unsigned char freebufferend[];
+unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
+{
+    if (buffer_size)
+        *buffer_size = freebufferend - freebuffer + 1;
+
+    return freebuffer;
+    (void)talk_buf;
+}
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
 void usb_drv_int_enable(bool enable)
 {
@@ -249,7 +267,7 @@ int usb_detect(void)
 #ifdef USB_STATUS_BY_EVENT
     return usb_status;
 #else
-    return usb_pin_state() ? USB_INSERTED : USB_EXTRACTED;
+    return usb_plugged() ? USB_INSERTED : USB_EXTRACTED;
 #endif
 }
 

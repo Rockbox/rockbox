@@ -24,5 +24,11 @@
 void usb_init_device(void);
 void usb_insert_int(void);
 void firewire_insert_int(void);
+void usb_pin_init(void); /* Init the GPIO input only */
+bool usb_plugged(void); /* Returns instantaneous state - always */
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+#define USB_DRIVER_CLOSE
+#endif
 
 #endif

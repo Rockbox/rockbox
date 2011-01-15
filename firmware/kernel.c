@@ -48,8 +48,17 @@
 #define KERNEL_ASSERT(exp, msg...) ({})
 #endif
 
-#if !defined(CPU_PP) || !defined(BOOTLOADER) 
+#if !defined(CPU_PP) || !defined(BOOTLOADER) || \
+    defined(HAVE_BOOTLOADER_USB_MODE)
 volatile long current_tick SHAREDDATA_ATTR = 0;
+#endif
+
+/* Unless otherwise defined, do nothing */
+#ifndef YIELD_KERNEL_HOOK
+#define YIELD_KERNEL_HOOK() false
+#endif
+#ifndef SLEEP_KERNEL_HOOK
+#define SLEEP_KERNEL_HOOK(ticks) false
 #endif
 
 /* List of tick tasks - final element always NULL for termination */
@@ -215,30 +224,25 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
  ****************************************************************************/
 unsigned sleep(unsigned ticks)
 {
-#if defined(CPU_PP) && defined(BOOTLOADER)
-    unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
-    while (TIME_BEFORE(USEC_TIMER, stop))
-        switch_thread();
-#elif defined(CREATIVE_ZVx) && defined(BOOTLOADER)
-    /* hacky.. */
-    long sleep_ticks = current_tick + ticks + 1;
-    while (TIME_BEFORE(current_tick, sleep_ticks))
-        switch_thread();
-#else
+    /* In certain situations, certain bootloaders in particular, a normal
+     * threading call is inappropriate. */
+    if (SLEEP_KERNEL_HOOK(ticks))
+        return 0; /* Handled */
+
     disable_irq();
     sleep_thread(ticks);
     switch_thread();
-#endif
     return 0;
 }
 
 void yield(void)
 {
-#if ((defined(TATUNG_TPJ1022)) && defined(BOOTLOADER))
-    /* Some targets don't like yielding in the bootloader */
-#else
+    /* In certain situations, certain bootloaders in particular, a normal
+     * threading call is inappropriate. */
+    if (YIELD_KERNEL_HOOK())
+        return; /* handled */
+
     switch_thread();
-#endif
 }
 
 /****************************************************************************

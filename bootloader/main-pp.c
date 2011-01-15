@@ -48,6 +48,7 @@
 #include "usb.h"
 #include "usb_drv.h"
 #endif
+#include "usb-target.h"
 #if defined(SAMSUNG_YH925)
 /* this function (in lcd-yh925.c) resets the screen orientation for the OF
  * for use with dualbooting */
@@ -451,7 +452,103 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
 
     return EOK;
 }
+#endif /* (CONFIG_STORAGE & STORAGE_SD) */
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+/* Return USB_HANDLED if session took place else return USB_EXTRACTED */
+static int handle_usb(int connect_timeout)
+{
+    static struct event_queue q SHAREDBSS_ATTR;
+    struct queue_event ev;
+    int usb = USB_EXTRACTED;
+    long end_tick = 0;
+    
+    if (!usb_plugged())
+        return USB_EXTRACTED;
+
+    queue_init(&q, true);
+    usb_init();
+    usb_start_monitoring();
+
+    /* Switch to verbose mode if not in it so that the status updates
+     * are shown */
+
+    /* TODO: Should we forgo any messages except the connect? It might be a
+     * charger, not a USB host. */
+    verbose = true;
+
+    printf("USB: Connecting");
+
+    if (connect_timeout != TIMEOUT_BLOCK)
+        end_tick = current_tick + connect_timeout;
+
+    while (1)
+    {
+        /* Sleep no longer than 1/2s */
+        queue_wait_w_tmo(&q, &ev, HZ/2);
+
+        if (ev.id == SYS_USB_CONNECTED)
+        {
+            /* Got the message - wait for disconnect */
+            printf("Bootloader USB mode");
+
+            usb = USB_HANDLED;
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_wait_for_disconnect(&q);
+            break;
+        }
+
+        if (connect_timeout != TIMEOUT_BLOCK &&
+            TIME_AFTER(current_tick, end_tick))
+        {
+            /* Timed out waiting for the connect */
+            printf("USB: Timed out");
+            break;
+        }
+
+        if (!usb_plugged())
+            break; /* Cable pulled */
+    }
+
+    usb_close();
+    queue_delete(&q);
+
+    return usb;
+}
+#else /* !HAVE_BOOTLOADER_USB_MODE */
+
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
+    || defined (SANSA_VIEW)
+/* Ignore cable state */
+static int handle_usb(int connect_timeout)
+{
+    return USB_EXTRACTED;
+    (void)connect_timeout;
+}
+#else
+/* Return USB_INSERTED if cable present */
+static int handle_usb(int connect_timeout)
+{
+    int usb_retry = 0;
+    int usb = USB_EXTRACTED;
+
+    usb_init();
+    while (usb_drv_powered() && usb_retry < 5 && usb != USB_INSERTED)
+    {
+        usb_retry++;
+        sleep(HZ/4);
+        usb = usb_detect();
+    }
+
+    if (usb != USB_INSERTED)
+        usb = USB_EXTRACTED;
+
+    return usb;
+    (void)connect_timeout;
+}
 #endif
+
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
 void* main(void)
 {
@@ -460,21 +557,21 @@ void* main(void)
     int rc;
     int num_partitions;
     struct partinfo* pinfo;
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-    || defined (SANSA_VIEW)
-#if !defined(USE_ROCKBOX_USB)
-    int usb_retry = 0;
-#endif
-    bool usb = false;
-#else
+#if !(CONFIG_STORAGE & STORAGE_SD)
     char buf[256];
     unsigned short* identify_info;
 #endif
+    int usb = USB_EXTRACTED;
 
     chksum_crc32gentab ();
 
     system_init();
     kernel_init();
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    /* loader must service interrupts */
+    enable_interrupt(IRQ_FIQ_STATUS);
+#endif
 
     lcd_init();
 
@@ -482,7 +579,11 @@ void* main(void)
     show_logo();
 
     adc_init();
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    button_init_device();
+#else
     button_init();
+#endif
 #if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     i2c_init();
     _backlight_on();
@@ -505,20 +606,6 @@ void* main(void)
         lcd_clear_display();
         verbose = true;
     }
-
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
-#if !defined(USE_ROCKBOX_USB)
-    usb_init();
-    while (usb_drv_powered() && usb_retry < 5 && !usb)
-    {
-        usb_retry++;
-        sleep(HZ/4);
-        usb = (usb_detect() == USB_INSERTED);
-    }
-    if (usb)
-        btn |= BOOTLOADER_BOOT_OF;
-#endif /* USE_ROCKBOX_USB */
-#endif
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -560,6 +647,15 @@ void* main(void)
                 i, pinfo->type, pinfo->size / 2048);
     }
 
+    /* Now that storage is initialized, check for USB connection */
+    if ((btn & BOOTLOADER_BOOT_OF) == 0)
+    {
+        usb_pin_init();
+        usb = handle_usb(HZ*2);
+        if (usb == USB_INSERTED)
+            btn |= BOOTLOADER_BOOT_OF;
+    }
+
     /* Try loading Rockbox, if that fails, fall back to the OF */
     if((btn & BOOTLOADER_BOOT_OF) == 0)
     {
@@ -576,7 +672,7 @@ void* main(void)
             sleep(5*HZ);
         }
         else
-            return (void*)loadbuffer;
+            goto main_exit;
     }
 
     if(btn & BOOTLOADER_BOOT_OF)
@@ -601,7 +697,7 @@ void* main(void)
                 printf("Can't load from partition");
                 printf(strerror(rc));
             } else {
-                return (void*)loadbuffer;
+                goto main_exit;
             }
         } else {
             printf("No hidden partition found.");
@@ -615,7 +711,7 @@ void* main(void)
             printf("Can't load /System/OF.ebn");
             printf(strerror(rc));
         } else {
-            return (void*)loadbuffer;
+            goto main_exit;
         }
 #endif
 
@@ -628,7 +724,7 @@ void* main(void)
 #if defined(SAMSUNG_YH925)
             lcd_reset();
 #endif
-            return (void*)loadbuffer;
+            goto main_exit;
         }
 
         printf("Trying /System/OF.bin");
@@ -640,10 +736,17 @@ void* main(void)
 #if defined(SAMSUNG_YH925)
             lcd_reset();
 #endif
-            return (void*)loadbuffer;
+            goto main_exit;
         }
         
         error(0, 0, true);
     }
+
+main_exit:
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    storage_close();
+    system_prepare_fw_start();
+#endif
+
     return (void*)loadbuffer;
 }

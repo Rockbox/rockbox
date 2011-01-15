@@ -22,7 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 void TIMER1(void)
 {
     /* Run through the list of tick tasks (using main core) */
@@ -42,7 +42,7 @@ void TIMER1(void)
 /* Must be last function called init kernel/thread initialization */
 void tick_start(unsigned int interval_in_ms)
 {
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
     TIMER1_CFG = 0x0;
     TIMER1_VAL;
     /* enable timer */
@@ -54,3 +54,11 @@ void tick_start(unsigned int interval_in_ms)
     (void)interval_in_ms;
 #endif
 }
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+void tick_stop(void)
+{
+    CPU_INT_DIS = TIMER1_MASK;
+    TIMER1_CFG = 0;
+}
+#endif

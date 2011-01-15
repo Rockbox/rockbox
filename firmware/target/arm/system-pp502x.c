@@ -33,7 +33,7 @@
 #include "lcd-remote-target.h"
 #endif
 
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
 extern void TIMER2(void);
 extern void SERIAL0(void);
@@ -184,15 +184,33 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
             TIMER2();
     }
 }
-#endif /* BOOTLOADER */
+#endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
 
-/* TODO: The following function has been lifted straight from IPL, and
-   hence has a lot of numeric addresses used straight. I'd like to use
-   #defines for these, but don't know what most of them are for or even what
-   they should be named. Because of this I also have no way of knowing how
-   to extend the funtions to do alternate cache configurations. */
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
+static void disable_all_interrupts(void)
+{
+    COP_HI_INT_DIS      = -1;
+    CPU_HI_INT_DIS      = -1;
+    HI_INT_FORCED_CLR   = -1;
 
-#ifndef BOOTLOADER
+    COP_INT_DIS         = -1;
+    CPU_INT_DIS         = -1;
+    INT_FORCED_CLR      = -1;
+
+    GPIOA_INT_EN        = 0;
+    GPIOB_INT_EN        = 0;
+    GPIOC_INT_EN        = 0;
+    GPIOD_INT_EN        = 0;
+    GPIOE_INT_EN        = 0;
+    GPIOF_INT_EN        = 0;
+    GPIOG_INT_EN        = 0;
+    GPIOH_INT_EN        = 0;
+    GPIOI_INT_EN        = 0;
+    GPIOJ_INT_EN        = 0;
+    GPIOK_INT_EN        = 0;
+    GPIOL_INT_EN        = 0;
+}
+
 void ICODE_ATTR cpucache_commit(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
@@ -217,13 +235,17 @@ void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")))
 
 static void init_cache(void)
 {
-/* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
+/* Initialising the cache in the iPod bootloader may prevent Rockbox from starting
+ * depending on the model */
 
     /* cache init mode */
+    CACHE_CTL &= ~(CACHE_CTL_ENABLE | CACHE_CTL_RUN);
     CACHE_CTL |= CACHE_CTL_INIT;
 
+#ifndef BOOTLOADER
     /* what's this do? */
     CACHE_PRIORITY |= CURRENT_CORE == CPU ? 0x10 : 0x20;
+#endif
 
     /* Cache if (addr & mask) >> 16 == (mask & match) >> 16:
      * yes: 0x00000000 - 0x03ffffff
@@ -238,10 +260,11 @@ static void init_cache(void)
     CACHE_CTL |= CACHE_CTL_INIT | CACHE_CTL_ENABLE | CACHE_CTL_RUN;
     nop; nop; nop; nop;
 }
-#endif /* !BOOTLOADER */
+#endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE*/
 
 /* We need this for Sansas since we boost the cpu in their bootloader */
-#if !defined(BOOTLOADER) || defined(SANSA_E200) || defined(SANSA_C200) || \
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE) || \
+    defined(SANSA_E200) || defined(SANSA_C200) || \
     defined(PHILIPS_SA9200)
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
@@ -386,7 +409,8 @@ static void pp_set_cpu_frequency(long frequency)
     corelock_unlock(&cpufreq_cl);
 #endif
 }
-#endif /* !BOOTLOADER || SANSA_E200 || SANSA_C200 || PHILIPS_SA9200 */
+#endif /* !BOOTLOADER || HAVE_BOOTLOADER_USB_MODE ||
+          SANSA_E200 || SANSA_C200 || PHILIPS_SA9200 */
 
 void system_init(void)
 {
@@ -494,27 +518,7 @@ void system_init(void)
             MMAP_PHYS_DATA_MASK | MMAP_PHYS_CODE_MASK;
 #endif
 
-        /* disable all irqs */
-        COP_HI_INT_DIS      = -1;
-        CPU_HI_INT_DIS      = -1;
-        HI_INT_FORCED_CLR   = -1;
-        
-        COP_INT_DIS         = -1;
-        CPU_INT_DIS         = -1;
-        INT_FORCED_CLR      = -1;
-
-        GPIOA_INT_EN        = 0;
-        GPIOB_INT_EN        = 0;
-        GPIOC_INT_EN        = 0;
-        GPIOD_INT_EN        = 0;
-        GPIOE_INT_EN        = 0;
-        GPIOF_INT_EN        = 0;
-        GPIOG_INT_EN        = 0;
-        GPIOH_INT_EN        = 0;
-        GPIOI_INT_EN        = 0;
-        GPIOJ_INT_EN        = 0;
-        GPIOK_INT_EN        = 0;
-        GPIOL_INT_EN        = 0;
+        disable_all_interrupts();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1
@@ -534,13 +538,23 @@ void system_init(void)
     }
 
     init_cache();
-#else /* BOOTLOADER */
-    if (CURRENT_CORE == CPU)
-    {
+
+#else /* !BOOTLOADER */
+    /* Only the CPU gets here in the bootloader */
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    disable_all_interrupts();
+    init_cache();
+    /* Use the local vector map */
+    CACHE_CTL |= CACHE_CTL_VECT_REMAP;
+#endif /* HAVE_BOOTLOADER_USB_MODE */
+
 #if defined(SANSA_C200) || defined(SANSA_E200) || defined(PHILIPS_SA9200)
-        pp_set_cpu_frequency(CPUFREQ_MAX);
+    pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
-    }
+    /* Else the frequency shot get changed upon USB connect -
+     * decide per-target */
+
 #endif /* BOOTLOADER */
 }
 
@@ -582,3 +596,11 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+void system_prepare_fw_start(void)
+{
+    tick_stop();
+    disable_all_interrupts();
+}
+#endif

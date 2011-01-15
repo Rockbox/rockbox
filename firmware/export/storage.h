@@ -112,6 +112,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
         #define storage_init() sd_init()
+        #define storage_close() sd_close()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif

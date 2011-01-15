@@ -21,6 +21,10 @@
 
 #ifdef CPU_PP
 
+#ifdef HAVE_BOOTLOADER_USB_MODE
+#define ATA_DRIVER_CLOSE
+#endif
+
 /* primary channel */
 #define ATA_DATA        (*((volatile unsigned short*)(IDE_BASE + 0x1e0)))
 #define ATA_ERROR       (*((volatile unsigned char*)(IDE_BASE + 0x1e4)))

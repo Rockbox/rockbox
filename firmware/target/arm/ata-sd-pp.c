@@ -154,6 +154,9 @@ static long last_disk_activity = -1;
 
 /** static, private data **/ 
 static bool initialized = false;
+static unsigned int sd_thread_id = 0;
+
+#define Q_CLOSE    1
 
 static long next_yield = 0;
 #define MIN_YIELD_PERIOD 1000
@@ -1106,7 +1109,9 @@ sd_write_error:
     }
 }
 
+#ifndef SD_DRIVER_CLOSE
 static void sd_thread(void) NORETURN_ATTR;
+#endif
 static void sd_thread(void)
 {
     struct queue_event ev;
@@ -1175,9 +1180,29 @@ static void sd_thread(void)
         case SYS_USB_DISCONNECTED:
             usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
             break;
+
+#ifdef SD_DRIVER_CLOSE
+        case Q_CLOSE:
+            return;
+#endif
         }
     }
 }
+
+#ifdef SD_DRIVER_CLOSE
+void sd_close(void)
+{
+    unsigned int thread_id = sd_thread_id;
+    
+    if (thread_id == 0)
+        return;
+
+    sd_thread_id = 0;
+
+    queue_post(&sd_queue, Q_CLOSE, 0);
+    thread_wait(thread_id);
+}
+#endif /* SD_DRIVER_CLOSE */
 
 void sd_enable(bool on)
 {
@@ -1241,8 +1266,8 @@ int sd_init(void)
             ret = currcard->initialized;
 
         queue_init(&sd_queue, true);
-        create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
+        sd_thread_id = create_thread(sd_thread, sd_stack, sizeof(sd_stack),
+            0, sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
             IF_COP(, CPU));
 
         /* enable interupt for the mSD card */

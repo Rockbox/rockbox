@@ -224,6 +224,9 @@
 #define CACHE_OP_FLUSH       0x0002
 #define CACHE_OP_INVALIDATE  0x0004
 
+/* Local interrupt vector table (set CACHE_CTL_VECT_REMAP to enable) */
+#define INT_VECTOR_ENTRY(v) (*((volatile unsigned long *)(0x6000f100) + (v)))
+
 /* GPIO Ports */
 #define GPIO_BASE_ADDR   0x6000d000
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))

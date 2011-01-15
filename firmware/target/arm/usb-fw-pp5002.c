@@ -27,7 +27,7 @@
 #include "usb.h"
 #include "usb-target.h"
 
-void usb_init_device(void)
+void usb_pin_init(void)
 {
     /* TODO: add USB init for iPod 3rd gen */
 
@@ -37,6 +37,9 @@ void usb_init_device(void)
     GPIOC_OUTPUT_EN &= ~0x80;
 #endif
 }
+
+/* No different for now */
+void usb_init_device(void) __attribute__((alias("usb_pin_init")));
 
 void usb_enable(bool on)
 {
@@ -70,3 +73,6 @@ int usb_detect(void)
 
     return USB_EXTRACTED;
 }
+
+/* No different for now */
+void usb_plugged(void) __attribute__((alias("usb_detect")));

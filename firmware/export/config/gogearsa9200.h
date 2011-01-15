@@ -172,10 +172,9 @@
 #define USB_VENDOR_ID 0x0471
 #define USB_PRODUCT_ID 0x014f
 #define HAVE_USB_HID_MOUSE
-
-/* WARNING! Enable Rockbox USB mass storage. */
-#ifndef BOOTLOADER
-#define USE_ROCKBOX_USB
+#ifdef BOOTLOADER
+/* enable bootloader USB mode - ONLY define when also BOOTLOADER */
+#define HAVE_BOOTLOADER_USB_MODE
 #endif
 
 /* Define this if you have adjustable CPU frequency */
