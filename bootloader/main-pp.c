@@ -544,9 +544,6 @@ static int handle_usb(int connect_timeout)
     return USB_EXTRACTED;
     (void)connect_timeout;
 }
-#else
-#endif
-
 #endif /* HAVE_BOOTLOADER_USB_MODE */
 
 void* main(void)
