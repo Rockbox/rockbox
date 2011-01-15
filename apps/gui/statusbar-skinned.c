@@ -76,9 +76,7 @@ enum themable_icons sb_get_icon(enum screen_type screen)
 int sb_preproccess(enum screen_type screen, struct wps_data *data)
 {
     (void)data;
-    int i;
-    FOR_NB_SCREENS(i)
-        sbs_has_title[i] = false;
+    sbs_has_title[screen] = false;
     viewportmanager_theme_enable(screen, false, NULL);
     return 1;
 }
