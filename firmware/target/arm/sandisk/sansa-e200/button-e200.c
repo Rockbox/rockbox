@@ -272,6 +272,10 @@ void clickwheel_int(void)
             delta = 0x7ful << 24;
     }
 }
+#else
+void clickwheel_int(void)
+{
+}
 #endif /* BOOTLOADER */
 
 /* device buttons */

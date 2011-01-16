@@ -1,5 +1,10 @@
 #include "config.h"
 
+/* Can't link all Sansa PP devices the same way at this time */
+#ifdef HAVE_BOOTLOADER_USB_MODE
+#include "../boot-pp502x-bl-usb.lds"
+#else /* !HAVE_BOOTLOADER_USB_MODE */
+
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
@@ -73,3 +78,4 @@ SECTIONS
      _end = .;
   } > DRAM
 }
+#endif /* HAVE_BOOTLOADER_USB_MODE */
