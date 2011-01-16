@@ -483,10 +483,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<Neopakovat>"
+    *: "<Nepokračovat>"
   </dest>
   <voice>
-    *: "Neopakovat"
+    *: "nepokračovat"
   </voice>
 </phrase>
 <phrase>
@@ -497,7 +497,7 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", Promíchat"
+    *: ", Náhodně"
   </dest>
   <voice>
     *: ""
@@ -609,10 +609,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Prázdné záložky"
+    *: "Žádné záložky"
   </dest>
   <voice>
-    *: "Prázdné záložky"
+    *: "Žádné záložky"
   </voice>
 </phrase>
 <phrase>
@@ -1377,10 +1377,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Promíchání"
+    *: "Náhodný výběr"
   </dest>
   <voice>
-    *: "Promíchání"
+    *: "Náhodný výběr"
   </voice>
 </phrase>
 <phrase>
@@ -1475,10 +1475,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Skok převíjení"
+    *: "Minimální skok přetáčení"
   </dest>
   <voice>
-    *: "Skok převíjení"
+    *: "Minimální skok přetáčení"
   </voice>
 </phrase>
 <phrase>
@@ -1489,10 +1489,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Urychlené převíjení"
+    *: "Urychlené přetáčení"
   </dest>
   <voice>
-    *: "Urychlené převíjení"
+    *: "Urychlené přetáčení"
   </voice>
 </phrase>
 <phrase>
@@ -1601,11 +1601,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Zamíchat a přeskočit"
+    crossfade: "Náhodně nebo manuálně přeskočit skladbu"
   </dest>
   <voice>
     *: none
-    crossfade: "Zamíchat a přeskočit"
+    crossfade: "Náhodně nebo manuálně přeskočit skladbu"
   </voice>
 </phrase>
 <phrase>
@@ -2056,10 +2056,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Řadit adresáře"
+    *: "Řadit složky"
   </dest>
   <voice>
-    *: "Řadit adresáře"
+    *: "Řadit složky"
   </voice>
 </phrase>
 <phrase>
@@ -2210,10 +2210,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Pouze aktuální adresář"
+    *: "Pouze aktuální složka"
   </dest>
   <voice>
-    *: "Pouze aktuální adresář"
+    *: "Pouze aktuální složka"
   </voice>
 </phrase>
 <phrase>
@@ -2282,7 +2282,7 @@
     *: "Automaticky aktualizovat"
   </dest>
   <voice>
-    *: "Automaticky aktualizovat"
+    *: "Automatycky aktualizovat"
   </voice>
 </phrase>
 <phrase>
@@ -2293,10 +2293,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Inicializovat teď"
+    *: "Inicializovat nyní"
   </dest>
   <voice>
-    *: "Inycializovat teď"
+    *: "Inycializovat nyní"
   </voice>
 </phrase>
 <phrase>
@@ -2307,10 +2307,10 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Aktualizovat teď"
+    *: "Aktualizovat nyní"
   </dest>
   <voice>
-    *: "Aktualizovat teď"
+    *: "Aktualizovat nyní"
   </voice>
 </phrase>
 <phrase>
@@ -3850,11 +3850,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Mezipaměť adresářů"
+    dircache: "Mezipaměť složek"
   </dest>
   <voice>
     *: none
-    dircache: "Mezipaměť adresářů"
+    dircache: "Mezipaměť složek"
   </voice>
 </phrase>
 <phrase>
@@ -4381,10 +4381,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Max.poč. souborů v adresáři"
+    *: "Max.počet položek v prohlížeči souborů"
   </dest>
   <voice>
-    *: "Maximální počet souborů v adresáři"
+    *: "Maximální počet poožek v prohlížeči souborů"
   </voice>
 </phrase>
 <phrase>
@@ -4726,10 +4726,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Ozvučit adresáře"
+    *: "Ozvučit složky"
   </dest>
   <voice>
-    *: "Ozvučit adresáře"
+    *: "Ozvučit složky"
   </voice>
 </phrase>
 <phrase>
@@ -4740,10 +4740,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Použít .talk klipy pro adresáře"
+    *: "Použít .talk klipy pro složky"
   </dest>
   <voice>
-    *: "Použít talk klipy pro adresáře"
+    *: "Použít talk klipy pro složky"
   </voice>
 </phrase>
 <phrase>
@@ -5024,7 +5024,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Editovat stanici"
+    radio: "Edytovat stanici"
   </voice>
 </phrase>
 <phrase>
@@ -5228,7 +5228,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Automatické vyhledání stanic"
+    radio: "Automatycké vyhledání stanic"
   </voice>
 </phrase>
 <phrase>
@@ -5921,11 +5921,11 @@
   </source>
   <dest>
     *: none
-    recording: "Adresář"
+    recording: "Složka"
   </dest>
   <voice>
     *: none
-    recording: "Adresář"
+    recording: "Složka"
   </voice>
 </phrase>
 <phrase>
@@ -5938,11 +5938,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavit jako adresář pro nahrávání"
+    recording: "Nastavit jako složku pro nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Nastavit jako adresář pro nahrávání"
+    recording: "Nastavit jako složku pro nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -5955,11 +5955,11 @@
   </source>
   <dest>
     *: none
-    recording: "Vymazat obsah adresář s nahrávkami"
+    recording: "Vymazat obsah složky s nahrávkami"
   </dest>
   <voice>
     *: none
-    recording: "Vymazat obsah adresář s nahrávkami"
+    recording: "Vymazat obsah složky s nahrávkami"
   </voice>
 </phrase>
 <phrase>
@@ -5972,11 +5972,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nelze zapsat do adresáře pro nahrávání"
+    recording: "Nelze zapsat do složky pro nahrávání"
   </dest>
   <voice>
     *: none
-    recording: "Nelze zapsat do adresáře pro nahrávání"
+    recording: "Nelze zapsat do složky pro nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -6061,7 +6061,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Automatická spoušť"
+    recording: "Automatycká spoušť"
   </voice>
 </phrase>
 <phrase>
@@ -6498,10 +6498,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Vkládat adresáře rekurzivně"
+    *: "Vkládat složky rekurzivně"
   </dest>
   <voice>
-    *: "Vkládat adresáře rekurzivně"
+    *: "Vkládat složky rekurzivně"
   </voice>
 </phrase>
 <phrase>
@@ -6540,10 +6540,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Smazat dymanický playlist?"
+    *: "Smazat dynamický playlist?"
   </dest>
   <voice>
-    *: "Smazat dymanický plejlist?"
+    *: "Smazat dynamický plejlist?"
   </voice>
 </phrase>
 <phrase>
@@ -6967,10 +6967,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Znovu promíchat"
+    *: "Nový náhodný výběr"
   </dest>
   <voice>
-    *: "Znovu promíchat"
+    *: "Nový náhodný výběr"
   </voice>
 </phrase>
 <phrase>
@@ -7026,7 +7026,7 @@
     *: "%s neexistuje"
   </dest>
   <voice>
-    *: "Adresář plejlistů neexistuje"
+    *: "Složka plejlistů neexistuje"
   </voice>
 </phrase>
 <phrase>
@@ -7457,10 +7457,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Soubor nebo adresář již existuje. Přepsat?"
+    *: "Soubor nebo složka již existuje. Přepsat?"
   </dest>
   <voice>
-    *: "Soubor nebo adresář již existuje Přepsat?"
+    *: "Soubor nebo složka již existuje Přepsat?"
   </voice>
 </phrase>
 <phrase>
@@ -7485,10 +7485,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Smazat adresář"
+    *: "Smazat složku"
   </dest>
   <voice>
-    *: "Smazat adresář"
+    *: "Smazat složku"
   </voice>
 </phrase>
 <phrase>
@@ -7634,10 +7634,10 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Vytvořit adresář"
+    *: "Vytvořit složku"
   </dest>
   <voice>
-    *: "Vytvořit adresář"
+    *: "Vytvořit složku"
   </voice>
 </phrase>
 <phrase>
@@ -7861,10 +7861,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Chyba přístupu k adresáři"
+    *: "Chyba přístupu ke složce"
   </dest>
   <voice>
-    *: "Chyba přístupu k adresáři"
+    *: "Chyba přístupu ke složce"
   </voice>
 </phrase>
 <phrase>
@@ -8233,10 +8233,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Adresářová mezipaměť je zaplňená!"
+    *: "Mezipaměť složek je zaplňená!"
   </dest>
   <voice>
-    *: "Adresářová mezipaměť je zaplňená!"
+    *: "Mezipaměť složek je zaplňená!"
   </voice>
 </phrase>
 <phrase>
@@ -9982,7 +9982,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Automatická spoušť"
+    recording: "Automatycká spoušť"
   </voice>
 </phrase>
 <phrase>
@@ -10354,7 +10354,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Upravit"
+    *: "Edytace"
   </voice>
 </phrase>
 <phrase>
@@ -10368,7 +10368,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Prázdný"
+    *: "Mezera"
   </voice>
 </phrase>
 <phrase>
@@ -10436,15 +10436,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Oříznutí basů"
+    ipodvideo,ipod6g: "Oříznutí basů"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Oříznutí basů"
+    ipodvideo,ipod6g: "Oříznutí basů"
   </voice>
 </phrase>
 <phrase>
@@ -10453,15 +10453,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Oříznutí výšek"
+    ipodvideo,ipod6g: "Oříznutí výšek"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Oříznutí výšek"
+    ipodvideo,ipod6g: "Oříznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -10667,7 +10667,7 @@
   </dest>
   <voice> 
     *: none
-    serial_port: "Automatický"
+    serial_port: "Automatycký"
   </voice>
 </phrase>
 <phrase>
@@ -10884,7 +10884,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Automatické řízení zisku"
+    agc: "Automatycké řízení zisku"
   </voice>
 </phrase>
 <phrase>
@@ -11783,7 +11783,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Automaticky"
+    swcodec: "Automatycky"
   </voice>
 </phrase>
 <phrase>
@@ -11989,7 +11989,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Automatická změna pouze skladby"
+    crossfade: "Automatycká změna pouze skladby"
   </voice>
 </phrase>
 <phrase>
@@ -12603,5 +12603,33 @@
   </dest>
   <voice>
     *: "Velikost souboru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Auto.pokračování u všech souborů"
+  </dest>
+  <voice>
+    *: "Automatycké pokračování u všech souborů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Ano (vyžaduje inicializaci databáze)"
+  </dest>
+  <voice>
+    *: "Ano (vyžaduje inycializaci databáze)"
   </voice>
 </phrase>
