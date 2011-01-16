@@ -470,13 +470,6 @@ static int handle_usb(int connect_timeout)
     usb_init();
     usb_start_monitoring();
 
-    /* Switch to verbose mode if not in it so that the status updates
-     * are shown */
-
-    /* TODO: Should we forgo any messages except the connect? It might be a
-     * charger, not a USB host. */
-    verbose = true;
-
     printf("USB: Connecting");
 
     if (connect_timeout != TIMEOUT_BLOCK)
@@ -489,6 +482,9 @@ static int handle_usb(int connect_timeout)
 
         if (ev.id == SYS_USB_CONNECTED)
         {
+            /* Switch to verbose mode if not in it so that the status updates
+             * are shown */
+            verbose = true;
             /* Got the message - wait for disconnect */
             printf("Bootloader USB mode");
 
@@ -501,7 +497,9 @@ static int handle_usb(int connect_timeout)
         if (connect_timeout != TIMEOUT_BLOCK &&
             TIME_AFTER(current_tick, end_tick))
         {
-            /* Timed out waiting for the connect */
+            /* Timed out waiting for the connect - will happen when connected
+             * to a charger instead of a host port and the charging pin is
+             * the same as the USB pin */
             printf("USB: Timed out");
             break;
         }
@@ -598,10 +596,16 @@ void* main(void)
     btn = button_read_device();
 
     /* Enable bootloader messages if any button is pressed */
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    lcd_clear_display();
+    if (btn)
+        verbose = true;
+#else
     if (btn) {
         lcd_clear_display();
         verbose = true;
     }
+#endif
 
     lcd_setfont(FONT_SYSFIXED);
 
