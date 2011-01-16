@@ -3,12 +3,15 @@
 This plugin opens image files from the \setting{File Browser} to display them\nopt{lcd_color}{ using Rockbox's greyscale library}. Supported formats are as follows.
 
 \begin{table}
-  \begin{rbtabular}{.60\textwidth}{llX}%
+  \begin{rbtabular}{.60\textwidth}{lX}%
       {\textbf{Format}& \textbf{File-extension(s)}}%
       {}{}
     BMP         & \fname{.bmp}                  \\
     JPEG        & \fname{.jpg, .jpe, .jpeg}     \\
     PNG         & \fname{.png}                  \\
+    \opt{lcd_color}{
+      PPM         & \fname{.ppm}                  \\
+    }
   \end{rbtabular}
 \end{table}
 
@@ -139,4 +142,10 @@ for JPEG images.
 Progressive scan and other unusual JPEG files are not supported, and will
 result in various ``unsupported xx'' messages. Processing could also fail if the
 image is too big to decode which will be explained by a respective message.
+
+\opt{lcd_color}{
+  Supported PPM files are both ASCII PPM (P3) and raw PPM (P6).
+  For more information about PPM files, see
+  \url{http://netpbm.sourceforge.net/doc/ppm.html}
+}
 }

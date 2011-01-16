@@ -140,7 +140,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
     Shortcuts             & \fname{.link}                    &   \\
     Chip-8 Emulator       & \fname{.ch8}                     &   \\
     Frotz                 & \fname{.z1 - .z8}                &   \\
-    Image Viewer          & \fname{.bmp, .jpg, .jpeg, .png}  &   \\
+    Image Viewer          & \fname{.bmp, .jpg, .jpeg, .png\opt{lcd_color}{, .ppm}}  &   \\
     Lua scripting language& \fname{.lua}                     &   \\
     \opt{swcodec}{\nopt{lowmem}{
         Midiplay          & \fname{.mid, .midi}              &   \\
@@ -153,9 +153,6 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
         \opt{lcd_bitmap}{
             Movie Player  & \fname{.rvf}                     &   \\
         }
-    }
-    \opt{lcd_color}{
-        PPM viewer        & \fname{.ppm}                     &   \\
     }
     \opt{lcd_bitmap}{
         \nopt{ondio}{% not enough buttons
@@ -192,8 +189,6 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \opt{swcodec}{\nopt{lowmem}{\input{plugins/mp3_encoder.tex}}}
 
-
-\opt{lcd_color}{\input{plugins/ppmviewer.tex}}
 
 \opt{archosrecorder,archosfmrecorder,ondio}{\input{plugins/rockbox_flash.tex}}
 
