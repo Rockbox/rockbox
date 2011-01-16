@@ -469,19 +469,24 @@ struct imgdec_api {
 
 /* functions need to be implemented in each image decoders. */
 struct image_decoder {
-    /* if unscaled image can be always displayed when there isn't enough memory
-     * for resized image. e.g. when using native format to store image. */
+    /* set true if unscaled image can be always displayed even when there isn't
+     * enough memory for resized image. e.g. when using native format to store
+     * image. */
     const bool unscaled_avail;
 
-    /* return needed size of buffer to store downscaled image by ds */
+    /* return needed size of buffer to store downscaled image by ds.
+     * this is used to calculate min downscale. */
     int (*img_mem)(int ds);
-    /* load image from filename. set width and height of info properly. also, set
-     * buf_size to remaining size of buf after load image. it is used to caluclate
-     * min downscale. */
+    /* load image from filename. use the passed buffer to store loaded, decoded
+     * or resized image later, so save it to local variables if needed.
+     * set width and height of info properly. also, set buf_size to remaining
+     * size of buf after load image. it is used to calculate min downscale.
+     * return PLUGIN_ERROR for error. ui will skip to next image. */
     int (*load_image)(char *filename, struct image_info *info,
                       unsigned char *buf, ssize_t *buf_size);
-    /* downscale loaded image by ds. note that buf to store reszied image is not
-     * provided. return PLUGIN_ERROR for error. ui will skip to next image. */
+    /* downscale loaded image by ds. use the buffer passed to load_image to
+     * reszie image and/or store resized image.
+     * return PLUGIN_ERROR for error. ui will skip to next image. */
     int (*get_image)(struct image_info *info, int ds);
     /* draw part of image */
     void (*draw_image_rect)(struct image_info *info,
