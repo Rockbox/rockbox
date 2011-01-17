@@ -659,7 +659,7 @@ static void tagtree_buffer_event(void *data)
 
     logf("be:%s", id3->path);
     
-    while (! tagcache_is_usable())
+    while (! tagcache_is_fully_initialized())
         yield();
 
     if (!tagcache_find_index(&tcs, id3->path))

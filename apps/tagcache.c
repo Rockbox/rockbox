@@ -4746,6 +4746,10 @@ bool tagcache_is_initialized(void)
 {
     return tc_stat.initialized;
 }
+bool tagcache_is_fully_initialized(void)
+{
+    return tc_stat.readyvalid;
+}
 bool tagcache_is_usable(void)
 {
     return tc_stat.initialized && tc_stat.ready;
