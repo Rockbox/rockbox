@@ -9179,15 +9179,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Bass-knekkfrekvens"
+    ipodvideo,ipod6g: "Bass-knekkfrekvens"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass-knekkfrekvens"
+    ipodvideo,ipod6g: "Bass-knekkfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -10267,15 +10267,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Diskantknekkfrekvens"
+    ipodvideo,ipod6g: "Diskantknekkfrekvens"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Diskantknekkfrekvens"
+    ipodvideo,ipod6g: "Diskantknekkfrekvens"
   </voice>
 </phrase>
 <phrase>

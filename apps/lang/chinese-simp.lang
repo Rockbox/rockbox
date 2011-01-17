@@ -10216,15 +10216,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "低频截止频率"
+    ipodvideo,ipod6g: "低频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo: "低频截止频率"
+    ipodvideo,ipod6g: "低频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -10422,15 +10422,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "高频截止频率"
+    ipodvideo,ipod6g: "高频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo: "高频截止频率"
+    ipodvideo,ipod6g: "高频截止频率"
   </voice>
 </phrase>
 <phrase>

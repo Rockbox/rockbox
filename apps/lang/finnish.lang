@@ -10424,15 +10424,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Basson katkaisu"
+    ipodvideo,ipod6g: "Basson katkaisu"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Basson katkaisu"
+    ipodvideo,ipod6g: "Basson katkaisu"
   </voice>
 </phrase>
 <phrase>
@@ -10441,15 +10441,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Diskantin katkaisu"
+    ipodvideo,ipod6g: "Diskantin katkaisu"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Diskantin katkaisu"
+    ipodvideo,ipod6g: "Diskantin katkaisu"
   </voice>
 </phrase>
 <phrase>

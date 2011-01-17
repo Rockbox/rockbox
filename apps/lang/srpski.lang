@@ -10416,15 +10416,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Гранична фрекв. за ниске"
+    ipodvideo,ipod6g: "Гранична фрекв. за ниске"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Гранична фреквенција за ниске"
+    ipodvideo,ipod6g: "Гранична фреквенција за ниске"
   </voice>
 </phrase>
 <phrase>
@@ -10433,15 +10433,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Гранична фрекв. за високе"
+    ipodvideo,ipod6g: "Гранична фрекв. за високе"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Гранична фреквенција за високе"
+    ipodvideo,ipod6g: "Гранична фреквенција за високе"
   </voice>
 </phrase>
 <phrase>

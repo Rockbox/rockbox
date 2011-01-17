@@ -2654,15 +2654,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Taierea gravelor"
+    ipodvideo,ipod6g: "Taierea gravelor"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Taierea gravelor"
+    ipodvideo,ipod6g: "Taierea gravelor"
   </voice>
 </phrase>
 <phrase>
@@ -9517,15 +9517,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Taiere inalte"
+    ipodvideo,ipod6g: "Taiere inalte"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Taiere inalte"
+    ipodvideo,ipod6g: "Taiere inalte"
   </voice>
 </phrase>
 <phrase>

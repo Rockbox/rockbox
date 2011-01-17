@@ -10440,15 +10440,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "低音域カットオフ"
+    ipodvideo,ipod6g: "低音域カットオフ"
   </dest>
   <voice>
     *: none
-    ipodvideo: "低音域カットオフ"
+    ipodvideo,ipod6g: "低音域カットオフ"
   </voice>
 </phrase>
 <phrase>
@@ -10457,15 +10457,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "高音域カットオフ"
+    ipodvideo,ipod6g: "高音域カットオフ"
   </dest>
   <voice>
     *: none
-    ipodvideo: "高音域カットオフ"
+    ipodvideo,ipod6g: "高音域カットオフ"
   </voice>
 </phrase>
 <phrase>

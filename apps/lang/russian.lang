@@ -7381,15 +7381,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Отсечение баса"
+    ipodvideo,ipod6g: "Отсечение баса"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Отсечение баса"
+    ipodvideo,ipod6g: "Отсечение баса"
   </voice>
 </phrase>
 <phrase>
@@ -10157,15 +10157,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Подавление высоких частот"
+    ipodvideo,ipod6g: "Подавление высоких частот"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Подавление высоких частот"
+    ipodvideo,ipod6g: "Подавление высоких частот"
   </voice>
 </phrase>
 <phrase>

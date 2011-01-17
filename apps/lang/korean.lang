@@ -9252,15 +9252,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "중저음 컷오프 주파수"
+    ipodvideo,ipod6g: "중저음 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo: "중저음 컷오프 주파수"
+    ipodvideo,ipod6g: "중저음 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -10681,15 +10681,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "고음역 컷오프 주파수"
+    ipodvideo,ipod6g: "고음역 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo: "고음역 컷오프 주파수"
+    ipodvideo,ipod6g: "고음역 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>

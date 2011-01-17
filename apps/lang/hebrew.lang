@@ -10440,15 +10440,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "חיתוך בס"
+    ipodvideo,ipod6g: "חיתוך בס"
   </dest>
   <voice>
     *: none
-    ipodvideo: "חיתוך בס"
+    ipodvideo,ipod6g: "חיתוך בס"
   </voice>
 </phrase>
 <phrase>
@@ -10457,15 +10457,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "חיתוך טרבל"
+    ipodvideo,ipod6g: "חיתוך טרבל"
   </dest>
   <voice>
     *: none
-    ipodvideo: "חיתוך טרבל"
+    ipodvideo,ipod6g: "חיתוך טרבל"
   </voice>
 </phrase>
 <phrase>

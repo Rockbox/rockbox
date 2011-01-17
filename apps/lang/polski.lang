@@ -10443,15 +10443,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Ścięcie basów"
+    ipodvideo,ipod6g: "Ścięcie basów"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Ścięcie basów"
+    ipodvideo,ipod6g: "Ścięcie basów"
   </voice>
 </phrase>
 <phrase>
@@ -10460,15 +10460,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Ścięcie tonów niskich"
+    ipodvideo,ipod6g: "Ścięcie tonów niskich"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Ścięcie tonów niskich"
+    ipodvideo,ipod6g: "Ścięcie tonów niskich"
   </voice>
 </phrase>
 <phrase>

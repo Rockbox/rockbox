@@ -10194,15 +10194,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "ความถี่ตัดเสียงทุ้ม"
+    ipodvideo,ipod6g: "ความถี่ตัดเสียงทุ้ม"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10428,15 +10428,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "ความถี่ตัดเสียงแหลม"
+    ipodvideo,ipod6g: "ความถี่ตัดเสียงแหลม"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </voice>
 </phrase>
 <phrase>

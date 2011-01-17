@@ -10402,15 +10402,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Αποκοπή μπάσων"
+    ipodvideo,ipod6g: "Αποκοπή μπάσων"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Αποκοπή μπάσων"
+    ipodvideo,ipod6g: "Αποκοπή μπάσων"
   </voice>
 </phrase>
 <phrase>
@@ -10419,15 +10419,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Αποκοπή πρίμων"
+    ipodvideo,ipod6g: "Αποκοπή πρίμων"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Αποκοπή πρίμων"
+    ipodvideo,ipod6g: "Αποκοπή πρίμων"
   </voice>
 </phrase>
 <phrase>

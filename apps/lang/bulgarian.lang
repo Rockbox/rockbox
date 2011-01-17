@@ -2331,15 +2331,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Отрязване на бас"
+    ipodvideo,ipod6g: "Отрязване на бас"
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo,ipod6g: "Отрязване на бас"
   </voice>
 </phrase>
 <phrase>
@@ -9453,15 +9453,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Отрязване на високите"
+    ipodvideo,ipod6g: "Отрязване на високите"
   </dest>
   <voice>
     *: ""
-    ipodvideo: ""
+    ipodvideo,ipod6g: "Отрязване на високите"
   </voice>
 </phrase>
 <phrase>

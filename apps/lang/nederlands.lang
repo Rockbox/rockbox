@@ -10422,15 +10422,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Bass Afsnijfrequentie"
+    ipodvideo,ipod6g: "Bass Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Afsnijfrequentie"
+    ipodvideo,ipod6g: "Bass Afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -10439,15 +10439,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Treble Afsnijfrequentie"
+    ipodvideo,ipod6g: "Treble Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Afsnijfrequentie"
+    ipodvideo,ipod6g: "Treble Afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>

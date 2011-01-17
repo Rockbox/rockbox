@@ -10432,15 +10432,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Hranica Hĺbok"
+    ipodvideo,ipod6g: "Hranica Hĺbok"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hranica hĺbok"
+    ipodvideo,ipod6g: "Hranica hĺbok"
   </voice>
 </phrase>
 <phrase>
@@ -10449,15 +10449,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Hranica Výšok"
+    ipodvideo,ipod6g: "Hranica Výšok"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hranica výšok"
+    ipodvideo,ipod6g: "Hranica výšok"
   </voice>
 </phrase>
 <phrase>

@@ -10490,15 +10490,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Bosų nukirpimas"
+    ipodvideo,ipod6g: "Bosų nukirpimas"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bosų nukirpimas"
+    ipodvideo,ipod6g: "Bosų nukirpimas"
   </voice>
 </phrase>
 <phrase>
@@ -10507,15 +10507,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Aukštų daž. Nukirpimas"
+    ipodvideo,ipod6g: "Aukštų daž. Nukirpimas"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Aukštų daž. Nukirpimas"
+    ipodvideo,ipod6g: "Aukštų daž. Nukirpimas"
   </voice>
 </phrase>
 <phrase>

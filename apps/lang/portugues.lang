@@ -10414,15 +10414,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Corte de Graves"
+    ipodvideo,ipod6g: "Corte de Graves"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Corte de Graves"
+    ipodvideo,ipod6g: "Corte de Graves"
   </voice>
 </phrase>
 <phrase>
@@ -10798,15 +10798,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Corte de Agudos"
+    ipodvideo,ipod6g: "Corte de Agudos"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Corte dos Agudos"
+    ipodvideo,ipod6g: "Corte dos Agudos"
   </voice>
 </phrase>
 <phrase>

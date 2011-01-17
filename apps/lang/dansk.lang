@@ -10238,15 +10238,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Basgrænse"
+    ipodvideo,ipod6g: "Basgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Basgrænse"
+    ipodvideo,ipod6g: "Basgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -10444,15 +10444,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Diskantgrænse"
+    ipodvideo,ipod6g: "Diskantgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Diskantgrænse"
+    ipodvideo,ipod6g: "Diskantgrænse"
   </voice>
 </phrase>
 <phrase>
