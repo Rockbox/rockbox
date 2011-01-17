@@ -5863,7 +5863,7 @@
 <phrase>
  id: LANG_REC_SIZE
   desc: deprecated
-  user:
+  user: core
  <source>
     *: none
  </source>
@@ -6247,15 +6247,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Wala lawum og tingog"
+    ipodvideo,ipod6g: "Bass araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g: "Bass araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
@@ -9851,15 +9851,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Pagtatluhin araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g: "Pagtatluhin araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
