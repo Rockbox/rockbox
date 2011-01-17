@@ -28,8 +28,8 @@
 #include <lib/helper.h>
 #include <lib/configfile.h>
 #include "imageviewer.h"
+#include "imageviewer_button.h"
 #include "image_decoder.h"
-
 
 
 #ifdef USEGSLIB
@@ -344,6 +344,8 @@ static int show_menu(void) /* return 1 to quit */
 #ifdef USE_PLUG_BUF
 static int ask_and_get_audio_buffer(const char *filename)
 {
+    int button;
+    int lastbutton = BUTTON_NONE;
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
@@ -359,10 +361,18 @@ static int ask_and_get_audio_buffer(const char *filename)
 
     while (1)
     {
-        int button = rb->button_get(true);
+        if (iv_api.slideshow_enabled)
+            button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+        else
+            button = rb->button_get(true);
+
         switch(button)
         {
             case IMGVIEW_ZOOM_IN:
+#ifdef IMGVIEW_ZOOM_PRE
+                if (lastbutton != IMGVIEW_ZOOM_PRE)
+                    break;
+#endif
                 iv_api.plug_buf = false;
                 buf = rb->plugin_get_audio_buffer(&buf_size);
                 /*try again this file, now using the audio buffer */
@@ -391,11 +401,22 @@ static int ask_and_get_audio_buffer(const char *filename)
                     return change_filename(DIR_NEXT);
                 }
                 break;
+            case BUTTON_NONE:
+                if(entries>1)
+                {
+                    rb->lcd_clear_display();
+                    return change_filename(direction);
+                }
+                break;
+
             default:
                 if(rb->default_event_handler_ex(button, cleanup, NULL)
                         == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
+
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
 #endif /* USE_PLUG_BUF */
@@ -771,7 +792,7 @@ static int load_and_show(char* filename, struct image_info *info)
         return change_filename(direction);
     }
     else if (status == PLUGIN_ABORT) {
-        rb->splash(HZ, "aborted");
+        rb->splash(HZ, "Aborted");
         return PLUGIN_OK;
     }
 
@@ -793,7 +814,7 @@ static int load_and_show(char* filename, struct image_info *info)
         else
 #endif
         {
-            rb->splash(HZ, "too large");
+            rb->splash(HZ, "Too large");
             file_pt[curfile] = NULL;
             return change_filename(direction);
         }
