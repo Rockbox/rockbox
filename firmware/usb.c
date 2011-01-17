@@ -483,10 +483,11 @@ void usb_start_monitoring(void)
 
     usb_monitor_enabled = true;
 
-#ifdef USB_STATUS_BY_EVENT
-    /* Filter the status - an event may have been missed because it was
-     * sent before monitoring was enabled due to the connector already
-     * having been inserted before before or during boot. */
+    /* An event may have been missed because it was sent before monitoring
+     * was enabled due to the connector already having been inserted before
+     * before or during boot. */
+#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
+    /* Filter the status - USB_INSERTED may happen later */
     status = (status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED;
 #endif
     usb_status_event(status);
