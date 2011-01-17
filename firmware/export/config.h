@@ -698,6 +698,9 @@ Lyre prototype 1 */
 #define HAVE_PRIORITY_SCHEDULING
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_DRV
+#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
+#define INCLUDE_TIMEOUT_API
+#endif
 #endif
 
 #else /* !BOOTLOADER */
@@ -721,9 +724,7 @@ Lyre prototype 1 */
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_DRV
-#if CONFIG_CPU != IMX31L
 #define INCLUDE_TIMEOUT_API
-#endif
 #endif /* HAVE_USBSTACK && USBOTG_ARC */
 
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_AS3525
@@ -912,22 +913,17 @@ Lyre prototype 1 */
 
 #ifdef HAVE_HEADPHONE_DETECTION
 /* Timeout objects required if headphone detection is enabled */
-#ifndef INCLUDE_TIMEOUT_API
 #define INCLUDE_TIMEOUT_API
-#endif
 #endif /* HAVE_HEADPHONE_DETECTION */
 
 #ifdef HAVE_TOUCHSCREEN
 /* Timeout objects required for kinetic list scrolling */
-#undef  INCLUDE_TIMEOUT_API
 #define INCLUDE_TIMEOUT_API
 #endif /* HAVE_TOUCHSCREEN */
 
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
 /* USB charging support in the USB stack requires timeout objects */
-#ifndef INCLUDE_TIMEOUT_API
 #define INCLUDE_TIMEOUT_API
-#endif
 #endif /* HAVE_USB_CHARGING_ENABLE && HAVE_USBSTACK */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)

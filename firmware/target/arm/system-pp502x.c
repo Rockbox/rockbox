@@ -260,12 +260,11 @@ static void init_cache(void)
     CACHE_CTL |= CACHE_CTL_INIT | CACHE_CTL_ENABLE | CACHE_CTL_RUN;
     nop; nop; nop; nop;
 }
-#endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE*/
+#endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
 
 /* We need this for Sansas since we boost the cpu in their bootloader */
-#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE) || \
-    defined(SANSA_E200) || defined(SANSA_C200) || \
-    defined(PHILIPS_SA9200)
+#if !defined(BOOTLOADER) || (defined(SANSA_E200) || defined(SANSA_C200) || \
+    defined(PHILIPS_SA9200))
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
@@ -409,12 +408,11 @@ static void pp_set_cpu_frequency(long frequency)
     corelock_unlock(&cpufreq_cl);
 #endif
 }
-#endif /* !BOOTLOADER || HAVE_BOOTLOADER_USB_MODE ||
-          SANSA_E200 || SANSA_C200 || PHILIPS_SA9200 */
+#endif /* !BOOTLOADER || (SANSA_E200 || SANSA_C200 || PHILIPS_SA9200) */
 
+#ifndef BOOTLOADER
 void system_init(void)
 {
-#ifndef BOOTLOADER
     if (CURRENT_CORE == CPU)
     {
 #if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_COLOR)
@@ -538,10 +536,13 @@ void system_init(void)
     }
 
     init_cache();
+}
 
-#else /* !BOOTLOADER */
+#else /* BOOTLOADER */
+
+void system_init(void)
+{
     /* Only the CPU gets here in the bootloader */
-
 #ifdef HAVE_BOOTLOADER_USB_MODE
     disable_all_interrupts();
     init_cache();
@@ -550,13 +551,23 @@ void system_init(void)
 #endif /* HAVE_BOOTLOADER_USB_MODE */
 
 #if defined(SANSA_C200) || defined(SANSA_E200) || defined(PHILIPS_SA9200)
-    pp_set_cpu_frequency(CPUFREQ_MAX);
+        pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
-    /* Else the frequency shot get changed upon USB connect -
+    /* Else the frequency should get changed upon USB connect -
      * decide per-target */
-
-#endif /* BOOTLOADER */
 }
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+void system_prepare_fw_start(void)
+{
+    disable_interrupt(IRQ_FIQ_STATUS);
+    tick_stop();
+    disable_all_interrupts();
+    /* Some OF's disable this themselves, others do not and will hang. */
+    CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
+}
+#endif /* HAVE_BOOTLOADER_USB_MODE */
+#endif /* !BOOTLOADER */
 
 void ICODE_ATTR system_reboot(void)
 {
@@ -597,10 +608,3 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
-#ifdef HAVE_BOOTLOADER_USB_MODE
-void system_prepare_fw_start(void)
-{
-    tick_stop();
-    disable_all_interrupts();
-}
-#endif

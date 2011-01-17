@@ -193,7 +193,7 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write) {
     IDE_DMA_CONTROL |= 2;
     IDE_DMA_LENGTH = bytes - 4;
 
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined (HAVE_BOOTLOADER_USB_MODE)
     if ((unsigned long)addr < DRAM_START)
         /* Rockbox remaps DRAM to start at 0 */
         IDE_DMA_ADDR = (unsigned long)addr + DRAM_START;

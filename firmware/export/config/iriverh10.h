@@ -178,6 +178,9 @@
 #define USB_VENDOR_ID 0x0B70
 #define USB_PRODUCT_ID 0x00BA
 #define HAVE_USB_HID_MOUSE
+#ifdef BOOTLOADER
+#define HAVE_BOOTLOADER_USB_MODE
+#endif
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
