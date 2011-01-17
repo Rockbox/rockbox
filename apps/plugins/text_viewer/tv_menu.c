@@ -216,53 +216,28 @@ static bool tv_statusbar_setting(void)
 
 static bool tv_font_setting(void)
 {
-    int count = 0;
-    int i = 0;
-    int new_font = 0;
-    int old_font;
-    bool res;
-    unsigned char font_path[MAX_PATH];
+    struct browse_context browse;
+    char font[MAX_PATH], name[MAX_FILENAME+10];
 
-    struct tree_context *tree;
-    struct tree_context backup;
-    struct entry *dc;
-    int dirfilter = SHOW_FONT;
+    rb->snprintf(name, sizeof(name), "%s.fnt", new_prefs.font_name);
+    rb->browse_context_init(&browse, SHOW_FONT,
+                            BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
+                            "Font", Icon_Menu_setting, FONT_DIR, name);
 
-    tree = rb->tree_get_context();
-    backup = *tree;
-    dc = tree->dircache;
-    rb->strlcat(backup.currdir, "/", MAX_PATH);
-    rb->strlcat(backup.currdir, dc[tree->selected_item].name, MAX_PATH);
-    tree->dirfilter = &dirfilter;
-    tree->browse = NULL;
-    rb->snprintf(font_path, MAX_PATH, "%s/", FONT_DIR);
-    rb->set_current_file(font_path);
-    count = tree->filesindir;
+    browse.buf = font;
+    browse.bufsize = sizeof(font);
 
-    struct opt_items names[count];
+    rb->rockbox_browse(&browse);
 
-    for (i = 0; i < count; i++)
+    if (browse.flags & BROWSE_SELECTED)
     {
-        char *p = rb->strrchr(dc[i].name, '.');
+        char *name = rb->strrchr(font, '/')+1;
+        char *p = rb->strrchr(name, '.');
         if (p) *p = 0;
-        if (!rb->strcmp(dc[i].name, new_prefs.font_name))
-            new_font = i;
-
-        names[i].string = dc[i].name;
-        names[i].voice_id = -1;
+        rb->strlcpy(new_prefs.font_name, name, MAX_PATH);
     }
 
-    old_font = new_font;
-
-    res = rb->set_option("Select Font", &new_font, INT,
-                         names, count, NULL);
-
-    if (new_font != old_font)
-        rb->strlcpy(new_prefs.font_name, names[new_font].string, MAX_PATH);
-
-    *tree = backup;
-    rb->set_current_file(backup.currdir);
-    return res;
+    return false;
 }
 #endif
 

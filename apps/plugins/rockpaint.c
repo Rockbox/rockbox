@@ -684,136 +684,33 @@ static bool check_extention(const char *filename, const char *ext)
     return ( p != NULL && !rb->strcasecmp( p, ext ) );
 }
 
-static const char* browse_get_name_cb(int selected_item, void *data,
-                                      char *buffer, size_t buffer_len)
+/* only displayes directories and .bmp files */
+static bool callback_show_item(char *name, int attr, struct tree_context *tc)
 {
-    int *indexes = (int *) data;
-    struct entry* dc = tree->dircache;
-    struct entry* e = &dc[indexes[selected_item]];
-    (void) buffer;
-    (void) buffer_len;
-
-    return e->name;
+    (void) tc;
+    if( ( attr & ATTR_DIRECTORY ) ||
+        ( !(attr & ATTR_DIRECTORY) && check_extention( name, ".bmp" ) ) )
+    {
+        return true;
+    }
+    return false;
 }
 
 static bool browse( char *dst, int dst_size, const char *start )
 {
-    struct gui_synclist browse_list;
-    int item_count = 0, selected, button;
-    struct tree_context backup;
-    struct entry *dc, *e;
-    bool reload = true;
-    int dirfilter = SHOW_ALL;
-    int *indexes = (int *) buffer;
-    size_t bbuf_len, len;
+    struct browse_context browse;
 
-    char *a;
+    rb->browse_context_init(&browse, SHOW_ALL,
+                            BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
+                            NULL, NOICON, start, NULL);
 
-    rb->strcpy( bbuf, start );
-    bbuf_len = rb->strlen(bbuf);
-    if( bbuf[bbuf_len-1] != '/' )
-    {
-        bbuf[bbuf_len++] = '/';
-        bbuf[bbuf_len] = '\0';
-    }
-    bbuf_s[0] = '\0';
+    browse.callback_show_item = callback_show_item;
+    browse.buf = dst;
+    browse.bufsize = dst_size;
 
-    rb->gui_synclist_init(&browse_list, browse_get_name_cb,
-                            (void*) indexes, false, 1, NULL);
+    rb->rockbox_browse(&browse);
 
-    tree = rb->tree_get_context();
-    backup = *tree;
-    dc = tree->dircache;
-    a = backup.currdir+rb->strlen(backup.currdir)-1;
-    if( *a != '/' )
-    {
-        *++a = '/';
-    }
-    rb->strcpy( a+1, dc[tree->selected_item].name );
-    tree->dirfilter = &dirfilter;
-    tree->browse = NULL;
-    while( 1 )
-    {
-        if( reload )
-        {
-            int i;
-            rb->set_current_file(bbuf);
-            item_count = 0;
-            selected = 0;
-            for( i = 0; i < tree->filesindir ; i++)
-            {
-                e = &dc[i];
-                /* only displayes directories and .bmp files */
-                if( ( e->attr & ATTR_DIRECTORY ) ||
-                    ( !(e->attr & ATTR_DIRECTORY) &&
-                        check_extention( e->name, ".bmp" ) ) )
-                {
-                    if( bbuf_s[0] && !rb->strcmp( e->name, bbuf_s ) )
-                        selected = item_count;
-                    indexes[item_count++] = i;
-                }
-            }
-
-            rb->gui_synclist_set_nb_items(&browse_list,item_count);
-            rb->gui_synclist_select_item(&browse_list, selected);
-            rb->gui_synclist_set_title(&browse_list, bbuf, NOICON);
-            rb->gui_synclist_draw(&browse_list);
-            reload = false;
-        }
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&browse_list,&button,LIST_WRAP_UNLESS_HELD))
-            continue;
-        switch( button )
-        {
-            case ACTION_STD_CANCEL:
-                if( !rb->strcmp( bbuf, "/" ) )
-                {
-                    *tree = backup;
-                    rb->set_current_file( backup.currdir );
-                    return false;
-                }
-                a = bbuf + bbuf_len - 1;
-                if( a == bbuf ) break;
-                while( *a == '/' ) a--;
-                *(a+1) = '\0';
-                while( *a != '/' ) a--;
-                /* select parent directory */
-                rb->strcpy( bbuf_s, ++a );
-                *a = '\0';
-                bbuf_len = a - bbuf;
-                reload = true;
-                break;
-
-            case ACTION_STD_OK:
-                selected = rb->gui_synclist_get_sel_pos( &browse_list );
-                if( selected < 0 || selected >= item_count )
-                    break;
-                e = &dc[indexes[selected]];
-                if( !( e->attr & ATTR_DIRECTORY ) )
-                {
-                    rb->snprintf( dst, dst_size, "%s%s", bbuf, e->name );
-                    *tree = backup;
-                    rb->set_current_file( backup.currdir );
-                    return true;
-                }
-                len = rb->strlen(e->name);
-                if( bbuf_len + len + 2 < (int)sizeof(bbuf) )
-                {
-                    bbuf_s[0] = '\0';
-                    rb->strcpy( bbuf+bbuf_len, e->name );
-                    bbuf_len += len;
-                    bbuf[bbuf_len++] = '/';
-                    bbuf[bbuf_len] = '\0';
-                    reload = true;
-                }
-                break;
-
-            case ACTION_STD_MENU:
-                *tree = backup;
-                rb->set_current_file( backup.currdir );
-                return false;
-        }
-    }
+    return (browse.flags & BROWSE_SELECTED);
 }
 
 /***********************************************************************

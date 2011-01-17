@@ -773,6 +773,8 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     filetype_get_attr,
+    browse_context_init,
+    rockbox_browse,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
