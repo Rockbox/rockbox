@@ -9,7 +9,7 @@
 % The extension is selected in the preamble, so no further \ifpdfoutput
 % is necessary.
 \includegraphics[height=8cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-front}
-\opt{iaudiom3,h100}{% replace with HAVEREMOTEKEYMAP when all images exist or change specimg
+\opt{iaudiom3,iriverh100}{% replace with HAVEREMOTEKEYMAP when all images exist or change specimg
   \end{center}
   % spacing between the two pictures, could possibly be improved
   \begin{center}
@@ -42,7 +42,7 @@ detail in the following paragraph.
   \wikilink{BlindFAQ}.
   
   %
-  \opt{h100}{
+  \opt{iriverh100}{
   Hold or lay the \dap{} so that the side with the joystick and LCD is facing
   towards you, and the curved side is at the top. The joystick functions as
   the \ButtonUp{}, \ButtonRight{}, \ButtonLeft{}, and \ButtonDown{} buttons when
@@ -63,7 +63,7 @@ detail in the following paragraph.
   \dap{} hard locks, you can reset it by inserting a paper clip into the hole
   where the reset switch is.}
   % 
-  \opt{h300}{
+  \opt{iriverh300}{
   Hold or lay the \dap{} so that the side with the button pad and
   LCD is facing towards you.  The buttons on the button pad are as follows:  top 
   left corner: \ButtonOn{}, bottom left corner: \ButtonOff{}, top right corner: 
@@ -231,7 +231,7 @@ detail in the following paragraph.
   round crosspad is labelled \ButtonMenu{}.
   }
   %
-  \opt{h10,h10_5gb}{
+  \opt{iriverh10,iriverh10_5gb}{
   Hold or lay the \dap{} so that the side with the scroll pad and
   LCD is facing towards you. In the centre below the lcd is the scroll pad. It
   is oriented vertically. Touching the top and bottom half of it acts as the 
@@ -244,8 +244,8 @@ detail in the following paragraph.
   hand side is the \ButtonPower{} button.
 
   On the top panel of the \dap{}, from left to right, you can find the 
-  following: \ButtonHold{} switch, \opt{h10}{reset pin hole, }remote port and
-  headphone mini jack plug. 
+  following: \ButtonHold{} switch, \opt{iriverh10}{reset pin hole, }remote port
+  and headphone mini jack plug. 
   
   On the bottom panel of the \dap{} is the data cable port.}
   %
@@ -528,6 +528,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,PBELL_VIBE500_PAD%
           }{\ButtonPower}%
       \opt{COWON_D2_PAD} {\ButtonPower{}, then \ButtonHold}%
+      \opt{ONDA_VX777_PAD} {\ButtonPower{}}%
           &
       \opt{HAVEREMOTEKEYMAP}{
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCOn}%
@@ -615,7 +616,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     simultaneously until the player hard resets.
     }
 
-  \opt{h100,h300}
+  \opt{iriverh100,iriverh300}
     {
     Rockbox has a dual-boot feature. To boot into the original firmware,
     when the \dap{} is turned off, press and hold the \ButtonRec{} button,
@@ -631,15 +632,16 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     and Shutdown. Select the option you need with \ButtonRew{} and \ButtonFF{}
     and confirm with long \ButtonPlay{}.
     }
-  \opt{h10,h10_5gb}
+  \opt{iriverh10,iriverh10_5gb}
     {
     Rockbox has a dual-boot feature. It loads the original firmware from
     the file \fname{/System/OF.mi4}. To boot into the original firmware,
     press and hold the \ButtonLeft{} button while turning on the player.
     \note{The iriver firmware does not shut down properly when you turn it off,
     it only goes to sleep. To get back into Rockbox when exiting from the
-    iriver firmware, you will need to reset the player by \opt{h10}{inserting a
-    pin in the reset hole}\opt{h10_5gb}{removing and reinserting the battery}.}
+    iriver firmware, you will need to reset the player by \opt{iriverh10}{%
+    inserting a pin in the reset hole}\opt{iriverh10_5gb}{removing and
+    reinserting the battery}.}
     }
     
   \opt{sansa,sansaAMS}

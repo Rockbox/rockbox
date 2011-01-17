@@ -93,7 +93,7 @@ follow the instructions at
     \end{itemize}
 \end{description}
 }
-\opt{h300}{
+\opt{iriverh300}{
 \begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
   \emph{permanently} lose the ability to playback files with DRM.
@@ -161,14 +161,15 @@ follow the instructions at
     \setting{MSC} from within the original firmware.}
   }
 
-  \opt{h10,h10_5gb}{
+  \opt{iriverh10,iriverh10_5gb}{
     The installation requires you to use UMS mode and so
     may require use of the UMS trick, whereby it is possible to force a MTP
     \playertype{} to start up in UMS mode as follows:
       \begin{enumerate}
-        \item Ensure the \dap{} is fully powered off by \opt{h10}{using a pin to
-        push the small reset button inside the hole between the Hold switch and
-        remote control connector.}\opt{h10_5gb}{removing the battery and putting it back in again.}
+        \item Ensure the \dap{} is fully powered off by \opt{iriverh10}{using
+          a pin to push the small reset button inside the hole between the
+          \ButtonHold{} switch and remote control connector.}\opt{iriverh10_5gb}{removing
+          the battery and putting it back in again.}
         \item Connect your \playertype{} to the computer using the data cable.
         \item Hold \ButtonRight{} and push \ButtonPower{} to turn the \dap{} on.
         \item Continue holding \ButtonRight{} until the USB Connected screen appears.
@@ -319,7 +320,7 @@ letter the \dap{} gets assigned, on other systems this is a path in the
 filesystem.\\*
 
 
-\opt{h100,h300}{
+\opt{iriverh100,iriverh300}{
   Rockbox Utility will ask you for a compatible copy of the original
   firmware. This is because for legal reasons we cannot distribute
   the bootloader directly. Instead, we have to patch the Iriver firmware
@@ -330,13 +331,13 @@ filesystem.\\*
   \wikilink{IriverBoot}.
  
   Supported Iriver firmware versions currently include 
-  \opt{h100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
+  \opt{iriverh100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
     1.66EU and 1.66K. Note that the H140 uses the same firmware as the H120;
     H120 and H140 owners should use the firmware called \fname{ihp\_120.hex}.
     Likewise, the iHP110 and iHP115 use the same firmware, called 
     \fname{ihp\_100.hex}. Be sure to use the correct firmware file for 
     your player.}
-    \opt{h300}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
+    \opt{iriverh300}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
     \note{The US \playername{} firmware is not supported and cannot be
     patched to be used with the bootloader. If you wish to install Rockbox
     on a US \playername{}, you must first install a non-US version of the
@@ -444,7 +445,7 @@ data partiton.}}
 correct version for your \dap{}.}}
 
 \item Connect your \dap{} to the computer via USB 
-  \opt{sansa,sansaAMS,h10,h10_5gb,vibe500}{ in MSC mode }
+  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500}{ in MSC mode }
   \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
@@ -483,11 +484,11 @@ structure that Rockbox needs.\\}
 \opt{swcodec}{%
     \nopt{gigabeats}{%
     \subsubsection{Installing the bootloader}
-        \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
+        \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
         \opt{mpiohd200}{\input{getting_started/mpio_install.tex}}
         \opt{ipod}{\input{getting_started/ipod_install.tex}}
         \opt{iaudio}{\input{getting_started/iaudio_install.tex}}
-        \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
+        \opt{iriverh10,iriverh10_5gb}{\input{getting_started/h10_install.tex}}
         \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
         \opt{sansa}{\input{getting_started/sansa_install.tex}}
         \opt{sansaAMS}{\input{getting_started/sansaAMS_install.tex}}
@@ -526,7 +527,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{h10,h10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2,vibe500,ondavx777}{
+\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,archos,sansaAMS,cowond2,vibe500,ondavx777}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -534,7 +535,7 @@ structure that Rockbox needs.\\}
   Safely eject / unmount your \dap{}.
 }
 
-\opt{h100,h300}{
+\opt{iriverh100,iriverh300}{
   \begin{itemize}
   \item Safely eject / unmount your \dap{}.
   
@@ -665,7 +666,7 @@ You can uninstall Rockbox automatically by using Rockbox Utility. If you
 installed Rockbox manually you can still use Rockbox Utility for uninstallation
 but will not be able to do this selectively.
 
-\opt{h100,h300}{\note{Rockbox Utility cannot uninstall the bootloader due to
+\opt{iriverh100,iriverh300}{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
 completely follow the manual uninstallation instructions below.}}
 
@@ -677,14 +678,15 @@ completely follow the manual uninstallation instructions below.}}
   \fname{\firmwarefilename} file.
 }
 
-\opt{h10,h10_5gb}{
+\opt{iriverh10,iriverh10_5gb}{
   If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
-  \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}} file and rename
-  \fname{OF.mi4} to \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
-  in the \fname{System} directory on your \playertype{}. As in the installation,
-  it may be necessary to first put your device into UMS mode.
-}
+  \opt{iriverh10}{\fname{H10\_20GC.mi4}}\opt{iriverh10_5gb}{\fname{H10.mi4}}
+      file and rename \fname{OF.mi4} to \opt{iriverh10}{\fname{H10\_20GC.mi4}}%
+      \opt{iriverh10_5gb}{\fname{H10.mi4}} in the \fname{System} directory on
+      your \playertype{}. As in the installation, it may be necessary to first
+      put your device into UMS mode.
+  }
 
 \opt{vibe500}{
   If you would like to go back to using the original \playerman{} software,
@@ -726,18 +728,18 @@ completely follow the manual uninstallation instructions below.}}
   and insert the charger. The original firmware will automatically be flashed.
 }
 
-\opt{h100,h300}{
+\opt{iriverh100,iriverh300}{
     If you want to remove the Rockbox bootloader, simply flash an unpatched
     \playerman{} firmware. Be aware that doing so will also remove the bootloader
     USB mode. As that mode can come in quite handy (especially if you experience
    disk errors) it is recommended to keep the bootloader. It also
     gives you the possibility of trying Rockbox anytime later by simply
     installing the distribution files.
-    \opt{h100}{
+    \opt{iriverh100}{
       The Rockbox bootloader will automatically start the original firmware if
       the \fname{.rockbox} directory has been deleted.
     }
-    \opt{h300}{
+    \opt{iriverh300}{
       Although if you retain the Rockbox bootloader, you will need to hold the
       \ButtonRec{} button each time you want to start the original firmware.
     }
@@ -792,7 +794,7 @@ completely follow the manual uninstallation instructions below.}}
   please ensure that you are either logged in as an administrator (Windows), or
   you have root rights (Linux)}
 
-\opt{h100,h300}{
+\opt{iriverh100,iriverh300}{
   \item[Immediately loading original firmware.]
   If the original firmware is immediately
   loaded without the Rockbox bootloader appearing first, then the Rockbox bootloader
@@ -800,11 +802,11 @@ completely follow the manual uninstallation instructions below.}}
   the update if the filename is correct, including case. Make sure that the patched
   Iriver firmware is called \fname{.hex}.}
 
-\nopt{h100,h300,mpiohd200}{\item[``File Not Found'']}
-\opt{h100,h300,mpiohd200}{\item[``-1 error'']}
+\nopt{iriverh100,iriverh300,mpiohd200}{\item[``File Not Found'']}
+\opt{iriverh100,iriverh300,mpiohd200}{\item[``-1 error'']}
   If you receive a
-  \nopt{h100,h300,mpiohd200}{``File Not Found''}
-  \opt{h100,h300,mpiohd200}{``-1 error''} 
+  \nopt{iriverh100,iriverh300,mpiohd200}{``File Not Found''}
+  \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''} 
   from the bootloader, then the bootloader cannot find the Rockbox firmware. 
   This is usually a result of not extracting the contents of the \fname{.zip} 
   file to the proper location, and should not happen when Rockbox has been
