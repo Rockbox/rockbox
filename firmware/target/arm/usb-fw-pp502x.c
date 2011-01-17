@@ -65,10 +65,10 @@
 #define USB_GPIO_VAL    0x04
 
 #elif defined(PHILIPS_SA9200)
-    /* GPIO F bit 7 (low) is usb detect */
-#define USB_GPIO        GPIOF
-#define USB_GPIO_MASK   0x80
-#define USB_GPIO_VAL    0x00
+    /* GPIO B bit 6 (high) is usb bus power detect */
+#define USB_GPIO        GPIOB
+#define USB_GPIO_MASK   0x40
+#define USB_GPIO_VAL    0x40
 
 #elif defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
     /* GPIO E bit 2 is usb detect */
@@ -225,10 +225,12 @@ void usb_insert_int(void)
     timeout_register(&usb_oneshot, usb_timeout_event, HZ/5, val);
 }
 
-/* Called during the bus reset interrupt when in detect mode - filter for
- * invalid bus reset when unplugging by checking the pin state. */
+/* USB_DETECT_BY_DRV: Called during the bus reset interrupt when in detect mode
+ * USB_DETECT_BY_CORE: Called when device descriptor is requested
+ */
 void usb_drv_usb_detect_event(void)
 {
+    /* Filter for invalid bus reset when unplugging by checking the pin state. */
     if(usb_plugged()) {
         usb_status_event(USB_INSERTED);
     }

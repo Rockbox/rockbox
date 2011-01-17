@@ -498,15 +498,23 @@ static void log_ep(int ep_num, int ep_dir, char* prefix)
 
 void usb_drv_init(void)
 {
+#ifdef USB_DETECT_BY_CORE
+    /* USB core decides */
+    _usb_drv_init(true);
+#else
+    /* Use bus reset condition */
     _usb_drv_init(false);
+#endif
 }
 
 /* fully enable driver */
 void usb_drv_attach(void)
 {
     logf("usb_drv_attach");
+#ifndef USB_DETECT_BY_CORE
     sleep(HZ/10);
     _usb_drv_init(true);
+#endif
 }
 
 void usb_drv_exit(void)

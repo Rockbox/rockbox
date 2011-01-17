@@ -141,9 +141,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOD_INT_STAT & 0x02)
                 button_int();
-        }
-        else if (CPU_HI_INT_STAT & GPIO1_MASK) {
-            if (GPIOF_INT_STAT & 0x80)
+            if (GPIOB_INT_STAT & 0x40)
                 usb_insert_int();
         }
 /* end PHILIPS_SA9200 */

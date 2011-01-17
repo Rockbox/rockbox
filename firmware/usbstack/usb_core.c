@@ -559,6 +559,11 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
         case USB_DT_DEVICE:
             ptr = &device_descriptor;
             size = sizeof(struct usb_device_descriptor);
+#ifdef USB_DETECT_BY_CORE
+            /* Something requested a device descriptor; consider this a legit
+               connection */
+            usb_drv_usb_detect_event();
+#endif
             break;
 
         case USB_DT_OTHER_SPEED_CONFIG:

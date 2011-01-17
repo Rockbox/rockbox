@@ -136,7 +136,7 @@ static inline void usb_slave_mode(bool on)
     }
     else /* usb_state == USB_INSERTED (only!) */
     {
-#ifndef USB_DETECT_BY_DRV
+#if !defined(USB_DETECT_BY_DRV) && !defined(USB_DETECT_BY_CORE)
         usb_enable(false);
 #endif
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -244,7 +244,7 @@ static void usb_thread(void)
                     (struct usb_transfer_completion_event_data*)ev.data);
                 break;
 #endif
-#ifdef USB_DETECT_BY_DRV
+#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
             /* In this case, these events the handle cable insertion USB
              * driver determines INSERTED/EXTRACTED state. */
             case USB_POWERED:
@@ -263,7 +263,7 @@ static void usb_thread(void)
                  * available. */
                 queue_post(&usb_queue, USB_EXTRACTED, 0);
                 break;
-#endif /* USB_DETECT_BY_DRV */
+#endif /* USB_DETECT_BY_DRV || USB_DETECT_BY_CORE */
             case USB_INSERTED:
 #ifdef HAVE_LCD_BITMAP
                 if(do_screendump_instead_of_usb)
@@ -379,7 +379,8 @@ static void usb_thread(void)
 #ifdef HAVE_USBSTACK
                 if(!exclusive_storage_access)
                 {
-#ifndef USB_DETECT_BY_DRV /* Disabled handling USB_UNPOWERED */
+#if !defined(USB_DETECT_BY_DRV) && !defined(USB_DETECT_BY_CORE)
+                    /* Disabled handling USB_UNPOWERED */
                     usb_enable(false);
 #endif
                     break;
@@ -457,7 +458,8 @@ void usb_status_event(int current_status)
 {
     /* Caller isn't expected to filter for changes in status.
      * current_status:
-     *   USB_DETECT_BY_DRV: USB_POWERED, USB_UNPOWERED, USB_INSERTED (driver)
+     *   USB_DETECT_BY_DRV/CORE: USB_POWERED, USB_UNPOWERED,
+                                 USB_INSERTED (driver/core)
      *                else: USB_INSERTED, USB_EXTRACTED
      */
     if(usb_monitor_enabled)
@@ -481,7 +483,10 @@ void usb_start_monitoring(void)
 
     usb_monitor_enabled = true;
 
-#ifdef USB_DETECT_BY_DRV
+#ifdef USB_STATUS_BY_EVENT
+    /* Filter the status - an event may have been missed because it was
+     * sent before monitoring was enabled due to the connector already
+     * having been inserted before before or during boot. */
     status = (status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED;
 #endif
     usb_status_event(status);
@@ -577,7 +582,7 @@ void usb_init(void)
 {
     /* We assume that the USB cable is extracted */
     usb_state = USB_EXTRACTED;
-#ifdef USB_DETECT_BY_DRV
+#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
     last_usb_status = USB_UNPOWERED;
 #else
     last_usb_status = USB_EXTRACTED;

@@ -33,10 +33,11 @@
 enum {
     USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
-#if defined(HAVE_USB_POWER) || defined(USB_DETECT_BY_DRV)
+#if defined(HAVE_USB_POWER) || defined(USB_DETECT_BY_DRV) || \
+    defined(USB_DETECT_BY_CORE)
     USB_POWERED,             /* Event+State */
 #endif
-#ifdef USB_DETECT_BY_DRV
+#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
     USB_UNPOWERED,           /* Event */
 #endif
 #ifdef HAVE_LCD_BITMAP

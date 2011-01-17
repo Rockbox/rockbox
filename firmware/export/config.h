@@ -733,6 +733,12 @@ Lyre prototype 1 */
 
 #endif /* BOOTLOADER */
 
+#ifdef PHILIPS_SA9200
+/* Instead use the request for a device descriptor to detect a host */
+#undef USB_DETECT_BY_DRV
+#define USB_DETECT_BY_CORE
+#endif
+
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
