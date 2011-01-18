@@ -753,7 +753,7 @@ void shutdown_hw(void)
 
     if (battery_level_safe()) { /* do not save on critical battery */
 #ifdef HAVE_LCD_BITMAP
-      glyph_cache_save(NULL);
+        glyph_cache_save(NULL);
 #endif
 
 /* Commit pending writes if needed. Even though we don't do write caching,

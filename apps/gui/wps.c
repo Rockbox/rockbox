@@ -495,7 +495,7 @@ static void prev_track(unsigned long skip_thresh)
 #if (CONFIG_CODEC == SWCODEC)
             audio_pre_ff_rewind();
 #else
-        audio_pause();
+            audio_pause();
 #endif
 
         audio_ff_rewind(0);

@@ -764,7 +764,7 @@ void check_bootfile(bool do_rolo)
                     static const struct text_message message={ lines, 2 };
                     button_clear_queue(); /* Empty the keyboard buffer */
                     if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
-                    rolo_load(BOOTDIR "/" BOOTFILE);
+                        rolo_load(BOOTDIR "/" BOOTFILE);
                 }
             }
             wrtdate = info.wrtdate;
