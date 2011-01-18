@@ -38,7 +38,16 @@ do {                                    \
 
 #define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("nop\n nop\n"); }
 #define DELAY    SLEEP(700000);
-#ifdef USB_BOOT
+
+#if (defined(ONDA_VX777) && !defined(BOOTLOADER)) || defined(USB_BOOT)
+ /*
+  * Onda VX777 needs this in order to boot correctly, it looks like the SPL
+  * does not correctly initialize the LCD for Rockbox to switch it on.
+  */
+ #define RESET_LCD
+#endif
+
+#ifdef RESET_LCD
 static void _display_pin_init(void)
 {
     my__gpio_as_lcd_16bit();
@@ -61,7 +70,7 @@ static void _display_pin_init(void)
 #define SLCD_SEND_COMMAND(cmd,val) SLCD_SET_COMMAND(cmd); SLCD_SET_DATA(val);
 static void _display_init(void)
 {
-#ifdef USB_BOOT
+#ifdef RESET_LCD
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(1));
     SLEEP(700000);
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(0));
@@ -78,7 +87,7 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM));
 #endif
 
-#ifdef USB_BOOT
+#ifdef RESET_LCD
     SLCD_SEND_COMMAND(REG_DISP_CTRL2, 0x503);
     SLCD_SEND_COMMAND(REG_DISP_CTRL3, 1);
     SLCD_SEND_COMMAND(REG_LPCTRL, 0x10);
@@ -144,7 +153,7 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
                                        DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(3)));
     SLEEP(3500000);
-#endif /* USB_BOOT */
+#endif /* RESET_LCD */
 }
 
 static void _display_on(void)
@@ -199,7 +208,7 @@ void lcd_init_controller(void)
 {
     lcd_clock_enable();
 
-#ifdef USB_BOOT
+#ifdef RESET_LCD
     _display_pin_init();
 #endif
     _set_lcd_bus();
