@@ -92,7 +92,6 @@ static int handle_usb_events(void)
         switch(button)
         {
             case SYS_USB_DISCONNECTED:
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 return 1;
             case SYS_CHARGER_DISCONNECTED:
                 /*reset rockbox battery runtime*/

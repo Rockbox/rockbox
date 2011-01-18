@@ -135,10 +135,7 @@ static void handle_usb(void)
         {
             button = button_get(true);
             if (button == SYS_USB_DISCONNECTED)
-            {
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 break;
-            }
         }
     }
 

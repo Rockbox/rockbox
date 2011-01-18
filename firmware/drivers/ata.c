@@ -946,7 +946,6 @@ static void ata_thread(void)
             case SYS_USB_DISCONNECTED:
                 /* Tell the USB thread that we are ready again */
                 DEBUGF("ata_thread got SYS_USB_DISCONNECTED\n");
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 usb_mode = false;
                 break;
 #endif

@@ -78,10 +78,7 @@ static void usb_mode(void)
         {
             button = button_get(true);
             if (button == SYS_USB_DISCONNECTED)
-            {
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 break;
-            }
         }
     }
 }

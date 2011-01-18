@@ -57,13 +57,19 @@
 #define USB_FULL_INIT
 #endif
 
+#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
+/* These aren't treated differently here */
+#define USB_DELAYED_INSERT
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
 #endif
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
-static int usb_state;
+/* We assume that the USB cable is extracted */
+static int usb_state = USB_EXTRACTED;
 
 #if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT)
 static int usb_mmc_countdown = 0;
@@ -74,21 +80,12 @@ static int usb_mmc_countdown = 0;
 static long usb_stack[(DEFAULT_STACK_SIZE + SECTOR_SIZE + DUMP_BMP_LINESIZE)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
-#ifndef USB_STATUS_BY_EVENT
-#define NUM_POLL_READINGS (HZ/5)
-static int countdown;
-#endif /* USB_STATUS_BY_EVENT */
 #endif /* USB_FULL_INIT */
 static struct event_queue usb_queue;
-static bool usb_monitor_enabled;
-static int last_usb_status;
-#ifdef HAVE_USBSTACK
-static bool exclusive_storage_access;
-#endif
-
-#ifdef USB_FIREWIRE_HANDLING
-static int firewire_countdown;
-static bool last_firewire_status;
+static bool usb_monitor_enabled = false;
+static bool exclusive_storage_access = false;
+#ifdef USB_ENABLE_HID
+static bool usb_hid = true;
 #endif
 
 #ifdef USB_FULL_INIT
@@ -118,14 +115,93 @@ static void try_reboot(void)
 }
 #endif /* USB_FIRWIRE_HANDLING || (HAVE_USBSTACK && !USE_ROCKBOX_USB) */
 
+
+#ifdef HAVE_LCD_BITMAP
+static inline bool usb_do_screendump(void)
+{
+    if(do_screendump_instead_of_usb)
+    {
+        usb_state = USB_SCREENDUMP;
+        screen_dump();
+#ifdef HAVE_REMOTE_LCD
+        remote_screen_dump();
+#endif
+        return true;
+    }
+
+    return false;
+}
+#else /* !HAVE_LCD_BITMAP */
+static inline bool usb_do_screendump(void)
+{
+    return false;
+}
+#endif /* HAVE_LCD_BITMAP */
+
+
 #ifdef HAVE_USBSTACK
-/* inline since branch is chosen at compile time */
+static inline bool usb_configure_drivers(int for_state)
+{
+    switch(for_state)
+    {
+    case USB_POWERED:
+#ifdef USB_ENABLE_STORAGE
+        usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
+#endif
+#ifdef USB_ENABLE_HID
+#ifdef USB_ENABLE_CHARGING_ONLY
+        usb_core_enable_driver(USB_DRIVER_HID, false);
+#else
+        usb_core_enable_driver(USB_DRIVER_HID, true);
+#endif /* USB_ENABLE_CHARGING_ONLY */
+#endif /* USB_ENABLE_HID */
+
+#ifdef USB_ENABLE_CHARGING_ONLY
+        usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
+#endif
+        exclusive_storage_access = false;
+
+        usb_attach(); /* Powered only: attach now. */
+        break;
+        /* USB_POWERED: */
+    
+    case USB_INSERTED:
+#ifdef USB_ENABLE_STORAGE
+        usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
+#endif
+#ifdef USB_ENABLE_HID
+        usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
+#endif
+#ifdef USB_ENABLE_CHARGING_ONLY
+        usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
+#endif
+        /* Check any drivers enabled at this point for exclusive storage
+         * access requirements. */
+        exclusive_storage_access = usb_core_any_exclusive_storage();
+
+        if(exclusive_storage_access)
+            return true;
+
+        usb_attach(); /* Not exclusive: attach now. */
+        break;
+        /* USB_INSERTED: */
+
+    case USB_EXTRACTED:
+        if(exclusive_storage_access)
+            usb_release_exclusive_storage();
+        break;
+        /* USB_EXTRACTED: */
+    }
+
+    return false;
+}
+
+#ifdef USE_ROCKBOX_USB
 static inline void usb_slave_mode(bool on)
 {
-#ifdef USE_ROCKBOX_USB
     int rc;
 
-    if (on)
+    if(on)
     {
         trigger_cpu_boost();
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -136,36 +212,72 @@ static inline void usb_slave_mode(bool on)
     }
     else /* usb_state == USB_INSERTED (only!) */
     {
-#if !defined(USB_DETECT_BY_DRV) && !defined(USB_DETECT_BY_CORE)
         usb_enable(false);
-#endif
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(THREAD_ID_CURRENT, PRIORITY_SYSTEM);
 #endif
         /* Entered exclusive mode */
         rc = disk_mount_all();
-        if (rc <= 0) /* no partition */
+        if(rc <= 0) /* no partition */
             panicf("mount: %d",rc);
 
         cancel_cpu_boost();
     }
-#else /* !USE_ROCKBOX_USB */
-    if (on)
+}
+
+#ifdef HAVE_HOTSWAP
+static inline void usb_handle_hotswap(long id)
+{
+    switch(id)
+    {
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        usb_core_hotswap_event(1, id == SYS_HOTSWAP_INSERTED);
+        break;
+    }
+    /* Note: No MMC storage handling is needed with the stack atm. */
+}
+#endif /* HAVE_HOTSWAP */
+
+#else /* !USB_ROCKBOX_USB */
+static inline void usb_slave_mode(bool on)
+{
+    if(on)
     {
         /* until we have native mass-storage mode, we want to reboot on
            usb host connect */
         try_reboot();
     }
-#endif /* USE_ROCKBOX_USB */
 }
+#endif /* USE_ROCKBOX_USB */
 
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data* event_data)
 {
     queue_post(&usb_queue, USB_TRANSFER_COMPLETION, (intptr_t)event_data);
 }
+
 #else  /* !HAVE_USBSTACK */
-/* inline since branch is chosen at compile time */
+
+static inline bool usb_configure_drivers(int for_state)
+{
+    switch(for_state)
+    {
+    case USB_POWERED:
+        exclusive_storage_access = false;
+        break;
+    case USB_INSERTED:
+        exclusive_storage_access = true;
+        return true;
+    case USB_EXTRACTED:
+        if(exclusive_storage_access)
+            usb_release_exclusive_storage();
+        break;
+    }
+
+    return false;
+}
+
 static inline void usb_slave_mode(bool on)
 {
     int rc;
@@ -196,10 +308,34 @@ static inline void usb_slave_mode(bool on)
             panicf("storage: %d",rc);
 
         rc = disk_mount_all();
-        if (rc <= 0) /* no partition */
+        if(rc <= 0) /* no partition */
             panicf("mount: %d",rc);
     }
 }
+
+#ifdef HAVE_HOTSWAP
+static inline void usb_handle_hotswap(long id)
+{
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    switch(id)
+    {
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        if(usb_state == USB_INSERTED)
+        {
+            usb_enable(false);
+            usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
+        }
+        break;
+    case USB_REENABLE:
+        if(usb_state == USB_INSERTED)
+            usb_enable(true);  /* reenable only if still inserted */
+        break;
+    }
+#endif /* STORAGE_MMC */
+    (void)id;
+}
+#endif /* HAVE_HOTSWAP */
 #endif /* HAVE_USBSTACK */
 
 #ifdef HAVE_USB_POWER
@@ -218,15 +354,27 @@ static inline bool usb_reboot_button(void)
     return (button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON;
 }
 #endif
+#else /* !HAVE_USB_POWER */
+static inline bool usb_power_button(void)
+{
+    return false;
+}
+
+#ifdef USB_FIREWIRE_HANDLING
+static inline bool usb_reboot_button(void)
+{
+    return false;
+}
+#endif
 #endif /* HAVE_USB_POWER */
 
-#ifdef USB_ENABLE_HID
-static bool usb_hid = true;
+#ifndef USB_DRIVER_CLOSE
+static void usb_thread(void) NORETURN_ATTR;
 #endif
-
 static void usb_thread(void)
 {
     int num_acks_to_expect = 0;
+    long last_broadcast_tick = current_tick;
     struct queue_event ev;
 
     while(1)
@@ -234,216 +382,150 @@ static void usb_thread(void)
         queue_wait(&usb_queue, &ev);
         switch(ev.id)
         {
-#ifdef USB_DRIVER_CLOSE
-            case USB_QUIT:
-                return;
-#endif
+        /*** Main USB thread duties ***/
+
 #ifdef HAVE_USBSTACK
-            case USB_TRANSFER_COMPLETION:
-                usb_core_handle_transfer_completion(
-                    (struct usb_transfer_completion_event_data*)ev.data);
-                break;
-#endif
-#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
-            /* In this case, these events the handle cable insertion USB
-             * driver determines INSERTED/EXTRACTED state. */
-            case USB_POWERED:
-                /* Set the state to USB_POWERED for now and enable the driver
-                 * to detect a bus reset only. If a bus reset is detected,
-                 * USB_INSERTED will be received. */
-                usb_state = USB_POWERED;
-                usb_enable(true);
-                break;
-
-            case USB_UNPOWERED:
-                usb_enable(false);
-                /* This part shouldn't be obligatory for anything that can
-                 * reliably detect removal of the data lines. USB_EXTRACTED
-                 * could be posted on that event while bus power remains
-                 * available. */
-                queue_post(&usb_queue, USB_EXTRACTED, 0);
-                break;
-#endif /* USB_DETECT_BY_DRV || USB_DETECT_BY_CORE */
-            case USB_INSERTED:
-#ifdef HAVE_LCD_BITMAP
-                if(do_screendump_instead_of_usb)
-                {
-                    usb_state = USB_SCREENDUMP;
-                    screen_dump();
-#ifdef HAVE_REMOTE_LCD
-                    remote_screen_dump();
-#endif
-                    break;
-                }
-#endif
-#ifdef HAVE_USB_POWER
-                if(usb_power_button())
-                {
-                    /* Only charging is desired */
-                    usb_state = USB_POWERED;
-#ifdef HAVE_USBSTACK
-#ifdef USB_ENABLE_STORAGE
-                    usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
-#endif
-
-#ifdef USB_ENABLE_HID
-#ifdef USB_ENABLE_CHARGING_ONLY
-                    usb_core_enable_driver(USB_DRIVER_HID, false);
-#else
-                    usb_core_enable_driver(USB_DRIVER_HID, true);
-#endif /* USB_ENABLE_CHARGING_ONLY */
-#endif /* USB_ENABLE_HID */
-
-#ifdef USB_ENABLE_CHARGING_ONLY
-                    usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
-#endif
-                    usb_attach();
-#endif
-                    break;
-                }
-#endif /* HAVE_USB_POWER */
-#ifdef HAVE_USBSTACK
-#ifdef HAVE_USB_POWER
-                /* Set the state to USB_POWERED for now. If permission to connect
-                 * by threads and storage is granted it will be changed to
-                 * USB_CONNECTED. */
-                usb_state = USB_POWERED;
-#endif
-#ifdef USB_ENABLE_STORAGE
-                usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
-#endif
-#ifdef USB_ENABLE_HID
-                usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
-#endif
-#ifdef USB_ENABLE_CHARGING_ONLY
-                usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
-#endif
-
-                /* Check any drivers enabled at this point for exclusive storage
-                 * access requirements. */
-                exclusive_storage_access = usb_core_any_exclusive_storage();
-
-                if(!exclusive_storage_access)
-                {
-                    usb_attach();
-                    break;
-                }
+        case USB_TRANSFER_COMPLETION:
+            usb_core_handle_transfer_completion(
+                (struct usb_transfer_completion_event_data*)ev.data);
+            break;
 #endif /* HAVE_USBSTACK */
-                /* Tell all threads that they have to back off the storage.
-                   We subtract one for our own thread. */
-                num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
-                DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
-                       num_acks_to_expect);
+
+        case USB_INSERTED:
+#ifdef USB_DELAYED_INSERT
+            if(usb_state != USB_POWERED)
+                break;
+#else /* !USB_DELAYED_INSERT */
+            if(usb_state != USB_EXTRACTED)
                 break;
 
-            case SYS_USB_CONNECTED_ACK:
-                if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
+            if(usb_do_screendump())
+                break;
+
+            usb_state = USB_POWERED;
+#endif /* USB_DELAYED_INSERT */
+
+            if(usb_power_button())
+            {
+                /* Only charging is desired */
+                usb_configure_drivers(USB_POWERED);
+                break;
+            }
+
+            if(!usb_configure_drivers(USB_INSERTED))
+                break; /* Exclusive storage access not required */
+
+            /* Tell all threads that they have to back off the storage.
+               We subtract one for our own thread. Expect an ACK for every
+               listener for each broadcast they received. If it has been too
+               long, the user might have entered a screen that didn't ACK
+               when inserting the cable, such as a debugging screen. In that
+               case, reset the count or else USB would be locked out until
+               rebooting because it most likely won't ever come. Simply
+               resetting to the most recent broadcast count is racy. */
+            if(TIME_AFTER(current_tick, last_broadcast_tick + HZ*5))
+            {
+                num_acks_to_expect = 0;
+                last_broadcast_tick = current_tick;
+            }
+
+            num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+            DEBUGF("USB inserted. Waiting for %d acks...\n",
+                   num_acks_to_expect);
+
+            /* Leave the state as USB_POWERED until the expected number of
+               ACKS are received. */
+            break;
+            /* USB_INSERTED: */
+
+        case SYS_USB_CONNECTED_ACK:
+            if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
+            {
+                DEBUGF("All threads have acknowledged the connect.\n");
+                if(usb_state == USB_POWERED)
                 {
-                    DEBUGF("All threads have acknowledged the connect.\n");
                     usb_slave_mode(true);
                     usb_state = USB_INSERTED;
                 }
-                else
-                {
-                    DEBUGF("usb: got ack, %d to go...\n",
-                           num_acks_to_expect);
-                }
+            }
+            else
+            {
+                DEBUGF("usb: got ack, %d to go...\n",
+                       num_acks_to_expect);
+            }
+            break;
+            /* SYS_USB_CONNECTED_ACK */
+
+#ifdef USB_DELAYED_INSERT
+        /* In this case, these events handle cable insertion. USB driver or
+           core determines USB_INSERTED. */
+        case USB_POWERED:
+            if(usb_state != USB_EXTRACTED)
                 break;
 
-            case USB_EXTRACTED:
-#ifdef HAVE_LCD_BITMAP
-                if(usb_state == USB_SCREENDUMP)
-                {
-                    usb_state = USB_EXTRACTED;
-                    break; /* Connected for screendump only */
-                }
-#endif
-#ifndef HAVE_USBSTACK /* Stack must undo this if POWERED state was transitional */
-#ifdef HAVE_USB_POWER
-                if(usb_state == USB_POWERED)
-                {
-                    usb_state = USB_EXTRACTED;
-                    break;
-                }
-#endif
-#endif /* HAVE_USBSTACK */
-                if(usb_state == USB_INSERTED)
-                {
-                    /* Only disable the USB mode if we really have enabled it
-                       some threads might not have acknowledged the
-                       insertion */
-                    usb_slave_mode(false);
-                }
-
-                usb_state = USB_EXTRACTED;
-#ifdef HAVE_USBSTACK
-                if(!exclusive_storage_access)
-                {
-#if !defined(USB_DETECT_BY_DRV) && !defined(USB_DETECT_BY_CORE)
-                    /* Disabled handling USB_UNPOWERED */
-                    usb_enable(false);
-#endif
-                    break;
-                }
-
-#endif /* HAVE_USBSTACK */
-                num_acks_to_expect = usb_release_exclusive_storage();
-
+            if(usb_do_screendump())
                 break;
 
-            case SYS_USB_DISCONNECTED_ACK:
-                if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
-                {
-                    DEBUGF("All threads have acknowledged. "
-                           "We're in business.\n");
-                }
-                else
-                {
-                    DEBUGF("usb: got ack, %d to go...\n",
-                           num_acks_to_expect);
-                }
+            usb_state = USB_POWERED;
+            usb_enable(true);
+            break;
+            /* USB_POWERED: */
+
+        case USB_UNPOWERED:
+            if(usb_state == USB_POWERED)
+                usb_enable(false);
+            /* Fall-through - other legal states can be USB_INSERTED or
+               USB_SCREENDUMP */
+#endif /* USB_DELAYED_INSERT */
+        case USB_EXTRACTED:
+            if(usb_state == USB_EXTRACTED)
                 break;
 
+            usb_configure_drivers(USB_EXTRACTED);
+
+            /* Only disable the USB slave mode if we really have enabled
+               it. Some expected acks may not have been received. */
+            if(usb_state == USB_INSERTED)
+                usb_slave_mode(false);
+
+            usb_state = USB_EXTRACTED;
+            break;
+            /* USB_UNPOWERED: USB_EXTRACTED: */
+
+        /*** Miscellaneous USB thread duties ***/
+
+        /* HOTSWAP */
 #ifdef HAVE_HOTSWAP
-            case SYS_HOTSWAP_INSERTED:
-            case SYS_HOTSWAP_EXTRACTED:
-#ifdef HAVE_USBSTACK
-                usb_core_hotswap_event(1,ev.id == SYS_HOTSWAP_INSERTED);
-#else  /* !HAVE_USBSTACK */
-                if(usb_state == USB_INSERTED)
-                {
+        case SYS_HOTSWAP_INSERTED:
+        case SYS_HOTSWAP_EXTRACTED:
 #if (CONFIG_STORAGE & STORAGE_MMC)
-                    usb_enable(false);
-                    usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
-#endif /* STORAGE_MMC */
-                }
-#endif /* HAVE_USBSTACK */
-                break;
+        case USB_REENABLE:
+#endif
+            usb_handle_hotswap(ev.id);
+#endif
 
-#if (CONFIG_STORAGE & STORAGE_MMC)
-            case USB_REENABLE:
-                if(usb_state == USB_INSERTED)
-                    usb_enable(true);  /* reenable only if still inserted */
-                break;
-#endif /* STORAGE_MMC */
-#endif /* HAVE_HOTSWAP */
-
+        /* FIREWIRE */
 #ifdef USB_FIREWIRE_HANDLING
-            case USB_REQUEST_REBOOT:
-#ifdef HAVE_USB_POWER
-                if (usb_reboot_button())
+        case USB_REQUEST_REBOOT:
+            if(usb_reboot_button())
+                try_reboot();
+            break;
 #endif
-                    try_reboot();
-                break;
-#endif /* USB_FIREWIRE_HANDLING */
 
+        /* CHARGING */
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
-            case USB_CHARGER_UPDATE:
-                usb_charging_maxcurrent_change(usb_charging_maxcurrent());
-                break;
+        case USB_CHARGER_UPDATE:
+            usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+            break;
 #endif
-        }
-    }
+
+        /* CLOSE */
+#ifdef USB_DRIVER_CLOSE
+        case USB_QUIT:
+            return;
+#endif
+        } /* switch */
+    } /* while */
 }
 
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
@@ -460,18 +542,13 @@ void usb_status_event(int current_status)
      * current_status:
      *   USB_DETECT_BY_DRV/CORE: USB_POWERED, USB_UNPOWERED,
                                  USB_INSERTED (driver/core)
-     *                else: USB_INSERTED, USB_EXTRACTED
+     *                     else: USB_INSERTED, USB_EXTRACTED
      */
     if(usb_monitor_enabled)
     {
         int oldstatus = disable_irq_save(); /* Dual-use function */
-
-        if(last_usb_status != current_status)
-        {
-            last_usb_status = current_status;
-            queue_post(&usb_queue, current_status, 0);
-        }
-
+        queue_remove_from_head(&usb_queue, current_status);
+        queue_post(&usb_queue, current_status, 0);
         restore_irq(oldstatus);
     }
 }
@@ -486,14 +563,14 @@ void usb_start_monitoring(void)
     /* An event may have been missed because it was sent before monitoring
      * was enabled due to the connector already having been inserted before
      * before or during boot. */
-#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
+#ifdef USB_DELAYED_INSERT
     /* Filter the status - USB_INSERTED may happen later */
     status = (status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED;
 #endif
     usb_status_event(status);
 
 #ifdef USB_FIREWIRE_HANDLING
-    if (firewire_detect())
+    if(firewire_detect())
         usb_firewire_connect_event();
 #endif
 
@@ -506,10 +583,18 @@ void usb_firewire_connect_event(void)
     queue_post(&usb_queue, USB_REQUEST_REBOOT, 0);
 }
 #endif /* USB_FIREWIRE_HANDLING */
+
 #else /* !USB_STATUS_BY_EVENT */
+
 static void usb_tick(void)
 {
-    int current_status;
+    #define NUM_POLL_READINGS (HZ/5)
+    static int usb_countdown = -1;
+    static int last_usb_status = USB_EXTRACTED;
+#ifdef USB_FIREWIRE_HANDLING
+    static int firewire_countdown = -1;
+    static int last_firewire_status = false;
+#endif    
 
     if(usb_monitor_enabled)
     {
@@ -535,23 +620,23 @@ static void usb_tick(void)
         }
 #endif /* USB_FIREWIRE_HANDLING */
 
-        current_status = usb_detect();
+        int current_status = usb_detect();
 
         /* Only report when the status has changed */
         if(current_status != last_usb_status)
         {
             last_usb_status = current_status;
-            countdown = NUM_POLL_READINGS;
+            usb_countdown = NUM_POLL_READINGS;
         }
         else
         {
             /* Count down until it gets negative */
-            if(countdown >= 0)
-                countdown--;
+            if(usb_countdown >= 0)
+                usb_countdown--;
 
             /* Report to the thread if we have had 3 identical status
                readings in a row */
-            if(countdown == 0)
+            if(usb_countdown == 0)
             {
                 queue_post(&usb_queue, current_status, 0);
             }
@@ -561,7 +646,7 @@ static void usb_tick(void)
     if(usb_mmc_countdown > 0)
     {
         usb_mmc_countdown--;
-        if (usb_mmc_countdown == 0)
+        if(usb_mmc_countdown == 0)
             queue_post(&usb_queue, USB_REENABLE, 0);
     }
 #endif
@@ -581,25 +666,8 @@ void usb_acknowledge(long id)
 
 void usb_init(void)
 {
-    /* We assume that the USB cable is extracted */
-    usb_state = USB_EXTRACTED;
-#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
-    last_usb_status = USB_UNPOWERED;
-#else
-    last_usb_status = USB_EXTRACTED;
-#endif
-    usb_monitor_enabled = false;
-
-#ifdef HAVE_USBSTACK
-    exclusive_storage_access = false;
-#endif
-
-#ifdef USB_FIREWIRE_HANDLING
-    firewire_countdown = -1;
-    last_firewire_status = false;
-#endif
-
     usb_init_device();
+
 #ifdef USB_FULL_INIT
     usb_enable(false);
 
@@ -610,7 +678,6 @@ void usb_init(void)
                        IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
 #ifndef USB_STATUS_BY_EVENT
-    countdown = -1;
     tick_add_task(usb_tick);
 #endif
 #endif /* USB_FULL_INIT */
@@ -626,14 +693,10 @@ void usb_wait_for_disconnect(struct event_queue *q)
     {
         queue_wait(q, &ev);
         if(ev.id == SYS_USB_DISCONNECTED)
-        {
-            usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
             return;
-        }
     }
-#else
-    (void)q;
 #endif /* USB_FULL_INIT */
+    (void)q;
 }
 
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
@@ -648,16 +711,14 @@ int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
         switch(ev.id)
         {
             case SYS_USB_DISCONNECTED:
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 return 0;
             case SYS_TIMEOUT:
                 return 1;
         }
     }
-#else
+#endif /* USB_FULL_INIT */
     (void)q; (void)ticks;
     return 0;
-#endif /* USB_FULL_INIT */
 }
 
 #ifdef USB_DRIVER_CLOSE
@@ -666,7 +727,7 @@ void usb_close(void)
     unsigned int thread = usb_thread_entry;
     usb_thread_entry = 0;
 
-    if (thread == 0)
+    if(thread == 0)
         return;
 
 #ifndef USB_STATUS_BY_EVENT
@@ -681,11 +742,7 @@ void usb_close(void)
 
 bool usb_inserted(void)
 {
-#ifdef HAVE_USB_POWER
     return usb_state == USB_INSERTED || usb_state == USB_POWERED;
-#else
-    return usb_state == USB_INSERTED;
-#endif
 }
 
 #ifdef HAVE_USBSTACK
@@ -693,20 +750,16 @@ bool usb_exclusive_storage(void)
 {
     return exclusive_storage_access;
 }
-#endif
+#endif /* HAVE_USBSTACK */
 
 int usb_release_exclusive_storage(void)
 {
-    int num_acks_to_expect;
-#ifdef HAVE_USBSTACK
+    int bccount;
     exclusive_storage_access = false;
-#endif /* HAVE_USBSTACK */
     /* Tell all threads that we are back in business */
-    num_acks_to_expect =
-        queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
-    DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
-           num_acks_to_expect);
-    return num_acks_to_expect;
+    bccount = queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+    DEBUGF("USB extracted. Broadcast to %d threads...\n", bccount);
+    return bccount;
 }
 
 #ifdef HAVE_USB_POWER
@@ -714,7 +767,7 @@ bool usb_powered(void)
 {
     return usb_state == USB_POWERED;
 }
-#endif
+#endif /* HAVE_USB_POWER */
 
 #ifdef USB_ENABLE_HID
 void usb_set_hid(bool enable)
@@ -722,16 +775,16 @@ void usb_set_hid(bool enable)
     usb_hid = enable;
     usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 }
-#endif
+#endif /* USB_ENABLE_HID */
 
-#else
+#else /* SIMULATOR || USB_NONE */
 
 #ifdef USB_NONE
 bool usb_inserted(void)
 {
     return false;
 }
-#endif
+#endif /* USB_NONE */
 
 /* Dummy simulator functions */
 void usb_acknowledge(long id)
@@ -757,4 +810,4 @@ void usb_wait_for_disconnect(struct event_queue *q)
    (void)q;
 }
 
-#endif /* USB_NONE or SIMULATOR */
+#endif /* !USB_NONE && !SIMULATOR */

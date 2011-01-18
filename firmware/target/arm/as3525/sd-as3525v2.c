@@ -700,9 +700,6 @@ static void sd_thread(void)
             usb_wait_for_disconnect(&sd_queue);
 
             break;
-        case SYS_USB_DISCONNECTED:
-            usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
-            break;
         }
     }
 }

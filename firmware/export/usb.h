@@ -33,10 +33,7 @@
 enum {
     USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
-#if defined(HAVE_USB_POWER) || defined(USB_DETECT_BY_DRV) || \
-    defined(USB_DETECT_BY_CORE)
-    USB_POWERED,             /* Event+State */
-#endif
+    USB_POWERED,             /* Event+State - transitional indicator if no power */
 #if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
     USB_UNPOWERED,           /* Event */
 #endif

@@ -303,7 +303,7 @@ void display_logf(void) /* Doesn't return! */
         if(button == SYS_USB_CONNECTED)
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
         else if(button == SYS_USB_DISCONNECTED)
-            usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+            ;
         else if(button & LOGF_UP)
             user_index++;
         else if(button & LOGF_DOWN)

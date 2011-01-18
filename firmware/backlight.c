@@ -577,10 +577,6 @@ void backlight_thread(void)
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 break;
 
-            case SYS_USB_DISCONNECTED:
-                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
-                break;
-
 #ifdef BACKLIGHT_DRIVER_CLOSE
             /* Get out of here */
             case BACKLIGHT_QUIT:

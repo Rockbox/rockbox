@@ -426,7 +426,6 @@ static void thread(void)
                 break;
             case SYS_USB_DISCONNECTED:
                 in_usb_mode = false;
-                rb->usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 break;
             case SYS_POWEROFF:
                 exit_reason = "power off";
