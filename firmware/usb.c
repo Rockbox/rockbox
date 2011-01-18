@@ -80,9 +80,9 @@ static int usb_mmc_countdown = 0;
 static long usb_stack[(DEFAULT_STACK_SIZE + SECTOR_SIZE + DUMP_BMP_LINESIZE)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
+static bool usb_monitor_enabled = false;
 #endif /* USB_FULL_INIT */
 static struct event_queue usb_queue;
-static bool usb_monitor_enabled = false;
 static bool exclusive_storage_access = false;
 #ifdef USB_ENABLE_HID
 static bool usb_hid = true;
@@ -140,6 +140,21 @@ static inline bool usb_do_screendump(void)
 
 
 #ifdef HAVE_USBSTACK
+
+#ifdef HAVE_HOTSWAP
+static inline void usb_handle_hotswap(long id)
+{
+    switch(id)
+    {
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        usb_core_hotswap_event(1, id == SYS_HOTSWAP_INSERTED);
+        break;
+    }
+    /* Note: No MMC storage handling is needed with the stack atm. */
+}
+#endif /* HAVE_HOTSWAP */
+
 static inline bool usb_configure_drivers(int for_state)
 {
     switch(for_state)
@@ -224,21 +239,6 @@ static inline void usb_slave_mode(bool on)
         cancel_cpu_boost();
     }
 }
-
-#ifdef HAVE_HOTSWAP
-static inline void usb_handle_hotswap(long id)
-{
-    switch(id)
-    {
-    case SYS_HOTSWAP_INSERTED:
-    case SYS_HOTSWAP_EXTRACTED:
-        usb_core_hotswap_event(1, id == SYS_HOTSWAP_INSERTED);
-        break;
-    }
-    /* Note: No MMC storage handling is needed with the stack atm. */
-}
-#endif /* HAVE_HOTSWAP */
-
 #else /* !USB_ROCKBOX_USB */
 static inline void usb_slave_mode(bool on)
 {
@@ -258,6 +258,30 @@ void usb_signal_transfer_completion(
 }
 
 #else  /* !HAVE_USBSTACK */
+
+#ifdef HAVE_HOTSWAP
+static inline void usb_handle_hotswap(long id)
+{
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    switch(id)
+    {
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        if(usb_state == USB_INSERTED)
+        {
+            usb_enable(false);
+            usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
+        }
+        break;
+    case USB_REENABLE:
+        if(usb_state == USB_INSERTED)
+            usb_enable(true);  /* reenable only if still inserted */
+        break;
+    }
+#endif /* STORAGE_MMC */
+    (void)id;
+}
+#endif /* HAVE_HOTSWAP */
 
 static inline bool usb_configure_drivers(int for_state)
 {
@@ -312,30 +336,6 @@ static inline void usb_slave_mode(bool on)
             panicf("mount: %d",rc);
     }
 }
-
-#ifdef HAVE_HOTSWAP
-static inline void usb_handle_hotswap(long id)
-{
-#if (CONFIG_STORAGE & STORAGE_MMC)
-    switch(id)
-    {
-    case SYS_HOTSWAP_INSERTED:
-    case SYS_HOTSWAP_EXTRACTED:
-        if(usb_state == USB_INSERTED)
-        {
-            usb_enable(false);
-            usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
-        }
-        break;
-    case USB_REENABLE:
-        if(usb_state == USB_INSERTED)
-            usb_enable(true);  /* reenable only if still inserted */
-        break;
-    }
-#endif /* STORAGE_MMC */
-    (void)id;
-}
-#endif /* HAVE_HOTSWAP */
 #endif /* HAVE_USBSTACK */
 
 #ifdef HAVE_USB_POWER
