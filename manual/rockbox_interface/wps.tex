@@ -128,10 +128,11 @@ your WPS (While Playing Screen).
 	           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsPitchScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
-         & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
+          & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
       }%
       \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{%
-        \ActionWpsPlaylist 
+        \ActionWpsPlaylist
+        \opt{HAVEREMOTEKEYMAP}{&}
           & Show current \setting{Playlist}.\\%
       }%
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
