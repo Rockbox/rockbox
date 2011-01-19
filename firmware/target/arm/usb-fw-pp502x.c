@@ -188,6 +188,8 @@ void usb_enable(bool on)
         usb_core_exit();
 #ifndef BOOTLOADER
         /* Disable USB devices */
+        DEV_RS |= (DEV_USB0 | DEV_USB1);
+        DEV_RS &= ~(DEV_USB0 | DEV_USB1);
         DEV_EN &=~ DEV_USB0;
         DEV_EN &=~ DEV_USB1;
         DEV_INIT2 &=~ INIT_USB;
