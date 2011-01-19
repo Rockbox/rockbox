@@ -48,9 +48,9 @@
 #define SPC_DUAL_CORE 0
 #endif
 
-/* TGB is the only target fast enough for gaussian and realtime BRR decode */
-/* echo is almost fast enough but not quite */
-#if defined(TOSHIBA_GIGABEAT_F) || defined(TOSHIBA_GIGABEAT_S) ||\
+/* Only some targets are fast enough for gaussian and realtime BRR decode */
+#if CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || \
+    CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2 || \
     (CONFIG_PLATFORM & PLATFORM_HOSTED) || MEMORYSIZE <= 2
     /* Don't cache BRR waves */
     #define SPC_BRRCACHE 0 
