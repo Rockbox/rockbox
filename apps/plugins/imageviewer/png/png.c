@@ -194,39 +194,26 @@ static int load_image(char *filename, struct image_info *info,
     }
 
     if (p_decoder->error) {
-#ifdef USE_PLUG_BUF
-        if (iv->plug_buf && (p_decoder->error == FILE_TOO_LARGE ||
-            p_decoder->error == OUT_OF_MEMORY ||
-            p_decoder->error == TINF_DATA_ERROR))
+        if (p_decoder->error == FILE_TOO_LARGE ||
+            p_decoder->error == OUT_OF_MEMORY)
+        {
             return PLUGIN_OUTOFMEM;
-#endif
+        }
 
-        if (p_decoder->error >= PNG_ERROR_MIN && 
-            p_decoder->error <= PNG_ERROR_MAX &&
-            LodePNG_perror(p_decoder) != NULL) 
+        if (LodePNG_perror(p_decoder) != NULL)
         {
             rb->splash(HZ, LodePNG_perror(p_decoder));
         }
+        else if (p_decoder->error == TINF_DATA_ERROR)
+        {
+            rb->splash(HZ, "Zlib decompressor error");
+        }
         else
         {
-            switch (p_decoder->error) {
-            case PLUGIN_ABORT:
-                break;
-            case OUT_OF_MEMORY:
-                rb->splash(HZ, "Out of Memory");break;
-            case FILE_TOO_LARGE:
-                rb->splash(HZ, "File too large");break;
-            case TINF_DATA_ERROR:
-                rb->splash(HZ, "Zlib decompressor error");break;
-            default:
-                rb->splashf(HZ, "other error : %ld", p_decoder->error);break;
-            }
+            rb->splashf(HZ, "other error : %ld", p_decoder->error);
         }
 
-        if (p_decoder->error == PLUGIN_ABORT)
-            return PLUGIN_ABORT;
-        else
-            return PLUGIN_ERROR;
+        return PLUGIN_ERROR;
     }
 
     info->x_size = p_decoder->infoPng.width;

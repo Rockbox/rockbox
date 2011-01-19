@@ -18,7 +18,7 @@ OTHER_SRC += $(PNG_SRC)
 ROCKS += $(PNGBUILDDIR)/png.ovl
 
 $(PNGBUILDDIR)/png.refmap: $(PNG_OBJ)
-$(PNGBUILDDIR)/png.link: $(PNG_OBJ) $(PNGBUILDDIR)/png.refmap
+$(PNGBUILDDIR)/png.link: $(PLUGIN_LDS) $(PNGBUILDDIR)/png.refmap
 $(PNGBUILDDIR)/png.ovl: $(PNG_OBJ)
 
 # Use -O3 for png plugin : it gives a bigger file but very good performances

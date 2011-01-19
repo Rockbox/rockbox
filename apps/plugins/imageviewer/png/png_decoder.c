@@ -2189,5 +2189,8 @@ void LodePNG_Decoder_init(LodePNG_Decoder* decoder,
 
 const char* LodePNG_perror(LodePNG_Decoder *decoder)
 {
-    return png_error_messages[decoder->error-PNG_ERROR_MIN];
+    if (decoder->error >= PNG_ERROR_MIN && decoder->error <= PNG_ERROR_MAX)
+        return png_error_messages[decoder->error-PNG_ERROR_MIN];
+    else
+        return NULL;
 }
