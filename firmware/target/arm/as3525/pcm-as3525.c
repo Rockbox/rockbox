@@ -35,9 +35,11 @@
                                       * and the number of 32bits words has to
                                       * fit in 11 bits of DMA register */
 
-static void *dma_start_addr;
-static size_t      dma_size;   /* in 4*32 bits */
-static size_t      play_sub_size;  /* size of subtransfer */
+static void *dma_start_addr;    /* Pointer to callback buffer */
+static size_t dma_start_size;   /* Size of callback buffer */
+static void *dma_sub_addr;      /* Pointer to sub buffer */
+static size_t dma_rem_size;     /* Remaining size - in 4*32 bits */
+static size_t play_sub_size;    /* size of current subtransfer */
 static void dma_callback(void);
 static int locked = 0;
 static bool is_playing = false;
@@ -66,23 +68,22 @@ void pcm_play_unlock(void)
 
 static void play_start_pcm(void)
 {
-    const unsigned char* addr = dma_start_addr;
-    size_t size = dma_size;
+    const void *addr = dma_sub_addr;
+    size_t size = dma_rem_size;
     if(size > MAX_TRANSFER)
         size = MAX_TRANSFER;
 
     play_sub_size = size;
 
-    clean_dcache_range((void*)addr, size);  /* force write back */
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
-                DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2, DMA_S1,
-                dma_callback);
+                DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2,
+                DMA_S1, dma_callback);
 }
 
 static void dma_callback(void)
 {
-    dma_size -= play_sub_size;
-    dma_start_addr += play_sub_size;
+    dma_sub_addr += play_sub_size;
+    dma_rem_size -= play_sub_size;
     play_sub_size = 0; /* Might get called again if locked */
 
     if(locked)
@@ -91,12 +92,18 @@ static void dma_callback(void)
         return;
     }
 
-    if(!dma_size)
+    if(!dma_rem_size)
     {
-        pcm_play_get_more_callback(&dma_start_addr, &dma_size);
+        pcm_play_get_more_callback(&dma_start_addr, &dma_start_size);
 
-        if (!dma_size)
+        if (!dma_start_size)
             return;
+
+        dma_sub_addr = dma_start_addr;
+        dma_rem_size = dma_start_size;
+
+        /* force writeback */
+        clean_dcache_range(dma_start_addr, dma_start_size);
     }
 
     play_start_pcm();
@@ -104,8 +111,10 @@ static void dma_callback(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_size = size;
-    dma_start_addr = (unsigned char*)addr;
+    dma_start_addr = (void*)addr;
+    dma_start_size = size;
+    dma_sub_addr = dma_start_addr;
+    dma_rem_size = size;
 
     bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
     CGU_AUDIO |= (1<<11);
@@ -114,6 +123,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     is_playing = true;
 
+    /* force writeback */
+    clean_dcache_range(dma_start_addr, dma_start_size);
     play_start_pcm();
 }
 
@@ -121,7 +132,12 @@ void pcm_play_dma_stop(void)
 {
     is_playing = false;
     dma_disable_channel(1);
-    dma_size = 0;
+
+    /* Ensure byte counts read back 0 */
+    DMAC_CH_SRC_ADDR(1) = 0;
+    dma_start_addr = NULL;
+    dma_start_size = 0;
+    dma_rem_size = 0;
 
     dma_release();
 
@@ -133,15 +149,21 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_dma_pause(bool pause)
 {
+    is_playing = !pause;
+
     if(pause)
     {
-        is_playing = false;
-        dma_disable_channel(1);
-        play_callback_pending = false;
+        dma_pause_channel(1);
+
+        /* if producer's buffer finished, upper layer starts anew */
+        if (dma_rem_size == 0)
+            play_callback_pending = false;
     }
     else
     {
-        play_start_pcm();
+        if (play_sub_size != 0)
+            dma_resume_channel(1);
+        /* else unlock calls the callback if sub buffers remain */
     }
 }
 
@@ -194,16 +216,25 @@ void pcm_dma_apply_settings(void)
 
 size_t pcm_get_bytes_waiting(void)
 {
-    return dma_size;
+    int oldstatus = disable_irq_save();
+    size_t addr = DMAC_CH_SRC_ADDR(1);
+    size_t start_addr = (size_t)dma_start_addr;
+    size_t start_size = dma_start_size;
+    restore_interrupt(oldstatus);
+
+    return start_size - addr + start_addr;
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    pcm_play_lock();
-    void *addr = (void*)DMAC_CH_SRC_ADDR(1);
-    *count = (dma_size - (addr - dma_start_addr)) >> 2;
-    pcm_play_unlock();
-    return AS3525_UNCACHED_ADDR(addr);
+    int oldstatus = disable_irq_save();
+    size_t addr = DMAC_CH_SRC_ADDR(1);
+    size_t start_addr = (size_t)dma_start_addr;
+    size_t start_size = dma_start_size;
+    restore_interrupt(oldstatus);
+
+    *count = (start_size - addr + start_addr) >> 2;
+    return (void*)AS3525_UNCACHED_ADDR(addr);
 }
 
 #ifdef HAVE_PCM_DMA_ADDRESS

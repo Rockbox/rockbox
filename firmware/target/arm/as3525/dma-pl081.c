@@ -33,7 +33,7 @@ void dma_retain(void)
     if(++dma_used == 1)
     {
         bitset32(&CGU_PERI, CGU_DMA_CLOCK_ENABLE);
-        DMAC_CONFIGURATION |= (1<<0);
+        bitset32(&DMAC_CONFIGURATION, 1<<0);
     }
 }
 
@@ -41,7 +41,7 @@ void dma_release(void)
 {
     if(--dma_used == 0)
     {
-        DMAC_CONFIGURATION &= ~(1<<0);
+        bitclr32(&DMAC_CONFIGURATION, 1<<0);
         bitclr32(&CGU_PERI, CGU_DMA_CLOCK_ENABLE);
     }
     if (dma_used < 0)
@@ -56,10 +56,32 @@ void dma_init(void)
     VIC_INT_ENABLE = INTERRUPT_DMAC;
 }
 
-void dma_disable_channel(int channel)
+void dma_pause_channel(int channel)
 {
-    DMAC_CH_CONFIGURATION(channel) &= ~(1<<0);
+    /* Disable the channel - clears the FIFO after sending last word */
+    bitclr32(&DMAC_CH_CONFIGURATION(channel), 1<<0);
+    /* Wait for it to go inactive */
+    while (DMAC_CH_CONFIGURATION(channel) & (1<<17));
 }
+
+void dma_resume_channel(int channel)
+{
+    /* Resume - must reinit to where it left off (so the docs say) */
+    unsigned long control = DMAC_CH_CONTROL(channel);
+    if ((control & 0x7ff) == 0)
+        return; /* empty */
+
+    DMAC_INT_TC_CLEAR = (1<<channel);
+    DMAC_INT_ERR_CLEAR = (1<<channel);
+    DMAC_CH_SRC_ADDR(channel) = DMAC_CH_SRC_ADDR(channel);
+    DMAC_CH_DST_ADDR(channel) = DMAC_CH_DST_ADDR(channel);
+    DMAC_CH_LLI(channel) = DMAC_CH_LLI(channel);
+    DMAC_CH_CONTROL(channel) = control;
+    bitset32(&DMAC_CH_CONFIGURATION(channel), (1<<0));
+}
+
+void dma_disable_channel(int channel) \
+    __attribute__((alias("dma_pause_channel")));
 
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
