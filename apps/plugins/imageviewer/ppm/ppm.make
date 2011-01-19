@@ -18,12 +18,10 @@ OTHER_SRC += $(PPM_SRC)
 ROCKS += $(PPMBUILDDIR)/ppm.ovl
 
 $(PPMBUILDDIR)/ppm.refmap: $(PPM_OBJ)
-$(PPMBUILDDIR)/ppm.link: $(PPM_OBJ) $(PPMBUILDDIR)/ppm.refmap
+$(PPMBUILDDIR)/ppm.link: $(PLUGIN_LDS) $(PPMBUILDDIR)/ppm.refmap
 $(PPMBUILDDIR)/ppm.ovl: $(PPM_OBJ)
 
-PPMFLAGS = $(IMGDECFLAGS) -Os
-
-# Compile PPM plugin with extra flags (adapted from ZXBox)
+# special pattern rule for compiling image decoder with extra flags
 $(PPMBUILDDIR)/%.o: $(PPMSRCDIR)/%.c $(PPMSRCDIR)/ppm.make
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PPMFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(IMGDECFLAGS) -c $< -o $@

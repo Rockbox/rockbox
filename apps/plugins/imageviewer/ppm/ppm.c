@@ -106,11 +106,6 @@ static int load_image(char *filename, struct image_info *info,
     if (!iv->running_slideshow)
     {
         rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_update();
-    }
-
-    if (!iv->running_slideshow)
-    {
         rb->lcd_putsf(0, 1, "loading %zu bytes", file_size);
         rb->lcd_update();
     }
@@ -130,14 +125,11 @@ static int load_image(char *filename, struct image_info *info,
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
     time = *rb->current_tick - time;
 
-    /* close file descriptor */
     rb->close(fd);
 
-    /* check return value from decoder */
-    if ( rc == PLUGIN_ERROR )
+    if (rc != PLUGIN_OK)
     {
-        rb->splashf(HZ, "ppm decoder error");
-        return PLUGIN_ERROR;
+        return rc;
     }
 
     if (!iv->running_slideshow)
