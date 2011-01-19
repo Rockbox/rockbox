@@ -84,6 +84,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
+#define AB_REPEAT_ENABLE
+
 /* Define this if you have a SI4700 fm radio tuner */
 #define CONFIG_TUNER SI4700
 
