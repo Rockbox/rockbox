@@ -32,7 +32,8 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
 {
     SDL_Rect dest;
 #if LCD_DEPTH >= 8 && (LCD_PIXELFORMAT == RGB565) \
-    && !defined(LCD_STRIDEFORMAT) && !defined(HAVE_LCD_SPLIT)
+    && !defined(LCD_STRIDEFORMAT) && !defined(HAVE_LCD_SPLIT) \
+    && !defined(HAVE_REMOTE_LCD)
     SDL_Rect src;
     (void)max_x;
     (void)max_y;
