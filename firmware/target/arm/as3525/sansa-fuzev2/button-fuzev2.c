@@ -213,9 +213,9 @@ void button_gpioa_isr(void)
  */
 int button_read_device(void)
 {
-    int btn = 0;
     static long power_counter = 0;
     bool hold = false;
+    int btn;
     unsigned gpiod6;
 
     /* if we don't wait for the fifo to empty, we'll see screen corruption
@@ -240,28 +240,16 @@ int button_read_device(void)
     GPIOB_PIN(0) = 0;
     udelay(2);
 
-    if (GPIOC_PIN(1) & 1<<1)
-        btn |= BUTTON_DOWN;
-    if (GPIOC_PIN(2) & 1<<2)
-        btn |= BUTTON_UP;
-    if (GPIOC_PIN(3) & 1<<3)
-        btn |= BUTTON_LEFT;
-    if (GPIOC_PIN(4) & 1<<4)
-        btn |= BUTTON_SELECT;
-    if (GPIOC_PIN(5) & 1<<5)
-        btn |= BUTTON_RIGHT;
-    if (GPIOB_PIN(1) & 1<<1)
-        btn |= BUTTON_HOME;
+    btn = GPIOC_PIN_MASK(0x3e) | (GPIOB_PIN(1) >> 1);
+
     if (amsv2_variant == 1)
         btn ^= BUTTON_HOME;
 
-    if (gpiod6 & 1<<6)
+    if (gpiod6)
     {   /* power/hold is on the same pin. we know it's hold if the bit isn't
          * set now anymore */
-        if (GPIOD_PIN(6) & 1<<6)
-            btn |= BUTTON_POWER;
-        else
-            hold = true;
+        btn |= GPIOD_PIN(6);
+        hold = !(btn & BUTTON_POWER);
     }
 
     if(gpiob_pin0_dir)

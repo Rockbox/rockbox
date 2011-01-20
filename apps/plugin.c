@@ -382,6 +382,7 @@ static const struct plugin_api rockbox_api = {
     file_exists,
     strip_extension,
     crc_32,
+    filetype_get_attr,
 
     /* dir */
     (opendir_func)PREFIX(opendir),
@@ -391,6 +392,10 @@ static const struct plugin_api rockbox_api = {
     PREFIX(rmdir),
     dir_exists,
     dir_get_info,
+
+    /* browsing */
+    browse_context_init,
+    rockbox_browse,
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -772,9 +777,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    filetype_get_attr,
-    browse_context_init,
-    rockbox_browse,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

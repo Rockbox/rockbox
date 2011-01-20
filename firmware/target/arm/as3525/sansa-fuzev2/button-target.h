@@ -32,15 +32,14 @@ bool button_hold(void);
 int button_read_device(void);
 /* Sandisk Sansa Fuze button codes */
 
-/* Main unit's buttons */
+/* Main unit's buttons - mapped for optimal reading */
 #define BUTTON_HOME         0x00000001
-
 #define BUTTON_DOWN         0x00000002
-#define BUTTON_RIGHT        0x00000004
-
+#define BUTTON_UP           0x00000004
 #define BUTTON_LEFT         0x00000008
 #define BUTTON_SELECT       0x00000010
-#define BUTTON_UP           0x00000020
+#define BUTTON_RIGHT        0x00000020
+
 #define BUTTON_POWER        0x00000040
 
 #define BUTTON_SCROLL_BACK  0x00000080

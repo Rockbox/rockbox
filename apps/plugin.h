@@ -149,12 +149,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 197
+#define PLUGIN_API_VERSION 198
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 196
+#define PLUGIN_MIN_API_VERSION 198
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -448,6 +448,9 @@ struct plugin_api {
     char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
     unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
 
+    int (*filetype_get_attr)(const char* file);
+
+
 
     /* dir */
     DIR* (*opendir)(const char* name);
@@ -457,6 +460,13 @@ struct plugin_api {
     int (*rmdir)(const char *name);
     bool (*dir_exists)(const char *path);
     struct dirinfo (*dir_get_info)(DIR* parent, struct dirent *entry);
+
+    /* browsing */
+    void (*browse_context_init)(struct browse_context *browse,
+                                int dirfilter, unsigned flags,
+                                char *title, enum themable_icons icon,
+                                const char *root, const char *selected);
+    int (*rockbox_browse)(struct browse_context *browse);
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -901,12 +911,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    int (*filetype_get_attr)(const char* file);
-    void (*browse_context_init)(struct browse_context *browse,
-                                int dirfilter, unsigned flags,
-                                char *title, enum themable_icons icon,
-                                const char *root, const char *selected);
-    int (*rockbox_browse)(struct browse_context *browse);
 };
 
 /* plugin header */
