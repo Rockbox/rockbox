@@ -196,22 +196,17 @@ void button_init_device(void)
 #endif
 }
 
-    /* read the 2 bits at the same time */
-#define GPIOA_PIN76_offset ((1<<(6+2)) | (1<<(7+2)))
-#define GPIOA_PIN76 (*(volatile unsigned char*)(GPIOA_BASE+GPIOA_PIN76_offset))
-
 void button_gpioa_isr(void)
 {
 #if defined(HAVE_SCROLLWHEEL)
     /* scroll wheel handling */
     if (GPIOA_MIS & SCROLLWHEEL_BITS)
-        scrollwheel(GPIOA_PIN76 >> 6);
+        scrollwheel(GPIOA_PIN_MASK(0xc0) >> 6);
 
     /* ack interrupt */
     GPIOA_IC = SCROLLWHEEL_BITS;
 #endif
 }
-
 
 /*
  * Get button pressed from hardware
@@ -219,8 +214,8 @@ void button_gpioa_isr(void)
 int button_read_device(void)
 {
     int btn = 0;
-    static bool hold_button_old = false;
     static long power_counter = 0;
+    bool hold = false;
     unsigned gpiod6;
 
     /* if we don't wait for the fifo to empty, we'll see screen corruption
@@ -264,14 +259,9 @@ int button_read_device(void)
     {   /* power/hold is on the same pin. we know it's hold if the bit isn't
          * set now anymore */
         if (GPIOD_PIN(6) & 1<<6)
-        {
-            hold_button = false;
             btn |= BUTTON_POWER;
-        }
         else
-        {
-            hold_button = true;
-        }
+            hold = true;
     }
 
     if(gpiob_pin0_dir)
@@ -283,21 +273,21 @@ int button_read_device(void)
 #ifdef HAS_BUTTON_HOLD
 #ifndef BOOTLOADER
     /* light handling */
-    if (hold_button != hold_button_old)
+    if (hold != hold_button)
     {
-        hold_button_old = hold_button;
-        backlight_hold_changed(hold_button);
+        hold_button = hold;
+        backlight_hold_changed(hold);
         /* mask scrollwheel irq so we don't need to check for
          * the hold button in the isr */
-        if (hold_button)
+        if (hold)
             GPIOA_IE &= ~SCROLLWHEEL_BITS;
         else
             GPIOA_IE |= SCROLLWHEEL_BITS;
     }
 #else
-    (void)hold_button_old;
-#endif
-    if (hold_button)
+    hold_button = hold;
+#endif /* BOOTLOADER */
+    if (hold)
     {
         power_counter = HZ;
         return 0;
@@ -311,7 +301,7 @@ int button_read_device(void)
         power_counter--;
         btn &= ~BUTTON_POWER;
     }
-#endif
+#endif /* HAS_BUTTON_HOLD */
     return btn;
 }
 

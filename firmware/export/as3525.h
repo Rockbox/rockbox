@@ -343,7 +343,6 @@ CE lines
 
 
 /* GPIO registers */
-
 #define GPIOA_DIR       (*(volatile unsigned char*)(GPIOA_BASE+0x400))
 #define GPIOA_IS        (*(volatile unsigned char*)(GPIOA_BASE+0x404))
 #define GPIOA_IBE       (*(volatile unsigned char*)(GPIOA_BASE+0x408))
@@ -354,6 +353,7 @@ CE lines
 #define GPIOA_IC        (*(volatile unsigned char*)(GPIOA_BASE+0x41C))
 #define GPIOA_AFSEL     (*(volatile unsigned char*)(GPIOA_BASE+0x420))
 #define GPIOA_PIN(a)    (*(volatile unsigned char*)(GPIOA_BASE+(1<<((a)+2))))
+#define GPIOA_PIN_MASK(m) (*(volatile unsigned char *)(GPIOA_BASE+(((m)&0xff)<<2)))
 #define GPIOA_DATA      (*(volatile unsigned char*)(GPIOA_BASE+(0xff<<2)))
 
 
@@ -367,6 +367,7 @@ CE lines
 #define GPIOB_IC        (*(volatile unsigned char*)(GPIOB_BASE+0x41C))
 #define GPIOB_AFSEL     (*(volatile unsigned char*)(GPIOB_BASE+0x420))
 #define GPIOB_PIN(a)    (*(volatile unsigned char*)(GPIOB_BASE+(1<<((a)+2))))
+#define GPIOB_PIN_MASK(m) (*(volatile unsigned char *)(GPIOB_BASE+(((m)&0xff)<<2)))
 #define GPIOB_DATA      (*(volatile unsigned char*)(GPIOB_BASE+(0xff<<2)))
 
 #define GPIOC_DIR       (*(volatile unsigned char*)(GPIOC_BASE+0x400))
@@ -379,6 +380,7 @@ CE lines
 #define GPIOC_IC        (*(volatile unsigned char*)(GPIOC_BASE+0x41C))
 #define GPIOC_AFSEL     (*(volatile unsigned char*)(GPIOC_BASE+0x420))
 #define GPIOC_PIN(a)    (*(volatile unsigned char*)(GPIOC_BASE+(1<<((a)+2))))
+#define GPIOC_PIN_MASK(m) (*(volatile unsigned char *)(GPIOC_BASE+(((m)&0xff)<<2)))
 #define GPIOC_DATA      (*(volatile unsigned char*)(GPIOC_BASE+(0xff<<2)))
 
 #define GPIOD_DIR       (*(volatile unsigned char*)(GPIOD_BASE+0x400))
@@ -391,6 +393,7 @@ CE lines
 #define GPIOD_IC        (*(volatile unsigned char*)(GPIOD_BASE+0x41C))
 #define GPIOD_AFSEL     (*(volatile unsigned char*)(GPIOD_BASE+0x420))
 #define GPIOD_PIN(a)    (*(volatile unsigned char*)(GPIOD_BASE+(1<<((a)+2))))
+#define GPIOD_PIN_MASK(m) (*(volatile unsigned char *)(GPIOD_BASE+(((m)&0xff)<<2)))
 #define GPIOD_DATA      (*(volatile unsigned char*)(GPIOD_BASE+(0xff<<2)))
 
 /* ARM PL172 Memory Controller registers */
