@@ -106,19 +106,7 @@
 #define USB_GPIO_INT_CLR     GPIO_INT_CLR(USB_GPIO)
 #define USB_GPIO_HI_INT_MASK GPIO_HI_INT_MASK(USB_GPIO)
 
-/* Enable raw status pin read only - not interrupt */
-void usb_pin_init(void)
-{
-    GPIO_CLEAR_BITWISE(USB_GPIO_OUTPUT_EN, USB_GPIO_MASK);
-    GPIO_SET_BITWISE(USB_GPIO_ENABLE, USB_GPIO_MASK);
-#ifdef USB_FIREWIRE_HANDLING
-    /* GPIO C bit 1 is firewire detect */
-    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_EN, 0x02);
-    GPIO_SET_BITWISE(GPIOC_ENABLE, 0x02);
-#endif
-}
-
-void usb_init_device(void)
+static void usb_reset_controller(void)
 {
     /* enable usb module */
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
@@ -139,9 +127,6 @@ void usb_init_device(void)
     udelay(100000);
     XMB_RAM_CFG |= 0x47A;
 
-    /* Do one-time inits */
-    usb_drv_startup();
-
     /* disable USB-devices until USB is detected via GPIO */
 #ifndef BOOTLOADER
     /* Disabling USB0 in the bootloader makes the OF not load,
@@ -151,6 +136,26 @@ void usb_init_device(void)
     DEV_EN &= ~DEV_USB1;
     DEV_INIT2 &= ~INIT_USB;
 #endif
+}
+
+/* Enable raw status pin read only - not interrupt */
+void usb_pin_init(void)
+{
+    GPIO_CLEAR_BITWISE(USB_GPIO_OUTPUT_EN, USB_GPIO_MASK);
+    GPIO_SET_BITWISE(USB_GPIO_ENABLE, USB_GPIO_MASK);
+#ifdef USB_FIREWIRE_HANDLING
+    /* GPIO C bit 1 is firewire detect */
+    GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_EN, 0x02);
+    GPIO_SET_BITWISE(GPIOC_ENABLE, 0x02);
+#endif
+}
+
+void usb_init_device(void)
+{
+    usb_reset_controller();
+
+    /* Do one-time inits (no dependency on controller) */
+    usb_drv_startup();
 
     usb_pin_init();
 
@@ -186,14 +191,8 @@ void usb_enable(bool on)
     }
     else {
         usb_core_exit();
-#ifndef BOOTLOADER
         /* Disable USB devices */
-        DEV_RS |= (DEV_USB0 | DEV_USB1);
-        DEV_RS &= ~(DEV_USB0 | DEV_USB1);
-        DEV_EN &=~ DEV_USB0;
-        DEV_EN &=~ DEV_USB1;
-        DEV_INIT2 &=~ INIT_USB;
-#endif
+        usb_reset_controller();
     }
 }
 
