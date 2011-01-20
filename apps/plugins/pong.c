@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/helper.h"
 
 #define PAD_HEIGHT LCD_HEIGHT / 6    /* Recorder: 10   iRiver: 21 */
 #define PAD_WIDTH LCD_WIDTH / 50     /* Recorder: 2    iRiver: 2  */
@@ -28,8 +29,10 @@
 
 #define SPEEDX ( LCD_WIDTH * 3 ) / 2 /* Recorder: 168  iRiver: 240 */
 #define SPEEDY LCD_HEIGHT * 2        /* Recorder: 128  iRiver: 256 */
-#define CPU_PLAYER_DIST ( (LCD_WIDTH/8 ) * 5 ) /*        This is the width of the dead spot where the         */
-#define DEM_PLAYER_DIST ( (LCD_WIDTH/8 ) * 3 ) /* cpu player doesnt care about the ball -- 3/8 of the screen  */
+/* This is the width of the dead spot where the
+ * cpu player doesnt care about the ball -- 3/8 of the screen */
+#define CPU_PLAYER_RIGHT_DIST   ( (LCD_WIDTH/8 ) * 5 )
+#define CPU_PLAYER_LEFT_DIST    ( (LCD_WIDTH/8 ) * 3 )
 
 #define RES 100
 
@@ -258,15 +261,24 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 #endif
 
+struct player {
+    int xpos;  /* X position of pad */
+    int w_pad; /* wanted current Y position of pad */
+    int e_pad; /* existing current Y position of pad */
+    int score;
+    bool iscpu; /* Status of AI player */
+};
+
+struct ball {
+    int x; /* current X*RES position of the ball */
+    int y; /* current Y*RES position of the ball */
+    int speedx; /*  */
+    int speedy; /*  */
+};
+
 struct pong {
-    int ballx; /* current X*RES position of the ball */
-    int bally; /* current Y*RES position of the ball */
-    int w_pad[2]; /* wanted current Y positions of pads */
-    int e_pad[2]; /* existing current Y positions of pads */
-    int ballspeedx; /*  */
-    int ballspeedy; /*  */
-    int score[2];
-    bool cpu_player[2]; /* Status of AI players */
+    struct ball ball;
+    struct player player[2];
 };
 
 void singlepad(int x, int y, int set)
@@ -281,17 +293,17 @@ void singlepad(int x, int y, int set)
     }
 }
 
-static int xpos[2]={0, LCD_WIDTH-PAD_WIDTH};
 void pad(struct pong *p, int pad)
 {
+    struct player *player = &p->player[pad];
     /* clear existing pad */
-    singlepad(xpos[pad], p->e_pad[pad], 0);
+    singlepad(player->xpos, player->e_pad, 0);
 
     /* draw wanted pad */
-    singlepad(xpos[pad], p->w_pad[pad], 1);
+    singlepad(player->xpos, player->w_pad, 1);
 
     /* existing is now the wanted */
-    p->e_pad[pad] = p->w_pad[pad];
+    player->e_pad = player->w_pad;
 }
 
 bool wallcollide(struct pong *p, int pad)
@@ -300,11 +312,11 @@ bool wallcollide(struct pong *p, int pad)
        the wall */
     if(pad) {
         /* right-side */
-        if(p->ballx > ( LCD_WIDTH*RES ) - PAD_WIDTH )
+        if(p->ball.x > ( LCD_WIDTH*RES ) - PAD_WIDTH )
             return true;
     }
     else {
-        if(p->ballx < PAD_WIDTH)
+        if(p->ball.x + ( BALL_WIDTH*RES ) < PAD_WIDTH )
             return true;
     }
     return false;
@@ -315,11 +327,12 @@ bool wallcollide(struct pong *p, int pad)
 
 bool padcollide(struct pong *p, int pad, int *info)
 {
-    int x = p->ballx/RES;
-    int y = p->bally/RES;
+    struct player *player = &p->player[pad];
+    int x = p->ball.x/RES;
+    int y = p->ball.y/RES;
 
-    if((y < (p->e_pad[pad]+PAD_HEIGHT)) &&
-       (y + BALL_HEIGHT > p->e_pad[pad])) {
+    if((y < (player->e_pad+PAD_HEIGHT)) &&
+       (y + BALL_HEIGHT > player->e_pad)) {
         /* Y seems likely right */
 
         /* store the delta between ball-middle MINUS pad-middle, so
@@ -331,7 +344,7 @@ bool padcollide(struct pong *p, int pad, int *info)
            max number is +- PAD_HEIGHT/2
         */
 
-        *info = (y+BALL_HEIGHT/2) - (p->e_pad[pad] + PAD_HEIGHT/2);
+        *info = (y+BALL_HEIGHT/2) - (player->e_pad + PAD_HEIGHT/2);
 
         if(pad) {
             /* right-side */
@@ -348,43 +361,45 @@ bool padcollide(struct pong *p, int pad, int *info)
 
 void bounce(struct pong *p, int pad, int info)
 {
-    p->ballspeedx = -p->ballspeedx;
+    p->ball.speedx = -p->ball.speedx;
 
-    if(pad==0) {      /* Give ball a little push to keep it from getting stuck between wall and pad */
-        p->ballx += PAD_WIDTH;
+    /* Give ball a little push to keep it from getting stuck between wall and pad */
+    if(pad) {
+        /* right side */
+        p->ball.x -= PAD_WIDTH*RES/4;
     }
     else {
-        p->ballx -= PAD_WIDTH;
+        p->ball.x += PAD_WIDTH*RES/4;
     }
 
     /* info is the hit-angle into the pad */
-    if(p->ballspeedy > 0) {
+    if(p->ball.speedy > 0) {
         /* downwards */
         if(info > 0) {
             /* below the middle of the pad */
-            p->ballspeedy += info * RES/3;
+            p->ball.speedy += info * RES/3;
         }
         else if(info < 0) {
             /* above the middle */
-            p->ballspeedy = info * RES/2;
+            p->ball.speedy = info * RES/2;
         }
     }
     else {
         /* upwards */
         if(info > 0) {
             /* below the middle of the pad */
-            p->ballspeedy = info * RES/2;
+            p->ball.speedy = info * RES/2;
         }
         else if(info < 0) {
             /* above the middle */
-            p->ballspeedy -= info * RES/3;
+            p->ball.speedy += info * RES/3;
         }
     }
 
-    p->ballspeedy += rb->rand()%21-10;
+    p->ball.speedy += rb->rand()%21-10;
 
 #if 0
-    fprintf(stderr, "INFO: %d YSPEED: %d\n", info, p->ballspeedy);
+    fprintf(stderr, "INFO: %d YSPEED: %d\n", info, p->ball.speedy);
 #endif
 }
 
@@ -395,29 +410,29 @@ void score(struct pong *p, int pad)
     else
         rb->splash(HZ/4, "left scores!");
     rb->lcd_clear_display();
-    p->score[pad]++;
+    p->player[pad].score++;
 
     /* then move the X-speed of the ball and give it a random Y position */
-    p->ballspeedx = -p->ballspeedx;
-    p->bally = rb->rand()%(LCD_HEIGHT*RES - BALL_HEIGHT);
+    p->ball.speedx = -p->ball.speedx;
+    p->ball.y = rb->rand()%((LCD_HEIGHT-BALL_HEIGHT)*RES);
 
     /* avoid hitting the pad with the new ball */
-    p->ballx = (p->ballx < 0) ?
+    p->ball.x = (p->ball.x < 0) ?
         (RES * PAD_WIDTH) : (RES * (LCD_WIDTH - PAD_WIDTH - BALL_WIDTH));
 
     /* restore Y-speed to default */
-    p->ballspeedy = (p->ballspeedy > 0) ? SPEEDY : -SPEEDY;
+    p->ball.speedy = (p->ball.speedy > 0) ? SPEEDY : -SPEEDY;
 
     /* set the existing pad positions to something weird to force pad
        updates */
-    p->e_pad[0] = -1;
-    p->e_pad[1] = -1;
+    p->player[0].e_pad = -1;
+    p->player[1].e_pad = -1;
 }
 
 void ball(struct pong *p)
 {
-    int x = p->ballx/RES;
-    int y = p->bally/RES;
+    int oldx = p->ball.x/RES;
+    int oldy = p->ball.y/RES;
 
     int newx;
     int newy;
@@ -425,24 +440,22 @@ void ball(struct pong *p)
     int info;
 
     /* movement */
-    p->ballx += p->ballspeedx;
-    p->bally += p->ballspeedy;
+    p->ball.x += p->ball.speedx;
+    p->ball.y += p->ball.speedy;
 
-    newx = p->ballx/RES;
-    newy = p->bally/RES;
+    newx = p->ball.x/RES;
+    newy = p->ball.y/RES;
 
     /* detect if ball hits a wall */
     if(newy + BALL_HEIGHT > LCD_HEIGHT) {
         /* hit floor, bounce */
-        p->ballspeedy = -p->ballspeedy;
-        newy = LCD_HEIGHT - BALL_HEIGHT;
-        p->bally = newy * RES;
+        p->ball.speedy = -p->ball.speedy;
+        p->ball.y = (LCD_HEIGHT - BALL_HEIGHT) * RES;
     }
     else if(newy < 0) {
         /* hit ceiling, bounce */
-        p->ballspeedy = -p->ballspeedy;
-        p->bally = 0;
-        newy = 0;
+        p->ball.speedy = -p->ball.speedy;
+        p->ball.y = 0;
     }
 
     /* detect if ball hit pads */
@@ -455,12 +468,12 @@ void ball(struct pong *p)
     else if(wallcollide(p, 1))
         score(p, 0);
 
-        newx = p->ballx/RES;
-        newy = p->bally/RES;
+    newx = p->ball.x/RES;
+    newy = p->ball.y/RES;
 
     /* clear old position */
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(x, y, BALL_WIDTH, BALL_HEIGHT);
+    rb->lcd_fillrect(oldx, oldy, BALL_WIDTH, BALL_HEIGHT);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* draw the new ball position */
@@ -474,6 +487,36 @@ void padmove(int *pos, int dir)
         *pos = (LCD_HEIGHT-PAD_HEIGHT);
     else if(*pos < 0)
         *pos = 0;
+}
+
+void key_pad(struct pong *p, int pad, int up, int down)
+{
+    struct player *player = &p->player[pad];
+    if(player->iscpu) {
+        if((pad && (p->ball.x/RES > CPU_PLAYER_RIGHT_DIST)) /* cpu right */
+            || (!pad && (p->ball.x/RES < CPU_PLAYER_LEFT_DIST)) /* cpu left */)
+        {
+            if(p->ball.y/RES > player->w_pad) /* player goes down */
+                padmove(&player->w_pad, MOVE_STEP);
+
+            if(p->ball.y/RES < player->w_pad) /* player goes up */
+                padmove(&player->w_pad, -MOVE_STEP);
+        }
+
+        if(down || up) {
+            /* if player presses control keys stop cpu player */
+            player->iscpu = false;
+            p->player[0].score = p->player[1].score = 0; /* reset the score */
+            rb->lcd_clear_display(); /* get rid of the text */
+        }
+    }
+    else {
+        if(down) /* player goes down */
+            padmove(&player->w_pad, MOVE_STEP);
+
+        if(up)   /* player goes up */
+            padmove(&player->w_pad, -MOVE_STEP);
+    }
 }
 
 int keys(struct pong *p)
@@ -499,19 +542,39 @@ int keys(struct pong *p)
         short touch_x, touch_y;
         if(key & BUTTON_TOUCHSCREEN)
         {
+            struct player *player;
             touch_x = rb->button_get_data() >> 16;
             touch_y = rb->button_get_data() & 0xFFFF;
-            if(touch_x >= xpos[0] && touch_x <= xpos[0]+(PAD_WIDTH*4))
-                padmove(&p->w_pad[0], touch_y-(p->e_pad[0]*2+PAD_HEIGHT)/2);
 
-            if(touch_x >= xpos[1]-(PAD_WIDTH*4) && touch_x <= xpos[1])
-                padmove(&p->w_pad[1], touch_y-(p->e_pad[1]*2+PAD_HEIGHT)/2);
+            player = &p->player[0];
+            if(touch_x >= player->xpos && touch_x <= player->xpos+(PAD_WIDTH*4))
+            {
+                padmove(&player->w_pad, touch_y-(player->e_pad*2+PAD_HEIGHT)/2);
+                if (player->iscpu) {
+                    /* if left player presses control keys stop cpu player */
+                    player->iscpu = false;
+                    p->player[0].score = p->player[1].score = 0; /* reset the score */
+                    rb->lcd_clear_display(); /* get rid of the text */
+                }
+            }
+
+            player = &p->player[1];
+            if(touch_x >= player->xpos-(PAD_WIDTH*4) && touch_x <= player->xpos)
+            {
+                padmove(&player->w_pad, touch_y-(player->e_pad*2+PAD_HEIGHT)/2);
+                if (player->iscpu) {
+                    /* if right player presses control keys stop cpu player */
+                    player->iscpu = false;
+                    p->player[0].score = p->player[1].score = 0; /* reset the score */
+                    rb->lcd_clear_display(); /* get rid of the text */
+                }
+            }
         }
 #endif
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
-        return 2; /* Pause game */
+            return 2; /* Pause game */
 #endif
 
         if(key & PONG_QUIT
@@ -530,53 +593,8 @@ int keys(struct pong *p)
 
         key = rb->button_status(); /* ignore BUTTON_REPEAT */
 
-        if(p->cpu_player[1] == true) {
-            if( (p->bally/RES > p->w_pad[0])
-                & (p->ballx/RES < DEM_PLAYER_DIST) ) /* player right goes down */
-                padmove(&p->w_pad[0], MOVE_STEP);
-
-            if( (p->bally/RES < p->w_pad[0])
-                & (p->ballx/RES < DEM_PLAYER_DIST) ) /* player right goes up */
-                padmove(&p->w_pad[0], -MOVE_STEP);
-
-            if( (key & PONG_LEFT_DOWN) || (key & PONG_LEFT_UP) ) {
-                /* if left player presses control keys stop cpu player */
-                p->cpu_player[1] = false;
-                p->score[0] = p->score[1] = 0; /* reset the score */
-                rb->lcd_clear_display(); /* get rid of the text */
-            }
-        }
-        else {
-            if(key & PONG_LEFT_DOWN) /* player left goes down */
-                padmove(&p->w_pad[0], MOVE_STEP);
-
-            if(key & PONG_LEFT_UP)   /* player left goes up */
-                padmove(&p->w_pad[0], -MOVE_STEP);
-        }
-
-        if(p->cpu_player[2] == true) {
-            if( (p->bally/RES > p->w_pad[1])
-                & (p->ballx/RES > CPU_PLAYER_DIST) ) /* player right goes down */
-                padmove(&p->w_pad[1], MOVE_STEP);
-
-            if( (p->bally/RES < p->w_pad[1])
-                & (p->ballx/RES > CPU_PLAYER_DIST) ) /* player right goes up */
-                padmove(&p->w_pad[1], -MOVE_STEP);
-
-            if( (key & PONG_RIGHT_DOWN) || (key & PONG_RIGHT_UP) ) {
-                /* if right player presses control keys stop cpu player */
-                p->cpu_player[2] = false;
-                p->score[0] = p->score[1] = 0; /* reset the score */
-                rb->lcd_clear_display(); /* get rid of the text */
-            }
-        }
-        else {
-            if(key & PONG_RIGHT_DOWN) /* player right goes down */
-                padmove(&p->w_pad[1], MOVE_STEP);
-
-            if(key & PONG_RIGHT_UP)   /* player right goes up */
-                padmove(&p->w_pad[1], -MOVE_STEP);
-        }
+        key_pad(p, 0, (key & PONG_LEFT_UP), (key & PONG_LEFT_DOWN));
+        key_pad(p, 1, (key & PONG_RIGHT_UP), (key & PONG_RIGHT_DOWN));
 
         if(rb->default_event_handler(key) == SYS_USB_CONNECTED)
             return -1; /* exit game because of USB */
@@ -589,7 +607,8 @@ void showscore(struct pong *p)
     static char buffer[20];
     int w;
 
-    rb->snprintf(buffer, sizeof(buffer), "%d - %d", p->score[0], p->score[1]);
+    rb->snprintf(buffer, sizeof(buffer), "%d - %d",
+        p->player[0].score, p->player[1].score);
     w = rb->lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
     rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, (unsigned char *)buffer);
 }
@@ -618,24 +637,29 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* init the struct with some silly values to start with */
 
-    pong.ballx = 20*RES;
-    pong.bally = 20*RES;
+    pong.ball.x = 20*RES;
+    pong.ball.y = 20*RES;
+    pong.ball.speedx = SPEEDX;
+    pong.ball.speedy = SPEEDY;
 
-    pong.e_pad[0] = 0;
-    pong.w_pad[0] = 7;
-    pong.e_pad[1] = 0;
-    pong.w_pad[1] = 40;
-    pong.cpu_player[1] = pong.cpu_player[2] = true;  /* start every game in demo mode */
+    pong.player[0].xpos = 0;
+    pong.player[0].e_pad = 0;
+    pong.player[0].w_pad = 7;
+    pong.player[1].xpos = LCD_WIDTH-PAD_WIDTH;
+    pong.player[1].e_pad = 0;
+    pong.player[1].w_pad = 40;
 
-    pong.ballspeedx = SPEEDX;
-    pong.ballspeedy = SPEEDY;
+    /* start every game in demo mode */
+    pong.player[0].iscpu = pong.player[1].iscpu = true;
 
-    pong.score[0] = pong.score[1] = 0; /* lets start at 0 - 0 ;-) */
+    pong.player[0].score = pong.player[1].score = 0; /* lets start at 0 - 0 ;-) */
 
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;
 
+    /* Turn off backlight timeout */
+    backlight_force_on();
     /* Clear screen */
     rb->lcd_clear_display();
 
@@ -648,7 +672,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->lcd_clear_display();
         }
 
-        if( (pong.cpu_player[1]==true) && (pong.cpu_player[2]==true) ) {
+        if( pong.player[0].iscpu && pong.player[1].iscpu ) {
             if(blink_timer<blink_rate) {
                 ++blink_timer;
             }
@@ -675,5 +699,7 @@ enum plugin_status plugin_start(const void* parameter)
         game = keys(&pong); /* deal with keys */
     }
 
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings();
     return (game == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
