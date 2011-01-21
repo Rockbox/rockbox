@@ -39,7 +39,7 @@ do {                                    \
 #define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("nop\n nop\n"); }
 #define DELAY    SLEEP(700000);
 
-#if (defined((ONDA_VX777) || (ONDA_VX747P)) && !defined(BOOTLOADER)) \
+#if ((defined(ONDA_VX777) || defined(ONDA_VX747P)) && !defined(BOOTLOADER)) \
     || defined(USB_BOOT)
  /*
   * Onda VX777/VX747+ needs this in order to boot correctly, it looks like the
