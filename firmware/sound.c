@@ -477,10 +477,14 @@ int sound_enum_hw_eq_band_setting(unsigned int band,
 
 static void sound_set_hw_eq_band_gain(unsigned int band, int value)
 {
+    int setting;
+
     if(!audio_is_initialized)
         return;
 
-    current_eq_band_gain[band] = value;
+    setting = sound_enum_hw_eq_band_setting(band, AUDIOHW_EQ_GAIN);
+    current_eq_band_gain[band] = sound_val2phys(setting + 0x10000, value);
+
     audiohw_set_eq_band_gain(band, value);
     set_prescaled_volume();
 }

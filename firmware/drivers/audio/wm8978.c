@@ -217,6 +217,14 @@ int sound_val2phys(int setting, int value)
         break;
 #endif
 
+    case SOUND_EQ_BAND1_GAIN+0x10000:
+    case SOUND_EQ_BAND2_GAIN+0x10000:
+    case SOUND_EQ_BAND3_GAIN+0x10000:
+    case SOUND_EQ_BAND4_GAIN+0x10000:
+    case SOUND_EQ_BAND5_GAIN+0x10000:
+        result = value * 10;
+        break;
+
     case SOUND_DEPTH_3D:
         result = (100 * value + 8) / 15;
         break;
@@ -330,7 +338,7 @@ static void sync_prescaler(void)
 
     /* Combine all prescaling into a single DAC attenuation */
     if (wmc_vol.eq_on)
-        prescaler = wmc_vol.prescaler * 2;
+        prescaler = wmc_vol.prescaler;
 
     if (wmc_vol.enh_3d_on)
         prescaler += wmc_vol.enh_3d_prescaler;
@@ -460,7 +468,7 @@ void audiohw_set_eq_band_width(unsigned int band, int val)
  * gain to EQ bands. */
 void audiohw_set_prescaler(int val)
 {
-    wmc_vol.prescaler = val;
+    wmc_vol.prescaler = val / 5; /* centibels->semi-decibels */
     sync_prescaler();
 }
 
