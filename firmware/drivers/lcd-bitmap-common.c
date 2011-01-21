@@ -470,8 +470,10 @@ void LCDFN(scroll_fn)(void)
         }
         else {
             /* scroll forward the whole time */
-            if (s->offset >= s->width)
-                s->offset %= s->width;
+            if (s->offset >= s->width) {
+                s->offset = 0;
+                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
+            }
         }
         LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, s->width,
                                pf->height, s->offset);

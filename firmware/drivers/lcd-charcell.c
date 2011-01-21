@@ -605,8 +605,10 @@ void lcd_scroll_fn(void)
         }
         else    /* scroll forward the whole time */
         {
-            if (s->offset >= s->len)
-                s->offset -= s->len;
+            if (s->offset >= s->len) {
+                s->offset = 0;
+                s->start_tick = current_tick + lcd_scroll_info.delay * 2;
+            }
         }
 
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
