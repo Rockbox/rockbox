@@ -298,7 +298,7 @@ remap_end:
 #endif
 
     /* Make memory coherent for devices */
-    bl      clean_dcache
+    bl      cpucache_commit_discard
 
     bl      main
 
@@ -351,9 +351,13 @@ data_abort_handler:
     b      UIE
 
 /* 256 words of IRQ stack */
-    .space 256*4
+    .section .bss
+    .balign  32
+    .space   256*4
 irq_stack:
 
 /* 256 words of FIQ stack */
-    .space 256*4
+    .section .bss
+    .balign  32
+    .space   256*4
 fiq_stack:

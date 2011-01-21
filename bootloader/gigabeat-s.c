@@ -30,6 +30,7 @@
 #include "dir.h"
 #include "disk.h"
 #include "common.h"
+#include "power.h"
 #include "backlight.h"
 #include "usb.h"
 #include "button.h"
@@ -37,6 +38,9 @@
 #include "lcd.h"
 #include "usb-target.h"
 #include "version.h"
+
+/* Show the Rockbox logo - in show_logo.c */
+extern int show_logo(void);
 
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157
@@ -51,67 +55,44 @@ static void * const load_buf = 0x00000000;
 static const size_t load_buf_size = 0x20000000 - 0x100000;
 static const void * const start_addr = 0x00000000;
 
-static void show_splash(int timeout, const char *msg)
+/* Show a message + "Shutting down...", then power off the device */
+static void display_message_and_power_off(int timeout, const char *msg)
 {
-    backlight_on();
-    reset_screen();
-    lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
-                (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
-    lcd_update();
-
+    verbose = true;
+    printf(msg);
+    printf("Shutting down...");
     sleep(timeout);
+    power_off();
 }
 
-static bool pause_if_button_pressed(bool pre_usb)
+static void check_battery_safe(void)
 {
-    while (1)
-    {
-        int button = button_read_device();
+    if (battery_level_safe())
+        return;
 
-        if (pre_usb && !usb_plugged())
-            return false;
-
-        /* Exit if no button or only select buttons that have other
-         * functions */
-        switch (button)
-        {
-        case USB_BL_INSTALL_MODE_BTN:
-            if (!pre_usb)
-                break;    /* Only before USB detect */
-        case BUTTON_MENU: /* Settings reset */
-        case BUTTON_NONE: /* Nothing pressed */
-            return true;
-        }
-
-        sleep(HZ/5);
-
-        /* If the disk powers off, the firmware will lock at startup */
-        storage_spin();
-    }
+    display_message_and_power_off(HZ, "Battery low");
 }
 
 /* TODO: Handle charging while connected */
-static void handle_usb(void)
+static void handle_usb(int connect_timeout)
 {
+    long end_tick = 0;
     int button;
-
-    /* Check if plugged and pause to look at messages. If the cable was pulled
-     * while waiting, proceed as if it never was plugged. */
-    if (!usb_plugged() || !pause_if_button_pressed(true))
-        return;
-
-    /** Enter USB mode **/
 
     /* We need full button and backlight handling now */
     backlight_init();
     button_init();
+    backlight_on();
 
     /* Start the USB driver */
     usb_init();
     usb_start_monitoring();
 
     /* Wait for threads to connect or cable is pulled */
-    show_splash(HZ/2, "Waiting for USB");
+    printf("USB: Connecting");
+
+    if (connect_timeout != TIMEOUT_BLOCK)
+        end_tick = current_tick + connect_timeout;
 
     while (1)
     {
@@ -120,35 +101,47 @@ static void handle_usb(void)
         if (button == SYS_USB_CONNECTED)
             break; /* Hit */
 
+        if (connect_timeout != TIMEOUT_BLOCK &&
+            TIME_AFTER(current_tick, end_tick))
+        {
+            /* Timed out waiting for the connect - will happen when connected
+             * to a charger through the USB port */
+            printf("USB: Timed out");
+            break;
+        }
+
         if (!usb_plugged())
             break; /* Cable pulled */
     }
 
     if (button == SYS_USB_CONNECTED)
     {
+        /* Switch to verbose mode if not in it so that the status updates
+         * are shown */
+        verbose = true;
         /* Got the message - wait for disconnect */
-        show_splash(0, "Bootloader USB mode");
+        printf("Bootloader USB mode");
 
         usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
         while (1)
         {
-            button = button_get(true);
+            button = button_get_w_tmo(HZ/2);
             if (button == SYS_USB_DISCONNECTED)
                 break;
+
+            check_battery_safe();
         }
+
+        backlight_on();
+        /* Sleep a little to let the backlight ramp up */
+        sleep(HZ*5/4);
     }
 
     /* Put drivers initialized for USB connection into a known state */
-    backlight_on();
     usb_close();
     button_close();
     backlight_close();
-
-    /* Sleep a little to let the backlight ramp up */
-    sleep(HZ*5/4);
-
-    reset_screen();
 }
 
 static void untar(int tar_fd)
@@ -265,6 +258,7 @@ static void handle_untar(void)
             model[4] = 0;
             if (strcmp(model, "gigs") == 0)
             {
+                verbose = true;
                 printf("Found rockbox binary. Moving...");
                 close(fd);
                 remove( BOOTDIR "/" BOOTFILE);
@@ -283,6 +277,7 @@ static void handle_untar(void)
             tarstring[5] = 0;
             if (strcmp(tarstring, "ustar") == 0)
             {
+                verbose = true;
                 printf("Found tar file. Unarchiving...");
                 lseek(fd, 0, SEEK_SET);
                 untar(fd);
@@ -300,14 +295,27 @@ static void handle_untar(void)
 /* Try to load the firmware and run it */
 static void NORETURN_ATTR handle_firmware_load(void)
 {
-    int rc = load_firmware(load_buf, BOOTFILE,
-                           load_buf_size);
+    int rc = load_firmware(load_buf, BOOTFILE, load_buf_size);
 
     if(rc < 0)
         error(EBOOTFILE, rc, true);
 
     /* Pause to look at messages */
-    pause_if_button_pressed(false);
+    while (1)
+    {
+        int button = button_read_device();
+
+        /* Ignore settings reset */
+        if (button == BUTTON_NONE || button == BUTTON_MENU)
+            break;
+
+        sleep(HZ/5);
+
+        check_battery_safe();
+
+        /* If the disk powers off, the firmware will lock at startup */
+        storage_spin();
+    }
 
     /* Put drivers into a known state */
     button_close_device();
@@ -316,7 +324,7 @@ static void NORETURN_ATTR handle_firmware_load(void)
 
     if (rc == EOK)
     {
-        cpucache_invalidate();
+        cpucache_commit_discard();
         asm volatile ("bx %0": : "r"(start_addr));
     }
 
@@ -325,58 +333,55 @@ static void NORETURN_ATTR handle_firmware_load(void)
         core_idle();
 }
 
-static void check_battery(void)
-{
-    int batt = battery_adc_voltage();
-    printf("Battery: %d.%03d V", batt / 1000, batt % 1000);
-    /* TODO: warn on low battery or shut down */
-}
-
 void main(void)
 {
     int rc;
-
-    /* Flush and invalidate all caches (because vectors were written) */
-    cpucache_invalidate();
+    int batt;
 
     system_init();
     kernel_init();
 
     enable_interrupt(IRQ_FIQ_STATUS);
 
-    lcd_init_device();
+    /* Keep button_device_init early to delay calls to button_read_device */
+    button_init_device();
+
+    lcd_init();
+    font_init();
+    show_logo();
     lcd_clear_display();
+
+    if (button_hold())
+        display_message_and_power_off(HZ, "Hold switch on");
+
+    if (button_read_device() != BUTTON_NONE)
+        verbose = true;
 
     printf("Gigabeat S Rockbox Bootloader");
     printf("Version " RBVERSION);
 
-    /* Initialize KPP so we can poll the button states */
-    button_init_device();
-
     adc_init();
-
-    check_battery();
+    batt = battery_adc_voltage();
+    printf("Battery: %d.%03d V", batt / 1000, batt % 1000);
+    check_battery_safe();
 
     rc = storage_init();
     if(rc)
-    {
-        reset_screen();
         error(EATA, rc, true);
-    }
 
     disk_init();
 
     rc = disk_mount_all();
-    if (rc<=0)
-    {
+    if (rc <= 0)
         error(EDISK, rc, true);
-    }
 
     printf("Init complete");
 
     /* Do USB first since a tar or binary could be added to the MTP directory
      * at the time and we can untar or move after unplugging. */
-    handle_usb();
+    if (usb_plugged())
+        handle_usb(HZ*2);
+
     handle_untar();
     handle_firmware_load(); /* No return */
 }
