@@ -747,25 +747,74 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         {
         case 'd':
             /* %xd */
-            id = "";
-            id.append(element->params[0].data.text[0]);
-            c = element->params[0].data.text[1];
 
-            if(c == '\0')
+            /* Breaking up into cases, getting the id first */
+            if(element->params_count == 1)
             {
-                tile = 1;
+                /* The old fashioned style */
+                id = "";
+                id.append(element->params[0].data.text[0]);
             }
             else
             {
-                if(isupper(c))
-                    tile = c - 'A' + 25;
-                else
-                    tile = c - 'a';
+                id = QString(element->params[0].data.text);
             }
+
 
             if(info.screen()->getImage(id))
             {
+                /* Fetching the image if available */
                 image = new RBImage(*(info.screen()->getImage(id)), viewport);
+            }
+            else
+            {
+                image = 0;
+            }
+
+            /* Now determining the particular tile to load */
+            if(element->params_count == 1)
+            {
+                c = element->params[0].data.text[1];
+
+                if(c == '\0')
+                {
+                    tile = 1;
+                }
+                else
+                {
+                    if(isupper(c))
+                        tile = c - 'A' + 25;
+                    else
+                        tile = c - 'a';
+                }
+
+            }else{
+                /* If the next param is just an int, use it as the tile */
+                if(element->params[1].type == skin_tag_parameter::INTEGER)
+                {
+                    tile = element->params[1].data.number - 1;
+                }
+                else
+                {
+                    tile = children[1]->evalTag(info, true,
+                                                image->numTiles()).toInt();
+
+                    /* Adding the offset if there is one */
+                    if(element->params_count == 3)
+                        tile += element->params[2].data.number;
+                    if(tile < 0)
+                    {
+                        /* If there is no image for the current status, then
+                         * just refrain from showing anything
+                         */
+                        delete image;
+                        return true;
+                    }
+                }
+            }
+
+            if(image)
+            {
                 image->setTile(tile);
                 image->show();
                 image->enableMovement();

@@ -47,6 +47,11 @@ public:
             currentTile = tiles -1;
     }
 
+    int numTiles()
+    {
+        return tiles;
+    }
+
     void enableMovement()
     {
         setFlag(ItemSendsGeometryChanges, true);
