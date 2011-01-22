@@ -372,7 +372,7 @@ static int chessclock_set_int(char* string,
 
 static char * show_time(int secs);
 
-static bool pause;
+static bool chesspause;
 
 #define MAX_TIME 7200
 
@@ -436,7 +436,7 @@ enum plugin_status plugin_start(const void* parameter)
         timer_holder[i].hidden=false;
     }
 
-    pause=true; /* We start paused */
+    chesspause=true; /* We start paused */
 
     nr=0;
     do {
@@ -511,7 +511,7 @@ static int run_timer(int nr)
     long ticks=0;
     bool round_time=false;
 
-    show_pause_mode(pause);
+    show_pause_mode(chesspause);
 
     if (settings.round_time*HZ<max_ticks) {
         max_ticks=settings.round_time*HZ;
@@ -533,7 +533,7 @@ static int run_timer(int nr)
             ticks = max_ticks;
         } else {
             now=*rb->current_tick;
-            if (!pause) {
+            if (!chesspause) {
                 ticks+=now-last_tick;
                 if ((max_ticks-ticks)/HZ == 10) {
                      /* Backlight on if 10 seconds remain */
@@ -565,8 +565,8 @@ static int run_timer(int nr)
 
             /* PLAY = Stop/Start toggle */
             case CHC_STARTSTOP:
-                pause=!pause;
-                show_pause_mode(pause);
+                chesspause=!chesspause;
+                show_pause_mode(chesspause);
                 break;
 
             /* LEFT = Reset timer */
@@ -633,7 +633,7 @@ static int run_timer(int nr)
                         break;
                 }
                 rb->lcd_clear_display();
-                show_pause_mode(pause);
+                show_pause_mode(chesspause);
                 rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
             }
             break;
