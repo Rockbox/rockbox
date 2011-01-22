@@ -44,6 +44,16 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 static bool lcd_on = true;
 static bool lcd_powered = true;
 static unsigned lcd_yuv_options = 0;
+/* Settings shadow regs */
+#ifdef HAVE_LCD_CONTRAST
+static uint8_t reg0x0b = 0x2f;
+#endif
+#ifdef HAVE_LCD_INVERT
+static uint8_t reg0x27 = 0x00;
+#endif
+#ifdef HAVE_LCD_FLIP
+static uint8_t reg0x06 = 0x04;
+#endif
 
 #if 0
 /* Initialization data from OF bootloader. Identical to Gigabeat F/X. */
@@ -64,12 +74,12 @@ static const unsigned char lcd_init_data[50] =
     0x00, 0x03,
     0x01, 0x10,
     0x02, 0x0a,
-    0x06, 0x04, /* Set the orientation 2=upside down, 4=normal */
+    0x06, 0x04, /* Set the orientation 0x02=upside down, 0x04=normal */
     0x08, 0x2e,
     0x24, 0x12,
     0x25, 0x3f,
     0x26, 0x0b,
-    0x27, 0x00,
+    0x27, 0x00, /* Invert display 0x00=normal, 0x10=inverted */
     0x28, 0x00,
     0x29, 0xf6,
     0x2a, 0x03,
@@ -80,7 +90,7 @@ static const unsigned char lcd_init_data[50] =
 
 static const struct spi_node lcd_spi_node =
 {
-    /* Original firmware settings for LCD panel commication */
+    /* Original firmware settings for LCD panel communication */
     CSPI3_NUM,                      /* CSPI module 3 */
     CSPI_CONREG_CHIP_SELECT_SS1 |   /* Chip select 1 */
     CSPI_CONREG_DRCTL_DONT_CARE |   /* Don't care about CSPI_RDY */
@@ -146,6 +156,19 @@ static void lcd_set_power(bool powered)
     }
 }
 
+static void lcd_sync_settings(void)
+{
+#ifdef HAVE_LCD_CONTRAST
+    lcd_write_reg(0x0b, reg0x0b);
+#endif
+#ifdef HAVE_LCD_INVERT
+    lcd_write_reg(0x27, reg0x27);
+#endif
+#ifdef HAVE_LCD_FLIP
+    lcd_write_reg(0x06, reg0x06);
+#endif
+}
+
 /* LCD init */
 void INIT_ATTR lcd_init_device(void)
 {
@@ -158,15 +181,7 @@ void INIT_ATTR lcd_init_device(void)
     IPU_IPU_IMA_DATA = FRAME_PHYS_ADDR;
 
     lcd_enable_interface(true);
-#ifdef HAVE_LCD_CONTRAST
-    lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
-#endif
-#ifdef HAVE_LCD_INVERT
-    lcd_set_invert_display(false);
-#endif
-#ifdef HAVE_LCD_FLIP
-    lcd_set_flip(false);
-#endif
+    lcd_sync_settings();
 }
 
 /* Update a fraction of the display. */
@@ -191,8 +206,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
-    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
-     * and lcd_framebuffer */
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
     src = &lcd_framebuffer[y][x];
 
@@ -230,6 +243,7 @@ void lcd_enable(bool state)
         if (!lcd_powered)
             lcd_set_power(true);
         IPU_IDMAC_CHA_EN |= 1ul << MAIN_LCD_IDMAC_CHANNEL;
+        lcd_sync_settings();
         sleep(HZ/50);
         lcd_on = true;
         lcd_update();
@@ -330,10 +344,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
 #ifdef HAVE_LCD_CONTRAST
 void lcd_set_contrast(int val)
 {
+    reg0x0b = val & 0x3f;
+
     if (!lcd_on)
         return;
 
-    lcd_write_reg(0x0b, val);
+    lcd_write_reg(0x0b, reg0x0b);
 }
 
 int lcd_default_contrast(void)
@@ -345,19 +361,23 @@ int lcd_default_contrast(void)
 #ifdef HAVE_LCD_INVERT
 void lcd_set_invert_display(bool yesno)
 {
+    reg0x27 = yesno ? 0x10 : 0x00;
+
     if (!lcd_on)
         return;
 
-    lcd_write_reg(0x27, yesno ? 0x10 : 00);
+    lcd_write_reg(0x27, reg0x27);
 }
 #endif /* HAVE_LCD_INVERT */
 
 #ifdef HAVE_LCD_FLIP
 void lcd_set_flip(bool yesno)
 {
+    reg0x06 = yesno ? 0x02 : 0x04;
+
     if (!lcd_on)
         return;
 
-    lcd_write_reg(0x06, yesno ? 0x02 : 0x04);
+    lcd_write_reg(0x06, reg0x06);
 }
 #endif /* HAVE_LCD_FLIP */
