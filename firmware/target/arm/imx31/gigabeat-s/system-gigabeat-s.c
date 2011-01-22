@@ -97,10 +97,10 @@ void gpt_start(void)
     while (GPTCR & GPTCR_SWR);
     /* No output
      * No capture
-     * Enable in run mode only (doesn't tick while in WFI)
+     * Enable in wait and run mode
      * Freerun mode (count to 0xFFFFFFFF and roll-over to 0x00000000)
      */
-    GPTCR = GPTCR_FRR | GPTCR_CLKSRC_IPG_CLK;
+    GPTCR = GPTCR_FRR | GPTCR_WAITEN | GPTCR_CLKSRC_IPG_CLK;
     GPTPR = ipg_mhz - 1;
     GPTCR |= GPTCR_EN;
 }

@@ -201,6 +201,7 @@ static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
 
+#ifndef ATA_TARGET_POLLING
 STATICIRAM ICODE_ATTR int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
@@ -235,6 +236,12 @@ STATICIRAM ICODE_ATTR int wait_for_rdy(void)
 
     return 0; /* timeout */
 }
+#else
+extern int ata_wait_for_bsy(void);
+extern int ata_wait_for_rdy(void);
+#define wait_for_bsy    ata_wait_for_bsy
+#define wait_for_rdy    ata_wait_for_rdy
+#endif
 
 STATICIRAM ICODE_ATTR int wait_for_start_of_transfer(void)
 {

@@ -53,4 +53,6 @@ bool ata_is_coldstart(void);
 #define ATA_SET_DEVICE_FEATURES
 void ata_set_pio_timings(int mode);
 
+#define ATA_TARGET_POLLING
+
 #endif /* ATA_TARGET_H */

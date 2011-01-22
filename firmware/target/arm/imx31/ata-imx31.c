@@ -26,6 +26,7 @@
 #include "power.h"
 #include "panic.h"
 #include "ata.h"
+#include "ata-defines.h"
 #include "ata-target.h"
 #include "ccm-imx31.h"
 #ifdef HAVE_ATA_DMA
@@ -459,6 +460,7 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write)
          * shouldn't be reached based upon size. Otherwise we simply didn't
          * understand the DMA mode setup. Force PIO in both cases. */
         ATA_INTF_CONTROL = ATA_FIFO_RST | ATA_ATA_RST;
+        yield();
         return false;
     }
 
@@ -644,6 +646,43 @@ bool ata_dma_finish(void)
     return true;
 }
 #endif /* HAVE_ATA_DMA */
+
+static int ata_wait_status(unsigned status, unsigned mask, int timeout)
+{
+    long busy_timeout = usec_timer() + 2;
+    long end_tick = current_tick + timeout;
+    
+    while (1)
+    {
+        if ((ATA_DRIVE_STATUS & mask) == status)
+            return 1;
+
+        if (!TIME_AFTER(usec_timer(), busy_timeout))
+            continue;
+
+        ata_keep_active();
+
+        if (TIME_AFTER(current_tick, end_tick))
+            break;
+
+        sleep(0);
+        busy_timeout = usec_timer() + 2;
+    }
+
+    return 0; /* timed out */
+}
+
+int ata_wait_for_bsy(void)
+{
+    /* BSY = 0 */
+    return ata_wait_status(0, STATUS_BSY, 30*HZ);
+}
+
+int ata_wait_for_rdy(void)
+{
+    /* RDY = 1 && BSY = 0 */
+    return ata_wait_status(STATUS_RDY, STATUS_RDY | STATUS_BSY, 40*HZ);
+}
 
 void ata_device_init(void)
 {
