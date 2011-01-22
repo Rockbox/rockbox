@@ -567,7 +567,7 @@ static void play_game(void);
 static void process_input(int);
 
 /*Helper functions*/
-static void pause(void);
+static void rfkpause(void);
 static int validchar(char);
 static void play_animation(int);
 
@@ -715,7 +715,7 @@ static void process_input(int input)
         case KITTEN: /*Found it!*/
           play_animation(input);
           /* Wait for the user to click something */
-          pause();
+          rfkpause();
           break;
         default: /*We hit a bogus object; print its message.*/
           message(messages[bogus_messages[screen[check_x][check_y]-2]]);
@@ -743,7 +743,7 @@ static void finish(int sig)
  *
  *****************************************************************************/
 
-static void pause()
+static void rfkpause()
 {
   int button;
   rb->lcd_update();
@@ -831,7 +831,7 @@ static void instructions()
     "Press", "any", "key", "to", "start",
   };
   display_text(ARRAYLEN(help_text), help_text, NULL, NULL, false);
-  pause();
+  rfkpause();
 }
 
 static void initialize_arrays()
