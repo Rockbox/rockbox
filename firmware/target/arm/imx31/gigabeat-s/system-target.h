@@ -31,6 +31,8 @@
 /* Overdrive mode */
 #define CPUFREQ_MAX         528000000
 
+#define CPU_MULTI_FREQUENCY 3
+
 static inline void udelay(unsigned long usecs)
 {
     unsigned long stop = GPTCNT + usecs;

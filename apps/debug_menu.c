@@ -272,13 +272,18 @@ static bool dbg_audio_thread(void)
 }
 #endif /* !SIMULATOR */
 #else /* CONFIG_CODEC == SWCODEC */
-static unsigned int ticks, boost_ticks, freq_sum;
+static unsigned int ticks, freq_sum;
+#ifndef CPU_MULTI_FREQUENCY
+static unsigned int boost_ticks;
+#endif
 
 static void dbg_audio_task(void)
 {
 #ifdef CPUFREQ_NORMAL
+#ifndef CPU_MULTI_FREQUENCY
     if(FREQ > CPUFREQ_NORMAL)
         boost_ticks++;
+#endif
     freq_sum += FREQ/1000000; /* in MHz */
 #endif
     ticks++;
@@ -296,7 +301,10 @@ static bool dbg_buffering_thread(void)
     size_t filebuflen = audio_get_filebuflen();
     /* This is a size_t, but call it a long so it puts a - when it's bad. */
 
-    ticks = boost_ticks = freq_sum = 0;
+#ifndef CPU_MULTI_FREQUENCY
+    boost_ticks = 0;
+#endif
+    ticks = freq_sum = 0;
 
     tick_add_task(dbg_audio_task);
     
@@ -378,8 +386,13 @@ static bool dbg_buffering_thread(void)
 
             if (ticks > 0)
             {
-                int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
                 int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
+#ifdef CPU_MULTI_FREQUENCY
+                int boostquota = (avgclock * 100 - CPUFREQ_NORMAL/1000) /
+                    ((CPUFREQ_MAX - CPUFREQ_NORMAL) / 1000000); /* in 0.1 % */
+#else
+                int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
+#endif
                 screens[i].putsf(0, line++, "boost:%3d.%d%% (%d.%dMHz)",
                                  boostquota/10, boostquota%10, avgclock/10, avgclock%10);
             }
