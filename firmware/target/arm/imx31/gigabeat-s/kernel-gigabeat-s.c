@@ -69,6 +69,7 @@ void INIT_ATTR kernel_device_init(void)
 {
     sdma_init();
     spi_init();
+    enable_interrupt(IRQ_FIQ_STATUS);
     mc13783_init();
     dvfs_dptc_init();
     dvfs_wfi_monitor(true); /* Monitor the WFI signal */

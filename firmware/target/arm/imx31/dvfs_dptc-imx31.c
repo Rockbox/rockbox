@@ -81,16 +81,19 @@ static inline void wait_for_dvfs_update_en(void)
     while (!(CCM_PMCR0 & CCM_PMCR0_UPDTEN));
 }
 
-
-static void do_dvfs_update(unsigned int level, bool in_isr)
+/* Do the actual frequency and DVFS pin change - always call with IRQ masked */
+static void do_dvfs_update(unsigned int level)
 {
     const struct dvfs_clock_table_entry *setting = &dvfs_clock_table[level];
     unsigned long pmcr0 = CCM_PMCR0;
+    int oldlevel;
 
     if (pmcr0 & CCM_PMCR0_DPTEN)
     {
         /* Ignore voltage change request from DPTC. Voltage is *not* valid. */
         pmcr0 &= ~CCM_PMCR0_DPVCR;
+        /* Mask DPTC interrupt for when called in thread context */
+        pmcr0 |= CCM_PMCR0_PTVAIM;
     }
 
     pmcr0 &= ~CCM_PMCR0_VSCNT;
@@ -127,13 +130,10 @@ static void do_dvfs_update(unsigned int level, bool in_isr)
     CCM_PMCR0 = pmcr0;
     /* Note: changes to frequency with ints unmaked seem to cause spurious
      * DVFS interrupts with value CCM_PMCR0_FSVAI_NO_INT. These aren't
-     * supposed to happen. Only do the lengthy delay with them enabled iff
-     * called from the IRQ handler. */
-    if (in_isr)
-        enable_irq();
+     * supposed to happen. Only do the lengthy delay with them enabled. */
+    enable_irq();
     udelay(100); /* Software wait for voltage ramp-up */
-    if (in_isr)
-        disable_irq();
+    disable_irq();
     CCM_PDR0 = setting->pdr_val;
 
     if (!(pmcr0 & CCM_PMCR0_DFSUP_POST_DIVIDERS))
@@ -150,9 +150,10 @@ static void do_dvfs_update(unsigned int level, bool in_isr)
     if (pmcr0 & CCM_PMCR0_DPTEN)
     {
         update_dptc_counts(level, dptc_wp);
-        /* Enable DPTC to request voltage changes. Voltage is valid. */
-        CCM_PMCR0 |= CCM_PMCR0_DPVCR;
+        /* Enable DPTC to request voltage changes, unmask interrupt. */
+        CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_PTVAIM) | CCM_PMCR0_DPVCR;
         udelay(2);
+        /* Voltage is valid. */
         CCM_PMCR0 |= CCM_PMCR0_DPVV;
     }
 }
@@ -167,7 +168,7 @@ static void set_current_dvfs_level(unsigned int level)
 
     wait_for_dvfs_update_en();
 
-    do_dvfs_update(level, false);
+    do_dvfs_update(level);
 
     wait_for_dvfs_update_en();
 
@@ -231,7 +232,7 @@ static void __attribute__((used)) dvfs_int(void)
         return;     /* Do nothing. Freq change is not required */
     } /* end switch */
 
-    do_dvfs_update(level, true);
+    do_dvfs_update(level);
 }
 
 
@@ -370,7 +371,8 @@ static void dptc_transfer_done_callback(struct spi_transfer_desc *xfer)
 }
 
 
-/* Handle the DPTC interrupt and sometimes the manual setting */
+/* Handle the DPTC interrupt and sometimes the manual setting - always call
+ * with IRQ masked. */
 static void dptc_int(unsigned long pmcr0)
 {
     const union dvfs_dptc_voltage_table_entry *entry;
@@ -433,6 +435,8 @@ static void dptc_int(unsigned long pmcr0)
 }
 
 
+/* Handle setting the working point explicitly - always call with IRQ
+ * masked */
 static void dptc_new_wp(unsigned int wp)
 {
     dptc_wp = wp;
@@ -550,7 +554,7 @@ void dvfs_stop(void)
         {
             /* Set default frequency level */
             wait_for_dvfs_update_en();
-            do_dvfs_update(DVFS_LEVEL_DEFAULT, false);
+            do_dvfs_update(DVFS_LEVEL_DEFAULT);
             wait_for_dvfs_update_en();
         }
 
