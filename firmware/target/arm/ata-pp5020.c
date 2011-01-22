@@ -106,7 +106,9 @@ void ata_dma_set_mode(unsigned char mode) {
     int modeidx;
 
     (*(volatile unsigned long *)(0x600060C4)) = 0xC0000000; /* 80 Mhz */
+#if !defined(IPOD_NANO)
     IDE0_CFG &= ~0x10000000;
+#endif
 
     modeidx = mode & 7;
     mode &= 0xF8;
@@ -121,7 +123,9 @@ void ata_dma_set_mode(unsigned char mode) {
     } else if (mode == 0x20 && modeidx <= ATA_MAX_MWDMA)
         IDE0_PRI_TIMING1 = tm_mwdma[modeidx];
 
+#if !defined(IPOD_NANO)
     IDE0_CFG |= 0x20000000; /* >= 50 Mhz */
+#endif
 } 
 
 #define IDE_CFG_INTRQ           8
