@@ -42,8 +42,11 @@ struct loader_info {
     size_t size;
 };
 
-enum image_type get_image_type(const char *name);
+/* Check file type by magic number or file extension */
+enum image_type get_image_type(const char *name, bool quiet);
+/* Load image decoder */
 const struct image_decoder *load_decoder(struct loader_info *loader_info);
+/* Release the loaded decoder */
 void release_decoder(void);
 
 #endif /* _IMAGE_DECODER_H */

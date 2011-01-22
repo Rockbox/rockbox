@@ -148,8 +148,8 @@ static void get_pic_list(void)
 
     for (i = 0; i < tree->filesindir && buf_size > sizeof(char**); i++)
     {
-        if (!(dircache[i].attr & ATTR_DIRECTORY)
-            && get_image_type(dircache[i].name) != IMAGE_UNKNOWN)
+        /* Add all files. Non-image files will be filtered out while loading. */
+        if (!(dircache[i].attr & ATTR_DIRECTORY))
         {
             file_pt[entries] = dircache[i].name;
             /* Set Selected File. */
@@ -742,7 +742,13 @@ static int load_and_show(char* filename, struct image_info *info)
 
     rb->lcd_clear_display();
 
-    status = get_image_type(filename);
+    /* suppress warning while running slideshow */
+    status = get_image_type(filename, iv_api.running_slideshow);
+    if (status == IMAGE_UNKNOWN) {
+        /* file isn't supported image file, skip this. */
+        file_pt[curfile] = NULL;
+        return change_filename(direction);
+    }
     if (image_type != status) /* type of image is changed, load decoder. */
     {
         struct loader_info loader_info = {
@@ -914,7 +920,7 @@ enum plugin_status plugin_start(const void* parameter)
     if(!parameter) return PLUGIN_ERROR;
 
     rb->strcpy(np_file, parameter);
-    if (get_image_type(np_file) == IMAGE_UNKNOWN)
+    if (get_image_type(np_file, false) == IMAGE_UNKNOWN)
     {
         rb->splash(HZ*2, "Unsupported file");
         return PLUGIN_ERROR;
