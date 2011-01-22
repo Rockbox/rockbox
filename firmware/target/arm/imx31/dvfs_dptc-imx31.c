@@ -86,7 +86,6 @@ static void do_dvfs_update(unsigned int level)
 {
     const struct dvfs_clock_table_entry *setting = &dvfs_clock_table[level];
     unsigned long pmcr0 = CCM_PMCR0;
-    int oldlevel;
 
     if (pmcr0 & CCM_PMCR0_DPTEN)
     {
