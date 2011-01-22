@@ -127,7 +127,7 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
     release_decoder();
 
     name = decoder_names[loader_info->type];
-    rb->snprintf(filename, MAX_PATH, "/rockbox/rocks/viewers" "/%s.ovl", name);
+    rb->snprintf(filename, MAX_PATH, VIEWERS_DIR "/%s.ovl", name);
 
     /* load decoder to the buffer. */
     decoder_handle = rb->lc_open(filename, loader_info->buffer, loader_info->size);
