@@ -2345,6 +2345,9 @@ static const struct the_menu_item menuitems[] = {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
 #endif
+#if CONFIG_CPU == IMX31L
+        { "DVFS/DPTC", __dbg_dvfs_dptc },
+#endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
         { "S/PDIF analyzer", dbg_spdif },
 #endif

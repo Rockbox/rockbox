@@ -74,8 +74,6 @@ unsigned int dvfs_nr_up = 0;
 unsigned int dvfs_nr_pnc = 0;
 unsigned int dvfs_nr_no = 0;
 
-static void dvfs_stop(void);
-
 
 /* Wait for the UPDTEN flag to be set so that all bits may be written */
 static inline void wait_for_dvfs_update_en(void)
@@ -279,6 +277,9 @@ static void INIT_ATTR dvfs_init(void)
     iomuxc_set_pin_mux(IOMUXC_GPIO1_5,
                        IOMUXC_MUX_OUT_FUNCTIONAL | IOMUXC_MUX_IN_FUNCTIONAL);
 #endif
+
+    /* GP load bits disabled */
+    bitclr32(&CCM_PMCR1, 0xf);
     
     /* Initialize DVFS signal weights and detection modes. */
     int i;
@@ -320,66 +321,6 @@ static void INIT_ATTR dvfs_init(void)
 
     logf("DVFS: Initialized");
 }
-
-
-/* Start the DVFS hardware */
-static void dvfs_start(void)
-{
-    int oldlevel;
-
-    /* Have to wait at least 3 div3 clocks before enabling after being
-     * stopped. */
-    udelay(1500);
-
-    oldlevel = disable_irq_save();
-
-    if (!dvfs_running)
-    {
-        dvfs_running = true;
-
-        /* Unmask DVFS interrupt source and enable DVFS. */
-        avic_enable_int(INT_CCM_DVFS, INT_TYPE_IRQ, INT_PRIO_DVFS,
-                        CCM_DVFS_HANDLER);
-
-        CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_FSVAIM) | CCM_PMCR0_DVFEN;
-    }
-
-    restore_irq(oldlevel);
-
-    logf("DVFS: started");
-}
-
-
-/* Stop the DVFS hardware and return to default frequency */
-static void dvfs_stop(void)
-{
-    int oldlevel = disable_irq_save();
-
-    if (dvfs_running)
-    {
-        /* Mask DVFS interrupts. */
-        CCM_PMCR0 |= CCM_PMCR0_FSVAIM | CCM_PMCR0_LBMI;
-        avic_disable_int(INT_CCM_DVFS);
-
-        if (((CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS) !=
-                DVFS_LEVEL_DEFAULT)
-        {
-            /* Set default frequency level */
-            wait_for_dvfs_update_en();
-            do_dvfs_update(DVFS_LEVEL_DEFAULT, false);
-            wait_for_dvfs_update_en();
-        }
-
-        /* Disable DVFS. */
-        CCM_PMCR0 &= ~CCM_PMCR0_DVFEN;
-        dvfs_running = false;
-    }
-
-    restore_irq(oldlevel);
-
-    logf("DVFS: stopped");
-}
-
 
 /** DPTC **/
 
@@ -540,52 +481,6 @@ static void INIT_ATTR dptc_init(void)
 }
 
 
-/* Start DPTC module */
-static void dptc_start(void)
-{
-    int oldlevel = disable_irq_save();
-
-    if (!dptc_running)
-    {
-        dptc_running = true;
-
-        /* Enable DPTC and unmask interrupt. */
-        avic_enable_int(INT_CCM_CLK, INT_TYPE_IRQ, INT_PRIO_DPTC, 
-                        CCM_CLK_HANDLER);
-
-        update_dptc_counts(dvfs_level, dptc_wp);
-        enable_dptc();
-    }
-
-    restore_irq(oldlevel);
-
-    logf("DPTC: started");
-}
-
-
-/* Stop the DPTC hardware if running and go back to default working point */
-static void dptc_stop(void)
-{
-    int oldlevel = disable_irq_save();
-
-    if (dptc_running)
-    {
-        dptc_running = false;
-
-        /* Disable DPTC and mask interrupt. */
-        CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
-        avic_disable_int(INT_CCM_CLK);
-
-        /* Go back to default working point. */
-        dptc_new_wp(DPTC_WP_DEFAULT);
-    }
-
-    restore_irq(oldlevel);
-
-    logf("DPTC: stopped");
-}
-
-
 /** Main module interface **/
 
 /* Initialize DVFS and DPTC */
@@ -609,6 +504,64 @@ void dvfs_dptc_stop(void)
 {
     dptc_stop();
     dvfs_stop();
+}
+
+/* Start the DVFS hardware */
+void dvfs_start(void)
+{
+    int oldlevel;
+
+    /* Have to wait at least 3 div3 clocks before enabling after being
+     * stopped. */
+    udelay(1500);
+
+    oldlevel = disable_irq_save();
+
+    if (!dvfs_running)
+    {
+        dvfs_running = true;
+
+        /* Unmask DVFS interrupt source and enable DVFS. */
+        avic_enable_int(INT_CCM_DVFS, INT_TYPE_IRQ, INT_PRIO_DVFS,
+                        CCM_DVFS_HANDLER);
+
+        CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_FSVAIM) | CCM_PMCR0_DVFEN;
+    }
+
+    restore_irq(oldlevel);
+
+    logf("DVFS: started");
+}
+
+
+/* Stop the DVFS hardware and return to default frequency */
+void dvfs_stop(void)
+{
+    int oldlevel = disable_irq_save();
+
+    if (dvfs_running)
+    {
+        /* Mask DVFS interrupts. */
+        CCM_PMCR0 |= CCM_PMCR0_FSVAIM | CCM_PMCR0_LBMI;
+        avic_disable_int(INT_CCM_DVFS);
+
+        if (((CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS) !=
+                DVFS_LEVEL_DEFAULT)
+        {
+            /* Set default frequency level */
+            wait_for_dvfs_update_en();
+            do_dvfs_update(DVFS_LEVEL_DEFAULT, false);
+            wait_for_dvfs_update_en();
+        }
+
+        /* Disable DVFS. */
+        CCM_PMCR0 &= ~CCM_PMCR0_DVFEN;
+        dvfs_running = false;
+    }
+
+    restore_irq(oldlevel);
+
+    logf("DVFS: stopped");
 }
 
 
@@ -648,6 +601,26 @@ void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value)
 }
 
 
+/* Return a signal load tracking weight */
+unsigned long dvfs_get_lt_weight(enum DVFS_LT_SIGS index)
+{
+    volatile unsigned long *reg_p = &CCM_LTR2;
+    unsigned int shift = 3 * index;
+
+    if (index < 9)
+    {
+        reg_p = &CCM_LTR3;
+        shift += 5; /* Bits 7:5, 10:8 ... 31:29 */
+    }
+    else if (index < 16)
+    {
+        shift -= 16; /* Bits 13:11, 16:14 ... 31:29 */
+    }
+
+    return (*reg_p & (0x7 << shift)) >> shift;
+}
+
+
 /* Set a signal load detection mode */
 void dvfs_set_lt_detect(enum DVFS_LT_SIGS index, bool edge)
 {
@@ -662,6 +635,21 @@ void dvfs_set_lt_detect(enum DVFS_LT_SIGS index, bool edge)
 }
 
 
+/* Returns a signal load detection mode */
+bool dvfs_get_lt_detect(enum DVFS_LT_SIGS index)
+{
+    unsigned int shift = 32;
+
+    if ((unsigned)index < 13)
+        shift = index + 3;
+    else if ((unsigned)index < 16)
+        shift = index + 29;
+
+    return !!((CCM_LTR0 & (1ul << shift)) >> shift);
+}
+
+
+/* Set/clear the general-purpose load tracking bit */
 void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert)
 {
     if ((unsigned)dvgp <= 3)
@@ -669,6 +657,82 @@ void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert)
         unsigned long bit = 1ul << dvgp;
         bitmod32(&CCM_PMCR1, assert ? bit : 0, bit);
     }
+}
+
+
+/* Return the general-purpose load tracking bit */
+bool dvfs_get_gp_bit(enum DVFS_DVGPS dvgp)
+{
+    if ((unsigned)dvgp <= 3)
+        return (CCM_PMCR1 & (1ul << dvgp)) != 0;
+    return false;
+}
+
+
+/* Set GP load tracking by code.
+ * level_code:
+ *     lt 0  =defaults
+ *     0     =all off ->
+ *     28    =highest load
+ *     gte 28=highest load
+ * detect_mask bits:
+ *     b[3:0]: 1=LTn edge detect, 0=LTn level detect
+ */
+void dvfs_set_gp_sense(int level_code, unsigned long detect_mask)
+{
+    int i;
+
+    for (i = 0; i <= 3; i++)
+    {
+        int ltsig_num = DVFS_LT_SIG_DVGP0 + i;
+        int gpw_num = DVFS_DVGP_0 + i;
+        unsigned long weight;
+        bool edge;
+        bool assert;
+
+        if (level_code < 0)
+        {
+            /* defaults */
+            detect_mask = 0;
+            assert = 0;
+            weight = lt_signals[ltsig_num].weight;
+            edge = lt_signals[ltsig_num].detect != 0;
+        }
+        else
+        {
+            weight = MIN(level_code, 7);
+            edge = !!(detect_mask & 1);
+            assert = weight > 0;
+            detect_mask >>= 1;
+            level_code -= 7;
+            if (level_code < 0)
+                level_code = 0;
+        }
+
+        dvfs_set_lt_weight(ltsig_num, weight);  /* set weight */
+        dvfs_set_lt_detect(ltsig_num, edge);    /* set detect mode */
+        dvfs_set_gp_bit(gpw_num, assert);       /* set activity */
+    }
+}
+
+/* Return GP weight settings */
+void dvfs_get_gp_sense(int *level_code, unsigned long *detect_mask)
+{
+    int i;
+    int code = 0;
+    unsigned long mask = 0;
+
+    for (i = DVFS_LT_SIG_DVGP0; i <= DVFS_LT_SIG_DVGP3; i++)
+    {
+        code += dvfs_get_lt_weight(i);
+        mask = (mask << 1) | (dvfs_get_lt_detect(i) ? 1 : 0);
+    }
+
+    if (level_code)
+        *level_code = code;
+
+    if (detect_mask)
+        *detect_mask = mask;
 }
 
 
@@ -700,18 +764,80 @@ unsigned int dvfs_get_level(void)
 }
 
 
+/* Is DVFS enabled? */
+bool dvfs_enabled(void)
+{
+   return dvfs_running; 
+}
+
+
+/* Get bitmask of levels supported */
+unsigned int dvfs_level_mask(void)
+{
+    return DVFS_LEVEL_MASK;
+}
+
+
 /* If DVFS is disabled, set the level explicitly */
 void dvfs_set_level(unsigned int level)
 {
     int oldlevel = disable_irq_save();
 
-    unsigned int currlevel =
-        (CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS;
-
-    if (!dvfs_running && level < DVFS_NUM_LEVELS && level != currlevel)
-        set_current_dvfs_level(level);
+    if (!dvfs_running && level < DVFS_NUM_LEVELS)
+    {
+        unsigned int currlevel =
+            (CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS;
+        if (level != currlevel && ((1 << level) & DVFS_LEVEL_MASK))
+            set_current_dvfs_level(level);
+    }
 
     restore_irq(oldlevel);
+}
+
+
+/* Start DPTC module */
+void dptc_start(void)
+{
+    int oldlevel = disable_irq_save();
+
+    if (!dptc_running)
+    {
+        dptc_running = true;
+
+        /* Enable DPTC and unmask interrupt. */
+        avic_enable_int(INT_CCM_CLK, INT_TYPE_IRQ, INT_PRIO_DPTC, 
+                        CCM_CLK_HANDLER);
+
+        update_dptc_counts(dvfs_level, dptc_wp);
+        enable_dptc();
+    }
+
+    restore_irq(oldlevel);
+
+    logf("DPTC: started");
+}
+
+
+/* Stop the DPTC hardware if running and go back to default working point */
+void dptc_stop(void)
+{
+    int oldlevel = disable_irq_save();
+
+    if (dptc_running)
+    {
+        dptc_running = false;
+
+        /* Disable DPTC and mask interrupt. */
+        CCM_PMCR0 = (CCM_PMCR0 & ~CCM_PMCR0_DPTEN) | CCM_PMCR0_PTVAIM;
+        avic_disable_int(INT_CCM_CLK);
+
+        /* Go back to default working point. */
+        dptc_new_wp(DPTC_WP_DEFAULT);
+    }
+
+    restore_irq(oldlevel);
+
+    logf("DPTC: stopped");
 }
 
 
@@ -719,6 +845,13 @@ void dvfs_set_level(unsigned int level)
 unsigned int dptc_get_wp(void)
 {
     return dptc_wp;
+}
+
+
+/* Is DPTC enabled? */
+bool dptc_enabled(void)
+{
+    return dptc_running;
 }
 
 

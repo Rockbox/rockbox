@@ -241,10 +241,10 @@ static const struct dvfs_lt_signal_descriptor lt_signals[16] =
     { 0, 0 }, /* DVFS_LT_SIG_ARM11_P_FIQ_B_RBT_GATE */
     { 0, 0 }, /* DVFS_LT_SIG_IPI_GPIO1_INT0 */
     { 0, 0 }, /* DVFS_LT_SIG_IPI_INT_IPU_FUNC */
-    { 7, 0 }, /* DVFS_LT_SIG_DVGP0 */
-    { 7, 0 }, /* DVFS_LT_SIG_DVGP1 */
-    { 7, 0 }, /* DVFS_LT_SIG_DVGP2 */
-    { 7, 0 }, /* DVFS_LT_SIG_DVGP3 */
+    { 0, 0 }, /* DVFS_LT_SIG_DVGP0 */
+    { 0, 0 }, /* DVFS_LT_SIG_DVGP1 */
+    { 0, 0 }, /* DVFS_LT_SIG_DVGP2 */
+    { 0, 0 }, /* DVFS_LT_SIG_DVGP3 */
 };
 
 #endif /* _DVFS_DPTC_TARGET_H_ */

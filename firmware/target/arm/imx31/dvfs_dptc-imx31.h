@@ -124,16 +124,28 @@ void dvfs_dptc_init(void);
 void dvfs_dptc_start(void);
 void dvfs_dptc_stop(void);
 
+void dvfs_start(void);
+void dvfs_stop(void);
+bool dvfs_enabled(void);
 void dvfs_wfi_monitor(bool on);
 void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value);
+unsigned long dvfs_get_lt_weight(enum DVFS_LT_SIGS index);
 void dvfs_set_lt_detect(enum DVFS_LT_SIGS index, bool edge);
+bool dvfs_get_lt_detect(enum DVFS_LT_SIGS index);
 void dvfs_set_gp_bit(enum DVFS_DVGPS dvgp, bool assert);
+bool dvfs_get_gp_bit(enum DVFS_DVGPS dvgp);
 void dvfs_int_mask(bool mask);
+void dvfs_set_gp_sense(int level_code, unsigned long detect_mask);
+void dvfs_get_gp_sense(int *level_code, unsigned long *detect_mask);
+unsigned int dvfs_level_mask(void);
 
 unsigned int dvfs_dptc_get_voltage(void);
 unsigned int dvfs_get_level(void);
 void dvfs_set_level(unsigned int level);
 
+void dptc_start(void);
+void dptc_stop(void);
+bool dptc_enabled(void);
 unsigned int dptc_get_wp(void);
 void dptc_set_wp(unsigned int wp);
 

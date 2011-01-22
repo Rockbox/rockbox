@@ -29,6 +29,7 @@
 #include "adc.h"
 #include "ccm-imx31.h"
 #include "dvfs_dptc-imx31.h"
+#include <stdio.h>
 
 bool __dbg_hw_info(void)
 {
@@ -242,4 +243,148 @@ bool dbg_ports(void)
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
-}  
+}
+
+
+bool __dbg_dvfs_dptc(void)
+{
+    int ltwlevel;
+    unsigned long ltdetect;
+    int dvfs_wp, dvfs_mask;
+    bool dptc_on;
+    int i;
+    char buf[32];
+    unsigned long ltw[4];
+    bool ltwassert[4];
+
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    dvfs_mask = dvfs_level_mask();
+
+    dvfs_wp = dvfs_enabled() ? -1 : (int)dvfs_get_level();
+    dptc_on = dptc_enabled();
+    dvfs_get_gp_sense(&ltwlevel, &ltdetect);
+
+    while (1)
+    {
+        int line = 0;
+
+        int button = button_get_w_tmo(HZ/10);
+
+        if (dvfs_wp < 0)
+            strcpy(buf, "Auto");
+        else
+            snprintf(buf, sizeof(buf), "%d", dvfs_wp);
+
+        lcd_puts(0, line, "[DVFS/DPTC]");
+        line += 2;
+        lcd_putsf(0, line, "CPU freq. point (Up/Dn) : %s", buf);
+        line += 2;
+        lcd_putsf(0, line, "DPTC volt. scale (Play) : %s",
+                  dptc_on ? "Enabled" : "Disabled");
+        line += 2;
+        lcd_putsf(0, line, "GP load level (Vol +/-) : %d", ltwlevel);
+        line += 2;
+        lcd_puts(0, line, "----------------------------------------");
+        line += 2;
+        lcd_putsf(0, line++, "Frequency: %dHz", cpu_frequency);
+        i = dvfs_dptc_get_voltage();
+        lcd_putsf(0, line++, "Voltage  : %d.%03d V", i / 1000, i % 1000);
+
+        for (i = 0; i <= 3; i++)
+        {
+            ltw[i] = dvfs_get_lt_weight(i + DVFS_LT_SIG_DVGP0);
+            ltwassert[i] = dvfs_get_gp_bit(i + DVFS_DVGP_0);
+        }
+
+        lcd_putsf(0, line++, "GPW (3-0): %lu%lu%lu%lu %c%c%c%c",
+                  ltw[3], ltw[2], ltw[1], ltw[0],
+                  ltwassert[3] ? 'y' : 'n',
+                  ltwassert[2] ? 'y' : 'n',
+                  ltwassert[1] ? 'y' : 'n',
+                  ltwassert[0] ? 'y' : 'n');
+
+        line += 2;
+        lcd_puts(8, line, "(Press SELECT to revert)");
+
+        switch (button)
+        {
+        case DEBUG_CANCEL|BUTTON_REL:
+            return false;
+
+        /* CPU frequency */
+        case BUTTON_UP:
+            if (++dvfs_wp >= DVFS_NUM_LEVELS)
+            {
+                /* Going back to automatic */
+                dvfs_wp = -1;
+                dvfs_start();
+            }
+            else
+            {
+                if (dvfs_wp == 0)
+                {
+                    /* Going to manual setting */
+                    dvfs_stop();
+                }
+
+                /* Skip gaps in mask */
+                while (((1 << dvfs_wp) & dvfs_mask) == 0) dvfs_wp++;
+                dvfs_set_level(dvfs_wp);
+            }
+
+            break;
+
+        case BUTTON_DOWN:
+            if (--dvfs_wp == -1)
+            {
+                /* Going back to automatic */
+                dvfs_start();
+            }
+            else
+            {
+                if (dvfs_wp <= -2)
+                {
+                    /* Going to manual setting */
+                    dvfs_stop();
+                    dvfs_wp = DVFS_NUM_LEVELS - 1;
+                }
+
+                /* Skip gaps in mask */
+                while (((1 << dvfs_wp) & dvfs_mask) == 0) dvfs_wp--;
+                dvfs_set_level(dvfs_wp);
+            }
+            break;
+
+        /* GP Load tracking */
+        case BUTTON_VOL_UP:
+            if (ltwlevel < 28)
+                dvfs_set_gp_sense(++ltwlevel, ltdetect);
+            break;
+
+        case BUTTON_VOL_DOWN:
+            if (ltwlevel > 0)
+                dvfs_set_gp_sense(--ltwlevel, ltdetect);
+            break;
+
+        case BUTTON_PLAY:
+            dptc_on = !dptc_enabled();
+            dptc_on ? dptc_start() : dptc_stop();
+            break;
+
+        case BUTTON_SELECT:
+            dvfs_start();
+            dptc_start();
+            dvfs_set_gp_sense(-1, 0);
+
+            dvfs_wp = dvfs_enabled() ? -1 : (int)dvfs_get_level();
+            dptc_on = dptc_enabled();
+            dvfs_get_gp_sense(&ltwlevel, &ltdetect);
+            break;
+        }
+
+        lcd_update();
+        yield();
+    }
+}
