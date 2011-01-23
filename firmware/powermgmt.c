@@ -767,9 +767,6 @@ void shutdown_hw(void)
             storage_spindown(1);
     }
 
-    while (storage_disk_is_active())
-        sleep(HZ/10);
-
 #if CONFIG_CODEC == SWCODEC
     audiohw_close();
 #else
