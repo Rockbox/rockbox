@@ -435,7 +435,7 @@ void LCDFN(scroll_fn)(void)
     int index;
     int xpos, ypos;
     struct viewport* old_vp = current_vp;
-    bool makedelay = false;
+    bool makedelay;
 
     for ( index = 0; index < LCDFN(scroll_info).lines; index++ ) {
         s = &LCDFN(scroll_info).scroll[index];
@@ -455,6 +455,7 @@ void LCDFN(scroll_fn)(void)
         xpos = s->startx;
         ypos = s->y * pf->height + s->y_offset;
 
+        makedelay = false;
         if (s->bidir) { /* scroll bidirectional */
             if (s->offset <= 0) {
                 /* at beginning of line */

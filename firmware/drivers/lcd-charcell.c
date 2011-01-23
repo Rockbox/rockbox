@@ -569,7 +569,7 @@ void lcd_scroll_fn(void)
     int xpos, ypos;
     bool update;
     struct viewport* old_vp = current_vp;
-    bool makedelay = false;
+    bool makedelay;
 
     update = false;
     for ( index = 0; index < lcd_scroll_info.lines; index++ ) {
@@ -589,6 +589,7 @@ void lcd_scroll_fn(void)
         xpos = s->startx;
         ypos = s->y;
 
+        makedelay = false;
         if (s->bidir)  /* scroll bidirectional */
         {
             if (s->offset <= 0) {
