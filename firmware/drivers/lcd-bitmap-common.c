@@ -435,6 +435,7 @@ void LCDFN(scroll_fn)(void)
     int index;
     int xpos, ypos;
     struct viewport* old_vp = current_vp;
+    bool makedelay = false;
 
     for ( index = 0; index < LCDFN(scroll_info).lines; index++ ) {
         s = &LCDFN(scroll_info).scroll[index];
@@ -459,26 +460,31 @@ void LCDFN(scroll_fn)(void)
                 /* at beginning of line */
                 s->offset = 0;
                 s->backward = false;
-                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
+                makedelay = true;
             }
-            if (s->offset >= s->width - (current_vp->width - xpos)) {
+            else if (s->offset >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
                 s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
-                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
+                makedelay = true;
             }
         }
         else {
             /* scroll forward the whole time */
             if (s->offset >= s->width) {
                 s->offset = 0;
-                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
+                makedelay = true;
             }
         }
+
+        if (makedelay)
+            s->start_tick = current_tick + LCDFN(scroll_info).delay +
+                    LCDFN(scroll_info).ticks;
+
         LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, s->width,
                                pf->height, s->offset);
         LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width - xpos,
-                                    pf->height);
+                               pf->height);
     }
     LCDFN(set_viewport)(old_vp);
 }
