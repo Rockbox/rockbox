@@ -396,6 +396,7 @@ bool mc13783_read_async(struct spi_transfer_desc *xfer,
     xfer->rxbuf = buffer;
     xfer->count = count;
     xfer->callback = callback;
+    xfer->next = NULL;
 
     return spi_transfer(xfer);
 }
@@ -422,6 +423,7 @@ bool mc13783_write_async(struct spi_transfer_desc *xfer,
     xfer->rxbuf = NULL;
     xfer->count = count;
     xfer->callback = callback;
+    xfer->next = NULL;
 
     return spi_transfer(xfer);
 }

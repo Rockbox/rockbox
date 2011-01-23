@@ -210,7 +210,8 @@ void INIT_ATTR system_init(void)
 
 void system_prepare_fw_start(void)
 {
-    dvfs_dptc_stop();
+    dvfs_stop();
+    dptc_stop();
     mc13783_close();
     tick_stop();
     disable_interrupt(IRQ_FIQ_STATUS);

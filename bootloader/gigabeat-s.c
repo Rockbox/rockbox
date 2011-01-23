@@ -341,8 +341,6 @@ void main(void)
     system_init();
     kernel_init();
 
-    enable_interrupt(IRQ_FIQ_STATUS);
-
     /* Keep button_device_init early to delay calls to button_read_device */
     button_init_device();
 

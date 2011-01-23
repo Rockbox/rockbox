@@ -71,10 +71,11 @@ void INIT_ATTR kernel_device_init(void)
     spi_init();
     enable_interrupt(IRQ_FIQ_STATUS);
     mc13783_init();
-    dvfs_dptc_init();
-    dvfs_wfi_monitor(true); /* Monitor the WFI signal */
+    dvfs_dptc_init();       /* Init also sets default points */
 #ifndef BOOTLOADER
-    dvfs_dptc_start(); /* Should be ok to start even so early */
+    dvfs_wfi_monitor(true); /* Monitor the WFI signal */
+    dvfs_start();           /* Should be ok to start even so early */
+    dptc_start();
 #endif
 }
 

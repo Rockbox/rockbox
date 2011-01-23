@@ -129,7 +129,8 @@ bool tuner_powered(void)
 void power_off(void)
 {
     /* Turn off voltage and frequency scaling */
-    dvfs_dptc_stop();
+    dvfs_stop();
+    dptc_stop();
 
     /* Cut backlight */
     _backlight_off();
