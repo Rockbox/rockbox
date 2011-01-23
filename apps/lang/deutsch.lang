@@ -12605,3 +12605,20 @@
     *: "Dateigröße"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Signalstärke:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Signalstärke:"
+  </voice>
+</phrase>
