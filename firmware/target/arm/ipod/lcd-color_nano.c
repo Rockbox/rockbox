@@ -155,22 +155,24 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
     /* calculate the drawing region */
 #if CONFIG_LCD == LCD_IPODNANO
     y0 = x;                         /* start horiz */
-    x0 = y;                         /* start vert */
     y1 = (x + width) - 1;           /* max horiz */
+    x0 = y;                         /* start vert */
     x1 = (y + height) - 1;          /* max vert */
 #elif CONFIG_LCD == LCD_IPODCOLOR
     y0 = y;                         /* start vert */
-    x0 = LCD_WIDTH - (x + width);   /* start horiz */
     y1 = (y + height) - 1;          /* end vert */
-    x1 = (x0 + width) - 1;          /* end horiz */
+    x1 = (LCD_WIDTH - 1) - x;       /* end horiz */
+    x0 = (x1 - width) + 1;          /* start horiz */
 #endif
 
     /* setup the drawing region */
     if ((lcd_type&1) == 0) {
+        /* x0 and x1 need to be swapped until 
+         * proper direction setup is added */
         lcd_cmd_data(0x12, y0);      /* start vert */
-        lcd_cmd_data(0x13, x0);      /* start horiz */
+        lcd_cmd_data(0x13, x1);      /* start horiz */
         lcd_cmd_data(0x15, y1);      /* end vert */
-        lcd_cmd_data(0x16, x1);      /* end horiz */
+        lcd_cmd_data(0x16, x0);      /* end horiz */
     } else {
         /* max horiz << 8 | start horiz */
         lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
