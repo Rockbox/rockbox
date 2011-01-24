@@ -748,6 +748,9 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
         len, dir_in, blocking);
 
+    /* mask the usb interrupt to avoid any race */
+    VIC_INT_EN_CLEAR = INTERRUPT_USB;
+    
     volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
     volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
     volatile unsigned long *epdma = dir_in ? &DIEPDMA(ep) : &DOEPDMA(ep);
@@ -788,6 +791,9 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA);
 
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
+
+    /* unmask the usb interrupt */
+    VIC_INT_ENABLE = INTERRUPT_USB;
 
     if(blocking)
     {
