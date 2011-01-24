@@ -256,7 +256,7 @@ static void store_lcd_settings(void)
 ******************************************************************************/
 static void restore_lcd_settings(void) {
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
     /* Restore the old settings */
 #if LCD_DEPTH > 1
@@ -271,7 +271,7 @@ static void restore_lcd_settings(void) {
 ******************************************************************************/
 static void plugin_lcd_settings(void) {
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     /* Set the new settings */
 #ifdef HAVE_LCD_COLOR

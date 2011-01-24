@@ -2427,7 +2427,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     /* now go ahead and have fun! */
     rb->srand( *rb->current_tick );
@@ -2458,7 +2458,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
     return PLUGIN_OK;
 }

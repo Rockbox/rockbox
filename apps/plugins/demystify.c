@@ -436,9 +436,9 @@ enum plugin_status plugin_start(const void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 #ifdef HAVE_REMOTE_LCD
-    remote_backlight_force_on(); /* remote backlight control in lib/helper.c */
+    remote_backlight_ignore_timeout();
 #endif
     ret = plugin_main();
 

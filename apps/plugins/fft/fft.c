@@ -1352,7 +1352,7 @@ enum plugin_status plugin_start(const void* parameter)
     mylcd_clear_display();
     mylcd_update();
 #endif
-    backlight_force_on();
+    backlight_ignore_timeout();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);

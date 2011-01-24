@@ -450,7 +450,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     /* ignore backlight time out */
-    backlight_force_on();
+    backlight_ignore_timeout();
 
     gnuboy_main(parameter);
 

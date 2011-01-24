@@ -36,8 +36,17 @@ const unsigned bit_n_table[32] = {
 };
 #endif
 
-/*  Force the backlight on */
+/* Force the backlight on */
 void backlight_force_on(void)
+{
+    rb->backlight_set_timeout(0);
+#if CONFIG_CHARGING
+    rb->backlight_set_timeout_plugged(0);
+#endif /* CONFIG_CHARGING */
+}
+
+/* Turn off backlight timeout */
+void backlight_ignore_timeout(void)
 {
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(0);
@@ -60,6 +69,15 @@ void backlight_use_settings(void)
 #ifdef HAVE_REMOTE_LCD
 /*  Force the backlight on */
 void remote_backlight_force_on(void)
+{
+    rb->remote_backlight_set_timeout(0);
+#if CONFIG_CHARGING
+    rb->remote_backlight_set_timeout_plugged(0);
+#endif /* CONFIG_CHARGING */
+}
+
+/* Turn off backlight timeout */
+void remote_backlight_ignore_timeout(void)
 {
     if (rb->global_settings->remote_backlight_timeout > 0)
         rb->remote_backlight_set_timeout(0);
@@ -84,6 +102,12 @@ void remote_backlight_use_settings(void)
 #ifdef HAVE_BUTTON_LIGHT
 /*  Force the buttonlight on */
 void buttonlight_force_on(void)
+{
+    rb->buttonlight_set_timeout(0);
+}
+
+/* Turn off backlight timeout */
+void buttonlight_ignore_timeout(void)
 {
     if (rb->global_settings->buttonlight_timeout > 0)
         rb->buttonlight_set_timeout(0);

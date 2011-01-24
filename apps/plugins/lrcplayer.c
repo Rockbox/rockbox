@@ -2320,7 +2320,7 @@ static bool lrc_theme_menu(void)
 #ifdef HAVE_LCD_COLOR
                         "Inactive Colour",
 #endif
-                        "Backlight Force On");
+                        "Backlight Always On");
 
     while (!exit && !usb)
     {
@@ -2344,7 +2344,7 @@ static bool lrc_theme_menu(void)
                 break;
 #endif
             case LRC_MENU_BACKLIGHT:
-                usb = rb->set_bool("Backlight Force On", &prefs.backlight_on);
+                usb = rb->set_bool("Backlight Always On", &prefs.backlight_on);
                 break;
             case MENU_ATTACHED_USB:
                 usb = true;
@@ -2797,7 +2797,7 @@ static int lrc_main(void)
     }
 
     if (prefs.backlight_on)
-        backlight_force_on();
+        backlight_ignore_timeout();
 
 #ifdef HAVE_LCD_BITMAP
     /* in case settings that may affect break position 

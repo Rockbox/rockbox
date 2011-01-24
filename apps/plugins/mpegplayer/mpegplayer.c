@@ -822,8 +822,7 @@ static void osd_backlight_on_video_mode(bool video_on)
 {
     if (video_on) {
         /* Turn off backlight timeout */
-        /* backlight control in lib/helper.c */
-        backlight_force_on();
+        backlight_ignore_timeout();
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif

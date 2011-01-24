@@ -441,7 +441,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_backdrop(NULL);
     rb->lcd_clear_display();
 #endif
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     rb->splashf(0, "LCD driver performance test, please wait %d sec",
                 6*4*DURATION/HZ);

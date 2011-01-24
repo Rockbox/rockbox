@@ -139,7 +139,7 @@ int do_user_menu(void) {
 #endif
 
     /* ignore backlight time out */
-    backlight_force_on();
+    backlight_ignore_timeout();
 
     return ret;
 }

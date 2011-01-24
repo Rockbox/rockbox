@@ -441,7 +441,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->srand(*rb->current_tick);
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     while(!quit)
     {
@@ -460,7 +460,7 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
     
     rb->rmdir(testbasedir);
 

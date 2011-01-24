@@ -27,14 +27,17 @@
  * Backlight on/off operations
  */
 void backlight_force_on(void);
+void backlight_ignore_timeout(void);
 void backlight_use_settings(void);
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_force_on(void);
+void remote_backlight_ignore_timeout(void);
 void remote_backlight_use_settings(void);
 #endif
 
 #ifdef HAVE_BUTTON_LIGHT
 void buttonlight_force_on(void);
+void buttonlight_ignore_timeout(void);
 void buttonlight_use_settings(void);
 #endif
 

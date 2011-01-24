@@ -547,7 +547,7 @@ static bool main_menu(void)
         }
     }
 
-    backlight_force_on();
+    backlight_ignore_timeout();
     return exit_tuner;
 }
 
@@ -995,7 +995,7 @@ static void record_and_get_pitch(void)
     audio_tail = 1;
 #endif
 
-    backlight_force_on();
+    backlight_ignore_timeout();
 
     record_data();
 

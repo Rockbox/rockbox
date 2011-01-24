@@ -574,7 +574,7 @@ static void display_helpfile(void)
     
 static void led_resistance_calc(void)
 {
-    backlight_force_on();
+    backlight_ignore_timeout();
     int voltage_menu_selection, button_press, j, k, l, foreward_current = 0;
     int fwd_current_selection = 0;
     bool quit = false;
@@ -779,7 +779,7 @@ static void led_resistance_calc(void)
         
 static void resistance_to_color(void) 
 {
-    backlight_force_on();
+    backlight_ignore_timeout();
     int menu_selection;
     int menu_selection_tol;
     int button_press;
@@ -916,7 +916,7 @@ static void resistance_to_color(void)
     
 static void color_to_resistance(void) 
 {
-    backlight_force_on();
+    backlight_ignore_timeout();
     bool quit = false;
     int button_input = 0;
             

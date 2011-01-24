@@ -245,7 +245,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     
     /* Make backlight remain on -- making music requires attention. */
-    backlight_force_on();
+    backlight_ignore_timeout();
 
     /* Main loop. */
     while(!quit)

@@ -659,7 +659,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     /* Turn off backlight timeout */
-    backlight_force_on();
+    backlight_ignore_timeout();
     /* Clear screen */
     rb->lcd_clear_display();
 

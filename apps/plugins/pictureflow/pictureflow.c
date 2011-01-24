@@ -2203,7 +2203,7 @@ void cleanup(void)
 #endif
     end_pf_thread();
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
 #ifdef USEGSLIB
     grey_release();
@@ -2666,7 +2666,7 @@ int main(void)
         draw_splashscreen();
     if(backlight_mode == 0) {
         /* Turn off backlight timeout */
-        backlight_force_on();     /* backlight control in lib/helper.c */
+        backlight_ignore_timeout();
     }
 
     init_scroll_lines();

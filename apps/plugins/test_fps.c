@@ -367,7 +367,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     time_main_update();
     rb->sleep(HZ);
@@ -389,7 +389,7 @@ enum plugin_status plugin_start(const void* parameter)
                      (cpu_freq + 500000) / 1000000);
     log_text(str);
 #endif
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
     /* wait until user closes plugin */
     while (rb->button_get(true) != FPS_QUIT);

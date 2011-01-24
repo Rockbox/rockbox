@@ -1345,13 +1345,13 @@ static int rockblox_loop (void)
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
             /* Turn on backlight timeout (revert to settings) */
-            backlight_use_settings(); /* backlight control in lib/helper.c */
+            backlight_use_settings();
             rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
 
             /* Turn off backlight timeout */
-            backlight_force_on(); /* backlight control in lib/helper.c */
+            backlight_ignore_timeout();
 
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1527,7 +1527,7 @@ enum plugin_status plugin_start (const void *parameter)
     }
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
     load_game();
     resume_file = resume;
     while(!rockblox_loop()) {
@@ -1548,7 +1548,7 @@ enum plugin_status plugin_start (const void *parameter)
 #endif
     /* Save user's HighScore */
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
     return PLUGIN_OK;
 }

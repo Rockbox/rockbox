@@ -372,7 +372,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     /* Turn off backlight timeout */
-    backlight_force_on(); /* backlight control in lib/helper.c */
+    backlight_ignore_timeout();
 
     rb->show_logo();
 #ifdef HAVE_LCD_CHARCELLS
@@ -384,7 +384,7 @@ enum plugin_status plugin_start(const void* parameter)
         roll_credits();
       
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(); /* backlight control in lib/helper.c */
+    backlight_use_settings();
 
     return PLUGIN_OK;
 }
