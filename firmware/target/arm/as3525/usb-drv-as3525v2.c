@@ -276,8 +276,10 @@ static void reset_endpoints(void)
         endpoints[ep][DIR_IN].busy = false;
         endpoints[ep][DIR_IN].status = -1;
         if(endpoints[ep][DIR_IN].wait)
+        {
+            endpoints[ep][DIR_IN].wait = false;
             wakeup_signal(&endpoints[ep][DIR_IN].complete);
-        endpoints[ep][DIR_IN].wait = false;
+        }
         if(DIEPCTL(ep) & DEPCTL_epena)
             DIEPCTL(ep) = DEPCTL_snak;
         else
@@ -290,8 +292,10 @@ static void reset_endpoints(void)
         endpoints[ep][DIR_OUT].busy = false;
         endpoints[ep][DIR_OUT].status = -1;
         if(endpoints[ep][DIR_OUT].wait)
+        {
+            endpoints[ep][DIR_OUT].wait = false;
             wakeup_signal(&endpoints[ep][DIR_OUT].complete);
-        endpoints[ep][DIR_OUT].wait = false;
+        }
         if(DOEPCTL(ep) & DEPCTL_epena)
             DOEPCTL(ep) =  DEPCTL_snak;
         else
@@ -318,17 +322,23 @@ static void cancel_all_transfers(bool cancel_ep0)
     FOR_EACH_IN_EP_EX(cancel_ep0, i, ep)
     {
         endpoints[ep][DIR_IN].status = -1;
-        endpoints[ep][DIR_IN].wait = false;
         endpoints[ep][DIR_IN].busy = false;
-        wakeup_signal(&endpoints[ep][DIR_IN].complete);
+        if(endpoints[ep][DIR_IN].wait)
+        {
+            endpoints[ep][DIR_IN].wait = false;
+            wakeup_signal(&endpoints[ep][DIR_IN].complete);
+        }
         DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
     FOR_EACH_OUT_EP_EX(cancel_ep0, i, ep)
     {
         endpoints[ep][DIR_OUT].status = -1;
-        endpoints[ep][DIR_OUT].wait = false;
         endpoints[ep][DIR_OUT].busy = false;
-        wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+        if(endpoints[ep][DIR_OUT].wait)
+        {
+            endpoints[ep][DIR_OUT].wait = false;
+            wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+        }
         DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
 
@@ -482,7 +492,11 @@ static void handle_ep_in_int(int ep)
                 handle_ep0_complete(endpoint->len == 0);
             endpoint->len = size;
             usb_core_transfer_complete(ep, USB_DIR_IN, 0, transfered);
-            wakeup_signal(&endpoint->complete);
+            if(endpoint->wait)
+            {
+                endpoint->wait = false;
+                wakeup_signal(&endpoint->complete);
+            }
         }
     }
     if(sts & DIEPINT_timeout)
@@ -495,7 +509,11 @@ static void handle_ep_in_int(int ep)
             /* for safety, act as if no bytes as been transfered */
             endpoint->len = 0;
             usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
-            wakeup_signal(&endpoint->complete);
+            if(endpoint->wait)
+            {
+                endpoint->wait = false;
+                wakeup_signal(&endpoint->complete);
+            }
         }
     }
     /* clear interrupts */
@@ -525,7 +543,11 @@ static void handle_ep_out_int(int ep)
             if(ep == 0)
                 handle_ep0_complete(endpoint->len == 0);
             usb_core_transfer_complete(ep, USB_DIR_OUT, 0, transfered);
-            wakeup_signal(&endpoint->complete);
+            if(endpoint->wait)
+            {
+                endpoint->wait = false;
+                wakeup_signal(&endpoint->complete);
+            }
         }
     }
     if(sts & DOEPINT_setup)
