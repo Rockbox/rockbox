@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 
 import org.rockbox.R;
 import org.rockbox.RockboxActivity;
-import org.rockbox.RockboxWidgetProvider;
 
 import android.app.Notification;
 import android.app.NotificationManager;
