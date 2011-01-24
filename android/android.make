@@ -31,6 +31,7 @@ DX=$(ANDROID_PLATFORM)/tools/dx
 APKBUILDER=$(ANDROID_SDK_PATH)/tools/apkbuilder
 ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
+ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
 
 MANIFEST	:= $(ANDROID_DIR)/AndroidManifest.xml
 
@@ -69,7 +70,7 @@ $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class: $(R_JAVA)
 		-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin \
 		-sourcepath $(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
 
-$(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java
+$(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
 	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
 		-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin \
 		-sourcepath $(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
@@ -112,3 +113,7 @@ $(DIRS):
 dirs: $(DIRS)
 
 apk: $(APK)
+
+install: apk
+	$(ADB) install -r $(APK)
+

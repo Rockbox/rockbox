@@ -295,6 +295,7 @@ voice: voicetools $(BUILDDIR)/apps/features
 
 endif
 
+ifeq (,$(findstring android, $(APP_TYPE)))
 bininstall: $(BUILDDIR)/$(BINARY)
 	@echo "Installing your rockbox binary in your '$(RBPREFIX)' dir"
 	$(SILENT)cp $(BINARY) "$(RBPREFIX)/.rockbox/"
@@ -310,6 +311,7 @@ fullinstall:
 symlinkinstall:
 	@echo "Installing a full setup with links in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY) -l
+endif
 
 help:
 	@echo "A few helpful make targets"
