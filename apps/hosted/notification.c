@@ -32,7 +32,7 @@ extern jobject RockboxService_instance;
 
 static jmethodID updateNotification;
 static jobject NotificationManager_instance;
-static jstring headline, content, ticker;
+static jstring title, artist, album;
 
 #define NZV(a) (a && a[0])
 
@@ -45,37 +45,24 @@ static void track_changed_callback(void *param)
     if (id3)
     {
         /* passing NULL to DeleteLocalRef() is OK */
-        e->DeleteLocalRef(env_ptr, headline);
-        e->DeleteLocalRef(env_ptr, content);
-        e->DeleteLocalRef(env_ptr, ticker);
+        e->DeleteLocalRef(env_ptr, title);
+        e->DeleteLocalRef(env_ptr, artist);
+        e->DeleteLocalRef(env_ptr, album);
 
         char buf[200];
-        const char * title = id3->title;
-        if (!title)
+        const char * ptitle = id3->title;
+        if (!ptitle)
         {   /* pass the filename as title if id3 info isn't available */
-            title =
+            ptitle =
                 strip_extension(buf, sizeof(buf), strrchr(id3->path,'/') + 1);
         }
 
-        /* do text for the notification area in the scrolled-down statusbar */
-        headline = e->NewStringUTF(env_ptr, title);
+        title = e->NewStringUTF(env_ptr, ptitle);
+        artist = e->NewStringUTF(env_ptr, id3->artist ?: "");
+        album = e->NewStringUTF(env_ptr, id3->album ?: "");
 
-        /* add a \n so that android does split into two lines */
-        snprintf(buf, sizeof(buf), "%s\n%s", id3->artist ?: "", id3->album ?: "");
-        content = e->NewStringUTF(env_ptr, buf);
-
-        /* now do the text for the notification in the statusbar itself */
-        if (NZV(id3->artist))
-        {   /* title - artist */
-            snprintf(buf, sizeof(buf), "%s - %s", title, id3->artist);
-            ticker = e->NewStringUTF(env_ptr, buf);
-        }
-        else
-        {   /* title */
-            ticker = e->NewStringUTF(env_ptr, title);
-        }
         e->CallVoidMethod(env_ptr, NotificationManager_instance,
-                      updateNotification, headline, content, ticker);
+                      updateNotification, title, artist, album);
     }
 }
 
@@ -92,5 +79,6 @@ void notification_init(void)
                                          "(Ljava/lang/String;"
                                          "Ljava/lang/String;"
                                          "Ljava/lang/String;)V");
+
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
 }

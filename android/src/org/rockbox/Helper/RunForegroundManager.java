@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 import org.rockbox.R;
 import org.rockbox.RockboxActivity;
+import org.rockbox.RockboxWidgetProvider;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -82,12 +83,15 @@ public class RunForegroundManager
         api.stopForeground();
     }
 
-    public void updateNotification(String title, String content, String ticker)
+    public void updateNotification(String title, String artist, String album)
     {
         RemoteViews views = mNotification.contentView;
         views.setTextViewText(R.id.title, title);
-        views.setTextViewText(R.id.content, content);
-        mNotification.tickerText = ticker;
+        views.setTextViewText(R.id.content, artist+"\n"+album);
+        if (artist.equals(""))
+            mNotification.tickerText = title;
+        else
+            mNotification.tickerText = title+" - "+artist;
         mNM.notify(R.string.notification, mNotification);
     }
 
