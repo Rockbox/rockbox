@@ -37,6 +37,7 @@ enum orientation {
                                      color even if FOREGROUND */
     INNER_FILL_MASK   = 0x00c0,
 #endif
+    DONT_CLEAR_EXCESS = 0x0100,   /* Don't clear the entire bar area */
 };
 
 /*

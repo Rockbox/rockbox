@@ -234,6 +234,28 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
             y += img->bm.height / 2;
         }
     }
+    
+    if (pb->backdrop)
+    {
+        struct gui_img *img = pb->backdrop;
+#if LCD_DEPTH > 1
+        if(img->bm.format == FORMAT_MONO) {
+#endif
+            display->mono_bitmap_part(img->bm.data,
+                                      0, 0, img->bm.width,
+                                      x, y, width, height);
+#if LCD_DEPTH > 1
+        } else {
+            display->transparent_bitmap_part((fb_data *)img->bm.data,
+                                             0, 0,
+                                             STRIDE(display->screen_type,
+                                             img->bm.width, img->bm.height),
+                                             x, y, width, height);
+        }
+#endif
+        flags |= DONT_CLEAR_EXCESS;
+	}
+    
     if (!pb->nobar)
     {
         if (pb->image)

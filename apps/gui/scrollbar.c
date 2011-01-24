@@ -192,7 +192,8 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x,
     screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
     /* clear pixels in progress bar */
-    screen->fillrect(x, y, width, height);
+    if ((flags&DONT_CLEAR_EXCESS) == 0)
+        screen->fillrect(x, y, width, height);
 
     screen->set_drawmode(DRMODE_SOLID);
 

@@ -111,6 +111,7 @@ struct progressbar {
     bool nobar;
     struct gui_img *slider;
     bool horizontal;
+    struct gui_img *backdrop;
 };
 #endif
 

@@ -601,6 +601,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->nobar = false;
     pb->image = NULL;
     pb->slider = NULL;
+    pb->backdrop = NULL;
     pb->invert_fill_direction = false;
     pb->horizontal = true;
     
@@ -696,6 +697,18 @@ static int parse_progressbar_tag(struct skin_element* element,
             else /* option needs the next param */
                 return -1;
         }
+        else if (!strcmp(param->data.text, "backdrop"))
+        {
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                pb->backdrop = find_image(param->data.text, wps_data);
+                
+            }
+            else /* option needs the next param */
+                return -1;
+        }
         else if (!strcmp(param->data.text, "vertical"))
         {
             pb->horizontal = false;
@@ -735,8 +748,7 @@ static int parse_progressbar_tag(struct skin_element* element,
             add_to_ll_chain(&wps_data->images, item);
             pb->image = img;
         }
-    }
-        
+    }    
         
     if (token->type == SKIN_TOKEN_VOLUME)
         token->type = SKIN_TOKEN_VOLUMEBAR;
