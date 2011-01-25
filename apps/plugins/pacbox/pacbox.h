@@ -293,7 +293,13 @@
 #define YOFS ((LCD_HEIGHT-224/2)/2)
 #elif (LCD_WIDTH >= 128)
 #define XOFS ((LCD_WIDTH-224/2)/2)
+#if LCD_HEIGHT < 144
 #define YCLIP ((288-2*LCD_HEIGHT)/2)
+#define YOFS 0
+#else
+#define YCLIP 0
+#define YOFS ((LCD_HEIGHT-288/2)/2)
+#endif
 #endif
 
 /* How many video frames (out of a possible 60) we display each second.

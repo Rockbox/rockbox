@@ -106,11 +106,13 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             vbuf+=ScreenWidth;
         }
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
-        /* 0.5 scaling - display every other pixel = 112x144, crop to 112x128 */
+        /* 0.5 scaling - display every other pixel
+         * LCD_HEIGHT < 144: 112x144, crop to 112x128
+         * else center vertically without clipping */
         (void)next_dst;
-        dst=&lcd_framebuffer[XOFS];
+        dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
         
-        /* Skip first 16 lines */
+        /* Skip first YCLIP lines */
         vbuf+=ScreenWidth*YCLIP;
         
         /* Show regular screen */
