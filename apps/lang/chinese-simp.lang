@@ -19,6 +19,7 @@
 # - Xinlu Huang
 # - Harry Tu
 # - Jun Gu
+# - Purling Nayuki
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -27,10 +28,10 @@
     *: "Yes"
   </source>
   <dest>
-    *: "开启"
+    *: "√"
   </dest>
   <voice>
-    *: "开启"
+    *: "是"
   </voice>
 </phrase>
 <phrase>
@@ -41,10 +42,10 @@
     *: "No"
   </source>
   <dest>
-    *: "关闭"
+    *: "×"
   </dest>
   <voice>
-    *: "关闭"
+    *: "否"
   </voice>
 </phrase>
 <phrase>
@@ -97,10 +98,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "读取中,请稍后..."
+    *: "读取中,请稍候..."
   </dest>
   <voice>
-    *: "读取中 请稍后"
+    *: "读取中 请稍候"
   </voice>
 </phrase>
 <phrase>
@@ -113,7 +114,6 @@
   </source>
   <dest>
     *: none
-    ondavx*:"拨动电源开关关机"
     soft_shutdown: "按下OFF关机"
   </dest>
   <voice>
@@ -11261,11 +11261,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Release Time"
+    swcodec: "压限释放时间"
   </dest>
   <voice>
     *: none
-    swcodec: "Release Time"
+    swcodec: "压限释放时间"
   </voice>
 </phrase>
 <phrase>
@@ -11278,11 +11278,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Threshold"
+    swcodec: "阀值"
   </dest>
   <voice>
     *: none
-    swcodec: "Threshold"
+    swcodec: "阀值"
   </voice>
 </phrase>
 <phrase>
@@ -11295,11 +11295,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "增益"
   </dest>
   <voice>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "增益"
   </voice>
 </phrase>
 <phrase>
@@ -11380,11 +11380,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Knee"
+    swcodec: "柔和度"
   </dest>
   <voice>
     *: none
-    swcodec: "Knee"
+    swcodec: "柔和度"
   </voice>
 </phrase>
 <phrase>
@@ -11428,11 +11428,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Soft Knee"
+    swcodec: "柔和"
   </dest>
   <voice>
     *: none
-    swcodec: "Soft Knee"
+    swcodec: "柔和"
   </voice>
 </phrase>
 <phrase>
@@ -11459,11 +11459,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Ratio"
+    swcodec: "压限比例"
   </dest>
   <voice>
     *: none
-    swcodec: "Ratio"
+    swcodec: "压限比例"
   </voice>
 </phrase>
 <phrase>
@@ -11493,11 +11493,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "锐利"
   </dest>
   <voice>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "锐利"
   </voice>
 </phrase>
 <phrase>
@@ -11779,11 +11779,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Limit"
+    swcodec: "极限(Limit)"
   </dest>
   <voice>
     *: none
-    swcodec: "Limit"
+    swcodec: "极限 Limit"
   </voice>
 </phrase>
 <phrase>
@@ -11937,11 +11937,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Compressor"
+    swcodec: "压限器"
   </dest>
   <voice>
     *: none
-    swcodec: "Compressor"
+    swcodec: "压限器"
   </voice>
 </phrase>
 <phrase>
@@ -11999,11 +11999,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Speed"
+    swcodec: "速度"
   </dest>
   <voice>
     *: none
-    swcodec: "Speed"
+    swcodec: "速度"
   </voice>
 </phrase>
 <phrase>
@@ -12014,10 +12014,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Next Track:"
+    *: "下一曲目:"
   </dest>
   <voice>
-    *: "Next Track:"
+    *: "下一曲目是"
   </voice>
 </phrase>
 <phrase>
