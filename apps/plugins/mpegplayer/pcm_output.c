@@ -127,20 +127,21 @@ static void get_more(unsigned char **start, size_t *size)
             else if (offset < 100*CLOCK_RATE/1000)
             {
                 /* Frame less than 100ms early - play it */
-                *start = pcmbuf_head->data;
+                struct pcm_frame_header *head = pcmbuf_head;
 
                 pcm_advance_buffer(&pcmbuf_head, sz);
                 pcmbuf_curr_size = sz;
 
                 sz -= PCM_HDR_SIZE;
 
-                *size = sz;
-
                 /* Audio is time master - keep clock synchronized */
                 clock_time = time + (sz >> 2);
 
                 /* Update base clock */
                 clock_tick += sz >> 2;
+
+                *start = head->data;
+                *size = sz;
                 return;
             }
             /* Frame will be dropped - play silence clip */
@@ -157,11 +158,11 @@ static void get_more(unsigned char **start, size_t *size)
     }
 
     /* Keep clock going at all times */
+    clock_time += sizeof (silence) / 4;
+    clock_tick += sizeof (silence) / 4;
+
     *start = (unsigned char *)silence;
     *size = sizeof (silence);
-
-    clock_tick += sizeof (silence) / 4;
-    clock_time += sizeof (silence) / 4;
 
     if (sz < 0)
         pcmbuf_read = pcmbuf_written;
