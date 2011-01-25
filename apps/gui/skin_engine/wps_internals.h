@@ -306,7 +306,6 @@ struct wps_state
     int  ff_rewind_count;
     bool ff_rewind;
     bool paused;
-    bool wps_time_countup;
     bool is_fading;
 };
 

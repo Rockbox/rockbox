@@ -355,8 +355,8 @@ bool ffwd_rew(int button)
 
                 /* set the wps state ff_rewind_count so the progess info
                    displays corectly */
-                skin_get_global_state()->ff_rewind_count = (skin_get_global_state()->wps_time_countup == false)?
-                                            ff_rewind_count:-ff_rewind_count;
+                skin_get_global_state()->ff_rewind_count = ff_rewind_count;
+
                 FOR_NB_SCREENS(i)
                 {
                     skin_update(WPS, i,
