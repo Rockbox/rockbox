@@ -7636,7 +7636,7 @@
 <phrase>
   id: LANG_REC_SIZE
   desc: deprecated
-  user:
+  user: core
   <source>
     *: none
   </source>
@@ -12607,5 +12607,33 @@
   </dest>
   <voice>
     *: "Размер файла"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Да (необходима инициализированная база данных)"
+  </dest>
+  <voice>
+    *: "Да (необходима инициализированная база данных)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Автоматически продолжать воспроизведение"
+  </dest>
+  <voice>
+    *: "Автоматически продолжать воспроизведение"
   </voice>
 </phrase>
