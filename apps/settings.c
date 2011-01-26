@@ -888,7 +888,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_REMOTE_LCD        
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
-            snprintf(buf, sizeof buf, FONT_DIR "%s.fnt",
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.remote_font_file);
             CHART2(">font_load_remoteui ", global_settings.remote_font_file);
             rc = font_load_remoteui(buf);
