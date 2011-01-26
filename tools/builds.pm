@@ -63,7 +63,7 @@ $releasenotes="/wiki/ReleaseNotes371";
     },
     'gogearsa9200' => {
         name => 'Philips GoGear SA9200',
-        status => 1,
+        status => 2,
     },
     'iaudio7' => {
         name => 'iAudio 7',
