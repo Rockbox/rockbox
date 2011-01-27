@@ -160,8 +160,9 @@ int app_remove(const char *name)
     const char *fname = name;
     if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
     {
-        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
     }
+
     return remove(fname);
 }
 
@@ -171,7 +172,7 @@ int app_rename(const char *old, const char *new)
     const char *fname = old;
     if (!strncmp(ROCKBOX_DIR, old, ROCKBOX_DIR_LEN))
     {
-        fname = _get_user_file_path(old, 0, realpath, sizeof(realpath));
+        fname = _get_user_file_path(old, NEED_WRITE, realpath, sizeof(realpath));
     }
     return rename(fname, new);
 }
@@ -193,7 +194,7 @@ int app_mkdir(const char* name)
     const char *fname = name;
     if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
     {
-        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
     }
     return mkdir(fname);
 }
@@ -204,8 +205,7 @@ int app_rmdir(const char* name)
     const char *fname = name;
     if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
     {
-        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
+        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
     }
     return rmdir(fname);
 }
-
