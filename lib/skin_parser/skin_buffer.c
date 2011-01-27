@@ -46,6 +46,7 @@
 
 #ifdef ROCKBOX
 #include "config.h"
+#include "skin_debug.h"
 
 #ifdef APPLICATION
 #   define USE_HOST_MALLOC
