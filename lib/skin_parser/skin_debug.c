@@ -56,6 +56,8 @@ void skin_error(enum skin_errorcode error, const char* cursor)
     switch(error)
     {
     case MEMORY_LIMIT_EXCEEDED:
+        error_line_start = NULL;
+        printf("Error: Memory limit exceeded at Line %d\n", skin_line);
         error_message = "Memory limit exceeded";
         break;
     case NEWLINE_EXPECTED:

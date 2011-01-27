@@ -25,6 +25,7 @@
 #include <stdlib.h>
 
 #include "skin_buffer.h"
+#include "skin_parser.h"
 
 /****************************************************************************
  * 
@@ -103,7 +104,10 @@ void* skin_buffer_alloc(size_t size)
     /* 32-bit aligned */
     size = (size + 3) & ~3;
     if (size > skin_buffer_freespace())
+    {
+        skin_error(MEMORY_LIMIT_EXCEEDED, NULL);
         return NULL;
+    }
     retval = buffer_front;
     buffer_front += size;
 #elif defined(USE_HOST_MALLOC)
