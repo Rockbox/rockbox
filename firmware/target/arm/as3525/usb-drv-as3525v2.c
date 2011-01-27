@@ -485,7 +485,7 @@ static void handle_ep_in_int(int ep)
             /* works even for EP0 */
             int size = (DIEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
             int transfered = endpoint->len - size;
-            logf("len=%d reg=%ld xfer=%d", endpoint->len, size, transfered);
+            logf("len=%d reg=%d xfer=%d", endpoint->len, size, transfered);
             /* handle EP0 state if necessary,
              * this is a ack if length is 0 */
             if(ep == 0)
@@ -748,8 +748,8 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, blocking=%d", ep,
         len, dir_in, blocking);
 
-    /* mask the usb interrupt to avoid any race */
-    VIC_INT_EN_CLEAR = INTERRUPT_USB;
+    /* disable interrupts to avoid any race */
+    int oldlevel = disable_irq_save();
     
     volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
     volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
@@ -792,8 +792,8 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     DEPCTL |= DEPCTL_epena | DEPCTL_cnak;
 
-    /* unmask the usb interrupt */
-    VIC_INT_ENABLE = INTERRUPT_USB;
+    /* restore interrupts */
+    restore_irq(oldlevel);
 
     if(blocking)
     {
