@@ -4226,8 +4226,17 @@ static bool add_search_root(const char *name)
 #ifndef WIN32
     struct search_roots_ll *this, *prev = NULL;
     char target[MAX_PATH];
-    char _abs_target[MAX_PATH];
-    char * abs_target;
+    /* Okay, realpath() is almost completely broken on android
+     *
+     * It doesn't accept NULL for resolved_name to dynamically allocate
+     * the resulting path; and it assumes resolved_name to be PATH_MAX
+     * (actually MAXPATHLEN, but it's the same [as of 2.3]) long
+     * and blindly writes to the end if it
+     *
+     * therefore use sufficiently large static storage here
+     * Note that PATH_MAX != MAX_PATH
+     **/
+    static char abs_target[PATH_MAX];
     ssize_t len;
 
     len = readlink(name, target, sizeof(target));
@@ -4235,9 +4244,7 @@ static bool add_search_root(const char *name)
         return false;
 
     target[len] = '\0';
-    /* realpath(target, NULL) doesn't work on android ... */
-    abs_target = realpath(target, _abs_target);
-    if (abs_target == NULL)
+    if (realpath(target, abs_target) == NULL)
         return false;
 
     for(this = &roots_ll; this; prev = this, this = this->next)
@@ -4258,6 +4265,7 @@ static bool add_search_root(const char *name)
             logf("Error at adding a search root: %s", this ? "path too long":"OOM");
             free(this);
             prev->next = NULL;
+            return false;
         }
         this->path = ((char*)this) + sizeof(struct search_roots_ll);
         strcpy((char*)this->path, abs_target); /* ok to cast const away here */
@@ -4327,7 +4335,7 @@ static bool check_dir(const char *dirname, int add_files)
         struct dirinfo info = dir_get_info(dir, entry);
 
         yield();
-        
+
         len = strlen(curpath);
         /* don't add an extra / for curpath == / */
         if (len <= 1) len = 0;
