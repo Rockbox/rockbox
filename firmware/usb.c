@@ -481,14 +481,15 @@ static void usb_thread(void)
             if(usb_state == USB_EXTRACTED)
                 break;
 
-            usb_configure_drivers(USB_EXTRACTED);
-
             /* Only disable the USB slave mode if we really have enabled
                it. Some expected acks may not have been received. */
             if(usb_state == USB_INSERTED)
                 usb_slave_mode(false);
 
             usb_state = USB_EXTRACTED;
+
+            /* Ok to broadcast disconnect now */
+            usb_configure_drivers(USB_EXTRACTED);
             break;
             /* USB_UNPOWERED: USB_EXTRACTED: */
 
