@@ -643,8 +643,17 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     static bool wait_for_release = false;
 
     released = (button&BUTTON_REL) != 0;
-    if (released)
+
+    if (released && wait_for_release)
+    {   /* was waiting on a release, reset everything so the next call
+         * can start from new */
         wait_for_release = false;
+        last_position = 0;
+        if (scroll_mode == SCROLL_KINETIC)
+            kinetic_force_stop();
+        scroll_mode = SCROLL_NONE;
+        return ACTION_NONE;
+    }
 
     if (button == ACTION_NONE || button == ACTION_UNKNOWN)
     {
