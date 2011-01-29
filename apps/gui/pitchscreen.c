@@ -683,7 +683,6 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
         }
         else if (x > (2*column))
         {   /* right column */
-            debugf("%s(): %8x", __func__, ret);
             if (ret & BUTTON_REL)
             {
                 wait_for_release = false;
