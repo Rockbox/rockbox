@@ -29,6 +29,37 @@
 			</intent-filter>
 		</receiver>
 
+    <!-- Widgets -->
+    <receiver android:name=".widgets.RockboxWidgetProvider4x1"
+              android:label="@string/appwidget_label_4x1">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        <action android:name="org.rockbox.TrackUpdateInfo" />
+        <action android:name="org.rockbox.TrackFinish" />
+        <action android:name="org.rockbox.UpdateState" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+                 android:resource="@xml/appwidget_provider_4x1" />
+    </receiver>
+
+    <receiver android:name=".widgets.RockboxWidgetProvider2x2"
+              android:label="@string/appwidget_label_2x2">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        <action android:name="org.rockbox.TrackUpdateInfo" />
+        <action android:name="org.rockbox.TrackFinish" />
+        <action android:name="org.rockbox.UpdateState" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+                 android:resource="@xml/appwidget_provider_2x2" />
+    </receiver>
+
+    <!-- Widget configuration -->
+    <activity android:name=".widgets.RockboxWidgetConfigure">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+      </intent-filter>
+    </activity>
 	
 	</application>
 

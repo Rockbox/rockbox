@@ -30,7 +30,7 @@ extern JNIEnv *env_ptr;
 extern jclass RockboxService_class;
 extern jobject RockboxService_instance;
 
-static jmethodID updateNotification;
+static jmethodID updateNotification, finishNotification;
 static jobject NotificationManager_instance;
 static jstring title, artist, album;
 
@@ -66,6 +66,16 @@ static void track_changed_callback(void *param)
     }
 }
 
+/*
+ * notify about track finishing */
+static void track_finished_callback(void *param)
+{
+    (void)param;
+    JNIEnv e = *env_ptr;
+    e->CallVoidMethod(env_ptr, NotificationManager_instance,
+                      finishNotification);
+}
+
 void notification_init(void)
 {
     JNIEnv e = *env_ptr;
@@ -79,6 +89,9 @@ void notification_init(void)
                                          "(Ljava/lang/String;"
                                          "Ljava/lang/String;"
                                          "Ljava/lang/String;)V");
+    finishNotification = e->GetMethodID(env_ptr, class, "finishNotification",
+                                        "()V");
 
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, track_finished_callback);
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="horizontal"
+              android:gravity="center"
+              android:background="@drawable/appwidget_background">
+              <!-- style="@style/appwidget_background"-->
+
+  <Button android:id="@+id/infoDisplay"
+          style="@style/appwidget_infodisplay"
+          android:layout_height="fill_parent"
+          android:text="@string/appwidget_infoDisplay" />
+  <ImageButton android:id="@+id/prev"
+               style="@style/appwidget_button"
+               android:layout_height="fill_parent"
+               android:src="@drawable/appwidget_prev" />
+  <ImageButton android:id="@+id/stop"
+               style="@style/appwidget_button"
+               android:layout_height="fill_parent"
+               android:src="@drawable/appwidget_stop" />
+  <ImageButton android:id="@+id/playPause"
+               style="@style/appwidget_button"
+               android:layout_height="fill_parent"
+               android:src="@drawable/appwidget_play" />
+  <ImageButton android:id="@+id/next"
+               style="@style/appwidget_button"
+               android:layout_height="fill_parent"
+               android:src="@drawable/appwidget_next" />
+</LinearLayout>

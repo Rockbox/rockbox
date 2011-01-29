@@ -10,4 +10,18 @@
 <string name="No">No</string>
 <string name="error_extraction">Error occured during extraction!</string>
 <string name="rockbox_extracting">Rockbox is loading. Please wait...</string>
+
+<!-- Widget -->
+<string name="appwidget_label_4x1">Rockbox (line)</string>
+<string name="appwidget_label_2x2">Rockbox (square)</string>
+<string name="appwidget_infoDisplay">Touch to launch app</string>
+
+<!-- Widget configuration -->
+<string name="appwidget_configure_instructions">Please chose elements to display in widget.</string>
+<string name="appwidget_configure_prev">Prev Button</string>
+<string name="appwidget_configure_stop">Stop Button</string>
+<string name="appwidget_configure_playpause">Play/Pause Button</string>
+<string name="appwidget_configure_next">Next Button</string>
+<string name="appwidget_configure_confirm">Create Widget</string>
+
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+  <ImageView android:id="@+id/logo"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:scaleType="centerInside"
+             android:src="@drawable/rockbox" />
+
+  <TextView android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_instructions"/>
+
+  <CheckBox android:id="@+id/enable_prev"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_prev"/>
+  <CheckBox android:id="@+id/enable_stop"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_stop"/>
+  <CheckBox android:id="@+id/enable_playpause"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_playpause"/>
+  <CheckBox android:id="@+id/enable_next"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_next"/>
+
+  <Button android:id="@+id/confirm"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/appwidget_configure_confirm"/>
+</LinearLayout>
+

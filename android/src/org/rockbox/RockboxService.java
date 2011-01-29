@@ -43,6 +43,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Log;
+import android.view.KeyEvent;
 
 /* This class is used as the main glue between java and c.
  * All access should be done through RockboxService.get_instance() for safety.
@@ -76,7 +77,7 @@ public class RockboxService extends Service
     @Override
     public void onCreate()
     {
-   		instance = this;
+        instance = this;
     }
     
     public static RockboxService get_instance()
@@ -115,6 +116,31 @@ public class RockboxService extends Service
         if (!rbLibLoaded)
             startservice();
         
+        if (intent != null && intent.getAction() != null)
+        {
+            Log.d("RockboxService", intent.getAction());
+            if (intent.getAction().equals("org.rockbox.PlayPause"))
+            {
+                if (fb != null)
+                    fb.onKeyUp(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, null);
+            }
+            else if (intent.getAction().equals("org.rockbox.Prev"))
+            {
+                if (fb != null)
+                    fb.onKeyUp(KeyEvent.KEYCODE_MEDIA_PREVIOUS, null);
+            }
+            else if (intent.getAction().equals("org.rockbox.Next"))
+            {
+                if (fb != null)
+                    fb.onKeyUp(KeyEvent.KEYCODE_MEDIA_NEXT, null);
+            }
+            else if (intent.getAction().equals("org.rockbox.Stop"))
+            {
+                if (fb != null)
+                    fb.onKeyUp(KeyEvent.KEYCODE_MEDIA_STOP, null);
+            }
+        }
+
         /* Display a notification about us starting.  
          * We put an icon in the status bar. */
         if (fg_runner == null)

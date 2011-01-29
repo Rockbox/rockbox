@@ -11,6 +11,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -92,6 +93,19 @@ public class RunForegroundManager
         else
             mNotification.tickerText = title+" - "+artist;
         mNM.notify(R.string.notification, mNotification);
+
+        Intent widgetUpdate = new Intent("org.rockbox.TrackUpdateInfo");
+        widgetUpdate.putExtra("title", title);
+        widgetUpdate.putExtra("artist", artist);
+        widgetUpdate.putExtra("album", album);
+        mCurrentService.sendBroadcast(widgetUpdate);
+    }
+
+    public void finishNotification()
+    {
+        Log.d("Rockbox", "TrackFinish");
+        Intent widgetUpdate = new Intent("org.rockbox.TrackFinish");
+        mCurrentService.sendBroadcast(widgetUpdate);
     }
 
     private interface IRunForeground 

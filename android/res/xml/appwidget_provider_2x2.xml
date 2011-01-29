@@ -1,0 +1,8 @@
+<!-- cell size is (number of cells * 74) - 2 dp according to http://developer.android.com/guide/topics/appwidgets/index.html#MetaData -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+  android:minWidth="146dp"
+  android:minHeight="146dp"
+  android:updatePeriodMillis="86400000"
+  android:initialLayout="@layout/appwidget_2x2"
+  android:configure="org.rockbox.widgets.RockboxWidgetConfigure">
+</appwidget-provider>

@@ -23,9 +23,11 @@ package org.rockbox;
 
 import java.util.Arrays;
 
+import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -80,10 +82,16 @@ public class RockboxPCM extends AudioTrack
     private void play_pause(boolean pause) {
         if (pause)
         {
+            Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
+            widgetUpdate.putExtra("state", "pause");
+            RockboxService.get_instance().sendBroadcast(widgetUpdate);
             pause();
         }
         else
         {
+            Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
+            widgetUpdate.putExtra("state", "play");
+            RockboxService.get_instance().sendBroadcast(widgetUpdate);
             if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
             {
                 RockboxService.get_instance().startForeground();
@@ -114,6 +122,9 @@ public class RockboxPCM extends AudioTrack
             throw new IllegalStateException(e);
         }
         RockboxService.get_instance().stopForeground();
+        Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
+        widgetUpdate.putExtra("state", "stop");
+        RockboxService.get_instance().sendBroadcast(widgetUpdate);
     }
 
     @SuppressWarnings("unused")

@@ -147,5 +147,5 @@ public class RockboxFramebuffer extends View
     private native void post_update_done();
     private native void set_lcd_active(int active);
     private native void touchHandler(boolean down, int x, int y);
-    private native boolean buttonHandler(int keycode, boolean state);
+    private native static boolean buttonHandler(int keycode, boolean state);
 }

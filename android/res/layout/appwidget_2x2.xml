@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:gravity="center"
+              android:background="@drawable/appwidget_background">
+              <!-- style="@style/appwidget_background"-->
+
+  <ImageView android:id="@+id/logo"
+             android:layout_width="fill_parent"
+             android:layout_height="40dp"
+             android:scaleType="centerInside"
+             android:src="@drawable/rockbox" />
+  <Button android:id="@+id/infoDisplay"
+          style="@style/appwidget_infodisplay"
+          android:layout_width="fill_parent"
+          android:text="@string/appwidget_infoDisplay" />
+  <LinearLayout android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:gravity="center"
+                android:orientation="horizontal">
+    <ImageButton android:id="@+id/prev"
+                 style="@style/appwidget_button"
+                 android:layout_weight="1"
+                 android:src="@drawable/appwidget_prev" />
+    <ImageButton android:id="@+id/stop"
+                 style="@style/appwidget_button"
+                 android:layout_weight="1"
+                 android:src="@drawable/appwidget_stop" />
+    <ImageButton android:id="@+id/playPause"
+                 style="@style/appwidget_button"
+                 android:layout_weight="1"
+                 android:src="@drawable/appwidget_play" />
+    <ImageButton android:id="@+id/next"
+                 style="@style/appwidget_button"
+                 android:layout_weight="1"
+                 android:src="@drawable/appwidget_next" />
+  </LinearLayout>
+</LinearLayout>
