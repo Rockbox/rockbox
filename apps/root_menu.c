@@ -424,7 +424,8 @@ static const struct root_items items[] = {
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
     [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL },
-    [GO_TO_PLAYLISTS_SCREEN]     = { miscscrn, &playlist_options, NULL },
+    [GO_TO_PLAYLISTS_SCREEN]     = { miscscrn, &playlist_options,
+                                                        &playlist_settings },
     [GO_TO_PLAYLIST_VIEWER] = { playlist_view, NULL, NULL },
     [GO_TO_SYSTEM_SCREEN] = { miscscrn, &info_menu, &system_menu },
     
