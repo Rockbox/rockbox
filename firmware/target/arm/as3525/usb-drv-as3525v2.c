@@ -160,7 +160,7 @@ static void as3525v2_disconnect(void)
 {
     /* Disconnect */
     DCTL |= DCTL_sftdiscon;
-    usb_delay();
+    sleep(HZ/20);
     /* Disable clock */
     CGU_USB = 0;
     usb_delay();
