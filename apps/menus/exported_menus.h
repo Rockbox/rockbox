@@ -26,7 +26,6 @@
 #ifndef PLUGIN 
 
 extern const struct menu_item_ex 
-        main_menu_,                 /* main_menu.c      */
         display_menu,               /* display_menu.c   */
         playback_settings,          /* playback_menu.c  */
 #ifdef HAVE_RECORDING
@@ -38,12 +37,10 @@ extern const struct menu_item_ex
         sound_settings,             /* sound_menu.c     */
         settings_menu_item,         /* settings_menu.c  */
         playlist_settings,          /* playlist_menu.c  */
-        playlist_options,           /* playlist_menu.c  */
         equalizer_menu,             /* eq_menu.c        */
 #ifdef AUDIOHW_HAVE_EQ
         audiohw_eq_tone_controls,   /* audiohw_eq_menu.c */
 #endif
-        info_menu,                  /* info_menu.c      */
         theme_menu;                 /* theme_menu.c     */
 
 struct browse_folder_info {

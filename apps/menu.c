@@ -327,7 +327,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int selected = start_selected? *start_selected : 0;
     int action;
     struct gui_synclist lists;
-    const struct menu_item_ex *temp, *menu;
+    const struct menu_item_ex *temp, *menu = start_menu;
     int ret = 0, i;
     bool redraw_lists;
     int old_audio_status = audio_status();
@@ -347,9 +347,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #endif
 
     menu_callback_type menu_callback = NULL;
-    if (start_menu == NULL)
-        menu = &main_menu_;
-    else menu = start_menu;
 
     /* if hide_theme is true, assume parent has been fixed before passed into
      * this function, e.g. with viewport_set_defaults(parent, screen) */
