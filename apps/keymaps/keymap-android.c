@@ -47,7 +47,8 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,      BUTTON_BACK|BUTTON_REPEAT,        BUTTON_BACK },
     { ACTION_STD_CANCEL,      BUTTON_DPAD_LEFT|BUTTON_REL,      BUTTON_NONE },
 
-    { ACTION_STD_CONTEXT,     BUTTON_MENU,                    BUTTON_NONE },
+    { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REL,           BUTTON_MENU },
+    { ACTION_STD_CONTEXT,     BUTTON_MENU|BUTTON_REPEAT,        BUTTON_MENU },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
