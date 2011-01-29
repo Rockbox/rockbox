@@ -16,6 +16,9 @@ menus/menu_common.c
 menus/display_menu.c
 menus/theme_menu.c
 menus/plugin_menu.c
+#if CONFIG_TUNER
+menus/radio_menu.c
+#endif
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_WM8978
 menus/audiohw_eq_menu.c

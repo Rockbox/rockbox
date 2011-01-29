@@ -30,17 +30,20 @@ extern const struct menu_item_ex
         playback_settings,          /* playback_menu.c  */
 #ifdef HAVE_RECORDING
         recording_settings,         /* recording_menu.c */
+        recording_settings_menu,
 #ifdef HAVE_LCD_BITMAP
         peak_meter_menu,            /* also used from within recording_menu */
 #endif
 #endif
         sound_settings,             /* sound_menu.c     */
         settings_menu_item,         /* settings_menu.c  */
+        bookmark_settings_menu,
         playlist_settings,          /* playlist_menu.c  */
         equalizer_menu,             /* eq_menu.c        */
 #ifdef AUDIOHW_HAVE_EQ
         audiohw_eq_tone_controls,   /* audiohw_eq_menu.c */
 #endif
+        radio_settings_menu,        /* radio_menu.c     */
         theme_menu;                 /* theme_menu.c     */
 
 struct browse_folder_info {

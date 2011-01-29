@@ -363,9 +363,6 @@ extern struct menu_item_ex
 #endif
         main_menu_,
         manage_settings,
-        recording_settings_menu,
-        radio_settings_menu,
-        bookmark_settings_menu,
         plugin_menu,
         playlist_options,
         info_menu,
