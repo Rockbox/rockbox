@@ -31,8 +31,8 @@
 
 
 enum {
-    APPS,
     GAMES,
+    APPS,
     DEMOS,
 };
 
