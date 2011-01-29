@@ -210,10 +210,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "Selhalo"
+    *: "Operace selhala"
   </dest>
   <voice>
-    *: "Selhalo"
+    *: "Operace selhala"
   </voice>
 </phrase>
 <phrase>
@@ -4384,7 +4384,7 @@
     *: "Max.počet položek v prohlížeči souborů"
   </dest>
   <voice>
-    *: "Maximální počet poožek v prohlížeči souborů"
+    *: "Maximální počet položek v prohlížeči souborů"
   </voice>
 </phrase>
 <phrase>
@@ -4557,11 +4557,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Budík vypnutý"
+    alarm: "Budík vypnut"
   </dest>
   <voice>
     *: none
-    alarm: "Budík vypnutý"
+    alarm: "Budík vypnut"
   </voice>
 </phrase>
 <phrase>
@@ -5883,7 +5883,7 @@
 <phrase>
   id: LANG_REC_SIZE
   desc: deprecated
-  user:
+  user: core
   <source>
     *: none
   </source>
@@ -9693,7 +9693,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Aktualní čas:"
+    rtc: "Aktuální čas:"
   </voice>
 </phrase>
 <phrase>
@@ -12627,9 +12627,9 @@
     *: "Yes (requires initialized database)"
   </source>
   <dest>
-    *: "Ano (vyžaduje inicializaci databáze)"
+    *: "Ano (vyžaduje inicializovanou databázi)"
   </dest>
   <voice>
-    *: "Ano (vyžaduje inycializaci databáze)"
+    *: "Ano, vyžaduje inicializovanou databázi"
   </voice>
 </phrase>
