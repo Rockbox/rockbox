@@ -62,6 +62,7 @@
 #include <ctype.h>
 #ifdef APPLICATION
 #include <unistd.h> /* readlink() */
+#include <limits.h> /* PATH_MAX */
 #endif
 #include "config.h"
 #include "ata_idle_notify.h"
