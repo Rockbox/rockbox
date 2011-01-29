@@ -636,6 +636,7 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
     short x, y;
     struct viewport *this_vp = &vps[PITCH_TOP];
     int ret;
+    static bool wait_for_release = false;
     ret = action_get_touchscreen_press_in_vp(&x, &y, this_vp);
 
     /* top row */
@@ -651,7 +652,7 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
         {   /* center column pressed */
             if (ret == BUTTON_REPEAT)
                 return ACTION_PS_INC_BIG;
-            else if (ret == BUTTON_TOUCHSCREEN)
+            else if (ret & BUTTON_REL)
                 return ACTION_PS_INC_SMALL;
         }
         return ACTION_NONE;
@@ -668,21 +669,37 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
         if (x < column)
         {   /* left column */
             if (ret & BUTTON_REL)
+            {
+                wait_for_release = false;
                 return ACTION_PS_NUDGE_LEFTOFF;
+            }
             else if (ret & BUTTON_REPEAT)
                 return ACTION_PS_SLOWER;
-            return ACTION_PS_NUDGE_LEFT;
+            if (!wait_for_release)
+            {
+                wait_for_release = true;
+                return ACTION_PS_NUDGE_LEFT;
+            }
         }
         else if (x > (2*column))
         {   /* right column */
+            debugf("%s(): %8x", __func__, ret);
             if (ret & BUTTON_REL)
+            {
+                wait_for_release = false;
                 return ACTION_PS_NUDGE_LEFTOFF;
+            }
             else if (ret & BUTTON_REPEAT)
                 return ACTION_PS_FASTER;
-            return ACTION_PS_NUDGE_LEFT;
+            if (!wait_for_release)
+            {
+                wait_for_release = true;
+                return ACTION_PS_NUDGE_LEFT;
+            }
         }
-        /* center column was pressed */
-        return ACTION_PS_RESET;
+        else
+            /* center column was pressed */
+            return ACTION_PS_RESET;
     }
 
     /* now the bottom row */
@@ -698,9 +715,9 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
             return ACTION_PS_EXIT;
         else if (x >= column && x <= (2*column))
         {   /* center column was pressed */
-            if (ret == BUTTON_REPEAT)
+            if (ret & BUTTON_REPEAT)
                 return ACTION_PS_DEC_BIG;
-            else if (ret == BUTTON_TOUCHSCREEN)
+            else if (ret & BUTTON_REL)
                 return ACTION_PS_DEC_SMALL;
         }
         return ACTION_NONE;
