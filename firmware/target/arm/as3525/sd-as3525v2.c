@@ -334,9 +334,6 @@ static tCardInfo card_info[NUM_DRIVES];
 /* for compatibility */
 static long last_disk_activity = -1;
 
-#define MIN_YIELD_PERIOD 5  /* ticks */
-static long next_yield = 0;
-
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
@@ -470,10 +467,18 @@ static int sd_wait_for_tran_state(const int drive)
 {
     unsigned long response;
     unsigned int timeout = current_tick + 5*HZ;
+    int cmd_retry = 10;
 
     while (1)
     {
-        while(!(send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP, &response)));
+        while (!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca, MCI_RESP,
+                         &response) && cmd_retry > 0)
+        {
+            cmd_retry--;
+        }
+
+        if (cmd_retry <= 0)
+            return -1;
 
         if (((response >> 9) & 0xf) == SD_TRAN)
             return 0;
@@ -481,11 +486,7 @@ static int sd_wait_for_tran_state(const int drive)
         if(TIME_AFTER(current_tick, timeout))
             return -10 * ((response >> 9) & 0xf);
 
-        if (TIME_AFTER(current_tick, next_yield))
-        {
-            yield();
-            next_yield = current_tick + MIN_YIELD_PERIOD;
-        }
+        last_disk_activity = current_tick;
     }
 }
 
@@ -669,11 +670,13 @@ static void sd_thread(void)
              */
             if (microsd_init)
                 queue_broadcast(SYS_FS_CHANGED, 0);
+
+            sd_enable(false);
+
             /* Access is now safe */
             mutex_unlock(&sd_mtx);
             fat_unlock();
-            sd_enable(false);
-        }
+            }
             break;
 #endif
         case SYS_TIMEOUT:
@@ -681,16 +684,10 @@ static void sd_thread(void)
             {
                 idle_notified = false;
             }
-            else
+            else if (!idle_notified)
             {
-                /* never let a timer wrap confuse us */
-                next_yield = current_tick;
-
-                if (!idle_notified)
-                {
-                    call_storage_idle_notifys(false);
-                    idle_notified = true;
-                }
+                call_storage_idle_notifys(false);
+                idle_notified = true;
             }
             break;
 
@@ -825,7 +822,10 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
-
+    int const retry_all_max = 1;
+    int retry_all = 0;
+    int const retry_data_max = 100; /* Generous, methinks */
+    int retry_data;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
@@ -833,6 +833,21 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     led(true);
 #endif
 
+    if(count < 0) /* XXX: why is it signed ? */
+    {
+        ret = -18;
+        goto sd_transfer_error_no_dma;
+    }
+
+    /* skip SanDisk OF */
+    if (drive == INTERNAL_AS3525)
+        start += AMS_OF_SIZE;
+
+    /* no need for complete retry on main, just SD */
+    if (drive == SD_SLOT_AS3525)
+        retry_all = retry_all_max;
+
+sd_transfer_retry_with_reinit:
     if (card_info[drive].initialized <= 0)
     {
         ret = sd_init_card(drive);
@@ -840,20 +855,11 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             goto sd_transfer_error_no_dma;
     }
 
-    if(count < 0) /* XXX: why is it signed ? */
-    {
-        ret = -18;
-        goto sd_transfer_error_no_dma;
-    }
     if((start+count) > card_info[drive].numblocks)
     {
         ret = -19;
         goto sd_transfer_error_no_dma;
     }
-
-    /* skip SanDisk OF */
-    if (drive == INTERNAL_AS3525)
-        start += AMS_OF_SIZE;
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
@@ -862,7 +868,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         goto sd_transfer_error_no_dma;
     }
 
-    last_disk_activity = current_tick;
     dma_retain();
 
     if(aligned)
@@ -874,11 +879,14 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     }
 
     const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
+    retry_data = retry_data_max;
 
-    do
+    while (1)
     {
         void *dma_buf;
         unsigned int transfer = count;
+
+        last_disk_activity = current_tick;
 
         if(aligned)
         {
@@ -947,15 +955,21 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
             buf += transfer * SD_BLOCK_SIZE;
             start += transfer;
             count -= transfer;
+
+            if (count > 0)
+                continue;
         }
         else   /*  reset controller if we had an error  */
         {
             MCI_CTRL |= (FIFO_RESET|DMA_RESET);
             while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
                 ;
+            if (--retry_data >= 0)
+                continue;
         }
 
-    } while(retry || count);
+        break;
+    }
 
     dma_release();
 
@@ -967,22 +981,29 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         goto sd_transfer_error;
     }
 
+    while (1)
+    {
 #ifndef BOOTLOADER
-    sd_enable(false);
-    led(false);
+        sd_enable(false);
+        led(false);
 #endif
-    mutex_unlock(&sd_mtx);
-    return 0;
+        mutex_unlock(&sd_mtx);
+        return ret;
 
 sd_transfer_error:
-
-    dma_release();
+        dma_release();
 
 sd_transfer_error_no_dma:
+        card_info[drive].initialized = 0;
 
-    card_info[drive].initialized = 0;
-    mutex_unlock(&sd_mtx);
-    return ret;
+        /* .initialized might have been >= 0 but now stale if the ata sd thread
+         * isn't handling an insert because of USB */
+        if (--retry_all >= 0)
+        {
+            ret = 0;
+            goto sd_transfer_retry_with_reinit;
+        }
+    }
 }
 
 int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
