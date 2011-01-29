@@ -28,9 +28,10 @@
 #include "settings.h"
 #include "presets.h"
 #include "exported_menus.h"
-#include "recording.h"  /* recording_screen() */
 #include "sound_menu.h" /* recording_menu()   */
 
+#ifdef HAVE_RECORDING
+#include "recording.h"  /* recording_screen() */
 
 #if defined(HAVE_FMRADIO_REC) && CONFIG_CODEC == SWCODEC
 #define FM_RECORDING_SCREEN
@@ -75,6 +76,7 @@ static int fm_recording_settings(void)
 MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif /* defined(HAVE_FMRADIO_REC) || CONFIG_CODEC != SWCODEC */
+#endif /* HAVE_RECORDING */
 
 #ifndef FM_PRESET
 MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET),

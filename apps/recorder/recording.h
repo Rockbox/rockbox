@@ -20,6 +20,8 @@
  ****************************************************************************/
 #ifndef RECORDING_H
 #define RECORDING_H
+
+#include "config.h"
 #include "audio.h"
 
 bool in_recording_screen(void);
