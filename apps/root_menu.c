@@ -320,7 +320,8 @@ static int radio(void* param)
 static int miscscrn(void * param)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex*)param;
-    switch (do_menu(menu, NULL, NULL, false))
+    int result = do_menu(menu, NULL, NULL, false);
+    switch (result)
     {
         case GO_TO_PLAYLIST_VIEWER:
             return GO_TO_PLAYLIST_VIEWER;
@@ -350,44 +351,7 @@ static int load_bmarks(void* param)
         return GO_TO_WPS;
     return GO_TO_PREVIOUS;
 }
-static int plugins_menu(void* param)
-{
-    (void)param;
-    MENUITEM_STRINGLIST(plugins_menu_items, ID2P(LANG_PLUGINS), NULL,
-                        ID2P(LANG_PLUGIN_GAMES),
-                        ID2P(LANG_PLUGIN_APPS), ID2P(LANG_PLUGIN_DEMOS));
-    const char *folder;
-    struct browse_context browse;
-    char *title;
-    int retval = GO_TO_PREVIOUS;
-    int selection = 0, current = 0;
 
-    while (retval == GO_TO_PREVIOUS)
-    {
-        selection = do_menu(&plugins_menu_items, &current, NULL, false);
-        switch (selection)
-        {
-            case 0:
-                folder = PLUGIN_GAMES_DIR;
-                title = str(LANG_PLUGIN_GAMES);
-                break;
-            case 1:
-                folder = PLUGIN_APPS_DIR;
-                title = str(LANG_PLUGIN_APPS);
-                break;
-            case 2:
-                folder = PLUGIN_DEMOS_DIR;
-                title = str(LANG_PLUGIN_DEMOS);
-                break;
-            default:
-                return selection;
-        }
-        browse_context_init(&browse, SHOW_PLUGINS, 0,
-                            title, Icon_Plugin, folder, NULL);
-        retval = rockbox_browse(&browse);
-    }
-    return retval;
-}
 int time_screen(void* ignored);     
 
 /* These are all static const'd from apps/menus/ *.c
@@ -402,6 +366,7 @@ extern struct menu_item_ex
         recording_settings_menu,
         radio_settings_menu,
         bookmark_settings_menu,
+        plugin_menu,
         playlist_options,
         info_menu,
         system_menu;
@@ -423,8 +388,8 @@ static const struct root_items items[] = {
 #endif
     
     [GO_TO_RECENTBMARKS] =  { load_bmarks, NULL, &bookmark_settings_menu }, 
-    [GO_TO_BROWSEPLUGINS] = { plugins_menu, NULL, NULL },
-    [GO_TO_PLAYLISTS_SCREEN]     = { miscscrn, &playlist_options,
+    [GO_TO_BROWSEPLUGINS] = { miscscrn, &plugin_menu, NULL },
+    [GO_TO_PLAYLISTS_SCREEN] = { miscscrn, &playlist_options,
                                                         &playlist_settings },
     [GO_TO_PLAYLIST_VIEWER] = { playlist_view, NULL, NULL },
     [GO_TO_SYSTEM_SCREEN] = { miscscrn, &info_menu, &system_menu },
