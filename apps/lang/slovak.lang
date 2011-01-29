@@ -5879,7 +5879,7 @@
 <phrase>
   id: LANG_REC_SIZE
   desc: deprecated
-  user:
+  user: core
   <source>
     *: none
   </source>
@@ -12582,5 +12582,50 @@
   </dest>
   <voice>
     *: "Veľkosť Súboru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Áno (požaduje inicializovanú databázu)"
+  </dest>
+  <voice>
+    *: "Áno (požaduje inicializovanú databázu)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Sila Signálu:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Sila Signálu:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Aktivovať Automatické Obnovenie Prehrávania"
+  </dest>
+  <voice>
+    *: "Aktivovať Automatické Obnovenie Prehrávania"
   </voice>
 </phrase>
