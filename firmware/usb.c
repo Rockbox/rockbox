@@ -373,6 +373,9 @@ static void usb_thread(void) NORETURN_ATTR;
 #endif
 static void usb_thread(void)
 {
+#ifdef USB_DELAYED_INSERT
+    bool host_detected = false;
+#endif
     int num_acks_to_expect = 0;
     long last_broadcast_tick = current_tick;
     struct queue_event ev;
@@ -395,6 +398,11 @@ static void usb_thread(void)
 #ifdef USB_DELAYED_INSERT
             if(usb_state != USB_POWERED)
                 break;
+
+            if (host_detected)
+                break; /* Drivers configured but we're still USB_POWERED */
+
+            host_detected = true;
 #else /* !USB_DELAYED_INSERT */
             if(usb_state != USB_EXTRACTED)
                 break;
@@ -490,6 +498,9 @@ static void usb_thread(void)
 
             /* Ok to broadcast disconnect now */
             usb_configure_drivers(USB_EXTRACTED);
+#ifdef USB_DELAYED_INSERT
+            host_detected = false;
+#endif
             break;
             /* USB_UNPOWERED: USB_EXTRACTED: */
 
@@ -566,7 +577,7 @@ void usb_start_monitoring(void)
      * before or during boot. */
 #ifdef USB_DELAYED_INSERT
     /* Filter the status - USB_INSERTED may happen later */
-    status = (status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED;
+    status = (status == USB_EXTRACTED) ? USB_UNPOWERED : USB_POWERED;
 #endif
     usb_status_event(status);
 
@@ -749,7 +760,8 @@ bool usb_inserted(void)
 #ifdef HAVE_USBSTACK
 bool usb_exclusive_storage(void)
 {
-    return exclusive_storage_access;
+    /* Storage isn't actually exclusive until slave mode has been entered */
+    return exclusive_storage_access && usb_state == USB_INSERTED;
 }
 #endif /* HAVE_USBSTACK */
 
