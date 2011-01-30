@@ -7,9 +7,9 @@
 set -e
 
 # http://developer.android.com/sdk/index.html
-SDK_URL="http://dl.google.com/android/android-sdk_r07-linux_x86.tgz"
+SDK_URL="http://dl.google.com/android/android-sdk_r09-linux_x86.tgz"
 # http://developer.android.com/sdk/ndk/index.html
-NDK_URL="http://dl.google.com/android/ndk/android-ndk-r5-linux-x86.tar.bz2"
+NDK_URL="http://dl.google.com/android/ndk/android-ndk-r5b-linux-x86.tar.bz2"
 
 prefix="${INSTALL_PREFIX:-$HOME}"
 dldir="${DOWNLOAD_DIR:-/tmp}"
