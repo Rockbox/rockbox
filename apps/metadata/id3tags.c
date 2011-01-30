@@ -836,6 +836,12 @@ void setid3v2title(int fd, struct mp3entry *entry)
         if(framelen >= buffersize - bufferpos)
             framelen = buffersize - bufferpos - 1;
 
+        /* Limit the maximum length of an id3 data item to ID3V2_MAX_ITEM_SIZE
+           bytes. This reduces the chance that the available buffer is filled
+           by single metadata items like large comments. */
+        if (ID3V2_MAX_ITEM_SIZE < framelen)
+            framelen = ID3V2_MAX_ITEM_SIZE;
+
         logf("id3v2 frame: %.4s", header);
 
         /* Check for certain frame headers
