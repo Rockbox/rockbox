@@ -56,15 +56,15 @@ struct aiff_header aiff_header =
     0,                                  /* form_size         (*) */
     { 'A', 'I', 'F', 'F' },             /* aiff_id               */
     { 'C', 'O', 'M', 'M' },             /* comm_id               */
-    H_TO_BE32(18),                      /* comm_size             */
+    htobe32(18),                        /* comm_size             */
     0,                                  /* num_channels      (*) */
     0,                                  /* num_sample_frames (*) */
-    H_TO_BE16(PCM_DEPTH_BITS),          /* sample_size           */
+    htobe16(PCM_DEPTH_BITS),            /* sample_size           */
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   /* sample_rate       (*) */
     { 'S', 'S', 'N', 'D' },             /* ssnd_id               */
     0,                                  /* ssnd_size         (*) */
-    H_TO_BE32(0),                       /* offset                */
-    H_TO_BE32(0),                       /* block_size            */
+    htobe32(0),                         /* offset                */
+    htobe32(0),                         /* block_size            */
 };
 
 /* (*) updated when finalizing file */
@@ -96,7 +96,10 @@ STATICIRAM void uint32_h_to_ieee754_extended_be(uint8_t f[10], uint32_t l)
     f[1] = (uint8_t)exp;
     /* mantissa is value left justified with most significant non-zero
        bit stored in bit 63 - bits 0-63 */
-    *(uint32_t *)&f[2] = htobe32(l);
+    f[2] = (uint8_t)(l >> 24);
+    f[3] = (uint8_t)(l >> 16);
+    f[4] = (uint8_t)(l >>  8);
+    f[5] = (uint8_t)(l >>  0);
 } /* uint32_h_to_ieee754_extended_be */
 
 /* called version often - inline */

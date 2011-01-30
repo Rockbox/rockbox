@@ -60,7 +60,7 @@
 #define get_le32(gb) bswap_32(get_bits_long(gb, 32))
 
 /* converts fourcc string to int */
-static int ff_get_fourcc(const char *s){
+static unsigned int ff_get_fourcc(const char *s){
     //assert( strlen(s)==4 );
     return (s[0]) + (s[1]<<8) + (s[2]<<16) + (s[3]<<24);
 }

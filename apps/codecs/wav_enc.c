@@ -71,14 +71,14 @@ static const struct riff_header riff_header =
     /* format header */ 
     { 'W', 'A', 'V', 'E' },         /* format           */
     { 'f', 'm', 't', ' ' },         /* format_id        */
-    H_TO_LE32(16),                  /* format_size      */
+    htole32(16),                    /* format_size      */
     /* format data */
-    H_TO_LE16(1),                   /* audio_format     */
+    htole16(1),                     /* audio_format     */
     0,                              /* num_channels (*) */
     0,                              /* sample_rate  (*) */
     0,                              /* byte_rate    (*) */
     0,                              /* block_align  (*) */
-    H_TO_LE16(PCM_DEPTH_BITS),      /* bits_per_sample  */
+    htole16(PCM_DEPTH_BITS),        /* bits_per_sample  */
     /* data header */
     { 'd', 'a', 't', 'a' },         /* data_id          */
     0                               /* data_size    (*) */

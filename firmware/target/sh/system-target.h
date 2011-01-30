@@ -77,7 +77,7 @@ static inline void enable_irq(void)
 #define restore_irq(i) \
     ((void)set_irq_level(i))
 
-static inline uint16_t swap16(uint16_t value)
+static inline uint16_t swap16_hw(uint16_t value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
@@ -88,7 +88,7 @@ static inline uint16_t swap16(uint16_t value)
     return result;
 }
 
-static inline uint32_t SWAW32(uint32_t value)
+static inline uint32_t swaw32_hw(uint32_t value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
@@ -99,7 +99,7 @@ static inline uint32_t SWAW32(uint32_t value)
     return result;
 }
 
-static inline uint32_t swap32(uint32_t value)
+static inline uint32_t swap32_hw(uint32_t value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
@@ -113,7 +113,7 @@ static inline uint32_t swap32(uint32_t value)
     return value;
 }
 
-static inline uint32_t swap_odd_even32(uint32_t value)
+static inline uint32_t swap_odd_even32_hw(uint32_t value)
 {
     /*
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
