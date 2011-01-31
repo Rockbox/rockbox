@@ -30,31 +30,26 @@
 #define MPIO_STRING_OFFSET 0xfffe0 /* offset of the version string in OF */
 #define BOOTLOADER_MAX_SIZE 0x1f800 /* free space size */
 
-/* Descriptive name of these models */
-static const char* model_names[] = {
-    [MODEL_HD200] = "MPIO HD200",
-    [MODEL_HD300] = "MPIO HD300",
+struct mpio_model {
+    /* Descriptive name of this model */
+    const char* model_name;
+    /* Model name used in the Rockbox header in ".mpio" files - these match the
+       -add parameter to the "scramble" tool */
+    const char* rb_model_name;
+    /* Model number used to initialise the checksum in the Rockbox header in
+       ".mpio" files - these are the same as MODEL_NUMBER in config-target.h */
+    const int rb_model_num;
+    /* Strings which indentifies OF version */
+    const char* of_model_string;
 };
 
-/* Model names used in the Rockbox header in ".mpio" files - these match the
-   -add parameter to the "scramble" tool */
-static const char* rb_model_names[] = {
-    [MODEL_HD200] = "hd20",
-    [MODEL_HD300] = "hd30",
+static const struct mpio_model mpio_models[] = {
+    [MODEL_HD200] =
+        { "MPIO HD200", "hd20", 69, "HD200  HDD Audio Ver113005" },
+    [MODEL_HD300] =
+        { "MPIO HD300", "hd30", 70, "HD300  HDD Audio Ver113006" },
 };
 
-/* Model numbers used to initialise the checksum in the Rockbox header in
-   ".mpio" files - these are the same as MODEL_NUMBER in config-target.h */
-static const int rb_model_num[] = {
-    [MODEL_HD200] = 69,
-    [MODEL_HD300] = 70,
-};
-
-/* Strings which indentify OF version */
-static const char* of_model_string[] = {
-    [MODEL_HD200] = "HD200  HDD Audio Ver113005",
-    [MODEL_HD300] = "HD300  HDD Audio Ver113006",
-};
 
 /* MPIO HD200 and HD300 firmware is plain binary image
  * 4 bytes of initial SP (loaded on reset)
@@ -123,7 +118,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
      */
 
     for(model_index = 0; model_index < NUM_MODELS; model_index++)
-        if (strcmp(of_model_string[model_index],
+        if (strcmp(mpio_models[model_index].of_model_string,
             (char*)(image + MPIO_STRING_OFFSET)) == 0)
             break;
 
@@ -134,7 +129,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     }
 
     fprintf(stderr, "[INFO] Loading original firmware file for %s\n",
-            model_names[model_index]);
+            mpio_models[model_index].model_name);
 
     /* Now, read the boot loader into the image */
     f = fopen(bootfile, "rb");
@@ -178,11 +173,11 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     /* get bootloader header*/
     fread(header,1,8,f);
 
-    if ( memcmp(header + 4, rb_model_names[model_index], 4) != 0 )
+    if ( memcmp(header + 4, mpio_models[model_index].rb_model_name, 4) != 0 )
     {
         fprintf(stderr, "[ERR]  Original firmware and rockbox bootloader mismatch!\n");
         fprintf(stderr, "[ERR]  Double check that you have bootloader for %s\n",
-                model_names[model_index]);
+                mpio_models[model_index].model_name);
         return -7;
     }
 
@@ -202,7 +197,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     /* calculate checksum and compare with data
      * from header
      */
-    file_checksum = checksum(image + origin, rb_model_num[model_index], len);
+    file_checksum = checksum(image + origin, mpio_models[model_index].rb_model_num, len);
 
     if ( file_checksum != get_uint32be(header) )
     {
