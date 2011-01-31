@@ -45,6 +45,18 @@ typedef struct {
 
 typedef uint32_t fourcc_t;
 
+typedef struct 
+{
+    uint32_t first_chunk;
+    uint32_t num_samples;
+} sample_to_chunk_t;
+
+typedef struct 
+{
+    uint32_t sample_count;
+    uint32_t sample_duration;
+} time_to_sample_t;
+
 typedef struct
 {
     uint16_t num_channels;
@@ -53,19 +65,13 @@ typedef struct
     fourcc_t format;
     void *buf;
 
-    struct {
-        uint32_t first_chunk;
-        uint32_t num_samples;
-    } *sample_to_chunk;
+    sample_to_chunk_t *sample_to_chunk;
     uint32_t num_sample_to_chunks;
     
     uint32_t *chunk_offset;
     uint32_t num_chunk_offsets;
     
-    struct {
-        uint32_t sample_count;
-        uint32_t sample_duration;
-    } *time_to_sample;
+    time_to_sample_t *time_to_sample;
     uint32_t num_time_to_samples;
 
     uint16_t *sample_byte_size;
