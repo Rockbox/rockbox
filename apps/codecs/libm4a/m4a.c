@@ -368,7 +368,7 @@ unsigned int alac_seek_raw(demux_res_t* demux_res, stream_t* stream,
     /* Locate the chunk containing file_loc. */
 
     for (i = 0; i < demux_res->num_chunk_offsets && 
-        file_loc < demux_res->chunk_offset[i]; i++)
+        file_loc > demux_res->chunk_offset[i]; i++)
     {
     }
     
@@ -378,7 +378,7 @@ unsigned int alac_seek_raw(demux_res_t* demux_res, stream_t* stream,
     /* Get the first sample of the chunk. */
     
     for (i = 1; i < demux_res->num_sample_to_chunks &&
-        chunk < demux_res->sample_to_chunk[i - 1].first_chunk; i++) 
+        chunk > demux_res->sample_to_chunk[i - 1].first_chunk; i++) 
     {
         chunk_sample += demux_res->sample_to_chunk[i - 1].num_samples *
             (demux_res->sample_to_chunk[i].first_chunk - 
