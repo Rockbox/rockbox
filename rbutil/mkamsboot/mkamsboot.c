@@ -111,91 +111,19 @@ execution to the uncompressed firmware.
 #define O_BINARY 0
 #endif
 
-/* 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clip, 1 for clip+ */
-const unsigned short hw_revisions[] = {
-    [MODEL_FUZE]    = 1,
-    [MODEL_CLIP]    = 1,
-    [MODEL_CLIPV2]  = 2,
-    [MODEL_E200V2]  = 2,
-    [MODEL_M200V4]  = 4,
-    [MODEL_C200V2]  = 2,
-    [MODEL_CLIPPLUS]= 1,
-    [MODEL_FUZEV2]  = 2,
+/* fw_revision: version 2 is used in Clipv2, Clip+ and Fuzev2 firmwares */
+/* hw_revision: 4 for m200, 2 for e200/c200, 1 or 2 for fuze/clip, 1 for clip+ */
+const struct ams_models ams_identity[] = {
+    [MODEL_C200V2]  = { 2, 1, "c200",  dualboot_c200v2,   sizeof(dualboot_c200v2),   "c2v2", 44 },
+    [MODEL_CLIPPLUS]= { 1, 2, "Clip+", dualboot_clipplus, sizeof(dualboot_clipplus), "cli+", 66 },
+    [MODEL_CLIPV2]  = { 2, 2, "Clip",  dualboot_clipv2,   sizeof(dualboot_clipv2),   "clv2", 60 },
+    [MODEL_CLIP]    = { 1, 1, "Clip",  dualboot_clip,     sizeof(dualboot_clip),     "clip", 40 },
+    [MODEL_E200V2]  = { 2, 1, "e200",  dualboot_e200v2,   sizeof(dualboot_e200v2),   "e2v2", 41 },
+    [MODEL_FUZEV2]  = { 2, 2, "Fuze",  dualboot_fuzev2,   sizeof(dualboot_fuzev2),   "fuz2", 68 },
+    [MODEL_FUZE]    = { 1, 1, "Fuze",  dualboot_fuze,     sizeof(dualboot_fuze),     "fuze", 43 },
+    [MODEL_M200V4]  = { 4, 1, "m200",  dualboot_m200v4,   sizeof(dualboot_m200v4),   "m2v4", 42 },
 };
 
-/* version 2 is used in Clipv2, Clip+ and Fuzev2 firmwares */
-const unsigned short fw_revisions[] = {
-    [MODEL_FUZE]    = 1,
-    [MODEL_CLIP]    = 1,
-    [MODEL_CLIPV2]  = 2,
-    [MODEL_E200V2]  = 1,
-    [MODEL_M200V4]  = 1,
-    [MODEL_C200V2]  = 1,
-    [MODEL_CLIPPLUS]= 2,
-    [MODEL_FUZEV2]  = 2,
-};
-
-/* Descriptive name of these models */
-const char* model_names[] = {
-    [MODEL_FUZE]    = "Fuze",
-    [MODEL_CLIP]    = "Clip",
-    [MODEL_CLIPV2]  = "Clip",
-    [MODEL_CLIPPLUS]= "Clip+",
-    [MODEL_E200V2]  = "e200",
-    [MODEL_M200V4]  = "m200",
-    [MODEL_C200V2]  = "c200",
-    [MODEL_FUZEV2]  = "Fuze",
-};
-
-/* Dualboot functions for these models */
-static const unsigned char* bootloaders[] = {
-    [MODEL_FUZE]    = dualboot_fuze,
-    [MODEL_CLIP]    = dualboot_clip,
-    [MODEL_CLIPV2]  = dualboot_clipv2,
-    [MODEL_E200V2]  = dualboot_e200v2,
-    [MODEL_M200V4]  = dualboot_m200v4,
-    [MODEL_C200V2]  = dualboot_c200v2,
-    [MODEL_CLIPPLUS]= dualboot_clipplus,
-    [MODEL_FUZEV2]  = dualboot_fuzev2,
-};
-
-/* Size of dualboot functions for these models */
-const int bootloader_sizes[] = {
-    [MODEL_FUZE]    = sizeof(dualboot_fuze),
-    [MODEL_CLIP]    = sizeof(dualboot_clip),
-    [MODEL_CLIPV2]  = sizeof(dualboot_clipv2),
-    [MODEL_E200V2]  = sizeof(dualboot_e200v2),
-    [MODEL_M200V4]  = sizeof(dualboot_m200v4),
-    [MODEL_C200V2]  = sizeof(dualboot_c200v2),
-    [MODEL_CLIPPLUS]= sizeof(dualboot_clipplus),
-    [MODEL_FUZEV2]  = sizeof(dualboot_fuzev2),
-};
-
-/* Model names used in the Rockbox header in ".sansa" files - these match the
-   -add parameter to the "scramble" tool */
-static const char* rb_model_names[] = {
-    [MODEL_FUZE]    = "fuze",
-    [MODEL_CLIP]    = "clip",
-    [MODEL_CLIPV2]  = "clv2",
-    [MODEL_E200V2]  = "e2v2",
-    [MODEL_M200V4]  = "m2v4",
-    [MODEL_C200V2]  = "c2v2",
-    [MODEL_CLIPPLUS]= "cli+",
-    [MODEL_FUZEV2]  = "fuz2",
-};
-
-/* Model numbers used to initialise the checksum in the Rockbox header in
-   ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
-static const int rb_model_num[] = {
-    [MODEL_FUZE]    = 43,
-    [MODEL_CLIP]    = 40,
-    [MODEL_CLIPV2]  = 60,
-    [MODEL_E200V2]  = 41,
-    [MODEL_M200V4]  = 42,
-    [MODEL_C200V2]  = 44,
-    [MODEL_CLIPPLUS]= 66,
-    [MODEL_FUZEV2]  = 68,
-};
 
 /* Checksums of unmodified original firmwares - for safety, and device
    detection */
@@ -265,7 +193,7 @@ static unsigned int model_memory_size(int model)
 
 int firmware_revision(int model)
 {
-    return fw_revisions[model];
+    return ams_identity[model].fw_revision;
 }
 
 static off_t filesize(int fd)
@@ -403,8 +331,8 @@ unsigned char* load_of_file(
         *sum = sansasums[i];
         if(sum->model != model) {
             ERROR("[ERR]  OF File provided is %sv%d version %s, not for %sv%d\n",
-                model_names[sum->model], hw_revisions[sum->model],
-                sum->version, model_names[model], hw_revisions[model]
+                ams_identity[sum->model].model_name, ams_identity[sum->model].hw_revision,
+                sum->version, ams_identity[model].model_name, ams_identity[model].hw_revision
             );
         }
     } else {
@@ -425,7 +353,7 @@ unsigned char* load_of_file(
 
         ERROR("[ERR]  Original firmware unknown, please try an other version." \
               " Tested %sv%d versions are : %s\n",
-              model_names[model], hw_revisions[model], tested_versions);
+              ams_identity[model].model_name, ams_identity[model].hw_revision, tested_versions);
     }
 
     /* TODO: Do some more sanity checks on the OF image. Some images (like
@@ -435,13 +363,13 @@ unsigned char* load_of_file(
     if (checksum != 0xefbeadde && checksum != calc_checksum(buf, last_word))
         ERROR("%s", "[ERR]  Whole file checksum failed\n");
 
-    if (bootloaders[sum->model] == NULL)
-        ERROR("[ERR]  Unsupported model - \"%s\"\n", model_names[sum->model]);
+    if (ams_identity[sum->model].bootloader == NULL)
+        ERROR("[ERR]  Unsupported model - \"%s\"\n", ams_identity[sum->model].model_name);
 
     /* Get the firmware size */
-    if (fw_revisions[sum->model] == 1)
+    if (ams_identity[sum->model].fw_revision == 1)
         *firmware_size = get_uint32le(&buf[0x0c]);
-    else if (fw_revisions[sum->model] == 2)
+    else if (ams_identity[sum->model].fw_revision == 2)
         *firmware_size = get_uint32le(&buf[0x10]);
 
     /* Compress the original firmware image */
@@ -479,7 +407,7 @@ unsigned char* load_rockbox_file(
         ERROR("[ERR]  Could not read file %s\n", filename);
 
     for(*model = 0; *model < NUM_MODELS; (*model)++)
-        if (memcmp(rb_model_names[*model], header + 4, 4) == 0)
+        if (memcmp(ams_identity[*model].rb_model_name, header + 4, 4) == 0)
             break;
 
     if(*model == NUM_MODELS)
@@ -497,7 +425,7 @@ unsigned char* load_rockbox_file(
         ERROR("[ERR]  Could not read file %s\n", filename);
 
     /* Check checksum */
-    sum = rb_model_num[*model];
+    sum = ams_identity[*model].rb_model_num;
     for (i = 0; i < *bufsize; i++) {
          /* add 8 unsigned bits but keep a 32 bit sum */
          sum += buf[i];
@@ -536,7 +464,7 @@ void patch_firmware(
 
     /* Insert dual-boot bootloader at offset 0x200, we preserve the OF
      * version string located between 0x0 and 0x200 */
-    memcpy(buf + 0x600, bootloaders[model], bootloader_sizes[model]);
+    memcpy(buf + 0x600, ams_identity[model].bootloader, ams_identity[model].bootloader_size);
 
     /* Insert vectors, they won't overwrite the OF version string */
 
@@ -614,7 +542,7 @@ int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
 {
     /* XXX: we keep the first 0x200 bytes block unmodified, we just replace
      * the ARM vectors */
-    unsigned int packed_size = bootloader_sizes[model] + sizeof(nrv2e_d8) +
+    unsigned int packed_size = ams_identity[model].bootloader_size + sizeof(nrv2e_d8) +
             of_packed_size + rb_packed_size + 0x200;
 
     /* how much memory is available */

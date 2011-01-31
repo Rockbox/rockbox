@@ -104,7 +104,8 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] Original firmware MD5 checksum match\n");
     fprintf(stderr, "[INFO] Model: Sansa %s v%d - Firmware version: %s\n",
-            model_names[sum.model], hw_revisions[sum.model], sum.version);
+            ams_identity[sum.model].model_name,
+            ams_identity[sum.model].hw_revision, sum.version);
 
 
     printf("[INFO] Firmware patching has begun !\n\n");
@@ -118,7 +119,7 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] Packed bootloader size:    %8d bytes\n",
             rb_packedsize);
     fprintf(stderr, "[INFO] Dual-boot function size:   %8d bytes\n",
-            bootloader_sizes[sum.model]);
+            ams_identity[sum.model].bootloader_size);
     fprintf(stderr, "[INFO] UCL unpack function size:  %8u bytes\n",
             (unsigned int)sizeof(nrv2e_d8));
     fprintf(stderr, "[INFO] Original firmware version: %8u bytes\n",
@@ -137,8 +138,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    patch_firmware(sum.model, fw_revisions[sum.model], firmware_size, buf, len,
-            of_packed, of_packedsize, rb_packed, rb_packedsize);
+    patch_firmware(sum.model, ams_identity[sum.model].fw_revision,
+            firmware_size, buf, len, of_packed, of_packedsize, rb_packed,
+            rb_packedsize);
 
     /* Write the new firmware */
     fdout = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);

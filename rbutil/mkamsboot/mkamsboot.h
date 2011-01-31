@@ -56,10 +56,23 @@ struct md5sums {
     char *md5;
 };
 
-extern const unsigned short hw_revisions[];
-extern const unsigned short fw_revisions[];
-extern const char* model_names[];
-extern const int bootloader_sizes[];
+struct ams_models {
+    unsigned short hw_revision;
+    unsigned short fw_revision;
+    /* Descriptive name of this model */
+    const char* model_name;
+    /* Dualboot functions for this model */
+    const unsigned char* bootloader;
+    /* Size of dualboot functions for this model */
+    int bootloader_size;
+    /* Model name used in the Rockbox header in ".sansa" files - these match the
+       -add parameter to the "scramble" tool */
+    const char* rb_model_name;
+    /* Model number used to initialise the checksum in the Rockbox header in
+       ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
+    const int rb_model_num;
+};
+extern const struct ams_models ams_identity[];
 
 /* load_rockbox_file()
  *
