@@ -356,10 +356,11 @@ unsigned int alac_seek_raw(demux_res_t* demux_res, stream_t* stream,
     chunk = 0;
     while (chunk < demux_res->num_chunk_offsets)
     {
-        if (file_loc < demux_res->chunk_offset[chunk++])
+        if (file_loc < demux_res->chunk_offset[chunk])
         {
             break;
         }
+        ++chunk;
     }
     new_pos = demux_res->chunk_offset[chunk-1];
 
