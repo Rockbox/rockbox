@@ -686,14 +686,14 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
             if (ret & BUTTON_REL)
             {
                 wait_for_release = false;
-                return ACTION_PS_NUDGE_LEFTOFF;
+                return ACTION_PS_NUDGE_RIGHTOFF;
             }
             else if (ret & BUTTON_REPEAT)
                 return ACTION_PS_FASTER;
             if (!wait_for_release)
             {
                 wait_for_release = true;
-                return ACTION_PS_NUDGE_LEFT;
+                return ACTION_PS_NUDGE_RIGHT;
             }
         }
         else
