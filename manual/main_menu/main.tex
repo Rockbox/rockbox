@@ -199,14 +199,13 @@ pages of information.}
   \item[Time and Date:]
     Time related menu options. Pressing \ActionStdContext{} will voice the current time if voice support is enabled
     \begin{description}
-      \item [Set Time/Date: ] Set current time and date.
+      \item[Set Time/Date:] Set current time and date.
       \item[Sleep Timer:]
         The \setting{Sleep Timer} powers off your \dap{} after playing for a given
         time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
         The \setting{Sleep Timer} is reset on boot.
-      \item [Time Format: ] Choose 12 or 24 hour clock.
       \opt{alarm}{
-        \subsection{Wake-Up Alarm}
+        \item[Wake-Up Alarm:]
             This option will make the \dap{} start up at the specified time.
             Use \ActionSettingInc{} and \ActionSettingDec{} to adjust the minutes setting,
             \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to adjust the hours.
@@ -215,12 +214,13 @@ pages of information.}
             will be cancelled.
 
         \opt{recording,radio}{
-            \subsection{Alarm Wake up Screen}
+            \item[Alarm Wake Up Screen:]
             This option controls what the \dap{} does when it is woken up by the alarm.
-        }
-      }
+        }%\opt{recording,radio}
+      }%\opt{alarm}
+      \item [Time Format:] Choose 12 or 24 hour clock.
     \end{description}
-}
+}%\opt{rtc}
 \item[Rockbox Info:]
   Displays some basic system information. This is, from top to bottom,
   the amount of memory Rockbox has available for storing music (the buffer).
