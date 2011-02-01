@@ -362,7 +362,7 @@ unsigned int alac_seek_raw(demux_res_t* demux_res, stream_t* stream,
         }
         ++chunk;
     }
-    new_pos = demux_res->chunk_offset[chunk-1];
+    new_pos = demux_res->chunk_offset[chunk > 0 ? chunk - 1 : 0];
 
     /* Get the first sample of the chunk. */
     i = 1;
