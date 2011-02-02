@@ -61,6 +61,8 @@ RES		:= $(wildcard $(ANDROID_DIR)/res/*/*)
 
 CLEANOBJS += bin gen libs data
 
+JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin
+
 $(R_JAVA) $(AP_): $(MANIFEST) $(DIRS) $(RES)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m \
 		-J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res \
@@ -68,13 +70,13 @@ $(R_JAVA) $(AP_): $(MANIFEST) $(DIRS) $(RES)
 
 $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class: $(R_JAVA)
 	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
-		-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin \
-		-sourcepath $(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
+		$(JAVAC_OPTS) \
+		-sourcepath $(ANDROID_DIR)/gen $<
 
 $(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
 	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
-		-classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin \
-		-sourcepath $(ANDROID_DIR)/gen:$(ANDROID_DIR)/src $<
+		$(JAVAC_OPTS) \
+		-sourcepath $(ANDROID_DIR)/src $<
 
 $(DEX): $(R_OBJ) $(JAVA_OBJ)
 	$(call PRINTS,DX $(subst $(BUILDDIR)/,,$@))$(DX) --dex --output=$@ $(BUILDDIR)/bin
