@@ -44,7 +44,7 @@
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
 #if LCD_HEIGHT > 64
-#if MEM > 2
+#if MEMORYSIZE > 2
 #define MAX_FONT_SIZE   60000
 #else
 #define MAX_FONT_SIZE   10000

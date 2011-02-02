@@ -131,7 +131,7 @@ static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
 ****************************************************************************/
 
 /** buffer parameters where incoming PCM data is placed **/
-#if MEM <= 2
+#if MEMORYSIZE <= 2
 #define PCM_NUM_CHUNKS             16 /* Power of 2 */
 #else
 #define PCM_NUM_CHUNKS            256 /* Power of 2 */
@@ -180,13 +180,13 @@ static int            flood_watermark; /* boost thread priority when here  */
 #ifdef HAVE_PRIORITY_SCHEDULING
 #define PRIO_SECONDS   10       /* max flush time before priority boost    */
 #endif
-#if MEM <= 2
+#if MEMORYSIZE <= 2
 /* fractions must be integer fractions of 4 because they are evaluated with
  * X*4*XXX_SECONDS, that way we avoid float calculation */
 #define LOW_SECONDS     1/4     /* low watermark time till empty           */
 #define PANIC_SECONDS   1/2     /* flood watermark time until full         */
 #define FLUSH_SECONDS   1       /* flush watermark time until full         */
-#elif MEM <= 16
+#elif MEMORYSIZE <= 16
 #define LOW_SECONDS     1       /* low watermark time till empty           */
 #define PANIC_SECONDS   5       /* flood watermark time until full         */
 #define FLUSH_SECONDS   7       /* flush watermark time until full         */
@@ -194,7 +194,7 @@ static int            flood_watermark; /* boost thread priority when here  */
 #define LOW_SECONDS     1       /* low watermark time till empty           */
 #define PANIC_SECONDS   8
 #define FLUSH_SECONDS  10
-#endif /* MEM */
+#endif /* MEMORYSIZE */
 
 /** encoder events **/
 static void (*enc_events_callback)(enum enc_events event, void *data);

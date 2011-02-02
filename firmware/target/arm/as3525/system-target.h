@@ -42,7 +42,7 @@
 
 #define AS3525_UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
 #define AS3525_PHYSICAL_ADDR(a) \
-    ((typeof(a)) ((((uintptr_t)(a)) & (MEM*0x100000)) \
+    ((typeof(a)) ((((uintptr_t)(a)) & (MEMORYSIZE*0x100000)) \
         ? (((uintptr_t)(a)) - IRAM_ORIG) \
         : ((uintptr_t)(a))))
 

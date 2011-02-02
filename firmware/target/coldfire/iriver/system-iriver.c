@@ -49,7 +49,7 @@
  * 124185600   11   0x018ae025   59    29   0x1180  0x1580  0x2180     3      1       1
  */
 
-#if MEM < 32
+#if MEMORYSIZE < 32
 #define MAX_REFRESH_TIMER     59
 #define NORMAL_REFRESH_TIMER  21
 #define DEFAULT_REFRESH_TIMER 4

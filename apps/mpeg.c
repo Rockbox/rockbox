@@ -1623,7 +1623,7 @@ static void mpeg_thread(void)
 #if (CONFIG_STORAGE & STORAGE_MMC)
     /* MMC is slow, so don't read too large chunks */
                 amount_to_read = MIN(0x40000, amount_to_read);
-#elif MEM == 8
+#elif MEMORYSIZE == 8
                 amount_to_read = MIN(0x100000, amount_to_read);
 #endif
 
@@ -1933,7 +1933,7 @@ static void mpeg_thread(void)
 #if (CONFIG_STORAGE & STORAGE_MMC)
     /* MMC is slow, so don't save too large chunks at once */
                     amount_to_save = MIN(0x40000, amount_to_save);
-#elif MEM == 8
+#elif MEMORYSIZE == 8
                     amount_to_save = MIN(0x100000, amount_to_save);
 #endif
                     rc = write(mpeg_file, audiobuf + audiobuf_read,

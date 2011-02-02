@@ -28,7 +28,7 @@
 #define REG32_PTR_T volatile unsigned long *
 
 /* Place in the section with the framebuffer */
-#define TTB_BASE_ADDR (CSD0_BASE_ADDR + (MEM*0x100000) - TTB_SIZE)
+#define TTB_BASE_ADDR (CSD0_BASE_ADDR + (MEMORYSIZE*0x100000) - TTB_SIZE)
 #define TTB_SIZE      (0x4000)
 #define IRAM_SIZE     (0x4000)
 #define TTB_BASE      ((unsigned long *)TTB_BASE_ADDR)

@@ -21,7 +21,7 @@
  *
  ****************************************************************************/
 
-#if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
+#if defined(MAX_PHYS_SECTOR_SIZE) && MEMORYSIZE == 64
 /* Support a special workaround object for large-sector disks */
 #define IF_NO_SKIP_YIELD(...) __VA_ARGS__
 #endif

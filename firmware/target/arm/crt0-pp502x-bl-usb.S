@@ -47,7 +47,7 @@
     .equ    CACHE_ENAB,  0x1
     .equ    CACHE_OP_COMMIT_DISCARD, 0x1
     .equ    CACHE_OP_COMMIT        , 0x0
-#if MEM > 32
+#if MEMORYSIZE > 32
     .equ    MMAP_MASK,   0x00003c00
 #else
     .equ    MMAP_MASK,   0x00003e00

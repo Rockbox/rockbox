@@ -48,7 +48,7 @@ start:
     .equ    CACHE_CTRL,  0xcf004024
     .equ    MMAP_LOG,    0xf000f000 /* MMAP0 */
     .equ    MMAP_PHYS,   0xf000f004
-#if MEM > 32
+#if MEMORYSIZE > 32
     .equ    MMAP_MASK,   0x00003c00
 #else
     .equ    MMAP_MASK,   0x00003e00
@@ -69,7 +69,7 @@ start:
     .equ    CACHE_CTRL,  0x6000c000
     .equ    MMAP_LOG,    0xf000f000 /* MMAP0 */
     .equ    MMAP_PHYS,   0xf000f004
-#if MEM > 32
+#if MEMORYSIZE > 32
     .equ    MMAP_MASK,   0x00003c00
 #else
     .equ    MMAP_MASK,   0x00003e00

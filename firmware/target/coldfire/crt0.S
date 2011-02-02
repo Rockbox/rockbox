@@ -138,7 +138,7 @@ start:
 
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
-#if MEM < 32
+#if MEMORYSIZE < 32
     move.w  #0x8004,%d0 /* DCR - Synchronous, 80 cycle refresh */
 #else
     move.w  #0x8001,%d0 /* DCR - Synchronous, 32 cycle refresh */
@@ -153,7 +153,7 @@ start:
        In our case this means that we set the base address 16M ahead and
        use a 64M mask.
     */
-#if MEM < 32
+#if MEMORYSIZE < 32
     move.l  #0x31002324,%d0 /* DACR0 - Base 0x31000000, Banks on 21 and up,
                                CAS latency 2, Page mode, No refresh yet */
     move.l  %d0,(0x108,%a0)

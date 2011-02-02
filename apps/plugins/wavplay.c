@@ -3600,7 +3600,7 @@ int play_file(char* filename)
                 wanted = MIN(free_space, aud_size - aud_write);
 #if (CONFIG_STORAGE & STORAGE_MMC)
                 wanted = MIN(wanted, 256*1024);
-#elif MEM == 8
+#elif MEMORYSIZE == 8
                 wanted = MIN(wanted, 1024*1024);
 #endif
                 if (available() < low_water)

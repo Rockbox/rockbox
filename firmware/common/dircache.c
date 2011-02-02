@@ -51,7 +51,7 @@
 #define DIRCACHE_BUILD 1
 #define DIRCACHE_STOP  2
 
-#if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8)
+#if (MEMORYSIZE > 8)
 #define MAX_OPEN_DIRS 12
 #else
 #define MAX_OPEN_DIRS 8

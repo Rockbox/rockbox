@@ -24,7 +24,7 @@
 #include "logf.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-unsigned char audiobuffer[(MEM*1024-256)*1024];
+unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
 unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 #else
 /* defined in linker script */

@@ -109,7 +109,7 @@ start_loc:
     mov    r0, #0x20000000    /* Otherwise, load address is the start of DRAM */
 #endif
     mov    r1, #0x20000000    /* Destination: 1MB from end of DRAM */
-    add    r1, r1, #((MEM - 1) * 0x100000)
+    add    r1, r1, #((MEMORYSIZE - 1) * 0x100000)
 
     ldr    r2, =_dataend
 1:

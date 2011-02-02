@@ -112,7 +112,7 @@ struct queue_entry /* one entry of the internal queue */
 /* The MMC storage on the Ondios is slow enough that we want to buffer the
  * talk clips only when they are needed */
 #   define TALK_PROGRESSIVE_LOAD
-#elif CONFIG_CODEC == SWCODEC && MEM <= 2
+#elif CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2
 /* The entire voice file wouldn't fit in memory together with codecs, so we
  * load clips each time they are accessed */
 #   define TALK_PARTIAL_LOAD

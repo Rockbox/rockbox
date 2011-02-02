@@ -119,7 +119,7 @@ static volatile size_t buf_ridx;  /* current reading position */
 
 /* Configuration */
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
-#if MEM > 8
+#if MEMORYSIZE > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer */
 #endif
 
@@ -1509,7 +1509,7 @@ void buffering_thread(void)
 #if 0
         /* TODO: This needs to be fixed to use the idle callback, disable it
          * for simplicity until its done right */
-#if MEM > 8
+#if MEMORYSIZE > 8
         /* If the disk is spinning, take advantage by filling the buffer */
         else if (storage_disk_is_active() && queue_empty(&buffering_queue))
         {
@@ -1589,7 +1589,7 @@ bool buffering_reset(char *buf, size_t buflen)
     base_handle_id = -1;
 
     /* Set the high watermark as 75% full...or 25% empty :) */
-#if MEM > 8
+#if MEMORYSIZE > 8
     high_watermark = 3*buflen / 4;
 #endif
 

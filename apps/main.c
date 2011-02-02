@@ -430,7 +430,7 @@ static void init(void)
     system_init();
 #if defined(IPOD_VIDEO)
     audiobufend=(unsigned char *)audiobufend_lds;
-    if(MEM==64 && probed_ramsize!=64)
+    if(MEMORYSIZE==64 && probed_ramsize!=64)
     {
         audiobufend -= (32<<20);
     }

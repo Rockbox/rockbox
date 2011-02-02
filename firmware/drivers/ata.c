@@ -79,7 +79,7 @@
 static unsigned int ata_thread_id = 0;
 #endif
 
-#if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
+#if defined(MAX_PHYS_SECTOR_SIZE) && MEMORYSIZE == 64
 /* Hack - what's the deal with 5g? */
 struct ata_lock
 {

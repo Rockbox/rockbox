@@ -760,7 +760,7 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4), topruntime, 0),
     INT_SETTING(F_BANFROMQS, max_files_in_playlist, 
                 LANG_MAX_FILES_IN_PLAYLIST,
-#if MEM > 1
+#if MEMORYSIZE > 1
                   10000,
 #else
                   400,
@@ -768,7 +768,7 @@ const struct settings_list settings[] = {
                   "max files in playlist", UNIT_INT, 1000, 32000, 1000,
                   NULL, NULL, NULL),
     INT_SETTING(F_BANFROMQS, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
-#if MEM > 1
+#if MEMORYSIZE > 1
                   1000,
 #else
                   200,

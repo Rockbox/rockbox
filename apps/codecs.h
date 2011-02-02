@@ -27,10 +27,6 @@
 #define NO_REDEFINES_PLEASE
 #endif
 
-#ifndef MEM
-#define MEM 2
-#endif
-
 #include <stdbool.h>
 #include <stdlib.h>
 #include "strlcpy.h"

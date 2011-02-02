@@ -121,7 +121,7 @@ void mmu_init(void)
     local_flush_tlb_all();
 /*
     map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);
-    map_address(0x80004000, 0x80004000, MEM * 0x100000, K_CacheAttrC);
+    map_address(0x80004000, 0x80004000, MEMORYSIZE * 0x100000, K_CacheAttrC);
 */
 }
 
