@@ -798,7 +798,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                 gui_list->selected_item = list_start_item+line;
                 gui_synclist_speak_item(gui_list);
                 if (last_position == 0)
+                {
+                    redraw = true;
                     last_position = actual_y;
+                }
                 else
                 {
                     /* record speed data in case we do kinetic scrolling */
