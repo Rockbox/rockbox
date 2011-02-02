@@ -64,7 +64,7 @@ CLEANOBJS += bin gen libs data
 
 JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin
 
-$(R_JAVA) $(AP_): $(MANIFEST) $(DIRS) $(RES)
+$(R_JAVA) $(AP_): $(MANIFEST) $(RES) | $(DIRS)
 	$(call PRINTS,AAPT $(subst $(BUILDDIR)/,,$@))$(AAPT) package -f -m \
 		-J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res \
 		-I $(ANDROID_PLATFORM)/android.jar -F $(AP_)
@@ -104,7 +104,7 @@ $(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 
 libs: $(LIBS)
 
-$(TEMP_APK): $(AP_) $(DIRS) $(LIBS) $(DEX)
+$(TEMP_APK): $(AP_) $(LIBS) $(DEX) | $(DIRS)
 	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
 	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
 
